@@ -54,6 +54,10 @@ export async function* serveWithVite(
     builderName,
   )) as json.JsonObject & BrowserBuilderOptions;
 
+  if (serverOptions.servePath === undefined && browserOptions.baseHref !== undefined) {
+    serverOptions.servePath = browserOptions.baseHref;
+  }
+
   let server: ViteDevServer | undefined;
   let listeningAddress: AddressInfo | undefined;
   const generatedFiles = new Map<string, OutputFileRecord>();
@@ -191,6 +195,7 @@ export async function setupServer(
     css: {
       devSourcemap: true,
     },
+    base: serverOptions.servePath,
     server: {
       port: serverOptions.port,
       strictPort: true,
@@ -247,10 +252,17 @@ export async function setupServer(
             // Parse the incoming request.
             // The base of the URL is unused but required to parse the URL.
             const parsedUrl = new URL(req.url, 'http://localhost');
-            const extension = path.extname(parsedUrl.pathname);
+            let pathname = parsedUrl.pathname;
+            if (serverOptions.servePath && pathname.startsWith(serverOptions.servePath)) {
+              pathname = pathname.slice(serverOptions.servePath.length);
+              if (pathname[0] !== '/') {
+                pathname = '/' + pathname;
+              }
+            }
+            const extension = path.extname(pathname);
 
             // Rewrite all build assets to a vite raw fs URL
-            const assetSourcePath = assets.get(parsedUrl.pathname);
+            const assetSourcePath = assets.get(pathname);
             if (assetSourcePath !== undefined) {
               req.url = `/@fs/${assetSourcePath}`;
               next();
@@ -262,7 +274,7 @@ export async function setupServer(
             // Global stylesheets (CSS files) are currently considered resources to workaround
             // dev server sourcemap issues with stylesheets.
             if (extension !== '.html') {
-              const outputFile = outputFiles.get(parsedUrl.pathname);
+              const outputFile = outputFiles.get(pathname);
               if (outputFile) {
                 const mimeType = lookupMimeType(extension);
                 if (mimeType) {
