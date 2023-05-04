@@ -462,6 +462,16 @@ function getFeatureSupport(target: string[]): BuildOptions['supported'] {
     // will be used instead which provides a workaround for the performance issue.
     // For more details: https://bugs.chromium.org/p/v8/issues/detail?id=11536
     'object-rest-spread': false,
+    // esbuild currently has a defect involving self-referencing a class within a static code block or
+    // static field initializer. This is not an issue for projects that use the default browserslist as these
+    // elements are an ES2022 feature which is not support by all browsers in the default list. However, if a
+    // custom browserslist is used that only has newer browsers than the static code elements may be present.
+    // This issue is compounded by the default usage of the tsconfig `"useDefineForClassFields": false` option
+    // present in generated CLI projects which causes static code blocks to be used instead of static fields.
+    // esbuild currently unconditionally downlevels all static fields in top-level classes so to workaround the
+    // Angular issue only static code blocks are disabled here.
+    // For more details: https://github.com/evanw/esbuild/issues/2950
+    'class-static-blocks': false,
   };
 
   // Detect Safari browser versions that have a class field behavior bug
