@@ -399,7 +399,7 @@
           "required": ["input"]
         },
         {
-          "const": "false",
+          "const": false,
           "description": "Does not generate an `index.html` file."
         }
       ]
