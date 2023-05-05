@@ -125,7 +125,6 @@
 
 "@angular/build-tooling@https://github.com/angular/dev-infra-private-build-tooling-builds.git#988781b092b543a21af7996f26cda23b43b70226":
   version "0.0.0-e82631b66d14e57672e21ca7d021b8425214771e"
-  uid "988781b092b543a21af7996f26cda23b43b70226"
   resolved "https://github.com/angular/dev-infra-private-build-tooling-builds.git#988781b092b543a21af7996f26cda23b43b70226"
   dependencies:
     "@angular-devkit/build-angular" "16.0.0-rc.4"
@@ -286,7 +285,6 @@
 
 "@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#01d77bf81a01d438b86026aacb9abeee03f53f65":
   version "0.0.0-e82631b66d14e57672e21ca7d021b8425214771e"
-  uid "01d77bf81a01d438b86026aacb9abeee03f53f65"
   resolved "https://github.com/angular/dev-infra-private-ng-dev-builds.git#01d77bf81a01d438b86026aacb9abeee03f53f65"
   dependencies:
     "@yarnpkg/lockfile" "^1.1.0"
@@ -3366,6 +3364,11 @@
   integrity sha512-f2SeAxumolBmhuR62vNGTsSAvdz/Oj0k682xNrcKJ4dmRnTPODB74j6CPoNPzBPTHsu7Y7W7u93Mgp8Ovo8vWw==
   dependencies:
     parse5 "*"
+
+"@types/picomatch@^2.3.0":
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/@types/picomatch/-/picomatch-2.3.0.tgz#75db5e75a713c5a83d5b76780c3da84a82806003"
+  integrity sha512-O397rnSS9iQI4OirieAtsDqvCj4+3eY1J+EPdNTKuHuRWIfUoGyzX294o8C4KJYaLqgSrd2o60c5EqCU8Zv02g==
 
 "@types/pidusage@^2.0.1":
   version "2.0.2"
@@ -9378,7 +9381,7 @@ picocolors@^1.0.0:
   resolved "https://registry.yarnpkg.com/picocolors/-/picocolors-1.0.0.tgz#cb5bdc74ff3f51892236eaf79d68bc44564ab81c"
   integrity sha512-1fygroTLlHu66zi26VoTDv8yRgm0Fccecssto+MhsZ0D/DGW2sm8E8AjW7NU5VVTRt5GxbeZ5qBuJr+HyLYkjQ==
 
-picomatch@^2.0.4, picomatch@^2.2.1, picomatch@^2.3.1:
+picomatch@2.3.1, picomatch@^2.0.4, picomatch@^2.2.1, picomatch@^2.3.1:
   version "2.3.1"
   resolved "https://registry.yarnpkg.com/picomatch/-/picomatch-2.3.1.tgz#3ba3833733646d9d3e4995946c1365a67fb07a42"
   integrity sha512-JU3teHTNjmE2VCGFzuY8EXzCDVwEqB2a8fsIvwaStHhAWJEeVd1o1QD80CU6+ZdEXXSLbSsuLwJjkCBWqRQUVA==
@@ -10308,7 +10311,6 @@ sass@^1.55.0:
 
 "sauce-connect-proxy@https://saucelabs.com/downloads/sc-4.8.1-linux.tar.gz":
   version "0.0.0"
-  uid "9c16682e4c9716734432789884f868212f95f563"
   resolved "https://saucelabs.com/downloads/sc-4.8.1-linux.tar.gz#9c16682e4c9716734432789884f868212f95f563"
 
 saucelabs@^1.5.0:
