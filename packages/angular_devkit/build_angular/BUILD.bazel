@@ -136,6 +136,7 @@ ts_library(
         "@npm//@types/less",
         "@npm//@types/loader-utils",
         "@npm//@types/node",
+        "@npm//@types/picomatch",
         "@npm//@types/semver",
         "@npm//@types/text-table",
         "@npm//@vitejs/plugin-basic-ssl",
