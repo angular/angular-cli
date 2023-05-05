@@ -67,12 +67,14 @@
     "inlineStyle": {
       "description": "Include styles inline in the component TS file. By default, an external styles file is created and referenced in the component TypeScript file.",
       "type": "boolean",
+      "default": false,
       "alias": "s",
       "x-user-analytics": "ep.ng_inline_style"
     },
     "inlineTemplate": {
       "description": "Include template inline in the component TS file. By default, an external template file is created and referenced in the component TypeScript file.",
       "type": "boolean",
+      "default": false,
       "alias": "t",
       "x-user-analytics": "ep.ng_inline_template"
     },
@@ -92,6 +94,7 @@
     "routing": {
       "type": "boolean",
       "description": "Generate a routing module for the initial project.",
+      "default": false,
       "x-user-analytics": "ep.ng_routing"
     },
     "prefix": {
