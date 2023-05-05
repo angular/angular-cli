@@ -6,10 +6,12 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import { hasMagic as isDynamicPattern } from 'glob';
 import { existsSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import { extname, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
+import { parse as parseGlob } from 'picomatch';
 import { assertIsError } from '../../utils/error';
 import { loadEsmModule } from '../../utils/load-esm';
 
@@ -66,6 +68,21 @@ export async function loadProxyConfiguration(root: string, proxyConfig: string |
 
         throw e;
       }
+  }
+}
+
+/**
+ * Converts glob patterns to regular expressions to support Vite's proxy option.
+ * @param proxy A proxy configuration object.
+ */
+export function normalizeProxyConfiguration(proxy: Record<string, unknown>) {
+  // TODO: Consider upstreaming glob support
+  for (const key of Object.keys(proxy)) {
+    if (isDynamicPattern(key)) {
+      const { output } = parseGlob(key);
+      proxy[`^${output}$`] = proxy[key];
+      delete proxy[key];
+    }
   }
 }
 
