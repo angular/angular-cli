@@ -13,7 +13,7 @@ import * as https from 'https';
 import { from, throwError, timer } from 'rxjs';
 import { concatMap, debounceTime, mergeMap, retryWhen, take } from 'rxjs/operators';
 import { createArchitect, host } from '../../testing/utils';
-import { SSRDevServerBuilderOutput } from './index';
+import { SSRDevServerBuilderOutput, log } from './index';
 
 // todo check why it resolves to mjs
 // [ERR_REQUIRE_ESM]: Must use import to load ES Module
@@ -166,6 +166,43 @@ describe('Serve SSR Builder', () => {
         take(2),
       )
       .toPromise();
+  });
+
+  describe('test logger', () => {
+    let resp = { stderr: '', stdout: '' };
+    const logger = {
+      error: (stderr: string) => (resp.stderr = stderr),
+      info: (stdout: string) => (resp.stdout = stdout),
+    };
+
+    afterEach(() => (resp = { stderr: '', stdout: '' }));
+
+    it('should properly strip out new lines from output', async () => {
+      const data = { stderr: 'Error message\n', stdout: 'Output message\n' };
+      log(data, logger as any);
+      expect(resp.stderr).toBe('Error message');
+      expect(resp.stdout).toBe('Output message');
+    });
+
+    it('should only strip out the last new line', async () => {
+      const data = { stderr: 'Error message\n\n\n', stdout: 'Output message\n\n' };
+      log(data, logger as any);
+      expect(resp.stderr).toBe('Error message\n\n');
+      expect(resp.stdout).toBe('Output message\n');
+    });
+
+    it('work fine when nothing to strip out', async () => {
+      const data = { stderr: 'Typical error', stdout: 'Typical output' };
+      log(data, logger as any);
+      expect(resp.stderr).toBe('Typical error');
+      expect(resp.stdout).toBe('Typical output');
+    });
+
+    it('strip out webpack scheme', async () => {
+      const data = { stderr: 'webpack://foo', stdout: '' };
+      log(data, logger as any);
+      expect(resp.stderr).toBe('.foo');
+    });
   });
 
   it('proxies requests based on the proxy configuration file provided in the option', async () => {

@@ -173,6 +173,22 @@ export function execute(
   );
 }
 
+// Logs output to the terminal.
+// Removes any trailing new lines from the output.
+export function log(
+  { stderr, stdout }: { stderr: string | undefined; stdout: string | undefined },
+  logger: logging.LoggerApi,
+) {
+  if (stderr) {
+    // Strip the webpack scheme (webpack://) from error log.
+    logger.error(stderr.replace(/\n?$/, '').replace(/webpack:\/\//g, '.'));
+  }
+
+  if (stdout && !IGNORED_STDOUT_MESSAGES.some((x) => stdout.includes(x))) {
+    logger.info(stdout.replace(/\n?$/, ''));
+  }
+}
+
 function startNodeServer(
   serverOutput: BuilderOutput,
   port: number,
@@ -191,16 +207,7 @@ function startNodeServer(
   return of(null).pipe(
     delay(0), // Avoid EADDRINUSE error since it will cause the kill event to be finish.
     switchMap(() => spawnAsObservable('node', args, { env, shell: true })),
-    tap(({ stderr, stdout }) => {
-      if (stderr) {
-        // Strip the webpack scheme (webpack://) from error log.
-        logger.error(stderr.replace(/webpack:\/\//g, '.'));
-      }
-
-      if (stdout && !IGNORED_STDOUT_MESSAGES.some((x) => stdout.includes(x))) {
-        logger.info(stdout);
-      }
-    }),
+    tap((res) => log({ stderr: res.stderr, stdout: res.stdout }, logger)),
     ignoreElements(),
     // Emit a signal after the process has been started
     startWith(undefined),
