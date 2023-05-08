@@ -75,8 +75,11 @@ export function checkCommonJSModules(
         continue;
       }
 
-      // Check if the import is ESM format and issue a diagnostic if the file is not allowed
-      if (metafile.inputs[imported.path].format !== 'esm') {
+      // Check if non-relative import is ESM format and issue a diagnostic if the file is not allowed
+      if (
+        !isPotentialRelative(imported.original) &&
+        metafile.inputs[imported.path].format !== 'esm'
+      ) {
         const request = imported.original;
 
         let notAllowed = true;
@@ -117,6 +120,23 @@ export function checkCommonJSModules(
  */
 function isPathCode(name: string): boolean {
   return /\.[cm]?[jt]sx?$/.test(name);
+}
+
+/**
+ * Test an import module specifier to determine if the string potentially references a relative file.
+ * npm packages should not start with a period so if the first character is a period than it is not a
+ * package. While this is sufficient for the use case in the CommmonJS checker, only checking the
+ * first character does not definitely indicate the specifier is a relative path.
+ *
+ * @param specifier An import module specifier.
+ * @returns True, if specifier is potentially relative; false, otherwise.
+ */
+function isPotentialRelative(specifier: string): boolean {
+  if (specifier[0] === '.') {
+    return true;
+  }
+
+  return false;
 }
 
 /**
