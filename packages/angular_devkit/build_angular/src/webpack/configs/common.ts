@@ -415,13 +415,6 @@ export async function getCommonConfig(wco: WebpackConfigOptions): Promise<Config
             {
               loader: require.resolve('../../babel/webpack-loader'),
               options: {
-                assumptions: {
-                  // Use `setPublicClassFields: true` to avoid decrease bundle sizes
-                  // when targetting ES2022+ with `useDefineForClassFields: true`.
-                  // This is because ervery property of the class will otherwise be wrapped in a `_defineProperty`.
-                  // This is not needed for TypeScript as TS itself will emit the right declaration of class properties.
-                  setPublicClassFields: true,
-                },
                 cacheDirectory: (cache.enabled && path.join(cache.path, 'babel-webpack')) || false,
                 aot: buildOptions.aot,
                 optimize: buildOptions.buildOptimizer,
