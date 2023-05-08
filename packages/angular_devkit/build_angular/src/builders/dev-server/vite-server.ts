@@ -302,15 +302,27 @@ export async function setupServer(
           // before the built-in HTML middleware
           return () =>
             server.middlewares.use(function angularIndexMiddleware(req, res, next) {
-              if (req.url === '/' || req.url === `/index.html`) {
+              if (!req.url) {
+                next();
+
+                return;
+              }
+
+              // Parse the incoming request.
+              // The base of the URL is unused but required to parse the URL.
+              const parsedUrl = new URL(req.url, 'http://localhost');
+              let pathname = parsedUrl.pathname;
+              if (serverOptions.servePath && pathname.startsWith(serverOptions.servePath)) {
+                pathname = pathname.slice(serverOptions.servePath.length);
+                if (pathname[0] !== '/') {
+                  pathname = '/' + pathname;
+                }
+              }
+              if (pathname === '/' || pathname === `/index.html`) {
                 const rawHtml = outputFiles.get('/index.html')?.contents;
                 if (rawHtml) {
                   server
-                    .transformIndexHtml(
-                      req.url,
-                      Buffer.from(rawHtml).toString('utf-8'),
-                      req.originalUrl,
-                    )
+                    .transformIndexHtml(req.url, Buffer.from(rawHtml).toString('utf-8'))
                     .then((processedHtml) => {
                       res.setHeader('Content-Type', 'text/html');
                       res.setHeader('Cache-Control', 'no-cache');
