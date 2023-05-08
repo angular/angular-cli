@@ -159,5 +159,25 @@ describeBuilder(buildEsbuildBrowser, BROWSER_BUILDER_INFO, (harness) => {
         }),
       );
     });
+
+    it('should not show warning for relative imports', async () => {
+      await harness.appendToFile('src/main.ts', `import './abc';`);
+      await harness.writeFile('src/abc.ts', 'console.log("abc");');
+
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+        allowedCommonJsDependencies: [],
+        optimization: true,
+      });
+
+      const { result, logs } = await harness.executeOnce();
+
+      expect(result?.success).toBe(true);
+      expect(logs).not.toContain(
+        jasmine.objectContaining<logging.LogEntry>({
+          message: jasmine.stringMatching(/CommonJS or AMD dependencies/),
+        }),
+      );
+    });
   });
 });
