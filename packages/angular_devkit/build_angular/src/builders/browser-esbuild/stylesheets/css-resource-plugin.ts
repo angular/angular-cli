@@ -55,9 +55,18 @@ export function createCssResourcePlugin(): Plugin {
           resolveDir,
         });
 
+        if (result.errors.length && args.path[0] === '~') {
+          result.errors[0].notes = [
+            {
+              location: null,
+              text: 'You can remove the tilde and use a relative path to reference it, which should remove this error.',
+            },
+          ];
+        }
+
         // Return results that are not files since these are most likely specific to another plugin
         // and cannot be loaded by this plugin.
-        if (result.namespace !== 'file' || !result.path) {
+        if (result.namespace !== 'file') {
           return result;
         }
 
