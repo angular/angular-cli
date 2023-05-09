@@ -10,7 +10,7 @@ import type ng from '@angular/compiler-cli';
 import assert from 'node:assert';
 import ts from 'typescript';
 import { profileAsync, profileSync } from '../profiling';
-import { AngularCompilation, FileEmitter } from './angular-compilation';
+import { AngularCompilation, EmitFileResult } from './angular-compilation';
 import {
   AngularHostOptions,
   createAngularCompilerHost,
@@ -149,38 +149,52 @@ export class AotCompilation extends AngularCompilation {
     }
   }
 
-  createFileEmitter(onAfterEmit?: (sourceFile: ts.SourceFile) => void): FileEmitter {
+  emitAffectedFiles(): Iterable<EmitFileResult> {
     assert(this.#state, 'Angular compilation must be initialized prior to emitting files.');
     const { angularCompiler, typeScriptProgram } = this.#state;
+    const buildInfoFilename =
+      typeScriptProgram.getCompilerOptions().tsBuildInfoFile ?? '.tsbuildinfo';
 
+    const emittedFiles = new Map<ts.SourceFile, EmitFileResult>();
+    const writeFileCallback: ts.WriteFileCallback = (filename, contents, _a, _b, sourceFiles) => {
+      if (sourceFiles?.length === 0 && filename.endsWith(buildInfoFilename)) {
+        // TODO: Store incremental build info
+        return;
+      }
+
+      assert(sourceFiles?.length === 1, 'Invalid TypeScript program emit for ' + filename);
+      const sourceFile = sourceFiles[0];
+      if (angularCompiler.ignoreForEmit.has(sourceFile)) {
+        return;
+      }
+
+      emittedFiles.set(sourceFile, { filename: sourceFile.fileName, contents });
+    };
     const transformers = mergeTransformers(angularCompiler.prepareEmit().transformers, {
       before: [replaceBootstrap(() => typeScriptProgram.getProgram().getTypeChecker())],
     });
 
-    return async (file: string) => {
-      const sourceFile = typeScriptProgram.getSourceFile(file);
-      if (!sourceFile) {
-        return undefined;
+    // TypeScript will loop until there are no more affected files in the program
+    while (
+      typeScriptProgram.emitNextAffectedFile(writeFileCallback, undefined, undefined, transformers)
+    ) {
+      /* empty */
+    }
+
+    // Angular may have files that must be emitted but TypeScript does not consider affected
+    for (const sourceFile of typeScriptProgram.getSourceFiles()) {
+      if (emittedFiles.has(sourceFile) || angularCompiler.ignoreForEmit.has(sourceFile)) {
+        continue;
       }
 
-      let content: string | undefined;
-      typeScriptProgram.emit(
-        sourceFile,
-        (filename, data) => {
-          if (/\.[cm]?js$/.test(filename)) {
-            content = data;
-          }
-        },
-        undefined /* cancellationToken */,
-        undefined /* emitOnlyDtsFiles */,
-        transformers,
-      );
+      if (angularCompiler.incrementalCompilation.safeToSkipEmit(sourceFile)) {
+        continue;
+      }
 
-      angularCompiler.incrementalCompilation.recordSuccessfulEmit(sourceFile);
-      onAfterEmit?.(sourceFile);
+      typeScriptProgram.emit(sourceFile, writeFileCallback, undefined, undefined, transformers);
+    }
 
-      return { content, dependencies: [] };
-    };
+    return emittedFiles.values();
   }
 }
 
