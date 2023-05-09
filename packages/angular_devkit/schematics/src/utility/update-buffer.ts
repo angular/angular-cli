@@ -8,6 +8,7 @@
 
 import { BaseException } from '@angular-devkit/core';
 import MagicString from 'magic-string';
+import { TextDecoder } from 'node:util';
 
 export class IndexOutOfBoundException extends BaseException {
   constructor(index: number, min: number, max = Infinity) {
@@ -32,11 +33,23 @@ export abstract class UpdateBufferBase {
   /**
    * Creates an UpdateBufferBase instance.
    *
+   * @param contentPath The path of the update buffer instance.
    * @param originalContent The original content of the update buffer instance.
    * @returns An UpdateBufferBase instance.
    */
-  static create(originalContent: Buffer): UpdateBufferBase {
-    return new UpdateBuffer(originalContent);
+  static create(contentPath: string, originalContent: Buffer): UpdateBufferBase {
+    try {
+      // We only support utf8 encoding.
+      new TextDecoder('utf8', { fatal: true }).decode(originalContent);
+
+      return new UpdateBuffer(originalContent);
+    } catch (e) {
+      if (e instanceof TypeError) {
+        throw new Error(`Failed to decode "${contentPath}" as UTF-8 text.`);
+      }
+
+      throw e;
+    }
   }
 }
 
