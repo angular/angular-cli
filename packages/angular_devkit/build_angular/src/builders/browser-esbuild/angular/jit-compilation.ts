@@ -10,7 +10,7 @@ import type ng from '@angular/compiler-cli';
 import assert from 'node:assert';
 import ts from 'typescript';
 import { profileSync } from '../profiling';
-import { AngularCompilation, FileEmitter } from './angular-compilation';
+import { AngularCompilation, EmitFileResult } from './angular-compilation';
 import { AngularHostOptions, createAngularCompilerHost } from './angular-host';
 import { createJitResourceTransformer } from './jit-resource-transformer';
 
@@ -83,41 +83,39 @@ export class JitCompilation extends AngularCompilation {
     yield* profileSync('NG_DIAGNOSTICS_SEMANTIC', () => typeScriptProgram.getSemanticDiagnostics());
   }
 
-  createFileEmitter(onAfterEmit?: (sourceFile: ts.SourceFile) => void): FileEmitter {
+  emitAffectedFiles(): Iterable<EmitFileResult> {
     assert(this.#state, 'Compilation must be initialized prior to emitting files.');
     const {
       typeScriptProgram,
       constructorParametersDownlevelTransform,
       replaceResourcesTransform,
     } = this.#state;
+    const buildInfoFilename =
+      typeScriptProgram.getCompilerOptions().tsBuildInfoFile ?? '.tsbuildinfo';
 
+    const emittedFiles: EmitFileResult[] = [];
+    const writeFileCallback: ts.WriteFileCallback = (filename, contents, _a, _b, sourceFiles) => {
+      if (sourceFiles?.length === 0 && filename.endsWith(buildInfoFilename)) {
+        // TODO: Store incremental build info
+        return;
+      }
+
+      assert(sourceFiles?.length === 1, 'Invalid TypeScript program emit for ' + filename);
+
+      emittedFiles.push({ filename: sourceFiles[0].fileName, contents });
+    };
     const transformers = {
       before: [replaceResourcesTransform, constructorParametersDownlevelTransform],
     };
 
-    return async (file: string) => {
-      const sourceFile = typeScriptProgram.getSourceFile(file);
-      if (!sourceFile) {
-        return undefined;
-      }
+    // TypeScript will loop until there are no more affected files in the program
+    while (
+      typeScriptProgram.emitNextAffectedFile(writeFileCallback, undefined, undefined, transformers)
+    ) {
+      /* empty */
+    }
 
-      let content: string | undefined;
-      typeScriptProgram.emit(
-        sourceFile,
-        (filename, data) => {
-          if (/\.[cm]?js$/.test(filename)) {
-            content = data;
-          }
-        },
-        undefined /* cancellationToken */,
-        undefined /* emitOnlyDtsFiles */,
-        transformers,
-      );
-
-      onAfterEmit?.(sourceFile);
-
-      return { content, dependencies: [] };
-    };
+    return emittedFiles;
   }
 }
 

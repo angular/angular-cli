@@ -14,7 +14,6 @@ import type {
   Plugin,
   PluginBuild,
 } from 'esbuild';
-import * as assert from 'node:assert';
 import { realpath } from 'node:fs/promises';
 import { platform } from 'node:os';
 import * as path from 'node:path';
@@ -30,7 +29,7 @@ import {
   resetCumulativeDurations,
 } from '../profiling';
 import { BundleStylesheetOptions, bundleComponentStylesheet } from '../stylesheets/bundle-options';
-import { AngularCompilation, FileEmitter } from './angular-compilation';
+import { AngularCompilation } from './angular-compilation';
 import { AngularHostOptions } from './angular-host';
 import { AotCompilation } from './aot-compilation';
 import { convertTypeScriptDiagnostic } from './diagnostics';
@@ -43,7 +42,7 @@ const WINDOWS_SEP_REGEXP = new RegExp(`\\${path.win32.sep}`, 'g');
 export class SourceFileCache extends Map<string, ts.SourceFile> {
   readonly modifiedFiles = new Set<string>();
   readonly babelFileCache = new Map<string, Uint8Array>();
-  readonly typeScriptFileCache = new Map<string, Uint8Array>();
+  readonly typeScriptFileCache = new Map<string, string | Uint8Array>();
   readonly loadResultCache = new MemoryLoadResultCache();
 
   invalidate(files: Iterable<string>): void {
@@ -116,8 +115,11 @@ export function createCompilerPlugin(
         build.initialOptions.define[key] = value.toString();
       }
 
-      // The file emitter created during `onStart` that will be used during the build in `onLoad` callbacks for TS files
-      let fileEmitter: FileEmitter | undefined;
+      // The in-memory cache of TypeScript file outputs will be used during the build in `onLoad` callbacks for TS files.
+      // A string value indicates direct TS/NG output and a Uint8Array indicates fully transformed code.
+      const typeScriptFileCache =
+        pluginOptions.sourceFileCache?.typeScriptFileCache ??
+        new Map<string, string | Uint8Array>();
 
       // The stylesheet resources from component stylesheets that will be added to the build results output files
       let stylesheetResourceFiles: OutputFile[] = [];
@@ -178,7 +180,6 @@ export function createCompilerPlugin(
         // Initialize the Angular compilation for the current build.
         // In watch mode, previous build state will be reused.
         const {
-          affectedFiles,
           compilerOptions: { allowJs },
         } = await compilation.initialize(tsconfigPath, hostOptions, (compilerOptions) => {
           if (
@@ -219,15 +220,6 @@ export function createCompilerPlugin(
         });
         shouldTsIgnoreJs = !allowJs;
 
-        // Clear affected files from the cache (if present)
-        if (pluginOptions.sourceFileCache) {
-          for (const affected of affectedFiles) {
-            pluginOptions.sourceFileCache.typeScriptFileCache.delete(
-              pathToFileURL(affected.fileName).href,
-            );
-          }
-        }
-
         profileSync('NG_DIAGNOSTICS_TOTAL', () => {
           for (const diagnostic of compilation.collectDiagnostics()) {
             const message = convertTypeScriptDiagnostic(diagnostic);
@@ -239,7 +231,10 @@ export function createCompilerPlugin(
           }
         });
 
-        fileEmitter = compilation.createFileEmitter();
+        // Update TypeScript file output cache for all affected files
+        for (const { filename, contents } of compilation.emitAffectedFiles()) {
+          typeScriptFileCache.set(pathToFileURL(filename).href, contents);
+        }
 
         // Reset the setup warnings so that they are only shown during the first build.
         setupWarnings = undefined;
@@ -251,8 +246,6 @@ export function createCompilerPlugin(
         profileAsync(
           'NG_EMIT_TS*',
           async () => {
-            assert.ok(fileEmitter, 'Invalid plugin execution order');
-
             const request = pluginOptions.fileReplacements?.[args.path] ?? args.path;
 
             // Skip TS load attempt if JS TypeScript compilation not enabled and file is JS
@@ -264,41 +257,35 @@ export function createCompilerPlugin(
             // the options cannot change and do not need to be represented in the key. If the
             // cache is later stored to disk, then the options that affect transform output
             // would need to be added to the key as well as a check for any change of content.
-            let contents = pluginOptions.sourceFileCache?.typeScriptFileCache.get(
-              pathToFileURL(request).href,
-            );
+            let contents = typeScriptFileCache.get(pathToFileURL(request).href);
 
             if (contents === undefined) {
-              const typescriptResult = await fileEmitter(request);
-              if (!typescriptResult?.content) {
-                // No TS result indicates the file is not part of the TypeScript program.
-                // If allowJs is enabled and the file is JS then defer to the next load hook.
-                if (!shouldTsIgnoreJs && /\.[cm]?js$/.test(request)) {
-                  return undefined;
-                }
-
-                // Otherwise return an error
-                return {
-                  errors: [
-                    createMissingFileError(
-                      request,
-                      args.path,
-                      build.initialOptions.absWorkingDir ?? '',
-                    ),
-                  ],
-                };
+              // No TS result indicates the file is not part of the TypeScript program.
+              // If allowJs is enabled and the file is JS then defer to the next load hook.
+              if (!shouldTsIgnoreJs && /\.[cm]?js$/.test(request)) {
+                return undefined;
               }
 
+              // Otherwise return an error
+              return {
+                errors: [
+                  createMissingFileError(
+                    request,
+                    args.path,
+                    build.initialOptions.absWorkingDir ?? '',
+                  ),
+                ],
+              };
+            } else if (typeof contents === 'string') {
+              // A string indicates untransformed output from the TS/NG compiler
               contents = await javascriptTransformer.transformData(
                 request,
-                typescriptResult.content,
+                contents,
                 true /* skipLinker */,
               );
 
-              pluginOptions.sourceFileCache?.typeScriptFileCache.set(
-                pathToFileURL(request).href,
-                contents,
-              );
+              // Store as the returned Uint8Array to allow caching the fully transformed code
+              typeScriptFileCache.set(pathToFileURL(request).href, contents);
             }
 
             return {
