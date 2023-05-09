@@ -17,14 +17,13 @@ import {
   reduce,
 } from 'rxjs';
 import { CreateFileAction } from '../tree/action';
-import { UpdateBufferBase } from '../utility/update-buffer';
 import { SimpleSinkBase } from './sink';
 
 export class HostSink extends SimpleSinkBase {
   protected _filesToDelete = new Set<Path>();
   protected _filesToRename = new Set<[Path, Path]>();
-  protected _filesToCreate = new Map<Path, UpdateBufferBase>();
-  protected _filesToUpdate = new Map<Path, UpdateBufferBase>();
+  protected _filesToCreate = new Map<Path, Buffer>();
+  protected _filesToUpdate = new Map<Path, Buffer>();
 
   constructor(protected _host: virtualFs.Host, protected _force = false) {
     super();
@@ -56,20 +55,23 @@ export class HostSink extends SimpleSinkBase {
   }
 
   protected _overwriteFile(path: Path, content: Buffer): Observable<void> {
-    this._filesToUpdate.set(path, UpdateBufferBase.create(content));
+    this._filesToUpdate.set(path, content);
 
     return EMPTY;
   }
+
   protected _createFile(path: Path, content: Buffer): Observable<void> {
-    this._filesToCreate.set(path, UpdateBufferBase.create(content));
+    this._filesToCreate.set(path, content);
 
     return EMPTY;
   }
+
   protected _renameFile(from: Path, to: Path): Observable<void> {
     this._filesToRename.add([from, to]);
 
     return EMPTY;
   }
+
   protected _deleteFile(path: Path): Observable<void> {
     if (this._filesToCreate.has(path)) {
       this._filesToCreate.delete(path);
@@ -91,14 +93,10 @@ export class HostSink extends SimpleSinkBase {
         concatMap(([_, [path, to]]) => this._host.rename(path, to)),
       ),
       observableFrom([...this._filesToCreate.entries()]).pipe(
-        concatMap(([path, buffer]) => {
-          return this._host.write(path, buffer.generate() as {} as virtualFs.FileBuffer);
-        }),
+        concatMap(([path, buffer]) => this._host.write(path, buffer)),
       ),
       observableFrom([...this._filesToUpdate.entries()]).pipe(
-        concatMap(([path, buffer]) => {
-          return this._host.write(path, buffer.generate() as {} as virtualFs.FileBuffer);
-        }),
+        concatMap(([path, buffer]) => this._host.write(path, buffer)),
       ),
     ).pipe(reduce(() => {}));
   }

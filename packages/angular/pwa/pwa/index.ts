@@ -167,12 +167,7 @@ export default function (options: PwaOptions): Rule {
     return chain([
       externalSchematic('@schematics/angular', 'service-worker', swOptions),
       mergeWith(apply(url('./files/root'), [template({ ...options }), move(sourcePath)])),
-      mergeWith(
-        apply(url('./files/assets'), [
-          template({ ...options }),
-          move(posix.join(sourcePath, 'assets')),
-        ]),
-      ),
+      mergeWith(apply(url('./files/assets'), [move(posix.join(sourcePath, 'assets'))])),
       ...[...indexFiles].map((path) => updateIndexFile(path)),
     ]);
   };

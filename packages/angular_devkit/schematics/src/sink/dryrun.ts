@@ -117,10 +117,10 @@ export class DryRunSink extends HostSink {
         return;
       }
 
-      this._subject.next({ kind: 'create', path, content: content.generate() });
+      this._subject.next({ kind: 'create', path, content });
     });
     this._filesToUpdate.forEach((content, path) => {
-      this._subject.next({ kind: 'update', path, content: content.generate() });
+      this._subject.next({ kind: 'update', path, content });
     });
 
     this._subject.complete();

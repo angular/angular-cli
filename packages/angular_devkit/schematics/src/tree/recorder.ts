@@ -17,7 +17,7 @@ export class UpdateRecorderBase implements UpdateRecorder {
 
   constructor(entry: FileEntry) {
     this._original = Buffer.from(entry.content);
-    this._content = UpdateBufferBase.create(entry.content);
+    this._content = UpdateBufferBase.create(entry.path, entry.content);
     this._path = entry.path;
   }
 
