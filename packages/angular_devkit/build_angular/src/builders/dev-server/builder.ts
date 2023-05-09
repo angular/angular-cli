@@ -45,7 +45,10 @@ export function execute(
   return defer(() => initialize(options, projectName, context)).pipe(
     switchMap(({ builderName, normalizedOptions }) => {
       // Use vite-based development server for esbuild-based builds
-      if (builderName === '@angular-devkit/build-angular:browser-esbuild') {
+      if (
+        builderName === '@angular-devkit/build-angular:browser-esbuild' ||
+        normalizedOptions.forceEsbuild
+      ) {
         return defer(() => import('./vite-server')).pipe(
           switchMap(({ serveWithVite }) => serveWithVite(normalizedOptions, builderName, context)),
         );
@@ -92,6 +95,13 @@ case.
     context.logger.warn(
       'Warning: Running a server with --disable-host-check is a security risk. ' +
         'See https://medium.com/webpack/webpack-dev-server-middleware-security-issues-1489d950874a for more information.',
+    );
+  }
+
+  if (normalizedOptions.forceEsbuild && !builderName.startsWith('@angular-devkit/build-angular:')) {
+    context.logger.warn(
+      'Warning: Forcing the use of the esbuild-based build system with third-party builders' +
+        ' may cause unexpected behavior and/or build failures.',
     );
   }
 

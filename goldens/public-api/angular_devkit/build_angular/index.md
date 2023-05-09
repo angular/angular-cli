@@ -110,6 +110,7 @@ export interface DevServerBuilderOptions {
     allowedHosts?: string[];
     browserTarget: string;
     disableHostCheck?: boolean;
+    forceEsbuild?: boolean;
     headers?: {
         [key: string]: string;
     };

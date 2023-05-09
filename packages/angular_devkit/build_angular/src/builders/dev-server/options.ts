@@ -55,6 +55,7 @@ export async function normalizeOptions(
     ssl,
     sslCert,
     sslKey,
+    forceEsbuild,
   } = options;
 
   // Return all the normalized options
@@ -80,5 +81,6 @@ export async function normalizeOptions(
     ssl,
     sslCert,
     sslKey,
+    forceEsbuild,
   };
 }
