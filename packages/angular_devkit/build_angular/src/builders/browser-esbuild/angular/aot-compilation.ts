@@ -24,6 +24,7 @@ const { mergeTransformers, replaceBootstrap } = require('@ngtools/webpack/src/iv
 class AngularCompilationState {
   constructor(
     public readonly angularProgram: ng.NgtscProgram,
+    public readonly compilerHost: ng.CompilerHost,
     public readonly typeScriptProgram: ts.EmitAndSemanticDiagnosticsBuilderProgram,
     public readonly affectedFiles: ReadonlySet<ts.SourceFile>,
     public readonly templateDiagnosticsOptimization: ng.OptimizeFor,
@@ -67,20 +68,28 @@ export class AotCompilation extends AngularCompilation {
     const angularTypeScriptProgram = angularProgram.getTsProgram();
     ensureSourceFileVersions(angularTypeScriptProgram);
 
+    let oldProgram = this.#state?.typeScriptProgram;
+    let usingBuildInfo = false;
+    if (!oldProgram) {
+      oldProgram = ts.readBuilderProgram(compilerOptions, host);
+      usingBuildInfo = true;
+    }
+
     const typeScriptProgram = ts.createEmitAndSemanticDiagnosticsBuilderProgram(
       angularTypeScriptProgram,
       host,
-      this.#state?.typeScriptProgram,
+      oldProgram,
       configurationDiagnostics,
     );
 
     await profileAsync('NG_ANALYZE_PROGRAM', () => angularCompiler.analyzeAsync());
     const affectedFiles = profileSync('NG_FIND_AFFECTED', () =>
-      findAffectedFiles(typeScriptProgram, angularCompiler),
+      findAffectedFiles(typeScriptProgram, angularCompiler, usingBuildInfo),
     );
 
     this.#state = new AngularCompilationState(
       angularProgram,
+      host,
       typeScriptProgram,
       affectedFiles,
       affectedFiles.size === 1 ? OptimizeFor.SingleFile : OptimizeFor.WholeProgram,
@@ -151,14 +160,16 @@ export class AotCompilation extends AngularCompilation {
 
   emitAffectedFiles(): Iterable<EmitFileResult> {
     assert(this.#state, 'Angular compilation must be initialized prior to emitting files.');
-    const { angularCompiler, typeScriptProgram } = this.#state;
+    const { angularCompiler, compilerHost, typeScriptProgram } = this.#state;
     const buildInfoFilename =
       typeScriptProgram.getCompilerOptions().tsBuildInfoFile ?? '.tsbuildinfo';
 
     const emittedFiles = new Map<ts.SourceFile, EmitFileResult>();
     const writeFileCallback: ts.WriteFileCallback = (filename, contents, _a, _b, sourceFiles) => {
-      if (sourceFiles?.length === 0 && filename.endsWith(buildInfoFilename)) {
-        // TODO: Store incremental build info
+      if (!sourceFiles?.length && filename.endsWith(buildInfoFilename)) {
+        // Save builder info contents to specified location
+        compilerHost.writeFile(filename, contents, false);
+
         return;
       }
 
@@ -168,6 +179,7 @@ export class AotCompilation extends AngularCompilation {
         return;
       }
 
+      angularCompiler.incrementalCompilation.recordSuccessfulEmit(sourceFile);
       emittedFiles.set(sourceFile, { filename: sourceFile.fileName, contents });
     };
     const transformers = mergeTransformers(angularCompiler.prepareEmit().transformers, {
@@ -187,6 +199,10 @@ export class AotCompilation extends AngularCompilation {
         continue;
       }
 
+      if (sourceFile.isDeclarationFile) {
+        continue;
+      }
+
       if (angularCompiler.incrementalCompilation.safeToSkipEmit(sourceFile)) {
         continue;
       }
@@ -200,7 +216,8 @@ export class AotCompilation extends AngularCompilation {
 
 function findAffectedFiles(
   builder: ts.EmitAndSemanticDiagnosticsBuilderProgram,
-  { ignoreForDiagnostics, ignoreForEmit, incrementalCompilation }: ng.NgtscProgram['compiler'],
+  { ignoreForDiagnostics }: ng.NgtscProgram['compiler'],
+  includeTTC: boolean,
 ): Set<ts.SourceFile> {
   const affectedFiles = new Set<ts.SourceFile>();
 
@@ -235,13 +252,22 @@ function findAffectedFiles(
     affectedFiles.add(result.affected as ts.SourceFile);
   }
 
-  // A file is also affected if the Angular compiler requires it to be emitted
-  for (const sourceFile of builder.getSourceFiles()) {
-    if (ignoreForEmit.has(sourceFile) || incrementalCompilation.safeToSkipEmit(sourceFile)) {
-      continue;
+  // Add all files with associated template type checking files.
+  // Stored TS build info does not have knowledge of the AOT compiler or the typechecking state of the templates.
+  // To ensure that errors are reported correctly, all AOT component diagnostics need to be analyzed even if build
+  // info is present.
+  if (includeTTC) {
+    for (const sourceFile of builder.getSourceFiles()) {
+      if (ignoreForDiagnostics.has(sourceFile) && sourceFile.fileName.endsWith('.ngtypecheck.ts')) {
+        // This file name conversion relies on internal compiler logic and should be converted
+        // to an official method when available. 15 is length of `.ngtypecheck.ts`
+        const originalFilename = sourceFile.fileName.slice(0, -15) + '.ts';
+        const originalSourceFile = builder.getSourceFile(originalFilename);
+        if (originalSourceFile) {
+          affectedFiles.add(originalSourceFile);
+        }
+      }
     }
-
-    affectedFiles.add(sourceFile);
   }
 
   return affectedFiles;

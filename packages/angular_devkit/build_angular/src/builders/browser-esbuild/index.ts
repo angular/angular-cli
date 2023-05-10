@@ -98,6 +98,7 @@ async function execute(
     assets,
     serviceWorkerOptions,
     indexHtmlOptions,
+    cacheOptions,
   } = options;
 
   const browsers = getSupportedBrowsers(projectRoot, context.logger);
@@ -105,9 +106,9 @@ async function execute(
 
   // Reuse rebuild state or create new bundle contexts for code and global stylesheets
   let bundlerContexts = rebuildState?.rebuildContexts;
-  const codeBundleCache = options.watch
-    ? rebuildState?.codeBundleCache ?? new SourceFileCache()
-    : undefined;
+  const codeBundleCache =
+    rebuildState?.codeBundleCache ??
+    new SourceFileCache(cacheOptions.enabled ? cacheOptions.path : undefined);
   if (bundlerContexts === undefined) {
     bundlerContexts = [];
 
