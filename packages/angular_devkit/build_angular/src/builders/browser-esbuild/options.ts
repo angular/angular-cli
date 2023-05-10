@@ -7,7 +7,6 @@
  */
 
 import { BuilderContext } from '@angular-devkit/architect';
-import fs from 'node:fs';
 import { createRequire } from 'node:module';
 import path from 'node:path';
 import { normalizeAssetPatterns, normalizeOptimization, normalizeSourceMaps } from '../../utils';
@@ -64,7 +63,9 @@ export async function normalizeOptions(
     path.join(workspaceRoot, (projectMetadata.sourceRoot as string | undefined) ?? 'src'),
   );
 
+  // Gather persistent caching option and provide a project specific cache location
   const cacheOptions = normalizeCacheOptions(projectMetadata, workspaceRoot);
+  cacheOptions.path = path.join(cacheOptions.path, projectName);
 
   const entryPoints = normalizeEntryPoints(workspaceRoot, options.main, options.entryPoints);
   const tsconfig = path.join(workspaceRoot, options.tsConfig);

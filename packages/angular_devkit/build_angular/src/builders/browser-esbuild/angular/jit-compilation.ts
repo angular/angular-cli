@@ -16,6 +16,7 @@ import { createJitResourceTransformer } from './jit-resource-transformer';
 
 class JitCompilationState {
   constructor(
+    public readonly compilerHost: ng.CompilerHost,
     public readonly typeScriptProgram: ts.EmitAndSemanticDiagnosticsBuilderProgram,
     public readonly constructorParametersDownlevelTransform: ts.TransformerFactory<ts.SourceFile>,
     public readonly replaceResourcesTransform: ts.TransformerFactory<ts.SourceFile>,
@@ -51,7 +52,7 @@ export class JitCompilation extends AngularCompilation {
         rootNames,
         compilerOptions,
         host,
-        this.#state?.typeScriptProgram,
+        this.#state?.typeScriptProgram ?? ts.readBuilderProgram(compilerOptions, host),
         configurationDiagnostics,
       ),
     );
@@ -61,6 +62,7 @@ export class JitCompilation extends AngularCompilation {
     );
 
     this.#state = new JitCompilationState(
+      host,
       typeScriptProgram,
       constructorParametersDownlevelTransform(typeScriptProgram.getProgram()),
       createJitResourceTransformer(() => typeScriptProgram.getProgram().getTypeChecker()),
@@ -86,6 +88,7 @@ export class JitCompilation extends AngularCompilation {
   emitAffectedFiles(): Iterable<EmitFileResult> {
     assert(this.#state, 'Compilation must be initialized prior to emitting files.');
     const {
+      compilerHost,
       typeScriptProgram,
       constructorParametersDownlevelTransform,
       replaceResourcesTransform,
@@ -95,8 +98,10 @@ export class JitCompilation extends AngularCompilation {
 
     const emittedFiles: EmitFileResult[] = [];
     const writeFileCallback: ts.WriteFileCallback = (filename, contents, _a, _b, sourceFiles) => {
-      if (sourceFiles?.length === 0 && filename.endsWith(buildInfoFilename)) {
-        // TODO: Store incremental build info
+      if (!sourceFiles?.length && filename.endsWith(buildInfoFilename)) {
+        // Save builder info contents to specified location
+        compilerHost.writeFile(filename, contents, false);
+
         return;
       }
 

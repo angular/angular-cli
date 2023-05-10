@@ -45,6 +45,10 @@ export class SourceFileCache extends Map<string, ts.SourceFile> {
   readonly typeScriptFileCache = new Map<string, string | Uint8Array>();
   readonly loadResultCache = new MemoryLoadResultCache();
 
+  constructor(readonly persistentCachePath?: string) {
+    super();
+  }
+
   invalidate(files: Iterable<string>): void {
     this.modifiedFiles.clear();
     for (let file of files) {
@@ -208,6 +212,18 @@ export function createCompilerPlugin(
             });
           }
 
+          // Enable incremental compilation by default if caching is enabled
+          if (pluginOptions.sourceFileCache?.persistentCachePath) {
+            compilerOptions.incremental ??= true;
+            // Set the build info file location to the configured cache directory
+            compilerOptions.tsBuildInfoFile = path.join(
+              pluginOptions.sourceFileCache?.persistentCachePath,
+              '.tsbuildinfo',
+            );
+          } else {
+            compilerOptions.incremental = false;
+          }
+
           return {
             ...compilerOptions,
             noEmitOnError: false,
@@ -232,9 +248,11 @@ export function createCompilerPlugin(
         });
 
         // Update TypeScript file output cache for all affected files
-        for (const { filename, contents } of compilation.emitAffectedFiles()) {
-          typeScriptFileCache.set(pathToFileURL(filename).href, contents);
-        }
+        profileSync('NG_EMIT_TS', () => {
+          for (const { filename, contents } of compilation.emitAffectedFiles()) {
+            typeScriptFileCache.set(pathToFileURL(filename).href, contents);
+          }
+        });
 
         // Reset the setup warnings so that they are only shown during the first build.
         setupWarnings = undefined;
@@ -242,60 +260,50 @@ export function createCompilerPlugin(
         return result;
       });
 
-      build.onLoad({ filter: /\.[cm]?[jt]sx?$/ }, (args) =>
-        profileAsync(
-          'NG_EMIT_TS*',
-          async () => {
-            const request = pluginOptions.fileReplacements?.[args.path] ?? args.path;
+      build.onLoad({ filter: /\.[cm]?[jt]sx?$/ }, async (args) => {
+        const request = pluginOptions.fileReplacements?.[args.path] ?? args.path;
 
-            // Skip TS load attempt if JS TypeScript compilation not enabled and file is JS
-            if (shouldTsIgnoreJs && /\.[cm]?js$/.test(request)) {
-              return undefined;
-            }
+        // Skip TS load attempt if JS TypeScript compilation not enabled and file is JS
+        if (shouldTsIgnoreJs && /\.[cm]?js$/.test(request)) {
+          return undefined;
+        }
 
-            // The filename is currently used as a cache key. Since the cache is memory only,
-            // the options cannot change and do not need to be represented in the key. If the
-            // cache is later stored to disk, then the options that affect transform output
-            // would need to be added to the key as well as a check for any change of content.
-            let contents = typeScriptFileCache.get(pathToFileURL(request).href);
+        // The filename is currently used as a cache key. Since the cache is memory only,
+        // the options cannot change and do not need to be represented in the key. If the
+        // cache is later stored to disk, then the options that affect transform output
+        // would need to be added to the key as well as a check for any change of content.
+        let contents = typeScriptFileCache.get(pathToFileURL(request).href);
 
-            if (contents === undefined) {
-              // No TS result indicates the file is not part of the TypeScript program.
-              // If allowJs is enabled and the file is JS then defer to the next load hook.
-              if (!shouldTsIgnoreJs && /\.[cm]?js$/.test(request)) {
-                return undefined;
-              }
+        if (contents === undefined) {
+          // No TS result indicates the file is not part of the TypeScript program.
+          // If allowJs is enabled and the file is JS then defer to the next load hook.
+          if (!shouldTsIgnoreJs && /\.[cm]?js$/.test(request)) {
+            return undefined;
+          }
 
-              // Otherwise return an error
-              return {
-                errors: [
-                  createMissingFileError(
-                    request,
-                    args.path,
-                    build.initialOptions.absWorkingDir ?? '',
-                  ),
-                ],
-              };
-            } else if (typeof contents === 'string') {
-              // A string indicates untransformed output from the TS/NG compiler
-              contents = await javascriptTransformer.transformData(
-                request,
-                contents,
-                true /* skipLinker */,
-              );
+          // Otherwise return an error
+          return {
+            errors: [
+              createMissingFileError(request, args.path, build.initialOptions.absWorkingDir ?? ''),
+            ],
+          };
+        } else if (typeof contents === 'string') {
+          // A string indicates untransformed output from the TS/NG compiler
+          contents = await javascriptTransformer.transformData(
+            request,
+            contents,
+            true /* skipLinker */,
+          );
 
-              // Store as the returned Uint8Array to allow caching the fully transformed code
-              typeScriptFileCache.set(pathToFileURL(request).href, contents);
-            }
+          // Store as the returned Uint8Array to allow caching the fully transformed code
+          typeScriptFileCache.set(pathToFileURL(request).href, contents);
+        }
 
-            return {
-              contents,
-              loader: 'js',
-            };
-          },
-          true,
-        ),
-      );
+        return {
+          contents,
+          loader: 'js',
+        };
+      });
 
       build.onLoad({ filter: /\.[cm]?js$/ }, (args) =>
         profileAsync(
