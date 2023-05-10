@@ -1,3 +1,36 @@
+<a name="16.0.1"></a>
+
+# 16.0.1 (2023-05-10)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                        |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------ |
+| [ed82c83fe](https://github.com/angular/angular-cli/commit/ed82c83fef1a67b4168be455b119860217267564) | fix  | avoid CommonJS warnings for relative imports with esbuild builders |
+| [3083c4eda](https://github.com/angular/angular-cli/commit/3083c4eda87e735a4b1b9e16ff1f61abbccb1c98) | fix  | avoid hash filenames for non-injected global styles/scripts        |
+| [b106bc9d0](https://github.com/angular/angular-cli/commit/b106bc9d07b1e2e38176c484d2fc04251e274aa5) | fix  | clean incoming index URL before processing in esbuild builder      |
+| [2967705ed](https://github.com/angular/angular-cli/commit/2967705ed3f88c35e93866bca659222769664c62) | fix  | convert dev-server glob proxy entries for esbuild builder          |
+| [a9d20015c](https://github.com/angular/angular-cli/commit/a9d20015c943e89b6f29a6e3e295bef6e2072a92) | fix  | disable runtime errors from being displayed in overlay             |
+| [822b552f6](https://github.com/angular/angular-cli/commit/822b552f6f94ac1c39405f7359550e1ab5aa4c17) | fix  | fix index option const value for browser-esbuild                   |
+| [131cd23b6](https://github.com/angular/angular-cli/commit/131cd23b65c12ba671088aafcaff4d522f402ba8) | fix  | prevent relative import failure with Less in esbuild builder       |
+| [fedcc5d92](https://github.com/angular/angular-cli/commit/fedcc5d923b7237622b1e7adef053a2ee68f872e) | fix  | properly set base dev-server path with esbuild                     |
+| [cb3161045](https://github.com/angular/angular-cli/commit/cb3161045ef39e335460672d016cf0a973de428a) | fix  | show error note for CSS url() tilde usage in esbuild builder       |
+| [54e5000ca](https://github.com/angular/angular-cli/commit/54e5000ca88655bf9d01b87e317dc5810a7ac676) | fix  | workaround for esbuild static block AOT generated code             |
+
+### @angular-devkit/schematics
+
+| Commit                                                                                              | Type | Description                                                      |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------------- |
+| [5a35970af](https://github.com/angular/angular-cli/commit/5a35970afdf39461592bb0130eb9b959272949fb) | fix  | do not generate an UpdateBuffer for created and overridden files |
+
+### @angular/pwa
+
+| Commit                                                                                              | Type | Description        |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------ |
+| [70d224ca7](https://github.com/angular/angular-cli/commit/70d224ca7edbfe31fb6360e55cbe06c65dc5e91a) | fix  | compress PWA icons |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="16.0.0"></a>
 
 # 16.0.0 (2023-05-03)
