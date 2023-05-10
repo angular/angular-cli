@@ -8,7 +8,7 @@
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { path } from '../path';
-import { fileBuffer } from './buffer';
+import { stringToFileBuffer } from './buffer';
 import { CordHost } from './record';
 import { test } from './test';
 
@@ -22,7 +22,7 @@ describe('CordHost', () => {
     });
 
     const host = new CordHost(base);
-    host.write(path`/blue`, fileBuffer`hi`).subscribe(undefined, done.fail);
+    host.write(path`/blue`, stringToFileBuffer(`hi`)).subscribe(undefined, done.fail);
 
     const target = new TestHost();
     host.commit(target).subscribe(undefined, done.fail);
@@ -42,8 +42,8 @@ describe('CordHost', () => {
     });
 
     const host = new CordHost(base);
-    host.write(path`/blue`, fileBuffer`hi`).subscribe(undefined, done.fail);
-    host.write(path`/blue`, fileBuffer`hi again`).subscribe(undefined, done.fail);
+    host.write(path`/blue`, stringToFileBuffer(`hi`)).subscribe(undefined, done.fail);
+    host.write(path`/blue`, stringToFileBuffer(`hi again`)).subscribe(undefined, done.fail);
 
     const target = new TestHost();
     host.commit(target).subscribe(undefined, done.fail);
@@ -64,7 +64,7 @@ describe('CordHost', () => {
     });
 
     const host = new CordHost(base);
-    host.write(path`/blue`, fileBuffer`hi`).subscribe(undefined, done.fail);
+    host.write(path`/blue`, stringToFileBuffer(`hi`)).subscribe(undefined, done.fail);
     host.delete(path`/blue`).subscribe(undefined, done.fail);
 
     const target = new TestHost();
@@ -83,7 +83,7 @@ describe('CordHost', () => {
     });
 
     const host = new CordHost(base);
-    host.write(path`/blue`, fileBuffer`hi`).subscribe(undefined, done.fail);
+    host.write(path`/blue`, stringToFileBuffer(`hi`)).subscribe(undefined, done.fail);
     host.rename(path`/blue`, path`/red`).subscribe(undefined, done.fail);
 
     const target = new TestHost();
@@ -107,7 +107,7 @@ describe('CordHost', () => {
     });
 
     const host = new CordHost(base);
-    host.write(path`/blue`, fileBuffer`hi`).subscribe(undefined, done.fail);
+    host.write(path`/blue`, stringToFileBuffer(`hi`)).subscribe(undefined, done.fail);
     host.rename(path`/blue`, path`/blue`).subscribe(undefined, done.fail);
 
     const target = new TestHost();
@@ -130,7 +130,7 @@ describe('CordHost', () => {
     });
 
     const host = new CordHost(base);
-    host.write(path`/blue`, fileBuffer`hi`).subscribe(undefined, done.fail);
+    host.write(path`/blue`, stringToFileBuffer(`hi`)).subscribe(undefined, done.fail);
     host.rename(path`/blue`, path`/red`).subscribe(undefined, done.fail);
     host.rename(path`/red`, path`/yellow`).subscribe(undefined, done.fail);
 
@@ -203,7 +203,7 @@ describe('CordHost', () => {
 
     const host = new CordHost(base);
     host.rename(path`/hello`, path`/blue`).subscribe(undefined, done.fail);
-    host.write(path`/hello`, fileBuffer`beautiful world`).subscribe(undefined, done.fail);
+    host.write(path`/hello`, stringToFileBuffer(`beautiful world`)).subscribe(undefined, done.fail);
 
     const target = base.clone();
     host.commit(target).subscribe(undefined, done.fail);
@@ -226,7 +226,7 @@ describe('CordHost', () => {
     });
 
     const host = new CordHost(base);
-    host.write(path`/hello`, fileBuffer`beautiful world`).subscribe(undefined, done.fail);
+    host.write(path`/hello`, stringToFileBuffer(`beautiful world`)).subscribe(undefined, done.fail);
 
     const target = base.clone();
     host.commit(target).subscribe(undefined, done.fail);
@@ -248,8 +248,8 @@ describe('CordHost', () => {
     });
 
     const host = new CordHost(base);
-    host.write(path`/hello`, fileBuffer`beautiful world`).subscribe(undefined, done.fail);
-    host.write(path`/hello`, fileBuffer`again`).subscribe(undefined, done.fail);
+    host.write(path`/hello`, stringToFileBuffer(`beautiful world`)).subscribe(undefined, done.fail);
+    host.write(path`/hello`, stringToFileBuffer(`again`)).subscribe(undefined, done.fail);
 
     const target = base.clone();
     host.commit(target).subscribe(undefined, done.fail);
@@ -271,7 +271,7 @@ describe('CordHost', () => {
     });
 
     const host = new CordHost(base);
-    host.write(path`/hello`, fileBuffer`beautiful world`).subscribe(undefined, done.fail);
+    host.write(path`/hello`, stringToFileBuffer(`beautiful world`)).subscribe(undefined, done.fail);
     host.rename(path`/hello`, path`/blue`).subscribe(undefined, done.fail);
 
     const target = base.clone();
@@ -295,7 +295,7 @@ describe('CordHost', () => {
     });
 
     const host = new CordHost(base);
-    host.write(path`/hello`, fileBuffer`beautiful world`).subscribe(undefined, done.fail);
+    host.write(path`/hello`, stringToFileBuffer(`beautiful world`)).subscribe(undefined, done.fail);
     host.delete(path`/hello`).subscribe(undefined, done.fail);
 
     const target = base.clone();
@@ -316,7 +316,7 @@ describe('CordHost', () => {
 
     const host = new CordHost(base);
     host.rename(path`/hello`, path`/blue`).subscribe(undefined, done.fail);
-    host.write(path`/blue`, fileBuffer`beautiful world`).subscribe(undefined, done.fail);
+    host.write(path`/blue`, stringToFileBuffer(`beautiful world`)).subscribe(undefined, done.fail);
 
     const target = base.clone();
     host.commit(target).subscribe(undefined, done.fail);
@@ -359,7 +359,7 @@ describe('CordHost', () => {
 
     const host = new CordHost(base);
     host.delete(path`/hello`).subscribe(undefined, done.fail);
-    host.write(path`/hello`, fileBuffer`beautiful world`).subscribe(undefined, done.fail);
+    host.write(path`/hello`, stringToFileBuffer(`beautiful world`)).subscribe(undefined, done.fail);
 
     const target = base.clone();
     host.commit(target).subscribe(undefined, done.fail);
@@ -421,7 +421,7 @@ describe('CordHost', () => {
     });
 
     const host = new CordHost(base);
-    host.write(path`/blue`, fileBuffer`hi`).subscribe();
+    host.write(path`/blue`, stringToFileBuffer(`hi`)).subscribe();
 
     const target = new TestHost({
       '/blue': 'test',
@@ -442,7 +442,7 @@ describe('CordHost', () => {
     });
 
     const host = new CordHost(base);
-    host.write(path`/hello`, fileBuffer`hi`).subscribe();
+    host.write(path`/hello`, stringToFileBuffer(`hi`)).subscribe();
 
     const target = new TestHost({});
 
@@ -502,7 +502,7 @@ describe('CordHost', () => {
 
     const host = new CordHost(base);
     let error = false;
-    host.write(path`/dir`, fileBuffer`beautiful world`).subscribe(
+    host.write(path`/dir`, stringToFileBuffer(`beautiful world`)).subscribe(
       undefined,
       () => (error = true),
       () => (error = false),

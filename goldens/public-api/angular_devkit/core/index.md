@@ -237,7 +237,7 @@ export class FileAlreadyExistException extends BaseException {
 // @public (undocumented)
 type FileBuffer = ArrayBuffer;
 
-// @public (undocumented)
+// @public @deprecated (undocumented)
 const fileBuffer: TemplateTag<FileBuffer>;
 
 // @public (undocumented)
