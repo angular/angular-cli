@@ -1,3 +1,15 @@
+<a name="16.0.1"></a>
+
+# 16.0.1 (2023-05-11)
+
+### @nguniversal/builders
+
+| Commit                                                                                           | Type | Description        |
+| ------------------------------------------------------------------------------------------------ | ---- | ------------------ |
+| [ca8a5bb9](https://github.com/angular/universal/commit/ca8a5bb953eb0793cd7768b67b73727791f55a8e) | fix  | strip out newlines |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="16.0.0"></a>
 
 # 16.0.0 (2023-05-03)
