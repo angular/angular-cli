@@ -10,6 +10,7 @@ import type { BuildOptions } from 'esbuild';
 import MagicString, { Bundle } from 'magic-string';
 import assert from 'node:assert';
 import { readFile } from 'node:fs/promises';
+import { isAbsolute } from 'node:path';
 import { NormalizedBrowserOptions } from './options';
 import { createSourcemapIngorelistPlugin } from './sourcemap-ignorelist-plugin';
 
@@ -95,7 +96,12 @@ export function createGlobalScriptsBundleOptions(
 
             // Global scripts are concatenated using magic-string instead of bundled via esbuild.
             const bundleContent = new Bundle();
-            for (const filename of files) {
+            for (let filename of files) {
+
+              if (!isAbsolute(filename)) {
+                filename = "./" + filename;
+              }
+
               const resolveResult = await build.resolve(filename, {
                 kind: 'entry-point',
                 resolveDir: workspaceRoot,
