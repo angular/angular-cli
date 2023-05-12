@@ -10,6 +10,8 @@ import type { BuildOptions } from 'esbuild';
 import MagicString, { Bundle } from 'magic-string';
 import assert from 'node:assert';
 import { readFile } from 'node:fs/promises';
+import path from 'node:path';
+import { assertIsError } from '../../utils/error';
 import { NormalizedBrowserOptions } from './options';
 import { createSourcemapIngorelistPlugin } from './sourcemap-ignorelist-plugin';
 
@@ -96,23 +98,36 @@ export function createGlobalScriptsBundleOptions(
             // Global scripts are concatenated using magic-string instead of bundled via esbuild.
             const bundleContent = new Bundle();
             for (const filename of files) {
-              const resolveResult = await build.resolve(filename, {
-                kind: 'entry-point',
-                resolveDir: workspaceRoot,
-              });
+              let fileContent;
+              try {
+                // Attempt to read as a relative path from the workspace root
+                fileContent = await readFile(path.join(workspaceRoot, filename), 'utf-8');
+              } catch (e) {
+                assertIsError(e);
+                if (e.code !== 'ENOENT') {
+                  throw e;
+                }
 
-              if (resolveResult.errors.length) {
-                // Remove resolution failure notes about marking as external since it doesn't apply
-                // to global scripts.
-                resolveResult.errors.forEach((error) => (error.notes = []));
+                // If not found attempt to resolve as a module specifier
+                const resolveResult = await build.resolve(filename, {
+                  kind: 'entry-point',
+                  resolveDir: workspaceRoot,
+                });
 
-                return {
-                  errors: resolveResult.errors,
-                  warnings: resolveResult.warnings,
-                };
+                if (resolveResult.errors.length) {
+                  // Remove resolution failure notes about marking as external since it doesn't apply
+                  // to global scripts.
+                  resolveResult.errors.forEach((error) => (error.notes = []));
+
+                  return {
+                    errors: resolveResult.errors,
+                    warnings: resolveResult.warnings,
+                  };
+                }
+
+                fileContent = await readFile(resolveResult.path, 'utf-8');
               }
 
-              const fileContent = await readFile(resolveResult.path, 'utf-8');
               bundleContent.addSource(new MagicString(fileContent, { filename }));
             }
 
