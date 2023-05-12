@@ -63,15 +63,15 @@ class CliFilesystem implements Filesystem {
 }
 
 class ResultFilesystem implements Filesystem {
-  private readonly fileReaders = new Map<string, () => Promise<string>>();
+  private readonly fileReaders = new Map<string, () => Promise<Uint8Array>>();
 
   constructor(outputFiles: OutputFile[], assetFiles: { source: string; destination: string }[]) {
     for (const file of outputFiles) {
-      this.fileReaders.set('/' + file.path.replace(/\\/g, '/'), async () => file.text);
+      this.fileReaders.set('/' + file.path.replace(/\\/g, '/'), async () => file.contents);
     }
     for (const file of assetFiles) {
       this.fileReaders.set('/' + file.destination.replace(/\\/g, '/'), () =>
-        fsPromises.readFile(file.source, 'utf-8'),
+        fsPromises.readFile(file.source),
       );
     }
   }
@@ -84,19 +84,25 @@ class ResultFilesystem implements Filesystem {
     return [...this.fileReaders.keys()];
   }
 
-  read(file: string): Promise<string> {
+  async read(file: string): Promise<string> {
+    const reader = this.fileReaders.get(file);
+    if (reader === undefined) {
+      throw new Error('File does not exist.');
+    }
+    const contents = await reader();
+
+    return Buffer.from(contents.buffer, contents.byteOffset, contents.byteLength).toString('utf-8');
+  }
+
+  async hash(file: string): Promise<string> {
     const reader = this.fileReaders.get(file);
     if (reader === undefined) {
       throw new Error('File does not exist.');
     }
 
-    return reader();
-  }
-
-  async hash(file: string): Promise<string> {
     return crypto
       .createHash('sha1')
-      .update(await this.read(file))
+      .update(await reader())
       .digest('hex');
   }
 
