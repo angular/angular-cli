@@ -31,6 +31,6 @@
     "@angular/compiler": "16.0.1",
     "@angular/compiler-cli": "16.0.1",
     "typescript": "~5.0.2",
-    "webpack": "5.82.0"
+    "webpack": "5.82.1"
   }
 }
