@@ -267,7 +267,7 @@ export async function setupServer(
             // Rewrite all build assets to a vite raw fs URL
             const assetSourcePath = assets.get(pathname);
             if (assetSourcePath !== undefined) {
-              req.url = `/@fs/${assetSourcePath}`;
+              req.url = `/@fs/${normalizePath(assetSourcePath)}`;
               next();
 
               return;
