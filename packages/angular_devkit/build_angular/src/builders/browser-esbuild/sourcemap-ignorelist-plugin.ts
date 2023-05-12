@@ -16,6 +16,12 @@ import type { Plugin } from 'esbuild';
 const IGNORE_LIST_ID = 'x_google_ignoreList';
 
 /**
+ * The UTF-8 bytes for the node modules check text used to avoid unnecessary parsing
+ * of a full source map if not present in the source map data.
+ */
+const NODE_MODULE_BYTES = Buffer.from('node_modules/', 'utf-8');
+
+/**
  * Minimal sourcemap object required to create the ignore list.
  */
 interface SourceMap {
@@ -50,10 +56,15 @@ export function createSourcemapIngorelistPlugin(): Plugin {
             continue;
           }
 
-          const contents = Buffer.from(file.contents);
+          // Create a Buffer object that shares the memory of the output file contents
+          const contents = Buffer.from(
+            file.contents.buffer,
+            file.contents.byteOffset,
+            file.contents.byteLength,
+          );
 
           // Avoid parsing sourcemaps that have no node modules references
-          if (!contents.includes('node_modules/')) {
+          if (!contents.includes(NODE_MODULE_BYTES)) {
             continue;
           }
 
@@ -62,10 +73,8 @@ export function createSourcemapIngorelistPlugin(): Plugin {
 
           // Check and store the index of each source originating from a node modules directory
           for (let index = 0; index < map.sources.length; ++index) {
-            if (
-              map.sources[index].startsWith('node_modules/') ||
-              map.sources[index].includes('/node_modules/')
-            ) {
+            const location = map.sources[index].indexOf('node_modules/');
+            if (location === 0 || (location > 0 && map.sources[index][location - 1] === '/')) {
               ignoreList.push(index);
             }
           }
