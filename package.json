@@ -60,7 +60,7 @@
     "@bazel/esbuild": "5.8.1",
     "@bazel/ibazel": "0.16.2",
     "@bazel/jasmine": "5.8.1",
-    "@rollup/plugin-commonjs": "^24.0.0",
+    "@rollup/plugin-commonjs": "^25.0.0",
     "@rollup/plugin-node-resolve": "^13.0.5",
     "@schematics/angular": "16.0.0",
     "@types/browser-sync": "^2.26.1",
