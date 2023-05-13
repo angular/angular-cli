@@ -155,7 +155,7 @@
     "husky": "8.0.3",
     "ini": "4.1.0",
     "inquirer": "8.2.4",
-    "jasmine": "^4.0.0",
+    "jasmine": "^5.0.0",
     "jasmine-core": "~4.6.0",
     "jasmine-spec-reporter": "~7.0.0",
     "jquery": "^3.3.1",
