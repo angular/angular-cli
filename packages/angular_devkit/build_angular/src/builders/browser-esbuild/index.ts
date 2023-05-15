@@ -11,6 +11,8 @@ import type { BuildOptions, Metafile, OutputFile } from 'esbuild';
 import { constants as fsConstants } from 'node:fs';
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import { promisify } from 'node:util';
+import { brotliCompress } from 'node:zlib';
 import { copyAssets } from '../../utils/copy-assets';
 import { assertIsError } from '../../utils/error';
 import { transformSupportedBrowsersToTargets } from '../../utils/esbuild-targets';
@@ -32,6 +34,8 @@ import { Schema as BrowserBuilderOptions } from './schema';
 import { createSourcemapIngorelistPlugin } from './sourcemap-ignorelist-plugin';
 import { shutdownSassWorkerPool } from './stylesheets/sass-plugin';
 import type { ChangedFiles } from './watcher';
+
+const compressAsync = promisify(brotliCompress);
 
 interface RebuildState {
   rebuildContexts: BundlerContext[];
@@ -259,7 +263,12 @@ async function execute(
     }
   }
 
-  logBuildStats(context, metafile, initialFiles);
+  // Calculate estimated transfer size if scripts are optimized
+  let estimatedTransferSizes;
+  if (optimizationOptions.scripts || optimizationOptions.styles.minify) {
+    estimatedTransferSizes = await calculateEstimatedTransferSizes(executionResult.outputFiles);
+  }
+  logBuildStats(context, metafile, initialFiles, estimatedTransferSizes);
 
   const buildTime = Number(process.hrtime.bigint() - startTime) / 10 ** 9;
   context.logger.info(`Application bundle generation complete. [${buildTime.toFixed(3)} seconds]`);
@@ -700,7 +709,12 @@ export async function* buildEsbuildBrowserInternal(
 
 export default createBuilder(buildEsbuildBrowser);
 
-function logBuildStats(context: BuilderContext, metafile: Metafile, initialFiles: FileInfo[]) {
+function logBuildStats(
+  context: BuilderContext,
+  metafile: Metafile,
+  initialFiles: FileInfo[],
+  estimatedTransferSizes?: Map<string, number>,
+) {
   const initial = new Map(initialFiles.map((info) => [info.file, info.name]));
   const stats: BundleStats[] = [];
   for (const [file, output] of Object.entries(metafile.outputs)) {
@@ -716,11 +730,45 @@ function logBuildStats(context: BuilderContext, metafile: Metafile, initialFiles
 
     stats.push({
       initial: initial.has(file),
-      stats: [file, initial.get(file) ?? '-', output.bytes, ''],
+      stats: [
+        file,
+        initial.get(file) ?? '-',
+        output.bytes,
+        estimatedTransferSizes?.get(file) ?? '-',
+      ],
     });
   }
 
-  const tableText = generateBuildStatsTable(stats, true, true, false, undefined);
+  const tableText = generateBuildStatsTable(stats, true, true, !!estimatedTransferSizes, undefined);
 
   context.logger.info('\n' + tableText + '\n');
+}
+
+async function calculateEstimatedTransferSizes(outputFiles: OutputFile[]) {
+  const sizes = new Map<string, number>();
+
+  const pendingCompression = [];
+  for (const outputFile of outputFiles) {
+    // Only calculate JavaScript and CSS files
+    if (!outputFile.path.endsWith('.js') && !outputFile.path.endsWith('.css')) {
+      continue;
+    }
+
+    // Skip compressing small files which may end being larger once compressed and will most likely not be
+    // compressed in actual transit.
+    if (outputFile.contents.byteLength < 1024) {
+      sizes.set(outputFile.path, outputFile.contents.byteLength);
+      continue;
+    }
+
+    pendingCompression.push(
+      compressAsync(outputFile.contents).then((result) =>
+        sizes.set(outputFile.path, result.byteLength),
+      ),
+    );
+  }
+
+  await Promise.all(pendingCompression);
+
+  return sizes;
 }

@@ -2,11 +2,6 @@ import { getGlobalVariable } from '../../utils/env';
 import { ng } from '../../utils/process';
 
 export default async function () {
-  if (getGlobalVariable('argv')['esbuild']) {
-    // EXPERIMENTAL_ESBUILD: esbuild does not yet output build stats
-    return;
-  }
-
   const { stderr: stderrProgress, stdout } = await ng('build', '--progress');
   if (!stdout.includes('Initial Total')) {
     throw new Error(`Expected stdout to contain 'Initial Total' but it did not.\n${stdout}`);
@@ -18,11 +13,16 @@ export default async function () {
     );
   }
 
-  const logs: string[] = [
-    'Browser application bundle generation complete',
-    'Copying assets complete',
-    'Index html generation complete',
-  ];
+  let logs;
+  if (getGlobalVariable('argv')['esbuild']) {
+    logs = ['Application bundle generation complete.'];
+  } else {
+    logs = [
+      'Browser application bundle generation complete',
+      'Copying assets complete',
+      'Index html generation complete',
+    ];
+  }
 
   for (const log of logs) {
     if (!stderrProgress.includes(log)) {
