@@ -48,7 +48,14 @@
             "tsConfig": "tsconfig.app.json",
             "aot": true,
             "assets": ["src/favicon.ico", "src/assets"],
-            "styles": ["src/styles.css"],
+            "styles": [
+              "src/styles.css",
+              {
+                "input": "src/styles-extra.css",
+                "inject": true,
+                "bundleName": "extra"
+              }
+            ],
             "scripts": []
           },
           "configurations": {

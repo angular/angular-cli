@@ -102,7 +102,7 @@ export class CommonEngine {
           document: inlineCriticalCss
             ? // Workaround for https://github.com/GoogleChromeLabs/critters/issues/64
               doc.replace(
-                / media="print" onload="this\.media='.+'"(?: ngCspMedia=".+")?><noscript><link .+?><\/noscript>/g,
+                / media="print" onload="this\.media='.+?'"(?: ngCspMedia=".+")?><noscript><link .+?><\/noscript>/g,
                 '>',
               )
             : doc,
