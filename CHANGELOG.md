@@ -1,3 +1,18 @@
+<a name="16.0.2"></a>
+
+# 16.0.2 (2023-05-17)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                  |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------ |
+| [7a3c895c8](https://github.com/angular/angular-cli/commit/7a3c895c8da534ceff26754ca7ffd49b30c24069) | fix  | attempt relative global script read first in esbuild builder |
+| [f30be2518](https://github.com/angular/angular-cli/commit/f30be2518b118106f5d6634c92279adcefab0f70) | fix  | correctly generate serviceworker hashes for binary assets    |
+| [117e8d001](https://github.com/angular/angular-cli/commit/117e8d00192d3b764c9c362c2554fa80706946cf) | fix  | normalize Vite dev-server Windows asset paths                |
+| [e5c1d43de](https://github.com/angular/angular-cli/commit/e5c1d43de932daedfaac002ff363ed12243f97bb) | perf | minor sourcemap ignorelist improvements for esbuild builder  |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="16.0.1"></a>
 
 # 16.0.1 (2023-05-10)
