@@ -16,7 +16,7 @@ import type {
   FileImporterWithRequestContextOptions,
   SassWorkerImplementation,
 } from '../../../sass/sass-service';
-import type { LoadResultCache } from '../load-result-cache';
+import { LoadResultCache, createCachedLoad } from '../load-result-cache';
 
 export interface SassPluginOptions {
   sourcemap: boolean;
@@ -63,43 +63,33 @@ export function createSassPlugin(options: SassPluginOptions, cache?: LoadResultC
         return result;
       };
 
-      build.onLoad({ filter: /^s[ac]ss;/, namespace: 'angular:styles/component' }, async (args) => {
-        const data = options.inlineComponentData?.[args.path];
-        assert(
-          typeof data === 'string',
-          `component style name should always be found [${args.path}]`,
-        );
+      // Load inline component stylesheets
+      build.onLoad(
+        { filter: /^s[ac]ss;/, namespace: 'angular:styles/component' },
+        createCachedLoad(cache, async (args) => {
+          const data = options.inlineComponentData?.[args.path];
+          assert(
+            typeof data === 'string',
+            `component style name should always be found [${args.path}]`,
+          );
 
-        let result = cache?.get(data);
-        if (result === undefined) {
           const [language, , filePath] = args.path.split(';', 3);
           const syntax = language === 'sass' ? 'indented' : 'scss';
 
-          result = await compileString(data, filePath, syntax, options, resolveUrl);
-          if (result.errors === undefined) {
-            // Cache the result if there were no errors
-            await cache?.put(data, result);
-          }
-        }
+          return compileString(data, filePath, syntax, options, resolveUrl);
+        }),
+      );
 
-        return result;
-      });
-
-      build.onLoad({ filter: /\.s[ac]ss$/ }, async (args) => {
-        let result = cache?.get(args.path);
-        if (result === undefined) {
+      // Load file stylesheets
+      build.onLoad(
+        { filter: /\.s[ac]ss$/ },
+        createCachedLoad(cache, async (args) => {
           const data = await readFile(args.path, 'utf-8');
           const syntax = extname(args.path).toLowerCase() === '.sass' ? 'indented' : 'scss';
 
-          result = await compileString(data, args.path, syntax, options, resolveUrl);
-          if (result.errors === undefined) {
-            // Cache the result if there were no errors
-            await cache?.put(args.path, result);
-          }
-        }
-
-        return result;
-      });
+          return compileString(data, args.path, syntax, options, resolveUrl);
+        }),
+      );
     },
   };
 }

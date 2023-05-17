@@ -7,6 +7,7 @@
  */
 
 import type { BuildOptions, OutputFile } from 'esbuild';
+import { createHash } from 'node:crypto';
 import path from 'node:path';
 import { BundlerContext } from '../esbuild';
 import { LoadResultCache } from '../load-result-cache';
@@ -108,7 +109,11 @@ export async function bundleComponentStylesheet(
   cache?: LoadResultCache,
 ) {
   const namespace = 'angular:styles/component';
-  const entry = [language, componentStyleCounter++, filename].join(';');
+  // Use a hash of the inline stylesheet content to ensure a consistent identifier. External stylesheets will resolve
+  // to the actual stylesheet file path.
+  // TODO: Consider xxhash instead for hashing
+  const id = inline ? createHash('sha256').update(data).digest('hex') : componentStyleCounter++;
+  const entry = [language, id, filename].join(';');
 
   const buildOptions = createStylesheetBundleOptions(options, cache, { [entry]: data });
   buildOptions.entryPoints = [`${namespace};${entry}`];
