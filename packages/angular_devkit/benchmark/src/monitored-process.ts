@@ -59,11 +59,13 @@ export class LocalMonitoredProcess implements MonitoredProcess {
           map((statsByProcess) => {
             // Ignore the spawned shell in the total process number.
             const pids = Object.keys(statsByProcess).filter(
-              (pid) => pid != childProcess.pid.toString(),
+              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+              (pid) => pid != childProcess.pid!.toString(),
             );
             const processes = pids.length;
             // We want most stats from the parent process.
-            const { pid, ppid, ctime, elapsed, timestamp } = statsByProcess[childProcess.pid];
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            const { pid, ppid, ctime, elapsed, timestamp } = statsByProcess[childProcess.pid!];
 
             // CPU and memory should be agreggated.
             let cpu = 0;
