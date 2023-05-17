@@ -236,13 +236,13 @@ export async function killAllProcesses(signal = 'SIGTERM'): Promise<void> {
 
   while (_processes.length) {
     const childProc = _processes.pop();
-    if (!childProc) {
+    if (!childProc || childProc.pid === undefined) {
       continue;
     }
 
     processesToKill.push(
       new Promise<void>((resolve) => {
-        treeKill(childProc.pid, signal, () => {
+        treeKill(childProc.pid!, signal, () => {
           // Ignore all errors.
           // This is due to a race condition with the `waitForMatch` logic.
           // where promises are resolved on matches and not when the process terminates.
