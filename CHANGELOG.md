@@ -1,3 +1,17 @@
+<a name="16.1.0-next.0"></a>
+
+# 16.1.0-next.0 (2023-05-17)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                            |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------------------- |
+| [3ede1a2ca](https://github.com/angular/angular-cli/commit/3ede1a2cac5005f4dfbd2a62ef528a34c3793b78) | feat | allow forcing esbuild builder with dev-server                          |
+| [2d141fe3b](https://github.com/angular/angular-cli/commit/2d141fe3bc1efb9e254b15ce91ebc885a43c928a) | feat | show estimated transfer size with esbuild builder                      |
+| [d8930facc](https://github.com/angular/angular-cli/commit/d8930facc075e39d82b3c6cb252c9a8b5fa6a476) | feat | support incremental TypeScript semantic diagnostics in esbuild builder |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="16.0.2"></a>
 
 # 16.0.2 (2023-05-17)
