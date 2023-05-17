@@ -1,3 +1,15 @@
+<a name="16.0.2"></a>
+
+# 16.0.2 (2023-05-17)
+
+### @nguniversal/common
+
+| Commit                                                                                           | Type | Description                              |
+| ------------------------------------------------------------------------------------------------ | ---- | ---------------------------------------- |
+| [90d6939a](https://github.com/angular/universal/commit/90d6939ac44bf9bb23fe9d04416a47d1c18165e9) | fix  | correctly handle multiple lazy CSS files |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="16.0.1"></a>
 
 # 16.0.1 (2023-05-11)
