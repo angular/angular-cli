@@ -6,11 +6,36 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import type { OnLoadResult } from 'esbuild';
+import type { OnLoadResult, PluginBuild } from 'esbuild';
 
 export interface LoadResultCache {
   get(path: string): OnLoadResult | undefined;
   put(path: string, result: OnLoadResult): Promise<void>;
+}
+
+export function createCachedLoad(
+  cache: LoadResultCache | undefined,
+  callback: Parameters<PluginBuild['onLoad']>[1],
+): Parameters<PluginBuild['onLoad']>[1] {
+  if (cache === undefined) {
+    return callback;
+  }
+
+  return async (args) => {
+    const loadCacheKey = `${args.namespace}:${args.path}`;
+    let result: OnLoadResult | null | undefined = cache.get(loadCacheKey);
+
+    if (result === undefined) {
+      result = await callback(args);
+
+      // Do not cache null or undefined or results with errors
+      if (result && result.errors === undefined) {
+        await cache.put(loadCacheKey, result);
+      }
+    }
+
+    return result;
+  };
 }
 
 export class MemoryLoadResultCache implements LoadResultCache {
