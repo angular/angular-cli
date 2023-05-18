@@ -70,18 +70,24 @@ export function createStylesheetBundleOptions(
         },
         cache,
       ),
-      createLessPlugin({
-        sourcemap: !!options.sourcemap,
-        includePaths,
-        inlineComponentData,
-      }),
-      createCssPlugin({
-        sourcemap: !!options.sourcemap,
-        inlineComponentData,
-        browsers: options.browsers,
-        tailwindConfiguration: options.tailwindConfiguration,
-      }),
-      createCssResourcePlugin(),
+      createLessPlugin(
+        {
+          sourcemap: !!options.sourcemap,
+          includePaths,
+          inlineComponentData,
+        },
+        cache,
+      ),
+      createCssPlugin(
+        {
+          sourcemap: !!options.sourcemap,
+          inlineComponentData,
+          browsers: options.browsers,
+          tailwindConfiguration: options.tailwindConfiguration,
+        },
+        cache,
+      ),
+      createCssResourcePlugin(cache),
     ],
   };
 }

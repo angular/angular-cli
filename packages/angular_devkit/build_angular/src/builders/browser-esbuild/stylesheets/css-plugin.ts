@@ -10,6 +10,7 @@ import createAutoPrefixerPlugin from 'autoprefixer';
 import type { OnLoadResult, Plugin, PluginBuild } from 'esbuild';
 import assert from 'node:assert';
 import { readFile } from 'node:fs/promises';
+import { LoadResultCache, createCachedLoad } from '../load-result-cache';
 
 /**
  * The lazy-loaded instance of the postcss stylesheet postprocessor.
@@ -46,7 +47,7 @@ export interface CssPluginOptions {
  * @param options An object containing the plugin options.
  * @returns An esbuild Plugin instance.
  */
-export function createCssPlugin(options: CssPluginOptions): Plugin {
+export function createCssPlugin(options: CssPluginOptions, cache?: LoadResultCache): Plugin {
   return {
     name: 'angular-css',
     async setup(build: PluginBuild): Promise<void> {
@@ -78,24 +79,30 @@ export function createCssPlugin(options: CssPluginOptions): Plugin {
       }
 
       // Add a load callback to support inline Component styles
-      build.onLoad({ filter: /^css;/, namespace: 'angular:styles/component' }, async (args) => {
-        const data = options.inlineComponentData?.[args.path];
-        assert(
-          typeof data === 'string',
-          `component style name should always be found [${args.path}]`,
-        );
+      build.onLoad(
+        { filter: /^css;/, namespace: 'angular:styles/component' },
+        createCachedLoad(cache, async (args) => {
+          const data = options.inlineComponentData?.[args.path];
+          assert(
+            typeof data === 'string',
+            `component style name should always be found [${args.path}]`,
+          );
 
-        const [, , filePath] = args.path.split(';', 3);
+          const [, , filePath] = args.path.split(';', 3);
 
-        return compileString(data, filePath, postcssProcessor, options);
-      });
+          return compileString(data, filePath, postcssProcessor, options);
+        }),
+      );
 
       // Add a load callback to support files from disk
-      build.onLoad({ filter: /\.css$/ }, async (args) => {
-        const data = await readFile(args.path, 'utf-8');
+      build.onLoad(
+        { filter: /\.css$/ },
+        createCachedLoad(cache, async (args) => {
+          const data = await readFile(args.path, 'utf-8');
 
-        return compileString(data, args.path, postcssProcessor, options);
-      });
+          return compileString(data, args.path, postcssProcessor, options);
+        }),
+      );
     },
   };
 }
@@ -157,6 +164,7 @@ async function compileString(
       contents: result.css,
       loader: 'css',
       warnings,
+      watchFiles: [filename],
     };
   } catch (error) {
     postcss ??= (await import('postcss')).default;
