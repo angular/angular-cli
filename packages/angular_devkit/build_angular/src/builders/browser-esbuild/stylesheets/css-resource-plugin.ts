@@ -9,6 +9,7 @@
 import type { Plugin, PluginBuild } from 'esbuild';
 import { readFile } from 'node:fs/promises';
 import { join, relative } from 'node:path';
+import { LoadResultCache, createCachedLoad } from '../load-result-cache';
 
 /**
  * Symbol marker used to indicate CSS resource resolution is being attempted.
@@ -24,7 +25,7 @@ const CSS_RESOURCE_RESOLUTION = Symbol('CSS_RESOURCE_RESOLUTION');
  *
  * @returns An esbuild {@link Plugin} instance.
  */
-export function createCssResourcePlugin(): Plugin {
+export function createCssResourcePlugin(cache?: LoadResultCache): Plugin {
   return {
     name: 'angular-css-resource',
     setup(build: PluginBuild): void {
@@ -80,12 +81,18 @@ export function createCssResourcePlugin(): Plugin {
         };
       });
 
-      build.onLoad({ filter: /.*/, namespace: 'css-resource' }, async (args) => {
-        return {
-          contents: await readFile(join(build.initialOptions.absWorkingDir ?? '', args.path)),
-          loader: 'file',
-        };
-      });
+      build.onLoad(
+        { filter: /./, namespace: 'css-resource' },
+        createCachedLoad(cache, async (args) => {
+          const resourcePath = join(build.initialOptions.absWorkingDir ?? '', args.path);
+
+          return {
+            contents: await readFile(resourcePath),
+            loader: 'file',
+            watchFiles: [resourcePath],
+          };
+        }),
+      );
     },
   };
 }

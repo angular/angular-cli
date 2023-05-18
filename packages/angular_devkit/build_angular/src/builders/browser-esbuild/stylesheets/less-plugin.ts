@@ -9,6 +9,7 @@
 import type { OnLoadResult, Plugin, PluginBuild } from 'esbuild';
 import assert from 'node:assert';
 import { readFile } from 'node:fs/promises';
+import { LoadResultCache, createCachedLoad } from '../load-result-cache';
 
 /**
  * The lazy-loaded instance of the less stylesheet preprocessor.
@@ -33,29 +34,35 @@ function isLessException(error: unknown): error is LessException {
   return !!error && typeof error === 'object' && 'column' in error;
 }
 
-export function createLessPlugin(options: LessPluginOptions): Plugin {
+export function createLessPlugin(options: LessPluginOptions, cache?: LoadResultCache): Plugin {
   return {
     name: 'angular-less',
     setup(build: PluginBuild): void {
       // Add a load callback to support inline Component styles
-      build.onLoad({ filter: /^less;/, namespace: 'angular:styles/component' }, async (args) => {
-        const data = options.inlineComponentData?.[args.path];
-        assert(
-          typeof data === 'string',
-          `component style name should always be found [${args.path}]`,
-        );
+      build.onLoad(
+        { filter: /^less;/, namespace: 'angular:styles/component' },
+        createCachedLoad(cache, async (args) => {
+          const data = options.inlineComponentData?.[args.path];
+          assert(
+            typeof data === 'string',
+            `component style name should always be found [${args.path}]`,
+          );
 
-        const [, , filePath] = args.path.split(';', 3);
+          const [, , filePath] = args.path.split(';', 3);
 
-        return compileString(data, filePath, options, build.resolve.bind(build));
-      });
+          return compileString(data, filePath, options, build.resolve.bind(build));
+        }),
+      );
 
       // Add a load callback to support files from disk
-      build.onLoad({ filter: /\.less$/ }, async (args) => {
-        const data = await readFile(args.path, 'utf-8');
+      build.onLoad(
+        { filter: /\.less$/ },
+        createCachedLoad(cache, async (args) => {
+          const data = await readFile(args.path, 'utf-8');
 
-        return compileString(data, args.path, options, build.resolve.bind(build));
-      });
+          return compileString(data, args.path, options, build.resolve.bind(build));
+        }),
+      );
     },
   };
 }
@@ -127,6 +134,7 @@ async function compileString(
     return {
       contents: result.css,
       loader: 'css',
+      watchFiles: [filename, ...result.imports],
     };
   } catch (error) {
     if (isLessException(error)) {
