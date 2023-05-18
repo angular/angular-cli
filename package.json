@@ -58,10 +58,6 @@
       "packages/schematics/*"
     ]
   },
-  "resolutions": {
-    "**/ajv-formats/ajv": "8.12.0",
-    "@types/parse5-html-rewriting-stream/@types/parse5-sax-parser": "^5.0.2"
-  },
   "devDependencies": {
     "@ampproject/remapping": "2.2.1",
     "@angular/animations": "16.1.0-next.0",
