@@ -255,7 +255,7 @@ export async function setupServer(
             // Parse the incoming request.
             // The base of the URL is unused but required to parse the URL.
             const parsedUrl = new URL(req.url, 'http://localhost');
-            let pathname = parsedUrl.pathname;
+            let pathname = decodeURIComponent(parsedUrl.pathname);
             if (serverOptions.servePath && pathname.startsWith(serverOptions.servePath)) {
               pathname = pathname.slice(serverOptions.servePath.length);
               if (pathname[0] !== '/') {
@@ -267,7 +267,7 @@ export async function setupServer(
             // Rewrite all build assets to a vite raw fs URL
             const assetSourcePath = assets.get(pathname);
             if (assetSourcePath !== undefined) {
-              req.url = `/@fs/${normalizePath(assetSourcePath)}`;
+              req.url = `/@fs/${encodeURIComponent(assetSourcePath)}`;
               next();
 
               return;
