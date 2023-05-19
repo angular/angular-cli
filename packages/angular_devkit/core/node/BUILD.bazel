@@ -18,7 +18,6 @@ ts_library(
         exclude = [
             "testing/**/*.ts",
             "**/*_spec.ts",
-            "**/*_benchmark.ts",
         ],
     ),
     data = ["package.json"],

@@ -20,16 +20,11 @@ ts_library(
         include = ["src/**/*.ts"],
         exclude = [
             "src/**/*_spec.ts",
-            "src/**/*_benchmark.ts",
         ],
     ),
-    data = glob(
-        include = ["**/*.json"],
-        exclude = [
-            # NB: we need to exclude the nested node_modules that is laid out by yarn workspaces
-            "node_modules/**",
-        ],
-    ),
+    data = [
+        "package.json",
+    ],
     module_name = "@angular-devkit/schematics",
     module_root = "src/index.d.ts",
     deps = [

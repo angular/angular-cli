@@ -15,20 +15,8 @@ package(default_visibility = ["//visibility:public"])
 ts_library(
     name = "pwa",
     package_name = "@angular/pwa",
-    srcs = glob(
-        ["**/*.ts"],
-        # Currently, this library is used only with the rollup plugin.
-        # To make it simpler for downstream repositories to compile this, we
-        # neither provide compile-time deps as an `npm_install` rule, nor do we
-        # expect the downstream repository to install @types/webpack[-*]
-        # So we exclude files that depend on webpack typings.
-        exclude = [
-            "pwa/files/**/*",
-            "**/*_spec.ts",
-            # NB: we need to exclude the nested node_modules that is laid out by yarn workspaces
-            "node_modules/**",
-        ],
-    ) + [
+    srcs = [
+        "pwa/index.ts",
         "//packages/angular/pwa:pwa/schema.ts",
     ],
     data = glob(

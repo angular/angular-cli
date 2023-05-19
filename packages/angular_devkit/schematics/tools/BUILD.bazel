@@ -16,7 +16,6 @@ ts_library(
         include = ["**/*.ts"],
         exclude = [
             "**/*_spec.ts",
-            "**/*_benchmark.ts",
             "test/**/*.ts",
         ],
     ),
