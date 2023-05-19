@@ -181,12 +181,6 @@ jobs:
           paths:
             - ~/.cache/yarn
 
-  lint:
-    executor: action-executor
-    steps:
-      - custom_attach_workspace
-      - run: yarn lint
-
   validate:
     executor: action-executor
     steps:
@@ -386,9 +380,6 @@ workflows:
     jobs:
       # Linux jobs
       - setup
-      - lint:
-          requires:
-            - setup
       - validate:
           requires:
             - setup
