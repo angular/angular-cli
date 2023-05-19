@@ -12,8 +12,8 @@
     "node": "^16.14.0 || >=18.10.0"
   },
   "peerDependencies": {
-    "@angular/common": "^16.0.0 || ^16.0.0-next.0",
-    "@angular/core": "^16.0.0 || ^16.0.0-next.0",
+    "@angular/common": "^16.0.0 || ^16.1.0-next.0",
+    "@angular/core": "^16.0.0 || ^16.1.0-next.0",
     "express": "EXPRESS_VERSION"
   },
   "dependencies": {

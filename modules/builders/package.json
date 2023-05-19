@@ -25,11 +25,11 @@
   "typings": "src/index.d.ts",
   "builders": "builders.json",
   "peerDependencies": {
-    "@angular-devkit/build-angular": "^16.0.0 || ^16.0.0-next.0"
+    "@angular-devkit/build-angular": "^16.0.0 || ^16.1.0-next.0"
   },
   "dependencies": {
-    "@angular-devkit/architect": "~0.1600.0-next.2",
-    "@angular-devkit/core": "~16.0.0-next.2",
+    "@angular-devkit/architect": "~0.1601.0-next.0",
+    "@angular-devkit/core": "~16.1.0-next.0",
     "@nguniversal/common": "0.0.0-PLACEHOLDER",
     "browser-sync": "^2.27.10",
     "express": "^4.18.2",
