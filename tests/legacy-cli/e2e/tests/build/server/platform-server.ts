@@ -51,7 +51,7 @@ export default async function () {
 
   await expectFileToMatch(
     'dist/test-project/server/main.js',
-    /exports.*AppServerModule|"AppServerModule":/,
+    '/* harmony export */   AppServerModule: () => (/* binding */ AppServerModule)',
   );
   await exec(normalize('node'), 'dist/test-project/server/main.js');
   await expectFileToMatch(
