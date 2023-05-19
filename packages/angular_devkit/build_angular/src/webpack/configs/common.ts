@@ -436,6 +436,7 @@ export async function getCommonConfig(wco: WebpackConfigOptions): Promise<Config
       backCompat: false,
       syncWebAssembly: true,
       asyncWebAssembly: true,
+      topLevelAwait: false,
     },
     infrastructureLogging: {
       debug: verbose,
