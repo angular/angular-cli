@@ -24,12 +24,9 @@ ts_library(
             "src/**/*_spec_helpers.ts",
         ],
     ),
-    data = glob(
-        include = [
-            "src/type_checker_bootstrap.js",
-            "package.json",
-        ],
-    ),
+    data = [
+        "package.json",
+    ],
     module_name = "@ngtools/webpack",
     module_root = "src/index.d.ts",
     deps = [

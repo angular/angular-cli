@@ -17,11 +17,12 @@ ts_library(
     name = "angular-cli",
     package_name = "@angular/cli",
     srcs = glob(
-        include = ["**/*.ts"],
+        include = [
+            "lib/**/*.ts",
+            "src/**/*.ts",
+        ],
         exclude = [
             "**/*_spec.ts",
-            # NB: we need to exclude the nested node_modules that is laid out by yarn workspaces
-            "node_modules/**",
         ],
     ) + [
         # @external_begin
@@ -33,12 +34,10 @@ ts_library(
     data = glob(
         include = [
             "bin/**/*",
-            "**/*.json",
-            "**/*.md",
+            "src/**/*.md",
+            "src/**/*.json",
         ],
         exclude = [
-            # NB: we need to exclude the nested node_modules that is laid out by yarn workspaces
-            "node_modules/**",
             "lib/config/workspace-schema.json",
         ],
     ) + [

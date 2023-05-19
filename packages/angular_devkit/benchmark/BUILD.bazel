@@ -18,7 +18,6 @@ ts_library(
         include = ["src/**/*.ts"],
         exclude = [
             "src/**/*_spec.ts",
-            "src/**/*_benchmark.ts",
         ],
     ),
     module_name = "@angular-devkit/benchmark",
