@@ -88,7 +88,6 @@ pkg_npm(
         ":core",
         ":license",
         "//packages/angular_devkit/core/node",
-        "//packages/angular_devkit/core/node:package.json",
         "//packages/angular_devkit/core/node/testing",
     ],
 )

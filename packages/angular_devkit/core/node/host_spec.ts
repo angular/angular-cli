@@ -7,12 +7,11 @@
  */
 
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-/* eslint-disable import/no-extraneous-dependencies */
-import { normalize, virtualFs } from '@angular-devkit/core';
-import { NodeJsAsyncHost, NodeJsSyncHost } from '@angular-devkit/core/node';
 import * as fs from 'fs';
 import { tmpdir } from 'os';
 import { join } from 'path';
+import { normalize, virtualFs } from '../src';
+import { NodeJsAsyncHost, NodeJsSyncHost } from './host';
 
 // TODO: replace this with an "it()" macro that's reusable globally.
 let linuxOnlyIt: typeof it = it;
