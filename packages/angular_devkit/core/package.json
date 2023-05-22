@@ -7,6 +7,23 @@
   "keywords": [
     "core"
   ],
+  "exports": {
+    ".": {
+      "types": "./src/index.d.ts",
+      "default": "./src/index.js"
+    },
+    "./node": {
+      "types": "./node/index.d.ts",
+      "default": "./node/index.js"
+    },
+    "./node/testing": {
+      "types": "./node/testing/index.d.ts",
+      "default": "./node/testing/index.js"
+    },
+    "./package.json": "./package.json",
+    "./*": "./*.js",
+    "./*.js": "./*.js"
+  },
   "dependencies": {
     "ajv-formats": "2.1.1",
     "ajv": "8.12.0",

@@ -20,7 +20,6 @@ ts_library(
             "**/*_spec.ts",
         ],
     ),
-    data = ["package.json"],
     module_name = "@angular-devkit/core/node",
     module_root = "index.d.ts",
     deps = [
