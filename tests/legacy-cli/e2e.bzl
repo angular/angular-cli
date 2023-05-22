@@ -8,8 +8,6 @@ TESTED_PACKAGES = [
     "//packages/angular/pwa:npm_package_archive.tgz",
     "//packages/angular_devkit/architect:npm_package_archive.tgz",
     "//packages/angular_devkit/architect_cli:npm_package_archive.tgz",
-    # this is private so don't use here
-    # "//packages/angular_devkit/benchmark:npm_package_archive.tgz",
     "//packages/angular_devkit/build_angular:npm_package_archive.tgz",
     "//packages/angular_devkit/build_webpack:npm_package_archive.tgz",
     "//packages/angular_devkit/core:npm_package_archive.tgz",

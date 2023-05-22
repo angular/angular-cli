@@ -1,6 +1,5 @@
 {
   "packages": {
-    "@_/benchmark": {},
     "@_/builders": {},
     "devkit": {},
     "@angular/cli": {
@@ -43,10 +42,6 @@
       "name": "Architect CLI",
       "section": "Tooling",
       "snapshotRepo": "angular/angular-devkit-architect-cli-builds"
-    },
-    "@angular-devkit/benchmark": {
-      "name": "Benchmark",
-      "section": "Tooling"
     },
     "@angular-devkit/build-angular": {
       "name": "Build Angular",
