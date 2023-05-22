@@ -5,7 +5,6 @@
   "description": "Software Development Kit for Angular",
   "bin": {
     "architect": "./bin/architect",
-    "benchmark": "./bin/benchmark",
     "devkit-admin": "./bin/devkit-admin",
     "ng": "./bin/ng",
     "schematics": "./bin/schematics"
@@ -109,7 +108,6 @@
     "@types/npm-package-arg": "^6.1.0",
     "@types/pacote": "^11.1.3",
     "@types/picomatch": "^2.3.0",
-    "@types/pidusage": "^2.0.1",
     "@types/progress": "^2.0.3",
     "@types/resolve": "^1.17.1",
     "@types/semver": "^7.3.12",
@@ -179,8 +177,6 @@
     "pacote": "15.2.0",
     "parse5-html-rewriting-stream": "7.0.0",
     "picomatch": "2.3.1",
-    "pidtree": "^0.6.0",
-    "pidusage": "^3.0.0",
     "piscina": "3.2.0",
     "popper.js": "^1.14.1",
     "postcss": "8.4.23",
