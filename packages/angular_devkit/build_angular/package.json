@@ -60,7 +60,7 @@
     "semver": "7.5.1",
     "source-map-loader": "4.0.1",
     "source-map-support": "0.5.21",
-    "terser": "5.17.5",
+    "terser": "5.17.6",
     "text-table": "0.2.0",
     "tree-kill": "1.2.2",
     "tslib": "2.5.2",
