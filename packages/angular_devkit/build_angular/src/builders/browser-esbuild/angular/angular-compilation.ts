@@ -33,7 +33,6 @@ export abstract class AngularCompilation {
 
   protected async loadConfiguration(tsconfig: string): Promise<ng.CompilerOptions> {
     const { readConfiguration } = await AngularCompilation.loadCompilerCli();
-
     return profileSync('NG_READ_CONFIG', () =>
       readConfiguration(tsconfig, {
         // Angular specific configuration defaults and overrides to ensure a functioning compilation.
