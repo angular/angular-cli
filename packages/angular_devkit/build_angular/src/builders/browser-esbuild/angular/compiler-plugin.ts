@@ -45,6 +45,8 @@ export class SourceFileCache extends Map<string, ts.SourceFile> {
   readonly typeScriptFileCache = new Map<string, string | Uint8Array>();
   readonly loadResultCache = new MemoryLoadResultCache();
 
+  referencedFiles?: readonly string[];
+
   constructor(readonly persistentCachePath?: string) {
     super();
   }
@@ -185,6 +187,7 @@ export function createCompilerPlugin(
         // In watch mode, previous build state will be reused.
         const {
           compilerOptions: { allowJs },
+          referencedFiles,
         } = await compilation.initialize(tsconfigPath, hostOptions, (compilerOptions) => {
           if (
             compilerOptions.target === undefined ||
@@ -253,6 +256,11 @@ export function createCompilerPlugin(
             typeScriptFileCache.set(pathToFileURL(filename).href, contents);
           }
         });
+
+        // Store referenced files for updated file watching if enabled
+        if (pluginOptions.sourceFileCache) {
+          pluginOptions.sourceFileCache.referencedFiles = referencedFiles;
+        }
 
         // Reset the setup warnings so that they are only shown during the first build.
         setupWarnings = undefined;
