@@ -30,7 +30,11 @@ export class JitCompilation extends AngularCompilation {
     tsconfig: string,
     hostOptions: AngularHostOptions,
     compilerOptionsTransformer?: (compilerOptions: ng.CompilerOptions) => ng.CompilerOptions,
-  ): Promise<{ affectedFiles: ReadonlySet<ts.SourceFile>; compilerOptions: ng.CompilerOptions }> {
+  ): Promise<{
+    affectedFiles: ReadonlySet<ts.SourceFile>;
+    compilerOptions: ng.CompilerOptions;
+    referencedFiles: readonly string[];
+  }> {
     // Dynamically load the Angular compiler CLI package
     const { constructorParametersDownlevelTransform } = await AngularCompilation.loadCompilerCli();
 
@@ -68,7 +72,11 @@ export class JitCompilation extends AngularCompilation {
       createJitResourceTransformer(() => typeScriptProgram.getProgram().getTypeChecker()),
     );
 
-    return { affectedFiles, compilerOptions };
+    const referencedFiles = typeScriptProgram
+      .getSourceFiles()
+      .map((sourceFile) => sourceFile.fileName);
+
+    return { affectedFiles, compilerOptions, referencedFiles };
   }
 
   *collectDiagnostics(): Iterable<ts.Diagnostic> {

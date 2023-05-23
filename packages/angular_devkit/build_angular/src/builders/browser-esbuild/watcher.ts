@@ -25,8 +25,8 @@ export class ChangedFiles {
 }
 
 export interface BuildWatcher extends AsyncIterableIterator<ChangedFiles> {
-  add(paths: string | string[]): void;
-  remove(paths: string | string[]): void;
+  add(paths: string | readonly string[]): void;
+  remove(paths: string | readonly string[]): void;
   close(): Promise<void>;
 }
 

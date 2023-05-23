@@ -73,6 +73,10 @@ class ExecutionResult {
     };
   }
 
+  get watchFiles() {
+    return this.codeBundleCache?.referencedFiles ?? [];
+  }
+
   createRebuildState(fileChanges: ChangedFiles): RebuildState {
     this.codeBundleCache?.invalidate([...fileChanges.modified, ...fileChanges.removed]);
 
@@ -676,6 +680,10 @@ export async function* buildEsbuildBrowserInternal(
   ];
   watcher.add(packageWatchFiles.map((file) => path.join(normalizedOptions.workspaceRoot, file)));
 
+  // Watch locations provided by the initial build result
+  let previousWatchFiles = new Set(result.watchFiles);
+  watcher.add(result.watchFiles);
+
   // Wait for changes and rebuild as needed
   try {
     for await (const changes of watcher) {
@@ -686,6 +694,14 @@ export async function* buildEsbuildBrowserInternal(
       result = await withProgress('Changes detected. Rebuilding...', () =>
         execute(normalizedOptions, context, result.createRebuildState(changes)),
       );
+
+      // Update watched locations provided by the new build result.
+      // Add any new locations
+      watcher.add(result.watchFiles.filter((watchFile) => !previousWatchFiles.has(watchFile)));
+      const newWatchFiles = new Set(result.watchFiles);
+      // Remove any old locations
+      watcher.remove([...previousWatchFiles].filter((watchFile) => !newWatchFiles.has(watchFile)));
+      previousWatchFiles = newWatchFiles;
 
       if (shouldWriteResult) {
         // Write output files

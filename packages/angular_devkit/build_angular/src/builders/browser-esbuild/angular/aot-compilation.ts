@@ -43,7 +43,11 @@ export class AotCompilation extends AngularCompilation {
     tsconfig: string,
     hostOptions: AngularHostOptions,
     compilerOptionsTransformer?: (compilerOptions: ng.CompilerOptions) => ng.CompilerOptions,
-  ): Promise<{ affectedFiles: ReadonlySet<ts.SourceFile>; compilerOptions: ng.CompilerOptions }> {
+  ): Promise<{
+    affectedFiles: ReadonlySet<ts.SourceFile>;
+    compilerOptions: ng.CompilerOptions;
+    referencedFiles: readonly string[];
+  }> {
     // Dynamically load the Angular compiler CLI package
     const { NgtscProgram, OptimizeFor } = await AngularCompilation.loadCompilerCli();
 
@@ -96,7 +100,12 @@ export class AotCompilation extends AngularCompilation {
       this.#state?.diagnosticCache,
     );
 
-    return { affectedFiles, compilerOptions };
+    const referencedFiles = typeScriptProgram
+      .getSourceFiles()
+      .filter((sourceFile) => !angularCompiler.ignoreForEmit.has(sourceFile))
+      .map((sourceFile) => sourceFile.fileName);
+
+    return { affectedFiles, compilerOptions, referencedFiles };
   }
 
   *collectDiagnostics(): Iterable<ts.Diagnostic> {
