@@ -9,7 +9,6 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "target": "es2022",
-    "typeRoots": ["node_modules/@types"],
     "lib": ["es2022", "dom"]
   },
   "angularCompilerOptions": {
