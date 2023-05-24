@@ -11,10 +11,11 @@ import { createHash } from 'node:crypto';
 import path from 'node:path';
 import { BundlerContext } from '../esbuild';
 import { LoadResultCache } from '../load-result-cache';
-import { createCssPlugin } from './css-plugin';
+import { CssStylesheetLanguage } from './css-language';
 import { createCssResourcePlugin } from './css-resource-plugin';
-import { createLessPlugin } from './less-plugin';
-import { createSassPlugin } from './sass-plugin';
+import { LessStylesheetLanguage } from './less-language';
+import { SassStylesheetLanguage } from './sass-language';
+import { StylesheetPluginFactory } from './stylesheet-plugin-factory';
 
 /**
  * A counter for component styles used to generate unique build-time identifiers for each stylesheet.
@@ -44,6 +45,17 @@ export function createStylesheetBundleOptions(
     path.resolve(options.workspaceRoot, includePath),
   );
 
+  const pluginFactory = new StylesheetPluginFactory(
+    {
+      sourcemap: !!options.sourcemap,
+      includePaths,
+      inlineComponentData,
+      browsers: options.browsers,
+      tailwindConfiguration: options.tailwindConfiguration,
+    },
+    cache,
+  );
+
   return {
     absWorkingDir: options.workspaceRoot,
     bundle: true,
@@ -62,31 +74,9 @@ export function createStylesheetBundleOptions(
     conditions: ['style', 'sass'],
     mainFields: ['style', 'sass'],
     plugins: [
-      createSassPlugin(
-        {
-          sourcemap: !!options.sourcemap,
-          loadPaths: includePaths,
-          inlineComponentData,
-        },
-        cache,
-      ),
-      createLessPlugin(
-        {
-          sourcemap: !!options.sourcemap,
-          includePaths,
-          inlineComponentData,
-        },
-        cache,
-      ),
-      createCssPlugin(
-        {
-          sourcemap: !!options.sourcemap,
-          inlineComponentData,
-          browsers: options.browsers,
-          tailwindConfiguration: options.tailwindConfiguration,
-        },
-        cache,
-      ),
+      pluginFactory.create(SassStylesheetLanguage),
+      pluginFactory.create(LessStylesheetLanguage),
+      pluginFactory.create(CssStylesheetLanguage),
       createCssResourcePlugin(cache),
     ],
   };

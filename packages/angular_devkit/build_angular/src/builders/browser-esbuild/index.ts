@@ -32,7 +32,7 @@ import { extractLicenses } from './license-extractor';
 import { BrowserEsbuildOptions, NormalizedBrowserOptions, normalizeOptions } from './options';
 import { Schema as BrowserBuilderOptions } from './schema';
 import { createSourcemapIngorelistPlugin } from './sourcemap-ignorelist-plugin';
-import { shutdownSassWorkerPool } from './stylesheets/sass-plugin';
+import { shutdownSassWorkerPool } from './stylesheets/sass-language';
 import type { ChangedFiles } from './watcher';
 
 const compressAsync = promisify(brotliCompress);
