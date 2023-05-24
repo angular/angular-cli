@@ -6,23 +6,15 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import type { OnLoadResult, PartialMessage, Plugin, PluginBuild, ResolveResult } from 'esbuild';
-import assert from 'node:assert';
-import { readFile } from 'node:fs/promises';
-import { dirname, extname, join, relative } from 'node:path';
+import type { OnLoadResult, PartialMessage, ResolveResult } from 'esbuild';
+import { dirname, join, relative } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import type { CompileResult, Exception, Syntax } from 'sass';
 import type {
   FileImporterWithRequestContextOptions,
   SassWorkerImplementation,
 } from '../../../sass/sass-service';
-import { LoadResultCache, createCachedLoad } from '../load-result-cache';
-
-export interface SassPluginOptions {
-  sourcemap: boolean;
-  loadPaths?: string[];
-  inlineComponentData?: Record<string, string>;
-}
+import { StylesheetLanguage, StylesheetPluginOptions } from './stylesheet-plugin-factory';
 
 let sassWorkerPool: SassWorkerImplementation | undefined;
 
@@ -35,70 +27,45 @@ export function shutdownSassWorkerPool(): void {
   sassWorkerPool = undefined;
 }
 
-export function createSassPlugin(options: SassPluginOptions, cache?: LoadResultCache): Plugin {
-  return {
-    name: 'angular-sass',
-    setup(build: PluginBuild): void {
-      const resolveUrl = async (url: string, previousResolvedModules?: Set<string>) => {
-        let result = await build.resolve(url, {
-          kind: 'import-rule',
-          // This should ideally be the directory of the importer file from Sass
-          // but that is not currently available from the Sass importer API.
-          resolveDir: build.initialOptions.absWorkingDir,
-        });
+export const SassStylesheetLanguage = Object.freeze<StylesheetLanguage>({
+  name: 'sass',
+  componentFilter: /^s[ac]ss;/,
+  fileFilter: /\.s[ac]ss$/,
+  process(data, file, format, options, build) {
+    const syntax = format === 'sass' ? 'indented' : 'scss';
+    const resolveUrl = async (url: string, previousResolvedModules?: Set<string>) => {
+      let result = await build.resolve(url, {
+        kind: 'import-rule',
+        // This should ideally be the directory of the importer file from Sass
+        // but that is not currently available from the Sass importer API.
+        resolveDir: build.initialOptions.absWorkingDir,
+      });
 
-        // Workaround to support Yarn PnP without access to the importer file from Sass
-        if (!result.path && previousResolvedModules?.size) {
-          for (const previous of previousResolvedModules) {
-            result = await build.resolve(url, {
-              kind: 'import-rule',
-              resolveDir: previous,
-            });
-            if (result.path) {
-              break;
-            }
+      // Workaround to support Yarn PnP without access to the importer file from Sass
+      if (!result.path && previousResolvedModules?.size) {
+        for (const previous of previousResolvedModules) {
+          result = await build.resolve(url, {
+            kind: 'import-rule',
+            resolveDir: previous,
+          });
+          if (result.path) {
+            break;
           }
         }
+      }
 
-        return result;
-      };
+      return result;
+    };
 
-      // Load inline component stylesheets
-      build.onLoad(
-        { filter: /^s[ac]ss;/, namespace: 'angular:styles/component' },
-        createCachedLoad(cache, async (args) => {
-          const data = options.inlineComponentData?.[args.path];
-          assert(
-            typeof data === 'string',
-            `component style name should always be found [${args.path}]`,
-          );
-
-          const [language, , filePath] = args.path.split(';', 3);
-          const syntax = language === 'sass' ? 'indented' : 'scss';
-
-          return compileString(data, filePath, syntax, options, resolveUrl);
-        }),
-      );
-
-      // Load file stylesheets
-      build.onLoad(
-        { filter: /\.s[ac]ss$/ },
-        createCachedLoad(cache, async (args) => {
-          const data = await readFile(args.path, 'utf-8');
-          const syntax = extname(args.path).toLowerCase() === '.sass' ? 'indented' : 'scss';
-
-          return compileString(data, args.path, syntax, options, resolveUrl);
-        }),
-      );
-    },
-  };
-}
+    return compileString(data, file, syntax, options, resolveUrl);
+  },
+});
 
 async function compileString(
   data: string,
   filePath: string,
   syntax: Syntax,
-  options: SassPluginOptions,
+  options: StylesheetPluginOptions,
   resolveUrl: (url: string, previousResolvedModules?: Set<string>) => Promise<ResolveResult>,
 ): Promise<OnLoadResult> {
   // Lazily load Sass when a Sass file is found
@@ -113,7 +80,7 @@ async function compileString(
       url: pathToFileURL(filePath),
       style: 'expanded',
       syntax,
-      loadPaths: options.loadPaths,
+      loadPaths: options.includePaths,
       sourceMap: options.sourcemap,
       sourceMapIncludeSources: options.sourcemap,
       quietDeps: true,

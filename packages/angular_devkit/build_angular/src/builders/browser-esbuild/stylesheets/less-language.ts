@@ -6,22 +6,15 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import type { OnLoadResult, Plugin, PluginBuild } from 'esbuild';
-import assert from 'node:assert';
+import type { OnLoadResult, PluginBuild } from 'esbuild';
 import { readFile } from 'node:fs/promises';
-import { LoadResultCache, createCachedLoad } from '../load-result-cache';
+import { StylesheetLanguage, StylesheetPluginOptions } from './stylesheet-plugin-factory';
 
 /**
  * The lazy-loaded instance of the less stylesheet preprocessor.
  * It is only imported and initialized if a less stylesheet is used.
  */
 let lessPreprocessor: typeof import('less') | undefined;
-
-export interface LessPluginOptions {
-  sourcemap: boolean;
-  includePaths?: string[];
-  inlineComponentData?: Record<string, string>;
-}
 
 interface LessException extends Error {
   filename: string;
@@ -34,43 +27,19 @@ function isLessException(error: unknown): error is LessException {
   return !!error && typeof error === 'object' && 'column' in error;
 }
 
-export function createLessPlugin(options: LessPluginOptions, cache?: LoadResultCache): Plugin {
-  return {
-    name: 'angular-less',
-    setup(build: PluginBuild): void {
-      // Add a load callback to support inline Component styles
-      build.onLoad(
-        { filter: /^less;/, namespace: 'angular:styles/component' },
-        createCachedLoad(cache, async (args) => {
-          const data = options.inlineComponentData?.[args.path];
-          assert(
-            typeof data === 'string',
-            `component style name should always be found [${args.path}]`,
-          );
-
-          const [, , filePath] = args.path.split(';', 3);
-
-          return compileString(data, filePath, options, build.resolve.bind(build));
-        }),
-      );
-
-      // Add a load callback to support files from disk
-      build.onLoad(
-        { filter: /\.less$/ },
-        createCachedLoad(cache, async (args) => {
-          const data = await readFile(args.path, 'utf-8');
-
-          return compileString(data, args.path, options, build.resolve.bind(build));
-        }),
-      );
-    },
-  };
-}
+export const LessStylesheetLanguage = Object.freeze<StylesheetLanguage>({
+  name: 'less',
+  componentFilter: /^less;/,
+  fileFilter: /\.less$/,
+  process(data, file, _, options, build) {
+    return compileString(data, file, options, build.resolve.bind(build));
+  },
+});
 
 async function compileString(
   data: string,
   filename: string,
-  options: LessPluginOptions,
+  options: StylesheetPluginOptions,
   resolver: PluginBuild['resolve'],
 ): Promise<OnLoadResult> {
   const less = (lessPreprocessor ??= (await import('less')).default);
