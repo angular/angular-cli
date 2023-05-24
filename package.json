@@ -145,7 +145,7 @@
     "express": "4.18.2",
     "glob": "8.1.0",
     "http-proxy": "^1.18.1",
-    "https-proxy-agent": "5.0.1",
+    "https-proxy-agent": "6.2.1",
     "husky": "8.0.3",
     "ini": "4.1.1",
     "inquirer": "8.2.4",
