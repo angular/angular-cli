@@ -1,3 +1,15 @@
+<a name="16.0.3"></a>
+
+# 16.0.3 (2023-05-25)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                 |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------- |
+| [1d83bb656](https://github.com/angular/angular-cli/commit/1d83bb6565550107ab00de52b706cad8f28514b3) | fix  | percent encode asset URLs in development server for esbuild |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="16.0.2"></a>
 
 # 16.0.2 (2023-05-17)
