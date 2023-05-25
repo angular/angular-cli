@@ -1,3 +1,17 @@
+<a name="16.1.0-next.1"></a>
+
+# 16.1.0-next.1 (2023-05-25)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                             |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------------- |
+| [4c82bb8e8](https://github.com/angular/angular-cli/commit/4c82bb8e812e71a9d36bfb3eb6e4c117fa41f00f) | fix  | percent encode asset URLs in development server for esbuild             |
+| [5cacd34a2](https://github.com/angular/angular-cli/commit/5cacd34a222eea16c18caa63dbe4448b81e106f3) | fix  | watch all TypeScript referenced files in esbuild builder                |
+| [8336ad80d](https://github.com/angular/angular-cli/commit/8336ad80da41cde69343960f7515d9ffd5e5e2e1) | perf | enable in-memory load result caching for stylesheets in esbuild builder |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="16.0.3"></a>
 
 # 16.0.3 (2023-05-25)
