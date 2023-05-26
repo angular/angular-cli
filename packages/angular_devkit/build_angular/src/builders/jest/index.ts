@@ -63,6 +63,7 @@ export default createBuilder(
       entryPoints: new Set([...testFiles, jestGlobal, initTestBed]),
       tsConfig: options.tsConfig,
       polyfills: options.polyfills ?? ['zone.js', 'zone.js/testing'],
+      stylePreprocessorOptions: options.stylePreprocessorOptions ?? {},
       outputPath: testOut,
       aot: false,
       index: null,

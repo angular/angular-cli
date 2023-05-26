@@ -41,6 +41,21 @@
           "description": "The full path for the polyfills file, relative to the current workspace or a module specifier. Example: 'zone.js'."
         }
       ]
+    },
+    "stylePreprocessorOptions": {
+      "description": "Options to pass to style preprocessors.",
+      "type": "object",
+      "properties": {
+        "includePaths": {
+          "description": "Paths to include. Paths will be resolved to workspace root.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        }
+      },
+      "additionalProperties": false
     }
   },
   "additionalProperties": false,
