@@ -56,6 +56,7 @@ export function createIvyPlugin(
     compilerOptions,
     fileReplacements,
     jitMode: !aot,
+    emitClassMetadata: !optimize,
     emitNgModuleScope: !optimize,
     inlineStyleFileExtension: buildOptions.inlineStyleLanguage ?? 'css',
   });
