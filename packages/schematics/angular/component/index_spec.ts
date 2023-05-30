@@ -208,6 +208,30 @@ describe('Component Schematic', () => {
     ).toBeRejectedWithError('Selector "app-1-one" is invalid.');
   });
 
+  it('should allow dash in selector before a number', async () => {
+    const options = { ...defaultOptions, name: 'one-1' };
+
+    const tree = await schematicRunner.runSchematic('component', options, appTree);
+    const content = tree.readContent('/projects/bar/src/app/one-1/one-1.component.ts');
+    expect(content).toMatch(/selector: 'app-one-1'/);
+  });
+
+  it('should allow dash in selector before a number and with a custom prefix', async () => {
+    const options = { ...defaultOptions, name: 'one-1', prefix: 'pre' };
+
+    const tree = await schematicRunner.runSchematic('component', options, appTree);
+    const content = tree.readContent('/projects/bar/src/app/one-1/one-1.component.ts');
+    expect(content).toMatch(/selector: 'pre-one-1'/);
+  });
+
+  it('should allow dash in selector before a number and without a prefix', async () => {
+    const options = { ...defaultOptions, name: 'one-2', selector: 'one-2' };
+
+    const tree = await schematicRunner.runSchematic('component', options, appTree);
+    const content = tree.readContent('/projects/bar/src/app/one-2/one-2.component.ts');
+    expect(content).toMatch(/selector: 'one-2'/);
+  });
+
   it('should use the default project prefix if none is passed', async () => {
     const options = { ...defaultOptions, prefix: undefined };
 
