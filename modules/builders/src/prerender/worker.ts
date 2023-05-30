@@ -90,7 +90,7 @@ async function render({
   if (inlineCriticalCss) {
     // Workaround for https://github.com/GoogleChromeLabs/critters/issues/64
     document = document.replace(
-      / media="print" onload="this\.media='all'"><noscript><link .+?><\/noscript>/g,
+      / media="print" onload="this\.media=['&apos;].+?['&apos;]"(?: ngCspMedia=".+")?><noscript><link .+?><\/noscript>/g,
       '>',
     );
   }
