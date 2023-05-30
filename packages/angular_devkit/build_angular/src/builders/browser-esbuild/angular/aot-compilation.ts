@@ -19,7 +19,10 @@ import {
 
 // Temporary deep import for transformer support
 // TODO: Move these to a private exports location or move the implementation into this package.
-const { mergeTransformers, replaceBootstrap } = require('@ngtools/webpack/src/ivy/transformation');
+const {
+  mergeTransformers,
+  createAotTransformers,
+} = require('@ngtools/webpack/src/ivy/transformation');
 
 class AngularCompilationState {
   constructor(
@@ -191,9 +194,11 @@ export class AotCompilation extends AngularCompilation {
       angularCompiler.incrementalCompilation.recordSuccessfulEmit(sourceFile);
       emittedFiles.set(sourceFile, { filename: sourceFile.fileName, contents });
     };
-    const transformers = mergeTransformers(angularCompiler.prepareEmit().transformers, {
-      before: [replaceBootstrap(() => typeScriptProgram.getProgram().getTypeChecker())],
-    });
+    const transformers = mergeTransformers(
+      angularCompiler.prepareEmit().transformers,
+      // The default behavior is to replace JIT bootstraping and remove AOT metadata calls
+      createAotTransformers(typeScriptProgram, {}),
+    );
 
     // TypeScript will loop until there are no more affected files in the program
     while (
