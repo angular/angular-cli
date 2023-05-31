@@ -1,6 +1,6 @@
 import { createConsoleLogger } from '../../packages/angular_devkit/core/node';
-import * as colors from 'ansi-colors';
-import glob from 'glob';
+import colors from 'ansi-colors';
+import glob from 'fast-glob';
 import yargsParser from 'yargs-parser';
 import * as path from 'path';
 import { getGlobalVariable, setGlobalVariable } from './e2e/utils/env';
@@ -120,11 +120,11 @@ const SRC_FILE_EXT_RE = /\.js$/;
 const testGlob = argv.glob?.replace(/\.ts$/, '.js') || `tests/**/*.js`;
 
 const e2eRoot = path.join(__dirname, 'e2e');
-const allSetups = glob.sync(`setup/**/*.js`, { nodir: true, cwd: e2eRoot }).sort();
-const allInitializers = glob.sync(`initialize/**/*.js`, { nodir: true, cwd: e2eRoot }).sort();
+const allSetups = glob.sync(`setup/**/*.js`, { cwd: e2eRoot }).sort();
+const allInitializers = glob.sync(`initialize/**/*.js`, { cwd: e2eRoot }).sort();
 
 const allTests = glob
-  .sync(testGlob, { nodir: true, cwd: e2eRoot, ignore: argv.ignore })
+  .sync(testGlob, { cwd: e2eRoot, ignore: argv.ignore })
   // Replace windows slashes.
   .map((name) => name.replace(/\\/g, '/'))
   .filter((name) => {
@@ -359,18 +359,20 @@ function printFooter(testName: string, type: 'setup' | 'initializer' | 'test', s
 // Collect the packages passed as arguments and return as {package-name => pkg-path}
 async function findPackageTars(): Promise<{ [pkg: string]: PkgInfo }> {
   const pkgs: string[] = (getGlobalVariable('argv').package as string[]).flatMap((p) =>
-    glob.sync(p, { realpath: true }),
+    glob.sync(p),
   );
 
   const pkgJsons = await Promise.all(
-    pkgs.map(async (pkg) => {
-      try {
-        return await extractFile(pkg, './package/package.json');
-      } catch (e) {
-        // TODO(bazel): currently the bazel npm packaging does not contain the standard npm ./package directory
-        return await extractFile(pkg, './package.json');
-      }
-    }),
+    pkgs
+      .map((pkg) => realpathSync(pkg))
+      .map(async (pkg) => {
+        try {
+          return await extractFile(pkg, './package/package.json');
+        } catch (e) {
+          // TODO(bazel): currently the bazel npm packaging does not contain the standard npm ./package directory
+          return await extractFile(pkg, './package.json');
+        }
+      }),
   );
 
   return pkgs.reduce((all, pkg, i) => {

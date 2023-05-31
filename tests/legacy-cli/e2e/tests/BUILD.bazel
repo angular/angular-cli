@@ -11,11 +11,10 @@ ts_library(
     deps = [
         "//tests/legacy-cli/e2e/utils",
         "@npm//@types/express",
-        "@npm//@types/glob",
         "@npm//@types/node-fetch",
         "@npm//@types/semver",
         "@npm//express",
-        "@npm//glob",
+        "@npm//fast-glob",
         "@npm//node-fetch",
         "@npm//semver",
     ],

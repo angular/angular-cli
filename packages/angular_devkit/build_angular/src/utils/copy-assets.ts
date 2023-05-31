@@ -6,12 +6,9 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import * as fs from 'fs';
-import glob from 'glob';
-import * as path from 'path';
-import { promisify } from 'util';
-
-const globPromise = promisify(glob);
+import glob from 'fast-glob';
+import fs from 'node:fs';
+import path from 'node:path';
 
 export async function copyAssets(
   entries: {
@@ -32,14 +29,11 @@ export async function copyAssets(
 
   for (const entry of entries) {
     const cwd = path.resolve(root, entry.input);
-    const files = await globPromise(entry.glob, {
+    const files = await glob(entry.glob, {
       cwd,
       dot: true,
-      nodir: true,
-      root: cwd,
-      nomount: true,
       ignore: entry.ignore ? defaultIgnore.concat(entry.ignore) : defaultIgnore,
-      follow: entry.followSymlinks,
+      followSymbolicLinks: entry.followSymlinks,
     });
 
     const directoryExists = new Set<string>();

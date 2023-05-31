@@ -1,8 +1,5 @@
-import glob from 'glob';
-import { promisify } from 'util';
+import glob from 'fast-glob';
 import { readFile } from '../../utils/fs';
-
-const globAsync = promisify(glob);
 
 const CURRENT_SCRIPT_PACKAGES: ReadonlySet<string> = new Set([
   'esbuild (postinstall)',
@@ -20,7 +17,7 @@ const FALSE_POSITIVE_PATHS: ReadonlySet<string> = new Set([
 const INNER_NODE_MODULES_SEGMENT = '/node_modules/';
 
 export default async function () {
-  const manifestPaths = await globAsync('node_modules/**/package.json');
+  const manifestPaths = await glob('node_modules/**/package.json');
   const newPackages: string[] = [];
 
   for (const manifestPath of manifestPaths) {

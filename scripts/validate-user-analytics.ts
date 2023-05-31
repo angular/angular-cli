@@ -8,10 +8,9 @@
 
 import { logging } from '@angular-devkit/core';
 import assert from 'assert';
+import glob from 'fast-glob';
 import * as fs from 'fs';
-import { glob as globCb } from 'glob';
 import * as path from 'path';
-import { promisify } from 'util';
 import { packages } from '../lib/packages';
 import {
   EventCustomDimension,
@@ -80,7 +79,6 @@ async function _checkDimensions(dimensionsTable: string, logger: logging.Logger)
     }
   };
 
-  const glob = promisify(globCb);
   // Find all the schemas
   const packagesPaths = Object.values(packages).map(({ root }) => root);
   for (const packagePath of packagesPaths) {

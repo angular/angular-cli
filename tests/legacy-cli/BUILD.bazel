@@ -15,9 +15,9 @@ ts_library(
         "//packages/angular_devkit/core",
         "//packages/angular_devkit/core/node",
         "//tests/legacy-cli/e2e/utils",
-        "@npm//@types/glob",
         "@npm//@types/yargs-parser",
         "@npm//ansi-colors",
+        "@npm//fast-glob",
         "@npm//yargs-parser",
     ],
 )
