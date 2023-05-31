@@ -117,7 +117,7 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
       expect(result?.success).toBeFalse();
       expect(logs).toContain(
         jasmine.objectContaining<logging.LogEntry>({
-          message: jasmine.stringMatching(`SassError: Can't find stylesheet to import.`),
+          message: jasmine.stringMatching(`Can't find stylesheet to import`),
         }),
       );
       expect(logs).not.toContain(
