@@ -26,11 +26,11 @@ export function createIvyPlugin(
   };
 
   if (tsConfig.options.target === undefined || tsConfig.options.target < ScriptTarget.ES2022) {
-    tsConfig.options.target = ScriptTarget.ES2022;
+    compilerOptions.target = ScriptTarget.ES2022;
     // If 'useDefineForClassFields' is already defined in the users project leave the value as is.
     // Otherwise fallback to false due to https://github.com/microsoft/TypeScript/issues/45995
     // which breaks the deprecated `@Effects` NGRX decorator and potentially other existing code as well.
-    tsConfig.options.useDefineForClassFields ??= false;
+    compilerOptions.useDefineForClassFields ??= false;
 
     wco.logger.warn(
       'TypeScript compiler options "target" and "useDefineForClassFields" are set to "ES2022" and ' +
