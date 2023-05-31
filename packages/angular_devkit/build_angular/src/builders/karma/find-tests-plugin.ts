@@ -7,14 +7,11 @@
  */
 
 import assert from 'assert';
+import glob, { isDynamicPattern } from 'fast-glob';
 import { PathLike, constants, promises as fs } from 'fs';
-import glob, { hasMagic } from 'glob';
 import { pluginName } from 'mini-css-extract-plugin';
 import { basename, dirname, extname, join, relative } from 'path';
-import { promisify } from 'util';
 import type { Compilation, Compiler } from 'webpack';
-
-const globPromise = promisify(glob);
 
 /**
  * The name of the plugin provided to Webpack when tapping Webpack compiler hooks.
@@ -114,7 +111,7 @@ async function findMatchingTests(
   }
 
   // special logic when pattern does not look like a glob
-  if (!hasMagic(normalizedPattern)) {
+  if (!isDynamicPattern(normalizedPattern)) {
     if (await isDirectory(join(projectSourceRoot, normalizedPattern))) {
       normalizedPattern = `${normalizedPattern}/**/*.spec.@(ts|tsx)`;
     } else {
@@ -133,10 +130,8 @@ async function findMatchingTests(
     }
   }
 
-  return globPromise(normalizedPattern, {
+  return glob(normalizedPattern, {
     cwd: projectSourceRoot,
-    root: projectSourceRoot,
-    nomount: true,
     absolute: true,
     ignore: ['**/node_modules/**', ...ignore],
   });

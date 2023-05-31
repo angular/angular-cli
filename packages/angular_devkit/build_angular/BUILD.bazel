@@ -130,7 +130,6 @@ ts_library(
         "@npm//@types/babel__template",
         "@npm//@types/browserslist",
         "@npm//@types/cacache",
-        "@npm//@types/glob",
         "@npm//@types/inquirer",
         "@npm//@types/karma",
         "@npm//@types/less",
@@ -153,7 +152,7 @@ ts_library(
         "@npm//css-loader",
         "@npm//esbuild",
         "@npm//esbuild-wasm",
-        "@npm//glob",
+        "@npm//fast-glob",
         "@npm//https-proxy-agent",
         "@npm//inquirer",
         "@npm//jsonc-parser",
@@ -357,8 +356,7 @@ LARGE_SPECS = {
     },
     "jest": {
         "extra_deps": [
-            "@npm//glob",
-            "@npm//@types/glob",
+            "@npm//fast-glob",
         ],
     },
 }

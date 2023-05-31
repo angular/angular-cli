@@ -6,14 +6,12 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+// eslint-disable-next-line import/no-extraneous-dependencies
+import realGlob from 'fast-glob';
 import { promises as fs } from 'fs';
-import { glob as globCb } from 'glob';
 import * as path from 'path';
-import { promisify } from 'util';
 import { findTestFiles } from '../test-files';
 import { BASE_OPTIONS } from './options';
-
-const realGlob = promisify(globCb);
 
 describe('test-files', () => {
   describe('findTestFiles()', () => {
@@ -118,7 +116,8 @@ describe('test-files', () => {
             include: ['*.spec.ts', '*.stuff.ts', '*.test.ts'],
           },
           tempDir,
-          glob,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          glob as any,
         ),
       ).toBeRejectedWith(err);
     });

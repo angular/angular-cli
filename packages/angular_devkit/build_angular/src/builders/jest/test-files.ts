@@ -6,11 +6,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { IOptions as GlobOptions, glob as globCb } from 'glob';
-import { promisify } from 'util';
+import fastGlob, { Options as GlobOptions } from 'fast-glob';
 import { JestBuilderOptions } from './options';
-
-const globAsync = promisify(globCb);
 
 /**
  * Finds all test files in the project.
@@ -24,15 +21,13 @@ const globAsync = promisify(globCb);
 export async function findTestFiles(
   options: JestBuilderOptions,
   workspaceRoot: string,
-  glob: typeof globAsync = globAsync,
+  glob: typeof fastGlob = fastGlob,
 ): Promise<Set<string>> {
   const globOptions: GlobOptions = {
     cwd: workspaceRoot,
     ignore: ['node_modules/**'].concat(options.exclude),
-    strict: true, // Fail on an "unusual error" when reading the file system.
-    nobrace: true, // Do not expand `a{b,c}` to `ab,ac`.
-    noext: true, // Disable "extglob" patterns.
-    nodir: true, // Match only files, don't care about directories.
+    braceExpansion: false, // Do not expand `a{b,c}` to `ab,ac`.
+    extglob: false, // Disable "extglob" patterns.
   };
 
   const included = await Promise.all(options.include.map((pattern) => glob(pattern, globOptions)));
