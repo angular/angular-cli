@@ -19,6 +19,7 @@ import {
   addSymbolToNgModuleMetadata,
   findNodes,
   insertAfterLastOccurrence,
+  insertImport,
 } from './ast-utils';
 
 function getTsSource(path: string, content: string): ts.SourceFile {
@@ -683,6 +684,96 @@ describe('ast utils', () => {
 
         expect(paNodes.length).toEqual(4);
       });
+    });
+  });
+
+  describe('insertImport', () => {
+    const filePath = './src/foo.ts';
+
+    it('should insert a new import into a file', () => {
+      const fileContent = '';
+      const source = getTsSource(filePath, fileContent);
+      const change = insertImport(source, filePath, 'Component', '@angular/core');
+      const result = applyChanges(filePath, fileContent, [change]).trim();
+
+      expect(result).toBe(`import { Component } from '@angular/core';`);
+    });
+
+    it('should insert a new import under an alias into a file', () => {
+      const fileContent = '';
+      const source = getTsSource(filePath, fileContent);
+      const change = insertImport(
+        source,
+        filePath,
+        'Component',
+        '@angular/core',
+        false,
+        'NgComponent',
+      );
+      const result = applyChanges(filePath, fileContent, [change]).trim();
+
+      expect(result).toBe(`import { Component as NgComponent } from '@angular/core';`);
+    });
+
+    it('should reuse imports from the same module without an alias', () => {
+      const fileContent = `import { Pipe } from '@angular/core';`;
+      const source = getTsSource(filePath, fileContent);
+      const change = insertImport(source, filePath, 'Component', '@angular/core');
+      const result = applyChanges(filePath, fileContent, [change]).trim();
+
+      expect(result).toBe(`import { Pipe, Component } from '@angular/core';`);
+    });
+
+    it('should reuse imports from the same module with an alias', () => {
+      const fileContent = `import { Pipe } from '@angular/core';`;
+      const source = getTsSource(filePath, fileContent);
+      const change = insertImport(
+        source,
+        filePath,
+        'Component',
+        '@angular/core',
+        false,
+        'NgComponent',
+      );
+      const result = applyChanges(filePath, fileContent, [change]).trim();
+
+      expect(result).toBe(`import { Pipe, Component as NgComponent } from '@angular/core';`);
+    });
+
+    it('should reuse imports for the same symbol', () => {
+      const fileContent = `import { Component } from '@angular/core';`;
+      const source = getTsSource(filePath, fileContent);
+      const change = insertImport(source, filePath, 'Component', '@angular/core');
+      const result = applyChanges(filePath, fileContent, [change]).trim();
+
+      expect(result).toBe(fileContent);
+    });
+
+    it('should not insert a new import if the symbol is imported under an alias', () => {
+      const fileContent = `import { Component as NgComponent } from '@angular/core';`;
+      const source = getTsSource(filePath, fileContent);
+      const change = insertImport(source, filePath, 'Component', '@angular/core');
+      const result = applyChanges(filePath, fileContent, [change]).trim();
+
+      expect(result).toBe(fileContent);
+    });
+
+    it('should insert a new default import into a file', () => {
+      const fileContent = '';
+      const source = getTsSource(filePath, fileContent);
+      const change = insertImport(source, filePath, 'core', '@angular/core', true);
+      const result = applyChanges(filePath, fileContent, [change]).trim();
+
+      expect(result).toBe(`import core from '@angular/core';`);
+    });
+
+    it('should not insert an import if there is a namespace import', () => {
+      const fileContent = `import * as foo from '@angular/core';`;
+      const source = getTsSource(filePath, fileContent);
+      const change = insertImport(source, filePath, 'Component', '@angular/core');
+      const result = applyChanges(filePath, fileContent, [change]).trim();
+
+      expect(result).toBe(fileContent);
     });
   });
 });

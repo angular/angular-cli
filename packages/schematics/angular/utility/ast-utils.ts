@@ -13,10 +13,11 @@ import { Change, InsertChange, NoopChange } from './change';
 /**
  * Add Import `import { symbolName } from fileName` if the import doesn't exit
  * already. Assumes fileToEdit can be resolved and accessed.
- * @param fileToEdit (file we want to add import to)
- * @param symbolName (item to import)
- * @param fileName (path to the file)
- * @param isDefault (if true, import follows style for importing default exports)
+ * @param fileToEdit File we want to add import to.
+ * @param symbolName Item to import.
+ * @param fileName Path to the file.
+ * @param isDefault If true, import follows style for importing default exports.
+ * @param alias Alias that the symbol should be inserted under.
  * @return Change
  */
 export function insertImport(
@@ -25,46 +26,40 @@ export function insertImport(
   symbolName: string,
   fileName: string,
   isDefault = false,
+  alias?: string,
 ): Change {
   const rootNode = source;
-  const allImports = findNodes(rootNode, ts.SyntaxKind.ImportDeclaration);
+  const allImports = findNodes(rootNode, ts.isImportDeclaration);
+  const importExpression = alias ? `${symbolName} as ${alias}` : symbolName;
 
   // get nodes that map to import statements from the file fileName
   const relevantImports = allImports.filter((node) => {
-    // StringLiteral of the ImportDeclaration is the import file (fileName in this case).
-    const importFiles = node
-      .getChildren()
-      .filter(ts.isStringLiteral)
-      .map((n) => n.text);
-
-    return importFiles.filter((file) => file === fileName).length === 1;
+    return ts.isStringLiteralLike(node.moduleSpecifier) && node.moduleSpecifier.text === fileName;
   });
 
   if (relevantImports.length > 0) {
-    let importsAsterisk = false;
-    // imports from import file
-    const imports: ts.Node[] = [];
-    relevantImports.forEach((n) => {
-      Array.prototype.push.apply(imports, findNodes(n, ts.SyntaxKind.Identifier));
-      if (findNodes(n, ts.SyntaxKind.AsteriskToken).length > 0) {
-        importsAsterisk = true;
-      }
+    const hasNamespaceImport = relevantImports.some((node) => {
+      return node.importClause?.namedBindings?.kind === ts.SyntaxKind.NamespaceImport;
     });
 
     // if imports * from fileName, don't add symbolName
-    if (importsAsterisk) {
+    if (hasNamespaceImport) {
       return new NoopChange();
     }
 
-    const importTextNodes = imports.filter((n) => (n as ts.Identifier).text === symbolName);
+    const imports = relevantImports.flatMap((node) => {
+      return node.importClause?.namedBindings && ts.isNamedImports(node.importClause.namedBindings)
+        ? node.importClause.namedBindings.elements
+        : [];
+    });
 
     // insert import if it's not there
-    if (importTextNodes.length === 0) {
+    if (!imports.some((node) => (node.propertyName || node.name).text === symbolName)) {
       const fallbackPos =
         findNodes(relevantImports[0], ts.SyntaxKind.CloseBraceToken)[0].getStart() ||
         findNodes(relevantImports[0], ts.SyntaxKind.FromKeyword)[0].getStart();
 
-      return insertAfterLastOccurrence(imports, `, ${symbolName}`, fileToEdit, fallbackPos);
+      return insertAfterLastOccurrence(imports, `, ${importExpression}`, fileToEdit, fallbackPos);
     }
 
     return new NoopChange();
@@ -82,7 +77,7 @@ export function insertImport(
   const insertAtBeginning = allImports.length === 0 && useStrict.length === 0;
   const separator = insertAtBeginning ? '' : ';\n';
   const toInsert =
-    `${separator}import ${open}${symbolName}${close}` +
+    `${separator}import ${open}${importExpression}${close}` +
     ` from '${fileName}'${insertAtBeginning ? ';\n' : ''}`;
 
   return insertAfterLastOccurrence(
