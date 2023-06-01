@@ -1,3 +1,16 @@
+<a name="16.0.4"></a>
+
+# 16.0.4 (2023-06-01)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                         |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------- |
+| [5bff97d5b](https://github.com/angular/angular-cli/commit/5bff97d5b965373cd7e4dc0b731c24d80b512faa) | fix  | correctly set overridden compiler option            |
+| [cd0247514](https://github.com/angular/angular-cli/commit/cd0247514db295661d319bec33ad7167229d99f9) | fix  | preemptively remove AOT metadata in esbuild builder |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="16.1.0-next.1"></a>
 
 # 16.1.0-next.1 (2023-05-25)
