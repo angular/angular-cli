@@ -9,6 +9,10 @@
 import { DOCUMENT } from '@angular/common';
 import { APP_INITIALIZER, NgModule } from '@angular/core';
 
+/**
+ * @deprecated Use `provideClientHydration` instead which caches HTTP requests by default.
+ * @see https://angular.io/api/platform-browser/provideClientHydration
+ */
 export function domContentLoadedFactory(doc: Document): () => Promise<void> {
   return () =>
     new Promise((resolve, _reject) => {
@@ -27,6 +31,10 @@ export function domContentLoadedFactory(doc: Document): () => Promise<void> {
     });
 }
 
+/**
+ * @deprecated Use `provideClientHydration` instead which caches HTTP requests by default.
+ * @see https://angular.io/api/platform-browser/provideClientHydration
+ */
 @NgModule({
   providers: [
     {

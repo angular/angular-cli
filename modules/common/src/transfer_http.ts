@@ -50,6 +50,10 @@ function getHeadersMap(headers: HttpHeaders): Record<string, string[]> {
   return headersMap;
 }
 
+/**
+ * @deprecated Use `provideClientHydration` instead which caches HTTP requests by default.
+ * @see https://angular.io/api/platform-browser/provideClientHydration
+ */
 @Injectable()
 export class TransferHttpCacheInterceptor implements HttpInterceptor {
   private isCacheActive = true;
