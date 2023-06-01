@@ -665,3 +665,52 @@ export function addRouteDeclarationToModule(
 
   return new InsertChange(fileToAdd, insertPos, route);
 }
+
+/** Asserts if the specified node is a named declaration (e.g. class, interface). */
+function isNamedNode(
+  node: ts.Node & { name?: ts.Node },
+): node is ts.Node & { name: ts.Identifier } {
+  return !!node.name && ts.isIdentifier(node.name);
+}
+
+/**
+ * Determines if a SourceFile has a top-level declaration whose name matches a specific symbol.
+ * Can be used to avoid conflicts when inserting new imports into a file.
+ * @param sourceFile File in which to search.
+ * @param symbolName Name of the symbol to search for.
+ * @param skipModule Path of the module that the symbol may have been imported from. Used to
+ * avoid false positives where the same symbol we're looking for may have been imported.
+ */
+export function hasTopLevelIdentifier(
+  sourceFile: ts.SourceFile,
+  symbolName: string,
+  skipModule: string | null = null,
+): boolean {
+  for (const node of sourceFile.statements) {
+    if (isNamedNode(node) && node.name.text === symbolName) {
+      return true;
+    }
+
+    if (
+      ts.isVariableStatement(node) &&
+      node.declarationList.declarations.some((decl) => {
+        return isNamedNode(decl) && decl.name.text === symbolName;
+      })
+    ) {
+      return true;
+    }
+
+    if (
+      ts.isImportDeclaration(node) &&
+      ts.isStringLiteralLike(node.moduleSpecifier) &&
+      node.moduleSpecifier.text !== skipModule &&
+      node.importClause?.namedBindings &&
+      ts.isNamedImports(node.importClause.namedBindings) &&
+      node.importClause.namedBindings.elements.some((el) => el.name.text === symbolName)
+    ) {
+      return true;
+    }
+  }
+
+  return false;
+}

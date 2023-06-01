@@ -18,6 +18,7 @@ import {
   addRouteDeclarationToModule,
   addSymbolToNgModuleMetadata,
   findNodes,
+  hasTopLevelIdentifier,
   insertAfterLastOccurrence,
   insertImport,
 } from './ast-utils';
@@ -774,6 +775,76 @@ describe('ast utils', () => {
       const result = applyChanges(filePath, fileContent, [change]).trim();
 
       expect(result).toBe(fileContent);
+    });
+  });
+
+  describe('hasTopLevelIdentifier', () => {
+    const filePath = './src/foo.ts';
+
+    it('should find top-level class declaration with a specific name', () => {
+      const fileContent = `class FooClass {}`;
+      const source = getTsSource(filePath, fileContent);
+
+      expect(hasTopLevelIdentifier(source, 'FooClass')).toBe(true);
+      expect(hasTopLevelIdentifier(source, 'Foo')).toBe(false);
+    });
+
+    it('should find top-level interface declaration with a specific name', () => {
+      const fileContent = `interface FooInterface {}`;
+      const source = getTsSource(filePath, fileContent);
+
+      expect(hasTopLevelIdentifier(source, 'FooInterface')).toBe(true);
+      expect(hasTopLevelIdentifier(source, 'Foo')).toBe(false);
+    });
+
+    it('should find top-level variable declaration with a specific name', () => {
+      const fileContent = `
+        const singleVar = 1;
+
+        const fooVar = 1, barVar = 2;
+      `;
+      const source = getTsSource(filePath, fileContent);
+
+      expect(hasTopLevelIdentifier(source, 'singleVar')).toBe(true);
+      expect(hasTopLevelIdentifier(source, 'fooVar')).toBe(true);
+      expect(hasTopLevelIdentifier(source, 'barVar')).toBe(true);
+      expect(hasTopLevelIdentifier(source, 'bar')).toBe(false);
+    });
+
+    it('should find top-level imports with a specific name', () => {
+      const fileContent = `
+        import { FooInterface } from '@foo/interfaces';
+
+        class FooClass implements FooInterface {}
+      `;
+      const source = getTsSource(filePath, fileContent);
+
+      expect(hasTopLevelIdentifier(source, 'FooInterface')).toBe(true);
+      expect(hasTopLevelIdentifier(source, 'Foo')).toBe(false);
+    });
+
+    it('should find top-level aliased imports with a specific name', () => {
+      const fileContent = `
+        import { FooInterface as AliasedFooInterface } from '@foo/interfaces';
+
+        class FooClass implements AliasedFooInterface {}
+      `;
+      const source = getTsSource(filePath, fileContent);
+
+      expect(hasTopLevelIdentifier(source, 'AliasedFooInterface')).toBe(true);
+      expect(hasTopLevelIdentifier(source, 'FooInterface')).toBe(false);
+      expect(hasTopLevelIdentifier(source, 'Foo')).toBe(false);
+    });
+
+    it('should be able to skip imports from a certain module', () => {
+      const fileContent = `
+        import { FooInterface } from '@foo/interfaces';
+
+        class FooClass implements FooInterface {}
+      `;
+      const source = getTsSource(filePath, fileContent);
+
+      expect(hasTopLevelIdentifier(source, 'FooInterface', '@foo/interfaces')).toBe(false);
     });
   });
 });
