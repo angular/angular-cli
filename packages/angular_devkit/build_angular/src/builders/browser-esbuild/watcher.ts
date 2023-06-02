@@ -31,7 +31,7 @@ export interface BuildWatcher extends AsyncIterableIterator<ChangedFiles> {
 }
 
 export function createWatcher(options?: {
-  polling?: boolean;
+  usePolling?: boolean;
   interval?: number;
   ignored?: string[];
 }): BuildWatcher {

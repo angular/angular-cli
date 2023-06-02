@@ -679,7 +679,7 @@ export async function* buildEsbuildBrowserInternal(
   // Setup a watcher
   const { createWatcher } = await import('./watcher');
   const watcher = createWatcher({
-    polling: typeof userOptions.poll === 'number',
+    usePolling: typeof userOptions.poll === 'number',
     interval: userOptions.poll,
     ignored: [
       // Ignore the output and cache paths to avoid infinite rebuild cycles
