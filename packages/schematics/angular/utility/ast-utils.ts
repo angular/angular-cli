@@ -217,7 +217,7 @@ function nodesByPosition(first: ts.Node, second: ts.Node): number {
  * @throw Error if toInsert is first occurence but fall back is not set
  */
 export function insertAfterLastOccurrence(
-  nodes: ts.Node[],
+  nodes: ts.Node[] | ts.NodeArray<ts.Node>,
   toInsert: string,
   file: string,
   fallbackPos: number,

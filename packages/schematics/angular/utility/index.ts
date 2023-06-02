@@ -16,6 +16,7 @@ export {
   writeWorkspace,
 } from './workspace';
 export { Builders as AngularBuilder } from './workspace-models';
+export * from './standalone';
 
 // Package dependency related rules and types
 export { DependencyType, ExistingBehavior, InstallBehavior, addDependency } from './dependency';
