@@ -15,6 +15,7 @@ import { assertIsError } from '../../utils/error';
 import { LoadResultCache, createCachedLoad } from './load-result-cache';
 import type { NormalizedBrowserOptions } from './options';
 import { createSourcemapIngorelistPlugin } from './sourcemap-ignorelist-plugin';
+import { createVirtualModulePlugin } from './virtual-module-plugin';
 
 /**
  * Create an esbuild 'build' options object for all global scripts defined in the user provied
@@ -71,84 +72,62 @@ export function createGlobalScriptsBundleOptions(
     preserveSymlinks,
     plugins: [
       createSourcemapIngorelistPlugin(),
-      {
-        name: 'angular-global-scripts',
-        setup(build) {
-          build.onResolve({ filter: /^angular:script\/global:/ }, (args) => {
-            if (args.kind !== 'entry-point') {
-              return null;
+      createVirtualModulePlugin({
+        namespace,
+        external: true,
+        // Add the `js` extension here so that esbuild generates an output file with the extension
+        transformPath: (path) => path.slice(namespace.length + 1) + '.js',
+        loadContent: (args, build) =>
+          createCachedLoad(loadCache, async (args) => {
+            const files = globalScripts.find(({ name }) => name === args.path.slice(0, -3))?.files;
+            assert(files, `Invalid operation: global scripts name not found [${args.path}]`);
+
+            // Global scripts are concatenated using magic-string instead of bundled via esbuild.
+            const bundleContent = new Bundle();
+            const watchFiles = [];
+            for (const filename of files) {
+              let fileContent;
+              try {
+                // Attempt to read as a relative path from the workspace root
+                fileContent = await readFile(path.join(workspaceRoot, filename), 'utf-8');
+                watchFiles.push(filename);
+              } catch (e) {
+                assertIsError(e);
+                if (e.code !== 'ENOENT') {
+                  throw e;
+                }
+
+                // If not found attempt to resolve as a module specifier
+                const resolveResult = await build.resolve(filename, {
+                  kind: 'entry-point',
+                  resolveDir: workspaceRoot,
+                });
+
+                if (resolveResult.errors.length) {
+                  // Remove resolution failure notes about marking as external since it doesn't apply
+                  // to global scripts.
+                  resolveResult.errors.forEach((error) => (error.notes = []));
+
+                  return {
+                    errors: resolveResult.errors,
+                    warnings: resolveResult.warnings,
+                  };
+                }
+
+                watchFiles.push(path.relative(resolveResult.path, workspaceRoot));
+                fileContent = await readFile(resolveResult.path, 'utf-8');
+              }
+
+              bundleContent.addSource(new MagicString(fileContent, { filename }));
             }
 
             return {
-              // Add the `js` extension here so that esbuild generates an output file with the extension
-              path: args.path.slice(namespace.length + 1) + '.js',
-              namespace,
+              contents: bundleContent.toString(),
+              loader: 'js',
+              watchFiles,
             };
-          });
-          // All references within a global script should be considered external. This maintains the runtime
-          // behavior of the script as if it were added directly to a script element for referenced imports.
-          build.onResolve({ filter: /./, namespace }, ({ path }) => {
-            return {
-              path,
-              external: true,
-            };
-          });
-          build.onLoad(
-            { filter: /./, namespace },
-            createCachedLoad(loadCache, async (args) => {
-              const files = globalScripts.find(
-                ({ name }) => name === args.path.slice(0, -3),
-              )?.files;
-              assert(files, `Invalid operation: global scripts name not found [${args.path}]`);
-
-              // Global scripts are concatenated using magic-string instead of bundled via esbuild.
-              const bundleContent = new Bundle();
-              const watchFiles = [];
-              for (const filename of files) {
-                let fileContent;
-                try {
-                  // Attempt to read as a relative path from the workspace root
-                  fileContent = await readFile(path.join(workspaceRoot, filename), 'utf-8');
-                  watchFiles.push(filename);
-                } catch (e) {
-                  assertIsError(e);
-                  if (e.code !== 'ENOENT') {
-                    throw e;
-                  }
-
-                  // If not found attempt to resolve as a module specifier
-                  const resolveResult = await build.resolve(filename, {
-                    kind: 'entry-point',
-                    resolveDir: workspaceRoot,
-                  });
-
-                  if (resolveResult.errors.length) {
-                    // Remove resolution failure notes about marking as external since it doesn't apply
-                    // to global scripts.
-                    resolveResult.errors.forEach((error) => (error.notes = []));
-
-                    return {
-                      errors: resolveResult.errors,
-                      warnings: resolveResult.warnings,
-                    };
-                  }
-
-                  watchFiles.push(path.relative(resolveResult.path, workspaceRoot));
-                  fileContent = await readFile(resolveResult.path, 'utf-8');
-                }
-
-                bundleContent.addSource(new MagicString(fileContent, { filename }));
-              }
-
-              return {
-                contents: bundleContent.toString(),
-                loader: 'js',
-                watchFiles,
-              };
-            }),
-          );
-        },
-      },
+          }).call(build, args),
+      }),
     ],
   };
 }

@@ -11,6 +11,7 @@ import assert from 'node:assert';
 import { LoadResultCache } from './load-result-cache';
 import { NormalizedBrowserOptions } from './options';
 import { createStylesheetBundleOptions } from './stylesheets/bundle-options';
+import { createVirtualModulePlugin } from './virtual-module-plugin';
 
 export function createGlobalStylesBundleOptions(
   options: NormalizedBrowserOptions,
@@ -69,20 +70,11 @@ export function createGlobalStylesBundleOptions(
   buildOptions.legalComments = options.extractLicenses ? 'none' : 'eof';
   buildOptions.entryPoints = entryPoints;
 
-  buildOptions.plugins.unshift({
-    name: 'angular-global-styles',
-    setup(build) {
-      build.onResolve({ filter: /^angular:styles\/global;/ }, (args) => {
-        if (args.kind !== 'entry-point') {
-          return null;
-        }
-
-        return {
-          path: args.path.split(';', 2)[1],
-          namespace,
-        };
-      });
-      build.onLoad({ filter: /./, namespace }, (args) => {
+  buildOptions.plugins.unshift(
+    createVirtualModulePlugin({
+      namespace,
+      transformPath: (path) => path.split(';', 2)[1],
+      loadContent: (args) => {
         const files = globalStyles.find(({ name }) => name === args.path)?.files;
         assert(files, `global style name should always be found [${args.path}]`);
 
@@ -91,9 +83,9 @@ export function createGlobalStylesBundleOptions(
           loader: 'css',
           resolveDir: workspaceRoot,
         };
-      });
-    },
-  });
+      },
+    }),
+  );
 
   return buildOptions;
 }
