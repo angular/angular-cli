@@ -26,6 +26,8 @@ interface ResolvedAppConfig {
  * @param tree File tree of the project.
  * @param filePath Path of the file in which to check.
  * @param className Class name of the module to search for.
+ * @deprecated Private utility that will be removed. Use `addRootImport` or `addRootProvider` from
+ * `@schematics/angular/utility` instead.
  */
 export function importsProvidersFrom(tree: Tree, filePath: string, className: string): boolean {
   const sourceFile = createSourceFile(tree, filePath);
@@ -43,6 +45,8 @@ export function importsProvidersFrom(tree: Tree, filePath: string, className: st
  * @param tree File tree of the project.
  * @param filePath Path of the file in which to check.
  * @param functionName Name of the function to search for.
+ * @deprecated Private utility that will be removed. Use `addRootImport` or `addRootProvider` from
+ * `@schematics/angular/utility` instead.
  */
 export function callsProvidersFunction(
   tree: Tree,
@@ -68,6 +72,8 @@ export function callsProvidersFunction(
  * @param filePath Path to the file that should be updated.
  * @param moduleName Name of the module that should be imported.
  * @param modulePath Path from which to import the module.
+ * @deprecated Private utility that will be removed. Use `addRootImport` or `addRootProvider` from
+ * `@schematics/angular/utility` instead.
  */
 export function addModuleImportToStandaloneBootstrap(
   tree: Tree,
@@ -164,6 +170,8 @@ export function addModuleImportToStandaloneBootstrap(
  * @param importPath Path from which to import the function.
  * @param args Arguments to use when calling the function.
  * @returns The file path that the provider was added to.
+ * @deprecated Private utility that will be removed. Use `addRootImport` or `addRootProvider` from
+ * `@schematics/angular/utility` instead.
  */
 export function addFunctionalProvidersToStandaloneBootstrap(
   tree: Tree,
@@ -240,7 +248,11 @@ export function addFunctionalProvidersToStandaloneBootstrap(
   return configFilePath;
 }
 
-/** Finds the call to `bootstrapApplication` within a file. */
+/**
+ * Finds the call to `bootstrapApplication` within a file.
+ * @deprecated Private utility that will be removed. Use `addRootImport` or `addRootProvider` from
+ * `@schematics/angular/utility` instead.
+ */
 export function findBootstrapApplicationCall(sourceFile: ts.SourceFile): ts.CallExpression | null {
   const localName = findImportLocalName(
     sourceFile,
