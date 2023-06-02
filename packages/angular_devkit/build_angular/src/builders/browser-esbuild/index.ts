@@ -33,6 +33,7 @@ import { BrowserEsbuildOptions, NormalizedBrowserOptions, normalizeOptions } fro
 import { Schema as BrowserBuilderOptions } from './schema';
 import { createSourcemapIngorelistPlugin } from './sourcemap-ignorelist-plugin';
 import { shutdownSassWorkerPool } from './stylesheets/sass-language';
+import { createVirtualModulePlugin } from './virtual-module-plugin';
 import type { ChangedFiles } from './watcher';
 
 const compressAsync = promisify(brotliCompress);
@@ -470,28 +471,16 @@ function createCodeBundleOptions(
       ['polyfills']: namespace,
     };
 
-    buildOptions.plugins?.unshift({
-      name: 'angular-polyfills',
-      setup(build) {
-        build.onResolve({ filter: /^angular:polyfills$/ }, (args) => {
-          if (args.kind !== 'entry-point') {
-            return null;
-          }
-
-          return {
-            path: 'entry',
-            namespace,
-          };
-        });
-        build.onLoad({ filter: /./, namespace }, () => {
-          return {
-            contents: polyfills.map((file) => `import '${file.replace(/\\/g, '/')}';`).join('\n'),
-            loader: 'js',
-            resolveDir: workspaceRoot,
-          };
-        });
-      },
-    });
+    buildOptions.plugins?.unshift(
+      createVirtualModulePlugin({
+        namespace,
+        loadContent: () => ({
+          contents: polyfills.map((file) => `import '${file.replace(/\\/g, '/')}';`).join('\n'),
+          loader: 'js',
+          resolveDir: workspaceRoot,
+        }),
+      }),
+    );
   }
 
   return buildOptions;
