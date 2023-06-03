@@ -126,7 +126,6 @@
 
 "@angular/build-tooling@https://github.com/angular/dev-infra-private-build-tooling-builds.git#57bb4d90bd38d46d5408c43d590c550f45a61cc4":
   version "0.0.0-e2ec253bcdf2f8b79478046a268e6f70e17838f4"
-  uid "57bb4d90bd38d46d5408c43d590c550f45a61cc4"
   resolved "https://github.com/angular/dev-infra-private-build-tooling-builds.git#57bb4d90bd38d46d5408c43d590c550f45a61cc4"
   dependencies:
     "@angular-devkit/build-angular" "16.1.0-next.0"
@@ -287,7 +286,6 @@
 
 "@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#e61936b0ce31bf344b96e488c7d2e11975036efc":
   version "0.0.0-e2ec253bcdf2f8b79478046a268e6f70e17838f4"
-  uid e61936b0ce31bf344b96e488c7d2e11975036efc
   resolved "https://github.com/angular/dev-infra-private-ng-dev-builds.git#e61936b0ce31bf344b96e488c7d2e11975036efc"
   dependencies:
     "@yarnpkg/lockfile" "^1.1.0"
@@ -11430,10 +11428,10 @@ typescript@5.0.4, typescript@~5.0.4:
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-5.0.4.tgz#b217fd20119bd61a94d4011274e0ab369058da3b"
   integrity sha512-cW9T5W9xY37cc+jfEnaUvX91foxtHkza3Nw3wkoF4sSlKn0MONdkdEndig/qPBWXNkmplh3NzayQzCiHM4/hqw==
 
-typescript@5.1.0-beta:
-  version "5.1.0-beta"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-5.1.0-beta.tgz#f2a436a238e29e63b60d689d2775bac84786f584"
-  integrity sha512-NT+wDYZu95yUj1K9fbHz6v2gl3m56MNZs6tbKdMJq7pN0l+oQn0g6Z0IV3fHcEQDA9LxZgs3BrWMdMsvJZixdg==
+typescript@5.1.3:
+  version "5.1.3"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-5.1.3.tgz#8d84219244a6b40b6fb2b33cc1c062f715b9e826"
+  integrity sha512-XH627E9vkeqhlZFQuL+UsyAXEnibT0kWR2FWONlr4sTjvxyJYnyefgrkyECLzM5NenmKzRAy2rR/OlYLA1HkZw==
 
 typescript@~4.9.0:
   version "4.9.5"
