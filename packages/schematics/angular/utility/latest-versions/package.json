@@ -17,7 +17,7 @@
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "ts-node": "~10.9.0",
-    "typescript": "~5.0.2",
+    "typescript": "~5.1.3",
     "zone.js": "~0.13.0"
   }
 }
