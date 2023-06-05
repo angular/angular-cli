@@ -6,7 +6,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { createHash } from 'crypto';
+import { createHash } from 'node:crypto';
+import { extname } from 'node:path';
 import { loadEsmModule } from '../load-esm';
 import { htmlRewritingStream } from './html-rewriting-stream';
 
@@ -38,6 +39,7 @@ export interface AugmentIndexHtmlOptions {
   entrypoints: Entrypoint[];
   /** Used to set the document default locale */
   lang?: string;
+  hints?: { url: string; mode: string }[];
 }
 
 export interface FileInfo {
@@ -131,6 +133,38 @@ export async function augmentIndexHtml(
     }
 
     linkTags.push(`<link ${attrs.join(' ')}>`);
+  }
+
+  if (params.hints?.length) {
+    for (const hint of params.hints) {
+      const attrs = [`rel="${hint.mode}"`, `href="${deployUrl}${hint.url}"`];
+
+      if (hint.mode !== 'modulepreload' && crossOrigin !== 'none') {
+        // Value is considered anonymous by the browser when not present or empty
+        attrs.push(crossOrigin === 'anonymous' ? 'crossorigin' : `crossorigin="${crossOrigin}"`);
+      }
+
+      if (hint.mode === 'preload' || hint.mode === 'prefetch') {
+        switch (extname(hint.url)) {
+          case '.js':
+            attrs.push('as="script"');
+            break;
+          case '.css':
+            attrs.push('as="style"');
+            break;
+        }
+      }
+
+      if (
+        sri &&
+        (hint.mode === 'preload' || hint.mode === 'prefetch' || hint.mode === 'modulepreload')
+      ) {
+        const content = await loadOutputFile(hint.url);
+        attrs.push(generateSriAttributes(content));
+      }
+
+      linkTags.push(`<link ${attrs.join(' ')}>`);
+    }
   }
 
   const dir = lang ? await getLanguageDirection(lang, warnings) : undefined;
