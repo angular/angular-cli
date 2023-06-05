@@ -21,11 +21,14 @@ type IndexHtmlGeneratorPlugin = (
   options: IndexHtmlGeneratorProcessOptions,
 ) => Promise<string | IndexHtmlTransformResult>;
 
+export type HintMode = 'prefetch' | 'preload' | 'modulepreload' | 'preconnect' | 'dns-prefetch';
+
 export interface IndexHtmlGeneratorProcessOptions {
   lang: string | undefined;
   baseHref: string | undefined;
   outputPath: string;
   files: FileInfo[];
+  hints?: { url: string; mode: HintMode }[];
 }
 
 export interface IndexHtmlGeneratorOptions {
@@ -112,7 +115,7 @@ function augmentIndexHtmlPlugin(generator: IndexHtmlGenerator): IndexHtmlGenerat
   const { deployUrl, crossOrigin, sri = false, entrypoints } = generator.options;
 
   return async (html, options) => {
-    const { lang, baseHref, outputPath = '', files } = options;
+    const { lang, baseHref, outputPath = '', files, hints } = options;
 
     return augmentIndexHtml({
       html,
@@ -124,6 +127,7 @@ function augmentIndexHtmlPlugin(generator: IndexHtmlGenerator): IndexHtmlGenerat
       entrypoints,
       loadOutputFile: (filePath) => generator.readAsset(join(outputPath, filePath)),
       files,
+      hints,
     });
   };
 }

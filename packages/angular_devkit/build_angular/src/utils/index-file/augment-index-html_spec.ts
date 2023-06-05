@@ -164,6 +164,217 @@ describe('augment-index-html', () => {
     `);
   });
 
+  it(`should add preconnect and dns-prefetch hints when provided with cross origin`, async () => {
+    const { content, warnings } = await augmentIndexHtml({
+      ...indexGeneratorOptions,
+      hints: [
+        { mode: 'preconnect', url: 'http://example.com' },
+        { mode: 'dns-prefetch', url: 'http://example.com' },
+      ],
+    });
+
+    expect(warnings).toHaveSize(0);
+    expect(content).toEqual(oneLineHtml`
+        <html>
+          <head>
+            <base href="/">
+            <link rel="preconnect" href="http://example.com">
+            <link rel="dns-prefetch" href="http://example.com">
+          </head>
+          <body>
+          </body>
+        </html>
+      `);
+  });
+
+  it(`should add preconnect and dns-prefetch hints when provided with "use-credentials" cross origin`, async () => {
+    const { content, warnings } = await augmentIndexHtml({
+      ...indexGeneratorOptions,
+      crossOrigin: 'use-credentials',
+      hints: [
+        { mode: 'preconnect', url: 'http://example.com' },
+        { mode: 'dns-prefetch', url: 'http://example.com' },
+      ],
+    });
+
+    expect(warnings).toHaveSize(0);
+    expect(content).toEqual(oneLineHtml`
+        <html>
+          <head>
+            <base href="/">
+            <link rel="preconnect" href="http://example.com" crossorigin="use-credentials">
+            <link rel="dns-prefetch" href="http://example.com" crossorigin="use-credentials">
+          </head>
+          <body>
+          </body>
+        </html>
+      `);
+  });
+
+  it(`should add preconnect and dns-prefetch hints when provided with "anonymous" cross origin`, async () => {
+    const { content, warnings } = await augmentIndexHtml({
+      ...indexGeneratorOptions,
+      crossOrigin: 'anonymous',
+      hints: [
+        { mode: 'preconnect', url: 'http://example.com' },
+        { mode: 'dns-prefetch', url: 'http://example.com' },
+      ],
+    });
+
+    expect(warnings).toHaveSize(0);
+    expect(content).toEqual(oneLineHtml`
+        <html>
+          <head>
+            <base href="/">
+            <link rel="preconnect" href="http://example.com" crossorigin>
+            <link rel="dns-prefetch" href="http://example.com" crossorigin>
+          </head>
+          <body>
+          </body>
+        </html>
+      `);
+  });
+
+  it(`should add preconnect and dns-prefetch hints when provided with "none" cross origin`, async () => {
+    const { content, warnings } = await augmentIndexHtml({
+      ...indexGeneratorOptions,
+      crossOrigin: 'none',
+      hints: [
+        { mode: 'preconnect', url: 'http://example.com' },
+        { mode: 'dns-prefetch', url: 'http://example.com' },
+      ],
+    });
+
+    expect(warnings).toHaveSize(0);
+    expect(content).toEqual(oneLineHtml`
+        <html>
+          <head>
+            <base href="/">
+            <link rel="preconnect" href="http://example.com">
+            <link rel="dns-prefetch" href="http://example.com">
+          </head>
+          <body>
+          </body>
+        </html>
+      `);
+  });
+
+  it(`should add preconnect and dns-prefetch hints when provided with no cross origin`, async () => {
+    const { content, warnings } = await augmentIndexHtml({
+      ...indexGeneratorOptions,
+      hints: [
+        { mode: 'preconnect', url: 'http://example.com' },
+        { mode: 'dns-prefetch', url: 'http://example.com' },
+      ],
+    });
+
+    expect(warnings).toHaveSize(0);
+    expect(content).toEqual(oneLineHtml`
+        <html>
+          <head>
+            <base href="/">
+            <link rel="preconnect" href="http://example.com">
+            <link rel="dns-prefetch" href="http://example.com">
+          </head>
+          <body>
+          </body>
+        </html>
+      `);
+  });
+
+  it(`should add modulepreload hint when provided`, async () => {
+    const { content, warnings } = await augmentIndexHtml({
+      ...indexGeneratorOptions,
+      hints: [
+        { mode: 'modulepreload', url: 'x.js' },
+        { mode: 'modulepreload', url: 'y/z.js' },
+      ],
+    });
+
+    expect(warnings).toHaveSize(0);
+    expect(content).toEqual(oneLineHtml`
+        <html>
+          <head>
+            <base href="/">
+            <link rel="modulepreload" href="x.js">
+            <link rel="modulepreload" href="y/z.js">
+          </head>
+          <body>
+          </body>
+        </html>
+      `);
+  });
+
+  it(`should add modulepreload hint with no crossorigin attribute when provided with cross origin set`, async () => {
+    const { content, warnings } = await augmentIndexHtml({
+      ...indexGeneratorOptions,
+      crossOrigin: 'anonymous',
+      hints: [
+        { mode: 'modulepreload', url: 'x.js' },
+        { mode: 'modulepreload', url: 'y/z.js' },
+      ],
+    });
+
+    expect(warnings).toHaveSize(0);
+    expect(content).toEqual(oneLineHtml`
+        <html>
+          <head>
+            <base href="/">
+            <link rel="modulepreload" href="x.js">
+            <link rel="modulepreload" href="y/z.js">
+          </head>
+          <body>
+          </body>
+        </html>
+      `);
+  });
+
+  it(`should add prefetch/preload hints with as=script when specified with a JS url`, async () => {
+    const { content, warnings } = await augmentIndexHtml({
+      ...indexGeneratorOptions,
+      hints: [
+        { mode: 'prefetch', url: 'x.js' },
+        { mode: 'preload', url: 'y/z.js' },
+      ],
+    });
+
+    expect(warnings).toHaveSize(0);
+    expect(content).toEqual(oneLineHtml`
+        <html>
+          <head>
+            <base href="/">
+            <link rel="prefetch" href="x.js" as="script">
+            <link rel="preload" href="y/z.js" as="script">
+          </head>
+          <body>
+          </body>
+        </html>
+      `);
+  });
+
+  it(`should add prefetch/preload hints with as=style when specified with a CSS url`, async () => {
+    const { content, warnings } = await augmentIndexHtml({
+      ...indexGeneratorOptions,
+      hints: [
+        { mode: 'prefetch', url: 'x.css' },
+        { mode: 'preload', url: 'y/z.css' },
+      ],
+    });
+
+    expect(warnings).toHaveSize(0);
+    expect(content).toEqual(oneLineHtml`
+        <html>
+          <head>
+            <base href="/">
+            <link rel="prefetch" href="x.css" as="style">
+            <link rel="preload" href="y/z.css" as="style">
+          </head>
+          <body>
+          </body>
+        </html>
+      `);
+  });
+
   it('should add `.mjs` script tags', async () => {
     const { content } = await augmentIndexHtml({
       ...indexGeneratorOptions,
