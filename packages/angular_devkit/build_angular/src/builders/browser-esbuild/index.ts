@@ -16,7 +16,6 @@ import { brotliCompress } from 'node:zlib';
 import { copyAssets } from '../../utils/copy-assets';
 import { assertIsError } from '../../utils/error';
 import { transformSupportedBrowsersToTargets } from '../../utils/esbuild-targets';
-import { FileInfo } from '../../utils/index-file/augment-index-html';
 import { IndexHtmlGenerator } from '../../utils/index-file/index-html-generator';
 import { augmentAppWithServiceWorkerEsbuild } from '../../utils/service-worker';
 import { Spinner } from '../../utils/spinner';
@@ -25,7 +24,7 @@ import { BundleStats, generateBuildStatsTable } from '../../webpack/utils/stats'
 import { SourceFileCache, createCompilerPlugin } from './angular/compiler-plugin';
 import { logBuilderStatusWarnings } from './builder-status-warnings';
 import { checkCommonJSModules } from './commonjs-checker';
-import { BundlerContext, logMessages } from './esbuild';
+import { BundlerContext, InitialFileRecord, logMessages } from './esbuild';
 import { createGlobalScriptsBundleOptions } from './global-scripts';
 import { createGlobalStylesBundleOptions } from './global-styles';
 import { extractLicenses } from './license-extractor';
@@ -141,7 +140,9 @@ async function execute(
           codeBundleCache?.loadResultCache,
         );
         if (bundleOptions) {
-          bundlerContexts.push(new BundlerContext(workspaceRoot, !!options.watch, bundleOptions));
+          bundlerContexts.push(
+            new BundlerContext(workspaceRoot, !!options.watch, bundleOptions, () => initial),
+          );
         }
       }
     }
@@ -151,7 +152,9 @@ async function execute(
       for (const initial of [true, false]) {
         const bundleOptions = createGlobalScriptsBundleOptions(options, initial);
         if (bundleOptions) {
-          bundlerContexts.push(new BundlerContext(workspaceRoot, !!options.watch, bundleOptions));
+          bundlerContexts.push(
+            new BundlerContext(workspaceRoot, !!options.watch, bundleOptions, () => initial),
+          );
         }
       }
     }
@@ -167,15 +170,6 @@ async function execute(
   // Return if the bundling has errors
   if (bundlingResult.errors) {
     return executionResult;
-  }
-
-  // Filter global stylesheet initial files. Currently all initial CSS files are from the global styles option.
-  if (options.globalStyles.length > 0) {
-    bundlingResult.initialFiles = bundlingResult.initialFiles.filter(
-      ({ file, name }) =>
-        !file.endsWith('.css') ||
-        options.globalStyles.find((style) => style.name === name)?.initial,
-    );
   }
 
   const { metafile, initialFiles, outputFiles } = bundlingResult;
@@ -216,7 +210,11 @@ async function execute(
       baseHref: options.baseHref,
       lang: undefined,
       outputPath: virtualOutputPath,
-      files: initialFiles,
+      files: [...initialFiles].map(([file, record]) => ({
+        name: record.name ?? '',
+        file,
+        extension: path.extname(file),
+      })),
     });
 
     for (const error of errors) {
@@ -758,10 +756,9 @@ export default createBuilder(buildEsbuildBrowser);
 function logBuildStats(
   context: BuilderContext,
   metafile: Metafile,
-  initialFiles: FileInfo[],
+  initial: Map<string, InitialFileRecord>,
   estimatedTransferSizes?: Map<string, number>,
 ) {
-  const initial = new Map(initialFiles.map((info) => [info.file, info.name]));
   const stats: BundleStats[] = [];
   for (const [file, output] of Object.entries(metafile.outputs)) {
     // Only display JavaScript and CSS files
@@ -778,7 +775,7 @@ function logBuildStats(
       initial: initial.has(file),
       stats: [
         file,
-        initial.get(file) ?? '-',
+        initial.get(file)?.name ?? '-',
         output.bytes,
         estimatedTransferSizes?.get(file) ?? '-',
       ],

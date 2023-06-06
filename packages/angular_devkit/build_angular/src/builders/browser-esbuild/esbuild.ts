@@ -20,7 +20,6 @@ import {
   formatMessages,
 } from 'esbuild';
 import { basename, extname, relative } from 'node:path';
-import { FileInfo } from '../../utils/index-file/augment-index-html';
 
 export type BundleContextResult =
   | { errors: Message[]; warnings: Message[] }
@@ -29,7 +28,7 @@ export type BundleContextResult =
       warnings: Message[];
       metafile: Metafile;
       outputFiles: OutputFile[];
-      initialFiles: FileInfo[];
+      initialFiles: Map<string, InitialFileRecord>;
     };
 
 /**
@@ -41,11 +40,23 @@ export function isEsBuildFailure(value: unknown): value is BuildFailure {
   return !!value && typeof value === 'object' && 'errors' in value && 'warnings' in value;
 }
 
+export interface InitialFileRecord {
+  entrypoint: boolean;
+  name?: string;
+  type: 'script' | 'style';
+  external?: boolean;
+}
+
 export class BundlerContext {
   #esbuildContext?: BuildContext<{ metafile: true; write: false }>;
   #esbuildOptions: BuildOptions & { metafile: true; write: false };
 
-  constructor(private workspaceRoot: string, private incremental: boolean, options: BuildOptions) {
+  constructor(
+    private workspaceRoot: string,
+    private incremental: boolean,
+    options: BuildOptions,
+    private initialFilter?: (initial: Readonly<InitialFileRecord>) => boolean,
+  ) {
     this.#esbuildOptions = {
       ...options,
       metafile: true,
@@ -64,7 +75,7 @@ export class BundlerContext {
     let errors: Message[] | undefined;
     const warnings: Message[] = [];
     const metafile: Metafile = { inputs: {}, outputs: {} };
-    const initialFiles = [];
+    const initialFiles = new Map<string, InitialFileRecord>();
     const outputFiles = [];
     for (const result of individualResults) {
       warnings.push(...result.warnings);
@@ -80,7 +91,7 @@ export class BundlerContext {
         metafile.outputs = { ...metafile.outputs, ...result.metafile.outputs };
       }
 
-      initialFiles.push(...result.initialFiles);
+      result.initialFiles.forEach((value, key) => initialFiles.set(key, value));
       outputFiles.push(...result.outputFiles);
     }
 
@@ -139,27 +150,59 @@ export class BundlerContext {
     }
 
     // Find all initial files
-    const initialFiles: FileInfo[] = [];
+    const initialFiles = new Map<string, InitialFileRecord>();
     for (const outputFile of result.outputFiles) {
       // Entries in the metafile are relative to the `absWorkingDir` option which is set to the workspaceRoot
       const relativeFilePath = relative(this.workspaceRoot, outputFile.path);
-      const entryPoint = result.metafile?.outputs[relativeFilePath]?.entryPoint;
+      const entryPoint = result.metafile.outputs[relativeFilePath]?.entryPoint;
 
       outputFile.path = relativeFilePath;
 
       if (entryPoint) {
         // The first part of the filename is the name of file (e.g., "polyfills" for "polyfills.7S5G3MDY.js")
-        const name = basename(outputFile.path).split('.', 1)[0];
+        const name = basename(relativeFilePath).split('.', 1)[0];
+        // Entry points are only styles or scripts
+        const type = extname(relativeFilePath) === '.css' ? 'style' : 'script';
 
         // Only entrypoints with an entry in the options are initial files.
         // Dynamic imports also have an entryPoint value in the meta file.
         if ((this.#esbuildOptions.entryPoints as Record<string, string>)?.[name]) {
           // An entryPoint value indicates an initial file
-          initialFiles.push({
-            file: outputFile.path,
+          const record: InitialFileRecord = {
             name,
-            extension: extname(outputFile.path),
-          });
+            type,
+            entrypoint: true,
+          };
+
+          if (!this.initialFilter || this.initialFilter(record)) {
+            initialFiles.set(relativeFilePath, record);
+          }
+        }
+      }
+    }
+
+    // Analyze for transitive initial files
+    const files = [...initialFiles.keys()];
+    for (const file of files) {
+      for (const initialImport of result.metafile.outputs[file].imports) {
+        if (initialFiles.has(initialImport.path)) {
+          continue;
+        }
+
+        if (initialImport.kind === 'import-statement' || initialImport.kind === 'import-rule') {
+          const record: InitialFileRecord = {
+            type: initialImport.kind === 'import-rule' ? 'style' : 'script',
+            entrypoint: false,
+            external: initialImport.external,
+          };
+
+          if (!this.initialFilter || this.initialFilter(record)) {
+            initialFiles.set(initialImport.path, record);
+          }
+
+          if (!initialImport.external) {
+            files.push(initialImport.path);
+          }
         }
       }
     }
