@@ -9,11 +9,13 @@
 import { logging, tags } from '@angular-devkit/core';
 import { AggregatedMetric, BenchmarkReporter, Metric } from './interfaces';
 
-export const defaultReporter = (logger: logging.Logger): BenchmarkReporter => (process, groups) => {
-  const toplevelLogger = logger;
-  const indentLogger = new logging.IndentLogger('benchmark-indent-logger', toplevelLogger);
+export const defaultReporter =
+  (logger: logging.Logger): BenchmarkReporter =>
+  (process, groups) => {
+    const toplevelLogger = logger;
+    const indentLogger = new logging.IndentLogger('benchmark-indent-logger', toplevelLogger);
 
-  const formatMetric = (metric: Metric | AggregatedMetric) => tags.oneLine`
+    const formatMetric = (metric: Metric | AggregatedMetric) => tags.oneLine`
     ${metric.name}: ${metric.value.toFixed(2)} ${metric.unit}
     ${
       metric.componentValues
@@ -22,8 +24,8 @@ export const defaultReporter = (logger: logging.Logger): BenchmarkReporter => (p
     }
   `;
 
-  groups.forEach((group) => {
-    toplevelLogger.info(`${group.name}`);
-    group.metrics.forEach((metric) => indentLogger.info(formatMetric(metric)));
-  });
-};
+    groups.forEach((group) => {
+      toplevelLogger.info(`${group.name}`);
+      group.metrics.forEach((metric) => indentLogger.info(formatMetric(metric)));
+    });
+  };
