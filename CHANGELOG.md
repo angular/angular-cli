@@ -1,3 +1,16 @@
+<a name="16.0.5"></a>
+
+# 16.0.5 (2023-06-07)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                   |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------- |
+| [9817b984b](https://github.com/angular/angular-cli/commit/9817b984b15e352caedac6e347cc662117b9e0f8) | fix  | ignore .git folder in browser-esbuild watcher                 |
+| [ce95d2545](https://github.com/angular/angular-cli/commit/ce95d254510ffa93a9bd4230f6447530d511ef5f) | fix  | ignore folders starting with a dot in browser-esbuild watcher |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="16.0.4"></a>
 
 # 16.0.4 (2023-06-01)
