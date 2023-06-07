@@ -12,7 +12,7 @@ import * as fs from 'fs';
 /**
  * Pattern used to extract the media query set by Critters in an `onload` handler.
  */
-const MEDIA_SET_HANDLER_PATTERN = /^this\.media=["'](.*)["'];?$/;
+const MEDIA_SET_HANDLER_PATTERN = /^this\.media=[&apos;"'](.*)[&apos;"'];?$/;
 
 /**
  * Name of the attribute used to save the Critters media query so it can be re-assigned on load.
