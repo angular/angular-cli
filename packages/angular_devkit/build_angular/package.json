@@ -65,7 +65,7 @@
     "tree-kill": "1.2.2",
     "tslib": "2.5.3",
     "vite": "4.3.9",
-    "webpack": "5.85.1",
+    "webpack": "5.86.0",
     "webpack-dev-middleware": "6.1.1",
     "webpack-dev-server": "4.15.0",
     "webpack-merge": "5.9.0",

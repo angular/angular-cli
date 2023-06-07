@@ -8621,10 +8621,10 @@ neo-async@^2.6.0, neo-async@^2.6.2:
   resolved "https://registry.yarnpkg.com/neo-async/-/neo-async-2.6.2.tgz#b4aafb93e3aeb2d8174ca53cf163ab7d7308305f"
   integrity sha512-Yd3UES5mWCSqR+qNT93S3UoYUkqAZ9lLg8a7g9rimsWmYGK8cVToA4/sF3RrshdyV3sAGMXVUmpMYOw+dLpOuw==
 
-ng-packagr@16.1.0-next.0:
-  version "16.1.0-next.0"
-  resolved "https://registry.yarnpkg.com/ng-packagr/-/ng-packagr-16.1.0-next.0.tgz#013efcfeea5257f20d73115f02db6793493da62f"
-  integrity sha512-xMKmbHV9GeXI8hpOqdEk+Aob1xgTbKtIGzfOKaEvsQOK4bdXSCa7vvYCBclVcEAl4qBdTqSXNLqxczGxJnjvlA==
+ng-packagr@16.1.0-rc.0:
+  version "16.1.0-rc.0"
+  resolved "https://registry.yarnpkg.com/ng-packagr/-/ng-packagr-16.1.0-rc.0.tgz#de9e0ada9f4568b519ac923e55078ab57c55e07e"
+  integrity sha512-z/zAZkQ1unxZP9+EHhXKfhayQ986JqqcNk1uK6yhUjrNtpCYtQEzPIoK620yXMHYx/rXGrdulZqohGaNU4ct7g==
   dependencies:
     "@rollup/plugin-json" "^6.0.0"
     "@rollup/plugin-node-resolve" "^15.0.0"
@@ -11857,10 +11857,10 @@ webpack@5.83.1:
     watchpack "^2.4.0"
     webpack-sources "^3.2.3"
 
-webpack@5.85.1:
-  version "5.85.1"
-  resolved "https://registry.yarnpkg.com/webpack/-/webpack-5.85.1.tgz#d77406352f8f14ec847c54e4dcfb80b28c776b3f"
-  integrity sha512-xTb7MRf4LY8Z5rzn7aIx4TDrwYJrjcHnIfU1TqtyZOoObyuGSpAUwIvVuqq5wPnv7WEgQr8UvO1q/dgoGG4HjA==
+webpack@5.86.0:
+  version "5.86.0"
+  resolved "https://registry.yarnpkg.com/webpack/-/webpack-5.86.0.tgz#b0eb81794b62aee0b7e7eb8c5073495217d9fc6d"
+  integrity sha512-3BOvworZ8SO/D4GVP+GoRC3fVeg5MO4vzmq8TJJEkdmopxyazGDxN8ClqN12uzrZW9Tv8EED8v5VSb6Sqyi0pg==
   dependencies:
     "@types/eslint-scope" "^3.7.3"
     "@types/estree" "^1.0.0"
