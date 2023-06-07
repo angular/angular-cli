@@ -16,7 +16,7 @@ export default async function () {
       `,
     'src/app/app.component.scss': `
       @import 'variables';
-      h2 { background-color: $primary-color; }
+      h2 { color: $primary-color; }
       `,
     'src/style-paths/variables.less': '@primary-color: #ADDADD;',
     'src/styles.less': `
@@ -62,6 +62,6 @@ export default async function () {
     await expectFileToMatch('dist/test-project/styles.css', /h1\s*{\s*color: red;\s*}/);
     await expectFileToMatch('dist/test-project/main.js', /h2.*{.*color: red;.*}/);
     await expectFileToMatch('dist/test-project/styles.css', /h5\s*{\s*color: #ADDADD;\s*}/);
-    await expectFileToMatch('dist/test-project/main.js', /h6.*{.*color: #ADDADD;.*}/);
+    await expectFileToMatch('dist/test-project/main.js', /h6.*{\s*color: #ADDADD;\s*}/);
   }
 }

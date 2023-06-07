@@ -241,7 +241,7 @@ describe('Browser Builder styles', () => {
 
       const matches: { [path: string]: RegExp } = {
         'styles.css': /h1\s*{\s*color: #f00;\s*}/,
-        'main.js': /h2.*{.*color: #f00;.*}/,
+        'main.js': /h2\s*{\s*color: #f00;\s*}/,
       };
 
       host.replaceInFile(
@@ -258,8 +258,8 @@ describe('Browser Builder styles', () => {
       };
 
       const { files } = await browserBuild(architect, host, target, overrides);
-      for (const fileName of Object.keys(matches)) {
-        expect(await files[fileName]).toMatch(matches[fileName]);
+      for (const [fileName, match] of Object.entries(matches)) {
+        expect(await files[fileName]).toMatch(match);
       }
     });
   });

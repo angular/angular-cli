@@ -118,7 +118,6 @@ export class WebpackResourceLoader {
     const {
       EntryPlugin,
       NormalModule,
-      WebpackError,
       library,
       node,
       sources,
@@ -170,7 +169,7 @@ export class WebpackResourceLoader {
       'angular-compiler:resource',
       outputOptions,
       [
-        new node.NodeTemplatePlugin(outputOptions),
+        new node.NodeTemplatePlugin(),
         new node.NodeTargetPlugin(),
         new EntryPlugin(context, entry, { name: 'resource' }),
         new library.EnableLibraryPlugin('var'),
