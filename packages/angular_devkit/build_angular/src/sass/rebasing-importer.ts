@@ -89,10 +89,10 @@ abstract class UrlRebasingImporter implements Importer<'sync'> {
 
     let syntax: Syntax | undefined;
     switch (extname(stylesheetPath).toLowerCase()) {
-      case 'css':
+      case '.css':
         syntax = 'css';
         break;
-      case 'sass':
+      case '.sass':
         syntax = 'indented';
         break;
       default:
