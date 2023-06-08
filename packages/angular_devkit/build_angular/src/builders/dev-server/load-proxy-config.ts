@@ -15,7 +15,11 @@ import { parse as parseGlob } from 'picomatch';
 import { assertIsError } from '../../utils/error';
 import { loadEsmModule } from '../../utils/load-esm';
 
-export async function loadProxyConfiguration(root: string, proxyConfig: string | undefined) {
+export async function loadProxyConfiguration(
+  root: string,
+  proxyConfig: string | undefined,
+  normalize = false,
+) {
   if (!proxyConfig) {
     return undefined;
   }
@@ -26,13 +30,14 @@ export async function loadProxyConfiguration(root: string, proxyConfig: string |
     throw new Error(`Proxy configuration file ${proxyPath} does not exist.`);
   }
 
+  let proxyConfiguration;
   switch (extname(proxyPath)) {
     case '.json': {
       const content = await readFile(proxyPath, 'utf-8');
 
       const { parse, printParseErrorCode } = await import('jsonc-parser');
       const parseErrors: import('jsonc-parser').ParseError[] = [];
-      const proxyConfiguration = parse(content, parseErrors, { allowTrailingComma: true });
+      proxyConfiguration = parse(content, parseErrors, { allowTrailingComma: true });
 
       if (parseErrors.length > 0) {
         let errorMessage = `Proxy configuration file ${proxyPath} contains parse errors:`;
@@ -43,47 +48,94 @@ export async function loadProxyConfiguration(root: string, proxyConfig: string |
         throw new Error(errorMessage);
       }
 
-      return proxyConfiguration;
+      break;
     }
     case '.mjs':
       // Load the ESM configuration file using the TypeScript dynamic import workaround.
       // Once TypeScript provides support for keeping the dynamic import this workaround can be
       // changed to a direct dynamic import.
-      return (await loadEsmModule<{ default: unknown }>(pathToFileURL(proxyPath))).default;
+      proxyConfiguration = (await loadEsmModule<{ default: unknown }>(pathToFileURL(proxyPath)))
+        .default;
+      break;
     case '.cjs':
-      return require(proxyPath);
+      proxyConfiguration = require(proxyPath);
+      break;
     default:
       // The file could be either CommonJS or ESM.
       // CommonJS is tried first then ESM if loading fails.
       try {
-        return require(proxyPath);
+        proxyConfiguration = require(proxyPath);
+        break;
       } catch (e) {
         assertIsError(e);
         if (e.code === 'ERR_REQUIRE_ESM') {
           // Load the ESM configuration file using the TypeScript dynamic import workaround.
           // Once TypeScript provides support for keeping the dynamic import this workaround can be
           // changed to a direct dynamic import.
-          return (await loadEsmModule<{ default: unknown }>(pathToFileURL(proxyPath))).default;
+          proxyConfiguration = (await loadEsmModule<{ default: unknown }>(pathToFileURL(proxyPath)))
+            .default;
+          break;
         }
 
         throw e;
       }
   }
+
+  if (normalize) {
+    proxyConfiguration = normalizeProxyConfiguration(proxyConfiguration);
+  }
+
+  return proxyConfiguration;
 }
 
 /**
  * Converts glob patterns to regular expressions to support Vite's proxy option.
+ * Also converts the Webpack supported array form to an object form supported by both.
+ *
  * @param proxy A proxy configuration object.
  */
-export function normalizeProxyConfiguration(proxy: Record<string, unknown>) {
+function normalizeProxyConfiguration(
+  proxy: Record<string, unknown> | object[],
+): Record<string, unknown> {
+  let normalizedProxy: Record<string, unknown> | undefined;
+
+  if (Array.isArray(proxy)) {
+    // Construct an object-form proxy configuration from the array
+    normalizedProxy = {};
+    for (const proxyEntry of proxy) {
+      if (!('context' in proxyEntry)) {
+        continue;
+      }
+      if (!Array.isArray(proxyEntry.context)) {
+        continue;
+      }
+
+      // Array-form entries contain a context string array with the path(s)
+      // to use for the configuration entry.
+      const context = proxyEntry.context;
+      delete proxyEntry.context;
+      for (const contextEntry of context) {
+        if (typeof contextEntry !== 'string') {
+          continue;
+        }
+
+        normalizedProxy[contextEntry] = proxyEntry;
+      }
+    }
+  } else {
+    normalizedProxy = proxy;
+  }
+
   // TODO: Consider upstreaming glob support
-  for (const key of Object.keys(proxy)) {
+  for (const key of Object.keys(normalizedProxy)) {
     if (isDynamicPattern(key)) {
       const { output } = parseGlob(key);
-      proxy[`^${output}$`] = proxy[key];
-      delete proxy[key];
+      normalizedProxy[`^${output}$`] = normalizedProxy[key];
+      delete normalizedProxy[key];
     }
   }
+
+  return normalizedProxy;
 }
 
 /**
