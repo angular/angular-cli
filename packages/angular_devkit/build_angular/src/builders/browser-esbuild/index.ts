@@ -92,6 +92,7 @@ class ExecutionResult {
   }
 }
 
+// eslint-disable-next-line max-lines-per-function
 async function execute(
   options: NormalizedBrowserOptions,
   context: BuilderContext,
@@ -184,6 +185,24 @@ async function execute(
 
   // Generate index HTML file
   if (indexHtmlOptions) {
+    // Analyze metafile for initial link-based hints.
+    // Skip if the internal externalPackages option is enabled since this option requires
+    // dev server cooperation to properly resolve and fetch imports.
+    const hints = [];
+    if (!options.externalPackages) {
+      for (const [key, value] of initialFiles) {
+        if (value.entrypoint) {
+          // Entry points are already referenced in the HTML
+          continue;
+        }
+        if (value.type === 'script') {
+          hints.push({ url: key, mode: 'modulepreload' as const });
+        } else if (value.type === 'style') {
+          hints.push({ url: key, mode: 'preload' as const });
+        }
+      }
+    }
+
     // Create an index HTML generator that reads from the in-memory output files
     const indexHtmlGenerator = new IndexHtmlGenerator({
       indexPath: indexHtmlOptions.input,
@@ -215,6 +234,7 @@ async function execute(
         file,
         extension: path.extname(file),
       })),
+      hints,
     });
 
     for (const error of errors) {
