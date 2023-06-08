@@ -20,7 +20,7 @@ import { buildEsbuildBrowserInternal } from '../browser-esbuild';
 import { JavaScriptTransformer } from '../browser-esbuild/javascript-transformer';
 import { BrowserEsbuildOptions } from '../browser-esbuild/options';
 import type { Schema as BrowserBuilderOptions } from '../browser-esbuild/schema';
-import { loadProxyConfiguration, normalizeProxyConfiguration } from './load-proxy-config';
+import { loadProxyConfiguration } from './load-proxy-config';
 import type { NormalizedDevServerOptions } from './options';
 import type { DevServerBuilderOutput } from './webpack-server';
 
@@ -196,10 +196,8 @@ export async function setupServer(
   const proxy = await loadProxyConfiguration(
     serverOptions.workspaceRoot,
     serverOptions.proxyConfig,
+    true,
   );
-  if (proxy) {
-    normalizeProxyConfiguration(proxy);
-  }
 
   const configuration: InlineConfig = {
     configFile: false,

@@ -173,6 +173,30 @@ describeBuilder(serveWebpackBrowser, DEV_SERVER_BUILDER_INFO, (harness) => {
       }
     });
 
+    it('supports the Webpack array form of the configuration file', async () => {
+      harness.useTarget('serve', {
+        ...BASE_OPTIONS,
+        proxyConfig: 'proxy.config.json',
+      });
+
+      const proxyServer = createProxyServer();
+      try {
+        await new Promise<void>((resolve) => proxyServer.listen(0, '127.0.0.1', resolve));
+        const proxyAddress = proxyServer.address() as import('net').AddressInfo;
+
+        await harness.writeFiles({
+          'proxy.config.json': `[ { "context": ["/api", "/abc"], "target": "http://127.0.0.1:${proxyAddress.port}" } ]`,
+        });
+
+        const { result, response } = await executeOnceAndFetch(harness, '/api/test');
+
+        expect(result?.success).toBeTrue();
+        expect(await response?.text()).toContain('TEST_API_RETURN');
+      } finally {
+        await new Promise<void>((resolve) => proxyServer.close(() => resolve()));
+      }
+    });
+
     it('throws an error when proxy configuration file cannot be found', async () => {
       harness.useTarget('serve', {
         ...BASE_OPTIONS,
