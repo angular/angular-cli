@@ -16,8 +16,8 @@
   <br>
   <img src="/docs/images/angular-cli-logo.png" alt="Angular CLI logo" width="100px" height="108px"/>
   <br><br>
-  <i>The Angular CLI is a command-line interface tool that you use to initialize, develop, scaffold,
-    <br>and maintain Angular applications directly from a command shell.</i>
+  <em>The Angular CLI is a command-line interface tool that you use to initialize, develop, scaffold,
+    <br>and maintain Angular applications directly from a command shell.</em>
   <br>
 </p>
 
