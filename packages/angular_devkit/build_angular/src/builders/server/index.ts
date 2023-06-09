@@ -12,6 +12,15 @@ import { readFile } from 'node:fs/promises';
 import * as path from 'node:path';
 import { Observable, concatMap, from } from 'rxjs';
 import webpack, { Configuration } from 'webpack';
+import { getCommonConfig, getStylesConfig } from '../../tools/webpack/configs';
+import { isPlatformServerInstalled } from '../../tools/webpack/utils/helpers';
+import {
+  statsErrorsToString,
+  statsHasErrors,
+  statsHasWarnings,
+  statsWarningsToString,
+  webpackStatsLogger,
+} from '../../tools/webpack/utils/stats';
 import { ExecutionTransformer } from '../../transforms';
 import {
   NormalizedBrowserBuilderSchema,
@@ -31,15 +40,6 @@ import {
   BrowserWebpackConfigOptions,
   generateI18nBrowserWebpackConfigFromContext,
 } from '../../utils/webpack-browser-config';
-import { getCommonConfig, getStylesConfig } from '../../webpack/configs';
-import { isPlatformServerInstalled } from '../../webpack/utils/helpers';
-import {
-  statsErrorsToString,
-  statsHasErrors,
-  statsHasWarnings,
-  statsWarningsToString,
-  webpackStatsLogger,
-} from '../../webpack/utils/stats';
 import { Schema as ServerBuilderOptions } from './schema';
 
 /**

@@ -18,6 +18,14 @@ import { Observable, concatMap, from, switchMap } from 'rxjs';
 import * as url from 'url';
 import webpack from 'webpack';
 import webpackDevServer from 'webpack-dev-server';
+import { getCommonConfig, getDevServerConfig, getStylesConfig } from '../../tools/webpack/configs';
+import { IndexHtmlWebpackPlugin } from '../../tools/webpack/plugins/index-html-webpack-plugin';
+import { ServiceWorkerPlugin } from '../../tools/webpack/plugins/service-worker-plugin';
+import {
+  BuildEventStats,
+  createWebpackLoggingCallback,
+  generateBuildEventStats,
+} from '../../tools/webpack/utils/stats';
 import { ExecutionTransformer } from '../../transforms';
 import { normalizeOptimization } from '../../utils';
 import { colors } from '../../utils/color';
@@ -33,14 +41,6 @@ import {
   getIndexOutputFile,
 } from '../../utils/webpack-browser-config';
 import { addError, addWarning } from '../../utils/webpack-diagnostics';
-import { getCommonConfig, getDevServerConfig, getStylesConfig } from '../../webpack/configs';
-import { IndexHtmlWebpackPlugin } from '../../webpack/plugins/index-html-webpack-plugin';
-import { ServiceWorkerPlugin } from '../../webpack/plugins/service-worker-plugin';
-import {
-  BuildEventStats,
-  createWebpackLoggingCallback,
-  generateBuildEventStats,
-} from '../../webpack/utils/stats';
 import { Schema as BrowserBuilderSchema, OutputHashing } from '../browser/schema';
 import { NormalizedDevServerOptions } from './options';
 
@@ -317,7 +317,7 @@ async function setupLocalize(
     enforce: 'post',
     use: [
       {
-        loader: require.resolve('../../babel/webpack-loader'),
+        loader: require.resolve('../../tools/babel/webpack-loader'),
         options: {
           cacheDirectory:
             (cacheOptions.enabled && path.join(cacheOptions.path, 'babel-dev-server-i18n')) ||

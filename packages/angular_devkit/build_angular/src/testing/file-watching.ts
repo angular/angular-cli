@@ -9,7 +9,7 @@
 import {
   BuilderWatcherCallback,
   BuilderWatcherFactory,
-} from '../webpack/plugins/builder-watch-plugin';
+} from '../tools/webpack/plugins/builder-watch-plugin';
 
 class WatcherDescriptor {
   constructor(

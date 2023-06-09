@@ -12,6 +12,18 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { Observable, concatMap, from, map, switchMap } from 'rxjs';
 import webpack, { StatsCompilation } from 'webpack';
+import { getCommonConfig, getStylesConfig } from '../../tools/webpack/configs';
+import { markAsyncChunksNonInitial } from '../../tools/webpack/utils/async-chunks';
+import { normalizeExtraEntryPoints } from '../../tools/webpack/utils/helpers';
+import {
+  BuildEventStats,
+  generateBuildEventStats,
+  statsErrorsToString,
+  statsHasErrors,
+  statsHasWarnings,
+  statsWarningsToString,
+  webpackStatsLogger,
+} from '../../tools/webpack/utils/stats';
 import { ExecutionTransformer } from '../../transforms';
 import {
   deleteOutputDir,
@@ -46,18 +58,6 @@ import {
   getIndexInputFile,
   getIndexOutputFile,
 } from '../../utils/webpack-browser-config';
-import { getCommonConfig, getStylesConfig } from '../../webpack/configs';
-import { markAsyncChunksNonInitial } from '../../webpack/utils/async-chunks';
-import { normalizeExtraEntryPoints } from '../../webpack/utils/helpers';
-import {
-  BuildEventStats,
-  generateBuildEventStats,
-  statsErrorsToString,
-  statsHasErrors,
-  statsHasWarnings,
-  statsWarningsToString,
-  webpackStatsLogger,
-} from '../../webpack/utils/stats';
 import { Schema as BrowserBuilderSchema } from './schema';
 
 /**
