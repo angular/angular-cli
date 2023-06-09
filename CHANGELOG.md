@@ -9725,9 +9725,9 @@ Alan Agius, Charles Lyding, Keen Yee Liau, Joey Perrott, Doug Parker, Cédric Ex
 
 <tr><td colspan=3><h3>@angular/cli (12.0.0-rc.3)</h3></td></tr>
   <tr>
-    <td><b>Commit</b>
-    <td><b>Description</b>
-    <td><b>Notes</b>
+    <td><strong>Commit</strong>
+    <td><strong>Description</strong>
+    <td><strong>Notes</strong>
   </tr>
 
 <tr>
@@ -9812,9 +9812,9 @@ Alan Agius, Charles Lyding, Joey Perrott
 
 <tr><td colspan=3><h3>@angular-devkit/build-angular (12.0.0-rc.2)</h3></td></tr>
   <tr>
-    <td><b>Commit</b>
-    <td><b>Description</b>
-    <td><b>Notes</b>
+    <td><strong>Commit</strong>
+    <td><strong>Description</strong>
+    <td><strong>Notes</strong>
   </tr>
 
 <tr>
@@ -9840,9 +9840,9 @@ Alan Agius, Charles Lyding, Joey Perrott
 
 <tr><td colspan=3><h3>@angular/cli (12.0.0-rc.2)</h3></td></tr>
   <tr>
-    <td><b>Commit</b>
-    <td><b>Description</b>
-    <td><b>Notes</b>
+    <td><strong>Commit</strong>
+    <td><strong>Description</strong>
+    <td><strong>Notes</strong>
   </tr>
 
 <tr>
@@ -9898,9 +9898,9 @@ Alan Agius, Charles Lyding, Joey Perrott
 
 <tr><td colspan=3><h3>@ngtools/webpack (12.0.0-rc.2)</h3></td></tr>
   <tr>
-    <td><b>Commit</b>
-    <td><b>Description</b>
-    <td><b>Notes</b>
+    <td><strong>Commit</strong>
+    <td><strong>Description</strong>
+    <td><strong>Notes</strong>
   </tr>
 
 <tr>
@@ -9935,9 +9935,9 @@ Alan Agius, Charles Lyding, Joey Perrott
 
 <tr><td colspan=3><h3>@schematics/angular (12.0.0-rc.2)</h3></td></tr>
   <tr>
-    <td><b>Commit</b>
-    <td><b>Description</b>
-    <td><b>Notes</b>
+    <td><strong>Commit</strong>
+    <td><strong>Description</strong>
+    <td><strong>Notes</strong>
   </tr>
 
 <tr>
@@ -10011,9 +10011,9 @@ Alan Agius, Charles Lyding, Keen Yee Liau, Sam Bulatov, Doug Parker
 
 <tr><td colspan=3><h3>@angular-devkit/build-angular (12.0.0-rc.1)</h3></td></tr>
   <tr>
-    <td><b>Commit</b>
-    <td><b>Description</b>
-    <td><b>Notes</b>
+    <td><strong>Commit</strong>
+    <td><strong>Description</strong>
+    <td><strong>Notes</strong>
   </tr>
 
 <tr>
@@ -10078,9 +10078,9 @@ Alan Agius, Charles Lyding, Keen Yee Liau, Sam Bulatov, Doug Parker
 
 <tr><td colspan=3><h3>@angular-devkit/core (12.0.0-rc.1)</h3></td></tr>
   <tr>
-    <td><b>Commit</b>
-    <td><b>Description</b>
-    <td><b>Notes</b>
+    <td><strong>Commit</strong>
+    <td><strong>Description</strong>
+    <td><strong>Notes</strong>
   </tr>
 
 <tr>
@@ -10106,9 +10106,9 @@ Alan Agius, Charles Lyding, Keen Yee Liau, Sam Bulatov, Doug Parker
 
 <tr><td colspan=3><h3>@angular/cli (12.0.0-rc.1)</h3></td></tr>
   <tr>
-    <td><b>Commit</b>
-    <td><b>Description</b>
-    <td><b>Notes</b>
+    <td><strong>Commit</strong>
+    <td><strong>Description</strong>
+    <td><strong>Notes</strong>
   </tr>
 
 <tr>
@@ -10143,9 +10143,9 @@ Alan Agius, Charles Lyding, Keen Yee Liau, Sam Bulatov, Doug Parker
 
 <tr><td colspan=3><h3>@schematics/angular (12.0.0-rc.1)</h3></td></tr>
   <tr>
-    <td><b>Commit</b>
-    <td><b>Description</b>
-    <td><b>Notes</b>
+    <td><strong>Commit</strong>
+    <td><strong>Description</strong>
+    <td><strong>Notes</strong>
   </tr>
 
 <tr>
@@ -10231,9 +10231,9 @@ Alan Agius, Charles Lyding, Keen Yee Liau, Sam Bulatov, Doug Parker
 
 <tr><td colspan=3><h3>@angular-devkit/schematics-cli (12.0.0-rc.1)</h3></td></tr>
   <tr>
-    <td><b>Commit</b>
-    <td><b>Description</b>
-    <td><b>Notes</b>
+    <td><strong>Commit</strong>
+    <td><strong>Description</strong>
+    <td><strong>Notes</strong>
   </tr>
 
 <tr>
@@ -10277,9 +10277,9 @@ Alan Agius, Charles Lyding, Joey Perrott, Cédric Exbrayat, Doug Parker, Joshua 
 
 <tr><td colspan=3><h3>@angular-devkit/build-angular (12.0.0-rc.0)</h3></td></tr>
   <tr>
-    <td><b>Commit</b>
-    <td><b>Description</b>
-    <td><b>Notes</b>
+    <td><strong>Commit</strong>
+    <td><strong>Description</strong>
+    <td><strong>Notes</strong>
   </tr>
 
 <tr>
@@ -10451,9 +10451,9 @@ Alan Agius, Charles Lyding, Joey Perrott, Cédric Exbrayat, Doug Parker, Joshua 
 
 <tr><td colspan=3><h3>@angular/cli (12.0.0-rc.0)</h3></td></tr>
   <tr>
-    <td><b>Commit</b>
-    <td><b>Description</b>
-    <td><b>Notes</b>
+    <td><strong>Commit</strong>
+    <td><strong>Description</strong>
+    <td><strong>Notes</strong>
   </tr>
 
 <tr>
@@ -10488,9 +10488,9 @@ Alan Agius, Charles Lyding, Joey Perrott, Cédric Exbrayat, Doug Parker, Joshua 
 
 <tr><td colspan=3><h3>@ngtools/webpack (12.0.0-rc.0)</h3></td></tr>
   <tr>
-    <td><b>Commit</b>
-    <td><b>Description</b>
-    <td><b>Notes</b>
+    <td><strong>Commit</strong>
+    <td><strong>Description</strong>
+    <td><strong>Notes</strong>
   </tr>
 
 <tr>
@@ -10525,9 +10525,9 @@ Alan Agius, Charles Lyding, Joey Perrott, Cédric Exbrayat, Doug Parker, Joshua 
 
 <tr><td colspan=3><h3>@schematics/angular (12.0.0-rc.0)</h3></td></tr>
   <tr>
-    <td><b>Commit</b>
-    <td><b>Description</b>
-    <td><b>Notes</b>
+    <td><strong>Commit</strong>
+    <td><strong>Description</strong>
+    <td><strong>Notes</strong>
   </tr>
 
 <tr>
@@ -10617,9 +10617,9 @@ Alan Agius, Charles Lyding, Keen Yee Liau, Joey Perrott, David Shevitz
 
 <tr><td colspan=3><h3>@angular-devkit/build-angular (12.0.0-next.9)</h3></td></tr>
   <tr>
-    <td><b>Commit</b>
-    <td><b>Description</b>
-    <td><b>Notes</b>
+    <td><strong>Commit</strong>
+    <td><strong>Description</strong>
+    <td><strong>Notes</strong>
   </tr>
 
 <tr>
@@ -10731,9 +10731,9 @@ Alan Agius, Charles Lyding, Keen Yee Liau, Joey Perrott, David Shevitz
 
 <tr><td colspan=3><h3>@angular-devkit/build-webpack (0.1200.0-next.9)</h3></td></tr>
   <tr>
-    <td><b>Commit</b>
-    <td><b>Description</b>
-    <td><b>Notes</b>
+    <td><strong>Commit</strong>
+    <td><strong>Description</strong>
+    <td><strong>Notes</strong>
   </tr>
 
 <tr>
