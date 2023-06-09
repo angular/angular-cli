@@ -14,7 +14,7 @@ import { ApplicationPresetOptions, I18nPluginCreators } from './presets/applicat
 interface AngularCustomOptions extends Omit<ApplicationPresetOptions, 'instrumentCode'> {
   instrumentCode?: {
     /** node_modules and test files are always excluded. */
-    excludedPaths: Set<String>;
+    excludedPaths: Set<string>;
     includedBasePath: string;
   };
 }
