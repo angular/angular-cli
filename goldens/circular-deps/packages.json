@@ -1,7 +1,7 @@
 [
   [
-    "packages/angular_devkit/build_angular/src/utils/bundle-calculator.ts",
-    "packages/angular_devkit/build_angular/src/webpack/utils/stats.ts"
+    "packages/angular_devkit/build_angular/src/tools/webpack/utils/stats.ts",
+    "packages/angular_devkit/build_angular/src/utils/bundle-calculator.ts"
   ],
   [
     "packages/angular/cli/src/analytics/analytics-collector.ts",

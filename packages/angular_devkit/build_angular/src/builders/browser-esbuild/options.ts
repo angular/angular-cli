@@ -9,12 +9,15 @@
 import { BuilderContext } from '@angular-devkit/architect';
 import { createRequire } from 'node:module';
 import path from 'node:path';
+import {
+  globalScriptsByBundleName,
+  normalizeGlobalStyles,
+} from '../../tools/webpack/utils/helpers';
 import { normalizeAssetPatterns, normalizeOptimization, normalizeSourceMaps } from '../../utils';
 import { normalizeCacheOptions } from '../../utils/normalize-cache';
 import { generateEntryPoints } from '../../utils/package-chunk-sort';
 import { findTailwindConfigurationFile } from '../../utils/tailwind';
 import { getIndexInputFile, getIndexOutputFile } from '../../utils/webpack-browser-config';
-import { globalScriptsByBundleName, normalizeGlobalStyles } from '../../webpack/utils/helpers';
 import { Schema as BrowserBuilderOptions, OutputHashing } from './schema';
 
 export type NormalizedBrowserOptions = Awaited<ReturnType<typeof normalizeOptions>>;
