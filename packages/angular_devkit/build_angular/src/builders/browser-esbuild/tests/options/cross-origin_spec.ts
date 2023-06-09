@@ -22,7 +22,7 @@ describeBuilder(buildEsbuildBrowser, BROWSER_BUILDER_INFO, (harness) => {
       // Reduce the input index HTML to a single line to simplify comparing
       await harness.writeFile(
         'src/index.html',
-        '<html><head><base href="/"></head><body><app-root></app-root></body></html>',
+        '<html lang="en"><head><base href="/"></head><body><app-root></app-root></body></html>',
       );
     });
 
@@ -38,7 +38,7 @@ describeBuilder(buildEsbuildBrowser, BROWSER_BUILDER_INFO, (harness) => {
       harness
         .expectFile('dist/index.html')
         .content.toEqual(
-          `<html><head><base href="/"><link rel="stylesheet" href="styles.css" crossorigin="use-credentials"></head>` +
+          `<html lang="en"><head><base href="/"><link rel="stylesheet" href="styles.css" crossorigin="use-credentials"></head>` +
             `<body><app-root></app-root>` +
             `<script src="main.js" type="module" crossorigin="use-credentials"></script></body></html>`,
         );
@@ -56,7 +56,7 @@ describeBuilder(buildEsbuildBrowser, BROWSER_BUILDER_INFO, (harness) => {
       harness
         .expectFile('dist/index.html')
         .content.toEqual(
-          `<html><head><base href="/">` +
+          `<html lang="en"><head><base href="/">` +
             `<link rel="stylesheet" href="styles.css" crossorigin="anonymous"></head>` +
             `<body><app-root></app-root>` +
             `<script src="main.js" type="module" crossorigin="anonymous"></script></body></html>`,
@@ -75,7 +75,7 @@ describeBuilder(buildEsbuildBrowser, BROWSER_BUILDER_INFO, (harness) => {
       harness
         .expectFile('dist/index.html')
         .content.toEqual(
-          `<html><head><base href="/">` +
+          `<html lang="en"><head><base href="/">` +
             `<link rel="stylesheet" href="styles.css"></head>` +
             `<body><app-root></app-root>` +
             `<script src="main.js" type="module"></script></body></html>`,
@@ -93,7 +93,7 @@ describeBuilder(buildEsbuildBrowser, BROWSER_BUILDER_INFO, (harness) => {
       harness
         .expectFile('dist/index.html')
         .content.toEqual(
-          `<html><head><base href="/">` +
+          `<html lang="en"><head><base href="/">` +
             `<link rel="stylesheet" href="styles.css"></head>` +
             `<body><app-root></app-root>` +
             `<script src="main.js" type="module"></script></body></html>`,

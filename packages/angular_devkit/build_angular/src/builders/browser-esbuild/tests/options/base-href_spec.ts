@@ -31,7 +31,7 @@ describeBuilder(buildEsbuildBrowser, BROWSER_BUILDER_INFO, (harness) => {
       await harness.writeFile(
         'src/index.html',
         `
-        <html>
+        <html lang="en">
           <head><base></head>
           <body></body>
         </html>
@@ -52,7 +52,7 @@ describeBuilder(buildEsbuildBrowser, BROWSER_BUILDER_INFO, (harness) => {
       await harness.writeFile(
         'src/index.html',
         `
-        <html>
+        <html lang="en">
           <head></head>
           <body></body>
         </html>
@@ -94,7 +94,7 @@ describeBuilder(buildEsbuildBrowser, BROWSER_BUILDER_INFO, (harness) => {
       await harness.writeFile(
         'src/index.html',
         `
-        <html>
+        <html lang="en">
           <head><base href="."></head>
           <body></body>
         </html>
