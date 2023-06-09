@@ -17,7 +17,6 @@ import {
   chain,
   mergeWith,
   move,
-  noop,
   strings,
   url,
 } from '@angular-devkit/schematics';
