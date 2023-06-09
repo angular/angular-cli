@@ -7,96 +7,36 @@
  */
 
 import { BuilderContext, BuilderOutput, createBuilder } from '@angular-devkit/architect';
-import type { BuildOptions, OutputFile } from 'esbuild';
+import type { OutputFile } from 'esbuild';
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import { SourceFileCache, createCompilerPlugin } from '../../tools/esbuild/angular/compiler-plugin';
+import { SourceFileCache } from '../../tools/esbuild/angular/compiler-plugin';
+import { createCodeBundleOptions } from '../../tools/esbuild/application-code-bundle';
 import { BundlerContext } from '../../tools/esbuild/bundler-context';
+import { ExecutionResult, RebuildState } from '../../tools/esbuild/bundler-execution-result';
 import { checkCommonJSModules } from '../../tools/esbuild/commonjs-checker';
-import { createExternalPackagesPlugin } from '../../tools/esbuild/external-packages-plugin';
 import { createGlobalScriptsBundleOptions } from '../../tools/esbuild/global-scripts';
 import { createGlobalStylesBundleOptions } from '../../tools/esbuild/global-styles';
+import { generateIndexHtml } from '../../tools/esbuild/index-html-generator';
 import { extractLicenses } from '../../tools/esbuild/license-extractor';
-import { createSourcemapIngorelistPlugin } from '../../tools/esbuild/sourcemap-ignorelist-plugin';
 import { shutdownSassWorkerPool } from '../../tools/esbuild/stylesheets/sass-language';
 import {
   calculateEstimatedTransferSizes,
-  createOutputFileFromText,
-  getFeatureSupport,
   logBuildStats,
   logMessages,
   withNoProgress,
   withSpinner,
   writeResultFiles,
 } from '../../tools/esbuild/utils';
-import { createVirtualModulePlugin } from '../../tools/esbuild/virtual-module-plugin';
-import type { ChangedFiles } from '../../tools/esbuild/watcher';
 import { copyAssets } from '../../utils/copy-assets';
 import { assertIsError } from '../../utils/error';
 import { transformSupportedBrowsersToTargets } from '../../utils/esbuild-targets';
-import { IndexHtmlGenerator } from '../../utils/index-file/index-html-generator';
 import { augmentAppWithServiceWorkerEsbuild } from '../../utils/service-worker';
 import { getSupportedBrowsers } from '../../utils/supported-browsers';
 import { logBuilderStatusWarnings } from './builder-status-warnings';
 import { BrowserEsbuildOptions, NormalizedBrowserOptions, normalizeOptions } from './options';
 import { Schema as BrowserBuilderOptions } from './schema';
 
-interface RebuildState {
-  rebuildContexts: BundlerContext[];
-  codeBundleCache?: SourceFileCache;
-  fileChanges: ChangedFiles;
-}
-
-/**
- * Represents the result of a single builder execute call.
- */
-class ExecutionResult {
-  readonly outputFiles: OutputFile[] = [];
-  readonly assetFiles: { source: string; destination: string }[] = [];
-
-  constructor(
-    private rebuildContexts: BundlerContext[],
-    private codeBundleCache?: SourceFileCache,
-  ) {}
-
-  addOutputFile(path: string, content: string): void {
-    this.outputFiles.push(createOutputFileFromText(path, content));
-  }
-
-  get output() {
-    return {
-      success: this.outputFiles.length > 0,
-    };
-  }
-
-  get outputWithFiles() {
-    return {
-      success: this.outputFiles.length > 0,
-      outputFiles: this.outputFiles,
-      assetFiles: this.assetFiles,
-    };
-  }
-
-  get watchFiles() {
-    return this.codeBundleCache?.referencedFiles ?? [];
-  }
-
-  createRebuildState(fileChanges: ChangedFiles): RebuildState {
-    this.codeBundleCache?.invalidate([...fileChanges.modified, ...fileChanges.removed]);
-
-    return {
-      rebuildContexts: this.rebuildContexts,
-      codeBundleCache: this.codeBundleCache,
-      fileChanges,
-    };
-  }
-
-  async dispose(): Promise<void> {
-    await Promise.allSettled(this.rebuildContexts.map((context) => context.dispose()));
-  }
-}
-
-// eslint-disable-next-line max-lines-per-function
 async function execute(
   options: NormalizedBrowserOptions,
   context: BuilderContext,
@@ -189,58 +129,11 @@ async function execute(
 
   // Generate index HTML file
   if (indexHtmlOptions) {
-    // Analyze metafile for initial link-based hints.
-    // Skip if the internal externalPackages option is enabled since this option requires
-    // dev server cooperation to properly resolve and fetch imports.
-    const hints = [];
-    if (!options.externalPackages) {
-      for (const [key, value] of initialFiles) {
-        if (value.entrypoint) {
-          // Entry points are already referenced in the HTML
-          continue;
-        }
-        if (value.type === 'script') {
-          hints.push({ url: key, mode: 'modulepreload' as const });
-        } else if (value.type === 'style') {
-          hints.push({ url: key, mode: 'preload' as const });
-        }
-      }
-    }
-
-    // Create an index HTML generator that reads from the in-memory output files
-    const indexHtmlGenerator = new IndexHtmlGenerator({
-      indexPath: indexHtmlOptions.input,
-      entrypoints: indexHtmlOptions.insertionOrder,
-      sri: options.subresourceIntegrity,
-      optimization: optimizationOptions,
-      crossOrigin: options.crossOrigin,
-    });
-
-    /** Virtual output path to support reading in-memory files. */
-    const virtualOutputPath = '/';
-    indexHtmlGenerator.readAsset = async function (filePath: string): Promise<string> {
-      // Remove leading directory separator
-      const relativefilePath = path.relative(virtualOutputPath, filePath);
-      const file = executionResult.outputFiles.find((file) => file.path === relativefilePath);
-      if (file) {
-        return file.text;
-      }
-
-      throw new Error(`Output file does not exist: ${path}`);
-    };
-
-    const { content, warnings, errors } = await indexHtmlGenerator.process({
-      baseHref: options.baseHref,
-      lang: undefined,
-      outputPath: virtualOutputPath,
-      files: [...initialFiles].map(([file, record]) => ({
-        name: record.name ?? '',
-        file,
-        extension: path.extname(file),
-      })),
-      hints,
-    });
-
+    const { errors, warnings, content } = await generateIndexHtml(
+      initialFiles,
+      executionResult,
+      options,
+    );
     for (const error of errors) {
       context.logger.error(error);
     }
@@ -301,131 +194,6 @@ async function execute(
   context.logger.info(`Application bundle generation complete. [${buildTime.toFixed(3)} seconds]`);
 
   return executionResult;
-}
-
-function createCodeBundleOptions(
-  options: NormalizedBrowserOptions,
-  target: string[],
-  browsers: string[],
-  sourceFileCache?: SourceFileCache,
-): BuildOptions {
-  const {
-    workspaceRoot,
-    entryPoints,
-    optimizationOptions,
-    sourcemapOptions,
-    tsconfig,
-    outputNames,
-    outExtension,
-    fileReplacements,
-    externalDependencies,
-    preserveSymlinks,
-    stylePreprocessorOptions,
-    advancedOptimizations,
-    inlineStyleLanguage,
-    jit,
-    tailwindConfiguration,
-  } = options;
-
-  const buildOptions: BuildOptions = {
-    absWorkingDir: workspaceRoot,
-    bundle: true,
-    format: 'esm',
-    entryPoints,
-    entryNames: outputNames.bundles,
-    assetNames: outputNames.media,
-    target,
-    supported: getFeatureSupport(target),
-    mainFields: ['es2020', 'browser', 'module', 'main'],
-    conditions: ['es2020', 'es2015', 'module'],
-    resolveExtensions: ['.ts', '.tsx', '.mjs', '.js'],
-    metafile: true,
-    legalComments: options.extractLicenses ? 'none' : 'eof',
-    logLevel: options.verbose ? 'debug' : 'silent',
-    minify: optimizationOptions.scripts,
-    pure: ['forwardRef'],
-    outdir: workspaceRoot,
-    outExtension: outExtension ? { '.js': `.${outExtension}` } : undefined,
-    sourcemap: sourcemapOptions.scripts && (sourcemapOptions.hidden ? 'external' : true),
-    splitting: true,
-    tsconfig,
-    external: externalDependencies,
-    write: false,
-    platform: 'browser',
-    preserveSymlinks,
-    plugins: [
-      createSourcemapIngorelistPlugin(),
-      createCompilerPlugin(
-        // JS/TS options
-        {
-          sourcemap: !!sourcemapOptions.scripts,
-          thirdPartySourcemaps: sourcemapOptions.vendor,
-          tsconfig,
-          jit,
-          advancedOptimizations,
-          fileReplacements,
-          sourceFileCache,
-          loadResultCache: sourceFileCache?.loadResultCache,
-        },
-        // Component stylesheet options
-        {
-          workspaceRoot,
-          optimization: !!optimizationOptions.styles.minify,
-          sourcemap:
-            // Hidden component stylesheet sourcemaps are inaccessible which is effectively
-            // the same as being disabled. Disabling has the advantage of avoiding the overhead
-            // of sourcemap processing.
-            !!sourcemapOptions.styles && (sourcemapOptions.hidden ? false : 'inline'),
-          outputNames,
-          includePaths: stylePreprocessorOptions?.includePaths,
-          externalDependencies,
-          target,
-          inlineStyleLanguage,
-          preserveSymlinks,
-          browsers,
-          tailwindConfiguration,
-        },
-      ),
-    ],
-    define: {
-      // Only set to false when script optimizations are enabled. It should not be set to true because
-      // Angular turns `ngDevMode` into an object for development debugging purposes when not defined
-      // which a constant true value would break.
-      ...(optimizationOptions.scripts ? { 'ngDevMode': 'false' } : undefined),
-      'ngJitMode': jit ? 'true' : 'false',
-    },
-  };
-
-  if (options.externalPackages) {
-    buildOptions.plugins ??= [];
-    buildOptions.plugins.push(createExternalPackagesPlugin());
-  }
-
-  const polyfills = options.polyfills ? [...options.polyfills] : [];
-  if (jit) {
-    polyfills.push('@angular/compiler');
-  }
-
-  if (polyfills?.length) {
-    const namespace = 'angular:polyfills';
-    buildOptions.entryPoints = {
-      ...buildOptions.entryPoints,
-      ['polyfills']: namespace,
-    };
-
-    buildOptions.plugins?.unshift(
-      createVirtualModulePlugin({
-        namespace,
-        loadContent: () => ({
-          contents: polyfills.map((file) => `import '${file.replace(/\\/g, '/')}';`).join('\n'),
-          loader: 'js',
-          resolveDir: workspaceRoot,
-        }),
-      }),
-    );
-  }
-
-  return buildOptions;
 }
 
 /**
