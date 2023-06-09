@@ -9620,7 +9620,7 @@ the application may need to be updated to become Ivy compatible.
 <h3>
     @schematics/angular: remove `entryComponent` from `component` schematic (<a href="https://github.com/angular/angular-cli/commit/8582ddc35e153b8bc409d0505f29bc43e6cef455">8582ddc</a>)
 </h3>
-`entryComponent` option has been removed from the `component` schematic as this was intended to be used with the the now no longer supported ViewEngine rendering engine.
+`entryComponent` option has been removed from the `component` schematic as this was intended to be used with the now no longer supported ViewEngine rendering engine.
 
 <h3>
     @angular-devkit/build-angular: remove view engine app-shell generation (<a href="https://github.com/angular/angular-cli/commit/1c2aeeb46a23fd511c89f9c8800ac2a5ab0c2734">1c2aeeb</a>)
@@ -11302,7 +11302,7 @@ the application may need to be updated to become Ivy compatible.
 <h3>
     @schematics/angular: remove `entryComponent` from `component` schematic (<a href="https://github.com/angular/angular-cli/commit/8582ddc35e153b8bc409d0505f29bc43e6cef455">8582ddc</a>)
 </h3>
-`entryComponent` option has been removed from the `component` schematic as this was intended to be used with the the now no longer supported ViewEngine rendering engine.
+`entryComponent` option has been removed from the `component` schematic as this was intended to be used with the now no longer supported ViewEngine rendering engine.
 
 <h3>
     @angular-devkit/build-angular: remove view engine app-shell generation (<a href="https://github.com/angular/angular-cli/commit/1c2aeeb46a23fd511c89f9c8800ac2a5ab0c2734">1c2aeeb</a>)
