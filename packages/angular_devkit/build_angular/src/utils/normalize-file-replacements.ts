@@ -12,7 +12,7 @@ import * as path from 'path';
 import { FileReplacement } from '../builders/browser/schema';
 
 export class MissingFileReplacementException extends BaseException {
-  constructor(path: String) {
+  constructor(path: string) {
     super(`The ${path} path in file replacements does not exist.`);
   }
 }

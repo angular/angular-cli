@@ -12,7 +12,7 @@ import * as path from 'path';
 import { AssetPattern, AssetPatternClass } from '../builders/browser/schema';
 
 export class MissingAssetSourceRootException extends BaseException {
-  constructor(path: String) {
+  constructor(path: string) {
     super(`The ${path} asset path must start with the project source root.`);
   }
 }
