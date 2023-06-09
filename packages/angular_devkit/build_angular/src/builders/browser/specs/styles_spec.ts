@@ -7,7 +7,6 @@
  */
 
 import { Architect } from '@angular-devkit/architect';
-import { TestProjectHost } from '@angular-devkit/architect/testing';
 import { normalize, tags } from '@angular-devkit/core';
 import { dirname } from 'path';
 import { browserBuild, createArchitect, host } from '../../../testing/test-utils';
