@@ -87,7 +87,7 @@ def pkg_npm(name, pkg_deps = [], use_prodmode_output = False, **kwargs):
     deps = kwargs.pop("deps", [])
 
     # The `pkg_npm` rule brings in devmode (`JSModuleInfo`) and prodmode (`JSEcmaScriptModuleInfo`)
-    # output into the the NPM package We do not intend to ship the prodmode ECMAScript `.mjs`
+    # output into the NPM package We do not intend to ship the prodmode ECMAScript `.mjs`
     # files, but the `JSModuleInfo` outputs (which correspond to devmode output). Depending on
     # the `use_prodmode_output` macro attribute, we either ship the ESM output of dependencies,
     # or continue shipping the devmode ES5 output.
