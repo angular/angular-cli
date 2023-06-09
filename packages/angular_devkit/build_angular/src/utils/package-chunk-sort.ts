@@ -7,7 +7,7 @@
  */
 
 import { ScriptElement, StyleElement } from '../builders/browser/schema';
-import { normalizeExtraEntryPoints } from '../webpack/utils/helpers';
+import { normalizeExtraEntryPoints } from '../tools/webpack/utils/helpers';
 
 export type EntryPointsType = [name: string, isModule: boolean];
 
