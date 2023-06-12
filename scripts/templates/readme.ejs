@@ -10,9 +10,9 @@
   Any changes to README.md directly will result in a failure on CI.
 -->
 
-<h1 align="center">Angular CLI - The CLI tool for Angular.</h1>
+<h1 style="text-align: center">Angular CLI - The CLI tool for Angular.</h1>
 
-<p align="center">
+<p style="text-align: center">
   <br>
   <img src="/docs/images/angular-cli-logo.png" alt="Angular CLI logo" width="100px" height="108px"/>
   <br><br>
@@ -21,12 +21,12 @@
   <br>
 </p>
 
-<p align="center">
+<p style="text-align: center">
   <a href="https://cli.angular.io"><strong>cli.angular.io</strong></a>
   <br>
 </p>
 
-<p align="center">
+<p style="text-align: center">
   <a href="CONTRIBUTING.md">Contributing Guidelines</a>
   ·
   <a href="https://github.com/angular/angular-cli/issues">Submit an Issue</a>
@@ -36,7 +36,7 @@
   <br>
 </p>
 
-<p align="center">
+<p style="text-align: center">
   <a href="https://circleci.com/gh/angular/workflows/angular-cli/tree/main">
     <img src="https://img.shields.io/circleci/build/github/angular/angular-cli/main.svg?logo=circleci&logoColor=fff&label=CircleCI" alt="CI status" />
   </a>&nbsp;
