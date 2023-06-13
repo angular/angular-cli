@@ -1,3 +1,16 @@
+<a name="16.0.6"></a>
+
+# 16.0.6 (2023-06-13)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                               |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------- |
+| [eebb54cbf](https://github.com/angular/angular-cli/commit/eebb54cbf4683b6113eb56dba17fab038318c918) | fix  | correctly handle sass imports                             |
+| [081b62539](https://github.com/angular/angular-cli/commit/081b62539b2562bff130343558bf4baafed7c36d) | fix  | support proxy configuration array-form in esbuild builder |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="16.0.5"></a>
 
 # 16.0.5 (2023-06-07)
