@@ -1,6 +1,6 @@
-<a name="16.1.0-rc.0"></a>
+<a name="16.1.0"></a>
 
-# 16.1.0-rc.0 (2023-06-07)
+# 16.1.0 (2023-06-13)
 
 ## Deprecations
 
@@ -13,12 +13,6 @@
 | Commit                                                                                           | Type     | Description                   |
 | ------------------------------------------------------------------------------------------------ | -------- | ----------------------------- |
 | [ccc2f52f](https://github.com/angular/universal/commit/ccc2f52f9be47b5fb2cddd4d3f57b9a18eb1b0ca) | refactor | deprecate transfer http cache |
-
-<!-- CHANGELOG SPLIT MARKER -->
-
-<a name="16.1.0-next.0"></a>
-
-# 16.1.0-next.0 (2023-05-19)
 
 <!-- CHANGELOG SPLIT MARKER -->
 
