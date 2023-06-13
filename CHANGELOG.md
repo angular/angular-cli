@@ -1,6 +1,6 @@
-<a name="16.1.0-rc.0"></a>
+<a name="16.1.0"></a>
 
-# 16.1.0-rc.0 (2023-06-07)
+# 16.1.0 (2023-06-13)
 
 ### @schematics/angular
 
@@ -10,10 +10,15 @@
 
 ### @angular-devkit/build-angular
 
-| Commit                                                                                              | Type | Description                                                   |
-| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------- |
-| [772fe84ed](https://github.com/angular/angular-cli/commit/772fe84ed399ccc085893e645163b4b12c461d0e) | fix  | ignore .git folder in browser-esbuild watcher                 |
-| [7155cbe5b](https://github.com/angular/angular-cli/commit/7155cbe5b2991f986c0683d16a6fc4d9b411e47b) | fix  | ignore folders starting with a dot in browser-esbuild watcher |
+| Commit                                                                                              | Type | Description                                                             |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------------- |
+| [3ede1a2ca](https://github.com/angular/angular-cli/commit/3ede1a2cac5005f4dfbd2a62ef528a34c3793b78) | feat | allow forcing esbuild builder with dev-server                           |
+| [2d141fe3b](https://github.com/angular/angular-cli/commit/2d141fe3bc1efb9e254b15ce91ebc885a43c928a) | feat | show estimated transfer size with esbuild builder                       |
+| [9aa9b5264](https://github.com/angular/angular-cli/commit/9aa9b5264eee1b1dda7abd334b560d4b446c4970) | feat | support autoprefixer/tailwind CSS with Less/Sass in esbuild builder     |
+| [3d1c09b23](https://github.com/angular/angular-cli/commit/3d1c09b235bf1db0d031c36fdc68ab99359b34b1) | feat | support dev-server package prebundling with esbuild builder             |
+| [d8930facc](https://github.com/angular/angular-cli/commit/d8930facc075e39d82b3c6cb252c9a8b5fa6a476) | feat | support incremental TypeScript semantic diagnostics in esbuild builder  |
+| [5cacd34a2](https://github.com/angular/angular-cli/commit/5cacd34a222eea16c18caa63dbe4448b81e106f3) | fix  | watch all TypeScript referenced files in esbuild builder                |
+| [8336ad80d](https://github.com/angular/angular-cli/commit/8336ad80da41cde69343960f7515d9ffd5e5e2e1) | perf | enable in-memory load result caching for stylesheets in esbuild builder |
 
 <!-- CHANGELOG SPLIT MARKER -->
 
@@ -30,21 +35,6 @@
 
 <!-- CHANGELOG SPLIT MARKER -->
 
-<a name="16.1.0-next.2"></a>
-
-# 16.1.0-next.2 (2023-06-01)
-
-### @angular-devkit/build-angular
-
-| Commit                                                                                              | Type | Description                                                         |
-| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------- |
-| [9aa9b5264](https://github.com/angular/angular-cli/commit/9aa9b5264eee1b1dda7abd334b560d4b446c4970) | feat | support autoprefixer/tailwind CSS with Less/Sass in esbuild builder |
-| [3d1c09b23](https://github.com/angular/angular-cli/commit/3d1c09b235bf1db0d031c36fdc68ab99359b34b1) | feat | support dev-server package prebundling with esbuild builder         |
-| [fc60d2227](https://github.com/angular/angular-cli/commit/fc60d2227672f8276255f95be135923c4d82b75c) | fix  | correctly set overridden compiler option                            |
-| [c462d9cb9](https://github.com/angular/angular-cli/commit/c462d9cb90377342980384c6bccb3ddfef533282) | fix  | preemptively remove AOT metadata in esbuild builder                 |
-
-<!-- CHANGELOG SPLIT MARKER -->
-
 <a name="16.0.4"></a>
 
 # 16.0.4 (2023-06-01)
@@ -58,20 +48,6 @@
 
 <!-- CHANGELOG SPLIT MARKER -->
 
-<a name="16.1.0-next.1"></a>
-
-# 16.1.0-next.1 (2023-05-25)
-
-### @angular-devkit/build-angular
-
-| Commit                                                                                              | Type | Description                                                             |
-| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------------- |
-| [4c82bb8e8](https://github.com/angular/angular-cli/commit/4c82bb8e812e71a9d36bfb3eb6e4c117fa41f00f) | fix  | percent encode asset URLs in development server for esbuild             |
-| [5cacd34a2](https://github.com/angular/angular-cli/commit/5cacd34a222eea16c18caa63dbe4448b81e106f3) | fix  | watch all TypeScript referenced files in esbuild builder                |
-| [8336ad80d](https://github.com/angular/angular-cli/commit/8336ad80da41cde69343960f7515d9ffd5e5e2e1) | perf | enable in-memory load result caching for stylesheets in esbuild builder |
-
-<!-- CHANGELOG SPLIT MARKER -->
-
 <a name="16.0.3"></a>
 
 # 16.0.3 (2023-05-25)
@@ -81,20 +57,6 @@
 | Commit                                                                                              | Type | Description                                                 |
 | --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------- |
 | [1d83bb656](https://github.com/angular/angular-cli/commit/1d83bb6565550107ab00de52b706cad8f28514b3) | fix  | percent encode asset URLs in development server for esbuild |
-
-<!-- CHANGELOG SPLIT MARKER -->
-
-<a name="16.1.0-next.0"></a>
-
-# 16.1.0-next.0 (2023-05-17)
-
-### @angular-devkit/build-angular
-
-| Commit                                                                                              | Type | Description                                                            |
-| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------------------- |
-| [3ede1a2ca](https://github.com/angular/angular-cli/commit/3ede1a2cac5005f4dfbd2a62ef528a34c3793b78) | feat | allow forcing esbuild builder with dev-server                          |
-| [2d141fe3b](https://github.com/angular/angular-cli/commit/2d141fe3bc1efb9e254b15ce91ebc885a43c928a) | feat | show estimated transfer size with esbuild builder                      |
-| [d8930facc](https://github.com/angular/angular-cli/commit/d8930facc075e39d82b3c6cb252c9a8b5fa6a476) | feat | support incremental TypeScript semantic diagnostics in esbuild builder |
 
 <!-- CHANGELOG SPLIT MARKER -->
 
