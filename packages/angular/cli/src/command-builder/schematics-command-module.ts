@@ -181,10 +181,10 @@ export abstract class SchematicsCommandModule
 
             const validator = definition.validator;
             if (validator) {
-              question.validate = (input) => validator(input);
+              question.validate = (input:any) => validator(input);
 
               // Filter allows transformation of the value prior to validation
-              question.filter = async (input) => {
+              question.filter = async (input:any) => {
                 for (const type of definition.propertyTypes) {
                   let value;
                   switch (type) {
