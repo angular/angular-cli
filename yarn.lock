@@ -126,7 +126,6 @@
 
 "@angular/build-tooling@https://github.com/angular/dev-infra-private-build-tooling-builds.git#27aea082d8662d61c5a087b320c23e38f9268bfa":
   version "0.0.0-2ec31a92100367a52100fca54d5e8c7c78cb149c"
-  uid "27aea082d8662d61c5a087b320c23e38f9268bfa"
   resolved "https://github.com/angular/dev-infra-private-build-tooling-builds.git#27aea082d8662d61c5a087b320c23e38f9268bfa"
   dependencies:
     "@angular-devkit/build-angular" "16.1.0-next.1"
@@ -180,6 +179,20 @@
   dependencies:
     tslib "^2.3.0"
 
+"@angular/compiler-cli@16.1.0":
+  version "16.1.0"
+  resolved "https://registry.yarnpkg.com/@angular/compiler-cli/-/compiler-cli-16.1.0.tgz#50cddc9524b945e9739e9daf86df1df4c8382232"
+  integrity sha512-t/fam7YdY6sINP0IAmt3cWQ0KUndhm457i4e0uZH+NVeBzItvBQggmrl+UhXslg/iFEyHohtyrjZKnGSzgkzKg==
+  dependencies:
+    "@babel/core" "7.21.8"
+    "@jridgewell/sourcemap-codec" "^1.4.14"
+    chokidar "^3.0.0"
+    convert-source-map "^1.5.1"
+    reflect-metadata "^0.1.2"
+    semver "^7.0.0"
+    tslib "^2.3.0"
+    yargs "^17.2.1"
+
 "@angular/compiler-cli@16.1.0-rc.0":
   version "16.1.0-rc.0"
   resolved "https://registry.yarnpkg.com/@angular/compiler-cli/-/compiler-cli-16.1.0-rc.0.tgz#d13ed6169f522ce84d491f70dcaea3d9c8b91019"
@@ -193,6 +206,13 @@
     semver "^7.0.0"
     tslib "^2.3.0"
     yargs "^17.2.1"
+
+"@angular/compiler@16.1.0":
+  version "16.1.0"
+  resolved "https://registry.yarnpkg.com/@angular/compiler/-/compiler-16.1.0.tgz#e3f3de9accbd5c2fe4aefc29406c5b1db47e3a8e"
+  integrity sha512-lQ8pZmfQpAevUbd1BO7snkS8LX4D8HADcdNMnFY/JmSDnb2Kt9VG56uX2HMq8mjyWdqy8E7ggwRi0wFWT5G23Q==
+  dependencies:
+    tslib "^2.3.0"
 
 "@angular/compiler@16.1.0-rc.0":
   version "16.1.0-rc.0"
@@ -287,7 +307,6 @@
 
 "@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#2607227d897f609848248ffd6d611fa79b6a5593":
   version "0.0.0-2ec31a92100367a52100fca54d5e8c7c78cb149c"
-  uid "2607227d897f609848248ffd6d611fa79b6a5593"
   resolved "https://github.com/angular/dev-infra-private-ng-dev-builds.git#2607227d897f609848248ffd6d611fa79b6a5593"
   dependencies:
     "@yarnpkg/lockfile" "^1.1.0"
@@ -5212,7 +5231,7 @@ browser-sync@^2.27.7:
     ua-parser-js "^1.0.33"
     yargs "^17.3.1"
 
-browserslist@*, browserslist@4.21.7, browserslist@^4.14.5, browserslist@^4.21.3, browserslist@^4.21.4, browserslist@^4.21.5:
+browserslist@*, browserslist@^4.14.5, browserslist@^4.21.3, browserslist@^4.21.4, browserslist@^4.21.5:
   version "4.21.7"
   resolved "https://registry.yarnpkg.com/browserslist/-/browserslist-4.21.7.tgz#e2b420947e5fb0a58e8f4668ae6e23488127e551"
   integrity sha512-BauCXrQ7I2ftSqd2mvKHGo85XR0u7Ru3C/Hxsy/0TkfCtjrmAbPdzLGasmoiBxplpDXlPvdjX9u7srIMfgasNA==
