@@ -368,7 +368,7 @@ export async function setupServer(
       // Exclude any provided dependencies (currently build defined externals)
       exclude: prebundleExclude,
       // Skip automatic file-based entry point discovery
-      include: [],
+      entries: [],
       // Add an esbuild plugin to run the Angular linker on dependencies
       esbuildOptions: {
         plugins: [
