@@ -9717,6 +9717,17 @@ piscina@3.2.0, piscina@^3.2.0:
   optionalDependencies:
     nice-napi "^1.0.2"
 
+piscina@4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/piscina/-/piscina-4.0.0.tgz#f8913d52b2000606d51aaa242f0813a0c77ca3b1"
+  integrity sha512-641nAmJS4k4iqpNUqfggqUBUMmlw0ZoM5VZKdQkV2e970Inn3Tk9kroCc1wpsYLD07vCwpys5iY0d3xI/9WkTg==
+  dependencies:
+    eventemitter-asyncresource "^1.0.0"
+    hdr-histogram-js "^2.0.1"
+    hdr-histogram-percentiles-obj "^3.0.0"
+  optionalDependencies:
+    nice-napi "^1.0.2"
+
 pkg-dir@^4.1.0:
   version "4.2.0"
   resolved "https://registry.yarnpkg.com/pkg-dir/-/pkg-dir-4.2.0.tgz#f099133df7ede422e81d1d8448270eeb3e4261f3"
