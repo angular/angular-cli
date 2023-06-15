@@ -176,7 +176,7 @@
     "pacote": "15.2.0",
     "parse5-html-rewriting-stream": "7.0.0",
     "picomatch": "2.3.1",
-    "piscina": "3.2.0",
+    "piscina": "4.0.0",
     "popper.js": "^1.14.1",
     "postcss": "8.4.24",
     "postcss-loader": "7.3.2",

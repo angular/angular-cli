@@ -180,6 +180,20 @@
   dependencies:
     tslib "^2.3.0"
 
+"@angular/compiler-cli@16.1.0":
+  version "16.1.0"
+  resolved "https://registry.yarnpkg.com/@angular/compiler-cli/-/compiler-cli-16.1.0.tgz#50cddc9524b945e9739e9daf86df1df4c8382232"
+  integrity sha512-t/fam7YdY6sINP0IAmt3cWQ0KUndhm457i4e0uZH+NVeBzItvBQggmrl+UhXslg/iFEyHohtyrjZKnGSzgkzKg==
+  dependencies:
+    "@babel/core" "7.21.8"
+    "@jridgewell/sourcemap-codec" "^1.4.14"
+    chokidar "^3.0.0"
+    convert-source-map "^1.5.1"
+    reflect-metadata "^0.1.2"
+    semver "^7.0.0"
+    tslib "^2.3.0"
+    yargs "^17.2.1"
+
 "@angular/compiler-cli@16.1.0-rc.0":
   version "16.1.0-rc.0"
   resolved "https://registry.yarnpkg.com/@angular/compiler-cli/-/compiler-cli-16.1.0-rc.0.tgz#d13ed6169f522ce84d491f70dcaea3d9c8b91019"
@@ -193,6 +207,13 @@
     semver "^7.0.0"
     tslib "^2.3.0"
     yargs "^17.2.1"
+
+"@angular/compiler@16.1.0":
+  version "16.1.0"
+  resolved "https://registry.yarnpkg.com/@angular/compiler/-/compiler-16.1.0.tgz#e3f3de9accbd5c2fe4aefc29406c5b1db47e3a8e"
+  integrity sha512-lQ8pZmfQpAevUbd1BO7snkS8LX4D8HADcdNMnFY/JmSDnb2Kt9VG56uX2HMq8mjyWdqy8E7ggwRi0wFWT5G23Q==
+  dependencies:
+    tslib "^2.3.0"
 
 "@angular/compiler@16.1.0-rc.0":
   version "16.1.0-rc.0"
@@ -9540,6 +9561,17 @@ piscina@3.2.0, piscina@^3.2.0:
   version "3.2.0"
   resolved "https://registry.yarnpkg.com/piscina/-/piscina-3.2.0.tgz#f5a1dde0c05567775690cccefe59d9223924d154"
   integrity sha512-yn/jMdHRw+q2ZJhFhyqsmANcbF6V2QwmD84c6xRau+QpQOmtrBCoRGdvTfeuFDYXB5W2m6MfLkjkvQa9lUSmIA==
+  dependencies:
+    eventemitter-asyncresource "^1.0.0"
+    hdr-histogram-js "^2.0.1"
+    hdr-histogram-percentiles-obj "^3.0.0"
+  optionalDependencies:
+    nice-napi "^1.0.2"
+
+piscina@4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/piscina/-/piscina-4.0.0.tgz#f8913d52b2000606d51aaa242f0813a0c77ca3b1"
+  integrity sha512-641nAmJS4k4iqpNUqfggqUBUMmlw0ZoM5VZKdQkV2e970Inn3Tk9kroCc1wpsYLD07vCwpys5iY0d3xI/9WkTg==
   dependencies:
     eventemitter-asyncresource "^1.0.0"
     hdr-histogram-js "^2.0.1"
