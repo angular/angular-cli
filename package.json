@@ -60,7 +60,7 @@
   "devDependencies": {
     "@ampproject/remapping": "2.2.1",
     "@angular/animations": "16.1.0-rc.0",
-    "@angular/build-tooling": "https://github.com/angular/dev-infra-private-build-tooling-builds.git#27aea082d8662d61c5a087b320c23e38f9268bfa",
+    "@angular/build-tooling": "https://github.com/angular/dev-infra-private-build-tooling-builds.git#69da084401b5724a236d7a6fe8be402ff2ea79b3",
     "@angular/cdk": "16.0.4",
     "@angular/common": "16.1.0-rc.0",
     "@angular/compiler": "16.1.0-rc.0",
