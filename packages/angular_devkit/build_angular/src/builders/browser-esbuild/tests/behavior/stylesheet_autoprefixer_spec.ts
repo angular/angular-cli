@@ -106,10 +106,12 @@ describeBuilder(buildEsbuildBrowser, BROWSER_BUILDER_INFO, (harness) => {
 
         harness
           .expectFile('dist/main.js')
-          .content.toMatch(/{\\n\s*-webkit-hyphens:\s*none;\\n\s*hyphens:\s*none;\\n\s*}/);
+          .content.toMatch(
+            /section\s*{\\n\s*-webkit-hyphens:\s*none;\\n\s*hyphens:\s*none;\\n\s*}/,
+          );
         harness
           .expectFile('dist/main.js')
-          .content.toMatch(/{\\n\s*-webkit-hyphens:\s*none;\\n\s*hyphens:\s*none;\\n\s*}/);
+          .content.toMatch(/div\s*{\\n\s*-webkit-hyphens:\s*none;\\n\s*hyphens:\s*none;\\n\s*}/);
       });
 
       it(`should not add prefixes if not required by browsers in external component styles [${ext}]`, async () => {
@@ -135,8 +137,10 @@ describeBuilder(buildEsbuildBrowser, BROWSER_BUILDER_INFO, (harness) => {
         const { result } = await harness.executeOnce();
         expect(result?.success).toBeTrue();
 
-        harness.expectFile('dist/main.js').content.toMatch(/{\\n\s*hyphens:\s*none;\\n\s*}/);
-        harness.expectFile('dist/main.js').content.toMatch(/{\\n\s*hyphens:\s*none;\\n\s*}/);
+        harness
+          .expectFile('dist/main.js')
+          .content.toMatch(/section\s*{\\n\s*hyphens:\s*none;\\n\s*}/);
+        harness.expectFile('dist/main.js').content.toMatch(/div\s*{\\n\s*hyphens:\s*none;\\n\s*}/);
       });
     }
 
@@ -165,8 +169,7 @@ describeBuilder(buildEsbuildBrowser, BROWSER_BUILDER_INFO, (harness) => {
 
       harness
         .expectFile('dist/main.js')
-        // div[_ngcontent-%COMP%] {\n  -webkit-hyphens: none;\n  hyphens: none;\n}\n
-        .content.toMatch(/{\\n\s*-webkit-hyphens:\s*none;\\n\s*hyphens:\s*none;\\n\s*}/);
+        .content.toMatch(/div\s*{\\n\s*-webkit-hyphens:\s*none;\\n\s*hyphens:\s*none;\\n\s*}/);
     });
 
     it('should not add prefixes if not required by browsers in inline component styles', async () => {
@@ -190,7 +193,7 @@ describeBuilder(buildEsbuildBrowser, BROWSER_BUILDER_INFO, (harness) => {
       const { result } = await harness.executeOnce();
       expect(result?.success).toBeTrue();
 
-      harness.expectFile('dist/main.js').content.toMatch(/{\\n\s*hyphens:\s*none;\\n\s*}/);
+      harness.expectFile('dist/main.js').content.toMatch(/div\s*{\\n\s*hyphens:\s*none;\\n\s*}/);
     });
   });
 });
