@@ -6,12 +6,12 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import * as cacache from 'cacache';
-import * as fs from 'fs';
-import * as https from 'https';
 import proxyAgent from 'https-proxy-agent';
-import { join } from 'path';
-import { URL } from 'url';
+import { createHash } from 'node:crypto';
+import { readFile, rm, writeFile } from 'node:fs/promises';
+import * as https from 'node:https';
+import { join } from 'node:path';
+import { URL } from 'node:url';
 import { NormalizedCachedOptions } from '../normalize-cache';
 import { VERSION } from '../package-version';
 import { htmlRewritingStream } from './html-rewriting-stream';
@@ -33,6 +33,16 @@ const SUPPORTED_PROVIDERS: Record<string, FontProviderDetails> = {
     preconnectUrl: 'https://use.typekit.net',
   },
 };
+
+/**
+ * Hash algorithm used for cached files.
+ */
+const CONTENT_HASH_ALGORITHM = 'sha256';
+
+/**
+ * String length of the SHA-256 content hash stored in cached files.
+ */
+const CONTENT_HASH_LENGTH = 64;
 
 export class InlineFontsProcessor {
   private readonly cachePath: string | undefined;
@@ -161,13 +171,29 @@ export class InlineFontsProcessor {
   }
 
   private async getResponse(url: URL): Promise<string> {
-    const key = `${VERSION}|${url}`;
-
+    let cacheFile;
     if (this.cachePath) {
-      const entry = await cacache.get.info(this.cachePath, key);
-      if (entry) {
-        return fs.promises.readFile(entry.path, 'utf8');
-      }
+      const key = createHash(CONTENT_HASH_ALGORITHM).update(`${VERSION}|${url}`).digest('hex');
+      cacheFile = join(this.cachePath, key);
+    }
+
+    if (cacheFile) {
+      try {
+        const data = await readFile(cacheFile, 'utf8');
+        // Check for valid content via stored hash
+        if (data.length > CONTENT_HASH_LENGTH) {
+          const storedHash = data.slice(0, CONTENT_HASH_LENGTH);
+          const content = data.slice(CONTENT_HASH_LENGTH);
+          const contentHash = createHash(CONTENT_HASH_ALGORITHM).update(content).digest('base64');
+          if (storedHash === contentHash) {
+            // Return valid content
+            return content;
+          } else {
+            // Delete corrupted cache content
+            await rm(cacheFile);
+          }
+        }
+      } catch {}
     }
 
     let agent: proxyAgent.HttpsProxyAgent | undefined;
@@ -214,8 +240,11 @@ export class InlineFontsProcessor {
         );
     });
 
-    if (this.cachePath) {
-      await cacache.put(this.cachePath, key, data);
+    if (cacheFile) {
+      try {
+        const dataHash = createHash(CONTENT_HASH_ALGORITHM).update(data).digest('hex');
+        await writeFile(cacheFile, dataHash + data);
+      } catch {}
     }
 
     return data;
