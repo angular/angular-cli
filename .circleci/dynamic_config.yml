@@ -390,10 +390,7 @@ workflows:
           name: test-node<< matrix.nodeversion >>
           matrix:
             parameters:
-              # Disable running this on Node.js 18 for now. This causes failures when using RBE.
-              # Example: `GLIBC_2.28' not found.
-              # Likely this is caused by outdated Ubuntu image https://github.com/angular/dev-infra/blob/main/bazel/remote-execution/BUILD.bazel#L21
-              nodeversion: ['16']
+              nodeversion: ['16', '18']
           requires:
             - build
 

@@ -54,7 +54,7 @@ describe('Dev Server Builder', () => {
     const output = (await run.result) as DevServerBuildOutput;
     expect(output.success).toBe(true);
 
-    const response = await fetch(`http://${output.address}:${output.port}/bundle.js`);
+    const response = await fetch(`http://localhost:${output.port}/bundle.js`);
     expect(await response.text()).toContain(`console.log('hello world')`);
 
     await run.stop();
@@ -67,7 +67,7 @@ describe('Dev Server Builder', () => {
     const output = (await run.result) as DevServerBuildOutput;
     expect(output.success).toBe(true);
 
-    const response = await fetch(`http://${output.address}:${output.port}/bundle.js`);
+    const response = await fetch(`http://localhost:${output.port}/bundle.js`);
     expect(await response.text()).toContain(`console.log('hello world')`);
 
     await run.stop();
