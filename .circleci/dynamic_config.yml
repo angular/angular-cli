@@ -55,8 +55,16 @@ var_6: &only_pull_requests
       only:
         - /pull\/\d+/
 
+var_7: &only_builds_branches
+  filters:
+    branches:
+      only:
+        - main
+        - /\d+\.\d+\.x/
+        - ^feature\-.*
+
 # All e2e test suites
-var_7: &all_e2e_subsets ['npm', 'esbuild', 'yarn']
+var_8: &all_e2e_subsets ['npm', 'esbuild', 'yarn']
 
 # Executor Definitions
 # https://circleci.com/docs/2.0/reusing-config/#authoring-reusable-executors
@@ -455,7 +463,7 @@ workflows:
 
       # Publish jobs
       - snapshot_publish:
-          <<: *only_release_branches
+          <<: *only_builds_branches
           requires:
             - setup
             - e2e-cli
