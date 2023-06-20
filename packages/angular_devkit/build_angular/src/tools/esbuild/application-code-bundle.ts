@@ -47,7 +47,11 @@ export function createCodeBundleOptions(
     assetNames: outputNames.media,
     target,
     supported: getFeatureSupport(target),
-    mainFields: ['es2020', 'browser', 'module', 'main'],
+    // Note: `es2015` is needed for RxJS v6. If not specified, `module` would
+    // match and the ES5 distribution would be bundled and ends up breaking at
+    // runtime with the RxJS testing library.
+    // More details: https://github.com/angular/angular-cli/issues/25405.
+    mainFields: ['es2020', 'es2015', 'browser', 'module', 'main'],
     conditions: ['es2020', 'es2015', 'module'],
     resolveExtensions: ['.ts', '.tsx', '.mjs', '.js'],
     metafile: true,
