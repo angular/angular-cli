@@ -45,6 +45,7 @@ export abstract class AngularCompilation {
         allowEmptyCodegenFiles: false,
         annotationsAs: 'decorators',
         enableResourceInlining: false,
+        supportTestBed: false,
       }),
     );
   }
