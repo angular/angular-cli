@@ -8,6 +8,7 @@
 
 import createAutoPrefixerPlugin from 'autoprefixer';
 import type { OnLoadResult, Plugin, PluginBuild } from 'esbuild';
+import glob from 'fast-glob';
 import assert from 'node:assert';
 import { readFile } from 'node:fs/promises';
 import { extname } from 'node:path';
@@ -268,10 +269,27 @@ async function compileString(
       });
     }
 
+    let watchFiles;
+    for (const resultMessage of result.messages) {
+      if (resultMessage.type === 'dependency' && typeof resultMessage['file'] === 'string') {
+        watchFiles ??= [];
+        watchFiles.push(resultMessage['file']);
+      } else if (
+        resultMessage.type === 'dir-dependency' &&
+        typeof resultMessage['dir'] === 'string' &&
+        typeof resultMessage['glob'] === 'string'
+      ) {
+        watchFiles ??= [];
+        const dependencies = await glob(resultMessage['glob'], { cwd: resultMessage['dir'] });
+        watchFiles.push(...dependencies);
+      }
+    }
+
     return {
       contents: result.css,
       loader: 'css',
       warnings,
+      watchFiles,
     };
   } catch (error) {
     postcss ??= (await import('postcss')).default;
