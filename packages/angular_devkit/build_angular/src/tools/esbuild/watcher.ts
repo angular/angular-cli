@@ -36,7 +36,9 @@ export function createWatcher(options?: {
   ignored?: string[];
 }): BuildWatcher {
   const watcher = new FSWatcher({
-    ...options,
+    usePolling: options?.polling,
+    interval: options?.interval,
+    ignored: options?.ignored,
     disableGlobbing: true,
     ignoreInitial: true,
   });
