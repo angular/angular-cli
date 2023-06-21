@@ -16,7 +16,7 @@ import {
   build,
   context,
 } from 'esbuild';
-import { basename, extname, relative } from 'node:path';
+import { basename, extname, join, relative } from 'node:path';
 
 export type BundleContextResult =
   | { errors: Message[]; warnings: Message[] }
@@ -47,6 +47,8 @@ function isEsBuildFailure(value: unknown): value is BuildFailure {
 export class BundlerContext {
   #esbuildContext?: BuildContext<{ metafile: true; write: false }>;
   #esbuildOptions: BuildOptions & { metafile: true; write: false };
+
+  readonly watchFiles = new Set<string>();
 
   constructor(
     private workspaceRoot: string,
@@ -136,6 +138,17 @@ export class BundlerContext {
       } else {
         throw failure;
       }
+    }
+
+    // Update files that should be watched.
+    // While this should technically not be linked to incremental mode, incremental is only
+    // currently enabled with watch mode where watch files are needed.
+    if (this.incremental) {
+      this.watchFiles.clear();
+      // Add input files except virtual angular files which do not exist on disk
+      Object.keys(result.metafile.inputs)
+        .filter((input) => !input.startsWith('angular:'))
+        .forEach((input) => this.watchFiles.add(join(this.workspaceRoot, input)));
     }
 
     // Return if the build encountered any errors

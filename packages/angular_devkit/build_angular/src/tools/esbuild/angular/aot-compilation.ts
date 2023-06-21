@@ -103,7 +103,10 @@ export class AotCompilation extends AngularCompilation {
     const referencedFiles = typeScriptProgram
       .getSourceFiles()
       .filter((sourceFile) => !angularCompiler.ignoreForEmit.has(sourceFile))
-      .map((sourceFile) => sourceFile.fileName);
+      .flatMap((sourceFile) => [
+        sourceFile.fileName,
+        ...angularCompiler.getResourceDependencies(sourceFile),
+      ]);
 
     return { affectedFiles, compilerOptions, referencedFiles };
   }

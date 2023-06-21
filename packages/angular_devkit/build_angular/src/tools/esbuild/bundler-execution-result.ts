@@ -49,7 +49,12 @@ export class ExecutionResult {
   }
 
   get watchFiles() {
-    return this.codeBundleCache?.referencedFiles ?? [];
+    const files = this.rebuildContexts.flatMap((context) => [...context.watchFiles]);
+    if (this.codeBundleCache?.referencedFiles) {
+      files.push(...this.codeBundleCache.referencedFiles);
+    }
+
+    return files;
   }
 
   createRebuildState(fileChanges: ChangedFiles): RebuildState {
