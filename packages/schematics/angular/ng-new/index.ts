@@ -38,6 +38,7 @@ export default function (options: NgNewOptions): Rule {
     version: options.version,
     newProjectRoot: options.newProjectRoot,
     minimal: options.minimal,
+    standalone: options.standalone,
     strict: options.strict,
     packageManager: options.packageManager,
   };

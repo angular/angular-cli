@@ -32,6 +32,11 @@
       "type": "boolean",
       "default": false
     },
+    "standalone": {
+      "description": "Creates an application based upon the standalone API, without NgModules.",
+      "type": "boolean",
+      "default": false
+    },
     "strict": {
       "description": "Create a workspace with stricter type checking options. This setting helps improve maintainability and catch bugs ahead of time. For more information, see https://angular.io/strict",
       "type": "boolean",

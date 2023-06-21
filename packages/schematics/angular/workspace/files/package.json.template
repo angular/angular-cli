@@ -15,8 +15,8 @@
     "@angular/compiler": "<%= latestVersions.Angular %>",
     "@angular/core": "<%= latestVersions.Angular %>",
     "@angular/forms": "<%= latestVersions.Angular %>",
-    "@angular/platform-browser": "<%= latestVersions.Angular %>",
-    "@angular/platform-browser-dynamic": "<%= latestVersions.Angular %>",
+    "@angular/platform-browser": "<%= latestVersions.Angular %>",<% if (!standalone) { %>
+    "@angular/platform-browser-dynamic": "<%= latestVersions.Angular %>",<% } %>
     "@angular/router": "<%= latestVersions.Angular %>",
     "rxjs": "<%= latestVersions['rxjs'] %>",
     "tslib": "<%= latestVersions['tslib'] %>",
@@ -24,7 +24,8 @@
   },
   "devDependencies": {
     "@angular/cli": "<%= '~' + version %>",
-    "@angular/compiler-cli": "<%= latestVersions.Angular %>",<% if (!minimal) { %>
+    "@angular/compiler-cli": "<%= latestVersions.Angular %>",<% if (standalone) { %>
+    "@angular/platform-browser-dynamic": "<%= latestVersions.Angular %>",<% } %><% if (!minimal) { %>
     "@types/jasmine": "<%= latestVersions['@types/jasmine'] %>",
     "jasmine-core": "<%= latestVersions['jasmine-core'] %>",
     "karma": "<%= latestVersions['karma'] %>",

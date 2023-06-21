@@ -57,6 +57,7 @@ describe('Workspace Schematic', () => {
     const tree = await schematicRunner.runSchematic('workspace', defaultOptions);
     const pkg = JSON.parse(tree.readContent('/package.json'));
     expect(pkg.dependencies['@angular/core']).toEqual(latestVersions.Angular);
+    expect(pkg.dependencies['@angular/platform-browser-dynamic']).toEqual(latestVersions.Angular);
     expect(pkg.dependencies['rxjs']).toEqual(latestVersions['rxjs']);
     expect(pkg.dependencies['zone.js']).toEqual(latestVersions['zone.js']);
     expect(pkg.devDependencies['typescript']).toEqual(latestVersions['typescript']);
@@ -133,5 +134,17 @@ describe('Workspace Schematic', () => {
     expect(configurations).not.toContain(jasmine.objectContaining({ name: 'ng test' }));
     const { tasks } = parseJson(tree.readContent('.vscode/tasks.json').toString());
     expect(tasks).not.toContain(jasmine.objectContaining({ type: 'npm', script: 'test' }));
+  });
+
+  it('should not @angular/platform-browser-dynamic as a dev dependency when using standalone', async () => {
+    const tree = await schematicRunner.runSchematic('workspace', {
+      ...defaultOptions,
+      standalone: true,
+    });
+    const pkg = JSON.parse(tree.readContent('/package.json'));
+    expect(pkg.dependencies['@angular/platform-browser-dynamic']).toBeUndefined();
+    expect(pkg.devDependencies['@angular/platform-browser-dynamic']).toEqual(
+      latestVersions.Angular,
+    );
   });
 });

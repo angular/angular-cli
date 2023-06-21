@@ -7,6 +7,7 @@
  */
 
 import { SchematicTestRunner } from '@angular-devkit/schematics/testing';
+import { latestVersions } from '../utility/latest-versions';
 import { Schema as NgNewOptions } from './schema';
 
 describe('Ng New Schematic', () => {
@@ -55,6 +56,13 @@ describe('Ng New Schematic', () => {
       ]),
     );
     expect(files).not.toEqual(jasmine.arrayContaining(['/bar/src/app/app.module.ts']));
+
+    // @angular/platform-browser-dynamic is just a dev dependency in a standalone app
+    const pkg = JSON.parse(tree.readContent('/bar/package.json'));
+    expect(pkg.dependencies['@angular/platform-browser-dynamic']).toBeUndefined();
+    expect(pkg.devDependencies['@angular/platform-browser-dynamic']).toEqual(
+      latestVersions.Angular,
+    );
   });
 
   it('should should set the prefix in angular.json and in app.component.ts', async () => {
