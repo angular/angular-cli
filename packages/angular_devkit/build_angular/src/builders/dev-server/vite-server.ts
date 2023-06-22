@@ -376,7 +376,10 @@ export async function setupServer(
             name: 'angular-vite-optimize-deps',
             setup(build) {
               const transformer = new JavaScriptTransformer(
-                { sourcemap: !!build.initialOptions.sourcemap },
+                // Always enable JIT linking to support applications built with and without AOT.
+                // In a development environment the additional scope information does not
+                // have a negative effect unlike production where final output size is relevant.
+                { sourcemap: !!build.initialOptions.sourcemap, jit: true },
                 1,
               );
 
