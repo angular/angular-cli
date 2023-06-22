@@ -13,6 +13,7 @@ import { createExternalPackagesPlugin } from '../../tools/esbuild/external-packa
 import { createSourcemapIngorelistPlugin } from '../../tools/esbuild/sourcemap-ignorelist-plugin';
 import { getFeatureSupport } from '../../tools/esbuild/utils';
 import { createVirtualModulePlugin } from '../../tools/esbuild/virtual-module-plugin';
+import { allowMangle } from '../../utils/environment-options';
 
 export function createCodeBundleOptions(
   options: NormalizedBrowserOptions,
@@ -57,7 +58,9 @@ export function createCodeBundleOptions(
     metafile: true,
     legalComments: options.extractLicenses ? 'none' : 'eof',
     logLevel: options.verbose ? 'debug' : 'silent',
-    minify: optimizationOptions.scripts,
+    minifyIdentifiers: optimizationOptions.scripts && allowMangle,
+    minifySyntax: optimizationOptions.scripts,
+    minifyWhitespace: optimizationOptions.scripts,
     pure: ['forwardRef'],
     outdir: workspaceRoot,
     outExtension: outExtension ? { '.js': `.${outExtension}` } : undefined,
