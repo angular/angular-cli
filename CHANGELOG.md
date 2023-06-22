@@ -1,3 +1,19 @@
+<a name="16.1.1"></a>
+
+# 16.1.1 (2023-06-22)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                                          |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------------------ |
+| [f017fee2e](https://github.com/angular/angular-cli/commit/f017fee2e93a4207b7bfd69c838991546b398753) | fix  | actually disable Vite prebundling file discovery                                     |
+| [2b4beaca2](https://github.com/angular/angular-cli/commit/2b4beaca2c32c11508078e082b3338d1edb414a0) | fix  | experimental esbuild pipeline, add `es2015` to main fields for RxJS v6 compatibility |
+| [e3c85e00e](https://github.com/angular/angular-cli/commit/e3c85e00e6b3390f239aaeb3db6a38fe4b4d2523) | fix  | track postcss provided file dependencies in esbuild builder                          |
+| [1419fff88](https://github.com/angular/angular-cli/commit/1419fff887173e331690fb0a664a081154842554) | fix  | unpin and downgrade `browserslist`                                                   |
+| [950a4b60f](https://github.com/angular/angular-cli/commit/950a4b60f046117867755ccd005f0e04bcc403a7) | fix  | watch all bundler provided inputs with esbuild builder                               |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="16.1.0"></a>
 
 # 16.1.0 (2023-06-13)
