@@ -51,10 +51,10 @@ describe('InlineCriticalCssProcessor', () => {
     });
 
     expect(content).toContain(
-      `<link href="styles.css" rel="stylesheet" media="print" onload="this.media=&apos;all&apos;">`,
+      `<link href="styles.css" rel="stylesheet" media="print" onload="this.media='all'">`,
     );
     expect(content).toContain(
-      `<link href="theme.css" rel="stylesheet" media="print" onload="this.media=&apos;all&apos;">`,
+      `<link href="theme.css" rel="stylesheet" media="print" onload="this.media='all'">`,
     );
     expect(content).not.toContain('color: blue');
     expect(tags.stripIndents`${content}`).toContain(tags.stripIndents`
@@ -75,10 +75,10 @@ describe('InlineCriticalCssProcessor', () => {
     });
 
     expect(content).toContain(
-      `<link href="http://cdn.com/styles.css" rel="stylesheet" media="print" onload="this.media=&apos;all&apos;">`,
+      `<link href="http://cdn.com/styles.css" rel="stylesheet" media="print" onload="this.media='all'">`,
     );
     expect(content).toContain(
-      `<link href="http://cdn.com/theme.css" rel="stylesheet" media="print" onload="this.media=&apos;all&apos;">`,
+      `<link href="http://cdn.com/theme.css" rel="stylesheet" media="print" onload="this.media='all'">`,
     );
     expect(tags.stripIndents`${content}`).toContain(tags.stripIndents`
     <style>
@@ -98,10 +98,10 @@ describe('InlineCriticalCssProcessor', () => {
     });
 
     expect(content).toContain(
-      `<link href="styles.css" rel="stylesheet" media="print" onload="this.media=&apos;all&apos;">`,
+      `<link href="styles.css" rel="stylesheet" media="print" onload="this.media='all'">`,
     );
     expect(content).toContain(
-      `<link href="theme.css" rel="stylesheet" media="print" onload="this.media=&apos;all&apos;">`,
+      `<link href="theme.css" rel="stylesheet" media="print" onload="this.media='all'">`,
     );
     expect(content).toContain('<style>body{margin:0}html{color:white}</style>');
   });
