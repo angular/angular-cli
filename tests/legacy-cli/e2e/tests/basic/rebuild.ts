@@ -158,4 +158,19 @@ export default async function () {
       throw new Error('Expected component CSS to update.');
     }
   }
+
+  await Promise.all([
+    waitForAnyProcessOutputToMatch(validBundleRegEx),
+    writeMultipleFiles({
+      'src/styles.css': 'div { color: green; }',
+    }),
+  ]);
+
+  {
+    const response = await fetch(`http://localhost:${port}/styles.css`);
+    const body = await response.text();
+    if (!body.match(/color:\s?green/)) {
+      throw new Error('Expected component CSS to update.');
+    }
+  }
 }

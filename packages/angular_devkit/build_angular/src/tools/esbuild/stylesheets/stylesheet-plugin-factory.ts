@@ -232,7 +232,7 @@ async function compileString(
   options: StylesheetPluginOptions,
 ): Promise<OnLoadResult> {
   try {
-    const result = await postcssProcessor.process(data, {
+    const postcssResult = await postcssProcessor.process(data, {
       from: filename,
       to: filename,
       map: options.sourcemap && {
@@ -241,11 +241,15 @@ async function compileString(
       },
     });
 
-    const rawWarnings = result.warnings();
-    let warnings;
+    const loadResult: OnLoadResult = {
+      contents: postcssResult.css,
+      loader: 'css',
+    };
+
+    const rawWarnings = postcssResult.warnings();
     if (rawWarnings.length > 0) {
       const lineMappings = new Map<string, string[] | null>();
-      warnings = rawWarnings.map((warning) => {
+      loadResult.warnings = rawWarnings.map((warning) => {
         const file = warning.node.source?.input.file;
         if (file === undefined) {
           return { text: warning.text };
@@ -269,28 +273,22 @@ async function compileString(
       });
     }
 
-    let watchFiles;
-    for (const resultMessage of result.messages) {
+    for (const resultMessage of postcssResult.messages) {
       if (resultMessage.type === 'dependency' && typeof resultMessage['file'] === 'string') {
-        watchFiles ??= [];
-        watchFiles.push(resultMessage['file']);
+        loadResult.watchFiles ??= [];
+        loadResult.watchFiles.push(resultMessage['file']);
       } else if (
         resultMessage.type === 'dir-dependency' &&
         typeof resultMessage['dir'] === 'string' &&
         typeof resultMessage['glob'] === 'string'
       ) {
-        watchFiles ??= [];
+        loadResult.watchFiles ??= [];
         const dependencies = await glob(resultMessage['glob'], { cwd: resultMessage['dir'] });
-        watchFiles.push(...dependencies);
+        loadResult.watchFiles.push(...dependencies);
       }
     }
 
-    return {
-      contents: result.css,
-      loader: 'css',
-      warnings,
-      watchFiles,
-    };
+    return loadResult;
   } catch (error) {
     postcss ??= (await import('postcss')).default;
     if (error instanceof postcss.CssSyntaxError) {
