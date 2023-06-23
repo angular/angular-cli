@@ -45,7 +45,9 @@ export function generateIndexHtml(
       if (value.type === 'script') {
         hints.push({ url: key, mode: 'modulepreload' as const });
       } else if (value.type === 'style') {
-        hints.push({ url: key, mode: 'preload' as const });
+        // Provide an "as" value of "style" to ensure external URLs which may not have a
+        // file extension are treated as stylesheets.
+        hints.push({ url: key, mode: 'preload' as const, as: 'style' });
       }
     }
   }

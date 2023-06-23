@@ -375,6 +375,29 @@ describe('augment-index-html', () => {
       `);
   });
 
+  it(`should add prefetch/preload hints with as=style when specified with a URL and an 'as' option`, async () => {
+    const { content, warnings } = await augmentIndexHtml({
+      ...indexGeneratorOptions,
+      hints: [
+        { mode: 'prefetch', url: 'https://example.com/x?a=1', as: 'style' },
+        { mode: 'preload', url: 'http://example.com/y?b=2', as: 'style' },
+      ],
+    });
+
+    expect(warnings).toHaveSize(0);
+    expect(content).toEqual(oneLineHtml`
+        <html>
+          <head>
+            <base href="/">
+            <link rel="prefetch" href="https://example.com/x?a=1" as="style">
+            <link rel="preload" href="http://example.com/y?b=2" as="style">
+          </head>
+          <body>
+          </body>
+        </html>
+      `);
+  });
+
   it('should add `.mjs` script tags', async () => {
     const { content } = await augmentIndexHtml({
       ...indexGeneratorOptions,

@@ -30,7 +30,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       harness
         .expectFile('dist/index.html')
         .content.toContain(
-          '<link rel="preload" href="https://fonts.googleapis.com/css2?family=Roboto+Mono&family=Roboto:wght@300;400;500;700&display=swap">',
+          '<link rel="preload" href="https://fonts.googleapis.com/css2?family=Roboto+Mono&family=Roboto:wght@300;400;500;700&display=swap" as="style">',
         );
     });
   });
