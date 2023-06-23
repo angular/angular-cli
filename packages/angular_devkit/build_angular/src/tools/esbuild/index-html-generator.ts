@@ -8,7 +8,7 @@
 
 import assert from 'node:assert';
 import path from 'node:path';
-import { NormalizedBrowserOptions } from '../../builders/browser-esbuild/options';
+import { NormalizedApplicationBuildOptions } from '../../builders/application/options';
 import {
   IndexHtmlGenerator,
   IndexHtmlTransformResult,
@@ -19,7 +19,7 @@ import type { ExecutionResult } from './bundler-execution-result';
 export function generateIndexHtml(
   initialFiles: Map<string, InitialFileRecord>,
   executionResult: ExecutionResult,
-  buildOptions: NormalizedBrowserOptions,
+  buildOptions: NormalizedApplicationBuildOptions,
 ): Promise<IndexHtmlTransformResult> {
   // Analyze metafile for initial link-based hints.
   // Skip if the internal externalPackages option is enabled since this option requires

@@ -7,11 +7,11 @@
  */
 
 import { concatMap, count, take, timeout } from 'rxjs';
-import { buildEsbuildBrowser } from '../../index';
+import { buildApplication } from '../../index';
 import { InlineStyleLanguage } from '../../schema';
-import { BASE_OPTIONS, BROWSER_BUILDER_INFO, describeBuilder } from '../setup';
+import { APPLICATION_BUILDER_INFO, BASE_OPTIONS, describeBuilder } from '../setup';
 
-describeBuilder(buildEsbuildBrowser, BROWSER_BUILDER_INFO, (harness) => {
+describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
   describe('Option: "inlineStyleLanguage"', () => {
     beforeEach(async () => {
       // Setup application component with inline style property
@@ -78,7 +78,6 @@ describeBuilder(buildEsbuildBrowser, BROWSER_BUILDER_INFO, (harness) => {
         xit('updates produced stylesheet in watch mode', async () => {
           harness.useTarget('build', {
             ...BASE_OPTIONS,
-            main: 'src/main.ts',
             inlineStyleLanguage: InlineStyleLanguage.Scss,
             aot,
             watch: true,

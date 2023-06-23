@@ -11,7 +11,7 @@ import MagicString, { Bundle } from 'magic-string';
 import assert from 'node:assert';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
-import type { NormalizedBrowserOptions } from '../../builders/browser-esbuild/options';
+import type { NormalizedApplicationBuildOptions } from '../../builders/application/options';
 import { assertIsError } from '../../utils/error';
 import { LoadResultCache, createCachedLoad } from './load-result-cache';
 import { createSourcemapIngorelistPlugin } from './sourcemap-ignorelist-plugin';
@@ -24,7 +24,7 @@ import { createVirtualModulePlugin } from './virtual-module-plugin';
  * @returns An esbuild BuildOptions object.
  */
 export function createGlobalScriptsBundleOptions(
-  options: NormalizedBrowserOptions,
+  options: NormalizedApplicationBuildOptions,
   initial: boolean,
   loadCache?: LoadResultCache,
 ): BuildOptions | undefined {

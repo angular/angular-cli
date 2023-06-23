@@ -18,9 +18,9 @@ import { normalizeCacheOptions } from '../../utils/normalize-cache';
 import { generateEntryPoints } from '../../utils/package-chunk-sort';
 import { findTailwindConfigurationFile } from '../../utils/tailwind';
 import { getIndexInputFile, getIndexOutputFile } from '../../utils/webpack-browser-config';
-import { Schema as BrowserBuilderOptions, OutputHashing } from './schema';
+import { Schema as ApplicationBuilderOptions, OutputHashing } from './schema';
 
-export type NormalizedBrowserOptions = Awaited<ReturnType<typeof normalizeOptions>>;
+export type NormalizedApplicationBuildOptions = Awaited<ReturnType<typeof normalizeOptions>>;
 
 /** Internal options hidden from builder schema but available when invoked programmatically. */
 interface InternalOptions {
@@ -43,9 +43,12 @@ interface InternalOptions {
 }
 
 /** Full set of options for `browser-esbuild` builder. */
-export type BrowserEsbuildOptions = Omit<BrowserBuilderOptions & InternalOptions, 'main'> & {
-  // `main` can be `undefined` if `entryPoints` is used.
-  main?: string;
+export type ApplicationBuilderInternalOptions = Omit<
+  ApplicationBuilderOptions & InternalOptions,
+  'browser'
+> & {
+  // `browser` can be `undefined` if `entryPoints` is used.
+  browser?: string;
 };
 
 /**
@@ -61,7 +64,7 @@ export type BrowserEsbuildOptions = Omit<BrowserBuilderOptions & InternalOptions
 export async function normalizeOptions(
   context: BuilderContext,
   projectName: string,
-  options: BrowserEsbuildOptions,
+  options: ApplicationBuilderInternalOptions,
 ) {
   const workspaceRoot = context.workspaceRoot;
   const projectMetadata = await context.getProjectMetadata(projectName);
@@ -76,7 +79,7 @@ export async function normalizeOptions(
   const cacheOptions = normalizeCacheOptions(projectMetadata, workspaceRoot);
   cacheOptions.path = path.join(cacheOptions.path, projectName);
 
-  const entryPoints = normalizeEntryPoints(workspaceRoot, options.main, options.entryPoints);
+  const entryPoints = normalizeEntryPoints(workspaceRoot, options.browser, options.entryPoints);
   const tsconfig = path.join(workspaceRoot, options.tsConfig);
   const outputPath = normalizeDirectoryPath(path.join(workspaceRoot, options.outputPath));
   const optimizationOptions = normalizeOptimization(options.optimization);
@@ -147,14 +150,6 @@ export async function normalizeOptions(
     }
   }
 
-  let serviceWorkerOptions;
-  if (options.serviceWorker) {
-    // If ngswConfigPath is not specified, the default is 'ngsw-config.json' within the project root
-    serviceWorkerOptions = options.ngswConfigPath
-      ? path.join(workspaceRoot, options.ngswConfigPath)
-      : path.join(projectRoot, 'ngsw-config.json');
-  }
-
   let indexHtmlOptions;
   if (options.index) {
     indexHtmlOptions = {
@@ -174,12 +169,12 @@ export async function normalizeOptions(
     allowedCommonJsDependencies,
     aot,
     baseHref,
-    buildOptimizer,
     crossOrigin,
     externalDependencies,
     extractLicenses,
     inlineStyleLanguage = 'css',
     outExtension,
+    serviceWorker,
     poll,
     polyfills,
     preserveSymlinks,
@@ -187,18 +182,21 @@ export async function normalizeOptions(
     stylePreprocessorOptions,
     subresourceIntegrity,
     verbose,
+    server,
     watch,
-    progress,
+    progress = true,
     externalPackages,
+    deleteOutputPath,
   } = options;
 
   // Return all the normalized options
   return {
-    advancedOptimizations: buildOptimizer,
+    advancedOptimizations: !!aot,
     allowedCommonJsDependencies,
     baseHref,
     cacheOptions,
     crossOrigin,
+    deleteOutputPath,
     externalDependencies,
     extractLicenses,
     inlineStyleLanguage,
@@ -206,12 +204,13 @@ export async function normalizeOptions(
     stats: !!statsJson,
     polyfills: polyfills === undefined || Array.isArray(polyfills) ? polyfills : [polyfills],
     poll,
-    progress: progress ?? true,
+    progress,
     externalPackages,
     // If not explicitly set, default to the Node.js process argument
     preserveSymlinks: preserveSymlinks ?? process.execArgv.includes('--preserve-symlinks'),
     stylePreprocessorOptions,
     subresourceIntegrity,
+    server: !!server && path.join(workspaceRoot, server),
     verbose,
     watch,
     workspaceRoot,
@@ -227,7 +226,7 @@ export async function normalizeOptions(
     fileReplacements,
     globalStyles,
     globalScripts,
-    serviceWorkerOptions,
+    serviceWorker,
     indexHtmlOptions,
     tailwindConfiguration,
   };

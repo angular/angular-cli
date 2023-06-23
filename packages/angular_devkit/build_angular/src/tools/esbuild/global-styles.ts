@@ -8,13 +8,13 @@
 
 import type { BuildOptions } from 'esbuild';
 import assert from 'node:assert';
-import { NormalizedBrowserOptions } from '../../builders/browser-esbuild/options';
+import { NormalizedApplicationBuildOptions } from '../../builders/application/options';
 import { LoadResultCache } from './load-result-cache';
 import { createStylesheetBundleOptions } from './stylesheets/bundle-options';
 import { createVirtualModulePlugin } from './virtual-module-plugin';
 
 export function createGlobalStylesBundleOptions(
-  options: NormalizedBrowserOptions,
+  options: NormalizedApplicationBuildOptions,
   target: string[],
   browsers: string[],
   initial: boolean,

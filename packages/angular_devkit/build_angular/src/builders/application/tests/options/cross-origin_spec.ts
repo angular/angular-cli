@@ -6,11 +6,11 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { buildEsbuildBrowser } from '../../index';
+import { buildApplication } from '../../index';
 import { CrossOrigin } from '../../schema';
-import { BASE_OPTIONS, BROWSER_BUILDER_INFO, describeBuilder } from '../setup';
+import { APPLICATION_BUILDER_INFO, BASE_OPTIONS, describeBuilder } from '../setup';
 
-describeBuilder(buildEsbuildBrowser, BROWSER_BUILDER_INFO, (harness) => {
+describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
   describe('Option: "crossOrigin"', () => {
     beforeEach(async () => {
       // Application code is not needed for asset tests

@@ -9,8 +9,8 @@
 import Piscina from 'piscina';
 import type { Compiler, sources } from 'webpack';
 import { maxWorkers } from '../../../utils/environment-options';
-import { transformSupportedBrowsersToTargets } from '../../../utils/esbuild-targets';
 import { addError } from '../../../utils/webpack-diagnostics';
+import { transformSupportedBrowsersToTargets } from '../../esbuild/utils';
 import { EsbuildExecutor } from './esbuild-executor';
 import type { OptimizeRequestOptions } from './javascript-optimizer-worker';
 

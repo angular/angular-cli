@@ -11,8 +11,8 @@ import { execFile as execFileCb } from 'child_process';
 import * as path from 'path';
 import { promisify } from 'util';
 import { colors } from '../../utils/color';
-import { buildEsbuildBrowserInternal } from '../browser-esbuild';
-import { BrowserEsbuildOptions } from '../browser-esbuild/options';
+import { buildApplicationInternal } from '../application';
+import { ApplicationBuilderInternalOptions } from '../application/options';
 import { OutputHashing } from '../browser-esbuild/schema';
 import { normalizeOptions } from './options';
 import { Schema as JestBuilderSchema } from './schema';
@@ -68,9 +68,7 @@ export default createBuilder(
       index: null,
       outputHashing: OutputHashing.None,
       outExtension: 'mjs', // Force native ESM.
-      commonChunk: false,
       optimization: false,
-      buildOptimizer: false,
       sourceMap: {
         scripts: true,
         styles: false,
@@ -140,10 +138,10 @@ export default createBuilder(
 
 async function build(
   context: BuilderContext,
-  options: BrowserEsbuildOptions,
+  options: ApplicationBuilderInternalOptions,
 ): Promise<BuilderOutput> {
   try {
-    for await (const _ of buildEsbuildBrowserInternal(options, context)) {
+    for await (const _ of buildApplicationInternal(options, context)) {
       // Nothing to do for each event, just wait for the whole build.
     }
 

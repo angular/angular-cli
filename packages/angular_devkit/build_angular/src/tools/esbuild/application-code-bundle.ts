@@ -7,7 +7,7 @@
  */
 
 import type { BuildOptions } from 'esbuild';
-import { NormalizedBrowserOptions } from '../../builders/browser-esbuild/options';
+import type { NormalizedApplicationBuildOptions } from '../../builders/application/options';
 import { SourceFileCache, createCompilerPlugin } from '../../tools/esbuild/angular/compiler-plugin';
 import { createExternalPackagesPlugin } from '../../tools/esbuild/external-packages-plugin';
 import { createSourcemapIngorelistPlugin } from '../../tools/esbuild/sourcemap-ignorelist-plugin';
@@ -16,7 +16,7 @@ import { createVirtualModulePlugin } from '../../tools/esbuild/virtual-module-pl
 import { allowMangle } from '../../utils/environment-options';
 
 export function createCodeBundleOptions(
-  options: NormalizedBrowserOptions,
+  options: NormalizedApplicationBuildOptions,
   target: string[],
   browsers: string[],
   sourceFileCache?: SourceFileCache,

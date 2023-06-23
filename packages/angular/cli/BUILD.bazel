@@ -79,6 +79,7 @@ ts_library(
 
 # @external_begin
 CLI_SCHEMA_DATA = [
+    "//packages/angular_devkit/build_angular:src/builders/application/schema.json",
     "//packages/angular_devkit/build_angular:src/builders/app-shell/schema.json",
     "//packages/angular_devkit/build_angular:src/builders/browser/schema.json",
     "//packages/angular_devkit/build_angular:src/builders/browser-esbuild/schema.json",
