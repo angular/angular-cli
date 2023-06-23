@@ -354,6 +354,7 @@
                   "description": "The builder used for this package.",
                   "not": {
                     "enum": [
+                      "@angular-devkit/build-angular:application",
                       "@angular-devkit/build-angular:app-shell",
                       "@angular-devkit/build-angular:browser",
                       "@angular-devkit/build-angular:browser-esbuild",
@@ -384,6 +385,28 @@
               },
               "additionalProperties": false,
               "required": ["builder"]
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "builder": {
+                  "const": "@angular-devkit/build-angular:application"
+                },
+                "defaultConfiguration": {
+                  "type": "string",
+                  "description": "A default named configuration to use when a target configuration is not provided."
+                },
+                "options": {
+                  "$ref": "../../../../angular_devkit/build_angular/src/builders/application/schema.json"
+                },
+                "configurations": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "$ref": "../../../../angular_devkit/build_angular/src/builders/application/schema.json"
+                  }
+                }
+              }
             },
             {
               "type": "object",

@@ -6,10 +6,10 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { buildEsbuildBrowser } from '../../index';
-import { BASE_OPTIONS, BROWSER_BUILDER_INFO, describeBuilder } from '../setup';
+import { buildApplication } from '../../index';
+import { APPLICATION_BUILDER_INFO, BASE_OPTIONS, describeBuilder } from '../setup';
 
-describeBuilder(buildEsbuildBrowser, BROWSER_BUILDER_INFO, (harness) => {
+describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
   describe('Option: "extractLicenses"', () => {
     it(`should generate '3rdpartylicenses.txt' when 'extractLicenses' is true`, async () => {
       harness.useTarget('build', {

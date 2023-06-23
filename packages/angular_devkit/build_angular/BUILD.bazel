@@ -14,6 +14,11 @@ licenses(["notice"])
 package(default_visibility = ["//visibility:public"])
 
 ts_json_schema(
+    name = "application_schema",
+    src = "src/builders/application/schema.json",
+)
+
+ts_json_schema(
     name = "app_shell_schema",
     src = "src/builders/app-shell/schema.json",
 )
@@ -80,6 +85,7 @@ ts_library(
         ],
     ) + [
         "//packages/angular_devkit/build_angular:src/builders/app-shell/schema.ts",
+        "//packages/angular_devkit/build_angular:src/builders/application/schema.ts",
         "//packages/angular_devkit/build_angular:src/builders/browser-esbuild/schema.ts",
         "//packages/angular_devkit/build_angular:src/builders/browser/schema.ts",
         "//packages/angular_devkit/build_angular:src/builders/dev-server/schema.ts",
@@ -290,6 +296,12 @@ ts_library(
 )
 
 LARGE_SPECS = {
+    "application": {
+        "shards": 10,
+        "extra_deps": [
+            "@npm//buffer",
+        ],
+    },
     "app-shell": {
     },
     "dev-server": {
@@ -347,10 +359,6 @@ LARGE_SPECS = {
         ],
     },
     "browser-esbuild": {
-        "shards": 10,
-        "extra_deps": [
-            "@npm//buffer",
-        ],
     },
     "jest": {
         "extra_deps": [

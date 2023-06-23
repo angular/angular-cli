@@ -8,7 +8,6 @@
 
 import { BuilderContext } from '@angular-devkit/architect';
 import { Schema as BrowserBuilderOptions } from '../browser/schema';
-import { BrowserEsbuildOptions } from './options';
 
 const UNSUPPORTED_OPTIONS: Array<keyof BrowserBuilderOptions> = [
   'budgets',
@@ -33,7 +32,7 @@ const UNSUPPORTED_OPTIONS: Array<keyof BrowserBuilderOptions> = [
   'webWorkerTsConfig',
 ];
 
-export function logBuilderStatusWarnings(options: BrowserEsbuildOptions, context: BuilderContext) {
+export function logBuilderStatusWarnings(options: BrowserBuilderOptions, context: BuilderContext) {
   context.logger.warn(
     `The esbuild-based browser application builder ('browser-esbuild') is currently in developer preview` +
       ' and is not yet recommended for production use.' +

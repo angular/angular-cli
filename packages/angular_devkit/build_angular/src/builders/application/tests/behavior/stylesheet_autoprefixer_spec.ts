@@ -6,8 +6,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { buildEsbuildBrowser } from '../../index';
-import { BASE_OPTIONS, BROWSER_BUILDER_INFO, describeBuilder } from '../setup';
+import { buildApplication } from '../../index';
+import { APPLICATION_BUILDER_INFO, BASE_OPTIONS, describeBuilder } from '../setup';
 
 const styleBaseContent: Record<string, string> = Object.freeze({
   'css': `
@@ -20,7 +20,7 @@ const styleImportedContent: Record<string, string> = Object.freeze({
   'css': 'section { hyphens: none; }',
 });
 
-describeBuilder(buildEsbuildBrowser, BROWSER_BUILDER_INFO, (harness) => {
+describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
   describe('Behavior: "Stylesheet autoprefixer"', () => {
     for (const ext of ['css'] /* ['css', 'sass', 'scss', 'less'] */) {
       it(`should add prefixes for listed browsers in global styles [${ext}]`, async () => {

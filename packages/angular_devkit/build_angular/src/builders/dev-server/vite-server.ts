@@ -17,8 +17,7 @@ import type { AddressInfo } from 'node:net';
 import path from 'node:path';
 import { InlineConfig, ViteDevServer, createServer, normalizePath } from 'vite';
 import { JavaScriptTransformer } from '../../tools/esbuild/javascript-transformer';
-import { buildEsbuildBrowserInternal } from '../browser-esbuild';
-import { BrowserEsbuildOptions } from '../browser-esbuild/options';
+import { buildEsbuildBrowser } from '../browser-esbuild';
 import type { Schema as BrowserBuilderOptions } from '../browser-esbuild/schema';
 import { loadProxyConfiguration } from './load-proxy-config';
 import type { NormalizedDevServerOptions } from './options';
@@ -54,7 +53,7 @@ export async function* serveWithVite(
       verbose: serverOptions.verbose,
     } as json.JsonObject & BrowserBuilderOptions,
     builderName,
-  )) as json.JsonObject & BrowserEsbuildOptions;
+  )) as json.JsonObject & BrowserBuilderOptions;
   // Set all packages as external to support Vite's prebundle caching
   browserOptions.externalPackages = serverOptions.cacheOptions.enabled;
 
@@ -67,7 +66,7 @@ export async function* serveWithVite(
   const generatedFiles = new Map<string, OutputFileRecord>();
   const assetFiles = new Map<string, string>();
   // TODO: Switch this to an architect schedule call when infrastructure settings are supported
-  for await (const result of buildEsbuildBrowserInternal(browserOptions, context, {
+  for await (const result of buildEsbuildBrowser(browserOptions, context, {
     write: false,
   })) {
     assert(result.outputFiles, 'Builder did not provide result files.');

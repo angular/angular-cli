@@ -8,8 +8,8 @@
 
 import type { Message, TransformResult } from 'esbuild';
 import type { Compilation, Compiler, sources } from 'webpack';
-import { transformSupportedBrowsersToTargets } from '../../../utils/esbuild-targets';
 import { addWarning } from '../../../utils/webpack-diagnostics';
+import { transformSupportedBrowsersToTargets } from '../../esbuild/utils';
 import { EsbuildExecutor } from './esbuild-executor';
 
 /**
