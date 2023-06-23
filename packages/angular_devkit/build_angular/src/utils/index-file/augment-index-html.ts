@@ -39,7 +39,7 @@ export interface AugmentIndexHtmlOptions {
   entrypoints: Entrypoint[];
   /** Used to set the document default locale */
   lang?: string;
-  hints?: { url: string; mode: string }[];
+  hints?: { url: string; mode: string; as?: string }[];
 }
 
 export interface FileInfo {
@@ -151,6 +151,11 @@ export async function augmentIndexHtml(
             break;
           case '.css':
             attrs.push('as="style"');
+            break;
+          default:
+            if (hint.as) {
+              attrs.push(`as="${hint.as}"`);
+            }
             break;
         }
       }

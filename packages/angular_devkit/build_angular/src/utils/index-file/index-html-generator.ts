@@ -28,7 +28,7 @@ export interface IndexHtmlGeneratorProcessOptions {
   baseHref: string | undefined;
   outputPath: string;
   files: FileInfo[];
-  hints?: { url: string; mode: HintMode }[];
+  hints?: { url: string; mode: HintMode; as?: string }[];
 }
 
 export interface IndexHtmlGeneratorOptions {
