@@ -300,7 +300,6 @@ export async function getCommonConfig(wco: WebpackConfigOptions): Promise<Config
         sourcemap: scriptsSourceMap,
         supportedBrowsers: buildOptions.supportedBrowsers,
         keepIdentifierNames: !allowMangle || isPlatformServer,
-        keepNames: isPlatformServer,
         removeLicenses: buildOptions.extractLicenses,
         advanced: buildOptions.buildOptimizer,
       }),

@@ -33,10 +33,6 @@ export interface OptimizeRequestOptions {
   keepIdentifierNames: boolean;
 
   /**
-   * Controls whether to retain the original name of classes and functions.
-   */
-  keepNames: boolean;
-  /**
    * Controls whether license text is removed from the output code.
    * Within the CLI, this option is linked to the license extraction functionality.
    */
@@ -167,11 +163,6 @@ async function optimizeWithEsbuild(
       sourcefile: name,
       sourcemap: options.sourcemap && 'external',
       define: options.define,
-      // This option should always be disabled for browser builds as we don't rely on `.name`
-      // and causes deadcode to be retained which makes `NG_BUILD_MANGLE` unusable to investigate tree-shaking issues.
-      // We enable `keepNames` only for server builds as Domino relies on `.name`.
-      // Once we no longer rely on Domino for SSR we should be able to remove this.
-      keepNames: options.keepNames,
       target: options.target,
     });
   } catch (error) {
