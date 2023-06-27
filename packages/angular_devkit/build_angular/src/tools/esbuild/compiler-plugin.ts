@@ -14,7 +14,6 @@ type CreateCompilerPluginParameters = Parameters<typeof createCompilerPlugin>;
 export function createCompilerPluginOptions(
   options: NormalizedApplicationBuildOptions,
   target: string[],
-  browsers: string[],
   sourceFileCache?: SourceFileCache,
 ): {
   pluginOptions: CreateCompilerPluginParameters[0];
@@ -63,7 +62,6 @@ export function createCompilerPluginOptions(
       target,
       inlineStyleLanguage,
       preserveSymlinks,
-      browsers,
       tailwindConfiguration,
     },
   };

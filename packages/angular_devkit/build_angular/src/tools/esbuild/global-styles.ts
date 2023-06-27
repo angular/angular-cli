@@ -16,7 +16,6 @@ import { createVirtualModulePlugin } from './virtual-module-plugin';
 export function createGlobalStylesBundleOptions(
   options: NormalizedApplicationBuildOptions,
   target: string[],
-  browsers: string[],
   initial: boolean,
   cache?: LoadResultCache,
 ): BuildOptions | undefined {
@@ -62,7 +61,6 @@ export function createGlobalStylesBundleOptions(
             bundles: '[name]',
           },
       includePaths: stylePreprocessorOptions?.includePaths,
-      browsers,
       tailwindConfiguration,
     },
     cache,
