@@ -407,7 +407,7 @@ workflows:
 
       - e2e-tests:
           name: e2e-cli-<< matrix.subset >>
-          nodeversion: '14.15'
+          nodeversion: '14.19'
           matrix:
             parameters:
               subset: *all_e2e_subsets
@@ -424,7 +424,7 @@ workflows:
           matrix:
             alias: e2e-cli
             parameters:
-              nodeversion: ['14.15', '16.10']
+              nodeversion: ['14.19', '16.10']
               subset: *all_e2e_subsets
           requires:
             - build
