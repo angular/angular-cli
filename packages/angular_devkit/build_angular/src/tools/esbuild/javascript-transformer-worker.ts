@@ -18,7 +18,6 @@ interface JavaScriptTransformRequest {
   sourcemap: boolean;
   thirdPartySourcemaps: boolean;
   advancedOptimizations: boolean;
-  forceAsyncTransformation?: boolean;
   skipLinker: boolean;
   jit: boolean;
 }
@@ -41,16 +40,13 @@ async function transformWithBabel({
   data,
   ...options
 }: JavaScriptTransformRequest): Promise<string> {
-  const forceAsyncTransformation =
-    options.forceAsyncTransformation ??
-    (!/[\\/][_f]?esm2015[\\/]/.test(filename) && /async(?:\s+function)?\s*\*/.test(data));
   const shouldLink = !options.skipLinker && (await requiresLinking(filename, data));
   const useInputSourcemap =
     options.sourcemap &&
     (!!options.thirdPartySourcemaps || !/[\\/]node_modules[\\/]/.test(filename));
 
   // If no additional transformations are needed, return the data directly
-  if (!forceAsyncTransformation && !options.advancedOptimizations && !shouldLink) {
+  if (!options.advancedOptimizations && !shouldLink) {
     // Strip sourcemaps if they should not be used
     return useInputSourcemap ? data : data.replace(/^\/\/# sourceMappingURL=[^\r\n]*/gm, '');
   }
@@ -87,7 +83,6 @@ async function transformWithBabel({
             jitMode: options.jit,
             linkerPluginCreator,
           },
-          forceAsyncTransformation,
           optimize: options.advancedOptimizations && {
             pureTopLevel: safeAngularPackage,
           },
