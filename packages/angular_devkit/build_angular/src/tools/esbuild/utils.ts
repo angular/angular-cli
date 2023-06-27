@@ -123,10 +123,7 @@ export async function logMessages(
 export function getFeatureSupport(target: string[]): BuildOptions['supported'] {
   const supported: Record<string, boolean> = {
     // Native async/await is not supported with Zone.js. Disabling support here will cause
-    // esbuild to downlevel async/await and for await...of to a Zone.js supported form. However, esbuild
-    // does not currently support downleveling async generators. Instead babel is used within the JS/TS
-    // loader to perform the downlevel transformation.
-    // NOTE: If esbuild adds support in the future, the babel support for async generators can be disabled.
+    // esbuild to downlevel async/await, async generators, and for await...of to a Zone.js supported form.
     'async-await': false,
     // V8 currently has a performance defect involving object spread operations that can cause signficant
     // degradation in runtime performance. By not supporting the language feature here, a downlevel form

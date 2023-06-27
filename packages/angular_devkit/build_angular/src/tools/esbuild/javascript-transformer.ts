@@ -58,7 +58,7 @@ export class JavaScriptTransformer {
    * @returns A promise that resolves to a UTF-8 encoded Uint8Array containing the result.
    */
   transformFile(filename: string, skipLinker?: boolean): Promise<Uint8Array> {
-    // Always send the request to a worker. Files are almost always from node modules which measn
+    // Always send the request to a worker. Files are almost always from node modules which means
     // they may need linking. The data is also not yet available to perform most transformation checks.
     return this.#workerPool.run({
       filename,
@@ -78,29 +78,20 @@ export class JavaScriptTransformer {
   async transformData(filename: string, data: string, skipLinker: boolean): Promise<Uint8Array> {
     // Perform a quick test to determine if the data needs any transformations.
     // This allows directly returning the data without the worker communication overhead.
-    let forceAsyncTransformation;
     if (skipLinker && !this.#commonOptions.advancedOptimizations) {
-      // If the linker is being skipped and no optimizations are needed, only async transformation is left.
-      // This checks for async generator functions and class methods. All other async transformation is handled by esbuild.
-      forceAsyncTransformation = data.includes('async') && /async(?:\s+function)?\s*\*/.test(data);
+      const keepSourcemap =
+        this.#commonOptions.sourcemap &&
+        (!!this.#commonOptions.thirdPartySourcemaps || !/[\\/]node_modules[\\/]/.test(filename));
 
-      if (!forceAsyncTransformation) {
-        const keepSourcemap =
-          this.#commonOptions.sourcemap &&
-          (!!this.#commonOptions.thirdPartySourcemaps || !/[\\/]node_modules[\\/]/.test(filename));
-
-        return Buffer.from(
-          keepSourcemap ? data : data.replace(/^\/\/# sourceMappingURL=[^\r\n]*/gm, ''),
-          'utf-8',
-        );
-      }
+      return Buffer.from(
+        keepSourcemap ? data : data.replace(/^\/\/# sourceMappingURL=[^\r\n]*/gm, ''),
+        'utf-8',
+      );
     }
 
     return this.#workerPool.run({
       filename,
       data,
-      // Send the async check result if present to avoid rechecking in the worker
-      forceAsyncTransformation,
       skipLinker,
       ...this.#commonOptions,
     });
