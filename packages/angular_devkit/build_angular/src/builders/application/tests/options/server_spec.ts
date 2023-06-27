@@ -10,60 +10,65 @@ import { buildApplication } from '../../index';
 import { APPLICATION_BUILDER_INFO, BASE_OPTIONS, describeBuilder } from '../setup';
 
 describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
-  describe('Option: "browser"', () => {
+  beforeEach(async () => {
+    await harness.modifyFile('src/tsconfig.app.json', (content) => {
+      const tsConfig = JSON.parse(content);
+      tsConfig.files ??= [];
+      tsConfig.files.push('main.server.ts');
+
+      return JSON.stringify(tsConfig);
+    });
+  });
+
+  describe('Option: "server"', () => {
     it('uses a provided TypeScript file', async () => {
       harness.useTarget('build', {
         ...BASE_OPTIONS,
-        browser: 'src/main.ts',
+        server: 'src/main.server.ts',
       });
 
       const { result } = await harness.executeOnce();
+      expect(result?.success).toBeTrue();
 
-      expect(result?.success).toBe(true);
-
+      harness.expectFile('dist/server.mjs').toExist();
       harness.expectFile('dist/main.js').toExist();
-      harness.expectFile('dist/index.html').toExist();
     });
 
     it('uses a provided JavaScript file', async () => {
-      await harness.writeFile('src/main.js', `console.log('main');`);
+      await harness.writeFile('src/server.js', `console.log('server');`);
 
       harness.useTarget('build', {
         ...BASE_OPTIONS,
-        browser: 'src/main.js',
+        server: 'src/server.js',
       });
 
       const { result } = await harness.executeOnce();
+      expect(result?.success).toBeTrue();
 
-      expect(result?.success).toBe(true);
-
-      harness.expectFile('dist/main.js').toExist();
-      harness.expectFile('dist/index.html').toExist();
-
-      harness.expectFile('dist/main.js').content.toContain('console.log("main")');
+      harness.expectFile('dist/server.mjs').content.toContain('console.log("server")');
     });
 
     it('fails and shows an error when file does not exist', async () => {
       harness.useTarget('build', {
         ...BASE_OPTIONS,
-        browser: 'src/missing.ts',
+        server: 'src/missing.ts',
       });
 
       const { result, logs } = await harness.executeOnce({ outputLogsOnFailure: false });
 
-      expect(result?.success).toBe(false);
+      expect(result?.success).toBeFalse();
       expect(logs).toContain(
         jasmine.objectContaining({ message: jasmine.stringMatching('Could not resolve "') }),
       );
 
       harness.expectFile('dist/main.js').toNotExist();
-      harness.expectFile('dist/index.html').toNotExist();
+      harness.expectFile('dist/server.mjs').toNotExist();
     });
 
     it('throws an error when given an empty string', async () => {
       harness.useTarget('build', {
         ...BASE_OPTIONS,
-        browser: '',
+        server: '',
       });
 
       const { result, error } = await harness.executeOnce({ outputLogsOnException: false });
@@ -77,14 +82,14 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
       harness.useTarget('build', {
         ...BASE_OPTIONS,
-        browser: '/file.mjs',
+        server: '/file.mjs',
       });
 
       const { result } = await harness.executeOnce();
       expect(result?.success).toBeTrue();
 
-      // Always uses the name `main.js` for the `browser` option.
-      harness.expectFile('dist/main.js').toExist();
+      // Always uses the name `server.mjs` for the `server` option.
+      harness.expectFile('dist/server.mjs').toExist();
     });
   });
 });

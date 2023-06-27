@@ -9,10 +9,10 @@
 import type ng from '@angular/compiler-cli';
 import assert from 'node:assert';
 import ts from 'typescript';
-import { profileSync } from '../profiling';
+import { profileSync } from '../../profiling';
+import { AngularHostOptions, createAngularCompilerHost } from '../angular-host';
+import { createJitResourceTransformer } from '../jit-resource-transformer';
 import { AngularCompilation, EmitFileResult } from './angular-compilation';
-import { AngularHostOptions, createAngularCompilerHost } from './angular-host';
-import { createJitResourceTransformer } from './jit-resource-transformer';
 
 class JitCompilationState {
   constructor(
