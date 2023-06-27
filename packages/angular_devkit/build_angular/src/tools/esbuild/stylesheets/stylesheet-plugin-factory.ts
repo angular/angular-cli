@@ -6,7 +6,6 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import createAutoPrefixerPlugin from 'autoprefixer';
 import type { OnLoadResult, Plugin, PluginBuild } from 'esbuild';
 import glob from 'fast-glob';
 import assert from 'node:assert';
@@ -62,56 +61,34 @@ export interface StylesheetLanguage {
 }
 
 export class StylesheetPluginFactory {
-  private autoprefixer: import('postcss').Plugin | undefined;
-
   constructor(
     private readonly options: StylesheetPluginOptions,
     private readonly cache?: LoadResultCache,
-  ) {
-    const autoprefixer = createAutoPrefixerPlugin({
-      overrideBrowserslist: options.browsers,
-      ignoreUnknownVersions: true,
-    });
-
-    // Autoprefixer currently does not contain a method to check if autoprefixer is required
-    // based on the provided list of browsers. However, it does contain a method that returns
-    // informational text that can be used as a replacement. The text "Awesome!" will be present
-    // when autoprefixer determines no actions are needed.
-    // ref: https://github.com/postcss/autoprefixer/blob/e2f5c26ff1f3eaca95a21873723ce1cdf6e59f0e/lib/info.js#L118
-    const autoprefixerInfo = autoprefixer.info();
-    const skipAutoprefixer = autoprefixerInfo.includes('Awesome!');
-
-    if (!skipAutoprefixer) {
-      this.autoprefixer = autoprefixer;
-    }
-  }
+  ) {}
 
   create(language: Readonly<StylesheetLanguage>): Plugin {
     // Return a noop plugin if no load actions are required
-    if (!language.process && !this.autoprefixer && !this.options.tailwindConfiguration) {
+    if (!language.process && !this.options.tailwindConfiguration) {
       return {
         name: 'angular-' + language.name,
         setup() {},
       };
     }
 
-    const { autoprefixer, cache, options } = this;
+    const { cache, options } = this;
 
     return {
       name: 'angular-' + language.name,
       async setup(build) {
-        // Setup postcss if needed by either autoprefixer or tailwind
+        // Setup postcss if needed by tailwind
         // TODO: Move this into the plugin factory to avoid repeat setup per created plugin
         let postcssProcessor: import('postcss').Processor | undefined;
-        if (autoprefixer || options.tailwindConfiguration) {
+        if (options.tailwindConfiguration) {
           postcss ??= (await import('postcss')).default;
           postcssProcessor = postcss();
           if (options.tailwindConfiguration) {
             const tailwind = await import(options.tailwindConfiguration.package);
             postcssProcessor.use(tailwind.default({ config: options.tailwindConfiguration.file }));
-          }
-          if (autoprefixer) {
-            postcssProcessor.use(autoprefixer);
           }
         }
 
