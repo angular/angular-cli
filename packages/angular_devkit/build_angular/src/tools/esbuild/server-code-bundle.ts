@@ -25,7 +25,6 @@ import { createVirtualModulePlugin } from './virtual-module-plugin';
 export function createServerCodeBundleOptions(
   options: NormalizedApplicationBuildOptions,
   target: string[],
-  browsers: string[],
   sourceFileCache: SourceFileCache,
 ): BuildOptions {
   const { jit, serverEntryPoint, workspaceRoot } = options;
@@ -38,7 +37,6 @@ export function createServerCodeBundleOptions(
   const { pluginOptions, styleOptions } = createCompilerPluginOptions(
     options,
     target,
-    browsers,
     sourceFileCache,
   );
 

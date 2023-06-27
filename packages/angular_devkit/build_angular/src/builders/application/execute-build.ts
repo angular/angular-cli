@@ -62,7 +62,7 @@ export async function executeBuild(
       new BundlerContext(
         workspaceRoot,
         !!options.watch,
-        createBrowserCodeBundleOptions(options, target, browsers, codeBundleCache),
+        createBrowserCodeBundleOptions(options, target, codeBundleCache),
       ),
     );
 
@@ -72,7 +72,6 @@ export async function executeBuild(
         const bundleOptions = createGlobalStylesBundleOptions(
           options,
           target,
-          browsers,
           initial,
           codeBundleCache?.loadResultCache,
         );
@@ -107,7 +106,6 @@ export async function executeBuild(
             // NOTE: earlier versions of Node.js are not supported due to unsafe promise patching.
             // See: https://github.com/angular/angular/pull/50552#issue-1737967592
             [...target, 'node18.13'],
-            browsers,
             codeBundleCache,
           ),
           () => false,

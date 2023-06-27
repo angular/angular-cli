@@ -21,7 +21,6 @@ import { createVirtualModulePlugin } from './virtual-module-plugin';
 export function createBrowserCodeBundleOptions(
   options: NormalizedApplicationBuildOptions,
   target: string[],
-  browsers: string[],
   sourceFileCache?: SourceFileCache,
 ): BuildOptions {
   const { workspaceRoot, entryPoints, outputNames, jit } = options;
@@ -29,7 +28,6 @@ export function createBrowserCodeBundleOptions(
   const { pluginOptions, styleOptions } = createCompilerPluginOptions(
     options,
     target,
-    browsers,
     sourceFileCache,
   );
 

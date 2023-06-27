@@ -31,7 +31,6 @@ export interface BundleStylesheetOptions {
   includePaths?: string[];
   externalDependencies?: string[];
   target: string[];
-  browsers: string[];
   tailwindConfiguration?: { file: string; package: string };
 }
 
@@ -50,7 +49,6 @@ export function createStylesheetBundleOptions(
       sourcemap: !!options.sourcemap,
       includePaths,
       inlineComponentData,
-      browsers: options.browsers,
       tailwindConfiguration: options.tailwindConfiguration,
     },
     cache,
