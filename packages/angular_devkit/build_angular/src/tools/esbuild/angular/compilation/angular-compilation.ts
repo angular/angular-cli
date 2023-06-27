@@ -8,9 +8,9 @@
 
 import type ng from '@angular/compiler-cli';
 import type ts from 'typescript';
-import { loadEsmModule } from '../../../utils/load-esm';
-import { profileSync } from '../profiling';
-import type { AngularHostOptions } from './angular-host';
+import { loadEsmModule } from '../../../../utils/load-esm';
+import { profileSync } from '../../profiling';
+import type { AngularHostOptions } from '../angular-host';
 
 export interface EmitFileResult {
   filename: string;

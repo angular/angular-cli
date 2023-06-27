@@ -25,7 +25,7 @@ export type NormalizedApplicationBuildOptions = Awaited<ReturnType<typeof normal
 /** Internal options hidden from builder schema but available when invoked programmatically. */
 interface InternalOptions {
   /**
-   * Entry points to use for the compilation. Incompatible with `main`, which must not be provided. May be relative or absolute paths.
+   * Entry points to use for the compilation. Incompatible with `browser`, which must not be provided. May be relative or absolute paths.
    * If given a relative path, it is resolved relative to the current workspace and will generate an output at the same relative location
    * in the output directory. If given an absolute path, the output will be generated in the root of the output directory with the same base
    * name.
@@ -42,7 +42,7 @@ interface InternalOptions {
   externalPackages?: boolean;
 }
 
-/** Full set of options for `browser-esbuild` builder. */
+/** Full set of options for `application` builder. */
 export type ApplicationBuilderInternalOptions = Omit<
   ApplicationBuilderOptions & InternalOptions,
   'browser'
@@ -164,6 +164,13 @@ export async function normalizeOptions(
     };
   }
 
+  let serverEntryPoint: string | undefined;
+  if (options.server) {
+    serverEntryPoint = path.join(workspaceRoot, options.server);
+  } else if (options.server === '') {
+    throw new Error('`server` option cannot be an empty string.');
+  }
+
   // Initial options to keep
   const {
     allowedCommonJsDependencies,
@@ -182,7 +189,6 @@ export async function normalizeOptions(
     stylePreprocessorOptions,
     subresourceIntegrity,
     verbose,
-    server,
     watch,
     progress = true,
     externalPackages,
@@ -210,7 +216,7 @@ export async function normalizeOptions(
     preserveSymlinks: preserveSymlinks ?? process.execArgv.includes('--preserve-symlinks'),
     stylePreprocessorOptions,
     subresourceIntegrity,
-    server: !!server && path.join(workspaceRoot, server),
+    serverEntryPoint,
     verbose,
     watch,
     workspaceRoot,
@@ -233,39 +239,39 @@ export async function normalizeOptions(
 }
 
 /**
- * Normalize entry point options. To maintain compatibility with the legacy browser builder, we need a single `main` option which defines a
- * single entry point. However, we also want to support multiple entry points as an internal option. The two options are mutually exclusive
- * and if `main` is provided it will be used as the sole entry point. If `entryPoints` are provided, they will be used as the set of entry
- * points.
+ * Normalize entry point options. To maintain compatibility with the legacy browser builder, we need a single `browser`
+ * option which defines a single entry point. However, we also want to support multiple entry points as an internal option.
+ * The two options are mutually exclusive and if `browser` is provided it will be used as the sole entry point.
+ * If `entryPoints` are provided, they will be used as the set of entry points.
  *
  * @param workspaceRoot Path to the root of the Angular workspace.
- * @param main The `main` option pointing at the application entry point. While required per the schema file, it may be omitted by
+ * @param browser The `browser` option pointing at the application entry point. While required per the schema file, it may be omitted by
  *     programmatic usages of `browser-esbuild`.
  * @param entryPoints Set of entry points to use if provided.
  * @returns An object mapping entry point names to their file paths.
  */
 function normalizeEntryPoints(
   workspaceRoot: string,
-  main: string | undefined,
+  browser: string | undefined,
   entryPoints: Set<string> = new Set(),
 ): Record<string, string> {
-  if (main === '') {
-    throw new Error('`main` option cannot be an empty string.');
+  if (browser === '') {
+    throw new Error('`browser` option cannot be an empty string.');
   }
 
-  // `main` and `entryPoints` are mutually exclusive.
-  if (main && entryPoints.size > 0) {
-    throw new Error('Only one of `main` or `entryPoints` may be provided.');
+  // `browser` and `entryPoints` are mutually exclusive.
+  if (browser && entryPoints.size > 0) {
+    throw new Error('Only one of `browser` or `entryPoints` may be provided.');
   }
-  if (!main && entryPoints.size === 0) {
+  if (!browser && entryPoints.size === 0) {
     // Schema should normally reject this case, but programmatic usages of the builder might make this mistake.
-    throw new Error('Either `main` or at least one `entryPoints` value must be provided.');
+    throw new Error('Either `browser` or at least one `entryPoints` value must be provided.');
   }
 
-  // Schema types force `main` to always be provided, but it may be omitted when the builder is invoked programmatically.
-  if (main) {
-    // Use `main` alone.
-    return { 'main': path.join(workspaceRoot, main) };
+  // Schema types force `browser` to always be provided, but it may be omitted when the builder is invoked programmatically.
+  if (browser) {
+    // Use `browser` alone.
+    return { 'main': path.join(workspaceRoot, browser) };
   } else {
     // Use `entryPoints` alone.
     const entryPointPaths: Record<string, string> = {};

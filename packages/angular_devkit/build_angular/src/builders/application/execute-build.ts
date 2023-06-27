@@ -8,7 +8,7 @@
 
 import { BuilderContext } from '@angular-devkit/architect';
 import { SourceFileCache } from '../../tools/esbuild/angular/compiler-plugin';
-import { createCodeBundleOptions } from '../../tools/esbuild/application-code-bundle';
+import { createBrowserCodeBundleOptions } from '../../tools/esbuild/browser-code-bundle';
 import { BundlerContext } from '../../tools/esbuild/bundler-context';
 import { ExecutionResult, RebuildState } from '../../tools/esbuild/bundler-execution-result';
 import { checkCommonJSModules } from '../../tools/esbuild/commonjs-checker';
@@ -16,6 +16,7 @@ import { createGlobalScriptsBundleOptions } from '../../tools/esbuild/global-scr
 import { createGlobalStylesBundleOptions } from '../../tools/esbuild/global-styles';
 import { generateIndexHtml } from '../../tools/esbuild/index-html-generator';
 import { extractLicenses } from '../../tools/esbuild/license-extractor';
+import { createServerCodeBundleOptions } from '../../tools/esbuild/server-code-bundle';
 import {
   calculateEstimatedTransferSizes,
   logBuildStats,
@@ -39,6 +40,7 @@ export async function executeBuild(
     workspaceRoot,
     serviceWorker,
     optimizationOptions,
+    serverEntryPoint,
     assets,
     indexHtmlOptions,
     cacheOptions,
@@ -55,12 +57,12 @@ export async function executeBuild(
   if (bundlerContexts === undefined) {
     bundlerContexts = [];
 
-    // Application code
+    // Browser application code
     bundlerContexts.push(
       new BundlerContext(
         workspaceRoot,
         !!options.watch,
-        createCodeBundleOptions(options, target, browsers, codeBundleCache),
+        createBrowserCodeBundleOptions(options, target, browsers, codeBundleCache),
       ),
     );
 
@@ -92,6 +94,25 @@ export async function executeBuild(
           );
         }
       }
+    }
+
+    // Server application code
+    if (serverEntryPoint) {
+      bundlerContexts.push(
+        new BundlerContext(
+          workspaceRoot,
+          !!options.watch,
+          createServerCodeBundleOptions(
+            options,
+            // NOTE: earlier versions of Node.js are not supported due to unsafe promise patching.
+            // See: https://github.com/angular/angular/pull/50552#issue-1737967592
+            [...target, 'node18.13'],
+            browsers,
+            codeBundleCache,
+          ),
+          () => false,
+        ),
+      );
     }
   }
 

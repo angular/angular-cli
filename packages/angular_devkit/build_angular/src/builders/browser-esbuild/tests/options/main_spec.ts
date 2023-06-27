@@ -66,7 +66,7 @@ describeBuilder(buildEsbuildBrowser, BROWSER_BUILDER_INFO, (harness) => {
         main: '',
       });
 
-      const { result, error } = await harness.executeOnce();
+      const { result, error } = await harness.executeOnce({ outputLogsOnException: false });
       expect(result).toBeUndefined();
 
       expect(error?.message).toContain('cannot be an empty string');

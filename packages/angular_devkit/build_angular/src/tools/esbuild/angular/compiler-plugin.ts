@@ -29,11 +29,12 @@ import {
   resetCumulativeDurations,
 } from '../profiling';
 import { BundleStylesheetOptions, bundleComponentStylesheet } from '../stylesheets/bundle-options';
-import { AngularCompilation } from './angular-compilation';
 import { AngularHostOptions } from './angular-host';
-import { AotCompilation } from './aot-compilation';
+import { AngularCompilation } from './compilation/angular-compilation';
+import { AotCompilation } from './compilation/aot-compilation';
+import { JitCompilation } from './compilation/jit-compilation';
+import { NoopCompilation } from './compilation/noop-compilation';
 import { convertTypeScriptDiagnostic } from './diagnostics';
-import { JitCompilation } from './jit-compilation';
 import { setupJitPluginCallbacks } from './jit-plugin-callbacks';
 
 const USING_WINDOWS = platform() === 'win32';
@@ -73,6 +74,8 @@ export interface CompilerPluginOptions {
   sourcemap: boolean;
   tsconfig: string;
   jit?: boolean;
+  /** Skip TypeScript compilation setup. This is useful to re-use the TypeScript compilation from another plugin. */
+  noopTypeScriptCompilation?: boolean;
   advancedOptimizations?: boolean;
   thirdPartySourcemaps?: boolean;
   fileReplacements?: Record<string, string>;
@@ -80,11 +83,22 @@ export interface CompilerPluginOptions {
   loadResultCache?: LoadResultCache;
 }
 
+// TODO: find a better way to unblock TS compilation of server bundles.
+let TS_COMPILATION_READY: Promise<void> | undefined;
+
 // eslint-disable-next-line max-lines-per-function
 export function createCompilerPlugin(
   pluginOptions: CompilerPluginOptions,
   styleOptions: BundleStylesheetOptions & { inlineStyleLanguage: string },
 ): Plugin {
+  let resolveCompilationReady: (() => void) | undefined;
+
+  if (!pluginOptions.noopTypeScriptCompilation) {
+    TS_COMPILATION_READY = new Promise<void>((resolve) => {
+      resolveCompilationReady = resolve;
+    });
+  }
+
   return {
     name: 'angular-compiler',
     // eslint-disable-next-line max-lines-per-function
@@ -132,7 +146,9 @@ export function createCompilerPlugin(
       let stylesheetMetafiles: Metafile[];
 
       // Create new reusable compilation for the appropriate mode based on the `jit` plugin option
-      const compilation: AngularCompilation = pluginOptions.jit
+      const compilation: AngularCompilation = pluginOptions.noopTypeScriptCompilation
+        ? new NoopCompilation()
+        : pluginOptions.jit
         ? new JitCompilation()
         : new AotCompilation();
 
@@ -239,6 +255,12 @@ export function createCompilerPlugin(
         });
         shouldTsIgnoreJs = !allowJs;
 
+        if (compilation instanceof NoopCompilation) {
+          await TS_COMPILATION_READY;
+
+          return result;
+        }
+
         profileSync('NG_DIAGNOSTICS_TOTAL', () => {
           for (const diagnostic of compilation.collectDiagnostics()) {
             const message = convertTypeScriptDiagnostic(diagnostic);
@@ -264,6 +286,9 @@ export function createCompilerPlugin(
 
         // Reset the setup warnings so that they are only shown during the first build.
         setupWarnings = undefined;
+
+        // TODO: find a better way to unblock TS compilation of server bundles.
+        resolveCompilationReady?.();
 
         return result;
       });

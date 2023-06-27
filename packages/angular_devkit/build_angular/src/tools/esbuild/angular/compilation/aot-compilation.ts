@@ -9,13 +9,13 @@
 import type ng from '@angular/compiler-cli';
 import assert from 'node:assert';
 import ts from 'typescript';
-import { profileAsync, profileSync } from '../profiling';
-import { AngularCompilation, EmitFileResult } from './angular-compilation';
+import { profileAsync, profileSync } from '../../profiling';
 import {
   AngularHostOptions,
   createAngularCompilerHost,
   ensureSourceFileVersions,
-} from './angular-host';
+} from '../angular-host';
+import { AngularCompilation, EmitFileResult } from './angular-compilation';
 
 // Temporary deep import for transformer support
 // TODO: Move these to a private exports location or move the implementation into this package.

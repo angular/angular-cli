@@ -13,6 +13,8 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { promisify } from 'node:util';
 import { brotliCompress } from 'node:zlib';
+import { NormalizedApplicationBuildOptions } from '../../builders/application/options';
+import { allowMangle } from '../../utils/environment-options';
 import { Spinner } from '../../utils/spinner';
 import { BundleStats, generateBuildStatsTable } from '../webpack/utils/stats';
 import { InitialFileRecord } from './bundler-context';
@@ -255,4 +257,49 @@ export function transformSupportedBrowsersToTargets(supportedBrowsers: string[])
   }
 
   return transformed;
+}
+
+export function getEsBuildCommonOptions(options: NormalizedApplicationBuildOptions): BuildOptions {
+  const {
+    workspaceRoot,
+    outExtension,
+    optimizationOptions,
+    sourcemapOptions,
+    tsconfig,
+    externalDependencies,
+    outputNames,
+    preserveSymlinks,
+    jit,
+  } = options;
+
+  return {
+    absWorkingDir: workspaceRoot,
+    bundle: true,
+    format: 'esm',
+    assetNames: outputNames.media,
+    conditions: ['es2020', 'es2015', 'module'],
+    resolveExtensions: ['.ts', '.tsx', '.mjs', '.js'],
+    metafile: true,
+    legalComments: options.extractLicenses ? 'none' : 'eof',
+    logLevel: options.verbose ? 'debug' : 'silent',
+    minifyIdentifiers: optimizationOptions.scripts && allowMangle,
+    minifySyntax: optimizationOptions.scripts,
+    minifyWhitespace: optimizationOptions.scripts,
+    pure: ['forwardRef'],
+    outdir: workspaceRoot,
+    outExtension: outExtension ? { '.js': `.${outExtension}` } : undefined,
+    sourcemap: sourcemapOptions.scripts && (sourcemapOptions.hidden ? 'external' : true),
+    splitting: true,
+    tsconfig,
+    external: externalDependencies,
+    write: false,
+    preserveSymlinks,
+    define: {
+      // Only set to false when script optimizations are enabled. It should not be set to true because
+      // Angular turns `ngDevMode` into an object for development debugging purposes when not defined
+      // which a constant true value would break.
+      ...(optimizationOptions.scripts ? { 'ngDevMode': 'false' } : undefined),
+      'ngJitMode': jit ? 'true' : 'false',
+    },
+  };
 }
