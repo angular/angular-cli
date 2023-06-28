@@ -1,3 +1,22 @@
+<a name="16.1.2"></a>
+
+# 16.1.2 (2023-06-28)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                  |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------- |
+| [3475e0281](https://github.com/angular/angular-cli/commit/3475e0281da3298f288a5f8836155c0b8c971372) | fix  | update direct `semver` dependencies to 7.5.3 |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                    |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------- |
+| [8108b8c2d](https://github.com/angular/angular-cli/commit/8108b8c2da3ebfdb74f0f9d3554df01f484670bd) | fix  | allow linker JIT support with prebundling with esbuild builder |
+| [502365037](https://github.com/angular/angular-cli/commit/502365037bf7dbacd0e28d29a074a246971848ea) | fix  | use all style language watch files in esbuild builder          |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="16.1.1"></a>
 
 # 16.1.1 (2023-06-22)
