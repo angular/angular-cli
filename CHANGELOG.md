@@ -1,3 +1,17 @@
+<a name="16.2.0-next.0"></a>
+
+# 16.2.0-next.0 (2023-06-28)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                        |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------ |
+| [c05c83be7](https://github.com/angular/angular-cli/commit/c05c83be7c6c8bcdad4be8686a6e0701a55304cc) | feat | add initial application builder implementation                     |
+| [2a3fc6846](https://github.com/angular/angular-cli/commit/2a3fc68460152a48758b9353bff48193641861c5) | feat | add preload hints based on transitive initial files                |
+| [f42f10135](https://github.com/angular/angular-cli/commit/f42f10135c1e2184a9080b726dc5e41669937b13) | fix  | ensure preload hints for external stylesheets are marked as styles |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="16.1.2"></a>
 
 # 16.1.2 (2023-06-28)
