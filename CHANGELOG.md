@@ -1,3 +1,15 @@
+<a name="14.2.12"></a>
+
+# 14.2.12 (2023-06-28)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------ |
+| [bd396b656](https://github.com/angular/angular-cli/commit/bd396b65623fb0b8e826be13f88709e87b54336e) | fix  | update direct semver dependencies to 7.5.3 |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="14.2.11"></a>
 
 # 14.2.11 (2023-03-16)
