@@ -13,6 +13,7 @@ import type { NormalizedApplicationBuildOptions } from '../../builders/applicati
 import { SourceFileCache, createCompilerPlugin } from './angular/compiler-plugin';
 import { createCompilerPluginOptions } from './compiler-plugin';
 import { createExternalPackagesPlugin } from './external-packages-plugin';
+import { createRxjsEsmResolutionPlugin } from './rxjs-esm-resolution-plugin';
 import { createSourcemapIngorelistPlugin } from './sourcemap-ignorelist-plugin';
 import { getEsBuildCommonOptions, getFeatureSupport } from './utils';
 import { createVirtualModulePlugin } from './virtual-module-plugin';
@@ -96,9 +97,11 @@ export function createServerCodeBundleOptions(
     ],
   };
 
+  buildOptions.plugins ??= [];
   if (options.externalPackages) {
-    buildOptions.plugins ??= [];
     buildOptions.plugins.push(createExternalPackagesPlugin());
+  } else {
+    buildOptions.plugins.push(createRxjsEsmResolutionPlugin());
   }
 
   return buildOptions;
