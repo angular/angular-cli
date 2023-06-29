@@ -260,7 +260,10 @@ async function compileString(
         typeof resultMessage['glob'] === 'string'
       ) {
         loadResult.watchFiles ??= [];
-        const dependencies = await glob(resultMessage['glob'], { cwd: resultMessage['dir'] });
+        const dependencies = await glob(resultMessage['glob'], {
+          absolute: true,
+          cwd: resultMessage['dir'],
+        });
         loadResult.watchFiles.push(...dependencies);
       }
     }
