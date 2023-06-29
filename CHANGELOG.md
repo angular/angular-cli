@@ -1,3 +1,15 @@
+<a name="16.1.3"></a>
+
+# 16.1.3 (2023-06-29)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                              |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------- |
+| [b56ab0798](https://github.com/angular/angular-cli/commit/b56ab07980c5d990606ddb1e298fc1c4ecf8a2a8) | fix  | use absolute watch paths for postcss dependency messages |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="15.2.9"></a>
 
 # 15.2.9 (2023-06-28)
