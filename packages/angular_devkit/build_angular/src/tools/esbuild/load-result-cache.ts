@@ -7,6 +7,7 @@
  */
 
 import type { OnLoadResult, PluginBuild } from 'esbuild';
+import { normalize } from 'node:path';
 
 export interface LoadResultCache {
   get(path: string): OnLoadResult | undefined;
@@ -50,10 +51,12 @@ export class MemoryLoadResultCache implements LoadResultCache {
     this.#loadResults.set(path, result);
     if (result.watchFiles) {
       for (const watchFile of result.watchFiles) {
-        let affected = this.#fileDependencies.get(watchFile);
+        // Normalize the watch file path to ensure OS consistent paths
+        const normalizedWatchFile = normalize(watchFile);
+        let affected = this.#fileDependencies.get(normalizedWatchFile);
         if (affected === undefined) {
           affected = new Set();
-          this.#fileDependencies.set(watchFile, affected);
+          this.#fileDependencies.set(normalizedWatchFile, affected);
         }
         affected.add(path);
       }

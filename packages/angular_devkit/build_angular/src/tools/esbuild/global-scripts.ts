@@ -89,15 +89,16 @@ export function createGlobalScriptsBundleOptions(
               let fileContent;
               try {
                 // Attempt to read as a relative path from the workspace root
-                fileContent = await readFile(path.join(workspaceRoot, filename), 'utf-8');
-                watchFiles.push(filename);
+                const fullPath = path.join(workspaceRoot, filename);
+                fileContent = await readFile(fullPath, 'utf-8');
+                watchFiles.push(fullPath);
               } catch (e) {
                 assertIsError(e);
                 if (e.code !== 'ENOENT') {
                   throw e;
                 }
 
-                // If not found attempt to resolve as a module specifier
+                // If not found, attempt to resolve as a module specifier
                 const resolveResult = await build.resolve(filename, {
                   kind: 'entry-point',
                   resolveDir: workspaceRoot,
@@ -114,7 +115,7 @@ export function createGlobalScriptsBundleOptions(
                   };
                 }
 
-                watchFiles.push(path.relative(resolveResult.path, workspaceRoot));
+                watchFiles.push(resolveResult.path);
                 fileContent = await readFile(resolveResult.path, 'utf-8');
               }
 
