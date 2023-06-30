@@ -193,7 +193,10 @@ export class AngularWebpackPlugin {
     let changedFiles;
     if (cache) {
       changedFiles = new Set<string>();
-      for (const changedFile of [...compiler.modifiedFiles, ...compiler.removedFiles]) {
+      for (const changedFile of [
+        ...(compiler.modifiedFiles ?? []),
+        ...(compiler.removedFiles ?? []),
+      ]) {
         const normalizedChangedFile = normalizePath(changedFile);
         // Invalidate file dependencies
         this.fileDependencies.delete(normalizedChangedFile);
