@@ -10839,9 +10839,9 @@ Alan Agius, Charles Lyding, Keen Yee Liau, Joey Perrott, David Shevitz
 
 <tr><td colspan=3><h3>@angular/cli (12.0.0-next.9)</h3></td></tr>
   <tr>
-    <td><b>Commit</b>
-    <td><b>Description</b>
-    <td><b>Notes</b>
+    <td><strong>Commit</strong>
+    <td><strong>Description</strong>
+    <td><strong>Notes</strong>
   </tr>
 
 <tr>
@@ -10863,9 +10863,9 @@ Alan Agius, Charles Lyding, Keen Yee Liau, Joey Perrott, David Shevitz
 
 <tr><td colspan=3><h3>@ngtools/webpack (12.0.0-next.9)</h3></td></tr>
   <tr>
-    <td><b>Commit</b>
-    <td><b>Description</b>
-    <td><b>Notes</b>
+    <td><strong>Commit</strong>
+    <td><strong>Description</strong>
+    <td><strong>Notes</strong>
   </tr>
 
 <tr>
@@ -10917,9 +10917,9 @@ Alan Agius, Charles Lyding, Keen Yee Liau, Joey Perrott, David Shevitz
 
 <tr><td colspan=3><h3>@schematics/angular (12.0.0-next.9)</h3></td></tr>
   <tr>
-    <td><b>Commit</b>
-    <td><b>Description</b>
-    <td><b>Notes</b>
+    <td><strong>Commit</strong>
+    <td><strong>Description</strong>
+    <td><strong>Notes</strong>
   </tr>
 
 <tr>
@@ -11042,9 +11042,9 @@ Alan Agius, Charles Lyding, Keen Yee Liau, Doug Parker, Douglas Parker
 
 <tr><td colspan=3><h3>@angular-devkit/build-angular (0.1200.0-next.8)</h3></td></tr>
   <tr>
-    <td><b>Commit</b>
-    <td><b>Description</b>
-    <td><b>Notes</b>
+    <td><strong>Commit</strong>
+    <td><strong>Description</strong>
+    <td><strong>Notes</strong>
   </tr>
 
 <tr>
@@ -11066,9 +11066,9 @@ Alan Agius, Charles Lyding, Keen Yee Liau, Doug Parker, Douglas Parker
 
 <tr><td colspan=3><h3>@ngtools/webpack (12.0.0-next.8)</h3></td></tr>
   <tr>
-    <td><b>Commit</b>
-    <td><b>Description</b>
-    <td><b>Notes</b>
+    <td><strong>Commit</strong>
+    <td><strong>Description</strong>
+    <td><strong>Notes</strong>
   </tr>
 
 <tr>
@@ -11090,9 +11090,9 @@ Alan Agius, Charles Lyding, Keen Yee Liau, Doug Parker, Douglas Parker
 
 <tr><td colspan=3><h3>@schematics/angular (12.0.0-next.8)</h3></td></tr>
   <tr>
-    <td><b>Commit</b>
-    <td><b>Description</b>
-    <td><b>Notes</b>
+    <td><strong>Commit</strong>
+    <td><strong>Description</strong>
+    <td><strong>Notes</strong>
   </tr>
 
 <tr>
@@ -11161,9 +11161,9 @@ Charles Lyding, Renovate Bot, Alan Agius, Doug Parker, Joey Perrott
 
 <tr><td colspan=3><h3>@angular-devkit/build-angular (0.1200.0-next.7)</h3></td></tr>
   <tr>
-    <td><b>Commit</b>
-    <td><b>Description</b>
-    <td><b>Notes</b>
+    <td><strong>Commit</strong>
+    <td><strong>Description</strong>
+    <td><strong>Notes</strong>
   </tr>
 
 <tr>
@@ -11219,9 +11219,9 @@ Charles Lyding, Renovate Bot, Alan Agius, Doug Parker, Joey Perrott
 
 <tr><td colspan=3><h3>@angular/cli (12.0.0-next.7)</h3></td></tr>
   <tr>
-    <td><b>Commit</b>
-    <td><b>Description</b>
-    <td><b>Notes</b>
+    <td><strong>Commit</strong>
+    <td><strong>Description</strong>
+    <td><strong>Notes</strong>
   </tr>
 
 <tr>
@@ -11256,9 +11256,9 @@ Charles Lyding, Renovate Bot, Alan Agius, Doug Parker, Joey Perrott
 
 <tr><td colspan=3><h3>@ngtools/webpack (12.0.0-next.7)</h3></td></tr>
   <tr>
-    <td><b>Commit</b>
-    <td><b>Description</b>
-    <td><b>Notes</b>
+    <td><strong>Commit</strong>
+    <td><strong>Description</strong>
+    <td><strong>Notes</strong>
   </tr>
 
 <tr>
@@ -11293,9 +11293,9 @@ Charles Lyding, Renovate Bot, Alan Agius, Doug Parker, Joey Perrott
 
 <tr><td colspan=3><h3>@schematics/angular (12.0.0-next.7)</h3></td></tr>
   <tr>
-    <td><b>Commit</b>
-    <td><b>Description</b>
-    <td><b>Notes</b>
+    <td><strong>Commit</strong>
+    <td><strong>Description</strong>
+    <td><strong>Notes</strong>
   </tr>
 
 <tr>
@@ -11398,9 +11398,9 @@ Charles Lyding, Alan Agius, Renovate Bot, George Kalpakas, Joey Perrott, Keen Ye
 
 <tr><td colspan=3><h3>@angular-devkit/build-angular (0.1200.0-next.6)</h3></td></tr>
   <tr>
-    <td><b>Commit</b>
-    <td><b>Description</b>
-    <td><b>Notes</b>
+    <td><strong>Commit</strong>
+    <td><strong>Description</strong>
+    <td><strong>Notes</strong>
   </tr>
 
 <tr>
@@ -11422,9 +11422,9 @@ Charles Lyding, Alan Agius, Renovate Bot, George Kalpakas, Joey Perrott, Keen Ye
 
 <tr><td colspan=3><h3>@schematics/angular (12.0.0-next.6)</h3></td></tr>
   <tr>
-    <td><b>Commit</b>
-    <td><b>Description</b>
-    <td><b>Notes</b>
+    <td><strong>Commit</strong>
+    <td><strong>Description</strong>
+    <td><strong>Notes</strong>
   </tr>
 
 <tr>
@@ -11498,9 +11498,9 @@ Renovate Bot, Alan Agius, Charles Lyding, Keen Yee Liau
 
 <tr><td colspan=3><h3>@angular-devkit/build-angular (0.1200.0-next.5)</h3></td></tr>
   <tr>
-    <td><b>Commit</b>
-    <td><b>Description</b>
-    <td><b>Notes</b>
+    <td><strong>Commit</strong>
+    <td><strong>Description</strong>
+    <td><strong>Notes</strong>
   </tr>
 
 <tr>
@@ -11659,9 +11659,9 @@ Renovate Bot, Alan Agius, Charles Lyding, Keen Yee Liau
 
 <tr><td colspan=3><h3>@angular-devkit/build-webpack (0.1200.0-next.5)</h3></td></tr>
   <tr>
-    <td><b>Commit</b>
-    <td><b>Description</b>
-    <td><b>Notes</b>
+    <td><strong>Commit</strong>
+    <td><strong>Description</strong>
+    <td><strong>Notes</strong>
   </tr>
 
 <tr>
@@ -11683,9 +11683,9 @@ Renovate Bot, Alan Agius, Charles Lyding, Keen Yee Liau
 
 <tr><td colspan=3><h3>@angular/cli (12.0.0-next.5)</h3></td></tr>
   <tr>
-    <td><b>Commit</b>
-    <td><b>Description</b>
-    <td><b>Notes</b>
+    <td><strong>Commit</strong>
+    <td><strong>Description</strong>
+    <td><strong>Notes</strong>
   </tr>
 
 <tr>
@@ -11737,9 +11737,9 @@ Renovate Bot, Alan Agius, Charles Lyding, Keen Yee Liau
 
 <tr><td colspan=3><h3>@ngtools/webpack (12.0.0-next.5)</h3></td></tr>
   <tr>
-    <td><b>Commit</b>
-    <td><b>Description</b>
-    <td><b>Notes</b>
+    <td><strong>Commit</strong>
+    <td><strong>Description</strong>
+    <td><strong>Notes</strong>
   </tr>
 
 <tr>
@@ -11791,9 +11791,9 @@ Renovate Bot, Alan Agius, Charles Lyding, Keen Yee Liau
 
 <tr><td colspan=3><h3>@schematics/angular (12.0.0-next.5)</h3></td></tr>
   <tr>
-    <td><b>Commit</b>
-    <td><b>Description</b>
-    <td><b>Notes</b>
+    <td><strong>Commit</strong>
+    <td><strong>Description</strong>
+    <td><strong>Notes</strong>
   </tr>
 
 <tr>
