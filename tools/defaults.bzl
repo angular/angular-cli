@@ -44,21 +44,15 @@ def ts_library(
         **kwargs
     )
 
-EXPRESS_VERSION = "^4.15.2"
-EXPRESS_TYPES_VERSION = "^4.17.0"
-
-NGUNIVERSAL_SCOPED_PACKAGES = ["@nguniversal/%s" % p for p in [
-    "builders",
-    "common",
-    "express-engine",
+# Packages which are versioned together on npm
+ANGULAR_SCOPED_PACKAGES = ["@angular/%s" % p for p in [
+    "ssr",
 ]]
 
 PKG_GROUP_REPLACEMENTS = {
     "\"NG_UPDATE_PACKAGE_GROUP\"": """[
       %s
-    ]""" % ",\n      ".join(["\"%s\"" % s for s in NGUNIVERSAL_SCOPED_PACKAGES]),
-    "EXPRESS_VERSION": EXPRESS_VERSION,
-    "EXPRESS_TYPES_VERSION": EXPRESS_TYPES_VERSION,
+    ]""" % ",\n      ".join(["\"%s\"" % s for s in ANGULAR_SCOPED_PACKAGES]),
 }
 
 def ng_module(name, package_name, module_name = None, tsconfig = None, testonly = False, deps = [], **kwargs):

@@ -1,0 +1,10 @@
+{
+  "$schema": "../../node_modules/@angular-devkit/schematics/collection-schema.json",
+  "schematics": {
+    "ng-add": {
+      "description": "Adds Angular Universal Express Engine.",
+      "factory": "./universal-express",
+      "schema": "./universal-express/schema.json"
+    }
+  }
+}

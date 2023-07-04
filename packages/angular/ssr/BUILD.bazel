@@ -1,0 +1,43 @@
+load("//tools:defaults.bzl", "ng_module")
+
+package(default_visibility = ["//visibility:public"])
+
+ng_module(
+    name = "ssr",
+    package_name = "@angular/ssr",
+    srcs = glob([
+        "src/*.ts",
+        "*.ts",
+    ]),
+    deps = [
+        "@npm//@angular/core",
+        "@npm//@angular/platform-server",
+    ],
+)
+
+ng_package(
+    name = "npm_package",
+    package_name = "@angular/ssr",
+    srcs = [
+        ":package.json",
+    ],
+    tags = ["release"],
+    visibility = [
+        "//integration:__subpackages__",
+    ],
+    deps = [
+      ":ssr",
+      "//packages/angular/ssr/express",
+      "//packages/angular/ssr/express/tokens",
+    ],
+)
+
+# work-around for ng_package not providing its output in runfiles
+filegroup(
+    name = "npm_package_runfiles",
+    srcs = [":npm_package"],
+    data = [":npm_package"],
+    visibility = [
+        "//integration:__subpackages__",
+    ],
+)
