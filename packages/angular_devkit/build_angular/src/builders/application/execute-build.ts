@@ -8,7 +8,10 @@
 
 import { BuilderContext } from '@angular-devkit/architect';
 import { SourceFileCache } from '../../tools/esbuild/angular/compiler-plugin';
-import { createBrowserCodeBundleOptions } from '../../tools/esbuild/browser-code-bundle';
+import {
+  createBrowserCodeBundleOptions,
+  createServerCodeBundleOptions,
+} from '../../tools/esbuild/application-code-bundle';
 import { BundlerContext } from '../../tools/esbuild/bundler-context';
 import { ExecutionResult, RebuildState } from '../../tools/esbuild/bundler-execution-result';
 import { checkCommonJSModules } from '../../tools/esbuild/commonjs-checker';
@@ -16,7 +19,6 @@ import { createGlobalScriptsBundleOptions } from '../../tools/esbuild/global-scr
 import { createGlobalStylesBundleOptions } from '../../tools/esbuild/global-styles';
 import { generateIndexHtml } from '../../tools/esbuild/index-html-generator';
 import { extractLicenses } from '../../tools/esbuild/license-extractor';
-import { createServerCodeBundleOptions } from '../../tools/esbuild/server-code-bundle';
 import {
   calculateEstimatedTransferSizes,
   logBuildStats,

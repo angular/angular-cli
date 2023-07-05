@@ -30,10 +30,7 @@ import {
 } from '../profiling';
 import { BundleStylesheetOptions, bundleComponentStylesheet } from '../stylesheets/bundle-options';
 import { AngularHostOptions } from './angular-host';
-import { AngularCompilation } from './compilation/angular-compilation';
-import { AotCompilation } from './compilation/aot-compilation';
-import { JitCompilation } from './compilation/jit-compilation';
-import { NoopCompilation } from './compilation/noop-compilation';
+import { AngularCompilation, AotCompilation, JitCompilation, NoopCompilation } from './compilation';
 import { convertTypeScriptDiagnostic } from './diagnostics';
 import { setupJitPluginCallbacks } from './jit-plugin-callbacks';
 
