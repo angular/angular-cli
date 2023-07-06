@@ -6,33 +6,39 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { transform } from '@babel/core';
-import { default as adjustTypeScriptEnums } from './adjust-typescript-enums';
-
+import { transformSync } from '@babel/core';
 // eslint-disable-next-line import/no-extraneous-dependencies
-const prettier = require('prettier');
+import { format } from 'prettier';
+import adjustTypeScriptEnums from './adjust-typescript-enums';
 
-function testCase({ input, expected }: { input: string; expected: string }): void {
-  const result = transform(input, {
-    configFile: false,
-    babelrc: false,
-    plugins: [[adjustTypeScriptEnums]],
-  });
-  if (!result) {
-    fail('Expected babel to return a transform result.');
-  } else {
-    expect(prettier.format(result.code, { parser: 'babel' })).toEqual(
-      prettier.format(expected, { parser: 'babel' }),
-    );
-  }
-}
+const NO_CHANGE = Symbol('NO_CHANGE');
 
-function testCaseNoChange(input: string): void {
-  testCase({ input, expected: input });
+function testCase({
+  input,
+  expected,
+}: {
+  input: string;
+  expected: string | typeof NO_CHANGE;
+}): jasmine.ImplementationCallback {
+  return async () => {
+    const result = transformSync(input, {
+      configFile: false,
+      babelrc: false,
+      plugins: [[adjustTypeScriptEnums]],
+    });
+    if (!result?.code) {
+      fail('Expected babel to return a transform result.');
+    } else {
+      expect(await format(result.code, { parser: 'babel' })).toEqual(
+        await format(expected === NO_CHANGE ? input : expected, { parser: 'babel' }),
+      );
+    }
+  };
 }
 
 describe('adjust-typescript-enums Babel plugin', () => {
-  it('wraps unexported TypeScript enums', () => {
+  it(
+    'wraps unexported TypeScript enums',
     testCase({
       input: `
         var ChangeDetectionStrategy;
@@ -49,10 +55,11 @@ describe('adjust-typescript-enums Babel plugin', () => {
           return ChangeDetectionStrategy;
         })();
       `,
-    });
-  });
+    }),
+  );
 
-  it('wraps exported TypeScript enums', () => {
+  it(
+    'wraps exported TypeScript enums',
     testCase({
       input: `
         export var ChangeDetectionStrategy;
@@ -69,10 +76,11 @@ describe('adjust-typescript-enums Babel plugin', () => {
           return ChangeDetectionStrategy;
         })();
       `,
-    });
-  });
+    }),
+  );
 
-  it('wraps TypeScript enums with custom numbering', () => {
+  it(
+    'wraps TypeScript enums with custom numbering',
     testCase({
       input: `
         export var ChangeDetectionStrategy;
@@ -89,10 +97,11 @@ describe('adjust-typescript-enums Babel plugin', () => {
           return ChangeDetectionStrategy;
         })();
       `,
-    });
-  });
+    }),
+  );
 
-  it('wraps string-based TypeScript enums', () => {
+  it(
+    'wraps string-based TypeScript enums',
     testCase({
       input: `
       var NotificationKind;
@@ -111,10 +120,11 @@ describe('adjust-typescript-enums Babel plugin', () => {
           return NotificationKind;
         })();
       `,
-    });
-  });
+    }),
+  );
 
-  it('wraps enums that were renamed due to scope hoisting', () => {
+  it(
+    'wraps enums that were renamed due to scope hoisting',
     testCase({
       input: `
         var NotificationKind$1;
@@ -134,10 +144,11 @@ describe('adjust-typescript-enums Babel plugin', () => {
           return NotificationKind$1;
         })();
       `,
-    });
-  });
+    }),
+  );
 
-  it('maintains multi-line comments', () => {
+  it(
+    'maintains multi-line comments',
     testCase({
       input: `
         /**
@@ -172,33 +183,42 @@ describe('adjust-typescript-enums Babel plugin', () => {
           return RequestMethod;
         })();
       `,
-    });
-  });
+    }),
+  );
 
-  it('does not wrap TypeScript enums with side effect values', () => {
-    testCaseNoChange(`
-      export var ChangeDetectionStrategy;
-      (function (ChangeDetectionStrategy) {
-          ChangeDetectionStrategy[ChangeDetectionStrategy["OnPush"] = 0] = console.log('foo');
-          ChangeDetectionStrategy[ChangeDetectionStrategy["Default"] = 1] = "Default";
-      })(ChangeDetectionStrategy || (ChangeDetectionStrategy = {}));
-    `);
-  });
+  it(
+    'does not wrap TypeScript enums with side effect values',
+    testCase({
+      input: `
+        export var ChangeDetectionStrategy;
+        (function (ChangeDetectionStrategy) {
+            ChangeDetectionStrategy[ChangeDetectionStrategy["OnPush"] = 0] = console.log('foo');
+            ChangeDetectionStrategy[ChangeDetectionStrategy["Default"] = 1] = "Default";
+        })(ChangeDetectionStrategy || (ChangeDetectionStrategy = {}));
+      `,
+      expected: NO_CHANGE,
+    }),
+  );
 
-  it('does not wrap object literals similar to TypeScript enums', () => {
-    testCaseNoChange(`
-      const RendererStyleFlags3 = {
-          Important: 1,
-          DashCase: 2,
-      };
-      if (typeof RendererStyleFlags3 === 'object') {
-        RendererStyleFlags3[RendererStyleFlags3.Important] = 'DashCase';
-      }
-      RendererStyleFlags3[RendererStyleFlags3.Important] = 'Important';
-    `);
-  });
+  it(
+    'does not wrap object literals similar to TypeScript enums',
+    testCase({
+      input: `
+        const RendererStyleFlags3 = {
+            Important: 1,
+            DashCase: 2,
+        };
+        if (typeof RendererStyleFlags3 === 'object') {
+          RendererStyleFlags3[RendererStyleFlags3.Important] = 'DashCase';
+        }
+        RendererStyleFlags3[RendererStyleFlags3.Important] = 'Important';
+      `,
+      expected: NO_CHANGE,
+    }),
+  );
 
-  it('wraps TypeScript enums', () => {
+  it(
+    'wraps TypeScript enums',
     testCase({
       input: `
         var ChangeDetectionStrategy;
@@ -215,10 +235,11 @@ describe('adjust-typescript-enums Babel plugin', () => {
           return ChangeDetectionStrategy;
         })();
       `,
-    });
-  });
+    }),
+  );
 
-  it('should not wrap TypeScript enums if the declaration identifier has been renamed to avoid collisions', () => {
+  it(
+    'should not wrap TypeScript enums if the declaration identifier has been renamed to avoid collisions',
     testCase({
       input: `
         var ChangeDetectionStrategy$1;
@@ -236,6 +257,6 @@ describe('adjust-typescript-enums Babel plugin', () => {
           return ChangeDetectionStrategy$1;
         })();
       `,
-    });
-  });
+    }),
+  );
 });

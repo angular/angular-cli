@@ -6,11 +6,12 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { transform } from '@babel/core';
-import { default as adjustStaticClassMembers } from './adjust-static-class-members';
-
+import { transformSync } from '@babel/core';
 // eslint-disable-next-line import/no-extraneous-dependencies
-const prettier = require('prettier');
+import { format } from 'prettier';
+import adjustStaticClassMembers from './adjust-static-class-members';
+
+const NO_CHANGE = Symbol('NO_CHANGE');
 
 function testCase({
   input,
@@ -18,69 +19,72 @@ function testCase({
   options,
 }: {
   input: string;
-  expected: string;
+  expected: string | typeof NO_CHANGE;
   options?: { wrapDecorators?: boolean };
-}): void {
-  const result = transform(input, {
-    configFile: false,
-    babelrc: false,
-    plugins: [[adjustStaticClassMembers, options]],
-  });
-  if (!result) {
-    fail('Expected babel to return a transform result.');
-  } else {
-    expect(prettier.format(result.code, { parser: 'babel' })).toEqual(
-      prettier.format(expected, { parser: 'babel' }),
-    );
-  }
-}
-
-function testCaseNoChange(input: string, options?: { wrapDecorators?: boolean }): void {
-  testCase({ input, expected: input, options });
+}): jasmine.ImplementationCallback {
+  return async () => {
+    const result = transformSync(input, {
+      configFile: false,
+      babelrc: false,
+      plugins: [[adjustStaticClassMembers, options]],
+    });
+    if (!result?.code) {
+      fail('Expected babel to return a transform result.');
+    } else {
+      expect(await format(result.code, { parser: 'babel' })).toEqual(
+        await format(expected === NO_CHANGE ? input : expected, { parser: 'babel' }),
+      );
+    }
+  };
 }
 
 describe('adjust-static-class-members Babel plugin', () => {
-  it('elides empty ctorParameters function expression static field', () => {
+  it(
+    'elides empty ctorParameters function expression static field',
     testCase({
       input: `
         export class SomeClass {}
         SomeClass.ctorParameters = function () { return []; };
       `,
       expected: 'export class SomeClass {}',
-    });
-  });
+    }),
+  );
 
-  it('elides non-empty ctorParameters function expression static field', () => {
+  it(
+    'elides non-empty ctorParameters function expression static field',
     testCase({
       input: `
         export class SomeClass {}
         SomeClass.ctorParameters = function () { return [{type: Injector}]; };
       `,
       expected: 'export class SomeClass {}',
-    });
-  });
+    }),
+  );
 
-  it('elides empty ctorParameters arrow expression static field', () => {
+  it(
+    'elides empty ctorParameters arrow expression static field',
     testCase({
       input: `
         export class SomeClass {}
         SomeClass.ctorParameters = () => [];
       `,
       expected: 'export class SomeClass {}',
-    });
-  });
+    }),
+  );
 
-  it('elides non-empty ctorParameters arrow expression static field', () => {
+  it(
+    'elides non-empty ctorParameters arrow expression static field',
     testCase({
       input: `
         export class SomeClass {}
         SomeClass.ctorParameters = () => [{type: Injector}];
       `,
       expected: 'export class SomeClass {}',
-    });
-  });
+    }),
+  );
 
-  it('keeps ctorParameters static field without arrow/function expression', () => {
+  it(
+    'keeps ctorParameters static field without arrow/function expression',
     testCase({
       input: `
         export class SomeClass {}
@@ -93,30 +97,33 @@ describe('adjust-static-class-members Babel plugin', () => {
           return SomeClass;
         })();
       `,
-    });
-  });
+    }),
+  );
 
-  it('elides empty decorators static field with array literal', () => {
+  it(
+    'elides empty decorators static field with array literal',
     testCase({
       input: `
         export class SomeClass {}
         SomeClass.decorators = [];
       `,
       expected: 'export class SomeClass {}',
-    });
-  });
+    }),
+  );
 
-  it('elides non-empty decorators static field with array literal', () => {
+  it(
+    'elides non-empty decorators static field with array literal',
     testCase({
       input: `
         export class SomeClass {}
         SomeClass.decorators = [{ type: Injectable }];
       `,
       expected: 'export class SomeClass {}',
-    });
-  });
+    }),
+  );
 
-  it('keeps decorators static field without array literal', () => {
+  it(
+    'keeps decorators static field without array literal',
     testCase({
       input: `
         export class SomeClass {}
@@ -129,30 +136,33 @@ describe('adjust-static-class-members Babel plugin', () => {
           return SomeClass;
         })();
       `,
-    });
-  });
+    }),
+  );
 
-  it('elides empty propDecorators static field with object literal', () => {
+  it(
+    'elides empty propDecorators static field with object literal',
     testCase({
       input: `
         export class SomeClass {}
         SomeClass.propDecorators = {};
       `,
       expected: 'export class SomeClass {}',
-    });
-  });
+    }),
+  );
 
-  it('elides non-empty propDecorators static field with object literal', () => {
+  it(
+    'elides non-empty propDecorators static field with object literal',
     testCase({
       input: `
         export class SomeClass {}
         SomeClass.propDecorators = { 'ngIf': [{ type: Input }] };
       `,
       expected: 'export class SomeClass {}',
-    });
-  });
+    }),
+  );
 
-  it('keeps propDecorators static field without object literal', () => {
+  it(
+    'keeps propDecorators static field without object literal',
     testCase({
       input: `
         export class SomeClass {}
@@ -165,13 +175,14 @@ describe('adjust-static-class-members Babel plugin', () => {
           return SomeClass;
         })();
       `,
-    });
-  });
+    }),
+  );
 
-  it('does not wrap default exported class with no connected siblings', () => {
-    // NOTE: This could technically have no changes but the default export splitting detection
-    // does not perform class property analysis currently.
+  it(
+    'does not wrap default exported class with no connected siblings',
     testCase({
+      // NOTE: This could technically have no changes but the default export splitting detection
+      // does not perform class property analysis currently.
       input: `
         export default class CustomComponentEffects {
           constructor(_actions) {
@@ -189,11 +200,13 @@ describe('adjust-static-class-members Babel plugin', () => {
         }
         export { CustomComponentEffects as default };
       `,
-    });
-  });
+    }),
+  );
 
-  it('does wrap not default exported class with only side effect fields', () => {
-    testCaseNoChange(`
+  it(
+    'does wrap not default exported class with only side effect fields',
+    testCase({
+      input: `
       export default class CustomComponentEffects {
         constructor(_actions) {
           this._actions = _actions;
@@ -201,11 +214,15 @@ describe('adjust-static-class-members Babel plugin', () => {
         }
       }
       CustomComponentEffects.someFieldWithSideEffects = console.log('foo');
-    `);
-  });
+    `,
+      expected: NO_CHANGE,
+    }),
+  );
 
-  it('does not wrap class with only side effect fields', () => {
-    testCaseNoChange(`
+  it(
+    'does not wrap class with only side effect fields',
+    testCase({
+      input: `
       class CustomComponentEffects {
         constructor(_actions) {
           this._actions = _actions;
@@ -213,11 +230,15 @@ describe('adjust-static-class-members Babel plugin', () => {
         }
       }
       CustomComponentEffects.someFieldWithSideEffects = console.log('foo');
-    `);
-  });
+    `,
+      expected: NO_CHANGE,
+    }),
+  );
 
-  it('does not wrap class with only side effect native fields', () => {
-    testCaseNoChange(`
+  it(
+    'does not wrap class with only side effect native fields',
+    testCase({
+      input: `
       class CustomComponentEffects {
         static someFieldWithSideEffects = console.log('foo');
         constructor(_actions) {
@@ -225,11 +246,15 @@ describe('adjust-static-class-members Babel plugin', () => {
           this.doThis = this._actions;
         }
       }
-    `);
-  });
+    `,
+      expected: NO_CHANGE,
+    }),
+  );
 
-  it('does not wrap class with only instance native fields', () => {
-    testCaseNoChange(`
+  it(
+    'does not wrap class with only instance native fields',
+    testCase({
+      input: `
       class CustomComponentEffects {
         someFieldWithSideEffects = console.log('foo');
         constructor(_actions) {
@@ -237,10 +262,13 @@ describe('adjust-static-class-members Babel plugin', () => {
           this.doThis = this._actions;
         }
       }
-    `);
-  });
+    `,
+      expected: NO_CHANGE,
+    }),
+  );
 
-  it('wraps class with pure annotated side effect fields (#__PURE__)', () => {
+  it(
+    'wraps class with pure annotated side effect fields (#__PURE__)',
     testCase({
       input: `
         class CustomComponentEffects {
@@ -263,10 +291,11 @@ describe('adjust-static-class-members Babel plugin', () => {
           return CustomComponentEffects;
         })();
       `,
-    });
-  });
+    }),
+  );
 
-  it('wraps class with pure annotated side effect native fields (#__PURE__)', () => {
+  it(
+    'wraps class with pure annotated side effect native fields (#__PURE__)',
     testCase({
       input: `
         class CustomComponentEffects {
@@ -289,10 +318,11 @@ describe('adjust-static-class-members Babel plugin', () => {
           return CustomComponentEffects;
         })();
       `,
-    });
-  });
+    }),
+  );
 
-  it('wraps class with pure annotated side effect fields (@__PURE__)', () => {
+  it(
+    'wraps class with pure annotated side effect fields (@__PURE__)',
     testCase({
       input: `
         class CustomComponentEffects {
@@ -315,10 +345,11 @@ describe('adjust-static-class-members Babel plugin', () => {
           return CustomComponentEffects;
         })();
       `,
-    });
-  });
+    }),
+  );
 
-  it('wraps class with pure annotated side effect fields (@pureOrBreakMyCode)', () => {
+  it(
+    'wraps class with pure annotated side effect fields (@pureOrBreakMyCode)',
     testCase({
       input: `
         class CustomComponentEffects {
@@ -342,10 +373,11 @@ describe('adjust-static-class-members Babel plugin', () => {
           return CustomComponentEffects;
         })();
       `,
-    });
-  });
+    }),
+  );
 
-  it('wraps class with closure pure annotated side effect fields', () => {
+  it(
+    'wraps class with closure pure annotated side effect fields',
     testCase({
       input: `
         class CustomComponentEffects {
@@ -369,10 +401,11 @@ describe('adjust-static-class-members Babel plugin', () => {
           return CustomComponentEffects;
         })();
       `,
-    });
-  });
+    }),
+  );
 
-  it('wraps exported class with a pure static field', () => {
+  it(
+    'wraps exported class with a pure static field',
     testCase({
       input: `
         export class CustomComponentEffects {
@@ -395,10 +428,11 @@ describe('adjust-static-class-members Babel plugin', () => {
           return CustomComponentEffects;
         })();
       `,
-    });
-  });
+    }),
+  );
 
-  it('wraps exported class with a pure native static field', () => {
+  it(
+    'wraps exported class with a pure native static field',
     testCase({
       input: `
         export class CustomComponentEffects {
@@ -421,10 +455,11 @@ describe('adjust-static-class-members Babel plugin', () => {
           return CustomComponentEffects;
         })();
       `,
-    });
-  });
+    }),
+  );
 
-  it('wraps class with a basic literal static field', () => {
+  it(
+    'wraps class with a basic literal static field',
     testCase({
       input: `
         class CustomComponentEffects {
@@ -447,10 +482,11 @@ describe('adjust-static-class-members Babel plugin', () => {
           return CustomComponentEffects;
         })();
       `,
-    });
-  });
+    }),
+  );
 
-  it('wraps class with a pure static field', () => {
+  it(
+    'wraps class with a pure static field',
     testCase({
       input: `
         const SWITCH_TEMPLATE_REF_FACTORY__POST_R3__ = injectTemplateRef;
@@ -467,10 +503,11 @@ describe('adjust-static-class-members Babel plugin', () => {
           return TemplateRef;
         })();
       `,
-    });
-  });
+    }),
+  );
 
-  it('wraps class with multiple pure static field', () => {
+  it(
+    'wraps class with multiple pure static field',
     testCase({
       input: `
         const SWITCH_TEMPLATE_REF_FACTORY__POST_R3__ = injectTemplateRef;
@@ -489,62 +526,77 @@ describe('adjust-static-class-members Babel plugin', () => {
           return TemplateRef;
         })();
       `,
-    });
-  });
+    }),
+  );
 
-  it('does not wrap class with only some pure static fields', () => {
-    testCaseNoChange(`
-      class CustomComponentEffects {
-        constructor(_actions) {
-          this._actions = _actions;
-          this.doThis = this._actions;
+  it(
+    'does not wrap class with only some pure static fields',
+    testCase({
+      input: `
+        class CustomComponentEffects {
+          constructor(_actions) {
+            this._actions = _actions;
+            this.doThis = this._actions;
+          }
         }
-      }
-      CustomComponentEffects.someField = 42;
-      CustomComponentEffects.someFieldWithSideEffects = console.log('foo');
-    `);
-  });
+        CustomComponentEffects.someField = 42;
+        CustomComponentEffects.someFieldWithSideEffects = console.log('foo');
+      `,
+      expected: NO_CHANGE,
+    }),
+  );
 
-  it('does not wrap class with only pure native static fields and some side effect static fields', () => {
-    testCaseNoChange(`
-      class CustomComponentEffects {
-        static someField = 42;
-        constructor(_actions) {
-          this._actions = _actions;
-          this.doThis = this._actions;
+  it(
+    'does not wrap class with only pure native static fields and some side effect static fields',
+    testCase({
+      input: `
+        class CustomComponentEffects {
+          static someField = 42;
+          constructor(_actions) {
+            this._actions = _actions;
+            this.doThis = this._actions;
+          }
         }
-      }
-      CustomComponentEffects.someFieldWithSideEffects = console.log('foo');
-    `);
-  });
+        CustomComponentEffects.someFieldWithSideEffects = console.log('foo');
+      `,
+      expected: NO_CHANGE,
+    }),
+  );
 
-  it('does not wrap class with only some pure native static fields', () => {
-    testCaseNoChange(`
-      class CustomComponentEffects {
-        static someField = 42;
-        static someFieldWithSideEffects = console.log('foo');
-        constructor(_actions) {
-          this._actions = _actions;
-          this.doThis = this._actions;
+  it(
+    'does not wrap class with only some pure native static fields',
+    testCase({
+      input: `
+        class CustomComponentEffects {
+          static someField = 42;
+          static someFieldWithSideEffects = console.log('foo');
+          constructor(_actions) {
+            this._actions = _actions;
+            this.doThis = this._actions;
+          }
         }
-      }
-    `);
-  });
+      `,
+      expected: NO_CHANGE,
+    }),
+  );
 
-  it('does not wrap class with class decorators when wrapDecorators is false', () => {
-    testCaseNoChange(
-      `
+  it(
+    'does not wrap class with class decorators when wrapDecorators is false',
+    testCase({
+      input: `
         let SomeClass = class SomeClass {
         };
         SomeClass = __decorate([
             Dec()
         ], SomeClass);
       `,
-      { wrapDecorators: false },
-    );
-  });
+      expected: NO_CHANGE,
+      options: { wrapDecorators: false },
+    }),
+  );
 
-  it('wraps class with class decorators when wrapDecorators is true', () => {
+  it(
+    'wraps class with class decorators when wrapDecorators is true',
     testCase({
       input: `
         let SomeClass = class SomeClass {
@@ -564,12 +616,13 @@ describe('adjust-static-class-members Babel plugin', () => {
         })();
       `,
       options: { wrapDecorators: true },
-    });
-  });
+    }),
+  );
 
-  it('does not wrap class with constructor decorators when wrapDecorators is false', () => {
-    testCaseNoChange(
-      `
+  it(
+    'does not wrap class with constructor decorators when wrapDecorators is false',
+    testCase({
+      input: `
         let SomeClass = class SomeClass {
           constructor(foo) { }
         };
@@ -577,11 +630,13 @@ describe('adjust-static-class-members Babel plugin', () => {
             __param(0, SomeDecorator)
         ], SomeClass);
       `,
-      { wrapDecorators: false },
-    );
-  });
+      expected: NO_CHANGE,
+      options: { wrapDecorators: false },
+    }),
+  );
 
-  it('wraps class with constructor decorators when wrapDecorators is true', () => {
+  it(
+    'wraps class with constructor decorators when wrapDecorators is true',
     testCase({
       input: `
         let SomeClass = class SomeClass {
@@ -603,12 +658,13 @@ describe('adjust-static-class-members Babel plugin', () => {
         })();
       `,
       options: { wrapDecorators: true },
-    });
-  });
+    }),
+  );
 
-  it('does not wrap class with field decorators when wrapDecorators is false', () => {
-    testCaseNoChange(
-      `
+  it(
+    'does not wrap class with field decorators when wrapDecorators is false',
+    testCase({
+      input: `
         class SomeClass {
           constructor() {
               this.foo = 42;
@@ -618,11 +674,13 @@ describe('adjust-static-class-members Babel plugin', () => {
             SomeDecorator
         ], SomeClass.prototype, "foo", void 0);
       `,
-      { wrapDecorators: false },
-    );
-  });
+      expected: NO_CHANGE,
+      options: { wrapDecorators: false },
+    }),
+  );
 
-  it('wraps class with field decorators when wrapDecorators is true', () => {
+  it(
+    'wraps class with field decorators when wrapDecorators is true',
     testCase({
       input: `
         class SomeClass {
@@ -648,10 +706,11 @@ describe('adjust-static-class-members Babel plugin', () => {
         })();
       `,
       options: { wrapDecorators: true },
-    });
-  });
+    }),
+  );
 
-  it('wraps class with Angular ɵfac static field', () => {
+  it(
+    'wraps class with Angular ɵfac static field',
     testCase({
       input: `
         class CommonModule {
@@ -666,10 +725,11 @@ describe('adjust-static-class-members Babel plugin', () => {
           return CommonModule;
         })();
       `,
-    });
-  });
+    }),
+  );
 
-  it('wraps class with Angular ɵfac static block (ES2022 + useDefineForClassFields: false)', () => {
+  it(
+    'wraps class with Angular ɵfac static block (ES2022 + useDefineForClassFields: false)',
     testCase({
       input: `
         class CommonModule {
@@ -694,18 +754,23 @@ describe('adjust-static-class-members Babel plugin', () => {
           return CommonModule;
         })();
       `,
-    });
-  });
+    }),
+  );
 
-  it('does not wrap class with side effect full static block (ES2022 + useDefineForClassFields: false)', () => {
-    testCaseNoChange(`
+  it(
+    'does not wrap class with side effect full static block (ES2022 + useDefineForClassFields: false)',
+    testCase({
+      input: `
         class CommonModule {
           static { globalThis.bar = 1 }
         }
-      `);
-  });
+      `,
+      expected: NO_CHANGE,
+    }),
+  );
 
-  it('wraps class with Angular ɵmod static field', () => {
+  it(
+    'wraps class with Angular ɵmod static field',
     testCase({
       input: `
         class CommonModule {
@@ -720,10 +785,11 @@ describe('adjust-static-class-members Babel plugin', () => {
           return CommonModule;
         })();
       `,
-    });
-  });
+    }),
+  );
 
-  it('wraps class with Angular ɵinj static field', () => {
+  it(
+    'wraps class with Angular ɵinj static field',
     testCase({
       input: `
         class CommonModule {
@@ -745,10 +811,11 @@ describe('adjust-static-class-members Babel plugin', () => {
           return CommonModule;
         })();
       `,
-    });
-  });
+    }),
+  );
 
-  it('wraps class with multiple Angular static fields', () => {
+  it(
+    'wraps class with multiple Angular static fields',
     testCase({
       input: `
         class CommonModule {
@@ -774,10 +841,11 @@ describe('adjust-static-class-members Babel plugin', () => {
           return CommonModule;
         })();
       `,
-    });
-  });
+    }),
+  );
 
-  it('wraps class with multiple Angular native static fields', () => {
+  it(
+    'wraps class with multiple Angular native static fields',
     testCase({
       input: `
         class CommonModule {
@@ -809,10 +877,11 @@ describe('adjust-static-class-members Babel plugin', () => {
           return CommonModule;
         })();
       `,
-    });
-  });
+    }),
+  );
 
-  it('wraps default exported class with pure static fields', () => {
+  it(
+    'wraps default exported class with pure static fields',
     testCase({
       input: `
         export default class CustomComponentEffects {
@@ -836,6 +905,6 @@ describe('adjust-static-class-members Babel plugin', () => {
         })();
         export { CustomComponentEffects as default };
       `,
-    });
-  });
+    }),
+  );
 });
