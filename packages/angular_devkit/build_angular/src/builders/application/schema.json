@@ -220,10 +220,6 @@
       "type": "string",
       "description": "The full path for the new output directory, relative to the current workspace.\nBy default, writes output to a folder named dist/ in the current project."
     },
-    "resourcesOutputPath": {
-      "type": "string",
-      "description": "The path where style resources will be placed, relative to outputPath."
-    },
     "aot": {
       "type": "boolean",
       "description": "Build using Ahead of Time compilation.",

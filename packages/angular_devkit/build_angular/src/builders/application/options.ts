@@ -94,13 +94,11 @@ export async function normalizeOptions(
         ? '[name].[hash]'
         : '[name]',
     media:
-      options.outputHashing === OutputHashing.All || options.outputHashing === OutputHashing.Media
+      'media/' +
+      (options.outputHashing === OutputHashing.All || options.outputHashing === OutputHashing.Media
         ? '[name].[hash]'
-        : '[name]',
+        : '[name]'),
   };
-  if (options.resourcesOutputPath) {
-    outputNames.media = path.join(options.resourcesOutputPath, outputNames.media);
-  }
 
   let fileReplacements: Record<string, string> | undefined;
   if (options.fileReplacements) {
