@@ -56,6 +56,7 @@ export function logBuilderStatusWarnings(options: BrowserBuilderOptions, context
     if (
       unsupportedOption === 'namedChunks' ||
       unsupportedOption === 'vendorChunk' ||
+      unsupportedOption === 'resourcesOutputPath' ||
       unsupportedOption === 'deployUrl'
     ) {
       context.logger.warn(

@@ -34,7 +34,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       expect(harness.hasFileMatch('dist', /main\.[0-9A-Z]{8}\.js$/)).toBeTrue();
       expect(harness.hasFileMatch('dist', /polyfills\.[0-9A-Z]{8}\.js$/)).toBeTrue();
       expect(harness.hasFileMatch('dist', /styles\.[0-9A-Z]{8}\.css$/)).toBeTrue();
-      expect(harness.hasFileMatch('dist', /spectrum\.[0-9A-Z]{8}\.png$/)).toBeTrue();
+      expect(harness.hasFileMatch('dist/media', /spectrum\.[0-9A-Z]{8}\.png$/)).toBeTrue();
     });
 
     it(`doesn't hash any filenames when not set`, async () => {
@@ -52,7 +52,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       expect(harness.hasFileMatch('dist', /main\.[0-9A-Z]{8}\.js$/)).toBeFalse();
       expect(harness.hasFileMatch('dist', /polyfills\.[0-9A-Z]{8}\.js$/)).toBeFalse();
       expect(harness.hasFileMatch('dist', /styles\.[0-9A-Z]{8}\.css$/)).toBeFalse();
-      expect(harness.hasFileMatch('dist', /spectrum\.[0-9A-Z]{8}\.png$/)).toBeFalse();
+      expect(harness.hasFileMatch('dist/media', /spectrum\.[0-9A-Z]{8}\.png$/)).toBeFalse();
     });
 
     it(`doesn't hash any filenames when set to "none"`, async () => {
@@ -71,7 +71,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       expect(harness.hasFileMatch('dist', /main\.[0-9A-Z]{8}\.js$/)).toBeFalse();
       expect(harness.hasFileMatch('dist', /polyfills\.[0-9A-Z]{8}\.js$/)).toBeFalse();
       expect(harness.hasFileMatch('dist', /styles\.[0-9A-Z]{8}\.css$/)).toBeFalse();
-      expect(harness.hasFileMatch('dist', /spectrum\.[0-9A-Z]{8}\.png$/)).toBeFalse();
+      expect(harness.hasFileMatch('dist/media', /spectrum\.[0-9A-Z]{8}\.png$/)).toBeFalse();
     });
 
     it(`hashes CSS resources filenames only when set to "media"`, async () => {
@@ -90,7 +90,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       expect(harness.hasFileMatch('dist', /main\.[0-9A-Z]{8}\.js$/)).toBeFalse();
       expect(harness.hasFileMatch('dist', /polyfills\.[0-9A-Z]{8}\.js$/)).toBeFalse();
       expect(harness.hasFileMatch('dist', /styles\.[0-9A-Z]{8}\.css$/)).toBeFalse();
-      expect(harness.hasFileMatch('dist', /spectrum\.[0-9A-Z]{8}\.png$/)).toBeTrue();
+      expect(harness.hasFileMatch('dist/media', /spectrum\.[0-9A-Z]{8}\.png$/)).toBeTrue();
     });
 
     it(`hashes bundles filenames only when set to "bundles"`, async () => {
@@ -109,11 +109,10 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       expect(harness.hasFileMatch('dist', /main\.[0-9A-Z]{8}\.js$/)).toBeTrue();
       expect(harness.hasFileMatch('dist', /polyfills\.[0-9A-Z]{8}\.js$/)).toBeTrue();
       expect(harness.hasFileMatch('dist', /styles\.[0-9A-Z]{8}\.css$/)).toBeTrue();
-      expect(harness.hasFileMatch('dist', /spectrum\.[0-9A-Z]{8}\.png$/)).toBeFalse();
+      expect(harness.hasFileMatch('dist/media', /spectrum\.[0-9A-Z]{8}\.png$/)).toBeFalse();
     });
 
-    // TODO: Re-enable once implemented in the esbuild builder
-    xit('does not hash non injected styles', async () => {
+    it('does not hash non injected styles', async () => {
       harness.useTarget('build', {
         ...BASE_OPTIONS,
         outputHashing: OutputHashing.All,
@@ -159,8 +158,8 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       const { result } = await harness.executeOnce();
       expect(result?.success).toBe(true);
 
-      harness.expectFile('dist/test.svg').toExist();
-      harness.expectFile('dist/small-test.svg').toExist();
+      harness.expectFile('dist/media/test.svg').toExist();
+      harness.expectFile('dist/media/small-test.svg').toExist();
     });
   });
 });
