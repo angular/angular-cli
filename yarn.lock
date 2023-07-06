@@ -131,7 +131,6 @@
 
 "@angular/build-tooling@https://github.com/angular/dev-infra-private-build-tooling-builds.git#94903cc6c8023b776170ccce4746fd5624d65f2f":
   version "0.0.0-abd901f78e5c6f945c07e8886259f0c1c7e0383b"
-  uid "94903cc6c8023b776170ccce4746fd5624d65f2f"
   resolved "https://github.com/angular/dev-infra-private-build-tooling-builds.git#94903cc6c8023b776170ccce4746fd5624d65f2f"
   dependencies:
     "@angular-devkit/build-angular" "16.1.0"
@@ -292,7 +291,6 @@
 
 "@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#af299940f1c6e16418e5a8627ac59564e52503d5":
   version "0.0.0-abd901f78e5c6f945c07e8886259f0c1c7e0383b"
-  uid af299940f1c6e16418e5a8627ac59564e52503d5
   resolved "https://github.com/angular/dev-infra-private-ng-dev-builds.git#af299940f1c6e16418e5a8627ac59564e52503d5"
   dependencies:
     "@yarnpkg/lockfile" "^1.1.0"
@@ -9469,10 +9467,15 @@ prelude-ls@^1.2.1:
   resolved "https://registry.yarnpkg.com/prelude-ls/-/prelude-ls-1.2.1.tgz#debc6489d7a6e6b0e7611888cec880337d316396"
   integrity sha512-vkcDPrRZo1QZLbn5RLGPpg/WmIQ65qoWWhcGKf/b5eplkkarX0m9z8ppCat4mlOqUsWpyNuYgO3VRyrYHSzX5g==
 
-prettier@2.8.8, prettier@^2.0.0:
+prettier@2.8.8:
   version "2.8.8"
   resolved "https://registry.yarnpkg.com/prettier/-/prettier-2.8.8.tgz#e8c5d7e98a4305ffe3de2e1fc4aca1a71c28b1da"
   integrity sha512-tdN8qQGvNjw4CHbY+XXk0JgCXn9QiF21a55rBe5LJAU+kDyC4WQn4+awm2Xfk2lQMk5fKup9XgzTZtGkjBdP9Q==
+
+prettier@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/prettier/-/prettier-3.0.0.tgz#e7b19f691245a21d618c68bc54dc06122f6105ae"
+  integrity sha512-zBf5eHpwHOGPC47h0zrPyNn+eAEIdEzfywMoYn2XPi0P44Zp0tSq64rq0xAREh4auw2cJZHo9QUob+NqCQky4g==
 
 pretty-bytes@^5.3.0:
   version "5.6.0"
@@ -10187,7 +10190,6 @@ sass@1.63.6, sass@^1.55.0:
 
 "sauce-connect-proxy@https://saucelabs.com/downloads/sc-4.9.1-linux.tar.gz":
   version "0.0.0"
-  uid "9310bc860f7870a1f872b11c4dc6073a1ad34e5e"
   resolved "https://saucelabs.com/downloads/sc-4.9.1-linux.tar.gz#9310bc860f7870a1f872b11c4dc6073a1ad34e5e"
 
 saucelabs@^1.5.0:
