@@ -1,3 +1,15 @@
+<a name="16.1.4"></a>
+
+# 16.1.4 (2023-07-06)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                  |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------- |
+| [7016cee57](https://github.com/angular/angular-cli/commit/7016cee5783b2762d550db8f2a4f29e7b56f317f) | fix  | normalize paths in loader cache with esbuild |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="16.1.3"></a>
 
 # 16.1.3 (2023-06-29)
