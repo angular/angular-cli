@@ -1,0 +1,15 @@
+{
+  "$schema": "../../node_modules/@angular-devkit/architect/src/builders-schema.json",
+  "builders": {
+    "ssr-dev-server": {
+      "implementation": "./src/ssr-dev-server",
+      "schema": "./src/ssr-dev-server/schema.json",
+      "description": "Serve a universal application."
+    },
+    "prerender": {
+      "implementation": "./src/prerender/index",
+      "schema": "./src/prerender/schema.json",
+      "description": "Perform build-time prerendering of chosen routes."
+    }
+  }
+}

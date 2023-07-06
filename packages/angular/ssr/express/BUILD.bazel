@@ -1,0 +1,42 @@
+load("//tools:defaults.bzl", "jasmine_node_test", "ng_module", "ng_package", "ng_test_library")
+
+package(default_visibility = ["//visibility:public"])
+
+ng_module(
+    name = "express",
+    package_name = "@angular/ssr/express",
+    srcs = glob([
+        "*.ts",
+        "src/**/*.ts",
+    ]),
+    deps = [
+        "//packages/angular/ssr",
+        "@npm//@angular/compiler",
+        "@npm//@angular/core",
+        "@npm//@angular/platform-server",
+        "@npm//@types/express",
+    ],
+)
+
+ng_test_library(
+    name = "unit_test_lib",
+    srcs = glob([
+        "spec/**/*.ts",
+    ]),
+    entry_point = ":spec/index.spec.ts",
+    deps = [
+        ":express",
+        "//packages/angular/ssr/express/tokens",
+        "@npm//@angular/compiler",
+        "@npm//@angular/platform-browser",
+        "@npm//@angular/platform-server",
+        "@npm//domino",
+        "@npm//xhr2",
+        "@npm//zone.js",
+    ],
+)
+
+jasmine_node_test(
+    name = "unit_test",
+    srcs = [":unit_test_lib"],
+)
