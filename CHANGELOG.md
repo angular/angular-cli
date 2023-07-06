@@ -1,3 +1,17 @@
+<a name="16.2.0-next.1"></a>
+
+# 16.2.0-next.1 (2023-07-06)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                    |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------- |
+| [095f5aba6](https://github.com/angular/angular-cli/commit/095f5aba60a4c1267a87b8b3ae38dbfbf70731f1) | feat | add initial support for server bundle generation using esbuild |
+| [93b743af0](https://github.com/angular/angular-cli/commit/93b743af00511fc4cc7808004a0afe0c2b3c8b05) | fix  | normalize paths in loader cache with esbuild                   |
+| [376e3462d](https://github.com/angular/angular-cli/commit/376e3462d3a2204a412c1d3e4551c20ae6b61aaf) | fix  | use absolute watch paths for postcss dependency messages       |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="16.1.4"></a>
 
 # 16.1.4 (2023-07-06)
