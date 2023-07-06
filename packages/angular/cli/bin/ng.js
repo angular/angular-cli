@@ -11,6 +11,16 @@
 /* eslint-disable import/no-unassigned-import */
 'use strict';
 
+const path = require('path');
+
+// Error if the external CLI appears to be used inside a google3 context.
+if (process.cwd().split(path.sep).includes('google3')) {
+  console.error(
+    'This is the external Angular CLI, but you appear to be running in google3. There is a separate, internal version of the CLI which should be used instead. See http://go/angular/cli.',
+  );
+  process.exit();
+}
+
 // Provide a title to the process in `ps`.
 // Due to an obscure Mac bug, do not start this title with any symbol.
 try {
