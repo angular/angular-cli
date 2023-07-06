@@ -76,7 +76,7 @@
     "@angular/router": "16.1.0-rc.0",
     "@angular/service-worker": "16.1.0-rc.0",
     "@babel/core": "7.22.5",
-    "@babel/generator": "7.22.5",
+    "@babel/generator": "7.22.7",
     "@babel/helper-annotate-as-pure": "7.22.5",
     "@babel/helper-split-export-declaration": "7.22.5",
     "@babel/plugin-proposal-async-generator-functions": "7.20.7",

@@ -179,20 +179,6 @@
   dependencies:
     tslib "^2.3.0"
 
-"@angular/compiler-cli@16.1.0":
-  version "16.1.0"
-  resolved "https://registry.yarnpkg.com/@angular/compiler-cli/-/compiler-cli-16.1.0.tgz#50cddc9524b945e9739e9daf86df1df4c8382232"
-  integrity sha512-t/fam7YdY6sINP0IAmt3cWQ0KUndhm457i4e0uZH+NVeBzItvBQggmrl+UhXslg/iFEyHohtyrjZKnGSzgkzKg==
-  dependencies:
-    "@babel/core" "7.21.8"
-    "@jridgewell/sourcemap-codec" "^1.4.14"
-    chokidar "^3.0.0"
-    convert-source-map "^1.5.1"
-    reflect-metadata "^0.1.2"
-    semver "^7.0.0"
-    tslib "^2.3.0"
-    yargs "^17.2.1"
-
 "@angular/compiler-cli@16.1.0-rc.0":
   version "16.1.0-rc.0"
   resolved "https://registry.yarnpkg.com/@angular/compiler-cli/-/compiler-cli-16.1.0-rc.0.tgz#d13ed6169f522ce84d491f70dcaea3d9c8b91019"
@@ -206,13 +192,6 @@
     semver "^7.0.0"
     tslib "^2.3.0"
     yargs "^17.2.1"
-
-"@angular/compiler@16.1.0":
-  version "16.1.0"
-  resolved "https://registry.yarnpkg.com/@angular/compiler/-/compiler-16.1.0.tgz#e3f3de9accbd5c2fe4aefc29406c5b1db47e3a8e"
-  integrity sha512-lQ8pZmfQpAevUbd1BO7snkS8LX4D8HADcdNMnFY/JmSDnb2Kt9VG56uX2HMq8mjyWdqy8E7ggwRi0wFWT5G23Q==
-  dependencies:
-    tslib "^2.3.0"
 
 "@angular/compiler@16.1.0-rc.0":
   version "16.1.0-rc.0"
@@ -450,10 +429,10 @@
     "@jridgewell/trace-mapping" "^0.3.17"
     jsesc "^2.5.1"
 
-"@babel/generator@7.22.5", "@babel/generator@^7.22.5":
-  version "7.22.5"
-  resolved "https://registry.yarnpkg.com/@babel/generator/-/generator-7.22.5.tgz#1e7bf768688acfb05cf30b2369ef855e82d984f7"
-  integrity sha512-+lcUbnTRhd0jOewtFSedLyiPsD5tswKkbgcezOqqWFUVNEwoUTlpPOBmvhG7OXWLR4jMdv0czPGH5XbflnD1EA==
+"@babel/generator@7.22.7":
+  version "7.22.7"
+  resolved "https://registry.yarnpkg.com/@babel/generator/-/generator-7.22.7.tgz#a6b8152d5a621893f2c9dacf9a4e286d520633d5"
+  integrity sha512-p+jPjMG+SI8yvIaxGgeW24u7q9+5+TGpZh8/CuB7RhBKd7RCy8FayNEFNNKrNK/eUcY/4ExQqLmyrvBXKsIcwQ==
   dependencies:
     "@babel/types" "^7.22.5"
     "@jridgewell/gen-mapping" "^0.3.2"
@@ -466,6 +445,16 @@
   integrity sha512-C17MW4wlk//ES/CJDL51kPNwl+qiBQyN7b9SKyVp11BLGFeSPoVaHrv+MNt8jwQFhQWowW88z1eeBx3pFz9v8A==
   dependencies:
     "@babel/types" "^7.22.3"
+    "@jridgewell/gen-mapping" "^0.3.2"
+    "@jridgewell/trace-mapping" "^0.3.17"
+    jsesc "^2.5.1"
+
+"@babel/generator@^7.22.5":
+  version "7.22.5"
+  resolved "https://registry.yarnpkg.com/@babel/generator/-/generator-7.22.5.tgz#1e7bf768688acfb05cf30b2369ef855e82d984f7"
+  integrity sha512-+lcUbnTRhd0jOewtFSedLyiPsD5tswKkbgcezOqqWFUVNEwoUTlpPOBmvhG7OXWLR4jMdv0czPGH5XbflnD1EA==
+  dependencies:
+    "@babel/types" "^7.22.5"
     "@jridgewell/gen-mapping" "^0.3.2"
     "@jridgewell/trace-mapping" "^0.3.17"
     jsesc "^2.5.1"
