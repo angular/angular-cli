@@ -51,9 +51,9 @@ const argv = yargsParser(process.argv.slice(2), {
     'verbose',
     'yarn',
   ],
-  string: ['devkit', 'glob', 'ignore', 'reuse', 'ng-tag', 'tmpdir', 'ng-version'],
+  string: ['devkit', 'glob', 'reuse', 'ng-tag', 'tmpdir', 'ng-version'],
   number: ['nb-shards', 'shard'],
-  array: ['package'],
+  array: ['package', 'ignore'],
   configuration: {
     'camel-case-expansion': false,
     'dot-notation': false,
