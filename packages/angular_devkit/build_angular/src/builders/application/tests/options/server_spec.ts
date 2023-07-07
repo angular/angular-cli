@@ -35,7 +35,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
     });
 
     it('uses a provided JavaScript file', async () => {
-      await harness.writeFile('src/server.js', `console.log('server');`);
+      await harness.writeFile('src/server.js', `console.log('server'); export default {};`);
 
       harness.useTarget('build', {
         ...BASE_OPTIONS,
@@ -45,7 +45,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       const { result } = await harness.executeOnce();
       expect(result?.success).toBeTrue();
 
-      harness.expectFile('dist/server.mjs').content.toContain('console.log("server")');
+      harness.expectFile('dist/server.mjs').toExist();
     });
 
     it('fails and shows an error when file does not exist', async () => {
@@ -78,7 +78,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
     });
 
     it('resolves an absolute path as relative inside the workspace root', async () => {
-      await harness.writeFile('file.mjs', `console.log('Hello!');`);
+      await harness.writeFile('file.mjs', `console.log('Hello!'); export default {};`);
 
       harness.useTarget('build', {
         ...BASE_OPTIONS,

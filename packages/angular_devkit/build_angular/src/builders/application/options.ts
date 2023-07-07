@@ -61,6 +61,7 @@ export type ApplicationBuilderInternalOptions = Omit<
  * @param options An object containing the options to use for the build.
  * @returns An object containing normalized options required to perform the build.
  */
+// eslint-disable-next-line max-lines-per-function
 export async function normalizeOptions(
   context: BuilderContext,
   projectName: string,
@@ -151,7 +152,8 @@ export async function normalizeOptions(
   }
 
   let indexHtmlOptions;
-  if (options.index) {
+  // index can never have a value of `true` but in the schema it's of type `boolean`.
+  if (typeof options.index !== 'boolean') {
     indexHtmlOptions = {
       input: path.join(workspaceRoot, getIndexInputFile(options.index)),
       // The output file will be created within the configured output path
@@ -169,6 +171,28 @@ export async function normalizeOptions(
     serverEntryPoint = path.join(workspaceRoot, options.server);
   } else if (options.server === '') {
     throw new Error('`server` option cannot be an empty string.');
+  }
+
+  let prerenderOptions;
+  if (options.prerender) {
+    const {
+      discoverRoutes = true,
+      routes = [],
+      routesFile = undefined,
+    } = options.prerender === true ? {} : options.prerender;
+
+    prerenderOptions = {
+      discoverRoutes,
+      routes,
+      routesFile: routesFile && path.join(workspaceRoot, routesFile),
+    };
+  }
+
+  let appShellOptions;
+  if (options.appShell) {
+    appShellOptions = {
+      route: 'shell',
+    };
   }
 
   // Initial options to keep
@@ -217,6 +241,8 @@ export async function normalizeOptions(
     stylePreprocessorOptions,
     subresourceIntegrity,
     serverEntryPoint,
+    prerenderOptions,
+    appShellOptions,
     verbose,
     watch,
     workspaceRoot,
@@ -232,7 +258,8 @@ export async function normalizeOptions(
     fileReplacements,
     globalStyles,
     globalScripts,
-    serviceWorker,
+    serviceWorker:
+      typeof serviceWorker === 'string' ? path.join(workspaceRoot, serviceWorker) : undefined,
     indexHtmlOptions,
     tailwindConfiguration,
   };

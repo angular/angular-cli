@@ -146,9 +146,13 @@ export function createServerCodeBundleOptions(
       createVirtualModulePlugin({
         namespace,
         loadContent: () => {
+          const mainServerEntryPoint = path
+            .relative(workspaceRoot, serverEntryPoint)
+            .replace(/\\/g, '/');
           const importAndExportDec: string[] = [
             `import '@angular/platform-server/init';`,
-            `import './${path.relative(workspaceRoot, serverEntryPoint).replace(/\\/g, '/')}';`,
+            `import moduleOrBootstrapFn from './${mainServerEntryPoint}';`,
+            `export default moduleOrBootstrapFn;`,
             `export { renderApplication, renderModule, ɵSERVER_CONTEXT } from '@angular/platform-server';`,
           ];
 

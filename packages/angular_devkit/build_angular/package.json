@@ -34,6 +34,7 @@
     "css-loader": "6.8.1",
     "esbuild-wasm": "0.18.10",
     "fast-glob": "3.2.12",
+    "guess-parser": "0.4.22",
     "https-proxy-agent": "5.0.1",
     "inquirer": "8.2.4",
     "jsonc-parser": "3.2.0",
