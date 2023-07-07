@@ -9,18 +9,21 @@
 import assert from 'node:assert';
 import path from 'node:path';
 import { NormalizedApplicationBuildOptions } from '../../builders/application/options';
-import {
-  IndexHtmlGenerator,
-  IndexHtmlTransformResult,
-} from '../../utils/index-file/index-html-generator';
+import { IndexHtmlGenerator } from '../../utils/index-file/index-html-generator';
+import { InlineCriticalCssProcessor } from '../../utils/index-file/inline-critical-css';
 import { InitialFileRecord } from './bundler-context';
 import type { ExecutionResult } from './bundler-execution-result';
 
-export function generateIndexHtml(
+export async function generateIndexHtml(
   initialFiles: Map<string, InitialFileRecord>,
   executionResult: ExecutionResult,
   buildOptions: NormalizedApplicationBuildOptions,
-): Promise<IndexHtmlTransformResult> {
+): Promise<{
+  content: string;
+  contentWithoutCriticalCssInlined: string;
+  warnings: string[];
+  errors: string[];
+}> {
   // Analyze metafile for initial link-based hints.
   // Skip if the internal externalPackages option is enabled since this option requires
   // dev server cooperation to properly resolve and fetch imports.
@@ -52,18 +55,9 @@ export function generateIndexHtml(
     }
   }
 
-  // Create an index HTML generator that reads from the in-memory output files
-  const indexHtmlGenerator = new IndexHtmlGenerator({
-    indexPath: indexHtmlOptions.input,
-    entrypoints: indexHtmlOptions.insertionOrder,
-    sri: subresourceIntegrity,
-    optimization: optimizationOptions,
-    crossOrigin: crossOrigin,
-  });
-
   /** Virtual output path to support reading in-memory files. */
   const virtualOutputPath = '/';
-  indexHtmlGenerator.readAsset = async function (filePath: string): Promise<string> {
+  const readAsset = async function (filePath: string): Promise<string> {
     // Remove leading directory separator
     const relativefilePath = path.relative(virtualOutputPath, filePath);
     const file = executionResult.outputFiles.find((file) => file.path === relativefilePath);
@@ -71,10 +65,27 @@ export function generateIndexHtml(
       return file.text;
     }
 
-    throw new Error(`Output file does not exist: ${path}`);
+    throw new Error(`Output file does not exist: ${relativefilePath}`);
   };
 
-  return indexHtmlGenerator.process({
+  // Create an index HTML generator that reads from the in-memory output files
+  const indexHtmlGenerator = new IndexHtmlGenerator({
+    indexPath: indexHtmlOptions.input,
+    entrypoints: indexHtmlOptions.insertionOrder,
+    sri: subresourceIntegrity,
+    optimization: {
+      ...optimizationOptions,
+      styles: {
+        ...optimizationOptions.styles,
+        inlineCritical: false, // Disable critical css inline as for SSR and SSG this will be done during rendering.
+      },
+    },
+    crossOrigin: crossOrigin,
+  });
+
+  indexHtmlGenerator.readAsset = readAsset;
+
+  const transformResult = await indexHtmlGenerator.process({
     baseHref,
     lang: undefined,
     outputPath: virtualOutputPath,
@@ -85,4 +96,31 @@ export function generateIndexHtml(
     })),
     hints,
   });
+
+  const contentWithoutCriticalCssInlined = transformResult.content;
+  if (!optimizationOptions.styles.inlineCritical) {
+    return {
+      ...transformResult,
+      contentWithoutCriticalCssInlined,
+    };
+  }
+
+  const inlineCriticalCssProcessor = new InlineCriticalCssProcessor({
+    minify: false, // CSS has already been minified during the build.
+    readAsset,
+  });
+
+  const { content, errors, warnings } = await inlineCriticalCssProcessor.process(
+    contentWithoutCriticalCssInlined,
+    {
+      outputPath: virtualOutputPath,
+    },
+  );
+
+  return {
+    errors: [...transformResult.errors, ...errors],
+    warnings: [...transformResult.warnings, ...warnings],
+    content,
+    contentWithoutCriticalCssInlined,
+  };
 }

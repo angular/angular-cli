@@ -78,7 +78,7 @@ async function render({ serverBundlePath, document, url }: RenderRequest): Promi
   ];
 
   // Render platform server module
-  if (bootstrapAppFn) {
+  if (isBootstrapFn(bootstrapAppFn)) {
     assert(renderApplication, `renderApplication was not exported from: ${serverBundlePath}.`);
 
     return renderApplication(bootstrapAppFn, {
@@ -99,6 +99,11 @@ async function render({ serverBundlePath, document, url }: RenderRequest): Promi
     url,
     extraProviders: platformProviders,
   });
+}
+
+function isBootstrapFn(value: unknown): value is () => Promise<ApplicationRef> {
+  // We can differentiate between a module and a bootstrap function by reading `cmp`:
+  return typeof value === 'function' && !('ɵmod' in value);
 }
 
 /**

@@ -58,7 +58,7 @@ nodejs_register_toolchains(
 
 nodejs_register_toolchains(
     name = "node18",
-    node_version = "18.10.0",
+    node_version = "18.13.0",
 )
 
 # Set the default nodejs toolchain to the latest supported major version

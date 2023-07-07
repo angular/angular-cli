@@ -400,6 +400,7 @@
         },
         {
           "const": false,
+          "type": "boolean",
           "description": "Does not generate an `index.html` file."
         }
       ]

@@ -7,6 +7,7 @@
  */
 
 import { BuilderContext } from '@angular-devkit/architect';
+import assert from 'node:assert';
 import { SourceFileCache } from '../../tools/esbuild/angular/compiler-plugin';
 import {
   createBrowserCodeBundleOptions,
@@ -26,10 +27,13 @@ import {
   transformSupportedBrowsersToTargets,
 } from '../../tools/esbuild/utils';
 import { copyAssets } from '../../utils/copy-assets';
+import { maxWorkers } from '../../utils/environment-options';
 import { augmentAppWithServiceWorkerEsbuild } from '../../utils/service-worker';
+import { prerenderPages } from '../../utils/ssg/render';
 import { getSupportedBrowsers } from '../../utils/supported-browsers';
 import { NormalizedApplicationBuildOptions } from './options';
 
+// eslint-disable-next-line max-lines-per-function
 export async function executeBuild(
   options: NormalizedApplicationBuildOptions,
   context: BuilderContext,
@@ -46,6 +50,8 @@ export async function executeBuild(
     assets,
     indexHtmlOptions,
     cacheOptions,
+    prerenderOptions,
+    appShellOptions,
   } = options;
 
   const browsers = getSupportedBrowsers(projectRoot, context.logger);
@@ -138,21 +144,58 @@ export async function executeBuild(
     await logMessages(context, { warnings: messages });
   }
 
+  /**
+   * Index HTML content without CSS inlining to be used for server rendering (AppShell, SSG and SSR).
+   *
+   * NOTE: we don't perform critical CSS inlining as this will be done during server rendering.
+   */
+  let indexContentOutputNoCssInlining: string | undefined;
+
   // Generate index HTML file
   if (indexHtmlOptions) {
-    const { errors, warnings, content } = await generateIndexHtml(
+    const { content, contentWithoutCriticalCssInlined, errors, warnings } = await generateIndexHtml(
       initialFiles,
       executionResult,
-      options,
+      {
+        ...options,
+        optimizationOptions,
+      },
     );
-    for (const error of errors) {
-      context.logger.error(error);
-    }
-    for (const warning of warnings) {
-      context.logger.warn(warning);
-    }
+
+    indexContentOutputNoCssInlining = contentWithoutCriticalCssInlined;
+    printWarningsAndErrorsToConsole(context, warnings, errors);
 
     executionResult.addOutputFile(indexHtmlOptions.output, content);
+
+    if (serverEntryPoint) {
+      // TODO only add the below file when SSR is enabled.
+      executionResult.addOutputFile('index.server.html', contentWithoutCriticalCssInlined);
+    }
+  }
+
+  // Pre-render (SSG) and App-shell
+  if (prerenderOptions || appShellOptions) {
+    assert(
+      indexContentOutputNoCssInlining,
+      'The "index" option is required when using the "ssg" or "appShell" options.',
+    );
+
+    const { output, warnings, errors } = await prerenderPages(
+      workspaceRoot,
+      options.tsconfig,
+      appShellOptions,
+      prerenderOptions,
+      executionResult.outputFiles,
+      indexContentOutputNoCssInlining,
+      optimizationOptions.styles.inlineCritical,
+      maxWorkers,
+    );
+
+    printWarningsAndErrorsToConsole(context, warnings, errors);
+
+    for (const [path, content] of Object.entries(output)) {
+      executionResult.addOutputFile(path, content);
+    }
   }
 
   // Copy assets
@@ -205,4 +248,17 @@ export async function executeBuild(
   context.logger.info(`Application bundle generation complete. [${buildTime.toFixed(3)} seconds]`);
 
   return executionResult;
+}
+
+function printWarningsAndErrorsToConsole(
+  context: BuilderContext,
+  warnings: string[],
+  errors: string[],
+): void {
+  for (const error of errors) {
+    context.logger.error(error);
+  }
+  for (const warning of warnings) {
+    context.logger.warn(warning);
+  }
 }

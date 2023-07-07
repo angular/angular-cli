@@ -349,6 +349,7 @@
         },
         {
           "const": false,
+          "type": "boolean",
           "description": "Does not generate a service worker configuration."
         }
       ]
@@ -380,6 +381,7 @@
         },
         {
           "const": false,
+          "type": "boolean",
           "description": "Does not generate an `index.html` file."
         }
       ]
@@ -414,6 +416,46 @@
         "type": "string"
       },
       "default": []
+    },
+    "prerender": {
+      "description": "Prerender (SSG) pages of your application during build time.",
+      "default": false,
+      "oneOf": [
+        {
+          "type": "boolean",
+          "description": "Enable prerending of pages of your application during build time."
+        },
+        {
+          "type": "object",
+          "properties": {
+            "routesFile": {
+              "type": "string",
+              "description": "The path to a file containing routes separated by newlines."
+            },
+            "routes": {
+              "type": "array",
+              "description": "The routes to render.",
+              "items": {
+                "minItems": 1,
+                "type": "string",
+                "uniqueItems": true
+              },
+              "default": []
+            },
+            "discoverRoutes": {
+              "type": "boolean",
+              "description": "Whether the builder should statically discover routes.",
+              "default": true
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "appShell": {
+      "type": "boolean",
+      "description": "Generates an application shell during build time.",
+      "default": false
     }
   },
   "additionalProperties": false,

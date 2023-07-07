@@ -65,7 +65,7 @@ export default createBuilder(
       polyfills: options.polyfills ?? ['zone.js', 'zone.js/testing'],
       outputPath: testOut,
       aot: false,
-      index: null,
+      index: false,
       outputHashing: OutputHashing.None,
       outExtension: 'mjs', // Force native ESM.
       optimization: false,
