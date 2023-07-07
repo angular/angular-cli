@@ -1,13 +1,13 @@
-import { waitForAnyProcessOutputToMatch, silentNg } from '../../utils/process';
-import { writeFile, writeMultipleFiles } from '../../utils/fs';
 import fetch from 'node-fetch';
-import { ngServe } from '../../utils/project';
 import { getGlobalVariable } from '../../utils/env';
+import { writeFile, writeMultipleFiles } from '../../utils/fs';
+import { silentNg, waitForAnyProcessOutputToMatch } from '../../utils/process';
+import { ngServe } from '../../utils/project';
 
 export default async function () {
   const esbuild = getGlobalVariable('argv')['esbuild'];
   const validBundleRegEx = esbuild ? /complete\./ : /Compiled successfully\./;
-  const lazyBundleRegEx = esbuild ? /lazy\.module/ : /lazy_module_ts\.js/;
+  const lazyBundleRegEx = esbuild ? /chunk-/ : /lazy_module_ts\.js/;
 
   const port = await ngServe();
   // Add a lazy module.
@@ -17,6 +17,7 @@ export default async function () {
   // We need to use Promise.all to ensure we are waiting for the rebuild just before we write
   // the file, otherwise rebuilds can be too fast and fail CI.
   // Count the bundles.
+  // Verify that a new chunk was created.
   await Promise.all([
     waitForAnyProcessOutputToMatch(lazyBundleRegEx),
     writeFile(
