@@ -52,6 +52,7 @@ export async function executeBuild(
     cacheOptions,
     prerenderOptions,
     appShellOptions,
+    ssrOptions,
   } = options;
 
   const browsers = getSupportedBrowsers(projectRoot, context.logger);
@@ -167,8 +168,7 @@ export async function executeBuild(
 
     executionResult.addOutputFile(indexHtmlOptions.output, content);
 
-    if (serverEntryPoint) {
-      // TODO only add the below file when SSR is enabled.
+    if (ssrOptions) {
       executionResult.addOutputFile('index.server.html', contentWithoutCriticalCssInlined);
     }
   }

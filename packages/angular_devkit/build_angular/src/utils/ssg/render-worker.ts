@@ -63,7 +63,7 @@ async function render({ route, serverContext }: RenderOptions): Promise<RenderRe
     ɵSERVER_CONTEXT,
     renderModule,
     renderApplication,
-  } = await loadEsmModule<BundleExports>('./server.mjs');
+  } = await loadEsmModule<BundleExports>('./main.server.mjs');
 
   assert(ɵSERVER_CONTEXT, `ɵSERVER_CONTEXT was not exported.`);
 

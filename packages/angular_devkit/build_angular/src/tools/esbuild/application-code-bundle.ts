@@ -97,7 +97,7 @@ export function createServerCodeBundleOptions(
   target: string[],
   sourceFileCache: SourceFileCache,
 ): BuildOptions {
-  const { jit, serverEntryPoint, workspaceRoot } = options;
+  const { jit, serverEntryPoint, workspaceRoot, ssrOptions } = options;
 
   assert(
     serverEntryPoint,
@@ -110,7 +110,15 @@ export function createServerCodeBundleOptions(
     sourceFileCache,
   );
 
-  const namespace = 'angular:server-entry';
+  const namespace = 'angular:main-server';
+  const entryPoints: Record<string, string> = {
+    'main.server': namespace,
+  };
+
+  const ssrEntryPoint = ssrOptions?.entry;
+  if (ssrEntryPoint) {
+    entryPoints['server'] = ssrEntryPoint;
+  }
 
   const buildOptions: BuildOptions = {
     ...getEsBuildCommonOptions(options),
@@ -131,9 +139,7 @@ export function createServerCodeBundleOptions(
         `globalThis['require'] ??= createRequire(import.meta.url);`,
       ].join('\n'),
     },
-    entryPoints: {
-      'server': namespace,
-    },
+    entryPoints,
     supported: getFeatureSupport(target),
     plugins: [
       createSourcemapIngorelistPlugin(),
@@ -143,30 +149,6 @@ export function createServerCodeBundleOptions(
         // Component stylesheet options
         styleOptions,
       ),
-      createVirtualModulePlugin({
-        namespace,
-        loadContent: () => {
-          const mainServerEntryPoint = path
-            .relative(workspaceRoot, serverEntryPoint)
-            .replace(/\\/g, '/');
-          const importAndExportDec: string[] = [
-            `import '@angular/platform-server/init';`,
-            `import moduleOrBootstrapFn from './${mainServerEntryPoint}';`,
-            `export default moduleOrBootstrapFn;`,
-            `export { renderApplication, renderModule, ɵSERVER_CONTEXT } from '@angular/platform-server';`,
-          ];
-
-          if (jit) {
-            importAndExportDec.unshift(`import '@angular/compiler';`);
-          }
-
-          return {
-            contents: importAndExportDec.join('\n'),
-            loader: 'js',
-            resolveDir: workspaceRoot,
-          };
-        },
-      }),
     ],
   };
 
@@ -176,6 +158,33 @@ export function createServerCodeBundleOptions(
   } else {
     buildOptions.plugins.push(createRxjsEsmResolutionPlugin());
   }
+
+  buildOptions.plugins.push(
+    createVirtualModulePlugin({
+      namespace,
+      loadContent: () => {
+        const mainServerEntryPoint = path
+          .relative(workspaceRoot, serverEntryPoint)
+          .replace(/\\/g, '/');
+        const importAndExportDec: string[] = [
+          `import '@angular/platform-server/init';`,
+          `import moduleOrBootstrapFn from './${mainServerEntryPoint}';`,
+          `export default moduleOrBootstrapFn;`,
+          `export { renderApplication, renderModule, ɵSERVER_CONTEXT } from '@angular/platform-server';`,
+        ];
+
+        if (jit) {
+          importAndExportDec.unshift(`import '@angular/compiler';`);
+        }
+
+        return {
+          contents: importAndExportDec.join('\n'),
+          loader: 'js',
+          resolveDir: workspaceRoot,
+        };
+      },
+    }),
+  );
 
   return buildOptions;
 }
