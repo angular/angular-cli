@@ -106,6 +106,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       harness.useTarget('build', {
         ...BASE_OPTIONS,
         server: 'src/main.server.ts',
+        polyfills: ['zone.js'],
         appShell: true,
       });
 
@@ -122,6 +123,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       harness.useTarget('build', {
         ...BASE_OPTIONS,
         server: 'src/main.server.ts',
+        polyfills: ['zone.js'],
         appShell: true,
         styles: ['src/styles.css'],
         optimization: {
@@ -150,6 +152,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       harness.useTarget('build', {
         ...BASE_OPTIONS,
         server: 'src/main.server.ts',
+        polyfills: ['zone.js'],
         appShell: true,
         styles: ['src/styles.css'],
         optimization: {

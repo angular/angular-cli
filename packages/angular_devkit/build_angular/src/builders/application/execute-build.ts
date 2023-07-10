@@ -28,8 +28,8 @@ import {
 } from '../../tools/esbuild/utils';
 import { copyAssets } from '../../utils/copy-assets';
 import { maxWorkers } from '../../utils/environment-options';
+import { prerenderPages } from '../../utils/server-rendering/prerender';
 import { augmentAppWithServiceWorkerEsbuild } from '../../utils/service-worker';
-import { prerenderPages } from '../../utils/ssg/render';
 import { getSupportedBrowsers } from '../../utils/supported-browsers';
 import { NormalizedApplicationBuildOptions } from './options';
 
@@ -181,7 +181,6 @@ export async function executeBuild(
     );
 
     const { output, warnings, errors } = await prerenderPages(
-      workspaceRoot,
       options.tsconfig,
       appShellOptions,
       prerenderOptions,

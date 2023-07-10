@@ -177,6 +177,10 @@ export function createServerCodeBundleOptions(
           importAndExportDec.unshift(`import '@angular/compiler';`);
         }
 
+        if (options.polyfills?.includes('zone.js')) {
+          importAndExportDec.unshift(`import 'zone.js/node';`);
+        }
+
         return {
           contents: importAndExportDec.join('\n'),
           loader: 'js',
