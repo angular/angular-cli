@@ -9,7 +9,11 @@
 import { custom } from 'babel-loader';
 import { loadEsmModule } from '../../utils/load-esm';
 import { VERSION } from '../../utils/package-version';
-import { ApplicationPresetOptions, I18nPluginCreators } from './presets/application';
+import {
+  ApplicationPresetOptions,
+  I18nPluginCreators,
+  requiresLinking,
+} from './presets/application';
 
 interface AngularCustomOptions extends Omit<ApplicationPresetOptions, 'instrumentCode'> {
   instrumentCode?: {
@@ -22,11 +26,6 @@ interface AngularCustomOptions extends Omit<ApplicationPresetOptions, 'instrumen
 export type AngularBabelLoaderOptions = AngularCustomOptions & Record<string, unknown>;
 
 /**
- * Cached instance of the compiler-cli linker's needsLinking function.
- */
-let needsLinking: typeof import('@angular/compiler-cli/linker').needsLinking | undefined;
-
-/**
  * Cached instance of the compiler-cli linker's Babel plugin factory function.
  */
 let linkerPluginCreator:
@@ -37,26 +36,6 @@ let linkerPluginCreator:
  * Cached instance of the localize Babel plugins factory functions.
  */
 let i18nPluginCreators: I18nPluginCreators | undefined;
-
-export async function requiresLinking(path: string, source: string): Promise<boolean> {
-  // @angular/core and @angular/compiler will cause false positives
-  // Also, TypeScript files do not require linking
-  if (/[\\/]@angular[\\/](?:compiler|core)|\.tsx?$/.test(path)) {
-    return false;
-  }
-
-  if (!needsLinking) {
-    // Load ESM `@angular/compiler-cli/linker` using the TypeScript dynamic import workaround.
-    // Once TypeScript provides support for keeping the dynamic import this workaround can be
-    // changed to a direct dynamic import.
-    const linkerModule = await loadEsmModule<typeof import('@angular/compiler-cli/linker')>(
-      '@angular/compiler-cli/linker',
-    );
-    needsLinking = linkerModule.needsLinking;
-  }
-
-  return needsLinking(path, source);
-}
 
 // eslint-disable-next-line max-lines-per-function
 export default custom<ApplicationPresetOptions>(() => {

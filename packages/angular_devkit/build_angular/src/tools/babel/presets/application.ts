@@ -17,6 +17,12 @@ import { strict as assert } from 'assert';
 import browserslist from 'browserslist';
 import * as fs from 'fs';
 import * as path from 'path';
+import { loadEsmModule } from '../../../utils/load-esm';
+
+/**
+ * Cached instance of the compiler-cli linker's needsLinking function.
+ */
+let needsLinking: typeof import('@angular/compiler-cli/linker').needsLinking | undefined;
 
 /**
  * List of browsers which are affected by a WebKit bug where class field
@@ -275,4 +281,24 @@ export default function (api: unknown, options: ApplicationPresetOptions) {
   }
 
   return { presets, plugins };
+}
+
+export async function requiresLinking(path: string, source: string): Promise<boolean> {
+  // @angular/core and @angular/compiler will cause false positives
+  // Also, TypeScript files do not require linking
+  if (/[\\/]@angular[\\/](?:compiler|core)|\.tsx?$/.test(path)) {
+    return false;
+  }
+
+  if (!needsLinking) {
+    // Load ESM `@angular/compiler-cli/linker` using the TypeScript dynamic import workaround.
+    // Once TypeScript provides support for keeping the dynamic import this workaround can be
+    // changed to a direct dynamic import.
+    const linkerModule = await loadEsmModule<typeof import('@angular/compiler-cli/linker')>(
+      '@angular/compiler-cli/linker',
+    );
+    needsLinking = linkerModule.needsLinking;
+  }
+
+  return needsLinking(path, source);
 }
