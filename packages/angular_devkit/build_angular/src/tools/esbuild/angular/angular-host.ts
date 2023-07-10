@@ -77,7 +77,15 @@ export function createAngularCompilerHost(
 
   // Augment TypeScript Host for file replacements option
   if (hostOptions.fileReplacements) {
-    augmentHostWithReplacements(host, hostOptions.fileReplacements);
+    // Provide a resolution cache since overriding resolution prevents automatic creation
+    const resolutionCache = ts.createModuleResolutionCache(
+      host.getCurrentDirectory(),
+      host.getCanonicalFileName.bind(host),
+      compilerOptions,
+    );
+    host.getModuleResolutionCache = () => resolutionCache;
+
+    augmentHostWithReplacements(host, hostOptions.fileReplacements, resolutionCache);
   }
 
   // Augment TypeScript Host with source file caching if provided
