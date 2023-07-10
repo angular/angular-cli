@@ -13,10 +13,9 @@ import type {
   makeEs2015TranslatePlugin,
   makeLocalePlugin,
 } from '@angular/localize/tools';
-import { strict as assert } from 'assert';
-import browserslist from 'browserslist';
-import * as fs from 'fs';
-import * as path from 'path';
+import assert from 'node:assert';
+import fs from 'node:fs';
+import path from 'node:path';
 import { loadEsmModule } from '../../../utils/load-esm';
 
 /**
@@ -31,14 +30,7 @@ let needsLinking: typeof import('@angular/compiler-cli/linker').needsLinking | u
  * See: https://github.com/angular/angular-cli/issues/24355#issuecomment-1333477033
  * See: https://github.com/WebKit/WebKit/commit/e8788a34b3d5f5b4edd7ff6450b80936bff396f2
  */
-const safariClassFieldScopeBugBrowsers = new Set(
-  browserslist([
-    // Safari <15 is technically not supported via https://angular.io/guide/browser-support,
-    // but we apply the workaround if forcibly selected.
-    'Safari <=15',
-    'iOS <=15',
-  ]),
-);
+let safariClassFieldScopeBugBrowsers: ReadonlySet<string>;
 
 export type DiagnosticReporter = (type: 'error' | 'warning' | 'info', message: string) => void;
 
@@ -197,6 +189,18 @@ export default function (api: unknown, options: ApplicationPresetOptions) {
   // based on the supported browsers in browserslist.
   if (options.supportedBrowsers) {
     const includePlugins: string[] = [];
+
+    if (safariClassFieldScopeBugBrowsers === undefined) {
+      const browserslist = require('browserslist');
+      safariClassFieldScopeBugBrowsers = new Set(
+        browserslist([
+          // Safari <15 is technically not supported via https://angular.io/guide/browser-support,
+          // but we apply the workaround if forcibly selected.
+          'Safari <=15',
+          'iOS <=15',
+        ]),
+      );
+    }
 
     // If a Safari browser affected by the class field scope bug is selected, we
     // downlevel class properties by ensuring the class properties Babel plugin
