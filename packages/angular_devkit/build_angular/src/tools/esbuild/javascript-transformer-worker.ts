@@ -8,8 +8,7 @@
 
 import { transformAsync } from '@babel/core';
 import { readFile } from 'node:fs/promises';
-import angularApplicationPreset from '../../tools/babel/presets/application';
-import { requiresLinking } from '../../tools/babel/webpack-loader';
+import angularApplicationPreset, { requiresLinking } from '../../tools/babel/presets/application';
 import { loadEsmModule } from '../../utils/load-esm';
 
 interface JavaScriptTransformRequest {
