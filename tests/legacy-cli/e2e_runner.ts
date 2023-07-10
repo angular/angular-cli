@@ -375,14 +375,17 @@ async function findPackageTars(): Promise<{ [pkg: string]: PkgInfo }> {
       }),
   );
 
-  return pkgs.reduce((all, pkg, i) => {
-    const json = pkgJsons[i].toString('utf8');
-    const { name, version } = JSON.parse(json);
-    if (!name) {
-      throw new Error(`Package ${pkg} - package.json name/version not found`);
-    }
+  return pkgs.reduce(
+    (all, pkg, i) => {
+      const json = pkgJsons[i].toString('utf8');
+      const { name, version } = JSON.parse(json);
+      if (!name) {
+        throw new Error(`Package ${pkg} - package.json name/version not found`);
+      }
 
-    all[name] = { path: realpathSync(pkg), name, version };
-    return all;
-  }, {} as { [pkg: string]: PkgInfo });
+      all[name] = { path: realpathSync(pkg), name, version };
+      return all;
+    },
+    {} as { [pkg: string]: PkgInfo },
+  );
 }

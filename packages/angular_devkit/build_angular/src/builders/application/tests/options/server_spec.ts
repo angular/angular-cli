@@ -30,7 +30,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       const { result } = await harness.executeOnce();
       expect(result?.success).toBeTrue();
 
-      harness.expectFile('dist/server.mjs').toExist();
+      harness.expectFile('dist/main.server.mjs').toExist();
       harness.expectFile('dist/main.js').toExist();
     });
 
@@ -45,7 +45,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       const { result } = await harness.executeOnce();
       expect(result?.success).toBeTrue();
 
-      harness.expectFile('dist/server.mjs').toExist();
+      harness.expectFile('dist/main.server.mjs').toExist();
     });
 
     it('fails and shows an error when file does not exist', async () => {
@@ -62,7 +62,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       );
 
       harness.expectFile('dist/main.js').toNotExist();
-      harness.expectFile('dist/server.mjs').toNotExist();
+      harness.expectFile('dist/main.server.mjs').toNotExist();
     });
 
     it('throws an error when given an empty string', async () => {
@@ -88,8 +88,8 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       const { result } = await harness.executeOnce();
       expect(result?.success).toBeTrue();
 
-      // Always uses the name `server.mjs` for the `server` option.
-      harness.expectFile('dist/server.mjs').toExist();
+      // Always uses the name `main.server.mjs` for the `server` option.
+      harness.expectFile('dist/main.server.mjs').toExist();
     });
   });
 });

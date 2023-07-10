@@ -186,6 +186,17 @@ export async function normalizeOptions(
     };
   }
 
+  let ssrOptions;
+  if (options.ssr === true) {
+    ssrOptions = {};
+  } else if (typeof options.ssr === 'object') {
+    const { entry } = options.ssr;
+
+    ssrOptions = {
+      entry: entry && path.join(workspaceRoot, entry),
+    };
+  }
+
   let appShellOptions;
   if (options.appShell) {
     appShellOptions = {
@@ -241,6 +252,7 @@ export async function normalizeOptions(
     serverEntryPoint,
     prerenderOptions,
     appShellOptions,
+    ssrOptions,
     verbose,
     watch,
     workspaceRoot,
