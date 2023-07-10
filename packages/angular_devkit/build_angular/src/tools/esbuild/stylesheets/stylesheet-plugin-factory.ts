@@ -29,6 +29,10 @@ export interface StylesheetPluginOptions {
    */
   sourcemap: boolean;
 
+  /**
+   * An optional array of paths that will be searched for stylesheets if the default
+   * resolution process for the stylesheet language does not succeed.
+   */
   includePaths?: string[];
 
   /**
@@ -37,8 +41,20 @@ export interface StylesheetPluginOptions {
    */
   inlineComponentData?: Record<string, string>;
 
+  /**
+   * Optional information used to load and configure Tailwind CSS. If present, the postcss
+   * will be added to the stylesheet processing with the Tailwind plugin setup as provided
+   * by the configuration file.
+   */
   tailwindConfiguration?: { file: string; package: string };
 }
+
+/**
+ * An array of keywords that indicate Tailwind CSS processing is required for a stylesheet.
+ *
+ * Based on https://tailwindcss.com/docs/functions-and-directives
+ */
+const TAILWIND_KEYWORDS = ['@tailwind', '@layer', '@apply', '@config', 'theme(', 'screen('];
 
 export interface StylesheetLanguage {
   name: string;
@@ -54,6 +70,8 @@ export interface StylesheetLanguage {
 }
 
 export class StylesheetPluginFactory {
+  private postcssProcessor?: import('postcss').Processor;
+
   constructor(
     private readonly options: StylesheetPluginOptions,
     private readonly cache?: LoadResultCache,
@@ -69,21 +87,28 @@ export class StylesheetPluginFactory {
     }
 
     const { cache, options } = this;
+    const setupPostcss = async () => {
+      // Return already created processor if present
+      if (this.postcssProcessor) {
+        return this.postcssProcessor;
+      }
+
+      if (options.tailwindConfiguration) {
+        postcss ??= (await import('postcss')).default;
+        const tailwind = await import(options.tailwindConfiguration.package);
+        this.postcssProcessor = postcss().use(
+          tailwind.default({ config: options.tailwindConfiguration.file }),
+        );
+      }
+
+      return this.postcssProcessor;
+    };
 
     return {
       name: 'angular-' + language.name,
       async setup(build) {
-        // Setup postcss if needed by tailwind
-        // TODO: Move this into the plugin factory to avoid repeat setup per created plugin
-        let postcssProcessor: import('postcss').Processor | undefined;
-        if (options.tailwindConfiguration) {
-          postcss ??= (await import('postcss')).default;
-          postcssProcessor = postcss();
-          if (options.tailwindConfiguration) {
-            const tailwind = await import(options.tailwindConfiguration.package);
-            postcssProcessor.use(tailwind.default({ config: options.tailwindConfiguration.file }));
-          }
-        }
+        // Setup postcss if needed
+        const postcssProcessor = await setupPostcss();
 
         // Add a load callback to support inline Component styles
         build.onLoad(
@@ -96,6 +121,12 @@ export class StylesheetPluginFactory {
             );
 
             const [format, , filename] = args.path.split(';', 3);
+            // Only use postcss if Tailwind processing is required.
+            // NOTE: If postcss is used for more than just Tailwind in the future this check MUST
+            // be updated to account for the additional use.
+            // TODO: use better search algorithm for keywords
+            const needsPostcss =
+              !!postcssProcessor && TAILWIND_KEYWORDS.some((keyword) => data.includes(keyword));
 
             return processStylesheet(
               language,
@@ -104,7 +135,7 @@ export class StylesheetPluginFactory {
               format,
               options,
               build,
-              postcssProcessor,
+              needsPostcss ? postcssProcessor : undefined,
             );
           }),
         );
@@ -114,6 +145,8 @@ export class StylesheetPluginFactory {
           { filter: language.fileFilter },
           createCachedLoad(cache, async (args) => {
             const data = await readFile(args.path, 'utf-8');
+            const needsPostcss =
+              !!postcssProcessor && TAILWIND_KEYWORDS.some((keyword) => data.includes(keyword));
 
             return processStylesheet(
               language,
@@ -122,7 +155,7 @@ export class StylesheetPluginFactory {
               extname(args.path).toLowerCase().slice(1),
               options,
               build,
-              postcssProcessor,
+              needsPostcss ? postcssProcessor : undefined,
             );
           }),
         );
