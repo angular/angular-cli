@@ -10,9 +10,10 @@ import { OutputFile } from 'esbuild';
 import { readFile } from 'node:fs/promises';
 import { extname, posix } from 'node:path';
 import Piscina from 'piscina';
-import type { RenderResult, ServerContext, WorkerData } from './render-worker';
+import type { RenderResult, ServerContext } from './render-page';
+import type { WorkerData } from './render-worker';
 
-interface prerenderOptions {
+interface PrerenderOptions {
   routesFile?: string;
   discoverRoutes?: boolean;
   routes?: string[];
@@ -23,10 +24,9 @@ interface AppShellOptions {
 }
 
 export async function prerenderPages(
-  workspaceRoot: string,
   tsConfigPath: string,
   appShellOptions: AppShellOptions = {},
-  prerenderOptions: prerenderOptions = {},
+  prerenderOptions: PrerenderOptions = {},
   outputFiles: Readonly<OutputFile[]>,
   document: string,
   inlineCriticalCss?: boolean,
@@ -52,7 +52,6 @@ export async function prerenderPages(
     filename: require.resolve('./render-worker'),
     maxThreads: Math.min(allRoutes.size, maxThreads),
     workerData: {
-      zonePackage: require.resolve('zone.js', { paths: [workspaceRoot] }),
       outputFiles: outputFilesForWorker,
       inlineCriticalCss,
       document,
@@ -109,7 +108,7 @@ export async function prerenderPages(
 async function getAllRoutes(
   tsConfigPath: string,
   appShellOptions: AppShellOptions,
-  prerenderOptions: prerenderOptions,
+  prerenderOptions: PrerenderOptions,
 ): Promise<Set<string>> {
   const { routesFile, discoverRoutes, routes: existingRoutes } = prerenderOptions;
   const routes = new Set(existingRoutes);

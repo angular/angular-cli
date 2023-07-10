@@ -46,6 +46,7 @@ export function execute(
     switchMap(({ builderName, normalizedOptions }) => {
       // Use vite-based development server for esbuild-based builds
       if (
+        builderName === '@angular-devkit/build-angular:application' ||
         builderName === '@angular-devkit/build-angular:browser-esbuild' ||
         normalizedOptions.forceEsbuild
       ) {
