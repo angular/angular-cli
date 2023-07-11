@@ -86,7 +86,7 @@ export async function renderPage({
 
   if (inlineCriticalCss) {
     const inlineCriticalCssProcessor = new InlineCriticalCssProcessor({
-      minify: false,
+      minify: false, // CSS has already been minified during the build.
       readAsset: async (filePath) => {
         filePath = basename(filePath);
         const content = outputFiles[filePath];
