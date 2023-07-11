@@ -13,12 +13,14 @@ import { lookup as lookupMimeType } from 'mrmime';
 import assert from 'node:assert';
 import { BinaryLike, createHash } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
+import { ServerResponse } from 'node:http';
 import type { AddressInfo } from 'node:net';
 import path from 'node:path';
-import { InlineConfig, ViteDevServer, createServer, normalizePath } from 'vite';
+import { Connect, InlineConfig, ViteDevServer, createServer, normalizePath } from 'vite';
 import { JavaScriptTransformer } from '../../tools/esbuild/javascript-transformer';
+import { RenderOptions, renderPage } from '../../utils/server-rendering/render-page';
 import { buildEsbuildBrowser } from '../browser-esbuild';
-import type { Schema as BrowserBuilderOptions } from '../browser-esbuild/schema';
+import { Schema as BrowserBuilderOptions } from '../browser-esbuild/schema';
 import { loadProxyConfiguration } from './load-proxy-config';
 import type { NormalizedDevServerOptions } from './options';
 import type { DevServerBuilderOutput } from './webpack-server';
@@ -107,7 +109,9 @@ export async function* serveWithVite(
         assetFiles,
         browserOptions.preserveSymlinks,
         browserOptions.externalDependencies,
+        !!browserOptions.ssr,
       );
+
       server = await createServer(serverConfiguration);
 
       await server.listen();
@@ -191,6 +195,7 @@ export async function setupServer(
   assets: Map<string, string>,
   preserveSymlinks: boolean | undefined,
   prebundleExclude: string[] | undefined,
+  ssr: boolean,
 ): Promise<InlineConfig> {
   const proxy = await loadProxyConfiguration(
     serverOptions.workspaceRoot,
@@ -226,6 +231,10 @@ export async function setupServer(
       watch: {
         ignored: ['**/*'],
       },
+    },
+    ssr: {
+      // Exclude any provided dependencies (currently build defined externals)
+      external: prebundleExclude,
     },
     plugins: [
       {
@@ -271,14 +280,7 @@ export async function setupServer(
 
             // Parse the incoming request.
             // The base of the URL is unused but required to parse the URL.
-            const parsedUrl = new URL(req.url, 'http://localhost');
-            let pathname = decodeURIComponent(parsedUrl.pathname);
-            if (serverOptions.servePath && pathname.startsWith(serverOptions.servePath)) {
-              pathname = pathname.slice(serverOptions.servePath.length);
-              if (pathname[0] !== '/') {
-                pathname = '/' + pathname;
-              }
-            }
+            const pathname = pathnameWithoutServePath(req.url, serverOptions);
             const extension = path.extname(pathname);
 
             // Rewrite all build assets to a vite raw fs URL
@@ -317,7 +319,63 @@ export async function setupServer(
 
           // Returning a function, installs middleware after the main transform middleware but
           // before the built-in HTML middleware
-          return () =>
+          return () => {
+            function angularSSRMiddleware(
+              req: Connect.IncomingMessage,
+              res: ServerResponse,
+              next: Connect.NextFunction,
+            ) {
+              const url = req.originalUrl;
+              if (!url) {
+                next();
+
+                return;
+              }
+
+              const rawHtml = outputFiles.get('/index.server.html')?.contents;
+              if (!rawHtml) {
+                next();
+
+                return;
+              }
+
+              server
+                .transformIndexHtml(url, Buffer.from(rawHtml).toString('utf-8'))
+                .then(async (html) => {
+                  const { content } = await renderPage({
+                    document: html,
+                    route: pathnameWithoutServePath(url, serverOptions),
+                    serverContext: 'ssr',
+                    loadBundle: (path: string) =>
+                      server.ssrLoadModule(path.slice(1)) as ReturnType<
+                        NonNullable<RenderOptions['loadBundle']>
+                      >,
+                    // Files here are only needed for critical CSS inlining.
+                    outputFiles: {},
+                    // TODO: add support for critical css inlining.
+                    inlineCriticalCss: false,
+                  });
+
+                  if (content) {
+                    res.setHeader('Content-Type', 'text/html');
+                    res.setHeader('Cache-Control', 'no-cache');
+                    if (serverOptions.headers) {
+                      Object.entries(serverOptions.headers).forEach(([name, value]) =>
+                        res.setHeader(name, value),
+                      );
+                    }
+                    res.end(content);
+                  } else {
+                    next();
+                  }
+                })
+                .catch((error) => next(error));
+            }
+
+            if (ssr) {
+              server.middlewares.use(angularSSRMiddleware);
+            }
+
             server.middlewares.use(function angularIndexMiddleware(req, res, next) {
               if (!req.url) {
                 next();
@@ -327,14 +385,8 @@ export async function setupServer(
 
               // Parse the incoming request.
               // The base of the URL is unused but required to parse the URL.
-              const parsedUrl = new URL(req.url, 'http://localhost');
-              let pathname = parsedUrl.pathname;
-              if (serverOptions.servePath && pathname.startsWith(serverOptions.servePath)) {
-                pathname = pathname.slice(serverOptions.servePath.length);
-                if (pathname[0] !== '/') {
-                  pathname = '/' + pathname;
-                }
-              }
+              const pathname = pathnameWithoutServePath(req.url, serverOptions);
+
               if (pathname === '/' || pathname === `/index.html`) {
                 const rawHtml = outputFiles.get('/index.html')?.contents;
                 if (rawHtml) {
@@ -358,6 +410,7 @@ export async function setupServer(
 
               next();
             });
+          };
         },
       },
     ],
@@ -412,4 +465,17 @@ export async function setupServer(
   }
 
   return configuration;
+}
+
+function pathnameWithoutServePath(url: string, serverOptions: NormalizedDevServerOptions): string {
+  const parsedUrl = new URL(url, 'http://localhost');
+  let pathname = decodeURIComponent(parsedUrl.pathname);
+  if (serverOptions.servePath && pathname.startsWith(serverOptions.servePath)) {
+    pathname = pathname.slice(serverOptions.servePath.length);
+    if (pathname[0] !== '/') {
+      pathname = '/' + pathname;
+    }
+  }
+
+  return pathname;
 }
