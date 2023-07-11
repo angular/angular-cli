@@ -13,6 +13,17 @@
       ],
       "snapshotRepo": "angular/cli-builds"
     },
+    "@angular/ssr": {
+      "name": "Angular SSR",
+      "section": "Tooling",
+      "links": [
+        {
+          "label": "README",
+          "url": "/packages/angular/ssr/README.md"
+        }
+      ],
+      "snapshotRepo": "angular/ssr-builds"
+    },
     "@angular/create": {
       "name": "Angular Create",
       "section": "Misc",
