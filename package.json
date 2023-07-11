@@ -116,7 +116,7 @@
     "@types/yargs-parser": "^21.0.0",
     "@types/yarnpkg__lockfile": "^1.1.5",
     "@typescript-eslint/eslint-plugin": "5.61.0",
-    "@typescript-eslint/parser": "5.61.0",
+    "@typescript-eslint/parser": "6.0.0",
     "@vitejs/plugin-basic-ssl": "1.0.1",
     "@yarnpkg/lockfile": "1.1.0",
     "ajv": "8.12.0",
