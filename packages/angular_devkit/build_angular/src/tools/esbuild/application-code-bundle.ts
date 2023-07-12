@@ -110,14 +110,16 @@ export function createServerCodeBundleOptions(
     sourceFileCache,
   );
 
-  const namespace = 'angular:main-server';
+  const mainServerNamespace = 'angular:main-server';
+  const ssrEntryNamespace = 'angular:ssr-entry';
+
   const entryPoints: Record<string, string> = {
-    'main.server': namespace,
+    'main.server': mainServerNamespace,
   };
 
   const ssrEntryPoint = ssrOptions?.entry;
   if (ssrEntryPoint) {
-    entryPoints['server'] = ssrEntryPoint;
+    entryPoints['server'] = ssrEntryNamespace;
   }
 
   const buildOptions: BuildOptions = {
@@ -159,36 +161,61 @@ export function createServerCodeBundleOptions(
     buildOptions.plugins.push(createRxjsEsmResolutionPlugin());
   }
 
+  const polyfills = [`import '@angular/platform-server/init';`];
+
+  if (options.polyfills?.includes('zone.js')) {
+    polyfills.push(`import 'zone.js/node';`);
+  }
+
+  if (jit) {
+    polyfills.push(`import '@angular/compiler';`);
+  }
+
   buildOptions.plugins.push(
     createVirtualModulePlugin({
-      namespace,
+      namespace: mainServerNamespace,
       loadContent: () => {
         const mainServerEntryPoint = path
           .relative(workspaceRoot, serverEntryPoint)
           .replace(/\\/g, '/');
-        const importAndExportDec: string[] = [
-          `import '@angular/platform-server/init';`,
-          `import moduleOrBootstrapFn from './${mainServerEntryPoint}';`,
-          `export default moduleOrBootstrapFn;`,
-          `export { renderApplication, renderModule, ɵSERVER_CONTEXT } from '@angular/platform-server';`,
-        ];
-
-        if (jit) {
-          importAndExportDec.unshift(`import '@angular/compiler';`);
-        }
-
-        if (options.polyfills?.includes('zone.js')) {
-          importAndExportDec.unshift(`import 'zone.js/node';`);
-        }
 
         return {
-          contents: importAndExportDec.join('\n'),
+          contents: [
+            ...polyfills,
+            `import moduleOrBootstrapFn from './${mainServerEntryPoint}';`,
+            `export default moduleOrBootstrapFn;`,
+            `export * from './${mainServerEntryPoint}';`,
+            `export { renderApplication, renderModule, ɵSERVER_CONTEXT } from '@angular/platform-server';`,
+          ].join('\n'),
           loader: 'js',
           resolveDir: workspaceRoot,
         };
       },
     }),
   );
+
+  if (ssrEntryPoint) {
+    buildOptions.plugins.push(
+      createVirtualModulePlugin({
+        namespace: ssrEntryNamespace,
+        loadContent: () => {
+          const mainServerEntryPoint = path
+            .relative(workspaceRoot, ssrEntryPoint)
+            .replace(/\\/g, '/');
+
+          return {
+            contents: [
+              ...polyfills,
+              `import './${mainServerEntryPoint}';`,
+              `export * from './${mainServerEntryPoint}';`,
+            ].join('\n'),
+            loader: 'js',
+            resolveDir: workspaceRoot,
+          };
+        },
+      }),
+    );
+  }
 
   return buildOptions;
 }
