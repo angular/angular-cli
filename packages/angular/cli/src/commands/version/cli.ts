@@ -36,6 +36,7 @@ const PACKAGE_PATTERNS = [
   /^typescript$/,
   /^ng-packagr$/,
   /^webpack$/,
+  /^zone\.js$/,
 ];
 
 export default class VersionCommandModule
