@@ -33,17 +33,21 @@ export const SassStylesheetLanguage = Object.freeze<StylesheetLanguage>({
   fileFilter: /\.s[ac]ss$/,
   process(data, file, format, options, build) {
     const syntax = format === 'sass' ? 'indented' : 'scss';
-    const resolveUrl = async (url: string, previousResolvedModules?: Set<string>) => {
+    const resolveUrl = async (url: string, options: FileImporterWithRequestContextOptions) => {
       let result = await build.resolve(url, {
         kind: 'import-rule',
-        // This should ideally be the directory of the importer file from Sass
-        // but that is not currently available from the Sass importer API.
-        resolveDir: build.initialOptions.absWorkingDir,
+        // Use the provided resolve directory from the custom Sass service if available
+        resolveDir: options.resolveDir ?? build.initialOptions.absWorkingDir,
       });
 
-      // Workaround to support Yarn PnP without access to the importer file from Sass
-      if (!result.path && previousResolvedModules?.size) {
-        for (const previous of previousResolvedModules) {
+      // If a resolve directory is provided, no additional speculative resolutions are required
+      if (options.resolveDir) {
+        return result;
+      }
+
+      // Workaround to support Yarn PnP and pnpm without access to the importer file from Sass
+      if (!result.path && options.previousResolvedModules?.size) {
+        for (const previous of options.previousResolvedModules) {
           result = await build.resolve(url, {
             kind: 'import-rule',
             resolveDir: previous,
@@ -66,7 +70,10 @@ async function compileString(
   filePath: string,
   syntax: Syntax,
   options: StylesheetPluginOptions,
-  resolveUrl: (url: string, previousResolvedModules?: Set<string>) => Promise<ResolveResult>,
+  resolveUrl: (
+    url: string,
+    options: FileImporterWithRequestContextOptions,
+  ) => Promise<ResolveResult>,
 ): Promise<OnLoadResult> {
   // Lazily load Sass when a Sass file is found
   if (sassWorkerPool === undefined) {
@@ -88,9 +95,9 @@ async function compileString(
         {
           findFileUrl: async (
             url,
-            { previousResolvedModules }: FileImporterWithRequestContextOptions,
+            options: FileImporterWithRequestContextOptions,
           ): Promise<URL | null> => {
-            let result = await resolveUrl(url);
+            const result = await resolveUrl(url, options);
             if (result.path) {
               return pathToFileURL(result.path);
             }
@@ -101,30 +108,7 @@ async function compileString(
             const [nameOrScope, nameOrFirstPath, ...pathPart] = parts;
             const packageName = hasScope ? `${nameOrScope}/${nameOrFirstPath}` : nameOrScope;
 
-            let packageResult = await resolveUrl(packageName + '/package.json');
-
-            if (packageResult.path) {
-              return pathToFileURL(
-                join(
-                  dirname(packageResult.path),
-                  !hasScope && nameOrFirstPath ? nameOrFirstPath : '',
-                  ...pathPart,
-                ),
-              );
-            }
-
-            // Check with Yarn PnP workaround using previous resolved modules.
-            // This is done last to avoid a performance penalty for common cases.
-
-            result = await resolveUrl(url, previousResolvedModules);
-            if (result.path) {
-              return pathToFileURL(result.path);
-            }
-
-            packageResult = await resolveUrl(
-              packageName + '/package.json',
-              previousResolvedModules,
-            );
+            const packageResult = await resolveUrl(packageName + '/package.json', options);
 
             if (packageResult.path) {
               return pathToFileURL(
