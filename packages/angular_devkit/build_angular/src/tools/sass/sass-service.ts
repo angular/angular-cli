@@ -41,6 +41,12 @@ export interface FileImporterWithRequestContextOptions extends FileImporterOptio
    * Workaround until https://github.com/sass/sass/issues/3247 is addressed.
    */
   previousResolvedModules?: Set<string>;
+
+  /**
+   * The base directory to use when resolving the request.
+   * This value is only set if using the rebasing importers.
+   */
+  resolveDir?: string;
 }
 
 /**
