@@ -21,5 +21,16 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
       harness.expectFile('dist/main.js').content.not.toContain('setClassMetadata');
     });
+
+    it('should not emit any AOT NgModule scope metadata functions', async () => {
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+      });
+
+      const { result } = await harness.executeOnce();
+      expect(result?.success).toBe(true);
+
+      harness.expectFile('dist/main.js').content.not.toContain('setNgModuleScope');
+    });
   });
 });
