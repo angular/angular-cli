@@ -36,6 +36,15 @@ function testCase({
   };
 }
 
+// The majority of these test cases are based off TypeScript emitted enum code for the FW's
+// `ChangedDetectionStrategy` enum.
+// https://github.com/angular/angular/blob/55d412c5b1b0ba9b03174f7ad9907961fcafa970/packages/core/src/change_detection/constants.ts#L18
+// ```
+//  export enum ChangeDetectionStrategy {
+//    OnPush = 0,
+//    Default = 1,
+//  }
+// ```
 describe('adjust-typescript-enums Babel plugin', () => {
   it(
     'wraps unexported TypeScript enums',
@@ -48,12 +57,11 @@ describe('adjust-typescript-enums Babel plugin', () => {
         })(ChangeDetectionStrategy || (ChangeDetectionStrategy = {}));
       `,
       expected: `
-        var ChangeDetectionStrategy = /*#__PURE__*/ (() => {
-          ChangeDetectionStrategy = ChangeDetectionStrategy || {};
+        var ChangeDetectionStrategy = /*#__PURE__*/ (function (ChangeDetectionStrategy) {
           ChangeDetectionStrategy[(ChangeDetectionStrategy["OnPush"] = 0)] = "OnPush";
           ChangeDetectionStrategy[(ChangeDetectionStrategy["Default"] = 1)] = "Default";
           return ChangeDetectionStrategy;
-        })();
+        })(ChangeDetectionStrategy || {});
       `,
     }),
   );
@@ -69,12 +77,49 @@ describe('adjust-typescript-enums Babel plugin', () => {
         })(ChangeDetectionStrategy || (ChangeDetectionStrategy = {}));
       `,
       expected: `
-        export var ChangeDetectionStrategy = /*#__PURE__*/ (() => {
-          ChangeDetectionStrategy = ChangeDetectionStrategy || {};
+        export var ChangeDetectionStrategy = /*#__PURE__*/ (function (ChangeDetectionStrategy) {
           ChangeDetectionStrategy[(ChangeDetectionStrategy["OnPush"] = 0)] = "OnPush";
           ChangeDetectionStrategy[(ChangeDetectionStrategy["Default"] = 1)] = "Default";
           return ChangeDetectionStrategy;
-        })();
+        })(ChangeDetectionStrategy || {});
+      `,
+    }),
+  );
+
+  // Even with recent improvements this case is and was never wrapped. However, it also was not broken
+  // by the transformation. This test ensures that this older emitted enum form does not break with
+  // any future changes. Over time this older form will be encountered less and less frequently.
+  // In the future this test case could be considered for removal.
+  it(
+    'does not wrap exported TypeScript enums from CommonJS (<5.1)',
+    testCase({
+      input: `
+        var ChangeDetectionStrategy;
+        (function (ChangeDetectionStrategy) {
+            ChangeDetectionStrategy[ChangeDetectionStrategy["OnPush"] = 0] = "OnPush";
+            ChangeDetectionStrategy[ChangeDetectionStrategy["Default"] = 1] = "Default";
+        })(ChangeDetectionStrategy = exports.ChangeDetectionStrategy || (exports.ChangeDetectionStrategy = {}));
+      `,
+      expected: NO_CHANGE,
+    }),
+  );
+
+  it(
+    'wraps exported TypeScript enums from CommonJS (5.1+)',
+    testCase({
+      input: `
+        var ChangeDetectionStrategy;
+        (function (ChangeDetectionStrategy) {
+            ChangeDetectionStrategy[ChangeDetectionStrategy["OnPush"] = 0] = "OnPush";
+            ChangeDetectionStrategy[ChangeDetectionStrategy["Default"] = 1] = "Default";
+        })(ChangeDetectionStrategy || (exports.ChangeDetectionStrategy = ChangeDetectionStrategy = {}));
+      `,
+      expected: `
+        var ChangeDetectionStrategy = /*#__PURE__*/ (function (ChangeDetectionStrategy) {
+          ChangeDetectionStrategy[(ChangeDetectionStrategy["OnPush"] = 0)] = "OnPush";
+          ChangeDetectionStrategy[(ChangeDetectionStrategy["Default"] = 1)] = "Default";
+          return ChangeDetectionStrategy;
+        })(ChangeDetectionStrategy || (exports.ChangeDetectionStrategy = ChangeDetectionStrategy = {}));
       `,
     }),
   );
@@ -90,12 +135,11 @@ describe('adjust-typescript-enums Babel plugin', () => {
         })(ChangeDetectionStrategy || (ChangeDetectionStrategy = {}));
       `,
       expected: `
-        export var ChangeDetectionStrategy = /*#__PURE__*/ (() => {
-          ChangeDetectionStrategy = ChangeDetectionStrategy || {};
+        export var ChangeDetectionStrategy = /*#__PURE__*/ (function (ChangeDetectionStrategy) {
           ChangeDetectionStrategy[(ChangeDetectionStrategy["OnPush"] = 5)] = "OnPush";
           ChangeDetectionStrategy[(ChangeDetectionStrategy["Default"] = 8)] = "Default";
           return ChangeDetectionStrategy;
-        })();
+        })(ChangeDetectionStrategy || {});
       `,
     }),
   );
@@ -112,13 +156,12 @@ describe('adjust-typescript-enums Babel plugin', () => {
       })(NotificationKind || (NotificationKind = {}));
       `,
       expected: `
-        var NotificationKind = /*#__PURE__*/ (() => {
-          NotificationKind = NotificationKind || {};
+        var NotificationKind = /*#__PURE__*/ (function (NotificationKind) {
           NotificationKind["NEXT"] = "N";
           NotificationKind["ERROR"] = "E";
           NotificationKind["COMPLETE"] = "C";
           return NotificationKind;
-        })();
+        })(NotificationKind || {});
       `,
     }),
   );
@@ -135,14 +178,12 @@ describe('adjust-typescript-enums Babel plugin', () => {
         })(NotificationKind$1 || (NotificationKind$1 = {}));
       `,
       expected: `
-        var NotificationKind$1 = /*#__PURE__*/ (() => {
-          (function (NotificationKind) {
-              NotificationKind["NEXT"] = "N";
-              NotificationKind["ERROR"] = "E";
-              NotificationKind["COMPLETE"] = "C";
-          })(NotificationKind$1 || (NotificationKind$1 = {}));
-          return NotificationKind$1;
-        })();
+        var NotificationKind$1 = /*#__PURE__*/ (function (NotificationKind) {
+          NotificationKind["NEXT"] = "N";
+          NotificationKind["ERROR"] = "E";
+          NotificationKind["COMPLETE"] = "C";
+          return NotificationKind;
+        })(NotificationKind$1 || {});
       `,
     }),
   );
@@ -171,8 +212,7 @@ describe('adjust-typescript-enums Babel plugin', () => {
          * Supported http methods.
          * @deprecated use @angular/common/http instead
          */
-        var RequestMethod = /*#__PURE__*/ (() => {
-          RequestMethod = RequestMethod || {};
+        var RequestMethod = /*#__PURE__*/ (function (RequestMethod) {
           RequestMethod[(RequestMethod["Get"] = 0)] = "Get";
           RequestMethod[(RequestMethod["Post"] = 1)] = "Post";
           RequestMethod[(RequestMethod["Put"] = 2)] = "Put";
@@ -181,7 +221,7 @@ describe('adjust-typescript-enums Babel plugin', () => {
           RequestMethod[(RequestMethod["Head"] = 5)] = "Head";
           RequestMethod[(RequestMethod["Patch"] = 6)] = "Patch";
           return RequestMethod;
-        })();
+        })(RequestMethod || {});
       `,
     }),
   );
@@ -228,18 +268,17 @@ describe('adjust-typescript-enums Babel plugin', () => {
         })(ChangeDetectionStrategy || (ChangeDetectionStrategy = {}));
       `,
       expected: `
-        var ChangeDetectionStrategy = /*#__PURE__*/ (() => {
-          ChangeDetectionStrategy = ChangeDetectionStrategy || {};
+        var ChangeDetectionStrategy = /*#__PURE__*/ (function (ChangeDetectionStrategy) {
           ChangeDetectionStrategy[(ChangeDetectionStrategy["OnPush"] = 0)] = "OnPush";
           ChangeDetectionStrategy[(ChangeDetectionStrategy["Default"] = 1)] = "Default";
           return ChangeDetectionStrategy;
-        })();
+        })(ChangeDetectionStrategy || {});
       `,
     }),
   );
 
   it(
-    'should not wrap TypeScript enums if the declaration identifier has been renamed to avoid collisions',
+    'should wrap TypeScript enums if the declaration identifier has been renamed to avoid collisions',
     testCase({
       input: `
         var ChangeDetectionStrategy$1;
@@ -249,13 +288,11 @@ describe('adjust-typescript-enums Babel plugin', () => {
         })(ChangeDetectionStrategy$1 || (ChangeDetectionStrategy$1 = {}));
       `,
       expected: `
-        var ChangeDetectionStrategy$1 = /*#__PURE__*/ (() => {
-          (function (ChangeDetectionStrategy) {
-            ChangeDetectionStrategy[(ChangeDetectionStrategy["OnPush"] = 0)] = "OnPush";
-            ChangeDetectionStrategy[(ChangeDetectionStrategy["Default"] = 1)] = "Default";
-          })(ChangeDetectionStrategy$1 || (ChangeDetectionStrategy$1 = {}));
-          return ChangeDetectionStrategy$1;
-        })();
+        var ChangeDetectionStrategy$1 = /*#__PURE__*/ (function (ChangeDetectionStrategy) {
+          ChangeDetectionStrategy[ChangeDetectionStrategy["OnPush"] = 0] = "OnPush";
+          ChangeDetectionStrategy[ChangeDetectionStrategy["Default"] = 1] = "Default";
+          return ChangeDetectionStrategy;
+        })(ChangeDetectionStrategy$1 || {});
       `,
     }),
   );
