@@ -1,3 +1,27 @@
+<a name="16.2.0-next.2"></a>
+
+# 16.2.0-next.2 (2023-07-13)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                       |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------- |
+| [d0f005913](https://github.com/angular/angular-cli/commit/d0f005913f830c13df0acbb0753fc10ff207ca35) | fix  | add `zone.js` to `ng version` output              |
+| [da3c1c32a](https://github.com/angular/angular-cli/commit/da3c1c32ae91d7247c61aa050e6707109626082a) | fix  | throw an error when executed in a google3-context |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                                     |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------------- |
+| [e6b377436](https://github.com/angular/angular-cli/commit/e6b377436a471073657dc35e7c7a28db6688760a) | feat | add `ssr` option in application builder                                         |
+| [cb165a75d](https://github.com/angular/angular-cli/commit/cb165a75dc8c21ead537684a092ed50d3736e04a) | feat | add pre-rendering (SSG) and App-shell support generation to application builder |
+| [099cec758](https://github.com/angular/angular-cli/commit/099cec758ad671c7fd0ca2058a271e4fe181a44d) | feat | add support for serving SSR with dev-server when using the application builder  |
+| [7defb3635](https://github.com/angular/angular-cli/commit/7defb3635c89737d151c9537bd7becd463098434) | fix  | ensure that server dependencies are loaded also in ssr entrypoint               |
+| [974748cdf](https://github.com/angular/angular-cli/commit/974748cdf894c5ad0451e3fdf1c186bdad80878b) | perf | filter postcss usage based on content in esbuild builder                        |
+| [a0a2c7aef](https://github.com/angular/angular-cli/commit/a0a2c7aef675f8aae294d2119f721c4345d633b0) | perf | only load browserslist in babel preset if needed                                |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="16.2.0-next.1"></a>
 
 # 16.2.0-next.1 (2023-07-06)
