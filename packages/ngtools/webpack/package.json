@@ -28,8 +28,8 @@
   },
   "devDependencies": {
     "@angular-devkit/core": "0.0.0-PLACEHOLDER",
-    "@angular/compiler": "16.1.4",
-    "@angular/compiler-cli": "16.1.4",
+    "@angular/compiler": "16.1.5",
+    "@angular/compiler-cli": "16.1.5",
     "typescript": "5.1.6",
     "webpack": "5.88.1"
   }
