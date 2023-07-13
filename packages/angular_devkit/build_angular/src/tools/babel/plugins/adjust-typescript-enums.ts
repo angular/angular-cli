@@ -56,15 +56,22 @@ export default function (): PluginObj {
           return;
         }
 
-        const enumCallArgument = nextExpression.node.arguments[0];
-        if (!types.isLogicalExpression(enumCallArgument, { operator: '||' })) {
+        const enumCallArgument = nextExpression.get('arguments')[0];
+        if (!enumCallArgument.isLogicalExpression({ operator: '||' })) {
           return;
         }
 
+        const leftCallArgument = enumCallArgument.get('left');
+        const rightCallArgument = enumCallArgument.get('right');
+
         // Check if identifiers match var declaration
         if (
-          !types.isIdentifier(enumCallArgument.left) ||
-          !nextExpression.scope.bindingIdentifierEquals(enumCallArgument.left.name, declarationId)
+          !leftCallArgument.isIdentifier() ||
+          !nextExpression.scope.bindingIdentifierEquals(
+            leftCallArgument.node.name,
+            declarationId,
+          ) ||
+          !rightCallArgument.isAssignmentExpression()
         ) {
           return;
         }
@@ -74,13 +81,9 @@ export default function (): PluginObj {
           return;
         }
 
-        const enumCalleeParam = enumCallee.node.params[0];
-        const isEnumCalleeMatching =
-          types.isIdentifier(enumCalleeParam) && enumCalleeParam.name === declarationId.name;
-
-        let enumAssignments: types.ExpressionStatement[] | undefined;
-        if (isEnumCalleeMatching) {
-          enumAssignments = [];
+        const parameterId = enumCallee.get('params')[0];
+        if (!parameterId.isIdentifier()) {
+          return;
         }
 
         // Check if all enum member values are pure.
@@ -100,7 +103,6 @@ export default function (): PluginObj {
           }
 
           hasElements = true;
-          enumAssignments?.push(enumStatement.node);
         }
 
         // If there are no enum elements then there is nothing to wrap
@@ -108,48 +110,24 @@ export default function (): PluginObj {
           return;
         }
 
+        // Update right-side of initializer call argument to remove redundant assignment
+        if (rightCallArgument.get('left').isIdentifier()) {
+          rightCallArgument.replaceWith(rightCallArgument.get('right'));
+        }
+
+        // Add a return statement to the enum initializer block
+        enumCallee
+          .get('body')
+          .node.body.push(types.returnStatement(types.cloneNode(parameterId.node)));
+
         // Remove existing enum initializer
         const enumInitializer = nextExpression.node;
         nextExpression.remove();
 
-        // Create IIFE block contents
-        let blockContents;
-        if (enumAssignments) {
-          // Loose mode
-          blockContents = [
-            types.expressionStatement(
-              types.assignmentExpression(
-                '=',
-                types.cloneNode(declarationId),
-                types.logicalExpression(
-                  '||',
-                  types.cloneNode(declarationId),
-                  types.objectExpression([]),
-                ),
-              ),
-            ),
-            ...enumAssignments,
-          ];
-        } else {
-          blockContents = [types.expressionStatement(enumInitializer)];
-        }
-
-        // Wrap existing enum initializer in a pure annotated IIFE
-        const container = types.arrowFunctionExpression(
-          [],
-          types.blockStatement([
-            ...blockContents,
-            types.returnStatement(types.cloneNode(declarationId)),
-          ]),
-        );
-        const replacementInitializer = types.callExpression(
-          types.parenthesizedExpression(container),
-          [],
-        );
-        annotateAsPure(replacementInitializer);
+        annotateAsPure(enumInitializer);
 
         // Add the wrapped enum initializer directly to the variable declaration
-        declaration.get('init').replaceWith(replacementInitializer);
+        declaration.get('init').replaceWith(enumInitializer);
       },
     },
   };
