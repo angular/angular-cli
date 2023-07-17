@@ -65,6 +65,33 @@ export const SassStylesheetLanguage = Object.freeze<StylesheetLanguage>({
   },
 });
 
+function parsePackageName(url: string): { packageName: string; readonly pathSegments: string[] } {
+  const parts = url.split('/');
+  const hasScope = parts.length >= 2 && parts[0].startsWith('@');
+  const [nameOrScope, nameOrFirstPath, ...pathPart] = parts;
+  const packageName = hasScope ? `${nameOrScope}/${nameOrFirstPath}` : nameOrScope;
+
+  return {
+    packageName,
+    get pathSegments() {
+      return !hasScope && nameOrFirstPath ? [nameOrFirstPath, ...pathPart] : pathPart;
+    },
+  };
+}
+
+class Cache<K, V> extends Map<K, V> {
+  async getOrCreate(key: K, creator: () => V | Promise<V>): Promise<V> {
+    let value = this.get(key);
+
+    if (value === undefined) {
+      value = await creator();
+      this.set(key, value);
+    }
+
+    return value;
+  }
+}
+
 async function compileString(
   data: string,
   filePath: string,
@@ -81,6 +108,15 @@ async function compileString(
     sassWorkerPool = new sassService.SassWorkerImplementation(true);
   }
 
+  // Cache is currently local to individual compile requests.
+  // Caching follows Sass behavior where a given url will always resolve to the same value
+  // regardless of its importer's path.
+  // A null value indicates that the cached resolution attempt failed to find a location and
+  // later stage resolution should be attempted. This avoids potentially expensive repeat
+  // failing resolution attempts.
+  const resolutionCache = new Cache<string, URL | null>();
+  const packageRootCache = new Cache<string, string | null>();
+
   const warnings: PartialMessage[] = [];
   try {
     const { css, sourceMap, loadedUrls } = await sassWorkerPool.compileStringAsync(data, {
@@ -93,36 +129,36 @@ async function compileString(
       quietDeps: true,
       importers: [
         {
-          findFileUrl: async (
-            url,
-            options: FileImporterWithRequestContextOptions,
-          ): Promise<URL | null> => {
-            const result = await resolveUrl(url, options);
-            if (result.path) {
-              return pathToFileURL(result.path);
-            }
+          findFileUrl: (url, options: FileImporterWithRequestContextOptions) =>
+            resolutionCache.getOrCreate(url, async () => {
+              const result = await resolveUrl(url, options);
+              if (result.path) {
+                return pathToFileURL(result.path);
+              }
 
-            // Check for package deep imports
-            const parts = url.split('/');
-            const hasScope = parts.length >= 2 && parts[0].startsWith('@');
-            const [nameOrScope, nameOrFirstPath, ...pathPart] = parts;
-            const packageName = hasScope ? `${nameOrScope}/${nameOrFirstPath}` : nameOrScope;
+              // Check for package deep imports
+              const { packageName, pathSegments } = parsePackageName(url);
 
-            const packageResult = await resolveUrl(packageName + '/package.json', options);
+              // Caching package root locations is particularly beneficial for `@material/*` packages
+              // which extensively use deep imports.
+              const packageRoot = await packageRootCache.getOrCreate(packageName, async () => {
+                // Use the required presence of a package root `package.json` file to resolve the location
+                const packageResult = await resolveUrl(packageName + '/package.json', options);
 
-            if (packageResult.path) {
-              return pathToFileURL(
-                join(
-                  dirname(packageResult.path),
-                  !hasScope && nameOrFirstPath ? nameOrFirstPath : '',
-                  ...pathPart,
-                ),
-              );
-            }
+                return packageResult.path ? dirname(packageResult.path) : null;
+              });
 
-            // Not found
-            return null;
-          },
+              // Package not found could be because of an error or the specifier is intended to be found
+              // via a later stage of the resolution process (`loadPaths`, etc.).
+              // Errors are reported after the full completion of the resolution process. Exceptions for
+              // not found packages should not be raised here.
+              if (packageRoot) {
+                return pathToFileURL(join(packageRoot, ...pathSegments));
+              }
+
+              // Not found
+              return null;
+            }),
         },
       ],
       logger: {
