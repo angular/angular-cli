@@ -16,8 +16,8 @@ simplicity it should remain unique across all CLI commands. The dimension is the
 ### Adding dimension or metic.
 1. Create the dimension or metric in [Google Analytics](https://analytics.google.com/) first. These are not tracked if they aren't
    defined in Google Analytics.
-1. Use the ID of the dimension as the `x-user-analytics` value in the `schema.json` file.
-1. New dimension and metrics PRs need to be approved by the tooling lead and require a new [Launch](http://go/launch).
+2. Use the ID of the dimension as the `x-user-analytics` value in the `schema.json` file.
+3. New dimension and metrics PRs need to be approved by the tooling lead and require a new [Launch](http://go/launch).
 
 ### Deleting a dimension or metic.
 1. Archive the dimension and metric in [Google Analytics](https://analytics.google.com/).
