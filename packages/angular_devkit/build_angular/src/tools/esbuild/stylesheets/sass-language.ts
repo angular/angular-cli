@@ -17,14 +17,20 @@ import type {
 import { StylesheetLanguage, StylesheetPluginOptions } from './stylesheet-plugin-factory';
 
 let sassWorkerPool: SassWorkerImplementation | undefined;
+let sassWorkerPoolPromise: Promise<SassWorkerImplementation> | undefined;
 
 function isSassException(error: unknown): error is Exception {
   return !!error && typeof error === 'object' && 'sassMessage' in error;
 }
 
 export function shutdownSassWorkerPool(): void {
-  sassWorkerPool?.close();
-  sassWorkerPool = undefined;
+  if (sassWorkerPool) {
+    sassWorkerPool.close();
+    sassWorkerPool = undefined;
+  } else if (sassWorkerPoolPromise) {
+    void sassWorkerPoolPromise.then(shutdownSassWorkerPool);
+  }
+  sassWorkerPoolPromise = undefined;
 }
 
 export const SassStylesheetLanguage = Object.freeze<StylesheetLanguage>({
@@ -104,8 +110,12 @@ async function compileString(
 ): Promise<OnLoadResult> {
   // Lazily load Sass when a Sass file is found
   if (sassWorkerPool === undefined) {
-    const sassService = await import('../../sass/sass-service');
-    sassWorkerPool = new sassService.SassWorkerImplementation(true);
+    if (sassWorkerPoolPromise === undefined) {
+      sassWorkerPoolPromise = import('../../sass/sass-service').then(
+        (sassService) => new sassService.SassWorkerImplementation(true),
+      );
+    }
+    sassWorkerPool = await sassWorkerPoolPromise;
   }
 
   // Cache is currently local to individual compile requests.
