@@ -3547,7 +3547,7 @@ Alan Agius, Charles Lyding, Joey Perrott, LeonEck and Mike Jancar
 
   <td>
 <a href="https://github.com/angular/angular-cli/commit/8383c6b421f7005a25a3bff0826048f3a24f3030"><img
-   align="top"
+   style="vertical-align: top"
    title="Bug Fix" src="https://img.shields.io/badge/8383c6b-fix-green.svg" />
 </a>
   </td>
@@ -3566,7 +3566,7 @@ Alan Agius, Charles Lyding, Joey Perrott, LeonEck and Mike Jancar
 
   <td>
 <a href="https://github.com/angular/angular-cli/commit/07763702fd244ba44aebb714a295dbf5ba72b91d"><img
-   align="top"
+   style="vertical-align: top"
    title="Bug Fix" src="https://img.shields.io/badge/0776370-fix-green.svg" />
 </a>
   </td>
@@ -3585,7 +3585,7 @@ Alan Agius, Charles Lyding, Joey Perrott, LeonEck and Mike Jancar
 
   <td>
 <a href="https://github.com/angular/angular-cli/commit/a5c69722ffeceb72dcd46901c2bb983e5dc8bf32"><img
-   align="top"
+   style="vertical-align: top"
    title="Bug Fix" src="https://img.shields.io/badge/a5c6972-fix-green.svg" />
 </a>
   </td>
@@ -3600,7 +3600,7 @@ Alan Agius, Charles Lyding, Joey Perrott, LeonEck and Mike Jancar
 
   <td>
 <a href="https://github.com/angular/angular-cli/commit/c65b049996a8de9d9fcc66631872424cbe5f13f9"><img
-   align="top"
+   style="vertical-align: top"
    title="Bug Fix" src="https://img.shields.io/badge/c65b049-fix-green.svg" />
 </a>
   </td>
@@ -3615,7 +3615,7 @@ Alan Agius, Charles Lyding, Joey Perrott, LeonEck and Mike Jancar
 
   <td>
 <a href="https://github.com/angular/angular-cli/commit/3d71c63b3a11946ebfca3f0d97d4fbf8dca16255"><img
-   align="top"
+   style="vertical-align: top"
    title="Bug Fix" src="https://img.shields.io/badge/3d71c63-fix-green.svg" />
 </a>
   </td>
@@ -3634,7 +3634,7 @@ Alan Agius, Charles Lyding, Joey Perrott, LeonEck and Mike Jancar
 
   <td>
 <a href="https://github.com/angular/angular-cli/commit/9a04975a2170c3ecc2c09c32bd15a89c613e198f"><img
-   align="top"
+   style="vertical-align: top"
    title="Bug Fix" src="https://img.shields.io/badge/9a04975-fix-green.svg" />
 </a>
   </td>
@@ -3649,7 +3649,7 @@ Alan Agius, Charles Lyding, Joey Perrott, LeonEck and Mike Jancar
 
   <td>
 <a href="https://github.com/angular/angular-cli/commit/2ac8e9c0e131bf7fcb2c6e92500eeaa112efcefb"><img
-   align="top"
+   style="vertical-align: top"
    title="Bug Fix" src="https://img.shields.io/badge/2ac8e9c-fix-green.svg" />
 </a>
   </td>
