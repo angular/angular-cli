@@ -14,11 +14,12 @@ import {
   normalizeGlobalStyles,
 } from '../../tools/webpack/utils/helpers';
 import { normalizeAssetPatterns, normalizeOptimization, normalizeSourceMaps } from '../../utils';
+import { I18nOptions, createI18nOptions } from '../../utils/i18n-options';
 import { normalizeCacheOptions } from '../../utils/normalize-cache';
 import { generateEntryPoints } from '../../utils/package-chunk-sort';
 import { findTailwindConfigurationFile } from '../../utils/tailwind';
 import { getIndexInputFile, getIndexOutputFile } from '../../utils/webpack-browser-config';
-import { Schema as ApplicationBuilderOptions, OutputHashing } from './schema';
+import { Schema as ApplicationBuilderOptions, I18NTranslation, OutputHashing } from './schema';
 
 export type NormalizedApplicationBuildOptions = Awaited<ReturnType<typeof normalizeOptions>>;
 
@@ -79,6 +80,13 @@ export async function normalizeOptions(
   // Gather persistent caching option and provide a project specific cache location
   const cacheOptions = normalizeCacheOptions(projectMetadata, workspaceRoot);
   cacheOptions.path = path.join(cacheOptions.path, projectName);
+
+  const i18nOptions: I18nOptions & {
+    duplicateTranslationBehavior?: I18NTranslation;
+    missingTranslationBehavior?: I18NTranslation;
+  } = createI18nOptions(projectMetadata, options.localize);
+  i18nOptions.duplicateTranslationBehavior = options.i18nDuplicateTranslation;
+  i18nOptions.missingTranslationBehavior = options.i18nMissingTranslation;
 
   const entryPoints = normalizeEntryPoints(workspaceRoot, options.browser, options.entryPoints);
   const tsconfig = path.join(workspaceRoot, options.tsConfig);
@@ -272,6 +280,7 @@ export async function normalizeOptions(
       typeof serviceWorker === 'string' ? path.join(workspaceRoot, serviceWorker) : undefined,
     indexHtmlOptions,
     tailwindConfiguration,
+    i18nOptions,
   };
 }
 
