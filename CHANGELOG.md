@@ -1,3 +1,22 @@
+<a name="16.1.5"></a>
+
+# 16.1.5 (2023-07-20)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                       |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------- |
+| [7e91d4709](https://github.com/angular/angular-cli/commit/7e91d4709966c592c271ff8d3456ce569156e2e5) | fix  | add `zone.js` to `ng version` output              |
+| [475506822](https://github.com/angular/angular-cli/commit/475506822b148c8e2597c60653238a40140bacb0) | fix  | throw an error when executed in a google3-context |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                            |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------ |
+| [07d3d8c6a](https://github.com/angular/angular-cli/commit/07d3d8c6ae01212de866fac769ff2da888d5adea) | fix  | correctly wrap CommonJS exported enums when optimizing |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="16.1.4"></a>
 
 # 16.1.4 (2023-07-06)
