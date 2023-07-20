@@ -1,3 +1,18 @@
+<a name="16.2.0-next.3"></a>
+
+# 16.2.0-next.3 (2023-07-20)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                          |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------------- |
+| [5908ede3d](https://github.com/angular/angular-cli/commit/5908ede3d676f2b87f68bc976bd741b7725ab1c3) | fix  | correctly wrap CommonJS exported enums when optimizing               |
+| [5048f6e82](https://github.com/angular/angular-cli/commit/5048f6e82e299b0733f34cbdcb1e7b1ef9a63210) | fix  | Set chunk names explicitly                                           |
+| [61a652d91](https://github.com/angular/angular-cli/commit/61a652d91274f4adce20182e630fe9963b4ceddd) | perf | inject Sass import/use directive importer information when resolving |
+| [6bfd1800e](https://github.com/angular/angular-cli/commit/6bfd1800efa2bf41126696b66938bdf291ad5455) | perf | use in-memory Sass module resolution cache                           |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="16.1.5"></a>
 
 # 16.1.5 (2023-07-20)
