@@ -286,7 +286,9 @@ export async function setupServer(
             // Rewrite all build assets to a vite raw fs URL
             const assetSourcePath = assets.get(pathname);
             if (assetSourcePath !== undefined) {
-              req.url = `/@fs/${encodeURIComponent(assetSourcePath)}`;
+              // The encoding needs to match what happens in the vite static middleware.
+              // ref: https://github.com/vitejs/vite/blob/d4f13bd81468961c8c926438e815ab6b1c82735e/packages/vite/src/node/server/middlewares/static.ts#L163
+              req.url = `/@fs/${encodeURI(assetSourcePath)}`;
               next();
 
               return;
