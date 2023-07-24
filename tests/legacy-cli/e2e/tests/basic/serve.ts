@@ -18,9 +18,15 @@ export default async function () {
 }
 
 async function verifyResponse(port: number): Promise<void> {
-  const response = await fetch(`http://localhost:${port}/`);
+  const indexResponse = await fetch(`http://localhost:${port}/`);
 
-  if (!/<app-root><\/app-root>/.test(await response.text())) {
+  if (!/<app-root><\/app-root>/.test(await indexResponse.text())) {
     throw new Error('Response does not match expected value.');
+  }
+
+  const assetResponse = await fetch(`http://localhost:${port}/favicon.ico`);
+
+  if (!assetResponse.ok) {
+    throw new Error('Expected favicon asset to be available.');
   }
 }
