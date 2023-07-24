@@ -13,13 +13,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
-      - uses: angular/dev-infra/github-actions/commit-message-based-labels@29e01656e63a74549da8a7eadcd39f240c45cd09
+      - uses: angular/dev-infra/github-actions/commit-message-based-labels@1ad20ef9dd457de967252283c1a968b0d702d0ae
         with:
           angular-robot-key: ${{ secrets.ANGULAR_ROBOT_PRIVATE_KEY }}
   post_approval_changes:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
-      - uses: angular/dev-infra/github-actions/post-approval-changes@29e01656e63a74549da8a7eadcd39f240c45cd09
+      - uses: angular/dev-infra/github-actions/post-approval-changes@1ad20ef9dd457de967252283c1a968b0d702d0ae
         with:
           angular-robot-key: ${{ secrets.ANGULAR_ROBOT_PRIVATE_KEY }}
