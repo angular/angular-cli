@@ -6,7 +6,6 @@
 
 import { BuilderContext } from '@angular-devkit/architect';
 import { BuilderOutput } from '@angular-devkit/architect';
-import { BuildResult } from '@angular-devkit/build-webpack';
 import type { ConfigOptions } from 'karma';
 import { Configuration } from 'webpack';
 import { DevServerBuildOutput } from '@angular-devkit/build-webpack';
@@ -153,7 +152,7 @@ export function executeDevServerBuilder(options: DevServerBuilderOptions, contex
 // @public
 export function executeExtractI18nBuilder(options: ExtractI18nBuilderOptions, context: BuilderContext, transforms?: {
     webpackConfiguration?: ExecutionTransformer<webpack.Configuration>;
-}): Promise<BuildResult>;
+}): Promise<BuilderOutput>;
 
 // @public
 export function executeKarmaBuilder(options: KarmaBuilderOptions, context: BuilderContext, transforms?: {
@@ -175,8 +174,14 @@ export function executeServerBuilder(options: ServerBuilderOptions, context: Bui
 // @public
 export type ExecutionTransformer<T> = (input: T) => T | Promise<T>;
 
-// @public (undocumented)
-export type ExtractI18nBuilderOptions = Schema;
+// @public
+export interface ExtractI18nBuilderOptions {
+    browserTarget: string;
+    format?: Format;
+    outFile?: string;
+    outputPath?: string;
+    progress?: boolean;
+}
 
 // @public (undocumented)
 export interface FileReplacement {
