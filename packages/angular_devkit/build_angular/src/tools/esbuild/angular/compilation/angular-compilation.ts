@@ -10,7 +10,7 @@ import type ng from '@angular/compiler-cli';
 import type { PartialMessage } from 'esbuild';
 import ts from 'typescript';
 import { loadEsmModule } from '../../../../utils/load-esm';
-import { profileSync } from '../../profiling';
+import { profileAsync, profileSync } from '../../profiling';
 import type { AngularHostOptions } from '../angular-host';
 import { convertTypeScriptDiagnostic } from '../diagnostics';
 
@@ -26,9 +26,8 @@ export abstract class AngularCompilation {
   static async loadCompilerCli(): Promise<typeof ng> {
     // This uses a wrapped dynamic import to load `@angular/compiler-cli` which is ESM.
     // Once TypeScript provides support for retaining dynamic imports this workaround can be dropped.
-    AngularCompilation.#angularCompilerCliModule ??= await loadEsmModule<typeof ng>(
-      '@angular/compiler-cli',
-    );
+    AngularCompilation.#angularCompilerCliModule ??=
+      await loadEsmModule<typeof ng>('@angular/compiler-cli');
 
     return AngularCompilation.#angularCompilerCliModule;
   }
@@ -63,15 +62,17 @@ export abstract class AngularCompilation {
     referencedFiles: readonly string[];
   }>;
 
-  abstract emitAffectedFiles(): Iterable<EmitFileResult>;
+  abstract emitAffectedFiles(): Iterable<EmitFileResult> | Promise<Iterable<EmitFileResult>>;
 
-  protected abstract collectDiagnostics(): Iterable<ts.Diagnostic>;
+  protected abstract collectDiagnostics():
+    | Iterable<ts.Diagnostic>
+    | Promise<Iterable<ts.Diagnostic>>;
 
   async diagnoseFiles(): Promise<{ errors?: PartialMessage[]; warnings?: PartialMessage[] }> {
     const result: { errors?: PartialMessage[]; warnings?: PartialMessage[] } = {};
 
-    profileSync('NG_DIAGNOSTICS_TOTAL', () => {
-      for (const diagnostic of this.collectDiagnostics()) {
+    await profileAsync('NG_DIAGNOSTICS_TOTAL', async () => {
+      for (const diagnostic of await this.collectDiagnostics()) {
         const message = convertTypeScriptDiagnostic(diagnostic);
         if (diagnostic.category === ts.DiagnosticCategory.Error) {
           (result.errors ??= []).push(message);
@@ -83,4 +84,8 @@ export abstract class AngularCompilation {
 
     return result;
   }
+
+  update?(files: Set<string>): Promise<void>;
+
+  close?(): Promise<void>;
 }

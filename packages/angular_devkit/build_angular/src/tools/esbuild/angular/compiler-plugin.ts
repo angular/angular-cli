@@ -23,15 +23,10 @@ import ts from 'typescript';
 import { maxWorkers } from '../../../utils/environment-options';
 import { JavaScriptTransformer } from '../javascript-transformer';
 import { LoadResultCache } from '../load-result-cache';
-import {
-  logCumulativeDurations,
-  profileAsync,
-  profileSync,
-  resetCumulativeDurations,
-} from '../profiling';
+import { logCumulativeDurations, profileAsync, resetCumulativeDurations } from '../profiling';
 import { BundleStylesheetOptions } from '../stylesheets/bundle-options';
 import { AngularHostOptions } from './angular-host';
-import { AngularCompilation, AotCompilation, JitCompilation, NoopCompilation } from './compilation';
+import { AngularCompilation, NoopCompilation, createAngularCompilation } from './compilation';
 import { SharedTSCompilationState, getSharedCompilationState } from './compilation-state';
 import { ComponentStylesheetBundler } from './component-stylesheets';
 import { FileReferenceTracker } from './file-reference-tracker';
@@ -95,9 +90,7 @@ export function createCompilerPlugin(
       // Create new reusable compilation for the appropriate mode based on the `jit` plugin option
       const compilation: AngularCompilation = pluginOptions.noopTypeScriptCompilation
         ? new NoopCompilation()
-        : pluginOptions.jit
-        ? new JitCompilation()
-        : new AotCompilation();
+        : await createAngularCompilation(!!pluginOptions.jit);
 
       // Determines if TypeScript should process JavaScript files based on tsconfig `allowJs` option
       let shouldTsIgnoreJs = true;
@@ -139,6 +132,14 @@ export function createCompilerPlugin(
           // TODO: Differentiate between changed input files and stale output files
           modifiedFiles = referencedFileTracker.update(pluginOptions.sourceFileCache.modifiedFiles);
           pluginOptions.sourceFileCache.invalidate(modifiedFiles);
+        }
+
+        if (
+          !pluginOptions.noopTypeScriptCompilation &&
+          compilation.update &&
+          pluginOptions.sourceFileCache?.modifiedFiles.size
+        ) {
+          await compilation.update(modifiedFiles ?? pluginOptions.sourceFileCache.modifiedFiles);
         }
 
         // Create Angular compiler host options
@@ -298,8 +299,8 @@ export function createCompilerPlugin(
         }
 
         // Update TypeScript file output cache for all affected files
-        profileSync('NG_EMIT_TS', () => {
-          for (const { filename, contents } of compilation.emitAffectedFiles()) {
+        await profileAsync('NG_EMIT_TS', async () => {
+          for (const { filename, contents } of await compilation.emitAffectedFiles()) {
             typeScriptFileCache.set(pathToFileURL(filename).href, contents);
           }
         });
@@ -426,6 +427,7 @@ export function createCompilerPlugin(
       build.onDispose(() => {
         sharedTSCompilationState?.dispose();
         void stylesheetBundler.dispose();
+        void compilation.close?.();
       });
     },
   };
