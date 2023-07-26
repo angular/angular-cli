@@ -1,3 +1,15 @@
+<a name="16.1.6"></a>
+
+# 16.1.6 (2023-07-26)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                 |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------- |
+| [20816b57f](https://github.com/angular/angular-cli/commit/20816b57f16b0bcbd5b81f06f6f790e4485c1daa) | fix  | error during critical CSS inlining for external stylesheets |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="16.1.5"></a>
 
 # 16.1.5 (2023-07-20)
