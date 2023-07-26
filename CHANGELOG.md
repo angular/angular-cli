@@ -1,16 +1,3 @@
-<a name="16.2.0-next.4"></a>
-
-# 16.2.0-next.4 (2023-07-26)
-
-### @angular-devkit/build-angular
-
-| Commit                                                                                              | Type | Description                                                 |
-| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------- |
-| [449e21b3a](https://github.com/angular/angular-cli/commit/449e21b3a6da990a5865bb5bdfb8145794f40cf9) | fix  | correctly load dev server assets with vite 4.4.0+           |
-| [d6ae2c7b7](https://github.com/angular/angular-cli/commit/d6ae2c7b7af0fd7b182f19987583a2989a070060) | fix  | error during critical CSS inlining for external stylesheets |
-
-<!-- CHANGELOG SPLIT MARKER -->
-
 <a name="16.1.6"></a>
 
 # 16.1.6 (2023-07-26)
