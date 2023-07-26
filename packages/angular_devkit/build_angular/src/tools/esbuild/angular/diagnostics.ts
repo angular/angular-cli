@@ -83,11 +83,10 @@ export function convertTypeScriptDiagnostic(diagnostic: Diagnostic): PartialMess
     code = code.slice(3);
   }
 
-  const message: PartialMessage = {
-    ...convertTypeScriptDiagnosticInfo(diagnostic, `${codePrefix}${code}: `),
-    // Store original diagnostic for reference if needed downstream
-    detail: diagnostic,
-  };
+  const message: PartialMessage = convertTypeScriptDiagnosticInfo(
+    diagnostic,
+    `${codePrefix}${code}: `,
+  );
 
   if (diagnostic.relatedInformation?.length) {
     message.notes = diagnostic.relatedInformation.map((info) =>
