@@ -146,7 +146,15 @@ class CrittersExtended extends Critters {
         this.conditionallyInsertCspLoadingScript(document, cspNonce);
       }
 
-      link.prev?.setAttribute('nonce', cspNonce);
+      // Ideally we would hook in at the time Critters inserts the `style` tags, but there isn't
+      // a way of doing that at the moment so we fall back to doing it any time a `link` tag is
+      // inserted. We mitigate it by only iterating the direct children of the `<head>` which
+      // should be pretty shallow.
+      document.head.children.forEach((child) => {
+        if (child.tagName === 'style' && !child.hasAttribute('nonce')) {
+          child.setAttribute('nonce', cspNonce);
+        }
+      });
     }
 
     return returnValue;
