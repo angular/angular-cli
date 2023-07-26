@@ -133,4 +133,34 @@ describe('InlineCriticalCssProcessor', () => {
     html { color: white; }
     </style>`);
   });
+
+  it('should not modify the document for external stylesheets', async () => {
+    const inlineCssProcessor = new InlineCriticalCssProcessor({
+      readAsset,
+    });
+
+    const initialContent = `
+      <!doctype html>
+      <html lang="en">
+      <head>
+        <meta charset="utf-8">
+        <link rel="stylesheet" href="https://google.com/styles.css" />
+      </head>
+      <body>
+        <app ngCspNonce="{% nonce %}"></app>
+      </body>
+      </html>
+    `;
+
+    const { content } = await inlineCssProcessor.process(initialContent, {
+      outputPath: '/dist/',
+    });
+
+    expect(tags.stripIndents`${content}`).toContain(tags.stripIndents`
+      <head>
+        <meta charset="utf-8">
+        <link rel="stylesheet" href="https://google.com/styles.css">
+      </head>
+    `);
+  });
 });
