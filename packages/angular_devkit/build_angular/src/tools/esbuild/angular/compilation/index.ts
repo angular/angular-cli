@@ -7,6 +7,5 @@
  */
 
 export { AngularCompilation } from './angular-compilation';
-export { AotCompilation } from './aot-compilation';
-export { JitCompilation } from './jit-compilation';
+export { createAngularCompilation } from './factory';
 export { NoopCompilation } from './noop-compilation';
