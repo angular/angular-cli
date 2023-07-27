@@ -54,7 +54,8 @@ export class IndexHtmlWebpackPlugin extends IndexHtmlGenerator {
       try {
         for (const chunk of this.compilation.chunks) {
           for (const file of chunk.files) {
-            if (file.endsWith('.hot-update.js')) {
+            // https://github.com/webpack/webpack/blob/1f99ad6367f2b8a6ef17cce0e058f7a67fb7db18/lib/config/defaults.js#L1000
+            if (file.endsWith('.hot-update.js') || file.endsWith('.hot-update.mjs')) {
               continue;
             }
 
