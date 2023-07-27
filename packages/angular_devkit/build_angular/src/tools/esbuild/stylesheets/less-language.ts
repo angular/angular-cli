@@ -92,6 +92,7 @@ async function compileString(
       paths: options.includePaths,
       plugins: [resolverPlugin],
       rewriteUrls: 'all',
+      javascriptEnabled: true,
       sourceMap: options.sourcemap
         ? {
             sourceMapFileInline: true,
