@@ -200,38 +200,6 @@ jobs:
           command: yarn bazel build //...
       - fail_fast
 
-  test:
-    executor: bazel-executor
-    parameters:
-      nodeversion:
-        type: string
-        default: *default_nodeversion_major
-    steps:
-      - custom_attach_workspace
-      - setup_bazel_rbe
-      - when:
-          # The default nodeversion runs all *excluding* other versions
-          condition:
-            equal: [*default_nodeversion_major, << parameters.nodeversion >>]
-          steps:
-            - run:
-                command: yarn bazel test --test_tag_filters=-node18,-node<< parameters.nodeversion >>-broken //packages/...
-                # This timeout provides time for the actual tests to timeout and report status
-                # instead of CircleCI stopping the job without test failure information.
-                no_output_timeout: 40m
-      - when:
-          # Non-default nodeversion runs only that specific nodeversion
-          condition:
-            not:
-              equal: [*default_nodeversion_major, << parameters.nodeversion >>]
-          steps:
-            - run:
-                command: yarn bazel test --test_tag_filters=node<< parameters.nodeversion >>,-node<< parameters.nodeversion >>-broken //packages/...
-                # This timeout provides time for the actual tests to timeout and report status
-                # instead of CircleCI stopping the job without test failure information.
-                no_output_timeout: 40m
-      - fail_fast
-
   e2e-tests:
     executor: bazel-executor
     parallelism: 8
@@ -365,16 +333,6 @@ workflows:
     jobs:
       # Linux jobs
       - setup
-
-      # These jobs only really depend on Setup, but the build job is very quick to run (~35s) and
-      # will catch any build errors before proceeding to the more lengthy and resource intensive
-      - test:
-          name: test-node<< matrix.nodeversion >>
-          matrix:
-            parameters:
-              nodeversion: ['16', '18']
-          requires:
-            - build
 
       # Bazel jobs
       - build:
