@@ -51,3 +51,16 @@ jobs:
         # it has been merged.
         if: github.event_name == 'pull_request'
         run: yarn ng-dev format changed --check ${{ github.event.pull_request.base.sha }}
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Initialize environment
+        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@0109d498b0f6aae418ed4924a5e5c65695f0ac61
+      - name: Setup Bazel
+        uses: angular/dev-infra/github-actions/bazel/setup@0109d498b0f6aae418ed4924a5e5c65695f0ac61
+      - name: Setup Bazel RBE
+        uses: angular/dev-infra/github-actions/bazel/configure-remote@0109d498b0f6aae418ed4924a5e5c65695f0ac61
+      - name: Install node modules
+        run: yarn install --frozen-lockfile
+      - name: Build all buildable targets
+        run: yarn bazel build //...

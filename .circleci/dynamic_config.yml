@@ -189,6 +189,7 @@ jobs:
           paths:
             - ~/.cache/yarn
 
+  # TODO: Remove once no other jobs rely on it anymore.
   build:
     executor: bazel-executor
     steps:
