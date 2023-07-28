@@ -51,6 +51,7 @@ jobs:
         # it has been merged.
         if: github.event_name == 'pull_request'
         run: yarn ng-dev format changed --check ${{ github.event.pull_request.base.sha }}
+
   build:
     runs-on: ubuntu-latest
     steps:
@@ -62,8 +63,15 @@ jobs:
         uses: angular/dev-infra/github-actions/bazel/configure-remote@0109d498b0f6aae418ed4924a5e5c65695f0ac61
       - name: Install node modules
         run: yarn install --frozen-lockfile
-      - name: Build all buildable targets
-        run: yarn bazel build //...
+      - name: Build release targets
+        run: yarn ng-dev release build
+      - name: Store PR release packages
+        if: github.event_name == 'pull_request'
+        uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
+        with:
+          name: packages
+          path: dist/releases/*.tgz
+          retention-days: 14
 
   test:
     runs-on: ubuntu-latest
