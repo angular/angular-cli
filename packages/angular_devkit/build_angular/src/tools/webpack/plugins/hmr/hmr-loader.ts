@@ -19,8 +19,7 @@ export default function localizeExtractLoader(
   const source = `${content}
 
   // HMR Accept Code
-  import ngHmrAccept from '${hmrAcceptPath}';
-  ngHmrAccept(module);
+  import('${hmrAcceptPath}').then(({default:ngHmrAccept})=>ngHmrAccept(module));
   `;
 
   this.callback(null, source, map);
