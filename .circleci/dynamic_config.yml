@@ -265,24 +265,6 @@ jobs:
           command: yarn admin snapshots --verbose
       - fail_fast
 
-  publish_artifacts:
-    executor: action-executor
-    resource_class: medium
-    environment:
-    steps:
-      - custom_attach_workspace
-      - run:
-          name: Create artifacts for packages
-          command: yarn ng-dev release build
-      - run:
-          name: Copy tarballs to folder
-          command: |
-            mkdir -p dist/artifacts/
-            cp dist/releases/*.tgz dist/artifacts/
-      - store_artifacts:
-          path: dist/artifacts/
-          destination: angular
-
   # Windows jobs
   e2e-cli-win:
     executor: windows-executor
@@ -399,8 +381,3 @@ workflows:
           requires:
             - setup
             - e2e-cli
-
-      - publish_artifacts:
-          <<: *only_pull_requests
-          requires:
-            - build
