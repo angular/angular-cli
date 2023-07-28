@@ -95,9 +95,9 @@ export async function loadProxyConfiguration(
  * @param proxy A proxy configuration object.
  */
 function normalizeProxyConfiguration(
-  proxy: Record<string, unknown> | object[],
-): Record<string, unknown> {
-  let normalizedProxy: Record<string, unknown> | undefined;
+  proxy: Record<string, object> | object[],
+): Record<string, object> {
+  let normalizedProxy: Record<string, object> | undefined;
 
   if (Array.isArray(proxy)) {
     // Construct an object-form proxy configuration from the array
@@ -135,7 +135,42 @@ function normalizeProxyConfiguration(
     }
   }
 
+  // Replace `pathRewrite` field with a `rewrite` function
+  for (const proxyEntry of Object.values(normalizedProxy)) {
+    if (
+      'pathRewrite' in proxyEntry &&
+      proxyEntry.pathRewrite &&
+      typeof proxyEntry.pathRewrite === 'object'
+    ) {
+      // Preprocess path rewrite entries
+      const pathRewriteEntries: [RegExp, string][] = [];
+      for (const [pattern, value] of Object.entries(
+        proxyEntry.pathRewrite as Record<string, string>,
+      )) {
+        pathRewriteEntries.push([new RegExp(pattern), value]);
+      }
+
+      (proxyEntry as Record<string, unknown>).rewrite = pathRewriter.bind(
+        undefined,
+        pathRewriteEntries,
+      );
+
+      delete proxyEntry.pathRewrite;
+    }
+  }
+
   return normalizedProxy;
+}
+
+function pathRewriter(pathRewriteEntries: [RegExp, string][], path: string): string {
+  for (const [pattern, value] of pathRewriteEntries) {
+    const updated = path.replace(pattern, value);
+    if (path !== updated) {
+      return updated;
+    }
+  }
+
+  return path;
 }
 
 /**
