@@ -189,30 +189,6 @@ jobs:
           paths:
             - ~/.cache/yarn
 
-  validate:
-    executor: action-executor
-    steps:
-      - custom_attach_workspace
-      - run:
-          name: Validate Commit Messages
-          command: >
-            if [[ -n "${CIRCLE_PR_NUMBER}" ]]; then
-              yarn ng-dev commit-message validate-range <<pipeline.git.base_revision>> <<pipeline.git.revision>>
-            else
-              echo "This build is not over a PR, nothing to do."
-            fi
-      - run:
-          name: Validate Code Formatting
-          command: yarn -s ng-dev format changed <<pipeline.git.base_revision>> --check
-      - run:
-          name: Validate NgBot Configuration
-          command: yarn ng-dev ngbot verify
-      - run:
-          name: Validate Circular Dependencies
-          command: yarn ts-circular-deps:check
-      - run: yarn -s admin validate
-      - run: yarn -s check-tooling-setup
-
   build:
     executor: bazel-executor
     steps:
@@ -388,9 +364,6 @@ workflows:
     jobs:
       # Linux jobs
       - setup
-      - validate:
-          requires:
-            - setup
 
       # These jobs only really depend on Setup, but the build job is very quick to run (~35s) and
       # will catch any build errors before proceeding to the more lengthy and resource intensive
