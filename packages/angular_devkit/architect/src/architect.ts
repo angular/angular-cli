@@ -122,7 +122,7 @@ function _createJobHandlerFromBuilderInfo(
           }),
         );
       }),
-      // Share subscriptions to the output, otherwise the the handler will be re-run.
+      // Share subscriptions to the output, otherwise the handler will be re-run.
       shareReplay(),
     );
 
