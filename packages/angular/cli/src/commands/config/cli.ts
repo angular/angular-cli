@@ -182,7 +182,7 @@ function normalizeValue(value: string | undefined | boolean | number): JsonValue
 
   try {
     // We use `JSON.parse` instead of `parseJson` because the latter will parse UUIDs
-    // and convert them into a numberic entities.
+    // and convert them into a numeric entities.
     // Example: 73b61974-182c-48e4-b4c6-30ddf08c5c98 -> 73.
     // These values should never contain comments, therefore using `JSON.parse` is safe.
     return JSON.parse(valueString);
