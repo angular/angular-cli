@@ -92,6 +92,7 @@ async function compileString(
       paths: options.includePaths,
       plugins: [resolverPlugin],
       rewriteUrls: 'all',
+      // Note: If ng-zorro-antd no longer needs inline Javascript in the future, it can be removed
       javascriptEnabled: true,
       sourceMap: options.sourcemap
         ? {
