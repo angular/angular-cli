@@ -153,7 +153,7 @@ export default custom<ApplicationPresetOptions>(() => {
         !/\.(e2e|spec)\.tsx?$|[\\/]node_modules[\\/]/.test(this.resourcePath) &&
         this.resourcePath.startsWith(instrumentCode.includedBasePath)
       ) {
-        // `babel-plugin-istanbul` has it's own includes but we do the below so that we avoid running the the loader.
+        // `babel-plugin-istanbul` has it's own includes but we do the below so that we avoid running the loader.
         customOptions.instrumentCode = {
           includedBasePath: instrumentCode.includedBasePath,
           inputSourceMap: map,
