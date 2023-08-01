@@ -73,16 +73,19 @@ jobs:
       matrix:
         version: [16, 18]
     steps:
-      - name: Initialize environment
-        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@0109d498b0f6aae418ed4924a5e5c65695f0ac61
+      - uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@e33196f7422957bea03ed53f6fbb155025ffc7b8 # v3.7.0
         with:
           node-version: ${{ matrix.version }}
+          cache: 'yarn'
+      - name: Install node modules
+        run: yarn install --frozen-lockfile
       - name: Setup Bazel
         uses: angular/dev-infra/github-actions/bazel/setup@0109d498b0f6aae418ed4924a5e5c65695f0ac61
       - name: Setup Bazel RBE
         uses: angular/dev-infra/github-actions/bazel/configure-remote@0109d498b0f6aae418ed4924a5e5c65695f0ac61
-      - name: Install node modules
-        run: yarn install --frozen-lockfile
       - if: matrix.version == env.defaultVersion
         name: Run tests for default node version
         run: yarn bazel test --test_tag_filters=-node18,-node16-broken //packages/...
