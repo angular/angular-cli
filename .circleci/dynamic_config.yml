@@ -322,31 +322,6 @@ workflows:
             - setup
 
       - e2e-tests:
-          name: e2e-cli-<< matrix.subset >>
-          nodeversion: *default_nodeversion_major
-          matrix:
-            parameters:
-              subset: *all_e2e_subsets
-          filters:
-            branches:
-              ignore:
-                - main
-                - /\d+\.\d+\.x/
-          requires:
-            - build
-
-      - e2e-tests:
-          name: e2e-cli-node-<<matrix.nodeversion>>-<< matrix.subset >>
-          matrix:
-            alias: e2e-cli
-            parameters:
-              nodeversion: *all_nodeversion_major
-              subset: *all_e2e_subsets
-          requires:
-            - build
-          <<: *only_release_branches
-
-      - e2e-tests:
           name: e2e-snapshots-<< matrix.subset >>
           nodeversion: *default_nodeversion_major
           matrix:
@@ -380,4 +355,4 @@ workflows:
           <<: *only_builds_branches
           requires:
             - setup
-            - e2e-cli
+            - e2e-cli-win
