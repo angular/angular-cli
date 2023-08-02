@@ -352,7 +352,7 @@ LARGE_SPECS = {
     },
     "ng-packagr": {},
     "browser": {
-        "shards": 50,
+        "shards": 10,
         "size": "large",
         "flaky": True,
         "extra_deps": [
