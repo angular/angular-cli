@@ -1,5 +1,5 @@
 import { ng } from '../../utils/process';
-import { updateTsConfig } from '../../utils/project';
+import { updateJsonFile, updateTsConfig } from '../../utils/project';
 
 export default async function () {
   // Update project to disable experimental decorators
@@ -11,6 +11,11 @@ export default async function () {
   await ng('build');
 
   // Production build with JIT
+  await updateJsonFile('angular.json', (json) => {
+    // Remove bundle budgets to avoid a build error due to the expected increased output size
+    // of a JIT production build.
+    json.projects['test-project'].architect.build.configurations.production.budgets = [];
+  });
   await ng('build', '--no-aot', '--no-build-optimizer');
 
   // Default development build
