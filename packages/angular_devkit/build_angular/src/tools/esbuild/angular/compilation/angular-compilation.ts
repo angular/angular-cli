@@ -7,10 +7,12 @@
  */
 
 import type ng from '@angular/compiler-cli';
-import type ts from 'typescript';
+import type { PartialMessage } from 'esbuild';
+import ts from 'typescript';
 import { loadEsmModule } from '../../../../utils/load-esm';
 import { profileSync } from '../../profiling';
 import type { AngularHostOptions } from '../angular-host';
+import { convertTypeScriptDiagnostic } from '../diagnostics';
 
 export interface EmitFileResult {
   filename: string;
@@ -61,7 +63,24 @@ export abstract class AngularCompilation {
     referencedFiles: readonly string[];
   }>;
 
-  abstract collectDiagnostics(): Iterable<ts.Diagnostic>;
-
   abstract emitAffectedFiles(): Iterable<EmitFileResult>;
+
+  protected abstract collectDiagnostics(): Iterable<ts.Diagnostic>;
+
+  async diagnoseFiles(): Promise<{ errors?: PartialMessage[]; warnings?: PartialMessage[] }> {
+    const result: { errors?: PartialMessage[]; warnings?: PartialMessage[] } = {};
+
+    profileSync('NG_DIAGNOSTICS_TOTAL', () => {
+      for (const diagnostic of this.collectDiagnostics()) {
+        const message = convertTypeScriptDiagnostic(diagnostic);
+        if (diagnostic.category === ts.DiagnosticCategory.Error) {
+          (result.errors ??= []).push(message);
+        } else {
+          (result.warnings ??= []).push(message);
+        }
+      }
+    });
+
+    return result;
+  }
 }
