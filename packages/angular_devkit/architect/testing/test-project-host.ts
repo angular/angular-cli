@@ -74,7 +74,7 @@ export class TestProjectHost extends NodeJsSyncHost {
         ),
       );
 
-    // Find a unique folder that we can write to to use as current root.
+    // Find a unique folder that we can write to use as current root.
     return this.findUniqueFolderPath().pipe(
       // Save the path and create a scoped host for it.
       tap((newFolderPath) => {

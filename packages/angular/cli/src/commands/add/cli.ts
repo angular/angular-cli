@@ -102,7 +102,7 @@ export default class AddCommadModule
     } catch (error) {
       // During `ng add` prior to the downloading of the package
       // we are not able to resolve and create a collection.
-      // Or when the the collection value is a path to a tarball.
+      // Or when the collection value is a path to a tarball.
     }
 
     return localYargs;

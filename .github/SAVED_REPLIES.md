@@ -84,7 +84,7 @@ Hello, errors like `Error encountered resolving symbol values statically` mean t
 Angular CLI always runs *some* static analysis, even in JIT mode, in order to discover lazy-loaded routes.
 This may cause a lot of static analysis errors to surface when importing your project into the CLI, or upgrading for older versions where we didn't run this kind of analysis.
 
-Below are good resources on how to to debug these errors:
+Below are good resources on how to debug these errors:
 - https://gist.github.com/chuckjaz/65dcc2fd5f4f5463e492ed0cb93bca60
 - https://github.com/rangle/angular-2-aot-sandbox#aot-dos-and-donts
 
