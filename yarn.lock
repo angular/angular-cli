@@ -131,7 +131,6 @@
 
 "@angular/build-tooling@https://github.com/angular/dev-infra-private-build-tooling-builds.git#1a12a44e5409e2ea2fc8a4ee17ed0d222a51b01f":
   version "0.0.0-25a781ff4fff8c13348ddf335e8067f103cb9035"
-  uid "1a12a44e5409e2ea2fc8a4ee17ed0d222a51b01f"
   resolved "https://github.com/angular/dev-infra-private-build-tooling-builds.git#1a12a44e5409e2ea2fc8a4ee17ed0d222a51b01f"
   dependencies:
     "@angular-devkit/build-angular" "16.2.0-next.2"
@@ -292,7 +291,6 @@
 
 "@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#23787ae14d5da7e8c89d1aaee362d1722b87d618":
   version "0.0.0-25a781ff4fff8c13348ddf335e8067f103cb9035"
-  uid "23787ae14d5da7e8c89d1aaee362d1722b87d618"
   resolved "https://github.com/angular/dev-infra-private-ng-dev-builds.git#23787ae14d5da7e8c89d1aaee362d1722b87d618"
   dependencies:
     "@yarnpkg/lockfile" "^1.1.0"
@@ -5463,6 +5461,19 @@ critters@0.0.19:
   version "0.0.19"
   resolved "https://registry.yarnpkg.com/critters/-/critters-0.0.19.tgz#15e3a3a0ed77ae4b69c3b2fe29c8e7e87fc77d1b"
   integrity sha512-Fm4ZAXsG0VzWy1U30rP4qxbaWGSsqXDgSupJW1OUJGDAs0KWC+j37v7p5a2kZ9BPJvhRzWm3be+Hc9WvQOBUOw==
+  dependencies:
+    chalk "^4.1.0"
+    css-select "^5.1.0"
+    dom-serializer "^2.0.0"
+    domhandler "^5.0.2"
+    htmlparser2 "^8.0.2"
+    postcss "^8.4.23"
+    pretty-bytes "^5.3.0"
+
+critters@0.0.20:
+  version "0.0.20"
+  resolved "https://registry.yarnpkg.com/critters/-/critters-0.0.20.tgz#08ddb961550ab7b3a59370537e4f01df208f7646"
+  integrity sha512-CImNRorKOl5d8TWcnAz5n5izQ6HFsvz29k327/ELy6UFcmbiZNOsinaKvzv16WZR0P6etfSWYzE47C4/56B3Uw==
   dependencies:
     chalk "^4.1.0"
     css-select "^5.1.0"
