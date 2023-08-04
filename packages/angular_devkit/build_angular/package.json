@@ -31,7 +31,7 @@
     "cacache": "17.0.6",
     "chokidar": "3.5.3",
     "copy-webpack-plugin": "11.0.0",
-    "critters": "0.0.16",
+    "critters": "0.0.20",
     "css-loader": "6.7.3",
     "esbuild-wasm": "0.17.18",
     "glob": "8.1.0",
