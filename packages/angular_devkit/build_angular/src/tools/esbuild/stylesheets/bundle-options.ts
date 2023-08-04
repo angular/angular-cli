@@ -64,7 +64,7 @@ export function createStylesheetBundleOptions(
     preserveSymlinks: options.preserveSymlinks,
     external: options.externalDependencies,
     publicPath: options.publicPath,
-    conditions: ['style', 'sass'],
+    conditions: ['style', 'sass', 'less'],
     mainFields: ['style', 'sass'],
     plugins: [
       pluginFactory.create(SassStylesheetLanguage),
