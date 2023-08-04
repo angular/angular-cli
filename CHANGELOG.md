@@ -1,3 +1,13 @@
+<a name="16.1.8"></a>
+
+# 16.1.8 (2023-08-04)
+
+| Commit                                                                                              | Type | Description            |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------- |
+| [7a420d338](https://github.com/angular/angular-cli/commit/7a420d3382b21d24c73b722e849f01b0aacfb860) | fix  | build: update critters |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="16.1.7"></a>
 
 # 16.1.7 (2023-08-02)
