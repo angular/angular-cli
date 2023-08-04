@@ -1,3 +1,16 @@
+<a name="16.2.0-rc.1"></a>
+
+# 16.2.0-rc.1 (2023-08-04)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                           |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------- |
+| [05f31bd28](https://github.com/angular/angular-cli/commit/05f31bd28f002a232598e0468dc418f99e434ae0) | fix  | prevent race condition in setting up sass worker pool |
+| [192326a8b](https://github.com/angular/angular-cli/commit/192326a8b215f6df1c02e8e694170b4d12d1ffe9) | fix  | build: update critters                                |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="16.2.0-rc.0"></a>
 
 # 16.2.0-rc.0 (2023-08-02)
