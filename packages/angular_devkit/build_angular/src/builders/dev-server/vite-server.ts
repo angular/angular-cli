@@ -16,7 +16,7 @@ import { readFile } from 'node:fs/promises';
 import { ServerResponse } from 'node:http';
 import type { AddressInfo } from 'node:net';
 import path from 'node:path';
-import { Connect, InlineConfig, ViteDevServer, createServer, normalizePath } from 'vite';
+import type { Connect, InlineConfig, ViteDevServer } from 'vite';
 import { JavaScriptTransformer } from '../../tools/esbuild/javascript-transformer';
 import { RenderOptions, renderPage } from '../../utils/server-rendering/render-page';
 import { buildEsbuildBrowser } from '../browser-esbuild';
@@ -63,6 +63,9 @@ export async function* serveWithVite(
     serverOptions.servePath = browserOptions.baseHref;
   }
 
+  // dynamically import Vite for ESM compatibility
+  const { createServer, normalizePath } = await import('vite');
+
   let server: ViteDevServer | undefined;
   let listeningAddress: AddressInfo | undefined;
   const generatedFiles = new Map<string, OutputFileRecord>();
@@ -74,7 +77,7 @@ export async function* serveWithVite(
     assert(result.outputFiles, 'Builder did not provide result files.');
 
     // Analyze result files for changes
-    analyzeResultFiles(result.outputFiles, generatedFiles);
+    analyzeResultFiles(normalizePath, result.outputFiles, generatedFiles);
 
     assetFiles.clear();
     if (result.assetFiles) {
@@ -136,6 +139,7 @@ export async function* serveWithVite(
 }
 
 function analyzeResultFiles(
+  normalizePath: (id: string) => string,
   resultFiles: OutputFile[],
   generatedFiles: Map<string, OutputFileRecord>,
 ) {
@@ -202,6 +206,9 @@ export async function setupServer(
     serverOptions.proxyConfig,
     true,
   );
+
+  // dynamically import Vite for ESM compatibility
+  const { normalizePath } = await import('vite');
 
   const configuration: InlineConfig = {
     configFile: false,
