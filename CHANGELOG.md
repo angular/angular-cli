@@ -1,3 +1,11 @@
+<a name="16.1.8"></a>
+
+# 16.1.8 (2023-08-04)
+
+This release is being done to update to the latest version of `critters`.
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="16.1.7"></a>
 
 # 16.1.7 (2023-08-02)
