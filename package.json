@@ -139,7 +139,7 @@
     "cacache": "17.0.6",
     "chokidar": "3.5.3",
     "copy-webpack-plugin": "11.0.0",
-    "critters": "0.0.16",
+    "critters": "0.0.20",
     "css-loader": "6.7.3",
     "debug": "^4.1.1",
     "esbuild": "0.17.18",
