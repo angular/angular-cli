@@ -31,7 +31,6 @@ import {
 import { BundleStylesheetOptions, bundleComponentStylesheet } from '../stylesheets/bundle-options';
 import { AngularHostOptions } from './angular-host';
 import { AngularCompilation, AotCompilation, JitCompilation, NoopCompilation } from './compilation';
-import { convertTypeScriptDiagnostic } from './diagnostics';
 import { setupJitPluginCallbacks } from './jit-plugin-callbacks';
 
 const USING_WINDOWS = platform() === 'win32';
@@ -258,16 +257,13 @@ export function createCompilerPlugin(
           return result;
         }
 
-        profileSync('NG_DIAGNOSTICS_TOTAL', () => {
-          for (const diagnostic of compilation.collectDiagnostics()) {
-            const message = convertTypeScriptDiagnostic(diagnostic);
-            if (diagnostic.category === ts.DiagnosticCategory.Error) {
-              (result.errors ??= []).push(message);
-            } else {
-              (result.warnings ??= []).push(message);
-            }
-          }
-        });
+        const diagnostics = await compilation.diagnoseFiles();
+        if (diagnostics.errors) {
+          (result.errors ??= []).push(...diagnostics.errors);
+        }
+        if (diagnostics.warnings) {
+          (result.warnings ??= []).push(...diagnostics.warnings);
+        }
 
         // Update TypeScript file output cache for all affected files
         profileSync('NG_EMIT_TS', () => {
