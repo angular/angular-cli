@@ -30,7 +30,7 @@
     "browserslist": "^4.21.5",
     "chokidar": "3.5.3",
     "copy-webpack-plugin": "11.0.0",
-    "critters": "0.0.19",
+    "critters": "0.0.20",
     "css-loader": "6.8.1",
     "esbuild-wasm": "0.18.17",
     "fast-glob": "3.3.1",
