@@ -133,7 +133,7 @@ abstract class UrlRebasingImporter implements Importer<'sync'> {
       if (this.rebaseSourceMaps) {
         // Generate an intermediate source map for the rebasing changes
         const map = updatedContents.generateMap({
-          hires: true,
+          hires: 'boundary',
           includeContent: true,
           source: canonicalUrl.href,
         });
