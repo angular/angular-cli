@@ -36,7 +36,7 @@
     "fast-glob": "3.3.1",
     "guess-parser": "0.4.22",
     "https-proxy-agent": "5.0.1",
-    "inquirer": "8.2.6",
+    "inquirer": "9.2.10",
     "jsonc-parser": "3.2.0",
     "karma-source-map-support": "1.4.0",
     "less": "4.1.3",
