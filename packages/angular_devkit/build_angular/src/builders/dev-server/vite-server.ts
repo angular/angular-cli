@@ -15,7 +15,7 @@ import { BinaryLike, createHash } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import { ServerResponse } from 'node:http';
 import type { AddressInfo } from 'node:net';
-import path from 'node:path';
+import path, { posix } from 'node:path';
 import type { Connect, InlineConfig, ViteDevServer } from 'vite';
 import { JavaScriptTransformer } from '../../tools/esbuild/javascript-transformer';
 import { RenderOptions, renderPage } from '../../utils/server-rendering/render-page';
@@ -31,6 +31,8 @@ interface OutputFileRecord {
   hash?: Buffer;
   updated: boolean;
 }
+
+const SSG_MARKER_REGEXP = /ng-server-context=["']\w*\|?ssg\|?\w*["']/;
 
 function hashContent(contents: BinaryLike): Buffer {
   // TODO: Consider xxhash
@@ -335,10 +337,20 @@ export async function setupServer(
               next: Connect.NextFunction,
             ) {
               const url = req.originalUrl;
-              if (!url) {
+              if (!url || url.endsWith('.html')) {
                 next();
 
                 return;
+              }
+
+              const potentialPrerendered = outputFiles.get(posix.join(url, 'index.html'))?.contents;
+              if (potentialPrerendered) {
+                const content = Buffer.from(potentialPrerendered).toString('utf-8');
+                if (SSG_MARKER_REGEXP.test(content)) {
+                  transformIndexHtmlAndAddHeaders(url, potentialPrerendered, res, next);
+
+                  return;
+                }
               }
 
               const rawHtml = outputFiles.get('/index.server.html')?.contents;
@@ -348,37 +360,23 @@ export async function setupServer(
                 return;
               }
 
-              server
-                .transformIndexHtml(url, Buffer.from(rawHtml).toString('utf-8'))
-                .then(async (html) => {
-                  const { content } = await renderPage({
-                    document: html,
-                    route: pathnameWithoutServePath(url, serverOptions),
-                    serverContext: 'ssr',
-                    loadBundle: (path: string) =>
-                      server.ssrLoadModule(path.slice(1)) as ReturnType<
-                        NonNullable<RenderOptions['loadBundle']>
-                      >,
-                    // Files here are only needed for critical CSS inlining.
-                    outputFiles: {},
-                    // TODO: add support for critical css inlining.
-                    inlineCriticalCss: false,
-                  });
+              transformIndexHtmlAndAddHeaders(url, rawHtml, res, next, async (html) => {
+                const { content } = await renderPage({
+                  document: html,
+                  route: pathnameWithoutServePath(url, serverOptions),
+                  serverContext: 'ssr',
+                  loadBundle: (path: string) =>
+                    server.ssrLoadModule(path.slice(1)) as ReturnType<
+                      NonNullable<RenderOptions['loadBundle']>
+                    >,
+                  // Files here are only needed for critical CSS inlining.
+                  outputFiles: {},
+                  // TODO: add support for critical css inlining.
+                  inlineCriticalCss: false,
+                });
 
-                  if (content) {
-                    res.setHeader('Content-Type', 'text/html');
-                    res.setHeader('Cache-Control', 'no-cache');
-                    if (serverOptions.headers) {
-                      Object.entries(serverOptions.headers).forEach(([name, value]) =>
-                        res.setHeader(name, value),
-                      );
-                    }
-                    res.end(content);
-                  } else {
-                    next();
-                  }
-                })
-                .catch((error) => next(error));
+                return content;
+              });
             }
 
             if (ssr) {
@@ -399,19 +397,7 @@ export async function setupServer(
               if (pathname === '/' || pathname === `/index.html`) {
                 const rawHtml = outputFiles.get('/index.html')?.contents;
                 if (rawHtml) {
-                  server
-                    .transformIndexHtml(req.url, Buffer.from(rawHtml).toString('utf-8'))
-                    .then((processedHtml) => {
-                      res.setHeader('Content-Type', 'text/html');
-                      res.setHeader('Cache-Control', 'no-cache');
-                      if (serverOptions.headers) {
-                        Object.entries(serverOptions.headers).forEach(([name, value]) =>
-                          res.setHeader(name, value),
-                        );
-                      }
-                      res.end(processedHtml);
-                    })
-                    .catch((error) => next(error));
+                  transformIndexHtmlAndAddHeaders(req.url, rawHtml, res, next);
 
                   return;
                 }
@@ -420,6 +406,39 @@ export async function setupServer(
               next();
             });
           };
+
+          function transformIndexHtmlAndAddHeaders(
+            url: string,
+            rawHtml: Uint8Array,
+            res: ServerResponse<import('http').IncomingMessage>,
+            next: Connect.NextFunction,
+            additionalTransformer?: (html: string) => Promise<string | undefined>,
+          ) {
+            server
+              .transformIndexHtml(url, Buffer.from(rawHtml).toString('utf-8'))
+              .then(async (processedHtml) => {
+                if (additionalTransformer) {
+                  const content = await additionalTransformer(processedHtml);
+                  if (!content) {
+                    next();
+
+                    return;
+                  }
+
+                  processedHtml = content;
+                }
+
+                res.setHeader('Content-Type', 'text/html');
+                res.setHeader('Cache-Control', 'no-cache');
+                if (serverOptions.headers) {
+                  Object.entries(serverOptions.headers).forEach(([name, value]) =>
+                    res.setHeader(name, value),
+                  );
+                }
+                res.end(processedHtml);
+              })
+              .catch((error) => next(error));
+          }
         },
       },
     ],
