@@ -13,13 +13,6 @@
         "$source": "projectName"
       }
     },
-    "appId": {
-      "type": "string",
-      "format": "html-selector",
-      "description": "The application identifier to use for transition.",
-      "default": "serverApp",
-      "x-deprecated": "This option is no longer used."
-    },
     "main": {
       "type": "string",
       "format": "path",
