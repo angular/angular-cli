@@ -8,6 +8,7 @@
 
 import { BuilderContext } from '@angular-devkit/architect';
 import { BuildOptions, Metafile, OutputFile, PartialMessage, formatMessages } from 'esbuild';
+import { createHash } from 'node:crypto';
 import { constants as fsConstants } from 'node:fs';
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -201,6 +202,9 @@ export function createOutputFileFromText(path: string, text: string): OutputFile
   return {
     path,
     text,
+    get hash() {
+      return createHash('sha256').update(this.text).digest('hex');
+    },
     get contents() {
       return Buffer.from(this.text, 'utf-8');
     },
