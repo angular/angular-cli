@@ -27,6 +27,7 @@ const UNSUPPORTED_OPTIONS: Array<keyof BrowserBuilderOptions> = [
   // * Unused by builder and will be removed in a future release
   'namedChunks',
   'vendorChunk',
+  'resourcesOutputPath',
 
   // * Currently unsupported by esbuild
   'webWorkerTsConfig',
