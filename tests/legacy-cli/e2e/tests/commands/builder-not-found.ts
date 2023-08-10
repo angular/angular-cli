@@ -18,7 +18,7 @@ export default async function () {
         'ng',
         ['build'],
         new RegExp(
-          `Node packages may not be installed\. Try installing with '${getActivePackageManager()} install'\.`,
+          `Node packages may not be installed\\. Try installing with '${getActivePackageManager()} install'\\.`,
         ),
       ),
     );
@@ -35,7 +35,7 @@ export default async function () {
       'ng',
       ['build'],
       new RegExp(
-        `Node packages may not be installed\. Try installing with '${getActivePackageManager()} install'\.`,
+        `Node packages may not be installed\\. Try installing with '${getActivePackageManager()} install'\\.`,
       ),
     );
   } finally {
