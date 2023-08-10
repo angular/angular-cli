@@ -1,6 +1,6 @@
 import { join } from 'path';
 import { getGlobalVariable } from '../../utils/env';
-import { expectFileToMatch, writeFile } from '../../utils/fs';
+import { appendToFile, expectFileToMatch, writeFile } from '../../utils/fs';
 import { installPackage, uninstallPackage } from '../../utils/packages';
 import { ng } from '../../utils/process';
 import { expectToFail } from '../../utils/utils';
@@ -10,6 +10,8 @@ export default async function () {
   // Setup an i18n enabled component
   await ng('generate', 'component', 'i18n-test');
   await writeFile(join('src/app/i18n-test', 'i18n-test.component.html'), '<p i18n>Hello world</p>');
+  // Actually use the generated component to ensure it is present in the application output
+  await appendToFile('src/app/app.component.html', '<app-i18n-test>');
 
   // Should fail if `@angular/localize` is missing
   const { message: message1 } = await expectToFail(() => ng('extract-i18n'));

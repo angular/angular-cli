@@ -34,6 +34,7 @@ ESBUILD_TESTS = [
     "tests/build/relative-sourcemap.js",
     "tests/build/styles/**",
     "tests/commands/add/add-pwa.js",
+    "tests/i18n/extract-ivy*",
 ]
 
 # Tests excluded for esbuild
