@@ -33,13 +33,20 @@ export interface DirectoryEntry {
 const MODULE_RESOLUTION_PREFIX = '__NG_PACKAGE__';
 
 function packModuleSpecifier(specifier: string, resolveDir: string): string {
-  const packed = MODULE_RESOLUTION_PREFIX + ';' + resolveDir + ';' + specifier;
+  const packed =
+    MODULE_RESOLUTION_PREFIX +
+    ';' +
+    // Encode the resolve directory to prevent unsupported characters from being present when
+    // Sass processes the URL. This is important on Windows which can contain drive letters
+    // and colons which would otherwise be interpreted as a URL scheme.
+    encodeURIComponent(resolveDir) +
+    ';' +
+    // Escape characters instead of encoding to provide more friendly not found error messages.
+    // Unescaping is automatically handled by Sass.
+    // https://developer.mozilla.org/en-US/docs/Web/CSS/url#syntax
+    specifier.replace(/[()\s'"]/g, '\\$&');
 
-  // Normalize path separators and escape characters
-  // https://developer.mozilla.org/en-US/docs/Web/CSS/url#syntax
-  const normalizedPacked = packed.replace(/\\/g, '/').replace(/[()\s'"]/g, '\\$&');
-
-  return normalizedPacked;
+  return packed;
 }
 
 function unpackModuleSpecifier(specifier: string): { specifier: string; resolveDir?: string } {
@@ -51,7 +58,7 @@ function unpackModuleSpecifier(specifier: string): { specifier: string; resolveD
 
   return {
     specifier: values[2],
-    resolveDir: values[1],
+    resolveDir: decodeURIComponent(values[1]),
   };
 }
 
