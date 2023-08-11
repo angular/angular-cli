@@ -13,7 +13,6 @@ import type { NormalizedApplicationBuildOptions } from '../../builders/applicati
 import { allowMangle } from '../../utils/environment-options';
 import { SourceFileCache, createCompilerPlugin } from './angular/compiler-plugin';
 import { createCompilerPluginOptions } from './compiler-plugin-options';
-import { createExternalPackagesPlugin } from './external-packages-plugin';
 import { createRxjsEsmResolutionPlugin } from './rxjs-esm-resolution-plugin';
 import { createSourcemapIngorelistPlugin } from './sourcemap-ignorelist-plugin';
 import { getFeatureSupport } from './utils';
@@ -56,8 +55,7 @@ export function createBrowserCodeBundleOptions(
   };
 
   if (options.externalPackages) {
-    buildOptions.plugins ??= [];
-    buildOptions.plugins.push(createExternalPackagesPlugin());
+    buildOptions.packages = 'external';
   }
 
   const polyfills = options.polyfills ? [...options.polyfills] : [];
@@ -156,7 +154,7 @@ export function createServerCodeBundleOptions(
 
   buildOptions.plugins ??= [];
   if (options.externalPackages) {
-    buildOptions.plugins.push(createExternalPackagesPlugin());
+    buildOptions.packages = 'external';
   } else {
     buildOptions.plugins.push(createRxjsEsmResolutionPlugin());
   }
