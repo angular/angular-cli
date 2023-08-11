@@ -299,10 +299,6 @@ ts_library(
 LARGE_SPECS = {
     "application": {
         "shards": 10,
-        "tags": [
-            # TODO: This is broken as app-shell tests do not work in Node versions prior to 18.13 due to Zone.js and SafePromise.
-            "node16-broken",
-        ],
         "extra_deps": [
             "@npm//buffer",
         ],
