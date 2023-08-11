@@ -79,7 +79,7 @@ jobs:
       defaultVersion: 16
     strategy:
       matrix:
-        version: [16, 18]
+        version: [18]
     steps:
       - uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
         with:
@@ -105,7 +105,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        node: [16, 18]
+        node: [18]
         subset: [npm, yarn, esbuild]
         shard: [0, 1, 2, 3]
         exclude:

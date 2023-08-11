@@ -39,7 +39,7 @@
     "url": "https://github.com/angular/angular-cli.git"
   },
   "engines": {
-    "node": "^16.14.0 || ^18.10.0",
+    "node": "^18.13.0",
     "yarn": ">=1.21.1 <2",
     "npm": "Please use yarn instead of NPM to install dependencies"
   },
@@ -101,7 +101,7 @@
     "@types/karma": "^6.3.0",
     "@types/less": "^3.0.3",
     "@types/loader-utils": "^2.0.0",
-    "@types/node": "^16.11.7",
+    "@types/node": "^18.13.0",
     "@types/node-fetch": "^2.1.6",
     "@types/npm-package-arg": "^6.1.0",
     "@types/pacote": "^11.1.3",

@@ -25,11 +25,11 @@ parameters:
 # See https://circleci.com/docs/2.0/caching/#restoring-cache for how prefixes work in CircleCI.
 var_1: &cache_key v1-angular_devkit-16.14-{{ checksum "yarn.lock" }}
 var_1_win: &cache_key_win v1-angular_devkit-win-16.14-{{ checksum "yarn.lock" }}
-var_3: &default_nodeversion '16.14'
-var_3_major: &default_nodeversion_major '16'
+var_3: &default_nodeversion '18.13'
+var_3_major: &default_nodeversion_major '18'
 # The major version of node toolchains. See tools/toolchain_info.bzl
 # NOTE: entries in this array may be repeated elsewhere in the file, find them before adding more
-var_3_all_major: &all_nodeversion_major ['16', '18']
+var_3_all_major: &all_nodeversion_major ['18']
 # Workspace initially persisted by the `setup` job, and then enhanced by `setup-and-build-win`.
 # https://circleci.com/docs/2.0/workflows/#using-workspaces-to-share-data-among-jobs
 # https://circleci.com/blog/deep-diving-into-circleci-workspaces/
@@ -141,8 +141,8 @@ commands:
   setup_windows:
     steps:
       - initialize_env
-      - run: nvm install 16.14.2
-      - run: nvm use 16.14.2
+      - run: nvm install 18.13.0
+      - run: nvm use 18.13.0
       - run: npm install -g yarn@1.22.10 @bazel/bazelisk@${BAZELISK_VERSION}
       - run: node --version
       - run: yarn --version
@@ -299,15 +299,15 @@ jobs:
             PWD: .
           command: |
             mkdir X:/ramdisk/e2e
-            bazel test --define=E2E_TEMP=X:/ramdisk/e2e --define=E2E_SHARD_TOTAL=$env:CIRCLE_NODE_TOTAL --define=E2E_SHARD_INDEX=$env:CIRCLE_NODE_INDEX --config=e2e //tests/legacy-cli:e2e.npm_node16
+            bazel test --define=E2E_TEMP=X:/ramdisk/e2e --define=E2E_SHARD_TOTAL=$env:CIRCLE_NODE_TOTAL --define=E2E_SHARD_INDEX=$env:CIRCLE_NODE_INDEX --config=e2e //tests/legacy-cli:e2e.npm_node18
           # This timeout provides time for the actual tests to timeout and report status
           # instead of CircleCI stopping the job without test failure information.
           no_output_timeout: 40m
       - fail_fast
       - store_artifacts:
-          path: dist/testlogs/tests/legacy-cli/e2e.npm_node16
+          path: dist/testlogs/tests/legacy-cli/e2e.npm_node18
       - store_test_results:
-          path: dist/testlogs/tests/legacy-cli/e2e.npm_node16
+          path: dist/testlogs/tests/legacy-cli/e2e.npm_node18
 
 workflows:
   version: 2

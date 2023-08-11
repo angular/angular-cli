@@ -52,11 +52,6 @@ rules_pkg_dependencies()
 load("@rules_nodejs//nodejs:repositories.bzl", "nodejs_register_toolchains")
 
 nodejs_register_toolchains(
-    name = "node16",
-    node_version = "16.14.2",
-)
-
-nodejs_register_toolchains(
     name = "node18",
     node_version = "18.13.0",
 )
@@ -64,7 +59,7 @@ nodejs_register_toolchains(
 # Set the default nodejs toolchain to the latest supported major version
 nodejs_register_toolchains(
     name = "nodejs",
-    node_version = "18.10.0",
+    node_version = "18.13.0",
 )
 
 load("@build_bazel_rules_nodejs//:index.bzl", "yarn_install")
