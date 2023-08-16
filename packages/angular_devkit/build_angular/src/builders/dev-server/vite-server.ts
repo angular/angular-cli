@@ -7,7 +7,7 @@
  */
 
 import type { BuilderContext } from '@angular-devkit/architect';
-import type { json } from '@angular-devkit/core';
+import type { json, logging } from '@angular-devkit/core';
 import type { OutputFile } from 'esbuild';
 import { lookup as lookupMimeType } from 'mrmime';
 import assert from 'node:assert';
@@ -89,23 +89,7 @@ export async function* serveWithVite(
     }
 
     if (server) {
-      // Invalidate any updated files
-      for (const [file, record] of generatedFiles) {
-        if (record.updated) {
-          const updatedModules = server.moduleGraph.getModulesByFile(file);
-          updatedModules?.forEach((m) => server?.moduleGraph.invalidateModule(m));
-        }
-      }
-
-      // Send reload command to clients
-      if (serverOptions.liveReload) {
-        context.logger.info('Reloading client(s)...');
-
-        server.ws.send({
-          type: 'full-reload',
-          path: '*',
-        });
-      }
+      handleUpdate(generatedFiles, server, serverOptions, context.logger);
     } else {
       // Setup server and start listening
       const serverConfiguration = await setupServer(
@@ -137,6 +121,61 @@ export async function* serveWithVite(
       deferred?.();
     });
     await new Promise<void>((resolve) => (deferred = resolve));
+  }
+}
+
+function handleUpdate(
+  generatedFiles: Map<string, OutputFileRecord>,
+  server: ViteDevServer,
+  serverOptions: NormalizedDevServerOptions,
+  logger: logging.LoggerApi,
+): void {
+  const updatedFiles: string[] = [];
+
+  // Invalidate any updated files
+  for (const [file, record] of generatedFiles) {
+    if (record.updated) {
+      updatedFiles.push(file);
+      const updatedModules = server.moduleGraph.getModulesByFile(file);
+      updatedModules?.forEach((m) => server?.moduleGraph.invalidateModule(m));
+    }
+  }
+
+  if (!updatedFiles.length) {
+    return;
+  }
+
+  if (serverOptions.hmr) {
+    if (updatedFiles.every((f) => f.endsWith('.css'))) {
+      const timestamp = Date.now();
+      server.ws.send({
+        type: 'update',
+        updates: updatedFiles.map((f) => {
+          const filePath = f.slice(1); // Remove leading slash.
+
+          return {
+            type: 'css-update',
+            timestamp,
+            path: filePath,
+            acceptedPath: filePath,
+          };
+        }),
+      });
+
+      logger.info('HMR update sent to client(s)...');
+
+      return;
+    }
+  }
+
+  // Send reload command to clients
+  if (serverOptions.liveReload) {
+    logger.info('Reloading client(s)...');
+
+    server.ws.send({
+      type: 'full-reload',
+      path: '*',
+    });
   }
 }
 
