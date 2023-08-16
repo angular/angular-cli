@@ -28,6 +28,10 @@ export default class E2eCommandModule
       name: 'WebdriverIO',
       value: '@wdio/schematics',
     },
+    {
+      name: 'Puppeteer',
+      value: '@puppeteer/ng-schematics',
+    },
   ];
 
   multiTarget = true;
