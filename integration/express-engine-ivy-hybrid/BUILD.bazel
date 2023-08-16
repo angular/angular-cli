@@ -1,0 +1,49 @@
+sh_test(
+    name = "test",
+    srcs = ["test.sh"],
+    args = ["$(NODE_PATH)"],
+    data = glob(
+        ["**"],
+        exclude = [
+            "BUILD.bazel",
+            "node_modules",
+            "dist",
+        ],
+    ) + [
+        "@npm//:node_modules_files",
+        "//modules/builders:npm_package",
+        "//modules/common:npm_package_runfiles",
+        "//modules/express-engine:npm_package_runfiles",
+        "//:node_files",
+    ] + select({
+        # We're assuming the target platform & the execution platform as the same here
+        "//:linux_x86_64": [
+            "@org_chromium_chromedriver_linux_x64//:metadata",
+            "@org_chromium_chromium_linux_x64//:chrome-linux",
+        ],
+        # There are no Chromimum browsers configured for Linux arm64 yet in dev-infra
+        # https://github.com/angular/dev-infra/blob/main/bazel/browsers/chromium/chromium.bzl
+        # "//:linux_arm64": [
+        #     "@org_chromium_chromedriver_linux_arm64//:metadata",
+        #     "@org_chromium_chromium_linux_arm64//:chrome-linux",
+        # ],
+        "//:macos_x86_64": [
+            "@org_chromium_chromedriver_macos_x64//:metadata",
+            "@org_chromium_chromium_macos_x64//:chrome-mac",
+        ],
+        "//:macos_arm64": [
+            "@org_chromium_chromedriver_macos_arm64//:metadata",
+            "@org_chromium_chromium_macos_arm64//:chrome-mac",
+        ],
+    }),
+    env = {
+        "CHROME_BIN": "$(CHROMIUM)",
+        "CHROMEDRIVER_BIN": "$(CHROMEDRIVER)",
+    },
+    # e2e test runner creates a tmpdir sandbox itself so no point in double sandboxing
+    tags = ["local"],
+    toolchains = [
+        "@nodejs_toolchains//:resolved_toolchain",
+        "@npm//@angular/build-tooling/bazel/browsers/chromium:toolchain_alias",
+    ],
+)

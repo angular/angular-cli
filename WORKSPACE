@@ -1,11 +1,16 @@
 workspace(
+<<<<<<< HEAD
     name = "angular_cli",
+=======
+    name = "nguniversal",
+>>>>>>> universal/move-to-cli
     managed_directories = {"@npm": ["node_modules"]},
 )
 
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
 http_archive(
+<<<<<<< HEAD
     name = "bazel_skylib",
     sha256 = "66ffd9315665bfaafc96b52278f57c7e2dd09f5ede279ea6d39b2be471e7e3aa",
     urls = [
@@ -15,6 +20,8 @@ http_archive(
 )
 
 http_archive(
+=======
+>>>>>>> universal/move-to-cli
     name = "io_bazel_rules_webtesting",
     sha256 = "e9abb7658b6a129740c0b3ef6f5a2370864e102a5ba5ffca2cea565829ed825a",
     urls = ["https://github.com/bazelbuild/rules_webtesting/releases/download/0.3.5/rules_webtesting.tar.gz"],
@@ -22,14 +29,20 @@ http_archive(
 
 http_archive(
     name = "build_bazel_rules_nodejs",
+<<<<<<< HEAD
     sha256 = "5dd1e5dea1322174c57d3ca7b899da381d516220793d0adef3ba03b9d23baa8e",
     urls = ["https://github.com/bazelbuild/rules_nodejs/releases/download/5.8.3/rules_nodejs-5.8.3.tar.gz"],
+=======
+    sha256 = "94070eff79305be05b7699207fbac5d2608054dd53e6109f7d00d923919ff45a",
+    urls = ["https://github.com/bazelbuild/rules_nodejs/releases/download/5.8.2/rules_nodejs-5.8.2.tar.gz"],
+>>>>>>> universal/move-to-cli
 )
 
 load("@build_bazel_rules_nodejs//:repositories.bzl", "build_bazel_rules_nodejs_dependencies")
 
 build_bazel_rules_nodejs_dependencies()
 
+<<<<<<< HEAD
 http_archive(
     name = "rules_pkg",
     sha256 = "8c20f74bca25d2d442b327ae26768c02cf3c99e93fad0381f32be9aab1967675",
@@ -48,10 +61,13 @@ load("@rules_pkg//:deps.bzl", "rules_pkg_dependencies")
 
 rules_pkg_dependencies()
 
+=======
+>>>>>>> universal/move-to-cli
 # Setup the Node.js toolchain
 load("@rules_nodejs//nodejs:repositories.bzl", "nodejs_register_toolchains")
 
 nodejs_register_toolchains(
+<<<<<<< HEAD
     name = "node18",
     node_version = "18.13.0",
 )
@@ -60,12 +76,23 @@ nodejs_register_toolchains(
 nodejs_register_toolchains(
     name = "nodejs",
     node_version = "18.13.0",
+=======
+    name = "nodejs",
+    node_version = "16.14.2",
+)
+
+load("@build_bazel_rules_nodejs//toolchains/esbuild:esbuild_repositories.bzl", "esbuild_repositories")
+
+esbuild_repositories(
+    npm_repository = "npm",
+>>>>>>> universal/move-to-cli
 )
 
 load("@build_bazel_rules_nodejs//:index.bzl", "yarn_install")
 
 yarn_install(
     name = "npm",
+<<<<<<< HEAD
     data = [
         "//:.yarn/releases/yarn-1.22.17.cjs",
         "//:.yarnrc",
@@ -74,10 +101,28 @@ yarn_install(
     #  1. Missing Windows support currently.
     #  2. Incompatibilites with the `ts_library` rule.
     exports_directories_only = False,
+=======
+    all_node_modules_target_name = "node_modules_all",
+    data = [
+        "//:tools/postinstall/patches/@angular+bazel+16.0.0-next.6.patch",
+        "//:tools/postinstall/patches/@bazel+concatjs+5.8.1.patch",
+    ],
+    # Currently disabled due to:
+    #  1. Incompatibilites with the `ts_library` rule.
+    exports_directories_only = False,
+    manual_build_file_contents = """\
+# Used by integration tests
+filegroup(
+    name = "node_modules_files",
+    srcs = ["node_modules"],
+)
+""",
+>>>>>>> universal/move-to-cli
     package_json = "//:package.json",
     # We prefer to symlink the `node_modules` to only maintain a single install.
     # See https://github.com/angular/dev-infra/pull/446#issuecomment-1059820287 for details.
     symlink_node_modules = True,
+<<<<<<< HEAD
     yarn = "//:.yarn/releases/yarn-1.22.17.cjs",
     yarn_lock = "//:yarn.lock",
 )
@@ -102,6 +147,11 @@ register_toolchains(
     "@npm//@angular/build-tooling/bazel/git-toolchain:git_windows_toolchain",
 )
 
+=======
+    yarn_lock = "//:yarn.lock",
+)
+
+>>>>>>> universal/move-to-cli
 load("@npm//@angular/build-tooling/bazel/browsers:browser_repositories.bzl", "browser_repositories")
 
 browser_repositories()

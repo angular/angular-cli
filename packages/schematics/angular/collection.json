@@ -1,4 +1,5 @@
 {
+<<<<<<< HEAD
   "schematics": {
     "ng-new": {
       "factory": "./ng-new",
@@ -125,6 +126,14 @@
       "factory": "./config",
       "schema": "./config/schema.json",
       "description": "Generates a configuration file."
+=======
+  "$schema": "../../node_modules/@angular-devkit/schematics/collection-schema.json",
+  "schematics": {
+    "ng-add": {
+      "description": "Adds Angular Universal Express Engine.",
+      "factory": "./universal-express",
+      "schema": "./universal-express/schema.json"
+>>>>>>> universal/move-to-cli
     }
   }
 }

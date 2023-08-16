@@ -1,0 +1,17 @@
+load("//tools:defaults.bzl", "ng_module")
+
+package(default_visibility = ["//visibility:public"])
+
+exports_files(["package.json"])
+
+ng_module(
+    name = "tokens",
+    package_name = "@angular/ssr/express/tokens",
+    srcs = glob([
+        "*.ts",
+    ]),
+    deps = [
+        "@npm//@angular/core",
+        "@npm//@types/express",
+    ],
+)

@@ -1,0 +1,55 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "SchematicsExpressEngineInstall",
+  "title": "Express Engine Install Options Schema",
+  "type": "object",
+  "properties": {
+    "project": {
+      "type": "string",
+      "description": "The name of the project.",
+      "$default": {
+        "$source": "projectName"
+      }
+    },
+    "appId": {
+      "type": "string",
+      "format": "html-selector",
+      "description": "The appId to use withServerTransition.",
+      "default": "serverApp"
+    },
+    "main": {
+      "type": "string",
+      "format": "path",
+      "description": "The name of the main entry-point file.",
+      "default": "main.server.ts"
+    },
+    "serverFileName": {
+      "type": "string",
+      "default": "server.ts",
+      "description": "The name of the Express server file."
+    },
+    "serverPort": {
+      "type": "number",
+      "default": 4000,
+      "description": "The port for the Express server."
+    },
+    "rootModuleFileName": {
+      "type": "string",
+      "format": "path",
+      "description": "The name of the root module file",
+      "default": "app.server.module.ts"
+    },
+    "rootModuleClassName": {
+      "type": "string",
+      "description": "The name of the root module class.",
+      "default": "AppServerModule"
+    },
+    "skipInstall": {
+      "description": "Skip installing dependency packages.",
+      "type": "boolean",
+      "default": false
+    }
+  },
+  "required": ["project"],
+  "additionalProperties": false
+}

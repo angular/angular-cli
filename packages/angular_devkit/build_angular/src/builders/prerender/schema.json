@@ -1,0 +1,44 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "title": "Prerender Target",
+  "type": "object",
+  "properties": {
+    "browserTarget": {
+      "type": "string",
+      "description": "Target to build.",
+      "pattern": "^[^:\\s]+:[^:\\s]+(:[^\\s]+)?$"
+    },
+    "serverTarget": {
+      "type": "string",
+      "description": "Server target to use for prerendering the app.",
+      "pattern": "^[^:\\s]+:[^:\\s]+(:[^\\s]+)?$"
+    },
+    "routesFile": {
+      "type": "string",
+      "description": "The path to a file containing routes separated by newlines."
+    },
+    "routes": {
+      "type": "array",
+      "description": "The routes to render.",
+      "items": {
+        "minItems": 1,
+        "type": "string",
+        "uniqueItems": true
+      },
+      "default": []
+    },
+    "guessRoutes": {
+      "type": "boolean",
+      "description": "Whether or not the builder should extract routes and guess which paths to render.",
+      "default": true
+    },
+    "numProcesses": {
+      "type": "number",
+      "description": "The number of cpus to use. Defaults to all but one.",
+      "minimum": 1
+    }
+  },
+  "required": ["browserTarget", "serverTarget"],
+  "anyOf": [{ "required": ["routes"] }, { "required": ["routesFile"] }],
+  "additionalProperties": false
+}
