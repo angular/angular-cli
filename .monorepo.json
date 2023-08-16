@@ -28,6 +28,17 @@
       "section": "Schematics",
       "snapshotRepo": "angular/angular-pwa-builds"
     },
+    "@angular/ssr": {
+      "name": "Angular SSR",
+      "section": "Misc",
+      "links": [
+        {
+          "label": "README",
+          "url": "/packages/angular/ssr/README.md"
+        }
+      ],
+      "snapshotRepo": "angular/ssr-builds"
+    },
     "@angular-devkit/architect": {
       "name": "Architect",
       "links": [

@@ -69,6 +69,8 @@ yarn_install(
     data = [
         "//:.yarn/releases/yarn-1.22.17.cjs",
         "//:.yarnrc",
+        "//:tools/postinstall/patches/@angular+bazel+16.0.0-next.6.patch",
+        "//:tools/postinstall/patches/@bazel+concatjs+5.8.1.patch",
     ],
     # Currently disabled due to:
     #  1. Missing Windows support currently.

@@ -13,6 +13,7 @@ exports_files([
     "LICENSE",
     "tsconfig.json",
     "tsconfig-test.json",
+    "tsconfig-build-ng.json",
     "tsconfig-build.json",
     "package.json",
 ])

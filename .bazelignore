@@ -4,6 +4,7 @@ node_modules
 packages/angular/cli/node_modules
 packages/angular/create/node_modules
 packages/angular/pwa/node_modules
+packages/angular/ssr/node_modules
 packages/angular_devkit/architect/node_modules
 packages/angular_devkit/architect_cli/node_modules
 packages/angular_devkit/build_angular/node_modules
