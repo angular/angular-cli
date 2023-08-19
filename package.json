@@ -210,7 +210,7 @@
     "text-table": "0.2.0",
     "tree-kill": "1.2.2",
     "ts-node": "^10.9.1",
-    "tslib": "2.6.1",
+    "tslib": "2.6.2",
     "typescript": "5.1.6",
     "verdaccio": "5.26.1",
     "verdaccio-auth-memory": "^10.0.0",
