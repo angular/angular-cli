@@ -1,10 +1,10 @@
 .git
 dist
 node_modules
-<<<<<<< HEAD
 packages/angular/cli/node_modules
 packages/angular/create/node_modules
 packages/angular/pwa/node_modules
+packages/angular/ssr/node_modules
 packages/angular_devkit/architect/node_modules
 packages/angular_devkit/architect_cli/node_modules
 packages/angular_devkit/build_angular/node_modules
@@ -14,10 +14,3 @@ packages/angular_devkit/schematics/node_modules
 packages/angular_devkit/schematics_cli/node_modules
 packages/ngtools/webpack/node_modules
 packages/schematics/angular/node_modules
-=======
-integration/common-engine/dist
-integration/common-engine/node_modules
-integration/express-engine-ivy/node_modules
-integration/express-engine-hybrid/node_modules
-integration/express-engine-standalone/node_modules
->>>>>>> universal/move-to-cli

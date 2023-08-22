@@ -13,8 +13,13 @@ import {
   targetFromTargetString,
 } from '@angular-devkit/architect';
 import { json, logging, tags } from '@angular-devkit/core';
-import * as browserSync from 'browser-sync';
-import { createProxyMiddleware } from 'http-proxy-middleware';
+import type {
+  BrowserSyncInstance,
+  Options as BrowserSyncOptions,
+  HttpsOptions,
+  MiddlewareHandler,
+  ProxyOptions,
+} from 'browser-sync';
 import { join, resolve as pathResolve } from 'path';
 import { EMPTY, Observable, combineLatest, from, of, zip } from 'rxjs';
 import {
@@ -32,6 +37,7 @@ import {
   tap,
 } from 'rxjs/operators';
 import * as url from 'url';
+import { assertIsError } from '../../utils/error';
 import { Schema } from './schema';
 
 import { getAvailablePort, spawnAsObservable, waitUntilServerIsListening } from './utils';
@@ -42,9 +48,10 @@ const IGNORED_STDOUT_MESSAGES = [
   'Angular is running in development mode. Call enableProdMode() to enable production mode.',
 ];
 
-export type SSRDevServerBuilderOptions = Schema & json.JsonObject;
+type SSRDevServerBuilderOptions = Schema & json.JsonObject;
 export type SSRDevServerBuilderOutput = BuilderOutput & {
   baseUrl?: string;
+  port?: string;
 };
 
 export function execute(
@@ -53,23 +60,23 @@ export function execute(
 ): Observable<SSRDevServerBuilderOutput> {
   const browserTarget = targetFromTargetString(options.browserTarget);
   const serverTarget = targetFromTargetString(options.serverTarget);
-  const getBaseUrl = (bs: browserSync.BrowserSyncInstance) =>
+  const getBaseUrl = (bs: BrowserSyncInstance) =>
     `${bs.getOption('scheme')}://${bs.getOption('host')}:${bs.getOption('port')}`;
   const browserTargetRun = context.scheduleTarget(browserTarget, {
-    watch: true,
+    watch: options.watch,
     progress: options.progress,
     verbose: options.verbose,
     // Disable bundle budgets are these are not meant to be used with a dev-server as this will add extra JavaScript for live-reloading.
     budgets: [],
-  });
+  } as json.JsonObject);
 
   const serverTargetRun = context.scheduleTarget(serverTarget, {
-    watch: true,
+    watch: options.watch,
     progress: options.progress,
     verbose: options.verbose,
-  });
+  } as json.JsonObject);
 
-  const bsInstance = browserSync.create();
+  const bsInstance = require('browser-sync').create();
 
   context.logger.error(tags.stripIndents`
   ****************************************************************************************
@@ -155,8 +162,9 @@ export function execute(
         ({
           success: builderOutput.success,
           error: builderOutput.error,
-          baseUrl: bsInstance && getBaseUrl(bsInstance),
-        } as SSRDevServerBuilderOutput),
+          baseUrl: getBaseUrl(bsInstance),
+          port: bsInstance.getOption('port'),
+        }) as SSRDevServerBuilderOutput,
     ),
     finalize(() => {
       if (bsInstance) {
@@ -215,18 +223,18 @@ function startNodeServer(
 }
 
 async function initBrowserSync(
-  browserSyncInstance: browserSync.BrowserSyncInstance,
+  browserSyncInstance: BrowserSyncInstance,
   nodeServerPort: number,
   options: SSRDevServerBuilderOptions,
   context: BuilderContext,
-): Promise<browserSync.BrowserSyncInstance> {
+): Promise<BrowserSyncInstance> {
   if (browserSyncInstance.active) {
     return browserSyncInstance;
   }
 
   const { port: browserSyncPort, open, host, publicHost, proxyConfig } = options;
   const bsPort = browserSyncPort || (await getAvailablePort());
-  const bsOptions: browserSync.Options = {
+  const bsOptions: BrowserSyncOptions = {
     proxy: {
       target: `localhost:${nodeServerPort}`,
       proxyOptions: {
@@ -240,7 +248,7 @@ async function initBrowserSync(
         },
       ],
       // proxyOptions is not in the typings
-    } as browserSync.ProxyOptions & { proxyOptions: { xfwd: boolean } },
+    } as ProxyOptions & { proxyOptions: { xfwd: boolean } },
     host,
     port: bsPort,
     ui: false,
@@ -280,6 +288,8 @@ async function initBrowserSync(
     // However users will typically have a reverse proxy that will redirect all matching requests
     // ex: http://testinghost.com/ssr -> http://localhost:4200 which will result in a 404.
     if (hasPathname) {
+      const { createProxyMiddleware } = await import('http-proxy-middleware');
+
       // Remove leading slash
       // eslint-disable-next-line @typescript-eslint/no-unused-expressions
       (bsOptions.scriptPath = (p) => p.substring(1)),
@@ -293,6 +303,7 @@ async function initBrowserSync(
             }),
             ws: true,
             logLevel: 'silent',
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
           }) as any,
         ]);
     }
@@ -307,7 +318,7 @@ async function initBrowserSync(
 
     bsOptions.middleware = [
       ...bsOptions.middleware,
-      ...getProxyConfig(context.workspaceRoot, proxyConfig),
+      ...(await getProxyConfig(context.workspaceRoot, proxyConfig)),
     ];
   }
 
@@ -337,7 +348,7 @@ function mapErrorToMessage(error: unknown): string {
 function getSslConfig(
   root: string,
   options: SSRDevServerBuilderOptions,
-): browserSync.HttpsOptions | undefined | boolean {
+): HttpsOptions | undefined | boolean {
   const { ssl, sslCert, sslKey } = options;
   if (ssl && sslCert && sslKey) {
     return {
@@ -349,12 +360,14 @@ function getSslConfig(
   return ssl;
 }
 
-function getProxyConfig(root: string, proxyConfig: string): browserSync.MiddlewareHandler[] {
+async function getProxyConfig(root: string, proxyConfig: string): Promise<MiddlewareHandler[]> {
   const proxyPath = pathResolve(root, proxyConfig);
-  let proxySettings: any;
+  let proxySettings: unknown;
   try {
     proxySettings = require(proxyPath);
   } catch (error) {
+    assertIsError(error);
+
     if (error.code === 'MODULE_NOT_FOUND') {
       throw new Error(`Proxy config file ${proxyPath} does not exist.`);
     }
@@ -364,19 +377,21 @@ function getProxyConfig(root: string, proxyConfig: string): browserSync.Middlewa
 
   const proxies = Array.isArray(proxySettings) ? proxySettings : [proxySettings];
   const createdProxies = [];
-
+  const { createProxyMiddleware } = await import('http-proxy-middleware');
   for (const proxy of proxies) {
     for (const [key, context] of Object.entries(proxy)) {
       if (typeof key === 'string') {
         createdProxies.push(
           createProxyMiddleware(
             key.replace(/^\*$/, '**').replace(/\/\*$/, ''),
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             context as any,
-          ) as browserSync.MiddlewareHandler,
+          ) as MiddlewareHandler,
         );
       } else {
         createdProxies.push(
-          createProxyMiddleware(key, context as any) as browserSync.MiddlewareHandler,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          createProxyMiddleware(key, context as any) as MiddlewareHandler,
         );
       }
     }

@@ -8,11 +8,14 @@
 
 import { BuilderContext } from '@angular-devkit/architect';
 import { BrowserBuilderOptions } from '@angular-devkit/build-angular';
+import { json } from '@angular-devkit/core';
 import * as fs from 'fs';
 import { parseAngularRoutes } from 'guess-parser';
-import * as os from 'os';
 import * as path from 'path';
-import { PrerenderBuilderOptions } from './models';
+import { assertIsError } from '../../utils/error';
+import { Schema } from './schema';
+
+type PrerenderBuilderOptions = Schema & json.JsonObject;
 
 /**
  * Returns the union of routes, the contents of routesFile if given,
@@ -43,7 +46,9 @@ export async function getRoutes(
           .filter((route) => !route.includes('*') && !route.includes(':')),
       );
     } catch (e) {
-      logger.error('Unable to extract routes from application.', e);
+      assertIsError(e);
+
+      logger.error('Unable to extract routes from application.', { ...e });
     }
   }
 

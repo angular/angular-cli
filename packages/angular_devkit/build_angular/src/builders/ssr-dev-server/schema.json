@@ -24,6 +24,11 @@
       "default": 4200,
       "description": "Port to start the development server at. Default is 4200. Pass 0 to get a dynamically assigned port."
     },
+    "watch": {
+      "type": "boolean",
+      "description": "Rebuild on change.",
+      "default": true
+    },
     "publicHost": {
       "type": "string",
       "description": "The URL that the browser client should use to connect to the development server. Use for a complex dev server setup, such as one with reverse proxies."

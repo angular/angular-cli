@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Copyright Google Inc. All Rights Reserved.
 #
 # Use of this source code is governed by an MIT-style license that can be
@@ -30,6 +29,3 @@ nodejs_binary(
     templated_args = ["--bazel_patch_module_resolver"],
 )
 # @external_end
-=======
-# This file is a marker indicating this directory is a bazel package
->>>>>>> universal/move-to-cli

@@ -214,6 +214,7 @@ The following is the list of supported scopes:
 * **@angular/cli**
 * **@angular/create**
 * **@angular/pwa**
+* **@angular/ssr**
 * **@angular-devkit/architect**
 * **@angular-devkit/architect-cli**
 * **@angular-devkit/build-angular**

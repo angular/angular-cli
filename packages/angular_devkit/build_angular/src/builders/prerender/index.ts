@@ -12,20 +12,24 @@ import {
   createBuilder,
   targetFromTargetString,
 } from '@angular-devkit/architect';
-import {
-  BrowserBuilderOptions,
-  BrowserBuilderOutput,
-  ServerBuilderOutput,
-} from '@angular-devkit/build-angular';
-import { normalizeOptimization } from '@angular-devkit/build-angular/src/utils/normalize-optimization';
-import { augmentAppWithServiceWorker } from '@angular-devkit/build-angular/src/utils/service-worker';
+import { json } from '@angular-devkit/core';
 import * as fs from 'fs';
 import ora from 'ora';
 import * as path from 'path';
 import Piscina from 'piscina';
-import { PrerenderBuilderOptions, PrerenderBuilderOutput } from './models';
+import { normalizeOptimization } from '../../utils';
+import { maxWorkers } from '../../utils/environment-options';
+import { assertIsError } from '../../utils/error';
+import { augmentAppWithServiceWorker } from '../../utils/service-worker';
+import { BrowserBuilderOutput } from '../browser';
+import { Schema as BrowserBuilderOptions } from '../browser/schema';
+import { ServerBuilderOutput } from '../server';
+import type { RenderOptions, RenderResult } from './render-worker';
+import { Schema } from './schema';
 import { getIndexOutputFile, getRoutes } from './utils';
-import { RenderOptions, RenderResult } from './worker';
+
+type PrerenderBuilderOptions = Schema & json.JsonObject;
+type PrerenderBuilderOutput = BuilderOutput;
 
 /**
  * Schedules the server and browser builds and returns their results if both builds are successful.
@@ -63,6 +67,8 @@ async function _scheduleBuilds(
 
     return { success, error, browserResult, serverResult };
   } catch (e) {
+    assertIsError(e);
+
     return { success: false, error: e.message };
   } finally {
     await Promise.all([browserTargetRun.stop(), serverTargetRun.stop()]);
@@ -79,7 +85,6 @@ async function _renderUniversal(
   browserResult: BrowserBuilderOutput,
   serverResult: ServerBuilderOutput,
   browserOptions: BrowserBuilderOptions,
-  numProcesses?: number,
 ): Promise<PrerenderBuilderOutput> {
   const projectName = context.target && context.target.project;
   if (!projectName) {
@@ -102,8 +107,8 @@ async function _renderUniversal(
 
   const { baseOutputPath = '' } = serverResult;
   const worker = new Piscina({
-    filename: path.join(__dirname, 'worker.js'),
-    maxThreads: numProcesses,
+    filename: path.join(__dirname, 'render-worker.js'),
+    maxThreads: maxWorkers,
     workerData: { zonePackage },
   });
 
@@ -147,6 +152,7 @@ async function _renderUniversal(
         }
       } catch (error) {
         spinner.fail(`Prerendering routes to ${outputPath} failed.`);
+        assertIsError(error);
 
         return { success: false, error: error.message };
       }
@@ -164,6 +170,7 @@ async function _renderUniversal(
           );
         } catch (error) {
           spinner.fail('Service worker generation failed.');
+          assertIsError(error);
 
           return { success: false, error: error.message };
         }
@@ -204,14 +211,7 @@ export async function execute(
     return { success, error } as BuilderOutput;
   }
 
-  return _renderUniversal(
-    routes,
-    context,
-    browserResult,
-    serverResult,
-    browserOptions,
-    options.numProcesses,
-  );
+  return _renderUniversal(routes, context, browserResult, serverResult, browserOptions);
 }
 
 export default createBuilder(execute);

@@ -6,4 +6,9 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-export { CommonEngine, CommonEngineRenderOptions  } from './src/common-engine';
+export { CommonEngine, CommonEngineRenderOptions } from './src/common-engine';
+export {
+  ngExpressEngine,
+  NgExpressEngineOptions,
+  NgExpressEngineRenderOptions,
+} from './src/express-engine';

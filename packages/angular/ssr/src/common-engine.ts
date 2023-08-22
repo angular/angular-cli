@@ -18,6 +18,8 @@ import { dirname, resolve } from 'node:path';
 import { URL } from 'node:url';
 import { InlineCriticalCssProcessor } from './inline-css-processor';
 
+const SSG_MARKER_REGEXP = /ng-server-context=["']\w*\|?ssg\|?\w*["']/;
+
 export interface CommonEngineRenderOptions {
   bootstrap?: Type<{}> | (() => Promise<ApplicationRef>);
   providers?: StaticProvider[];
@@ -44,7 +46,7 @@ export interface CommonEngineRenderOptions {
 export class CommonEngine {
   private readonly templateCache = new Map<string, string>();
   private readonly inlineCriticalCssProcessor: InlineCriticalCssProcessor;
-  private readonly pageExists = new Map<string, boolean>();
+  private readonly pageIsSSG = new Map<string, boolean>();
 
   constructor(
     private bootstrap?: Type<{}> | (() => Promise<ApplicationRef>),
@@ -60,23 +62,29 @@ export class CommonEngine {
    * render options
    */
   async render(opts: CommonEngineRenderOptions): Promise<string> {
-    const { inlineCriticalCss = true } = opts;
+    const { inlineCriticalCss = true, url } = opts;
 
-    if (opts.publicPath && opts.documentFilePath && opts.url !== undefined) {
-      const url = new URL(opts.url);
+    if (opts.publicPath && opts.documentFilePath && url !== undefined) {
+      const pathname = canParseUrl(url) ? new URL(url).pathname : url;
       // Remove leading forward slash.
-      const pathname = url.pathname.substring(1);
-      const pagePath = resolve(opts.publicPath, pathname, 'index.html');
+      const pagePath = resolve(opts.publicPath, pathname.substring(1), 'index.html');
 
       if (pagePath !== resolve(opts.documentFilePath)) {
         // View path doesn't match with prerender path.
-        let pageExists = this.pageExists.get(pagePath);
-        if (pageExists === undefined) {
-          pageExists = await exists(pagePath);
-          this.pageExists.set(pagePath, pageExists);
-        }
+        const pageIsSSG = this.pageIsSSG.get(pagePath);
+        if (pageIsSSG === undefined) {
+          if (await exists(pagePath)) {
+            const content = await fs.promises.readFile(pagePath, 'utf-8');
+            const isSSG = SSG_MARKER_REGEXP.test(content);
+            this.pageIsSSG.set(pagePath, isSSG);
 
-        if (pageExists) {
+            if (isSSG) {
+              return content;
+            }
+          } else {
+            this.pageIsSSG.set(pagePath, false);
+          }
+        } else if (pageIsSSG) {
           // Serve pre-rendered page.
           return fs.promises.readFile(pagePath, 'utf-8');
         }
@@ -102,7 +110,7 @@ export class CommonEngine {
           document: inlineCriticalCss
             ? // Workaround for https://github.com/GoogleChromeLabs/critters/issues/64
               doc.replace(
-                / media="print" onload="this\.media=['&apos;].+?['&apos;]"(?: ngCspMedia=".+")?><noscript><link .+?><\/noscript>/g,
+                / media="print" onload="this\.media='.+?'"(?: ngCspMedia=".+")?><noscript><link .+?><\/noscript>/g,
                 '>',
               )
             : doc,
@@ -162,4 +170,13 @@ async function exists(path: fs.PathLike): Promise<boolean> {
 function isBootstrapFn(value: unknown): value is () => Promise<ApplicationRef> {
   // We can differentiate between a module and a bootstrap function by reading `cmp`:
   return typeof value === 'function' && !('ɵmod' in value);
+}
+
+// The below can be removed in favor of URL.canParse() when Node.js 18 is dropped
+function canParseUrl(url: string): boolean {
+  try {
+    return !!new URL(url);
+  } catch {
+    return false;
+  }
 }

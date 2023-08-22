@@ -55,7 +55,8 @@
       "matchPaths": [
         "packages/angular_devkit/schematics_cli/blank/project-files/package.json",
         "packages/angular_devkit/schematics_cli/schematic/files/package.json",
-        "packages/schematics/angular/utility/latest-versions/package.json"
+        "packages/schematics/angular/utility/latest-versions/package.json",
+        "packages/angular/ssr/utility/latest-versions/package.json"
       ],
       "matchPackagePatterns": ["*"],
       "groupName": "schematics dependencies",
@@ -66,7 +67,8 @@
       "matchPaths": [
         "!packages/angular_devkit/schematics_cli/blank/project-files/package.json",
         "!packages/angular_devkit/schematics_cli/schematic/files/package.json",
-        "!packages/schematics/angular/utility/latest-versions/package.json"
+        "!packages/schematics/angular/utility/latest-versions/package.json",
+        "!packages/angular/ssr/utility/latest-versions/package.json"
       ],
       "excludePackagePatterns": ["^@angular/.*", "angular/dev-infra"],
       "matchPackagePatterns": ["*"],

@@ -5,6 +5,7 @@ load("//tools:toolchain_info.bzl", "TOOLCHAINS_NAMES", "TOOLCHAINS_VERSIONS")
 TESTED_PACKAGES = [
     "//packages/angular/cli:npm_package_archive.tgz",
     "//packages/angular/create:npm_package_archive.tgz",
+    "//packages/angular/ssr:npm_package_archive.tgz",
     "//packages/angular/pwa:npm_package_archive.tgz",
     "//packages/angular_devkit/architect:npm_package_archive.tgz",
     "//packages/angular_devkit/architect_cli:npm_package_archive.tgz",
@@ -39,6 +40,7 @@ ESBUILD_TESTS = [
 
 # Tests excluded for esbuild
 ESBUILD_IGNORE_TESTS = [
+    "tests/ssr/**",
 ]
 
 def _to_glob(patterns):

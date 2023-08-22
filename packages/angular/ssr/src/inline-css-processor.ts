@@ -12,7 +12,7 @@ import { readFile } from 'node:fs/promises';
 /**
  * Pattern used to extract the media query set by Critters in an `onload` handler.
  */
-const MEDIA_SET_HANDLER_PATTERN = /^this\.media=[&apos;"'](.*)[&apos;"'];?$/;
+const MEDIA_SET_HANDLER_PATTERN = /^this\.media=["'](.*)["'];?$/;
 
 /**
  * Name of the attribute used to save the Critters media query so it can be re-assigned on load.
@@ -154,7 +154,15 @@ class CrittersExtended extends Critters {
         this.conditionallyInsertCspLoadingScript(document, cspNonce);
       }
 
-      link.prev?.setAttribute('nonce', cspNonce);
+      // Ideally we would hook in at the time Critters inserts the `style` tags, but there isn't
+      // a way of doing that at the moment so we fall back to doing it any time a `link` tag is
+      // inserted. We mitigate it by only iterating the direct children of the `<head>` which
+      // should be pretty shallow.
+      document.head.children.forEach((child) => {
+        if (child.tagName === 'style' && !child.hasAttribute('nonce')) {
+          child.setAttribute('nonce', cspNonce);
+        }
+      });
     }
 
     return returnValue;
@@ -198,7 +206,6 @@ class CrittersExtended extends Critters {
     const script = document.createElement('script');
     script.setAttribute('nonce', nonce);
     script.textContent = LINK_LOAD_SCRIPT_CONTENT;
-
     // Append the script to the head since it needs to
     // run as early as possible, after the `link` tags.
     document.head.appendChild(script);

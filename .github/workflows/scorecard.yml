@@ -8,12 +8,8 @@ on:
   workflow_dispatch:
 
 # Declare default permissions as read only.
-<<<<<<< HEAD
 permissions:
   contents: read
-=======
-permissions: read-all
->>>>>>> universal/move-to-cli
 
 jobs:
   analysis:
@@ -24,14 +20,9 @@ jobs:
       contents: read
       # Needed to upload the results to code-scanning dashboard.
       security-events: write
-<<<<<<< HEAD
       # Needed to publish results
       id-token: write
 
-=======
-      # Needed for signing and publishing of results for the badge.
-      id-token: write
->>>>>>> universal/move-to-cli
     steps:
       - name: 'Checkout code'
         uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
@@ -43,10 +34,6 @@ jobs:
         with:
           results_file: results.sarif
           results_format: sarif
-<<<<<<< HEAD
-=======
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
->>>>>>> universal/move-to-cli
           publish_results: true
 
       # Upload the results as artifacts.
@@ -59,10 +46,6 @@ jobs:
 
       # Upload the results to GitHub's code scanning dashboard.
       - name: 'Upload to code-scanning'
-<<<<<<< HEAD
         uses: github/codeql-action/upload-sarif@a09933a12a80f87b87005513f0abb1494c27a716 # v2.21.4
-=======
-        uses: github/codeql-action/upload-sarif@f6e388ebf0efc915c6c5b165b019ee61a6746a38 # v2.20.1
->>>>>>> universal/move-to-cli
         with:
           sarif_file: results.sarif

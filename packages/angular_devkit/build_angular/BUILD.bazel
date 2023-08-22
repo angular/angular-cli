@@ -68,6 +68,16 @@ ts_json_schema(
     src = "src/builders/ng-packagr/schema.json",
 )
 
+ts_json_schema(
+    name = "ssr_dev_server_schema",
+    src = "src/builders/ssr-dev-server/schema.json",
+)
+
+ts_json_schema(
+    name = "prerender_schema",
+    src = "src/builders/prerender/schema.json",
+)
+
 ts_library(
     name = "build_angular",
     package_name = "@angular-devkit/build-angular",
@@ -93,8 +103,10 @@ ts_library(
         "//packages/angular_devkit/build_angular:src/builders/jest/schema.ts",
         "//packages/angular_devkit/build_angular:src/builders/karma/schema.ts",
         "//packages/angular_devkit/build_angular:src/builders/ng-packagr/schema.ts",
+        "//packages/angular_devkit/build_angular:src/builders/prerender/schema.ts",
         "//packages/angular_devkit/build_angular:src/builders/protractor/schema.ts",
         "//packages/angular_devkit/build_angular:src/builders/server/schema.ts",
+        "//packages/angular_devkit/build_angular:src/builders/ssr-dev-server/schema.ts",
     ],
     data = glob(
         include = [
@@ -134,6 +146,7 @@ ts_library(
         "@npm//@discoveryjs/json-ext",
         "@npm//@types/babel__core",
         "@npm//@types/babel__template",
+        "@npm//@types/browser-sync",
         "@npm//@types/browserslist",
         "@npm//@types/inquirer",
         "@npm//@types/karma",
@@ -158,6 +171,7 @@ ts_library(
         "@npm//esbuild-wasm",
         "@npm//fast-glob",
         "@npm//guess-parser",
+        "@npm//http-proxy-middleware",
         "@npm//https-proxy-agent",
         "@npm//inquirer",
         "@npm//jsonc-parser",
@@ -303,8 +317,7 @@ LARGE_SPECS = {
             "@npm//buffer",
         ],
     },
-    "app-shell": {
-    },
+    "app-shell": {},
     "dev-server": {
         "shards": 10,
         "size": "large",
@@ -359,11 +372,20 @@ LARGE_SPECS = {
             "@npm//popper.js",
         ],
     },
-    "browser-esbuild": {
-    },
+    "prerender": {},
+    "browser-esbuild": {},
     "jest": {
         "extra_deps": [
             "@npm//fast-glob",
+        ],
+    },
+    "ssr-dev-server": {
+        "extra_deps": [
+            "@npm//@types/browser-sync",
+            "@npm//@types/node-fetch",
+            "@npm//browser-sync",
+            "@npm//node-fetch",
+            "//packages/angular/ssr",
         ],
     },
 }
