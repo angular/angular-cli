@@ -40,6 +40,7 @@ export interface IndexHtmlGeneratorOptions {
   crossOrigin?: CrossOriginValue;
   optimization?: NormalizedOptimizationOptions;
   cache?: NormalizedCachedOptions;
+  imageDomains?: string[];
 }
 
 export type IndexHtmlTransform = (content: string) => Promise<string>;
@@ -112,7 +113,7 @@ export class IndexHtmlGenerator {
 }
 
 function augmentIndexHtmlPlugin(generator: IndexHtmlGenerator): IndexHtmlGeneratorPlugin {
-  const { deployUrl, crossOrigin, sri = false, entrypoints } = generator.options;
+  const { deployUrl, crossOrigin, sri = false, entrypoints, imageDomains } = generator.options;
 
   return async (html, options) => {
     const { lang, baseHref, outputPath = '', files, hints } = options;
@@ -126,6 +127,7 @@ function augmentIndexHtmlPlugin(generator: IndexHtmlGenerator): IndexHtmlGenerat
       lang,
       entrypoints,
       loadOutputFile: (filePath) => generator.readAsset(join(outputPath, filePath)),
+      imageDomains,
       files,
       hints,
     });

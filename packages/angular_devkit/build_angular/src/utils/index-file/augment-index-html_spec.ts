@@ -419,4 +419,85 @@ describe('augment-index-html', () => {
       '`.mjs` files *must* set `isModule` to `true`.',
     );
   });
+
+  it('should add image domain preload tags', async () => {
+    const imageDomains = ['https://www.example.com', 'https://www.example2.com'];
+    const { content, warnings } = await augmentIndexHtml({
+      ...indexGeneratorOptions,
+      imageDomains,
+    });
+
+    expect(content).toEqual(oneLineHtml`
+        <html>
+          <head>
+            <base href="/">
+            <link rel="preconnect" href="https://www.example.com" data-ngimg>
+            <link rel="preconnect" href="https://www.example2.com" data-ngimg>
+          </head>
+          <body>
+          </body>
+        </html>
+      `);
+  });
+
+  it('should add no image preconnects if provided empty domain list', async () => {
+    const imageDomains: Array<string> = [];
+    const { content, warnings } = await augmentIndexHtml({
+      ...indexGeneratorOptions,
+      imageDomains,
+    });
+
+    expect(content).toEqual(oneLineHtml`
+        <html>
+          <head>
+            <base href="/">
+          </head>
+          <body>
+          </body>
+        </html>
+      `);
+  });
+
+  it('should not add duplicate preconnects', async () => {
+    const imageDomains = ['https://www.example1.com', 'https://www.example2.com'];
+    const { content, warnings } = await augmentIndexHtml({
+      ...indexGeneratorOptions,
+      html: '<html><head><link rel="preconnect" href="https://www.example1.com"></head><body></body></html>',
+      imageDomains,
+    });
+
+    expect(content).toEqual(oneLineHtml`
+        <html>
+          <head>
+            <base href="/">
+            <link rel="preconnect" href="https://www.example1.com">
+            <link rel="preconnect" href="https://www.example2.com" data-ngimg>
+          </head>
+          <body>
+          </body>
+        </html>
+      `);
+  });
+
+  it('should add image preconnects if it encounters preconnect elements for other resources', async () => {
+    const imageDomains = ['https://www.example2.com', 'https://www.example3.com'];
+    const { content, warnings } = await augmentIndexHtml({
+      ...indexGeneratorOptions,
+      html: '<html><head><link rel="preconnect" href="https://www.example1.com"></head><body></body></html>',
+      imageDomains,
+    });
+
+    expect(content).toEqual(oneLineHtml`
+        <html>
+          <head>
+            <base href="/">
+            <link rel="preconnect" href="https://www.example1.com">
+            <link rel="preconnect" href="https://www.example2.com" data-ngimg>
+            <link rel="preconnect" href="https://www.example3.com" data-ngimg>
+          </head>
+          <body>
+          </body>
+        </html>
+      `);
+  });
 });
