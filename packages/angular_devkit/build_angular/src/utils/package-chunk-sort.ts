@@ -18,7 +18,7 @@ export function generateEntryPoints(options: {
 }): EntryPointsType[] {
   // Add all styles/scripts, except lazy-loaded ones.
   const extraEntryPoints = (
-    extraEntryPoints: (ScriptElement | ScriptElement)[],
+    extraEntryPoints: (ScriptElement | StyleElement)[],
     defaultBundleName: string,
   ) => {
     const entryPoints = normalizeExtraEntryPoints(extraEntryPoints, defaultBundleName)
