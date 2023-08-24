@@ -8,6 +8,7 @@
 
 import { BuilderContext, BuilderOutput, createBuilder } from '@angular-devkit/architect';
 import { EmittedFiles, WebpackLoggingCallback, runWebpack } from '@angular-devkit/build-webpack';
+import { imageDomains } from '@ngtools/webpack';
 import * as fs from 'fs';
 import * as path from 'path';
 import { Observable, concatMap, from, map, switchMap } from 'rxjs';
@@ -310,6 +311,7 @@ export function buildWebpackBrowser(
                       optimization: normalizedOptimization,
                       crossOrigin: options.crossOrigin,
                       postTransform: transforms.indexHtml,
+                      imageDomains: Array.from(imageDomains),
                     });
 
                     let hasErrors = false;
@@ -412,7 +414,7 @@ export function buildWebpackBrowser(
                   path: baseOutputPath,
                   baseHref: options.baseHref,
                 },
-              } as BrowserBuilderOutput),
+              }) as BrowserBuilderOutput,
           ),
         );
       },

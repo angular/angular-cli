@@ -10,5 +10,6 @@ export {
   AngularWebpackLoaderPath,
   AngularWebpackPlugin,
   AngularWebpackPluginOptions,
+  imageDomains,
   default,
 } from './ivy';

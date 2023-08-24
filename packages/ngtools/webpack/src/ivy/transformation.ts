@@ -8,16 +8,18 @@
 
 import * as ts from 'typescript';
 import { elideImports } from '../transformers/elide_imports';
+import { findImageDomains } from '../transformers/find_image_domains';
 import { removeIvyJitSupportCalls } from '../transformers/remove-ivy-jit-support-calls';
 import { replaceResources } from '../transformers/replace_resources';
 
 export function createAotTransformers(
   builder: ts.BuilderProgram,
   options: { emitClassMetadata?: boolean; emitNgModuleScope?: boolean },
+  imageDomains: Set<string>,
 ): ts.CustomTransformers {
   const getTypeChecker = () => builder.getProgram().getTypeChecker();
   const transformers: ts.CustomTransformers = {
-    before: [replaceBootstrap(getTypeChecker)],
+    before: [findImageDomains(imageDomains), replaceBootstrap(getTypeChecker)],
     after: [],
   };
 

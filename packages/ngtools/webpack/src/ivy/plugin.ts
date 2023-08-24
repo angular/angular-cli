@@ -39,6 +39,8 @@ import { createAotTransformers, createJitTransformers, mergeTransformers } from 
  */
 const DIAGNOSTICS_AFFECTED_THRESHOLD = 1;
 
+export const imageDomains = new Set<string>();
+
 export interface AngularWebpackPluginOptions {
   tsconfig: string;
   compilerOptions?: CompilerOptions;
@@ -502,7 +504,7 @@ export class AngularWebpackPlugin {
       }
     }
 
-    const transformers = createAotTransformers(builder, this.pluginOptions);
+    const transformers = createAotTransformers(builder, this.pluginOptions, imageDomains);
 
     const getDependencies = (sourceFile: ts.SourceFile) => {
       const dependencies = [];

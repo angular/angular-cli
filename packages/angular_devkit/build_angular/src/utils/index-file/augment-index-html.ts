@@ -40,6 +40,7 @@ export interface AugmentIndexHtmlOptions {
   /** Used to set the document default locale */
   lang?: string;
   hints?: { url: string; mode: string; as?: string }[];
+  imageDomains?: string[];
 }
 
 export interface FileInfo {
@@ -53,10 +54,21 @@ export interface FileInfo {
  * after processing several configurations in order to build different sets of
  * bundles for differential serving.
  */
+// eslint-disable-next-line max-lines-per-function
 export async function augmentIndexHtml(
   params: AugmentIndexHtmlOptions,
 ): Promise<{ content: string; warnings: string[]; errors: string[] }> {
-  const { loadOutputFile, files, entrypoints, sri, deployUrl = '', lang, baseHref, html } = params;
+  const {
+    loadOutputFile,
+    files,
+    entrypoints,
+    sri,
+    deployUrl = '',
+    lang,
+    baseHref,
+    html,
+    imageDomains,
+  } = params;
 
   const warnings: string[] = [];
   const errors: string[] = [];
@@ -175,6 +187,7 @@ export async function augmentIndexHtml(
   const dir = lang ? await getLanguageDirection(lang, warnings) : undefined;
   const { rewriter, transformedContent } = await htmlRewritingStream(html);
   const baseTagExists = html.includes('<base');
+  const foundPreconnects = new Set<string>();
 
   rewriter
     .on('startTag', (tag) => {
@@ -204,6 +217,13 @@ export async function augmentIndexHtml(
             updateAttribute(tag, 'href', baseHref);
           }
           break;
+        case 'link':
+          if (readAttribute(tag, 'rel') === 'preconnect') {
+            const href = readAttribute(tag, 'href');
+            if (href) {
+              foundPreconnects.add(href);
+            }
+          }
       }
 
       rewriter.emitStartTag(tag);
@@ -214,7 +234,13 @@ export async function augmentIndexHtml(
           for (const linkTag of linkTags) {
             rewriter.emitRaw(linkTag);
           }
-
+          if (imageDomains) {
+            for (const imageDomain of imageDomains) {
+              if (!foundPreconnects.has(imageDomain)) {
+                rewriter.emitRaw(`<link rel="preconnect" href="${imageDomain}" data-ngimg>`);
+              }
+            }
+          }
           linkTags = [];
           break;
         case 'body':
@@ -263,6 +289,15 @@ function updateAttribute(
   } else {
     tag.attrs[index] = newValue;
   }
+}
+
+function readAttribute(
+  tag: { attrs: { name: string; value: string }[] },
+  name: string,
+): string | undefined {
+  const targetAttr = tag.attrs.find((attr) => attr.name === name);
+
+  return targetAttr ? targetAttr.value : undefined;
 }
 
 function isString(value: unknown): value is string {
