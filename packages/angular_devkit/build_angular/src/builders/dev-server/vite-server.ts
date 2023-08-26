@@ -7,7 +7,7 @@
  */
 
 import type { BuilderContext } from '@angular-devkit/architect';
-import type { json } from '@angular-devkit/core';
+import type { json, logging } from '@angular-devkit/core';
 import type { OutputFile } from 'esbuild';
 import { lookup as lookupMimeType } from 'mrmime';
 import assert from 'node:assert';
@@ -15,8 +15,8 @@ import { BinaryLike, createHash } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import { ServerResponse } from 'node:http';
 import type { AddressInfo } from 'node:net';
-import path from 'node:path';
-import { Connect, InlineConfig, ViteDevServer, createServer, normalizePath } from 'vite';
+import path, { posix } from 'node:path';
+import type { Connect, InlineConfig, ViteDevServer } from 'vite';
 import { JavaScriptTransformer } from '../../tools/esbuild/javascript-transformer';
 import { RenderOptions, renderPage } from '../../utils/server-rendering/render-page';
 import { buildEsbuildBrowser } from '../browser-esbuild';
@@ -31,6 +31,8 @@ interface OutputFileRecord {
   hash?: Buffer;
   updated: boolean;
 }
+
+const SSG_MARKER_REGEXP = /ng-server-context=["']\w*\|?ssg\|?\w*["']/;
 
 function hashContent(contents: BinaryLike): Buffer {
   // TODO: Consider xxhash
@@ -63,6 +65,9 @@ export async function* serveWithVite(
     serverOptions.servePath = browserOptions.baseHref;
   }
 
+  // dynamically import Vite for ESM compatibility
+  const { createServer, normalizePath } = await import('vite');
+
   let server: ViteDevServer | undefined;
   let listeningAddress: AddressInfo | undefined;
   const generatedFiles = new Map<string, OutputFileRecord>();
@@ -74,7 +79,7 @@ export async function* serveWithVite(
     assert(result.outputFiles, 'Builder did not provide result files.');
 
     // Analyze result files for changes
-    analyzeResultFiles(result.outputFiles, generatedFiles);
+    analyzeResultFiles(normalizePath, result.outputFiles, generatedFiles);
 
     assetFiles.clear();
     if (result.assetFiles) {
@@ -84,23 +89,7 @@ export async function* serveWithVite(
     }
 
     if (server) {
-      // Invalidate any updated files
-      for (const [file, record] of generatedFiles) {
-        if (record.updated) {
-          const updatedModules = server.moduleGraph.getModulesByFile(file);
-          updatedModules?.forEach((m) => server?.moduleGraph.invalidateModule(m));
-        }
-      }
-
-      // Send reload command to clients
-      if (serverOptions.liveReload) {
-        context.logger.info('Reloading client(s)...');
-
-        server.ws.send({
-          type: 'full-reload',
-          path: '*',
-        });
-      }
+      handleUpdate(generatedFiles, server, serverOptions, context.logger);
     } else {
       // Setup server and start listening
       const serverConfiguration = await setupServer(
@@ -135,7 +124,63 @@ export async function* serveWithVite(
   }
 }
 
+function handleUpdate(
+  generatedFiles: Map<string, OutputFileRecord>,
+  server: ViteDevServer,
+  serverOptions: NormalizedDevServerOptions,
+  logger: logging.LoggerApi,
+): void {
+  const updatedFiles: string[] = [];
+
+  // Invalidate any updated files
+  for (const [file, record] of generatedFiles) {
+    if (record.updated) {
+      updatedFiles.push(file);
+      const updatedModules = server.moduleGraph.getModulesByFile(file);
+      updatedModules?.forEach((m) => server?.moduleGraph.invalidateModule(m));
+    }
+  }
+
+  if (!updatedFiles.length) {
+    return;
+  }
+
+  if (serverOptions.hmr) {
+    if (updatedFiles.every((f) => f.endsWith('.css'))) {
+      const timestamp = Date.now();
+      server.ws.send({
+        type: 'update',
+        updates: updatedFiles.map((f) => {
+          const filePath = f.slice(1); // Remove leading slash.
+
+          return {
+            type: 'css-update',
+            timestamp,
+            path: filePath,
+            acceptedPath: filePath,
+          };
+        }),
+      });
+
+      logger.info('HMR update sent to client(s)...');
+
+      return;
+    }
+  }
+
+  // Send reload command to clients
+  if (serverOptions.liveReload) {
+    logger.info('Reloading client(s)...');
+
+    server.ws.send({
+      type: 'full-reload',
+      path: '*',
+    });
+  }
+}
+
 function analyzeResultFiles(
+  normalizePath: (id: string) => string,
   resultFiles: OutputFile[],
   generatedFiles: Map<string, OutputFileRecord>,
 ) {
@@ -202,6 +247,9 @@ export async function setupServer(
     serverOptions.proxyConfig,
     true,
   );
+
+  // dynamically import Vite for ESM compatibility
+  const { normalizePath } = await import('vite');
 
   const configuration: InlineConfig = {
     configFile: false,
@@ -328,10 +376,20 @@ export async function setupServer(
               next: Connect.NextFunction,
             ) {
               const url = req.originalUrl;
-              if (!url) {
+              if (!url || url.endsWith('.html')) {
                 next();
 
                 return;
+              }
+
+              const potentialPrerendered = outputFiles.get(posix.join(url, 'index.html'))?.contents;
+              if (potentialPrerendered) {
+                const content = Buffer.from(potentialPrerendered).toString('utf-8');
+                if (SSG_MARKER_REGEXP.test(content)) {
+                  transformIndexHtmlAndAddHeaders(url, potentialPrerendered, res, next);
+
+                  return;
+                }
               }
 
               const rawHtml = outputFiles.get('/index.server.html')?.contents;
@@ -341,37 +399,23 @@ export async function setupServer(
                 return;
               }
 
-              server
-                .transformIndexHtml(url, Buffer.from(rawHtml).toString('utf-8'))
-                .then(async (html) => {
-                  const { content } = await renderPage({
-                    document: html,
-                    route: pathnameWithoutServePath(url, serverOptions),
-                    serverContext: 'ssr',
-                    loadBundle: (path: string) =>
-                      server.ssrLoadModule(path.slice(1)) as ReturnType<
-                        NonNullable<RenderOptions['loadBundle']>
-                      >,
-                    // Files here are only needed for critical CSS inlining.
-                    outputFiles: {},
-                    // TODO: add support for critical css inlining.
-                    inlineCriticalCss: false,
-                  });
+              transformIndexHtmlAndAddHeaders(url, rawHtml, res, next, async (html) => {
+                const { content } = await renderPage({
+                  document: html,
+                  route: pathnameWithoutServePath(url, serverOptions),
+                  serverContext: 'ssr',
+                  loadBundle: (path: string) =>
+                    server.ssrLoadModule(path.slice(1)) as ReturnType<
+                      NonNullable<RenderOptions['loadBundle']>
+                    >,
+                  // Files here are only needed for critical CSS inlining.
+                  outputFiles: {},
+                  // TODO: add support for critical css inlining.
+                  inlineCriticalCss: false,
+                });
 
-                  if (content) {
-                    res.setHeader('Content-Type', 'text/html');
-                    res.setHeader('Cache-Control', 'no-cache');
-                    if (serverOptions.headers) {
-                      Object.entries(serverOptions.headers).forEach(([name, value]) =>
-                        res.setHeader(name, value),
-                      );
-                    }
-                    res.end(content);
-                  } else {
-                    next();
-                  }
-                })
-                .catch((error) => next(error));
+                return content;
+              });
             }
 
             if (ssr) {
@@ -392,19 +436,7 @@ export async function setupServer(
               if (pathname === '/' || pathname === `/index.html`) {
                 const rawHtml = outputFiles.get('/index.html')?.contents;
                 if (rawHtml) {
-                  server
-                    .transformIndexHtml(req.url, Buffer.from(rawHtml).toString('utf-8'))
-                    .then((processedHtml) => {
-                      res.setHeader('Content-Type', 'text/html');
-                      res.setHeader('Cache-Control', 'no-cache');
-                      if (serverOptions.headers) {
-                        Object.entries(serverOptions.headers).forEach(([name, value]) =>
-                          res.setHeader(name, value),
-                        );
-                      }
-                      res.end(processedHtml);
-                    })
-                    .catch((error) => next(error));
+                  transformIndexHtmlAndAddHeaders(req.url, rawHtml, res, next);
 
                   return;
                 }
@@ -413,6 +445,39 @@ export async function setupServer(
               next();
             });
           };
+
+          function transformIndexHtmlAndAddHeaders(
+            url: string,
+            rawHtml: Uint8Array,
+            res: ServerResponse<import('http').IncomingMessage>,
+            next: Connect.NextFunction,
+            additionalTransformer?: (html: string) => Promise<string | undefined>,
+          ) {
+            server
+              .transformIndexHtml(url, Buffer.from(rawHtml).toString('utf-8'))
+              .then(async (processedHtml) => {
+                if (additionalTransformer) {
+                  const content = await additionalTransformer(processedHtml);
+                  if (!content) {
+                    next();
+
+                    return;
+                  }
+
+                  processedHtml = content;
+                }
+
+                res.setHeader('Content-Type', 'text/html');
+                res.setHeader('Cache-Control', 'no-cache');
+                if (serverOptions.headers) {
+                  Object.entries(serverOptions.headers).forEach(([name, value]) =>
+                    res.setHeader(name, value),
+                  );
+                }
+                res.end(processedHtml);
+              })
+              .catch((error) => next(error));
+          }
         },
       },
     ],

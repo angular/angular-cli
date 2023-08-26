@@ -12,10 +12,14 @@ export default async function () {
 
   await writeMultipleFiles({
     'src/styles.scss': `
-      @use '@material/button/button' as mat;
+      @use '@material/button/button';
+
+      @include button.core-styles;
     `,
     'src/app/app.component.scss': `
-      @use '@material/button/button' as mat;
+      @use '@material/button/button';
+
+      @include button.core-styles;
     `,
   });
 

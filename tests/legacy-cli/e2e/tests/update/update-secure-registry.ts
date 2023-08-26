@@ -37,7 +37,7 @@ export default async function () {
 
   if (getActivePackageManager() === 'yarn') {
     // When running `ng update` using yarn (`yarn ng update`), yarn will set the `npm_config_registry` env variable to `https://registry.yarnpkg.com`
-    // Validate the the registry in the RC is used.
+    // Validate the registry in the RC is used.
     await createNpmConfigForAuthentication(true, true);
 
     const error = await expectToFail(() => exec('yarn', 'ng', 'update', ...extraArgs));

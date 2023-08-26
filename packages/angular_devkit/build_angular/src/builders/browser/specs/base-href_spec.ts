@@ -61,7 +61,7 @@ describe('Browser Builder base href', () => {
     await run.stop();
   });
 
-  it('should insert base href in the the correct position', async () => {
+  it('should insert base href in the correct position', async () => {
     host.writeMultipleFiles({
       'src/index.html': tags.oneLine`
         <html><head><meta charset="UTF-8"></head>

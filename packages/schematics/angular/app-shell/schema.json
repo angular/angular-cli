@@ -18,13 +18,6 @@
       "description": "Route path used to produce the application shell.",
       "default": "shell"
     },
-    "appId": {
-      "type": "string",
-      "format": "html-selector",
-      "description": "The application ID to use in withServerTransition().",
-      "default": "serverApp",
-      "x-deprecated": "This option is no longer used."
-    },
     "main": {
       "type": "string",
       "description": "The name of the main entry-point file.",

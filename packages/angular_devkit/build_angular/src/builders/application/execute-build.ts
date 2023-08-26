@@ -181,6 +181,7 @@ export async function executeBuild(
     );
 
     const { output, warnings, errors } = await prerenderPages(
+      workspaceRoot,
       options.tsconfig,
       appShellOptions,
       prerenderOptions,

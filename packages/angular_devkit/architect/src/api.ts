@@ -347,7 +347,7 @@ export function targetFromTargetString(str: string): Target {
 
 /**
  * Schedule a target, and forget about its run. This will return an observable of outputs, that
- * as a a teardown will stop the target from running. This means that the Run object this returns
+ * as a teardown will stop the target from running. This means that the Run object this returns
  * should not be shared.
  *
  * The reason this is not part of the Context interface is to keep the Context as normal form as

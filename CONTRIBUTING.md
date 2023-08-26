@@ -291,13 +291,13 @@ changes to be accepted, the CLA must be signed. It's a quick process, we promise
 
 [coc]: https://github.com/angular/code-of-conduct/blob/main/CODE_OF_CONDUCT.md
 [commit-message-format]: https://docs.google.com/document/d/1QrDFcIiPjSLDn3EL15IJygNPiHORgU1_OOAqWjiDU5Y/edit#
-[corporate-cla]: http://code.google.com/legal/corporate-cla-v1.0.html
+[corporate-cla]: https://code.google.com/legal/corporate-cla-v1.0.html
 [dev-doc]: https://github.com/angular/angular-cli/blob/main/packages/angular/cli/README.md#development-hints-for-working-on-angular-cli
 [GitHub]: https://github.com/angular/angular-cli
 [gitter]: https://gitter.im/angular/angular-cli
-[individual-cla]: http://code.google.com/legal/individual-cla-v1.0.html
+[individual-cla]: https://code.google.com/legal/individual-cla-v1.0.html
 [js-style-guide]: https://google.github.io/styleguide/jsguide.html
-[stackoverflow]: http://stackoverflow.com/questions/tagged/angular-devkit
+[stackoverflow]: https://stackoverflow.com/questions/tagged/angular-devkit
 
 ## <a name="public-api"></a> Updating the Public API
 Our Public API surface is tracked using golden files.

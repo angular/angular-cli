@@ -6,7 +6,7 @@ To get started locally, follow these instructions:
 
 1. If you haven't done it already, [make a fork of this repo](https://github.com/angular/angular-cli/fork).
 1. Clone to your local computer using `git`.
-1. Make sure that you have Node `v14.20`, `v16.14` or `v18.10` installed. See instructions [here](https://nodejs.org/en/download/).
+1. Make sure that you have Node `v18.13` or higher installed. See instructions [here](https://nodejs.org/en/download/).
 1. Make sure that you have `yarn` installed; see instructions [here](https://yarnpkg.com/lang/en/docs/install/).
 1. Run `yarn` (no arguments) from the root of your clone of this project to install dependencies.
 
@@ -86,8 +86,8 @@ You can find more info about debugging [tests with Bazel in the docs.](https://g
 ### End to end tests
 
 - For a complete list of test targets use the following Bazel query: `yarn bazel query "tests(//tests/...)"`
-- Run a subset of the tests: `yarn bazel test //tests/legacy-cli:e2e_node16 --test_filter="tests/i18n/ivy-localize-*"`
-- Use `bazel run` to debug failing tests debugging: `yarn bazel run //tests/legacy-cli:e2e_node16 --test_arg="--glob=tests/basic/aot.ts"`
+- Run a subset of the tests: `yarn bazel test //tests/legacy-cli:e2e_node18 --test_filter="tests/i18n/ivy-localize-*"`
+- Use `bazel run` to debug failing tests debugging: `yarn bazel run //tests/legacy-cli:e2e_node18 --test_arg="--glob=tests/basic/aot.ts"`
 - Provide additional `e2e_runner` options using `--test_arg`: `--test_arg="--yarn"`
 
 When running the debug commands, Node will stop and wait for a debugger to attach.

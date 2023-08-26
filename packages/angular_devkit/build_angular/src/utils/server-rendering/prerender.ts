@@ -24,6 +24,7 @@ interface AppShellOptions {
 }
 
 export async function prerenderPages(
+  workspaceRoot: string,
   tsConfigPath: string,
   appShellOptions: AppShellOptions = {},
   prerenderOptions: PrerenderOptions = {},
@@ -52,6 +53,7 @@ export async function prerenderPages(
     filename: require.resolve('./render-worker'),
     maxThreads: Math.min(allRoutes.size, maxThreads),
     workerData: {
+      workspaceRoot,
       outputFiles: outputFilesForWorker,
       inlineCriticalCss,
       document,
@@ -77,7 +79,12 @@ export async function prerenderPages(
       const render: Promise<RenderResult> = renderWorker.run({ route, serverContext });
       const renderResult: Promise<void> = render.then(({ content, warnings, errors }) => {
         if (content !== undefined) {
-          const outPath = isAppShellRoute ? 'index.html' : posix.join(route, 'index.html');
+          const outPath = isAppShellRoute
+            ? 'index.html'
+            : posix.join(
+                route.startsWith('/') ? route.slice(1) /* Remove leading slash */ : route,
+                'index.html',
+              );
           output[outPath] = content;
         }
 
