@@ -55,6 +55,16 @@
       "implementation": "./src/builders/ng-packagr",
       "schema": "./src/builders/ng-packagr/schema.json",
       "description": "Build a library with ng-packagr."
+    },
+    "ssr-dev-server": {
+      "implementation": "./src/builders/ssr-dev-server",
+      "schema": "./src/builders/ssr-dev-server/schema.json",
+      "description": "Serve a universal application."
+    },
+    "prerender": {
+      "implementation": "./src/builders/prerender",
+      "schema": "./src/builders/prerender/schema.json",
+      "description": "Perform build-time prerendering of chosen routes."
     }
   }
 }

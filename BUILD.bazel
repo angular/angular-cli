@@ -4,6 +4,7 @@
 # found in the LICENSE file at https://angular.io/license
 load("@bazel_skylib//rules:common_settings.bzl", "bool_flag")
 load("@build_bazel_rules_nodejs//:index.bzl", "copy_to_bin")
+load("@npm//@bazel/concatjs:index.bzl", "ts_config")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -13,6 +14,7 @@ exports_files([
     "LICENSE",
     "tsconfig.json",
     "tsconfig-test.json",
+    "tsconfig-build-ng.json",
     "tsconfig-build.json",
     "package.json",
 ])
@@ -55,4 +57,12 @@ config_setting(
     flag_values = {
         ":enable_snapshot_repo_deps": "true",
     },
+)
+
+ts_config(
+    name = "tsconfig-build-ng",
+    src = "tsconfig-build-ng.json",
+    deps = [
+        ":tsconfig.json",
+    ],
 )

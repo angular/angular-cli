@@ -1,0 +1,125 @@
+# Copyright Google Inc. All Rights Reserved.
+#
+# Use of this source code is governed by an MIT-style license that can be
+# found in the LICENSE file at https://angular.io/license
+
+load("@npm//@bazel/jasmine:index.bzl", "jasmine_node_test")
+load("//tools:defaults.bzl", "pkg_npm", "ts_library")
+load("//tools:ts_json_schema.bzl", "ts_json_schema")
+load("//tools:toolchain_info.bzl", "TOOLCHAINS_NAMES", "TOOLCHAINS_VERSIONS")
+
+licenses(["notice"])
+
+package(default_visibility = ["//visibility:public"])
+
+# Create a list of Tuple("path/file.json", "path_file") to be used as rules
+ALL_SCHEMA_TARGETS = [
+    (
+        x,
+        x.replace("/", "_").replace("-", "_").replace(".json", ""),
+    )
+    for x in glob(
+        include = ["*/schema.json"],
+        exclude = [
+            # NB: we need to exclude the nested node_modules that is laid out by yarn workspaces
+            "node_modules/**",
+        ],
+    )
+]
+
+# Create all the targets.
+[
+    ts_json_schema(
+        name = name,
+        src = src,
+    )
+    for (src, name) in ALL_SCHEMA_TARGETS
+]
+
+filegroup(
+    name = "schematics_assets",
+    srcs = glob(
+        [
+            "**/files/**/*",
+            "**/*.json",
+        ],
+        exclude = [
+            # NB: we need to exclude the nested node_modules that is laid out by yarn workspaces
+            "node_modules/**",
+        ],
+    ),
+)
+
+ts_library(
+    name = "schematics",
+    package_name = "@angular/ssr/schematics",
+    srcs = glob(
+        include = ["**/*.ts"],
+        exclude = [
+            "**/*_spec.ts",
+            # NB: we need to exclude the nested node_modules that is laid out by yarn workspaces
+            "node_modules/**",
+        ],
+    ) + [
+        "//packages/angular/ssr/schematics:" + src.replace(".json", ".ts")
+        for (src, _) in ALL_SCHEMA_TARGETS
+    ],
+    data = [":schematics_assets"],
+    deps = [
+        "//packages/angular_devkit/core",
+        "//packages/angular_devkit/schematics",
+        "//packages/schematics/angular",
+        "@npm//@types/node",
+        "@npm//typescript",
+    ],
+)
+
+ts_library(
+    name = "ssr_schematics_test_lib",
+    testonly = True,
+    srcs = glob(
+        include = [
+            "**/*_spec.ts",
+        ],
+        exclude = [
+            # NB: we need to exclude the nested node_modules that is laid out by yarn workspaces
+            "node_modules/**",
+        ],
+    ),
+    # @external_begin
+    deps = [
+        ":schematics",
+        "//packages/angular_devkit/core",
+        "//packages/angular_devkit/schematics",
+        "//packages/angular_devkit/schematics/testing",
+    ],
+    # @external_end
+)
+
+[
+    jasmine_node_test(
+        name = "ssr_schematics_test_" + toolchain_name,
+        srcs = [":ssr_schematics_test_lib"],
+        tags = [toolchain_name],
+        toolchain = toolchain,
+        deps = [
+            "@npm//jasmine",
+            "@npm//source-map",
+            "@npm//typescript",
+        ],
+    )
+    for toolchain_name, toolchain in zip(
+        TOOLCHAINS_NAMES,
+        TOOLCHAINS_VERSIONS,
+    )
+]
+
+# This package is intended to be combined into the main @angular/ssr package as a dep.
+pkg_npm(
+    name = "npm_package",
+    pkg_json = None,
+    visibility = ["//packages/angular/ssr:__pkg__"],
+    deps = [
+        ":schematics",
+    ],
+)

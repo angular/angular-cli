@@ -31,7 +31,7 @@ const bazelCmd = process.env.BAZEL || `yarn -s bazel`;
 /** Command that queries Bazel for all release package targets. */
 const queryPackagesCmd =
   `${bazelCmd} query --output=label "attr('tags', '\\[.*${releaseTargetTag}.*\\]', //packages/...) ` +
-  `intersect kind('pkg_npm', //packages/...)"`;
+  `intersect kind('ng_package|pkg_npm', //packages/...)"`;
 
 /** Path for the default distribution output directory. */
 const defaultDistPath = join(projectDir, 'dist/releases');

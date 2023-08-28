@@ -6,6 +6,7 @@ RELEASE_ENGINES_YARN = ">= 1.13.0"
 SNAPSHOT_REPOS = {
     "@angular/cli": "angular/cli-builds",
     "@angular/pwa": "angular/angular-pwa-builds",
+    "@angular/ssr": "angular/angular-ssr-builds",
     "@angular-devkit/architect": "angular/angular-devkit-architect-builds",
     "@angular-devkit/architect-cli": "angular/angular-devkit-architect-cli-builds",
     "@angular-devkit/build-angular": "angular/angular-devkit-build-angular-builds",
