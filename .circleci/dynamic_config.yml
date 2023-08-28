@@ -10,7 +10,6 @@
 version: 2.1
 
 orbs:
-  browser-tools: circleci/browser-tools@1.4.0
   devinfra: angular/dev-infra@1.0.8
 
 parameters:
@@ -24,7 +23,6 @@ parameters:
 # Windows needs its own cache key because binaries in node_modules are different.
 # See https://circleci.com/docs/2.0/caching/#restoring-cache for how prefixes work in CircleCI.
 var_1: &cache_key v1-angular_devkit-16.14-{{ checksum "yarn.lock" }}
-var_1_win: &cache_key_win v1-angular_devkit-win-16.14-{{ checksum "yarn.lock" }}
 var_3: &default_nodeversion '18.13'
 var_3_major: &default_nodeversion_major '18'
 # The major version of node toolchains. See tools/toolchain_info.bzl
@@ -89,16 +87,6 @@ executors:
     working_directory: ~/ng
     resource_class: xlarge
 
-  windows-executor:
-    # Same as https://circleci.com/orbs/registry/orb/circleci/windows, but named.
-    working_directory: ~/ng
-    resource_class: windows.large
-    shell: powershell.exe -ExecutionPolicy Bypass
-    machine:
-      # Contents of this image:
-      # https://circleci.com/developer/machine/image/windows-server-2022-gui
-      image: 'windows-server-2022-gui:current'
-
 # Command Definitions
 # https://circleci.com/docs/2.0/reusing-config/#authoring-reusable-commands
 commands:
@@ -123,29 +111,11 @@ commands:
           base_revision: << pipeline.git.base_revision >>
           head_revision: << pipeline.git.revision >>
 
-  rebase_pr_win:
-    steps:
-      - devinfra/rebase-pr-on-target-branch:
-          base_revision: << pipeline.git.base_revision >>
-          head_revision: << pipeline.git.revision >>
-          # Use `bash.exe` as Shell because the CircleCI-orb command is an
-          # included Bash script and expects Bash as shell.
-          shell: bash.exe
-
   custom_attach_workspace:
     description: Attach workspace at a predefined location
     steps:
       - attach_workspace:
           at: *workspace_location
-
-  setup_windows:
-    steps:
-      - initialize_env
-      - run: nvm install 18.13.0
-      - run: nvm use 18.13.0
-      - run: npm install -g yarn@1.22.10 @bazel/bazelisk@${BAZELISK_VERSION}
-      - run: node --version
-      - run: yarn --version
 
   setup_bazel_rbe:
     parameters:
@@ -265,50 +235,6 @@ jobs:
           command: yarn admin snapshots --verbose
       - fail_fast
 
-  # Windows jobs
-  e2e-cli-win:
-    executor: windows-executor
-    parallelism: 12
-    steps:
-      - checkout
-      - setup_windows
-      - rebase_pr_win
-      - setup_bazel_rbe
-      - restore_cache:
-          keys:
-            - *cache_key_win
-      - run:
-          # We use Arsenal Image Mounter (AIM) instead of ImDisk because of: https://github.com/nodejs/node/issues/6861
-          # Useful resources for AIM: http://reboot.pro/index.php?showtopic=22068
-          name: 'Arsenal Image Mounter (RAM Disk)'
-          command: |
-            pwsh ./.circleci/win-ram-disk.ps1
-      - run: yarn install --frozen-lockfile --cache-folder ~/.cache/yarn
-      - save_cache:
-          key: *cache_key_win
-          paths:
-            - ~/.cache/yarn
-            # Path where Arsenal Image Mounter files are downloaded.
-            # Must match path in .circleci/win-ram-disk.ps1
-            - ./aim
-      - run:
-          name: Execute E2E Tests
-          environment:
-            # Required by `yarn ng-dev`
-            # See https://github.com/angular/angular/issues/46858
-            PWD: .
-          command: |
-            mkdir X:/ramdisk/e2e
-            bazel test --define=E2E_TEMP=X:/ramdisk/e2e --define=E2E_SHARD_TOTAL=$env:CIRCLE_NODE_TOTAL --define=E2E_SHARD_INDEX=$env:CIRCLE_NODE_INDEX --config=e2e //tests/legacy-cli:e2e.npm_node18
-          # This timeout provides time for the actual tests to timeout and report status
-          # instead of CircleCI stopping the job without test failure information.
-          no_output_timeout: 40m
-      - fail_fast
-      - store_artifacts:
-          path: dist/testlogs/tests/legacy-cli/e2e.npm_node18
-      - store_test_results:
-          path: dist/testlogs/tests/legacy-cli/e2e.npm_node18
-
 workflows:
   version: 2
   default_workflow:
@@ -346,13 +272,8 @@ workflows:
           requires:
             - build
 
-      # Windows jobs
-      - e2e-cli-win:
-          <<: *only_release_branches
-
       # Publish jobs
       - snapshot_publish:
           <<: *only_builds_branches
           requires:
-            - setup
-            - e2e-cli-win
+            - build

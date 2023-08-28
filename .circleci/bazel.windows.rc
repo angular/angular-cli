@@ -1,8 +1,0 @@
-# Import config items common to both Linux and Windows setups.
-# https://docs.bazel.build/versions/master/guide.html#bazelrc-syntax-and-semantics
-import %workspace%/.circleci/bazel.common.rc
-
-build --remote_cache=https://storage.googleapis.com/angular-cli-windows-bazel-cache
-build --remote_accept_cached=true
-build --remote_upload_local_results=true
-build --google_default_credentials
