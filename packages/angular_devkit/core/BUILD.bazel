@@ -34,9 +34,11 @@ ts_library(
     module_root = "src/index.d.ts",
     deps = [
         "@npm//@types/node",
+        "@npm//@types/picomatch",
         "@npm//ajv",
         "@npm//ajv-formats",
         "@npm//jsonc-parser",
+        "@npm//picomatch",
         "@npm//rxjs",
         "@npm//source-map",
         # @node_module: typescript:es2015.proxy

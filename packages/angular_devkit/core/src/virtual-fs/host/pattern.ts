@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import { parse as parseGlob } from 'picomatch';
 import { Path } from '../path';
 import { ResolverHost } from './resolver';
 
@@ -17,28 +18,11 @@ export class PatternMatchingHost<StatsT extends object = {}> extends ResolverHos
   protected _patterns = new Map<RegExp, ReplacementFunction>();
 
   addPattern(pattern: string | string[], replacementFn: ReplacementFunction) {
-    // Simple GLOB pattern replacement.
-    const reString =
-      '^(' +
-      (Array.isArray(pattern) ? pattern : [pattern])
-        .map(
-          (ex) =>
-            '(' +
-            ex
-              .split(/[/\\]/g)
-              .map((f) =>
-                f
-                  .replace(/[-[\]{}()+?.^$|]/g, '\\$&')
-                  .replace(/^\*\*/g, '(.+?)?')
-                  .replace(/\*/g, '[^/\\\\]*'),
-              )
-              .join('[/\\\\]') +
-            ')',
-        )
-        .join('|') +
-      ')($|/|\\\\)';
-
-    this._patterns.set(new RegExp(reString), replacementFn);
+    const patterns = Array.isArray(pattern) ? pattern : [pattern];
+    for (const glob of patterns) {
+      const { output } = parseGlob(glob);
+      this._patterns.set(new RegExp(`^${output}$`), replacementFn);
+    }
   }
 
   protected _resolve(path: Path) {
