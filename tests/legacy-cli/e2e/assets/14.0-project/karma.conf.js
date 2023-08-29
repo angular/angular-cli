@@ -25,7 +25,7 @@ module.exports = function (config) {
       suppressAll: true // removes the duplicated traces
     },
     coverageReporter: {
-      dir: require('path').join(__dirname, './coverage/thirteen-project'),
+      dir: require('path').join(__dirname, './coverage/fourteen-project'),
       subdir: '.',
       reporters: [
         { type: 'html' },
@@ -37,18 +37,7 @@ module.exports = function (config) {
     colors: true,
     logLevel: config.LOG_INFO,
     autoWatch: true,
-    browsers: ['ChromeHeadlessNoSandbox'],
-    customLaunchers: {
-      ChromeHeadlessNoSandbox: {
-        base: 'ChromeHeadless',
-        flags: [
-          '--no-sandbox',
-          '--headless',
-          '--disable-gpu',
-          '--disable-dev-shm-usage',
-        ],
-      }
-    },
+    browsers: ['Chrome'],
     singleRun: false,
     restartOnFileChange: true
   });
