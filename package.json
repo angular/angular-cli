@@ -179,7 +179,7 @@
     "npm-package-arg": "11.0.0",
     "open": "8.4.2",
     "ora": "5.4.1",
-    "pacote": "16.0.0",
+    "pacote": "17.0.3",
     "parse5-html-rewriting-stream": "7.0.0",
     "patch-package": "^7.0.1",
     "picomatch": "2.3.1",
