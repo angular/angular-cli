@@ -15,7 +15,7 @@
   "dependencies": {
     "@angular-devkit/core": "0.0.0-PLACEHOLDER",
     "jsonc-parser": "3.2.0",
-    "magic-string": "0.30.2",
+    "magic-string": "0.30.3",
     "ora": "5.4.1",
     "rxjs": "7.8.1"
   }
