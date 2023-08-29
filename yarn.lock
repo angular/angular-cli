@@ -121,13 +121,12 @@
   dependencies:
     tslib "^2.3.0"
 
-"@angular/bazel@https://github.com/angular/bazel-builds.git#bac9c1abe1e6ac1801fbbccb53353a1ed7126469":
-  version "16.0.0-next.6"
-  resolved "https://github.com/angular/bazel-builds.git#bac9c1abe1e6ac1801fbbccb53353a1ed7126469"
+"@angular/bazel@https://github.com/angular/bazel-builds.git#392c26f29f65e6141cf336e9eb372c4e5b7e9c3d":
+  version "17.0.0-next.1"
+  resolved "https://github.com/angular/bazel-builds.git#392c26f29f65e6141cf336e9eb372c4e5b7e9c3d"
   dependencies:
     "@microsoft/api-extractor" "^7.24.2"
     magic-string "^0.30.0"
-    tsickle "^0.46.3"
     tslib "^2.3.0"
 
 "@angular/benchpress@0.3.0":
@@ -3625,11 +3624,6 @@
   version "5.1.2"
   resolved "https://registry.yarnpkg.com/@types/minimatch/-/minimatch-5.1.2.tgz#07508b45797cb81ec3f273011b054cd0755eddca"
   integrity sha512-K0VQKziLUWkVKiRVrx4a40iPaxTUefQmjtkQofBkYRcoaaL/8rhwDWww9qWbrgicNOgnpIsMxyNIUM4+n6dUIA==
-
-"@types/minimist@^1.2.1":
-  version "1.2.2"
-  resolved "https://registry.yarnpkg.com/@types/minimist/-/minimist-1.2.2.tgz#ee771e2ba4b3dc5b372935d549fd9617bf345b8c"
-  integrity sha512-jhuKLIRrhvCPLqwPcx6INqmKeiA5EWrsCOPhrlFSrbrmU4ZMPjj5Ul/oLCMDO98XRUIwVm78xICz4EPCektzeQ==
 
 "@types/node-fetch@*", "@types/node-fetch@^2.1.6":
   version "2.6.4"
@@ -12145,13 +12139,6 @@ tsconfig-paths@^3.14.2:
     json5 "^1.0.2"
     minimist "^1.2.6"
     strip-bom "^3.0.0"
-
-tsickle@^0.46.3:
-  version "0.46.3"
-  resolved "https://registry.yarnpkg.com/tsickle/-/tsickle-0.46.3.tgz#b74918a77e3ca1310a2ce4d019f5d6294360b56d"
-  integrity sha512-9PDXxOrtn2AdpvDin6FLGveXVGg8ec3ga8fh8mPR5lz9KtitW6riVgxgagicdfF1rgiBxDeH+5hVowPXhmZbYQ==
-  dependencies:
-    "@types/minimist" "^1.2.1"
 
 tslib@2.6.1:
   version "2.6.1"
