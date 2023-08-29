@@ -1,0 +1,13 @@
+diff --git a/node_modules/@angular/bazel/src/ng_package/packager.mjs b/node_modules/@angular/bazel/src/ng_package/packager.mjs
+index 9454623..d28910a 100755
+--- a/node_modules/@angular/bazel/src/ng_package/packager.mjs
++++ b/node_modules/@angular/bazel/src/ng_package/packager.mjs
+@@ -7,7 +7,7 @@
+  */
+ import * as fs from 'fs';
+ import * as path from 'path';
+-import { analyzeFileAndEnsureNoCrossImports } from './cross_entry_points_imports';
++import { analyzeFileAndEnsureNoCrossImports } from './cross_entry_points_imports.mjs';
+ /**
+  * List of known `package.json` fields which provide information about
+  * supported package formats and their associated entry paths.

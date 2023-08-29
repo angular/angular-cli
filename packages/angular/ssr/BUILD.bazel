@@ -1,16 +1,17 @@
 load("@rules_pkg//:pkg.bzl", "pkg_tar")
-load("//tools:defaults.bzl", "ng_module", "ng_package")
+load("//tools:defaults.bzl", "ng_package", "ts_library")
 load("@npm//@angular/build-tooling/bazel/api-golden:index.bzl", "api_golden_test_npm_package")
 
 package(default_visibility = ["//visibility:public"])
 
-ng_module(
+ts_library(
     name = "ssr",
     package_name = "@angular/ssr",
     srcs = glob([
         "*.ts",
         "src/**/*.ts",
     ]),
+    module_name = "@angular/ssr",
     deps = [
         "@npm//@angular/core",
         "@npm//@angular/platform-server",
