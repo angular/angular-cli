@@ -181,7 +181,7 @@
     "ora": "5.4.1",
     "pacote": "17.0.3",
     "parse5-html-rewriting-stream": "7.0.0",
-    "patch-package": "^7.0.1",
+    "patch-package": "^8.0.0",
     "picomatch": "2.3.1",
     "piscina": "4.1.0",
     "popper.js": "^1.14.1",
