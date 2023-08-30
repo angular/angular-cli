@@ -33,9 +33,9 @@ export async function checkPeerDependencies(
 
   let expectedFwPeerDep = `^${major}.0.0`;
   if (isMajor && isPrerelease) {
-    expectedFwPeerDep = `^${major}.0.0-next.0`;
+    expectedFwPeerDep += ` || ^${major}.0.0-next.0`;
   } else if (isPrerelease) {
-    expectedFwPeerDep = `^${major}.0.0 || ^${major}.${minor}.0-next.0`;
+    expectedFwPeerDep += ` || ^${major}.${minor}.0-next.0`;
   }
 
   const failures: string[] = [];
