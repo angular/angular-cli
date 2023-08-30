@@ -1,3 +1,35 @@
+<a name="17.0.0-next.0"></a>
+
+# 17.0.0-next.0 (2023-08-30)
+
+## Breaking Changes
+
+### @schematics/angular
+
+- App-shell and Universal schematics deprecated unused `appId` option has been removed.
+
+### @angular-devkit/build-angular
+
+- Node.js v16 support has been removed
+
+  Node.js v16 is planned to be End-of-Life on 2023-09-11. Angular will stop supporting Node.js v16 in Angular v17.
+  For Node.js release schedule details, please see: https://github.com/nodejs/release#release-schedule
+
+### @schematics/angular
+
+| Commit                                                                                              | Type     | Description                    |
+| --------------------------------------------------------------------------------------------------- | -------- | ------------------------------ |
+| [b15e82758](https://github.com/angular/angular-cli/commit/b15e827580d6d3159c49521eb9b5d2b6d8ca2502) | refactor | remove deprecated appId option |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                             |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------- |
+| [3c0719bde](https://github.com/angular/angular-cli/commit/3c0719bde244c45d71881d35899e5ee6206c09ee) | feat | initial i18n extraction support for application builder |
+| [5bf7022c4](https://github.com/angular/angular-cli/commit/5bf7022c4749f1298de61ef75e36769bbb8aba12) | fix  | remove support for Node.js v16                          |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="16.2.1"></a>
 
 # 16.2.1 (2023-08-30)
