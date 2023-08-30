@@ -62,6 +62,8 @@ interface PartialHTMLElement {
   hasAttribute(name: string): boolean;
   removeAttribute(name: string): void;
   appendChild(child: PartialHTMLElement): void;
+  remove(): void;
+  name: string;
   textContent: string;
   tagName: string | null;
   children: PartialHTMLElement[];
@@ -138,6 +140,17 @@ class CrittersExtended extends Critters {
    * that makes it work with Angular's CSP APIs.
    */
   private embedLinkedStylesheetOverride: EmbedLinkedStylesheetFn = async (link, document) => {
+    if (link.getAttribute('media') === 'print' && link.next?.name === 'noscript') {
+      // Workaround for https://github.com/GoogleChromeLabs/critters/issues/64
+      // NB: this is only needed for the webpack based builders.
+      const media = link.getAttribute('onload')?.match(MEDIA_SET_HANDLER_PATTERN);
+      if (media) {
+        link.removeAttribute('onload');
+        link.setAttribute('media', media[1]);
+        link?.next?.remove();
+      }
+    }
+
     const returnValue = await this.initialEmbedLinkedStylesheet(link, document);
     const cspNonce = this.findCspNonce(document);
 
