@@ -98,22 +98,16 @@ export class CommonEngine {
       ...this.providers,
     ];
 
-    let doc = opts.document;
-    if (!doc && opts.documentFilePath) {
-      doc = await this.getDocument(opts.documentFilePath);
+    let document = opts.document;
+    if (!document && opts.documentFilePath) {
+      document = await this.getDocument(opts.documentFilePath);
     }
 
-    if (doc) {
+    if (document) {
       extraProviders.push({
         provide: INITIAL_CONFIG,
         useValue: {
-          document: inlineCriticalCss
-            ? // Workaround for https://github.com/GoogleChromeLabs/critters/issues/64
-              doc.replace(
-                / media="print" onload="this\.media='.+?'"(?: ngCspMedia=".+")?><noscript><link .+?><\/noscript>/g,
-                '>',
-              )
-            : doc,
+          document,
           url: opts.url,
         },
       });

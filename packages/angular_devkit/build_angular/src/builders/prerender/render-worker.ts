@@ -85,15 +85,7 @@ async function render({
     ? 'index.original.html'
     : indexFile;
   const browserIndexInputPath = path.join(outputPath, indexBaseName);
-  let document = await fs.promises.readFile(browserIndexInputPath, 'utf8');
-
-  if (inlineCriticalCss) {
-    // Workaround for https://github.com/GoogleChromeLabs/critters/issues/64
-    document = document.replace(
-      / media="print" onload="this\.media='.+?'"(?: ngCspMedia=".+")?><noscript><link .+?><\/noscript>/g,
-      '>',
-    );
-  }
+  const document = await fs.promises.readFile(browserIndexInputPath, 'utf8');
 
   const platformProviders: StaticProvider[] = [
     {
