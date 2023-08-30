@@ -1,3 +1,19 @@
+<a name="16.2.1"></a>
+
+# 16.2.1 (2023-08-30)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                           |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------------------- |
+| [221ab2483](https://github.com/angular/angular-cli/commit/221ab2483a5504b0ad864a18dc5a4dbeb8c0748e) | fix  | display warning when using `resourcesOutputPath` with esbuild builder |
+| [fe752ad87](https://github.com/angular/angular-cli/commit/fe752ad87b8588e2a1ee1611953b36d5c004e673) | fix  | encode Sass package resolve directories in importer URLs              |
+| [82b0f94fd](https://github.com/angular/angular-cli/commit/82b0f94fdacc5f4665d00eeb1c93fcfc104b0cc8) | fix  | handle HMR updates of global CSS when using Vite                      |
+| [6a48a11b8](https://github.com/angular/angular-cli/commit/6a48a11b8c218796e4b778bd00d453fc0ac0c48e) | fix  | update vite to be able to serve app-shell and SSG pages               |
+| [fdb16f7cd](https://github.com/angular/angular-cli/commit/fdb16f7cd4327980436ddb1ce190c67c86588d2d) | fix  | use correct type for `extraEntryPoints`                               |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="16.2.0"></a>
 
 # 16.2.0 (2023-08-09)
