@@ -7,8 +7,3 @@
  */
 
 export { CommonEngine, CommonEngineRenderOptions } from './src/common-engine';
-export {
-  ngExpressEngine,
-  NgExpressEngineOptions,
-  NgExpressEngineRenderOptions,
-} from './src/express-engine';

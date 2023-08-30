@@ -26,18 +26,16 @@ describe('Serve SSR Builder', () => {
       'src/main.server.ts': `
         import 'zone.js/node';
 
-        import { ngExpressEngine } from '@angular/ssr';
+        import { CommonEngine } from '@angular/ssr';
         import * as express from 'express';
-        import { resolve } from 'node:path';
+        import { resolve, join } from 'node:path';
         import { AppServerModule } from './app/app.module.server';
 
         export function app(): express.Express {
           const server = express();
           const distFolder = resolve(__dirname, '../dist');
-
-          server.engine('html', ngExpressEngine({
-            bootstrap: AppServerModule
-          }));
+          const indexHtml = join(distFolder, 'index.html');
+          const commonEngine = new CommonEngine();
 
           server.set('view engine', 'html');
           server.set('views', distFolder);
@@ -46,10 +44,16 @@ describe('Serve SSR Builder', () => {
             maxAge: '1y'
           }));
 
-          server.get('*', (req, res) => {
-            res.render('index', {
-              url: req.originalUrl,
-            });
+          server.get('*', (req, res, next) => {
+            commonEngine
+              .render({
+                bootstrap: AppServerModule,
+                documentFilePath: indexHtml,
+                url: req.originalUrl,
+                publicPath: distFolder,
+              })
+              .then((html) => res.send(html))
+              .catch((err) => next(err));
           });
 
           return server;
