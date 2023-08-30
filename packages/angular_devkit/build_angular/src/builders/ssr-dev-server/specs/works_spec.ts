@@ -23,40 +23,44 @@ describe('Serve SSR Builder', () => {
 
     host.writeMultipleFiles({
       'src/main.server.ts': `
-        import 'zone.js/node';
+      import 'zone.js/node';
 
-        import { ngExpressEngine } from '@angular/ssr';
-        import * as express from 'express';
-        import { resolve } from 'node:path';
-        import { AppServerModule } from './app/app.module.server';
+      import { CommonEngine } from '@angular/ssr';
+      import * as express from 'express';
+      import { resolve, join } from 'node:path';
+      import { AppServerModule } from './app/app.module.server';
 
-        export function app(): express.Express {
-          const server = express();
-          const distFolder = resolve(__dirname, '../dist');
+      export function app(): express.Express {
+        const server = express();
+        const distFolder = resolve(__dirname, '../dist');
+        const indexHtml = join(distFolder, 'index.html');
+        const commonEngine = new CommonEngine();
 
-          server.engine('html', ngExpressEngine({
-            bootstrap: AppServerModule
-          }));
+        server.set('view engine', 'html');
+        server.set('views', distFolder);
 
-          server.set('view engine', 'html');
-          server.set('views', distFolder);
+        server.get('*.*', express.static(distFolder, {
+          maxAge: '1y'
+        }));
 
-          server.get('*.*', express.static(distFolder, {
-            maxAge: '1y'
-          }));
-
-          server.get('*', (req, res) => {
-            res.render('index', {
+        server.get('*', (req, res, next) => {
+          commonEngine
+            .render({
+              bootstrap: AppServerModule,
+              documentFilePath: indexHtml,
               url: req.originalUrl,
-            });
-          });
+              publicPath: distFolder,
+            })
+            .then((html) => res.send(html))
+            .catch((err) => next(err));
+        });
 
-          return server;
-        }
+        return server;
+      }
 
-        app().listen(process.env['PORT']);
+      app().listen(process.env['PORT']);
 
-        export * from './app/app.module.server';
+      export * from './app/app.module.server';
       `,
     });
   });

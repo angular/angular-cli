@@ -111,9 +111,8 @@ describe('Universal Schematic', () => {
       const filePath = '/projects/test-app/server.ts';
       const content = tree.readContent(filePath);
       expect(tags.oneLine`${content}`).toContain(tags.oneLine`
-      ngExpressEngine({
-        bootstrap: AppServerModule
-      }));
+      .render({
+        bootstrap: AppServerModule,
     `);
     });
   });
@@ -150,9 +149,8 @@ describe('Universal Schematic', () => {
       const filePath = '/projects/test-app/server.ts';
       const content = tree.readContent(filePath);
       expect(tags.oneLine`${content}`).toContain(tags.oneLine`
-        ngExpressEngine({
-          bootstrap
-        }));
+        .render({
+          bootstrap,
       `);
     });
   });

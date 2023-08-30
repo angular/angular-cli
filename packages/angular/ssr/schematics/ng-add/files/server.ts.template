@@ -1,7 +1,7 @@
 import 'zone.js/node';
 
 import { APP_BASE_HREF } from '@angular/common';
-import { ngExpressEngine } from '@angular/ssr';
+import { CommonEngine } from '@angular/ssr';
 import * as express from 'express';
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
@@ -11,12 +11,11 @@ import <% if (isStandalone) { %>bootstrap<% } else { %>{ AppServerModule }<% } %
 export function app(): express.Express {
   const server = express();
   const distFolder = join(process.cwd(), '<%= browserDistDirectory %>');
-  const indexHtml = existsSync(join(distFolder, 'index.original.html')) ? 'index.original.html' : 'index';
+  const indexHtml = existsSync(join(distFolder, 'index.original.html'))
+    ? join(distFolder, 'index.original.html')
+    : join(distFolder, 'index.html');
 
-  // Our Universal express-engine (found @ https://github.com/angular/universal/tree/main/modules/express-engine)
-  server.engine('html', ngExpressEngine({
-    <% if (isStandalone) { %>bootstrap<% } else { %>bootstrap: AppServerModule<% } %>
-  }));
+  const commonEngine = new CommonEngine();
 
   server.set('view engine', 'html');
   server.set('views', distFolder);
@@ -28,12 +27,18 @@ export function app(): express.Express {
     maxAge: '1y'
   }));
 
-  // All regular routes use the Universal engine
-  server.get('*', (req, res) => {
-    res.render(indexHtml, {
-      url: req.originalUrl,
-      providers: [{ provide: APP_BASE_HREF, useValue: req.baseUrl }],
-    });
+  // All regular routes use the Angular engine
+  server.get('*', (req, res, next) => {
+    commonEngine
+      .render({
+        <% if (isStandalone) { %>bootstrap<% } else { %>bootstrap: AppServerModule<% } %>,
+        documentFilePath: indexHtml,
+        url: req.originalUrl,
+        publicPath: distFolder,
+        providers: [{ provide: APP_BASE_HREF, useValue: req.baseUrl }],
+      })
+      .then((html) => res.send(html))
+      .catch((err) => next(err));
   });
 
   return server;
