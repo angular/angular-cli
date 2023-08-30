@@ -14,8 +14,8 @@
     "tslib": "^2.3.0"
   },
   "peerDependencies": {
-    "@angular/common": "^17.0.0 || ^17.0.0-next.1",
-    "@angular/core": "^17.0.0 || ^17.0.0-next.1"
+    "@angular/common": "^17.0.0 || ^17.0.0-next.0",
+    "@angular/core": "^17.0.0 || ^17.0.0-next.0"
   },
   "schematics": "./schematics/collection.json"
 }
