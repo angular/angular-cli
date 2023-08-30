@@ -7,7 +7,7 @@
  */
 
 import { Architect } from '@angular-devkit/architect';
-import { normalize, virtualFs } from '@angular-devkit/core';
+import { join, normalize, virtualFs } from '@angular-devkit/core';
 import { debounceTime, take, tap } from 'rxjs';
 import { createArchitect, host } from '../../../testing/test-utils';
 
@@ -40,10 +40,12 @@ describe('Browser Builder service worker', () => {
     await host.initialize().toPromise();
     architect = (await createArchitect(host.root())).architect;
   });
+
   afterEach(async () => host.restore().toPromise());
 
   it('errors if no ngsw-config.json is present', async () => {
     const overrides = { serviceWorker: true };
+    await host.delete(join(host.root(), 'src/ngsw-config.json')).toPromise();
 
     const run = await architect.scheduleTarget(target, overrides);
 

@@ -1,3 +1,29 @@
+<a name="16.2.0"></a>
+
+# 16.2.0 (2023-08-09)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                                     |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------------- |
+| [e6b377436](https://github.com/angular/angular-cli/commit/e6b377436a471073657dc35e7c7a28db6688760a) | feat | add `ssr` option in application builder                                         |
+| [c05c83be7](https://github.com/angular/angular-cli/commit/c05c83be7c6c8bcdad4be8686a6e0701a55304cc) | feat | add initial application builder implementation                                  |
+| [095f5aba6](https://github.com/angular/angular-cli/commit/095f5aba60a4c1267a87b8b3ae38dbfbf70731f1) | feat | add initial support for server bundle generation using esbuild                  |
+| [cb165a75d](https://github.com/angular/angular-cli/commit/cb165a75dc8c21ead537684a092ed50d3736e04a) | feat | add pre-rendering (SSG) and App-shell support generation to application builder |
+| [2a3fc6846](https://github.com/angular/angular-cli/commit/2a3fc68460152a48758b9353bff48193641861c5) | feat | add preload hints based on transitive initial files                             |
+| [099cec758](https://github.com/angular/angular-cli/commit/099cec758ad671c7fd0ca2058a271e4fe181a44d) | feat | add support for serving SSR with dev-server when using the application builder  |
+| [449e21b3a](https://github.com/angular/angular-cli/commit/449e21b3a6da990a5865bb5bdfb8145794f40cf9) | fix  | correctly load dev server assets with vite 4.4.0+                               |
+| [f42f10135](https://github.com/angular/angular-cli/commit/f42f10135c1e2184a9080b726dc5e41669937b13) | fix  | ensure preload hints for external stylesheets are marked as styles              |
+| [7defb3635](https://github.com/angular/angular-cli/commit/7defb3635c89737d151c9537bd7becd463098434) | fix  | ensure that server dependencies are loaded also in ssr entrypoint               |
+| [05f31bd28](https://github.com/angular/angular-cli/commit/05f31bd28f002a232598e0468dc418f99e434ae0) | fix  | prevent race condition in setting up sass worker pool                           |
+| [5048f6e82](https://github.com/angular/angular-cli/commit/5048f6e82e299b0733f34cbdcb1e7b1ef9a63210) | fix  | Set chunk names explicitly                                                      |
+| [974748cdf](https://github.com/angular/angular-cli/commit/974748cdf894c5ad0451e3fdf1c186bdad80878b) | perf | filter postcss usage based on content in esbuild builder                        |
+| [61a652d91](https://github.com/angular/angular-cli/commit/61a652d91274f4adce20182e630fe9963b4ceddd) | perf | inject Sass import/use directive importer information when resolving            |
+| [a0a2c7aef](https://github.com/angular/angular-cli/commit/a0a2c7aef675f8aae294d2119f721c4345d633b0) | perf | only load browserslist in babel preset if needed                                |
+| [6bfd1800e](https://github.com/angular/angular-cli/commit/6bfd1800efa2bf41126696b66938bdf291ad5455) | perf | use in-memory Sass module resolution cache                                      |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="16.1.8"></a>
 
 # 16.1.8 (2023-08-04)
@@ -5,31 +31,6 @@
 | Commit                                                                                              | Type | Description            |
 | --------------------------------------------------------------------------------------------------- | ---- | ---------------------- |
 | [7a420d338](https://github.com/angular/angular-cli/commit/7a420d3382b21d24c73b722e849f01b0aacfb860) | fix  | build: update critters |
-
-<!-- CHANGELOG SPLIT MARKER -->
-
-<a name="16.2.0-rc.1"></a>
-
-# 16.2.0-rc.1 (2023-08-04)
-
-### @angular-devkit/build-angular
-
-| Commit                                                                                              | Type | Description                                           |
-| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------- |
-| [05f31bd28](https://github.com/angular/angular-cli/commit/05f31bd28f002a232598e0468dc418f99e434ae0) | fix  | prevent race condition in setting up sass worker pool |
-| [192326a8b](https://github.com/angular/angular-cli/commit/192326a8b215f6df1c02e8e694170b4d12d1ffe9) | fix  | build: update critters                                |
-
-<!-- CHANGELOG SPLIT MARKER -->
-
-<a name="16.2.0-rc.0"></a>
-
-# 16.2.0-rc.0 (2023-08-02)
-
-### @angular-devkit/build-angular
-
-| Commit                                                                                              | Type | Description                            |
-| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------- |
-| [6539bb520](https://github.com/angular/angular-cli/commit/6539bb5200c924edbc62cc7be70072ecda84da1a) | fix  | hot update filename suffix with `.mjs` |
 
 <!-- CHANGELOG SPLIT MARKER -->
 
@@ -45,19 +46,6 @@
 
 <!-- CHANGELOG SPLIT MARKER -->
 
-<a name="16.2.0-next.4"></a>
-
-# 16.2.0-next.4 (2023-07-26)
-
-### @angular-devkit/build-angular
-
-| Commit                                                                                              | Type | Description                                                 |
-| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------- |
-| [449e21b3a](https://github.com/angular/angular-cli/commit/449e21b3a6da990a5865bb5bdfb8145794f40cf9) | fix  | correctly load dev server assets with vite 4.4.0+           |
-| [d6ae2c7b7](https://github.com/angular/angular-cli/commit/d6ae2c7b7af0fd7b182f19987583a2989a070060) | fix  | error during critical CSS inlining for external stylesheets |
-
-<!-- CHANGELOG SPLIT MARKER -->
-
 <a name="16.1.6"></a>
 
 # 16.1.6 (2023-07-26)
@@ -67,21 +55,6 @@
 | Commit                                                                                              | Type | Description                                                 |
 | --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------- |
 | [20816b57f](https://github.com/angular/angular-cli/commit/20816b57f16b0bcbd5b81f06f6f790e4485c1daa) | fix  | error during critical CSS inlining for external stylesheets |
-
-<!-- CHANGELOG SPLIT MARKER -->
-
-<a name="16.2.0-next.3"></a>
-
-# 16.2.0-next.3 (2023-07-20)
-
-### @angular-devkit/build-angular
-
-| Commit                                                                                              | Type | Description                                                          |
-| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------------- |
-| [5908ede3d](https://github.com/angular/angular-cli/commit/5908ede3d676f2b87f68bc976bd741b7725ab1c3) | fix  | correctly wrap CommonJS exported enums when optimizing               |
-| [5048f6e82](https://github.com/angular/angular-cli/commit/5048f6e82e299b0733f34cbdcb1e7b1ef9a63210) | fix  | Set chunk names explicitly                                           |
-| [61a652d91](https://github.com/angular/angular-cli/commit/61a652d91274f4adce20182e630fe9963b4ceddd) | perf | inject Sass import/use directive importer information when resolving |
-| [6bfd1800e](https://github.com/angular/angular-cli/commit/6bfd1800efa2bf41126696b66938bdf291ad5455) | perf | use in-memory Sass module resolution cache                           |
 
 <!-- CHANGELOG SPLIT MARKER -->
 
@@ -101,44 +74,6 @@
 | Commit                                                                                              | Type | Description                                            |
 | --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------ |
 | [07d3d8c6a](https://github.com/angular/angular-cli/commit/07d3d8c6ae01212de866fac769ff2da888d5adea) | fix  | correctly wrap CommonJS exported enums when optimizing |
-
-<!-- CHANGELOG SPLIT MARKER -->
-
-<a name="16.2.0-next.2"></a>
-
-# 16.2.0-next.2 (2023-07-13)
-
-### @angular/cli
-
-| Commit                                                                                              | Type | Description                                       |
-| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------- |
-| [d0f005913](https://github.com/angular/angular-cli/commit/d0f005913f830c13df0acbb0753fc10ff207ca35) | fix  | add `zone.js` to `ng version` output              |
-| [da3c1c32a](https://github.com/angular/angular-cli/commit/da3c1c32ae91d7247c61aa050e6707109626082a) | fix  | throw an error when executed in a google3-context |
-
-### @angular-devkit/build-angular
-
-| Commit                                                                                              | Type | Description                                                                     |
-| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------------- |
-| [e6b377436](https://github.com/angular/angular-cli/commit/e6b377436a471073657dc35e7c7a28db6688760a) | feat | add `ssr` option in application builder                                         |
-| [cb165a75d](https://github.com/angular/angular-cli/commit/cb165a75dc8c21ead537684a092ed50d3736e04a) | feat | add pre-rendering (SSG) and App-shell support generation to application builder |
-| [099cec758](https://github.com/angular/angular-cli/commit/099cec758ad671c7fd0ca2058a271e4fe181a44d) | feat | add support for serving SSR with dev-server when using the application builder  |
-| [7defb3635](https://github.com/angular/angular-cli/commit/7defb3635c89737d151c9537bd7becd463098434) | fix  | ensure that server dependencies are loaded also in ssr entrypoint               |
-| [974748cdf](https://github.com/angular/angular-cli/commit/974748cdf894c5ad0451e3fdf1c186bdad80878b) | perf | filter postcss usage based on content in esbuild builder                        |
-| [a0a2c7aef](https://github.com/angular/angular-cli/commit/a0a2c7aef675f8aae294d2119f721c4345d633b0) | perf | only load browserslist in babel preset if needed                                |
-
-<!-- CHANGELOG SPLIT MARKER -->
-
-<a name="16.2.0-next.1"></a>
-
-# 16.2.0-next.1 (2023-07-06)
-
-### @angular-devkit/build-angular
-
-| Commit                                                                                              | Type | Description                                                    |
-| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------- |
-| [095f5aba6](https://github.com/angular/angular-cli/commit/095f5aba60a4c1267a87b8b3ae38dbfbf70731f1) | feat | add initial support for server bundle generation using esbuild |
-| [93b743af0](https://github.com/angular/angular-cli/commit/93b743af00511fc4cc7808004a0afe0c2b3c8b05) | fix  | normalize paths in loader cache with esbuild                   |
-| [376e3462d](https://github.com/angular/angular-cli/commit/376e3462d3a2204a412c1d3e4551c20ae6b61aaf) | fix  | use absolute watch paths for postcss dependency messages       |
 
 <!-- CHANGELOG SPLIT MARKER -->
 
@@ -175,20 +110,6 @@
 | Commit                                                                                              | Type | Description                                |
 | --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------ |
 | [f36e38a91](https://github.com/angular/angular-cli/commit/f36e38a913b454ec340d6bf2311391c5df1cee24) | fix  | update direct semver dependencies to 7.5.3 |
-
-<!-- CHANGELOG SPLIT MARKER -->
-
-<a name="16.2.0-next.0"></a>
-
-# 16.2.0-next.0 (2023-06-28)
-
-### @angular-devkit/build-angular
-
-| Commit                                                                                              | Type | Description                                                        |
-| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------ |
-| [c05c83be7](https://github.com/angular/angular-cli/commit/c05c83be7c6c8bcdad4be8686a6e0701a55304cc) | feat | add initial application builder implementation                     |
-| [2a3fc6846](https://github.com/angular/angular-cli/commit/2a3fc68460152a48758b9353bff48193641861c5) | feat | add preload hints based on transitive initial files                |
-| [f42f10135](https://github.com/angular/angular-cli/commit/f42f10135c1e2184a9080b726dc5e41669937b13) | fix  | ensure preload hints for external stylesheets are marked as styles |
 
 <!-- CHANGELOG SPLIT MARKER -->
 

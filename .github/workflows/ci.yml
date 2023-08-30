@@ -79,12 +79,12 @@ jobs:
       defaultVersion: 16
     strategy:
       matrix:
-        version: [16, 18]
+        version: [18]
     steps:
-      - uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
+      - uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3.6.0
         with:
           persist-credentials: false
-      - uses: actions/setup-node@e33196f7422957bea03ed53f6fbb155025ffc7b8 # v3.7.0
+      - uses: actions/setup-node@5e21ff4d9bc1a8cf6de233a3057d20ec6b3fb69d # v3.8.1
         with:
           node-version: ${{ matrix.version }}
           cache: 'yarn'
@@ -100,3 +100,28 @@ jobs:
       - if: matrix.version != env.defaultVersion
         name: Run tests for non-default node version
         run: yarn bazel test --test_tag_filters=node18,-node18-broken //packages/...
+
+  e2e:
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        node: [18]
+        subset: [npm, yarn, esbuild]
+        shard: [0, 1, 2, 3]
+        exclude:
+          # Exclude Node.js v16 when running on a PR
+          - node: ${{ github.event_name != 'pull_request' && 'none' || '16' }}
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Initialize environment
+        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@0109d498b0f6aae418ed4924a5e5c65695f0ac61
+        with:
+          fetch-depth: 1
+      - name: Install node modules
+        run: yarn install --frozen-lockfile
+      - name: Setup Bazel
+        uses: angular/dev-infra/github-actions/bazel/setup@0109d498b0f6aae418ed4924a5e5c65695f0ac61
+      - name: Setup Bazel RBE
+        uses: angular/dev-infra/github-actions/bazel/configure-remote@0109d498b0f6aae418ed4924a5e5c65695f0ac61
+      - name: Run CLI E2E tests
+        run: yarn bazel test --define=E2E_SHARD_TOTAL=4 --define=E2E_SHARD_INDEX=${{ matrix.shard }} --config=e2e //tests/legacy-cli:e2e.${{ matrix.subset }}_node${{ matrix.node }}

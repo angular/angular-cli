@@ -8,4 +8,4 @@
 
 import { AppServerModule } from './app/app.module.server';
 export default AppServerModule;
-export { AppServerModule};
+export { AppServerModule };

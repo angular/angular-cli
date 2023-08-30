@@ -49,29 +49,34 @@ export async function execute(
   } catch {
     return {
       success: false,
-      error: `i18n extraction requires the '@angular/localize' package.`,
+      error:
+        `i18n extraction requires the '@angular/localize' package.` +
+        ` You can add it by using 'ng add @angular/localize'.`,
     };
   }
-
-  // Purge old build disk cache.
-  await purgeStaleBuildCache(context);
 
   // Normalize options
   const normalizedOptions = await normalizeOptions(context, projectName, options);
   const builderName = await context.getBuilderNameForTarget(normalizedOptions.browserTarget);
 
   // Extract messages based on configured builder
-  // TODO: Implement application/browser-esbuild support
   let extractionResult;
   if (
     builderName === '@angular-devkit/build-angular:application' ||
     builderName === '@angular-devkit/build-angular:browser-esbuild'
   ) {
-    return {
-      error: 'i18n extraction is currently only supported with the "browser" builder.',
-      success: false,
-    };
+    const { extractMessages } = await import('./application-extraction');
+    extractionResult = await extractMessages(
+      normalizedOptions,
+      builderName,
+      context,
+      localizeToolsModule.MessageExtractor,
+    );
   } else {
+    // Purge old build disk cache.
+    // Other build systems handle stale cache purging directly.
+    await purgeStaleBuildCache(context);
+
     const { extractMessages } = await import('./webpack-extraction');
     extractionResult = await extractMessages(normalizedOptions, builderName, context, transforms);
   }
@@ -123,7 +128,11 @@ export async function execute(
   // Write translation file
   fs.writeFileSync(normalizedOptions.outFile, content);
 
-  return extractionResult.builderResult;
+  if (normalizedOptions.progress) {
+    context.logger.info(`Extraction Complete. (Messages: ${extractionResult.messages.length})`);
+  }
+
+  return { success: true, outputPath: normalizedOptions.outFile };
 }
 
 async function createSerializer(
