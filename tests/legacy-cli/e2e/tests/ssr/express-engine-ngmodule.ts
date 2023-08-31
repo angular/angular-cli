@@ -1,11 +1,16 @@
 import { rimraf, writeMultipleFiles } from '../../utils/fs';
 import { findFreePort } from '../../utils/network';
+import { installWorkspacePackages } from '../../utils/packages';
 import { execAndWaitForOutputToMatch, killAllProcesses, ng } from '../../utils/process';
+import { useSha } from '../../utils/project';
 
 export default async function () {
   // forcibly remove in case another test doesn't clean itself up
   await rimraf('node_modules/@angular/ssr');
-  await ng('add', '@angular/ssr', '--skip-confirmation');
+  await ng('add', '@angular/ssr', '--skip-confirmation', '--skip-install');
+
+  await useSha();
+  await installWorkspacePackages();
 
   await writeMultipleFiles({
     'src/styles.css': `* { color: #000 }`,

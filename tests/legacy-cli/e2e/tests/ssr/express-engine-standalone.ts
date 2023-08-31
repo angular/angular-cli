@@ -1,20 +1,30 @@
 import { rimraf, writeMultipleFiles } from '../../utils/fs';
 import { findFreePort } from '../../utils/network';
+import { installWorkspacePackages } from '../../utils/packages';
 import { execAndWaitForOutputToMatch, killAllProcesses, ng } from '../../utils/process';
-import { useCIChrome, useCIDefaults } from '../../utils/project';
+import { useCIChrome, useCIDefaults, useSha } from '../../utils/project';
 
 export default async function () {
   // forcibly remove in case another test doesn't clean itself up
   await rimraf('node_modules/@angular/ssr');
 
   await ng('generate', 'app', 'test-project-two', '--standalone', '--skip-install');
-
   await ng('generate', 'e2e', '--related-app-name=test-project-two');
+
   // Setup testing to use CI Chrome.
   await useCIChrome('test-project-two', 'projects/test-project-two/e2e/');
   await useCIDefaults('test-project-two');
 
-  await ng('add', '@angular/ssr', '--skip-confirmation', '--project=test-project-two');
+  await ng(
+    'add',
+    '@angular/ssr',
+    '--skip-confirmation',
+    '--project=test-project-two',
+    '--skip-install',
+  );
+
+  await useSha();
+  await installWorkspacePackages();
 
   await writeMultipleFiles({
     'projects/test-project-two/src/styles.css': `* { color: #000 }`,

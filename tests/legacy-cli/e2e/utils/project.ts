@@ -82,53 +82,52 @@ export function useBuiltPackagesVersions(): Promise<void> {
   });
 }
 
-export function useSha() {
+export async function useSha(): Promise<void> {
   const argv = getGlobalVariable('argv');
-  if (argv['ng-snapshots'] || argv['ng-tag']) {
-    // We need more than the sha here, version is also needed. Examples of latest tags:
-    // 7.0.0-beta.4+dd2a650
-    // 6.1.6+4a8d56a
-    const label = argv['ng-tag'] ? argv['ng-tag'] : '';
-    const ngSnapshotVersions = require('../ng-snapshot/package.json');
-    return updateJsonFile('package.json', (json) => {
-      // Install over the project with snapshot builds.
-      function replaceDependencies(key: string) {
-        const missingSnapshots: string[] = [];
-        Object.keys(json[key] || {})
-          .filter((name) => name.match(/^@angular\//))
-          .forEach((name) => {
-            const pkgName = name.split(/\//)[1];
-            if (pkgName == 'cli') {
-              return;
-            }
-            if (label) {
-              json[key][`@angular/${pkgName}`] = `github:angular/${pkgName}-builds${label}`;
-            } else {
-              const replacement = ngSnapshotVersions.dependencies[`@angular/${pkgName}`];
-              if (!replacement) {
-                missingSnapshots.push(`missing @angular/${pkgName}`);
-              }
-              json[key][`@angular/${pkgName}`] = replacement;
-            }
-          });
-        if (missingSnapshots.length > 0) {
-          throw new Error(
-            'e2e test with --ng-snapshots requires all angular packages be ' +
-              'listed in tests/legacy-cli/e2e/ng-snapshot/package.json.\nErrors:\n' +
-              missingSnapshots.join('\n  '),
-          );
-        }
-      }
-      try {
-        replaceDependencies('dependencies');
-        replaceDependencies('devDependencies');
-      } catch (e) {
-        return Promise.reject(e);
-      }
-    });
-  } else {
-    return Promise.resolve();
+  if (!argv['ng-snapshots'] && !argv['ng-tag']) {
+    return;
   }
+
+  // We need more than the sha here, version is also needed. Examples of latest tags:
+  // 7.0.0-beta.4+dd2a650
+  // 6.1.6+4a8d56a
+  const label = argv['ng-tag'] || '';
+  const ngSnapshotVersions = require('../ng-snapshot/package.json');
+
+  return updateJsonFile('package.json', (json) => {
+    // Install over the project with snapshot builds.
+    function replaceDependencies(key: string) {
+      const missingSnapshots: string[] = [];
+      Object.keys(json[key] || {})
+        .filter((name) => name.startsWith('@angular/'))
+        .forEach((name) => {
+          const pkgName = name.split(/\//)[1];
+          if (pkgName === 'cli' || pkgName === 'ssr') {
+            return;
+          }
+
+          if (label) {
+            json[key][`@angular/${pkgName}`] = `github:angular/${pkgName}-builds${label}`;
+          } else {
+            const replacement = ngSnapshotVersions.dependencies[`@angular/${pkgName}`];
+            if (!replacement) {
+              missingSnapshots.push(`missing @angular/${pkgName}`);
+            }
+            json[key][`@angular/${pkgName}`] = replacement;
+          }
+        });
+      if (missingSnapshots.length > 0) {
+        throw new Error(
+          'e2e test with --ng-snapshots requires all angular packages be ' +
+            'listed in tests/legacy-cli/e2e/ng-snapshot/package.json.\nErrors:\n' +
+            missingSnapshots.join('\n  '),
+        );
+      }
+    }
+
+    replaceDependencies('dependencies');
+    replaceDependencies('devDependencies');
+  });
 }
 
 export function useCIDefaults(projectName = 'test-project'): Promise<void> {
