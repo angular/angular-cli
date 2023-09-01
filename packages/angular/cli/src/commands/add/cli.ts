@@ -112,7 +112,6 @@ export default class AddCommadModule
   async run(options: Options<AddCommandArgs> & OtherOptions): Promise<number | void> {
     const { logger, packageManager } = this.context;
     const { verbose, registry, collection, skipConfirmation } = options;
-    packageManager.ensureCompatibility();
 
     let packageIdentifier;
     try {

@@ -74,15 +74,6 @@ export default class NewCommandModule
     });
     workflow.registry.addSmartDefaultProvider('ng-cli-version', () => VERSION.full);
 
-    // Compatibility check for NPM 7
-    if (
-      collectionName === '@schematics/angular' &&
-      !schematicOptions.skipInstall &&
-      (schematicOptions.packageManager === undefined || schematicOptions.packageManager === 'npm')
-    ) {
-      this.context.packageManager.ensureCompatibility();
-    }
-
     return this.runSchematic({
       collectionName,
       schematicName: this.schematicName,

@@ -11,7 +11,6 @@ import { execSync, spawn } from 'child_process';
 import { existsSync, promises as fs, realpathSync, rmSync } from 'fs';
 import { tmpdir } from 'os';
 import { join } from 'path';
-import { satisfies, valid } from 'semver';
 import { PackageManager } from '../../lib/config/workspace-schema';
 import { AngularWorkspace, getProjectByCwd } from './config';
 import { memoize } from './memoize';
@@ -42,32 +41,6 @@ export class PackageManagerUtils {
   /** Get the package manager version. */
   get version(): string | undefined {
     return this.getVersion(this.name);
-  }
-
-  /**
-   * Checks if the package manager is supported. If not, display a warning.
-   */
-  ensureCompatibility(): void {
-    if (this.name !== PackageManager.Npm) {
-      return;
-    }
-
-    try {
-      const version = valid(this.version);
-      if (!version) {
-        return;
-      }
-
-      if (satisfies(version, '>=7 <7.5.6')) {
-        // eslint-disable-next-line no-console
-        console.warn(
-          `npm version ${version} detected.` +
-            ' When using npm 7 with the Angular CLI, npm version 7.5.6 or higher is recommended.',
-        );
-      }
-    } catch {
-      // npm is not installed.
-    }
   }
 
   /** Install a single package. */
