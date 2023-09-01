@@ -178,8 +178,6 @@ export default class UpdateCommandModule extends CommandModule<UpdateCommandArgs
   async run(options: Options<UpdateCommandArgs>): Promise<number | void> {
     const { logger, packageManager } = this.context;
 
-    packageManager.ensureCompatibility();
-
     // Check if the current installed CLI version is older than the latest compatible version.
     // Skip when running `ng update` without a package name as this will not trigger an actual update.
     if (!disableVersionCheck && options.packages?.length) {
