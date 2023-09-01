@@ -7,7 +7,7 @@
  */
 
 import { logging, schema } from '@angular-devkit/core';
-import { Observable, from, lastValueFrom, of as observableOf } from 'rxjs';
+import { Observable, lastValueFrom, of as observableOf } from 'rxjs';
 import {
   Collection,
   DelegateTree,
@@ -48,7 +48,10 @@ export class SchematicTestRunner {
   private _collection: Collection<{}, {}>;
   private _logger: logging.Logger;
 
-  constructor(private _collectionName: string, collectionPath: string) {
+  constructor(
+    private _collectionName: string,
+    collectionPath: string,
+  ) {
     this._engineHost.registerCollection(_collectionName, collectionPath);
     this._logger = new logging.Logger('test');
 
@@ -91,17 +94,6 @@ export class SchematicTestRunner {
     return new UnitTestTree(newTree);
   }
 
-  /**
-   * @deprecated since version 15.1. Use `runSchematic` instead.
-   */
-  runSchematicAsync<SchematicSchemaT extends object>(
-    schematicName: string,
-    opts?: SchematicSchemaT,
-    tree?: Tree,
-  ): Observable<UnitTestTree> {
-    return from(this.runSchematic(schematicName, opts, tree));
-  }
-
   async runExternalSchematic<SchematicSchemaT extends object>(
     collectionName: string,
     schematicName: string,
@@ -116,18 +108,6 @@ export class SchematicTestRunner {
     const newTree = await lastValueFrom(schematic.call(opts || {}, host, { logger: this._logger }));
 
     return new UnitTestTree(newTree);
-  }
-
-  /**
-   * @deprecated since version 15.1. Use `runExternalSchematic` instead.
-   */
-  runExternalSchematicAsync<SchematicSchemaT extends object>(
-    collectionName: string,
-    schematicName: string,
-    opts?: SchematicSchemaT,
-    tree?: Tree,
-  ): Observable<UnitTestTree> {
-    return from(this.runExternalSchematic(collectionName, schematicName, opts, tree));
   }
 
   callRule(rule: Rule, tree: Tree, parentContext?: Partial<SchematicContext>): Observable<Tree> {
