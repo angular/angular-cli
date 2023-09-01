@@ -19,6 +19,21 @@ defaults:
     shell: bash
 
 jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    outputs:
+      snapshots: ${{ steps.filter.outputs.snapshots }}
+    steps:
+      - uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3.6.0
+        with:
+          persist-credentials: false
+      - uses: dorny/paths-filter@4512585405083f25c027a35db413c2b3b9006d50 # v2.11.1
+        id: filter
+        with:
+          filters: |
+            snapshots:
+              - 'tests/legacy-cli/e2e/ng-snapshot/package.json'
+
   lint:
     runs-on: ubuntu-latest
     steps:
@@ -130,3 +145,27 @@ jobs:
         uses: angular/dev-infra/github-actions/bazel/configure-remote@ad327ca5766ef5dbf071a37056cee034bee258cd
       - name: Run CLI E2E tests
         run: yarn bazel test --define=E2E_SHARD_TOTAL=6 --define=E2E_SHARD_INDEX=${{ matrix.shard }} --config=e2e //tests/legacy-cli:e2e.${{ matrix.subset }}_node${{ matrix.node }}
+
+  e2e-snapshots:
+    needs: analyze
+    if: needs.analyze.outputs.snapshots == 'true' || github.event_name == 'push'
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        node: [18]
+        subset: [npm, yarn, esbuild]
+        shard: [0, 1, 2, 3, 4, 5]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Initialize environment
+        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@ad327ca5766ef5dbf071a37056cee034bee258cd
+        with:
+          fetch-depth: 1
+      - name: Install node modules
+        run: yarn install --frozen-lockfile
+      - name: Setup Bazel
+        uses: angular/dev-infra/github-actions/bazel/setup@ad327ca5766ef5dbf071a37056cee034bee258cd
+      - name: Setup Bazel RBE
+        uses: angular/dev-infra/github-actions/bazel/configure-remote@ad327ca5766ef5dbf071a37056cee034bee258cd
+      - name: Run CLI E2E tests
+        run: yarn bazel test --define=E2E_SHARD_TOTAL=6 --define=E2E_SHARD_INDEX=${{ matrix.shard }} --config=e2e //tests/legacy-cli:e2e.snapshots.${{ matrix.subset }}_node${{ matrix.node }}

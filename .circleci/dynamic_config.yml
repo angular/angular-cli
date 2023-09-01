@@ -24,34 +24,11 @@ parameters:
 # See https://circleci.com/docs/2.0/caching/#restoring-cache for how prefixes work in CircleCI.
 var_1: &cache_key v1-angular_devkit-16.14-{{ checksum "yarn.lock" }}
 var_3: &default_nodeversion '18.13'
-var_3_major: &default_nodeversion_major '18'
-# The major version of node toolchains. See tools/toolchain_info.bzl
-# NOTE: entries in this array may be repeated elsewhere in the file, find them before adding more
-var_3_all_major: &all_nodeversion_major ['18']
+
 # Workspace initially persisted by the `setup` job, and then enhanced by `setup-and-build-win`.
 # https://circleci.com/docs/2.0/workflows/#using-workspaces-to-share-data-among-jobs
 # https://circleci.com/blog/deep-diving-into-circleci-workspaces/
 var_4: &workspace_location .
-# Filter to only release branches on a given job.
-var_5_only_releases: &only_release_branches
-  filters:
-    branches:
-      only:
-        - main
-        - /\d+\.\d+\.x/
-var_5_only_snapshots: &only_snapshot_branches
-  filters:
-    branches:
-      only:
-        - main
-        # This is needed to run this steps on Renovate PRs that amend the snapshots package.json
-        - /^pull\/.*/
-
-var_6: &only_pull_requests
-  filters:
-    branches:
-      only:
-        - /pull\/\d+/
 
 var_7: &only_builds_branches
   filters:
@@ -60,9 +37,6 @@ var_7: &only_builds_branches
         - main
         - /\d+\.\d+\.x/
         - ^feature\-.*
-
-# All e2e test suites
-var_8: &all_e2e_subsets ['npm', 'esbuild', 'yarn']
 
 # Executor Definitions
 # https://circleci.com/docs/2.0/reusing-config/#authoring-reusable-executors
@@ -170,35 +144,6 @@ jobs:
           command: yarn bazel build //...
       - fail_fast
 
-  e2e-tests:
-    executor: bazel-executor
-    parallelism: 8
-    parameters:
-      nodeversion:
-        type: string
-        default: *default_nodeversion
-      snapshots:
-        type: boolean
-        default: false
-      subset:
-        type: enum
-        enum: *all_e2e_subsets
-        default: 'npm'
-    steps:
-      - custom_attach_workspace
-      - initialize_env
-      - setup_bazel_rbe
-      - run: mkdir /mnt/ramdisk/e2e
-      - run:
-          name: Execute CLI E2E Tests with << parameters.subset >>
-          command: yarn bazel test --define=E2E_TEMP=/mnt/ramdisk/e2e --define=E2E_SHARD_TOTAL=${CIRCLE_NODE_TOTAL} --define=E2E_SHARD_INDEX=${CIRCLE_NODE_INDEX} --config=e2e //tests/legacy-cli:e2e<<# parameters.snapshots >>.snapshots<</ parameters.snapshots >>.<< parameters.subset >>_node<< parameters.nodeversion >>
-          no_output_timeout: 40m
-      - store_artifacts:
-          path: dist/testlogs/tests/legacy-cli/e2e<<# parameters.snapshots >>.snapshots<</ parameters.snapshots >>.<< parameters.subset >>_node<< parameters.nodeversion >>
-      - store_test_results:
-          path: dist/testlogs/tests/legacy-cli/e2e<<# parameters.snapshots >>.snapshots<</ parameters.snapshots >>.<< parameters.subset >>_node<< parameters.nodeversion >>
-      - fail_fast
-
   test-browsers:
     executor: bazel-executor
     steps:
@@ -246,27 +191,6 @@ workflows:
       - build:
           requires:
             - setup
-
-      - e2e-tests:
-          name: e2e-snapshots-<< matrix.subset >>
-          nodeversion: *default_nodeversion_major
-          matrix:
-            parameters:
-              subset: *all_e2e_subsets
-          snapshots: true
-          pre-steps:
-            - when:
-                # Don't run snapshot E2E's unless it's on the main branch or the snapshots file has been updated.
-                condition:
-                  and:
-                    - not:
-                        equal: [main, << pipeline.git.branch >>]
-                    - not: << pipeline.parameters.snapshot_changed >>
-                steps:
-                  - run: circleci-agent step halt
-          requires:
-            - build
-          <<: *only_snapshot_branches
 
       - test-browsers:
           requires:
