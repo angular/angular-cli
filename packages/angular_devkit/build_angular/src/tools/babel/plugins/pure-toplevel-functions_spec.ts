@@ -66,9 +66,25 @@ describe('pure-toplevel-functions Babel plugin', () => {
   );
 
   it(
+    'annotates top-level arrow-function-based IIFE assignments with no arguments',
+    testCase({
+      input: 'var SomeClass = (() => { function SomeClass() { } return SomeClass; })();',
+      expected:
+        'var SomeClass = /*#__PURE__*/(() => { function SomeClass() { } return SomeClass; })();',
+    }),
+  );
+
+  it(
     'does not annotate top-level IIFE assignments with arguments',
     testCaseNoChange(
       'var SomeClass = (function () { function SomeClass() { } return SomeClass; })(abc);',
+    ),
+  );
+
+  it(
+    'does not annotate top-level arrow-function-based IIFE assignments with arguments',
+    testCaseNoChange(
+      'var SomeClass = (() => { function SomeClass() { } return SomeClass; })(abc);',
     ),
   );
 

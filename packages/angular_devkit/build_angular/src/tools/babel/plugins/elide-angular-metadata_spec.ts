@@ -79,4 +79,27 @@ describe('elide-angular-metadata Babel plugin', () => {
         (function () { (typeof ngJitMode === "undefined" || ngJitMode) && void 0 })();`,
     }),
   );
+
+  it(
+    'elides ɵsetClassMetadata inside an arrow-function-based IIFE',
+    testCase({
+      input: `
+        import { Component } from '@angular/core';
+        export class SomeClass {}
+        /*@__PURE__*/ (() => { i0.ɵsetClassMetadata(Clazz, [{
+            type: Component,
+            args: [{
+                    selector: 'app-lazy',
+                    template: 'very lazy',
+                    styles: []
+                }]
+        }], null, null); })();
+      `,
+      expected: `
+        import { Component } from '@angular/core';
+        export class SomeClass {}
+        /*@__PURE__*/ (() => { void 0 })();
+      `,
+    }),
+  );
 });
