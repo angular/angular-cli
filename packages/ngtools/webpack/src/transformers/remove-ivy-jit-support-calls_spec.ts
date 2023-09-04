@@ -137,6 +137,46 @@ const inputArrowFnWithImplicitReturn = tags.stripIndent`
       }], null, null))();
 `;
 
+const inputAsync = tags.stripIndent`
+  export class TestCmp {
+  }
+  TestCmp.ɵfac = function TestCmp_Factory(t) { return new (t || TestCmp)(); };
+  TestCmp.ɵcmp = i0.ɵɵdefineComponent({ type: TestCmp, selectors: [["test-cmp"]], standalone: true, features: [i0.ɵɵStandaloneFeature], decls: 3, vars: 0, template: function TestCmp_Template(rf, ctx) { }, encapsulation: 2 });
+  (function () {
+    (typeof ngJitMode === "undefined" || ngJitMode) && i0.ɵsetClassMetadataAsync(TestCmp,
+      function () { return [import("./cmp-a").then(function (m) { return m.CmpA; })]; },
+      function (CmpA) { i0.ɵsetClassMetadata(TestCmp, [{
+          type: Component,
+          args: [{
+            selector: 'test-cmp',
+            standalone: true,
+            imports: [CmpA],
+            template: '{#defer}<cmp-a />{/defer}',
+          }]
+      }], null, null); }); })();
+`;
+
+const inputAsyncArrowFn = tags.stripIndent`
+  export class TestCmp {
+  }
+  TestCmp.ɵfac = function TestCmp_Factory(t) { return new (t || TestCmp)(); };
+  TestCmp.ɵcmp = i0.ɵɵdefineComponent({ type: TestCmp, selectors: [["test-cmp"]], standalone: true, features: [i0.ɵɵStandaloneFeature], decls: 3, vars: 0, template: function TestCmp_Template(rf, ctx) { }, encapsulation: 2 });
+  (() => {
+    (typeof ngJitMode === "undefined" || ngJitMode) && i0.ɵsetClassMetadataAsync(TestCmp,
+      () => [import("./cmp-a").then((m) => m.CmpA)],
+      (CmpA) => {
+        i0.ɵsetClassMetadata(TestCmp, [{
+          type: Component,
+          args: [{
+            selector: 'test-cmp',
+            standalone: true,
+            imports: [CmpA],
+            template: '{#defer}<cmp-a />{/defer}',
+          }]
+        }], null, null);
+      }); })();
+`;
+
 describe('@ngtools/webpack transformers', () => {
   describe('remove-ivy-dev-calls', () => {
     it('should allow removing only set class metadata with pure annotation', () => {
@@ -392,6 +432,36 @@ describe('@ngtools/webpack transformers', () => {
 
       const result = transform(inputArrowFnWithImplicitReturn, (getTypeChecker) =>
         removeIvyJitSupportCalls(true, true, getTypeChecker),
+      );
+
+      expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
+    });
+
+    it('should remove setClassMetadataAsync calls', () => {
+      const output = tags.stripIndent`
+        export class TestCmp {
+        }
+        TestCmp.ɵfac = function TestCmp_Factory(t) { return new (t || TestCmp)(); };
+        TestCmp.ɵcmp = i0.ɵɵdefineComponent({ type: TestCmp, selectors: [["test-cmp"]], standalone: true, features: [i0.ɵɵStandaloneFeature], decls: 3, vars: 0, template: function TestCmp_Template(rf, ctx) { }, encapsulation: 2 });
+      `;
+
+      const result = transform(inputAsync, (getTypeChecker) =>
+        removeIvyJitSupportCalls(true, false, getTypeChecker),
+      );
+
+      expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
+    });
+
+    it('should remove arrow-function-based setClassMetadataAsync calls', () => {
+      const output = tags.stripIndent`
+        export class TestCmp {
+        }
+        TestCmp.ɵfac = function TestCmp_Factory(t) { return new (t || TestCmp)(); };
+        TestCmp.ɵcmp = i0.ɵɵdefineComponent({ type: TestCmp, selectors: [["test-cmp"]], standalone: true, features: [i0.ɵɵStandaloneFeature], decls: 3, vars: 0, template: function TestCmp_Template(rf, ctx) { }, encapsulation: 2 });
+      `;
+
+      const result = transform(inputAsyncArrowFn, (getTypeChecker) =>
+        removeIvyJitSupportCalls(true, false, getTypeChecker),
       );
 
       expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);

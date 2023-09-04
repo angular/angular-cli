@@ -34,7 +34,10 @@ export function removeIvyJitSupportCalls(
           const expression = ts.isBinaryExpression(innerExpression)
             ? innerExpression.right
             : innerExpression;
-          if (isIvyPrivateCallExpression(expression, 'ɵsetClassMetadata')) {
+          if (
+            isIvyPrivateCallExpression(expression, 'ɵsetClassMetadata') ||
+            isIvyPrivateCallExpression(expression, 'ɵsetClassMetadataAsync')
+          ) {
             removedNodes.push(innerExpression);
 
             return undefined;
@@ -120,7 +123,7 @@ function isIvyPrivateCallExpression(expression: ts.Expression, name: string) {
     return false;
   }
 
-  if (propAccExpr.name.text != name) {
+  if (propAccExpr.name.text !== name) {
     return false;
   }
 
