@@ -58,13 +58,13 @@ export default function (): PluginObj {
         }
 
         // The metadata function is always emitted inside a function expression
-        if (!path.getFunctionParent()?.isFunctionExpression()) {
-          return;
-        }
+        const parent = path.getFunctionParent();
 
-        // Replace the metadata function with `void 0` which is the equivalent return value
-        // of the metadata function.
-        path.replaceWith(path.scope.buildUndefinedNode());
+        if (parent && (parent.isFunctionExpression() || parent.isArrowFunctionExpression())) {
+          // Replace the metadata function with `void 0` which is the equivalent return value
+          // of the metadata function.
+          path.replaceWith(path.scope.buildUndefinedNode());
+        }
       },
     },
   };

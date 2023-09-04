@@ -47,7 +47,10 @@ export default function (): PluginObj {
         }
 
         const callee = path.node.callee;
-        if (types.isFunctionExpression(callee) && path.node.arguments.length !== 0) {
+        if (
+          (types.isFunctionExpression(callee) || types.isArrowFunctionExpression(callee)) &&
+          path.node.arguments.length !== 0
+        ) {
           return;
         }
         // Do not annotate TypeScript helpers emitted by the TypeScript compiler.
