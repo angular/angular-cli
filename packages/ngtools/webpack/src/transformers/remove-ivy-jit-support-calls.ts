@@ -18,24 +18,24 @@ export function removeIvyJitSupportCalls(
     const removedNodes: ts.Node[] = [];
 
     const visitNode: ts.Visitor = (node: ts.Node) => {
-      const innerStatement = ts.isExpressionStatement(node) && getIifeStatement(node);
-      if (innerStatement) {
+      const innerExpression = ts.isExpressionStatement(node) ? getIifeExpression(node) : null;
+      if (innerExpression) {
         if (
           ngModuleScope &&
-          ts.isBinaryExpression(innerStatement.expression) &&
-          isIvyPrivateCallExpression(innerStatement.expression.right, 'ɵɵsetNgModuleScope')
+          ts.isBinaryExpression(innerExpression) &&
+          isIvyPrivateCallExpression(innerExpression.right, 'ɵɵsetNgModuleScope')
         ) {
-          removedNodes.push(innerStatement);
+          removedNodes.push(innerExpression);
 
           return undefined;
         }
 
         if (classMetadata) {
-          const expression = ts.isBinaryExpression(innerStatement.expression)
-            ? innerStatement.expression.right
-            : innerStatement.expression;
+          const expression = ts.isBinaryExpression(innerExpression)
+            ? innerExpression.right
+            : innerExpression;
           if (isIvyPrivateCallExpression(expression, 'ɵsetClassMetadata')) {
-            removedNodes.push(innerStatement);
+            removedNodes.push(innerExpression);
 
             return undefined;
           }
@@ -75,7 +75,7 @@ export function removeIvyJitSupportCalls(
 }
 
 // Each Ivy private call expression is inside an IIFE
-function getIifeStatement(exprStmt: ts.ExpressionStatement): null | ts.ExpressionStatement {
+function getIifeExpression(exprStmt: ts.ExpressionStatement): null | ts.Expression {
   const expression = exprStmt.expression;
   if (!expression || !ts.isCallExpression(expression) || expression.arguments.length !== 0) {
     return null;
@@ -87,8 +87,12 @@ function getIifeStatement(exprStmt: ts.ExpressionStatement): null | ts.Expressio
   }
 
   const funExpr = parenExpr.expression.expression;
-  if (!ts.isFunctionExpression(funExpr)) {
+  if (!ts.isFunctionExpression(funExpr) && !ts.isArrowFunction(funExpr)) {
     return null;
+  }
+
+  if (!ts.isBlock(funExpr.body)) {
+    return funExpr.body;
   }
 
   const innerStmts = funExpr.body.statements;
@@ -101,7 +105,7 @@ function getIifeStatement(exprStmt: ts.ExpressionStatement): null | ts.Expressio
     return null;
   }
 
-  return innerExprStmt;
+  return innerExprStmt.expression;
 }
 
 function isIvyPrivateCallExpression(expression: ts.Expression, name: string) {
