@@ -102,4 +102,88 @@ describe('elide-angular-metadata Babel plugin', () => {
       `,
     }),
   );
+
+  it(
+    'elides pure annotated ɵsetClassMetadataAsync',
+    testCase({
+      input: `
+        import { Component } from '@angular/core';
+        export class SomeClass {}
+        /*@__PURE__*/ (function () {
+          i0.ɵsetClassMetadataAsync(SomeClass,
+            function () { return [import("./cmp-a").then(function (m) { return m.CmpA; })]; },
+            function (CmpA) { i0.ɵsetClassMetadata(SomeClass, [{
+                type: Component,
+                args: [{
+                        selector: 'test-cmp',
+                        standalone: true,
+                        imports: [CmpA, LocalDep],
+                        template: '{#defer}<cmp-a/>{/defer}',
+                    }]
+              }], null, null); });
+            })();
+      `,
+      expected: `
+        import { Component } from '@angular/core';
+        export class SomeClass {}
+        /*@__PURE__*/ (function () { void 0 })();
+      `,
+    }),
+  );
+
+  it(
+    'elides JIT mode protected ɵsetClassMetadataAsync',
+    testCase({
+      input: `
+        import { Component } from '@angular/core';
+        export class SomeClass {}
+        (function () {
+          (typeof ngJitMode === "undefined" || ngJitMode) && i0.ɵsetClassMetadataAsync(SomeClass,
+            function () { return [import("./cmp-a").then(function (m) { return m.CmpA; })]; },
+            function (CmpA) { i0.ɵsetClassMetadata(SomeClass, [{
+                type: Component,
+                args: [{
+                        selector: 'test-cmp',
+                        standalone: true,
+                        imports: [CmpA, LocalDep],
+                        template: '{#defer}<cmp-a/>{/defer}',
+                    }]
+              }], null, null); });
+            })();
+      `,
+      expected: `
+        import { Component } from '@angular/core';
+        export class SomeClass {}
+        (function () { (typeof ngJitMode === "undefined" || ngJitMode) && void 0 })();
+      `,
+    }),
+  );
+
+  it(
+    'elides arrow-function-based ɵsetClassMetadataAsync',
+    testCase({
+      input: `
+        import { Component } from '@angular/core';
+        export class SomeClass {}
+        /*@__PURE__*/ (() => {
+          i0.ɵsetClassMetadataAsync(SomeClass,
+            () => [import("./cmp-a").then(m => m.CmpA)],
+            (CmpA) => { i0.ɵsetClassMetadata(SomeClass, [{
+                type: Component,
+                args: [{
+                        selector: 'test-cmp',
+                        standalone: true,
+                        imports: [CmpA, LocalDep],
+                        template: '{#defer}<cmp-a/>{/defer}',
+                    }]
+              }], null, null); });
+            })();
+      `,
+      expected: `
+        import { Component } from '@angular/core';
+        export class SomeClass {}
+        /*@__PURE__*/ (() => { void 0 })();
+      `,
+    }),
+  );
 });
