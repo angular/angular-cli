@@ -81,6 +81,62 @@ const inputNoPure = tags.stripIndent`
       }], null, null); })();
 `;
 
+const inputArrowFnWithBody = tags.stripIndent`
+  export class AppModule {
+  }
+  AppModule.ɵmod = i0.ɵɵdefineNgModule({ type: AppModule, bootstrap: [AppComponent] });
+  AppModule.ɵinj = i0.ɵɵdefineInjector({ factory: function AppModule_Factory(t) { return new (t || AppModule)(); }, providers: [], imports: [[
+              BrowserModule,
+              AppRoutingModule
+          ]] });
+  (() => { (typeof ngJitMode === "undefined" || ngJitMode) && i0.ɵɵsetNgModuleScope(AppModule, { declarations: [AppComponent,
+          ExampleComponent], imports: [BrowserModule,
+          AppRoutingModule] }); })();
+  (() => { i0.ɵsetClassMetadata(AppModule, [{
+          type: NgModule,
+          args: [{
+                  declarations: [
+                      AppComponent,
+                      ExampleComponent
+                  ],
+                  imports: [
+                      BrowserModule,
+                      AppRoutingModule
+                  ],
+                  providers: [],
+                  bootstrap: [AppComponent]
+              }]
+      }], null, null); })();
+`;
+
+const inputArrowFnWithImplicitReturn = tags.stripIndent`
+  export class AppModule {
+  }
+  AppModule.ɵmod = i0.ɵɵdefineNgModule({ type: AppModule, bootstrap: [AppComponent] });
+  AppModule.ɵinj = i0.ɵɵdefineInjector({ factory: function AppModule_Factory(t) { return new (t || AppModule)(); }, providers: [], imports: [[
+              BrowserModule,
+              AppRoutingModule
+          ]] });
+  (() => (typeof ngJitMode === "undefined" || ngJitMode) && i0.ɵɵsetNgModuleScope(AppModule, { declarations: [AppComponent,
+          ExampleComponent], imports: [BrowserModule,
+          AppRoutingModule] }))();
+  (() => i0.ɵsetClassMetadata(AppModule, [{
+          type: NgModule,
+          args: [{
+                  declarations: [
+                      AppComponent,
+                      ExampleComponent
+                  ],
+                  imports: [
+                      BrowserModule,
+                      AppRoutingModule
+                  ],
+                  providers: [],
+                  bootstrap: [AppComponent]
+              }]
+      }], null, null))();
+`;
+
 describe('@ngtools/webpack transformers', () => {
   describe('remove-ivy-dev-calls', () => {
     it('should allow removing only set class metadata with pure annotation', () => {
@@ -299,6 +355,42 @@ describe('@ngtools/webpack transformers', () => {
       `;
 
       const result = transform(imports + inputNoPure, (getTypeChecker) =>
+        removeIvyJitSupportCalls(true, true, getTypeChecker),
+      );
+
+      expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
+    });
+
+    it('should remove setClassMetadata and setNgModuleScope calls inside arrow-function-based IIFEs that have bodies', () => {
+      const output = tags.stripIndent`
+        export class AppModule {
+        }
+        AppModule.ɵmod = i0.ɵɵdefineNgModule({ type: AppModule, bootstrap: [AppComponent] });
+        AppModule.ɵinj = i0.ɵɵdefineInjector({ factory: function AppModule_Factory(t) { return new (t || AppModule)(); }, providers: [], imports: [[
+                    BrowserModule,
+                    AppRoutingModule
+                ]] });
+      `;
+
+      const result = transform(inputArrowFnWithBody, (getTypeChecker) =>
+        removeIvyJitSupportCalls(true, true, getTypeChecker),
+      );
+
+      expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
+    });
+
+    it('should remove setClassMetadata and setNgModuleScope calls inside arrow-function-based IIFEs that have an implicit return', () => {
+      const output = tags.stripIndent`
+        export class AppModule {
+        }
+        AppModule.ɵmod = i0.ɵɵdefineNgModule({ type: AppModule, bootstrap: [AppComponent] });
+        AppModule.ɵinj = i0.ɵɵdefineInjector({ factory: function AppModule_Factory(t) { return new (t || AppModule)(); }, providers: [], imports: [[
+                    BrowserModule,
+                    AppRoutingModule
+                ]] });
+      `;
+
+      const result = transform(inputArrowFnWithImplicitReturn, (getTypeChecker) =>
         removeIvyJitSupportCalls(true, true, getTypeChecker),
       );
 
