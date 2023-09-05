@@ -118,6 +118,7 @@ jobs:
 
   e2e:
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest]
         node: [18]
@@ -150,6 +151,7 @@ jobs:
     needs: analyze
     if: needs.analyze.outputs.snapshots == 'true' || github.event_name == 'push'
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-latest]
         node: [18]
