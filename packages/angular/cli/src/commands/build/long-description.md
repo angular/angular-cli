@@ -7,7 +7,7 @@ A "development" configuration is created by default when you use the CLI to crea
 
 The configuration options generally correspond to the command options.
 You can override individual configuration defaults by specifying the corresponding options on the command line.
-The command can accept option names given in either dash-case or camelCase.
+The command can accept option names given in dash-case.
 Note that in the configuration file, you must specify names in camelCase.
 
 Some additional options can only be set through the configuration file,
