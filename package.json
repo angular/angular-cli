@@ -150,7 +150,7 @@
     "guess-parser": "0.4.22",
     "http-proxy": "^1.18.1",
     "http-proxy-middleware": "2.0.6",
-    "https-proxy-agent": "5.0.1",
+    "https-proxy-agent": "7.0.2",
     "husky": "8.0.3",
     "ini": "4.1.1",
     "inquirer": "8.2.6",
