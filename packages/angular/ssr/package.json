@@ -17,5 +17,9 @@
     "@angular/common": "^17.0.0 || ^17.0.0-next.0",
     "@angular/core": "^17.0.0 || ^17.0.0-next.0"
   },
-  "schematics": "./schematics/collection.json"
+  "schematics": "./schematics/collection.json",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/angular/angular-cli.git"
+  }
 }
