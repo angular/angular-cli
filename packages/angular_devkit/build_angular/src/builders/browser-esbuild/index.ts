@@ -41,11 +41,12 @@ export function buildEsbuildBrowser(
 }
 
 function normalizeOptions(options: BrowserBuilderOptions): ApplicationBuilderOptions {
-  const { main: browser, ngswConfigPath, serviceWorker, ...otherOptions } = options;
+  const { main: browser, ngswConfigPath, serviceWorker, polyfills, ...otherOptions } = options;
 
   return {
     browser,
     serviceWorker: serviceWorker ? ngswConfigPath : false,
+    polyfills: typeof polyfills === 'string' ? [polyfills] : polyfills,
     ...otherOptions,
   };
 }
