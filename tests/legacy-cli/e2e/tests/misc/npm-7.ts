@@ -36,7 +36,7 @@ export default async function () {
 
   try {
     // Install version >=7.5.6
-    await npm('install', '--global', 'npm@>=7.5.6');
+    await npm('install', '--global', 'npm@8.0.0');
 
     // Ensure `ng update` does not show npm warning
     const { stderr: stderrUpdate1 } = await ng('update', ...extraArgs);
