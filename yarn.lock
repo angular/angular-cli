@@ -9692,7 +9692,17 @@ npm-normalize-package-bin@^3.0.0:
   resolved "https://registry.yarnpkg.com/npm-normalize-package-bin/-/npm-normalize-package-bin-3.0.1.tgz#25447e32a9a7de1f51362c61a559233b89947832"
   integrity sha512-dMxCf+zZ+3zeQZXKxmyuCKlIDPGuv8EF940xbkC4kQVDTtqoh6rJFO+JTKSA6/Rwi0getWmtuy4Itup0AMcaDQ==
 
-npm-package-arg@11.0.0, npm-package-arg@^11.0.0:
+npm-package-arg@11.0.1:
+  version "11.0.1"
+  resolved "https://registry.yarnpkg.com/npm-package-arg/-/npm-package-arg-11.0.1.tgz#f208b0022c29240a1c532a449bdde3f0a4708ebc"
+  integrity sha512-M7s1BD4NxdAvBKUPqqRW957Xwcl/4Zvo8Aj+ANrzvIPzGJZElrH7Z//rSaec2ORcND6FHHLnZeY8qgTpXDMFQQ==
+  dependencies:
+    hosted-git-info "^7.0.0"
+    proc-log "^3.0.0"
+    semver "^7.3.5"
+    validate-npm-package-name "^5.0.0"
+
+npm-package-arg@^11.0.0:
   version "11.0.0"
   resolved "https://registry.yarnpkg.com/npm-package-arg/-/npm-package-arg-11.0.0.tgz#0f09cba4a2c7e1bcba9c6520cd1775fa18eda82d"
   integrity sha512-D8sItaQ8n6VlBUFed3DLz2sCpkabRAjaiLkTamDppvh8lmmAPirzNfBuhJd/2rlmoxZ2S9mOHmIEvzV2z2jOeA==
@@ -11190,10 +11200,17 @@ rollup-plugin-sourcemaps@^0.6.0:
     "@rollup/pluginutils" "^3.0.9"
     source-map-resolve "^0.6.0"
 
-rollup@^3.0.0, rollup@^3.25.2, rollup@^3.27.1, rollup@~3.28.0:
+rollup@^3.0.0, rollup@^3.25.2, rollup@^3.27.1:
   version "3.28.1"
   resolved "https://registry.yarnpkg.com/rollup/-/rollup-3.28.1.tgz#fb44aa6d5e65c7e13fd5bcfff266d0c4ea9ba433"
   integrity sha512-R9OMQmIHJm9znrU3m3cpE8uhN0fGdXiawME7aZIpQqvpS/85+Vt1Hq1/yVIcYfOmaQiHjvXkQAoJukvLpau6Yw==
+  optionalDependencies:
+    fsevents "~2.3.2"
+
+rollup@~3.29.0:
+  version "3.29.0"
+  resolved "https://registry.yarnpkg.com/rollup/-/rollup-3.29.0.tgz#1b40e64818afc979c7e5bef93de675829288986b"
+  integrity sha512-nszM8DINnx1vSS+TpbWKMkxem0CDWk3cSit/WWCBVs9/JZ1I/XLwOsiUglYuYReaeWWSsW9kge5zE5NZtf/a4w==
   optionalDependencies:
     fsevents "~2.3.2"
 
