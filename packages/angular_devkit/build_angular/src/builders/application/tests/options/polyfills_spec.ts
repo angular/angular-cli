@@ -14,7 +14,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
     it('uses a provided TypeScript file', async () => {
       harness.useTarget('build', {
         ...BASE_OPTIONS,
-        polyfills: 'src/polyfills.ts',
+        polyfills: ['src/polyfills.ts'],
       });
 
       const { result } = await harness.executeOnce();
@@ -29,7 +29,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
       harness.useTarget('build', {
         ...BASE_OPTIONS,
-        polyfills: 'src/polyfills.js',
+        polyfills: ['src/polyfills.js'],
       });
 
       const { result } = await harness.executeOnce();
@@ -42,7 +42,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
     it('fails and shows an error when file does not exist', async () => {
       harness.useTarget('build', {
         ...BASE_OPTIONS,
-        polyfills: 'src/missing.ts',
+        polyfills: ['src/missing.ts'],
       });
 
       const { result, logs } = await harness.executeOnce({ outputLogsOnFailure: false });

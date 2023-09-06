@@ -24,7 +24,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       harness.useTarget('build', {
         ...BASE_OPTIONS,
         styles: ['src/styles.css'],
-        polyfills: 'src/polyfills.ts',
+        polyfills: ['src/polyfills.ts'],
         outputHashing: OutputHashing.All,
       });
 
@@ -42,7 +42,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
       harness.useTarget('build', {
         ...BASE_OPTIONS,
-        polyfills: 'src/polyfills.ts',
+        polyfills: ['src/polyfills.ts'],
         styles: ['src/styles.css'],
       });
 
@@ -61,7 +61,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       harness.useTarget('build', {
         ...BASE_OPTIONS,
         styles: ['src/styles.css'],
-        polyfills: 'src/polyfills.ts',
+        polyfills: ['src/polyfills.ts'],
         outputHashing: OutputHashing.None,
       });
 
@@ -80,7 +80,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       harness.useTarget('build', {
         ...BASE_OPTIONS,
         styles: ['src/styles.css'],
-        polyfills: 'src/polyfills.ts',
+        polyfills: ['src/polyfills.ts'],
         outputHashing: OutputHashing.Media,
       });
 
@@ -99,7 +99,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       harness.useTarget('build', {
         ...BASE_OPTIONS,
         styles: ['src/styles.css'],
-        polyfills: 'src/polyfills.ts',
+        polyfills: ['src/polyfills.ts'],
         outputHashing: OutputHashing.Bundles,
       });
 
