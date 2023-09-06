@@ -1,3 +1,35 @@
+<a name="17.0.0-next.1"></a>
+
+# 17.0.0-next.1 (2023-09-06)
+
+## Breaking Changes
+
+### @angular-devkit/schematics
+
+- deprecated `runExternalSchematicAsync` and `runSchematicAsync` methods have been removed in favor of `runExternalSchematic` and `runSchematic`.
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                       |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------- |
+| [6b08efa6f](https://github.com/angular/angular-cli/commit/6b08efa6ffd988e08e3db471ffe3214a029de116) | fix  | account for arrow function IIFE   |
+| [188a00f3e](https://github.com/angular/angular-cli/commit/188a00f3e466c6c31c7671c63ffc91ccda4590c9) | fix  | elide setClassMetadataAsync calls |
+
+### @angular-devkit/schematics
+
+| Commit                                                                                              | Type     | Description                                                           |
+| --------------------------------------------------------------------------------------------------- | -------- | --------------------------------------------------------------------- |
+| [f600bbc97](https://github.com/angular/angular-cli/commit/f600bbc97d30a003b9d41fa5f67590d3955e6375) | refactor | remove deprecated `runExternalSchematicAsync` and `runSchematicAsync` |
+
+### @ngtools/webpack
+
+| Commit                                                                                              | Type | Description                        |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------- |
+| [4fe03266a](https://github.com/angular/angular-cli/commit/4fe03266a9232346ec49defa98d9eb3a8d88b1ff) | fix  | account for arrow function IIFE    |
+| [89f21ac8c](https://github.com/angular/angular-cli/commit/89f21ac8c4309614a59cda5a8ebc3b3fbc663932) | fix  | remove setClassMetadataAsync calls |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="17.0.0-next.0"></a>
 
 # 17.0.0-next.0 (2023-08-30)
