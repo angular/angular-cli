@@ -1,6 +1,6 @@
-<a name="17.0.0-next.2"></a>
+<a name="17.0.0-next.3"></a>
 
-# 17.0.0-next.2 (2023-09-06)
+# 17.0.0-next.3 (2023-09-07)
 
 ## Breaking Changes
 
@@ -27,6 +27,14 @@
 | --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------- |
 | [4fe03266a](https://github.com/angular/angular-cli/commit/4fe03266a9232346ec49defa98d9eb3a8d88b1ff) | fix  | account for arrow function IIFE    |
 | [89f21ac8c](https://github.com/angular/angular-cli/commit/89f21ac8c4309614a59cda5a8ebc3b3fbc663932) | fix  | remove setClassMetadataAsync calls |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
+<a name="17.0.0-next.2"></a>
+
+# 17.0.0-next.2 (2023-09-06)
+
+Release tooling failed part way through the publish process, some packages were not published. Do not use this version.
 
 <!-- CHANGELOG SPLIT MARKER -->
 
