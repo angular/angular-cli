@@ -65,6 +65,15 @@ export async function* serveWithVite(
     serverOptions.servePath = browserOptions.baseHref;
   }
 
+  // Setup the prebundling transformer that will be shared across Vite prebundling requests
+  const prebundleTransformer = new JavaScriptTransformer(
+    // Always enable JIT linking to support applications built with and without AOT.
+    // In a development environment the additional scope information does not
+    // have a negative effect unlike production where final output size is relevant.
+    { sourcemap: true, jit: true },
+    1,
+  );
+
   // dynamically import Vite for ESM compatibility
   const { createServer, normalizePath } = await import('vite');
 
@@ -99,6 +108,7 @@ export async function* serveWithVite(
         browserOptions.preserveSymlinks,
         browserOptions.externalDependencies,
         !!browserOptions.ssr,
+        prebundleTransformer,
       );
 
       server = await createServer(serverConfiguration);
@@ -114,14 +124,14 @@ export async function* serveWithVite(
     yield { success: true, port: listeningAddress?.port } as unknown as DevServerBuilderOutput;
   }
 
-  if (server) {
-    let deferred: () => void;
-    context.addTeardown(async () => {
-      await server?.close();
-      deferred?.();
-    });
-    await new Promise<void>((resolve) => (deferred = resolve));
-  }
+  // Add cleanup logic via a builder teardown
+  let deferred: () => void;
+  context.addTeardown(async () => {
+    await server?.close();
+    await prebundleTransformer.close();
+    deferred?.();
+  });
+  await new Promise<void>((resolve) => (deferred = resolve));
 }
 
 function handleUpdate(
@@ -241,6 +251,7 @@ export async function setupServer(
   preserveSymlinks: boolean | undefined,
   prebundleExclude: string[] | undefined,
   ssr: boolean,
+  prebundleTransformer: JavaScriptTransformer,
 ): Promise<InlineConfig> {
   const proxy = await loadProxyConfiguration(
     serverOptions.workspaceRoot,
@@ -494,21 +505,12 @@ export async function setupServer(
           {
             name: 'angular-vite-optimize-deps',
             setup(build) {
-              const transformer = new JavaScriptTransformer(
-                // Always enable JIT linking to support applications built with and without AOT.
-                // In a development environment the additional scope information does not
-                // have a negative effect unlike production where final output size is relevant.
-                { sourcemap: !!build.initialOptions.sourcemap, jit: true },
-                1,
-              );
-
               build.onLoad({ filter: /\.[cm]?js$/ }, async (args) => {
                 return {
-                  contents: await transformer.transformFile(args.path),
+                  contents: await prebundleTransformer.transformFile(args.path),
                   loader: 'js',
                 };
               });
-              build.onEnd(() => transformer.close());
             },
           },
         ],
