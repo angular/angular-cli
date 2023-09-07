@@ -92,7 +92,7 @@ class CrittersExtended extends Critters {
   private documentNonces = new WeakMap<PartialDocument, string | null>();
 
   // Inherited from `Critters`, but not exposed in the typings.
-  protected embedLinkedStylesheet!: EmbedLinkedStylesheetFn;
+  protected declare embedLinkedStylesheet: EmbedLinkedStylesheetFn;
 
   constructor(
     readonly optionsExtended: InlineCriticalCssProcessorOptions & InlineCriticalCssProcessOptions,

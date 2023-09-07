@@ -8,7 +8,7 @@
 
 import { BuilderContext } from '@angular-devkit/architect';
 import { BrowserBuilderOptions } from '@angular-devkit/build-angular';
-import { json } from '@angular-devkit/core';
+import { JsonObject, json } from '@angular-devkit/core';
 import * as fs from 'fs';
 import { parseAngularRoutes } from 'guess-parser';
 import * as path from 'path';
@@ -48,7 +48,7 @@ export async function getRoutes(
     } catch (e) {
       assertIsError(e);
 
-      logger.error('Unable to extract routes from application.', { ...e });
+      logger.error('Unable to extract routes from application.', { ...e } as unknown as JsonObject);
     }
   }
 
