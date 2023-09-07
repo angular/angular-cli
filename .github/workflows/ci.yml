@@ -82,7 +82,7 @@ jobs:
         run: yarn ng-dev release build
       - name: Store PR release packages
         if: github.event_name == 'pull_request'
-        uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
+        uses: actions/upload-artifact@a8a3f3ad30e3422c9c7b888a15615d19a852ae32 # v3.1.3
         with:
           name: packages
           path: dist/releases/*.tgz
