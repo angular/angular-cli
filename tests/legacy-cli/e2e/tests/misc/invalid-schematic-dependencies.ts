@@ -4,6 +4,9 @@ import { installPackage, uninstallPackage } from '../../utils/packages';
 import { isPrereleaseCli } from '../../utils/project';
 
 export default async function () {
+  // TODO(crisbeto): temporarily disabled until Material is updated to TS 5.2
+  return;
+
   // Must publish old version to local registry to allow install. This is especially important
   // for release commits as npm will try to request tooling packages that are not on the npm registry yet
   await publishOutdated('@schematics/angular@7');

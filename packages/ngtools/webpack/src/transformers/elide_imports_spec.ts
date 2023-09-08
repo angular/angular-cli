@@ -366,8 +366,9 @@ describe('@ngtools/webpack transformers', () => {
           import { __decorate } from "tslib";
           import { Decorator } from './decorator';
 
-          export let Foo = class Foo { constructor(param) { } };
+          let Foo = class Foo { constructor(param) { } };
           Foo = __decorate([ Decorator() ], Foo);
+          export { Foo };
         `;
 
         const { program, compilerHost } = createTypescriptContext(
@@ -404,8 +405,9 @@ describe('@ngtools/webpack transformers', () => {
           import { __decorate } from "tslib";
           import { Decorator } from './decorator';
 
-          export let Foo = class Foo { constructor(param) { } };
+          let Foo = class Foo { constructor(param) { } };
           Foo = __decorate([ Decorator() ], Foo);
+          export { Foo };
         `;
 
         const { program, compilerHost } = createTypescriptContext(
@@ -455,8 +457,9 @@ describe('@ngtools/webpack transformers', () => {
 
         const test = createElement("p", null, "123");
 
-        export let Foo = class Foo { constructor(param) { } };
+        let Foo = class Foo { constructor(param) { } };
         Foo = __decorate([ Decorator() ], Foo);
+        export { Foo };
       `;
 
       const { program, compilerHost } = createTypescriptContext(
@@ -494,8 +497,9 @@ describe('@ngtools/webpack transformers', () => {
           import { __decorate } from "tslib";
           import { Decorator } from './decorator';
 
-          export let Foo = class Foo { ngOnChanges(changes) { } };
+          let Foo = class Foo { ngOnChanges(changes) { } };
           Foo = __decorate([ Decorator() ], Foo);
+          export { Foo };
         `;
 
         const { program, compilerHost } = createTypescriptContext(
@@ -533,8 +537,9 @@ describe('@ngtools/webpack transformers', () => {
           import { Decorator } from './decorator';
           import { Service } from './service';
 
-          export let Foo = class Foo { constructor(param) { } };
+          let Foo = class Foo { constructor(param) { } };
           Foo = __decorate([ Decorator(), __metadata("design:paramtypes", [Service]) ], Foo);
+          export { Foo };
         `;
 
         const { program, compilerHost } = createTypescriptContext(
