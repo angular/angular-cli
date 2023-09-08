@@ -6,37 +6,13 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { appendToFile, prependToFile, readFile, replaceInFile, writeFile } from '../../utils/fs';
+import { readFile, replaceInFile, writeFile } from '../../utils/fs';
 import { ng } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';
 
 export default async function () {
   const projectName = 'test-project';
   const appRoutingModulePath = 'src/app/app-routing.module.ts';
-
-  // Add app routing.
-  // This is done automatically on a new app with --routing.
-  await writeFile(
-    appRoutingModulePath,
-    `
-      import { NgModule } from '@angular/core';
-      import { Routes, RouterModule } from '@angular/router';
-
-      const routes: Routes = [];
-
-      @NgModule({
-        imports: [RouterModule.forRoot(routes)],
-        exports: [RouterModule]
-      })
-      export class AppRoutingModule { }
-    `,
-  );
-  await prependToFile(
-    'src/app/app.module.ts',
-    `import { AppRoutingModule } from './app-routing.module';`,
-  );
-  await replaceInFile('src/app/app.module.ts', `imports: [`, `imports: [ AppRoutingModule,`);
-  await appendToFile('src/app/app.component.html', '<router-outlet></router-outlet>');
 
   const originalAppRoutingModule = await readFile(appRoutingModulePath);
   // helper to replace loadChildren

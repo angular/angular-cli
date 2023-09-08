@@ -31,7 +31,6 @@ describe('Application Schematic', () => {
 
   const defaultOptions: ApplicationOptions = {
     name: 'foo',
-    routing: false,
     skipPackageJson: false,
   };
 
@@ -566,8 +565,8 @@ describe('Application Schematic', () => {
       expect(component).toMatch(/standalone: true/);
     });
 
-    it('should create routing information when routing is true', async () => {
-      const options = { ...defaultOptions, standalone: true, routing: true };
+    it('should create routing information by default', async () => {
+      const options = { ...defaultOptions, standalone: true };
 
       const tree = await schematicRunner.runSchematic('application', options, workspaceTree);
 

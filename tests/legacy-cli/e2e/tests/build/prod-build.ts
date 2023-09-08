@@ -45,5 +45,5 @@ export default async function () {
   await expectFileToMatch(`dist/test-project/${mainPath}`, bootstrapRegExp);
 
   // Size checks in bytes
-  verifySize(mainPath, 124000);
+  verifySize(mainPath, 210000);
 }

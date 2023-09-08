@@ -39,9 +39,8 @@
     },
     "routing": {
       "type": "boolean",
-      "description": "Create a routing NgModule.",
-      "default": false,
-      "x-prompt": "Would you like to add Angular routing?",
+      "description": "Creates an application with routing enabled.",
+      "default": true,
       "x-user-analytics": "ep.ng_routing"
     },
     "prefix": {
