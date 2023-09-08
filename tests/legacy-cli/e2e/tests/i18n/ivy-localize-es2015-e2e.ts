@@ -1,3 +1,4 @@
+import { getGlobalVariable } from '../../utils/env';
 import { ng } from '../../utils/process';
 import { langTranslations, setupI18nConfig } from './setup';
 

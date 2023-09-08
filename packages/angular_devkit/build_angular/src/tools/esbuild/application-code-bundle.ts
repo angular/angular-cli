@@ -8,12 +8,14 @@
 
 import type { BuildOptions } from 'esbuild';
 import assert from 'node:assert';
+import { createHash } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import { join, relative } from 'node:path';
 import type { NormalizedApplicationBuildOptions } from '../../builders/application/options';
 import { allowMangle } from '../../utils/environment-options';
 import { SourceFileCache, createCompilerPlugin } from './angular/compiler-plugin';
 import { createCompilerPluginOptions } from './compiler-plugin-options';
+import { createAngularLocaleDataPlugin } from './i18n-locale-plugin';
 import { createRxjsEsmResolutionPlugin } from './rxjs-esm-resolution-plugin';
 import { createSourcemapIgnorelistPlugin } from './sourcemap-ignorelist-plugin';
 import { getFeatureSupport } from './utils';
@@ -60,11 +62,47 @@ export function createBrowserCodeBundleOptions(
   }
 
   const polyfills = options.polyfills ? [...options.polyfills] : [];
+
+  // Angular JIT mode requires the runtime compiler
   if (jit) {
     polyfills.push('@angular/compiler');
   }
 
-  if (polyfills?.length) {
+  // Add Angular's global locale data if i18n options are present.
+  // Locale data should go first so that project provided polyfill code can augment if needed.
+  let needLocaleDataPlugin = false;
+  if (options.i18nOptions.shouldInline) {
+    // When inlining, a placeholder is used to allow the post-processing step to inject the $localize locale identifier
+    polyfills.unshift('angular:locale/placeholder');
+    buildOptions.plugins?.unshift(
+      createVirtualModulePlugin({
+        namespace: 'angular:locale/placeholder',
+        entryPointOnly: false,
+        loadContent: () => ({
+          contents: `(globalThis.$localize ??= {}).locale = "___NG_LOCALE_INSERT___";\n`,
+          loader: 'js',
+          resolveDir: workspaceRoot,
+        }),
+      }),
+    );
+
+    // Add locale data for all active locales
+    // TODO: Inject each individually within the inlining process itself
+    for (const locale of options.i18nOptions.inlineLocales) {
+      polyfills.unshift(`angular:locale/data:${locale}`);
+    }
+    needLocaleDataPlugin = true;
+  } else if (options.i18nOptions.hasDefinedSourceLocale) {
+    // When not inlining and a source local is present, use the source locale data directly
+    polyfills.unshift(`angular:locale/data:${options.i18nOptions.sourceLocale}`);
+    needLocaleDataPlugin = true;
+  }
+  if (needLocaleDataPlugin) {
+    buildOptions.plugins?.push(createAngularLocaleDataPlugin());
+  }
+
+  // Add polyfill entry point if polyfills are present
+  if (polyfills.length) {
     const namespace = 'angular:polyfills';
     buildOptions.entryPoints = {
       ...buildOptions.entryPoints,
@@ -244,6 +282,21 @@ function getEsBuildCommonOptions(options: NormalizedApplicationBuildOptions): Bu
     jit,
   } = options;
 
+  // Ensure unique hashes for i18n translation changes when using post-process inlining.
+  // This hash value is added as a footer to each file and ensures that the output file names (with hashes)
+  // change when translation files have changed. If this is not done the post processed files may have
+  // different content but would retain identical production file names which would lead to browser caching problems.
+  let footer;
+  if (options.i18nOptions.shouldInline) {
+    // Update file hashes to include translation file content
+    const i18nHash = Object.values(options.i18nOptions.locales).reduce(
+      (data, locale) => data + locale.files.map((file) => file.integrity || '').join('|'),
+      '',
+    );
+
+    footer = { js: `/**i18n:${createHash('sha256').update(i18nHash).digest('hex')}*/` };
+  }
+
   return {
     absWorkingDir: workspaceRoot,
     bundle: true,
@@ -274,5 +327,6 @@ function getEsBuildCommonOptions(options: NormalizedApplicationBuildOptions): Bu
       ...(optimizationOptions.scripts ? { 'ngDevMode': 'false' } : undefined),
       'ngJitMode': jit ? 'true' : 'false',
     },
+    footer,
   };
 }

@@ -39,7 +39,7 @@ ESBUILD_TESTS = [
     "tests/build/styles/**",
     "tests/build/prerender/**",
     "tests/commands/add/**",
-    "tests/i18n/extract-ivy*",
+    "tests/i18n/**",
 ]
 
 def _to_glob(patterns):

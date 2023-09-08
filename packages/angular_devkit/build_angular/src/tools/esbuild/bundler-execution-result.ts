@@ -22,8 +22,8 @@ export interface RebuildState {
  * Represents the result of a single builder execute call.
  */
 export class ExecutionResult {
-  readonly outputFiles: OutputFile[] = [];
-  readonly assetFiles: { source: string; destination: string }[] = [];
+  outputFiles: OutputFile[] = [];
+  assetFiles: { source: string; destination: string }[] = [];
 
   constructor(
     private rebuildContexts: BundlerContext[],

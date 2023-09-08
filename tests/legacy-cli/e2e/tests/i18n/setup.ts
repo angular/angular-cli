@@ -214,12 +214,16 @@ export async function setupI18nConfig() {
 
     // Always error on missing translations.
     appArchitect['build'].options.optimization = true;
-    appArchitect['build'].options.buildOptimizer = true;
     appArchitect['build'].options.aot = true;
     appArchitect['build'].options.i18nMissingTranslation = 'error';
-    appArchitect['build'].options.vendorChunk = true;
     appArchitect['build'].options.sourceMap = true;
     appArchitect['build'].options.outputHashing = 'none';
+
+    const useWebpackBuilder = !getGlobalVariable('argv')['esbuild'];
+    if (useWebpackBuilder) {
+      appArchitect['build'].options.buildOptimizer = true;
+      appArchitect['build'].options.vendorChunk = true;
+    }
 
     // Enable localization for all locales
     appArchitect['build'].options.localize = true;

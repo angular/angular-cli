@@ -1,3 +1,4 @@
+import { getGlobalVariable } from '../../utils/env';
 import {
   expectFileToMatch,
   prependToFile,
@@ -35,9 +36,13 @@ export default async function () {
       continue;
     }
 
-    // Ensure locale is inlined (@angular/localize plugin inlines `$localize.locale` references)
-    // The only reference in a new application is in @angular/core
-    await expectFileToMatch(`${outputPath}/vendor.js`, lang);
+    const useWebpackBuilder = !getGlobalVariable('argv')['esbuild'];
+    if (useWebpackBuilder) {
+      // The only reference in a new application with Webpack is in @angular/core
+      await expectFileToMatch(`${outputPath}/vendor.js`, lang);
+    } else {
+      await expectFileToMatch(`${outputPath}/polyfills.js`, lang);
+    }
 
     // Execute Application E2E tests with dev server
     await ng('e2e', `--configuration=${lang}`, '--port=0');

@@ -43,12 +43,12 @@ export default async function () {
   });
 
   // Test absolute base href.
-  await ng('build', '--base-href', 'http://www.domain.com/', '--configuration=development');
+  await ng('build', '--base-href', 'http://www.example.com/', '--configuration=development');
   for (const { lang, outputPath } of langTranslations) {
     // Verify the HTML base HREF attribute is present
     await expectFileToMatch(
       `${outputPath}/index.html`,
-      `href="http://www.domain.com${baseHrefs[lang] || '/'}"`,
+      `href="http://www.example.com${baseHrefs[lang] || '/'}"`,
     );
   }
 }

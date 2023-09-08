@@ -12,12 +12,6 @@ import { Schema as BrowserBuilderOptions } from './schema';
 const UNSUPPORTED_OPTIONS: Array<keyof BrowserBuilderOptions> = [
   'budgets',
 
-  // * i18n support
-  'localize',
-  // The following two have no effect when localize is not enabled
-  // 'i18nDuplicateTranslation',
-  // 'i18nMissingTranslation',
-
   // * Deprecated
   'deployUrl',
 

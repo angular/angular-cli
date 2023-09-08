@@ -6,18 +6,19 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import type { OutputFile } from 'esbuild';
 import assert from 'node:assert';
 import path from 'node:path';
 import { NormalizedApplicationBuildOptions } from '../../builders/application/options';
 import { IndexHtmlGenerator } from '../../utils/index-file/index-html-generator';
 import { InlineCriticalCssProcessor } from '../../utils/index-file/inline-critical-css';
 import { InitialFileRecord } from './bundler-context';
-import type { ExecutionResult } from './bundler-execution-result';
 
 export async function generateIndexHtml(
   initialFiles: Map<string, InitialFileRecord>,
-  executionResult: ExecutionResult,
+  outputFiles: OutputFile[],
   buildOptions: NormalizedApplicationBuildOptions,
+  lang?: string,
 ): Promise<{
   content: string;
   contentWithoutCriticalCssInlined: string;
@@ -60,7 +61,7 @@ export async function generateIndexHtml(
   const readAsset = async function (filePath: string): Promise<string> {
     // Remove leading directory separator
     const relativefilePath = path.relative(virtualOutputPath, filePath);
-    const file = executionResult.outputFiles.find((file) => file.path === relativefilePath);
+    const file = outputFiles.find((file) => file.path === relativefilePath);
     if (file) {
       return file.text;
     }
@@ -87,7 +88,7 @@ export async function generateIndexHtml(
 
   const transformResult = await indexHtmlGenerator.process({
     baseHref,
-    lang: undefined,
+    lang,
     outputPath: virtualOutputPath,
     files: [...initialFiles].map(([file, record]) => ({
       name: record.name ?? '',

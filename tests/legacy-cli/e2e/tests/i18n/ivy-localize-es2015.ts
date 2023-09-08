@@ -1,3 +1,4 @@
+import { getGlobalVariable } from '../../utils/env';
 import { expectFileToMatch } from '../../utils/fs';
 import { ng } from '../../utils/process';
 import { expectToFail } from '../../utils/utils';
@@ -19,8 +20,13 @@ export default async function () {
     await expectToFail(() => expectFileToMatch(`${outputPath}/main.js`, '$localize`'));
 
     // Ensure locale is inlined (@angular/localize plugin inlines `$localize.locale` references)
-    // The only reference in a new application is in @angular/core
-    await expectFileToMatch(`${outputPath}/vendor.js`, lang);
+    const useWebpackBuilder = !getGlobalVariable('argv')['esbuild'];
+    if (useWebpackBuilder) {
+      // The only reference in a new application with Webpack is in @angular/core
+      await expectFileToMatch(`${outputPath}/vendor.js`, lang);
+    } else {
+      await expectFileToMatch(`${outputPath}/polyfills.js`, lang);
+    }
 
     // Verify the HTML lang attribute is present
     await expectFileToMatch(`${outputPath}/index.html`, `lang="${lang}"`);
