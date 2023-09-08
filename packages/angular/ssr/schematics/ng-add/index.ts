@@ -20,12 +20,14 @@ import {
   noop,
   url,
 } from '@angular-devkit/schematics';
-import { Schema as UniversalOptions } from '@schematics/angular/universal/schema';
+import { Schema as ServerOptions } from '@schematics/angular/server/schema';
 import { DependencyType, addDependency, updateWorkspace } from '@schematics/angular/utility';
 import { JSONFile } from '@schematics/angular/utility/json-file';
 import { isStandaloneApp } from '@schematics/angular/utility/ng-ast-utils';
 import { targetBuildNotFoundError } from '@schematics/angular/utility/project-targets';
-import { BrowserBuilderOptions } from '@schematics/angular/utility/workspace-models';
+import { getMainFilePath } from '@schematics/angular/utility/standalone/util';
+import { getWorkspace } from '@schematics/angular/utility/workspace';
+import { Builders } from '@schematics/angular/utility/workspace-models';
 import * as ts from 'typescript';
 
 import { latestVersions } from '../utility/latest-versions';
@@ -35,15 +37,14 @@ import {
   getImportOfIdentifier,
   getOutputPath,
   getProject,
-  stripTsExtension,
 } from '../utility/utils';
 
-import { Schema as AddUniversalOptions } from './schema';
+import { Schema as AddServerOptions } from './schema';
 
 const SERVE_SSR_TARGET_NAME = 'serve-ssr';
 const PRERENDER_TARGET_NAME = 'prerender';
 
-function addScriptsRule(options: AddUniversalOptions): Rule {
+function addScriptsRule(options: AddServerOptions): Rule {
   return async (host) => {
     const pkgPath = '/package.json';
     const buffer = host.read(pkgPath);
@@ -65,7 +66,55 @@ function addScriptsRule(options: AddUniversalOptions): Rule {
   };
 }
 
-function updateWorkspaceConfigRule(options: AddUniversalOptions): Rule {
+function updateApplicationBuilderTsConfigRule(options: AddServerOptions): Rule {
+  return async (host) => {
+    const project = await getProject(host, options.project);
+    const buildTarget = project.targets.get('build');
+    if (!buildTarget || !buildTarget.options) {
+      return;
+    }
+
+    const tsConfigPath = buildTarget.options.tsConfig;
+    if (!tsConfigPath || typeof tsConfigPath !== 'string') {
+      // No tsconfig path
+      return;
+    }
+
+    const tsConfig = new JSONFile(host, tsConfigPath);
+    const filesAstNode = tsConfig.get(['files']);
+    const serverFilePath = 'server.ts';
+    if (Array.isArray(filesAstNode) && !filesAstNode.some(({ text }) => text === serverFilePath)) {
+      tsConfig.modify(['files'], [...filesAstNode, serverFilePath]);
+    }
+  };
+}
+
+function updateApplicationBuilderWorkspaceConfigRule(
+  projectRoot: string,
+  options: AddServerOptions,
+): Rule {
+  return () => {
+    return updateWorkspace((workspace) => {
+      const buildTarget = workspace.projects.get(options.project)?.targets.get('build');
+      if (!buildTarget) {
+        return;
+      }
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const prodConfig = buildTarget.configurations?.production as Record<string, any>;
+      if (!prodConfig) {
+        throw new SchematicsException(
+          `A "production" configuration is not defined for the "build" builder.`,
+        );
+      }
+
+      prodConfig.prerender = true;
+      (prodConfig.ssr ??= {}).entry = join(normalize(projectRoot), 'server.ts');
+    });
+  };
+}
+
+function updateWebpackBuilderWorkspaceConfigRule(options: AddServerOptions): Rule {
   return () => {
     return updateWorkspace((workspace) => {
       const projectName = options.project;
@@ -127,7 +176,7 @@ function updateWorkspaceConfigRule(options: AddUniversalOptions): Rule {
   };
 }
 
-function updateServerTsConfigRule(options: AddUniversalOptions): Rule {
+function updateWebpackBuilderServerTsConfigRule(options: AddServerOptions): Rule {
   return async (host) => {
     const project = await getProject(host, options.project);
     const serverTarget = project.targets.get('server');
@@ -150,7 +199,7 @@ function updateServerTsConfigRule(options: AddUniversalOptions): Rule {
   };
 }
 
-function routingInitialNavigationRule(options: UniversalOptions): Rule {
+function routingInitialNavigationRule(options: ServerOptions): Rule {
   return async (host) => {
     const project = await getProject(host, options.project);
     const serverTarget = project.targets.get('server');
@@ -254,62 +303,72 @@ function routingInitialNavigationRule(options: UniversalOptions): Rule {
 }
 
 function addDependencies(): Rule {
-  return (_host: Tree) => {
-    return chain([
-      addDependency('express', latestVersions['express'], {
-        type: DependencyType.Default,
-      }),
-      addDependency('@types/express', latestVersions['@types/express'], {
-        type: DependencyType.Dev,
-      }),
-    ]);
-  };
+  return chain([
+    addDependency('express', latestVersions['express'], {
+      type: DependencyType.Default,
+    }),
+    addDependency('@types/express', latestVersions['@types/express'], {
+      type: DependencyType.Dev,
+    }),
+  ]);
 }
 
-function addServerFile(options: UniversalOptions, isStandalone: boolean): Rule {
+function addServerFile(options: ServerOptions, isStandalone: boolean): Rule {
   return async (host) => {
     const project = await getProject(host, options.project);
     const browserDistDirectory = await getOutputPath(host, options.project, 'build');
 
     return mergeWith(
-      apply(url('./files'), [
-        applyTemplates({
-          ...strings,
-          ...options,
-          stripTsExtension,
-          browserDistDirectory,
-          isStandalone,
-        }),
-        move(project.root),
-      ]),
+      apply(
+        url(
+          `./files/${
+            project?.targets?.get('build')?.builder === Builders.Application
+              ? 'application-builder'
+              : 'server-builder'
+          }`,
+        ),
+        [
+          applyTemplates({
+            ...strings,
+            ...options,
+            browserDistDirectory,
+            isStandalone,
+          }),
+          move(project.root),
+        ],
+      ),
     );
   };
 }
 
-export default function (options: AddUniversalOptions): Rule {
+export default function (options: AddServerOptions): Rule {
   return async (host) => {
-    const project = await getProject(host, options.project);
-    const universalOptions = {
-      ...options,
-      skipInstall: true,
-    };
-    const clientBuildTarget = project.targets.get('build');
-    if (!clientBuildTarget) {
+    const browserEntryPoint = await getMainFilePath(host, options.project);
+    const isStandalone = isStandaloneApp(host, browserEntryPoint);
+
+    const workspace = await getWorkspace(host);
+    const clientProject = workspace.projects.get(options.project);
+    if (!clientProject) {
       throw targetBuildNotFoundError();
     }
-
-    const clientBuildOptions = (clientBuildTarget.options ||
-      {}) as unknown as BrowserBuilderOptions;
-
-    const isStandalone = isStandaloneApp(host, clientBuildOptions.main);
+    const isUsingApplicationBuilder =
+      clientProject.targets.get('build')?.builder === Builders.Application;
 
     return chain([
-      project.targets.has('server')
-        ? noop()
-        : externalSchematic('@schematics/angular', 'universal', universalOptions),
-      addScriptsRule(options),
-      updateServerTsConfigRule(options),
-      updateWorkspaceConfigRule(options),
+      externalSchematic('@schematics/angular', 'server', {
+        ...options,
+        skipInstall: true,
+      }),
+      ...(isUsingApplicationBuilder
+        ? [
+            updateApplicationBuilderWorkspaceConfigRule(clientProject.root, options),
+            updateApplicationBuilderTsConfigRule(options),
+          ]
+        : [
+            addScriptsRule(options),
+            updateWebpackBuilderServerTsConfigRule(options),
+            updateWebpackBuilderWorkspaceConfigRule(options),
+          ]),
       isStandalone ? noop() : routingInitialNavigationRule(options),
       addServerFile(options, isStandalone),
       addDependencies(),

@@ -9,7 +9,7 @@ const snapshots = require('../../../ng-snapshot/package.json');
 
 export default async function () {
   await ng('generate', 'application', 'test-project-two', '--standalone', '--skip-install');
-  await ng('generate', 'universal', '--project', 'test-project-two');
+  await ng('generate', 'server', '--project', 'test-project-two');
 
   const isSnapshotBuild = getGlobalVariable('argv')['ng-snapshots'];
   if (isSnapshotBuild) {

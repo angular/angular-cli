@@ -21,20 +21,25 @@ import {
   url,
 } from '@angular-devkit/schematics';
 import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
+import { posix } from 'node:path';
 import {
   NodeDependencyType,
   addPackageJsonDependency,
   getPackageJsonDependency,
 } from '../utility/dependencies';
+import { JSONFile } from '../utility/json-file';
 import { latestVersions } from '../utility/latest-versions';
 import { isStandaloneApp } from '../utility/ng-ast-utils';
 import { relativePathToWorkspaceRoot } from '../utility/paths';
 import { targetBuildNotFoundError } from '../utility/project-targets';
+import { getMainFilePath } from '../utility/standalone/util';
 import { getWorkspace, updateWorkspace } from '../utility/workspace';
-import { BrowserBuilderOptions, Builders } from '../utility/workspace-models';
-import { Schema as UniversalOptions } from './schema';
+import { Builders } from '../utility/workspace-models';
+import { Schema as ServerOptions } from './schema';
 
-function updateConfigFile(options: UniversalOptions, tsConfigDirectory: Path): Rule {
+const serverMainEntryName = 'main.server.ts';
+
+function updateConfigFileBrowserBuilder(options: ServerOptions, tsConfigDirectory: Path): Rule {
   return updateWorkspace((workspace) => {
     const clientProject = workspace.projects.get(options.project);
 
@@ -75,7 +80,6 @@ function updateConfigFile(options: UniversalOptions, tsConfigDirectory: Path): R
         }
       }
 
-      const mainPath = options.main as string;
       const sourceRoot = clientProject.sourceRoot ?? join(normalize(clientProject.root), 'src');
       const serverTsConfig = join(tsConfigDirectory, 'tsconfig.server.json');
       clientProject.targets.add({
@@ -84,7 +88,7 @@ function updateConfigFile(options: UniversalOptions, tsConfigDirectory: Path): R
         defaultConfiguration: 'production',
         options: {
           outputPath: `dist/${options.project}/server`,
-          main: join(normalize(sourceRoot), mainPath.endsWith('.ts') ? mainPath : mainPath + '.ts'),
+          main: join(normalize(sourceRoot), serverMainEntryName),
           tsConfig: serverTsConfig,
           ...(buildTarget?.options ? getServerOptions(buildTarget?.options) : {}),
         },
@@ -92,6 +96,43 @@ function updateConfigFile(options: UniversalOptions, tsConfigDirectory: Path): R
       });
     }
   });
+}
+
+function updateConfigFileApplicationBuilder(options: ServerOptions): Rule {
+  return updateWorkspace((workspace) => {
+    const project = workspace.projects.get(options.project);
+    if (!project) {
+      return;
+    }
+
+    const buildTarget = project.targets.get('build');
+    if (buildTarget?.builder !== Builders.Application) {
+      throw new SchematicsException(
+        `This schematic requires "${Builders.Application}" to be used as a build builder.`,
+      );
+    }
+
+    buildTarget.options ??= {};
+    buildTarget.options['server'] = posix.join(
+      project.sourceRoot ?? posix.join(project.root, 'src'),
+      serverMainEntryName,
+    );
+  });
+}
+
+function updateTsConfigFile(tsConfigPath: string): Rule {
+  return (host: Tree) => {
+    const json = new JSONFile(host, tsConfigPath);
+    const filesPath = ['files'];
+    const files = new Set((json.get(filesPath) as string[] | undefined) ?? []);
+    files.add('src/' + serverMainEntryName);
+    json.modify(filesPath, [...files]);
+
+    const typePath = ['compilerOptions', 'types'];
+    const types = new Set((json.get(typePath) as string[] | undefined) ?? []);
+    types.add('node');
+    json.modify(typePath, [...types]);
+  };
 }
 
 function addDependencies(): Rule {
@@ -114,13 +155,12 @@ function addDependencies(): Rule {
   };
 }
 
-export default function (options: UniversalOptions): Rule {
+export default function (options: ServerOptions): Rule {
   return async (host: Tree, context: SchematicContext) => {
     const workspace = await getWorkspace(host);
-
     const clientProject = workspace.projects.get(options.project);
-    if (!clientProject || clientProject.extensions.projectType !== 'application') {
-      throw new SchematicsException(`Universal requires a project type of "application".`);
+    if (clientProject?.extensions.projectType !== 'application') {
+      throw new SchematicsException(`Server schematic requires a project type of "application".`);
     }
 
     const clientBuildTarget = clientProject.targets.get('build');
@@ -128,20 +168,26 @@ export default function (options: UniversalOptions): Rule {
       throw targetBuildNotFoundError();
     }
 
-    const clientBuildOptions = (clientBuildTarget.options ||
-      {}) as unknown as BrowserBuilderOptions;
+    const isUsingApplicationBuilder = clientBuildTarget.builder === Builders.Application;
+    if (
+      clientProject.targets.has('server') ||
+      (isUsingApplicationBuilder && clientBuildTarget.options?.server !== undefined)
+    ) {
+      // Server has already been added.
+      return;
+    }
 
     if (!options.skipInstall) {
       context.addTask(new NodePackageInstallTask());
     }
-
-    const isStandalone = isStandaloneApp(host, clientBuildOptions.main);
+    const clientBuildOptions = clientBuildTarget.options as Record<string, string>;
+    const browserEntryPoint = await getMainFilePath(host, options.project);
+    const isStandalone = isStandaloneApp(host, browserEntryPoint);
 
     const templateSource = apply(url(isStandalone ? './files/standalone-src' : './files/src'), [
       applyTemplates({
         ...strings,
         ...options,
-        stripTsExtension: (s: string) => s.replace(/\.ts$/, ''),
       }),
       move(join(normalize(clientProject.root), 'src')),
     ]);
@@ -150,23 +196,30 @@ export default function (options: UniversalOptions): Rule {
     const tsConfigExtends = basename(clientTsConfig);
     const tsConfigDirectory = dirname(clientTsConfig);
 
-    const rootSource = apply(url('./files/root'), [
-      applyTemplates({
-        ...strings,
-        ...options,
-        stripTsExtension: (s: string) => s.replace(/\.ts$/, ''),
-        tsConfigExtends,
-        hasLocalizePackage: !!getPackageJsonDependency(host, '@angular/localize'),
-        relativePathToWorkspaceRoot: relativePathToWorkspaceRoot(tsConfigDirectory),
-      }),
-      move(tsConfigDirectory),
-    ]);
-
     return chain([
       mergeWith(templateSource),
-      mergeWith(rootSource),
+      ...(isUsingApplicationBuilder
+        ? [
+            updateConfigFileApplicationBuilder(options),
+            updateTsConfigFile(clientBuildOptions.tsConfig),
+          ]
+        : [
+            mergeWith(
+              apply(url('./files/root'), [
+                applyTemplates({
+                  ...strings,
+                  ...options,
+                  stripTsExtension: (s: string) => s.replace(/\.ts$/, ''),
+                  tsConfigExtends,
+                  hasLocalizePackage: !!getPackageJsonDependency(host, '@angular/localize'),
+                  relativePathToWorkspaceRoot: relativePathToWorkspaceRoot(tsConfigDirectory),
+                }),
+                move(tsConfigDirectory),
+              ]),
+            ),
+            updateConfigFileBrowserBuilder(options, tsConfigDirectory),
+          ]),
       addDependencies(),
-      updateConfigFile(options, tsConfigDirectory),
     ]);
   };
 }

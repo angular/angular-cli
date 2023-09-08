@@ -72,7 +72,11 @@ function* generateConfigurationEnvironments(
   sourceRoot: string,
   projectName: string,
 ): Iterable<Rule> {
-  if (!buildTarget.builder.startsWith(AngularBuilder.Browser)) {
+  if (
+    buildTarget.builder !== AngularBuilder.Browser &&
+    buildTarget.builder !== AngularBuilder.BrowserEsbuild &&
+    buildTarget.builder !== AngularBuilder.Application
+  ) {
     yield log(
       'warn',
       `"build" target found for project "${projectName}" has a third-party builder "${buildTarget.builder}".` +
@@ -80,7 +84,7 @@ function* generateConfigurationEnvironments(
     );
   }
 
-  if (serverTarget && !serverTarget.builder.startsWith(AngularBuilder.Server)) {
+  if (serverTarget && serverTarget.builder !== AngularBuilder.Server) {
     yield log(
       'warn',
       `"server" target found for project "${projectName}" has a third-party builder "${buildTarget.builder}".` +

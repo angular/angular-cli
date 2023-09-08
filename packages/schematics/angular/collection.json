@@ -94,10 +94,10 @@
       "description": "Create an Angular service.",
       "schema": "./service/schema.json"
     },
-    "universal": {
-      "factory": "./universal",
-      "description": "Create an Angular universal app.",
-      "schema": "./universal/schema.json",
+    "server": {
+      "factory": "./server",
+      "description": "Create an Angular server app.",
+      "schema": "./server/schema.json",
       "hidden": true
     },
     "app-shell": {

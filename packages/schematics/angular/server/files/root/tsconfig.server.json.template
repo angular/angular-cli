@@ -9,6 +9,6 @@
     ]
   },
   "files": [
-    "src/<%= stripTsExtension(main) %>.ts"
+    "src/main.server.ts"
   ]
 }

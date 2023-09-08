@@ -87,14 +87,14 @@ async function render({ serverBundlePath, document, url }: RenderRequest): Promi
       platformProviders,
     });
   }
-
+  assert(renderModule, `renderModule was not exported from: ${serverBundlePath}.`);
+  const moduleClass = bootstrapAppFn || AppServerModule;
   assert(
-    AppServerModule,
+    moduleClass,
     `Neither an AppServerModule nor a bootstrapping function was exported from: ${serverBundlePath}.`,
   );
-  assert(renderModule, `renderModule was not exported from: ${serverBundlePath}.`);
 
-  return renderModule(AppServerModule, {
+  return renderModule(moduleClass, {
     document,
     url,
     extraProviders: platformProviders,

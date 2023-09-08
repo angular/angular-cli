@@ -18,12 +18,13 @@ export enum ProjectType {
  * `angular.json` workspace file.
  */
 export enum Builders {
+  Application = '@angular-devkit/build-angular:application',
   AppShell = '@angular-devkit/build-angular:app-shell',
   Server = '@angular-devkit/build-angular:server',
   Browser = '@angular-devkit/build-angular:browser',
+  BrowserEsbuild = '@angular-devkit/build-angular:browser-esbuild',
   Karma = '@angular-devkit/build-angular:karma',
   TsLint = '@angular-devkit/build-angular:tslint',
-  DeprecatedNgPackagr = '@angular-devkit/build-ng-packagr:build',
   NgPackagr = '@angular-devkit/build-angular:ng-packagr',
   DevServer = '@angular-devkit/build-angular:dev-server',
   ExtractI18n = '@angular-devkit/build-angular:extract-i18n',

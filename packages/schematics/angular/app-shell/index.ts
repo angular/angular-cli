@@ -9,7 +9,6 @@
 import { dirname, join, normalize } from '@angular-devkit/core';
 import {
   Rule,
-  SchematicContext,
   SchematicsException,
   Tree,
   chain,
@@ -30,10 +29,12 @@ import {
 } from '../utility/ast-utils';
 import { applyToUpdateRecorder } from '../utility/change';
 import { getAppModulePath, isStandaloneApp } from '../utility/ng-ast-utils';
-import { targetBuildNotFoundError } from '../utility/project-targets';
+import { getMainFilePath } from '../utility/standalone/util';
 import { getWorkspace, updateWorkspace } from '../utility/workspace';
-import { BrowserBuilderOptions, Builders, ServerBuilderOptions } from '../utility/workspace-models';
+import { Builders, ServerBuilderOptions } from '../utility/workspace-models';
 import { Schema as AppShellOptions } from './schema';
+
+const APP_SHELL_ROUTE = 'shell';
 
 function getSourceFile(host: Tree, path: string): ts.SourceFile {
   const content = host.readText(path);
@@ -128,46 +129,44 @@ function getBootstrapComponentPath(host: Tree, mainPath: string): string {
 // end helper functions.
 
 function validateProject(mainPath: string): Rule {
-  return (host: Tree, context: SchematicContext) => {
+  return (host: Tree) => {
     const routerOutletCheckRegex = /<router-outlet.*?>([\s\S]*?)<\/router-outlet>/;
 
     const componentPath = getBootstrapComponentPath(host, mainPath);
     const tmpl = getComponentTemplateInfo(host, componentPath);
     const template = getComponentTemplate(host, componentPath, tmpl);
     if (!routerOutletCheckRegex.test(template)) {
-      const errorMsg = `Prerequisite for application shell is to define a router-outlet in your root component.`;
-      context.logger.error(errorMsg);
-      throw new SchematicsException(errorMsg);
+      throw new SchematicsException(
+        `Prerequisite for application shell is to define a router-outlet in your root component.`,
+      );
     }
-  };
-}
-
-function addUniversalTarget(options: AppShellOptions): Rule {
-  return () => {
-    // Copy options.
-    const universalOptions = {
-      ...options,
-    };
-
-    // Delete non-universal options.
-    delete universalOptions.route;
-
-    return schematic('universal', universalOptions);
   };
 }
 
 function addAppShellConfigToWorkspace(options: AppShellOptions): Rule {
   return (host, context) => {
-    if (!options.route) {
-      throw new SchematicsException(`Route is not defined`);
-    }
-
     return updateWorkspace((workspace) => {
       const project = workspace.projects.get(options.project);
       if (!project) {
         return;
       }
 
+      const buildTarget = project.targets.get('build');
+      if (buildTarget?.builder === Builders.Application) {
+        // Application builder configuration.
+        const prodConfig = buildTarget.configurations?.production;
+        if (!prodConfig) {
+          throw new SchematicsException(
+            `A "production" configuration is not defined for the "build" builder.`,
+          );
+        }
+
+        prodConfig.appShell = true;
+
+        return;
+      }
+
+      // Webpack based builders configuration.
       // Validation of targets is handled already in the main function.
       // Duplicate keys means that we have configurations in both server and build builders.
       const serverConfigKeys = project.targets.get('server')?.configurations ?? {};
@@ -207,7 +206,7 @@ function addAppShellConfigToWorkspace(options: AppShellOptions): Rule {
         builder: Builders.AppShell,
         defaultConfiguration: configurations['production'] ? 'production' : undefined,
         options: {
-          route: options.route,
+          route: APP_SHELL_ROUTE,
         },
         configurations,
       });
@@ -249,25 +248,14 @@ function addServerRoutes(options: AppShellOptions): Rule {
   return async (host: Tree) => {
     // The workspace gets updated so this needs to be reloaded
     const workspace = await getWorkspace(host);
-    const clientProject = workspace.projects.get(options.project);
-    if (!clientProject) {
-      throw new Error('Universal schematic removed client project.');
+    const project = workspace.projects.get(options.project);
+    if (!project) {
+      throw new SchematicsException(`Invalid project name (${options.project})`);
     }
-    const clientServerTarget = clientProject.targets.get('server');
-    if (!clientServerTarget) {
-      throw new Error('Universal schematic did not add server target to client project.');
-    }
-    const clientServerOptions = clientServerTarget.options as unknown as ServerBuilderOptions;
-    if (!clientServerOptions) {
-      throw new SchematicsException('Server target does not contain options.');
-    }
-    const modulePath = getServerModulePath(
-      host,
-      clientProject.sourceRoot || 'src',
-      options.main as string,
-    );
+
+    const modulePath = getServerModulePath(host, project.sourceRoot || 'src', 'main.server.ts');
     if (modulePath === null) {
-      throw new SchematicsException('Universal/server module not found.');
+      throw new SchematicsException('Server module not found.');
     }
 
     let moduleSource = getSourceFile(host, modulePath);
@@ -282,7 +270,7 @@ function addServerRoutes(options: AppShellOptions): Rule {
         .filter((node) => node.kind === ts.SyntaxKind.ImportDeclaration)
         .sort((a, b) => a.getStart() - b.getStart());
       const insertPosition = imports[imports.length - 1].getEnd();
-      const routeText = `\n\nconst routes: Routes = [ { path: '${options.route}', component: AppShellComponent }];`;
+      const routeText = `\n\nconst routes: Routes = [ { path: '${APP_SHELL_ROUTE}', component: AppShellComponent }];`;
       recorder.insertRight(insertPosition, routeText);
       host.commitUpdate(recorder);
     }
@@ -369,7 +357,7 @@ function addStandaloneServerRoute(options: AppShellOptions): Rule {
                   [
                     ts.factory.createPropertyAssignment(
                       'path',
-                      ts.factory.createIdentifier(`'${options.route}'`),
+                      ts.factory.createIdentifier(`'${APP_SHELL_ROUTE}'`),
                     ),
                     ts.factory.createPropertyAssignment(
                       'component',
@@ -410,29 +398,18 @@ function addStandaloneServerRoute(options: AppShellOptions): Rule {
 
 export default function (options: AppShellOptions): Rule {
   return async (tree) => {
-    const workspace = await getWorkspace(tree);
-    const clientProject = workspace.projects.get(options.project);
-    if (!clientProject || clientProject.extensions.projectType !== 'application') {
-      throw new SchematicsException(`A client project type of "application" is required.`);
-    }
-    const clientBuildTarget = clientProject.targets.get('build');
-    if (!clientBuildTarget) {
-      throw targetBuildNotFoundError();
-    }
-    const clientBuildOptions = (clientBuildTarget.options ||
-      {}) as unknown as BrowserBuilderOptions;
-
-    const isStandalone = isStandaloneApp(tree, clientBuildOptions.main);
+    const browserEntryPoint = await getMainFilePath(tree, options.project);
+    const isStandalone = isStandaloneApp(tree, browserEntryPoint);
 
     return chain([
-      validateProject(clientBuildOptions.main),
-      clientProject.targets.has('server') ? noop() : addUniversalTarget(options),
+      validateProject(browserEntryPoint),
+      schematic('server', options),
       addAppShellConfigToWorkspace(options),
-      isStandalone ? noop() : addRouterModule(clientBuildOptions.main),
+      isStandalone ? noop() : addRouterModule(browserEntryPoint),
       isStandalone ? addStandaloneServerRoute(options) : addServerRoutes(options),
       schematic('component', {
         name: 'app-shell',
-        module: options.rootModuleFileName,
+        module: 'app.module.server.ts',
         project: options.project,
         standalone: isStandalone,
       }),

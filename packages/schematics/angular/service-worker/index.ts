@@ -19,34 +19,26 @@ import {
   move,
   url,
 } from '@angular-devkit/schematics';
-import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
 import { addFunctionalProvidersToStandaloneBootstrap } from '../private/standalone';
 import * as ts from '../third_party/github.com/Microsoft/TypeScript/lib/typescript';
-import { readWorkspace, writeWorkspace } from '../utility';
+import { addDependency, readWorkspace, writeWorkspace } from '../utility';
 import { addSymbolToNgModuleMetadata, insertImport } from '../utility/ast-utils';
 import { applyToUpdateRecorder } from '../utility/change';
-import { addPackageJsonDependency, getPackageJsonDependency } from '../utility/dependencies';
+import { getPackageJsonDependency } from '../utility/dependencies';
 import { getAppModulePath, isStandaloneApp } from '../utility/ng-ast-utils';
 import { relativePathToWorkspaceRoot } from '../utility/paths';
 import { targetBuildNotFoundError } from '../utility/project-targets';
-import { BrowserBuilderOptions } from '../utility/workspace-models';
+import { Builders } from '../utility/workspace-models';
 import { Schema as ServiceWorkerOptions } from './schema';
 
 function addDependencies(): Rule {
-  return (host: Tree, context: SchematicContext) => {
-    const packageName = '@angular/service-worker';
-    context.logger.debug(`adding dependency (${packageName})`);
+  return (host: Tree) => {
     const coreDep = getPackageJsonDependency(host, '@angular/core');
-    if (coreDep === null) {
-      throw new SchematicsException('Could not find version.');
+    if (!coreDep) {
+      throw new SchematicsException('Could not find "@angular/core" version.');
     }
-    const serviceWorkerDep = {
-      ...coreDep,
-      name: packageName,
-    };
-    addPackageJsonDependency(host, serviceWorkerDep);
 
-    return host;
+    return addDependency('@angular/service-worker', coreDep.version);
   };
 }
 
@@ -132,7 +124,7 @@ function getTsSourceFile(host: Tree, path: string): ts.SourceFile {
 }
 
 export default function (options: ServiceWorkerOptions): Rule {
-  return async (host: Tree, context: SchematicContext) => {
+  return async (host: Tree) => {
     const workspace = await readWorkspace(host);
     const project = workspace.projects.get(options.project);
     if (!project) {
@@ -145,23 +137,32 @@ export default function (options: ServiceWorkerOptions): Rule {
     if (!buildTarget) {
       throw targetBuildNotFoundError();
     }
-    const buildOptions = (buildTarget.options || {}) as unknown as BrowserBuilderOptions;
-    const root = project.root;
-    buildOptions.serviceWorker = true;
-    buildOptions.ngswConfigPath = join(normalize(root), 'ngsw-config.json');
 
-    let { resourcesOutputPath = '' } = buildOptions;
-    if (resourcesOutputPath) {
-      resourcesOutputPath = normalize(`/${resourcesOutputPath}`);
+    const buildOptions = buildTarget.options as Record<string, string | boolean>;
+    let browserEntryPoint: string | undefined;
+    let resourcesOutputPath = '';
+    const ngswConfigPath = join(normalize(project.root), 'ngsw-config.json');
+
+    if (buildTarget.builder === Builders.Application) {
+      browserEntryPoint = buildOptions.browser as string;
+      resourcesOutputPath = '/media';
+      const productionConf = buildTarget.configurations?.production;
+      if (productionConf) {
+        productionConf.serviceWorker = ngswConfigPath;
+      }
+    } else {
+      browserEntryPoint = buildOptions.main as string;
+      buildOptions.serviceWorker = true;
+      buildOptions.ngswConfigPath = ngswConfigPath;
+      if (buildOptions.resourcesOutputPath) {
+        resourcesOutputPath = normalize(`/${buildOptions.resourcesOutputPath}`);
+      }
     }
-
-    context.addTask(new NodePackageInstallTask());
 
     await writeWorkspace(host, workspace);
 
-    const { main } = buildOptions;
-
     return chain([
+      addDependencies(),
       mergeWith(
         apply(url('./files'), [
           applyTemplates({
@@ -172,8 +173,9 @@ export default function (options: ServiceWorkerOptions): Rule {
           move(project.root),
         ]),
       ),
-      addDependencies(),
-      isStandaloneApp(host, main) ? addProvideServiceWorker(main) : updateAppModule(main),
+      isStandaloneApp(host, browserEntryPoint)
+        ? addProvideServiceWorker(browserEntryPoint)
+        : updateAppModule(browserEntryPoint),
     ]);
   };
 }

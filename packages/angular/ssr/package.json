@@ -9,6 +9,9 @@
     "ssr",
     "universal"
   ],
+  "ng-add": {
+    "save": "dependencies"
+  },
   "dependencies": {
     "critters": "0.0.20",
     "tslib": "^2.3.0"
