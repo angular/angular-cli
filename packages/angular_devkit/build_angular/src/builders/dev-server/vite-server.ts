@@ -19,6 +19,7 @@ import path, { posix } from 'node:path';
 import type { Connect, InlineConfig, ViteDevServer } from 'vite';
 import { JavaScriptTransformer } from '../../tools/esbuild/javascript-transformer';
 import { RenderOptions, renderPage } from '../../utils/server-rendering/render-page';
+import { getIndexOutputFile } from '../../utils/webpack-browser-config';
 import { buildEsbuildBrowser } from '../browser-esbuild';
 import { Schema as BrowserBuilderOptions } from '../browser-esbuild/schema';
 import { loadProxyConfiguration } from './load-proxy-config';
@@ -74,6 +75,11 @@ export async function* serveWithVite(
     1,
   );
 
+  // Extract output index from options
+  // TODO: Provide this info from the build results
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const htmlIndexPath = getIndexOutputFile(browserOptions.index as any);
+
   // dynamically import Vite for ESM compatibility
   const { createServer, normalizePath } = await import('vite');
 
@@ -88,7 +94,7 @@ export async function* serveWithVite(
     assert(result.outputFiles, 'Builder did not provide result files.');
 
     // Analyze result files for changes
-    analyzeResultFiles(normalizePath, result.outputFiles, generatedFiles);
+    analyzeResultFiles(normalizePath, htmlIndexPath, result.outputFiles, generatedFiles);
 
     assetFiles.clear();
     if (result.assetFiles) {
@@ -191,12 +197,20 @@ function handleUpdate(
 
 function analyzeResultFiles(
   normalizePath: (id: string) => string,
+  htmlIndexPath: string,
   resultFiles: OutputFile[],
   generatedFiles: Map<string, OutputFileRecord>,
 ) {
   const seen = new Set<string>(['/index.html']);
   for (const file of resultFiles) {
-    const filePath = '/' + normalizePath(file.path);
+    let filePath;
+    if (file.path === htmlIndexPath) {
+      // Convert custom index output path to standard index path for dev-server usage.
+      // This mimics the Webpack dev-server behavior.
+      filePath = '/index.html';
+    } else {
+      filePath = '/' + normalizePath(file.path);
+    }
     seen.add(filePath);
 
     // Skip analysis of sourcemaps
