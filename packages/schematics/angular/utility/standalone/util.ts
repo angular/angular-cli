@@ -11,7 +11,7 @@ import ts from '../../third_party/github.com/Microsoft/TypeScript/lib/typescript
 import { Change, applyToUpdateRecorder } from '../change';
 import { targetBuildNotFoundError } from '../project-targets';
 import { getWorkspace } from '../workspace';
-import { BrowserBuilderOptions } from '../workspace-models';
+import { Builders } from '../workspace-models';
 
 /**
  * Finds the main file of a project.
@@ -27,7 +27,9 @@ export async function getMainFilePath(tree: Tree, projectName: string): Promise<
     throw targetBuildNotFoundError();
   }
 
-  return ((buildTarget.options || {}) as unknown as BrowserBuilderOptions).main;
+  const options = buildTarget.options as Record<string, string>;
+
+  return buildTarget.builder === Builders.Application ? options.browser : options.main;
 }
 
 /**

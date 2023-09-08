@@ -9,6 +9,7 @@
 import { tags } from '@angular-devkit/core';
 import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/testing';
 import { Schema as ApplicationOptions } from '../application/schema';
+import { Builders } from '../utility/workspace-models';
 import { Schema as WorkspaceOptions } from '../workspace/schema';
 import { Schema as AppShellOptions } from './schema';
 
@@ -42,6 +43,15 @@ describe('App Shell Schematic', () => {
     appTree = await schematicRunner.runSchematic('application', appOptions, appTree);
   });
 
+  it('should add app shell configuration', async () => {
+    const tree = await schematicRunner.runSchematic('app-shell', defaultOptions, appTree);
+    const filePath = '/angular.json';
+    const content = tree.readContent(filePath);
+    const workspace = JSON.parse(content);
+    const target = workspace.projects.bar.architect['build'];
+    expect(target.configurations.production.appShell).toBeTrue();
+  });
+
   it('should ensure the client app has a router-outlet', async () => {
     appTree = await schematicRunner.runSchematic('workspace', workspaceOptions);
     appTree = await schematicRunner.runSchematic(
@@ -54,23 +64,10 @@ describe('App Shell Schematic', () => {
     ).toBeRejected();
   });
 
-  it('should add a universal app', async () => {
+  it('should add a server app', async () => {
     const tree = await schematicRunner.runSchematic('app-shell', defaultOptions, appTree);
     const filePath = '/projects/bar/src/app/app.module.server.ts';
     expect(tree.exists(filePath)).toEqual(true);
-  });
-
-  it('should add app shell configuration', async () => {
-    const tree = await schematicRunner.runSchematic('app-shell', defaultOptions, appTree);
-    const filePath = '/angular.json';
-    const content = tree.readContent(filePath);
-    const workspace = JSON.parse(content);
-    const target = workspace.projects.bar.architect['app-shell'];
-    expect(target.options.route).toEqual('shell');
-    expect(target.configurations.development.browserTarget).toEqual('bar:build:development');
-    expect(target.configurations.development.serverTarget).toEqual('bar:server:development');
-    expect(target.configurations.production.browserTarget).toEqual('bar:build:production');
-    expect(target.configurations.production.serverTarget).toEqual('bar:server:production');
   });
 
   it('should add router module to client app module', async () => {
@@ -100,7 +97,7 @@ describe('App Shell Schematic', () => {
         App works!
       </p>`;
       const newText = `
-        import { Component, OnInit } from '@angular/core';
+        import { Component } from '@angular/core';
 
         @Component({
           selector: ''
@@ -109,14 +106,7 @@ describe('App Shell Schematic', () => {
           \`,
           styleUrls: ['./app.component.css']
         })
-        export class AppComponent implements OnInit {
-
-          constructor() { }
-
-          ngOnInit() {
-          }
-
-        }
+        export class AppComponent { }
 
       `;
       tree.overwrite('/projects/bar/src/app/app.component.ts', newText);
@@ -150,17 +140,10 @@ describe('App Shell Schematic', () => {
     expect(content).toMatch(/import { Routes, RouterModule } from '@angular\/router';/);
   });
 
-  it('should work after adding nguniversal', async () => {
-    let tree = await schematicRunner.runSchematic('universal', defaultOptions, appTree);
-    // change main tsconfig to mimic ng add for nguniveral
-    const workspace = JSON.parse(appTree.readContent('/angular.json'));
-    workspace.projects.bar.architect.server.options.main = 'server.ts';
-    appTree.overwrite('angular.json', JSON.stringify(workspace, undefined, 2));
-
+  it('should work if server config was added prior to running the app-shell schematic', async () => {
+    let tree = await schematicRunner.runSchematic('server', defaultOptions, appTree);
     tree = await schematicRunner.runSchematic('app-shell', defaultOptions, tree);
-    const filePath = '/projects/bar/src/app/app.module.server.ts';
-    const content = tree.readContent(filePath);
-    expect(content).toMatch(/import { Routes, RouterModule } from '@angular\/router';/);
+    expect(tree.exists('/projects/bar/src/app/app-shell/app-shell.component.ts')).toBe(true);
   });
 
   it('should define a server route', async () => {
@@ -267,6 +250,45 @@ describe('App Shell Schematic', () => {
       expect(content).toContain(
         `import { AppShellComponent } from './app-shell/app-shell.component';`,
       );
+    });
+  });
+
+  describe('Legacy browser builder', () => {
+    function convertBuilderToLegacyBrowser(): void {
+      const config = JSON.parse(appTree.readContent('/angular.json'));
+      const build = config.projects.bar.architect.build;
+
+      build.builder = Builders.Browser;
+      build.options = {
+        ...build.options,
+        main: build.options.browser,
+        browser: undefined,
+      };
+
+      build.configurations.development = {
+        ...build.configurations.development,
+        vendorChunk: true,
+        namedChunks: true,
+        buildOptimizer: false,
+      };
+
+      appTree.overwrite('/angular.json', JSON.stringify(config, undefined, 2));
+    }
+
+    beforeEach(() => {
+      convertBuilderToLegacyBrowser();
+    });
+
+    it('should add app shell configuration', async () => {
+      const tree = await schematicRunner.runSchematic('app-shell', defaultOptions, appTree);
+      const filePath = '/angular.json';
+      const content = tree.readContent(filePath);
+      const workspace = JSON.parse(content);
+      const target = workspace.projects.bar.architect['app-shell'];
+      expect(target.configurations.development.browserTarget).toEqual('bar:build:development');
+      expect(target.configurations.development.serverTarget).toEqual('bar:server:development');
+      expect(target.configurations.production.browserTarget).toEqual('bar:build:production');
+      expect(target.configurations.production.serverTarget).toEqual('bar:server:production');
     });
   });
 });

@@ -240,12 +240,12 @@ function addAppToWorkspaceFile(
     schematics,
     targets: {
       build: {
-        builder: Builders.Browser,
+        builder: Builders.Application,
         defaultConfiguration: 'production',
         options: {
           outputPath: `dist/${folderName}`,
           index: `${sourceRoot}/index.html`,
-          main: `${sourceRoot}/main.ts`,
+          browser: `${sourceRoot}/main.ts`,
           polyfills: ['zone.js'],
           tsConfig: `${projectRoot}tsconfig.app.json`,
           inlineStyleLanguage,
@@ -259,12 +259,9 @@ function addAppToWorkspaceFile(
             outputHashing: 'all',
           },
           development: {
-            buildOptimizer: false,
             optimization: false,
-            vendorChunk: true,
             extractLicenses: false,
             sourceMap: true,
-            namedChunks: true,
           },
         },
       },

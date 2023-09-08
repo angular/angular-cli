@@ -8,10 +8,11 @@
 
 import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/testing';
 import { Schema as ApplicationOptions } from '../application/schema';
+import { Builders } from '../utility/workspace-models';
 import { Schema as WorkspaceOptions } from '../workspace/schema';
 import { Schema as EnvironmentOptions } from './schema';
 
-describe('Application Schematic', () => {
+describe('Environments Schematic', () => {
   const schematicRunner = new SchematicTestRunner(
     '@schematics/angular',
     require.resolve('../collection.json'),
@@ -40,6 +41,27 @@ describe('Application Schematic', () => {
 
   function runEnvironmentsSchematic(): Promise<UnitTestTree> {
     return schematicRunner.runSchematic('environments', defaultOptions, applicationTree);
+  }
+
+  function convertBuilderToLegacyBrowser(): void {
+    const config = JSON.parse(applicationTree.readContent('/angular.json'));
+    const build = config.projects.foo.architect.build;
+
+    build.builder = Builders.Browser;
+    build.options = {
+      ...build.options,
+      main: build.options.browser,
+      browser: undefined,
+    };
+
+    build.configurations.development = {
+      ...build.configurations.development,
+      vendorChunk: true,
+      namedChunks: true,
+      buildOptimizer: false,
+    };
+
+    applicationTree.overwrite('/angular.json', JSON.stringify(config, undefined, 2));
   }
 
   beforeEach(async () => {
@@ -133,8 +155,10 @@ describe('Application Schematic', () => {
   });
 
   it('should update the angular.json file replacements option for server configurations', async () => {
+    convertBuilderToLegacyBrowser();
+
     await schematicRunner.runSchematic(
-      'universal',
+      'server',
       { project: 'foo', skipInstall: true },
       applicationTree,
     );

@@ -9,6 +9,7 @@
 import { tags } from '@angular-devkit/core';
 import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/testing';
 import { Schema as ApplicationOptions } from '../application/schema';
+import { Builders } from '../utility/workspace-models';
 import { Schema as WorkspaceOptions } from '../workspace/schema';
 import { Schema as ServiceWorkerOptions } from './schema';
 
@@ -49,7 +50,9 @@ describe('Service Worker Schematic', () => {
     const configText = tree.readContent('/angular.json');
     const buildConfig = JSON.parse(configText).projects.bar.architect.build;
 
-    expect(buildConfig.options.serviceWorker).toBeTrue();
+    expect(buildConfig.configurations.production.serviceWorker).toBe(
+      'projects/bar/ngsw-config.json',
+    );
   });
 
   it('should add the necessary dependency', async () => {
@@ -87,7 +90,7 @@ describe('Service Worker Schematic', () => {
     expect(tree.exists(path)).toEqual(true);
 
     const { projects } = JSON.parse(tree.readContent('/angular.json'));
-    expect(projects.bar.architect.build.options.ngswConfigPath).toBe(
+    expect(projects.bar.architect.build.configurations.production.serviceWorker).toBe(
       'projects/bar/ngsw-config.json',
     );
   });
@@ -130,19 +133,7 @@ describe('Service Worker Schematic', () => {
     const pkgText = tree.readContent('/projects/bar/ngsw-config.json');
     const config = JSON.parse(pkgText);
     expect(config.assetGroups[1].resources.files).toContain(
-      '/*.(svg|cur|jpg|jpeg|png|apng|webp|avif|gif|otf|ttf|woff|woff2)',
-    );
-  });
-
-  it('should add resourcesOutputPath to root assets when specified', async () => {
-    const config = JSON.parse(appTree.readContent('/angular.json'));
-    config.projects.bar.architect.build.options.resourcesOutputPath = 'outDir';
-    appTree.overwrite('/angular.json', JSON.stringify(config));
-    const tree = await schematicRunner.runSchematic('service-worker', defaultOptions, appTree);
-    const pkgText = tree.readContent('/projects/bar/ngsw-config.json');
-    const ngswConfig = JSON.parse(pkgText);
-    expect(ngswConfig.assetGroups[1].resources.files).toContain(
-      '/outDir/*.(svg|cur|jpg|jpeg|png|apng|webp|avif|gif|otf|ttf|woff|woff2)',
+      '/media/*.(svg|cur|jpg|jpeg|png|apng|webp|avif|gif|otf|ttf|woff|woff2)',
     );
   });
 
@@ -161,9 +152,6 @@ describe('Service Worker Schematic', () => {
     let tree = await schematicRunner.runSchematic('application', rootAppOptions, appTree);
     tree = await schematicRunner.runSchematic('service-worker', rootSWOptions, tree);
     expect(tree.exists('/ngsw-config.json')).toBe(true);
-
-    const { projects } = JSON.parse(tree.readContent('/angular.json'));
-    expect(projects.foo.architect.build.options.ngswConfigPath).toBe('ngsw-config.json');
   });
 
   describe('standalone', () => {
@@ -215,6 +203,61 @@ describe('Service Worker Schematic', () => {
       );
       const content = tree.readContent('/projects/buz/src/app/app.config.ts');
       expect(content).toContain(`import { provideServiceWorker } from '@angular/service-worker';`);
+    });
+  });
+
+  describe('Legacy browser builder', () => {
+    function convertBuilderToLegacyBrowser(): void {
+      const config = JSON.parse(appTree.readContent('/angular.json'));
+      const build = config.projects.bar.architect.build;
+
+      build.builder = Builders.Browser;
+      build.options = {
+        ...build.options,
+        main: build.options.browser,
+        browser: undefined,
+      };
+
+      build.configurations.development = {
+        ...build.configurations.development,
+        vendorChunk: true,
+        namedChunks: true,
+        buildOptimizer: false,
+      };
+
+      appTree.overwrite('/angular.json', JSON.stringify(config, undefined, 2));
+    }
+
+    beforeEach(() => {
+      convertBuilderToLegacyBrowser();
+    });
+
+    it('should add resourcesOutputPath to root assets when specified', async () => {
+      const config = JSON.parse(appTree.readContent('/angular.json'));
+      config.projects.bar.architect.build.options.resourcesOutputPath = 'outDir';
+      appTree.overwrite('/angular.json', JSON.stringify(config));
+      const tree = await schematicRunner.runSchematic('service-worker', defaultOptions, appTree);
+      const pkgText = tree.readContent('/projects/bar/ngsw-config.json');
+      const ngswConfig = JSON.parse(pkgText);
+      expect(ngswConfig.assetGroups[1].resources.files).toContain(
+        '/outDir/*.(svg|cur|jpg|jpeg|png|apng|webp|avif|gif|otf|ttf|woff|woff2)',
+      );
+    });
+
+    it('should add `serviceWorker` option to build target', async () => {
+      const tree = await schematicRunner.runSchematic('service-worker', defaultOptions, appTree);
+      const configText = tree.readContent('/angular.json');
+      const buildConfig = JSON.parse(configText).projects.bar.architect.build;
+
+      expect(buildConfig.options.serviceWorker).toBeTrue();
+    });
+
+    it('should add `ngswConfigPath` option to build target', async () => {
+      const tree = await schematicRunner.runSchematic('service-worker', defaultOptions, appTree);
+      const configText = tree.readContent('/angular.json');
+      const buildConfig = JSON.parse(configText).projects.bar.architect.build;
+
+      expect(buildConfig.options.ngswConfigPath).toBe('projects/bar/ngsw-config.json');
     });
   });
 });
