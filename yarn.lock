@@ -122,8 +122,7 @@
     tslib "^2.3.0"
 
 "@angular/bazel@https://github.com/angular/bazel-builds.git#91091a7265b992f7198771a990dcd02f6d76d349":
-  version "17.0.0-next.2+sha-970d68f"
-  uid "91091a7265b992f7198771a990dcd02f6d76d349"
+  version "17.0.0-next.2"
   resolved "https://github.com/angular/bazel-builds.git#91091a7265b992f7198771a990dcd02f6d76d349"
   dependencies:
     "@microsoft/api-extractor" "^7.24.2"
@@ -140,7 +139,6 @@
 
 "@angular/build-tooling@https://github.com/angular/dev-infra-private-build-tooling-builds.git#148a2664e8323239f6535aa3d4cf5ef765891a7d":
   version "0.0.0-9a54ceecfcd399051e18cd2dbdd6c9fc893f5dc4"
-  uid "148a2664e8323239f6535aa3d4cf5ef765891a7d"
   resolved "https://github.com/angular/dev-infra-private-build-tooling-builds.git#148a2664e8323239f6535aa3d4cf5ef765891a7d"
   dependencies:
     "@angular-devkit/build-angular" "16.2.0-rc.1"
@@ -301,7 +299,6 @@
 
 "@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#7a8480bb03fff8c139db4586286c439cd7366493":
   version "0.0.0-9a54ceecfcd399051e18cd2dbdd6c9fc893f5dc4"
-  uid "7a8480bb03fff8c139db4586286c439cd7366493"
   resolved "https://github.com/angular/dev-infra-private-ng-dev-builds.git#7a8480bb03fff8c139db4586286c439cd7366493"
   dependencies:
     "@yarnpkg/lockfile" "^1.1.0"
@@ -9489,10 +9486,10 @@ neo-async@^2.6.0, neo-async@^2.6.2:
   resolved "https://registry.yarnpkg.com/neo-async/-/neo-async-2.6.2.tgz#b4aafb93e3aeb2d8174ca53cf163ab7d7308305f"
   integrity sha512-Yd3UES5mWCSqR+qNT93S3UoYUkqAZ9lLg8a7g9rimsWmYGK8cVToA4/sF3RrshdyV3sAGMXVUmpMYOw+dLpOuw==
 
-ng-packagr@17.0.0-next.0:
-  version "17.0.0-next.0"
-  resolved "https://registry.yarnpkg.com/ng-packagr/-/ng-packagr-17.0.0-next.0.tgz#ad3eb5c5636cc3ac0bc435ef3f870f2e7c7d9f08"
-  integrity sha512-6ziU0FnAv/ko4AnonuCE0pFhEyrubJZ9stlizH0ahirWqKeVJe2+G8w4ohX29zgSTseZ3IRpzWhCA2RYXoy0KA==
+ng-packagr@17.0.0-next.1:
+  version "17.0.0-next.1"
+  resolved "https://registry.yarnpkg.com/ng-packagr/-/ng-packagr-17.0.0-next.1.tgz#e4cd279cb17a7aa8d6e73a36acd3208aa4c40aa0"
+  integrity sha512-mHSJc1lUNfxy7J+BGGg2pzy4RVefP2OhYGVkvstPrtLmYc0P5FKLAN1rXR74eHIaaP0Qlw7ri3hHrOOlQ6GhPg==
   dependencies:
     "@rollup/plugin-json" "^6.0.0"
     "@rollup/plugin-node-resolve" "^15.0.0"
@@ -11309,7 +11306,6 @@ sass@1.66.1, sass@^1.55.0:
 
 "sauce-connect-proxy@https://saucelabs.com/downloads/sc-4.9.1-linux.tar.gz":
   version "0.0.0"
-  uid "9310bc860f7870a1f872b11c4dc6073a1ad34e5e"
   resolved "https://saucelabs.com/downloads/sc-4.9.1-linux.tar.gz#9310bc860f7870a1f872b11c4dc6073a1ad34e5e"
 
 saucelabs@^1.5.0:
@@ -12418,11 +12414,6 @@ typed-assert@^1.0.8:
   version "1.0.9"
   resolved "https://registry.yarnpkg.com/typed-assert/-/typed-assert-1.0.9.tgz#8af9d4f93432c4970ec717e3006f33f135b06213"
   integrity sha512-KNNZtayBCtmnNmbo5mG47p1XsCyrx6iVqomjcZnec/1Y5GGARaxPs6r49RnSPeUP3YjNYiU9sQHAtY4BBvnZwg==
-
-typescript@5.1.6:
-  version "5.1.6"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-5.1.6.tgz#02f8ac202b6dad2c0dd5e0913745b47a37998274"
-  integrity sha512-zaWCozRZ6DLEWAWFrVDz1H6FVXzUSfTy5FUMWsQlU8Ym5JP9eO4xkTIROFCQvhQf61z6O/G6ugw3SgAnvvm+HA==
 
 typescript@5.2.2:
   version "5.2.2"
