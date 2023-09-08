@@ -76,7 +76,7 @@
     "@angular/platform-server": "17.0.0-next.2",
     "@angular/router": "17.0.0-next.2",
     "@angular/service-worker": "17.0.0-next.2",
-    "@babel/core": "7.22.15",
+    "@babel/core": "7.22.17",
     "@babel/generator": "7.22.15",
     "@babel/helper-annotate-as-pure": "7.22.5",
     "@babel/helper-split-export-declaration": "7.22.6",
