@@ -14,6 +14,11 @@ import { readNgVersion } from '../../utils/version';
 const snapshots = require('../../ng-snapshot/package.json');
 
 export default async function () {
+  // TODO: Update to support application builder
+  if (getGlobalVariable('argv')['esbuild']) {
+    return;
+  }
+
   const isSnapshotBuild = getGlobalVariable('argv')['ng-snapshots'];
 
   await updateJsonFile('package.json', (packageJson) => {

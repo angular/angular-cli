@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import { getGlobalVariable } from '../../utils/env';
 import { expectFileToMatch } from '../../utils/fs';
 import { ng } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';
@@ -34,10 +35,19 @@ export default async function () {
       continue;
     }
 
-    await expectFileToMatch(`${outputPath}/vendor.js`, lang);
+    const useWebpackBuilder = !getGlobalVariable('argv')['esbuild'];
+    if (useWebpackBuilder) {
+      // The only reference in a new application with Webpack is in @angular/core
+      await expectFileToMatch(`${outputPath}/vendor.js`, lang);
 
-    // Verify the locale data is registered using the global files
-    await expectFileToMatch(`${outputPath}/vendor.js`, '.ng.common.locales');
+      // Verify the locale data is registered using the global files
+      await expectFileToMatch(`${outputPath}/vendor.js`, '.ng.common.locales');
+    } else {
+      await expectFileToMatch(`${outputPath}/polyfills.js`, lang);
+
+      // Verify the locale data is registered using the global files
+      await expectFileToMatch(`${outputPath}/polyfills.js`, '.ng.common.locales');
+    }
 
     // Verify the HTML lang attribute is present
     await expectFileToMatch(`${outputPath}/index.html`, `lang="${lang}"`);

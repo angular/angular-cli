@@ -41,6 +41,12 @@ interface InternalOptions {
    * Currently used by the dev-server to support prebundling.
    */
   externalPackages?: boolean;
+
+  /**
+   * Forces the output from the localize post-processing to not create nested directories per locale output.
+   * This is only used by the development server which currently only supports a single locale per build.
+   */
+  forceI18nFlatOutput?: boolean;
 }
 
 /** Full set of options for `application` builder. */
@@ -87,6 +93,9 @@ export async function normalizeOptions(
   } = createI18nOptions(projectMetadata, options.localize);
   i18nOptions.duplicateTranslationBehavior = options.i18nDuplicateTranslation;
   i18nOptions.missingTranslationBehavior = options.i18nMissingTranslation;
+  if (options.forceI18nFlatOutput) {
+    i18nOptions.flatOutput = true;
+  }
 
   const entryPoints = normalizeEntryPoints(workspaceRoot, options.browser, options.entryPoints);
   const tsconfig = path.join(workspaceRoot, options.tsConfig);

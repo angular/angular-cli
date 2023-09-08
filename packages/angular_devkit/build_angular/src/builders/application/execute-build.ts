@@ -31,6 +31,7 @@ import { maxWorkers } from '../../utils/environment-options';
 import { prerenderPages } from '../../utils/server-rendering/prerender';
 import { augmentAppWithServiceWorkerEsbuild } from '../../utils/service-worker';
 import { getSupportedBrowsers } from '../../utils/supported-browsers';
+import { inlineI18n, loadActiveTranslations } from './i18n';
 import { NormalizedApplicationBuildOptions } from './options';
 
 // eslint-disable-next-line max-lines-per-function
@@ -58,6 +59,12 @@ export async function executeBuild(
 
   const browsers = getSupportedBrowsers(projectRoot, context.logger);
   const target = transformSupportedBrowsersToTargets(browsers);
+
+  // Load active translations if inlining
+  // TODO: Integrate into watch mode and only load changed translations
+  if (options.i18nOptions.shouldInline) {
+    await loadActiveTranslations(context, options.i18nOptions);
+  }
 
   // Reuse rebuild state or create new bundle contexts for code and global stylesheets
   let bundlerContexts = rebuildState?.rebuildContexts;
@@ -154,14 +161,18 @@ export async function executeBuild(
   let indexContentOutputNoCssInlining: string | undefined;
 
   // Generate index HTML file
-  if (indexHtmlOptions) {
+  // If localization is enabled, index generation is handled in the inlining process.
+  // NOTE: Localization with SSR is not currently supported.
+  if (indexHtmlOptions && !options.i18nOptions.shouldInline) {
     const { content, contentWithoutCriticalCssInlined, errors, warnings } = await generateIndexHtml(
       initialFiles,
-      executionResult,
+      executionResult.outputFiles,
       {
         ...options,
         optimizationOptions,
       },
+      // Set lang attribute to the defined source locale if present
+      options.i18nOptions.hasDefinedSourceLocale ? options.i18nOptions.sourceLocale : undefined,
     );
 
     indexContentOutputNoCssInlining = contentWithoutCriticalCssInlined;
@@ -248,6 +259,11 @@ export async function executeBuild(
 
   const buildTime = Number(process.hrtime.bigint() - startTime) / 10 ** 9;
   context.logger.info(`Application bundle generation complete. [${buildTime.toFixed(3)} seconds]`);
+
+  // Perform i18n translation inlining if enabled
+  if (options.i18nOptions.shouldInline) {
+    await inlineI18n(options, executionResult, initialFiles);
+  }
 
   return executionResult;
 }

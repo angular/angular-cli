@@ -24,6 +24,8 @@ export interface VirtualModulePluginOptions {
     args: OnLoadArgs,
     build: PluginBuild,
   ) => ReturnType<Parameters<PluginBuild['onLoad']>[1]>;
+  /** Restrict to only entry points. Defaults to `true`. */
+  entryPointOnly?: boolean;
 }
 
 /**
@@ -32,13 +34,19 @@ export interface VirtualModulePluginOptions {
  * @returns An esbuild plugin.
  */
 export function createVirtualModulePlugin(options: VirtualModulePluginOptions): Plugin {
-  const { namespace, external, transformPath: pathTransformer, loadContent } = options;
+  const {
+    namespace,
+    external,
+    transformPath: pathTransformer,
+    loadContent,
+    entryPointOnly = true,
+  } = options;
 
   return {
     name: namespace.replace(/[/:]/g, '-'),
     setup(build): void {
       build.onResolve({ filter: new RegExp('^' + namespace) }, ({ kind, path }) => {
-        if (kind !== 'entry-point') {
+        if (entryPointOnly && kind !== 'entry-point') {
           return null;
         }
 

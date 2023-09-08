@@ -211,6 +211,39 @@ export function createOutputFileFromText(path: string, text: string): OutputFile
   };
 }
 
+export function createOutputFileFromData(path: string, data: Uint8Array): OutputFile {
+  return {
+    path,
+    get text() {
+      return Buffer.from(data.buffer, data.byteOffset, data.byteLength).toString('utf-8');
+    },
+    get hash() {
+      return createHash('sha256').update(data).digest('hex');
+    },
+    get contents() {
+      return data;
+    },
+  };
+}
+
+export function cloneOutputFile(file: OutputFile): OutputFile {
+  const path = file.path;
+  const data = file.contents;
+
+  return {
+    path,
+    get text() {
+      return Buffer.from(data.buffer, data.byteOffset, data.byteLength).toString('utf-8');
+    },
+    get hash() {
+      return createHash('sha256').update(data).digest('hex');
+    },
+    get contents() {
+      return data;
+    },
+  };
+}
+
 /**
  * Transform browserlists result to esbuild target.
  * @see https://esbuild.github.io/api/#target

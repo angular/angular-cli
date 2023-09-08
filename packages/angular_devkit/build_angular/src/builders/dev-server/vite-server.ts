@@ -18,6 +18,7 @@ import type { AddressInfo } from 'node:net';
 import path, { posix } from 'node:path';
 import type { Connect, InlineConfig, ViteDevServer } from 'vite';
 import { JavaScriptTransformer } from '../../tools/esbuild/javascript-transformer';
+import { createAngularLocaleDataPlugin } from '../../tools/vite/i18n-locale-plugin';
 import { RenderOptions, renderPage } from '../../utils/server-rendering/render-page';
 import { getIndexOutputFile } from '../../utils/webpack-browser-config';
 import { buildEsbuildBrowser } from '../browser-esbuild';
@@ -64,6 +65,21 @@ export async function* serveWithVite(
 
   if (serverOptions.servePath === undefined && browserOptions.baseHref !== undefined) {
     serverOptions.servePath = browserOptions.baseHref;
+  }
+
+  // The development server currently only supports a single locale when localizing.
+  // This matches the behavior of the Webpack-based development server but could be expanded in the future.
+  if (
+    browserOptions.localize === true ||
+    (Array.isArray(browserOptions.localize) && browserOptions.localize.length > 1)
+  ) {
+    context.logger.warn(
+      'Localization (`localize` option) has been disabled. The development server only supports localizing a single locale per build.',
+    );
+    browserOptions.localize = false;
+  } else if (browserOptions.localize) {
+    // When localization is enabled with a single locale, force a flat path to maintain behavior with the existing Webpack-based dev server.
+    browserOptions.forceI18nFlatOutput = true;
   }
 
   // Setup the prebundling transformer that will be shared across Vite prebundling requests
@@ -310,6 +326,7 @@ export async function setupServer(
       external: prebundleExclude,
     },
     plugins: [
+      createAngularLocaleDataPlugin(),
       {
         name: 'vite:angular-memory',
         // Ensures plugin hooks run before built-in Vite hooks
