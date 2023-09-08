@@ -51,6 +51,7 @@ describe('Ng New Schematic', () => {
       jasmine.arrayContaining([
         '/bar/tsconfig.app.json',
         '/bar/src/main.ts',
+        '/bar/src/app/app.routes.ts',
         '/bar/src/app/app.config.ts',
       ]),
     );

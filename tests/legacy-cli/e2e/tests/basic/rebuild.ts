@@ -58,6 +58,7 @@ export default async function () {
       'src/app/app.module.ts': `
         import { BrowserModule } from '@angular/platform-browser';
         import { NgModule } from '@angular/core';
+        import { RouterModule } from '@angular/router';
 
         import { AppComponent } from './app.component';
 
@@ -66,6 +67,7 @@ export default async function () {
             AppComponent
           ],
           imports: [
+            RouterModule,
             BrowserModule
           ],
           providers: [],
@@ -95,7 +97,7 @@ export default async function () {
       'src/app/app.module.ts': `
         import { BrowserModule } from '@angular/platform-browser';
         import { NgModule } from '@angular/core';
-
+        import { RouterModule } from '@angular/router';
         import { AppComponent } from './app.component';
 
         @NgModule({
@@ -103,6 +105,7 @@ export default async function () {
             AppComponent
           ],
           imports: [
+            RouterModule,
             BrowserModule
           ],
           providers: [],

@@ -25,6 +25,7 @@ export default async function () {
     `
       import {NgModule} from '@angular/core';
       import {BrowserModule} from '@angular/platform-browser';
+      import {RouterModule} from '@angular/router';
       import {SecondaryModule} from 'mylib/secondary';
       import {AnotherModule} from 'mylib/another';
 
@@ -35,6 +36,7 @@ export default async function () {
           AppComponent
         ],
         imports: [
+          RouterModule,
           SecondaryModule,
           AnotherModule,
           BrowserModule

@@ -31,6 +31,7 @@ describe('standalone utilities', () => {
       {
         name: projectName,
         standalone,
+        routing: false,
       },
       host,
     );
