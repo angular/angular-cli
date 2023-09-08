@@ -30,16 +30,14 @@ BROWSER_TESTS = ["tests/misc/browsers.js"]
 YARN_TESTS = ["tests/basic/**", "tests/update/**", "tests/commands/add/**"]
 ESBUILD_TESTS = [
     "tests/basic/**",
+    "tests/build/app-shell/app-shell-standalone.js",
+    "tests/build/app-shell/app-shell-with-schematic.js",
     "tests/build/library/**",
     "tests/build/prod-build.js",
     "tests/build/relative-sourcemap.js",
     "tests/build/styles/**",
     "tests/commands/add/add-pwa.js",
     "tests/i18n/extract-ivy*",
-]
-
-# Tests excluded for esbuild
-ESBUILD_IGNORE_TESTS = [
     "tests/ssr/**",
 ]
 
@@ -135,8 +133,9 @@ def _e2e_suite(name, runner, type, data, toolchain_name = "", toolchain = None):
     elif type == "esbuild":
         args.append("--esbuild")
         tests = ESBUILD_TESTS
-        ignore = BROWSER_TESTS + ESBUILD_IGNORE_TESTS
+        ignore = BROWSER_TESTS
     elif type == "saucelabs":
+        args.append("--esbuild")
         tests = BROWSER_TESTS
         ignore = None
     elif type == "npm":

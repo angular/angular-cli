@@ -1,8 +1,9 @@
+import { getGlobalVariable } from '../../utils/env';
 import { rimraf, writeMultipleFiles } from '../../utils/fs';
 import { findFreePort } from '../../utils/network';
 import { installWorkspacePackages } from '../../utils/packages';
 import { execAndWaitForOutputToMatch, killAllProcesses, ng } from '../../utils/process';
-import { useCIChrome, useCIDefaults, useSha } from '../../utils/project';
+import { updateJsonFile, useCIChrome, useCIDefaults, useSha } from '../../utils/project';
 
 export default async function () {
   // forcibly remove in case another test doesn't clean itself up
@@ -15,6 +16,27 @@ export default async function () {
   await useCIChrome('test-project-two', 'projects/test-project-two/e2e/');
   await useCIDefaults('test-project-two');
 
+  const useWebpackBuilder = !getGlobalVariable('argv')['esbuild'];
+
+  if (useWebpackBuilder) {
+    await updateJsonFile('angular.json', (json) => {
+      const build = json['projects']['test-project-two']['architect']['build'];
+      build.builder = '@angular-devkit/build-angular:browser';
+      build.options = {
+        ...build.options,
+        main: build.options.browser,
+        browser: undefined,
+      };
+
+      build.configurations.development = {
+        ...build.configurations.development,
+        vendorChunk: true,
+        namedChunks: true,
+        buildOptimizer: false,
+      };
+    });
+  }
+
   await ng(
     'add',
     '@angular/ssr',
@@ -22,6 +44,14 @@ export default async function () {
     '--project=test-project-two',
     '--skip-install',
   );
+
+  if (!useWebpackBuilder) {
+    // Disable prerendering
+    await updateJsonFile('angular.json', (json) => {
+      const build = json['projects']['test-project-two']['architect']['build'];
+      build.configurations.production.prerender = false;
+    });
+  }
 
   await useSha();
   await installWorkspacePackages();
@@ -36,7 +66,8 @@ export default async function () {
         bootstrapApplication(AppComponent, appConfig).catch((err) => console.error(err));
       };
       `,
-    'projects/test-project-two/e2e/src/app.e2e-spec.ts': `
+    'projects/test-project-two/e2e/src/app.e2e-spec.ts':
+      `
       import { browser, by, element } from 'protractor';
       import * as webdriver from 'selenium-webdriver';
 
@@ -86,8 +117,10 @@ export default async function () {
 
           // Make sure there were no client side errors.
           await verifyNoBrowserErrors();
-        });
-
+        }); ` +
+      // TODO(alanagius): enable the below tests once critical css inlining for SSR is supported with Vite.
+      (useWebpackBuilder
+        ? `
         it('stylesheets should be configured to load asynchronously', async () => {
           // Load the page without waiting for Angular since it is not bootstrapped automatically.
           await browser.driver.get(browser.baseUrl);
@@ -98,18 +131,26 @@ export default async function () {
 
           // Make sure there were no client side errors.
           await verifyNoBrowserErrors();
-        });
+        });`
+        : '') +
+      `
       });
       `,
   });
 
   async function ngDevSsr(): Promise<number> {
     const port = await findFreePort();
+    const validBundleRegEx = useWebpackBuilder ? /Compiled successfully\./ : /complete\./;
 
     await execAndWaitForOutputToMatch(
       'ng',
-      ['run', 'test-project-two:serve-ssr:production', '--port', String(port)],
-      /Compiled successfully\./,
+      [
+        'run',
+        `test-project-two:${useWebpackBuilder ? 'serve-ssr' : 'serve'}:production`,
+        '--port',
+        String(port),
+      ],
+      validBundleRegEx,
     );
 
     return port;

@@ -8,12 +8,24 @@ import { updateJsonFile } from '../../utils/project';
 export default async function () {
   // General secondary application project
   await ng('generate', 'application', 'secondary-project', '--skip-install');
-  // Setup esbuild builder if requested on the commandline
-  const useEsbuildBuilder = !!getGlobalVariable('argv')['esbuild'];
-  if (useEsbuildBuilder) {
+  // Setup webpack builder if esbuild is not requested on the commandline
+  const useWebpackBuilder = !getGlobalVariable('argv')['esbuild'];
+  if (useWebpackBuilder) {
     await updateJsonFile('angular.json', (json) => {
-      json['projects']['secondary-project']['architect']['build']['builder'] =
-        '@angular-devkit/build-angular:browser-esbuild';
+      const build = json['projects']['secondary-project']['architect']['build'];
+      build.builder = '@angular-devkit/build-angular:browser';
+      build.options = {
+        ...build.options,
+        main: build.options.browser,
+        browser: undefined,
+      };
+
+      build.configurations.development = {
+        ...build.configurations.development,
+        vendorChunk: true,
+        namedChunks: true,
+        buildOptimizer: false,
+      };
     });
   }
 

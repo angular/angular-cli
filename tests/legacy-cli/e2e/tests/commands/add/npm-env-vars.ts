@@ -1,4 +1,5 @@
 import { expectFileNotToExist, expectFileToExist } from '../../../utils/fs';
+import { installWorkspacePackages } from '../../../utils/packages';
 import { git, ng } from '../../../utils/process';
 import {
   createNpmConfigForAuthentication,
@@ -23,4 +24,7 @@ export default async function () {
   await createNpmConfigForAuthentication(false, true);
   await ng(...command);
   await expectFileToExist('src/manifest.webmanifest');
+
+  await git('clean', '-dxf');
+  await installWorkspacePackages();
 }
