@@ -51,6 +51,5 @@ export default async function () {
 
   await ng('run', 'test-project:app-shell:production');
   await expectFileToMatch('dist/test-project/browser/index.html', /app-shell works!/);
-
   await ng('e2e', '--configuration=production');
 }

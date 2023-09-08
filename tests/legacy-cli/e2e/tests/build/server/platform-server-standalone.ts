@@ -9,6 +9,28 @@ const snapshots = require('../../../ng-snapshot/package.json');
 
 export default async function () {
   await ng('generate', 'application', 'test-project-two', '--standalone', '--skip-install');
+
+  // Setup webpack builder if esbuild is not requested on the commandline
+  const useWebpackBuilder = !getGlobalVariable('argv')['esbuild'];
+  if (useWebpackBuilder) {
+    await updateJsonFile('angular.json', (json) => {
+      const build = json['projects']['test-project-two']['architect']['build'];
+      build.builder = '@angular-devkit/build-angular:browser';
+      build.options = {
+        ...build.options,
+        main: build.options.browser,
+        browser: undefined,
+      };
+
+      build.configurations.development = {
+        ...build.configurations.development,
+        vendorChunk: true,
+        namedChunks: true,
+        buildOptimizer: false,
+      };
+    });
+  }
+
   await ng('generate', 'server', '--project', 'test-project-two');
 
   const isSnapshotBuild = getGlobalVariable('argv')['ng-snapshots'];

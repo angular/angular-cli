@@ -1,4 +1,5 @@
 import { expectFileNotToExist, expectFileToExist } from '../../../utils/fs';
+import { installWorkspacePackages } from '../../../utils/packages';
 import { git, ng } from '../../../utils/process';
 import { createNpmConfigForAuthentication } from '../../../utils/registry';
 import { expectToFail } from '../../../utils/utils';
@@ -29,4 +30,7 @@ export default async function () {
 
   await createNpmConfigForAuthentication(true, true);
   await expectToFail(() => ng(...command));
+
+  await git('clean', '-dxf');
+  await installWorkspacePackages();
 }
