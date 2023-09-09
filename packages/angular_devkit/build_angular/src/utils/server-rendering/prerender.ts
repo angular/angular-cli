@@ -37,7 +37,19 @@ export async function prerenderPages(
   warnings: string[];
   errors: string[];
 }> {
+  const output: Record<string, string> = {};
+  const warnings: string[] = [];
+  const errors: string[] = [];
   const allRoutes = await getAllRoutes(tsConfigPath, appShellOptions, prerenderOptions);
+
+  if (allRoutes.size < 1) {
+    return {
+      errors,
+      warnings,
+      output,
+    };
+  }
+
   const outputFilesForWorker: Record<string, string> = {};
 
   for (const { text, path } of outputFiles) {
@@ -64,10 +76,6 @@ export async function prerenderPages(
       require.resolve('./esm-in-memory-file-loader.js'),
     ],
   });
-
-  const output: Record<string, string> = {};
-  const warnings: string[] = [];
-  const errors: string[] = [];
 
   try {
     const renderingPromises: Promise<void>[] = [];
