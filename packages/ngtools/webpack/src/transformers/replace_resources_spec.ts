@@ -299,6 +299,45 @@ describe('@ngtools/webpack transformers', () => {
       expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
     });
 
+    it('should replace resources specified as string literals', () => {
+      const input = tags.stripIndent`
+        import { Component } from '@angular/core';
+
+        @Component({
+          selector: 'app-root',
+          templateUrl: './app.component.html',
+          styles: 'h2 {font-size: 10px}',
+          styleUrl: './app.component.css'
+        })
+        export class AppComponent {
+          title = 'app';
+        }
+      `;
+      const output = tags.stripIndent`
+        import { __decorate } from "tslib";
+        import __NG_CLI_RESOURCE__0 from "./app.component.html?ngResource";
+        import __NG_CLI_RESOURCE__1 from "./app.component.css?ngResource";
+        import { Component } from '@angular/core';
+
+        let AppComponent = class AppComponent {
+            constructor() {
+                this.title = 'app';
+            }
+        };
+        AppComponent = __decorate([
+            Component({
+                selector: 'app-root',
+                template: __NG_CLI_RESOURCE__0,
+                styles: ["h2 {font-size: 10px}", __NG_CLI_RESOURCE__1]
+            })
+        ], AppComponent);
+        export { AppComponent };
+      `;
+
+      const result = transform(input);
+      expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
+    });
+
     it('should not replace resources if not in Component decorator', () => {
       const input = tags.stripIndent`
         import { Component } from '@angular/core';
