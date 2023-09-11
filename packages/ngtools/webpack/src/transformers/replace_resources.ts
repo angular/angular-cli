@@ -180,41 +180,36 @@ function visitComponentMetadata(
         importName,
       );
     case 'styles':
+    case 'styleUrl':
     case 'styleUrls':
-      if (!ts.isArrayLiteralExpression(node.initializer)) {
+      const isInlineStyle = name === 'styles';
+      let styles: Iterable<ts.Expression>;
+
+      if (ts.isStringLiteralLike(node.initializer)) {
+        styles = [
+          transformInlineStyleLiteral(
+            node.initializer,
+            nodeFactory,
+            isInlineStyle,
+            inlineStyleFileExtension,
+            resourceImportDeclarations,
+            moduleKind,
+          ) as ts.StringLiteralLike,
+        ];
+      } else if (ts.isArrayLiteralExpression(node.initializer)) {
+        styles = ts.visitNodes(node.initializer.elements, (node) =>
+          transformInlineStyleLiteral(
+            node,
+            nodeFactory,
+            isInlineStyle,
+            inlineStyleFileExtension,
+            resourceImportDeclarations,
+            moduleKind,
+          ),
+        ) as ts.NodeArray<ts.Expression>;
+      } else {
         return node;
       }
-
-      const isInlineStyle = name === 'styles';
-      const styles = ts.visitNodes(node.initializer.elements, (node) => {
-        if (!ts.isStringLiteral(node) && !ts.isNoSubstitutionTemplateLiteral(node)) {
-          return node;
-        }
-
-        let url;
-        if (isInlineStyle) {
-          if (inlineStyleFileExtension) {
-            const data = Buffer.from(node.text).toString('base64');
-            const containingFile = node.getSourceFile().fileName;
-            // app.component.ts.css?ngResource!=!@ngtools/webpack/src/loaders/inline-resource.js?data=...!app.component.ts
-            url =
-              `${containingFile}.${inlineStyleFileExtension}?${NG_COMPONENT_RESOURCE_QUERY}` +
-              `!=!${InlineAngularResourceLoaderPath}?data=${encodeURIComponent(
-                data,
-              )}!${containingFile}`;
-          } else {
-            return nodeFactory.createStringLiteral(node.text);
-          }
-        } else {
-          url = getResourceUrl(node);
-        }
-
-        if (!url) {
-          return node;
-        }
-
-        return createResourceImport(nodeFactory, url, resourceImportDeclarations, moduleKind);
-      }) as ts.NodeArray<ts.Expression>;
 
       // Styles should be placed first
       if (isInlineStyle) {
@@ -229,9 +224,44 @@ function visitComponentMetadata(
   }
 }
 
+function transformInlineStyleLiteral(
+  node: ts.Node,
+  nodeFactory: ts.NodeFactory,
+  isInlineStyle: boolean,
+  inlineStyleFileExtension: string | undefined,
+  resourceImportDeclarations: ts.ImportDeclaration[],
+  moduleKind: ts.ModuleKind,
+) {
+  if (!ts.isStringLiteralLike(node)) {
+    return node;
+  }
+
+  if (!isInlineStyle) {
+    const url = getResourceUrl(node);
+
+    return url
+      ? createResourceImport(nodeFactory, url, resourceImportDeclarations, moduleKind)
+      : node;
+  }
+
+  if (!inlineStyleFileExtension) {
+    return nodeFactory.createStringLiteral(node.text);
+  }
+
+  const data = Buffer.from(node.text).toString('base64');
+  const containingFile = node.getSourceFile().fileName;
+
+  // app.component.ts.css?ngResource!=!@ngtools/webpack/src/loaders/inline-resource.js?data=...!app.component.ts
+  const url =
+    `${containingFile}.${inlineStyleFileExtension}?${NG_COMPONENT_RESOURCE_QUERY}` +
+    `!=!${InlineAngularResourceLoaderPath}?data=${encodeURIComponent(data)}!${containingFile}`;
+
+  return createResourceImport(nodeFactory, url, resourceImportDeclarations, moduleKind);
+}
+
 export function getResourceUrl(node: ts.Node): string | null {
   // only analyze strings
-  if (!ts.isStringLiteral(node) && !ts.isNoSubstitutionTemplateLiteral(node)) {
+  if (!ts.isStringLiteralLike(node)) {
     return null;
   }
 
