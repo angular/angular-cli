@@ -23,7 +23,7 @@ packages:
     access: $authenticated
     proxy: local
 
-logs:
+log:
   type: stdout
   format: pretty
   level: warn
