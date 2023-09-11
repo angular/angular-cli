@@ -46,7 +46,7 @@ export default function (): PluginObj {
         const hasExport =
           parentPath.isExportNamedDeclaration() || parentPath.isExportDefaultDeclaration();
         const origin = hasExport ? parentPath : path;
-        const nextStatement = origin.getSibling(+origin.key + 1);
+        const nextStatement = origin.getSibling(+(origin.key ?? 0) + 1);
         if (!nextStatement.isExpressionStatement()) {
           return;
         }

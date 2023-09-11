@@ -14,7 +14,7 @@ declare module '@babel/helper-annotate-as-pure' {
 
 declare module '@babel/helper-split-export-declaration' {
   export default function splitExportDeclaration(
-    exportDeclaration: import('@babel/traverse').NodePath<
+    exportDeclaration: import('@babel/core').NodePath<
       import('@babel/types').ExportDefaultDeclaration
     >,
   ): void;

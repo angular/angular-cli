@@ -11,12 +11,12 @@ import {
   NodePath,
   ParseResult,
   parseSync,
+  template as templateBuilder,
   transformAsync,
   transformFromAstSync,
   traverse,
   types,
 } from '@babel/core';
-import templateBuilder from '@babel/template';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import { workerData } from 'worker_threads';
