@@ -69,10 +69,6 @@ export function buildApplication(
     assetFiles?: { source: string; destination: string }[];
   }
 > {
-  context.logger.warn(
-    'The application builder is currently in developer preview and is not yet recommended for production use.',
-  );
-
   return buildApplicationInternal(options, context);
 }
 

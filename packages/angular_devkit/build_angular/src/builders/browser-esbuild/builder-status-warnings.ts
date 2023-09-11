@@ -34,12 +34,6 @@ const UNSUPPORTED_OPTIONS: Array<keyof BrowserBuilderOptions> = [
 ];
 
 export function logBuilderStatusWarnings(options: BrowserBuilderOptions, context: BuilderContext) {
-  context.logger.warn(
-    `The esbuild-based browser application builder ('browser-esbuild') is currently in developer preview` +
-      ' and is not yet recommended for production use.' +
-      ' For additional information, please see https://angular.io/guide/esbuild',
-  );
-
   // Validate supported options
   for (const unsupportedOption of UNSUPPORTED_OPTIONS) {
     const value = (options as unknown as BrowserBuilderOptions)[unsupportedOption];
