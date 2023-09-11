@@ -143,75 +143,90 @@ function visitComponentMetadata(
   switch (node.name.text) {
     case 'templateUrl':
       // Only analyze string literals
-      if (
-        !ts.isStringLiteral(node.initializer) &&
-        !ts.isNoSubstitutionTemplateLiteral(node.initializer)
-      ) {
+      if (!ts.isStringLiteralLike(node.initializer)) {
         return node;
       }
 
-      const url = node.initializer.text;
-      if (!url) {
-        return node;
-      }
-
-      return nodeFactory.updatePropertyAssignment(
-        node,
-        nodeFactory.createIdentifier('template'),
-        createResourceImport(
-          nodeFactory,
-          generateJitFileUri(url, 'template'),
-          resourceImportDeclarations,
-        ),
-      );
+      return node.initializer.text.length === 0
+        ? node
+        : nodeFactory.updatePropertyAssignment(
+            node,
+            nodeFactory.createIdentifier('template'),
+            createResourceImport(
+              nodeFactory,
+              generateJitFileUri(node.initializer.text, 'template'),
+              resourceImportDeclarations,
+            ),
+          );
     case 'styles':
-      if (!ts.isArrayLiteralExpression(node.initializer)) {
-        return node;
+      if (ts.isStringLiteralLike(node.initializer)) {
+        styleReplacements.unshift(
+          createResourceImport(
+            nodeFactory,
+            generateJitInlineUri(node.initializer.text, 'style'),
+            resourceImportDeclarations,
+          ),
+        );
+
+        return undefined;
       }
 
-      const inlineStyles = ts.visitNodes(node.initializer.elements, (node) => {
-        if (!ts.isStringLiteral(node) && !ts.isNoSubstitutionTemplateLiteral(node)) {
-          return node;
-        }
+      if (ts.isArrayLiteralExpression(node.initializer)) {
+        const inlineStyles = ts.visitNodes(node.initializer.elements, (node) => {
+          if (!ts.isStringLiteralLike(node)) {
+            return node;
+          }
 
-        const contents = node.text;
-        if (!contents) {
-          // An empty inline style is equivalent to not having a style element
-          return undefined;
-        }
+          return node.text.length === 0
+            ? undefined // An empty inline style is equivalent to not having a style element
+            : createResourceImport(
+                nodeFactory,
+                generateJitInlineUri(node.text, 'style'),
+                resourceImportDeclarations,
+              );
+        }) as ts.NodeArray<ts.Expression>;
 
-        return createResourceImport(
-          nodeFactory,
-          generateJitInlineUri(contents, 'style'),
-          resourceImportDeclarations,
+        // Inline styles should be placed first
+        styleReplacements.unshift(...inlineStyles);
+
+        // The inline styles will be added afterwards in combination with any external styles
+        return undefined;
+      }
+
+      return node;
+
+    case 'styleUrl':
+      if (ts.isStringLiteralLike(node.initializer)) {
+        styleReplacements.push(
+          createResourceImport(
+            nodeFactory,
+            generateJitFileUri(node.initializer.text, 'style'),
+            resourceImportDeclarations,
+          ),
         );
-      }) as ts.NodeArray<ts.Expression>;
 
-      // Inline styles should be placed first
-      styleReplacements.unshift(...inlineStyles);
+        return undefined;
+      }
 
-      // The inline styles will be added afterwards in combination with any external styles
-      return undefined;
+      return node;
+
     case 'styleUrls':
       if (!ts.isArrayLiteralExpression(node.initializer)) {
         return node;
       }
 
       const externalStyles = ts.visitNodes(node.initializer.elements, (node) => {
-        if (!ts.isStringLiteral(node) && !ts.isNoSubstitutionTemplateLiteral(node)) {
+        if (!ts.isStringLiteralLike(node)) {
           return node;
         }
 
-        const url = node.text;
-        if (!url) {
-          return node;
-        }
-
-        return createResourceImport(
-          nodeFactory,
-          generateJitFileUri(url, 'style'),
-          resourceImportDeclarations,
-        );
+        return node.text
+          ? createResourceImport(
+              nodeFactory,
+              generateJitFileUri(node.text, 'style'),
+              resourceImportDeclarations,
+            )
+          : undefined;
       }) as ts.NodeArray<ts.Expression>;
 
       // External styles are applied after any inline styles
