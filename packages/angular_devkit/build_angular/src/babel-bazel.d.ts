@@ -15,9 +15,3 @@ declare module '@babel/core' {
 declare module '@babel/generator' {
   export { default } from '@types/babel__generator';
 }
-declare module '@babel/traverse' {
-  export { default } from '@types/babel__traverse';
-}
-declare module '@babel/template' {
-  export { default } from '@types/babel__template';
-}

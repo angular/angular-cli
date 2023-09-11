@@ -122,8 +122,7 @@
     tslib "^2.3.0"
 
 "@angular/bazel@https://github.com/angular/bazel-builds.git#209efddd1c2cac304183971c2259e70a4a7b5f7b":
-  version "17.0.0-next.3+sha-05762b9"
-  uid "209efddd1c2cac304183971c2259e70a4a7b5f7b"
+  version "17.0.0-next.3"
   resolved "https://github.com/angular/bazel-builds.git#209efddd1c2cac304183971c2259e70a4a7b5f7b"
   dependencies:
     "@microsoft/api-extractor" "^7.24.2"
@@ -140,7 +139,6 @@
 
 "@angular/build-tooling@https://github.com/angular/dev-infra-private-build-tooling-builds.git#a870de5389e6533dd007b46512942249e7c82e95":
   version "0.0.0-c95355fd247d8003f18dcd2f1a410b906566cab6"
-  uid a870de5389e6533dd007b46512942249e7c82e95
   resolved "https://github.com/angular/dev-infra-private-build-tooling-builds.git#a870de5389e6533dd007b46512942249e7c82e95"
   dependencies:
     "@angular-devkit/build-angular" "16.2.0-rc.1"
@@ -301,7 +299,6 @@
 
 "@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#3e0d49e91578f0aa9ff6972ef7979df18c126c68":
   version "0.0.0-c95355fd247d8003f18dcd2f1a410b906566cab6"
-  uid "3e0d49e91578f0aa9ff6972ef7979df18c126c68"
   resolved "https://github.com/angular/dev-infra-private-ng-dev-builds.git#3e0d49e91578f0aa9ff6972ef7979df18c126c68"
   dependencies:
     "@yarnpkg/lockfile" "^1.1.0"
@@ -819,6 +816,16 @@
   integrity sha512-26lTNXoVRdAnsaDXPpvCNUq+OVWEVC6bx7Vvz9rC53F2bagUWW4u4ii2+h8Fejfh7RYqPxn+libeFBBck9muEw==
   dependencies:
     "@babel/helper-plugin-utils" "^7.22.5"
+
+"@babel/plugin-transform-async-generator-functions@7.22.5":
+  version "7.22.5"
+  resolved "https://registry.yarnpkg.com/@babel/plugin-transform-async-generator-functions/-/plugin-transform-async-generator-functions-7.22.5.tgz#7336356d23380eda9a56314974f053a020dab0c3"
+  integrity sha512-gGOEvFzm3fWoyD5uZq7vVTD57pPJ3PczPUD/xCFGjzBpUosnklmXyKnGQbbbGs1NPNPskFex0j93yKbHt0cHyg==
+  dependencies:
+    "@babel/helper-environment-visitor" "^7.22.5"
+    "@babel/helper-plugin-utils" "^7.22.5"
+    "@babel/helper-remap-async-to-generator" "^7.22.5"
+    "@babel/plugin-syntax-async-generators" "^7.8.4"
 
 "@babel/plugin-transform-async-generator-functions@^7.22.15", "@babel/plugin-transform-async-generator-functions@^7.22.7":
   version "7.22.15"
@@ -1436,15 +1443,6 @@
   dependencies:
     regenerator-runtime "^0.13.11"
 
-"@babel/template@7.22.15", "@babel/template@^7.22.15", "@babel/template@^7.22.5":
-  version "7.22.15"
-  resolved "https://registry.yarnpkg.com/@babel/template/-/template-7.22.15.tgz#09576efc3830f0430f4548ef971dde1350ef2f38"
-  integrity sha512-QPErUVm4uyJa60rkI73qneDacvdvzxshT3kksGqlGWYdOTIUOwJ7RDUL8sGqslY1uXWSL6xMFKEXDS3ox2uF0w==
-  dependencies:
-    "@babel/code-frame" "^7.22.13"
-    "@babel/parser" "^7.22.15"
-    "@babel/types" "^7.22.15"
-
 "@babel/template@7.22.5":
   version "7.22.5"
   resolved "https://registry.yarnpkg.com/@babel/template/-/template-7.22.5.tgz#0c8c4d944509875849bd0344ff0050756eefc6ec"
@@ -1453,6 +1451,15 @@
     "@babel/code-frame" "^7.22.5"
     "@babel/parser" "^7.22.5"
     "@babel/types" "^7.22.5"
+
+"@babel/template@^7.22.15", "@babel/template@^7.22.5":
+  version "7.22.15"
+  resolved "https://registry.yarnpkg.com/@babel/template/-/template-7.22.15.tgz#09576efc3830f0430f4548ef971dde1350ef2f38"
+  integrity sha512-QPErUVm4uyJa60rkI73qneDacvdvzxshT3kksGqlGWYdOTIUOwJ7RDUL8sGqslY1uXWSL6xMFKEXDS3ox2uF0w==
+  dependencies:
+    "@babel/code-frame" "^7.22.13"
+    "@babel/parser" "^7.22.15"
+    "@babel/types" "^7.22.15"
 
 "@babel/traverse@^7.22.15", "@babel/traverse@^7.22.17", "@babel/traverse@^7.22.5", "@babel/traverse@^7.22.8":
   version "7.22.17"
@@ -3301,7 +3308,7 @@
   dependencies:
     "@babel/types" "^7.0.0"
 
-"@types/babel__template@*", "@types/babel__template@7.4.1":
+"@types/babel__template@*":
   version "7.4.1"
   resolved "https://registry.yarnpkg.com/@types/babel__template/-/babel__template-7.4.1.tgz#3d1a48fd9d6c0edfd56f2ff578daed48f36c8969"
   integrity sha512-azBFKemX6kMg5Io+/rdGT0dkGreboUVR0Cdm3fz9QJWpaQGJRQXl7C+6hOTCZcMll7KFyEQpgbYI2lHdsS4U7g==
@@ -11079,7 +11086,6 @@ sass@1.66.1, sass@^1.55.0:
 
 "sauce-connect-proxy@https://saucelabs.com/downloads/sc-4.9.1-linux.tar.gz":
   version "0.0.0"
-  uid "9310bc860f7870a1f872b11c4dc6073a1ad34e5e"
   resolved "https://saucelabs.com/downloads/sc-4.9.1-linux.tar.gz#9310bc860f7870a1f872b11c4dc6073a1ad34e5e"
 
 saucelabs@^1.5.0:

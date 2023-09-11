@@ -105,7 +105,7 @@ function analyzeClassSiblings(
   const wrapStatementPaths: NodePath<types.Statement>[] = [];
   let hasPotentialSideEffects = false;
   for (let i = 1; ; ++i) {
-    const nextStatement = origin.getSibling(+origin.key + i);
+    const nextStatement = origin.getSibling(+(origin.key ?? 0) + i);
     if (!nextStatement.isExpressionStatement()) {
       break;
     }
@@ -213,7 +213,7 @@ export default function (): PluginObj {
       // to a subsequent statement to prevent a JavaScript syntax error.
       ExportDefaultDeclaration(path: NodePath<types.ExportDefaultDeclaration>, state: PluginPass) {
         const declaration = path.get('declaration');
-        if (!declaration.isClassDeclaration()) {
+        if (!declaration.isClassDeclaration() || !declaration.node.id) {
           return;
         }
 
@@ -232,7 +232,8 @@ export default function (): PluginObj {
         const { node: classNode, parentPath } = path;
         const { wrapDecorators } = state.opts as { wrapDecorators: boolean };
 
-        if (visitedClasses.has(classNode)) {
+        // Skip if already visited or has no name
+        if (visitedClasses.has(classNode) || !classNode.id) {
           return;
         }
 
