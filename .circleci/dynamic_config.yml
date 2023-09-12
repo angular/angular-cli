@@ -30,6 +30,12 @@ var_3: &default_nodeversion '18.13'
 # https://circleci.com/blog/deep-diving-into-circleci-workspaces/
 var_4: &workspace_location .
 
+var_6: &only_pull_requests
+  filters:
+    branches:
+      only:
+        - /pull\/\d+/
+
 var_7: &only_builds_branches
   filters:
     branches:
@@ -193,6 +199,7 @@ workflows:
             - setup
 
       - test-browsers:
+          <<: *only_pull_requests
           requires:
             - build
 

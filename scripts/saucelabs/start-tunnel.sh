@@ -26,9 +26,6 @@ if [[ ! -z "${SAUCE_PID_FILE:-}" ]]; then
   sauceArgs="${sauceArgs} --pidfile ${SAUCE_PID_FILE}"
 fi
 
-if [[ ! -z "${SAUCE_TUNNEL_IDENTIFIER:-}" ]]; then
-  sauceArgs="${sauceArgs} --tunnel-identifier ${SAUCE_TUNNEL_IDENTIFIER}"
-fi
 
 echo "Starting Sauce Connect. Passed arguments: ${sauceArgs}"
 
