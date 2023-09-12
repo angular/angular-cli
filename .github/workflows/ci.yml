@@ -93,8 +93,6 @@ jobs:
     steps:
       - name: Initialize environment
         uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@4ccf7eed68bba0d25f7edd47997852774f61755d
-        with:
-          fetch-depth: 1
       - name: Setup Bazel
         uses: angular/dev-infra/github-actions/bazel/setup@4ccf7eed68bba0d25f7edd47997852774f61755d
       - name: Setup Bazel RBE
@@ -124,8 +122,6 @@ jobs:
     steps:
       - name: Initialize environment
         uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@4ccf7eed68bba0d25f7edd47997852774f61755d
-        with:
-          fetch-depth: 1
       - name: Install node modules
         run: yarn install --frozen-lockfile
       - name: Setup Bazel
@@ -149,8 +145,6 @@ jobs:
     steps:
       - name: Initialize environment
         uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@4ccf7eed68bba0d25f7edd47997852774f61755d
-        with:
-          fetch-depth: 1
       - name: Install node modules
         run: yarn install --frozen-lockfile
       - name: Setup Bazel
@@ -159,3 +153,38 @@ jobs:
         uses: angular/dev-infra/github-actions/bazel/configure-remote@4ccf7eed68bba0d25f7edd47997852774f61755d
       - name: Run CLI E2E tests
         run: yarn bazel test --define=E2E_SHARD_TOTAL=6 --define=E2E_SHARD_INDEX=${{ matrix.shard }} --config=e2e //tests/legacy-cli:e2e.snapshots.${{ matrix.subset }}_node${{ matrix.node }}
+
+  browsers:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    name: Browser Compatibility Tests
+    env:
+      SAUCE_TUNNEL_IDENTIFIER: angular-cli-${{ github.workflow }}-${{ github.run_number }}
+    steps:
+      - name: Initialize environment
+        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@395903265d96198c141160912e73787d4a1ca324
+      - name: Install node modules
+        run: yarn install --frozen-lockfile
+      - name: Setup Bazel
+        uses: angular/dev-infra/github-actions/bazel/setup@395903265d96198c141160912e73787d4a1ca324
+      - name: Setup Bazel RBE
+        uses: angular/dev-infra/github-actions/bazel/configure-remote@395903265d96198c141160912e73787d4a1ca324
+      - name: Run E2E Browser tests
+        env:
+          SAUCE_USERNAME: ${{ vars.SAUCE_USERNAME }}
+          SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
+          SAUCE_LOG_FILE: /tmp/angular/sauce-connect.log
+          SAUCE_READY_FILE: /tmp/angular/sauce-connect-ready-file.lock
+          SAUCE_PID_FILE: /tmp/angular/sauce-connect-pid-file.lock
+          SAUCE_TUNNEL_IDENTIFIER: 'angular-${{ github.run_number }}'
+          SAUCE_READY_FILE_TIMEOUT: 120
+        run: |
+          ./scripts/saucelabs/start-tunnel.sh &
+          ./scripts/saucelabs/wait-for-tunnel.sh
+          yarn bazel test --config=saucelabs //tests/legacy-cli:e2e.saucelabs
+          ./scripts/saucelabs/stop-tunnel.sh
+      - uses: actions/upload-artifact@a8a3f3ad30e3422c9c7b888a15615d19a852ae32 # v3.1.3
+        if: ${{ failure() }}
+        with:
+          name: sauce-connect-log
+          path: ${{ env.SAUCE_CONNECT_DIR_IN_HOST }}/sauce-connect.log
