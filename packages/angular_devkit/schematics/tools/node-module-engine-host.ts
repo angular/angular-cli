@@ -33,18 +33,7 @@ export class NodeModulesEngineHost extends FileSystemEngineHostBase {
     super();
   }
 
-  private resolve(name: string, requester?: string, references = new Set<string>()): string {
-    if (requester) {
-      if (references.has(requester)) {
-        references.add(requester);
-        throw new Error(
-          'Circular schematic reference detected: ' + JSON.stringify(Array.from(references)),
-        );
-      } else {
-        references.add(requester);
-      }
-    }
-
+  private resolve(name: string, requester?: string): string {
     const relativeBase = requester ? dirname(requester) : process.cwd();
     let collectionPath: string | undefined = undefined;
 
@@ -57,6 +46,7 @@ export class NodeModulesEngineHost extends FileSystemEngineHostBase {
     };
 
     // Try to resolve as a package
+    let possibleCollectionPath = name;
     try {
       const packageJsonPath = require.resolve(join(name, 'package.json'), resolveOptions);
       const { schematics } = require(packageJsonPath);
@@ -65,7 +55,16 @@ export class NodeModulesEngineHost extends FileSystemEngineHostBase {
         throw new NodePackageDoesNotSupportSchematics(name);
       }
 
-      collectionPath = this.resolve(schematics, packageJsonPath, references);
+      // If this is a relative path to the collection, then create the collection
+      // path in relation to the package path
+      if (schematics.startsWith('.')) {
+        const packageDirectory = dirname(packageJsonPath);
+        collectionPath = resolve(packageDirectory, schematics);
+      }
+      // Otherwise use the path as-is to attempt resolution
+      else {
+        possibleCollectionPath = schematics;
+      }
     } catch (e) {
       if ((e as NodeJS.ErrnoException).code !== 'MODULE_NOT_FOUND') {
         throw e;
@@ -75,7 +74,7 @@ export class NodeModulesEngineHost extends FileSystemEngineHostBase {
     // If not a package, try to resolve as a file
     if (!collectionPath) {
       try {
-        collectionPath = require.resolve(name, resolveOptions);
+        collectionPath = require.resolve(possibleCollectionPath, resolveOptions);
       } catch (e) {
         if ((e as NodeJS.ErrnoException).code !== 'MODULE_NOT_FOUND') {
           throw e;
