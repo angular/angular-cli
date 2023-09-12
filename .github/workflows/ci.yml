@@ -38,7 +38,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Initialize environment
-        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@c95355fd247d8003f18dcd2f1a410b906566cab6
+        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@0f307b2f54f76ec4f57da4d3e51720947fea5726
       - name: Setup ESLint Caching
         uses: actions/cache@704facf57e6136b1bc63b828d79edcd491f0ee84 # v3.3.2
         with:
@@ -71,11 +71,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Initialize environment
-        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@c95355fd247d8003f18dcd2f1a410b906566cab6
+        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@0f307b2f54f76ec4f57da4d3e51720947fea5726
       - name: Setup Bazel
-        uses: angular/dev-infra/github-actions/bazel/setup@c95355fd247d8003f18dcd2f1a410b906566cab6
+        uses: angular/dev-infra/github-actions/bazel/setup@0f307b2f54f76ec4f57da4d3e51720947fea5726
       - name: Setup Bazel RBE
-        uses: angular/dev-infra/github-actions/bazel/configure-remote@c95355fd247d8003f18dcd2f1a410b906566cab6
+        uses: angular/dev-infra/github-actions/bazel/configure-remote@0f307b2f54f76ec4f57da4d3e51720947fea5726
       - name: Install node modules
         run: yarn install --frozen-lockfile
       - name: Build release targets
@@ -106,9 +106,9 @@ jobs:
       - name: Install node modules
         run: yarn install --frozen-lockfile
       - name: Setup Bazel
-        uses: angular/dev-infra/github-actions/bazel/setup@c95355fd247d8003f18dcd2f1a410b906566cab6
+        uses: angular/dev-infra/github-actions/bazel/setup@0f307b2f54f76ec4f57da4d3e51720947fea5726
       - name: Setup Bazel RBE
-        uses: angular/dev-infra/github-actions/bazel/configure-remote@c95355fd247d8003f18dcd2f1a410b906566cab6
+        uses: angular/dev-infra/github-actions/bazel/configure-remote@0f307b2f54f76ec4f57da4d3e51720947fea5726
       - if: matrix.version == env.defaultVersion
         name: Run tests for default node version
         run: yarn bazel test --test_tag_filters=-node18,-node16-broken //packages/...
@@ -135,15 +135,15 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Initialize environment
-        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@c95355fd247d8003f18dcd2f1a410b906566cab6
+        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@0f307b2f54f76ec4f57da4d3e51720947fea5726
         with:
           fetch-depth: 1
       - name: Install node modules
         run: yarn install --frozen-lockfile
       - name: Setup Bazel
-        uses: angular/dev-infra/github-actions/bazel/setup@c95355fd247d8003f18dcd2f1a410b906566cab6
+        uses: angular/dev-infra/github-actions/bazel/setup@0f307b2f54f76ec4f57da4d3e51720947fea5726
       - name: Setup Bazel RBE
-        uses: angular/dev-infra/github-actions/bazel/configure-remote@c95355fd247d8003f18dcd2f1a410b906566cab6
+        uses: angular/dev-infra/github-actions/bazel/configure-remote@0f307b2f54f76ec4f57da4d3e51720947fea5726
       - name: Run CLI E2E tests
         run: yarn bazel test --define=E2E_SHARD_TOTAL=6 --define=E2E_SHARD_INDEX=${{ matrix.shard }} --config=e2e //tests/legacy-cli:e2e.${{ matrix.subset }}_node${{ matrix.node }}
 
@@ -160,14 +160,14 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Initialize environment
-        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@c95355fd247d8003f18dcd2f1a410b906566cab6
+        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@0f307b2f54f76ec4f57da4d3e51720947fea5726
         with:
           fetch-depth: 1
       - name: Install node modules
         run: yarn install --frozen-lockfile
       - name: Setup Bazel
-        uses: angular/dev-infra/github-actions/bazel/setup@c95355fd247d8003f18dcd2f1a410b906566cab6
+        uses: angular/dev-infra/github-actions/bazel/setup@0f307b2f54f76ec4f57da4d3e51720947fea5726
       - name: Setup Bazel RBE
-        uses: angular/dev-infra/github-actions/bazel/configure-remote@c95355fd247d8003f18dcd2f1a410b906566cab6
+        uses: angular/dev-infra/github-actions/bazel/configure-remote@0f307b2f54f76ec4f57da4d3e51720947fea5726
       - name: Run CLI E2E tests
         run: yarn bazel test --define=E2E_SHARD_TOTAL=6 --define=E2E_SHARD_INDEX=${{ matrix.shard }} --config=e2e //tests/legacy-cli:e2e.snapshots.${{ matrix.subset }}_node${{ matrix.node }}
