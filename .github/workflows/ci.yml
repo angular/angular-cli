@@ -171,3 +171,33 @@ jobs:
         uses: angular/dev-infra/github-actions/bazel/configure-remote@c95355fd247d8003f18dcd2f1a410b906566cab6
       - name: Run CLI E2E tests
         run: yarn bazel test --define=E2E_SHARD_TOTAL=6 --define=E2E_SHARD_INDEX=${{ matrix.shard }} --config=e2e //tests/legacy-cli:e2e.snapshots.${{ matrix.subset }}_node${{ matrix.node }}
+
+  browsers:
+    runs-on: ubuntu-latest
+    name: Browser Compatibility Tests
+    env:
+      SAUCE_TUNNEL_IDENTIFIER: angular-cli-${{ github.workflow }}-${{ github.run_number }}
+    steps:
+      - name: Initialize environment
+        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@c95355fd247d8003f18dcd2f1a410b906566cab6
+        with:
+          fetch-depth: 1
+      - name: Install node modules
+        run: yarn install --frozen-lockfile
+      - name: Setup Bazel
+        uses: angular/dev-infra/github-actions/bazel/setup@c95355fd247d8003f18dcd2f1a410b906566cab6
+      - name: Setup Bazel RBE
+        uses: angular/dev-infra/github-actions/bazel/configure-remote@c95355fd247d8003f18dcd2f1a410b906566cab6
+      - name: Setup Saucelabs Tunnel
+        uses: saucelabs/sauce-connect-action@c331c1378197b1405756bea6675a18f36a992711 # v2.3.2
+        with:
+          username: ${{ vars.SAUCE_USERNAME }}
+          accessKey: ${{ secrets.SAUCE_ACCESS_KEY }}
+          tunnelName: ${{ env.SAUCE_TUNNEL_IDENTIFIER }}
+      - name: Run E2E Browser tests
+        run: yarn bazel test --config=saucelabs //tests/legacy-cli:e2e.saucelabs
+      - uses: actions/upload-artifact@a8a3f3ad30e3422c9c7b888a15615d19a852ae32 # v3.1.3
+        if: ${{ failure() }}
+        with:
+          name: sauce-connect-log
+          path: ${{ env.SAUCE_CONNECT_DIR_IN_HOST }}/sauce-connect.log
