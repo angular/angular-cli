@@ -162,7 +162,7 @@ export function createServerCodeBundleOptions(
   const polyfills = [`import '@angular/platform-server/init';`];
 
   if (options.polyfills?.includes('zone.js')) {
-    polyfills.push(`import 'zone.js/fesm2015/zone-node.js';`);
+    polyfills.push(`import 'zone.js/node';`);
   }
 
   if (jit) {
