@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import proxyAgent from 'https-proxy-agent';
+import { HttpsProxyAgent } from 'https-proxy-agent';
 import { createHash } from 'node:crypto';
 import { readFile, rm, writeFile } from 'node:fs/promises';
 import * as https from 'node:https';
@@ -196,11 +196,11 @@ export class InlineFontsProcessor {
       } catch {}
     }
 
-    let agent: proxyAgent.HttpsProxyAgent | undefined;
+    let agent: HttpsProxyAgent<string> | undefined;
     const httpsProxy = process.env.HTTPS_PROXY ?? process.env.https_proxy;
 
     if (httpsProxy) {
-      agent = proxyAgent(httpsProxy);
+      agent = new HttpsProxyAgent(httpsProxy);
     }
 
     const data = await new Promise<string>((resolve, reject) => {
