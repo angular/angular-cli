@@ -1,3 +1,40 @@
+<a name="17.0.0-next.4"></a>
+
+# 17.0.0-next.4 (2023-09-13)
+
+## Breaking Changes
+
+### @schematics/angular
+
+- Routing is enabled by default for new applications when using `ng generate application` and `ng new`. The `--no-routing` command line option can be used to disable this behaviour.
+- `rootModuleClassName`, `rootModuleFileName` and `main` options have been removed from the public `pwa` and `app-shell` schematics.
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                                          |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------------- |
+| [1a6a139aa](https://github.com/angular/angular-cli/commit/1a6a139aaf8d5a6947b399bbbd48bbfd9e52372c) | feat | enable routing by default for new applications                       |
+| [3f8aa9d8c](https://github.com/angular/angular-cli/commit/3f8aa9d8c7dc7eff06516c04ba08764bb044cb6b) | feat | update` ng new` to use the esbuild application builder based builder |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                      |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------------- |
+| [2f299fc7b](https://github.com/angular/angular-cli/commit/2f299fc7b5f00056054a06574e65ae311cd3ce0c) | fix  | account for styles specified as string literals and styleUrl     |
+| [e41e2015b](https://github.com/angular/angular-cli/commit/e41e2015bfc37672fb67014ae38f31b63f0bb256) | fix  | avoid spawning workers when there are no routes to prerender     |
+| [c11a0f0d3](https://github.com/angular/angular-cli/commit/c11a0f0d36f6cbffdf0464135510bda454efb08b) | fix  | support custom index option paths in Vite-based dev server       |
+| [7d3fd226c](https://github.com/angular/angular-cli/commit/7d3fd226c56a132d63d9c9fbb329f974296d69d3) | fix  | support dev server proxy pathRewrite field in Vite-based server  |
+| [4b67d2afd](https://github.com/angular/angular-cli/commit/4b67d2afd3a2d4be188a7313b3fe4ea5c07907b6) | perf | use single JS transformer instance during dev-server prebundling |
+
+### @ngtools/webpack
+
+| Commit                                                                                              | Type | Description                                                  |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------ |
+| [f43754570](https://github.com/angular/angular-cli/commit/f437545705d41c781498b8e7724293455cf3edf9) | feat | add automated preconnects for image domains                  |
+| [828030da0](https://github.com/angular/angular-cli/commit/828030da0fa9e82fa784c4f55e3c089c7c601e98) | fix  | account for styles specified as string literals and styleUrl |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="16.2.2"></a>
 
 # 16.2.2 (2023-09-13)
