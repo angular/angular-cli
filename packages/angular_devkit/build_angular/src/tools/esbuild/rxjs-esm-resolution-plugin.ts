@@ -39,7 +39,7 @@ export function createRxjsEsmResolutionPlugin(): Plugin {
           resolveDir,
         });
 
-        result.path = result.path.replace('/dist/cjs/', '/dist/esm/');
+        result.path = result.path.replace(/([\\/]dist[\\/])cjs([\\/])/, '$1esm$2');
 
         return result;
       });
