@@ -1,3 +1,15 @@
+<a name="16.2.2"></a>
+
+# 16.2.2 (2023-09-13)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                     |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------------- |
+| [e3a40a49a](https://github.com/angular/angular-cli/commit/e3a40a49aa768c6b0ddce24ad47c3ba50028963c) | fix  | support dev server proxy pathRewrite field in Vite-based server |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="17.0.0-next.3"></a>
 
 # 17.0.0-next.3 (2023-09-07)
