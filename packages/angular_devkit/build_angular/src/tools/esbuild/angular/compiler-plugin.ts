@@ -114,22 +114,9 @@ export function createCompilerPlugin(
       // Initialize a worker pool for JavaScript transformations
       const javascriptTransformer = new JavaScriptTransformer(pluginOptions, maxWorkers);
 
-      // Setup defines based on the values provided by the Angular compiler-cli
-      const { GLOBAL_DEFS_FOR_TERSER_WITH_AOT } = await AngularCompilation.loadCompilerCli();
+      // Setup defines based on the values used by the Angular compiler-cli
       build.initialOptions.define ??= {};
-      for (const [key, value] of Object.entries(GLOBAL_DEFS_FOR_TERSER_WITH_AOT)) {
-        if (key in build.initialOptions.define) {
-          // Skip keys that have been manually provided
-          continue;
-        }
-        if (key === 'ngDevMode') {
-          // ngDevMode is already set based on the builder's script optimization option
-          continue;
-        }
-        // esbuild requires values to be a string (actual strings need to be quoted).
-        // In this case, all provided values are booleans.
-        build.initialOptions.define[key] = value.toString();
-      }
+      build.initialOptions.define['ngI18nClosureMode'] ??= 'false';
 
       // The in-memory cache of TypeScript file outputs will be used during the build in `onLoad` callbacks for TS files.
       // A string value indicates direct TS/NG output and a Uint8Array indicates fully transformed code.
