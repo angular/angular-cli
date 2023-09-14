@@ -6,7 +6,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { join } from 'node:path';
+import { join, relative } from 'node:path';
+import { pathToFileURL } from 'node:url';
 import { workerData } from 'node:worker_threads';
 import { fileURLToPath } from 'url';
 import { JavaScriptTransformer } from '../../tools/esbuild/javascript-transformer';
@@ -23,7 +24,7 @@ const { outputFiles, workspaceRoot } = workerData as {
 
 const TRANSFORMED_FILES: Record<string, string> = {};
 const CHUNKS_REGEXP = /file:\/\/\/(main\.server|chunk-\w+)\.mjs/;
-const WORKSPACE_ROOT_FILE = new URL(join(workspaceRoot, 'index.mjs'), 'file:').href;
+const WORKSPACE_ROOT_FILE = pathToFileURL(join(workspaceRoot, 'index.mjs')).href;
 
 const JAVASCRIPT_TRANSFORMER = new JavaScriptTransformer(
   // Always enable JIT linking to support applications built with and without AOT.
@@ -44,7 +45,9 @@ export function resolve(
       return {
         format: 'module',
         shortCircuit: true,
-        url: new URL(normalizedSpecifier, 'file:').href,
+        // File URLs need to absolute. In Windows these also need to include the drive.
+        // The `/` will be resolved to the drive letter.
+        url: pathToFileURL('/' + normalizedSpecifier).href,
       };
     }
   }
@@ -60,8 +63,8 @@ export function resolve(
 export async function load(url: string, context: { format?: string | null }, nextLoad: Function) {
   if (isFileProtocol(url)) {
     const filePath = fileURLToPath(url);
-    let source =
-      outputFiles[filePath.slice(1)] /* Remove leading slash */ ?? TRANSFORMED_FILES[filePath];
+    // Remove '/' or drive letter for Windows that was added in the above 'resolve'.
+    let source = outputFiles[relative('/', filePath)] ?? TRANSFORMED_FILES[filePath];
 
     if (source === undefined) {
       source = TRANSFORMED_FILES[filePath] = Buffer.from(
