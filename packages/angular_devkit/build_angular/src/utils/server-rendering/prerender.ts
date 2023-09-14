@@ -8,7 +8,8 @@
 
 import { OutputFile } from 'esbuild';
 import { readFile } from 'node:fs/promises';
-import { extname, posix } from 'node:path';
+import { extname, join, posix } from 'node:path';
+import { pathToFileURL } from 'node:url';
 import Piscina from 'piscina';
 import type { RenderResult, ServerContext } from './render-page';
 import type { WorkerData } from './render-worker';
@@ -73,7 +74,7 @@ export async function prerenderPages(
     execArgv: [
       '--no-warnings', // Suppress `ExperimentalWarning: Custom ESM Loaders is an experimental feature...`.
       '--loader',
-      require.resolve('./esm-in-memory-file-loader.js'),
+      pathToFileURL(join(__dirname, 'esm-in-memory-file-loader.js')).href, // Loader cannot be an absolute path on Windows.
     ],
   });
 
