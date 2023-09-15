@@ -109,7 +109,7 @@ function updateApplicationBuilderWorkspaceConfigRule(
       }
 
       prodConfig.prerender = true;
-      (prodConfig.ssr ??= {}).entry = join(normalize(projectRoot), 'server.ts');
+      prodConfig.ssr = join(normalize(projectRoot), 'server.ts');
     });
   };
 }

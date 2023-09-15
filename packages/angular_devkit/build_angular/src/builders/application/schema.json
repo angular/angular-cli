@@ -452,14 +452,8 @@
           "description": "Enable the server bundles to be written to disk."
         },
         {
-          "type": "object",
-          "properties": {
-            "entry": {
-              "type": "string",
-              "description": "The server entry-point that when executed will spawn the web server."
-            }
-          },
-          "additionalProperties": false
+          "type": "string",
+          "description": "The server entry-point that when executed will spawn the web server."
         }
       ]
     },
