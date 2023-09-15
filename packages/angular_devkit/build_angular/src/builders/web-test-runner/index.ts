@@ -14,6 +14,7 @@ import path from 'node:path';
 import { findTestFiles } from '../../utils/test-files';
 import { buildApplicationInternal } from '../application';
 import { OutputHashing } from '../browser-esbuild/schema';
+import { logBuilderStatusWarnings } from './builder-status-warnings';
 import { WtrBuilderOptions, normalizeOptions } from './options';
 import { Schema } from './schema';
 
@@ -22,6 +23,7 @@ export default createBuilder(
     ctx.logger.warn(
       'NOTE: The Web Test Runner builder is currently EXPERIMENTAL and not ready for production use.',
     );
+    logBuilderStatusWarnings(schema, ctx);
 
     // Dynamic import `@web/test-runner` from the user's workspace. As an optional peer dep, it may not be installed
     // and may not be resolvable from `@angular-devkit/build-angular`.
