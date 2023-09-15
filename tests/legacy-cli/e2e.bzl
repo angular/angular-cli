@@ -33,12 +33,12 @@ ESBUILD_TESTS = [
     "tests/build/app-shell/app-shell-standalone.js",
     "tests/build/app-shell/app-shell-with-schematic.js",
     "tests/build/library/**",
+    "tests/build/ssr/**",
     "tests/build/prod-build.js",
     "tests/build/relative-sourcemap.js",
     "tests/build/styles/**",
     "tests/commands/add/**",
     "tests/i18n/extract-ivy*",
-    "tests/ssr/**",
 ]
 
 def _to_glob(patterns):
