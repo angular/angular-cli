@@ -7,7 +7,6 @@
  */
 
 import fastGlob, { Options as GlobOptions } from 'fast-glob';
-import { JestBuilderOptions } from './options';
 
 /**
  * Finds all test files in the project.
@@ -19,18 +18,19 @@ import { JestBuilderOptions } from './options';
  * @returns A set of all test files in the project.
  */
 export async function findTestFiles(
-  options: JestBuilderOptions,
+  include: string[],
+  exclude: string[],
   workspaceRoot: string,
   glob: typeof fastGlob = fastGlob,
 ): Promise<Set<string>> {
   const globOptions: GlobOptions = {
     cwd: workspaceRoot,
-    ignore: ['node_modules/**'].concat(options.exclude),
+    ignore: ['node_modules/**'].concat(exclude),
     braceExpansion: false, // Do not expand `a{b,c}` to `ab,ac`.
     extglob: false, // Disable "extglob" patterns.
   };
 
-  const included = await Promise.all(options.include.map((pattern) => glob(pattern, globOptions)));
+  const included = await Promise.all(include.map((pattern) => glob(pattern, globOptions)));
 
   // Flatten and deduplicate any files found in multiple include patterns.
   return new Set(included.flat());

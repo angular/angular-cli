@@ -11,12 +11,12 @@ import { execFile as execFileCb } from 'child_process';
 import * as path from 'path';
 import { promisify } from 'util';
 import { colors } from '../../utils/color';
+import { findTestFiles } from '../../utils/test-files';
 import { buildApplicationInternal } from '../application';
 import { ApplicationBuilderInternalOptions } from '../application/options';
 import { OutputHashing } from '../browser-esbuild/schema';
 import { normalizeOptions } from './options';
 import { Schema as JestBuilderSchema } from './schema';
-import { findTestFiles } from './test-files';
 
 const execFile = promisify(execFileCb);
 
@@ -55,7 +55,7 @@ export default createBuilder(
     }
 
     // Build all the test files.
-    const testFiles = await findTestFiles(options, context.workspaceRoot);
+    const testFiles = await findTestFiles(options.include, options.exclude, context.workspaceRoot);
     const jestGlobal = path.join(__dirname, 'jest-global.mjs');
     const initTestBed = path.join(__dirname, 'init-test-bed.mjs');
     const buildResult = await build(context, {

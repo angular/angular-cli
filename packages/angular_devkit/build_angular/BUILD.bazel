@@ -228,6 +228,7 @@ ts_library(
         ":build_angular_test_utils",
         "//packages/angular_devkit/architect/testing",
         "//packages/angular_devkit/core",
+        "@npm//fast-glob",
         "@npm//prettier",
         "@npm//typescript",
         "@npm//webpack",
@@ -367,11 +368,6 @@ LARGE_SPECS = {
     },
     "prerender": {},
     "browser-esbuild": {},
-    "jest": {
-        "extra_deps": [
-            "@npm//fast-glob",
-        ],
-    },
     "ssr-dev-server": {
         "extra_deps": [
             "@npm//@types/browser-sync",
