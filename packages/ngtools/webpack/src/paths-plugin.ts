@@ -141,10 +141,16 @@ export class TypeScriptPathsPlugin {
             return;
           }
 
+          // Absolute requests are not mapped
+          if (path.isAbsolute(originalRequest)) {
+            callback();
+
+            return;
+          }
+
           switch (originalRequest[0]) {
             case '.':
-            case '/':
-              // Relative or absolute requests are not mapped
+              // Relative requests are not mapped
               callback();
 
               return;
