@@ -1,9 +1,9 @@
-import { getGlobalVariable } from '../../utils/env';
-import { rimraf, writeMultipleFiles } from '../../utils/fs';
-import { findFreePort } from '../../utils/network';
-import { installWorkspacePackages } from '../../utils/packages';
-import { execAndWaitForOutputToMatch, killAllProcesses, ng } from '../../utils/process';
-import { updateJsonFile, useCIChrome, useCIDefaults, useSha } from '../../utils/project';
+import { getGlobalVariable } from '../../../utils/env';
+import { rimraf, writeMultipleFiles } from '../../../utils/fs';
+import { findFreePort } from '../../../utils/network';
+import { installWorkspacePackages } from '../../../utils/packages';
+import { execAndWaitForOutputToMatch, killAllProcesses, ng } from '../../../utils/process';
+import { updateJsonFile, useCIChrome, useCIDefaults, useSha } from '../../../utils/project';
 
 export default async function () {
   // forcibly remove in case another test doesn't clean itself up

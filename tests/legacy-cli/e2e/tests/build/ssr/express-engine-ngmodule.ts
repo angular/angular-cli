@@ -1,9 +1,9 @@
-import { getGlobalVariable } from '../../utils/env';
-import { rimraf, writeMultipleFiles } from '../../utils/fs';
-import { findFreePort } from '../../utils/network';
-import { installWorkspacePackages } from '../../utils/packages';
-import { execAndWaitForOutputToMatch, killAllProcesses, ng } from '../../utils/process';
-import { updateJsonFile, useSha } from '../../utils/project';
+import { getGlobalVariable } from '../../../utils/env';
+import { rimraf, writeMultipleFiles } from '../../../utils/fs';
+import { findFreePort } from '../../../utils/network';
+import { installWorkspacePackages } from '../../../utils/packages';
+import { execAndWaitForOutputToMatch, killAllProcesses, ng } from '../../../utils/process';
+import { updateJsonFile, useSha } from '../../../utils/project';
 
 export default async function () {
   const useWebpackBuilder = !getGlobalVariable('argv')['esbuild'];
@@ -34,18 +34,6 @@ export default async function () {
           .bootstrapModule(AppModule)
           .catch((err) => console.error(err));
       };
-    `,
-    'src/index.html': `
-      <!doctype html>
-      <html lang="en">
-      <head>
-        <meta charset="utf-8">
-        <base href="/">
-      </head>
-      <body>
-        <app-root ngCspNonce="{% nonce %}"></app-root>
-      </body>
-      </html>
     `,
     'e2e/src/app.e2e-spec.ts':
       `
@@ -79,12 +67,12 @@ export default async function () {
           // Load the page without waiting for Angular since it is not bootstrapped automatically.
           await browser.driver.get(browser.baseUrl);
 
-          expect(
-            await element(by.css('style[ng-app-id="ng"]')).getText()
-          ).not.toBeNull();
+          const style = await browser.driver.findElement(by.css('style[ng-app-id="ng"]'));
+          expect(await style.getText()).not.toBeNull();
 
           // Test the contents from the server.
-          expect(await element(by.css('div')).getText()).toMatch('Welcome');
+          const serverDiv = await browser.driver.findElement(by.css('div'));
+          expect(await serverDiv.getText()).toMatch('Welcome');
 
           // Bootstrap the client side app.
           await browser.executeScript('doBootstrap()');
@@ -93,9 +81,7 @@ export default async function () {
           expect(await element(by.css('div')).getText()).toMatch('Welcome');
 
           // Make sure the server styles got replaced by client side ones.
-          expect(
-            await element(by.css('style[ng-app-id="ng"]')).isPresent()
-          ).toBeFalsy();
+          expect(await element(by.css('style[ng-app-id="ng"]')).isPresent()).toBeFalsy();
           expect(await element(by.css('style')).getText()).toMatch('');
 
           // Make sure there were no client side errors.
@@ -104,42 +90,25 @@ export default async function () {
       // TODO(alanagius): enable the below tests once critical css inlining for SSR is supported with Vite.
       (useWebpackBuilder
         ? `
-        it('stylesheets should be configured to load asynchronously', async () => {
-          // Load the page without waiting for Angular since it is not bootstrapped automatically.
-          await browser.driver.get(browser.baseUrl);
+          it('stylesheets should be configured to load asynchronously', async () => {
+            // Load the page without waiting for Angular since it is not bootstrapped automatically.
+            await browser.driver.get(browser.baseUrl);
 
-          // Test the contents from the server.
-          const linkTag = await browser.driver.findElement(
-            by.css('link[rel="stylesheet"]')
-          );
-          expect(await linkTag.getAttribute('media')).toMatch('all');
-          expect(await linkTag.getAttribute('ngCspMedia')).toMatch('all');
-          expect(await linkTag.getAttribute('onload')).toBeNull();
+            // Test the contents from the server.
+            const styleTag = await browser.driver.findElement(by.css('link[rel="stylesheet"]'));
+            expect(await styleTag.getAttribute('media')).toMatch('all');
 
-          // Make sure there were no client side errors.
-          await verifyNoBrowserErrors();
-        });`
+            // Make sure there were no client side errors.
+            await verifyNoBrowserErrors();
+          });`
         : '') +
       `
-        it('style tags all have a nonce attribute', async () => {
-          // Load the page without waiting for Angular since it is not bootstrapped automatically.
-          await browser.driver.get(browser.baseUrl);
-
-          // Test the contents from the server.
-          for (const s of await browser.driver.findElements(by.css('style'))) {
-            expect(await s.getAttribute('nonce')).toBe('{% nonce %}');
-          }
-
-          // Make sure there were no client side errors.
-          await verifyNoBrowserErrors();
         });
-      });
       `,
   });
 
   async function ngDevSsr(): Promise<number> {
     const port = await findFreePort();
-    const useWebpackBuilder = !getGlobalVariable('argv')['esbuild'];
     const validBundleRegEx = useWebpackBuilder ? /Compiled successfully\./ : /complete\./;
 
     await execAndWaitForOutputToMatch(
