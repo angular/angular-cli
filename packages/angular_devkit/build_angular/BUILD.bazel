@@ -122,6 +122,7 @@ ts_library(
     module_root = "src/index.d.ts",
     deps = [
         "//packages/angular_devkit/architect",
+        "//packages/angular_devkit/build_angular/src/utils/routes-extractor",
         "//packages/angular_devkit/build_webpack",
         "//packages/angular_devkit/core",
         "//packages/angular_devkit/core/node",
@@ -168,7 +169,6 @@ ts_library(
         "@npm//esbuild",
         "@npm//esbuild-wasm",
         "@npm//fast-glob",
-        "@npm//guess-parser",
         "@npm//http-proxy-middleware",
         "@npm//https-proxy-agent",
         "@npm//inquirer",

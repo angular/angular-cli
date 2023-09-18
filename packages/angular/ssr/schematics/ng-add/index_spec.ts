@@ -194,7 +194,7 @@ describe('SSR Schematic', () => {
       const tree = await schematicRunner.runSchematic('ng-add', defaultOptions, appTree);
 
       const content = tree.readContent('/projects/test-app/server.ts');
-      expect(content).toContain(`export * from './src/main.server'`);
+      expect(content).toContain(`export default AppServerModule`);
     });
 
     it(`should add correct value to 'distFolder'`, async () => {

@@ -423,19 +423,9 @@
               "type": "string",
               "description": "The path to a file containing routes separated by newlines."
             },
-            "routes": {
-              "type": "array",
-              "description": "The routes to render.",
-              "items": {
-                "minItems": 1,
-                "type": "string",
-                "uniqueItems": true
-              },
-              "default": []
-            },
             "discoverRoutes": {
               "type": "boolean",
-              "description": "Whether the builder should statically discover routes.",
+              "description": "Whether the builder should discover routers using the Angular Router.",
               "default": true
             }
           },

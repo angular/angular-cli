@@ -102,7 +102,7 @@ async function render({ serverBundlePath, document, url }: RenderRequest): Promi
 }
 
 function isBootstrapFn(value: unknown): value is () => Promise<ApplicationRef> {
-  // We can differentiate between a module and a bootstrap function by reading `cmp`:
+  // We can differentiate between a module and a bootstrap function by reading compiler-generated `ɵmod` static property:
   return typeof value === 'function' && !('ɵmod' in value);
 }
 

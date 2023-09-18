@@ -27,9 +27,9 @@
       },
       "default": []
     },
-    "guessRoutes": {
+    "discoverRoutes": {
       "type": "boolean",
-      "description": "Whether or not the builder should extract routes and guess which paths to render.",
+      "description": "Whether the builder should discover routers using the Angular Router.",
       "default": true
     }
   },

@@ -181,15 +181,11 @@ export async function normalizeOptions(
 
   let prerenderOptions;
   if (options.prerender) {
-    const {
-      discoverRoutes = true,
-      routes = [],
-      routesFile = undefined,
-    } = options.prerender === true ? {} : options.prerender;
+    const { discoverRoutes = true, routesFile = undefined } =
+      options.prerender === true ? {} : options.prerender;
 
     prerenderOptions = {
       discoverRoutes,
-      routes,
       routesFile: routesFile && path.join(workspaceRoot, routesFile),
     };
   }

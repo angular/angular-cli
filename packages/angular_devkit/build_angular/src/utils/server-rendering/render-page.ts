@@ -6,11 +6,11 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import type { ApplicationRef, StaticProvider, Type } from '@angular/core';
-import type { renderApplication, renderModule, ɵSERVER_CONTEXT } from '@angular/platform-server';
+import type { ApplicationRef, StaticProvider } from '@angular/core';
 import { basename } from 'node:path';
 import { InlineCriticalCssProcessor } from '../index-file/inline-critical-css';
 import { loadEsmModule } from '../load-esm';
+import { MainServerBundleExports } from './main-bundle-exports';
 
 export interface RenderOptions {
   route: string;
@@ -28,20 +28,6 @@ export interface RenderResult {
 }
 
 export type ServerContext = 'app-shell' | 'ssg' | 'ssr';
-
-interface MainServerBundleExports {
-  /** An internal token that allows providing extra information about the server context. */
-  ɵSERVER_CONTEXT: typeof ɵSERVER_CONTEXT;
-
-  /** Render an NgModule application. */
-  renderModule: typeof renderModule;
-
-  /** Method to render a standalone application. */
-  renderApplication: typeof renderApplication;
-
-  /** Standalone application bootstrapping function. */
-  default: (() => Promise<ApplicationRef>) | Type<unknown>;
-}
 
 /**
  * Renders each route in routes and writes them to <outputPath>/<route>/index.html.
@@ -107,6 +93,6 @@ export async function renderPage({
 }
 
 function isBootstrapFn(value: unknown): value is () => Promise<ApplicationRef> {
-  // We can differentiate between a module and a bootstrap function by reading `cmp`:
+  // We can differentiate between a module and a bootstrap function by reading compiler-generated `ɵmod` static property:
   return typeof value === 'function' && !('ɵmod' in value);
 }

@@ -53,6 +53,7 @@ export async function executeBuild(
     prerenderOptions,
     appShellOptions,
     ssrOptions,
+    verbose,
   } = options;
 
   const browsers = getSupportedBrowsers(projectRoot, context.logger);
@@ -182,13 +183,13 @@ export async function executeBuild(
 
     const { output, warnings, errors } = await prerenderPages(
       workspaceRoot,
-      options.tsconfig,
       appShellOptions,
       prerenderOptions,
       executionResult.outputFiles,
       indexContentOutputNoCssInlining,
       optimizationOptions.styles.inlineCritical,
       maxWorkers,
+      verbose,
     );
 
     printWarningsAndErrorsToConsole(context, warnings, errors);
@@ -242,6 +243,7 @@ export async function executeBuild(
   if (optimizationOptions.scripts || optimizationOptions.styles.minify) {
     estimatedTransferSizes = await calculateEstimatedTransferSizes(executionResult.outputFiles);
   }
+
   logBuildStats(context, metafile, initialFiles, estimatedTransferSizes);
 
   const buildTime = Number(process.hrtime.bigint() - startTime) / 10 ** 9;

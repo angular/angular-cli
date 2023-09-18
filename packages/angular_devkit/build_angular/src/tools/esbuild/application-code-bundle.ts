@@ -8,7 +8,8 @@
 
 import type { BuildOptions } from 'esbuild';
 import assert from 'node:assert';
-import path from 'node:path';
+import { readFile } from 'node:fs/promises';
+import { join, relative } from 'node:path';
 import type { NormalizedApplicationBuildOptions } from '../../builders/application/options';
 import { allowMangle } from '../../utils/environment-options';
 import { SourceFileCache, createCompilerPlugin } from './angular/compiler-plugin';
@@ -109,6 +110,7 @@ export function createServerCodeBundleOptions(
   );
 
   const mainServerNamespace = 'angular:main-server';
+  const routeExtractorNamespace = 'angular:prerender-route-extractor';
   const ssrEntryNamespace = 'angular:ssr-entry';
 
   const entryPoints: Record<string, string> = {
@@ -123,6 +125,8 @@ export function createServerCodeBundleOptions(
   const buildOptions: BuildOptions = {
     ...getEsBuildCommonOptions(options),
     platform: 'node',
+    // TODO: Invesigate why enabling `splitting` in JIT mode causes an "'@angular/compiler' is not available" error.
+    splitting: !jit,
     outExtension: { '.js': '.mjs' },
     // Note: `es2015` is needed for RxJS v6. If not specified, `module` would
     // match and the ES5 distribution would be bundled and ends up breaking at
@@ -159,8 +163,7 @@ export function createServerCodeBundleOptions(
     buildOptions.plugins.push(createRxjsEsmResolutionPlugin());
   }
 
-  const polyfills = [`import '@angular/platform-server/init';`];
-
+  const polyfills: string[] = [];
   if (options.polyfills?.includes('zone.js')) {
     polyfills.push(`import 'zone.js/node';`);
   }
@@ -169,22 +172,35 @@ export function createServerCodeBundleOptions(
     polyfills.push(`import '@angular/compiler';`);
   }
 
+  polyfills.push(`import '@angular/platform-server/init';`);
+
   buildOptions.plugins.push(
     createVirtualModulePlugin({
       namespace: mainServerNamespace,
-      loadContent: () => {
-        const mainServerEntryPoint = path
-          .relative(workspaceRoot, serverEntryPoint)
-          .replace(/\\/g, '/');
+      loadContent: async () => {
+        const mainServerEntryPoint = relative(workspaceRoot, serverEntryPoint).replace(/\\/g, '/');
+
+        const contents = [
+          ...polyfills,
+          `import moduleOrBootstrapFn from './${mainServerEntryPoint}';`,
+          `export default moduleOrBootstrapFn;`,
+          `export * from './${mainServerEntryPoint}';`,
+          `export { renderApplication, renderModule, ɵSERVER_CONTEXT } from '@angular/platform-server';`,
+        ];
+
+        if (options.prerenderOptions?.discoverRoutes) {
+          // We do not import it directly so that node.js modules are resolved using the correct context.
+          const routesExtractorCode = await readFile(
+            join(__dirname, '../../utils/routes-extractor/extractor.js'),
+            'utf-8',
+          );
+
+          // Remove source map URL comments from the code if a sourcemap is present as this will not match the file.
+          contents.push(routesExtractorCode.replace(/^\/\/# sourceMappingURL=[^\r\n]*/gm, ''));
+        }
 
         return {
-          contents: [
-            ...polyfills,
-            `import moduleOrBootstrapFn from './${mainServerEntryPoint}';`,
-            `export default moduleOrBootstrapFn;`,
-            `export * from './${mainServerEntryPoint}';`,
-            `export { renderApplication, renderModule, ɵSERVER_CONTEXT } from '@angular/platform-server';`,
-          ].join('\n'),
+          contents: contents.join('\n'),
           loader: 'js',
           resolveDir: workspaceRoot,
         };
@@ -197,15 +213,13 @@ export function createServerCodeBundleOptions(
       createVirtualModulePlugin({
         namespace: ssrEntryNamespace,
         loadContent: () => {
-          const mainServerEntryPoint = path
-            .relative(workspaceRoot, ssrEntryPoint)
-            .replace(/\\/g, '/');
+          const serverEntryPoint = relative(workspaceRoot, ssrEntryPoint).replace(/\\/g, '/');
 
           return {
             contents: [
               ...polyfills,
-              `import './${mainServerEntryPoint}';`,
-              `export * from './${mainServerEntryPoint}';`,
+              `import './${serverEntryPoint}';`,
+              `export * from './${serverEntryPoint}';`,
             ].join('\n'),
             loader: 'js',
             resolveDir: workspaceRoot,
