@@ -1,0 +1,27 @@
+# Copyright Google Inc. All Rights Reserved.
+#
+# Use of this source code is governed by an MIT-style license that can be
+# found in the LICENSE file at https://angular.io/license
+
+load("//tools:defaults.bzl", "ts_library")
+
+# NOTE This is built as ESM as this is included in the users server bundle.
+licenses(["notice"])
+
+package(default_visibility = ["//packages/angular_devkit/build_angular:__subpackages__"])
+
+ts_library(
+    name = "routes-extractor",
+    srcs = [
+        "extractor.ts",
+    ],
+    devmode_module = "es2015",
+    prodmode_module = "es2015",
+    deps = [
+        "@npm//@angular/core",
+        "@npm//@angular/platform-server",
+        "@npm//@angular/router",
+        "@npm//@types/node",
+        "@npm//rxjs",
+    ],
+)

@@ -12,12 +12,15 @@ import { extname, join, posix } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import Piscina from 'piscina';
 import type { RenderResult, ServerContext } from './render-page';
-import type { WorkerData } from './render-worker';
+import type { RenderWorkerData } from './render-worker';
+import type {
+  RoutersExtractorWorkerResult,
+  RoutesExtractorWorkerData,
+} from './routes-extractor-worker';
 
 interface PrerenderOptions {
   routesFile?: string;
   discoverRoutes?: boolean;
-  routes?: string[];
 }
 
 interface AppShellOptions {
@@ -26,13 +29,13 @@ interface AppShellOptions {
 
 export async function prerenderPages(
   workspaceRoot: string,
-  tsConfigPath: string,
   appShellOptions: AppShellOptions = {},
   prerenderOptions: PrerenderOptions = {},
   outputFiles: Readonly<OutputFile[]>,
   document: string,
   inlineCriticalCss?: boolean,
   maxThreads = 1,
+  verbose = false,
 ): Promise<{
   output: Record<string, string>;
   warnings: string[];
@@ -41,16 +44,6 @@ export async function prerenderPages(
   const output: Record<string, string> = {};
   const warnings: string[] = [];
   const errors: string[] = [];
-  const allRoutes = await getAllRoutes(tsConfigPath, appShellOptions, prerenderOptions);
-
-  if (allRoutes.size < 1) {
-    return {
-      errors,
-      warnings,
-      output,
-    };
-  }
-
   const outputFilesForWorker: Record<string, string> = {};
 
   for (const { text, path } of outputFiles) {
@@ -62,6 +55,27 @@ export async function prerenderPages(
     }
   }
 
+  const { routes: allRoutes, warnings: routesWarnings } = await getAllRoutes(
+    workspaceRoot,
+    outputFilesForWorker,
+    document,
+    appShellOptions,
+    prerenderOptions,
+    verbose,
+  );
+
+  if (routesWarnings?.length) {
+    warnings.push(...routesWarnings);
+  }
+
+  if (allRoutes.size < 1) {
+    return {
+      errors,
+      warnings,
+      output,
+    };
+  }
+
   const renderWorker = new Piscina({
     filename: require.resolve('./render-worker'),
     maxThreads: Math.min(allRoutes.size, maxThreads),
@@ -70,7 +84,7 @@ export async function prerenderPages(
       outputFiles: outputFilesForWorker,
       inlineCriticalCss,
       document,
-    } as WorkerData,
+    } as RenderWorkerData,
     execArgv: [
       '--no-warnings', // Suppress `ExperimentalWarning: Custom ESM Loaders is an experimental feature...`.
       '--loader',
@@ -80,20 +94,16 @@ export async function prerenderPages(
 
   try {
     const renderingPromises: Promise<void>[] = [];
+    const appShellRoute = appShellOptions.route && removeLeadingSlash(appShellOptions.route);
 
     for (const route of allRoutes) {
-      const isAppShellRoute = appShellOptions.route === route;
+      const isAppShellRoute = appShellRoute === route;
       const serverContext: ServerContext = isAppShellRoute ? 'app-shell' : 'ssg';
 
       const render: Promise<RenderResult> = renderWorker.run({ route, serverContext });
       const renderResult: Promise<void> = render.then(({ content, warnings, errors }) => {
         if (content !== undefined) {
-          const outPath = isAppShellRoute
-            ? 'index.html'
-            : posix.join(
-                route.startsWith('/') ? route.slice(1) /* Remove leading slash */ : route,
-                'index.html',
-              );
+          const outPath = isAppShellRoute ? 'index.html' : posix.join(route, 'index.html');
           output[outPath] = content;
         }
 
@@ -121,13 +131,22 @@ export async function prerenderPages(
   };
 }
 
+class RoutesSet extends Set<string> {
+  override add(value: string): this {
+    return super.add(removeLeadingSlash(value));
+  }
+}
+
 async function getAllRoutes(
-  tsConfigPath: string,
+  workspaceRoot: string,
+  outputFilesForWorker: Record<string, string>,
+  document: string,
   appShellOptions: AppShellOptions,
   prerenderOptions: PrerenderOptions,
-): Promise<Set<string>> {
-  const { routesFile, discoverRoutes, routes: existingRoutes } = prerenderOptions;
-  const routes = new Set(existingRoutes);
+  verbose: boolean,
+): Promise<{ routes: Set<string>; warnings?: string[] }> {
+  const { routesFile, discoverRoutes } = prerenderOptions;
+  const routes = new RoutesSet();
 
   const { route: appShellRoute } = appShellOptions;
   if (appShellRoute !== undefined) {
@@ -136,23 +155,42 @@ async function getAllRoutes(
 
   if (routesFile) {
     const routesFromFile = (await readFile(routesFile, 'utf8')).split(/\r?\n/);
-    for (let route of routesFromFile) {
-      route = route.trim();
-      if (route) {
-        routes.add(route);
-      }
+    for (const route of routesFromFile) {
+      routes.add(route.trim());
     }
   }
 
-  if (discoverRoutes) {
-    const { parseAngularRoutes } = await import('guess-parser');
-    for (const { path } of parseAngularRoutes(tsConfigPath)) {
-      // Exclude dynamic routes as these cannot be pre-rendered.
-      if (!/[*:]/.test(path)) {
-        routes.add(path);
-      }
-    }
+  if (!discoverRoutes) {
+    return { routes };
   }
 
-  return routes;
+  const renderWorker = new Piscina({
+    filename: require.resolve('./routes-extractor-worker'),
+    maxThreads: 1,
+    workerData: {
+      workspaceRoot,
+      outputFiles: outputFilesForWorker,
+      document,
+      verbose,
+    } as RoutesExtractorWorkerData,
+    execArgv: [
+      '--no-warnings', // Suppress `ExperimentalWarning: Custom ESM Loaders is an experimental feature...`.
+      '--loader',
+      pathToFileURL(join(__dirname, 'esm-in-memory-file-loader.js')).href, // Loader cannot be an absolute path on Windows.
+    ],
+  });
+
+  const { routes: extractedRoutes, warnings }: RoutersExtractorWorkerResult = await renderWorker
+    .run({})
+    .finally(() => void renderWorker.destroy());
+
+  for (const route of extractedRoutes) {
+    routes.add(route);
+  }
+
+  return { routes, warnings };
+}
+
+function removeLeadingSlash(value: string): string {
+  return value.charAt(0) === '/' ? value.slice(1) : value;
 }

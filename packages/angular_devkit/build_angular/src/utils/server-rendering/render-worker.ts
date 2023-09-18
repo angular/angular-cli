@@ -7,10 +7,10 @@
  */
 
 import { workerData } from 'node:worker_threads';
+import type { ESMInMemoryFileLoaderWorkerData } from './esm-in-memory-file-loader';
 import { RenderResult, ServerContext, renderPage } from './render-page';
 
-export interface WorkerData {
-  outputFiles: Record<string, string>;
+export interface RenderWorkerData extends ESMInMemoryFileLoaderWorkerData {
   document: string;
   inlineCriticalCss?: boolean;
 }
@@ -23,7 +23,7 @@ export interface RenderOptions {
 /**
  * This is passed as workerData when setting up the worker via the `piscina` package.
  */
-const { outputFiles, document, inlineCriticalCss } = workerData as WorkerData;
+const { outputFiles, document, inlineCriticalCss } = workerData as RenderWorkerData;
 
 export default function (options: RenderOptions): Promise<RenderResult> {
   return renderPage({ ...options, outputFiles, document, inlineCriticalCss });

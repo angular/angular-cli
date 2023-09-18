@@ -14,6 +14,7 @@ import {
 } from '@angular-devkit/architect';
 import { json } from '@angular-devkit/core';
 import * as fs from 'fs';
+import { readFile } from 'node:fs/promises';
 import ora from 'ora';
 import * as path from 'path';
 import Piscina from 'piscina';
@@ -21,15 +22,69 @@ import { normalizeOptimization } from '../../utils';
 import { maxWorkers } from '../../utils/environment-options';
 import { assertIsError } from '../../utils/error';
 import { augmentAppWithServiceWorker } from '../../utils/service-worker';
+import { getIndexOutputFile } from '../../utils/webpack-browser-config';
 import { BrowserBuilderOutput } from '../browser';
 import { Schema as BrowserBuilderOptions } from '../browser/schema';
 import { ServerBuilderOutput } from '../server';
 import type { RenderOptions, RenderResult } from './render-worker';
+import { RoutesExtractorWorkerData } from './routes-extractor-worker';
 import { Schema } from './schema';
-import { getIndexOutputFile, getRoutes } from './utils';
 
 type PrerenderBuilderOptions = Schema & json.JsonObject;
 type PrerenderBuilderOutput = BuilderOutput;
+
+class RoutesSet extends Set<string> {
+  override add(value: string): this {
+    return super.add(value.charAt(0) === '/' ? value.slice(1) : value);
+  }
+}
+
+async function getRoutes(
+  indexFile: string,
+  outputPath: string,
+  serverBundlePath: string,
+  options: PrerenderBuilderOptions,
+  workspaceRoot: string,
+): Promise<string[]> {
+  const { routes: extraRoutes = [], routesFile, discoverRoutes } = options;
+  const routes = new RoutesSet(extraRoutes);
+
+  if (routesFile) {
+    const routesFromFile = (await readFile(path.join(workspaceRoot, routesFile), 'utf8')).split(
+      /\r?\n/,
+    );
+    for (const route of routesFromFile) {
+      routes.add(route);
+    }
+  }
+
+  if (discoverRoutes) {
+    const renderWorker = new Piscina({
+      filename: require.resolve('./routes-extractor-worker'),
+      maxThreads: 1,
+      workerData: {
+        indexFile,
+        outputPath,
+        serverBundlePath,
+        zonePackage: require.resolve('zone.js', { paths: [workspaceRoot] }),
+      } as RoutesExtractorWorkerData,
+    });
+
+    const extractedRoutes: string[] = await renderWorker
+      .run({})
+      .finally(() => void renderWorker.destroy());
+
+    for (const route of extractedRoutes) {
+      routes.add(route);
+    }
+  }
+
+  if (routes.size === 0) {
+    throw new Error('Could not find any routes to prerender.');
+  }
+
+  return [...routes];
+}
 
 /**
  * Schedules the server and browser builds and returns their results if both builds are successful.
@@ -80,7 +135,7 @@ async function _scheduleBuilds(
  * <route>/index.html for each output path in the browser result.
  */
 async function _renderUniversal(
-  routes: string[],
+  options: PrerenderBuilderOptions,
   context: BuilderContext,
   browserResult: BrowserBuilderOutput,
   serverResult: ServerBuilderOutput,
@@ -98,7 +153,7 @@ async function _renderUniversal(
   );
 
   // Users can specify a different base html file e.g. "src/home.html"
-  const indexFile = getIndexOutputFile(browserOptions);
+  const indexFile = getIndexOutputFile(browserOptions.index);
   const { styles: normalizedStylesOptimization } = normalizeOptimization(
     browserOptions.optimization,
   );
@@ -112,14 +167,25 @@ async function _renderUniversal(
     workerData: { zonePackage },
   });
 
+  let routes: string[] | undefined;
+
   try {
     // We need to render the routes for each locale from the browser output.
     for (const { path: outputPath } of browserResult.outputs) {
       const localeDirectory = path.relative(browserResult.baseOutputPath, outputPath);
       const serverBundlePath = path.join(baseOutputPath, localeDirectory, 'main.js');
+
       if (!fs.existsSync(serverBundlePath)) {
         throw new Error(`Could not find the main bundle: ${serverBundlePath}`);
       }
+
+      routes ??= await getRoutes(
+        indexFile,
+        outputPath,
+        serverBundlePath,
+        options,
+        context.workspaceRoot,
+      );
 
       const spinner = ora(`Prerendering ${routes.length} route(s) to ${outputPath}...`).start();
 
@@ -197,21 +263,14 @@ export async function execute(
   const browserOptions = (await context.getTargetOptions(
     browserTarget,
   )) as unknown as BrowserBuilderOptions;
-  const tsConfigPath =
-    typeof browserOptions.tsConfig === 'string' ? browserOptions.tsConfig : undefined;
-
-  const routes = await getRoutes(options, tsConfigPath, context);
-  if (!routes.length) {
-    throw new Error(`Could not find any routes to prerender.`);
-  }
-
   const result = await _scheduleBuilds(options, context);
   const { success, error, browserResult, serverResult } = result;
+
   if (!success || !browserResult || !serverResult) {
     return { success, error } as BuilderOutput;
   }
 
-  return _renderUniversal(routes, context, browserResult, serverResult, browserOptions);
+  return _renderUniversal(options, context, browserResult, serverResult, browserOptions);
 }
 
 export default createBuilder(execute);

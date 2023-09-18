@@ -17,10 +17,12 @@ import { JavaScriptTransformer } from '../../tools/esbuild/javascript-transforme
  * @see: https://nodejs.org/api/esm.html#loaders for more information about loaders.
  */
 
-const { outputFiles, workspaceRoot } = workerData as {
+export interface ESMInMemoryFileLoaderWorkerData {
   outputFiles: Record<string, string>;
   workspaceRoot: string;
-};
+}
+
+const { outputFiles, workspaceRoot } = workerData as ESMInMemoryFileLoaderWorkerData;
 
 const TRANSFORMED_FILES: Record<string, string> = {};
 const CHUNKS_REGEXP = /file:\/\/\/(main\.server|chunk-\w+)\.mjs/;

@@ -64,4 +64,4 @@ if (moduleFilename === __filename || moduleFilename.includes('iisnode')) {
   run();
 }
 
-<% if (isStandalone) { %>export default bootstrap;<% } else { %>export * from './src/main.server';<% } %>
+export default <% if (isStandalone) { %>bootstrap<% } else { %>AppServerModule<% } %>;
