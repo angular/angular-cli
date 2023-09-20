@@ -90,31 +90,19 @@ jobs:
 
   test:
     runs-on: ubuntu-latest
-    env:
-      defaultVersion: 16
-    strategy:
-      matrix:
-        version: [18]
     steps:
-      - uses: actions/checkout@3df4ab11eba7bda6032a0b82a6bb43b11571feac # v4.0.0
+      - name: Initialize environment
+        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@b57414124cf00fcbf1ecb190bdeb1a1396361424
         with:
-          persist-credentials: false
-      - uses: actions/setup-node@5e21ff4d9bc1a8cf6de233a3057d20ec6b3fb69d # v3.8.1
-        with:
-          node-version: ${{ matrix.version }}
-          cache: 'yarn'
-      - name: Install node modules
-        run: yarn install --frozen-lockfile
+          fetch-depth: 1
       - name: Setup Bazel
         uses: angular/dev-infra/github-actions/bazel/setup@b57414124cf00fcbf1ecb190bdeb1a1396361424
       - name: Setup Bazel RBE
         uses: angular/dev-infra/github-actions/bazel/configure-remote@b57414124cf00fcbf1ecb190bdeb1a1396361424
-      - if: matrix.version == env.defaultVersion
-        name: Run tests for default node version
-        run: yarn bazel test --test_tag_filters=-node18,-node16-broken //packages/...
-      - if: matrix.version != env.defaultVersion
-        name: Run tests for non-default node version
-        run: yarn bazel test --test_tag_filters=node18,-node18-broken //packages/...
+      - name: Install node modules
+        run: yarn install --frozen-lockfile
+      - name: Run tests
+        run: yarn bazel test //packages/...
 
   e2e:
     strategy:
