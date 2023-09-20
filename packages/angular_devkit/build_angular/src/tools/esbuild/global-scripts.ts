@@ -14,7 +14,7 @@ import path from 'node:path';
 import type { NormalizedApplicationBuildOptions } from '../../builders/application/options';
 import { assertIsError } from '../../utils/error';
 import { LoadResultCache, createCachedLoad } from './load-result-cache';
-import { createSourcemapIngorelistPlugin } from './sourcemap-ignorelist-plugin';
+import { createSourcemapIgnorelistPlugin } from './sourcemap-ignorelist-plugin';
 import { createVirtualModulePlugin } from './virtual-module-plugin';
 
 /**
@@ -71,7 +71,7 @@ export function createGlobalScriptsBundleOptions(
     platform: 'neutral',
     preserveSymlinks,
     plugins: [
-      createSourcemapIngorelistPlugin(),
+      createSourcemapIgnorelistPlugin(),
       createVirtualModulePlugin({
         namespace,
         external: true,
