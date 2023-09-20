@@ -15,7 +15,7 @@ import { allowMangle } from '../../utils/environment-options';
 import { SourceFileCache, createCompilerPlugin } from './angular/compiler-plugin';
 import { createCompilerPluginOptions } from './compiler-plugin-options';
 import { createRxjsEsmResolutionPlugin } from './rxjs-esm-resolution-plugin';
-import { createSourcemapIngorelistPlugin } from './sourcemap-ignorelist-plugin';
+import { createSourcemapIgnorelistPlugin } from './sourcemap-ignorelist-plugin';
 import { getFeatureSupport } from './utils';
 import { createVirtualModulePlugin } from './virtual-module-plugin';
 
@@ -45,7 +45,7 @@ export function createBrowserCodeBundleOptions(
     target,
     supported: getFeatureSupport(target),
     plugins: [
-      createSourcemapIngorelistPlugin(),
+      createSourcemapIgnorelistPlugin(),
       createCompilerPlugin(
         // JS/TS options
         pluginOptions,
@@ -146,7 +146,7 @@ export function createServerCodeBundleOptions(
     entryPoints,
     supported: getFeatureSupport(target),
     plugins: [
-      createSourcemapIngorelistPlugin(),
+      createSourcemapIgnorelistPlugin(),
       createCompilerPlugin(
         // JS/TS options
         { ...pluginOptions, noopTypeScriptCompilation: true },
