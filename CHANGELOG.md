@@ -1,3 +1,22 @@
+<a name="16.2.3"></a>
+
+# 16.2.3 (2023-09-20)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                               |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------- |
+| [39643bee1](https://github.com/angular/angular-cli/commit/39643bee1522e0313be612b564f2b96ec45007ec) | fix  | correctly re-point RXJS to ESM on Windows                 |
+| [d8d116b31](https://github.com/angular/angular-cli/commit/d8d116b318377d51f258a1a23025be2d41136ee3) | fix  | several windows fixes to application builder prerendering |
+
+### @ngtools/webpack
+
+| Commit                                                                                              | Type | Description                      |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------- |
+| [f1195d035](https://github.com/angular/angular-cli/commit/f1195d0351540bdcc7d3f3e7cf0761389eb3d569) | fix  | fix recursion in webpack resolve |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="17.0.0-next.4"></a>
 
 # 17.0.0-next.4 (2023-09-13)
