@@ -100,12 +100,12 @@ export async function normalizeOptions(
   const outputNames = {
     bundles:
       options.outputHashing === OutputHashing.All || options.outputHashing === OutputHashing.Bundles
-        ? '[name].[hash]'
+        ? '[name]-[hash]'
         : '[name]',
     media:
       'media/' +
       (options.outputHashing === OutputHashing.All || options.outputHashing === OutputHashing.Media
-        ? '[name].[hash]'
+        ? '[name]-[hash]'
         : '[name]'),
   };
 

@@ -169,8 +169,8 @@ export class BundlerContext {
       outputFile.path = relativeFilePath;
 
       if (entryPoint) {
-        // The first part of the filename is the name of file (e.g., "polyfills" for "polyfills.7S5G3MDY.js")
-        const name = basename(relativeFilePath).split('.', 1)[0];
+        // The first part of the filename is the name of file (e.g., "polyfills" for "polyfills-7S5G3MDY.js")
+        const name = basename(relativeFilePath).replace(/(?:-[\dA-Z]{8})?\.[a-z]{2,3}$/, '');
         // Entry points are only styles or scripts
         const type = extname(relativeFilePath) === '.css' ? 'style' : 'script';
 
