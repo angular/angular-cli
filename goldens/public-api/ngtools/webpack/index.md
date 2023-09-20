@@ -46,6 +46,9 @@ export interface AngularWebpackPluginOptions {
     tsconfig: string;
 }
 
+// @public (undocumented)
+export const imageDomains: Set<string>;
+
 // (No @packageDocumentation comment for this package)
 
 ```

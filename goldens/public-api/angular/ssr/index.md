@@ -30,18 +30,6 @@ export interface CommonEngineRenderOptions {
     url?: string;
 }
 
-// @public
-export function ngExpressEngine(setupOptions: Readonly<NgExpressEngineOptions>): (path: string, options: NgExpressEngineRenderOptions, callback: (err?: Error | null, html?: string) => void) => void;
-
-// @public
-export interface NgExpressEngineOptions extends Pick<CommonEngineRenderOptions, 'providers' | 'publicPath' | 'inlineCriticalCss'> {
-    // (undocumented)
-    bootstrap: NonNullable<CommonEngineRenderOptions['bootstrap']>;
-}
-
-// @public (undocumented)
-export type NgExpressEngineRenderOptions = CommonEngineRenderOptions;
-
 // (No @packageDocumentation comment for this package)
 
 ```
