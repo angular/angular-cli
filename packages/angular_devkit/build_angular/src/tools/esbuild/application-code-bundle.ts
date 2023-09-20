@@ -110,7 +110,6 @@ export function createServerCodeBundleOptions(
   );
 
   const mainServerNamespace = 'angular:main-server';
-  const routeExtractorNamespace = 'angular:prerender-route-extractor';
   const ssrEntryNamespace = 'angular:ssr-entry';
 
   const entryPoints: Record<string, string> = {

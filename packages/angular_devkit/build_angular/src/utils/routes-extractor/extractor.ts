@@ -6,18 +6,20 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { ApplicationRef, Injector, Type, createPlatformFactory, platformCore } from '@angular/core';
+import {
+  ApplicationRef,
+  Compiler,
+  Injector,
+  Type,
+  createPlatformFactory,
+  platformCore,
+} from '@angular/core';
 import {
   INITIAL_CONFIG,
   ɵINTERNAL_SERVER_PLATFORM_PROVIDERS as INTERNAL_SERVER_PLATFORM_PROVIDERS,
 } from '@angular/platform-server';
-import { Route, Router, ɵROUTER_PROVIDERS } from '@angular/router';
+import { Route, Router, ɵloadChildren as loadChildrenHelper } from '@angular/router';
 import { first } from 'rxjs/operators'; // Import from `/operators` to support rxjs 6 which is still supported by the Framework.
-
-// TODO(alanagius): replace the below once `RouterConfigLoader` is privately exported from `@angular/router`.
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const RouterConfigLoader = ɵROUTER_PROVIDERS[5] as any;
-type RouterConfigLoader = typeof RouterConfigLoader;
 
 interface RouterResult {
   route: string;
@@ -27,9 +29,9 @@ interface RouterResult {
 
 async function* getRoutesFromRouterConfig(
   routes: Route[],
-  routerConfigLoader: RouterConfigLoader,
-  injector: Injector,
-  parent = '',
+  compiler: Compiler,
+  parentInjector: Injector,
+  parentRoute = '',
 ): AsyncIterableIterator<RouterResult> {
   for (const route of routes) {
     const { path, redirectTo, loadChildren, children } = route;
@@ -37,7 +39,7 @@ async function* getRoutesFromRouterConfig(
       continue;
     }
 
-    const currentRoutePath = buildRoutePath(parent, path);
+    const currentRoutePath = buildRoutePath(parentRoute, path);
 
     if (redirectTo !== undefined) {
       // TODO: handle `redirectTo`.
@@ -53,13 +55,21 @@ async function* getRoutesFromRouterConfig(
 
     yield { route: currentRoutePath, success: true, redirect: false };
 
-    if (children?.length || loadChildren) {
-      yield* getRoutesFromRouterConfig(
-        children ?? (await routerConfigLoader.loadChildren(injector, route).toPromise()).routes,
-        routerConfigLoader,
-        injector,
-        currentRoutePath,
-      );
+    if (children?.length) {
+      yield* getRoutesFromRouterConfig(children, compiler, parentInjector, currentRoutePath);
+    }
+
+    if (loadChildren) {
+      const loadedChildRoutes = await loadChildrenHelper(
+        route,
+        compiler,
+        parentInjector,
+      ).toPromise();
+
+      if (loadedChildRoutes) {
+        const { routes: childRoutes, injector = parentInjector } = loadedChildRoutes;
+        yield* getRoutesFromRouterConfig(childRoutes, compiler, injector, currentRoutePath);
+      }
     }
   }
 }
@@ -92,10 +102,10 @@ export async function* extractRoutes(
 
     const injector = applicationRef.injector;
     const router = injector.get(Router);
-    const routerConfigLoader = injector.get(RouterConfigLoader);
+    const compiler = injector.get(Compiler);
 
     // Extract all the routes from the config.
-    yield* getRoutesFromRouterConfig(router.config, routerConfigLoader, injector);
+    yield* getRoutesFromRouterConfig(router.config, compiler, injector);
   } finally {
     platformRef.destroy();
   }
