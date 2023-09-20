@@ -15,6 +15,7 @@ import {
   createAngularCompilerHost,
   ensureSourceFileVersions,
 } from '../angular-host';
+import { createWorkerTransformer } from '../web-worker-transformer';
 import { AngularCompilation, EmitFileResult } from './angular-compilation';
 
 // Temporary deep import for transformer support
@@ -28,6 +29,7 @@ class AngularCompilationState {
     public readonly typeScriptProgram: ts.EmitAndSemanticDiagnosticsBuilderProgram,
     public readonly affectedFiles: ReadonlySet<ts.SourceFile>,
     public readonly templateDiagnosticsOptimization: ng.OptimizeFor,
+    public readonly webWorkerTransform: ts.TransformerFactory<ts.SourceFile>,
     public readonly diagnosticCache = new WeakMap<ts.SourceFile, ts.Diagnostic[]>(),
   ) {}
 
@@ -97,6 +99,7 @@ export class AotCompilation extends AngularCompilation {
       typeScriptProgram,
       affectedFiles,
       affectedFiles.size === 1 ? OptimizeFor.SingleFile : OptimizeFor.WholeProgram,
+      createWorkerTransformer(hostOptions.processWebWorker.bind(hostOptions)),
       this.#state?.diagnosticCache,
     );
 
@@ -172,7 +175,7 @@ export class AotCompilation extends AngularCompilation {
 
   emitAffectedFiles(): Iterable<EmitFileResult> {
     assert(this.#state, 'Angular compilation must be initialized prior to emitting files.');
-    const { angularCompiler, compilerHost, typeScriptProgram } = this.#state;
+    const { angularCompiler, compilerHost, typeScriptProgram, webWorkerTransform } = this.#state;
     const buildInfoFilename =
       typeScriptProgram.getCompilerOptions().tsBuildInfoFile ?? '.tsbuildinfo';
 
@@ -195,7 +198,10 @@ export class AotCompilation extends AngularCompilation {
       emittedFiles.set(sourceFile, { filename: sourceFile.fileName, contents });
     };
     const transformers = mergeTransformers(angularCompiler.prepareEmit().transformers, {
-      before: [replaceBootstrap(() => typeScriptProgram.getProgram().getTypeChecker())],
+      before: [
+        replaceBootstrap(() => typeScriptProgram.getProgram().getTypeChecker()),
+        webWorkerTransform,
+      ],
     });
 
     // TypeScript will loop until there are no more affected files in the program

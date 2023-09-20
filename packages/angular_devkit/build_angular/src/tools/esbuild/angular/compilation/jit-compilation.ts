@@ -12,6 +12,7 @@ import ts from 'typescript';
 import { profileSync } from '../../profiling';
 import { AngularHostOptions, createAngularCompilerHost } from '../angular-host';
 import { createJitResourceTransformer } from '../jit-resource-transformer';
+import { createWorkerTransformer } from '../web-worker-transformer';
 import { AngularCompilation, EmitFileResult } from './angular-compilation';
 
 class JitCompilationState {
@@ -20,6 +21,7 @@ class JitCompilationState {
     public readonly typeScriptProgram: ts.EmitAndSemanticDiagnosticsBuilderProgram,
     public readonly constructorParametersDownlevelTransform: ts.TransformerFactory<ts.SourceFile>,
     public readonly replaceResourcesTransform: ts.TransformerFactory<ts.SourceFile>,
+    public readonly webWorkerTransform: ts.TransformerFactory<ts.SourceFile>,
   ) {}
 }
 
@@ -70,6 +72,7 @@ export class JitCompilation extends AngularCompilation {
       typeScriptProgram,
       constructorParametersDownlevelTransform(typeScriptProgram.getProgram()),
       createJitResourceTransformer(() => typeScriptProgram.getProgram().getTypeChecker()),
+      createWorkerTransformer(hostOptions.processWebWorker.bind(hostOptions)),
     );
 
     const referencedFiles = typeScriptProgram
@@ -100,6 +103,7 @@ export class JitCompilation extends AngularCompilation {
       typeScriptProgram,
       constructorParametersDownlevelTransform,
       replaceResourcesTransform,
+      webWorkerTransform,
     } = this.#state;
     const buildInfoFilename =
       typeScriptProgram.getCompilerOptions().tsBuildInfoFile ?? '.tsbuildinfo';
@@ -118,7 +122,11 @@ export class JitCompilation extends AngularCompilation {
       emittedFiles.push({ filename: sourceFiles[0].fileName, contents });
     };
     const transformers = {
-      before: [replaceResourcesTransform, constructorParametersDownlevelTransform],
+      before: [
+        replaceResourcesTransform,
+        constructorParametersDownlevelTransform,
+        webWorkerTransform,
+      ],
     };
 
     // TypeScript will loop until there are no more affected files in the program
