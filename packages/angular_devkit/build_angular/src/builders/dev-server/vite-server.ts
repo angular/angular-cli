@@ -161,7 +161,7 @@ function handleUpdate(
     return;
   }
 
-  if (serverOptions.hmr) {
+  if (serverOptions.liveReload || serverOptions.hmr) {
     if (updatedFiles.every((f) => f.endsWith('.css'))) {
       const timestamp = Date.now();
       server.ws.send({
