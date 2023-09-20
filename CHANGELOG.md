@@ -1,3 +1,36 @@
+<a name="17.0.0-next.5"></a>
+
+# 17.0.0-next.5 (2023-09-20)
+
+## Breaking Changes
+
+###
+
+- Versions of TypeScript older than 5.2 are no longer supported.
+
+###
+
+| Commit                                                                                              | Type     | Description                                |
+| --------------------------------------------------------------------------------------------------- | -------- | ------------------------------------------ |
+| [1c00fd3fe](https://github.com/angular/angular-cli/commit/1c00fd3fe9ca764d96d1393af90e4dea4c132bf4) | refactor | drop support for older TypeScript versions |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                      |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------------- |
+| [8168ae2a8](https://github.com/angular/angular-cli/commit/8168ae2a892dd012707bd294ffd26d0a070c0b5d) | feat | apply global CSS updates without a live-reload when using `vite` |
+| [8f9a0d70c](https://github.com/angular/angular-cli/commit/8f9a0d70cdf692b19574410cebb4d029056263fc) | feat | support standalone apps route discovery during prerendering      |
+| [c8909406a](https://github.com/angular/angular-cli/commit/c8909406a57c9309f78eb5394456ce8fe3fdd131) | fix  | correctly re-point RXJS to ESM on Windows                        |
+| [48963fc17](https://github.com/angular/angular-cli/commit/48963fc17f92a5f6f339cb12bc9a842736e04ae4) | fix  | several windows fixes to application builder prerendering        |
+
+### @ngtools/webpack
+
+| Commit                                                                                              | Type | Description                      |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------- |
+| [9291ddab8](https://github.com/angular/angular-cli/commit/9291ddab85f83eb3b5f2a1bb5f960ff9e57d38fb) | fix  | fix recursion in webpack resolve |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="16.2.3"></a>
 
 # 16.2.3 (2023-09-20)
