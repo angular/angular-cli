@@ -52,7 +52,7 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
         'src/app/app.component.ts',
         `
         import 'bootstrap';
-        import 'zone.js/dist/zone-error';
+        import 'zone.js';
       `,
       );
 
