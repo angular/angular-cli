@@ -25,7 +25,7 @@ export interface ESMInMemoryFileLoaderWorkerData {
 const { outputFiles, workspaceRoot } = workerData as ESMInMemoryFileLoaderWorkerData;
 
 const TRANSFORMED_FILES: Record<string, string> = {};
-const CHUNKS_REGEXP = /file:\/\/\/(main\.server|chunk-\w+)\.mjs/;
+const CHUNKS_REGEXP = /file:\/\/\/(main\.server|chunk\.\w+)\.mjs/;
 const WORKSPACE_ROOT_FILE = pathToFileURL(join(workspaceRoot, 'index.mjs')).href;
 
 const JAVASCRIPT_TRANSFORMER = new JavaScriptTransformer(

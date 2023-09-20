@@ -109,7 +109,7 @@ export default createBuilder(
       `--testPathIgnorePatterns="<rootDir>/init-test-bed\\.mjs"`,
 
       // Skip shared chunks, as they are not entry points to tests.
-      `--testPathIgnorePatterns="<rootDir>/chunk-.*\\.mjs"`,
+      `--testPathIgnorePatterns="<rootDir>/chunk\\..*\\.mjs"`,
 
       // Optionally enable color.
       ...(colors.enabled ? ['--colors'] : []),

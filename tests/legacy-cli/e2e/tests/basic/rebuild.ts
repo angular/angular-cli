@@ -7,7 +7,7 @@ import { ngServe } from '../../utils/project';
 export default async function () {
   const esbuild = getGlobalVariable('argv')['esbuild'];
   const validBundleRegEx = esbuild ? /complete\./ : /Compiled successfully\./;
-  const lazyBundleRegEx = esbuild ? /chunk-/ : /lazy_module_ts\.js/;
+  const lazyBundleRegEx = esbuild ? /chunk\./ : /lazy_module_ts\.js/;
 
   const port = await ngServe();
   // Add a lazy module.

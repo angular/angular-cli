@@ -263,7 +263,7 @@ function getEsBuildCommonOptions(options: NormalizedApplicationBuildOptions): Bu
     outExtension: outExtension ? { '.js': `.${outExtension}` } : undefined,
     sourcemap: sourcemapOptions.scripts && (sourcemapOptions.hidden ? 'external' : true),
     splitting: true,
-    chunkNames: 'chunk-[hash]',
+    chunkNames: 'chunk.[hash]',
     tsconfig,
     external: externalDependencies,
     write: false,
