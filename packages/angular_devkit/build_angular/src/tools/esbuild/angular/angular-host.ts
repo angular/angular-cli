@@ -21,6 +21,7 @@ export interface AngularHostOptions {
     containingFile: string,
     stylesheetFile?: string,
   ): Promise<string | null>;
+  processWebWorker(workerFile: string, containingFile: string): string;
 }
 
 // Temporary deep import for host augmentation support.

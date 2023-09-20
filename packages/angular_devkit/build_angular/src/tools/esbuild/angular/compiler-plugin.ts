@@ -180,6 +180,25 @@ export function createCompilerPlugin(
 
             return contents;
           },
+          processWebWorker(workerFile, containingFile) {
+            // TODO: Implement bundling of the worker
+            // This temporarily issues a warning that workers are not yet processed.
+            (result.warnings ??= []).push({
+              text: 'Processing of Web Worker files is not yet implemented.',
+              location: null,
+              notes: [
+                {
+                  text: `The worker entry point file '${workerFile}' found in '${path.relative(
+                    styleOptions.workspaceRoot,
+                    containingFile,
+                  )}' will not be present in the output.`,
+                },
+              ],
+            });
+
+            // Returning the original file prevents modification to the containing file
+            return workerFile;
+          },
         };
 
         // Initialize the Angular compilation for the current build.
