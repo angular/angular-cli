@@ -37,7 +37,7 @@ interface SourceMap {
  * For more information, see https://developer.chrome.com/articles/x-google-ignore-list/
  * @returns An esbuild plugin.
  */
-export function createSourcemapIngorelistPlugin(): Plugin {
+export function createSourcemapIgnorelistPlugin(): Plugin {
   return {
     name: 'angular-sourcemap-ignorelist',
     setup(build): void {
