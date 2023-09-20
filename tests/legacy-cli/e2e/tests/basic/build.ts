@@ -16,8 +16,8 @@ export default async function () {
   // Production build
   const { stdout: stdout2 } = await ng('build');
   if (getGlobalVariable('argv')['esbuild']) {
-    // esbuild uses an 8 character hash
-    await expectFileToMatch('dist/test-project/index.html', /main\.[a-zA-Z0-9]{8}\.js/);
+    // esbuild uses an 8 character hash and a dash as separator
+    await expectFileToMatch('dist/test-project/index.html', /main-[a-zA-Z0-9]{8}\.js/);
   } else {
     await expectFileToMatch('dist/test-project/index.html', /main\.[a-zA-Z0-9]{16}\.js/);
   }
