@@ -9,8 +9,11 @@
 import { readdir } from 'fs/promises';
 import { expectFileToExist, expectFileToMatch, replaceInFile, writeFile } from '../../utils/fs';
 import { ng } from '../../utils/process';
+import { getGlobalVariable } from '../../utils/env';
 
 export default async function () {
+  const useWebpackBuilder = !getGlobalVariable('argv')['esbuild'];
+
   const workerPath = 'src/app/app.worker.ts';
   const snippetPath = 'src/app/app.component.ts';
   const projectTsConfig = 'tsconfig.json';
@@ -23,14 +26,25 @@ export default async function () {
   await expectFileToMatch(snippetPath, `new Worker(new URL('./app.worker', import.meta.url)`);
 
   await ng('build', '--configuration=development');
-  await expectFileToExist('dist/test-project/src_app_app_worker_ts.js');
-  await expectFileToMatch('dist/test-project/main.js', 'src_app_app_worker_ts');
+  if (useWebpackBuilder) {
+    await expectFileToExist('dist/test-project/src_app_app_worker_ts.js');
+    await expectFileToMatch('dist/test-project/main.js', 'src_app_app_worker_ts');
+  } else {
+    const workerOutputFile = await getWorkerOutputFile(false);
+    await expectFileToExist(`dist/test-project/${workerOutputFile}`);
+    await expectFileToMatch('dist/test-project/main.js', workerOutputFile);
+  }
 
   await ng('build', '--output-hashing=none');
 
-  const chunkId = await getWorkerChunkId();
-  await expectFileToExist(`dist/test-project/${chunkId}.js`);
-  await expectFileToMatch('dist/test-project/main.js', chunkId);
+  const workerOutputFile = await getWorkerOutputFile(useWebpackBuilder);
+  await expectFileToExist(`dist/test-project/${workerOutputFile}`);
+  if (useWebpackBuilder) {
+    // Check Webpack builds for the numeric chunk identifier
+    await expectFileToMatch('dist/test-project/main.js', workerOutputFile.substring(0, 3));
+  } else {
+    await expectFileToMatch('dist/test-project/main.js', workerOutputFile);
+  }
 
   // console.warn has to be used because chrome only captures warnings and errors by default
   // https://github.com/angular/protractor/issues/2207
@@ -56,13 +70,18 @@ export default async function () {
   await ng('e2e');
 }
 
-async function getWorkerChunkId(): Promise<string> {
+async function getWorkerOutputFile(useWebpackBuilder: boolean): Promise<string> {
   const files = await readdir('dist/test-project');
-  const fileName = files.find((f) => /^\d{3}\.js$/.test(f));
-
-  if (!fileName) {
-    throw new Error('Cannot determine worker chunk Id.');
+  let fileName;
+  if (useWebpackBuilder) {
+    fileName = files.find((f) => /^\d{3}\.js$/.test(f));
+  } else {
+    fileName = files.find((f) => /worker-[\dA-Z]{8}\.js/.test(f));
   }
 
-  return fileName.substring(0, 3);
+  if (!fileName) {
+    throw new Error('Cannot determine worker output file name.');
+  }
+
+  return fileName;
 }
