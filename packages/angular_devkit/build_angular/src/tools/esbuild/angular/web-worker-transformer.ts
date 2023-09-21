@@ -97,7 +97,15 @@ export function createWorkerTransformer(
                     workerUrlNode.arguments,
                   ),
                 ),
-                node.arguments[1],
+                // Use the second Worker argument (options) if present.
+                // Otherwise create a default options object for module Workers.
+                node.arguments[1] ??
+                  nodeFactory.createObjectLiteralExpression([
+                    nodeFactory.createPropertyAssignment(
+                      'type',
+                      nodeFactory.createStringLiteral('module'),
+                    ),
+                  ]),
               ],
               node.arguments.hasTrailingComma,
             ),

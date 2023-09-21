@@ -38,6 +38,7 @@ ESBUILD_TESTS = [
     "tests/build/relative-sourcemap.js",
     "tests/build/styles/**",
     "tests/build/prerender/**",
+    "tests/build/worker.js",
     "tests/commands/add/**",
     "tests/i18n/**",
 ]

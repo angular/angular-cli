@@ -125,8 +125,8 @@ export function createCompilerPlugin(
         new Map<string, string | Uint8Array>();
 
       // The stylesheet resources from component stylesheets that will be added to the build results output files
-      let stylesheetResourceFiles: OutputFile[] = [];
-      let stylesheetMetafiles: Metafile[];
+      let additionalOutputFiles: OutputFile[] = [];
+      let additionalMetafiles: Metafile[];
 
       // Create new reusable compilation for the appropriate mode based on the `jit` plugin option
       const compilation: AngularCompilation = pluginOptions.noopTypeScriptCompilation
@@ -146,9 +146,9 @@ export function createCompilerPlugin(
         // Reset debug performance tracking
         resetCumulativeDurations();
 
-        // Reset stylesheet resource output files
-        stylesheetResourceFiles = [];
-        stylesheetMetafiles = [];
+        // Reset additional output files
+        additionalOutputFiles = [];
+        additionalMetafiles = [];
 
         // Create Angular compiler host options
         const hostOptions: AngularHostOptions = {
@@ -173,31 +173,50 @@ export function createCompilerPlugin(
               (result.errors ??= []).push(...errors);
             }
             (result.warnings ??= []).push(...warnings);
-            stylesheetResourceFiles.push(...resourceFiles);
+            additionalOutputFiles.push(...resourceFiles);
             if (stylesheetResult.metafile) {
-              stylesheetMetafiles.push(stylesheetResult.metafile);
+              additionalMetafiles.push(stylesheetResult.metafile);
             }
 
             return contents;
           },
           processWebWorker(workerFile, containingFile) {
-            // TODO: Implement bundling of the worker
-            // This temporarily issues a warning that workers are not yet processed.
-            (result.warnings ??= []).push({
-              text: 'Processing of Web Worker files is not yet implemented.',
-              location: null,
-              notes: [
-                {
-                  text: `The worker entry point file '${workerFile}' found in '${path.relative(
-                    styleOptions.workspaceRoot,
-                    containingFile,
-                  )}' will not be present in the output.`,
-                },
-              ],
+            const fullWorkerPath = path.join(path.dirname(containingFile), workerFile);
+            // The synchronous API must be used due to the TypeScript compilation currently being
+            // fully synchronous and this process callback being called from within a TypeScript
+            // transformer.
+            const workerResult = build.esbuild.buildSync({
+              platform: 'browser',
+              write: false,
+              bundle: true,
+              metafile: true,
+              format: 'esm',
+              mainFields: ['es2020', 'es2015', 'browser', 'module', 'main'],
+              sourcemap: pluginOptions.sourcemap,
+              entryNames: 'worker-[hash]',
+              entryPoints: [fullWorkerPath],
+              absWorkingDir: build.initialOptions.absWorkingDir,
+              outdir: build.initialOptions.outdir,
+              minifyIdentifiers: build.initialOptions.minifyIdentifiers,
+              minifySyntax: build.initialOptions.minifySyntax,
+              minifyWhitespace: build.initialOptions.minifyWhitespace,
+              target: build.initialOptions.target,
             });
 
-            // Returning the original file prevents modification to the containing file
-            return workerFile;
+            if (workerResult.errors) {
+              (result.errors ??= []).push(...workerResult.errors);
+            }
+            (result.warnings ??= []).push(...workerResult.warnings);
+            additionalOutputFiles.push(...workerResult.outputFiles);
+            if (workerResult.metafile) {
+              additionalMetafiles.push(workerResult.metafile);
+            }
+
+            // Return bundled worker file entry name to be used in the built output
+            return path.relative(
+              build.initialOptions.outdir ?? '',
+              workerResult.outputFiles[0].path,
+            );
           },
         };
 
@@ -365,20 +384,20 @@ export function createCompilerPlugin(
         setupJitPluginCallbacks(
           build,
           styleOptions,
-          stylesheetResourceFiles,
+          additionalOutputFiles,
           pluginOptions.loadResultCache,
         );
       }
 
       build.onEnd((result) => {
-        // Add any component stylesheet resource files to the output files
-        if (stylesheetResourceFiles.length) {
-          result.outputFiles?.push(...stylesheetResourceFiles);
+        // Add any additional output files to the main output files
+        if (additionalOutputFiles.length) {
+          result.outputFiles?.push(...additionalOutputFiles);
         }
 
-        // Combine component stylesheet metafiles with main metafile
-        if (result.metafile && stylesheetMetafiles.length) {
-          for (const metafile of stylesheetMetafiles) {
+        // Combine additional metafiles with main metafile
+        if (result.metafile && additionalMetafiles.length) {
+          for (const metafile of additionalMetafiles) {
             result.metafile.inputs = { ...result.metafile.inputs, ...metafile.inputs };
             result.metafile.outputs = { ...result.metafile.outputs, ...metafile.outputs };
           }
