@@ -23,10 +23,6 @@ describe('Server Schematic', () => {
   const defaultOptions: ServerOptions = {
     project: 'bar',
   };
-  const workspaceUniversalOptions: ServerOptions = {
-    project: 'workspace',
-  };
-
   const workspaceOptions: WorkspaceOptions = {
     name: 'workspace',
     newProjectRoot: 'projects',
@@ -43,86 +39,68 @@ describe('Server Schematic', () => {
     skipPackageJson: false,
   };
 
-  const initialWorkspaceAppOptions: ApplicationOptions = {
-    name: 'workspace',
-    projectRoot: '',
-    inlineStyle: false,
-    inlineTemplate: false,
-    routing: false,
-    style: Style.Css,
-    skipTests: false,
-    skipPackageJson: false,
-  };
-
   let appTree: UnitTestTree;
 
   beforeEach(async () => {
     appTree = await schematicRunner.runSchematic('workspace', workspaceOptions);
-    appTree = await schematicRunner.runSchematic(
-      'application',
-      initialWorkspaceAppOptions,
-      appTree,
-    );
-    appTree = await schematicRunner.runSchematic('application', appOptions, appTree);
   });
 
-  it('should create a root module file', async () => {
-    const tree = await schematicRunner.runSchematic('server', defaultOptions, appTree);
-    const filePath = '/projects/bar/src/app/app.module.server.ts';
-    expect(tree.exists(filePath)).toBeTrue();
-  });
+  describe('non standalone application', () => {
+    beforeEach(async () => {
+      appTree = await schematicRunner.runSchematic(
+        'application',
+        { ...appOptions, standalone: false },
+        appTree,
+      );
+    });
 
-  it('should create a main file', async () => {
-    const tree = await schematicRunner.runSchematic('server', defaultOptions, appTree);
-    const filePath = '/projects/bar/src/main.server.ts';
-    expect(tree.exists(filePath)).toBeTrue();
-    const contents = tree.readContent(filePath);
-    expect(contents).toContain(
-      `export { AppServerModule as default } from './app/app.module.server';`,
-    );
-  });
+    it('should create a root module file', async () => {
+      const tree = await schematicRunner.runSchematic('server', defaultOptions, appTree);
+      const filePath = '/projects/bar/src/app/app.module.server.ts';
+      expect(tree.exists(filePath)).toBeTrue();
+    });
 
-  it('should add dependency: @angular/platform-server', async () => {
-    const tree = await schematicRunner.runSchematic('server', defaultOptions, appTree);
-    const filePath = '/package.json';
-    const contents = tree.readContent(filePath);
-    expect(contents).toMatch(/"@angular\/platform-server": "/);
-  });
+    it('should create a main file', async () => {
+      const tree = await schematicRunner.runSchematic('server', defaultOptions, appTree);
+      const filePath = '/projects/bar/src/main.server.ts';
+      expect(tree.exists(filePath)).toBeTrue();
+      const contents = tree.readContent(filePath);
+      expect(contents).toContain(
+        `export { AppServerModule as default } from './app/app.module.server';`,
+      );
+    });
 
-  it('should install npm dependencies', async () => {
-    await schematicRunner.runSchematic('server', defaultOptions, appTree);
-    expect(schematicRunner.tasks.length).toBe(1);
-    expect(schematicRunner.tasks[0].name).toBe('node-package');
-    expect((schematicRunner.tasks[0].options as { command: string }).command).toBe('install');
-  });
+    it('should add dependency: @angular/platform-server', async () => {
+      const tree = await schematicRunner.runSchematic('server', defaultOptions, appTree);
+      const filePath = '/package.json';
+      const contents = tree.readContent(filePath);
+      expect(contents).toMatch(/"@angular\/platform-server": "/);
+    });
 
-  it('should update tsconfig.app.json', async () => {
-    const tree = await schematicRunner.runSchematic('server', defaultOptions, appTree);
-    const filePath = '/projects/bar/tsconfig.app.json';
-    const contents = parseJson(tree.readContent(filePath).toString());
-    expect(contents.compilerOptions.types).toEqual(['node']);
-    expect(contents.files).toEqual(['src/main.ts', 'src/main.server.ts']);
+    it('should install npm dependencies', async () => {
+      await schematicRunner.runSchematic('server', defaultOptions, appTree);
+      expect(schematicRunner.tasks.length).toBe(1);
+      expect(schematicRunner.tasks[0].name).toBe('node-package');
+      expect((schematicRunner.tasks[0].options as { command: string }).command).toBe('install');
+    });
+
+    it('should update tsconfig.app.json', async () => {
+      const tree = await schematicRunner.runSchematic('server', defaultOptions, appTree);
+      const filePath = '/projects/bar/tsconfig.app.json';
+      const contents = parseJson(tree.readContent(filePath).toString());
+      expect(contents.compilerOptions.types).toEqual(['node']);
+      expect(contents.files).toEqual(['src/main.ts', 'src/main.server.ts']);
+    });
   });
 
   describe('standalone application', () => {
-    let standaloneAppOptions;
-    let defaultStandaloneOptions: ServerOptions;
     beforeEach(async () => {
-      const standaloneAppName = 'baz';
-      standaloneAppOptions = {
-        ...appOptions,
-        name: standaloneAppName,
-        standalone: true,
-      };
-      defaultStandaloneOptions = {
-        project: standaloneAppName,
-      };
-      appTree = await schematicRunner.runSchematic('application', standaloneAppOptions, appTree);
+      appTree = await schematicRunner.runSchematic('application', appOptions, appTree);
     });
 
     it('should create not root module file', async () => {
-      const tree = await schematicRunner.runSchematic('server', defaultStandaloneOptions, appTree);
-      const filePath = '/projects/baz/src/app/app.module.server.ts';
+      const tree = await schematicRunner.runSchematic('server', defaultOptions, appTree);
+      const filePath = '/projects/bar/src/app/app.module.server.ts';
       expect(tree.exists(filePath)).toEqual(false);
     });
 
@@ -136,16 +114,16 @@ describe('Server Schematic', () => {
     });
 
     it('should create a main file', async () => {
-      const tree = await schematicRunner.runSchematic('server', defaultStandaloneOptions, appTree);
-      const filePath = '/projects/baz/src/main.server.ts';
+      const tree = await schematicRunner.runSchematic('server', defaultOptions, appTree);
+      const filePath = '/projects/bar/src/main.server.ts';
       expect(tree.exists(filePath)).toBeTrue();
       const contents = tree.readContent(filePath);
       expect(contents).toContain(`bootstrapApplication(AppComponent, config)`);
     });
 
     it('should create server app config file', async () => {
-      const tree = await schematicRunner.runSchematic('server', defaultStandaloneOptions, appTree);
-      const filePath = '/projects/baz/src/app/app.config.server.ts';
+      const tree = await schematicRunner.runSchematic('server', defaultOptions, appTree);
+      const filePath = '/projects/bar/src/app/app.config.server.ts';
       expect(tree.exists(filePath)).toBeTrue();
       const contents = tree.readContent(filePath);
       expect(contents).toContain(`const serverConfig: ApplicationConfig = {`);
@@ -174,7 +152,8 @@ describe('Server Schematic', () => {
       appTree.overwrite('/angular.json', JSON.stringify(config, undefined, 2));
     }
 
-    beforeEach(() => {
+    beforeEach(async () => {
+      appTree = await schematicRunner.runSchematic('application', appOptions, appTree);
       convertBuilderToLegacyBrowser();
     });
 

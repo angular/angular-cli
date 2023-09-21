@@ -49,7 +49,7 @@
     "standalone": {
       "description": "Whether the generated pipe is standalone.",
       "type": "boolean",
-      "default": false,
+      "default": true,
       "x-user-analytics": "ep.ng_standalone"
     },
     "module": {

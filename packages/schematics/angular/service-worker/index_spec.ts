@@ -63,27 +63,6 @@ describe('Service Worker Schematic', () => {
     expect(pkg.dependencies['@angular/service-worker']).toEqual(version);
   });
 
-  it('should import ServiceWorkerModule', async () => {
-    const tree = await schematicRunner.runSchematic('service-worker', defaultOptions, appTree);
-    const pkgText = tree.readContent('/projects/bar/src/app/app.module.ts');
-    expect(pkgText).toMatch(/import \{ ServiceWorkerModule \} from '@angular\/service-worker'/);
-  });
-
-  it('should add the SW import to the NgModule imports', async () => {
-    const tree = await schematicRunner.runSchematic('service-worker', defaultOptions, appTree);
-    const pkgText = tree.readContent('/projects/bar/src/app/app.module.ts');
-    expect(pkgText).toMatch(
-      new RegExp(
-        "(\\s+)ServiceWorkerModule\\.register\\('ngsw-worker\\.js', \\{\\n" +
-          '\\1  enabled: !isDevMode\\(\\),\\n' +
-          '\\1  // Register the ServiceWorker as soon as the application is stable\\n' +
-          '\\1  // or after 30 seconds \\(whichever comes first\\)\\.\\n' +
-          "\\1  registrationStrategy: 'registerWhenStable:30000'\\n" +
-          '\\1}\\)',
-      ),
-    );
-  });
-
   it('should put the ngsw-config.json file in the project root', async () => {
     const tree = await schematicRunner.runSchematic('service-worker', defaultOptions, appTree);
     const path = '/projects/bar/ngsw-config.json';
@@ -154,55 +133,72 @@ describe('Service Worker Schematic', () => {
     expect(tree.exists('/ngsw-config.json')).toBe(true);
   });
 
-  describe('standalone', () => {
+  it(`should add the 'provideServiceWorker' to providers`, async () => {
+    const tree = await schematicRunner.runSchematic('service-worker', defaultOptions, appTree);
+    const content = tree.readContent('/projects/bar/src/app/app.config.ts');
+    expect(tags.oneLine`${content}`).toContain(tags.oneLine`
+      providers: [provideServiceWorker('ngsw-worker.js', {
+        enabled: !isDevMode(),
+        registrationStrategy: 'registerWhenStable:30000'
+      })]
+    `);
+  });
+
+  it(`should import 'isDevMode' from '@angular/core'`, async () => {
+    const tree = await schematicRunner.runSchematic('service-worker', defaultOptions, appTree);
+    const content = tree.readContent('/projects/bar/src/app/app.config.ts');
+    expect(content).toContain(`import { ApplicationConfig, isDevMode } from '@angular/core';`);
+  });
+
+  it(`should import 'provideServiceWorker' from '@angular/service-worker'`, async () => {
+    const tree = await schematicRunner.runSchematic('service-worker', defaultOptions, appTree);
+    const content = tree.readContent('/projects/bar/src/app/app.config.ts');
+    expect(content).toContain(`import { provideServiceWorker } from '@angular/service-worker';`);
+  });
+
+  describe('standalone=false', () => {
     const name = 'buz';
-    const standaloneAppOptions: ApplicationOptions = {
+    const nonStandaloneAppOptions: ApplicationOptions = {
       ...appOptions,
       name,
-      standalone: true,
+      standalone: false,
     };
-    const standaloneSWOptions: ServiceWorkerOptions = {
+    const nonStandaloneSWOptions: ServiceWorkerOptions = {
       ...defaultOptions,
       project: name,
     };
 
     beforeEach(async () => {
-      appTree = await schematicRunner.runSchematic('application', standaloneAppOptions, appTree);
+      appTree = await schematicRunner.runSchematic('application', nonStandaloneAppOptions, appTree);
     });
 
-    it(`should add the 'provideServiceWorker' to providers`, async () => {
+    it('should import ServiceWorkerModule', async () => {
       const tree = await schematicRunner.runSchematic(
         'service-worker',
-        standaloneSWOptions,
+        nonStandaloneSWOptions,
         appTree,
       );
-      const content = tree.readContent('/projects/buz/src/app/app.config.ts');
-      expect(tags.oneLine`${content}`).toContain(tags.oneLine`
-        providers: [provideServiceWorker('ngsw-worker.js', {
-          enabled: !isDevMode(),
-          registrationStrategy: 'registerWhenStable:30000'
-        })]
-      `);
+      const pkgText = tree.readContent('/projects/buz/src/app/app.module.ts');
+      expect(pkgText).toMatch(/import \{ ServiceWorkerModule \} from '@angular\/service-worker'/);
     });
 
-    it(`should import 'isDevMode' from '@angular/core'`, async () => {
+    it('should add the SW import to the NgModule imports', async () => {
       const tree = await schematicRunner.runSchematic(
         'service-worker',
-        standaloneSWOptions,
+        nonStandaloneSWOptions,
         appTree,
       );
-      const content = tree.readContent('/projects/buz/src/app/app.config.ts');
-      expect(content).toContain(`import { ApplicationConfig, isDevMode } from '@angular/core';`);
-    });
-
-    it(`should import 'provideServiceWorker' from '@angular/service-worker'`, async () => {
-      const tree = await schematicRunner.runSchematic(
-        'service-worker',
-        standaloneSWOptions,
-        appTree,
+      const pkgText = tree.readContent('/projects/buz/src/app/app.module.ts');
+      expect(pkgText).toMatch(
+        new RegExp(
+          "(\\s+)ServiceWorkerModule\\.register\\('ngsw-worker\\.js', \\{\\n" +
+            '\\1  enabled: !isDevMode\\(\\),\\n' +
+            '\\1  // Register the ServiceWorker as soon as the application is stable\\n' +
+            '\\1  // or after 30 seconds \\(whichever comes first\\)\\.\\n' +
+            "\\1  registrationStrategy: 'registerWhenStable:30000'\\n" +
+            '\\1}\\)',
+        ),
       );
-      const content = tree.readContent('/projects/buz/src/app/app.config.ts');
-      expect(content).toContain(`import { provideServiceWorker } from '@angular/service-worker';`);
     });
   });
 

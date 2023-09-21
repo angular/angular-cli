@@ -43,7 +43,7 @@ describe('Library Schematic', () => {
     workspaceTree = await schematicRunner.runSchematic('workspace', workspaceOptions);
   });
 
-  it('should create files', async () => {
+  it('should create correct files', async () => {
     const tree = await schematicRunner.runSchematic('library', defaultOptions, workspaceTree);
 
     const files = tree.files;
@@ -55,13 +55,23 @@ describe('Library Schematic', () => {
         '/projects/foo/tsconfig.lib.json',
         '/projects/foo/tsconfig.lib.prod.json',
         '/projects/foo/src/my-index.ts',
-        '/projects/foo/src/lib/foo.module.ts',
         '/projects/foo/src/lib/foo.component.spec.ts',
         '/projects/foo/src/lib/foo.component.ts',
         '/projects/foo/src/lib/foo.service.spec.ts',
         '/projects/foo/src/lib/foo.service.ts',
       ]),
     );
+  });
+
+  it('should not add reference to module file in entry-file', async () => {
+    const tree = await schematicRunner.runSchematic('library', defaultOptions, workspaceTree);
+    expect(tree.readContent('/projects/foo/src/my-index.ts')).not.toContain('foo.module');
+  });
+
+  it('should create a standalone component', async () => {
+    const tree = await schematicRunner.runSchematic('library', defaultOptions, workspaceTree);
+    const componentContent = tree.readContent('/projects/foo/src/lib/foo.component.ts');
+    expect(componentContent).toContain('standalone: true');
   });
 
   describe('custom projectRoot', () => {
@@ -90,7 +100,6 @@ describe('Library Schematic', () => {
           '/some/other/directory/bar/tsconfig.lib.json',
           '/some/other/directory/bar/tsconfig.lib.prod.json',
           '/some/other/directory/bar/src/my-index.ts',
-          '/some/other/directory/bar/src/lib/foo.module.ts',
           '/some/other/directory/bar/src/lib/foo.component.spec.ts',
           '/some/other/directory/bar/src/lib/foo.component.ts',
           '/some/other/directory/bar/src/lib/foo.service.spec.ts',
@@ -204,13 +213,6 @@ describe('Library Schematic', () => {
     expect(svcContent).toMatch(/providedIn: 'root'/);
   });
 
-  it('should export the component in the NgModule', async () => {
-    const tree = await schematicRunner.runSchematic('library', defaultOptions, workspaceTree);
-
-    const fileContent = getFileContent(tree, '/projects/foo/src/lib/foo.module.ts');
-    expect(fileContent).toMatch(/exports: \[\n(\s*) {2}FooComponent\n\1\]/);
-  });
-
   describe(`update package.json`, () => {
     it(`should add ng-packagr to devDependencies`, async () => {
       const tree = await schematicRunner.runSchematic('library', defaultOptions, workspaceTree);
@@ -318,7 +320,7 @@ describe('Library Schematic', () => {
 
     const pkgJsonPath = '/projects/myscope/mylib/package.json';
     expect(tree.files).toContain(pkgJsonPath);
-    expect(tree.files).toContain('/projects/myscope/mylib/src/lib/mylib.module.ts');
+    expect(tree.files).toContain('/projects/myscope/mylib/src/lib/mylib.service.ts');
     expect(tree.files).toContain('/projects/myscope/mylib/src/lib/mylib.component.ts');
 
     const pkgJson = JSON.parse(tree.readContent(pkgJsonPath));
@@ -391,13 +393,24 @@ describe('Library Schematic', () => {
     );
   });
 
-  describe('standalone', () => {
-    const defaultStandaloneOptions = { ...defaultOptions, standalone: true };
+  describe('standalone=false', () => {
+    const defaultNonStandaloneOptions = { ...defaultOptions, standalone: false };
 
-    it('should create correct files', async () => {
+    it('should export the component in the NgModule', async () => {
       const tree = await schematicRunner.runSchematic(
         'library',
-        defaultStandaloneOptions,
+        defaultNonStandaloneOptions,
+        workspaceTree,
+      );
+
+      const fileContent = getFileContent(tree, '/projects/foo/src/lib/foo.module.ts');
+      expect(fileContent).toMatch(/exports: \[\n(\s*) {2}FooComponent\n\1\]/);
+    });
+
+    it('should create files', async () => {
+      const tree = await schematicRunner.runSchematic(
+        'library',
+        defaultNonStandaloneOptions,
         workspaceTree,
       );
 
@@ -410,31 +423,13 @@ describe('Library Schematic', () => {
           '/projects/foo/tsconfig.lib.json',
           '/projects/foo/tsconfig.lib.prod.json',
           '/projects/foo/src/my-index.ts',
+          '/projects/foo/src/lib/foo.module.ts',
           '/projects/foo/src/lib/foo.component.spec.ts',
           '/projects/foo/src/lib/foo.component.ts',
           '/projects/foo/src/lib/foo.service.spec.ts',
           '/projects/foo/src/lib/foo.service.ts',
         ]),
       );
-    });
-
-    it('should not add reference to module file in entry-file', async () => {
-      const tree = await schematicRunner.runSchematic(
-        'library',
-        defaultStandaloneOptions,
-        workspaceTree,
-      );
-      expect(tree.readContent('/projects/foo/src/my-index.ts')).not.toContain('foo.module');
-    });
-
-    it('should create a standalone component', async () => {
-      const tree = await schematicRunner.runSchematic(
-        'library',
-        defaultStandaloneOptions,
-        workspaceTree,
-      );
-      const componentContent = tree.readContent('/projects/foo/src/lib/foo.component.ts');
-      expect(componentContent).toContain('standalone: true');
     });
   });
 });
