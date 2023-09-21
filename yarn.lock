@@ -123,9 +123,10 @@
   dependencies:
     tslib "^2.3.0"
 
-"@angular/bazel@https://github.com/angular/bazel-builds.git#184fafd0b36bea2adf17b60592dccebe6a605699":
-  version "17.0.0-next.4"
-  resolved "https://github.com/angular/bazel-builds.git#184fafd0b36bea2adf17b60592dccebe6a605699"
+"@angular/bazel@https://github.com/angular/bazel-builds.git#029a92c7fa71db56267645775011b7d0cf93fe6e":
+  version "17.0.0-next.5+sha-0a4f18a"
+  uid "029a92c7fa71db56267645775011b7d0cf93fe6e"
+  resolved "https://github.com/angular/bazel-builds.git#029a92c7fa71db56267645775011b7d0cf93fe6e"
   dependencies:
     "@microsoft/api-extractor" "^7.24.2"
     magic-string "^0.30.0"
@@ -139,9 +140,10 @@
     "@angular/core" "^13.0.0 || ^14.0.0-0"
     reflect-metadata "^0.1.13"
 
-"@angular/build-tooling@https://github.com/angular/dev-infra-private-build-tooling-builds.git#846fcd1dc50a1e0a9ef5ba842ea588749921efd1":
-  version "0.0.0-b57414124cf00fcbf1ecb190bdeb1a1396361424"
-  resolved "https://github.com/angular/dev-infra-private-build-tooling-builds.git#846fcd1dc50a1e0a9ef5ba842ea588749921efd1"
+"@angular/build-tooling@https://github.com/angular/dev-infra-private-build-tooling-builds.git#b8b41c5f814de0505458a7fcb20e991ecefbaa53":
+  version "0.0.0-62e28b76575609d5fdf5fa4028126d3897a0d60f"
+  uid b8b41c5f814de0505458a7fcb20e991ecefbaa53
+  resolved "https://github.com/angular/dev-infra-private-build-tooling-builds.git#b8b41c5f814de0505458a7fcb20e991ecefbaa53"
   dependencies:
     "@angular-devkit/build-angular" "17.0.0-next.4"
     "@angular/benchpress" "0.3.0"
@@ -155,7 +157,7 @@
     "@bazel/runfiles" "5.8.1"
     "@bazel/terser" "5.8.1"
     "@bazel/typescript" "5.8.1"
-    "@microsoft/api-extractor" "7.36.4"
+    "@microsoft/api-extractor" "7.37.0"
     "@types/browser-sync" "^2.26.3"
     "@types/marked" "^5.0.1"
     "@types/node" "16.10.9"
@@ -303,9 +305,10 @@
     "@material/typography" "15.0.0-canary.bc9ae6c9c.0"
     tslib "^2.3.0"
 
-"@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#1eb7b574d63c1ba0a199e4272dee28de31c03084":
-  version "0.0.0-b57414124cf00fcbf1ecb190bdeb1a1396361424"
-  resolved "https://github.com/angular/dev-infra-private-ng-dev-builds.git#1eb7b574d63c1ba0a199e4272dee28de31c03084"
+"@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#3bde09ee389fa27cb2343fd145b6dda59a59bd49":
+  version "0.0.0-62e28b76575609d5fdf5fa4028126d3897a0d60f"
+  uid "3bde09ee389fa27cb2343fd145b6dda59a59bd49"
+  resolved "https://github.com/angular/dev-infra-private-ng-dev-builds.git#3bde09ee389fa27cb2343fd145b6dda59a59bd49"
   dependencies:
     "@yarnpkg/lockfile" "^1.1.0"
     typescript "~4.9.0"
@@ -2609,15 +2612,6 @@
     "@material/theme" "15.0.0-canary.bc9ae6c9c.0"
     tslib "^2.1.0"
 
-"@microsoft/api-extractor-model@7.27.6":
-  version "7.27.6"
-  resolved "https://registry.yarnpkg.com/@microsoft/api-extractor-model/-/api-extractor-model-7.27.6.tgz#308e44cd595d2fb446c6357759ee0675ec37d26e"
-  integrity sha512-eiCnlayyum1f7fS2nA9pfIod5VCNR1G+Tq84V/ijDrKrOFVa598BLw145nCsGDMoFenV6ajNi2PR5WCwpAxW6Q==
-  dependencies:
-    "@microsoft/tsdoc" "0.14.2"
-    "@microsoft/tsdoc-config" "~0.16.1"
-    "@rushstack/node-core-library" "3.59.7"
-
 "@microsoft/api-extractor-model@7.28.0":
   version "7.28.0"
   resolved "https://registry.yarnpkg.com/@microsoft/api-extractor-model/-/api-extractor-model-7.28.0.tgz#33136473abd048ca219a7f0bcb0b80030d712853"
@@ -2627,25 +2621,7 @@
     "@microsoft/tsdoc-config" "~0.16.1"
     "@rushstack/node-core-library" "3.60.0"
 
-"@microsoft/api-extractor@7.36.4":
-  version "7.36.4"
-  resolved "https://registry.yarnpkg.com/@microsoft/api-extractor/-/api-extractor-7.36.4.tgz#3bb9fbbbeacaa48eea49150351905a2677a506d9"
-  integrity sha512-21UECq8C/8CpHT23yiqTBQ10egKUacIpxkPyYR7hdswo/M5yTWdBvbq+77YC9uPKQJOUfOD1FImBQ1DzpsdeQQ==
-  dependencies:
-    "@microsoft/api-extractor-model" "7.27.6"
-    "@microsoft/tsdoc" "0.14.2"
-    "@microsoft/tsdoc-config" "~0.16.1"
-    "@rushstack/node-core-library" "3.59.7"
-    "@rushstack/rig-package" "0.4.1"
-    "@rushstack/ts-command-line" "4.15.2"
-    colors "~1.2.1"
-    lodash "~4.17.15"
-    resolve "~1.22.1"
-    semver "~7.5.4"
-    source-map "~0.6.1"
-    typescript "~5.0.4"
-
-"@microsoft/api-extractor@^7.24.2":
+"@microsoft/api-extractor@7.37.0", "@microsoft/api-extractor@^7.24.2":
   version "7.37.0"
   resolved "https://registry.yarnpkg.com/@microsoft/api-extractor/-/api-extractor-7.37.0.tgz#374a0ef0e166de53a44033c4c59c7f25c96e15e5"
   integrity sha512-df/wffWpDhYRw7kzdxeHGsCpim+dC8aFiZlsJb4uFvVPWhBZpDzOhQxSUTFx3Df1ORY+/JjuPR3fDE9Hq+PHzQ==
@@ -3057,19 +3033,6 @@
     estree-walker "^2.0.2"
     picomatch "^2.3.1"
 
-"@rushstack/node-core-library@3.59.7":
-  version "3.59.7"
-  resolved "https://registry.yarnpkg.com/@rushstack/node-core-library/-/node-core-library-3.59.7.tgz#9dcd62b79263e8a5b68465d4bf9124ec86e14b6c"
-  integrity sha512-ln1Drq0h+Hwa1JVA65x5mlSgUrBa1uHL+V89FqVWQgXd1vVIMhrtqtWGQrhTnFHxru5ppX+FY39VWELF/FjQCw==
-  dependencies:
-    colors "~1.2.1"
-    fs-extra "~7.0.1"
-    import-lazy "~4.0.0"
-    jju "~1.4.0"
-    resolve "~1.22.1"
-    semver "~7.5.4"
-    z-schema "~5.0.2"
-
 "@rushstack/node-core-library@3.60.0":
   version "3.60.0"
   resolved "https://registry.yarnpkg.com/@rushstack/node-core-library/-/node-core-library-3.60.0.tgz#a52ca6b98762e9f64c1735d21456510d2aa956e3"
@@ -3083,14 +3046,6 @@
     semver "~7.5.4"
     z-schema "~5.0.2"
 
-"@rushstack/rig-package@0.4.1":
-  version "0.4.1"
-  resolved "https://registry.yarnpkg.com/@rushstack/rig-package/-/rig-package-0.4.1.tgz#ff11bf67dad46f9b4f09db91cf45739ab411ee9f"
-  integrity sha512-AGRwpqlXNSp9LhUSz4HKI9xCluqQDt/obsQFdv/NYIekF3pTTPzc+HbQsIsjVjYnJ3DcmxOREVMhvrMEjpiq6g==
-  dependencies:
-    resolve "~1.22.1"
-    strip-json-comments "~3.1.1"
-
 "@rushstack/rig-package@0.5.0":
   version "0.5.0"
   resolved "https://registry.yarnpkg.com/@rushstack/rig-package/-/rig-package-0.5.0.tgz#cca786e08634d12c6fde790d524a410a17f173d9"
@@ -3098,16 +3053,6 @@
   dependencies:
     resolve "~1.22.1"
     strip-json-comments "~3.1.1"
-
-"@rushstack/ts-command-line@4.15.2":
-  version "4.15.2"
-  resolved "https://registry.yarnpkg.com/@rushstack/ts-command-line/-/ts-command-line-4.15.2.tgz#7920e3fa2ab6af129d995ce4424c600da0bf8a93"
-  integrity sha512-5+C2uoJY8b+odcZD6coEe2XNC4ZjGB4vCMESbqW/8DHRWC/qIHfANdmN9F1wz/lAgxz72i7xRoVtPY2j7e4gpQ==
-  dependencies:
-    "@types/argparse" "1.0.38"
-    argparse "~1.0.9"
-    colors "~1.2.1"
-    string-argv "~0.3.1"
 
 "@rushstack/ts-command-line@4.16.0":
   version "4.16.0"
