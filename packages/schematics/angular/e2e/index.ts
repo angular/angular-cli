@@ -22,6 +22,7 @@ import {
   DependencyType,
   ExistingBehavior,
   addDependency,
+  addRootProvider,
   updateWorkspace,
 } from '@schematics/angular/utility';
 import { posix as path } from 'path';
@@ -91,6 +92,11 @@ export default function (options: E2eOptions): Rule {
           }),
           move(e2eRootPath),
         ]),
+      ),
+      addRootProvider(
+        relatedAppName,
+        ({ code, external }) =>
+          code`${external('provideProtractorTestingSupport', '@angular/platform-browser')}()`,
       ),
       ...E2E_DEV_DEPENDENCIES.map((name) =>
         addDependency(name, latestVersions[name], {

@@ -51,7 +51,7 @@
     "standalone": {
       "description": "Creates a library based upon the standalone API, without NgModules.",
       "type": "boolean",
-      "default": false,
+      "default": true,
       "x-user-analytics": "ep.ng_standalone"
     }
   },

@@ -45,18 +45,6 @@ describe('Directive Schematic', () => {
     appTree = await schematicRunner.runSchematic('application', appOptions, appTree);
   });
 
-  it('should create a directive', async () => {
-    const options = { ...defaultOptions };
-
-    const tree = await schematicRunner.runSchematic('directive', options, appTree);
-    const files = tree.files;
-    expect(files).toContain('/projects/bar/src/app/foo.directive.spec.ts');
-    expect(files).toContain('/projects/bar/src/app/foo.directive.ts');
-    const moduleContent = tree.readContent('/projects/bar/src/app/app.module.ts');
-    expect(moduleContent).toMatch(/import.*Foo.*from '.\/foo.directive'/);
-    expect(moduleContent).toMatch(/declarations:\s*\[[^\]]+?,\r?\n\s+FooDirective\r?\n/m);
-  });
-
   it('should create respect the flat flag', async () => {
     const options = { ...defaultOptions, flat: false };
 
@@ -64,50 +52,6 @@ describe('Directive Schematic', () => {
     const files = tree.files;
     expect(files).toContain('/projects/bar/src/app/foo/foo.directive.spec.ts');
     expect(files).toContain('/projects/bar/src/app/foo/foo.directive.ts');
-  });
-
-  it('should find the closest module', async () => {
-    const options = { ...defaultOptions, flat: false };
-    const fooModule = '/projects/bar/src/app/foo/foo.module.ts';
-    appTree.create(
-      fooModule,
-      `
-      import { NgModule } from '@angular/core';
-
-      @NgModule({
-        imports: [],
-        declarations: []
-      })
-      export class FooModule { }
-    `,
-    );
-
-    const tree = await schematicRunner.runSchematic('directive', options, appTree);
-    const fooModuleContent = tree.readContent(fooModule);
-    expect(fooModuleContent).toMatch(/import { FooDirective } from '.\/foo.directive'/);
-  });
-
-  it('should export the directive', async () => {
-    const options = { ...defaultOptions, export: true };
-
-    const tree = await schematicRunner.runSchematic('directive', options, appTree);
-    const appModuleContent = tree.readContent('/projects/bar/src/app/app.module.ts');
-    expect(appModuleContent).toMatch(/exports: \[\n(\s*) {2}FooDirective\n\1\]/);
-  });
-
-  it('should import into a specified module', async () => {
-    const options = { ...defaultOptions, module: 'app.module.ts' };
-
-    const tree = await schematicRunner.runSchematic('directive', options, appTree);
-    const appModule = tree.readContent('/projects/bar/src/app/app.module.ts');
-
-    expect(appModule).toMatch(/import { FooDirective } from '.\/foo.directive'/);
-  });
-
-  it('should fail if specified module does not exist', async () => {
-    const options = { ...defaultOptions, module: '/projects/bar/src/app/app.moduleXXX.ts' };
-
-    await expectAsync(schematicRunner.runSchematic('directive', options, appTree)).toBeRejected();
   });
 
   it('should converts dash-cased-name to a camelCasedSelector', async () => {
@@ -150,23 +94,6 @@ describe('Directive Schematic', () => {
     expect(content).toMatch(/selector: '\[foo\]'/);
   });
 
-  it('should respect the sourceRoot value', async () => {
-    const config = JSON.parse(appTree.readContent('/angular.json'));
-    config.projects.bar.sourceRoot = 'projects/bar/custom';
-    appTree.overwrite('/angular.json', JSON.stringify(config, null, 2));
-
-    // should fail without a module in that dir
-    await expectAsync(
-      schematicRunner.runSchematic('directive', defaultOptions, appTree),
-    ).toBeRejected();
-
-    // move the module
-    appTree.rename('/projects/bar/src/app/app.module.ts', '/projects/bar/custom/app/app.module.ts');
-    appTree = await schematicRunner.runSchematic('directive', defaultOptions, appTree);
-
-    expect(appTree.files).toContain('/projects/bar/custom/app/foo.directive.ts');
-  });
-
   it('should respect skipTests flag', async () => {
     const options = { ...defaultOptions, skipTests: true };
 
@@ -179,10 +106,107 @@ describe('Directive Schematic', () => {
   it('should create a standalone directive', async () => {
     const options = { ...defaultOptions, standalone: true };
     const tree = await schematicRunner.runSchematic('directive', options, appTree);
-    const moduleContent = tree.readContent('/projects/bar/src/app/app.module.ts');
     const directiveContent = tree.readContent('/projects/bar/src/app/foo.directive.ts');
     expect(directiveContent).toContain('standalone: true');
     expect(directiveContent).toContain('class FooDirective');
-    expect(moduleContent).not.toContain('FooDirective');
+  });
+
+  describe('standalone=false', () => {
+    const defaultNonStandaloneOptions: DirectiveOptions = {
+      ...defaultOptions,
+      standalone: false,
+      project: 'baz',
+    };
+
+    beforeEach(async () => {
+      appTree = await schematicRunner.runSchematic(
+        'application',
+        { ...appOptions, standalone: false, name: 'baz' },
+        appTree,
+      );
+    });
+
+    it('should create a directive', async () => {
+      const options = { ...defaultNonStandaloneOptions };
+
+      const tree = await schematicRunner.runSchematic('directive', options, appTree);
+      const files = tree.files;
+      expect(files).toContain('/projects/baz/src/app/foo.directive.spec.ts');
+      expect(files).toContain('/projects/baz/src/app/foo.directive.ts');
+      const moduleContent = tree.readContent('/projects/baz/src/app/app.module.ts');
+      expect(moduleContent).toMatch(/import.*Foo.*from '.\/foo.directive'/);
+      expect(moduleContent).toMatch(/declarations:\s*\[[^\]]+?,\r?\n\s+FooDirective\r?\n/m);
+    });
+
+    it('should respect the sourceRoot value', async () => {
+      const config = JSON.parse(appTree.readContent('/angular.json'));
+      config.projects.baz.sourceRoot = 'projects/baz/custom';
+      appTree.overwrite('/angular.json', JSON.stringify(config, null, 2));
+
+      // should fail without a module in that dir
+      await expectAsync(
+        schematicRunner.runSchematic('directive', defaultNonStandaloneOptions, appTree),
+      ).toBeRejected();
+
+      // move the module
+      appTree.rename(
+        '/projects/baz/src/app/app.module.ts',
+        '/projects/baz/custom/app/app.module.ts',
+      );
+      appTree = await schematicRunner.runSchematic(
+        'directive',
+        defaultNonStandaloneOptions,
+        appTree,
+      );
+
+      expect(appTree.files).toContain('/projects/baz/custom/app/foo.directive.ts');
+    });
+
+    it('should find the closest module', async () => {
+      const options = { ...defaultNonStandaloneOptions, flat: false };
+      const fooModule = '/projects/baz/src/app/foo/foo.module.ts';
+      appTree.create(
+        fooModule,
+        `
+      import { NgModule } from '@angular/core';
+
+      @NgModule({
+        imports: [],
+        declarations: []
+      })
+      export class FooModule { }
+    `,
+      );
+
+      const tree = await schematicRunner.runSchematic('directive', options, appTree);
+      const fooModuleContent = tree.readContent(fooModule);
+      expect(fooModuleContent).toMatch(/import { FooDirective } from '.\/foo.directive'/);
+    });
+
+    it('should export the directive', async () => {
+      const options = { ...defaultNonStandaloneOptions, export: true };
+
+      const tree = await schematicRunner.runSchematic('directive', options, appTree);
+      const appModuleContent = tree.readContent('/projects/baz/src/app/app.module.ts');
+      expect(appModuleContent).toMatch(/exports: \[\n(\s*) {2}FooDirective\n\1\]/);
+    });
+
+    it('should import into a specified module', async () => {
+      const options = { ...defaultNonStandaloneOptions, module: 'app.module.ts' };
+
+      const tree = await schematicRunner.runSchematic('directive', options, appTree);
+      const appModule = tree.readContent('/projects/baz/src/app/app.module.ts');
+
+      expect(appModule).toMatch(/import { FooDirective } from '.\/foo.directive'/);
+    });
+
+    it('should fail if specified module does not exist', async () => {
+      const options = {
+        ...defaultNonStandaloneOptions,
+        module: '/projects/baz/src/app/app.moduleXXX.ts',
+      };
+
+      await expectAsync(schematicRunner.runSchematic('directive', options, appTree)).toBeRejected();
+    });
   });
 });

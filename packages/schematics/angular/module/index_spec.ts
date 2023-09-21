@@ -33,6 +33,7 @@ describe('Module Schematic', () => {
     name: 'bar',
     inlineStyle: false,
     inlineTemplate: false,
+    standalone: false,
     routing: true,
     skipTests: false,
     skipPackageJson: false,

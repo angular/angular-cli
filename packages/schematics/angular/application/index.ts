@@ -37,13 +37,6 @@ export default function (options: ApplicationOptions): Rule {
     const { appDir, appRootSelector, componentOptions, folderName, sourceDir } =
       await getAppOptions(host, options);
 
-    if (options.standalone) {
-      context.logger.warn(
-        'Standalone application structure is new and not yet supported by many existing' +
-          ` 'ng add' and 'ng update' integrations with community libraries.`,
-      );
-    }
-
     return chain([
       addAppToWorkspaceFile(options, appDir, folderName),
       options.standalone
@@ -183,20 +176,14 @@ function addAppToWorkspaceFile(
     ];
 
     schematicsWithTests.forEach((type) => {
-      if (!(`@schematics/angular:${type}` in schematics)) {
-        schematics[`@schematics/angular:${type}`] = {};
-      }
-      (schematics[`@schematics/angular:${type}`] as JsonObject).skipTests = true;
+      ((schematics[`@schematics/angular:${type}`] ??= {}) as JsonObject).skipTests = true;
     });
   }
 
-  if (options.standalone) {
+  if (!options.standalone) {
     const schematicsWithStandalone = ['component', 'directive', 'pipe'];
     schematicsWithStandalone.forEach((type) => {
-      if (!(`@schematics/angular:${type}` in schematics)) {
-        schematics[`@schematics/angular:${type}`] = {};
-      }
-      (schematics[`@schematics/angular:${type}`] as JsonObject).standalone = true;
+      ((schematics[`@schematics/angular:${type}`] ??= {}) as JsonObject).standalone = false;
     });
   }
 

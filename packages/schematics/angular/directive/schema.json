@@ -63,7 +63,7 @@
     "standalone": {
       "description": "Whether the generated directive is standalone.",
       "type": "boolean",
-      "default": false,
+      "default": true,
       "x-user-analytics": "ep.ng_standalone"
     },
     "flat": {

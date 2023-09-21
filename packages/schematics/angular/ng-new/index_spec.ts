@@ -37,13 +37,15 @@ describe('Ng New Schematic', () => {
       jasmine.arrayContaining([
         '/bar/tsconfig.app.json',
         '/bar/src/main.ts',
-        '/bar/src/app/app.module.ts',
+        '/bar/src/app/app.config.ts',
       ]),
     );
+
+    expect(files).not.toEqual(jasmine.arrayContaining(['/bar/src/app/app.module.ts']));
   });
 
-  it('should create files of a standalone application', async () => {
-    const options = { ...defaultOptions, standalone: true };
+  it('should create module files of a standalone=false application', async () => {
+    const options = { ...defaultOptions, standalone: false };
 
     const tree = await schematicRunner.runSchematic('ng-new', options);
     const files = tree.files;
@@ -51,11 +53,9 @@ describe('Ng New Schematic', () => {
       jasmine.arrayContaining([
         '/bar/tsconfig.app.json',
         '/bar/src/main.ts',
-        '/bar/src/app/app.routes.ts',
-        '/bar/src/app/app.config.ts',
+        '/bar/src/app/app.module.ts',
       ]),
     );
-    expect(files).not.toEqual(jasmine.arrayContaining(['/bar/src/app/app.module.ts']));
   });
 
   it('should should set the prefix in angular.json and in app.component.ts', async () => {
@@ -66,10 +66,11 @@ describe('Ng New Schematic', () => {
     expect(content).toMatch(/"prefix": "pre"/);
   });
 
-  it('should set up the app module', async () => {
+  it('should set up the app module when standalone=false', async () => {
     const options: NgNewOptions = {
       name: 'foo',
       version: '6.0.0',
+      standalone: false,
     };
 
     const tree = await schematicRunner.runSchematic('ng-new', options);
