@@ -189,7 +189,7 @@ export class AotCompilation extends AngularCompilation {
       }
 
       assert(sourceFiles?.length === 1, 'Invalid TypeScript program emit for ' + filename);
-      const sourceFile = sourceFiles[0];
+      const sourceFile = ts.getOriginalNode(sourceFiles[0], ts.isSourceFile);
       if (angularCompiler.ignoreForEmit.has(sourceFile)) {
         return;
       }
