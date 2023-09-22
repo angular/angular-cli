@@ -93,87 +93,78 @@ function updateApplicationBuilderWorkspaceConfigRule(
   projectRoot: string,
   options: AddServerOptions,
 ): Rule {
-  return () => {
-    return updateWorkspace((workspace) => {
-      const buildTarget = workspace.projects.get(options.project)?.targets.get('build');
-      if (!buildTarget) {
-        return;
-      }
+  return updateWorkspace((workspace) => {
+    const buildTarget = workspace.projects.get(options.project)?.targets.get('build');
+    if (!buildTarget) {
+      return;
+    }
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const prodConfig = buildTarget.configurations?.production as Record<string, any>;
-      if (!prodConfig) {
-        throw new SchematicsException(
-          `A "production" configuration is not defined for the "build" builder.`,
-        );
-      }
-
-      prodConfig.prerender = true;
-      prodConfig.ssr = join(normalize(projectRoot), 'server.ts');
-    });
-  };
+    buildTarget.options = {
+      ...buildTarget.options,
+      prerender: true,
+      ssr: join(normalize(projectRoot), 'server.ts'),
+    };
+  });
 }
 
 function updateWebpackBuilderWorkspaceConfigRule(options: AddServerOptions): Rule {
-  return () => {
-    return updateWorkspace((workspace) => {
-      const projectName = options.project;
-      const project = workspace.projects.get(projectName);
-      if (!project) {
-        return;
-      }
+  return updateWorkspace((workspace) => {
+    const projectName = options.project;
+    const project = workspace.projects.get(projectName);
+    if (!project) {
+      return;
+    }
 
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      const serverTarget = project.targets.get('server')!;
-      (serverTarget.options ??= {}).main = join(normalize(project.root), 'server.ts');
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const serverTarget = project.targets.get('server')!;
+    (serverTarget.options ??= {}).main = join(normalize(project.root), 'server.ts');
 
-      const serveSSRTarget = project.targets.get(SERVE_SSR_TARGET_NAME);
-      if (serveSSRTarget) {
-        return;
-      }
+    const serveSSRTarget = project.targets.get(SERVE_SSR_TARGET_NAME);
+    if (serveSSRTarget) {
+      return;
+    }
 
-      project.targets.add({
-        name: SERVE_SSR_TARGET_NAME,
-        builder: '@angular-devkit/build-angular:ssr-dev-server',
-        defaultConfiguration: 'development',
-        options: {},
-        configurations: {
-          development: {
-            browserTarget: `${projectName}:build:development`,
-            serverTarget: `${projectName}:server:development`,
-          },
-          production: {
-            browserTarget: `${projectName}:build:production`,
-            serverTarget: `${projectName}:server:production`,
-          },
+    project.targets.add({
+      name: SERVE_SSR_TARGET_NAME,
+      builder: '@angular-devkit/build-angular:ssr-dev-server',
+      defaultConfiguration: 'development',
+      options: {},
+      configurations: {
+        development: {
+          browserTarget: `${projectName}:build:development`,
+          serverTarget: `${projectName}:server:development`,
         },
-      });
-
-      const prerenderTarget = project.targets.get(PRERENDER_TARGET_NAME);
-      if (prerenderTarget) {
-        return;
-      }
-
-      project.targets.add({
-        name: PRERENDER_TARGET_NAME,
-        builder: '@angular-devkit/build-angular:prerender',
-        defaultConfiguration: 'production',
-        options: {
-          routes: ['/'],
+        production: {
+          browserTarget: `${projectName}:build:production`,
+          serverTarget: `${projectName}:server:production`,
         },
-        configurations: {
-          production: {
-            browserTarget: `${projectName}:build:production`,
-            serverTarget: `${projectName}:server:production`,
-          },
-          development: {
-            browserTarget: `${projectName}:build:development`,
-            serverTarget: `${projectName}:server:development`,
-          },
-        },
-      });
+      },
     });
-  };
+
+    const prerenderTarget = project.targets.get(PRERENDER_TARGET_NAME);
+    if (prerenderTarget) {
+      return;
+    }
+
+    project.targets.add({
+      name: PRERENDER_TARGET_NAME,
+      builder: '@angular-devkit/build-angular:prerender',
+      defaultConfiguration: 'production',
+      options: {
+        routes: ['/'],
+      },
+      configurations: {
+        production: {
+          browserTarget: `${projectName}:build:production`,
+          serverTarget: `${projectName}:server:production`,
+        },
+        development: {
+          browserTarget: `${projectName}:build:development`,
+          serverTarget: `${projectName}:server:development`,
+        },
+      },
+    });
+  });
 }
 
 function updateWebpackBuilderServerTsConfigRule(options: AddServerOptions): Rule {
