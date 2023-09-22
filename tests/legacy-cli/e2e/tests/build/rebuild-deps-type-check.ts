@@ -81,7 +81,7 @@ export default function () {
         Promise.all([
           waitForAnyProcessOutputToMatch(errorRe, 20000),
           appendToFile(
-            'src/app/app.module.ts',
+            'src/app/app.config.ts',
             `
         function anything(): number { return 1; }
       `,

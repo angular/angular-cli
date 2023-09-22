@@ -1,17 +1,17 @@
 import fetch from 'node-fetch';
 import { getGlobalVariable } from '../../utils/env';
-import { writeFile, writeMultipleFiles } from '../../utils/fs';
+import { appendToFile, replaceInFile, writeMultipleFiles } from '../../utils/fs';
 import { silentNg, waitForAnyProcessOutputToMatch } from '../../utils/process';
 import { ngServe } from '../../utils/project';
 
 export default async function () {
   const esbuild = getGlobalVariable('argv')['esbuild'];
   const validBundleRegEx = esbuild ? /complete\./ : /Compiled successfully\./;
-  const lazyBundleRegEx = esbuild ? /chunk-/ : /lazy_module_ts\.js/;
+  const lazyBundleRegEx = esbuild ? /chunk-/ : /src_app_lazy_lazy_component_ts\.js/;
 
   const port = await ngServe();
-  // Add a lazy module.
-  await silentNg('generate', 'module', 'lazy', '--routing');
+  // Add a lazy route.
+  await silentNg('generate', 'component', 'lazy');
 
   // Should trigger a rebuild with a new bundle.
   // We need to use Promise.all to ensure we are waiting for the rebuild just before we write
@@ -20,98 +20,40 @@ export default async function () {
   // Verify that a new chunk was created.
   await Promise.all([
     waitForAnyProcessOutputToMatch(lazyBundleRegEx),
-    writeFile(
-      'src/app/app.module.ts',
-      `
-        import { BrowserModule } from '@angular/platform-browser';
-        import { NgModule } from '@angular/core';
-        import { FormsModule } from '@angular/forms';
-        import { HttpClientModule } from '@angular/common/http';
-
-        import { AppComponent } from './app.component';
-        import { RouterModule } from '@angular/router';
-
-        @NgModule({
-          declarations: [
-            AppComponent
-          ],
-          imports: [
-            BrowserModule,
-            FormsModule,
-            HttpClientModule,
-            RouterModule.forRoot([
-              { path: 'lazy', loadChildren: () => import('./lazy/lazy.module').then(m => m.LazyModule) }
-            ])
-          ],
-          providers: [],
-          bootstrap: [AppComponent]
-        })
-        export class AppModule { }
-      `,
+    replaceInFile(
+      'src/app/app.routes.ts',
+      'routes: Routes = [];',
+      `routes: Routes = [{path: 'lazy', loadComponent: () => import('./lazy/lazy.component').then(c => c.LazyComponent)}];`,
     ),
   ]);
 
   // Change multiple files and check that all of them are invalidated and recompiled.
   await Promise.all([
     waitForAnyProcessOutputToMatch(validBundleRegEx),
-    writeMultipleFiles({
-      'src/app/app.module.ts': `
-        import { BrowserModule } from '@angular/platform-browser';
-        import { NgModule } from '@angular/core';
-        import { RouterModule } from '@angular/router';
-
-        import { AppComponent } from './app.component';
-
-        @NgModule({
-          declarations: [
-            AppComponent
-          ],
-          imports: [
-            RouterModule,
-            BrowserModule
-          ],
-          providers: [],
-          bootstrap: [AppComponent]
-        })
-        export class AppModule { }
-
+    appendToFile(
+      'src/app/app.routes.ts',
+      `
         console.log('$$_E2E_GOLDEN_VALUE_1');
         export let X = '$$_E2E_GOLDEN_VALUE_2';
-        `,
-      'src/main.ts': `
-        import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-        import { AppModule } from './app/app.module';
-
-        platformBrowserDynamic().bootstrapModule(AppModule);
-
-        import * as m from './app/app.module';
+      `,
+    ),
+    appendToFile(
+      'src/main.ts',
+      `
+        import * as m from './app/app.routes';
         console.log(m.X);
         console.log('$$_E2E_GOLDEN_VALUE_3');
         `,
-    }),
+    ),
   ]);
 
   await Promise.all([
     waitForAnyProcessOutputToMatch(validBundleRegEx),
     writeMultipleFiles({
-      'src/app/app.module.ts': `
-        import { BrowserModule } from '@angular/platform-browser';
-        import { NgModule } from '@angular/core';
-        import { RouterModule } from '@angular/router';
-        import { AppComponent } from './app.component';
+      'src/app/app.routes.ts': `
+        import { Routes } from '@angular/router';
 
-        @NgModule({
-          declarations: [
-            AppComponent
-          ],
-          imports: [
-            RouterModule,
-            BrowserModule
-          ],
-          providers: [],
-          bootstrap: [AppComponent]
-        })
-        export class AppModule { }
+        export const routes: Routes = [];
 
         console.log('$$_E2E_GOLDEN_VALUE_1');
         export let X = '$$_E2E_GOLDEN_VALUE_2';

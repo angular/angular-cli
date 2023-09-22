@@ -52,6 +52,7 @@ export default async function () {
     `,
     './src/app/app.component.ts': `
       import { Component } from '@angular/core';
+      import { CommonModule } from '@angular/common';
       import { Store, select } from '@ngrx/store';
       import { Observable } from 'rxjs';
       import { INCREMENT, DECREMENT, RESET } from './counter.reducer';
@@ -61,7 +62,9 @@ export default async function () {
       }
 
       @Component({
+        standalone: true,
         selector: 'app-root',
+        imports: [CommonModule],
         template: \`
           <button (click)="increment()">Increment</button>
           <div>Current Count: <span>{{ count$ | async }}</span></div>
@@ -91,26 +94,26 @@ export default async function () {
       }
     `,
     './src/app/app.effects.ts': `
-          import { Injectable } from '@angular/core';
-          import { Actions, Effect } from '@ngrx/effects';
-          import { filter, map, tap } from 'rxjs/operators';
+        import { Injectable } from '@angular/core';
+        import { Actions, Effect } from '@ngrx/effects';
+        import { filter, map, tap } from 'rxjs/operators';
 
-          @Injectable()
-          export class AppEffects {
+        @Injectable()
+        export class AppEffects {
 
-            @Effect()
-            mapper$ = this.actions$.pipe(map(() => ({ type: 'ANOTHER'})), filter(() => false));
+          @Effect()
+          mapper$ = this.actions$.pipe(map(() => ({ type: 'ANOTHER'})), filter(() => false));
 
-            @Effect({ dispatch: false })
-            logger$ = this.actions$.pipe(tap(console.log));
+          @Effect({ dispatch: false })
+          logger$ = this.actions$.pipe(tap(console.log));
 
-            constructor(private actions$: Actions) {}
-          }
+          constructor(private actions$: Actions) {}
+        }
       `,
-    './src/app/app.module.ts': `
-      import { BrowserModule } from '@angular/platform-browser';
-      import { NgModule } from '@angular/core';
-
+    './src/app/app.config.ts': `
+      import { ApplicationConfig, importProvidersFrom } from '@angular/core';
+      import { provideRouter } from '@angular/router';
+      import { provideProtractorTestingSupport } from '@angular/platform-browser';
       import { AppComponent } from './app.component';
       import { StoreModule } from '@ngrx/store';
       import { StoreDevtoolsModule } from '@ngrx/store-devtools';
@@ -118,20 +121,17 @@ export default async function () {
       import { AppEffects } from './app.effects';
       import { counterReducer } from './counter.reducer';
 
-      @NgModule({
-        declarations: [
-          AppComponent
-        ],
-        imports: [
-          BrowserModule,
-          StoreModule.forRoot({ count: counterReducer }),
-          StoreDevtoolsModule.instrument(),
-          EffectsModule.forRoot([AppEffects])
-        ],
-        providers: [],
-        bootstrap: [AppComponent]
-      })
-      export class AppModule { }
+      import { routes } from './app.routes';
+
+      export const appConfig: ApplicationConfig = {
+        providers: [
+          provideProtractorTestingSupport(),
+          provideRouter(routes),
+          importProvidersFrom(StoreModule.forRoot({ count: counterReducer })),
+          importProvidersFrom(StoreDevtoolsModule.instrument()),
+          importProvidersFrom(EffectsModule.forRoot([AppEffects])),
+        ]
+      };
     `,
     './src/app/counter.reducer.ts': `
       import { Action } from '@ngrx/store';

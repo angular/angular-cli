@@ -1,6 +1,6 @@
 import { join } from 'path';
 import { getGlobalVariable } from '../../utils/env';
-import { appendToFile, expectFileToMatch, rimraf, writeFile } from '../../utils/fs';
+import { expectFileToMatch, rimraf, writeFile } from '../../utils/fs';
 import { installPackage, uninstallPackage } from '../../utils/packages';
 import { ng } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';
@@ -16,8 +16,22 @@ export default async function () {
   // Setup an i18n enabled component
   await ng('generate', 'component', 'i18n-test');
   await writeFile(join('src/app/i18n-test', 'i18n-test.component.html'), '<p i18n>Hello world</p>');
-  // Actually use the generated component to ensure it is present in the application output
-  await appendToFile('src/app/app.component.html', '<app-i18n-test>');
+
+  await writeFile(
+    'src/app/app.component.ts',
+    `
+    import { Component } from '@angular/core';
+    import { I18nTestComponent } from './i18n-test/i18n-test.component';
+
+    @Component({
+      standalone: true,
+      selector: 'app-root',
+      imports: [I18nTestComponent],
+      template: '<app-i18n-test />'
+    })
+    export class AppComponent {}
+  `,
+  );
 
   // Install correct version
   let localizeVersion = '@angular/localize@' + readNgVersion();

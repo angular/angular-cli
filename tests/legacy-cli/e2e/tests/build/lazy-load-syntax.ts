@@ -6,37 +6,20 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { readFile, replaceInFile, writeFile } from '../../utils/fs';
+import { replaceInFile, writeFile } from '../../utils/fs';
 import { ng } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';
 
 export default async function () {
-  const projectName = 'test-project';
-  const appRoutingModulePath = 'src/app/app-routing.module.ts';
-
-  const originalAppRoutingModule = await readFile(appRoutingModulePath);
-  // helper to replace loadChildren
-  const replaceLoadChildren = async (route: string) => {
-    const content = originalAppRoutingModule.replace(
-      'const routes: Routes = [];',
-      `
-       const routes: Routes = [{ path: 'lazy', loadChildren: ${route} }];
-      `,
-    );
-
-    return writeFile(appRoutingModulePath, content);
-  };
-
   // Add lazy route.
-  await ng('generate', 'module', 'lazy', '--routing');
-  await ng('generate', 'component', 'lazy/lazy-comp');
+  await ng('generate', 'component', 'lazy-comp');
   await replaceInFile(
-    'src/app/lazy/lazy-routing.module.ts',
-    'const routes: Routes = [];',
-    `
-      import { LazyCompComponent } from './lazy-comp/lazy-comp.component';
-      const routes: Routes = [{ path: '', component: LazyCompComponent }];
-    `,
+    'src/app/app.routes.ts',
+    'routes: Routes = [];',
+    `routes: Routes = [{
+      path: 'lazy',
+      loadComponent: () => import('./lazy-comp/lazy-comp.component').then(c => c.LazyCompComponent),
+    }];`,
   );
 
   // Add lazy route e2e
@@ -65,14 +48,10 @@ export default async function () {
   // Convert the default config to use JIT and prod to just do AOT.
   // This way we can use `ng e2e` to test JIT and `ng e2e --configuration=production` to test AOT.
   await updateJsonFile('angular.json', (json) => {
-    const buildTarget = json['projects'][projectName]['architect']['build'];
+    const buildTarget = json['projects']['test-project']['architect']['build'];
     buildTarget['options']['aot'] = true;
     buildTarget['configurations']['development']['aot'] = false;
   });
-
-  // Test `import()` style lazy load.
-  // Both Ivy and View Engine should support it.
-  await replaceLoadChildren(`() => import('./lazy/lazy.module').then(m => m.LazyModule)`);
 
   await ng('e2e');
   await ng('e2e', '--configuration=production');

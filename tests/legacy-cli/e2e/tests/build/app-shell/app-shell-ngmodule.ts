@@ -7,7 +7,7 @@ import { updateJsonFile } from '../../../utils/project';
 const snapshots = require('../../../ng-snapshot/package.json');
 
 export default async function () {
-  await ng('generate', 'app', 'test-project-two', '--routing', '--standalone', '--skip-install');
+  await ng('generate', 'app', 'test-project-two', '--routing', '--no-standalone', '--skip-install');
 
   const useWebpackBuilder = !getGlobalVariable('argv')['esbuild'];
 
@@ -26,11 +26,7 @@ export default async function () {
         ...build.configurations.development,
         vendorChunk: true,
         namedChunks: true,
-        buildOptimizer: false,
       };
-    } else {
-      // TODO(alanagius): enable once esbuild supports standalone route extraction.
-      build.configurations.production.prerender = false;
     }
   });
 

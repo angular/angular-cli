@@ -101,8 +101,12 @@ export async function setupI18nConfig() {
     'src/app/app.component.ts',
     `
     import { Component, Inject, LOCALE_ID } from '@angular/core';
+    import { DatePipe } from '@angular/common';
+
     @Component({
       selector: 'app-root',
+      imports: [DatePipe],
+      standalone: true,
       templateUrl: './app.component.html'
     })
     export class AppComponent {
