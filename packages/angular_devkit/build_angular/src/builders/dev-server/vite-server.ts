@@ -60,6 +60,14 @@ export async function* serveWithVite(
     } as json.JsonObject & BrowserBuilderOptions,
     builderName,
   )) as json.JsonObject & BrowserBuilderOptions;
+
+  if (browserOptions.prerender) {
+    // Disable prerendering if enabled and force SSR.
+    // This is so instead of prerendering all the routes for every change, the page is "prerendered" when it is requested.
+    browserOptions.ssr = true;
+    browserOptions.prerender = false;
+  }
+
   // Set all packages as external to support Vite's prebundle caching
   browserOptions.externalPackages = serverOptions.cacheOptions.enabled;
 
