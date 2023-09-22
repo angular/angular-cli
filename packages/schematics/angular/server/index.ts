@@ -22,6 +22,7 @@ import {
 } from '@angular-devkit/schematics';
 import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
 import { posix } from 'node:path';
+import { addRootProvider } from '../utility';
 import {
   NodeDependencyType,
   addPackageJsonDependency,
@@ -220,6 +221,11 @@ export default function (options: ServerOptions): Rule {
             updateConfigFileBrowserBuilder(options, tsConfigDirectory),
           ]),
       addDependencies(),
+      addRootProvider(
+        options.project,
+        ({ code, external }) =>
+          code`${external('provideClientHydration', '@angular/platform-browser')}()`,
+      ),
     ]);
   };
 }

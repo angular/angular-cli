@@ -91,6 +91,12 @@ describe('Server Schematic', () => {
       expect(contents.compilerOptions.types).toEqual(['node']);
       expect(contents.files).toEqual(['src/main.ts', 'src/main.server.ts']);
     });
+
+    it(`should add 'provideClientHydration' to the providers list`, async () => {
+      const tree = await schematicRunner.runSchematic('server', defaultOptions, appTree);
+      const contents = tree.readContent('/projects/bar/src/app/app.module.ts');
+      expect(contents).toContain(`provideClientHydration()`);
+    });
   });
 
   describe('standalone application', () => {
@@ -127,6 +133,12 @@ describe('Server Schematic', () => {
       expect(tree.exists(filePath)).toBeTrue();
       const contents = tree.readContent(filePath);
       expect(contents).toContain(`const serverConfig: ApplicationConfig = {`);
+    });
+
+    it(`should add 'provideClientHydration' to the providers list`, async () => {
+      const tree = await schematicRunner.runSchematic('server', defaultOptions, appTree);
+      const contents = tree.readContent('/projects/bar/src/app/app.config.ts');
+      expect(contents).toContain(`providers: [provideClientHydration()]`);
     });
   });
 
