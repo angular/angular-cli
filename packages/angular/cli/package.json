@@ -45,6 +45,7 @@
     "migrations": "@schematics/angular/migrations/migration-collection.json",
     "packageGroup": {
       "@angular/cli": "0.0.0-PLACEHOLDER",
+      "@angular/ssr": "0.0.0-PLACEHOLDER",
       "@angular-devkit/architect": "0.0.0-EXPERIMENTAL-PLACEHOLDER",
       "@angular-devkit/build-angular": "0.0.0-PLACEHOLDER",
       "@angular-devkit/build-webpack": "0.0.0-EXPERIMENTAL-PLACEHOLDER",
