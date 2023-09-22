@@ -19,7 +19,7 @@ export default async function () {
     'src/app/shared/index.ts': `export * from './meaning'`,
   });
 
-  await replaceInFile('src/app/app.module.ts', './app.component', '@root/app/app.component');
+  await replaceInFile('src/main.ts', './app/app.component', '@root/app/app.component');
   await ng('build', '--configuration=development');
 
   await updateTsConfig((json) => {

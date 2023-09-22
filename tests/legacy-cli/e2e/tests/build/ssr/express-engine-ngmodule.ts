@@ -3,14 +3,47 @@ import { rimraf, writeMultipleFiles } from '../../../utils/fs';
 import { findFreePort } from '../../../utils/network';
 import { installWorkspacePackages } from '../../../utils/packages';
 import { execAndWaitForOutputToMatch, killAllProcesses, ng } from '../../../utils/process';
-import { updateJsonFile, useSha } from '../../../utils/project';
+import { updateJsonFile, useCIChrome, useCIDefaults, useSha } from '../../../utils/project';
 
 export default async function () {
-  const useWebpackBuilder = !getGlobalVariable('argv')['esbuild'];
-
   // forcibly remove in case another test doesn't clean itself up
   await rimraf('node_modules/@angular/ssr');
-  await ng('add', '@angular/ssr', '--skip-confirmation', '--skip-install');
+
+  await ng('generate', 'app', 'test-project-two', '--no-standalone', '--skip-install');
+  await ng('generate', 'e2e', '--related-app-name=test-project-two');
+
+  // Setup testing to use CI Chrome.
+  await useCIChrome('test-project-two', 'projects/test-project-two/e2e/');
+  await useCIDefaults('test-project-two');
+
+  const useWebpackBuilder = !getGlobalVariable('argv')['esbuild'];
+
+  if (useWebpackBuilder) {
+    await updateJsonFile('angular.json', (json) => {
+      const build = json['projects']['test-project-two']['architect']['build'];
+      build.builder = '@angular-devkit/build-angular:browser';
+      build.options = {
+        ...build.options,
+        main: build.options.browser,
+        browser: undefined,
+      };
+
+      build.configurations.development = {
+        ...build.configurations.development,
+        vendorChunk: true,
+        namedChunks: true,
+        buildOptimizer: false,
+      };
+    });
+  }
+
+  await ng(
+    'add',
+    '@angular/ssr',
+    '--skip-confirmation',
+    '--skip-install',
+    '--project=test-project-two',
+  );
 
   await useSha();
   await installWorkspacePackages();
@@ -18,14 +51,14 @@ export default async function () {
   if (!useWebpackBuilder) {
     // Disable prerendering
     await updateJsonFile('angular.json', (json) => {
-      const build = json['projects']['test-project']['architect']['build'];
+      const build = json['projects']['test-project-two']['architect']['build'];
       build.configurations.production.prerender = false;
     });
   }
 
   await writeMultipleFiles({
-    'src/styles.css': `* { color: #000 }`,
-    'src/main.ts': `
+    'projects/test-project-two/src/styles.css': `* { color: #000 }`,
+    'projects/test-project-two/src/main.ts': `
       import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
       import { AppModule } from './app/app.module';
 
@@ -35,7 +68,7 @@ export default async function () {
           .catch((err) => console.error(err));
       };
     `,
-    'e2e/src/app.e2e-spec.ts':
+    'projects/test-project-two/e2e/src/app.e2e-spec.ts':
       `
       import { browser, by, element } from 'protractor';
       import * as webdriver from 'selenium-webdriver';
@@ -115,7 +148,7 @@ export default async function () {
       'ng',
       [
         'run',
-        `test-project:${useWebpackBuilder ? 'serve-ssr' : 'serve'}:production`,
+        `test-project-two:${useWebpackBuilder ? 'serve-ssr' : 'serve'}:production`,
         '--port',
         String(port),
       ],
@@ -127,7 +160,12 @@ export default async function () {
 
   try {
     const port = await ngDevSsr();
-    await ng('e2e', `--base-url=http://localhost:${port}`, '--dev-server-target=');
+    await ng(
+      'e2e',
+      'test-project-two',
+      `--base-url=http://localhost:${port}`,
+      '--dev-server-target=',
+    );
   } finally {
     await killAllProcesses();
   }

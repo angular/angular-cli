@@ -10,37 +10,20 @@ export async function libraryConsumptionSetup(): Promise<void> {
     'projects/my-lib/src/lib/my-lib.component.ts': `import { Component } from '@angular/core';
 
     @Component({
+      standalone: true,
       selector: 'lib-my-lib',
       templateUrl: './my-lib.component.html',
     })
     export class MyLibComponent {}`,
-    './src/app/app.module.ts': `
-    import { BrowserModule } from '@angular/platform-browser';
-    import { NgModule } from '@angular/core';
-    import { MyLibModule } from 'my-lib';
-
-    import { AppComponent } from './app.component';
-
-    @NgModule({
-      declarations: [
-        AppComponent
-      ],
-      imports: [
-        BrowserModule,
-        MyLibModule,
-      ],
-      providers: [],
-      bootstrap: [AppComponent]
-    })
-    export class AppModule { }
-  `,
     './src/app/app.component.ts': `
     import { Component } from '@angular/core';
-    import { MyLibService } from 'my-lib';
+    import { MyLibService, MyLibComponent } from 'my-lib';
 
     @Component({
+      standalone: true,
       selector: 'app-root',
-      template: '<lib-my-lib></lib-my-lib>'
+      template: '<lib-my-lib></lib-my-lib>',
+      imports: [MyLibComponent],
     })
     export class AppComponent {
       title = 'test-project';

@@ -1,5 +1,5 @@
 import { getGlobalVariable } from '../../utils/env';
-import { expectFileToMatch, replaceInFile, writeFile } from '../../utils/fs';
+import { expectFileToMatch, prependToFile, replaceInFile, writeFile } from '../../utils/fs';
 import { installPackage, uninstallPackage } from '../../utils/packages';
 import { ng } from '../../utils/process';
 import { readNgVersion } from '../../utils/version';
@@ -17,27 +17,10 @@ export default async function () {
   await ng('build', 'i18n-lib-test', '--configuration=development');
 
   // Consume library in application
-  await writeFile(
-    'src/app/app.module.ts',
-    `
-    import { BrowserModule } from '@angular/platform-browser';
-    import { NgModule } from '@angular/core';
-    import { AppComponent } from './app.component';
-    import { I18nLibTestModule } from 'i18n-lib-test';
-
-    @NgModule({
-      declarations: [
-        AppComponent
-      ],
-      imports: [
-        BrowserModule,
-        I18nLibTestModule,
-      ],
-      providers: [],
-      bootstrap: [AppComponent]
-    })
-    export class AppModule { }
-    `,
+  await replaceInFile('src/app/app.component.ts', 'imports: [', 'imports: [I18nLibTestComponent,');
+  await prependToFile(
+    'src/app/app.component.ts',
+    `import { I18nLibTestComponent } from 'i18n-lib-test';`,
   );
 
   await writeFile(

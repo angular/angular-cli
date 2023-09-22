@@ -25,16 +25,14 @@ export default async function () {
 
   await writeMultipleFiles({
     'src/styles.css': `* { color: #000 }`,
-    'src/main.ts': `
-      import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-      import { AppModule } from './app/app.module';
+    'src/main.ts': `import { bootstrapApplication } from '@angular/platform-browser';
+      import { AppComponent } from './app/app.component';
+      import { appConfig } from './app/app.config';
 
       (window as any)['doBootstrap'] = () => {
-        platformBrowserDynamic()
-          .bootstrapModule(AppModule)
-          .catch((err) => console.error(err));
+        bootstrapApplication(AppComponent, appConfig).catch((err) => console.error(err));
       };
-    `,
+      `,
     'src/index.html': `
       <!doctype html>
       <html lang="en">

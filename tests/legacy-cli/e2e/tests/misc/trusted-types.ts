@@ -11,18 +11,13 @@ import { ng } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';
 
 export default async function () {
-  // Add app routing.
-  // This is done automatically on a new app with --routing.
-  await prependToFile('src/app/app.module.ts', `import { RouterModule } from '@angular/router';`);
-  await replaceInFile(
-    'src/app/app.module.ts',
-    `imports: [`,
-    `imports: [ RouterModule.forRoot([]),`,
-  );
-  await appendToFile('src/app/app.component.html', '<router-outlet></router-outlet>');
-
   // Add lazy route.
-  await ng('generate', 'module', 'lazy', '--route', 'lazy', '--module', 'app.module');
+  await ng('generate', 'component', 'lazy');
+  await replaceInFile(
+    'src/app/app.routes.ts',
+    'routes: Routes = [];',
+    `routes: Routes = [{path: 'lazy', loadComponent: () => import('./lazy/lazy.component').then(c => c.LazyComponent)}];`,
+  );
 
   // Add lazy route e2e
   await writeFile(

@@ -3,46 +3,18 @@ import { getGlobalVariable } from '../../../utils/env';
 import { expectFileToMatch, rimraf, writeFile } from '../../../utils/fs';
 import { installWorkspacePackages } from '../../../utils/packages';
 import { ng } from '../../../utils/process';
-import { updateJsonFile, useSha } from '../../../utils/project';
+import { useSha } from '../../../utils/project';
 
 export default async function () {
-  const projectName = 'test-project-two';
-  await ng('generate', 'application', projectName, '--standalone', '--skip-install');
-
   const useWebpackBuilder = !getGlobalVariable('argv')['esbuild'];
   if (useWebpackBuilder) {
     // Forcibly remove in case another test doesn't clean itself up.
     await rimraf('node_modules/@angular/ssr');
 
-    // Setup webpack builder if esbuild is not requested on the commandline
-    await updateJsonFile('angular.json', (json) => {
-      const build = json['projects'][projectName]['architect']['build'];
-      build.builder = '@angular-devkit/build-angular:browser';
-      build.options = {
-        ...build.options,
-        main: build.options.browser,
-        browser: undefined,
-      };
-
-      build.configurations.development = {
-        ...build.configurations.development,
-        vendorChunk: true,
-        namedChunks: true,
-        buildOptimizer: false,
-      };
-    });
-
     // Angular SSR is not needed to do prerendering but it is the easiest way to enable when usign webpack based builders.
-    await ng(
-      'add',
-      '@angular/ssr',
-      '--project',
-      projectName,
-      '--skip-confirmation',
-      '--skip-install',
-    );
+    await ng('add', '@angular/ssr', '--skip-confirmation', '--skip-install');
   } else {
-    await ng('generate', 'server', '--project', projectName, '--skip-install');
+    await ng('generate', 'server', '--skip-install');
   }
 
   await useSha();
@@ -50,7 +22,7 @@ export default async function () {
 
   // Add routes
   await writeFile(
-    `projects/${projectName}/src/app/app.routes.ts`,
+    'src/app/app.routes.ts',
     `
   import { Routes } from '@angular/router';
   import { OneComponent } from './one/one.component';
@@ -107,22 +79,22 @@ export default async function () {
   ];
 
   for (const componentName of componentNames) {
-    await ng('generate', 'component', componentName, '--project', projectName);
+    await ng('generate', 'component', componentName);
   }
 
   // Prerender pages
   if (useWebpackBuilder) {
-    await ng('run', projectName + ':prerender:production');
+    await ng('run', 'test-project:prerender:production');
     await runExpects();
 
     return;
   }
 
-  await ng('build', projectName, '--configuration=production', '--prerender');
+  await ng('build', '--configuration=production', '--prerender');
   await runExpects();
 
   // Test also JIT mode.
-  await ng('build', projectName, '--configuration=development', '--prerender', '--no-aot');
+  await ng('build', '--configuration=development', '--prerender', '--no-aot');
   await runExpects();
 
   async function runExpects(): Promise<void> {
@@ -136,7 +108,7 @@ export default async function () {
       'lazy-two/index.html': 'lazy-two works!',
     };
 
-    let distPath = 'dist/' + projectName;
+    let distPath = 'dist/test-project';
     if (useWebpackBuilder) {
       distPath += '/browser';
     }
