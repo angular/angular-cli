@@ -23,7 +23,7 @@
     "zone.js": "<%= latestVersions['zone.js'] %>"
   },
   "devDependencies": {
-    "@angular/cli": "<%= '~' + version %>",
+    "@angular/cli": "<%= '^' + version %>",
     "@angular/compiler-cli": "<%= latestVersions.Angular %>",<% if (!minimal) { %>
     "@types/jasmine": "<%= latestVersions['@types/jasmine'] %>",
     "jasmine-core": "<%= latestVersions['jasmine-core'] %>",
