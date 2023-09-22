@@ -11,7 +11,7 @@ import { appendToFile } from '../../utils/fs';
 import { ng } from '../../utils/process';
 import { langTranslations, setupI18nConfig } from './setup';
 
-const OUTPUT_RE = /^(?<name>(?:main|vendor|\d+))\.(?<hash>[a-z0-9]+)\.js$/i;
+const OUTPUT_RE = /^(?<name>(?:main|vendor|\d+))(?:\.|-)(?<hash>[a-z0-9]+)\.js$/i;
 
 export default async function () {
   // Setup i18n tests and config.
