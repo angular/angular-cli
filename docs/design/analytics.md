@@ -58,6 +58,7 @@ PROJECT NAME TO BUILD OR A MODULE NAME.**
 | SchematicCollectionName | `ep.ng_schematic_collection_name` | `string` |
 | SchematicName | `ep.ng_schematic_name` | `string` |
 | Standalone | `ep.ng_standalone` | `string` |
+| SSR | `ep.ng_ssr` | `string` |
 | Style | `ep.ng_style` | `string` |
 | Routing | `ep.ng_routing` | `string` |
 | InlineTemplate | `ep.ng_inline_template` | `string` |
