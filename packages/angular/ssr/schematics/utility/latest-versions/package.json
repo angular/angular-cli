@@ -1,9 +1,0 @@
-{
-  "description": "Package versions used by schematics in @angular/ssr.",
-  "comment": "This file is needed so that dependencies are synced by Renovate.",
-  "private": true,
-  "dependencies": {
-    "@types/express": "^4.17.17",
-    "express": "^4.18.2"
-  }
-}

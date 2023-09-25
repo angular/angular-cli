@@ -40,12 +40,7 @@ filegroup(
     name = "schematics_assets",
     srcs = glob(
         [
-            "**/files/**/*",
             "**/*.json",
-        ],
-        exclude = [
-            # NB: we need to exclude the nested node_modules that is laid out by yarn workspaces
-            "node_modules/**",
         ],
     ),
 )
@@ -66,11 +61,8 @@ ts_library(
     ],
     data = [":schematics_assets"],
     deps = [
-        "//packages/angular_devkit/core",
         "//packages/angular_devkit/schematics",
         "//packages/schematics/angular",
-        "@npm//@types/node",
-        "@npm//typescript",
     ],
 )
 
@@ -89,8 +81,6 @@ ts_library(
     # @external_begin
     deps = [
         ":schematics",
-        "//packages/angular_devkit/core",
-        "//packages/angular_devkit/schematics",
         "//packages/angular_devkit/schematics/testing",
     ],
     # @external_end

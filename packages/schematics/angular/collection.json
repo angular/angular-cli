@@ -100,6 +100,12 @@
       "schema": "./server/schema.json",
       "hidden": true
     },
+    "ssr": {
+      "factory": "./ssr",
+      "description": "Adds SSR to an Angular app.",
+      "schema": "./ssr/schema.json",
+      "hidden": true
+    },
     "app-shell": {
       "factory": "./app-shell",
       "description": "Create an application shell.",
