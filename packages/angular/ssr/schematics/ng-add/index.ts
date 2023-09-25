@@ -6,9 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { Rule, externalSchematic } from '@angular-devkit/schematics';
+import { externalSchematic } from '@angular-devkit/schematics';
 import { Schema as SSROptions } from './schema';
 
-export default function (options: SSROptions): Rule {
-  return externalSchematic('@schematics/angular', 'ssr', options);
-}
+export default (options: SSROptions) => externalSchematic('@schematics/angular', 'ssr', options);

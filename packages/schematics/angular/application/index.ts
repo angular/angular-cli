@@ -98,6 +98,11 @@ export default function (options: ApplicationOptions): Rule {
         ]),
         MergeStrategy.Overwrite,
       ),
+      options.ssr
+        ? schematic('ssr', {
+            project: options.name,
+          })
+        : noop(),
       options.skipPackageJson ? noop() : addDependenciesToPackageJson(options),
     ]);
   };

@@ -11,7 +11,7 @@ import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/te
 
 import { join } from 'node:path';
 
-describe('SSR Schematic', () => {
+describe('@angular/ssr ng-add schematic', () => {
   const defaultOptions = {
     project: 'test-app',
   };
