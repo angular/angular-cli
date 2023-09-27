@@ -1,3 +1,47 @@
+<a name="17.0.0-next.6"></a>
+
+# 17.0.0-next.6 (2023-09-27)
+
+## Breaking Changes
+
+### @schematics/angular
+
+- `ng g interceptor` now generate a functional interceptor by default. or guard by default. To generate a class-based interceptor the `--no-functional` command flag should be used.
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                        |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------- |
+| [741cca73c](https://github.com/angular/angular-cli/commit/741cca73c129ff05e7229081d50762a054c09a8d) | feat | add `ng new --ssr`                                 |
+| [6979eba3c](https://github.com/angular/angular-cli/commit/6979eba3c9d46fd5fc2622d28636c48dbcbbe1c6) | feat | enable hydration when adding SSR, SSG or AppShell  |
+| [ac0db6697](https://github.com/angular/angular-cli/commit/ac0db6697593196692e5b87e1e724be6de0ef0a0) | feat | enable standalone by default in new applications   |
+| [a189962a5](https://github.com/angular/angular-cli/commit/a189962a515051fd77e20bf8dd1815086a0d12ef) | feat | generate functional interceptors by default        |
+| [a23a1acab](https://github.com/angular/angular-cli/commit/a23a1acabefbec69f3d8ef25999eaec67e420084) | fix  | update `@angular/cli` version specifier to use `^` |
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                                |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------- |
+| [f4e7fa873](https://github.com/angular/angular-cli/commit/f4e7fa87350ea1162287114796e0e04e2af101c4) | fix  | add `@angular/ssr` as part of the ng update `packageGroup` |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                       |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------- |
+| [8bce80b91](https://github.com/angular/angular-cli/commit/8bce80b91b953c391ef8e45fec7f887f8d8521aa) | feat | initial support for application Web Worker discovery with esbuild |
+| [c3a87a60e](https://github.com/angular/angular-cli/commit/c3a87a60e0d3cdcae9f4361c2cf21c7ea29bd7de) | feat | support basic web worker bundling with esbuild builders           |
+| [c5f3ec71f](https://github.com/angular/angular-cli/commit/c5f3ec71f536e7ebb1c8cd0d7523b42e58f9611a) | feat | support i18n inlining with esbuild-based builder                  |
+| [4e89c3cae](https://github.com/angular/angular-cli/commit/4e89c3cae43870a10ef58de5ebdc094f5a06023e) | fix  | use a dash in bundle names                                        |
+| [61f409cbe](https://github.com/angular/angular-cli/commit/61f409cbe4a7bf59711ef0cfa3b7365a8df3016d) | perf | disable ahead of time prerendering in vite dev-server             |
+
+### @angular/ssr
+
+| Commit                                                                                              | Type | Description                                              |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------- |
+| [8d033841d](https://github.com/angular/angular-cli/commit/8d033841d1785944f60ccd425e413865c9caf581) | fix  | enable `prerender` and `ssr` for all build configuration |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="16.2.4"></a>
 
 # 16.2.4 (2023-09-27)
