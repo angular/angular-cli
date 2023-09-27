@@ -1,3 +1,15 @@
+<a name="16.2.4"></a>
+
+# 16.2.4 (2023-09-27)
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                        |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------- |
+| [5dc7fb1a1](https://github.com/angular/angular-cli/commit/5dc7fb1a1849a427ceedb06404346de370c91083) | fix  | update `@angular/cli` version specifier to use `^` |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="17.0.0-next.5"></a>
 
 # 17.0.0-next.5 (2023-09-20)
