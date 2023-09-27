@@ -325,6 +325,11 @@
       "description": "Extract all licenses in a separate file.",
       "default": true
     },
+    "namedChunks": {
+      "type": "boolean",
+      "description": "Use file name for lazy loaded chunks.",
+      "default": false
+    },
     "subresourceIntegrity": {
       "type": "boolean",
       "description": "Enables the use of subresource integrity validation.",
