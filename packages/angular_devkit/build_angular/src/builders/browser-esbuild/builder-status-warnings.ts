@@ -19,7 +19,6 @@ const UNSUPPORTED_OPTIONS: Array<keyof BrowserBuilderOptions> = [
   // 'commonChunk',
 
   // * Unused by builder and will be removed in a future release
-  'namedChunks',
   'vendorChunk',
   'resourcesOutputPath',
 
@@ -43,7 +42,6 @@ export function logBuilderStatusWarnings(options: BrowserBuilderOptions, context
     }
 
     if (
-      unsupportedOption === 'namedChunks' ||
       unsupportedOption === 'vendorChunk' ||
       unsupportedOption === 'resourcesOutputPath' ||
       unsupportedOption === 'deployUrl'

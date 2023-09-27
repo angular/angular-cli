@@ -237,6 +237,7 @@ export async function normalizeOptions(
     progress = true,
     externalPackages,
     deleteOutputPath,
+    namedChunks,
   } = options;
 
   // Return all the normalized options
@@ -284,6 +285,7 @@ export async function normalizeOptions(
     indexHtmlOptions,
     tailwindConfiguration,
     i18nOptions,
+    namedChunks,
   };
 }
 
