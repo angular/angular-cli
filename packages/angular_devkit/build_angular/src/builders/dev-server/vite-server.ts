@@ -450,6 +450,14 @@ export async function setupServer(
               }
 
               transformIndexHtmlAndAddHeaders(url, rawHtml, res, next, async (html) => {
+                /* eslint-disable no-console */
+                const originalConsoleLog = console.log;
+                console.log = (...args) => {
+                  if (args[0] !== 'Angular is running in development mode.') {
+                    originalConsoleLog.apply(args);
+                  }
+                };
+
                 const { content } = await renderPage({
                   document: html,
                   route: pathnameWithoutServePath(url, serverOptions),
@@ -463,6 +471,9 @@ export async function setupServer(
                   // TODO: add support for critical css inlining.
                   inlineCriticalCss: false,
                 });
+
+                console.log = originalConsoleLog;
+                /* eslint-enable no-console */
 
                 return content;
               });
