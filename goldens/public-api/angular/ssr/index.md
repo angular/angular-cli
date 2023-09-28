@@ -10,20 +10,25 @@ import { Type } from '@angular/core';
 
 // @public
 export class CommonEngine {
-    constructor(bootstrap?: Type<{}> | (() => Promise<ApplicationRef>) | undefined, providers?: StaticProvider[]);
+    constructor(options?: CommonEngineOptions | undefined);
     render(opts: CommonEngineRenderOptions): Promise<string>;
 }
 
 // @public (undocumented)
+export interface CommonEngineOptions {
+    bootstrap?: Type<{}> | (() => Promise<ApplicationRef>);
+    enablePeformanceProfiler?: boolean;
+    providers?: StaticProvider[];
+}
+
+// @public (undocumented)
 export interface CommonEngineRenderOptions {
-    // (undocumented)
     bootstrap?: Type<{}> | (() => Promise<ApplicationRef>);
     // (undocumented)
     document?: string;
     // (undocumented)
     documentFilePath?: string;
     inlineCriticalCss?: boolean;
-    // (undocumented)
     providers?: StaticProvider[];
     publicPath?: string;
     // (undocumented)
