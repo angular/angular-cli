@@ -13,13 +13,13 @@ import {
   Type,
   createPlatformFactory,
   platformCore,
+  ɵwhenStable as whenStable,
 } from '@angular/core';
 import {
   INITIAL_CONFIG,
   ɵINTERNAL_SERVER_PLATFORM_PROVIDERS as INTERNAL_SERVER_PLATFORM_PROVIDERS,
 } from '@angular/platform-server';
 import { Route, Router, ɵloadChildren as loadChildrenHelper } from '@angular/router';
-import { first } from 'rxjs/operators'; // Import from `/operators` to support rxjs 6 which is still supported by the Framework.
 
 interface RouterResult {
   route: string;
@@ -98,7 +98,7 @@ export async function* extractRoutes(
     }
 
     // Wait until the application is stable.
-    await applicationRef.isStable.pipe(first((isStable) => isStable)).toPromise();
+    await whenStable(applicationRef);
 
     const injector = applicationRef.injector;
     const router = injector.get(Router);
