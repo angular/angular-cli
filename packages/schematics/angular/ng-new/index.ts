@@ -57,6 +57,7 @@ export default function (options: NgNewOptions): Rule {
     strict: options.strict,
     minimal: options.minimal,
     standalone: options.standalone,
+    ssr: options.ssr,
   };
 
   return chain([

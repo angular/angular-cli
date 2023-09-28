@@ -143,7 +143,6 @@
     "ssr": {
       "description": "Creates an application with Server-Side Rendering (SSR) and Static Site Generation (SSG/Prerendering) enabled.",
       "type": "boolean",
-      "default": false,
       "x-user-analytics": "ep.ng_ssr"
     }
   },
