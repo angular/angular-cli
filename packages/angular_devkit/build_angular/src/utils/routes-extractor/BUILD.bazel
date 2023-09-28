@@ -22,6 +22,5 @@ ts_library(
         "@npm//@angular/platform-server",
         "@npm//@angular/router",
         "@npm//@types/node",
-        "@npm//rxjs",
     ],
 )
