@@ -16,12 +16,28 @@ import {
 import * as fs from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { URL } from 'node:url';
-import { InlineCriticalCssProcessor } from './inline-css-processor';
+import { InlineCriticalCssProcessor, InlineCriticalCssResult } from './inline-css-processor';
+import {
+  noopRunMethodAndMeasurePerf,
+  printPerformanceLogs,
+  runMethodAndMeasurePerf,
+} from './peformance-profiler';
 
 const SSG_MARKER_REGEXP = /ng-server-context=["']\w*\|?ssg\|?\w*["']/;
 
-export interface CommonEngineRenderOptions {
+export interface CommonEngineOptions {
+  /** A method that when invoked returns a promise that returns an `ApplicationRef` instance once resolved or an NgModule. */
   bootstrap?: Type<{}> | (() => Promise<ApplicationRef>);
+  /** A set of platform level providers for all requests. */
+  providers?: StaticProvider[];
+  /** Enable request performance profiling data collection and printing the results in the server console. */
+  enablePeformanceProfiler?: boolean;
+}
+
+export interface CommonEngineRenderOptions {
+  /** A method that when invoked returns a promise that returns an `ApplicationRef` instance once resolved or an NgModule. */
+  bootstrap?: Type<{}> | (() => Promise<ApplicationRef>);
+  /** A set of platform level providers for the current request. */
   providers?: StaticProvider[];
   url?: string;
   document?: string;
@@ -39,19 +55,15 @@ export interface CommonEngineRenderOptions {
 }
 
 /**
- * A common rendering engine utility. This abstracts the logic
- * for handling the platformServer compiler, the module cache, and
- * the document loader
+ * A common engine to use to server render an application.
  */
+
 export class CommonEngine {
   private readonly templateCache = new Map<string, string>();
   private readonly inlineCriticalCssProcessor: InlineCriticalCssProcessor;
   private readonly pageIsSSG = new Map<string, boolean>();
 
-  constructor(
-    private bootstrap?: Type<{}> | (() => Promise<ApplicationRef>),
-    private providers: StaticProvider[] = [],
-  ) {
+  constructor(private options?: CommonEngineOptions) {
     this.inlineCriticalCssProcessor = new InlineCriticalCssProcessor({
       minify: false,
     });
@@ -62,40 +74,87 @@ export class CommonEngine {
    * render options
    */
   async render(opts: CommonEngineRenderOptions): Promise<string> {
-    const { inlineCriticalCss = true, url } = opts;
+    const enablePeformanceProfiler = this.options?.enablePeformanceProfiler;
 
-    if (opts.publicPath && opts.documentFilePath && url !== undefined) {
-      const pathname = canParseUrl(url) ? new URL(url).pathname : url;
-      // Remove leading forward slash.
-      const pagePath = resolve(opts.publicPath, pathname.substring(1), 'index.html');
+    const runMethod = enablePeformanceProfiler
+      ? runMethodAndMeasurePerf
+      : noopRunMethodAndMeasurePerf;
 
-      if (pagePath !== resolve(opts.documentFilePath)) {
-        // View path doesn't match with prerender path.
-        const pageIsSSG = this.pageIsSSG.get(pagePath);
-        if (pageIsSSG === undefined) {
-          if (await exists(pagePath)) {
-            const content = await fs.promises.readFile(pagePath, 'utf-8');
-            const isSSG = SSG_MARKER_REGEXP.test(content);
-            this.pageIsSSG.set(pagePath, isSSG);
+    let html = await runMethod('Retrieve SSG Page', () => this.retrieveSSGPage(opts));
 
-            if (isSSG) {
-              return content;
-            }
-          } else {
-            this.pageIsSSG.set(pagePath, false);
-          }
-        } else if (pageIsSSG) {
-          // Serve pre-rendered page.
-          return fs.promises.readFile(pagePath, 'utf-8');
-        }
+    if (html === undefined) {
+      html = await runMethod('Render Page', () => this.renderApplication(opts));
+
+      if (opts.inlineCriticalCss !== false) {
+        const { content, errors, warnings } = await runMethod('Inline Critical CSS', () =>
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          this.inlineCriticalCss(html!, opts),
+        );
+
+        html = content;
+
+        // eslint-disable-next-line no-console
+        warnings?.forEach((m) => console.warn(m));
+        // eslint-disable-next-line no-console
+        errors?.forEach((m) => console.error(m));
       }
     }
 
-    // if opts.document dosen't exist then opts.documentFilePath must
+    if (enablePeformanceProfiler) {
+      printPerformanceLogs();
+    }
+
+    return html;
+  }
+
+  private inlineCriticalCss(
+    html: string,
+    opts: CommonEngineRenderOptions,
+  ): Promise<InlineCriticalCssResult> {
+    return this.inlineCriticalCssProcessor.process(html, {
+      outputPath: opts.publicPath ?? (opts.documentFilePath ? dirname(opts.documentFilePath) : ''),
+    });
+  }
+
+  private async retrieveSSGPage(opts: CommonEngineRenderOptions): Promise<string | undefined> {
+    const { publicPath, documentFilePath, url } = opts;
+    if (!publicPath || !documentFilePath || url === undefined) {
+      return undefined;
+    }
+
+    const pathname = canParseUrl(url) ? new URL(url).pathname : url;
+    // Remove leading forward slash.
+    const pagePath = resolve(publicPath, pathname.substring(1), 'index.html');
+
+    if (pagePath !== resolve(documentFilePath)) {
+      // View path doesn't match with prerender path.
+      const pageIsSSG = this.pageIsSSG.get(pagePath);
+      if (pageIsSSG === undefined) {
+        if (await exists(pagePath)) {
+          const content = await fs.promises.readFile(pagePath, 'utf-8');
+          const isSSG = SSG_MARKER_REGEXP.test(content);
+          this.pageIsSSG.set(pagePath, isSSG);
+
+          if (isSSG) {
+            return content;
+          }
+        } else {
+          this.pageIsSSG.set(pagePath, false);
+        }
+      } else if (pageIsSSG) {
+        // Serve pre-rendered page.
+        return fs.promises.readFile(pagePath, 'utf-8');
+      }
+    }
+
+    return undefined;
+  }
+
+  private async renderApplication(opts: CommonEngineRenderOptions): Promise<string> {
     const extraProviders: StaticProvider[] = [
       { provide: ɵSERVER_CONTEXT, useValue: 'ssr' },
       ...(opts.providers ?? []),
-      ...this.providers,
+      ...(this.options?.providers ?? []),
     ];
 
     let document = opts.document;
@@ -113,29 +172,14 @@ export class CommonEngine {
       });
     }
 
-    const moduleOrFactory = this.bootstrap || opts.bootstrap;
+    const moduleOrFactory = this.options?.bootstrap ?? opts.bootstrap;
     if (!moduleOrFactory) {
       throw new Error('A module or bootstrap option must be provided.');
     }
 
-    const html = await (isBootstrapFn(moduleOrFactory)
+    return isBootstrapFn(moduleOrFactory)
       ? renderApplication(moduleOrFactory, { platformProviders: extraProviders })
-      : renderModule(moduleOrFactory, { extraProviders }));
-
-    if (!inlineCriticalCss) {
-      return html;
-    }
-
-    const { content, errors, warnings } = await this.inlineCriticalCssProcessor.process(html, {
-      outputPath: opts.publicPath ?? (opts.documentFilePath ? dirname(opts.documentFilePath) : ''),
-    });
-
-    // eslint-disable-next-line no-console
-    warnings?.forEach((m) => console.warn(m));
-    // eslint-disable-next-line no-console
-    errors?.forEach((m) => console.error(m));
-
-    return content;
+      : renderModule(moduleOrFactory, { extraProviders });
   }
 
   /** Retrieve the document from the cache or the filesystem */
