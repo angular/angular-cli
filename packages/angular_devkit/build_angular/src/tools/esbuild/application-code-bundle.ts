@@ -134,7 +134,15 @@ export function createServerCodeBundleOptions(
   target: string[],
   sourceFileCache: SourceFileCache,
 ): BuildOptions {
-  const { jit, serverEntryPoint, workspaceRoot, ssrOptions } = options;
+  const {
+    jit,
+    serverEntryPoint,
+    workspaceRoot,
+    ssrOptions,
+    watch,
+    externalPackages,
+    prerenderOptions,
+  } = options;
 
   assert(
     serverEntryPoint,
@@ -194,7 +202,7 @@ export function createServerCodeBundleOptions(
   };
 
   buildOptions.plugins ??= [];
-  if (options.externalPackages) {
+  if (externalPackages) {
     buildOptions.packages = 'external';
   } else {
     buildOptions.plugins.push(createRxjsEsmResolutionPlugin());
@@ -225,7 +233,11 @@ export function createServerCodeBundleOptions(
           `export { renderApplication, renderModule, ɵSERVER_CONTEXT } from '@angular/platform-server';`,
         ];
 
-        if (options.prerenderOptions?.discoverRoutes) {
+        if (watch) {
+          contents.push(`export { ɵresetCompiledComponents } from '@angular/core';`);
+        }
+
+        if (prerenderOptions?.discoverRoutes) {
           // We do not import it directly so that node.js modules are resolved using the correct context.
           const routesExtractorCode = await readFile(
             join(__dirname, '../../utils/routes-extractor/extractor.js'),

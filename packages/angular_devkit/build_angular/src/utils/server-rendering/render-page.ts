@@ -45,7 +45,13 @@ export async function renderPage({
     ɵSERVER_CONTEXT,
     renderModule,
     renderApplication,
+    ɵresetCompiledComponents,
   } = await loadBundle('./main.server.mjs');
+
+  // Need to clean up GENERATED_COMP_IDS map in `@angular/core`.
+  // Otherwise an incorrect component ID generation collision detected warning will be displayed in development.
+  // See: https://github.com/angular/angular-cli/issues/25924
+  ɵresetCompiledComponents?.();
 
   const platformProviders: StaticProvider[] = [
     {
