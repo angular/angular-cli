@@ -25,4 +25,6 @@ export interface MainServerBundleExports {
 
   /** Method to extract routes from the router config. */
   extractRoutes: typeof extractRoutes;
+
+  ɵresetCompiledComponents?: () => void;
 }
