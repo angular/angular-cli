@@ -126,5 +126,30 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
         }),
       );
     });
+
+    it('should not show warning when all Common JS is allowed by wildcard (*)', async () => {
+      // Add a Common JS dependency
+      await harness.appendToFile(
+        'src/app/app.component.ts',
+        `
+        import 'bootstrap';
+        import 'zone.js';
+      `,
+      );
+
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+        allowedCommonJsDependencies: ['*'],
+      });
+
+      const { result, logs } = await harness.executeOnce();
+
+      expect(result?.success).toBe(true);
+      expect(logs).not.toContain(
+        jasmine.objectContaining<logging.LogEntry>({
+          message: jasmine.stringMatching(/CommonJS or AMD dependencies/),
+        }),
+      );
+    });
   });
 });
