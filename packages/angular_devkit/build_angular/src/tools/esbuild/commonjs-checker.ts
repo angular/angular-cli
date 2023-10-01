@@ -29,7 +29,7 @@ import type { Metafile, PartialMessage } from 'esbuild';
  */
 export function checkCommonJSModules(
   metafile: Metafile,
-  allowedCommonJsDependencies?: string[],
+  allowedCommonJsDependencies?: string[]
 ): PartialMessage[] {
   const messages: PartialMessage[] = [];
   const allowedRequests = new Set(allowedCommonJsDependencies);
@@ -83,7 +83,7 @@ export function checkCommonJSModules(
         const request = imported.original;
 
         let notAllowed = true;
-        if (allowedRequests.has(request)) {
+        if (allowedRequests.has('*') || allowedRequests.has(request)) {
           notAllowed = false;
         } else {
           // Check for deep imports of allowed requests
