@@ -266,7 +266,7 @@ describe('Library Schematic', () => {
       const tree = await schematicRunner.runSchematic('library', defaultOptions, workspaceTree);
 
       const tsConfigJson = getJsonFileContent(tree, 'tsconfig.json');
-      expect(tsConfigJson.compilerOptions.paths['foo']).toEqual(['dist/foo']);
+      expect(tsConfigJson.compilerOptions.paths['foo']).toEqual(['./dist/foo']);
     });
 
     it(`should append to existing paths mappings`, async () => {
@@ -284,7 +284,7 @@ describe('Library Schematic', () => {
       const tree = await schematicRunner.runSchematic('library', defaultOptions, workspaceTree);
 
       const tsConfigJson = getJsonFileContent(tree, 'tsconfig.json');
-      expect(tsConfigJson.compilerOptions.paths['foo']).toEqual(['libs/*', 'dist/foo']);
+      expect(tsConfigJson.compilerOptions.paths['foo']).toEqual(['libs/*', './dist/foo']);
     });
 
     it(`should not modify the file when --skipTsConfig`, async () => {
@@ -333,7 +333,7 @@ describe('Library Schematic', () => {
     expect(cfg.projects['@myscope/mylib']).toBeDefined();
 
     const rootTsCfg = getJsonFileContent(tree, '/tsconfig.json');
-    expect(rootTsCfg.compilerOptions.paths['@myscope/mylib']).toEqual(['dist/myscope/mylib']);
+    expect(rootTsCfg.compilerOptions.paths['@myscope/mylib']).toEqual(['./dist/myscope/mylib']);
   });
 
   it(`should dasherize scoped libraries`, async () => {

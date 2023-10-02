@@ -164,7 +164,7 @@ export default function (options: LibraryOptions): Rule {
       mergeWith(templateSource),
       addLibToWorkspaceFile(options, libDir, packageName),
       options.skipPackageJson ? noop() : addDependenciesToPackageJson(),
-      options.skipTsConfig ? noop() : updateTsConfig(packageName, distRoot),
+      options.skipTsConfig ? noop() : updateTsConfig(packageName, './' + distRoot),
       options.standalone
         ? noop()
         : schematic('module', {

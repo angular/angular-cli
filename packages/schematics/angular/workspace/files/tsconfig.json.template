@@ -2,7 +2,6 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
-    "baseUrl": "./",
     "outDir": "./dist/out-tsc",<% if (strict) { %>
     "forceConsistentCasingInFileNames": true,
     "strict": true,

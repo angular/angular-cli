@@ -17,7 +17,7 @@ export default async function () {
 
   // Scenario #1 where we use wildcard path mappings for secondary entry-points.
   await updateJsonFile('tsconfig.json', (json) => {
-    json.compilerOptions.paths = { 'mylib': ['dist/mylib'], 'mylib/*': ['dist/mylib/*'] };
+    json.compilerOptions.paths = { 'mylib': ['./dist/mylib'], 'mylib/*': ['./dist/mylib/*'] };
   });
 
   await appendToFile(
@@ -39,9 +39,9 @@ export default async function () {
   // Scenario #2 where we don't use wildcard path mappings.
   await updateJsonFile('tsconfig.json', (json) => {
     json.compilerOptions.paths = {
-      'mylib': ['dist/mylib'],
-      'mylib/secondary': ['dist/mylib/secondary'],
-      'mylib/another': ['dist/mylib/another'],
+      'mylib': ['./dist/mylib'],
+      'mylib/secondary': ['./dist/mylib/secondary'],
+      'mylib/another': ['./dist/mylib/another'],
     };
   });
 
