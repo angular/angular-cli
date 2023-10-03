@@ -55,6 +55,14 @@ describe('Component Schematic', () => {
     appTree = await schematicRunner.runSchematic('application', appOptions, appTree);
   });
 
+  it('should contain a TestBed compileComponents call', async () => {
+    const options = { ...defaultOptions };
+
+    const tree = await schematicRunner.runSchematic('component', options, appTree);
+    const tsContent = tree.readContent('/projects/bar/src/app/foo/foo.component.spec.ts');
+    expect(tsContent).toContain('compileComponents()');
+  });
+
   it('should set change detection to OnPush', async () => {
     const options = { ...defaultOptions, changeDetection: 'OnPush' };
 
