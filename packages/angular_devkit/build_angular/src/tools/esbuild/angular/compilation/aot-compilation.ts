@@ -78,7 +78,7 @@ export class AotCompilation extends AngularCompilation {
     let usingBuildInfo = false;
     if (!oldProgram) {
       oldProgram = ts.readBuilderProgram(compilerOptions, host);
-      usingBuildInfo = true;
+      usingBuildInfo = !!oldProgram;
     }
 
     const typeScriptProgram = ts.createEmitAndSemanticDiagnosticsBuilderProgram(
@@ -93,6 +93,25 @@ export class AotCompilation extends AngularCompilation {
       findAffectedFiles(typeScriptProgram, angularCompiler, usingBuildInfo),
     );
 
+    // Get all files referenced in the TypeScript/Angular program including component resources
+    const referencedFiles = typeScriptProgram
+      .getSourceFiles()
+      .filter((sourceFile) => !angularCompiler.ignoreForEmit.has(sourceFile))
+      .flatMap((sourceFile) => {
+        const resourceDependencies = angularCompiler.getResourceDependencies(sourceFile);
+
+        // Also invalidate Angular diagnostics for a source file if component resources are modified
+        if (this.#state && hostOptions.modifiedFiles?.size) {
+          for (const resourceDependency of resourceDependencies) {
+            if (hostOptions.modifiedFiles.has(resourceDependency)) {
+              this.#state.diagnosticCache.delete(sourceFile);
+            }
+          }
+        }
+
+        return [sourceFile.fileName, ...resourceDependencies];
+      });
+
     this.#state = new AngularCompilationState(
       angularProgram,
       host,
@@ -102,14 +121,6 @@ export class AotCompilation extends AngularCompilation {
       createWorkerTransformer(hostOptions.processWebWorker.bind(hostOptions)),
       this.#state?.diagnosticCache,
     );
-
-    const referencedFiles = typeScriptProgram
-      .getSourceFiles()
-      .filter((sourceFile) => !angularCompiler.ignoreForEmit.has(sourceFile))
-      .flatMap((sourceFile) => [
-        sourceFile.fileName,
-        ...angularCompiler.getResourceDependencies(sourceFile),
-      ]);
 
     return { affectedFiles, compilerOptions, referencedFiles };
   }
