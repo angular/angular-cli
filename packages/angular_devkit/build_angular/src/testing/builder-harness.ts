@@ -51,6 +51,7 @@ export interface BuilderHarnessExecutionOptions {
   outputLogsOnFailure: boolean;
   outputLogsOnException: boolean;
   useNativeFileWatching: boolean;
+  signal: AbortSignal;
 }
 
 /**
@@ -235,6 +236,7 @@ export class BuilderHarness<T> {
       this.builderInfo,
       this.resolvePath('.'),
       contextHost,
+      options.signal,
       useNativeFileWatching ? undefined : this.watcherNotifier,
     );
     if (this.targetName !== undefined) {
@@ -389,6 +391,7 @@ class HarnessBuilderContext implements BuilderContext {
     public builder: BuilderInfo,
     basePath: string,
     private readonly contextHost: ContextHost,
+    public readonly signal: AbortSignal | undefined,
     public readonly watcherFactory: BuilderWatcherFactory | undefined,
   ) {
     this.workspaceRoot = this.currentDirectory = basePath;
@@ -442,6 +445,7 @@ class HarnessBuilderContext implements BuilderContext {
       info,
       this.workspaceRoot,
       this.contextHost,
+      this.signal,
       this.watcherFactory,
     );
     context.target = target;

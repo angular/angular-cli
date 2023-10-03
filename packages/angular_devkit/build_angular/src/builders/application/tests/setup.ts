@@ -28,4 +28,8 @@ export const BASE_OPTIONS = Object.freeze<Schema>({
 
   // Disable optimizations
   optimization: false,
+
+  // Enable polling (if a test enables watch mode).
+  // This is a workaround for bazel isolation file watch not triggering in tests.
+  poll: 100,
 });
