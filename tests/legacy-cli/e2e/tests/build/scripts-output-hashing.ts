@@ -1,3 +1,4 @@
+import { getGlobalVariable } from '../../utils/env';
 import {
   expectFileMatchToExist,
   expectFileToMatch,
@@ -8,7 +9,14 @@ import { ng } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';
 
 function getScriptsFilename(): Promise<string> {
-  return expectFileMatchToExist('dist/test-project/browser/', /external-module\.[0-9a-f]{16}\.js/);
+  if (getGlobalVariable('argv')['esbuild']) {
+    return expectFileMatchToExist('dist/test-project/browser/', /external-module-[0-9A-Z]{8}\.js/);
+  } else {
+    return expectFileMatchToExist(
+      'dist/test-project/browser/',
+      /external-module\.[0-9a-f]{16}\.js/,
+    );
+  }
 }
 
 export default async function () {
