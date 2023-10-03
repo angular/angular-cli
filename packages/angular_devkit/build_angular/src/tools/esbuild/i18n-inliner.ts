@@ -8,7 +8,7 @@
 
 import type { OutputFile } from 'esbuild';
 import Piscina from 'piscina';
-import { cloneOutputFile, createOutputFileFromData } from './utils';
+import { cloneOutputFile, createOutputFileFromText } from './utils';
 
 /**
  * A keyword used to indicate if a JavaScript file may require inlining of translations.
@@ -42,7 +42,7 @@ export class I18nInliner {
     const files = new Map<string, Blob>();
     const pendingMaps = [];
     for (const file of options.outputFiles) {
-      if (file.path.endsWith('.js')) {
+      if (file.path.endsWith('.js') || file.path.endsWith('.mjs')) {
         // Check if localizations are present
         const contentBuffer = Buffer.isBuffer(file.contents)
           ? file.contents
@@ -123,7 +123,7 @@ export class I18nInliner {
 
     // Convert raw results to output file objects and include all unmodified files
     return [
-      ...rawResults.flat().map(({ file, contents }) => createOutputFileFromData(file, contents)),
+      ...rawResults.flat().map(({ file, contents }) => createOutputFileFromText(file, contents)),
       ...this.#unmodifiedFiles.map((file) => cloneOutputFile(file)),
     ];
   }

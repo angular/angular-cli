@@ -227,19 +227,16 @@ export function createOutputFileFromData(path: string, data: Uint8Array): Output
 }
 
 export function cloneOutputFile(file: OutputFile): OutputFile {
-  const path = file.path;
-  const data = file.contents;
-
   return {
-    path,
+    path: file.path,
     get text() {
-      return Buffer.from(data.buffer, data.byteOffset, data.byteLength).toString('utf-8');
+      return file.text;
     },
     get hash() {
-      return createHash('sha256').update(data).digest('hex');
+      return file.hash;
     },
     get contents() {
-      return data;
+      return file.contents;
     },
   };
 }
