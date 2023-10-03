@@ -30,15 +30,7 @@ BROWSER_TESTS = ["tests/misc/browsers.js"]
 YARN_TESTS = ["tests/basic/**", "tests/update/**", "tests/commands/add/**"]
 ESBUILD_TESTS = [
     "tests/basic/**",
-    "tests/build/app-shell/app-shell-standalone.js",
-    "tests/build/app-shell/app-shell-with-schematic.js",
-    "tests/build/library/**",
-    "tests/build/ssr/**",
-    "tests/build/prod-build.js",
-    "tests/build/relative-sourcemap.js",
-    "tests/build/styles/**",
-    "tests/build/prerender/**",
-    "tests/build/worker.js",
+    "tests/build/**",
     "tests/commands/add/**",
     "tests/i18n/**",
 ]

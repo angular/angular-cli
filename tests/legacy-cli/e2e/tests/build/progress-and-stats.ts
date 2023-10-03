@@ -15,7 +15,7 @@ export default async function () {
 
   let logs;
   if (getGlobalVariable('argv')['esbuild']) {
-    logs = ['Application bundle generation complete.'];
+    logs = ['Building...'];
   } else {
     logs = [
       'Browser application bundle generation complete',

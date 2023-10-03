@@ -1,9 +1,12 @@
+import { getGlobalVariable } from '../../utils/env';
 import { appendToFile } from '../../utils/fs';
 import { killAllProcesses, waitForAnyProcessOutputToMatch } from '../../utils/process';
 import { ngServe } from '../../utils/project';
 import { expectToFail, wait } from '../../utils/utils';
 
-const webpackGoodRegEx = / Compiled successfully./;
+const webpackGoodRegEx = getGlobalVariable('argv')['esbuild']
+  ? /Application bundle generation complete\./
+  : / Compiled successfully\./;
 
 export default async function () {
   try {

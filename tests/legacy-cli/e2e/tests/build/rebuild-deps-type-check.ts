@@ -4,9 +4,12 @@ import {
   execAndWaitForOutputToMatch,
 } from '../../utils/process';
 import { writeFile, prependToFile, appendToFile } from '../../utils/fs';
+import { getGlobalVariable } from '../../utils/env';
 
-const doneRe = / Compiled successfully.|: Failed to compile./;
-const errorRe = /Error/;
+const doneRe = getGlobalVariable('argv')['esbuild']
+  ? /Application bundle generation complete\./
+  : / Compiled successfully\.|: Failed to compile\./;
+const errorRe = /Error/i;
 
 export default function () {
   // TODO(architect): Delete this test. It is now in devkit/build-angular.
@@ -71,7 +74,11 @@ export default function () {
       )
       .then((results) => {
         const stderr = results[0].stderr;
-        if (!/Error: (.*src\/)?main\.ts/.test(stderr)) {
+        if (
+          !stderr.includes(
+            "Argument of type 'string' is not assignable to parameter of type 'number'",
+          )
+        ) {
           throw new Error('Expected an error but none happened.');
         }
       })
@@ -90,7 +97,11 @@ export default function () {
       )
       .then((results) => {
         const stderr = results[0].stderr;
-        if (!/Error: (.*src\/)?main\.ts/.test(stderr)) {
+        if (
+          !stderr.includes(
+            "Argument of type 'string' is not assignable to parameter of type 'number'",
+          )
+        ) {
           throw new Error('Expected an error to still be there but none was.');
         }
       })
@@ -110,7 +121,11 @@ export default function () {
       )
       .then((results) => {
         const stderr = results[0].stderr;
-        if (/Error: (.*src\/)?main\.ts/.test(stderr)) {
+        if (
+          stderr.includes(
+            "Argument of type 'string' is not assignable to parameter of type 'number'",
+          )
+        ) {
           throw new Error('Expected no error but an error was shown.');
         }
       })

@@ -6,7 +6,9 @@ import {
 import { writeFile, prependToFile } from '../../utils/fs';
 import { getGlobalVariable } from '../../utils/env';
 
-const successRe = / Compiled successfully/;
+const successRe = getGlobalVariable('argv')['esbuild']
+  ? /Application bundle generation complete\./
+  : / Compiled successfully/;
 
 export default async function () {
   // TODO(architect): Delete this test. It is now in devkit/build-angular.

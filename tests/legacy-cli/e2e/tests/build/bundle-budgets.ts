@@ -5,11 +5,14 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import { getGlobalVariable } from '../../utils/env';
 import { ng } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';
 import { expectToFail } from '../../utils/utils';
 
 export default async function () {
+  const usingWebpack = !getGlobalVariable('argv')['esbuild'];
+
   // Error
   await updateJsonFile('angular.json', (json) => {
     json.projects['test-project'].architect.build.configurations.production.budgets = [
@@ -17,9 +20,17 @@ export default async function () {
     ];
   });
 
-  const { message: errorMessage } = await expectToFail(() => ng('build'));
-  if (!/Error.+budget/.test(errorMessage)) {
-    throw new Error('Budget error: all, max error.');
+  if (usingWebpack) {
+    const { message: errorMessage } = await expectToFail(() => ng('build'));
+    if (!/Error.+budget/i.test(errorMessage)) {
+      throw new Error('Budget error: all, max error.');
+    }
+  } else {
+    // Application builder does not generate an error exit code for budget failures
+    const { stderr } = await ng('build');
+    if (!/Error.+budget/i.test(stderr)) {
+      throw new Error('Budget error: all, max error.');
+    }
   }
 
   // Warning
@@ -30,7 +41,7 @@ export default async function () {
   });
 
   const { stderr } = await ng('build');
-  if (!/Warning.+budget/.test(stderr)) {
+  if (!/Warning.+budget/i.test(stderr)) {
     throw new Error('Budget warning: all, min warning');
   }
 
@@ -42,7 +53,7 @@ export default async function () {
   });
 
   const { stderr: stderr2 } = await ng('build');
-  if (/(Warning|Error)/.test(stderr2)) {
+  if (/(Warning|Error)/i.test(stderr2)) {
     throw new Error('BIG max for all, should not error');
   }
 }

@@ -1,8 +1,13 @@
 import { ng } from '../../utils/process';
 import { copyProjectAsset } from '../../utils/assets';
 import { appendToFile, expectFileToMatch, writeMultipleFiles } from '../../utils/fs';
+import { getGlobalVariable } from '../../utils/env';
 
 export default function () {
+  if (getGlobalVariable('argv')['esbuild']) {
+    return;
+  }
+
   return (
     Promise.resolve()
       .then(() =>
