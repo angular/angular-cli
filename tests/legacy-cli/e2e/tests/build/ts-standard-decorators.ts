@@ -1,3 +1,4 @@
+import { getGlobalVariable } from '../../utils/env';
 import { ng } from '../../utils/process';
 import { updateJsonFile, updateTsConfig } from '../../utils/project';
 
@@ -16,7 +17,10 @@ export default async function () {
     // of a JIT production build.
     json.projects['test-project'].architect.build.configurations.production.budgets = [];
   });
-  await ng('build', '--no-aot', '--no-build-optimizer');
+
+  if (!getGlobalVariable('argv')['esbuild']) {
+    await ng('build', '--no-aot', '--no-build-optimizer');
+  }
 
   // Default development build
   await ng('build', '--configuration=development');
