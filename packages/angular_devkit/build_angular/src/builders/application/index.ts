@@ -44,20 +44,12 @@ export async function* buildApplicationInternal(
 
   const normalizedOptions = await normalizeOptions(context, projectName, options);
 
-  // Warn about prerender/ssr not yet supporting localize
-  if (
-    normalizedOptions.i18nOptions.shouldInline &&
-    (normalizedOptions.prerenderOptions ||
-      normalizedOptions.ssrOptions ||
-      normalizedOptions.appShellOptions)
-  ) {
+  // Warn about SSR not yet supporting localize
+  if (normalizedOptions.i18nOptions.shouldInline && normalizedOptions.ssrOptions) {
     context.logger.warn(
-      `Prerendering, App Shell, and SSR are not yet supported with the 'localize' option and will be disabled for this build.`,
+      `SSR is not yet supported with the 'localize' option and will be disabled for this build.`,
     );
-    normalizedOptions.prerenderOptions =
-      normalizedOptions.ssrOptions =
-      normalizedOptions.appShellOptions =
-        undefined;
+    normalizedOptions.ssrOptions = undefined;
   }
 
   yield* runEsBuildBuildAction(

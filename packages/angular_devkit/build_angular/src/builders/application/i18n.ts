@@ -16,6 +16,8 @@ import { createOutputFileFromText } from '../../tools/esbuild/utils';
 import { maxWorkers } from '../../utils/environment-options';
 import { loadTranslations } from '../../utils/i18n-options';
 import { createTranslationLoader } from '../../utils/load-translations';
+import { prerenderPages } from '../../utils/server-rendering/prerender';
+import { augmentAppWithServiceWorkerEsbuild } from '../../utils/service-worker';
 import { urlJoin } from '../../utils/url';
 import { NormalizedApplicationBuildOptions } from './options';
 
@@ -30,7 +32,7 @@ export async function inlineI18n(
   options: NormalizedApplicationBuildOptions,
   executionResult: ExecutionResult,
   initialFiles: Map<string, InitialFileRecord>,
-): Promise<void> {
+): Promise<{ errors: string[]; warnings: string[] }> {
   // Create the multi-threaded inliner with common options and the files generated from the build.
   const inliner = new I18nInliner(
     {
@@ -40,6 +42,11 @@ export async function inlineI18n(
     },
     maxWorkers,
   );
+
+  const inlineResult: { errors: string[]; warnings: string[] } = {
+    errors: [],
+    warnings: [],
+  };
 
   // For each active locale, use the inliner to process the output files of the build.
   const updatedOutputFiles = [];
@@ -52,20 +59,64 @@ export async function inlineI18n(
         options.i18nOptions.locales[locale].translation,
       );
 
+      const baseHref =
+        getLocaleBaseHref(options.baseHref, options.i18nOptions, locale) ?? options.baseHref;
+
       // Generate locale specific index HTML files
       if (options.indexHtmlOptions) {
-        const { content, errors, warnings } = await generateIndexHtml(
-          initialFiles,
-          localeOutputFiles,
-          {
-            ...options,
-            baseHref:
-              getLocaleBaseHref(options.baseHref, options.i18nOptions, locale) ?? options.baseHref,
-          },
-          locale,
-        );
+        const { content, contentWithoutCriticalCssInlined, errors, warnings } =
+          await generateIndexHtml(
+            initialFiles,
+            localeOutputFiles,
+            {
+              ...options,
+              baseHref,
+            },
+            locale,
+          );
 
         localeOutputFiles.push(createOutputFileFromText(options.indexHtmlOptions.output, content));
+        inlineResult.errors.push(...errors);
+        inlineResult.warnings.push(...warnings);
+
+        // Pre-render (SSG) and App-shell
+        if (options.prerenderOptions || options.appShellOptions) {
+          const { output, warnings, errors } = await prerenderPages(
+            options.workspaceRoot,
+            options.appShellOptions,
+            options.prerenderOptions,
+            localeOutputFiles,
+            contentWithoutCriticalCssInlined,
+            options.optimizationOptions.styles.inlineCritical,
+            maxWorkers,
+            options.verbose,
+          );
+
+          inlineResult.errors.push(...errors);
+          inlineResult.warnings.push(...warnings);
+
+          for (const [path, content] of Object.entries(output)) {
+            localeOutputFiles.push(createOutputFileFromText(path, content));
+          }
+        }
+      }
+
+      if (options.serviceWorker) {
+        try {
+          const serviceWorkerResult = await augmentAppWithServiceWorkerEsbuild(
+            options.workspaceRoot,
+            options.serviceWorker,
+            baseHref || '/',
+            localeOutputFiles,
+            executionResult.assetFiles,
+          );
+          localeOutputFiles.push(
+            createOutputFileFromText('ngsw.json', serviceWorkerResult.manifest),
+          );
+          executionResult.assetFiles.push(...serviceWorkerResult.assetFiles);
+        } catch (error) {
+          inlineResult.errors.push(error instanceof Error ? error.message : `${error}`);
+        }
       }
 
       // Update directory with locale base
@@ -95,6 +146,8 @@ export async function inlineI18n(
   if (options.i18nOptions.flatOutput !== true) {
     executionResult.assetFiles = updatedAssetFiles;
   }
+
+  return inlineResult;
 }
 
 function getLocaleBaseHref(

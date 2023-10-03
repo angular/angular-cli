@@ -186,7 +186,8 @@ export async function executeBuild(
   }
 
   // Pre-render (SSG) and App-shell
-  if (prerenderOptions || appShellOptions) {
+  // If localization is enabled, prerendering is handled in the inlining process.
+  if ((prerenderOptions || appShellOptions) && !options.i18nOptions.shouldInline) {
     assert(
       indexContentOutputNoCssInlining,
       'The "index" option is required when using the "ssg" or "appShell" options.',
@@ -217,11 +218,6 @@ export async function executeBuild(
     executionResult.assetFiles.push(...(await copyAssets(assets, [], workspaceRoot)));
   }
 
-  // Write metafile if stats option is enabled
-  if (options.stats) {
-    executionResult.addOutputFile('stats.json', JSON.stringify(metafile, null, 2));
-  }
-
   // Extract and write licenses for used packages
   if (options.extractLicenses) {
     executionResult.addOutputFile(
@@ -231,7 +227,8 @@ export async function executeBuild(
   }
 
   // Augment the application with service worker support
-  if (serviceWorker) {
+  // If localization is enabled, service worker is handled in the inlining process.
+  if (serviceWorker && !options.i18nOptions.shouldInline) {
     try {
       const serviceWorkerResult = await augmentAppWithServiceWorkerEsbuild(
         workspaceRoot,
@@ -262,7 +259,13 @@ export async function executeBuild(
 
   // Perform i18n translation inlining if enabled
   if (options.i18nOptions.shouldInline) {
-    await inlineI18n(options, executionResult, initialFiles);
+    const { errors, warnings } = await inlineI18n(options, executionResult, initialFiles);
+    printWarningsAndErrorsToConsole(context, warnings, errors);
+  }
+
+  // Write metafile if stats option is enabled
+  if (options.stats) {
+    executionResult.addOutputFile('stats.json', JSON.stringify(metafile, null, 2));
   }
 
   return executionResult;
