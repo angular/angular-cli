@@ -17,7 +17,8 @@ import { Schema as ApplicationBuilderOptions } from './schema';
 
 export async function* buildApplicationInternal(
   options: ApplicationBuilderInternalOptions,
-  context: BuilderContext,
+  // TODO: Integrate abort signal support into builder system
+  context: BuilderContext & { signal?: AbortSignal },
   infrastructureSettings?: {
     write?: boolean;
   },
@@ -73,6 +74,7 @@ export async function* buildApplicationInternal(
       progress: normalizedOptions.progress,
       writeToFileSystem: infrastructureSettings?.write,
       logger: context.logger,
+      signal: context.signal,
     },
   );
 }

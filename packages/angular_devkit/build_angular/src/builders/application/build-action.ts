@@ -30,6 +30,7 @@ export async function* runEsBuildBuildAction(
     progress?: boolean;
     deleteOutputPath?: boolean;
     poll?: number;
+    signal?: AbortSignal;
   },
 ): AsyncIterable<(ExecutionResult['outputWithFiles'] | ExecutionResult['output']) & BuilderOutput> {
   const {
@@ -75,22 +76,6 @@ export async function* runEsBuildBuildAction(
   let result: ExecutionResult;
   try {
     result = await withProgress('Building...', () => action());
-
-    if (writeToFileSystem) {
-      // Write output files
-      await writeResultFiles(result.outputFiles, result.assetFiles, outputPath);
-
-      yield result.output;
-    } else {
-      // Requires casting due to unneeded `JsonObject` requirement. Remove once fixed.
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      yield result.outputWithFiles as any;
-    }
-
-    // Finish if watch mode is not enabled
-    if (!watch) {
-      return;
-    }
   } finally {
     // Ensure Sass workers are shutdown if not watching
     if (!watch) {
@@ -98,52 +83,82 @@ export async function* runEsBuildBuildAction(
     }
   }
 
-  if (progress) {
-    logger.info('Watch mode enabled. Watching for file changes...');
+  // Setup watcher if watch mode enabled
+  let watcher: import('../../tools/esbuild/watcher').BuildWatcher | undefined;
+  if (watch) {
+    if (progress) {
+      logger.info('Watch mode enabled. Watching for file changes...');
+    }
+
+    // Setup a watcher
+    const { createWatcher } = await import('../../tools/esbuild/watcher');
+    watcher = createWatcher({
+      polling: typeof poll === 'number',
+      interval: poll,
+      ignored: [
+        // Ignore the output and cache paths to avoid infinite rebuild cycles
+        outputPath,
+        cacheOptions.basePath,
+        // Ignore all node modules directories to avoid excessive file watchers.
+        // Package changes are handled below by watching manifest and lock files.
+        '**/node_modules/**',
+        '**/.*/**',
+      ],
+    });
+
+    // Setup abort support
+    options.signal?.addEventListener('abort', () => void watcher?.close());
+
+    // Temporarily watch the entire project
+    watcher.add(projectRoot);
+
+    // Watch workspace for package manager changes
+    const packageWatchFiles = [
+      // manifest can affect module resolution
+      'package.json',
+      // npm lock file
+      'package-lock.json',
+      // pnpm lock file
+      'pnpm-lock.yaml',
+      // yarn lock file including Yarn PnP manifest files (https://yarnpkg.com/advanced/pnp-spec/)
+      'yarn.lock',
+      '.pnp.cjs',
+      '.pnp.data.json',
+    ];
+
+    watcher.add(packageWatchFiles.map((file) => path.join(workspaceRoot, file)));
+
+    // Watch locations provided by the initial build result
+    watcher.add(result.watchFiles);
   }
 
-  // Setup a watcher
-  const { createWatcher } = await import('../../tools/esbuild/watcher');
-  const watcher = createWatcher({
-    polling: typeof poll === 'number',
-    interval: poll,
-    ignored: [
-      // Ignore the output and cache paths to avoid infinite rebuild cycles
-      outputPath,
-      cacheOptions.basePath,
-      // Ignore all node modules directories to avoid excessive file watchers.
-      // Package changes are handled below by watching manifest and lock files.
-      '**/node_modules/**',
-      '**/.*/**',
-    ],
-  });
+  // Output the first build results after setting up the watcher to ensure that any code executed
+  // higher in the iterator call stack will trigger the watcher. This is particularly relevant for
+  // unit tests which execute the builder and modify the file system programmatically.
+  if (writeToFileSystem) {
+    // Write output files
+    await writeResultFiles(result.outputFiles, result.assetFiles, outputPath);
 
-  // Temporarily watch the entire project
-  watcher.add(projectRoot);
+    yield result.output;
+  } else {
+    // Requires casting due to unneeded `JsonObject` requirement. Remove once fixed.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    yield result.outputWithFiles as any;
+  }
 
-  // Watch workspace for package manager changes
-  const packageWatchFiles = [
-    // manifest can affect module resolution
-    'package.json',
-    // npm lock file
-    'package-lock.json',
-    // pnpm lock file
-    'pnpm-lock.yaml',
-    // yarn lock file including Yarn PnP manifest files (https://yarnpkg.com/advanced/pnp-spec/)
-    'yarn.lock',
-    '.pnp.cjs',
-    '.pnp.data.json',
-  ];
-
-  watcher.add(packageWatchFiles.map((file) => path.join(workspaceRoot, file)));
-
-  // Watch locations provided by the initial build result
-  let previousWatchFiles = new Set(result.watchFiles);
-  watcher.add(result.watchFiles);
+  // Finish if watch mode is not enabled
+  if (!watcher) {
+    return;
+  }
 
   // Wait for changes and rebuild as needed
+  let previousWatchFiles = new Set(result.watchFiles);
   try {
     for await (const changes of watcher) {
+      if (options.signal?.aborted) {
+        break;
+      }
+
       if (verbose) {
         logger.info(changes.toDebugString());
       }
