@@ -6,17 +6,16 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import type { OutputFile } from 'esbuild';
 import assert from 'node:assert';
 import path from 'node:path';
 import { NormalizedApplicationBuildOptions } from '../../builders/application/options';
 import { IndexHtmlGenerator } from '../../utils/index-file/index-html-generator';
 import { InlineCriticalCssProcessor } from '../../utils/index-file/inline-critical-css';
-import { InitialFileRecord } from './bundler-context';
+import { BuildOutputFile, BuildOutputFileType, InitialFileRecord } from './bundler-context';
 
 export async function generateIndexHtml(
   initialFiles: Map<string, InitialFileRecord>,
-  outputFiles: OutputFile[],
+  outputFiles: BuildOutputFile[],
   buildOptions: NormalizedApplicationBuildOptions,
   lang?: string,
 ): Promise<{
@@ -57,11 +56,12 @@ export async function generateIndexHtml(
   }
 
   /** Virtual output path to support reading in-memory files. */
+  const browserOutputFiles = outputFiles.filter(({ type }) => type === BuildOutputFileType.Browser);
   const virtualOutputPath = '/';
   const readAsset = async function (filePath: string): Promise<string> {
     // Remove leading directory separator
     const relativefilePath = path.relative(virtualOutputPath, filePath);
-    const file = outputFiles.find((file) => file.path === relativefilePath);
+    const file = browserOutputFiles.find((file) => file.path === relativefilePath);
     if (file) {
       return file.text;
     }

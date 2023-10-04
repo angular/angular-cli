@@ -8,7 +8,7 @@
 
 import { BuilderContext } from '@angular-devkit/architect';
 import { join } from 'node:path';
-import { InitialFileRecord } from '../../tools/esbuild/bundler-context';
+import { BuildOutputFileType, InitialFileRecord } from '../../tools/esbuild/bundler-context';
 import { ExecutionResult } from '../../tools/esbuild/bundler-execution-result';
 import { I18nInliner } from '../../tools/esbuild/i18n-inliner';
 import { generateIndexHtml } from '../../tools/esbuild/index-html-generator';
@@ -75,7 +75,13 @@ export async function inlineI18n(
             locale,
           );
 
-        localeOutputFiles.push(createOutputFileFromText(options.indexHtmlOptions.output, content));
+        localeOutputFiles.push(
+          createOutputFileFromText(
+            options.indexHtmlOptions.output,
+            content,
+            BuildOutputFileType.Browser,
+          ),
+        );
         inlineResult.errors.push(...errors);
         inlineResult.warnings.push(...warnings);
 
@@ -96,7 +102,9 @@ export async function inlineI18n(
           inlineResult.warnings.push(...warnings);
 
           for (const [path, content] of Object.entries(output)) {
-            localeOutputFiles.push(createOutputFileFromText(path, content));
+            localeOutputFiles.push(
+              createOutputFileFromText(path, content, BuildOutputFileType.Browser),
+            );
           }
         }
       }
@@ -111,7 +119,11 @@ export async function inlineI18n(
             executionResult.assetFiles,
           );
           localeOutputFiles.push(
-            createOutputFileFromText('ngsw.json', serviceWorkerResult.manifest),
+            createOutputFileFromText(
+              'ngsw.json',
+              serviceWorkerResult.manifest,
+              BuildOutputFileType.Browser,
+            ),
           );
           executionResult.assetFiles.push(...serviceWorkerResult.assetFiles);
         } catch (error) {

@@ -10,6 +10,7 @@ import { BuilderOutput } from '@angular-devkit/architect';
 import type { logging } from '@angular-devkit/core';
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import { BuildOutputFile } from '../../tools/esbuild/bundler-context';
 import { ExecutionResult, RebuildState } from '../../tools/esbuild/bundler-execution-result';
 import { shutdownSassWorkerPool } from '../../tools/esbuild/stylesheets/sass-language';
 import { withNoProgress, withSpinner, writeResultFiles } from '../../tools/esbuild/utils';
@@ -25,6 +26,7 @@ export async function* runEsBuildBuildAction(
     logger: logging.LoggerApi;
     cacheOptions: NormalizedCachedOptions;
     writeToFileSystem?: boolean;
+    writeToFileSystemFilter?: (file: BuildOutputFile) => boolean;
     watch?: boolean;
     verbose?: boolean;
     progress?: boolean;
@@ -34,6 +36,7 @@ export async function* runEsBuildBuildAction(
   },
 ): AsyncIterable<(ExecutionResult['outputWithFiles'] | ExecutionResult['output']) & BuilderOutput> {
   const {
+    writeToFileSystemFilter,
     writeToFileSystem = true,
     watch,
     poll,
@@ -177,7 +180,10 @@ export async function* runEsBuildBuildAction(
 
       if (writeToFileSystem) {
         // Write output files
-        await writeResultFiles(result.outputFiles, result.assetFiles, outputPath);
+        const filesToWrite = writeToFileSystemFilter
+          ? result.outputFiles.filter(writeToFileSystemFilter)
+          : result.outputFiles;
+        await writeResultFiles(filesToWrite, result.assetFiles, outputPath);
 
         yield result.output;
       } else {

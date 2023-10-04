@@ -7,7 +7,7 @@
  */
 
 import { BuilderContext, BuilderOutput, createBuilder } from '@angular-devkit/architect';
-import type { OutputFile } from 'esbuild';
+import { BuildOutputFile, BuildOutputFileType } from '../../tools/esbuild/bundler-context';
 import { purgeStaleBuildCache } from '../../utils/purge-cache';
 import { assertCompatibleAngularVersion } from '../../utils/version';
 import { runEsBuildBuildAction } from './build-action';
@@ -24,7 +24,7 @@ export async function* buildApplicationInternal(
   },
 ): AsyncIterable<
   BuilderOutput & {
-    outputFiles?: OutputFile[];
+    outputFiles?: BuildOutputFile[];
     assetFiles?: { source: string; destination: string }[];
   }
 > {
@@ -65,6 +65,12 @@ export async function* buildApplicationInternal(
       workspaceRoot: normalizedOptions.workspaceRoot,
       progress: normalizedOptions.progress,
       writeToFileSystem: infrastructureSettings?.write,
+      // For app-shell and SSG server files are not required by users.
+      // Omit these when SSR is not enabled.
+      writeToFileSystemFilter:
+        normalizedOptions.ssrOptions && normalizedOptions.serverEntryPoint
+          ? undefined
+          : (file) => file.type !== BuildOutputFileType.Server,
       logger: context.logger,
       signal: context.signal,
     },
@@ -76,7 +82,7 @@ export function buildApplication(
   context: BuilderContext,
 ): AsyncIterable<
   BuilderOutput & {
-    outputFiles?: OutputFile[];
+    outputFiles?: BuildOutputFile[];
     assetFiles?: { source: string; destination: string }[];
   }
 > {
