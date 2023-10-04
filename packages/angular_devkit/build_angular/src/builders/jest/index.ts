@@ -84,7 +84,7 @@ export default createBuilder(
       '--experimental-vm-modules',
       jest,
 
-      `--rootDir="${testOut}"`,
+      `--rootDir="${path.join(testOut, 'browser')}"`,
       '--testEnvironment=jsdom',
 
       // TODO(dgp1130): Enable cache once we have a mechanism for properly clearing / disabling it.

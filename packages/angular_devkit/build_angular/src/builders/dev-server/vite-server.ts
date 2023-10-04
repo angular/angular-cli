@@ -8,7 +8,6 @@
 
 import type { BuilderContext } from '@angular-devkit/architect';
 import type { json, logging } from '@angular-devkit/core';
-import type { OutputFile } from 'esbuild';
 import { lookup as lookupMimeType } from 'mrmime';
 import assert from 'node:assert';
 import { BinaryLike, createHash } from 'node:crypto';
@@ -17,6 +16,7 @@ import { ServerResponse } from 'node:http';
 import type { AddressInfo } from 'node:net';
 import path, { posix } from 'node:path';
 import type { Connect, InlineConfig, ViteDevServer } from 'vite';
+import { BuildOutputFile, BuildOutputFileType } from '../../tools/esbuild/bundler-context';
 import { JavaScriptTransformer } from '../../tools/esbuild/javascript-transformer';
 import { createAngularLocaleDataPlugin } from '../../tools/vite/i18n-locale-plugin';
 import { RenderOptions, renderPage } from '../../utils/server-rendering/render-page';
@@ -32,6 +32,7 @@ interface OutputFileRecord {
   size: number;
   hash?: Buffer;
   updated: boolean;
+  servable: boolean;
 }
 
 const SSG_MARKER_REGEXP = /ng-server-context=["']\w*\|?ssg\|?\w*["']/;
@@ -222,7 +223,7 @@ function handleUpdate(
 function analyzeResultFiles(
   normalizePath: (id: string) => string,
   htmlIndexPath: string,
-  resultFiles: OutputFile[],
+  resultFiles: BuildOutputFile[],
   generatedFiles: Map<string, OutputFileRecord>,
 ) {
   const seen = new Set<string>(['/index.html']);
@@ -241,6 +242,8 @@ function analyzeResultFiles(
     if (filePath.endsWith('.map')) {
       generatedFiles.set(filePath, {
         contents: file.contents,
+        servable:
+          file.type === BuildOutputFileType.Browser || file.type === BuildOutputFileType.Media,
         size: file.contents.byteLength,
         updated: false,
       });
@@ -270,6 +273,8 @@ function analyzeResultFiles(
       size: file.contents.byteLength,
       hash: fileHash,
       updated: true,
+      servable:
+        file.type === BuildOutputFileType.Browser || file.type === BuildOutputFileType.Media,
     });
   }
 
@@ -397,7 +402,7 @@ export async function setupServer(
             // dev server sourcemap issues with stylesheets.
             if (extension !== '.js' && extension !== '.html') {
               const outputFile = outputFiles.get(pathname);
-              if (outputFile) {
+              if (outputFile?.servable) {
                 const mimeType = lookupMimeType(extension);
                 if (mimeType) {
                   res.setHeader('Content-Type', mimeType);

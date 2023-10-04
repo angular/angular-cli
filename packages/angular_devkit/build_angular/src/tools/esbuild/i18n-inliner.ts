@@ -6,9 +6,9 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import type { OutputFile } from 'esbuild';
 import Piscina from 'piscina';
-import { cloneOutputFile, createOutputFileFromText } from './utils';
+import { BuildOutputFile, BuildOutputFileType } from './bundler-context';
+import { createOutputFileFromText } from './utils';
 
 /**
  * A keyword used to indicate if a JavaScript file may require inlining of translations.
@@ -21,7 +21,7 @@ const LOCALIZE_KEYWORD = '$localize';
  */
 export interface I18nInlinerOptions {
   missingTranslation: 'error' | 'warning' | 'ignore';
-  outputFiles: OutputFile[];
+  outputFiles: BuildOutputFile[];
   shouldOptimize?: boolean;
 }
 
@@ -34,7 +34,8 @@ export interface I18nInlinerOptions {
 export class I18nInliner {
   #workerPool: Piscina;
   readonly #localizeFiles: ReadonlyMap<string, Blob>;
-  readonly #unmodifiedFiles: Array<OutputFile>;
+  readonly #unmodifiedFiles: Array<BuildOutputFile>;
+  readonly #fileToType = new Map<string, BuildOutputFileType>();
 
   constructor(options: I18nInlinerOptions, maxThreads?: number) {
     this.#unmodifiedFiles = [];
@@ -42,6 +43,13 @@ export class I18nInliner {
     const files = new Map<string, Blob>();
     const pendingMaps = [];
     for (const file of options.outputFiles) {
+      if (file.type === BuildOutputFileType.Root) {
+        // Skip stats and similar files.
+        continue;
+      }
+
+      this.#fileToType.set(file.path, file.type);
+
       if (file.path.endsWith('.js') || file.path.endsWith('.mjs')) {
         // Check if localizations are present
         const contentBuffer = Buffer.isBuffer(file.contents)
@@ -102,7 +110,7 @@ export class I18nInliner {
   async inlineForLocale(
     locale: string,
     translation: Record<string, unknown> | undefined,
-  ): Promise<OutputFile[]> {
+  ): Promise<BuildOutputFile[]> {
     // Request inlining for each file that contains localize calls
     const requests = [];
     for (const filename of this.#localizeFiles.keys()) {
@@ -123,8 +131,11 @@ export class I18nInliner {
 
     // Convert raw results to output file objects and include all unmodified files
     return [
-      ...rawResults.flat().map(({ file, contents }) => createOutputFileFromText(file, contents)),
-      ...this.#unmodifiedFiles.map((file) => cloneOutputFile(file)),
+      ...rawResults.flat().map(({ file, contents }) =>
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        createOutputFileFromText(file, contents, this.#fileToType.get(file)!),
+      ),
+      ...this.#unmodifiedFiles.map((file) => file.clone()),
     ];
   }
 

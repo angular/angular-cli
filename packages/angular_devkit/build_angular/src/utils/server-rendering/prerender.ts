@@ -6,11 +6,11 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { OutputFile } from 'esbuild';
 import { readFile } from 'node:fs/promises';
 import { extname, join, posix } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import Piscina from 'piscina';
+import { BuildOutputFile, BuildOutputFileType } from '../../tools/esbuild/bundler-context';
 import type { RenderResult, ServerContext } from './render-page';
 import type { RenderWorkerData } from './render-worker';
 import type {
@@ -31,7 +31,7 @@ export async function prerenderPages(
   workspaceRoot: string,
   appShellOptions: AppShellOptions = {},
   prerenderOptions: PrerenderOptions = {},
-  outputFiles: Readonly<OutputFile[]>,
+  outputFiles: Readonly<BuildOutputFile[]>,
   document: string,
   inlineCriticalCss?: boolean,
   maxThreads = 1,
@@ -46,12 +46,12 @@ export async function prerenderPages(
   const errors: string[] = [];
   const outputFilesForWorker: Record<string, string> = {};
 
-  for (const { text, path } of outputFiles) {
-    switch (extname(path)) {
-      case '.mjs': // Contains the server runnable application code.
-      case '.css': // Global styles for critical CSS inlining.
-        outputFilesForWorker[path] = text;
-        break;
+  for (const { text, path, type } of outputFiles) {
+    if (
+      type === BuildOutputFileType.Server || // Contains the server runnable application code
+      (type === BuildOutputFileType.Browser && extname(path) === '.css') // Global styles for critical CSS inlining.
+    ) {
+      outputFilesForWorker[path] = text;
     }
   }
 

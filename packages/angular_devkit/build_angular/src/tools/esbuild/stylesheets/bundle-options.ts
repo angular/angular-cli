@@ -9,7 +9,7 @@
 import type { BuildOptions, OutputFile } from 'esbuild';
 import { createHash } from 'node:crypto';
 import path from 'node:path';
-import { BundlerContext } from '../bundler-context';
+import { BuildOutputFileType, BundlerContext } from '../bundler-context';
 import { LoadResultCache } from '../load-result-cache';
 import { CssStylesheetLanguage } from './css-language';
 import { createCssResourcePlugin } from './css-resource-plugin';
@@ -152,14 +152,18 @@ export async function bundleComponentStylesheet(
   if (!result.errors) {
     for (const outputFile of result.outputFiles) {
       const filename = path.basename(outputFile.path);
-      if (filename.endsWith('.css')) {
+      if (outputFile.type === BuildOutputFileType.Media) {
+        // The output files could also contain resources (images/fonts/etc.) that were referenced
+        resourceFiles.push(outputFile);
+      } else if (filename.endsWith('.css')) {
         outputPath = outputFile.path;
         contents = outputFile.text;
       } else if (filename.endsWith('.css.map')) {
         map = outputFile.text;
       } else {
-        // The output files could also contain resources (images/fonts/etc.) that were referenced
-        resourceFiles.push(outputFile);
+        throw new Error(
+          `Unexpected non CSS/Media file "${filename}" outputted during component stylesheet processing.`,
+        );
       }
     }
   }
