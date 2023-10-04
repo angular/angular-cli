@@ -28,9 +28,10 @@ import {
   profileSync,
   resetCumulativeDurations,
 } from '../profiling';
-import { BundleStylesheetOptions, bundleComponentStylesheet } from '../stylesheets/bundle-options';
+import { BundleStylesheetOptions } from '../stylesheets/bundle-options';
 import { AngularHostOptions } from './angular-host';
 import { AngularCompilation, AotCompilation, JitCompilation, NoopCompilation } from './compilation';
+import { ComponentStylesheetBundler } from './component-stylesheets';
 import { setupJitPluginCallbacks } from './jit-plugin-callbacks';
 
 const USING_WINDOWS = platform() === 'win32';
@@ -138,6 +139,12 @@ export function createCompilerPlugin(
       // Determines if TypeScript should process JavaScript files based on tsconfig `allowJs` option
       let shouldTsIgnoreJs = true;
 
+      // Track incremental component stylesheet builds
+      const stylesheetBundler = new ComponentStylesheetBundler(
+        styleOptions,
+        pluginOptions.loadResultCache,
+      );
+
       build.onStart(async () => {
         const result: OnStartResult = {
           warnings: setupWarnings,
@@ -156,17 +163,18 @@ export function createCompilerPlugin(
           modifiedFiles: pluginOptions.sourceFileCache?.modifiedFiles,
           sourceFileCache: pluginOptions.sourceFileCache,
           async transformStylesheet(data, containingFile, stylesheetFile) {
-            // Stylesheet file only exists for external stylesheets
-            const filename = stylesheetFile ?? containingFile;
+            let stylesheetResult;
 
-            const stylesheetResult = await bundleComponentStylesheet(
-              styleOptions.inlineStyleLanguage,
-              data,
-              filename,
-              !stylesheetFile,
-              styleOptions,
-              pluginOptions.loadResultCache,
-            );
+            // Stylesheet file only exists for external stylesheets
+            if (stylesheetFile) {
+              stylesheetResult = await stylesheetBundler.bundleFile(stylesheetFile);
+            } else {
+              stylesheetResult = await stylesheetBundler.bundleInline(
+                data,
+                containingFile,
+                styleOptions.inlineStyleLanguage,
+              );
+            }
 
             const { contents, resourceFiles, errors, warnings } = stylesheetResult;
             if (errors) {
@@ -383,9 +391,9 @@ export function createCompilerPlugin(
       if (pluginOptions.jit) {
         setupJitPluginCallbacks(
           build,
-          styleOptions,
+          stylesheetBundler,
           additionalOutputFiles,
-          pluginOptions.loadResultCache,
+          styleOptions.inlineStyleLanguage,
         );
       }
 
@@ -405,6 +413,8 @@ export function createCompilerPlugin(
 
         logCumulativeDurations();
       });
+
+      build.onDispose(() => void stylesheetBundler.dispose());
     },
   };
 }
