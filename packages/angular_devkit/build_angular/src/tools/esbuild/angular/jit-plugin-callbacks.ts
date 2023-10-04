@@ -9,8 +9,7 @@
 import type { OutputFile, PluginBuild } from 'esbuild';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
-import { LoadResultCache } from '../load-result-cache';
-import { BundleStylesheetOptions, bundleComponentStylesheet } from '../stylesheets/bundle-options';
+import { ComponentStylesheetBundler } from './component-stylesheets';
 import {
   JIT_NAMESPACE_REGEXP,
   JIT_STYLE_NAMESPACE,
@@ -64,9 +63,9 @@ async function loadEntry(
  */
 export function setupJitPluginCallbacks(
   build: PluginBuild,
-  styleOptions: BundleStylesheetOptions & { inlineStyleLanguage: string },
+  stylesheetBundler: ComponentStylesheetBundler,
   stylesheetResourceFiles: OutputFile[],
-  cache?: LoadResultCache,
+  inlineStyleLanguage: string,
 ): void {
   const root = build.initialOptions.absWorkingDir ?? '';
 
@@ -105,15 +104,20 @@ export function setupJitPluginCallbacks(
     // directly either via a preprocessor or esbuild itself.
     const entry = await loadEntry(args.path, root, true /* skipRead */);
 
-    const { contents, resourceFiles, errors, warnings } = await bundleComponentStylesheet(
-      styleOptions.inlineStyleLanguage,
-      // The `data` parameter is only needed for a stylesheet if it was inline
-      entry.contents ?? '',
-      entry.path,
-      entry.contents !== undefined,
-      styleOptions,
-      cache,
-    );
+    let stylesheetResult;
+
+    // Stylesheet contents only exist for internal stylesheets
+    if (entry.contents === undefined) {
+      stylesheetResult = await stylesheetBundler.bundleFile(entry.path);
+    } else {
+      stylesheetResult = await stylesheetBundler.bundleInline(
+        entry.contents,
+        entry.path,
+        inlineStyleLanguage,
+      );
+    }
+
+    const { contents, resourceFiles, errors, warnings } = stylesheetResult;
 
     stylesheetResourceFiles.push(...resourceFiles);
 
