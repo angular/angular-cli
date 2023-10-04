@@ -1,3 +1,16 @@
+<a name="16.2.5"></a>
+
+# 16.2.5 (2023-10-04)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                                                        |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------------------------------------------- |
+| [933358186](https://github.com/angular/angular-cli/commit/93335818689a67557942ab27ec8cc5b96f2a5abe) | fix  | do not print `Angular is running in development mode.` in the server console when using dev-server |
+| [493bd3906](https://github.com/angular/angular-cli/commit/493bd390679889359a05b2f23b74787647aee341) | fix  | update dependency postcss to v8.4.31                                                               |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="17.0.0-next.6"></a>
 
 # 17.0.0-next.6 (2023-09-27)
