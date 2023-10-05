@@ -10,7 +10,7 @@ import type { BuildOptions } from 'esbuild';
 import assert from 'node:assert';
 import { createHash } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
-import { join, relative } from 'node:path';
+import { extname, join, relative } from 'node:path';
 import type { NormalizedApplicationBuildOptions } from '../../builders/application/options';
 import { allowMangle } from '../../utils/environment-options';
 import { SourceFileCache, createCompilerPlugin } from './angular/compiler-plugin';
@@ -112,11 +112,31 @@ export function createBrowserCodeBundleOptions(
     buildOptions.plugins?.unshift(
       createVirtualModulePlugin({
         namespace,
-        loadContent: () => ({
-          contents: polyfills.map((file) => `import '${file.replace(/\\/g, '/')}';`).join('\n'),
-          loader: 'js',
-          resolveDir: workspaceRoot,
-        }),
+        loadContent: async (_, build) => {
+          const polyfillPaths = await Promise.all(
+            polyfills.map(async (path) => {
+              if (path.startsWith('zone.js') || !extname(path)) {
+                return path;
+              }
+
+              const potentialPathRelative = './' + path;
+              const result = await build.resolve(potentialPathRelative, {
+                kind: 'import-statement',
+                resolveDir: workspaceRoot,
+              });
+
+              return result.path ? potentialPathRelative : path;
+            }),
+          );
+
+          return {
+            contents: polyfillPaths
+              .map((file) => `import '${file.replace(/\\/g, '/')}';`)
+              .join('\n'),
+            loader: 'js',
+            resolveDir: workspaceRoot,
+          };
+        },
       }),
     );
   }
