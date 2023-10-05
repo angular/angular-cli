@@ -14,6 +14,7 @@ import type {
   Plugin,
   PluginBuild,
 } from 'esbuild';
+import assert from 'node:assert';
 import { realpath } from 'node:fs/promises';
 import { platform } from 'node:os';
 import * as path from 'node:path';
@@ -203,20 +204,26 @@ export function createCompilerPlugin(
               target: build.initialOptions.target,
             });
 
-            if (workerResult.errors) {
-              (result.errors ??= []).push(...workerResult.errors);
-            }
             (result.warnings ??= []).push(...workerResult.warnings);
             additionalOutputFiles.push(...workerResult.outputFiles);
             if (workerResult.metafile) {
               additionalMetafiles.push(workerResult.metafile);
             }
 
+            if (workerResult.errors.length > 0) {
+              (result.errors ??= []).push(...workerResult.errors);
+
+              // Return the original path if the build failed
+              return workerFile;
+            }
+
             // Return bundled worker file entry name to be used in the built output
-            return path.relative(
-              build.initialOptions.outdir ?? '',
-              workerResult.outputFiles[0].path,
+            const workerCodeFile = workerResult.outputFiles.find((file) =>
+              file.path.endsWith('.js'),
             );
+            assert(workerCodeFile, 'Web Worker bundled code file should always be present.');
+
+            return path.relative(build.initialOptions.outdir ?? '', workerCodeFile.path);
           },
         };
 

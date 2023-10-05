@@ -10,6 +10,7 @@ import { readdir } from 'fs/promises';
 import { expectFileToExist, expectFileToMatch, replaceInFile, writeFile } from '../../utils/fs';
 import { ng } from '../../utils/process';
 import { getGlobalVariable } from '../../utils/env';
+import { expectToFail } from '../../utils/utils';
 
 export default async function () {
   const useWebpackBuilder = !getGlobalVariable('argv')['esbuild'];
@@ -33,6 +34,9 @@ export default async function () {
     const workerOutputFile = await getWorkerOutputFile(false);
     await expectFileToExist(`dist/test-project/browser/${workerOutputFile}`);
     await expectFileToMatch('dist/test-project/browser/main.js', workerOutputFile);
+    await expectToFail(() =>
+      expectFileToMatch('dist/test-project/browser/main.js', workerOutputFile + '.map'),
+    );
   }
 
   await ng('build', '--output-hashing=none');
