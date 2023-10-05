@@ -48,7 +48,7 @@
     "ora": "5.4.1",
     "parse5-html-rewriting-stream": "7.0.0",
     "piscina": "3.2.0",
-    "postcss": "8.4.21",
+    "postcss": "8.4.31",
     "postcss-loader": "7.0.2",
     "resolve-url-loader": "5.0.0",
     "rxjs": "6.6.7",
