@@ -30,8 +30,19 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       const { result } = await harness.executeOnce();
       expect(result?.success).toBeTrue();
 
-      harness.expectFile('dist/main.server.mjs').toExist();
-      harness.expectFile('dist/main.js').toExist();
+      harness.expectFile('dist/browser/main.js').toExist();
+    });
+
+    it('does not write file to disk when "ssr" is "false"', async () => {
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+        server: 'src/main.server.ts',
+      });
+
+      const { result } = await harness.executeOnce();
+      expect(result?.success).toBeTrue();
+
+      harness.expectFile('dist/browser/main.js').toExist();
     });
 
     it('uses a provided JavaScript file', async () => {
@@ -44,8 +55,6 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
       const { result } = await harness.executeOnce();
       expect(result?.success).toBeTrue();
-
-      harness.expectFile('dist/main.server.mjs').toExist();
     });
 
     it('fails and shows an error when file does not exist', async () => {
@@ -61,13 +70,13 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
         jasmine.objectContaining({ message: jasmine.stringMatching('Could not resolve "') }),
       );
 
-      harness.expectFile('dist/main.js').toNotExist();
-      harness.expectFile('dist/main.server.mjs').toNotExist();
+      harness.expectFile('dist/browser/main.js').toNotExist();
     });
 
     it('throws an error when given an empty string', async () => {
       harness.useTarget('build', {
         ...BASE_OPTIONS,
+        ssr: true,
         server: '',
       });
 
@@ -87,9 +96,6 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
       const { result } = await harness.executeOnce();
       expect(result?.success).toBeTrue();
-
-      // Always uses the name `main.server.mjs` for the `server` option.
-      harness.expectFile('dist/main.server.mjs').toExist();
     });
   });
 });

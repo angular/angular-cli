@@ -30,8 +30,8 @@ export default async function () {
 
   await writeFile('.browserslistrc', 'last 1 chrome version');
   await ng('build', '--configuration=development');
-  await expectFileToExist('dist/test-project/main.js');
-  const mainContentChromeLatest = await readFile('dist/test-project/main.js');
+  await expectFileToExist('dist/test-project/browser/main.js');
+  const mainContentChromeLatest = await readFile('dist/test-project/browser/main.js');
 
   assert.match(
     mainContentChromeLatest,
@@ -47,8 +47,8 @@ export default async function () {
   await writeFile('.browserslistrc', 'Safari <=15');
 
   await ng('build', '--configuration=development');
-  await expectFileToExist('dist/test-project/main.js');
-  const mainContentSafari15Explicit = await readFile('dist/test-project/main.js');
+  await expectFileToExist('dist/test-project/browser/main.js');
+  const mainContentSafari15Explicit = await readFile('dist/test-project/browser/main.js');
   assert.doesNotMatch(
     mainContentSafari15Explicit,
     staticIndicatorRegex,

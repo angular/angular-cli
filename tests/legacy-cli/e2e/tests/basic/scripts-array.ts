@@ -44,16 +44,19 @@ export default async function () {
   await ng('build', '--configuration=development');
 
   // files were created successfully
-  await expectFileToMatch('dist/test-project/scripts.js', 'string-script');
-  await expectFileToMatch('dist/test-project/scripts.js', 'input-script');
-  await expectFileToMatch('dist/test-project/lazy-script.js', 'lazy-script');
-  await expectFileToMatch('dist/test-project/renamed-script.js', 'pre-rename-script');
-  await expectFileToMatch('dist/test-project/renamed-lazy-script.js', 'pre-rename-lazy-script');
+  await expectFileToMatch('dist/test-project/browser/scripts.js', 'string-script');
+  await expectFileToMatch('dist/test-project/browser/scripts.js', 'input-script');
+  await expectFileToMatch('dist/test-project/browser/lazy-script.js', 'lazy-script');
+  await expectFileToMatch('dist/test-project/browser/renamed-script.js', 'pre-rename-script');
+  await expectFileToMatch(
+    'dist/test-project/browser/renamed-lazy-script.js',
+    'pre-rename-lazy-script',
+  );
 
   // index.html lists the right bundles
   if (getGlobalVariable('argv')['esbuild']) {
     await expectFileToMatch(
-      'dist/test-project/index.html',
+      'dist/test-project/browser/index.html',
       [
         '<script src="polyfills.js" type="module"></script>',
         '<script src="scripts.js" defer></script>',
@@ -63,7 +66,7 @@ export default async function () {
     );
   } else {
     await expectFileToMatch(
-      'dist/test-project/index.html',
+      'dist/test-project/browser/index.html',
       [
         '<script src="runtime.js" type="module"></script>',
         '<script src="polyfills.js" type="module"></script>',

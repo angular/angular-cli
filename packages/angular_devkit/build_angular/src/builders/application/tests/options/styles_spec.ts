@@ -26,7 +26,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
       expect(result?.success).toBe(true);
 
-      harness.expectFile('dist/styles.css').toNotExist();
+      harness.expectFile('dist/browser/styles.css').toNotExist();
     });
 
     it('does not create an output styles file when option is not present', async () => {
@@ -38,7 +38,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
       expect(result?.success).toBe(true);
 
-      harness.expectFile('dist/styles.css').toNotExist();
+      harness.expectFile('dist/browser/styles.css').toNotExist();
     });
 
     describe('shorthand syntax', () => {
@@ -54,9 +54,11 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
         expect(result?.success).toBe(true);
 
-        harness.expectFile('dist/styles.css').content.toMatch(/\.test-a {\s*color: red;?\s*}/);
         harness
-          .expectFile('dist/index.html')
+          .expectFile('dist/browser/styles.css')
+          .content.toMatch(/\.test-a {\s*color: red;?\s*}/);
+        harness
+          .expectFile('dist/browser/index.html')
           .content.toContain('<link rel="stylesheet" href="styles.css">');
       });
 
@@ -75,10 +77,14 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
         expect(result?.success).toBe(true);
 
-        harness.expectFile('dist/styles.css').content.toMatch(/\.test-a {\s*color: red;?\s*}/);
-        harness.expectFile('dist/styles.css').content.toMatch(/\.test-b {\s*color: green;?\s*}/);
         harness
-          .expectFile('dist/index.html')
+          .expectFile('dist/browser/styles.css')
+          .content.toMatch(/\.test-a {\s*color: red;?\s*}/);
+        harness
+          .expectFile('dist/browser/styles.css')
+          .content.toMatch(/\.test-b {\s*color: green;?\s*}/);
+        harness
+          .expectFile('dist/browser/index.html')
           .content.toContain('<link rel="stylesheet" href="styles.css">');
       });
 
@@ -104,7 +110,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
         expect(result?.success).toBe(true);
 
-        harness.expectFile('dist/styles.css').content.toMatch(
+        harness.expectFile('dist/browser/styles.css').content.toMatch(
           // eslint-disable-next-line max-len
           /\.test-c {\s*color: blue;?\s*}[\s|\S]+\.test-d {\s*color: yellow;?\s*}[\s|\S]+\.test-b {\s*color: green;?\s*}[\s|\S]+\.test-a {\s*color: red;?\s*}/m,
         );
@@ -126,7 +132,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
           }),
         );
 
-        harness.expectFile('dist/styles.css').toNotExist();
+        harness.expectFile('dist/browser/styles.css').toNotExist();
       });
 
       it('shows the output style as a chunk entry in the logging output', async () => {
@@ -160,9 +166,11 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
         expect(result?.success).toBe(true);
 
-        harness.expectFile('dist/styles.css').content.toMatch(/\.test-a {\s*color: red;?\s*}/);
         harness
-          .expectFile('dist/index.html')
+          .expectFile('dist/browser/styles.css')
+          .content.toMatch(/\.test-a {\s*color: red;?\s*}/);
+        harness
+          .expectFile('dist/browser/index.html')
           .content.toContain('<link rel="stylesheet" href="styles.css">');
       });
 
@@ -178,9 +186,11 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
         expect(result?.success).toBe(true);
 
-        harness.expectFile('dist/extra.css').content.toMatch(/\.test-a {\s*color: red;?\s*}/);
         harness
-          .expectFile('dist/index.html')
+          .expectFile('dist/browser/extra.css')
+          .content.toMatch(/\.test-a {\s*color: red;?\s*}/);
+        harness
+          .expectFile('dist/browser/index.html')
           .content.toContain('<link rel="stylesheet" href="extra.css">');
       });
 
@@ -196,9 +206,11 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
         expect(result?.success).toBe(true);
 
-        harness.expectFile('dist/styles.css').content.toMatch(/\.test-a {\s*color: red;?\s*}/);
         harness
-          .expectFile('dist/index.html')
+          .expectFile('dist/browser/styles.css')
+          .content.toMatch(/\.test-a {\s*color: red;?\s*}/);
+        harness
+          .expectFile('dist/browser/index.html')
           .content.toContain('<link rel="stylesheet" href="styles.css">');
       });
 
@@ -217,10 +229,14 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
         expect(result?.success).toBe(true);
 
-        harness.expectFile('dist/styles.css').content.toMatch(/\.test-a {\s*color: red;?\s*}/);
-        harness.expectFile('dist/styles.css').content.toMatch(/\.test-b {\s*color: green;?\s*}/);
         harness
-          .expectFile('dist/index.html')
+          .expectFile('dist/browser/styles.css')
+          .content.toMatch(/\.test-a {\s*color: red;?\s*}/);
+        harness
+          .expectFile('dist/browser/styles.css')
+          .content.toMatch(/\.test-b {\s*color: green;?\s*}/);
+        harness
+          .expectFile('dist/browser/index.html')
           .content.toContain('<link rel="stylesheet" href="styles.css">');
       });
 
@@ -242,10 +258,14 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
         expect(result?.success).toBe(true);
 
-        harness.expectFile('dist/extra.css').content.toMatch(/\.test-a {\s*color: red;?\s*}/);
-        harness.expectFile('dist/extra.css').content.toMatch(/\.test-b {\s*color: green;?\s*}/);
         harness
-          .expectFile('dist/index.html')
+          .expectFile('dist/browser/extra.css')
+          .content.toMatch(/\.test-a {\s*color: red;?\s*}/);
+        harness
+          .expectFile('dist/browser/extra.css')
+          .content.toMatch(/\.test-b {\s*color: green;?\s*}/);
+        harness
+          .expectFile('dist/browser/index.html')
           .content.toContain('<link rel="stylesheet" href="extra.css">');
       });
 
@@ -267,13 +287,17 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
         expect(result?.success).toBe(true);
 
-        harness.expectFile('dist/extra.css').content.toMatch(/\.test-a {\s*color: red;?\s*}/);
-        harness.expectFile('dist/other.css').content.toMatch(/\.test-b {\s*color: green;?\s*}/);
         harness
-          .expectFile('dist/index.html')
+          .expectFile('dist/browser/extra.css')
+          .content.toMatch(/\.test-a {\s*color: red;?\s*}/);
+        harness
+          .expectFile('dist/browser/other.css')
+          .content.toMatch(/\.test-b {\s*color: green;?\s*}/);
+        harness
+          .expectFile('dist/browser/index.html')
           .content.toContain('<link rel="stylesheet" href="extra.css">');
         harness
-          .expectFile('dist/index.html')
+          .expectFile('dist/browser/index.html')
           .content.toContain('<link rel="stylesheet" href="other.css">');
       });
 
@@ -299,7 +323,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
         expect(result?.success).toBe(true);
 
-        harness.expectFile('dist/styles.css').content.toMatch(
+        harness.expectFile('dist/browser/styles.css').content.toMatch(
           // eslint-disable-next-line max-len
           /\.test-c {\s*color: blue;?\s*}[\s|\S]+\.test-d {\s*color: yellow;?\s*}[\s|\S]+\.test-b {\s*color: green;?\s*}[\s|\S]+\.test-a {\s*color: red;?\s*}/,
         );
@@ -328,15 +352,15 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
         expect(result?.success).toBe(true);
 
         harness
-          .expectFile('dist/other.css')
+          .expectFile('dist/browser/other.css')
           .content.toMatch(/\.test-c {\s*color: blue;?\s*}[\s|\S]+\.test-a {\s*color: red;?\s*}/);
         harness
-          .expectFile('dist/extra.css')
+          .expectFile('dist/browser/extra.css')
           .content.toMatch(
             /\.test-d {\s*color: yellow;?\s*}[\s|\S]+\.test-b {\s*color: green;?\s*}/,
           );
         harness
-          .expectFile('dist/index.html')
+          .expectFile('dist/browser/index.html')
           .content.toMatch(
             /<link rel="stylesheet" href="other.css">\s*<link rel="stylesheet" href="extra.css">/,
           );
@@ -354,9 +378,11 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
         expect(result?.success).toBe(true);
 
-        harness.expectFile('dist/styles.css').content.toMatch(/\.test-a {\s*color: red;?\s*}/);
         harness
-          .expectFile('dist/index.html')
+          .expectFile('dist/browser/styles.css')
+          .content.toMatch(/\.test-a {\s*color: red;?\s*}/);
+        harness
+          .expectFile('dist/browser/index.html')
           .content.toContain('<link rel="stylesheet" href="styles.css">');
       });
 
@@ -374,10 +400,10 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
         // `inject: false` causes the bundleName to be the input file name
         harness
-          .expectFile('dist/test-style-a.css')
+          .expectFile('dist/browser/test-style-a.css')
           .content.toMatch(/\.test-a {\s*color: red;?\s*}/);
         harness
-          .expectFile('dist/index.html')
+          .expectFile('dist/browser/index.html')
           .content.not.toContain('<link rel="stylesheet" href="test-style-a.css">');
       });
 
@@ -393,10 +419,12 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
         expect(result?.success).toBe(true);
 
-        harness.expectFile('dist/extra.css').content.toMatch(/\.test-a {\s*color: red;?\s*}/);
+        harness
+          .expectFile('dist/browser/extra.css')
+          .content.toMatch(/\.test-a {\s*color: red;?\s*}/);
 
         harness
-          .expectFile('dist/index.html')
+          .expectFile('dist/browser/index.html')
           .content.not.toContain('<link rel="stylesheet" href="extra.css">');
       });
 

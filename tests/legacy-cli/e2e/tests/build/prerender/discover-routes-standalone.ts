@@ -108,13 +108,8 @@ export default async function () {
       'lazy-two/index.html': 'lazy-two works!',
     };
 
-    let distPath = 'dist/test-project';
-    if (useWebpackBuilder) {
-      distPath += '/browser';
-    }
-
     for (const [filePath, fileMatch] of Object.entries(expects)) {
-      await expectFileToMatch(join(distPath, filePath), fileMatch);
+      await expectFileToMatch(join('dist/test-project/browser', filePath), fileMatch);
     }
   }
 }

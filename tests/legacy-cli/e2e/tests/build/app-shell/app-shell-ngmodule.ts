@@ -59,6 +59,6 @@ export default async function () {
     await expectFileToMatch('dist/test-project-two/browser/index.html', 'app-shell works!');
   } else {
     await ng('build', 'test-project-two');
-    await expectFileToMatch('dist/test-project-two/index.html', 'app-shell works!');
+    await expectFileToMatch('dist/test-project-two/browser/index.html', 'app-shell works!');
   }
 }

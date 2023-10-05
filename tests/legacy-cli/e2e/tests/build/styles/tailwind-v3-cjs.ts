@@ -27,9 +27,12 @@ export default async function () {
   await ng('build', '--configuration=development');
 
   // Check for Tailwind output
-  await expectFileToMatch('dist/test-project/styles.css', /::placeholder/);
+  await expectFileToMatch('dist/test-project/browser/styles.css', /::placeholder/);
   await expectToFail(() =>
-    expectFileToMatch('dist/test-project/styles.css', /@tailwind base;\s+@tailwind components;/),
+    expectFileToMatch(
+      'dist/test-project/browser/styles.css',
+      /@tailwind base;\s+@tailwind components;/,
+    ),
   );
 
   // Uninstall Tailwind

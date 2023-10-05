@@ -25,11 +25,11 @@ export default async function () {
 
   // Tailwind directives should be unprocessed with missing package
   await expectFileToMatch(
-    'dist/test-project/styles.css',
+    'dist/test-project/browser/styles.css',
     /@tailwind base;\s+@tailwind components;/,
   );
   await expectFileToMatch(
-    'dist/test-project/main.js',
+    'dist/test-project/browser/main.js',
     /@tailwind base;(?:\\n|\s*)@tailwind components;/,
   );
 
@@ -40,14 +40,17 @@ export default async function () {
   await ng('build', '--configuration=development');
 
   // Check for Tailwind output
-  await expectFileToMatch('dist/test-project/styles.css', /::placeholder/);
-  await expectFileToMatch('dist/test-project/main.js', /::placeholder/);
+  await expectFileToMatch('dist/test-project/browser/styles.css', /::placeholder/);
+  await expectFileToMatch('dist/test-project/browser/main.js', /::placeholder/);
   await expectToFail(() =>
-    expectFileToMatch('dist/test-project/styles.css', /@tailwind base;\s+@tailwind components;/),
+    expectFileToMatch(
+      'dist/test-project/browser/styles.css',
+      /@tailwind base;\s+@tailwind components;/,
+    ),
   );
   await expectToFail(() =>
     expectFileToMatch(
-      'dist/test-project/main.js',
+      'dist/test-project/browser/main.js',
       /@tailwind base;(?:\\n|\s*)@tailwind components;/,
     ),
   );
@@ -58,11 +61,11 @@ export default async function () {
   // Ensure Tailwind is disabled when no configuration file is present
   await ng('build', '--configuration=development');
   await expectFileToMatch(
-    'dist/test-project/styles.css',
+    'dist/test-project/browser/styles.css',
     /@tailwind base;\s+@tailwind components;/,
   );
   await expectFileToMatch(
-    'dist/test-project/main.js',
+    'dist/test-project/browser/main.js',
     /@tailwind base;(?:\\n|\s*)@tailwind components;/,
   );
 

@@ -33,8 +33,11 @@ export default async function () {
 
   await ng('build', '--configuration=development');
 
-  await expectToFail(() => expectFileToMatch('dist/test-project/styles.css', /exports/));
+  await expectToFail(() => expectFileToMatch('dist/test-project/browser/styles.css', /exports/));
   await expectToFail(() =>
-    expectFileToMatch('dist/test-project/main.js', /".*module\.exports.*\.outer.*background:/),
+    expectFileToMatch(
+      'dist/test-project/browser/main.js',
+      /".*module\.exports.*\.outer.*background:/,
+    ),
   );
 }

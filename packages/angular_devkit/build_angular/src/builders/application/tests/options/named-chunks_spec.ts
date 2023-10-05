@@ -9,9 +9,9 @@
 import { buildApplication } from '../../index';
 import { APPLICATION_BUILDER_INFO, BASE_OPTIONS, describeBuilder } from '../setup';
 
-const MAIN_OUTPUT = 'dist/main.js';
-const NAMED_LAZY_OUTPUT = 'dist/lazy-module-7QZXF7K7.js';
-const UNNAMED_LAZY_OUTPUT = 'dist/chunk-OW5RYMPM.js';
+const MAIN_OUTPUT = 'dist/browser/main.js';
+const NAMED_LAZY_OUTPUT = 'dist/browser/lazy-module-7QZXF7K7.js';
+const UNNAMED_LAZY_OUTPUT = 'dist/browser/chunk-OW5RYMPM.js';
 
 describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
   describe('Option: "namedChunks"', () => {

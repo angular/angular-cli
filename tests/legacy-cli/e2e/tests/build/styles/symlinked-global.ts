@@ -18,10 +18,10 @@ export default async function () {
   });
 
   await ng('build', '--configuration=development');
-  await expectFileToMatch('dist/test-project/styles.css', 'red');
-  await expectFileToMatch('dist/test-project/styles.css', 'blue');
+  await expectFileToMatch('dist/test-project/browser/styles.css', 'red');
+  await expectFileToMatch('dist/test-project/browser/styles.css', 'blue');
 
   await ng('build', '--preserve-symlinks', '--configuration=development');
-  await expectFileToMatch('dist/test-project/styles.css', 'red');
-  await expectFileToMatch('dist/test-project/styles.css', 'blue');
+  await expectFileToMatch('dist/test-project/browser/styles.css', 'red');
+  await expectFileToMatch('dist/test-project/browser/styles.css', 'blue');
 }

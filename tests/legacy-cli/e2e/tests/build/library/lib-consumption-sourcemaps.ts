@@ -10,5 +10,8 @@ export default async function () {
 
   // Validate that sourcemaps for the library exists.
   await ng('build', '--configuration=development');
-  await expectFileToMatch('dist/test-project/main.js.map', 'projects/my-lib/src/public-api.ts');
+  await expectFileToMatch(
+    'dist/test-project/browser/main.js.map',
+    'projects/my-lib/src/public-api.ts',
+  );
 }

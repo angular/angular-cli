@@ -10,7 +10,7 @@ import { AddressInfo } from 'net';
 
 // Configurations for each locale.
 const translationFile = 'src/locale/messages.xlf';
-export const baseDir = 'dist/test-project';
+export const baseDir = 'dist/test-project/browser';
 export const langTranslations = [
   {
     lang: 'en-US',

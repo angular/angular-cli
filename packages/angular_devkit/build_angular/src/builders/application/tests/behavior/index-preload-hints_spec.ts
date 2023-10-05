@@ -28,7 +28,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       expect(result?.success).toBe(true);
 
       harness
-        .expectFile('dist/index.html')
+        .expectFile('dist/browser/index.html')
         .content.toContain(
           '<link rel="preload" href="https://fonts.googleapis.com/css2?family=Roboto+Mono&family=Roboto:wght@300;400;500;700&display=swap" as="style">',
         );

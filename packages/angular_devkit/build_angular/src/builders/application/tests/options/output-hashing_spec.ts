@@ -31,10 +31,10 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       const { result } = await harness.executeOnce();
       expect(result?.success).toBe(true);
 
-      expect(harness.hasFileMatch('dist', /main-[0-9A-Z]{8}\.js$/)).toBeTrue();
-      expect(harness.hasFileMatch('dist', /polyfills-[0-9A-Z]{8}\.js$/)).toBeTrue();
-      expect(harness.hasFileMatch('dist', /styles-[0-9A-Z]{8}\.css$/)).toBeTrue();
-      expect(harness.hasFileMatch('dist/media', /spectrum-[0-9A-Z]{8}\.png$/)).toBeTrue();
+      expect(harness.hasFileMatch('dist/browser', /main-[0-9A-Z]{8}\.js$/)).toBeTrue();
+      expect(harness.hasFileMatch('dist/browser', /polyfills-[0-9A-Z]{8}\.js$/)).toBeTrue();
+      expect(harness.hasFileMatch('dist/browser', /styles-[0-9A-Z]{8}\.css$/)).toBeTrue();
+      expect(harness.hasFileMatch('dist/browser/media', /spectrum-[0-9A-Z]{8}\.png$/)).toBeTrue();
     });
 
     it(`doesn't hash any filenames when not set`, async () => {
@@ -49,10 +49,10 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       const { result } = await harness.executeOnce();
       expect(result?.success).toBe(true);
 
-      expect(harness.hasFileMatch('dist', /main-[0-9A-Z]{8}\.js$/)).toBeFalse();
-      expect(harness.hasFileMatch('dist', /polyfills-[0-9A-Z]{8}\.js$/)).toBeFalse();
-      expect(harness.hasFileMatch('dist', /styles-[0-9A-Z]{8}\.css$/)).toBeFalse();
-      expect(harness.hasFileMatch('dist/media', /spectrum-[0-9A-Z]{8}\.png$/)).toBeFalse();
+      expect(harness.hasFileMatch('dist/browser', /main-[0-9A-Z]{8}\.js$/)).toBeFalse();
+      expect(harness.hasFileMatch('dist/browser', /polyfills-[0-9A-Z]{8}\.js$/)).toBeFalse();
+      expect(harness.hasFileMatch('dist/browser', /styles-[0-9A-Z]{8}\.css$/)).toBeFalse();
+      expect(harness.hasFileMatch('dist/browser/media', /spectrum-[0-9A-Z]{8}\.png$/)).toBeFalse();
     });
 
     it(`doesn't hash any filenames when set to "none"`, async () => {
@@ -68,10 +68,10 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       const { result } = await harness.executeOnce();
       expect(result?.success).toBe(true);
 
-      expect(harness.hasFileMatch('dist', /main-[0-9A-Z]{8}\.js$/)).toBeFalse();
-      expect(harness.hasFileMatch('dist', /polyfills-[0-9A-Z]{8}\.js$/)).toBeFalse();
-      expect(harness.hasFileMatch('dist', /styles-[0-9A-Z]{8}\.css$/)).toBeFalse();
-      expect(harness.hasFileMatch('dist/media', /spectrum-[0-9A-Z]{8}\.png$/)).toBeFalse();
+      expect(harness.hasFileMatch('dist/browser', /main-[0-9A-Z]{8}\.js$/)).toBeFalse();
+      expect(harness.hasFileMatch('dist/browser', /polyfills-[0-9A-Z]{8}\.js$/)).toBeFalse();
+      expect(harness.hasFileMatch('dist/browser', /styles-[0-9A-Z]{8}\.css$/)).toBeFalse();
+      expect(harness.hasFileMatch('dist/browser/media', /spectrum-[0-9A-Z]{8}\.png$/)).toBeFalse();
     });
 
     it(`hashes CSS resources filenames only when set to "media"`, async () => {
@@ -87,10 +87,10 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       const { result } = await harness.executeOnce();
       expect(result?.success).toBe(true);
 
-      expect(harness.hasFileMatch('dist', /main-[0-9A-Z]{8}\.js$/)).toBeFalse();
-      expect(harness.hasFileMatch('dist', /polyfills-[0-9A-Z]{8}\.js$/)).toBeFalse();
-      expect(harness.hasFileMatch('dist', /styles-[0-9A-Z]{8}\.css$/)).toBeFalse();
-      expect(harness.hasFileMatch('dist/media', /spectrum-[0-9A-Z]{8}\.png$/)).toBeTrue();
+      expect(harness.hasFileMatch('dist/browser', /main-[0-9A-Z]{8}\.js$/)).toBeFalse();
+      expect(harness.hasFileMatch('dist/browser', /polyfills-[0-9A-Z]{8}\.js$/)).toBeFalse();
+      expect(harness.hasFileMatch('dist/browser', /styles-[0-9A-Z]{8}\.css$/)).toBeFalse();
+      expect(harness.hasFileMatch('dist/browser/media', /spectrum-[0-9A-Z]{8}\.png$/)).toBeTrue();
     });
 
     it(`hashes bundles filenames only when set to "bundles"`, async () => {
@@ -106,10 +106,10 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       const { result } = await harness.executeOnce();
       expect(result?.success).toBe(true);
 
-      expect(harness.hasFileMatch('dist', /main-[0-9A-Z]{8}\.js$/)).toBeTrue();
-      expect(harness.hasFileMatch('dist', /polyfills-[0-9A-Z]{8}\.js$/)).toBeTrue();
-      expect(harness.hasFileMatch('dist', /styles-[0-9A-Z]{8}\.css$/)).toBeTrue();
-      expect(harness.hasFileMatch('dist/media', /spectrum-[0-9A-Z]{8}\.png$/)).toBeFalse();
+      expect(harness.hasFileMatch('dist/browser', /main-[0-9A-Z]{8}\.js$/)).toBeTrue();
+      expect(harness.hasFileMatch('dist/browser', /polyfills-[0-9A-Z]{8}\.js$/)).toBeTrue();
+      expect(harness.hasFileMatch('dist/browser', /styles-[0-9A-Z]{8}\.css$/)).toBeTrue();
+      expect(harness.hasFileMatch('dist/browser/media', /spectrum-[0-9A-Z]{8}\.png$/)).toBeFalse();
     });
 
     it('does not hash non injected styles', async () => {
@@ -128,10 +128,10 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       const { result } = await harness.executeOnce();
       expect(result?.success).toBe(true);
 
-      expect(harness.hasFileMatch('dist', /styles-[0-9A-Z]{8}\.css$/)).toBeFalse();
-      expect(harness.hasFileMatch('dist', /styles-[0-9A-Z]{8}\.css.map$/)).toBeFalse();
-      harness.expectFile('dist/styles.css').toExist();
-      harness.expectFile('dist/styles.css.map').toExist();
+      expect(harness.hasFileMatch('dist/browser', /styles-[0-9A-Z]{8}\.css$/)).toBeFalse();
+      expect(harness.hasFileMatch('dist/browser', /styles-[0-9A-Z]{8}\.css.map$/)).toBeFalse();
+      harness.expectFile('dist/browser/styles.css').toExist();
+      harness.expectFile('dist/browser/styles.css.map').toExist();
     });
 
     // TODO: Re-enable once implemented in the esbuild builder
@@ -158,8 +158,8 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       const { result } = await harness.executeOnce();
       expect(result?.success).toBe(true);
 
-      harness.expectFile('dist/media/test.svg').toExist();
-      harness.expectFile('dist/media/small-test.svg').toExist();
+      harness.expectFile('dist/browser/media/test.svg').toExist();
+      harness.expectFile('dist/browser/media/small-test.svg').toExist();
     });
   });
 });

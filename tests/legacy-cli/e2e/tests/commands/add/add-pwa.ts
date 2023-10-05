@@ -44,9 +44,7 @@ export default async function () {
   }
 
   // It should generate a SW configuration file (`ngsw.json`).
-  const workspaceJson = JSON.parse(await readFile('angular.json'));
-  const outputPath = workspaceJson.projects['test-project'].architect.build.options.outputPath;
-  const ngswPath = join(process.cwd(), outputPath, 'ngsw.json');
+  const ngswPath = 'dist/test-project/browser/ngsw.json';
 
   await ng('build');
   await expectFileToExist(ngswPath);

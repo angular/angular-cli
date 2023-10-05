@@ -35,7 +35,7 @@ export default async function () {
 
   // Setup server
   const app = express();
-  app.use(express.static(path.resolve('dist/test-project')));
+  app.use(express.static(path.resolve('dist/test-project/browser')));
   const server = app.listen(2000, 'localhost');
 
   try {

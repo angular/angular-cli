@@ -11,19 +11,19 @@ export default async function () {
   await ng('build', '--aot=false', '--configuration=development');
 
   // files were created successfully
-  await expectFileToMatch('dist/test-project/polyfills.js', 'zone.js');
+  await expectFileToMatch('dist/test-project/browser/polyfills.js', 'zone.js');
   await expectFileToMatch(
-    'dist/test-project/index.html',
+    'dist/test-project/browser/index.html',
     '<script src="polyfills.js" type="module">',
   );
 
   await ng('build', '--aot=true', '--configuration=development');
 
   // files were created successfully
-  await expectFileToExist('dist/test-project/polyfills.js');
-  await expectFileToMatch('dist/test-project/polyfills.js', 'zone.js');
+  await expectFileToExist('dist/test-project/browser/polyfills.js');
+  await expectFileToMatch('dist/test-project/browser/polyfills.js', 'zone.js');
   await expectFileToMatch(
-    'dist/test-project/index.html',
+    'dist/test-project/browser/index.html',
     '<script src="polyfills.js" type="module">',
   );
 }
