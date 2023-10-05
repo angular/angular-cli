@@ -14,6 +14,7 @@ import {
   normalizeGlobalStyles,
 } from '../../tools/webpack/utils/helpers';
 import { normalizeAssetPatterns, normalizeOptimization, normalizeSourceMaps } from '../../utils';
+import { calculateThresholds } from '../../utils/bundle-calculator';
 import { I18nOptions, createI18nOptions } from '../../utils/i18n-options';
 import { normalizeCacheOptions } from '../../utils/normalize-cache';
 import { generateEntryPoints } from '../../utils/package-chunk-sort';
@@ -238,6 +239,7 @@ export async function normalizeOptions(
     externalPackages,
     deleteOutputPath,
     namedChunks,
+    budgets,
   } = options;
 
   // Return all the normalized options
@@ -286,6 +288,7 @@ export async function normalizeOptions(
     tailwindConfiguration,
     i18nOptions,
     namedChunks,
+    budgets: budgets?.length ? budgets : undefined,
   };
 }
 
