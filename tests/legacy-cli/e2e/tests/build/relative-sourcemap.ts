@@ -30,9 +30,12 @@ export default async function () {
   }
 
   await ng('build', 'secondary-project', '--configuration=development');
-
   await ng('build', '--output-hashing=none', '--source-map', '--configuration=development');
-  const content = fs.readFileSync('./dist/secondary-project/main.js.map', 'utf8');
+
+  const sourceMapPath = getGlobalVariable('argv')['esbuild']
+    ? './dist/secondary-project/browser/main.js.map'
+    : './dist/secondary-project/main.js.map';
+  const content = fs.readFileSync(sourceMapPath, 'utf8');
   const { sources } = JSON.parse(content) as { sources: string[] };
   let mainFileFound = false;
   for (const source of sources) {

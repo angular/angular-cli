@@ -27,5 +27,5 @@ export default async function () {
   // Trigger a rebuild
   await appendToFile('src/link-source.ts', `console.log('foo-bar');`);
   await waitForAnyProcessOutputToMatch(buildReadyRegEx);
-  await expectFileToMatch('dist/test-project/main.js', `console.log('foo-bar')`);
+  await expectFileToMatch('dist/test-project/browser/main.js', `console.log('foo-bar')`);
 }

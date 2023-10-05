@@ -39,28 +39,39 @@ export default function () {
       .then(() => ng('build', '--aot', '--configuration=development'))
       // Check paths are correctly generated.
       .then(() =>
-        expectFileToMatch('dist/test-project/styles.css', 'assets/global-img-absolute.svg'),
+        expectFileToMatch('dist/test-project/browser/styles.css', 'assets/global-img-absolute.svg'),
       )
       .then(() =>
         expectFileToMatch(
-          'dist/test-project/styles.css',
+          'dist/test-project/browser/styles.css',
           /url\('\/assets\/global-img-absolute\.svg'\)/,
         ),
       )
-      .then(() => expectFileToMatch('dist/test-project/styles.css', /global-img-relative\.png/))
       .then(() =>
-        expectFileToMatch('dist/test-project/main.js', '/assets/component-img-absolute.svg'),
+        expectFileToMatch('dist/test-project/browser/styles.css', /global-img-relative\.png/),
       )
-      .then(() => expectFileToMatch('dist/test-project/main.js', /component-img-relative\.png/))
+      .then(() =>
+        expectFileToMatch(
+          'dist/test-project/browser/main.js',
+          '/assets/component-img-absolute.svg',
+        ),
+      )
+      .then(() =>
+        expectFileToMatch('dist/test-project/browser/main.js', /component-img-relative\.png/),
+      )
       // Check files are correctly created.
       .then(() =>
-        expectToFail(() => expectFileToExist('dist/test-project/global-img-absolute.svg')),
+        expectToFail(() => expectFileToExist('dist/test-project/browser/global-img-absolute.svg')),
       )
       .then(() =>
-        expectToFail(() => expectFileToExist('dist/test-project/component-img-absolute.svg')),
+        expectToFail(() =>
+          expectFileToExist('dist/test-project/browser/component-img-absolute.svg'),
+        ),
       )
-      .then(() => expectFileMatchToExist('./dist/test-project', /global-img-relative\.png/))
-      .then(() => expectFileMatchToExist('./dist/test-project', /component-img-relative\.png/))
+      .then(() => expectFileMatchToExist('./dist/test-project/browser', /global-img-relative\.png/))
+      .then(() =>
+        expectFileMatchToExist('./dist/test-project/browser', /component-img-relative\.png/),
+      )
       // Check urls with deploy-url scheme are used as is.
       .then(() =>
         ng(
@@ -72,13 +83,13 @@ export default function () {
       )
       .then(() =>
         expectFileToMatch(
-          'dist/test-project/styles.css',
+          'dist/test-project/browser/styles.css',
           /url\(\'\/assets\/global-img-absolute\.svg\'\)/,
         ),
       )
       .then(() =>
         expectFileToMatch(
-          'dist/test-project/main.js',
+          'dist/test-project/browser/main.js',
           /url\(\'\/assets\/component-img-absolute\.svg\'\)/,
         ),
       )
@@ -93,13 +104,13 @@ export default function () {
       )
       .then(() =>
         expectFileToMatch(
-          'dist/test-project/styles.css',
+          'dist/test-project/browser/styles.css',
           /url\(\'\/assets\/global-img-absolute\.svg\'\)/,
         ),
       )
       .then(() =>
         expectFileToMatch(
-          'dist/test-project/main.js',
+          'dist/test-project/browser/main.js',
           /url\(\'\/assets\/component-img-absolute\.svg\'\)/,
         ),
       )
@@ -114,13 +125,13 @@ export default function () {
       )
       .then(() =>
         expectFileToMatch(
-          'dist/test-project/styles.css',
+          'dist/test-project/browser/styles.css',
           /url\(\'\/assets\/global-img-absolute\.svg\'\)/,
         ),
       )
       .then(() =>
         expectFileToMatch(
-          'dist/test-project/main.js',
+          'dist/test-project/browser/main.js',
           /url\(\'\/assets\/component-img-absolute\.svg\'\)/,
         ),
       )
@@ -135,14 +146,25 @@ export default function () {
         ),
       )
       .then(() =>
-        expectFileToMatch('dist/test-project/styles.css', '/assets/global-img-absolute.svg'),
+        expectFileToMatch(
+          'dist/test-project/browser/styles.css',
+          '/assets/global-img-absolute.svg',
+        ),
       )
-      .then(() => expectFileToMatch('dist/test-project/styles.css', /global-img-relative\.png/))
       .then(() =>
-        expectFileToMatch('dist/test-project/main.js', '/assets/component-img-absolute.svg'),
+        expectFileToMatch('dist/test-project/browser/styles.css', /global-img-relative\.png/),
       )
       .then(() =>
-        expectFileToMatch('dist/test-project/main.js', /deploy\/component-img-relative\.png/),
+        expectFileToMatch(
+          'dist/test-project/browser/main.js',
+          '/assets/component-img-absolute.svg',
+        ),
+      )
+      .then(() =>
+        expectFileToMatch(
+          'dist/test-project/browser/main.js',
+          /deploy\/component-img-relative\.png/,
+        ),
       )
       // Check with identical base-href and deploy-url flags.
       .then(() =>
@@ -155,24 +177,45 @@ export default function () {
         ),
       )
       .then(() =>
-        expectFileToMatch('dist/test-project/styles.css', '/assets/global-img-absolute.svg'),
+        expectFileToMatch(
+          'dist/test-project/browser/styles.css',
+          '/assets/global-img-absolute.svg',
+        ),
       )
-      .then(() => expectFileToMatch('dist/test-project/styles.css', /global-img-relative\.png/))
       .then(() =>
-        expectFileToMatch('dist/test-project/main.js', '/assets/component-img-absolute.svg'),
+        expectFileToMatch('dist/test-project/browser/styles.css', /global-img-relative\.png/),
       )
       .then(() =>
-        expectFileToMatch('dist/test-project/main.js', /\/base\/component-img-relative\.png/),
+        expectFileToMatch(
+          'dist/test-project/browser/main.js',
+          '/assets/component-img-absolute.svg',
+        ),
+      )
+      .then(() =>
+        expectFileToMatch(
+          'dist/test-project/browser/main.js',
+          /\/base\/component-img-relative\.png/,
+        ),
       )
       // Check with only base-href flag.
       .then(() => ng('build', '--base-href=/base/', '--aot', '--configuration=development'))
       .then(() =>
-        expectFileToMatch('dist/test-project/styles.css', '/assets/global-img-absolute.svg'),
+        expectFileToMatch(
+          'dist/test-project/browser/styles.css',
+          '/assets/global-img-absolute.svg',
+        ),
       )
-      .then(() => expectFileToMatch('dist/test-project/styles.css', /global-img-relative\.png/))
       .then(() =>
-        expectFileToMatch('dist/test-project/main.js', '/assets/component-img-absolute.svg'),
+        expectFileToMatch('dist/test-project/browser/styles.css', /global-img-relative\.png/),
       )
-      .then(() => expectFileToMatch('dist/test-project/main.js', /component-img-relative\.png/))
+      .then(() =>
+        expectFileToMatch(
+          'dist/test-project/browser/main.js',
+          '/assets/component-img-absolute.svg',
+        ),
+      )
+      .then(() =>
+        expectFileToMatch('dist/test-project/browser/main.js', /component-img-relative\.png/),
+      )
   );
 }

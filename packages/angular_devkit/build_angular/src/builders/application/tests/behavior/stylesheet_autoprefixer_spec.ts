@@ -47,10 +47,10 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
         expect(result?.success).toBeTrue();
 
         harness
-          .expectFile('dist/styles.css')
+          .expectFile('dist/browser/styles.css')
           .content.toMatch(/section\s*{\s*-webkit-hyphens:\s*none;\s*hyphens:\s*none;\s*}/);
         harness
-          .expectFile('dist/styles.css')
+          .expectFile('dist/browser/styles.css')
           .content.toMatch(/div\s*{\s*-webkit-hyphens:\s*none;\s*hyphens:\s*none;\s*}/);
       });
 
@@ -75,8 +75,12 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
         const { result } = await harness.executeOnce();
         expect(result?.success).toBeTrue();
 
-        harness.expectFile('dist/styles.css').content.toMatch(/section\s*{\s*hyphens:\s*none;\s*}/);
-        harness.expectFile('dist/styles.css').content.toMatch(/div\s*{\s*hyphens:\s*none;\s*}/);
+        harness
+          .expectFile('dist/browser/styles.css')
+          .content.toMatch(/section\s*{\s*hyphens:\s*none;\s*}/);
+        harness
+          .expectFile('dist/browser/styles.css')
+          .content.toMatch(/div\s*{\s*hyphens:\s*none;\s*}/);
       });
 
       it(`should add prefixes for listed browsers in external component styles [${ext}]`, async () => {
@@ -105,10 +109,10 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
         expect(result?.success).toBeTrue();
 
         harness
-          .expectFile('dist/main.js')
+          .expectFile('dist/browser/main.js')
           .content.toMatch(/{\\n\s*-webkit-hyphens:\s*none;\\n\s*hyphens:\s*none;\\n\s*}/);
         harness
-          .expectFile('dist/main.js')
+          .expectFile('dist/browser/main.js')
           .content.toMatch(/{\\n\s*-webkit-hyphens:\s*none;\\n\s*hyphens:\s*none;\\n\s*}/);
       });
 
@@ -135,8 +139,12 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
         const { result } = await harness.executeOnce();
         expect(result?.success).toBeTrue();
 
-        harness.expectFile('dist/main.js').content.toMatch(/{\\n\s*hyphens:\s*none;\\n\s*}/);
-        harness.expectFile('dist/main.js').content.toMatch(/{\\n\s*hyphens:\s*none;\\n\s*}/);
+        harness
+          .expectFile('dist/browser/main.js')
+          .content.toMatch(/{\\n\s*hyphens:\s*none;\\n\s*}/);
+        harness
+          .expectFile('dist/browser/main.js')
+          .content.toMatch(/{\\n\s*hyphens:\s*none;\\n\s*}/);
       });
     }
 
@@ -164,7 +172,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       expect(result?.success).toBeTrue();
 
       harness
-        .expectFile('dist/main.js')
+        .expectFile('dist/browser/main.js')
         // div[_ngcontent-%COMP%] {\n  -webkit-hyphens: none;\n  hyphens: none;\n}\n
         .content.toMatch(/{\\n\s*-webkit-hyphens:\s*none;\\n\s*hyphens:\s*none;\\n\s*}/);
     });
@@ -190,7 +198,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       const { result } = await harness.executeOnce();
       expect(result?.success).toBeTrue();
 
-      harness.expectFile('dist/main.js').content.toMatch(/{\\n\s*hyphens:\s*none;\\n\s*}/);
+      harness.expectFile('dist/browser/main.js').content.toMatch(/{\\n\s*hyphens:\s*none;\\n\s*}/);
     });
   });
 });

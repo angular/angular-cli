@@ -21,8 +21,8 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
       expect(result?.success).toBe(true);
 
-      harness.expectFile('dist/main.js').toExist();
-      harness.expectFile('dist/index.html').toExist();
+      harness.expectFile('dist/browser/main.js').toExist();
+      harness.expectFile('dist/browser/index.html').toExist();
     });
 
     it('uses a provided JavaScript file', async () => {
@@ -37,10 +37,9 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
       expect(result?.success).toBe(true);
 
-      harness.expectFile('dist/main.js').toExist();
-      harness.expectFile('dist/index.html').toExist();
-
-      harness.expectFile('dist/main.js').content.toContain('console.log("main")');
+      harness.expectFile('dist/browser/main.js').toExist();
+      harness.expectFile('dist/browser/index.html').toExist();
+      harness.expectFile('dist/browser/main.js').content.toContain('console.log("main")');
     });
 
     it('fails and shows an error when file does not exist', async () => {
@@ -56,8 +55,8 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
         jasmine.objectContaining({ message: jasmine.stringMatching('Could not resolve "') }),
       );
 
-      harness.expectFile('dist/main.js').toNotExist();
-      harness.expectFile('dist/index.html').toNotExist();
+      harness.expectFile('dist/browser/main.js').toNotExist();
+      harness.expectFile('dist/browser/index.html').toNotExist();
     });
 
     it('throws an error when given an empty string', async () => {
@@ -84,7 +83,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       expect(result?.success).toBeTrue();
 
       // Always uses the name `main.js` for the `browser` option.
-      harness.expectFile('dist/main.js').toExist();
+      harness.expectFile('dist/browser/main.js').toExist();
     });
   });
 });

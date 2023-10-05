@@ -15,14 +15,19 @@ export default function () {
       // use image with file size >10KB to prevent inlining
       .then(() => copyProjectAsset('images/spectrum.png', './src/assets/more.png'))
       .then(() => ng('build', '--deploy-url=deployUrl/', '--configuration=development'))
-      .then(() => expectFileToMatch('dist/test-project/index.html', 'deployUrl/main.js'))
+      .then(() => expectFileToMatch('dist/test-project/browser/index.html', 'deployUrl/main.js'))
       // verify --deploy-url isn't applied to extracted css urls
-      .then(() => expectFileToMatch('dist/test-project/styles.css', /url\(['"]?more\.png['"]?\)/))
+      .then(() =>
+        expectFileToMatch('dist/test-project/browser/styles.css', /url\(['"]?more\.png['"]?\)/),
+      )
       .then(() =>
         ng('build', '--deploy-url=http://example.com/some/path/', '--configuration=development'),
       )
       .then(() =>
-        expectFileToMatch('dist/test-project/index.html', 'http://example.com/some/path/main.js'),
+        expectFileToMatch(
+          'dist/test-project/browser/index.html',
+          'http://example.com/some/path/main.js',
+        ),
       )
   );
 }

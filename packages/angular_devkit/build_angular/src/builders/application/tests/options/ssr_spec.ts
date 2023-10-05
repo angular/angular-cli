@@ -33,8 +33,8 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       const { result } = await harness.executeOnce();
       expect(result?.success).toBeTrue();
 
-      harness.expectFile('dist/main.server.mjs').toExist();
-      harness.expectFile('dist/server.mjs').toExist();
+      harness.expectFile('dist/server/main.server.mjs').toExist();
+      harness.expectFile('dist/server/server.mjs').toExist();
     });
 
     it('resolves an absolute path as relative inside the workspace root', async () => {
@@ -48,7 +48,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
       const { result } = await harness.executeOnce();
       expect(result?.success).toBeTrue();
-      harness.expectFile('dist/server.mjs').toExist();
+      harness.expectFile('dist/server/server.mjs').toExist();
     });
   });
 });

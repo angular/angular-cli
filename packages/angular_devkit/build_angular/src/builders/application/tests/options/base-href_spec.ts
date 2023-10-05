@@ -24,7 +24,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
       const { result } = await harness.executeOnce();
       expect(result?.success).toBe(true);
-      harness.expectFile('dist/index.html').content.toContain('<base href="/abc">');
+      harness.expectFile('dist/browser/index.html').content.toContain('<base href="/abc">');
     });
 
     it('should update the base element with no href attribute when option is set', async () => {
@@ -45,7 +45,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
       const { result } = await harness.executeOnce();
       expect(result?.success).toBe(true);
-      harness.expectFile('dist/index.html').content.toContain('<base href="/abc">');
+      harness.expectFile('dist/browser/index.html').content.toContain('<base href="/abc">');
     });
 
     it('should add the base element href attribute when option is set', async () => {
@@ -66,7 +66,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
       const { result } = await harness.executeOnce();
       expect(result?.success).toBe(true);
-      harness.expectFile('dist/index.html').content.toContain('<base href="/abc">');
+      harness.expectFile('dist/browser/index.html').content.toContain('<base href="/abc">');
     });
 
     it('should update the base element href attribute when option is set to an empty string', async () => {
@@ -77,7 +77,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
       const { result } = await harness.executeOnce();
       expect(result?.success).toBe(true);
-      harness.expectFile('dist/index.html').content.toContain('<base href="">');
+      harness.expectFile('dist/browser/index.html').content.toContain('<base href="">');
     });
 
     it('should not update the base element href attribute when option is not present', async () => {
@@ -87,7 +87,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
       const { result } = await harness.executeOnce();
       expect(result?.success).toBe(true);
-      harness.expectFile('dist/index.html').content.toContain('<base href="/">');
+      harness.expectFile('dist/browser/index.html').content.toContain('<base href="/">');
     });
 
     it('should not change the base element href attribute when option is not present', async () => {
@@ -107,7 +107,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
       const { result } = await harness.executeOnce();
       expect(result?.success).toBe(true);
-      harness.expectFile('dist/index.html').content.toContain('<base href=".">');
+      harness.expectFile('dist/browser/index.html').content.toContain('<base href=".">');
     });
   });
 });

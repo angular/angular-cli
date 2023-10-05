@@ -42,9 +42,9 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
       expect(result?.success).toBe(true);
 
-      harness.expectFile('dist/scripts.js').toExist();
+      harness.expectFile('dist/browser/scripts.js').toExist();
       harness
-        .expectFile('dist/index.html')
+        .expectFile('dist/browser/index.html')
         .content.toContain('<script src="scripts.js" defer></script>');
     });
 
@@ -61,9 +61,9 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
         expect(result?.success).toBe(true);
 
-        harness.expectFile('dist/scripts.js').content.toContain('console.log("a")');
+        harness.expectFile('dist/browser/scripts.js').content.toContain('console.log("a")');
         harness
-          .expectFile('dist/index.html')
+          .expectFile('dist/browser/index.html')
           .content.toContain('<script src="scripts.js" defer></script>');
       });
 
@@ -80,10 +80,10 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
         expect(result?.success).toBe(true);
 
-        harness.expectFile('dist/scripts.js').content.toContain('console.log("a")');
-        harness.expectFile('dist/scripts.js').content.toContain('console.log("b")');
+        harness.expectFile('dist/browser/scripts.js').content.toContain('console.log("a")');
+        harness.expectFile('dist/browser/scripts.js').content.toContain('console.log("b")');
         harness
-          .expectFile('dist/index.html')
+          .expectFile('dist/browser/index.html')
           .content.toContain('<script src="scripts.js" defer></script>');
       });
 
@@ -108,7 +108,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
         expect(result?.success).toBe(true);
 
         harness
-          .expectFile('dist/scripts.js')
+          .expectFile('dist/browser/scripts.js')
           .content.toMatch(
             /console\.log\("c"\)[;\s]+console\.log\("d"\)[;\s]+console\.log\("b"\)[;\s]+console\.log\("a"\)/,
           );
@@ -130,7 +130,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
           }),
         );
 
-        harness.expectFile('dist/scripts.js').toNotExist();
+        harness.expectFile('dist/browser/scripts.js').toNotExist();
       });
 
       it('shows the output script as a chunk entry in the logging output', async () => {
@@ -164,9 +164,9 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
         expect(result?.success).toBe(true);
 
-        harness.expectFile('dist/scripts.js').content.toContain('console.log("a")');
+        harness.expectFile('dist/browser/scripts.js').content.toContain('console.log("a")');
         harness
-          .expectFile('dist/index.html')
+          .expectFile('dist/browser/index.html')
           .content.toContain('<script src="scripts.js" defer></script>');
       });
 
@@ -182,9 +182,9 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
         expect(result?.success).toBe(true);
 
-        harness.expectFile('dist/extra.js').content.toContain('console.log("a")');
+        harness.expectFile('dist/browser/extra.js').content.toContain('console.log("a")');
         harness
-          .expectFile('dist/index.html')
+          .expectFile('dist/browser/index.html')
           .content.toContain('<script src="extra.js" defer></script>');
       });
 
@@ -200,9 +200,9 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
         expect(result?.success).toBe(true);
 
-        harness.expectFile('dist/scripts.js').content.toContain('console.log("a")');
+        harness.expectFile('dist/browser/scripts.js').content.toContain('console.log("a")');
         harness
-          .expectFile('dist/index.html')
+          .expectFile('dist/browser/index.html')
           .content.toContain('<script src="scripts.js" defer></script>');
       });
 
@@ -224,13 +224,13 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
         expect(result?.success).toBe(true);
 
-        harness.expectFile('dist/extra.js').content.toContain('console.log("a")');
-        harness.expectFile('dist/other.js').content.toContain('console.log("b")');
+        harness.expectFile('dist/browser/extra.js').content.toContain('console.log("a")');
+        harness.expectFile('dist/browser/other.js').content.toContain('console.log("b")');
         harness
-          .expectFile('dist/index.html')
+          .expectFile('dist/browser/index.html')
           .content.toContain('<script src="extra.js" defer></script>');
         harness
-          .expectFile('dist/index.html')
+          .expectFile('dist/browser/index.html')
           .content.toContain('<script src="other.js" defer></script>');
       });
 
@@ -249,10 +249,10 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
         expect(result?.success).toBe(true);
 
-        harness.expectFile('dist/scripts.js').content.toContain('console.log("a")');
-        harness.expectFile('dist/scripts.js').content.toContain('console.log("b")');
+        harness.expectFile('dist/browser/scripts.js').content.toContain('console.log("a")');
+        harness.expectFile('dist/browser/scripts.js').content.toContain('console.log("b")');
         harness
-          .expectFile('dist/index.html')
+          .expectFile('dist/browser/index.html')
           .content.toContain('<script src="scripts.js" defer></script>');
       });
 
@@ -274,10 +274,10 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
         expect(result?.success).toBe(true);
 
-        harness.expectFile('dist/extra.js').content.toContain('console.log("a")');
-        harness.expectFile('dist/extra.js').content.toContain('console.log("b")');
+        harness.expectFile('dist/browser/extra.js').content.toContain('console.log("a")');
+        harness.expectFile('dist/browser/extra.js').content.toContain('console.log("b")');
         harness
-          .expectFile('dist/index.html')
+          .expectFile('dist/browser/index.html')
           .content.toContain('<script src="extra.js" defer></script>');
       });
 
@@ -304,7 +304,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
         expect(result?.success).toBe(true);
 
         harness
-          .expectFile('dist/scripts.js')
+          .expectFile('dist/browser/scripts.js')
           .content.toMatch(
             /console\.log\("c"\)[;\s]+console\.log\("d"\)[;\s]+console\.log\("b"\)[;\s]+console\.log\("a"\)/,
           );
@@ -333,13 +333,13 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
         expect(result?.success).toBe(true);
 
         harness
-          .expectFile('dist/other.js')
+          .expectFile('dist/browser/other.js')
           .content.toMatch(/console\.log\("c"\)[;\s]+console\.log\("a"\)/);
         harness
-          .expectFile('dist/extra.js')
+          .expectFile('dist/browser/extra.js')
           .content.toMatch(/console\.log\("d"\)[;\s]+console\.log\("b"\)/);
         harness
-          .expectFile('dist/index.html')
+          .expectFile('dist/browser/index.html')
           .content.toMatch(
             /<script src="other.js" defer><\/script>\s*<script src="extra.js" defer><\/script>/,
           );
@@ -357,9 +357,9 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
         expect(result?.success).toBe(true);
 
-        harness.expectFile('dist/scripts.js').content.toContain('console.log("a")');
+        harness.expectFile('dist/browser/scripts.js').content.toContain('console.log("a")');
         harness
-          .expectFile('dist/index.html')
+          .expectFile('dist/browser/index.html')
           .content.toContain('<script src="scripts.js" defer></script>');
       });
 
@@ -376,9 +376,9 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
         expect(result?.success).toBe(true);
 
         // `inject: false` causes the bundleName to be the input file name
-        harness.expectFile('dist/test-script-a.js').content.toContain('console.log("a")');
+        harness.expectFile('dist/browser/test-script-a.js').content.toContain('console.log("a")');
         harness
-          .expectFile('dist/index.html')
+          .expectFile('dist/browser/index.html')
           .content.not.toContain('<script src="test-script-a.js" defer></script>');
       });
 
@@ -394,9 +394,9 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
         expect(result?.success).toBe(true);
 
-        harness.expectFile('dist/extra.js').content.toContain('console.log("a")');
+        harness.expectFile('dist/browser/extra.js').content.toContain('console.log("a")');
         harness
-          .expectFile('dist/index.html')
+          .expectFile('dist/browser/index.html')
           .content.not.toContain('<script src="extra.js" defer></script>');
       });
 

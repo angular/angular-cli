@@ -37,7 +37,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
         expect(result?.success).toBe(true);
 
-        harness.expectFile('dist/polyfills.js').toExist();
+        harness.expectFile('dist/browser/polyfills.js').toExist();
       });
 
       it('uses a provided JavaScript file', async () => {
@@ -52,7 +52,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
         expect(result?.success).toBe(true);
 
-        harness.expectFile('dist/polyfills.js').content.toContain(`console.log("main")`);
+        harness.expectFile('dist/browser/polyfills.js').content.toContain(`console.log("main")`);
       });
 
       it('fails and shows an error when file does not exist', async () => {
@@ -68,7 +68,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
           jasmine.objectContaining({ message: jasmine.stringMatching('Could not resolve') }),
         );
 
-        harness.expectFile('dist/polyfills.js').toNotExist();
+        harness.expectFile('dist/browser/polyfills.js').toNotExist();
       });
 
       it('resolves module specifiers in array', async () => {
@@ -79,7 +79,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
         const { result } = await harness.executeOnce();
         expect(result?.success).toBeTrue();
-        harness.expectFile('dist/polyfills.js').toExist();
+        harness.expectFile('dist/browser/polyfills.js').toExist();
       });
     });
   }

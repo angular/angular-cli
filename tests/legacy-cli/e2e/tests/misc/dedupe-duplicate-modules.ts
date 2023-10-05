@@ -41,7 +41,7 @@ export default async function () {
       '--no-progress',
       '--configuration=development',
     );
-    const outFile = 'dist/test-project/main.js';
+    const outFile = 'dist/test-project/browser/main.js';
 
     if (/\[DedupeModuleResolvePlugin\]:.+tslib-1-copy.+ -> .+tslib-1.+/.test(stderr)) {
       await expectFileToMatch(outFile, './node_modules/tslib-1/tslib.es6.js');

@@ -103,7 +103,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       const { result } = await harness.executeOnce();
 
       expect(result?.success).toBe(true);
-      harness.expectFile('dist/main.js').content.toContain(`console.log("A")`);
+      harness.expectFile('dist/browser/main.js').content.toContain(`console.log("A")`);
     });
   });
 });

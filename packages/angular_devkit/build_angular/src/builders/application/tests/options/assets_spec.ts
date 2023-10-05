@@ -41,9 +41,9 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
       expect(result?.success).toBe(true);
 
-      harness.expectFile('dist/extra.file').content.toBe('extra file');
-      harness.expectFile('dist/test.svg').content.toBe('<svg></svg>');
-      harness.expectFile('dist/another.file').content.toBe('asset file');
+      harness.expectFile('dist/browser/extra.file').content.toBe('extra file');
+      harness.expectFile('dist/browser/test.svg').content.toBe('<svg></svg>');
+      harness.expectFile('dist/browser/another.file').content.toBe('asset file');
     });
 
     describe('shorthand syntax', () => {
@@ -59,7 +59,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
         expect(result?.success).toBe(true);
 
-        harness.expectFile('dist/test.svg').content.toBe('<svg></svg>');
+        harness.expectFile('dist/browser/test.svg').content.toBe('<svg></svg>');
       });
 
       it('copies multiple assets', async () => {
@@ -75,8 +75,8 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
         expect(result?.success).toBe(true);
 
-        harness.expectFile('dist/test.svg').content.toBe('<svg></svg>');
-        harness.expectFile('dist/another.file').content.toBe('asset file');
+        harness.expectFile('dist/browser/test.svg').content.toBe('<svg></svg>');
+        harness.expectFile('dist/browser/another.file').content.toBe('asset file');
       });
 
       it('copies an asset with directory and maintains directory in output', async () => {
@@ -91,7 +91,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
         expect(result?.success).toBe(true);
 
-        harness.expectFile('dist/subdirectory/test.svg').content.toBe('<svg></svg>');
+        harness.expectFile('dist/browser/subdirectory/test.svg').content.toBe('<svg></svg>');
       });
 
       it('does not fail if asset does not exist', async () => {
@@ -104,7 +104,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
         expect(result?.success).toBe(true);
 
-        harness.expectFile('dist/test.svg').toNotExist();
+        harness.expectFile('dist/browser/test.svg').toNotExist();
       });
 
       it('fail if asset path is not within project source root', async () => {
@@ -119,7 +119,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
         expect(error?.message).toMatch('path must start with the project source root');
 
-        harness.expectFile('dist/test.svg').toNotExist();
+        harness.expectFile('dist/browser/test.svg').toNotExist();
       });
     });
 
@@ -136,7 +136,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
         expect(result?.success).toBe(true);
 
-        harness.expectFile('dist/test.svg').content.toBe('<svg></svg>');
+        harness.expectFile('dist/browser/test.svg').content.toBe('<svg></svg>');
       });
 
       it('copies multiple assets as separate entries', async () => {
@@ -155,8 +155,8 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
         expect(result?.success).toBe(true);
 
-        harness.expectFile('dist/test.svg').content.toBe('<svg></svg>');
-        harness.expectFile('dist/another.file').content.toBe('asset file');
+        harness.expectFile('dist/browser/test.svg').content.toBe('<svg></svg>');
+        harness.expectFile('dist/browser/another.file').content.toBe('asset file');
       });
 
       it('copies multiple assets with a single entry glob pattern', async () => {
@@ -172,8 +172,8 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
         expect(result?.success).toBe(true);
 
-        harness.expectFile('dist/test.svg').content.toBe('<svg></svg>');
-        harness.expectFile('dist/another.file').content.toBe('asset file');
+        harness.expectFile('dist/browser/test.svg').content.toBe('<svg></svg>');
+        harness.expectFile('dist/browser/another.file').content.toBe('asset file');
       });
 
       it('copies multiple assets with a wildcard glob pattern', async () => {
@@ -189,8 +189,8 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
         expect(result?.success).toBe(true);
 
-        harness.expectFile('dist/test.svg').content.toBe('<svg></svg>');
-        harness.expectFile('dist/another.file').content.toBe('asset file');
+        harness.expectFile('dist/browser/test.svg').content.toBe('<svg></svg>');
+        harness.expectFile('dist/browser/another.file').content.toBe('asset file');
       });
 
       it('copies multiple assets with a recursive wildcard glob pattern', async () => {
@@ -209,9 +209,9 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
         expect(result?.success).toBe(true);
 
-        harness.expectFile('dist/test.svg').content.toBe('<svg></svg>');
-        harness.expectFile('dist/another.file').content.toBe('asset file');
-        harness.expectFile('dist/nested/extra.file').content.toBe('extra file');
+        harness.expectFile('dist/browser/test.svg').content.toBe('<svg></svg>');
+        harness.expectFile('dist/browser/another.file').content.toBe('asset file');
+        harness.expectFile('dist/browser/nested/extra.file').content.toBe('extra file');
       });
 
       it('automatically ignores "." prefixed files when using wildcard glob pattern', async () => {
@@ -245,9 +245,9 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
         expect(result?.success).toBe(true);
 
-        harness.expectFile('dist/test.svg').content.toBe('<svg></svg>');
-        harness.expectFile('dist/another.file').toNotExist();
-        harness.expectFile('dist/nested/extra.file').content.toBe('extra file');
+        harness.expectFile('dist/browser/test.svg').content.toBe('<svg></svg>');
+        harness.expectFile('dist/browser/another.file').toNotExist();
+        harness.expectFile('dist/browser/nested/extra.file').content.toBe('extra file');
       });
 
       it('supports ignoring with a glob pattern when using a glob pattern', async () => {
@@ -266,9 +266,9 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
         expect(result?.success).toBe(true);
 
-        harness.expectFile('dist/test.svg').content.toBe('<svg></svg>');
-        harness.expectFile('dist/another.file').toNotExist();
-        harness.expectFile('dist/nested/extra.file').toNotExist();
+        harness.expectFile('dist/browser/test.svg').content.toBe('<svg></svg>');
+        harness.expectFile('dist/browser/another.file').toNotExist();
+        harness.expectFile('dist/browser/nested/extra.file').toNotExist();
       });
 
       it('copies an asset with directory and maintains directory in output', async () => {
@@ -283,7 +283,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
         expect(result?.success).toBe(true);
 
-        harness.expectFile('dist/subdirectory/test.svg').content.toBe('<svg></svg>');
+        harness.expectFile('dist/browser/subdirectory/test.svg').content.toBe('<svg></svg>');
       });
 
       it('does not fail if asset does not exist', async () => {
@@ -296,7 +296,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
         expect(result?.success).toBe(true);
 
-        harness.expectFile('dist/test.svg').toNotExist();
+        harness.expectFile('dist/browser/test.svg').toNotExist();
       });
 
       it('uses project output path when output option is empty string', async () => {
@@ -311,7 +311,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
         expect(result?.success).toBe(true);
 
-        harness.expectFile('dist/test.svg').content.toBe('<svg></svg>');
+        harness.expectFile('dist/browser/test.svg').content.toBe('<svg></svg>');
       });
 
       it('uses project output path when output option is "."', async () => {
@@ -326,7 +326,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
         expect(result?.success).toBe(true);
 
-        harness.expectFile('dist/test.svg').content.toBe('<svg></svg>');
+        harness.expectFile('dist/browser/test.svg').content.toBe('<svg></svg>');
       });
 
       it('uses project output path when output option is "/"', async () => {
@@ -341,7 +341,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
         expect(result?.success).toBe(true);
 
-        harness.expectFile('dist/test.svg').content.toBe('<svg></svg>');
+        harness.expectFile('dist/browser/test.svg').content.toBe('<svg></svg>');
       });
 
       it('creates a project output sub-path when output option path does not exist', async () => {
@@ -356,7 +356,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
         expect(result?.success).toBe(true);
 
-        harness.expectFile('dist/subdirectory/test.svg').content.toBe('<svg></svg>');
+        harness.expectFile('dist/browser/subdirectory/test.svg').content.toBe('<svg></svg>');
       });
 
       it('fails if output option is not within project output path', async () => {
@@ -373,7 +373,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
           'An asset cannot be written to a location outside of the output path',
         );
 
-        harness.expectFile('dist/test.svg').toNotExist();
+        harness.expectFile('dist/browser/test.svg').toNotExist();
       });
     });
   });

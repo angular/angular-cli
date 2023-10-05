@@ -40,8 +40,8 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       const { result } = await harness.executeOnce();
 
       expect(result?.success).toBe(true);
-      harness.expectFile('dist/main.js').content.not.toMatch(/\sasync\s+function\s/);
-      harness.expectFile('dist/main.js.map').content.toContain('Promise<Void123>');
+      harness.expectFile('dist/browser/main.js').content.not.toMatch(/\sasync\s+function\s/);
+      harness.expectFile('dist/browser/main.js.map').content.toContain('Promise<Void123>');
     });
 
     it('downlevels async functions ', async () => {
@@ -58,8 +58,8 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       const { result } = await harness.executeOnce();
 
       expect(result?.success).toBe(true);
-      harness.expectFile('dist/main.js').content.not.toMatch(/\sasync\s/);
-      harness.expectFile('dist/main.js').content.toContain('"from-async-function"');
+      harness.expectFile('dist/browser/main.js').content.not.toMatch(/\sasync\s/);
+      harness.expectFile('dist/browser/main.js').content.toContain('"from-async-function"');
     });
 
     it('warns when IE is present in browserslist', async () => {
@@ -109,8 +109,8 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       const { result } = await harness.executeOnce();
 
       expect(result?.success).toBe(true);
-      harness.expectFile('dist/main.js').content.not.toMatch(/\sawait\s/);
-      harness.expectFile('dist/main.js').content.toContain('"for await...of"');
+      harness.expectFile('dist/browser/main.js').content.not.toMatch(/\sawait\s/);
+      harness.expectFile('dist/browser/main.js').content.toContain('"for await...of"');
     });
   });
 });

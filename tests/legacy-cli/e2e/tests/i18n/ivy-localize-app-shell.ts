@@ -37,8 +37,6 @@ export default async function () {
 
   await installWorkspacePackages();
 
-  const browserBaseDir = useWebpackBuilder ? 'dist/test-project/browser' : 'dist/test-project';
-
   // Set configurations for each locale.
   const langTranslations = [
     { lang: 'en-US', translation: 'Hello i18n!' },
@@ -113,6 +111,6 @@ export default async function () {
     await ng('build');
   }
   for (const { lang, translation } of langTranslations) {
-    await expectFileToMatch(`${browserBaseDir}/${lang}/index.html`, translation);
+    await expectFileToMatch(`dist/test-project/browser/${lang}/index.html`, translation);
   }
 }

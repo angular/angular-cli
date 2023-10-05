@@ -21,7 +21,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
       expect(result?.success).toBe(true);
 
-      harness.expectFile('dist/main.js.map').toNotExist();
+      harness.expectFile('dist/browser/main.js.map').toNotExist();
     });
 
     it('should not generate script sourcemap files when false', async () => {
@@ -34,7 +34,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
       expect(result?.success).toBe(true);
 
-      harness.expectFile('dist/main.js.map').toNotExist();
+      harness.expectFile('dist/browser/main.js.map').toNotExist();
     });
 
     it('should not generate script sourcemap files when scripts suboption is false', async () => {
@@ -47,7 +47,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
       expect(result?.success).toBe(true);
 
-      harness.expectFile('dist/main.js.map').toNotExist();
+      harness.expectFile('dist/browser/main.js.map').toNotExist();
     });
 
     it('should generate script sourcemap files when true', async () => {
@@ -60,7 +60,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
       expect(result?.success).toBe(true);
 
-      harness.expectFile('dist/main.js.map').toExist();
+      harness.expectFile('dist/browser/main.js.map').toExist();
     });
 
     it('should generate script sourcemap files when scripts suboption is true', async () => {
@@ -73,7 +73,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
       expect(result?.success).toBe(true);
 
-      harness.expectFile('dist/main.js.map').toExist();
+      harness.expectFile('dist/browser/main.js.map').toExist();
     });
 
     it('should not include third-party sourcemaps when true', async () => {
@@ -88,8 +88,8 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
       expect(result?.success).toBe(true);
 
-      harness.expectFile('dist/main.js.map').content.not.toContain('/core/index.ts');
-      harness.expectFile('dist/main.js.map').content.not.toContain('/common/index.ts');
+      harness.expectFile('dist/browser/main.js.map').content.not.toContain('/core/index.ts');
+      harness.expectFile('dist/browser/main.js.map').content.not.toContain('/common/index.ts');
     });
 
     it('should not include third-party sourcemaps when vendor suboption is false', async () => {
@@ -104,8 +104,8 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
       expect(result?.success).toBe(true);
 
-      harness.expectFile('dist/main.js.map').content.not.toContain('/core/index.ts');
-      harness.expectFile('dist/main.js.map').content.not.toContain('/common/index.ts');
+      harness.expectFile('dist/browser/main.js.map').content.not.toContain('/core/index.ts');
+      harness.expectFile('dist/browser/main.js.map').content.not.toContain('/common/index.ts');
     });
 
     it('should include third-party sourcemaps when vendor suboption is true', async () => {
@@ -120,8 +120,8 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
       expect(result?.success).toBe(true);
 
-      harness.expectFile('dist/main.js.map').content.toContain('/core/index.ts');
-      harness.expectFile('dist/main.js.map').content.toContain('/common/index.ts');
+      harness.expectFile('dist/browser/main.js.map').content.toContain('/core/index.ts');
+      harness.expectFile('dist/browser/main.js.map').content.toContain('/common/index.ts');
     });
 
     it('should add "x_google_ignoreList" extension to script sourcemap files when true', async () => {
@@ -134,7 +134,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
       expect(result?.success).toBe(true);
 
-      harness.expectFile('dist/main.js.map').content.toContain('"x_google_ignoreList"');
+      harness.expectFile('dist/browser/main.js.map').content.toContain('"x_google_ignoreList"');
     });
   });
 });

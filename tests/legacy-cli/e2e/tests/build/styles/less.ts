@@ -37,15 +37,26 @@ export default function () {
     )
     .then(() => ng('build', '--source-map', '--configuration=development'))
     .then(() =>
-      expectFileToMatch('dist/test-project/styles.css', /body\s*{\s*background-color: blue;\s*}/),
+      expectFileToMatch(
+        'dist/test-project/browser/styles.css',
+        /body\s*{\s*background-color: blue;\s*}/,
+      ),
     )
     .then(() =>
-      expectFileToMatch('dist/test-project/styles.css', /p\s*{\s*background-color: red;\s*}/),
+      expectFileToMatch(
+        'dist/test-project/browser/styles.css',
+        /p\s*{\s*background-color: red;\s*}/,
+      ),
     )
     .then(() =>
-      expectToFail(() => expectFileToMatch('dist/test-project/styles.css', '"mappings":""')),
+      expectToFail(() =>
+        expectFileToMatch('dist/test-project/browser/styles.css', '"mappings":""'),
+      ),
     )
     .then(() =>
-      expectFileToMatch('dist/test-project/main.js', /.outer.*.inner.*background:\s*#[fF]+/),
+      expectFileToMatch(
+        'dist/test-project/browser/main.js',
+        /.outer.*.inner.*background:\s*#[fF]+/,
+      ),
     );
 }

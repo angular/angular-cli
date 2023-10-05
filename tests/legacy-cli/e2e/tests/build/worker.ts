@@ -27,23 +27,23 @@ export default async function () {
 
   await ng('build', '--configuration=development');
   if (useWebpackBuilder) {
-    await expectFileToExist('dist/test-project/src_app_app_worker_ts.js');
-    await expectFileToMatch('dist/test-project/main.js', 'src_app_app_worker_ts');
+    await expectFileToExist('dist/test-project/browser/src_app_app_worker_ts.js');
+    await expectFileToMatch('dist/test-project/browser/main.js', 'src_app_app_worker_ts');
   } else {
     const workerOutputFile = await getWorkerOutputFile(false);
-    await expectFileToExist(`dist/test-project/${workerOutputFile}`);
-    await expectFileToMatch('dist/test-project/main.js', workerOutputFile);
+    await expectFileToExist(`dist/test-project/browser/${workerOutputFile}`);
+    await expectFileToMatch('dist/test-project/browser/main.js', workerOutputFile);
   }
 
   await ng('build', '--output-hashing=none');
 
   const workerOutputFile = await getWorkerOutputFile(useWebpackBuilder);
-  await expectFileToExist(`dist/test-project/${workerOutputFile}`);
+  await expectFileToExist(`dist/test-project/browser/${workerOutputFile}`);
   if (useWebpackBuilder) {
     // Check Webpack builds for the numeric chunk identifier
-    await expectFileToMatch('dist/test-project/main.js', workerOutputFile.substring(0, 3));
+    await expectFileToMatch('dist/test-project/browser/main.js', workerOutputFile.substring(0, 3));
   } else {
-    await expectFileToMatch('dist/test-project/main.js', workerOutputFile);
+    await expectFileToMatch('dist/test-project/browser/main.js', workerOutputFile);
   }
 
   // console.warn has to be used because chrome only captures warnings and errors by default
@@ -71,7 +71,7 @@ export default async function () {
 }
 
 async function getWorkerOutputFile(useWebpackBuilder: boolean): Promise<string> {
-  const files = await readdir('dist/test-project');
+  const files = await readdir('dist/test-project/browser');
   let fileName;
   if (useWebpackBuilder) {
     fileName = files.find((f) => /^\d{3}\.js$/.test(f));

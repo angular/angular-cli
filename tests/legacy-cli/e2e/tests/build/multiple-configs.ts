@@ -41,18 +41,18 @@ export default async function () {
 
   // Test the base configuration.
   await ng('build', '--configuration=development');
-  await expectFileToExist('dist/test-project/favicon.ico');
-  await expectFileToExist('dist/test-project/main.js.map');
-  await expectFileToExist('dist/test-project/vendor.js');
+  await expectFileToExist('dist/test-project/browser/favicon.ico');
+  await expectFileToExist('dist/test-project/browser/main.js.map');
+  await expectFileToExist('dist/test-project/browser/vendor.js');
   await ng('build');
-  await expectFileToExist('dist/test-project/styles.css');
+  await expectFileToExist('dist/test-project/browser/styles.css');
   // Use two configurations.
   await ng('build', '--configuration=one,two', '--vendor-chunk=false');
-  await expectToFail(() => expectFileToExist('dist/test-project/favicon.ico'));
-  await expectToFail(() => expectFileToExist('dist/test-project/main.js.map'));
+  await expectToFail(() => expectFileToExist('dist/test-project/browser/favicon.ico'));
+  await expectToFail(() => expectFileToExist('dist/test-project/browser/main.js.map'));
   // Use two configurations and two overrides, one of which overrides a config.
   await ng('build', '--configuration=one,two', '--vendor-chunk=false', '--source-map=true');
-  await expectToFail(() => expectFileToExist('dist/test-project/favicon.ico'));
-  await expectFileToExist('dist/test-project/main.js.map');
-  await expectToFail(() => expectFileToExist('dist/test-project/vendor.js'));
+  await expectToFail(() => expectFileToExist('dist/test-project/browser/favicon.ico'));
+  await expectFileToExist('dist/test-project/browser/main.js.map');
+  await expectToFail(() => expectFileToExist('dist/test-project/browser/vendor.js'));
 }

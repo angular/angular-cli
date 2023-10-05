@@ -5,10 +5,10 @@ import {
   writeMultipleFiles,
 } from '../../utils/fs';
 import { ng } from '../../utils/process';
-import { updateJsonFile, updateTsConfig } from '../../utils/project';
+import { updateJsonFile } from '../../utils/project';
 
 function getScriptsFilename(): Promise<string> {
-  return expectFileMatchToExist('dist/test-project/', /external-module\.[0-9a-f]{16}\.js/);
+  return expectFileMatchToExist('dist/test-project/browser/', /external-module\.[0-9a-f]{16}\.js/);
 }
 
 export default async function () {
@@ -34,13 +34,19 @@ export default async function () {
 
   await ng('build', '--configuration=production');
   const filenameBuild1 = await getScriptsFilename();
-  await expectFileToMatch(`dist/test-project/${filenameBuild1}`, 'try{console.log()}catch(c){}');
+  await expectFileToMatch(
+    `dist/test-project/browser/${filenameBuild1}`,
+    'try{console.log()}catch(c){}',
+  );
 
   await writeFile('.browserslistrc', 'last 1 Chrome version');
 
   await ng('build', '--configuration=production');
   const filenameBuild2 = await getScriptsFilename();
-  await expectFileToMatch(`dist/test-project/${filenameBuild2}`, 'try{console.log()}catch{}');
+  await expectFileToMatch(
+    `dist/test-project/browser/${filenameBuild2}`,
+    'try{console.log()}catch{}',
+  );
   if (filenameBuild1 === filenameBuild2) {
     throw new Error(
       'Contents of the built file changed between builds, but the content hash stayed the same!',

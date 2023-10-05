@@ -7,12 +7,12 @@ export default function () {
 
   return ng('build', '--aot', '--build-optimizer')
     .then(() =>
-      expectToFail(() => expectFileToMatch('dist/test-project/main.js', /\.decorators =/)),
+      expectToFail(() => expectFileToMatch('dist/test-project/browser/main.js', /\.decorators =/)),
     )
     .then(() => ng('build'))
     .then(() => expectToFail(() => expectFileToExist('dist/vendor.js')))
     .then(() =>
-      expectToFail(() => expectFileToMatch('dist/test-project/main.js', /\.decorators =/)),
+      expectToFail(() => expectFileToMatch('dist/test-project/browser/main.js', /\.decorators =/)),
     )
     .then(() => expectToFail(() => ng('build', '--aot=false', '--build-optimizer')));
 }

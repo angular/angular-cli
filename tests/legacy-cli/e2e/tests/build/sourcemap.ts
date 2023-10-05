@@ -15,9 +15,9 @@ export default async function () {
 }
 
 async function testForSourceMaps(expectedNumberOfFiles: number): Promise<void> {
-  await expectFileToExist('dist/test-project/main.js.map');
+  await expectFileToExist('dist/test-project/browser/main.js.map');
 
-  const files = fs.readdirSync('./dist/test-project');
+  const files = fs.readdirSync('./dist/test-project/browser');
 
   let count = 0;
   for (const file of files) {
@@ -31,7 +31,7 @@ async function testForSourceMaps(expectedNumberOfFiles: number): Promise<void> {
       throw new Error('Sourcemap not generated for ' + file);
     }
 
-    const content = fs.readFileSync('./dist/test-project/' + file, 'utf8');
+    const content = fs.readFileSync('./dist/test-project/browser/' + file, 'utf8');
     const lastLineIndex = content.lastIndexOf('\n');
     const comment = lastLineIndex !== -1 && content.slice(lastLineIndex).trim();
     if (comment !== `//# sourceMappingURL=${file}.map`) {

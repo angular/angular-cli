@@ -34,8 +34,19 @@ export default async function () {
 
   await ng('build', '--source-map', '--configuration=development');
 
-  await expectFileToMatch('dist/test-project/styles.css', /body\s*{\s*background-color: blue;\s*}/);
-  await expectFileToMatch('dist/test-project/styles.css', /p\s*{\s*background-color: red;\s*}/);
-  await expectToFail(() => expectFileToMatch('dist/test-project/styles.css', '"mappings":""'));
-  await expectFileToMatch('dist/test-project/main.js', /.outer.*.inner.*background:\s*#[fF]+/);
+  await expectFileToMatch(
+    'dist/test-project/browser/styles.css',
+    /body\s*{\s*background-color: blue;\s*}/,
+  );
+  await expectFileToMatch(
+    'dist/test-project/browser/styles.css',
+    /p\s*{\s*background-color: red;\s*}/,
+  );
+  await expectToFail(() =>
+    expectFileToMatch('dist/test-project/browser/styles.css', '"mappings":""'),
+  );
+  await expectFileToMatch(
+    'dist/test-project/browser/main.js',
+    /.outer.*.inner.*background:\s*#[fF]+/,
+  );
 }

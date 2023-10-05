@@ -28,13 +28,16 @@ export default async function () {
 
   const { stdout } = await ng('build', '--configuration=development');
 
-  await expectFileToMatch('dist/test-project/styles.css', '.string-style');
-  await expectFileToMatch('dist/test-project/styles.css', '.input-style');
-  await expectFileToMatch('dist/test-project/lazy-style.css', '.lazy-style');
-  await expectFileToMatch('dist/test-project/renamed-style.css', '.pre-rename-style');
-  await expectFileToMatch('dist/test-project/renamed-lazy-style.css', '.pre-rename-lazy-style');
+  await expectFileToMatch('dist/test-project/browser/styles.css', '.string-style');
+  await expectFileToMatch('dist/test-project/browser/styles.css', '.input-style');
+  await expectFileToMatch('dist/test-project/browser/lazy-style.css', '.lazy-style');
+  await expectFileToMatch('dist/test-project/browser/renamed-style.css', '.pre-rename-style');
   await expectFileToMatch(
-    'dist/test-project/index.html',
+    'dist/test-project/browser/renamed-lazy-style.css',
+    '.pre-rename-lazy-style',
+  );
+  await expectFileToMatch(
+    'dist/test-project/browser/index.html',
     '<link rel="stylesheet" href="styles.css"><link rel="stylesheet" href="renamed-style.css">',
   );
 

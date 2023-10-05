@@ -33,11 +33,11 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
       expect(result?.success).toBe(true);
       harness
-        .expectFile('dist/index.html')
+        .expectFile('dist/browser/index.html')
         .content.toContain(
           `<link rel="stylesheet" href="styles.css" media="print" onload="this.media='all'">`,
         );
-      harness.expectFile('dist/index.html').content.toContain(`body{color:#000}`);
+      harness.expectFile('dist/browser/index.html').content.toContain(`body{color:#000}`);
     });
 
     it(`should extract critical css when 'optimization' is unset`, async () => {
@@ -51,11 +51,11 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
       expect(result?.success).toBe(true);
       harness
-        .expectFile('dist/index.html')
+        .expectFile('dist/browser/index.html')
         .content.toContain(
           `<link rel="stylesheet" href="styles.css" media="print" onload="this.media='all'">`,
         );
-      harness.expectFile('dist/index.html').content.toContain(`body{color:#000}`);
+      harness.expectFile('dist/browser/index.html').content.toContain(`body{color:#000}`);
     });
 
     it(`should extract critical css when 'optimization' is true`, async () => {
@@ -69,11 +69,11 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
       expect(result?.success).toBe(true);
       harness
-        .expectFile('dist/index.html')
+        .expectFile('dist/browser/index.html')
         .content.toContain(
           `<link rel="stylesheet" href="styles.css" media="print" onload="this.media='all'">`,
         );
-      harness.expectFile('dist/index.html').content.toContain(`body{color:#000}`);
+      harness.expectFile('dist/browser/index.html').content.toContain(`body{color:#000}`);
     });
 
     it(`should not extract critical css when 'optimization' is false`, async () => {
@@ -86,7 +86,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       const { result } = await harness.executeOnce();
 
       expect(result?.success).toBe(true);
-      harness.expectFile('dist/index.html').content.not.toContain(`<style`);
+      harness.expectFile('dist/browser/index.html').content.not.toContain(`<style`);
     });
 
     it(`should not extract critical css when 'inlineCritical' is false`, async () => {
@@ -106,7 +106,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       const { result } = await harness.executeOnce();
 
       expect(result?.success).toBe(true);
-      harness.expectFile('dist/index.html').content.not.toContain(`<style`);
+      harness.expectFile('dist/browser/index.html').content.not.toContain(`<style`);
     });
 
     it(`should extract critical css when using '@media all {}' and 'minify' is set to true`, async () => {
@@ -128,11 +128,11 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       const { result } = await harness.executeOnce();
       expect(result?.success).toBe(true);
       harness
-        .expectFile('dist/index.html')
+        .expectFile('dist/browser/index.html')
         .content.toContain(
           `<link rel="stylesheet" href="styles.css" media="print" onload="this.media='all'">`,
         );
-      harness.expectFile('dist/index.html').content.toContain(`body{color:#000}`);
+      harness.expectFile('dist/browser/index.html').content.toContain(`body{color:#000}`);
     });
   });
 });

@@ -113,8 +113,8 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       const { result } = await harness.executeOnce();
       expect(result?.success).toBeTrue();
 
-      harness.expectFile('dist/main.js').toExist();
-      const indexFileContent = harness.expectFile('dist/index.html').content;
+      harness.expectFile('dist/browser/main.js').toExist();
+      const indexFileContent = harness.expectFile('dist/browser/index.html').content;
       indexFileContent.toContain('app-shell works!');
       indexFileContent.toContain('ng-server-context="app-shell"');
     });
@@ -137,7 +137,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       const { result } = await harness.executeOnce();
       expect(result?.success).toBeTrue();
 
-      const indexFileContent = harness.expectFile('dist/index.html').content;
+      const indexFileContent = harness.expectFile('dist/browser/index.html').content;
       indexFileContent.toContain('app-shell works!');
       indexFileContent.toContain('p{color:#000}');
       indexFileContent.toContain(
@@ -166,7 +166,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       const { result } = await harness.executeOnce();
       expect(result?.success).toBeTrue();
 
-      const indexFileContent = harness.expectFile('dist/index.html').content;
+      const indexFileContent = harness.expectFile('dist/browser/index.html').content;
       indexFileContent.toContain('app-shell works!');
       indexFileContent.toContain('p{color:#000}');
       indexFileContent.toContain(
