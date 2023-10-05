@@ -14,6 +14,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { promisify } from 'node:util';
 import { brotliCompress } from 'node:zlib';
+import { coerce } from 'semver';
 import { Spinner } from '../../utils/spinner';
 import { BundleStats, generateBuildStatsTable } from '../webpack/utils/stats';
 import { InitialFileRecord } from './bundler-context';
@@ -289,4 +290,19 @@ export function transformSupportedBrowsersToTargets(supportedBrowsers: string[])
   }
 
   return transformed;
+}
+
+const SUPPORTED_NODE_VERSIONS = '0.0.0-ENGINES-NODE';
+
+/**
+ * Transform supported Node.js versions to esbuild target.
+ * @see https://esbuild.github.io/api/#target
+ */
+export function getSupportedNodeTargets(): string[] {
+  if (SUPPORTED_NODE_VERSIONS.charAt(0) === '0') {
+    // Unlike `pkg_npm`, `ts_library` which is used to run unit tests does not support substitutions.
+    return [];
+  }
+
+  return SUPPORTED_NODE_VERSIONS.split('||').map((v) => 'node' + coerce(v)?.version);
 }
