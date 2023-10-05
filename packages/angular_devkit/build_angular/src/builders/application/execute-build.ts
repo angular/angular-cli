@@ -22,6 +22,7 @@ import { generateIndexHtml } from '../../tools/esbuild/index-html-generator';
 import { extractLicenses } from '../../tools/esbuild/license-extractor';
 import {
   calculateEstimatedTransferSizes,
+  getSupportedNodeTargets,
   logBuildStats,
   logMessages,
   transformSupportedBrowsersToTargets,
@@ -114,17 +115,12 @@ export async function executeBuild(
 
     // Server application code
     if (serverEntryPoint) {
+      const nodeTargets = getSupportedNodeTargets();
       bundlerContexts.push(
         new BundlerContext(
           workspaceRoot,
           !!options.watch,
-          createServerCodeBundleOptions(
-            options,
-            // NOTE: earlier versions of Node.js are not supported due to unsafe promise patching.
-            // See: https://github.com/angular/angular/pull/50552#issue-1737967592
-            [...target, 'node18.13'],
-            codeBundleCache,
-          ),
+          createServerCodeBundleOptions(options, [...target, ...nodeTargets], codeBundleCache),
           () => false,
         ),
       );
