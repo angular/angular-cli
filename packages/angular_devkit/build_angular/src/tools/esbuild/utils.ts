@@ -15,6 +15,7 @@ import path, { join } from 'node:path';
 import { promisify } from 'node:util';
 import { brotliCompress } from 'node:zlib';
 import { coerce } from 'semver';
+import { BudgetCalculatorResult } from '../../utils/bundle-calculator';
 import { Spinner } from '../../utils/spinner';
 import { BundleStats, generateBuildStatsTable } from '../webpack/utils/stats';
 import { BuildOutputFile, BuildOutputFileType, InitialFileRecord } from './bundler-context';
@@ -25,6 +26,7 @@ export function logBuildStats(
   context: BuilderContext,
   metafile: Metafile,
   initial: Map<string, InitialFileRecord>,
+  budgetFailures: BudgetCalculatorResult[] | undefined,
   estimatedTransferSizes?: Map<string, number>,
 ): void {
   const stats: BundleStats[] = [];
@@ -39,18 +41,27 @@ export function logBuildStats(
       continue;
     }
 
+    let name = initial.get(file)?.name;
+    if (name === undefined && output.entryPoint) {
+      name = path
+        .basename(output.entryPoint)
+        .replace(/\.[cm]?[jt]s$/, '')
+        .replace(/[\\/.]/g, '-');
+    }
+
     stats.push({
       initial: initial.has(file),
-      stats: [
-        file,
-        initial.get(file)?.name ?? '-',
-        output.bytes,
-        estimatedTransferSizes?.get(file) ?? '-',
-      ],
+      stats: [file, name ?? '-', output.bytes, estimatedTransferSizes?.get(file) ?? '-'],
     });
   }
 
-  const tableText = generateBuildStatsTable(stats, true, true, !!estimatedTransferSizes, undefined);
+  const tableText = generateBuildStatsTable(
+    stats,
+    true,
+    true,
+    !!estimatedTransferSizes,
+    budgetFailures,
+  );
 
   context.logger.info('\n' + tableText + '\n');
 }
