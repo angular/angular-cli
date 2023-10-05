@@ -1,3 +1,15 @@
+<a name="15.2.10"></a>
+
+# 15.2.10 (2023-10-05)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                          |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------ |
+| [05213c95b](https://github.com/angular/angular-cli/commit/05213c95b032dd64fdc73ed33af695e9f19b5d09) | fix  | update dependency postcss to v8.4.31 |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="14.2.13"></a>
 
 # 14.2.13 (2023-10-05)
