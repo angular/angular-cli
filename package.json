@@ -189,7 +189,7 @@
     "puppeteer": "18.2.1",
     "quicktype-core": "23.0.76",
     "resolve-url-loader": "5.0.0",
-    "rollup": "~3.29.0",
+    "rollup": "~4.0.0",
     "rollup-plugin-sourcemaps": "^0.6.0",
     "rxjs": "7.8.1",
     "sass": "1.67.0",
