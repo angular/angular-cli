@@ -52,7 +52,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
                 // Update type of 'foo' to invalid (number -> string)
                 await harness.writeFiles({
-                  'lazy.ts': `export const foo: string = 1;`,
+                  'src/lazy.ts': `export const foo: string = 1;`,
                 });
 
                 break;
@@ -68,7 +68,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
                 // Fix TS error
                 await harness.writeFiles({
-                  'lazy.ts': `export const foo: number = 100;`,
+                  'src/lazy.ts': `export const foo: number = 100;`,
                 });
 
                 break;
