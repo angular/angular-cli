@@ -14,7 +14,6 @@ import {
   normalizeGlobalStyles,
 } from '../../tools/webpack/utils/helpers';
 import { normalizeAssetPatterns, normalizeOptimization, normalizeSourceMaps } from '../../utils';
-import { calculateThresholds } from '../../utils/bundle-calculator';
 import { I18nOptions, createI18nOptions } from '../../utils/i18n-options';
 import { normalizeCacheOptions } from '../../utils/normalize-cache';
 import { generateEntryPoints } from '../../utils/package-chunk-sort';

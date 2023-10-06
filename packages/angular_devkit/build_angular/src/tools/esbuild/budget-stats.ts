@@ -47,7 +47,17 @@ export function generateBudgetStats(
       initial: !!initialRecord,
       names: name ? [name] : undefined,
     });
-    stats.assets.push({ name: file, size: entry.bytes });
+
+    // 'ng-component' is set by the angular plugin's component stylesheet bundler
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const componentStyle: boolean = (entry as any)['ng-component'];
+
+    stats.assets.push({
+      // Component styles use the input file while all other outputs use the result file
+      name: (componentStyle && Object.keys(entry.inputs)[0]) || file,
+      size: entry.bytes,
+      componentStyle,
+    });
   }
 
   return stats;

@@ -45,6 +45,7 @@ export interface BudgetChunk {
 export interface BudgetAsset {
   name: string;
   size: number;
+  componentStyle?: boolean;
 }
 
 export interface BudgetStats {
@@ -118,23 +119,15 @@ export function* calculateThresholds(budget: Budget): IterableIterator<Threshold
  * Calculates the sizes for bundles in the budget type provided.
  */
 function calculateSizes(budget: Budget, stats: BudgetStats): Size[] {
-  if (budget.type === Type.AnyComponentStyle) {
-    // Component style size information is not available post-build, this must
-    // be checked mid-build via the `AnyComponentStyleBudgetChecker` plugin.
-    throw new Error(
-      'Can not calculate size of AnyComponentStyle. Use `AnyComponentStyleBudgetChecker` instead.',
-    );
-  }
-
-  type NonComponentStyleBudgetTypes = Exclude<Budget['type'], Type.AnyComponentStyle>;
   type CalculatorTypes = {
     new (budget: Budget, chunks: BudgetChunk[], assets: BudgetAsset[]): Calculator;
   };
-  const calculatorMap: Record<NonComponentStyleBudgetTypes, CalculatorTypes> = {
+  const calculatorMap: Record<Budget['type'], CalculatorTypes> = {
     all: AllCalculator,
     allScript: AllScriptCalculator,
     any: AnyCalculator,
     anyScript: AnyScriptCalculator,
+    anyComponentStyle: AnyComponentStyleCalculator,
     bundle: BundleCalculator,
     initial: InitialCalculator,
   };
@@ -280,6 +273,20 @@ class AnyCalculator extends Calculator {
 }
 
 /**
+ * Any compoonent stylesheet
+ */
+class AnyComponentStyleCalculator extends Calculator {
+  calculate() {
+    return this.assets
+      .filter((asset) => asset.componentStyle)
+      .map((asset) => ({
+        size: this.getAssetSize(asset),
+        label: asset.name,
+      }));
+  }
+}
+
+/**
  * Calculate the bytes given a string value.
  */
 function calculateBytes(input: string, baseline?: string, factor: 1 | -1 = 1): number {
@@ -316,9 +323,12 @@ function calculateBytes(input: string, baseline?: string, factor: 1 | -1 = 1): n
 export function* checkBudgets(
   budgets: Budget[],
   stats: BudgetStats,
+  checkComponentStyles?: boolean,
 ): IterableIterator<BudgetCalculatorResult> {
-  // Ignore AnyComponentStyle budgets as these are handled in `AnyComponentStyleBudgetChecker`.
-  const computableBudgets = budgets.filter((budget) => budget.type !== Type.AnyComponentStyle);
+  // Ignore AnyComponentStyle budgets as these are handled in `AnyComponentStyleBudgetChecker` unless requested
+  const computableBudgets = checkComponentStyles
+    ? budgets
+    : budgets.filter((budget) => budget.type !== Type.AnyComponentStyle);
 
   for (const budget of computableBudgets) {
     const sizes = calculateSizes(budget, stats);
