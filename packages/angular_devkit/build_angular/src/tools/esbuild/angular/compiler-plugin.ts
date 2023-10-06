@@ -31,6 +31,7 @@ import {
 import { BundleStylesheetOptions } from '../stylesheets/bundle-options';
 import { AngularHostOptions } from './angular-host';
 import { AngularCompilation, AotCompilation, JitCompilation, NoopCompilation } from './compilation';
+import { SharedTSCompilationState, getSharedCompilationState } from './compilation-state';
 import { ComponentStylesheetBundler } from './component-stylesheets';
 import { setupJitPluginCallbacks } from './jit-plugin-callbacks';
 import { SourceFileCache } from './source-file-cache';
@@ -48,29 +49,18 @@ export interface CompilerPluginOptions {
   loadResultCache?: LoadResultCache;
 }
 
-// TODO: find a better way to unblock TS compilation of server bundles.
-let TS_COMPILATION_READY: Promise<void> | undefined;
-
 // eslint-disable-next-line max-lines-per-function
 export function createCompilerPlugin(
   pluginOptions: CompilerPluginOptions,
   styleOptions: BundleStylesheetOptions & { inlineStyleLanguage: string },
 ): Plugin {
-  let resolveCompilationReady: (() => void) | undefined;
-
-  if (!pluginOptions.noopTypeScriptCompilation) {
-    TS_COMPILATION_READY = new Promise<void>((resolve) => {
-      resolveCompilationReady = resolve;
-    });
-  }
-
   return {
     name: 'angular-compiler',
     // eslint-disable-next-line max-lines-per-function
     async setup(build: PluginBuild): Promise<void> {
       let setupWarnings: PartialMessage[] | undefined = [];
-
       const preserveSymlinks = build.initialOptions.preserveSymlinks;
+
       let tsconfigPath = pluginOptions.tsconfig;
       if (!preserveSymlinks) {
         // Use the real path of the tsconfig if not preserving symlinks.
@@ -112,8 +102,14 @@ export function createCompilerPlugin(
         styleOptions,
         pluginOptions.loadResultCache,
       );
+      let sharedTSCompilationState: SharedTSCompilationState | undefined;
 
       build.onStart(async () => {
+        sharedTSCompilationState = getSharedCompilationState();
+        if (!(compilation instanceof NoopCompilation)) {
+          sharedTSCompilationState.markAsInProgress();
+        }
+
         const result: OnStartResult = {
           warnings: setupWarnings,
         };
@@ -259,7 +255,7 @@ export function createCompilerPlugin(
         shouldTsIgnoreJs = !allowJs;
 
         if (compilation instanceof NoopCompilation) {
-          await TS_COMPILATION_READY;
+          await sharedTSCompilationState.waitUntilReady;
 
           return result;
         }
@@ -287,8 +283,7 @@ export function createCompilerPlugin(
         // Reset the setup warnings so that they are only shown during the first build.
         setupWarnings = undefined;
 
-        // TODO: find a better way to unblock TS compilation of server bundles.
-        resolveCompilationReady?.();
+        sharedTSCompilationState.markAsReady();
 
         return result;
       });
@@ -388,7 +383,10 @@ export function createCompilerPlugin(
         logCumulativeDurations();
       });
 
-      build.onDispose(() => void stylesheetBundler.dispose());
+      build.onDispose(() => {
+        sharedTSCompilationState?.dispose();
+        void stylesheetBundler.dispose();
+      });
     },
   };
 }
