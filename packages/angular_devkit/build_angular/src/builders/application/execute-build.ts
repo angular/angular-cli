@@ -8,7 +8,7 @@
 
 import { BuilderContext } from '@angular-devkit/architect';
 import assert from 'node:assert';
-import { SourceFileCache } from '../../tools/esbuild/angular/compiler-plugin';
+import { SourceFileCache } from '../../tools/esbuild/angular/source-file-cache';
 import {
   createBrowserCodeBundleOptions,
   createServerCodeBundleOptions,
