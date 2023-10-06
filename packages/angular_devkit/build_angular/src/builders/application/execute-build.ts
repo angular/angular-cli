@@ -257,7 +257,7 @@ export async function executeBuild(
   let budgetFailures;
   if (options.budgets) {
     const compatStats = generateBudgetStats(metafile, initialFiles);
-    budgetFailures = [...checkBudgets(options.budgets, compatStats)];
+    budgetFailures = [...checkBudgets(options.budgets, compatStats, true)];
     for (const { severity, message } of budgetFailures) {
       if (severity === 'error') {
         context.logger.error(message);

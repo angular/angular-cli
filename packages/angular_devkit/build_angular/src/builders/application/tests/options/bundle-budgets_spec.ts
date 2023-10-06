@@ -88,7 +88,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
     });
 
     CSS_EXTENSIONS.forEach((ext) => {
-      xit(`shows warnings for large component ${ext} when using 'anyComponentStyle' when AOT`, async () => {
+      it(`shows warnings for large component ${ext} when using 'anyComponentStyle' when AOT`, async () => {
         const cssContent = `
           .foo { color: white; padding: 1px; }
           .buz { color: white; padding: 2px; }
@@ -118,7 +118,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
         expect(logs).toContain(
           jasmine.objectContaining<logging.LogEntry>({
             level: 'warn',
-            message: jasmine.stringMatching(new RegExp(`Warning.+app.component.${ext}`)),
+            message: jasmine.stringMatching(new RegExp(`app.component.${ext}`)),
           }),
         );
       });
