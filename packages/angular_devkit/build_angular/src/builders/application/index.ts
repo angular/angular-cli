@@ -44,14 +44,6 @@ export async function* buildApplicationInternal(
 
   const normalizedOptions = await normalizeOptions(context, projectName, options);
 
-  // Warn about SSR not yet supporting localize
-  if (normalizedOptions.i18nOptions.shouldInline && normalizedOptions.ssrOptions) {
-    context.logger.warn(
-      `SSR is not yet supported with the 'localize' option and will be disabled for this build.`,
-    );
-    normalizedOptions.ssrOptions = undefined;
-  }
-
   yield* runEsBuildBuildAction(
     (rebuildState) => executeBuild(normalizedOptions, context, rebuildState),
     {
