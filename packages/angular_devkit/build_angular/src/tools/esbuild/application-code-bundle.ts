@@ -10,6 +10,7 @@ import type { BuildOptions } from 'esbuild';
 import assert from 'node:assert';
 import { createHash } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
+import { createRequire } from 'node:module';
 import { extname, join, relative } from 'node:path';
 import type { NormalizedApplicationBuildOptions } from '../../builders/application/options';
 import { allowMangle } from '../../utils/environment-options';
@@ -114,8 +115,11 @@ export function createBrowserCodeBundleOptions(
       createVirtualModulePlugin({
         namespace,
         loadContent: async (_, build) => {
+          let hasLocalizePolyfill = false;
           const polyfillPaths = await Promise.all(
             polyfills.map(async (path) => {
+              hasLocalizePolyfill ||= path.startsWith('@angular/localize');
+
               if (path.startsWith('zone.js') || !extname(path)) {
                 return path;
               }
@@ -130,10 +134,29 @@ export function createBrowserCodeBundleOptions(
             }),
           );
 
+          if (!options.i18nOptions.shouldInline && !hasLocalizePolyfill) {
+            // Cannot use `build.resolve` here since it does not allow overriding the external options
+            // and the actual presence of the `@angular/localize` package needs to be checked here.
+            const workspaceRequire = createRequire(workspaceRoot + '/');
+            try {
+              workspaceRequire.resolve('@angular/localize');
+              // The resolve call above will throw if not found
+              polyfillPaths.push('@angular/localize/init');
+            } catch {}
+          }
+
+          // Generate module contents with an import statement per defined polyfill
+          let contents = polyfillPaths
+            .map((file) => `import '${file.replace(/\\/g, '/')}';`)
+            .join('\n');
+
+          // If not inlining translations and source locale is defined, inject the locale specifier
+          if (!options.i18nOptions.shouldInline && options.i18nOptions.hasDefinedSourceLocale) {
+            contents += `(globalThis.$localize ??= {}).locale = "${options.i18nOptions.sourceLocale}";\n`;
+          }
+
           return {
-            contents: polyfillPaths
-              .map((file) => `import '${file.replace(/\\/g, '/')}';`)
-              .join('\n'),
+            contents,
             loader: 'js',
             resolveDir: workspaceRoot,
           };
@@ -256,6 +279,27 @@ export function createServerCodeBundleOptions(
 
         if (watch) {
           contents.push(`export { ɵresetCompiledComponents } from '@angular/core';`);
+        }
+
+        if (!options.i18nOptions.shouldInline) {
+          // Cannot use `build.resolve` here since it does not allow overriding the external options
+          // and the actual presence of the `@angular/localize` package needs to be checked here.
+          const workspaceRequire = createRequire(workspaceRoot + '/');
+          try {
+            workspaceRequire.resolve('@angular/localize');
+            // The resolve call above will throw if not found
+            contents.push(`import '@angular/localize/init';`);
+          } catch {}
+        }
+
+        if (options.i18nOptions.shouldInline) {
+          // When inlining, a placeholder is used to allow the post-processing step to inject the $localize locale identifier
+          contents.push('(globalThis.$localize ??= {}).locale = "___NG_LOCALE_INSERT___";');
+        } else if (options.i18nOptions.hasDefinedSourceLocale) {
+          // If not inlining translations and source locale is defined, inject the locale specifier
+          contents.push(
+            `(globalThis.$localize ??= {}).locale = "${options.i18nOptions.sourceLocale}";`,
+          );
         }
 
         if (prerenderOptions?.discoverRoutes) {
