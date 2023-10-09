@@ -18,8 +18,10 @@ import path, { posix } from 'node:path';
 import type { Connect, InlineConfig, ViteDevServer } from 'vite';
 import { BuildOutputFile, BuildOutputFileType } from '../../tools/esbuild/bundler-context';
 import { JavaScriptTransformer } from '../../tools/esbuild/javascript-transformer';
+import { getFeatureSupport, transformSupportedBrowsersToTargets } from '../../tools/esbuild/utils';
 import { createAngularLocaleDataPlugin } from '../../tools/vite/i18n-locale-plugin';
 import { RenderOptions, renderPage } from '../../utils/server-rendering/render-page';
+import { getSupportedBrowsers } from '../../utils/supported-browsers';
 import { getIndexOutputFile } from '../../utils/webpack-browser-config';
 import { buildEsbuildBrowser } from '../browser-esbuild';
 import { Schema as BrowserBuilderOptions } from '../browser-esbuild/schema';
@@ -131,6 +133,16 @@ export async function* serveWithVite(
     if (server) {
       handleUpdate(generatedFiles, server, serverOptions, context.logger);
     } else {
+      const projectName = context.target?.project;
+      if (!projectName) {
+        throw new Error('The builder requires a target.');
+      }
+
+      const { root = '' } = await context.getProjectMetadata(projectName);
+      const projectRoot = path.join(context.workspaceRoot, root as string);
+      const browsers = getSupportedBrowsers(projectRoot, context.logger);
+      const target = transformSupportedBrowsersToTargets(browsers);
+
       // Setup server and start listening
       const serverConfiguration = await setupServer(
         serverOptions,
@@ -140,6 +152,7 @@ export async function* serveWithVite(
         browserOptions.externalDependencies,
         !!browserOptions.ssr,
         prebundleTransformer,
+        target,
       );
 
       server = await createServer(serverConfiguration);
@@ -295,6 +308,7 @@ export async function setupServer(
   prebundleExclude: string[] | undefined,
   ssr: boolean,
   prebundleTransformer: JavaScriptTransformer,
+  target: string[],
 ): Promise<InlineConfig> {
   const proxy = await loadProxyConfiguration(
     serverOptions.workspaceRoot,
@@ -556,6 +570,9 @@ export async function setupServer(
       entries: [],
       // Add an esbuild plugin to run the Angular linker on dependencies
       esbuildOptions: {
+        // Set esbuild supported targets.
+        target,
+        supported: getFeatureSupport(target),
         plugins: [
           {
             name: 'angular-vite-optimize-deps',
