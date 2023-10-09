@@ -27,7 +27,7 @@ const CHUNKS_REGEXP = /file:\/\/\/(main\.server|chunk-\w+)\.mjs/;
 let workspaceRootFile: string;
 let outputFiles: Record<string, string>;
 
-const JavascriptTransformer = new JavaScriptTransformer(
+const javascriptTransformer = new JavaScriptTransformer(
   // Always enable JIT linking to support applications built with and without AOT.
   // In a development environment the additional scope information does not
   // have a negative effect unlike production where final output size is relevant.
@@ -76,7 +76,7 @@ export async function load(url: string, context: { format?: string | null }, nex
 
     if (source === undefined) {
       source = TRANSFORMED_FILES[filePath] = Buffer.from(
-        await JavascriptTransformer.transformFile(filePath),
+        await javascriptTransformer.transformFile(filePath),
       ).toString('utf-8');
     }
 
@@ -100,7 +100,7 @@ function isFileProtocol(url: string): boolean {
 }
 
 function handleProcessExit(): void {
-  void JavascriptTransformer.close();
+  void javascriptTransformer.close();
 }
 
 function isBundleEntryPointOrChunk(context: { parentURL: undefined | string }): boolean {
