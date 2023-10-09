@@ -7,9 +7,6 @@ import { isPrereleaseCli, updateJsonFile } from '../../utils/project';
 const snapshots = require('../../ng-snapshot/package.json');
 
 export default async function () {
-  // TODO(crisbeto): temporarily disabled until Material is updated to TS 5.2
-  return;
-
   let tag = (await isPrereleaseCli()) ? '@next' : '';
   await ng('add', `@angular/material${tag}`, '--skip-confirmation');
 
@@ -46,10 +43,10 @@ export default async function () {
   // Ensure moment adapter works (uses unique importing mechanism for moment)
   // Issue: https://github.com/angular/angular-cli/issues/17320
   await replaceInFile(
-    'src/app/app.module.ts',
-    `import { AppComponent } from './app.component';`,
+    'src/app/app.config.ts',
+    `import { ApplicationConfig } from '@angular/core';`,
     `
-    import { AppComponent } from './app.component';
+    import { ApplicationConfig } from '@angular/core';
     import {
       MomentDateAdapter,
       MAT_MOMENT_DATE_FORMATS
@@ -63,10 +60,11 @@ export default async function () {
   );
 
   await replaceInFile(
-    'src/app/app.module.ts',
-    `providers: []`,
+    'src/app/app.config.ts',
+    `providers: [provideRouter(routes) ]`,
     `
     providers: [
+      provideRouter(routes),
       {
         provide: DateAdapter,
         useClass: MomentDateAdapter,
