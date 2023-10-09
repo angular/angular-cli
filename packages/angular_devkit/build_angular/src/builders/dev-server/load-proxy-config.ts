@@ -138,6 +138,7 @@ function normalizeProxyConfiguration(
   // Replace `pathRewrite` field with a `rewrite` function
   for (const proxyEntry of Object.values(normalizedProxy)) {
     if (
+      typeof proxyEntry === 'object' &&
       'pathRewrite' in proxyEntry &&
       proxyEntry.pathRewrite &&
       typeof proxyEntry.pathRewrite === 'object'
