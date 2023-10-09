@@ -62,6 +62,7 @@ export function createGlobalStylesBundleOptions(
           },
       includePaths: stylePreprocessorOptions?.includePaths,
       tailwindConfiguration,
+      publicPath: options.publicPath,
     },
     cache,
   );

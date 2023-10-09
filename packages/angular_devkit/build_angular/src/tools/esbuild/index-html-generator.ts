@@ -82,6 +82,7 @@ export async function generateIndexHtml(
       },
     },
     crossOrigin: crossOrigin,
+    deployUrl: buildOptions.publicPath,
   });
 
   indexHtmlGenerator.readAsset = readAsset;

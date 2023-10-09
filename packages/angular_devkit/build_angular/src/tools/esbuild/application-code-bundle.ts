@@ -405,5 +405,6 @@ function getEsBuildCommonOptions(options: NormalizedApplicationBuildOptions): Bu
       'ngJitMode': jit ? 'true' : 'false',
     },
     footer,
+    publicPath: options.publicPath,
   };
 }
