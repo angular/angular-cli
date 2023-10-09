@@ -18,7 +18,9 @@ import type { AddressInfo } from 'node:net';
 import path, { posix } from 'node:path';
 import { Connect, InlineConfig, ViteDevServer, createServer, normalizePath } from 'vite';
 import { JavaScriptTransformer } from '../../tools/esbuild/javascript-transformer';
+import { getFeatureSupport, transformSupportedBrowsersToTargets } from '../../tools/esbuild/utils';
 import { RenderOptions, renderPage } from '../../utils/server-rendering/render-page';
+import { getSupportedBrowsers } from '../../utils/supported-browsers';
 import { buildEsbuildBrowser } from '../browser-esbuild';
 import { Schema as BrowserBuilderOptions } from '../browser-esbuild/schema';
 import { loadProxyConfiguration } from './load-proxy-config';
@@ -88,6 +90,16 @@ export async function* serveWithVite(
     if (server) {
       handleUpdate(generatedFiles, server, serverOptions, context.logger);
     } else {
+      const projectName = context.target?.project;
+      if (!projectName) {
+        throw new Error('The builder requires a target.');
+      }
+
+      const { root = '' } = await context.getProjectMetadata(projectName);
+      const projectRoot = path.join(context.workspaceRoot, root as string);
+      const browsers = getSupportedBrowsers(projectRoot, context.logger);
+      const target = transformSupportedBrowsersToTargets(browsers);
+
       // Setup server and start listening
       const serverConfiguration = await setupServer(
         serverOptions,
@@ -96,6 +108,7 @@ export async function* serveWithVite(
         browserOptions.preserveSymlinks,
         browserOptions.externalDependencies,
         !!browserOptions.ssr,
+        target,
       );
 
       server = await createServer(serverConfiguration);
@@ -237,6 +250,7 @@ export async function setupServer(
   preserveSymlinks: boolean | undefined,
   prebundleExclude: string[] | undefined,
   ssr: boolean,
+  target: string[],
 ): Promise<InlineConfig> {
   const proxy = await loadProxyConfiguration(
     serverOptions.workspaceRoot,
@@ -494,6 +508,9 @@ export async function setupServer(
       entries: [],
       // Add an esbuild plugin to run the Angular linker on dependencies
       esbuildOptions: {
+        // Set esbuild supported targets.
+        target,
+        supported: getFeatureSupport(target),
         plugins: [
           {
             name: 'angular-vite-optimize-deps',
