@@ -64,6 +64,7 @@ export function createCompilerPluginOptions(
       inlineStyleLanguage,
       preserveSymlinks,
       tailwindConfiguration,
+      publicPath: options.publicPath,
     },
   };
 }

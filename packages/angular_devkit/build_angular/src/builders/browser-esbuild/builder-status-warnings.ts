@@ -10,9 +10,6 @@ import { BuilderContext } from '@angular-devkit/architect';
 import { Schema as BrowserBuilderOptions } from './schema';
 
 const UNSUPPORTED_OPTIONS: Array<keyof BrowserBuilderOptions> = [
-  // * Deprecated
-  'deployUrl',
-
   // * Always enabled with esbuild
   // 'commonChunk',
 
