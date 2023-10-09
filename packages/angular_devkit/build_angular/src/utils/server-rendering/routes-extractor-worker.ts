@@ -8,7 +8,7 @@
 
 import { workerData } from 'node:worker_threads';
 import { loadEsmModule } from '../load-esm';
-import type { ESMInMemoryFileLoaderWorkerData } from './esm-in-memory-file-loader';
+import type { ESMInMemoryFileLoaderWorkerData } from './esm-in-memory-loader/loader-hooks';
 import { MainServerBundleExports } from './main-bundle-exports';
 
 export interface RoutesExtractorWorkerData extends ESMInMemoryFileLoaderWorkerData {

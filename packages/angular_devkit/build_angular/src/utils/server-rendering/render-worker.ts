@@ -7,7 +7,7 @@
  */
 
 import { workerData } from 'node:worker_threads';
-import type { ESMInMemoryFileLoaderWorkerData } from './esm-in-memory-file-loader';
+import type { ESMInMemoryFileLoaderWorkerData } from './esm-in-memory-loader/loader-hooks';
 import { RenderResult, ServerContext, renderPage } from './render-page';
 
 export interface RenderWorkerData extends ESMInMemoryFileLoaderWorkerData {

@@ -7,10 +7,10 @@
  */
 
 import { readFile } from 'node:fs/promises';
-import { extname, join, posix } from 'node:path';
-import { pathToFileURL } from 'node:url';
+import { extname, posix } from 'node:path';
 import Piscina from 'piscina';
 import { BuildOutputFile, BuildOutputFileType } from '../../tools/esbuild/bundler-context';
+import { getESMLoaderArgs } from './esm-in-memory-loader/node-18-utils';
 import type { RenderResult, ServerContext } from './render-page';
 import type { RenderWorkerData } from './render-worker';
 import type {
@@ -85,11 +85,7 @@ export async function prerenderPages(
       inlineCriticalCss,
       document,
     } as RenderWorkerData,
-    execArgv: [
-      '--no-warnings', // Suppress `ExperimentalWarning: Custom ESM Loaders is an experimental feature...`.
-      '--loader',
-      pathToFileURL(join(__dirname, 'esm-in-memory-file-loader.js')).href, // Loader cannot be an absolute path on Windows.
-    ],
+    execArgv: getESMLoaderArgs(),
   });
 
   try {
@@ -173,11 +169,7 @@ async function getAllRoutes(
       document,
       verbose,
     } as RoutesExtractorWorkerData,
-    execArgv: [
-      '--no-warnings', // Suppress `ExperimentalWarning: Custom ESM Loaders is an experimental feature...`.
-      '--loader',
-      pathToFileURL(join(__dirname, 'esm-in-memory-file-loader.js')).href, // Loader cannot be an absolute path on Windows.
-    ],
+    execArgv: getESMLoaderArgs(),
   });
 
   const { routes: extractedRoutes, warnings }: RoutersExtractorWorkerResult = await renderWorker

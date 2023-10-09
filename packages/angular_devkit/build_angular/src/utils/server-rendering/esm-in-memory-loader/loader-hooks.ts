@@ -8,9 +8,9 @@
 
 import { join, relative } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { workerData } from 'node:worker_threads';
 import { fileURLToPath } from 'url';
-import { JavaScriptTransformer } from '../../tools/esbuild/javascript-transformer';
+import { JavaScriptTransformer } from '../../../tools/esbuild/javascript-transformer';
+import { callInitializeIfNeeded } from './node-18-utils';
 
 /**
  * Node.js ESM loader to redirect imports to in memory files.
@@ -22,19 +22,25 @@ export interface ESMInMemoryFileLoaderWorkerData {
   workspaceRoot: string;
 }
 
-const { outputFiles, workspaceRoot } = workerData as ESMInMemoryFileLoaderWorkerData;
-
 const TRANSFORMED_FILES: Record<string, string> = {};
 const CHUNKS_REGEXP = /file:\/\/\/(main\.server|chunk-\w+)\.mjs/;
-const WORKSPACE_ROOT_FILE = pathToFileURL(join(workspaceRoot, 'index.mjs')).href;
+let workspaceRootFile: string;
+let outputFiles: Record<string, string>;
 
-const JAVASCRIPT_TRANSFORMER = new JavaScriptTransformer(
+const javascriptTransformer = new JavaScriptTransformer(
   // Always enable JIT linking to support applications built with and without AOT.
   // In a development environment the additional scope information does not
   // have a negative effect unlike production where final output size is relevant.
   { sourcemap: true, jit: true },
   1,
 );
+
+callInitializeIfNeeded(initialize);
+
+export function initialize(data: ESMInMemoryFileLoaderWorkerData) {
+  workspaceRootFile = pathToFileURL(join(data.workspaceRoot, 'index.mjs')).href;
+  outputFiles = data.outputFiles;
+}
 
 export function resolve(
   specifier: string,
@@ -58,7 +64,7 @@ export function resolve(
   // Node.js default resolve if this is the last user-specified loader.
   return nextResolve(
     specifier,
-    isBundleEntryPointOrChunk(context) ? { ...context, parentURL: WORKSPACE_ROOT_FILE } : context,
+    isBundleEntryPointOrChunk(context) ? { ...context, parentURL: workspaceRootFile } : context,
   );
 }
 
@@ -70,7 +76,7 @@ export async function load(url: string, context: { format?: string | null }, nex
 
     if (source === undefined) {
       source = TRANSFORMED_FILES[filePath] = Buffer.from(
-        await JAVASCRIPT_TRANSFORMER.transformFile(filePath),
+        await javascriptTransformer.transformFile(filePath),
       ).toString('utf-8');
     }
 
@@ -94,7 +100,7 @@ function isFileProtocol(url: string): boolean {
 }
 
 function handleProcessExit(): void {
-  void JAVASCRIPT_TRANSFORMER.close();
+  void javascriptTransformer.close();
 }
 
 function isBundleEntryPointOrChunk(context: { parentURL: undefined | string }): boolean {
