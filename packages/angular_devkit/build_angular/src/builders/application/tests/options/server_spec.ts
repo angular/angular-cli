@@ -24,6 +24,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
     it('uses a provided TypeScript file', async () => {
       harness.useTarget('build', {
         ...BASE_OPTIONS,
+        ssr: true,
         server: 'src/main.server.ts',
       });
 
@@ -36,6 +37,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
     it('does not write file to disk when "ssr" is "false"', async () => {
       harness.useTarget('build', {
         ...BASE_OPTIONS,
+        ssr: true,
         server: 'src/main.server.ts',
       });
 
@@ -50,6 +52,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
       harness.useTarget('build', {
         ...BASE_OPTIONS,
+        ssr: true,
         server: 'src/server.js',
       });
 
@@ -60,6 +63,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
     it('fails and shows an error when file does not exist', async () => {
       harness.useTarget('build', {
         ...BASE_OPTIONS,
+        ssr: true,
         server: 'src/missing.ts',
       });
 
@@ -91,6 +95,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
       harness.useTarget('build', {
         ...BASE_OPTIONS,
+        ssr: true,
         server: '/file.mjs',
       });
 

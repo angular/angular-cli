@@ -114,7 +114,8 @@ export async function executeBuild(
     }
 
     // Server application code
-    if (serverEntryPoint) {
+    // Skip server build when non of the features are enabled.
+    if (serverEntryPoint && (prerenderOptions || appShellOptions || ssrOptions)) {
       const nodeTargets = getSupportedNodeTargets();
       bundlerContexts.push(
         new BundlerContext(
