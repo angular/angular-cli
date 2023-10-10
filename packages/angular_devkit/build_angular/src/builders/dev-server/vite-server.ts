@@ -24,6 +24,7 @@ import { createAngularLocaleDataPlugin } from '../../tools/vite/i18n-locale-plug
 import { RenderOptions, renderPage } from '../../utils/server-rendering/render-page';
 import { getSupportedBrowsers } from '../../utils/supported-browsers';
 import { getIndexOutputFile } from '../../utils/webpack-browser-config';
+import { buildApplicationInternal } from '../application';
 import { buildEsbuildBrowser } from '../browser-esbuild';
 import { Schema as BrowserBuilderOptions } from '../browser-esbuild/schema';
 import { loadProxyConfiguration } from './load-proxy-config';
@@ -116,9 +117,15 @@ export async function* serveWithVite(
   let listeningAddress: AddressInfo | undefined;
   const generatedFiles = new Map<string, OutputFileRecord>();
   const assetFiles = new Map<string, string>();
+  const build =
+    builderName === '@angular-devkit/build-angular:application'
+      ? buildApplicationInternal
+      : buildEsbuildBrowser;
+
   // TODO: Switch this to an architect schedule call when infrastructure settings are supported
-  for await (const result of buildEsbuildBrowser(
-    browserOptions,
+  for await (const result of build(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    browserOptions as any,
     context,
     {
       write: false,
