@@ -263,17 +263,17 @@ function addAppToWorkspaceFile(
         options: {},
         configurations: {
           production: {
-            browserTarget: `${options.name}:build:production`,
+            buildTarget: `${options.name}:build:production`,
           },
           development: {
-            browserTarget: `${options.name}:build:development`,
+            buildTarget: `${options.name}:build:development`,
           },
         },
       },
       'extract-i18n': {
         builder: Builders.ExtractI18n,
         options: {
-          browserTarget: `${options.name}:build`,
+          buildTarget: `${options.name}:build`,
         },
       },
       test: options.minimal

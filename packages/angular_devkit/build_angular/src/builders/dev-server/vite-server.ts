@@ -51,7 +51,7 @@ export async function* serveWithVite(
 ): AsyncIterableIterator<DevServerBuilderOutput> {
   // Get the browser configuration from the target name.
   const rawBrowserOptions = (await context.getTargetOptions(
-    serverOptions.browserTarget,
+    serverOptions.buildTarget,
   )) as json.JsonObject & BrowserBuilderOptions;
 
   const browserOptions = (await context.validateOptions(

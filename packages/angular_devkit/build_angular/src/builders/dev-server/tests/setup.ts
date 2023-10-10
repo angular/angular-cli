@@ -30,7 +30,7 @@ export const DEV_SERVER_BUILDER_INFO = Object.freeze({
  * supports parallel test execution.
  */
 export const BASE_OPTIONS = Object.freeze<Schema>({
-  browserTarget: 'test:build',
+  buildTarget: 'test:build',
   port: 0,
 });
 

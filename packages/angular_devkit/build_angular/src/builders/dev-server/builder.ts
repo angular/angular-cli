@@ -74,7 +74,7 @@ async function initialize(
   await purgeStaleBuildCache(context);
 
   const normalizedOptions = await normalizeOptions(context, projectName, initialOptions);
-  const builderName = await context.getBuilderNameForTarget(normalizedOptions.browserTarget);
+  const builderName = await context.getBuilderNameForTarget(normalizedOptions.buildTarget);
 
   if (
     !normalizedOptions.disableHostCheck &&
