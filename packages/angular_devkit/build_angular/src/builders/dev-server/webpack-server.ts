@@ -86,7 +86,7 @@ export function serveWebpackBrowser(
 
     // Get the browser configuration from the target name.
     const rawBrowserOptions = (await context.getTargetOptions(
-      options.browserTarget,
+      options.buildTarget,
     )) as json.JsonObject & BrowserBuilderSchema;
 
     if (rawBrowserOptions.outputHashing && rawBrowserOptions.outputHashing !== OutputHashing.None) {

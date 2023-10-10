@@ -34,7 +34,8 @@ export async function normalizeOptions(
 
   const cacheOptions = normalizeCacheOptions(projectMetadata, workspaceRoot);
 
-  const browserTarget = targetFromTargetString(options.browserTarget);
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  const buildTarget = targetFromTargetString(options.buildTarget ?? options.browserTarget!);
 
   // Initial options to keep
   const {
@@ -60,7 +61,7 @@ export async function normalizeOptions(
 
   // Return all the normalized options
   return {
-    browserTarget,
+    buildTarget,
     host: host ?? 'localhost',
     port: port ?? 4200,
     poll,

@@ -41,7 +41,7 @@ export async function extractMessages(
   let useLegacyIds = true;
 
   const browserOptions = await context.validateOptions(
-    await context.getTargetOptions(options.browserTarget),
+    await context.getTargetOptions(options.buildTarget),
     builderName,
   );
 

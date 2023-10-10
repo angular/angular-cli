@@ -33,7 +33,8 @@ export async function normalizeOptions(
   const projectMetadata = await context.getProjectMetadata(projectName);
   const projectRoot = path.join(workspaceRoot, (projectMetadata.root as string | undefined) ?? '');
 
-  const browserTarget = targetFromTargetString(options.browserTarget);
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  const buildTarget = targetFromTargetString(options.buildTarget ?? options.browserTarget!);
 
   const i18nOptions = createI18nOptions(projectMetadata);
 
@@ -62,7 +63,7 @@ export async function normalizeOptions(
   return {
     workspaceRoot,
     projectRoot,
-    browserTarget,
+    buildTarget,
     i18nOptions,
     format,
     outFile,

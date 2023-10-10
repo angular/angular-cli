@@ -76,7 +76,7 @@ export interface BuildOptions {
 
 export interface WebpackDevServerOptions
   extends BuildOptions,
-    Omit<DevServerSchema, 'optimization' | 'sourceMap' | 'browserTarget'> {}
+    Omit<DevServerSchema, 'optimization' | 'sourceMap' | 'buildTarget' | 'browserTarget'> {}
 
 export interface WebpackConfigOptions<T = BuildOptions> {
   root: string;

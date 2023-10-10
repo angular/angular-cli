@@ -43,9 +43,8 @@ export async function execute(
   // The package is a peer dependency and might not be present
   let localizeToolsModule;
   try {
-    localizeToolsModule = await loadEsmModule<typeof import('@angular/localize/tools')>(
-      '@angular/localize/tools',
-    );
+    localizeToolsModule =
+      await loadEsmModule<typeof import('@angular/localize/tools')>('@angular/localize/tools');
   } catch {
     return {
       success: false,
@@ -57,7 +56,7 @@ export async function execute(
 
   // Normalize options
   const normalizedOptions = await normalizeOptions(context, projectName, options);
-  const builderName = await context.getBuilderNameForTarget(normalizedOptions.browserTarget);
+  const builderName = await context.getBuilderNameForTarget(normalizedOptions.buildTarget);
 
   // Extract messages based on configured builder
   let extractionResult;
