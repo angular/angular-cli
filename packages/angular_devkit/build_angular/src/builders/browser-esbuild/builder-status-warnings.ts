@@ -21,7 +21,15 @@ const UNSUPPORTED_OPTIONS: Array<keyof BrowserBuilderOptions> = [
   'webWorkerTsConfig',
 ];
 
-export function logBuilderStatusWarnings(options: BrowserBuilderOptions, context: BuilderContext) {
+export function logBuilderStatusWarnings(
+  options: BrowserBuilderOptions,
+  { logger }: BuilderContext,
+) {
+  logger.warn(
+    `The 'browser-esbuild' builder is a compatibility builder which will be removed in a future major ` +
+      `version in favor of the 'application' builder.`,
+  );
+
   // Validate supported options
   for (const unsupportedOption of UNSUPPORTED_OPTIONS) {
     const value = (options as unknown as BrowserBuilderOptions)[unsupportedOption];
@@ -41,12 +49,12 @@ export function logBuilderStatusWarnings(options: BrowserBuilderOptions, context
       unsupportedOption === 'resourcesOutputPath' ||
       unsupportedOption === 'deployUrl'
     ) {
-      context.logger.warn(
+      logger.warn(
         `The '${unsupportedOption}' option is not used by this builder and will be ignored.`,
       );
       continue;
     }
 
-    context.logger.warn(`The '${unsupportedOption}' option is not yet supported by this builder.`);
+    logger.warn(`The '${unsupportedOption}' option is not yet supported by this builder.`);
   }
 }
