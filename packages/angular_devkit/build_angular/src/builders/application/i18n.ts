@@ -8,17 +8,14 @@
 
 import { BuilderContext } from '@angular-devkit/architect';
 import { join } from 'node:path';
-import { BuildOutputFileType, InitialFileRecord } from '../../tools/esbuild/bundler-context';
+import { InitialFileRecord } from '../../tools/esbuild/bundler-context';
 import { ExecutionResult } from '../../tools/esbuild/bundler-execution-result';
 import { I18nInliner } from '../../tools/esbuild/i18n-inliner';
-import { generateIndexHtml } from '../../tools/esbuild/index-html-generator';
-import { createOutputFileFromText } from '../../tools/esbuild/utils';
 import { maxWorkers } from '../../utils/environment-options';
 import { loadTranslations } from '../../utils/i18n-options';
 import { createTranslationLoader } from '../../utils/load-translations';
-import { prerenderPages } from '../../utils/server-rendering/prerender';
-import { augmentAppWithServiceWorkerEsbuild } from '../../utils/service-worker';
 import { urlJoin } from '../../utils/url';
+import { executePostBundleSteps } from './execute-post-bundle';
 import { NormalizedApplicationBuildOptions } from './options';
 
 /**
@@ -62,74 +59,21 @@ export async function inlineI18n(
       const baseHref =
         getLocaleBaseHref(options.baseHref, options.i18nOptions, locale) ?? options.baseHref;
 
-      // Generate locale specific index HTML files
-      if (options.indexHtmlOptions) {
-        const { content, contentWithoutCriticalCssInlined, errors, warnings } =
-          await generateIndexHtml(
-            initialFiles,
-            localeOutputFiles,
-            {
-              ...options,
-              baseHref,
-            },
-            locale,
-          );
-
-        localeOutputFiles.push(
-          createOutputFileFromText(
-            options.indexHtmlOptions.output,
-            content,
-            BuildOutputFileType.Browser,
-          ),
+      const { errors, warnings, additionalAssets, additionalOutputFiles } =
+        await executePostBundleSteps(
+          {
+            ...options,
+            baseHref,
+          },
+          localeOutputFiles,
+          executionResult.assetFiles,
+          initialFiles,
+          locale,
         );
-        inlineResult.errors.push(...errors);
-        inlineResult.warnings.push(...warnings);
 
-        // Pre-render (SSG) and App-shell
-        if (options.prerenderOptions || options.appShellOptions) {
-          const { output, warnings, errors } = await prerenderPages(
-            options.workspaceRoot,
-            options.appShellOptions,
-            options.prerenderOptions,
-            localeOutputFiles,
-            contentWithoutCriticalCssInlined,
-            options.optimizationOptions.styles.inlineCritical,
-            maxWorkers,
-            options.verbose,
-          );
-
-          inlineResult.errors.push(...errors);
-          inlineResult.warnings.push(...warnings);
-
-          for (const [path, content] of Object.entries(output)) {
-            localeOutputFiles.push(
-              createOutputFileFromText(path, content, BuildOutputFileType.Browser),
-            );
-          }
-        }
-      }
-
-      if (options.serviceWorker) {
-        try {
-          const serviceWorkerResult = await augmentAppWithServiceWorkerEsbuild(
-            options.workspaceRoot,
-            options.serviceWorker,
-            baseHref || '/',
-            localeOutputFiles,
-            executionResult.assetFiles,
-          );
-          localeOutputFiles.push(
-            createOutputFileFromText(
-              'ngsw.json',
-              serviceWorkerResult.manifest,
-              BuildOutputFileType.Browser,
-            ),
-          );
-          executionResult.assetFiles.push(...serviceWorkerResult.assetFiles);
-        } catch (error) {
-          inlineResult.errors.push(error instanceof Error ? error.message : `${error}`);
-        }
-      }
+      localeOutputFiles.push(...additionalOutputFiles);
+      inlineResult.errors.push(...errors);
+      inlineResult.warnings.push(...warnings);
 
       // Update directory with locale base
       if (options.i18nOptions.flatOutput !== true) {
@@ -137,12 +81,14 @@ export async function inlineI18n(
           file.path = join(locale, file.path);
         });
 
-        for (const assetFile of executionResult.assetFiles) {
+        for (const assetFile of [...executionResult.assetFiles, ...additionalAssets]) {
           updatedAssetFiles.push({
             source: assetFile.source,
             destination: join(locale, assetFile.destination),
           });
         }
+      } else {
+        executionResult.assetFiles.push(...additionalAssets);
       }
 
       updatedOutputFiles.push(...localeOutputFiles);

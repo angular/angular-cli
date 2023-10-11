@@ -108,7 +108,7 @@ export async function withSpinner<T>(text: string, action: () => T | Promise<T>)
   }
 }
 
-export async function withNoProgress<T>(test: string, action: () => T | Promise<T>): Promise<T> {
+export async function withNoProgress<T>(text: string, action: () => T | Promise<T>): Promise<T> {
   return action();
 }
 

@@ -7,7 +7,6 @@
  */
 
 import { BuilderContext } from '@angular-devkit/architect';
-import assert from 'node:assert';
 import { SourceFileCache } from '../../tools/esbuild/angular/source-file-cache';
 import {
   createBrowserCodeBundleOptions,
@@ -19,7 +18,6 @@ import { ExecutionResult, RebuildState } from '../../tools/esbuild/bundler-execu
 import { checkCommonJSModules } from '../../tools/esbuild/commonjs-checker';
 import { createGlobalScriptsBundleOptions } from '../../tools/esbuild/global-scripts';
 import { createGlobalStylesBundleOptions } from '../../tools/esbuild/global-styles';
-import { generateIndexHtml } from '../../tools/esbuild/index-html-generator';
 import { extractLicenses } from '../../tools/esbuild/license-extractor';
 import {
   calculateEstimatedTransferSizes,
@@ -30,10 +28,8 @@ import {
 } from '../../tools/esbuild/utils';
 import { checkBudgets } from '../../utils/bundle-calculator';
 import { copyAssets } from '../../utils/copy-assets';
-import { maxWorkers } from '../../utils/environment-options';
-import { prerenderPages } from '../../utils/server-rendering/prerender';
-import { augmentAppWithServiceWorkerEsbuild } from '../../utils/service-worker';
 import { getSupportedBrowsers } from '../../utils/supported-browsers';
+import { executePostBundleSteps } from './execute-post-bundle';
 import { inlineI18n, loadActiveTranslations } from './i18n';
 import { NormalizedApplicationBuildOptions } from './options';
 
@@ -48,16 +44,14 @@ export async function executeBuild(
   const {
     projectRoot,
     workspaceRoot,
-    serviceWorker,
+    i18nOptions,
     optimizationOptions,
     serverEntryPoint,
     assets,
-    indexHtmlOptions,
     cacheOptions,
     prerenderOptions,
     appShellOptions,
     ssrOptions,
-    verbose,
   } = options;
 
   const browsers = getSupportedBrowsers(projectRoot, context.logger);
@@ -65,8 +59,8 @@ export async function executeBuild(
 
   // Load active translations if inlining
   // TODO: Integrate into watch mode and only load changed translations
-  if (options.i18nOptions.shouldInline) {
-    await loadActiveTranslations(context, options.i18nOptions);
+  if (i18nOptions.shouldInline) {
+    await loadActiveTranslations(context, i18nOptions);
   }
 
   // Reuse rebuild state or create new bundle contexts for code and global stylesheets
@@ -152,68 +146,6 @@ export async function executeBuild(
     await logMessages(context, { warnings: messages });
   }
 
-  /**
-   * Index HTML content without CSS inlining to be used for server rendering (AppShell, SSG and SSR).
-   *
-   * NOTE: we don't perform critical CSS inlining as this will be done during server rendering.
-   */
-  let indexContentOutputNoCssInlining: string | undefined;
-
-  // Generate index HTML file
-  // If localization is enabled, index generation is handled in the inlining process.
-  // NOTE: Localization with SSR is not currently supported.
-  if (indexHtmlOptions && !options.i18nOptions.shouldInline) {
-    const { content, contentWithoutCriticalCssInlined, errors, warnings } = await generateIndexHtml(
-      initialFiles,
-      executionResult.outputFiles,
-      {
-        ...options,
-        optimizationOptions,
-      },
-      // Set lang attribute to the defined source locale if present
-      options.i18nOptions.hasDefinedSourceLocale ? options.i18nOptions.sourceLocale : undefined,
-    );
-
-    indexContentOutputNoCssInlining = contentWithoutCriticalCssInlined;
-    printWarningsAndErrorsToConsole(context, warnings, errors);
-
-    executionResult.addOutputFile(indexHtmlOptions.output, content, BuildOutputFileType.Browser);
-
-    if (ssrOptions) {
-      executionResult.addOutputFile(
-        'index.server.html',
-        contentWithoutCriticalCssInlined,
-        BuildOutputFileType.Server,
-      );
-    }
-  }
-
-  // Pre-render (SSG) and App-shell
-  // If localization is enabled, prerendering is handled in the inlining process.
-  if ((prerenderOptions || appShellOptions) && !options.i18nOptions.shouldInline) {
-    assert(
-      indexContentOutputNoCssInlining,
-      'The "index" option is required when using the "ssg" or "appShell" options.',
-    );
-
-    const { output, warnings, errors } = await prerenderPages(
-      workspaceRoot,
-      appShellOptions,
-      prerenderOptions,
-      executionResult.outputFiles,
-      indexContentOutputNoCssInlining,
-      optimizationOptions.styles.inlineCritical,
-      maxWorkers,
-      verbose,
-    );
-
-    printWarningsAndErrorsToConsole(context, warnings, errors);
-
-    for (const [path, content] of Object.entries(output)) {
-      executionResult.addOutputFile(path, content, BuildOutputFileType.Browser);
-    }
-  }
-
   // Copy assets
   if (assets) {
     // The webpack copy assets helper is used with no base paths defined. This prevents the helper
@@ -228,30 +160,6 @@ export async function executeBuild(
       await extractLicenses(metafile, workspaceRoot),
       BuildOutputFileType.Root,
     );
-  }
-
-  // Augment the application with service worker support
-  // If localization is enabled, service worker is handled in the inlining process.
-  if (serviceWorker && !options.i18nOptions.shouldInline) {
-    try {
-      const serviceWorkerResult = await augmentAppWithServiceWorkerEsbuild(
-        workspaceRoot,
-        serviceWorker,
-        options.baseHref || '/',
-        executionResult.outputFiles,
-        executionResult.assetFiles,
-      );
-      executionResult.addOutputFile(
-        'ngsw.json',
-        serviceWorkerResult.manifest,
-        BuildOutputFileType.Browser,
-      );
-      executionResult.addAssets(serviceWorkerResult.assetFiles);
-    } catch (error) {
-      context.logger.error(error instanceof Error ? error.message : `${error}`);
-
-      return executionResult;
-    }
   }
 
   // Analyze files for bundle budget failures if present
@@ -274,17 +182,30 @@ export async function executeBuild(
     estimatedTransferSizes = await calculateEstimatedTransferSizes(executionResult.outputFiles);
   }
 
+  // Perform i18n translation inlining if enabled
+  if (i18nOptions.shouldInline) {
+    const { errors, warnings } = await inlineI18n(options, executionResult, initialFiles);
+    printWarningsAndErrorsToConsole(context, warnings, errors);
+  } else {
+    const { errors, warnings, additionalAssets, additionalOutputFiles } =
+      await executePostBundleSteps(
+        options,
+        executionResult.outputFiles,
+        executionResult.assetFiles,
+        initialFiles,
+        // Set lang attribute to the defined source locale if present
+        i18nOptions.hasDefinedSourceLocale ? i18nOptions.sourceLocale : undefined,
+      );
+
+    executionResult.outputFiles.push(...additionalOutputFiles);
+    executionResult.assetFiles.push(...additionalAssets);
+    printWarningsAndErrorsToConsole(context, warnings, errors);
+  }
+
   logBuildStats(context, metafile, initialFiles, budgetFailures, estimatedTransferSizes);
 
   const buildTime = Number(process.hrtime.bigint() - startTime) / 10 ** 9;
   context.logger.info(`Application bundle generation complete. [${buildTime.toFixed(3)} seconds]`);
-
-  // Perform i18n translation inlining if enabled
-  if (options.i18nOptions.shouldInline) {
-    const { errors, warnings } = await inlineI18n(options, executionResult, initialFiles);
-    printWarningsAndErrorsToConsole(context, warnings, errors);
-  }
-
   // Write metafile if stats option is enabled
   if (options.stats) {
     executionResult.addOutputFile(
