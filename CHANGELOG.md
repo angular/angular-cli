@@ -1,3 +1,34 @@
+<a name="17.0.0-next.8"></a>
+
+# 17.0.0-next.8 (2023-10-11)
+
+## Deprecations
+
+### @angular-devkit/build-angular
+
+- The `browserTarget` in the dev-server and extract-i18n builders have been deprecated in favor of `buildTarget`.
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                                                       |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------------------------------- |
+| [c48982dc1](https://github.com/angular/angular-cli/commit/c48982dc1d01d11be54ffb0b1469e3b0557f3920) | feat | add `buildTarget` option to dev-server and `extract-i18n` builders                                |
+| [1fb0350eb](https://github.com/angular/angular-cli/commit/1fb0350eb7370ef6f72acc4e20c4d0bee8bf0b29) | feat | add initial support for bundle budgets to esbuild builders                                        |
+| [91019bde2](https://github.com/angular/angular-cli/commit/91019bde2af5fb9dff6426ba24098271d8ac4889) | feat | enable localize support for SSR with application builder                                          |
+| [49f07a84d](https://github.com/angular/angular-cli/commit/49f07a84d6f6120388d9fc48a2514d3398986e49) | feat | standardize application builder output structure                                                  |
+| [9e425308a](https://github.com/angular/angular-cli/commit/9e425308a0c146b685e452a106cbdf3e02bddd00) | feat | support component style budgets in esbuild builders                                               |
+| [771e036d5](https://github.com/angular/angular-cli/commit/771e036d5ce3d436736d3c8b261050d633b3ef29) | feat | support deploy URL option for `browser-esbuild` builder                                           |
+| [2c33f09db](https://github.com/angular/angular-cli/commit/2c33f09db0561f344a26dd4f4304a9098e0ee13f) | fix  | avoid dev-server proxy rewrite normalization when invalid value                                   |
+| [667f43af6](https://github.com/angular/angular-cli/commit/667f43af6d91025424147f6e9ac94800f463da1d) | fix  | correctly resolve polyfills when `baseUrl` URL is not set to root                                 |
+| [3ad028bb4](https://github.com/angular/angular-cli/commit/3ad028bb442a8978a4f45511cab9bb515764b930) | fix  | ensure localize polyfill and locale specifier are injected when not inlining                      |
+| [1f73bcc49](https://github.com/angular/angular-cli/commit/1f73bcc49abd9f136a18dc6329e2f50a7565eb76) | fix  | ensure Web Worker code file is replaced in esbuild builders                                       |
+| [968ee3428](https://github.com/angular/angular-cli/commit/968ee3428046eaad8eb56518c73195f43b6d4ead) | fix  | fully downlevel async/await when using vite dev-server with caching enabled                       |
+| [8981d8c35](https://github.com/angular/angular-cli/commit/8981d8c355ec9154fcdcdad3a66e1b789d1079b0) | fix  | improve sharing of TypeScript compilation state between various esbuild instances during rebuilds |
+| [99d9037ee](https://github.com/angular/angular-cli/commit/99d9037eee2eabd7b5ec2d8f01146578ef6b5860) | perf | only perform a server build when either prerendering, app-shell or ssr is enabled                 |
+| [223a82f5f](https://github.com/angular/angular-cli/commit/223a82f5f02c8caaf34ce49ee3ddde22a75e65c1) | perf | use incremental bundling for component styles in esbuild builders                                 |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="16.2.6"></a>
 
 # 16.2.6 (2023-10-11)
