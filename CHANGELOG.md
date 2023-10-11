@@ -1,3 +1,15 @@
+<a name="16.2.6"></a>
+
+# 16.2.6 (2023-10-11)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                                 |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------------------------- |
+| [c6ea25626](https://github.com/angular/angular-cli/commit/c6ea2562683cc6e640136a02760db9363ded4352) | fix  | fully downlevel async/await when using vite dev-server with caching enabled |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="15.2.10"></a>
 
 # 15.2.10 (2023-10-05)
