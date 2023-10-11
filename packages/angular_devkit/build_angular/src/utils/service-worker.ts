@@ -11,6 +11,7 @@ import * as crypto from 'crypto';
 import { existsSync, constants as fsConstants, promises as fsPromises } from 'node:fs';
 import * as path from 'path';
 import { BuildOutputFile, BuildOutputFileType } from '../tools/esbuild/bundler-context';
+import { BuildOutputAsset } from '../tools/esbuild/bundler-execution-result';
 import { assertIsError } from './error';
 import { loadEsmModule } from './load-esm';
 
@@ -180,8 +181,8 @@ export async function augmentAppWithServiceWorkerEsbuild(
   configPath: string,
   baseHref: string,
   outputFiles: BuildOutputFile[],
-  assetFiles: { source: string; destination: string }[],
-): Promise<{ manifest: string; assetFiles: { source: string; destination: string }[] }> {
+  assetFiles: BuildOutputAsset[],
+): Promise<{ manifest: string; assetFiles: BuildOutputAsset[] }> {
   // Read the configuration file
   let config: Config | undefined;
   try {

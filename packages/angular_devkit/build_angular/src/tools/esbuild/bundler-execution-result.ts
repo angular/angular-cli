@@ -11,6 +11,11 @@ import type { SourceFileCache } from './angular/source-file-cache';
 import type { BuildOutputFile, BuildOutputFileType, BundlerContext } from './bundler-context';
 import { createOutputFileFromText } from './utils';
 
+export interface BuildOutputAsset {
+  source: string;
+  destination: string;
+}
+
 export interface RebuildState {
   rebuildContexts: BundlerContext[];
   codeBundleCache?: SourceFileCache;
@@ -22,7 +27,7 @@ export interface RebuildState {
  */
 export class ExecutionResult {
   outputFiles: BuildOutputFile[] = [];
-  assetFiles: { source: string; destination: string }[] = [];
+  assetFiles: BuildOutputAsset[] = [];
 
   constructor(
     private rebuildContexts: BundlerContext[],
@@ -33,7 +38,7 @@ export class ExecutionResult {
     this.outputFiles.push(createOutputFileFromText(path, content, type));
   }
 
-  addAssets(assets: { source: string; destination: string }[]): void {
+  addAssets(assets: BuildOutputAsset[]): void {
     this.assetFiles.push(...assets);
   }
 
