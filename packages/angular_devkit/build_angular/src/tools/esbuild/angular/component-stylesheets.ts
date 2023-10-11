@@ -64,11 +64,10 @@ export class ComponentStylesheetBundler {
     // to the actual stylesheet file path.
     // TODO: Consider xxhash instead for hashing
     const id = createHash('sha256').update(data).digest('hex');
+    const entry = [language, id, filename].join(';');
 
-    const bundlerContext = this.#inlineContexts.getOrCreate(id, () => {
+    const bundlerContext = this.#inlineContexts.getOrCreate(entry, () => {
       const namespace = 'angular:styles/component';
-      const entry = [language, id, filename].join(';');
-
       const buildOptions = createStylesheetBundleOptions(this.options, this.cache, {
         [entry]: data,
       });
