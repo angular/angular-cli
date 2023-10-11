@@ -5,6 +5,11 @@
       "factory": "./update-17/replace-nguniversal-builders",
       "description": "Replace usages of '@nguniversal/builders' with '@angular-devkit/build-angular'."
     },
+    "replace-nguniversal-engines": {
+      "version": "17.0.0",
+      "factory": "./update-17/replace-nguniversal-engines",
+      "description": "Replace usages of '@nguniversal/' packages with '@angular/ssr'."
+    },
     "update-workspace-config": {
       "version": "17.0.0",
       "factory": "./update-17/update-workspace-config",
