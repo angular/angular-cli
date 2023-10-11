@@ -7,6 +7,7 @@
  */
 
 import { BuilderContext, BuilderOutput, createBuilder } from '@angular-devkit/architect';
+import type { Plugin } from 'esbuild';
 import { constants as fsConstants } from 'node:fs';
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -29,6 +30,7 @@ export async function* buildEsbuildBrowser(
   infrastructureSettings?: {
     write?: boolean;
   },
+  plugins?: Plugin[],
 ): AsyncIterable<
   BuilderOutput & {
     outputFiles?: BuildOutputFile[];
@@ -40,9 +42,14 @@ export async function* buildEsbuildBrowser(
   const normalizedOptions = normalizeOptions(userOptions);
   const fullOutputPath = path.join(context.workspaceRoot, normalizedOptions.outputPath);
 
-  for await (const result of buildApplicationInternal(normalizedOptions, context, {
-    write: false,
-  })) {
+  for await (const result of buildApplicationInternal(
+    normalizedOptions,
+    context,
+    {
+      write: false,
+    },
+    plugins,
+  )) {
     if (infrastructureSettings?.write !== false && result.outputFiles) {
       // Write output files
       await writeResultFiles(result.outputFiles, result.assetFiles, fullOutputPath);

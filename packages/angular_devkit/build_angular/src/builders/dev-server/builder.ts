@@ -7,6 +7,7 @@
  */
 
 import type { BuilderContext } from '@angular-devkit/architect';
+import type { Plugin } from 'esbuild';
 import { EMPTY, Observable, defer, switchMap } from 'rxjs';
 import type { ExecutionTransformer } from '../../transforms';
 import { checkPort } from '../../utils/check-port';
@@ -33,6 +34,7 @@ export function execute(
     logging?: import('@angular-devkit/build-webpack').WebpackLoggingCallback;
     indexHtml?: IndexHtmlTransform;
   } = {},
+  plugins?: Plugin[],
 ): Observable<DevServerBuilderOutput> {
   // Determine project name from builder context target
   const projectName = context.target?.project;
@@ -50,9 +52,21 @@ export function execute(
         builderName === '@angular-devkit/build-angular:browser-esbuild' ||
         normalizedOptions.forceEsbuild
       ) {
+        if (Object.keys(transforms).length > 0) {
+          throw new Error(
+            'The `application` and `browser-esbuild` builders do not support Webpack transforms.',
+          );
+        }
+
         return defer(() => import('./vite-server')).pipe(
-          switchMap(({ serveWithVite }) => serveWithVite(normalizedOptions, builderName, context)),
+          switchMap(({ serveWithVite }) =>
+            serveWithVite(normalizedOptions, builderName, context, plugins),
+          ),
         );
+      }
+
+      if (plugins?.length) {
+        throw new Error('Only the `application` and `browser-esbuild` builders support plugins.');
       }
 
       // Use Webpack for all other browser targets

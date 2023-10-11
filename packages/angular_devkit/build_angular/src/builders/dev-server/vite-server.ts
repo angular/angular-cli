@@ -8,6 +8,7 @@
 
 import type { BuilderContext } from '@angular-devkit/architect';
 import type { json, logging } from '@angular-devkit/core';
+import type { Plugin } from 'esbuild';
 import { lookup as lookupMimeType } from 'mrmime';
 import assert from 'node:assert';
 import { BinaryLike, createHash } from 'node:crypto';
@@ -48,6 +49,7 @@ export async function* serveWithVite(
   serverOptions: NormalizedDevServerOptions,
   builderName: string,
   context: BuilderContext,
+  plugins?: Plugin[],
 ): AsyncIterableIterator<DevServerBuilderOutput> {
   // Get the browser configuration from the target name.
   const rawBrowserOptions = (await context.getTargetOptions(
@@ -115,9 +117,14 @@ export async function* serveWithVite(
   const generatedFiles = new Map<string, OutputFileRecord>();
   const assetFiles = new Map<string, string>();
   // TODO: Switch this to an architect schedule call when infrastructure settings are supported
-  for await (const result of buildEsbuildBrowser(browserOptions, context, {
-    write: false,
-  })) {
+  for await (const result of buildEsbuildBrowser(
+    browserOptions,
+    context,
+    {
+      write: false,
+    },
+    plugins,
+  )) {
     assert(result.outputFiles, 'Builder did not provide result files.');
 
     // Analyze result files for changes

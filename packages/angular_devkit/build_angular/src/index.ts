@@ -29,6 +29,8 @@ export {
   BrowserBuilderOutput,
 } from './builders/browser';
 
+export { buildApplication, ApplicationBuilderOptions } from './builders/application';
+
 export {
   executeDevServerBuilder,
   DevServerBuilderOptions,
