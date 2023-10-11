@@ -165,6 +165,10 @@ export function createBrowserCodeBundleOptions(
     );
   }
 
+  if (options.plugins) {
+    buildOptions.plugins?.push(...options.plugins);
+  }
+
   return buildOptions;
 }
 
@@ -341,6 +345,10 @@ export function createServerCodeBundleOptions(
         },
       }),
     );
+  }
+
+  if (options.plugins) {
+    buildOptions.plugins.push(...options.plugins);
   }
 
   return buildOptions;

@@ -10,8 +10,53 @@ import type { ConfigOptions } from 'karma';
 import { Configuration } from 'webpack';
 import { DevServerBuildOutput } from '@angular-devkit/build-webpack';
 import { Observable } from 'rxjs';
+import { OutputFile } from 'esbuild';
+import type { Plugin as Plugin_2 } from 'esbuild';
 import webpack from 'webpack';
 import { WebpackLoggingCallback } from '@angular-devkit/build-webpack';
+
+// @public
+export interface ApplicationBuilderOptions {
+    allowedCommonJsDependencies?: string[];
+    aot?: boolean;
+    appShell?: boolean;
+    assets?: AssetPattern_2[];
+    baseHref?: string;
+    browser: string;
+    budgets?: Budget_2[];
+    crossOrigin?: CrossOrigin_2;
+    deleteOutputPath?: boolean;
+    externalDependencies?: string[];
+    extractLicenses?: boolean;
+    fileReplacements?: FileReplacement_2[];
+    i18nDuplicateTranslation?: I18NTranslation_2;
+    i18nMissingTranslation?: I18NTranslation_2;
+    index: IndexUnion_2;
+    inlineStyleLanguage?: InlineStyleLanguage_2;
+    localize?: Localize_2;
+    namedChunks?: boolean;
+    optimization?: OptimizationUnion_2;
+    outputHashing?: OutputHashing_2;
+    outputPath: string;
+    poll?: number;
+    polyfills?: string[];
+    prerender?: PrerenderUnion;
+    preserveSymlinks?: boolean;
+    progress?: boolean;
+    scripts?: ScriptElement_2[];
+    server?: string;
+    serviceWorker?: ServiceWorker_2;
+    sourceMap?: SourceMapUnion_2;
+    ssr?: ServiceWorker_2;
+    statsJson?: boolean;
+    stylePreprocessorOptions?: StylePreprocessorOptions_2;
+    styles?: StyleElement_2[];
+    subresourceIntegrity?: boolean;
+    tsConfig: string;
+    verbose?: boolean;
+    watch?: boolean;
+    webWorkerTsConfig?: string;
+}
 
 // @public (undocumented)
 export type AssetPattern = AssetPatternObject | string;
@@ -95,6 +140,15 @@ export interface Budget {
 }
 
 // @public
+export function buildApplication(options: ApplicationBuilderOptions, context: BuilderContext, plugins?: Plugin_2[]): AsyncIterable<BuilderOutput & {
+    outputFiles?: BuildOutputFile[];
+    assetFiles?: {
+        source: string;
+        destination: string;
+    }[];
+}>;
+
+// @public
 export enum CrossOrigin {
     // (undocumented)
     Anonymous = "anonymous",
@@ -149,7 +203,7 @@ export function executeDevServerBuilder(options: DevServerBuilderOptions, contex
     webpackConfiguration?: ExecutionTransformer<Configuration>;
     logging?: WebpackLoggingCallback;
     indexHtml?: IndexHtmlTransform;
-}): Observable<DevServerBuilderOutput>;
+}, plugins?: Plugin_2[]): Observable<DevServerBuilderOutput>;
 
 // @public
 export function executeExtractI18nBuilder(options: ExtractI18nBuilderOptions, context: BuilderContext, transforms?: {
@@ -201,14 +255,14 @@ export interface FileReplacement {
 
 // @public
 export interface KarmaBuilderOptions {
-    assets?: AssetPattern_2[];
+    assets?: AssetPattern_3[];
     browsers?: string;
     codeCoverage?: boolean;
     codeCoverageExclude?: string[];
     exclude?: string[];
-    fileReplacements?: FileReplacement_2[];
+    fileReplacements?: FileReplacement_3[];
     include?: string[];
-    inlineStyleLanguage?: InlineStyleLanguage_2;
+    inlineStyleLanguage?: InlineStyleLanguage_3;
     karmaConfig?: string;
     main?: string;
     poll?: number;
@@ -216,10 +270,10 @@ export interface KarmaBuilderOptions {
     preserveSymlinks?: boolean;
     progress?: boolean;
     reporters?: string[];
-    scripts?: ScriptElement_2[];
-    sourceMap?: SourceMapUnion_2;
-    stylePreprocessorOptions?: StylePreprocessorOptions_2;
-    styles?: StyleElement_2[];
+    scripts?: ScriptElement_3[];
+    sourceMap?: SourceMapUnion_3;
+    stylePreprocessorOptions?: StylePreprocessorOptions_3;
+    styles?: StyleElement_3[];
     tsConfig: string;
     watch?: boolean;
     webWorkerTsConfig?: string;
@@ -276,30 +330,30 @@ export interface ProtractorBuilderOptions {
 
 // @public (undocumented)
 export interface ServerBuilderOptions {
-    assets?: AssetPattern_3[];
+    assets?: AssetPattern_4[];
     buildOptimizer?: boolean;
     deleteOutputPath?: boolean;
     // @deprecated
     deployUrl?: string;
     externalDependencies?: string[];
     extractLicenses?: boolean;
-    fileReplacements?: FileReplacement_3[];
-    i18nDuplicateTranslation?: I18NTranslation_2;
-    i18nMissingTranslation?: I18NTranslation_2;
-    inlineStyleLanguage?: InlineStyleLanguage_3;
-    localize?: Localize_2;
+    fileReplacements?: FileReplacement_4[];
+    i18nDuplicateTranslation?: I18NTranslation_3;
+    i18nMissingTranslation?: I18NTranslation_3;
+    inlineStyleLanguage?: InlineStyleLanguage_4;
+    localize?: Localize_3;
     main: string;
     namedChunks?: boolean;
-    optimization?: OptimizationUnion_2;
-    outputHashing?: OutputHashing_2;
+    optimization?: OptimizationUnion_3;
+    outputHashing?: OutputHashing_3;
     outputPath: string;
     poll?: number;
     preserveSymlinks?: boolean;
     progress?: boolean;
     resourcesOutputPath?: string;
-    sourceMap?: SourceMapUnion_3;
+    sourceMap?: SourceMapUnion_4;
     statsJson?: boolean;
-    stylePreprocessorOptions?: StylePreprocessorOptions_3;
+    stylePreprocessorOptions?: StylePreprocessorOptions_4;
     tsConfig: string;
     vendorChunk?: boolean;
     verbose?: boolean;

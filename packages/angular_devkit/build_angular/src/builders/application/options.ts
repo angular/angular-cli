@@ -7,6 +7,7 @@
  */
 
 import { BuilderContext } from '@angular-devkit/architect';
+import type { Plugin } from 'esbuild';
 import { createRequire } from 'node:module';
 import path from 'node:path';
 import {
@@ -71,6 +72,7 @@ export type ApplicationBuilderInternalOptions = Omit<
  * @param context The context for current builder execution.
  * @param projectName The name of the project for the current execution.
  * @param options An object containing the options to use for the build.
+ * @param plugins An optional array of programmatically supplied build plugins.
  * @returns An object containing normalized options required to perform the build.
  */
 // eslint-disable-next-line max-lines-per-function
@@ -78,6 +80,7 @@ export async function normalizeOptions(
   context: BuilderContext,
   projectName: string,
   options: ApplicationBuilderInternalOptions,
+  plugins?: Plugin[],
 ) {
   const workspaceRoot = context.workspaceRoot;
   const projectMetadata = await context.getProjectMetadata(projectName);
@@ -295,6 +298,7 @@ export async function normalizeOptions(
     namedChunks,
     budgets: budgets?.length ? budgets : undefined,
     publicPath: deployUrl ? deployUrl : undefined,
+    plugins: plugins?.length ? plugins : undefined,
   };
 }
 
