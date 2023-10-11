@@ -175,40 +175,67 @@ export function getFeatureSupport(target: string[]): BuildOptions['supported'] {
   return supported;
 }
 
+const MAX_CONCURRENT_WRITES = 64;
+
 export async function writeResultFiles(
   outputFiles: BuildOutputFile[],
   assetFiles: { source: string; destination: string }[] | undefined,
   outputPath: string,
 ) {
   const directoryExists = new Set<string>();
-  await Promise.all(
-    outputFiles.map(async (file) => {
-      const fullOutputPath = file.fullOutputPath;
+
+  // Writes the output file to disk and ensures the containing directories are present
+  const writeOutputFile = async (file: BuildOutputFile) => {
+    const fullOutputPath = file.fullOutputPath;
+    // Ensure output subdirectories exist
+    const basePath = path.dirname(fullOutputPath);
+    if (basePath && !directoryExists.has(basePath)) {
+      await fs.mkdir(path.join(outputPath, basePath), { recursive: true });
+      directoryExists.add(basePath);
+    }
+    // Write file contents
+    await fs.writeFile(path.join(outputPath, fullOutputPath), file.contents);
+  };
+
+  // Write files in groups of MAX_CONCURRENT_WRITES to avoid too many open files
+  for (let fileIndex = 0; fileIndex < outputFiles.length; ) {
+    const groupMax = Math.min(fileIndex + MAX_CONCURRENT_WRITES, outputFiles.length);
+
+    const actions = [];
+    while (fileIndex < groupMax) {
+      actions.push(writeOutputFile(outputFiles[fileIndex++]));
+    }
+
+    await Promise.all(actions);
+  }
+
+  if (assetFiles?.length) {
+    const copyAssetFile = async (asset: { source: string; destination: string }) => {
       // Ensure output subdirectories exist
-      const basePath = path.dirname(fullOutputPath);
+      const destPath = join('browser', asset.destination);
+      const basePath = path.dirname(destPath);
       if (basePath && !directoryExists.has(basePath)) {
         await fs.mkdir(path.join(outputPath, basePath), { recursive: true });
         directoryExists.add(basePath);
       }
-      // Write file contents
-      await fs.writeFile(path.join(outputPath, fullOutputPath), file.contents);
-    }),
-  );
+      // Copy file contents
+      await fs.copyFile(
+        asset.source,
+        path.join(outputPath, destPath),
+        fsConstants.COPYFILE_FICLONE,
+      );
+    };
 
-  if (assetFiles?.length) {
-    await Promise.all(
-      assetFiles.map(async ({ source, destination }) => {
-        // Ensure output subdirectories exist
-        const destPath = join('browser', destination);
-        const basePath = path.dirname(destPath);
-        if (basePath && !directoryExists.has(basePath)) {
-          await fs.mkdir(path.join(outputPath, basePath), { recursive: true });
-          directoryExists.add(basePath);
-        }
-        // Copy file contents
-        await fs.copyFile(source, path.join(outputPath, destPath), fsConstants.COPYFILE_FICLONE);
-      }),
-    );
+    for (let fileIndex = 0; fileIndex < assetFiles.length; ) {
+      const groupMax = Math.min(fileIndex + MAX_CONCURRENT_WRITES, assetFiles.length);
+
+      const actions = [];
+      while (fileIndex < groupMax) {
+        actions.push(copyAssetFile(assetFiles[fileIndex++]));
+      }
+
+      await Promise.all(actions);
+    }
   }
 }
 
