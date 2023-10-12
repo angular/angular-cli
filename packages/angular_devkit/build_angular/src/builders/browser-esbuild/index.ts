@@ -12,6 +12,8 @@ import { constants as fsConstants } from 'node:fs';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { BuildOutputFile } from '../../tools/esbuild/bundler-context';
+import { BuildOutputAsset } from '../../tools/esbuild/bundler-execution-result';
+import { emitFilesToDisk } from '../../tools/esbuild/utils';
 import { buildApplicationInternal } from '../application';
 import { Schema as ApplicationBuilderOptions } from '../application/schema';
 import { logBuilderStatusWarnings } from './builder-status-warnings';
@@ -74,36 +76,37 @@ function normalizeOptions(options: BrowserBuilderOptions): ApplicationBuilderOpt
 // and not output browser files into '/browser'.
 async function writeResultFiles(
   outputFiles: BuildOutputFile[],
-  assetFiles: { source: string; destination: string }[] | undefined,
+  assetFiles: BuildOutputAsset[] | undefined,
   outputPath: string,
 ) {
   const directoryExists = new Set<string>();
-  await Promise.all(
-    outputFiles.map(async (file) => {
-      // Ensure output subdirectories exist
-      const basePath = path.dirname(file.path);
-      if (basePath && !directoryExists.has(basePath)) {
-        await fs.mkdir(path.join(outputPath, basePath), { recursive: true });
-        directoryExists.add(basePath);
-      }
-      // Write file contents
-      await fs.writeFile(path.join(outputPath, file.path), file.contents);
-    }),
-  );
+  const ensureDirectoryExists = async (basePath: string) => {
+    if (basePath && !directoryExists.has(basePath)) {
+      await fs.mkdir(path.join(outputPath, basePath), { recursive: true });
+      directoryExists.add(basePath);
+    }
+  };
+
+  // Writes the output file to disk and ensures the containing directories are present
+  await emitFilesToDisk(outputFiles, async (file: BuildOutputFile) => {
+    // Ensure output subdirectories exist
+    const basePath = path.dirname(file.path);
+    await ensureDirectoryExists(basePath);
+
+    // Write file contents
+    await fs.writeFile(path.join(outputPath, file.path), file.contents);
+  });
 
   if (assetFiles?.length) {
-    await Promise.all(
-      assetFiles.map(async ({ source, destination }) => {
-        // Ensure output subdirectories exist
-        const basePath = path.dirname(destination);
-        if (basePath && !directoryExists.has(basePath)) {
-          await fs.mkdir(path.join(outputPath, basePath), { recursive: true });
-          directoryExists.add(basePath);
-        }
-        // Copy file contents
-        await fs.copyFile(source, path.join(outputPath), fsConstants.COPYFILE_FICLONE);
-      }),
-    );
+    await emitFilesToDisk(assetFiles, async ({ source, destination }) => {
+      const basePath = path.dirname(destination);
+
+      // Ensure output subdirectories exist
+      await ensureDirectoryExists(basePath);
+
+      // Copy file contents
+      await fs.copyFile(source, path.join(outputPath, destination), fsConstants.COPYFILE_FICLONE);
+    });
   }
 }
 
