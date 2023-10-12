@@ -11,7 +11,6 @@ import { basename } from 'node:path';
 import { InlineCriticalCssProcessor } from '../index-file/inline-critical-css';
 import { loadEsmModule } from '../load-esm';
 import { MainServerBundleExports } from './main-bundle-exports';
-import { patchConsoleToIgnoreSpecificLogs } from './utils';
 
 export interface RenderOptions {
   route: string;
@@ -47,6 +46,7 @@ export async function renderPage({
     renderModule,
     renderApplication,
     ɵresetCompiledComponents,
+    ɵConsole,
   } = await loadBundle('./main.server.mjs');
 
   // Need to clean up GENERATED_COMP_IDS map in `@angular/core`.
@@ -59,27 +59,38 @@ export async function renderPage({
       provide: ɵSERVER_CONTEXT,
       useValue: serverContext,
     },
+    {
+      provide: ɵConsole,
+      /** An Angular Console Provider that does not print a set of predefined logs. */
+      useFactory: () => {
+        class Console extends ɵConsole {
+          private readonly ignoredLogs = new Set(['Angular is running in development mode.']);
+          override log(message: string): void {
+            if (!this.ignoredLogs.has(message)) {
+              super.log(message);
+            }
+          }
+        }
+
+        return new Console();
+      },
+    },
   ];
 
   let html: string | undefined;
 
-  const resetPatchedConsole = patchConsoleToIgnoreSpecificLogs();
-  try {
-    if (isBootstrapFn(bootstrapAppFnOrModule)) {
-      html = await renderApplication(bootstrapAppFnOrModule, {
-        document,
-        url: route,
-        platformProviders,
-      });
-    } else {
-      html = await renderModule(bootstrapAppFnOrModule, {
-        document,
-        url: route,
-        extraProviders: platformProviders,
-      });
-    }
-  } finally {
-    resetPatchedConsole();
+  if (isBootstrapFn(bootstrapAppFnOrModule)) {
+    html = await renderApplication(bootstrapAppFnOrModule, {
+      document,
+      url: route,
+      platformProviders,
+    });
+  } else {
+    html = await renderModule(bootstrapAppFnOrModule, {
+      document,
+      url: route,
+      extraProviders: platformProviders,
+    });
   }
 
   if (inlineCriticalCss) {

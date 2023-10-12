@@ -278,6 +278,7 @@ export function createServerCodeBundleOptions(
           `import moduleOrBootstrapFn from './${mainServerEntryPoint}';`,
           `export default moduleOrBootstrapFn;`,
           `export * from './${mainServerEntryPoint}';`,
+          `export { ɵConsole } from '@angular/core';`,
           `export { renderApplication, renderModule, ɵSERVER_CONTEXT } from '@angular/platform-server';`,
         ];
 
