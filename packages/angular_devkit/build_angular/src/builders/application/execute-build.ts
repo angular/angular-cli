@@ -10,6 +10,7 @@ import { BuilderContext } from '@angular-devkit/architect';
 import { SourceFileCache } from '../../tools/esbuild/angular/source-file-cache';
 import {
   createBrowserCodeBundleOptions,
+  createBrowserPolyfillBundleOptions,
   createServerCodeBundleOptions,
 } from '../../tools/esbuild/application-code-bundle';
 import { generateBudgetStats } from '../../tools/esbuild/budget-stats';
@@ -80,6 +81,18 @@ export async function executeBuild(
       ),
     );
 
+    // Browser polyfills code
+    const polyfillBundleOptions = createBrowserPolyfillBundleOptions(
+      options,
+      target,
+      codeBundleCache,
+    );
+    if (polyfillBundleOptions) {
+      bundlerContexts.push(
+        new BundlerContext(workspaceRoot, !!options.watch, polyfillBundleOptions),
+      );
+    }
+
     // Global Stylesheets
     if (options.globalStyles.length > 0) {
       for (const initial of [true, false]) {
@@ -110,7 +123,7 @@ export async function executeBuild(
     }
 
     // Server application code
-    // Skip server build when non of the features are enabled.
+    // Skip server build when none of the features are enabled.
     if (serverEntryPoint && (prerenderOptions || appShellOptions || ssrOptions)) {
       const nodeTargets = getSupportedNodeTargets();
       bundlerContexts.push(
