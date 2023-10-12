@@ -11,6 +11,7 @@ import { basename } from 'node:path';
 import { InlineCriticalCssProcessor } from '../index-file/inline-critical-css';
 import { loadEsmModule } from '../load-esm';
 import { MainServerBundleExports } from './main-bundle-exports';
+import { patchConsoleToIgnoreSpecificLogs } from './utils';
 
 export interface RenderOptions {
   route: string;
@@ -62,18 +63,23 @@ export async function renderPage({
 
   let html: string | undefined;
 
-  if (isBootstrapFn(bootstrapAppFnOrModule)) {
-    html = await renderApplication(bootstrapAppFnOrModule, {
-      document,
-      url: route,
-      platformProviders,
-    });
-  } else {
-    html = await renderModule(bootstrapAppFnOrModule, {
-      document,
-      url: route,
-      extraProviders: platformProviders,
-    });
+  const resetPatchedConsole = patchConsoleToIgnoreSpecificLogs();
+  try {
+    if (isBootstrapFn(bootstrapAppFnOrModule)) {
+      html = await renderApplication(bootstrapAppFnOrModule, {
+        document,
+        url: route,
+        platformProviders,
+      });
+    } else {
+      html = await renderModule(bootstrapAppFnOrModule, {
+        document,
+        url: route,
+        extraProviders: platformProviders,
+      });
+    }
+  } finally {
+    resetPatchedConsole();
   }
 
   if (inlineCriticalCss) {
