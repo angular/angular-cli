@@ -9,7 +9,7 @@
 import { platform } from 'node:os';
 import * as path from 'node:path';
 import { pathToFileURL } from 'node:url';
-import ts from 'typescript';
+import type ts from 'typescript';
 import { MemoryLoadResultCache } from '../load-result-cache';
 
 const USING_WINDOWS = platform() === 'win32';
