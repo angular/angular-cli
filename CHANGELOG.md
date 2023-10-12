@@ -1,3 +1,23 @@
+<a name="17.0.0-next.9"></a>
+
+# 17.0.0-next.9 (2023-10-12)
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                                    |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------- |
+| [3938863b9](https://github.com/angular/angular-cli/commit/3938863b9900fcfe574b3112d73a8f34672f38bd) | feat | add migration to migrate from `@nguniversal` to `@angular/ssr` |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                        |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------ |
+| [c12f98f94](https://github.com/angular/angular-cli/commit/c12f98f948b1c10594f9d00f4ebf87630fe3cc47) | fix  | conditionally enable deprecated Less stylesheet JavaScript support |
+| [ac7caa426](https://github.com/angular/angular-cli/commit/ac7caa4264c7a68467903528deca4a6f579ee15c) | fix  | ensure unique internal identifiers for inline stylesheet bundling  |
+| [0da87bf1c](https://github.com/angular/angular-cli/commit/0da87bf1c94c6caf711204fcdd9a3973d766bd6e) | fix  | limit concurrent output file writes with application builder       |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="17.0.0-next.8"></a>
 
 # 17.0.0-next.8 (2023-10-11)
