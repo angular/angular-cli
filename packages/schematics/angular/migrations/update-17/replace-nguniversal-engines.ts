@@ -90,7 +90,7 @@ export default function (): Rule {
       removePackageJsonDependency(tree, '@nguniversal/express-engine');
       removePackageJsonDependency(tree, '@nguniversal/common');
     },
-    addDependency('@angular/ssr', latestVersions.Angular),
+    addDependency('@angular/ssr', latestVersions.AngularSSR),
   ]);
 }
 
