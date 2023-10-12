@@ -207,7 +207,7 @@ function updateWebpackBuilderServerTsConfigRule(options: SSROptions): Rule {
 
 function addDependencies(): Rule {
   return chain([
-    addDependency('@angular/ssr', '^0.0.0-PLACEHOLDER', {
+    addDependency('@angular/ssr', latestVersions.AngularSSR, {
       type: DependencyType.Default,
     }),
     addDependency('express', latestVersions['express'], {
