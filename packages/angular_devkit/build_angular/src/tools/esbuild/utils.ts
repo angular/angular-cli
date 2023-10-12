@@ -19,6 +19,7 @@ import { BudgetCalculatorResult } from '../../utils/bundle-calculator';
 import { Spinner } from '../../utils/spinner';
 import { BundleStats, generateBuildStatsTable } from '../webpack/utils/stats';
 import { BuildOutputFile, BuildOutputFileType, InitialFileRecord } from './bundler-context';
+import { BuildOutputAsset } from './bundler-execution-result';
 
 const compressAsync = promisify(brotliCompress);
 
@@ -175,67 +176,58 @@ export function getFeatureSupport(target: string[]): BuildOptions['supported'] {
   return supported;
 }
 
-const MAX_CONCURRENT_WRITES = 64;
-
 export async function writeResultFiles(
   outputFiles: BuildOutputFile[],
-  assetFiles: { source: string; destination: string }[] | undefined,
+  assetFiles: BuildOutputAsset[] | undefined,
   outputPath: string,
 ) {
   const directoryExists = new Set<string>();
-
-  // Writes the output file to disk and ensures the containing directories are present
-  const writeOutputFile = async (file: BuildOutputFile) => {
-    const fullOutputPath = file.fullOutputPath;
-    // Ensure output subdirectories exist
-    const basePath = path.dirname(fullOutputPath);
+  const ensureDirectoryExists = async (basePath: string) => {
     if (basePath && !directoryExists.has(basePath)) {
       await fs.mkdir(path.join(outputPath, basePath), { recursive: true });
       directoryExists.add(basePath);
     }
-    // Write file contents
-    await fs.writeFile(path.join(outputPath, fullOutputPath), file.contents);
   };
 
+  // Writes the output file to disk and ensures the containing directories are present
+  await emitFilesToDisk(outputFiles, async (file: BuildOutputFile) => {
+    const fullOutputPath = file.fullOutputPath;
+    // Ensure output subdirectories exist
+    const basePath = path.dirname(fullOutputPath);
+    await ensureDirectoryExists(basePath);
+
+    // Write file contents
+    await fs.writeFile(path.join(outputPath, fullOutputPath), file.contents);
+  });
+
+  if (assetFiles?.length) {
+    await emitFilesToDisk(assetFiles, async ({ source, destination }) => {
+      // Ensure output subdirectories exist
+      const destPath = join('browser', destination);
+      const basePath = path.dirname(destPath);
+      await ensureDirectoryExists(basePath);
+
+      // Copy file contents
+      await fs.copyFile(source, path.join(outputPath, destPath), fsConstants.COPYFILE_FICLONE);
+    });
+  }
+}
+
+const MAX_CONCURRENT_WRITES = 64;
+export async function emitFilesToDisk<T = BuildOutputAsset | BuildOutputFile>(
+  files: T[],
+  writeFileCallback: (file: T) => Promise<void>,
+): Promise<void> {
   // Write files in groups of MAX_CONCURRENT_WRITES to avoid too many open files
-  for (let fileIndex = 0; fileIndex < outputFiles.length; ) {
-    const groupMax = Math.min(fileIndex + MAX_CONCURRENT_WRITES, outputFiles.length);
+  for (let fileIndex = 0; fileIndex < files.length; ) {
+    const groupMax = Math.min(fileIndex + MAX_CONCURRENT_WRITES, files.length);
 
     const actions = [];
     while (fileIndex < groupMax) {
-      actions.push(writeOutputFile(outputFiles[fileIndex++]));
+      actions.push(writeFileCallback(files[fileIndex++]));
     }
 
     await Promise.all(actions);
-  }
-
-  if (assetFiles?.length) {
-    const copyAssetFile = async (asset: { source: string; destination: string }) => {
-      // Ensure output subdirectories exist
-      const destPath = join('browser', asset.destination);
-      const basePath = path.dirname(destPath);
-      if (basePath && !directoryExists.has(basePath)) {
-        await fs.mkdir(path.join(outputPath, basePath), { recursive: true });
-        directoryExists.add(basePath);
-      }
-      // Copy file contents
-      await fs.copyFile(
-        asset.source,
-        path.join(outputPath, destPath),
-        fsConstants.COPYFILE_FICLONE,
-      );
-    };
-
-    for (let fileIndex = 0; fileIndex < assetFiles.length; ) {
-      const groupMax = Math.min(fileIndex + MAX_CONCURRENT_WRITES, assetFiles.length);
-
-      const actions = [];
-      while (fileIndex < groupMax) {
-        actions.push(copyAssetFile(assetFiles[fileIndex++]));
-      }
-
-      await Promise.all(actions);
-    }
   }
 }
 
