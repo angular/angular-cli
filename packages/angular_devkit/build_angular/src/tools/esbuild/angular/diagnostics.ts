@@ -8,13 +8,7 @@
 
 import type { PartialMessage, PartialNote } from 'esbuild';
 import { platform } from 'node:os';
-import {
-  Diagnostic,
-  DiagnosticRelatedInformation,
-  flattenDiagnosticMessageText,
-  getLineAndCharacterOfPosition,
-  getPositionOfLineAndCharacter,
-} from 'typescript';
+import type ts from 'typescript';
 
 /**
  * Converts TypeScript Diagnostic related information into an esbuild compatible note object.
@@ -24,11 +18,12 @@ import {
  * @returns An esbuild diagnostic message as a PartialMessage object
  */
 function convertTypeScriptDiagnosticInfo(
-  info: DiagnosticRelatedInformation,
+  typescript: typeof ts,
+  info: ts.DiagnosticRelatedInformation,
   textPrefix?: string,
 ): PartialNote {
   const newLine = platform() === 'win32' ? '\r\n' : '\n';
-  let text = flattenDiagnosticMessageText(info.messageText, newLine);
+  let text = typescript.flattenDiagnosticMessageText(info.messageText, newLine);
   if (textPrefix) {
     text = textPrefix + text;
   }
@@ -43,23 +38,23 @@ function convertTypeScriptDiagnosticInfo(
 
     // Calculate the line/column location and extract the full line text that has the diagnostic
     if (info.start) {
-      const { line, character } = getLineAndCharacterOfPosition(info.file, info.start);
+      const { line, character } = typescript.getLineAndCharacterOfPosition(info.file, info.start);
       note.location.line = line + 1;
       note.location.column = character;
 
       // The start position for the slice is the first character of the error line
-      const lineStartPosition = getPositionOfLineAndCharacter(info.file, line, 0);
+      const lineStartPosition = typescript.getPositionOfLineAndCharacter(info.file, line, 0);
 
       // The end position for the slice is the first character of the next line or the length of
       // the entire file if the line is the last line of the file (getPositionOfLineAndCharacter
       // will error if a nonexistent line is passed).
-      const { line: lastLineOfFile } = getLineAndCharacterOfPosition(
+      const { line: lastLineOfFile } = typescript.getLineAndCharacterOfPosition(
         info.file,
         info.file.text.length - 1,
       );
       const lineEndPosition =
         line < lastLineOfFile
-          ? getPositionOfLineAndCharacter(info.file, line + 1, 0)
+          ? typescript.getPositionOfLineAndCharacter(info.file, line + 1, 0)
           : info.file.text.length;
 
       note.location.lineText = info.file.text.slice(lineStartPosition, lineEndPosition).trimEnd();
@@ -74,7 +69,10 @@ function convertTypeScriptDiagnosticInfo(
  * @param diagnostic The TypeScript diagnostic to convert.
  * @returns An esbuild diagnostic message as a PartialMessage object
  */
-export function convertTypeScriptDiagnostic(diagnostic: Diagnostic): PartialMessage {
+export function convertTypeScriptDiagnostic(
+  typescript: typeof ts,
+  diagnostic: ts.Diagnostic,
+): PartialMessage {
   let codePrefix = 'TS';
   let code = `${diagnostic.code}`;
   if (diagnostic.source === 'ngtsc') {
@@ -84,13 +82,14 @@ export function convertTypeScriptDiagnostic(diagnostic: Diagnostic): PartialMess
   }
 
   const message: PartialMessage = convertTypeScriptDiagnosticInfo(
+    typescript,
     diagnostic,
     `${codePrefix}${code}: `,
   );
 
   if (diagnostic.relatedInformation?.length) {
     message.notes = diagnostic.relatedInformation.map((info) =>
-      convertTypeScriptDiagnosticInfo(info),
+      convertTypeScriptDiagnosticInfo(typescript, info),
     );
   }
 

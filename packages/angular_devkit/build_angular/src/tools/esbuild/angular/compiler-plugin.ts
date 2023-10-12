@@ -19,7 +19,6 @@ import assert from 'node:assert';
 import { realpath } from 'node:fs/promises';
 import * as path from 'node:path';
 import { pathToFileURL } from 'node:url';
-import ts from 'typescript';
 import { maxWorkers } from '../../../utils/environment-options';
 import { JavaScriptTransformer } from '../javascript-transformer';
 import { LoadResultCache } from '../load-result-cache';
@@ -234,14 +233,12 @@ export function createCompilerPlugin(
           compilerOptions: { allowJs },
           referencedFiles,
         } = await compilation.initialize(tsconfigPath, hostOptions, (compilerOptions) => {
-          if (
-            compilerOptions.target === undefined ||
-            compilerOptions.target < ts.ScriptTarget.ES2022
-          ) {
+          // target of 9 is ES2022 (using the number avoids an expensive import of typescript just for an enum)
+          if (compilerOptions.target === undefined || compilerOptions.target < 9) {
             // If 'useDefineForClassFields' is already defined in the users project leave the value as is.
             // Otherwise fallback to false due to https://github.com/microsoft/TypeScript/issues/45995
             // which breaks the deprecated `@Effects` NGRX decorator and potentially other existing code as well.
-            compilerOptions.target = ts.ScriptTarget.ES2022;
+            compilerOptions.target = 9;
             compilerOptions.useDefineForClassFields ??= false;
 
             // Only add the warning on the initial build

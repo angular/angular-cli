@@ -8,7 +8,7 @@
 
 import type ng from '@angular/compiler-cli';
 import type { PartialMessage } from 'esbuild';
-import ts from 'typescript';
+import type ts from 'typescript';
 import { loadEsmModule } from '../../../../utils/load-esm';
 import { profileAsync, profileSync } from '../../profiling';
 import type { AngularHostOptions } from '../angular-host';
@@ -22,6 +22,7 @@ export interface EmitFileResult {
 
 export abstract class AngularCompilation {
   static #angularCompilerCliModule?: typeof ng;
+  static #typescriptModule?: typeof ts;
 
   static async loadCompilerCli(): Promise<typeof ng> {
     // This uses a wrapped dynamic import to load `@angular/compiler-cli` which is ESM.
@@ -30,6 +31,12 @@ export abstract class AngularCompilation {
       await loadEsmModule<typeof ng>('@angular/compiler-cli');
 
     return AngularCompilation.#angularCompilerCliModule;
+  }
+
+  static async loadTypescript(): Promise<typeof ts> {
+    AngularCompilation.#typescriptModule ??= await import('typescript');
+
+    return AngularCompilation.#typescriptModule;
   }
 
   protected async loadConfiguration(tsconfig: string): Promise<ng.CompilerOptions> {
@@ -71,10 +78,14 @@ export abstract class AngularCompilation {
   async diagnoseFiles(): Promise<{ errors?: PartialMessage[]; warnings?: PartialMessage[] }> {
     const result: { errors?: PartialMessage[]; warnings?: PartialMessage[] } = {};
 
+    // Avoid loading typescript until actually needed.
+    // This allows for avoiding the load of typescript in the main thread when using the parallel compilation.
+    const typescript = await AngularCompilation.loadTypescript();
+
     await profileAsync('NG_DIAGNOSTICS_TOTAL', async () => {
       for (const diagnostic of await this.collectDiagnostics()) {
-        const message = convertTypeScriptDiagnostic(diagnostic);
-        if (diagnostic.category === ts.DiagnosticCategory.Error) {
+        const message = convertTypeScriptDiagnostic(typescript, diagnostic);
+        if (diagnostic.category === typescript.DiagnosticCategory.Error) {
           (result.errors ??= []).push(message);
         } else {
           (result.warnings ??= []).push(message);
