@@ -14,6 +14,7 @@ import {
   createPlatformFactory,
   platformCore,
   ɵwhenStable as whenStable,
+  ɵConsole,
 } from '@angular/core';
 import {
   INITIAL_CONFIG,
@@ -79,12 +80,26 @@ export async function* extractRoutes(
   document: string,
 ): AsyncIterableIterator<RouterResult> {
   const platformRef = createPlatformFactory(platformCore, 'server', [
-    [
-      {
-        provide: INITIAL_CONFIG,
-        useValue: { document, url: '' },
+    {
+      provide: INITIAL_CONFIG,
+      useValue: { document, url: '' },
+    },
+    {
+      provide: ɵConsole,
+      /** An Angular Console Provider that does not print a set of predefined logs. */
+      useFactory: () => {
+        class Console extends ɵConsole {
+          private readonly ignoredLogs = new Set(['Angular is running in development mode.']);
+          override log(message: string): void {
+            if (!this.ignoredLogs.has(message)) {
+              super.log(message);
+            }
+          }
+        }
+
+        return new Console();
       },
-    ],
+    },
     ...INTERNAL_SERVER_PLATFORM_PROVIDERS,
   ])();
 

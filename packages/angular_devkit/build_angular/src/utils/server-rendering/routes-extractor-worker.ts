@@ -10,7 +10,6 @@ import { workerData } from 'node:worker_threads';
 import { loadEsmModule } from '../load-esm';
 import type { ESMInMemoryFileLoaderWorkerData } from './esm-in-memory-loader/loader-hooks';
 import { MainServerBundleExports } from './main-bundle-exports';
-import { patchConsoleToIgnoreSpecificLogs } from './utils';
 
 export interface RoutesExtractorWorkerData extends ESMInMemoryFileLoaderWorkerData {
   document: string;
@@ -28,8 +27,6 @@ export interface RoutersExtractorWorkerResult {
 const { document, verbose } = workerData as RoutesExtractorWorkerData;
 
 export default async function (): Promise<RoutersExtractorWorkerResult> {
-  patchConsoleToIgnoreSpecificLogs();
-
   const { default: bootstrapAppFnOrModule, extractRoutes } =
     await loadEsmModule<MainServerBundleExports>('./main.server.mjs');
 
