@@ -167,7 +167,7 @@
     "license-checker": "^25.0.0",
     "license-webpack-plugin": "4.0.2",
     "loader-utils": "3.2.1",
-    "magic-string": "0.30.4",
+    "magic-string": "0.30.5",
     "mini-css-extract-plugin": "2.7.6",
     "mrmime": "1.0.1",
     "ng-packagr": "17.0.0-next.2",
