@@ -48,7 +48,6 @@ import {
 import { scheduleByName, scheduleByTarget } from './schedule-by-name';
 
 const inputSchema = require('./input-schema.json');
-const outputSchema = require('./output-schema.json');
 
 function _createJobHandlerFromBuilderInfo(
   info: BuilderInfo,
@@ -60,8 +59,8 @@ function _createJobHandlerFromBuilderInfo(
   const jobDescription: BuilderDescription = {
     name: target ? `{${targetStringFromTarget(target)}}` : info.builderName,
     argument: { type: 'object' },
-    input: inputSchema,
-    output: outputSchema,
+    input: true,
+    output: true,
     info,
   };
 

@@ -64,8 +64,8 @@ interface JobHandlerWithExtra extends JobHandler<JsonValue, JsonValue, JsonValue
   jobDescription: JobDescription;
 
   argumentV: Promise<schema.SchemaValidator>;
-  outputV: Promise<schema.SchemaValidator>;
-  inputV: Promise<schema.SchemaValidator>;
+  outputV: Promise<schema.SchemaValidator> | undefined;
+  inputV: Promise<schema.SchemaValidator> | undefined;
 }
 
 function _jobShare<T>(): MonoTypeOperatorFunction<T> {
@@ -158,8 +158,15 @@ export class SimpleScheduler<
         const handlerWithExtra = Object.assign(handler.bind(undefined), {
           jobDescription: description,
           argumentV: this._schemaRegistry.compile(description.argument),
-          inputV: this._schemaRegistry.compile(description.input),
-          outputV: this._schemaRegistry.compile(description.output),
+          inputV:
+            // A true schema is always valid
+            description.input === true
+              ? undefined
+              : this._schemaRegistry.compile(description.input),
+          outputV:
+            description.output === true
+              ? undefined
+              : this._schemaRegistry.compile(description.output),
         }) as JobHandlerWithExtra;
         this._internalJobDescriptionMap.set(name, handlerWithExtra);
 
@@ -309,6 +316,14 @@ export class SimpleScheduler<
                 throw new JobDoesNotExistException(name);
               }
 
+              // Use message directly if no input validator
+              if (handler.inputV === undefined) {
+                return Promise.resolve({
+                  success: true,
+                  data: message,
+                });
+              }
+
               const validator = await handler.inputV;
 
               return validator(message);
@@ -400,6 +415,19 @@ export class SimpleScheduler<
             if (handler === null) {
               throw new JobDoesNotExistException(name);
             }
+
+            // Use message directly if no output validator
+            if (handler.outputV === undefined) {
+              return new Promise((resolve) =>
+                setTimeout(() => {
+                  resolve({
+                    ...message,
+                    output: message.value,
+                  } as JobOutboundMessageOutput<O>);
+                }, 0),
+              );
+            }
+
             const validate = await handler.outputV;
             const output = await validate(message.value);
             if (!output.success) {
