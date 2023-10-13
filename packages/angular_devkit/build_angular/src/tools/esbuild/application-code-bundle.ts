@@ -308,6 +308,23 @@ export function createServerCodeBundleOptions(
 
   polyfills.push(`import '@angular/platform-server/init';`);
 
+  // Add Angular's global locale data if i18n options are present.
+  let needLocaleDataPlugin = false;
+  if (options.i18nOptions.shouldInline) {
+    // Add locale data for all active locales
+    for (const locale of options.i18nOptions.inlineLocales) {
+      polyfills.unshift(`import 'angular:locale/data:${locale}';`);
+    }
+    needLocaleDataPlugin = true;
+  } else if (options.i18nOptions.hasDefinedSourceLocale) {
+    // When not inlining and a source local is present, use the source locale data directly
+    polyfills.unshift(`import 'angular:locale/data:${options.i18nOptions.sourceLocale}';`);
+    needLocaleDataPlugin = true;
+  }
+  if (needLocaleDataPlugin) {
+    buildOptions.plugins.push(createAngularLocaleDataPlugin());
+  }
+
   buildOptions.plugins.push(
     createVirtualModulePlugin({
       namespace: mainServerNamespace,
