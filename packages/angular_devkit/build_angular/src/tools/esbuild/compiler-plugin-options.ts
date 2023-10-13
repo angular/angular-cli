@@ -47,6 +47,7 @@ export function createCompilerPluginOptions(
       fileReplacements,
       sourceFileCache,
       loadResultCache: sourceFileCache?.loadResultCache,
+      incremental: !!options.watch,
     },
     // Component stylesheet options
     styleOptions: {
