@@ -47,6 +47,7 @@ export interface CompilerPluginOptions {
   fileReplacements?: Record<string, string>;
   sourceFileCache?: SourceFileCache;
   loadResultCache?: LoadResultCache;
+  incremental: boolean;
 }
 
 // eslint-disable-next-line max-lines-per-function
@@ -100,6 +101,7 @@ export function createCompilerPlugin(
       // Track incremental component stylesheet builds
       const stylesheetBundler = new ComponentStylesheetBundler(
         styleOptions,
+        pluginOptions.incremental,
         pluginOptions.loadResultCache,
       );
       let sharedTSCompilationState: SharedTSCompilationState | undefined;

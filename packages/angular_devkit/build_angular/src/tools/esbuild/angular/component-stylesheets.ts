@@ -45,6 +45,7 @@ export class ComponentStylesheetBundler {
    */
   constructor(
     private readonly options: BundleStylesheetOptions,
+    private readonly incremental: boolean,
     private readonly cache?: LoadResultCache,
   ) {}
 
@@ -53,7 +54,7 @@ export class ComponentStylesheetBundler {
       const buildOptions = createStylesheetBundleOptions(this.options, this.cache);
       buildOptions.entryPoints = [entry];
 
-      return new BundlerContext(this.options.workspaceRoot, true, buildOptions);
+      return new BundlerContext(this.options.workspaceRoot, this.incremental, buildOptions);
     });
 
     return extractResult(await bundlerContext.bundle(), bundlerContext.watchFiles);
@@ -95,7 +96,7 @@ export class ComponentStylesheetBundler {
         },
       });
 
-      return new BundlerContext(this.options.workspaceRoot, true, buildOptions);
+      return new BundlerContext(this.options.workspaceRoot, this.incremental, buildOptions);
     });
 
     // Extract the result of the bundling from the output files
