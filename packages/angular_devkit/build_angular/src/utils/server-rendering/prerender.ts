@@ -7,7 +7,7 @@
  */
 
 import { readFile } from 'node:fs/promises';
-import { extname, posix } from 'node:path';
+import { extname, join, posix } from 'node:path';
 import Piscina from 'piscina';
 import { BuildOutputFile, BuildOutputFileType } from '../../tools/esbuild/bundler-context';
 import { getESMLoaderArgs } from './esm-in-memory-loader/node-18-utils';
@@ -33,7 +33,8 @@ export async function prerenderPages(
   prerenderOptions: PrerenderOptions = {},
   outputFiles: Readonly<BuildOutputFile[]>,
   document: string,
-  inlineCriticalCss?: boolean,
+  sourcemap = false,
+  inlineCriticalCss = false,
   maxThreads = 1,
   verbose = false,
 ): Promise<{
@@ -45,15 +46,32 @@ export async function prerenderPages(
   const warnings: string[] = [];
   const errors: string[] = [];
   const outputFilesForWorker: Record<string, string> = {};
+  const serverBundlesSourceMaps = new Map<string, string>();
 
   for (const { text, path, type } of outputFiles) {
-    if (
+    const fileExt = extname(path);
+    if (type === BuildOutputFileType.Server && fileExt === '.map') {
+      serverBundlesSourceMaps.set(path.slice(0, -4), text);
+    } else if (
       type === BuildOutputFileType.Server || // Contains the server runnable application code
-      (type === BuildOutputFileType.Browser && extname(path) === '.css') // Global styles for critical CSS inlining.
+      (type === BuildOutputFileType.Browser && fileExt === '.css') // Global styles for critical CSS inlining.
     ) {
       outputFilesForWorker[path] = text;
     }
   }
+
+  // Inline sourcemap into JS file. This is needed to make Node.js resolve sourcemaps
+  // when using `--enable-source-maps` when using in memory files.
+  for (const [filePath, map] of serverBundlesSourceMaps) {
+    const jsContent = outputFilesForWorker[filePath];
+    if (jsContent) {
+      outputFilesForWorker[filePath] =
+        jsContent +
+        `\n//# sourceMappingURL=` +
+        `data:application/json;base64,${Buffer.from(map).toString('base64')}`;
+    }
+  }
+  serverBundlesSourceMaps.clear();
 
   const { routes: allRoutes, warnings: routesWarnings } = await getAllRoutes(
     workspaceRoot,
@@ -61,6 +79,7 @@ export async function prerenderPages(
     document,
     appShellOptions,
     prerenderOptions,
+    sourcemap,
     verbose,
   );
 
@@ -76,6 +95,11 @@ export async function prerenderPages(
     };
   }
 
+  const workerExecArgv = getESMLoaderArgs();
+  if (sourcemap) {
+    workerExecArgv.push('--enable-source-maps');
+  }
+
   const renderWorker = new Piscina({
     filename: require.resolve('./render-worker'),
     maxThreads: Math.min(allRoutes.size, maxThreads),
@@ -85,7 +109,7 @@ export async function prerenderPages(
       inlineCriticalCss,
       document,
     } as RenderWorkerData,
-    execArgv: getESMLoaderArgs(),
+    execArgv: workerExecArgv,
   });
 
   try {
@@ -139,6 +163,7 @@ async function getAllRoutes(
   document: string,
   appShellOptions: AppShellOptions,
   prerenderOptions: PrerenderOptions,
+  sourcemap: boolean,
   verbose: boolean,
 ): Promise<{ routes: Set<string>; warnings?: string[] }> {
   const { routesFile, discoverRoutes } = prerenderOptions;
@@ -160,6 +185,11 @@ async function getAllRoutes(
     return { routes };
   }
 
+  const workerExecArgv = getESMLoaderArgs();
+  if (sourcemap) {
+    workerExecArgv.push('--enable-source-maps');
+  }
+
   const renderWorker = new Piscina({
     filename: require.resolve('./routes-extractor-worker'),
     maxThreads: 1,
@@ -169,7 +199,7 @@ async function getAllRoutes(
       document,
       verbose,
     } as RoutesExtractorWorkerData,
-    execArgv: getESMLoaderArgs(),
+    execArgv: workerExecArgv,
   });
 
   const { routes: extractedRoutes, warnings }: RoutersExtractorWorkerResult = await renderWorker
