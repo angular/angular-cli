@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import type { OutputFile, PluginBuild } from 'esbuild';
+import type { Metafile, OutputFile, PluginBuild } from 'esbuild';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { ComponentStylesheetBundler } from './component-stylesheets';
@@ -59,12 +59,12 @@ async function loadEntry(
  * static imports.
  * @param build An esbuild {@link PluginBuild} instance used to add callbacks.
  * @param styleOptions The options to use when bundling stylesheets.
- * @param stylesheetResourceFiles An array where stylesheet resources will be added.
+ * @param additionalResultFiles A Map where stylesheet resources will be added.
  */
 export function setupJitPluginCallbacks(
   build: PluginBuild,
   stylesheetBundler: ComponentStylesheetBundler,
-  stylesheetResourceFiles: OutputFile[],
+  additionalResultFiles: Map<string, { outputFiles?: OutputFile[]; metafile?: Metafile }>,
   inlineStyleLanguage: string,
 ): void {
   const root = build.initialOptions.absWorkingDir ?? '';
@@ -117,9 +117,9 @@ export function setupJitPluginCallbacks(
       );
     }
 
-    const { contents, resourceFiles, errors, warnings } = stylesheetResult;
+    const { contents, resourceFiles, errors, warnings, metafile } = stylesheetResult;
 
-    stylesheetResourceFiles.push(...resourceFiles);
+    additionalResultFiles.set(entry.path, { outputFiles: resourceFiles, metafile });
 
     return {
       errors,
