@@ -28,7 +28,9 @@ export class SourceFileCache extends Map<string, ts.SourceFile> {
   }
 
   invalidate(files: Iterable<string>): void {
-    this.modifiedFiles.clear();
+    if (files !== this.modifiedFiles) {
+      this.modifiedFiles.clear();
+    }
     for (let file of files) {
       this.babelFileCache.delete(file);
       this.typeScriptFileCache.delete(pathToFileURL(file).href);
