@@ -60,15 +60,15 @@
     "semver": "7.5.4",
     "source-map-loader": "4.0.1",
     "source-map-support": "0.5.21",
-    "terser": "5.21.0",
+    "terser": "5.22.0",
     "text-table": "0.2.0",
     "tree-kill": "1.2.2",
     "tslib": "2.6.2",
     "vite": "4.4.11",
-    "webpack": "5.88.2",
+    "webpack": "5.89.0",
     "webpack-dev-middleware": "6.1.1",
     "webpack-dev-server": "4.15.1",
-    "webpack-merge": "5.9.0",
+    "webpack-merge": "5.10.0",
     "webpack-subresource-integrity": "5.1.0"
   },
   "optionalDependencies": {
