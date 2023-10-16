@@ -77,6 +77,31 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       );
     });
 
+    it('should not show warning when all dependencies are allowed by wildcard', async () => {
+      // Add a Common JS dependency
+      await harness.appendToFile(
+        'src/app/app.component.ts',
+        `
+        import 'buffer';
+      `,
+      );
+
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+        allowedCommonJsDependencies: ['*'],
+        optimization: true,
+      });
+
+      const { result, logs } = await harness.executeOnce();
+
+      expect(result?.success).toBe(true);
+      expect(logs).not.toContain(
+        jasmine.objectContaining<logging.LogEntry>({
+          message: jasmine.stringMatching(/CommonJS or AMD dependencies/),
+        }),
+      );
+    });
+
     it('should not show warning when depending on zone.js', async () => {
       // Add a Common JS dependency
       await harness.appendToFile(

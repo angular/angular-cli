@@ -17,7 +17,7 @@ const CommonJsRequireDependency = require('webpack/lib/dependencies/CommonJsRequ
 const CommonJsSelfReferenceDependency = require('webpack/lib/dependencies/CommonJsSelfReferenceDependency');
 
 export interface CommonJsUsageWarnPluginOptions {
-  /** A list of CommonJS packages that are allowed to be used without a warning. */
+  /** A list of CommonJS or AMD packages that are allowed to be used without a warning. Use `'*'` to allow all. */
   allowedDependencies?: string[];
 }
 
@@ -30,6 +30,10 @@ export class CommonJsUsageWarnPlugin {
   }
 
   apply(compiler: Compiler) {
+    if (this.allowedDependencies.has('*')) {
+      return;
+    }
+
     compiler.hooks.compilation.tap('CommonJsUsageWarnPlugin', (compilation) => {
       compilation.hooks.finishModules.tap('CommonJsUsageWarnPlugin', (modules) => {
         const mainEntry = compilation.entries.get('main');
