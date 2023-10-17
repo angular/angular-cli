@@ -105,6 +105,8 @@ export class AotCompilation extends AngularCompilation {
           for (const resourceDependency of resourceDependencies) {
             if (hostOptions.modifiedFiles.has(resourceDependency)) {
               this.#state.diagnosticCache.delete(sourceFile);
+              // Also mark as affected in case changed template affects diagnostics
+              affectedFiles.add(sourceFile);
             }
           }
         }
