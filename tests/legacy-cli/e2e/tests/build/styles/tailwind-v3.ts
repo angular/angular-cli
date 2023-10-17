@@ -55,6 +55,29 @@ export default async function () {
     ),
   );
 
+  // Add Tailwind directives to an imported global style
+  await writeFile('src/tailwind.scss', '@tailwind base; @tailwind components;');
+  await writeFile('src/styles.css', '@import "./tailwind.scss";');
+
+  // Build should succeed and process Tailwind directives
+  await ng('build', '--configuration=development');
+
+  // Check for Tailwind output
+  await expectFileToMatch('dist/test-project/browser/styles.css', /::placeholder/);
+  await expectFileToMatch('dist/test-project/browser/main.js', /::placeholder/);
+  await expectToFail(() =>
+    expectFileToMatch(
+      'dist/test-project/browser/styles.css',
+      /@tailwind base;\s+@tailwind components;/,
+    ),
+  );
+  await expectToFail(() =>
+    expectFileToMatch(
+      'dist/test-project/browser/main.js',
+      /@tailwind base;(?:\\n|\s*)@tailwind components;/,
+    ),
+  );
+
   // Remove configuration file
   await deleteFile('tailwind.config.js');
 
