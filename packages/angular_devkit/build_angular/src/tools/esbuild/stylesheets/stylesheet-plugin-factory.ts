@@ -17,7 +17,7 @@ import { LoadResultCache, createCachedLoad } from '../load-result-cache';
  * The lazy-loaded instance of the postcss stylesheet postprocessor.
  * It is only imported and initialized if postcss is needed.
  */
-let postcss: typeof import('postcss')['default'] | undefined;
+let postcss: (typeof import('postcss'))['default'] | undefined;
 
 /**
  * An object containing the plugin options to use when processing stylesheets.
@@ -121,12 +121,6 @@ export class StylesheetPluginFactory {
             );
 
             const [format, , filename] = args.path.split(';', 3);
-            // Only use postcss if Tailwind processing is required.
-            // NOTE: If postcss is used for more than just Tailwind in the future this check MUST
-            // be updated to account for the additional use.
-            // TODO: use better search algorithm for keywords
-            const needsPostcss =
-              !!postcssProcessor && TAILWIND_KEYWORDS.some((keyword) => data.includes(keyword));
 
             return processStylesheet(
               language,
@@ -135,7 +129,7 @@ export class StylesheetPluginFactory {
               format,
               options,
               build,
-              needsPostcss ? postcssProcessor : undefined,
+              postcssProcessor,
             );
           }),
         );
@@ -145,8 +139,6 @@ export class StylesheetPluginFactory {
           { filter: language.fileFilter },
           createCachedLoad(cache, async (args) => {
             const data = await readFile(args.path, 'utf-8');
-            const needsPostcss =
-              !!postcssProcessor && TAILWIND_KEYWORDS.some((keyword) => data.includes(keyword));
 
             return processStylesheet(
               language,
@@ -155,7 +147,7 @@ export class StylesheetPluginFactory {
               extname(args.path).toLowerCase().slice(1),
               options,
               build,
-              needsPostcss ? postcssProcessor : undefined,
+              postcssProcessor,
             );
           }),
         );
@@ -186,8 +178,15 @@ async function processStylesheet(
     };
   }
 
-  // Transform with postcss if needed and there are no errors
-  if (postcssProcessor && result.contents && !result.errors?.length) {
+  // Return early if there are no contents to further process
+  if (!result.contents) {
+    return result;
+  }
+
+  // Only use postcss if Tailwind processing is required.
+  // NOTE: If postcss is used for more than just Tailwind in the future this check MUST
+  // be updated to account for the additional use.
+  if (postcssProcessor && !result.errors?.length && hasTailwindKeywords(result.contents)) {
     const postcssResult = await compileString(
       typeof result.contents === 'string'
         ? result.contents
@@ -217,6 +216,24 @@ async function processStylesheet(
   }
 
   return result;
+}
+
+/**
+ * Searches the provided contents for keywords that indicate Tailwind is used
+ * within a stylesheet.
+ * @param contents A string or Uint8Array containing UTF-8 text.
+ * @returns True, if the contents contains tailwind keywords; False, otherwise.
+ */
+function hasTailwindKeywords(contents: string | Uint8Array): boolean {
+  // TODO: use better search algorithm for keywords
+  if (typeof contents === 'string') {
+    return TAILWIND_KEYWORDS.some((keyword) => contents.includes(keyword));
+  }
+
+  // Contents is a Uint8Array
+  const data = contents instanceof Buffer ? contents : Buffer.from(contents);
+
+  return TAILWIND_KEYWORDS.some((keyword) => data.includes(keyword));
 }
 
 /**
