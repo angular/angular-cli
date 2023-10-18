@@ -196,24 +196,40 @@ export async function executeBuild(
   }
 
   // Perform i18n translation inlining if enabled
+  let prerenderedRoutes: string[];
+  let errors: string[];
+  let warnings: string[];
   if (i18nOptions.shouldInline) {
-    const { errors, warnings } = await inlineI18n(options, executionResult, initialFiles);
-    printWarningsAndErrorsToConsole(context, warnings, errors);
+    const result = await inlineI18n(options, executionResult, initialFiles);
+    errors = result.errors;
+    warnings = result.warnings;
+    prerenderedRoutes = result.prerenderedRoutes;
   } else {
-    const { errors, warnings, additionalAssets, additionalOutputFiles } =
-      await executePostBundleSteps(
-        options,
-        executionResult.outputFiles,
-        executionResult.assetFiles,
-        initialFiles,
-        // Set lang attribute to the defined source locale if present
-        i18nOptions.hasDefinedSourceLocale ? i18nOptions.sourceLocale : undefined,
-      );
+    const result = await executePostBundleSteps(
+      options,
+      executionResult.outputFiles,
+      executionResult.assetFiles,
+      initialFiles,
+      // Set lang attribute to the defined source locale if present
+      i18nOptions.hasDefinedSourceLocale ? i18nOptions.sourceLocale : undefined,
+    );
 
-    executionResult.outputFiles.push(...additionalOutputFiles);
-    executionResult.assetFiles.push(...additionalAssets);
-    printWarningsAndErrorsToConsole(context, warnings, errors);
+    errors = result.errors;
+    warnings = result.warnings;
+    prerenderedRoutes = result.prerenderedRoutes;
+    executionResult.outputFiles.push(...result.additionalOutputFiles);
+    executionResult.assetFiles.push(...result.additionalAssets);
   }
+
+  if (prerenderOptions) {
+    executionResult.addOutputFile(
+      'prerendered-routes.json',
+      JSON.stringify({ routes: prerenderedRoutes.sort((a, b) => a.localeCompare(b)) }, null, 2),
+      BuildOutputFileType.Root,
+    );
+  }
+
+  printWarningsAndErrorsToConsole(context, warnings, errors);
 
   logBuildStats(context, metafile, initialFiles, budgetFailures, estimatedTransferSizes);
 

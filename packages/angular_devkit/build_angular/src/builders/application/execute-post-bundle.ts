@@ -39,11 +39,13 @@ export async function executePostBundleSteps(
   warnings: string[];
   additionalOutputFiles: BuildOutputFile[];
   additionalAssets: BuildOutputAsset[];
+  prerenderedRoutes: string[];
 }> {
   const additionalAssets: BuildOutputAsset[] = [];
   const additionalOutputFiles: BuildOutputFile[] = [];
   const allErrors: string[] = [];
   const allWarnings: string[] = [];
+  const prerenderedRoutes: string[] = [];
 
   const {
     serviceWorker,
@@ -104,7 +106,12 @@ export async function executePostBundleSteps(
       'The "index" option is required when using the "ssg" or "appShell" options.',
     );
 
-    const { output, warnings, errors } = await prerenderPages(
+    const {
+      output,
+      warnings,
+      errors,
+      prerenderedRoutes: generatedRoutes,
+    } = await prerenderPages(
       workspaceRoot,
       appShellOptions,
       prerenderOptions,
@@ -117,6 +124,7 @@ export async function executePostBundleSteps(
 
     allErrors.push(...errors);
     allWarnings.push(...warnings);
+    prerenderedRoutes.push(...Array.from(generatedRoutes));
 
     for (const [path, content] of Object.entries(output)) {
       additionalOutputFiles.push(
@@ -153,6 +161,7 @@ export async function executePostBundleSteps(
     errors: allErrors,
     warnings: allWarnings,
     additionalAssets,
+    prerenderedRoutes,
     additionalOutputFiles,
   };
 }
