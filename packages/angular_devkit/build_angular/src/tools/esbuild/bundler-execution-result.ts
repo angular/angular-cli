@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import type { Message } from 'esbuild';
 import type { ChangedFiles } from '../../tools/esbuild/watcher';
 import type { SourceFileCache } from './angular/source-file-cache';
 import type { BuildOutputFile, BuildOutputFileType, BundlerContext } from './bundler-context';
@@ -28,6 +29,7 @@ export interface RebuildState {
 export class ExecutionResult {
   outputFiles: BuildOutputFile[] = [];
   assetFiles: BuildOutputAsset[] = [];
+  errors: Message[] = [];
 
   constructor(
     private rebuildContexts: BundlerContext[],
@@ -42,17 +44,22 @@ export class ExecutionResult {
     this.assetFiles.push(...assets);
   }
 
+  addErrors(errors: Message[]): void {
+    this.errors.push(...errors);
+  }
+
   get output() {
     return {
-      success: this.outputFiles.length > 0,
+      success: this.errors.length === 0,
     };
   }
 
   get outputWithFiles() {
     return {
-      success: this.outputFiles.length > 0,
+      success: this.errors.length === 0,
       outputFiles: this.outputFiles,
       assetFiles: this.assetFiles,
+      errors: this.errors,
     };
   }
 

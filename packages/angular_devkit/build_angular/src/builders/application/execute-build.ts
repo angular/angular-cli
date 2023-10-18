@@ -146,6 +146,8 @@ export async function executeBuild(
 
   // Return if the bundling has errors
   if (bundlingResult.errors) {
+    executionResult.addErrors(bundlingResult.errors);
+
     return executionResult;
   }
 

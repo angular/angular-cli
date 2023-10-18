@@ -115,6 +115,7 @@ export async function* serveWithVite(
 
   let server: ViteDevServer | undefined;
   let listeningAddress: AddressInfo | undefined;
+  let hadError = false;
   const generatedFiles = new Map<string, OutputFileRecord>();
   const assetFiles = new Map<string, string>();
   const build =
@@ -133,6 +134,29 @@ export async function* serveWithVite(
     plugins,
   )) {
     assert(result.outputFiles, 'Builder did not provide result files.');
+
+    // If build failed, nothing to serve
+    if (!result.success) {
+      // If server is active, send an error notification
+      if (result.errors?.length && server) {
+        hadError = true;
+        server.ws.send({
+          type: 'error',
+          err: {
+            message: result.errors[0].text,
+            stack: '',
+            loc: result.errors[0].location,
+          },
+        });
+      }
+      continue;
+    } else if (hadError && server) {
+      // Send an empty update to clear the error overlay
+      server.ws.send({
+        'type': 'update',
+        updates: [],
+      });
+    }
 
     // Analyze result files for changes
     analyzeResultFiles(normalizePath, htmlIndexPath, result.outputFiles, generatedFiles);
