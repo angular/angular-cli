@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import type { PartialMessage } from 'esbuild';
 import assert from 'node:assert';
 import { randomUUID } from 'node:crypto';
 import { type MessagePort, receiveMessageOnPort } from 'node:worker_threads';
@@ -98,7 +99,10 @@ export async function initialize(request: InitRequest) {
   };
 }
 
-export async function diagnose() {
+export async function diagnose(): Promise<{
+  errors?: PartialMessage[];
+  warnings?: PartialMessage[];
+}> {
   assert(compilation);
 
   const diagnostics = await compilation.diagnoseFiles();
