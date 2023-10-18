@@ -22,6 +22,6 @@
     "yargs-parser": "21.1.1"
   },
   "devDependencies": {
-    "@types/progress": "2.0.5"
+    "@types/progress": "2.0.6"
   }
 }
