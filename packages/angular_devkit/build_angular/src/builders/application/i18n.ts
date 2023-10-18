@@ -7,7 +7,7 @@
  */
 
 import { BuilderContext } from '@angular-devkit/architect';
-import { join } from 'node:path';
+import { join, posix } from 'node:path';
 import { InitialFileRecord } from '../../tools/esbuild/bundler-context';
 import { ExecutionResult } from '../../tools/esbuild/bundler-execution-result';
 import { I18nInliner } from '../../tools/esbuild/i18n-inliner';
@@ -29,7 +29,7 @@ export async function inlineI18n(
   options: NormalizedApplicationBuildOptions,
   executionResult: ExecutionResult,
   initialFiles: Map<string, InitialFileRecord>,
-): Promise<{ errors: string[]; warnings: string[] }> {
+): Promise<{ errors: string[]; warnings: string[]; prerenderedRoutes: string[] }> {
   // Create the multi-threaded inliner with common options and the files generated from the build.
   const inliner = new I18nInliner(
     {
@@ -40,9 +40,10 @@ export async function inlineI18n(
     maxWorkers,
   );
 
-  const inlineResult: { errors: string[]; warnings: string[] } = {
+  const inlineResult: { errors: string[]; warnings: string[]; prerenderedRoutes: string[] } = {
     errors: [],
     warnings: [],
+    prerenderedRoutes: [],
   };
 
   // For each active locale, use the inliner to process the output files of the build.
@@ -59,17 +60,22 @@ export async function inlineI18n(
       const baseHref =
         getLocaleBaseHref(options.baseHref, options.i18nOptions, locale) ?? options.baseHref;
 
-      const { errors, warnings, additionalAssets, additionalOutputFiles } =
-        await executePostBundleSteps(
-          {
-            ...options,
-            baseHref,
-          },
-          localeOutputFiles,
-          executionResult.assetFiles,
-          initialFiles,
-          locale,
-        );
+      const {
+        errors,
+        warnings,
+        additionalAssets,
+        additionalOutputFiles,
+        prerenderedRoutes: generatedRoutes,
+      } = await executePostBundleSteps(
+        {
+          ...options,
+          baseHref,
+        },
+        localeOutputFiles,
+        executionResult.assetFiles,
+        initialFiles,
+        locale,
+      );
 
       localeOutputFiles.push(...additionalOutputFiles);
       inlineResult.errors.push(...errors);
@@ -87,7 +93,12 @@ export async function inlineI18n(
             destination: join(locale, assetFile.destination),
           });
         }
+
+        inlineResult.prerenderedRoutes.push(
+          ...generatedRoutes.map((route) => posix.join('/', locale, route)),
+        );
       } else {
+        inlineResult.prerenderedRoutes.push(...generatedRoutes);
         executionResult.assetFiles.push(...additionalAssets);
       }
 
