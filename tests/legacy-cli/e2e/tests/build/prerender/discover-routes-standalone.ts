@@ -1,9 +1,10 @@
 import { join } from 'path';
 import { getGlobalVariable } from '../../../utils/env';
-import { expectFileToMatch, rimraf, writeFile } from '../../../utils/fs';
+import { expectFileToMatch, readFile, rimraf, writeFile } from '../../../utils/fs';
 import { installWorkspacePackages } from '../../../utils/packages';
 import { ng } from '../../../utils/process';
 import { useSha } from '../../../utils/project';
+import { deepStrictEqual } from 'node:assert';
 
 export default async function () {
   const useWebpackBuilder = !getGlobalVariable('argv')['esbuild'];
@@ -110,6 +111,22 @@ export default async function () {
 
     for (const [filePath, fileMatch] of Object.entries(expects)) {
       await expectFileToMatch(join('dist/test-project/browser', filePath), fileMatch);
+    }
+
+    if (!useWebpackBuilder) {
+      // prerendered-routes.json file is only generated when using esbuild.
+      const generatedRoutesStats = await readFile('dist/test-project/prerendered-routes.json');
+      deepStrictEqual(JSON.parse(generatedRoutesStats), {
+        routes: [
+          '/',
+          '/lazy-one',
+          '/lazy-one/lazy-one-child',
+          '/lazy-two',
+          '/two',
+          '/two/two-child-one',
+          '/two/two-child-two',
+        ],
+      });
     }
   }
 }

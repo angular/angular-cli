@@ -41,6 +41,7 @@ export async function prerenderPages(
   output: Record<string, string>;
   warnings: string[];
   errors: string[];
+  prerenderedRoutes: Set<string>;
 }> {
   const output: Record<string, string> = {};
   const warnings: string[] = [];
@@ -92,6 +93,7 @@ export async function prerenderPages(
       errors,
       warnings,
       output,
+      prerenderedRoutes: allRoutes,
     };
   }
 
@@ -114,7 +116,7 @@ export async function prerenderPages(
 
   try {
     const renderingPromises: Promise<void>[] = [];
-    const appShellRoute = appShellOptions.route && removeLeadingSlash(appShellOptions.route);
+    const appShellRoute = appShellOptions.route && addLeadingSlash(appShellOptions.route);
 
     for (const route of allRoutes) {
       const isAppShellRoute = appShellRoute === route;
@@ -123,7 +125,9 @@ export async function prerenderPages(
       const render: Promise<RenderResult> = renderWorker.run({ route, serverContext });
       const renderResult: Promise<void> = render.then(({ content, warnings, errors }) => {
         if (content !== undefined) {
-          const outPath = isAppShellRoute ? 'index.html' : posix.join(route, 'index.html');
+          const outPath = isAppShellRoute
+            ? 'index.html'
+            : removeLeadingSlash(posix.join(route, 'index.html'));
           output[outPath] = content;
         }
 
@@ -148,12 +152,13 @@ export async function prerenderPages(
     errors,
     warnings,
     output,
+    prerenderedRoutes: allRoutes,
   };
 }
 
 class RoutesSet extends Set<string> {
   override add(value: string): this {
-    return super.add(removeLeadingSlash(value));
+    return super.add(addLeadingSlash(value));
   }
 }
 
@@ -211,6 +216,10 @@ async function getAllRoutes(
   }
 
   return { routes, warnings };
+}
+
+function addLeadingSlash(value: string): string {
+  return value.charAt(0) === '/' ? value : '/' + value;
 }
 
 function removeLeadingSlash(value: string): string {
