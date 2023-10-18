@@ -121,13 +121,12 @@ export async function prerenderPages(
     for (const route of allRoutes) {
       const isAppShellRoute = appShellRoute === route;
       const serverContext: ServerContext = isAppShellRoute ? 'app-shell' : 'ssg';
-
       const render: Promise<RenderResult> = renderWorker.run({ route, serverContext });
       const renderResult: Promise<void> = render.then(({ content, warnings, errors }) => {
         if (content !== undefined) {
           const outPath = isAppShellRoute
             ? 'index.html'
-            : removeLeadingSlash(posix.join(route, 'index.html'));
+            : posix.join(removeLeadingSlash(route), 'index.html');
           output[outPath] = content;
         }
 
