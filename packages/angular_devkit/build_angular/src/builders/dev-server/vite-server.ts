@@ -151,6 +151,7 @@ export async function* serveWithVite(
       }
       continue;
     } else if (hadError && server) {
+      hadError = false;
       // Send an empty update to clear the error overlay
       server.ws.send({
         'type': 'update',
