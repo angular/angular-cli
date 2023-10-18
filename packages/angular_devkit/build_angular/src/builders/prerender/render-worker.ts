@@ -12,7 +12,6 @@ import assert from 'node:assert';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { workerData } from 'node:worker_threads';
-import { InlineCriticalCssProcessor } from '../../utils/index-file/inline-critical-css';
 
 export interface RenderOptions {
   indexFile: string;
@@ -122,6 +121,10 @@ async function render({
   }
 
   if (inlineCriticalCss) {
+    const { InlineCriticalCssProcessor } = await import(
+      '../../utils/index-file/inline-critical-css'
+    );
+
     const inlineCriticalCssProcessor = new InlineCriticalCssProcessor({
       deployUrl: deployUrl,
       minify: minifyCss,

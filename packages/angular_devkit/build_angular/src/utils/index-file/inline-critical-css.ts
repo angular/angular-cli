@@ -6,9 +6,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import Critters from 'critters';
 import { readFile } from 'node:fs/promises';
-
-const Critters: typeof import('critters').default = require('critters');
 
 /**
  * Pattern used to extract the media query set by Critters in an `onload` handler.
