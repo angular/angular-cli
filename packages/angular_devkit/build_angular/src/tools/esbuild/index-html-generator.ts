@@ -10,7 +10,6 @@ import assert from 'node:assert';
 import path from 'node:path';
 import { NormalizedApplicationBuildOptions } from '../../builders/application/options';
 import { IndexHtmlGenerator } from '../../utils/index-file/index-html-generator';
-import { InlineCriticalCssProcessor } from '../../utils/index-file/inline-critical-css';
 import { BuildOutputFile, BuildOutputFileType, InitialFileRecord } from './bundler-context';
 
 export async function generateIndexHtml(
@@ -106,6 +105,8 @@ export async function generateIndexHtml(
       contentWithoutCriticalCssInlined,
     };
   }
+
+  const { InlineCriticalCssProcessor } = await import('../../utils/index-file/inline-critical-css');
 
   const inlineCriticalCssProcessor = new InlineCriticalCssProcessor({
     minify: false, // CSS has already been minified during the build.

@@ -8,7 +8,6 @@
 
 import type { ApplicationRef, StaticProvider } from '@angular/core';
 import { basename } from 'node:path';
-import { InlineCriticalCssProcessor } from '../index-file/inline-critical-css';
 import { loadEsmModule } from '../load-esm';
 import { MainServerBundleExports } from './main-bundle-exports';
 
@@ -94,6 +93,10 @@ export async function renderPage({
   }
 
   if (inlineCriticalCss) {
+    const { InlineCriticalCssProcessor } = await import(
+      '../../utils/index-file/inline-critical-css'
+    );
+
     const inlineCriticalCssProcessor = new InlineCriticalCssProcessor({
       minify: false, // CSS has already been minified during the build.
       readAsset: async (filePath) => {
