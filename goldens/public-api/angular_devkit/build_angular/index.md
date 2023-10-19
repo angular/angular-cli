@@ -47,7 +47,7 @@ export interface ApplicationBuilderOptions {
     server?: string;
     serviceWorker?: ServiceWorker_2;
     sourceMap?: SourceMapUnion_2;
-    ssr?: ServiceWorker_2;
+    ssr?: SsrUnion;
     statsJson?: boolean;
     stylePreprocessorOptions?: StylePreprocessorOptions_2;
     styles?: StyleElement_2[];
