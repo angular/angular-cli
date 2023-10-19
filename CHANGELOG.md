@@ -1,3 +1,36 @@
+<a name="17.0.0-rc.0"></a>
+
+# 17.0.0-rc.0 (2023-10-19)
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                           |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------- |
+| [6bed28640](https://github.com/angular/angular-cli/commit/6bed2864058a9acf278200d6645f14cfe4864bf0) | fix  | change Twitter logo to X                              |
+| [d60a6e86a](https://github.com/angular/angular-cli/commit/d60a6e86a48f15b3ddf89943dad31ee267f67648) | fix  | noop workspace config migration when already executed |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                                                                     |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------------------------------------------------------------- |
+| [da4e19145](https://github.com/angular/angular-cli/commit/da4e19145b341dccdd5174cc7bc821e5025514b1) | fix  | address a path concatenation on Windows                                                                         |
+| [657f78292](https://github.com/angular/angular-cli/commit/657f78292b4c78db5a43a172087a078820812323) | fix  | avoid dev server update analysis when build fails with vite                                                     |
+| [0c982b993](https://github.com/angular/angular-cli/commit/0c982b993b69f4a4b52002cc65ad7ba3b0b9d591) | fix  | avoid repeat error clear in vite development server                                                             |
+| [508c7606e](https://github.com/angular/angular-cli/commit/508c7606ea2fa8e84d5243992abb59db1b75af49) | fix  | do not print `Angular is running in development mode.` in the server console when running prerender in dev mode |
+| [e817656f6](https://github.com/angular/angular-cli/commit/e817656f601eaaf910271d5bb2c2230ddb8ed864) | fix  | do not print `Angular is running in development mode.` in the server console when running prerender in dev mode |
+| [52f595655](https://github.com/angular/angular-cli/commit/52f595655c69bb6a1398b030cf937b0d92d49864) | fix  | ensure i18n locale data is included in SSR application builds                                                   |
+| [3e5a99c2c](https://github.com/angular/angular-cli/commit/3e5a99c2c438152a0b930864dcad660a6ea1590a) | fix  | ensure recalculation of component diagnostics when template changes                                             |
+| [a3e9efe80](https://github.com/angular/angular-cli/commit/a3e9efe80f6e77c8bf80f6a2d37f4488f780503b) | fix  | fully track Web Worker file changes in watch mode                                                               |
+| [b9505ed09](https://github.com/angular/angular-cli/commit/b9505ed097d60eadae665d4664199e3d4989c864) | fix  | generate a file containing a list of prerendered routes                                                         |
+| [58bd3971f](https://github.com/angular/angular-cli/commit/58bd3971fd2a95a5da1a87deddfe2416f3d636d6) | fix  | process nested tailwind usage in application builder                                                            |
+| [263271fae](https://github.com/angular/angular-cli/commit/263271fae3f664da9d396192152d22a9b6e3ef09) | fix  | resolve and load sourcemaps during prerendering to provide better stacktraces                                   |
+| [b78508fc8](https://github.com/angular/angular-cli/commit/b78508fc80bb9b2a3aec9830ad3ae9903d25927b) | fix  | several fixes to assets and files writes in browser-esbuild builder                                             |
+| [6c3d7d1c1](https://github.com/angular/angular-cli/commit/6c3d7d1c10907d8d57b5f84f298b324d6f972226) | fix  | update `ssr` option definition                                                                                  |
+| [34947fc64](https://github.com/angular/angular-cli/commit/34947fc64953f845d33ffb1c52f236869a040c9d) | fix  | use incremental component style bundling only in watch mode                                                     |
+| [49fe74e24](https://github.com/angular/angular-cli/commit/49fe74e241d75456c65a7cd439b9eb8842e9d6d7) | perf | reduce CLI loading times by removing critters from critical path                                                |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="17.0.0-next.9"></a>
 
 # 17.0.0-next.9 (2023-10-12)
