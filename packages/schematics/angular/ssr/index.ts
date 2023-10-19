@@ -116,7 +116,9 @@ function updateApplicationBuilderWorkspaceConfigRule(
     buildTarget.options = {
       ...buildTarget.options,
       prerender: true,
-      ssr: join(normalize(projectRoot), 'server.ts'),
+      ssr: {
+        entry: join(normalize(projectRoot), 'server.ts'),
+      },
     };
   });
 }

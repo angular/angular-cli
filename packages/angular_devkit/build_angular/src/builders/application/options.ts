@@ -210,9 +210,11 @@ export async function normalizeOptions(
   let ssrOptions;
   if (options.ssr === true) {
     ssrOptions = {};
-  } else if (typeof options.ssr === 'string') {
+  } else if (typeof options.ssr === 'object') {
+    const { entry } = options.ssr;
+
     ssrOptions = {
-      entry: path.join(workspaceRoot, options.ssr),
+      entry: entry && path.join(workspaceRoot, entry),
     };
   }
 

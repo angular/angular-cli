@@ -27,7 +27,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       harness.useTarget('build', {
         ...BASE_OPTIONS,
         server: 'src/main.server.ts',
-        ssr: 'src/server.ts',
+        ssr: { entry: 'src/server.ts' },
       });
 
       const { result } = await harness.executeOnce();
@@ -43,7 +43,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       harness.useTarget('build', {
         ...BASE_OPTIONS,
         server: 'src/main.server.ts',
-        ssr: '/file.mjs',
+        ssr: { entry: '/file.mjs' },
       });
 
       const { result } = await harness.executeOnce();
