@@ -1,3 +1,15 @@
+<a name="16.2.7"></a>
+
+# 16.2.7 (2023-10-19)
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description              |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------ |
+| [f1a0c3361](https://github.com/angular/angular-cli/commit/f1a0c3361a6caa27bdf5cc07315d8bf2b6424b11) | fix  | change Twitter logo to X |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="17.0.0-rc.0"></a>
 
 # 17.0.0-rc.0 (2023-10-19)
