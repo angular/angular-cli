@@ -6,8 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { Rule, chain } from '@angular-devkit/schematics';
-import { removePackageJsonDependency } from '../../utility/dependencies';
+import { Rule } from '@angular-devkit/schematics';
 import { allTargetOptions, updateWorkspace } from '../../utility/workspace';
 import { Builders, ProjectType } from '../../utility/workspace-models';
 
@@ -22,8 +21,10 @@ export default function (): Rule {
       for (const [, target] of project.targets) {
         if (target.builder === Builders.ExtractI18n || target.builder === Builders.DevServer) {
           for (const [, options] of allTargetOptions(target, false)) {
-            options['buildTarget'] = options['browserTarget'];
-            delete options['browserTarget'];
+            if (options['browserTarget'] !== undefined) {
+              options['buildTarget'] = options['browserTarget'];
+              delete options['browserTarget'];
+            }
           }
         }
       }
