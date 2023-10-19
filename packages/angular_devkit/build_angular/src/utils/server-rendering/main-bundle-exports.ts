@@ -11,6 +11,11 @@ import type { renderApplication, renderModule, ɵSERVER_CONTEXT } from '@angular
 import type { extractRoutes } from '../routes-extractor/extractor';
 
 export interface MainServerBundleExports {
+  /** Standalone application bootstrapping function. */
+  default: (() => Promise<ApplicationRef>) | Type<unknown>;
+}
+
+export interface RenderUtilsServerBundleExports {
   /** An internal token that allows providing extra information about the server context. */
   ɵSERVER_CONTEXT: typeof ɵSERVER_CONTEXT;
 
@@ -19,9 +24,6 @@ export interface MainServerBundleExports {
 
   /** Method to render a standalone application. */
   renderApplication: typeof renderApplication;
-
-  /** Standalone application bootstrapping function. */
-  default: (() => Promise<ApplicationRef>) | Type<unknown>;
 
   /** Method to extract routes from the router config. */
   extractRoutes: typeof extractRoutes;

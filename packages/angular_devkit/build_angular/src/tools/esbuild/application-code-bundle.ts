@@ -10,14 +10,14 @@ import type { BuildOptions } from 'esbuild';
 import assert from 'node:assert';
 import { createHash } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
-import { createRequire } from 'node:module';
-import { extname, join, relative } from 'node:path';
+import { extname, join } from 'node:path';
 import type { NormalizedApplicationBuildOptions } from '../../builders/application/options';
 import { allowMangle } from '../../utils/environment-options';
 import { createCompilerPlugin } from './angular/compiler-plugin';
 import { SourceFileCache } from './angular/source-file-cache';
 import { createCompilerPluginOptions } from './compiler-plugin-options';
 import { createAngularLocaleDataPlugin } from './i18n-locale-plugin';
+import { createJavaScriptTransformerPlugin } from './javascript-transfomer-plugin';
 import { createRxjsEsmResolutionPlugin } from './rxjs-esm-resolution-plugin';
 import { createSourcemapIgnorelistPlugin } from './sourcemap-ignorelist-plugin';
 import { getFeatureSupport } from './utils';
@@ -75,8 +75,13 @@ export function createBrowserPolyfillBundleOptions(
   target: string[],
   sourceFileCache?: SourceFileCache,
 ): BuildOptions | undefined {
-  const { workspaceRoot, outputNames, jit } = options;
+  const namespace = 'angular:polyfills';
+  const polyfillBundleOptions = getEsBuildCommonPolyfillsOptions(options, namespace, true);
+  if (!polyfillBundleOptions) {
+    return;
+  }
 
+  const { outputNames } = options;
   const { pluginOptions, styleOptions } = createCompilerPluginOptions(
     options,
     target,
@@ -84,7 +89,7 @@ export function createBrowserPolyfillBundleOptions(
   );
 
   const buildOptions: BuildOptions = {
-    ...getEsBuildCommonOptions(options),
+    ...polyfillBundleOptions,
     platform: 'browser',
     // Note: `es2015` is needed for RxJS v6. If not specified, `module` would
     // match and the ES5 distribution would be bundled and ends up breaking at
@@ -93,121 +98,19 @@ export function createBrowserPolyfillBundleOptions(
     mainFields: ['es2020', 'es2015', 'browser', 'module', 'main'],
     entryNames: outputNames.bundles,
     target,
-    splitting: false,
-    supported: getFeatureSupport(target),
-    plugins: [
-      createSourcemapIgnorelistPlugin(),
-      createCompilerPlugin(
-        // JS/TS options
-        { ...pluginOptions, noopTypeScriptCompilation: true },
-        // Component stylesheet options are unused for polyfills but required by the plugin
-        styleOptions,
-      ),
-    ],
+    entryPoints: {
+      'polyfills': namespace,
+    },
   };
+
   buildOptions.plugins ??= [];
-
-  const polyfills = options.polyfills ? [...options.polyfills] : [];
-
-  // Angular JIT mode requires the runtime compiler
-  if (jit) {
-    polyfills.push('@angular/compiler');
-  }
-
-  // Add Angular's global locale data if i18n options are present.
-  // Locale data should go first so that project provided polyfill code can augment if needed.
-  let needLocaleDataPlugin = false;
-  if (options.i18nOptions.shouldInline) {
-    // When inlining, a placeholder is used to allow the post-processing step to inject the $localize locale identifier
-    polyfills.unshift('angular:locale/placeholder');
-    buildOptions.plugins?.unshift(
-      createVirtualModulePlugin({
-        namespace: 'angular:locale/placeholder',
-        entryPointOnly: false,
-        loadContent: () => ({
-          contents: `(globalThis.$localize ??= {}).locale = "___NG_LOCALE_INSERT___";\n`,
-          loader: 'js',
-          resolveDir: workspaceRoot,
-        }),
-      }),
-    );
-
-    // Add locale data for all active locales
-    // TODO: Inject each individually within the inlining process itself
-    for (const locale of options.i18nOptions.inlineLocales) {
-      polyfills.unshift(`angular:locale/data:${locale}`);
-    }
-    needLocaleDataPlugin = true;
-  } else if (options.i18nOptions.hasDefinedSourceLocale) {
-    // When not inlining and a source local is present, use the source locale data directly
-    polyfills.unshift(`angular:locale/data:${options.i18nOptions.sourceLocale}`);
-    needLocaleDataPlugin = true;
-  }
-  if (needLocaleDataPlugin) {
-    buildOptions.plugins?.push(createAngularLocaleDataPlugin());
-  }
-
-  if (polyfills.length === 0) {
-    return;
-  }
-
-  // Add polyfill entry point if polyfills are present
-  const namespace = 'angular:polyfills';
-  buildOptions.entryPoints = {
-    'polyfills': namespace,
-  };
-
-  buildOptions.plugins?.unshift(
-    createVirtualModulePlugin({
-      namespace,
-      loadContent: async (_, build) => {
-        let hasLocalizePolyfill = false;
-        const polyfillPaths = await Promise.all(
-          polyfills.map(async (path) => {
-            hasLocalizePolyfill ||= path.startsWith('@angular/localize');
-
-            if (path.startsWith('zone.js') || !extname(path)) {
-              return path;
-            }
-
-            const potentialPathRelative = './' + path;
-            const result = await build.resolve(potentialPathRelative, {
-              kind: 'import-statement',
-              resolveDir: workspaceRoot,
-            });
-
-            return result.path ? potentialPathRelative : path;
-          }),
-        );
-
-        if (!options.i18nOptions.shouldInline && !hasLocalizePolyfill) {
-          // Cannot use `build.resolve` here since it does not allow overriding the external options
-          // and the actual presence of the `@angular/localize` package needs to be checked here.
-          const workspaceRequire = createRequire(workspaceRoot + '/');
-          try {
-            workspaceRequire.resolve('@angular/localize');
-            // The resolve call above will throw if not found
-            polyfillPaths.push('@angular/localize/init');
-          } catch {}
-        }
-
-        // Generate module contents with an import statement per defined polyfill
-        let contents = polyfillPaths
-          .map((file) => `import '${file.replace(/\\/g, '/')}';`)
-          .join('\n');
-
-        // If not inlining translations and source locale is defined, inject the locale specifier
-        if (!options.i18nOptions.shouldInline && options.i18nOptions.hasDefinedSourceLocale) {
-          contents += `(globalThis.$localize ??= {}).locale = "${options.i18nOptions.sourceLocale}";\n`;
-        }
-
-        return {
-          contents,
-          loader: 'js',
-          resolveDir: workspaceRoot,
-        };
-      },
-    }),
+  buildOptions.plugins.push(
+    createCompilerPlugin(
+      // JS/TS options
+      { ...pluginOptions, noopTypeScriptCompilation: true },
+      // Component stylesheet options are unused for polyfills but required by the plugin
+      styleOptions,
+    ),
   );
 
   return buildOptions;
@@ -244,23 +147,21 @@ export function createServerCodeBundleOptions(
     sourceFileCache,
   );
 
-  const mainServerNamespace = 'angular:main-server';
-  const ssrEntryNamespace = 'angular:ssr-entry';
-
+  const mainServerNamespace = 'angular:server-render-utils';
   const entryPoints: Record<string, string> = {
-    'main.server': mainServerNamespace,
+    'render-utils.server': mainServerNamespace,
+    'main.server': serverEntryPoint,
   };
 
   const ssrEntryPoint = ssrOptions?.entry;
   if (ssrEntryPoint) {
-    entryPoints['server'] = ssrEntryNamespace;
+    entryPoints['server'] = ssrOptions?.entry;
   }
 
   const buildOptions: BuildOptions = {
     ...getEsBuildCommonOptions(options),
     platform: 'node',
-    // TODO: Invesigate why enabling `splitting` in JIT mode causes an "'@angular/compiler' is not available" error.
-    splitting: !jit,
+    splitting: true,
     outExtension: { '.js': '.mjs' },
     // Note: `es2015` is needed for RxJS v6. If not specified, `module` would
     // match and the ES5 distribution would be bundled and ends up breaking at
@@ -270,12 +171,7 @@ export function createServerCodeBundleOptions(
     entryNames: '[name]',
     target,
     banner: {
-      // Note: Needed as esbuild does not provide require shims / proxy from ESModules.
-      // See: https://github.com/evanw/esbuild/issues/1921.
-      js: [
-        `import { createRequire } from 'node:module';`,
-        `globalThis['require'] ??= createRequire(import.meta.url);`,
-      ].join('\n'),
+      js: `import './polyfills.server.mjs';`,
     },
     entryPoints,
     supported: getFeatureSupport(target),
@@ -297,72 +193,17 @@ export function createServerCodeBundleOptions(
     buildOptions.plugins.push(createRxjsEsmResolutionPlugin());
   }
 
-  const polyfills: string[] = [];
-  if (options.polyfills?.includes('zone.js')) {
-    polyfills.push(`import 'zone.js/node';`);
-  }
-
-  if (jit) {
-    polyfills.push(`import '@angular/compiler';`);
-  }
-
-  polyfills.push(`import '@angular/platform-server/init';`);
-
-  // Add Angular's global locale data if i18n options are present.
-  let needLocaleDataPlugin = false;
-  if (options.i18nOptions.shouldInline) {
-    // Add locale data for all active locales
-    for (const locale of options.i18nOptions.inlineLocales) {
-      polyfills.unshift(`import 'angular:locale/data:${locale}';`);
-    }
-    needLocaleDataPlugin = true;
-  } else if (options.i18nOptions.hasDefinedSourceLocale) {
-    // When not inlining and a source local is present, use the source locale data directly
-    polyfills.unshift(`import 'angular:locale/data:${options.i18nOptions.sourceLocale}';`);
-    needLocaleDataPlugin = true;
-  }
-  if (needLocaleDataPlugin) {
-    buildOptions.plugins.push(createAngularLocaleDataPlugin());
-  }
-
   buildOptions.plugins.push(
     createVirtualModulePlugin({
       namespace: mainServerNamespace,
       loadContent: async () => {
-        const mainServerEntryPoint = relative(workspaceRoot, serverEntryPoint).replace(/\\/g, '/');
-
-        const contents = [
-          ...polyfills,
-          `import moduleOrBootstrapFn from './${mainServerEntryPoint}';`,
-          `export default moduleOrBootstrapFn;`,
-          `export * from './${mainServerEntryPoint}';`,
+        const contents: string[] = [
           `export { ɵConsole } from '@angular/core';`,
           `export { renderApplication, renderModule, ɵSERVER_CONTEXT } from '@angular/platform-server';`,
         ];
 
         if (watch) {
           contents.push(`export { ɵresetCompiledComponents } from '@angular/core';`);
-        }
-
-        if (!options.i18nOptions.shouldInline) {
-          // Cannot use `build.resolve` here since it does not allow overriding the external options
-          // and the actual presence of the `@angular/localize` package needs to be checked here.
-          const workspaceRequire = createRequire(workspaceRoot + '/');
-          try {
-            workspaceRequire.resolve('@angular/localize');
-            // The resolve call above will throw if not found
-            contents.push(`import '@angular/localize/init';`);
-          } catch {}
-        }
-
-        if (options.i18nOptions.shouldInline) {
-          // When inlining, a placeholder is used to allow the post-processing step to inject the $localize locale identifier
-          contents.push('(globalThis.$localize ??= {}).locale = "___NG_LOCALE_INSERT___";');
-        } else if (options.i18nOptions.hasDefinedSourceLocale) {
-          // If not inlining translations and source locale is defined, inject the locale specifier
-          contents.push(
-            `(globalThis.$localize ??= {}).locale = "${options.i18nOptions.sourceLocale}";`,
-          );
         }
 
         if (prerenderOptions?.discoverRoutes) {
@@ -385,30 +226,103 @@ export function createServerCodeBundleOptions(
     }),
   );
 
-  if (ssrEntryPoint) {
-    buildOptions.plugins.push(
-      createVirtualModulePlugin({
-        namespace: ssrEntryNamespace,
-        loadContent: () => {
-          const serverEntryPoint = relative(workspaceRoot, ssrEntryPoint).replace(/\\/g, '/');
+  if (options.plugins) {
+    buildOptions.plugins.push(...options.plugins);
+  }
 
-          return {
-            contents: [
-              ...polyfills,
-              `import './${serverEntryPoint}';`,
-              `export * from './${serverEntryPoint}';`,
-            ].join('\n'),
-            loader: 'js',
-            resolveDir: workspaceRoot,
-          };
-        },
+  return buildOptions;
+}
+
+export function createServerPolyfillBundleOptions(
+  options: NormalizedApplicationBuildOptions,
+  target: string[],
+  sourceFileCache?: SourceFileCache,
+): BuildOptions | undefined {
+  const polyfills: string[] = [];
+  const zoneFlagsNamespace = 'angular:zone-flags/placeholder';
+  const polyfillsFromConfig = new Set(options.polyfills);
+  let hasZoneJs = false;
+
+  if (polyfillsFromConfig.has('zone.js')) {
+    hasZoneJs = true;
+    polyfills.push(zoneFlagsNamespace, 'zone.js/node');
+  }
+
+  if (
+    polyfillsFromConfig.has('@angular/localize') ||
+    polyfillsFromConfig.has('@angular/localize/init')
+  ) {
+    polyfills.push('@angular/localize/init');
+  }
+
+  polyfills.push('@angular/platform-server/init');
+
+  const namespace = 'angular:polyfills-server';
+  const polyfillBundleOptions = getEsBuildCommonPolyfillsOptions(
+    {
+      ...options,
+      polyfills,
+    },
+    namespace,
+    false,
+  );
+
+  if (!polyfillBundleOptions) {
+    return;
+  }
+
+  const { workspaceRoot, jit, sourcemapOptions, advancedOptimizations } = options;
+  const buildOptions: BuildOptions = {
+    ...polyfillBundleOptions,
+    platform: 'node',
+    outExtension: { '.js': '.mjs' },
+    // Note: `es2015` is needed for RxJS v6. If not specified, `module` would
+    // match and the ES5 distribution would be bundled and ends up breaking at
+    // runtime with the RxJS testing library.
+    // More details: https://github.com/angular/angular-cli/issues/25405.
+    mainFields: ['es2020', 'es2015', 'module', 'main'],
+    entryNames: '[name]',
+    banner: {
+      js: [
+        // Note: Needed as esbuild does not provide require shims / proxy from ESModules.
+        // See: https://github.com/evanw/esbuild/issues/1921.
+        `import { createRequire } from 'node:module';`,
+        `globalThis['require'] ??= createRequire(import.meta.url);`,
+      ].join('\n'),
+    },
+    target,
+    entryPoints: {
+      'polyfills.server': namespace,
+    },
+  };
+
+  buildOptions.plugins ??= [];
+
+  // Disable Zone.js uncaught promise rejections to provide cleaner stacktraces.
+  if (hasZoneJs) {
+    buildOptions.plugins.unshift(
+      createVirtualModulePlugin({
+        namespace: zoneFlagsNamespace,
+        entryPointOnly: false,
+        loadContent: () => ({
+          contents: `globalThis.__zone_symbol__DISABLE_WRAPPING_UNCAUGHT_PROMISE_REJECTION = true;`,
+          loader: 'js',
+          resolveDir: workspaceRoot,
+        }),
       }),
     );
   }
 
-  if (options.plugins) {
-    buildOptions.plugins.push(...options.plugins);
-  }
+  buildOptions.plugins.push(
+    createRxjsEsmResolutionPlugin(),
+    createJavaScriptTransformerPlugin({
+      jit,
+      sourcemap: !!sourcemapOptions.scripts,
+      babelFileCache: sourceFileCache?.babelFileCache,
+      advancedOptimizations,
+      maxWorkers: 1,
+    }),
+  );
 
   return buildOptions;
 }
@@ -474,4 +388,121 @@ function getEsBuildCommonOptions(options: NormalizedApplicationBuildOptions): Bu
     footer,
     publicPath: options.publicPath,
   };
+}
+
+function getEsBuildCommonPolyfillsOptions(
+  options: NormalizedApplicationBuildOptions,
+  namespace: string,
+  tryToResolvePolyfillsAsRelative: boolean,
+): BuildOptions | undefined {
+  const { jit, workspaceRoot, i18nOptions } = options;
+  const buildOptions: BuildOptions = {
+    ...getEsBuildCommonOptions(options),
+    splitting: false,
+    plugins: [createSourcemapIgnorelistPlugin()],
+  };
+
+  const polyfills = options.polyfills ? [...options.polyfills] : [];
+
+  // Angular JIT mode requires the runtime compiler
+  if (jit) {
+    polyfills.unshift('@angular/compiler');
+  }
+
+  // Add Angular's global locale data if i18n options are present.
+  // Locale data should go first so that project provided polyfill code can augment if needed.
+  let needLocaleDataPlugin = false;
+  if (i18nOptions.shouldInline) {
+    // When inlining, a placeholder is used to allow the post-processing step to inject the $localize locale identifier
+    polyfills.unshift('angular:locale/placeholder');
+    buildOptions.plugins?.push(
+      createVirtualModulePlugin({
+        namespace: 'angular:locale/placeholder',
+        entryPointOnly: false,
+        loadContent: () => ({
+          contents: `(globalThis.$localize ??= {}).locale = "___NG_LOCALE_INSERT___";\n`,
+          loader: 'js',
+          resolveDir: workspaceRoot,
+        }),
+      }),
+    );
+
+    // Add locale data for all active locales
+    // TODO: Inject each individually within the inlining process itself
+    for (const locale of i18nOptions.inlineLocales) {
+      polyfills.unshift(`angular:locale/data:${locale}`);
+    }
+    needLocaleDataPlugin = true;
+  } else if (i18nOptions.hasDefinedSourceLocale) {
+    // When not inlining and a source local is present, use the source locale data directly
+    polyfills.unshift(`angular:locale/data:${i18nOptions.sourceLocale}`);
+    needLocaleDataPlugin = true;
+  }
+  if (needLocaleDataPlugin) {
+    buildOptions.plugins?.push(createAngularLocaleDataPlugin());
+  }
+
+  if (polyfills.length === 0) {
+    return;
+  }
+
+  buildOptions.plugins?.push(
+    createVirtualModulePlugin({
+      namespace,
+      loadContent: async (_, build) => {
+        let hasLocalizePolyfill = false;
+        let polyfillPaths = polyfills;
+
+        if (tryToResolvePolyfillsAsRelative) {
+          polyfillPaths = await Promise.all(
+            polyfills.map(async (path) => {
+              hasLocalizePolyfill ||= path.startsWith('@angular/localize');
+              if (path.startsWith('zone.js') || !extname(path)) {
+                return path;
+              }
+
+              const potentialPathRelative = './' + path;
+              const result = await build.resolve(potentialPathRelative, {
+                kind: 'import-statement',
+                resolveDir: workspaceRoot,
+              });
+
+              return result.path ? potentialPathRelative : path;
+            }),
+          );
+        } else {
+          hasLocalizePolyfill = polyfills.some((p) => p.startsWith('@angular/localize'));
+        }
+
+        if (!i18nOptions.shouldInline && !hasLocalizePolyfill) {
+          const result = await build.resolve('@angular/localize', {
+            kind: 'import-statement',
+            resolveDir: workspaceRoot,
+          });
+
+          if (result.path) {
+            polyfillPaths.push('@angular/localize/init');
+          }
+        }
+
+        // Generate module contents with an import statement per defined polyfill
+        let contents = polyfillPaths
+          .map((file) => `import '${file.replace(/\\/g, '/')}';`)
+          .join('\n');
+
+        // If not inlining translations and source locale is defined, inject the locale specifier
+        if (!i18nOptions.shouldInline && i18nOptions.hasDefinedSourceLocale) {
+          contents += `(globalThis.$localize ??= {}).locale = "${i18nOptions.sourceLocale}";\n`;
+        }
+
+        return {
+          contents,
+          loader: 'js',
+          resolveDir: workspaceRoot,
+        };
+      },
+    }),
+  );
+
+  return buildOptions;
 }

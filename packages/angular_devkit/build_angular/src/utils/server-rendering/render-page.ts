@@ -9,7 +9,7 @@
 import type { ApplicationRef, StaticProvider } from '@angular/core';
 import { basename } from 'node:path';
 import { loadEsmModule } from '../load-esm';
-import { MainServerBundleExports } from './main-bundle-exports';
+import { MainServerBundleExports, RenderUtilsServerBundleExports } from './main-bundle-exports';
 
 export interface RenderOptions {
   route: string;
@@ -17,7 +17,8 @@ export interface RenderOptions {
   outputFiles: Record<string, string>;
   document: string;
   inlineCriticalCss?: boolean;
-  loadBundle?: (path: string) => Promise<MainServerBundleExports>;
+  loadBundle?: ((path: './main.server.mjs') => Promise<MainServerBundleExports>) &
+    ((path: './render-utils.server.mjs') => Promise<RenderUtilsServerBundleExports>);
 }
 
 export interface RenderResult {
@@ -39,14 +40,9 @@ export async function renderPage({
   outputFiles,
   loadBundle = loadEsmModule,
 }: RenderOptions): Promise<RenderResult> {
-  const {
-    default: bootstrapAppFnOrModule,
-    ɵSERVER_CONTEXT,
-    renderModule,
-    renderApplication,
-    ɵresetCompiledComponents,
-    ɵConsole,
-  } = await loadBundle('./main.server.mjs');
+  const { default: bootstrapAppFnOrModule } = await loadBundle('./main.server.mjs');
+  const { ɵSERVER_CONTEXT, renderModule, renderApplication, ɵresetCompiledComponents, ɵConsole } =
+    await loadBundle('./render-utils.server.mjs');
 
   // Need to clean up GENERATED_COMP_IDS map in `@angular/core`.
   // Otherwise an incorrect component ID generation collision detected warning will be displayed in development.

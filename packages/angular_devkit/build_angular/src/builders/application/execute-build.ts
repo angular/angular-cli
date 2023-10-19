@@ -12,6 +12,7 @@ import {
   createBrowserCodeBundleOptions,
   createBrowserPolyfillBundleOptions,
   createServerCodeBundleOptions,
+  createServerPolyfillBundleOptions,
 } from '../../tools/esbuild/application-code-bundle';
 import { generateBudgetStats } from '../../tools/esbuild/budget-stats';
 import { BuildOutputFileType, BundlerContext } from '../../tools/esbuild/bundler-context';
@@ -82,14 +83,14 @@ export async function executeBuild(
     );
 
     // Browser polyfills code
-    const polyfillBundleOptions = createBrowserPolyfillBundleOptions(
+    const browserPolyfillBundleOptions = createBrowserPolyfillBundleOptions(
       options,
       target,
       codeBundleCache,
     );
-    if (polyfillBundleOptions) {
+    if (browserPolyfillBundleOptions) {
       bundlerContexts.push(
-        new BundlerContext(workspaceRoot, !!options.watch, polyfillBundleOptions),
+        new BundlerContext(workspaceRoot, !!options.watch, browserPolyfillBundleOptions),
       );
     }
 
@@ -122,18 +123,36 @@ export async function executeBuild(
       }
     }
 
-    // Server application code
     // Skip server build when none of the features are enabled.
     if (serverEntryPoint && (prerenderOptions || appShellOptions || ssrOptions)) {
-      const nodeTargets = getSupportedNodeTargets();
+      const nodeTargets = [...target, ...getSupportedNodeTargets()];
+      // Server application code
       bundlerContexts.push(
         new BundlerContext(
           workspaceRoot,
           !!options.watch,
-          createServerCodeBundleOptions(options, [...target, ...nodeTargets], codeBundleCache),
+          createServerCodeBundleOptions(options, nodeTargets, codeBundleCache),
           () => false,
         ),
       );
+
+      // Server polyfills code
+      const serverPolyfillBundleOptions = createServerPolyfillBundleOptions(
+        options,
+        nodeTargets,
+        codeBundleCache,
+      );
+
+      if (serverPolyfillBundleOptions) {
+        bundlerContexts.push(
+          new BundlerContext(
+            workspaceRoot,
+            !!options.watch,
+            serverPolyfillBundleOptions,
+            () => false,
+          ),
+        );
+      }
     }
   }
 

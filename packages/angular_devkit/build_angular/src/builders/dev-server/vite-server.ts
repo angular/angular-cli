@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import remapping, { SourceMapInput } from '@ampproject/remapping';
 import type { BuilderContext } from '@angular-devkit/architect';
 import type { json, logging } from '@angular-devkit/core';
 import type { Plugin } from 'esbuild';
@@ -70,6 +71,10 @@ export async function* serveWithVite(
     // This is so instead of prerendering all the routes for every change, the page is "prerendered" when it is requested.
     browserOptions.ssr = true;
     browserOptions.prerender = false;
+
+    // https://nodejs.org/api/process.html#processsetsourcemapsenabledval
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (process as any).setSourceMapsEnabled(true);
   }
 
   // Set all packages as external to support Vite's prebundle caching
@@ -426,6 +431,31 @@ export async function setupServer(
           };
         },
         configureServer(server) {
+          const originalssrTransform = server.ssrTransform;
+          server.ssrTransform = async (code, map, url, originalCode) => {
+            const result = await originalssrTransform(code, null, url, originalCode);
+            if (!result) {
+              return null;
+            }
+
+            let transformedCode = result.code;
+            if (result.map && map) {
+              transformedCode +=
+                `\n//# sourceMappingURL=` +
+                `data:application/json;base64,${Buffer.from(
+                  JSON.stringify(
+                    remapping([result.map as SourceMapInput, map as SourceMapInput], () => null),
+                  ),
+                ).toString('base64')}`;
+            }
+
+            return {
+              ...result,
+              map: null,
+              code: transformedCode,
+            };
+          };
+
           // Assets and resources get handled first
           server.middlewares.use(function angularAssetsMiddleware(req, res, next) {
             if (req.url === undefined || res.writableEnded) {
@@ -501,9 +531,8 @@ export async function setupServer(
                   route: pathnameWithoutServePath(url, serverOptions),
                   serverContext: 'ssr',
                   loadBundle: (path: string) =>
-                    server.ssrLoadModule(path.slice(1)) as ReturnType<
-                      NonNullable<RenderOptions['loadBundle']>
-                    >,
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    server.ssrLoadModule(path.slice(1)) as any,
                   // Files here are only needed for critical CSS inlining.
                   outputFiles: {},
                   // TODO: add support for critical css inlining.
