@@ -2,7 +2,7 @@ The command can be used to build a project of type "application" or "library".
 When used to build a library, a different builder is invoked, and only the `ts-config`, `configuration`, and `watch` options are applied.
 All other options apply only to building applications.
 
-The application builder uses the [webpack](https://webpack.js.org/) build tool, with default configuration options specified in the workspace configuration file (`angular.json`) or with a named alternative configuration.
+The application builder uses the [esbuild](https://esbuild.github.io/) build tool, with default configuration options specified in the workspace configuration file (`angular.json`) or with a named alternative configuration.
 A "development" configuration is created by default when you use the CLI to create the project, and you can use that configuration by specifying the `--configuration development`.
 
 The configuration options generally correspond to the command options.
