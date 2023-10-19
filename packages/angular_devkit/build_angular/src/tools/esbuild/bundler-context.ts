@@ -17,7 +17,7 @@ import {
   context,
 } from 'esbuild';
 import { basename, dirname, extname, join, relative } from 'node:path';
-import { createOutputFileFromData, createOutputFileFromText } from './utils';
+import { convertOutputFile } from './utils';
 
 export type BundleContextResult =
   | { errors: Message[]; warnings: Message[] }
@@ -231,9 +231,9 @@ export class BundlerContext {
       }
     }
 
-    const outputFiles = result.outputFiles.map(({ contents, path }) => {
+    const outputFiles = result.outputFiles.map((file) => {
       let fileType: BuildOutputFileType;
-      if (dirname(path) === 'media') {
+      if (dirname(file.path) === 'media') {
         fileType = BuildOutputFileType.Media;
       } else {
         fileType =
@@ -242,7 +242,7 @@ export class BundlerContext {
             : BuildOutputFileType.Browser;
       }
 
-      return createOutputFileFromData(path, contents, fileType);
+      return convertOutputFile(file, fileType);
     });
 
     // Return the successful build results

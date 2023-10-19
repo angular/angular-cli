@@ -34,14 +34,9 @@ import type { DevServerBuilderOutput } from './webpack-server';
 interface OutputFileRecord {
   contents: Uint8Array;
   size: number;
-  hash?: Buffer;
+  hash?: string;
   updated: boolean;
   servable: boolean;
-}
-
-function hashContent(contents: BinaryLike): Buffer {
-  // TODO: Consider xxhash
-  return createHash('sha256').update(contents).digest();
 }
 
 export async function* serveWithVite(
@@ -301,27 +296,22 @@ function analyzeResultFiles(
       continue;
     }
 
-    let fileHash: Buffer | undefined;
     const existingRecord = generatedFiles.get(filePath);
-    if (existingRecord && existingRecord.size === file.contents.byteLength) {
-      // Only hash existing file when needed
-      if (existingRecord.hash === undefined) {
-        existingRecord.hash = hashContent(existingRecord.contents);
-      }
-
-      // Compare against latest result output
-      fileHash = hashContent(file.contents);
-      if (fileHash.equals(existingRecord.hash)) {
-        // Same file
-        existingRecord.updated = false;
-        continue;
-      }
+    if (
+      existingRecord &&
+      existingRecord.size === file.contents.byteLength &&
+      existingRecord.hash === file.hash
+    ) {
+      // Same file
+      existingRecord.updated = false;
+      continue;
     }
 
+    // New or updated file
     generatedFiles.set(filePath, {
       contents: file.contents,
       size: file.contents.byteLength,
-      hash: fileHash,
+      hash: file.hash,
       updated: true,
       servable:
         file.type === BuildOutputFileType.Browser || file.type === BuildOutputFileType.Media,

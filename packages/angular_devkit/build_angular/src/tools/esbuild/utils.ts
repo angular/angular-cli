@@ -281,6 +281,30 @@ export function createOutputFileFromData(
   };
 }
 
+export function convertOutputFile(file: OutputFile, type: BuildOutputFileType): BuildOutputFile {
+  const { path, contents, hash } = file;
+
+  return {
+    contents,
+    hash,
+    path,
+    type,
+    get text() {
+      return Buffer.from(
+        this.contents.buffer,
+        this.contents.byteOffset,
+        this.contents.byteLength,
+      ).toString('utf-8');
+    },
+    get fullOutputPath(): string {
+      return getFullOutputPath(this);
+    },
+    clone(): BuildOutputFile {
+      return convertOutputFile(this, this.type);
+    },
+  };
+}
+
 export function getFullOutputPath(file: BuildOutputFile): string {
   switch (file.type) {
     case BuildOutputFileType.Browser:
