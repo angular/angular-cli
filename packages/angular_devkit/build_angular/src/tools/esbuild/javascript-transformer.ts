@@ -29,7 +29,7 @@ export class JavaScriptTransformer {
   #workerPool: Piscina;
   #commonOptions: Required<JavaScriptTransformerOptions>;
 
-  constructor(options: JavaScriptTransformerOptions, maxThreads?: number) {
+  constructor(options: JavaScriptTransformerOptions, maxThreads: number) {
     this.#workerPool = new Piscina({
       filename: require.resolve('./javascript-transformer-worker'),
       maxThreads,
