@@ -109,4 +109,27 @@ describe(`Migration to update 'angular.json'.`, () => {
     expect(browserTarget).toBe('app:build');
     expect(buildTarget).toBeUndefined();
   });
+
+  it(`should not remove 'buildTarget' when migration is ran multiple times`, async () => {
+    const runMigrationAndExpects = async (testTree: UnitTestTree) => {
+      const newTree = await schematicRunner.runSchematic(schematicName, {}, testTree);
+      const {
+        projects: { app },
+      } = JSON.parse(newTree.readContent('/angular.json'));
+
+      const { browserTarget, buildTarget } = app.architect['serve'].options;
+      expect(browserTarget).toBeUndefined();
+      expect(buildTarget).toBe('app:build:development');
+
+      const { browserTarget: browserTargetProd, buildTarget: buildTargetProd } =
+        app.architect['serve'].configurations['production'];
+      expect(browserTargetProd).toBeUndefined();
+      expect(buildTargetProd).toBe('app:build:production');
+
+      return newTree;
+    };
+
+    const newTree = await runMigrationAndExpects(tree);
+    await runMigrationAndExpects(newTree);
+  });
 });
