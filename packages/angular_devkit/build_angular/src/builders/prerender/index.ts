@@ -244,6 +244,8 @@ async function _renderUniversal(
       }
     }
   } finally {
+    // Workaround piscina bug where a worker thread will be recreated after destroy to meet the minimum.
+    worker.options.minThreads = 0;
     void worker.destroy();
   }
 
