@@ -32,6 +32,7 @@ export class JavaScriptTransformer {
   constructor(options: JavaScriptTransformerOptions, maxThreads: number) {
     this.#workerPool = new Piscina({
       filename: require.resolve('./javascript-transformer-worker'),
+      minThreads: 1,
       maxThreads,
     });
 
@@ -102,6 +103,9 @@ export class JavaScriptTransformer {
    * @returns A void promise that resolves when closing is complete.
    */
   close(): Promise<void> {
+    // Workaround piscina bug where a worker thread will be recreated after destroy to meet the minimum.
+    this.#workerPool.options.minThreads = 0;
+
     return this.#workerPool.destroy();
   }
 }
