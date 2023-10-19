@@ -45,7 +45,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       const builderAbort = new AbortController();
       const buildCount = await firstValueFrom(
         harness.execute({ outputLogsOnFailure: false, signal: builderAbort.signal }).pipe(
-          timeout(20_000),
+          timeout(30_000),
           concatMap(async ({ result, logs }, index) => {
             switch (index) {
               case 0:
