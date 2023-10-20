@@ -133,7 +133,7 @@ In order to debug some Angular CLI behaviour using Visual Studio Code, you can r
 
 Then you can add breakpoints in `dist/@angular` files.
 
-For more informations about Node.js debugging in VS Code, see the related [VS Code Documentation](https://code.visualstudio.com/docs/nodejs/nodejs-debugging).
+For more information about Node.js debugging in VS Code, see the related [VS Code Documentation](https://code.visualstudio.com/docs/nodejs/nodejs-debugging).
 
 ## CPU Profiling
 
