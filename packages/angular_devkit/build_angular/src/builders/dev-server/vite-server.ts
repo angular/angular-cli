@@ -39,8 +39,6 @@ interface OutputFileRecord {
   servable: boolean;
 }
 
-const SSG_MARKER_REGEXP = /ng-server-context=["']\w*\|?ssg\|?\w*["']/;
-
 function hashContent(contents: BinaryLike): Buffer {
   // TODO: Consider xxhash
   return createHash('sha256').update(contents).digest();
@@ -488,16 +486,6 @@ export async function setupServer(
                 next();
 
                 return;
-              }
-
-              const potentialPrerendered = outputFiles.get(posix.join(url, 'index.html'))?.contents;
-              if (potentialPrerendered) {
-                const content = Buffer.from(potentialPrerendered).toString('utf-8');
-                if (SSG_MARKER_REGEXP.test(content)) {
-                  transformIndexHtmlAndAddHeaders(url, potentialPrerendered, res, next);
-
-                  return;
-                }
               }
 
               const rawHtml = outputFiles.get('/index.server.html')?.contents;
