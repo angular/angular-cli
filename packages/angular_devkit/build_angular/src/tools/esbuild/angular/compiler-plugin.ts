@@ -98,7 +98,6 @@ export function createCompilerPlugin(
       const stylesheetBundler = new ComponentStylesheetBundler(
         styleOptions,
         pluginOptions.incremental,
-        pluginOptions.loadResultCache,
       );
       let sharedTSCompilationState: SharedTSCompilationState | undefined;
 
@@ -131,6 +130,7 @@ export function createCompilerPlugin(
           // TODO: Differentiate between changed input files and stale output files
           modifiedFiles = referencedFileTracker.update(pluginOptions.sourceFileCache.modifiedFiles);
           pluginOptions.sourceFileCache.invalidate(modifiedFiles);
+          stylesheetBundler.invalidate(modifiedFiles);
         }
 
         if (

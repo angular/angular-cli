@@ -17,6 +17,7 @@ import {
   context,
 } from 'esbuild';
 import { basename, dirname, extname, join, relative } from 'node:path';
+import { LoadResultCache, MemoryLoadResultCache } from './load-result-cache';
 import { convertOutputFile } from './utils';
 
 export type BundleContextResult =
@@ -49,6 +50,10 @@ export interface BuildOutputFile extends OutputFile {
   clone: () => BuildOutputFile;
 }
 
+export type BundlerOptionsFactory<T extends BuildOptions = BuildOptions> = (
+  loadCache: LoadResultCache | undefined,
+) => T;
+
 /**
  * Determines if an unknown value is an esbuild BuildFailure error object thrown by esbuild.
  * @param value A potential esbuild BuildFailure error object.
@@ -60,20 +65,26 @@ function isEsBuildFailure(value: unknown): value is BuildFailure {
 
 export class BundlerContext {
   #esbuildContext?: BuildContext<{ metafile: true; write: false }>;
-  #esbuildOptions: BuildOptions & { metafile: true; write: false };
+  #esbuildOptions?: BuildOptions & { metafile: true; write: false };
+  #optionsFactory: BundlerOptionsFactory<BuildOptions & { metafile: true; write: false }>;
 
+  #loadCache?: MemoryLoadResultCache;
   readonly watchFiles = new Set<string>();
 
   constructor(
     private workspaceRoot: string,
     private incremental: boolean,
-    options: BuildOptions,
+    options: BuildOptions | BundlerOptionsFactory,
     private initialFilter?: (initial: Readonly<InitialFileRecord>) => boolean,
   ) {
-    this.#esbuildOptions = {
-      ...options,
-      metafile: true,
-      write: false,
+    this.#optionsFactory = (...args) => {
+      const baseOptions = typeof options === 'function' ? options(...args) : options;
+
+      return {
+        ...baseOptions,
+        metafile: true,
+        write: false,
+      };
     };
   }
 
@@ -131,6 +142,14 @@ export class BundlerContext {
    * warnings and errors for the attempted build.
    */
   async bundle(): Promise<BundleContextResult> {
+    // Create esbuild options if not present
+    if (this.#esbuildOptions === undefined) {
+      if (this.incremental) {
+        this.#loadCache = new MemoryLoadResultCache();
+      }
+      this.#esbuildOptions = this.#optionsFactory(this.#loadCache);
+    }
+
     let result;
     try {
       if (this.#esbuildContext) {
@@ -162,7 +181,15 @@ export class BundlerContext {
       // Add input files except virtual angular files which do not exist on disk
       Object.keys(result.metafile.inputs)
         .filter((input) => !input.startsWith('angular:'))
+        // input file paths are always relative to the workspace root
         .forEach((input) => this.watchFiles.add(join(this.workspaceRoot, input)));
+      // Also add any files from the load result cache
+      if (this.#loadCache) {
+        this.#loadCache.watchFiles
+          .filter((file) => !file.startsWith('angular:'))
+          // watch files are fully resolved paths
+          .forEach((file) => this.watchFiles.add(file));
+      }
     }
 
     // Return if the build encountered any errors
@@ -254,6 +281,24 @@ export class BundlerContext {
     };
   }
 
+  invalidate(files: Iterable<string>): boolean {
+    if (!this.incremental) {
+      return false;
+    }
+
+    let invalid = false;
+    for (const file of files) {
+      if (this.#loadCache?.invalidate(file)) {
+        invalid = true;
+        continue;
+      }
+
+      invalid ||= this.watchFiles.has(file);
+    }
+
+    return invalid;
+  }
+
   /**
    * Disposes incremental build resources present in the context.
    *
@@ -261,7 +306,9 @@ export class BundlerContext {
    */
   async dispose(): Promise<void> {
     try {
-      return this.#esbuildContext?.dispose();
+      this.#esbuildOptions = undefined;
+      this.#loadCache = undefined;
+      await this.#esbuildContext?.dispose();
     } finally {
       this.#esbuildContext = undefined;
     }
