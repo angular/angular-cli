@@ -126,15 +126,8 @@ export function createServerCodeBundleOptions(
   target: string[],
   sourceFileCache: SourceFileCache,
 ): BuildOptions {
-  const {
-    jit,
-    serverEntryPoint,
-    workspaceRoot,
-    ssrOptions,
-    watch,
-    externalPackages,
-    prerenderOptions,
-  } = options;
+  const { serverEntryPoint, workspaceRoot, ssrOptions, watch, externalPackages, prerenderOptions } =
+    options;
 
   assert(
     serverEntryPoint,
@@ -155,7 +148,7 @@ export function createServerCodeBundleOptions(
 
   const ssrEntryPoint = ssrOptions?.entry;
   if (ssrEntryPoint) {
-    entryPoints['server'] = ssrOptions?.entry;
+    entryPoints['server'] = ssrEntryPoint;
   }
 
   const buildOptions: BuildOptions = {
