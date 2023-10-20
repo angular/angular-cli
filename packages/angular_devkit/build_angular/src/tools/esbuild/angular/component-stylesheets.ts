@@ -10,7 +10,6 @@ import { OutputFile } from 'esbuild';
 import { createHash } from 'node:crypto';
 import path from 'node:path';
 import { BuildOutputFileType, BundleContextResult, BundlerContext } from '../bundler-context';
-import { LoadResultCache } from '../load-result-cache';
 import {
   BundleStylesheetOptions,
   createStylesheetBundleOptions,
@@ -46,15 +45,16 @@ export class ComponentStylesheetBundler {
   constructor(
     private readonly options: BundleStylesheetOptions,
     private readonly incremental: boolean,
-    private readonly cache?: LoadResultCache,
   ) {}
 
   async bundleFile(entry: string) {
     const bundlerContext = this.#fileContexts.getOrCreate(entry, () => {
-      const buildOptions = createStylesheetBundleOptions(this.options, this.cache);
-      buildOptions.entryPoints = [entry];
+      return new BundlerContext(this.options.workspaceRoot, this.incremental, (loadCache) => {
+        const buildOptions = createStylesheetBundleOptions(this.options, loadCache);
+        buildOptions.entryPoints = [entry];
 
-      return new BundlerContext(this.options.workspaceRoot, this.incremental, buildOptions);
+        return buildOptions;
+      });
     });
 
     return extractResult(await bundlerContext.bundle(), bundlerContext.watchFiles);
@@ -69,38 +69,54 @@ export class ComponentStylesheetBundler {
 
     const bundlerContext = this.#inlineContexts.getOrCreate(entry, () => {
       const namespace = 'angular:styles/component';
-      const buildOptions = createStylesheetBundleOptions(this.options, this.cache, {
-        [entry]: data,
-      });
-      buildOptions.entryPoints = [`${namespace};${entry}`];
-      buildOptions.plugins.push({
-        name: 'angular-component-styles',
-        setup(build) {
-          build.onResolve({ filter: /^angular:styles\/component;/ }, (args) => {
-            if (args.kind !== 'entry-point') {
-              return null;
-            }
 
-            return {
-              path: entry,
-              namespace,
-            };
-          });
-          build.onLoad({ filter: /^css;/, namespace }, async () => {
-            return {
-              contents: data,
-              loader: 'css',
-              resolveDir: path.dirname(filename),
-            };
-          });
-        },
-      });
+      return new BundlerContext(this.options.workspaceRoot, this.incremental, (loadCache) => {
+        const buildOptions = createStylesheetBundleOptions(this.options, loadCache, {
+          [entry]: data,
+        });
+        buildOptions.entryPoints = [`${namespace};${entry}`];
+        buildOptions.plugins.push({
+          name: 'angular-component-styles',
+          setup(build) {
+            build.onResolve({ filter: /^angular:styles\/component;/ }, (args) => {
+              if (args.kind !== 'entry-point') {
+                return null;
+              }
 
-      return new BundlerContext(this.options.workspaceRoot, this.incremental, buildOptions);
+              return {
+                path: entry,
+                namespace,
+              };
+            });
+            build.onLoad({ filter: /^css;/, namespace }, async () => {
+              return {
+                contents: data,
+                loader: 'css',
+                resolveDir: path.dirname(filename),
+              };
+            });
+          },
+        });
+
+        return buildOptions;
+      });
     });
 
     // Extract the result of the bundling from the output files
     return extractResult(await bundlerContext.bundle(), bundlerContext.watchFiles);
+  }
+
+  invalidate(files: Iterable<string>) {
+    if (!this.incremental) {
+      return;
+    }
+
+    for (const bundler of this.#fileContexts.values()) {
+      bundler.invalidate(files);
+    }
+    for (const bundler of this.#inlineContexts.values()) {
+      bundler.invalidate(files);
+    }
   }
 
   async dispose(): Promise<void> {

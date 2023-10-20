@@ -12,6 +12,7 @@ import { normalize } from 'node:path';
 export interface LoadResultCache {
   get(path: string): OnLoadResult | undefined;
   put(path: string, result: OnLoadResult): Promise<void>;
+  readonly watchFiles: ReadonlyArray<string>;
 }
 
 export function createCachedLoad(
@@ -75,5 +76,9 @@ export class MemoryLoadResultCache implements LoadResultCache {
     found ||= this.#loadResults.delete(path);
 
     return found;
+  }
+
+  get watchFiles(): string[] {
+    return [...this.#loadResults.keys(), ...this.#fileDependencies.keys()];
   }
 }
