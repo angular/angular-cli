@@ -7,6 +7,7 @@
  */
 
 import type { OnLoadArgs, Plugin, PluginBuild } from 'esbuild';
+import { LoadResultCache, createCachedLoad } from './load-result-cache';
 
 /**
  * Options for the createVirtualModulePlugin
@@ -26,6 +27,8 @@ export interface VirtualModulePluginOptions {
   ) => ReturnType<Parameters<PluginBuild['onLoad']>[1]>;
   /** Restrict to only entry points. Defaults to `true`. */
   entryPointOnly?: boolean;
+  /** Load results cache. */
+  cache?: LoadResultCache;
 }
 
 /**
@@ -39,6 +42,7 @@ export function createVirtualModulePlugin(options: VirtualModulePluginOptions): 
     external,
     transformPath: pathTransformer,
     loadContent,
+    cache,
     entryPointOnly = true,
   } = options;
 
@@ -65,7 +69,10 @@ export function createVirtualModulePlugin(options: VirtualModulePluginOptions): 
         });
       }
 
-      build.onLoad({ filter: /./, namespace }, (args) => loadContent(args, build));
+      build.onLoad(
+        { filter: /./, namespace },
+        createCachedLoad(cache, (args) => loadContent(args, build)),
+      );
     },
   };
 }
