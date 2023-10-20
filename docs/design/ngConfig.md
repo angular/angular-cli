@@ -20,7 +20,7 @@ Instead of polluting the package file, a `.angular-cli.json` file will be create
 
 ## Fallback
 
-There should be two `.angular-cli.json` files; one for the project and a general one. The general one should contain information that can be useful when scaffolding new apps, or informations about the user.
+There should be two `.angular-cli.json` files; one for the project and a general one. The general one should contain information that can be useful when scaffolding new apps, or information about the user.
 
 The project `.angular-cli.json` goes into the project root. The global configuration should live at `$HOME/.angular-cli.json`.
 

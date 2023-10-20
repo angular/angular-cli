@@ -2399,7 +2399,7 @@ Alan Agius, Charles Lyding and Doug Parker
 | [7fa3e6587](https://github.com/angular/angular-cli/commit/7fa3e6587955d0638929758d3c257392c242c796) | feat     | support TypeScript 4.6.2                                                           |
 | [9e69331fa](https://github.com/angular/angular-cli/commit/9e69331fa61265c77d6281232bb64a2c63509290) | feat     | use PNPM as package manager when `pnpm-lock.yaml` exists                           |
 | [6f6b453fb](https://github.com/angular/angular-cli/commit/6f6b453fbf90adad16eba7ea8929a11235c1061b) | fix      | `ng doc` doesn't open browser in Windows                                           |
-| [8e66c9188](https://github.com/angular/angular-cli/commit/8e66c9188be827380e5acda93c7e21fae718b9ce) | fix      | `ng g` show descrption from `collection.json` if not present in `schema.json`      |
+| [8e66c9188](https://github.com/angular/angular-cli/commit/8e66c9188be827380e5acda93c7e21fae718b9ce) | fix      | `ng g` show description from `collection.json` if not present in `schema.json`     |
 | [9edeb8614](https://github.com/angular/angular-cli/commit/9edeb86146131878c5e8b21b6adaa24a26f12453) | fix      | add long description to `ng update`                                                |
 | [160cb0718](https://github.com/angular/angular-cli/commit/160cb071870602d9e7fece2ce381facb71e7d762) | fix      | correctly handle `--search` option in `ng doc`                                     |
 | [d46cf6744](https://github.com/angular/angular-cli/commit/d46cf6744eadb70008df1ef25e24fb1db58bb997) | fix      | display option descriptions during auto completion                                 |
@@ -3011,9 +3011,9 @@ Doug Parker and iRealNirmal
 
 ### @ngtools/webpack
 
-| Commit                                                                                              | Type | Description                                            |
-| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------ |
-| [b03b9eefe](https://github.com/angular/angular-cli/commit/b03b9eefeac77b93931803de208118e3a6c5a928) | perf | reduce redudant module rebuilds when cache is restored |
+| Commit                                                                                              | Type | Description                                             |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------- |
+| [b03b9eefe](https://github.com/angular/angular-cli/commit/b03b9eefeac77b93931803de208118e3a6c5a928) | perf | reduce redundant module rebuilds when cache is restored |
 
 ## Special Thanks
 
@@ -3035,9 +3035,9 @@ Alan Agius, Cédric Exbrayat, Derek Cormier and Doug Parker
 
 ### @ngtools/webpack
 
-| Commit                                                                                              | Type | Description                                            |
-| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------ |
-| [f31d7f79d](https://github.com/angular/angular-cli/commit/f31d7f79dfa8f997fecdcfec1ebc6cfbe657f3fb) | perf | reduce redudant module rebuilds when cache is restored |
+| Commit                                                                                              | Type | Description                                             |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------- |
+| [f31d7f79d](https://github.com/angular/angular-cli/commit/f31d7f79dfa8f997fecdcfec1ebc6cfbe657f3fb) | perf | reduce redundant module rebuilds when cache is restored |
 
 ## Special Thanks
 
@@ -3372,7 +3372,7 @@ npm install classlist.js web-animations-js --save
   });
   ```
 
-- The automatic inclusion of Angular-required ES2015 polyfills to support ES5 browsers has been removed. Previously when targetting ES5 within the application's TypeScript configuration or listing an ES5 requiring browser in the browserslist file, Angular-required polyfills were included in the built application. However, with Angular no longer supporting IE11, there are now no browsers officially supported by Angular that would require these polyfills. As a result, the automatic inclusion of these ES2015 polyfills has been removed. Any polyfills manually added to an application's code are not affected by this change.
+- The automatic inclusion of Angular-required ES2015 polyfills to support ES5 browsers has been removed. Previously when targeting ES5 within the application's TypeScript configuration or listing an ES5 requiring browser in the browserslist file, Angular-required polyfills were included in the built application. However, with Angular no longer supporting IE11, there are now no browsers officially supported by Angular that would require these polyfills. As a result, the automatic inclusion of these ES2015 polyfills has been removed. Any polyfills manually added to an application's code are not affected by this change.
 
 - With this change a number of deprecated dev-server builder options which proxied to the browser builder have been removed. These options should be configured in the browser builder instead.
 
@@ -3773,7 +3773,7 @@ Alan Agius and Charles Lyding
 | [fefd6d042](https://github.com/angular/angular-cli/commit/fefd6d04213e61d3f48c0484d8c6a8dcff1ecd34) | perf(@angular-devkit/build-angular): use `esbuild` as a CSS optimizer for component styles                                     |
 | [18cfa0431](https://github.com/angular/angular-cli/commit/18cfa04317230f934ccba798c080543bb389725f) | feat(@angular-devkit/build-angular): add support to inline Adobe Fonts                                                         |
 | [9a751f0f8](https://github.com/angular/angular-cli/commit/9a751f0f81919d67f5eeeaecbe807d5c216f6a7a) | fix(@angular-devkit/build-angular): handle `ENOENT` and `ENOTDIR` errors when deleting outputs                                 |
-| [41e645792](https://github.com/angular/angular-cli/commit/41e64579213b9d4a7c976ea45daa6b32d980df10) | fix(@angular-devkit/build-angular): downlevel `for await...of` when targetting ES2018+                                         |
+| [41e645792](https://github.com/angular/angular-cli/commit/41e64579213b9d4a7c976ea45daa6b32d980df10) | fix(@angular-devkit/build-angular): downlevel `for await...of` when targeting ES2018+                                          |
 | [070a13364](https://github.com/angular/angular-cli/commit/070a1336478d721bbbb474622f50fab455cda26c) | fix(@angular-devkit/build-angular): configure webpack target in common configuration                                           |
 | [da32daa75](https://github.com/angular/angular-cli/commit/da32daa75d08d4be177af5fa16088398d7fb427b) | perf(@angular-devkit/build-angular): use combination of `esbuild` and `terser` as a JavaScript optimizer                       |
 | [6a2b11906](https://github.com/angular/angular-cli/commit/6a2b11906e4173562a82b3654ff662dd05513049) | perf(@angular-devkit/build-angular): cache JavaScriptOptimizerPlugin results                                                   |
@@ -4579,7 +4579,7 @@ Alan Agius, Charles Lyding, Joey Perrott, Terence D. Honles
 </a>
   </td>
 
-  <td>downlevel `for await...of` when targetting ES2018+</td>
+  <td>downlevel `for await...of` when targeting ES2018+</td>
 
   <td>
 <a href="https://github.com/angular/angular-cli/issues/21196">
@@ -4770,7 +4770,7 @@ Alan Agius, Charles Lyding, Doug Parker
 </a>
   </td>
 
-  <td>downlevel `for await...of` when targetting ES2018+</td>
+  <td>downlevel `for await...of` when targeting ES2018+</td>
 
   <td>
 <a href="https://github.com/angular/angular-cli/issues/21196">
@@ -5105,7 +5105,7 @@ Alan Agius, Charles Lyding, Doug Parker, Vaibhav Singh, Joey Perrott, twerske, D
 </a>
   </td>
 
-  <td>suppport using TypeScript 4.3</td>
+  <td>support using TypeScript 4.3</td>
 
   <td>
   </td>
@@ -5758,7 +5758,7 @@ Alan Agius, Joey Perrott
 </a>
   </td>
 
-  <td>suppport using TypeScript 4.3</td>
+  <td>support using TypeScript 4.3</td>
 
   <td>
   </td>
@@ -9173,7 +9173,7 @@ Alan Agius, Charles Lyding, Joey Perrott, Keen Yee Liau, Luca Vazzano, Pankaj Pa
 </a>
   </td>
 
-  <td>Support XDG Base Directory Specfication</td>
+  <td>Support XDG Base Directory Specification</td>
 
   <td>
   </td>
@@ -10703,7 +10703,7 @@ Alan Agius, Charles Lyding, Keen Yee Liau, Sam Bulatov, Doug Parker
 </a>
   </td>
 
-  <td>Support XDG Base Directory Specfication</td>
+  <td>Support XDG Base Directory Specification</td>
 
   <td>
   </td>

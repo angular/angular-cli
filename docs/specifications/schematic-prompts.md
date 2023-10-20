@@ -58,7 +58,7 @@ Prompts have several different types which provide the ability to display an inp
 
 When using the _shorthand_ form, the most appropriate type will automatically be selected based on the property's schema. In the example, the `name` prompt will use an `input` type because it is a `string` property. The `useColor` prompt will use a `confirmation` type because it is a boolean property with `yes` corresponding to `true` and `no` corresponding to `false`.
 
-It is also important that the response from the user conforms to the contraints of the property. By specifying constraints using the JSON schema, the prompt runtime will automatically validate the response provided by the user. If the value is not acceptable, the user will be asked to enter a new value. This ensures that any values passed to the schematic will meet the expectations of the schematic's implementation and removes the need to add additional checks within the schematic's code.
+It is also important that the response from the user conforms to the constraints of the property. By specifying constraints using the JSON schema, the prompt runtime will automatically validate the response provided by the user. If the value is not acceptable, the user will be asked to enter a new value. This ensures that any values passed to the schematic will meet the expectations of the schematic's implementation and removes the need to add additional checks within the schematic's code.
 
 ## Configuration Reference
 
