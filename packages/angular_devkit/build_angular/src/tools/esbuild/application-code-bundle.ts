@@ -76,7 +76,12 @@ export function createBrowserPolyfillBundleOptions(
   sourceFileCache?: SourceFileCache,
 ): BuildOptions | undefined {
   const namespace = 'angular:polyfills';
-  const polyfillBundleOptions = getEsBuildCommonPolyfillsOptions(options, namespace, true);
+  const polyfillBundleOptions = getEsBuildCommonPolyfillsOptions(
+    options,
+    namespace,
+    true,
+    sourceFileCache,
+  );
   if (!polyfillBundleOptions) {
     return;
   }
@@ -155,7 +160,7 @@ export function createServerCodeBundleOptions(
 
   const ssrEntryPoint = ssrOptions?.entry;
   if (ssrEntryPoint) {
-    entryPoints['server'] = ssrOptions?.entry;
+    entryPoints['server'] = ssrEntryPoint;
   }
 
   const buildOptions: BuildOptions = {
@@ -196,6 +201,7 @@ export function createServerCodeBundleOptions(
   buildOptions.plugins.push(
     createVirtualModulePlugin({
       namespace: mainServerNamespace,
+      cache: sourceFileCache?.loadResultCache,
       loadContent: async () => {
         const contents: string[] = [
           `export { ɵConsole } from '@angular/core';`,
@@ -265,6 +271,7 @@ export function createServerPolyfillBundleOptions(
     },
     namespace,
     false,
+    sourceFileCache,
   );
 
   if (!polyfillBundleOptions) {
@@ -394,6 +401,7 @@ function getEsBuildCommonPolyfillsOptions(
   options: NormalizedApplicationBuildOptions,
   namespace: string,
   tryToResolvePolyfillsAsRelative: boolean,
+  sourceFileCache: SourceFileCache | undefined,
 ): BuildOptions | undefined {
   const { jit, workspaceRoot, i18nOptions } = options;
   const buildOptions: BuildOptions = {
@@ -449,6 +457,7 @@ function getEsBuildCommonPolyfillsOptions(
   buildOptions.plugins?.push(
     createVirtualModulePlugin({
       namespace,
+      cache: sourceFileCache?.loadResultCache,
       loadContent: async (_, build) => {
         let hasLocalizePolyfill = false;
         let polyfillPaths = polyfills;
