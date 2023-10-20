@@ -122,10 +122,10 @@
   dependencies:
     tslib "^2.3.0"
 
-"@angular/bazel@https://github.com/angular/bazel-builds.git#d0ba749872059a3f8f8150ee65b10159a2ed43ee":
-  version "17.1.0-next.0+sha-43115da"
-  uid d0ba749872059a3f8f8150ee65b10159a2ed43ee
-  resolved "https://github.com/angular/bazel-builds.git#d0ba749872059a3f8f8150ee65b10159a2ed43ee"
+"@angular/bazel@https://github.com/angular/bazel-builds.git#7ae8f36ecf9997cb345b2284dd88d36ff49a5797":
+  version "17.1.0-next.0+sha-3278966"
+  uid "7ae8f36ecf9997cb345b2284dd88d36ff49a5797"
+  resolved "https://github.com/angular/bazel-builds.git#7ae8f36ecf9997cb345b2284dd88d36ff49a5797"
   dependencies:
     "@microsoft/api-extractor" "^7.24.2"
     magic-string "^0.30.0"
@@ -139,17 +139,17 @@
     "@angular/core" "^13.0.0 || ^14.0.0-0"
     reflect-metadata "^0.1.13"
 
-"@angular/build-tooling@https://github.com/angular/dev-infra-private-build-tooling-builds.git#4466ed3b65809001fdd3ca98535f30d5a2cd40c2":
-  version "0.0.0-d1d6f4e1718cbf9937ac48247e5b89d88dfa3c71"
-  uid "4466ed3b65809001fdd3ca98535f30d5a2cd40c2"
-  resolved "https://github.com/angular/dev-infra-private-build-tooling-builds.git#4466ed3b65809001fdd3ca98535f30d5a2cd40c2"
+"@angular/build-tooling@https://github.com/angular/dev-infra-private-build-tooling-builds.git#1aff213dee78452a7730d9e5920ecba33a1f0466":
+  version "0.0.0-3c092a0d6eb426763cbf702bac586a448f985abc"
+  uid "1aff213dee78452a7730d9e5920ecba33a1f0466"
+  resolved "https://github.com/angular/dev-infra-private-build-tooling-builds.git#1aff213dee78452a7730d9e5920ecba33a1f0466"
   dependencies:
     "@angular-devkit/build-angular" "17.0.0-next.9"
     "@angular/benchpress" "0.3.0"
     "@babel/core" "^7.16.0"
     "@babel/helper-annotate-as-pure" "^7.18.6"
     "@babel/plugin-proposal-async-generator-functions" "^7.20.1"
-    "@bazel/buildifier" "6.1.2"
+    "@bazel/buildifier" "6.3.3"
     "@bazel/concatjs" "5.8.1"
     "@bazel/esbuild" "5.8.1"
     "@bazel/protractor" "5.8.1"
@@ -164,7 +164,7 @@
     "@types/send" "^0.17.1"
     "@types/tmp" "^0.2.1"
     "@types/uuid" "^9.0.0"
-    "@types/ws" "8.5.6"
+    "@types/ws" "8.5.8"
     "@types/yargs" "^17.0.0"
     browser-sync "^2.27.7"
     clang-format "1.8.0"
@@ -173,7 +173,7 @@
     preact-render-to-string "^6.2.1"
     prettier "3.0.3"
     protractor "^7.0.0"
-    selenium-webdriver "4.13.0"
+    selenium-webdriver "4.14.0"
     send "^0.18.0"
     source-map "^0.7.4"
     tmp "^0.2.1"
@@ -304,10 +304,10 @@
     "@material/typography" "15.0.0-canary.a246a4439.0"
     tslib "^2.3.0"
 
-"@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#1f35c99c7d4599c1711590689ce98d1d6b543b4c":
-  version "0.0.0-d1d6f4e1718cbf9937ac48247e5b89d88dfa3c71"
-  uid "1f35c99c7d4599c1711590689ce98d1d6b543b4c"
-  resolved "https://github.com/angular/dev-infra-private-ng-dev-builds.git#1f35c99c7d4599c1711590689ce98d1d6b543b4c"
+"@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#c806f8ffcfd63ad73615c9b56c221631e6d0dc3d":
+  version "0.0.0-3c092a0d6eb426763cbf702bac586a448f985abc"
+  uid c806f8ffcfd63ad73615c9b56c221631e6d0dc3d
+  resolved "https://github.com/angular/dev-infra-private-ng-dev-builds.git#c806f8ffcfd63ad73615c9b56c221631e6d0dc3d"
   dependencies:
     "@yarnpkg/lockfile" "^1.1.0"
     typescript "~4.9.0"
@@ -1361,11 +1361,6 @@
   version "1.18.0"
   resolved "https://registry.yarnpkg.com/@bazel/bazelisk/-/bazelisk-1.18.0.tgz#90ea8fc432ac6a7c83020e47a4bf59cfa2c81020"
   integrity sha512-WqlTatsGKypeHYidqe3/6W8dkqkgJ13sMCEers/vH7dNwxojHrMQcuaH26sOnQG1eVn8UfHo78fy34yGAF3zsw==
-
-"@bazel/buildifier@6.1.2":
-  version "6.1.2"
-  resolved "https://registry.yarnpkg.com/@bazel/buildifier/-/buildifier-6.1.2.tgz#c151df52d2537937911f8f7802f96611d63a90b7"
-  integrity sha512-psKePmRkP6acwyePOhXP67R/wdwN7BGJxHqp1j5myaO24feMsaXyyiO+oW49x8YAwOpKVSCujVzkTwX2auAc0A==
 
 "@bazel/buildifier@6.3.3":
   version "6.3.3"
@@ -3726,10 +3721,17 @@
     anymatch "^3.0.0"
     source-map "^0.6.0"
 
-"@types/ws@*", "@types/ws@8.5.6", "@types/ws@^8.5.5":
+"@types/ws@*", "@types/ws@^8.5.5":
   version "8.5.6"
   resolved "https://registry.yarnpkg.com/@types/ws/-/ws-8.5.6.tgz#e9ad51f0ab79b9110c50916c9fcbddc36d373065"
   integrity sha512-8B5EO9jLVCy+B58PLHvLDuOD8DRVMgQzq8d55SjLCOn9kqGyqOvy27exVaTio1q1nX5zLu8/6N0n2ThSxOM6tg==
+  dependencies:
+    "@types/node" "*"
+
+"@types/ws@8.5.8":
+  version "8.5.8"
+  resolved "https://registry.yarnpkg.com/@types/ws/-/ws-8.5.8.tgz#13efec7bd439d0bdf2af93030804a94f163b1430"
+  integrity sha512-flUksGIQCnJd6sZ1l5dqCEG/ksaoAg/eUwiLAGTJQcfgvZJKF++Ta4bJA6A5aPSJmsr+xlseHn4KLgVlNnvPTg==
   dependencies:
     "@types/node" "*"
 
@@ -10943,14 +10945,14 @@ selenium-webdriver@3.6.0, selenium-webdriver@^3.0.1:
     tmp "0.0.30"
     xml2js "^0.4.17"
 
-selenium-webdriver@4.13.0:
-  version "4.13.0"
-  resolved "https://registry.yarnpkg.com/selenium-webdriver/-/selenium-webdriver-4.13.0.tgz#1e06bab7adedb308e3635131bc75bd32038261d5"
-  integrity sha512-8JS0h5E0Sq7gNfbGg8LVaQ+Eqek97tvOONn3Jmy+NiWfb12WYpftz4VTC4D2JT4wakdG6VUzGKpA8cFGg0IjkA==
+selenium-webdriver@4.14.0:
+  version "4.14.0"
+  resolved "https://registry.yarnpkg.com/selenium-webdriver/-/selenium-webdriver-4.14.0.tgz#d39917cd7c1bb30f753c1f668158f37d1905fafc"
+  integrity sha512-637rs8anqMKHbWxcBZpyG3Gcs+rBUtAUiqk0O/knUqH4Paj3MFUZrz88/pVGOLNryEVy2z92fZomT8p1ENl1gA==
   dependencies:
     jszip "^3.10.1"
     tmp "^0.2.1"
-    ws ">=8.13.0"
+    ws ">=8.14.2"
 
 selfsigned@^2.1.1:
   version "2.1.1"
@@ -12663,7 +12665,7 @@ ws@8.9.0:
   resolved "https://registry.yarnpkg.com/ws/-/ws-8.9.0.tgz#2a994bb67144be1b53fe2d23c53c028adeb7f45e"
   integrity sha512-Ja7nszREasGaYUYCI2k4lCKIRTt+y7XuqVoHR44YpI49TtryyqbqvDMn5eqfW7e6HzTukDRIsXqzVHScqRcafg==
 
-ws@>=8.13.0, ws@^8.13.0:
+ws@>=8.14.2, ws@^8.13.0:
   version "8.14.2"
   resolved "https://registry.yarnpkg.com/ws/-/ws-8.14.2.tgz#6c249a806eb2db7a20d26d51e7709eab7b2e6c7f"
   integrity sha512-wEBG1ftX4jcglPxgFCMJmZ2PLtSbJ2Peg6TmpJFTbe9GZYOQCDPdMYu/Tm0/bGZkw8paZnJY45J4K2PZrLYq8g==
