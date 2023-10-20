@@ -107,23 +107,21 @@ export default class UpdateCommandModule extends CommandModule<UpdateCommandArgs
       })
       .option('name', {
         description:
-          'The name of the migration to run. ' +
-          `Only available with a single package being updated, and only with 'migrate-only' option.`,
+          'The name of the migration to run. Only available when a single package is updated.',
         type: 'string',
-        implies: ['migrate-only'],
         conflicts: ['to', 'from'],
       })
       .option('from', {
         description:
           'Version from which to migrate from. ' +
-          `Only available with a single package being updated, and only with 'migrate-only'.`,
+          `Only available when a single package is updated, and only with 'migrate-only'.`,
         type: 'string',
         implies: ['migrate-only'],
         conflicts: ['name'],
       })
       .option('to', {
         describe:
-          'Version up to which to apply migrations. Only available with a single package being updated, ' +
+          'Version up to which to apply migrations. Only available when a single package is updated, ' +
           `and only with 'migrate-only' option. Requires 'from' to be specified. Default to the installed version detected.`,
         type: 'string',
         implies: ['from', 'migrate-only'],
@@ -145,6 +143,14 @@ export default class UpdateCommandModule extends CommandModule<UpdateCommandArgs
         type: 'boolean',
         alias: ['C'],
         default: false,
+      })
+      .middleware((argv) => {
+        if (argv.name) {
+          argv['migrate-only'] = true;
+        }
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        return argv as any;
       })
       .check(({ packages, 'allow-dirty': allowDirty, 'migrate-only': migrateOnly }) => {
         const { logger } = this.context;
@@ -1082,9 +1088,7 @@ export default class UpdateCommandModule extends CommandModule<UpdateCommandArgs
       for (const migration of optionalMigrations) {
         const { title } = getMigrationTitleAndDescription(migration);
         logger.info(colors.cyan(colors.symbols.pointer) + ' ' + colors.bold(title));
-        logger.info(
-          colors.gray(`  ng update ${packageName} --migration-only --name ${migration.name}`),
-        );
+        logger.info(colors.gray(`  ng update ${packageName} --name ${migration.name}`));
         logger.info(''); // Extra trailing newline.
       }
 
