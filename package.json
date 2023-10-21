@@ -192,7 +192,7 @@
     "rollup": "~4.1.0",
     "rollup-plugin-sourcemaps": "^0.6.0",
     "rxjs": "7.8.1",
-    "sass": "1.67.0",
+    "sass": "1.69.4",
     "sass-loader": "13.3.2",
     "sauce-connect-proxy": "https://saucelabs.com/downloads/sc-4.9.1-linux.tar.gz",
     "semver": "7.5.4",
