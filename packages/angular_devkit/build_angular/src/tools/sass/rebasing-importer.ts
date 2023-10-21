@@ -11,7 +11,7 @@ import MagicString from 'magic-string';
 import { readFileSync, readdirSync } from 'node:fs';
 import { basename, dirname, extname, join, relative } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import type { Importer, ImporterResult, Syntax } from 'sass';
+import type { CanonicalizeContext, Importer, ImporterResult, Syntax } from 'sass';
 import { findImports, findUrls } from './lexer';
 
 /**
@@ -350,13 +350,13 @@ export class ModuleUrlRebasingImporter extends RelativeUrlRebasingImporter {
     rebaseSourceMaps: Map<string, RawSourceMap> | undefined,
     private finder: (
       specifier: string,
-      options: { fromImport: boolean; resolveDir?: string },
+      options: CanonicalizeContext & { resolveDir?: string },
     ) => URL | null,
   ) {
     super(entryDirectory, directoryCache, rebaseSourceMaps);
   }
 
-  override canonicalize(url: string, options: { fromImport: boolean }): URL | null {
+  override canonicalize(url: string, options: CanonicalizeContext): URL | null {
     if (url.startsWith('file://')) {
       return super.canonicalize(url, options);
     }
