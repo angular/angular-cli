@@ -86,12 +86,7 @@ export function createBrowserPolyfillBundleOptions(
     return;
   }
 
-  const { outputNames } = options;
-  const { pluginOptions, styleOptions } = createCompilerPluginOptions(
-    options,
-    target,
-    sourceFileCache,
-  );
+  const { outputNames, polyfills } = options;
 
   const buildOptions: BuildOptions = {
     ...polyfillBundleOptions,
@@ -108,15 +103,24 @@ export function createBrowserPolyfillBundleOptions(
     },
   };
 
-  buildOptions.plugins ??= [];
-  buildOptions.plugins.push(
-    createCompilerPlugin(
-      // JS/TS options
-      { ...pluginOptions, noopTypeScriptCompilation: true },
-      // Component stylesheet options are unused for polyfills but required by the plugin
-      styleOptions,
-    ),
-  );
+  // Only add the Angular TypeScript compiler if TypeScript files are provided in the polyfills
+  const hasTypeScriptEntries = polyfills?.some((entry) => /\.[cm]?tsx?$/.test(entry));
+  if (hasTypeScriptEntries) {
+    buildOptions.plugins ??= [];
+    const { pluginOptions, styleOptions } = createCompilerPluginOptions(
+      options,
+      target,
+      sourceFileCache,
+    );
+    buildOptions.plugins.push(
+      createCompilerPlugin(
+        // JS/TS options
+        { ...pluginOptions, noopTypeScriptCompilation: true },
+        // Component stylesheet options are unused for polyfills but required by the plugin
+        styleOptions,
+      ),
+    );
+  }
 
   return buildOptions;
 }
