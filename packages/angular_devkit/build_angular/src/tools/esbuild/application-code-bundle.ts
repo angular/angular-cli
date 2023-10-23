@@ -17,7 +17,6 @@ import { createCompilerPlugin } from './angular/compiler-plugin';
 import { SourceFileCache } from './angular/source-file-cache';
 import { createCompilerPluginOptions } from './compiler-plugin-options';
 import { createAngularLocaleDataPlugin } from './i18n-locale-plugin';
-import { createJavaScriptTransformerPlugin } from './javascript-transfomer-plugin';
 import { createRxjsEsmResolutionPlugin } from './rxjs-esm-resolution-plugin';
 import { createSourcemapIgnorelistPlugin } from './sourcemap-ignorelist-plugin';
 import { getFeatureSupport } from './utils';
@@ -282,7 +281,7 @@ export function createServerPolyfillBundleOptions(
     return;
   }
 
-  const { workspaceRoot, jit, sourcemapOptions, advancedOptimizations } = options;
+  const { workspaceRoot } = options;
   const buildOptions: BuildOptions = {
     ...polyfillBundleOptions,
     platform: 'node',
@@ -324,16 +323,7 @@ export function createServerPolyfillBundleOptions(
     );
   }
 
-  buildOptions.plugins.push(
-    createRxjsEsmResolutionPlugin(),
-    createJavaScriptTransformerPlugin({
-      jit,
-      sourcemap: !!sourcemapOptions.scripts,
-      babelFileCache: sourceFileCache?.babelFileCache,
-      advancedOptimizations,
-      maxWorkers: 1,
-    }),
-  );
+  buildOptions.plugins.push(createRxjsEsmResolutionPlugin());
 
   return buildOptions;
 }
