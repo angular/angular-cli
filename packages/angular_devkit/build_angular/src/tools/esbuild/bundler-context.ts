@@ -29,6 +29,7 @@ export type BundleContextResult =
       metafile: Metafile;
       outputFiles: BuildOutputFile[];
       initialFiles: Map<string, InitialFileRecord>;
+      externalImports: Set<string>;
     };
 
 export interface InitialFileRecord {
@@ -105,6 +106,7 @@ export class BundlerContext {
     const warnings: Message[] = [];
     const metafile: Metafile = { inputs: {}, outputs: {} };
     const initialFiles = new Map<string, InitialFileRecord>();
+    const externalImports = new Set<string>();
     const outputFiles = [];
     for (const result of individualResults) {
       warnings.push(...result.warnings);
@@ -122,6 +124,7 @@ export class BundlerContext {
 
       result.initialFiles.forEach((value, key) => initialFiles.set(key, value));
       outputFiles.push(...result.outputFiles);
+      result.externalImports.forEach((value) => externalImports.add(value));
     }
 
     if (errors !== undefined) {
@@ -134,6 +137,7 @@ export class BundlerContext {
       metafile,
       initialFiles,
       outputFiles,
+      externalImports,
     };
   }
 
@@ -284,6 +288,20 @@ export class BundlerContext {
       }
     }
 
+    // Collect all external package names
+    const externalImports = new Set<string>();
+    for (const { imports } of Object.values(result.metafile.outputs)) {
+      for (const importData of imports) {
+        if (
+          !importData.external ||
+          (importData.kind !== 'import-statement' && importData.kind !== 'dynamic-import')
+        ) {
+          continue;
+        }
+        externalImports.add(importData.path);
+      }
+    }
+
     const outputFiles = result.outputFiles.map((file) => {
       let fileType: BuildOutputFileType;
       if (dirname(file.path) === 'media') {
@@ -303,6 +321,7 @@ export class BundlerContext {
       ...result,
       outputFiles,
       initialFiles,
+      externalImports,
       errors: undefined,
     };
   }
