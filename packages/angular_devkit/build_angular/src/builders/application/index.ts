@@ -49,7 +49,19 @@ export async function* buildApplicationInternal(
   const normalizedOptions = await normalizeOptions(context, projectName, options, plugins);
 
   yield* runEsBuildBuildAction(
-    (rebuildState) => executeBuild(normalizedOptions, context, rebuildState),
+    async (rebuildState) => {
+      const startTime = process.hrtime.bigint();
+
+      const result = await executeBuild(normalizedOptions, context, rebuildState);
+
+      const buildTime = Number(process.hrtime.bigint() - startTime) / 10 ** 9;
+      const status = result.errors.length > 0 ? 'failed' : 'complete';
+      context.logger.info(
+        `Application bundle generation ${status}. [${buildTime.toFixed(3)} seconds]`,
+      );
+
+      return result;
+    },
     {
       watch: normalizedOptions.watch,
       poll: normalizedOptions.poll,
