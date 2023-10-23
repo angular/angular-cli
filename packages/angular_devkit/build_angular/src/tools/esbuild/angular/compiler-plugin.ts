@@ -257,6 +257,15 @@ export function createCompilerPlugin(
             });
           }
 
+          if (compilerOptions.compilationMode === 'partial') {
+            setupWarnings?.push({
+              text: 'Angular partial compilation mode is not supported when building applications.',
+              location: null,
+              notes: [{ text: 'Full compilation mode will be used instead.' }],
+            });
+            compilerOptions.compilationMode = 'full';
+          }
+
           // Enable incremental compilation by default if caching is enabled
           if (pluginOptions.sourceFileCache?.persistentCachePath) {
             compilerOptions.incremental ??= true;
