@@ -6,10 +6,11 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { dirname, join } from 'node:path';
+import { join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { MessageChannel, Worker } from 'node:worker_threads';
 import {
+  CanonicalizeContext,
   CompileResult,
   Exception,
   FileImporter,
@@ -31,24 +32,6 @@ const MAX_RENDER_WORKERS = maxWorkers;
  */
 type RenderCallback = (error?: Exception, result?: CompileResult) => void;
 
-type FileImporterOptions = Parameters<FileImporter['findFileUrl']>[1];
-
-export interface FileImporterWithRequestContextOptions extends FileImporterOptions {
-  /**
-   * This is a custom option and is required as SASS does not provide context from which the file is being resolved.
-   * This breaks Yarn PNP as transitive deps cannot be resolved from the workspace root.
-   *
-   * Workaround until https://github.com/sass/sass/issues/3247 is addressed.
-   */
-  previousResolvedModules?: Set<string>;
-
-  /**
-   * The base directory to use when resolving the request.
-   * This value is only set if using the rebasing importers.
-   */
-  resolveDir?: string;
-}
-
 /**
  * An object containing the contextual information for a specific render request.
  */
@@ -58,7 +41,6 @@ interface RenderRequest {
   callback: RenderCallback;
   logger?: Logger;
   importers?: Importers[];
-  previousResolvedModules?: Set<string>;
 }
 
 /**
@@ -244,7 +226,7 @@ export class SassWorkerImplementation {
 
     mainImporterPort.on(
       'message',
-      ({ id, url, options }: { id: number; url: string; options: FileImporterOptions }) => {
+      ({ id, url, options }: { id: number; url: string; options: CanonicalizeContext }) => {
         const request = this.requests.get(id);
         if (!request?.importers) {
           mainImporterPort.postMessage(null);
@@ -256,14 +238,12 @@ export class SassWorkerImplementation {
 
         this.processImporters(request.importers, url, {
           ...options,
-          previousResolvedModules: request.previousResolvedModules,
+          // URL is not serializable so in the worker we convert to string and here back to URL.
+          containingUrl: options.containingUrl
+            ? pathToFileURL(options.containingUrl as unknown as string)
+            : null,
         })
           .then((result) => {
-            if (result) {
-              request.previousResolvedModules ??= new Set();
-              request.previousResolvedModules.add(dirname(result));
-            }
-
             mainImporterPort.postMessage(result);
           })
           .catch((error) => {
@@ -284,7 +264,7 @@ export class SassWorkerImplementation {
   private async processImporters(
     importers: Iterable<Importers>,
     url: string,
-    options: FileImporterWithRequestContextOptions,
+    options: CanonicalizeContext,
   ): Promise<string | null> {
     for (const importer of importers) {
       if (this.isImporter(importer)) {

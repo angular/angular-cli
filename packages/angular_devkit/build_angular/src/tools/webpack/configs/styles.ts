@@ -8,16 +8,13 @@
 
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import * as path from 'node:path';
-import { pathToFileURL } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import type { FileImporter } from 'sass';
 import type { Configuration, LoaderContext, RuleSetUseItem } from 'webpack';
 import { WebpackConfigOptions } from '../../../utils/build-options';
 import { useLegacySass } from '../../../utils/environment-options';
 import { findTailwindConfigurationFile } from '../../../utils/tailwind';
-import {
-  FileImporterWithRequestContextOptions,
-  SassWorkerImplementation,
-} from '../../sass/sass-service';
+import { SassWorkerImplementation } from '../../sass/sass-service';
 import { SassLegacyWorkerImplementation } from '../../sass/sass-service-legacy';
 import {
   AnyComponentStyleBudgetChecker,
@@ -405,28 +402,20 @@ function getSassResolutionImporter(
   });
 
   return {
-    findFileUrl: async (
-      url,
-      { fromImport, previousResolvedModules }: FileImporterWithRequestContextOptions,
-    ): Promise<URL | null> => {
+    findFileUrl: async (url, { fromImport, containingUrl }): Promise<URL | null> => {
       if (url.charAt(0) === '.') {
         // Let Sass handle relative imports.
         return null;
       }
 
+      let resolveDir = root;
+      if (containingUrl) {
+        resolveDir = path.dirname(fileURLToPath(containingUrl));
+      }
+
       const resolve = fromImport ? resolveImport : resolveModule;
       // Try to resolve from root of workspace
-      let result = await tryResolve(resolve, root, url);
-
-      // Try to resolve from previously resolved modules.
-      if (!result && previousResolvedModules) {
-        for (const path of previousResolvedModules) {
-          result = await tryResolve(resolve, path, url);
-          if (result) {
-            break;
-          }
-        }
-      }
+      const result = await tryResolve(resolve, resolveDir, url);
 
       return result ? pathToFileURL(result) : null;
     },
