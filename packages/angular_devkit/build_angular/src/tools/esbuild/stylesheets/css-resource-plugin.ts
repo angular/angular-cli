@@ -8,7 +8,7 @@
 
 import type { Plugin, PluginBuild } from 'esbuild';
 import { readFile } from 'node:fs/promises';
-import { join, relative } from 'node:path';
+import { extname, join, relative } from 'node:path';
 import { LoadResultCache, createCachedLoad } from '../load-result-cache';
 
 /**
@@ -56,13 +56,33 @@ export function createCssResourcePlugin(cache?: LoadResultCache): Plugin {
           resolveDir,
         });
 
-        if (result.errors.length && args.path[0] === '~') {
-          result.errors[0].notes = [
-            {
+        if (result.errors.length) {
+          const error = result.errors[0];
+          if (args.path[0] === '~') {
+            error.notes = [
+              {
+                location: null,
+                text: 'You can remove the tilde and use a relative path to reference it, which should remove this error.',
+              },
+            ];
+          } else if (args.path[0] === '^') {
+            error.notes = [
+              {
+                location: null,
+                text:
+                  'You can remove the caret and add the path to the `externalDependencies` build option,' +
+                  ' which should remove this error.',
+              },
+            ];
+          }
+
+          const extension = importer && extname(importer);
+          if (extension !== '.css') {
+            error.notes.push({
               location: null,
-              text: 'You can remove the tilde and use a relative path to reference it, which should remove this error.',
-            },
-          ];
+              text: 'Preprocessor stylesheets may not show the exact file location of the error.',
+            });
+          }
         }
 
         // Return results that are not files since these are most likely specific to another plugin

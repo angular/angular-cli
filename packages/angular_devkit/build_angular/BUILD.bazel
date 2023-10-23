@@ -310,7 +310,7 @@ ts_library(
 
 LARGE_SPECS = {
     "application": {
-        "shards": 16,
+        "shards": 12,
         "size": "large",
         "flaky": True,
         "extra_deps": [
