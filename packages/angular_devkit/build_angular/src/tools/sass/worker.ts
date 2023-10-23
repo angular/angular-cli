@@ -93,7 +93,14 @@ parentPort.on('message', (message: RenderRequestMessage) => {
       const proxyImporter: FileImporter<'sync'> = {
         findFileUrl: (url, options) => {
           Atomics.store(importerSignal, 0, 0);
-          workerImporterPort.postMessage({ id, url, options });
+          workerImporterPort.postMessage({
+            id,
+            url,
+            options: {
+              ...options,
+              containingUrl: options.containingUrl ? fileURLToPath(options.containingUrl) : null,
+            },
+          });
           Atomics.wait(importerSignal, 0, 0);
 
           const result = receiveMessageOnPort(workerImporterPort)?.message as string | null;

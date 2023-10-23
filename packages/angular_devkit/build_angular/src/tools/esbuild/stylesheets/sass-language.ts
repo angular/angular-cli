@@ -9,11 +9,8 @@
 import type { OnLoadResult, PartialMessage, ResolveResult } from 'esbuild';
 import { dirname, join, relative } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import type { CompileResult, Exception, Syntax } from 'sass';
-import type {
-  FileImporterWithRequestContextOptions,
-  SassWorkerImplementation,
-} from '../../sass/sass-service';
+import type { CanonicalizeContext, CompileResult, Exception, Syntax } from 'sass';
+import type { SassWorkerImplementation } from '../../sass/sass-service';
 import { StylesheetLanguage, StylesheetPluginOptions } from './stylesheet-plugin-factory';
 
 let sassWorkerPool: SassWorkerImplementation | undefined;
@@ -39,30 +36,16 @@ export const SassStylesheetLanguage = Object.freeze<StylesheetLanguage>({
   fileFilter: /\.s[ac]ss$/,
   process(data, file, format, options, build) {
     const syntax = format === 'sass' ? 'indented' : 'scss';
-    const resolveUrl = async (url: string, options: FileImporterWithRequestContextOptions) => {
-      let result = await build.resolve(url, {
+    const resolveUrl = async (url: string, options: CanonicalizeContext) => {
+      let resolveDir = build.initialOptions.absWorkingDir;
+      if (options.containingUrl) {
+        resolveDir = dirname(fileURLToPath(options.containingUrl));
+      }
+
+      const result = await build.resolve(url, {
         kind: 'import-rule',
-        // Use the provided resolve directory from the custom Sass service if available
-        resolveDir: options.resolveDir ?? build.initialOptions.absWorkingDir,
+        resolveDir,
       });
-
-      // If a resolve directory is provided, no additional speculative resolutions are required
-      if (options.resolveDir) {
-        return result;
-      }
-
-      // Workaround to support Yarn PnP and pnpm without access to the importer file from Sass
-      if (!result.path && options.previousResolvedModules?.size) {
-        for (const previous of options.previousResolvedModules) {
-          result = await build.resolve(url, {
-            kind: 'import-rule',
-            resolveDir: previous,
-          });
-          if (result.path) {
-            break;
-          }
-        }
-      }
 
       return result;
     };
@@ -103,10 +86,7 @@ async function compileString(
   filePath: string,
   syntax: Syntax,
   options: StylesheetPluginOptions,
-  resolveUrl: (
-    url: string,
-    options: FileImporterWithRequestContextOptions,
-  ) => Promise<ResolveResult>,
+  resolveUrl: (url: string, options: CanonicalizeContext) => Promise<ResolveResult>,
 ): Promise<OnLoadResult> {
   // Lazily load Sass when a Sass file is found
   if (sassWorkerPool === undefined) {
@@ -139,7 +119,7 @@ async function compileString(
       quietDeps: true,
       importers: [
         {
-          findFileUrl: (url, options: FileImporterWithRequestContextOptions) =>
+          findFileUrl: (url, options) =>
             resolutionCache.getOrCreate(url, async () => {
               const result = await resolveUrl(url, options);
               if (result.path) {
