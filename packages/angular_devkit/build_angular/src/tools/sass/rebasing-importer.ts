@@ -55,8 +55,8 @@ abstract class UrlRebasingImporter implements Importer<'sync'> {
     // Rebase any URLs that are found
     let updatedContents;
     for (const { start, end, value } of findUrls(contents)) {
-      // Skip if value is empty or a Sass variable
-      if (value.length === 0 || value.startsWith('$')) {
+      // Skip if value is empty, a Sass variable, or Webpack-specific prefix
+      if (value.length === 0 || value[0] === '$' || value[0] === '~' || value[0] === '^') {
         continue;
       }
 
