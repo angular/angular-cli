@@ -115,6 +115,10 @@ export async function* serveWithVite(
   let hadError = false;
   const generatedFiles = new Map<string, OutputFileRecord>();
   const assetFiles = new Map<string, string>();
+  const externalMetadata: { implicit: string[]; explicit: string[] } = {
+    implicit: [],
+    explicit: [],
+  };
   const build =
     builderName === '@angular-devkit/build-angular:application'
       ? buildApplicationInternal
@@ -166,6 +170,15 @@ export async function* serveWithVite(
       }
     }
 
+    // To avoid disconnecting the array objects from the option, these arrays need to be mutated
+    // instead of replaced.
+    if (result.externalMetadata.explicit) {
+      externalMetadata.explicit.push(...result.externalMetadata.explicit);
+    }
+    if (result.externalMetadata.implicit) {
+      externalMetadata.implicit.push(...result.externalMetadata.implicit);
+    }
+
     if (server) {
       handleUpdate(generatedFiles, server, serverOptions, context.logger);
     } else {
@@ -185,7 +198,7 @@ export async function* serveWithVite(
         generatedFiles,
         assetFiles,
         browserOptions.preserveSymlinks,
-        browserOptions.externalDependencies,
+        externalMetadata,
         !!browserOptions.ssr,
         prebundleTransformer,
         target,
@@ -336,7 +349,7 @@ export async function setupServer(
   outputFiles: Map<string, OutputFileRecord>,
   assets: Map<string, string>,
   preserveSymlinks: boolean | undefined,
-  prebundleExclude: string[] | undefined,
+  externalMetadata: { implicit: string[]; explicit: string[] },
   ssr: boolean,
   prebundleTransformer: JavaScriptTransformer,
   target: string[],
@@ -381,7 +394,7 @@ export async function setupServer(
     },
     ssr: {
       // Exclude any provided dependencies (currently build defined externals)
-      external: prebundleExclude,
+      external: externalMetadata.implicit,
     },
     plugins: [
       createAngularLocaleDataPlugin(),
@@ -598,8 +611,10 @@ export async function setupServer(
     optimizeDeps: {
       // Only enable with caching since it causes prebundle dependencies to be cached
       disabled: !serverOptions.cacheOptions.enabled,
-      // Exclude any provided dependencies (currently build defined externals)
-      exclude: prebundleExclude,
+      // Exclude any explicitly defined dependencies (currently build defined externals)
+      exclude: externalMetadata.explicit,
+      // Include all implict dependencies from the external packages internal option
+      include: externalMetadata.implicit,
       // Skip automatic file-based entry point discovery
       entries: [],
       // Add an esbuild plugin to run the Angular linker on dependencies
