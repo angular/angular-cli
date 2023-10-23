@@ -160,6 +160,25 @@ if (moduleFilename === __filename || moduleFilename.includes('iisnode')) {
     expect(dependencies['@angular/ssr']).toBeDefined();
   });
 
+  it(`should not add '@angular/ssr' when there is no dependency on '@nguniversal'`, async () => {
+    tree.overwrite(
+      '/package.json',
+      JSON.stringify(
+        {
+          dependencies: {
+            '@angular/common': '0.0.0',
+          },
+        },
+        undefined,
+        2,
+      ),
+    );
+
+    const newTree = await schematicRunner.runSchematic(schematicName, {}, tree);
+    const { dependencies } = JSON.parse(newTree.readContent('/package.json'));
+    expect(dependencies['@angular/ssr']).toBeUndefined();
+  });
+
   it(`should replace imports from '@nguniversal/common' to '@angular/ssr'`, async () => {
     tree.create(
       'file.ts',
