@@ -41,8 +41,6 @@ export async function executeBuild(
   context: BuilderContext,
   rebuildState?: RebuildState,
 ): Promise<ExecutionResult> {
-  const startTime = process.hrtime.bigint();
-
   const {
     projectRoot,
     workspaceRoot,
@@ -251,11 +249,8 @@ export async function executeBuild(
   }
 
   printWarningsAndErrorsToConsole(context, warnings, errors);
-
   logBuildStats(context, metafile, initialFiles, budgetFailures, estimatedTransferSizes);
 
-  const buildTime = Number(process.hrtime.bigint() - startTime) / 10 ** 9;
-  context.logger.info(`Application bundle generation complete. [${buildTime.toFixed(3)} seconds]`);
   // Write metafile if stats option is enabled
   if (options.stats) {
     executionResult.addOutputFile(
