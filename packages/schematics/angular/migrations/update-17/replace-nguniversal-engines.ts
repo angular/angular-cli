@@ -8,7 +8,7 @@
 
 import { DirEntry, Rule, chain } from '@angular-devkit/schematics';
 import { addDependency } from '../../utility';
-import { removePackageJsonDependency } from '../../utility/dependencies';
+import { getPackageJsonDependency, removePackageJsonDependency } from '../../utility/dependencies';
 import { latestVersions } from '../../utility/latest-versions';
 import { allTargetOptions, getWorkspace } from '../../utility/workspace';
 import { Builders, ProjectType } from '../../utility/workspace-models';
@@ -36,6 +36,8 @@ function* visit(directory: DirEntry): IterableIterator<[fileName: string, conten
   }
 }
 
+const UNIVERSAL_PACKAGES = ['@nguniversal/common', '@nguniversal/express-engine'];
+
 /**
  * Regexp to match Universal packages.
  * @nguniversal/common/engine
@@ -45,53 +47,61 @@ function* visit(directory: DirEntry): IterableIterator<[fileName: string, conten
 const NGUNIVERSAL_PACKAGE_REGEXP = /@nguniversal\/(common(\/engine)?|express-engine)/g;
 
 export default function (): Rule {
-  return chain([
-    async (tree) => {
-      // Replace server file.
-      const workspace = await getWorkspace(tree);
-      for (const [, project] of workspace.projects) {
-        if (project.extensions.projectType !== ProjectType.Application) {
-          continue;
-        }
+  return async (tree) => {
+    const hasUniversalDeps = UNIVERSAL_PACKAGES.some((d) => getPackageJsonDependency(tree, d));
+    if (!hasUniversalDeps) {
+      return;
+    }
 
-        const serverMainFiles = new Map<string /** Main Path */, string /** Output Path */>();
-        for (const [, target] of project.targets) {
-          if (target.builder !== Builders.Server) {
+    return chain([
+      async (tree) => {
+        // Replace server file.
+        const workspace = await getWorkspace(tree);
+        for (const [, project] of workspace.projects) {
+          if (project.extensions.projectType !== ProjectType.Application) {
             continue;
           }
 
-          const outputPath = project.targets.get('build')?.options?.outputPath;
-
-          for (const [, { main }] of allTargetOptions(target, false)) {
-            if (
-              typeof main === 'string' &&
-              typeof outputPath === 'string' &&
-              tree.readText(main).includes('ngExpressEngine')
-            ) {
-              serverMainFiles.set(main, outputPath);
+          const serverMainFiles = new Map<string /** Main Path */, string /** Output Path */>();
+          for (const [, target] of project.targets) {
+            if (target.builder !== Builders.Server) {
+              continue;
             }
+
+            const outputPath = project.targets.get('build')?.options?.outputPath;
+
+            for (const [, { main }] of allTargetOptions(target, false)) {
+              if (
+                typeof main === 'string' &&
+                typeof outputPath === 'string' &&
+                tree.readText(main).includes('ngExpressEngine')
+              ) {
+                serverMainFiles.set(main, outputPath);
+              }
+            }
+          }
+
+          // Replace server file
+          for (const [path, outputPath] of serverMainFiles.entries()) {
+            tree.rename(path, path + '.bak');
+            tree.create(path, getServerFileContents(outputPath));
           }
         }
 
-        // Replace server file
-        for (const [path, outputPath] of serverMainFiles.entries()) {
-          tree.rename(path, path + '.bak');
-          tree.create(path, getServerFileContents(outputPath));
+        // Replace all import specifiers in all files.
+        for (const file of visit(tree.root)) {
+          const [path, content] = file;
+          tree.overwrite(path, content.replaceAll(NGUNIVERSAL_PACKAGE_REGEXP, '@angular/ssr'));
         }
-      }
 
-      // Replace all import specifiers in all files.
-      for (const file of visit(tree.root)) {
-        const [path, content] = file;
-        tree.overwrite(path, content.replaceAll(NGUNIVERSAL_PACKAGE_REGEXP, '@angular/ssr'));
-      }
-
-      // Remove universal packages from deps.
-      removePackageJsonDependency(tree, '@nguniversal/express-engine');
-      removePackageJsonDependency(tree, '@nguniversal/common');
-    },
-    addDependency('@angular/ssr', latestVersions.AngularSSR),
-  ]);
+        // Remove universal packages from deps.
+        for (const name of UNIVERSAL_PACKAGES) {
+          removePackageJsonDependency(tree, name);
+        }
+      },
+      addDependency('@angular/ssr', latestVersions.AngularSSR),
+    ]);
+  };
 }
 
 function getServerFileContents(outputPath: string): string {
