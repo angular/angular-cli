@@ -11,7 +11,7 @@ import { APPLICATION_BUILDER_INFO, BASE_OPTIONS, describeBuilder } from '../setu
 
 describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
   describe('Behavior: "Stylesheet url() Resolution"', () => {
-    it('should show a note when using tilde prefix', async () => {
+    it('should show a note when using tilde prefix in a directly referenced stylesheet', async () => {
       await harness.writeFile(
         'src/styles.css',
         `
@@ -26,12 +26,140 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
         styles: ['src/styles.css'],
       });
 
-      const { result, logs } = await harness.executeOnce();
+      const { result, logs } = await harness.executeOnce({ outputLogsOnFailure: false });
       expect(result?.success).toBe(false);
 
       expect(logs).toContain(
         jasmine.objectContaining({
           message: jasmine.stringMatching('You can remove the tilde and'),
+        }),
+      );
+      expect(logs).not.toContain(
+        jasmine.objectContaining({
+          message: jasmine.stringMatching('Preprocessor stylesheets may not show the exact'),
+        }),
+      );
+    });
+
+    it('should show a note when using tilde prefix in an imported CSS stylesheet', async () => {
+      await harness.writeFile(
+        'src/styles.css',
+        `
+        @import "a.css";
+      `,
+      );
+      await harness.writeFile(
+        'src/a.css',
+        `
+        .a {
+          background-image: url("~/image.jpg")
+        }
+      `,
+      );
+
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+        styles: ['src/styles.css'],
+      });
+
+      const { result, logs } = await harness.executeOnce({ outputLogsOnFailure: false });
+      expect(result?.success).toBe(false);
+
+      expect(logs).toContain(
+        jasmine.objectContaining({
+          message: jasmine.stringMatching('You can remove the tilde and'),
+        }),
+      );
+    });
+
+    it('should show a note when using tilde prefix in an imported Sass stylesheet', async () => {
+      await harness.writeFile(
+        'src/styles.scss',
+        `
+        @import "a";
+      `,
+      );
+      await harness.writeFile(
+        'src/a.scss',
+        `
+        .a {
+          background-image: url("~/image.jpg")
+        }
+      `,
+      );
+
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+        styles: ['src/styles.scss'],
+      });
+
+      const { result, logs } = await harness.executeOnce({ outputLogsOnFailure: false });
+      expect(result?.success).toBe(false);
+
+      expect(logs).toContain(
+        jasmine.objectContaining({
+          message: jasmine.stringMatching('You can remove the tilde and'),
+        }),
+      );
+      expect(logs).toContain(
+        jasmine.objectContaining({
+          message: jasmine.stringMatching('Preprocessor stylesheets may not show the exact'),
+        }),
+      );
+    });
+
+    it('should show a note when using caret prefix in a directly referenced stylesheet', async () => {
+      await harness.writeFile(
+        'src/styles.css',
+        `
+        .a {
+          background-image: url("^image.jpg")
+        }
+      `,
+      );
+
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+        styles: ['src/styles.css'],
+      });
+
+      const { result, logs } = await harness.executeOnce({ outputLogsOnFailure: false });
+      expect(result?.success).toBe(false);
+
+      expect(logs).toContain(
+        jasmine.objectContaining({
+          message: jasmine.stringMatching('You can remove the caret and'),
+        }),
+      );
+    });
+
+    it('should show a note when using caret prefix in an imported Sass stylesheet', async () => {
+      await harness.writeFile(
+        'src/styles.scss',
+        `
+        @import "a";
+      `,
+      );
+      await harness.writeFile(
+        'src/a.scss',
+        `
+        .a {
+          background-image: url("^image.jpg")
+        }
+      `,
+      );
+
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+        styles: ['src/styles.scss'],
+      });
+
+      const { result, logs } = await harness.executeOnce({ outputLogsOnFailure: false });
+      expect(result?.success).toBe(false);
+
+      expect(logs).toContain(
+        jasmine.objectContaining({
+          message: jasmine.stringMatching('You can remove the caret and'),
         }),
       );
     });
