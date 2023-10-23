@@ -7,12 +7,7 @@
  */
 
 import { ApplicationRef, StaticProvider, Type } from '@angular/core';
-import {
-  INITIAL_CONFIG,
-  renderApplication,
-  renderModule,
-  ɵSERVER_CONTEXT,
-} from '@angular/platform-server';
+import { renderApplication, renderModule, ɵSERVER_CONTEXT } from '@angular/platform-server';
 import * as fs from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { URL } from 'node:url';
@@ -151,6 +146,11 @@ export class CommonEngine {
   }
 
   private async renderApplication(opts: CommonEngineRenderOptions): Promise<string> {
+    const moduleOrFactory = this.options?.bootstrap ?? opts.bootstrap;
+    if (!moduleOrFactory) {
+      throw new Error('A module or bootstrap option must be provided.');
+    }
+
     const extraProviders: StaticProvider[] = [
       { provide: ɵSERVER_CONTEXT, useValue: 'ssr' },
       ...(opts.providers ?? []),
@@ -162,24 +162,17 @@ export class CommonEngine {
       document = await this.getDocument(opts.documentFilePath);
     }
 
-    if (document) {
-      extraProviders.push({
-        provide: INITIAL_CONFIG,
-        useValue: {
-          document,
-          url: opts.url,
-        },
-      });
-    }
-
-    const moduleOrFactory = this.options?.bootstrap ?? opts.bootstrap;
-    if (!moduleOrFactory) {
-      throw new Error('A module or bootstrap option must be provided.');
-    }
+    const commonRenderingOptions = {
+      url: opts.url,
+      document,
+    };
 
     return isBootstrapFn(moduleOrFactory)
-      ? renderApplication(moduleOrFactory, { platformProviders: extraProviders })
-      : renderModule(moduleOrFactory, { extraProviders });
+      ? renderApplication(moduleOrFactory, {
+          platformProviders: extraProviders,
+          ...commonRenderingOptions,
+        })
+      : renderModule(moduleOrFactory, { extraProviders, ...commonRenderingOptions });
   }
 
   /** Retrieve the document from the cache or the filesystem */
