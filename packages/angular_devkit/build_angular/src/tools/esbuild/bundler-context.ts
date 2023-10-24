@@ -10,6 +10,7 @@ import {
   BuildContext,
   BuildFailure,
   BuildOptions,
+  BuildResult,
   Message,
   Metafile,
   OutputFile,
@@ -66,7 +67,9 @@ function isEsBuildFailure(value: unknown): value is BuildFailure {
 export class BundlerContext {
   #esbuildContext?: BuildContext<{ metafile: true; write: false }>;
   #esbuildOptions?: BuildOptions & { metafile: true; write: false };
+  #esbuildResult?: BundleContextResult;
   #optionsFactory: BundlerOptionsFactory<BuildOptions & { metafile: true; write: false }>;
+  #shouldCacheResult: boolean;
 
   #loadCache?: MemoryLoadResultCache;
   readonly watchFiles = new Set<string>();
@@ -77,6 +80,8 @@ export class BundlerContext {
     options: BuildOptions | BundlerOptionsFactory,
     private initialFilter?: (initial: Readonly<InitialFileRecord>) => boolean,
   ) {
+    // To cache the results an option factory is needed to capture the full set of dependencies
+    this.#shouldCacheResult = incremental && typeof options === 'function';
     this.#optionsFactory = (...args) => {
       const baseOptions = typeof options === 'function' ? options(...args) : options;
 
@@ -142,12 +147,30 @@ export class BundlerContext {
    * warnings and errors for the attempted build.
    */
   async bundle(): Promise<BundleContextResult> {
+    // Return existing result if present
+    if (this.#esbuildResult) {
+      return this.#esbuildResult;
+    }
+
+    const result = await this.#performBundle();
+    if (this.#shouldCacheResult) {
+      this.#esbuildResult = result;
+    }
+
+    return result;
+  }
+
+  async #performBundle() {
     // Create esbuild options if not present
     if (this.#esbuildOptions === undefined) {
       if (this.incremental) {
         this.#loadCache = new MemoryLoadResultCache();
       }
       this.#esbuildOptions = this.#optionsFactory(this.#loadCache);
+    }
+
+    if (this.incremental) {
+      this.watchFiles.clear();
     }
 
     let result;
@@ -167,6 +190,8 @@ export class BundlerContext {
     } catch (failure) {
       // Build failures will throw an exception which contains errors/warnings
       if (isEsBuildFailure(failure)) {
+        this.#addErrorsToWatch(failure);
+
         return failure;
       } else {
         throw failure;
@@ -177,7 +202,6 @@ export class BundlerContext {
     // While this should technically not be linked to incremental mode, incremental is only
     // currently enabled with watch mode where watch files are needed.
     if (this.incremental) {
-      this.watchFiles.clear();
       // Add input files except virtual angular files which do not exist on disk
       Object.keys(result.metafile.inputs)
         .filter((input) => !input.startsWith('angular:'))
@@ -194,6 +218,8 @@ export class BundlerContext {
 
     // Return if the build encountered any errors
     if (result.errors.length) {
+      this.#addErrorsToWatch(result);
+
       return {
         errors: result.errors,
         warnings: result.warnings,
@@ -281,6 +307,28 @@ export class BundlerContext {
     };
   }
 
+  #addErrorsToWatch(result: BuildFailure | BuildResult): void {
+    for (const error of result.errors) {
+      let file = error.location?.file;
+      if (file) {
+        this.watchFiles.add(join(this.workspaceRoot, file));
+      }
+      for (const note of error.notes) {
+        file = note.location?.file;
+        if (file) {
+          this.watchFiles.add(join(this.workspaceRoot, file));
+        }
+      }
+    }
+  }
+
+  /**
+   * Invalidate a stored bundler result based on the previous watch files
+   * and a list of changed files.
+   * The context must be created with incremental mode enabled for results
+   * to be stored.
+   * @returns True, if the result was invalidated; False, otherwise.
+   */
   invalidate(files: Iterable<string>): boolean {
     if (!this.incremental) {
       return false;
@@ -296,6 +344,10 @@ export class BundlerContext {
       invalid ||= this.watchFiles.has(file);
     }
 
+    if (invalid) {
+      this.#esbuildResult = undefined;
+    }
+
     return invalid;
   }
 
@@ -307,6 +359,7 @@ export class BundlerContext {
   async dispose(): Promise<void> {
     try {
       this.#esbuildOptions = undefined;
+      this.#esbuildResult = undefined;
       this.#loadCache = undefined;
       await this.#esbuildContext?.dispose();
     } finally {
