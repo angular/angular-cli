@@ -45,6 +45,10 @@ export function checkCommonJSModules(
   // Once the build output is updated to be fully ESM, this can be removed.
   allowedRequests.add('zone.js');
 
+  // Used by '@angular/platform-server' and is in a seperate chunk that is unused when
+  // using `provideHttpClient(withFetch())`.
+  allowedRequests.add('xhr2');
+
   // Find all entry points that contain code (JS/TS)
   const files: string[] = [];
   for (const { entryPoint } of Object.values(metafile.outputs)) {
