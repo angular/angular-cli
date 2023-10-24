@@ -34,6 +34,8 @@ export class JavaScriptTransformer {
       filename: require.resolve('./javascript-transformer-worker'),
       minThreads: 1,
       maxThreads,
+      // Shutdown idle threads after 1 second of inactivity
+      idleTimeout: 1000,
     });
 
     // Extract options to ensure only the named options are serialized and sent to the worker
