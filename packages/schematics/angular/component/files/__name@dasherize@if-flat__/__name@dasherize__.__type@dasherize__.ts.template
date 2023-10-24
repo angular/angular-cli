@@ -11,14 +11,12 @@ import { CommonModule } from '@angular/common';<% } %>
     </p>
   `<% } else { %>
   templateUrl: './<%= dasherize(name) %><%= type ? '.' + dasherize(type): '' %>.html'<% } if(inlineStyle) { %>,
-  styles: [<% if(displayBlock){ %>
-    `
-      :host {
-        display: block;
-      }
-    `<% } %>
-  ]<% } else if (style !== 'none') { %>,
-  styleUrls: ['./<%= dasherize(name) %><%= type ? '.' + dasherize(type): '' %>.<%= style %>']<% } %><% if(!!viewEncapsulation) { %>,
+  styles: `<% if(displayBlock){ %>
+    :host {
+      display: block;
+    }
+  <% } %>`<% } else if (style !== 'none') { %>,
+  styleUrl: './<%= dasherize(name) %><%= type ? '.' + dasherize(type): '' %>.<%= style %>'<% } %><% if(!!viewEncapsulation) { %>,
   encapsulation: ViewEncapsulation.<%= viewEncapsulation %><% } if (changeDetection !== 'Default') { %>,
   changeDetection: ChangeDetectionStrategy.<%= changeDetection %><% } %>
 })
