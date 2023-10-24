@@ -210,8 +210,8 @@ describe('Component Schematic', () => {
     const options = { ...defaultOptions, inlineStyle: true };
     const tree = await schematicRunner.runSchematic('component', options, appTree);
     const content = tree.readContent('/projects/bar/src/app/foo/foo.component.ts');
-    expect(content).toMatch(/styles: \[/);
-    expect(content).not.toMatch(/styleUrls: /);
+    expect(content).toMatch(/styles: `/);
+    expect(content).not.toMatch(/styleUrl: /);
     expect(tree.files).not.toContain('/projects/bar/src/app/foo/foo.component.css');
   });
 
@@ -247,7 +247,7 @@ describe('Component Schematic', () => {
     const options = { ...defaultOptions, style: Style.Sass };
     const tree = await schematicRunner.runSchematic('component', options, appTree);
     const content = tree.readContent('/projects/bar/src/app/foo/foo.component.ts');
-    expect(content).toMatch(/styleUrls: \['.\/foo.component.sass/);
+    expect(content).toMatch(/styleUrl: '.\/foo.component.sass/);
     expect(tree.files).toContain('/projects/bar/src/app/foo/foo.component.sass');
     expect(tree.files).not.toContain('/projects/bar/src/app/foo/foo.component.css');
   });
