@@ -20,6 +20,7 @@ import {
   ScriptElement,
   SourceMapClass,
   StyleElement,
+  PostcssPluginElement,
 } from '../builders/browser/schema';
 import { Schema as DevServerSchema } from '../builders/dev-server/schema';
 import { NormalizedCachedOptions } from './normalize-cache';
@@ -63,6 +64,7 @@ export interface BuildOptions {
   assets: AssetPatternClass[];
   scripts: ScriptElement[];
   styles: StyleElement[];
+  postcssPlugins: PostcssPluginElement[];
   stylePreprocessorOptions?: { includePaths: string[] };
   platform?: 'browser' | 'server';
   fileReplacements: NormalizedFileReplacement[];

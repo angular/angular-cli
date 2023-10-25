@@ -65,6 +65,7 @@ export function normalizeBrowserSchema(
     budgets: options.budgets || [],
     scripts: options.scripts || [],
     styles: options.styles || [],
+    postcssPlugins: options.postcssPlugins || [],
     stylePreprocessorOptions: {
       includePaths:
         (options.stylePreprocessorOptions && options.stylePreprocessorOptions.includePaths) || [],

@@ -101,6 +101,29 @@ export async function getStylesConfig(wco: WebpackConfigOptions): Promise<Config
     }
   }
 
+  for (const userPlugin of wco.buildOptions.postcssPlugins) {
+    let packageName, packageOptions;
+    if (typeof userPlugin === 'string') packageName = userPlugin;
+    else if (typeof userPlugin === 'object') {
+      packageName = <string>userPlugin.packageName;
+      packageOptions = <object>userPlugin.options;
+    }
+
+    if (packageName) {
+      let packagePath;
+      try {
+        packagePath = require.resolve(packageName, { paths: [root] });
+      } catch {
+        logger.warn(`Couldn't resolve postcss plugin package "${packageName}". Skipping...`);
+      }
+      if (packagePath) {
+        extraPostcssPlugins.push(require(packagePath)(packageOptions ? packageOptions : {}));
+      }
+    } else {
+      logger.warn('Empty postcss plugin package name detected. Skipping...');
+    }
+  }
+
   const autoprefixer: typeof import('autoprefixer') = require('autoprefixer');
 
   const postcssOptionsCreator = (inlineSourcemaps: boolean, extracted: boolean) => {
