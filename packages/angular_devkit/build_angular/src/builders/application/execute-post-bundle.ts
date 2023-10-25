@@ -117,6 +117,7 @@ export async function executePostBundleSteps(
       appShellOptions,
       prerenderOptions,
       outputFiles,
+      assetFiles,
       indexContentOutputNoCssInlining,
       sourcemapOptions.scripts,
       optimizationOptions.styles.inlineCritical,

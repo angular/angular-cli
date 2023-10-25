@@ -14,6 +14,8 @@ import { MainServerBundleExports, RenderUtilsServerBundleExports } from './main-
 export interface RoutesExtractorWorkerData extends ESMInMemoryFileLoaderWorkerData {
   document: string;
   verbose: boolean;
+  url: string;
+  assetsServerAddress: string;
 }
 
 export interface RoutersExtractorWorkerResult {
@@ -24,7 +26,7 @@ export interface RoutersExtractorWorkerResult {
 /**
  * This is passed as workerData when setting up the worker via the `piscina` package.
  */
-const { document, verbose } = workerData as RoutesExtractorWorkerData;
+const { document, verbose, url } = workerData as RoutesExtractorWorkerData;
 
 export default async function (): Promise<RoutersExtractorWorkerResult> {
   const { extractRoutes } = await loadEsmModule<RenderUtilsServerBundleExports>(
@@ -40,6 +42,7 @@ export default async function (): Promise<RoutersExtractorWorkerResult> {
   for await (const { route, success, redirect } of extractRoutes(
     bootstrapAppFnOrModule,
     document,
+    url,
   )) {
     if (success) {
       routes.push(route);
