@@ -94,8 +94,19 @@ export class BundlerContext {
     };
   }
 
-  static async bundleAll(contexts: Iterable<BundlerContext>): Promise<BundleContextResult> {
-    const individualResults = await Promise.all([...contexts].map((context) => context.bundle()));
+  static async bundleAll(
+    contexts: Iterable<BundlerContext>,
+    changedFiles?: Iterable<string>,
+  ): Promise<BundleContextResult> {
+    const individualResults = await Promise.all(
+      [...contexts].map((context) => {
+        if (changedFiles) {
+          context.invalidate(changedFiles);
+        }
+
+        return context.bundle();
+      }),
+    );
 
     // Return directly if only one result
     if (individualResults.length === 1) {
