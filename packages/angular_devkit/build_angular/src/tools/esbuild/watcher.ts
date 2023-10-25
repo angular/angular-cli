@@ -13,6 +13,10 @@ export class ChangedFiles {
   readonly modified = new Set<string>();
   readonly removed = new Set<string>();
 
+  get all(): string[] {
+    return [...this.added, ...this.modified, ...this.removed];
+  }
+
   toDebugString(): string {
     const content = {
       added: Array.from(this.added),
