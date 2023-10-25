@@ -13,6 +13,7 @@ import { RenderResult, ServerContext, renderPage } from './render-page';
 export interface RenderWorkerData extends ESMInMemoryFileLoaderWorkerData {
   document: string;
   inlineCriticalCss?: boolean;
+  baseUrl: string;
 }
 
 export interface RenderOptions {
@@ -23,8 +24,15 @@ export interface RenderOptions {
 /**
  * This is passed as workerData when setting up the worker via the `piscina` package.
  */
-const { outputFiles, document, inlineCriticalCss } = workerData as RenderWorkerData;
+const { outputFiles, document, inlineCriticalCss, baseUrl } = workerData as RenderWorkerData;
 
+/** Renders an application based on a provided options. */
 export default function (options: RenderOptions): Promise<RenderResult> {
-  return renderPage({ ...options, outputFiles, document, inlineCriticalCss });
+  return renderPage({
+    ...options,
+    route: baseUrl + options.route,
+    outputFiles,
+    document,
+    inlineCriticalCss,
+  });
 }
