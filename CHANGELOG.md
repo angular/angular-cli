@@ -1,3 +1,45 @@
+<a name="17.0.0-rc.1"></a>
+
+# 17.0.0-rc.1 (2023-10-25)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                                                          |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------------------ |
+| [f66f9cf61](https://github.com/angular/angular-cli/commit/f66f9cf612bed49b961f1f8a8e4deef05fd5ef40) | fix  | remove Node.js 16 from supported checks                                              |
+| [dbdc7b2c8](https://github.com/angular/angular-cli/commit/dbdc7b2c8ff38a0c5a466bbb878e64d72ec3e4e7) | fix  | remove the need to specify `--migrate-only` when `--name` is used during `ng update` |
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                                          |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------------- |
+| [175944672](https://github.com/angular/angular-cli/commit/17594467218b788ebb27d8d16ffb0b555fcf71ee) | fix  | do not add unnecessary dependency on `@angular/ssr` during migration |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                                      |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------------------------- |
+| [e3c5b91e8](https://github.com/angular/angular-cli/commit/e3c5b91e8a09c8a7dd940655087b69a8949cb2cc) | fix  | automatically include known packages in vite prebundling                         |
+| [1a6aa4378](https://github.com/angular/angular-cli/commit/1a6aa437887d2fc5d08c833efc0ca792f6157350) | fix  | ensure css url() prefix warnings support Sass rebasing                           |
+| [192a2ae6b](https://github.com/angular/angular-cli/commit/192a2ae6bd8bdeab785f1ed8e60c5e4213801dd3) | fix  | handle HTTP requests to assets during prerendering                               |
+| [87425a791](https://github.com/angular/angular-cli/commit/87425a791fbdb44b3504e7e6d4b000b1df92c494) | fix  | normalize paths when invalidating stylesheet bundler                             |
+| [651e3195f](https://github.com/angular/angular-cli/commit/651e3195ffe06394212c8d8d275289ac05ea5ef5) | fix  | resolve and load sourcemaps when using vite dev server with prerendering and ssr |
+| [c4c299bce](https://github.com/angular/angular-cli/commit/c4c299bce900b27556eaf2e06838a52f16990bb6) | fix  | silence xhr2 not ESM module warning                                              |
+| [ca4d1634f](https://github.com/angular/angular-cli/commit/ca4d1634f7fa2070f53f5978387ea68cc875c986) | fix  | use component style load result caching information for file watching            |
+| [ec160fe4e](https://github.com/angular/angular-cli/commit/ec160fe4e89cb89b93278cfac63877093dd19392) | fix  | warn if using partial mode with application builder                              |
+| [2cbec36c7](https://github.com/angular/angular-cli/commit/2cbec36c7286cdbbbd547433061421d7fe7762cc) | perf | cache polyfills virtual module result                                            |
+| [e06e95f73](https://github.com/angular/angular-cli/commit/e06e95f73a35e2cc7cb00a44ce3633b4c99c8505) | perf | conditionally add Angular compiler plugin to polyfills bundling                  |
+| [01ab16c5d](https://github.com/angular/angular-cli/commit/01ab16c5d5678a135a5af5640ad2ba7c33a00452) | perf | fully avoid rebuild of component stylesheets when unchanged                      |
+| [c28475d30](https://github.com/angular/angular-cli/commit/c28475d30b08138ddddb9903acaa067cf8ab2ef6) | perf | reuse esbuild generated output file hashes                                       |
+
+### @angular/ssr
+
+| Commit                                                                                              | Type | Description              |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------ |
+| [6224b0599](https://github.com/angular/angular-cli/commit/6224b0599fd60f61c537aa602fb89079197a6e2d) | fix  | correctly set config URL |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="16.2.8"></a>
 
 # 16.2.8 (2023-10-25)
