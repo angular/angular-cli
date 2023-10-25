@@ -1,3 +1,15 @@
+<a name="16.2.8"></a>
+
+# 16.2.8 (2023-10-25)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                                                          |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------------------ |
+| [44275601b](https://github.com/angular/angular-cli/commit/44275601ba0e4c7b8c24f8184a33d09350a0fbef) | fix  | remove the need to specify `--migrate-only` when `--name` is used during `ng update` |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="16.2.7"></a>
 
 # 16.2.7 (2023-10-19)
