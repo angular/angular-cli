@@ -110,6 +110,37 @@
         ]
       }
     },
+    "postcssPlugins": {
+      "description": "Postcss plugins to be included in the build.",
+      "type": "array",
+      "default": [],
+      "items": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "packageName": {
+                "type": "string",
+                "description": "Plugin package name."
+              },
+              "options": {
+                "type": "object",
+                "properties": {},
+                "description": "Plugin options.",
+                "additionalProperties": true,
+                "required": []
+              }
+            },
+            "additionalProperties": false,
+            "required": ["packageName"]
+          },
+          {
+            "type": "string",
+            "description": "Plugin package name."
+          }
+        ]
+      }
+    },
     "inlineStyleLanguage": {
       "description": "The stylesheet language to use for the application's inline component styles.",
       "type": "string",

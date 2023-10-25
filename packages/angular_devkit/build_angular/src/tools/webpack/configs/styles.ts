@@ -101,6 +101,12 @@ export async function getStylesConfig(wco: WebpackConfigOptions): Promise<Config
     }
   }
 
+  for (const userPlugin of wco.buildOptions.postcssPlugins) {
+    if (typeof userPlugin === 'string') extraPostcssPlugins.push(require(userPlugin)({}));
+    else if (typeof userPlugin === 'object')
+      extraPostcssPlugins.push(require(<string>userPlugin.packageName)(<object>userPlugin.options));
+  }
+
   const autoprefixer: typeof import('autoprefixer') = require('autoprefixer');
 
   const postcssOptionsCreator = (inlineSourcemaps: boolean, extracted: boolean) => {
