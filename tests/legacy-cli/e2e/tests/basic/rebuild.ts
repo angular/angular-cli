@@ -116,7 +116,7 @@ export default async function () {
     const response = await fetch(`http://localhost:${port}/styles.css`);
     const body = await response.text();
     if (!body.match(/color:\s?green/)) {
-      throw new Error('Expected component CSS to update.');
+      throw new Error('Expected global CSS to update.');
     }
   }
 }
