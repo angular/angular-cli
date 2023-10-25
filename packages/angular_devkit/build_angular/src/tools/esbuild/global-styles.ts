@@ -6,10 +6,9 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import type { BuildOptions } from 'esbuild';
 import assert from 'node:assert';
 import { NormalizedApplicationBuildOptions } from '../../builders/application/options';
-import { LoadResultCache } from './load-result-cache';
+import { BundlerOptionsFactory } from './bundler-context';
 import { createStylesheetBundleOptions } from './stylesheets/bundle-options';
 import { createVirtualModulePlugin } from './virtual-module-plugin';
 
@@ -17,8 +16,7 @@ export function createGlobalStylesBundleOptions(
   options: NormalizedApplicationBuildOptions,
   target: string[],
   initial: boolean,
-  cache?: LoadResultCache,
-): BuildOptions | undefined {
+): BundlerOptionsFactory | undefined {
   const {
     workspaceRoot,
     optimizationOptions,
@@ -46,45 +44,47 @@ export function createGlobalStylesBundleOptions(
     return;
   }
 
-  const buildOptions = createStylesheetBundleOptions(
-    {
-      workspaceRoot,
-      optimization: !!optimizationOptions.styles.minify,
-      sourcemap: !!sourcemapOptions.styles,
-      preserveSymlinks,
-      target,
-      externalDependencies,
-      outputNames: initial
-        ? outputNames
-        : {
-            ...outputNames,
-            bundles: '[name]',
-          },
-      includePaths: stylePreprocessorOptions?.includePaths,
-      tailwindConfiguration,
-      publicPath: options.publicPath,
-    },
-    cache,
-  );
-  buildOptions.legalComments = options.extractLicenses ? 'none' : 'eof';
-  buildOptions.entryPoints = entryPoints;
-
-  buildOptions.plugins.unshift(
-    createVirtualModulePlugin({
-      namespace,
-      transformPath: (path) => path.split(';', 2)[1],
-      loadContent: (args) => {
-        const files = globalStyles.find(({ name }) => name === args.path)?.files;
-        assert(files, `global style name should always be found [${args.path}]`);
-
-        return {
-          contents: files.map((file) => `@import '${file.replace(/\\/g, '/')}';`).join('\n'),
-          loader: 'css',
-          resolveDir: workspaceRoot,
-        };
+  return (loadCache) => {
+    const buildOptions = createStylesheetBundleOptions(
+      {
+        workspaceRoot,
+        optimization: !!optimizationOptions.styles.minify,
+        sourcemap: !!sourcemapOptions.styles,
+        preserveSymlinks,
+        target,
+        externalDependencies,
+        outputNames: initial
+          ? outputNames
+          : {
+              ...outputNames,
+              bundles: '[name]',
+            },
+        includePaths: stylePreprocessorOptions?.includePaths,
+        tailwindConfiguration,
+        publicPath: options.publicPath,
       },
-    }),
-  );
+      loadCache,
+    );
+    buildOptions.legalComments = options.extractLicenses ? 'none' : 'eof';
+    buildOptions.entryPoints = entryPoints;
 
-  return buildOptions;
+    buildOptions.plugins.unshift(
+      createVirtualModulePlugin({
+        namespace,
+        transformPath: (path) => path.split(';', 2)[1],
+        loadContent: (args) => {
+          const files = globalStyles.find(({ name }) => name === args.path)?.files;
+          assert(files, `global style name should always be found [${args.path}]`);
+
+          return {
+            contents: files.map((file) => `@import '${file.replace(/\\/g, '/')}';`).join('\n'),
+            loader: 'css',
+            resolveDir: workspaceRoot,
+          };
+        },
+      }),
+    );
+
+    return buildOptions;
+  };
 }
