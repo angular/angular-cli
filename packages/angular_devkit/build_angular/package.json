@@ -36,7 +36,7 @@
     "fast-glob": "3.3.1",
     "https-proxy-agent": "7.0.2",
     "http-proxy-middleware": "2.0.6",
-    "inquirer": "8.2.6",
+    "inquirer": "9.2.11",
     "jsonc-parser": "3.2.0",
     "karma-source-map-support": "1.4.0",
     "less": "4.2.0",

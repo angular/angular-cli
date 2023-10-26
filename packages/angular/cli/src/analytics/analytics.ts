@@ -12,6 +12,7 @@ import type { CommandContext } from '../command-builder/command-module';
 import { colors } from '../utilities/color';
 import { getWorkspace } from '../utilities/config';
 import { analyticsDisabled } from '../utilities/environment-options';
+import { loadEsmModule } from '../utilities/load-esm';
 import { isTTY } from '../utilities/tty';
 
 /* eslint-disable no-console */
@@ -74,8 +75,8 @@ export async function promptAnalytics(
   }
 
   if (force || isTTY()) {
-    const { prompt } = await import('inquirer');
-    const answers = await prompt<{ analytics: boolean }>([
+    const { default: inquirer } = await loadEsmModule<typeof import('inquirer')>('inquirer');
+    const answers = await inquirer.prompt<{ analytics: boolean }>([
       {
         type: 'confirm',
         name: 'analytics',
