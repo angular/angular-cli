@@ -20,6 +20,7 @@ import { isPackageNameSafeForAnalytics } from '../analytics/analytics';
 import { EventCustomDimension } from '../analytics/analytics-parameters';
 import { getProjectByCwd, getSchematicDefaults } from '../utilities/config';
 import { assertIsError } from '../utilities/error';
+import { loadEsmModule } from '../utilities/load-esm';
 import { memoize } from '../utilities/memoize';
 import { isTTY } from '../utilities/tty';
 import {
@@ -234,9 +235,9 @@ export abstract class SchematicsCommandModule
           });
 
         if (questions.length) {
-          const { prompt } = await import('inquirer');
+          const { default: inquirer } = await loadEsmModule<typeof import('inquirer')>('inquirer');
 
-          return prompt(questions);
+          return inquirer.prompt(questions);
         } else {
           return {};
         }

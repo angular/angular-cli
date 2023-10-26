@@ -13,6 +13,7 @@ import type {
   ListQuestion,
   Question,
 } from 'inquirer';
+import { loadEsmModule } from './load-esm';
 import { isTTY } from './tty';
 
 export async function askConfirmation(
@@ -32,8 +33,8 @@ export async function askConfirmation(
     default: defaultResponse,
   };
 
-  const { prompt } = await import('inquirer');
-  const answers = await prompt([question]);
+  const { default: inquirer } = await loadEsmModule<typeof import('inquirer')>('inquirer');
+  const answers = await inquirer.prompt([question]);
 
   return answers['confirmation'];
 }
@@ -57,8 +58,8 @@ export async function askQuestion(
     default: defaultResponseIndex,
   };
 
-  const { prompt } = await import('inquirer');
-  const answers = await prompt([question]);
+  const { default: inquirer } = await loadEsmModule<typeof import('inquirer')>('inquirer');
+  const answers = await inquirer.prompt([question]);
 
   return answers['answer'];
 }
@@ -80,8 +81,8 @@ export async function askChoices(
     choices,
   };
 
-  const { prompt } = await import('inquirer');
-  const answers = await prompt([question]);
+  const { default: inquirer } = await loadEsmModule<typeof import('inquirer')>('inquirer');
+  const answers = await inquirer.prompt([question]);
 
   return answers['answer'];
 }

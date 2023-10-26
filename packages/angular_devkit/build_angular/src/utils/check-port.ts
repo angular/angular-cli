@@ -7,6 +7,7 @@
  */
 
 import * as net from 'net';
+import { loadEsmModule } from './load-esm';
 import { isTTY } from './tty';
 
 function createInUseError(port: number): Error {
@@ -35,8 +36,8 @@ export async function checkPort(port: number, host: string): Promise<number> {
           return;
         }
 
-        import('inquirer')
-          .then(({ prompt }) =>
+        loadEsmModule<typeof import('inquirer')>('inquirer')
+          .then(({ default: { prompt } }) =>
             prompt({
               type: 'confirm',
               name: 'useDifferent',
