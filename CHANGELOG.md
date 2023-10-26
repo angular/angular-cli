@@ -1,3 +1,26 @@
+<a name="17.0.0-rc.2"></a>
+
+# 17.0.0-rc.2 (2023-10-26)
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                            |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------- |
+| [2b91472c8](https://github.com/angular/angular-cli/commit/2b91472c8ed12b624dcc1256b5b2eae472b86b4d) | fix  | allow dash in selector before a number |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                               |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------- |
+| [ca38ee34c](https://github.com/angular/angular-cli/commit/ca38ee34c6267e32b8ee74db815f929896f1baba) | fix  | avoid binary content in architect results with browser-esbuild            |
+| [070da72c4](https://github.com/angular/angular-cli/commit/070da72c481b881538d6f5ff39955a3da7eb5126) | fix  | do not perform advanced optimizations on `@angular/common/locales/global` |
+| [c0c7dad77](https://github.com/angular/angular-cli/commit/c0c7dad77dd59a387dbcc643a52ee1ed634727ab) | fix  | ensure that externalMetadata is defined                                   |
+| [19191e32b](https://github.com/angular/angular-cli/commit/19191e32bab9a2927b4feb5074e14165597fbf6d) | fix  | handle HTTP requests to assets during SSG in dev-server                   |
+| [e68a662bc](https://github.com/angular/angular-cli/commit/e68a662bc0e636082e43b4f3c894585174366f4d) | perf | only rebundle global scripts/styles on explicit changes                   |
+| [07e2120da](https://github.com/angular/angular-cli/commit/07e2120dab741fda11debc0fe777a5ef888dcaad) | perf | remove JavaScript transformer from server polyfills bundling              |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="17.0.0-rc.1"></a>
 
 # 17.0.0-rc.1 (2023-10-25)
