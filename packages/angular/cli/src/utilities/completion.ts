@@ -16,6 +16,7 @@ import { getWorkspace } from '../utilities/config';
 import { forceAutocomplete } from '../utilities/environment-options';
 import { isTTY } from '../utilities/tty';
 import { assertIsError } from './error';
+import { loadEsmModule } from './load-esm';
 
 /** Interface for the autocompletion configuration stored in the global workspace. */
 interface CompletionConfig {
@@ -180,8 +181,8 @@ async function shouldPromptForAutocompletionSetup(
 async function promptForAutocompletion(): Promise<boolean> {
   // Dynamically load `inquirer` so users don't have to pay the cost of parsing and executing it for
   // the 99% of builds that *don't* prompt for autocompletion.
-  const { prompt } = await import('inquirer');
-  const { autocomplete } = await prompt<{ autocomplete: boolean }>([
+  const { default: inquirer } = await loadEsmModule<typeof import('inquirer')>('inquirer');
+  const { autocomplete } = await inquirer.prompt<{ autocomplete: boolean }>([
     {
       name: 'autocomplete',
       type: 'confirm',

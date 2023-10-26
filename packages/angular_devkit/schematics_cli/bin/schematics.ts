@@ -15,7 +15,7 @@ import { UnsuccessfulWorkflowExecution } from '@angular-devkit/schematics';
 import { NodeWorkflow } from '@angular-devkit/schematics/tools';
 import * as ansiColors from 'ansi-colors';
 import { existsSync } from 'fs';
-import * as inquirer from 'inquirer';
+import type { Question, QuestionCollection } from 'inquirer';
 import * as path from 'path';
 import yargsParser, { camelCase, decamelize } from 'yargs-parser';
 
@@ -68,9 +68,9 @@ function _listSchematics(workflow: NodeWorkflow, collectionName: string, logger:
 }
 
 function _createPromptProvider(): schema.PromptProvider {
-  return (definitions) => {
-    const questions: inquirer.QuestionCollection = definitions.map((definition) => {
-      const question: inquirer.Question = {
+  return async (definitions) => {
+    const questions: QuestionCollection = definitions.map((definition) => {
+      const question: Question = {
         name: definition.id,
         message: definition.message,
         default: definition.default,
@@ -131,6 +131,7 @@ function _createPromptProvider(): schema.PromptProvider {
           return { ...question, type: definition.type };
       }
     });
+    const { default: inquirer } = await loadEsmModule<typeof import('inquirer')>('inquirer');
 
     return inquirer.prompt(questions);
   };
@@ -486,4 +487,20 @@ if (require.main === module) {
     .catch((e) => {
       throw e;
     });
+}
+
+/**
+ * This uses a dynamic import to load a module which may be ESM.
+ * CommonJS code can load ESM code via a dynamic import. Unfortunately, TypeScript
+ * will currently, unconditionally downlevel dynamic import into a require call.
+ * require calls cannot load ESM code and will result in a runtime error. To workaround
+ * this, a Function constructor is used to prevent TypeScript from changing the dynamic import.
+ * Once TypeScript provides support for keeping the dynamic import this workaround can
+ * be dropped.
+ *
+ * @param modulePath The path of the module to load.
+ * @returns A Promise that resolves to the dynamically imported module.
+ */
+export function loadEsmModule<T>(modulePath: string | URL): Promise<T> {
+  return new Function('modulePath', `return import(modulePath);`)(modulePath) as Promise<T>;
 }
