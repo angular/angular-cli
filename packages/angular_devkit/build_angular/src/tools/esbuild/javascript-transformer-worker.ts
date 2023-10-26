@@ -50,10 +50,11 @@ async function transformWithBabel({
     return useInputSourcemap ? data : data.replace(/^\/\/# sourceMappingURL=[^\r\n]*/gm, '');
   }
 
-  // @angular/platform-server/init entry-point has side-effects.
+  // `@angular/platform-server/init` and `@angular/common/locales/global` entry-points are side effectful.
   const safeAngularPackage =
     /[\\/]node_modules[\\/]@angular[\\/]/.test(filename) &&
-    !/@angular[\\/]platform-server[\\/]f?esm2022[\\/]init/.test(filename);
+    !/@angular[\\/]platform-server[\\/]f?esm2022[\\/]init/.test(filename) &&
+    !/@angular[\\/]common[\\/]locales[\\/]global/.test(filename);
 
   // Lazy load the linker plugin only when linking is required
   if (shouldLink) {
