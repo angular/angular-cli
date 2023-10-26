@@ -28,9 +28,11 @@ export function logBuildStats(
   metafile: Metafile,
   initial: Map<string, InitialFileRecord>,
   budgetFailures: BudgetCalculatorResult[] | undefined,
+  changedFiles?: Set<string>,
   estimatedTransferSizes?: Map<string, number>,
 ): void {
   const stats: BundleStats[] = [];
+  let unchangedCount = 0;
   for (const [file, output] of Object.entries(metafile.outputs)) {
     // Only display JavaScript and CSS files
     if (!file.endsWith('.js') && !file.endsWith('.css')) {
@@ -39,6 +41,12 @@ export function logBuildStats(
     // Skip internal component resources
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     if ((output as any)['ng-component']) {
+      continue;
+    }
+
+    // Show only changed files if a changed list is provided
+    if (changedFiles && !changedFiles.has(file)) {
+      ++unchangedCount;
       continue;
     }
 
@@ -56,15 +64,22 @@ export function logBuildStats(
     });
   }
 
-  const tableText = generateBuildStatsTable(
-    stats,
-    true,
-    true,
-    !!estimatedTransferSizes,
-    budgetFailures,
-  );
+  if (stats.length > 0) {
+    const tableText = generateBuildStatsTable(
+      stats,
+      true,
+      unchangedCount === 0,
+      !!estimatedTransferSizes,
+      budgetFailures,
+    );
 
-  context.logger.info('\n' + tableText + '\n');
+    context.logger.info('\n' + tableText + '\n');
+  } else if (changedFiles !== undefined) {
+    context.logger.info('\nNo output file changes.\n');
+  }
+  if (unchangedCount > 0) {
+    context.logger.info(`Unchanged output files: ${unchangedCount}`);
+  }
 }
 
 export async function calculateEstimatedTransferSizes(
