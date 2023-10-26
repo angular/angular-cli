@@ -256,7 +256,16 @@ export async function executeBuild(
   }
 
   printWarningsAndErrorsToConsole(context, warnings, errors);
-  logBuildStats(context, metafile, initialFiles, budgetFailures, estimatedTransferSizes);
+  const changedFiles =
+    rebuildState && executionResult.findChangedFiles(rebuildState.previousOutputHashes);
+  logBuildStats(
+    context,
+    metafile,
+    initialFiles,
+    budgetFailures,
+    changedFiles,
+    estimatedTransferSizes,
+  );
 
   // Write metafile if stats option is enabled
   if (options.stats) {
