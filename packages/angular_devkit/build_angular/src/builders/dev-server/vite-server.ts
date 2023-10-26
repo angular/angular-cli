@@ -172,11 +172,13 @@ export async function* serveWithVite(
 
     // To avoid disconnecting the array objects from the option, these arrays need to be mutated
     // instead of replaced.
-    if (result.externalMetadata.explicit) {
-      externalMetadata.explicit.push(...result.externalMetadata.explicit);
-    }
-    if (result.externalMetadata.implicit) {
-      externalMetadata.implicit.push(...result.externalMetadata.implicit);
+    if (result.externalMetadata) {
+      if (result.externalMetadata.explicit) {
+        externalMetadata.explicit.push(...result.externalMetadata.explicit);
+      }
+      if (result.externalMetadata.implicit) {
+        externalMetadata.implicit.push(...result.externalMetadata.implicit);
+      }
     }
 
     if (server) {
