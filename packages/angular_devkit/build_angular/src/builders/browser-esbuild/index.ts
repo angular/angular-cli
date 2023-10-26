@@ -57,7 +57,16 @@ export async function* buildEsbuildBrowser(
       await writeResultFiles(result.outputFiles, result.assetFiles, fullOutputPath);
     }
 
-    yield result;
+    // The builder system (architect) currently attempts to treat all results as JSON and
+    // attempts to validate the object with a JSON schema validator. This can lead to slow
+    // build completion (even after the actual build is fully complete) or crashes if the
+    // size and/or quantity of output files is large. Architect only requires a `success`
+    // property so that is all that will be passed here if the infrastructure settings have
+    // not been explicitly set to avoid writes. Writing is only disabled when used directly
+    // by the dev server which bypasses the architect behavior.
+    const builderResult =
+      infrastructureSettings?.write === false ? result : { success: result.success };
+    yield builderResult;
   }
 }
 
