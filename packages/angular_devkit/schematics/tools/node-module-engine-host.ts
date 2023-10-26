@@ -33,7 +33,19 @@ export class NodeModulesEngineHost extends FileSystemEngineHostBase {
     super();
   }
 
-  private resolve(name: string, requester?: string): string {
+  private resolve(name: string, requester?: string, references = new Set<string>()): string {
+    // Keep track of the package requesting the schematic, in order to avoid infinite recursion
+    if (requester) {
+      if (references.has(requester)) {
+        references.add(requester);
+        throw new Error(
+          'Circular schematic reference detected: ' + JSON.stringify(Array.from(references)),
+        );
+      } else {
+        references.add(requester);
+      }
+    }
+
     const relativeBase = requester ? dirname(requester) : process.cwd();
     let collectionPath: string | undefined = undefined;
 
@@ -46,7 +58,6 @@ export class NodeModulesEngineHost extends FileSystemEngineHostBase {
     };
 
     // Try to resolve as a package
-    let possibleCollectionPath = name;
     try {
       const packageJsonPath = require.resolve(join(name, 'package.json'), resolveOptions);
       const { schematics } = require(packageJsonPath);
@@ -61,9 +72,9 @@ export class NodeModulesEngineHost extends FileSystemEngineHostBase {
         const packageDirectory = dirname(packageJsonPath);
         collectionPath = resolve(packageDirectory, schematics);
       }
-      // Otherwise use the path as-is to attempt resolution
+      // Otherwise treat this as a package, and recurse to find the collection path
       else {
-        possibleCollectionPath = schematics;
+        collectionPath = this.resolve(schematics, packageJsonPath, references);
       }
     } catch (e) {
       if ((e as NodeJS.ErrnoException).code !== 'MODULE_NOT_FOUND') {
@@ -74,7 +85,7 @@ export class NodeModulesEngineHost extends FileSystemEngineHostBase {
     // If not a package, try to resolve as a file
     if (!collectionPath) {
       try {
-        collectionPath = require.resolve(possibleCollectionPath, resolveOptions);
+        collectionPath = require.resolve(name, resolveOptions);
       } catch (e) {
         if ((e as NodeJS.ErrnoException).code !== 'MODULE_NOT_FOUND') {
           throw e;
