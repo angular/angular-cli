@@ -45,6 +45,10 @@ export default async function () {
           buildOptimizer: false,
         };
       });
+      await updateJsonFile('tsconfig.json', (tsconfig) => {
+        delete tsconfig.compilerOptions.esModuleInterop;
+        tsconfig.compilerOptions.allowSyntheticDefaultImports = true;
+      });
     }
   }
 

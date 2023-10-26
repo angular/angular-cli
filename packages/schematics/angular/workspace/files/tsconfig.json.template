@@ -9,7 +9,7 @@
     "noPropertyAccessFromIndexSignature": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,<% } %>
-    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
     "sourceMap": true,
     "declaration": false,
     "downlevelIteration": true,
