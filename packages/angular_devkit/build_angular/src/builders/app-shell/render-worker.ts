@@ -51,7 +51,7 @@ interface RenderRequest {
   /**
    * An optional URL path that represents the Angular route that should be rendered.
    */
-  url: string | undefined;
+  url: string;
 }
 
 /**
@@ -77,28 +77,45 @@ async function render({ serverBundlePath, document, url }: RenderRequest): Promi
     },
   ];
 
+  let renderAppPromise: Promise<string>;
   // Render platform server module
   if (isBootstrapFn(bootstrapAppFn)) {
     assert(renderApplication, `renderApplication was not exported from: ${serverBundlePath}.`);
 
-    return renderApplication(bootstrapAppFn, {
+    renderAppPromise = renderApplication(bootstrapAppFn, {
       document,
       url,
       platformProviders,
     });
+  } else {
+    assert(renderModule, `renderModule was not exported from: ${serverBundlePath}.`);
+    const moduleClass = bootstrapAppFn || AppServerModule;
+    assert(
+      moduleClass,
+      `Neither an AppServerModule nor a bootstrapping function was exported from: ${serverBundlePath}.`,
+    );
+
+    renderAppPromise = renderModule(moduleClass, {
+      document,
+      url,
+      extraProviders: platformProviders,
+    });
   }
-  assert(renderModule, `renderModule was not exported from: ${serverBundlePath}.`);
-  const moduleClass = bootstrapAppFn || AppServerModule;
-  assert(
-    moduleClass,
-    `Neither an AppServerModule nor a bootstrapping function was exported from: ${serverBundlePath}.`,
+
+  // The below should really handled by the framework!!!.
+  let timer: NodeJS.Timeout;
+  const renderingTimeout = new Promise<never>(
+    (_, reject) =>
+      (timer = setTimeout(
+        () =>
+          reject(
+            new Error(`Page ${new URL(url, 'resolve://').pathname} did not render in 30 seconds.`),
+          ),
+        30_000,
+      )),
   );
 
-  return renderModule(moduleClass, {
-    document,
-    url,
-    extraProviders: platformProviders,
-  });
+  return Promise.race([renderAppPromise, renderingTimeout]).finally(() => clearTimeout(timer));
 }
 
 function isBootstrapFn(value: unknown): value is () => Promise<ApplicationRef> {
