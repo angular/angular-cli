@@ -17,6 +17,12 @@ import { APPLICATION_BUILDER_INFO, BASE_OPTIONS, describeBuilder } from '../setu
  */
 export const BUILD_TIMEOUT = 30_000;
 
+/**
+ * A regular expression used to check if a built worker is correctly referenced in application code.
+ */
+const REFERENCED_WORKER_REGEXP =
+  /new Worker\(new URL\("worker-[A-Z0-9]{8}\.js", import\.meta\.url\)/;
+
 describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
   describe('Behavior: "Rebuilds when Web Worker files change"', () => {
     it('Recovers from error when directly referenced worker file is changed', async () => {
@@ -59,11 +65,17 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
               case 0:
                 expect(result?.success).toBeTrue();
 
+                // Ensure built worker is referenced in the application code
+                harness
+                  .expectFile('dist/browser/main.js')
+                  .content.toMatch(REFERENCED_WORKER_REGEXP);
+
                 // Update the worker file to be invalid syntax
                 await harness.writeFile('src/app/worker.ts', `asd;fj$3~kls;kd^(*fjlk;sdj---flk`);
 
                 break;
               case 1:
+                expect(result?.success).toBeFalse();
                 expect(logs).toContain(
                   jasmine.objectContaining<logging.LogEntry>({
                     message: jasmine.stringMatching(errorText),
@@ -107,6 +119,11 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
                     message: jasmine.stringMatching(errorText),
                   }),
                 );
+
+                // Ensure built worker is referenced in the application code
+                harness
+                  .expectFile('dist/browser/main.js')
+                  .content.toMatch(REFERENCED_WORKER_REGEXP);
 
                 // Test complete - abort watch mode
                 builderAbort?.abort();
