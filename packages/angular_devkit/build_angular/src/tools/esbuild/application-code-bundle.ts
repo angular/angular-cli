@@ -298,6 +298,12 @@ export function createServerPolyfillBundleOptions(
         // See: https://github.com/evanw/esbuild/issues/1921.
         `import { createRequire } from 'node:module';`,
         `globalThis['require'] ??= createRequire(import.meta.url);`,
+
+        // The below should not be needed but in some cases libraries
+        // do not correctly check if these are undefined.
+        // TODO: consider adding a warning when these are encountered.
+        `globalThis['global'] ??= globalThis;`,
+        `globalThis['self'] ??= globalThis;`,
       ].join('\n'),
     },
     target,
