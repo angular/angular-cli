@@ -78,12 +78,11 @@ async function* getRoutesFromRouterConfig(
 export async function* extractRoutes(
   bootstrapAppFnOrModule: (() => Promise<ApplicationRef>) | Type<unknown>,
   document: string,
-  url: string,
 ): AsyncIterableIterator<RouterResult> {
   const platformRef = createPlatformFactory(platformCore, 'server', [
     {
       provide: INITIAL_CONFIG,
-      useValue: { document, url },
+      useValue: { document, url: '' },
     },
     {
       provide: ɵConsole,
