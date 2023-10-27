@@ -15,6 +15,7 @@ import type { NormalizedApplicationBuildOptions } from '../../builders/applicati
 import { allowMangle } from '../../utils/environment-options';
 import { createCompilerPlugin } from './angular/compiler-plugin';
 import { SourceFileCache } from './angular/source-file-cache';
+import { BundlerOptionsFactory } from './bundler-context';
 import { createCompilerPluginOptions } from './compiler-plugin-options';
 import { createAngularLocaleDataPlugin } from './i18n-locale-plugin';
 import { createRxjsEsmResolutionPlugin } from './rxjs-esm-resolution-plugin';
@@ -73,7 +74,7 @@ export function createBrowserPolyfillBundleOptions(
   options: NormalizedApplicationBuildOptions,
   target: string[],
   sourceFileCache?: SourceFileCache,
-): BuildOptions | undefined {
+): BuildOptions | BundlerOptionsFactory | undefined {
   const namespace = 'angular:polyfills';
   const polyfillBundleOptions = getEsBuildCommonPolyfillsOptions(
     options,
@@ -86,6 +87,7 @@ export function createBrowserPolyfillBundleOptions(
   }
 
   const { outputNames, polyfills } = options;
+  const hasTypeScriptEntries = polyfills?.some((entry) => /\.[cm]?tsx?$/.test(entry));
 
   const buildOptions: BuildOptions = {
     ...polyfillBundleOptions,
@@ -103,7 +105,6 @@ export function createBrowserPolyfillBundleOptions(
   };
 
   // Only add the Angular TypeScript compiler if TypeScript files are provided in the polyfills
-  const hasTypeScriptEntries = polyfills?.some((entry) => /\.[cm]?tsx?$/.test(entry));
   if (hasTypeScriptEntries) {
     buildOptions.plugins ??= [];
     const { pluginOptions, styleOptions } = createCompilerPluginOptions(
@@ -121,7 +122,10 @@ export function createBrowserPolyfillBundleOptions(
     );
   }
 
-  return buildOptions;
+  // Use an options factory to allow fully incremental bundling when no TypeScript files are present.
+  // The TypeScript compilation is not currently integrated into the bundler invalidation so
+  // cannot be used with fully incremental bundling yet.
+  return hasTypeScriptEntries ? buildOptions : () => buildOptions;
 }
 
 /**
