@@ -1,17 +1,16 @@
-version: 2.1
-orbs:
-  path-filtering: circleci/path-filtering@0.1.3
+# This config is remaining in place to prevent pull requests failing because of CircleCI config missing.
 
-# This allows you to use CircleCI's dynamic configuration feature
-setup: true
+version: 2.1
+
+jobs:
+  pass:
+    docker:
+      - image: cimg/base:2022.05
+    steps:
+      - run: echo "This too shall pass (always)"
 
 workflows:
-  run-filter:
+  version: 2
+  default_workflow:
     jobs:
-      - path-filtering/filter:
-          # Compare files on main
-          base-revision: main
-          # 3-column space-separated table for mapping; `path-to-test parameter-to-set value-for-parameter` for each row
-          mapping: |
-            tests/legacy-cli/e2e/ng-snapshot/package.json snapshot_changed true
-          config-path: '.circleci/dynamic_config.yml'
+      - pass
