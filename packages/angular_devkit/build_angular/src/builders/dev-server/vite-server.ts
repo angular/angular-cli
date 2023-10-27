@@ -12,6 +12,7 @@ import type { json, logging } from '@angular-devkit/core';
 import type { Plugin } from 'esbuild';
 import { lookup as lookupMimeType } from 'mrmime';
 import assert from 'node:assert';
+import { randomUUID } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import { ServerResponse } from 'node:http';
 import type { AddressInfo } from 'node:net';
@@ -182,7 +183,7 @@ export async function* serveWithVite(
     }
 
     if (server) {
-      handleUpdate(generatedFiles, server, serverOptions, context.logger);
+      handleUpdate(normalizePath, generatedFiles, server, serverOptions, context.logger);
     } else {
       const projectName = context.target?.project;
       if (!projectName) {
@@ -230,6 +231,7 @@ export async function* serveWithVite(
 }
 
 function handleUpdate(
+  normalizePath: (id: string) => string,
   generatedFiles: Map<string, OutputFileRecord>,
   server: ViteDevServer,
   serverOptions: NormalizedDevServerOptions,
@@ -241,7 +243,9 @@ function handleUpdate(
   for (const [file, record] of generatedFiles) {
     if (record.updated) {
       updatedFiles.push(file);
-      const updatedModules = server.moduleGraph.getModulesByFile(file);
+      const updatedModules = server.moduleGraph.getModulesByFile(
+        normalizePath(path.join(server.config.root, file)),
+      );
       updatedModules?.forEach((m) => server?.moduleGraph.invalidateModule(m));
     }
   }
@@ -255,9 +259,7 @@ function handleUpdate(
       const timestamp = Date.now();
       server.ws.send({
         type: 'update',
-        updates: updatedFiles.map((f) => {
-          const filePath = f.slice(1); // Remove leading slash.
-
+        updates: updatedFiles.map((filePath) => {
           return {
             type: 'css-update',
             timestamp,
@@ -298,7 +300,7 @@ function analyzeResultFiles(
       // This mimics the Webpack dev-server behavior.
       filePath = '/index.html';
     } else {
-      filePath = '/' + normalizePath(file.path);
+      filePath = normalizePath(file.path);
     }
     seen.add(filePath);
 
@@ -365,11 +367,16 @@ export async function setupServer(
   // dynamically import Vite for ESM compatibility
   const { normalizePath } = await import('vite');
 
+  // Path will not exist on disk and only used to provide separate path for Vite requests
+  const virtualProjectRoot = normalizePath(
+    path.join(serverOptions.workspaceRoot, `.angular/vite-root/${randomUUID()}/`),
+  );
+
   const configuration: InlineConfig = {
     configFile: false,
     envFile: false,
     cacheDir: path.join(serverOptions.cacheOptions.path, 'vite'),
-    root: serverOptions.workspaceRoot,
+    root: virtualProjectRoot,
     publicDir: false,
     esbuild: false,
     mode: 'development',
@@ -399,7 +406,7 @@ export async function setupServer(
     },
     ssr: {
       // Exclude any provided dependencies (currently build defined externals)
-      external: externalMetadata.implicit,
+      external: externalMetadata.explicit,
     },
     plugins: [
       createAngularLocaleDataPlugin(),
@@ -415,27 +422,32 @@ export async function setupServer(
             return source;
           }
 
-          if (importer && source.startsWith('.')) {
+          if (importer && source[0] === '.' && importer.startsWith(virtualProjectRoot)) {
             // Remove query if present
             const [importerFile] = importer.split('?', 1);
 
-            source = normalizePath(path.join(path.dirname(importerFile), source));
+            source = normalizePath(
+              path.join(path.dirname(path.relative(virtualProjectRoot, importerFile)), source),
+            );
           }
-
+          if (source[0] === '/') {
+            source = source.slice(1);
+          }
           const [file] = source.split('?', 1);
           if (outputFiles.has(file)) {
-            return source;
+            return path.join(virtualProjectRoot, source);
           }
         },
         load(id) {
           const [file] = id.split('?', 1);
-          const codeContents = outputFiles.get(file)?.contents;
+          const relativeFile = normalizePath(path.relative(virtualProjectRoot, file));
+          const codeContents = outputFiles.get(relativeFile)?.contents;
           if (codeContents === undefined) {
             return;
           }
 
           const code = Buffer.from(codeContents).toString('utf-8');
-          const mapContents = outputFiles.get(file + '.map')?.contents;
+          const mapContents = outputFiles.get(relativeFile + '.map')?.contents;
 
           return {
             // Remove source map URL comments from the code if a sourcemap is present.
@@ -532,7 +544,7 @@ export async function setupServer(
                 return;
               }
 
-              const rawHtml = outputFiles.get('/index.server.html')?.contents;
+              const rawHtml = outputFiles.get('index.server.html')?.contents;
               if (!rawHtml) {
                 next();
 

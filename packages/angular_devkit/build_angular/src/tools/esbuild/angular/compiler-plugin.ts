@@ -222,8 +222,12 @@ export function createCompilerPlugin(
               file.path.endsWith('.js'),
             );
             assert(workerCodeFile, 'Web Worker bundled code file should always be present.');
+            const workerCodePath = path.relative(
+              build.initialOptions.outdir ?? '',
+              workerCodeFile.path,
+            );
 
-            return path.relative(build.initialOptions.outdir ?? '', workerCodeFile.path);
+            return workerCodePath.replaceAll('\\', '/');
           },
         };
 
