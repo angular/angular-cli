@@ -12,7 +12,6 @@ import Piscina from 'piscina';
 import { BuildOutputFile, BuildOutputFileType } from '../../tools/esbuild/bundler-context';
 import { BuildOutputAsset } from '../../tools/esbuild/bundler-execution-result';
 import { getESMLoaderArgs } from './esm-in-memory-loader/node-18-utils';
-import { startServer } from './prerender-server';
 import type { RenderResult, ServerContext } from './render-page';
 import type { RenderWorkerData } from './render-worker';
 import type {
@@ -76,65 +75,62 @@ export async function prerenderPages(
   }
   serverBundlesSourceMaps.clear();
 
-  // Start server to handle HTTP requests to assets.
-  // TODO: consider starting this is a seperate process to avoid any blocks to the main thread.
-  const { address: assetsServerAddress, close: closeAssetsServer } = await startServer(assets);
+  const assetsReversed: Record</** Destination */ string, /** Source */ string> = {};
+  for (const { source, destination } of assets) {
+    assetsReversed[addLeadingSlash(destination.replace(/\\/g, posix.sep))] = source;
+  }
 
-  try {
-    // Get routes to prerender
-    const { routes: allRoutes, warnings: routesWarnings } = await getAllRoutes(
-      workspaceRoot,
-      outputFilesForWorker,
-      document,
-      appShellOptions,
-      prerenderOptions,
-      sourcemap,
-      verbose,
-      assetsServerAddress,
-    );
+  // Get routes to prerender
+  const { routes: allRoutes, warnings: routesWarnings } = await getAllRoutes(
+    workspaceRoot,
+    outputFilesForWorker,
+    assetsReversed,
+    document,
+    appShellOptions,
+    prerenderOptions,
+    sourcemap,
+    verbose,
+  );
 
-    if (routesWarnings?.length) {
-      warnings.push(...routesWarnings);
-    }
+  if (routesWarnings?.length) {
+    warnings.push(...routesWarnings);
+  }
 
-    if (allRoutes.size < 1) {
-      return {
-        errors,
-        warnings,
-        output: {},
-        prerenderedRoutes: allRoutes,
-      };
-    }
-
-    // Render routes
-    const {
-      warnings: renderingWarnings,
-      errors: renderingErrors,
-      output,
-    } = await renderPages(
-      sourcemap,
-      allRoutes,
-      maxThreads,
-      workspaceRoot,
-      outputFilesForWorker,
-      inlineCriticalCss,
-      document,
-      assetsServerAddress,
-      appShellOptions,
-    );
-
-    errors.push(...renderingErrors);
-    warnings.push(...renderingWarnings);
-
+  if (allRoutes.size < 1) {
     return {
       errors,
       warnings,
-      output,
+      output: {},
       prerenderedRoutes: allRoutes,
     };
-  } finally {
-    void closeAssetsServer?.();
   }
+
+  // Render routes
+  const {
+    warnings: renderingWarnings,
+    errors: renderingErrors,
+    output,
+  } = await renderPages(
+    sourcemap,
+    allRoutes,
+    maxThreads,
+    workspaceRoot,
+    outputFilesForWorker,
+    assetsReversed,
+    inlineCriticalCss,
+    document,
+    appShellOptions,
+  );
+
+  errors.push(...renderingErrors);
+  warnings.push(...renderingWarnings);
+
+  return {
+    errors,
+    warnings,
+    output,
+    prerenderedRoutes: allRoutes,
+  };
 }
 
 class RoutesSet extends Set<string> {
@@ -149,9 +145,9 @@ async function renderPages(
   maxThreads: number,
   workspaceRoot: string,
   outputFilesForWorker: Record<string, string>,
+  assetFilesForWorker: Record<string, string>,
   inlineCriticalCss: boolean,
   document: string,
-  baseUrl: string,
   appShellOptions: AppShellOptions,
 ): Promise<{
   output: Record<string, string>;
@@ -173,9 +169,9 @@ async function renderPages(
     workerData: {
       workspaceRoot,
       outputFiles: outputFilesForWorker,
+      assetFiles: assetFilesForWorker,
       inlineCriticalCss,
       document,
-      baseUrl,
     } as RenderWorkerData,
     execArgv: workerExecArgv,
   });
@@ -225,12 +221,12 @@ async function renderPages(
 async function getAllRoutes(
   workspaceRoot: string,
   outputFilesForWorker: Record<string, string>,
+  assetFilesForWorker: Record<string, string>,
   document: string,
   appShellOptions: AppShellOptions,
   prerenderOptions: PrerenderOptions,
   sourcemap: boolean,
   verbose: boolean,
-  assetsServerAddress: string,
 ): Promise<{ routes: Set<string>; warnings?: string[] }> {
   const { routesFile, discoverRoutes } = prerenderOptions;
   const routes = new RoutesSet();
@@ -262,9 +258,9 @@ async function getAllRoutes(
     workerData: {
       workspaceRoot,
       outputFiles: outputFilesForWorker,
+      assetFiles: assetFilesForWorker,
       document,
       verbose,
-      url: assetsServerAddress,
     } as RoutesExtractorWorkerData,
     execArgv: workerExecArgv,
   });

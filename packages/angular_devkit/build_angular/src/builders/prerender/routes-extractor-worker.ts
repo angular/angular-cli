@@ -51,7 +51,7 @@ async function extract(): Promise<string[]> {
   );
 
   const routes: string[] = [];
-  for await (const { route, success } of extractRoutes(bootstrapAppFnOrModule, document, '')) {
+  for await (const { route, success } of extractRoutes(bootstrapAppFnOrModule, document)) {
     if (success) {
       routes.push(route);
     }
