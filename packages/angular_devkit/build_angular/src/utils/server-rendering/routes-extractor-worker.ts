@@ -10,12 +10,12 @@ import { workerData } from 'node:worker_threads';
 import { loadEsmModule } from '../load-esm';
 import type { ESMInMemoryFileLoaderWorkerData } from './esm-in-memory-loader/loader-hooks';
 import { MainServerBundleExports, RenderUtilsServerBundleExports } from './main-bundle-exports';
+import { startServer } from './prerender-server';
 
 export interface RoutesExtractorWorkerData extends ESMInMemoryFileLoaderWorkerData {
   document: string;
   verbose: boolean;
-  url: string;
-  assetsServerAddress: string;
+  assetFiles: Record</** Destination */ string, /** Source */ string>;
 }
 
 export interface RoutersExtractorWorkerResult {
@@ -26,9 +26,11 @@ export interface RoutersExtractorWorkerResult {
 /**
  * This is passed as workerData when setting up the worker via the `piscina` package.
  */
-const { document, verbose, url } = workerData as RoutesExtractorWorkerData;
+const { document, verbose, assetFiles } = workerData as RoutesExtractorWorkerData;
+let baseUrl = '';
 
-export default async function (): Promise<RoutersExtractorWorkerResult> {
+/** Renders an application based on a provided options. */
+async function extractRoutes(): Promise<RoutersExtractorWorkerResult> {
   const { extractRoutes } = await loadEsmModule<RenderUtilsServerBundleExports>(
     './render-utils.server.mjs',
   );
@@ -42,7 +44,7 @@ export default async function (): Promise<RoutersExtractorWorkerResult> {
   for await (const { route, success, redirect } of extractRoutes(
     bootstrapAppFnOrModule,
     document,
-    url,
+    baseUrl,
   )) {
     if (success) {
       routes.push(route);
@@ -77,3 +79,12 @@ export default async function (): Promise<RoutersExtractorWorkerResult> {
 
   return { routes, warnings };
 }
+
+async function initialize() {
+  const { address } = await startServer(assetFiles);
+  baseUrl = address;
+
+  return extractRoutes;
+}
+
+export default initialize();

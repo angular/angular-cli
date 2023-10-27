@@ -9,8 +9,7 @@
 import { lookup as lookupMimeType } from 'mrmime';
 import { readFile } from 'node:fs/promises';
 import { IncomingMessage, RequestListener, ServerResponse, createServer } from 'node:http';
-import { extname, posix } from 'node:path';
-import { BuildOutputAsset } from '../../tools/esbuild/bundler-execution-result';
+import { extname } from 'node:path';
 
 /**
  * Start a server that can handle HTTP requests to assets.
@@ -21,19 +20,14 @@ import { BuildOutputAsset } from '../../tools/esbuild/bundler-execution-result';
  * ```
  * @returns the server address.
  */
-export async function startServer(assets: Readonly<BuildOutputAsset[]>): Promise<{
+export async function startServer(assetsReversed: Record<string, string>): Promise<{
   address: string;
   close?: () => void;
 }> {
-  if (Object.keys(assets).length === 0) {
+  if (Object.keys(assetsReversed).length === 0) {
     return {
       address: '',
     };
-  }
-
-  const assetsReversed: Record<string, string> = {};
-  for (const { source, destination } of assets) {
-    assetsReversed[addLeadingSlash(destination.replace(/\\/g, posix.sep))] = source;
   }
 
   const assetsCache: Map<string, { mimeType: string | void; content: Buffer }> = new Map();
@@ -63,6 +57,7 @@ export async function startServer(assets: Readonly<BuildOutputAsset[]>): Promise
     },
   };
 }
+
 function requestHandler(
   assetsReversed: Record<string, string>,
   assetsCache: Map<string, { mimeType: string | void; content: Buffer }>,
@@ -114,8 +109,4 @@ function requestHandler(
       })
       .catch((e) => res.destroy(e));
   };
-}
-
-function addLeadingSlash(value: string): string {
-  return value.charAt(0) === '/' ? value : '/' + value;
 }

@@ -8,12 +8,13 @@
 
 import { workerData } from 'node:worker_threads';
 import type { ESMInMemoryFileLoaderWorkerData } from './esm-in-memory-loader/loader-hooks';
+import { startServer } from './prerender-server';
 import { RenderResult, ServerContext, renderPage } from './render-page';
 
 export interface RenderWorkerData extends ESMInMemoryFileLoaderWorkerData {
   document: string;
   inlineCriticalCss?: boolean;
-  baseUrl: string;
+  assetFiles: Record</** Destination */ string, /** Source */ string>;
 }
 
 export interface RenderOptions {
@@ -24,10 +25,12 @@ export interface RenderOptions {
 /**
  * This is passed as workerData when setting up the worker via the `piscina` package.
  */
-const { outputFiles, document, inlineCriticalCss, baseUrl } = workerData as RenderWorkerData;
+const { outputFiles, document, inlineCriticalCss, assetFiles } = workerData as RenderWorkerData;
+
+let baseUrl = '';
 
 /** Renders an application based on a provided options. */
-export default function (options: RenderOptions): Promise<RenderResult> {
+async function render(options: RenderOptions): Promise<RenderResult> {
   return renderPage({
     ...options,
     route: baseUrl + options.route,
@@ -36,3 +39,12 @@ export default function (options: RenderOptions): Promise<RenderResult> {
     inlineCriticalCss,
   });
 }
+
+async function initialize() {
+  const { address } = await startServer(assetFiles);
+  baseUrl = address;
+
+  return render;
+}
+
+export default initialize();
