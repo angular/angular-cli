@@ -209,6 +209,7 @@
     "ts-node": "^10.9.1",
     "tslib": "2.6.2",
     "typescript": "5.2.2",
+    "undici": "5.27.0",
     "verdaccio": "5.27.0",
     "verdaccio-auth-memory": "^10.0.0",
     "vite": "4.5.0",
