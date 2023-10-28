@@ -206,12 +206,15 @@ export async function executeBuild(
   if (options.budgets) {
     const compatStats = generateBudgetStats(metafile, initialFiles);
     budgetFailures = [...checkBudgets(options.budgets, compatStats, true)];
-    for (const { severity, message } of budgetFailures) {
-      if (severity === 'error') {
-        context.logger.error(message);
-      } else {
-        context.logger.warn(message);
-      }
+    if (budgetFailures.length > 0) {
+      await logMessages(context, {
+        errors: budgetFailures
+          .filter((failure) => failure.severity === 'error')
+          .map((failure) => ({ text: failure.message, location: null })),
+        warnings: budgetFailures
+          .filter((failure) => failure.severity !== 'error')
+          .map((failure) => ({ text: failure.message, location: null })),
+      });
     }
   }
 
@@ -255,7 +258,7 @@ export async function executeBuild(
     );
   }
 
-  printWarningsAndErrorsToConsole(context, warnings, errors);
+  await printWarningsAndErrorsToConsole(context, warnings, errors);
   const changedFiles =
     rebuildState && executionResult.findChangedFiles(rebuildState.previousOutputHashes);
   logBuildStats(
@@ -279,15 +282,13 @@ export async function executeBuild(
   return executionResult;
 }
 
-function printWarningsAndErrorsToConsole(
+async function printWarningsAndErrorsToConsole(
   context: BuilderContext,
   warnings: string[],
   errors: string[],
-): void {
-  for (const error of errors) {
-    context.logger.error(error);
-  }
-  for (const warning of warnings) {
-    context.logger.warn(warning);
-  }
+): Promise<void> {
+  await logMessages(context, {
+    errors: errors.map((text) => ({ text, location: null })),
+    warnings: warnings.map((text) => ({ text, location: null })),
+  });
 }
