@@ -236,6 +236,11 @@ function transformInlineStyleLiteral(
     return node;
   }
 
+  // Don't transform empty strings as PostCSS will choke on them. No work to do anyways.
+  if (node.text === '') {
+    return node;
+  }
+
   if (!isInlineStyle) {
     const url = getResourceUrl(node);
 
