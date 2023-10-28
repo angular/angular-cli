@@ -37,6 +37,7 @@ export async function extractMessages(
   buildOptions.optimization = false;
   buildOptions.sourceMap = { scripts: true, vendor: true };
   buildOptions.localize = false;
+  buildOptions.budgets = undefined;
 
   let build;
   if (builderName === '@angular-devkit/build-angular:application') {
