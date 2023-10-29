@@ -183,6 +183,7 @@ function _validateReversePeerDependencies(
         '@schematics/update',
         '@angular-devkit/build-ng-packagr',
         'tsickle',
+        '@nguniversal/builders',
       ];
       if (ignoredPackages.includes(installed)) {
         continue;
@@ -698,11 +699,14 @@ function _addPackageGroup(
   }
   let packageGroupNormalized: Record<string, string> = {};
   if (Array.isArray(packageGroup) && !packageGroup.some((x) => typeof x != 'string')) {
-    packageGroupNormalized = packageGroup.reduce((acc, curr) => {
-      acc[curr] = maybePackage;
+    packageGroupNormalized = packageGroup.reduce(
+      (acc, curr) => {
+        acc[curr] = maybePackage;
 
-      return acc;
-    }, {} as { [name: string]: string });
+        return acc;
+      },
+      {} as { [name: string]: string },
+    );
   } else if (
     typeof packageGroup == 'object' &&
     packageGroup &&
