@@ -104,11 +104,12 @@ export function checkCommonJSModules(
         }
 
         if (notAllowed) {
-          // Issue a diagnostic message and skip all descendants since they are also most
-          // likely not ESM but solved by addressing this import.
+          // Issue a diagnostic message for CommonJS module
           messages.push(createCommonJSModuleError(request, currentFile));
-          continue;
         }
+
+        // Skip all descendants since they are also most likely not ESM but solved by addressing this import
+        continue;
       }
 
       // Add the path so that its imports can be checked
