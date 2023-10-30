@@ -6,8 +6,6 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-// eslint-disable-next-line import/no-extraneous-dependencies
-import fetch from 'node-fetch';
 import { concatMap, count, take, timeout } from 'rxjs';
 import { serveWebpackBrowser } from '../../index';
 import { executeOnceAndFetch } from '../execute-fetch';
@@ -177,7 +175,7 @@ describeBuilder(serveWebpackBrowser, DEV_SERVER_BUILDER_INFO, (harness) => {
           concatMap(async ({ result }, index) => {
             expect(result?.success).toBeTrue();
             const response = await fetch(new URL('ngsw.json', `${result?.baseUrl}`));
-            const { hashTable } = await response.json();
+            const { hashTable } = (await response.json()) as { hashTable: object };
             const hashTableEntries = Object.keys(hashTable);
 
             switch (index) {

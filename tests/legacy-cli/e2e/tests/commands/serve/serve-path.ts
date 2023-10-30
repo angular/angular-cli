@@ -1,5 +1,4 @@
 import * as assert from 'assert';
-import fetch from 'node-fetch';
 import { killAllProcesses } from '../../../utils/process';
 import { ngServe } from '../../../utils/project';
 
