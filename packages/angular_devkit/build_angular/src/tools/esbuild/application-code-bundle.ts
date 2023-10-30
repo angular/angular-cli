@@ -250,7 +250,7 @@ export function createServerPolyfillBundleOptions(
   options: NormalizedApplicationBuildOptions,
   target: string[],
   sourceFileCache?: SourceFileCache,
-): BuildOptions | undefined {
+): BundlerOptionsFactory | undefined {
   const polyfills: string[] = [];
   const zoneFlagsNamespace = 'angular:zone-flags/placeholder';
   const polyfillsFromConfig = new Set(options.polyfills);
@@ -329,7 +329,7 @@ export function createServerPolyfillBundleOptions(
 
   buildOptions.plugins.push(createRxjsEsmResolutionPlugin());
 
-  return buildOptions;
+  return () => buildOptions;
 }
 
 function getEsBuildCommonOptions(options: NormalizedApplicationBuildOptions): BuildOptions {
