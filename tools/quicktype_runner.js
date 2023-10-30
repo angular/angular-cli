@@ -60,7 +60,6 @@ class FetchingJSONSchemaStore extends JSONSchemaStore {
       content = fs.readFileSync(filePath, 'utf-8').trim();
     } else if (url.hostname) {
       try {
-        const fetch = require('node-fetch');
         const response = await fetch(address);
         content = response.text();
       } catch (e) {

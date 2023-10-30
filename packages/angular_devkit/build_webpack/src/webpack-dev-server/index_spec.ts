@@ -11,7 +11,6 @@ import { WorkspaceNodeModulesArchitectHost } from '@angular-devkit/architect/nod
 import { TestingArchitectHost } from '@angular-devkit/architect/testing';
 import { schema, workspaces } from '@angular-devkit/core';
 import { NodeJsSyncHost } from '@angular-devkit/core/node';
-import fetch from 'node-fetch'; // eslint-disable-line import/no-extraneous-dependencies
 import * as path from 'path';
 import { DevServerBuildOutput } from './index';
 

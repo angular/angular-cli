@@ -1,4 +1,3 @@
-import fetch from 'node-fetch';
 import { getGlobalVariable } from '../../utils/env';
 import { appendToFile, replaceInFile, writeMultipleFiles } from '../../utils/fs';
 import { silentNg, waitForAnyProcessOutputToMatch } from '../../utils/process';

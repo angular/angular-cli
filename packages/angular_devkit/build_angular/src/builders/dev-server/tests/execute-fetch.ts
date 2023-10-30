@@ -6,7 +6,6 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import fetch, { RequestInit, Response } from 'node-fetch'; // eslint-disable-line import/no-extraneous-dependencies
 import { lastValueFrom, mergeMap, take, timeout } from 'rxjs';
 import { URL } from 'url';
 import {

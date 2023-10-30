@@ -295,7 +295,6 @@ ts_library(
         "//packages/angular_devkit/architect/testing",
         "//packages/angular_devkit/core",
         "//packages/angular_devkit/core/node",
-        "@npm//@types/node-fetch",
         "@npm//rxjs",
     ],
 )
@@ -314,11 +313,10 @@ LARGE_SPECS = {
         "shards": 10,
         "size": "large",
         "extra_deps": [
-            "@npm//@types/node-fetch",
-            "@npm//node-fetch",
             "@npm//@types/http-proxy",
             "@npm//http-proxy",
             "@npm//puppeteer",
+            "@npm//undici",
         ],
     },
     "extract-i18n": {},
@@ -374,9 +372,8 @@ LARGE_SPECS = {
     "ssr-dev-server": {
         "extra_deps": [
             "@npm//@types/browser-sync",
-            "@npm//@types/node-fetch",
             "@npm//browser-sync",
-            "@npm//node-fetch",
+            "@npm//undici",
             "//packages/angular/ssr",
         ],
     },

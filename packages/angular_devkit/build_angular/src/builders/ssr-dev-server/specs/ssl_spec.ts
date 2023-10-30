@@ -9,8 +9,7 @@
 import { Architect } from '@angular-devkit/architect';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import * as browserSync from 'browser-sync';
-import * as https from 'https';
-import fetch from 'node-fetch'; // eslint-disable-line import/no-extraneous-dependencies
+import { Agent, getGlobalDispatcher, setGlobalDispatcher } from 'undici';
 import { createArchitect, host } from '../../../testing/test-utils';
 import { SSRDevServerBuilderOutput } from '../index';
 
@@ -78,12 +77,21 @@ describe('Serve SSR Builder', () => {
     expect(output.success).toBe(true);
     expect(output.baseUrl).toBe(`https://localhost:${output.port}`);
 
-    const response = await fetch(`https://localhost:${output.port}/index.html`, {
-      agent: new https.Agent({ rejectUnauthorized: false }),
-    });
+    // The self-signed certificate used by the dev server will cause fetch to fail
+    // unless reject unauthorized is disabled.
+    const originalDispatcher = getGlobalDispatcher();
+    setGlobalDispatcher(
+      new Agent({
+        connect: { rejectUnauthorized: false },
+      }),
+    );
+    try {
+      const response = await fetch(`https://localhost:${output.port}/index.html`);
+      expect(await response.text()).toContain('<title>HelloWorldApp</title>');
+    } finally {
+      setGlobalDispatcher(originalDispatcher);
+    }
 
     await run.stop();
-
-    expect(await response.text()).toContain('<title>HelloWorldApp</title>');
   });
 });

@@ -9,7 +9,6 @@ ts_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "@npm//@types/node-fetch",
         "@npm//@types/semver",
         "@npm//@types/tar",
         "@npm//@types/yargs-parser",
