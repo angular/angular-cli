@@ -16,7 +16,7 @@ function createWorkSpaceConfig(tree: UnitTestTree) {
     projects: {
       app: {
         root: '',
-        sourceRoot: '/src',
+        sourceRoot: 'src',
         projectType: ProjectType.Application,
         prefix: 'app',
         architect: {
@@ -181,7 +181,7 @@ if (moduleFilename === __filename || moduleFilename.includes('iisnode')) {
 
   it(`should replace imports from '@nguniversal/common' to '@angular/ssr'`, async () => {
     tree.create(
-      'file.ts',
+      'src/file.ts',
       `
       import { CommonEngine } from '@nguniversal/common';
       import { Component } from '@angular/core';
@@ -189,12 +189,12 @@ if (moduleFilename === __filename || moduleFilename.includes('iisnode')) {
     );
 
     const newTree = await schematicRunner.runSchematic(schematicName, {}, tree);
-    expect(newTree.readContent('/file.ts')).toContain(
+    expect(newTree.readContent('src//file.ts')).toContain(
       `import { CommonEngine } from '@angular/ssr';`,
     );
   });
 
-  it(`should replace anf backup 'server.ts' file`, async () => {
+  it(`should replace and backup 'server.ts' file`, async () => {
     const newTree = await schematicRunner.runSchematic(schematicName, {}, tree);
     expect(newTree.readContent('server.ts.bak')).toContain(
       `import { ngExpressEngine } from '@nguniversal/express-engine';`,
@@ -203,5 +203,30 @@ if (moduleFilename === __filename || moduleFilename.includes('iisnode')) {
     const newServerFile = newTree.readContent('server.ts');
     expect(newServerFile).toContain(`import { CommonEngine } from '@angular/ssr';`);
     expect(newServerFile).toContain(`const distFolder = join(process.cwd(), 'dist/browser');`);
+  });
+
+  it(`should create tokens file and replace usages of '@nguniversal/express-engine/tokens'`, async () => {
+    const filePath = 'src/tokens-usage.ts';
+    tree.create(filePath, `import {RESPONSE} from '@nguniversal/express-engine/tokens';`);
+
+    const newTree = await schematicRunner.runSchematic(schematicName, {}, tree);
+    expect(tree.readContent(filePath)).toContain(`import {RESPONSE} from './express.tokens';`);
+
+    const newServerFile = newTree.readContent('server.ts');
+    expect(newServerFile).toContain(`{ provide: RESPONSE, useValue: res }`);
+    expect(newServerFile).toContain(`import { REQUEST, RESPONSE } from './src/express.tokens';`);
+
+    expect(newTree.exists('src/express.tokens.ts')).toBeTrue();
+  });
+
+  it(`should not create tokens file when '@nguniversal/express-engine/tokens' is not used`, async () => {
+    const newTree = await schematicRunner.runSchematic(schematicName, {}, tree);
+    const newServerFile = newTree.readContent('server.ts');
+    expect(newServerFile).not.toContain(`{ provide: RESPONSE, useValue: res }`);
+    expect(newServerFile).not.toContain(
+      `import { REQUEST, RESPONSE } from './src/express.tokens';`,
+    );
+
+    expect(newTree.exists('src/express.tokens.ts')).toBeFalse();
   });
 });
