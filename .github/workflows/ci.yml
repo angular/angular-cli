@@ -109,17 +109,20 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest]
-        node: [18]
+        node: [18, 20]
         subset: [npm, yarn, esbuild]
         shard: [0, 1, 2, 3, 4, 5]
         exclude:
-          # Exclude Node.js v16 when running on a PR
-          - node: ${{ github.event_name != 'pull_request' && 'none' || '16' }}
+          # Exclude Node.js v18 when running on a PR
+          - node: ${{ github.event_name != 'pull_request' && 'none' || '18' }}
           # Exclude Windows when running on a PR
           - os: ${{ github.event_name != 'pull_request' && 'none' || 'windows-latest' }}
-          # Skip yarn subset for Windows
+          # Skip yarn subset on Windows
           - os: windows-latest
             subset: yarn
+          # Skip node 18 tests on Windows
+          - os: windows-latest
+            node: 18
     runs-on: ${{ matrix.os }}
     steps:
       - name: Initialize environment
