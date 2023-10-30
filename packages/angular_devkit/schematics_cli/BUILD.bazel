@@ -1,7 +1,6 @@
 load("@npm//@bazel/jasmine:index.bzl", "jasmine_node_test")
 load("//tools:defaults.bzl", "pkg_npm", "ts_library")
 load("//tools:ts_json_schema.bzl", "ts_json_schema")
-load("//tools:toolchain_info.bzl", "TOOLCHAINS_NAMES", "TOOLCHAINS_VERSIONS")
 
 # Copyright Google Inc. All Rights Reserved.
 #
@@ -74,18 +73,10 @@ ts_library(
     ],
 )
 
-[
-    jasmine_node_test(
-        name = "schematics_cli_test_" + toolchain_name,
-        srcs = [":schematics_cli_test_lib"],
-        tags = [toolchain_name],
-        toolchain = toolchain,
-    )
-    for toolchain_name, toolchain in zip(
-        TOOLCHAINS_NAMES,
-        TOOLCHAINS_VERSIONS,
-    )
-]
+jasmine_node_test(
+    name = "schematics_cli_test",
+    srcs = [":schematics_cli_test_lib"],
+)
 
 ts_json_schema(
     name = "blank_schema",
