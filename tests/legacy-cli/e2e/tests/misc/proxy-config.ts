@@ -2,8 +2,7 @@ import express from 'express';
 import * as http from 'http';
 
 import { writeFile } from '../../utils/fs';
-import fetch from 'node-fetch';
-import { killAllProcesses, ng } from '../../utils/process';
+import { killAllProcesses } from '../../utils/process';
 import { ngServe } from '../../utils/project';
 import { AddressInfo } from 'net';
 import * as assert from 'assert';

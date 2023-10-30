@@ -123,8 +123,7 @@
     tslib "^2.3.0"
 
 "@angular/bazel@https://github.com/angular/bazel-builds.git#2a68e955e8b13c9048246509165188bf52b0f930":
-  version "17.1.0-next.0+sha-fc9ba39"
-  uid "2a68e955e8b13c9048246509165188bf52b0f930"
+  version "17.1.0-next.0"
   resolved "https://github.com/angular/bazel-builds.git#2a68e955e8b13c9048246509165188bf52b0f930"
   dependencies:
     "@microsoft/api-extractor" "^7.24.2"
@@ -141,7 +140,6 @@
 
 "@angular/build-tooling@https://github.com/angular/dev-infra-private-build-tooling-builds.git#1aa5847d4e55262a7e26b59d8d497b1c1a3c3d62":
   version "0.0.0-4ccf7eed68bba0d25f7edd47997852774f61755d"
-  uid "1aa5847d4e55262a7e26b59d8d497b1c1a3c3d62"
   resolved "https://github.com/angular/dev-infra-private-build-tooling-builds.git#1aa5847d4e55262a7e26b59d8d497b1c1a3c3d62"
   dependencies:
     "@angular-devkit/build-angular" "17.0.0-rc.0"
@@ -306,7 +304,6 @@
 
 "@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#162ca6b95d162df53acd87e90ff04972f951e14e":
   version "0.0.0-4ccf7eed68bba0d25f7edd47997852774f61755d"
-  uid "162ca6b95d162df53acd87e90ff04972f951e14e"
   resolved "https://github.com/angular/dev-infra-private-ng-dev-builds.git#162ca6b95d162df53acd87e90ff04972f951e14e"
   dependencies:
     "@yarnpkg/lockfile" "^1.1.0"
@@ -3310,7 +3307,7 @@
   resolved "https://registry.yarnpkg.com/@types/minimatch/-/minimatch-5.1.2.tgz#07508b45797cb81ec3f273011b054cd0755eddca"
   integrity sha512-K0VQKziLUWkVKiRVrx4a40iPaxTUefQmjtkQofBkYRcoaaL/8rhwDWww9qWbrgicNOgnpIsMxyNIUM4+n6dUIA==
 
-"@types/node-fetch@*", "@types/node-fetch@^2.1.6":
+"@types/node-fetch@*":
   version "2.6.7"
   resolved "https://registry.yarnpkg.com/@types/node-fetch/-/node-fetch-2.6.7.tgz#a1abe2ce24228b58ad97f99480fdcf9bbc6ab16d"
   integrity sha512-lX17GZVpJ/fuCjguZ5b3TjEbSENxmEk1B2z02yoXSK9WMEWRivhdSY73wWMn6bpcCDAOh6qAdktpKHIlkDk2lg==
@@ -8969,7 +8966,7 @@ node-fetch@2.6.7, node-fetch@cjs:
   dependencies:
     whatwg-url "^5.0.0"
 
-node-fetch@^2.2.0, node-fetch@^2.6.12:
+node-fetch@^2.6.12:
   version "2.7.0"
   resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.7.0.tgz#d0f0fa6e3e2dc1d27efcd8ad99d550bda94d187d"
   integrity sha512-c4FRfUm/dbcWZ7U+1Wq0AwCyFL+3nt2bEw05wfxSz+DWpWsitgmSgYmy2dQdWyKC1694ELPqMs/YzUSNozLt8A==
@@ -10744,7 +10741,6 @@ sass@1.69.5, sass@^1.55.0:
 
 "sauce-connect-proxy@https://saucelabs.com/downloads/sc-4.9.1-linux.tar.gz":
   version "0.0.0"
-  uid "9310bc860f7870a1f872b11c4dc6073a1ad34e5e"
   resolved "https://saucelabs.com/downloads/sc-4.9.1-linux.tar.gz#9310bc860f7870a1f872b11c4dc6073a1ad34e5e"
 
 saucelabs@^1.5.0:

@@ -9,8 +9,7 @@
 import { Architect, BuilderRun } from '@angular-devkit/architect';
 import { DevServerBuilderOutput } from '@angular-devkit/build-angular';
 import { tags } from '@angular-devkit/core';
-import * as https from 'https';
-import fetch from 'node-fetch'; // eslint-disable-line import/no-extraneous-dependencies
+import { Agent, getGlobalDispatcher, setGlobalDispatcher } from 'undici';
 import { createArchitect, host } from '../../../testing/test-utils';
 
 describe('Dev Server Builder ssl', () => {
@@ -36,10 +35,20 @@ describe('Dev Server Builder ssl', () => {
     expect(output.success).toBe(true);
     expect(output.baseUrl).toMatch(/^https:\/\/localhost:\d+\//);
 
-    const response = await fetch(output.baseUrl, {
-      agent: new https.Agent({ rejectUnauthorized: false }),
-    });
-    expect(await response.text()).toContain('<title>HelloWorldApp</title>');
+    // The self-signed certificate used by the dev server will cause fetch to fail
+    // unless reject unauthorized is disabled.
+    const originalDispatcher = getGlobalDispatcher();
+    setGlobalDispatcher(
+      new Agent({
+        connect: { rejectUnauthorized: false },
+      }),
+    );
+    try {
+      const response = await fetch(output.baseUrl);
+      expect(await response.text()).toContain('<title>HelloWorldApp</title>');
+    } finally {
+      setGlobalDispatcher(originalDispatcher);
+    }
   });
 
   it('supports key and cert', async () => {
@@ -113,9 +122,19 @@ describe('Dev Server Builder ssl', () => {
     expect(output.success).toBe(true);
     expect(output.baseUrl).toMatch(/^https:\/\/localhost:\d+\//);
 
-    const response = await fetch(output.baseUrl, {
-      agent: new https.Agent({ rejectUnauthorized: false }),
-    });
-    expect(await response.text()).toContain('<title>HelloWorldApp</title>');
+    // The self-signed certificate used by the dev server will cause fetch to fail
+    // unless reject unauthorized is disabled.
+    const originalDispatcher = getGlobalDispatcher();
+    setGlobalDispatcher(
+      new Agent({
+        connect: { rejectUnauthorized: false },
+      }),
+    );
+    try {
+      const response = await fetch(output.baseUrl);
+      expect(await response.text()).toContain('<title>HelloWorldApp</title>');
+    } finally {
+      setGlobalDispatcher(originalDispatcher);
+    }
   });
 });
