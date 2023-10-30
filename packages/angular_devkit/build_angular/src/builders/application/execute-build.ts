@@ -29,6 +29,7 @@ import {
   transformSupportedBrowsersToTargets,
 } from '../../tools/esbuild/utils';
 import { checkBudgets } from '../../utils/bundle-calculator';
+import { colors } from '../../utils/color';
 import { copyAssets } from '../../utils/copy-assets';
 import { getSupportedBrowsers } from '../../utils/supported-browsers';
 import { executePostBundleSteps } from './execute-post-bundle';
@@ -250,15 +251,25 @@ export async function executeBuild(
     executionResult.assetFiles.push(...result.additionalAssets);
   }
 
+  await printWarningsAndErrorsToConsole(context, warnings, errors);
+
   if (prerenderOptions) {
     executionResult.addOutputFile(
       'prerendered-routes.json',
       JSON.stringify({ routes: prerenderedRoutes.sort((a, b) => a.localeCompare(b)) }, null, 2),
       BuildOutputFileType.Root,
     );
+
+    let prerenderMsg = `Prerendered ${prerenderedRoutes.length} static route`;
+    if (prerenderedRoutes.length > 1) {
+      prerenderMsg += 's.';
+    } else {
+      prerenderMsg += '.';
+    }
+
+    context.logger.info(colors.magenta(prerenderMsg) + '\n');
   }
 
-  await printWarningsAndErrorsToConsole(context, warnings, errors);
   const changedFiles =
     rebuildState && executionResult.findChangedFiles(rebuildState.previousOutputHashes);
   logBuildStats(
