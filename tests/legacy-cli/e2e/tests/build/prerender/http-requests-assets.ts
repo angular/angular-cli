@@ -5,12 +5,6 @@ import { installWorkspacePackages } from '../../../utils/packages';
 import { useSha } from '../../../utils/project';
 
 export default async function () {
-  // TODO(alanagius): allow this test to run for non snapshots once FW v17.0.0-rc.1 is released on NPM.
-  const isSnapshotBuild = getGlobalVariable('argv')['ng-snapshots'];
-  if (!isSnapshotBuild) {
-    return;
-  }
-
   const useWebpackBuilder = !getGlobalVariable('argv')['esbuild'];
   if (useWebpackBuilder) {
     // Not supported by the webpack based builder.
