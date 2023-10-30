@@ -26,18 +26,13 @@ export interface JavaScriptTransformerOptions {
  * and advanced optimizations.
  */
 export class JavaScriptTransformer {
-  #workerPool: Piscina;
+  #workerPool: Piscina | undefined;
   #commonOptions: Required<JavaScriptTransformerOptions>;
 
-  constructor(options: JavaScriptTransformerOptions, maxThreads: number) {
-    this.#workerPool = new Piscina({
-      filename: require.resolve('./javascript-transformer-worker'),
-      minThreads: 1,
-      maxThreads,
-      // Shutdown idle threads after 1 second of inactivity
-      idleTimeout: 1000,
-    });
-
+  constructor(
+    options: JavaScriptTransformerOptions,
+    readonly maxThreads: number,
+  ) {
     // Extract options to ensure only the named options are serialized and sent to the worker
     const {
       sourcemap,
@@ -53,6 +48,18 @@ export class JavaScriptTransformer {
     };
   }
 
+  #ensureWorkerPool(): Piscina {
+    this.#workerPool ??= new Piscina({
+      filename: require.resolve('./javascript-transformer-worker'),
+      minThreads: 1,
+      maxThreads: this.maxThreads,
+      // Shutdown idle threads after 1 second of inactivity
+      idleTimeout: 1000,
+    });
+
+    return this.#workerPool;
+  }
+
   /**
    * Performs JavaScript transformations on a file from the filesystem.
    * If no transformations are required, the data for the original file will be returned.
@@ -63,7 +70,7 @@ export class JavaScriptTransformer {
   transformFile(filename: string, skipLinker?: boolean): Promise<Uint8Array> {
     // Always send the request to a worker. Files are almost always from node modules which means
     // they may need linking. The data is also not yet available to perform most transformation checks.
-    return this.#workerPool.run({
+    return this.#ensureWorkerPool().run({
       filename,
       skipLinker,
       ...this.#commonOptions,
@@ -92,7 +99,7 @@ export class JavaScriptTransformer {
       );
     }
 
-    return this.#workerPool.run({
+    return this.#ensureWorkerPool().run({
       filename,
       data,
       skipLinker,
@@ -104,10 +111,16 @@ export class JavaScriptTransformer {
    * Stops all active transformation tasks and shuts down all workers.
    * @returns A void promise that resolves when closing is complete.
    */
-  close(): Promise<void> {
-    // Workaround piscina bug where a worker thread will be recreated after destroy to meet the minimum.
-    this.#workerPool.options.minThreads = 0;
+  async close(): Promise<void> {
+    if (this.#workerPool) {
+      // Workaround piscina bug where a worker thread will be recreated after destroy to meet the minimum.
+      this.#workerPool.options.minThreads = 0;
 
-    return this.#workerPool.destroy();
+      try {
+        await this.#workerPool.destroy();
+      } finally {
+        this.#workerPool = undefined;
+      }
+    }
   }
 }
