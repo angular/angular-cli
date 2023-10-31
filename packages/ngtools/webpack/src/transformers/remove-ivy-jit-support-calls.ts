@@ -12,6 +12,7 @@ import { elideImports } from './elide_imports';
 export function removeIvyJitSupportCalls(
   classMetadata: boolean,
   ngModuleScope: boolean,
+  debugInfo: boolean,
   getTypeChecker: () => ts.TypeChecker,
 ): ts.TransformerFactory<ts.SourceFile> {
   return (context: ts.TransformationContext) => {
@@ -42,6 +43,16 @@ export function removeIvyJitSupportCalls(
 
             return undefined;
           }
+        }
+
+        if (
+          debugInfo &&
+          ts.isBinaryExpression(innerExpression) &&
+          isIvyPrivateCallExpression(innerExpression.right, 'ɵsetClassDebugInfo')
+        ) {
+          removedNodes.push(innerExpression);
+
+          return undefined;
         }
       }
 

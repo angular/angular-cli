@@ -49,6 +49,7 @@ export interface AngularWebpackPluginOptions {
   directTemplateLoading: boolean;
   emitClassMetadata: boolean;
   emitNgModuleScope: boolean;
+  emitSetClassDebugInfo?: boolean;
   jitMode: boolean;
   inlineStyleFileExtension?: string;
 }
