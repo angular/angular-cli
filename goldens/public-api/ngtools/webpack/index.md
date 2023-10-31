@@ -35,6 +35,8 @@ export interface AngularWebpackPluginOptions {
     // (undocumented)
     emitNgModuleScope: boolean;
     // (undocumented)
+    emitSetClassDebugInfo?: boolean;
+    // (undocumented)
     fileReplacements: Record<string, string>;
     // (undocumented)
     inlineStyleFileExtension?: string;
