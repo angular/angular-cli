@@ -177,6 +177,16 @@ const inputAsyncArrowFn = tags.stripIndent`
       }); })();
 `;
 
+const inputDebugInfo = tags.stripIndent`
+  import { Component } from '@angular/core';
+  import * as i0 from "@angular/core";
+  export class TestCmp {
+  }
+  TestCmp.ɵfac = function TestCmp_Factory(t) { return new (t || TestCmp)(); };
+  TestCmp.ɵcmp = /*@__PURE__*/ i0.ɵɵdefineComponent({ type: TestCmp, selectors: [["test-cmp"]], decls: 0, vars: 0, template: function TestCmp_Template(rf, ctx) { }, encapsulation: 2 });
+  (() => { (typeof ngDevMode === "undefined" || ngDevMode) && i0.ɵsetClassDebugInfo(TestCmp, { className: "TestCmp" }); })();
+`;
+
 describe('@ngtools/webpack transformers', () => {
   describe('remove-ivy-dev-calls', () => {
     it('should allow removing only set class metadata with pure annotation', () => {
@@ -194,7 +204,7 @@ describe('@ngtools/webpack transformers', () => {
       `;
 
       const result = transform(input, (getTypeChecker) =>
-        removeIvyJitSupportCalls(true, false, getTypeChecker),
+        removeIvyJitSupportCalls(true, false, false, getTypeChecker),
       );
 
       expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
@@ -215,7 +225,7 @@ describe('@ngtools/webpack transformers', () => {
       `;
 
       const result = transform(inputNoPure, (getTypeChecker) =>
-        removeIvyJitSupportCalls(true, false, getTypeChecker),
+        removeIvyJitSupportCalls(true, false, false, getTypeChecker),
       );
 
       expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
@@ -248,7 +258,7 @@ describe('@ngtools/webpack transformers', () => {
       `;
 
       const result = transform(input, (getTypeChecker) =>
-        removeIvyJitSupportCalls(false, true, getTypeChecker),
+        removeIvyJitSupportCalls(false, true, false, getTypeChecker),
       );
 
       expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
@@ -281,7 +291,7 @@ describe('@ngtools/webpack transformers', () => {
       `;
 
       const result = transform(inputNoPure, (getTypeChecker) =>
-        removeIvyJitSupportCalls(false, true, getTypeChecker),
+        removeIvyJitSupportCalls(false, true, false, getTypeChecker),
       );
 
       expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
@@ -299,7 +309,7 @@ describe('@ngtools/webpack transformers', () => {
       `;
 
       const result = transform(input, (getTypeChecker) =>
-        removeIvyJitSupportCalls(true, true, getTypeChecker),
+        removeIvyJitSupportCalls(true, true, false, getTypeChecker),
       );
 
       expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
@@ -317,7 +327,7 @@ describe('@ngtools/webpack transformers', () => {
       `;
 
       const result = transform(inputNoPure, (getTypeChecker) =>
-        removeIvyJitSupportCalls(true, true, getTypeChecker),
+        removeIvyJitSupportCalls(true, true, false, getTypeChecker),
       );
 
       expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
@@ -325,7 +335,7 @@ describe('@ngtools/webpack transformers', () => {
 
     it('should allow removing neither set class metadata nor ng module scope with pure annotation', () => {
       const result = transform(input, (getTypeChecker) =>
-        removeIvyJitSupportCalls(false, false, getTypeChecker),
+        removeIvyJitSupportCalls(false, false, false, getTypeChecker),
       );
 
       expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${input}`);
@@ -333,7 +343,7 @@ describe('@ngtools/webpack transformers', () => {
 
     it('should allow removing neither set class metadata nor ng module scope', () => {
       const result = transform(inputNoPure, (getTypeChecker) =>
-        removeIvyJitSupportCalls(false, false, getTypeChecker),
+        removeIvyJitSupportCalls(false, false, false, getTypeChecker),
       );
 
       expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${inputNoPure}`);
@@ -364,7 +374,7 @@ describe('@ngtools/webpack transformers', () => {
       `;
 
       const result = transform(imports + input, (getTypeChecker) =>
-        removeIvyJitSupportCalls(true, true, getTypeChecker),
+        removeIvyJitSupportCalls(true, true, false, getTypeChecker),
       );
 
       expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
@@ -395,7 +405,7 @@ describe('@ngtools/webpack transformers', () => {
       `;
 
       const result = transform(imports + inputNoPure, (getTypeChecker) =>
-        removeIvyJitSupportCalls(true, true, getTypeChecker),
+        removeIvyJitSupportCalls(true, true, false, getTypeChecker),
       );
 
       expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
@@ -413,7 +423,7 @@ describe('@ngtools/webpack transformers', () => {
       `;
 
       const result = transform(inputArrowFnWithBody, (getTypeChecker) =>
-        removeIvyJitSupportCalls(true, true, getTypeChecker),
+        removeIvyJitSupportCalls(true, true, false, getTypeChecker),
       );
 
       expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
@@ -431,7 +441,7 @@ describe('@ngtools/webpack transformers', () => {
       `;
 
       const result = transform(inputArrowFnWithImplicitReturn, (getTypeChecker) =>
-        removeIvyJitSupportCalls(true, true, getTypeChecker),
+        removeIvyJitSupportCalls(true, true, false, getTypeChecker),
       );
 
       expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
@@ -446,7 +456,7 @@ describe('@ngtools/webpack transformers', () => {
       `;
 
       const result = transform(inputAsync, (getTypeChecker) =>
-        removeIvyJitSupportCalls(true, false, getTypeChecker),
+        removeIvyJitSupportCalls(true, false, false, getTypeChecker),
       );
 
       expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
@@ -461,7 +471,22 @@ describe('@ngtools/webpack transformers', () => {
       `;
 
       const result = transform(inputAsyncArrowFn, (getTypeChecker) =>
-        removeIvyJitSupportCalls(true, false, getTypeChecker),
+        removeIvyJitSupportCalls(true, false, false, getTypeChecker),
+      );
+
+      expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
+    });
+
+    it('should remove setClassDebugInfo calls', () => {
+      const output = tags.stripIndent`
+        import * as i0 from "@angular/core";
+        export class TestCmp { }
+        TestCmp.ɵfac = function TestCmp_Factory(t) { return new (t || TestCmp)(); };
+        TestCmp.ɵcmp = /*@__PURE__*/ i0.ɵɵdefineComponent({ type: TestCmp, selectors: [["test-cmp"]], decls: 0, vars: 0, template: function TestCmp_Template(rf, ctx) { }, encapsulation: 2 });
+      `;
+
+      const result = transform(inputDebugInfo, (getTypeChecker) =>
+        removeIvyJitSupportCalls(true, false, true, getTypeChecker),
       );
 
       expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);

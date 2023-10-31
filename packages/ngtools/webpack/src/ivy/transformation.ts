@@ -14,7 +14,11 @@ import { replaceResources } from '../transformers/replace_resources';
 
 export function createAotTransformers(
   builder: ts.BuilderProgram,
-  options: { emitClassMetadata?: boolean; emitNgModuleScope?: boolean },
+  options: {
+    emitClassMetadata?: boolean;
+    emitNgModuleScope?: boolean;
+    emitSetClassDebugInfo?: boolean;
+  },
   imageDomains: Set<string>,
 ): ts.CustomTransformers {
   const getTypeChecker = () => builder.getProgram().getTypeChecker();
@@ -25,10 +29,16 @@ export function createAotTransformers(
 
   const removeClassMetadata = !options.emitClassMetadata;
   const removeNgModuleScope = !options.emitNgModuleScope;
-  if (removeClassMetadata || removeNgModuleScope) {
+  const removeSetClassDebugInfo = !options.emitSetClassDebugInfo;
+  if (removeClassMetadata || removeNgModuleScope || removeSetClassDebugInfo) {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     transformers.before!.push(
-      removeIvyJitSupportCalls(removeClassMetadata, removeNgModuleScope, getTypeChecker),
+      removeIvyJitSupportCalls(
+        removeClassMetadata,
+        removeNgModuleScope,
+        removeSetClassDebugInfo,
+        getTypeChecker,
+      ),
     );
   }
 
