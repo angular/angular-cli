@@ -14,6 +14,7 @@ import { BuildOutputFile } from '../../tools/esbuild/bundler-context';
 import { ExecutionResult, RebuildState } from '../../tools/esbuild/bundler-execution-result';
 import { shutdownSassWorkerPool } from '../../tools/esbuild/stylesheets/sass-language';
 import { withNoProgress, withSpinner, writeResultFiles } from '../../tools/esbuild/utils';
+import { shouldWatchRoot } from '../../utils/environment-options';
 import { assertIsError } from '../../utils/error';
 import { NormalizedCachedOptions } from '../../utils/normalize-cache';
 
@@ -112,8 +113,10 @@ export async function* runEsBuildBuildAction(
     // Setup abort support
     options.signal?.addEventListener('abort', () => void watcher?.close());
 
-    // Temporarily watch the entire project
-    watcher.add(projectRoot);
+    // Watch the entire project root if 'NG_BUILD_WATCH_ROOT' environment variable is set
+    if (shouldWatchRoot) {
+      watcher.add(projectRoot);
+    }
 
     // Watch workspace for package manager changes
     const packageWatchFiles = [

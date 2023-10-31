@@ -81,6 +81,9 @@ export class ExecutionResult {
     if (this.codeBundleCache?.referencedFiles) {
       files.push(...this.codeBundleCache.referencedFiles);
     }
+    if (this.codeBundleCache?.loadResultCache) {
+      files.push(...this.codeBundleCache.loadResultCache.watchFiles);
+    }
 
     return files;
   }
