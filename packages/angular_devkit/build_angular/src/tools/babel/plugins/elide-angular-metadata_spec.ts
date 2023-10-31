@@ -186,4 +186,25 @@ describe('elide-angular-metadata Babel plugin', () => {
       `,
     }),
   );
+
+  it(
+    'elides arrow-function-based ɵsetClassMetadataAsync',
+    testCase({
+      input: `
+        import { Component } from '@angular/core';
+        class SomeClass {}
+        (() => {
+          (typeof ngDevMode === 'undefined' || ngDevMode) &&
+            i0.ɵsetClassDebugInfo(SomeClass, { className: 'SomeClass' });
+        })();
+      `,
+      expected: `
+        import { Component } from "@angular/core";
+        class SomeClass {}
+        (() => {
+          (typeof ngDevMode === "undefined" || ngDevMode) && void 0;
+        })();
+      `,
+    }),
+  );
 });
