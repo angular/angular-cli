@@ -112,7 +112,7 @@ export async function* serveWithVite(
   const { createServer, normalizePath } = await import('vite');
 
   let server: ViteDevServer | undefined;
-  let listeningAddress: AddressInfo | undefined;
+  let serverUrl: URL | undefined;
   let hadError = false;
   const generatedFiles = new Map<string, OutputFileRecord>();
   const assetFiles = new Map<string, string>();
@@ -210,14 +210,21 @@ export async function* serveWithVite(
       server = await createServer(serverConfiguration);
 
       await server.listen();
-      listeningAddress = server.httpServer?.address() as AddressInfo;
+      const urls = server.resolvedUrls;
+      if (urls && (urls.local.length || urls.network.length)) {
+        serverUrl = new URL(urls.local[0] ?? urls.network[0]);
+      }
 
       // log connection information
       server.printUrls();
     }
 
     // TODO: adjust output typings to reflect both development servers
-    yield { success: true, port: listeningAddress?.port } as unknown as DevServerBuilderOutput;
+    yield {
+      success: true,
+      port: serverUrl?.port,
+      baseUrl: serverUrl?.href,
+    } as unknown as DevServerBuilderOutput;
   }
 
   // Add cleanup logic via a builder teardown
