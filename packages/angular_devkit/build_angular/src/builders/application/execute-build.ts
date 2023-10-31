@@ -108,7 +108,7 @@ export async function executeBuild(
     // Global Scripts
     if (options.globalScripts.length > 0) {
       for (const initial of [true, false]) {
-        const bundleOptions = createGlobalScriptsBundleOptions(options, initial);
+        const bundleOptions = createGlobalScriptsBundleOptions(options, target, initial);
         if (bundleOptions) {
           bundlerContexts.push(
             new BundlerContext(workspaceRoot, !!options.watch, bundleOptions, () => initial),
