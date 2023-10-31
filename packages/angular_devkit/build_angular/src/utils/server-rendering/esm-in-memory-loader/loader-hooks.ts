@@ -23,7 +23,7 @@ export interface ESMInMemoryFileLoaderWorkerData {
 }
 
 const TRANSFORMED_FILES: Record<string, string> = {};
-const CHUNKS_REGEXP = /file:\/\/\/(main\.server|chunk-\w+)\.mjs/;
+const CHUNKS_REGEXP = /file:\/\/\/((?:main|render-utils)\.server|chunk-\w+)\.mjs/;
 let workspaceRootFile: string;
 let outputFiles: Record<string, string>;
 
