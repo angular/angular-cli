@@ -19,13 +19,18 @@ const SET_CLASS_METADATA_NAME = 'ɵsetClassMetadata';
 const SET_CLASS_METADATA_ASYNC_NAME = 'ɵsetClassMetadataAsync';
 
 /**
+ * Name of the function that sets debug information on classes.
+ */
+const SET_CLASS_DEBUG_INFO_NAME = 'ɵsetClassDebugInfo';
+
+/**
  * Provides one or more keywords that if found within the content of a source file indicate
  * that this plugin should be used with a source file.
  *
  * @returns An a string iterable containing one or more keywords.
  */
 export function getKeywords(): Iterable<string> {
-  return [SET_CLASS_METADATA_NAME, SET_CLASS_METADATA_ASYNC_NAME];
+  return [SET_CLASS_METADATA_NAME, SET_CLASS_METADATA_ASYNC_NAME, SET_CLASS_DEBUG_INFO_NAME];
 }
 
 /**
@@ -51,7 +56,8 @@ export default function (): PluginObj {
         if (
           calleeName !== undefined &&
           (isRemoveClassMetadataCall(calleeName, callArguments) ||
-            isRemoveClassmetadataAsyncCall(calleeName, callArguments))
+            isRemoveClassmetadataAsyncCall(calleeName, callArguments) ||
+            isSetClassDebugInfoCall(calleeName, callArguments))
         ) {
           // The metadata function is always emitted inside a function expression
           const parent = path.getFunctionParent();
@@ -95,6 +101,16 @@ function isRemoveClassmetadataAsyncCall(
     types.isIdentifier(args[0]) &&
     isInlineFunction(args[1]) &&
     isInlineFunction(args[2])
+  );
+}
+
+/** Determines if a function call is a call to `setClassDebugInfo`. */
+function isSetClassDebugInfoCall(name: string, args: types.CallExpression['arguments']): boolean {
+  return (
+    name === SET_CLASS_DEBUG_INFO_NAME &&
+    args.length === 2 &&
+    types.isIdentifier(args[0]) &&
+    types.isObjectExpression(args[1])
   );
 }
 
