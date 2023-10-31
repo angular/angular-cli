@@ -25,6 +25,7 @@ import { createVirtualModulePlugin } from './virtual-module-plugin';
  */
 export function createGlobalScriptsBundleOptions(
   options: NormalizedApplicationBuildOptions,
+  target: string[],
   initial: boolean,
 ): BundlerOptionsFactory | undefined {
   const {
@@ -69,6 +70,7 @@ export function createGlobalScriptsBundleOptions(
       sourcemap: sourcemapOptions.scripts && (sourcemapOptions.hidden ? 'external' : true),
       write: false,
       platform: 'neutral',
+      target,
       preserveSymlinks,
       plugins: [
         createSourcemapIgnorelistPlugin(),
