@@ -71,7 +71,7 @@ export function resolve(
 export async function load(url: string, context: { format?: string | null }, nextLoad: Function) {
   const { format } = context;
 
-  // CommonJs modules require not transformations and are not in memory.
+  // CommonJs modules require no transformations and are not in memory.
   if (format !== 'commonjs' && isFileProtocol(url)) {
     const filePath = fileURLToPath(url);
     // Remove '/' or drive letter for Windows that was added in the above 'resolve'.
