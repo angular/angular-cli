@@ -1,3 +1,22 @@
+<a name="16.2.9"></a>
+
+# 16.2.9 (2023-11-01)
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                            |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------- |
+| [75b74912b](https://github.com/angular/angular-cli/commit/75b74912b937f0dd723ae44c826a193eff68763c) | fix  | allow dash in selector before a number |
+
+### @angular-devkit/schematics
+
+| Commit                                                                                              | Type | Description                               |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------- |
+| [2a1bbc007](https://github.com/angular/angular-cli/commit/2a1bbc0077c900946948c3ae1f1564e60bc2b1c7) | fix  | running external schematics with yarn pnp |
+| [5f4ca4ebf](https://github.com/angular/angular-cli/commit/5f4ca4ebf93c741338a26ed2cf08a72893ce9b4e) | fix  | running external schematics with yarn pnp |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="16.2.8"></a>
 
 # 16.2.8 (2023-10-25)
