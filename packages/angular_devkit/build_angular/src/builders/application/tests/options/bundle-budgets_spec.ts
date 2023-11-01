@@ -42,6 +42,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       });
 
       const { result, logs } = await harness.executeOnce();
+      expect(result?.success).toBeFalse();
       expect(logs).toContain(
         jasmine.objectContaining<logging.LogEntry>({
           level: 'error',

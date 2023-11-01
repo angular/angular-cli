@@ -28,7 +28,7 @@ import {
   logMessages,
   transformSupportedBrowsersToTargets,
 } from '../../tools/esbuild/utils';
-import { checkBudgets } from '../../utils/bundle-calculator';
+import { BudgetCalculatorResult, checkBudgets } from '../../utils/bundle-calculator';
 import { colors } from '../../utils/color';
 import { copyAssets } from '../../utils/copy-assets';
 import { getSupportedBrowsers } from '../../utils/supported-browsers';
@@ -180,6 +180,37 @@ export async function executeBuild(
 
   executionResult.outputFiles.push(...outputFiles);
 
+  const changedFiles =
+    rebuildState && executionResult.findChangedFiles(rebuildState.previousOutputHashes);
+
+  // Analyze files for bundle budget failures if present
+  let budgetFailures: BudgetCalculatorResult[] | undefined;
+  if (options.budgets) {
+    const compatStats = generateBudgetStats(metafile, initialFiles);
+    budgetFailures = [...checkBudgets(options.budgets, compatStats, true)];
+    if (budgetFailures.length > 0) {
+      const errors = budgetFailures
+        .filter((failure) => failure.severity === 'error')
+        .map(({ message }) => message);
+      const warnings = budgetFailures
+        .filter((failure) => failure.severity !== 'error')
+        .map(({ message }) => message);
+
+      await printWarningsAndErrorsToConsoleAndAddToResult(
+        context,
+        executionResult,
+        warnings,
+        errors,
+      );
+    }
+  }
+
+  // Calculate estimated transfer size if scripts are optimized
+  let estimatedTransferSizes;
+  if (optimizationOptions.scripts || optimizationOptions.styles.minify) {
+    estimatedTransferSizes = await calculateEstimatedTransferSizes(executionResult.outputFiles);
+  }
+
   // Check metafile for CommonJS module usage if optimizing scripts
   if (optimizationOptions.scripts) {
     const messages = checkCommonJSModules(metafile, options.allowedCommonJsDependencies);
@@ -200,29 +231,6 @@ export async function executeBuild(
       await extractLicenses(metafile, workspaceRoot),
       BuildOutputFileType.Root,
     );
-  }
-
-  // Analyze files for bundle budget failures if present
-  let budgetFailures;
-  if (options.budgets) {
-    const compatStats = generateBudgetStats(metafile, initialFiles);
-    budgetFailures = [...checkBudgets(options.budgets, compatStats, true)];
-    if (budgetFailures.length > 0) {
-      await logMessages(context, {
-        errors: budgetFailures
-          .filter((failure) => failure.severity === 'error')
-          .map((failure) => ({ text: failure.message, location: null })),
-        warnings: budgetFailures
-          .filter((failure) => failure.severity !== 'error')
-          .map((failure) => ({ text: failure.message, location: null })),
-      });
-    }
-  }
-
-  // Calculate estimated transfer size if scripts are optimized
-  let estimatedTransferSizes;
-  if (optimizationOptions.scripts || optimizationOptions.styles.minify) {
-    estimatedTransferSizes = await calculateEstimatedTransferSizes(executionResult.outputFiles);
   }
 
   // Perform i18n translation inlining if enabled
@@ -251,7 +259,7 @@ export async function executeBuild(
     executionResult.assetFiles.push(...result.additionalAssets);
   }
 
-  await printWarningsAndErrorsToConsole(context, warnings, errors);
+  await printWarningsAndErrorsToConsoleAndAddToResult(context, executionResult, warnings, errors);
 
   if (prerenderOptions) {
     executionResult.addOutputFile(
@@ -270,8 +278,6 @@ export async function executeBuild(
     context.logger.info(colors.magenta(prerenderMsg) + '\n');
   }
 
-  const changedFiles =
-    rebuildState && executionResult.findChangedFiles(rebuildState.previousOutputHashes);
   logBuildStats(
     context,
     metafile,
@@ -293,13 +299,19 @@ export async function executeBuild(
   return executionResult;
 }
 
-async function printWarningsAndErrorsToConsole(
+async function printWarningsAndErrorsToConsoleAndAddToResult(
   context: BuilderContext,
+  executionResult: ExecutionResult,
   warnings: string[],
   errors: string[],
 ): Promise<void> {
+  const errorMessages = errors.map((text) => ({ text, location: null }));
+  if (errorMessages.length) {
+    executionResult.addErrors(errorMessages);
+  }
+
   await logMessages(context, {
-    errors: errors.map((text) => ({ text, location: null })),
+    errors: errorMessages,
     warnings: warnings.map((text) => ({ text, location: null })),
   });
 }
