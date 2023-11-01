@@ -32,7 +32,9 @@ ESBUILD_TESTS = [
     "tests/basic/**",
     "tests/build/**",
     "tests/commands/add/**",
+    "tests/commands/e2e/**",
     "tests/i18n/**",
+    "tests/test/**",
 ]
 
 def _to_glob(patterns):
