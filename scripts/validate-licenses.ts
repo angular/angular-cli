@@ -47,35 +47,21 @@ const allowedLicenses = [
   'Unlicense',
   'CC0-1.0',
   '0BSD',
-
-  // Combinations.
-  '(AFL-2.1 OR BSD-2-Clause)',
 ];
 
 // Name variations of SPDX licenses that some packages have.
 // Licenses not included in SPDX but accepted will be converted to MIT.
 const licenseReplacements: { [key: string]: string } = {
-  // Just a longer string that our script catches. SPDX official name is the shorter one.
-  'Apache License, Version 2.0': 'Apache-2.0',
-  'Apache2': 'Apache-2.0',
+  // Official SPDX identifier has a dash
   'Apache 2.0': 'Apache-2.0',
-  'Apache v2': 'Apache-2.0',
-  'AFLv2.1': 'AFL-2.1',
   // BSD is BSD-2-clause by default.
   'BSD': 'BSD-2-Clause',
 };
 
 // Specific packages to ignore, add a reason in a comment. Format: package-name@version.
 const ignoredPackages = [
-  // Us.
-  '@angular/devkit-repo@0.0.0', // Hey, that's us!
-  // * Development only
-  'spdx-license-ids@3.0.5', // CC0 but it's content only (index.json, no code) and not distributed.
-
   // * Broken license fields
   'pako@1.0.11', // MIT but broken license in package.json
-  'fs-monkey@1.0.1', // Unlicense but missing license field (PR: https://github.com/streamich/fs-monkey/pull/209)
-  'memfs@3.2.0', // Unlicense but missing license field (PR: https://github.com/streamich/memfs/pull/594)
 ];
 
 // Ignore own packages (all MIT)
