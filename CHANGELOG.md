@@ -1,3 +1,54 @@
+<a name="17.0.0-rc.3"></a>
+
+# 17.0.0-rc.3 (2023-11-01)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                              |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------- |
+| [1f7156b11](https://github.com/angular/angular-cli/commit/1f7156b112606410ab9ea1cd3f178a762566b96b) | fix  | add Node.js 20 as supported version                      |
+| [4b9a87c90](https://github.com/angular/angular-cli/commit/4b9a87c90469481dc3dd0da4d1506521b4203255) | fix  | ignore peer mismatch when updating @nguniversal/builders |
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                                       |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------- |
+| [eb0fc7434](https://github.com/angular/angular-cli/commit/eb0fc7434539d3f5a7ea3f3c4e540ac920b10c19) | fix  | add missing express `REQUEST` and `RESPONSE` tokens               |
+| [23c4c5e42](https://github.com/angular/angular-cli/commit/23c4c5e4293ef770d555b8b2bd449ad32d1537d4) | fix  | enable TypeScript `esModuleInterop` by default for ESM compliance |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                                                           |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------------------------------------------- |
+| [9994b2dde](https://github.com/angular/angular-cli/commit/9994b2dde801b2f74fb70152eb73225283da32a3) | fix  | add a maximum rendering timeout for SSR and SSG during development                                    |
+| [f806e3498](https://github.com/angular/angular-cli/commit/f806e3498b5a4fced7a515258fad30821f3e866c) | fix  | elide setClassDebugInfo calls                                                                         |
+| [d392d653c](https://github.com/angular/angular-cli/commit/d392d653cba67db28eddd003dfec6dcb9b192a95) | fix  | ensure correct web worker URL resolution in vite dev server                                           |
+| [391ff78cb](https://github.com/angular/angular-cli/commit/391ff78cb0f29212c476ca36940b77839b84075e) | fix  | log number of prerendered routes in console                                                           |
+| [d4f37da50](https://github.com/angular/angular-cli/commit/d4f37da50ce2890a2b86281e5a373beab349b630) | fix  | only show changed output files in watch mode with esbuild                                             |
+| [0d54f2d20](https://github.com/angular/angular-cli/commit/0d54f2d20bfd6d55615c0ab3537b5af0aeb008ee) | fix  | only watch used files with application builder                                                        |
+| [c27ad719f](https://github.com/angular/angular-cli/commit/c27ad719f2cb1b13f76f8fce033087a9124e646d) | fix  | remove unactionable error overlay suggestion from Vite-based dev server                               |
+| [f7f6e97d0](https://github.com/angular/angular-cli/commit/f7f6e97d0f3540badb68813c39ce0237e4dcc9e3) | fix  | skip checking CommonJS module descendants                                                             |
+| [559e89159](https://github.com/angular/angular-cli/commit/559e89159150a10728272081b7bbda80fe708093) | fix  | Windows Node.js 20 prerendering failure ([#26186](https://github.com/angular/angular-cli/pull/26186)) |
+| [c013a95e2](https://github.com/angular/angular-cli/commit/c013a95e2f38a5c2435b22c3338bf57b03c84ebf) | perf | only rebundle browser polyfills on explicit changes                                                   |
+| [28d9ab88f](https://github.com/angular/angular-cli/commit/28d9ab88fe81898ec7591608816c77455c9a61bf) | perf | only rebundle server polyfills on explicit changes                                                    |
+| [2e8e9d802](https://github.com/angular/angular-cli/commit/2e8e9d8020aa01107a3ee6b31942d9d53d6f73cd) | perf | patch `fetch` to load assets from memory                                                              |
+
+### @angular-devkit/schematics
+
+| Commit                                                                                              | Type | Description                               |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------- |
+| [056982f97](https://github.com/angular/angular-cli/commit/056982f97f55c481a94f1debb785b6d0b0f7ffaa) | fix  | running external schematics with yarn pnp |
+| [25b86ab1d](https://github.com/angular/angular-cli/commit/25b86ab1d6b020c34ab3dca93f844957c18f40dc) | fix  | running external schematics with yarn pnp |
+
+### @ngtools/webpack
+
+| Commit                                                                                              | Type | Description                                                       |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------- |
+| [486becdbb](https://github.com/angular/angular-cli/commit/486becdbbaec7cacfa42bd66882efe720473b0f6) | fix  | remove setClassDebugInfo calls                                    |
+| [8899fb9e3](https://github.com/angular/angular-cli/commit/8899fb9e36556debe3b262f27c1b6e94c4963144) | fix  | skip transforming empty inline styles in Webpack JIT compilations |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="17.0.0-rc.2"></a>
 
 # 17.0.0-rc.2 (2023-10-26)
