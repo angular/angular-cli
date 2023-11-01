@@ -5,14 +5,11 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { getGlobalVariable } from '../../utils/env';
 import { ng } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';
 import { expectToFail } from '../../utils/utils';
 
 export default async function () {
-  const usingWebpack = !getGlobalVariable('argv')['esbuild'];
-
   // Error
   await updateJsonFile('angular.json', (json) => {
     json.projects['test-project'].architect.build.configurations.production.budgets = [
@@ -20,17 +17,9 @@ export default async function () {
     ];
   });
 
-  if (usingWebpack) {
-    const { message: errorMessage } = await expectToFail(() => ng('build'));
-    if (!/Error.+budget/i.test(errorMessage)) {
-      throw new Error('Budget error: all, max error.');
-    }
-  } else {
-    // Application builder does not generate an error exit code for budget failures
-    const { stderr } = await ng('build');
-    if (!/Error.+budget/i.test(stderr)) {
-      throw new Error('Budget error: all, max error.');
-    }
+  const { message: errorMessage } = await expectToFail(() => ng('build'));
+  if (!/Error.+budget/i.test(errorMessage)) {
+    throw new Error('Budget error: all, max error.');
   }
 
   // Warning
