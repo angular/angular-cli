@@ -31,10 +31,11 @@ const { document, verbose } = workerData as RoutesExtractorWorkerData;
 /** Renders an application based on a provided options. */
 async function extractRoutes(): Promise<RoutersExtractorWorkerResult> {
   const { extractRoutes } = await loadEsmModule<RenderUtilsServerBundleExports>(
-    './render-utils.server.mjs',
+    new URL('./render-utils.server.mjs', 'memory://'),
   );
-  const { default: bootstrapAppFnOrModule } =
-    await loadEsmModule<MainServerBundleExports>('./main.server.mjs');
+  const { default: bootstrapAppFnOrModule } = await loadEsmModule<MainServerBundleExports>(
+    new URL('./main.server.mjs', 'memory://'),
+  );
 
   const skippedRedirects: string[] = [];
   const skippedOthers: string[] = [];
