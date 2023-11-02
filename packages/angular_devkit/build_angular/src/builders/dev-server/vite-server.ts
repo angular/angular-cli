@@ -40,11 +40,18 @@ interface OutputFileRecord {
   servable: boolean;
 }
 
+// eslint-disable-next-line max-lines-per-function
 export async function* serveWithVite(
   serverOptions: NormalizedDevServerOptions,
   builderName: string,
   context: BuilderContext,
-  plugins?: Plugin[],
+  transformers?: {
+    indexHtml?: (content: string) => Promise<string>;
+  },
+  extensions?: {
+    middleware?: Connect.NextHandleFunction[];
+    buildPlugins?: Plugin[];
+  },
 ): AsyncIterableIterator<DevServerBuilderOutput> {
   // Get the browser configuration from the target name.
   const rawBrowserOptions = (await context.getTargetOptions(
@@ -133,7 +140,7 @@ export async function* serveWithVite(
     {
       write: false,
     },
-    plugins,
+    extensions?.buildPlugins,
   )) {
     assert(result.outputFiles, 'Builder did not provide result files.');
 
@@ -207,6 +214,8 @@ export async function* serveWithVite(
         !!browserOptions.ssr,
         prebundleTransformer,
         target,
+        extensions?.middleware,
+        transformers?.indexHtml,
       );
 
       server = await createServer(serverConfiguration);
@@ -366,6 +375,8 @@ export async function setupServer(
   ssr: boolean,
   prebundleTransformer: JavaScriptTransformer,
   target: string[],
+  extensionMiddleware?: Connect.NextHandleFunction[],
+  indexHtmlTransformer?: (content: string) => Promise<string>,
 ): Promise<InlineConfig> {
   const proxy = await loadProxyConfiguration(
     serverOptions.workspaceRoot,
@@ -557,6 +568,10 @@ export async function setupServer(
             next();
           });
 
+          if (extensionMiddleware?.length) {
+            extensionMiddleware.forEach((middleware) => server.middlewares.use(middleware));
+          }
+
           // Returning a function, installs middleware after the main transform middleware but
           // before the built-in HTML middleware
           return () => {
@@ -595,7 +610,9 @@ export async function setupServer(
                   inlineCriticalCss: false,
                 });
 
-                return content;
+                return indexHtmlTransformer && content
+                  ? await indexHtmlTransformer(content)
+                  : content;
               });
             }
 
@@ -617,7 +634,13 @@ export async function setupServer(
               if (pathname === '/' || pathname === `/index.html`) {
                 const rawHtml = outputFiles.get('/index.html')?.contents;
                 if (rawHtml) {
-                  transformIndexHtmlAndAddHeaders(req.url, rawHtml, res, next);
+                  transformIndexHtmlAndAddHeaders(
+                    req.url,
+                    rawHtml,
+                    res,
+                    next,
+                    indexHtmlTransformer,
+                  );
 
                   return;
                 }
