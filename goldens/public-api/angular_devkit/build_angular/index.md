@@ -9,6 +9,7 @@ import { BuilderOutput } from '@angular-devkit/architect';
 import type { ConfigOptions } from 'karma';
 import { Configuration } from 'webpack';
 import { DevServerBuildOutput } from '@angular-devkit/build-webpack';
+import { json } from '@angular-devkit/core';
 import { Observable } from 'rxjs';
 import { OutputFile } from 'esbuild';
 import type { Plugin as Plugin_2 } from 'esbuild';
@@ -227,6 +228,9 @@ export function executeServerBuilder(options: ServerBuilderOptions, context: Bui
     webpackConfiguration?: ExecutionTransformer<webpack.Configuration>;
 }): Observable<ServerBuilderOutput>;
 
+// @public (undocumented)
+export function executeSSRDevServerBuilder(options: SSRDevServerBuilderOptions, context: BuilderContext): Observable<SSRDevServerBuilderOutput>;
+
 // @public
 export type ExecutionTransformer<T> = (input: T) => T | Promise<T>;
 
@@ -380,6 +384,15 @@ export interface SourceMapObject {
 
 // @public
 export type SourceMapUnion = boolean | SourceMapObject;
+
+// @public (undocumented)
+export type SSRDevServerBuilderOptions = Schema & json.JsonObject;
+
+// @public (undocumented)
+export type SSRDevServerBuilderOutput = BuilderOutput & {
+    baseUrl?: string;
+    port?: string;
+};
 
 // @public
 export interface StylePreprocessorOptions {
