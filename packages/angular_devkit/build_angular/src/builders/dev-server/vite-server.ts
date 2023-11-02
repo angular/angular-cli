@@ -15,11 +15,11 @@ import assert from 'node:assert';
 import { randomUUID } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import { ServerResponse } from 'node:http';
-import type { AddressInfo } from 'node:net';
 import path from 'node:path';
-import type { Connect, InlineConfig, ViteDevServer } from 'vite';
+import type { Connect, DepOptimizationConfig, InlineConfig, ViteDevServer } from 'vite';
 import { BuildOutputFile, BuildOutputFileType } from '../../tools/esbuild/bundler-context';
 import { JavaScriptTransformer } from '../../tools/esbuild/javascript-transformer';
+import { createRxjsEsmResolutionPlugin } from '../../tools/esbuild/rxjs-esm-resolution-plugin';
 import { getFeatureSupport, transformSupportedBrowsersToTargets } from '../../tools/esbuild/utils';
 import { createAngularLocaleDataPlugin } from '../../tools/vite/i18n-locale-plugin';
 import { renderPage } from '../../utils/server-rendering/render-page';
@@ -173,6 +173,8 @@ export async function* serveWithVite(
 
     // To avoid disconnecting the array objects from the option, these arrays need to be mutated
     // instead of replaced.
+    // TODO: split explicit imports by platform to avoid having Vite optimize server-only/browser-only
+    // dependencies twice when SSR is enabled.
     if (result.externalMetadata) {
       if (result.externalMetadata.explicit) {
         externalMetadata.explicit.push(...result.externalMetadata.explicit);
@@ -379,6 +381,8 @@ export async function setupServer(
     path.join(serverOptions.workspaceRoot, `.angular/vite-root/${randomUUID()}/`),
   );
 
+  const { builtinModules } = await import('node:module');
+
   const configuration: InlineConfig = {
     configFile: false,
     envFile: false,
@@ -412,8 +416,21 @@ export async function setupServer(
       preTransformRequests: externalMetadata.explicit.length === 0,
     },
     ssr: {
-      // Exclude any provided dependencies (currently build defined externals)
-      external: externalMetadata.explicit,
+      // Note: `true` and `/.*/` have different sematics. When true, the `external` option is ignored.
+      noExternal: /.*/,
+      // Exclude any Node.js built in module and provided dependencies (currently build defined externals)
+      external: [...builtinModules, ...externalMetadata.explicit],
+      optimizeDeps: getDepOptimizationConfig({
+        // Only enable with caching since it causes prebundle dependencies to be cached
+        disabled: !serverOptions.cacheOptions.enabled,
+        // Exclude any explicitly defined dependencies (currently build defined externals)
+        exclude: externalMetadata.explicit,
+        // Include all implict dependencies from the external packages internal option
+        include: externalMetadata.implicit,
+        ssr: true,
+        prebundleTransformer,
+        target,
+      }),
     },
     plugins: [
       createAngularLocaleDataPlugin(),
@@ -645,35 +662,18 @@ export async function setupServer(
         },
       },
     ],
-    optimizeDeps: {
+    // Browser only optimizeDeps. (This does not run for SSR dependencies).
+    optimizeDeps: getDepOptimizationConfig({
       // Only enable with caching since it causes prebundle dependencies to be cached
       disabled: !serverOptions.cacheOptions.enabled,
       // Exclude any explicitly defined dependencies (currently build defined externals)
       exclude: externalMetadata.explicit,
       // Include all implict dependencies from the external packages internal option
       include: externalMetadata.implicit,
-      // Skip automatic file-based entry point discovery
-      entries: [],
-      // Add an esbuild plugin to run the Angular linker on dependencies
-      esbuildOptions: {
-        // Set esbuild supported targets.
-        target,
-        supported: getFeatureSupport(target),
-        plugins: [
-          {
-            name: 'angular-vite-optimize-deps',
-            setup(build) {
-              build.onLoad({ filter: /\.[cm]?js$/ }, async (args) => {
-                return {
-                  contents: await prebundleTransformer.transformFile(args.path),
-                  loader: 'js',
-                };
-              });
-            },
-          },
-        ],
-      },
-    },
+      ssr: false,
+      prebundleTransformer,
+      target,
+    }),
   };
 
   if (serverOptions.ssl) {
@@ -727,4 +727,58 @@ function pathnameWithoutServePath(url: string, serverOptions: NormalizedDevServe
   }
 
   return pathname;
+}
+
+type ViteEsBuildPlugin = NonNullable<
+  NonNullable<DepOptimizationConfig['esbuildOptions']>['plugins']
+>[0];
+
+function getDepOptimizationConfig({
+  disabled,
+  exclude,
+  include,
+  target,
+  prebundleTransformer,
+  ssr,
+}: {
+  disabled: boolean;
+  exclude: string[];
+  include: string[];
+  target: string[];
+  prebundleTransformer: JavaScriptTransformer;
+  ssr: boolean;
+}): DepOptimizationConfig {
+  const plugins: ViteEsBuildPlugin[] = [
+    {
+      name: `angular-vite-optimize-deps${ssr ? '-ssr' : ''}`,
+      setup(build) {
+        build.onLoad({ filter: /\.[cm]?js$/ }, async (args) => {
+          return {
+            contents: await prebundleTransformer.transformFile(args.path),
+            loader: 'js',
+          };
+        });
+      },
+    },
+  ];
+
+  if (ssr) {
+    plugins.unshift(createRxjsEsmResolutionPlugin() as ViteEsBuildPlugin);
+  }
+
+  return {
+    // Only enable with caching since it causes prebundle dependencies to be cached
+    disabled,
+    // Exclude any explicitly defined dependencies (currently build defined externals)
+    exclude,
+    // Include all implict dependencies from the external packages internal option
+    include,
+    // Add an esbuild plugin to run the Angular linker on dependencies
+    esbuildOptions: {
+      // Set esbuild supported targets.
+      target,
+      supported: getFeatureSupport(target),
+      plugins,
+    },
+  };
 }
