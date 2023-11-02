@@ -1,3 +1,4 @@
+import { setTimeout } from 'node:timers/promises';
 import { getGlobalVariable } from '../../utils/env';
 import { appendToFile, replaceInFile, writeMultipleFiles } from '../../utils/fs';
 import { silentNg, waitForAnyProcessOutputToMatch } from '../../utils/process';
@@ -27,6 +28,7 @@ export default async function () {
   ]);
 
   // Change multiple files and check that all of them are invalidated and recompiled.
+  await setTimeout(500);
   await Promise.all([
     waitForAnyProcessOutputToMatch(validBundleRegEx),
     appendToFile(
@@ -46,6 +48,7 @@ export default async function () {
     ),
   ]);
 
+  await setTimeout(500);
   await Promise.all([
     waitForAnyProcessOutputToMatch(validBundleRegEx),
     writeMultipleFiles({
@@ -74,6 +77,7 @@ export default async function () {
     }
   }
 
+  await setTimeout(500);
   await Promise.all([
     waitForAnyProcessOutputToMatch(validBundleRegEx),
     writeMultipleFiles({
@@ -89,6 +93,7 @@ export default async function () {
     }
   }
 
+  await setTimeout(500);
   await Promise.all([
     waitForAnyProcessOutputToMatch(validBundleRegEx),
     writeMultipleFiles({
@@ -104,6 +109,7 @@ export default async function () {
     }
   }
 
+  await setTimeout(500);
   await Promise.all([
     waitForAnyProcessOutputToMatch(validBundleRegEx),
     writeMultipleFiles({
