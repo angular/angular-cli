@@ -490,6 +490,11 @@ if (require.main === module) {
 }
 
 /**
+ * Lazily compiled dynamic import loader function.
+ */
+let load: (<T>(modulePath: string | URL) => Promise<T>) | undefined;
+
+/**
  * This uses a dynamic import to load a module which may be ESM.
  * CommonJS code can load ESM code via a dynamic import. Unfortunately, TypeScript
  * will currently, unconditionally downlevel dynamic import into a require call.
@@ -502,5 +507,10 @@ if (require.main === module) {
  * @returns A Promise that resolves to the dynamically imported module.
  */
 export function loadEsmModule<T>(modulePath: string | URL): Promise<T> {
-  return new Function('modulePath', `return import(modulePath);`)(modulePath) as Promise<T>;
+  load ??= new Function('modulePath', `return import(modulePath);`) as Exclude<
+    typeof load,
+    undefined
+  >;
+
+  return load(modulePath);
 }
