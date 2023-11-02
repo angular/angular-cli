@@ -7,6 +7,7 @@
  */
 
 import { workerData } from 'node:worker_threads';
+import { loadEsmModule } from '../load-esm';
 import type { ESMInMemoryFileLoaderWorkerData } from './esm-in-memory-loader/loader-hooks';
 import { patchFetchToLoadInMemoryAssets } from './fetch-patch';
 import { RenderResult, ServerContext, renderPage } from './render-page';
@@ -34,6 +35,7 @@ function render(options: RenderOptions): Promise<RenderResult> {
     outputFiles,
     document,
     inlineCriticalCss,
+    loadBundle: async (path) => await loadEsmModule(new URL(path, 'memory://')),
   });
 }
 
