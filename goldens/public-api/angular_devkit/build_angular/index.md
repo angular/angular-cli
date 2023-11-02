@@ -4,11 +4,14 @@
 
 ```ts
 
+/// <reference types="node" />
+
 import { BuilderContext } from '@angular-devkit/architect';
 import { BuilderOutput } from '@angular-devkit/architect';
 import type { ConfigOptions } from 'karma';
 import { Configuration } from 'webpack';
 import { DevServerBuildOutput } from '@angular-devkit/build-webpack';
+import type http from 'node:http';
 import { json } from '@angular-devkit/core';
 import { Observable } from 'rxjs';
 import { OutputFile } from 'esbuild';
@@ -204,7 +207,10 @@ export function executeDevServerBuilder(options: DevServerBuilderOptions, contex
     webpackConfiguration?: ExecutionTransformer<Configuration>;
     logging?: WebpackLoggingCallback;
     indexHtml?: IndexHtmlTransform;
-}, plugins?: Plugin_2[]): Observable<DevServerBuilderOutput>;
+}, extensions?: {
+    buildPlugins?: Plugin_2[];
+    middleware?: ((req: http.IncomingMessage, res: http.ServerResponse, next: (err?: unknown) => void) => void)[];
+}): Observable<DevServerBuilderOutput>;
 
 // @public
 export function executeExtractI18nBuilder(options: ExtractI18nBuilderOptions, context: BuilderContext, transforms?: {
