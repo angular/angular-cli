@@ -252,13 +252,10 @@ export function createServerPolyfillBundleOptions(
   sourceFileCache?: SourceFileCache,
 ): BundlerOptionsFactory | undefined {
   const polyfills: string[] = [];
-  const zoneFlagsNamespace = 'angular:zone-flags/placeholder';
   const polyfillsFromConfig = new Set(options.polyfills);
-  let hasZoneJs = false;
 
   if (polyfillsFromConfig.has('zone.js')) {
-    hasZoneJs = true;
-    polyfills.push(zoneFlagsNamespace, 'zone.js/node');
+    polyfills.push('zone.js/node');
   }
 
   if (
@@ -311,22 +308,6 @@ export function createServerPolyfillBundleOptions(
   };
 
   buildOptions.plugins ??= [];
-
-  // Disable Zone.js uncaught promise rejections to provide cleaner stacktraces.
-  if (hasZoneJs) {
-    buildOptions.plugins.unshift(
-      createVirtualModulePlugin({
-        namespace: zoneFlagsNamespace,
-        entryPointOnly: false,
-        loadContent: () => ({
-          contents: `globalThis.__zone_symbol__DISABLE_WRAPPING_UNCAUGHT_PROMISE_REJECTION = true;`,
-          loader: 'js',
-          resolveDir: workspaceRoot,
-        }),
-      }),
-    );
-  }
-
   buildOptions.plugins.push(createRxjsEsmResolutionPlugin());
 
   return () => buildOptions;
