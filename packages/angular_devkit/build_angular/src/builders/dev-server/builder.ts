@@ -8,6 +8,7 @@
 
 import type { BuilderContext } from '@angular-devkit/architect';
 import type { Plugin } from 'esbuild';
+import type http from 'node:http';
 import { EMPTY, Observable, defer, switchMap } from 'rxjs';
 import type { ExecutionTransformer } from '../../transforms';
 import { checkPort } from '../../utils/check-port';
@@ -19,10 +20,16 @@ import type { DevServerBuilderOutput } from './webpack-server';
 
 /**
  * A Builder that executes a development server based on the provided browser target option.
+ *
+ * Usage of the `transforms` and/or `extensions` parameters is NOT supported and may cause
+ * unexpected build output or build failures.
+ *
  * @param options Dev Server options.
  * @param context The build context.
  * @param transforms A map of transforms that can be used to hook into some logic (such as
  * transforming webpack configuration before passing it to webpack).
+ * @param extensions An optional object containing an array of build plugins (esbuild-based)
+ * and/or HTTP request middleware.
  *
  * @experimental Direct usage of this function is considered experimental.
  */
@@ -34,7 +41,14 @@ export function execute(
     logging?: import('@angular-devkit/build-webpack').WebpackLoggingCallback;
     indexHtml?: IndexHtmlTransform;
   } = {},
-  plugins?: Plugin[],
+  extensions?: {
+    buildPlugins?: Plugin[];
+    middleware?: ((
+      req: http.IncomingMessage,
+      res: http.ServerResponse,
+      next: (err?: unknown) => void,
+    ) => void)[];
+  },
 ): Observable<DevServerBuilderOutput> {
   // Determine project name from builder context target
   const projectName = context.target?.project;
@@ -52,7 +66,7 @@ export function execute(
         builderName === '@angular-devkit/build-angular:browser-esbuild' ||
         normalizedOptions.forceEsbuild
       ) {
-        if (Object.keys(transforms).length > 0) {
+        if (transforms?.logging || transforms?.webpackConfiguration) {
           throw new Error(
             'The `application` and `browser-esbuild` builders do not support Webpack transforms.',
           );
@@ -60,13 +74,18 @@ export function execute(
 
         return defer(() => import('./vite-server')).pipe(
           switchMap(({ serveWithVite }) =>
-            serveWithVite(normalizedOptions, builderName, context, plugins),
+            serveWithVite(normalizedOptions, builderName, context, transforms, extensions),
           ),
         );
       }
 
-      if (plugins?.length) {
+      if (extensions?.buildPlugins?.length) {
         throw new Error('Only the `application` and `browser-esbuild` builders support plugins.');
+      }
+      if (extensions?.middleware?.length) {
+        throw new Error(
+          'Only the `application` and `browser-esbuild` builders support middleware.',
+        );
       }
 
       // Use Webpack for all other browser targets
