@@ -59,4 +59,10 @@ export {
   ServerBuilderOutput,
 } from './builders/server';
 
+export {
+  execute as executeSSRDevServerBuilder,
+  SSRDevServerBuilderOptions,
+  SSRDevServerBuilderOutput,
+} from './builders/ssr-dev-server';
+
 export { execute as executeNgPackagrBuilder, NgPackagrBuilderOptions } from './builders/ng-packagr';

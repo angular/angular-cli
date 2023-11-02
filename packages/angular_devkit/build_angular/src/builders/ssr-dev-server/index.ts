@@ -48,7 +48,7 @@ const IGNORED_STDOUT_MESSAGES = [
   'Angular is running in development mode. Call enableProdMode() to enable production mode.',
 ];
 
-type SSRDevServerBuilderOptions = Schema & json.JsonObject;
+export type SSRDevServerBuilderOptions = Schema & json.JsonObject;
 export type SSRDevServerBuilderOutput = BuilderOutput & {
   baseUrl?: string;
   port?: string;
