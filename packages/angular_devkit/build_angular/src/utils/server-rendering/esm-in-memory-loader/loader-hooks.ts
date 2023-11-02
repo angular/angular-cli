@@ -9,7 +9,6 @@
 import { join, relative } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { fileURLToPath } from 'url';
-import { JavaScriptTransformer } from '../../../tools/esbuild/javascript-transformer';
 import { callInitializeIfNeeded } from './node-18-utils';
 
 /**
@@ -22,18 +21,9 @@ export interface ESMInMemoryFileLoaderWorkerData {
   workspaceRoot: string;
 }
 
-const TRANSFORMED_FILES: Record<string, string> = {};
 const CHUNKS_REGEXP = /file:\/\/\/((?:main|render-utils)\.server|chunk-\w+)\.mjs/;
 let workspaceRootFile: string;
 let outputFiles: Record<string, string>;
-
-const javascriptTransformer = new JavaScriptTransformer(
-  // Always enable JIT linking to support applications built with and without AOT.
-  // In a development environment the additional scope information does not
-  // have a negative effect unlike production where final output size is relevant.
-  { sourcemap: true, jit: true },
-  1,
-);
 
 callInitializeIfNeeded(initialize);
 
@@ -75,14 +65,7 @@ export async function load(url: string, context: { format?: string | null }, nex
   if (format !== 'commonjs' && isFileProtocol(url)) {
     const filePath = fileURLToPath(url);
     // Remove '/' or drive letter for Windows that was added in the above 'resolve'.
-    let source = outputFiles[relative('/', filePath)] ?? TRANSFORMED_FILES[filePath];
-
-    if (source === undefined) {
-      source = TRANSFORMED_FILES[filePath] = Buffer.from(
-        await javascriptTransformer.transformFile(filePath),
-      ).toString('utf-8');
-    }
-
+    const source = outputFiles[relative('/', filePath)];
     if (source !== undefined) {
       return {
         format,
@@ -100,14 +83,6 @@ function isFileProtocol(url: string): boolean {
   return url.startsWith('file://');
 }
 
-function handleProcessExit(): void {
-  void javascriptTransformer.close();
-}
-
 function isBundleEntryPointOrChunk(context: { parentURL: undefined | string }): boolean {
   return !!context.parentURL && CHUNKS_REGEXP.test(context.parentURL);
 }
-
-process.once('exit', handleProcessExit);
-process.once('SIGINT', handleProcessExit);
-process.once('uncaughtException', handleProcessExit);
