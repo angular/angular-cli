@@ -214,6 +214,11 @@ export class WorkspaceNodeModulesArchitectHost implements ArchitectHost<NodeModu
 }
 
 /**
+ * Lazily compiled dynamic import loader function.
+ */
+let load: (<T>(modulePath: string | URL) => Promise<T>) | undefined;
+
+/**
  * This uses a dynamic import to load a module which may be ESM.
  * CommonJS code can load ESM code via a dynamic import. Unfortunately, TypeScript
  * will currently, unconditionally downlevel dynamic import into a require call.
@@ -225,8 +230,13 @@ export class WorkspaceNodeModulesArchitectHost implements ArchitectHost<NodeModu
  * @param modulePath The path of the module to load.
  * @returns A Promise that resolves to the dynamically imported module.
  */
-function loadEsmModule<T>(modulePath: string | URL): Promise<T> {
-  return new Function('modulePath', `return import(modulePath);`)(modulePath) as Promise<T>;
+export function loadEsmModule<T>(modulePath: string | URL): Promise<T> {
+  load ??= new Function('modulePath', `return import(modulePath);`) as Exclude<
+    typeof load,
+    undefined
+  >;
+
+  return load(modulePath);
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
