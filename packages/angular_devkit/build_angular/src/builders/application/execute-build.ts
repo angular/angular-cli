@@ -169,11 +169,9 @@ export async function executeBuild(
 
   // Analyze external imports if external options are enabled
   if (options.externalPackages || options.externalDependencies?.length) {
+    const { browser = new Set(), server = new Set() } = bundlingResult.externalImports;
     // TODO: Filter externalImports to generate second argument to support wildcard externalDependency values
-    executionResult.setExternalMetadata(
-      [...bundlingResult.externalImports],
-      options.externalDependencies,
-    );
+    executionResult.setExternalMetadata([...browser], [...server], options.externalDependencies);
   }
 
   const { metafile, initialFiles, outputFiles } = bundlingResult;
