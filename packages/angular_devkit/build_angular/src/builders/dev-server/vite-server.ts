@@ -15,7 +15,7 @@ import assert from 'node:assert';
 import { randomUUID } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import { ServerResponse } from 'node:http';
-import path from 'node:path';
+import { dirname, extname, join, relative } from 'node:path';
 import type { Connect, DepOptimizationConfig, InlineConfig, ViteDevServer } from 'vite';
 import { BuildOutputFile, BuildOutputFileType } from '../../tools/esbuild/bundler-context';
 import { JavaScriptTransformer } from '../../tools/esbuild/javascript-transformer';
@@ -200,7 +200,7 @@ export async function* serveWithVite(
       }
 
       const { root = '' } = await context.getProjectMetadata(projectName);
-      const projectRoot = path.join(context.workspaceRoot, root as string);
+      const projectRoot = join(context.workspaceRoot, root as string);
       const browsers = getSupportedBrowsers(projectRoot, context.logger);
       const target = transformSupportedBrowsersToTargets(browsers);
 
@@ -262,7 +262,7 @@ function handleUpdate(
     if (record.updated) {
       updatedFiles.push(file);
       const updatedModules = server.moduleGraph.getModulesByFile(
-        normalizePath(path.join(server.config.root, file)),
+        normalizePath(join(server.config.root, file)),
       );
       updatedModules?.forEach((m) => server?.moduleGraph.invalidateModule(m));
     }
@@ -389,7 +389,7 @@ export async function setupServer(
 
   // Path will not exist on disk and only used to provide separate path for Vite requests
   const virtualProjectRoot = normalizePath(
-    path.join(serverOptions.workspaceRoot, `.angular/vite-root/${randomUUID()}/`),
+    join(serverOptions.workspaceRoot, `.angular/vite-root/${randomUUID()}/`),
   );
 
   const { builtinModules } = await import('node:module');
@@ -397,7 +397,7 @@ export async function setupServer(
   const configuration: InlineConfig = {
     configFile: false,
     envFile: false,
-    cacheDir: path.join(serverOptions.cacheOptions.path, 'vite'),
+    cacheDir: join(serverOptions.cacheOptions.path, 'vite'),
     root: virtualProjectRoot,
     publicDir: false,
     esbuild: false,
@@ -462,7 +462,7 @@ export async function setupServer(
             const [importerFile] = importer.split('?', 1);
 
             source = normalizePath(
-              path.join(path.dirname(path.relative(virtualProjectRoot, importerFile)), source),
+              join(dirname(relative(virtualProjectRoot, importerFile)), source),
             );
           }
           if (source[0] === '/') {
@@ -470,12 +470,12 @@ export async function setupServer(
           }
           const [file] = source.split('?', 1);
           if (outputFiles.has(file)) {
-            return path.join(virtualProjectRoot, source);
+            return join(virtualProjectRoot, source);
           }
         },
         load(id) {
           const [file] = id.split('?', 1);
-          const relativeFile = normalizePath(path.relative(virtualProjectRoot, file));
+          const relativeFile = normalizePath(relative(virtualProjectRoot, file));
           const codeContents = outputFiles.get(relativeFile)?.contents;
           if (codeContents === undefined) {
             if (relativeFile.endsWith('/node_modules/vite/dist/client/client.mjs')) {
@@ -530,7 +530,7 @@ export async function setupServer(
             // Parse the incoming request.
             // The base of the URL is unused but required to parse the URL.
             const pathname = pathnameWithoutServePath(req.url, serverOptions);
-            const extension = path.extname(pathname);
+            const extension = extname(pathname);
 
             // Rewrite all build assets to a vite raw fs URL
             const assetSourcePath = assets.get(pathname);
@@ -586,7 +586,7 @@ export async function setupServer(
                 !url ||
                 // Skip if path is like a file.
                 // NOTE: We use a regexp to mitigate against matching requests like: /browse/pl.0ef59752c0cd457dbf1391f08cbd936f
-                /^\.[a-z]{2,4}$/i.test(path.extname(url.split('?')[0]))
+                /^\.[a-z]{2,4}$/i.test(extname(url.split('?')[0]))
               ) {
                 next();
 
@@ -607,9 +607,9 @@ export async function setupServer(
                   document: html,
                   route,
                   serverContext: 'ssr',
-                  loadBundle: (path: string) =>
+                  loadBundle: (uri: string) =>
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    server.ssrLoadModule(path.slice(1)) as any,
+                    server.ssrLoadModule(uri.slice(1)) as any,
                   // Files here are only needed for critical CSS inlining.
                   outputFiles: {},
                   // TODO: add support for critical css inlining.
