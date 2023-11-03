@@ -49,6 +49,11 @@ export function checkCommonJSModules(
   // using `provideHttpClient(withFetch())`.
   allowedRequests.add('xhr2');
 
+  // Packages used by @angular/ssr.
+  // While critters is ESM it has a number of direct and transtive CJS deps.
+  allowedRequests.add('express');
+  allowedRequests.add('critters');
+
   // Find all entry points that contain code (JS/TS)
   const files: string[] = [];
   for (const { entryPoint } of Object.values(metafile.outputs)) {
@@ -76,7 +81,13 @@ export function checkCommonJSModules(
       if (!imported.original || seenFiles.has(imported.path)) {
         continue;
       }
+
       seenFiles.add(imported.path);
+
+      // If the dependency is allowed ignore all other checks
+      if (allowedRequests.has(imported.original)) {
+        continue;
+      }
 
       // Only check actual code files
       if (!isPathCode(imported.path)) {
@@ -141,11 +152,7 @@ function isPathCode(name: string): boolean {
  * @returns True, if specifier is potentially relative; false, otherwise.
  */
 function isPotentialRelative(specifier: string): boolean {
-  if (specifier[0] === '.') {
-    return true;
-  }
-
-  return false;
+  return specifier[0] === '.';
 }
 
 /**
