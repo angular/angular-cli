@@ -17,7 +17,7 @@ export class CommonEngine {
 // @public (undocumented)
 export interface CommonEngineOptions {
     bootstrap?: Type<{}> | (() => Promise<ApplicationRef>);
-    enablePeformanceProfiler?: boolean;
+    enablePerformanceProfiler?: boolean;
     providers?: StaticProvider[];
 }
 
