@@ -18,6 +18,7 @@ import { ServerResponse } from 'node:http';
 import { dirname, extname, join, relative } from 'node:path';
 import type { Connect, DepOptimizationConfig, InlineConfig, ViteDevServer } from 'vite';
 import { BuildOutputFile, BuildOutputFileType } from '../../tools/esbuild/bundler-context';
+import { ExternalResultMetadata } from '../../tools/esbuild/bundler-execution-result';
 import { JavaScriptTransformer } from '../../tools/esbuild/javascript-transformer';
 import { createRxjsEsmResolutionPlugin } from '../../tools/esbuild/rxjs-esm-resolution-plugin';
 import { getFeatureSupport, transformSupportedBrowsersToTargets } from '../../tools/esbuild/utils';
@@ -123,8 +124,9 @@ export async function* serveWithVite(
   let hadError = false;
   const generatedFiles = new Map<string, OutputFileRecord>();
   const assetFiles = new Map<string, string>();
-  const externalMetadata: { implicit: string[]; explicit: string[] } = {
-    implicit: [],
+  const externalMetadata: ExternalResultMetadata = {
+    implicitBrowser: [],
+    implicitServer: [],
     explicit: [],
   };
   const build =
@@ -178,17 +180,12 @@ export async function* serveWithVite(
       }
     }
 
-    // To avoid disconnecting the array objects from the option, these arrays need to be mutated
-    // instead of replaced.
-    // TODO: split explicit imports by platform to avoid having Vite optimize server-only/browser-only
-    // dependencies twice when SSR is enabled.
+    // To avoid disconnecting the array objects from the option, these arrays need to be mutated instead of replaced.
     if (result.externalMetadata) {
-      if (result.externalMetadata.explicit) {
-        externalMetadata.explicit.push(...result.externalMetadata.explicit);
-      }
-      if (result.externalMetadata.implicit) {
-        externalMetadata.implicit.push(...result.externalMetadata.implicit);
-      }
+      const { implicitBrowser, implicitServer, explicit } = result.externalMetadata;
+      externalMetadata.explicit.push(...explicit);
+      externalMetadata.implicitServer.push(...implicitServer);
+      externalMetadata.implicitBrowser.push(...implicitBrowser);
     }
 
     if (server) {
@@ -371,7 +368,7 @@ export async function setupServer(
   outputFiles: Map<string, OutputFileRecord>,
   assets: Map<string, string>,
   preserveSymlinks: boolean | undefined,
-  externalMetadata: { implicit: string[]; explicit: string[] },
+  externalMetadata: ExternalResultMetadata,
   ssr: boolean,
   prebundleTransformer: JavaScriptTransformer,
   target: string[],
@@ -437,7 +434,7 @@ export async function setupServer(
         // Exclude any explicitly defined dependencies (currently build defined externals)
         exclude: externalMetadata.explicit,
         // Include all implict dependencies from the external packages internal option
-        include: externalMetadata.implicit,
+        include: externalMetadata.implicitServer,
         ssr: true,
         prebundleTransformer,
         target,
@@ -698,7 +695,7 @@ export async function setupServer(
       // Exclude any explicitly defined dependencies (currently build defined externals)
       exclude: externalMetadata.explicit,
       // Include all implict dependencies from the external packages internal option
-      include: externalMetadata.implicit,
+      include: externalMetadata.implicitBrowser,
       ssr: false,
       prebundleTransformer,
       target,
