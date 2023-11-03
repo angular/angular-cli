@@ -28,7 +28,7 @@ export interface RenderOptions {
 const { outputFiles, document, inlineCriticalCss } = workerData as RenderWorkerData;
 
 /** Renders an application based on a provided options. */
-async function render(options: RenderOptions): Promise<RenderResult> {
+function render(options: RenderOptions): Promise<RenderResult> {
   return renderPage({
     ...options,
     outputFiles,
