@@ -318,8 +318,9 @@ function analyzeResultFiles(
       // This mimics the Webpack dev-server behavior.
       filePath = '/index.html';
     } else {
-      filePath = normalizePath(file.path);
+      filePath = '/' + normalizePath(file.path);
     }
+
     seen.add(filePath);
 
     // Skip analysis of sourcemaps
@@ -461,13 +462,11 @@ export async function setupServer(
             // Remove query if present
             const [importerFile] = importer.split('?', 1);
 
-            source = normalizePath(
-              join(dirname(relative(virtualProjectRoot, importerFile)), source),
-            );
+            source =
+              '/' +
+              normalizePath(join(dirname(relative(virtualProjectRoot, importerFile)), source));
           }
-          if (source[0] === '/') {
-            source = source.slice(1);
-          }
+
           const [file] = source.split('?', 1);
           if (outputFiles.has(file)) {
             return join(virtualProjectRoot, source);
@@ -475,7 +474,7 @@ export async function setupServer(
         },
         load(id) {
           const [file] = id.split('?', 1);
-          const relativeFile = normalizePath(relative(virtualProjectRoot, file));
+          const relativeFile = '/' + normalizePath(relative(virtualProjectRoot, file));
           const codeContents = outputFiles.get(relativeFile)?.contents;
           if (codeContents === undefined) {
             if (relativeFile.endsWith('/node_modules/vite/dist/client/client.mjs')) {
@@ -593,7 +592,7 @@ export async function setupServer(
                 return;
               }
 
-              const rawHtml = outputFiles.get('index.server.html')?.contents;
+              const rawHtml = outputFiles.get('/index.server.html')?.contents;
               if (!rawHtml) {
                 next();
 
