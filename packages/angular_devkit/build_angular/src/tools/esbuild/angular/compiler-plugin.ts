@@ -418,6 +418,9 @@ export function createCompilerPlugin(
       }
 
       build.onEnd((result) => {
+        // Ensure other compilations are unblocked if the main compilation throws during start
+        sharedTSCompilationState?.markAsReady();
+
         for (const { outputFiles, metafile } of additionalResults.values()) {
           // Add any additional output files to the main output files
           if (outputFiles?.length) {
