@@ -9,7 +9,7 @@
 import { ApplicationRef, StaticProvider, Type } from '@angular/core';
 import { renderApplication, renderModule, ɵSERVER_CONTEXT } from '@angular/platform-server';
 import * as fs from 'node:fs';
-import { dirname, resolve } from 'node:path';
+import { dirname, join, normalize, resolve } from 'node:path';
 import { URL } from 'node:url';
 import { InlineCriticalCssProcessor, InlineCriticalCssResult } from './inline-css-processor';
 import {
@@ -117,32 +117,34 @@ export class CommonEngine {
       return undefined;
     }
 
-    const pathname = canParseUrl(url) ? new URL(url).pathname : url;
-    // Remove leading forward slash.
-    const pagePath = resolve(publicPath, pathname.substring(1), 'index.html');
+    const { pathname } = new URL(url, 'resolve://');
+    // Do not use `resolve` here as otherwise it can lead to path traversal vulnerability.
+    // See: https://portswigger.net/web-security/file-path-traversal
+    const pagePath = join(publicPath, pathname, 'index.html');
 
-    if (pagePath !== resolve(documentFilePath)) {
-      // View path doesn't match with prerender path.
-      const pageIsSSG = this.pageIsSSG.get(pagePath);
-      if (pageIsSSG === undefined) {
-        if (await exists(pagePath)) {
-          const content = await fs.promises.readFile(pagePath, 'utf-8');
-          const isSSG = SSG_MARKER_REGEXP.test(content);
-          this.pageIsSSG.set(pagePath, isSSG);
-
-          if (isSSG) {
-            return content;
-          }
-        } else {
-          this.pageIsSSG.set(pagePath, false);
-        }
-      } else if (pageIsSSG) {
-        // Serve pre-rendered page.
-        return fs.promises.readFile(pagePath, 'utf-8');
-      }
+    if (this.pageIsSSG.get(pagePath)) {
+      // Serve pre-rendered page.
+      return fs.promises.readFile(pagePath, 'utf-8');
     }
 
-    return undefined;
+    if (!pagePath.startsWith(normalize(publicPath))) {
+      // Potential path traversal detected.
+      return undefined;
+    }
+
+    if (pagePath === resolve(documentFilePath) || !(await exists(pagePath))) {
+      // View matches with prerender path or file does not exist.
+      this.pageIsSSG.set(pagePath, false);
+
+      return undefined;
+    }
+
+    // Static file exists.
+    const content = await fs.promises.readFile(pagePath, 'utf-8');
+    const isSSG = SSG_MARKER_REGEXP.test(content);
+    this.pageIsSSG.set(pagePath, isSSG);
+
+    return isSSG ? content : undefined;
   }
 
   private async renderApplication(opts: CommonEngineRenderOptions): Promise<string> {
@@ -201,13 +203,4 @@ async function exists(path: fs.PathLike): Promise<boolean> {
 function isBootstrapFn(value: unknown): value is () => Promise<ApplicationRef> {
   // We can differentiate between a module and a bootstrap function by reading compiler-generated `ɵmod` static property:
   return typeof value === 'function' && !('ɵmod' in value);
-}
-
-// The below can be removed in favor of URL.canParse() when Node.js 18 is dropped
-function canParseUrl(url: string): boolean {
-  try {
-    return !!new URL(url);
-  } catch {
-    return false;
-  }
 }
