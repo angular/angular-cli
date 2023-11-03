@@ -26,7 +26,7 @@ export interface CommonEngineOptions {
   /** A set of platform level providers for all requests. */
   providers?: StaticProvider[];
   /** Enable request performance profiling data collection and printing the results in the server console. */
-  enablePeformanceProfiler?: boolean;
+  enablePerformanceProfiler?: boolean;
 }
 
 export interface CommonEngineRenderOptions {
@@ -69,9 +69,9 @@ export class CommonEngine {
    * render options
    */
   async render(opts: CommonEngineRenderOptions): Promise<string> {
-    const enablePeformanceProfiler = this.options?.enablePeformanceProfiler;
+    const enablePerformanceProfiler = this.options?.enablePerformanceProfiler;
 
-    const runMethod = enablePeformanceProfiler
+    const runMethod = enablePerformanceProfiler
       ? runMethodAndMeasurePerf
       : noopRunMethodAndMeasurePerf;
 
@@ -95,7 +95,7 @@ export class CommonEngine {
       }
     }
 
-    if (enablePeformanceProfiler) {
+    if (enablePerformanceProfiler) {
       printPerformanceLogs();
     }
 
