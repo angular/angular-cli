@@ -24,6 +24,12 @@ export interface RebuildState {
   previousOutputHashes: Map<string, string>;
 }
 
+export interface ExternalResultMetadata {
+  implicitBrowser: string[];
+  implicitServer: string[];
+  explicit: string[];
+}
+
 /**
  * Represents the result of a single builder execute call.
  */
@@ -31,7 +37,7 @@ export class ExecutionResult {
   outputFiles: BuildOutputFile[] = [];
   assetFiles: BuildOutputAsset[] = [];
   errors: (Message | PartialMessage)[] = [];
-  externalMetadata?: { implicit: string[]; explicit?: string[] };
+  externalMetadata?: ExternalResultMetadata;
 
   constructor(
     private rebuildContexts: BundlerContext[],
@@ -53,11 +59,16 @@ export class ExecutionResult {
   /**
    * Add external JavaScript import metadata to the result. This is currently used
    * by the development server to optimize the prebundling process.
-   * @param implicit External dependencies due to the external packages option.
+   * @param implicitBrowser External dependencies for the browser bundles due to the external packages option.
+   * @param implicitServer External dependencies for the server bundles due to the external packages option.
    * @param explicit External dependencies due to explicit project configuration.
    */
-  setExternalMetadata(implicit: string[], explicit: string[] | undefined) {
-    this.externalMetadata = { implicit, explicit };
+  setExternalMetadata(
+    implicitBrowser: string[],
+    implicitServer: string[],
+    explicit: string[] | undefined,
+  ): void {
+    this.externalMetadata = { implicitBrowser, implicitServer, explicit: explicit ?? [] };
   }
 
   get output() {

@@ -29,7 +29,10 @@ export type BundleContextResult =
       metafile: Metafile;
       outputFiles: BuildOutputFile[];
       initialFiles: Map<string, InitialFileRecord>;
-      externalImports: Set<string>;
+      externalImports: {
+        server?: Set<string>;
+        browser?: Set<string>;
+      };
     };
 
 export interface InitialFileRecord {
@@ -117,7 +120,9 @@ export class BundlerContext {
     const warnings: Message[] = [];
     const metafile: Metafile = { inputs: {}, outputs: {} };
     const initialFiles = new Map<string, InitialFileRecord>();
-    const externalImports = new Set<string>();
+    const externalImportsBrowser = new Set<string>();
+    const externalImportsServer = new Set<string>();
+
     const outputFiles = [];
     for (const result of individualResults) {
       warnings.push(...result.warnings);
@@ -135,7 +140,8 @@ export class BundlerContext {
 
       result.initialFiles.forEach((value, key) => initialFiles.set(key, value));
       outputFiles.push(...result.outputFiles);
-      result.externalImports.forEach((value) => externalImports.add(value));
+      result.externalImports.browser?.forEach((value) => externalImportsBrowser.add(value));
+      result.externalImports.server?.forEach((value) => externalImportsServer.add(value));
     }
 
     if (errors !== undefined) {
@@ -148,7 +154,10 @@ export class BundlerContext {
       metafile,
       initialFiles,
       outputFiles,
-      externalImports,
+      externalImports: {
+        browser: externalImportsBrowser,
+        server: externalImportsServer,
+      },
     };
   }
 
@@ -175,7 +184,7 @@ export class BundlerContext {
     return result;
   }
 
-  async #performBundle() {
+  async #performBundle(): Promise<BundleContextResult> {
     // Create esbuild options if not present
     if (this.#esbuildOptions === undefined) {
       if (this.incremental) {
@@ -313,15 +322,13 @@ export class BundlerContext {
       }
     }
 
+    const platformIsServer = this.#esbuildOptions?.platform === 'node';
     const outputFiles = result.outputFiles.map((file) => {
       let fileType: BuildOutputFileType;
       if (dirname(file.path) === 'media') {
         fileType = BuildOutputFileType.Media;
       } else {
-        fileType =
-          this.#esbuildOptions?.platform === 'node'
-            ? BuildOutputFileType.Server
-            : BuildOutputFileType.Browser;
+        fileType = platformIsServer ? BuildOutputFileType.Server : BuildOutputFileType.Browser;
       }
 
       return convertOutputFile(file, fileType);
@@ -332,7 +339,9 @@ export class BundlerContext {
       ...result,
       outputFiles,
       initialFiles,
-      externalImports,
+      externalImports: {
+        [platformIsServer ? 'server' : 'browser']: externalImports,
+      },
       errors: undefined,
     };
   }
