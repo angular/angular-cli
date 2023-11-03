@@ -581,7 +581,13 @@ export async function setupServer(
               next: Connect.NextFunction,
             ) {
               const url = req.originalUrl;
-              if (!url || url.endsWith('.html')) {
+              if (
+                // Skip if path is not defined.
+                !url ||
+                // Skip if path is like a file.
+                // NOTE: We use a regexp to mitigate against matching requests like: /browse/pl.0ef59752c0cd457dbf1391f08cbd936f
+                /^\.[a-z]{2,4}$/i.test(path.extname(url.split('?')[0]))
+              ) {
                 next();
 
                 return;
