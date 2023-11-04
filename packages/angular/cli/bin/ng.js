@@ -51,7 +51,7 @@ if (version[0] % 2 === 1) {
       process.version +
       ' detected.\n' +
       'Odd numbered Node.js versions will not enter LTS status and should not be used for production.' +
-      ' For more information, please see https://nodejs.org/en/about/releases/.',
+      ' For more information, please see https://nodejs.org/en/about/previous-releases/.',
   );
 
   require('./bootstrap');
