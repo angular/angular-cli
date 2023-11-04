@@ -102,14 +102,7 @@ export async function* serveWithVite(
     browserOptions.forceI18nFlatOutput = true;
   }
 
-  // Setup the prebundling transformer that will be shared across Vite prebundling requests
-  const prebundleTransformer = new JavaScriptTransformer(
-    // Always enable JIT linking to support applications built with and without AOT.
-    // In a development environment the additional scope information does not
-    // have a negative effect unlike production where final output size is relevant.
-    { sourcemap: true, jit: true },
-    1,
-  );
+  const prebundleTransformerCache = new Map<string, Uint8Array>();
 
   // Extract output index from options
   // TODO: Provide this info from the build results
@@ -209,7 +202,7 @@ export async function* serveWithVite(
         browserOptions.preserveSymlinks,
         externalMetadata,
         !!browserOptions.ssr,
-        prebundleTransformer,
+        prebundleTransformerCache,
         target,
         extensions?.middleware,
         transformers?.indexHtml,
@@ -239,8 +232,8 @@ export async function* serveWithVite(
   let deferred: () => void;
   context.addTeardown(async () => {
     await server?.close();
-    await prebundleTransformer.close();
     deferred?.();
+    prebundleTransformerCache.clear();
   });
   await new Promise<void>((resolve) => (deferred = resolve));
 }
@@ -363,14 +356,14 @@ function analyzeResultFiles(
 }
 
 // eslint-disable-next-line max-lines-per-function
-export async function setupServer(
+async function setupServer(
   serverOptions: NormalizedDevServerOptions,
   outputFiles: Map<string, OutputFileRecord>,
   assets: Map<string, string>,
   preserveSymlinks: boolean | undefined,
   externalMetadata: ExternalResultMetadata,
   ssr: boolean,
-  prebundleTransformer: JavaScriptTransformer,
+  prebundleTransformerCache: Map<string, Uint8Array>,
   target: string[],
   extensionMiddleware?: Connect.NextHandleFunction[],
   indexHtmlTransformer?: (content: string) => Promise<string>,
@@ -436,7 +429,7 @@ export async function setupServer(
         // Include all implict dependencies from the external packages internal option
         include: externalMetadata.implicitServer,
         ssr: true,
-        prebundleTransformer,
+        prebundleTransformerCache,
         target,
       }),
     },
@@ -697,7 +690,7 @@ export async function setupServer(
       // Include all implict dependencies from the external packages internal option
       include: externalMetadata.implicitBrowser,
       ssr: false,
-      prebundleTransformer,
+      prebundleTransformerCache,
       target,
     }),
   };
@@ -764,25 +757,47 @@ function getDepOptimizationConfig({
   exclude,
   include,
   target,
-  prebundleTransformer,
+  prebundleTransformerCache,
   ssr,
 }: {
   disabled: boolean;
   exclude: string[];
   include: string[];
   target: string[];
-  prebundleTransformer: JavaScriptTransformer;
+  prebundleTransformerCache: Map<string, Uint8Array>;
   ssr: boolean;
 }): DepOptimizationConfig {
   const plugins: ViteEsBuildPlugin[] = [
     {
       name: `angular-vite-optimize-deps${ssr ? '-ssr' : ''}`,
       setup(build) {
+        let prebundleTransformer: JavaScriptTransformer | undefined;
+
         build.onLoad({ filter: /\.[cm]?js$/ }, async (args) => {
+          const { path } = args;
+          let contents = prebundleTransformerCache.get(path);
+          if (!contents) {
+            // Setup the prebundling transformer that will be shared across Vite prebundling requests
+            prebundleTransformer ??= new JavaScriptTransformer(
+              // Always enable JIT linking to support applications built with and without AOT.
+              // In a development environment the additional scope information does not
+              // have a negative effect unlike production where final output size is relevant.
+              { sourcemap: true, jit: true },
+              1,
+            );
+
+            contents = await prebundleTransformer.transformFile(path);
+            prebundleTransformerCache.set(path, contents);
+          }
+
           return {
-            contents: await prebundleTransformer.transformFile(args.path),
+            contents,
             loader: 'js',
           };
+        });
+
+        build.onDispose(() => {
+          void prebundleTransformer?.close();
         });
       },
     },
