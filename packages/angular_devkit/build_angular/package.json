@@ -64,7 +64,7 @@
     "text-table": "0.2.0",
     "tree-kill": "1.2.2",
     "tslib": "2.6.2",
-    "undici": "5.27.0",
+    "undici": "5.27.2",
     "vite": "4.5.0",
     "webpack": "5.89.0",
     "webpack-dev-middleware": "6.1.1",
