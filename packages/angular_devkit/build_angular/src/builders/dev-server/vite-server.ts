@@ -390,7 +390,10 @@ export async function setupServer(
     join(serverOptions.workspaceRoot, `.angular/vite-root/${randomUUID()}/`),
   );
 
-  const { builtinModules } = await import('node:module');
+  const serverExplicitExternal = [
+    ...(await import('node:module')).builtinModules,
+    ...externalMetadata.explicit,
+  ];
 
   const configuration: InlineConfig = {
     configFile: false,
@@ -428,12 +431,12 @@ export async function setupServer(
       // Note: `true` and `/.*/` have different sematics. When true, the `external` option is ignored.
       noExternal: /.*/,
       // Exclude any Node.js built in module and provided dependencies (currently build defined externals)
-      external: [...builtinModules, ...externalMetadata.explicit],
+      external: serverExplicitExternal,
       optimizeDeps: getDepOptimizationConfig({
         // Only enable with caching since it causes prebundle dependencies to be cached
         disabled: !serverOptions.cacheOptions.enabled,
-        // Exclude any explicitly defined dependencies (currently build defined externals)
-        exclude: externalMetadata.explicit,
+        // Exclude any explicitly defined dependencies (currently build defined externals and node.js built-ins)
+        exclude: serverExplicitExternal,
         // Include all implict dependencies from the external packages internal option
         include: externalMetadata.implicitServer,
         ssr: true,
