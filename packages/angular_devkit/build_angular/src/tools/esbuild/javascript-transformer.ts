@@ -28,10 +28,12 @@ export interface JavaScriptTransformerOptions {
 export class JavaScriptTransformer {
   #workerPool: Piscina | undefined;
   #commonOptions: Required<JavaScriptTransformerOptions>;
+  #pendingfileResults?: Map<string, Promise<Uint8Array>>;
 
   constructor(
     options: JavaScriptTransformerOptions,
     readonly maxThreads: number,
+    reuseResults?: boolean,
   ) {
     // Extract options to ensure only the named options are serialized and sent to the worker
     const {
@@ -46,6 +48,11 @@ export class JavaScriptTransformer {
       advancedOptimizations,
       jit,
     };
+
+    // Currently only tracks pending file transform results
+    if (reuseResults) {
+      this.#pendingfileResults = new Map();
+    }
   }
 
   #ensureWorkerPool(): Piscina {
@@ -68,13 +75,21 @@ export class JavaScriptTransformer {
    * @returns A promise that resolves to a UTF-8 encoded Uint8Array containing the result.
    */
   transformFile(filename: string, skipLinker?: boolean): Promise<Uint8Array> {
-    // Always send the request to a worker. Files are almost always from node modules which means
-    // they may need linking. The data is also not yet available to perform most transformation checks.
-    return this.#ensureWorkerPool().run({
-      filename,
-      skipLinker,
-      ...this.#commonOptions,
-    });
+    const pendingKey = `${!!skipLinker}--${filename}`;
+    let pending = this.#pendingfileResults?.get(pendingKey);
+    if (pending === undefined) {
+      // Always send the request to a worker. Files are almost always from node modules which means
+      // they may need linking. The data is also not yet available to perform most transformation checks.
+      pending = this.#ensureWorkerPool().run({
+        filename,
+        skipLinker,
+        ...this.#commonOptions,
+      });
+
+      this.#pendingfileResults?.set(pendingKey, pending);
+    }
+
+    return pending;
   }
 
   /**
@@ -112,6 +127,8 @@ export class JavaScriptTransformer {
    * @returns A void promise that resolves when closing is complete.
    */
   async close(): Promise<void> {
+    this.#pendingfileResults?.clear();
+
     if (this.#workerPool) {
       // Workaround piscina bug where a worker thread will be recreated after destroy to meet the minimum.
       this.#workerPool.options.minThreads = 0;
