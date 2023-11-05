@@ -216,8 +216,20 @@ export async function* serveWithVite(
       );
 
       server = await createServer(serverConfiguration);
-
       await server.listen();
+
+      if (browserOptions.ssr) {
+        /**
+         * Vite will only start dependency optimization of SSR modules when the first request comes in.
+         * In some cases, this causes a long waiting time. To mitigate this, we call `ssrLoadModule` to
+         * initiate this process before the first request.
+         *
+         * NOTE: This will intentionally fail from the unknown module, but currently there is no other way
+         * to initiate the SSR dep optimizer.
+         */
+        void server.ssrLoadModule('<deps-caller>').catch(() => {});
+      }
+
       const urls = server.resolvedUrls;
       if (urls && (urls.local.length || urls.network.length)) {
         serverUrl = new URL(urls.local[0] ?? urls.network[0]);
