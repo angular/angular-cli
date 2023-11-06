@@ -12,7 +12,6 @@ import type { json, logging } from '@angular-devkit/core';
 import type { Plugin } from 'esbuild';
 import { lookup as lookupMimeType } from 'mrmime';
 import assert from 'node:assert';
-import { randomUUID } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import { ServerResponse } from 'node:http';
 import { dirname, extname, join, relative } from 'node:path';
@@ -192,6 +191,12 @@ export async function* serveWithVite(
       externalMetadata.explicit.push(...explicit);
       externalMetadata.implicitServer.push(...implicitServer);
       externalMetadata.implicitBrowser.push(...implicitBrowser);
+
+      // The below needs to be sorted as Vite uses these options are part of the hashing invalidation algorithm.
+      // See: https://github.com/vitejs/vite/blob/0873bae0cfe0f0718ad2f5743dd34a17e4ab563d/packages/vite/src/node/optimizer/index.ts#L1203-L1239
+      externalMetadata.explicit.sort();
+      externalMetadata.implicitServer.sort();
+      externalMetadata.implicitBrowser.sort();
     }
 
     if (server) {
@@ -405,7 +410,7 @@ export async function setupServer(
 
   // Path will not exist on disk and only used to provide separate path for Vite requests
   const virtualProjectRoot = normalizePath(
-    join(serverOptions.workspaceRoot, `.angular/vite-root/${randomUUID()}/`),
+    join(serverOptions.workspaceRoot, `.angular/vite-root`, serverOptions.buildTarget.project),
   );
 
   const serverExplicitExternal = [
