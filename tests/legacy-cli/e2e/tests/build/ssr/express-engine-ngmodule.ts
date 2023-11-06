@@ -104,14 +104,14 @@ export default async function () {
           expect(await style.getText()).not.toBeNull();
 
           // Test the contents from the server.
-          const serverDiv = await browser.driver.findElement(by.css('div'));
-          expect(await serverDiv.getText()).toMatch('Welcome');
+          const serverDiv = await browser.driver.findElement(by.css('h1'));
+          expect(await serverDiv.getText()).toMatch('Hello');
 
           // Bootstrap the client side app.
           await browser.executeScript('doBootstrap()');
 
           // Retest the contents after the client bootstraps.
-          expect(await element(by.css('div')).getText()).toMatch('Welcome');
+          expect(await element(by.css('h1')).getText()).toMatch('Hello');
 
           // Make sure the server styles got replaced by client side ones.
           expect(await element(by.css('style[ng-app-id="ng"]')).isPresent()).toBeFalsy();

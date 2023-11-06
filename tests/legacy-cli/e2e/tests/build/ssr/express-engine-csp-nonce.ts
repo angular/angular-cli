@@ -82,13 +82,13 @@ export default async function () {
           ).not.toBeNull();
 
           // Test the contents from the server.
-          expect(await element(by.css('div')).getText()).toMatch('Welcome');
+          expect(await element(by.css('h1')).getText()).toMatch('Hello');
 
           // Bootstrap the client side app.
           await browser.executeScript('doBootstrap()');
 
           // Retest the contents after the client bootstraps.
-          expect(await element(by.css('div')).getText()).toMatch('Welcome');
+          expect(await element(by.css('h1')).getText()).toMatch('Hello');
 
           // Make sure the server styles got replaced by client side ones.
           expect(

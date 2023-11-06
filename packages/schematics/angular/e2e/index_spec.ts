@@ -62,29 +62,6 @@ describe('Application Schematic', () => {
     );
   });
 
-  it('should set the rootSelector in the app.po.ts', async () => {
-    const tree = await schematicRunner.runSchematic('e2e', defaultOptions, applicationTree);
-
-    const content = tree.readContent('/projects/foo/e2e/src/app.po.ts');
-    expect(content).toMatch(/app-root/);
-  });
-
-  it('should set the rootSelector in the app.po.ts from the option', async () => {
-    const options = { ...defaultOptions, rootSelector: 't-a-c-o' };
-    const tree = await schematicRunner.runSchematic('e2e', options, applicationTree);
-
-    const content = tree.readContent('/projects/foo/e2e/src/app.po.ts');
-    expect(content).toMatch(/t-a-c-o/);
-  });
-
-  it('should set the rootSelector in the app.po.ts from the option with emoji', async () => {
-    const options = { ...defaultOptions, rootSelector: '🌮-🌯' };
-    const tree = await schematicRunner.runSchematic('e2e', options, applicationTree);
-
-    const content = tree.readContent('/projects/foo/e2e/src/app.po.ts');
-    expect(content).toMatch(/🌮-🌯/);
-  });
-
   describe('workspace config', () => {
     it('should add e2e targets for the app', async () => {
       const tree = await schematicRunner.runSchematic('e2e', defaultOptions, applicationTree);

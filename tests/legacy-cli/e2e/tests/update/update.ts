@@ -56,6 +56,9 @@ export default async function () {
   // Update Angular current build
   const extraUpdateArgs = isPrereleaseCli() ? ['--next', '--force'] : [];
 
+  // Generate e2e test prior to `ng update` as the asserted content changed in v17.
+  await ng('generate', 'e2e', '--related-app-name=fourteen-project');
+
   // For the latest/next release we purposely don't run `ng update @angular/core`.
 
   // During a major release when the branch version is bumped from `12.0.0-rc.x` to `12.0.0` there would be a period were in
@@ -72,7 +75,6 @@ export default async function () {
   await ng('update', '@angular/cli', ...extraUpdateArgs);
 
   // Setup testing to use CI Chrome.
-  await ng('generate', 'e2e', '--related-app-name=fourteen-project');
   await useCIChrome('fourteen-project', './');
   await useCIChrome('fourteen-project', './e2e/');
   await useCIDefaults('fourteen-project');
