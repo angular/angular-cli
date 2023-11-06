@@ -80,7 +80,7 @@ async function findTests(
   projectSourceRoot: string,
 ): Promise<string[]> {
   const matchingTestsPromises = include.map((pattern) =>
-    findMatchingTests(pattern, exclude, workspaceRoot, projectSourceRoot),
+    findMatchingTests(pattern, exclude, workspaceRoot, projectSourceRoot)
   );
   const files = await Promise.all(matchingTestsPromises);
 
@@ -90,38 +90,54 @@ async function findTests(
 
 const normalizePath = (path: string): string => path.replace(/\\/g, '/');
 
+const removeLeadingSlash = (pattern: string) => {
+  if (pattern.charAt(0) === '/') {
+    return pattern.substring(1);
+  }
+  return pattern;
+};
+
+const removeRelativeRoot = (path: string, root: string) => {
+  if (path.startsWith(root)) {
+    return path.substring(root.length);
+  }
+  return path;
+};
+
 async function findMatchingTests(
   pattern: string,
   ignore: string[],
   workspaceRoot: string,
-  projectSourceRoot: string,
+  projectSourceRoot: string
 ): Promise<string[]> {
   // normalize pattern, glob lib only accepts forward slashes
-  let normalizedPattern = normalizePath(pattern);
-  if (normalizedPattern.charAt(0) === '/') {
-    normalizedPattern = normalizedPattern.substring(1);
-  }
+  let normalizedIncludePattern = normalizePath(pattern);
+  normalizedIncludePattern = removeLeadingSlash(normalizedIncludePattern);
+  let normalizedExcludePatternList = ignore.map((pattern: string) =>
+    removeLeadingSlash(normalizePath(pattern))
+  );
 
   const relativeProjectRoot = normalizePath(relative(workspaceRoot, projectSourceRoot) + '/');
 
   // remove relativeProjectRoot to support relative paths from root
   // such paths are easy to get when running scripts via IDEs
-  if (normalizedPattern.startsWith(relativeProjectRoot)) {
-    normalizedPattern = normalizedPattern.substring(relativeProjectRoot.length);
-  }
+  normalizedIncludePattern = removeRelativeRoot(normalizedIncludePattern, relativeProjectRoot);
+  normalizedExcludePatternList = normalizedExcludePatternList.map((pattern: string) =>
+    removeRelativeRoot(pattern, relativeProjectRoot)
+  );
 
   // special logic when pattern does not look like a glob
-  if (!isDynamicPattern(normalizedPattern)) {
-    if (await isDirectory(join(projectSourceRoot, normalizedPattern))) {
-      normalizedPattern = `${normalizedPattern}/**/*.spec.@(ts|tsx)`;
+  if (!isDynamicPattern(normalizedIncludePattern)) {
+    if (await isDirectory(join(projectSourceRoot, normalizedIncludePattern))) {
+      normalizedIncludePattern = `${normalizedIncludePattern}/**/*.spec.@(ts|tsx)`;
     } else {
       // see if matching spec file exists
-      const fileExt = extname(normalizedPattern);
+      const fileExt = extname(normalizedIncludePattern);
       // Replace extension to `.spec.ext`. Example: `src/app/app.component.ts`-> `src/app/app.component.spec.ts`
       const potentialSpec = join(
         projectSourceRoot,
-        dirname(normalizedPattern),
-        `${basename(normalizedPattern, fileExt)}.spec${fileExt}`,
+        dirname(normalizedIncludePattern),
+        `${basename(normalizedIncludePattern, fileExt)}.spec${fileExt}`
       );
 
       if (await exists(potentialSpec)) {
@@ -130,10 +146,10 @@ async function findMatchingTests(
     }
   }
 
-  return glob(normalizedPattern, {
+  return glob(normalizedIncludePattern, {
     cwd: projectSourceRoot,
     absolute: true,
-    ignore: ['**/node_modules/**', ...ignore],
+    ignore: ['**/node_modules/**', ...normalizedExcludePatternList],
   });
 }
 
