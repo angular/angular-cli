@@ -183,6 +183,11 @@ export async function* serveWithVite(
     // To avoid disconnecting the array objects from the option, these arrays need to be mutated instead of replaced.
     if (result.externalMetadata) {
       const { implicitBrowser, implicitServer, explicit } = result.externalMetadata;
+      // Empty Arrays to avoid growing unlimited with every re-build.
+      externalMetadata.explicit.length = 0;
+      externalMetadata.implicitServer.length = 0;
+      externalMetadata.implicitBrowser.length = 0;
+
       externalMetadata.explicit.push(...explicit);
       externalMetadata.implicitServer.push(...implicitServer);
       externalMetadata.implicitBrowser.push(...implicitBrowser);
