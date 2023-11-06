@@ -90,6 +90,22 @@ async function findTests(
 
 const normalizePath = (path: string): string => path.replace(/\\/g, '/');
 
+const removeLeadingSlash = (pattern: string): string => {
+  if (pattern.charAt(0) === '/') {
+    return pattern.substring(1);
+  }
+
+  return pattern;
+};
+
+const removeRelativeRoot = (path: string, root: string): string => {
+  if (path.startsWith(root)) {
+    return path.substring(root.length);
+  }
+
+  return path;
+};
+
 async function findMatchingTests(
   pattern: string,
   ignore: string[],
@@ -98,17 +114,13 @@ async function findMatchingTests(
 ): Promise<string[]> {
   // normalize pattern, glob lib only accepts forward slashes
   let normalizedPattern = normalizePath(pattern);
-  if (normalizedPattern.charAt(0) === '/') {
-    normalizedPattern = normalizedPattern.substring(1);
-  }
+  normalizedPattern = removeLeadingSlash(normalizedPattern);
 
   const relativeProjectRoot = normalizePath(relative(workspaceRoot, projectSourceRoot) + '/');
 
   // remove relativeProjectRoot to support relative paths from root
   // such paths are easy to get when running scripts via IDEs
-  if (normalizedPattern.startsWith(relativeProjectRoot)) {
-    normalizedPattern = normalizedPattern.substring(relativeProjectRoot.length);
-  }
+  normalizedPattern = removeRelativeRoot(normalizedPattern, relativeProjectRoot);
 
   // special logic when pattern does not look like a glob
   if (!isDynamicPattern(normalizedPattern)) {
@@ -130,10 +142,15 @@ async function findMatchingTests(
     }
   }
 
+  // normalize the patterns in the ignore list
+  const normalizedIgnorePatternList = ignore.map((pattern: string) =>
+    removeRelativeRoot(removeLeadingSlash(normalizePath(pattern)), relativeProjectRoot),
+  );
+
   return glob(normalizedPattern, {
     cwd: projectSourceRoot,
     absolute: true,
-    ignore: ['**/node_modules/**', ...ignore],
+    ignore: ['**/node_modules/**', ...normalizedIgnorePatternList],
   });
 }
 

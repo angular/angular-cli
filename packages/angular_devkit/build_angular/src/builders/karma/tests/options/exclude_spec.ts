@@ -31,10 +31,29 @@ describeBuilder(execute, KARMA_BUILDER_INFO, (harness) => {
       expect(result?.success).toBeFalse();
     });
 
-    it(`should exclude spec that matches the 'exclude' pattern`, async () => {
+    it(`should exclude spec that matches the 'exclude' glob pattern`, async () => {
       harness.useTarget('test', {
         ...BASE_OPTIONS,
         exclude: ['**/error.spec.ts'],
+      });
+      const { result } = await harness.executeOnce();
+      expect(result?.success).toBeTrue();
+    });
+
+    it(`should exclude spec that matches the 'exclude' pattern with a relative project root`, async () => {
+      harness.useTarget('test', {
+        ...BASE_OPTIONS,
+        exclude: ['src/app/error.spec.ts'],
+      });
+
+      const { result } = await harness.executeOnce();
+      expect(result?.success).toBeTrue();
+    });
+
+    it(`should exclude spec that matches the 'exclude' pattern prefixed with a slash`, async () => {
+      harness.useTarget('test', {
+        ...BASE_OPTIONS,
+        exclude: ['/src/app/error.spec.ts'],
       });
 
       const { result } = await harness.executeOnce();
