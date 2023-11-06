@@ -90,6 +90,8 @@ export function createCompilerPlugin(
       const compilation: AngularCompilation = pluginOptions.noopTypeScriptCompilation
         ? new NoopCompilation()
         : await createAngularCompilation(!!pluginOptions.jit);
+      // Compilation is initially assumed to have errors until emitted
+      let hasCompilationErrors = true;
 
       // Determines if TypeScript should process JavaScript files based on tsconfig `allowJs` option
       let shouldTsIgnoreJs = true;
@@ -233,66 +235,32 @@ export function createCompilerPlugin(
 
         // Initialize the Angular compilation for the current build.
         // In watch mode, previous build state will be reused.
-        const {
-          compilerOptions: { allowJs },
-          referencedFiles,
-        } = await compilation.initialize(tsconfigPath, hostOptions, (compilerOptions) => {
-          // target of 9 is ES2022 (using the number avoids an expensive import of typescript just for an enum)
-          if (compilerOptions.target === undefined || compilerOptions.target < 9) {
-            // If 'useDefineForClassFields' is already defined in the users project leave the value as is.
-            // Otherwise fallback to false due to https://github.com/microsoft/TypeScript/issues/45995
-            // which breaks the deprecated `@Effects` NGRX decorator and potentially other existing code as well.
-            compilerOptions.target = 9;
-            compilerOptions.useDefineForClassFields ??= false;
+        let referencedFiles;
+        try {
+          const initializationResult = await compilation.initialize(
+            tsconfigPath,
+            hostOptions,
+            createCompilerOptionsTransformer(setupWarnings, pluginOptions, preserveSymlinks),
+          );
+          shouldTsIgnoreJs = !initializationResult.compilerOptions.allowJs;
+          referencedFiles = initializationResult.referencedFiles;
+        } catch (error) {
+          (result.errors ??= []).push({
+            text: 'Angular compilation initialization failed.',
+            location: null,
+            notes: [
+              {
+                text: error instanceof Error ? error.stack ?? error.message : `${error}`,
+                location: null,
+              },
+            ],
+          });
 
-            // Only add the warning on the initial build
-            setupWarnings?.push({
-              text:
-                'TypeScript compiler options "target" and "useDefineForClassFields" are set to "ES2022" and ' +
-                '"false" respectively by the Angular CLI.',
-              location: { file: pluginOptions.tsconfig },
-              notes: [
-                {
-                  text:
-                    'To control ECMA version and features use the Browerslist configuration. ' +
-                    'For more information, see https://angular.io/guide/build#configuring-browser-compatibility',
-                },
-              ],
-            });
-          }
+          // Initialization failure prevents further compilation steps
+          hasCompilationErrors = true;
 
-          if (compilerOptions.compilationMode === 'partial') {
-            setupWarnings?.push({
-              text: 'Angular partial compilation mode is not supported when building applications.',
-              location: null,
-              notes: [{ text: 'Full compilation mode will be used instead.' }],
-            });
-            compilerOptions.compilationMode = 'full';
-          }
-
-          // Enable incremental compilation by default if caching is enabled
-          if (pluginOptions.sourceFileCache?.persistentCachePath) {
-            compilerOptions.incremental ??= true;
-            // Set the build info file location to the configured cache directory
-            compilerOptions.tsBuildInfoFile = path.join(
-              pluginOptions.sourceFileCache?.persistentCachePath,
-              '.tsbuildinfo',
-            );
-          } else {
-            compilerOptions.incremental = false;
-          }
-
-          return {
-            ...compilerOptions,
-            noEmitOnError: false,
-            inlineSources: pluginOptions.sourcemap,
-            inlineSourceMap: pluginOptions.sourcemap,
-            mapRoot: undefined,
-            sourceRoot: undefined,
-            preserveSymlinks,
-          };
-        });
-        shouldTsIgnoreJs = !allowJs;
+          return result;
+        }
 
         if (compilation instanceof NoopCompilation) {
           await sharedTSCompilationState.waitUntilReady;
@@ -301,19 +269,32 @@ export function createCompilerPlugin(
         }
 
         const diagnostics = await compilation.diagnoseFiles();
-        if (diagnostics.errors) {
+        if (diagnostics.errors?.length) {
           (result.errors ??= []).push(...diagnostics.errors);
         }
-        if (diagnostics.warnings) {
+        if (diagnostics.warnings?.length) {
           (result.warnings ??= []).push(...diagnostics.warnings);
         }
 
         // Update TypeScript file output cache for all affected files
-        await profileAsync('NG_EMIT_TS', async () => {
-          for (const { filename, contents } of await compilation.emitAffectedFiles()) {
-            typeScriptFileCache.set(pathToFileURL(filename).href, contents);
-          }
-        });
+        try {
+          await profileAsync('NG_EMIT_TS', async () => {
+            for (const { filename, contents } of await compilation.emitAffectedFiles()) {
+              typeScriptFileCache.set(pathToFileURL(filename).href, contents);
+            }
+          });
+        } catch (error) {
+          (result.errors ??= []).push({
+            text: 'Angular compilation emit failed.',
+            location: null,
+            notes: [
+              {
+                text: error instanceof Error ? error.stack ?? error.message : `${error}`,
+                location: null,
+              },
+            ],
+          });
+        }
 
         // Add errors from failed additional results.
         // This must be done after emit to capture latest web worker results.
@@ -330,6 +311,8 @@ export function createCompilerPlugin(
             ...referencedFileTracker.referencedFiles,
           ];
         }
+
+        hasCompilationErrors = !!result.errors?.length;
 
         // Reset the setup warnings so that they are only shown during the first build.
         setupWarnings = undefined;
@@ -354,6 +337,12 @@ export function createCompilerPlugin(
         let contents = typeScriptFileCache.get(pathToFileURL(request).href);
 
         if (contents === undefined) {
+          // If the Angular compilation had errors the file may not have been emitted.
+          // To avoid additional errors about missing files, return empty contents.
+          if (hasCompilationErrors) {
+            return { contents: '', loader: 'js' };
+          }
+
           // No TS result indicates the file is not part of the TypeScript program.
           // If allowJs is enabled and the file is JS then defer to the next load hook.
           if (!shouldTsIgnoreJs && /\.[cm]?js$/.test(request)) {
@@ -443,6 +432,69 @@ export function createCompilerPlugin(
         void compilation.close?.();
       });
     },
+  };
+}
+
+function createCompilerOptionsTransformer(
+  setupWarnings: PartialMessage[] | undefined,
+  pluginOptions: CompilerPluginOptions,
+  preserveSymlinks: boolean | undefined,
+): Parameters<AngularCompilation['initialize']>[2] {
+  return (compilerOptions) => {
+    // target of 9 is ES2022 (using the number avoids an expensive import of typescript just for an enum)
+    if (compilerOptions.target === undefined || compilerOptions.target < 9) {
+      // If 'useDefineForClassFields' is already defined in the users project leave the value as is.
+      // Otherwise fallback to false due to https://github.com/microsoft/TypeScript/issues/45995
+      // which breaks the deprecated `@Effects` NGRX decorator and potentially other existing code as well.
+      compilerOptions.target = 9;
+      compilerOptions.useDefineForClassFields ??= false;
+
+      // Only add the warning on the initial build
+      setupWarnings?.push({
+        text:
+          'TypeScript compiler options "target" and "useDefineForClassFields" are set to "ES2022" and ' +
+          '"false" respectively by the Angular CLI.',
+        location: { file: pluginOptions.tsconfig },
+        notes: [
+          {
+            text:
+              'To control ECMA version and features use the Browerslist configuration. ' +
+              'For more information, see https://angular.io/guide/build#configuring-browser-compatibility',
+          },
+        ],
+      });
+    }
+
+    if (compilerOptions.compilationMode === 'partial') {
+      setupWarnings?.push({
+        text: 'Angular partial compilation mode is not supported when building applications.',
+        location: null,
+        notes: [{ text: 'Full compilation mode will be used instead.' }],
+      });
+      compilerOptions.compilationMode = 'full';
+    }
+
+    // Enable incremental compilation by default if caching is enabled
+    if (pluginOptions.sourceFileCache?.persistentCachePath) {
+      compilerOptions.incremental ??= true;
+      // Set the build info file location to the configured cache directory
+      compilerOptions.tsBuildInfoFile = path.join(
+        pluginOptions.sourceFileCache?.persistentCachePath,
+        '.tsbuildinfo',
+      );
+    } else {
+      compilerOptions.incremental = false;
+    }
+
+    return {
+      ...compilerOptions,
+      noEmitOnError: false,
+      inlineSources: pluginOptions.sourcemap,
+      inlineSourceMap: pluginOptions.sourcemap,
+      mapRoot: undefined,
+      sourceRoot: undefined,
+      preserveSymlinks,
+    };
   };
 }
 
