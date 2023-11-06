@@ -218,7 +218,7 @@ export async function* serveWithVite(
       server = await createServer(serverConfiguration);
       await server.listen();
 
-      if (browserOptions.ssr) {
+      if (serverConfiguration.ssr?.optimizeDeps?.disabled === false) {
         /**
          * Vite will only start dependency optimization of SSR modules when the first request comes in.
          * In some cases, this causes a long waiting time. To mitigate this, we call `ssrLoadModule` to
@@ -445,8 +445,19 @@ export async function setupServer(
       // Exclude any Node.js built in module and provided dependencies (currently build defined externals)
       external: serverExplicitExternal,
       optimizeDeps: getDepOptimizationConfig({
+        /**
+         * *********************************************
+         * NOTE: Temporary disable 'optimizeDeps' for SSR.
+         * *********************************************
+         *
+         * Currently this causes a number of issues.
+         * - Deps are re-optimized everytime the server is started.
+         * - Added deps after a rebuild are not optimized.
+         * - Breaks RxJs (Unless it is added as external). See: https://github.com/angular/angular-cli/issues/26235
+         */
+
         // Only enable with caching since it causes prebundle dependencies to be cached
-        disabled: !serverOptions.cacheOptions.enabled,
+        disabled: true, // !serverOptions.cacheOptions.enabled,
         // Exclude any explicitly defined dependencies (currently build defined externals and node.js built-ins)
         exclude: serverExplicitExternal,
         // Include all implict dependencies from the external packages internal option
