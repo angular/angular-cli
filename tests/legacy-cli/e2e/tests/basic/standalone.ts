@@ -30,7 +30,7 @@ import { bootstrapApplication, provideProtractorTestingSupport } from '@angular/
   template: \`
     <ng-template [ngIf]="isVisible">
       <div class="content">
-        <span>{{name}} app is running!</span>
+        <h1>Hello, {{name}}</h1>
       </div>
     </ng-template>
   \`,
