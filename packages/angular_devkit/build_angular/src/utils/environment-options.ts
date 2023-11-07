@@ -78,11 +78,8 @@ export const allowMinify = debugOptimize.minify;
 const maxWorkersVariable = process.env['NG_BUILD_MAX_WORKERS'];
 export const maxWorkers = isPresent(maxWorkersVariable) ? +maxWorkersVariable : 4;
 
-// Default to enabled unless inside a Web Container which currently fails when transferring MessagePort objects
 const parallelTsVariable = process.env['NG_BUILD_PARALLEL_TS'];
-export const useParallelTs = isPresent(parallelTsVariable)
-  ? !isDisabled(parallelTsVariable)
-  : !process.versions.webcontainer;
+export const useParallelTs = !isPresent(parallelTsVariable) || !isDisabled(parallelTsVariable);
 
 const legacySassVariable = process.env['NG_BUILD_LEGACY_SASS'];
 export const useLegacySass: boolean = (() => {
