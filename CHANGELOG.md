@@ -1,3 +1,50 @@
+<a name="17.0.0-rc.4"></a>
+
+# 17.0.0-rc.4 (2023-11-06)
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                           |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------- |
+| [ae45c4ab8](https://github.com/angular/angular-cli/commit/ae45c4ab8103ba8ebc2686e71dbf7d0394b1ee92) | feat | update `ng new` generated application |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                            |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------------------- |
+| [b182be8aa](https://github.com/angular/angular-cli/commit/b182be8aa7ff5fd3cddc0bcac5f4e45e9ed9cf2e) | fix  | avoid in-memory prerendering ESM loader errors                         |
+| [e10f49efa](https://github.com/angular/angular-cli/commit/e10f49efa8ac96e72bbc441423a730fd172c9f1d) | fix  | convert AOT compiler exceptions into diagnostics                       |
+| [d46fb128a](https://github.com/angular/angular-cli/commit/d46fb128a51f172da72ab403ec97213099f43de8) | fix  | disable dependency optimization for SSR                                |
+| [1b384308c](https://github.com/angular/angular-cli/commit/1b384308c65ff67b8eac7f3b6407e19ce3db46fa) | fix  | disable parallel TS/NG compilation inside WebContainers                |
+| [05ce9d697](https://github.com/angular/angular-cli/commit/05ce9d697a723dcac7a5d24a14f4d11f8686851a) | fix  | ensure all SSR chunks are resolved correctly with dev server           |
+| [fa234a418](https://github.com/angular/angular-cli/commit/fa234a4186c9d408bfb52b3a649d307f93d0b9b3) | fix  | ensure secondary Angular compilations are unblocked on start errors    |
+| [23a722b79](https://github.com/angular/angular-cli/commit/23a722b791a64bae32dc925160f2c3d1942955fc) | fix  | exclude node.js built-ins from vite dependency optimization            |
+| [fd2c4c324](https://github.com/angular/angular-cli/commit/fd2c4c324dcfedc81af41351b52ed4c8e41f48fc) | fix  | expose ssr-dev-server builder in the public api                        |
+| [9eb58cf7a](https://github.com/angular/angular-cli/commit/9eb58cf7a51c0b7950f80b474890fb2ebd685977) | fix  | fail build on non bundling error when using the esbuild based builders |
+| [5a3ae0159](https://github.com/angular/angular-cli/commit/5a3ae0159faa81558537012a0ceba07b5ad1b88b) | fix  | in vite skip SSR middleware for path with extensions                   |
+| [f87f22d3f](https://github.com/angular/angular-cli/commit/f87f22d3f1436678ca1e07cc10874a012ae55e60) | fix  | keep dependencies pre-bundling validate between builds                 |
+| [c46f312ad](https://github.com/angular/angular-cli/commit/c46f312adb06ae4a8293a07aa441514030052e93) | fix  | media files download files in vite                                     |
+| [1f299ff2d](https://github.com/angular/angular-cli/commit/1f299ff2de3c80bf9cb3dc4b6a5ff02e81c1a94f) | fix  | prebundle dependencies for SSR when using Vite                         |
+| [60ca3c82d](https://github.com/angular/angular-cli/commit/60ca3c82d28d0168b2f608a44a701ad8ad658369) | fix  | provide server baseUrl result property in Vite-based dev server        |
+| [9453a2380](https://github.com/angular/angular-cli/commit/9453a23800f40a33b16fd887e3aa0817448134b1) | fix  | remove CJS usage warnings for inactionable packages                    |
+| [83b4b2567](https://github.com/angular/angular-cli/commit/83b4b25678ba6b8082d580a2d75b0f02a9addc2a) | fix  | use browserslist when processing global scripts in application builder |
+| [6d3942723](https://github.com/angular/angular-cli/commit/6d3942723d824382e52a8f06e03dcbc3d6d8eff6) | perf | optimize server or browser only dependencies once                      |
+| [59c22aa4c](https://github.com/angular/angular-cli/commit/59c22aa4cadd7bc6da20acfd3632c834824044e2) | perf | start SSR dependencies optimization before the first request           |
+
+### @angular/ssr
+
+| Commit                                                                                              | Type | Description                             |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------- |
+| [ee0991bed](https://github.com/angular/angular-cli/commit/ee0991beddc96160f9ba7e27b29def54868f3490) | fix  | enable performance profiler option name |
+
+### @ngtools/webpack
+
+| Commit                                                                                              | Type | Description                                                      |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------------- |
+| [16428fc97](https://github.com/angular/angular-cli/commit/16428fc97ae64627f790346e6b54b94a67c7202c) | fix  | adjust static scan to find image domains in standlone components |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="17.0.0-rc.3"></a>
 
 # 17.0.0-rc.3 (2023-11-01)
