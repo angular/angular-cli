@@ -44,22 +44,14 @@
     -moz-osx-font-smoothing: grayscale;
   }
 
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
+  h1 {
+    font-size: 3.125rem;
     color: var(--gray-900);
     font-weight: 500;
     line-height: 100%;
     letter-spacing: -0.125rem;
     margin: 0;
     font-family: "Inter Tight";
-  }
-
-  h1 {
-    font-size: 3.125rem;
   }
 
   p {
@@ -233,7 +225,7 @@
       </svg>
       <h1>Hello, {{ title }}</h1>
       <p>Congratulations! Your app is running. 🎉</p>
-    </div>
+   </div>
     <div class="divider" role="separator" aria-label="Divider"></div>
     <div class="right-side">
       <div class="pill-group">
