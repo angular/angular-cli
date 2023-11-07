@@ -1,3 +1,28 @@
+<a name="17.0.0-rc.5"></a>
+
+# 17.0.0-rc.5 (2023-11-07)
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                          |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------ |
+| [ecdcff2db](https://github.com/angular/angular-cli/commit/ecdcff2db2b205443a585dd5dd118dbd50613883) | fix  | add missing icons in ng-new template |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                          |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------- |
+| [9d4d11cc4](https://github.com/angular/angular-cli/commit/9d4d11cc43f2ae149ee8bfcf28285a1f62594ef7) | fix  | allow SSR compilation to work with TS allowJs option |
+| [303c98cd0](https://github.com/angular/angular-cli/commit/303c98cd0c5b39607ef44e7b34452dc27472d794) | fix  | normalize exclude path                               |
+
+### @angular/pwa
+
+| Commit                                                                                              | Type | Description           |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------- |
+| [81e4917ce](https://github.com/angular/angular-cli/commit/81e4917ceca89759770a76d63b932f380d83685c) | fix  | replace Angular logos |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="17.0.0-rc.4"></a>
 
 # 17.0.0-rc.4 (2023-11-06)
