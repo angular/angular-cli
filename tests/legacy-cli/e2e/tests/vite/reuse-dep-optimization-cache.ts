@@ -1,3 +1,4 @@
+import { setTimeout } from 'node:timers/promises';
 import assert from 'node:assert';
 import { findFreePort } from '../../utils/network';
 import { execAndWaitForOutputToMatch, killAllProcesses, ng } from '../../utils/process';
@@ -27,6 +28,9 @@ export default async function () {
     // Make request so that vite writes the cache.
     const response = await fetch(`http://localhost:${port}/@vite/client`);
     assert(response.ok, `Expected 'response.ok' to be 'true'.`);
+
+    // Wait for vite to write to FS and stablize.
+    await setTimeout(2_000);
 
     // Terminate the dev-server
     await killAllProcesses();
