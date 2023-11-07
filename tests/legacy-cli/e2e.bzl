@@ -34,6 +34,7 @@ ESBUILD_TESTS = [
     "tests/commands/add/**",
     "tests/commands/e2e/**",
     "tests/i18n/**",
+    "tests/vite/**",
     "tests/test/**",
 ]
 
