@@ -264,6 +264,7 @@ export function createCompilerPlugin(
 
         if (compilation instanceof NoopCompilation) {
           await sharedTSCompilationState.waitUntilReady;
+          hasCompilationErrors = false;
 
           return result;
         }
