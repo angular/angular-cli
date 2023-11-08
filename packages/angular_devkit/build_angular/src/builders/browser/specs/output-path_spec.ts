@@ -21,7 +21,7 @@ describe('Browser Builder output path', () => {
   });
   afterEach(async () => host.restore().toPromise());
 
-  it('deletes output path', async () => {
+  it('deletes output path content', async () => {
     // Write a file to the output path to later verify it was deleted.
     await host
       .write(join(host.root(), 'dist/file.txt'), virtualFs.stringToFileBuffer('file'))
@@ -34,14 +34,14 @@ describe('Browser Builder output path', () => {
     const run = await architect.scheduleTarget(target);
     const output = await run.result;
     expect(output.success).toBe(false);
-    expect(await host.exists(join(host.root(), 'dist')).toPromise()).toBe(false);
+    expect(await host.exists(join(host.root(), 'dist/file.txt')).toPromise()).toBe(false);
     await run.stop();
   });
 
-  it('deletes output path and unlink symbolic link', async () => {
+  it('deletes output path content and unlink symbolic link', async () => {
     // Write a file to the output path to later verify it was deleted.
     host.writeMultipleFiles({
-      'src-link/dummy.txt': '',
+      'src-link/a.txt': '',
       'dist/file.txt': virtualFs.stringToFileBuffer('file'),
     });
 
@@ -63,8 +63,8 @@ describe('Browser Builder output path', () => {
     const output = await run.result;
     expect(output.success).toBe(false);
 
-    expect(await host.exists(join(host.root(), 'dist')).toPromise()).toBe(false);
-    expect(await host.exists(join(host.root(), 'src-link')).toPromise()).toBe(true);
+    expect(await host.exists(join(host.root(), 'dist/file.txt')).toPromise()).toBe(false);
+    expect(await host.exists(join(host.root(), 'src-link/a.txt')).toPromise()).toBe(true);
     await run.stop();
   });
 
