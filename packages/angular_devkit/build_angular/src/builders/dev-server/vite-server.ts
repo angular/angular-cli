@@ -129,6 +129,15 @@ export async function* serveWithVite(
     implicitServer: [],
     explicit: [],
   };
+
+  // Add cleanup logic via a builder teardown.
+  let deferred: () => void;
+  context.addTeardown(async () => {
+    await server?.close();
+    await prebundleTransformer.close();
+    deferred?.();
+  });
+
   const build =
     builderName === '@angular-devkit/build-angular:application'
       ? buildApplicationInternal
@@ -258,13 +267,6 @@ export async function* serveWithVite(
     } as unknown as DevServerBuilderOutput;
   }
 
-  // Add cleanup logic via a builder teardown
-  let deferred: () => void;
-  context.addTeardown(async () => {
-    await server?.close();
-    await prebundleTransformer.close();
-    deferred?.();
-  });
   await new Promise<void>((resolve) => (deferred = resolve));
 }
 
