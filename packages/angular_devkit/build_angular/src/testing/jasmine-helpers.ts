@@ -38,7 +38,7 @@ export function describeBuilder<T>(
   });
 }
 
-class JasmineBuilderHarness<T> extends BuilderHarness<T> {
+export class JasmineBuilderHarness<T> extends BuilderHarness<T> {
   expectFile(path: string): HarnessFileMatchers {
     return expectFile(path, this);
   }

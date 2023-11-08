@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { serveWebpackBrowser } from '../../index';
+import { executeDevServer } from '../../index';
 import { executeOnceAndFetch } from '../execute-fetch';
 import {
   BASE_OPTIONS,
@@ -15,7 +15,7 @@ import {
   setupBrowserTarget,
 } from '../setup';
 
-describeBuilder(serveWebpackBrowser, DEV_SERVER_BUILDER_INFO, (harness) => {
+describeBuilder(executeDevServer, DEV_SERVER_BUILDER_INFO, (harness) => {
   describe('Behavior: "browser builder deployUrl"', () => {
     beforeEach(() => {
       setupBrowserTarget(harness, {

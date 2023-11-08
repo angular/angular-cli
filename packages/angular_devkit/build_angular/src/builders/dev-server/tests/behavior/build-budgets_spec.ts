@@ -7,32 +7,33 @@
  */
 
 import { Type as BudgetType } from '../../../..';
-import { serveWebpackBrowser } from '../../index';
-import {
-  BASE_OPTIONS,
+import { executeDevServer } from '../../index';
+import { describeServeBuilder } from '../jasmine-helpers';
+import { BASE_OPTIONS, DEV_SERVER_BUILDER_INFO } from '../setup';
+
+describeServeBuilder(
+  executeDevServer,
   DEV_SERVER_BUILDER_INFO,
-  describeBuilder,
-  setupBrowserTarget,
-} from '../setup';
-
-describeBuilder(serveWebpackBrowser, DEV_SERVER_BUILDER_INFO, (harness) => {
-  describe('Behavior: "browser builder budgets"', () => {
-    beforeEach(() => {
-      setupBrowserTarget(harness, {
-        // Add a budget error for any file over 100 bytes
-        budgets: [{ type: BudgetType.All, maximumError: '100b' }],
-        optimization: true,
-      });
-    });
-
-    it('should ignore budgets defined in the "browserTarget" options', async () => {
-      harness.useTarget('serve', {
-        ...BASE_OPTIONS,
+  (harness, setupTarget, isViteRun) => {
+    // TODO(fix-vite): currently this is broken in vite.
+    (isViteRun ? xdescribe : describe)('Behavior: "browser builder budgets"', () => {
+      beforeEach(() => {
+        setupTarget(harness, {
+          // Add a budget error for any file over 100 bytes
+          budgets: [{ type: BudgetType.All, maximumError: '100b' }],
+          optimization: true,
+        });
       });
 
-      const { result } = await harness.executeOnce();
+      it('should ignore budgets defined in the "buildTarget" options', async () => {
+        harness.useTarget('serve', {
+          ...BASE_OPTIONS,
+        });
 
-      expect(result?.success).toBe(true);
+        const { result } = await harness.executeOnce();
+
+        expect(result?.success).toBe(true);
+      });
     });
-  });
-});
+  },
+);
