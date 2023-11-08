@@ -240,7 +240,7 @@
         ]; track item.title) {
           <a
             class="pill"
-            href="{{ item.link }}"
+            [href]="item.link"
             target="_blank"
             rel="noopener"
           >
