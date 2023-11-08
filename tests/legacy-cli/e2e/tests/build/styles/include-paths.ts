@@ -27,8 +27,8 @@ export default async function () {
 
   await replaceInFile(
     'src/app/app.component.ts',
-    `'./app.component.css\'`,
-    `'./app.component.scss', './app.component.less'`,
+    `styleUrl: './app.component.css\'`,
+    `styleUrls: ['./app.component.scss', './app.component.less']`,
   );
 
   await updateJsonFile('angular.json', (workspaceJson) => {
