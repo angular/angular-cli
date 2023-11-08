@@ -15,4 +15,4 @@ export { DevServerBuilderOptions, DevServerBuilderOutput, execute as executeDevS
 export default createBuilder<DevServerBuilderOptions, DevServerBuilderOutput>(execute);
 
 // Temporary export to support specs
-export { execute as serveWebpackBrowser };
+export { execute as executeDevServer };
