@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { serveWebpackBrowser } from '../../index';
+import { executeDevServer } from '../../index';
 import {
   BASE_OPTIONS,
   DEV_SERVER_BUILDER_INFO,
@@ -16,7 +16,7 @@ import {
 
 const VERBOSE_LOG_TEXT = /\[emitted\] \(name: main\)/;
 
-describeBuilder(serveWebpackBrowser, DEV_SERVER_BUILDER_INFO, (harness) => {
+describeBuilder(executeDevServer, DEV_SERVER_BUILDER_INFO, (harness) => {
   describe('Option: "verbose"', () => {
     beforeEach(() => {
       setupBrowserTarget(harness);

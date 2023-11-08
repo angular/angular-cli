@@ -7,14 +7,10 @@
  */
 
 import { URL } from 'url';
-import { serveWebpackBrowser } from '../../index';
+import { executeDevServer } from '../../index';
 import { executeOnceAndFetch } from '../execute-fetch';
-import {
-  BASE_OPTIONS,
-  DEV_SERVER_BUILDER_INFO,
-  describeBuilder,
-  setupBrowserTarget,
-} from '../setup';
+import { describeServeBuilder } from '../jasmine-helpers';
+import { BASE_OPTIONS, DEV_SERVER_BUILDER_INFO } from '../setup';
 
 function getResultPort(result: Record<string, unknown> | undefined): string | undefined {
   if (typeof result?.baseUrl !== 'string') {
@@ -30,73 +26,82 @@ function getResultPort(result: Record<string, unknown> | undefined): string | un
   }
 }
 
-describeBuilder(serveWebpackBrowser, DEV_SERVER_BUILDER_INFO, (harness) => {
-  describe('option: "port"', () => {
-    beforeEach(async () => {
-      setupBrowserTarget(harness);
+describeServeBuilder(
+  executeDevServer,
+  DEV_SERVER_BUILDER_INFO,
+  (harness, setupTarget, isViteRun) => {
+    describe('option: "port"', () => {
+      beforeEach(async () => {
+        setupTarget(harness);
 
-      // Application code is not needed for these tests
-      await harness.writeFile('src/main.ts', '');
-    });
-
-    it('uses default port (4200) when not present', async () => {
-      harness.useTarget('serve', {
-        ...BASE_OPTIONS,
-        // Base options set port to zero
-        port: undefined,
+        // Application code is not needed for these tests
+        await harness.writeFile('src/main.ts', '');
       });
 
-      const { result, response, logs } = await executeOnceAndFetch(harness, '/');
+      it('uses default port (4200) when not present', async () => {
+        harness.useTarget('serve', {
+          ...BASE_OPTIONS,
+          // Base options set port to zero
+          port: undefined,
+        });
 
-      expect(result?.success).toBeTrue();
-      expect(getResultPort(result)).toBe('4200');
-      expect(await response?.text()).toContain('<title>');
+        const { result, response, logs } = await executeOnceAndFetch(harness, '/');
 
-      expect(logs).toContain(
-        jasmine.objectContaining({
-          message: jasmine.stringMatching(/:4200/),
-        }),
-      );
-    });
+        expect(result?.success).toBeTrue();
+        expect(getResultPort(result)).toBe('4200');
+        expect(await response?.text()).toContain('<title>');
 
-    it('uses a random free port when set to 0 (zero)', async () => {
-      harness.useTarget('serve', {
-        ...BASE_OPTIONS,
-        port: 0,
+        if (!isViteRun) {
+          expect(logs).toContain(
+            jasmine.objectContaining({
+              message: jasmine.stringMatching(/:4200/),
+            }),
+          );
+        }
       });
 
-      const { result, response, logs } = await executeOnceAndFetch(harness, '/');
+      it('uses a random free port when set to 0 (zero)', async () => {
+        harness.useTarget('serve', {
+          ...BASE_OPTIONS,
+          port: 0,
+        });
 
-      expect(result?.success).toBeTrue();
-      const port = getResultPort(result);
-      expect(port).not.toBe('4200');
-      expect(port).toMatch(/\d{4,6}/);
-      expect(await response?.text()).toContain('<title>');
+        const { result, response, logs } = await executeOnceAndFetch(harness, '/');
 
-      expect(logs).toContain(
-        jasmine.objectContaining({
-          message: jasmine.stringMatching(':' + port),
-        }),
-      );
-    });
+        expect(result?.success).toBeTrue();
+        const port = getResultPort(result);
+        expect(port).not.toBe('4200');
+        expect(port).toMatch(/\d{4,6}/);
+        expect(await response?.text()).toContain('<title>');
 
-    it('uses specific port when a non-zero number is specified', async () => {
-      harness.useTarget('serve', {
-        ...BASE_OPTIONS,
-        port: 8000,
+        if (!isViteRun) {
+          expect(logs).toContain(
+            jasmine.objectContaining({
+              message: jasmine.stringMatching(':' + port),
+            }),
+          );
+        }
       });
 
-      const { result, response, logs } = await executeOnceAndFetch(harness, '/');
+      it('uses specific port when a non-zero number is specified', async () => {
+        harness.useTarget('serve', {
+          ...BASE_OPTIONS,
+          port: 8000,
+        });
 
-      expect(result?.success).toBeTrue();
-      expect(getResultPort(result)).toBe('8000');
-      expect(await response?.text()).toContain('<title>');
+        const { result, response, logs } = await executeOnceAndFetch(harness, '/');
 
-      expect(logs).toContain(
-        jasmine.objectContaining({
-          message: jasmine.stringMatching(':8000'),
-        }),
-      );
+        expect(result?.success).toBeTrue();
+        expect(getResultPort(result)).toBe('8000');
+        expect(await response?.text()).toContain('<title>');
+        if (!isViteRun) {
+          expect(logs).toContain(
+            jasmine.objectContaining({
+              message: jasmine.stringMatching(':8000'),
+            }),
+          );
+        }
+      });
     });
-  });
-});
+  },
+);

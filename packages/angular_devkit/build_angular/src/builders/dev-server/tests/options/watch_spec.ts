@@ -7,119 +7,120 @@
  */
 
 import { TimeoutError, concatMap, count, take, timeout } from 'rxjs';
-import { serveWebpackBrowser } from '../../index';
-import {
-  BASE_OPTIONS,
-  BUILD_TIMEOUT,
+import { executeDevServer } from '../../index';
+import { describeServeBuilder } from '../jasmine-helpers';
+import { BASE_OPTIONS, BUILD_TIMEOUT, DEV_SERVER_BUILDER_INFO } from '../setup';
+
+describeServeBuilder(
+  executeDevServer,
   DEV_SERVER_BUILDER_INFO,
-  describeBuilder,
-  setupBrowserTarget,
-} from '../setup';
-
-describeBuilder(serveWebpackBrowser, DEV_SERVER_BUILDER_INFO, (harness) => {
-  describe('Option: "watch"', () => {
-    beforeEach(() => {
-      setupBrowserTarget(harness);
-    });
-
-    it('does not wait for file changes when false', async () => {
-      harness.useTarget('serve', {
-        ...BASE_OPTIONS,
-        watch: false,
+  (harness, setupTarget, isViteRun) => {
+    // TODO(fix-vite): currently this is broken in vite.
+    (isViteRun ? xdescribe : describe)('Option: "watch"', () => {
+      beforeEach(() => {
+        setupTarget(harness);
       });
 
-      await harness
-        .execute()
-        .pipe(
-          timeout(BUILD_TIMEOUT),
-          concatMap(async ({ result }, index) => {
-            expect(result?.success).toBe(true);
-
-            switch (index) {
-              case 0:
-                await harness.modifyFile(
-                  'src/main.ts',
-                  (content) => content + 'console.log("abcd1234");',
-                );
-                break;
-              case 1:
-                fail('Expected files to not be watched.');
-                break;
-            }
-          }),
-          take(2),
-        )
-        .toPromise()
-        .catch((error) => {
-          // Timeout is expected if watching is disabled
-          if (error instanceof TimeoutError) {
-            return;
-          }
-          throw error;
+      it('does not wait for file changes when false', async () => {
+        harness.useTarget('serve', {
+          ...BASE_OPTIONS,
+          watch: false,
         });
-    });
 
-    it('watches for file changes when not present', async () => {
-      harness.useTarget('serve', {
-        ...BASE_OPTIONS,
+        await harness
+          .execute()
+          .pipe(
+            timeout(BUILD_TIMEOUT),
+            concatMap(async ({ result }, index) => {
+              expect(result?.success).toBe(true);
+
+              switch (index) {
+                case 0:
+                  await harness.modifyFile(
+                    'src/main.ts',
+                    (content) => content + 'console.log("abcd1234");',
+                  );
+                  break;
+                case 1:
+                  fail('Expected files to not be watched.');
+                  break;
+              }
+            }),
+            take(2),
+          )
+          .toPromise()
+          .catch((error) => {
+            // Timeout is expected if watching is disabled
+            if (error instanceof TimeoutError) {
+              return;
+            }
+            throw error;
+          });
       });
 
-      const buildCount = await harness
-        .execute()
-        .pipe(
-          timeout(BUILD_TIMEOUT),
-          concatMap(async ({ result }, index) => {
-            expect(result?.success).toBe(true);
+      it('watches for file changes when not present', async () => {
+        harness.useTarget('serve', {
+          ...BASE_OPTIONS,
+          watch: undefined,
+        });
 
-            switch (index) {
-              case 0:
-                await harness.modifyFile(
-                  'src/main.ts',
-                  (content) => content + 'console.log("abcd1234");',
-                );
-                break;
-              case 1:
-                break;
-            }
-          }),
-          take(2),
-          count(),
-        )
-        .toPromise();
+        const buildCount = await harness
+          .execute()
+          .pipe(
+            timeout(BUILD_TIMEOUT),
+            concatMap(async ({ result }, index) => {
+              expect(result?.success).toBe(true);
 
-      expect(buildCount).toBe(2);
-    });
+              switch (index) {
+                case 0:
+                  await harness.modifyFile(
+                    'src/main.ts',
+                    (content) => content + 'console.log("abcd1234");',
+                  );
+                  break;
+                case 1:
+                  break;
+              }
+            }),
+            take(2),
+            count(),
+          )
+          .toPromise();
 
-    it('watches for file changes when true', async () => {
-      harness.useTarget('serve', {
-        ...BASE_OPTIONS,
-        watch: true,
+        expect(buildCount).toBe(2);
       });
 
-      const buildCount = await harness
-        .execute()
-        .pipe(
-          timeout(BUILD_TIMEOUT),
-          concatMap(async ({ result }, index) => {
-            expect(result?.success).toBe(true);
+      it('watches for file changes when true', async () => {
+        harness.useTarget('serve', {
+          ...BASE_OPTIONS,
+          watch: true,
+        });
 
-            switch (index) {
-              case 0:
-                await harness.modifyFile(
-                  'src/main.ts',
-                  (content) => content + 'console.log("abcd1234");',
-                );
-                break;
-              case 1:
-                break;
-            }
-          }),
-          take(2),
-          count(),
-        )
-        .toPromise();
+        const buildCount = await harness
+          .execute()
+          .pipe(
+            timeout(BUILD_TIMEOUT),
+            concatMap(async ({ result }, index) => {
+              expect(result?.success).toBe(true);
 
-      expect(buildCount).toBe(2);
+              switch (index) {
+                case 0:
+                  await harness.modifyFile(
+                    'src/main.ts',
+                    (content) => content + 'console.log("abcd1234");',
+                  );
+                  break;
+                case 1:
+                  break;
+              }
+            }),
+            take(2),
+            count(),
+          )
+          .toPromise();
+
+        expect(buildCount).toBe(2);
+      });
     });
-  });
-});
+  },
+);

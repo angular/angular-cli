@@ -7,19 +7,15 @@
  */
 
 import * as http from 'http';
-import { serveWebpackBrowser } from '../../index';
+import { executeDevServer } from '../../index';
 import { executeOnceAndFetch } from '../execute-fetch';
-import {
-  BASE_OPTIONS,
-  DEV_SERVER_BUILDER_INFO,
-  describeBuilder,
-  setupBrowserTarget,
-} from '../setup';
+import { describeServeBuilder } from '../jasmine-helpers';
+import { BASE_OPTIONS, DEV_SERVER_BUILDER_INFO } from '../setup';
 
-describeBuilder(serveWebpackBrowser, DEV_SERVER_BUILDER_INFO, (harness) => {
+describeServeBuilder(executeDevServer, DEV_SERVER_BUILDER_INFO, (harness, setupTarget) => {
   describe('option: "proxyConfig"', () => {
     beforeEach(async () => {
-      setupBrowserTarget(harness);
+      setupTarget(harness);
 
       // Application code is not needed for these tests
       await harness.writeFile('src/main.ts', '');

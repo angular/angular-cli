@@ -6,22 +6,18 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { serveWebpackBrowser } from '../../index';
+import { executeDevServer } from '../../index';
 import { executeOnceAndFetch } from '../execute-fetch';
-import {
-  BASE_OPTIONS,
-  DEV_SERVER_BUILDER_INFO,
-  describeBuilder,
-  setupBrowserTarget,
-} from '../setup';
+import { describeServeBuilder } from '../jasmine-helpers';
+import { BASE_OPTIONS, DEV_SERVER_BUILDER_INFO } from '../setup';
 
-describeBuilder(serveWebpackBrowser, DEV_SERVER_BUILDER_INFO, (harness) => {
+describeServeBuilder(executeDevServer, DEV_SERVER_BUILDER_INFO, (harness, setupTarget) => {
   describe('Behavior: "browser builder assets"', () => {
     it('serves a project JavaScript asset unmodified', async () => {
       const javascriptFileContent = '/* a comment */const foo = `bar`;\n\n\n';
       await harness.writeFile('src/extra.js', javascriptFileContent);
 
-      setupBrowserTarget(harness, {
+      setupTarget(harness, {
         assets: ['src/extra.js'],
         optimization: {
           scripts: true,

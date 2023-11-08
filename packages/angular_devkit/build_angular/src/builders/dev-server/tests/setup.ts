@@ -9,6 +9,12 @@
 import { json } from '@angular-devkit/core';
 import { readFileSync } from 'fs';
 import { BuilderHarness } from '../../../testing/builder-harness';
+import { buildApplication } from '../../application';
+import { Schema as AppilicationSchema } from '../../application/schema';
+import {
+  BASE_OPTIONS as APPLICATION_BASE_OPTIONS,
+  APPLICATION_BUILDER_INFO,
+} from '../../application/tests/setup';
 import { buildWebpackBrowser } from '../../browser';
 import { Schema as BrowserSchema } from '../../browser/schema';
 import {
@@ -32,6 +38,9 @@ export const DEV_SERVER_BUILDER_INFO = Object.freeze({
 export const BASE_OPTIONS = Object.freeze<Schema>({
   buildTarget: 'test:build',
   port: 0,
+
+  // Watch is not supported for testing in vite as currently there is no teardown logic to stop the watchers.
+  watch: false,
 });
 
 /**
@@ -43,7 +52,7 @@ export const BUILD_TIMEOUT = 25_000;
 /**
  * Cached browser builder option schema
  */
-let browserSchema: json.schema.JsonSchema | undefined = undefined;
+let browserSchema: json.schema.JsonSchema | undefined;
 
 /**
  * Adds a `build` target to a builder test harness for the browser builder with the base options
@@ -56,11 +65,9 @@ export function setupBrowserTarget<T>(
   harness: BuilderHarness<T>,
   extraOptions?: Partial<BrowserSchema>,
 ): void {
-  if (!browserSchema) {
-    browserSchema = JSON.parse(
-      readFileSync(BROWSER_BUILDER_INFO.schemaPath, 'utf8'),
-    ) as json.schema.JsonSchema;
-  }
+  browserSchema ??= JSON.parse(
+    readFileSync(BROWSER_BUILDER_INFO.schemaPath, 'utf8'),
+  ) as json.schema.JsonSchema;
 
   harness.withBuilderTarget(
     'build',
@@ -72,6 +79,40 @@ export function setupBrowserTarget<T>(
     {
       builderName: BROWSER_BUILDER_INFO.name,
       optionSchema: browserSchema,
+    },
+  );
+}
+
+/**
+ * Cached application builder option schema
+ */
+let applicationSchema: json.schema.JsonSchema | undefined;
+
+/**
+ * Adds a `build` target to a builder test harness for the application builder with the base options
+ * used by the application builder tests.
+ *
+ * @param harness The builder harness to use when setting up the application builder target
+ * @param extraOptions The additional options that should be used when executing the target.
+ */
+export function setupApplicationTarget<T>(
+  harness: BuilderHarness<T>,
+  extraOptions?: Partial<AppilicationSchema>,
+): void {
+  applicationSchema ??= JSON.parse(
+    readFileSync(APPLICATION_BUILDER_INFO.schemaPath, 'utf8'),
+  ) as json.schema.JsonSchema;
+
+  harness.withBuilderTarget(
+    'build',
+    buildApplication,
+    {
+      ...APPLICATION_BASE_OPTIONS,
+      ...extraOptions,
+    },
+    {
+      builderName: APPLICATION_BUILDER_INFO.name,
+      optionSchema: applicationSchema,
     },
   );
 }

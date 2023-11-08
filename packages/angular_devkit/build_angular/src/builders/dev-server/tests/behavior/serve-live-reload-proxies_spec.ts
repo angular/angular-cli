@@ -13,7 +13,8 @@ import { createProxyServer } from 'http-proxy';
 import { AddressInfo } from 'net';
 import puppeteer, { Browser, Page } from 'puppeteer';
 import { count, debounceTime, finalize, switchMap, take, timeout } from 'rxjs';
-import { serveWebpackBrowser } from '../../index';
+import { executeDevServer } from '../../index';
+import { describeServeBuilder } from '../jasmine-helpers';
 import {
   BASE_OPTIONS,
   BUILD_TIMEOUT,
@@ -142,171 +143,185 @@ async function goToPageAndWaitForWS(page: Page, url: string): Promise<void> {
   await client.detach();
 }
 
-describeBuilder(serveWebpackBrowser, DEV_SERVER_BUILDER_INFO, (harness) => {
-  describe('Behavior: "Dev-server builder live-reload with proxies"', () => {
-    let browser: Browser;
-    let page: Page;
+describeServeBuilder(
+  executeDevServer,
+  DEV_SERVER_BUILDER_INFO,
+  (harness, setupTarget, isViteRun) => {
+    // TODO(fix-vite): currently this is broken in vite.
+    (isViteRun ? xdescribe : describe)(
+      'Behavior: "Dev-server builder live-reload with proxies"',
+      () => {
+        let browser: Browser;
+        let page: Page;
 
-    const SERVE_OPTIONS = Object.freeze({
-      ...BASE_OPTIONS,
-      hmr: false,
-      watch: true,
-      liveReload: true,
-    });
+        const SERVE_OPTIONS = Object.freeze({
+          ...BASE_OPTIONS,
+          hmr: false,
+          watch: true,
+          liveReload: true,
+        });
 
-    beforeAll(async () => {
-      browser = await puppeteer.launch({
-        // MacOSX users need to set the local binary manually because Chrome has lib files with
-        // spaces in them which Bazel does not support in runfiles
-        // See: https://github.com/angular/angular-cli/pull/17624
-        // eslint-disable-next-line max-len
-        // executablePath: '/Users/<USERNAME>/git/angular-cli/node_modules/puppeteer/.local-chromium/mac-818858/chrome-mac/Chromium.app/Contents/MacOS/Chromium',
-        ignoreHTTPSErrors: true,
-        args: ['--no-sandbox', '--disable-gpu'],
-      });
-    });
+        beforeAll(async () => {
+          browser = await puppeteer.launch({
+            // MacOSX users need to set the local binary manually because Chrome has lib files with
+            // spaces in them which Bazel does not support in runfiles
+            // See: https://github.com/angular/angular-cli/pull/17624
+            // eslint-disable-next-line max-len
+            // executablePath: '/Users/<USERNAME>/git/angular-cli/node_modules/puppeteer/.local-chromium/mac-818858/chrome-mac/Chromium.app/Contents/MacOS/Chromium',
+            ignoreHTTPSErrors: true,
+            args: ['--no-sandbox', '--disable-gpu'],
+          });
+        });
 
-    afterAll(async () => {
-      await browser.close();
-    });
+        afterAll(async () => {
+          await browser.close();
+        });
 
-    beforeEach(async () => {
-      setupBrowserTarget(harness, {
-        polyfills: 'src/polyfills.ts',
-      });
+        beforeEach(async () => {
+          setupTarget(harness, {
+            polyfills: ['src/polyfills.ts'],
+          });
 
-      page = await browser.newPage();
-    });
+          page = await browser.newPage();
+        });
 
-    afterEach(async () => {
-      await page.close();
-    });
+        afterEach(async () => {
+          await page.close();
+        });
 
-    it('works without proxy', async () => {
-      harness.useTarget('serve', {
-        ...SERVE_OPTIONS,
-      });
+        it('works without proxy', async () => {
+          harness.useTarget('serve', {
+            ...SERVE_OPTIONS,
+          });
 
-      await harness.writeFile('src/app/app.component.html', '<p>{{ title }}</p>');
+          await harness.writeFile('src/app/app.component.html', '<p>{{ title }}</p>');
 
-      const buildCount = await harness
-        .execute()
-        .pipe(
-          debounceTime(1000),
-          timeout(BUILD_TIMEOUT * 2),
-          switchMap(async ({ result }, index) => {
-            expect(result?.success).toBeTrue();
-            if (typeof result?.baseUrl !== 'string') {
-              throw new Error('Expected "baseUrl" to be a string.');
-            }
+          const buildCount = await harness
+            .execute()
+            .pipe(
+              debounceTime(1000),
+              timeout(BUILD_TIMEOUT * 2),
+              switchMap(async ({ result }, index) => {
+                expect(result?.success).toBeTrue();
+                if (typeof result?.baseUrl !== 'string') {
+                  throw new Error('Expected "baseUrl" to be a string.');
+                }
 
-            switch (index) {
-              case 0:
-                await goToPageAndWaitForWS(page, result.baseUrl);
-                await harness.modifyFile('src/app/app.component.ts', (content) =>
-                  content.replace(`'app'`, `'app-live-reload'`),
-                );
-                break;
-              case 1:
-                const innerText = await page.evaluate(() => document.querySelector('p').innerText);
-                expect(innerText).toBe('app-live-reload');
-                break;
-            }
-          }),
-          take(2),
-          count(),
-        )
-        .toPromise();
+                switch (index) {
+                  case 0:
+                    await goToPageAndWaitForWS(page, result.baseUrl);
+                    await harness.modifyFile('src/app/app.component.ts', (content) =>
+                      content.replace(`'app'`, `'app-live-reload'`),
+                    );
+                    break;
+                  case 1:
+                    const innerText = await page.evaluate(
+                      () => document.querySelector('p').innerText,
+                    );
+                    expect(innerText).toBe('app-live-reload');
+                    break;
+                }
+              }),
+              take(2),
+              count(),
+            )
+            .toPromise();
 
-      expect(buildCount).toBe(2);
-    });
+          expect(buildCount).toBe(2);
+        });
 
-    it('works without http -> http proxy', async () => {
-      harness.useTarget('serve', {
-        ...SERVE_OPTIONS,
-      });
+        it('works without http -> http proxy', async () => {
+          harness.useTarget('serve', {
+            ...SERVE_OPTIONS,
+          });
 
-      await harness.writeFile('src/app/app.component.html', '<p>{{ title }}</p>');
+          await harness.writeFile('src/app/app.component.html', '<p>{{ title }}</p>');
 
-      let proxy: ProxyInstance | undefined;
-      const buildCount = await harness
-        .execute()
-        .pipe(
-          debounceTime(1000),
-          timeout(BUILD_TIMEOUT * 2),
-          switchMap(async ({ result }, index) => {
-            expect(result?.success).toBeTrue();
-            if (typeof result?.baseUrl !== 'string') {
-              throw new Error('Expected "baseUrl" to be a string.');
-            }
+          let proxy: ProxyInstance | undefined;
+          const buildCount = await harness
+            .execute()
+            .pipe(
+              debounceTime(1000),
+              timeout(BUILD_TIMEOUT * 2),
+              switchMap(async ({ result }, index) => {
+                expect(result?.success).toBeTrue();
+                if (typeof result?.baseUrl !== 'string') {
+                  throw new Error('Expected "baseUrl" to be a string.');
+                }
 
-            switch (index) {
-              case 0:
-                proxy = await createProxy(result.baseUrl, false);
-                await goToPageAndWaitForWS(page, proxy.url);
-                await harness.modifyFile('src/app/app.component.ts', (content) =>
-                  content.replace(`'app'`, `'app-live-reload'`),
-                );
-                break;
-              case 1:
-                const innerText = await page.evaluate(() => document.querySelector('p').innerText);
-                expect(innerText).toBe('app-live-reload');
-                break;
-            }
-          }),
-          take(2),
-          count(),
-          finalize(() => {
-            proxy?.server.close();
-          }),
-        )
-        .toPromise();
+                switch (index) {
+                  case 0:
+                    proxy = await createProxy(result.baseUrl, false);
+                    await goToPageAndWaitForWS(page, proxy.url);
+                    await harness.modifyFile('src/app/app.component.ts', (content) =>
+                      content.replace(`'app'`, `'app-live-reload'`),
+                    );
+                    break;
+                  case 1:
+                    const innerText = await page.evaluate(
+                      () => document.querySelector('p').innerText,
+                    );
+                    expect(innerText).toBe('app-live-reload');
+                    break;
+                }
+              }),
+              take(2),
+              count(),
+              finalize(() => {
+                proxy?.server.close();
+              }),
+            )
+            .toPromise();
 
-      expect(buildCount).toBe(2);
-    });
+          expect(buildCount).toBe(2);
+        });
 
-    it('works without https -> http proxy', async () => {
-      harness.useTarget('serve', {
-        ...SERVE_OPTIONS,
-      });
+        it('works without https -> http proxy', async () => {
+          harness.useTarget('serve', {
+            ...SERVE_OPTIONS,
+          });
 
-      await harness.writeFile('src/app/app.component.html', '<p>{{ title }}</p>');
+          await harness.writeFile('src/app/app.component.html', '<p>{{ title }}</p>');
 
-      let proxy: ProxyInstance | undefined;
-      const buildCount = await harness
-        .execute()
-        .pipe(
-          debounceTime(1000),
-          timeout(BUILD_TIMEOUT * 2),
-          switchMap(async ({ result }, index) => {
-            expect(result?.success).toBeTrue();
-            if (typeof result?.baseUrl !== 'string') {
-              throw new Error('Expected "baseUrl" to be a string.');
-            }
+          let proxy: ProxyInstance | undefined;
+          const buildCount = await harness
+            .execute()
+            .pipe(
+              debounceTime(1000),
+              timeout(BUILD_TIMEOUT * 2),
+              switchMap(async ({ result }, index) => {
+                expect(result?.success).toBeTrue();
+                if (typeof result?.baseUrl !== 'string') {
+                  throw new Error('Expected "baseUrl" to be a string.');
+                }
 
-            switch (index) {
-              case 0:
-                proxy = await createProxy(result.baseUrl, true);
-                await goToPageAndWaitForWS(page, proxy.url);
-                await harness.modifyFile('src/app/app.component.ts', (content) =>
-                  content.replace(`'app'`, `'app-live-reload'`),
-                );
-                break;
-              case 1:
-                const innerText = await page.evaluate(() => document.querySelector('p').innerText);
-                expect(innerText).toBe('app-live-reload');
-                break;
-            }
-          }),
-          take(2),
-          count(),
-          finalize(() => {
-            proxy?.server.close();
-          }),
-        )
-        .toPromise();
+                switch (index) {
+                  case 0:
+                    proxy = await createProxy(result.baseUrl, true);
+                    await goToPageAndWaitForWS(page, proxy.url);
+                    await harness.modifyFile('src/app/app.component.ts', (content) =>
+                      content.replace(`'app'`, `'app-live-reload'`),
+                    );
+                    break;
+                  case 1:
+                    const innerText = await page.evaluate(
+                      () => document.querySelector('p').innerText,
+                    );
+                    expect(innerText).toBe('app-live-reload');
+                    break;
+                }
+              }),
+              take(2),
+              count(),
+              finalize(() => {
+                proxy?.server.close();
+              }),
+            )
+            .toPromise();
 
-      expect(buildCount).toBe(2);
-    });
-  });
-});
+          expect(buildCount).toBe(2);
+        });
+      },
+    );
+  },
+);
