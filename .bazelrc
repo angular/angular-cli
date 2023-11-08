@@ -94,6 +94,9 @@ build:e2e --workspace_status_command="yarn -s ng-dev release build-env-stamp --m
 build:e2e --stamp
 test:e2e --test_timeout=3600 --experimental_ui_max_stdouterr_bytes=2097152
 
+# Retry in the event of flakes
+test:e2e --flaky_test_attempts=2
+
 build:local --//:enable_package_json_tar_deps
 
 ###############################
