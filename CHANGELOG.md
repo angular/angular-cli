@@ -1,3 +1,15 @@
+<a name="16.2.10"></a>
+
+# 16.2.10 (2023-11-08)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description            |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------- |
+| [bab3672cd](https://github.com/angular/angular-cli/commit/bab3672cdaf4875cf83f94e34abdef29cffe2686) | fix  | normalize exclude path |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="16.2.9"></a>
 
 # 16.2.9 (2023-11-01)
