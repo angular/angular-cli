@@ -282,7 +282,6 @@ export function createServerPolyfillBundleOptions(
     return;
   }
 
-  const { workspaceRoot } = options;
   const buildOptions: BuildOptions = {
     ...polyfillBundleOptions,
     platform: 'node',
@@ -306,9 +305,6 @@ export function createServerPolyfillBundleOptions(
       'polyfills.server': namespace,
     },
   };
-
-  buildOptions.plugins ??= [];
-  buildOptions.plugins.push(createRxjsEsmResolutionPlugin());
 
   return () => buildOptions;
 }
