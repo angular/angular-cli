@@ -2,14 +2,8 @@ import { setTimeout } from 'node:timers/promises';
 import assert from 'node:assert';
 import { findFreePort } from '../../utils/network';
 import { execAndWaitForOutputToMatch, killAllProcesses, ng } from '../../utils/process';
-import { getGlobalVariable } from '../../utils/env';
 
 export default async function () {
-  const useWebpackBuilder = !getGlobalVariable('argv')['esbuild'];
-  if (useWebpackBuilder) {
-    return;
-  }
-
   await ng('cache', 'clean');
   await ng('cache', 'on');
 
