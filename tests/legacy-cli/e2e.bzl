@@ -38,6 +38,10 @@ ESBUILD_TESTS = [
     "tests/test/**",
 ]
 
+WEBPACK_IGNORE_TESTS = [
+    "tests/vite/**",
+]
+
 def _to_glob(patterns):
     if len(patterns) == 1:
         return patterns[0]
@@ -126,7 +130,7 @@ def _e2e_suite(name, runner, type, data, toolchain_name = "", toolchain = None):
     if type == "yarn":
         args.append("--yarn")
         tests = YARN_TESTS
-        ignore = BROWSER_TESTS
+        ignore = BROWSER_TESTS + WEBPACK_IGNORE_TESTS
     elif type == "esbuild":
         args.append("--esbuild")
         tests = ESBUILD_TESTS
@@ -137,7 +141,7 @@ def _e2e_suite(name, runner, type, data, toolchain_name = "", toolchain = None):
         ignore = None
     elif type == "npm":
         tests = None
-        ignore = BROWSER_TESTS
+        ignore = BROWSER_TESTS + WEBPACK_IGNORE_TESTS
 
     # Standard e2e tests
     _e2e_tests(
