@@ -14,6 +14,7 @@ import path from 'node:path';
 import { BuildOutputFile } from '../../tools/esbuild/bundler-context';
 import { BuildOutputAsset } from '../../tools/esbuild/bundler-execution-result';
 import { emitFilesToDisk } from '../../tools/esbuild/utils';
+import { deleteOutputDir } from '../../utils';
 import { buildApplicationInternal } from '../application';
 import { Schema as ApplicationBuilderOptions } from '../application/schema';
 import { logBuilderStatusWarnings } from './builder-status-warnings';
@@ -42,7 +43,12 @@ export async function* buildEsbuildBrowser(
   // Inform user of status of builder and options
   logBuilderStatusWarnings(userOptions, context);
   const normalizedOptions = normalizeOptions(userOptions);
-  const fullOutputPath = path.join(context.workspaceRoot, normalizedOptions.outputPath);
+  const { deleteOutputPath, outputPath } = normalizedOptions;
+  const fullOutputPath = path.join(context.workspaceRoot, outputPath);
+
+  if (deleteOutputPath && infrastructureSettings?.write !== false) {
+    await deleteOutputDir(context.workspaceRoot, outputPath);
+  }
 
   for await (const result of buildApplicationInternal(
     normalizedOptions,

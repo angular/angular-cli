@@ -8,14 +8,13 @@
 
 import { BuilderOutput } from '@angular-devkit/architect';
 import type { logging } from '@angular-devkit/core';
-import fs from 'node:fs/promises';
 import path from 'node:path';
 import { BuildOutputFile } from '../../tools/esbuild/bundler-context';
 import { ExecutionResult, RebuildState } from '../../tools/esbuild/bundler-execution-result';
 import { shutdownSassWorkerPool } from '../../tools/esbuild/stylesheets/sass-language';
 import { withNoProgress, withSpinner, writeResultFiles } from '../../tools/esbuild/utils';
+import { deleteOutputDir } from '../../utils/delete-output-dir';
 import { shouldWatchRoot } from '../../utils/environment-options';
-import { assertIsError } from '../../utils/error';
 import { NormalizedCachedOptions } from '../../utils/normalize-cache';
 
 export async function* runEsBuildBuildAction(
@@ -51,27 +50,8 @@ export async function* runEsBuildBuildAction(
     progress,
   } = options;
 
-  if (writeToFileSystem) {
-    // Clean output path if enabled
-    if (deleteOutputPath) {
-      if (outputPath === workspaceRoot) {
-        logger.error('Output path MUST not be workspace root directory!');
-
-        return;
-      }
-
-      await fs.rm(outputPath, { force: true, recursive: true, maxRetries: 3 });
-    }
-
-    // Create output directory if needed
-    try {
-      await fs.mkdir(outputPath, { recursive: true });
-    } catch (e) {
-      assertIsError(e);
-      logger.error('Unable to create output directory: ' + e.message);
-
-      return;
-    }
+  if (deleteOutputPath && writeToFileSystem) {
+    await deleteOutputDir(workspaceRoot, outputPath);
   }
 
   const withProgress: typeof withSpinner = progress ? withSpinner : withNoProgress;
