@@ -68,11 +68,13 @@ export async function* serveWithVite(
     builderName,
   )) as json.JsonObject & BrowserBuilderOptions;
 
-  if (browserOptions.prerender) {
+  if (browserOptions.prerender || browserOptions.ssr) {
     // Disable prerendering if enabled and force SSR.
     // This is so instead of prerendering all the routes for every change, the page is "prerendered" when it is requested.
-    browserOptions.ssr = true;
     browserOptions.prerender = false;
+
+    // Avoid bundling and processing the ssr entry-point as this is not used by the dev-server.
+    browserOptions.ssr = true;
 
     // https://nodejs.org/api/process.html#processsetsourcemapsenabledval
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
