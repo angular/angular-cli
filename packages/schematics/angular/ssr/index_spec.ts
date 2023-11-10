@@ -136,6 +136,13 @@ describe('SSR Schematic', () => {
           bootstrap,
       `);
     });
+
+    it('should add script section in package.json', async () => {
+      const tree = await schematicRunner.runSchematic('ssr', defaultOptions, appTree);
+      const { scripts } = tree.readJson('/package.json') as { scripts: Record<string, string> };
+
+      expect(scripts['serve:ssr:test-app']).toBe(`node dist/test-app/server/server.mjs`);
+    });
   });
 
   describe('Legacy browser builder', () => {

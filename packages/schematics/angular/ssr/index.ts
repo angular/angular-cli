@@ -57,23 +57,28 @@ async function getOutputPath(
   return outputPath;
 }
 
-function addScriptsRule(options: SSROptions): Rule {
+function addScriptsRule({ project }: SSROptions, isUsingApplicationBuilder: boolean): Rule {
   return async (host) => {
     const pkgPath = '/package.json';
-    const buffer = host.read(pkgPath);
-    if (buffer === null) {
+    const pkg = host.readJson(pkgPath) as { scripts?: Record<string, string> } | null;
+    if (pkg === null) {
       throw new SchematicsException('Could not find package.json');
     }
 
-    const serverDist = await getOutputPath(host, options.project, 'server');
-    const pkg = JSON.parse(buffer.toString()) as { scripts?: Record<string, string> };
-    pkg.scripts = {
-      ...pkg.scripts,
-      'dev:ssr': `ng run ${options.project}:${SERVE_SSR_TARGET_NAME}`,
-      'serve:ssr': `node ${serverDist}/main.js`,
-      'build:ssr': `ng build && ng run ${options.project}:server`,
-      'prerender': `ng run ${options.project}:${PRERENDER_TARGET_NAME}`,
-    };
+    if (isUsingApplicationBuilder) {
+      const distPath = await getOutputPath(host, project, 'build');
+      pkg.scripts ??= {};
+      pkg.scripts[`serve:ssr:${project}`] = `node ${distPath}/server/server.mjs`;
+    } else {
+      const serverDist = await getOutputPath(host, project, 'server');
+      pkg.scripts = {
+        ...pkg.scripts,
+        'dev:ssr': `ng run ${project}:${SERVE_SSR_TARGET_NAME}`,
+        'serve:ssr': `node ${serverDist}/main.js`,
+        'build:ssr': `ng build && ng run ${project}:server`,
+        'prerender': `ng run ${project}:${PRERENDER_TARGET_NAME}`,
+      };
+    }
 
     host.overwrite(pkgPath, JSON.stringify(pkg, null, 2));
   };
@@ -278,11 +283,11 @@ export default function (options: SSROptions): Rule {
             updateApplicationBuilderTsConfigRule(options),
           ]
         : [
-            addScriptsRule(options),
             updateWebpackBuilderServerTsConfigRule(options),
             updateWebpackBuilderWorkspaceConfigRule(options),
           ]),
       addServerFile(options, isStandalone),
+      addScriptsRule(options, isUsingApplicationBuilder),
       addDependencies(),
     ]);
   };
