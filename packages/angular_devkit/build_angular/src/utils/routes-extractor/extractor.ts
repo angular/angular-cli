@@ -117,10 +117,15 @@ export async function* extractRoutes(
 
     const injector = applicationRef.injector;
     const router = injector.get(Router);
-    const compiler = injector.get(Compiler);
 
-    // Extract all the routes from the config.
-    yield* getRoutesFromRouterConfig(router.config, compiler, injector);
+    if (router.config.length === 0) {
+      // In case there are no routes available
+      yield { route: '', success: true, redirect: false };
+    } else {
+      const compiler = injector.get(Compiler);
+      // Extract all the routes from the config.
+      yield* getRoutesFromRouterConfig(router.config, compiler, injector);
+    }
   } finally {
     platformRef.destroy();
   }
