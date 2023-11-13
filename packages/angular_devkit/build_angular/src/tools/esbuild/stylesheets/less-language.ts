@@ -115,6 +115,8 @@ async function compileString(
     };
   } catch (error) {
     if (isLessException(error)) {
+      const location = convertExceptionLocation(error);
+
       // Retry with a warning for less files requiring the deprecated inline JavaScript option
       if (error.message.includes('Inline JavaScript is not enabled.')) {
         const withJsResult = await compileString(
@@ -127,7 +129,7 @@ async function compileString(
         withJsResult.warnings = [
           {
             text: 'Deprecated inline execution of JavaScript has been enabled ("javascriptEnabled")',
-            location: convertExceptionLocation(error),
+            location,
             notes: [
               {
                 location: null,
@@ -148,10 +150,11 @@ async function compileString(
         errors: [
           {
             text: error.message,
-            location: convertExceptionLocation(error),
+            location,
           },
         ],
         loader: 'css',
+        watchFiles: location.file ? [filename, location.file] : [filename],
       };
     }
 
