@@ -217,7 +217,7 @@ async function initialize(
     );
 
   if (options.deleteOutputPath) {
-    deleteOutputDir(context.workspaceRoot, originalOutputPath);
+    await deleteOutputDir(context.workspaceRoot, originalOutputPath);
   }
 
   const transformedConfig = (await webpackConfigurationTransform?.(config)) ?? config;
