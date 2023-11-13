@@ -220,6 +220,16 @@ export class BundlerContext {
       } else {
         throw failure;
       }
+    } finally {
+      if (this.incremental) {
+        // When incremental always add any files from the load result cache
+        if (this.#loadCache) {
+          this.#loadCache.watchFiles
+            .filter((file) => !isInternalAngularFile(file))
+            // watch files are fully resolved paths
+            .forEach((file) => this.watchFiles.add(file));
+        }
+      }
     }
 
     // Update files that should be watched.
@@ -228,16 +238,9 @@ export class BundlerContext {
     if (this.incremental) {
       // Add input files except virtual angular files which do not exist on disk
       Object.keys(result.metafile.inputs)
-        .filter((input) => !input.startsWith('angular:'))
+        .filter((input) => !isInternalAngularFile(input))
         // input file paths are always relative to the workspace root
         .forEach((input) => this.watchFiles.add(join(this.workspaceRoot, input)));
-      // Also add any files from the load result cache
-      if (this.#loadCache) {
-        this.#loadCache.watchFiles
-          .filter((file) => !file.startsWith('angular:'))
-          // watch files are fully resolved paths
-          .forEach((file) => this.watchFiles.add(file));
-      }
     }
 
     // Return if the build encountered any errors
@@ -349,12 +352,12 @@ export class BundlerContext {
   #addErrorsToWatch(result: BuildFailure | BuildResult): void {
     for (const error of result.errors) {
       let file = error.location?.file;
-      if (file) {
+      if (file && !isInternalAngularFile(file)) {
         this.watchFiles.add(join(this.workspaceRoot, file));
       }
       for (const note of error.notes) {
         file = note.location?.file;
-        if (file) {
+        if (file && !isInternalAngularFile(file)) {
           this.watchFiles.add(join(this.workspaceRoot, file));
         }
       }
@@ -405,4 +408,8 @@ export class BundlerContext {
       this.#esbuildContext = undefined;
     }
   }
+}
+
+function isInternalAngularFile(file: string) {
+  return file.startsWith('angular:');
 }
