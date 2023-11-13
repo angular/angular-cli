@@ -107,7 +107,7 @@ async function initialize(
   }
 
   if (options.deleteOutputPath) {
-    deleteOutputDir(context.workspaceRoot, originalOutputPath);
+    await deleteOutputDir(context.workspaceRoot, originalOutputPath);
   }
 
   return { config: transformedConfig || config, projectRoot, projectSourceRoot, i18n };
