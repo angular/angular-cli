@@ -8,12 +8,13 @@
 
 export class SharedTSCompilationState {
   #pendingCompilation = true;
-  #resolveCompilationReady: (() => void) | undefined;
-  #compilationReadyPromise: Promise<void> | undefined;
+  #resolveCompilationReady: ((value: boolean) => void) | undefined;
+  #compilationReadyPromise: Promise<boolean> | undefined;
+  #hasErrors = true;
 
-  get waitUntilReady(): Promise<void> {
+  get waitUntilReady(): Promise<boolean> {
     if (!this.#pendingCompilation) {
-      return Promise.resolve();
+      return Promise.resolve(this.#hasErrors);
     }
 
     this.#compilationReadyPromise ??= new Promise((resolve) => {
@@ -23,8 +24,9 @@ export class SharedTSCompilationState {
     return this.#compilationReadyPromise;
   }
 
-  markAsReady(): void {
-    this.#resolveCompilationReady?.();
+  markAsReady(hasErrors: boolean): void {
+    this.#hasErrors = hasErrors;
+    this.#resolveCompilationReady?.(hasErrors);
     this.#compilationReadyPromise = undefined;
     this.#pendingCompilation = false;
   }
@@ -34,7 +36,7 @@ export class SharedTSCompilationState {
   }
 
   dispose(): void {
-    this.markAsReady();
+    this.markAsReady(true);
     globalSharedCompilationState = undefined;
   }
 }
