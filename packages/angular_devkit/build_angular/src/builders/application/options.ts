@@ -8,6 +8,7 @@
 
 import { BuilderContext } from '@angular-devkit/architect';
 import type { Plugin } from 'esbuild';
+import { access, constants } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import path from 'node:path';
 import {
@@ -129,11 +130,16 @@ export async function normalizeOptions(
   let fileReplacements: Record<string, string> | undefined;
   if (options.fileReplacements) {
     for (const replacement of options.fileReplacements) {
+      const fileReplaceWith = path.join(workspaceRoot, replacement.with);
+
+      try {
+        await access(fileReplaceWith, constants.F_OK);
+      } catch {
+        throw new Error(`The ${fileReplaceWith} path in file replacements does not exist.`);
+      }
+
       fileReplacements ??= {};
-      fileReplacements[path.join(workspaceRoot, replacement.replace)] = path.join(
-        workspaceRoot,
-        replacement.with,
-      );
+      fileReplacements[path.join(workspaceRoot, replacement.replace)] = fileReplaceWith;
     }
   }
 
