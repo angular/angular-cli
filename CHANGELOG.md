@@ -1,3 +1,41 @@
+<a name="17.0.1"></a>
+
+# 17.0.1 (2023-11-15)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                     |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------- |
+| [5267e6055](https://github.com/angular/angular-cli/commit/5267e605567aba798ee00322f14e3a48eae68b48) | fix  | handle packages with no version |
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                                         |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------- |
+| [d9f7d439e](https://github.com/angular/angular-cli/commit/d9f7d439eba879f8fffaacd258d832c407dfd90f) | fix  | add helper script to spawn SSR server from `dist`                   |
+| [a80926cdb](https://github.com/angular/angular-cli/commit/a80926cdb6b4d99a65549fcfba2ab094a5835480) | fix  | html indentation                                                    |
+| [f7f62c9d6](https://github.com/angular/angular-cli/commit/f7f62c9d6988e6801981592f56137cd02bfe2316) | fix  | remove `downlevelIteration` from `tsconfig.json` for new workspaces |
+| [7cb57317d](https://github.com/angular/angular-cli/commit/7cb57317d2b78e9a1f947c9f11175a7d381275fc) | fix  | use href property binding for links                                 |
+| [731917cd0](https://github.com/angular/angular-cli/commit/731917cd00b366bbec4f184ee9064b307eba59ce) | fix  | use styleUrl                                                        |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                               |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------- |
+| [15dd71aba](https://github.com/angular/angular-cli/commit/15dd71abac77ec5e1c092bebb86edffa3999937a) | fix  | `deleteOutputPath` when using `esbuild-builder`                           |
+| [fa4d8ff31](https://github.com/angular/angular-cli/commit/fa4d8ff31ef64738e45078c0e7be471591361442) | fix  | add actionable error when file replacement is missing                     |
+| [160a91160](https://github.com/angular/angular-cli/commit/160a91160ff3677d9e2d3d413ae360c4e1957c53) | fix  | add support for vendor sourcemaps when using the dev-server               |
+| [5623c193e](https://github.com/angular/angular-cli/commit/5623c193e4cccbf6783f7e3faaf0a6c2fb086b34) | fix  | cache stylesheet load errors with application builder                     |
+| [1a5538e0c](https://github.com/angular/angular-cli/commit/1a5538e0c9cc121fa1608eb99e941bc3a5f59ad6) | fix  | disable Worker wait loop for TS/NG parallel compilation in web containers |
+| [883771946](https://github.com/angular/angular-cli/commit/883771946a36a42ebfe23d32b393513309b16c82) | fix  | do not process ssr entry-point when running `ng serve`                    |
+| [d3b549167](https://github.com/angular/angular-cli/commit/d3b54916705e57f017597917d9aea1f71f2ba95a) | fix  | empty output directory instead of removing                                |
+| [596f7639a](https://github.com/angular/angular-cli/commit/596f7639a6c7fe00c9088e32739578cc374a31e2) | fix  | ensure compilation errors propagate to all bundle actions                 |
+| [d900a5217](https://github.com/angular/angular-cli/commit/d900a5217a75accf434a95ad90300ec5005a23a8) | fix  | maintain current watch files after build errors                           |
+| [21549bdeb](https://github.com/angular/angular-cli/commit/21549bdeb97b23f7f37110d579513f3102dc60e8) | fix  | prerender default view when no routes are defined                         |
+| [4c251647b](https://github.com/angular/angular-cli/commit/4c251647b8fdb3b128ca3252c83aaa71ecc48e88) | fix  | rewire sourcemap back to original source root                             |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="17.0.0"></a>
 
 # 17.0.0 (2023-11-08)
