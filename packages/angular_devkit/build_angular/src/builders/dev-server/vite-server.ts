@@ -106,7 +106,7 @@ export async function* serveWithVite(
     // Always enable JIT linking to support applications built with and without AOT.
     // In a development environment the additional scope information does not
     // have a negative effect unlike production where final output size is relevant.
-    { sourcemap: true, jit: true },
+    { sourcemap: true, jit: true, thirdPartySourcemaps: true },
     1,
     true,
   );
