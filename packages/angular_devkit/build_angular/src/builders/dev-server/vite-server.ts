@@ -234,6 +234,7 @@ export async function* serveWithVite(
         !!browserOptions.ssr,
         prebundleTransformer,
         target,
+        browserOptions.loader as EsbuildLoaderOption | undefined,
         extensions?.middleware,
         transformers?.indexHtml,
       );
@@ -401,6 +402,7 @@ export async function setupServer(
   ssr: boolean,
   prebundleTransformer: JavaScriptTransformer,
   target: string[],
+  prebundleLoaderExtensions: EsbuildLoaderOption | undefined,
   extensionMiddleware?: Connect.NextHandleFunction[],
   indexHtmlTransformer?: (content: string) => Promise<string>,
 ): Promise<InlineConfig> {
@@ -481,6 +483,7 @@ export async function setupServer(
         ssr: true,
         prebundleTransformer,
         target,
+        loader: prebundleLoaderExtensions,
       }),
     },
     plugins: [
@@ -736,6 +739,7 @@ export async function setupServer(
       ssr: false,
       prebundleTransformer,
       target,
+      loader: prebundleLoaderExtensions,
     }),
   };
 
@@ -796,6 +800,8 @@ type ViteEsBuildPlugin = NonNullable<
   NonNullable<DepOptimizationConfig['esbuildOptions']>['plugins']
 >[0];
 
+type EsbuildLoaderOption = Exclude<DepOptimizationConfig['esbuildOptions'], undefined>['loader'];
+
 function getDepOptimizationConfig({
   disabled,
   exclude,
@@ -803,6 +809,7 @@ function getDepOptimizationConfig({
   target,
   prebundleTransformer,
   ssr,
+  loader,
 }: {
   disabled: boolean;
   exclude: string[];
@@ -810,6 +817,7 @@ function getDepOptimizationConfig({
   target: string[];
   prebundleTransformer: JavaScriptTransformer;
   ssr: boolean;
+  loader?: EsbuildLoaderOption;
 }): DepOptimizationConfig {
   const plugins: ViteEsBuildPlugin[] = [
     {
@@ -842,6 +850,7 @@ function getDepOptimizationConfig({
       target,
       supported: getFeatureSupport(target),
       plugins,
+      loader,
     },
   };
 }
