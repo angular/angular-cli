@@ -143,6 +143,20 @@ export async function normalizeOptions(
     }
   }
 
+  let loaderExtensions: Record<string, 'text' | 'binary' | 'file'> | undefined;
+  if (options.loader) {
+    for (const [extension, value] of Object.entries(options.loader)) {
+      if (extension[0] !== '.' || /\.[cm]?[jt]sx?$/.test(extension)) {
+        continue;
+      }
+      if (value !== 'text' && value !== 'binary' && value !== 'file' && value !== 'empty') {
+        continue;
+      }
+      loaderExtensions ??= {};
+      loaderExtensions[extension] = value;
+    }
+  }
+
   const globalStyles: { name: string; files: string[]; initial: boolean }[] = [];
   if (options.styles?.length) {
     const { entryPoints: stylesheetEntrypoints, noInjectNames } = normalizeGlobalStyles(
@@ -307,6 +321,7 @@ export async function normalizeOptions(
     budgets: budgets?.length ? budgets : undefined,
     publicPath: deployUrl ? deployUrl : undefined,
     plugins: plugins?.length ? plugins : undefined,
+    loaderExtensions,
   };
 }
 

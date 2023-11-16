@@ -320,6 +320,7 @@ function getEsBuildCommonOptions(options: NormalizedApplicationBuildOptions): Bu
     outputNames,
     preserveSymlinks,
     jit,
+    loaderExtensions,
   } = options;
 
   // Ensure unique hashes for i18n translation changes when using post-process inlining.
@@ -367,6 +368,7 @@ function getEsBuildCommonOptions(options: NormalizedApplicationBuildOptions): Bu
       ...(optimizationOptions.scripts ? { 'ngDevMode': 'false' } : undefined),
       'ngJitMode': jit ? 'true' : 'false',
     },
+    loader: loaderExtensions,
     footer,
     publicPath: options.publicPath,
   };

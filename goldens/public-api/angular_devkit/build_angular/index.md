@@ -37,6 +37,9 @@ export interface ApplicationBuilderOptions {
     i18nMissingTranslation?: I18NTranslation_2;
     index: IndexUnion_2;
     inlineStyleLanguage?: InlineStyleLanguage_2;
+    loader?: {
+        [key: string]: any;
+    };
     localize?: Localize_2;
     namedChunks?: boolean;
     optimization?: OptimizationUnion_2;
