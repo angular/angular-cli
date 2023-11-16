@@ -22,6 +22,7 @@ import { JavaScriptTransformer } from '../../tools/esbuild/javascript-transforme
 import { createRxjsEsmResolutionPlugin } from '../../tools/esbuild/rxjs-esm-resolution-plugin';
 import { getFeatureSupport, transformSupportedBrowsersToTargets } from '../../tools/esbuild/utils';
 import { createAngularLocaleDataPlugin } from '../../tools/vite/i18n-locale-plugin';
+import { loadEsmModule } from '../../utils/load-esm';
 import { renderPage } from '../../utils/server-rendering/render-page';
 import { getSupportedBrowsers } from '../../utils/supported-browsers';
 import { getIndexOutputFile } from '../../utils/webpack-browser-config';
@@ -119,7 +120,7 @@ export async function* serveWithVite(
   const htmlIndexPath = getIndexOutputFile(browserOptions.index as any);
 
   // dynamically import Vite for ESM compatibility
-  const { createServer, normalizePath } = await import('vite');
+  const { createServer, normalizePath } = await loadEsmModule<typeof import('vite')>('vite');
 
   let server: ViteDevServer | undefined;
   let serverUrl: URL | undefined;
@@ -410,7 +411,7 @@ export async function setupServer(
   );
 
   // dynamically import Vite for ESM compatibility
-  const { normalizePath } = await import('vite');
+  const { normalizePath } = await loadEsmModule<typeof import('vite')>('vite');
 
   // Path will not exist on disk and only used to provide separate path for Vite requests
   const virtualProjectRoot = normalizePath(

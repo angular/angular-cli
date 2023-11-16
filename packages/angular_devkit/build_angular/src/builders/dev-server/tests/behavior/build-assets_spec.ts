@@ -31,7 +31,7 @@ describeServeBuilder(executeDevServer, DEV_SERVER_BUILDER_INFO, (harness, setupT
       const { result, response } = await executeOnceAndFetch(harness, 'extra.js');
 
       expect(result?.success).toBeTrue();
-      expect(await response?.text()).toBe(javascriptFileContent);
+      expect(await response?.text()).toContain(javascriptFileContent);
     });
   });
 });
