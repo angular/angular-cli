@@ -552,7 +552,7 @@ export async function setupServer(
             );
 
             // Set the sourcemap root to the workspace root. This is needed since we set a virtual path as root.
-            remappedMap.sourceRoot = serverOptions.workspaceRoot + '/';
+            remappedMap.sourceRoot = normalizePath(serverOptions.workspaceRoot) + '/';
 
             return {
               ...result,
