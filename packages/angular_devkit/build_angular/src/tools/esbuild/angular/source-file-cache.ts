@@ -8,7 +8,6 @@
 
 import { platform } from 'node:os';
 import * as path from 'node:path';
-import { pathToFileURL } from 'node:url';
 import type ts from 'typescript';
 import { MemoryLoadResultCache } from '../load-result-cache';
 
@@ -17,7 +16,6 @@ const WINDOWS_SEP_REGEXP = new RegExp(`\\${path.win32.sep}`, 'g');
 
 export class SourceFileCache extends Map<string, ts.SourceFile> {
   readonly modifiedFiles = new Set<string>();
-  readonly babelFileCache = new Map<string, Uint8Array>();
   readonly typeScriptFileCache = new Map<string, string | Uint8Array>();
   readonly loadResultCache = new MemoryLoadResultCache();
 
@@ -32,8 +30,8 @@ export class SourceFileCache extends Map<string, ts.SourceFile> {
       this.modifiedFiles.clear();
     }
     for (let file of files) {
-      this.babelFileCache.delete(file);
-      this.typeScriptFileCache.delete(pathToFileURL(file).href);
+      file = path.normalize(file);
+      this.typeScriptFileCache.delete(file);
       this.loadResultCache.invalidate(file);
 
       // Normalize separators to allow matching TypeScript Host paths

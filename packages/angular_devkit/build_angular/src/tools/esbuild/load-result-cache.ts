@@ -32,6 +32,11 @@ export function createCachedLoad(
 
       // Do not cache null or undefined
       if (result) {
+        // Ensure requested path is included if it was a resolved file
+        if (args.namespace === 'file') {
+          result.watchFiles ??= [];
+          result.watchFiles.push(args.path);
+        }
         await cache.put(loadCacheKey, result);
       }
     }
@@ -79,6 +84,8 @@ export class MemoryLoadResultCache implements LoadResultCache {
   }
 
   get watchFiles(): string[] {
-    return [...this.#loadResults.keys(), ...this.#fileDependencies.keys()];
+    // this.#loadResults.keys() is not included here because the keys
+    // are namespaced request paths and not disk-based file paths.
+    return [...this.#fileDependencies.keys()];
   }
 }
