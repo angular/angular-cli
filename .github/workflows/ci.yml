@@ -89,7 +89,11 @@ jobs:
           retention-days: 14
 
   test:
-    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
     steps:
       - name: Initialize environment
         uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@ea86ac0778eb6eabb9ba756fe60eaefeccd7a4a9
