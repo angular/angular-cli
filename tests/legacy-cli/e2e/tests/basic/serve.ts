@@ -2,18 +2,14 @@ import { killAllProcesses } from '../../utils/process';
 import { ngServe } from '../../utils/project';
 
 export default async function () {
-  try {
-    // Serve works without HMR
-    const noHmrPort = await ngServe('--no-hmr');
-    await verifyResponse(noHmrPort);
-    await killAllProcesses();
+  // Serve works without HMR
+  const noHmrPort = await ngServe('--no-hmr');
+  await verifyResponse(noHmrPort);
+  await killAllProcesses();
 
-    // Serve works with HMR
-    const hmrPort = await ngServe('--hmr');
-    await verifyResponse(hmrPort);
-  } finally {
-    await killAllProcesses();
-  }
+  // Serve works with HMR
+  const hmrPort = await ngServe('--hmr');
+  await verifyResponse(hmrPort);
 }
 
 async function verifyResponse(port: number): Promise<void> {

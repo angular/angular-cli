@@ -2,7 +2,6 @@ import express from 'express';
 import * as http from 'http';
 
 import { writeFile } from '../../utils/fs';
-import { killAllProcesses } from '../../utils/process';
 import { ngServe } from '../../utils/project';
 import { AddressInfo } from 'net';
 import * as assert from 'assert';
@@ -38,8 +37,7 @@ export default function () {
       assert.strictEqual(response.status, 200);
       assert.match(await response.text(), /TEST_API_RETURN/);
     })
-    .finally(async () => {
-      await killAllProcesses();
+    .finally(() => {
       server.close();
     });
 }

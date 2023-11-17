@@ -1,5 +1,4 @@
 import * as assert from 'assert';
-import { killAllProcesses } from '../../../utils/process';
 import { ngServe } from '../../../utils/project';
 
 export default async function () {
@@ -17,6 +16,5 @@ export default async function () {
     .then(async (response) => {
       assert.strictEqual(response.status, 200);
       assert.match(await response.text(), /<app-root><\/app-root>/);
-    })
-    .finally(() => killAllProcesses());
+    });
 }

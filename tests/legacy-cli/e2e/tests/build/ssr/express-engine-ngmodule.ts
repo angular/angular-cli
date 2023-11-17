@@ -2,7 +2,7 @@ import { getGlobalVariable } from '../../../utils/env';
 import { rimraf, writeMultipleFiles } from '../../../utils/fs';
 import { findFreePort } from '../../../utils/network';
 import { installWorkspacePackages } from '../../../utils/packages';
-import { execAndWaitForOutputToMatch, killAllProcesses, ng } from '../../../utils/process';
+import { execAndWaitForOutputToMatch, ng } from '../../../utils/process';
 import { updateJsonFile, useCIChrome, useCIDefaults, useSha } from '../../../utils/project';
 
 export default async function () {
@@ -158,15 +158,11 @@ export default async function () {
     return port;
   }
 
-  try {
-    const port = await ngDevSsr();
-    await ng(
-      'e2e',
-      'test-project-two',
-      `--base-url=http://localhost:${port}`,
-      '--dev-server-target=',
-    );
-  } finally {
-    await killAllProcesses();
-  }
+  const port = await ngDevSsr();
+  await ng(
+    'e2e',
+    'test-project-two',
+    `--base-url=http://localhost:${port}`,
+    '--dev-server-target=',
+  );
 }

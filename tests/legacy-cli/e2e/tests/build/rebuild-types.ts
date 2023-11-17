@@ -1,8 +1,4 @@
-import {
-  killAllProcesses,
-  waitForAnyProcessOutputToMatch,
-  execAndWaitForOutputToMatch,
-} from '../../utils/process';
+import { waitForAnyProcessOutputToMatch, execAndWaitForOutputToMatch } from '../../utils/process';
 import { writeFile, prependToFile } from '../../utils/fs';
 import { getGlobalVariable } from '../../utils/env';
 
@@ -20,14 +16,10 @@ export default async function () {
   await writeFile('src/app/type.ts', `export type MyType = number;`);
   await prependToFile('src/app/app.component.ts', 'import { MyType } from "./type";\n');
 
-  try {
-    await execAndWaitForOutputToMatch('ng', ['serve'], successRe);
+  await execAndWaitForOutputToMatch('ng', ['serve'], successRe);
 
-    await Promise.all([
-      waitForAnyProcessOutputToMatch(successRe, 20000),
-      writeFile('src/app/type.ts', `export type MyType = string;`),
-    ]);
-  } finally {
-    await killAllProcesses();
-  }
+  await Promise.all([
+    waitForAnyProcessOutputToMatch(successRe, 20000),
+    writeFile('src/app/type.ts', `export type MyType = string;`),
+  ]);
 }
