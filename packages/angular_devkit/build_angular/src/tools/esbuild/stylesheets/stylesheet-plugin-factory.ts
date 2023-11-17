@@ -69,6 +69,11 @@ export interface StylesheetLanguage {
   ): OnLoadResult | Promise<OnLoadResult>;
 }
 
+/**
+ * Cached postcss instances that can be re-used between various StylesheetPluginFactory instances.
+ */
+const postcssProcessor = new Map<string, WeakRef<import('postcss').Processor>>();
+
 export class StylesheetPluginFactory {
   private postcssProcessor?: import('postcss').Processor;
 
@@ -94,11 +99,16 @@ export class StylesheetPluginFactory {
       }
 
       if (options.tailwindConfiguration) {
-        postcss ??= (await import('postcss')).default;
-        const tailwind = await import(options.tailwindConfiguration.package);
-        this.postcssProcessor = postcss().use(
-          tailwind.default({ config: options.tailwindConfiguration.file }),
-        );
+        const { package: tailwindPackage, file: config } = options.tailwindConfiguration;
+        const postCssInstanceKey = tailwindPackage + ':' + config;
+        this.postcssProcessor = postcssProcessor.get(postCssInstanceKey)?.deref();
+
+        if (!this.postcssProcessor) {
+          postcss ??= (await import('postcss')).default;
+          const tailwind = await import(tailwindPackage);
+          this.postcssProcessor = postcss().use(tailwind.default({ config }));
+          postcssProcessor.set(postCssInstanceKey, new WeakRef(this.postcssProcessor));
+        }
       }
 
       return this.postcssProcessor;
