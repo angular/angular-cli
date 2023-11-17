@@ -1,16 +1,15 @@
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';<% if(routing) { %>
+import { Component } from '@angular/core';<% if(routing) { %>
 import { RouterOutlet } from '@angular/router';<% } %>
 
 @Component({
   selector: '<%= selector %>',
   standalone: true,
-  imports: [CommonModule<% if(routing) { %>, RouterOutlet<% } %>],<% if(inlineTemplate) { %>
+  imports: [<% if(routing) { %>RouterOutlet<% } %>],<% if(inlineTemplate) { %>
   template: `
     <h1>Welcome to {{title}}!</h1>
 
     <% if (routing) {
-     %><router-outlet></router-outlet><%
+     %><router-outlet /><%
     } %>
   `,<% } else { %>
   templateUrl: './app.component.html',<% } if(inlineStyle) { %>

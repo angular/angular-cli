@@ -538,7 +538,7 @@ describe('Application Schematic', () => {
 
     const component = tree.readContent('/projects/foo/src/app/app.component.ts');
     expect(component).toContain(`import { RouterOutlet } from '@angular/router';`);
-    expect(component).toContain(`imports: [CommonModule, RouterOutlet]`);
+    expect(component).toContain(`imports: [RouterOutlet]`);
 
     const config = tree.readContent('/projects/foo/src/app/app.config.ts');
     expect(config).toContain(`import { provideRouter } from '@angular/router';`);
