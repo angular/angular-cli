@@ -1,8 +1,4 @@
-import {
-  killAllProcesses,
-  waitForAnyProcessOutputToMatch,
-  execAndWaitForOutputToMatch,
-} from '../../utils/process';
+import { waitForAnyProcessOutputToMatch, execAndWaitForOutputToMatch } from '../../utils/process';
 import { writeFile, prependToFile, appendToFile } from '../../utils/fs';
 import { getGlobalVariable } from '../../utils/env';
 
@@ -129,6 +125,5 @@ export default function () {
           throw new Error('Expected no error but an error was shown.');
         }
       })
-      .finally(() => killAllProcesses())
   );
 }
