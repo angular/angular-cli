@@ -31,7 +31,7 @@ import { applyToUpdateRecorder } from '../utility/change';
 import { getAppModulePath, isStandaloneApp } from '../utility/ng-ast-utils';
 import { getMainFilePath } from '../utility/standalone/util';
 import { getWorkspace, updateWorkspace } from '../utility/workspace';
-import { Builders, ServerBuilderOptions } from '../utility/workspace-models';
+import { Builders } from '../utility/workspace-models';
 import { Schema as AppShellOptions } from './schema';
 
 const APP_SHELL_ROUTE = 'shell';
@@ -130,7 +130,7 @@ function getBootstrapComponentPath(host: Tree, mainPath: string): string {
 
 function validateProject(mainPath: string): Rule {
   return (host: Tree) => {
-    const routerOutletCheckRegex = /<router-outlet.*?>([\s\S]*?)<\/router-outlet>/;
+    const routerOutletCheckRegex = /<router-outlet.*?>([\s\S]*?)(?:<\/router-outlet>)?/;
 
     const componentPath = getBootstrapComponentPath(host, mainPath);
     const tmpl = getComponentTemplateInfo(host, componentPath);
