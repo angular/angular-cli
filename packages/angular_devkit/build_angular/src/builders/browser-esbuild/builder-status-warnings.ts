@@ -25,11 +25,6 @@ export function logBuilderStatusWarnings(
   options: BrowserBuilderOptions,
   { logger }: BuilderContext,
 ) {
-  logger.warn(
-    `The 'browser-esbuild' builder is a compatibility builder which will be removed in a future major ` +
-      `version in favor of the 'application' builder.`,
-  );
-
   // Validate supported options
   for (const unsupportedOption of UNSUPPORTED_OPTIONS) {
     const value = (options as unknown as BrowserBuilderOptions)[unsupportedOption];
