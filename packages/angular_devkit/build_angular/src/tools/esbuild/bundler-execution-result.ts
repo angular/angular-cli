@@ -7,6 +7,7 @@
  */
 
 import type { Message, PartialMessage } from 'esbuild';
+import { normalize } from 'node:path';
 import type { ChangedFiles } from '../../tools/esbuild/watcher';
 import type { SourceFileCache } from './angular/source-file-cache';
 import type { BuildOutputFile, BuildOutputFileType, BundlerContext } from './bundler-context';
@@ -88,11 +89,15 @@ export class ExecutionResult {
   }
 
   get watchFiles() {
+    // Bundler contexts internally normalize file dependencies
     const files = this.rebuildContexts.flatMap((context) => [...context.watchFiles]);
     if (this.codeBundleCache?.referencedFiles) {
-      files.push(...this.codeBundleCache.referencedFiles);
+      // These files originate from TS/NG and can have POSIX path separators even on Windows.
+      // To ensure path comparisons are valid, all these paths must be normalized.
+      files.push(...this.codeBundleCache.referencedFiles.map(normalize));
     }
     if (this.codeBundleCache?.loadResultCache) {
+      // Load result caches internally normalize file dependencies
       files.push(...this.codeBundleCache.loadResultCache.watchFiles);
     }
 
