@@ -313,5 +313,68 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
       expect(buildCount).toBe(3);
     });
+
+    it('recovers from component template error', async () => {
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+        watch: true,
+      });
+
+      const builderAbort = new AbortController();
+      const buildCount = await harness
+        .execute({ outputLogsOnFailure: true, signal: builderAbort.signal })
+        .pipe(
+          timeout(BUILD_TIMEOUT),
+          concatMap(async ({ result, logs }, index) => {
+            switch (index) {
+              case 0:
+                // Missing ending `>` on the div will cause an error
+                await harness.appendToFile('src/app/app.component.html', '<div>Hello, world!</div');
+
+                break;
+              case 1:
+                expect(logs).toContain(
+                  jasmine.objectContaining<logging.LogEntry>({
+                    message: jasmine.stringMatching('Unexpected character "EOF"'),
+                  }),
+                );
+
+                await harness.appendToFile('src/app/app.component.html', '>');
+
+                break;
+              case 2:
+                expect(logs).not.toContain(
+                  jasmine.objectContaining<logging.LogEntry>({
+                    message: jasmine.stringMatching('Unexpected character "EOF"'),
+                  }),
+                );
+
+                harness.expectFile('dist/browser/main.js').content.toContain('Hello, world!');
+
+                // Make an additional valid change to ensure that rebuilds still trigger
+                await harness.appendToFile('src/app/app.component.html', '<div>Guten Tag</div>');
+
+                break;
+              case 3:
+                expect(logs).not.toContain(
+                  jasmine.objectContaining<logging.LogEntry>({
+                    message: jasmine.stringMatching('invalid-css-content'),
+                  }),
+                );
+
+                harness.expectFile('dist/browser/main.js').content.toContain('Hello, world!');
+                harness.expectFile('dist/browser/main.js').content.toContain('Guten Tag');
+
+                // Test complete - abort watch mode
+                builderAbort?.abort();
+                break;
+            }
+          }),
+          count(),
+        )
+        .toPromise();
+
+      expect(buildCount).toBe(4);
+    });
   });
 });
