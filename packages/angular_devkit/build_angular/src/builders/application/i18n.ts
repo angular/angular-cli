@@ -8,7 +8,7 @@
 
 import { BuilderContext } from '@angular-devkit/architect';
 import { join, posix } from 'node:path';
-import { InitialFileRecord } from '../../tools/esbuild/bundler-context';
+import { BuildOutputFileType, InitialFileRecord } from '../../tools/esbuild/bundler-context';
 import { ExecutionResult } from '../../tools/esbuild/bundler-execution-result';
 import { I18nInliner } from '../../tools/esbuild/i18n-inliner';
 import { maxWorkers } from '../../utils/environment-options';
@@ -108,8 +108,13 @@ export async function inlineI18n(
     await inliner.close();
   }
 
-  // Update the result with all localized files
-  executionResult.outputFiles = updatedOutputFiles;
+  // Update the result with all localized files.
+  executionResult.outputFiles = [
+    // Root files are not modified.
+    ...executionResult.outputFiles.filter(({ type }) => type === BuildOutputFileType.Root),
+    // Updated files for each locale.
+    ...updatedOutputFiles,
+  ];
 
   // Assets are only changed if not using the flat output option
   if (options.i18nOptions.flatOutput !== true) {
