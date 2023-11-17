@@ -18,7 +18,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       });
 
       const { result } = await harness.executeOnce();
-      expect(result?.success).toBe(true);
+      expect(result?.success).toBeTrue();
       harness.expectFile('dist/3rdpartylicenses.txt').content.toContain('MIT');
     });
 
@@ -29,7 +29,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       });
 
       const { result } = await harness.executeOnce();
-      expect(result?.success).toBe(true);
+      expect(result?.success).toBeTrue();
       harness.expectFile('dist/3rdpartylicenses.txt').toNotExist();
     });
 
@@ -39,8 +39,21 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       });
 
       const { result } = await harness.executeOnce();
-      expect(result?.success).toBe(true);
+      expect(result?.success).toBeTrue();
       harness.expectFile('dist/3rdpartylicenses.txt').content.toContain('MIT');
+    });
+
+    it(`should generate '3rdpartylicenses.txt' when 'extractLicenses' and 'localize' are true`, async () => {
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+        localize: true,
+        extractLicenses: true,
+      });
+
+      const { result } = await harness.executeOnce();
+      expect(result?.success).toBeTrue();
+      harness.expectFile('dist/3rdpartylicenses.txt').content.toContain('MIT');
+      harness.expectFile('dist/browser/en-US/main.js').toExist();
     });
   });
 });
