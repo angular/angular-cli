@@ -215,6 +215,11 @@ export async function* serveWithVite(
     }
 
     if (server) {
+      // Update fs allow list to include any new assets from the build option.
+      server.config.server.fs.allow = [
+        ...new Set(...server.config.server.fs.allow, ...assetFiles.values()),
+      ];
+
       handleUpdate(normalizePath, generatedFiles, server, serverOptions, context.logger);
     } else {
       const projectName = context.target?.project;
@@ -430,10 +435,11 @@ export async function setupServer(
     ...externalMetadata.explicit,
   ];
 
+  const cacheDir = join(serverOptions.cacheOptions.path, 'vite');
   const configuration: InlineConfig = {
     configFile: false,
     envFile: false,
-    cacheDir: join(serverOptions.cacheOptions.path, 'vite'),
+    cacheDir,
     root: virtualProjectRoot,
     publicDir: false,
     esbuild: false,
@@ -456,6 +462,13 @@ export async function setupServer(
       proxy,
       // File watching is handled by the build directly. `null` disables file watching for Vite.
       watch: null,
+      fs: {
+        // Ensure cache directory, node modules, and all assets are accessible by the client.
+        // The first two are required for Vite to function in prebundling mode (the default) and to load
+        // the Vite client-side code for browser reloading. These would be available by default but when
+        // the `allow` option is explicitly configured, they must be included manually.
+        allow: [cacheDir, join(serverOptions.workspaceRoot, 'node_modules'), ...assets.values()],
+      },
       // This is needed when `externalDependencies` is used to prevent Vite load errors.
       // NOTE: If Vite adds direct support for externals, this can be removed.
       preTransformRequests: externalMetadata.explicit.length === 0,
