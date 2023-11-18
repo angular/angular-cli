@@ -142,9 +142,9 @@ export async function* serveWithVite(
   });
 
   const build =
-    builderName === '@angular-devkit/build-angular:application'
-      ? buildApplicationInternal
-      : buildEsbuildBrowser;
+    builderName === '@angular-devkit/build-angular:browser-esbuild'
+      ? buildEsbuildBrowser
+      : buildApplicationInternal;
 
   // TODO: Switch this to an architect schedule call when infrastructure settings are supported
   for await (const result of build(
