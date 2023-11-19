@@ -449,10 +449,8 @@ export async function setupServer(
       open: serverOptions.open,
       headers: serverOptions.headers,
       proxy,
-      // Currently does not appear to be a way to disable file watching directly so ignore all files
-      watch: {
-        ignored: ['**/*'],
-      },
+      // File watching is handled by the build directly. `null` disables file watching for Vite.
+      watch: null,
       // This is needed when `externalDependencies` is used to prevent Vite load errors.
       // NOTE: If Vite adds direct support for externals, this can be removed.
       preTransformRequests: externalMetadata.explicit.length === 0,
