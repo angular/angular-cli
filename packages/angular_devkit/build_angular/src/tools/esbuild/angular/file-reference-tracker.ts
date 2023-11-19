@@ -6,6 +6,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import { normalize } from 'node:path';
+
 export class FileReferenceTracker {
   #referencingFiles = new Map<string, Set<string>>();
 
@@ -14,17 +16,19 @@ export class FileReferenceTracker {
   }
 
   add(containingFile: string, referencedFiles: Iterable<string>): void {
+    const normalizedContainingFile = normalize(containingFile);
     for (const file of referencedFiles) {
-      if (file === containingFile) {
+      const normalizedReferencedFile = normalize(file);
+      if (normalizedReferencedFile === normalizedContainingFile) {
         // Containing file is already known to the AOT compiler
         continue;
       }
 
-      const referencing = this.#referencingFiles.get(file);
+      const referencing = this.#referencingFiles.get(normalizedReferencedFile);
       if (referencing === undefined) {
-        this.#referencingFiles.set(file, new Set([containingFile]));
+        this.#referencingFiles.set(normalizedReferencedFile, new Set([normalizedContainingFile]));
       } else {
-        referencing.add(containingFile);
+        referencing.add(normalizedContainingFile);
       }
     }
   }
@@ -39,14 +43,15 @@ export class FileReferenceTracker {
 
     // Add referencing files to fully notify the AOT compiler of required component updates
     for (const modifiedFile of changed) {
-      const referencing = this.#referencingFiles.get(modifiedFile);
+      const normalizedModifiedFile = normalize(modifiedFile);
+      const referencing = this.#referencingFiles.get(normalizedModifiedFile);
       if (referencing) {
         allChangedFiles ??= new Set(changed);
         for (const referencingFile of referencing) {
           allChangedFiles.add(referencingFile);
         }
         // Cleanup the stale record which will be updated by new resource transforms
-        this.#referencingFiles.delete(modifiedFile);
+        this.#referencingFiles.delete(normalizedModifiedFile);
       }
     }
 
