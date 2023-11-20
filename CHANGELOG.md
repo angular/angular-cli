@@ -1,3 +1,20 @@
+<a name="17.0.2"></a>
+
+# 17.0.2 (2023-11-20)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                                         |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------------------------- |
+| [023645185](https://github.com/angular/angular-cli/commit/02364518571a2b73be945a0036bbfa39e336330c) | fix  | always normalize AOT file reference tracker paths                                   |
+| [3b99980bd](https://github.com/angular/angular-cli/commit/3b99980bd02c875a37d1603ae7468558fe7ef4c3) | fix  | emit root files when `localize` is enabled when using the esbuild based builders    |
+| [ef3e3abb8](https://github.com/angular/angular-cli/commit/ef3e3abb8e29a9274e9d1f5fc5c18f01de6fd76f) | fix  | ensure watch file paths from TypeScript are normalized                              |
+| [d11b36fe2](https://github.com/angular/angular-cli/commit/d11b36fe207d8a38cb4a1001667c63ecd17aba0c) | fix  | normalize paths in ssr sourcemaps to posix when using vite                          |
+| [62d51383a](https://github.com/angular/angular-cli/commit/62d51383acfd8cdeedf07b34c2d78f505ff2e3a8) | fix  | only include vendor sourcemaps when using the dev-server when the option is enabled |
+| [d28ba8a73](https://github.com/angular/angular-cli/commit/d28ba8a7311ea3345b112a47d6f1e617fb691643) | fix  | remove browser-esbuild usage warning                                                |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="17.0.1"></a>
 
 # 17.0.1 (2023-11-15)
