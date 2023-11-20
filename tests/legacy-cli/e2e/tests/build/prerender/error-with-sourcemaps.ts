@@ -3,6 +3,8 @@ import { getGlobalVariable } from '../../../utils/env';
 import { rimraf, writeMultipleFiles } from '../../../utils/fs';
 import { match } from 'node:assert';
 import { expectToFail } from '../../../utils/utils';
+import { useSha } from '../../../utils/project';
+import { installWorkspacePackages } from '../../../utils/packages';
 
 export default async function () {
   const useWebpackBuilder = !getGlobalVariable('argv')['esbuild'];
@@ -13,6 +15,8 @@ export default async function () {
   // Forcibly remove in case another test doesn't clean itself up.
   await rimraf('node_modules/@angular/ssr');
   await ng('add', '@angular/ssr', '--skip-confirmation');
+  await useSha();
+  await installWorkspacePackages();
 
   await writeMultipleFiles({
     'src/app/app.component.ts': `
