@@ -144,7 +144,8 @@ export async function executePostBundleSteps(
         workspaceRoot,
         serviceWorker,
         options.baseHref || '/',
-        outputFiles,
+        // Ensure additional files recently added are used
+        [...outputFiles, ...additionalOutputFiles],
         assetFiles,
       );
       additionalOutputFiles.push(
