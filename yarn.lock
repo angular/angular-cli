@@ -123,9 +123,10 @@
   dependencies:
     tslib "^2.3.0"
 
-"@angular/bazel@https://github.com/angular/bazel-builds.git#737eadec1e62b8df5afb4f961ca6e4afaa8d29cb":
-  version "17.1.0-next.0"
-  resolved "https://github.com/angular/bazel-builds.git#737eadec1e62b8df5afb4f961ca6e4afaa8d29cb"
+"@angular/bazel@https://github.com/angular/bazel-builds.git#a28c857eaaaaee9a899c9a81c5b73519b9a23468":
+  version "17.1.0-next.0+sha-060ea83"
+  uid a28c857eaaaaee9a899c9a81c5b73519b9a23468
+  resolved "https://github.com/angular/bazel-builds.git#a28c857eaaaaee9a899c9a81c5b73519b9a23468"
   dependencies:
     "@microsoft/api-extractor" "^7.24.2"
     magic-string "^0.30.0"
@@ -139,9 +140,10 @@
     "@angular/core" "^13.0.0 || ^14.0.0-0"
     reflect-metadata "^0.1.13"
 
-"@angular/build-tooling@https://github.com/angular/dev-infra-private-build-tooling-builds.git#9fbc09cccc4ae50cf121a0590260d4e426bbeca4":
-  version "0.0.0-ea86ac0778eb6eabb9ba756fe60eaefeccd7a4a9"
-  resolved "https://github.com/angular/dev-infra-private-build-tooling-builds.git#9fbc09cccc4ae50cf121a0590260d4e426bbeca4"
+"@angular/build-tooling@https://github.com/angular/dev-infra-private-build-tooling-builds.git#8d37c849a06f0d259e0276288e67613fa378b154":
+  version "0.0.0-deec58560a3b4e9d3acf75bbce0ae7f9ab969f98"
+  uid "8d37c849a06f0d259e0276288e67613fa378b154"
+  resolved "https://github.com/angular/dev-infra-private-build-tooling-builds.git#8d37c849a06f0d259e0276288e67613fa378b154"
   dependencies:
     "@angular-devkit/build-angular" "17.0.0"
     "@angular/benchpress" "0.3.0"
@@ -168,7 +170,7 @@
     clang-format "1.8.0"
     highlight.js "^11.8.0"
     html-entities "^2.4.0"
-    marked "^9.1.5"
+    marked "^10.0.0"
     marked-mangle "^1.1.4"
     preact "^10.17.1"
     preact-render-to-string "^6.2.1"
@@ -242,10 +244,10 @@
   dependencies:
     tslib "^2.3.0"
 
-"@angular/localize@17.0.0":
-  version "17.0.0"
-  resolved "https://registry.yarnpkg.com/@angular/localize/-/localize-17.0.0.tgz#bf5e3cdd50e22eda34c991cd0d6b820354969890"
-  integrity sha512-F47b2gDQt4EmrBw+YeDJgkJ4f+D/4MiUZvWQUot+wPJJ8/nRu+90uuQ+4Wv/YOvmIBY4s3J2+NGSEN/7wWiJUw==
+"@angular/localize@17.0.3":
+  version "17.0.3"
+  resolved "https://registry.yarnpkg.com/@angular/localize/-/localize-17.0.3.tgz#3f3c8af2e5ebf82f4874fdd66eeb92fbfb751c0f"
+  integrity sha512-AxMqZwClWNiYjoaHYu2Y499yM30DJDCgrV9k8mOb92SU3IUaQ52loPb91Cb2Xp4h0b6A3TVAmnYApcLYaUf40g==
   dependencies:
     "@babel/core" "7.23.2"
     fast-glob "3.3.1"
@@ -305,9 +307,10 @@
     "@material/typography" "15.0.0-canary.a246a4439.0"
     tslib "^2.3.0"
 
-"@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#9b82bdb8b0e9defac8bc68148c93aee1608399a1":
-  version "0.0.0-ea86ac0778eb6eabb9ba756fe60eaefeccd7a4a9"
-  resolved "https://github.com/angular/dev-infra-private-ng-dev-builds.git#9b82bdb8b0e9defac8bc68148c93aee1608399a1"
+"@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#c4feed03fe52880f5c3c10496e0980bb86545589":
+  version "0.0.0-deec58560a3b4e9d3acf75bbce0ae7f9ab969f98"
+  uid c4feed03fe52880f5c3c10496e0980bb86545589
+  resolved "https://github.com/angular/dev-infra-private-ng-dev-builds.git#c4feed03fe52880f5c3c10496e0980bb86545589"
   dependencies:
     "@yarnpkg/lockfile" "^1.1.0"
     typescript "~4.9.0"
@@ -8973,10 +8976,10 @@ marked-mangle@^1.1.4:
   resolved "https://registry.yarnpkg.com/marked-mangle/-/marked-mangle-1.1.5.tgz#ff1fc4d774eb8362cdc5088a0adbd794ca2b330a"
   integrity sha512-xso3Pn39JrRi4SZ38upu2Gzfqphs3AvM3SeCoCdAnFNopjqhos0DYCqeNNrzWsLBFslRsgYwndeCNuWphKYfGA==
 
-marked@^9.1.5:
-  version "9.1.6"
-  resolved "https://registry.yarnpkg.com/marked/-/marked-9.1.6.tgz#5d2a3f8180abfbc5d62e3258a38a1c19c0381695"
-  integrity sha512-jcByLnIFkd5gSXZmjNvS1TlmRhCXZjIzHYlaGkPlLIekG55JDR2Z4va9tZwCiP+/RDERiNhMOFu01xd6O5ct1Q==
+marked@^10.0.0:
+  version "10.0.0"
+  resolved "https://registry.yarnpkg.com/marked/-/marked-10.0.0.tgz#7fe1805bb908433d760e2de0fcc8841a2b2d745c"
+  integrity sha512-YiGcYcWj50YrwBgNzFoYhQ1hT6GmQbFG8SksnYJX1z4BXTHSOrz1GB5/Jm2yQvMg4nN1FHP4M6r03R10KrVUiA==
 
 media-typer@0.3.0:
   version "0.3.0"
