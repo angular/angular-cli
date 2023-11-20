@@ -165,7 +165,7 @@ def _e2e_suite(name, runner, type, data, toolchain_name = "", toolchain = None):
         data = data,
         toolchain = toolchain,
         shard_count = TEST_SHARD_COUNT,
-        templated_args = [
+        templated_args = args + [
             "--ng-snapshots",
             "--glob=%s" % _to_glob(tests) if tests else "",
             "--ignore=%s" % _to_glob(ignore) if ignore else "",
