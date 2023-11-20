@@ -22,6 +22,7 @@ import { JavaScriptTransformer } from '../../tools/esbuild/javascript-transforme
 import { createRxjsEsmResolutionPlugin } from '../../tools/esbuild/rxjs-esm-resolution-plugin';
 import { getFeatureSupport, transformSupportedBrowsersToTargets } from '../../tools/esbuild/utils';
 import { createAngularLocaleDataPlugin } from '../../tools/vite/i18n-locale-plugin';
+import { normalizeSourceMaps } from '../../utils';
 import { renderPage } from '../../utils/server-rendering/render-page';
 import { getSupportedBrowsers } from '../../utils/supported-browsers';
 import { getIndexOutputFile } from '../../utils/webpack-browser-config';
@@ -103,12 +104,14 @@ export async function* serveWithVite(
     browserOptions.forceI18nFlatOutput = true;
   }
 
+  const { vendor: thirdPartySourcemaps } = normalizeSourceMaps(browserOptions.sourceMap ?? false);
+
   // Setup the prebundling transformer that will be shared across Vite prebundling requests
   const prebundleTransformer = new JavaScriptTransformer(
     // Always enable JIT linking to support applications built with and without AOT.
     // In a development environment the additional scope information does not
     // have a negative effect unlike production where final output size is relevant.
-    { sourcemap: true, jit: true, thirdPartySourcemaps: true },
+    { sourcemap: true, jit: true, thirdPartySourcemaps },
     1,
     true,
   );
@@ -235,6 +238,7 @@ export async function* serveWithVite(
         target,
         extensions?.middleware,
         transformers?.indexHtml,
+        thirdPartySourcemaps,
       );
 
       server = await createServer(serverConfiguration);
@@ -402,6 +406,7 @@ export async function setupServer(
   target: string[],
   extensionMiddleware?: Connect.NextHandleFunction[],
   indexHtmlTransformer?: (content: string) => Promise<string>,
+  thirdPartySourcemaps = false,
 ): Promise<InlineConfig> {
   const proxy = await loadProxyConfiguration(
     serverOptions.workspaceRoot,
@@ -480,6 +485,7 @@ export async function setupServer(
         ssr: true,
         prebundleTransformer,
         target,
+        thirdPartySourcemaps,
       }),
     },
     plugins: [
@@ -735,6 +741,7 @@ export async function setupServer(
       ssr: false,
       prebundleTransformer,
       target,
+      thirdPartySourcemaps,
     }),
   };
 
@@ -802,6 +809,7 @@ function getDepOptimizationConfig({
   target,
   prebundleTransformer,
   ssr,
+  thirdPartySourcemaps,
 }: {
   disabled: boolean;
   exclude: string[];
@@ -809,10 +817,13 @@ function getDepOptimizationConfig({
   target: string[];
   prebundleTransformer: JavaScriptTransformer;
   ssr: boolean;
+  thirdPartySourcemaps: boolean;
 }): DepOptimizationConfig {
   const plugins: ViteEsBuildPlugin[] = [
     {
-      name: `angular-vite-optimize-deps${ssr ? '-ssr' : ''}`,
+      name: `angular-vite-optimize-deps${ssr ? '-ssr' : ''}${
+        thirdPartySourcemaps ? '-vendor-sourcemap' : ''
+      }`,
       setup(build) {
         build.onLoad({ filter: /\.[cm]?js$/ }, async (args) => {
           return {
