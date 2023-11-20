@@ -112,7 +112,8 @@ export class AotCompilation extends AngularCompilation {
         }
 
         return [sourceFile.fileName, ...resourceDependencies];
-      });
+      })
+      .map((file) => host.getCanonicalFileName(file));
 
     this.#state = new AngularCompilationState(
       angularProgram,
@@ -208,7 +209,10 @@ export class AotCompilation extends AngularCompilation {
       }
 
       angularCompiler.incrementalCompilation.recordSuccessfulEmit(sourceFile);
-      emittedFiles.set(sourceFile, { filename: sourceFile.fileName, contents });
+      emittedFiles.set(sourceFile, {
+        filename: compilerHost.getCanonicalFileName(sourceFile.fileName),
+        contents,
+      });
     };
     const transformers = mergeTransformers(angularCompiler.prepareEmit().transformers, {
       before: [

@@ -90,15 +90,19 @@ export class ExecutionResult {
 
   get watchFiles() {
     // Bundler contexts internally normalize file dependencies
-    const files = this.rebuildContexts.flatMap((context) => [...context.watchFiles]);
+    const files = new Set(this.rebuildContexts.flatMap((context) => [...context.watchFiles]));
     if (this.codeBundleCache?.referencedFiles) {
-      // These files originate from TS/NG and can have POSIX path separators even on Windows.
-      // To ensure path comparisons are valid, all these paths must be normalized.
-      files.push(...this.codeBundleCache.referencedFiles.map(normalize));
+      for (const file of this.codeBundleCache.referencedFiles) {
+        // These files originate from TS/NG and can have POSIX path separators even on Windows.
+        // To ensure path comparisons are valid, all these paths must be normalized.
+        files.add(normalize(file));
+      }
     }
     if (this.codeBundleCache?.loadResultCache) {
       // Load result caches internally normalize file dependencies
-      files.push(...this.codeBundleCache.loadResultCache.watchFiles);
+      for (const file of this.codeBundleCache.loadResultCache.watchFiles) {
+        files.add(file);
+      }
     }
 
     return files;

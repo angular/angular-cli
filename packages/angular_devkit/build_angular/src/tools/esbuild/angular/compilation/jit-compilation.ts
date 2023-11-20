@@ -77,7 +77,7 @@ export class JitCompilation extends AngularCompilation {
 
     const referencedFiles = typeScriptProgram
       .getSourceFiles()
-      .map((sourceFile) => sourceFile.fileName);
+      .map((sourceFile) => host.getCanonicalFileName(sourceFile.fileName));
 
     return { affectedFiles, compilerOptions, referencedFiles };
   }
@@ -119,7 +119,10 @@ export class JitCompilation extends AngularCompilation {
 
       assert(sourceFiles?.length === 1, 'Invalid TypeScript program emit for ' + filename);
 
-      emittedFiles.push({ filename: sourceFiles[0].fileName, contents });
+      emittedFiles.push({
+        filename: compilerHost.getCanonicalFileName(sourceFiles[0].fileName),
+        contents,
+      });
     };
     const transformers = {
       before: [

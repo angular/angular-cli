@@ -115,7 +115,7 @@ export async function* runEsBuildBuildAction(
     watcher.add(packageWatchFiles.map((file) => path.join(workspaceRoot, file)));
 
     // Watch locations provided by the initial build result
-    watcher.add(result.watchFiles);
+    watcher.add([...result.watchFiles]);
   }
 
   // Output the first build results after setting up the watcher to ensure that any code executed
