@@ -1,3 +1,17 @@
+<a name="17.0.3"></a>
+
+# 17.0.3 (2023-11-21)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                          |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------------- |
+| [450dd29a1](https://github.com/angular/angular-cli/commit/450dd29a13da9930fede96732b29c9c04e1c0cf5) | fix  | default to watching project root on Windows with application builder |
+| [8072b8574](https://github.com/angular/angular-cli/commit/8072b8574a84a97277e8c83ebbbdde076b79a910) | fix  | ensure service worker hashes index HTML file for application builder |
+| [d99870740](https://github.com/angular/angular-cli/commit/d998707406c7a191a191f71d07a9491481c8ad56) | perf | only create one instance of postcss when needed                      |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="17.0.2"></a>
 
 # 17.0.2 (2023-11-20)
