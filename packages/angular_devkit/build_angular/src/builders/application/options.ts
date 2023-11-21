@@ -83,7 +83,7 @@ export async function normalizeOptions(
   options: ApplicationBuilderInternalOptions,
   plugins?: Plugin[],
 ) {
-  const workspaceRoot = context.workspaceRoot;
+  const workspaceRoot = normalizeDirectoryPath(context.workspaceRoot);
   const projectMetadata = await context.getProjectMetadata(projectName);
   const projectRoot = normalizeDirectoryPath(
     path.join(workspaceRoot, (projectMetadata.root as string | undefined) ?? ''),
@@ -396,14 +396,18 @@ function normalizeEntryPoints(
 
 /**
  * Normalize a directory path string.
- * Currently only removes a trailing slash if present.
+ * * Removes a trailing slash if present
+ * * Ensures all lower case on Windows
  * @param path A path string.
  * @returns A normalized path string.
  */
 function normalizeDirectoryPath(path: string): string {
+  if (process.platform === 'win32') {
+    path = path.toLowerCase();
+  }
   const last = path[path.length - 1];
   if (last === '/' || last === '\\') {
-    return path.slice(0, -1);
+    path = path.slice(0, -1);
   }
 
   return path;
