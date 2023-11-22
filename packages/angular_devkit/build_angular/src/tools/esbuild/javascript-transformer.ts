@@ -72,9 +72,14 @@ export class JavaScriptTransformer {
    * If no transformations are required, the data for the original file will be returned.
    * @param filename The full path to the file.
    * @param skipLinker If true, bypass all Angular linker processing; if false, attempt linking.
+   * @param sideEffects If false, and `advancedOptimizations` is enabled tslib decorators are wrapped.
    * @returns A promise that resolves to a UTF-8 encoded Uint8Array containing the result.
    */
-  transformFile(filename: string, skipLinker?: boolean): Promise<Uint8Array> {
+  transformFile(
+    filename: string,
+    skipLinker?: boolean,
+    sideEffects?: boolean,
+  ): Promise<Uint8Array> {
     const pendingKey = `${!!skipLinker}--${filename}`;
     let pending = this.#pendingfileResults?.get(pendingKey);
     if (pending === undefined) {
@@ -83,6 +88,7 @@ export class JavaScriptTransformer {
       pending = this.#ensureWorkerPool().run({
         filename,
         skipLinker,
+        sideEffects,
         ...this.#commonOptions,
       });
 
@@ -98,9 +104,15 @@ export class JavaScriptTransformer {
    * @param filename The full path of the file represented by the data.
    * @param data The data of the file that should be transformed.
    * @param skipLinker If true, bypass all Angular linker processing; if false, attempt linking.
+   * @param sideEffects If false, and `advancedOptimizations` is enabled tslib decorators are wrapped.
    * @returns A promise that resolves to a UTF-8 encoded Uint8Array containing the result.
    */
-  async transformData(filename: string, data: string, skipLinker: boolean): Promise<Uint8Array> {
+  async transformData(
+    filename: string,
+    data: string,
+    skipLinker: boolean,
+    sideEffects?: boolean,
+  ): Promise<Uint8Array> {
     // Perform a quick test to determine if the data needs any transformations.
     // This allows directly returning the data without the worker communication overhead.
     if (skipLinker && !this.#commonOptions.advancedOptimizations) {
@@ -118,6 +130,7 @@ export class JavaScriptTransformer {
       filename,
       data,
       skipLinker,
+      sideEffects,
       ...this.#commonOptions,
     });
   }

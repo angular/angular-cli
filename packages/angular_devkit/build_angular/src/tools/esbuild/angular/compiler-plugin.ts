@@ -358,10 +358,12 @@ export function createCompilerPlugin(
           };
         } else if (typeof contents === 'string') {
           // A string indicates untransformed output from the TS/NG compiler
+          const sideEffects = await hasSideEffects(request);
           contents = await javascriptTransformer.transformData(
             request,
             contents,
             true /* skipLinker */,
+            sideEffects,
           );
 
           // Store as the returned Uint8Array to allow caching the fully transformed code
@@ -380,9 +382,11 @@ export function createCompilerPlugin(
           return profileAsync(
             'NG_EMIT_JS*',
             async () => {
+              const sideEffects = await hasSideEffects(args.path);
               const contents = await javascriptTransformer.transformFile(
                 args.path,
                 pluginOptions.jit,
+                sideEffects,
               );
 
               return {
@@ -430,6 +434,22 @@ export function createCompilerPlugin(
         void stylesheetBundler.dispose();
         void compilation.close?.();
       });
+
+      /**
+       * Checks if the file has side-effects when `advancedOptimizations` is enabled.
+       */
+      async function hasSideEffects(path: string): Promise<boolean | undefined> {
+        if (!pluginOptions.advancedOptimizations) {
+          return undefined;
+        }
+
+        const { sideEffects } = await build.resolve(path, {
+          kind: 'import-statement',
+          resolveDir: build.initialOptions.absWorkingDir ?? '',
+        });
+
+        return sideEffects;
+      }
     },
   };
 }
