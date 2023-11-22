@@ -8,6 +8,7 @@
 
 import { BuilderContext } from '@angular-devkit/architect';
 import type { Plugin } from 'esbuild';
+import { realpathSync } from 'node:fs';
 import { access, constants } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import path from 'node:path';
@@ -83,7 +84,17 @@ export async function normalizeOptions(
   options: ApplicationBuilderInternalOptions,
   plugins?: Plugin[],
 ) {
-  const workspaceRoot = context.workspaceRoot;
+  // If not explicitly set, default to the Node.js process argument
+  const preserveSymlinks =
+    options.preserveSymlinks ?? process.execArgv.includes('--preserve-symlinks');
+
+  // Setup base paths based on workspace root and project information
+  const workspaceRoot = preserveSymlinks
+    ? context.workspaceRoot
+    : // NOTE: promises.realpath should not be used here since it uses realpath.native which
+      // can cause case conversion and other undesirable behavior on Windows systems.
+      // ref: https://github.com/nodejs/node/issues/7726
+      realpathSync(context.workspaceRoot);
   const projectMetadata = await context.getProjectMetadata(projectName);
   const projectRoot = normalizeDirectoryPath(
     path.join(workspaceRoot, (projectMetadata.root as string | undefined) ?? ''),
@@ -258,7 +269,6 @@ export async function normalizeOptions(
     serviceWorker,
     poll,
     polyfills,
-    preserveSymlinks,
     statsJson,
     stylePreprocessorOptions,
     subresourceIntegrity,
@@ -289,8 +299,7 @@ export async function normalizeOptions(
     poll,
     progress,
     externalPackages,
-    // If not explicitly set, default to the Node.js process argument
-    preserveSymlinks: preserveSymlinks ?? process.execArgv.includes('--preserve-symlinks'),
+    preserveSymlinks,
     stylePreprocessorOptions,
     subresourceIntegrity,
     serverEntryPoint,
