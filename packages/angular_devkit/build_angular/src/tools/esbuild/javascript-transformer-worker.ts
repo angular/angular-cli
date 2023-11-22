@@ -17,7 +17,8 @@ interface JavaScriptTransformRequest {
   sourcemap: boolean;
   thirdPartySourcemaps: boolean;
   advancedOptimizations: boolean;
-  skipLinker: boolean;
+  skipLinker?: boolean;
+  sideEffects?: boolean;
   jit: boolean;
 }
 
@@ -50,11 +51,8 @@ async function transformWithBabel({
     return useInputSourcemap ? data : data.replace(/^\/\/# sourceMappingURL=[^\r\n]*/gm, '');
   }
 
-  // `@angular/platform-server/init` and `@angular/common/locales/global` entry-points are side effectful.
-  const safeAngularPackage =
-    /[\\/]node_modules[\\/]@angular[\\/]/.test(filename) &&
-    !/@angular[\\/]platform-server[\\/]f?esm2022[\\/]init/.test(filename) &&
-    !/@angular[\\/]common[\\/]locales[\\/]global/.test(filename);
+  const sideEffectFree = options.sideEffects === false;
+  const safeAngularPackage = sideEffectFree && /[\\/]node_modules[\\/]@angular[\\/]/.test(filename);
 
   // Lazy load the linker plugin only when linking is required
   if (shouldLink) {
@@ -85,6 +83,7 @@ async function transformWithBabel({
           },
           optimize: options.advancedOptimizations && {
             pureTopLevel: safeAngularPackage,
+            wrapDecorators: sideEffectFree,
           },
         },
       ],
