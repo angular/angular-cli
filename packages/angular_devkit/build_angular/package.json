@@ -86,7 +86,7 @@
     "ng-packagr": "^17.0.0 || ^17.1.0-next.0",
     "protractor": "^7.0.0",
     "tailwindcss": "^2.0.0 || ^3.0.0",
-    "typescript": ">=5.2 <5.3"
+    "typescript": ">=5.2 <5.4"
   },
   "peerDependenciesMeta": {
     "@angular/localize": {

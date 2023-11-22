@@ -4,6 +4,9 @@
 
 ```ts
 
+/// <reference types="@types/node/ts4.8/url" />
+/// <reference types="@types/node/url" />
+
 import { BaseException } from '@angular-devkit/core';
 import { JsonValue } from '@angular-devkit/core';
 import { logging } from '@angular-devkit/core';

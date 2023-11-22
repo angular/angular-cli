@@ -124,8 +124,7 @@
     tslib "^2.3.0"
 
 "@angular/bazel@https://github.com/angular/bazel-builds.git#e5f668bd63521a567998f2614398f53cbae2d227":
-  version "17.1.0-next.1+sha-c62b2da"
-  uid e5f668bd63521a567998f2614398f53cbae2d227
+  version "17.1.0-next.1"
   resolved "https://github.com/angular/bazel-builds.git#e5f668bd63521a567998f2614398f53cbae2d227"
   dependencies:
     "@microsoft/api-extractor" "^7.24.2"
@@ -142,7 +141,6 @@
 
 "@angular/build-tooling@https://github.com/angular/dev-infra-private-build-tooling-builds.git#1cd003b90ea0b96c97e43108f71e35634cfcf686":
   version "0.0.0-8d620dd288dcde4cb2122afb4eddad246ceae780"
-  uid "1cd003b90ea0b96c97e43108f71e35634cfcf686"
   resolved "https://github.com/angular/dev-infra-private-build-tooling-builds.git#1cd003b90ea0b96c97e43108f71e35634cfcf686"
   dependencies:
     "@angular-devkit/build-angular" "17.0.0"
@@ -309,7 +307,6 @@
 
 "@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#24dd667b08a5f512f9ddd262ab9254477b363b71":
   version "0.0.0-8d620dd288dcde4cb2122afb4eddad246ceae780"
-  uid "24dd667b08a5f512f9ddd262ab9254477b363b71"
   resolved "https://github.com/angular/dev-infra-private-ng-dev-builds.git#24dd667b08a5f512f9ddd262ab9254477b363b71"
   dependencies:
     "@yarnpkg/lockfile" "^1.1.0"
@@ -11098,7 +11095,6 @@ sass@1.69.5, sass@^1.69.5:
 
 "sauce-connect-proxy@https://saucelabs.com/downloads/sc-4.9.1-linux.tar.gz":
   version "0.0.0"
-  uid "9310bc860f7870a1f872b11c4dc6073a1ad34e5e"
   resolved "https://saucelabs.com/downloads/sc-4.9.1-linux.tar.gz#9310bc860f7870a1f872b11c4dc6073a1ad34e5e"
 
 saucelabs@^1.5.0:
@@ -12178,6 +12174,11 @@ typescript@5.2.2:
   version "5.2.2"
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-5.2.2.tgz#5ebb5e5a5b75f085f22bc3f8460fba308310fa78"
   integrity sha512-mI4WrpHsbCIcwT9cF4FZvr80QUeKvsUsUvKDoR+X/7XHQH98xYD8YHZg7ANtz2GtZt/CBq2QJ0thkGJMHfqc1w==
+
+typescript@5.3.2:
+  version "5.3.2"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-5.3.2.tgz#00d1c7c1c46928c5845c1ee8d0cc2791031d4c43"
+  integrity sha512-6l+RyNy7oAHDfxC4FzSJcz9vnjTKxrLpDG5M2Vu4SHRVNg6xzqZp6LYSR9zjqQTu8DU/f5xwxUdADOkbrIX2gQ==
 
 typescript@~4.9.0:
   version "4.9.5"
