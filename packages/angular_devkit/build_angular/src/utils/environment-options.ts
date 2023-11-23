@@ -102,7 +102,4 @@ export const debugPerformance = isPresent(debugPerfVariable) && isEnabled(debugP
 
 // Default to true on Windows to workaround Visual Studio atomic file saving watch issues
 const watchRootVariable = process.env['NG_BUILD_WATCH_ROOT'];
-export const shouldWatchRoot =
-  process.platform === 'win32'
-    ? !isPresent(watchRootVariable) || !isDisabled(watchRootVariable)
-    : isPresent(watchRootVariable) && isEnabled(watchRootVariable);
+export const shouldWatchRoot = isPresent(watchRootVariable) && isEnabled(watchRootVariable);
