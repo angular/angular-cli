@@ -322,7 +322,7 @@ function handleUpdate(
         }),
       });
 
-      logger.info('HMR update sent to client(s)...');
+      logger.info('HMR update sent to client(s).');
 
       return;
     }
@@ -330,12 +330,12 @@ function handleUpdate(
 
   // Send reload command to clients
   if (serverOptions.liveReload) {
-    logger.info('Reloading client(s)...');
-
     server.ws.send({
       type: 'full-reload',
       path: '*',
     });
+
+    logger.info('Page reload sent to client(s).');
   }
 }
 
