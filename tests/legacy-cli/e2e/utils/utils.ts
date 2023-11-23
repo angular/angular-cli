@@ -18,12 +18,6 @@ export function expectToFail(fn: () => Promise<any>, errorMessage?: string): Pro
   );
 }
 
-export function wait(msecs: number): Promise<void> {
-  return new Promise((resolve) => {
-    setTimeout(resolve, msecs);
-  });
-}
-
 export async function mktempd(prefix: string, tempRoot?: string): Promise<string> {
   return realpath(await mkdtemp(path.join(tempRoot ?? tmpdir(), prefix)));
 }

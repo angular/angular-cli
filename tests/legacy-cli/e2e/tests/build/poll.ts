@@ -1,8 +1,9 @@
+import { setTimeout } from 'node:timers/promises';
 import { getGlobalVariable } from '../../utils/env';
 import { appendToFile } from '../../utils/fs';
 import { waitForAnyProcessOutputToMatch } from '../../utils/process';
 import { ngServe } from '../../utils/project';
-import { expectToFail, wait } from '../../utils/utils';
+import { expectToFail } from '../../utils/utils';
 
 const webpackGoodRegEx = getGlobalVariable('argv')['esbuild']
   ? /Application bundle generation complete\./
@@ -13,7 +14,7 @@ export default async function () {
 
   // Wait before editing a file.
   // Editing too soon seems to trigger a rebuild and throw polling out of whack.
-  await wait(3000);
+  await setTimeout(3000);
   await appendToFile('src/main.ts', 'console.log(1);');
 
   // We have to wait poll time + rebuild build time for the regex match.
