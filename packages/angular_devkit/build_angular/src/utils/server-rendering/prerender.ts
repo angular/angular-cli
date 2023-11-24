@@ -206,8 +206,6 @@ async function renderPages(
 
     await Promise.all(renderingPromises);
   } finally {
-    // Workaround piscina bug where a worker thread will be recreated after destroy to meet the minimum.
-    renderWorker.options.minThreads = 0;
     void renderWorker.destroy();
   }
 
@@ -268,8 +266,6 @@ async function getAllRoutes(
   const { routes: extractedRoutes, warnings }: RoutersExtractorWorkerResult = await renderWorker
     .run({})
     .finally(() => {
-      // Workaround piscina bug where a worker thread will be recreated after destroy to meet the minimum.
-      renderWorker.options.minThreads = 0;
       void renderWorker.destroy();
     });
 

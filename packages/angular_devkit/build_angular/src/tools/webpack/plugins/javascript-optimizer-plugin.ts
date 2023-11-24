@@ -231,8 +231,6 @@ export class JavaScriptOptimizerPlugin {
 
             await Promise.all(tasks);
           } finally {
-            // Workaround piscina bug where a worker thread will be recreated after destroy to meet the minimum.
-            workerPool.options.minThreads = 0;
             void workerPool.destroy();
           }
 
