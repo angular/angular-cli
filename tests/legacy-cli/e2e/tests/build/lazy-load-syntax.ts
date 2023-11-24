@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-
+import { setTimeout } from 'node:timers/promises';
 import { replaceInFile, writeFile } from '../../utils/fs';
 import { ng } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';
@@ -54,5 +54,6 @@ export default async function () {
   });
 
   await ng('e2e');
+  await setTimeout(500);
   await ng('e2e', '--configuration=production');
 }
