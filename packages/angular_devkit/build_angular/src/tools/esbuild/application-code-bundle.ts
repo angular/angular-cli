@@ -398,20 +398,6 @@ function getEsBuildCommonPolyfillsOptions(
   // Locale data should go first so that project provided polyfill code can augment if needed.
   let needLocaleDataPlugin = false;
   if (i18nOptions.shouldInline) {
-    // When inlining, a placeholder is used to allow the post-processing step to inject the $localize locale identifier
-    polyfills.unshift('angular:locale/placeholder');
-    buildOptions.plugins?.push(
-      createVirtualModulePlugin({
-        namespace: 'angular:locale/placeholder',
-        entryPointOnly: false,
-        loadContent: () => ({
-          contents: `(globalThis.$localize ??= {}).locale = "___NG_LOCALE_INSERT___";\n`,
-          loader: 'js',
-          resolveDir: workspaceRoot,
-        }),
-      }),
-    );
-
     // Add locale data for all active locales
     // TODO: Inject each individually within the inlining process itself
     for (const locale of i18nOptions.inlineLocales) {
@@ -476,8 +462,12 @@ function getEsBuildCommonPolyfillsOptions(
           .map((file) => `import '${file.replace(/\\/g, '/')}';`)
           .join('\n');
 
-        // If not inlining translations and source locale is defined, inject the locale specifier
-        if (!i18nOptions.shouldInline && i18nOptions.hasDefinedSourceLocale) {
+        // The below should be done after loading `$localize` as otherwise the locale will be overridden.
+        if (i18nOptions.shouldInline) {
+          // When inlining, a placeholder is used to allow the post-processing step to inject the $localize locale identifier.
+          contents += '(globalThis.$localize ??= {}).locale = "___NG_LOCALE_INSERT___";\n';
+        } else if (i18nOptions.hasDefinedSourceLocale) {
+          // If not inlining translations and source locale is defined, inject the locale specifier.
           contents += `(globalThis.$localize ??= {}).locale = "${i18nOptions.sourceLocale}";\n`;
         }
 
