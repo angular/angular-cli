@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import assert from 'node:assert';
 import Piscina from 'piscina';
 import { BuildOutputFile, BuildOutputFileType } from './bundler-context';
 import { createOutputFileFromText } from './utils';
@@ -110,7 +111,7 @@ export class I18nInliner {
   async inlineForLocale(
     locale: string,
     translation: Record<string, unknown> | undefined,
-  ): Promise<BuildOutputFile[]> {
+  ): Promise<{ outputFiles: BuildOutputFile[]; errors: string[]; warnings: string[] }> {
     // Request inlining for each file that contains localize calls
     const requests = [];
     for (const filename of this.#localizeFiles.keys()) {
@@ -130,13 +131,36 @@ export class I18nInliner {
     const rawResults = await Promise.all(requests);
 
     // Convert raw results to output file objects and include all unmodified files
-    return [
-      ...rawResults.flat().map(({ file, contents }) =>
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        createOutputFileFromText(file, contents, this.#fileToType.get(file)!),
-      ),
+    const errors: string[] = [];
+    const warnings: string[] = [];
+    const outputFiles = [
+      ...rawResults.flatMap(({ file, code, map, messages }) => {
+        const type = this.#fileToType.get(file);
+        assert(type !== undefined, 'localized file should always have a type' + file);
+
+        const resultFiles = [createOutputFileFromText(file, code, type)];
+        if (map) {
+          resultFiles.push(createOutputFileFromText(file + '.map', map, type));
+        }
+
+        for (const message of messages) {
+          if (message.type === 'error') {
+            errors.push(message.message);
+          } else {
+            warnings.push(message.message);
+          }
+        }
+
+        return resultFiles;
+      }),
       ...this.#unmodifiedFiles.map((file) => file.clone()),
     ];
+
+    return {
+      outputFiles,
+      errors,
+      warnings,
+    };
   }
 
   /**

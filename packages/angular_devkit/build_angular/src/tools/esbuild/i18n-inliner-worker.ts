@@ -60,14 +60,12 @@ export default async function inlineLocale(request: InlineRequest) {
     request,
   );
 
-  // TODO: Return diagnostics
-  // TODO: Consider buffer transfer instead of string copying
-  const response = [{ file: request.filename, contents: result.code }];
-  if (result.map) {
-    response.push({ file: request.filename + '.map', contents: result.map });
-  }
-
-  return response;
+  return {
+    file: request.filename,
+    code: result.code,
+    map: result.map,
+    messages: result.diagnostics.messages,
+  };
 }
 
 /**
