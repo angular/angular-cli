@@ -52,10 +52,13 @@ export async function inlineI18n(
   try {
     for (const locale of options.i18nOptions.inlineLocales) {
       // A locale specific set of files is returned from the inliner.
-      const localeOutputFiles = await inliner.inlineForLocale(
+      const localeInlineResult = await inliner.inlineForLocale(
         locale,
         options.i18nOptions.locales[locale].translation,
       );
+      const localeOutputFiles = localeInlineResult.outputFiles;
+      inlineResult.errors.push(...localeInlineResult.errors);
+      inlineResult.warnings.push(...localeInlineResult.warnings);
 
       const baseHref =
         getLocaleBaseHref(options.baseHref, options.i18nOptions, locale) ?? options.baseHref;
