@@ -18,7 +18,9 @@ describeServeBuilder(
   (harness, setupTarget, isViteRun) => {
     describe('option: "servePath"', () => {
       beforeEach(async () => {
-        setupTarget(harness);
+        setupTarget(harness, {
+          assets: ['src/assets'],
+        });
 
         // Application code is not needed for these tests
         await harness.writeFile('src/main.ts', 'console.log("foo");');
@@ -95,6 +97,23 @@ describeServeBuilder(
 
         expect(result?.success).toBeTrue();
         expect(await response?.text()).toContain('<title>');
+      });
+
+      it('serves assets at specified path when option is used', async () => {
+        await harness.writeFile('src/assets/test.txt', 'hello world!');
+
+        harness.useTarget('serve', {
+          ...BASE_OPTIONS,
+          servePath: 'test',
+        });
+
+        const { result, response } = await executeOnceAndFetch(harness, '/test/assets/test.txt', {
+          // fallback processing requires an accept header
+          request: { headers: { accept: 'text/html' } },
+        });
+
+        expect(result?.success).toBeTrue();
+        expect(await response?.text()).toContain('hello world');
       });
     });
   },
