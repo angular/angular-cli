@@ -182,7 +182,7 @@ export default function (options: ServerOptions): Rule {
       context.addTask(new NodePackageInstallTask());
     }
     const clientBuildOptions = clientBuildTarget.options as Record<string, string>;
-    const browserEntryPoint = await getMainFilePath(host, options.project);
+    const browserEntryPoint = await getMainFilePath(host, options.project, context.interactive);
     const isStandalone = isStandaloneApp(host, browserEntryPoint);
 
     const templateSource = apply(url(isStandalone ? './files/standalone-src' : './files/src'), [

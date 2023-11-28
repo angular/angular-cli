@@ -397,8 +397,8 @@ function addStandaloneServerRoute(options: AppShellOptions): Rule {
 }
 
 export default function (options: AppShellOptions): Rule {
-  return async (tree) => {
-    const browserEntryPoint = await getMainFilePath(tree, options.project);
+  return async (tree, { interactive }) => {
+    const browserEntryPoint = await getMainFilePath(tree, options.project, interactive);
     const isStandalone = isStandaloneApp(tree, browserEntryPoint);
 
     return chain([

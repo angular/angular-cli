@@ -82,8 +82,8 @@ function getRootInsertionRule(
   ngModuleField: string,
   standaloneWrapperFunction?: { name: string; module: string },
 ): Rule {
-  return async (host) => {
-    const mainFilePath = await getMainFilePath(host, project);
+  return async (host, { interactive }) => {
+    const mainFilePath = await getMainFilePath(host, project, interactive);
     const codeBlock = new CodeBlock();
 
     if (isStandaloneApp(host, mainFilePath)) {

@@ -260,8 +260,8 @@ function addServerFile(options: ServerOptions, isStandalone: boolean): Rule {
 }
 
 export default function (options: SSROptions): Rule {
-  return async (host) => {
-    const browserEntryPoint = await getMainFilePath(host, options.project);
+  return async (host, context) => {
+    const browserEntryPoint = await getMainFilePath(host, options.project, context.interactive);
     const isStandalone = isStandaloneApp(host, browserEntryPoint);
 
     const workspace = await getWorkspace(host);

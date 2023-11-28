@@ -12,24 +12,54 @@ import { Change, applyToUpdateRecorder } from '../change';
 import { targetBuildNotFoundError } from '../project-targets';
 import { getWorkspace } from '../workspace';
 import { Builders } from '../workspace-models';
+import { askQuestion } from "@angular/cli/src/utilities/prompt";
 
 /**
  * Finds the main file of a project.
  * @param tree File tree for the project.
  * @param projectName Name of the project in which to search.
+ * @param interactive Whether to ask the user to select a build target if we can't find one under the name "build".
  */
-export async function getMainFilePath(tree: Tree, projectName: string): Promise<string> {
+export async function getMainFilePath(tree: Tree, projectName: string, interactive = false): Promise<string> {
   const workspace = await getWorkspace(tree);
   const project = workspace.projects.get(projectName);
-  const buildTarget = project?.targets.get('build');
-
-  if (!buildTarget) {
+  if (!project) {
+    throw new SchematicsException(`Could not find project "${projectName}" in workspace`);
+  }
+  let buildTarget = project.targets.get('build');
+  if (!buildTarget && !interactive) {
     throw targetBuildNotFoundError();
   }
+  if (!buildTarget) {
+    const projectTargets = Array.from(project?.targets.keys() || []).map((name) => {
+      return {
+        name,
+        value: name
+      }
+    });
+    if (projectTargets.length === 0) {
+      throw targetBuildNotFoundError();
+    }
+    const targetName = await askQuestion(
+      `Please select your project's build target`,
+      projectTargets,
+      0,
+      null
+    );
+    buildTarget = project.targets.get(targetName || '');
 
+    if (!targetName || !buildTarget) {
+      throw targetBuildNotFoundError();
+    }
+  }
   const options = buildTarget.options as Record<string, string>;
 
-  return buildTarget.builder === Builders.Application ? options.browser : options.main;
+  const mainFilePath = buildTarget.builder === Builders.Application ? options.browser : options.main;
+
+  if (!mainFilePath || !tree.exists(mainFilePath)) {
+    throw new SchematicsException(`Could not find the main file of the project.`);
+  }
+  return mainFilePath;
 }
 
 /**
