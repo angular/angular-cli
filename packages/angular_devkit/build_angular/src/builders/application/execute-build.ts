@@ -192,6 +192,7 @@ export async function executeBuild(
 
   // Analyze files for bundle budget failures if present
   let budgetFailures: BudgetCalculatorResult[] | undefined;
+  let hasBudgetErrors = false;
   if (options.budgets) {
     const compatStats = generateBudgetStats(metafile, initialFiles);
     budgetFailures = [...checkBudgets(options.budgets, compatStats, true)];
@@ -202,6 +203,7 @@ export async function executeBuild(
       const warnings = budgetFailures
         .filter((failure) => failure.severity !== 'error')
         .map(({ message }) => message);
+      hasBudgetErrors = errors.length > 0;
 
       await printWarningsAndErrorsToConsoleAndAddToResult(
         context,
@@ -285,14 +287,16 @@ export async function executeBuild(
     context.logger.info(colors.magenta(prerenderMsg) + '\n');
   }
 
-  logBuildStats(
-    context,
-    metafile,
-    initialFiles,
-    budgetFailures,
-    changedFiles,
-    estimatedTransferSizes,
-  );
+  if (!hasBudgetErrors) {
+    logBuildStats(
+      context,
+      metafile,
+      initialFiles,
+      budgetFailures,
+      changedFiles,
+      estimatedTransferSizes,
+    );
+  }
 
   // Write metafile if stats option is enabled
   if (options.stats) {
