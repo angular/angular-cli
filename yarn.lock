@@ -123,10 +123,10 @@
   dependencies:
     tslib "^2.3.0"
 
-"@angular/bazel@https://github.com/angular/bazel-builds.git#e5f668bd63521a567998f2614398f53cbae2d227":
-  version "17.1.0-next.1+sha-c62b2da"
-  uid e5f668bd63521a567998f2614398f53cbae2d227
-  resolved "https://github.com/angular/bazel-builds.git#e5f668bd63521a567998f2614398f53cbae2d227"
+"@angular/bazel@https://github.com/angular/bazel-builds.git#18fe69c8d9558564187fbea2d47acaac34af3ec9":
+  version "17.1.0-next.1+sha-e3dbadd"
+  uid "18fe69c8d9558564187fbea2d47acaac34af3ec9"
+  resolved "https://github.com/angular/bazel-builds.git#18fe69c8d9558564187fbea2d47acaac34af3ec9"
   dependencies:
     "@microsoft/api-extractor" "^7.24.2"
     magic-string "^0.30.0"
@@ -140,10 +140,10 @@
     "@angular/core" "^13.0.0 || ^14.0.0-0"
     reflect-metadata "^0.1.13"
 
-"@angular/build-tooling@https://github.com/angular/dev-infra-private-build-tooling-builds.git#1cd003b90ea0b96c97e43108f71e35634cfcf686":
-  version "0.0.0-8d620dd288dcde4cb2122afb4eddad246ceae780"
-  uid "1cd003b90ea0b96c97e43108f71e35634cfcf686"
-  resolved "https://github.com/angular/dev-infra-private-build-tooling-builds.git#1cd003b90ea0b96c97e43108f71e35634cfcf686"
+"@angular/build-tooling@https://github.com/angular/dev-infra-private-build-tooling-builds.git#39de01a4b72a744a86f1062872a2822a609fe975":
+  version "0.0.0-f00131a6ab074797904b905c6a7637af1ce7ce80"
+  uid "39de01a4b72a744a86f1062872a2822a609fe975"
+  resolved "https://github.com/angular/dev-infra-private-build-tooling-builds.git#39de01a4b72a744a86f1062872a2822a609fe975"
   dependencies:
     "@angular-devkit/build-angular" "17.0.0"
     "@angular/benchpress" "0.3.0"
@@ -157,14 +157,14 @@
     "@bazel/runfiles" "5.8.1"
     "@bazel/terser" "5.8.1"
     "@bazel/typescript" "5.8.1"
-    "@microsoft/api-extractor" "7.38.2"
+    "@microsoft/api-extractor" "7.38.3"
     "@types/browser-sync" "^2.26.3"
     "@types/node" "16.10.9"
     "@types/selenium-webdriver" "^4.0.18"
     "@types/send" "^0.17.1"
     "@types/tmp" "^0.2.1"
     "@types/uuid" "^9.0.0"
-    "@types/ws" "8.5.8"
+    "@types/ws" "8.5.10"
     "@types/yargs" "^17.0.0"
     browser-sync "^2.27.7"
     clang-format "1.8.0"
@@ -174,7 +174,7 @@
     marked-mangle "^1.1.4"
     preact "^10.17.1"
     preact-render-to-string "^6.2.1"
-    prettier "3.0.3"
+    prettier "3.1.0"
     protractor "^7.0.0"
     selenium-webdriver "4.15.0"
     send "^0.18.0"
@@ -182,7 +182,7 @@
     tmp "^0.2.1"
     "true-case-path" "^2.2.1"
     tslib "^2.5.2"
-    typescript "5.2.2"
+    typescript "5.3.2"
     uuid "^9.0.0"
     yargs "^17.0.0"
 
@@ -307,10 +307,10 @@
     "@material/typography" "15.0.0-canary.a246a4439.0"
     tslib "^2.3.0"
 
-"@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#24dd667b08a5f512f9ddd262ab9254477b363b71":
-  version "0.0.0-8d620dd288dcde4cb2122afb4eddad246ceae780"
-  uid "24dd667b08a5f512f9ddd262ab9254477b363b71"
-  resolved "https://github.com/angular/dev-infra-private-ng-dev-builds.git#24dd667b08a5f512f9ddd262ab9254477b363b71"
+"@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#581fbc0546738cf4e0ded85d2ba307ba20b781cc":
+  version "0.0.0-f00131a6ab074797904b905c6a7637af1ce7ce80"
+  uid "581fbc0546738cf4e0ded85d2ba307ba20b781cc"
+  resolved "https://github.com/angular/dev-infra-private-ng-dev-builds.git#581fbc0546738cf4e0ded85d2ba307ba20b781cc"
   dependencies:
     "@yarnpkg/lockfile" "^1.1.0"
     typescript "~4.9.0"
@@ -2756,25 +2756,7 @@
     "@microsoft/tsdoc-config" "~0.16.1"
     "@rushstack/node-core-library" "3.61.0"
 
-"@microsoft/api-extractor@7.38.2":
-  version "7.38.2"
-  resolved "https://registry.yarnpkg.com/@microsoft/api-extractor/-/api-extractor-7.38.2.tgz#fbc329fbec2b27a160507d08d02b78018fd142ac"
-  integrity sha512-JOARuhTwOcOMIU0O2czscoJy3ddVzIRhSA9/7T1ALuZSNphgWsPk+Bv4E7AnBDmTV4pP4lBNLtCxEHjjpWaytQ==
-  dependencies:
-    "@microsoft/api-extractor-model" "7.28.2"
-    "@microsoft/tsdoc" "0.14.2"
-    "@microsoft/tsdoc-config" "~0.16.1"
-    "@rushstack/node-core-library" "3.61.0"
-    "@rushstack/rig-package" "0.5.1"
-    "@rushstack/ts-command-line" "4.17.1"
-    colors "~1.2.1"
-    lodash "~4.17.15"
-    resolve "~1.22.1"
-    semver "~7.5.4"
-    source-map "~0.6.1"
-    typescript "~5.0.4"
-
-"@microsoft/api-extractor@^7.24.2":
+"@microsoft/api-extractor@7.38.3", "@microsoft/api-extractor@^7.24.2":
   version "7.38.3"
   resolved "https://registry.yarnpkg.com/@microsoft/api-extractor/-/api-extractor-7.38.3.tgz#2b0157d166c1a23642e22d139c7b7b39ad6340fd"
   integrity sha512-xt9iYyC5f39281j77JTA9C3ISJpW1XWkCcnw+2vM78CPnro6KhPfwQdPDfwS5JCPNuq0grm8cMdPUOPvrchDWw==
@@ -3873,17 +3855,10 @@
     anymatch "^3.0.0"
     source-map "^0.6.0"
 
-"@types/ws@*", "@types/ws@^8.5.5":
+"@types/ws@*", "@types/ws@8.5.10", "@types/ws@^8.5.5":
   version "8.5.10"
   resolved "https://registry.yarnpkg.com/@types/ws/-/ws-8.5.10.tgz#4acfb517970853fa6574a3a6886791d04a396787"
   integrity sha512-vmQSUcfalpIq0R9q7uTo2lXs6eGIpt9wtnLdMv9LVpIjCA/+ufZRozlVoVelIYixx1ugCBKDhn89vnsEGOCx9A==
-  dependencies:
-    "@types/node" "*"
-
-"@types/ws@8.5.8":
-  version "8.5.8"
-  resolved "https://registry.yarnpkg.com/@types/ws/-/ws-8.5.8.tgz#13efec7bd439d0bdf2af93030804a94f163b1430"
-  integrity sha512-flUksGIQCnJd6sZ1l5dqCEG/ksaoAg/eUwiLAGTJQcfgvZJKF++Ta4bJA6A5aPSJmsr+xlseHn4KLgVlNnvPTg==
   dependencies:
     "@types/node" "*"
 
@@ -10367,12 +10342,7 @@ prelude-ls@^1.2.1:
   resolved "https://registry.yarnpkg.com/prelude-ls/-/prelude-ls-1.2.1.tgz#debc6489d7a6e6b0e7611888cec880337d316396"
   integrity sha512-vkcDPrRZo1QZLbn5RLGPpg/WmIQ65qoWWhcGKf/b5eplkkarX0m9z8ppCat4mlOqUsWpyNuYgO3VRyrYHSzX5g==
 
-prettier@3.0.3:
-  version "3.0.3"
-  resolved "https://registry.yarnpkg.com/prettier/-/prettier-3.0.3.tgz#432a51f7ba422d1469096c0fdc28e235db8f9643"
-  integrity sha512-L/4pUDMxcNa8R/EthV08Zt42WBO4h1rarVtK0K+QJG0X187OLo7l699jWw0GKuwzkPQ//jMFA/8Xm6Fh3J/DAg==
-
-prettier@^3.0.0:
+prettier@3.1.0, prettier@^3.0.0:
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/prettier/-/prettier-3.1.0.tgz#c6d16474a5f764ea1a4a373c593b779697744d5e"
   integrity sha512-TQLvXjq5IAibjh8EpBIkNKxO749UEWABoiIZehEPiY4GNpVdhaFKqSTu+QrlU6D2dPAfubRmtJTi4K4YkQ5eXw==
@@ -12181,11 +12151,6 @@ typed-assert@^1.0.8:
   version "1.0.9"
   resolved "https://registry.yarnpkg.com/typed-assert/-/typed-assert-1.0.9.tgz#8af9d4f93432c4970ec717e3006f33f135b06213"
   integrity sha512-KNNZtayBCtmnNmbo5mG47p1XsCyrx6iVqomjcZnec/1Y5GGARaxPs6r49RnSPeUP3YjNYiU9sQHAtY4BBvnZwg==
-
-typescript@5.2.2:
-  version "5.2.2"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-5.2.2.tgz#5ebb5e5a5b75f085f22bc3f8460fba308310fa78"
-  integrity sha512-mI4WrpHsbCIcwT9cF4FZvr80QUeKvsUsUvKDoR+X/7XHQH98xYD8YHZg7ANtz2GtZt/CBq2QJ0thkGJMHfqc1w==
 
 typescript@5.3.2:
   version "5.3.2"
