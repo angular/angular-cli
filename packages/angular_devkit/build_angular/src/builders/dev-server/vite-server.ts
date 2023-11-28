@@ -270,6 +270,22 @@ export async function* serveWithVite(
 
       // log connection information
       server.printUrls();
+
+      server.bindCLIShortcuts({
+        print: true,
+        customShortcuts: [
+          {
+            key: 'r',
+            description: 'force reload browser',
+            action(server) {
+              server.ws.send({
+                type: 'full-reload',
+                path: '*',
+              });
+            },
+          },
+        ],
+      });
     }
 
     // TODO: adjust output typings to reflect both development servers
