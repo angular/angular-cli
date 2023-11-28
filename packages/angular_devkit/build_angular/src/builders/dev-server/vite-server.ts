@@ -439,6 +439,7 @@ export async function setupServer(
     css: {
       devSourcemap: true,
     },
+    // Vite will normalize the `base` option by adding a leading and trailing forward slash.
     base: serverOptions.servePath,
     resolve: {
       mainFields: ['es2020', 'browser', 'module', 'main'],
@@ -568,7 +569,7 @@ export async function setupServer(
 
             // Parse the incoming request.
             // The base of the URL is unused but required to parse the URL.
-            const pathname = pathnameWithoutServePath(req.url, serverOptions);
+            const pathname = pathnameWithoutBasePath(req.url, server.config.base);
             const extension = extname(pathname);
 
             // Rewrite all build assets to a vite raw fs URL
@@ -576,7 +577,7 @@ export async function setupServer(
             if (assetSourcePath !== undefined) {
               // The encoding needs to match what happens in the vite static middleware.
               // ref: https://github.com/vitejs/vite/blob/d4f13bd81468961c8c926438e815ab6b1c82735e/packages/vite/src/node/server/middlewares/static.ts#L163
-              req.url = `/@fs/${encodeURI(assetSourcePath)}`;
+              req.url = `${server.config.base}@fs/${encodeURI(assetSourcePath)}`;
               next();
 
               return;
@@ -674,7 +675,7 @@ export async function setupServer(
 
               // Parse the incoming request.
               // The base of the URL is unused but required to parse the URL.
-              const pathname = pathnameWithoutServePath(req.url, serverOptions);
+              const pathname = pathnameWithoutBasePath(req.url, server.config.base);
 
               if (pathname === '/' || pathname === `/index.html`) {
                 const rawHtml = outputFiles.get('/index.html')?.contents;
@@ -785,17 +786,14 @@ async function loadViteClientCode(file: string) {
   return contents;
 }
 
-function pathnameWithoutServePath(url: string, serverOptions: NormalizedDevServerOptions): string {
+function pathnameWithoutBasePath(url: string, basePath: string): string {
   const parsedUrl = new URL(url, 'http://localhost');
-  let pathname = decodeURIComponent(parsedUrl.pathname);
-  if (serverOptions.servePath && pathname.startsWith(serverOptions.servePath)) {
-    pathname = pathname.slice(serverOptions.servePath.length);
-    if (pathname[0] !== '/') {
-      pathname = '/' + pathname;
-    }
-  }
+  const pathname = decodeURIComponent(parsedUrl.pathname);
 
-  return pathname;
+  // slice(basePath.length - 1) to retain the trailing slash
+  return basePath !== '/' && pathname.startsWith(basePath)
+    ? pathname.slice(basePath.length - 1)
+    : pathname;
 }
 
 type ViteEsBuildPlugin = NonNullable<
