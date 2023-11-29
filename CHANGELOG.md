@@ -1,3 +1,19 @@
+<a name="17.1.0-next.0"></a>
+
+# 17.1.0-next.0 (2023-11-29)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                                 |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------------------------- |
+| [e0b274b8f](https://github.com/angular/angular-cli/commit/e0b274b8ff4d164061ca7b60248bb85ceee8f65d) | feat | add option to retain CSS special comments in global styles                  |
+| [4784155bd](https://github.com/angular/angular-cli/commit/4784155bd62cfac9b29327167093e70c9c6bee41) | feat | add wildcard option for `allowedCommonJsDependencies`                       |
+| [3b93df42d](https://github.com/angular/angular-cli/commit/3b93df42daf9eda9215ea65d8ed0efd1ef203a09) | feat | allow configuring loaders for custom file extensions in application builder |
+| [ccba849e4](https://github.com/angular/angular-cli/commit/ccba849e48287805bd8253a03f88d5f44b2b23ae) | feat | support keyboard command shortcuts in application dev server                |
+| [6473b0160](https://github.com/angular/angular-cli/commit/6473b01603b55d265489840cbf32697ad663aeeb) | fix  | ensure all configured assets can be served by dev server                    |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="17.0.4"></a>
 
 # 17.0.4 (2023-11-29)
