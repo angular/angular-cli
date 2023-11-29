@@ -12,7 +12,7 @@ export default async function () {
   try {
     // We need to use the public registry because in the local NPM server we don't have
     // older versions @angular/cli packages which would cause `npm install` during `ng update` to fail.
-    restoreRegistry = await createProjectFromAsset('14.0-project', true);
+    restoreRegistry = await createProjectFromAsset('15.0-project', true);
 
     // If using npm, enable legacy peer deps mode to avoid defects in npm 7+'s peer dependency resolution
     // Example error where 11.2.14 satisfies the SemVer range ^11.0.0 but still fails:
@@ -57,7 +57,7 @@ export default async function () {
   const extraUpdateArgs = isPrereleaseCli() ? ['--next', '--force'] : [];
 
   // Generate e2e test prior to `ng update` as the asserted content changed in v17.
-  await ng('generate', 'e2e', '--related-app-name=fourteen-project');
+  await ng('generate', 'e2e', '--related-app-name=fifteen-project');
 
   // For the latest/next release we purposely don't run `ng update @angular/core`.
 
@@ -75,12 +75,12 @@ export default async function () {
   await ng('update', '@angular/cli', ...extraUpdateArgs);
 
   // Setup testing to use CI Chrome.
-  await useCIChrome('fourteen-project', './');
-  await useCIChrome('fourteen-project', './e2e/');
-  await useCIDefaults('fourteen-project');
+  await useCIChrome('fifteen-project', './');
+  await useCIChrome('fifteen-project', './e2e/');
+  await useCIDefaults('fifteen-project');
 
   // Run CLI commands.
-  await ng('generate', 'component', 'my-comp');
+  await ng('generate', 'component', 'my-comp', '--no-standalone');
   await ng('test', '--watch=false');
 
   await ng('e2e');
@@ -88,5 +88,5 @@ export default async function () {
 
   // Verify project now creates bundles
   await noSilentNg('build', '--configuration=production');
-  await expectFileMatchToExist('dist/fourteen-project/', /main\.[0-9a-f]{16}\.js/);
+  await expectFileMatchToExist('dist/fifteen-project/', /main\.[0-9a-f]{16}\.js/);
 }
