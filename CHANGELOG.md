@@ -1,3 +1,28 @@
+<a name="17.0.4"></a>
+
+# 17.0.4 (2023-11-29)
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                           |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------- |
+| [7a2823080](https://github.com/angular/angular-cli/commit/7a2823080c61df3515d85f7aa35ee83f57e80e2d) | fix  | remove CommonModule import from standalone components |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                             |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------------- |
+| [0634a4e40](https://github.com/angular/angular-cli/commit/0634a4e40f1b2e4c0a076814f3e1b242ccf1a588) | fix  | avoid native realpath in application builder                            |
+| [22880d9cb](https://github.com/angular/angular-cli/commit/22880d9cbf70fffb6cc685b3a9ad82ca741a56fe) | fix  | correct set locale when using esbuild based builders                    |
+| [a0680672f](https://github.com/angular/angular-cli/commit/a0680672fd369dc6fba2433441d086e53bebb0a2) | fix  | correctly watch files when app is in a directory that starts with a dot |
+| [bbbe13d67](https://github.com/angular/angular-cli/commit/bbbe13d6782ba9d1b80473a98ea95bc301c48597) | fix  | improve file watching on Windows when using certain IDEs                |
+| [27e7c2e1b](https://github.com/angular/angular-cli/commit/27e7c2e1b4f514843c2c505b7fe1b3cef126a101) | fix  | propagate localize errors to full build result                          |
+| [7455fdca0](https://github.com/angular/angular-cli/commit/7455fdca01bd4af00248bb1769945dc088c59063) | fix  | serve assets from the provided `serve-path`                             |
+| [657a07bd6](https://github.com/angular/angular-cli/commit/657a07bd6ba138a209c2a1540ea4d200c60e0f66) | fix  | treeshake unused class that use custom decorators                       |
+| [77474951b](https://github.com/angular/angular-cli/commit/77474951b59605a2c36a8bd890376f9e28131ee4) | fix  | use workspace real path when not preserving symlinks                    |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="17.0.3"></a>
 
 # 17.0.3 (2023-11-21)
