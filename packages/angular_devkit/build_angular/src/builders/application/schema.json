@@ -162,6 +162,11 @@
                       "type": "boolean",
                       "description": "Extract and inline critical CSS definitions to improve first paint time.",
                       "default": true
+                    },
+                    "removeSpecialComments": {
+                      "type": "boolean",
+                      "description": "Remove comments in global CSS that contains '@license' or '@preserve' or that starts with '//!' or '/*!'.",
+                      "default": true
                     }
                   },
                   "additionalProperties": false
