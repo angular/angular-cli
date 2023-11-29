@@ -7,7 +7,6 @@
  */
 
 import { FSWatcher } from 'chokidar';
-import { normalize } from 'node:path';
 
 export class ChangedFiles {
   readonly added = new Set<string>();
@@ -52,65 +51,19 @@ export function createWatcher(options?: {
   let currentChanges: ChangedFiles | undefined;
   let nextWaitTimeout: NodeJS.Timeout | undefined;
 
-  /**
-   * We group the current events in a map as on Windows with certain IDE a file contents change can trigger multiple events.
-   *
-   * Example:
-   * rename | 'C:/../src/app/app.component.css'
-   * rename | 'C:/../src/app/app.component.css'
-   * change | 'C:/../src/app/app.component.css'
-   *
-   */
-  let currentEvents: Map</* Event name */ string, /* File path */ string> | undefined;
-
-  /**
-   * Using `watcher.on('all')` does not capture some of events fired when using Visual studio and this does not happen all the time,
-   * but only after a file has been changed 3 or more times.
-   *
-   * Also, some IDEs such as Visual Studio (not VS Code) will fire a rename event instead of unlink when a file is renamed or changed.
-   *
-   * Example:
-   * ```
-   * watcher.on('raw')
-   * Change 1
-   * rename | 'C:/../src/app/app.component.css'
-   * rename | 'C:/../src/app/app.component.css'
-   * change | 'C:/../src/app/app.component.css'
-   *
-   * Change 2
-   * rename | 'C:/../src/app/app.component.css'
-   * rename | 'C:/../src/app/app.component.css'
-   * change | 'C:/../src/app/app.component.css'
-   *
-   * Change 3
-   * rename | 'C:/../src/app/app.component.css'
-   * rename | 'C:/../src/app/app.component.css'
-   * change | 'C:/../src/app/app.component.css'
-   *
-   * watcher.on('all')
-   * Change 1
-   * change | 'C:\\..\\src\\app\\app.component.css'
-   *
-   * Change 2
-   * unlink | 'C:\\..\\src\\app\\app.component.css'
-   *
-   * Change 3
-   * ... (Nothing)
-   * ```
-   */
-  watcher.on('raw', (event, path, { watchedPath }) => {
+  watcher.on('all', (event, path) => {
     switch (event) {
       case 'add':
+        currentChanges ??= new ChangedFiles();
+        currentChanges.added.add(path);
+        break;
       case 'change':
-      // When using Visual Studio the rename event is fired before a change event when the contents of the file changed
-      // or instead of `unlink` when the file has been renamed.
+        currentChanges ??= new ChangedFiles();
+        currentChanges.modified.add(path);
+        break;
       case 'unlink':
-      case 'rename':
-        // When polling is enabled `watchedPath` can be undefined.
-        // `path` is always normalized unlike `watchedPath`.
-        const changedPath = watchedPath ? normalize(watchedPath) : path;
-        currentEvents ??= new Map();
-        currentEvents.set(changedPath, event);
+        currentChanges ??= new ChangedFiles();
+        currentChanges.removed.add(path);
         break;
       default:
         return;
@@ -121,27 +74,10 @@ export function createWatcher(options?: {
       nextWaitTimeout = setTimeout(() => {
         nextWaitTimeout = undefined;
         const next = nextQueue.shift();
-        if (next && currentEvents) {
-          const events = currentEvents;
-          currentEvents = undefined;
-
-          const currentChanges = new ChangedFiles();
-          for (const [path, event] of events) {
-            switch (event) {
-              case 'add':
-                currentChanges.added.add(path);
-                break;
-              case 'change':
-                currentChanges.modified.add(path);
-                break;
-              case 'unlink':
-              case 'rename':
-                currentChanges.removed.add(path);
-                break;
-            }
-          }
-
-          next(currentChanges);
+        if (next) {
+          const value = currentChanges;
+          currentChanges = undefined;
+          next(value);
         }
       }, 250);
       nextWaitTimeout?.unref();
