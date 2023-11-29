@@ -1,3 +1,11 @@
+<a name="17.0.5"></a>
+
+# 17.0.5 (2023-11-29)
+
+Rolling back [bbbe13d67](https://github.com/angular/angular-cli/commit/bbbe13d6782ba9d1b80473a98ea95bc301c48597) which appears to break file watching on Mac devices.
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="17.1.0-next.0"></a>
 
 # 17.1.0-next.0 (2023-11-29)
