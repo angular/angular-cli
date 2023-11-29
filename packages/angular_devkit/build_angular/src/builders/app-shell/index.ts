@@ -170,6 +170,8 @@ async function _appShellBuilder(
 
   const optimization = normalizeOptimization(browserOptions.optimization);
   optimization.styles.inlineCritical = false;
+  // Webpack based builders do not have the `removeSpecialComments` option.
+  delete optimization.styles.removeSpecialComments;
 
   const browserTargetRun = await context.scheduleTarget(browserTarget, {
     watch: false,
