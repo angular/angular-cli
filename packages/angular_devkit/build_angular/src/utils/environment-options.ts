@@ -101,4 +101,7 @@ const debugPerfVariable = process.env['NG_BUILD_DEBUG_PERF'];
 export const debugPerformance = isPresent(debugPerfVariable) && isEnabled(debugPerfVariable);
 
 const watchRootVariable = process.env['NG_BUILD_WATCH_ROOT'];
-export const shouldWatchRoot = isPresent(watchRootVariable) && isEnabled(watchRootVariable);
+export const shouldWatchRoot =
+  process.platform === 'win32'
+    ? !isPresent(watchRootVariable) || !isDisabled(watchRootVariable)
+    : isPresent(watchRootVariable) && isEnabled(watchRootVariable);
