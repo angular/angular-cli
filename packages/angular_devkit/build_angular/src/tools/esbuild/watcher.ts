@@ -7,7 +7,7 @@
  */
 
 import { FSWatcher } from 'chokidar';
-import { normalize } from 'node:path';
+import { extname, normalize } from 'node:path';
 
 export class ChangedFiles {
   readonly added = new Set<string>();
@@ -98,55 +98,24 @@ export function createWatcher(options?: {
    * ... (Nothing)
    * ```
    */
-  watcher.on(watcher.options.useFsEvents ? 'all' : 'raw', (event, path, metadata) => {
-    switch (event) {
-      case 'add':
-      case 'change':
-      // When using Visual Studio the rename event is fired before a change event when the contents of the file changed
-      // or instead of `unlink` when the file has been renamed.
-      case 'unlink':
-      case 'rename':
-        // When polling is enabled `watchedPath` can be undefined.
-        // `path` is always normalized unlike `watchedPath`.
-        const changedPath = metadata?.watchedPath ? normalize(metadata.watchedPath) : path;
-        currentEvents ??= new Map();
-        currentEvents.set(changedPath, event);
-        break;
-      default:
+  watcher
+    .on('raw', (event, path, { watchedPath }) => {
+      if (watchedPath && !extname(watchedPath)) {
+        // Ignore directories, file changes in directories will be fired seperatly.
         return;
-    }
+      }
 
-    // Wait 250ms from next change to better capture groups of file save operations.
-    if (!nextWaitTimeout) {
-      nextWaitTimeout = setTimeout(() => {
-        nextWaitTimeout = undefined;
-        const next = nextQueue.shift();
-        if (next && currentEvents) {
-          const events = currentEvents;
-          currentEvents = undefined;
-
-          const currentChanges = new ChangedFiles();
-          for (const [path, event] of events) {
-            switch (event) {
-              case 'add':
-                currentChanges.added.add(path);
-                break;
-              case 'change':
-                currentChanges.modified.add(path);
-                break;
-              case 'unlink':
-              case 'rename':
-                currentChanges.removed.add(path);
-                break;
-            }
-          }
-
-          next(currentChanges);
-        }
-      }, 250);
-      nextWaitTimeout?.unref();
-    }
-  });
+      switch (event) {
+        case 'rename':
+        case 'change':
+          // When polling is enabled `watchedPath` can be undefined.
+          // `path` is always normalized unlike `watchedPath`.
+          const changedPath = watchedPath ? normalize(watchedPath) : path;
+          handleFileChange(event, changedPath);
+          break;
+      }
+    })
+    .on('all', handleFileChange);
 
   return {
     [Symbol.asyncIterator]() {
@@ -188,4 +157,51 @@ export function createWatcher(options?: {
       }
     },
   };
+
+  function handleFileChange(event: string, path: string): void {
+    switch (event) {
+      case 'add':
+      case 'change':
+      // When using Visual Studio the rename event is fired before a change event when the contents of the file changed
+      // or instead of `unlink` when the file has been renamed.
+      case 'unlink':
+      case 'rename':
+        currentEvents ??= new Map();
+        currentEvents.set(path, event);
+        break;
+      default:
+        return;
+    }
+
+    // Wait 250ms from next change to better capture groups of file save operations.
+    if (!nextWaitTimeout) {
+      nextWaitTimeout = setTimeout(() => {
+        nextWaitTimeout = undefined;
+        const next = nextQueue.shift();
+        if (next && currentEvents) {
+          const events = currentEvents;
+          currentEvents = undefined;
+
+          const currentChanges = new ChangedFiles();
+          for (const [path, event] of events) {
+            switch (event) {
+              case 'add':
+                currentChanges.added.add(path);
+                break;
+              case 'change':
+                currentChanges.modified.add(path);
+                break;
+              case 'unlink':
+              case 'rename':
+                currentChanges.removed.add(path);
+                break;
+            }
+          }
+
+          next(currentChanges);
+        }
+      }, 250);
+      nextWaitTimeout?.unref();
+    }
+  }
 }
