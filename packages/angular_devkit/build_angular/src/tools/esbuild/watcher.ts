@@ -98,7 +98,7 @@ export function createWatcher(options?: {
    * ... (Nothing)
    * ```
    */
-  watcher.on('raw', (event, path, { watchedPath }) => {
+  watcher.on(watcher.options.useFsEvents ? 'all' : 'raw', (event, path, metadata) => {
     switch (event) {
       case 'add':
       case 'change':
@@ -108,7 +108,7 @@ export function createWatcher(options?: {
       case 'rename':
         // When polling is enabled `watchedPath` can be undefined.
         // `path` is always normalized unlike `watchedPath`.
-        const changedPath = watchedPath ? normalize(watchedPath) : path;
+        const changedPath = metadata?.watchedPath ? normalize(metadata.watchedPath) : path;
         currentEvents ??= new Map();
         currentEvents.set(changedPath, event);
         break;
