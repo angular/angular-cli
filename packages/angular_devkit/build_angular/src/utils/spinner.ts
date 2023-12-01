@@ -19,7 +19,7 @@ export class Spinner {
 
   constructor(text?: string) {
     this.spinner = ora({
-      text,
+      text: text === undefined ? undefined : text + '\n',
       // The below 2 options are needed because otherwise CTRL+C will be delayed
       // when the underlying process is sync.
       hideCursor: false,
