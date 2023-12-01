@@ -44,5 +44,10 @@ export default async function () {
   const { message } = await expectToFail(() =>
     ng('build', '--configuration', 'development', '--prerender'),
   );
-  match(message, /window is not defined[.\s\S]*constructor \(.*app\.component\.ts\:\d+:\d+\)/);
+  match(
+    message,
+    // When babel is used it will add names to the sourcemap and `constructor` will be used in the stack trace.
+    // This will currently only happen if AOT and script optimizations are set which enables advanced optimizations.
+    /window is not defined[.\s\S]*(?:constructor|_AppComponent) \(.*app\.component\.ts\:\d+:\d+\)/,
+  );
 }

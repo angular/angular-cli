@@ -14,6 +14,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
     it('should not emit any AOT class metadata functions', async () => {
       harness.useTarget('build', {
         ...BASE_OPTIONS,
+        optimization: true,
       });
 
       const { result } = await harness.executeOnce();
@@ -25,6 +26,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
     it('should not emit any AOT NgModule scope metadata functions', async () => {
       harness.useTarget('build', {
         ...BASE_OPTIONS,
+        optimization: true,
       });
 
       const { result } = await harness.executeOnce();
