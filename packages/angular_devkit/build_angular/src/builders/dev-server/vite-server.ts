@@ -191,7 +191,7 @@ export async function* serveWithVite(
     assetFiles.clear();
     if (result.assetFiles) {
       for (const asset of result.assetFiles) {
-        assetFiles.set('/' + normalizePath(asset.destination), asset.source);
+        assetFiles.set('/' + normalizePath(asset.destination), normalizePath(asset.source));
       }
     }
 
