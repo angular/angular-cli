@@ -216,6 +216,13 @@
         "^\\.\\S+$": { "enum": ["text", "binary", "file", "empty"] }
       }
     },
+    "define": {
+      "description": "Defines global identifiers that will be replaced with a specified constant value when found in any JavaScript or TypeScript code including libraries. The value will be used directly. String values must be put in quotes. Identifiers within Angular metadata such as Component Decorators will not be replaced.",
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
     "fileReplacements": {
       "description": "Replace compilation source files with other compilation source files in the build.",
       "type": "array",
