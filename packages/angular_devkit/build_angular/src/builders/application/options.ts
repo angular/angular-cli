@@ -270,7 +270,7 @@ export async function normalizeOptions(
 
   // Return all the normalized options
   return {
-    advancedOptimizations: !!aot,
+    advancedOptimizations: !!aot && optimizationOptions.scripts,
     allowedCommonJsDependencies,
     baseHref,
     cacheOptions,
