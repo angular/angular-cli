@@ -7,7 +7,7 @@
  */
 
 import { logging } from '@angular-devkit/core';
-import { concatMap, count, timeout } from 'rxjs';
+import { concatMap, count, take, timeout } from 'rxjs';
 import { buildApplication } from '../../index';
 import { APPLICATION_BUILDER_INFO, BASE_OPTIONS, describeBuilder } from '../setup';
 
@@ -72,9 +72,8 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       `,
       );
 
-      const builderAbort = new AbortController();
       const buildCount = await harness
-        .execute({ outputLogsOnFailure: false, signal: builderAbort.signal })
+        .execute({ outputLogsOnFailure: false })
         .pipe(
           timeout(BUILD_TIMEOUT),
           concatMap(async ({ result, logs }, index) => {
@@ -143,11 +142,10 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
                   }),
                 );
 
-                // Test complete - abort watch mode
-                builderAbort?.abort();
                 break;
             }
           }),
+          take(5),
           count(),
         )
         .toPromise();
@@ -161,9 +159,8 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
         watch: true,
       });
 
-      const builderAbort = new AbortController();
       const buildCount = await harness
-        .execute({ outputLogsOnFailure: false, signal: builderAbort.signal })
+        .execute({ outputLogsOnFailure: false })
         .pipe(
           timeout(BUILD_TIMEOUT),
           concatMap(async ({ logs }, index) => {
@@ -251,11 +248,10 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
                   }),
                 );
 
-                // Test complete - abort watch mode
-                builderAbort?.abort();
                 break;
             }
           }),
+          take(6),
           count(),
         )
         .toPromise();
@@ -270,9 +266,8 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
         aot: false,
       });
 
-      const builderAbort = new AbortController();
       const buildCount = await harness
-        .execute({ outputLogsOnFailure: false, signal: builderAbort.signal })
+        .execute({ outputLogsOnFailure: false })
         .pipe(
           timeout(BUILD_TIMEOUT),
           concatMap(async ({ result, logs }, index) => {
@@ -302,11 +297,10 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
                   .expectFile('dist/browser/main.js')
                   .content.toContain('p {\\n  color: green;\\n}');
 
-                // Test complete - abort watch mode
-                builderAbort?.abort();
                 break;
             }
           }),
+          take(3),
           count(),
         )
         .toPromise();
@@ -320,9 +314,8 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
         watch: true,
       });
 
-      const builderAbort = new AbortController();
       const buildCount = await harness
-        .execute({ outputLogsOnFailure: true, signal: builderAbort.signal })
+        .execute({ outputLogsOnFailure: true })
         .pipe(
           timeout(BUILD_TIMEOUT),
           concatMap(async ({ result, logs }, index) => {
@@ -365,11 +358,10 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
                 harness.expectFile('dist/browser/main.js').content.toContain('Hello, world!');
                 harness.expectFile('dist/browser/main.js').content.toContain('Guten Tag');
 
-                // Test complete - abort watch mode
-                builderAbort?.abort();
                 break;
             }
           }),
+          take(4),
           count(),
         )
         .toPromise();

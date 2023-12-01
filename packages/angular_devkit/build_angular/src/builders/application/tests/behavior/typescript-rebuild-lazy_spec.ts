@@ -7,7 +7,7 @@
  */
 
 import type { logging } from '@angular-devkit/core';
-import { concatMap, count, firstValueFrom, timeout } from 'rxjs';
+import { concatMap, count, firstValueFrom, take, timeout } from 'rxjs';
 import { buildApplication } from '../../index';
 import { OutputHashing } from '../../schema';
 import { APPLICATION_BUILDER_INFO, BASE_OPTIONS, describeBuilder } from '../setup';
@@ -42,9 +42,8 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
         ssr: true,
       });
 
-      const builderAbort = new AbortController();
       const buildCount = await firstValueFrom(
-        harness.execute({ outputLogsOnFailure: false, signal: builderAbort.signal }).pipe(
+        harness.execute({ outputLogsOnFailure: false }).pipe(
           timeout(30_000),
           concatMap(async ({ result, logs }, index) => {
             switch (index) {
@@ -79,10 +78,10 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
               case 3:
                 expect(result?.success).toBeTrue();
 
-                builderAbort.abort();
                 break;
             }
           }),
+          take(4),
           count(),
         ),
       );

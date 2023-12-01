@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { concatMap, count, timeout } from 'rxjs';
+import { concatMap, count, take, timeout } from 'rxjs';
 import { buildApplication } from '../../index';
 import { APPLICATION_BUILDER_INFO, BASE_OPTIONS, describeBuilder } from '../setup';
 
@@ -33,9 +33,8 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       await harness.writeFile('src/styles.scss', "@import './a';");
       await harness.writeFile('src/a.scss', '$primary: aqua;\\nh1 { color: $primary; }');
 
-      const builderAbort = new AbortController();
       const buildCount = await harness
-        .execute({ signal: builderAbort.signal, outputLogsOnFailure: false })
+        .execute({ outputLogsOnFailure: false })
         .pipe(
           timeout(30000),
           concatMap(async ({ result }, index) => {
@@ -60,11 +59,10 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
                 harness.expectFile('dist/browser/styles.css').content.not.toContain('color: aqua');
                 harness.expectFile('dist/browser/styles.css').content.toContain('color: blue');
 
-                // Test complete - abort watch mode
-                builderAbort.abort();
                 break;
             }
           }),
+          take(3),
           count(),
         )
         .toPromise();
@@ -82,9 +80,8 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       await harness.writeFile('src/styles.scss', "@import './a';");
       await harness.writeFile('src/a.scss', 'invalid-invalid-invalid\\nh1 { color: $primary; }');
 
-      const builderAbort = new AbortController();
       const buildCount = await harness
-        .execute({ signal: builderAbort.signal, outputLogsOnFailure: false })
+        .execute({ outputLogsOnFailure: false })
         .pipe(
           timeout(30000),
           concatMap(async ({ result }, index) => {
@@ -105,12 +102,10 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
                 expect(result?.success).toBe(true);
                 harness.expectFile('dist/browser/styles.css').content.not.toContain('color: aqua');
                 harness.expectFile('dist/browser/styles.css').content.toContain('color: blue');
-
-                // Test complete - abort watch mode
-                builderAbort.abort();
                 break;
             }
           }),
+          take(3),
           count(),
         )
         .toPromise();

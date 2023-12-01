@@ -87,9 +87,8 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
             content.replace('__STYLE_MARKER__', '$primary: indianred;\\nh1 { color: $primary; }'),
           );
 
-          const builderAbort = new AbortController();
           const buildCount = await harness
-            .execute({ signal: builderAbort.signal })
+            .execute()
             .pipe(
               timeout(30000),
               concatMap(async ({ result }, index) => {
@@ -129,11 +128,10 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
                     harness.expectFile('dist/browser/main.js').content.not.toContain('color: aqua');
                     harness.expectFile('dist/browser/main.js').content.toContain('color: blue');
 
-                    // Test complete - abort watch mode
-                    builderAbort.abort();
                     break;
                 }
               }),
+              take(3),
               count(),
             )
             .toPromise();
