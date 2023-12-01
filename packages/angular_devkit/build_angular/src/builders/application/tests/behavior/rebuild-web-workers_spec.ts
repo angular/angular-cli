@@ -55,9 +55,8 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       `,
       );
 
-      const builderAbort = new AbortController();
       const buildCount = await harness
-        .execute({ outputLogsOnFailure: false, signal: builderAbort.signal })
+        .execute({ outputLogsOnFailure: false })
         .pipe(
           timeout(BUILD_TIMEOUT),
           concatMap(async ({ result, logs }, index) => {
@@ -125,11 +124,10 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
                   .expectFile('dist/browser/main.js')
                   .content.toMatch(REFERENCED_WORKER_REGEXP);
 
-                // Test complete - abort watch mode
-                builderAbort?.abort();
                 break;
             }
           }),
+          take(5),
           count(),
         )
         .toPromise();

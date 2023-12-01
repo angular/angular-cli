@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { concatMap, count, timeout } from 'rxjs';
+import { concatMap, count, take, timeout } from 'rxjs';
 import { buildApplication } from '../../index';
 import { APPLICATION_BUILDER_INFO, BASE_OPTIONS, describeBuilder } from '../setup';
 
@@ -30,9 +30,8 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       await harness.writeFile('src/app/app.component.scss', "@import './a';");
       await harness.writeFile('src/app/a.scss', '$primary: aqua;\\nh1 { color: $primary; }');
 
-      const builderAbort = new AbortController();
       const buildCount = await harness
-        .execute({ signal: builderAbort.signal })
+        .execute()
         .pipe(
           timeout(30000),
           concatMap(async ({ result }, index) => {
@@ -62,11 +61,10 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
                 harness.expectFile('dist/browser/main.js').content.not.toContain('color: blue');
                 harness.expectFile('dist/browser/main.js').content.toContain('color: green');
 
-                // Test complete - abort watch mode
-                builderAbort.abort();
                 break;
             }
           }),
+          take(3),
           count(),
         )
         .toPromise();

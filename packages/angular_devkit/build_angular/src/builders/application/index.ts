@@ -48,6 +48,14 @@ export async function* buildApplicationInternal(
 
   const normalizedOptions = await normalizeOptions(context, projectName, options, plugins);
 
+  // Setup an abort controller with a builder teardown if no signal is present
+  let signal = context.signal;
+  if (!signal) {
+    const controller = new AbortController();
+    signal = controller.signal;
+    context.addTeardown(() => controller.abort('builder-teardown'));
+  }
+
   yield* runEsBuildBuildAction(
     async (rebuildState) => {
       const startTime = process.hrtime.bigint();
@@ -80,7 +88,7 @@ export async function* buildApplicationInternal(
           ? undefined
           : (file) => file.type !== BuildOutputFileType.Server,
       logger: context.logger,
-      signal: context.signal,
+      signal,
     },
   );
 }
