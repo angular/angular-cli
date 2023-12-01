@@ -22,6 +22,8 @@ export enum Builders {
   AppShell = '@angular-devkit/build-angular:app-shell',
   Server = '@angular-devkit/build-angular:server',
   Browser = '@angular-devkit/build-angular:browser',
+  SsrDevServer = '@angular-devkit/build-angular:ssr-dev-server',
+  Prerender = '@angular-devkit/build-angular:prerender',
   BrowserEsbuild = '@angular-devkit/build-angular:browser-esbuild',
   Karma = '@angular-devkit/build-angular:karma',
   TsLint = '@angular-devkit/build-angular:tslint',

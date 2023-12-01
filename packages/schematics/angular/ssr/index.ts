@@ -14,9 +14,9 @@ import {
   apply,
   applyTemplates,
   chain,
-  externalSchematic,
   mergeWith,
   move,
+  schematic,
   url,
 } from '@angular-devkit/schematics';
 import { Schema as ServerOptions } from '../server/schema';
@@ -273,7 +273,7 @@ export default function (options: SSROptions): Rule {
       clientProject.targets.get('build')?.builder === Builders.Application;
 
     return chain([
-      externalSchematic('@schematics/angular', 'server', {
+      schematic('server', {
         ...options,
         skipInstall: true,
       }),
