@@ -295,6 +295,7 @@ export async function normalizeOptions(
     budgets,
     deployUrl,
     clearScreen,
+    define,
   } = options;
 
   // Return all the normalized options
@@ -350,6 +351,7 @@ export async function normalizeOptions(
     jsonLogs: useJSONBuildLogs,
     colors: colors.enabled,
     clearScreen,
+    define,
   };
 }
 

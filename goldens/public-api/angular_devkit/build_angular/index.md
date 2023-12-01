@@ -32,6 +32,9 @@ export interface ApplicationBuilderOptions {
     budgets?: Budget_2[];
     clearScreen?: boolean;
     crossOrigin?: CrossOrigin_2;
+    define?: {
+        [key: string]: string;
+    };
     deleteOutputPath?: boolean;
     externalDependencies?: string[];
     extractLicenses?: boolean;

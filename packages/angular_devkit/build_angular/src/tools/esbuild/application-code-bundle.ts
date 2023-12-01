@@ -379,6 +379,7 @@ function getEsBuildCommonOptions(options: NormalizedApplicationBuildOptions): Bu
     write: false,
     preserveSymlinks,
     define: {
+      ...options.define,
       // Only set to false when script optimizations are enabled. It should not be set to true because
       // Angular turns `ngDevMode` into an object for development debugging purposes when not defined
       // which a constant true value would break.
