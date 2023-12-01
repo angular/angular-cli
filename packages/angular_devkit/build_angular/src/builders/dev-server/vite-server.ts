@@ -12,27 +12,39 @@ import type { json, logging } from '@angular-devkit/core';
 import type { Plugin } from 'esbuild';
 import { lookup as lookupMimeType } from 'mrmime';
 import assert from 'node:assert';
+import { createHash } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import { ServerResponse } from 'node:http';
 import { dirname, extname, join, relative } from 'node:path';
 import type { Connect, DepOptimizationConfig, InlineConfig, ViteDevServer } from 'vite';
+import { getEsbuildDefineValues } from '../../tools/esbuild/application-code-bundle';
 import { BuildOutputFile, BuildOutputFileType } from '../../tools/esbuild/bundler-context';
 import { ExternalResultMetadata } from '../../tools/esbuild/bundler-execution-result';
 import { JavaScriptTransformer } from '../../tools/esbuild/javascript-transformer';
 import { createRxjsEsmResolutionPlugin } from '../../tools/esbuild/rxjs-esm-resolution-plugin';
 import { getFeatureSupport, transformSupportedBrowsersToTargets } from '../../tools/esbuild/utils';
 import { createAngularLocaleDataPlugin } from '../../tools/vite/i18n-locale-plugin';
-import { normalizeSourceMaps } from '../../utils';
 import { loadEsmModule } from '../../utils/load-esm';
 import { renderPage } from '../../utils/server-rendering/render-page';
 import { getSupportedBrowsers } from '../../utils/supported-browsers';
 import { getIndexOutputFile } from '../../utils/webpack-browser-config';
 import { buildApplicationInternal } from '../application';
+import {
+  ApplicationBuilderInternalOptions,
+  NormalizedApplicationBuildOptions,
+  normalizeOptions,
+} from '../application/options';
 import { buildEsbuildBrowser } from '../browser-esbuild';
 import { Schema as BrowserBuilderOptions } from '../browser-esbuild/schema';
 import { loadProxyConfiguration } from './load-proxy-config';
 import type { NormalizedDevServerOptions } from './options';
 import type { DevServerBuilderOutput } from './webpack-server';
+
+type EsBuildOptions = DepOptimizationConfig['esbuildOptions'];
+
+type ViteEsBuildPlugin = NonNullable<NonNullable<EsBuildOptions>['plugins']>[0];
+
+type EsbuildLoaderOption = Exclude<EsBuildOptions, undefined>['loader'];
 
 interface OutputFileRecord {
   contents: Uint8Array;
@@ -105,14 +117,25 @@ export async function* serveWithVite(
     browserOptions.forceI18nFlatOutput = true;
   }
 
-  const { vendor: thirdPartySourcemaps } = normalizeSourceMaps(browserOptions.sourceMap ?? false);
+  const projectName = context.target?.project;
+  if (!projectName) {
+    throw new Error('The builder requires a target.');
+  }
+
+  const applicationOptions = await normalizeOptions(
+    context,
+    projectName,
+    browserOptions as ApplicationBuilderInternalOptions,
+  );
+
+  const {
+    jit,
+    sourcemapOptions: { vendor: thirdPartySourcemaps, scripts: scriptSourceMap },
+  } = applicationOptions;
 
   // Setup the prebundling transformer that will be shared across Vite prebundling requests
   const prebundleTransformer = new JavaScriptTransformer(
-    // Always enable JIT linking to support applications built with and without AOT.
-    // In a development environment the additional scope information does not
-    // have a negative effect unlike production where final output size is relevant.
-    { sourcemap: true, jit: true, thirdPartySourcemaps },
+    { sourcemap: !!scriptSourceMap, jit, thirdPartySourcemaps },
     1,
     true,
   );
@@ -222,30 +245,19 @@ export async function* serveWithVite(
 
       handleUpdate(normalizePath, generatedFiles, server, serverOptions, context.logger);
     } else {
-      const projectName = context.target?.project;
-      if (!projectName) {
-        throw new Error('The builder requires a target.');
-      }
-
-      const { root = '' } = await context.getProjectMetadata(projectName);
-      const projectRoot = join(context.workspaceRoot, root as string);
-      const browsers = getSupportedBrowsers(projectRoot, context.logger);
-      const target = transformSupportedBrowsersToTargets(browsers);
-
       // Setup server and start listening
       const serverConfiguration = await setupServer(
         serverOptions,
+        applicationOptions,
         generatedFiles,
         assetFiles,
         browserOptions.preserveSymlinks,
         externalMetadata,
-        !!browserOptions.ssr,
+        context.logger,
         prebundleTransformer,
-        target,
         browserOptions.loader as EsbuildLoaderOption | undefined,
         extensions?.middleware,
         transformers?.indexHtml,
-        thirdPartySourcemaps,
       );
 
       server = await createServer(serverConfiguration);
@@ -420,17 +432,16 @@ function analyzeResultFiles(
 // eslint-disable-next-line max-lines-per-function
 export async function setupServer(
   serverOptions: NormalizedDevServerOptions,
+  applicationOptions: NormalizedApplicationBuildOptions,
   outputFiles: Map<string, OutputFileRecord>,
   assets: Map<string, string>,
   preserveSymlinks: boolean | undefined,
   externalMetadata: ExternalResultMetadata,
-  ssr: boolean,
+  logger: logging.LoggerApi,
   prebundleTransformer: JavaScriptTransformer,
-  target: string[],
   prebundleLoaderExtensions: EsbuildLoaderOption | undefined,
   extensionMiddleware?: Connect.NextHandleFunction[],
   indexHtmlTransformer?: (content: string) => Promise<string>,
-  thirdPartySourcemaps = false,
 ): Promise<InlineConfig> {
   const proxy = await loadProxyConfiguration(
     serverOptions.workspaceRoot,
@@ -451,7 +462,10 @@ export async function setupServer(
     ...externalMetadata.explicit,
   ];
 
-  const cacheDir = join(serverOptions.cacheOptions.path, 'vite');
+  const browsers = getSupportedBrowsers(applicationOptions.projectRoot, logger);
+  const target = transformSupportedBrowsersToTargets(browsers);
+  const cacheDir = getCacheDir(serverOptions, applicationOptions);
+
   const configuration: InlineConfig = {
     configFile: false,
     envFile: false,
@@ -514,10 +528,10 @@ export async function setupServer(
         // Include all implict dependencies from the external packages internal option
         include: externalMetadata.implicitServer,
         ssr: true,
-        prebundleTransformer,
         target,
         loader: prebundleLoaderExtensions,
-        thirdPartySourcemaps,
+        prebundleTransformer,
+        applicationOptions,
       }),
     },
     plugins: [
@@ -693,7 +707,7 @@ export async function setupServer(
               });
             }
 
-            if (ssr) {
+            if (applicationOptions.ssrOptions) {
               server.middlewares.use(angularSSRMiddleware);
             }
 
@@ -771,10 +785,10 @@ export async function setupServer(
       // Include all implict dependencies from the external packages internal option
       include: externalMetadata.implicitBrowser,
       ssr: false,
-      prebundleTransformer,
       target,
+      prebundleTransformer,
       loader: prebundleLoaderExtensions,
-      thirdPartySourcemaps,
+      applicationOptions,
     }),
   };
 
@@ -794,6 +808,25 @@ export async function setupServer(
   }
 
   return configuration;
+}
+
+function getCacheDir(
+  serverOptions: NormalizedDevServerOptions,
+  applicationOptions: NormalizedApplicationBuildOptions,
+): string {
+  const { jit, optimizationOptions, sourcemapOptions } = applicationOptions;
+  // Any of the below options will cause the prebundle to be invalidated.
+  const key = createHash('sha1')
+    .update(
+      JSON.stringify({
+        jit,
+        optimizationOptions,
+        sourcemapOptions,
+      }),
+    )
+    .digest('hex');
+
+  return join(serverOptions.cacheOptions.path, 'vite', key);
 }
 
 /**
@@ -828,36 +861,28 @@ function pathnameWithoutBasePath(url: string, basePath: string): string {
     : pathname;
 }
 
-type ViteEsBuildPlugin = NonNullable<
-  NonNullable<DepOptimizationConfig['esbuildOptions']>['plugins']
->[0];
-
-type EsbuildLoaderOption = Exclude<DepOptimizationConfig['esbuildOptions'], undefined>['loader'];
-
 function getDepOptimizationConfig({
   disabled,
   exclude,
   include,
-  target,
   prebundleTransformer,
-  ssr,
   loader,
-  thirdPartySourcemaps,
+  target,
+  ssr,
+  applicationOptions,
 }: {
   disabled: boolean;
   exclude: string[];
   include: string[];
   target: string[];
-  prebundleTransformer: JavaScriptTransformer;
   ssr: boolean;
+  prebundleTransformer: JavaScriptTransformer;
   loader?: EsbuildLoaderOption;
-  thirdPartySourcemaps: boolean;
+  applicationOptions: NormalizedApplicationBuildOptions;
 }): DepOptimizationConfig {
   const plugins: ViteEsBuildPlugin[] = [
     {
-      name: `angular-vite-optimize-deps${ssr ? '-ssr' : ''}${
-        thirdPartySourcemaps ? '-vendor-sourcemap' : ''
-      }`,
+      name: `angular-vite-optimize-deps${ssr ? '-ssr' : ''}`,
       setup(build) {
         build.onLoad({ filter: /\.[cm]?js$/ }, async (args) => {
           return {
@@ -885,8 +910,9 @@ function getDepOptimizationConfig({
       // Set esbuild supported targets.
       target,
       supported: getFeatureSupport(target),
-      plugins,
       loader,
+      define: getEsbuildDefineValues(applicationOptions),
+      plugins,
     },
   };
 }

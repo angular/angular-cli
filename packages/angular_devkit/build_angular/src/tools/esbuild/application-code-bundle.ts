@@ -361,13 +361,7 @@ function getEsBuildCommonOptions(options: NormalizedApplicationBuildOptions): Bu
     external: externalDependencies,
     write: false,
     preserveSymlinks,
-    define: {
-      // Only set to false when script optimizations are enabled. It should not be set to true because
-      // Angular turns `ngDevMode` into an object for development debugging purposes when not defined
-      // which a constant true value would break.
-      ...(optimizationOptions.scripts ? { 'ngDevMode': 'false' } : undefined),
-      'ngJitMode': jit ? 'true' : 'false',
-    },
+    define: getEsbuildDefineValues(options),
     loader: loaderExtensions,
     footer,
     publicPath: options.publicPath,
@@ -481,4 +475,17 @@ function getEsBuildCommonPolyfillsOptions(
   );
 
   return buildOptions;
+}
+
+export function getEsbuildDefineValues({
+  jit,
+  optimizationOptions,
+}: NormalizedApplicationBuildOptions): BuildOptions['define'] {
+  return {
+    // Only set to false when script optimizations are enabled. It should not be set to true because
+    // Angular turns `ngDevMode` into an object for development debugging purposes when not defined
+    // which a constant true value would break.
+    ...(optimizationOptions.scripts ? { 'ngDevMode': 'false' } : undefined),
+    'ngJitMode': jit ? 'true' : 'false',
+  };
 }
