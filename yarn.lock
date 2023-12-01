@@ -10676,10 +10676,10 @@ quick-format-unescaped@^4.0.3:
   resolved "https://registry.yarnpkg.com/quick-format-unescaped/-/quick-format-unescaped-4.0.4.tgz#93ef6dd8d3453cbc7970dd614fad4c5954d6b5a7"
   integrity sha512-tYC1Q1hgyRuHgloV/YXs2w15unPVh8qfu/qCTfhTYamaw7fyhumKa2yGpdSo87vY32rIclj+4fWYQXUMs9EHvg==
 
-quicktype-core@23.0.79:
-  version "23.0.79"
-  resolved "https://registry.yarnpkg.com/quicktype-core/-/quicktype-core-23.0.79.tgz#e5c6faa6bb0b8c51545d1716b18ad1d8cdd72bee"
-  integrity sha512-Auzy8AhorFt6YGeB53/dzUSINmKKassAyCsr2wpNgG9XoC3i6oUoLuySNUzYIkyCFCGmKdBRBQeyAqPOVteoYw==
+quicktype-core@23.0.80:
+  version "23.0.80"
+  resolved "https://registry.yarnpkg.com/quicktype-core/-/quicktype-core-23.0.80.tgz#d9114cb862e03046599eb5f0f44b01b9aaafccd4"
+  integrity sha512-dd+aJRzAl3MzkaXJMjUu0j60y82gwX/RRr3EvW/aScQKycvkgwliNDN2tIiLB06EKBzjgC9mtlMqKyRg2rYKhQ==
   dependencies:
     "@glideapps/ts-necessities" "2.1.3"
     "@types/urijs" "^1.19.19"
@@ -12322,10 +12322,10 @@ undici@5.27.2:
   dependencies:
     "@fastify/busboy" "^2.0.0"
 
-undici@5.28.1:
-  version "5.28.1"
-  resolved "https://registry.yarnpkg.com/undici/-/undici-5.28.1.tgz#1052d37bd1a2e8cf3e188d7caebff833fdc06fa7"
-  integrity sha512-xcIIvj1LOQH9zAL54iWFkuDEaIVEjLrru7qRpa3GrEEHk6OBhb/LycuUY2m7VCcTuDeLziXCxobQVyKExyGeIA==
+undici@5.28.2:
+  version "5.28.2"
+  resolved "https://registry.yarnpkg.com/undici/-/undici-5.28.2.tgz#fea200eac65fc7ecaff80a023d1a0543423b4c91"
+  integrity sha512-wh1pHJHnUeQV5Xa8/kyQhO7WFa8M34l026L5P/+2TYiakvGy5Rdc8jWZVyG7ieht/0WgJLEd3kcU5gKx+6GC8w==
   dependencies:
     "@fastify/busboy" "^2.0.0"
 
