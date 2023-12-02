@@ -39,7 +39,7 @@ describe('Webpack Builder basic test', () => {
   }
 
   describe('basic app', () => {
-    const ngJsonPath = path.join(__dirname, '../../test/basic-app/angular.json');
+    const ngJsonPath = path.join(__dirname, '../../../test/basic-app/angular.json');
     const workspaceRoot = path.dirname(require.resolve(ngJsonPath));
     const outputPath = join(normalize(workspaceRoot), 'dist');
 
@@ -90,7 +90,7 @@ describe('Webpack Builder basic test', () => {
 
   describe('Angular app', () => {
     jasmine.DEFAULT_TIMEOUT_INTERVAL = 150000;
-    const ngJsonPath = path.join(__dirname, '../../test/angular-app/angular.json');
+    const ngJsonPath = path.join(__dirname, '../../../test/angular-app/angular.json');
     const workspaceRoot = path.dirname(require.resolve(ngJsonPath));
     const outputPath = join(normalize(workspaceRoot), 'dist');
 

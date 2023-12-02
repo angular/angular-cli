@@ -6,6 +6,6 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-export * from './webpack';
-export * from './webpack-dev-server';
+export * from './builders/webpack';
+export * from './builders/webpack-dev-server';
 export { EmittedFiles } from './utils';
