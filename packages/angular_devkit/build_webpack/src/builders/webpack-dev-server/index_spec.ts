@@ -41,7 +41,7 @@ describe('Dev Server Builder', () => {
   }
 
   beforeEach(async () => {
-    const ngJsonPath = path.join(__dirname, '../../test/basic-app/angular.json');
+    const ngJsonPath = path.join(__dirname, '../../../test/basic-app/angular.json');
     const workspaceRoot = path.dirname(require.resolve(ngJsonPath));
     await createArchitect(workspaceRoot);
   });

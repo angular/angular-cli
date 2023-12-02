@@ -14,12 +14,12 @@ package(default_visibility = ["//visibility:public"])
 
 ts_json_schema(
     name = "webpack_schema",
-    src = "src/webpack/schema.json",
+    src = "src/builders/webpack/schema.json",
 )
 
 ts_json_schema(
     name = "webpack_dev_server_schema",
-    src = "src/webpack-dev-server/schema.json",
+    src = "src/builders/webpack-dev-server/schema.json",
 )
 
 ts_library(
@@ -32,14 +32,14 @@ ts_library(
             "src/**/*_spec.ts",
         ],
     ) + [
-        "//packages/angular_devkit/build_webpack:src/webpack-dev-server/schema.ts",
-        "//packages/angular_devkit/build_webpack:src/webpack/schema.ts",
+        "//packages/angular_devkit/build_webpack:src/builders/webpack-dev-server/schema.ts",
+        "//packages/angular_devkit/build_webpack:src/builders/webpack/schema.ts",
     ],
     data = [
         "builders.json",
         "package.json",
-        "src/webpack-dev-server/schema.json",
-        "src/webpack/schema.json",
+        "src/builders/webpack-dev-server/schema.json",
+        "src/builders/webpack/schema.json",
     ],
     module_name = "@angular-devkit/build-webpack",
     module_root = "src/index.d.ts",

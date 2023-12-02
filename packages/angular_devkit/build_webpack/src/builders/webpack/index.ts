@@ -10,7 +10,7 @@ import { BuilderContext, BuilderOutput, createBuilder } from '@angular-devkit/ar
 import { resolve as pathResolve } from 'path';
 import { Observable, from, isObservable, of, switchMap } from 'rxjs';
 import webpack from 'webpack';
-import { EmittedFiles, getEmittedFiles, getWebpackConfig } from '../utils';
+import { EmittedFiles, getEmittedFiles, getWebpackConfig } from '../../utils';
 import { Schema as RealWebpackBuilderSchema } from './schema';
 
 export type WebpackBuilderSchema = RealWebpackBuilderSchema;

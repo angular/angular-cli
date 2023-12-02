@@ -11,7 +11,7 @@ import { resolve as pathResolve } from 'path';
 import { Observable, from, isObservable, of, switchMap } from 'rxjs';
 import webpack from 'webpack';
 import WebpackDevServer from 'webpack-dev-server';
-import { getEmittedFiles, getWebpackConfig } from '../utils';
+import { getEmittedFiles, getWebpackConfig } from '../../utils';
 import { BuildResult, WebpackFactory, WebpackLoggingCallback } from '../webpack';
 import { Schema as WebpackDevServerBuilderSchema } from './schema';
 
