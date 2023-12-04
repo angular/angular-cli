@@ -3597,6 +3597,13 @@
     "@types/minimatch" "*"
     "@types/node" "*"
 
+"@types/graceful-fs@*":
+  version "4.1.9"
+  resolved "https://registry.yarnpkg.com/@types/graceful-fs/-/graceful-fs-4.1.9.tgz#2a06bc0f68a20ab37b3e36aa238be6abdf49e8b4"
+  integrity sha512-olP3sd1qOEe5dXTSaFvQG+02VdRXcdytWLAZsAq1PecU8uqQAhkrnbli7DagjtXKW/Bl7YJbUsa8MPcuc8LHEQ==
+  dependencies:
+    "@types/node" "*"
+
 "@types/http-errors@*":
   version "2.0.4"
   resolved "https://registry.yarnpkg.com/@types/http-errors/-/http-errors-2.0.4.tgz#7eb47726c391b7345a6ec35ad7f4de469cf5ba4f"
@@ -3940,6 +3947,14 @@
   version "9.0.7"
   resolved "https://registry.yarnpkg.com/@types/uuid/-/uuid-9.0.7.tgz#b14cebc75455eeeb160d5fe23c2fcc0c64f724d8"
   integrity sha512-WUtIVRUZ9i5dYXefDEAI7sh9/O7jGvHg7Df/5O/gtH3Yabe5odI3UWopVR1qbPXQtvOxWu3mM4XxlYeZtMWF4g==
+
+"@types/watchpack@^2.4.4":
+  version "2.4.4"
+  resolved "https://registry.yarnpkg.com/@types/watchpack/-/watchpack-2.4.4.tgz#d492bca62ba73cf041eda26e494fe7a540852836"
+  integrity sha512-SbuSavsPxfOPZwVHBgQUVuzYBe6+8KL7dwiJLXaj5rmv3DxktOMwX5WP1J6UontwUbewjVoc7pCgZvqy6rPn+A==
+  dependencies:
+    "@types/graceful-fs" "*"
+    "@types/node" "*"
 
 "@types/webpack-sources@*":
   version "3.2.3"
@@ -12677,7 +12692,7 @@ walk-up-path@^1.0.0:
   resolved "https://registry.yarnpkg.com/walk-up-path/-/walk-up-path-1.0.0.tgz#d4745e893dd5fd0dbb58dd0a4c6a33d9c9fec53e"
   integrity sha512-hwj/qMDUEjCU5h0xr90KGCf0tg0/LgJbmOWgrWKYlcJZM7XvquvUJZ0G/HMGr7F7OQMOUuPHWP9JpriinkAlkg==
 
-watchpack@^2.4.0:
+watchpack@2.4.0, watchpack@^2.4.0:
   version "2.4.0"
   resolved "https://registry.yarnpkg.com/watchpack/-/watchpack-2.4.0.tgz#fa33032374962c78113f93c7f2fb4c54c9862a5d"
   integrity sha512-Lcvm7MGST/4fup+ifyKi2hjyIAwcdI4HRgtvTpIUxBRhB+RFtUh8XtDOxUfctVCnhVi+QQj49i91OyvzkJl6cg==
