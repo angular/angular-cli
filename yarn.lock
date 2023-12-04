@@ -123,10 +123,10 @@
   dependencies:
     tslib "^2.3.0"
 
-"@angular/bazel@https://github.com/angular/bazel-builds.git#d29e65f5b6e361e5cf547fb805b72b6cd93e16dc":
-  version "17.1.0-next.2+sha-1940280"
-  uid d29e65f5b6e361e5cf547fb805b72b6cd93e16dc
-  resolved "https://github.com/angular/bazel-builds.git#d29e65f5b6e361e5cf547fb805b72b6cd93e16dc"
+"@angular/bazel@https://github.com/angular/bazel-builds.git#fff23b098d180a0093cfbc88d7b510afa500f962":
+  version "17.1.0-next.2+sha-d4b4236"
+  uid fff23b098d180a0093cfbc88d7b510afa500f962
+  resolved "https://github.com/angular/bazel-builds.git#fff23b098d180a0093cfbc88d7b510afa500f962"
   dependencies:
     "@microsoft/api-extractor" "^7.24.2"
     magic-string "^0.30.0"
@@ -140,10 +140,10 @@
     "@angular/core" "^13.0.0 || ^14.0.0-0"
     reflect-metadata "^0.1.13"
 
-"@angular/build-tooling@https://github.com/angular/dev-infra-private-build-tooling-builds.git#069ea40c7018ad3faec7a399a3b9de7188d47596":
-  version "0.0.0-1d3d98fabb0f3bb3a18bea96534f2a390a2b09b4"
-  uid "069ea40c7018ad3faec7a399a3b9de7188d47596"
-  resolved "https://github.com/angular/dev-infra-private-build-tooling-builds.git#069ea40c7018ad3faec7a399a3b9de7188d47596"
+"@angular/build-tooling@https://github.com/angular/dev-infra-private-build-tooling-builds.git#605fc83f5ab25151a313158418a2e6769c5e9602":
+  version "0.0.0-1337ad7c046566310c1748a4bdf3a12d89207a0d"
+  uid "605fc83f5ab25151a313158418a2e6769c5e9602"
+  resolved "https://github.com/angular/dev-infra-private-build-tooling-builds.git#605fc83f5ab25151a313158418a2e6769c5e9602"
   dependencies:
     "@angular-devkit/build-angular" "17.0.0"
     "@angular/benchpress" "0.3.0"
@@ -186,10 +186,10 @@
     uuid "^9.0.0"
     yargs "^17.0.0"
 
-"@angular/cdk@17.1.0-next.0":
-  version "17.1.0-next.0"
-  resolved "https://registry.yarnpkg.com/@angular/cdk/-/cdk-17.1.0-next.0.tgz#2a09fb38b5f19bd333d6a4586cc569900a76df9d"
-  integrity sha512-H7bj8CNPXDKuFQCbwFXO3WiiZnyu5mfRlE62wtDJ7Spa1MYdfxdG8vyW9H3gDCQINvFoc5McbvDnhh2GCs6MHA==
+"@angular/cdk@17.1.0-next.1":
+  version "17.1.0-next.1"
+  resolved "https://registry.yarnpkg.com/@angular/cdk/-/cdk-17.1.0-next.1.tgz#48f60546fd94d8d29a931250254a55d37ad8be62"
+  integrity sha512-EOH20Pg7r9Oiua0SIlXltTQ8t7alRK7IRg3W5Uq0Esx9Jz0hdk6dsvPPM215tscGI7ogEkixuevznhLNAeymIg==
   dependencies:
     tslib "^2.3.0"
   optionalDependencies:
@@ -253,10 +253,10 @@
     fast-glob "3.3.1"
     yargs "^17.2.1"
 
-"@angular/material@17.1.0-next.0":
-  version "17.1.0-next.0"
-  resolved "https://registry.yarnpkg.com/@angular/material/-/material-17.1.0-next.0.tgz#8feb599112c21f3db4eb9bb2bbf6e23073920617"
-  integrity sha512-8OVBFkoDuAhhljdYqT7ODNfezf8CbpEuwj1r/OjWg8kiZmcyM8pAwo5pqocFf0QSYtFWx2wnvEyh395aEvROwg==
+"@angular/material@17.1.0-next.1":
+  version "17.1.0-next.1"
+  resolved "https://registry.yarnpkg.com/@angular/material/-/material-17.1.0-next.1.tgz#52c6485c49cb267d5107d9d13279c794d0da86fe"
+  integrity sha512-vT+RIwMaYCQdSVTONjakxKwggjjMvYVoPnLZIRFN9OCumCGQ2nb931sd59t4SyI7OyGyBj1iUg3eVGGX1z5onw==
   dependencies:
     "@material/animation" "15.0.0-canary.a246a4439.0"
     "@material/auto-init" "15.0.0-canary.a246a4439.0"
@@ -307,10 +307,10 @@
     "@material/typography" "15.0.0-canary.a246a4439.0"
     tslib "^2.3.0"
 
-"@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#f00eb4ccb4c5282d8b7d292893baee2c38a3fa9e":
-  version "0.0.0-1d3d98fabb0f3bb3a18bea96534f2a390a2b09b4"
-  uid f00eb4ccb4c5282d8b7d292893baee2c38a3fa9e
-  resolved "https://github.com/angular/dev-infra-private-ng-dev-builds.git#f00eb4ccb4c5282d8b7d292893baee2c38a3fa9e"
+"@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#117c8524872a164cc0a6eefa569f915f5fc19137":
+  version "0.0.0-1337ad7c046566310c1748a4bdf3a12d89207a0d"
+  uid "117c8524872a164cc0a6eefa569f915f5fc19137"
+  resolved "https://github.com/angular/dev-infra-private-ng-dev-builds.git#117c8524872a164cc0a6eefa569f915f5fc19137"
   dependencies:
     "@yarnpkg/lockfile" "^1.1.0"
     typescript "~4.9.0"
