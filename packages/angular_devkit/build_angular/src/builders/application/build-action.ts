@@ -8,6 +8,7 @@
 
 import { BuilderOutput } from '@angular-devkit/architect';
 import type { logging } from '@angular-devkit/core';
+import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { BuildOutputFile } from '../../tools/esbuild/bundler-context';
 import { ExecutionResult, RebuildState } from '../../tools/esbuild/bundler-execution-result';
@@ -115,7 +116,11 @@ export async function* runEsBuildBuildAction(
       '.pnp.data.json',
     ];
 
-    watcher.add(packageWatchFiles.map((file) => path.join(workspaceRoot, file)));
+    watcher.add(
+      packageWatchFiles
+        .map((file) => path.join(workspaceRoot, file))
+        .filter((file) => existsSync(file)),
+    );
 
     // Watch locations provided by the initial build result
     watcher.add(result.watchFiles);
