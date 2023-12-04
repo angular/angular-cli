@@ -27,7 +27,7 @@ exports.config = {
     },
     {
       browserName: 'chrome',
-      platform: 'Linux',
+      platform: 'Windows 11',
       version: '116',
       tunnelIdentifier,
     },
@@ -40,7 +40,7 @@ exports.config = {
     {
       browserName: 'firefox',
       version: '102', // Latest Firefox ESR version as of Sep 2023
-      platform: 'Linux',
+      platform: 'Windows 11',
       tunnelIdentifier,
     },
     {
