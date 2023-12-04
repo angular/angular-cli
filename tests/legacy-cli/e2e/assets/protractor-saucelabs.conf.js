@@ -17,47 +17,54 @@ exports.config = {
   allScriptsTimeout: 11000,
   specs: ['./src/**/*.e2e-spec.ts'],
 
+  // NOTE: https://saucelabs.com/products/platform-configurator can be used to determine configuration values
   multiCapabilities: [
     {
       browserName: 'chrome',
       platform: 'Windows 11',
-      version: '105',
+      version: '119',
+      tunnelIdentifier,
+    },
+    {
+      browserName: 'chrome',
+      platform: 'Linux',
+      version: '116',
       tunnelIdentifier,
     },
     {
       browserName: 'firefox',
-      version: '104',
+      version: '119',
       platform: 'Windows 11',
       tunnelIdentifier,
     },
     {
       browserName: 'firefox',
-      version: '91', // Latest Firefox ESR version
-      platform: 'Windows 11',
+      version: '102', // Latest Firefox ESR version as of Sep 2023
+      platform: 'Linux',
+      tunnelIdentifier,
+    },
+    {
+      browserName: 'safari',
+      platform: 'macOS 13',
+      version: '17',
       tunnelIdentifier,
     },
     {
       browserName: 'safari',
       platform: 'macOS 12',
-      version: '15',
-      tunnelIdentifier,
-    },
-    {
-      browserName: 'safari',
-      platform: 'macOS 11.00',
-      version: '14',
+      version: '16',
       tunnelIdentifier,
     },
     {
       browserName: 'MicrosoftEdge',
       platform: 'Windows 11',
-      version: '103',
+      version: '118',
       tunnelIdentifier,
     },
     {
       browserName: 'MicrosoftEdge',
       platform: 'Windows 11',
-      version: '104',
+      version: '115',
       tunnelIdentifier,
     },
   ],
