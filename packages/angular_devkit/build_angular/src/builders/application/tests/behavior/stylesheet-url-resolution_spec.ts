@@ -163,5 +163,47 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
         }),
       );
     });
+
+    it('should not rebase a URL with a namespaced Sass variable reference', async () => {
+      await harness.writeFile(
+        'src/styles.scss',
+        `
+        @import "a";
+      `,
+      );
+      await harness.writeFile(
+        'src/a.scss',
+        `
+        @use './b' as named;
+        .a {
+          background-image: url(named.$my-var)
+        }
+      `,
+      );
+      await harness.writeFile(
+        'src/b.scss',
+        `
+        @forward './c.scss' show $my-var;
+      `,
+      );
+      await harness.writeFile(
+        'src/c.scss',
+        `
+        $my-var: "https://example.com/example.png";
+      `,
+      );
+
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+        styles: ['src/styles.scss'],
+      });
+
+      const { result } = await harness.executeOnce();
+      expect(result?.success).toBe(true);
+
+      harness
+        .expectFile('dist/browser/styles.css')
+        .content.toContain('url(https://example.com/example.png)');
+    });
   });
 });

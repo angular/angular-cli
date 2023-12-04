@@ -24,6 +24,28 @@ export interface DirectoryEntry {
 }
 
 /**
+ * Ensures that a bare specifier URL path that is intended to be treated as
+ * a relative path has a leading `./` or `../` prefix.
+ *
+ * @param url A bare specifier URL path that should be considered relative.
+ * @returns
+ */
+function ensureRelative(url: string): string {
+  // Empty
+  if (!url) {
+    return url;
+  }
+
+  // Already relative
+  if (url[0] === '.' && (url[1] === '/' || (url[1] === '.' && url[2] === '/'))) {
+    return url;
+  }
+
+  // Needs prefix
+  return './' + url;
+}
+
+/**
  * A Sass Importer base class that provides the load logic to rebase all `url()` functions
  * within a stylesheet. The rebasing will ensure that the URLs in the output of the Sass compiler
  * reflect the final filesystem location of the output CSS file.
@@ -55,8 +77,14 @@ abstract class UrlRebasingImporter implements Importer<'sync'> {
     // Rebase any URLs that are found
     let updatedContents;
     for (const { start, end, value } of findUrls(contents)) {
-      // Skip if value is empty, a Sass variable, or Webpack-specific prefix
-      if (value.length === 0 || value[0] === '$' || value[0] === '~' || value[0] === '^') {
+      // Skip if value is empty or Webpack-specific prefix
+      if (value.length === 0 || value[0] === '~' || value[0] === '^') {
+        continue;
+      }
+
+      // Skip if value is a Sass variable.
+      // Sass variable usage either starts with a `$` or contains a namespace and a `.$`
+      if (value[0] === '$' || /^\w+\.\$/.test(value)) {
         continue;
       }
 
@@ -69,10 +97,13 @@ abstract class UrlRebasingImporter implements Importer<'sync'> {
 
       // Normalize path separators and escape characters
       // https://developer.mozilla.org/en-US/docs/Web/CSS/url#syntax
-      const rebasedUrl = './' + rebasedPath.replace(/\\/g, '/').replace(/[()\s'"]/g, '\\$&');
+      const rebasedUrl = ensureRelative(
+        rebasedPath.replace(/\\/g, '/').replace(/[()\s'"]/g, '\\$&'),
+      );
 
       updatedContents ??= new MagicString(contents);
-      updatedContents.update(start, end, rebasedUrl);
+      // Always quote the URL to avoid potential downstream parsing problems
+      updatedContents.update(start, end, `"${rebasedUrl}"`);
     }
 
     if (updatedContents) {
