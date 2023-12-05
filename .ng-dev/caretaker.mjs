@@ -1,7 +1,9 @@
-import { CaretakerConfig } from '@angular/ng-dev';
-
-/** The configuration for `ng-dev caretaker` commands. */
-export const caretaker: CaretakerConfig = {
+/**
+ * The configuration for `ng-dev caretaker` commands.
+ * 
+ * @type { import("@angular/ng-dev").CaretakerConfig }
+ */
+export const caretaker = {
   githubQueries: [
     {
       name: 'Merge Queue',

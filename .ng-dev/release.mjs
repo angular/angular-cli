@@ -1,5 +1,4 @@
 import semver from 'semver';
-import { ReleaseConfig } from '@angular/ng-dev';
 import packages from '../lib/packages.js';
 
 const npmPackages = Object.entries(packages.releasePackages).map(([name, { experimental }]) => ({
@@ -7,8 +6,12 @@ const npmPackages = Object.entries(packages.releasePackages).map(([name, { exper
   experimental,
 }));
 
-/** Configuration for the `ng-dev release` command. */
-export const release: ReleaseConfig = {
+/** 
+ * Configuration for the `ng-dev release` command.
+ * 
+ * @type { import("@angular/ng-dev").ReleaseConfig }
+ */
+export const release = {
   representativeNpmPackage: '@angular/cli',
   npmPackages,
   buildPackages: async () => {
@@ -17,7 +20,7 @@ export const release: ReleaseConfig = {
     const { performNpmReleaseBuild } = await import('../scripts/build-packages-dist.mjs');
     return performNpmReleaseBuild();
   },
-  prereleaseCheck: async (newVersionStr: string) => {
+  prereleaseCheck: async (newVersionStr) => {
     const newVersion = new semver.SemVer(newVersionStr);
     const { assertValidDependencyRanges } = await import(
       '../scripts/release-checks/dependency-ranges/index.mjs'

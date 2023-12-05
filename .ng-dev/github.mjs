@@ -1,10 +1,10 @@
-import { GithubConfig } from '@angular/ng-dev';
-
 /**
  * Github configuration for the ng-dev command. This repository is
- * uses as remote for the merge script.
+ * used as remote for the merge script.
+ * 
+ * @type { import("@angular/ng-dev").GithubConfig }
  */
-export const github: GithubConfig = {
+export const github = {
   owner: 'angular',
   name: 'angular-cli',
   mainBranchName: 'main',
