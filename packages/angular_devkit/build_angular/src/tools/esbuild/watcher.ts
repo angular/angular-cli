@@ -39,11 +39,13 @@ export function createWatcher(options?: {
   polling?: boolean;
   interval?: number;
   ignored?: string[];
+  followSymlinks?: boolean;
 }): BuildWatcher {
   const watcher = new FSWatcher({
     usePolling: options?.polling,
     interval: options?.interval,
     ignored: options?.ignored,
+    followSymlinks: options?.followSymlinks,
     disableGlobbing: true,
     ignoreInitial: true,
   });

@@ -33,6 +33,7 @@ export async function* runEsBuildBuildAction(
     deleteOutputPath?: boolean;
     poll?: number;
     signal?: AbortSignal;
+    preserveSymlinks?: boolean;
   },
 ): AsyncIterable<(ExecutionResult['outputWithFiles'] | ExecutionResult['output']) & BuilderOutput> {
   const {
@@ -48,6 +49,7 @@ export async function* runEsBuildBuildAction(
     projectRoot,
     workspaceRoot,
     progress,
+    preserveSymlinks,
   } = options;
 
   if (deleteOutputPath && writeToFileSystem) {
@@ -79,6 +81,7 @@ export async function* runEsBuildBuildAction(
     watcher = createWatcher({
       polling: typeof poll === 'number',
       interval: poll,
+      followSymlinks: preserveSymlinks,
       ignored: [
         // Ignore the output and cache paths to avoid infinite rebuild cycles
         outputPath,
