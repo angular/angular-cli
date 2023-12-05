@@ -12326,10 +12326,10 @@ undici@5.27.2:
   dependencies:
     "@fastify/busboy" "^2.0.0"
 
-undici@5.28.2:
-  version "5.28.2"
-  resolved "https://registry.yarnpkg.com/undici/-/undici-5.28.2.tgz#fea200eac65fc7ecaff80a023d1a0543423b4c91"
-  integrity sha512-wh1pHJHnUeQV5Xa8/kyQhO7WFa8M34l026L5P/+2TYiakvGy5Rdc8jWZVyG7ieht/0WgJLEd3kcU5gKx+6GC8w==
+undici@6.0.0:
+  version "6.0.0"
+  resolved "https://registry.yarnpkg.com/undici/-/undici-6.0.0.tgz#e8275e084354fd009ce597174fac9b1dd114a3dc"
+  integrity sha512-m3nzx/3ji00Y6wY9hAJTBOBdtcMj0SyxpHKd5kaxghTftjB3icbYaPXGeogxIVcm6FVvnAM9aB6wz9L8Sntt8w==
   dependencies:
     "@fastify/busboy" "^2.0.0"
 
