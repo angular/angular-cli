@@ -1,10 +1,11 @@
-import { CommitMessageConfig } from '@angular/ng-dev';
 import packages from '../lib/packages.js';
 
 /**
  * The configuration for `ng-dev commit-message` commands.
+ * 
+ * @type { import("@angular/ng-dev").CommitMessageConfig }
  */
-export const commitMessage: CommitMessageConfig = {
+export const commitMessage = {
   maxLineLength: Infinity,
   minBodyLength: 0,
   minBodyLengthTypeExcludes: ['docs'],

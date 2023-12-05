@@ -1,11 +1,12 @@
 {
   "extends": "../tsconfig.json",
   "compilerOptions": {
+    "allowJs": true,
     "module": "Node16",
     "moduleResolution": "Node16",
     "noEmit": true,
     "types": []
   },
-  "include": ["**/*.mts"],
+  "include": ["**/*.mjs"],
   "exclude": []
 }
