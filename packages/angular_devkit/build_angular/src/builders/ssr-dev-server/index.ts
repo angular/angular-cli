@@ -21,21 +21,25 @@ import type {
   ProxyOptions,
 } from 'browser-sync';
 import { join, resolve as pathResolve } from 'path';
-import { EMPTY, Observable, combineLatest, from, of, zip } from 'rxjs';
 import {
+  EMPTY,
+  Observable,
   catchError,
+  combineLatest,
   concatMap,
   debounce,
   debounceTime,
   delay,
   finalize,
+  from,
   ignoreElements,
   map,
-  mapTo,
+  of,
   startWith,
   switchMap,
   tap,
-} from 'rxjs/operators';
+  zip,
+} from 'rxjs';
 import * as url from 'url';
 import { assertIsError } from '../../utils/error';
 import { Schema } from './schema';
@@ -99,7 +103,7 @@ export function execute(
           }
 
           return startNodeServer(s, nodeServerPort, context.logger, !!options.inspect).pipe(
-            mapTo([b, s]),
+            map(() => [b, s]),
             catchError((err) => {
               context.logger.error(`A server error has occurred.\n${mapErrorToMessage(err)}`);
 
@@ -153,7 +157,7 @@ export function execute(
                 **
               `);
           }),
-          mapTo(builderOutput),
+          map(() => builderOutput),
         );
       }
     }),
