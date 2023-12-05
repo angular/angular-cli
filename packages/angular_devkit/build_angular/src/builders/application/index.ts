@@ -64,6 +64,7 @@ export async function* buildApplicationInternal(
     },
     {
       watch: normalizedOptions.watch,
+      preserveSymlinks: normalizedOptions.preserveSymlinks,
       poll: normalizedOptions.poll,
       deleteOutputPath: normalizedOptions.deleteOutputPath,
       cacheOptions: normalizedOptions.cacheOptions,
