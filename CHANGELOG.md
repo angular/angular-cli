@@ -1,3 +1,28 @@
+<a name="17.0.6"></a>
+
+# 17.0.6 (2023-12-06)
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                       |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------- |
+| [da5d39471](https://github.com/angular/angular-cli/commit/da5d39471751cd92f6c21936aefc1f7157b4973b) | fix  | enable TypeScript `skipLibCheck` in new workspace |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                               |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------- |
+| [048512874](https://github.com/angular/angular-cli/commit/048512874bf9cc022cc9a8ab70f35fc60d9982f5) | fix  | app-shell generation incorrect content when using the application builder |
+| [f9e982c44](https://github.com/angular/angular-cli/commit/f9e982c4458fc022d34039b9c082471c7ce29c07) | fix  | check namespaced Sass variables when rebasing URLs                        |
+| [a1e8ffa9d](https://github.com/angular/angular-cli/commit/a1e8ffa9df3a8eb6af2a8851385ed8927e3c0c64) | fix  | correctly align error/warning messages when spinner is active             |
+| [46d88a034](https://github.com/angular/angular-cli/commit/46d88a034343dc93dd0c467afc08c824da427fef) | fix  | handle watch updates on Mac OSX when using native FSEvents API            |
+| [4594407ae](https://github.com/angular/angular-cli/commit/4594407ae214ce49985a5df315cae3ac8107147d) | fix  | improve file watching on Windows when using certain IDEs                  |
+| [aa9e7c615](https://github.com/angular/angular-cli/commit/aa9e7c615529cb9dd6dccd862674cadac0372f08) | fix  | normalize locale tags with Intl API when resolving in application builder |
+| [a8dbf1da2](https://github.com/angular/angular-cli/commit/a8dbf1da27faf772a4df382b1301e95c32d1ba89) | fix  | watch symlink when using `preserveSymlinks` option                        |
+| [e3820cb6c](https://github.com/angular/angular-cli/commit/e3820cb6c7cf131d890882f9e94b8f23c4cbb6a3) | perf | only enable advanced optimizations with script optimizations              |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="17.0.5"></a>
 
 # 17.0.5 (2023-11-29)
