@@ -124,8 +124,7 @@
     tslib "^2.3.0"
 
 "@angular/bazel@https://github.com/angular/bazel-builds.git#e0f8ff88b58705956db7799fefe48a1b1986c1c1":
-  version "17.1.0-next.0+sha-c745ca2"
-  uid e0f8ff88b58705956db7799fefe48a1b1986c1c1
+  version "17.1.0-next.0"
   resolved "https://github.com/angular/bazel-builds.git#e0f8ff88b58705956db7799fefe48a1b1986c1c1"
   dependencies:
     "@microsoft/api-extractor" "^7.24.2"
@@ -142,7 +141,6 @@
 
 "@angular/build-tooling@https://github.com/angular/dev-infra-private-build-tooling-builds.git#9a252c6036fe7f3193d16d3c8bf27fbf2152995c":
   version "0.0.0-bcf96bceec10f5c6806d49a6a0a80155d38f0c7b"
-  uid "9a252c6036fe7f3193d16d3c8bf27fbf2152995c"
   resolved "https://github.com/angular/dev-infra-private-build-tooling-builds.git#9a252c6036fe7f3193d16d3c8bf27fbf2152995c"
   dependencies:
     "@angular-devkit/build-angular" "17.0.0-rc.4"
@@ -307,7 +305,6 @@
 
 "@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#070371eb7409a874924ac7b8acef214d30bb9df9":
   version "0.0.0-bcf96bceec10f5c6806d49a6a0a80155d38f0c7b"
-  uid "070371eb7409a874924ac7b8acef214d30bb9df9"
   resolved "https://github.com/angular/dev-infra-private-ng-dev-builds.git#070371eb7409a874924ac7b8acef214d30bb9df9"
   dependencies:
     "@yarnpkg/lockfile" "^1.1.0"
@@ -12126,6 +12123,17 @@ vite@4.5.0:
   version "4.5.0"
   resolved "https://registry.yarnpkg.com/vite/-/vite-4.5.0.tgz#ec406295b4167ac3bc23e26f9c8ff559287cff26"
   integrity sha512-ulr8rNLA6rkyFAlVWw2q5YJ91v098AFQ2R0PRFwPzREXOUJQPtFUG0t+/ZikhaOCDqFoDhN6/v8Sq0o4araFAw==
+  dependencies:
+    esbuild "^0.18.10"
+    postcss "^8.4.27"
+    rollup "^3.27.1"
+  optionalDependencies:
+    fsevents "~2.3.2"
+
+vite@4.5.1:
+  version "4.5.1"
+  resolved "https://registry.yarnpkg.com/vite/-/vite-4.5.1.tgz#3370986e1ed5dbabbf35a6c2e1fb1e18555b968a"
+  integrity sha512-AXXFaAJ8yebyqzoNB9fu2pHoo/nWX+xZlaRwoeYUxEqBO+Zj4msE5G+BhGBll9lYEKv9Hfks52PAF2X7qDYXQA==
   dependencies:
     esbuild "^0.18.10"
     postcss "^8.4.27"
