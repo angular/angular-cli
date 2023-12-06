@@ -15,6 +15,11 @@
       "factory": "./update-17/update-workspace-config",
       "description": "Replace deprecated options in 'angular.json'."
     },
+    "add-browser-sync-dependency": {
+      "version": "17.1.0",
+      "factory": "./update-17/add-browser-sync-dependency",
+      "description": "Add 'browser-sync' as dev dependency when '@angular-devkit/build-angular:ssr-dev-server' is used, as it is no longer a direct dependency of '@angular-devkit/build-angular'."
+    },
     "use-application-builder": {
       "version": "18.0.0",
       "factory": "./update-17/use-application-builder",

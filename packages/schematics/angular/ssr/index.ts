@@ -212,8 +212,8 @@ function updateWebpackBuilderServerTsConfigRule(options: SSROptions): Rule {
   };
 }
 
-function addDependencies(): Rule {
-  return chain([
+function addDependencies(isUsingApplicationBuilder: boolean): Rule {
+  const rules: Rule[] = [
     addDependency('@angular/ssr', latestVersions.AngularSSR, {
       type: DependencyType.Default,
     }),
@@ -223,7 +223,17 @@ function addDependencies(): Rule {
     addDependency('@types/express', latestVersions['@types/express'], {
       type: DependencyType.Dev,
     }),
-  ]);
+  ];
+
+  if (!isUsingApplicationBuilder) {
+    rules.push(
+      addDependency('browser-sync', latestVersions['browser-sync'], {
+        type: DependencyType.Dev,
+      }),
+    );
+  }
+
+  return chain(rules);
 }
 
 function addServerFile(options: ServerOptions, isStandalone: boolean): Rule {
@@ -288,7 +298,7 @@ export default function (options: SSROptions): Rule {
           ]),
       addServerFile(options, isStandalone),
       addScriptsRule(options, isUsingApplicationBuilder),
-      addDependencies(),
+      addDependencies(isUsingApplicationBuilder),
     ]);
   };
 }
