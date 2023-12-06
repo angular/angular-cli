@@ -66,9 +66,12 @@ export async function executePostBundleSteps(
    */
   let indexContentOutputNoCssInlining: string | undefined;
 
+  // When using prerender/app-shell the index HTML file can be regenerated.
+  // Thus, we use a Map so that we do not generate 2 files with the same filename.
+  const additionalHtmlOutputFiles = new Map<string, BuildOutputFile>();
+
   // Generate index HTML file
   // If localization is enabled, index generation is handled in the inlining process.
-  // NOTE: Localization with SSR is not currently supported.
   if (indexHtmlOptions) {
     const { content, contentWithoutCriticalCssInlined, errors, warnings } = await generateIndexHtml(
       initialFiles,
@@ -84,14 +87,17 @@ export async function executePostBundleSteps(
     allErrors.push(...errors);
     allWarnings.push(...warnings);
 
-    additionalOutputFiles.push(
+    additionalHtmlOutputFiles.set(
+      indexHtmlOptions.output,
       createOutputFileFromText(indexHtmlOptions.output, content, BuildOutputFileType.Browser),
     );
 
     if (ssrOptions) {
-      additionalOutputFiles.push(
+      const serverIndexHtmlFilename = 'index.server.html';
+      additionalHtmlOutputFiles.set(
+        serverIndexHtmlFilename,
         createOutputFileFromText(
-          'index.server.html',
+          serverIndexHtmlFilename,
           contentWithoutCriticalCssInlined,
           BuildOutputFileType.Server,
         ),
@@ -130,11 +136,14 @@ export async function executePostBundleSteps(
     prerenderedRoutes.push(...Array.from(generatedRoutes));
 
     for (const [path, content] of Object.entries(output)) {
-      additionalOutputFiles.push(
+      additionalHtmlOutputFiles.set(
+        path,
         createOutputFileFromText(path, content, BuildOutputFileType.Browser),
       );
     }
   }
+
+  additionalOutputFiles.push(...additionalHtmlOutputFiles.values());
 
   // Augment the application with service worker support
   // If localization is enabled, service worker is handled in the inlining process.
