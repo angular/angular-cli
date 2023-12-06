@@ -80,7 +80,18 @@ export function execute(
     verbose: options.verbose,
   } as json.JsonObject);
 
-  const bsInstance = require('browser-sync').create();
+  let browserSync: typeof import('browser-sync');
+  try {
+    browserSync = require('browser-sync');
+  } catch {
+    return of({
+      success: false,
+      error:
+        '"browser-sync" is not installed, most likely you need to run `npm install browser-sync --save-dev` in your project.',
+    });
+  }
+
+  const bsInstance = browserSync.create();
 
   context.logger.error(tags.stripIndents`
   ****************************************************************************************
