@@ -6,16 +6,17 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-const fs = require('fs');
-const path = require('path');
-const {
+import {readFileSync, existsSync, writeFileSync} from 'fs';
+import {isAbsolute,join,dirname,resolve} from 'path';
+import {
   InputData,
   JSONSchemaInput,
   JSONSchemaStore,
   TypeScriptTargetLanguage,
   parseJSON,
   quicktype,
-} = require('quicktype-core');
+} from 'quicktype-core';
+import {parse} from 'url';
 
 /**
  * This file is pure JavaScript because Bazel only support compiling to ES5, while quicktype is
@@ -46,18 +47,18 @@ const footer = ``;
  * Supports reading from ng-cli addresses, valid URLs and files (absolute).
  */
 class FetchingJSONSchemaStore extends JSONSchemaStore {
-  constructor(inPath) {
+  private _inPath = ''
+  constructor(inPath: string) {
     super();
     this._inPath = inPath;
   }
 
-  async fetch(address) {
-    const URL = require('url');
-    const url = URL.parse(address);
+  async fetch(address: string) {
+    const url = parse(address);
     let content = null;
     if (url.protocol === 'ng-cli:') {
-      let filePath = path.join(__dirname, '../packages/angular/cli', url.hostname, url.path);
-      content = fs.readFileSync(filePath, 'utf-8').trim();
+      let filePath = join(__dirname, '../packages/angular/cli', url.hostname || '', url.path || '');
+      content = readFileSync(filePath, 'utf-8').trim();
     } else if (url.hostname) {
       try {
         const response = await fetch(address);
@@ -67,17 +68,17 @@ class FetchingJSONSchemaStore extends JSONSchemaStore {
       }
     }
 
-    if (content === null && !path.isAbsolute(address)) {
-      const resolvedPath = path.join(path.dirname(this._inPath), address);
+    if (content === null && !isAbsolute(address)) {
+      const resolvedPath = join(dirname(this._inPath), address);
 
       // Check relative to inPath
-      if (fs.existsSync(resolvedPath)) {
-        content = fs.readFileSync(resolvedPath, 'utf-8');
+      if (existsSync(resolvedPath)) {
+        content = readFileSync(resolvedPath, 'utf-8');
       }
     }
 
-    if (content === null && fs.existsSync(address)) {
-      content = fs.readFileSync(address, 'utf-8').trim();
+    if (content === null && existsSync(address)) {
+      content = readFileSync(address, 'utf-8').trim();
     }
 
     if (content == null) {
@@ -95,7 +96,7 @@ class FetchingJSONSchemaStore extends JSONSchemaStore {
  * @param {string} inPath
  * @param {string} outPath
  */
-async function main(inPath, outPath) {
+async function main(inPath: string, outPath: string) {
   const content = await generate(inPath);
 
   if (outPath === '-') {
@@ -104,15 +105,15 @@ async function main(inPath, outPath) {
   }
 
   const buildWorkspaceDirectory = process.env['BUILD_WORKSPACE_DIRECTORY'] || '.';
-  outPath = path.resolve(buildWorkspaceDirectory, outPath);
-  fs.writeFileSync(outPath, content, 'utf-8');
+  outPath = resolve(buildWorkspaceDirectory, outPath);
+  writeFileSync(outPath, content, 'utf-8');
 }
 
-async function generate(inPath) {
+export async function generate(inPath: string) {
   // Best description of how to use the API was found at
   //   https://blog.quicktype.io/customizing-quicktype/
   const inputData = new InputData();
-  const content = fs.readFileSync(inPath, 'utf-8');
+  const content = readFileSync(inPath, 'utf-8');
   const source = { name: 'Schema', schema: appendDeprecatedDescription(content) };
 
   await inputData.addSource('schema', source, () => {
@@ -139,7 +140,7 @@ async function generate(inPath) {
  * Converts `x-deprecated` to `@deprecated` comments.
  * @param {string} schema
  */
-function appendDeprecatedDescription(schema) {
+function appendDeprecatedDescription(schema: any) {
   const content = JSON.parse(schema);
   const props = content.properties;
 
@@ -173,4 +174,3 @@ if (require.main === module) {
     });
 }
 
-exports.generate = generate;
