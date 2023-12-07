@@ -10,7 +10,7 @@ import type { BuildOptions } from 'esbuild';
 import assert from 'node:assert';
 import { createHash } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
-import { extname, join } from 'node:path';
+import { extname, join, resolve } from 'node:path';
 import type { NormalizedApplicationBuildOptions } from '../../builders/application/options';
 import { allowMangle } from '../../utils/environment-options';
 import { createCompilerPlugin } from './angular/compiler-plugin';
@@ -312,6 +312,7 @@ export function createServerPolyfillBundleOptions(
 function getEsBuildCommonOptions(options: NormalizedApplicationBuildOptions): BuildOptions {
   const {
     workspaceRoot,
+    outputPath,
     outExtension,
     optimizationOptions,
     sourcemapOptions,
@@ -352,7 +353,7 @@ function getEsBuildCommonOptions(options: NormalizedApplicationBuildOptions): Bu
     minifySyntax: optimizationOptions.scripts,
     minifyWhitespace: optimizationOptions.scripts,
     pure: ['forwardRef'],
-    outdir: workspaceRoot,
+    outdir: resolve(workspaceRoot, outputPath),
     outExtension: outExtension ? { '.js': `.${outExtension}` } : undefined,
     sourcemap: sourcemapOptions.scripts && (sourcemapOptions.hidden ? 'external' : true),
     splitting: true,
