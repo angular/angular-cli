@@ -72,6 +72,14 @@ export function execute(
           );
         }
 
+        if (
+          normalizedOptions.forceEsbuild &&
+          builderName === '@angular-devkit/build-angular:browser'
+        ) {
+          // The compatibility builder should be used if esbuild is force enabled with the official Webpack-based builder.
+          builderName = '@angular-devkit/build-angular:browser-esbuild';
+        }
+
         return defer(() => import('./vite-server')).pipe(
           switchMap(({ serveWithVite }) =>
             serveWithVite(normalizedOptions, builderName, context, transforms, extensions),
