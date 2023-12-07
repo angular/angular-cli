@@ -199,8 +199,18 @@
       "description": "Do not use the real path when resolving modules. If unset then will default to `true` if NodeJS option --preserve-symlinks is set."
     },
     "browsers": {
-      "type": "string",
-      "description": "Override which browsers tests are run against."
+      "description": "Override which browsers tests are run against. Set to `false` to not use any browser.",
+      "oneOf": [
+        {
+          "type": "string",
+          "description": "A comma seperate list of browsers to run tests against."
+        },
+        {
+          "const": false,
+          "type": "boolean",
+          "description": "Does use run tests against a browser."
+        }
+      ]
     },
     "codeCoverage": {
       "type": "boolean",
