@@ -6,8 +6,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import {readFileSync, existsSync, writeFileSync} from 'fs';
-import {isAbsolute,join,dirname,resolve} from 'path';
+import { readFileSync, existsSync, writeFileSync } from 'fs';
+import { isAbsolute, join, dirname, resolve } from 'path';
 import {
   InputData,
   JSONSchemaInput,
@@ -16,13 +16,9 @@ import {
   parseJSON,
   quicktype,
 } from 'quicktype-core';
-import {parse} from 'url';
+import { parse } from 'url';
 
 /**
- * This file is pure JavaScript because Bazel only support compiling to ES5, while quicktype is
- * ES2015. This results in an incompatible call to `super()` in the FetchingJSONSchemaStore
- * class as it tries to call JSONSchemaStore's constructor in ES5.
- * TODO: move this file to typescript when Bazel supports ES2015 output.
  *
  * This file wraps around quicktype and can do one of two things;
  *
@@ -47,7 +43,7 @@ const footer = ``;
  * Supports reading from ng-cli addresses, valid URLs and files (absolute).
  */
 class FetchingJSONSchemaStore extends JSONSchemaStore {
-  private _inPath = ''
+  private _inPath = '';
   constructor(inPath: string) {
     super();
     this._inPath = inPath;
@@ -173,4 +169,3 @@ if (require.main === module) {
       process.exit(127);
     });
 }
-
