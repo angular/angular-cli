@@ -271,7 +271,7 @@ export interface FileReplacement {
 // @public
 export interface KarmaBuilderOptions {
     assets?: AssetPattern_3[];
-    browsers?: string;
+    browsers?: Browsers;
     codeCoverage?: boolean;
     codeCoverageExclude?: string[];
     exclude?: string[];

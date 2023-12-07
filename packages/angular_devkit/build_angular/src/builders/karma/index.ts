@@ -100,8 +100,10 @@ export function execute(
       karmaOptions.singleRun = singleRun;
 
       // Convert browsers from a string to an array
-      if (options.browsers) {
+      if (typeof options.browsers === 'string' && options.browsers) {
         karmaOptions.browsers = options.browsers.split(',');
+      } else if (options.browsers === false) {
+        karmaOptions.browsers = [];
       }
 
       if (options.reporters) {
