@@ -71,6 +71,11 @@ describeServeBuilder(
         expect(result?.success).toBeTrue();
         const port = getResultPort(result);
         expect(port).not.toBe('4200');
+        if (isViteRun) {
+          // Should not be default Vite port either
+          expect(port).not.toBe('5173');
+        }
+
         expect(port).toMatch(/\d{4,6}/);
         expect(await response?.text()).toContain('<title>');
 
