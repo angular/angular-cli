@@ -211,8 +211,17 @@ export class InlineFontsProcessor {
           {
             agent,
             headers: {
+              /**
+               * Always use a Windows UA. This is because Google fonts will including hinting in fonts for Windows.
+               * Hinting is a technique used with Windows files to improve appearance however
+               * results in 20-50% larger file sizes.
+               *
+               * @see http://google3/java/com/google/fonts/css/OpenSansWebFontsCssBuilder.java?l=22
+               * @see https://fonts.google.com/knowledge/glossary/hinting (short)
+               * @see https://glyphsapp.com/learn/hinting-manual-truetype-hinting (deep dive)
+               */
               'user-agent':
-                'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.121 Safari/537.36',
+                'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
             },
           },
           (res) => {
