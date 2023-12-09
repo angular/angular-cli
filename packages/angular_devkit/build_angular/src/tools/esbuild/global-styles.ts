@@ -27,6 +27,8 @@ export function createGlobalStylesBundleOptions(
     externalDependencies,
     stylePreprocessorOptions,
     tailwindConfiguration,
+    cacheOptions,
+    publicPath,
   } = options;
 
   const namespace = 'angular:styles/global';
@@ -49,6 +51,7 @@ export function createGlobalStylesBundleOptions(
       {
         workspaceRoot,
         optimization: !!optimizationOptions.styles.minify,
+        inlineFonts: !!optimizationOptions.fonts.inline,
         sourcemap: !!sourcemapOptions.styles,
         preserveSymlinks,
         target,
@@ -61,7 +64,8 @@ export function createGlobalStylesBundleOptions(
             },
         includePaths: stylePreprocessorOptions?.includePaths,
         tailwindConfiguration,
-        publicPath: options.publicPath,
+        cacheOptions,
+        publicPath,
       },
       loadCache,
     );

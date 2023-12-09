@@ -6,9 +6,11 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import type { BuildOptions } from 'esbuild';
+import type { BuildOptions, Plugin } from 'esbuild';
 import path from 'node:path';
+import { NormalizedCachedOptions } from '../../../utils/normalize-cache';
 import { LoadResultCache } from '../load-result-cache';
+import { createCssInlineFontsPlugin } from './css-inline-fonts-plugin';
 import { CssStylesheetLanguage } from './css-language';
 import { createCssResourcePlugin } from './css-resource-plugin';
 import { LessStylesheetLanguage } from './less-language';
@@ -18,6 +20,7 @@ import { StylesheetPluginFactory } from './stylesheet-plugin-factory';
 export interface BundleStylesheetOptions {
   workspaceRoot: string;
   optimization: boolean;
+  inlineFonts: boolean;
   preserveSymlinks?: boolean;
   sourcemap: boolean | 'external' | 'inline';
   outputNames: { bundles: string; media: string };
@@ -26,6 +29,7 @@ export interface BundleStylesheetOptions {
   target: string[];
   tailwindConfiguration?: { file: string; package: string };
   publicPath?: string;
+  cacheOptions: NormalizedCachedOptions;
 }
 
 export function createStylesheetBundleOptions(
@@ -48,6 +52,17 @@ export function createStylesheetBundleOptions(
     cache,
   );
 
+  const plugins: Plugin[] = [
+    pluginFactory.create(SassStylesheetLanguage),
+    pluginFactory.create(LessStylesheetLanguage),
+    pluginFactory.create(CssStylesheetLanguage),
+    createCssResourcePlugin(cache),
+  ];
+
+  if (options.inlineFonts) {
+    plugins.push(createCssInlineFontsPlugin({ cache, cacheOptions: options.cacheOptions }));
+  }
+
   return {
     absWorkingDir: options.workspaceRoot,
     bundle: true,
@@ -66,11 +81,6 @@ export function createStylesheetBundleOptions(
     publicPath: options.publicPath,
     conditions: ['style', 'sass', 'less'],
     mainFields: ['style', 'sass'],
-    plugins: [
-      pluginFactory.create(SassStylesheetLanguage),
-      pluginFactory.create(LessStylesheetLanguage),
-      pluginFactory.create(CssStylesheetLanguage),
-      createCssResourcePlugin(cache),
-    ],
+    plugins,
   };
 }

@@ -33,7 +33,9 @@ export function createCompilerPluginOptions(
     advancedOptimizations,
     inlineStyleLanguage,
     jit,
+    cacheOptions,
     tailwindConfiguration,
+    publicPath,
   } = options;
 
   return {
@@ -52,6 +54,7 @@ export function createCompilerPluginOptions(
     // Component stylesheet options
     styleOptions: {
       workspaceRoot,
+      inlineFonts: !!optimizationOptions.fonts.inline,
       optimization: !!optimizationOptions.styles.minify,
       sourcemap:
         // Hidden component stylesheet sourcemaps are inaccessible which is effectively
@@ -65,7 +68,8 @@ export function createCompilerPluginOptions(
       inlineStyleLanguage,
       preserveSymlinks,
       tailwindConfiguration,
-      publicPath: options.publicPath,
+      cacheOptions,
+      publicPath,
     },
   };
 }
