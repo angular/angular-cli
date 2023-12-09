@@ -116,7 +116,7 @@ export class InlineFontsProcessor {
         continue;
       }
 
-      const content = await this.processHref(url);
+      const content = await this.processURL(url);
       if (content === undefined) {
         continue;
       }
@@ -258,13 +258,18 @@ export class InlineFontsProcessor {
     return data;
   }
 
-  private async processHref(url: URL): Promise<string | undefined> {
-    const provider = this.getFontProviderDetails(url);
+  async processURL(url: string | URL): Promise<string | undefined> {
+    const normalizedURL = url instanceof URL ? url : this.createNormalizedUrl(url);
+    if (!normalizedURL) {
+      return;
+    }
+
+    const provider = this.getFontProviderDetails(normalizedURL);
     if (!provider) {
       return undefined;
     }
 
-    let cssContent = await this.getResponse(url);
+    let cssContent = await this.getResponse(normalizedURL);
 
     if (this.options.minify) {
       cssContent = cssContent
@@ -279,23 +284,28 @@ export class InlineFontsProcessor {
     return cssContent;
   }
 
+  canInlineRequest(url: string): boolean {
+    const normalizedUrl = this.createNormalizedUrl(url);
+
+    return normalizedUrl ? !!this.getFontProviderDetails(normalizedUrl) : false;
+  }
+
   private getFontProviderDetails(url: URL): FontProviderDetails | undefined {
     return SUPPORTED_PROVIDERS[url.hostname];
   }
 
   private createNormalizedUrl(value: string): URL | undefined {
     // Need to convert '//' to 'https://' because the URL parser will fail with '//'.
-    const normalizedHref = value.startsWith('//') ? `https:${value}` : value;
-    if (!normalizedHref.startsWith('http')) {
-      // Non valid URL.
-      // Example: relative path styles.css.
-      return undefined;
+    const url = new URL(value.startsWith('//') ? `https:${value}` : value, 'resolve://');
+
+    switch (url.protocol) {
+      case 'http:':
+      case 'https:':
+        url.protocol = 'https:';
+
+        return url;
+      default:
+        return undefined;
     }
-
-    const url = new URL(normalizedHref);
-    // Force HTTPS protocol
-    url.protocol = 'https:';
-
-    return url;
   }
 }
