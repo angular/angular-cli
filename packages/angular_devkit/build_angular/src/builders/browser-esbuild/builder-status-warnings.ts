@@ -39,11 +39,7 @@ export function logBuilderStatusWarnings(
       continue;
     }
 
-    if (
-      unsupportedOption === 'vendorChunk' ||
-      unsupportedOption === 'resourcesOutputPath' ||
-      unsupportedOption === 'deployUrl'
-    ) {
+    if (unsupportedOption === 'vendorChunk' || unsupportedOption === 'resourcesOutputPath') {
       logger.warn(
         `The '${unsupportedOption}' option is not used by this builder and will be ignored.`,
       );
