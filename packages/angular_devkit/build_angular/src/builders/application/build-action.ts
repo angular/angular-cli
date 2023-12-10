@@ -53,7 +53,7 @@ export async function* runEsBuildBuildAction(
   } = options;
 
   if (deleteOutputPath && writeToFileSystem) {
-    await deleteOutputDir(workspaceRoot, outputPath);
+    await deleteOutputDir(workspaceRoot, outputPath, ['browser', 'server']);
   }
 
   const withProgress: typeof withSpinner = progress ? withSpinner : withNoProgress;
