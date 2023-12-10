@@ -12,11 +12,19 @@ import { join, resolve } from 'node:path';
 /**
  * Delete an output directory, but error out if it's the root of the project.
  */
-export async function deleteOutputDir(root: string, outputPath: string): Promise<void> {
+export async function deleteOutputDir(
+  root: string,
+  outputPath: string,
+  emptyOnlyDirectories?: string[],
+): Promise<void> {
   const resolvedOutputPath = resolve(root, outputPath);
   if (resolvedOutputPath === root) {
     throw new Error('Output path MUST not be project root directory!');
   }
+
+  const directoriesToEmpty = emptyOnlyDirectories
+    ? new Set(emptyOnlyDirectories.map((directory) => join(resolvedOutputPath, directory)))
+    : undefined;
 
   // Avoid removing the actual directory to avoid errors in cases where the output
   // directory is mounted or symlinked. Instead the contents are removed.
@@ -31,6 +39,14 @@ export async function deleteOutputDir(root: string, outputPath: string): Promise
   }
 
   for (const entry of entries) {
-    await rm(join(resolvedOutputPath, entry), { force: true, recursive: true, maxRetries: 3 });
+    const fullEntry = join(resolvedOutputPath, entry);
+
+    // Leave requested directories. This allows symlinks to continue to function.
+    if (directoriesToEmpty?.has(fullEntry)) {
+      await deleteOutputDir(resolvedOutputPath, fullEntry);
+      continue;
+    }
+
+    await rm(fullEntry, { force: true, recursive: true, maxRetries: 3 });
   }
 }

@@ -15,8 +15,9 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       // Application code is not needed for asset tests
       await harness.writeFile('src/main.ts', 'console.log("TEST");');
 
-      // Add file in output
-      await harness.writeFile('dist/dummy.txt', '');
+      // Add files in output
+      await harness.writeFile('dist/a.txt', 'A');
+      await harness.writeFile('dist/browser/b.txt', 'B');
     });
 
     it(`should delete the output files when 'deleteOutputPath' is true`, async () => {
@@ -27,7 +28,10 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
       const { result } = await harness.executeOnce();
       expect(result?.success).toBeTrue();
-      harness.expectFile('dist/dummy.txt').toNotExist();
+      harness.expectDirectory('dist').toExist();
+      harness.expectFile('dist/a.txt').toNotExist();
+      harness.expectDirectory('dist/browser').toExist();
+      harness.expectFile('dist/browser/b.txt').toNotExist();
     });
 
     it(`should delete the output files when 'deleteOutputPath' is not set`, async () => {
@@ -38,7 +42,10 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
       const { result } = await harness.executeOnce();
       expect(result?.success).toBeTrue();
-      harness.expectFile('dist/dummy.txt').toNotExist();
+      harness.expectDirectory('dist').toExist();
+      harness.expectFile('dist/a.txt').toNotExist();
+      harness.expectDirectory('dist/browser').toExist();
+      harness.expectFile('dist/browser/b.txt').toNotExist();
     });
 
     it(`should not delete the output files when 'deleteOutputPath' is false`, async () => {
@@ -49,7 +56,23 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
       const { result } = await harness.executeOnce();
       expect(result?.success).toBeTrue();
-      harness.expectFile('dist/dummy.txt').toExist();
+      harness.expectFile('dist/a.txt').toExist();
+      harness.expectFile('dist/browser/b.txt').toExist();
+    });
+
+    it(`should not delete empty only directories when 'deleteOutputPath' is true`, async () => {
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+        deleteOutputPath: true,
+      });
+
+      // Add an error to prevent the build from writing files
+      await harness.writeFile('src/main.ts', 'INVALID_CODE');
+
+      const { result } = await harness.executeOnce({ outputLogsOnFailure: false });
+      expect(result?.success).toBeFalse();
+      harness.expectDirectory('dist').toExist();
+      harness.expectDirectory('dist/browser').toExist();
     });
   });
 });
