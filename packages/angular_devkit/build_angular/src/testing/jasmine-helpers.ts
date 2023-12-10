@@ -42,6 +42,9 @@ export class JasmineBuilderHarness<T> extends BuilderHarness<T> {
   expectFile(path: string): HarnessFileMatchers {
     return expectFile(path, this);
   }
+  expectDirectory(path: string): HarnessDirectoryMatchers {
+    return expectDirectory(path, this);
+  }
 }
 
 export interface HarnessFileMatchers {
@@ -49,6 +52,11 @@ export interface HarnessFileMatchers {
   toNotExist(): boolean;
   readonly content: jasmine.ArrayLikeMatchers<string>;
   readonly size: jasmine.Matchers<number>;
+}
+
+export interface HarnessDirectoryMatchers {
+  toExist(): boolean;
+  toNotExist(): boolean;
 }
 
 /**
@@ -122,6 +130,26 @@ export function expectFile<T>(path: string, harness: BuilderHarness<T>): Harness
           `Expected file size but file does not exist: '${path}'`,
         );
       }
+    },
+  };
+}
+
+export function expectDirectory<T>(
+  path: string,
+  harness: BuilderHarness<T>,
+): HarnessDirectoryMatchers {
+  return {
+    toExist() {
+      const exists = harness.hasDirectory(path);
+      expect(exists).toBe(true, 'Expected directory to exist: ' + path);
+
+      return exists;
+    },
+    toNotExist() {
+      const exists = harness.hasDirectory(path);
+      expect(exists).toBe(false, 'Expected directory to not exist: ' + path);
+
+      return !exists;
     },
   };
 }

@@ -22,7 +22,7 @@ import {
 import { WorkspaceHost } from '@angular-devkit/architect/node';
 import { TestProjectHost } from '@angular-devkit/architect/testing';
 import { getSystemPath, json, logging } from '@angular-devkit/core';
-import { existsSync, readFileSync, readdirSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import fs from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import {
@@ -349,6 +349,12 @@ export class BuilderHarness<T> {
     const fullPath = this.resolvePath(path);
 
     return existsSync(fullPath);
+  }
+
+  hasDirectory(path: string): boolean {
+    const fullPath = this.resolvePath(path);
+
+    return statSync(fullPath, { throwIfNoEntry: false })?.isDirectory() ?? false;
   }
 
   hasFileMatch(directory: string, pattern: RegExp): boolean {
