@@ -56,7 +56,7 @@ export async function* buildEsbuildBrowser(
     {
       write: false,
     },
-    plugins,
+    plugins && { codePlugins: plugins },
   )) {
     if (infrastructureSettings?.write !== false && result.outputFiles) {
       // Write output files

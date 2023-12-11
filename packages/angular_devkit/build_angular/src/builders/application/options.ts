@@ -18,6 +18,7 @@ import {
 } from '../../tools/webpack/utils/helpers';
 import { normalizeAssetPatterns, normalizeOptimization, normalizeSourceMaps } from '../../utils';
 import { I18nOptions, createI18nOptions } from '../../utils/i18n-options';
+import { IndexHtmlTransform } from '../../utils/index-file/index-html-generator';
 import { normalizeCacheOptions } from '../../utils/normalize-cache';
 import { generateEntryPoints } from '../../utils/package-chunk-sort';
 import { findTailwindConfigurationFile } from '../../utils/tailwind';
@@ -25,6 +26,11 @@ import { getIndexInputFile, getIndexOutputFile } from '../../utils/webpack-brows
 import { Schema as ApplicationBuilderOptions, I18NTranslation, OutputHashing } from './schema';
 
 export type NormalizedApplicationBuildOptions = Awaited<ReturnType<typeof normalizeOptions>>;
+
+export interface ApplicationBuilderExtensions {
+  codePlugins?: Plugin[];
+  indexHtmlTransformer?: IndexHtmlTransform;
+}
 
 /** Internal options hidden from builder schema but available when invoked programmatically. */
 interface InternalOptions {
@@ -82,7 +88,7 @@ export async function normalizeOptions(
   context: BuilderContext,
   projectName: string,
   options: ApplicationBuilderInternalOptions,
-  plugins?: Plugin[],
+  extensions?: ApplicationBuilderExtensions,
 ) {
   // If not explicitly set, default to the Node.js process argument
   const preserveSymlinks =
@@ -217,6 +223,7 @@ export async function normalizeOptions(
         scripts: options.scripts ?? [],
         styles: options.styles ?? [],
       }),
+      transformer: extensions?.indexHtmlTransformer,
     };
   }
 
@@ -329,7 +336,7 @@ export async function normalizeOptions(
     namedChunks,
     budgets: budgets?.length ? budgets : undefined,
     publicPath: deployUrl ? deployUrl : undefined,
-    plugins: plugins?.length ? plugins : undefined,
+    plugins: extensions?.codePlugins?.length ? extensions?.codePlugins : undefined,
     loaderExtensions,
   };
 }
