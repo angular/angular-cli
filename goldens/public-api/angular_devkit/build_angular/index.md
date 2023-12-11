@@ -149,13 +149,10 @@ export interface Budget {
 }
 
 // @public
-export function buildApplication(options: ApplicationBuilderOptions, context: BuilderContext, plugins?: Plugin_2[]): AsyncIterable<BuilderOutput & {
-    outputFiles?: BuildOutputFile[];
-    assetFiles?: {
-        source: string;
-        destination: string;
-    }[];
-}>;
+export function buildApplication(options: ApplicationBuilderOptions, context: BuilderContext, plugins?: Plugin_2[]): AsyncIterable<ApplicationBuilderOutput>;
+
+// @public
+export function buildApplication(options: ApplicationBuilderOptions, context: BuilderContext, extensions?: ApplicationBuilderExtensions): AsyncIterable<ApplicationBuilderOutput>;
 
 // @public
 export enum CrossOrigin {

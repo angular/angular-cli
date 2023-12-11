@@ -13,7 +13,11 @@ import { purgeStaleBuildCache } from '../../utils/purge-cache';
 import { assertCompatibleAngularVersion } from '../../utils/version';
 import { runEsBuildBuildAction } from './build-action';
 import { executeBuild } from './execute-build';
-import { ApplicationBuilderInternalOptions, normalizeOptions } from './options';
+import {
+  ApplicationBuilderExtensions,
+  ApplicationBuilderInternalOptions,
+  normalizeOptions,
+} from './options';
 import { Schema as ApplicationBuilderOptions } from './schema';
 
 export { ApplicationBuilderOptions };
@@ -25,13 +29,8 @@ export async function* buildApplicationInternal(
   infrastructureSettings?: {
     write?: boolean;
   },
-  plugins?: Plugin[],
-): AsyncIterable<
-  BuilderOutput & {
-    outputFiles?: BuildOutputFile[];
-    assetFiles?: { source: string; destination: string }[];
-  }
-> {
+  extensions?: ApplicationBuilderExtensions,
+): AsyncIterable<ApplicationBuilderOutput> {
   // Check Angular version.
   assertCompatibleAngularVersion(context.workspaceRoot);
 
@@ -46,7 +45,7 @@ export async function* buildApplicationInternal(
     return;
   }
 
-  const normalizedOptions = await normalizeOptions(context, projectName, options, plugins);
+  const normalizedOptions = await normalizeOptions(context, projectName, options, extensions);
 
   // Setup an abort controller with a builder teardown if no signal is present
   let signal = context.signal;
@@ -94,6 +93,11 @@ export async function* buildApplicationInternal(
   );
 }
 
+export interface ApplicationBuilderOutput extends BuilderOutput {
+  outputFiles?: BuildOutputFile[];
+  assetFiles?: { source: string; destination: string }[];
+}
+
 /**
  * Builds an application using the `application` builder with the provided
  * options.
@@ -112,13 +116,41 @@ export function buildApplication(
   options: ApplicationBuilderOptions,
   context: BuilderContext,
   plugins?: Plugin[],
-): AsyncIterable<
-  BuilderOutput & {
-    outputFiles?: BuildOutputFile[];
-    assetFiles?: { source: string; destination: string }[];
+): AsyncIterable<ApplicationBuilderOutput>;
+
+/**
+ * Builds an application using the `application` builder with the provided
+ * options.
+ *
+ * Usage of the `extensions` parameter is NOT supported and may cause unexpected
+ * build output or build failures.
+ *
+ * @experimental Direct usage of this function is considered experimental.
+ *
+ * @param options The options defined by the builder's schema to use.
+ * @param context An Architect builder context instance.
+ * @param extensions An object contain extension points for the build.
+ * @returns The build output results of the build.
+ */
+export function buildApplication(
+  options: ApplicationBuilderOptions,
+  context: BuilderContext,
+  extensions?: ApplicationBuilderExtensions,
+): AsyncIterable<ApplicationBuilderOutput>;
+
+export function buildApplication(
+  options: ApplicationBuilderOptions,
+  context: BuilderContext,
+  pluginsOrExtensions?: Plugin[] | ApplicationBuilderExtensions,
+): AsyncIterable<ApplicationBuilderOutput> {
+  let extensions;
+  if (pluginsOrExtensions && Array.isArray(pluginsOrExtensions)) {
+    extensions = {
+      codePlugins: pluginsOrExtensions,
+    };
   }
-> {
-  return buildApplicationInternal(options, context, undefined, plugins);
+
+  return buildApplicationInternal(options, context, undefined, extensions);
 }
 
 export default createBuilder(buildApplication);

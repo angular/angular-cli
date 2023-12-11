@@ -82,6 +82,7 @@ export async function generateIndexHtml(
     },
     crossOrigin: crossOrigin,
     deployUrl: buildOptions.publicPath,
+    postTransform: indexHtmlOptions.transformer,
   });
 
   indexHtmlGenerator.readAsset = readAsset;
@@ -110,6 +111,7 @@ export async function generateIndexHtml(
 
   const inlineCriticalCssProcessor = new InlineCriticalCssProcessor({
     minify: false, // CSS has already been minified during the build.
+    deployUrl: buildOptions.publicPath,
     readAsset,
   });
 
