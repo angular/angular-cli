@@ -220,7 +220,7 @@ export async function* serveWithVite(
     if (server) {
       // Update fs allow list to include any new assets from the build option.
       server.config.server.fs.allow = [
-        ...new Set(...server.config.server.fs.allow, ...assetFiles.values()),
+        ...new Set([...server.config.server.fs.allow, ...assetFiles.values()]),
       ];
 
       handleUpdate(normalizePath, generatedFiles, server, serverOptions, context.logger);
