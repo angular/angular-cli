@@ -9,23 +9,24 @@
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { workerData } from 'node:worker_threads';
+import { satisfies } from 'semver';
 
-let IS_NODE_18: boolean | undefined;
-function isNode18(): boolean {
-  return (IS_NODE_18 ??= process.versions.node.startsWith('18.'));
+let SUPPORTS_IMPORT_FLAG: boolean | undefined;
+function supportsImportFlag(): boolean {
+  return (SUPPORTS_IMPORT_FLAG ??= satisfies(process.versions.node, '>= 18.19'));
 }
 
 /** Call the initialize hook when running on Node.js 18 */
 export function callInitializeIfNeeded(
   initialize: (typeof import('./loader-hooks'))['initialize'],
 ): void {
-  if (isNode18()) {
+  if (!supportsImportFlag()) {
     initialize(workerData);
   }
 }
 
 export function getESMLoaderArgs(): string[] {
-  if (isNode18()) {
+  if (!supportsImportFlag()) {
     return [
       '--no-warnings', // Suppress `ExperimentalWarning: Custom ESM Loaders is an experimental feature...`.
       '--loader',
