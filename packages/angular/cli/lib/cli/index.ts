@@ -105,7 +105,11 @@ export default async function (options: { cliArgs: string[] }) {
     } else if (typeof err === 'number') {
       // Log nothing.
     } else {
-      logger.fatal(`An unexpected error occurred: ${err}`);
+      logger.fatal(
+        `An unexpected error occurred: ${
+          typeof err === 'object' && 'code' in err ? err.code : err
+        }`,
+      );
     }
 
     return 1;
