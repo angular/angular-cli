@@ -31,7 +31,6 @@ export class SourceFileCache extends Map<string, ts.SourceFile> {
     }
     for (let file of files) {
       file = path.normalize(file);
-      this.typeScriptFileCache.delete(file);
       this.loadResultCache.invalidate(file);
 
       // Normalize separators to allow matching TypeScript Host paths
