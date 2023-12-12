@@ -8,7 +8,8 @@
 
 import type { Metafile, OutputFile, PluginBuild } from 'esbuild';
 import { readFile } from 'node:fs/promises';
-import path from 'node:path';
+import { dirname, join, relative } from 'node:path';
+import { LoadResultCache, createCachedLoad } from '../load-result-cache';
 import { ComponentStylesheetBundler } from './component-stylesheets';
 import {
   JIT_NAMESPACE_REGEXP,
@@ -34,7 +35,7 @@ async function loadEntry(
   skipRead?: boolean,
 ): Promise<{ path: string; contents?: string }> {
   if (entry.startsWith('file:')) {
-    const specifier = path.join(root, entry.slice(5));
+    const specifier = join(root, entry.slice(5));
 
     return {
       path: specifier,
@@ -44,7 +45,7 @@ async function loadEntry(
     const [importer, data] = entry.slice(7).split(';', 2);
 
     return {
-      path: path.join(root, importer),
+      path: join(root, importer),
       contents: Buffer.from(data, 'base64').toString(),
     };
   } else {
@@ -66,6 +67,7 @@ export function setupJitPluginCallbacks(
   stylesheetBundler: ComponentStylesheetBundler,
   additionalResultFiles: Map<string, { outputFiles?: OutputFile[]; metafile?: Metafile }>,
   inlineStyleLanguage: string,
+  loadCache?: LoadResultCache,
 ): void {
   const root = build.initialOptions.absWorkingDir ?? '';
 
@@ -84,12 +86,12 @@ export function setupJitPluginCallbacks(
       return {
         // Use a relative path to prevent fully resolved paths in the metafile (JSON stats file).
         // This is only necessary for custom namespaces. esbuild will handle the file namespace.
-        path: 'file:' + path.relative(root, path.join(path.dirname(args.importer), specifier)),
+        path: 'file:' + relative(root, join(dirname(args.importer), specifier)),
         namespace,
       };
     } else {
       // Inline data may need the importer to resolve imports/references within the content
-      const importer = path.relative(root, args.importer);
+      const importer = relative(root, args.importer);
 
       return {
         path: `inline:${importer};${specifier}`,
@@ -99,45 +101,54 @@ export function setupJitPluginCallbacks(
   });
 
   // Add a load callback to handle Component stylesheets (both inline and external)
-  build.onLoad({ filter: /./, namespace: JIT_STYLE_NAMESPACE }, async (args) => {
-    // skipRead is used here because the stylesheet bundling will read a file stylesheet
-    // directly either via a preprocessor or esbuild itself.
-    const entry = await loadEntry(args.path, root, true /* skipRead */);
+  build.onLoad(
+    { filter: /./, namespace: JIT_STYLE_NAMESPACE },
+    createCachedLoad(loadCache, async (args) => {
+      // skipRead is used here because the stylesheet bundling will read a file stylesheet
+      // directly either via a preprocessor or esbuild itself.
+      const entry = await loadEntry(args.path, root, true /* skipRead */);
 
-    let stylesheetResult;
+      let stylesheetResult;
 
-    // Stylesheet contents only exist for internal stylesheets
-    if (entry.contents === undefined) {
-      stylesheetResult = await stylesheetBundler.bundleFile(entry.path);
-    } else {
-      stylesheetResult = await stylesheetBundler.bundleInline(
-        entry.contents,
-        entry.path,
-        inlineStyleLanguage,
-      );
-    }
+      // Stylesheet contents only exist for internal stylesheets
+      if (entry.contents === undefined) {
+        stylesheetResult = await stylesheetBundler.bundleFile(entry.path);
+      } else {
+        stylesheetResult = await stylesheetBundler.bundleInline(
+          entry.contents,
+          entry.path,
+          inlineStyleLanguage,
+        );
+      }
 
-    const { contents, resourceFiles, errors, warnings, metafile } = stylesheetResult;
+      const { contents, resourceFiles, errors, warnings, metafile, referencedFiles } =
+        stylesheetResult;
 
-    additionalResultFiles.set(entry.path, { outputFiles: resourceFiles, metafile });
+      additionalResultFiles.set(entry.path, { outputFiles: resourceFiles, metafile });
 
-    return {
-      errors,
-      warnings,
-      contents,
-      loader: 'text',
-    };
-  });
+      return {
+        errors,
+        warnings,
+        contents,
+        loader: 'text',
+        watchFiles: referencedFiles && [...referencedFiles],
+      };
+    }),
+  );
 
   // Add a load callback to handle Component templates
   // NOTE: While this callback supports both inline and external templates, the transformer
   // currently only supports generating URIs for external templates.
-  build.onLoad({ filter: /./, namespace: JIT_TEMPLATE_NAMESPACE }, async (args) => {
-    const { contents } = await loadEntry(args.path, root);
+  build.onLoad(
+    { filter: /./, namespace: JIT_TEMPLATE_NAMESPACE },
+    createCachedLoad(loadCache, async (args) => {
+      const { contents, path } = await loadEntry(args.path, root);
 
-    return {
-      contents,
-      loader: 'text',
-    };
-  });
+      return {
+        contents,
+        loader: 'text',
+        watchFiles: [path],
+      };
+    }),
+  );
 }
