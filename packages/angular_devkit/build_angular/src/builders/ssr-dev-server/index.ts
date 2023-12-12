@@ -41,7 +41,7 @@ import {
   zip,
 } from 'rxjs';
 import * as url from 'url';
-import { assertIsError } from '../../utils/error';
+import { loadProxyConfiguration } from '../../utils';
 import { Schema } from './schema';
 
 import { getAvailablePort, spawnAsObservable, waitUntilServerIsListening } from './utils';
@@ -376,39 +376,23 @@ function getSslConfig(
 }
 
 async function getProxyConfig(root: string, proxyConfig: string): Promise<MiddlewareHandler[]> {
-  const proxyPath = pathResolve(root, proxyConfig);
-  let proxySettings: unknown;
-  try {
-    proxySettings = require(proxyPath);
-  } catch (error) {
-    assertIsError(error);
-
-    if (error.code === 'MODULE_NOT_FOUND') {
-      throw new Error(`Proxy config file ${proxyPath} does not exist.`);
-    }
-
-    throw error;
-  }
-
-  const proxies = Array.isArray(proxySettings) ? proxySettings : [proxySettings];
+  const proxy = await loadProxyConfiguration(root, proxyConfig, false);
   const createdProxies = [];
   const { createProxyMiddleware } = await import('http-proxy-middleware');
-  for (const proxy of proxies) {
-    for (const [key, context] of Object.entries(proxy)) {
-      if (typeof key === 'string') {
-        createdProxies.push(
-          createProxyMiddleware(
-            key.replace(/^\*$/, '**').replace(/\/\*$/, ''),
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            context as any,
-          ) as MiddlewareHandler,
-        );
-      } else {
-        createdProxies.push(
+  for (const [key, context] of Object.entries(proxy)) {
+    if (typeof key === 'string') {
+      createdProxies.push(
+        createProxyMiddleware(
+          key.replace(/^\*$/, '**').replace(/\/\*$/, ''),
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          createProxyMiddleware(key, context as any) as MiddlewareHandler,
-        );
-      }
+          context as any,
+        ) as MiddlewareHandler,
+      );
+    } else {
+      createdProxies.push(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        createProxyMiddleware(key, context as any) as MiddlewareHandler,
+      );
     }
   }
 
