@@ -12,8 +12,8 @@ import { readFile } from 'node:fs/promises';
 import { extname, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { parse as parseGlob } from 'picomatch';
-import { assertIsError } from '../../utils/error';
-import { loadEsmModule } from '../../utils/load-esm';
+import { assertIsError } from './error';
+import { loadEsmModule } from './load-esm';
 
 export async function loadProxyConfiguration(
   root: string,
