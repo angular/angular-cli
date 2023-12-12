@@ -578,6 +578,11 @@ export async function setupServer(
             // Rewrite all build assets to a vite raw fs URL
             const assetSourcePath = assets.get(pathname);
             if (assetSourcePath !== undefined) {
+              // Workaround to disable Vite transformer middleware.
+              // See: https://github.com/vitejs/vite/blob/746a1daab0395f98f0afbdee8f364cb6cf2f3b3f/packages/vite/src/node/server/middlewares/transform.ts#L201 and
+              // https://github.com/vitejs/vite/blob/746a1daab0395f98f0afbdee8f364cb6cf2f3b3f/packages/vite/src/node/server/transformRequest.ts#L204-L206
+              req.headers.accept = 'text/html';
+
               // The encoding needs to match what happens in the vite static middleware.
               // ref: https://github.com/vitejs/vite/blob/d4f13bd81468961c8c926438e815ab6b1c82735e/packages/vite/src/node/server/middlewares/static.ts#L163
               req.url = `${server.config.base}@fs/${encodeURI(assetSourcePath)}`;
