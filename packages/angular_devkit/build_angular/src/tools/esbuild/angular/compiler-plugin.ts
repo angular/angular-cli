@@ -409,6 +409,7 @@ export function createCompilerPlugin(
           stylesheetBundler,
           additionalResults,
           styleOptions.inlineStyleLanguage,
+          pluginOptions.loadResultCache,
         );
       }
 
