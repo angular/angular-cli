@@ -1,3 +1,4 @@
+import { setTimeout } from 'node:timers/promises';
 import { killAllProcesses } from '../../utils/process';
 import { ngServe } from '../../utils/project';
 
@@ -5,6 +6,8 @@ export default async function () {
   // Serve works without HMR
   const noHmrPort = await ngServe('--no-hmr');
   await verifyResponse(noHmrPort);
+
+  await setTimeout(500);
   await killAllProcesses();
 
   // Serve works with HMR
