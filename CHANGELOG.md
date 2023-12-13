@@ -1,3 +1,24 @@
+<a name="17.0.7"></a>
+
+# 17.0.7 (2023-12-13)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                                                      |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------------------------------ |
+| [3df3e583c](https://github.com/angular/angular-cli/commit/3df3e583c8788511598bbe406012196a2882ee49) | fix  | `baseHref` with trailing slash causes server not to be accessible without trailing slash         |
+| [ef1178188](https://github.com/angular/angular-cli/commit/ef1178188a145a1277197a33a304910e1024c365) | fix  | allow vite to serve JavaScript and TypeScript assets                                             |
+| [385eb77d2](https://github.com/angular/angular-cli/commit/385eb77d2645a1407dbc7528e90a506f9bb2952f) | fix  | cache loading of component resources in JIT mode                                                 |
+| [4b3af73ac](https://github.com/angular/angular-cli/commit/4b3af73ac934a24dd2b022604bc01f00389d87a1) | fix  | ensure browser-esbuild is used in dev server with browser builder and forceEsbuild               |
+| [d1b27e53e](https://github.com/angular/angular-cli/commit/d1b27e53ed9e23a0c08c13c22fc0b4c00f3998b2) | fix  | ensure port 0 uses random port with Vite development server                                      |
+| [f2f7d7c70](https://github.com/angular/angular-cli/commit/f2f7d7c7073e5564ddd8a196b6fcaab7db55b110) | fix  | file is missing from the TypeScript compilation with JIT                                         |
+| [7b8d6cddd](https://github.com/angular/angular-cli/commit/7b8d6cddd0daa637a5fecdea627f4154fafe23fa) | fix  | handle updates of an `npm link` library from another workspace when `preserveSymlinks` is `true` |
+| [c08c78cb8](https://github.com/angular/angular-cli/commit/c08c78cb8965a52887f697e12633391908a3b434) | fix  | inlining of fonts results in jagged fonts for Windows users                                      |
+| [930024811](https://github.com/angular/angular-cli/commit/9300248114282a2a425b722482fdf9676b000b94) | fix  | retain symlinks to output platform directories on builds                                         |
+| [3623fe911](https://github.com/angular/angular-cli/commit/3623fe9118be14eedd1a04351df5e15b3d7a289a) | fix  | update ESM loader to work with Node.js 18.19.0                                                   |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="17.1.0-next.1"></a>
 
 # 17.1.0-next.1 (2023-12-06)
