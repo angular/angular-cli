@@ -240,6 +240,8 @@ export async function killAllProcesses(signal = 'SIGTERM'): Promise<void> {
       continue;
     }
 
+    childProd.unref();
+
     processesToKill.push(
       new Promise<void>((resolve) => {
         treeKill(childProc.pid!, signal, (e) => {
