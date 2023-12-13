@@ -74,7 +74,7 @@ export function createAngularCompilerHost(
       context.resourceFile ?? undefined,
     );
 
-    return result ? { content: result } : null;
+    return typeof result === 'string' ? { content: result } : null;
   };
 
   // Allow the AOT compiler to request the set of changed templates and styles
