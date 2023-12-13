@@ -23,5 +23,26 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       const { result } = await harness.executeOnce();
       expect(result?.success).toBeTrue();
     });
+
+    it('should maintain optimized empty Sass stylesheet when original has content', async () => {
+      await harness.modifyFile('src/app/app.component.ts', (content) => {
+        return content.replace('./app.component.css', './app.component.scss');
+      });
+      await harness.removeFile('src/app/app.component.css');
+      await harness.writeFile('src/app/app.component.scss', '@import "variables";');
+      await harness.writeFile('src/app/_variables.scss', '$value: blue;');
+
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+        optimization: {
+          styles: true,
+        },
+      });
+
+      const { result } = await harness.executeOnce();
+      expect(result?.success).toBeTrue();
+
+      harness.expectFile('dist/browser/main.js').content.not.toContain('variables');
+    });
   });
 });
