@@ -48,7 +48,7 @@
     "ora": "5.4.1",
     "parse5-html-rewriting-stream": "7.0.0",
     "picomatch": "3.0.1",
-    "piscina": "4.2.0",
+    "piscina": "4.2.1",
     "postcss": "8.4.32",
     "postcss-loader": "7.3.3",
     "resolve-url-loader": "5.0.0",

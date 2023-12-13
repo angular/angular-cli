@@ -10538,7 +10538,17 @@ piscina@4.1.0:
   optionalDependencies:
     nice-napi "^1.0.2"
 
-piscina@4.2.0, piscina@^4.2.0:
+piscina@4.2.1:
+  version "4.2.1"
+  resolved "https://registry.yarnpkg.com/piscina/-/piscina-4.2.1.tgz#efb7f009d3a961e02ae08f1909bd24b5423e77fa"
+  integrity sha512-LShp0+lrO+WIzB9LXO+ZmO4zGHxtTJNZhEO56H9SSu+JPaUQb6oLcTCzWi5IL2DS8/vIkCE88ElahuSSw4TAkA==
+  dependencies:
+    hdr-histogram-js "^2.0.1"
+    hdr-histogram-percentiles-obj "^3.0.0"
+  optionalDependencies:
+    nice-napi "^1.0.2"
+
+piscina@^4.2.0:
   version "4.2.0"
   resolved "https://registry.yarnpkg.com/piscina/-/piscina-4.2.0.tgz#61ac6c07f45fdefdd7726b6b07fc237d9a8d1776"
   integrity sha512-/Yq6CLchvi5UQ6YGeiYHIJQV09VcZ5eYuNVS/YPkpxlxKrB4tEbIyc6j8F5b0jCP6tHdiji1Gos4fapc7q1csg==

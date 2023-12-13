@@ -179,7 +179,7 @@
     "parse5-html-rewriting-stream": "7.0.0",
     "patch-package": "^7.0.1",
     "picomatch": "3.0.1",
-    "piscina": "4.2.0",
+    "piscina": "4.2.1",
     "popper.js": "^1.14.1",
     "postcss": "8.4.32",
     "postcss-loader": "7.3.3",
