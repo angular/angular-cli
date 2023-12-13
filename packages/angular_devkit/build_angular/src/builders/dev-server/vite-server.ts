@@ -680,11 +680,9 @@ export async function setupServer(
               }
 
               transformIndexHtmlAndAddHeaders(url, rawHtml, res, next, async (html) => {
-                const protocol = serverOptions.ssl ? 'https' : 'http';
-                const route = `${protocol}://${req.headers.host}${req.originalUrl}`;
                 const { content } = await renderPage({
                   document: html,
-                  route,
+                  route: new URL(req.originalUrl ?? '/', server.resolvedUrls?.local[0]).toString(),
                   serverContext: 'ssr',
                   loadBundle: (uri: string) =>
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any

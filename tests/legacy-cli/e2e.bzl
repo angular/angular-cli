@@ -33,6 +33,7 @@ ESBUILD_TESTS = [
     "tests/build/**",
     "tests/commands/add/**",
     "tests/commands/e2e/**",
+    "tests/commands/serve/ssr-http-requests-assets.js",
     "tests/i18n/**",
     "tests/vite/**",
     "tests/test/**",
@@ -40,6 +41,9 @@ ESBUILD_TESTS = [
 
 WEBPACK_IGNORE_TESTS = [
     "tests/vite/**",
+    "tests/commands/serve/ssr-http-requests-assets.js",
+    "tests/build/prerender/http-requests-assets.js",
+    "tests/build/prerender/error-with-sourcemaps.js",
 ]
 
 def _to_glob(patterns):
