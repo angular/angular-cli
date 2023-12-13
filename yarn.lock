@@ -123,10 +123,10 @@
   dependencies:
     tslib "^2.3.0"
 
-"@angular/bazel@https://github.com/angular/bazel-builds.git#b0f7cdcb78f20eecd19b6b39bb284eb56be5607c":
-  version "17.1.0-next.3+sha-636b0d0"
-  uid b0f7cdcb78f20eecd19b6b39bb284eb56be5607c
-  resolved "https://github.com/angular/bazel-builds.git#b0f7cdcb78f20eecd19b6b39bb284eb56be5607c"
+"@angular/bazel@https://github.com/angular/bazel-builds.git#38c1629669f3f5a07094fcdbf6eb7236e510c63d":
+  version "17.1.0-next.3+sha-d9348be"
+  uid "38c1629669f3f5a07094fcdbf6eb7236e510c63d"
+  resolved "https://github.com/angular/bazel-builds.git#38c1629669f3f5a07094fcdbf6eb7236e510c63d"
   dependencies:
     "@microsoft/api-extractor" "^7.24.2"
     magic-string "^0.30.0"
@@ -140,10 +140,10 @@
     "@angular/core" "^13.0.0 || ^14.0.0-0"
     reflect-metadata "^0.1.13"
 
-"@angular/build-tooling@https://github.com/angular/dev-infra-private-build-tooling-builds.git#8827faa090279bbbb4888be25b2382062ccbc8ae":
-  version "0.0.0-98c6cb206c3cfca7a4281953e64a7d0232b29473"
-  uid "8827faa090279bbbb4888be25b2382062ccbc8ae"
-  resolved "https://github.com/angular/dev-infra-private-build-tooling-builds.git#8827faa090279bbbb4888be25b2382062ccbc8ae"
+"@angular/build-tooling@https://github.com/angular/dev-infra-private-build-tooling-builds.git#c0e875d1fcb27d261d39a8a155efbb277a70c168":
+  version "0.0.0-d2b340f67d87158a34b54ecb3caa797baf0626e6"
+  uid c0e875d1fcb27d261d39a8a155efbb277a70c168
+  resolved "https://github.com/angular/dev-infra-private-build-tooling-builds.git#c0e875d1fcb27d261d39a8a155efbb277a70c168"
   dependencies:
     "@angular-devkit/build-angular" "17.0.0"
     "@angular/benchpress" "0.3.0"
@@ -307,10 +307,10 @@
     "@material/typography" "15.0.0-canary.a246a4439.0"
     tslib "^2.3.0"
 
-"@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#db2a07ec4a396dca2b6092d05e4d5d9667bb18cb":
-  version "0.0.0-98c6cb206c3cfca7a4281953e64a7d0232b29473"
-  uid db2a07ec4a396dca2b6092d05e4d5d9667bb18cb
-  resolved "https://github.com/angular/dev-infra-private-ng-dev-builds.git#db2a07ec4a396dca2b6092d05e4d5d9667bb18cb"
+"@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#c4c915572998b051d3f196e55dc53cd5364b0c4d":
+  version "0.0.0-d2b340f67d87158a34b54ecb3caa797baf0626e6"
+  uid c4c915572998b051d3f196e55dc53cd5364b0c4d
+  resolved "https://github.com/angular/dev-infra-private-ng-dev-builds.git#c4c915572998b051d3f196e55dc53cd5364b0c4d"
   dependencies:
     "@yarnpkg/lockfile" "^1.1.0"
     typescript "~4.9.0"
