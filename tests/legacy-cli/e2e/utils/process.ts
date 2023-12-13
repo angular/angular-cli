@@ -242,7 +242,8 @@ export async function killAllProcesses(signal = 'SIGTERM'): Promise<void> {
 
     processesToKill.push(
       new Promise<void>((resolve) => {
-        treeKill(childProc.pid!, signal, () => {
+        treeKill(childProc.pid!, signal, (e) => {
+          console.error(e);
           // Ignore all errors.
           // This is due to a race condition with the `waitForMatch` logic.
           // where promises are resolved on matches and not when the process terminates.
@@ -253,7 +254,7 @@ export async function killAllProcesses(signal = 'SIGTERM'): Promise<void> {
     );
   }
 
-  await Promise.all(processesToKill);
+  await Promise.allSettled(processesToKill);
 }
 
 export function exec(cmd: string, ...args: string[]) {
