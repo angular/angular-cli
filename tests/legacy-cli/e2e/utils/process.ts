@@ -242,11 +242,12 @@ export async function killAllProcesses(signal = 'SIGTERM'): Promise<void> {
 
     processesToKill.push(
       new Promise<void>((resolve) => {
-        treeKill(childProc.pid!, signal, () => {
+        treeKill(childProc.pid!, signal, (e) => {
           // Ignore all errors.
           // This is due to a race condition with the `waitForMatch` logic.
           // where promises are resolved on matches and not when the process terminates.
           // Also in some cases in windows we get `The operation attempted is not supported`.
+          console.error(e);
           resolve();
         });
       }),
