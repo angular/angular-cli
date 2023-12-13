@@ -18,6 +18,6 @@ const testFunction: () => Promise<void> | void =
     console.error('Test Process error', e);
     process.exitCode = -1;
   } finally {
-    await killAllProcesses();
+    process.exit();
   }
 })();
