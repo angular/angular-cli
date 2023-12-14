@@ -11,10 +11,11 @@ import { BuildOptions, Metafile, OutputFile, PartialMessage, formatMessages } fr
 import { createHash } from 'node:crypto';
 import { constants as fsConstants } from 'node:fs';
 import fs from 'node:fs/promises';
-import path, { join } from 'node:path';
+import path from 'node:path';
 import { promisify } from 'node:util';
 import { brotliCompress } from 'node:zlib';
 import { coerce } from 'semver';
+import { NormalizedOutputOptions } from '../../builders/application/options';
 import { BudgetCalculatorResult } from '../../utils/bundle-calculator';
 import { Spinner } from '../../utils/spinner';
 import { BundleStats, generateBuildStatsTable } from '../webpack/utils/stats';
@@ -194,36 +195,55 @@ export function getFeatureSupport(target: string[]): BuildOptions['supported'] {
 export async function writeResultFiles(
   outputFiles: BuildOutputFile[],
   assetFiles: BuildOutputAsset[] | undefined,
-  outputPath: string,
+  { base, browser, media, server }: NormalizedOutputOptions,
 ) {
   const directoryExists = new Set<string>();
-  const ensureDirectoryExists = async (basePath: string) => {
-    if (basePath && !directoryExists.has(basePath)) {
-      await fs.mkdir(path.join(outputPath, basePath), { recursive: true });
+  const ensureDirectoryExists = async (destPath: string) => {
+    const basePath = path.dirname(destPath);
+    if (!directoryExists.has(basePath)) {
+      await fs.mkdir(path.join(base, basePath), { recursive: true });
       directoryExists.add(basePath);
     }
   };
 
   // Writes the output file to disk and ensures the containing directories are present
   await emitFilesToDisk(outputFiles, async (file: BuildOutputFile) => {
-    const fullOutputPath = file.fullOutputPath;
+    let outputDir: string;
+    switch (file.type) {
+      case BuildOutputFileType.Browser:
+      case BuildOutputFileType.Media:
+        outputDir = browser;
+        break;
+      case BuildOutputFileType.Server:
+        outputDir = server;
+        break;
+      case BuildOutputFileType.Root:
+        outputDir = '';
+        break;
+      default:
+        throw new Error(
+          `Unhandled write for file "${file.path}" with type "${BuildOutputFileType[file.type]}".`,
+        );
+    }
+
+    const destPath = path.join(outputDir, file.path);
+
     // Ensure output subdirectories exist
-    const basePath = path.dirname(fullOutputPath);
-    await ensureDirectoryExists(basePath);
+    await ensureDirectoryExists(destPath);
 
     // Write file contents
-    await fs.writeFile(path.join(outputPath, fullOutputPath), file.contents);
+    await fs.writeFile(path.join(base, destPath), file.contents);
   });
 
   if (assetFiles?.length) {
     await emitFilesToDisk(assetFiles, async ({ source, destination }) => {
+      const destPath = path.join(browser, destination);
+
       // Ensure output subdirectories exist
-      const destPath = join('browser', destination);
-      const basePath = path.dirname(destPath);
-      await ensureDirectoryExists(basePath);
+      await ensureDirectoryExists(destPath);
 
       // Copy file contents
-      await fs.copyFile(source, path.join(outputPath, destPath), fsConstants.COPYFILE_FICLONE);
+      await fs.copyFile(source, path.join(base, destPath), fsConstants.COPYFILE_FICLONE);
     });
   }
 }
@@ -261,9 +281,6 @@ export function createOutputFileFromText(
     get contents() {
       return Buffer.from(this.text, 'utf-8');
     },
-    get fullOutputPath(): string {
-      return getFullOutputPath(this);
-    },
     clone(): BuildOutputFile {
       return createOutputFileFromText(this.path, this.text, this.type);
     },
@@ -287,9 +304,6 @@ export function createOutputFileFromData(
     get contents() {
       return data;
     },
-    get fullOutputPath(): string {
-      return getFullOutputPath(this);
-    },
     clone(): BuildOutputFile {
       return createOutputFileFromData(this.path, this.contents, this.type);
     },
@@ -311,25 +325,10 @@ export function convertOutputFile(file: OutputFile, type: BuildOutputFileType): 
         this.contents.byteLength,
       ).toString('utf-8');
     },
-    get fullOutputPath(): string {
-      return getFullOutputPath(this);
-    },
     clone(): BuildOutputFile {
       return convertOutputFile(this, this.type);
     },
   };
-}
-
-export function getFullOutputPath(file: BuildOutputFile): string {
-  switch (file.type) {
-    case BuildOutputFileType.Browser:
-    case BuildOutputFileType.Media:
-      return join('browser', file.path);
-    case BuildOutputFileType.Server:
-      return join('server', file.path);
-    default:
-      return file.path;
-  }
 }
 
 /**

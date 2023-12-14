@@ -17,17 +17,18 @@ import { withNoProgress, withSpinner, writeResultFiles } from '../../tools/esbui
 import { deleteOutputDir } from '../../utils/delete-output-dir';
 import { shouldWatchRoot } from '../../utils/environment-options';
 import { NormalizedCachedOptions } from '../../utils/normalize-cache';
+import { NormalizedOutputOptions } from './options';
 
 export async function* runEsBuildBuildAction(
   action: (rebuildState?: RebuildState) => ExecutionResult | Promise<ExecutionResult>,
   options: {
     workspaceRoot: string;
     projectRoot: string;
-    outputPath: string;
+    outputOptions: NormalizedOutputOptions;
     logger: logging.LoggerApi;
     cacheOptions: NormalizedCachedOptions;
-    writeToFileSystem?: boolean;
-    writeToFileSystemFilter?: (file: BuildOutputFile) => boolean;
+    writeToFileSystem: boolean;
+    writeToFileSystemFilter: ((file: BuildOutputFile) => boolean) | undefined;
     watch?: boolean;
     verbose?: boolean;
     progress?: boolean;
@@ -39,13 +40,13 @@ export async function* runEsBuildBuildAction(
 ): AsyncIterable<(ExecutionResult['outputWithFiles'] | ExecutionResult['output']) & BuilderOutput> {
   const {
     writeToFileSystemFilter,
-    writeToFileSystem = true,
+    writeToFileSystem,
     watch,
     poll,
     logger,
     deleteOutputPath,
     cacheOptions,
-    outputPath,
+    outputOptions,
     verbose,
     projectRoot,
     workspaceRoot,
@@ -54,7 +55,10 @@ export async function* runEsBuildBuildAction(
   } = options;
 
   if (deleteOutputPath && writeToFileSystem) {
-    await deleteOutputDir(workspaceRoot, outputPath, ['browser', 'server']);
+    await deleteOutputDir(workspaceRoot, outputOptions.base, [
+      outputOptions.browser,
+      outputOptions.server,
+    ]);
   }
 
   const withProgress: typeof withSpinner = progress ? withSpinner : withNoProgress;
@@ -79,7 +83,7 @@ export async function* runEsBuildBuildAction(
 
     const ignored: string[] = [
       // Ignore the output and cache paths to avoid infinite rebuild cycles
-      outputPath,
+      outputOptions.base,
       cacheOptions.basePath,
       `${workspaceRoot.replace(/\\/g, '/')}/**/.*/**`,
     ];
@@ -137,7 +141,7 @@ export async function* runEsBuildBuildAction(
   // unit tests which execute the builder and modify the file system programmatically.
   if (writeToFileSystem) {
     // Write output files
-    await writeResultFiles(result.outputFiles, result.assetFiles, outputPath);
+    await writeResultFiles(result.outputFiles, result.assetFiles, outputOptions);
 
     yield result.output;
   } else {
@@ -191,7 +195,7 @@ export async function* runEsBuildBuildAction(
         const filesToWrite = writeToFileSystemFilter
           ? result.outputFiles.filter(writeToFileSystemFilter)
           : result.outputFiles;
-        await writeResultFiles(filesToWrite, result.assetFiles, outputPath);
+        await writeResultFiles(filesToWrite, result.assetFiles, outputOptions);
 
         yield result.output;
       } else {

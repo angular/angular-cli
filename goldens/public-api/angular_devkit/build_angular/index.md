@@ -46,7 +46,7 @@ export interface ApplicationBuilderOptions {
     namedChunks?: boolean;
     optimization?: OptimizationUnion_2;
     outputHashing?: OutputHashing_2;
-    outputPath: string;
+    outputPath: OutputPathUnion;
     poll?: number;
     polyfills?: string[];
     prerender?: PrerenderUnion;
