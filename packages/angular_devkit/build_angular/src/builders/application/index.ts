@@ -31,21 +31,47 @@ export async function* buildApplicationInternal(
   },
   extensions?: ApplicationBuilderExtensions,
 ): AsyncIterable<ApplicationBuilderOutput> {
+  const { workspaceRoot, logger, target } = context;
+
   // Check Angular version.
-  assertCompatibleAngularVersion(context.workspaceRoot);
+  assertCompatibleAngularVersion(workspaceRoot);
 
   // Purge old build disk cache.
   await purgeStaleBuildCache(context);
 
   // Determine project name from builder context target
-  const projectName = context.target?.project;
+  const projectName = target?.project;
   if (!projectName) {
-    context.logger.error(`The 'application' builder requires a target to be specified.`);
+    yield { success: false, error: `The 'application' builder requires a target to be specified.` };
 
     return;
   }
 
   const normalizedOptions = await normalizeOptions(context, projectName, options, extensions);
+  const writeToFileSystem = infrastructureSettings?.write ?? true;
+  const writeServerBundles =
+    writeToFileSystem && !!(normalizedOptions.ssrOptions && normalizedOptions.serverEntryPoint);
+
+  if (writeServerBundles) {
+    const { browser, server } = normalizedOptions.outputOptions;
+    if (browser === '') {
+      yield {
+        success: false,
+        error: `'outputPath.browser' cannot be configured to an empty string when SSR is enabled.`,
+      };
+
+      return;
+    }
+
+    if (browser === server) {
+      yield {
+        success: false,
+        error: `'outputPath.browser' and 'outputPath.server' cannot be configured to the same value.`,
+      };
+
+      return;
+    }
+  }
 
   // Setup an abort controller with a builder teardown if no signal is present
   let signal = context.signal;
@@ -58,14 +84,11 @@ export async function* buildApplicationInternal(
   yield* runEsBuildBuildAction(
     async (rebuildState) => {
       const startTime = process.hrtime.bigint();
-
       const result = await executeBuild(normalizedOptions, context, rebuildState);
 
       const buildTime = Number(process.hrtime.bigint() - startTime) / 10 ** 9;
       const status = result.errors.length > 0 ? 'failed' : 'complete';
-      context.logger.info(
-        `Application bundle generation ${status}. [${buildTime.toFixed(3)} seconds]`,
-      );
+      logger.info(`Application bundle generation ${status}. [${buildTime.toFixed(3)} seconds]`);
 
       return result;
     },
@@ -75,19 +98,18 @@ export async function* buildApplicationInternal(
       poll: normalizedOptions.poll,
       deleteOutputPath: normalizedOptions.deleteOutputPath,
       cacheOptions: normalizedOptions.cacheOptions,
-      outputPath: normalizedOptions.outputPath,
+      outputOptions: normalizedOptions.outputOptions,
       verbose: normalizedOptions.verbose,
       projectRoot: normalizedOptions.projectRoot,
       workspaceRoot: normalizedOptions.workspaceRoot,
       progress: normalizedOptions.progress,
-      writeToFileSystem: infrastructureSettings?.write,
+      writeToFileSystem,
       // For app-shell and SSG server files are not required by users.
       // Omit these when SSR is not enabled.
-      writeToFileSystemFilter:
-        normalizedOptions.ssrOptions && normalizedOptions.serverEntryPoint
-          ? undefined
-          : (file) => file.type !== BuildOutputFileType.Server,
-      logger: context.logger,
+      writeToFileSystemFilter: writeServerBundles
+        ? undefined
+        : (file) => file.type !== BuildOutputFileType.Server,
+      logger,
       signal,
     },
   );

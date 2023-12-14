@@ -17,6 +17,7 @@ import {
   build,
   context,
 } from 'esbuild';
+import assert from 'node:assert';
 import { basename, dirname, extname, join, relative } from 'node:path';
 import { LoadResultCache, MemoryLoadResultCache } from './load-result-cache';
 import { convertOutputFile } from './utils';
@@ -51,7 +52,6 @@ export enum BuildOutputFileType {
 
 export interface BuildOutputFile extends OutputFile {
   type: BuildOutputFileType;
-  fullOutputPath: string;
   clone: () => BuildOutputFile;
 }
 
@@ -325,10 +325,14 @@ export class BundlerContext {
       }
     }
 
-    const platformIsServer = this.#esbuildOptions?.platform === 'node';
+    assert(this.#esbuildOptions, 'esbuild options cannot be undefined.');
+
+    const { platform, assetNames = '' } = this.#esbuildOptions;
+    const platformIsServer = platform === 'node';
+    const mediaDirname = dirname(assetNames);
     const outputFiles = result.outputFiles.map((file) => {
       let fileType: BuildOutputFileType;
-      if (dirname(file.path) === 'media') {
+      if (dirname(file.path) === mediaDirname) {
         fileType = BuildOutputFileType.Media;
       } else {
         fileType = platformIsServer ? BuildOutputFileType.Server : BuildOutputFileType.Browser;

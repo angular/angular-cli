@@ -16,7 +16,7 @@ import { BuildOutputAsset } from '../../tools/esbuild/bundler-execution-result';
 import { emitFilesToDisk } from '../../tools/esbuild/utils';
 import { deleteOutputDir } from '../../utils';
 import { buildApplicationInternal } from '../application';
-import { Schema as ApplicationBuilderOptions } from '../application/schema';
+import { Schema as ApplicationBuilderOptions, OutputPathClass } from '../application/schema';
 import { logBuilderStatusWarnings } from './builder-status-warnings';
 import { Schema as BrowserBuilderOptions } from './schema';
 
@@ -44,10 +44,10 @@ export async function* buildEsbuildBrowser(
   logBuilderStatusWarnings(userOptions, context);
   const normalizedOptions = normalizeOptions(userOptions);
   const { deleteOutputPath, outputPath } = normalizedOptions;
-  const fullOutputPath = path.join(context.workspaceRoot, outputPath);
+  const fullOutputPath = path.join(context.workspaceRoot, outputPath.base);
 
   if (deleteOutputPath && infrastructureSettings?.write !== false) {
-    await deleteOutputDir(context.workspaceRoot, outputPath);
+    await deleteOutputDir(context.workspaceRoot, outputPath.base);
   }
 
   for await (const result of buildApplicationInternal(
@@ -76,13 +76,26 @@ export async function* buildEsbuildBrowser(
   }
 }
 
-function normalizeOptions(options: BrowserBuilderOptions): ApplicationBuilderOptions {
-  const { main: browser, ngswConfigPath, serviceWorker, polyfills, ...otherOptions } = options;
+function normalizeOptions(
+  options: BrowserBuilderOptions,
+): Omit<ApplicationBuilderOptions, 'outputPath'> & { outputPath: OutputPathClass } {
+  const {
+    main: browser,
+    outputPath,
+    ngswConfigPath,
+    serviceWorker,
+    polyfills,
+    ...otherOptions
+  } = options;
 
   return {
     browser,
     serviceWorker: serviceWorker ? ngswConfigPath : false,
     polyfills: typeof polyfills === 'string' ? [polyfills] : polyfills,
+    outputPath: {
+      base: outputPath,
+      browser: '',
+    },
     ...otherOptions,
   };
 }
