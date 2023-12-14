@@ -38,7 +38,7 @@ export async function generateIndexHtml(
 
   assert(indexHtmlOptions, 'indexHtmlOptions cannot be undefined.');
 
-  if (!externalPackages) {
+  if (!externalPackages && indexHtmlOptions.preloadInitial) {
     for (const [key, value] of initialFiles) {
       if (value.entrypoint) {
         // Entry points are already referenced in the HTML

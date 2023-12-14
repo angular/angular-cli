@@ -220,6 +220,8 @@ export async function normalizeOptions(
         styles: options.styles ?? [],
       }),
       transformer: extensions?.indexHtmlTransformer,
+      // Preload initial defaults to true
+      preloadInitial: typeof options.index !== 'object' || (options.index.preloadInitial ?? true),
     };
   }
 
