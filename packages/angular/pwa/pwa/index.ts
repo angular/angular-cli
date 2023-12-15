@@ -20,15 +20,13 @@ import {
 } from '@angular-devkit/schematics';
 import { readWorkspace, writeWorkspace } from '@schematics/angular/utility';
 import { posix } from 'path';
-import { Readable, Writable } from 'stream';
+import { Readable } from 'stream';
+import { pipeline } from 'stream/promises';
 import { Schema as PwaOptions } from './schema';
 
 function updateIndexFile(path: string): Rule {
   return async (host: Tree) => {
-    const buffer = host.read(path);
-    if (buffer === null) {
-      throw new SchematicsException(`Could not read index file: ${path}`);
-    }
+    const originalContent = host.readText(path);
 
     const { RewritingStream } = await loadEsmModule<typeof import('parse5-html-rewriting-stream')>(
       'parse5-html-rewriting-stream',
@@ -57,30 +55,12 @@ function updateIndexFile(path: string): Rule {
       rewriter.emitEndTag(endTag);
     });
 
-    return new Promise<void>((resolve) => {
-      const input = new Readable({
-        encoding: 'utf8',
-        read(): void {
-          this.push(buffer);
-          this.push(null);
-        },
-      });
-
-      const chunks: Array<Buffer> = [];
-      const output = new Writable({
-        write(chunk: string | Buffer, encoding: BufferEncoding, callback: Function): void {
-          chunks.push(typeof chunk === 'string' ? Buffer.from(chunk, encoding) : chunk);
-          callback();
-        },
-        final(callback: (error?: Error) => void): void {
-          const full = Buffer.concat(chunks);
-          host.overwrite(path, full.toString());
-          callback();
-          resolve();
-        },
-      });
-
-      input.pipe(rewriter).pipe(output);
+    return pipeline(Readable.from(originalContent), rewriter, async function (source) {
+      const chunks = [];
+      for await (const chunk of source) {
+        chunks.push(Buffer.from(chunk));
+      }
+      host.overwrite(path, Buffer.concat(chunks));
     });
   };
 }
