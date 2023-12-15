@@ -6,8 +6,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import nodeModule from 'module';
-import { resolve } from 'path';
+import nodeModule from 'node:module';
+import { resolve } from 'node:path';
 import { Argv } from 'yargs';
 import { CommandModule, CommandModuleImplementation } from '../../command-builder/command-module';
 import { colors } from '../../utilities/color';
@@ -28,9 +28,7 @@ const SUPPORTED_NODE_MAJORS = [18, 20];
 const PACKAGE_PATTERNS = [
   /^@angular\/.*/,
   /^@angular-devkit\/.*/,
-  /^@bazel\/.*/,
   /^@ngtools\/.*/,
-  /^@nguniversal\/.*/,
   /^@schematics\/.*/,
   /^rxjs$/,
   /^typescript$/,
