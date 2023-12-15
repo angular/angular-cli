@@ -64,6 +64,7 @@ export abstract class SchematicsCommandModule
       .option('dry-run', {
         describe: 'Run through and reports activity without writing out results.',
         type: 'boolean',
+        alias: ['d'],
         default: false,
       })
       .option('defaults', {
