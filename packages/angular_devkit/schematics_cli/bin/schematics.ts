@@ -9,14 +9,14 @@
 
 // symbol polyfill must go first
 import 'symbol-observable';
-import { logging, schema, tags } from '@angular-devkit/core';
+import type { logging, schema } from '@angular-devkit/core';
 import { ProcessOutput, createConsoleLogger } from '@angular-devkit/core/node';
 import { UnsuccessfulWorkflowExecution } from '@angular-devkit/schematics';
 import { NodeWorkflow } from '@angular-devkit/schematics/tools';
-import * as ansiColors from 'ansi-colors';
-import { existsSync } from 'fs';
+import ansiColors from 'ansi-colors';
 import type { Question, QuestionCollection } from 'inquirer';
-import * as path from 'path';
+import { existsSync } from 'node:fs';
+import * as path from 'node:path';
 import yargsParser, { camelCase, decamelize } from 'yargs-parser';
 
 /**
@@ -367,35 +367,35 @@ export async function main({
  * Get usage of the CLI tool.
  */
 function getUsage(): string {
-  return tags.stripIndent`
-  schematics [collection-name:]schematic-name [options, ...]
+  return `
+schematics [collection-name:]schematic-name [options, ...]
 
-  By default, if the collection name is not specified, use the internal collection provided
-  by the Schematics CLI.
+By default, if the collection name is not specified, use the internal collection provided
+by the Schematics CLI.
 
-  Options:
-      --debug             Debug mode. This is true by default if the collection is a relative
-                          path (in that case, turn off with --debug=false).
+Options:
+    --debug             Debug mode. This is true by default if the collection is a relative
+                        path (in that case, turn off with --debug=false).
 
-      --allow-private     Allow private schematics to be run from the command line. Default to
-                          false.
+    --allow-private     Allow private schematics to be run from the command line. Default to
+                        false.
 
-      --dry-run           Do not output anything, but instead just show what actions would be
-                          performed. Default to true if debug is also true.
+    --dry-run           Do not output anything, but instead just show what actions would be
+                        performed. Default to true if debug is also true.
 
-      --force             Force overwriting files that would otherwise be an error.
+    --force             Force overwriting files that would otherwise be an error.
 
-      --list-schematics   List all schematics from the collection, by name. A collection name
-                          should be suffixed by a colon. Example: '@angular-devkit/schematics-cli:'.
+    --list-schematics   List all schematics from the collection, by name. A collection name
+                        should be suffixed by a colon. Example: '@angular-devkit/schematics-cli:'.
 
-      --no-interactive    Disables interactive input prompts.
+    --no-interactive    Disables interactive input prompts.
 
-      --verbose           Show more information.
+    --verbose           Show more information.
 
-      --help              Show this message.
+    --help              Show this message.
 
-  Any additional option is passed to the Schematics depending on its schema.
-  `;
+Any additional option is passed to the Schematics depending on its schema.
+`;
 }
 
 /** Parse the command line. */
