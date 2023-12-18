@@ -143,6 +143,52 @@ describe('SSR Schematic', () => {
 
       expect(scripts['serve:ssr:test-app']).toBe(`node dist/test-app/server/server.mjs`);
     });
+
+    it('works when using a custom "outputPath.browser" and "outputPath.server" values', async () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const config = appTree.readJson('/angular.json') as any;
+      const build = config.projects['test-app'].architect.build;
+
+      build.options.outputPath = {
+        base: build.options.outputPath,
+        browser: 'public',
+        server: 'node-server',
+      };
+
+      appTree.overwrite('/angular.json', JSON.stringify(config, undefined, 2));
+      const tree = await schematicRunner.runSchematic('ssr', defaultOptions, appTree);
+
+      const { scripts } = tree.readJson('/package.json') as { scripts: Record<string, string> };
+      expect(scripts['serve:ssr:test-app']).toBe(`node dist/test-app/node-server/server.mjs`);
+
+      const serverFileContent = tree.readContent('/projects/test-app/server.ts');
+      expect(serverFileContent).toContain(`resolve(serverDistFolder, '../public')`);
+    });
+
+    it(`removes "outputPath.browser" when it's an empty string`, async () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const config = appTree.readJson('/angular.json') as any;
+      const build = config.projects['test-app'].architect.build;
+
+      build.options.outputPath = {
+        base: build.options.outputPath,
+        browser: '',
+        server: 'node-server',
+      };
+
+      appTree.overwrite('/angular.json', JSON.stringify(config, undefined, 2));
+      const tree = await schematicRunner.runSchematic('ssr', defaultOptions, appTree);
+
+      const { scripts } = tree.readJson('/package.json') as { scripts: Record<string, string> };
+      expect(scripts['serve:ssr:test-app']).toBe(`node dist/test-app/node-server/server.mjs`);
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const updatedConfig = tree.readJson('/angular.json') as any;
+      expect(updatedConfig.projects['test-app'].architect.build.options.outputPath).toEqual({
+        base: 'dist/test-app',
+        server: 'node-server',
+      });
+    });
   });
 
   describe('Legacy browser builder', () => {

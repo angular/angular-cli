@@ -6,9 +6,10 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { join, normalize, strings } from '@angular-devkit/core';
+import { isJsonObject, join, normalize, strings } from '@angular-devkit/core';
 import {
   Rule,
+  SchematicContext,
   SchematicsException,
   Tree,
   apply,
@@ -19,6 +20,7 @@ import {
   schematic,
   url,
 } from '@angular-devkit/schematics';
+import { posix } from 'node:path';
 import { Schema as ServerOptions } from '../server/schema';
 import { DependencyType, addDependency, readWorkspace, updateWorkspace } from '../utility';
 import { JSONFile } from '../utility/json-file';
@@ -33,8 +35,11 @@ import { Schema as SSROptions } from './schema';
 
 const SERVE_SSR_TARGET_NAME = 'serve-ssr';
 const PRERENDER_TARGET_NAME = 'prerender';
+const DEFAULT_BROWSER_DIR = 'browser';
+const DEFAULT_MEDIA_DIR = 'media';
+const DEFAULT_SERVER_DIR = 'server';
 
-async function getOutputPath(
+async function getLegacyOutputPaths(
   host: Tree,
   projectName: string,
   target: 'server' | 'build',
@@ -42,12 +47,12 @@ async function getOutputPath(
   // Generate new output paths
   const workspace = await readWorkspace(host);
   const project = workspace.projects.get(projectName);
-  const serverTarget = project?.targets.get(target);
-  if (!serverTarget || !serverTarget.options) {
+  const architectTarget = project?.targets.get(target);
+  if (!architectTarget?.options) {
     throw new SchematicsException(`Cannot find 'options' for ${projectName} ${target} target.`);
   }
 
-  const { outputPath } = serverTarget.options;
+  const { outputPath } = architectTarget.options;
   if (typeof outputPath !== 'string') {
     throw new SchematicsException(
       `outputPath for ${projectName} ${target} target is not a string.`,
@@ -55,6 +60,52 @@ async function getOutputPath(
   }
 
   return outputPath;
+}
+
+async function getApplicationBuilderOutputPaths(
+  host: Tree,
+  projectName: string,
+): Promise<{ browser: string; server: string; base: string }> {
+  // Generate new output paths
+  const target = 'build';
+  const workspace = await readWorkspace(host);
+  const project = workspace.projects.get(projectName);
+  const architectTarget = project?.targets.get(target);
+
+  if (!architectTarget?.options) {
+    throw new SchematicsException(`Cannot find 'options' for ${projectName} ${target} target.`);
+  }
+
+  const { outputPath } = architectTarget.options;
+  if (outputPath === null || outputPath === undefined) {
+    throw new SchematicsException(
+      `outputPath for ${projectName} ${target} target is undeined or null.`,
+    );
+  }
+
+  const defaultDirs = {
+    server: DEFAULT_SERVER_DIR,
+    browser: DEFAULT_BROWSER_DIR,
+  };
+
+  if (outputPath && isJsonObject(outputPath)) {
+    return {
+      ...defaultDirs,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      ...(outputPath as any),
+    };
+  }
+
+  if (typeof outputPath !== 'string') {
+    throw new SchematicsException(
+      `outputPath for ${projectName} ${target} target is not a string.`,
+    );
+  }
+
+  return {
+    base: outputPath,
+    ...defaultDirs,
+  };
 }
 
 function addScriptsRule({ project }: SSROptions, isUsingApplicationBuilder: boolean): Rule {
@@ -66,11 +117,11 @@ function addScriptsRule({ project }: SSROptions, isUsingApplicationBuilder: bool
     }
 
     if (isUsingApplicationBuilder) {
-      const distPath = await getOutputPath(host, project, 'build');
+      const { base, server } = await getApplicationBuilderOutputPaths(host, project);
       pkg.scripts ??= {};
-      pkg.scripts[`serve:ssr:${project}`] = `node ${distPath}/server/server.mjs`;
+      pkg.scripts[`serve:ssr:${project}`] = `node ${posix.join(base, server)}/server.mjs`;
     } else {
-      const serverDist = await getOutputPath(host, project, 'server');
+      const serverDist = await getLegacyOutputPaths(host, project, 'server');
       pkg.scripts = {
         ...pkg.scripts,
         'dev:ssr': `ng run ${project}:${SERVE_SSR_TARGET_NAME}`,
@@ -111,6 +162,7 @@ function updateApplicationBuilderTsConfigRule(options: SSROptions): Rule {
 function updateApplicationBuilderWorkspaceConfigRule(
   projectRoot: string,
   options: SSROptions,
+  { logger }: SchematicContext,
 ): Rule {
   return updateWorkspace((workspace) => {
     const buildTarget = workspace.projects.get(options.project)?.targets.get('build');
@@ -118,8 +170,32 @@ function updateApplicationBuilderWorkspaceConfigRule(
       return;
     }
 
+    let outputPath = buildTarget.options?.outputPath;
+    if (outputPath && isJsonObject(outputPath)) {
+      if (outputPath.browser === '') {
+        const base = outputPath.base as string;
+        logger.warn(
+          `The output location of the browser build has been updated from "${base}" to "${posix.join(
+            base,
+            DEFAULT_BROWSER_DIR,
+          )}".
+          You might need to adjust your deployment pipeline.`,
+        );
+
+        if (
+          (outputPath.media && outputPath.media !== DEFAULT_MEDIA_DIR) ||
+          (outputPath.server && outputPath.server !== DEFAULT_SERVER_DIR)
+        ) {
+          delete outputPath.browser;
+        } else {
+          outputPath = outputPath.base;
+        }
+      }
+    }
+
     buildTarget.options = {
       ...buildTarget.options,
+      outputPath,
       prerender: true,
       ssr: {
         entry: join(normalize(projectRoot), 'server.ts'),
@@ -238,23 +314,22 @@ function addDependencies(isUsingApplicationBuilder: boolean): Rule {
 
 function addServerFile(options: ServerOptions, isStandalone: boolean): Rule {
   return async (host) => {
+    const projectName = options.project;
     const workspace = await readWorkspace(host);
-    const project = workspace.projects.get(options.project);
+    const project = workspace.projects.get(projectName);
     if (!project) {
-      throw new SchematicsException(`Invalid project name (${options.project})`);
+      throw new SchematicsException(`Invalid project name (${projectName})`);
     }
+    const isUsingApplicationBuilder =
+      project?.targets?.get('build')?.builder === Builders.Application;
 
-    const browserDistDirectory = await getOutputPath(host, options.project, 'build');
+    const browserDistDirectory = isUsingApplicationBuilder
+      ? (await getApplicationBuilderOutputPaths(host, projectName)).browser
+      : await getLegacyOutputPaths(host, projectName, 'build');
 
     return mergeWith(
       apply(
-        url(
-          `./files/${
-            project?.targets?.get('build')?.builder === Builders.Application
-              ? 'application-builder'
-              : 'server-builder'
-          }`,
-        ),
+        url(`./files/${isUsingApplicationBuilder ? 'application-builder' : 'server-builder'}`),
         [
           applyTemplates({
             ...strings,
@@ -270,7 +345,7 @@ function addServerFile(options: ServerOptions, isStandalone: boolean): Rule {
 }
 
 export default function (options: SSROptions): Rule {
-  return async (host) => {
+  return async (host, context) => {
     const browserEntryPoint = await getMainFilePath(host, options.project);
     const isStandalone = isStandaloneApp(host, browserEntryPoint);
 
@@ -289,7 +364,7 @@ export default function (options: SSROptions): Rule {
       }),
       ...(isUsingApplicationBuilder
         ? [
-            updateApplicationBuilderWorkspaceConfigRule(clientProject.root, options),
+            updateApplicationBuilderWorkspaceConfigRule(clientProject.root, options, context),
             updateApplicationBuilderTsConfigRule(options),
           ]
         : [
