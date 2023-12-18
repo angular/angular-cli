@@ -14,7 +14,7 @@ import {
   chain,
   externalSchematic,
 } from '@angular-devkit/schematics';
-import { dirname } from 'node:path';
+import { dirname, join } from 'node:path/posix';
 import { JSONFile } from '../../utility/json-file';
 import { TreeWorkspaceHost, allTargetOptions, getWorkspace } from '../../utility/workspace';
 import { Builders, ProjectType } from '../../utility/workspace-models';
@@ -68,8 +68,33 @@ export default function (): Rule {
           options['polyfills'] = [options['polyfills']];
         }
 
-        if (typeof options['outputPath'] === 'string') {
-          options['outputPath'] = options['outputPath']?.replace(/\/browser\/?$/, '');
+        let outputPath = options['outputPath'];
+        if (typeof outputPath === 'string') {
+          if (!/\/browser\/?$/.test(outputPath)) {
+            // TODO: add prompt.
+            context.logger.warn(
+              `The output location of the browser build has been updated from "${outputPath}" to ` +
+                `"${join(outputPath, 'browser')}". ` +
+                'You might need to adjust your deployment pipeline or, as an alternative, ' +
+                'set outputPath.browser to "" in order to maintain the previous functionality.',
+            );
+          } else {
+            outputPath = outputPath.replace(/\/browser\/?$/, '');
+          }
+
+          options['outputPath'] = {
+            base: outputPath,
+          };
+
+          if (typeof options['resourcesOutputPath'] === 'string') {
+            const media = options['resourcesOutputPath'].replaceAll('/', '');
+            if (media && media !== 'media') {
+              options['outputPath'] = {
+                base: outputPath,
+                media: media,
+              };
+            }
+          }
         }
 
         // Delete removed options
@@ -186,14 +211,6 @@ function usesNoLongerSupportedOptions(
     hasUsage = true;
     context.logger.warn(
       `Skipping migration for project "${projectName}". "deployUrl" option is not available in the application builder.`,
-    );
-  }
-
-  if (typeof resourcesOutputPath === 'string' && /^\/?media\/?$/.test(resourcesOutputPath)) {
-    hasUsage = true;
-    context.logger.warn(
-      `Skipping migration for project "${projectName}". "resourcesOutputPath" option is not available in the application builder.` +
-        `Media files will be output into a "media" directory within the output location.`,
     );
   }
 

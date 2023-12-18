@@ -9,7 +9,7 @@ import <% if (isStandalone) { %>bootstrap<% } else { %>AppServerModule<% } %> fr
 export function app(): express.Express {
   const server = express();
   const serverDistFolder = dirname(fileURLToPath(import.meta.url));
-  const browserDistFolder = resolve(serverDistFolder, '../browser');
+  const browserDistFolder = resolve(serverDistFolder, '../<%= browserDistDirectory %>');
   const indexHtml = join(serverDistFolder, 'index.server.html');
 
   const commonEngine = new CommonEngine();
@@ -19,7 +19,7 @@ export function app(): express.Express {
 
   // Example Express Rest API endpoints
   // server.get('/api/**', (req, res) => { });
-  // Serve static files from /browser
+  // Serve static files from /<%= browserDistDirectory %>
   server.get('*.*', express.static(browserDistFolder, {
     maxAge: '1y'
   }));
