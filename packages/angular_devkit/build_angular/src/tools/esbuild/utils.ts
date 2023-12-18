@@ -12,7 +12,6 @@ import { createHash } from 'node:crypto';
 import { constants as fsConstants } from 'node:fs';
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import { promisify } from 'node:util';
 import { brotliCompress } from 'node:zlib';
 import { coerce } from 'semver';
 import { NormalizedOutputOptions } from '../../builders/application/options';
@@ -21,8 +20,6 @@ import { Spinner } from '../../utils/spinner';
 import { BundleStats, generateBuildStatsTable } from '../webpack/utils/stats';
 import { BuildOutputFile, BuildOutputFileType, InitialFileRecord } from './bundler-context';
 import { BuildOutputAsset } from './bundler-execution-result';
-
-const compressAsync = promisify(brotliCompress);
 
 export function logBuildStats(
   context: BuilderContext,
@@ -87,31 +84,47 @@ export async function calculateEstimatedTransferSizes(
   outputFiles: OutputFile[],
 ): Promise<Map<string, number>> {
   const sizes = new Map<string, number>();
-  const pendingCompression = [];
-
-  for (const outputFile of outputFiles) {
-    // Only calculate JavaScript and CSS files
-    if (!outputFile.path.endsWith('.js') && !outputFile.path.endsWith('.css')) {
-      continue;
-    }
-
-    // Skip compressing small files which may end being larger once compressed and will most likely not be
-    // compressed in actual transit.
-    if (outputFile.contents.byteLength < 1024) {
-      sizes.set(outputFile.path, outputFile.contents.byteLength);
-      continue;
-    }
-
-    pendingCompression.push(
-      compressAsync(outputFile.contents).then((result) =>
-        sizes.set(outputFile.path, result.byteLength),
-      ),
-    );
+  if (outputFiles.length <= 0) {
+    return sizes;
   }
 
-  await Promise.all(pendingCompression);
+  return new Promise((resolve, reject) => {
+    let completeCount = 0;
+    for (const outputFile of outputFiles) {
+      // Only calculate JavaScript and CSS files
+      if (!outputFile.path.endsWith('.js') && !outputFile.path.endsWith('.css')) {
+        ++completeCount;
+        continue;
+      }
 
-  return sizes;
+      // Skip compressing small files which may end being larger once compressed and will most likely not be
+      // compressed in actual transit.
+      if (outputFile.contents.byteLength < 1024) {
+        sizes.set(outputFile.path, outputFile.contents.byteLength);
+        ++completeCount;
+        continue;
+      }
+
+      // Directly use the async callback function to minimize the number of Promises that need to be created.
+      brotliCompress(outputFile.contents, (error, result) => {
+        if (error) {
+          reject(error);
+
+          return;
+        }
+
+        sizes.set(outputFile.path, result.byteLength);
+        if (++completeCount >= outputFiles.length) {
+          resolve(sizes);
+        }
+      });
+    }
+
+    // Covers the case where no files need to be compressed
+    if (completeCount >= outputFiles.length) {
+      resolve(sizes);
+    }
+  });
 }
 
 export async function withSpinner<T>(text: string, action: () => T | Promise<T>): Promise<T> {
