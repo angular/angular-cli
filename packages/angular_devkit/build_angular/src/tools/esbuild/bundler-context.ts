@@ -34,6 +34,7 @@ export type BundleContextResult =
         server?: Set<string>;
         browser?: Set<string>;
       };
+      externalConfiguration?: string[];
     };
 
 export interface InitialFileRecord {
@@ -124,6 +125,7 @@ export class BundlerContext {
     const externalImportsServer = new Set<string>();
 
     const outputFiles = [];
+    let externalConfiguration;
     for (const result of individualResults) {
       warnings.push(...result.warnings);
       if (result.errors) {
@@ -142,6 +144,13 @@ export class BundlerContext {
       outputFiles.push(...result.outputFiles);
       result.externalImports.browser?.forEach((value) => externalImportsBrowser.add(value));
       result.externalImports.server?.forEach((value) => externalImportsServer.add(value));
+
+      if (result.externalConfiguration) {
+        externalConfiguration ??= new Set<string>();
+        for (const value of result.externalConfiguration) {
+          externalConfiguration.add(value);
+        }
+      }
     }
 
     if (errors !== undefined) {
@@ -158,6 +167,7 @@ export class BundlerContext {
         browser: externalImportsBrowser,
         server: externalImportsServer,
       },
+      externalConfiguration: externalConfiguration ? [...externalConfiguration] : undefined,
     };
   }
 
@@ -349,6 +359,7 @@ export class BundlerContext {
       externalImports: {
         [platformIsServer ? 'server' : 'browser']: externalImports,
       },
+      externalConfiguration: this.#esbuildOptions.external,
       errors: undefined,
     };
   }
