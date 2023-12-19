@@ -28,6 +28,7 @@ import { renderPage } from '../../utils/server-rendering/render-page';
 import { getSupportedBrowsers } from '../../utils/supported-browsers';
 import { getIndexOutputFile } from '../../utils/webpack-browser-config';
 import { buildApplicationInternal } from '../application';
+import { ApplicationBuilderInternalOptions } from '../application/options';
 import { buildEsbuildBrowser } from '../browser-esbuild';
 import { Schema as BrowserBuilderOptions } from '../browser-esbuild/schema';
 import type { NormalizedDevServerOptions } from './options';
@@ -148,19 +149,23 @@ export async function* serveWithVite(
 
   const build =
     builderName === '@angular-devkit/build-angular:browser-esbuild'
-      ? buildEsbuildBrowser
-      : buildApplicationInternal;
+      ? buildEsbuildBrowser.bind(
+          undefined,
+          browserOptions,
+          context,
+          { write: false },
+          extensions?.buildPlugins,
+        )
+      : buildApplicationInternal.bind(
+          undefined,
+          browserOptions as ApplicationBuilderInternalOptions,
+          context,
+          { write: false },
+          { codePlugins: extensions?.buildPlugins },
+        );
 
   // TODO: Switch this to an architect schedule call when infrastructure settings are supported
-  for await (const result of build(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    browserOptions as any,
-    context,
-    {
-      write: false,
-    },
-    extensions?.buildPlugins,
-  )) {
+  for await (const result of build()) {
     assert(result.outputFiles, 'Builder did not provide result files.');
 
     // If build failed, nothing to serve
