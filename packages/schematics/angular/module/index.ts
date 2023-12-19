@@ -176,6 +176,7 @@ export default function (options: ModuleOptions): Rule {
       name: options.name,
       path: options.path,
       project: options.project,
+      standalone: false,
     };
 
     return chain([
