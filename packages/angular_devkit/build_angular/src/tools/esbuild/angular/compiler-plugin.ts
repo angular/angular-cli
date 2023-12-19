@@ -16,7 +16,6 @@ import type {
   PluginBuild,
 } from 'esbuild';
 import assert from 'node:assert';
-import { realpathSync } from 'node:fs';
 import * as path from 'node:path';
 import { maxWorkers } from '../../../utils/environment-options';
 import { JavaScriptTransformer } from '../javascript-transformer';
@@ -56,18 +55,6 @@ export function createCompilerPlugin(
     async setup(build: PluginBuild): Promise<void> {
       let setupWarnings: PartialMessage[] | undefined = [];
       const preserveSymlinks = build.initialOptions.preserveSymlinks;
-
-      let tsconfigPath = pluginOptions.tsconfig;
-      if (!preserveSymlinks) {
-        // Use the real path of the tsconfig if not preserving symlinks.
-        // This ensures the TS source file paths are based on the real path of the configuration.
-        // NOTE: promises.realpath should not be used here since it uses realpath.native which
-        // can cause case conversion and other undesirable behavior on Windows systems.
-        // ref: https://github.com/nodejs/node/issues/7726
-        try {
-          tsconfigPath = realpathSync(tsconfigPath);
-        } catch {}
-      }
 
       // Initialize a worker pool for JavaScript transformations
       const javascriptTransformer = new JavaScriptTransformer(pluginOptions, maxWorkers);
@@ -240,7 +227,7 @@ export function createCompilerPlugin(
         let referencedFiles;
         try {
           const initializationResult = await compilation.initialize(
-            tsconfigPath,
+            pluginOptions.tsconfig,
             hostOptions,
             createCompilerOptionsTransformer(setupWarnings, pluginOptions, preserveSymlinks),
           );
