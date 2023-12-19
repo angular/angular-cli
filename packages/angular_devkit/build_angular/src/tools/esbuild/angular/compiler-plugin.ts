@@ -528,22 +528,19 @@ function bundleWebWorker(
 ) {
   try {
     return build.esbuild.buildSync({
+      ...build.initialOptions,
       platform: 'browser',
       write: false,
       bundle: true,
       metafile: true,
       format: 'esm',
-      mainFields: ['es2020', 'es2015', 'browser', 'module', 'main'],
-      logLevel: 'silent',
-      sourcemap: pluginOptions.sourcemap,
       entryNames: 'worker-[hash]',
       entryPoints: [workerFile],
-      absWorkingDir: build.initialOptions.absWorkingDir,
-      outdir: build.initialOptions.outdir,
-      minifyIdentifiers: build.initialOptions.minifyIdentifiers,
-      minifySyntax: build.initialOptions.minifySyntax,
-      minifyWhitespace: build.initialOptions.minifyWhitespace,
-      target: build.initialOptions.target,
+      sourcemap: pluginOptions.sourcemap,
+      // Zone.js is not used in Web workers so no need to disable
+      supported: undefined,
+      // Plugins are not supported in sync esbuild calls
+      plugins: undefined,
     });
   } catch (error) {
     if (error && typeof error === 'object' && 'errors' in error && 'warnings' in error) {
