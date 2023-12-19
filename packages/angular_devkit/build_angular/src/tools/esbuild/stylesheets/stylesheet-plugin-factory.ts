@@ -54,7 +54,15 @@ export interface StylesheetPluginOptions {
  *
  * Based on https://tailwindcss.com/docs/functions-and-directives
  */
-const TAILWIND_KEYWORDS = ['@tailwind', '@layer', '@apply', '@config', 'theme(', 'screen('];
+const TAILWIND_KEYWORDS = [
+  '@tailwind',
+  '@layer',
+  '@apply',
+  '@config',
+  'theme(',
+  'screen(',
+  '@screen', // Undocumented in version 3, see: https://github.com/tailwindlabs/tailwindcss/discussions/7516.
+];
 
 export interface StylesheetLanguage {
   name: string;
