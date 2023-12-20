@@ -57,7 +57,7 @@ export class ComponentStylesheetBundler {
       });
     });
 
-    return extractResult(await bundlerContext.bundle(), bundlerContext.watchFiles);
+    return this.extractResult(await bundlerContext.bundle(), bundlerContext.watchFiles);
   }
 
   async bundleInline(data: string, filename: string, language: string) {
@@ -103,7 +103,7 @@ export class ComponentStylesheetBundler {
     });
 
     // Extract the result of the bundling from the output files
-    return extractResult(await bundlerContext.bundle(), bundlerContext.watchFiles);
+    return this.extractResult(await bundlerContext.bundle(), bundlerContext.watchFiles);
   }
 
   invalidate(files: Iterable<string>) {
@@ -128,52 +128,50 @@ export class ComponentStylesheetBundler {
 
     await Promise.allSettled(contexts.map((context) => context.dispose()));
   }
-}
 
-function extractResult(result: BundleContextResult, referencedFiles?: Set<string>) {
-  let contents = '';
-  let map;
-  let outputPath;
-  const resourceFiles: OutputFile[] = [];
-  if (!result.errors) {
-    for (const outputFile of result.outputFiles) {
-      const filename = path.basename(outputFile.path);
-      if (outputFile.type === BuildOutputFileType.Media) {
-        // The output files could also contain resources (images/fonts/etc.) that were referenced
-        resourceFiles.push(outputFile);
-      } else if (filename.endsWith('.css')) {
-        outputPath = outputFile.path;
-        contents = outputFile.text;
-      } else if (filename.endsWith('.css.map')) {
-        map = outputFile.text;
-      } else {
-        throw new Error(
-          `Unexpected non CSS/Media file "${filename}" outputted during component stylesheet processing.`,
-        );
+  private extractResult(result: BundleContextResult, referencedFiles?: Set<string>) {
+    let contents = '';
+    let metafile;
+    const outputFiles: OutputFile[] = [];
+
+    if (!result.errors) {
+      for (const outputFile of result.outputFiles) {
+        const filename = path.basename(outputFile.path);
+
+        // Needed for Bazel as otherwise the files will not be written in the correct place.
+        outputFile.path = path.join(this.options.workspaceRoot, outputFile.path);
+
+        if (outputFile.type === BuildOutputFileType.Media) {
+          // The output files could also contain resources (images/fonts/etc.) that were referenced
+          outputFiles.push(outputFile);
+        } else if (filename.endsWith('.css')) {
+          contents = outputFile.text;
+        } else if (filename.endsWith('.css.map')) {
+          outputFiles.push(outputFile);
+        } else {
+          throw new Error(
+            `Unexpected non CSS/Media file "${filename}" outputted during component stylesheet processing.`,
+          );
+        }
       }
+
+      metafile = result.metafile;
+      // Remove entryPoint fields from outputs to prevent the internal component styles from being
+      // treated as initial files. Also mark the entry as a component resource for stat reporting.
+      Object.values(metafile.outputs).forEach((output) => {
+        delete output.entryPoint;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (output as any)['ng-component'] = true;
+      });
     }
-  }
 
-  let metafile;
-  if (!result.errors) {
-    metafile = result.metafile;
-    // Remove entryPoint fields from outputs to prevent the internal component styles from being
-    // treated as initial files. Also mark the entry as a component resource for stat reporting.
-    Object.values(metafile.outputs).forEach((output) => {
-      delete output.entryPoint;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (output as any)['ng-component'] = true;
-    });
+    return {
+      errors: result.errors,
+      warnings: result.warnings,
+      contents,
+      outputFiles,
+      metafile,
+      referencedFiles,
+    };
   }
-
-  return {
-    errors: result.errors,
-    warnings: result.warnings,
-    contents,
-    map,
-    path: outputPath,
-    resourceFiles,
-    metafile,
-    referencedFiles,
-  };
 }
