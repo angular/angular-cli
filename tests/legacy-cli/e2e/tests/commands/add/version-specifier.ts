@@ -8,12 +8,11 @@ export default async function () {
   // forcibly remove in case another test doesn't clean itself up.
   await rimraf('node_modules/@angular/localize');
 
-  // If using npm, enable the force option to allow testing the output behavior of the
-  // `ng add` command itself and not the behavior of npm which may otherwise fail depending
-  // on the npm version in use and the version specifier supplied in each test.
-  if (getActivePackageManager() === 'npm') {
-    appendFile('.npmrc', '\nforce=true\n');
-  }
+  // Enable the force option to allow testing the output behavior of the
+  // `ng add` command itself and not the behavior of the package manager which may otherwise fail depending
+  // on the package manager version in use and the version specifier supplied in each test.
+  appendFile('.npmrc', '\nforce=true\n');
+  appendFile('.yarnrc', '\n--ignore-engines true\n');
 
   const tag = (await isPrereleaseCli()) ? '@next' : '';
 
