@@ -57,6 +57,10 @@ export default function (): Rule {
           continue;
         }
 
+        if (options['index'] === '') {
+          options['index'] = false;
+        }
+
         // Rename and transform options
         options['browser'] = options['main'];
         if (hasServerTarget && typeof options['browser'] === 'string') {
