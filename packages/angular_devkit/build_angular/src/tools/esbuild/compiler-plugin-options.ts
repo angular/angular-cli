@@ -60,7 +60,7 @@ export function createCompilerPluginOptions(
         // Hidden component stylesheet sourcemaps are inaccessible which is effectively
         // the same as being disabled. Disabling has the advantage of avoiding the overhead
         // of sourcemap processing.
-        !!sourcemapOptions.styles && (sourcemapOptions.hidden ? false : 'inline'),
+        sourcemapOptions.styles && !sourcemapOptions.hidden ? 'linked' : false,
       outputNames,
       includePaths: stylePreprocessorOptions?.includePaths,
       externalDependencies,

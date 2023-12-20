@@ -136,5 +136,41 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
       harness.expectFile('dist/browser/main.js.map').content.toContain('"x_google_ignoreList"');
     });
+
+    it('should generate component sourcemaps when sourcemaps when true', async () => {
+      await harness.writeFile('src/app/app.component.css', `* { color: red}`);
+
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+        sourceMap: true,
+      });
+
+      const { result } = await harness.executeOnce();
+
+      expect(result?.success).toBeTrue();
+
+      harness
+        .expectFile('dist/browser/main.js')
+        .content.toContain('sourceMappingURL=app.component.css.map');
+      harness.expectFile('dist/browser/app.component.css.map').toExist();
+    });
+
+    it('should not generate component sourcemaps when sourcemaps when false', async () => {
+      await harness.writeFile('src/app/app.component.css', `* { color: red}`);
+
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+        sourceMap: false,
+      });
+
+      const { result } = await harness.executeOnce();
+
+      expect(result?.success).toBeTrue();
+
+      harness
+        .expectFile('dist/browser/main.js')
+        .content.not.toContain('sourceMappingURL=app.component.css.map');
+      harness.expectFile('dist/browser/app.component.css.map').toNotExist();
+    });
   });
 });
