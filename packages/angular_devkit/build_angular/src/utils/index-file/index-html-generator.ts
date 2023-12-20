@@ -6,8 +6,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import * as fs from 'fs';
-import { join } from 'path';
+import { readFile } from 'node:fs/promises';
+import { join } from 'node:path';
 import { NormalizedCachedOptions } from '../normalize-cache';
 import { NormalizedOptimizationOptions } from '../normalize-optimization';
 import { stripBom } from '../strip-bom';
@@ -104,11 +104,19 @@ export class IndexHtmlGenerator {
   }
 
   async readAsset(path: string): Promise<string> {
-    return fs.promises.readFile(path, 'utf-8');
+    try {
+      return await readFile(path, 'utf-8');
+    } catch {
+      throw new Error(`Failed to read asset "${path}".`);
+    }
   }
 
   protected async readIndex(path: string): Promise<string> {
-    return fs.promises.readFile(path, 'utf-8');
+    try {
+      return await readFile(path, 'utf-8');
+    } catch {
+      throw new Error(`Failed to read index HTML file "${path}".`);
+    }
   }
 }
 
