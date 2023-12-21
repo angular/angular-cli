@@ -1,3 +1,32 @@
+<a name="17.0.8"></a>
+
+# 17.0.8 (2023-12-21)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                                                     |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------------- |
+| [6dba26a0b](https://github.com/angular/angular-cli/commit/6dba26a0b33ee867923c4505decd86f183e0e098) | fix  | `ng e2e` and `ng lint` prompt requires to hit Enter twice to proceed on Windows |
+| [0b48acc4e](https://github.com/angular/angular-cli/commit/0b48acc4eaa15460175368fdc86e3dd8484ed18b) | fix  | re-add `-d` alias for `--dry-run`                                               |
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                                           |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------------------- |
+| [99b026ede](https://github.com/angular/angular-cli/commit/99b026edece990e7f420718fd4967e21db838453) | fix  | add missing property "buildTarget" to interface "ServeBuilderOptions" |
+| [313004311](https://github.com/angular/angular-cli/commit/3130043114d3321b1304f99a4209d9da14055673) | fix  | do not generate standalone component when using `ng generate module`  |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                  |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------ |
+| [cf11cdf6c](https://github.com/angular/angular-cli/commit/cf11cdf6ce7569e2da5fa3bc76e20d19c719ce4c) | fix  | add missing tailwind `@screen` directive in matcher          |
+| [aa6c757d7](https://github.com/angular/angular-cli/commit/aa6c757d701b7f95896c8f1643968ee030b179af) | fix  | construct SSR request URL using server resolvedUrls          |
+| [0662048d4](https://github.com/angular/angular-cli/commit/0662048d4abbcdc36ff74d647bb7d3056dff42a8) | fix  | ensure empty optimized Sass stylesheets stay empty           |
+| [d1923a66d](https://github.com/angular/angular-cli/commit/d1923a66d9d2ab39831ac4cd012fa0d2df66124b) | fix  | ensure external dependencies are used by Web Worker bundling |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="16.2.11"></a>
 
 # 16.2.11 (2023-12-21)
