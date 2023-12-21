@@ -178,12 +178,21 @@ export async function executeBuild(
 
   // Analyze external imports if external options are enabled
   if (options.externalPackages || bundlingResult.externalConfiguration) {
-    const { browser = new Set(), server = new Set() } = bundlingResult.externalImports;
-    // TODO: Filter externalImports to generate third argument to support wildcard externalConfiguration values
+    const {
+      externalConfiguration,
+      externalImports: { browser, server },
+    } = bundlingResult;
+    const implicitBrowser = browser ? [...browser] : [];
+    const implicitServer = server ? [...server] : [];
+    // TODO: Implement wildcard externalConfiguration filtering
     executionResult.setExternalMetadata(
-      [...browser],
-      [...server],
-      bundlingResult.externalConfiguration,
+      externalConfiguration
+        ? implicitBrowser.filter((value) => !externalConfiguration.includes(value))
+        : implicitBrowser,
+      externalConfiguration
+        ? implicitServer.filter((value) => !externalConfiguration.includes(value))
+        : implicitServer,
+      externalConfiguration,
     );
   }
 
