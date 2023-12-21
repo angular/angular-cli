@@ -201,17 +201,13 @@ export abstract class ArchitectBaseCommandModule<T extends object>
       return;
     }
 
-    // Check for a `node_modules` directory (npm, yarn non-PnP, etc.)
-    if (existsSync(resolve(basePath, 'node_modules'))) {
+    // Check if yarn PnP is used. https://yarnpkg.com/advanced/pnpapi#processversionspnp
+    if (process.versions.pnp) {
       return;
     }
 
-    // Check for yarn PnP files
-    if (
-      existsSync(resolve(basePath, '.pnp.js')) ||
-      existsSync(resolve(basePath, '.pnp.cjs')) ||
-      existsSync(resolve(basePath, '.pnp.mjs'))
-    ) {
+    // Check for a `node_modules` directory (npm, yarn non-PnP, etc.)
+    if (existsSync(resolve(basePath, 'node_modules'))) {
       return;
     }
 
