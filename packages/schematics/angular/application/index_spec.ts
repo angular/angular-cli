@@ -105,6 +105,26 @@ describe('Application Schematic', () => {
     expect(_extends).toBe('../../tsconfig.json');
   });
 
+  it('should install npm dependencies when `skipInstall` is false', async () => {
+    await schematicRunner.runSchematic(
+      'application',
+      { ...defaultOptions, ssr: true, skipInstall: false },
+      workspaceTree,
+    );
+    expect(schematicRunner.tasks.length).toBe(1);
+    expect(schematicRunner.tasks[0].name).toBe('node-package');
+    expect((schematicRunner.tasks[0].options as { command: string }).command).toBe('install');
+  });
+
+  it('should not install npm dependencies when `skipInstall` is true', async () => {
+    await schematicRunner.runSchematic(
+      'application',
+      { ...defaultOptions, ssr: true, skipInstall: true },
+      workspaceTree,
+    );
+    expect(schematicRunner.tasks.length).toBe(0);
+  });
+
   it('should set the skipTests flag for other schematics when using --skipTests=true', async () => {
     const options: ApplicationOptions = { ...defaultOptions, skipTests: true };
     const tree = await schematicRunner.runSchematic('application', options, workspaceTree);

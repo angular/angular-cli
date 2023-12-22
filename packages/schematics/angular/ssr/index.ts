@@ -22,7 +22,13 @@ import {
 } from '@angular-devkit/schematics';
 import { posix } from 'node:path';
 import { Schema as ServerOptions } from '../server/schema';
-import { DependencyType, addDependency, readWorkspace, updateWorkspace } from '../utility';
+import {
+  DependencyType,
+  InstallBehavior,
+  addDependency,
+  readWorkspace,
+  updateWorkspace,
+} from '../utility';
 import { JSONFile } from '../utility/json-file';
 import { latestVersions } from '../utility/latest-versions';
 import { isStandaloneApp } from '../utility/ng-ast-utils';
@@ -288,16 +294,21 @@ function updateWebpackBuilderServerTsConfigRule(options: SSROptions): Rule {
   };
 }
 
-function addDependencies(isUsingApplicationBuilder: boolean): Rule {
+function addDependencies({ skipInstall }: SSROptions, isUsingApplicationBuilder: boolean): Rule {
+  const install = skipInstall ? InstallBehavior.None : InstallBehavior.Auto;
+
   const rules: Rule[] = [
     addDependency('@angular/ssr', latestVersions.AngularSSR, {
       type: DependencyType.Default,
+      install,
     }),
     addDependency('express', latestVersions['express'], {
       type: DependencyType.Default,
+      install,
     }),
     addDependency('@types/express', latestVersions['@types/express'], {
       type: DependencyType.Dev,
+      install,
     }),
   ];
 
@@ -305,6 +316,7 @@ function addDependencies(isUsingApplicationBuilder: boolean): Rule {
     rules.push(
       addDependency('browser-sync', latestVersions['browser-sync'], {
         type: DependencyType.Dev,
+        install,
       }),
     );
   }
@@ -373,7 +385,7 @@ export default function (options: SSROptions): Rule {
           ]),
       addServerFile(options, isStandalone),
       addScriptsRule(options, isUsingApplicationBuilder),
-      addDependencies(isUsingApplicationBuilder),
+      addDependencies(options, isUsingApplicationBuilder),
     ]);
   };
 }

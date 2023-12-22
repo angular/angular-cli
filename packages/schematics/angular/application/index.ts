@@ -101,6 +101,7 @@ export default function (options: ApplicationOptions): Rule {
       options.ssr
         ? schematic('ssr', {
             project: options.name,
+            skipInstall: true,
           })
         : noop(),
       options.skipPackageJson ? noop() : addDependenciesToPackageJson(options),
