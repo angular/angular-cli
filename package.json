@@ -174,7 +174,7 @@
     "npm": "^8.11.0",
     "npm-package-arg": "11.0.1",
     "open": "8.4.2",
-    "ora": "5.4.1",
+    "ora": "8.0.1",
     "pacote": "17.0.5",
     "parse5-html-rewriting-stream": "7.0.0",
     "patch-package": "^7.0.1",
