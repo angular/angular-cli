@@ -411,7 +411,7 @@ export function addSymbolToNgModuleMetadata(
     return [];
   }
 
-  let expresssion: ts.Expression | ts.ArrayLiteralExpression;
+  let expression: ts.Expression | ts.ArrayLiteralExpression;
   const assignmentInit = assignment.initializer;
   const elements = assignmentInit.elements;
 
@@ -421,20 +421,20 @@ export function addSymbolToNgModuleMetadata(
       return [];
     }
 
-    expresssion = elements[elements.length - 1];
+    expression = elements[elements.length - 1];
   } else {
-    expresssion = assignmentInit;
+    expression = assignmentInit;
   }
 
   let toInsert: string;
-  let position = expresssion.getEnd();
-  if (ts.isArrayLiteralExpression(expresssion)) {
+  let position = expression.getEnd();
+  if (ts.isArrayLiteralExpression(expression)) {
     // We found the field but it's empty. Insert it just before the `]`.
     position--;
     toInsert = `\n${tags.indentBy(4)`${symbolName}`}\n  `;
   } else {
     // Get the indentation of the last element, if any.
-    const text = expresssion.getFullText(source);
+    const text = expression.getFullText(source);
     const matches = text.match(/^(\r?\n)(\s*)/);
     if (matches) {
       toInsert = `,${matches[1]}${tags.indentBy(matches[2].length)`${symbolName}`}`;
