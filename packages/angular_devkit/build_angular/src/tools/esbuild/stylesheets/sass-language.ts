@@ -11,6 +11,7 @@ import { dirname, join, relative } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import type { CanonicalizeContext, CompileResult, Exception, Syntax } from 'sass';
 import type { SassWorkerImplementation } from '../../sass/sass-service';
+import { MemoryCache } from '../cache';
 import { StylesheetLanguage, StylesheetPluginOptions } from './stylesheet-plugin-factory';
 
 let sassWorkerPool: SassWorkerImplementation | undefined;
@@ -68,19 +69,6 @@ function parsePackageName(url: string): { packageName: string; readonly pathSegm
   };
 }
 
-class Cache<K, V> extends Map<K, V> {
-  async getOrCreate(key: K, creator: () => V | Promise<V>): Promise<V> {
-    let value = this.get(key);
-
-    if (value === undefined) {
-      value = await creator();
-      this.set(key, value);
-    }
-
-    return value;
-  }
-}
-
 async function compileString(
   data: string,
   filePath: string,
@@ -104,8 +92,8 @@ async function compileString(
   // A null value indicates that the cached resolution attempt failed to find a location and
   // later stage resolution should be attempted. This avoids potentially expensive repeat
   // failing resolution attempts.
-  const resolutionCache = new Cache<string, URL | null>();
-  const packageRootCache = new Cache<string, string | null>();
+  const resolutionCache = new MemoryCache<URL | null>();
+  const packageRootCache = new MemoryCache<string | null>();
 
   const warnings: PartialMessage[] = [];
   try {
