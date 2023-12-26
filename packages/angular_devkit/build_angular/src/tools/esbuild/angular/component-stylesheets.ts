@@ -10,23 +10,11 @@ import { OutputFile } from 'esbuild';
 import { createHash } from 'node:crypto';
 import path from 'node:path';
 import { BuildOutputFileType, BundleContextResult, BundlerContext } from '../bundler-context';
+import { MemoryCache } from '../cache';
 import {
   BundleStylesheetOptions,
   createStylesheetBundleOptions,
 } from '../stylesheets/bundle-options';
-
-class BundlerContextCache extends Map<string, BundlerContext> {
-  getOrCreate(key: string, creator: () => BundlerContext): BundlerContext {
-    let value = this.get(key);
-
-    if (value === undefined) {
-      value = creator();
-      this.set(key, value);
-    }
-
-    return value;
-  }
-}
 
 /**
  * Bundles component stylesheets. A stylesheet can be either an inline stylesheet that
@@ -34,8 +22,8 @@ class BundlerContextCache extends Map<string, BundlerContext> {
  * from the Component's metadata definition.
  */
 export class ComponentStylesheetBundler {
-  readonly #fileContexts = new BundlerContextCache();
-  readonly #inlineContexts = new BundlerContextCache();
+  readonly #fileContexts = new MemoryCache<BundlerContext>();
+  readonly #inlineContexts = new MemoryCache<BundlerContext>();
 
   /**
    *
@@ -48,7 +36,7 @@ export class ComponentStylesheetBundler {
   ) {}
 
   async bundleFile(entry: string) {
-    const bundlerContext = this.#fileContexts.getOrCreate(entry, () => {
+    const bundlerContext = await this.#fileContexts.getOrCreate(entry, () => {
       return new BundlerContext(this.options.workspaceRoot, this.incremental, (loadCache) => {
         const buildOptions = createStylesheetBundleOptions(this.options, loadCache);
         buildOptions.entryPoints = [entry];
@@ -67,7 +55,7 @@ export class ComponentStylesheetBundler {
     const id = createHash('sha256').update(data).digest('hex');
     const entry = [language, id, filename].join(';');
 
-    const bundlerContext = this.#inlineContexts.getOrCreate(entry, () => {
+    const bundlerContext = await this.#inlineContexts.getOrCreate(entry, () => {
       const namespace = 'angular:styles/component';
 
       return new BundlerContext(this.options.workspaceRoot, this.incremental, (loadCache) => {
