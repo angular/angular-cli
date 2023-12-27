@@ -420,7 +420,7 @@
             "preloadInitial": {
               "type": "boolean",
               "default": true,
-              "description": "Generates 'preload', `modulepreload', and 'preconnect' link elements for initial application files and resources."
+              "description": "Generates 'preload', 'modulepreload', and 'preconnect' link elements for initial application files and resources."
             }
           },
           "required": ["input"]
