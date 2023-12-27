@@ -117,7 +117,6 @@ export async function* serveWithVite(
     // have a negative effect unlike production where final output size is relevant.
     { sourcemap: true, jit: true, thirdPartySourcemaps },
     1,
-    true,
   );
 
   // Extract output index from options

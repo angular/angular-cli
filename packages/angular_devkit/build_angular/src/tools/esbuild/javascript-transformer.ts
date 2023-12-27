@@ -6,7 +6,10 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import { createHash } from 'node:crypto';
+import { readFile } from 'node:fs/promises';
 import Piscina from 'piscina';
+import { Cache } from './cache';
 
 /**
  * Transformation options that should apply to all transformed files and data.
@@ -28,12 +31,12 @@ export interface JavaScriptTransformerOptions {
 export class JavaScriptTransformer {
   #workerPool: Piscina | undefined;
   #commonOptions: Required<JavaScriptTransformerOptions>;
-  #pendingfileResults?: Map<string, Promise<Uint8Array>>;
+  #fileCacheKeyBase: Uint8Array;
 
   constructor(
     options: JavaScriptTransformerOptions,
     readonly maxThreads: number,
-    reuseResults?: boolean,
+    private readonly cache?: Cache<Uint8Array>,
   ) {
     // Extract options to ensure only the named options are serialized and sent to the worker
     const {
@@ -48,11 +51,7 @@ export class JavaScriptTransformer {
       advancedOptimizations,
       jit,
     };
-
-    // Currently only tracks pending file transform results
-    if (reuseResults) {
-      this.#pendingfileResults = new Map();
-    }
+    this.#fileCacheKeyBase = Buffer.from(JSON.stringify(this.#commonOptions), 'utf-8');
   }
 
   #ensureWorkerPool(): Piscina {
@@ -75,27 +74,56 @@ export class JavaScriptTransformer {
    * @param sideEffects If false, and `advancedOptimizations` is enabled tslib decorators are wrapped.
    * @returns A promise that resolves to a UTF-8 encoded Uint8Array containing the result.
    */
-  transformFile(
+  async transformFile(
     filename: string,
     skipLinker?: boolean,
     sideEffects?: boolean,
   ): Promise<Uint8Array> {
-    const pendingKey = `${!!skipLinker}--${filename}`;
-    let pending = this.#pendingfileResults?.get(pendingKey);
-    if (pending === undefined) {
-      // Always send the request to a worker. Files are almost always from node modules which means
-      // they may need linking. The data is also not yet available to perform most transformation checks.
-      pending = this.#ensureWorkerPool().run({
-        filename,
-        skipLinker,
-        sideEffects,
-        ...this.#commonOptions,
-      });
+    const data = await readFile(filename);
 
-      this.#pendingfileResults?.set(pendingKey, pending);
+    let result;
+    let cacheKey;
+    if (this.cache) {
+      // Create a cache key from the file data and options that effect the output.
+      // NOTE: If additional options are added, this may need to be updated.
+      // TODO: Consider xxhash or similar instead of SHA256
+      const hash = createHash('sha256');
+      hash.update(`${!!skipLinker}--${!!sideEffects}`);
+      hash.update(data);
+      hash.update(this.#fileCacheKeyBase);
+      cacheKey = hash.digest('hex');
+
+      try {
+        result = await this.cache?.get(cacheKey);
+      } catch {
+        // Failure to get the value should not fail the transform
+      }
     }
 
-    return pending;
+    if (result === undefined) {
+      // If there is no cache or no cached entry, process the file
+      result = (await this.#ensureWorkerPool().run(
+        {
+          filename,
+          data,
+          skipLinker,
+          sideEffects,
+          ...this.#commonOptions,
+        },
+        { transferList: [data.buffer] },
+      )) as Uint8Array;
+
+      // If there is a cache then store the result
+      if (this.cache && cacheKey) {
+        try {
+          await this.cache.put(cacheKey, result);
+        } catch {
+          // Failure to store the value in the cache should not fail the transform
+        }
+      }
+    }
+
+    return result;
   }
 
   /**
@@ -140,8 +168,6 @@ export class JavaScriptTransformer {
    * @returns A void promise that resolves when closing is complete.
    */
   async close(): Promise<void> {
-    this.#pendingfileResults?.clear();
-
     if (this.#workerPool) {
       try {
         await this.#workerPool.destroy();

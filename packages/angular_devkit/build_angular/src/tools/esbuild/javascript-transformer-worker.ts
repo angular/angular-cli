@@ -7,13 +7,13 @@
  */
 
 import { transformAsync } from '@babel/core';
-import { readFile } from 'node:fs/promises';
+import Piscina from 'piscina';
 import angularApplicationPreset, { requiresLinking } from '../../tools/babel/presets/application';
 import { loadEsmModule } from '../../utils/load-esm';
 
 interface JavaScriptTransformRequest {
   filename: string;
-  data: string;
+  data: string | Uint8Array;
   sourcemap: boolean;
   thirdPartySourcemaps: boolean;
   advancedOptimizations: boolean;
@@ -22,24 +22,28 @@ interface JavaScriptTransformRequest {
   jit: boolean;
 }
 
-export default async function transformJavaScript(
-  request: JavaScriptTransformRequest,
-): Promise<Uint8Array> {
-  request.data ??= await readFile(request.filename, 'utf-8');
-  const transformedData = await transformWithBabel(request);
+const textDecoder = new TextDecoder();
+const textEncoder = new TextEncoder();
 
-  return Buffer.from(transformedData, 'utf-8');
+export default async function transformJavaScript(request: JavaScriptTransformRequest) {
+  const { filename, data, ...options } = request;
+  const textData = typeof data === 'string' ? data : textDecoder.decode(data);
+
+  const transformedData = await transformWithBabel(filename, textData, options);
+
+  // Transfer the data via `move` instead of cloning
+  return Piscina.move(textEncoder.encode(transformedData));
 }
 
 let linkerPluginCreator:
   | typeof import('@angular/compiler-cli/linker/babel').createEs2015LinkerPlugin
   | undefined;
 
-async function transformWithBabel({
-  filename,
-  data,
-  ...options
-}: JavaScriptTransformRequest): Promise<string> {
+async function transformWithBabel(
+  filename: string,
+  data: string,
+  options: Omit<JavaScriptTransformRequest, 'filename' | 'data'>,
+): Promise<string> {
   const shouldLink = !options.skipLinker && (await requiresLinking(filename, data));
   const useInputSourcemap =
     options.sourcemap &&
