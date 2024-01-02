@@ -3,6 +3,8 @@ import { readFile } from '../../utils/fs';
 
 const CURRENT_SCRIPT_PACKAGES: ReadonlySet<string> = new Set([
   'esbuild (postinstall)',
+  'lmdb (install)',
+  'msgpackr-extract (install)',
   'nice-napi (install)',
 ]);
 

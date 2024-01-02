@@ -31,6 +31,7 @@
     "fast-glob": "3.3.2",
     "https-proxy-agent": "7.0.4",
     "inquirer": "9.2.20",
+    "lmdb": "3.0.8",
     "magic-string": "0.30.10",
     "mrmime": "2.0.0",
     "ora": "5.4.1",
