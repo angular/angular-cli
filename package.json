@@ -159,6 +159,7 @@
     "less-loader": "12.2.0",
     "license-checker": "^25.0.0",
     "license-webpack-plugin": "4.0.2",
+    "lmdb": "3.0.8",
     "loader-utils": "3.2.1",
     "lodash": "^4.17.21",
     "magic-string": "0.30.10",

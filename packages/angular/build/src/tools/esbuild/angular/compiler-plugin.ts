@@ -19,6 +19,7 @@ import assert from 'node:assert';
 import * as path from 'node:path';
 import { maxWorkers, useTypeChecking } from '../../../utils/environment-options';
 import { JavaScriptTransformer } from '../javascript-transformer';
+import { LmbdCacheStore } from '../lmdb-cache-store';
 import { LoadResultCache, createCachedLoad } from '../load-result-cache';
 import { logCumulativeDurations, profileAsync, resetCumulativeDurations } from '../profiling';
 import { BundleStylesheetOptions } from '../stylesheets/bundle-options';
@@ -62,7 +63,17 @@ export function createCompilerPlugin(
       const preserveSymlinks = build.initialOptions.preserveSymlinks;
 
       // Initialize a worker pool for JavaScript transformations
-      const javascriptTransformer = new JavaScriptTransformer(pluginOptions, maxWorkers);
+      let cacheStore;
+      if (pluginOptions.sourceFileCache?.persistentCachePath) {
+        cacheStore = new LmbdCacheStore(
+          pluginOptions.sourceFileCache.persistentCachePath + '/angular-compiler.db',
+        );
+      }
+      const javascriptTransformer = new JavaScriptTransformer(
+        pluginOptions,
+        maxWorkers,
+        cacheStore?.createCache('jstransformer'),
+      );
 
       // Setup defines based on the values used by the Angular compiler-cli
       build.initialOptions.define ??= {};
