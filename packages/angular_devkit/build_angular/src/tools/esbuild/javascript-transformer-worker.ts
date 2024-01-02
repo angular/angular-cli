@@ -25,7 +25,9 @@ interface JavaScriptTransformRequest {
 const textDecoder = new TextDecoder();
 const textEncoder = new TextEncoder();
 
-export default async function transformJavaScript(request: JavaScriptTransformRequest) {
+export default async function transformJavaScript(
+  request: JavaScriptTransformRequest,
+): Promise<unknown> {
   const { filename, data, ...options } = request;
   const textData = typeof data === 'string' ? data : textDecoder.decode(data);
 
