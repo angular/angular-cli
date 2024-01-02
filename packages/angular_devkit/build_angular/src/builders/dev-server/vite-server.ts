@@ -797,6 +797,7 @@ export async function setupServer(
       };
     } else {
       const { default: basicSslPlugin } = await import('@vitejs/plugin-basic-ssl');
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
       configuration.plugins ??= [];
       configuration.plugins.push(basicSslPlugin());
     }
