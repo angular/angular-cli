@@ -83,6 +83,7 @@ ts_library(
         "@npm//fast-glob",
         "@npm//https-proxy-agent",
         "@npm//inquirer",
+        "@npm//lmdb",
         "@npm//magic-string",
         "@npm//mrmime",
         "@npm//ora",
