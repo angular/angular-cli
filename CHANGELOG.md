@@ -1,3 +1,36 @@
+<a name="17.1.0-rc.0"></a>
+
+# 17.1.0-rc.0 (2024-01-03)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                                     |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------------- |
+| [602d0166c](https://github.com/angular/angular-cli/commit/602d0166c43d2b290e03707ad1afede6a769fe7f) | fix  | add prerender and ssr-dev-server schemas in angular.json schema |
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                                         |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------- |
+| [4469e481f](https://github.com/angular/angular-cli/commit/4469e481fc4f74574fdd028513b57ba2300c3b34) | fix  | do not trigger NPM install when using `---skip-install` and `--ssr` |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                                     |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------------- |
+| [68dae539a](https://github.com/angular/angular-cli/commit/68dae539adfa12d6088f96ac5c9f224d9bb52e17) | feat | initial experimental implementation of `@web/test-runner` builder               |
+| [49ed9a26c](https://github.com/angular/angular-cli/commit/49ed9a26cb87ae629d7d4167277f7e5c4ee066f7) | fix  | emit error when using prerender and app-shell builders with application builder |
+| [874e576b5](https://github.com/angular/angular-cli/commit/874e576b523ba675f85011388e4ce3fcc38992fa) | fix  | filter explicit external dependencies for Vite prebundling                      |
+| [bd26a18e7](https://github.com/angular/angular-cli/commit/bd26a18e7a9512bdad15784a19f42aaca8aec303) | fix  | typo in preloadInitial option description                                       |
+
+### @angular-devkit/schematics
+
+| Commit                                                                                              | Type | Description                                          |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------- |
+| [7e9bbe442](https://github.com/angular/angular-cli/commit/7e9bbe442d7f4a050d7aee1779508d14211863fe) | fix  | replace template line endings with platform specific |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="17.0.9"></a>
 
 # 17.0.9 (2024-01-03)
