@@ -46,9 +46,7 @@ export default createBuilder(
     // Parallelize startup work.
     const [testFiles] = await Promise.all([
       // Glob for files to test.
-      findTestFiles(options.include, options.exclude, ctx.workspaceRoot).then((files) =>
-        Array.from(files).map((file) => path.relative(process.cwd(), file)),
-      ),
+      findTestFiles(options.include, options.exclude, ctx.workspaceRoot),
       // Clean build output path.
       fs.rm(testDir, { recursive: true, force: true }),
     ]);
@@ -66,7 +64,7 @@ export default createBuilder(
 
 /** Build all the given test files and write the result to the given output path. */
 async function buildTests(
-  testFiles: string[],
+  testFiles: ReadonlySet<string>,
   outputPath: string,
   options: WtrBuilderOptions,
   ctx: BuilderContext,
