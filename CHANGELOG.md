@@ -1,3 +1,21 @@
+<a name="17.0.9"></a>
+
+# 17.0.9 (2024-01-03)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                                     |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------------- |
+| [446dfb76a](https://github.com/angular/angular-cli/commit/446dfb76a5e2a53542fae93b4400133bf7d9552e) | fix  | add prerender and ssr-dev-server schemas in angular.json schema |
+
+### @angular-devkit/schematics
+
+| Commit                                                                                              | Type | Description                                          |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------- |
+| [88d6ca4a5](https://github.com/angular/angular-cli/commit/88d6ca4a545c2d3e35822923f2aae03f43b2e3e3) | fix  | replace template line endings with platform specific |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="17.1.0-next.3"></a>
 
 # 17.1.0-next.3 (2023-12-21)
