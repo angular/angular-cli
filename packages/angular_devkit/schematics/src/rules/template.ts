@@ -7,7 +7,7 @@
  */
 
 import { BaseException, normalize, template as templateImpl } from '@angular-devkit/core';
-import { TextDecoder } from 'util';
+import { EOL } from 'node:os';
 import { FileOperator, Rule } from '../engine/interface';
 import { FileEntry } from '../tree/interface';
 import { chain, composeFileOperators, forEach, when } from './base';
@@ -55,7 +55,7 @@ export function applyContentTemplate<T>(options: T): FileOperator {
     const { path, content } = entry;
 
     try {
-      const decodedContent = decoder.decode(content);
+      const decodedContent = decoder.decode(content).replace(/\r?\n/g, EOL);
 
       return {
         path,
