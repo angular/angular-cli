@@ -208,20 +208,12 @@ export async function executeBuild(
   if (options.budgets) {
     const compatStats = generateBudgetStats(metafile, initialFiles);
     budgetFailures = [...checkBudgets(options.budgets, compatStats, true)];
-    if (budgetFailures.length > 0) {
-      const errors = budgetFailures
-        .filter((failure) => failure.severity === 'error')
-        .map(({ message }) => message);
-      const warnings = budgetFailures
-        .filter((failure) => failure.severity !== 'error')
-        .map(({ message }) => message);
-
-      await printWarningsAndErrorsToConsoleAndAddToResult(
-        context,
-        executionResult,
-        warnings,
-        errors,
-      );
+    for (const { message, severity } of budgetFailures) {
+      if (severity === 'error') {
+        executionResult.addError(message);
+      } else {
+        executionResult.addWarning(message);
+      }
     }
   }
 
@@ -234,7 +226,7 @@ export async function executeBuild(
   // Check metafile for CommonJS module usage if optimizing scripts
   if (optimizationOptions.scripts) {
     const messages = checkCommonJSModules(metafile, options.allowedCommonJsDependencies);
-    await logMessages(context, { warnings: messages });
+    executionResult.addWarnings(messages);
   }
 
   // Copy assets
@@ -255,12 +247,10 @@ export async function executeBuild(
 
   // Perform i18n translation inlining if enabled
   let prerenderedRoutes: string[];
-  let errors: string[];
-  let warnings: string[];
   if (i18nOptions.shouldInline) {
     const result = await inlineI18n(options, executionResult, initialFiles);
-    errors = result.errors;
-    warnings = result.warnings;
+    executionResult.addErrors(result.errors);
+    executionResult.addWarnings(result.warnings);
     prerenderedRoutes = result.prerenderedRoutes;
   } else {
     const result = await executePostBundleSteps(
@@ -272,14 +262,12 @@ export async function executeBuild(
       i18nOptions.hasDefinedSourceLocale ? i18nOptions.sourceLocale : undefined,
     );
 
-    errors = result.errors;
-    warnings = result.warnings;
+    executionResult.addErrors(result.errors);
+    executionResult.addWarnings(result.warnings);
     prerenderedRoutes = result.prerenderedRoutes;
     executionResult.outputFiles.push(...result.additionalOutputFiles);
     executionResult.assetFiles.push(...result.additionalAssets);
   }
-
-  await printWarningsAndErrorsToConsoleAndAddToResult(context, executionResult, warnings, errors);
 
   if (prerenderOptions) {
     executionResult.addOutputFile(
@@ -307,6 +295,8 @@ export async function executeBuild(
     estimatedTransferSizes,
   );
 
+  await logMessages(context, executionResult);
+
   // Write metafile if stats option is enabled
   if (options.stats) {
     executionResult.addOutputFile(
@@ -317,21 +307,4 @@ export async function executeBuild(
   }
 
   return executionResult;
-}
-
-async function printWarningsAndErrorsToConsoleAndAddToResult(
-  context: BuilderContext,
-  executionResult: ExecutionResult,
-  warnings: string[],
-  errors: string[],
-): Promise<void> {
-  const errorMessages = errors.map((text) => ({ text, location: null }));
-  if (errorMessages.length) {
-    executionResult.addErrors(errorMessages);
-  }
-
-  await logMessages(context, {
-    errors: errorMessages,
-    warnings: warnings.map((text) => ({ text, location: null })),
-  });
 }
