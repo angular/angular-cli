@@ -130,9 +130,10 @@
   dependencies:
     tslib "^2.3.0"
 
-"@angular/bazel@https://github.com/angular/bazel-builds.git#99804dcbccc234d6ec79b96914a3bd2a3dabbbad":
-  version "17.1.0-next.5"
-  resolved "https://github.com/angular/bazel-builds.git#99804dcbccc234d6ec79b96914a3bd2a3dabbbad"
+"@angular/bazel@https://github.com/angular/bazel-builds.git#b3d2c6bd08aa95afdc6bf24ba04fdb52f83b07b6":
+  version "17.1.0-next.5+sha-1c63edd"
+  uid b3d2c6bd08aa95afdc6bf24ba04fdb52f83b07b6
+  resolved "https://github.com/angular/bazel-builds.git#b3d2c6bd08aa95afdc6bf24ba04fdb52f83b07b6"
   dependencies:
     "@microsoft/api-extractor" "^7.24.2"
     magic-string "^0.30.0"
