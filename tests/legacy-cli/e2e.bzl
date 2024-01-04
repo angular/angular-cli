@@ -103,6 +103,7 @@ def _e2e_tests(name, runner, **kwargs):
     # Chromium browser toolchain
     env.update({
         "CHROME_BIN": "$(CHROMIUM)",
+        "CHROME_PATH": "$(CHROMIUM)",
         "CHROMEDRIVER_BIN": "$(CHROMEDRIVER)",
     })
     toolchains = toolchains + ["@npm//@angular/build-tooling/bazel/browsers/chromium:toolchain_alias"]
