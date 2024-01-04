@@ -206,6 +206,7 @@ setGlobalVariable('package-manager', argv.yarn ? 'yarn' : 'npm');
 // Resolve from relative paths to absolute paths within the bazel runfiles tree
 // so subprocesses spawned in a different working directory can still find them.
 process.env.CHROME_BIN = path.resolve(process.env.CHROME_BIN!);
+process.env.CHROME_PATH = path.resolve(process.env.CHROME_PATH!);
 process.env.CHROMEDRIVER_BIN = path.resolve(process.env.CHROMEDRIVER_BIN!);
 
 Promise.all([findFreePort(), findFreePort(), findPackageTars()])
