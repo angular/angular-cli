@@ -177,6 +177,7 @@ function extractCIEnv(): NodeJS.ProcessEnv {
         v === 'CI' ||
         v === 'CIRCLECI' ||
         v === 'CHROME_BIN' ||
+        v === 'CHROME_PATH' ||
         v === 'CHROMEDRIVER_BIN',
     )
     .reduce<NodeJS.ProcessEnv>((vars, n) => {
