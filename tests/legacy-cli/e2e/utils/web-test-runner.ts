@@ -3,11 +3,6 @@ import { updateJsonFile } from './project';
 
 /** Updates the `test` builder in the current workspace to use Web Test Runner with the given options. */
 export async function applyWtrBuilder(): Promise<void> {
-  // Does not load Chrome binary correctly on Windows.
-  if (process.platform.startsWith('win')) {
-    return;
-  }
-
   await silentNpm('install', '@web/test-runner', '--save-dev');
 
   await updateJsonFile('angular.json', (json) => {
