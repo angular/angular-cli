@@ -38,6 +38,7 @@ export class ExecutionResult {
   outputFiles: BuildOutputFile[] = [];
   assetFiles: BuildOutputAsset[] = [];
   errors: (Message | PartialMessage)[] = [];
+  warnings: (Message | PartialMessage)[] = [];
   externalMetadata?: ExternalResultMetadata;
 
   constructor(
@@ -53,8 +54,32 @@ export class ExecutionResult {
     this.assetFiles.push(...assets);
   }
 
-  addErrors(errors: (Message | PartialMessage)[]): void {
-    this.errors.push(...errors);
+  addError(error: PartialMessage | string): void {
+    if (typeof error === 'string') {
+      this.errors.push({ text: error, location: null });
+    } else {
+      this.errors.push(error);
+    }
+  }
+
+  addErrors(errors: (PartialMessage | string)[]): void {
+    for (const error of errors) {
+      this.addError(error);
+    }
+  }
+
+  addWarning(error: PartialMessage | string): void {
+    if (typeof error === 'string') {
+      this.warnings.push({ text: error, location: null });
+    } else {
+      this.warnings.push(error);
+    }
+  }
+
+  addWarnings(errors: (PartialMessage | string)[]): void {
+    for (const error of errors) {
+      this.addWarning(error);
+    }
   }
 
   /**
