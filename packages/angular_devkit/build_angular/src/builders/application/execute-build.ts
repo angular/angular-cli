@@ -8,25 +8,15 @@
 
 import { BuilderContext } from '@angular-devkit/architect';
 import { SourceFileCache } from '../../tools/esbuild/angular/source-file-cache';
-import {
-  createBrowserCodeBundleOptions,
-  createBrowserPolyfillBundleOptions,
-  createServerCodeBundleOptions,
-  createServerPolyfillBundleOptions,
-} from '../../tools/esbuild/application-code-bundle';
 import { generateBudgetStats } from '../../tools/esbuild/budget-stats';
 import { BuildOutputFileType, BundlerContext } from '../../tools/esbuild/bundler-context';
 import { ExecutionResult, RebuildState } from '../../tools/esbuild/bundler-execution-result';
 import { checkCommonJSModules } from '../../tools/esbuild/commonjs-checker';
-import { createGlobalScriptsBundleOptions } from '../../tools/esbuild/global-scripts';
-import { createGlobalStylesBundleOptions } from '../../tools/esbuild/global-styles';
 import { extractLicenses } from '../../tools/esbuild/license-extractor';
 import {
   calculateEstimatedTransferSizes,
-  getSupportedNodeTargets,
   logBuildStats,
   logMessages,
-  transformSupportedBrowsersToTargets,
 } from '../../tools/esbuild/utils';
 import { BudgetCalculatorResult, checkBudgets } from '../../utils/bundle-calculator';
 import { colors } from '../../utils/color';
@@ -35,8 +25,8 @@ import { getSupportedBrowsers } from '../../utils/supported-browsers';
 import { executePostBundleSteps } from './execute-post-bundle';
 import { inlineI18n, loadActiveTranslations } from './i18n';
 import { NormalizedApplicationBuildOptions } from './options';
+import { setupBundlerContexts } from './setup-bundling';
 
-// eslint-disable-next-line max-lines-per-function
 export async function executeBuild(
   options: NormalizedApplicationBuildOptions,
   context: BuilderContext,
@@ -47,16 +37,13 @@ export async function executeBuild(
     workspaceRoot,
     i18nOptions,
     optimizationOptions,
-    serverEntryPoint,
     assets,
     cacheOptions,
     prerenderOptions,
-    appShellOptions,
-    ssrOptions,
   } = options;
 
+  // TODO: Consider integrating into watch mode. Would require full rebuild on target changes.
   const browsers = getSupportedBrowsers(projectRoot, context.logger);
-  const target = transformSupportedBrowsersToTargets(browsers);
 
   // Load active translations if inlining
   // TODO: Integrate into watch mode and only load changed translations
@@ -70,93 +57,7 @@ export async function executeBuild(
     rebuildState?.codeBundleCache ??
     new SourceFileCache(cacheOptions.enabled ? cacheOptions.path : undefined);
   if (bundlerContexts === undefined) {
-    bundlerContexts = [];
-
-    // Browser application code
-    bundlerContexts.push(
-      new BundlerContext(
-        workspaceRoot,
-        !!options.watch,
-        createBrowserCodeBundleOptions(options, target, codeBundleCache),
-      ),
-    );
-
-    // Browser polyfills code
-    const browserPolyfillBundleOptions = createBrowserPolyfillBundleOptions(
-      options,
-      target,
-      codeBundleCache,
-    );
-    if (browserPolyfillBundleOptions) {
-      bundlerContexts.push(
-        new BundlerContext(workspaceRoot, !!options.watch, browserPolyfillBundleOptions),
-      );
-    }
-
-    // Global Stylesheets
-    if (options.globalStyles.length > 0) {
-      for (const initial of [true, false]) {
-        const bundleOptions = createGlobalStylesBundleOptions(options, target, initial);
-        if (bundleOptions) {
-          bundlerContexts.push(
-            new BundlerContext(workspaceRoot, !!options.watch, bundleOptions, () => initial),
-          );
-        }
-      }
-    }
-
-    // Global Scripts
-    if (options.globalScripts.length > 0) {
-      for (const initial of [true, false]) {
-        const bundleOptions = createGlobalScriptsBundleOptions(options, target, initial);
-        if (bundleOptions) {
-          bundlerContexts.push(
-            new BundlerContext(workspaceRoot, !!options.watch, bundleOptions, () => initial),
-          );
-        }
-      }
-    }
-
-    // Skip server build when none of the features are enabled.
-    if (serverEntryPoint && (prerenderOptions || appShellOptions || ssrOptions)) {
-      const nodeTargets = [...target, ...getSupportedNodeTargets()];
-      // Server application code
-      bundlerContexts.push(
-        new BundlerContext(
-          workspaceRoot,
-          !!options.watch,
-          createServerCodeBundleOptions(
-            {
-              ...options,
-              // Disable external deps for server bundles.
-              // This is because it breaks Vite 'optimizeDeps' for SSR.
-              externalPackages: false,
-            },
-            nodeTargets,
-            codeBundleCache,
-          ),
-          () => false,
-        ),
-      );
-
-      // Server polyfills code
-      const serverPolyfillBundleOptions = createServerPolyfillBundleOptions(
-        options,
-        nodeTargets,
-        codeBundleCache,
-      );
-
-      if (serverPolyfillBundleOptions) {
-        bundlerContexts.push(
-          new BundlerContext(
-            workspaceRoot,
-            !!options.watch,
-            serverPolyfillBundleOptions,
-            () => false,
-          ),
-        );
-      }
-    }
+    bundlerContexts = setupBundlerContexts(options, browsers, codeBundleCache);
   }
 
   const bundlingResult = await BundlerContext.bundleAll(
