@@ -18,6 +18,7 @@ import {
   parseTree,
   printParseErrorCode,
 } from 'jsonc-parser';
+import { getEOL } from './eol';
 
 export type InsertionIndex = (properties: string[]) => number;
 export type JSONPath = (string | number)[];
@@ -25,9 +26,14 @@ export type JSONPath = (string | number)[];
 /** @private */
 export class JSONFile {
   content: string;
+  private eol: string;
 
-  constructor(private readonly host: Tree, private readonly path: string) {
+  constructor(
+    private readonly host: Tree,
+    private readonly path: string,
+  ) {
     this.content = this.host.readText(this.path);
+    this.eol = getEOL(this.content);
   }
 
   private _jsonAst: Node | undefined;
@@ -81,7 +87,9 @@ export class JSONFile {
 
     const edits = modify(this.content, jsonPath, value, {
       getInsertionIndex,
+
       formattingOptions: {
+        eol: this.eol,
         insertSpaces: true,
         tabSize: 2,
       },
