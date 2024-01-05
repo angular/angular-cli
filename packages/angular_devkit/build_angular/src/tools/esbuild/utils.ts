@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { BuilderContext } from '@angular-devkit/architect';
+import { logging } from '@angular-devkit/core';
 import { BuildOptions, Metafile, OutputFile, PartialMessage, formatMessages } from 'esbuild';
 import { createHash } from 'node:crypto';
 import { constants as fsConstants } from 'node:fs';
@@ -22,7 +22,7 @@ import { BuildOutputFile, BuildOutputFileType, InitialFileRecord } from './bundl
 import { BuildOutputAsset } from './bundler-execution-result';
 
 export function logBuildStats(
-  context: BuilderContext,
+  logger: logging.LoggerApi,
   metafile: Metafile,
   initial: Map<string, InitialFileRecord>,
   budgetFailures: BudgetCalculatorResult[] | undefined,
@@ -71,12 +71,12 @@ export function logBuildStats(
       budgetFailures,
     );
 
-    context.logger.info('\n' + tableText + '\n');
+    logger.info('\n' + tableText + '\n');
   } else if (changedFiles !== undefined) {
-    context.logger.info('\nNo output file changes.\n');
+    logger.info('\nNo output file changes.\n');
   }
   if (unchangedCount > 0) {
-    context.logger.info(`Unchanged output files: ${unchangedCount}`);
+    logger.info(`Unchanged output files: ${unchangedCount}`);
   }
 }
 
@@ -143,17 +143,17 @@ export async function withNoProgress<T>(text: string, action: () => T | Promise<
 }
 
 export async function logMessages(
-  context: BuilderContext,
+  logger: logging.LoggerApi,
   { errors, warnings }: { errors?: PartialMessage[]; warnings?: PartialMessage[] },
 ): Promise<void> {
   if (warnings?.length) {
     const warningMessages = await formatMessages(warnings, { kind: 'warning', color: true });
-    context.logger.warn(warningMessages.join('\n'));
+    logger.warn(warningMessages.join('\n'));
   }
 
   if (errors?.length) {
     const errorMessages = await formatMessages(errors, { kind: 'error', color: true });
-    context.logger.error(errorMessages.join('\n'));
+    logger.error(errorMessages.join('\n'));
   }
 }
 
