@@ -20,14 +20,9 @@ import {
   strings,
   url,
 } from '@angular-devkit/schematics';
-import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
 import { posix } from 'node:path';
-import { addRootProvider } from '../utility';
-import {
-  NodeDependencyType,
-  addPackageJsonDependency,
-  getPackageJsonDependency,
-} from '../utility/dependencies';
+import { DependencyType, InstallBehavior, addDependency, addRootProvider } from '../utility';
+import { getPackageJsonDependency } from '../utility/dependencies';
 import { JSONFile } from '../utility/json-file';
 import { latestVersions } from '../utility/latest-versions';
 import { isStandaloneApp } from '../utility/ng-ast-utils';
@@ -136,23 +131,25 @@ function updateTsConfigFile(tsConfigPath: string): Rule {
   };
 }
 
-function addDependencies(): Rule {
+function addDependencies(skipInstall: boolean | undefined): Rule {
   return (host: Tree) => {
     const coreDep = getPackageJsonDependency(host, '@angular/core');
     if (coreDep === null) {
       throw new SchematicsException('Could not find version.');
     }
-    const platformServerDep = {
-      ...coreDep,
-      name: '@angular/platform-server',
-    };
-    addPackageJsonDependency(host, platformServerDep);
 
-    addPackageJsonDependency(host, {
-      type: NodeDependencyType.Dev,
-      name: '@types/node',
-      version: latestVersions['@types/node'],
-    });
+    const install = skipInstall ? InstallBehavior.None : InstallBehavior.Auto;
+
+    return chain([
+      addDependency('@angular/platform-server', coreDep.version, {
+        type: DependencyType.Default,
+        install,
+      }),
+      addDependency('@types/node', latestVersions['@types/node'], {
+        type: DependencyType.Dev,
+        install,
+      }),
+    ]);
   };
 }
 
@@ -178,9 +175,6 @@ export default function (options: ServerOptions): Rule {
       return;
     }
 
-    if (!options.skipInstall) {
-      context.addTask(new NodePackageInstallTask());
-    }
     const clientBuildOptions = clientBuildTarget.options as Record<string, string>;
     const browserEntryPoint = await getMainFilePath(host, options.project);
     const isStandalone = isStandaloneApp(host, browserEntryPoint);
@@ -220,7 +214,7 @@ export default function (options: ServerOptions): Rule {
             ),
             updateConfigFileBrowserBuilder(options, tsConfigDirectory),
           ]),
-      addDependencies(),
+      addDependencies(options.skipInstall),
       addRootProvider(
         options.project,
         ({ code, external }) =>
