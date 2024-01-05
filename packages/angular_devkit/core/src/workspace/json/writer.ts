@@ -7,6 +7,7 @@
  */
 
 import { applyEdits, modify } from 'jsonc-parser';
+import { EOL } from 'node:os';
 import { JsonObject, JsonValue } from '../../json';
 import { ProjectDefinition, TargetDefinition, WorkspaceDefinition } from '../definitions';
 import { WorkspaceHost } from '../host';
@@ -163,6 +164,7 @@ function updateJsonWorkspace(metadata: JsonWorkspaceMetadata): string {
       formattingOptions: {
         insertSpaces: true,
         tabSize: 2,
+        eol: getEOL(content),
       },
     });
 
@@ -170,4 +172,19 @@ function updateJsonWorkspace(metadata: JsonWorkspaceMetadata): string {
   }
 
   return content;
+}
+
+function getEOL(content: string): string {
+  const CRLF = '\r\n';
+  const LF = '\n';
+  const newlines = content.match(/(?:\r?\n)/g);
+
+  if (newlines?.length) {
+    const crlf = newlines.filter((l) => l === CRLF).length;
+    const lf = newlines.length - crlf;
+
+    return crlf > lf ? CRLF : LF;
+  }
+
+  return EOL;
 }
