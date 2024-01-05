@@ -9,6 +9,7 @@
 import { tags } from '@angular-devkit/core';
 import * as ts from '../third_party/github.com/Microsoft/TypeScript/lib/typescript';
 import { Change, InsertChange, NoopChange } from './change';
+import { getEOL } from './eol';
 
 /**
  * Add Import `import { symbolName } from fileName` if the import doesn't exit
@@ -73,12 +74,13 @@ export function insertImport(
   }
   const open = isDefault ? '' : '{ ';
   const close = isDefault ? '' : ' }';
+  const eol = getEOL(rootNode.getText());
   // if there are no imports or 'use strict' statement, insert import at beginning of file
   const insertAtBeginning = allImports.length === 0 && useStrict.length === 0;
-  const separator = insertAtBeginning ? '' : ';\n';
+  const separator = insertAtBeginning ? '' : `;${eol}`;
   const toInsert =
     `${separator}import ${open}${importExpression}${close}` +
-    ` from '${fileName}'${insertAtBeginning ? ';\n' : ''}`;
+    ` from '${fileName}'${insertAtBeginning ? `;${eol}` : ''}`;
 
   return insertAfterLastOccurrence(
     allImports,
