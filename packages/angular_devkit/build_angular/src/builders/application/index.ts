@@ -165,11 +165,13 @@ export function buildApplication(
   context: BuilderContext,
   pluginsOrExtensions?: Plugin[] | ApplicationBuilderExtensions,
 ): AsyncIterable<ApplicationBuilderOutput> {
-  let extensions;
+  let extensions: ApplicationBuilderExtensions | undefined;
   if (pluginsOrExtensions && Array.isArray(pluginsOrExtensions)) {
     extensions = {
       codePlugins: pluginsOrExtensions,
     };
+  } else {
+    extensions = pluginsOrExtensions;
   }
 
   return buildApplicationInternal(options, context, undefined, extensions);
