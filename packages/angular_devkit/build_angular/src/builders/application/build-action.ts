@@ -13,7 +13,12 @@ import path from 'node:path';
 import { BuildOutputFile } from '../../tools/esbuild/bundler-context';
 import { ExecutionResult, RebuildState } from '../../tools/esbuild/bundler-execution-result';
 import { shutdownSassWorkerPool } from '../../tools/esbuild/stylesheets/sass-language';
-import { withNoProgress, withSpinner, writeResultFiles } from '../../tools/esbuild/utils';
+import {
+  logMessages,
+  withNoProgress,
+  withSpinner,
+  writeResultFiles,
+} from '../../tools/esbuild/utils';
 import { deleteOutputDir } from '../../utils/delete-output-dir';
 import { shouldWatchRoot } from '../../utils/environment-options';
 import { NormalizedCachedOptions } from '../../utils/normalize-cache';
@@ -66,7 +71,11 @@ export async function* runEsBuildBuildAction(
   // Initial build
   let result: ExecutionResult;
   try {
+    // Perform the build action
     result = await withProgress('Building...', () => action());
+
+    // Log all diagnostic (error/warning) messages from the build
+    await logMessages(logger, result);
   } finally {
     // Ensure Sass workers are shutdown if not watching
     if (!watch) {
@@ -170,6 +179,9 @@ export async function* runEsBuildBuildAction(
       result = await withProgress('Changes detected. Rebuilding...', () =>
         action(result.createRebuildState(changes)),
       );
+
+      // Log all diagnostic (error/warning) messages from the rebuild
+      await logMessages(logger, result);
 
       // Update watched locations provided by the new build result.
       // Keep watching all previous files if there are any errors; otherwise consider all

@@ -13,11 +13,7 @@ import { BuildOutputFileType, BundlerContext } from '../../tools/esbuild/bundler
 import { ExecutionResult, RebuildState } from '../../tools/esbuild/bundler-execution-result';
 import { checkCommonJSModules } from '../../tools/esbuild/commonjs-checker';
 import { extractLicenses } from '../../tools/esbuild/license-extractor';
-import {
-  calculateEstimatedTransferSizes,
-  logBuildStats,
-  logMessages,
-} from '../../tools/esbuild/utils';
+import { calculateEstimatedTransferSizes, logBuildStats } from '../../tools/esbuild/utils';
 import { BudgetCalculatorResult, checkBudgets } from '../../utils/bundle-calculator';
 import { colors } from '../../utils/color';
 import { copyAssets } from '../../utils/copy-assets';
@@ -65,10 +61,8 @@ export async function executeBuild(
     rebuildState?.fileChanges.all,
   );
 
-  // Log all warnings and errors generated during bundling
-  await logMessages(context, bundlingResult);
-
   const executionResult = new ExecutionResult(bundlerContexts, codeBundleCache);
+  executionResult.addWarnings(bundlingResult.warnings);
 
   // Return if the bundling has errors
   if (bundlingResult.errors) {
@@ -188,15 +182,13 @@ export async function executeBuild(
   }
 
   logBuildStats(
-    context,
+    context.logger,
     metafile,
     initialFiles,
     budgetFailures,
     changedFiles,
     estimatedTransferSizes,
   );
-
-  await logMessages(context, executionResult);
 
   // Write metafile if stats option is enabled
   if (options.stats) {
