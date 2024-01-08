@@ -48,6 +48,7 @@ export function execute(
       res: http.ServerResponse,
       next: (err?: unknown) => void,
     ) => void)[];
+    builderSelector?: (info: BuilderSelectorInfo, logger: BuilderContext['logger']) => string;
   },
 ): Observable<DevServerBuilderOutput> {
   // Determine project name from builder context target
@@ -58,26 +59,14 @@ export function execute(
     return EMPTY;
   }
 
-  return defer(() => initialize(options, projectName, context)).pipe(
+  return defer(() => initialize(options, projectName, context, extensions?.builderSelector)).pipe(
     switchMap(({ builderName, normalizedOptions }) => {
       // Use vite-based development server for esbuild-based builds
-      if (
-        builderName === '@angular-devkit/build-angular:application' ||
-        builderName === '@angular-devkit/build-angular:browser-esbuild' ||
-        normalizedOptions.forceEsbuild
-      ) {
+      if (isEsbuildBased(builderName)) {
         if (transforms?.logging || transforms?.webpackConfiguration) {
           throw new Error(
             'The `application` and `browser-esbuild` builders do not support Webpack transforms.',
           );
-        }
-
-        if (
-          normalizedOptions.forceEsbuild &&
-          builderName === '@angular-devkit/build-angular:browser'
-        ) {
-          // The compatibility builder should be used if esbuild is force enabled with the official Webpack-based builder.
-          builderName = '@angular-devkit/build-angular:browser-esbuild';
         }
 
         return defer(() => import('./vite-server')).pipe(
@@ -110,6 +99,7 @@ async function initialize(
   initialOptions: DevServerBuilderOptions,
   projectName: string,
   context: BuilderContext,
+  builderSelector = defaultBuilderSelector,
 ) {
   // Purge old build disk cache.
   await purgeStaleBuildCache(context);
@@ -140,14 +130,56 @@ case.
     );
   }
 
-  if (normalizedOptions.forceEsbuild && !builderName.startsWith('@angular-devkit/build-angular:')) {
-    context.logger.warn(
-      'Warning: Forcing the use of the esbuild-based build system with third-party builders' +
-        ' may cause unexpected behavior and/or build failures.',
-    );
-  }
-
   normalizedOptions.port = await checkPort(normalizedOptions.port, normalizedOptions.host);
 
-  return { builderName, normalizedOptions };
+  return {
+    builderName: builderSelector(
+      { builderName, forceEsbuild: !!normalizedOptions.forceEsbuild },
+      context.logger,
+    ),
+    normalizedOptions,
+  };
+}
+
+function isEsbuildBased(
+  builderName: string,
+): builderName is
+  | '@angular-devkit/build-angular:application'
+  | '@angular-devkit/build-angular:browser-esbuild' {
+  if (
+    builderName === '@angular-devkit/build-angular:application' ||
+    builderName === '@angular-devkit/build-angular:browser-esbuild'
+  ) {
+    return true;
+  }
+
+  return false;
+}
+
+interface BuilderSelectorInfo {
+  builderName: string;
+  forceEsbuild: boolean;
+}
+
+function defaultBuilderSelector(
+  info: BuilderSelectorInfo,
+  logger: BuilderContext['logger'],
+): string {
+  if (isEsbuildBased(info.builderName)) {
+    return info.builderName;
+  }
+
+  if (info.forceEsbuild) {
+    if (!info.builderName.startsWith('@angular-devkit/build-angular:')) {
+      logger.warn(
+        'Warning: Forcing the use of the esbuild-based build system with third-party builders' +
+          ' may cause unexpected behavior and/or build failures.',
+      );
+    }
+
+    // The compatibility builder should be used if esbuild is force enabled.
+    return '@angular-devkit/build-angular:browser-esbuild';
+  }
+
+  return info.builderName;
 }
