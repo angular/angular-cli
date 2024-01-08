@@ -503,7 +503,7 @@ namespace strategy {
 export type Target = json.JsonObject & Target_2;
 
 // @public
-export function targetFromTargetString(str: string): Target;
+export function targetFromTargetString(specifier: string, abbreviatedProjectName?: string, abbreviatedTargetName?: string): Target;
 
 // @public
 export function targetStringFromTarget({ project, target, configuration }: Target): string;

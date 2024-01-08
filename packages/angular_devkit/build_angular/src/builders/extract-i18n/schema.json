@@ -13,7 +13,7 @@
     "buildTarget": {
       "type": "string",
       "description": "A builder target to extract i18n messages in the format of `project:target[:configuration]`. You can also pass in more than one configuration name as a comma-separated list. Example: `project:target:production,staging`.",
-      "pattern": "^[^:\\s]+:[^:\\s]+(:[^\\s]+)?$"
+      "pattern": "^[^:\\s]*:[^:\\s]*(:[^\\s]+)?$"
     },
     "format": {
       "type": "string",

@@ -33,8 +33,9 @@ export async function normalizeOptions(
   const projectMetadata = await context.getProjectMetadata(projectName);
   const projectRoot = path.join(workspaceRoot, (projectMetadata.root as string | undefined) ?? '');
 
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const buildTarget = targetFromTargetString(options.buildTarget ?? options.browserTarget!);
+  // Target specifier defaults to the current project's build target with no specified configuration
+  const buildTargetSpecifier = options.buildTarget ?? options.browserTarget ?? ':';
+  const buildTarget = targetFromTargetString(buildTargetSpecifier, projectName, 'build');
 
   const i18nOptions = createI18nOptions(projectMetadata);
 
