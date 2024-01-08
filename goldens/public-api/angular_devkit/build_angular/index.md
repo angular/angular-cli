@@ -212,6 +212,7 @@ export function executeDevServerBuilder(options: DevServerBuilderOptions, contex
 }, extensions?: {
     buildPlugins?: Plugin_2[];
     middleware?: ((req: http.IncomingMessage, res: http.ServerResponse, next: (err?: unknown) => void) => void)[];
+    builderSelector?: (info: BuilderSelectorInfo, logger: BuilderContext['logger']) => string;
 }): Observable<DevServerBuilderOutput>;
 
 // @public
