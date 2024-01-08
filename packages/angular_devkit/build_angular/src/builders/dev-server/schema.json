@@ -13,7 +13,7 @@
     "buildTarget": {
       "type": "string",
       "description": "A build builder target to serve in the format of `project:target[:configuration]`. You can also pass in more than one configuration name as a comma-separated list. Example: `project:target:production,staging`.",
-      "pattern": "^[^:\\s]+:[^:\\s]+(:[^\\s]+)?$"
+      "pattern": "^[^:\\s]*:[^:\\s]*(:[^\\s]+)?$"
     },
     "port": {
       "type": "number",
