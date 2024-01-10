@@ -1,3 +1,35 @@
+<a name="17.1.0-rc.1"></a>
+
+# 17.1.0-rc.1 (2024-01-10)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                  |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------- |
+| [9f71d2e97](https://github.com/angular/angular-cli/commit/9f71d2e976e86e60151b3cf8e1fedc6ec7380840) | fix  | retain existing EOL when updating JSON files |
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                  |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------- |
+| [8c815711a](https://github.com/angular/angular-cli/commit/8c815711a255049512c3712ff89c9ab321a20b23) | fix  | retain existing EOL when adding imports      |
+| [4a5e7086d](https://github.com/angular/angular-cli/commit/4a5e7086dcb64d1642c243ab02892070d473e7a4) | fix  | retain existing EOL when updating JSON files |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                             |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------- |
+| [2a02b1320](https://github.com/angular/angular-cli/commit/2a02b1320449e0562041bbba86e42048665402e5) | fix  | fix normalization of the application builder extensions |
+| [6d7fdb952](https://github.com/angular/angular-cli/commit/6d7fdb952d49dda1301af229af138d834161c2f9) | fix  | show diagnostic messages after build stats              |
+
+### @angular-devkit/core
+
+| Commit                                                                                              | Type | Description                                        |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------- |
+| [7f395be1b](https://github.com/angular/angular-cli/commit/7f395be1beeec192330936692537697d3b3395ff) | fix  | retain existing EOL when updating workspace config |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="17.0.10"></a>
 
 # 17.0.10 (2024-01-10)
