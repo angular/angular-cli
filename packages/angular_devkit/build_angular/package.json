@@ -42,7 +42,7 @@
     "license-webpack-plugin": "4.0.2",
     "loader-utils": "3.2.1",
     "magic-string": "0.30.5",
-    "mini-css-extract-plugin": "2.7.6",
+    "mini-css-extract-plugin": "2.7.7",
     "mrmime": "2.0.0",
     "open": "8.4.2",
     "ora": "5.4.1",
