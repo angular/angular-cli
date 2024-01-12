@@ -16,7 +16,7 @@ import {
   ensureSourceFileVersions,
 } from '../angular-host';
 import { createWorkerTransformer } from '../web-worker-transformer';
-import { AngularCompilation, EmitFileResult } from './angular-compilation';
+import { AngularCompilation, DiagnosticModes, EmitFileResult } from './angular-compilation';
 
 // Temporary deep import for transformer support
 // TODO: Move these to a private exports location or move the implementation into this package.
@@ -127,7 +127,7 @@ export class AotCompilation extends AngularCompilation {
     return { affectedFiles, compilerOptions, referencedFiles };
   }
 
-  *collectDiagnostics(): Iterable<ts.Diagnostic> {
+  *collectDiagnostics(modes: DiagnosticModes): Iterable<ts.Diagnostic> {
     assert(this.#state, 'Angular compilation must be initialized prior to collecting diagnostics.');
     const {
       affectedFiles,
@@ -137,11 +137,18 @@ export class AotCompilation extends AngularCompilation {
       typeScriptProgram,
     } = this.#state;
 
+    const syntactic = modes & DiagnosticModes.Syntactic;
+    const semantic = modes & DiagnosticModes.Semantic;
+
     // Collect program level diagnostics
-    yield* typeScriptProgram.getConfigFileParsingDiagnostics();
-    yield* angularCompiler.getOptionDiagnostics();
-    yield* typeScriptProgram.getOptionsDiagnostics();
-    yield* typeScriptProgram.getGlobalDiagnostics();
+    if (modes & DiagnosticModes.Option) {
+      yield* typeScriptProgram.getConfigFileParsingDiagnostics();
+      yield* angularCompiler.getOptionDiagnostics();
+      yield* typeScriptProgram.getOptionsDiagnostics();
+    }
+    if (syntactic) {
+      yield* typeScriptProgram.getGlobalDiagnostics();
+    }
 
     // Collect source file specific diagnostics
     for (const sourceFile of typeScriptProgram.getSourceFiles()) {
@@ -149,13 +156,20 @@ export class AotCompilation extends AngularCompilation {
         continue;
       }
 
-      // TypeScript will use cached diagnostics for files that have not been
-      // changed or affected for this build when using incremental building.
-      yield* profileSync(
-        'NG_DIAGNOSTICS_SYNTACTIC',
-        () => typeScriptProgram.getSyntacticDiagnostics(sourceFile),
-        true,
-      );
+      if (syntactic) {
+        // TypeScript will use cached diagnostics for files that have not been
+        // changed or affected for this build when using incremental building.
+        yield* profileSync(
+          'NG_DIAGNOSTICS_SYNTACTIC',
+          () => typeScriptProgram.getSyntacticDiagnostics(sourceFile),
+          true,
+        );
+      }
+
+      if (!semantic) {
+        continue;
+      }
+
       yield* profileSync(
         'NG_DIAGNOSTICS_SEMANTIC',
         () => typeScriptProgram.getSemanticDiagnostics(sourceFile),

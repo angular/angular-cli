@@ -13,7 +13,7 @@ import { MessageChannel } from 'node:worker_threads';
 import Piscina from 'piscina';
 import type { SourceFile } from 'typescript';
 import type { AngularHostOptions } from '../angular-host';
-import { AngularCompilation, EmitFileResult } from './angular-compilation';
+import { AngularCompilation, DiagnosticModes, EmitFileResult } from './angular-compilation';
 
 /**
  * An Angular compilation which uses a Node.js Worker thread to load and execute
@@ -122,8 +122,10 @@ export class ParallelCompilation extends AngularCompilation {
     throw new Error('Not implemented in ParallelCompilation.');
   }
 
-  override diagnoseFiles(): Promise<{ errors?: PartialMessage[]; warnings?: PartialMessage[] }> {
-    return this.#worker.run(undefined, { name: 'diagnose' });
+  override diagnoseFiles(
+    modes = DiagnosticModes.All,
+  ): Promise<{ errors?: PartialMessage[]; warnings?: PartialMessage[] }> {
+    return this.#worker.run(modes, { name: 'diagnose' });
   }
 
   override emitAffectedFiles(): Promise<Iterable<EmitFileResult>> {
