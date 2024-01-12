@@ -601,13 +601,20 @@ export default class UpdateCommandModule extends CommandModule<UpdateCommandArgs
     options: Options<UpdateCommandArgs>,
     packages: PackageIdentifier[],
   ): Promise<number> {
-    const { logger } = this.context;
+    const { logger, packageManager } = this.context;
+    packageManager.ensureCompatibility();
 
     const logVerbose = (message: string) => {
       if (options.verbose) {
         logger.info(message);
       }
     };
+
+    const usingYarn = packageManager.name === PackageManager.Yarn;
+    const packageManagerVersion = packageManager.version;
+    logger.info(
+      `Using package manager: ${colors.grey(packageManager.name)} ${packageManagerVersion}`,
+    );
 
     const requests: {
       identifier: PackageIdentifier;
@@ -647,6 +654,8 @@ export default class UpdateCommandModule extends CommandModule<UpdateCommandArgs
         // Metadata requests are internally cached; multiple requests for same name
         // does not result in additional network traffic
         metadata = await fetchPackageMetadata(packageName, logger, {
+          packageManagerVersion: packageManagerVersion,
+          usingYarn: usingYarn,
           verbose: options.verbose,
         });
       } catch (e) {

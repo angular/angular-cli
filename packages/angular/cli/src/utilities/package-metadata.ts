@@ -13,6 +13,7 @@ import * as ini from 'ini';
 import { homedir } from 'os';
 import type { Manifest, Packument } from 'pacote';
 import * as path from 'path';
+import * as semver from 'semver';
 
 export interface PackageMetadata extends Packument, NgPackageManifestProperties {
   tags: Record<string, PackageManifest>;
@@ -58,7 +59,12 @@ interface PackageManagerOptions extends Record<string, unknown> {
 let npmrc: PackageManagerOptions;
 const npmPackageJsonCache = new Map<string, Promise<Partial<NpmRepositoryPackageJson>>>();
 
-function ensureNpmrc(logger: logging.LoggerApi, usingYarn: boolean, verbose: boolean): void {
+function ensureNpmrc(
+  logger: logging.LoggerApi,
+  usingYarn: boolean,
+  verbose: boolean,
+  packageManagerVersion?: string,
+): void {
   if (!npmrc) {
     try {
       npmrc = readOptions(logger, false, verbose);
@@ -66,7 +72,7 @@ function ensureNpmrc(logger: logging.LoggerApi, usingYarn: boolean, verbose: boo
 
     if (usingYarn) {
       try {
-        npmrc = { ...npmrc, ...readOptions(logger, true, verbose) };
+        npmrc = { ...npmrc, ...readOptions(logger, true, verbose, packageManagerVersion) };
       } catch {}
     }
   }
@@ -76,9 +82,20 @@ function readOptions(
   logger: logging.LoggerApi,
   yarn = false,
   showPotentials = false,
+  packageManagerVersion?: string,
 ): PackageManagerOptions {
   const cwd = process.cwd();
-  const baseFilename = yarn ? 'yarnrc' : 'npmrc';
+  let baseFilename: string;
+  if (yarn) {
+    // adds support for the yarnrc.yml format used by yarn v2+
+    if (packageManagerVersion != null && semver.gt(packageManagerVersion, '2.0.0')) {
+      baseFilename = 'yarnrc.yml';
+    } else {
+      baseFilename = 'yarnrc';
+    }
+  } else {
+    baseFilename = 'npmrc';
+  }
   const dotFilename = '.' + baseFilename;
 
   let globalPrefix: string;
@@ -229,19 +246,21 @@ export async function fetchPackageMetadata(
   name: string,
   logger: logging.LoggerApi,
   options?: {
+    packageManagerVersion?: string;
     registry?: string;
     usingYarn?: boolean;
     verbose?: boolean;
   },
 ): Promise<PackageMetadata> {
-  const { usingYarn, verbose, registry } = {
+  const { packageManagerVersion, usingYarn, verbose, registry } = {
+    packageManagerVersion: undefined,
     registry: undefined,
     usingYarn: false,
     verbose: false,
     ...options,
   };
 
-  ensureNpmrc(logger, usingYarn, verbose);
+  ensureNpmrc(logger, usingYarn, verbose, packageManagerVersion);
   const { packument } = await import('pacote');
   const response = await packument(name, {
     fullMetadata: true,
@@ -278,13 +297,19 @@ export async function fetchPackageManifest(
   name: string,
   logger: logging.LoggerApi,
   options: {
+    packageManagerVersion?: string;
     registry?: string;
     usingYarn?: boolean;
     verbose?: boolean;
   } = {},
 ): Promise<PackageManifest> {
-  const { usingYarn = false, verbose = false, registry } = options;
-  ensureNpmrc(logger, usingYarn, verbose);
+  const {
+    packageManagerVersion = undefined,
+    usingYarn = false,
+    verbose = false,
+    registry,
+  } = options;
+  ensureNpmrc(logger, usingYarn, verbose, packageManagerVersion);
   const { manifest } = await import('pacote');
 
   const response = await manifest(name, {
@@ -300,6 +325,7 @@ export async function getNpmPackageJson(
   packageName: string,
   logger: logging.LoggerApi,
   options: {
+    packageManagerVersion?: string;
     registry?: string;
     usingYarn?: boolean;
     verbose?: boolean;
@@ -310,8 +336,13 @@ export async function getNpmPackageJson(
     return cachedResponse;
   }
 
-  const { usingYarn = false, verbose = false, registry } = options;
-  ensureNpmrc(logger, usingYarn, verbose);
+  const {
+    packageManagerVersion = undefined,
+    usingYarn = false,
+    verbose = false,
+    registry,
+  } = options;
+  ensureNpmrc(logger, usingYarn, verbose, packageManagerVersion);
   const { packument } = await import('pacote');
   const response = packument(packageName, {
     fullMetadata: true,

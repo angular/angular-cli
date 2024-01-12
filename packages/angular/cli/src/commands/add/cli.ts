@@ -141,7 +141,10 @@ export default class AddCommandModule
 
     spinner.start('Determining package manager...');
     const usingYarn = packageManager.name === PackageManager.Yarn;
-    spinner.info(`Using package manager: ${colors.grey(packageManager.name)}`);
+    const packageManagerVersion = packageManager.version;
+    spinner.info(
+      `Using package manager: ${colors.grey(packageManager.name)} ${packageManagerVersion}`,
+    );
 
     if (
       packageIdentifier.name &&
@@ -155,6 +158,7 @@ export default class AddCommandModule
       let packageMetadata;
       try {
         packageMetadata = await fetchPackageMetadata(packageIdentifier.name, logger, {
+          packageManagerVersion,
           registry,
           usingYarn,
           verbose,
@@ -241,6 +245,7 @@ export default class AddCommandModule
     try {
       spinner.start('Loading package information from registry...');
       const manifest = await fetchPackageManifest(packageIdentifier.toString(), logger, {
+        packageManagerVersion,
         registry,
         verbose,
         usingYarn,
