@@ -20,6 +20,14 @@ export interface EmitFileResult {
   dependencies?: readonly string[];
 }
 
+export enum DiagnosticModes {
+  None = 0,
+  Option = 1 << 0,
+  Syntactic = 1 << 1,
+  Semantic = 1 << 2,
+  All = Option | Syntactic | Semantic,
+}
+
 export abstract class AngularCompilation {
   static #angularCompilerCliModule?: typeof ng;
   static #typescriptModule?: typeof ts;
@@ -71,11 +79,13 @@ export abstract class AngularCompilation {
 
   abstract emitAffectedFiles(): Iterable<EmitFileResult> | Promise<Iterable<EmitFileResult>>;
 
-  protected abstract collectDiagnostics():
-    | Iterable<ts.Diagnostic>
-    | Promise<Iterable<ts.Diagnostic>>;
+  protected abstract collectDiagnostics(
+    modes: DiagnosticModes,
+  ): Iterable<ts.Diagnostic> | Promise<Iterable<ts.Diagnostic>>;
 
-  async diagnoseFiles(): Promise<{ errors?: PartialMessage[]; warnings?: PartialMessage[] }> {
+  async diagnoseFiles(
+    modes = DiagnosticModes.All,
+  ): Promise<{ errors?: PartialMessage[]; warnings?: PartialMessage[] }> {
     const result: { errors?: PartialMessage[]; warnings?: PartialMessage[] } = {};
 
     // Avoid loading typescript until actually needed.
@@ -83,7 +93,7 @@ export abstract class AngularCompilation {
     const typescript = await AngularCompilation.loadTypescript();
 
     await profileAsync('NG_DIAGNOSTICS_TOTAL', async () => {
-      for (const diagnostic of await this.collectDiagnostics()) {
+      for (const diagnostic of await this.collectDiagnostics(modes)) {
         const message = convertTypeScriptDiagnostic(typescript, diagnostic);
         if (diagnostic.category === typescript.DiagnosticCategory.Error) {
           (result.errors ??= []).push(message);

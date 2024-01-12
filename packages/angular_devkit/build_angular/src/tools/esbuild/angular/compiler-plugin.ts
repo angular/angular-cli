@@ -17,13 +17,18 @@ import type {
 } from 'esbuild';
 import assert from 'node:assert';
 import * as path from 'node:path';
-import { maxWorkers } from '../../../utils/environment-options';
+import { maxWorkers, useTypeChecking } from '../../../utils/environment-options';
 import { JavaScriptTransformer } from '../javascript-transformer';
 import { LoadResultCache, createCachedLoad } from '../load-result-cache';
 import { logCumulativeDurations, profileAsync, resetCumulativeDurations } from '../profiling';
 import { BundleStylesheetOptions } from '../stylesheets/bundle-options';
 import { AngularHostOptions } from './angular-host';
-import { AngularCompilation, NoopCompilation, createAngularCompilation } from './compilation';
+import {
+  AngularCompilation,
+  DiagnosticModes,
+  NoopCompilation,
+  createAngularCompilation,
+} from './compilation';
 import { SharedTSCompilationState, getSharedCompilationState } from './compilation-state';
 import { ComponentStylesheetBundler } from './component-stylesheets';
 import { FileReferenceTracker } from './file-reference-tracker';
@@ -258,14 +263,6 @@ export function createCompilerPlugin(
           return result;
         }
 
-        const diagnostics = await compilation.diagnoseFiles();
-        if (diagnostics.errors?.length) {
-          (result.errors ??= []).push(...diagnostics.errors);
-        }
-        if (diagnostics.warnings?.length) {
-          (result.warnings ??= []).push(...diagnostics.warnings);
-        }
-
         // Update TypeScript file output cache for all affected files
         try {
           await profileAsync('NG_EMIT_TS', async () => {
@@ -284,6 +281,16 @@ export function createCompilerPlugin(
               },
             ],
           });
+        }
+
+        const diagnostics = await compilation.diagnoseFiles(
+          useTypeChecking ? DiagnosticModes.All : DiagnosticModes.All & ~DiagnosticModes.Semantic,
+        );
+        if (diagnostics.errors?.length) {
+          (result.errors ??= []).push(...diagnostics.errors);
+        }
+        if (diagnostics.warnings?.length) {
+          (result.warnings ??= []).push(...diagnostics.warnings);
         }
 
         // Add errors from failed additional results.
