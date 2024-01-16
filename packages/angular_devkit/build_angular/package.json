@@ -56,7 +56,7 @@
     "sass": "1.69.7",
     "sass-loader": "13.3.3",
     "semver": "7.5.4",
-    "source-map-loader": "4.0.2",
+    "source-map-loader": "5.0.0",
     "source-map-support": "0.5.21",
     "terser": "5.26.0",
     "text-table": "0.2.0",
