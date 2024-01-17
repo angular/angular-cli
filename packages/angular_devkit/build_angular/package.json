@@ -50,7 +50,7 @@
     "picomatch": "3.0.1",
     "piscina": "4.3.0",
     "postcss": "8.4.33",
-    "postcss-loader": "7.3.4",
+    "postcss-loader": "8.0.0",
     "resolve-url-loader": "5.0.0",
     "rxjs": "7.8.1",
     "sass": "1.69.7",
