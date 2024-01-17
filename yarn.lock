@@ -9989,10 +9989,10 @@ netmask@^2.0.2:
   resolved "https://registry.yarnpkg.com/netmask/-/netmask-2.0.2.tgz#8b01a07644065d536383835823bc52004ebac5e7"
   integrity sha512-dBpDMdxv9Irdq66304OLfEmQ9tbNRFnFTuZiLo+bD+r332bBmMJ8GBLXklIXXgxd3+v9+KUnZaUR5PJMa75Gsg==
 
-ng-packagr@17.1.0-next.5:
-  version "17.1.0-next.5"
-  resolved "https://registry.yarnpkg.com/ng-packagr/-/ng-packagr-17.1.0-next.5.tgz#02d51a0ec8ea44d127d7577aadf2c0aab1eec0a0"
-  integrity sha512-oa9PHFrJrzOq267igNBcIG4BZcqtkWXN/k81CJyk2QrUf9xLV9rGt4heDqyj1L4EvJQAViWi0gbnuwj35Nu1DA==
+ng-packagr@17.1.0:
+  version "17.1.0"
+  resolved "https://registry.yarnpkg.com/ng-packagr/-/ng-packagr-17.1.0.tgz#f4c7830b29fe7e7267353f7d65f43d7574be8e32"
+  integrity sha512-pUVevtjmRSlDOADQ3BNCtq5gZCAbtIVgHemx7R5eEgta8HbiLApFxbayDiNnviaSIpyJzzAv13oPiOvMdGLLwQ==
   dependencies:
     "@rollup/plugin-json" "^6.0.1"
     "@rollup/plugin-node-resolve" "^15.2.3"
