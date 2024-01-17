@@ -171,7 +171,7 @@
     "magic-string": "0.30.5",
     "mini-css-extract-plugin": "2.7.7",
     "mrmime": "2.0.0",
-    "ng-packagr": "17.1.0-next.5",
+    "ng-packagr": "17.1.0",
     "npm": "^8.11.0",
     "npm-package-arg": "11.0.1",
     "open": "8.4.2",
