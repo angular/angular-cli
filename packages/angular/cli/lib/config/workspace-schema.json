@@ -23,7 +23,7 @@
     "projects": {
       "type": "object",
       "patternProperties": {
-        "^(?:@[a-zA-Z0-9_-]+/)?[a-zA-Z0-9_-]+$": {
+        "^(?:@[a-zA-Z0-9._-]+/)?[a-zA-Z0-9._-]+$": {
           "$ref": "#/definitions/project"
         }
       },
@@ -31,7 +31,9 @@
     }
   },
   "additionalProperties": false,
-  "required": ["version"],
+  "required": [
+    "version"
+  ],
   "definitions": {
     "cliOptions": {
       "type": "object",
@@ -47,7 +49,12 @@
         "packageManager": {
           "description": "Specify which package manager tool to use.",
           "type": "string",
-          "enum": ["npm", "cnpm", "yarn", "pnpm"]
+          "enum": [
+            "npm",
+            "cnpm",
+            "yarn",
+            "pnpm"
+          ]
         },
         "warnings": {
           "description": "Control CLI specific console warnings",
@@ -61,7 +68,10 @@
           "additionalProperties": false
         },
         "analytics": {
-          "type": ["boolean", "string"],
+          "type": [
+            "boolean",
+            "string"
+          ],
           "description": "Share pseudonymous usage data with the Angular Team at Google."
         },
         "cache": {
@@ -71,7 +81,11 @@
             "environment": {
               "description": "Configure in which environment disk cache is enabled.",
               "type": "string",
-              "enum": ["local", "ci", "all"]
+              "enum": [
+                "local",
+                "ci",
+                "all"
+              ]
             },
             "enabled": {
               "description": "Configure whether disk caching is enabled.",
@@ -101,7 +115,12 @@
         "packageManager": {
           "description": "Specify which package manager tool to use.",
           "type": "string",
-          "enum": ["npm", "cnpm", "yarn", "pnpm"]
+          "enum": [
+            "npm",
+            "cnpm",
+            "yarn",
+            "pnpm"
+          ]
         },
         "warnings": {
           "description": "Control CLI specific console warnings",
@@ -115,7 +134,10 @@
           "additionalProperties": false
         },
         "analytics": {
-          "type": ["boolean", "string"],
+          "type": [
+            "boolean",
+            "string"
+          ],
           "description": "Share pseudonymous usage data with the Angular Team at Google."
         },
         "completion": {
@@ -220,7 +242,10 @@
         "projectType": {
           "type": "string",
           "description": "Project type.",
-          "enum": ["application", "library"]
+          "enum": [
+            "application",
+            "library"
+          ]
         },
         "architect": {
           "type": "object",
@@ -235,23 +260,37 @@
           }
         }
       },
-      "required": ["root", "projectType"],
+      "required": [
+        "root",
+        "projectType"
+      ],
       "anyOf": [
         {
-          "required": ["architect"],
+          "required": [
+            "architect"
+          ],
           "not": {
-            "required": ["targets"]
+            "required": [
+              "targets"
+            ]
           }
         },
         {
-          "required": ["targets"],
+          "required": [
+            "targets"
+          ],
           "not": {
-            "required": ["architect"]
+            "required": [
+              "architect"
+            ]
           }
         },
         {
           "not": {
-            "required": ["targets", "architect"]
+            "required": [
+              "targets",
+              "architect"
+            ]
           }
         }
       ],
@@ -387,7 +426,9 @@
                 }
               },
               "additionalProperties": false,
-              "required": ["builder"]
+              "required": [
+                "builder"
+              ]
             },
             {
               "type": "object",
@@ -717,7 +758,9 @@
           "$ref": "#/definitions/schematicOptions"
         }
       },
-      "required": ["version"]
+      "required": [
+        "version"
+      ]
     }
   }
 }

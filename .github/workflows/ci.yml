@@ -44,7 +44,7 @@ jobs:
       - name: Initialize environment
         uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@ae9155d1083fd8390e98bfe09a5ccf89f0375b52
       - name: Setup ESLint Caching
-        uses: actions/cache@e12d46a63a90f2fae62d114769bbf2a179198b5c # v3.3.3
+        uses: actions/cache@13aacd865c20de90d75de3b17ebe84f7a17d57d2 # v4.0.0
         with:
           path: .eslintcache
           key: ${{ runner.os }}-${{ hashFiles('.eslintrc.json') }}
