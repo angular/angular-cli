@@ -70,7 +70,7 @@ describe('Serve SSR Builder', () => {
     await host.restore().toPromise();
   });
 
-  it('proxies requests based on the proxy configuration file provided in the option', async () => {
+  it('proxies requests based on the proxy configuration json file provided in the option', async () => {
     const proxyServer = http.createServer((request, response) => {
       if (request.url?.endsWith('/test')) {
         response.writeHead(200);
@@ -92,6 +92,51 @@ describe('Serve SSR Builder', () => {
       const run = await architect.scheduleTarget(target, {
         port: 0,
         proxyConfig: 'proxy.config.json',
+      });
+
+      const output = (await run.result) as SSRDevServerBuilderOutput;
+
+      expect(output.success).toBe(true);
+      expect(output.baseUrl).toBe(`http://localhost:${output.port}`);
+      const response = await fetch(`http://localhost:${output.port}/api/segment/test`);
+      await run.stop();
+
+      expect(await response?.text()).toContain('TEST_API_RETURN');
+    } finally {
+      await new Promise<void>((resolve) => proxyServer.close(() => resolve()));
+    }
+  });
+
+  it('proxies requests based on the proxy configuration js file provided in the option', async () => {
+    const proxyServer = http.createServer((request, response) => {
+      if (request.url?.endsWith('/test')) {
+        response.writeHead(200);
+        response.end('TEST_API_RETURN');
+      } else {
+        response.writeHead(404);
+        response.end();
+      }
+    });
+
+    try {
+      await new Promise<void>((resolve) => proxyServer.listen(0, '127.0.0.1', resolve));
+      const proxyAddress = proxyServer.address() as import('net').AddressInfo;
+
+      host.writeMultipleFiles({
+        'proxy.config.js': `
+          const PROXY_CONFIG = [
+            {
+              context: ['/api/*'],
+              target: 'http://127.0.0.1:${proxyAddress.port}',
+            },
+          ];
+          module.exports = PROXY_CONFIG;
+        `,
+      });
+
+      const run = await architect.scheduleTarget(target, {
+        port: 0,
+        proxyConfig: 'proxy.config.js',
       });
 
       const output = (await run.result) as SSRDevServerBuilderOutput;

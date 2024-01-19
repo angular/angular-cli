@@ -375,24 +375,32 @@ function getSslConfig(
   return ssl;
 }
 
+function fixWildcardBehavior(regex: string): string {
+  // This fixes an issue with the normalized wildcard regex and the proxy middleware
+
+  return regex.replace(
+    '\\/(?!\\.)(?=.)[^/]*?\\/?$', // Matches paths with one segment
+    '(?:\\/(?!\\.)(?:(?:(?!(?:^|\\/)\\.).)*?)|$)$', // Matches paths with more than one segment
+  );
+}
+
 async function getProxyConfig(root: string, proxyConfig: string): Promise<MiddlewareHandler[]> {
-  const proxy = await loadProxyConfiguration(root, proxyConfig, false);
+  const proxy = await loadProxyConfiguration(root, proxyConfig, true);
   const createdProxies = [];
   const { createProxyMiddleware } = await import('http-proxy-middleware');
+
   for (const [key, context] of Object.entries(proxy)) {
-    if (typeof key === 'string') {
+    if (key.startsWith('^') && key.endsWith('$')) {
       createdProxies.push(
         createProxyMiddleware(
-          key.replace(/^\*$/, '**').replace(/\/\*$/, ''),
+          (pathname) => !!pathname.match(fixWildcardBehavior(key)),
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           context as any,
         ) as MiddlewareHandler,
       );
     } else {
-      createdProxies.push(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        createProxyMiddleware(key, context as any) as MiddlewareHandler,
-      );
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      createdProxies.push(createProxyMiddleware(key, context as any) as MiddlewareHandler);
     }
   }
 
