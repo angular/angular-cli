@@ -17,6 +17,7 @@ import { createCompilerPlugin } from './angular/compiler-plugin';
 import { SourceFileCache } from './angular/source-file-cache';
 import { BundlerOptionsFactory } from './bundler-context';
 import { createCompilerPluginOptions } from './compiler-plugin-options';
+import { createExternalPackagesPlugin } from './external-packages-plugin';
 import { createAngularLocaleDataPlugin } from './i18n-locale-plugin';
 import { createRxjsEsmResolutionPlugin } from './rxjs-esm-resolution-plugin';
 import { createSourcemapIgnorelistPlugin } from './sourcemap-ignorelist-plugin';
@@ -59,12 +60,19 @@ export function createBrowserCodeBundleOptions(
     ],
   };
 
-  if (options.externalPackages) {
-    buildOptions.packages = 'external';
-  }
-
   if (options.plugins) {
     buildOptions.plugins?.push(...options.plugins);
+  }
+
+  if (options.externalPackages) {
+    // Package files affected by a customized loader should not be implicitly marked as external
+    if (options.loaderExtensions || options.plugins) {
+      // Plugin must be added after custom plugins to ensure any added loader options are considered
+      buildOptions.plugins?.push(createExternalPackagesPlugin());
+    } else {
+      // Safe to use the packages external option directly
+      buildOptions.packages = 'external';
+    }
   }
 
   return buildOptions;
