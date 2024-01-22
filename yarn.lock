@@ -5910,16 +5910,16 @@ css-loader@6.8.1:
     postcss-value-parser "^4.2.0"
     semver "^7.3.8"
 
-css-loader@6.9.0:
-  version "6.9.0"
-  resolved "https://registry.yarnpkg.com/css-loader/-/css-loader-6.9.0.tgz#0cc2f14df94ed97c526c5ae42b6b13916d1d8d0e"
-  integrity sha512-3I5Nu4ytWlHvOP6zItjiHlefBNtrH+oehq8tnQa2kO305qpVyx9XNIT1CXIj5bgCJs7qICBCkgCYxQLKPANoLA==
+css-loader@6.9.1:
+  version "6.9.1"
+  resolved "https://registry.yarnpkg.com/css-loader/-/css-loader-6.9.1.tgz#9ec9a434368f2bdfeffbf8f6901a1ce773586c6b"
+  integrity sha512-OzABOh0+26JKFdMzlK6PY1u5Zx8+Ck7CVRlcGNZoY9qwJjdfu2VWFuprTIpPW+Av5TZTVViYWcFQaEEQURLknQ==
   dependencies:
     icss-utils "^5.1.0"
-    postcss "^8.4.31"
+    postcss "^8.4.33"
     postcss-modules-extract-imports "^3.0.0"
-    postcss-modules-local-by-default "^4.0.3"
-    postcss-modules-scope "^3.1.0"
+    postcss-modules-local-by-default "^4.0.4"
+    postcss-modules-scope "^3.1.1"
     postcss-modules-values "^4.0.0"
     postcss-value-parser "^4.2.0"
     semver "^7.5.4"
@@ -9643,10 +9643,10 @@ netmask@^2.0.2:
   resolved "https://registry.yarnpkg.com/netmask/-/netmask-2.0.2.tgz#8b01a07644065d536383835823bc52004ebac5e7"
   integrity sha512-dBpDMdxv9Irdq66304OLfEmQ9tbNRFnFTuZiLo+bD+r332bBmMJ8GBLXklIXXgxd3+v9+KUnZaUR5PJMa75Gsg==
 
-ng-packagr@17.1.0:
-  version "17.1.0"
-  resolved "https://registry.yarnpkg.com/ng-packagr/-/ng-packagr-17.1.0.tgz#f4c7830b29fe7e7267353f7d65f43d7574be8e32"
-  integrity sha512-pUVevtjmRSlDOADQ3BNCtq5gZCAbtIVgHemx7R5eEgta8HbiLApFxbayDiNnviaSIpyJzzAv13oPiOvMdGLLwQ==
+ng-packagr@17.1.1:
+  version "17.1.1"
+  resolved "https://registry.yarnpkg.com/ng-packagr/-/ng-packagr-17.1.1.tgz#556547427d6c2ab9d9efae576f011c34adabf0e3"
+  integrity sha512-va38240Nss1PTB09RIB0LsHOIkHdhA5voiDUtVbFwXTyHl/RfPQkb+F5h2wzDqcohHUXabjW05LIgh5pq3ioTA==
   dependencies:
     "@rollup/plugin-json" "^6.0.1"
     "@rollup/plugin-node-resolve" "^15.2.3"
@@ -10715,10 +10715,26 @@ postcss-modules-local-by-default@^4.0.3:
     postcss-selector-parser "^6.0.2"
     postcss-value-parser "^4.1.0"
 
-postcss-modules-scope@^3.0.0, postcss-modules-scope@^3.1.0:
+postcss-modules-local-by-default@^4.0.4:
+  version "4.0.4"
+  resolved "https://registry.yarnpkg.com/postcss-modules-local-by-default/-/postcss-modules-local-by-default-4.0.4.tgz#7cbed92abd312b94aaea85b68226d3dec39a14e6"
+  integrity sha512-L4QzMnOdVwRm1Qb8m4x8jsZzKAaPAgrUF1r/hjDR2Xj7R+8Zsf97jAlSQzWtKx5YNiNGN8QxmPFIc/sh+RQl+Q==
+  dependencies:
+    icss-utils "^5.0.0"
+    postcss-selector-parser "^6.0.2"
+    postcss-value-parser "^4.1.0"
+
+postcss-modules-scope@^3.0.0:
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/postcss-modules-scope/-/postcss-modules-scope-3.1.0.tgz#fbfddfda93a31f310f1d152c2bb4d3f3c5592ee0"
   integrity sha512-SaIbK8XW+MZbd0xHPf7kdfA/3eOt7vxJ72IRecn3EzuZVLr1r0orzf0MX/pN8m+NMDoo6X/SQd8oeKqGZd8PXg==
+  dependencies:
+    postcss-selector-parser "^6.0.4"
+
+postcss-modules-scope@^3.1.1:
+  version "3.1.1"
+  resolved "https://registry.yarnpkg.com/postcss-modules-scope/-/postcss-modules-scope-3.1.1.tgz#32cfab55e84887c079a19bbb215e721d683ef134"
+  integrity sha512-uZgqzdTleelWjzJY+Fhti6F3C9iF1JR/dODLs/JDefozYcKTBCdD8BIl6nNPbTbcLnGrk56hzwZC2DaGNvYjzA==
   dependencies:
     postcss-selector-parser "^6.0.4"
 
@@ -10742,7 +10758,7 @@ postcss-value-parser@^4.1.0, postcss-value-parser@^4.2.0:
   resolved "https://registry.yarnpkg.com/postcss-value-parser/-/postcss-value-parser-4.2.0.tgz#723c09920836ba6d3e5af019f92bc0971c02e514"
   integrity sha512-1NNCs6uurfkVbeXG4S8JFT9t19m45ICnif8zWLd5oPSZ50QnwMfK+H3jv408d4jw/7Bttv5axS5IiHoLaVNHeQ==
 
-postcss@8.4.33, postcss@^8.2.14, postcss@^8.4.21, postcss@^8.4.23, postcss@^8.4.31, postcss@^8.4.32:
+postcss@8.4.33, postcss@^8.2.14, postcss@^8.4.21, postcss@^8.4.23, postcss@^8.4.31, postcss@^8.4.32, postcss@^8.4.33:
   version "8.4.33"
   resolved "https://registry.yarnpkg.com/postcss/-/postcss-8.4.33.tgz#1378e859c9f69bf6f638b990a0212f43e2aaa742"
   integrity sha512-Kkpbhhdjw2qQs2O2DGX+8m5OVqEcbB9HRBvuYM9pgrjEFUg30A9LmXNlTAUj4S9kgtGyrMbTzVjH7E+s5Re2yg==
@@ -12819,10 +12835,10 @@ undici@6.2.1:
   dependencies:
     "@fastify/busboy" "^2.0.0"
 
-undici@6.3.0:
-  version "6.3.0"
-  resolved "https://registry.yarnpkg.com/undici/-/undici-6.3.0.tgz#ad105a56ec80fb74ecb3252e6dc27947bf69d275"
-  integrity sha512-zkSMOXs2topAR1LF0PxAaNNvhdX4LYEcmRMJLMh3mjgfZpBtc/souXOp4aYiR5Q46HrBPA2/8DkEZhD3eNFE1Q==
+undici@6.4.0:
+  version "6.4.0"
+  resolved "https://registry.yarnpkg.com/undici/-/undici-6.4.0.tgz#7ca0c3f73e1034f3c79e566183b61bb55b1410ea"
+  integrity sha512-wYaKgftNqf6Je7JQ51YzkEkEevzOgM7at5JytKO7BjaURQpERW8edQSMrr2xb+Yv4U8Yg47J24+lc9+NbeXMFA==
   dependencies:
     "@fastify/busboy" "^2.0.0"
 
