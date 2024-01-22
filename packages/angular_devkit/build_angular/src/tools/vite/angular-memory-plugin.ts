@@ -176,6 +176,7 @@ export function createAngularMemoryPlugin(options: AngularMemoryPluginOptions): 
         ) {
           const url = req.originalUrl;
           if (
+            !req.url ||
             // Skip if path is not defined.
             !url ||
             // Skip if path is like a file.
@@ -194,7 +195,7 @@ export function createAngularMemoryPlugin(options: AngularMemoryPluginOptions): 
             return;
           }
 
-          transformIndexHtmlAndAddHeaders(url, rawHtml, res, next, async (html) => {
+          transformIndexHtmlAndAddHeaders(req.url, rawHtml, res, next, async (html) => {
             const { content } = await renderPage({
               document: html,
               route: new URL(req.originalUrl ?? '/', server.resolvedUrls?.local[0]).toString(),
