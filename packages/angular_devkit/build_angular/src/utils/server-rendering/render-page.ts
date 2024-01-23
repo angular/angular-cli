@@ -7,6 +7,7 @@
  */
 
 import type { ApplicationRef, StaticProvider } from '@angular/core';
+import assert from 'node:assert';
 import { basename } from 'node:path';
 import { loadEsmModule } from '../load-esm';
 import { MainServerBundleExports, RenderUtilsServerBundleExports } from './main-bundle-exports';
@@ -73,6 +74,10 @@ export async function renderPage({
   ];
 
   let html: string | undefined;
+  assert(
+    bootstrapAppFnOrModule,
+    'The file "./main.server.mjs" does not have a default export for an AppServerModule or a bootstrapping function.',
+  );
 
   if (isBootstrapFn(bootstrapAppFnOrModule)) {
     html = await renderApplication(bootstrapAppFnOrModule, {

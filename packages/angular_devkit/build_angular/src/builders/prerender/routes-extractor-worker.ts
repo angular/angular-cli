@@ -47,7 +47,7 @@ async function extract(): Promise<string[]> {
   const bootstrapAppFnOrModule = bootstrapAppFn || AppServerModule;
   assert(
     bootstrapAppFnOrModule,
-    `Neither an AppServerModule nor a bootstrapping function was exported from: ${serverBundlePath}.`,
+    `The file "${serverBundlePath}" does not have a default export for an AppServerModule or a bootstrapping function.`,
   );
 
   const routes: string[] = [];
