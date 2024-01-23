@@ -445,5 +445,36 @@ describe('standalone utilities', () => {
       assertContains(content, `import { provideModule } from '@my/module';`);
       assertContains(content, `providers: [provideModule([])]`);
     });
+
+    it('should add a root provider to a standalone app when providers contain a trailing comma', async () => {
+      await setupProject(true);
+
+      const configPath = 'app/app.config.ts';
+      host.overwrite(
+        getPathWithinProject(configPath),
+        `
+        import { ApplicationConfig } from '@angular/core';
+        import { provideRouter } from '@angular/router';
+
+        export const appConfig: ApplicationConfig = {
+          providers: [
+            provideRouter([]),
+          ]
+        };
+      `,
+      );
+
+      await testRule(
+        addRootProvider(
+          projectName,
+          ({ code, external }) => code`${external('provideModule', '@my/module')}([])`,
+        ),
+        host,
+      );
+
+      const content = readFile('app/app.config.ts');
+      assertContains(content, `import { provideModule } from '@my/module';`);
+      assertContains(content, `providers: [provideRouter([]),provideModule([]),]`);
+    });
   });
 });
