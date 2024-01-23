@@ -35,7 +35,7 @@
     "https-proxy-agent": "7.0.2",
     "http-proxy-middleware": "2.0.6",
     "inquirer": "9.2.12",
-    "jsonc-parser": "3.2.0",
+    "jsonc-parser": "3.2.1",
     "karma-source-map-support": "1.4.0",
     "less": "4.2.0",
     "less-loader": "11.1.0",
