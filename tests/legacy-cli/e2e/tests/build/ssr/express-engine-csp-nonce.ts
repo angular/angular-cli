@@ -111,7 +111,7 @@ export default async function () {
             by.css('link[rel="stylesheet"]')
           );
           expect(await linkTag.getAttribute('media')).toMatch('all');
-          expect(await linkTag.getAttribute('ngCspMedia')).toMatch('all');
+          expect(await linkTag.getAttribute('ngCspMedia')).toBeNull();
           expect(await linkTag.getAttribute('onload')).toBeNull();
 
           // Make sure there were no client side errors.
