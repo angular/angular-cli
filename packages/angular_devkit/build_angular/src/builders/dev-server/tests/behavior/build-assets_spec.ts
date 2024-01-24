@@ -41,9 +41,6 @@ describeServeBuilder(executeDevServer, DEV_SERVER_BUILDER_INFO, (harness, setupT
 
       setupTarget(harness, {
         assets: ['src/extra.ts'],
-        optimization: {
-          scripts: true,
-        },
       });
 
       harness.useTarget('serve', {
@@ -54,6 +51,24 @@ describeServeBuilder(executeDevServer, DEV_SERVER_BUILDER_INFO, (harness, setupT
 
       expect(result?.success).toBeTrue();
       expect(await response?.text()).toContain(javascriptFileContent);
+    });
+
+    it('should return 404 for non existing assets', async () => {
+      setupTarget(harness, {
+        assets: ['src/extra.js'],
+        optimization: {
+          scripts: true,
+        },
+      });
+
+      harness.useTarget('serve', {
+        ...BASE_OPTIONS,
+      });
+
+      const { result, response } = await executeOnceAndFetch(harness, 'extra.js');
+
+      expect(result?.success).toBeTrue();
+      expect(await response?.status).toBe(404);
     });
   });
 });
