@@ -285,16 +285,17 @@ export function createAngularMemoryPlugin(options: AngularMemoryPluginOptions): 
  */
 async function loadViteClientCode(file: string) {
   const originalContents = await readFile(file, 'utf-8');
-  let contents = originalContents.replace('You can also disable this overlay by setting', '');
-  contents = contents.replace(
+  const firstUpdate = originalContents.replace('You can also disable this overlay by setting', '');
+  assert(originalContents !== firstUpdate, 'Failed to update Vite client error overlay text. (1)');
+
+  const secondUpdate = firstUpdate.replace(
     // eslint-disable-next-line max-len
-    '<code part="config-option-name">server.hmr.overlay</code> to <code part="config-option-value">false</code> in <code part="config-file-name">vite.config.js.</code>',
+    '<code part="config-option-name">server.hmr.overlay</code> to <code part="config-option-value">false</code> in <code part="config-file-name">${hmrConfigName}.</code>',
     '',
   );
+  assert(firstUpdate !== secondUpdate, 'Failed to update Vite client error overlay text. (2)');
 
-  assert(originalContents !== contents, 'Failed to update Vite client error overlay text.');
-
-  return contents;
+  return secondUpdate;
 }
 
 function pathnameWithoutBasePath(url: string, basePath: string): string {
