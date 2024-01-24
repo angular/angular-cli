@@ -462,7 +462,7 @@ export async function setupServer(
     publicDir: false,
     esbuild: false,
     mode: 'development',
-    appType: 'spa',
+    appType: 'mpa',
     css: {
       devSourcemap: true,
     },

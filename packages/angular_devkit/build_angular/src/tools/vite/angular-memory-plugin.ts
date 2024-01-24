@@ -90,6 +90,7 @@ export function createAngularMemoryPlugin(options: AngularMemoryPluginOptions): 
         map: mapContents && Buffer.from(mapContents).toString('utf-8'),
       };
     },
+    // eslint-disable-next-line max-lines-per-function
     configureServer(server) {
       const originalssrTransform = server.ssrTransform;
       server.ssrTransform = async (code, map, url, originalCode) => {
@@ -169,6 +170,8 @@ export function createAngularMemoryPlugin(options: AngularMemoryPluginOptions): 
       // Returning a function, installs middleware after the main transform middleware but
       // before the built-in HTML middleware
       return () => {
+        server.middlewares.use(angularHtmlFallbackMiddleware);
+
         function angularSSRMiddleware(
           req: Connect.IncomingMessage,
           res: ServerResponse,
@@ -180,8 +183,8 @@ export function createAngularMemoryPlugin(options: AngularMemoryPluginOptions): 
             // Skip if path is not defined.
             !url ||
             // Skip if path is like a file.
-            // NOTE: We use a regexp to mitigate against matching requests like: /browse/pl.0ef59752c0cd457dbf1391f08cbd936f
-            /^\.[a-z]{2,4}$/i.test(extname(url.split('?')[0]))
+            // NOTE: We use a mime type lookup to mitigate against matching requests like: /browse/pl.0ef59752c0cd457dbf1391f08cbd936f
+            lookupMimeTypeFromRequest(url)
           ) {
             next();
 
@@ -306,4 +309,35 @@ function pathnameWithoutBasePath(url: string, basePath: string): string {
   return basePath !== '/' && pathname.startsWith(basePath)
     ? pathname.slice(basePath.length - 1)
     : pathname;
+}
+
+function angularHtmlFallbackMiddleware(
+  req: Connect.IncomingMessage,
+  res: ServerResponse,
+  next: Connect.NextFunction,
+): void {
+  // Similar to how it is handled in vite
+  // https://github.com/vitejs/vite/blob/main/packages/vite/src/node/server/middlewares/htmlFallback.ts#L15C19-L15C45
+  if (
+    (req.method === 'GET' || req.method === 'HEAD') &&
+    (!req.url || !lookupMimeTypeFromRequest(req.url)) &&
+    (!req.headers.accept ||
+      req.headers.accept.includes('text/html') ||
+      req.headers.accept.includes('text/*') ||
+      req.headers.accept.includes('*/*'))
+  ) {
+    req.url = '/index.html';
+  }
+
+  next();
+}
+
+function lookupMimeTypeFromRequest(url: string): string | undefined {
+  const extension = extname(url.split('?')[0]);
+
+  if (extension === '.ico') {
+    return 'image/x-icon';
+  }
+
+  return extension && lookupMimeType(extension);
 }
