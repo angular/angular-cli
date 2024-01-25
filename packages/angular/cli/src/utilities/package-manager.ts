@@ -141,6 +141,14 @@ export class PackageManagerUtils {
           prefix: '--prefix',
           noLockfile: '--no-lockfile',
         };
+      case PackageManager.Bun:
+        return {
+          saveDev: '--development',
+          install: 'add',
+          installAll: 'install',
+          prefix: '--cwd',
+          noLockfile: '',
+        };
       default:
         return {
           saveDev: '--save-dev',
@@ -218,6 +226,7 @@ export class PackageManagerUtils {
     const hasNpmLock = this.hasLockfile(PackageManager.Npm);
     const hasYarnLock = this.hasLockfile(PackageManager.Yarn);
     const hasPnpmLock = this.hasLockfile(PackageManager.Pnpm);
+    const hasBunLock = this.hasLockfile(PackageManager.Bun);
 
     // PERF NOTE: `this.getVersion` spawns the package a the child_process which can take around ~300ms at times.
     // Therefore, we should only call this method when needed. IE: don't call `this.getVersion(PackageManager.Pnpm)` unless truly needed.
@@ -225,7 +234,7 @@ export class PackageManagerUtils {
 
     if (hasNpmLock) {
       // Has NPM lock file.
-      if (!hasYarnLock && !hasPnpmLock && this.getVersion(PackageManager.Npm)) {
+      if (!hasYarnLock && !hasPnpmLock && !hasBunLock && this.getVersion(PackageManager.Npm)) {
         // Only NPM lock file and NPM binary is available.
         return PackageManager.Npm;
       }
@@ -237,6 +246,9 @@ export class PackageManagerUtils {
       } else if (hasPnpmLock && this.getVersion(PackageManager.Pnpm)) {
         // PNPM lock file and PNPM binary is available.
         return PackageManager.Pnpm;
+      } else if (hasBunLock && this.getVersion(PackageManager.Bun)) {
+        // Bun lock file and Bun binary is available.
+        return PackageManager.Bun;
       }
     }
 
@@ -244,11 +256,14 @@ export class PackageManagerUtils {
       // Doesn't have NPM installed.
       const hasYarn = !!this.getVersion(PackageManager.Yarn);
       const hasPnpm = !!this.getVersion(PackageManager.Pnpm);
+      const hasBun = !!this.getVersion(PackageManager.Bun);
 
-      if (hasYarn && !hasPnpm) {
+      if (hasYarn && !hasPnpm && !hasBun) {
         return PackageManager.Yarn;
-      } else if (!hasYarn && hasPnpm) {
+      } else if (hasPnpm && !hasYarn && !hasBun) {
         return PackageManager.Pnpm;
+      } else if (hasBun && !hasYarn && !hasPnpm) {
+        return PackageManager.Bun;
       }
     }
 
@@ -265,6 +280,9 @@ export class PackageManagerUtils {
         break;
       case PackageManager.Pnpm:
         lockfileName = 'pnpm-lock.yaml';
+        break;
+      case PackageManager.Bun:
+        lockfileName = 'bun.lockb';
         break;
       case PackageManager.Npm:
       default:
