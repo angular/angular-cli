@@ -17,7 +17,7 @@ export interface HostWatchOptions {
   readonly recursive?: boolean;
 }
 
-export const enum HostWatchEventType {
+export enum HostWatchEventType {
   Changed = 0,
   Created = 1,
   Deleted = 2,

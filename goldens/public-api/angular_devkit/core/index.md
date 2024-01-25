@@ -289,7 +289,7 @@ interface HostWatchEvent {
 }
 
 // @public (undocumented)
-const enum HostWatchEventType {
+enum HostWatchEventType {
     // (undocumented)
     Changed = 0,
     // (undocumented)
