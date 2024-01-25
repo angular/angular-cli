@@ -10,7 +10,7 @@
 import { path } from '../path';
 import { stringToFileBuffer } from './buffer';
 import { CordHost } from './record';
-import { test } from './test';
+import * as test from './test';
 
 describe('CordHost', () => {
   const TestHost = test.TestHost;

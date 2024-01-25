@@ -27,137 +27,134 @@ import {
   JobOutboundMessageKind,
 } from './api';
 
-// eslint-disable-next-line @typescript-eslint/no-namespace
-export namespace strategy {
-  export type JobStrategy<
-    A extends JsonValue = JsonValue,
-    I extends JsonValue = JsonValue,
-    O extends JsonValue = JsonValue,
-  > = (
-    handler: JobHandler<A, I, O>,
-    options?: Partial<Readonly<JobDescription>>,
-  ) => JobHandler<A, I, O>;
+export type JobStrategy<
+  A extends JsonValue = JsonValue,
+  I extends JsonValue = JsonValue,
+  O extends JsonValue = JsonValue,
+> = (
+  handler: JobHandler<A, I, O>,
+  options?: Partial<Readonly<JobDescription>>,
+) => JobHandler<A, I, O>;
 
-  /**
-   * Creates a JobStrategy that serializes every call. This strategy can be mixed between jobs.
-   */
-  export function serialize<
-    A extends JsonValue = JsonValue,
-    I extends JsonValue = JsonValue,
-    O extends JsonValue = JsonValue,
-  >(): JobStrategy<A, I, O> {
-    let latest: Observable<JobOutboundMessage<O>> = of();
+/**
+ * Creates a JobStrategy that serializes every call. This strategy can be mixed between jobs.
+ */
+export function serialize<
+  A extends JsonValue = JsonValue,
+  I extends JsonValue = JsonValue,
+  O extends JsonValue = JsonValue,
+>(): JobStrategy<A, I, O> {
+  let latest: Observable<JobOutboundMessage<O>> = of();
 
-    return (handler, options) => {
-      const newHandler = (argument: A, context: JobHandlerContext<A, I, O>) => {
-        const previous = latest;
-        latest = concat(
-          previous.pipe(ignoreElements()),
-          new Observable<JobOutboundMessage<O>>((o) => handler(argument, context).subscribe(o)),
-        ).pipe(shareReplay(0));
+  return (handler, options) => {
+    const newHandler = (argument: A, context: JobHandlerContext<A, I, O>) => {
+      const previous = latest;
+      latest = concat(
+        previous.pipe(ignoreElements()),
+        new Observable<JobOutboundMessage<O>>((o) => handler(argument, context).subscribe(o)),
+      ).pipe(shareReplay(0));
 
-        return latest;
-      };
-
-      return Object.assign(newHandler, {
-        jobDescription: Object.assign({}, handler.jobDescription, options),
-      });
+      return latest;
     };
-  }
 
-  /**
-   * Creates a JobStrategy that will always reuse a running job, and restart it if the job ended.
-   * @param replayMessages Replay ALL messages if a job is reused, otherwise just hook up where it
-   * is.
-   */
-  export function reuse<
-    A extends JsonValue = JsonValue,
-    I extends JsonValue = JsonValue,
-    O extends JsonValue = JsonValue,
-  >(replayMessages = false): JobStrategy<A, I, O> {
-    let inboundBus = new Subject<JobInboundMessage<I>>();
-    let run: Observable<JobOutboundMessage<O>> | null = null;
-    let state: JobOutboundMessage<O> | null = null;
+    return Object.assign(newHandler, {
+      jobDescription: Object.assign({}, handler.jobDescription, options),
+    });
+  };
+}
 
-    return (handler, options) => {
-      const newHandler = (argument: A, context: JobHandlerContext<A, I, O>) => {
-        // Forward inputs.
-        const subscription = context.inboundBus.subscribe(inboundBus);
+/**
+ * Creates a JobStrategy that will always reuse a running job, and restart it if the job ended.
+ * @param replayMessages Replay ALL messages if a job is reused, otherwise just hook up where it
+ * is.
+ */
+export function reuse<
+  A extends JsonValue = JsonValue,
+  I extends JsonValue = JsonValue,
+  O extends JsonValue = JsonValue,
+>(replayMessages = false): JobStrategy<A, I, O> {
+  let inboundBus = new Subject<JobInboundMessage<I>>();
+  let run: Observable<JobOutboundMessage<O>> | null = null;
+  let state: JobOutboundMessage<O> | null = null;
 
-        if (run) {
-          return concat(
-            // Update state.
-            of(state),
-            run,
-          ).pipe(finalize(() => subscription.unsubscribe()));
-        }
+  return (handler, options) => {
+    const newHandler = (argument: A, context: JobHandlerContext<A, I, O>) => {
+      // Forward inputs.
+      const subscription = context.inboundBus.subscribe(inboundBus);
 
-        run = handler(argument, { ...context, inboundBus: inboundBus.asObservable() }).pipe(
-          tap(
-            (message) => {
-              if (
-                message.kind == JobOutboundMessageKind.Start ||
-                message.kind == JobOutboundMessageKind.OnReady ||
-                message.kind == JobOutboundMessageKind.End
-              ) {
-                state = message;
-              }
-            },
-            undefined,
-            () => {
-              subscription.unsubscribe();
-              inboundBus = new Subject<JobInboundMessage<I>>();
-              run = null;
-            },
-          ),
-          replayMessages ? shareReplay() : share(),
-        );
+      if (run) {
+        return concat(
+          // Update state.
+          of(state),
+          run,
+        ).pipe(finalize(() => subscription.unsubscribe()));
+      }
 
-        return run;
-      };
+      run = handler(argument, { ...context, inboundBus: inboundBus.asObservable() }).pipe(
+        tap(
+          (message) => {
+            if (
+              message.kind == JobOutboundMessageKind.Start ||
+              message.kind == JobOutboundMessageKind.OnReady ||
+              message.kind == JobOutboundMessageKind.End
+            ) {
+              state = message;
+            }
+          },
+          undefined,
+          () => {
+            subscription.unsubscribe();
+            inboundBus = new Subject<JobInboundMessage<I>>();
+            run = null;
+          },
+        ),
+        replayMessages ? shareReplay() : share(),
+      );
 
-      return Object.assign(newHandler, handler, options || {});
+      return run;
     };
-  }
 
-  /**
-   * Creates a JobStrategy that will reuse a running job if the argument matches.
-   * @param replayMessages Replay ALL messages if a job is reused, otherwise just hook up where it
-   * is.
-   */
-  export function memoize<
-    A extends JsonValue = JsonValue,
-    I extends JsonValue = JsonValue,
-    O extends JsonValue = JsonValue,
-  >(replayMessages = false): JobStrategy<A, I, O> {
-    const runs = new Map<string, Observable<JobOutboundMessage<O>>>();
+    return Object.assign(newHandler, handler, options || {});
+  };
+}
 
-    return (handler, options) => {
-      const newHandler = (argument: A, context: JobHandlerContext<A, I, O>) => {
-        const argumentJson = JSON.stringify(
-          isJsonObject(argument)
-            ? Object.keys(argument)
-                .sort()
-                .reduce((result, key) => {
-                  result[key] = argument[key];
+/**
+ * Creates a JobStrategy that will reuse a running job if the argument matches.
+ * @param replayMessages Replay ALL messages if a job is reused, otherwise just hook up where it
+ * is.
+ */
+export function memoize<
+  A extends JsonValue = JsonValue,
+  I extends JsonValue = JsonValue,
+  O extends JsonValue = JsonValue,
+>(replayMessages = false): JobStrategy<A, I, O> {
+  const runs = new Map<string, Observable<JobOutboundMessage<O>>>();
 
-                  return result;
-                }, {} as JsonObject)
-            : argument,
-        );
-        const maybeJob = runs.get(argumentJson);
+  return (handler, options) => {
+    const newHandler = (argument: A, context: JobHandlerContext<A, I, O>) => {
+      const argumentJson = JSON.stringify(
+        isJsonObject(argument)
+          ? Object.keys(argument)
+              .sort()
+              .reduce((result, key) => {
+                result[key] = argument[key];
 
-        if (maybeJob) {
-          return maybeJob;
-        }
+                return result;
+              }, {} as JsonObject)
+          : argument,
+      );
+      const maybeJob = runs.get(argumentJson);
 
-        const run = handler(argument, context).pipe(replayMessages ? shareReplay() : share());
-        runs.set(argumentJson, run);
+      if (maybeJob) {
+        return maybeJob;
+      }
 
-        return run;
-      };
+      const run = handler(argument, context).pipe(replayMessages ? shareReplay() : share());
+      runs.set(argumentJson, run);
 
-      return Object.assign(newHandler, handler, options || {});
+      return run;
     };
-  }
+
+    return Object.assign(newHandler, handler, options || {});
+  };
 }

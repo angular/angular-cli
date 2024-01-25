@@ -11,7 +11,7 @@ import { JobState } from './api';
 import { createJobHandler } from './create-job-handler';
 import { SimpleJobRegistry } from './simple-registry';
 import { SimpleScheduler } from './simple-scheduler';
-import { strategy } from './strategy';
+import * as strategy from './strategy';
 
 const flush = promisify(setImmediate);
 

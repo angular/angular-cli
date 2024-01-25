@@ -1223,70 +1223,75 @@ interface TemplateTag<R = string> {
     (template: TemplateStringsArray, ...substitutions: any[]): R;
 }
 
-// @public (undocumented)
-namespace test {
-    // (undocumented)
-    class TestHost extends SimpleMemoryHost {
-        // (undocumented)
-        $exists(path: string): boolean;
-        // (undocumented)
-        $isDirectory(path: string): boolean;
-        // (undocumented)
-        $isFile(path: string): boolean;
-        // (undocumented)
-        $list(path: string): PathFragment[];
-        // (undocumented)
-        $read(path: string): string;
-        // (undocumented)
-        $write(path: string, content: string): void;
-        constructor(map?: {
-            [path: string]: string;
-        });
-        // (undocumented)
-        clearRecords(): void;
-        // (undocumented)
-        clone(): TestHost;
-        // (undocumented)
-        protected _delete(path: Path): void;
-        // (undocumented)
-        protected _exists(path: Path): boolean;
-        // (undocumented)
-        get files(): Path[];
-        // (undocumented)
-        protected _isDirectory(path: Path): boolean;
-        // (undocumented)
-        protected _isFile(path: Path): boolean;
-        // (undocumented)
-        protected _list(path: Path): PathFragment[];
-        // (undocumented)
-        protected _read(path: Path): ArrayBuffer;
-        // (undocumented)
-        get records(): TestLogRecord[];
-        // (undocumented)
-        protected _records: TestLogRecord[];
-        // (undocumented)
-        protected _rename(from: Path, to: Path): void;
-        // (undocumented)
-        protected _stat(path: Path): Stats<SimpleMemoryHostStats> | null;
-        // (undocumented)
-        get sync(): SyncDelegateHost<{}>;
-        // (undocumented)
-        protected _sync: SyncDelegateHost<{}> | null;
-        // (undocumented)
-        protected _watch(path: Path, options?: HostWatchOptions): Observable<HostWatchEvent>;
-        // (undocumented)
-        protected _write(path: Path, content: FileBuffer): void;
+declare namespace test {
+    export {
+        TestLogRecord,
+        TestHost
     }
-    // (undocumented)
-    type TestLogRecord = {
-        kind: 'write' | 'read' | 'delete' | 'list' | 'exists' | 'isDirectory' | 'isFile' | 'stat' | 'watch';
-        path: Path;
-    } | {
-        kind: 'rename';
-        from: Path;
-        to: Path;
-    };
 }
+
+// @public (undocumented)
+class TestHost extends SimpleMemoryHost {
+    // (undocumented)
+    $exists(path: string): boolean;
+    // (undocumented)
+    $isDirectory(path: string): boolean;
+    // (undocumented)
+    $isFile(path: string): boolean;
+    // (undocumented)
+    $list(path: string): PathFragment[];
+    // (undocumented)
+    $read(path: string): string;
+    // (undocumented)
+    $write(path: string, content: string): void;
+    constructor(map?: {
+        [path: string]: string;
+    });
+    // (undocumented)
+    clearRecords(): void;
+    // (undocumented)
+    clone(): TestHost;
+    // (undocumented)
+    protected _delete(path: Path): void;
+    // (undocumented)
+    protected _exists(path: Path): boolean;
+    // (undocumented)
+    get files(): Path[];
+    // (undocumented)
+    protected _isDirectory(path: Path): boolean;
+    // (undocumented)
+    protected _isFile(path: Path): boolean;
+    // (undocumented)
+    protected _list(path: Path): PathFragment[];
+    // (undocumented)
+    protected _read(path: Path): ArrayBuffer;
+    // (undocumented)
+    get records(): TestLogRecord[];
+    // (undocumented)
+    protected _records: TestLogRecord[];
+    // (undocumented)
+    protected _rename(from: Path, to: Path): void;
+    // (undocumented)
+    protected _stat(path: Path): Stats<SimpleMemoryHostStats> | null;
+    // (undocumented)
+    get sync(): SyncDelegateHost<{}>;
+    // (undocumented)
+    protected _sync: SyncDelegateHost<{}> | null;
+    // (undocumented)
+    protected _watch(path: Path, options?: HostWatchOptions): Observable<HostWatchEvent>;
+    // (undocumented)
+    protected _write(path: Path, content: FileBuffer): void;
+}
+
+// @public (undocumented)
+type TestLogRecord = {
+    kind: 'write' | 'read' | 'delete' | 'list' | 'exists' | 'isDirectory' | 'isFile' | 'stat' | 'watch';
+    path: Path;
+} | {
+    kind: 'rename';
+    from: Path;
+    to: Path;
+};
 
 // @public (undocumented)
 class TransformLogger extends Logger {
@@ -1315,6 +1320,7 @@ type UriHandler = (uri: string) => Observable<JsonObject> | Promise<JsonObject> 
 
 declare namespace virtualFs {
     export {
+        test,
         AliasHost,
         stringToFileBuffer,
         fileBufferToString,
@@ -1345,8 +1351,7 @@ declare namespace virtualFs {
         ScopedHost,
         SynchronousDelegateExpectedException,
         SyncDelegateHost,
-        ResolverHost,
-        test
+        ResolverHost
     }
 }
 export { virtualFs }

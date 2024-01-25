@@ -358,6 +358,7 @@ class JobOutputSchemaValidationError extends schema.SchemaValidationException {
 
 declare namespace jobs {
     export {
+        strategy,
         isJobHandler,
         JobName,
         JobHandler,
@@ -403,8 +404,7 @@ declare namespace jobs {
         JobArgumentSchemaValidationError,
         JobInboundMessageSchemaValidationError,
         JobOutputSchemaValidationError,
-        SimpleScheduler,
-        strategy
+        SimpleScheduler
     }
 }
 export { jobs }
@@ -418,6 +418,12 @@ enum JobState {
     Started = "started"
 }
 
+// @public (undocumented)
+type JobStrategy<A extends JsonValue = JsonValue, I extends JsonValue = JsonValue, O extends JsonValue = JsonValue> = (handler: JobHandler<A, I, O>, options?: Partial<Readonly<JobDescription>>) => JobHandler<A, I, O>;
+
+// @public
+function memoize<A extends JsonValue = JsonValue, I extends JsonValue = JsonValue, O extends JsonValue = JsonValue>(replayMessages?: boolean): JobStrategy<A, I, O>;
+
 // @public
 interface RegisterJobOptions extends Partial<JobDescription> {
 }
@@ -426,6 +432,9 @@ interface RegisterJobOptions extends Partial<JobDescription> {
 interface Registry<MinimumArgumentValueT extends JsonValue = JsonValue, MinimumInputValueT extends JsonValue = JsonValue, MinimumOutputValueT extends JsonValue = JsonValue> {
     get<A extends MinimumArgumentValueT, I extends MinimumInputValueT, O extends MinimumOutputValueT>(name: JobName): Observable<JobHandler<A, I, O> | null>;
 }
+
+// @public
+function reuse<A extends JsonValue = JsonValue, I extends JsonValue = JsonValue, O extends JsonValue = JsonValue>(replayMessages?: boolean): JobStrategy<A, I, O>;
 
 // @public
 interface ScheduleJobOptions {
@@ -448,6 +457,9 @@ interface Scheduler<MinimumArgumentValueT extends JsonValue = JsonValue, Minimum
 
 // @public
 export function scheduleTargetAndForget(context: BuilderContext, target: Target, overrides?: json.JsonObject, scheduleOptions?: ScheduleOptions_2): Observable<BuilderOutput>;
+
+// @public
+function serialize<A extends JsonValue = JsonValue, I extends JsonValue = JsonValue, O extends JsonValue = JsonValue>(): JobStrategy<A, I, O>;
 
 // @public
 interface SimpleJobHandlerContext<A extends JsonValue, I extends JsonValue, O extends JsonValue> extends JobHandlerContext<A, I, O> {
@@ -490,13 +502,13 @@ class SimpleScheduler<MinimumArgumentT extends JsonValue = JsonValue, MinimumInp
     protected _schemaRegistry: schema.SchemaRegistry;
 }
 
-// @public (undocumented)
-namespace strategy {
-    // (undocumented)
-    type JobStrategy<A extends JsonValue = JsonValue, I extends JsonValue = JsonValue, O extends JsonValue = JsonValue> = (handler: JobHandler<A, I, O>, options?: Partial<Readonly<JobDescription>>) => JobHandler<A, I, O>;
-    function memoize<A extends JsonValue = JsonValue, I extends JsonValue = JsonValue, O extends JsonValue = JsonValue>(replayMessages?: boolean): JobStrategy<A, I, O>;
-    function reuse<A extends JsonValue = JsonValue, I extends JsonValue = JsonValue, O extends JsonValue = JsonValue>(replayMessages?: boolean): JobStrategy<A, I, O>;
-    function serialize<A extends JsonValue = JsonValue, I extends JsonValue = JsonValue, O extends JsonValue = JsonValue>(): JobStrategy<A, I, O>;
+declare namespace strategy {
+    export {
+        serialize,
+        reuse,
+        memoize,
+        JobStrategy
+    }
 }
 
 // @public (undocumented)

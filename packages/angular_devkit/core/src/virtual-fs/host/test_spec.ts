@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { test } from './test';
+import * as test from './test';
 
 // Yes, we realize the irony of testing a test host.
 describe('TestHost', () => {
