@@ -25,7 +25,7 @@
     "ng-dev": "ts-node --esm --project .ng-dev/tsconfig.json --transpile-only node_modules/@angular/ng-dev/bundles/cli.mjs",
     "templates": "node ./bin/devkit-admin templates",
     "validate": "node ./bin/devkit-admin validate",
-    "postinstall": "yarn webdriver-update && yarn husky install && patch-package --patch-dir tools/postinstall/patches",
+    "postinstall": "yarn webdriver-update && yarn husky && patch-package --patch-dir tools/postinstall/patches",
     "//webdriver-update-README": "ChromeDriver version must match Puppeteer Chromium version, see https://github.com/GoogleChrome/puppeteer/releases http://chromedriver.chromium.org/downloads",
     "webdriver-update": "webdriver-manager update --standalone false --gecko false --versions.chrome 106.0.5249.21",
     "public-api:check": "node goldens/public-api/manage.js test",
