@@ -1,3 +1,16 @@
+<a name="17.2.0-next.0"></a>
+
+# 17.2.0-next.0 (2024-01-25)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                                          |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------------------ |
+| [8f47f1e96](https://github.com/angular/angular-cli/commit/8f47f1e965b25f3d976eda701ae2e7b7e8cccfa3) | feat | provide default and abbreviated build target support for dev-server and extract-i18n |
+| [8216b11b3](https://github.com/angular/angular-cli/commit/8216b11b3cff5b0c37afd4dac6aa61851f24849a) | fix  | return 404 for assets that are not found                                             |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="17.1.1"></a>
 
 # 17.1.1 (2024-01-24)
