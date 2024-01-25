@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { join } from 'path';
+import { join } from 'node:path';
 import { MissingTargetChoice } from '../../command-builder/architect-base-command-module';
 import { ArchitectCommandModule } from '../../command-builder/architect-command-module';
 import { CommandModuleImplementation } from '../../command-builder/command-module';
@@ -28,10 +28,6 @@ export default class DeployCommandModule
     {
       name: 'Netlify',
       value: '@netlify-builder/deploy',
-    },
-    {
-      name: 'NPM',
-      value: 'ngx-deploy-npm',
     },
     {
       name: 'GitHub Pages',
