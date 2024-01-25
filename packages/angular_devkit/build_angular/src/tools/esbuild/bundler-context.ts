@@ -207,7 +207,7 @@ export class BundlerContext {
       this.watchFiles.clear();
     }
 
-    let result;
+    let result: BuildResult<{ metafile: true; write: false }>;
     try {
       if (this.#esbuildContext) {
         // Rebuild using the existing incremental build context
