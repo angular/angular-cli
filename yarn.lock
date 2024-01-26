@@ -131,8 +131,7 @@
     tslib "^2.3.0"
 
 "@angular/bazel@https://github.com/angular/bazel-builds.git#a0e463179c1d15995508827d977565031b9ba8fb":
-  version "17.2.0-next.0+sha-c043128"
-  uid a0e463179c1d15995508827d977565031b9ba8fb
+  version "17.2.0-next.0"
   resolved "https://github.com/angular/bazel-builds.git#a0e463179c1d15995508827d977565031b9ba8fb"
   dependencies:
     "@microsoft/api-extractor" "^7.24.2"
@@ -149,7 +148,6 @@
 
 "@angular/build-tooling@https://github.com/angular/dev-infra-private-build-tooling-builds.git#103b5c2cf1be1d62b292d3c0a447b0f6918f0770":
   version "0.0.0-10788de8a2999c84bc16a132dfe1a0a9bc934604"
-  uid "103b5c2cf1be1d62b292d3c0a447b0f6918f0770"
   resolved "https://github.com/angular/dev-infra-private-build-tooling-builds.git#103b5c2cf1be1d62b292d3c0a447b0f6918f0770"
   dependencies:
     "@angular-devkit/build-angular" "17.2.0-next.0"
@@ -317,7 +315,6 @@
 
 "@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#21604aaadd15167ee2be0d89622b7009a13cdac7":
   version "0.0.0-10788de8a2999c84bc16a132dfe1a0a9bc934604"
-  uid "21604aaadd15167ee2be0d89622b7009a13cdac7"
   resolved "https://github.com/angular/dev-infra-private-ng-dev-builds.git#21604aaadd15167ee2be0d89622b7009a13cdac7"
   dependencies:
     "@yarnpkg/lockfile" "^1.1.0"
@@ -3960,11 +3957,6 @@
   dependencies:
     "@types/node" "*"
     minipass "^4.0.0"
-
-"@types/text-table@^0.2.1":
-  version "0.2.5"
-  resolved "https://registry.yarnpkg.com/@types/text-table/-/text-table-0.2.5.tgz#f9c609b81c943e9fc8d73ef82ad2f2a78be5f53b"
-  integrity sha512-hcZhlNvMkQG/k1vcZ6yHOl6WAYftQ2MLfTHcYRZ2xYZFD8tGVnE3qFV0lj1smQeDSR7/yY0PyuUalauf33bJeA==
 
 "@types/through@*":
   version "0.0.33"
