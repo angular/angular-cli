@@ -128,7 +128,7 @@ function normalizeProxyConfiguration(
 
   // TODO: Consider upstreaming glob support
   for (const key of Object.keys(normalizedProxy)) {
-    if (isDynamicPattern(key)) {
+    if (key[0] !== '^' && isDynamicPattern(key)) {
       const { output } = parseGlob(key);
       normalizedProxy[`^${output}$`] = normalizedProxy[key];
       delete normalizedProxy[key];
