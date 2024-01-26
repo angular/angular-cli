@@ -144,7 +144,7 @@ export async function normalizeOptions(
     media: 'media',
     ...(typeof outputPath === 'string' ? undefined : outputPath),
     base: normalizeDirectoryPath(
-      path.join(workspaceRoot, typeof outputPath === 'string' ? outputPath : outputPath.base),
+      path.resolve(workspaceRoot, typeof outputPath === 'string' ? outputPath : outputPath.base),
     ),
   };
 
