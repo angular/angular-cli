@@ -8,9 +8,8 @@
 
 import { WebpackLoggingCallback } from '@angular-devkit/build-webpack';
 import { logging, tags } from '@angular-devkit/core';
-import assert from 'assert';
-import * as path from 'path';
-import textTable from 'text-table';
+import assert from 'node:assert';
+import * as path from 'node:path';
 import { Configuration, StatsCompilation } from 'webpack';
 import { Schema as BrowserBuilderOptions } from '../../../builders/browser/schema';
 import { normalizeOptimization } from '../../../utils';
@@ -88,7 +87,6 @@ export function generateBuildStatsTable(
   const r = (x: string) => (colors ? ansiColors.redBright(x) : x);
   const y = (x: string) => (colors ? ansiColors.yellowBright(x) : x);
   const bold = (x: string) => (colors ? ansiColors.bold(x) : x);
-  const dim = (x: string) => (colors ? ansiColors.dim(x) : x);
 
   const getSizeColor = (name: string, file?: string, defaultColor = c) => {
     const severity = budgets.get(name) || (file && budgets.get(file));
@@ -216,11 +214,45 @@ export function generateBuildStatsTable(
     bundleInfo.push(['Lazy Chunk Files', ...baseTitles].map(bold), ...changedLazyChunksStats);
   }
 
-  return textTable(bundleInfo, {
-    hsep: dim(' | '),
-    stringLength: (s) => removeColor(s).length,
-    align: tableAlign,
-  });
+  return generateTableText(bundleInfo, colors);
+}
+
+function generateTableText(bundleInfo: (string | number)[][], colors: boolean): string {
+  const longest: number[] = [];
+  for (const item of bundleInfo) {
+    for (let i = 0; i < item.length; i++) {
+      if (item[i] === undefined) {
+        continue;
+      }
+
+      const currentItem = item[i].toString();
+      const currentLongest = (longest[i] ??= 0);
+      const currentItemLength = removeColor(currentItem).length;
+      if (currentLongest < currentItemLength) {
+        longest[i] = currentItemLength;
+      }
+    }
+  }
+
+  const seperator = colors ? ansiColors.dim(' | ') : ' | ';
+  const outputTable: string[] = [];
+  for (const item of bundleInfo) {
+    for (let i = 0; i < longest.length; i++) {
+      if (item[i] === undefined) {
+        continue;
+      }
+
+      const currentItem = item[i].toString();
+      const currentItemLength = removeColor(currentItem).length;
+      const stringPad = ' '.repeat(longest[i] - currentItemLength);
+      // Last item is right aligned, thus we add the padding at the start.
+      item[i] = longest.length === i + 1 ? stringPad + currentItem : currentItem + stringPad;
+    }
+
+    outputTable.push(item.join(seperator));
+  }
+
+  return outputTable.join('\n');
 }
 
 function generateBuildStats(hash: string, time: number, colors: boolean): string {
