@@ -42,8 +42,8 @@ export default async function () {
   );
 
   // Non injected styles should be listed under lazy chunk files
-  if (!/Lazy Chunk Files[\s\S]+renamed-lazy-style\.css/m.test(stdout)) {
+  if (!/Lazy chunk files[\s\S]+renamed-lazy-style\.css/m.test(stdout)) {
     console.log(stdout);
-    throw new Error(`Expected "renamed-lazy-style.css" to be listed under "Lazy Chunk Files".`);
+    throw new Error(`Expected "renamed-lazy-style.css" to be listed under "Lazy chunk files".`);
   }
 }

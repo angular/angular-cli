@@ -7,7 +7,7 @@
  */
 
 import { WebpackLoggingCallback } from '@angular-devkit/build-webpack';
-import { logging, tags } from '@angular-devkit/core';
+import { logging } from '@angular-devkit/core';
 import assert from 'node:assert';
 import * as path from 'node:path';
 import { Configuration, StatsCompilation } from 'webpack';
@@ -75,6 +75,38 @@ function generateBundleStats(info: {
   };
 }
 
+export function generateEsbuildBuildStatsTable(
+  [browserStats, serverStats]: [browserStats: BundleStats[], serverStats: BundleStats[]],
+  colors: boolean,
+  showTotalSize: boolean,
+  showEstimatedTransferSize: boolean,
+  budgetFailures?: BudgetCalculatorResult[],
+): string {
+  const bundleInfo = generateBuildStatsData(
+    browserStats,
+    colors,
+    showTotalSize,
+    showEstimatedTransferSize,
+    budgetFailures,
+  );
+
+  if (serverStats.length) {
+    const m = (x: string) => (colors ? ansiColors.magenta(x) : x);
+    if (browserStats.length) {
+      bundleInfo.unshift([m('Browser bundles')]);
+      // Add seperators between browser and server logs
+      bundleInfo.push([], []);
+    }
+
+    bundleInfo.push(
+      [m('Server bundles')],
+      ...generateBuildStatsData(serverStats, colors, false, false, undefined),
+    );
+  }
+
+  return generateTableText(bundleInfo, colors);
+}
+
 export function generateBuildStatsTable(
   data: BundleStats[],
   colors: boolean,
@@ -82,11 +114,34 @@ export function generateBuildStatsTable(
   showEstimatedTransferSize: boolean,
   budgetFailures?: BudgetCalculatorResult[],
 ): string {
-  const g = (x: string) => (colors ? ansiColors.greenBright(x) : x);
-  const c = (x: string) => (colors ? ansiColors.cyanBright(x) : x);
+  const bundleInfo = generateBuildStatsData(
+    data,
+    colors,
+    showTotalSize,
+    showEstimatedTransferSize,
+    budgetFailures,
+  );
+
+  return generateTableText(bundleInfo, colors);
+}
+
+function generateBuildStatsData(
+  data: BundleStats[],
+  colors: boolean,
+  showTotalSize: boolean,
+  showEstimatedTransferSize: boolean,
+  budgetFailures?: BudgetCalculatorResult[],
+): (string | number)[][] {
+  if (data.length === 0) {
+    return [];
+  }
+
+  const g = (x: string) => (colors ? ansiColors.green(x) : x);
+  const c = (x: string) => (colors ? ansiColors.cyan(x) : x);
   const r = (x: string) => (colors ? ansiColors.redBright(x) : x);
   const y = (x: string) => (colors ? ansiColors.yellowBright(x) : x);
   const bold = (x: string) => (colors ? ansiColors.bold(x) : x);
+  const dim = (x: string) => (colors ? ansiColors.dim(x) : x);
 
   const getSizeColor = (name: string, file?: string, defaultColor = c) => {
     const severity = budgets.get(name) || (file && budgets.get(file));
@@ -138,7 +193,7 @@ export function generateBuildStatsTable(
     if (showEstimatedTransferSize) {
       data = [
         g(files),
-        names,
+        dim(names),
         getRawSizeColor(typeof rawSize === 'number' ? formatSize(rawSize) : rawSize),
         c(
           typeof estimatedTransferSize === 'number'
@@ -149,7 +204,7 @@ export function generateBuildStatsTable(
     } else {
       data = [
         g(files),
-        names,
+        dim(names),
         getRawSizeColor(typeof rawSize === 'number' ? formatSize(rawSize) : rawSize),
         '',
       ];
@@ -172,17 +227,17 @@ export function generateBuildStatsTable(
   }
 
   const bundleInfo: (string | number)[][] = [];
-  const baseTitles = ['Names', 'Raw Size'];
+  const baseTitles = ['Names', 'Raw size'];
   const tableAlign: ('l' | 'r')[] = ['l', 'l', 'r'];
 
   if (showEstimatedTransferSize) {
-    baseTitles.push('Estimated Transfer Size');
+    baseTitles.push('Estimated transfer size');
     tableAlign.push('r');
   }
 
   // Entry chunks
   if (changedEntryChunksStats.length) {
-    bundleInfo.push(['Initial Chunk Files', ...baseTitles].map(bold), ...changedEntryChunksStats);
+    bundleInfo.push(['Initial chunk files', ...baseTitles].map(bold), ...changedEntryChunksStats);
 
     if (showTotalSize) {
       bundleInfo.push([]);
@@ -190,7 +245,7 @@ export function generateBuildStatsTable(
       const initialSizeTotalColor = getSizeColor('bundle initial', undefined, (x) => x);
       const totalSizeElements = [
         ' ',
-        'Initial Total',
+        'Initial total',
         initialSizeTotalColor(formatSize(initialTotalRawSize)),
       ];
       if (showEstimatedTransferSize) {
@@ -211,10 +266,10 @@ export function generateBuildStatsTable(
 
   // Lazy chunks
   if (changedLazyChunksStats.length) {
-    bundleInfo.push(['Lazy Chunk Files', ...baseTitles].map(bold), ...changedLazyChunksStats);
+    bundleInfo.push(['Lazy chunk files', ...baseTitles].map(bold), ...changedLazyChunksStats);
   }
 
-  return generateTableText(bundleInfo, colors);
+  return bundleInfo;
 }
 
 function generateTableText(bundleInfo: (string | number)[][], colors: boolean): string {
@@ -255,12 +310,6 @@ function generateTableText(bundleInfo: (string | number)[][], colors: boolean): 
   return outputTable.join('\n');
 }
 
-function generateBuildStats(hash: string, time: number, colors: boolean): string {
-  const w = (x: string) => (colors ? ansiColors.bold.white(x) : x);
-
-  return `Build at: ${w(new Date().toISOString())} - Hash: ${w(hash)} - Time: ${w('' + time)}ms`;
-}
-
 // We use this cache because we can have multiple builders running in the same process,
 // where each builder has different output path.
 
@@ -279,6 +328,7 @@ function statsToString(
 
   const colors = statsConfig.colors;
   const rs = (x: string) => (colors ? ansiColors.reset(x) : x);
+  const w = (x: string) => (colors ? ansiColors.bold.white(x) : x);
 
   const changedChunksStats: BundleStats[] = [];
   let unchangedChunkNumber = 0;
@@ -330,30 +380,13 @@ function statsToString(
   // In some cases we do things outside of webpack context
   // Such us index generation, service worker augmentation etc...
   // This will correct the time and include these.
-
   const time = getBuildDuration(json);
 
-  if (unchangedChunkNumber > 0) {
-    return (
-      '\n' +
-      rs(tags.stripIndents`
-      ${statsTable}
-
-      ${unchangedChunkNumber} unchanged chunks
-
-      ${generateBuildStats(json.hash || '', time, colors)}
-      `)
-    );
-  } else {
-    return (
-      '\n' +
-      rs(tags.stripIndents`
-      ${statsTable}
-
-      ${generateBuildStats(json.hash || '', time, colors)}
-      `)
-    );
-  }
+  return rs(
+    `\n${statsTable}\n\n` +
+      (unchangedChunkNumber > 0 ? `${unchangedChunkNumber} unchanged chunks\n\n` : '') +
+      `Build at: ${w(new Date().toISOString())} - Hash: ${w(json.hash || '')} - Time: ${w('' + time)}ms`,
+  );
 }
 
 export function statsWarningsToString(

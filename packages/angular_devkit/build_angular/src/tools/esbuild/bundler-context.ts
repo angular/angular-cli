@@ -221,6 +221,13 @@ export class BundlerContext {
         // For non-incremental builds, perform a single build
         result = await build(this.#esbuildOptions);
       }
+
+      if (this.#esbuildOptions?.platform === 'node') {
+        for (const entry of Object.values(result.metafile.outputs)) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          (entry as any)['ng-platform-server'] = true;
+        }
+      }
     } catch (failure) {
       // Build failures will throw an exception which contains errors/warnings
       if (isEsBuildFailure(failure)) {

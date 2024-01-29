@@ -103,7 +103,6 @@ export function setupBundlerContexts(
           nodeTargets,
           codeBundleCache,
         ),
-        () => false,
       ),
     );
 
@@ -116,12 +115,7 @@ export function setupBundlerContexts(
 
     if (serverPolyfillBundleOptions) {
       bundlerContexts.push(
-        new BundlerContext(
-          workspaceRoot,
-          !!options.watch,
-          serverPolyfillBundleOptions,
-          () => false,
-        ),
+        new BundlerContext(workspaceRoot, !!options.watch, serverPolyfillBundleOptions),
       );
     }
   }
