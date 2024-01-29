@@ -17,7 +17,7 @@ import { coerce } from 'semver';
 import { NormalizedOutputOptions } from '../../builders/application/options';
 import { BudgetCalculatorResult } from '../../utils/bundle-calculator';
 import { Spinner } from '../../utils/spinner';
-import { BundleStats, generateBuildStatsTable } from '../webpack/utils/stats';
+import { BundleStats, generateEsbuildBuildStatsTable } from '../webpack/utils/stats';
 import { BuildOutputFile, BuildOutputFileType, InitialFileRecord } from './bundler-context';
 import { BuildOutputAsset } from './bundler-execution-result';
 
@@ -28,14 +28,18 @@ export function logBuildStats(
   budgetFailures: BudgetCalculatorResult[] | undefined,
   changedFiles?: Set<string>,
   estimatedTransferSizes?: Map<string, number>,
+  ssrOutputEnabled?: boolean,
 ): void {
-  const stats: BundleStats[] = [];
+  const browserStats: BundleStats[] = [];
+  const serverStats: BundleStats[] = [];
   let unchangedCount = 0;
+
   for (const [file, output] of Object.entries(metafile.outputs)) {
     // Only display JavaScript and CSS files
-    if (!file.endsWith('.js') && !file.endsWith('.css')) {
+    if (!/\.(?:css|m?js)$/.test(file)) {
       continue;
     }
+
     // Skip internal component resources
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     if ((output as any)['ng-component']) {
@@ -48,6 +52,13 @@ export function logBuildStats(
       continue;
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const isPlatformServer = (output as any)['ng-platform-server'];
+    if (isPlatformServer && !ssrOutputEnabled) {
+      // Only log server build stats when SSR is enabled.
+      continue;
+    }
+
     let name = initial.get(file)?.name;
     if (name === undefined && output.entryPoint) {
       name = path
@@ -56,22 +67,28 @@ export function logBuildStats(
         .replace(/[\\/.]/g, '-');
     }
 
-    stats.push({
+    const stat: BundleStats = {
       initial: initial.has(file),
       stats: [file, name ?? '-', output.bytes, estimatedTransferSizes?.get(file) ?? '-'],
-    });
+    };
+
+    if (isPlatformServer) {
+      serverStats.push(stat);
+    } else {
+      browserStats.push(stat);
+    }
   }
 
-  if (stats.length > 0) {
-    const tableText = generateBuildStatsTable(
-      stats,
+  if (browserStats.length > 0 || serverStats.length > 0) {
+    const tableText = generateEsbuildBuildStatsTable(
+      [browserStats, serverStats],
       true,
       unchangedCount === 0,
       !!estimatedTransferSizes,
       budgetFailures,
     );
 
-    logger.info('\n' + tableText + '\n');
+    logger.info(tableText + '\n');
   } else if (changedFiles !== undefined) {
     logger.info('\nNo output file changes.\n');
   }

@@ -3,13 +3,13 @@ import { ng } from '../../utils/process';
 
 export default async function () {
   const { stderr: stderrProgress, stdout } = await ng('build', '--progress');
-  if (!stdout.includes('Initial Total')) {
-    throw new Error(`Expected stdout to contain 'Initial Total' but it did not.\n${stdout}`);
+  if (!stdout.includes('Initial total')) {
+    throw new Error(`Expected stdout to contain 'Initial total' but it did not.\n${stdout}`);
   }
 
-  if (!stdout.includes('Estimated Transfer Size')) {
+  if (!stdout.includes('Estimated transfer size')) {
     throw new Error(
-      `Expected stdout to contain 'Estimated Transfer Size' but it did not.\n${stdout}`,
+      `Expected stdout to contain 'Estimated transfer size' but it did not.\n${stdout}`,
     );
   }
 
