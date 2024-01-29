@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { NodePath, PluginObj, types } from '@babel/core';
+import type { PluginObj } from '@babel/core';
 import annotateAsPure from '@babel/helper-annotate-as-pure';
 import * as tslib from 'tslib';
 
@@ -40,28 +40,28 @@ function isTslibHelperName(name: string): boolean {
 export default function (): PluginObj {
   return {
     visitor: {
-      CallExpression(path: NodePath<types.CallExpression>) {
+      CallExpression(path) {
         // If the expression has a function parent, it is not top-level
         if (path.getFunctionParent()) {
           return;
         }
 
-        const callee = path.node.callee;
+        const callee = path.get('callee');
         if (
-          (types.isFunctionExpression(callee) || types.isArrowFunctionExpression(callee)) &&
+          (callee.isFunctionExpression() || callee.isArrowFunctionExpression()) &&
           path.node.arguments.length !== 0
         ) {
           return;
         }
         // Do not annotate TypeScript helpers emitted by the TypeScript compiler.
         // TypeScript helpers are intended to cause side effects.
-        if (types.isIdentifier(callee) && isTslibHelperName(callee.name)) {
+        if (callee.isIdentifier() && isTslibHelperName(callee.node.name)) {
           return;
         }
 
         annotateAsPure(path);
       },
-      NewExpression(path: NodePath<types.NewExpression>) {
+      NewExpression(path) {
         // If the expression has a function parent, it is not top-level
         if (!path.getFunctionParent()) {
           annotateAsPure(path);
