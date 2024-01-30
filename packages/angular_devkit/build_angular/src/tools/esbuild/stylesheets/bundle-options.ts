@@ -9,6 +9,7 @@
 import type { BuildOptions, Plugin } from 'esbuild';
 import path from 'node:path';
 import { NormalizedCachedOptions } from '../../../utils/normalize-cache';
+import { PostcssConfiguration } from '../../../utils/postcss-configuration';
 import { LoadResultCache } from '../load-result-cache';
 import { createCssInlineFontsPlugin } from './css-inline-fonts-plugin';
 import { CssStylesheetLanguage } from './css-language';
@@ -28,6 +29,7 @@ export interface BundleStylesheetOptions {
   externalDependencies?: string[];
   target: string[];
   tailwindConfiguration?: { file: string; package: string };
+  postcssConfiguration?: PostcssConfiguration;
   publicPath?: string;
   cacheOptions: NormalizedCachedOptions;
 }
@@ -48,6 +50,7 @@ export function createStylesheetBundleOptions(
       includePaths,
       inlineComponentData,
       tailwindConfiguration: options.tailwindConfiguration,
+      postcssConfiguration: options.postcssConfiguration,
     },
     cache,
   );
