@@ -27,6 +27,7 @@ export function createGlobalStylesBundleOptions(
     externalDependencies,
     stylePreprocessorOptions,
     tailwindConfiguration,
+    postcssConfiguration,
     cacheOptions,
     publicPath,
   } = options;
@@ -64,6 +65,7 @@ export function createGlobalStylesBundleOptions(
             },
         includePaths: stylePreprocessorOptions?.includePaths,
         tailwindConfiguration,
+        postcssConfiguration,
         cacheOptions,
         publicPath,
       },

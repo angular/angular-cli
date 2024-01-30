@@ -35,6 +35,7 @@ export function createCompilerPluginOptions(
     jit,
     cacheOptions,
     tailwindConfiguration,
+    postcssConfiguration,
     publicPath,
   } = options;
 
@@ -68,6 +69,7 @@ export function createCompilerPluginOptions(
       inlineStyleLanguage,
       preserveSymlinks,
       tailwindConfiguration,
+      postcssConfiguration,
       cacheOptions,
       publicPath,
     },
