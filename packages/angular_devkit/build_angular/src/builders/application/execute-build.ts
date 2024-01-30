@@ -37,6 +37,7 @@ export async function executeBuild(
     cacheOptions,
     prerenderOptions,
     ssrOptions,
+    verbose,
   } = options;
 
   // TODO: Consider integrating into watch mode. Would require full rebuild on target changes.
@@ -190,6 +191,7 @@ export async function executeBuild(
     changedFiles,
     estimatedTransferSizes,
     !!ssrOptions,
+    verbose,
   );
 
   // Write metafile if stats option is enabled

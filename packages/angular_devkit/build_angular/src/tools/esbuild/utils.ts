@@ -29,6 +29,7 @@ export function logBuildStats(
   changedFiles?: Set<string>,
   estimatedTransferSizes?: Map<string, number>,
   ssrOutputEnabled?: boolean,
+  verbose?: boolean,
 ): void {
   const browserStats: BundleStats[] = [];
   const serverStats: BundleStats[] = [];
@@ -86,6 +87,7 @@ export function logBuildStats(
       unchangedCount === 0,
       !!estimatedTransferSizes,
       budgetFailures,
+      verbose,
     );
 
     logger.info(tableText + '\n');
