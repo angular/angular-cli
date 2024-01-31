@@ -135,7 +135,7 @@
     "chokidar": "3.5.3",
     "copy-webpack-plugin": "12.0.2",
     "critters": "0.0.20",
-    "css-loader": "6.9.1",
+    "css-loader": "6.10.0",
     "debug": "^4.1.1",
     "esbuild": "0.20.0",
     "esbuild-wasm": "0.20.0",
