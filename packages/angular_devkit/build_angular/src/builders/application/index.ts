@@ -87,8 +87,15 @@ export async function* buildApplicationInternal(
       const result = await executeBuild(normalizedOptions, context, rebuildState);
 
       const buildTime = Number(process.hrtime.bigint() - startTime) / 10 ** 9;
-      const status = result.errors.length > 0 ? 'failed' : 'complete';
-      logger.info(`Application bundle generation ${status}. [${buildTime.toFixed(3)} seconds]`);
+      const hasError = result.errors.length > 0;
+
+      if (writeToFileSystem && !hasError) {
+        logger.info(`Output location: ${normalizedOptions.outputOptions.base}\n`);
+      }
+
+      logger.info(
+        `Application bundle generation ${hasError ? 'failed' : 'complete'}. [${buildTime.toFixed(3)} seconds]`,
+      );
 
       return result;
     },
