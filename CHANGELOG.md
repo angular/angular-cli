@@ -1,3 +1,19 @@
+<a name="17.1.2"></a>
+
+# 17.1.2 (2024-01-31)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                      |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------------- |
+| [6815f13e3](https://github.com/angular/angular-cli/commit/6815f13e3c87eff773aa914858293c75e4fae7d2) | fix  | add `required` modules as externals imports                      |
+| [a0e306098](https://github.com/angular/angular-cli/commit/a0e306098147cf5fb7b51264c18860767fdf6316) | fix  | correctly handle glob negation in proxy config when using vite   |
+| [235c8403a](https://github.com/angular/angular-cli/commit/235c8403a5bf8a2032da72a504e8cee441dd2d82) | fix  | handle regular expressions in proxy config when using Vite       |
+| [5332e5b2e](https://github.com/angular/angular-cli/commit/5332e5b2ea0c9757f717e386fb162392ef2327a4) | fix  | resolve absolute `output-path` when using esbuild based builders |
+| [3deb0d4a1](https://github.com/angular/angular-cli/commit/3deb0d4a102fb8d8fae7617b81f62706371e03f5) | fix  | return 404 for assets that are not found                         |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="17.2.0-next.0"></a>
 
 # 17.2.0-next.0 (2024-01-25)
