@@ -1,3 +1,41 @@
+<a name="17.2.0-next.1"></a>
+
+# 17.2.0-next.1 (2024-01-31)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                          |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------ |
+| [b3e206741](https://github.com/angular/angular-cli/commit/b3e206741c5b59b8563b7c60a1f66c49802549e7) | feat | add support to `bun` package manager |
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                          |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------ |
+| [03e1aa790](https://github.com/angular/angular-cli/commit/03e1aa7904acfe9d12eaf3717d1b136159893a76) | feat | add support to `bun` package manager |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                         |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------- |
+| [f4f535653](https://github.com/angular/angular-cli/commit/f4f535653a34c2a7c37c51c98680b6b1766c6d0d) | feat | add JSON build logs when using the application builder              |
+| [7c522aa87](https://github.com/angular/angular-cli/commit/7c522aa8742cd936bb0dfd30773d88f3ef92d488) | feat | support using custom postcss configuration with application builder |
+| [d6aea27db](https://github.com/angular/angular-cli/commit/d6aea27dbcad7b0d2aa563b4a3c58f0935dbd0bf) | fix  | add `required` modules as externals imports                         |
+| [476a68daa](https://github.com/angular/angular-cli/commit/476a68daa9746d29d3f74f68307d982d1d66f94c) | fix  | add output location in build stats                                  |
+| [dbd3984f2](https://github.com/angular/angular-cli/commit/dbd3984f2458ae413aef1d8d33c8ee092787e360) | fix  | correctly handle glob negation in proxy config when using vite      |
+| [41ea985f9](https://github.com/angular/angular-cli/commit/41ea985f9317b11cfa6627a2d3f6b34ff4dbc134) | fix  | display server bundles in build stats                               |
+| [822e7a482](https://github.com/angular/angular-cli/commit/822e7a482dc536a64fb08db699381c0fdf4ef4b0) | fix  | handle regular expressions in proxy config when using Vite          |
+| [944cbcdb1](https://github.com/angular/angular-cli/commit/944cbcdb1af62855febc931fce92debf28a3b2a5) | fix  | limit the number of lazy chunks visible in the stats table          |
+| [37ffa5e4a](https://github.com/angular/angular-cli/commit/37ffa5e4a01f5603dbbc5ad3882593bdb5bb17db) | fix  | resolve absolute `output-path` when using esbuild based builders    |
+
+### @angular/create
+
+| Commit                                                                                              | Type | Description                          |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------ |
+| [600498f2c](https://github.com/angular/angular-cli/commit/600498f2cd3e3251e7e6e3dd3505c5e943b2986a) | feat | add support to `bun` package manager |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="17.1.2"></a>
 
 # 17.1.2 (2024-01-31)
