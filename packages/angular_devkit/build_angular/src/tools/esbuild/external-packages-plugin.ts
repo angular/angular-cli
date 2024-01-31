@@ -18,25 +18,31 @@ const EXTERNAL_PACKAGE_RESOLUTION = Symbol('EXTERNAL_PACKAGE_RESOLUTION');
  *
  * @returns An esbuild plugin.
  */
-export function createExternalPackagesPlugin(): Plugin {
+export function createExternalPackagesPlugin(options?: { exclude?: string[] }): Plugin {
+  const exclusions = options?.exclude?.length ? new Set(options.exclude) : undefined;
+
   return {
     name: 'angular-external-packages',
     setup(build) {
-      // Safe to use native packages external option if no loader options present
-      if (
-        build.initialOptions.loader === undefined ||
-        Object.keys(build.initialOptions.loader).length === 0
-      ) {
+      const loaderOptionKeys =
+        build.initialOptions.loader && Object.keys(build.initialOptions.loader);
+
+      // Safe to use native packages external option if no loader options or exclusions present
+      if (!exclusions && !loaderOptionKeys?.length) {
         build.initialOptions.packages = 'external';
 
         return;
       }
 
-      const loaderFileExtensions = new Set(Object.keys(build.initialOptions.loader));
+      const loaderFileExtensions = new Set(loaderOptionKeys);
 
       // Only attempt resolve of non-relative and non-absolute paths
       build.onResolve({ filter: /^[^./]/ }, async (args) => {
         if (args.pluginData?.[EXTERNAL_PACKAGE_RESOLUTION]) {
+          return null;
+        }
+
+        if (exclusions?.has(args.path)) {
           return null;
         }
 

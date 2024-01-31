@@ -66,9 +66,17 @@ export function createBrowserCodeBundleOptions(
 
   if (options.externalPackages) {
     // Package files affected by a customized loader should not be implicitly marked as external
-    if (options.loaderExtensions || options.plugins) {
+    if (
+      options.loaderExtensions ||
+      options.plugins ||
+      typeof options.externalPackages === 'object'
+    ) {
       // Plugin must be added after custom plugins to ensure any added loader options are considered
-      buildOptions.plugins?.push(createExternalPackagesPlugin());
+      buildOptions.plugins?.push(
+        createExternalPackagesPlugin(
+          options.externalPackages !== true ? options.externalPackages : undefined,
+        ),
+      );
     } else {
       // Safe to use the packages external option directly
       buildOptions.packages = 'external';
