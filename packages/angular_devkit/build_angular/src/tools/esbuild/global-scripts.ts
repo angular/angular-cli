@@ -34,6 +34,7 @@ export function createGlobalScriptsBundleOptions(
     outputNames,
     preserveSymlinks,
     sourcemapOptions,
+    jsonLogs,
     workspaceRoot,
   } = options;
 
@@ -63,7 +64,7 @@ export function createGlobalScriptsBundleOptions(
       mainFields: ['script', 'browser', 'main'],
       conditions: ['script'],
       resolveExtensions: ['.mjs', '.js'],
-      logLevel: options.verbose ? 'debug' : 'silent',
+      logLevel: options.verbose && !jsonLogs ? 'debug' : 'silent',
       metafile: true,
       minify: optimizationOptions.scripts,
       outdir: workspaceRoot,
@@ -81,8 +82,9 @@ export function createGlobalScriptsBundleOptions(
           transformPath: (path) => path.slice(namespace.length + 1) + '.js',
           loadContent: (args, build) =>
             createCachedLoad(loadCache, async (args) => {
-              const files = globalScripts.find(({ name }) => name === args.path.slice(0, -3))
-                ?.files;
+              const files = globalScripts.find(
+                ({ name }) => name === args.path.slice(0, -3),
+              )?.files;
               assert(files, `Invalid operation: global scripts name not found [${args.path}]`);
 
               // Global scripts are concatenated using magic-string instead of bundled via esbuild.

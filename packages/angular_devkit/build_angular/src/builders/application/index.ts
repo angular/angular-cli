@@ -9,6 +9,8 @@
 import { BuilderContext, BuilderOutput, createBuilder } from '@angular-devkit/architect';
 import type { Plugin } from 'esbuild';
 import { BuildOutputFile, BuildOutputFileType } from '../../tools/esbuild/bundler-context';
+import { logMessages } from '../../tools/esbuild/utils';
+import { colors as ansiColors } from '../../utils/color';
 import { purgeStaleBuildCache } from '../../utils/purge-cache';
 import { assertCompatibleAngularVersion } from '../../utils/version';
 import { runEsBuildBuildAction } from './build-action';
@@ -83,19 +85,33 @@ export async function* buildApplicationInternal(
 
   yield* runEsBuildBuildAction(
     async (rebuildState) => {
+      const { prerenderOptions, outputOptions, jsonLogs } = normalizedOptions;
+
       const startTime = process.hrtime.bigint();
       const result = await executeBuild(normalizedOptions, context, rebuildState);
 
-      const buildTime = Number(process.hrtime.bigint() - startTime) / 10 ** 9;
-      const hasError = result.errors.length > 0;
+      if (!jsonLogs) {
+        if (prerenderOptions) {
+          const prerenderedRoutesLength = result.prerenderedRoutes.length;
+          let prerenderMsg = `Prerendered ${prerenderedRoutesLength} static route`;
+          prerenderMsg += prerenderedRoutesLength !== 1 ? 's.' : '.';
 
-      if (writeToFileSystem && !hasError) {
-        logger.info(`Output location: ${normalizedOptions.outputOptions.base}\n`);
+          logger.info(ansiColors.magenta(prerenderMsg));
+        }
+
+        const buildTime = Number(process.hrtime.bigint() - startTime) / 10 ** 9;
+        const hasError = result.errors.length > 0;
+        if (writeToFileSystem && !hasError) {
+          logger.info(`Output location: ${outputOptions.base}\n`);
+        }
+
+        logger.info(
+          `Application bundle generation ${hasError ? 'failed' : 'complete'}. [${buildTime.toFixed(3)} seconds]`,
+        );
       }
 
-      logger.info(
-        `Application bundle generation ${hasError ? 'failed' : 'complete'}. [${buildTime.toFixed(3)} seconds]`,
-      );
+      // Log all diagnostic (error/warning) messages
+      await logMessages(logger, result, normalizedOptions);
 
       return result;
     },

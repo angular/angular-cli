@@ -7,30 +7,34 @@
  */
 
 import { logging } from '@angular-devkit/core';
-import { BuildOptions, Metafile, OutputFile, PartialMessage, formatMessages } from 'esbuild';
+import { BuildOptions, Metafile, OutputFile, formatMessages } from 'esbuild';
 import { createHash } from 'node:crypto';
 import { constants as fsConstants } from 'node:fs';
 import fs from 'node:fs/promises';
-import path from 'node:path';
+import { basename, dirname, join } from 'node:path';
+import { pathToFileURL } from 'node:url';
 import { brotliCompress } from 'node:zlib';
 import { coerce } from 'semver';
-import { NormalizedOutputOptions } from '../../builders/application/options';
+import {
+  NormalizedApplicationBuildOptions,
+  NormalizedOutputOptions,
+} from '../../builders/application/options';
 import { BudgetCalculatorResult } from '../../utils/bundle-calculator';
 import { Spinner } from '../../utils/spinner';
 import { BundleStats, generateEsbuildBuildStatsTable } from '../webpack/utils/stats';
 import { BuildOutputFile, BuildOutputFileType, InitialFileRecord } from './bundler-context';
-import { BuildOutputAsset } from './bundler-execution-result';
+import { BuildOutputAsset, ExecutionResult } from './bundler-execution-result';
 
 export function logBuildStats(
-  logger: logging.LoggerApi,
   metafile: Metafile,
   initial: Map<string, InitialFileRecord>,
   budgetFailures: BudgetCalculatorResult[] | undefined,
+  colors: boolean,
   changedFiles?: Set<string>,
   estimatedTransferSizes?: Map<string, number>,
   ssrOutputEnabled?: boolean,
   verbose?: boolean,
-): void {
+): string {
   const browserStats: BundleStats[] = [];
   const serverStats: BundleStats[] = [];
   let unchangedCount = 0;
@@ -62,8 +66,7 @@ export function logBuildStats(
 
     let name = initial.get(file)?.name;
     if (name === undefined && output.entryPoint) {
-      name = path
-        .basename(output.entryPoint)
+      name = basename(output.entryPoint)
         .replace(/\.[cm]?[jt]s$/, '')
         .replace(/[\\/.]/g, '-');
     }
@@ -83,20 +86,22 @@ export function logBuildStats(
   if (browserStats.length > 0 || serverStats.length > 0) {
     const tableText = generateEsbuildBuildStatsTable(
       [browserStats, serverStats],
-      true,
+      colors,
       unchangedCount === 0,
       !!estimatedTransferSizes,
       budgetFailures,
       verbose,
     );
 
-    logger.info(tableText + '\n');
+    return tableText + '\n';
   } else if (changedFiles !== undefined) {
-    logger.info('\nNo output file changes.\n');
+    return '\nNo output file changes.\n';
   }
   if (unchangedCount > 0) {
-    logger.info(`Unchanged output files: ${unchangedCount}`);
+    return `Unchanged output files: ${unchangedCount}`;
   }
+
+  return '';
 }
 
 export async function calculateEstimatedTransferSizes(
@@ -161,21 +166,6 @@ export async function withNoProgress<T>(text: string, action: () => T | Promise<
   return action();
 }
 
-export async function logMessages(
-  logger: logging.LoggerApi,
-  { errors, warnings }: { errors?: PartialMessage[]; warnings?: PartialMessage[] },
-): Promise<void> {
-  if (warnings?.length) {
-    const warningMessages = await formatMessages(warnings, { kind: 'warning', color: true });
-    logger.warn(warningMessages.join('\n'));
-  }
-
-  if (errors?.length) {
-    const errorMessages = await formatMessages(errors, { kind: 'error', color: true });
-    logger.error(errorMessages.join('\n'));
-  }
-}
-
 /**
  * Generates a syntax feature object map for Angular applications based on a list of targets.
  * A full set of feature names can be found here: https://esbuild.github.io/api/#supported
@@ -231,9 +221,9 @@ export async function writeResultFiles(
 ) {
   const directoryExists = new Set<string>();
   const ensureDirectoryExists = async (destPath: string) => {
-    const basePath = path.dirname(destPath);
+    const basePath = dirname(destPath);
     if (!directoryExists.has(basePath)) {
-      await fs.mkdir(path.join(base, basePath), { recursive: true });
+      await fs.mkdir(join(base, basePath), { recursive: true });
       directoryExists.add(basePath);
     }
   };
@@ -258,24 +248,24 @@ export async function writeResultFiles(
         );
     }
 
-    const destPath = path.join(outputDir, file.path);
+    const destPath = join(outputDir, file.path);
 
     // Ensure output subdirectories exist
     await ensureDirectoryExists(destPath);
 
     // Write file contents
-    await fs.writeFile(path.join(base, destPath), file.contents);
+    await fs.writeFile(join(base, destPath), file.contents);
   });
 
   if (assetFiles?.length) {
     await emitFilesToDisk(assetFiles, async ({ source, destination }) => {
-      const destPath = path.join(browser, destination);
+      const destPath = join(browser, destination);
 
       // Ensure output subdirectories exist
       await ensureDirectoryExists(destPath);
 
       // Copy file contents
-      await fs.copyFile(source, path.join(base, destPath), fsConstants.COPYFILE_FICLONE);
+      await fs.copyFile(source, join(base, destPath), fsConstants.COPYFILE_FICLONE);
     });
   }
 }
@@ -426,4 +416,59 @@ export function getSupportedNodeTargets(): string[] {
   }
 
   return SUPPORTED_NODE_VERSIONS.split('||').map((v) => 'node' + coerce(v)?.version);
+}
+
+interface BuildManifest {
+  errors: string[];
+  warnings: string[];
+  outputPaths: {
+    root: URL;
+    server?: URL | undefined;
+    browser: URL;
+  };
+  prerenderedRoutes?: string[];
+}
+
+export async function logMessages(
+  logger: logging.LoggerApi,
+  executionResult: ExecutionResult,
+  options: NormalizedApplicationBuildOptions,
+): Promise<void> {
+  const {
+    outputOptions: { base, server, browser },
+    ssrOptions,
+    jsonLogs,
+    colors: color,
+  } = options;
+  const { warnings, errors, prerenderedRoutes } = executionResult;
+  const warningMessages = warnings.length
+    ? await formatMessages(warnings, { kind: 'warning', color })
+    : [];
+  const errorMessages = errors.length ? await formatMessages(errors, { kind: 'error', color }) : [];
+
+  if (jsonLogs) {
+    // JSON format output
+    const manifest: BuildManifest = {
+      errors: errorMessages,
+      warnings: warningMessages,
+      outputPaths: {
+        root: pathToFileURL(base),
+        browser: pathToFileURL(join(base, browser)),
+        server: ssrOptions ? pathToFileURL(join(base, server)) : undefined,
+      },
+      prerenderedRoutes,
+    };
+
+    logger.info(JSON.stringify(manifest, undefined, 2));
+
+    return;
+  }
+
+  if (warningMessages.length) {
+    logger.warn(warningMessages.join('\n'));
+  }
+
+  if (errorMessages.length) {
+    logger.error(errorMessages.join('\n'));
+  }
 }

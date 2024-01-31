@@ -15,7 +15,6 @@ import { checkCommonJSModules } from '../../tools/esbuild/commonjs-checker';
 import { extractLicenses } from '../../tools/esbuild/license-extractor';
 import { calculateEstimatedTransferSizes, logBuildStats } from '../../tools/esbuild/utils';
 import { BudgetCalculatorResult, checkBudgets } from '../../utils/bundle-calculator';
-import { colors } from '../../utils/color';
 import { copyAssets } from '../../utils/copy-assets';
 import { getSupportedBrowsers } from '../../utils/supported-browsers';
 import { executePostBundleSteps } from './execute-post-bundle';
@@ -38,6 +37,8 @@ export async function executeBuild(
     prerenderOptions,
     ssrOptions,
     verbose,
+    colors,
+    jsonLogs,
   } = options;
 
   // TODO: Consider integrating into watch mode. Would require full rebuild on target changes.
@@ -143,12 +144,11 @@ export async function executeBuild(
   }
 
   // Perform i18n translation inlining if enabled
-  let prerenderedRoutes: string[];
   if (i18nOptions.shouldInline) {
     const result = await inlineI18n(options, executionResult, initialFiles);
     executionResult.addErrors(result.errors);
     executionResult.addWarnings(result.warnings);
-    prerenderedRoutes = result.prerenderedRoutes;
+    executionResult.addPrerenderedRoutes(result.prerenderedRoutes);
   } else {
     const result = await executePostBundleSteps(
       options,
@@ -161,38 +161,19 @@ export async function executeBuild(
 
     executionResult.addErrors(result.errors);
     executionResult.addWarnings(result.warnings);
-    prerenderedRoutes = result.prerenderedRoutes;
+    executionResult.addPrerenderedRoutes(result.prerenderedRoutes);
     executionResult.outputFiles.push(...result.additionalOutputFiles);
     executionResult.assetFiles.push(...result.additionalAssets);
   }
 
   if (prerenderOptions) {
+    const prerenderedRoutes = executionResult.prerenderedRoutes;
     executionResult.addOutputFile(
       'prerendered-routes.json',
-      JSON.stringify({ routes: prerenderedRoutes.sort((a, b) => a.localeCompare(b)) }, null, 2),
+      JSON.stringify({ routes: prerenderedRoutes }, null, 2),
       BuildOutputFileType.Root,
     );
-
-    let prerenderMsg = `Prerendered ${prerenderedRoutes.length} static route`;
-    if (prerenderedRoutes.length > 1) {
-      prerenderMsg += 's.';
-    } else {
-      prerenderMsg += '.';
-    }
-
-    context.logger.info(colors.magenta(prerenderMsg) + '\n');
   }
-
-  logBuildStats(
-    context.logger,
-    metafile,
-    initialFiles,
-    budgetFailures,
-    changedFiles,
-    estimatedTransferSizes,
-    !!ssrOptions,
-    verbose,
-  );
 
   // Write metafile if stats option is enabled
   if (options.stats) {
@@ -200,6 +181,21 @@ export async function executeBuild(
       'stats.json',
       JSON.stringify(metafile, null, 2),
       BuildOutputFileType.Root,
+    );
+  }
+
+  if (!jsonLogs) {
+    context.logger.info(
+      logBuildStats(
+        metafile,
+        initialFiles,
+        budgetFailures,
+        colors,
+        changedFiles,
+        estimatedTransferSizes,
+        !!ssrOptions,
+        verbose,
+      ),
     );
   }
 

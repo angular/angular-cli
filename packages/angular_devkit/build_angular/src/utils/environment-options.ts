@@ -106,3 +106,7 @@ export const shouldWatchRoot = isPresent(watchRootVariable) && isEnabled(watchRo
 const typeCheckingVariable = process.env['NG_BUILD_TYPE_CHECK'];
 export const useTypeChecking =
   !isPresent(typeCheckingVariable) || !isDisabled(typeCheckingVariable);
+
+const buildLogsJsonVariable = process.env['NG_BUILD_LOGS_JSON'];
+export const useJSONBuildLogs =
+  isPresent(buildLogsJsonVariable) && isEnabled(buildLogsJsonVariable);

@@ -38,6 +38,7 @@ export class ExecutionResult {
   outputFiles: BuildOutputFile[] = [];
   assetFiles: BuildOutputAsset[] = [];
   errors: (Message | PartialMessage)[] = [];
+  prerenderedRoutes: string[] = [];
   warnings: (Message | PartialMessage)[] = [];
   externalMetadata?: ExternalResultMetadata;
 
@@ -66,6 +67,12 @@ export class ExecutionResult {
     for (const error of errors) {
       this.addError(error);
     }
+  }
+
+  addPrerenderedRoutes(routes: string[]): void {
+    this.prerenderedRoutes.push(...routes);
+    // Sort the prerendered routes.
+    this.prerenderedRoutes.sort((a, b) => a.localeCompare(b));
   }
 
   addWarning(error: PartialMessage | string): void {

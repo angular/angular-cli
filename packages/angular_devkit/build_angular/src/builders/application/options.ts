@@ -17,6 +17,8 @@ import {
   normalizeGlobalStyles,
 } from '../../tools/webpack/utils/helpers';
 import { normalizeAssetPatterns, normalizeOptimization, normalizeSourceMaps } from '../../utils';
+import { colors } from '../../utils/color';
+import { useJSONBuildLogs } from '../../utils/environment-options';
 import { I18nOptions, createI18nOptions } from '../../utils/i18n-options';
 import { IndexHtmlTransform } from '../../utils/index-file/index-html-generator';
 import { normalizeCacheOptions } from '../../utils/normalize-cache';
@@ -336,6 +338,8 @@ export async function normalizeOptions(
     publicPath: deployUrl ? deployUrl : undefined,
     plugins: extensions?.codePlugins?.length ? extensions?.codePlugins : undefined,
     loaderExtensions,
+    jsonLogs: useJSONBuildLogs,
+    colors: colors.enabled,
   };
 }
 
