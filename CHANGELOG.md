@@ -1,3 +1,19 @@
+<a name="17.1.2"></a>
+
+# 17.1.2 (2024-01-31)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                      |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------------- |
+| [6815f13e3](https://github.com/angular/angular-cli/commit/6815f13e3c87eff773aa914858293c75e4fae7d2) | fix  | add `required` modules as externals imports                      |
+| [a0e306098](https://github.com/angular/angular-cli/commit/a0e306098147cf5fb7b51264c18860767fdf6316) | fix  | correctly handle glob negation in proxy config when using vite   |
+| [235c8403a](https://github.com/angular/angular-cli/commit/235c8403a5bf8a2032da72a504e8cee441dd2d82) | fix  | handle regular expressions in proxy config when using Vite       |
+| [5332e5b2e](https://github.com/angular/angular-cli/commit/5332e5b2ea0c9757f717e386fb162392ef2327a4) | fix  | resolve absolute `output-path` when using esbuild based builders |
+| [3deb0d4a1](https://github.com/angular/angular-cli/commit/3deb0d4a102fb8d8fae7617b81f62706371e03f5) | fix  | return 404 for assets that are not found                         |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="17.1.1"></a>
 
 # 17.1.1 (2024-01-24)
@@ -21,15 +37,15 @@
 | [88de1da92](https://github.com/angular/angular-cli/commit/88de1da92919834f620a31d8a3e6a4e2ad1e2f07) | fix  | `ENOENT: no such file or directory` on Windows during component rebuild       |
 | [4e2586aeb](https://github.com/angular/angular-cli/commit/4e2586aeb8ec11cf951f30bbfca6422f13cfd5cc) | fix  | allow package file loader option with Vite prebundling                        |
 | [aca1cfcda](https://github.com/angular/angular-cli/commit/aca1cfcda520d9a68bc01833453c81f38c133d37) | fix  | do not add internal CSS resources files in watch                              |
-| [53258f617](https://github.com/angular/angular-cli/commit/53258f617cf6c9068e069122029ff91c62d2109e) | fix  | handle load event for multiple stylesheets and CSP nonces              |
+| [53258f617](https://github.com/angular/angular-cli/commit/53258f617cf6c9068e069122029ff91c62d2109e) | fix  | handle load event for multiple stylesheets and CSP nonces                     |
 | [412fe6ec6](https://github.com/angular/angular-cli/commit/412fe6ec69bfcbb1e9fb09ccbb10a086b5166689) | fix  | pre-transform error when using vite with SSR                                  |
 | [45dea6f44](https://github.com/angular/angular-cli/commit/45dea6f44cb27431e4767ce16df3e84c5b6d8f9c) | fix  | provide actionable error message when server bundle is missing default export |
 | [4e2b23f03](https://github.com/angular/angular-cli/commit/4e2b23f0321f3ec6edfd3e20e9bf95d799de5e7f) | fix  | update dependency vite to v5.0.12                                             |
 
 ### @angular/ssr
 
-| Commit                                                                                              | Type | Description                                                      |
-| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------------- |
+| Commit                                                                                              | Type | Description                                               |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------- |
 | [02d9d84c5](https://github.com/angular/angular-cli/commit/02d9d84c5da3def7e6b307b115e77233cfcf8d4b) | fix  | handle load event for multiple stylesheets and CSP nonces |
 
 <!-- CHANGELOG SPLIT MARKER -->
