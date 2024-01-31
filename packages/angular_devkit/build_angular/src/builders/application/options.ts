@@ -58,7 +58,7 @@ interface InternalOptions {
    * Indicates whether all node packages should be marked as external.
    * Currently used by the dev-server to support prebundling.
    */
-  externalPackages?: boolean;
+  externalPackages?: boolean | { exclude: string[] };
 
   /**
    * Forces the output from the localize post-processing to not create nested directories per locale output.
