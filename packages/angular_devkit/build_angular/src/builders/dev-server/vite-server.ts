@@ -76,8 +76,7 @@ export async function* serveWithVite(
     browserOptions.ssr = true;
 
     // https://nodejs.org/api/process.html#processsetsourcemapsenabledval
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (process as any).setSourceMapsEnabled(true);
+    process.setSourceMapsEnabled(true);
   }
 
   // Set all packages as external to support Vite's prebundle caching
