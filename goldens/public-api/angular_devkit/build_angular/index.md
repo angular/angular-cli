@@ -182,6 +182,7 @@ export interface DevServerBuilderOptions {
     open?: boolean;
     poll?: number;
     port?: number;
+    prebundle?: PrebundleUnion;
     proxyConfig?: string;
     publicHost?: string;
     servePath?: string;
