@@ -87,7 +87,7 @@ export async function* serveWithVite(
   if (serverOptions.servePath === undefined && baseHref !== undefined) {
     // Remove trailing slash
     serverOptions.servePath =
-      baseHref[baseHref.length - 1] === '/' ? baseHref.slice(0, -1) : baseHref;
+      baseHref !== './' && baseHref[baseHref.length - 1] === '/' ? baseHref.slice(0, -1) : baseHref;
   }
 
   // The development server currently only supports a single locale when localizing.
