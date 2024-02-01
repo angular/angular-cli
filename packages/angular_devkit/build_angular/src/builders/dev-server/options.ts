@@ -58,6 +58,7 @@ export async function normalizeOptions(
     sslCert,
     sslKey,
     forceEsbuild,
+    prebundle,
   } = options;
 
   // Return all the normalized options
@@ -84,5 +85,7 @@ export async function normalizeOptions(
     sslCert,
     sslKey,
     forceEsbuild,
+    // Prebundling defaults to true but requires caching to function
+    prebundle: cacheOptions.enabled && (prebundle ?? true),
   };
 }

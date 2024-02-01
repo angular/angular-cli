@@ -69,10 +69,24 @@ export function execute(
           );
         }
 
+        // Warn if the initial options provided by the user enable prebundling but caching is disabled
+        if (options.prebundle && !normalizedOptions.cacheOptions.enabled) {
+          context.logger.warn(
+            `Prebundling has been configured but will not be used because caching has been disabled.`,
+          );
+        }
+
         return defer(() => import('./vite-server')).pipe(
           switchMap(({ serveWithVite }) =>
             serveWithVite(normalizedOptions, builderName, context, transforms, extensions),
           ),
+        );
+      }
+
+      // Warn if the initial options provided by the user enable prebundling with Webpack-based builders
+      if (options.prebundle) {
+        context.logger.warn(
+          `Prebundling has been configured but will not be used because it is not supported by the "${builderName}" builder.`,
         );
       }
 
@@ -105,7 +119,13 @@ async function initialize(
   await purgeStaleBuildCache(context);
 
   const normalizedOptions = await normalizeOptions(context, projectName, initialOptions);
-  const builderName = await context.getBuilderNameForTarget(normalizedOptions.buildTarget);
+  const builderName = builderSelector(
+    {
+      builderName: await context.getBuilderNameForTarget(normalizedOptions.buildTarget),
+      forceEsbuild: !!normalizedOptions.forceEsbuild,
+    },
+    context.logger,
+  );
 
   if (
     !normalizedOptions.disableHostCheck &&
@@ -133,10 +153,7 @@ case.
   normalizedOptions.port = await checkPort(normalizedOptions.port, normalizedOptions.host);
 
   return {
-    builderName: builderSelector(
-      { builderName, forceEsbuild: !!normalizedOptions.forceEsbuild },
-      context.logger,
-    ),
+    builderName,
     normalizedOptions,
   };
 }
