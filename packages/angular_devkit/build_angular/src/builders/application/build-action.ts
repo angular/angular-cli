@@ -19,6 +19,20 @@ import { shouldWatchRoot } from '../../utils/environment-options';
 import { NormalizedCachedOptions } from '../../utils/normalize-cache';
 import { NormalizedOutputOptions } from './options';
 
+// Watch workspace for package manager changes
+const packageWatchFiles = [
+  // manifest can affect module resolution
+  'package.json',
+  // npm lock file
+  'package-lock.json',
+  // pnpm lock file
+  'pnpm-lock.yaml',
+  // yarn lock file including Yarn PnP manifest files (https://yarnpkg.com/advanced/pnp-spec/)
+  'yarn.lock',
+  '.pnp.cjs',
+  '.pnp.data.json',
+];
+
 export async function* runEsBuildBuildAction(
   action: (rebuildState?: RebuildState) => ExecutionResult | Promise<ExecutionResult>,
   options: {
@@ -36,6 +50,7 @@ export async function* runEsBuildBuildAction(
     poll?: number;
     signal?: AbortSignal;
     preserveSymlinks?: boolean;
+    clearScreen?: boolean;
   },
 ): AsyncIterable<(ExecutionResult['outputWithFiles'] | ExecutionResult['output']) & BuilderOutput> {
   const {
@@ -43,6 +58,7 @@ export async function* runEsBuildBuildAction(
     writeToFileSystem,
     watch,
     poll,
+    clearScreen,
     logger,
     deleteOutputPath,
     cacheOptions,
@@ -113,20 +129,6 @@ export async function* runEsBuildBuildAction(
       watcher.add(projectRoot);
     }
 
-    // Watch workspace for package manager changes
-    const packageWatchFiles = [
-      // manifest can affect module resolution
-      'package.json',
-      // npm lock file
-      'package-lock.json',
-      // pnpm lock file
-      'pnpm-lock.yaml',
-      // yarn lock file including Yarn PnP manifest files (https://yarnpkg.com/advanced/pnp-spec/)
-      'yarn.lock',
-      '.pnp.cjs',
-      '.pnp.data.json',
-    ];
-
     watcher.add(
       packageWatchFiles
         .map((file) => path.join(workspaceRoot, file))
@@ -162,6 +164,11 @@ export async function* runEsBuildBuildAction(
     for await (const changes of watcher) {
       if (options.signal?.aborted) {
         break;
+      }
+
+      if (clearScreen) {
+        // eslint-disable-next-line no-console
+        console.clear();
       }
 
       if (verbose) {

@@ -126,6 +126,7 @@ export async function* buildApplicationInternal(
       projectRoot: normalizedOptions.projectRoot,
       workspaceRoot: normalizedOptions.workspaceRoot,
       progress: normalizedOptions.progress,
+      clearScreen: normalizedOptions.clearScreen,
       writeToFileSystem,
       // For app-shell and SSG server files are not required by users.
       // Omit these when SSR is not enabled.
