@@ -13,10 +13,10 @@ export default async function () {
   await execWithEnv(webpackCLIBin, [], { ...process.env, 'DISABLE_V8_COMPILE_CACHE': '1' });
 
   // Note: these sizes are without Build Optimizer or any advanced optimizations in the CLI.
-  await expectFileSizeToBeUnder('dist/app.main.js', 656 * 1024);
-  await expectFileSizeToBeUnder('dist/501.app.main.js', 1 * 1024);
-  await expectFileSizeToBeUnder('dist/888.app.main.js', 2 * 1024);
-  await expectFileSizeToBeUnder('dist/972.app.main.js', 2 * 1024);
+  await expectFileSizeToBeUnder('dist/app.main.js', 650 * 1024);
+  await expectFileSizeToBeUnder('dist/604.app.main.js', 1024);
+  await expectFileSizeToBeUnder('dist/988.app.main.js', 1024);
+  await expectFileSizeToBeUnder('dist/896.app.main.js', 1024);
 
   // test resource urls without ./
   await replaceInFile('app/app.component.ts', './app.component.html', 'app.component.html');
