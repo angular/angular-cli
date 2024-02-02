@@ -58,10 +58,15 @@ export function runWebpackDevServer(
     return new WebpackDevServer(config, webpack);
   };
 
-  const log: WebpackLoggingCallback =
-    options.logging || ((stats, config) => context.logger.info(stats.toString(config.stats)));
-
-  const shouldProvideStats = options.shouldProvideStats ?? true;
+  const {
+    logging: log = (stats, config) => {
+      if (config.stats !== false) {
+        const statsOptions = config.stats === true ? undefined : config.stats;
+        context.logger.info(stats.toString(statsOptions));
+      }
+    },
+    shouldProvideStats = true,
+  } = options;
 
   return createWebpack({ ...config, watch: false }).pipe(
     switchMap(
