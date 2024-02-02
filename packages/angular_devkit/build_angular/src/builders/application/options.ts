@@ -294,6 +294,7 @@ export async function normalizeOptions(
     namedChunks,
     budgets,
     deployUrl,
+    clearScreen,
   } = options;
 
   // Return all the normalized options
@@ -348,6 +349,7 @@ export async function normalizeOptions(
     loaderExtensions,
     jsonLogs: useJSONBuildLogs,
     colors: colors.enabled,
+    clearScreen,
   };
 }
 

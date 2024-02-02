@@ -30,6 +30,7 @@ export interface ApplicationBuilderOptions {
     baseHref?: string;
     browser: string;
     budgets?: Budget_2[];
+    clearScreen?: boolean;
     crossOrigin?: CrossOrigin_2;
     deleteOutputPath?: boolean;
     externalDependencies?: string[];
