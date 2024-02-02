@@ -542,8 +542,9 @@ export function createWebpackLoggingCallback(
   ];
 
   return (stats, config) => {
-    if (verbose) {
-      logger.info(stats.toString(config.stats));
+    if (verbose && config.stats !== false) {
+      const statsOptions = config.stats === true ? undefined : config.stats;
+      logger.info(stats.toString(statsOptions));
     }
 
     const rawStats = stats.toJson(getStatsOptions(false));

@@ -38,9 +38,15 @@ export function runWebpack(
   } = {},
 ): Observable<BuildResult> {
   const {
-    logging: log = (stats, config) => context.logger.info(stats.toString(config.stats)),
+    logging: log = (stats, config) => {
+      if (config.stats !== false) {
+        const statsOptions = config.stats === true ? undefined : config.stats;
+        context.logger.info(stats.toString(statsOptions));
+      }
+    },
     shouldProvideStats = true,
   } = options;
+
   const createWebpack = (c: webpack.Configuration) => {
     if (options.webpackFactory) {
       const result = options.webpackFactory(c);
