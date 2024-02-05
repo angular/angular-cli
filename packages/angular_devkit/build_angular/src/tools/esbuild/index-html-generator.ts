@@ -40,10 +40,11 @@ export async function generateIndexHtml(
 
   if (!externalPackages && indexHtmlOptions.preloadInitial) {
     for (const [key, value] of initialFiles) {
-      if (value.entrypoint) {
+      if (value.entrypoint || value.serverFile) {
         // Entry points are already referenced in the HTML
         continue;
       }
+
       if (value.type === 'script') {
         hints.push({ url: key, mode: 'modulepreload' as const });
       } else if (value.type === 'style') {
@@ -91,11 +92,13 @@ export async function generateIndexHtml(
     baseHref,
     lang,
     outputPath: virtualOutputPath,
-    files: [...initialFiles].map(([file, record]) => ({
-      name: record.name ?? '',
-      file,
-      extension: path.extname(file),
-    })),
+    files: [...initialFiles]
+      .filter(([, file]) => !file.serverFile)
+      .map(([file, record]) => ({
+        name: record.name ?? '',
+        file,
+        extension: path.extname(file),
+      })),
     hints,
   });
 

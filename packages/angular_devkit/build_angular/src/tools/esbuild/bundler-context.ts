@@ -42,6 +42,7 @@ export interface InitialFileRecord {
   name?: string;
   type: 'script' | 'style';
   external?: boolean;
+  serverFile: boolean;
 }
 
 export enum BuildOutputFileType {
@@ -75,7 +76,6 @@ export class BundlerContext {
   #esbuildResult?: BundleContextResult;
   #optionsFactory: BundlerOptionsFactory<BuildOptions & { metafile: true; write: false }>;
   #shouldCacheResult: boolean;
-
   #loadCache?: MemoryLoadResultCache;
   readonly watchFiles = new Set<string>();
 
@@ -222,7 +222,7 @@ export class BundlerContext {
         result = await build(this.#esbuildOptions);
       }
 
-      if (this.#esbuildOptions?.platform === 'node') {
+      if (this.#platformIsServer) {
         for (const entry of Object.values(result.metafile.outputs)) {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (entry as any)['ng-platform-server'] = true;
@@ -297,6 +297,7 @@ export class BundlerContext {
             name,
             type,
             entrypoint: true,
+            serverFile: this.#platformIsServer,
           };
 
           if (!this.initialFilter || this.initialFilter(record)) {
@@ -319,6 +320,7 @@ export class BundlerContext {
             type: initialImport.kind === 'import-rule' ? 'style' : 'script',
             entrypoint: false,
             external: initialImport.external,
+            serverFile: this.#platformIsServer,
           };
 
           if (!this.initialFilter || this.initialFilter(record)) {
@@ -350,15 +352,16 @@ export class BundlerContext {
 
     assert(this.#esbuildOptions, 'esbuild options cannot be undefined.');
 
-    const { platform, assetNames = '' } = this.#esbuildOptions;
-    const platformIsServer = platform === 'node';
+    const { assetNames = '' } = this.#esbuildOptions;
     const mediaDirname = dirname(assetNames);
     const outputFiles = result.outputFiles.map((file) => {
       let fileType: BuildOutputFileType;
       if (dirname(file.path) === mediaDirname) {
         fileType = BuildOutputFileType.Media;
       } else {
-        fileType = platformIsServer ? BuildOutputFileType.Server : BuildOutputFileType.Browser;
+        fileType = this.#platformIsServer
+          ? BuildOutputFileType.Server
+          : BuildOutputFileType.Browser;
       }
 
       return convertOutputFile(file, fileType);
@@ -370,7 +373,7 @@ export class BundlerContext {
       outputFiles,
       initialFiles,
       externalImports: {
-        [platformIsServer ? 'server' : 'browser']: externalImports,
+        [this.#platformIsServer ? 'server' : 'browser']: externalImports,
       },
       externalConfiguration: this.#esbuildOptions.external,
       errors: undefined,
@@ -390,6 +393,10 @@ export class BundlerContext {
         }
       }
     }
+  }
+
+  get #platformIsServer(): boolean {
+    return this.#esbuildOptions?.platform === 'node';
   }
 
   /**
