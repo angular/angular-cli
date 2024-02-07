@@ -140,6 +140,23 @@ export function createAngularMemoryPlugin(options: AngularMemoryPluginOptions): 
           return;
         }
 
+        // HTML fallbacking
+        // This matches what happens in the vite html fallback middleware.
+        // ref: https://github.com/vitejs/vite/blob/main/packages/vite/src/node/server/middlewares/htmlFallback.ts#L9
+        const htmlAssetSourcePath =
+          pathname[pathname.length - 1] === '/'
+            ? // Trailing slash check for `index.html`.
+              assets.get(pathname + 'index.html')
+            : // Non-trailing slash check for fallback `.html`
+              assets.get(pathname + '.html');
+
+        if (htmlAssetSourcePath) {
+          req.url = `${server.config.base}@fs/${encodeURI(htmlAssetSourcePath)}`;
+          next();
+
+          return;
+        }
+
         // Resource files are handled directly.
         // Global stylesheets (CSS files) are currently considered resources to workaround
         // dev server sourcemap issues with stylesheets.

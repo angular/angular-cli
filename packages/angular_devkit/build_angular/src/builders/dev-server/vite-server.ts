@@ -461,7 +461,8 @@ export async function setupServer(
     publicDir: false,
     esbuild: false,
     mode: 'development',
-    appType: 'mpa',
+    // We use custom as we do not rely on Vite's htmlFallbackMiddleware and indexHtmlMiddleware.
+    appType: 'custom',
     css: {
       devSourcemap: true,
     },
