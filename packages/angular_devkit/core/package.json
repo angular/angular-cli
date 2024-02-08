@@ -28,7 +28,7 @@
     "ajv-formats": "2.1.1",
     "ajv": "8.12.0",
     "jsonc-parser": "3.2.1",
-    "picomatch": "3.0.1",
+    "picomatch": "4.0.1",
     "rxjs": "7.8.1",
     "source-map": "0.7.4"
   },
