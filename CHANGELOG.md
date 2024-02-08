@@ -1,3 +1,16 @@
+<a name="17.1.3"></a>
+
+# 17.1.3 (2024-02-08)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                        |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------- |
+| [3de3aa170](https://github.com/angular/angular-cli/commit/3de3aa170f02352fe2adf61beea221b356a40843) | fix  | allow `./` baseHref when using vite based server   |
+| [17f47a3c9](https://github.com/angular/angular-cli/commit/17f47a3c94b434a73b9fc698872ef6230f61c781) | fix  | ensure WebWorker main entry is used in output code |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="17.2.0-next.1"></a>
 
 # 17.2.0-next.1 (2024-01-31)
