@@ -1,3 +1,21 @@
+<a name="17.2.0-rc.0"></a>
+
+# 17.2.0-rc.0 (2024-02-08)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                                        |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------------------------------- |
+| [7f57123fd](https://github.com/angular/angular-cli/commit/7f57123fd40b345d7880cb9e2eccd4757c0fb6ee) | feat | add define build option to application builder                                     |
+| [b59f663e5](https://github.com/angular/angular-cli/commit/b59f663e5715e009b05bf560637c1bca3b112784) | feat | allow control of Vite-based development server prebundling                         |
+| [7a12074dc](https://github.com/angular/angular-cli/commit/7a12074dc940f1aa8f5347071324fa0d2fd1300b) | feat | provide option to allow automatically cleaning the terminal screen during rebuilds |
+| [2a25e06ea](https://github.com/angular/angular-cli/commit/2a25e06eaeba1e30ca6ddd76e7bd46b66c2112db) | fix  | allow `./` baseHref when using vite based server                                   |
+| [5e6f1a9f4](https://github.com/angular/angular-cli/commit/5e6f1a9f4362e9b12db64c7c2e609a346b17963d) | fix  | avoid preloading server chunks                                                     |
+| [8d5af1d5c](https://github.com/angular/angular-cli/commit/8d5af1d5c78ce9aa996f6ba138b99d0bb5005d46) | fix  | ensure correct `.html` served with Vite dev-server                                 |
+| [1aeeb7da0](https://github.com/angular/angular-cli/commit/1aeeb7da099ff90126b0844eb6c8ed21d174e617) | fix  | ensure WebWorker main entry is used in output code                                 |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="17.1.3"></a>
 
 # 17.1.3 (2024-02-08)
