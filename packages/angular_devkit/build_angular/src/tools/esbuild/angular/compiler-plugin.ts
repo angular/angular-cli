@@ -216,7 +216,7 @@ export function createCompilerPlugin(
 
             // Return bundled worker file entry name to be used in the built output
             const workerCodeFile = workerResult.outputFiles.find((file) =>
-              file.path.endsWith('.js'),
+              /^worker-[A-Z0-9]{8}.[cm]?js$/.test(path.basename(file.path)),
             );
             assert(workerCodeFile, 'Web Worker bundled code file should always be present.');
             const workerCodePath = path.relative(
