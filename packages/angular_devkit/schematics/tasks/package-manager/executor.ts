@@ -36,6 +36,13 @@ const packageManagers: { [name: string]: PackageManagerProfile } = {
   },
   'yarn': {
     commands: {
+      installAll: 'install',
+      installPackage: 'add',
+    },
+  },
+  'bun': {
+    commands: {
+      installAll: 'install',
       installPackage: 'add',
     },
   },
