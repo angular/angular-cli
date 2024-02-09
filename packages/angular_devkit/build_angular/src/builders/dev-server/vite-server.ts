@@ -206,8 +206,13 @@ export async function* serveWithVite(
       externalMetadata.implicitBrowser.length = 0;
 
       externalMetadata.explicit.push(...explicit);
-      externalMetadata.implicitServer.push(...implicitServer);
-      externalMetadata.implicitBrowser.push(...implicitBrowser);
+      // Remove any absolute URLs (http://, https://, //) to avoid Vite's prebundling from processing them as files
+      externalMetadata.implicitServer.push(
+        ...(implicitServer as string[]).filter((value) => !/^(?:https?:)?\/\//.test(value)),
+      );
+      externalMetadata.implicitBrowser.push(
+        ...(implicitBrowser as string[]).filter((value) => !/^(?:https?:)?\/\//.test(value)),
+      );
 
       // The below needs to be sorted as Vite uses these options are part of the hashing invalidation algorithm.
       // See: https://github.com/vitejs/vite/blob/0873bae0cfe0f0718ad2f5743dd34a17e4ab563d/packages/vite/src/node/optimizer/index.ts#L1203-L1239
