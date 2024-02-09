@@ -491,6 +491,11 @@ export async function setupServer(
         // the Vite client-side code for browser reloading. These would be available by default but when
         // the `allow` option is explicitly configured, they must be included manually.
         allow: [cacheDir, join(serverOptions.workspaceRoot, 'node_modules'), ...assets.values()],
+
+        // Temporary disable cached FS checks.
+        // This is because we configure `config.base` to a virtual directory which causes `getRealPath` to fail.
+        // See: https://github.com/vitejs/vite/blob/b2873ac3936de25ca8784327cb9ef16bd4881805/packages/vite/src/node/fsUtils.ts#L45-L67
+        cachedChecks: false,
       },
       // This is needed when `externalDependencies` is used to prevent Vite load errors.
       // NOTE: If Vite adds direct support for externals, this can be removed.
