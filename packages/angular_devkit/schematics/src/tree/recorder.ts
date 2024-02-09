@@ -6,10 +6,16 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import { BaseException } from '@angular-devkit/core';
 import MagicString from 'magic-string';
 import { ContentHasMutatedException } from '../exception/exception';
-import { IndexOutOfBoundException } from '../utility/update-buffer';
 import { FileEntry, UpdateRecorder } from './interface';
+
+export class IndexOutOfBoundException extends BaseException {
+  constructor(index: number, min: number, max = Infinity) {
+    super(`Index ${index} outside of range [${min}, ${max}].`);
+  }
+}
 
 export class UpdateRecorderBase implements UpdateRecorder {
   protected _path: string;
