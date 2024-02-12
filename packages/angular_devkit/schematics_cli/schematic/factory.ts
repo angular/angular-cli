@@ -10,10 +10,10 @@ import { strings } from '@angular-devkit/core';
 import {
   Rule,
   apply,
+  applyTemplates,
   mergeWith,
   move,
   partitionApplyMerge,
-  template,
   url,
 } from '@angular-devkit/schematics';
 import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
@@ -28,9 +28,11 @@ export default function (options: Schema): Rule {
 
     return mergeWith(
       apply(url('./files'), [
+        // The `package.json` name is kept to allow renovate to update the dependency versions
+        move('package.json', 'package.json.template'),
         partitionApplyMerge(
           (p) => !/\/src\/.*?\/files\//.test(p),
-          template({
+          applyTemplates({
             ...options,
             coreVersion,
             schematicsVersion,
