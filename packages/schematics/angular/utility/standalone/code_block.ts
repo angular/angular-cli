@@ -20,7 +20,7 @@ export interface PendingCode {
   imports: PendingImports;
 }
 
-/** Map keeping track of imports and aliases under which they're referred to in an expresion. */
+/** Map keeping track of imports and aliases under which they're referred to in an expression. */
 type PendingImports = Map<string, Map<string, string>>;
 
 /** Counter used to generate unique IDs. */
