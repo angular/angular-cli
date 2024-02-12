@@ -34,7 +34,7 @@ export function createIvyPlugin(
 
     wco.logger.warn(
       'TypeScript compiler options "target" and "useDefineForClassFields" are set to "ES2022" and ' +
-        '"false" respectively by the Angular CLI. To control ECMA version and features use the Browerslist configuration. ' +
+        '"false" respectively by the Angular CLI. To control ECMA version and features use the Browserslist configuration. ' +
         'For more information, see https://angular.io/guide/build#configuring-browser-compatibility\n' +
         `NOTE: You can set the "target" to "ES2022" in the project's tsconfig to remove this warning.`,
     );

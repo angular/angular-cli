@@ -476,7 +476,7 @@ function createCompilerOptionsTransformer(
         notes: [
           {
             text:
-              'To control ECMA version and features use the Browerslist configuration. ' +
+              'To control ECMA version and features use the Browserslist configuration. ' +
               'For more information, see https://angular.io/guide/build#configuring-browser-compatibility',
           },
         ],
