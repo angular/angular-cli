@@ -32,7 +32,7 @@
     "css-loader": "6.10.0",
     "esbuild-wasm": "0.20.0",
     "fast-glob": "3.3.2",
-    "https-proxy-agent": "7.0.2",
+    "https-proxy-agent": "7.0.3",
     "http-proxy-middleware": "2.0.6",
     "inquirer": "9.2.14",
     "jsonc-parser": "3.2.1",
