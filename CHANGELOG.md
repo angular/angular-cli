@@ -1,3 +1,21 @@
+<a name="17.1.4"></a>
+
+# 17.1.4 (2024-02-14)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                             |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------- |
+| [6d2168db9](https://github.com/angular/angular-cli/commit/6d2168db92fcba1ebf82498fed85cd2b596547d3) | fix  | prevent BOM errors in `package.json` during `ng update` |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                      |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------ |
+| [bf42d6df2](https://github.com/angular/angular-cli/commit/bf42d6df2f5eda45bec80bb60315152c03f4a3dc) | fix  | bypass Vite prebundling for absolute URL imports |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="17.1.3"></a>
 
 # 17.1.3 (2024-02-08)
