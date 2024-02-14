@@ -10,11 +10,11 @@ import { readFile, readdir } from 'node:fs/promises';
 import { join } from 'node:path';
 
 export interface PostcssConfiguration {
-  plugins: [name: string, options?: object][];
+  plugins: [name: string, options?: object | string][];
 }
 
 interface RawPostcssConfiguration {
-  plugins?: Record<string, object | boolean> | (string | [string, object])[];
+  plugins?: Record<string, object | boolean | string> | (string | [string, object])[];
 }
 
 const postcssConfigurationFiles: string[] = ['postcss.config.json', '.postcssrc.json'];
@@ -104,7 +104,7 @@ export async function loadPostcssConfiguration(
 
   const config: PostcssConfiguration = { plugins: [] };
   for (const [name, options] of entries) {
-    if (!options || typeof options !== 'object') {
+    if (!options || (typeof options !== 'object' && typeof options !== 'string')) {
       continue;
     }
 
