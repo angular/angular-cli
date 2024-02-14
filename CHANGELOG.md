@@ -1,18 +1,48 @@
-<a name="17.2.0-rc.0"></a>
+<a name="17.2.0"></a>
 
-# 17.2.0-rc.0 (2024-02-08)
+# 17.2.0 (2024-02-14)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                          |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------ |
+| [b3e206741](https://github.com/angular/angular-cli/commit/b3e206741c5b59b8563b7c60a1f66c49802549e7) | feat | add support to `bun` package manager |
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                          |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------ |
+| [03e1aa790](https://github.com/angular/angular-cli/commit/03e1aa7904acfe9d12eaf3717d1b136159893a76) | feat | add support to `bun` package manager |
 
 ### @angular-devkit/build-angular
 
-| Commit                                                                                              | Type | Description                                                                        |
-| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------------------------------- |
-| [7f57123fd](https://github.com/angular/angular-cli/commit/7f57123fd40b345d7880cb9e2eccd4757c0fb6ee) | feat | add define build option to application builder                                     |
-| [b59f663e5](https://github.com/angular/angular-cli/commit/b59f663e5715e009b05bf560637c1bca3b112784) | feat | allow control of Vite-based development server prebundling                         |
-| [7a12074dc](https://github.com/angular/angular-cli/commit/7a12074dc940f1aa8f5347071324fa0d2fd1300b) | feat | provide option to allow automatically cleaning the terminal screen during rebuilds |
-| [2a25e06ea](https://github.com/angular/angular-cli/commit/2a25e06eaeba1e30ca6ddd76e7bd46b66c2112db) | fix  | allow `./` baseHref when using vite based server                                   |
-| [5e6f1a9f4](https://github.com/angular/angular-cli/commit/5e6f1a9f4362e9b12db64c7c2e609a346b17963d) | fix  | avoid preloading server chunks                                                     |
-| [8d5af1d5c](https://github.com/angular/angular-cli/commit/8d5af1d5c78ce9aa996f6ba138b99d0bb5005d46) | fix  | ensure correct `.html` served with Vite dev-server                                 |
-| [1aeeb7da0](https://github.com/angular/angular-cli/commit/1aeeb7da099ff90126b0844eb6c8ed21d174e617) | fix  | ensure WebWorker main entry is used in output code                                 |
+| Commit                                                                                              | Type | Description                                                                          |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------------------ |
+| [7f57123fd](https://github.com/angular/angular-cli/commit/7f57123fd40b345d7880cb9e2eccd4757c0fb6ee) | feat | add define build option to application builder                                       |
+| [f4f535653](https://github.com/angular/angular-cli/commit/f4f535653a34c2a7c37c51c98680b6b1766c6d0d) | feat | add JSON build logs when using the application builder                               |
+| [b59f663e5](https://github.com/angular/angular-cli/commit/b59f663e5715e009b05bf560637c1bca3b112784) | feat | allow control of Vite-based development server prebundling                           |
+| [8f47f1e96](https://github.com/angular/angular-cli/commit/8f47f1e965b25f3d976eda701ae2e7b7e8cccfa3) | feat | provide default and abbreviated build target support for dev-server and extract-i18n |
+| [7a12074dc](https://github.com/angular/angular-cli/commit/7a12074dc940f1aa8f5347071324fa0d2fd1300b) | feat | provide option to allow automatically cleaning the terminal screen during rebuilds   |
+| [7c522aa87](https://github.com/angular/angular-cli/commit/7c522aa8742cd936bb0dfd30773d88f3ef92d488) | feat | support using custom postcss configuration with application builder                  |
+| [476a68daa](https://github.com/angular/angular-cli/commit/476a68daa9746d29d3f74f68307d982d1d66f94c) | fix  | add output location in build stats                                                   |
+| [5e6f1a9f4](https://github.com/angular/angular-cli/commit/5e6f1a9f4362e9b12db64c7c2e609a346b17963d) | fix  | avoid preloading server chunks                                                       |
+| [41ea985f9](https://github.com/angular/angular-cli/commit/41ea985f9317b11cfa6627a2d3f6b34ff4dbc134) | fix  | display server bundles in build stats                                                |
+| [d493609d3](https://github.com/angular/angular-cli/commit/d493609d30e1f148a7efb72bd64227521a326fbb) | fix  | downgrade copy-webpack-plugin to workaround Node.js support issue                    |
+| [8d5af1d5c](https://github.com/angular/angular-cli/commit/8d5af1d5c78ce9aa996f6ba138b99d0bb5005d46) | fix  | ensure correct `.html` served with Vite dev-server                                   |
+| [944cbcdb1](https://github.com/angular/angular-cli/commit/944cbcdb1af62855febc931fce92debf28a3b2a5) | fix  | limit the number of lazy chunks visible in the stats table                           |
+| [905e13633](https://github.com/angular/angular-cli/commit/905e13633071b1db25621ae9f2762a48fe010df1) | fix  | support string as plugin option in custom postcss plugin config                      |
+
+### @angular-devkit/schematics
+
+| Commit                                                                                              | Type | Description                         |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------- |
+| [da1c38c48](https://github.com/angular/angular-cli/commit/da1c38c486b07d5a1b2933f23f83c6231b512e0f) | fix  | add `bun` to known package managers |
+
+### @angular/create
+
+| Commit                                                                                              | Type | Description                          |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------ |
+| [600498f2c](https://github.com/angular/angular-cli/commit/600498f2cd3e3251e7e6e3dd3505c5e943b2986a) | feat | add support to `bun` package manager |
 
 <!-- CHANGELOG SPLIT MARKER -->
 
@@ -29,44 +59,6 @@
 
 <!-- CHANGELOG SPLIT MARKER -->
 
-<a name="17.2.0-next.1"></a>
-
-# 17.2.0-next.1 (2024-01-31)
-
-### @angular/cli
-
-| Commit                                                                                              | Type | Description                          |
-| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------ |
-| [b3e206741](https://github.com/angular/angular-cli/commit/b3e206741c5b59b8563b7c60a1f66c49802549e7) | feat | add support to `bun` package manager |
-
-### @schematics/angular
-
-| Commit                                                                                              | Type | Description                          |
-| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------ |
-| [03e1aa790](https://github.com/angular/angular-cli/commit/03e1aa7904acfe9d12eaf3717d1b136159893a76) | feat | add support to `bun` package manager |
-
-### @angular-devkit/build-angular
-
-| Commit                                                                                              | Type | Description                                                         |
-| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------- |
-| [f4f535653](https://github.com/angular/angular-cli/commit/f4f535653a34c2a7c37c51c98680b6b1766c6d0d) | feat | add JSON build logs when using the application builder              |
-| [7c522aa87](https://github.com/angular/angular-cli/commit/7c522aa8742cd936bb0dfd30773d88f3ef92d488) | feat | support using custom postcss configuration with application builder |
-| [d6aea27db](https://github.com/angular/angular-cli/commit/d6aea27dbcad7b0d2aa563b4a3c58f0935dbd0bf) | fix  | add `required` modules as externals imports                         |
-| [476a68daa](https://github.com/angular/angular-cli/commit/476a68daa9746d29d3f74f68307d982d1d66f94c) | fix  | add output location in build stats                                  |
-| [dbd3984f2](https://github.com/angular/angular-cli/commit/dbd3984f2458ae413aef1d8d33c8ee092787e360) | fix  | correctly handle glob negation in proxy config when using vite      |
-| [41ea985f9](https://github.com/angular/angular-cli/commit/41ea985f9317b11cfa6627a2d3f6b34ff4dbc134) | fix  | display server bundles in build stats                               |
-| [822e7a482](https://github.com/angular/angular-cli/commit/822e7a482dc536a64fb08db699381c0fdf4ef4b0) | fix  | handle regular expressions in proxy config when using Vite          |
-| [944cbcdb1](https://github.com/angular/angular-cli/commit/944cbcdb1af62855febc931fce92debf28a3b2a5) | fix  | limit the number of lazy chunks visible in the stats table          |
-| [37ffa5e4a](https://github.com/angular/angular-cli/commit/37ffa5e4a01f5603dbbc5ad3882593bdb5bb17db) | fix  | resolve absolute `output-path` when using esbuild based builders    |
-
-### @angular/create
-
-| Commit                                                                                              | Type | Description                          |
-| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------ |
-| [600498f2c](https://github.com/angular/angular-cli/commit/600498f2cd3e3251e7e6e3dd3505c5e943b2986a) | feat | add support to `bun` package manager |
-
-<!-- CHANGELOG SPLIT MARKER -->
-
 <a name="17.1.2"></a>
 
 # 17.1.2 (2024-01-31)
@@ -80,19 +72,6 @@
 | [235c8403a](https://github.com/angular/angular-cli/commit/235c8403a5bf8a2032da72a504e8cee441dd2d82) | fix  | handle regular expressions in proxy config when using Vite       |
 | [5332e5b2e](https://github.com/angular/angular-cli/commit/5332e5b2ea0c9757f717e386fb162392ef2327a4) | fix  | resolve absolute `output-path` when using esbuild based builders |
 | [3deb0d4a1](https://github.com/angular/angular-cli/commit/3deb0d4a102fb8d8fae7617b81f62706371e03f5) | fix  | return 404 for assets that are not found                         |
-
-<!-- CHANGELOG SPLIT MARKER -->
-
-<a name="17.2.0-next.0"></a>
-
-# 17.2.0-next.0 (2024-01-25)
-
-### @angular-devkit/build-angular
-
-| Commit                                                                                              | Type | Description                                                                          |
-| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------------------ |
-| [8f47f1e96](https://github.com/angular/angular-cli/commit/8f47f1e965b25f3d976eda701ae2e7b7e8cccfa3) | feat | provide default and abbreviated build target support for dev-server and extract-i18n |
-| [8216b11b3](https://github.com/angular/angular-cli/commit/8216b11b3cff5b0c37afd4dac6aa61851f24849a) | fix  | return 404 for assets that are not found                                             |
 
 <!-- CHANGELOG SPLIT MARKER -->
 
