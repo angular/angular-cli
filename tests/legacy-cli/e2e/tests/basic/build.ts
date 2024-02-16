@@ -7,9 +7,9 @@ export default async function () {
   const { stdout: stdout1 } = await ng('build', '--configuration=development');
   await expectFileToMatch('dist/test-project/browser/index.html', 'main.js');
 
-  if (stdout1.includes('Estimated Transfer Size')) {
+  if (stdout1.includes('Estimated transfer size')) {
     throw new Error(
-      `Expected stdout not to contain 'Estimated Transfer Size' but it did.\n${stdout1}`,
+      `Expected stdout not to contain 'Estimated transfer size' but it did.\n${stdout1}`,
     );
   }
 
@@ -22,9 +22,9 @@ export default async function () {
     await expectFileToMatch('dist/test-project/browser/index.html', /main\.[a-zA-Z0-9]{16}\.js/);
   }
 
-  if (!stdout2.includes('Estimated Transfer Size')) {
+  if (!stdout2.includes('Estimated transfer size')) {
     throw new Error(
-      `Expected stdout to contain 'Estimated Transfer Size' but it did not.\n${stdout2}`,
+      `Expected stdout to contain 'Estimated transfer size' but it did not.\n${stdout2}`,
     );
   }
 }

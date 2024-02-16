@@ -10,8 +10,7 @@
 import realGlob from 'fast-glob';
 import { promises as fs } from 'fs';
 import * as path from 'path';
-import { findTestFiles } from '../test-files';
-import { BASE_OPTIONS } from './options';
+import { findTestFiles } from './test-files';
 
 describe('test-files', () => {
   describe('findTestFiles()', () => {
@@ -31,11 +30,8 @@ describe('test-files', () => {
       await fs.writeFile(path.join(tempDir, 'nested', 'bar.spec.ts'), '');
 
       const testFiles = await findTestFiles(
-        {
-          ...BASE_OPTIONS,
-          include: ['**/*.spec.ts'],
-          exclude: [],
-        },
+        ['**/*.spec.ts'] /* include */,
+        [] /* exclude */,
         tempDir,
       );
 
@@ -49,11 +45,8 @@ describe('test-files', () => {
       await fs.writeFile(path.join(tempDir, 'node_modules', 'dep', 'baz.spec.ts'), '');
 
       const testFiles = await findTestFiles(
-        {
-          ...BASE_OPTIONS,
-          include: ['**/*.spec.ts'],
-          exclude: ['**/*.ignored.spec.ts'],
-        },
+        ['**/*.spec.ts'] /* include */,
+        ['**/*.ignored.spec.ts'] /* exclude */,
         tempDir,
       );
 
@@ -71,12 +64,9 @@ describe('test-files', () => {
       await fs.writeFile(path.join(tempDir, 'node_modules', 'dep', 'baz.test.ts'), '');
 
       const testFiles = await findTestFiles(
-        {
-          ...BASE_OPTIONS,
-          include: ['**/*.spec.ts', '**/*.test.ts'],
-          // Exclude should be applied to all `glob()` executions.
-          exclude: ['**/*.ignored.*.ts'],
-        },
+        ['**/*.spec.ts', '**/*.test.ts'] /* include */,
+        // Exclude should be applied to all `glob()` executions.
+        ['**/*.ignored.*.ts'] /* exclude */,
         tempDir,
       );
 
@@ -89,10 +79,8 @@ describe('test-files', () => {
       await fs.writeFile(path.join(tempDir, 'nested', 'bar.spec.ts'), '');
 
       const testFiles = await findTestFiles(
-        {
-          ...BASE_OPTIONS,
-          include: ['**/*.spec.ts'],
-        },
+        ['**/*.spec.ts'] /* include */,
+        [] /* exclude */,
         path.join(tempDir, 'nested'),
       );
 
@@ -111,10 +99,8 @@ describe('test-files', () => {
 
       await expectAsync(
         findTestFiles(
-          {
-            ...BASE_OPTIONS,
-            include: ['*.spec.ts', '*.stuff.ts', '*.test.ts'],
-          },
+          ['*.spec.ts', '*.stuff.ts', '*.test.ts'] /* include */,
+          [] /* exclude */,
           tempDir,
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           glob as any,
@@ -127,10 +113,8 @@ describe('test-files', () => {
       await fs.writeFile(path.join(tempDir, 'bar.spec.ts'), '');
 
       const testFiles = await findTestFiles(
-        {
-          ...BASE_OPTIONS,
-          include: ['{foo,bar}.spec.ts'],
-        },
+        ['{foo,bar}.spec.ts'] /* include */,
+        [] /* exclude */,
         tempDir,
       );
 
@@ -142,10 +126,8 @@ describe('test-files', () => {
       await fs.writeFile(path.join(tempDir, 'bar.spec.ts'), '');
 
       const testFiles = await findTestFiles(
-        {
-          ...BASE_OPTIONS,
-          include: ['+(foo|bar).spec.ts'],
-        },
+        ['+(foo|bar).spec.ts'] /* include */,
+        [] /* exclude */,
         tempDir,
       );
 
@@ -158,10 +140,8 @@ describe('test-files', () => {
       await fs.writeFile(path.join(tempDir, 'bar.spec.ts', 'baz.spec.ts'), '');
 
       const testFiles = await findTestFiles(
-        {
-          ...BASE_OPTIONS,
-          include: ['**/*.spec.ts'],
-        },
+        ['**/*.spec.ts'] /* include */,
+        [] /* exclude */,
         tempDir,
       );
 

@@ -102,3 +102,11 @@ export const debugPerformance = isPresent(debugPerfVariable) && isEnabled(debugP
 
 const watchRootVariable = process.env['NG_BUILD_WATCH_ROOT'];
 export const shouldWatchRoot = isPresent(watchRootVariable) && isEnabled(watchRootVariable);
+
+const typeCheckingVariable = process.env['NG_BUILD_TYPE_CHECK'];
+export const useTypeChecking =
+  !isPresent(typeCheckingVariable) || !isDisabled(typeCheckingVariable);
+
+const buildLogsJsonVariable = process.env['NG_BUILD_LOGS_JSON'];
+export const useJSONBuildLogs =
+  isPresent(buildLogsJsonVariable) && isEnabled(buildLogsJsonVariable);

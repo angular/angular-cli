@@ -23,7 +23,7 @@
     "projects": {
       "type": "object",
       "patternProperties": {
-        "^(?:@[a-zA-Z0-9_-]+/)?[a-zA-Z0-9_-]+$": {
+        "^(?:@[a-zA-Z0-9._-]+/)?[a-zA-Z0-9._-]+$": {
           "$ref": "#/definitions/project"
         }
       },
@@ -47,7 +47,7 @@
         "packageManager": {
           "description": "Specify which package manager tool to use.",
           "type": "string",
-          "enum": ["npm", "cnpm", "yarn", "pnpm"]
+          "enum": ["npm", "cnpm", "yarn", "pnpm", "bun"]
         },
         "warnings": {
           "description": "Control CLI specific console warnings",
@@ -101,7 +101,7 @@
         "packageManager": {
           "description": "Specify which package manager tool to use.",
           "type": "string",
-          "enum": ["npm", "cnpm", "yarn", "pnpm"]
+          "enum": ["npm", "cnpm", "yarn", "pnpm", "bun"]
         },
         "warnings": {
           "description": "Control CLI specific console warnings",
@@ -361,10 +361,13 @@
                       "@angular-devkit/build-angular:dev-server",
                       "@angular-devkit/build-angular:extract-i18n",
                       "@angular-devkit/build-angular:karma",
+                      "@angular-devkit/build-angular:ng-packagr",
+                      "@angular-devkit/build-angular:prerender",
                       "@angular-devkit/build-angular:jest",
+                      "@angular-devkit/build-angular:web-test-runner",
                       "@angular-devkit/build-angular:protractor",
                       "@angular-devkit/build-angular:server",
-                      "@angular-devkit/build-angular:ng-packagr"
+                      "@angular-devkit/build-angular:ssr-dev-server"
                     ]
                   }
                 },
@@ -567,6 +570,28 @@
               "additionalProperties": false,
               "properties": {
                 "builder": {
+                  "const": "@angular-devkit/build-angular:web-test-runner"
+                },
+                "defaultConfiguration": {
+                  "type": "string",
+                  "description": "A default named configuration to use when a target configuration is not provided."
+                },
+                "options": {
+                  "$ref": "../../../../angular_devkit/build_angular/src/builders/web-test-runner/schema.json"
+                },
+                "configurations": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "$ref": "../../../../angular_devkit/build_angular/src/builders/web-test-runner/schema.json"
+                  }
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "builder": {
                   "const": "@angular-devkit/build-angular:protractor"
                 },
                 "defaultConfiguration": {
@@ -580,6 +605,50 @@
                   "type": "object",
                   "additionalProperties": {
                     "$ref": "../../../../angular_devkit/build_angular/src/builders/protractor/schema.json"
+                  }
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "builder": {
+                  "const": "@angular-devkit/build-angular:prerender"
+                },
+                "defaultConfiguration": {
+                  "type": "string",
+                  "description": "A default named configuration to use when a target configuration is not provided."
+                },
+                "options": {
+                  "$ref": "../../../../angular_devkit/build_angular/src/builders/prerender/schema.json"
+                },
+                "configurations": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "$ref": "../../../../angular_devkit/build_angular/src/builders/prerender/schema.json"
+                  }
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "builder": {
+                  "const": "@angular-devkit/build-angular:ssr-dev-server"
+                },
+                "defaultConfiguration": {
+                  "type": "string",
+                  "description": "A default named configuration to use when a target configuration is not provided."
+                },
+                "options": {
+                  "$ref": "../../../../angular_devkit/build_angular/src/builders/ssr-dev-server/schema.json"
+                },
+                "configurations": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "$ref": "../../../../angular_devkit/build_angular/src/builders/ssr-dev-server/schema.json"
                   }
                 }
               }

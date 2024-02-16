@@ -13,7 +13,7 @@ import { profileSync } from '../../profiling';
 import { AngularHostOptions, createAngularCompilerHost } from '../angular-host';
 import { createJitResourceTransformer } from '../jit-resource-transformer';
 import { createWorkerTransformer } from '../web-worker-transformer';
-import { AngularCompilation, EmitFileResult } from './angular-compilation';
+import { AngularCompilation, DiagnosticModes, EmitFileResult } from './angular-compilation';
 
 class JitCompilationState {
   constructor(
@@ -82,18 +82,26 @@ export class JitCompilation extends AngularCompilation {
     return { affectedFiles, compilerOptions, referencedFiles };
   }
 
-  *collectDiagnostics(): Iterable<ts.Diagnostic> {
+  *collectDiagnostics(modes: DiagnosticModes): Iterable<ts.Diagnostic> {
     assert(this.#state, 'Compilation must be initialized prior to collecting diagnostics.');
     const { typeScriptProgram } = this.#state;
 
     // Collect program level diagnostics
-    yield* typeScriptProgram.getConfigFileParsingDiagnostics();
-    yield* typeScriptProgram.getOptionsDiagnostics();
-    yield* typeScriptProgram.getGlobalDiagnostics();
-    yield* profileSync('NG_DIAGNOSTICS_SYNTACTIC', () =>
-      typeScriptProgram.getSyntacticDiagnostics(),
-    );
-    yield* profileSync('NG_DIAGNOSTICS_SEMANTIC', () => typeScriptProgram.getSemanticDiagnostics());
+    if (modes & DiagnosticModes.Option) {
+      yield* typeScriptProgram.getConfigFileParsingDiagnostics();
+      yield* typeScriptProgram.getOptionsDiagnostics();
+    }
+    if (modes & DiagnosticModes.Syntactic) {
+      yield* typeScriptProgram.getGlobalDiagnostics();
+      yield* profileSync('NG_DIAGNOSTICS_SYNTACTIC', () =>
+        typeScriptProgram.getSyntacticDiagnostics(),
+      );
+    }
+    if (modes & DiagnosticModes.Semantic) {
+      yield* profileSync('NG_DIAGNOSTICS_SEMANTIC', () =>
+        typeScriptProgram.getSemanticDiagnostics(),
+      );
+    }
   }
 
   emitAffectedFiles(): Iterable<EmitFileResult> {

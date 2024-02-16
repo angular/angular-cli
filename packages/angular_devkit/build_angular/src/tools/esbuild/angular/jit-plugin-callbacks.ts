@@ -121,10 +121,10 @@ export function setupJitPluginCallbacks(
         );
       }
 
-      const { contents, resourceFiles, errors, warnings, metafile, referencedFiles } =
+      const { contents, outputFiles, errors, warnings, metafile, referencedFiles } =
         stylesheetResult;
 
-      additionalResultFiles.set(entry.path, { outputFiles: resourceFiles, metafile });
+      additionalResultFiles.set(entry.path, { outputFiles, metafile });
 
       return {
         errors,

@@ -33,6 +33,12 @@ export function generateBudgetStats(
       continue;
     }
 
+    // Exclude server bundles
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    if ((entry as any)['ng-platform-server']) {
+      continue;
+    }
+
     const initialRecord = initialFiles.get(file);
     let name = initialRecord?.name;
     if (name === undefined && entry.entryPoint) {

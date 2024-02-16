@@ -267,13 +267,7 @@ function _performUpdate(
     throw new SchematicsException('Could not find a package.json. Are you in a Node project?');
   }
 
-  let packageJson: JsonSchemaForNpmPackageJsonFiles;
-  try {
-    packageJson = JSON.parse(packageJsonContent.toString()) as JsonSchemaForNpmPackageJsonFiles;
-  } catch (e) {
-    assertIsError(e);
-    throw new SchematicsException('package.json could not be parsed: ' + e.message);
-  }
+  const packageJson = tree.readJson('/package.json') as JsonSchemaForNpmPackageJsonFiles;
 
   const updateDependency = (deps: Record<string, string>, name: string, newVersion: string) => {
     const oldVersion = deps[name];
@@ -556,11 +550,13 @@ function _buildPackageInfo(
 
   // Find out the currently installed version. Either from the package.json or the node_modules/
   // TODO: figure out a way to read package-lock.json and/or yarn.lock.
+  const pkgJsonPath = `/node_modules/${name}/package.json`;
+  const pkgJsonExists = tree.exists(pkgJsonPath);
+
   let installedVersion: string | undefined | null;
-  const packageContent = tree.read(`/node_modules/${name}/package.json`);
-  if (packageContent) {
-    const content = JSON.parse(packageContent.toString()) as JsonSchemaForNpmPackageJsonFiles;
-    installedVersion = content.version;
+  if (pkgJsonExists) {
+    const { version } = tree.readJson(pkgJsonPath) as JsonSchemaForNpmPackageJsonFiles;
+    installedVersion = version;
   }
 
   const packageVersionsNonDeprecated: string[] = [];
@@ -590,7 +586,7 @@ function _buildPackageInfo(
     );
   }
 
-  const installedPackageJson = npmPackageJson.versions[installedVersion] || packageContent;
+  const installedPackageJson = npmPackageJson.versions[installedVersion] || pkgJsonExists;
   if (!installedPackageJson) {
     throw new SchematicsException(
       `An unexpected error happened; package ${name} has no version ${installedVersion}.`,
@@ -783,23 +779,14 @@ function _addPeerDependencies(
 }
 
 function _getAllDependencies(tree: Tree): Array<readonly [string, VersionRange]> {
-  const packageJsonContent = tree.read('/package.json');
-  if (!packageJsonContent) {
-    throw new SchematicsException('Could not find a package.json. Are you in a Node project?');
-  }
-
-  let packageJson: JsonSchemaForNpmPackageJsonFiles;
-  try {
-    packageJson = JSON.parse(packageJsonContent.toString()) as JsonSchemaForNpmPackageJsonFiles;
-  } catch (e) {
-    assertIsError(e);
-    throw new SchematicsException('package.json could not be parsed: ' + e.message);
-  }
+  const { dependencies, devDependencies, peerDependencies } = tree.readJson(
+    '/package.json',
+  ) as JsonSchemaForNpmPackageJsonFiles;
 
   return [
-    ...(Object.entries(packageJson.peerDependencies || {}) as Array<[string, VersionRange]>),
-    ...(Object.entries(packageJson.devDependencies || {}) as Array<[string, VersionRange]>),
-    ...(Object.entries(packageJson.dependencies || {}) as Array<[string, VersionRange]>),
+    ...(Object.entries(peerDependencies || {}) as Array<[string, VersionRange]>),
+    ...(Object.entries(devDependencies || {}) as Array<[string, VersionRange]>),
+    ...(Object.entries(dependencies || {}) as Array<[string, VersionRange]>),
   ];
 }
 

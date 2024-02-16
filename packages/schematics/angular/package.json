@@ -13,13 +13,12 @@
     "./utility": "./utility/index.js",
     "./utility/*": "./utility/*.js",
     "./migrations/migration-collection.json": "./migrations/migration-collection.json",
-    "./*": "./*.js",
-    "./private/components": "./private/components.js"
+    "./*": "./*.js"
   },
   "schematics": "./collection.json",
   "dependencies": {
     "@angular-devkit/core": "0.0.0-PLACEHOLDER",
     "@angular-devkit/schematics": "0.0.0-PLACEHOLDER",
-    "jsonc-parser": "3.2.0"
+    "jsonc-parser": "3.2.1"
   }
 }

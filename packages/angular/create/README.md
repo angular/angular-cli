@@ -23,3 +23,9 @@ yarn create @angular [project-name] [...options]
 ```
 pnpm create @angular [project-name] [...options]
 ```
+
+### bun
+
+```
+bun create @angular [project-name] [...options]
+```

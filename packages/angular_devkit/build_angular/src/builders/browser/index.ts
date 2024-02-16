@@ -173,8 +173,9 @@ export function buildWebpackBrowser(
           logging:
             transforms.logging ||
             ((stats, config) => {
-              if (options.verbose) {
-                context.logger.info(stats.toString(config.stats));
+              if (options.verbose && config.stats !== false) {
+                const statsOptions = config.stats === true ? undefined : config.stats;
+                context.logger.info(stats.toString(statsOptions));
               }
             }),
         }).pipe(

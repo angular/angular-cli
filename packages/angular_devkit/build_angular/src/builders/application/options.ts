@@ -17,10 +17,13 @@ import {
   normalizeGlobalStyles,
 } from '../../tools/webpack/utils/helpers';
 import { normalizeAssetPatterns, normalizeOptimization, normalizeSourceMaps } from '../../utils';
+import { colors } from '../../utils/color';
+import { useJSONBuildLogs } from '../../utils/environment-options';
 import { I18nOptions, createI18nOptions } from '../../utils/i18n-options';
 import { IndexHtmlTransform } from '../../utils/index-file/index-html-generator';
 import { normalizeCacheOptions } from '../../utils/normalize-cache';
 import { generateEntryPoints } from '../../utils/package-chunk-sort';
+import { loadPostcssConfiguration } from '../../utils/postcss-configuration';
 import { findTailwindConfigurationFile } from '../../utils/tailwind';
 import { getIndexInputFile, getIndexOutputFile } from '../../utils/webpack-browser-config';
 import {
@@ -55,7 +58,7 @@ interface InternalOptions {
    * Indicates whether all node packages should be marked as external.
    * Currently used by the dev-server to support prebundling.
    */
-  externalPackages?: boolean;
+  externalPackages?: boolean | { exclude: string[] };
 
   /**
    * Forces the output from the localize post-processing to not create nested directories per locale output.
@@ -144,7 +147,7 @@ export async function normalizeOptions(
     media: 'media',
     ...(typeof outputPath === 'string' ? undefined : outputPath),
     base: normalizeDirectoryPath(
-      path.join(workspaceRoot, typeof outputPath === 'string' ? outputPath : outputPath.base),
+      path.resolve(workspaceRoot, typeof outputPath === 'string' ? outputPath : outputPath.base),
     ),
   };
 
@@ -190,6 +193,12 @@ export async function normalizeOptions(
     }
   }
 
+  const postcssConfiguration = await loadPostcssConfiguration(workspaceRoot, projectRoot);
+  // Skip tailwind configuration if postcss is customized
+  const tailwindConfiguration = postcssConfiguration
+    ? undefined
+    : await getTailwindConfig(workspaceRoot, projectRoot, context);
+
   const globalStyles: { name: string; files: string[]; initial: boolean }[] = [];
   if (options.styles?.length) {
     const { entryPoints: stylesheetEntrypoints, noInjectNames } = normalizeGlobalStyles(
@@ -220,6 +229,8 @@ export async function normalizeOptions(
         styles: options.styles ?? [],
       }),
       transformer: extensions?.indexHtmlTransformer,
+      // Preload initial defaults to true
+      preloadInitial: typeof options.index !== 'object' || (options.index.preloadInitial ?? true),
     };
   }
 
@@ -283,6 +294,8 @@ export async function normalizeOptions(
     namedChunks,
     budgets,
     deployUrl,
+    clearScreen,
+    define,
   } = options;
 
   // Return all the normalized options
@@ -327,13 +340,18 @@ export async function normalizeOptions(
     serviceWorker:
       typeof serviceWorker === 'string' ? path.join(workspaceRoot, serviceWorker) : undefined,
     indexHtmlOptions,
-    tailwindConfiguration: await getTailwindConfig(workspaceRoot, projectRoot, context),
+    tailwindConfiguration,
+    postcssConfiguration,
     i18nOptions,
     namedChunks,
     budgets: budgets?.length ? budgets : undefined,
     publicPath: deployUrl ? deployUrl : undefined,
     plugins: extensions?.codePlugins?.length ? extensions?.codePlugins : undefined,
     loaderExtensions,
+    jsonLogs: useJSONBuildLogs,
+    colors: colors.enabled,
+    clearScreen,
+    define,
   };
 }
 
@@ -415,10 +433,9 @@ function normalizeEntryPoints(
         ? parsedEntryPoint.name
         : path.join(parsedEntryPoint.dir, parsedEntryPoint.name);
 
-      // Get the full file path to the entry point input.
-      const entryPointPath = path.isAbsolute(entryPoint)
-        ? entryPoint
-        : path.join(workspaceRoot, entryPoint);
+      // Get the full file path to a relative entry point input. Leave bare specifiers alone so they are resolved as modules.
+      const isRelativePath = entryPoint.startsWith('.');
+      const entryPointPath = isRelativePath ? path.join(workspaceRoot, entryPoint) : entryPoint;
 
       // Check for conflicts with previous entry points.
       const existingEntryPointPath = entryPointPaths[entryPointName];

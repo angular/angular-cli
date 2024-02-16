@@ -11,7 +11,7 @@ import { existsSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import { extname, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { parse as parseGlob } from 'picomatch';
+import { makeRe as makeRegExpFromGlob } from 'picomatch';
 import { assertIsError } from './error';
 import { loadEsmModule } from './load-esm';
 
@@ -128,9 +128,9 @@ function normalizeProxyConfiguration(
 
   // TODO: Consider upstreaming glob support
   for (const key of Object.keys(normalizedProxy)) {
-    if (isDynamicPattern(key)) {
-      const { output } = parseGlob(key);
-      normalizedProxy[`^${output}$`] = normalizedProxy[key];
+    if (key[0] !== '^' && isDynamicPattern(key)) {
+      const pattern = makeRegExpFromGlob(key).source;
+      normalizedProxy[pattern] = normalizedProxy[key];
       delete normalizedProxy[key];
     }
   }

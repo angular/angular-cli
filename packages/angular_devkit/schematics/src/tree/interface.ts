@@ -127,12 +127,15 @@ export interface Tree {
   readonly actions: Action[];
 }
 
-// eslint-disable-next-line @typescript-eslint/no-namespace
-namespace Tree {
-  export function isTree(maybeTree: object): maybeTree is Tree {
-    return TreeSymbol in maybeTree;
-  }
+export interface TreeConstructor {
+  isTree(maybeTree: object): maybeTree is Tree;
 }
+
+export const Tree: TreeConstructor = Object.freeze({
+  isTree(maybeTree: object): maybeTree is Tree {
+    return TreeSymbol in maybeTree;
+  },
+});
 
 export interface UpdateRecorder {
   // These just record changes.

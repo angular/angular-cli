@@ -24,10 +24,6 @@ The secondary caretaker does not have any _direct_ responsibilities, but they ma
 over the primary's responsibilities if the primary is unavailable for an extended time (a day
 or more) or in the event of an emergency.
 
-The primary is also responsible for releasing
-[Angular Universal](https://github.com/angular/universal/), but _not_ responsible for merging
-PRs.
-
 At the end of each caretaker's rotation, the primary should perform a handoff in which they
 provide information to the next caretaker about the current state of the repository and update
 the access group to now include the next caretakers. To perform this update to the access group,
@@ -111,9 +107,3 @@ Releases should be done in "reverse semver order", meaning they should follow:
 Oldest LTS -> Newest LTS -> Patch -> RC -> Next
 
 This can skip any versions which don't need releases, so most weeks are just "Patch -> Next".
-
-### Angular Universal
-
-After CLI releases, the primary is also responsible for releasing Angular Universal if necessary.
-Follow [the instructions there](https://github.com/angular/universal/blob/main/docs/process/release.md)
-for the release process. If there are no changes to Universal, then the release can be skipped.

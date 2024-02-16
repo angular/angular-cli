@@ -9,6 +9,7 @@
 import { tags } from '@angular-devkit/core';
 import * as ts from '../third_party/github.com/Microsoft/TypeScript/lib/typescript';
 import { Change, InsertChange, NoopChange } from './change';
+import { getEOL } from './eol';
 
 /**
  * Add Import `import { symbolName } from fileName` if the import doesn't exit
@@ -73,12 +74,13 @@ export function insertImport(
   }
   const open = isDefault ? '' : '{ ';
   const close = isDefault ? '' : ' }';
+  const eol = getEOL(rootNode.getText());
   // if there are no imports or 'use strict' statement, insert import at beginning of file
   const insertAtBeginning = allImports.length === 0 && useStrict.length === 0;
-  const separator = insertAtBeginning ? '' : ';\n';
+  const separator = insertAtBeginning ? '' : `;${eol}`;
   const toInsert =
     `${separator}import ${open}${importExpression}${close}` +
-    ` from '${fileName}'${insertAtBeginning ? ';\n' : ''}`;
+    ` from '${fileName}'${insertAtBeginning ? `;${eol}` : ''}`;
 
   return insertAfterLastOccurrence(
     allImports,
@@ -411,7 +413,7 @@ export function addSymbolToNgModuleMetadata(
     return [];
   }
 
-  let expresssion: ts.Expression | ts.ArrayLiteralExpression;
+  let expression: ts.Expression | ts.ArrayLiteralExpression;
   const assignmentInit = assignment.initializer;
   const elements = assignmentInit.elements;
 
@@ -421,20 +423,20 @@ export function addSymbolToNgModuleMetadata(
       return [];
     }
 
-    expresssion = elements[elements.length - 1];
+    expression = elements[elements.length - 1];
   } else {
-    expresssion = assignmentInit;
+    expression = assignmentInit;
   }
 
   let toInsert: string;
-  let position = expresssion.getEnd();
-  if (ts.isArrayLiteralExpression(expresssion)) {
+  let position = expression.getEnd();
+  if (ts.isArrayLiteralExpression(expression)) {
     // We found the field but it's empty. Insert it just before the `]`.
     position--;
     toInsert = `\n${tags.indentBy(4)`${symbolName}`}\n  `;
   } else {
     // Get the indentation of the last element, if any.
-    const text = expresssion.getFullText(source);
+    const text = expression.getFullText(source);
     const matches = text.match(/^(\r?\n)(\s*)/);
     if (matches) {
       toInsert = `,${matches[1]}${tags.indentBy(matches[2].length)`${symbolName}`}`;

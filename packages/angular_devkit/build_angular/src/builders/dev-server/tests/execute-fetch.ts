@@ -18,20 +18,24 @@ export async function executeOnceAndFetch<T>(
   harness: BuilderHarness<T>,
   url: string,
   options?: Partial<BuilderHarnessExecutionOptions> & { request?: RequestInit },
-): Promise<BuilderHarnessExecutionResult & { response?: Response }> {
+): Promise<BuilderHarnessExecutionResult & { response?: Response; content?: string }> {
   return lastValueFrom(
     harness.execute().pipe(
       timeout(30000),
       mergeMap(async (executionResult) => {
         let response = undefined;
+        let content = undefined;
         if (executionResult.result?.success) {
           let baseUrl = `${executionResult.result.baseUrl}`;
           baseUrl = baseUrl[baseUrl.length - 1] === '/' ? baseUrl : `${baseUrl}/`;
           const resolvedUrl = new URL(url, baseUrl);
-          response = await fetch(resolvedUrl, options?.request);
+          const originalResponse = await fetch(resolvedUrl, options?.request);
+          response = originalResponse.clone();
+          // Ensure all data is available before stopping server
+          content = await originalResponse.text();
         }
 
-        return { ...executionResult, response };
+        return { ...executionResult, response, content };
       }),
       take(1),
     ),

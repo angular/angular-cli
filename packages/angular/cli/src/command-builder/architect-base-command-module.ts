@@ -12,9 +12,8 @@ import {
   WorkspaceNodeModulesArchitectHost,
 } from '@angular-devkit/architect/node';
 import { json } from '@angular-devkit/core';
-import { spawnSync } from 'child_process';
-import { existsSync } from 'fs';
-import { resolve } from 'path';
+import { existsSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { isPackageNameSafeForAnalytics } from '../analytics/analytics';
 import { EventCustomDimension, EventCustomMetric } from '../analytics/analytics-parameters';
 import { assertIsError } from '../utilities/error';
@@ -201,17 +200,13 @@ export abstract class ArchitectBaseCommandModule<T extends object>
       return;
     }
 
-    // Check for a `node_modules` directory (npm, yarn non-PnP, etc.)
-    if (existsSync(resolve(basePath, 'node_modules'))) {
+    // Check if yarn PnP is used. https://yarnpkg.com/advanced/pnpapi#processversionspnp
+    if (process.versions.pnp) {
       return;
     }
 
-    // Check for yarn PnP files
-    if (
-      existsSync(resolve(basePath, '.pnp.js')) ||
-      existsSync(resolve(basePath, '.pnp.cjs')) ||
-      existsSync(resolve(basePath, '.pnp.mjs'))
-    ) {
+    // Check for a `node_modules` directory (npm, yarn non-PnP, etc.)
+    if (existsSync(resolve(basePath, 'node_modules'))) {
       return;
     }
 
@@ -248,14 +243,14 @@ export abstract class ArchitectBaseCommandModule<T extends object>
       const packageToInstall = await this.getMissingTargetPackageToInstall(choices);
       if (packageToInstall) {
         // Example run: `ng add @angular-eslint/schematics`.
-        const binPath = resolve(__dirname, '../../bin/ng.js');
-        const { error } = spawnSync(process.execPath, [binPath, 'add', packageToInstall], {
-          stdio: 'inherit',
+        const AddCommandModule = (await import('../commands/add/cli')).default;
+        await new AddCommandModule(this.context).run({
+          interactive: true,
+          force: false,
+          dryRun: false,
+          defaults: false,
+          collection: packageToInstall,
         });
-
-        if (error) {
-          throw error;
-        }
       }
     } else {
       // Non TTY display error message.

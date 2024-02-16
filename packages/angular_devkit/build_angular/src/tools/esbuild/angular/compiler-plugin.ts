@@ -16,15 +16,19 @@ import type {
   PluginBuild,
 } from 'esbuild';
 import assert from 'node:assert';
-import { realpathSync } from 'node:fs';
 import * as path from 'node:path';
-import { maxWorkers } from '../../../utils/environment-options';
+import { maxWorkers, useTypeChecking } from '../../../utils/environment-options';
 import { JavaScriptTransformer } from '../javascript-transformer';
 import { LoadResultCache, createCachedLoad } from '../load-result-cache';
 import { logCumulativeDurations, profileAsync, resetCumulativeDurations } from '../profiling';
 import { BundleStylesheetOptions } from '../stylesheets/bundle-options';
 import { AngularHostOptions } from './angular-host';
-import { AngularCompilation, NoopCompilation, createAngularCompilation } from './compilation';
+import {
+  AngularCompilation,
+  DiagnosticModes,
+  NoopCompilation,
+  createAngularCompilation,
+} from './compilation';
 import { SharedTSCompilationState, getSharedCompilationState } from './compilation-state';
 import { ComponentStylesheetBundler } from './component-stylesheets';
 import { FileReferenceTracker } from './file-reference-tracker';
@@ -56,18 +60,6 @@ export function createCompilerPlugin(
     async setup(build: PluginBuild): Promise<void> {
       let setupWarnings: PartialMessage[] | undefined = [];
       const preserveSymlinks = build.initialOptions.preserveSymlinks;
-
-      let tsconfigPath = pluginOptions.tsconfig;
-      if (!preserveSymlinks) {
-        // Use the real path of the tsconfig if not preserving symlinks.
-        // This ensures the TS source file paths are based on the real path of the configuration.
-        // NOTE: promises.realpath should not be used here since it uses realpath.native which
-        // can cause case conversion and other undesirable behavior on Windows systems.
-        // ref: https://github.com/nodejs/node/issues/7726
-        try {
-          tsconfigPath = realpathSync(tsconfigPath);
-        } catch {}
-      }
 
       // Initialize a worker pool for JavaScript transformations
       const javascriptTransformer = new JavaScriptTransformer(pluginOptions, maxWorkers);
@@ -164,14 +156,15 @@ export function createCompilerPlugin(
               );
             }
 
-            const { contents, resourceFiles, referencedFiles, errors, warnings } = stylesheetResult;
+            const { contents, outputFiles, metafile, referencedFiles, errors, warnings } =
+              stylesheetResult;
             if (errors) {
               (result.errors ??= []).push(...errors);
             }
             (result.warnings ??= []).push(...warnings);
             additionalResults.set(stylesheetFile ?? containingFile, {
-              outputFiles: resourceFiles,
-              metafile: stylesheetResult.metafile,
+              outputFiles,
+              metafile,
             });
 
             if (referencedFiles) {
@@ -223,7 +216,7 @@ export function createCompilerPlugin(
 
             // Return bundled worker file entry name to be used in the built output
             const workerCodeFile = workerResult.outputFiles.find((file) =>
-              file.path.endsWith('.js'),
+              /^worker-[A-Z0-9]{8}.[cm]?js$/.test(path.basename(file.path)),
             );
             assert(workerCodeFile, 'Web Worker bundled code file should always be present.');
             const workerCodePath = path.relative(
@@ -240,7 +233,7 @@ export function createCompilerPlugin(
         let referencedFiles;
         try {
           const initializationResult = await compilation.initialize(
-            tsconfigPath,
+            pluginOptions.tsconfig,
             hostOptions,
             createCompilerOptionsTransformer(setupWarnings, pluginOptions, preserveSymlinks),
           );
@@ -270,14 +263,6 @@ export function createCompilerPlugin(
           return result;
         }
 
-        const diagnostics = await compilation.diagnoseFiles();
-        if (diagnostics.errors?.length) {
-          (result.errors ??= []).push(...diagnostics.errors);
-        }
-        if (diagnostics.warnings?.length) {
-          (result.warnings ??= []).push(...diagnostics.warnings);
-        }
-
         // Update TypeScript file output cache for all affected files
         try {
           await profileAsync('NG_EMIT_TS', async () => {
@@ -296,6 +281,16 @@ export function createCompilerPlugin(
               },
             ],
           });
+        }
+
+        const diagnostics = await compilation.diagnoseFiles(
+          useTypeChecking ? DiagnosticModes.All : DiagnosticModes.All & ~DiagnosticModes.Semantic,
+        );
+        if (diagnostics.errors?.length) {
+          (result.errors ??= []).push(...diagnostics.errors);
+        }
+        if (diagnostics.warnings?.length) {
+          (result.warnings ??= []).push(...diagnostics.warnings);
         }
 
         // Add errors from failed additional results.
@@ -528,22 +523,19 @@ function bundleWebWorker(
 ) {
   try {
     return build.esbuild.buildSync({
+      ...build.initialOptions,
       platform: 'browser',
       write: false,
       bundle: true,
       metafile: true,
       format: 'esm',
-      mainFields: ['es2020', 'es2015', 'browser', 'module', 'main'],
-      logLevel: 'silent',
-      sourcemap: pluginOptions.sourcemap,
       entryNames: 'worker-[hash]',
       entryPoints: [workerFile],
-      absWorkingDir: build.initialOptions.absWorkingDir,
-      outdir: build.initialOptions.outdir,
-      minifyIdentifiers: build.initialOptions.minifyIdentifiers,
-      minifySyntax: build.initialOptions.minifySyntax,
-      minifyWhitespace: build.initialOptions.minifyWhitespace,
-      target: build.initialOptions.target,
+      sourcemap: pluginOptions.sourcemap,
+      // Zone.js is not used in Web workers so no need to disable
+      supported: undefined,
+      // Plugins are not supported in sync esbuild calls
+      plugins: undefined,
     });
   } catch (error) {
     if (error && typeof error === 'object' && 'errors' in error && 'warnings' in error) {

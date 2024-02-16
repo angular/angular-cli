@@ -11,7 +11,7 @@ import assert from 'node:assert';
 import { randomUUID } from 'node:crypto';
 import { type MessagePort, receiveMessageOnPort } from 'node:worker_threads';
 import { SourceFileCache } from '../source-file-cache';
-import type { AngularCompilation } from './angular-compilation';
+import type { AngularCompilation, DiagnosticModes } from './angular-compilation';
 import { AotCompilation } from './aot-compilation';
 import { JitCompilation } from './jit-compilation';
 
@@ -99,13 +99,13 @@ export async function initialize(request: InitRequest) {
   };
 }
 
-export async function diagnose(): Promise<{
+export async function diagnose(modes: DiagnosticModes): Promise<{
   errors?: PartialMessage[];
   warnings?: PartialMessage[];
 }> {
   assert(compilation);
 
-  const diagnostics = await compilation.diagnoseFiles();
+  const diagnostics = await compilation.diagnoseFiles(modes);
 
   return diagnostics;
 }

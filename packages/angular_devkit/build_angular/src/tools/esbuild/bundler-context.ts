@@ -34,6 +34,7 @@ export type BundleContextResult =
         server?: Set<string>;
         browser?: Set<string>;
       };
+      externalConfiguration?: string[];
     };
 
 export interface InitialFileRecord {
@@ -41,6 +42,7 @@ export interface InitialFileRecord {
   name?: string;
   type: 'script' | 'style';
   external?: boolean;
+  serverFile: boolean;
 }
 
 export enum BuildOutputFileType {
@@ -74,7 +76,6 @@ export class BundlerContext {
   #esbuildResult?: BundleContextResult;
   #optionsFactory: BundlerOptionsFactory<BuildOptions & { metafile: true; write: false }>;
   #shouldCacheResult: boolean;
-
   #loadCache?: MemoryLoadResultCache;
   readonly watchFiles = new Set<string>();
 
@@ -124,6 +125,7 @@ export class BundlerContext {
     const externalImportsServer = new Set<string>();
 
     const outputFiles = [];
+    let externalConfiguration;
     for (const result of individualResults) {
       warnings.push(...result.warnings);
       if (result.errors) {
@@ -142,6 +144,13 @@ export class BundlerContext {
       outputFiles.push(...result.outputFiles);
       result.externalImports.browser?.forEach((value) => externalImportsBrowser.add(value));
       result.externalImports.server?.forEach((value) => externalImportsServer.add(value));
+
+      if (result.externalConfiguration) {
+        externalConfiguration ??= new Set<string>();
+        for (const value of result.externalConfiguration) {
+          externalConfiguration.add(value);
+        }
+      }
     }
 
     if (errors !== undefined) {
@@ -158,6 +167,7 @@ export class BundlerContext {
         browser: externalImportsBrowser,
         server: externalImportsServer,
       },
+      externalConfiguration: externalConfiguration ? [...externalConfiguration] : undefined,
     };
   }
 
@@ -197,7 +207,7 @@ export class BundlerContext {
       this.watchFiles.clear();
     }
 
-    let result;
+    let result: BuildResult<{ metafile: true; write: false }>;
     try {
       if (this.#esbuildContext) {
         // Rebuild using the existing incremental build context
@@ -210,6 +220,13 @@ export class BundlerContext {
       } else {
         // For non-incremental builds, perform a single build
         result = await build(this.#esbuildOptions);
+      }
+
+      if (this.#platformIsServer) {
+        for (const entry of Object.values(result.metafile.outputs)) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          (entry as any)['ng-platform-server'] = true;
+        }
       }
     } catch (failure) {
       // Build failures will throw an exception which contains errors/warnings
@@ -224,10 +241,12 @@ export class BundlerContext {
       if (this.incremental) {
         // When incremental always add any files from the load result cache
         if (this.#loadCache) {
-          this.#loadCache.watchFiles
-            .filter((file) => !isInternalAngularFile(file))
-            // watch files are fully resolved paths
-            .forEach((file) => this.watchFiles.add(file));
+          for (const file of this.#loadCache.watchFiles) {
+            if (!isInternalAngularFile(file)) {
+              // watch files are fully resolved paths
+              this.watchFiles.add(file);
+            }
+          }
         }
       }
     }
@@ -237,10 +256,12 @@ export class BundlerContext {
     // currently enabled with watch mode where watch files are needed.
     if (this.incremental) {
       // Add input files except virtual angular files which do not exist on disk
-      Object.keys(result.metafile.inputs)
-        .filter((input) => !isInternalAngularFile(input))
-        // input file paths are always relative to the workspace root
-        .forEach((input) => this.watchFiles.add(join(this.workspaceRoot, input)));
+      for (const input of Object.keys(result.metafile.inputs)) {
+        if (!isInternalAngularFile(input)) {
+          // input file paths are always relative to the workspace root
+          this.watchFiles.add(join(this.workspaceRoot, input));
+        }
+      }
     }
 
     // Return if the build encountered any errors
@@ -276,6 +297,7 @@ export class BundlerContext {
             name,
             type,
             entrypoint: true,
+            serverFile: this.#platformIsServer,
           };
 
           if (!this.initialFilter || this.initialFilter(record)) {
@@ -298,6 +320,7 @@ export class BundlerContext {
             type: initialImport.kind === 'import-rule' ? 'style' : 'script',
             entrypoint: false,
             external: initialImport.external,
+            serverFile: this.#platformIsServer,
           };
 
           if (!this.initialFilter || this.initialFilter(record)) {
@@ -317,7 +340,9 @@ export class BundlerContext {
       for (const importData of imports) {
         if (
           !importData.external ||
-          (importData.kind !== 'import-statement' && importData.kind !== 'dynamic-import')
+          (importData.kind !== 'import-statement' &&
+            importData.kind !== 'dynamic-import' &&
+            importData.kind !== 'require-call')
         ) {
           continue;
         }
@@ -327,15 +352,16 @@ export class BundlerContext {
 
     assert(this.#esbuildOptions, 'esbuild options cannot be undefined.');
 
-    const { platform, assetNames = '' } = this.#esbuildOptions;
-    const platformIsServer = platform === 'node';
+    const { assetNames = '' } = this.#esbuildOptions;
     const mediaDirname = dirname(assetNames);
     const outputFiles = result.outputFiles.map((file) => {
       let fileType: BuildOutputFileType;
       if (dirname(file.path) === mediaDirname) {
         fileType = BuildOutputFileType.Media;
       } else {
-        fileType = platformIsServer ? BuildOutputFileType.Server : BuildOutputFileType.Browser;
+        fileType = this.#platformIsServer
+          ? BuildOutputFileType.Server
+          : BuildOutputFileType.Browser;
       }
 
       return convertOutputFile(file, fileType);
@@ -347,8 +373,9 @@ export class BundlerContext {
       outputFiles,
       initialFiles,
       externalImports: {
-        [platformIsServer ? 'server' : 'browser']: externalImports,
+        [this.#platformIsServer ? 'server' : 'browser']: externalImports,
       },
+      externalConfiguration: this.#esbuildOptions.external,
       errors: undefined,
     };
   }
@@ -366,6 +393,10 @@ export class BundlerContext {
         }
       }
     }
+  }
+
+  get #platformIsServer(): boolean {
+    return this.#esbuildOptions?.platform === 'node';
   }
 
   /**

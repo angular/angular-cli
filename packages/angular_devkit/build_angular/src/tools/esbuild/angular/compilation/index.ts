@@ -6,6 +6,6 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-export { AngularCompilation } from './angular-compilation';
+export { AngularCompilation, DiagnosticModes } from './angular-compilation';
 export { createAngularCompilation } from './factory';
 export { NoopCompilation } from './noop-compilation';

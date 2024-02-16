@@ -21,23 +21,34 @@ const CSP_MEDIA_ATTR = 'ngCspMedia';
 
 /**
  * Script text used to change the media value of the link tags.
+ *
+ * NOTE:
+ * We do not use `document.querySelectorAll('link').forEach((s) => s.addEventListener('load', ...)`
+ * because this does not always fire on Chome.
+ * See: https://github.com/angular/angular-cli/issues/26932 and https://crbug.com/1521256
  */
 const LINK_LOAD_SCRIPT_CONTENT = [
-  `(() => {`,
-  // Save the `children` in a variable since they're a live DOM node collection.
-  // We iterate over the direct descendants, instead of going through a `querySelectorAll`,
-  // because we know that the tags will be directly inside the `head`.
-  `  const children = document.head.children;`,
-  // Declare `onLoad` outside the loop to avoid leaking memory.
-  // Can't be an arrow function, because we need `this` to refer to the DOM node.
-  `  function onLoad() {this.media = this.getAttribute('${CSP_MEDIA_ATTR}');}`,
-  // Has to use a plain for loop, because some browsers don't support
-  // `forEach` on `children` which is a `HTMLCollection`.
-  `  for (let i = 0; i < children.length; i++) {`,
-  `    const child = children[i];`,
-  `    child.hasAttribute('${CSP_MEDIA_ATTR}') && child.addEventListener('load', onLoad);`,
-  `  }`,
-  `})();`,
+  '(() => {',
+  `  const CSP_MEDIA_ATTR = '${CSP_MEDIA_ATTR}';`,
+  '  const documentElement = document.documentElement;',
+  '  const listener = (e) => {',
+  '    const target = e.target;',
+  `    if (!target || target.tagName !== 'LINK' || !target.hasAttribute(CSP_MEDIA_ATTR)) {`,
+  '     return;',
+  '    }',
+
+  '    target.media = target.getAttribute(CSP_MEDIA_ATTR);',
+  '    target.removeAttribute(CSP_MEDIA_ATTR);',
+
+  // Remove onload listener when there are no longer styles that need to be loaded.
+  '    if (!document.head.querySelector(`link[${CSP_MEDIA_ATTR}]`)) {',
+  `      documentElement.removeEventListener('load', listener);`,
+  '    }',
+  '  };',
+
+  //  We use an event with capturing (the true parameter) because load events don't bubble.
+  `  documentElement.addEventListener('load', listener, true);`,
+  '})();',
 ].join('\n');
 
 export interface InlineCriticalCssProcessOptions {
@@ -62,6 +73,7 @@ interface PartialHTMLElement {
   hasAttribute(name: string): boolean;
   removeAttribute(name: string): void;
   appendChild(child: PartialHTMLElement): void;
+  insertBefore(newNode: PartialHTMLElement, referenceNode?: PartialHTMLElement): void;
   remove(): void;
   name: string;
   textContent: string;
@@ -164,7 +176,7 @@ class CrittersExtended extends Critters {
         // `addEventListener` to apply the media query instead.
         link.removeAttribute('onload');
         link.setAttribute(CSP_MEDIA_ATTR, crittersMedia[1]);
-        this.conditionallyInsertCspLoadingScript(document, cspNonce);
+        this.conditionallyInsertCspLoadingScript(document, cspNonce, link);
       }
 
       // Ideally we would hook in at the time Critters inserts the `style` tags, but there isn't
@@ -204,7 +216,11 @@ class CrittersExtended extends Critters {
    * Inserts the `script` tag that swaps the critical CSS at runtime,
    * if one hasn't been inserted into the document already.
    */
-  private conditionallyInsertCspLoadingScript(document: PartialDocument, nonce: string): void {
+  private conditionallyInsertCspLoadingScript(
+    document: PartialDocument,
+    nonce: string,
+    link: PartialHTMLElement,
+  ): void {
     if (this.addedCspScriptsDocuments.has(document)) {
       return;
     }
@@ -219,9 +235,9 @@ class CrittersExtended extends Critters {
     const script = document.createElement('script');
     script.setAttribute('nonce', nonce);
     script.textContent = LINK_LOAD_SCRIPT_CONTENT;
-    // Append the script to the head since it needs to
-    // run as early as possible, after the `link` tags.
-    document.head.appendChild(script);
+    // Prepend the script to the head since it needs to
+    // run as early as possible, before the `link` tags.
+    document.head.insertBefore(script, link);
     this.addedCspScriptsDocuments.add(document);
   }
 }

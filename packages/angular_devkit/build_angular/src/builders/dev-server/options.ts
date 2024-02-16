@@ -34,8 +34,9 @@ export async function normalizeOptions(
 
   const cacheOptions = normalizeCacheOptions(projectMetadata, workspaceRoot);
 
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const buildTarget = targetFromTargetString(options.buildTarget ?? options.browserTarget!);
+  // Target specifier defaults to the current project's build target using a development configuration
+  const buildTargetSpecifier = options.buildTarget ?? options.browserTarget ?? `::development`;
+  const buildTarget = targetFromTargetString(buildTargetSpecifier, projectName, 'build');
 
   // Initial options to keep
   const {
@@ -57,6 +58,7 @@ export async function normalizeOptions(
     sslCert,
     sslKey,
     forceEsbuild,
+    prebundle,
   } = options;
 
   // Return all the normalized options
@@ -83,5 +85,7 @@ export async function normalizeOptions(
     sslCert,
     sslKey,
     forceEsbuild,
+    // Prebundling defaults to true but requires caching to function
+    prebundle: cacheOptions.enabled && (prebundle ?? true),
   };
 }

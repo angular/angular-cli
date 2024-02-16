@@ -6,39 +6,45 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { BuilderContext } from '@angular-devkit/architect';
-import { BuildOptions, Metafile, OutputFile, PartialMessage, formatMessages } from 'esbuild';
+import { logging } from '@angular-devkit/core';
+import { BuildOptions, Metafile, OutputFile, formatMessages } from 'esbuild';
 import { createHash } from 'node:crypto';
 import { constants as fsConstants } from 'node:fs';
 import fs from 'node:fs/promises';
-import path from 'node:path';
-import { promisify } from 'node:util';
+import { basename, dirname, join } from 'node:path';
+import { pathToFileURL } from 'node:url';
 import { brotliCompress } from 'node:zlib';
 import { coerce } from 'semver';
-import { NormalizedOutputOptions } from '../../builders/application/options';
+import {
+  NormalizedApplicationBuildOptions,
+  NormalizedOutputOptions,
+} from '../../builders/application/options';
 import { BudgetCalculatorResult } from '../../utils/bundle-calculator';
 import { Spinner } from '../../utils/spinner';
-import { BundleStats, generateBuildStatsTable } from '../webpack/utils/stats';
+import { BundleStats, generateEsbuildBuildStatsTable } from '../webpack/utils/stats';
 import { BuildOutputFile, BuildOutputFileType, InitialFileRecord } from './bundler-context';
-import { BuildOutputAsset } from './bundler-execution-result';
-
-const compressAsync = promisify(brotliCompress);
+import { BuildOutputAsset, ExecutionResult } from './bundler-execution-result';
 
 export function logBuildStats(
-  context: BuilderContext,
   metafile: Metafile,
   initial: Map<string, InitialFileRecord>,
   budgetFailures: BudgetCalculatorResult[] | undefined,
+  colors: boolean,
   changedFiles?: Set<string>,
   estimatedTransferSizes?: Map<string, number>,
-): void {
-  const stats: BundleStats[] = [];
+  ssrOutputEnabled?: boolean,
+  verbose?: boolean,
+): string {
+  const browserStats: BundleStats[] = [];
+  const serverStats: BundleStats[] = [];
   let unchangedCount = 0;
+
   for (const [file, output] of Object.entries(metafile.outputs)) {
     // Only display JavaScript and CSS files
-    if (!file.endsWith('.js') && !file.endsWith('.css')) {
+    if (!/\.(?:css|m?js)$/.test(file)) {
       continue;
     }
+
     // Skip internal component resources
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     if ((output as any)['ng-component']) {
@@ -51,67 +57,98 @@ export function logBuildStats(
       continue;
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const isPlatformServer = (output as any)['ng-platform-server'];
+    if (isPlatformServer && !ssrOutputEnabled) {
+      // Only log server build stats when SSR is enabled.
+      continue;
+    }
+
     let name = initial.get(file)?.name;
     if (name === undefined && output.entryPoint) {
-      name = path
-        .basename(output.entryPoint)
+      name = basename(output.entryPoint)
         .replace(/\.[cm]?[jt]s$/, '')
         .replace(/[\\/.]/g, '-');
     }
 
-    stats.push({
+    const stat: BundleStats = {
       initial: initial.has(file),
       stats: [file, name ?? '-', output.bytes, estimatedTransferSizes?.get(file) ?? '-'],
-    });
+    };
+
+    if (isPlatformServer) {
+      serverStats.push(stat);
+    } else {
+      browserStats.push(stat);
+    }
   }
 
-  if (stats.length > 0) {
-    const tableText = generateBuildStatsTable(
-      stats,
-      true,
+  if (browserStats.length > 0 || serverStats.length > 0) {
+    const tableText = generateEsbuildBuildStatsTable(
+      [browserStats, serverStats],
+      colors,
       unchangedCount === 0,
       !!estimatedTransferSizes,
       budgetFailures,
+      verbose,
     );
 
-    context.logger.info('\n' + tableText + '\n');
+    return tableText + '\n';
   } else if (changedFiles !== undefined) {
-    context.logger.info('\nNo output file changes.\n');
+    return '\nNo output file changes.\n';
   }
   if (unchangedCount > 0) {
-    context.logger.info(`Unchanged output files: ${unchangedCount}`);
+    return `Unchanged output files: ${unchangedCount}`;
   }
+
+  return '';
 }
 
 export async function calculateEstimatedTransferSizes(
   outputFiles: OutputFile[],
 ): Promise<Map<string, number>> {
   const sizes = new Map<string, number>();
-  const pendingCompression = [];
-
-  for (const outputFile of outputFiles) {
-    // Only calculate JavaScript and CSS files
-    if (!outputFile.path.endsWith('.js') && !outputFile.path.endsWith('.css')) {
-      continue;
-    }
-
-    // Skip compressing small files which may end being larger once compressed and will most likely not be
-    // compressed in actual transit.
-    if (outputFile.contents.byteLength < 1024) {
-      sizes.set(outputFile.path, outputFile.contents.byteLength);
-      continue;
-    }
-
-    pendingCompression.push(
-      compressAsync(outputFile.contents).then((result) =>
-        sizes.set(outputFile.path, result.byteLength),
-      ),
-    );
+  if (outputFiles.length <= 0) {
+    return sizes;
   }
 
-  await Promise.all(pendingCompression);
+  return new Promise((resolve, reject) => {
+    let completeCount = 0;
+    for (const outputFile of outputFiles) {
+      // Only calculate JavaScript and CSS files
+      if (!outputFile.path.endsWith('.js') && !outputFile.path.endsWith('.css')) {
+        ++completeCount;
+        continue;
+      }
 
-  return sizes;
+      // Skip compressing small files which may end being larger once compressed and will most likely not be
+      // compressed in actual transit.
+      if (outputFile.contents.byteLength < 1024) {
+        sizes.set(outputFile.path, outputFile.contents.byteLength);
+        ++completeCount;
+        continue;
+      }
+
+      // Directly use the async callback function to minimize the number of Promises that need to be created.
+      brotliCompress(outputFile.contents, (error, result) => {
+        if (error) {
+          reject(error);
+
+          return;
+        }
+
+        sizes.set(outputFile.path, result.byteLength);
+        if (++completeCount >= outputFiles.length) {
+          resolve(sizes);
+        }
+      });
+    }
+
+    // Covers the case where no files need to be compressed
+    if (completeCount >= outputFiles.length) {
+      resolve(sizes);
+    }
+  });
 }
 
 export async function withSpinner<T>(text: string, action: () => T | Promise<T>): Promise<T> {
@@ -127,21 +164,6 @@ export async function withSpinner<T>(text: string, action: () => T | Promise<T>)
 
 export async function withNoProgress<T>(text: string, action: () => T | Promise<T>): Promise<T> {
   return action();
-}
-
-export async function logMessages(
-  context: BuilderContext,
-  { errors, warnings }: { errors?: PartialMessage[]; warnings?: PartialMessage[] },
-): Promise<void> {
-  if (warnings?.length) {
-    const warningMessages = await formatMessages(warnings, { kind: 'warning', color: true });
-    context.logger.warn(warningMessages.join('\n'));
-  }
-
-  if (errors?.length) {
-    const errorMessages = await formatMessages(errors, { kind: 'error', color: true });
-    context.logger.error(errorMessages.join('\n'));
-  }
 }
 
 /**
@@ -199,9 +221,9 @@ export async function writeResultFiles(
 ) {
   const directoryExists = new Set<string>();
   const ensureDirectoryExists = async (destPath: string) => {
-    const basePath = path.dirname(destPath);
+    const basePath = dirname(destPath);
     if (!directoryExists.has(basePath)) {
-      await fs.mkdir(path.join(base, basePath), { recursive: true });
+      await fs.mkdir(join(base, basePath), { recursive: true });
       directoryExists.add(basePath);
     }
   };
@@ -226,24 +248,24 @@ export async function writeResultFiles(
         );
     }
 
-    const destPath = path.join(outputDir, file.path);
+    const destPath = join(outputDir, file.path);
 
     // Ensure output subdirectories exist
     await ensureDirectoryExists(destPath);
 
     // Write file contents
-    await fs.writeFile(path.join(base, destPath), file.contents);
+    await fs.writeFile(join(base, destPath), file.contents);
   });
 
   if (assetFiles?.length) {
     await emitFilesToDisk(assetFiles, async ({ source, destination }) => {
-      const destPath = path.join(browser, destination);
+      const destPath = join(browser, destination);
 
       // Ensure output subdirectories exist
       await ensureDirectoryExists(destPath);
 
       // Copy file contents
-      await fs.copyFile(source, path.join(base, destPath), fsConstants.COPYFILE_FICLONE);
+      await fs.copyFile(source, join(base, destPath), fsConstants.COPYFILE_FICLONE);
     });
   }
 }
@@ -394,4 +416,59 @@ export function getSupportedNodeTargets(): string[] {
   }
 
   return SUPPORTED_NODE_VERSIONS.split('||').map((v) => 'node' + coerce(v)?.version);
+}
+
+interface BuildManifest {
+  errors: string[];
+  warnings: string[];
+  outputPaths: {
+    root: URL;
+    server?: URL | undefined;
+    browser: URL;
+  };
+  prerenderedRoutes?: string[];
+}
+
+export async function logMessages(
+  logger: logging.LoggerApi,
+  executionResult: ExecutionResult,
+  options: NormalizedApplicationBuildOptions,
+): Promise<void> {
+  const {
+    outputOptions: { base, server, browser },
+    ssrOptions,
+    jsonLogs,
+    colors: color,
+  } = options;
+  const { warnings, errors, prerenderedRoutes } = executionResult;
+  const warningMessages = warnings.length
+    ? await formatMessages(warnings, { kind: 'warning', color })
+    : [];
+  const errorMessages = errors.length ? await formatMessages(errors, { kind: 'error', color }) : [];
+
+  if (jsonLogs) {
+    // JSON format output
+    const manifest: BuildManifest = {
+      errors: errorMessages,
+      warnings: warningMessages,
+      outputPaths: {
+        root: pathToFileURL(base),
+        browser: pathToFileURL(join(base, browser)),
+        server: ssrOptions ? pathToFileURL(join(base, server)) : undefined,
+      },
+      prerenderedRoutes,
+    };
+
+    logger.info(JSON.stringify(manifest, undefined, 2));
+
+    return;
+  }
+
+  if (warningMessages.length) {
+    logger.warn(warningMessages.join('\n'));
+  }
+
+  if (errorMessages.length) {
+    logger.error(errorMessages.join('\n'));
+  }
 }

@@ -143,6 +143,6 @@ describe('Browser Builder scripts array', () => {
     expect(joinedLogs).toMatch(/lazy-script.+\d+ bytes/);
     expect(joinedLogs).toMatch(/renamed-script.+\d+ bytes/);
     expect(joinedLogs).toMatch(/renamed-lazy-script.+\d+ bytes/);
-    expect(joinedLogs).not.toContain('Lazy Chunks');
+    expect(joinedLogs).not.toContain('Lazy chunks');
   });
 });
