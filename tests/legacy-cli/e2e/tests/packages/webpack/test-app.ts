@@ -21,7 +21,7 @@ export default async function () {
   for (const outputFile of outputFiles) {
     if (outputFile.isFile() && outputFile.name.endsWith('.app.main.js')) {
       ++fileCount;
-      await expectFileSizeToBeUnder(join(outputFile.path, outputFile.name), 1024);
+      await expectFileSizeToBeUnder(join('dist', outputFile.name), 1024);
     }
   }
   if (fileCount !== 3) {
