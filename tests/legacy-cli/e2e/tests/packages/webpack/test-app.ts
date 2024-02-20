@@ -1,7 +1,9 @@
-import { normalize } from 'path';
+import { join, normalize } from 'path';
 import { createProjectFromAsset } from '../../../utils/assets';
 import { expectFileSizeToBeUnder, expectFileToMatch, replaceInFile } from '../../../utils/fs';
 import { execWithEnv } from '../../../utils/process';
+import { readdir } from 'node:fs/promises';
+import assert from 'node:assert';
 
 export default async function () {
   const webpackCLIBin = normalize('node_modules/.bin/webpack-cli');
@@ -14,9 +16,17 @@ export default async function () {
 
   // Note: these sizes are without Build Optimizer or any advanced optimizations in the CLI.
   await expectFileSizeToBeUnder('dist/app.main.js', 650 * 1024);
-  await expectFileSizeToBeUnder('dist/604.app.main.js', 1024);
-  await expectFileSizeToBeUnder('dist/988.app.main.js', 1024);
-  await expectFileSizeToBeUnder('dist/896.app.main.js', 1024);
+  const outputFiles = await readdir('dist', { withFileTypes: true });
+  let fileCount = 0;
+  for (const outputFile of outputFiles) {
+    if (outputFile.isFile() && outputFile.name.endsWith('.app.main.js')) {
+      ++fileCount;
+      await expectFileSizeToBeUnder(join(outputFile.path, outputFile.name), 1024);
+    }
+  }
+  if (fileCount !== 3) {
+    assert.fail('Expected three additional Webpack output chunk files.');
+  }
 
   // test resource urls without ./
   await replaceInFile('app/app.component.ts', './app.component.html', 'app.component.html');
