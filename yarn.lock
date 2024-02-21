@@ -130,8 +130,7 @@
     tslib "^2.3.0"
 
 "@angular/bazel@https://github.com/angular/bazel-builds.git#b51a0a6543ffbb9844353f33036fc54bda607443":
-  version "17.3.0-next.0+sha-e9246f7"
-  uid b51a0a6543ffbb9844353f33036fc54bda607443
+  version "17.3.0-next.0"
   resolved "https://github.com/angular/bazel-builds.git#b51a0a6543ffbb9844353f33036fc54bda607443"
   dependencies:
     "@microsoft/api-extractor" "^7.24.2"
@@ -148,7 +147,6 @@
 
 "@angular/build-tooling@https://github.com/angular/dev-infra-private-build-tooling-builds.git#eae1b15289d585a0d7888b947e1e57d8eb44e3c1":
   version "0.0.0-b6876b1fc6cf590e3223519fbbdedb7f8adbda2d"
-  uid eae1b15289d585a0d7888b947e1e57d8eb44e3c1
   resolved "https://github.com/angular/dev-infra-private-build-tooling-builds.git#eae1b15289d585a0d7888b947e1e57d8eb44e3c1"
   dependencies:
     "@angular-devkit/build-angular" "17.2.0-rc.0"
@@ -316,7 +314,6 @@
 
 "@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#2382925cf9c460e270725016baefd5d046cc2c59":
   version "0.0.0-b6876b1fc6cf590e3223519fbbdedb7f8adbda2d"
-  uid "2382925cf9c460e270725016baefd5d046cc2c59"
   resolved "https://github.com/angular/dev-infra-private-ng-dev-builds.git#2382925cf9c460e270725016baefd5d046cc2c59"
   dependencies:
     "@yarnpkg/lockfile" "^1.1.0"
@@ -11671,6 +11668,15 @@ sass@1.70.0, sass@^1.69.5:
   version "1.70.0"
   resolved "https://registry.yarnpkg.com/sass/-/sass-1.70.0.tgz#761197419d97b5358cb25f9dd38c176a8a270a75"
   integrity sha512-uUxNQ3zAHeAx5nRFskBnrWzDUJrrvpCPD5FNAoRvTi0WwremlheES3tg+56PaVtCs5QDRX5CBLxxKMDJMEa1WQ==
+  dependencies:
+    chokidar ">=3.0.0 <4.0.0"
+    immutable "^4.0.0"
+    source-map-js ">=0.6.2 <2.0.0"
+
+sass@1.71.1:
+  version "1.71.1"
+  resolved "https://registry.yarnpkg.com/sass/-/sass-1.71.1.tgz#dfb09c63ce63f89353777bbd4a88c0a38386ee54"
+  integrity sha512-wovtnV2PxzteLlfNzbgm1tFXPLoZILYAMJtvoXXkD7/+1uP41eKkIt1ypWq5/q2uT94qHjXehEYfmjKOvjL9sg==
   dependencies:
     chokidar ">=3.0.0 <4.0.0"
     immutable "^4.0.0"
