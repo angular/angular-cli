@@ -16,9 +16,9 @@ import {
   FileImporter,
   Importer,
   Logger,
+  NodePackageImporter,
   SourceSpan,
-  StringOptionsWithImporter,
-  StringOptionsWithoutImporter,
+  StringOptions,
 } from 'sass';
 import { maxWorkers } from '../../utils/environment-options';
 
@@ -50,7 +50,8 @@ type Importers =
   | Importer<'sync'>
   | Importer<'async'>
   | FileImporter<'sync'>
-  | FileImporter<'async'>;
+  | FileImporter<'async'>
+  | NodePackageImporter;
 
 /**
  * A response from the Sass render Worker containing the result of the operation.
@@ -104,10 +105,7 @@ export class SassWorkerImplementation {
    * @param source The contents to compile.
    * @param options The `dart-sass` options to use when rendering the stylesheet.
    */
-  compileStringAsync(
-    source: string,
-    options: StringOptionsWithImporter<'async'> | StringOptionsWithoutImporter<'async'>,
-  ): Promise<CompileResult> {
+  compileStringAsync(source: string, options: StringOptions<'async'>): Promise<CompileResult> {
     // The `functions`, `logger` and `importer` options are JavaScript functions that cannot be transferred.
     // If any additional function options are added in the future, they must be excluded as well.
     const { functions, importers, url, logger, ...serializableOptions } = options;
@@ -267,7 +265,7 @@ export class SassWorkerImplementation {
     options: CanonicalizeContext,
   ): Promise<string | null> {
     for (const importer of importers) {
-      if (this.isImporter(importer)) {
+      if (!this.isFileImporter(importer)) {
         // Importer
         throw new Error('Only File Importers are supported.');
       }
@@ -297,7 +295,7 @@ export class SassWorkerImplementation {
     };
   }
 
-  private isImporter(value: Importers): value is Importer {
-    return 'canonicalize' in value && 'load' in value;
+  private isFileImporter(value: Importers): value is FileImporter {
+    return 'findFileUrl' in value;
   }
 }
