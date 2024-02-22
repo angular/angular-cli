@@ -1,3 +1,16 @@
+<a name="17.2.1"></a>
+
+# 17.2.1 (2024-02-22)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                      |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------ |
+| [9e7c47b59](https://github.com/angular/angular-cli/commit/9e7c47b5945b368a6fd5e2544674d5a3afd63d65) | fix  | allow `mts` and `cts` file replacement           |
+| [f2a2e9287](https://github.com/angular/angular-cli/commit/f2a2e92877298a30bc1042772be043d5db9ac729) | fix  | provide Vite client code source map when loading |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="17.2.0"></a>
 
 # 17.2.0 (2024-02-14)
