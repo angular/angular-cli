@@ -130,8 +130,7 @@
     tslib "^2.3.0"
 
 "@angular/bazel@https://github.com/angular/bazel-builds.git#b6a228c2f6a1ee8d0dd7aa68c20f7be697b354c0":
-  version "17.3.0-next.0+sha-8e65bdc"
-  uid b6a228c2f6a1ee8d0dd7aa68c20f7be697b354c0
+  version "17.3.0-next.0"
   resolved "https://github.com/angular/bazel-builds.git#b6a228c2f6a1ee8d0dd7aa68c20f7be697b354c0"
   dependencies:
     "@microsoft/api-extractor" "^7.24.2"
@@ -148,7 +147,6 @@
 
 "@angular/build-tooling@https://github.com/angular/dev-infra-private-build-tooling-builds.git#00f7e7965bbc1788f178147c7149d6e7d1490daa":
   version "0.0.0-54698f602641db238753834d26b88f60152d9a5f"
-  uid "00f7e7965bbc1788f178147c7149d6e7d1490daa"
   resolved "https://github.com/angular/dev-infra-private-build-tooling-builds.git#00f7e7965bbc1788f178147c7149d6e7d1490daa"
   dependencies:
     "@angular-devkit/build-angular" "17.2.0-rc.0"
@@ -316,7 +314,6 @@
 
 "@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#1a47ddb107c2a2af607b3d589a798fa77a9b4d42":
   version "0.0.0-54698f602641db238753834d26b88f60152d9a5f"
-  uid "1a47ddb107c2a2af607b3d589a798fa77a9b4d42"
   resolved "https://github.com/angular/dev-infra-private-ng-dev-builds.git#1a47ddb107c2a2af607b3d589a798fa77a9b4d42"
   dependencies:
     "@yarnpkg/lockfile" "^1.1.0"
@@ -11874,7 +11871,6 @@ sass@1.71.1, sass@^1.69.5:
 
 "sauce-connect-proxy@https://saucelabs.com/downloads/sc-4.9.1-linux.tar.gz":
   version "0.0.0"
-  uid "9310bc860f7870a1f872b11c4dc6073a1ad34e5e"
   resolved "https://saucelabs.com/downloads/sc-4.9.1-linux.tar.gz#9310bc860f7870a1f872b11c4dc6073a1ad34e5e"
 
 saucelabs@^1.5.0:
@@ -13607,6 +13603,36 @@ webpack@5.90.1:
   version "5.90.1"
   resolved "https://registry.yarnpkg.com/webpack/-/webpack-5.90.1.tgz#62ab0c097d7cbe83d32523dbfbb645cdb7c3c01c"
   integrity sha512-SstPdlAC5IvgFnhiRok8hqJo/+ArAbNv7rhU4fnWGHNVfN59HSQFaxZDSAL3IFG2YmqxuRs+IU33milSxbPlog==
+  dependencies:
+    "@types/eslint-scope" "^3.7.3"
+    "@types/estree" "^1.0.5"
+    "@webassemblyjs/ast" "^1.11.5"
+    "@webassemblyjs/wasm-edit" "^1.11.5"
+    "@webassemblyjs/wasm-parser" "^1.11.5"
+    acorn "^8.7.1"
+    acorn-import-assertions "^1.9.0"
+    browserslist "^4.21.10"
+    chrome-trace-event "^1.0.2"
+    enhanced-resolve "^5.15.0"
+    es-module-lexer "^1.2.1"
+    eslint-scope "5.1.1"
+    events "^3.2.0"
+    glob-to-regexp "^0.4.1"
+    graceful-fs "^4.2.9"
+    json-parse-even-better-errors "^2.3.1"
+    loader-runner "^4.2.0"
+    mime-types "^2.1.27"
+    neo-async "^2.6.2"
+    schema-utils "^3.2.0"
+    tapable "^2.1.1"
+    terser-webpack-plugin "^5.3.10"
+    watchpack "^2.4.0"
+    webpack-sources "^3.2.3"
+
+webpack@5.90.3:
+  version "5.90.3"
+  resolved "https://registry.yarnpkg.com/webpack/-/webpack-5.90.3.tgz#37b8f74d3ded061ba789bb22b31e82eed75bd9ac"
+  integrity sha512-h6uDYlWCctQRuXBs1oYpVe6sFcWedl0dpcVaTf/YF67J9bKvwJajFulMVSYKHrksMB3I/pIagRzDxwxkebuzKA==
   dependencies:
     "@types/eslint-scope" "^3.7.3"
     "@types/estree" "^1.0.5"
