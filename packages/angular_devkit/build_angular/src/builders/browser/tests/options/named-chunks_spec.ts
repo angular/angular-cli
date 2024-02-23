@@ -11,7 +11,7 @@ import { BASE_OPTIONS, BROWSER_BUILDER_INFO, describeBuilder } from '../setup';
 
 const MAIN_OUTPUT = 'dist/main.js';
 const NAMED_LAZY_OUTPUT = 'dist/src_lazy-module_ts.js';
-const UNNAMED_LAZY_OUTPUT = 'dist/208.js';
+const UNNAMED_LAZY_OUTPUT = 'dist/28.js';
 
 describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
   describe('Option: "namedChunks"', () => {
@@ -53,7 +53,7 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
       harness.expectFile(UNNAMED_LAZY_OUTPUT).toExist();
     });
 
-    it('generates named files in output when not present', async () => {
+    it('does not generate named files in output when not present', async () => {
       harness.useTarget('build', {
         ...BASE_OPTIONS,
       });
