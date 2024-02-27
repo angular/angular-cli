@@ -15,8 +15,8 @@ function createWorkSpaceConfig(tree: UnitTestTree) {
     version: 1,
     projects: {
       app: {
-        root: '/project/lib',
-        sourceRoot: '/project/app/src',
+        root: '/project/app',
+        sourceRoot: 'src',
         projectType: ProjectType.Application,
         prefix: 'app',
         architect: {
@@ -100,5 +100,171 @@ describe(`Migration to use the application builder`, () => {
       base: 'dist/project',
       media: 'resources',
     });
+  });
+
+  it('should remove tilde prefix from CSS @import specifiers', async () => {
+    // Replace outputPath
+    tree.create(
+      '/project/app/src/styles.css',
+      '@import "~@angular/material";\n@import "./abc.css"\n',
+    );
+
+    const newTree = await schematicRunner.runSchematic(schematicName, {}, tree);
+    const content = newTree.readText('/project/app/src/styles.css');
+
+    expect(content).toEqual('@import "@angular/material";\n@import "./abc.css"\n');
+  });
+
+  it('should remove caret prefix from CSS @import specifiers and as external dependency', async () => {
+    // Replace outputPath
+    tree.create(
+      '/project/app/src/styles.css',
+      '@import "^@angular/material";\n@import "./abc.css"\n',
+    );
+
+    const newTree = await schematicRunner.runSchematic(schematicName, {}, tree);
+    const content = newTree.readText('/project/app/src/styles.css');
+
+    expect(content).toEqual('@import "@angular/material";\n@import "./abc.css"\n');
+    const {
+      projects: { app },
+    } = JSON.parse(newTree.readContent('/angular.json'));
+
+    const { externalDependencies } = app.architect['build'].options;
+    expect(externalDependencies).toEqual(['@angular/material']);
+  });
+
+  it('should remove tilde prefix from SCSS @import specifiers', async () => {
+    // Replace outputPath
+    tree.create('/project/app/src/styles.scss', '@import "~@angular/material";\n@import "./abc"\n');
+
+    const newTree = await schematicRunner.runSchematic(schematicName, {}, tree);
+    const content = newTree.readText('/project/app/src/styles.scss');
+
+    expect(content).toEqual('@import "@angular/material";\n@import "./abc"\n');
+  });
+
+  it('should remove tilde prefix from SCSS @use specifiers', async () => {
+    // Replace outputPath
+    tree.create('/project/app/src/styles.scss', '@use "~@angular/material";\n@import "./abc"\n');
+
+    const newTree = await schematicRunner.runSchematic(schematicName, {}, tree);
+    const content = newTree.readText('/project/app/src/styles.scss');
+
+    expect(content).toEqual('@use "@angular/material";\n@import "./abc"\n');
+  });
+
+  it('should remove caret prefix from SCSS @import specifiers and as external dependency', async () => {
+    // Replace outputPath
+    tree.create('/project/app/src/styles.scss', '@import "^@angular/material";\n@import "./abc"\n');
+
+    const newTree = await schematicRunner.runSchematic(schematicName, {}, tree);
+    const content = newTree.readText('/project/app/src/styles.scss');
+
+    expect(content).toEqual('@import "@angular/material";\n@import "./abc"\n');
+    const {
+      projects: { app },
+    } = JSON.parse(newTree.readContent('/angular.json'));
+
+    const { externalDependencies } = app.architect['build'].options;
+    expect(externalDependencies).toEqual(['@angular/material']);
+  });
+
+  it('should remove caret prefix from SCSS @use specifiers and as external dependency', async () => {
+    // Replace outputPath
+    tree.create('/project/app/src/styles.scss', '@use "^@angular/material";\n@import "./abc"\n');
+
+    const newTree = await schematicRunner.runSchematic(schematicName, {}, tree);
+    const content = newTree.readText('/project/app/src/styles.scss');
+
+    expect(content).toEqual('@use "@angular/material";\n@import "./abc"\n');
+    const {
+      projects: { app },
+    } = JSON.parse(newTree.readContent('/angular.json'));
+
+    const { externalDependencies } = app.architect['build'].options;
+    expect(externalDependencies).toEqual(['@angular/material']);
+  });
+
+  it('should add SCSS workspace include path for root referenced @import specifiers', async () => {
+    // Replace outputPath
+    tree.create(
+      '/project/app/src/styles.scss',
+      '@use "@angular/material";\n@import "some/path/abc"\n',
+    );
+    tree.create('/some/path/abc.scss', '');
+
+    const newTree = await schematicRunner.runSchematic(schematicName, {}, tree);
+    const content = newTree.readText('/project/app/src/styles.scss');
+
+    expect(content).toEqual('@use "@angular/material";\n@import "some/path/abc"\n');
+    const {
+      projects: { app },
+    } = JSON.parse(newTree.readContent('/angular.json'));
+
+    const { stylePreprocessorOptions } = app.architect['build'].options;
+    expect(stylePreprocessorOptions).toEqual({ includePaths: ['.'] });
+  });
+
+  it('should add SCSS workspace include path for root referenced @use specifiers', async () => {
+    // Replace outputPath
+    tree.create(
+      '/project/app/src/styles.scss',
+      '@use "@angular/material";\n@use "some/path/abc"\n',
+    );
+    tree.create('/some/path/abc.scss', '');
+
+    const newTree = await schematicRunner.runSchematic(schematicName, {}, tree);
+    const content = newTree.readText('/project/app/src/styles.scss');
+
+    expect(content).toEqual('@use "@angular/material";\n@use "some/path/abc"\n');
+    const {
+      projects: { app },
+    } = JSON.parse(newTree.readContent('/angular.json'));
+
+    const { stylePreprocessorOptions } = app.architect['build'].options;
+    expect(stylePreprocessorOptions).toEqual({ includePaths: ['.'] });
+  });
+
+  it('should not add SCSS workspace include path for root referenced @import specifiers with ".import" local file', async () => {
+    // Replace outputPath
+    tree.create(
+      '/project/app/src/styles.scss',
+      '@use "@angular/material";\n@import "some/path/abc"\n',
+    );
+    tree.create('/some/path/abc.scss', '');
+    tree.create('/project/app/src/some/path/abc.import.scss', '');
+
+    const newTree = await schematicRunner.runSchematic(schematicName, {}, tree);
+    const content = newTree.readText('/project/app/src/styles.scss');
+
+    expect(content).toEqual('@use "@angular/material";\n@import "some/path/abc"\n');
+    const {
+      projects: { app },
+    } = JSON.parse(newTree.readContent('/angular.json'));
+
+    const { stylePreprocessorOptions } = app.architect['build'].options;
+    expect(stylePreprocessorOptions).toBeUndefined();
+  });
+
+  it('should add SCSS workspace include path for root referenced @use specifiers with ".import" local file', async () => {
+    // Replace outputPath
+    tree.create(
+      '/project/app/src/styles.scss',
+      '@use "@angular/material";\n@use "some/path/abc"\n',
+    );
+    tree.create('/some/path/abc.scss', '');
+    tree.create('/project/app/src/some/path/abc.import.scss', '');
+
+    const newTree = await schematicRunner.runSchematic(schematicName, {}, tree);
+    const content = newTree.readText('/project/app/src/styles.scss');
+
+    expect(content).toEqual('@use "@angular/material";\n@use "some/path/abc"\n');
+    const {
+      projects: { app },
+    } = JSON.parse(newTree.readContent('/angular.json'));
+
+    const { stylePreprocessorOptions } = app.architect['build'].options;
+    expect(stylePreprocessorOptions).toEqual({ includePaths: ['.'] });
   });
 });
