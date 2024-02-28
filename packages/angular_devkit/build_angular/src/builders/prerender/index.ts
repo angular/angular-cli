@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import { augmentAppWithServiceWorker } from '@angular/build/private';
 import {
   BuilderContext,
   BuilderOutput,
@@ -20,7 +21,6 @@ import Piscina from 'piscina';
 import { normalizeOptimization } from '../../utils';
 import { maxWorkers } from '../../utils/environment-options';
 import { assertIsError } from '../../utils/error';
-import { augmentAppWithServiceWorker } from '../../utils/service-worker';
 import { getIndexOutputFile } from '../../utils/webpack-browser-config';
 import { BrowserBuilderOutput } from '../browser';
 import { Schema as BrowserBuilderOptions } from '../browser/schema';

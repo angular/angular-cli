@@ -2,6 +2,17 @@
   "packages": {
     "@_/builders": {},
     "devkit": {},
+    "@angular/build": {
+      "name": "Angular Build System",
+      "section": "Tooling",
+      "links": [
+        {
+          "label": "README",
+          "url": "/packages/angular/build/README.md"
+        }
+      ],
+      "snapshotRepo": "angular/angular-build-builds"
+    },
     "@angular/cli": {
       "name": "Angular CLI",
       "section": "Tooling",

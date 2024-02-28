@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import { assertCompatibleAngularVersion, purgeStaleBuildCache } from '@angular/build/private';
 import { BuilderContext, BuilderOutput, createBuilder } from '@angular-devkit/architect';
 import { strings } from '@angular-devkit/core';
 import type { Config, ConfigOptions } from 'karma';
@@ -15,8 +16,6 @@ import { Observable, defaultIfEmpty, from, switchMap } from 'rxjs';
 import { Configuration } from 'webpack';
 import { getCommonConfig, getStylesConfig } from '../../tools/webpack/configs';
 import { ExecutionTransformer } from '../../transforms';
-import { purgeStaleBuildCache } from '../../utils/purge-cache';
-import { assertCompatibleAngularVersion } from '../../utils/version';
 import { generateBrowserWebpackConfigFromContext } from '../../utils/webpack-browser-config';
 import { Schema as BrowserBuilderOptions, OutputHashing } from '../browser/schema';
 import { FindTestsPlugin } from './find-tests-plugin';

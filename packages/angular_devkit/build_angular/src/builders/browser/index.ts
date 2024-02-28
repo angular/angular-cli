@@ -6,6 +6,17 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import {
+  BudgetCalculatorResult,
+  FileInfo,
+  IndexHtmlGenerator,
+  IndexHtmlTransform,
+  ThresholdSeverity,
+  assertCompatibleAngularVersion,
+  augmentAppWithServiceWorker,
+  checkBudgets,
+  purgeStaleBuildCache,
+} from '@angular/build/private';
 import { BuilderContext, BuilderOutput, createBuilder } from '@angular-devkit/architect';
 import { EmittedFiles, WebpackLoggingCallback, runWebpack } from '@angular-devkit/build-webpack';
 import { imageDomains } from '@ngtools/webpack';
@@ -32,28 +43,15 @@ import {
   normalizeOptimization,
   urlJoin,
 } from '../../utils';
-import {
-  BudgetCalculatorResult,
-  ThresholdSeverity,
-  checkBudgets,
-} from '../../utils/bundle-calculator';
 import { colors } from '../../utils/color';
 import { copyAssets } from '../../utils/copy-assets';
 import { assertIsError } from '../../utils/error';
 import { i18nInlineEmittedFiles } from '../../utils/i18n-inlining';
 import { I18nOptions } from '../../utils/i18n-webpack';
-import { FileInfo } from '../../utils/index-file/augment-index-html';
-import {
-  IndexHtmlGenerator,
-  IndexHtmlTransform,
-} from '../../utils/index-file/index-html-generator';
 import { normalizeCacheOptions } from '../../utils/normalize-cache';
 import { ensureOutputPaths } from '../../utils/output-paths';
 import { generateEntryPoints } from '../../utils/package-chunk-sort';
-import { purgeStaleBuildCache } from '../../utils/purge-cache';
-import { augmentAppWithServiceWorker } from '../../utils/service-worker';
 import { Spinner } from '../../utils/spinner';
-import { assertCompatibleAngularVersion } from '../../utils/version';
 import {
   generateI18nBrowserWebpackConfigFromContext,
   getIndexInputFile,

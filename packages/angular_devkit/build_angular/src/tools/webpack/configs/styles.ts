@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import { SassWorkerImplementation } from '@angular/build/private';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import * as path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -13,7 +14,6 @@ import type { FileImporter } from 'sass';
 import type { Configuration, LoaderContext, RuleSetUseItem } from 'webpack';
 import { WebpackConfigOptions } from '../../../utils/build-options';
 import { findTailwindConfigurationFile } from '../../../utils/tailwind';
-import { SassWorkerImplementation } from '../../sass/sass-service';
 import {
   AnyComponentStyleBudgetChecker,
   PostcssCliResources,

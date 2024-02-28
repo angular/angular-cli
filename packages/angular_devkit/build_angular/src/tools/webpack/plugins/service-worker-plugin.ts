@@ -6,8 +6,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import { augmentAppWithServiceWorker } from '@angular/build/private';
 import type { Compiler } from 'webpack';
-import { augmentAppWithServiceWorker } from '../../../utils/service-worker';
 
 export interface ServiceWorkerPluginOptions {
   projectRoot: string;

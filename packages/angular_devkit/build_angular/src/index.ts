@@ -29,7 +29,7 @@ export {
   BrowserBuilderOutput,
 } from './builders/browser';
 
-export { buildApplication, ApplicationBuilderOptions } from './builders/application';
+export { buildApplication, ApplicationBuilderOptions } from '@angular/build';
 
 export {
   executeDevServerBuilder,

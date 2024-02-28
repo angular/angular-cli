@@ -8,7 +8,7 @@ load("//tools:defaults.bzl", "ts_library")
 # NOTE This is built as ESM as this is included in the users server bundle.
 licenses(["notice"])
 
-package(default_visibility = ["//packages/angular_devkit/build_angular:__subpackages__"])
+package(default_visibility = ["//packages/angular/build:__subpackages__"])
 
 ts_library(
     name = "routes-extractor",

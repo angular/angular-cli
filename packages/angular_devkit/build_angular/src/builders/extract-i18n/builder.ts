@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import { assertCompatibleAngularVersion, purgeStaleBuildCache } from '@angular/build/private';
 import type { Diagnostics } from '@angular/localize/tools';
 import type { BuilderContext, BuilderOutput } from '@angular-devkit/architect';
 import fs from 'node:fs';
@@ -13,8 +14,6 @@ import path from 'node:path';
 import type webpack from 'webpack';
 import type { ExecutionTransformer } from '../../transforms';
 import { loadEsmModule } from '../../utils/load-esm';
-import { purgeStaleBuildCache } from '../../utils/purge-cache';
-import { assertCompatibleAngularVersion } from '../../utils/version';
 import { normalizeOptions } from './options';
 import { Schema as ExtractI18nBuilderOptions, Format } from './schema';
 

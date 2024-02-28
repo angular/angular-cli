@@ -6,6 +6,10 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import {
+  ApplicationBuilderInternalOptions,
+  buildApplicationInternal,
+} from '@angular/build/private';
 import { BuilderContext, BuilderOutput, createBuilder } from '@angular-devkit/architect';
 import { execFile as execFileCb } from 'node:child_process';
 import * as fs from 'node:fs/promises';
@@ -13,8 +17,6 @@ import * as path from 'node:path';
 import { promisify } from 'node:util';
 import { colors } from '../../utils/color';
 import { findTestFiles } from '../../utils/test-files';
-import { buildApplicationInternal } from '../application';
-import { ApplicationBuilderInternalOptions } from '../application/options';
 import { OutputHashing } from '../browser-esbuild/schema';
 import { normalizeOptions } from './options';
 import { Schema as JestBuilderSchema } from './schema';

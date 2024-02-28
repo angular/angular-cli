@@ -6,10 +6,10 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import { transformSupportedBrowsersToTargets } from '@angular/build/private';
 import type { Message, TransformResult } from 'esbuild';
 import type { Compilation, Compiler, sources } from 'webpack';
 import { addWarning } from '../../../utils/webpack-diagnostics';
-import { transformSupportedBrowsersToTargets } from '../../esbuild/utils';
 import { EsbuildExecutor } from './esbuild-executor';
 
 /**

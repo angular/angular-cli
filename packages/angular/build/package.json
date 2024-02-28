@@ -1,0 +1,65 @@
+{
+  "name": "@angular/build",
+  "version": "0.0.0-PLACEHOLDER",
+  "description": "Official build system for Angular",
+  "keywords": [
+    "angular",
+    "angular-cli"
+  ],
+  "exports": {
+    ".": {
+      "types": "./src/index.d.ts",
+      "default": "./src/index.js"
+    },
+    "./private": {
+      "default": "./src/private.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "builders": "builders.json",
+  "dependencies": {
+    "@ampproject/remapping": "2.3.0",
+    "@angular-devkit/architect": "0.0.0-EXPERIMENTAL-PLACEHOLDER",
+    "@babel/core": "7.24.4",
+    "@babel/helper-annotate-as-pure": "7.22.5",
+    "@babel/helper-split-export-declaration": "7.22.6",
+    "browserslist": "^4.23.0",
+    "critters": "0.0.22",
+    "esbuild": "0.20.2",
+    "fast-glob": "3.3.2",
+    "https-proxy-agent": "7.0.4",
+    "less": "4.2.0",
+    "magic-string": "0.30.10",
+    "mrmime": "2.0.0",
+    "ora": "5.4.1",
+    "piscina": "4.4.0",
+    "parse5-html-rewriting-stream": "7.0.0",
+    "postcss": "8.4.38",
+    "sass": "1.75.0",
+    "semver": "7.6.0",
+    "undici": "6.13.0",
+    "watchpack": "2.4.1"
+  },
+  "peerDependencies": {
+    "@angular/compiler-cli": "^18.0.0 || ^18.0.0-next.0",
+    "@angular/localize": "^18.0.0 || ^18.0.0-next.0",
+    "@angular/platform-server": "^18.0.0 || ^18.0.0-next.0",
+    "@angular/service-worker": "^18.0.0 || ^18.0.0-next.0",
+    "tailwindcss": "^2.0.0 || ^3.0.0",
+    "typescript": ">=5.4 <5.5"
+  },
+  "peerDependenciesMeta": {
+    "@angular/localize": {
+      "optional": true
+    },
+    "@angular/platform-server": {
+      "optional": true
+    },
+    "@angular/service-worker": {
+      "optional": true
+    },
+    "tailwindcss": {
+      "optional": true
+    }
+  }
+}

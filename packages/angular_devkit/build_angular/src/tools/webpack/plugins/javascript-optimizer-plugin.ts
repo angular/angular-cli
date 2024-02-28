@@ -6,11 +6,11 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import { transformSupportedBrowsersToTargets } from '@angular/build/private';
 import Piscina from 'piscina';
 import type { Compiler, sources } from 'webpack';
 import { maxWorkers } from '../../../utils/environment-options';
 import { addError } from '../../../utils/webpack-diagnostics';
-import { transformSupportedBrowsersToTargets } from '../../esbuild/utils';
 import { EsbuildExecutor } from './esbuild-executor';
 import type { OptimizeRequestOptions } from './javascript-optimizer-worker';
 

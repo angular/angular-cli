@@ -6,69 +6,22 @@
 
 /// <reference types="node" />
 
+import { ApplicationBuilderOptions } from '@angular/build';
+import { buildApplication } from '@angular/build';
 import { BuilderContext } from '@angular-devkit/architect';
 import { BuilderOutput } from '@angular-devkit/architect';
 import type { ConfigOptions } from 'karma';
 import { Configuration } from 'webpack';
 import { DevServerBuildOutput } from '@angular-devkit/build-webpack';
 import type http from 'node:http';
+import { IndexHtmlTransform } from '@angular/build/private';
 import { json } from '@angular-devkit/core';
 import { Observable } from 'rxjs';
-import { OutputFile } from 'esbuild';
 import type { Plugin as Plugin_2 } from 'esbuild';
 import webpack from 'webpack';
 import { WebpackLoggingCallback } from '@angular-devkit/build-webpack';
 
-// @public
-export interface ApplicationBuilderOptions {
-    allowedCommonJsDependencies?: string[];
-    aot?: boolean;
-    appShell?: boolean;
-    assets?: AssetPattern_2[];
-    baseHref?: string;
-    browser: string;
-    budgets?: Budget_2[];
-    clearScreen?: boolean;
-    crossOrigin?: CrossOrigin_2;
-    define?: {
-        [key: string]: string;
-    };
-    deleteOutputPath?: boolean;
-    deployUrl?: string;
-    externalDependencies?: string[];
-    extractLicenses?: boolean;
-    fileReplacements?: FileReplacement_2[];
-    i18nDuplicateTranslation?: I18NTranslation_2;
-    i18nMissingTranslation?: I18NTranslation_2;
-    index: IndexUnion_2;
-    inlineStyleLanguage?: InlineStyleLanguage_2;
-    loader?: {
-        [key: string]: any;
-    };
-    localize?: Localize_2;
-    namedChunks?: boolean;
-    optimization?: OptimizationUnion_2;
-    outputHashing?: OutputHashing_2;
-    outputPath: OutputPathUnion;
-    poll?: number;
-    polyfills?: string[];
-    prerender?: PrerenderUnion;
-    preserveSymlinks?: boolean;
-    progress?: boolean;
-    scripts?: ScriptElement_2[];
-    server?: string;
-    serviceWorker?: ServiceWorker_2;
-    sourceMap?: SourceMapUnion_2;
-    ssr?: SsrUnion;
-    statsJson?: boolean;
-    stylePreprocessorOptions?: StylePreprocessorOptions_2;
-    styles?: StyleElement_2[];
-    subresourceIntegrity?: boolean;
-    tsConfig: string;
-    verbose?: boolean;
-    watch?: boolean;
-    webWorkerTsConfig?: string;
-}
+export { ApplicationBuilderOptions }
 
 // @public (undocumented)
 export type AssetPattern = AssetPatternObject | string;
@@ -150,11 +103,7 @@ export interface Budget {
     warning?: string;
 }
 
-// @public
-export function buildApplication(options: ApplicationBuilderOptions, context: BuilderContext, plugins?: Plugin_2[]): AsyncIterable<ApplicationBuilderOutput>;
-
-// @public
-export function buildApplication(options: ApplicationBuilderOptions, context: BuilderContext, extensions?: ApplicationBuilderExtensions): AsyncIterable<ApplicationBuilderOutput>;
+export { buildApplication }
 
 // @public
 export enum CrossOrigin {
@@ -271,14 +220,14 @@ export interface FileReplacement {
 
 // @public
 export interface KarmaBuilderOptions {
-    assets?: AssetPattern_3[];
+    assets?: AssetPattern_2[];
     browsers?: Browsers;
     codeCoverage?: boolean;
     codeCoverageExclude?: string[];
     exclude?: string[];
-    fileReplacements?: FileReplacement_3[];
+    fileReplacements?: FileReplacement_2[];
     include?: string[];
-    inlineStyleLanguage?: InlineStyleLanguage_3;
+    inlineStyleLanguage?: InlineStyleLanguage_2;
     karmaConfig?: string;
     main?: string;
     poll?: number;
@@ -286,10 +235,10 @@ export interface KarmaBuilderOptions {
     preserveSymlinks?: boolean;
     progress?: boolean;
     reporters?: string[];
-    scripts?: ScriptElement_3[];
-    sourceMap?: SourceMapUnion_3;
-    stylePreprocessorOptions?: StylePreprocessorOptions_3;
-    styles?: StyleElement_3[];
+    scripts?: ScriptElement_2[];
+    sourceMap?: SourceMapUnion_2;
+    stylePreprocessorOptions?: StylePreprocessorOptions_2;
+    styles?: StyleElement_2[];
     tsConfig: string;
     watch?: boolean;
     webWorkerTsConfig?: string;
@@ -347,29 +296,29 @@ export interface ProtractorBuilderOptions {
 
 // @public (undocumented)
 export interface ServerBuilderOptions {
-    assets?: AssetPattern_4[];
+    assets?: AssetPattern_3[];
     buildOptimizer?: boolean;
     deleteOutputPath?: boolean;
     deployUrl?: string;
     externalDependencies?: string[];
     extractLicenses?: boolean;
-    fileReplacements?: FileReplacement_4[];
-    i18nDuplicateTranslation?: I18NTranslation_3;
-    i18nMissingTranslation?: I18NTranslation_3;
-    inlineStyleLanguage?: InlineStyleLanguage_4;
-    localize?: Localize_3;
+    fileReplacements?: FileReplacement_3[];
+    i18nDuplicateTranslation?: I18NTranslation_2;
+    i18nMissingTranslation?: I18NTranslation_2;
+    inlineStyleLanguage?: InlineStyleLanguage_3;
+    localize?: Localize_2;
     main: string;
     namedChunks?: boolean;
-    optimization?: OptimizationUnion_3;
-    outputHashing?: OutputHashing_3;
+    optimization?: OptimizationUnion_2;
+    outputHashing?: OutputHashing_2;
     outputPath: string;
     poll?: number;
     preserveSymlinks?: boolean;
     progress?: boolean;
     resourcesOutputPath?: string;
-    sourceMap?: SourceMapUnion_4;
+    sourceMap?: SourceMapUnion_3;
     statsJson?: boolean;
-    stylePreprocessorOptions?: StylePreprocessorOptions_4;
+    stylePreprocessorOptions?: StylePreprocessorOptions_3;
     tsConfig: string;
     vendorChunk?: boolean;
     verbose?: boolean;

@@ -6,19 +6,16 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import type { ApplicationBuilderOptions, BuildOutputAsset, BuildOutputFile } from '@angular/build';
+import { buildApplicationInternal, deleteOutputDir, emitFilesToDisk } from '@angular/build/private';
 import { BuilderContext, BuilderOutput, createBuilder } from '@angular-devkit/architect';
 import type { Plugin } from 'esbuild';
-import { constants as fsConstants } from 'node:fs';
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import { BuildOutputFile } from '../../tools/esbuild/bundler-context';
-import { BuildOutputAsset } from '../../tools/esbuild/bundler-execution-result';
-import { emitFilesToDisk } from '../../tools/esbuild/utils';
-import { deleteOutputDir } from '../../utils';
-import { buildApplicationInternal } from '../application';
-import { Schema as ApplicationBuilderOptions, OutputPathClass } from '../application/schema';
 import { logBuilderStatusWarnings } from './builder-status-warnings';
-import { Schema as BrowserBuilderOptions } from './schema';
+import type { Schema as BrowserBuilderOptions } from './schema';
+
+type OutputPathClass = Exclude<ApplicationBuilderOptions['outputPath'], string | undefined>;
 
 /**
  * Main execution function for the esbuild-based application builder.
@@ -133,7 +130,7 @@ async function writeResultFiles(
       await ensureDirectoryExists(basePath);
 
       // Copy file contents
-      await fs.copyFile(source, path.join(outputPath, destination), fsConstants.COPYFILE_FICLONE);
+      await fs.copyFile(source, path.join(outputPath, destination), fs.constants.COPYFILE_FICLONE);
     });
   }
 }

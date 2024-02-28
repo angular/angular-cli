@@ -6,13 +6,15 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import {
+  type ApplicationBuilderInternalOptions,
+  buildApplicationInternal,
+} from '@angular/build/private';
 import type { ɵParsedMessage as LocalizeMessage } from '@angular/localize';
 import type { MessageExtractor } from '@angular/localize/tools';
 import type { BuilderContext, BuilderOutput } from '@angular-devkit/architect';
 import assert from 'node:assert';
 import nodePath from 'node:path';
-import { buildApplicationInternal } from '../application';
-import type { ApplicationBuilderInternalOptions } from '../application/options';
 import { buildEsbuildBrowser } from '../browser-esbuild';
 import type { NormalizedExtractI18nOptions } from './options';
 

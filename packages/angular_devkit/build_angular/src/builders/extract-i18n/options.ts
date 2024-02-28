@@ -6,10 +6,10 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import { createI18nOptions } from '@angular/build/private';
 import { BuilderContext, targetFromTargetString } from '@angular-devkit/architect';
 import { fail } from 'node:assert';
 import path from 'node:path';
-import { createI18nOptions } from '../../utils/i18n-options';
 import { Schema as ExtractI18nOptions, Format } from './schema';
 
 export type NormalizedExtractI18nOptions = Awaited<ReturnType<typeof normalizeOptions>>;

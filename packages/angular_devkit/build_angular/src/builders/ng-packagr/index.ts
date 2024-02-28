@@ -6,12 +6,12 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import { purgeStaleBuildCache } from '@angular/build/private';
 import { BuilderContext, BuilderOutput, createBuilder } from '@angular-devkit/architect';
 import type { NgPackagrOptions } from 'ng-packagr';
 import { join, resolve } from 'node:path';
 import { Observable, catchError, from, map, of, switchMap } from 'rxjs';
 import { normalizeCacheOptions } from '../../utils/normalize-cache';
-import { purgeStaleBuildCache } from '../../utils/purge-cache';
 import { Schema as NgPackagrBuilderOptions } from './schema';
 
 /**

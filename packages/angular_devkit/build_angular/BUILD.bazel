@@ -13,11 +13,6 @@ licenses(["notice"])
 package(default_visibility = ["//visibility:public"])
 
 ts_json_schema(
-    name = "application_schema",
-    src = "src/builders/application/schema.json",
-)
-
-ts_json_schema(
     name = "app_shell_schema",
     src = "src/builders/app-shell/schema.json",
 )
@@ -99,7 +94,6 @@ ts_library(
         ],
     ) + [
         "//packages/angular_devkit/build_angular:src/builders/app-shell/schema.ts",
-        "//packages/angular_devkit/build_angular:src/builders/application/schema.ts",
         "//packages/angular_devkit/build_angular:src/builders/browser-esbuild/schema.ts",
         "//packages/angular_devkit/build_angular:src/builders/browser/schema.ts",
         "//packages/angular_devkit/build_angular:src/builders/dev-server/schema.ts",
@@ -115,19 +109,21 @@ ts_library(
     ],
     data = glob(
         include = [
-            "package.json",
-            "builders.json",
             "src/**/schema.json",
             "src/**/*.js",
             "src/**/*.mjs",
             "src/**/*.html",
         ],
-    ),
+    ) + [
+        "builders.json",
+        "package.json",
+    ],
     module_name = "@angular-devkit/build-angular",
     module_root = "src/index.d.ts",
     deps = [
+        "//packages/angular/build",
+        "//packages/angular/build:private",
         "//packages/angular_devkit/architect",
-        "//packages/angular_devkit/build_angular/src/utils/routes-extractor",
         "//packages/angular_devkit/build_webpack",
         "//packages/angular_devkit/core",
         "//packages/angular_devkit/core/node",
@@ -297,6 +293,8 @@ ts_library(
     deps = [
         ":build_angular",
         "//modules/testing/builder",
+        "//packages/angular/build",
+        "//packages/angular/build:private",
         "//packages/angular_devkit/architect",
         "//packages/angular_devkit/architect/node",
         "//packages/angular_devkit/architect/testing",
@@ -307,14 +305,6 @@ ts_library(
 )
 
 LARGE_SPECS = {
-    "application": {
-        "shards": 12,
-        "size": "large",
-        "flaky": True,
-        "extra_deps": [
-            "@npm//buffer",
-        ],
-    },
     "app-shell": {},
     "dev-server": {
         "shards": 10,
@@ -395,6 +385,8 @@ LARGE_SPECS = {
             ":build_angular",
             ":build_angular_test_utils",
             "//modules/testing/builder",
+            "//packages/angular/build",
+            "//packages/angular/build:private",
             "//packages/angular_devkit/architect",
             "//packages/angular_devkit/architect/node",
             "//packages/angular_devkit/architect/testing",

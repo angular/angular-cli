@@ -1,11 +1,7 @@
 {
   "$schema": "../architect/src/builders-schema.json",
   "builders": {
-    "application": {
-      "implementation": "./src/builders/application",
-      "schema": "./src/builders/application/schema.json",
-      "description": "Build an application."
-    },
+    "application": "@angular/build:application",
     "app-shell": {
       "implementation": "./src/builders/app-shell",
       "schema": "./src/builders/app-shell/schema.json",

@@ -3,6 +3,7 @@ load("//tools:toolchain_info.bzl", "TOOLCHAINS_NAMES", "TOOLCHAINS_VERSIONS")
 
 # bazel query --output=label "kind('pkg_tar', //packages/...)"
 TESTED_PACKAGES = [
+    "//packages/angular/build:npm_package_archive.tgz",
     "//packages/angular/cli:npm_package_archive.tgz",
     "//packages/angular/create:npm_package_archive.tgz",
     "//packages/angular/ssr:npm_package_archive.tgz",
