@@ -1,6 +1,7 @@
 import assert from 'node:assert';
 import { expectFileToExist, readFile, writeFile, replaceInFile } from '../../utils/fs';
 import { ng } from '../../utils/process';
+import { getGlobalVariable } from '../../utils/env';
 
 const unexpectedStaticFieldErrorMessage =
   'Found unexpected static field. This indicates that the Safari <=v15 ' +
@@ -55,9 +56,17 @@ export default async function () {
     unexpectedStaticFieldErrorMessage,
   );
 
-  assert.match(
-    mainContentSafari15Explicit,
-    /var _myPrivateMethod/,
-    'Expected private method to be downlevelled when Safari <=v15 is targeted',
-  );
+  if (getGlobalVariable('argv')['esbuild']) {
+    assert.match(
+      mainContentSafari15Explicit,
+      /var _myPrivateMethod/,
+      'Expected private method to be downlevelled when Safari <=v15 is targeted',
+    );
+  } else {
+    assert.match(
+      mainContentSafari15Explicit,
+      /_assertClassBrand/,
+      'Expected private method to be downlevelled when Safari <=v15 is targeted',
+    );
+  }
 }
