@@ -253,7 +253,7 @@ export default function (api: unknown, options: ApplicationPresetOptions) {
       adjustTypeScriptEnums,
       elideAngularMetadata,
       markTopLevelPure,
-    } = require('../plugins');
+    } = require('@angular/build/private');
     if (options.optimize.pureTopLevel) {
       plugins.push(markTopLevelPure);
     }

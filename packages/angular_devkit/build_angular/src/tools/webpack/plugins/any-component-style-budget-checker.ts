@@ -6,15 +6,15 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import * as path from 'path';
-import { Compilation, Compiler } from 'webpack';
 import {
   BudgetAsset,
   BudgetEntry,
   BudgetType,
   ThresholdSeverity,
   checkBudgets,
-} from '../../../utils/bundle-calculator';
+} from '@angular/build/private';
+import * as path from 'path';
+import { Compilation, Compiler } from 'webpack';
 import { addError, addWarning } from '../../../utils/webpack-diagnostics';
 
 const PLUGIN_NAME = 'AnyComponentStyleBudgetChecker';

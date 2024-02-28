@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import { getSupportedBrowsers } from '@angular/build/private';
 import { json, logging } from '@angular-devkit/core';
 import {
   AssetPatternClass,
@@ -22,7 +23,6 @@ import {
 import { NormalizedOptimizationOptions, normalizeOptimization } from './normalize-optimization';
 import { normalizePolyfills } from './normalize-polyfills';
 import { normalizeSourceMaps } from './normalize-source-maps';
-import { getSupportedBrowsers } from './supported-browsers';
 
 /**
  * A normalized browser builder schema.

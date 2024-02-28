@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import { augmentAppWithServiceWorker } from '@angular/build/private';
 import {
   BuilderContext,
   BuilderOutput,
@@ -18,8 +19,6 @@ import * as path from 'path';
 import Piscina from 'piscina';
 import { normalizeOptimization } from '../../utils';
 import { assertIsError } from '../../utils/error';
-import type { InlineCriticalCssProcessor } from '../../utils/index-file/inline-critical-css';
-import { augmentAppWithServiceWorker } from '../../utils/service-worker';
 import { Spinner } from '../../utils/spinner';
 import { BrowserBuilderOutput } from '../browser';
 import { Schema as BrowserBuilderSchema } from '../browser/schema';
@@ -55,11 +54,9 @@ async function _renderUniversal(
   const projectRoot = path.join(root, (projectMetadata.root as string | undefined) ?? '');
 
   const { styles } = normalizeOptimization(browserOptions.optimization);
-  let inlineCriticalCssProcessor: InlineCriticalCssProcessor | undefined;
+  let inlineCriticalCssProcessor;
   if (styles.inlineCritical) {
-    const { InlineCriticalCssProcessor } = await import(
-      '../../utils/index-file/inline-critical-css'
-    );
+    const { InlineCriticalCssProcessor } = await import('@angular/build/private');
     inlineCriticalCssProcessor = new InlineCriticalCssProcessor({
       minify: styles.minify,
       deployUrl: browserOptions.deployUrl,
@@ -170,8 +167,6 @@ async function _appShellBuilder(
 
   const optimization = normalizeOptimization(browserOptions.optimization);
   optimization.styles.inlineCritical = false;
-  // Webpack based builders do not have the `removeSpecialComments` option.
-  delete optimization.styles.removeSpecialComments;
 
   const browserTargetRun = await context.scheduleTarget(browserTarget, {
     watch: false,

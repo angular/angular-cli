@@ -8,7 +8,9 @@
 
 import { Schema } from '../schema';
 
-export { describeBuilder } from '../../../testing';
+// TODO: Consider using package.json imports field instead of relative path
+//       after the switch to rules_js.
+export * from '../../../../../../../modules/testing/builder/src';
 
 export const APPLICATION_BUILDER_INFO = Object.freeze({
   name: '@angular-devkit/build-angular:application',

@@ -1,0 +1,188 @@
+load("@npm//@angular/build-tooling/bazel/api-golden:index.bzl", "api_golden_test_npm_package")
+load("@npm//@bazel/jasmine:index.bzl", "jasmine_node_test")
+load("//tools:defaults.bzl", "pkg_npm", "ts_library")
+load("//tools:ts_json_schema.bzl", "ts_json_schema")
+
+licenses(["notice"])
+
+package(default_visibility = ["//visibility:public"])
+
+ts_json_schema(
+    name = "application_schema",
+    src = "src/builders/application/schema.json",
+)
+
+ts_library(
+    name = "build",
+    package_name = "@angular/build",
+    srcs = glob(
+        include = [
+            "src/**/*.ts",
+        ],
+        exclude = [
+            "src/test-utils.ts",
+            "src/**/*_spec.ts",
+            "src/**/tests/**/*.ts",
+            "src/testing/**/*.ts",
+            "src/private.ts",
+        ],
+    ) + [
+        "//packages/angular/build:src/builders/application/schema.ts",
+    ],
+    data = glob(
+        include = [
+            "src/**/schema.json",
+            "src/**/*.js",
+            "src/**/*.mjs",
+            "src/**/*.html",
+        ],
+    ) + [
+        "builders.json",
+        "package.json",
+    ],
+    module_name = "@angular/build",
+    module_root = "src/index.d.ts",
+    deps = [
+        "//packages/angular/build/src/utils/routes-extractor",
+        "//packages/angular_devkit/architect",
+        "@npm//@ampproject/remapping",
+        "@npm//@angular/common",
+        "@npm//@angular/compiler-cli",
+        "@npm//@angular/core",
+        "@npm//@angular/localize",
+        "@npm//@angular/platform-server",
+        "@npm//@angular/service-worker",
+        "@npm//@babel/core",
+        "@npm//@babel/helper-annotate-as-pure",
+        "@npm//@babel/helper-split-export-declaration",
+        "@npm//@types/babel__core",
+        "@npm//@types/browserslist",
+        "@npm//@types/less",
+        "@npm//@types/node",
+        "@npm//@types/picomatch",
+        "@npm//@types/semver",
+        "@npm//@types/watchpack",
+        "@npm//ansi-colors",
+        "@npm//autoprefixer",
+        "@npm//browserslist",
+        "@npm//critters",
+        "@npm//esbuild",
+        "@npm//fast-glob",
+        "@npm//https-proxy-agent",
+        "@npm//less",
+        "@npm//magic-string",
+        "@npm//mrmime",
+        "@npm//ora",
+        "@npm//parse5-html-rewriting-stream",
+        "@npm//piscina",
+        "@npm//postcss",
+        "@npm//sass",
+        "@npm//semver",
+        "@npm//tslib",
+        "@npm//typescript",
+        "@npm//undici",
+        "@npm//watchpack",
+    ],
+)
+
+ts_library(
+    name = "private",
+    srcs = ["src/private.ts"],
+    module_name = "@angular/build/private",
+    module_root = "src/private.d.ts",
+    deps = [
+        "//packages/angular/build",
+    ],
+)
+
+ts_library(
+    name = "unit_test_lib",
+    testonly = True,
+    srcs = glob(
+        include = ["src/**/*_spec.ts"],
+        exclude = ["src/builders/**/tests/**"],
+    ),
+    deps = [
+        ":build",
+        ":private",
+        "//packages/angular_devkit/core",
+        "//packages/angular_devkit/core/node",
+        "@npm//@angular/compiler-cli",
+        "@npm//@babel/core",
+        "@npm//prettier",
+    ],
+)
+
+jasmine_node_test(
+    name = "unit_tests",
+    deps = [":unit_test_lib"],
+)
+
+ts_library(
+    name = "integration_test_lib",
+    testonly = True,
+    srcs = glob(include = ["src/builders/**/tests/**/*.ts"]),
+    deps = [
+        ":build",
+        ":private",
+        "//modules/testing/builder",
+        "//packages/angular_devkit/architect",
+        "//packages/angular_devkit/architect/node",
+        "//packages/angular_devkit/architect/testing",
+        "//packages/angular_devkit/core",
+        "//packages/angular_devkit/core/node",
+
+        # Base dependencies for the application in hello-world-app.
+        "@npm//@angular/common",
+        "@npm//@angular/compiler",
+        "@npm//@angular/compiler-cli",
+        "@npm//@angular/core",
+        "@npm//@angular/platform-browser",
+        "@npm//@angular/platform-browser-dynamic",
+        "@npm//@angular/router",
+        "@npm//rxjs",
+        "@npm//tslib",
+        "@npm//typescript",
+        "@npm//zone.js",
+        "@npm//buffer",
+    ],
+)
+
+jasmine_node_test(
+    name = "integration_tests",
+    size = "large",
+    flaky = True,
+    shard_count = 10,
+    deps = [":integration_test_lib"],
+)
+
+genrule(
+    name = "license",
+    srcs = ["//:LICENSE"],
+    outs = ["LICENSE"],
+    cmd = "cp $(execpath //:LICENSE) $@",
+)
+
+pkg_npm(
+    name = "npm_package",
+    pkg_deps = [
+        "//packages/angular_devkit/architect:package.json",
+    ],
+    tags = ["release-package"],
+    deps = [
+        ":README.md",
+        ":build",
+        ":license",
+        ":private",
+    ],
+)
+
+api_golden_test_npm_package(
+    name = "api",
+    data = [
+        ":npm_package",
+        "//goldens:public-api",
+    ],
+    golden_dir = "angular_cli/goldens/public-api/angular/build",
+    npm_package = "angular_cli/packages/angular/build/npm_package",
+)

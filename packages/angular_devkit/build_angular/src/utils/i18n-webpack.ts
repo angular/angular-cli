@@ -6,6 +6,12 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import {
+  type I18nOptions,
+  createI18nOptions,
+  createTranslationLoader,
+  loadTranslations,
+} from '@angular/build/private';
 import { BuilderContext } from '@angular-devkit/architect';
 import fs from 'node:fs';
 import { createRequire } from 'node:module';
@@ -14,8 +20,6 @@ import path from 'node:path';
 import { Schema as BrowserBuilderSchema } from '../builders/browser/schema';
 import { Schema as ServerBuilderSchema } from '../builders/server/schema';
 import { readTsconfig } from '../utils/read-tsconfig';
-import { I18nOptions, createI18nOptions, loadTranslations } from './i18n-options';
-import { createTranslationLoader } from './load-translations';
 
 /**
  * The base module location used to search for locale specific data.

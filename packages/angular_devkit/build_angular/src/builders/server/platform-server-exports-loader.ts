@@ -7,7 +7,7 @@
  */
 
 import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { dirname, join } from 'node:path';
 
 /**
  * This loader is needed to add additional exports and is a workaround for a Webpack bug that doesn't
@@ -19,6 +19,11 @@ export default function (
   content: string,
   map: Parameters<import('webpack').LoaderDefinitionFunction>[1],
 ) {
+  const extractorPath = join(
+    dirname(require.resolve('@angular/build/package.json')),
+    'src/utils/routes-extractor/extractor.js',
+  );
+
   const source =
     `${content}
 
@@ -27,10 +32,7 @@ export default function (
   ` +
     // We do not import it directly so that node.js modules are resolved using the correct context.
     // Remove source map URL comments from the code if a sourcemap is present as this will not match the file.
-    readFileSync(join(__dirname, '../../utils/routes-extractor/extractor.js'), 'utf-8').replace(
-      /^\/\/# sourceMappingURL=[^\r\n]*/gm,
-      '',
-    );
+    readFileSync(extractorPath, 'utf-8').replace(/^\/\/# sourceMappingURL=[^\r\n]*/gm, '');
 
   this.callback(null, source, map);
 

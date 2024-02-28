@@ -1,0 +1,9 @@
+{
+  "builders": {
+    "application": {
+      "implementation": "./src/builders/application",
+      "schema": "./src/builders/application/schema.json",
+      "description": "Build an application."
+    }
+  }
+}

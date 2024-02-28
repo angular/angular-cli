@@ -354,6 +354,7 @@
                   "description": "The builder used for this package.",
                   "not": {
                     "enum": [
+                      "@angular/build:application",
                       "@angular-devkit/build-angular:application",
                       "@angular-devkit/build-angular:app-shell",
                       "@angular-devkit/build-angular:browser",
@@ -394,6 +395,28 @@
               "additionalProperties": false,
               "properties": {
                 "builder": {
+                  "const": "@angular/build:application"
+                },
+                "defaultConfiguration": {
+                  "type": "string",
+                  "description": "A default named configuration to use when a target configuration is not provided."
+                },
+                "options": {
+                  "$ref": "../../../../angular/build/src/builders/application/schema.json"
+                },
+                "configurations": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "$ref": "../../../../angular/build/src/builders/application/schema.json"
+                  }
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "builder": {
                   "const": "@angular-devkit/build-angular:application"
                 },
                 "defaultConfiguration": {
@@ -401,12 +424,12 @@
                   "description": "A default named configuration to use when a target configuration is not provided."
                 },
                 "options": {
-                  "$ref": "../../../../angular_devkit/build_angular/src/builders/application/schema.json"
+                  "$ref": "../../../../angular/build/src/builders/application/schema.json"
                 },
                 "configurations": {
                   "type": "object",
                   "additionalProperties": {
-                    "$ref": "../../../../angular_devkit/build_angular/src/builders/application/schema.json"
+                    "$ref": "../../../../angular/build/src/builders/application/schema.json"
                   }
                 }
               }

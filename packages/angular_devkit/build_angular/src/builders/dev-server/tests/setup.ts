@@ -7,14 +7,10 @@
  */
 
 import { json } from '@angular-devkit/core';
-import { readFileSync } from 'fs';
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
 import { BuilderHarness } from '../../../testing';
-import { buildApplication } from '../../application';
-import { Schema as AppilicationSchema } from '../../application/schema';
-import {
-  BASE_OPTIONS as APPLICATION_BASE_OPTIONS,
-  APPLICATION_BUILDER_INFO,
-} from '../../application/tests/setup';
+import { ApplicationBuilderOptions as AppilicationSchema, buildApplication } from '@angular/build';
 import { buildWebpackBrowser } from '../../browser';
 import { Schema as BrowserSchema } from '../../browser/schema';
 import {
@@ -24,6 +20,34 @@ import {
 import { Schema } from '../schema';
 
 export { describeBuilder } from '../../../testing';
+
+// TODO: Remove and use import after Vite-based dev server is moved to new package
+export const APPLICATION_BUILDER_INFO = Object.freeze({
+  name: '@angular-devkit/build-angular:application',
+  schemaPath: path.join(
+    path.dirname(require.resolve('@angular/build/package.json')),
+    'src/builders/application/schema.json',
+  ),
+});
+
+/**
+ * Contains all required application builder fields.
+ * Also disables progress reporting to minimize logging output.
+ */
+export const APPLICATION_BASE_OPTIONS = Object.freeze<AppilicationSchema>({
+  index: 'src/index.html',
+  browser: 'src/main.ts',
+  outputPath: 'dist',
+  tsConfig: 'src/tsconfig.app.json',
+  progress: false,
+
+  // Disable optimizations
+  optimization: false,
+
+  // Enable polling (if a test enables watch mode).
+  // This is a workaround for bazel isolation file watch not triggering in tests.
+  poll: 100,
+});
 
 export const DEV_SERVER_BUILDER_INFO = Object.freeze({
   name: '@angular-devkit/build-angular:dev-server',

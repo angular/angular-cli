@@ -11,7 +11,7 @@ import {
   OptimizationClass,
   OptimizationUnion,
   StylesClass,
-} from '../builders/application/schema';
+} from '../builders/browser/schema';
 
 export type NormalizedOptimizationOptions = Required<
   Omit<OptimizationClass, 'fonts' | 'styles'>
@@ -33,7 +33,6 @@ export function normalizeOptimization(
           ? optimization.styles
           : {
               minify: styleOptimization,
-              removeSpecialComments: styleOptimization,
               inlineCritical: styleOptimization,
             },
       fonts:
@@ -50,7 +49,6 @@ export function normalizeOptimization(
     styles: {
       minify: optimization,
       inlineCritical: optimization,
-      removeSpecialComments: optimization,
     },
     fonts: {
       inline: optimization,

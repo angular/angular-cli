@@ -6,6 +6,11 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import {
+  BudgetCalculatorResult,
+  BundleStats,
+  generateBuildStatsTable,
+} from '@angular/build/private';
 import { WebpackLoggingCallback } from '@angular-devkit/build-webpack';
 import { logging } from '@angular-devkit/core';
 import assert from 'node:assert';
@@ -13,9 +18,7 @@ import * as path from 'node:path';
 import { Configuration, StatsCompilation } from 'webpack';
 import { Schema as BrowserBuilderOptions } from '../../../builders/browser/schema';
 import { normalizeOptimization } from '../../../utils';
-import { BudgetCalculatorResult } from '../../../utils/bundle-calculator';
 import { colors as ansiColors } from '../../../utils/color';
-import { BundleStats, generateBuildStatsTable } from '../../../utils/stats-table';
 import { markAsyncChunksNonInitial } from './async-chunks';
 import { WebpackStatsOptions, getStatsOptions, normalizeExtraEntryPoints } from './helpers';
 

@@ -11,7 +11,6 @@ import assert from 'node:assert';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { workerData } from 'node:worker_threads';
-import type { extractRoutes } from '../../utils/routes-extractor/extractor';
 
 export interface RoutesExtractorWorkerData {
   zonePackage: string;
@@ -28,7 +27,10 @@ interface ServerBundleExports {
   default?: (() => Promise<ApplicationRef>) | Type<unknown>;
 
   /** Method to extract routes from the router config. */
-  extractRoutes: typeof extractRoutes;
+  extractRoutes(
+    bootstrapFunctionOrModule: (() => Promise<ApplicationRef>) | Type<unknown>,
+    document: string,
+  ): AsyncIterable<{ success: boolean; route: string }>;
 }
 
 const { zonePackage, serverBundlePath, outputPath, indexFile } =

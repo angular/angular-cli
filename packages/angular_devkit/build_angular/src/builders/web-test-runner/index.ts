@@ -6,13 +6,13 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import { buildApplicationInternal } from '@angular/build/private';
 import { BuilderContext, BuilderOutput, createBuilder } from '@angular-devkit/architect';
 import type * as WebTestRunner from '@web/test-runner';
 import { promises as fs } from 'node:fs';
 import { createRequire } from 'node:module';
 import path from 'node:path';
 import { findTestFiles } from '../../utils/test-files';
-import { buildApplicationInternal } from '../application';
 import { OutputHashing } from '../browser-esbuild/schema';
 import { logBuilderStatusWarnings } from './builder-status-warnings';
 import { WtrBuilderOptions, normalizeOptions } from './options';

@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import { assertCompatibleAngularVersion, purgeStaleBuildCache } from '@angular/build/private';
 import { BuilderContext, BuilderOutput, createBuilder } from '@angular-devkit/architect';
 import { runWebpack } from '@angular-devkit/build-webpack';
 import { readFile } from 'node:fs/promises';
@@ -33,9 +34,7 @@ import { assertIsError } from '../../utils/error';
 import { i18nInlineEmittedFiles } from '../../utils/i18n-inlining';
 import { I18nOptions } from '../../utils/i18n-webpack';
 import { ensureOutputPaths } from '../../utils/output-paths';
-import { purgeStaleBuildCache } from '../../utils/purge-cache';
 import { Spinner } from '../../utils/spinner';
-import { assertCompatibleAngularVersion } from '../../utils/version';
 import {
   BrowserWebpackConfigOptions,
   generateI18nBrowserWebpackConfigFromContext,

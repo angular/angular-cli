@@ -130,8 +130,7 @@
     tslib "^2.3.0"
 
 "@angular/bazel@https://github.com/angular/bazel-builds.git#d4cd1ac66633528be9ad967b06a00d326446729e":
-  version "18.0.0-next.5+sha-e1eae84"
-  uid d4cd1ac66633528be9ad967b06a00d326446729e
+  version "18.0.0-next.5"
   resolved "https://github.com/angular/bazel-builds.git#d4cd1ac66633528be9ad967b06a00d326446729e"
   dependencies:
     "@microsoft/api-extractor" "^7.24.2"
@@ -148,7 +147,6 @@
 
 "@angular/build-tooling@https://github.com/angular/dev-infra-private-build-tooling-builds.git#ba23169e282840cfac66488ff05c4258e20d4abc":
   version "0.0.0-10f65a101457091d4bc3500963d3a9630d55f7bd"
-  uid ba23169e282840cfac66488ff05c4258e20d4abc
   resolved "https://github.com/angular/dev-infra-private-build-tooling-builds.git#ba23169e282840cfac66488ff05c4258e20d4abc"
   dependencies:
     "@angular-devkit/build-angular" "17.3.3"
@@ -316,7 +314,6 @@
 
 "@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#5f1f27c5ad034501ba7de855c0e2579bd131d43f":
   version "0.0.0-10f65a101457091d4bc3500963d3a9630d55f7bd"
-  uid "5f1f27c5ad034501ba7de855c0e2579bd131d43f"
   resolved "https://github.com/angular/dev-infra-private-ng-dev-builds.git#5f1f27c5ad034501ba7de855c0e2579bd131d43f"
   dependencies:
     "@yarnpkg/lockfile" "^1.1.0"
@@ -12202,7 +12199,6 @@ sass@1.75.0, sass@^1.69.5:
 
 "sauce-connect-proxy@https://saucelabs.com/downloads/sc-4.9.1-linux.tar.gz":
   version "0.0.0"
-  uid "9310bc860f7870a1f872b11c4dc6073a1ad34e5e"
   resolved "https://saucelabs.com/downloads/sc-4.9.1-linux.tar.gz#9310bc860f7870a1f872b11c4dc6073a1ad34e5e"
 
 saucelabs@^1.5.0:

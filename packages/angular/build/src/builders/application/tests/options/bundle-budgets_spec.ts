@@ -7,10 +7,15 @@
  */
 
 import { logging } from '@angular-devkit/core';
-import { lazyModuleFiles, lazyModuleFnImport } from '../../../../testing/test-utils';
 import { buildApplication } from '../../index';
 import { Type } from '../../schema';
-import { APPLICATION_BUILDER_INFO, BASE_OPTIONS, describeBuilder } from '../setup';
+import {
+  APPLICATION_BUILDER_INFO,
+  BASE_OPTIONS,
+  describeBuilder,
+  lazyModuleFiles,
+  lazyModuleFnImport,
+} from '../setup';
 
 describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
   const CSS_EXTENSIONS = ['css', 'scss', 'less'];
