@@ -1,3 +1,15 @@
+<a name="17.2.2"></a>
+
+# 17.2.2 (2024-02-28)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                       |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------- |
+| [3394d3cf1](https://github.com/angular/angular-cli/commit/3394d3cf10996a93777edfb28d83cf4eb85ae40b) | fix  | ensure all related stylesheets are rebuilt when an import changes |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="17.2.1"></a>
 
 # 17.2.1 (2024-02-22)
