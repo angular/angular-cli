@@ -68,6 +68,7 @@ async function getRoutes(
         serverBundlePath,
         zonePackage: require.resolve('zone.js', { paths: [workspaceRoot] }),
       } as RoutesExtractorWorkerData,
+      recordTiming: false,
     });
 
     const extractedRoutes: string[] = await renderWorker
@@ -175,6 +176,7 @@ async function _renderUniversal(
     filename: path.join(__dirname, 'render-worker.js'),
     maxThreads: maxWorkers,
     workerData: { zonePackage },
+    recordTiming: false,
   });
 
   let routes: string[] | undefined;

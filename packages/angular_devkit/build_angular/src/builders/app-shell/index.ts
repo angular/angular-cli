@@ -71,6 +71,7 @@ async function _renderUniversal(
     filename: require.resolve('./render-worker'),
     maxThreads: 1,
     workerData: { zonePackage },
+    recordTiming: false,
   });
 
   try {
