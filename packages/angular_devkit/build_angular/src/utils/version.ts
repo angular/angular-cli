@@ -8,38 +8,39 @@
 
 /* eslint-disable no-console */
 
-import { tags } from '@angular-devkit/core';
+import { createRequire } from 'node:module';
 import { SemVer, satisfies } from 'semver';
 
 export function assertCompatibleAngularVersion(projectRoot: string): void | never {
   let angularCliPkgJson;
   let angularPkgJson;
-  const resolveOptions = { paths: [projectRoot] };
+
+  // Create a custom require function for ESM compliance.
+  // NOTE: The trailing slash is significant.
+  const projectRequire = createRequire(projectRoot + '/');
 
   try {
-    const angularPackagePath = require.resolve('@angular/core/package.json', resolveOptions);
+    const angularPackagePath = projectRequire.resolve('@angular/core/package.json');
 
-    angularPkgJson = require(angularPackagePath);
+    angularPkgJson = projectRequire(angularPackagePath);
   } catch {
-    console.error(tags.stripIndents`
-      You seem to not be depending on "@angular/core". This is an error.
-    `);
+    console.error('You seem to not be depending on "@angular/core". This is an error.');
 
     process.exit(2);
   }
 
   if (!(angularPkgJson && angularPkgJson['version'])) {
-    console.error(tags.stripIndents`
-      Cannot determine versions of "@angular/core".
-      This likely means your local installation is broken. Please reinstall your packages.
-    `);
+    console.error(
+      'Cannot determine versions of "@angular/core".\n' +
+        'This likely means your local installation is broken. Please reinstall your packages.',
+    );
 
     process.exit(2);
   }
 
   try {
-    const angularCliPkgPath = require.resolve('@angular/cli/package.json', resolveOptions);
-    angularCliPkgJson = require(angularCliPkgPath);
+    const angularCliPkgPath = projectRequire.resolve('@angular/cli/package.json');
+    angularCliPkgJson = projectRequire(angularCliPkgPath);
     if (!(angularCliPkgJson && angularCliPkgJson['version'])) {
       return;
     }
@@ -55,19 +56,16 @@ export function assertCompatibleAngularVersion(projectRoot: string): void | neve
     return;
   }
 
-  const supportedAngularSemver =
-    require('../../package.json')['peerDependencies']['@angular/compiler-cli'];
+  const supportedAngularSemver = projectRequire('@angular-devkit/build-angular/package.json')[
+    'peerDependencies'
+  ]['@angular/compiler-cli'];
   const angularVersion = new SemVer(angularPkgJson['version']);
 
   if (!satisfies(angularVersion, supportedAngularSemver, { includePrerelease: true })) {
     console.error(
-      tags.stripIndents`
-        This version of CLI is only compatible with Angular versions ${supportedAngularSemver},
-        but Angular version ${angularVersion} was found instead.
-
-        Please visit the link below to find instructions on how to update Angular.
-        https://update.angular.io/
-      ` + '\n',
+      `This version of CLI is only compatible with Angular versions ${supportedAngularSemver},\n` +
+        `but Angular version ${angularVersion} was found instead.\n` +
+        'Please visit the link below to find instructions on how to update Angular.\nhttps://update.angular.io/',
     );
 
     process.exit(3);
