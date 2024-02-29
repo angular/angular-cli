@@ -174,6 +174,7 @@ async function renderPages(
       document,
     } as RenderWorkerData,
     execArgv: workerExecArgv,
+    recordTiming: false,
   });
 
   try {
@@ -261,6 +262,7 @@ async function getAllRoutes(
       verbose,
     } as RoutesExtractorWorkerData,
     execArgv: workerExecArgv,
+    recordTiming: false,
   });
 
   const { routes: extractedRoutes, warnings }: RoutersExtractorWorkerResult = await renderWorker

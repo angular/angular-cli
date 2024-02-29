@@ -28,6 +28,7 @@ export class BundleActionExecutor {
       name: 'inlineLocales',
       workerData: this.workerOptions,
       maxThreads: maxWorkers,
+      recordTiming: false,
     });
 
     return this.workerPool;
