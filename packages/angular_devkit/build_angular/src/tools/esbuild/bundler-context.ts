@@ -352,11 +352,10 @@ export class BundlerContext {
 
     assert(this.#esbuildOptions, 'esbuild options cannot be undefined.');
 
-    const { assetNames = '' } = this.#esbuildOptions;
-    const mediaDirname = dirname(assetNames);
     const outputFiles = result.outputFiles.map((file) => {
       let fileType: BuildOutputFileType;
-      if (dirname(file.path) === mediaDirname) {
+      // All files that are not JS, CSS, WASM, or sourcemaps for them are considered media
+      if (!/\.([cm]?js|css|wasm)(\.map)?$/i.test(file.path)) {
         fileType = BuildOutputFileType.Media;
       } else {
         fileType = this.#platformIsServer
