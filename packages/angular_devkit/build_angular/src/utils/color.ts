@@ -7,7 +7,7 @@
  */
 
 import * as ansiColors from 'ansi-colors';
-import { WriteStream } from 'tty';
+import { WriteStream } from 'node:tty';
 
 function supportColor(): boolean {
   if (process.env.FORCE_COLOR !== undefined) {
@@ -30,16 +30,10 @@ function supportColor(): boolean {
   }
 
   if (process.stdout instanceof WriteStream) {
-    return process.stdout.getColorDepth() > 1;
+    return process.stdout.hasColors();
   }
 
   return false;
-}
-
-export function removeColor(text: string): string {
-  // This has been created because when colors.enabled is false unstyle doesn't work
-  // see: https://github.com/doowb/ansi-colors/blob/a4794363369d7b4d1872d248fc43a12761640d8e/index.js#L38
-  return text.replace(ansiColors.ansiRegex, '');
 }
 
 // Create a separate instance to prevent unintended global changes to the color configuration

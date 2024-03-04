@@ -10,11 +10,12 @@ import { WebpackLoggingCallback } from '@angular-devkit/build-webpack';
 import { logging } from '@angular-devkit/core';
 import assert from 'node:assert';
 import * as path from 'node:path';
+import { stripVTControlCharacters } from 'node:util';
 import { Configuration, StatsCompilation } from 'webpack';
 import { Schema as BrowserBuilderOptions } from '../../../builders/browser/schema';
 import { normalizeOptimization } from '../../../utils';
 import { BudgetCalculatorResult } from '../../../utils/bundle-calculator';
-import { colors as ansiColors, removeColor } from '../../../utils/color';
+import { colors as ansiColors } from '../../../utils/color';
 import { markAsyncChunksNonInitial } from './async-chunks';
 import { WebpackStatsOptions, getStatsOptions, normalizeExtraEntryPoints } from './helpers';
 
@@ -310,7 +311,7 @@ function generateTableText(bundleInfo: (string | number)[][], colors: boolean): 
       }
 
       const currentLongest = (longest[i] ??= 0);
-      const currentItemLength = removeColor(currentItem).length;
+      const currentItemLength = stripVTControlCharacters(currentItem).length;
       if (currentLongest < currentItemLength) {
         longest[i] = currentItemLength;
       }
@@ -330,7 +331,7 @@ function generateTableText(bundleInfo: (string | number)[][], colors: boolean): 
         continue;
       }
 
-      const currentItemLength = removeColor(currentItem).length;
+      const currentItemLength = stripVTControlCharacters(currentItem).length;
       const stringPad = ' '.repeat(longest[i] - currentItemLength);
       // Values in columns at index 2 and 3 (Raw and Estimated sizes) are always right aligned.
       item[i] = i >= 2 ? stringPad + currentItem : currentItem + stringPad;
