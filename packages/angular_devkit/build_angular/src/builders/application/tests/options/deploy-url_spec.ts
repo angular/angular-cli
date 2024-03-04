@@ -6,10 +6,10 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { buildEsbuildBrowser } from '../../index';
-import { BASE_OPTIONS, BROWSER_BUILDER_INFO, describeBuilder } from '../setup';
+import { buildApplication } from '../../index';
+import { APPLICATION_BUILDER_INFO, BASE_OPTIONS, describeBuilder } from '../setup';
 
-describeBuilder(buildEsbuildBrowser, BROWSER_BUILDER_INFO, (harness) => {
+describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
   describe('Option: "deployUrl"', () => {
     beforeEach(async () => {
       // Add a global stylesheet to test link elements
@@ -32,7 +32,7 @@ describeBuilder(buildEsbuildBrowser, BROWSER_BUILDER_INFO, (harness) => {
       const { result } = await harness.executeOnce();
       expect(result?.success).toBe(true);
       harness
-        .expectFile('dist/index.html')
+        .expectFile('dist/browser/index.html')
         .content.toEqual(
           `<html><head><base href="/"><link rel="stylesheet" href="deployUrl/styles.css"></head>` +
             `<body><app-root></app-root>` +
@@ -50,7 +50,7 @@ describeBuilder(buildEsbuildBrowser, BROWSER_BUILDER_INFO, (harness) => {
       const { result } = await harness.executeOnce();
       expect(result?.success).toBe(true);
       harness
-        .expectFile('dist/index.html')
+        .expectFile('dist/browser/index.html')
         .content.toEqual(
           `<html><head><base href="/"><link rel="stylesheet" href="https://example.com/some/path/styles.css"></head>` +
             `<body><app-root></app-root>` +
@@ -74,7 +74,7 @@ describeBuilder(buildEsbuildBrowser, BROWSER_BUILDER_INFO, (harness) => {
       expect(result?.success).toBeTrue();
 
       harness
-        .expectFile('dist/main.js')
+        .expectFile('dist/browser/main.js')
         .content.toContain('background-image: url("https://example.com/some/path/media/test.svg")');
     });
   });

@@ -36,6 +36,7 @@ export interface ApplicationBuilderOptions {
         [key: string]: string;
     };
     deleteOutputPath?: boolean;
+    deployUrl?: string;
     externalDependencies?: string[];
     extractLicenses?: boolean;
     fileReplacements?: FileReplacement_2[];
@@ -94,7 +95,6 @@ export interface BrowserBuilderOptions {
     commonChunk?: boolean;
     crossOrigin?: CrossOrigin;
     deleteOutputPath?: boolean;
-    // @deprecated
     deployUrl?: string;
     extractLicenses?: boolean;
     fileReplacements?: FileReplacement[];
@@ -351,7 +351,6 @@ export interface ServerBuilderOptions {
     assets?: AssetPattern_4[];
     buildOptimizer?: boolean;
     deleteOutputPath?: boolean;
-    // @deprecated
     deployUrl?: string;
     externalDependencies?: string[];
     extractLicenses?: boolean;

@@ -7,13 +7,7 @@
  */
 
 import { workspaces } from '@angular-devkit/core';
-import {
-  Rule,
-  SchematicContext,
-  SchematicsException,
-  chain,
-  externalSchematic,
-} from '@angular-devkit/schematics';
+import { Rule, SchematicsException, chain, externalSchematic } from '@angular-devkit/schematics';
 import { dirname, join } from 'node:path/posix';
 import { JSONFile } from '../../utility/json-file';
 import { TreeWorkspaceHost, allTargetOptions, getWorkspace } from '../../utility/workspace';
@@ -52,11 +46,6 @@ export default function (): Rule {
       const hasServerTarget = project.targets.has('server');
 
       for (const [, options] of allTargetOptions(buildTarget, false)) {
-        // Show warnings for using no longer supported options
-        if (usesNoLongerSupportedOptions(options, context, name)) {
-          continue;
-        }
-
         if (options['index'] === '') {
           options['index'] = false;
         }
@@ -102,7 +91,6 @@ export default function (): Rule {
         }
 
         // Delete removed options
-        delete options['deployUrl'];
         delete options['vendorChunk'];
         delete options['commonChunk'];
         delete options['resourcesOutputPath'];
@@ -203,20 +191,4 @@ export default function (): Rule {
 
     return chain(rules);
   };
-}
-
-function usesNoLongerSupportedOptions(
-  { deployUrl, resourcesOutputPath }: Record<string, unknown>,
-  context: SchematicContext,
-  projectName: string,
-): boolean {
-  let hasUsage = false;
-  if (typeof deployUrl === 'string') {
-    hasUsage = true;
-    context.logger.warn(
-      `Skipping migration for project "${projectName}". "deployUrl" option is not available in the application builder.`,
-    );
-  }
-
-  return hasUsage;
 }

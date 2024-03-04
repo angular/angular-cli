@@ -65,11 +65,6 @@ interface InternalOptions {
    * This is only used by the development server which currently only supports a single locale per build.
    */
   forceI18nFlatOutput?: boolean;
-
-  /**
-   * Allows for usage of the deprecated `deployUrl` option with the compatibility builder `browser-esbuild`.
-   */
-  deployUrl?: string;
 }
 
 /** Full set of options for `application` builder. */
@@ -345,7 +340,7 @@ export async function normalizeOptions(
     i18nOptions,
     namedChunks,
     budgets: budgets?.length ? budgets : undefined,
-    publicPath: deployUrl ? deployUrl : undefined,
+    publicPath: deployUrl,
     plugins: extensions?.codePlugins?.length ? extensions?.codePlugins : undefined,
     loaderExtensions,
     jsonLogs: useJSONBuildLogs,
