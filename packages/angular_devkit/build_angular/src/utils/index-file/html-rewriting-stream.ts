@@ -6,7 +6,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { Readable, Writable } from 'stream';
+import { Readable } from 'node:stream';
+import { pipeline } from 'node:stream/promises';
 import { loadEsmModule } from '../load-esm';
 
 export async function htmlRewritingStream(content: string): Promise<{
@@ -16,42 +17,18 @@ export async function htmlRewritingStream(content: string): Promise<{
   const { RewritingStream } = await loadEsmModule<typeof import('parse5-html-rewriting-stream')>(
     'parse5-html-rewriting-stream',
   );
-  const chunks: Buffer[] = [];
   const rewriter = new RewritingStream();
 
   return {
     rewriter,
-    transformedContent: () => {
-      return new Promise((resolve) => {
-        new Readable({
-          encoding: 'utf8',
-          read(): void {
-            this.push(Buffer.from(content));
-            this.push(null);
-          },
-        })
-          .pipe(rewriter)
-          .pipe(
-            new Writable({
-              write(
-                chunk: string | Buffer,
-                encoding: string | undefined,
-                callback: Function,
-              ): void {
-                chunks.push(
-                  typeof chunk === 'string'
-                    ? Buffer.from(chunk, encoding as BufferEncoding)
-                    : chunk,
-                );
-                callback();
-              },
-              final(callback: (error?: Error) => void): void {
-                callback();
-                resolve(Buffer.concat(chunks).toString());
-              },
-            }),
-          );
-      });
-    },
+    transformedContent: () =>
+      pipeline(Readable.from(content), rewriter, async function (source) {
+        const chunks = [];
+        for await (const chunk of source) {
+          chunks.push(Buffer.from(chunk));
+        }
+
+        return Buffer.concat(chunks).toString('utf-8');
+      }),
   };
 }
