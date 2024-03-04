@@ -10,7 +10,6 @@ import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { NormalizedCachedOptions } from '../normalize-cache';
 import { NormalizedOptimizationOptions } from '../normalize-optimization';
-import { stripBom } from '../strip-bom';
 import { CrossOriginValue, Entrypoint, FileInfo, augmentIndexHtml } from './augment-index-html';
 import { InlineCriticalCssProcessor } from './inline-critical-css';
 import { InlineFontsProcessor } from './inline-fonts';
@@ -75,7 +74,7 @@ export class IndexHtmlGenerator {
   }
 
   async process(options: IndexHtmlGeneratorProcessOptions): Promise<IndexHtmlTransformResult> {
-    let content = stripBom(await this.readIndex(this.options.indexPath));
+    let content = await this.readIndex(this.options.indexPath);
     const warnings: string[] = [];
     const errors: string[] = [];
 
@@ -113,9 +112,9 @@ export class IndexHtmlGenerator {
 
   protected async readIndex(path: string): Promise<string> {
     try {
-      return await readFile(path, 'utf-8');
-    } catch {
-      throw new Error(`Failed to read index HTML file "${path}".`);
+      return new TextDecoder('utf-8').decode(await readFile(path));
+    } catch (cause) {
+      throw new Error(`Failed to read index HTML file "${path}".`, { cause });
     }
   }
 }
