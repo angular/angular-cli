@@ -7,8 +7,8 @@
  */
 
 import { BuilderContext } from '@angular-devkit/architect';
-import { existsSync, promises as fsPromises } from 'fs';
-import { join } from 'path';
+import { readdir, rm } from 'node:fs/promises';
+import { join } from 'node:path';
 import { normalizeCacheOptions } from './normalize-cache';
 
 /** Delete stale cache directories used by previous versions of build-angular. */
@@ -21,19 +21,23 @@ export async function purgeStaleBuildCache(context: BuilderContext): Promise<voi
   const metadata = await context.getProjectMetadata(projectName);
   const { basePath, path, enabled } = normalizeCacheOptions(metadata, context.workspaceRoot);
 
-  if (!enabled || !existsSync(basePath)) {
+  if (!enabled) {
     return;
   }
 
-  const entriesToDelete = (await fsPromises.readdir(basePath, { withFileTypes: true }))
-    .filter((d) => join(basePath, d.name) !== path && d.isDirectory())
-    .map((d) => {
-      const subPath = join(basePath, d.name);
+  let baseEntries;
+  try {
+    baseEntries = await readdir(basePath, { withFileTypes: true });
+  } catch {
+    // No purging possible if base path does not exist or cannot otherwise be accessed
+    return;
+  }
 
-      return fsPromises
-        .rm(subPath, { force: true, recursive: true, maxRetries: 3 })
-        .catch(() => void 0);
-    });
+  const entriesToDelete = baseEntries
+    .filter((d) => d.isDirectory())
+    .map((d) => join(basePath, d.name))
+    .filter((cachePath) => cachePath !== path)
+    .map((stalePath) => rm(stalePath, { force: true, recursive: true, maxRetries: 3 }));
 
-  await Promise.all(entriesToDelete);
+  await Promise.allSettled(entriesToDelete);
 }
