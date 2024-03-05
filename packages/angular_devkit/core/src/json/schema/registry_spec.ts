@@ -28,7 +28,7 @@ describe('CoreSchemaRegistry', () => {
           },
         },
         tslint: {
-          $ref: 'https://json.schemastore.org/npm-link-up#',
+          $ref: 'https://raw.githubusercontent.com/SchemaStore/schemastore/734c0e5/src/schemas/json/tslint.json#',
         },
       },
     });
