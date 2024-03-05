@@ -388,7 +388,6 @@ function getEsBuildCommonOptions(options: NormalizedApplicationBuildOptions): Bu
     },
     loader: loaderExtensions,
     footer,
-    publicPath: options.publicPath,
   };
 }
 
