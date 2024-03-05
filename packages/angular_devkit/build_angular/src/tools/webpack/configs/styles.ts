@@ -12,10 +12,8 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import type { FileImporter } from 'sass';
 import type { Configuration, LoaderContext, RuleSetUseItem } from 'webpack';
 import { WebpackConfigOptions } from '../../../utils/build-options';
-import { useLegacySass } from '../../../utils/environment-options';
 import { findTailwindConfigurationFile } from '../../../utils/tailwind';
 import { SassWorkerImplementation } from '../../sass/sass-service';
-import { SassLegacyWorkerImplementation } from '../../sass/sass-service-legacy';
 import {
   AnyComponentStyleBudgetChecker,
   PostcssCliResources,
@@ -63,9 +61,7 @@ export async function getStylesConfig(wco: WebpackConfigOptions): Promise<Config
     }
   }
 
-  const sassImplementation = useLegacySass
-    ? new SassLegacyWorkerImplementation()
-    : new SassWorkerImplementation();
+  const sassImplementation = new SassWorkerImplementation();
 
   extraPlugins.push({
     apply(compiler) {
@@ -314,63 +310,33 @@ export async function getStylesConfig(wco: WebpackConfigOptions): Promise<Config
 
 function getSassLoaderOptions(
   root: string,
-  implementation: SassWorkerImplementation | SassLegacyWorkerImplementation,
+  implementation: SassWorkerImplementation,
   includePaths: string[],
   indentedSyntax: boolean,
   verbose: boolean,
   preserveSymlinks: boolean,
 ): Record<string, unknown> {
-  return implementation instanceof SassWorkerImplementation
-    ? {
-        sourceMap: true,
-        api: 'modern',
-        implementation,
-        // Webpack importer is only implemented in the legacy API and we have our own custom Webpack importer.
-        // See: https://github.com/webpack-contrib/sass-loader/blob/997f3eb41d86dd00d5fa49c395a1aeb41573108c/src/utils.js#L642-L651
-        webpackImporter: false,
-        sassOptions: (loaderContext: LoaderContext<{}>) => ({
-          importers: [getSassResolutionImporter(loaderContext, root, preserveSymlinks)],
-          loadPaths: includePaths,
-          // Use expanded as otherwise sass will remove comments that are needed for autoprefixer
-          // Ex: /* autoprefixer grid: autoplace */
-          // See: https://github.com/webpack-contrib/sass-loader/blob/45ad0be17264ceada5f0b4fb87e9357abe85c4ff/src/getSassOptions.js#L68-L70
-          style: 'expanded',
-          // Silences compiler warnings from 3rd party stylesheets
-          quietDeps: !verbose,
-          verbose,
-          syntax: indentedSyntax ? 'indented' : 'scss',
-          sourceMapIncludeSources: true,
-        }),
-      }
-    : {
-        sourceMap: true,
-        api: 'legacy',
-        implementation,
-        sassOptions: {
-          importer: (url: string, from: string) => {
-            if (url.charAt(0) === '~') {
-              throw new Error(
-                `'${from}' imports '${url}' with a tilde. Usage of '~' in imports is no longer supported.`,
-              );
-            }
-
-            return null;
-          },
-          // Prevent use of `fibers` package as it no longer works in newer Node.js versions
-          fiber: false,
-          indentedSyntax,
-          // bootstrap-sass requires a minimum precision of 8
-          precision: 8,
-          includePaths,
-          // Use expanded as otherwise sass will remove comments that are needed for autoprefixer
-          // Ex: /* autoprefixer grid: autoplace */
-          // See: https://github.com/webpack-contrib/sass-loader/blob/45ad0be17264ceada5f0b4fb87e9357abe85c4ff/src/getSassOptions.js#L68-L70
-          outputStyle: 'expanded',
-          // Silences compiler warnings from 3rd party stylesheets
-          quietDeps: !verbose,
-          verbose,
-        },
-      };
+  return {
+    sourceMap: true,
+    api: 'modern',
+    implementation,
+    // Webpack importer is only implemented in the legacy API and we have our own custom Webpack importer.
+    // See: https://github.com/webpack-contrib/sass-loader/blob/997f3eb41d86dd00d5fa49c395a1aeb41573108c/src/utils.js#L642-L651
+    webpackImporter: false,
+    sassOptions: (loaderContext: LoaderContext<{}>) => ({
+      importers: [getSassResolutionImporter(loaderContext, root, preserveSymlinks)],
+      loadPaths: includePaths,
+      // Use expanded as otherwise sass will remove comments that are needed for autoprefixer
+      // Ex: /* autoprefixer grid: autoplace */
+      // See: https://github.com/webpack-contrib/sass-loader/blob/45ad0be17264ceada5f0b4fb87e9357abe85c4ff/src/getSassOptions.js#L68-L70
+      style: 'expanded',
+      // Silences compiler warnings from 3rd party stylesheets
+      quietDeps: !verbose,
+      verbose,
+      syntax: indentedSyntax ? 'indented' : 'scss',
+      sourceMapIncludeSources: true,
+    }),
+  };
 }
 
 function getSassResolutionImporter(
