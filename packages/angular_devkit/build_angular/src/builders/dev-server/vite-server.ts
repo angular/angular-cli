@@ -57,6 +57,9 @@ export async function* serveWithVite(
     serverOptions.buildTarget,
   )) as json.JsonObject & BrowserBuilderOptions;
 
+  // Deploy url is not used in the dev-server.
+  delete rawBrowserOptions.deployUrl;
+
   const browserOptions = (await context.validateOptions(
     {
       ...rawBrowserOptions,
