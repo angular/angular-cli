@@ -6,26 +6,20 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { BuilderContext } from '@angular-devkit/architect';
+import type { BuilderContext } from '@angular-devkit/architect';
 import type { Plugin } from 'esbuild';
 import { realpathSync } from 'node:fs';
 import { access, constants } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import path from 'node:path';
-import {
-  globalScriptsByBundleName,
-  normalizeGlobalStyles,
-} from '../../tools/webpack/utils/helpers';
 import { normalizeAssetPatterns, normalizeOptimization, normalizeSourceMaps } from '../../utils';
 import { colors } from '../../utils/color';
 import { useJSONBuildLogs } from '../../utils/environment-options';
 import { I18nOptions, createI18nOptions } from '../../utils/i18n-options';
 import { IndexHtmlTransform } from '../../utils/index-file/index-html-generator';
 import { normalizeCacheOptions } from '../../utils/normalize-cache';
-import { generateEntryPoints } from '../../utils/package-chunk-sort';
 import { loadPostcssConfiguration } from '../../utils/postcss-configuration';
 import { findTailwindConfigurationFile } from '../../utils/tailwind';
-import { getIndexInputFile, getIndexOutputFile } from '../../utils/webpack-browser-config';
 import {
   Schema as ApplicationBuilderOptions,
   I18NTranslation,
@@ -194,35 +188,29 @@ export async function normalizeOptions(
     ? undefined
     : await getTailwindConfig(workspaceRoot, projectRoot, context);
 
-  const globalStyles: { name: string; files: string[]; initial: boolean }[] = [];
-  if (options.styles?.length) {
-    const { entryPoints: stylesheetEntrypoints, noInjectNames } = normalizeGlobalStyles(
-      options.styles || [],
-    );
-    for (const [name, files] of Object.entries(stylesheetEntrypoints)) {
-      globalStyles.push({ name, files, initial: !noInjectNames.includes(name) });
-    }
-  }
-
-  const globalScripts: { name: string; files: string[]; initial: boolean }[] = [];
-  if (options.scripts?.length) {
-    for (const { bundleName, paths, inject } of globalScriptsByBundleName(options.scripts)) {
-      globalScripts.push({ name: bundleName, files: paths, initial: inject });
-    }
-  }
+  const globalStyles = normalizeGlobalEntries(options.styles, 'styles');
+  const globalScripts = normalizeGlobalEntries(options.scripts, 'scripts');
 
   let indexHtmlOptions;
   // index can never have a value of `true` but in the schema it's of type `boolean`.
   if (typeof options.index !== 'boolean') {
     indexHtmlOptions = {
-      input: path.join(workspaceRoot, getIndexInputFile(options.index)),
+      input: path.join(
+        workspaceRoot,
+        typeof options.index === 'string' ? options.index : options.index.input,
+      ),
       // The output file will be created within the configured output path
-      output: getIndexOutputFile(options.index),
-      // TODO: Use existing information from above to create the insertion order
-      insertionOrder: generateEntryPoints({
-        scripts: options.scripts ?? [],
-        styles: options.styles ?? [],
-      }),
+      output:
+        typeof options.index === 'string'
+          ? path.basename(options.index)
+          : options.index.output || 'index.html',
+      insertionOrder: [
+        ['polyfills', true],
+        ...globalStyles.filter((s) => s.initial).map((s) => [s.name, false]),
+        ...globalScripts.filter((s) => s.initial).map((s) => [s.name, false]),
+        ['main', true],
+        // [name, esm]
+      ] as [string, boolean][],
       transformer: extensions?.indexHtmlTransformer,
       // Preload initial defaults to true
       preloadInitial: typeof options.index !== 'object' || (options.index.preloadInitial ?? true),
@@ -461,4 +449,47 @@ function normalizeDirectoryPath(path: string): string {
   }
 
   return path;
+}
+
+function normalizeGlobalEntries(
+  rawEntries: ({ bundleName?: string; input: string; inject?: boolean } | string)[] | undefined,
+  defaultName: string,
+): { name: string; files: string[]; initial: boolean }[] {
+  if (!rawEntries?.length) {
+    return [];
+  }
+
+  const bundles = new Map<string, { name: string; files: string[]; initial: boolean }>();
+
+  for (const rawEntry of rawEntries) {
+    let entry;
+    if (typeof rawEntry === 'string') {
+      // string entries use default bundle name and inject values
+      entry = { input: rawEntry };
+    } else {
+      entry = rawEntry;
+    }
+
+    const { bundleName, input, inject = true } = entry;
+
+    // Non-injected entries default to the file name
+    const name = bundleName || (inject ? defaultName : path.basename(input, path.extname(input)));
+
+    const existing = bundles.get(name);
+    if (!existing) {
+      bundles.set(name, { name, files: [input], initial: inject });
+      continue;
+    }
+
+    if (existing.initial !== inject) {
+      throw new Error(
+        `The "${name}" bundle is mixing injected and non-injected entries. ` +
+          'Verify that the project options are correct.',
+      );
+    }
+
+    existing.files.push(input);
+  }
+
+  return [...bundles.values()];
 }
