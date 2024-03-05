@@ -377,6 +377,7 @@ LARGE_SPECS = {
         "extra_deps": [
             "@npm//@types/browser-sync",
             "@npm//browser-sync",
+            "@npm//express",
             "@npm//undici",
             "//packages/angular/ssr",
         ],
