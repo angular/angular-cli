@@ -632,12 +632,12 @@ function getDepOptimizationConfig({
   }
 
   return {
-    // Only enable with caching since it causes prebundle dependencies to be cached
-    disabled,
     // Exclude any explicitly defined dependencies (currently build defined externals)
     exclude,
+    // NB: to disable the deps optimizer, set optimizeDeps.noDiscovery to true and optimizeDeps.include as undefined.
     // Include all implict dependencies from the external packages internal option
-    include,
+    include: disabled ? undefined : include,
+    noDiscovery: disabled,
     // Add an esbuild plugin to run the Angular linker on dependencies
     esbuildOptions: {
       // Set esbuild supported targets.
