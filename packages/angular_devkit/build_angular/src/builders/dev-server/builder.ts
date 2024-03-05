@@ -54,7 +54,7 @@ export function execute(
   // Determine project name from builder context target
   const projectName = context.target?.project;
   if (!projectName) {
-    context.logger.error(`The 'dev-server' builder requires a target to be specified.`);
+    context.logger.error(`The "dev-server" builder requires a target to be specified.`);
 
     return EMPTY;
   }
@@ -65,7 +65,7 @@ export function execute(
       if (isEsbuildBased(builderName)) {
         if (transforms?.logging || transforms?.webpackConfiguration) {
           throw new Error(
-            'The `application` and `browser-esbuild` builders do not support Webpack transforms.',
+            `The "application" and "browser-esbuild" builders do not support Webpack transforms.`,
           );
         }
 
@@ -73,6 +73,24 @@ export function execute(
         if (options.prebundle && !normalizedOptions.cacheOptions.enabled) {
           context.logger.warn(
             `Prebundling has been configured but will not be used because caching has been disabled.`,
+          );
+        }
+
+        if (options.allowedHosts?.length) {
+          context.logger.warn(
+            `The "allowedHost" option will not be used because it is not supported by the "${builderName}" builder.`,
+          );
+        }
+
+        if (options.publicHost) {
+          context.logger.warn(
+            `The "publicHost" option will not be used because it is not supported by the "${builderName}" builder.`,
+          );
+        }
+
+        if (options.disableHostCheck) {
+          context.logger.warn(
+            `The "disableHostCheck" option will not be used because it is not supported by the "${builderName}" builder.`,
           );
         }
 
@@ -91,11 +109,11 @@ export function execute(
       }
 
       if (extensions?.buildPlugins?.length) {
-        throw new Error('Only the `application` and `browser-esbuild` builders support plugins.');
+        throw new Error('Only the "application" and "browser-esbuild" builders support plugins.');
       }
       if (extensions?.middleware?.length) {
         throw new Error(
-          'Only the `application` and `browser-esbuild` builders support middleware.',
+          'Only the "application" and "browser-esbuild" builders support middleware.',
         );
       }
 
