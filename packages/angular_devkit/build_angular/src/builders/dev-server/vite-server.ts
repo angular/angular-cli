@@ -547,7 +547,6 @@ export async function setupServer(
         external: externalMetadata.explicit,
         indexHtmlTransformer,
         extensionMiddleware,
-        extraHeaders: serverOptions.headers,
         normalizePath,
       }),
     ],
