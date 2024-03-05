@@ -29,7 +29,6 @@ export function createGlobalStylesBundleOptions(
     tailwindConfiguration,
     postcssConfiguration,
     cacheOptions,
-    publicPath,
   } = options;
 
   const namespace = 'angular:styles/global';
@@ -67,7 +66,6 @@ export function createGlobalStylesBundleOptions(
         tailwindConfiguration,
         postcssConfiguration,
         cacheOptions,
-        publicPath,
       },
       loadCache,
     );
