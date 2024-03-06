@@ -6,7 +6,6 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { logging } from '@angular-devkit/core';
 import { spawn } from 'child_process';
 import fs from 'fs';
 import { dirname, join, relative, resolve } from 'path';
@@ -35,7 +34,7 @@ function _copy(from: string, to: string) {
   fs.writeFileSync(to, buffer);
 }
 
-function _recursiveCopy(from: string, to: string, logger: logging.Logger) {
+function _recursiveCopy(from: string, to: string, logger: Console) {
   if (!fs.existsSync(from)) {
     logger.error(`File "${from}" does not exist.`);
     process.exit(4);
@@ -53,13 +52,13 @@ function rimraf(location: string) {
   fs.rmSync(location, { force: true, recursive: true, maxRetries: 3 });
 }
 
-function _clean(logger: logging.Logger) {
+function _clean(logger: Console) {
   logger.info('Cleaning...');
   logger.info('  Removing dist/...');
   rimraf(join(__dirname, '../dist'));
 }
 
-function _exec(cmd: string, captureStdout: boolean, logger: logging.Logger): Promise<string> {
+function _exec(cmd: string, captureStdout: boolean, logger: Console): Promise<string> {
   return new Promise((resolve, reject) => {
     const proc = spawn(cmd, {
       stdio: 'pipe',
@@ -89,16 +88,15 @@ function _exec(cmd: string, captureStdout: boolean, logger: logging.Logger): Pro
   });
 }
 
-async function _build(logger: logging.Logger, mode: BuildMode): Promise<string[]> {
-  logger.info(`Building (mode=${mode})...`);
+async function _build(logger: Console, mode: BuildMode): Promise<string[]> {
+  logger.group(`Building (mode=${mode})...`);
 
-  const queryLogger = logger.createChild('query');
+  logger.group('Finding targets...');
   const queryTargetsCmd =
     `${bazelCmd} query --output=label "attr(name, npm_package_archive, //packages/...` +
     ' except //packages/angular/ssr/schematics/...)"';
-  const targets = (await _exec(queryTargetsCmd, true, queryLogger)).split(/\r?\n/);
-
-  const buildLogger = logger.createChild('build');
+  const targets = (await _exec(queryTargetsCmd, true, logger)).split(/\r?\n/);
+  logger.groupEnd();
 
   // If we are in release mode, run `bazel clean` to ensure the execroot and action cache
   // are not populated. This is necessary because targets using `npm_package` rely on
@@ -106,19 +104,24 @@ async function _build(logger: logging.Logger, mode: BuildMode): Promise<string[]
   // rebuilt if only the workspace status variables change. This could result in accidental
   // re-use of previously built package output with a different `version` in the `package.json`.
   if (mode == 'release') {
-    buildLogger.info('Building in release mode. Resetting the Bazel execroot and action cache.');
-    await _exec(`${bazelCmd} clean`, false, buildLogger);
+    logger.info('Building in release mode. Resetting the Bazel execroot and action cache.');
+    await _exec(`${bazelCmd} clean`, false, logger);
   }
 
-  await _exec(`${bazelCmd} build --config=${mode} ${targets.join(' ')}`, false, buildLogger);
+  logger.group('Building targets...');
+  await _exec(`${bazelCmd} build --config=${mode} ${targets.join(' ')}`, false, logger);
+  logger.groupEnd();
+
+  logger.groupEnd();
 
   return targets;
 }
 
 export default async function (
   argv: { local?: boolean; snapshot?: boolean } = {},
-  logger: logging.Logger = new logging.Logger('build-logger'),
 ): Promise<{ name: string; outputPath: string }[]> {
+  const logger = globalThis.console;
+
   const bazelBin = await _exec(`${bazelCmd} info bazel-bin`, true, logger);
 
   _clean(logger);
@@ -135,8 +138,7 @@ export default async function (
   const targets = await _build(logger, buildMode);
   const output: { name: string; outputPath: string }[] = [];
 
-  logger.info('Moving packages and tars to dist/');
-  const packageLogger = logger.createChild('packages');
+  logger.group('Moving packages and tars to dist/');
 
   for (const target of targets) {
     const packageDir = target.replace(/\/\/packages\/(.*):npm_package_archive/, '$1');
@@ -146,13 +148,15 @@ export default async function (
     const packageName = require(packageJsonPath).name;
     const destDir = `${distRoot}/${packageName}`;
 
-    packageLogger.info(packageName);
+    logger.info(packageName);
 
     _recursiveCopy(bazelOutDir, destDir, logger);
     _copy(tarPath, `${distRoot}/${packageName.replace('@', '_').replace('/', '_')}.tgz`);
 
     output.push({ name: packageDir, outputPath: destDir });
   }
+
+  logger.groupEnd();
 
   return output;
 }
