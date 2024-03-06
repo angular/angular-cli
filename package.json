@@ -202,7 +202,7 @@
     "spdx-satisfies": "^5.0.0",
     "symbol-observable": "4.0.0",
     "tar": "^6.1.6",
-    "terser": "5.28.1",
+    "terser": "5.29.1",
     "tree-kill": "1.2.2",
     "ts-node": "^10.9.1",
     "tslib": "2.6.2",
