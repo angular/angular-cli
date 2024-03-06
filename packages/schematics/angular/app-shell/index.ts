@@ -15,7 +15,6 @@ import {
   noop,
   schematic,
 } from '@angular-devkit/schematics';
-import { findBootstrapApplicationCall } from '../private/standalone';
 import * as ts from '../third_party/github.com/Microsoft/TypeScript/lib/typescript';
 import {
   addImportToModule,
@@ -29,7 +28,8 @@ import {
 } from '../utility/ast-utils';
 import { applyToUpdateRecorder } from '../utility/change';
 import { getAppModulePath, isStandaloneApp } from '../utility/ng-ast-utils';
-import { getMainFilePath } from '../utility/standalone/util';
+import { findAppConfig } from '../utility/standalone/app_config';
+import { findBootstrapApplicationCall, getMainFilePath } from '../utility/standalone/util';
 import { getWorkspace, updateWorkspace } from '../utility/workspace';
 import { Builders } from '../utility/workspace-models';
 import { Schema as AppShellOptions } from './schema';
@@ -89,18 +89,16 @@ function getComponentTemplate(host: Tree, compPath: string, tmplInfo: TemplateIn
 }
 
 function getBootstrapComponentPath(host: Tree, mainPath: string): string {
-  const mainSource = getSourceFile(host, mainPath);
-  const bootstrapAppCall = findBootstrapApplicationCall(mainSource);
-
   let bootstrappingFilePath: string;
   let bootstrappingSource: ts.SourceFile;
   let componentName: string;
 
-  if (bootstrapAppCall) {
+  if (isStandaloneApp(host, mainPath)) {
     // Standalone Application
-    componentName = bootstrapAppCall.arguments[0].getText();
+    const bootstrapCall = findBootstrapApplicationCall(host, mainPath);
+    componentName = bootstrapCall.arguments[0].getText();
     bootstrappingFilePath = mainPath;
-    bootstrappingSource = mainSource;
+    bootstrappingSource = getSourceFile(host, mainPath);
   } else {
     // NgModule Application
     const modulePath = getAppModulePath(host, mainPath);

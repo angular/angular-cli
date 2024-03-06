@@ -19,15 +19,16 @@ import {
   move,
   url,
 } from '@angular-devkit/schematics';
-import { addFunctionalProvidersToStandaloneBootstrap } from '../private/standalone';
 import * as ts from '../third_party/github.com/Microsoft/TypeScript/lib/typescript';
-import { addDependency, readWorkspace, writeWorkspace } from '../utility';
+import { addDependency, addRootProvider, readWorkspace, writeWorkspace } from '../utility';
 import { addSymbolToNgModuleMetadata, insertImport } from '../utility/ast-utils';
 import { applyToUpdateRecorder } from '../utility/change';
 import { getPackageJsonDependency } from '../utility/dependencies';
 import { getAppModulePath, isStandaloneApp } from '../utility/ng-ast-utils';
 import { relativePathToWorkspaceRoot } from '../utility/paths';
 import { targetBuildNotFoundError } from '../utility/project-targets';
+import { findAppConfig } from '../utility/standalone/app_config';
+import { findBootstrapApplicationCall } from '../utility/standalone/util';
 import { Builders } from '../utility/workspace-models';
 import { Schema as ServiceWorkerOptions } from './schema';
 
@@ -78,41 +79,20 @@ function updateAppModule(mainPath: string): Rule {
   };
 }
 
-function addProvideServiceWorker(mainPath: string): Rule {
+function addProvideServiceWorker(projectName: string, mainPath: string): Rule {
   return (host: Tree) => {
-    const updatedFilePath = addFunctionalProvidersToStandaloneBootstrap(
-      host,
-      mainPath,
-      'provideServiceWorker',
-      '@angular/service-worker',
-      [
-        ts.factory.createStringLiteral('ngsw-worker.js', true),
-        ts.factory.createObjectLiteralExpression(
-          [
-            ts.factory.createPropertyAssignment(
-              ts.factory.createIdentifier('enabled'),
-              ts.factory.createPrefixUnaryExpression(
-                ts.SyntaxKind.ExclamationToken,
-                ts.factory.createCallExpression(
-                  ts.factory.createIdentifier('isDevMode'),
-                  undefined,
-                  [],
-                ),
-              ),
-            ),
-            ts.factory.createPropertyAssignment(
-              ts.factory.createIdentifier('registrationStrategy'),
-              ts.factory.createStringLiteral('registerWhenStable:30000', true),
-            ),
-          ],
-          true,
-        ),
-      ],
+    const bootstrapCall = findBootstrapApplicationCall(host, mainPath);
+    const appConfig = findAppConfig(bootstrapCall, host, mainPath)?.filePath || mainPath;
+    addImport(host, appConfig, 'isDevMode', '@angular/core');
+
+    return addRootProvider(
+      projectName,
+      ({ code, external }) =>
+        code`${external('provideServiceWorker', '@angular/service-worker')}('ngsw-worker.js', {
+            enabled: !isDevMode(),
+            registrationStrategy: 'registerWhenStable:30000'
+          })`,
     );
-
-    addImport(host, updatedFilePath, 'isDevMode', '@angular/core');
-
-    return host;
   };
 }
 
@@ -174,7 +154,7 @@ export default function (options: ServiceWorkerOptions): Rule {
         ]),
       ),
       isStandaloneApp(host, browserEntryPoint)
-        ? addProvideServiceWorker(browserEntryPoint)
+        ? addProvideServiceWorker(options.project, browserEntryPoint)
         : updateAppModule(browserEntryPoint),
     ]);
   };

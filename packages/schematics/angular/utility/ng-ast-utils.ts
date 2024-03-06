@@ -9,9 +9,9 @@
 import { normalize } from '@angular-devkit/core';
 import { SchematicsException, Tree } from '@angular-devkit/schematics';
 import { dirname } from 'path';
-import { findBootstrapApplicationCall } from '../private/standalone';
 import * as ts from '../third_party/github.com/Microsoft/TypeScript/lib/typescript';
 import { findNode, getSourceNodes } from '../utility/ast-utils';
+import { findBootstrapApplicationCall } from './standalone/util';
 
 export function findBootstrapModuleCall(host: Tree, mainPath: string): ts.CallExpression | null {
   const mainText = host.readText(mainPath);
@@ -81,13 +81,15 @@ export function getAppModulePath(host: Tree, mainPath: string): string {
 }
 
 export function isStandaloneApp(host: Tree, mainPath: string): boolean {
-  const source = ts.createSourceFile(
-    mainPath,
-    host.readText(mainPath),
-    ts.ScriptTarget.Latest,
-    true,
-  );
-  const bootstrapCall = findBootstrapApplicationCall(source);
+  try {
+    findBootstrapApplicationCall(host, mainPath);
 
-  return bootstrapCall !== null;
+    return true;
+  } catch (error) {
+    if (error instanceof SchematicsException) {
+      return false;
+    }
+
+    throw error;
+  }
 }
