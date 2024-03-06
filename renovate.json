@@ -13,6 +13,7 @@
   "schedule": ["after 10:00pm every weekday", "before 4:00am every weekday", "every weekend"],
   "baseBranches": ["main"],
   "ignoreDeps": [
+    "critters",
     "@types/node",
     "aspect_bazel_lib",
     "rules_pkg",
