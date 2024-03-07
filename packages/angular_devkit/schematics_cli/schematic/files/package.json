@@ -15,7 +15,7 @@
   "dependencies": {
     "@angular-devkit/core": "^<%= coreVersion %>",
     "@angular-devkit/schematics": "^<%= schematicsVersion %>",
-    "typescript": "~5.3.2"
+    "typescript": "~5.4.2"
   },
   "devDependencies": {
     "@types/node": "^18.18.0",
