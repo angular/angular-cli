@@ -40,6 +40,7 @@ export class ExecutionResult {
   errors: (Message | PartialMessage)[] = [];
   prerenderedRoutes: string[] = [];
   warnings: (Message | PartialMessage)[] = [];
+  logs: string[] = [];
   externalMetadata?: ExternalResultMetadata;
 
   constructor(
@@ -53,6 +54,10 @@ export class ExecutionResult {
 
   addAssets(assets: BuildOutputAsset[]): void {
     this.assetFiles.push(...assets);
+  }
+
+  addLog(value: string): void {
+    this.logs.push(value);
   }
 
   addError(error: PartialMessage | string): void {
