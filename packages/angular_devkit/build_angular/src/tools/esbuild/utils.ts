@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { logging } from '@angular-devkit/core';
+import { BuilderContext } from '@angular-devkit/architect';
 import { BuildOptions, Metafile, OutputFile, formatMessages } from 'esbuild';
 import { createHash } from 'node:crypto';
 import { constants as fsConstants } from 'node:fs';
@@ -456,7 +456,7 @@ export async function createJsonBuildManifest(
 }
 
 export async function logMessages(
-  logger: logging.LoggerApi,
+  logger: BuilderContext['logger'],
   executionResult: ExecutionResult,
   color?: boolean,
   jsonLogs?: boolean,

@@ -6,12 +6,11 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { BaseException } from '@angular-devkit/core';
 import { statSync } from 'fs';
 import * as path from 'path';
 import { AssetPattern, AssetPatternClass } from '../builders/browser/schema';
 
-export class MissingAssetSourceRootException extends BaseException {
+export class MissingAssetSourceRootException extends Error {
   constructor(path: string) {
     super(`The ${path} asset path must start with the project source root.`);
   }

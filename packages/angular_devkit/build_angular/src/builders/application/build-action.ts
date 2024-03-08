@@ -6,8 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { BuilderOutput } from '@angular-devkit/architect';
-import type { logging } from '@angular-devkit/core';
+import { BuilderContext, BuilderOutput } from '@angular-devkit/architect';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { BuildOutputFile } from '../../tools/esbuild/bundler-context';
@@ -44,7 +43,7 @@ export async function* runEsBuildBuildAction(
     workspaceRoot: string;
     projectRoot: string;
     outputOptions: NormalizedOutputOptions;
-    logger: logging.LoggerApi;
+    logger: BuilderContext['logger'];
     cacheOptions: NormalizedCachedOptions;
     writeToFileSystem: boolean;
     writeToFileSystemFilter: ((file: BuildOutputFile) => boolean) | undefined;

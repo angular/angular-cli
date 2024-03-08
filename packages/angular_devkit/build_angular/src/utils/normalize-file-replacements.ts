@@ -6,12 +6,11 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { BaseException } from '@angular-devkit/core';
 import { existsSync } from 'fs';
 import * as path from 'path';
 import { FileReplacement } from '../builders/browser/schema';
 
-export class MissingFileReplacementException extends BaseException {
+export class MissingFileReplacementException extends Error {
   constructor(path: string) {
     super(`The ${path} path in file replacements does not exist.`);
   }

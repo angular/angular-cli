@@ -7,7 +7,7 @@
  */
 
 import type { BuilderContext } from '@angular-devkit/architect';
-import type { json, logging } from '@angular-devkit/core';
+import type { json } from '@angular-devkit/core';
 import type { Plugin } from 'esbuild';
 import assert from 'node:assert';
 import { readFile } from 'node:fs/promises';
@@ -314,7 +314,7 @@ function handleUpdate(
   generatedFiles: Map<string, OutputFileRecord>,
   server: ViteDevServer,
   serverOptions: NormalizedDevServerOptions,
-  logger: logging.LoggerApi,
+  logger: BuilderContext['logger'],
 ): void {
   const updatedFiles: string[] = [];
 
