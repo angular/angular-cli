@@ -185,7 +185,7 @@ export async function executeBuild(
   }
 
   if (!jsonLogs) {
-    context.logger.info(
+    executionResult.addLog(
       logBuildStats(
         metafile,
         initialFiles,
