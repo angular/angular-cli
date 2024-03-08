@@ -38,7 +38,7 @@ const defaultDistPath = join(projectDir, 'dist/releases');
 
 /** Builds the release packages for NPM. */
 export function performNpmReleaseBuild(): BuiltPackage[] {
-  return buildReleasePackages(defaultDistPath, /* isSnapshotBuild */ false);
+  return buildReleasePackages(defaultDistPath, /* config */ 'release');
 }
 
 /**
@@ -46,16 +46,20 @@ export function performNpmReleaseBuild(): BuiltPackage[] {
  * Git HEAD SHA is included in the version (for easier debugging and back tracing).
  */
 export function performDefaultSnapshotBuild(): BuiltPackage[] {
-  return buildReleasePackages(defaultDistPath, /* isSnapshotBuild */ true);
+  return buildReleasePackages(defaultDistPath, /* config */'snapshot');
+}
+
+export function performLocalPackageBuild(): BuiltPackage[] {
+  return buildReleasePackages(defaultDistPath, /* config */'local');
 }
 
 /**
  * Builds the release packages with the given compile mode and copies
  * the package output into the given directory.
  */
-function buildReleasePackages(distPath: string, isSnapshotBuild: boolean): BuiltPackage[] {
+function buildReleasePackages(distPath: string, config: 'release' | 'snapshot' | 'local'): BuiltPackage[] {
   console.log('######################################');
-  console.log('  Building release packages...');
+  console.log(`  Building ${config} packages...`);
   console.log('######################################');
 
   // List of targets to build. e.g. "packages/angular/cli:npm_package"
@@ -69,7 +73,10 @@ function buildReleasePackages(distPath: string, isSnapshotBuild: boolean): Built
   // Build with "--config=release" or `--config=snapshot` so that Bazel
   // runs the workspace stamping script. The stamping script ensures that the
   // version placeholder is populated in the release output.
-  const stampConfigArg = `--config=${isSnapshotBuild ? 'snapshot' : 'release'}`;
+  if (!['release', 'snapshot', 'local'].includes(config)) {
+    throw new Error('Invalid config value: ' + config);
+  }
+  const stampConfigArg = `--config=${config}`;
 
   // Walk through each release package and clear previous "npm_package" outputs. This is
   // a workaround for: https://github.com/bazelbuild/rules_nodejs/issues/1219. We need to
