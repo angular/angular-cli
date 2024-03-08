@@ -15,7 +15,7 @@ import {
   noop,
   schematic,
 } from '@angular-devkit/schematics';
-import * as ts from '../third_party/github.com/Microsoft/TypeScript/lib/typescript';
+import ts from '../third_party/github.com/Microsoft/TypeScript/lib/typescript';
 import {
   addImportToModule,
   addSymbolToNgModuleMetadata,
@@ -28,7 +28,6 @@ import {
 } from '../utility/ast-utils';
 import { applyToUpdateRecorder } from '../utility/change';
 import { getAppModulePath, isStandaloneApp } from '../utility/ng-ast-utils';
-import { findAppConfig } from '../utility/standalone/app_config';
 import { findBootstrapApplicationCall, getMainFilePath } from '../utility/standalone/util';
 import { getWorkspace, updateWorkspace } from '../utility/workspace';
 import { Builders } from '../utility/workspace-models';
