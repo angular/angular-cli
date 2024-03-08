@@ -7,11 +7,10 @@
  */
 
 import { BuilderContext } from '@angular-devkit/architect';
-import { json } from '@angular-devkit/core';
-import fs from 'fs';
-import module from 'module';
-import os from 'os';
-import path from 'path';
+import fs from 'node:fs';
+import { createRequire } from 'node:module';
+import os from 'node:os';
+import path from 'node:path';
 import { Schema as BrowserBuilderSchema, I18NTranslation } from '../builders/browser/schema';
 import { Schema as ServerBuilderSchema } from '../builders/server/schema';
 import { readTsconfig } from '../utils/read-tsconfig';
@@ -43,7 +42,7 @@ export interface I18nOptions {
 }
 
 function normalizeTranslationFileOption(
-  option: json.JsonValue,
+  option: unknown,
   locale: string,
   expectObjectInError: boolean,
 ): string[] {
@@ -65,14 +64,25 @@ function normalizeTranslationFileOption(
   throw new Error(errorMessage);
 }
 
+function ensureObject(value: unknown, name: string): asserts value is Record<string, unknown> {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    throw new Error(`Project ${name} field is malformed. Expected an object.`);
+  }
+}
+
+function ensureString(value: unknown, name: string): asserts value is string {
+  if (typeof value !== 'string') {
+    throw new Error(`Project ${name} field is malformed. Expected a string.`);
+  }
+}
+
 export function createI18nOptions(
-  metadata: json.JsonObject,
+  projectMetadata: { i18n?: unknown },
   inline?: boolean | string[],
 ): I18nOptions {
-  if (metadata.i18n !== undefined && !json.isJsonObject(metadata.i18n)) {
-    throw new Error('Project i18n field is malformed. Expected an object.');
-  }
-  metadata = metadata.i18n || {};
+  const { i18n: metadata = {} } = projectMetadata;
+
+  ensureObject(metadata, 'i18n');
 
   const i18n: I18nOptions = {
     inlineLocales: new Set<string>(),
@@ -86,24 +96,23 @@ export function createI18nOptions(
 
   let rawSourceLocale;
   let rawSourceLocaleBaseHref;
-  if (json.isJsonObject(metadata.sourceLocale)) {
-    rawSourceLocale = metadata.sourceLocale.code;
-    if (
-      metadata.sourceLocale.baseHref !== undefined &&
-      typeof metadata.sourceLocale.baseHref !== 'string'
-    ) {
-      throw new Error('Project i18n sourceLocale baseHref field is malformed. Expected a string.');
-    }
-    rawSourceLocaleBaseHref = metadata.sourceLocale.baseHref;
-  } else {
+  if (typeof metadata.sourceLocale === 'string') {
     rawSourceLocale = metadata.sourceLocale;
+  } else if (metadata.sourceLocale !== undefined) {
+    ensureObject(metadata.sourceLocale, 'i18n sourceLocale');
+
+    if (metadata.sourceLocale.code !== undefined) {
+      ensureString(metadata.sourceLocale.code, 'i18n sourceLocale code');
+      rawSourceLocale = metadata.sourceLocale.code;
+    }
+
+    if (metadata.sourceLocale.baseHref !== undefined) {
+      ensureString(metadata.sourceLocale.baseHref, 'i18n sourceLocale baseHref');
+      rawSourceLocaleBaseHref = metadata.sourceLocale.baseHref;
+    }
   }
 
   if (rawSourceLocale !== undefined) {
-    if (typeof rawSourceLocale !== 'string') {
-      throw new Error('Project i18n sourceLocale field is malformed. Expected a string.');
-    }
-
     i18n.sourceLocale = rawSourceLocale;
     i18n.hasDefinedSourceLocale = true;
   }
@@ -113,16 +122,17 @@ export function createI18nOptions(
     baseHref: rawSourceLocaleBaseHref,
   };
 
-  if (metadata.locales !== undefined && !json.isJsonObject(metadata.locales)) {
-    throw new Error('Project i18n locales field is malformed. Expected an object.');
-  } else if (metadata.locales) {
+  if (metadata.locales !== undefined) {
+    ensureObject(metadata.locales, 'i18n locales');
+
     for (const [locale, options] of Object.entries(metadata.locales)) {
       let translationFiles;
       let baseHref;
-      if (json.isJsonObject(options)) {
+      if (options && typeof options === 'object' && 'translation' in options) {
         translationFiles = normalizeTranslationFileOption(options.translation, locale, false);
 
-        if (typeof options.baseHref === 'string') {
+        if ('baseHref' in options) {
+          ensureString(options.baseHref, `i18n locales ${locale} baseHref`);
           baseHref = options.baseHref;
         }
       } else {
@@ -181,7 +191,7 @@ export async function configureI18nBuild<T extends BrowserBuilderSchema | Server
 
   const projectRoot = path.join(context.workspaceRoot, (metadata.root as string) || '');
   // The trailing slash is required to signal that the path is a directory and not a file.
-  const projectRequire = module.createRequire(projectRoot + '/');
+  const projectRequire = createRequire(projectRoot + '/');
   const localeResolver = (locale: string) =>
     projectRequire.resolve(path.join(LOCALE_DATA_BASE_MODULE, locale));
 
