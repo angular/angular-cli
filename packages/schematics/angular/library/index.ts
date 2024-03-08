@@ -6,7 +6,6 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { join, normalize } from '@angular-devkit/core';
 import {
   Rule,
   SchematicContext,
@@ -22,6 +21,7 @@ import {
   url,
 } from '@angular-devkit/schematics';
 import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
+import { join } from 'node:path/posix';
 import { NodeDependencyType, addPackageJsonDependency } from '../utility/dependencies';
 import { JSONFile } from '../utility/json-file';
 import { latestVersions } from '../utility/latest-versions';
@@ -138,8 +138,8 @@ export default function (options: LibraryOptions): Rule {
 
     const libDir =
       options.projectRoot !== undefined
-        ? normalize(options.projectRoot)
-        : join(normalize(newProjectRoot), folderName);
+        ? join(options.projectRoot)
+        : join(newProjectRoot, folderName);
 
     const distRoot = `dist/${folderName}`;
     const sourceDir = `${libDir}/src/lib`;
