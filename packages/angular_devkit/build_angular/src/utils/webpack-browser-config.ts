@@ -7,7 +7,6 @@
  */
 
 import { BuilderContext } from '@angular-devkit/architect';
-import { logging } from '@angular-devkit/core';
 import * as path from 'path';
 import { Configuration, javascript } from 'webpack';
 import { merge as webpackMerge } from 'webpack-merge';
@@ -34,7 +33,7 @@ export async function generateWebpackConfig(
   projectName: string,
   options: NormalizedBrowserBuilderSchema,
   webpackPartialGenerator: WebpackPartialGenerator,
-  logger: logging.LoggerApi,
+  logger: BuilderContext['logger'],
   extraBuildOptions: Partial<NormalizedBrowserBuilderSchema>,
 ): Promise<Configuration> {
   // Ensure Build Optimizer is only used with AOT.

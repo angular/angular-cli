@@ -6,10 +6,12 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { logging } from '@angular-devkit/core';
 import browserslist from 'browserslist';
 
-export function getSupportedBrowsers(projectRoot: string, logger: logging.LoggerApi): string[] {
+export function getSupportedBrowsers(
+  projectRoot: string,
+  logger: { warn(message: string): void },
+): string[] {
   browserslist.defaults = [
     'last 2 Chrome versions',
     'last 1 Firefox version',
