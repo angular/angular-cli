@@ -9,7 +9,7 @@
 import { BuilderContext, BuilderOutput, createBuilder } from '@angular-devkit/architect';
 import type { Plugin } from 'esbuild';
 import { BuildOutputFile, BuildOutputFileType } from '../../tools/esbuild/bundler-context';
-import { logMessages } from '../../tools/esbuild/utils';
+import { createJsonBuildManifest } from '../../tools/esbuild/utils';
 import { colors as ansiColors } from '../../utils/color';
 import { purgeStaleBuildCache } from '../../utils/purge-cache';
 import { assertCompatibleAngularVersion } from '../../utils/version';
@@ -90,28 +90,27 @@ export async function* buildApplicationInternal(
       const startTime = process.hrtime.bigint();
       const result = await executeBuild(normalizedOptions, context, rebuildState);
 
-      if (!jsonLogs) {
+      if (jsonLogs) {
+        result.addLog(await createJsonBuildManifest(result, normalizedOptions));
+      } else {
         if (prerenderOptions) {
           const prerenderedRoutesLength = result.prerenderedRoutes.length;
           let prerenderMsg = `Prerendered ${prerenderedRoutesLength} static route`;
           prerenderMsg += prerenderedRoutesLength !== 1 ? 's.' : '.';
 
-          logger.info(ansiColors.magenta(prerenderMsg));
+          result.addLog(ansiColors.magenta(prerenderMsg));
         }
 
         const buildTime = Number(process.hrtime.bigint() - startTime) / 10 ** 9;
         const hasError = result.errors.length > 0;
         if (writeToFileSystem && !hasError) {
-          logger.info(`Output location: ${outputOptions.base}\n`);
+          result.addLog(`Output location: ${outputOptions.base}\n`);
         }
 
-        logger.info(
-          `Application bundle generation ${hasError ? 'failed' : 'complete'}. [${buildTime.toFixed(3)} seconds]`,
+        result.addLog(
+          `Application bundle generation ${hasError ? 'failed' : 'complete'}. [${buildTime.toFixed(3)} seconds]\n`,
         );
       }
-
-      // Log all diagnostic (error/warning) messages
-      await logMessages(logger, result, normalizedOptions);
 
       return result;
     },
@@ -127,6 +126,8 @@ export async function* buildApplicationInternal(
       workspaceRoot: normalizedOptions.workspaceRoot,
       progress: normalizedOptions.progress,
       clearScreen: normalizedOptions.clearScreen,
+      colors: normalizedOptions.colors,
+      jsonLogs: normalizedOptions.jsonLogs,
       writeToFileSystem,
       // For app-shell and SSG server files are not required by users.
       // Omit these when SSR is not enabled.
