@@ -6,9 +6,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { normalize } from '@angular-devkit/core';
 import { SchematicsException, Tree } from '@angular-devkit/schematics';
-import { dirname } from 'path';
+import { dirname, join } from 'node:path/posix';
 import * as ts from '../third_party/github.com/Microsoft/TypeScript/lib/typescript';
 import { findNode, getSourceNodes } from '../utility/ast-utils';
 import { findBootstrapApplicationCall } from './standalone/util';
@@ -75,7 +74,7 @@ function findBootstrapModulePath(host: Tree, mainPath: string): string {
 export function getAppModulePath(host: Tree, mainPath: string): string {
   const moduleRelativePath = findBootstrapModulePath(host, mainPath);
   const mainDir = dirname(mainPath);
-  const modulePath = normalize(`/${mainDir}/${moduleRelativePath}.ts`);
+  const modulePath = join(mainDir, `${moduleRelativePath}.ts`);
 
   return modulePath;
 }
