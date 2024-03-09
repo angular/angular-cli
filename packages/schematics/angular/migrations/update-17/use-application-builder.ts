@@ -6,7 +6,6 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import type { workspaces } from '@angular-devkit/core';
 import {
   DirEntry,
   Rule,
@@ -18,14 +17,14 @@ import {
 } from '@angular-devkit/schematics';
 import { basename, dirname, extname, join } from 'node:path/posix';
 import { JSONFile } from '../../utility/json-file';
-import { allTargetOptions, updateWorkspace } from '../../utility/workspace';
+import { TargetDefinition, allTargetOptions, updateWorkspace } from '../../utility/workspace';
 import { Builders, ProjectType } from '../../utility/workspace-models';
 import { findImports } from './css-import-lexer';
 
 function* updateBuildTarget(
   projectName: string,
-  buildTarget: workspaces.TargetDefinition,
-  serverTarget: workspaces.TargetDefinition | undefined,
+  buildTarget: TargetDefinition,
+  serverTarget: TargetDefinition | undefined,
   tree: Tree,
   context: SchematicContext,
 ): Iterable<Rule> {
@@ -266,11 +265,7 @@ function* potentialSassImports(
   }
 }
 
-function updateStyleImports(
-  tree: Tree,
-  projectSourceRoot: string,
-  buildTarget: workspaces.TargetDefinition,
-) {
+function updateStyleImports(tree: Tree, projectSourceRoot: string, buildTarget: TargetDefinition) {
   const external = new Set<string>();
   let needWorkspaceIncludePath = false;
   for (const file of visit(tree.getDir(projectSourceRoot))) {
