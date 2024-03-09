@@ -6,8 +6,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { dirname, normalize, relative } from '@angular-devkit/core';
 import { DirEntry, Rule, chain } from '@angular-devkit/schematics';
+import { dirname, relative } from 'node:path/posix';
 import { addDependency } from '../../utility';
 import { getPackageJsonDependency, removePackageJsonDependency } from '../../utility/dependencies';
 import { latestVersions } from '../../utility/latest-versions';
@@ -95,10 +95,7 @@ export default function (): Rule {
             if (content.includes('@nguniversal/express-engine/tokens')) {
               hasExpressTokens ||= true;
 
-              let tokensFileRelativePath: string = relative(
-                dirname(normalize(path)),
-                normalize(tokensFilePath),
-              );
+              let tokensFileRelativePath: string = relative(dirname(path), tokensFilePath);
 
               if (tokensFileRelativePath.charAt(0) !== '.') {
                 tokensFileRelativePath = './' + tokensFileRelativePath;
