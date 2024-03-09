@@ -6,7 +6,6 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { Path, normalize } from '@angular-devkit/core';
 import {
   Rule,
   Tree,
@@ -21,6 +20,7 @@ import {
   strings,
   url,
 } from '@angular-devkit/schematics';
+import { join } from 'node:path/posix';
 import { Schema as ComponentOptions } from '../component/schema';
 import * as ts from '../third_party/github.com/Microsoft/TypeScript/lib/typescript';
 import { addImportToModule, addRouteDeclarationToModule } from '../utility/ast-utils';
@@ -37,11 +37,10 @@ import { createDefaultPath } from '../utility/workspace';
 import { Schema as ModuleOptions, RoutingScope } from './schema';
 
 function buildRelativeModulePath(options: ModuleOptions, modulePath: string): string {
-  const importModulePath = normalize(
-    `/${options.path}/` +
-      (options.flat ? '' : strings.dasherize(options.name) + '/') +
-      strings.dasherize(options.name) +
-      '.module',
+  const importModulePath = join(
+    options.path ?? '',
+    options.flat ? '' : strings.dasherize(options.name),
+    strings.dasherize(options.name) + '.module',
   );
 
   return buildRelativePath(modulePath, importModulePath);
@@ -80,7 +79,7 @@ function addImportToNgModule(options: ModuleOptions): Rule {
 
 function addRouteDeclarationToNgModule(
   options: ModuleOptions,
-  routingModulePath: Path | undefined,
+  routingModulePath: string | undefined,
 ): Rule {
   return (host: Tree) => {
     if (!options.route) {
@@ -113,12 +112,12 @@ function addRouteDeclarationToNgModule(
   };
 }
 
-function getRoutingModulePath(host: Tree, modulePath: string): Path | undefined {
+function getRoutingModulePath(host: Tree, modulePath: string): string | undefined {
   const routingModulePath = modulePath.endsWith(ROUTING_MODULE_EXT)
     ? modulePath
     : modulePath.replace(MODULE_EXT, ROUTING_MODULE_EXT);
 
-  return host.exists(routingModulePath) ? normalize(routingModulePath) : undefined;
+  return host.exists(routingModulePath) ? routingModulePath : undefined;
 }
 
 function buildRoute(options: ModuleOptions, modulePath: string) {
@@ -139,7 +138,7 @@ export default function (options: ModuleOptions): Rule {
       options.module = findModuleFromOptions(host, options);
     }
 
-    let routingModulePath: Path | undefined;
+    let routingModulePath;
     const isLazyLoadedModuleGen = !!(options.route && options.module);
     if (isLazyLoadedModuleGen) {
       options.routingScope = RoutingScope.Child;
