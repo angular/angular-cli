@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { logging, tags } from '@angular-devkit/core';
+import { logging } from '@angular-devkit/core';
 import { execSync } from 'child_process';
 import templates from './templates';
 import validateBuildFiles from './validate-build-files';
@@ -28,10 +28,9 @@ export default async function (options: { verbose: boolean }, logger: logging.Lo
   const templateLogger = logger.createChild('templates');
   await templates({}, templateLogger);
   if (execSync(`git status --porcelain`).toString()) {
-    logger.error(tags.oneLine`
-      Running templates updated files... Please run "devkit-admin templates" before submitting
-      a PR.
-    `);
+    logger.error(
+      'Running templates updated files... Please run "devkit-admin templates" before submitting a PR.',
+    );
     if (!options.verbose) {
       process.exit(2);
     }
