@@ -6,11 +6,10 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import { Log, ReleasePrecheckError, bold } from '@angular/ng-dev';
 import semver from 'semver';
-import { Log, bold, ReleasePrecheckError } from '@angular/ng-dev';
-import { checkPeerDependencies } from './peer-deps-check.mjs';
 import { checkSchematicsAngularLatestVersion } from './latest-versions-check.mjs';
-import { PackageMap } from '../../../lib/packages.js';
+import { PackageJson, checkPeerDependencies } from './peer-deps-check.mjs';
 
 /** Environment variable that can be used to skip this pre-check. */
 const skipEnvVar = 'SKIP_DEPENDENCY_RANGE_PRECHECK';
@@ -26,7 +25,7 @@ const skipEnvVar = 'SKIP_DEPENDENCY_RANGE_PRECHECK';
  */
 export async function assertValidDependencyRanges(
   newVersion: semver.SemVer,
-  allPackages: PackageMap,
+  allPackages: PackageJson[],
 ) {
   if (process.env[skipEnvVar] === '1') {
     return;

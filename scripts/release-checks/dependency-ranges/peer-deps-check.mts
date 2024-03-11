@@ -6,26 +6,20 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import path from 'path';
-import url from 'url';
 import semver from 'semver';
-import { PackageMap } from '../../../lib/packages.js';
 
 /** Path to the current directory. */
-const currentDir = path.dirname(url.fileURLToPath(import.meta.url));
 
-/** Path to the project directory. */
-const projectDir = path.join(currentDir, '../../../');
 
 /** Describes a parsed `package.json` file. */
-interface PackageJson {
+export interface PackageJson {
   name?: string;
   peerDependencies?: Record<string, string>;
 }
 
 export async function checkPeerDependencies(
   newVersion: semver.SemVer,
-  allPackages: PackageMap,
+  allPackages: PackageJson[],
 ): Promise<string[]> {
   const { major, minor } = newVersion;
   const isPrerelease = !!newVersion.prerelease[0];
@@ -39,8 +33,8 @@ export async function checkPeerDependencies(
   }
 
   const failures: string[] = [];
-  for (const pkgInfo of Object.values(allPackages)) {
-    failures.push(...checkPackage(pkgInfo.packageJson, expectedFwPeerDep));
+  for (const pkgInfo of allPackages) {
+    failures.push(...checkPackage(pkgInfo, expectedFwPeerDep));
   }
 
   return failures;
