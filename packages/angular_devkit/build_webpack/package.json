@@ -25,6 +25,6 @@
   },
   "peerDependencies": {
     "webpack": "^5.30.0",
-    "webpack-dev-server": "^4.0.0"
+    "webpack-dev-server": "^5.0.2"
   }
 }

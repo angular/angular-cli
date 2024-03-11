@@ -55,7 +55,7 @@ describeServeBuilder(executeDevServer, DEV_SERVER_BUILDER_INFO, (harness, setupT
 
     it('should return 404 for non existing assets', async () => {
       setupTarget(harness, {
-        assets: ['src/extra.js'],
+        assets: [],
         optimization: {
           scripts: true,
         },
@@ -65,25 +65,7 @@ describeServeBuilder(executeDevServer, DEV_SERVER_BUILDER_INFO, (harness, setupT
         ...BASE_OPTIONS,
       });
 
-      const { result, response } = await executeOnceAndFetch(harness, 'extra.js');
-
-      expect(result?.success).toBeTrue();
-      expect(await response?.status).toBe(404);
-    });
-
-    it('should return 404 for non existing assets', async () => {
-      setupTarget(harness, {
-        assets: ['src/extra.js'],
-        optimization: {
-          scripts: true,
-        },
-      });
-
-      harness.useTarget('serve', {
-        ...BASE_OPTIONS,
-      });
-
-      const { result, response } = await executeOnceAndFetch(harness, 'extra.js');
+      const { result, response } = await executeOnceAndFetch(harness, 'does-not-exist.js');
 
       expect(result?.success).toBeTrue();
       expect(await response?.status).toBe(404);
