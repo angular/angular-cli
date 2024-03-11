@@ -101,16 +101,16 @@ yarn_install(
 
 http_archive(
     name = "aspect_bazel_lib",
-    sha256 = "9a51150a25ba13e0301b47bbe731aef537330dcc222dc598ebdfe18d2efe2f33",
-    strip_prefix = "bazel-lib-1.34.5",
-    url = "https://github.com/aspect-build/bazel-lib/archive/v1.34.5.tar.gz",
+    sha256 = "6c25c59581041ede31e117693047f972cc4700c89acf913658dc89d04c338f8d",
+    strip_prefix = "bazel-lib-2.5.3",
+    url = "https://github.com/aspect-build/bazel-lib/releases/download/v2.5.3/bazel-lib-v2.5.3.tar.gz",
 )
 
-load("@aspect_bazel_lib//lib:repositories.bzl", "aspect_bazel_lib_dependencies", "register_jq_toolchains")
+load("@aspect_bazel_lib//lib:repositories.bzl", "aspect_bazel_lib_dependencies", "aspect_bazel_lib_register_toolchains")
 
 aspect_bazel_lib_dependencies()
 
-register_jq_toolchains(version = "1.6")
+aspect_bazel_lib_register_toolchains()
 
 register_toolchains(
     "@npm//@angular/build-tooling/bazel/git-toolchain:git_linux_toolchain",
