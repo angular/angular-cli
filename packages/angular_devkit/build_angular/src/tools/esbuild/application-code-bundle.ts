@@ -154,15 +154,8 @@ export function createServerCodeBundleOptions(
   target: string[],
   sourceFileCache: SourceFileCache,
 ): BuildOptions {
-  const {
-    jit,
-    serverEntryPoint,
-    workspaceRoot,
-    ssrOptions,
-    watch,
-    externalPackages,
-    prerenderOptions,
-  } = options;
+  const { serverEntryPoint, workspaceRoot, ssrOptions, watch, externalPackages, prerenderOptions } =
+    options;
 
   assert(
     serverEntryPoint,
