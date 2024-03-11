@@ -221,7 +221,7 @@ export async function normalizeOptions(
   if (options.server) {
     serverEntryPoint = path.join(workspaceRoot, options.server);
   } else if (options.server === '') {
-    throw new Error('`server` option cannot be an empty string.');
+    throw new Error('The "server" option cannot be an empty string.');
   }
 
   let prerenderOptions;
@@ -251,6 +251,12 @@ export async function normalizeOptions(
     appShellOptions = {
       route: 'shell',
     };
+  }
+
+  if ((appShellOptions || ssrOptions || prerenderOptions) && !serverEntryPoint) {
+    throw new Error(
+      'The "server" option is required when enabling "ssr", "prerender" or "app-shell".',
+    );
   }
 
   // Initial options to keep
