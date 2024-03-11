@@ -39,6 +39,12 @@ interface OutputFileRecord {
   servable: boolean;
 }
 
+/**
+ * Build options that are also present on the dev server but are only passed
+ * to the build.
+ */
+const CONVENIENCE_BUILD_OPTIONS = ['watch', 'poll', 'verbose'] as const;
+
 // eslint-disable-next-line max-lines-per-function
 export async function* serveWithVite(
   serverOptions: NormalizedDevServerOptions,
@@ -53,22 +59,23 @@ export async function* serveWithVite(
   },
 ): AsyncIterableIterator<DevServerBuilderOutput> {
   // Get the browser configuration from the target name.
-  const rawBrowserOptions = (await context.getTargetOptions(
-    serverOptions.buildTarget,
-  )) as json.JsonObject & BrowserBuilderOptions;
+  const rawBrowserOptions = await context.getTargetOptions(serverOptions.buildTarget);
 
   // Deploy url is not used in the dev-server.
   delete rawBrowserOptions.deployUrl;
 
-  const browserOptions = (await context.validateOptions(
-    {
-      ...rawBrowserOptions,
-      watch: serverOptions.watch,
-      poll: serverOptions.poll,
-      verbose: serverOptions.verbose,
-    } as json.JsonObject & BrowserBuilderOptions,
+  // Copy convenience options to build
+  for (const optionName of CONVENIENCE_BUILD_OPTIONS) {
+    const optionValue = serverOptions[optionName];
+    if (optionValue !== undefined) {
+      rawBrowserOptions[optionName] = optionValue;
+    }
+  }
+
+  const browserOptions = await context.validateOptions<json.JsonObject & BrowserBuilderOptions>(
+    rawBrowserOptions,
     builderName,
-  )) as json.JsonObject & BrowserBuilderOptions;
+  );
 
   if (browserOptions.prerender || browserOptions.ssr) {
     // Disable prerendering if enabled and force SSR.

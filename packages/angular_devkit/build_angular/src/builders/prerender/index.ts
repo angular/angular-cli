@@ -12,7 +12,6 @@ import {
   createBuilder,
   targetFromTargetString,
 } from '@angular-devkit/architect';
-import { json } from '@angular-devkit/core';
 import * as fs from 'fs';
 import { readFile } from 'node:fs/promises';
 import ora from 'ora';
@@ -30,7 +29,7 @@ import type { RenderOptions, RenderResult } from './render-worker';
 import { RoutesExtractorWorkerData } from './routes-extractor-worker';
 import { Schema } from './schema';
 
-type PrerenderBuilderOptions = Schema & json.JsonObject;
+type PrerenderBuilderOptions = Schema;
 type PrerenderBuilderOutput = BuilderOutput;
 
 class RoutesSet extends Set<string> {

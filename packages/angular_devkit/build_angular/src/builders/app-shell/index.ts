@@ -35,8 +35,7 @@ async function _renderUniversal(
 ): Promise<BrowserBuilderOutput> {
   // Get browser target options.
   const browserTarget = targetFromTargetString(options.browserTarget);
-  const rawBrowserOptions = (await context.getTargetOptions(browserTarget)) as JsonObject &
-    BrowserBuilderSchema;
+  const rawBrowserOptions = await context.getTargetOptions(browserTarget);
   const browserBuilderName = await context.getBuilderNameForTarget(browserTarget);
   const browserOptions = await context.validateOptions<JsonObject & BrowserBuilderSchema>(
     rawBrowserOptions,
