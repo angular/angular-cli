@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { logging, tags } from '@angular-devkit/core';
+import { logging } from '@angular-devkit/core';
 import { existsSync } from 'fs';
 import { join } from 'path';
 import { packages } from '../lib/packages';
@@ -24,10 +24,10 @@ export default async function (_options: {}, logger: logging.Logger) {
 
     // There should be at least one BUILD file next to each package.json.
     if (!existsSync(join(pkg.root, 'BUILD')) && !existsSync(join(pkg.root, 'BUILD.bazel'))) {
-      logger.error(tags.oneLine`
-        The package ${JSON.stringify(pkgName)} does not have a BUILD file associated to it. You
-        must either set an exception or make sure it can be built using Bazel.
-      `);
+      logger.error(
+        `The package ${JSON.stringify(pkgName)} does not have a BUILD file associated to it.\n` +
+          'You must either set an exception or make sure it can be built using Bazel.',
+      );
       error = true;
     }
   }
