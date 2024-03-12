@@ -12,7 +12,6 @@ import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { fileURLToPath } from 'url';
 import { JavaScriptTransformer } from '../../../tools/esbuild/javascript-transformer';
-import { callInitializeIfNeeded } from './node-18-utils';
 
 /**
  * Node.js ESM loader to redirect imports to in memory files.
@@ -36,8 +35,6 @@ const javascriptTransformer = new JavaScriptTransformer(
   { sourcemap: true, jit: true },
   1,
 );
-
-callInitializeIfNeeded(initialize);
 
 export function initialize(data: ESMInMemoryFileLoaderWorkerData) {
   // This path does not actually exist but is used to overlay the in memory files with the

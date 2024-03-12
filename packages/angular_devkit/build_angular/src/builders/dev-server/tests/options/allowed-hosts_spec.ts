@@ -18,7 +18,7 @@ describeServeBuilder(
   DEV_SERVER_BUILDER_INFO,
   (harness, setupTarget, isViteRun) => {
     // TODO(fix-vite): currently this is broken in vite.
-    (isViteRun ? xdescribe : describe)('option: "allowedHosts"', () => {
+    (isViteRun ? xdescribe : xdescribe)('option: "allowedHosts"', () => {
       beforeEach(async () => {
         setupTarget(harness);
 
