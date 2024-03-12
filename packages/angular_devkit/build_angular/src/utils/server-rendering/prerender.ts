@@ -7,11 +7,11 @@
  */
 
 import { readFile } from 'node:fs/promises';
-import { extname, posix } from 'node:path';
+import { extname, join, posix } from 'node:path';
+import { pathToFileURL } from 'node:url';
 import Piscina from 'piscina';
 import { BuildOutputFile, BuildOutputFileType } from '../../tools/esbuild/bundler-context';
 import { BuildOutputAsset } from '../../tools/esbuild/bundler-execution-result';
-import { getESMLoaderArgs } from './esm-in-memory-loader/node-18-utils';
 import type { RenderResult, ServerContext } from './render-page';
 import type { RenderWorkerData } from './render-worker';
 import type {
@@ -158,7 +158,12 @@ async function renderPages(
   const warnings: string[] = [];
   const errors: string[] = [];
 
-  const workerExecArgv = getESMLoaderArgs();
+  const workerExecArgv = [
+    '--import',
+    // Loader cannot be an absolute path on Windows.
+    pathToFileURL(join(__dirname, 'esm-in-memory-loader/register-hooks.js')).href,
+  ];
+
   if (sourcemap) {
     workerExecArgv.push('--enable-source-maps');
   }
@@ -246,7 +251,12 @@ async function getAllRoutes(
     return { routes };
   }
 
-  const workerExecArgv = getESMLoaderArgs();
+  const workerExecArgv = [
+    '--import',
+    // Loader cannot be an absolute path on Windows.
+    pathToFileURL(join(__dirname, 'esm-in-memory-loader/register-hooks.js')).href,
+  ];
+
   if (sourcemap) {
     workerExecArgv.push('--enable-source-maps');
   }
