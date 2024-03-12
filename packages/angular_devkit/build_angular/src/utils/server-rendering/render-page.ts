@@ -9,7 +9,7 @@
 import type { ApplicationRef, StaticProvider } from '@angular/core';
 import assert from 'node:assert';
 import { basename } from 'node:path';
-import { loadEsmModule } from '../load-esm';
+import { loadEsmModuleFromMemory } from './load-esm-from-memory';
 import { MainServerBundleExports, RenderUtilsServerBundleExports } from './main-bundle-exports';
 
 export interface RenderOptions {
@@ -39,7 +39,7 @@ export async function renderPage({
   document,
   inlineCriticalCss,
   outputFiles,
-  loadBundle = loadEsmModule,
+  loadBundle = loadEsmModuleFromMemory,
 }: RenderOptions): Promise<RenderResult> {
   const { default: bootstrapAppFnOrModule } = await loadBundle('./main.server.mjs');
   const { ɵSERVER_CONTEXT, renderModule, renderApplication, ɵresetCompiledComponents, ɵConsole } =
