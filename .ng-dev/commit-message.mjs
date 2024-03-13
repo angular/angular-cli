@@ -1,4 +1,4 @@
-import { getReleasablePackages } from '../lib/packages.mjs';
+import { packages } from '../lib/packages.mjs';
 
 /**
  * The configuration for `ng-dev commit-message` commands.
@@ -10,5 +10,5 @@ export const commitMessage = {
   minBodyLength: 0,
   minBodyLengthTypeExcludes: ['docs'],
   // Note: When changing this logic, also change the `contributing.ejs` file.
-  scopes: getReleasablePackages().map(({ name }) => name),
+  scopes: packages.map(({ name }) => name),
 };

@@ -9,23 +9,16 @@
 import { logging } from '@angular-devkit/core';
 import { existsSync } from 'fs';
 import { join } from 'path';
-import { packages } from '../lib/packages';
+import { releasePackages } from '../lib/packages';
 
 export default async function (_options: {}, logger: logging.Logger) {
   let error = false;
 
-  for (const pkgName of Object.keys(packages)) {
-    const pkg = packages[pkgName];
-
-    if (pkg.packageJson.private) {
-      // Ignore private packages.
-      continue;
-    }
-
+  for (const pkg of releasePackages) {
     // There should be at least one BUILD file next to each package.json.
     if (!existsSync(join(pkg.root, 'BUILD')) && !existsSync(join(pkg.root, 'BUILD.bazel'))) {
       logger.error(
-        `The package ${JSON.stringify(pkgName)} does not have a BUILD file associated to it.\n` +
+        `The package ${JSON.stringify(pkg.name)} does not have a BUILD file associated to it.\n` +
           'You must either set an exception or make sure it can be built using Bazel.',
       );
       error = true;
