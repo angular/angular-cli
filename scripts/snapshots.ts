@@ -63,6 +63,9 @@ function _exec(command: string, args: string[], opts: { cwd?: string }, logger: 
   return stdout.toString('utf-8');
 }
 
+const monorepoData = JSON.parse(fs.readFileSync('./.monorepo.json', 'utf-8'));
+let gitShaCache: string | undefined;
+
 async function _publishSnapshot(
   pkg: PackageInfo,
   branch: string,
@@ -70,20 +73,21 @@ async function _publishSnapshot(
   logger: logging.Logger,
   githubToken: string,
 ) {
-  if (!pkg.snapshot) {
+  const monoRepoPackageData = monorepoData[pkg.name];
+  if (!monoRepoPackageData || !monorepoData.snapshot) {
     logger.warn(`Skipping ${pkg.name}.`);
 
     return;
   }
 
-  logger.info(`Publishing ${pkg.name} to repo ${JSON.stringify(pkg.snapshotRepo)}.`);
+  logger.info(`Publishing ${pkg.name} to repo ${JSON.stringify(monorepoData.snapshotRepo)}.`);
 
   const root = process.cwd();
   const publishLogger = logger.createChild('publish');
   publishLogger.debug('Temporary directory: ' + root);
 
-  const url = `https://${githubToken ? githubToken + '@' : ''}github.com/${pkg.snapshotRepo}.git`;
-  const destPath = path.join(root, path.basename(pkg.snapshotRepo));
+  const url = `https://${githubToken ? githubToken + '@' : ''}github.com/${monorepoData.snapshotRepo}.git`;
+  const destPath = path.join(root, path.basename(monorepoData.snapshotRepo));
 
   _exec('git', ['clone', url], { cwd: root }, publishLogger);
   if (branch) {
@@ -101,7 +105,7 @@ async function _publishSnapshot(
   } catch {
     // Ignore errors on delete. :shrug:
   }
-  _copy(pkg.dist, destPath);
+  _copy(path.join(__dirname, '../dist', pkg.name), destPath);
 
   if (githubToken) {
     _exec('git', ['config', 'commit.gpgSign', 'false'], { cwd: destPath }, publishLogger);
@@ -120,10 +124,13 @@ async function _publishSnapshot(
   // empty commits).
   fs.writeFileSync(path.join(destPath, 'uniqueId'), '' + new Date());
 
+  // Ensure we call git from within this repo
+  gitShaCache ??= _exec('git', ['log', '--format=%h', '-n1'], { cwd: __dirname }, publishLogger);
+
   // Commit and push.
   _exec('git', ['add', '.'], { cwd: destPath }, publishLogger);
   _exec('git', ['commit', '-a', '-m', message], { cwd: destPath }, publishLogger);
-  _exec('git', ['tag', pkg.snapshotHash], { cwd: destPath }, publishLogger);
+  _exec('git', ['tag', gitShaCache], { cwd: destPath }, publishLogger);
   _exec('git', ['push', 'origin', branch], { cwd: destPath }, publishLogger);
   _exec('git', ['push', '--tags', 'origin', branch], { cwd: destPath }, publishLogger);
 }
@@ -175,9 +182,9 @@ export default async function (opts: SnapshotsOptions, logger: logging.Logger) {
     return 0;
   }
 
-  for (const packageName of Object.keys(packages)) {
+  for (const pkg of packages) {
     process.chdir(root);
-    await _publishSnapshot(packages[packageName], branch, message, logger, githubToken);
+    await _publishSnapshot(pkg, branch, message, logger, githubToken);
   }
 
   return 0;

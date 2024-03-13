@@ -34,7 +34,7 @@ export default async function ({ temporaryProjectRoot }: JsonHelpOptions, logger
 
   const newProjectRoot = temporaryProjectRoot ?? (await createTemporaryProject(logger));
   const ngPath = path.join(newProjectRoot, 'node_modules/.bin/ng');
-  const helpOutputRoot = path.join(packages['@angular/cli'].dist, 'help');
+  const helpOutputRoot = path.join(__dirname, '../dist/@angular/cli/help');
 
   await fs.mkdir(helpOutputRoot);
 

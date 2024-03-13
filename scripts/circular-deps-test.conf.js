@@ -13,7 +13,7 @@ const { packages } = require('../lib/packages');
 module.exports = {
   baseDir: '../',
   goldenFile: '../goldens/circular-deps/packages.json',
-  glob: './**/*.ts',
+  glob: '../packages/**/*.ts',
   // Command that will be displayed if the golden needs to be updated.
   approveCommand: 'yarn ts-circular-deps:approve',
   resolveModule: resolveModule,

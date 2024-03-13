@@ -80,7 +80,7 @@ async function _checkDimensions(dimensionsTable: string, logger: logging.Logger)
   };
 
   // Find all the schemas
-  const packagesPaths = Object.values(packages).map(({ root }) => root);
+  const packagesPaths = packages.map(({ root }) => root);
   for (const packagePath of packagesPaths) {
     const schemasPaths = await glob('**/schema.json', { cwd: packagePath });
 

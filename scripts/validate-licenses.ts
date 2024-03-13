@@ -10,9 +10,6 @@ import { JsonObject, logging } from '@angular-devkit/core';
 import * as path from 'path';
 import { packages } from '../lib/packages';
 
-// eslint-disable-next-line import/no-unassigned-import
-require('../lib/bootstrap-local');
-
 const checker = require('license-checker');
 const spdxSatisfies = require('spdx-satisfies');
 
@@ -65,11 +62,9 @@ const ignoredPackages = [
 ];
 
 // Ignore own packages (all MIT)
-for (const packageName of Object.keys(packages)) {
-  const version = packages[packageName].experimental
-    ? '0.0.0-EXPERIMENTAL-PLACEHOLDER'
-    : '0.0.0-PLACEHOLDER';
-  ignoredPackages.push(`${packageName}@${version}`);
+for (const pkg of packages) {
+  const version = pkg.experimental ? '0.0.0-EXPERIMENTAL-PLACEHOLDER' : '0.0.0-PLACEHOLDER';
+  ignoredPackages.push(`${pkg.name}@${version}`);
 }
 
 // Find all folders directly under a `node_modules` that have a package.json.

@@ -144,7 +144,7 @@ This is a monorepo which contains many tools and packages:
 
 <%
   const sections = [
-    ...new Set(Object.keys(packages).map(pkgName => monorepo.packages[pkgName].section ))
+    ...new Set(packages.map(pkgName => monorepo.packages[pkgName].section ))
   ].filter(x => x && x != 'Tooling');
   sections.unshift(undefined);
 %>
@@ -154,13 +154,9 @@ This is a monorepo which contains many tools and packages:
 | Project | Package | Version | Links |
 |---|---|---|---|
 <%
-for (const pkgName of Object.keys(packages)) {
-  const pkg = packages[pkgName];
+for (const pkgName of packages) {
   const mrPkg = monorepo.packages[pkgName];
 
-  if (pkg.private) {
-    continue;
-  }
   if (mrPkg.section != 'Tooling') {
     continue;
   }
@@ -184,13 +180,9 @@ if (mrPkg.snapshotRepo) {
 | Project | Package | Version | Links |
 |---|---|---|---|
 <%
-for (const pkgName of Object.keys(packages)) {
-  const pkg = packages[pkgName];
+for (const pkgName of packages) {
   const mrPkg = monorepo.packages[pkgName];
 
-  if (pkg.private) {
-    continue;
-  }
   if (mrPkg.section != section) {
     continue;
   }
