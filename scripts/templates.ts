@@ -9,6 +9,7 @@
 import { logging } from '@angular-devkit/core';
 import * as fs from 'fs';
 import * as path from 'path';
+import { releasePackages } from '../lib/packages';
 
 async function _runTemplate(inputPath: string, outputPath: string, logger: logging.Logger) {
   inputPath = path.resolve(__dirname, inputPath);
@@ -24,7 +25,7 @@ async function _runTemplate(inputPath: string, outputPath: string, logger: loggi
   const template = require(inputPath).default;
   const content = template({
     monorepo: require('../.monorepo.json'),
-    packages: require('../lib/packages').packages,
+    packages: releasePackages.map(({ name }) => name),
     encode: (x: string) => global.encodeURIComponent(x),
     require: (x: string) => require(path.resolve(path.dirname(inputPath), x)),
 
