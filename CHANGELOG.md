@@ -1,6 +1,6 @@
-<a name="17.3.0-rc.0"></a>
+<a name="17.3.0"></a>
 
-# 17.3.0-rc.0 (2024-03-06)
+# 17.3.0 (2024-03-13)
 
 ### @schematics/angular
 
@@ -10,9 +10,11 @@
 
 ### @angular-devkit/build-angular
 
-| Commit                                                                                              | Type | Description                            |
-| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------- |
-| [9ca3a5450](https://github.com/angular/angular-cli/commit/9ca3a54503574674eb107d4d2b507be7ecd727ee) | feat | add `deployUrl` to application builder |
+| Commit                                                                                              | Type | Description                                                               |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------- |
+| [9ca3a5450](https://github.com/angular/angular-cli/commit/9ca3a54503574674eb107d4d2b507be7ecd727ee) | feat | add `deployUrl` to application builder                                    |
+| [3821344da](https://github.com/angular/angular-cli/commit/3821344da663ded52b773752abc805ed04e28f3c) | fix  | ensure proper display of build logs in the presence of warnings or errors |
+| [de2d05049](https://github.com/angular/angular-cli/commit/de2d050498e16efa75459f526b9973c9e1d67050) | fix  | provide better error message when server option is required but missing   |
 
 <!-- CHANGELOG SPLIT MARKER -->
 
