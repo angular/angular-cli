@@ -72,6 +72,7 @@ manually updated:
 - [`@angular/pwa`](/packages/angular/pwa/package.json)
 - [`@angular-devkit/build-angular`](/packages/angular_devkit/build_angular/package.json)
 - [`@ngtools/webpack`](/packages/ngtools/webpack/package.json)
+- [`@angular/ssr`](/packages/angular/ssr/package.json)
 
 **DURING a minor OR major CLI release:**
 
