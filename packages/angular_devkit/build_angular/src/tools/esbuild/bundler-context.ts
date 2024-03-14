@@ -136,8 +136,8 @@ export class BundlerContext {
 
       // Combine metafiles used for the stats option as well as bundle budgets and console output
       if (result.metafile) {
-        metafile.inputs = { ...metafile.inputs, ...result.metafile.inputs };
-        metafile.outputs = { ...metafile.outputs, ...result.metafile.outputs };
+        Object.assign(metafile.inputs, result.metafile.inputs);
+        Object.assign(metafile.outputs, result.metafile.outputs);
       }
 
       result.initialFiles.forEach((value, key) => initialFiles.set(key, value));
