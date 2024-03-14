@@ -125,7 +125,7 @@ async function _publishSnapshot(
   fs.writeFileSync(path.join(destPath, 'uniqueId'), '' + new Date());
 
   // Ensure we call git from within this repo
-  gitShaCache ??= _exec('git', ['log', '--format=%h', '-n1'], { cwd: __dirname });
+  gitShaCache ??= _exec('git', ['log', '--format=%h', '-n1'], { cwd: __dirname }).trim();
 
   // Commit and push.
   _exec('git', ['add', '.'], { cwd: destPath });
