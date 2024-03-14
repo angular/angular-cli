@@ -27,7 +27,7 @@ export class NodePackageInstallTask implements TaskConfigurationGenerator<NodePa
     workingDirectory?: string;
 }
 
-// @public (undocumented)
+// @public @deprecated (undocumented)
 export class NodePackageLinkTask implements TaskConfigurationGenerator<NodePackageTaskOptions> {
     constructor(packageName?: string | undefined, workingDirectory?: string | undefined);
     // (undocumented)
