@@ -18,7 +18,7 @@ import {
   context,
 } from 'esbuild';
 import assert from 'node:assert';
-import { basename, dirname, extname, join, relative } from 'node:path';
+import { basename, extname, join, relative } from 'node:path';
 import { LoadResultCache, MemoryLoadResultCache } from './load-result-cache';
 import { convertOutputFile } from './utils';
 
