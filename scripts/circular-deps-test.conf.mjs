@@ -6,18 +6,16 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-const fs = require('fs');
-const path = require('path');
-const { packages } = require('../lib/packages');
+import { statSync } from 'node:fs';
+import { join } from 'node:path';
 
-module.exports = {
-  baseDir: '../',
-  goldenFile: '../goldens/circular-deps/packages.json',
-  glob: '../packages/**/*.ts',
-  // Command that will be displayed if the golden needs to be updated.
-  approveCommand: 'yarn ts-circular-deps:approve',
-  resolveModule: resolveModule,
-};
+import { packages } from './packages.mjs';
+
+export const baseDir = '../';
+export const goldenFile = '../goldens/circular-deps/packages.json';
+export const glob = '../packages/**/*.ts';
+// Command that will be displayed if the golden needs to be updated.
+export const approveCommand = 'yarn ts-circular-deps approve';
 
 /**
  * Custom module resolver that maps specifiers for local packages folder.
@@ -25,7 +23,7 @@ module.exports = {
  */
 const LOCAL_MAPPINGS = Object.entries(packages).map(([name, pkg]) => [name, pkg.root]);
 
-function resolveModule(specifier) {
+export function resolveModule(specifier) {
   let localSpecifierPath;
 
   for (const [key, value] of LOCAL_MAPPINGS) {
@@ -42,13 +40,13 @@ function resolveModule(specifier) {
   const lookups = [
     localSpecifierPath,
     `${localSpecifierPath}.ts`,
-    path.join(localSpecifierPath, 'src/index.ts'),
-    path.join(localSpecifierPath, 'index.ts'),
+    join(localSpecifierPath, 'src/index.ts'),
+    join(localSpecifierPath, 'index.ts'),
   ];
 
   for (const lookup of lookups) {
     try {
-      if (fs.statSync(lookup).isFile()) {
+      if (statSync(lookup).isFile()) {
         return lookup;
       }
     } catch {}

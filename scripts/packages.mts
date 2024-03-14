@@ -10,8 +10,6 @@ import fastGlob from 'fast-glob';
 import { readFileSync } from 'node:fs';
 import { dirname } from 'node:path';
 
-// NB: This is a copy of packages.ts
-
 export interface PackageInfo {
   name: string;
   root: string;

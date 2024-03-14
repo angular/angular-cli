@@ -46,18 +46,21 @@ export function performNpmReleaseBuild(): BuiltPackage[] {
  * Git HEAD SHA is included in the version (for easier debugging and back tracing).
  */
 export function performDefaultSnapshotBuild(): BuiltPackage[] {
-  return buildReleasePackages(defaultDistPath, /* config */'snapshot');
+  return buildReleasePackages(defaultDistPath, /* config */ 'snapshot');
 }
 
 export function performLocalPackageBuild(): BuiltPackage[] {
-  return buildReleasePackages(defaultDistPath, /* config */'local');
+  return buildReleasePackages(defaultDistPath, /* config */ 'local');
 }
 
 /**
  * Builds the release packages with the given compile mode and copies
  * the package output into the given directory.
  */
-function buildReleasePackages(distPath: string, config: 'release' | 'snapshot' | 'local'): BuiltPackage[] {
+function buildReleasePackages(
+  distPath: string,
+  config: 'release' | 'snapshot' | 'local',
+): BuiltPackage[] {
   console.log('######################################');
   console.log(`  Building ${config} packages...`);
   console.log('######################################');

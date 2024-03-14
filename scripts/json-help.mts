@@ -6,21 +6,21 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { logging } from '@angular-devkit/core';
 import { spawnSync } from 'child_process';
 import { promises as fs } from 'fs';
+import { fileURLToPath } from 'node:url';
 import * as os from 'os';
 import * as path from 'path';
-import { packages } from '../lib/packages';
-import { JsonHelp } from '../packages/angular/cli/src/command-builder/utilities/json-help';
-import create from './create';
+import create from './create.mjs';
 
-export async function createTemporaryProject(logger: logging.Logger): Promise<string> {
-  logger.info('Creating temporary project...');
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+export async function createTemporaryProject(): Promise<string> {
+  console.info('Creating temporary project...');
   const newProjectTempRoot = await fs.mkdtemp(path.join(os.tmpdir(), 'angular-cli-create-'));
   const newProjectName = 'help-project';
   const newProjectRoot = path.join(newProjectTempRoot, newProjectName);
-  await create({ _: [newProjectName] }, logger.createChild('create'), newProjectTempRoot);
+  await create({ _: [newProjectName] }, newProjectTempRoot);
 
   return newProjectRoot;
 }
@@ -29,16 +29,17 @@ export interface JsonHelpOptions {
   temporaryProjectRoot?: string;
 }
 
-export default async function ({ temporaryProjectRoot }: JsonHelpOptions, logger: logging.Logger) {
-  logger.info('Gathering JSON Help...');
+export default async function ({ temporaryProjectRoot }: JsonHelpOptions) {
+  console.info('Gathering JSON Help...');
 
-  const newProjectRoot = temporaryProjectRoot ?? (await createTemporaryProject(logger));
+  const newProjectRoot = temporaryProjectRoot ?? (await createTemporaryProject());
   const ngPath = path.join(newProjectRoot, 'node_modules/.bin/ng');
   const helpOutputRoot = path.join(__dirname, '../dist/@angular/cli/help');
 
   await fs.mkdir(helpOutputRoot);
 
-  const runNgCommandJsonHelp = async (args: string[]): Promise<JsonHelp> => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const runNgCommandJsonHelp = async (args: string[]): Promise<any> => {
     const { stdout, status } = spawnSync(ngPath, [...args, '--json-help', '--help'], {
       cwd: newProjectRoot,
       maxBuffer: 200_0000,
@@ -49,7 +50,7 @@ export default async function ({ temporaryProjectRoot }: JsonHelpOptions, logger
       try {
         return JSON.parse(stdout.toString().trim());
       } catch (e) {
-        logger.error(`${e}`);
+        console.error(`${e}`);
       }
     }
 
@@ -57,7 +58,8 @@ export default async function ({ temporaryProjectRoot }: JsonHelpOptions, logger
   };
 
   const { subcommands: commands = [] } = await runNgCommandJsonHelp([]);
-  const commandsHelp = commands.map((command) =>
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const commandsHelp = commands.map((command: any) =>
     runNgCommandJsonHelp([command.name]).then((c) => ({
       ...command,
       ...c,
@@ -66,15 +68,18 @@ export default async function ({ temporaryProjectRoot }: JsonHelpOptions, logger
 
   for await (const command of commandsHelp) {
     const commandName = command.name;
-    const commandOptionNames = new Set([...command.options.map(({ name }) => name)]);
-
-    const subCommandsHelp = command.subcommands?.map((subcommand) =>
+    const commandOptionNames = new Set([
+      ...command.options.map(({ name }: { name: string }) => name),
+    ]);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const subCommandsHelp = command.subcommands?.map((subcommand: any) =>
       runNgCommandJsonHelp([command.name, subcommand.name]).then((s) => ({
         ...s,
         ...subcommand,
         // Filter options which are inherited from the parent command.
         // Ex: `interactive` in `ng generate lib`.
-        options: s.options.filter((o) => !commandOptionNames.has(o.name)),
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        options: s.options.filter((o: any) => !commandOptionNames.has(o.name)),
       })),
     );
 
@@ -89,6 +94,6 @@ export default async function ({ temporaryProjectRoot }: JsonHelpOptions, logger
 
     const filePath = path.join(helpOutputRoot, commandName + '.json');
     await fs.writeFile(filePath, jsonOutput);
-    logger.info(filePath);
+    console.info(filePath);
   }
 }
