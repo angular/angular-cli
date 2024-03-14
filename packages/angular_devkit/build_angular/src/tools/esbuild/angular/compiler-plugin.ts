@@ -420,8 +420,11 @@ export function createCompilerPlugin(
 
           // Combine additional metafiles with main metafile
           if (result.metafile && metafile) {
-            result.metafile.inputs = { ...result.metafile.inputs, ...metafile.inputs };
-            result.metafile.outputs = { ...result.metafile.outputs, ...metafile.outputs };
+            // Append the existing object, by appending to it we prevent unnecessary new objections creations with spread
+            // mitigating significant performance overhead for large apps.
+            // See: https://bugs.chromium.org/p/v8/issues/detail?id=11536
+            Object.assign(result.metafile.inputs, metafile.inputs);
+            Object.assign(result.metafile.outputs, metafile.outputs);
           }
         }
 
