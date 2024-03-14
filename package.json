@@ -20,7 +20,6 @@
     "admin": "node --no-warnings=ExperimentalWarning --loader ts-node/esm/transpile-only ./scripts/devkit-admin.mjs",
     "test": "bazel test //packages/...",
     "build": "yarn admin build",
-    "build-tsc": "tsc -p tsconfig.json",
     "lint": "eslint --cache --max-warnings=0 \"**/*.@(ts|mts|cts)\"",
     "templates": "yarn admin templates",
     "validate": "yarn admin validate",
