@@ -20,7 +20,6 @@ import {
 } from '@angular-devkit/schematics';
 import {
   NodePackageInstallTask,
-  NodePackageLinkTask,
   RepositoryInitializerTask,
 } from '@angular-devkit/schematics/tasks';
 import { Schema as ApplicationOptions } from '../application/schema';
@@ -77,12 +76,6 @@ export default function (options: NgNewOptions): Rule {
             packageManager: options.packageManager,
           }),
         );
-        if (options.linkCli) {
-          packageTask = context.addTask(
-            new NodePackageLinkTask('@angular/cli', options.directory),
-            [packageTask],
-          );
-        }
       }
       if (!options.skipGit) {
         const commit =
