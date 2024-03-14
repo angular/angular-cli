@@ -6,18 +6,20 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { logging } from '@angular-devkit/core';
-import { execSync, spawnSync } from 'child_process';
-import * as fs from 'fs';
-import * as os from 'os';
-import * as path from 'path';
-import { PackageInfo, packages } from '../lib/packages';
-import build from './build';
-import jsonHelp, { createTemporaryProject } from './json-help';
+import { execSync, spawnSync } from 'node:child_process';
+import * as fs from 'node:fs';
+import * as os from 'node:os';
+import * as path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import build from './build.mjs';
+import jsonHelp, { createTemporaryProject } from './json-help.mjs';
+import { PackageInfo, packages } from './packages.mjs';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // Added to the README.md of the snapshot. This is markdown.
-const readmeHeaderFn = (pkg: PackageInfo) => `
-# Snapshot build of ${pkg.name}
+const readmeHeaderFn = (name: string, snapshotRepo: string) => `
+# Snapshot build of ${name}
 
 This repository is a snapshot of a commit on the original repository. The original code used to
 generate this is located at http://github.com/angular/angular-cli.
@@ -28,7 +30,7 @@ released version of this package.
 To test this snapshot in your own project, use
 
 \`\`\`bash
-npm install git+https://github.com/${pkg.snapshotRepo}.git
+npm install git+https://github.com/${snapshotRepo}.git
 \`\`\`
 
 ----
@@ -49,14 +51,14 @@ function _copy(from: string, to: string) {
   });
 }
 
-function _exec(command: string, args: string[], opts: { cwd?: string }, logger: logging.Logger) {
+function _exec(command: string, args: string[], opts: { cwd?: string }) {
   const { status, error, stdout } = spawnSync(command, args, {
     stdio: ['ignore', 'pipe', 'inherit'],
     ...opts,
   });
 
   if (status != 0) {
-    logger.error(`Command failed: ${command} ${args.map((x) => JSON.stringify(x)).join(', ')}`);
+    console.error(`Command failed: ${command} ${args.map((x) => JSON.stringify(x)).join(', ')}`);
     throw error;
   }
 
@@ -70,50 +72,48 @@ async function _publishSnapshot(
   pkg: PackageInfo,
   branch: string,
   message: string,
-  logger: logging.Logger,
   githubToken: string,
 ) {
   const monoRepoPackageData = monorepoData[pkg.name];
   if (!monoRepoPackageData || !monorepoData.snapshot) {
-    logger.warn(`Skipping ${pkg.name}.`);
+    console.warn(`Skipping ${pkg.name}.`);
 
     return;
   }
 
-  logger.info(`Publishing ${pkg.name} to repo ${JSON.stringify(monorepoData.snapshotRepo)}.`);
+  console.info(`Publishing ${pkg.name} to repo ${JSON.stringify(monorepoData.snapshotRepo)}.`);
 
   const root = process.cwd();
-  const publishLogger = logger.createChild('publish');
-  publishLogger.debug('Temporary directory: ' + root);
+  console.debug('Temporary directory: ' + root);
 
   const url = `https://${githubToken ? githubToken + '@' : ''}github.com/${monorepoData.snapshotRepo}.git`;
   const destPath = path.join(root, path.basename(monorepoData.snapshotRepo));
 
-  _exec('git', ['clone', url], { cwd: root }, publishLogger);
+  _exec('git', ['clone', url], { cwd: root });
   if (branch) {
     // Try to checkout an existing branch, otherwise create it.
     try {
-      _exec('git', ['checkout', branch], { cwd: destPath }, publishLogger);
+      _exec('git', ['checkout', branch], { cwd: destPath });
     } catch {
-      _exec('git', ['checkout', '-b', branch], { cwd: destPath }, publishLogger);
+      _exec('git', ['checkout', '-b', branch], { cwd: destPath });
     }
   }
 
   // Clear snapshot directory before publishing to remove deleted build files.
   try {
-    _exec('git', ['rm', '-rf', './'], { cwd: destPath }, publishLogger);
+    _exec('git', ['rm', '-rf', './'], { cwd: destPath });
   } catch {
     // Ignore errors on delete. :shrug:
   }
   _copy(path.join(__dirname, '../dist', pkg.name), destPath);
 
   if (githubToken) {
-    _exec('git', ['config', 'commit.gpgSign', 'false'], { cwd: destPath }, publishLogger);
+    _exec('git', ['config', 'commit.gpgSign', 'false'], { cwd: destPath });
   }
 
   // Add the header to the existing README.md (or create a README if it doesn't exist).
   const readmePath = path.join(destPath, 'README.md');
-  let readme = readmeHeaderFn(pkg);
+  let readme = readmeHeaderFn(pkg.name, monoRepoPackageData.snapshotRepo);
   try {
     readme += fs.readFileSync(readmePath, 'utf-8');
   } catch {}
@@ -125,14 +125,14 @@ async function _publishSnapshot(
   fs.writeFileSync(path.join(destPath, 'uniqueId'), '' + new Date());
 
   // Ensure we call git from within this repo
-  gitShaCache ??= _exec('git', ['log', '--format=%h', '-n1'], { cwd: __dirname }, publishLogger);
+  gitShaCache ??= _exec('git', ['log', '--format=%h', '-n1'], { cwd: __dirname });
 
   // Commit and push.
-  _exec('git', ['add', '.'], { cwd: destPath }, publishLogger);
-  _exec('git', ['commit', '-a', '-m', message], { cwd: destPath }, publishLogger);
-  _exec('git', ['tag', gitShaCache], { cwd: destPath }, publishLogger);
-  _exec('git', ['push', 'origin', branch], { cwd: destPath }, publishLogger);
-  _exec('git', ['push', '--tags', 'origin', branch], { cwd: destPath }, publishLogger);
+  _exec('git', ['add', '.'], { cwd: destPath });
+  _exec('git', ['commit', '-a', '-m', message], { cwd: destPath });
+  _exec('git', ['tag', gitShaCache], { cwd: destPath });
+  _exec('git', ['push', 'origin', branch], { cwd: destPath });
+  _exec('git', ['push', '--tags', 'origin', branch], { cwd: destPath });
 }
 
 export interface SnapshotsOptions {
@@ -141,10 +141,10 @@ export interface SnapshotsOptions {
   branch?: string;
 }
 
-export default async function (opts: SnapshotsOptions, logger: logging.Logger) {
+export default async function (opts: SnapshotsOptions) {
   // Get the SHA.
   if (execSync(`git status --porcelain`).toString() && !opts.force) {
-    logger.error('You cannot run snapshots with local changes.');
+    console.error('You cannot run snapshots with local changes.');
     process.exit(1);
   }
 
@@ -160,31 +160,31 @@ export default async function (opts: SnapshotsOptions, logger: logging.Logger) {
   const githubToken = (opts.githubToken || process.env.SNAPSHOT_BUILDS_GITHUB_TOKEN || '').trim();
 
   if (githubToken) {
-    logger.info('Setting up global git name.');
-    _exec('git', ['config', '--global', 'user.email', 'circleci@angular.io'], {}, logger);
-    _exec('git', ['config', '--global', 'user.name', 'Angular Builds'], {}, logger);
-    _exec('git', ['config', '--global', 'push.default', 'simple'], {}, logger);
+    console.info('Setting up global git name.');
+    _exec('git', ['config', '--global', 'user.email', 'circleci@angular.io'], {});
+    _exec('git', ['config', '--global', 'user.name', 'Angular Builds'], {});
+    _exec('git', ['config', '--global', 'push.default', 'simple'], {});
   }
 
   // This is needed as otherwise when we run `devkit admin create` after `bazel build` the `dist`
   // will be overridden with the output of the legacy build.
-  const temporaryProjectRoot = await createTemporaryProject(logger);
+  const temporaryProjectRoot = await createTemporaryProject();
 
   // Run build.
-  logger.info('Building...');
-  await build({ snapshot: true }, logger.createChild('build'));
+  console.info('Building...');
+  await build({ snapshot: true });
 
-  await jsonHelp({ temporaryProjectRoot }, logger);
+  await jsonHelp({ temporaryProjectRoot });
 
   if (!githubToken) {
-    logger.info('No token given, skipping actual publishing...');
+    console.info('No token given, skipping actual publishing...');
 
     return 0;
   }
 
   for (const pkg of packages) {
     process.chdir(root);
-    await _publishSnapshot(pkg, branch, message, logger, githubToken);
+    await _publishSnapshot(pkg, branch, message, githubToken);
   }
 
   return 0;

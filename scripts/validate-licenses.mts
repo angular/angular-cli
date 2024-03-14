@@ -6,12 +6,11 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { JsonObject, logging } from '@angular-devkit/core';
-import * as path from 'path';
-import { packages } from '../lib/packages';
-
-const checker = require('license-checker');
-const spdxSatisfies = require('spdx-satisfies');
+import checker from 'license-checker';
+import * as path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import spdxSatisfies from 'spdx-satisfies';
+import { packages } from './packages.mjs';
 
 /**
  * A general note on some black listed specific licenses:
@@ -78,23 +77,24 @@ function _passesSpdx(licenses: string[], accepted: string[]) {
   }
 }
 
-export default function (_options: {}, logger: logging.Logger): Promise<number> {
+export default function (_options: {}): Promise<number> {
   return new Promise((resolve) => {
     checker.init(
-      { start: path.join(__dirname, '..'), excludePrivatePackages: true },
-      (err: Error, json: JsonObject) => {
+      { start: path.join(fileURLToPath(import.meta.url), '../..'), excludePrivatePackages: true },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (err: Error, json: any) => {
         if (err) {
-          logger.fatal(`Something happened:\n${err.message}`);
+          console.error(`Something happened:\n${err.message}`);
           resolve(1);
         } else {
-          logger.info(`Testing ${Object.keys(json).length} packages.\n`);
+          console.info(`Testing ${Object.keys(json).length} packages.\n`);
 
           // Packages with bad licenses are those that neither pass SPDX nor are ignored.
           const badLicensePackages = Object.keys(json)
             .map((key) => ({
               id: key,
               licenses: ([] as string[])
-                .concat((json[key] as JsonObject).licenses as string[])
+                .concat(json[key].licenses as string[])
                 // `*` is used when the license is guessed.
                 .map((x) => x.replace(/\*$/, ''))
                 .map((x) => (x in licenseReplacements ? licenseReplacements[x] : x)),
@@ -104,14 +104,14 @@ export default function (_options: {}, logger: logging.Logger): Promise<number> 
 
           // Report packages with bad licenses
           if (badLicensePackages.length > 0) {
-            logger.error('Invalid package licences found:');
+            console.error('Invalid package licences found:');
             badLicensePackages.forEach((pkg) => {
-              logger.error(`${pkg.id}: ${JSON.stringify(pkg.licenses)}`);
+              console.error(`${pkg.id}: ${JSON.stringify(pkg.licenses)}`);
             });
-            logger.fatal(`\n${badLicensePackages.length} total packages with invalid licenses.`);
+            console.error(`\n${badLicensePackages.length} total packages with invalid licenses.`);
             resolve(2);
           } else {
-            logger.info('All package licenses are valid.');
+            console.info('All package licenses are valid.');
             resolve(0);
           }
         }

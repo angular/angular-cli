@@ -55,7 +55,7 @@ jobs:
       - name: Validate NgBot Configuration
         run: yarn ng-dev ngbot verify
       - name: Validate Circular Dependencies
-        run: yarn ts-circular-deps:check
+        run: yarn ts-circular-deps check
       - name: Run Validation
         run: yarn -s admin validate
       - name: Check tooling setup

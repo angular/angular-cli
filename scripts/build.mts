@@ -6,10 +6,12 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { spawn } from 'child_process';
-import fs from 'fs';
-import { dirname, join, relative, resolve } from 'path';
+import { spawn } from 'node:child_process';
+import fs from 'node:fs';
+import path, { dirname, join, relative, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const baseDir = resolve(`${__dirname}/..`);
 const bazelCmd = process.env.BAZEL ?? `yarn --cwd "${baseDir}" --silent bazel`;
 const distRoot = join(baseDir, '/dist');
@@ -48,14 +50,15 @@ function _recursiveCopy(from: string, to: string, logger: Console) {
   }
 }
 
-function rimraf(location: string) {
-  fs.rmSync(location, { force: true, recursive: true, maxRetries: 3 });
-}
-
 function _clean(logger: Console) {
   logger.info('Cleaning...');
   logger.info('  Removing dist/...');
-  rimraf(join(__dirname, '../dist'));
+
+  return fs.promises.rm(join(__dirname, '../dist'), {
+    force: true,
+    recursive: true,
+    maxRetries: 3,
+  });
 }
 
 function _exec(cmd: string, captureStdout: boolean, logger: Console): Promise<string> {
@@ -124,7 +127,7 @@ export default async function (
 
   const bazelBin = await _exec(`${bazelCmd} info bazel-bin`, true, logger);
 
-  _clean(logger);
+  await _clean(logger);
 
   let buildMode: BuildMode;
   if (argv.local) {
@@ -145,7 +148,7 @@ export default async function (
     const bazelOutDir = join(bazelBin, 'packages', packageDir, 'npm_package');
     const tarPath = `${bazelBin}/packages/${packageDir}/npm_package_archive.tgz`;
     const packageJsonPath = `${bazelOutDir}/package.json`;
-    const packageName = require(packageJsonPath).name;
+    const packageName = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8')).name;
     const destDir = `${distRoot}/${packageName}`;
 
     logger.info(packageName);

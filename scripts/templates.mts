@@ -6,29 +6,30 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { logging } from '@angular-devkit/core';
-import * as fs from 'fs';
-import * as path from 'path';
-import { releasePackages } from '../lib/packages';
+import template from 'lodash.template';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { releasePackages } from './packages.mjs';
 
-async function _runTemplate(inputPath: string, outputPath: string, logger: logging.Logger) {
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+async function _runTemplate(inputPath: string, outputPath: string) {
   inputPath = path.resolve(__dirname, inputPath);
   outputPath = path.resolve(__dirname, outputPath);
 
-  logger.info(`Building ${path.relative(path.dirname(__dirname), outputPath)}...`);
+  console.info(`Building ${path.relative(path.dirname(__dirname), outputPath)}...`);
 
   // TODO(ESM): Consider making this an actual import statement.
   const { COMMIT_TYPES, ScopeRequirement } = await new Function(
     `return import('@angular/ng-dev');`,
   )();
 
-  const template = require(inputPath).default;
-  const content = template({
-    monorepo: require('../.monorepo.json'),
+  const monorepo = JSON.parse(fs.readFileSync('./.monorepo.json', 'utf-8'));
+  const content = template(fs.readFileSync(inputPath, 'utf-8'))({
+    monorepo,
     packages: releasePackages.map(({ name }) => name),
     encode: (x: string) => global.encodeURIComponent(x),
-    require: (x: string) => require(path.resolve(path.dirname(inputPath), x)),
-
     // Pass-through `ng-dev` ESM commit message information for the `contributing.ejs`
     // template. EJS templates using the devkit template cannot use ESM.
     COMMIT_TYPES: COMMIT_TYPES,
@@ -37,9 +38,9 @@ async function _runTemplate(inputPath: string, outputPath: string, logger: loggi
   fs.writeFileSync(outputPath, content, 'utf-8');
 }
 
-export default async function (_options: {}, logger: logging.Logger): Promise<number> {
-  await _runTemplate('./templates/readme', '../README.md', logger);
-  await _runTemplate('./templates/contributing', '../CONTRIBUTING.md', logger);
+export default async function (_options: {}): Promise<number> {
+  await _runTemplate('./templates/readme.ejs', '../README.md');
+  await _runTemplate('./templates/contributing.ejs', '../CONTRIBUTING.md');
 
   return 0;
 }

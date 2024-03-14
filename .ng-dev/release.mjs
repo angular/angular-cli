@@ -1,5 +1,5 @@
 import semver from 'semver';
-import { releasePackages } from '../lib/packages.mjs';
+import { releasePackages } from '../scripts/packages.mjs';
 
 /**
  * Configuration for the `ng-dev release` command.

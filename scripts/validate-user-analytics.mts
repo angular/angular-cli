@@ -6,27 +6,30 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { logging } from '@angular-devkit/core';
 import assert from 'assert';
 import glob from 'fast-glob';
 import * as fs from 'fs';
+import template from 'lodash.template';
 import * as path from 'path';
-import { packages } from '../lib/packages';
+import { fileURLToPath } from 'url';
 import {
   EventCustomDimension,
   EventCustomMetric,
   UserCustomDimension,
-} from '../packages/angular/cli/src/analytics/analytics-parameters';
+} from '../packages/angular/cli/src/analytics/analytics-parameters.mjs';
 
-const userAnalyticsTable = require('./templates/user-analytics-table').default;
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const userAnalyticsTable = template(
+  fs.readFileSync(path.join(__dirname, './templates/user-analytics-table.ejs'), 'utf-8'),
+);
 
 const dimensionsTableRe = /<!--DIMENSIONS_TABLE_BEGIN-->([\s\S]*)<!--DIMENSIONS_TABLE_END-->/m;
 const userDimensionsTableRe =
   /<!--USER_DIMENSIONS_TABLE_BEGIN-->([\s\S]*)<!--USER_DIMENSIONS_TABLE_END-->/m;
 const metricsTableRe = /<!--METRICS_TABLE_BEGIN-->([\s\S]*)<!--METRICS_TABLE_END-->/m;
 
-async function _checkUserDimensions(dimensionsTable: string, logger: logging.Logger) {
-  logger.info('Gathering user dimensions from @angular/cli...');
+async function _checkUserDimensions(dimensionsTable: string) {
+  console.info('Gathering user dimensions from @angular/cli...');
   const data = Object.entries(UserCustomDimension).map(([key, value]) => ({
     parameter: value,
     name: key,
@@ -48,10 +51,10 @@ async function _checkUserDimensions(dimensionsTable: string, logger: logging.Log
 
   const generatedTable = userAnalyticsTable({ data }).trim();
   if (dimensionsTable !== generatedTable) {
-    logger.error(
+    console.error(
       'Expected user dimensions table to be the same as generated. Copy the lines below:',
     );
-    logger.error(generatedTable);
+    console.error(generatedTable);
 
     return 3;
   }
@@ -59,11 +62,11 @@ async function _checkUserDimensions(dimensionsTable: string, logger: logging.Log
   return 0;
 }
 
-async function _checkDimensions(dimensionsTable: string, logger: logging.Logger) {
-  logger.info('Gathering event dimensions from @angular/cli...');
+async function _checkDimensions(dimensionsTable: string) {
+  console.info('Gathering event dimensions from @angular/cli...');
   const eventCustomDimensionValues = new Set(Object.values(EventCustomDimension));
 
-  logger.info('Gathering options for user-analytics...');
+  console.info('Gathering options for user-analytics...');
   const schemaUserAnalyticsValidator = (obj: Object) => {
     for (const value of Object.values(obj)) {
       if (value && typeof value === 'object') {
@@ -80,6 +83,7 @@ async function _checkDimensions(dimensionsTable: string, logger: logging.Logger)
   };
 
   // Find all the schemas
+  const { packages } = await import('./packages.mjs');
   const packagesPaths = packages.map(({ root }) => root);
   for (const packagePath of packagesPaths) {
     const schemasPaths = await glob('**/schema.json', { cwd: packagePath });
@@ -111,10 +115,10 @@ async function _checkDimensions(dimensionsTable: string, logger: logging.Logger)
 
   const generatedTable = userAnalyticsTable({ data }).trim();
   if (dimensionsTable !== generatedTable) {
-    logger.error(
+    console.error(
       'Expected event dimensions table to be the same as generated. Copy the lines below:',
     );
-    logger.error(generatedTable);
+    console.error(generatedTable);
 
     return 3;
   }
@@ -122,8 +126,8 @@ async function _checkDimensions(dimensionsTable: string, logger: logging.Logger)
   return 0;
 }
 
-async function _checkMetrics(metricsTable: string, logger: logging.Logger) {
-  logger.info('Gathering metrics from @angular/cli...');
+async function _checkMetrics(metricsTable: string) {
+  console.info('Gathering metrics from @angular/cli...');
   const data = Object.entries(EventCustomMetric).map(([key, value]) => ({
     parameter: value,
     name: key,
@@ -145,8 +149,8 @@ async function _checkMetrics(metricsTable: string, logger: logging.Logger) {
 
   const generatedTable = userAnalyticsTable({ data }).trim();
   if (metricsTable !== generatedTable) {
-    logger.error('Expected metrics table to be the same as generated. Copy the lines below:');
-    logger.error(generatedTable);
+    console.error('Expected metrics table to be the same as generated. Copy the lines below:');
+    console.error(generatedTable);
 
     return 4;
   }
@@ -158,7 +162,7 @@ async function _checkMetrics(metricsTable: string, logger: logging.Logger) {
  * Validate that the table of analytics from the analytics.md document is the same as expected /
  * generated.
  */
-export default async function (_options: {}, logger: logging.Logger): Promise<number> {
+export default async function (_options: {}): Promise<number> {
   const analyticsMarkdownPath = path.join(__dirname, '../docs/design/analytics.md');
   const analyticsMarkdown = fs.readFileSync(analyticsMarkdownPath, 'utf8');
   const dimensionsMatch = analyticsMarkdown.match(dimensionsTableRe);
@@ -170,19 +174,19 @@ export default async function (_options: {}, logger: logging.Logger): Promise<nu
   assert.ok(metricsMatch, 'Metrics table not found in analytics.md');
 
   const userDimensionsTable = userDimensionsMatch[1].trim();
-  let maybeError = await _checkUserDimensions(userDimensionsTable, logger);
+  let maybeError = await _checkUserDimensions(userDimensionsTable);
   if (maybeError) {
     return maybeError;
   }
 
   const metricsTable = metricsMatch[1].trim();
-  maybeError = await _checkMetrics(metricsTable, logger);
+  maybeError = await _checkMetrics(metricsTable);
   if (maybeError) {
     return maybeError;
   }
 
   const dimensionsTable = dimensionsMatch[1].trim();
-  maybeError = await _checkDimensions(dimensionsTable, logger);
+  maybeError = await _checkDimensions(dimensionsTable);
   if (maybeError) {
     return maybeError;
   }

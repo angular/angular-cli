@@ -6,9 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-/** Any changes in this file needs to be done in the mts version. */
-
-export type PrimitiveTypes = string | number | boolean;
+/** This is a copy of analytics-parameters.ts and is needed for `yarn admin validate-user-analytics` due to ts-node. */
 
 /**
  * GA built-in request parameters
