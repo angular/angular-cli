@@ -51,6 +51,8 @@ function _copy(from: string, to: string) {
   });
 }
 
+const monorepoData = JSON.parse(fs.readFileSync('./.monorepo.json', 'utf-8'));
+
 function _exec(command: string, args: string[], opts: { cwd?: string }) {
   const { status, error, stdout } = spawnSync(command, args, {
     stdio: ['ignore', 'pipe', 'inherit'],
@@ -65,29 +67,27 @@ function _exec(command: string, args: string[], opts: { cwd?: string }) {
   return stdout.toString('utf-8');
 }
 
-const monorepoData = JSON.parse(fs.readFileSync('./.monorepo.json', 'utf-8'));
 let gitShaCache: string | undefined;
-
 async function _publishSnapshot(
   pkg: PackageInfo,
   branch: string,
   message: string,
   githubToken: string,
 ) {
-  const monoRepoPackageData = monorepoData[pkg.name];
-  if (!monoRepoPackageData || !monorepoData.snapshot) {
+  const snapshotRepo = monorepoData[pkg.name]?.snapshotRepo;
+  if (!snapshotRepo) {
     console.warn(`Skipping ${pkg.name}.`);
 
     return;
   }
 
-  console.info(`Publishing ${pkg.name} to repo ${JSON.stringify(monorepoData.snapshotRepo)}.`);
+  console.info(`Publishing ${pkg.name} to repo ${snapshotRepo}.`);
 
   const root = process.cwd();
   console.debug('Temporary directory: ' + root);
 
-  const url = `https://${githubToken ? githubToken + '@' : ''}github.com/${monorepoData.snapshotRepo}.git`;
-  const destPath = path.join(root, path.basename(monorepoData.snapshotRepo));
+  const url = `https://${githubToken ? githubToken + '@' : ''}github.com/${snapshotRepo}.git`;
+  const destPath = path.join(root, path.basename(snapshotRepo));
 
   _exec('git', ['clone', url], { cwd: root });
   if (branch) {
@@ -113,7 +113,7 @@ async function _publishSnapshot(
 
   // Add the header to the existing README.md (or create a README if it doesn't exist).
   const readmePath = path.join(destPath, 'README.md');
-  let readme = readmeHeaderFn(pkg.name, monoRepoPackageData.snapshotRepo);
+  let readme = readmeHeaderFn(pkg.name, snapshotRepo);
   try {
     readme += fs.readFileSync(readmePath, 'utf-8');
   } catch {}
