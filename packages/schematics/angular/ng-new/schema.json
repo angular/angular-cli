@@ -24,12 +24,6 @@
       "type": "boolean",
       "default": false
     },
-    "linkCli": {
-      "description": "Link the CLI to the global version (internal development only).",
-      "type": "boolean",
-      "default": false,
-      "visible": false
-    },
     "skipGit": {
       "description": "Do not initialize a git repository.",
       "type": "boolean",
