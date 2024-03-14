@@ -9,10 +9,16 @@
 import { TaskConfiguration, TaskConfigurationGenerator } from '../../src';
 import { NodePackageName, NodePackageTaskOptions } from './options';
 
+/**
+ * @deprecated since version 18. Create a custom task if required.
+ */
 export class NodePackageLinkTask implements TaskConfigurationGenerator<NodePackageTaskOptions> {
   quiet = true;
 
-  constructor(public packageName?: string, public workingDirectory?: string) {}
+  constructor(
+    public packageName?: string,
+    public workingDirectory?: string,
+  ) {}
 
   toConfiguration(): TaskConfiguration<NodePackageTaskOptions> {
     return {
