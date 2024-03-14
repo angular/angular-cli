@@ -74,7 +74,7 @@ async function _publishSnapshot(
   message: string,
   githubToken: string,
 ) {
-  const snapshotRepo = monorepoData[pkg.name]?.snapshotRepo;
+  const snapshotRepo = monorepoData.packages[pkg.name]?.snapshotRepo;
   if (!snapshotRepo) {
     console.warn(`Skipping ${pkg.name}.`);
 
