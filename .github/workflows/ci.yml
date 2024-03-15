@@ -117,8 +117,6 @@ jobs:
         exclude:
           # Exclude Node.js v18 when running on a PR
           - node: ${{ github.event_name != 'pull_request' && 'none' || '18' }}
-          # Exclude Windows when running on a PR
-          - os: ${{ github.event_name != 'pull_request' && 'none' || 'windows-latest' }}
           # Skip yarn subset on Windows
           - os: windows-latest
             subset: yarn
