@@ -4,8 +4,6 @@
 
 ```ts
 
-/// <reference types="@types/node/http" />
-/// <reference types="@types/node/ts4.8/http" />
 /// <reference types="node" />
 
 import { BuilderContext } from '@angular-devkit/architect';

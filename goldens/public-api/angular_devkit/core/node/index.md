@@ -4,8 +4,6 @@
 
 ```ts
 
-/// <reference types="@types/node/fs" />
-/// <reference types="@types/node/ts4.8/fs" />
 /// <reference types="node" />
 
 import { Observable } from 'rxjs';
