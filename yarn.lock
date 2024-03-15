@@ -6705,7 +6705,7 @@ esbuild-wasm@0.20.1:
   resolved "https://registry.yarnpkg.com/esbuild-wasm/-/esbuild-wasm-0.20.1.tgz#fdc14b95e3e16ec8e082dd641edb96140c1723f7"
   integrity sha512-6v/WJubRsjxBbQdz6izgvx7LsVFvVaGmSdwrFHmEzoVgfXL89hkKPoQHsnVI2ngOkcBUQT9kmAM1hVL1k/Av4A==
 
-esbuild-wasm@^0.20.0:
+esbuild-wasm@0.20.2, esbuild-wasm@^0.20.0:
   version "0.20.2"
   resolved "https://registry.yarnpkg.com/esbuild-wasm/-/esbuild-wasm-0.20.2.tgz#bbee2a729776b0b88b765c014f161b627435c5b6"
   integrity sha512-7o6nmsEqlcXJXMNqnx5K+M4w4OPx7yTFXQHcJyeP3SkXb8p2T8N9E1ayK4vd/qDBepH6fuPoZwiFvZm8x5qv+w==
@@ -6739,6 +6739,35 @@ esbuild@0.20.1:
     "@esbuild/win32-ia32" "0.20.1"
     "@esbuild/win32-x64" "0.20.1"
 
+esbuild@0.20.2, esbuild@^0.20.0:
+  version "0.20.2"
+  resolved "https://registry.yarnpkg.com/esbuild/-/esbuild-0.20.2.tgz#9d6b2386561766ee6b5a55196c6d766d28c87ea1"
+  integrity sha512-WdOOppmUNU+IbZ0PaDiTst80zjnrOkyJNHoKupIcVyU8Lvla3Ugx94VzkQ32Ijqd7UhHJy75gNWDMUekcrSJ6g==
+  optionalDependencies:
+    "@esbuild/aix-ppc64" "0.20.2"
+    "@esbuild/android-arm" "0.20.2"
+    "@esbuild/android-arm64" "0.20.2"
+    "@esbuild/android-x64" "0.20.2"
+    "@esbuild/darwin-arm64" "0.20.2"
+    "@esbuild/darwin-x64" "0.20.2"
+    "@esbuild/freebsd-arm64" "0.20.2"
+    "@esbuild/freebsd-x64" "0.20.2"
+    "@esbuild/linux-arm" "0.20.2"
+    "@esbuild/linux-arm64" "0.20.2"
+    "@esbuild/linux-ia32" "0.20.2"
+    "@esbuild/linux-loong64" "0.20.2"
+    "@esbuild/linux-mips64el" "0.20.2"
+    "@esbuild/linux-ppc64" "0.20.2"
+    "@esbuild/linux-riscv64" "0.20.2"
+    "@esbuild/linux-s390x" "0.20.2"
+    "@esbuild/linux-x64" "0.20.2"
+    "@esbuild/netbsd-x64" "0.20.2"
+    "@esbuild/openbsd-x64" "0.20.2"
+    "@esbuild/sunos-x64" "0.20.2"
+    "@esbuild/win32-arm64" "0.20.2"
+    "@esbuild/win32-ia32" "0.20.2"
+    "@esbuild/win32-x64" "0.20.2"
+
 esbuild@^0.19.3:
   version "0.19.12"
   resolved "https://registry.yarnpkg.com/esbuild/-/esbuild-0.19.12.tgz#dc82ee5dc79e82f5a5c3b4323a2a641827db3e04"
@@ -6767,35 +6796,6 @@ esbuild@^0.19.3:
     "@esbuild/win32-arm64" "0.19.12"
     "@esbuild/win32-ia32" "0.19.12"
     "@esbuild/win32-x64" "0.19.12"
-
-esbuild@^0.20.0:
-  version "0.20.2"
-  resolved "https://registry.yarnpkg.com/esbuild/-/esbuild-0.20.2.tgz#9d6b2386561766ee6b5a55196c6d766d28c87ea1"
-  integrity sha512-WdOOppmUNU+IbZ0PaDiTst80zjnrOkyJNHoKupIcVyU8Lvla3Ugx94VzkQ32Ijqd7UhHJy75gNWDMUekcrSJ6g==
-  optionalDependencies:
-    "@esbuild/aix-ppc64" "0.20.2"
-    "@esbuild/android-arm" "0.20.2"
-    "@esbuild/android-arm64" "0.20.2"
-    "@esbuild/android-x64" "0.20.2"
-    "@esbuild/darwin-arm64" "0.20.2"
-    "@esbuild/darwin-x64" "0.20.2"
-    "@esbuild/freebsd-arm64" "0.20.2"
-    "@esbuild/freebsd-x64" "0.20.2"
-    "@esbuild/linux-arm" "0.20.2"
-    "@esbuild/linux-arm64" "0.20.2"
-    "@esbuild/linux-ia32" "0.20.2"
-    "@esbuild/linux-loong64" "0.20.2"
-    "@esbuild/linux-mips64el" "0.20.2"
-    "@esbuild/linux-ppc64" "0.20.2"
-    "@esbuild/linux-riscv64" "0.20.2"
-    "@esbuild/linux-s390x" "0.20.2"
-    "@esbuild/linux-x64" "0.20.2"
-    "@esbuild/netbsd-x64" "0.20.2"
-    "@esbuild/openbsd-x64" "0.20.2"
-    "@esbuild/sunos-x64" "0.20.2"
-    "@esbuild/win32-arm64" "0.20.2"
-    "@esbuild/win32-ia32" "0.20.2"
-    "@esbuild/win32-x64" "0.20.2"
 
 escalade@^3.1.1:
   version "3.1.2"
@@ -12859,17 +12859,7 @@ terser@5.28.1:
     commander "^2.20.0"
     source-map-support "~0.5.20"
 
-terser@5.29.1:
-  version "5.29.1"
-  resolved "https://registry.yarnpkg.com/terser/-/terser-5.29.1.tgz#44e58045b70c09792ba14bfb7b4e14ca8755b9fa"
-  integrity sha512-lZQ/fyaIGxsbGxApKmoPTODIzELy3++mXhS5hOqaAWZjQtpq/hFHAc+rm29NND1rYRxRWKcjuARNwULNXa5RtQ==
-  dependencies:
-    "@jridgewell/source-map" "^0.3.3"
-    acorn "^8.8.2"
-    commander "^2.20.0"
-    source-map-support "~0.5.20"
-
-terser@^5.26.0:
+terser@5.29.2, terser@^5.26.0:
   version "5.29.2"
   resolved "https://registry.yarnpkg.com/terser/-/terser-5.29.2.tgz#c17d573ce1da1b30f21a877bffd5655dd86fdb35"
   integrity sha512-ZiGkhUBIM+7LwkNjXYJq8svgkd+QK3UUr0wJqY4MieaezBSAIPgbSPZyIx0idM6XWK5CMzSWa8MJIzmRcB8Caw==
@@ -13237,10 +13227,10 @@ undici@6.7.0:
   dependencies:
     "@fastify/busboy" "^2.0.0"
 
-undici@6.8.0:
-  version "6.8.0"
-  resolved "https://registry.yarnpkg.com/undici/-/undici-6.8.0.tgz#fb146f7e15645fd3453815e7b96e9b563856dfde"
-  integrity sha512-22FP0QRSJDQO2PC+bMBVqvsZ3cNQwQnxCNq910N3eIIU4xgMVVpLbEEX7fCg7AalvijPwjlyk5ezenw9FqZfHQ==
+undici@6.9.0:
+  version "6.9.0"
+  resolved "https://registry.yarnpkg.com/undici/-/undici-6.9.0.tgz#281b3c8bf29cafa957e743ab2a710b586b01e66e"
+  integrity sha512-XPWfXzJedevUziHwun70EKNvGnxv4CnfraFZ4f/JV01+fcvMYzHE26r/j8AY/9c/70nkN4B1zX7E2Oyuqwz4+Q==
 
 unicode-canonical-property-names-ecmascript@^2.0.0:
   version "2.0.0"
