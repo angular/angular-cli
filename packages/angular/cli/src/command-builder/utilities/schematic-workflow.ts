@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { logging, tags } from '@angular-devkit/core';
+import { logging } from '@angular-devkit/core';
 import { NodeWorkflow } from '@angular-devkit/schematics/tools';
 import { colors } from '../../utilities/color';
 
@@ -33,15 +33,11 @@ export function subscribeToWorkflow(
         logger.error(`ERROR! ${eventPath} ${desc}.`);
         break;
       case 'update':
-        logs.push(tags.oneLine`
-              ${colors.cyan('UPDATE')} ${eventPath} (${event.content.length} bytes)
-            `);
+        logs.push(`${colors.cyan('UPDATE')} ${eventPath} (${event.content.length} bytes)`);
         files.add(eventPath);
         break;
       case 'create':
-        logs.push(tags.oneLine`
-              ${colors.green('CREATE')} ${eventPath} (${event.content.length} bytes)
-            `);
+        logs.push(`${colors.green('CREATE')} ${eventPath} (${event.content.length} bytes)`);
         files.add(eventPath);
         break;
       case 'delete':

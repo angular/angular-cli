@@ -6,7 +6,6 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { tags } from '@angular-devkit/core';
 import { NodePackageDoesNotSupportSchematics } from '@angular-devkit/schematics/tools';
 import { createRequire } from 'module';
 import npa from 'npm-package-arg';
@@ -397,10 +396,10 @@ export default class AddCommandModule
       });
     } catch (e) {
       if (e instanceof NodePackageDoesNotSupportSchematics) {
-        this.context.logger.error(tags.oneLine`
-          The package that you are trying to add does not support schematics. You can try using
-          a different version of the package or contact the package author to add ng-add support.
-        `);
+        this.context.logger.error(
+          'The package that you are trying to add does not support schematics.' +
+            'You can try using a different version of the package or contact the package author to add ng-add support.',
+        );
 
         return 1;
       }
