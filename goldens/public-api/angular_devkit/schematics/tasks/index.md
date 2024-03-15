@@ -4,8 +4,7 @@
 
 ```ts
 
-/// <reference types="@types/node/ts4.8/url" />
-/// <reference types="@types/node/url" />
+/// <reference types="node" />
 
 // @public (undocumented)
 export class NodePackageInstallTask implements TaskConfigurationGenerator<NodePackageTaskOptions> {
