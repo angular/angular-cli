@@ -30,7 +30,7 @@
     "copy-webpack-plugin": "11.0.0",
     "critters": "0.0.22",
     "css-loader": "6.10.0",
-    "esbuild-wasm": "0.20.1",
+    "esbuild-wasm": "0.20.2",
     "fast-glob": "3.3.2",
     "https-proxy-agent": "7.0.4",
     "http-proxy-middleware": "2.0.6",
@@ -58,10 +58,10 @@
     "semver": "7.6.0",
     "source-map-loader": "5.0.0",
     "source-map-support": "0.5.21",
-    "terser": "5.29.1",
+    "terser": "5.29.2",
     "tree-kill": "1.2.2",
     "tslib": "2.6.2",
-    "undici": "6.8.0",
+    "undici": "6.9.0",
     "vite": "5.1.6",
     "watchpack": "2.4.1",
     "webpack": "5.90.3",
@@ -71,7 +71,7 @@
     "webpack-subresource-integrity": "5.1.0"
   },
   "optionalDependencies": {
-    "esbuild": "0.20.1"
+    "esbuild": "0.20.2"
   },
   "peerDependencies": {
     "@angular/compiler-cli": "^18.0.0-next.0",
