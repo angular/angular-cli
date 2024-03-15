@@ -105,10 +105,13 @@ export const RootCommands: Record<
   },
 };
 
-export const RootCommandsAliases = Object.values(RootCommands).reduce((prev, current) => {
-  current.aliases?.forEach((alias) => {
-    prev[alias] = current;
-  });
+export const RootCommandsAliases = Object.values(RootCommands).reduce(
+  (prev, current) => {
+    current.aliases?.forEach((alias) => {
+      prev[alias] = current;
+    });
 
-  return prev;
-}, {} as Record<string, CommandConfig>);
+    return prev;
+  },
+  {} as Record<string, CommandConfig>,
+);

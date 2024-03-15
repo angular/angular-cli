@@ -12,7 +12,10 @@ import { NodePackageName, NodePackageTaskOptions } from './options';
 export class NodePackageLinkTask implements TaskConfigurationGenerator<NodePackageTaskOptions> {
   quiet = true;
 
-  constructor(public packageName?: string, public workingDirectory?: string) {}
+  constructor(
+    public packageName?: string,
+    public workingDirectory?: string,
+  ) {}
 
   toConfiguration(): TaskConfiguration<NodePackageTaskOptions> {
     return {

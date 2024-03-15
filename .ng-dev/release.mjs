@@ -1,19 +1,16 @@
 import semver from 'semver';
-import packages from '../lib/packages.js';
+import { getReleasablePackages } from '../lib/packages.mjs';
 
-const npmPackages = Object.entries(packages.releasePackages).map(([name, { experimental }]) => ({
-  name,
-  experimental,
-}));
+const packages = getReleasablePackages();
 
-/** 
+/**
  * Configuration for the `ng-dev release` command.
- * 
+ *
  * @type { import("@angular/ng-dev").ReleaseConfig }
  */
 export const release = {
   representativeNpmPackage: '@angular/cli',
-  npmPackages,
+  npmPackages: packages.map(({ name, experimental }) => ({ name, experimental })),
   buildPackages: async () => {
     // The `performNpmReleaseBuild` function is loaded at runtime to avoid loading additional
     // files and dependencies unless a build is required.
@@ -26,7 +23,7 @@ export const release = {
       '../scripts/release-checks/dependency-ranges/index.mjs'
     );
 
-    await assertValidDependencyRanges(newVersion, packages.releasePackages);
+    await assertValidDependencyRanges(newVersion, packages);
   },
   releaseNotes: {
     groupOrder: [
