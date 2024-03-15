@@ -6,12 +6,11 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { logging, tags } from '@angular-devkit/core';
+import { logging } from '@angular-devkit/core';
 import { Rule, SchematicContext, SchematicsException, Tree } from '@angular-devkit/schematics';
 import * as npa from 'npm-package-arg';
 import type { Manifest } from 'pacote';
 import * as semver from 'semver';
-import { assertIsError } from '../../../utilities/error';
 import {
   NgPackageManifestProperties,
   NpmRepositoryPackageJson,
@@ -249,9 +248,11 @@ function _validateUpdatePackages(
   });
 
   if (!force && peerErrors) {
-    throw new SchematicsException(tags.stripIndents`Incompatible peer dependencies found.
-      Peer dependency warnings when installing dependencies means that those dependencies might not work correctly together.
-      You can use the '--force' option to ignore incompatible peer dependencies and instead address these warnings later.`);
+    throw new SchematicsException(
+      'Incompatible peer dependencies found.\n' +
+        'Peer dependency warnings when installing dependencies means that those dependencies might not work correctly together.\n' +
+        `You can use the '--force' option to ignore incompatible peer dependencies and instead address these warnings later.`,
+    );
   }
 }
 
