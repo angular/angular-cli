@@ -3,12 +3,6 @@
   "version": "18.0.0-next.0",
   "private": true,
   "description": "Software Development Kit for Angular",
-  "bin": {
-    "architect": "./bin/architect",
-    "devkit-admin": "./bin/devkit-admin",
-    "ng": "./bin/ng",
-    "schematics": "./bin/schematics"
-  },
   "keywords": [
     "angular",
     "Angular CLI",
