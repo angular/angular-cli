@@ -50,5 +50,47 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       expect(result?.success).toBeTrue();
       harness.expectFile('dist/server/server.mjs').toExist();
     });
+
+    it(`should emit 'server' directory when 'ssr' is 'true'`, async () => {
+      await harness.writeFile('file.mjs', `console.log('Hello!');`);
+
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+        server: 'src/main.server.ts',
+        ssr: true,
+      });
+
+      const { result } = await harness.executeOnce();
+      expect(result?.success).toBeTrue();
+      harness.expectDirectory('dist/server').toExist();
+    });
+
+    it(`should not emit 'server' directory when 'ssr' is 'false'`, async () => {
+      await harness.writeFile('file.mjs', `console.log('Hello!');`);
+
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+        server: 'src/main.server.ts',
+        ssr: false,
+      });
+
+      const { result } = await harness.executeOnce();
+      expect(result?.success).toBeTrue();
+      harness.expectDirectory('dist/server').toNotExist();
+    });
+
+    it(`should not emit 'server' directory when 'ssr' is not set`, async () => {
+      await harness.writeFile('file.mjs', `console.log('Hello!');`);
+
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+        server: 'src/main.server.ts',
+        ssr: undefined,
+      });
+
+      const { result } = await harness.executeOnce();
+      expect(result?.success).toBeTrue();
+      harness.expectDirectory('dist/server').toNotExist();
+    });
   });
 });

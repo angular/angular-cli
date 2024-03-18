@@ -21,7 +21,7 @@ import {
 import { deleteOutputDir } from '../../utils/delete-output-dir';
 import { shouldWatchRoot } from '../../utils/environment-options';
 import { NormalizedCachedOptions } from '../../utils/normalize-cache';
-import { NormalizedOutputOptions } from './options';
+import { NormalizedApplicationBuildOptions, NormalizedOutputOptions } from './options';
 
 // Watch workspace for package manager changes
 const packageWatchFiles = [
@@ -36,6 +36,9 @@ const packageWatchFiles = [
   '.pnp.cjs',
   '.pnp.data.json',
 ];
+
+type BuildActionOutput = (ExecutionResult['outputWithFiles'] | ExecutionResult['output']) &
+  BuilderOutput;
 
 export async function* runEsBuildBuildAction(
   action: (rebuildState?: RebuildState) => Promise<ExecutionResult>,
@@ -58,7 +61,7 @@ export async function* runEsBuildBuildAction(
     colors?: boolean;
     jsonLogs?: boolean;
   },
-): AsyncIterable<(ExecutionResult['outputWithFiles'] | ExecutionResult['output']) & BuilderOutput> {
+): AsyncIterable<BuildActionOutput> {
   const {
     writeToFileSystemFilter,
     writeToFileSystem,
@@ -153,16 +156,7 @@ export async function* runEsBuildBuildAction(
   // Output the first build results after setting up the watcher to ensure that any code executed
   // higher in the iterator call stack will trigger the watcher. This is particularly relevant for
   // unit tests which execute the builder and modify the file system programmatically.
-  if (writeToFileSystem) {
-    // Write output files
-    await writeResultFiles(result.outputFiles, result.assetFiles, outputOptions);
-
-    yield result.output;
-  } else {
-    // Requires casting due to unneeded `JsonObject` requirement. Remove once fixed.
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    yield result.outputWithFiles as any;
-  }
+  yield await writeAndEmitOutput(writeToFileSystem, result, outputOptions, writeToFileSystemFilter);
 
   // Finish if watch mode is not enabled
   if (!watcher) {
@@ -212,24 +206,39 @@ export async function* runEsBuildBuildAction(
         watcher.remove([...staleWatchFiles]);
       }
 
-      if (writeToFileSystem) {
-        // Write output files
-        const filesToWrite = writeToFileSystemFilter
-          ? result.outputFiles.filter(writeToFileSystemFilter)
-          : result.outputFiles;
-        await writeResultFiles(filesToWrite, result.assetFiles, outputOptions);
-
-        yield result.output;
-      } else {
-        // Requires casting due to unneeded `JsonObject` requirement. Remove once fixed.
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        yield result.outputWithFiles as any;
-      }
+      yield await writeAndEmitOutput(
+        writeToFileSystem,
+        result,
+        outputOptions,
+        writeToFileSystemFilter,
+      );
     }
   } finally {
     // Stop the watcher and cleanup incremental rebuild state
     await Promise.allSettled([watcher.close(), result.dispose()]);
 
     shutdownSassWorkerPool();
+  }
+}
+
+async function writeAndEmitOutput(
+  writeToFileSystem: boolean,
+  { outputFiles, output, outputWithFiles, assetFiles }: ExecutionResult,
+  outputOptions: NormalizedApplicationBuildOptions['outputOptions'],
+  writeToFileSystemFilter: ((file: BuildOutputFile) => boolean) | undefined,
+): Promise<BuildActionOutput> {
+  if (writeToFileSystem) {
+    // Write output files
+    const outputFilesToWrite = writeToFileSystemFilter
+      ? outputFiles.filter(writeToFileSystemFilter)
+      : outputFiles;
+
+    await writeResultFiles(outputFilesToWrite, assetFiles, outputOptions);
+
+    return output;
+  } else {
+    // Requires casting due to unneeded `JsonObject` requirement. Remove once fixed.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return outputWithFiles as any;
   }
 }
