@@ -217,7 +217,7 @@ export function getFeatureSupport(target: string[]): BuildOptions['supported'] {
 export async function writeResultFiles(
   outputFiles: BuildOutputFile[],
   assetFiles: BuildOutputAsset[] | undefined,
-  { base, browser, media, server }: NormalizedOutputOptions,
+  { base, browser, server }: NormalizedOutputOptions,
 ) {
   const directoryExists = new Set<string>();
   const ensureDirectoryExists = async (destPath: string) => {
