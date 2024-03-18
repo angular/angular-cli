@@ -78,7 +78,7 @@ export function execute(
 
         if (options.allowedHosts?.length) {
           context.logger.warn(
-            `The "allowedHost" option will not be used because it is not supported by the "${builderName}" builder.`,
+            `The "allowedHosts" option will not be used because it is not supported by the "${builderName}" builder.`,
           );
         }
 
