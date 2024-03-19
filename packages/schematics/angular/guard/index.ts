@@ -31,7 +31,7 @@ export default function (options: GuardOptions): Rule {
       .map((implement) => (implement === 'CanDeactivate' ? 'CanDeactivate<unknown>' : implement))
       .join(', ');
     const commonRouterNameImports = ['ActivatedRouteSnapshot', 'RouterStateSnapshot'];
-    const routerNamedImports: string[] = [...options.implements, 'UrlTree'];
+    const routerNamedImports: string[] = [...options.implements, 'MaybeAsync', 'GuardResult'];
 
     if (options.implements.includes(GuardInterface.CanMatch)) {
       routerNamedImports.push('Route', 'UrlSegment');
