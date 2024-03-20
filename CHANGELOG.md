@@ -1,3 +1,24 @@
+<a name="17.3.1"></a>
+
+# 17.3.1 (2024-03-20)
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                              |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------- |
+| [198ca9afc](https://github.com/angular/angular-cli/commit/198ca9afcc9a043d4329c2f4032f0b9cefa11a2e) | fix  | improve Sass format clarity for application style option |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                                                         |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------------------------------------------------- |
+| [2809971a5](https://github.com/angular/angular-cli/commit/2809971a57966cf79965c84a933f70709334c16b) | fix  | only generate `server` directory when SSR is enabled                                                |
+| [3f601a14e](https://github.com/angular/angular-cli/commit/3f601a14e70540f37ef6c6559a5cd50bb6b453d7) | fix  | typo in allowedHosts warning for unsupported vite options                                           |
+| [79c44adac](https://github.com/angular/angular-cli/commit/79c44adac4184408cbd1dc07989796f155cfc70e) | perf | avoid transforming empty component stylesheets                                                      |
+| [cc3167f30](https://github.com/angular/angular-cli/commit/cc3167f3012aa621a7fc9277a9c8a82601f7d914) | perf | reduce build times for apps with a large number of components when utilizing esbuild-based builders |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="17.3.0"></a>
 
 # 17.3.0 (2024-03-13)
