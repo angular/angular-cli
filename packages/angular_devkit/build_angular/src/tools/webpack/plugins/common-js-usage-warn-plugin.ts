@@ -140,7 +140,10 @@ export class CommonJsUsageWarnPlugin {
   }
 }
 
-function getIssuer(compilation: Compilation, module: Module | null): Module | null {
+function getIssuer(
+  compilation: Compilation,
+  module: Module | null | undefined,
+): Module | null | undefined {
   if (!module) {
     return null;
   }
@@ -148,7 +151,10 @@ function getIssuer(compilation: Compilation, module: Module | null): Module | nu
   return compilation.moduleGraph.getIssuer(module);
 }
 
-function getWebpackModule(compilation: Compilation, dependency: Dependency | null): Module | null {
+function getWebpackModule(
+  compilation: Compilation,
+  dependency: Dependency | null,
+): Module | null | undefined {
   if (!dependency) {
     return null;
   }

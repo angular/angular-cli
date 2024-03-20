@@ -37,7 +37,7 @@ export class StylesWebpackPlugin {
       preferRelative: true,
       useSyncFileSystemCalls: true,
       symlinks: !preserveSymlinks,
-      fileSystem: compiler.inputFileSystem,
+      fileSystem: compiler.inputFileSystem ?? undefined,
     });
 
     const webpackOptions = compiler.options;

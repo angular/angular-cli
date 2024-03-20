@@ -10,10 +10,10 @@ import * as ts from 'typescript';
 import { Compiler } from 'webpack';
 import { externalizePath } from './paths';
 
-export type InputFileSystem = Compiler['inputFileSystem'];
+export type InputFileSystem = NonNullable<Compiler['inputFileSystem']>;
 export interface InputFileSystemSync extends InputFileSystem {
-  readFileSync(path: string): Buffer;
-  statSync(path: string): { size: number; mtime: Date; isDirectory(): boolean; isFile(): boolean };
+  readFileSync: NonNullable<InputFileSystem['readFileSync']>;
+  statSync: NonNullable<InputFileSystem['statSync']>;
 }
 
 function shouldNotWrite(): never {
