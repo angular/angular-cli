@@ -365,12 +365,7 @@ export default function (): PluginObj {
           return;
         }
 
-        if (
-          !classNode.id ||
-          !parentPath.isVariableDeclarator() ||
-          !types.isIdentifier(parentPath.node.id) ||
-          parentPath.node.id.name !== classNode.id.name
-        ) {
+        if (!parentPath.isVariableDeclarator() || !types.isIdentifier(parentPath.node.id)) {
           return;
         }
 
@@ -402,16 +397,17 @@ export default function (): PluginObj {
           [],
           types.blockStatement([
             types.variableDeclaration('let', [
-              types.variableDeclarator(types.cloneNode(classNode.id), classNode),
+              types.variableDeclarator(types.cloneNode(parentPath.node.id), classNode),
             ]),
             ...wrapStatementNodes,
-            types.returnStatement(types.cloneNode(classNode.id)),
+            types.returnStatement(types.cloneNode(parentPath.node.id)),
           ]),
         );
         const replacementInitializer = types.callExpression(
           types.parenthesizedExpression(container),
           [],
         );
+
         annotateAsPure(replacementInitializer);
 
         // Add the wrapped class directly to the variable declaration

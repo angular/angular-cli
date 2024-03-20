@@ -596,6 +596,31 @@ describe('adjust-static-class-members Babel plugin', () => {
   );
 
   it(
+    'wraps class with class decorators when wrapDecorators is true (esbuild output)',
+    testCase({
+      input: `
+        var ExampleClass = class {
+          method() {
+          }
+        };
+        __decorate([
+          SomeDecorator()
+        ], ExampleClass.prototype, "method", null);
+      `,
+      expected: `
+        var ExampleClass = /*#__PURE__*/ (() => {
+          let ExampleClass = class {
+            method() {}
+          };
+          __decorate([SomeDecorator()], ExampleClass.prototype, "method", null);
+          return ExampleClass;
+        })();
+      `,
+      options: { wrapDecorators: true },
+    }),
+  );
+
+  it(
     'wraps class with class decorators when wrapDecorators is true',
     testCase({
       input: `
