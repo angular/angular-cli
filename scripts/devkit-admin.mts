@@ -14,6 +14,9 @@ import yargsParser from 'yargs-parser';
 
 const args = yargsParser(process.argv.slice(2), {
   boolean: ['verbose'],
+  configuration: {
+    'camel-case-expansion': false,
+  },
 });
 const scriptName = args._.shift();
 
