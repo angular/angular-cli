@@ -58,7 +58,7 @@ describe('Serve SSR Builder', () => {
           return server;
         }
 
-        app().listen(process.env['PORT']);
+        app().listen(process.env['SSR_PORT']);
 
         export * from './app/app.module.server';
       `,
