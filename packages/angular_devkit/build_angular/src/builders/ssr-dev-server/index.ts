@@ -220,7 +220,7 @@ function startNodeServer(
 ): Observable<void> {
   const outputPath = serverOutput.outputPath as string;
   const path = join(outputPath, 'main.js');
-  const env = { ...process.env, PORT: '' + port };
+  const env = { ...process.env, SSR_PORT: '' + port, PORT: '' + port };
 
   const args = ['--enable-source-maps', `"${path}"`];
   if (inspectMode) {
