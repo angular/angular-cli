@@ -6,15 +6,15 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import assert from 'assert';
-import * as child_process from 'child_process';
-import * as fs from 'fs';
-import * as path from 'path';
-import { fileURLToPath, pathToFileURL } from 'url';
+import assert from 'node:assert';
+import * as child_process from 'node:child_process';
+import { copyFile, readFile, rm, writeFile } from 'node:fs/promises';
+import * as path from 'node:path';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import build from './build.mjs';
 import { packages } from './packages.mjs';
 
-export interface CreateOptions {
+export interface CreateOptions extends Record<string, unknown> {
   _: string[];
 }
 
@@ -37,34 +37,52 @@ async function _exec(command: string, args: string[], opts: { cwd?: string }) {
 }
 
 export default async function (args: CreateOptions, cwd: string): Promise<number> {
-  const projectName = args._[0];
+  const { _, ...otherArgOptions } = args;
+  const projectName = _[0];
+  assert(projectName, 'Project name must be provided.');
+
+  const ngNewAdditionalOptions = Object.entries(otherArgOptions).map(
+    ([key, value]) => `--${key}=${value}`,
+  );
 
   const oldCwd = process.cwd();
   console.info('Building...');
-  await build({ local: true });
+
+  const buildResult = await build({ local: true });
+  const cliBuild = buildResult.find(({ name }) => name === 'angular/cli');
+
+  assert(cliBuild);
 
   process.chdir(cwd);
+
+  // The below is needed as NPX does not guarantee that the updated version is used unless the file name changes.
+  const newTarballName = cliBuild.tarPath.replace('.tgz', '-' + Date.now() + '.tgz');
+  await copyFile(cliBuild.tarPath, newTarballName);
+
   console.info('Creating project...');
 
-  assert(projectName, 'Project name must be provided.');
-
-  await _exec(
-    'npx',
-    [
-      '--yes',
-      pathToFileURL(path.join(__dirname, '../dist/_angular_cli.tgz')).toString(),
-      'new',
-      projectName,
-      '--skip-install',
-      '--skip-git',
-      '--no-interactive',
-    ],
-    { cwd },
-  );
+  try {
+    await _exec(
+      'npx',
+      [
+        '--yes',
+        pathToFileURL(newTarballName).toString(),
+        'new',
+        projectName,
+        '--skip-install',
+        '--skip-git',
+        '--no-interactive',
+        ...ngNewAdditionalOptions,
+      ],
+      { cwd },
+    );
+  } finally {
+    await rm(newTarballName, { maxRetries: 3 });
+  }
 
   console.info('Updating package.json...');
   const packageJsonPath = path.join(projectName, 'package.json');
-  const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
+  const packageJson = JSON.parse(await readFile(packageJsonPath, 'utf-8'));
 
   if (!packageJson['dependencies']) {
     packageJson['dependencies'] = {};
@@ -84,7 +102,7 @@ export default async function (args: CreateOptions, cwd: string): Promise<number
     }
   }
 
-  fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2), 'utf-8');
+  await writeFile(packageJsonPath, JSON.stringify(packageJson, null, 2), 'utf-8');
 
   console.info('Installing npm packages...');
   await _exec('npm', ['install'], { cwd: path.join(cwd, projectName) });

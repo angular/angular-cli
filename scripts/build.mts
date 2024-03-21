@@ -7,6 +7,7 @@
  */
 
 import { spawn } from 'node:child_process';
+import { COPYFILE_FICLONE } from 'node:constants';
 import fs from 'node:fs';
 import path, { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -32,8 +33,7 @@ function _copy(from: string, to: string) {
   from = relative(process.cwd(), from);
   to = relative(process.cwd(), to);
 
-  const buffer = fs.readFileSync(from);
-  fs.writeFileSync(to, buffer);
+  fs.copyFileSync(from, to, COPYFILE_FICLONE);
 }
 
 function _recursiveCopy(from: string, to: string, logger: Console) {
@@ -122,7 +122,7 @@ async function _build(logger: Console, mode: BuildMode): Promise<string[]> {
 
 export default async function (
   argv: { local?: boolean; snapshot?: boolean } = {},
-): Promise<{ name: string; outputPath: string }[]> {
+): Promise<{ name: string; outputPath: string; tarPath: string }[]> {
   const logger = globalThis.console;
 
   const bazelBin = await _exec(`${bazelCmd} info bazel-bin`, true, logger);
@@ -139,14 +139,14 @@ export default async function (
   }
 
   const targets = await _build(logger, buildMode);
-  const output: { name: string; outputPath: string }[] = [];
+  const output = [];
 
   logger.group('Moving packages and tars to dist/');
 
   for (const target of targets) {
     const packageDir = target.replace(/\/\/packages\/(.*):npm_package_archive/, '$1');
     const bazelOutDir = join(bazelBin, 'packages', packageDir, 'npm_package');
-    const tarPath = `${bazelBin}/packages/${packageDir}/npm_package_archive.tgz`;
+    const tarPathInBin = `${bazelBin}/packages/${packageDir}/npm_package_archive.tgz`;
     const packageJsonPath = `${bazelOutDir}/package.json`;
     const packageName = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8')).name;
     const destDir = `${distRoot}/${packageName}`;
@@ -154,9 +154,10 @@ export default async function (
     logger.info(packageName);
 
     _recursiveCopy(bazelOutDir, destDir, logger);
-    _copy(tarPath, `${distRoot}/${packageName.replace('@', '_').replace('/', '_')}.tgz`);
+    const tarPath = `${distRoot}/${packageName.replace('@', '_').replace('/', '_')}.tgz`;
+    _copy(tarPathInBin, tarPath);
 
-    output.push({ name: packageDir, outputPath: destDir });
+    output.push({ name: packageDir, outputPath: destDir, tarPath });
   }
 
   logger.groupEnd();
