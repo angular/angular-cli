@@ -1,3 +1,52 @@
+<a name="18.0.0-next.0"></a>
+
+# 18.0.0-next.0 (2024-03-21)
+
+## Breaking Changes
+
+### @angular/cli
+
+- Node.js support for versions <18.19.1 and <20.11.1 has been removed.
+
+### @angular-devkit/build-angular
+
+- The support for the legacy Sass build pipeline, previously accessible via `NG_BUILD_LEGACY_SASS` when utilizing webpack-based builders, has been removed.
+
+## Deprecations
+
+### @angular-devkit/schematics
+
+- `NodePackageLinkTask` in `@angular-devkit/schematics`. A custom task should be created instead.
+
+### @angular/cli
+
+| Commit                                                                                              | Type     | Description                                               |
+| --------------------------------------------------------------------------------------------------- | -------- | --------------------------------------------------------- |
+| [ac3019570](https://github.com/angular/angular-cli/commit/ac301957093d0689c98f7debe98fbb2546c9b442) | feat     | add `ng dev` alias to `ng serve`                          |
+| [c7b208555](https://github.com/angular/angular-cli/commit/c7b208555e34cc5ebf9cf2d335d257e72297cae9) | refactor | remove support for Node.js versions <18.19.1 and <20.11.1 |
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                               |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------- |
+| [f452589e2](https://github.com/angular/angular-cli/commit/f452589e2c921448b76a138a5f34ba92ad05e297) | feat | use TypeScript bundler module resolution for new projects |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type     | Description                                                        |
+| --------------------------------------------------------------------------------------------------- | -------- | ------------------------------------------------------------------ |
+| [ee9ec2301](https://github.com/angular/angular-cli/commit/ee9ec2301fd24972cf8de8b230e1ca088dbc0449) | fix      | `Internal server error: Invalid URL` when using a non localhost IP |
+| [8a54875cb](https://github.com/angular/angular-cli/commit/8a54875cbb654f95d5213b2d84190bd3814d6810) | fix      | handle wrapping of class expressions emitted by esbuild            |
+| [97973059e](https://github.com/angular/angular-cli/commit/97973059ec56a573629f7a367757773a3cfabe17) | refactor | remove Sass legacy implementation                                  |
+
+### @angular-devkit/schematics
+
+| Commit                                                                                              | Type     | Description                     |
+| --------------------------------------------------------------------------------------------------- | -------- | ------------------------------- |
+| [797584583](https://github.com/angular/angular-cli/commit/797584583138c9223bf238ae8f352e77575bd25a) | refactor | deprecate `NodePackageLinkTask` |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="17.3.1"></a>
 
 # 17.3.1 (2024-03-20)
