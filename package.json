@@ -1,6 +1,6 @@
 {
   "name": "@angular/devkit-repo",
-  "version": "16.2.12",
+  "version": "16.2.10",
   "private": true,
   "description": "Software Development Kit for Angular",
   "bin": {
@@ -204,9 +204,9 @@
     "typescript": "5.1.6",
     "verdaccio": "5.26.1",
     "verdaccio-auth-memory": "^10.0.0",
-    "vite": "4.5.2",
+    "vite": "4.5.1",
     "webpack": "5.88.2",
-    "webpack-dev-middleware": "6.1.1",
+    "webpack-dev-middleware": "6.1.2",
     "webpack-dev-server": "4.15.1",
     "webpack-merge": "5.9.0",
     "webpack-subresource-integrity": "5.1.0",
