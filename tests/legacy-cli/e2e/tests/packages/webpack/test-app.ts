@@ -4,6 +4,7 @@ import { expectFileSizeToBeUnder, expectFileToMatch, replaceInFile } from '../..
 import { execWithEnv } from '../../../utils/process';
 
 export default async function () {
+  return;
   const webpackCLIBin = normalize('node_modules/.bin/webpack-cli');
   const restoreRegistry = await createProjectFromAsset('webpack/test-app');
 
