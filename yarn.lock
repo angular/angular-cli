@@ -138,8 +138,7 @@
     tslib "^2.3.0"
 
 "@angular/bazel@https://github.com/angular/bazel-builds.git#951ccf637d0d30481955d199150b982e6b9a2c8e":
-  version "17.3.0-next.1+sha-bd60fb1"
-  uid "951ccf637d0d30481955d199150b982e6b9a2c8e"
+  version "17.3.0-next.1"
   resolved "https://github.com/angular/bazel-builds.git#951ccf637d0d30481955d199150b982e6b9a2c8e"
   dependencies:
     "@microsoft/api-extractor" "^7.24.2"
@@ -156,7 +155,6 @@
 
 "@angular/build-tooling@https://github.com/angular/dev-infra-private-build-tooling-builds.git#b24b407a078bf5bd8602be8a3cf971012eb4cc95":
   version "0.0.0-96a8277d21eb61a2370061717ffa8dee5668caa0"
-  uid b24b407a078bf5bd8602be8a3cf971012eb4cc95
   resolved "https://github.com/angular/dev-infra-private-build-tooling-builds.git#b24b407a078bf5bd8602be8a3cf971012eb4cc95"
   dependencies:
     "@angular-devkit/build-angular" "17.2.0-rc.0"
@@ -345,7 +343,6 @@
 
 "@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#262c6ede0815bb2ba6fbe6f1790eaaa77ce84c9c":
   version "0.0.0-96a8277d21eb61a2370061717ffa8dee5668caa0"
-  uid "262c6ede0815bb2ba6fbe6f1790eaaa77ce84c9c"
   resolved "https://github.com/angular/dev-infra-private-ng-dev-builds.git#262c6ede0815bb2ba6fbe6f1790eaaa77ce84c9c"
   dependencies:
     "@yarnpkg/lockfile" "^1.1.0"
@@ -12031,7 +12028,6 @@ sass@1.71.1, sass@^1.69.5:
 
 "sauce-connect-proxy@https://saucelabs.com/downloads/sc-4.9.1-linux.tar.gz":
   version "0.0.0"
-  uid "9310bc860f7870a1f872b11c4dc6073a1ad34e5e"
   resolved "https://saucelabs.com/downloads/sc-4.9.1-linux.tar.gz#9310bc860f7870a1f872b11c4dc6073a1ad34e5e"
 
 saucelabs@^1.5.0:
@@ -13688,6 +13684,17 @@ webpack-dev-middleware@6.1.1:
   version "6.1.1"
   resolved "https://registry.yarnpkg.com/webpack-dev-middleware/-/webpack-dev-middleware-6.1.1.tgz#6bbc257ec83ae15522de7a62f995630efde7cc3d"
   integrity sha512-y51HrHaFeeWir0YO4f0g+9GwZawuigzcAdRNon6jErXy/SqV/+O6eaVAzDqE6t3e3NpGeR5CS+cCDaTC+V3yEQ==
+  dependencies:
+    colorette "^2.0.10"
+    memfs "^3.4.12"
+    mime-types "^2.1.31"
+    range-parser "^1.2.1"
+    schema-utils "^4.0.0"
+
+webpack-dev-middleware@6.1.2:
+  version "6.1.2"
+  resolved "https://registry.yarnpkg.com/webpack-dev-middleware/-/webpack-dev-middleware-6.1.2.tgz#0463232e59b7d7330fa154121528d484d36eb973"
+  integrity sha512-Wu+EHmX326YPYUpQLKmKbTyZZJIB8/n6R09pTmB03kJmnMsVPTo9COzHZFr01txwaCAuZvfBJE4ZCHRcKs5JaQ==
   dependencies:
     colorette "^2.0.10"
     memfs "^3.4.12"
