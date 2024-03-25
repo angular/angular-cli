@@ -180,6 +180,7 @@ export async function augmentAppWithServiceWorkerEsbuild(
   workspaceRoot: string,
   configPath: string,
   baseHref: string,
+  indexHtml: string | undefined,
   outputFiles: BuildOutputFile[],
   assetFiles: BuildOutputAsset[],
 ): Promise<{ manifest: string; assetFiles: BuildOutputAsset[] }> {
@@ -188,6 +189,10 @@ export async function augmentAppWithServiceWorkerEsbuild(
   try {
     const configurationData = await fsPromises.readFile(configPath, 'utf-8');
     config = JSON.parse(configurationData) as Config;
+
+    if (indexHtml) {
+      config.index = indexHtml;
+    }
   } catch (error) {
     assertIsError(error);
     if (error.code === 'ENOENT') {
