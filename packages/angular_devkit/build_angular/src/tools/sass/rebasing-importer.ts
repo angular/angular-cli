@@ -8,7 +8,7 @@
 
 import { RawSourceMap } from '@ampproject/remapping';
 import MagicString from 'magic-string';
-import { readFileSync, readdirSync } from 'node:fs';
+import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { basename, dirname, extname, join, relative } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import type { CanonicalizeContext, Importer, ImporterResult, Syntax } from 'sass';
@@ -235,17 +235,28 @@ export class RelativeUrlRebasingImporter extends UrlRebasingImporter {
       foundImports = [];
       cachedEntries = { files: new Set<string>(), directories: new Set<string>() };
       for (const entry of entries) {
-        const isDirectory = entry.isDirectory();
+        let isDirectory: boolean;
+        let isFile: boolean;
+
+        if (entry.isSymbolicLink()) {
+          const stats = statSync(join(entry.path, entry.name));
+          isDirectory = stats.isDirectory();
+          isFile = stats.isFile();
+        } else {
+          isDirectory = entry.isDirectory();
+          isFile = entry.isFile();
+        }
+
         if (isDirectory) {
           cachedEntries.directories.add(entry.name);
+
+          // Record if the name should be checked as a directory with an index file
+          if (checkDirectory && !hasStyleExtension && entry.name === filename) {
+            hasPotentialIndex = true;
+          }
         }
 
-        // Record if the name should be checked as a directory with an index file
-        if (checkDirectory && !hasStyleExtension && entry.name === filename && isDirectory) {
-          hasPotentialIndex = true;
-        }
-
-        if (!entry.isFile()) {
+        if (!isFile) {
           continue;
         }
 
