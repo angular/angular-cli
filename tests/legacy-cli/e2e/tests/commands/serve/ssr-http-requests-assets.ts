@@ -34,7 +34,7 @@ export default async function () {
       };
     `,
     // Add asset
-    'src/assets/media.json': JSON.stringify({ dataFromAssets: true }),
+    'public/media.json': JSON.stringify({ dataFromAssets: true }),
     // Update component to do an HTTP call to asset.
     'src/app/app.component.ts': `
     import { Component, inject } from '@angular/core';
@@ -55,7 +55,7 @@ export default async function () {
       data: any;
       constructor() {
         const http = inject(HttpClient);
-        http.get('/assets/media.json').toPromise().then((d) => {
+        http.get('/media.json').toPromise().then((d) => {
           this.data = d;
         });
       }

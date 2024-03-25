@@ -120,12 +120,10 @@ export default function (options: ServiceWorkerOptions): Rule {
 
     const buildOptions = buildTarget.options as Record<string, string | boolean>;
     let browserEntryPoint: string | undefined;
-    let resourcesOutputPath = '';
     const ngswConfigPath = join(normalize(project.root), 'ngsw-config.json');
 
     if (buildTarget.builder === Builders.Application) {
       browserEntryPoint = buildOptions.browser as string;
-      resourcesOutputPath = '/media';
       const productionConf = buildTarget.configurations?.production;
       if (productionConf) {
         productionConf.serviceWorker = ngswConfigPath;
@@ -134,9 +132,6 @@ export default function (options: ServiceWorkerOptions): Rule {
       browserEntryPoint = buildOptions.main as string;
       buildOptions.serviceWorker = true;
       buildOptions.ngswConfigPath = ngswConfigPath;
-      if (buildOptions.resourcesOutputPath) {
-        resourcesOutputPath = normalize(`/${buildOptions.resourcesOutputPath}`);
-      }
     }
 
     await writeWorkspace(host, workspace);
@@ -147,7 +142,6 @@ export default function (options: ServiceWorkerOptions): Rule {
         apply(url('./files'), [
           applyTemplates({
             ...options,
-            resourcesOutputPath,
             relativePathToWorkspaceRoot: relativePathToWorkspaceRoot(project.root),
           }),
           move(project.root),

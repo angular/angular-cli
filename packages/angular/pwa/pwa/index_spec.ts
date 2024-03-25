@@ -54,7 +54,7 @@ describe('PWA Schematic', () => {
 
   it('should create icon files', async () => {
     const dimensions = [72, 96, 128, 144, 152, 192, 384, 512];
-    const iconPath = '/projects/bar/src/assets/icons/icon-';
+    const iconPath = '/projects/bar/public/icons/icon-';
     const tree = await schematicRunner.runSchematic('ng-add', defaultOptions, appTree);
 
     dimensions.forEach((d) => {
@@ -74,13 +74,13 @@ describe('PWA Schematic', () => {
 
   it('should create a manifest file', async () => {
     const tree = await schematicRunner.runSchematic('ng-add', defaultOptions, appTree);
-    expect(tree.exists('/projects/bar/src/manifest.webmanifest')).toBeTrue();
+    expect(tree.exists('/projects/bar/public/manifest.webmanifest')).toBeTrue();
   });
 
   it('should set the name & short_name in the manifest file', async () => {
     const tree = await schematicRunner.runSchematic('ng-add', defaultOptions, appTree);
 
-    const manifestText = tree.readContent('/projects/bar/src/manifest.webmanifest');
+    const manifestText = tree.readContent('/projects/bar/public/manifest.webmanifest');
     const manifest = JSON.parse(manifestText);
 
     expect(manifest.name).toEqual(defaultOptions.title);
@@ -91,7 +91,7 @@ describe('PWA Schematic', () => {
     const options = { ...defaultOptions, title: undefined };
     const tree = await schematicRunner.runSchematic('ng-add', options, appTree);
 
-    const manifestText = tree.readContent('/projects/bar/src/manifest.webmanifest');
+    const manifestText = tree.readContent('/projects/bar/public/manifest.webmanifest');
     const manifest = JSON.parse(manifestText);
 
     expect(manifest.name).toEqual(defaultOptions.project);
@@ -123,17 +123,6 @@ describe('PWA Schematic', () => {
       /<noscript>Please enable JavaScript to continue using this application.<\/noscript>/,
     );
     expect(content).toMatch(/<noscript>NO JAVASCRIPT<\/noscript>/);
-  });
-
-  it('should update the build and test assets configuration', async () => {
-    const tree = await schematicRunner.runSchematic('ng-add', defaultOptions, appTree);
-    const configText = tree.readContent('/angular.json');
-    const config = JSON.parse(configText);
-    const targets = config.projects.bar.architect;
-
-    ['build', 'test'].forEach((target) => {
-      expect(targets[target].options.assets).toContain('projects/bar/src/manifest.webmanifest');
-    });
   });
 
   describe('Legacy browser builder', () => {

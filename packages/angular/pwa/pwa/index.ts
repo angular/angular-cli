@@ -104,23 +104,6 @@ export default function (options: PwaOptions): Rule {
       }
     }
 
-    // Add manifest to asset configuration
-    const assetEntry = posix.join(
-      project.sourceRoot ?? posix.join(project.root, 'src'),
-      'manifest.webmanifest',
-    );
-    for (const target of [...buildTargets, ...testTargets]) {
-      if (target.options) {
-        if (Array.isArray(target.options.assets)) {
-          target.options.assets.push(assetEntry);
-        } else {
-          target.options.assets = [assetEntry];
-        }
-      } else {
-        target.options = { assets: [assetEntry] };
-      }
-    }
-
     // Find all index.html files in build targets
     const indexFiles = new Set<string>();
     for (const target of buildTargets) {
@@ -146,11 +129,32 @@ export default function (options: PwaOptions): Rule {
     const { title, ...swOptions } = options;
 
     await writeWorkspace(host, workspace);
+    let assetsDir = posix.join(sourcePath, 'assets');
+
+    if (host.exists(assetsDir)) {
+      // Add manifest to asset configuration
+      const assetEntry = posix.join(
+        project.sourceRoot ?? posix.join(project.root, 'src'),
+        'manifest.webmanifest',
+      );
+      for (const target of [...buildTargets, ...testTargets]) {
+        if (target.options) {
+          if (Array.isArray(target.options.assets)) {
+            target.options.assets.push(assetEntry);
+          } else {
+            target.options.assets = [assetEntry];
+          }
+        } else {
+          target.options = { assets: [assetEntry] };
+        }
+      }
+    } else {
+      assetsDir = posix.join(project.root, 'public');
+    }
 
     return chain([
       externalSchematic('@schematics/angular', 'service-worker', swOptions),
-      mergeWith(apply(url('./files/root'), [template({ ...options }), move(sourcePath)])),
-      mergeWith(apply(url('./files/assets'), [move(posix.join(sourcePath, 'assets'))])),
+      mergeWith(apply(url('./files/assets'), [template({ ...options }), move(assetsDir)])),
       ...[...indexFiles].map((path) => updateIndexFile(path)),
     ]);
   };

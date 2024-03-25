@@ -7,6 +7,7 @@
  */
 
 import { statSync } from 'fs';
+import assert from 'node:assert';
 import * as path from 'path';
 import { AssetPattern, AssetPatternClass } from '../builders/browser/schema';
 
@@ -21,7 +22,7 @@ export function normalizeAssetPatterns(
   workspaceRoot: string,
   projectRoot: string,
   projectSourceRoot: string | undefined,
-): AssetPatternClass[] {
+): (AssetPatternClass & { output: string })[] {
   if (assetPatterns.length === 0) {
     return [];
   }
@@ -67,13 +68,15 @@ export function normalizeAssetPatterns(
 
       assetPattern = { glob, input, output };
     } else {
-      assetPattern.output = path.join('.', assetPattern.output);
+      assetPattern.output = path.join('.', assetPattern.output ?? '');
     }
+
+    assert(assetPattern.output !== undefined);
 
     if (assetPattern.output.startsWith('..')) {
       throw new Error('An asset cannot be written to a location outside of the output path.');
     }
 
-    return assetPattern;
+    return assetPattern as AssetPatternClass & { output: string };
   });
 }

@@ -231,7 +231,7 @@ export function assetPatterns(root: string, assets: AssetPatternClass[]) {
   return assets.map((asset: AssetPatternClass, index: number): ObjectPattern => {
     // Resolve input paths relative to workspace root and add slash at the end.
     // eslint-disable-next-line prefer-const
-    let { input, output, ignore = [], glob } = asset;
+    let { input, output = '', ignore = [], glob } = asset;
     input = path.resolve(root, input).replace(/\\/g, '/');
     input = input.endsWith('/') ? input : input + '/';
     output = output.endsWith('/') ? output : output + '/';

@@ -269,6 +269,7 @@
             },
             "output": {
               "type": "string",
+              "default": "",
               "description": "Absolute path within the output."
             },
             "ignore": {
@@ -280,7 +281,7 @@
             }
           },
           "additionalProperties": false,
-          "required": ["glob", "input", "output"]
+          "required": ["glob", "input"]
         },
         {
           "type": "string"

@@ -50,7 +50,7 @@ describe('Application Schematic', () => {
       jasmine.arrayContaining([
         '/projects/foo/tsconfig.app.json',
         '/projects/foo/tsconfig.spec.json',
-        '/projects/foo/src/favicon.ico',
+        '/projects/foo/public/favicon.ico',
         '/projects/foo/src/index.html',
         '/projects/foo/src/main.ts',
         '/projects/foo/src/styles.css',
@@ -263,7 +263,7 @@ describe('Application Schematic', () => {
         jasmine.arrayContaining([
           '/tsconfig.app.json',
           '/tsconfig.spec.json',
-          '/src/favicon.ico',
+          '/public/favicon.ico',
           '/src/index.html',
           '/src/main.ts',
           '/src/styles.css',
@@ -448,7 +448,7 @@ describe('Application Schematic', () => {
     expect(files).toEqual(
       jasmine.arrayContaining([
         '/projects/foo/tsconfig.app.json',
-        '/projects/foo/src/favicon.ico',
+        '/projects/foo/public/favicon.ico',
         '/projects/foo/src/index.html',
         '/projects/foo/src/main.ts',
         '/projects/foo/src/styles.css',
@@ -473,7 +473,7 @@ describe('Application Schematic', () => {
     expect(files).toEqual(
       jasmine.arrayContaining([
         '/projects/foo/tsconfig.app.json',
-        '/projects/foo/src/favicon.ico',
+        '/projects/foo/public/favicon.ico',
         '/projects/foo/src/index.html',
         '/projects/foo/src/main.ts',
         '/projects/foo/src/styles.css',
@@ -499,7 +499,7 @@ describe('Application Schematic', () => {
     expect(files).toEqual(
       jasmine.arrayContaining([
         '/projects/foo/tsconfig.app.json',
-        '/projects/foo/src/favicon.ico',
+        '/projects/foo/public/favicon.ico',
         '/projects/foo/src/index.html',
         '/projects/foo/src/main.ts',
         '/projects/foo/src/styles.css',
@@ -519,7 +519,7 @@ describe('Application Schematic', () => {
       jasmine.arrayContaining([
         '/projects/foo/tsconfig.app.json',
         '/projects/foo/tsconfig.spec.json',
-        '/projects/foo/src/favicon.ico',
+        '/projects/foo/public/favicon.ico',
         '/projects/foo/src/index.html',
         '/projects/foo/src/main.ts',
         '/projects/foo/src/styles.css',

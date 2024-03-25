@@ -24,7 +24,6 @@ export default async function () {
         sourceMap: true,
         outputHashing: 'none',
         vendorChunk: true,
-        assets: ['src/favicon.ico', 'src/assets'],
         styles: ['src/styles.css'],
         scripts: [],
         budgets: [],

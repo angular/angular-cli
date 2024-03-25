@@ -8,6 +8,7 @@ import {
 import { copyProjectAsset } from '../../utils/assets';
 import { expectToFail } from '../../utils/utils';
 import { getGlobalVariable } from '../../utils/env';
+import { mkdir } from 'node:fs/promises';
 
 const imgSvg = `
   <svg width="100" height="100" xmlns="http://www.w3.org/2000/svg">
@@ -22,6 +23,8 @@ export default async function () {
     ? './dist/test-project/browser'
     : './dist/test-project/browser/media';
 
+  await mkdir('public/assets/', { recursive: true });
+
   await Promise.resolve()
     // Verify absolute/relative paths in global/component css.
     .then(() =>
@@ -34,8 +37,8 @@ export default async function () {
         h3 { background: url('/assets/component-img-absolute.svg'); }
         h4 { background: url('../assets/component-img-relative.png'); }
       `,
-        'src/assets/global-img-absolute.svg': imgSvg,
-        'src/assets/component-img-absolute.svg': imgSvg,
+        'public/assets/global-img-absolute.svg': imgSvg,
+        'public/assets/component-img-absolute.svg': imgSvg,
       }),
     )
     .then(() => copyProjectAsset('images/spectrum.png', './src/assets/global-img-relative.png'))
