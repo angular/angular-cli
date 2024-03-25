@@ -1,3 +1,24 @@
+<a name="17.3.2"></a>
+
+# 17.3.2 (2024-03-25)
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                  |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------- |
+| [935f931ee](https://github.com/angular/angular-cli/commit/935f931eea8ddd1cb86b2275b8e384bf51e9153e) | fix  | rename SSR port env variable |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                        |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------ |
+| [c9d436000](https://github.com/angular/angular-cli/commit/c9d4360000e6134b936781be3b0d5cf1871d44d7) | fix  | `Internal server error: Invalid URL` when using a non localhost IP |
+| [59fba38ec](https://github.com/angular/angular-cli/commit/59fba38ec6181c8d9c7a0636fb514c4b25aaf0cd) | fix  | ensure proper resolution of linked SCSS files                      |
+| [27dd8f208](https://github.com/angular/angular-cli/commit/27dd8f208911dbb2eda6d64efd6d1ce8c463ce35) | fix  | service-worker references non-existent named index output          |
+| [c12907d92](https://github.com/angular/angular-cli/commit/c12907d92f8a2268541fd3bf28857dbb216ec7c9) | fix  | update `webpack-dev-middleware` to `6.1.2`                         |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="17.3.1"></a>
 
 # 17.3.1 (2024-03-20)
