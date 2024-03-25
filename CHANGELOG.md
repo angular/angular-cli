@@ -1,3 +1,15 @@
+<a name="16.2.13"></a>
+
+# 16.2.13 (2024-03-25)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------ |
+| [5ad507e3d](https://github.com/angular/angular-cli/commit/5ad507e3d4cb27fb275d255018b9b6e735835711) | fix  | `update webpack-dev-middleware` to `6.1.2` |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="16.2.12"></a>
 
 # 16.2.12 (2024-01-24)
