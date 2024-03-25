@@ -12,5 +12,5 @@ export default async function () {
   await expectToFail(() => ng('add', '@angular/pwa', '--skip-confirmation'));
 
   await ng('add', `--registry=${testRegistry}`, '@angular/pwa', '--skip-confirmation');
-  await expectFileToExist('src/manifest.webmanifest');
+  await expectFileToExist('public/manifest.webmanifest');
 }

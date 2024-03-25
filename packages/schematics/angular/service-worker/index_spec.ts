@@ -107,15 +107,6 @@ describe('Service Worker Schematic', () => {
     expect(configNotInRoot.$schema).toBe(`../../${pathToNgswConfigSchema}`);
   });
 
-  it('should add root assets RegExp', async () => {
-    const tree = await schematicRunner.runSchematic('service-worker', defaultOptions, appTree);
-    const pkgText = tree.readContent('/projects/bar/ngsw-config.json');
-    const config = JSON.parse(pkgText);
-    expect(config.assetGroups[1].resources.files).toContain(
-      '/media/*.(svg|cur|jpg|jpeg|png|apng|webp|avif|gif|otf|ttf|woff|woff2)',
-    );
-  });
-
   it('should generate ngsw-config.json in root when the application is at root level', async () => {
     const name = 'foo';
     const rootAppOptions: ApplicationOptions = {
@@ -226,18 +217,6 @@ describe('Service Worker Schematic', () => {
 
     beforeEach(() => {
       convertBuilderToLegacyBrowser();
-    });
-
-    it('should add resourcesOutputPath to root assets when specified', async () => {
-      const config = JSON.parse(appTree.readContent('/angular.json'));
-      config.projects.bar.architect.build.options.resourcesOutputPath = 'outDir';
-      appTree.overwrite('/angular.json', JSON.stringify(config));
-      const tree = await schematicRunner.runSchematic('service-worker', defaultOptions, appTree);
-      const pkgText = tree.readContent('/projects/bar/ngsw-config.json');
-      const ngswConfig = JSON.parse(pkgText);
-      expect(ngswConfig.assetGroups[1].resources.files).toContain(
-        '/outDir/*.(svg|cur|jpg|jpeg|png|apng|webp|avif|gif|otf|ttf|woff|woff2)',
-      );
     });
 
     it('should add `serviceWorker` option to build target', async () => {

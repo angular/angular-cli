@@ -23,8 +23,8 @@ export default async function () {
     'config',
     `projects.test-project.architect.build.options.assets[0]`,
   );
-  if (!stdout2.includes('src/favicon.ico')) {
-    throw new Error(`Expected "src/favicon.ico", received "${JSON.stringify(stdout)}".`);
+  if (!stdout2.includes('"input": "public"')) {
+    throw new Error(`Expected "input": "public", received "${JSON.stringify(stdout)}".`);
   }
 
   const { stdout: stdout3 } = await ng(
@@ -32,8 +32,8 @@ export default async function () {
     `projects["test-project"].architect.build.options.assets[0]`,
   );
 
-  if (!stdout3.includes('src/favicon.ico')) {
-    throw new Error(`Expected "src/favicon.ico", received "${JSON.stringify(stdout)}".`);
+  if (!stdout3.includes('"input": "public"')) {
+    throw new Error(`Expected "input": "public", received "${JSON.stringify(stdout)}".`);
   }
 
   // should print all config when no positional args are provided.

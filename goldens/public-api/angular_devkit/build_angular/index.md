@@ -79,7 +79,7 @@ export interface AssetPatternObject {
     glob: string;
     ignore?: string[];
     input: string;
-    output: string;
+    output?: string;
 }
 
 // @public

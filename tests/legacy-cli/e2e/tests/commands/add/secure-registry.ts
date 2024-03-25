@@ -9,20 +9,20 @@ export default async function () {
   delete process.env['NPM_CONFIG_REGISTRY'];
 
   const command = ['add', '@angular/pwa', '--skip-confirmation'];
-  await expectFileNotToExist('src/manifest.webmanifest');
+  await expectFileNotToExist('public/manifest.webmanifest');
 
   // Works with unscoped registry authentication details
   await createNpmConfigForAuthentication(false);
   await ng(...command);
-  await expectFileToExist('src/manifest.webmanifest');
+  await expectFileToExist('public/manifest.webmanifest');
   await git('clean', '-dxf');
 
   // Works with scoped registry authentication details
-  await expectFileNotToExist('src/manifest.webmanifest');
+  await expectFileNotToExist('public/manifest.webmanifest');
 
   await createNpmConfigForAuthentication(true);
   await ng(...command);
-  await expectFileToExist('src/manifest.webmanifest');
+  await expectFileToExist('public/manifest.webmanifest');
 
   // Invalid authentication token
   await createNpmConfigForAuthentication(false, true);

@@ -8,12 +8,12 @@ export default async function () {
   const outsideDirectoryName = `../outside-${randomUUID()}`;
 
   await updateJsonFile('angular.json', (json) => {
-    json.projects['test-project'].architect.build.options.assets = [
-      'src/favicon.ico',
-      'src/assets',
-      // Ensure assets located outside the workspace root work with the dev server
-      { 'input': outsideDirectoryName, 'glob': '**/*', 'output': './outside' },
-    ];
+    // Ensure assets located outside the workspace root work with the dev server
+    json.projects['test-project'].architect.build.options.assets.push({
+      'input': outsideDirectoryName,
+      'glob': '**/*',
+      'output': './outside',
+    });
   });
 
   await mkdir(outsideDirectoryName);

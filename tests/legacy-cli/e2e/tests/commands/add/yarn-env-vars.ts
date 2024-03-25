@@ -15,15 +15,15 @@ export default async function () {
   const command = ['add', '@angular/pwa', '--skip-confirmation'];
 
   // Environment variables only
-  await expectFileNotToExist('src/manifest.webmanifest');
+  await expectFileNotToExist('public/manifest.webmanifest');
   setNpmEnvVarsForAuthentication(false, true);
   await ng(...command);
-  await expectFileToExist('src/manifest.webmanifest');
+  await expectFileToExist('public/manifest.webmanifest');
   await git('clean', '-dxf');
 
   // Mix of config file and env vars works
-  await expectFileNotToExist('src/manifest.webmanifest');
+  await expectFileNotToExist('public/manifest.webmanifest');
   await createNpmConfigForAuthentication(false, true);
   await ng(...command);
-  await expectFileToExist('src/manifest.webmanifest');
+  await expectFileToExist('public/manifest.webmanifest');
 }

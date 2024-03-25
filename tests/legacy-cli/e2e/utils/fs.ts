@@ -1,4 +1,4 @@
-import { PathLike, promises as fs, constants } from 'fs';
+import { promises as fs, constants } from 'fs';
 import { dirname, join } from 'path';
 
 export function readFile(fileName: string): Promise<string> {
