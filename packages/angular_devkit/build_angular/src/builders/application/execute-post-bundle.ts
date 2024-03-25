@@ -153,10 +153,12 @@ export async function executePostBundleSteps(
         workspaceRoot,
         serviceWorker,
         options.baseHref || '/',
+        options.indexHtmlOptions?.output,
         // Ensure additional files recently added are used
         [...outputFiles, ...additionalOutputFiles],
         assetFiles,
       );
+
       additionalOutputFiles.push(
         createOutputFileFromText(
           'ngsw.json',

@@ -326,8 +326,12 @@ export async function normalizeOptions(
     fileReplacements,
     globalStyles,
     globalScripts,
-    serviceWorker:
-      typeof serviceWorker === 'string' ? path.join(workspaceRoot, serviceWorker) : undefined,
+    serviceWorker: serviceWorker
+      ? path.join(
+          workspaceRoot,
+          typeof serviceWorker === 'string' ? serviceWorker : 'src/ngsw-config.json',
+        )
+      : undefined,
     indexHtmlOptions,
     tailwindConfiguration,
     postcssConfiguration,
