@@ -3,6 +3,7 @@
   "comment": "This file is needed so that dependencies are synced by Renovate.",
   "private": true,
   "dependencies": {
+    "@angular/core": "^17.3.0",
     "@types/express": "^4.17.17",
     "@types/jasmine": "~5.1.0",
     "@types/node": "^18.18.0",
