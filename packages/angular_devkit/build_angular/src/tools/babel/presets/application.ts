@@ -248,18 +248,20 @@ export default function (api: unknown, options: ApplicationPresetOptions) {
   }
 
   if (options.optimize) {
+    const {
+      adjustStaticMembers,
+      adjustTypeScriptEnums,
+      elideAngularMetadata,
+      markTopLevelPure,
+    } = require('../plugins');
     if (options.optimize.pureTopLevel) {
-      plugins.push(require('../plugins/pure-toplevel-functions').default);
+      plugins.push(markTopLevelPure);
     }
 
-    plugins.push(
-      require('../plugins/elide-angular-metadata').default,
-      [require('../plugins/adjust-typescript-enums').default, { loose: true }],
-      [
-        require('../plugins/adjust-static-class-members').default,
-        { wrapDecorators: options.optimize.wrapDecorators },
-      ],
-    );
+    plugins.push(elideAngularMetadata, adjustTypeScriptEnums, [
+      adjustStaticMembers,
+      { wrapDecorators: options.optimize.wrapDecorators },
+    ]);
   }
 
   if (options.instrumentCode) {
