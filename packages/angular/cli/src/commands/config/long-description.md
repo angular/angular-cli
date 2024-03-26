@@ -8,6 +8,6 @@ The configurable property names match command option names,
 except that in the configuration file, all names must use camelCase,
 while on the command line options can be given dash-case.
 
-For further details, see [Workspace Configuration](guide/workspace-config).
+For further details, see [Workspace Configuration](reference/configs/workspace-config).
 
 For configuration of CLI usage analytics, see [ng analytics](cli/analytics).
