@@ -51,7 +51,7 @@ Appended \`source <(ng completion script)\` to \`${rcFile}\`. Restart your termi
           ' Angular CLI. For autocompletion to work, the CLI will need to be on your `$PATH`, which' +
           ' is typically done with the `-g` flag in `npm install -g @angular/cli`.' +
           '\n\n' +
-          'For more information, see https://angular.io/cli/completion#global-install',
+          'For more information, see https://angular.dev/cli/completion#global-install',
       );
     }
 

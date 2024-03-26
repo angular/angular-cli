@@ -15,4 +15,4 @@ either by direct editing or with the `ng config` command.
 These include `assets`, `styles`, and `scripts` objects that provide runtime-global resources to include in the project.
 Resources in CSS, such as images and fonts, are automatically written and fingerprinted at the root of the output folder.
 
-For further details, see [Workspace Configuration](guide/workspace-config).
+For further details, see [Workspace Configuration](reference/configs/workspace-config).
