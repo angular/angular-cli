@@ -6,17 +6,19 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+// We could have used TypeScripts' `resolveJsonModule` to make the `latestVersion` object typesafe,
+// but ts_library doesn't support JSON inputs.
+const dependencies = require('./latest-versions/package.json')['dependencies'];
+
 export const latestVersions: Record<string, string> & {
   Angular: string;
   DevkitBuildAngular: string;
   AngularSSR: string;
 } = {
-  // We could have used TypeScripts' `resolveJsonModule` to make the `latestVersion` object typesafe,
-  // but ts_library doesn't support JSON inputs.
-  ...require('./latest-versions/package.json')['dependencies'],
+  ...dependencies,
 
   // As Angular CLI works with same minor versions of Angular Framework, a tilde match for the current
-  Angular: '^18.0.0-next.0',
+  Angular: dependencies['@angular/core'],
 
   DevkitBuildAngular: '^0.0.0-PLACEHOLDER',
   AngularSSR: '^0.0.0-PLACEHOLDER',
