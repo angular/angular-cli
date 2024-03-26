@@ -3,7 +3,7 @@ When a project name is not supplied, executes the `deploy` builder for the defau
 
 To use the `ng deploy` command, use `ng add` to add a package that implements deployment capabilities to your favorite platform.
 Adding the package automatically updates your workspace configuration, adding a deployment
-[CLI builder](guide/cli-builder).
+[CLI builder](tools/cli/cli-builder).
 For example:
 
 ```json
