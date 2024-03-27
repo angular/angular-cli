@@ -7,9 +7,7 @@
  */
 
 import type { Plugin } from 'esbuild';
-import { extname } from 'node:path';
-
-const EXTERNAL_PACKAGE_RESOLUTION = Symbol('EXTERNAL_PACKAGE_RESOLUTION');
+import { extname, isAbsolute } from 'node:path';
 
 /**
  * Creates a plugin that marks any resolved path as external if it is within a node modules directory.
@@ -34,49 +32,31 @@ export function createExternalPackagesPlugin(options?: { exclude?: string[] }): 
         return;
       }
 
-      const loaderFileExtensions = new Set(loaderOptionKeys);
+      const loaderFileExtensions = loaderOptionKeys && new Set(loaderOptionKeys);
 
-      // Only attempt resolve of non-relative and non-absolute paths
+      // esbuild's external packages option considers any package-like path as external
+      // which would exclude paths that are absolute or explicitly relative
       build.onResolve({ filter: /^[^./]/ }, async (args) => {
-        if (args.pluginData?.[EXTERNAL_PACKAGE_RESOLUTION]) {
-          return null;
-        }
-
+        // Skip marking excluded packages
         if (exclusions?.has(args.path)) {
           return null;
         }
 
-        const { importer, kind, resolveDir, namespace, pluginData = {} } = args;
-        pluginData[EXTERNAL_PACKAGE_RESOLUTION] = true;
-
-        const result = await build.resolve(args.path, {
-          importer,
-          kind,
-          namespace,
-          pluginData,
-          resolveDir,
-        });
-
-        // Return result if unable to resolve or explicitly marked external (externalDependencies option)
-        if (!result.path || result.external) {
-          return result;
-        }
-
         // Allow customized loaders to run against configured paths regardless of location
-        if (loaderFileExtensions.has(extname(result.path))) {
-          return result;
+        if (loaderFileExtensions?.has(extname(args.path))) {
+          return null;
         }
 
-        // Mark paths from a node modules directory as external
-        if (/[\\/]node_modules[\\/]/.test(result.path)) {
-          return {
-            path: args.path,
-            external: true,
-          };
+        // Avoid considering Windows absolute paths as package paths
+        if (isAbsolute(args.path)) {
+          return null;
         }
 
-        // Otherwise return original result
-        return result;
+        // Consider the path a package and external
+        return {
+          path: args.path,
+          external: true,
+        };
       });
     },
   };
