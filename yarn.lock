@@ -1509,10 +1509,10 @@
   resolved "https://registry.yarnpkg.com/@bazel/buildifier/-/buildifier-6.3.3.tgz#ff21352ac9f72df6a53cc8ad9b862eb68918c1e9"
   integrity sha512-0f5eNWhylZQbiTddfVkIXKkugQadzZdonLw4ur58oK4X+gIHOZ42Xv94sepu8Di9UWKFXNc4zxuuTiWM22hGvw==
 
-"@bazel/buildifier@6.4.0":
-  version "6.4.0"
-  resolved "https://registry.yarnpkg.com/@bazel/buildifier/-/buildifier-6.4.0.tgz#5d5e56fa1ba74aa2e55e0e84bd17ead95e3f0c02"
-  integrity sha512-upvdCVlXYOatvank2Ch5lfNe9Msgny1Fozdz4fIm8diVju4Kd2JmA9DVS/Tg8UlFX/ItAL1PdSyefWK8Ashwdg==
+"@bazel/buildifier@7.1.0":
+  version "7.1.0"
+  resolved "https://registry.yarnpkg.com/@bazel/buildifier/-/buildifier-7.1.0.tgz#68e505647394da28350881a6a46eca10bba5fe42"
+  integrity sha512-FgjztMqd+6OMJzvgUHDWo/qdMxiRaIy8hWth6fA0RWvhnqds2019xWXVOdCjyDWYXqj/Wb5hKGblLS3lzD3ryQ==
 
 "@bazel/concatjs@5.8.1":
   version "5.8.1"
