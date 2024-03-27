@@ -44,7 +44,7 @@ export abstract class ArchitectCommandModule
           `One or more named builder configurations as a comma-separated ` +
           `list as specified in the "configurations" section in angular.json.\n` +
           `The builder uses the named configurations to run the given target.\n` +
-          `For more information, see https://angular.io/guide/workspace-config#alternate-build-configurations.`,
+          `For more information, see https://angular.dev/reference/configs/workspace-config#alternate-build-configurations.`,
         alias: 'c',
         type: 'string',
         // Show only in when using --help and auto completion because otherwise comma seperated configuration values will be invalid.
