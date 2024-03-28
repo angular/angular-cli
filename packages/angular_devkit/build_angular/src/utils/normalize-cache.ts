@@ -6,8 +6,10 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { join, resolve } from 'path';
-import { VERSION } from './package-version';
+import { join, resolve } from 'node:path';
+
+/** Version placeholder is replaced during the build process with actual package version */
+const VERSION = '0.0.0-PLACEHOLDER';
 
 export interface NormalizedCachedOptions {
   /** Whether disk cache is enabled. */
