@@ -130,8 +130,7 @@
     tslib "^2.3.0"
 
 "@angular/bazel@https://github.com/angular/bazel-builds.git#f0c522de0e15e2eac42bb0fa9525103bdc72bf4b":
-  version "18.0.0-next.1+sha-0461bff"
-  uid f0c522de0e15e2eac42bb0fa9525103bdc72bf4b
+  version "18.0.0-next.1"
   resolved "https://github.com/angular/bazel-builds.git#f0c522de0e15e2eac42bb0fa9525103bdc72bf4b"
   dependencies:
     "@microsoft/api-extractor" "^7.24.2"
@@ -148,7 +147,6 @@
 
 "@angular/build-tooling@https://github.com/angular/dev-infra-private-build-tooling-builds.git#b60378db662fba684feb5ed9aa1ec319d7c77354":
   version "0.0.0-8af6b55a8b31cd9e632823cf8f2dd1e89caa6f4f"
-  uid b60378db662fba684feb5ed9aa1ec319d7c77354
   resolved "https://github.com/angular/dev-infra-private-build-tooling-builds.git#b60378db662fba684feb5ed9aa1ec319d7c77354"
   dependencies:
     "@angular-devkit/build-angular" "17.3.0-rc.0"
@@ -316,7 +314,6 @@
 
 "@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#87b7674b7dfe7abeb565f555cd19a9760ee46c72":
   version "0.0.0-8af6b55a8b31cd9e632823cf8f2dd1e89caa6f4f"
-  uid "87b7674b7dfe7abeb565f555cd19a9760ee46c72"
   resolved "https://github.com/angular/dev-infra-private-ng-dev-builds.git#87b7674b7dfe7abeb565f555cd19a9760ee46c72"
   dependencies:
     "@yarnpkg/lockfile" "^1.1.0"
@@ -1509,10 +1506,10 @@
   resolved "https://registry.yarnpkg.com/@bazel/buildifier/-/buildifier-6.3.3.tgz#ff21352ac9f72df6a53cc8ad9b862eb68918c1e9"
   integrity sha512-0f5eNWhylZQbiTddfVkIXKkugQadzZdonLw4ur58oK4X+gIHOZ42Xv94sepu8Di9UWKFXNc4zxuuTiWM22hGvw==
 
-"@bazel/buildifier@6.4.0":
-  version "6.4.0"
-  resolved "https://registry.yarnpkg.com/@bazel/buildifier/-/buildifier-6.4.0.tgz#5d5e56fa1ba74aa2e55e0e84bd17ead95e3f0c02"
-  integrity sha512-upvdCVlXYOatvank2Ch5lfNe9Msgny1Fozdz4fIm8diVju4Kd2JmA9DVS/Tg8UlFX/ItAL1PdSyefWK8Ashwdg==
+"@bazel/buildifier@7.1.0":
+  version "7.1.0"
+  resolved "https://registry.yarnpkg.com/@bazel/buildifier/-/buildifier-7.1.0.tgz#68e505647394da28350881a6a46eca10bba5fe42"
+  integrity sha512-FgjztMqd+6OMJzvgUHDWo/qdMxiRaIy8hWth6fA0RWvhnqds2019xWXVOdCjyDWYXqj/Wb5hKGblLS3lzD3ryQ==
 
 "@bazel/concatjs@5.8.1":
   version "5.8.1"
@@ -12189,7 +12186,6 @@ sass@1.72.0, sass@^1.69.5:
 
 "sauce-connect-proxy@https://saucelabs.com/downloads/sc-4.9.1-linux.tar.gz":
   version "0.0.0"
-  uid "9310bc860f7870a1f872b11c4dc6073a1ad34e5e"
   resolved "https://saucelabs.com/downloads/sc-4.9.1-linux.tar.gz#9310bc860f7870a1f872b11c4dc6073a1ad34e5e"
 
 saucelabs@^1.5.0:
