@@ -18,8 +18,12 @@ import { useJSONBuildLogs } from '../../utils/environment-options';
 import { I18nOptions, createI18nOptions } from '../../utils/i18n-options';
 import { IndexHtmlTransform } from '../../utils/index-file/index-html-generator';
 import { normalizeCacheOptions } from '../../utils/normalize-cache';
-import { loadPostcssConfiguration } from '../../utils/postcss-configuration';
-import { findTailwindConfigurationFile } from '../../utils/tailwind';
+import {
+  SearchDirectory,
+  findTailwindConfiguration,
+  generateSearchDirectories,
+  loadPostcssConfiguration,
+} from '../../utils/postcss-configuration';
 import {
   Schema as ApplicationBuilderOptions,
   I18NTranslation,
@@ -182,11 +186,13 @@ export async function normalizeOptions(
     }
   }
 
-  const postcssConfiguration = await loadPostcssConfiguration(workspaceRoot, projectRoot);
+  // A configuration file can exist in the project or workspace root
+  const searchDirectories = await generateSearchDirectories([projectRoot, workspaceRoot]);
+  const postcssConfiguration = await loadPostcssConfiguration(searchDirectories);
   // Skip tailwind configuration if postcss is customized
   const tailwindConfiguration = postcssConfiguration
     ? undefined
-    : await getTailwindConfig(workspaceRoot, projectRoot, context);
+    : await getTailwindConfig(searchDirectories, workspaceRoot, context);
 
   const globalStyles = normalizeGlobalEntries(options.styles, 'styles');
   const globalScripts = normalizeGlobalEntries(options.scripts, 'scripts');
@@ -349,18 +355,18 @@ export async function normalizeOptions(
 }
 
 async function getTailwindConfig(
+  searchDirectories: SearchDirectory[],
   workspaceRoot: string,
-  projectRoot: string,
   context: BuilderContext,
 ): Promise<{ file: string; package: string } | undefined> {
-  const tailwindConfigurationPath = await findTailwindConfigurationFile(workspaceRoot, projectRoot);
+  const tailwindConfigurationPath = findTailwindConfiguration(searchDirectories);
 
   if (!tailwindConfigurationPath) {
     return undefined;
   }
 
-  // Create a node resolver at the project root as a directory
-  const resolver = createRequire(projectRoot + '/');
+  // Create a node resolver from the configuration file
+  const resolver = createRequire(tailwindConfigurationPath);
   try {
     return {
       file: tailwindConfigurationPath,

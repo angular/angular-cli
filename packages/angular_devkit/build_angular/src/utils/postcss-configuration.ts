@@ -18,13 +18,19 @@ interface RawPostcssConfiguration {
 }
 
 const postcssConfigurationFiles: string[] = ['postcss.config.json', '.postcssrc.json'];
+const tailwindConfigFiles: string[] = [
+  'tailwind.config.js',
+  'tailwind.config.cjs',
+  'tailwind.config.mjs',
+  'tailwind.config.ts',
+];
 
-interface SearchDirectory {
+export interface SearchDirectory {
   root: string;
   files: Set<string>;
 }
 
-async function generateSearchDirectories(roots: string[]): Promise<SearchDirectory[]> {
+export async function generateSearchDirectories(roots: string[]): Promise<SearchDirectory[]> {
   return await Promise.all(
     roots.map((root) =>
       readdir(root, { withFileTypes: true }).then((entries) => ({
@@ -50,6 +56,12 @@ function findFile(
   return undefined;
 }
 
+export function findTailwindConfiguration(
+  searchDirectories: SearchDirectory[],
+): string | undefined {
+  return findFile(searchDirectories, tailwindConfigFiles);
+}
+
 async function readPostcssConfiguration(
   configurationFile: string,
 ): Promise<RawPostcssConfiguration> {
@@ -60,12 +72,8 @@ async function readPostcssConfiguration(
 }
 
 export async function loadPostcssConfiguration(
-  workspaceRoot: string,
-  projectRoot: string,
+  searchDirectories: SearchDirectory[],
 ): Promise<PostcssConfiguration | undefined> {
-  // A configuration file can exist in the project or workspace root
-  const searchDirectories = await generateSearchDirectories([projectRoot, workspaceRoot]);
-
   const configPath = findFile(searchDirectories, postcssConfigurationFiles);
   if (!configPath) {
     return undefined;
