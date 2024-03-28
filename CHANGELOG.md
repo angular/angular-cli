@@ -1,3 +1,23 @@
+<a name="18.0.0-next.1"></a>
+
+# 18.0.0-next.1 (2024-03-28)
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                              |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------- |
+| [6530aa11b](https://github.com/angular/angular-cli/commit/6530aa11bed5ef67d611e8aed268bd20345cf0e6) | feat | replace `assets` with `public` directory |
+| [950a44521](https://github.com/angular/angular-cli/commit/950a44521fdfb82000f6564ccc4c87d4a2b94680) | fix  | rename SSR port env variable             |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                               |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------- |
+| [e22d6771d](https://github.com/angular/angular-cli/commit/e22d6771da9f289577410b66d3fd8763b12113b2) | fix  | ensure proper resolution of linked SCSS files             |
+| [c71e954a2](https://github.com/angular/angular-cli/commit/c71e954a25f0c6949b0dcebf3dfa01bd10a188b0) | fix  | service-worker references non-existent named index output |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="17.3.2"></a>
 
 # 17.3.2 (2024-03-25)
