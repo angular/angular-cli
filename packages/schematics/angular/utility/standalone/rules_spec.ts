@@ -93,12 +93,9 @@ describe('standalone utilities', () => {
 
       const content = readFile('app/app.config.ts');
 
-      assertContains(
-        content,
-        `import { ApplicationConfig, importProvidersFrom } from '@angular/core';`,
-      );
+      assertContains(content, `importProvidersFrom`);
       assertContains(content, `import { MyModule } from '@my/module';`);
-      assertContains(content, `providers: [importProvidersFrom(MyModule)]`);
+      assertContains(content, `importProvidersFrom(MyModule)`);
     });
 
     it('should add a root import to a standalone app whose app config does not have a providers array', async () => {
@@ -443,7 +440,10 @@ describe('standalone utilities', () => {
       const content = readFile('app/app.config.ts');
 
       assertContains(content, `import { provideModule } from '@my/module';`);
-      assertContains(content, `providers: [provideModule([])]`);
+      assertContains(
+        content,
+        `providers: [provideZoneChangeDetection({eventCoalescing:true}),provideModule([])]`,
+      );
     });
 
     it('should add a root provider to a standalone app when providers contain a trailing comma', async () => {
