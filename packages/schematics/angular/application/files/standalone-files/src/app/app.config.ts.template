@@ -1,8 +1,8 @@
-import { ApplicationConfig } from '@angular/core';<% if (routing) { %>
+import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';<% if (routing) { %>
 import { provideRouter } from '@angular/router';
 
 import { routes } from './app.routes';<% } %>
 
 export const appConfig: ApplicationConfig = {
-  providers: [<% if (routing) { %>provideRouter(routes)<% } %>]
+  providers: [provideZoneChangeDetection({eventCoalescing: true})<% if (routing) { %>, provideRouter(routes)<% } %>]
 };

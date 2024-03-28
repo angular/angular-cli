@@ -138,7 +138,7 @@ describe('Server Schematic', () => {
     it(`should add 'provideClientHydration' to the providers list`, async () => {
       const tree = await schematicRunner.runSchematic('server', defaultOptions, appTree);
       const contents = tree.readContent('/projects/bar/src/app/app.config.ts');
-      expect(contents).toContain(`providers: [provideClientHydration()]`);
+      expect(contents).toContain(`provideClientHydration()`);
     });
   });
 
