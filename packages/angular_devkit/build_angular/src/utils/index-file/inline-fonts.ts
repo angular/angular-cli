@@ -11,9 +11,7 @@ import { createHash } from 'node:crypto';
 import { readFile, rm, writeFile } from 'node:fs/promises';
 import * as https from 'node:https';
 import { join } from 'node:path';
-import { URL } from 'node:url';
 import { NormalizedCachedOptions } from '../normalize-cache';
-import { VERSION } from '../package-version';
 import { htmlRewritingStream } from './html-rewriting-stream';
 
 interface FontProviderDetails {
@@ -173,7 +171,7 @@ export class InlineFontsProcessor {
   private async getResponse(url: URL): Promise<string> {
     let cacheFile;
     if (this.cachePath) {
-      const key = createHash(CONTENT_HASH_ALGORITHM).update(`${VERSION}|${url}`).digest('hex');
+      const key = createHash(CONTENT_HASH_ALGORITHM).update(`${url}`).digest('hex');
       cacheFile = join(this.cachePath, key);
     }
 
