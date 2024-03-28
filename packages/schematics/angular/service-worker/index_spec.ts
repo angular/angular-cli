@@ -128,17 +128,19 @@ describe('Service Worker Schematic', () => {
     const tree = await schematicRunner.runSchematic('service-worker', defaultOptions, appTree);
     const content = tree.readContent('/projects/bar/src/app/app.config.ts');
     expect(tags.oneLine`${content}`).toContain(tags.oneLine`
-      providers: [provideServiceWorker('ngsw-worker.js', {
-        enabled: !isDevMode(),
-        registrationStrategy: 'registerWhenStable:30000'
-      })]
+        provideServiceWorker('ngsw-worker.js', {
+          enabled: !isDevMode(),
+          registrationStrategy: 'registerWhenStable:30000'
+        })  
     `);
   });
 
   it(`should import 'isDevMode' from '@angular/core'`, async () => {
     const tree = await schematicRunner.runSchematic('service-worker', defaultOptions, appTree);
     const content = tree.readContent('/projects/bar/src/app/app.config.ts');
-    expect(content).toContain(`import { ApplicationConfig, isDevMode } from '@angular/core';`);
+    expect(content).toContain(
+      `import { ApplicationConfig, provideZoneChangeDetection, isDevMode } from '@angular/core';`,
+    );
   });
 
   it(`should import 'provideServiceWorker' from '@angular/service-worker'`, async () => {
