@@ -78,7 +78,7 @@
     "@babel/preset-env": "7.24.3",
     "@babel/runtime": "7.24.1",
     "@bazel/bazelisk": "1.19.0",
-    "@bazel/buildifier": "6.4.0",
+    "@bazel/buildifier": "7.1.0",
     "@bazel/concatjs": "5.8.1",
     "@bazel/esbuild": "5.8.1",
     "@bazel/jasmine": "5.8.1",
