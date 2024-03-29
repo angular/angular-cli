@@ -3,11 +3,8 @@
 
 import { AppModule } from './app/app.module';
 
-<% if(!!viewEncapsulation) { %>
 platformBrowserDynamic().bootstrapModule(AppModule, {
-  defaultEncapsulation: ViewEncapsulation.<%= viewEncapsulation %>
+  ngZoneEventCoalescing: true<% if(!!viewEncapsulation) { %>,
+  defaultEncapsulation: ViewEncapsulation.<%= viewEncapsulation %><% } %>
 })
-  .catch(err => console.error(err));<% } else { %>
-platformBrowserDynamic().bootstrapModule(AppModule)
   .catch(err => console.error(err));
-<% } %>
