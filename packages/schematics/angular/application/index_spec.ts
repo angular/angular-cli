@@ -545,7 +545,7 @@ describe('Application Schematic', () => {
 
     const tree = await schematicRunner.runSchematic('application', options, workspaceTree);
     const appConfig = tree.readContent('/projects/foo/src/app/app.config.ts');
-    expect(appConfig).toContain('provideZoneChangeDetection({eventCoalescing: true})');
+    expect(appConfig).toContain('provideZoneChangeDetection({ eventCoalescing: true })');
   });
 
   it('should create a standalone component', async () => {

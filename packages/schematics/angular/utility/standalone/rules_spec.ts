@@ -442,7 +442,7 @@ describe('standalone utilities', () => {
       assertContains(content, `import { provideModule } from '@my/module';`);
       assertContains(
         content,
-        `providers: [provideZoneChangeDetection({eventCoalescing:true}),provideModule([])]`,
+        `providers: [provideZoneChangeDetection({ eventCoalescing:true }),provideModule([])]`,
       );
     });
 
