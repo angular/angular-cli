@@ -118,7 +118,7 @@
     "@web/test-runner": "^0.18.0",
     "@yarnpkg/lockfile": "1.1.0",
     "ajv": "8.12.0",
-    "ajv-formats": "2.1.1",
+    "ajv-formats": "3.0.1",
     "ansi-colors": "4.1.3",
     "autoprefixer": "10.4.19",
     "babel-loader": "9.1.3",
