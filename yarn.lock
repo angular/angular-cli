@@ -129,10 +129,10 @@
   dependencies:
     tslib "^2.3.0"
 
-"@angular/bazel@https://github.com/angular/bazel-builds.git#3bf93e3a10c968e4c112e8f40b240fd107c82409":
-  version "18.0.0-next.2+sha-22dd52f"
-  uid "3bf93e3a10c968e4c112e8f40b240fd107c82409"
-  resolved "https://github.com/angular/bazel-builds.git#3bf93e3a10c968e4c112e8f40b240fd107c82409"
+"@angular/bazel@https://github.com/angular/bazel-builds.git#2117485242aa8e10e39cd130287298521814110a":
+  version "18.0.0-next.2+sha-87f3f27"
+  uid "2117485242aa8e10e39cd130287298521814110a"
+  resolved "https://github.com/angular/bazel-builds.git#2117485242aa8e10e39cd130287298521814110a"
   dependencies:
     "@microsoft/api-extractor" "^7.24.2"
     magic-string "^0.30.0"
@@ -192,10 +192,10 @@
     uuid "^9.0.0"
     yargs "^17.0.0"
 
-"@angular/cdk@18.0.0-next.1":
-  version "18.0.0-next.1"
-  resolved "https://registry.yarnpkg.com/@angular/cdk/-/cdk-18.0.0-next.1.tgz#089950a633f97bc091c27dddbf03101b5302a861"
-  integrity sha512-B9KvXGTu9jWjGV8ueqYnO06jHjqAc7oQNb8lwzH3ev8eJ7rgWsippc51MygNTVt5G/PeEYZl1gf8Gn7l8rfa5A==
+"@angular/cdk@18.0.0-next.2":
+  version "18.0.0-next.2"
+  resolved "https://registry.yarnpkg.com/@angular/cdk/-/cdk-18.0.0-next.2.tgz#d10096e84c8616f2683d757bf99b0200db29ef68"
+  integrity sha512-5bqvRry9EXoAGrOdIN9OQ+721B0h6pB9ctvYwiL0DiGKkWnruI9x2ED38xkSjmio6DkgeE2hrMoyFOQ2xEkJfg==
   dependencies:
     tslib "^2.3.0"
   optionalDependencies:
@@ -260,10 +260,10 @@
     fast-glob "3.3.2"
     yargs "^17.2.1"
 
-"@angular/material@18.0.0-next.1":
-  version "18.0.0-next.1"
-  resolved "https://registry.yarnpkg.com/@angular/material/-/material-18.0.0-next.1.tgz#b6561539ac5c5a7ac6358d91dcfd1726bc2ad8dc"
-  integrity sha512-tdr1+Y9d9cV1JNvfOFmaElWaO7l7lc7TjU0hZLlYjwsgPwXOONhm2qEcRzumatkuGqI4IBM/v9KJaCzOwFfu/Q==
+"@angular/material@18.0.0-next.2":
+  version "18.0.0-next.2"
+  resolved "https://registry.yarnpkg.com/@angular/material/-/material-18.0.0-next.2.tgz#3da9a85172ca4d8017c514979771555d3bbb558a"
+  integrity sha512-6KE2V9nROD6IYtfz+v0JiqdSOlxrb8ZvgU7jqzGGvouQ5gPwIewLRjOK3O5GklerughgLXv+QIwpANjd3xQ4iA==
   dependencies:
     "@material/animation" "15.0.0-canary.7f224ddd4.0"
     "@material/auto-init" "15.0.0-canary.7f224ddd4.0"
