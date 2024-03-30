@@ -130,8 +130,7 @@
     tslib "^2.3.0"
 
 "@angular/bazel@https://github.com/angular/bazel-builds.git#2117485242aa8e10e39cd130287298521814110a":
-  version "18.0.0-next.2+sha-87f3f27"
-  uid "2117485242aa8e10e39cd130287298521814110a"
+  version "18.0.0-next.2"
   resolved "https://github.com/angular/bazel-builds.git#2117485242aa8e10e39cd130287298521814110a"
   dependencies:
     "@microsoft/api-extractor" "^7.24.2"
@@ -148,7 +147,6 @@
 
 "@angular/build-tooling@https://github.com/angular/dev-infra-private-build-tooling-builds.git#9831b1aa2e40b8fdf1ebd44650797b5fd4ba08c3":
   version "0.0.0-4b433074a806bbbd4d319264430740cd46e62f27"
-  uid "9831b1aa2e40b8fdf1ebd44650797b5fd4ba08c3"
   resolved "https://github.com/angular/dev-infra-private-build-tooling-builds.git#9831b1aa2e40b8fdf1ebd44650797b5fd4ba08c3"
   dependencies:
     "@angular-devkit/build-angular" "17.3.0-rc.0"
@@ -316,7 +314,6 @@
 
 "@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#a8690b0870728efc1aea5eb6644e605e7d37eabc":
   version "0.0.0-4b433074a806bbbd4d319264430740cd46e62f27"
-  uid a8690b0870728efc1aea5eb6644e605e7d37eabc
   resolved "https://github.com/angular/dev-infra-private-ng-dev-builds.git#a8690b0870728efc1aea5eb6644e605e7d37eabc"
   dependencies:
     "@yarnpkg/lockfile" "^1.1.0"
@@ -1509,10 +1506,10 @@
   resolved "https://registry.yarnpkg.com/@bazel/buildifier/-/buildifier-6.3.3.tgz#ff21352ac9f72df6a53cc8ad9b862eb68918c1e9"
   integrity sha512-0f5eNWhylZQbiTddfVkIXKkugQadzZdonLw4ur58oK4X+gIHOZ42Xv94sepu8Di9UWKFXNc4zxuuTiWM22hGvw==
 
-"@bazel/buildifier@7.1.0":
-  version "7.1.0"
-  resolved "https://registry.yarnpkg.com/@bazel/buildifier/-/buildifier-7.1.0.tgz#68e505647394da28350881a6a46eca10bba5fe42"
-  integrity sha512-FgjztMqd+6OMJzvgUHDWo/qdMxiRaIy8hWth6fA0RWvhnqds2019xWXVOdCjyDWYXqj/Wb5hKGblLS3lzD3ryQ==
+"@bazel/buildifier@6.4.0":
+  version "6.4.0"
+  resolved "https://registry.yarnpkg.com/@bazel/buildifier/-/buildifier-6.4.0.tgz#5d5e56fa1ba74aa2e55e0e84bd17ead95e3f0c02"
+  integrity sha512-upvdCVlXYOatvank2Ch5lfNe9Msgny1Fozdz4fIm8diVju4Kd2JmA9DVS/Tg8UlFX/ItAL1PdSyefWK8Ashwdg==
 
 "@bazel/concatjs@5.8.1":
   version "5.8.1"
