@@ -1,3 +1,15 @@
+<a name="17.3.3"></a>
+
+# 17.3.3 (2024-04-02)
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                                     |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------------- |
+| [a673baf5c](https://github.com/angular/angular-cli/commit/a673baf5ce385415ded23641a2dc5cdcae8f3f5c) | fix  | Revert "fix(@schematics/angular): rename SSR port env variable" |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="17.3.2"></a>
 
 # 17.3.2 (2024-03-25)
