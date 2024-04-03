@@ -1,3 +1,17 @@
+<a name="18.0.0-next.2"></a>
+
+# 18.0.0-next.2 (2024-04-03)
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                                    |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------- |
+| [725883713](https://github.com/angular/angular-cli/commit/72588371385bebeea1003dff4d1d0a2ca9854321) | feat | use eventCoalescing option by default (standalone bootstrap)   |
+| [508d97da7](https://github.com/angular/angular-cli/commit/508d97da76b5359bc8029888ff0e9cfc59a6139c) | feat | use ngZoneEventCoalescing option by default (module bootstrap) |
+| [157329384](https://github.com/angular/angular-cli/commit/157329384809d723c428a043712a331493826748) | fix  | add spaces around eventCoalescing option                       |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="17.3.3"></a>
 
 # 17.3.3 (2024-04-02)
