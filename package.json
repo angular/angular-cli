@@ -202,7 +202,7 @@
     "tree-kill": "1.2.2",
     "ts-node": "^10.9.1",
     "tslib": "2.6.2",
-    "typescript": "5.4.3",
+    "typescript": "5.4.4",
     "undici": "6.11.1",
     "verdaccio": "5.30.2",
     "verdaccio-auth-memory": "^10.0.0",
