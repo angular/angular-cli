@@ -29,7 +29,7 @@
     "browserslist": "^4.21.5",
     "copy-webpack-plugin": "11.0.0",
     "critters": "0.0.22",
-    "css-loader": "6.11.0",
+    "css-loader": "7.0.0",
     "esbuild-wasm": "0.20.2",
     "fast-glob": "3.3.2",
     "https-proxy-agent": "7.0.4",
