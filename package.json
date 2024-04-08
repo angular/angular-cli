@@ -204,7 +204,7 @@
     "typescript": "5.1.6",
     "verdaccio": "5.26.1",
     "verdaccio-auth-memory": "^10.0.0",
-    "vite": "4.5.1",
+    "vite": "4.5.3",
     "webpack": "5.88.2",
     "webpack-dev-middleware": "6.1.2",
     "webpack-dev-server": "4.15.1",
