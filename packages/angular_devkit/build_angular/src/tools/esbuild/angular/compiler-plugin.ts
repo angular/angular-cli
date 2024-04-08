@@ -463,18 +463,18 @@ function createCompilerOptionsTransformer(
 ): Parameters<AngularCompilation['initialize']>[2] {
   return (compilerOptions) => {
     // target of 9 is ES2022 (using the number avoids an expensive import of typescript just for an enum)
-    if (compilerOptions.target === undefined || compilerOptions.target < 9) {
+    if (compilerOptions.target === undefined || compilerOptions.target < 9 /** ES2022 */) {
       // If 'useDefineForClassFields' is already defined in the users project leave the value as is.
       // Otherwise fallback to false due to https://github.com/microsoft/TypeScript/issues/45995
       // which breaks the deprecated `@Effects` NGRX decorator and potentially other existing code as well.
-      compilerOptions.target = 9;
+      compilerOptions.target = 9 /** ES2022 */;
       compilerOptions.useDefineForClassFields ??= false;
 
       // Only add the warning on the initial build
       setupWarnings?.push({
         text:
-          'TypeScript compiler options "target" and "useDefineForClassFields" are set to "ES2022" and ' +
-          '"false" respectively by the Angular CLI.',
+          `TypeScript compiler options 'target' and 'useDefineForClassFields' are set to 'ES2022' and ` +
+          `'false' respectively by the Angular CLI.`,
         location: { file: pluginOptions.tsconfig },
         notes: [
           {
@@ -505,6 +505,15 @@ function createCompilerOptionsTransformer(
       );
     } else {
       compilerOptions.incremental = false;
+    }
+
+    if (compilerOptions.module === undefined || compilerOptions.module < 5 /** ES2015 */) {
+      compilerOptions.module = 7; /** ES2022 */
+      setupWarnings?.push({
+        text: `TypeScript compiler options 'module' values 'CommonJS', 'UMD', 'System' and 'AMD' are not supported.`,
+        location: null,
+        notes: [{ text: `The 'module' option will be set to 'ES2022' instead.` }],
+      });
     }
 
     return {
