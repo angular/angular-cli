@@ -16,7 +16,6 @@ export type CommandNames =
   | 'completion'
   | 'config'
   | 'deploy'
-  | 'doc'
   | 'e2e'
   | 'extract-i18n'
   | 'generate'
@@ -60,10 +59,7 @@ export const RootCommands: Record<
   'deploy': {
     factory: () => import('./deploy/cli'),
   },
-  'doc': {
-    factory: () => import('./doc/cli'),
-    aliases: ['d'],
-  },
+
   'e2e': {
     factory: () => import('./e2e/cli'),
     aliases: ['e'],

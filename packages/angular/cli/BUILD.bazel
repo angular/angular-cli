@@ -68,7 +68,6 @@ ts_library(
         "@npm//ini",
         "@npm//jsonc-parser",
         "@npm//npm-package-arg",
-        "@npm//open",
         "@npm//ora",
         "@npm//pacote",
         "@npm//semver",
