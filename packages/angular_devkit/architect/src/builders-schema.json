@@ -11,7 +11,15 @@
     "builders": {
       "type": "object",
       "additionalProperties": {
-        "$ref": "#/definitions/builder"
+        "oneOf": [
+          {
+            "$ref": "#/definitions/builder"
+          },
+          {
+            "type": "string",
+            "minLength": 1
+          }
+        ]
       }
     }
   },

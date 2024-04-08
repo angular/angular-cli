@@ -7,13 +7,18 @@
  */
 
 import { json, workspaces } from '@angular-devkit/core';
-import * as path from 'path';
-import { URL, pathToFileURL } from 'url';
-import { deserialize, serialize } from 'v8';
+import { readFileSync } from 'node:fs';
+import { createRequire } from 'node:module';
+import * as path from 'node:path';
+import { pathToFileURL } from 'node:url';
+import { deserialize, serialize } from 'node:v8';
 import { BuilderInfo } from '../src';
 import { Schema as BuilderSchema } from '../src/builders-schema';
 import { Target } from '../src/input-schema';
 import { ArchitectHost, Builder, BuilderSymbol } from '../src/internal';
+
+// TODO_ESM: Update to use import.meta.url
+const localRequire = createRequire(__filename);
 
 export type NodeModulesBuilderInfo = BuilderInfo & {
   import: string;
@@ -121,41 +126,83 @@ export class WorkspaceNodeModulesArchitectHost implements ArchitectHost<NodeModu
    * @param builderStr The name of the builder to be used.
    * @returns All the info needed for the builder itself.
    */
-  resolveBuilder(builderStr: string): Promise<NodeModulesBuilderInfo> {
+  resolveBuilder(builderStr: string, seenBuilders?: Set<string>): Promise<NodeModulesBuilderInfo> {
+    if (seenBuilders?.has(builderStr)) {
+      throw new Error(
+        'Circular builder alias references detected: ' + [...seenBuilders, builderStr],
+      );
+    }
+
     const [packageName, builderName] = builderStr.split(':', 2);
     if (!builderName) {
       throw new Error('No builder name specified.');
     }
 
-    const packageJsonPath = require.resolve(packageName + '/package.json', {
+    // Resolve and load the builders manifest from the package's `builders` field, if present
+    const packageJsonPath = localRequire.resolve(packageName + '/package.json', {
       paths: [this._root],
     });
 
-    const packageJson = require(packageJsonPath);
-    if (!packageJson['builders']) {
+    const packageJson = JSON.parse(readFileSync(packageJsonPath, 'utf-8')) as { builders?: string };
+    const buildersManifestRawPath = packageJson['builders'];
+    if (!buildersManifestRawPath) {
       throw new Error(`Package ${JSON.stringify(packageName)} has no builders defined.`);
     }
 
-    const builderJsonPath = path.resolve(path.dirname(packageJsonPath), packageJson['builders']);
-    const builderJson = require(builderJsonPath) as BuilderSchema;
+    let buildersManifestPath = path.normalize(buildersManifestRawPath);
+    if (path.isAbsolute(buildersManifestRawPath) || buildersManifestRawPath.startsWith('..')) {
+      throw new Error(
+        `Package "${packageName}" has an invalid builders manifest path: "${buildersManifestRawPath}"`,
+      );
+    }
 
-    const builder = builderJson.builders && builderJson.builders[builderName];
+    buildersManifestPath = path.join(path.dirname(packageJsonPath), buildersManifestPath);
+    const buildersManifest = JSON.parse(
+      readFileSync(buildersManifestPath, 'utf-8'),
+    ) as BuilderSchema;
+    const buildersManifestDirectory = path.dirname(buildersManifestPath);
 
+    // Attempt to locate an entry for the specified builder by name
+    const builder = buildersManifest.builders?.[builderName];
     if (!builder) {
       throw new Error(`Cannot find builder ${JSON.stringify(builderStr)}.`);
     }
 
-    const importPath = builder.implementation;
-    if (!importPath) {
+    // Resolve alias reference if entry is a string
+    if (typeof builder === 'string') {
+      return this.resolveBuilder(builder, (seenBuilders ?? new Set()).add(builderStr));
+    }
+
+    // Determine builder implementation path (relative within package only)
+    const implementationPath = builder.implementation && path.normalize(builder.implementation);
+    if (!implementationPath) {
       throw new Error('Could not find the implementation for builder ' + builderStr);
     }
+    if (path.isAbsolute(implementationPath) || implementationPath.startsWith('..')) {
+      throw new Error(
+        `Package "${packageName}" has an invalid builder implementation path: "${builderName}" --> "${builder.implementation}"`,
+      );
+    }
+
+    // Determine builder option schema path (relative within package only)
+    const schemaPath = builder.schema && path.normalize(builder.schema);
+    if (!schemaPath) {
+      throw new Error('Could not find the schema for builder ' + builderStr);
+    }
+    if (path.isAbsolute(schemaPath) || schemaPath.startsWith('..')) {
+      throw new Error(
+        `Package "${packageName}" has an invalid builder implementation path: "${builderName}" --> "${builder.schema}"`,
+      );
+    }
+
+    const schemaText = readFileSync(path.join(buildersManifestDirectory, schemaPath), 'utf-8');
 
     return Promise.resolve({
       name: builderStr,
       builderName,
       description: builder['description'],
-      optionSchema: require(path.resolve(path.dirname(builderJsonPath), builder.schema)),
-      import: path.resolve(path.dirname(builderJsonPath), importPath),
+      optionSchema: JSON.parse(schemaText) as json.schema.JsonSchema,
+      import: path.join(buildersManifestDirectory, implementationPath),
     });
   }
 
@@ -248,12 +295,12 @@ async function getBuilder(builderPath: string): Promise<any> {
       // changed to a direct dynamic import.
       return (await loadEsmModule<{ default: unknown }>(pathToFileURL(builderPath))).default;
     case '.cjs':
-      return require(builderPath);
+      return localRequire(builderPath);
     default:
       // The file could be either CommonJS or ESM.
       // CommonJS is tried first then ESM if loading fails.
       try {
-        return require(builderPath);
+        return localRequire(builderPath);
       } catch (e) {
         if ((e as NodeJS.ErrnoException).code === 'ERR_REQUIRE_ESM') {
           // Load the ESM configuration file using the TypeScript dynamic import workaround.
