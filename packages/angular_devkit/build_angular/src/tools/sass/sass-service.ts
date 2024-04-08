@@ -12,6 +12,7 @@ import { MessageChannel, Worker } from 'node:worker_threads';
 import {
   CanonicalizeContext,
   CompileResult,
+  Deprecation,
   Exception,
   FileImporter,
   Importer,
@@ -53,6 +54,31 @@ type Importers =
   | FileImporter<'async'>
   | NodePackageImporter;
 
+export interface SerializableVersion {
+  major: number;
+  minor: number;
+  patch: number;
+}
+
+export interface SerializableDeprecation extends Omit<Deprecation, 'obsoleteIn' | 'deprecatedIn'> {
+  /** The version this deprecation first became active in. */
+  deprecatedIn: SerializableVersion | null;
+  /** The version this deprecation became obsolete in. */
+  obsoleteIn: SerializableVersion | null;
+}
+
+export type SerializableWarningMessage = (
+  | {
+      deprecation: true;
+      deprecationType: SerializableDeprecation;
+    }
+  | { deprecation: false }
+) & {
+  message: string;
+  span?: Omit<SourceSpan, 'url'> & { url?: string };
+  stack?: string;
+};
+
 /**
  * A response from the Sass render Worker containing the result of the operation.
  */
@@ -60,12 +86,7 @@ interface RenderResponseMessage {
   id: number;
   error?: Exception;
   result?: Omit<CompileResult, 'loadedUrls'> & { loadedUrls: string[] };
-  warnings?: {
-    message: string;
-    deprecation: boolean;
-    stack?: string;
-    span?: Omit<SourceSpan, 'url'> & { url?: string };
-  }[];
+  warnings?: SerializableWarningMessage[];
 }
 
 /**
