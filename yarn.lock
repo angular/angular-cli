@@ -130,8 +130,7 @@
     tslib "^2.3.0"
 
 "@angular/bazel@https://github.com/angular/bazel-builds.git#41e7aa5241ab1f15340eaecaa365cb111b74af50":
-  version "18.0.0-next.3+sha-a84cb62"
-  uid "41e7aa5241ab1f15340eaecaa365cb111b74af50"
+  version "18.0.0-next.3"
   resolved "https://github.com/angular/bazel-builds.git#41e7aa5241ab1f15340eaecaa365cb111b74af50"
   dependencies:
     "@microsoft/api-extractor" "^7.24.2"
@@ -148,7 +147,6 @@
 
 "@angular/build-tooling@https://github.com/angular/dev-infra-private-build-tooling-builds.git#eb9ed9f3fad9f3829e29fb1b4be5dc6a5a41e68b":
   version "0.0.0-86c4e22089a8e19ccf02ba52d2e93a744d62ac03"
-  uid eb9ed9f3fad9f3829e29fb1b4be5dc6a5a41e68b
   resolved "https://github.com/angular/dev-infra-private-build-tooling-builds.git#eb9ed9f3fad9f3829e29fb1b4be5dc6a5a41e68b"
   dependencies:
     "@angular-devkit/build-angular" "17.3.3"
@@ -314,10 +312,9 @@
     "@material/typography" "15.0.0-canary.7f224ddd4.0"
     tslib "^2.3.0"
 
-"@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#8a6d5db9df6a201f317e9ccfb41a7ebd54197419":
-  version "0.0.0-86c4e22089a8e19ccf02ba52d2e93a744d62ac03"
-  uid "8a6d5db9df6a201f317e9ccfb41a7ebd54197419"
-  resolved "https://github.com/angular/dev-infra-private-ng-dev-builds.git#8a6d5db9df6a201f317e9ccfb41a7ebd54197419"
+"@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#659ec125dd4253015d6a4a4665835e4e7d5c65a6":
+  version "0.0.0-4a904a92b839e4529f3d768df02148398a5fcdb6"
+  resolved "https://github.com/angular/dev-infra-private-ng-dev-builds.git#659ec125dd4253015d6a4a4665835e4e7d5c65a6"
   dependencies:
     "@yarnpkg/lockfile" "^1.1.0"
     typescript "~4.9.0"
@@ -9915,6 +9912,13 @@ magic-string@0.30.8, magic-string@^0.30.0, magic-string@^0.30.3:
   dependencies:
     "@jridgewell/sourcemap-codec" "^1.4.15"
 
+magic-string@0.30.9:
+  version "0.30.9"
+  resolved "https://registry.yarnpkg.com/magic-string/-/magic-string-0.30.9.tgz#8927ae21bfdd856310e07a1bc8dd5e73cb6c251d"
+  integrity sha512-S1+hd+dIrC8EZqKyT9DstTH/0Z+f76kmmvZnkfQVmOpDEF9iVgdYif3Q/pIWHmCoo59bQVGW0kVL3e2nl+9+Sw==
+  dependencies:
+    "@jridgewell/sourcemap-codec" "^1.4.15"
+
 make-dir@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/make-dir/-/make-dir-2.1.0.tgz#5f0310e18b8be898cc07009295a30ae41e91e6f5"
@@ -12343,7 +12347,16 @@ sass@1.71.1:
     immutable "^4.0.0"
     source-map-js ">=0.6.2 <2.0.0"
 
-sass@1.72.0, sass@^1.69.5:
+sass@1.74.1:
+  version "1.74.1"
+  resolved "https://registry.yarnpkg.com/sass/-/sass-1.74.1.tgz#686fc227d3707dd25cb2925e1db8e4562be29319"
+  integrity sha512-w0Z9p/rWZWelb88ISOLyvqTWGmtmu2QJICqDBGyNnfG4OUnPX9BBjjYIXUpXCMOOg5MQWNpqzt876la1fsTvUA==
+  dependencies:
+    chokidar ">=3.0.0 <4.0.0"
+    immutable "^4.0.0"
+    source-map-js ">=0.6.2 <2.0.0"
+
+sass@^1.69.5:
   version "1.72.0"
   resolved "https://registry.yarnpkg.com/sass/-/sass-1.72.0.tgz#5b9978943fcfb32b25a6a5acb102fc9dabbbf41c"
   integrity sha512-Gpczt3WA56Ly0Mn8Sl21Vj94s1axi9hDIzDFn9Ph9x3C3p4nNyvsqJoQyVXKou6cBlfFWEgRW4rT8Tb4i3XnVA==
@@ -12354,7 +12367,6 @@ sass@1.72.0, sass@^1.69.5:
 
 "sauce-connect-proxy@https://saucelabs.com/downloads/sc-4.9.1-linux.tar.gz":
   version "0.0.0"
-  uid "9310bc860f7870a1f872b11c4dc6073a1ad34e5e"
   resolved "https://saucelabs.com/downloads/sc-4.9.1-linux.tar.gz#9310bc860f7870a1f872b11c4dc6073a1ad34e5e"
 
 saucelabs@^1.5.0:
@@ -13876,10 +13888,10 @@ verdaccio-htpasswd@12.0.0-next-7.13:
     http-errors "2.0.0"
     unix-crypt-td-js "1.1.4"
 
-verdaccio@5.30.2:
-  version "5.30.2"
-  resolved "https://registry.yarnpkg.com/verdaccio/-/verdaccio-5.30.2.tgz#14f574e5613708fee3a52cbb2338132f56650aec"
-  integrity sha512-Mm1+Mtxo7Pu4WU/VUB9eP0PgNQpRoNxlvtzwT/uAWIx94idZoR3xRDxmqH4B++E3mCB1IO31in7Wr/z6U/tmCQ==
+verdaccio@5.30.3:
+  version "5.30.3"
+  resolved "https://registry.yarnpkg.com/verdaccio/-/verdaccio-5.30.3.tgz#d36ca91f3ad741dbeba57e28426c7fd23d663f95"
+  integrity sha512-s/ZhSRBusW2o+ZkERyzEIbVL3zo8QLpTQPVoB/pn/Yv6+ngflP+anK4xCYiXXQJhqEdBz3cwApa8UgOEaNSS4Q==
   dependencies:
     "@cypress/request" "3.0.1"
     "@verdaccio/config" "7.0.0-next-7.13"

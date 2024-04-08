@@ -11,6 +11,7 @@ import { dirname } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { MessagePort, parentPort, receiveMessageOnPort, workerData } from 'node:worker_threads';
 import {
+  Deprecation,
   Exception,
   FileImporter,
   SourceSpan,
@@ -24,6 +25,7 @@ import {
   RelativeUrlRebasingImporter,
   sassBindWorkaround,
 } from './rebasing-importer';
+import type { SerializableDeprecation, SerializableWarningMessage } from './sass-service';
 
 /**
  * A request to render a Sass stylesheet using the supplied options.
@@ -73,14 +75,7 @@ parentPort.on('message', (message: RenderRequestMessage) => {
 
   const { id, hasImporter, hasLogger, source, options, rebase } = message;
   const entryDirectory = dirname(options.url);
-  let warnings:
-    | {
-        message: string;
-        deprecation: boolean;
-        stack?: string;
-        span?: Omit<SourceSpan, 'url'> & { url?: string };
-      }[]
-    | undefined;
+  let warnings: SerializableWarningMessage[] | undefined;
   try {
     const directoryCache = new Map<string, DirectoryEntry>();
     const rebaseSourceMaps = options.sourceMap ? new Map<string, RawSourceMap>() : undefined;
@@ -153,13 +148,17 @@ parentPort.on('message', (message: RenderRequestMessage) => {
       importer: relativeImporter,
       logger: hasLogger
         ? {
-            warn(message, { deprecation, span, stack }) {
+            warn(message, warnOptions) {
               warnings ??= [];
               warnings.push({
+                ...warnOptions,
                 message,
-                deprecation,
-                stack,
-                span: span && convertSourceSpan(span),
+                span: warnOptions.span && convertSourceSpan(warnOptions.span),
+                ...convertDeprecation(
+                  warnOptions.deprecation,
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  (warnOptions as any).deprecationType,
+                ),
               });
             },
           }
@@ -238,5 +237,37 @@ function convertSourceSpan(span: SourceSpan): Omit<SourceSpan, 'url'> & { url?: 
       line: span.start.line,
     },
     url: span.url ? fileURLToPath(span.url) : undefined,
+  };
+}
+
+function convertDeprecation(
+  deprecation: boolean,
+  deprecationType: Deprecation | undefined,
+): { deprecation: false } | { deprecation: true; deprecationType: SerializableDeprecation } {
+  if (!deprecation || !deprecationType) {
+    return { deprecation: false };
+  }
+
+  const { obsoleteIn, deprecatedIn, ...rest } = deprecationType;
+
+  return {
+    deprecation: true,
+    deprecationType: {
+      ...rest,
+      obsoleteIn: obsoleteIn
+        ? {
+            major: obsoleteIn.major,
+            minor: obsoleteIn.minor,
+            patch: obsoleteIn.patch,
+          }
+        : null,
+      deprecatedIn: deprecatedIn
+        ? {
+            major: deprecatedIn.major,
+            minor: deprecatedIn.minor,
+            patch: deprecatedIn.patch,
+          }
+        : null,
+    },
   };
 }
