@@ -4,7 +4,7 @@ discover and use CLI commands without lots of memorization.
 
 ![A demo of Angular CLI autocompletion in a terminal. The user types several partial `ng` commands,
 using autocompletion to finish several arguments and list contextual options.
-](generated/images/guide/cli/completion.gif)
+](assets/images/guide/cli/completion.gif)
 
 ## Automated setup
 
