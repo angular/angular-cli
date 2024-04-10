@@ -109,13 +109,13 @@ export class ExecutionResult {
     this.externalMetadata = { implicitBrowser, implicitServer, explicit: explicit ?? [] };
   }
 
-  get output() {
-    return {
-      success: this.errors.length === 0,
-    };
-  }
-
-  get outputWithFiles() {
+  get outputWithFiles(): Readonly<{
+    success: boolean;
+    outputFiles: Readonly<BuildOutputFile[]>;
+    assetFiles: Readonly<BuildOutputAsset[]>;
+    errors: Readonly<(Message | PartialMessage)[]>;
+    externalMetadata: Readonly<ExternalResultMetadata> | undefined;
+  }> {
     return {
       success: this.errors.length === 0,
       outputFiles: this.outputFiles,

@@ -272,7 +272,7 @@ export async function writeResultFiles(
 
 const MAX_CONCURRENT_WRITES = 64;
 export async function emitFilesToDisk<T = BuildOutputAsset | BuildOutputFile>(
-  files: T[],
+  files: Readonly<T[]>,
   writeFileCallback: (file: T) => Promise<void>,
 ): Promise<void> {
   // Write files in groups of MAX_CONCURRENT_WRITES to avoid too many open files

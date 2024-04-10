@@ -8,12 +8,12 @@
 
 import { BuilderContext, BuilderOutput, createBuilder } from '@angular-devkit/architect';
 import type { Plugin } from 'esbuild';
-import { BuildOutputFile, BuildOutputFileType } from '../../tools/esbuild/bundler-context';
+import { BuildOutputFileType } from '../../tools/esbuild/bundler-context';
 import { createJsonBuildManifest } from '../../tools/esbuild/utils';
 import { colors as ansiColors } from '../../utils/color';
 import { purgeStaleBuildCache } from '../../utils/purge-cache';
 import { assertCompatibleAngularVersion } from '../../utils/version';
-import { runEsBuildBuildAction } from './build-action';
+import { BuildActionOutput, runEsBuildBuildAction } from './build-action';
 import { executeBuild } from './execute-build';
 import {
   ApplicationBuilderExtensions,
@@ -23,6 +23,8 @@ import {
 import { Schema as ApplicationBuilderOptions } from './schema';
 
 export { ApplicationBuilderOptions };
+
+export type ApplicationBuilderOutput = BuildActionOutput;
 
 export async function* buildApplicationInternal(
   options: ApplicationBuilderInternalOptions,
@@ -44,9 +46,7 @@ export async function* buildApplicationInternal(
   // Determine project name from builder context target
   const projectName = target?.project;
   if (!projectName) {
-    yield { success: false, error: `The 'application' builder requires a target to be specified.` };
-
-    return;
+    throw new Error(`The 'application' builder requires a target to be specified.`);
   }
 
   const normalizedOptions = await normalizeOptions(context, projectName, options, extensions);
@@ -57,21 +57,15 @@ export async function* buildApplicationInternal(
   if (writeServerBundles) {
     const { browser, server } = normalizedOptions.outputOptions;
     if (browser === '') {
-      yield {
-        success: false,
-        error: `'outputPath.browser' cannot be configured to an empty string when SSR is enabled.`,
-      };
-
-      return;
+      throw new Error(
+        `'outputPath.browser' cannot be configured to an empty string when SSR is enabled.`,
+      );
     }
 
     if (browser === server) {
-      yield {
-        success: false,
-        error: `'outputPath.browser' and 'outputPath.server' cannot be configured to the same value.`,
-      };
-
-      return;
+      throw new Error(
+        `'outputPath.browser' and 'outputPath.server' cannot be configured to the same value.`,
+      );
     }
   }
 
@@ -140,11 +134,6 @@ export async function* buildApplicationInternal(
   );
 }
 
-export interface ApplicationBuilderOutput extends BuilderOutput {
-  outputFiles?: BuildOutputFile[];
-  assetFiles?: { source: string; destination: string }[];
-}
-
 /**
  * Builds an application using the `application` builder with the provided
  * options.
@@ -202,4 +191,19 @@ export function buildApplication(
   return buildApplicationInternal(options, context, undefined, extensions);
 }
 
-export default createBuilder(buildApplication);
+export default createBuilder(async function* (options, context) {
+  for await (const result of buildApplication(options, context)) {
+    // The builder system (architect) currently attempts to treat all results as JSON and
+    // attempts to validate the object with a JSON schema validator. This can lead to slow
+    // build completion (even after the actual build is fully complete) or crashes if the
+    // size and/or quantity of output files is large. Architect only requires a `success`
+    // property so that is all that will be passed here if the infrastructure settings have
+    // not been explicitly set to avoid writes. Writing is only disabled when used directly
+    // by the dev server which bypasses the architect behavior.
+    const { success } = result;
+
+    yield {
+      success,
+    };
+  }
+});

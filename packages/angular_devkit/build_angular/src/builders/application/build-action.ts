@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { BuilderContext, BuilderOutput } from '@angular-devkit/architect';
+import { BuilderContext } from '@angular-devkit/architect';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { BuildOutputFile } from '../../tools/esbuild/bundler-context';
@@ -37,8 +37,7 @@ const packageWatchFiles = [
   '.pnp.data.json',
 ];
 
-type BuildActionOutput = (ExecutionResult['outputWithFiles'] | ExecutionResult['output']) &
-  BuilderOutput;
+export type BuildActionOutput = ExecutionResult['outputWithFiles'];
 
 export async function* runEsBuildBuildAction(
   action: (rebuildState?: RebuildState) => Promise<ExecutionResult>,
@@ -223,7 +222,7 @@ export async function* runEsBuildBuildAction(
 
 async function writeAndEmitOutput(
   writeToFileSystem: boolean,
-  { outputFiles, output, outputWithFiles, assetFiles }: ExecutionResult,
+  { outputFiles, outputWithFiles, assetFiles }: ExecutionResult,
   outputOptions: NormalizedApplicationBuildOptions['outputOptions'],
   writeToFileSystemFilter: ((file: BuildOutputFile) => boolean) | undefined,
 ): Promise<BuildActionOutput> {
@@ -234,11 +233,9 @@ async function writeAndEmitOutput(
       : outputFiles;
 
     await writeResultFiles(outputFilesToWrite, assetFiles, outputOptions);
-
-    return output;
-  } else {
-    // Requires casting due to unneeded `JsonObject` requirement. Remove once fixed.
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return outputWithFiles as any;
   }
+
+  // Requires casting due to unneeded `JsonObject` requirement. Remove once fixed.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return outputWithFiles as any;
 }

@@ -8,14 +8,20 @@
 
 import { BuilderContext } from '@angular-devkit/architect';
 import { BuilderOutput } from '@angular-devkit/architect';
+import { BuildOptions } from 'esbuild';
 import type { ConfigOptions } from 'karma';
 import { Configuration } from 'webpack';
 import { DevServerBuildOutput } from '@angular-devkit/build-webpack';
 import type http from 'node:http';
 import { json } from '@angular-devkit/core';
+import { Message } from 'esbuild';
+import { Metafile } from 'esbuild';
 import { Observable } from 'rxjs';
+import type { OnLoadResult } from 'esbuild';
 import { OutputFile } from 'esbuild';
+import type { PartialMessage } from 'esbuild';
 import type { Plugin as Plugin_2 } from 'esbuild';
+import type ts from 'typescript';
 import webpack from 'webpack';
 import { WebpackLoggingCallback } from '@angular-devkit/build-webpack';
 

@@ -177,13 +177,16 @@ export async function* serveWithVite(
     if (!result.success) {
       // If server is active, send an error notification
       if (result.errors?.length && server) {
+        const { text = '', location } = result.errors[0];
         hadError = true;
+
         server.ws.send({
           type: 'error',
           err: {
-            message: result.errors[0].text,
+            message: text,
             stack: '',
-            loc: result.errors[0].location,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            loc: location as any,
           },
         });
       }
@@ -375,7 +378,7 @@ function handleUpdate(
 function analyzeResultFiles(
   normalizePath: (id: string) => string,
   htmlIndexPath: string,
-  resultFiles: BuildOutputFile[],
+  resultFiles: Readonly<BuildOutputFile[]>,
   generatedFiles: Map<string, OutputFileRecord>,
 ) {
   const seen = new Set<string>(['/index.html']);

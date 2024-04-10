@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { BuilderContext, BuilderOutput, createBuilder } from '@angular-devkit/architect';
+import { BuilderContext, createBuilder } from '@angular-devkit/architect';
 import type { Plugin } from 'esbuild';
 import { constants as fsConstants } from 'node:fs';
 import fs from 'node:fs/promises';
@@ -15,7 +15,7 @@ import { BuildOutputFile } from '../../tools/esbuild/bundler-context';
 import { BuildOutputAsset } from '../../tools/esbuild/bundler-execution-result';
 import { emitFilesToDisk } from '../../tools/esbuild/utils';
 import { deleteOutputDir } from '../../utils';
-import { buildApplicationInternal } from '../application';
+import { ApplicationBuilderOutput, buildApplicationInternal } from '../application';
 import { Schema as ApplicationBuilderOptions, OutputPathClass } from '../application/schema';
 import { logBuilderStatusWarnings } from './builder-status-warnings';
 import { Schema as BrowserBuilderOptions } from './schema';
@@ -34,12 +34,7 @@ export async function* buildEsbuildBrowser(
     write?: boolean;
   },
   plugins?: Plugin[],
-): AsyncIterable<
-  BuilderOutput & {
-    outputFiles?: BuildOutputFile[];
-    assetFiles?: { source: string; destination: string }[];
-  }
-> {
+): AsyncIterable<ApplicationBuilderOutput> {
   // Inform user of status of builder and options
   logBuilderStatusWarnings(userOptions, context);
   const normalizedOptions = normalizeOptions(userOptions);
@@ -103,8 +98,8 @@ function normalizeOptions(
 // We write the file directly from this builder to maintain webpack output compatibility
 // and not output browser files into '/browser'.
 async function writeResultFiles(
-  outputFiles: BuildOutputFile[],
-  assetFiles: BuildOutputAsset[] | undefined,
+  outputFiles: Readonly<BuildOutputFile[]>,
+  assetFiles: Readonly<BuildOutputAsset[]> | undefined,
   outputPath: string,
 ) {
   const directoryExists = new Set<string>();
