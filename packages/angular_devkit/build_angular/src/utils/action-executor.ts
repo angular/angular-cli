@@ -9,7 +9,7 @@
 import Piscina from 'piscina';
 import { InlineOptions } from './bundle-inline-options';
 import { maxWorkers } from './environment-options';
-import { I18nOptions } from './i18n-options';
+import { I18nOptions } from './i18n-webpack';
 
 const workerFile = require.resolve('./process-bundle');
 

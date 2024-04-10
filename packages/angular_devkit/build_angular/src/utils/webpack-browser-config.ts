@@ -18,7 +18,7 @@ import {
 import { NormalizedBrowserBuilderSchema, defaultProgress, normalizeBrowserSchema } from '../utils';
 import { WebpackConfigOptions } from '../utils/build-options';
 import { readTsconfig } from '../utils/read-tsconfig';
-import { I18nOptions, configureI18nBuild } from './i18n-options';
+import { I18nOptions, configureI18nBuild } from './i18n-webpack';
 
 export type BrowserWebpackConfigOptions = WebpackConfigOptions<NormalizedBrowserBuilderSchema>;
 

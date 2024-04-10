@@ -41,7 +41,7 @@ import { colors } from '../../utils/color';
 import { copyAssets } from '../../utils/copy-assets';
 import { assertIsError } from '../../utils/error';
 import { i18nInlineEmittedFiles } from '../../utils/i18n-inlining';
-import { I18nOptions } from '../../utils/i18n-options';
+import { I18nOptions } from '../../utils/i18n-webpack';
 import { FileInfo } from '../../utils/index-file/augment-index-html';
 import {
   IndexHtmlGenerator,

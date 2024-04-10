@@ -14,7 +14,7 @@ import { BundleActionExecutor } from './action-executor';
 import { InlineOptions } from './bundle-inline-options';
 import { copyAssets } from './copy-assets';
 import { assertIsError } from './error';
-import { I18nOptions } from './i18n-options';
+import { I18nOptions } from './i18n-webpack';
 import { Spinner } from './spinner';
 
 function emittedFilesToInlineOptions(

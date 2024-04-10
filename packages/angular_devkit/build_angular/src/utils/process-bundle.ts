@@ -23,7 +23,7 @@ import { workerData } from 'worker_threads';
 import { InlineOptions } from './bundle-inline-options';
 import { allowMinify, shouldBeautify } from './environment-options';
 import { assertIsError } from './error';
-import { I18nOptions } from './i18n-options';
+import { I18nOptions } from './i18n-webpack';
 import { loadEsmModule } from './load-esm';
 
 // Extract Sourcemap input type from the remapping function since it is not currently exported

@@ -8,7 +8,7 @@
 
 import { existsSync, mkdirSync } from 'fs';
 import { join } from 'path';
-import { I18nOptions } from './i18n-options';
+import { I18nOptions } from './i18n-webpack';
 
 export function ensureOutputPaths(baseOutputPath: string, i18n: I18nOptions): Map<string, string> {
   const outputPaths: [string, string][] = i18n.shouldInline
