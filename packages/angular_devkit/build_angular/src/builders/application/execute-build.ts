@@ -15,7 +15,7 @@ import { checkCommonJSModules } from '../../tools/esbuild/commonjs-checker';
 import { extractLicenses } from '../../tools/esbuild/license-extractor';
 import { calculateEstimatedTransferSizes, logBuildStats } from '../../tools/esbuild/utils';
 import { BudgetCalculatorResult, checkBudgets } from '../../utils/bundle-calculator';
-import { copyAssets } from '../../utils/copy-assets';
+import { resolveAssets } from '../../utils/resolve-assets';
 import { getSupportedBrowsers } from '../../utils/supported-browsers';
 import { executePostBundleSteps } from './execute-post-bundle';
 import { inlineI18n, loadActiveTranslations } from './i18n';
@@ -129,9 +129,7 @@ export async function executeBuild(
 
   // Copy assets
   if (assets) {
-    // The webpack copy assets helper is used with no base paths defined. This prevents the helper
-    // from directly writing to disk. This should eventually be replaced with a more optimized helper.
-    executionResult.addAssets(await copyAssets(assets, [], workspaceRoot));
+    executionResult.addAssets(await resolveAssets(assets, workspaceRoot));
   }
 
   // Extract and write licenses for used packages
