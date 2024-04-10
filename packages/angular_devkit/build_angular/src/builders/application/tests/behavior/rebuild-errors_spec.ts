@@ -315,7 +315,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       });
 
       const buildCount = await harness
-        .execute({ outputLogsOnFailure: true })
+        .execute({ outputLogsOnFailure: false })
         .pipe(
           timeout(BUILD_TIMEOUT),
           concatMap(async ({ result, logs }, index) => {

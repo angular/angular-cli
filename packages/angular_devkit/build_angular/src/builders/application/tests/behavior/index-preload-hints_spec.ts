@@ -38,12 +38,10 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       await harness.modifyFile('src/tsconfig.app.json', (content) => {
         const tsConfig = JSON.parse(content);
         tsConfig.files ??= [];
-        tsConfig.files.push('main.server.ts', 'server.ts');
+        tsConfig.files.push('main.server.ts');
 
         return JSON.stringify(tsConfig);
       });
-
-      await harness.writeFile('src/server.ts', `console.log('Hello!');`);
 
       harness.useTarget('build', {
         ...BASE_OPTIONS,
@@ -57,7 +55,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       harness.expectFile('dist/server/main.server.mjs').toExist();
 
       harness
-        .expectFile('dist/browser/index.html')
+        .expectFile('dist/browser/index.csr.html')
         .content.not.toMatch(/<link rel="modulepreload" href="chunk-\.+\.mjs">/);
     });
   });

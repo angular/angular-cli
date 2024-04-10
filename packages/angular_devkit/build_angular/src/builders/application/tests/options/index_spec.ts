@@ -205,5 +205,27 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       harness.expectFile('dist/browser/index.html').content.not.toContain('modulepreload');
       harness.expectFile('dist/browser/index.html').content.not.toContain('chunk-');
     });
+
+    it(`should generate 'index.csr.html' instead of 'index.html' by default when ssr is enabled.`, async () => {
+      await harness.modifyFile('src/tsconfig.app.json', (content) => {
+        const tsConfig = JSON.parse(content);
+        tsConfig.files ??= [];
+        tsConfig.files.push('main.server.ts');
+
+        return JSON.stringify(tsConfig);
+      });
+
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+        server: 'src/main.server.ts',
+        ssr: true,
+      });
+
+      const { result } = await harness.executeOnce();
+      expect(result?.success).toBeTrue();
+      harness.expectDirectory('dist/server').toExist();
+      harness.expectFile('dist/browser/index.csr.html').toExist();
+      harness.expectFile('dist/browser/index.html').toNotExist();
+    });
   });
 });

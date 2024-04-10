@@ -194,35 +194,6 @@ export async function normalizeOptions(
     ? undefined
     : await getTailwindConfig(searchDirectories, workspaceRoot, context);
 
-  const globalStyles = normalizeGlobalEntries(options.styles, 'styles');
-  const globalScripts = normalizeGlobalEntries(options.scripts, 'scripts');
-
-  let indexHtmlOptions;
-  // index can never have a value of `true` but in the schema it's of type `boolean`.
-  if (typeof options.index !== 'boolean') {
-    indexHtmlOptions = {
-      input: path.join(
-        workspaceRoot,
-        typeof options.index === 'string' ? options.index : options.index.input,
-      ),
-      // The output file will be created within the configured output path
-      output:
-        typeof options.index === 'string'
-          ? path.basename(options.index)
-          : options.index.output || 'index.html',
-      insertionOrder: [
-        ['polyfills', true],
-        ...globalStyles.filter((s) => s.initial).map((s) => [s.name, false]),
-        ...globalScripts.filter((s) => s.initial).map((s) => [s.name, false]),
-        ['main', true],
-        // [name, esm]
-      ] as [string, boolean][],
-      transformer: extensions?.indexHtmlTransformer,
-      // Preload initial defaults to true
-      preloadInitial: typeof options.index !== 'object' || (options.index.preloadInitial ?? true),
-    };
-  }
-
   let serverEntryPoint: string | undefined;
   if (options.server) {
     serverEntryPoint = path.join(workspaceRoot, options.server);
@@ -259,10 +230,57 @@ export async function normalizeOptions(
     };
   }
 
-  if ((appShellOptions || ssrOptions || prerenderOptions) && !serverEntryPoint) {
-    throw new Error(
-      'The "server" option is required when enabling "ssr", "prerender" or "app-shell".',
-    );
+  const globalStyles = normalizeGlobalEntries(options.styles, 'styles');
+  const globalScripts = normalizeGlobalEntries(options.scripts, 'scripts');
+  let indexHtmlOptions;
+  // index can never have a value of `true` but in the schema it's of type `boolean`.
+  if (typeof options.index !== 'boolean') {
+    let indexOutput: string;
+    // The output file will be created within the configured output path
+    if (typeof options.index === 'string') {
+      /**
+       * If SSR is activated, create a distinct entry file for the `index.html`.
+       * This is necessary because numerous server/cloud providers automatically serve the `index.html` as a static file
+       * if it exists (handling SSG).
+       * For instance, accessing `foo.com/` would lead to `foo.com/index.html` being served instead of hitting the server.
+       */
+      const indexBaseName = path.basename(options.index);
+      indexOutput = ssrOptions && indexBaseName === 'index.html' ? 'index.csr.html' : indexBaseName;
+    } else {
+      indexOutput = options.index.output || 'index.html';
+    }
+
+    indexHtmlOptions = {
+      input: path.join(
+        workspaceRoot,
+        typeof options.index === 'string' ? options.index : options.index.input,
+      ),
+      output: indexOutput,
+      insertionOrder: [
+        ['polyfills', true],
+        ...globalStyles.filter((s) => s.initial).map((s) => [s.name, false]),
+        ...globalScripts.filter((s) => s.initial).map((s) => [s.name, false]),
+        ['main', true],
+        // [name, esm]
+      ] as [string, boolean][],
+      transformer: extensions?.indexHtmlTransformer,
+      // Preload initial defaults to true
+      preloadInitial: typeof options.index !== 'object' || (options.index.preloadInitial ?? true),
+    };
+  }
+
+  if (appShellOptions || ssrOptions || prerenderOptions) {
+    if (!serverEntryPoint) {
+      throw new Error(
+        'The "server" option is required when enabling "ssr", "prerender" or "app-shell".',
+      );
+    }
+
+    if (!indexHtmlOptions) {
+      throw new Error(
+        'The "index" option cannot be set to false when enabling "ssr", "prerender" or "app-shell".',
+      );
+    }
   }
 
   // Initial options to keep
