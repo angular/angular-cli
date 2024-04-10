@@ -451,7 +451,6 @@ export async function setupServer(
   const proxy = await loadProxyConfiguration(
     serverOptions.workspaceRoot,
     serverOptions.proxyConfig,
-    true,
   );
 
   // dynamically import Vite for ESM compatibility
