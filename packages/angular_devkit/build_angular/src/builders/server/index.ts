@@ -31,7 +31,7 @@ import { colors } from '../../utils/color';
 import { copyAssets } from '../../utils/copy-assets';
 import { assertIsError } from '../../utils/error';
 import { i18nInlineEmittedFiles } from '../../utils/i18n-inlining';
-import { I18nOptions } from '../../utils/i18n-options';
+import { I18nOptions } from '../../utils/i18n-webpack';
 import { ensureOutputPaths } from '../../utils/output-paths';
 import { purgeStaleBuildCache } from '../../utils/purge-cache';
 import { Spinner } from '../../utils/spinner';

@@ -29,7 +29,7 @@ import {
 import { ExecutionTransformer } from '../../transforms';
 import { normalizeOptimization } from '../../utils';
 import { colors } from '../../utils/color';
-import { I18nOptions, loadTranslations } from '../../utils/i18n-options';
+import { I18nOptions, loadTranslations } from '../../utils/i18n-webpack';
 import { IndexHtmlTransform } from '../../utils/index-file/index-html-generator';
 import { createTranslationLoader } from '../../utils/load-translations';
 import { NormalizedCachedOptions } from '../../utils/normalize-cache';
