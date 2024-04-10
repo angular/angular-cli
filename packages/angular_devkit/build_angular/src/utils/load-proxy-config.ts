@@ -18,8 +18,7 @@ import { loadEsmModule } from './load-esm';
 export async function loadProxyConfiguration(
   root: string,
   proxyConfig: string | undefined,
-  normalize = false,
-) {
+): Promise<Record<string, object> | undefined> {
   if (!proxyConfig) {
     return undefined;
   }
@@ -81,11 +80,7 @@ export async function loadProxyConfiguration(
       }
   }
 
-  if (normalize) {
-    proxyConfiguration = normalizeProxyConfiguration(proxyConfiguration);
-  }
-
-  return proxyConfiguration;
+  return normalizeProxyConfiguration(proxyConfiguration);
 }
 
 /**
