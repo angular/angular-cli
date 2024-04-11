@@ -8,11 +8,12 @@
 
 import * as path from 'path';
 import { Compilation, Compiler } from 'webpack';
-import { Budget, Type } from '../../../builders/browser/schema';
 import {
+  BudgetAsset,
+  BudgetEntry,
+  BudgetType,
   ThresholdSeverity,
-  calculateThresholds,
-  checkThresholds,
+  checkBudgets,
 } from '../../../utils/bundle-calculator';
 import { addError, addWarning } from '../../../utils/webpack-diagnostics';
 
@@ -23,10 +24,10 @@ const PLUGIN_NAME = 'AnyComponentStyleBudgetChecker';
  * budget is exceeded by a particular component's styles.
  */
 export class AnyComponentStyleBudgetChecker {
-  private readonly budgets: Budget[];
+  private readonly budgets: BudgetEntry[];
 
-  constructor(budgets: Budget[]) {
-    this.budgets = budgets.filter((budget) => budget.type === Type.AnyComponentStyle);
+  constructor(budgets: BudgetEntry[]) {
+    this.budgets = budgets.filter((budget) => budget.type === BudgetType.AnyComponentStyle);
   }
 
   apply(compiler: Compiler) {
@@ -49,30 +50,28 @@ export class AnyComponentStyleBudgetChecker {
 
           const cssExtensions = ['.css', '.scss', '.less', '.sass'];
 
-          const componentStyles = Object.keys(compilation.assets)
+          const componentStyles: BudgetAsset[] = Object.keys(compilation.assets)
             .filter((name) => cssExtensions.includes(path.extname(name)))
             .map((name) => ({
+              name,
               size: compilation.assets[name].size(),
-              label: name,
+              componentStyle: true,
             }));
 
-          const thresholds = this.budgets.flatMap((budget) => [...calculateThresholds(budget)]);
-          for (const { size, label } of componentStyles) {
-            for (const { severity, message } of checkThresholds(
-              thresholds[Symbol.iterator](),
-              size,
-              label,
-            )) {
-              switch (severity) {
-                case ThresholdSeverity.Warning:
-                  addWarning(compilation, message);
-                  break;
-                case ThresholdSeverity.Error:
-                  addError(compilation, message);
-                  break;
-                default:
-                  assertNever(severity);
-              }
+          for (const { severity, message } of checkBudgets(
+            this.budgets,
+            { chunks: [], assets: componentStyles },
+            true,
+          )) {
+            switch (severity) {
+              case ThresholdSeverity.Warning:
+                addWarning(compilation, message);
+                break;
+              case ThresholdSeverity.Error:
+                addError(compilation, message);
+                break;
+              default:
+                assertNever(severity);
             }
           }
         },
