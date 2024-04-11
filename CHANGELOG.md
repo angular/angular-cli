@@ -1,3 +1,15 @@
+<a name="16.2.14"></a>
+
+# 16.2.14 (2024-04-11)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description            |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------- |
+| [1068c3c73](https://github.com/angular/angular-cli/commit/1068c3c733a7c52e7876d43454d0ff590c99b61b) | fix  | update vite to `4.5.3` |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="16.2.13"></a>
 
 # 16.2.13 (2024-03-25)
