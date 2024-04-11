@@ -1,3 +1,15 @@
+<a name="17.3.4"></a>
+
+# 17.3.4 (2024-04-11)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                  |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------ |
+| [1128bdd64](https://github.com/angular/angular-cli/commit/1128bdd642c3e60c67485970e5cd354b2fde0f98) | fix  | ensure esbuild-based builders exclusively produce ESM output |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="16.2.14"></a>
 
 # 16.2.14 (2024-04-11)
