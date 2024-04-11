@@ -6,8 +6,11 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { Budget, Type } from '../builders/browser/schema';
+import { Budget as BudgetEntry, Type as BudgetType } from '../builders/application/schema';
 import { formatSize } from './format-bytes';
+
+// Re-export to avoid direct schema importing throughout code
+export { BudgetEntry, BudgetType };
 
 interface Size {
   size: number;
@@ -53,7 +56,7 @@ export interface BudgetStats {
   assets?: BudgetAsset[];
 }
 
-export function* calculateThresholds(budget: Budget): IterableIterator<Threshold> {
+export function* calculateThresholds(budget: BudgetEntry): IterableIterator<Threshold> {
   if (budget.maximumWarning) {
     yield {
       limit: calculateBytes(budget.maximumWarning, budget.baseline, 1),
@@ -118,11 +121,11 @@ export function* calculateThresholds(budget: Budget): IterableIterator<Threshold
 /**
  * Calculates the sizes for bundles in the budget type provided.
  */
-function calculateSizes(budget: Budget, stats: BudgetStats): Size[] {
+function calculateSizes(budget: BudgetEntry, stats: BudgetStats): Size[] {
   type CalculatorTypes = {
-    new (budget: Budget, chunks: BudgetChunk[], assets: BudgetAsset[]): Calculator;
+    new (budget: BudgetEntry, chunks: BudgetChunk[], assets: BudgetAsset[]): Calculator;
   };
-  const calculatorMap: Record<Budget['type'], CalculatorTypes> = {
+  const calculatorMap: Record<BudgetType, CalculatorTypes> = {
     all: AllCalculator,
     allScript: AllScriptCalculator,
     any: AnyCalculator,
@@ -148,7 +151,7 @@ function calculateSizes(budget: Budget, stats: BudgetStats): Size[] {
 
 abstract class Calculator {
   constructor(
-    protected budget: Budget,
+    protected budget: BudgetEntry,
     protected chunks: BudgetChunk[],
     protected assets: BudgetAsset[],
   ) {}
@@ -321,14 +324,14 @@ function calculateBytes(input: string, baseline?: string, factor: 1 | -1 = 1): n
 }
 
 export function* checkBudgets(
-  budgets: Budget[],
+  budgets: BudgetEntry[],
   stats: BudgetStats,
   checkComponentStyles?: boolean,
 ): IterableIterator<BudgetCalculatorResult> {
   // Ignore AnyComponentStyle budgets as these are handled in `AnyComponentStyleBudgetChecker` unless requested
   const computableBudgets = checkComponentStyles
     ? budgets
-    : budgets.filter((budget) => budget.type !== Type.AnyComponentStyle);
+    : budgets.filter((budget) => budget.type !== BudgetType.AnyComponentStyle);
 
   for (const budget of computableBudgets) {
     const sizes = calculateSizes(budget, stats);
@@ -339,7 +342,7 @@ export function* checkBudgets(
 }
 
 export function* checkThresholds(
-  thresholds: IterableIterator<Threshold>,
+  thresholds: Iterable<Threshold>,
   size: number,
   label?: string,
 ): IterableIterator<BudgetCalculatorResult> {

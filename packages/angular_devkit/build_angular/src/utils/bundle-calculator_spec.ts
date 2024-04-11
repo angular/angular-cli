@@ -6,18 +6,16 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { StatsCompilation } from 'webpack';
-import { Budget, Type } from '../builders/browser/schema';
-import { ThresholdSeverity, checkBudgets } from './bundle-calculator';
+import { BudgetEntry, BudgetType, ThresholdSeverity, checkBudgets } from './bundle-calculator';
 
 const KB = 1024;
 
 describe('bundle-calculator', () => {
   describe('checkBudgets()', () => {
     it('yields maximum budgets exceeded', () => {
-      const budgets: Budget[] = [
+      const budgets: BudgetEntry[] = [
         {
-          type: Type.Any,
+          type: BudgetType.Any,
           maximumError: '1kb',
         },
       ];
@@ -33,7 +31,7 @@ describe('bundle-calculator', () => {
             size: 0.5 * KB,
           },
         ],
-      } as unknown as StatsCompilation;
+      };
 
       const failures = Array.from(checkBudgets(budgets, stats));
 
@@ -46,9 +44,9 @@ describe('bundle-calculator', () => {
     });
 
     it('yields minimum budgets exceeded', () => {
-      const budgets: Budget[] = [
+      const budgets: BudgetEntry[] = [
         {
-          type: Type.Any,
+          type: BudgetType.Any,
           minimumError: '1kb',
         },
       ];
@@ -64,7 +62,7 @@ describe('bundle-calculator', () => {
             size: 0.5 * KB,
           },
         ],
-      } as unknown as StatsCompilation;
+      };
 
       const failures = Array.from(checkBudgets(budgets, stats));
 
@@ -77,9 +75,9 @@ describe('bundle-calculator', () => {
     });
 
     it('yields exceeded bundle budgets', () => {
-      const budgets: Budget[] = [
+      const budgets: BudgetEntry[] = [
         {
-          type: Type.Bundle,
+          type: BudgetType.Bundle,
           name: 'foo',
           maximumError: '1kb',
         },
@@ -102,7 +100,7 @@ describe('bundle-calculator', () => {
             size: 0.75 * KB,
           },
         ],
-      } as unknown as StatsCompilation;
+      };
 
       const failures = Array.from(checkBudgets(budgets, stats));
 
@@ -115,9 +113,9 @@ describe('bundle-calculator', () => {
     });
 
     it('yields exceeded initial budget', () => {
-      const budgets: Budget[] = [
+      const budgets: BudgetEntry[] = [
         {
-          type: Type.Initial,
+          type: BudgetType.Initial,
           maximumError: '1kb',
         },
       ];
@@ -140,7 +138,7 @@ describe('bundle-calculator', () => {
             size: 0.75 * KB,
           },
         ],
-      } as unknown as StatsCompilation;
+      };
 
       const failures = Array.from(checkBudgets(budgets, stats));
 
@@ -153,9 +151,9 @@ describe('bundle-calculator', () => {
     });
 
     it('yields exceeded total scripts budget', () => {
-      const budgets: Budget[] = [
+      const budgets: BudgetEntry[] = [
         {
-          type: Type.AllScript,
+          type: BudgetType.AllScript,
           maximumError: '1kb',
         },
       ];
@@ -182,7 +180,7 @@ describe('bundle-calculator', () => {
             size: 1.5 * KB,
           },
         ],
-      } as unknown as StatsCompilation;
+      };
 
       const failures = Array.from(checkBudgets(budgets, stats));
 
@@ -195,9 +193,9 @@ describe('bundle-calculator', () => {
     });
 
     it('yields exceeded total budget', () => {
-      const budgets: Budget[] = [
+      const budgets: BudgetEntry[] = [
         {
-          type: Type.All,
+          type: BudgetType.All,
           maximumError: '1kb',
         },
       ];
@@ -220,7 +218,7 @@ describe('bundle-calculator', () => {
             size: 0.75 * KB,
           },
         ],
-      } as unknown as StatsCompilation;
+      };
 
       const failures = Array.from(checkBudgets(budgets, stats));
 
@@ -233,9 +231,9 @@ describe('bundle-calculator', () => {
     });
 
     it('skips component style budgets', () => {
-      const budgets: Budget[] = [
+      const budgets: BudgetEntry[] = [
         {
-          type: Type.AnyComponentStyle,
+          type: BudgetType.AnyComponentStyle,
           maximumError: '1kb',
         },
       ];
@@ -258,7 +256,7 @@ describe('bundle-calculator', () => {
             size: 0.5 * KB,
           },
         ],
-      } as unknown as StatsCompilation;
+      };
 
       const failures = Array.from(checkBudgets(budgets, stats));
 
@@ -266,9 +264,9 @@ describe('bundle-calculator', () => {
     });
 
     it('yields exceeded individual script budget', () => {
-      const budgets: Budget[] = [
+      const budgets: BudgetEntry[] = [
         {
-          type: Type.AnyScript,
+          type: BudgetType.AnyScript,
           maximumError: '1kb',
         },
       ];
@@ -291,7 +289,7 @@ describe('bundle-calculator', () => {
             size: 0.5 * KB,
           },
         ],
-      } as unknown as StatsCompilation;
+      };
 
       const failures = Array.from(checkBudgets(budgets, stats));
 
@@ -304,9 +302,9 @@ describe('bundle-calculator', () => {
     });
 
     it('yields exceeded individual file budget', () => {
-      const budgets: Budget[] = [
+      const budgets: BudgetEntry[] = [
         {
-          type: Type.Any,
+          type: BudgetType.Any,
           maximumError: '1kb',
         },
       ];
@@ -329,7 +327,7 @@ describe('bundle-calculator', () => {
             size: 0.5 * KB,
           },
         ],
-      } as unknown as StatsCompilation;
+      };
 
       const failures = Array.from(checkBudgets(budgets, stats));
 
