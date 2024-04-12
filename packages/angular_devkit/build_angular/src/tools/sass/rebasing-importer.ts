@@ -82,18 +82,15 @@ abstract class UrlRebasingImporter implements Importer<'sync'> {
         continue;
       }
 
-      // Skip if value is a Sass variable.
-      // Sass variable usage either starts with a `$` or contains a namespace and a `.$`
-      if (value[0] === '$' || /^\w+\.\$/.test(value)) {
-        continue;
-      }
-
       // Skip if root-relative, absolute or protocol relative url
       if (/^((?:\w+:)?\/\/|data:|chrome:|#|\/)/.test(value)) {
         continue;
       }
 
-      const rebasedPath = relative(this.entryDirectory, join(stylesheetDirectory, value));
+      // Sass variable usage either starts with a `$` or contains a namespace and a `.$`
+      const valueNormalized = value[0] === '$' || /^\w+\.\$/.test(value) ? `#{${value}}` : value;
+      const rebasedPath =
+        relative(this.entryDirectory, stylesheetDirectory) + '||file:' + valueNormalized;
 
       // Normalize path separators and escape characters
       // https://developer.mozilla.org/en-US/docs/Web/CSS/url#syntax

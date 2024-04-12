@@ -7,6 +7,7 @@
  */
 
 import { buildApplication } from '../../index';
+import { OutputHashing } from '../../schema';
 import { APPLICATION_BUILDER_INFO, BASE_OPTIONS, describeBuilder } from '../setup';
 
 describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
@@ -164,34 +165,18 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       );
     });
 
-    it('should not rebase a URL with a namespaced Sass variable reference', async () => {
-      await harness.writeFile(
-        'src/styles.scss',
-        `
-        @import "a";
-      `,
-      );
-      await harness.writeFile(
-        'src/a.scss',
-        `
-        @use './b' as named;
-        .a {
-          background-image: url(named.$my-var)
-        }
-      `,
-      );
-      await harness.writeFile(
-        'src/b.scss',
-        `
-        @forward './c.scss' show $my-var;
-      `,
-      );
-      await harness.writeFile(
-        'src/c.scss',
-        `
-        $my-var: "https://example.com/example.png";
-      `,
-      );
+    it('should not rebase a URL with a namespaced Sass variable reference that points to an absolute asset', async () => {
+      await harness.writeFiles({
+        'src/styles.scss': `@use 'theme/a';`,
+        'src/theme/a.scss': `
+                            @use './b' as named;
+                            .a {
+                              background-image: url(named.$my-var)
+                            }
+        `,
+        'src/theme/b.scss': `@forward './c.scss' show $my-var;`,
+        'src/theme/c.scss': `$my-var: "https://example.com/example.png";`,
+      });
 
       harness.useTarget('build', {
         ...BASE_OPTIONS,
@@ -199,11 +184,112 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       });
 
       const { result } = await harness.executeOnce();
-      expect(result?.success).toBe(true);
+      expect(result?.success).toBeTrue();
 
       harness
         .expectFile('dist/browser/styles.css')
         .content.toContain('url(https://example.com/example.png)');
+    });
+
+    it('should not rebase a URL with a Sass variable reference that points to an absolute asset', async () => {
+      await harness.writeFiles({
+        'src/styles.scss': `@use 'theme/a';`,
+        'src/theme/a.scss': `
+                            @import './b';
+                            .a {
+                              background-image: url($my-var)
+                            }
+        `,
+        'src/theme/b.scss': `$my-var: "https://example.com/example.png";`,
+      });
+
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+        styles: ['src/styles.scss'],
+      });
+
+      const { result } = await harness.executeOnce();
+      expect(result?.success).toBeTrue();
+
+      harness
+        .expectFile('dist/browser/styles.css')
+        .content.toContain('url(https://example.com/example.png)');
+    });
+
+    it('should rebase a URL with a namespaced Sass variable referencing a local resource', async () => {
+      await harness.writeFiles({
+        'src/styles.scss': `@use 'theme/a';`,
+        'src/theme/a.scss': `
+                            @use './b' as named;
+                            .a {
+                              background-image: url(named.$my-var)
+                            }
+        `,
+        'src/theme/b.scss': `@forward './c.scss' show $my-var;`,
+        'src/theme/c.scss': `$my-var: "./images/logo.svg";`,
+        'src/theme/images/logo.svg': `<svg></svg>`,
+      });
+
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+        outputHashing: OutputHashing.None,
+        styles: ['src/styles.scss'],
+      });
+
+      const { result } = await harness.executeOnce();
+      expect(result?.success).toBeTrue();
+
+      harness.expectFile('dist/browser/styles.css').content.toContain(`url("./media/logo.svg")`);
+      harness.expectFile('dist/browser/media/logo.svg').toExist();
+    });
+
+    it('should rebase a URL with a Sass variable referencing a local resource', async () => {
+      await harness.writeFiles({
+        'src/styles.scss': `@use 'theme/a';`,
+        'src/theme/a.scss': `
+                            @import './b';
+                            .a {
+                              background-image: url($my-var)
+                            }
+        `,
+        'src/theme/b.scss': `$my-var: "./images/logo.svg";`,
+        'src/theme/images/logo.svg': `<svg></svg>`,
+      });
+
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+        outputHashing: OutputHashing.None,
+        styles: ['src/styles.scss'],
+      });
+
+      const { result } = await harness.executeOnce();
+      expect(result?.success).toBeTrue();
+
+      harness.expectFile('dist/browser/styles.css').content.toContain(`url("./media/logo.svg")`);
+      harness.expectFile('dist/browser/media/logo.svg').toExist();
+    });
+
+    it('should not process a URL that has been marked as external', async () => {
+      await harness.writeFiles({
+        'src/styles.scss': `@use 'theme/a';`,
+        'src/theme/a.scss': `
+          .a {
+            background-image: url("assets/logo.svg")
+          }
+        `,
+      });
+
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+        outputHashing: OutputHashing.None,
+        externalDependencies: ['assets/*'],
+        styles: ['src/styles.scss'],
+      });
+
+      const { result } = await harness.executeOnce();
+      expect(result?.success).toBeTrue();
+
+      harness.expectFile('dist/browser/styles.css').content.toContain(`url(assets/logo.svg)`);
     });
   });
 });
