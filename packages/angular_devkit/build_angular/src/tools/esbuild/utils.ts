@@ -21,7 +21,7 @@ import {
 } from '../../builders/application/options';
 import { BudgetCalculatorResult } from '../../utils/bundle-calculator';
 import { Spinner } from '../../utils/spinner';
-import { BundleStats, generateEsbuildBuildStatsTable } from '../webpack/utils/stats';
+import { BundleStats, generateEsbuildBuildStatsTable } from '../../utils/stats-table';
 import { BuildOutputFile, BuildOutputFileType, InitialFileRecord } from './bundler-context';
 import { BuildOutputAsset, ExecutionResult } from './bundler-execution-result';
 

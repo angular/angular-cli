@@ -7,7 +7,7 @@
  */
 
 import { Budget, Type } from '../builders/browser/schema';
-import { formatSize } from '../tools/webpack/utils/stats';
+import { formatSize } from './format-bytes';
 
 interface Size {
   size: number;
