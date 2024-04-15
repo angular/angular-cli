@@ -129,10 +129,10 @@
   dependencies:
     tslib "^2.3.0"
 
-"@angular/bazel@https://github.com/angular/bazel-builds.git#58aaac9e552c7d3b1d8a6bb718598b92910ac65e":
-  version "18.0.0-next.4+sha-0a8c48e"
-  uid "58aaac9e552c7d3b1d8a6bb718598b92910ac65e"
-  resolved "https://github.com/angular/bazel-builds.git#58aaac9e552c7d3b1d8a6bb718598b92910ac65e"
+"@angular/bazel@https://github.com/angular/bazel-builds.git#4e80fcc1a84cec4fac27dade7dd57e24aaff8e05":
+  version "18.0.0-next.4+sha-3af54d5"
+  uid "4e80fcc1a84cec4fac27dade7dd57e24aaff8e05"
+  resolved "https://github.com/angular/bazel-builds.git#4e80fcc1a84cec4fac27dade7dd57e24aaff8e05"
   dependencies:
     "@microsoft/api-extractor" "^7.24.2"
     magic-string "^0.30.0"
@@ -146,10 +146,10 @@
     "@angular/core" "^13.0.0 || ^14.0.0-0"
     reflect-metadata "^0.1.13"
 
-"@angular/build-tooling@https://github.com/angular/dev-infra-private-build-tooling-builds.git#8a925ffc26a47f03e12f5c0566e648547b391051":
-  version "0.0.0-65588bb9f321edbf3575114c0a455fa1d6b9b60b"
-  uid "8a925ffc26a47f03e12f5c0566e648547b391051"
-  resolved "https://github.com/angular/dev-infra-private-build-tooling-builds.git#8a925ffc26a47f03e12f5c0566e648547b391051"
+"@angular/build-tooling@https://github.com/angular/dev-infra-private-build-tooling-builds.git#262ffed59888efdad857733de9f62d85ee5239ce":
+  version "0.0.0-f8b2efa171f4ebec4d0cb3d5c5d4f7cb680f2af9"
+  uid "262ffed59888efdad857733de9f62d85ee5239ce"
+  resolved "https://github.com/angular/dev-infra-private-build-tooling-builds.git#262ffed59888efdad857733de9f62d85ee5239ce"
   dependencies:
     "@angular-devkit/build-angular" "17.3.3"
     "@angular/benchpress" "0.3.0"
@@ -163,7 +163,7 @@
     "@bazel/runfiles" "5.8.1"
     "@bazel/terser" "5.8.1"
     "@bazel/typescript" "5.8.1"
-    "@microsoft/api-extractor" "7.43.0"
+    "@microsoft/api-extractor" "7.43.1"
     "@types/browser-sync" "^2.26.3"
     "@types/node" "^18.19.21"
     "@types/selenium-webdriver" "^4.1.21"
@@ -188,14 +188,14 @@
     tmp "^0.2.1"
     "true-case-path" "^2.2.1"
     tslib "^2.5.2"
-    typescript "5.4.3"
+    typescript "5.4.5"
     uuid "^9.0.0"
     yargs "^17.0.0"
 
-"@angular/cdk@18.0.0-next.3":
-  version "18.0.0-next.3"
-  resolved "https://registry.yarnpkg.com/@angular/cdk/-/cdk-18.0.0-next.3.tgz#5e785fff8b3c99eea868572d45217a395d1095ea"
-  integrity sha512-ppryJiMoeiFwpVSAhbrAQG65DNEc3twJrcK+vHHpn2NEgfLVXcUJWfDBlaVJEIOwC+0LcymIounva24d3ABkOg==
+"@angular/cdk@18.0.0-next.4":
+  version "18.0.0-next.4"
+  resolved "https://registry.yarnpkg.com/@angular/cdk/-/cdk-18.0.0-next.4.tgz#8121b99e843f8ef5713fb9be6cf06a45f8aa6c1b"
+  integrity sha512-9YlGaC6HUqDS4wGaxpxNaSZgUtghSn8WJ4tbVeOwAFiXJUs1+KpOsNz08wnD8Qmpuc4wojHqd/hCLckmukV2ow==
   dependencies:
     tslib "^2.3.0"
   optionalDependencies:
@@ -260,10 +260,10 @@
     fast-glob "3.3.2"
     yargs "^17.2.1"
 
-"@angular/material@18.0.0-next.3":
-  version "18.0.0-next.3"
-  resolved "https://registry.yarnpkg.com/@angular/material/-/material-18.0.0-next.3.tgz#f81d24ea1f699286b5c87cc24926f618b4bb86d3"
-  integrity sha512-yc6tRIADrpVsi6fNrAecZBO19Mj1Qol5LSf/BuvlkR8zgljctlI4r0NT5q7wtG4Gr3FCL85jItT348pD4pOW0Q==
+"@angular/material@18.0.0-next.4":
+  version "18.0.0-next.4"
+  resolved "https://registry.yarnpkg.com/@angular/material/-/material-18.0.0-next.4.tgz#51df4be783e821444f6167907d93fe9fbb988c86"
+  integrity sha512-pgDg8fP8cpuA2t0SNRiqYFt5+VaUqJOZ0BlllSyqRTSZpM4/TAgVmscC2ZDOjj82g5okHHL9kI27x0lv4zn/9w==
   dependencies:
     "@material/animation" "15.0.0-canary.7f224ddd4.0"
     "@material/auto-init" "15.0.0-canary.7f224ddd4.0"
@@ -314,10 +314,10 @@
     "@material/typography" "15.0.0-canary.7f224ddd4.0"
     tslib "^2.3.0"
 
-"@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#76536af6079611dc23a76b04f3005bb7c1914862":
-  version "0.0.0-65588bb9f321edbf3575114c0a455fa1d6b9b60b"
-  uid "76536af6079611dc23a76b04f3005bb7c1914862"
-  resolved "https://github.com/angular/dev-infra-private-ng-dev-builds.git#76536af6079611dc23a76b04f3005bb7c1914862"
+"@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#0f934206eb3fbdada3e84438a51eef1dc5842bc4":
+  version "0.0.0-f8b2efa171f4ebec4d0cb3d5c5d4f7cb680f2af9"
+  uid "0f934206eb3fbdada3e84438a51eef1dc5842bc4"
+  resolved "https://github.com/angular/dev-infra-private-ng-dev-builds.git#0f934206eb3fbdada3e84438a51eef1dc5842bc4"
   dependencies:
     "@yarnpkg/lockfile" "^1.1.0"
     typescript "~4.9.0"
@@ -2838,7 +2838,35 @@
     "@microsoft/tsdoc-config" "~0.16.1"
     "@rushstack/node-core-library" "4.0.2"
 
-"@microsoft/api-extractor@7.43.0", "@microsoft/api-extractor@^7.24.2":
+"@microsoft/api-extractor-model@7.28.14":
+  version "7.28.14"
+  resolved "https://registry.yarnpkg.com/@microsoft/api-extractor-model/-/api-extractor-model-7.28.14.tgz#f0d2b93ef21f271a05b89c79d0662f6b34adeb0e"
+  integrity sha512-Bery/c8A8SsKPSvA82cTTuy/+OcxZbLRmKhPkk91/AJOQzxZsShcrmHFAGeiEqSIrv1nPZ3tKq9kfMLdCHmsqg==
+  dependencies:
+    "@microsoft/tsdoc" "0.14.2"
+    "@microsoft/tsdoc-config" "~0.16.1"
+    "@rushstack/node-core-library" "4.1.0"
+
+"@microsoft/api-extractor@7.43.1":
+  version "7.43.1"
+  resolved "https://registry.yarnpkg.com/@microsoft/api-extractor/-/api-extractor-7.43.1.tgz#5552427cf076819c914289deb9f0dddce743c629"
+  integrity sha512-ohg40SsvFFgzHFAtYq5wKJc8ZDyY46bphjtnSvhSSlXpPTG7GHwyyXkn48UZiUCBwr2WC7TRC1Jfwz7nreuiyQ==
+  dependencies:
+    "@microsoft/api-extractor-model" "7.28.14"
+    "@microsoft/tsdoc" "0.14.2"
+    "@microsoft/tsdoc-config" "~0.16.1"
+    "@rushstack/node-core-library" "4.1.0"
+    "@rushstack/rig-package" "0.5.2"
+    "@rushstack/terminal" "0.10.1"
+    "@rushstack/ts-command-line" "4.19.2"
+    lodash "~4.17.15"
+    minimatch "~3.0.3"
+    resolve "~1.22.1"
+    semver "~7.5.4"
+    source-map "~0.6.1"
+    typescript "5.4.2"
+
+"@microsoft/api-extractor@^7.24.2":
   version "7.43.0"
   resolved "https://registry.yarnpkg.com/@microsoft/api-extractor/-/api-extractor-7.43.0.tgz#41c42677bc71cd8e0f23c63c56802d85044e65cd"
   integrity sha512-GFhTcJpB+MI6FhvXEI9b2K0snulNLWHqC/BbcJtyNYcKUiw7l3Lgis5ApsYncJ0leALX7/of4XfmXk+maT111w==
@@ -3364,6 +3392,18 @@
     semver "~7.5.4"
     z-schema "~5.0.2"
 
+"@rushstack/node-core-library@4.1.0":
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/@rushstack/node-core-library/-/node-core-library-4.1.0.tgz#526360d4019f8bba7dd6434d6a9b6f8122507c20"
+  integrity sha512-qz4JFBZJCf1YN5cAXa1dP6Mki/HrsQxc/oYGAGx29dF2cwF2YMxHoly0FBhMw3IEnxo5fMj0boVfoHVBkpkx/w==
+  dependencies:
+    fs-extra "~7.0.1"
+    import-lazy "~4.0.0"
+    jju "~1.4.0"
+    resolve "~1.22.1"
+    semver "~7.5.4"
+    z-schema "~5.0.2"
+
 "@rushstack/rig-package@0.5.2":
   version "0.5.2"
   resolved "https://registry.yarnpkg.com/@rushstack/rig-package/-/rig-package-0.5.2.tgz#0e23a115904678717a74049661931c0b37dd5495"
@@ -3380,12 +3420,30 @@
     "@rushstack/node-core-library" "4.0.2"
     supports-color "~8.1.1"
 
+"@rushstack/terminal@0.10.1":
+  version "0.10.1"
+  resolved "https://registry.yarnpkg.com/@rushstack/terminal/-/terminal-0.10.1.tgz#e2b54733f72d80fdf1cbbfd867733169c421d278"
+  integrity sha512-C6Vi/m/84IYJTkfzmXr1+W8Wi3MmBjVF/q3za91Gb3VYjKbpALHVxY6FgH625AnDe5Z0Kh4MHKWA3Z7bqgAezA==
+  dependencies:
+    "@rushstack/node-core-library" "4.1.0"
+    supports-color "~8.1.1"
+
 "@rushstack/ts-command-line@4.19.1":
   version "4.19.1"
   resolved "https://registry.yarnpkg.com/@rushstack/ts-command-line/-/ts-command-line-4.19.1.tgz#288ee54dd607e558a8be07705869c16c31b5c3ef"
   integrity sha512-J7H768dgcpG60d7skZ5uSSwyCZs/S2HrWP1Ds8d1qYAyaaeJmpmmLr9BVw97RjFzmQPOYnoXcKA4GkqDCkduQg==
   dependencies:
     "@rushstack/terminal" "0.10.0"
+    "@types/argparse" "1.0.38"
+    argparse "~1.0.9"
+    string-argv "~0.3.1"
+
+"@rushstack/ts-command-line@4.19.2":
+  version "4.19.2"
+  resolved "https://registry.yarnpkg.com/@rushstack/ts-command-line/-/ts-command-line-4.19.2.tgz#4aef9fd7abd598bb0dd236ca471111426a9dbf12"
+  integrity sha512-cqmXXmBEBlzo9WtyUrHtF9e6kl0LvBY7aTSVX4jfnBfXWZQWnPq9JTFPlQZ+L/ZwjZ4HrNwQsOVvhe9oOucZkw==
+  dependencies:
+    "@rushstack/terminal" "0.10.1"
     "@types/argparse" "1.0.38"
     argparse "~1.0.9"
     string-argv "~0.3.1"
@@ -13411,11 +13469,6 @@ typescript@5.4.2:
   version "5.4.2"
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-5.4.2.tgz#0ae9cebcfae970718474fe0da2c090cad6577372"
   integrity sha512-+2/g0Fds1ERlP6JsakQQDXjZdZMM+rqpamFZJEKh4kwTIn3iDkgKtby0CeNd5ATNZ4Ry1ax15TMx0W2V+miizQ==
-
-typescript@5.4.3:
-  version "5.4.3"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-5.4.3.tgz#5c6fedd4c87bee01cd7a528a30145521f8e0feff"
-  integrity sha512-KrPd3PKaCLr78MalgiwJnA25Nm8HAmdwN3mYUYZgG/wizIo9EainNVQI9/yDavtVFRN2h3k8uf3GLHuhDMgEHg==
 
 typescript@5.4.5:
   version "5.4.5"
