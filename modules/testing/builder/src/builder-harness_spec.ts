@@ -6,6 +6,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+/* eslint-disable import/no-extraneous-dependencies */
+
 import { TestProjectHost } from '@angular-devkit/architect/testing';
 import { BuilderHarness } from './builder-harness';
 

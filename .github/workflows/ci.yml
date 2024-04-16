@@ -103,7 +103,9 @@ jobs:
         uses: angular/dev-infra/github-actions/bazel/configure-remote@f8b2efa171f4ebec4d0cb3d5c5d4f7cb680f2af9
       - name: Install node modules
         run: yarn install --frozen-lockfile
-      - name: Run tests
+      - name: Run module tests
+        run: yarn bazel test //modules/...
+      - name: Run package tests
         run: yarn bazel test //packages/...
 
   e2e:

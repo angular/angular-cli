@@ -12,7 +12,7 @@ import {
   BuilderHarness,
   BuilderHarnessExecutionOptions,
   BuilderHarnessExecutionResult,
-} from '../../../testing/builder-harness';
+} from '../../../testing';
 
 export async function executeOnceAndFetch<T>(
   harness: BuilderHarness<T>,
