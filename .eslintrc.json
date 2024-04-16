@@ -15,6 +15,7 @@
     "bazel-out",
     "dist-schema",
     "goldens/public-api",
+    "modules/testing/builder/projects",
     "packages/angular_devkit/build_angular/src/babel-bazel.d.ts",
     "packages/angular_devkit/build_angular/test",
     "packages/angular_devkit/build_webpack/test",

@@ -6,10 +6,17 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import {
-  BuilderWatcherCallback,
-  BuilderWatcherFactory,
-} from '../tools/webpack/plugins/builder-watch-plugin';
+type BuilderWatcherCallback = (
+  events: Array<{ path: string; type: 'created' | 'modified' | 'deleted'; time?: number }>,
+) => void;
+
+interface BuilderWatcherFactory {
+  watch(
+    files: Iterable<string>,
+    directories: Iterable<string>,
+    callback: BuilderWatcherCallback,
+  ): { close(): void };
+}
 
 class WatcherDescriptor {
   constructor(

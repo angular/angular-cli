@@ -7,7 +7,7 @@
  */
 
 import { createServer } from 'node:http';
-import { JasmineBuilderHarness } from '../../../../testing/jasmine-helpers';
+import { BuilderHarness } from '../../../../testing';
 import { executeDevServer } from '../../index';
 import { executeOnceAndFetch } from '../execute-fetch';
 import { describeServeBuilder } from '../jasmine-helpers';
@@ -275,7 +275,7 @@ async function createProxyServer() {
 /**
  * Vite specific tests
  */
-function viteOnlyTests(harness: JasmineBuilderHarness<unknown>): void {
+function viteOnlyTests(harness: BuilderHarness<unknown>): void {
   it('proxies support regexp as context', async () => {
     harness.useTarget('serve', {
       ...BASE_OPTIONS,

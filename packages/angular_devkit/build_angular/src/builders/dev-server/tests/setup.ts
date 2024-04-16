@@ -8,7 +8,7 @@
 
 import { json } from '@angular-devkit/core';
 import { readFileSync } from 'fs';
-import { BuilderHarness } from '../../../testing/builder-harness';
+import { BuilderHarness } from '../../../testing';
 import { buildApplication } from '../../application';
 import { Schema as AppilicationSchema } from '../../application/schema';
 import {
