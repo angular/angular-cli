@@ -171,7 +171,7 @@
     "npm-package-arg": "11.0.2",
     "open": "8.4.2",
     "ora": "5.4.1",
-    "pacote": "17.0.7",
+    "pacote": "18.0.0",
     "parse5-html-rewriting-stream": "7.0.0",
     "patch-package": "^7.0.1",
     "picomatch": "4.0.2",
