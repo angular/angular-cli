@@ -343,7 +343,7 @@ function handleUpdate(
   if (serverOptions.liveReload || serverOptions.hmr) {
     if (updatedFiles.every((f) => f.endsWith('.css'))) {
       const timestamp = Date.now();
-      server.ws.send({
+      server.hot.send({
         type: 'update',
         updates: updatedFiles.map((filePath) => {
           return {
@@ -363,7 +363,7 @@ function handleUpdate(
 
   // Send reload command to clients
   if (serverOptions.liveReload) {
-    server.ws.send({
+    server.hot.send({
       type: 'full-reload',
       path: '*',
     });
