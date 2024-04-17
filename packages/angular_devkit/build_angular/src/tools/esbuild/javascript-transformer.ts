@@ -111,7 +111,11 @@ export class JavaScriptTransformer {
           sideEffects,
           ...this.#commonOptions,
         },
-        { transferList: [data.buffer] },
+        {
+          // The below is disable as with Yarn PNP this causes build failures with the below message
+          // `Unable to deserialize cloned data`.
+          transferList: process.versions.pnp ? undefined : [data.buffer],
+        },
       )) as Uint8Array;
 
       // If there is a cache then store the result
