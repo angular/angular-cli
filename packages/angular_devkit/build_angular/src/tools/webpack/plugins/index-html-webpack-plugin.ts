@@ -67,7 +67,11 @@ export class IndexHtmlWebpackPlugin extends IndexHtmlGenerator {
           }
         }
 
-        const { content, warnings, errors } = await this.process({
+        const {
+          csrContent: content,
+          warnings,
+          errors,
+        } = await this.process({
           files,
           outputPath: dirname(this.options.outputPath),
           baseHref: this.options.baseHref,
