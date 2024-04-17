@@ -1,3 +1,51 @@
+<a name="18.0.0-next.3"></a>
+
+# 18.0.0-next.3 (2024-04-17)
+
+## Breaking Changes
+
+### @angular/cli
+
+- The `ng doc` command has been removed without a replacement. To perform searches, please visit www.angular.dev
+
+### @angular-devkit/build-angular
+
+- By default, the index.html file is no longer emitted in the browser directory when using the application builder with SSR. Instead, an index.csr.html file is emitted. This change is implemented because in many cases server and cloud providers incorrectly treat the index.html file as a statically generated page. If you still require the old behavior, you can use the `index` option to specify the `output` file name.
+
+  ```json
+  "architect": {
+    "build": {
+      "builder": "@angular-devkit/build-angular:application",
+      "options": {
+        "outputPath": "dist/my-app",
+        "index": {
+          "input": "src/index.html",
+          "output": "index.html"
+        }
+      }
+    }
+  }
+  ```
+
+### @angular/cli
+
+| Commit                                                                                              | Type     | Description             |
+| --------------------------------------------------------------------------------------------------- | -------- | ----------------------- |
+| [03eee0545](https://github.com/angular/angular-cli/commit/03eee0545095ff958ac86cb5dfad44692ef018ae) | refactor | remove `ng doc` command |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                                                          |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------------------------------------------------- |
+| [83d1d233a](https://github.com/angular/angular-cli/commit/83d1d233a2eded71fcdd5fec4b1a90bdd4dbf132) | feat | enhance Sass rebasing importer for resources URL defined in variables and handling of external paths |
+| [d51cb598a](https://github.com/angular/angular-cli/commit/d51cb598a74aba313aee212656de506004a041e6) | feat | inject event-dispatch in SSR HTML page                                                               |
+| [1c3ff61db](https://github.com/angular/angular-cli/commit/1c3ff61db84dca8300001e8a758a4a633aa972d3) | fix  | address `Unable to deserialize cloned data` issue with Yarn PnP                                      |
+| [2acf95a94](https://github.com/angular/angular-cli/commit/2acf95a94993e51876d4004d2c3bc0a04be0a419) | fix  | do not generate an `index.html` file in the browser directory when using SSR.                        |
+| [afa76bb36](https://github.com/angular/angular-cli/commit/afa76bb361a6a491f5c4ed725ef8cc4816f805c7) | fix  | ensure esbuild-based builders exclusively produce ESM output                                         |
+| [43816a5b2](https://github.com/angular/angular-cli/commit/43816a5b2d4c03a4cdd7c66fb16ddf0dd47b8124) | fix  | remove `type="text/css"` from `style` tag                                                            |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="17.3.5"></a>
 
 # 17.3.5 (2024-04-17)
