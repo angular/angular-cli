@@ -1,3 +1,16 @@
+<a name="17.3.5"></a>
+
+# 17.3.5 (2024-04-17)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                     |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------------- |
+| [6191d06ca](https://github.com/angular/angular-cli/commit/6191d06ca735a8fd29f048f319f912076abec698) | fix  | address `Unable to deserialize cloned data` issue with Yarn PnP |
+| [0335d6a5d](https://github.com/angular/angular-cli/commit/0335d6a5df1c0b0706673e6152e3bf5eb65d166a) | fix  | remove `type="text/css"` from `style` tag                       |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="17.3.4"></a>
 
 # 17.3.4 (2024-04-11)
