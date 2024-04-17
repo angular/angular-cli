@@ -224,6 +224,7 @@ export async function augmentIndexHtml(
               foundPreconnects.add(href);
             }
           }
+          break;
       }
 
       rewriter.emitStartTag(tag);

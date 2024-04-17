@@ -318,7 +318,11 @@ export function buildWebpackBrowser(
                     let hasErrors = false;
                     for (const [locale, outputPath] of outputPaths.entries()) {
                       try {
-                        const { content, warnings, errors } = await indexHtmlGenerator.process({
+                        const {
+                          csrContent: content,
+                          warnings,
+                          errors,
+                        } = await indexHtmlGenerator.process({
                           baseHref: getLocaleBaseHref(i18n, locale) ?? options.baseHref,
                           // i18nLocale is used when Ivy is disabled
                           lang: locale || undefined,

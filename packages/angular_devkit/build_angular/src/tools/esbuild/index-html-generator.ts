@@ -18,8 +18,8 @@ export async function generateIndexHtml(
   buildOptions: NormalizedApplicationBuildOptions,
   lang?: string,
 ): Promise<{
-  content: string;
-  contentWithoutCriticalCssInlined: string;
+  csrContent: string;
+  ssrContent?: string;
   warnings: string[];
   errors: string[];
 }> {
@@ -74,21 +74,20 @@ export async function generateIndexHtml(
     indexPath: indexHtmlOptions.input,
     entrypoints: indexHtmlOptions.insertionOrder,
     sri: subresourceIntegrity,
-    optimization: {
-      ...optimizationOptions,
-      styles: {
-        ...optimizationOptions.styles,
-        inlineCritical: false, // Disable critical css inline as for SSR and SSG this will be done during rendering.
-      },
-    },
+    optimization: optimizationOptions,
     crossOrigin: crossOrigin,
     deployUrl: buildOptions.publicPath,
     postTransform: indexHtmlOptions.transformer,
+    generateDedicatedSSRContent: !!(
+      buildOptions.ssrOptions ||
+      buildOptions.prerenderOptions ||
+      buildOptions.appShellOptions
+    ),
   });
 
   indexHtmlGenerator.readAsset = readAsset;
 
-  const transformResult = await indexHtmlGenerator.process({
+  return indexHtmlGenerator.process({
     baseHref,
     lang,
     outputPath: virtualOutputPath,
@@ -101,34 +100,4 @@ export async function generateIndexHtml(
       })),
     hints,
   });
-
-  const contentWithoutCriticalCssInlined = transformResult.content;
-  if (!optimizationOptions.styles.inlineCritical) {
-    return {
-      ...transformResult,
-      contentWithoutCriticalCssInlined,
-    };
-  }
-
-  const { InlineCriticalCssProcessor } = await import('../../utils/index-file/inline-critical-css');
-
-  const inlineCriticalCssProcessor = new InlineCriticalCssProcessor({
-    minify: false, // CSS has already been minified during the build.
-    deployUrl: buildOptions.publicPath,
-    readAsset,
-  });
-
-  const { content, errors, warnings } = await inlineCriticalCssProcessor.process(
-    contentWithoutCriticalCssInlined,
-    {
-      outputPath: virtualOutputPath,
-    },
-  );
-
-  return {
-    errors: [...transformResult.errors, ...errors],
-    warnings: [...transformResult.warnings, ...warnings],
-    content,
-    contentWithoutCriticalCssInlined,
-  };
 }

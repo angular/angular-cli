@@ -52,7 +52,6 @@ export async function executePostBundleSteps(
     indexHtmlOptions,
     optimizationOptions,
     sourcemapOptions,
-    ssrOptions,
     prerenderOptions,
     appShellOptions,
     workspaceRoot,
@@ -64,7 +63,7 @@ export async function executePostBundleSteps(
    *
    * NOTE: we don't perform critical CSS inlining as this will be done during server rendering.
    */
-  let indexContentOutputNoCssInlining: string | undefined;
+  let ssrIndexContent: string | undefined;
 
   // When using prerender/app-shell the index HTML file can be regenerated.
   // Thus, we use a Map so that we do not generate 2 files with the same filename.
@@ -73,35 +72,29 @@ export async function executePostBundleSteps(
   // Generate index HTML file
   // If localization is enabled, index generation is handled in the inlining process.
   if (indexHtmlOptions) {
-    const { content, contentWithoutCriticalCssInlined, errors, warnings } = await generateIndexHtml(
+    const { csrContent, ssrContent, errors, warnings } = await generateIndexHtml(
       initialFiles,
       outputFiles,
-      {
-        ...options,
-        optimizationOptions,
-      },
+      options,
       locale,
     );
 
-    indexContentOutputNoCssInlining = contentWithoutCriticalCssInlined;
     allErrors.push(...errors);
     allWarnings.push(...warnings);
 
     additionalHtmlOutputFiles.set(
       indexHtmlOptions.output,
-      createOutputFileFromText(indexHtmlOptions.output, content, BuildOutputFileType.Browser),
+      createOutputFileFromText(indexHtmlOptions.output, csrContent, BuildOutputFileType.Browser),
     );
 
-    if (ssrOptions) {
+    if (ssrContent) {
       const serverIndexHtmlFilename = 'index.server.html';
       additionalHtmlOutputFiles.set(
         serverIndexHtmlFilename,
-        createOutputFileFromText(
-          serverIndexHtmlFilename,
-          contentWithoutCriticalCssInlined,
-          BuildOutputFileType.Server,
-        ),
+        createOutputFileFromText(serverIndexHtmlFilename, ssrContent, BuildOutputFileType.Server),
       );
+
+      ssrIndexContent = ssrContent;
     }
   }
 
@@ -109,7 +102,7 @@ export async function executePostBundleSteps(
   // If localization is enabled, prerendering is handled in the inlining process.
   if (prerenderOptions || appShellOptions) {
     assert(
-      indexContentOutputNoCssInlining,
+      ssrIndexContent,
       'The "index" option is required when using the "ssg" or "appShell" options.',
     );
 
@@ -124,7 +117,7 @@ export async function executePostBundleSteps(
       prerenderOptions,
       outputFiles,
       assetFiles,
-      indexContentOutputNoCssInlining,
+      ssrIndexContent,
       sourcemapOptions.scripts,
       optimizationOptions.styles.inlineCritical,
       maxWorkers,

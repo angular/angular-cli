@@ -15,10 +15,10 @@ import { htmlRewritingStream } from './html-rewriting-stream';
 const NONCE_ATTR_PATTERN = /ngCspNonce/i;
 
 /**
- * Finds the `ngCspNonce` value and copies it to all inline `<style>` tags.
+ * Finds the `ngCspNonce` value and copies it to all inline `<style>` and `<script> `tags.
  * @param html Markup that should be processed.
  */
-export async function addStyleNonce(html: string): Promise<string> {
+export async function addNonce(html: string): Promise<string> {
   const nonce = await findNonce(html);
 
   if (!nonce) {
@@ -28,7 +28,11 @@ export async function addStyleNonce(html: string): Promise<string> {
   const { rewriter, transformedContent } = await htmlRewritingStream(html);
 
   rewriter.on('startTag', (tag) => {
-    if (tag.tagName === 'style' && !tag.attrs.some((attr) => attr.name === 'nonce')) {
+    if (
+      (tag.tagName === 'style' ||
+        (tag.tagName === 'script' && !tag.attrs.some((attr) => attr.name === 'src'))) &&
+      !tag.attrs.some((attr) => attr.name === 'nonce')
+    ) {
       tag.attrs.push({ name: 'nonce', value: nonce });
     }
 

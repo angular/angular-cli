@@ -10,15 +10,16 @@ import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { NormalizedCachedOptions } from '../normalize-cache';
 import { NormalizedOptimizationOptions } from '../normalize-optimization';
+import { addEventDispatchContract } from './add-event-dispatch-contract';
 import { CrossOriginValue, Entrypoint, FileInfo, augmentIndexHtml } from './augment-index-html';
 import { InlineCriticalCssProcessor } from './inline-critical-css';
 import { InlineFontsProcessor } from './inline-fonts';
-import { addStyleNonce } from './style-nonce';
+import { addNonce } from './nonce';
 
 type IndexHtmlGeneratorPlugin = (
   html: string,
   options: IndexHtmlGeneratorProcessOptions,
-) => Promise<string | IndexHtmlTransformResult>;
+) => Promise<string | IndexHtmlPluginTransformResult> | string;
 
 export type HintMode = 'prefetch' | 'preload' | 'modulepreload' | 'preconnect' | 'dns-prefetch';
 
@@ -40,45 +41,78 @@ export interface IndexHtmlGeneratorOptions {
   optimization?: NormalizedOptimizationOptions;
   cache?: NormalizedCachedOptions;
   imageDomains?: string[];
+  generateDedicatedSSRContent?: boolean;
 }
 
 export type IndexHtmlTransform = (content: string) => Promise<string>;
 
-export interface IndexHtmlTransformResult {
+export interface IndexHtmlPluginTransformResult {
   content: string;
+  warnings: string[];
+  errors: string[];
+}
+
+export interface IndexHtmlProcessResult {
+  csrContent: string;
+  ssrContent?: string;
   warnings: string[];
   errors: string[];
 }
 
 export class IndexHtmlGenerator {
   private readonly plugins: IndexHtmlGeneratorPlugin[];
+  private readonly csrPlugins: IndexHtmlGeneratorPlugin[] = [];
+  private readonly ssrPlugins: IndexHtmlGeneratorPlugin[] = [];
 
   constructor(readonly options: IndexHtmlGeneratorOptions) {
-    const extraPlugins: IndexHtmlGeneratorPlugin[] = [];
-    if (this.options.optimization?.fonts.inline) {
-      extraPlugins.push(inlineFontsPlugin(this));
+    const extraCommonPlugins: IndexHtmlGeneratorPlugin[] = [];
+    if (options?.optimization?.fonts.inline) {
+      extraCommonPlugins.push(inlineFontsPlugin(this), addNonce);
     }
 
-    if (this.options.optimization?.styles.inlineCritical) {
-      extraPlugins.push(inlineCriticalCssPlugin(this));
+    // Common plugins
+    this.plugins = [augmentIndexHtmlPlugin(this), ...extraCommonPlugins, postTransformPlugin(this)];
+
+    // CSR plugins
+    if (options?.optimization?.styles?.inlineCritical) {
+      this.csrPlugins.push(inlineCriticalCssPlugin(this));
     }
 
-    this.plugins = [
-      augmentIndexHtmlPlugin(this),
-      ...extraPlugins,
-      // Runs after the `extraPlugins` to capture any nonce or
-      // `style` tags that might've been added by them.
-      addStyleNoncePlugin(),
-      postTransformPlugin(this),
-    ];
+    // SSR plugins
+    if (options.generateDedicatedSSRContent) {
+      this.ssrPlugins.push(addEventDispatchContractPlugin(), addNoncePlugin());
+    }
   }
 
-  async process(options: IndexHtmlGeneratorProcessOptions): Promise<IndexHtmlTransformResult> {
+  async process(options: IndexHtmlGeneratorProcessOptions): Promise<IndexHtmlProcessResult> {
     let content = await this.readIndex(this.options.indexPath);
     const warnings: string[] = [];
     const errors: string[] = [];
 
-    for (const plugin of this.plugins) {
+    content = await this.runPlugins(content, this.plugins, options, warnings, errors);
+    const [csrContent, ssrContent] = await Promise.all([
+      this.runPlugins(content, this.csrPlugins, options, warnings, errors),
+      this.ssrPlugins.length
+        ? this.runPlugins(content, this.ssrPlugins, options, warnings, errors)
+        : undefined,
+    ]);
+
+    return {
+      ssrContent,
+      csrContent,
+      warnings,
+      errors,
+    };
+  }
+
+  private async runPlugins(
+    content: string,
+    plugins: IndexHtmlGeneratorPlugin[],
+    options: IndexHtmlGeneratorProcessOptions,
+    warnings: string[],
+    errors: string[],
+  ): Promise<string> {
+    for (const plugin of plugins) {
       const result = await plugin(content, options);
       if (typeof result === 'string') {
         content = result;
@@ -95,11 +129,7 @@ export class IndexHtmlGenerator {
       }
     }
 
-    return {
-      content,
-      warnings,
-      errors,
-    };
+    return content;
   }
 
   async readAsset(path: string): Promise<string> {
@@ -160,10 +190,14 @@ function inlineCriticalCssPlugin(generator: IndexHtmlGenerator): IndexHtmlGenera
     inlineCriticalCssProcessor.process(html, { outputPath: options.outputPath });
 }
 
-function addStyleNoncePlugin(): IndexHtmlGeneratorPlugin {
-  return (html) => addStyleNonce(html);
+function addNoncePlugin(): IndexHtmlGeneratorPlugin {
+  return (html) => addNonce(html);
 }
 
 function postTransformPlugin({ options }: IndexHtmlGenerator): IndexHtmlGeneratorPlugin {
   return async (html) => (options.postTransform ? options.postTransform(html) : html);
+}
+
+function addEventDispatchContractPlugin(): IndexHtmlGeneratorPlugin {
+  return (html) => addEventDispatchContract(html);
 }
