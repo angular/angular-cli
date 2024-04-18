@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import { loadProxyConfiguration } from '@angular/build/private';
 import {
   BuilderContext,
   BuilderOutput,
@@ -41,7 +42,6 @@ import {
   zip,
 } from 'rxjs';
 import * as url from 'url';
-import { loadProxyConfiguration } from '../../utils';
 import { Schema } from './schema';
 
 import { getAvailablePort, spawnAsObservable, waitUntilServerIsListening } from './utils';

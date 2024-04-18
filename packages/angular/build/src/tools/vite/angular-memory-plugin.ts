@@ -7,13 +7,13 @@
  */
 
 import remapping, { SourceMapInput } from '@ampproject/remapping';
-import { renderPage } from '@angular/build/private';
 import { lookup as lookupMimeType } from 'mrmime';
 import assert from 'node:assert';
 import { readFile } from 'node:fs/promises';
 import { ServerResponse } from 'node:http';
 import { dirname, extname, join, relative } from 'node:path';
 import type { Connect, Plugin } from 'vite';
+import { renderPage } from '../../utils/server-rendering/render-page';
 
 export interface AngularMemoryPluginOptions {
   workspaceRoot: string;

@@ -6,9 +6,9 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { DevServerBuilderOutput } from '@angular/build';
 import { createBuilder } from '@angular-devkit/architect';
 import { execute } from './builder';
+import { DevServerBuilderOutput } from './output';
 import { Schema as DevServerBuilderOptions } from './schema';
 
 export { DevServerBuilderOptions, DevServerBuilderOutput, execute as executeDevServerBuilder };
