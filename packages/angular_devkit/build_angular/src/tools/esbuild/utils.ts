@@ -170,18 +170,24 @@ export async function withNoProgress<T>(text: string, action: () => T | Promise<
  * Generates a syntax feature object map for Angular applications based on a list of targets.
  * A full set of feature names can be found here: https://esbuild.github.io/api/#supported
  * @param target An array of browser/engine targets in the format accepted by the esbuild `target` option.
+ * @param nativeAsyncAwait Indicate whether to support native async/await.
  * @returns An object that can be used with the esbuild build `supported` option.
  */
-export function getFeatureSupport(target: string[]): BuildOptions['supported'] {
+export function getFeatureSupport(
+  target: string[],
+  nativeAsyncAwait: boolean,
+): BuildOptions['supported'] {
   const supported: Record<string, boolean> = {
     // Native async/await is not supported with Zone.js. Disabling support here will cause
     // esbuild to downlevel async/await, async generators, and for await...of to a Zone.js supported form.
-    'async-await': false,
+    'async-await': nativeAsyncAwait,
     // V8 currently has a performance defect involving object spread operations that can cause signficant
     // degradation in runtime performance. By not supporting the language feature here, a downlevel form
     // will be used instead which provides a workaround for the performance issue.
     // For more details: https://bugs.chromium.org/p/v8/issues/detail?id=11536
     'object-rest-spread': false,
+    // Using top-level-await is not guaranteed to be safe with some code optimizations.
+    'top-level-await': false,
   };
 
   // Detect Safari browser versions that have a class field behavior bug
@@ -478,4 +484,15 @@ export async function logMessages(
   if (errors.length) {
     logger.error((await formatMessages(errors, { kind: 'error', color })).join('\n'));
   }
+}
+
+/**
+ * Ascertain whether the application operates without `zone.js`, we currently rely on the polyfills setting to determine its status.
+ * If a file with an extension is provided or if `zone.js` is included in the polyfills, the application is deemed as not zoneless.
+ * @param polyfills An array of polyfills
+ * @returns true, when the application is considered as zoneless.
+ */
+export function isZonelessApp(polyfills: string[] | undefined): boolean {
+  // TODO: Instead, we should rely on the presence of zone.js in the polyfills build metadata.
+  return !polyfills?.some((p) => p === 'zone.js' || /\.[mc]?[jt]s$/.test(p));
 }

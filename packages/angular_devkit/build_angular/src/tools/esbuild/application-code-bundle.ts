@@ -21,7 +21,7 @@ import { createExternalPackagesPlugin } from './external-packages-plugin';
 import { createAngularLocaleDataPlugin } from './i18n-locale-plugin';
 import { createRxjsEsmResolutionPlugin } from './rxjs-esm-resolution-plugin';
 import { createSourcemapIgnorelistPlugin } from './sourcemap-ignorelist-plugin';
-import { getFeatureSupport } from './utils';
+import { getFeatureSupport, isZonelessApp } from './utils';
 import { createVirtualModulePlugin } from './virtual-module-plugin';
 
 export function createBrowserCodeBundleOptions(
@@ -29,7 +29,7 @@ export function createBrowserCodeBundleOptions(
   target: string[],
   sourceFileCache?: SourceFileCache,
 ): BuildOptions {
-  const { entryPoints, outputNames } = options;
+  const { entryPoints, outputNames, polyfills } = options;
 
   const { pluginOptions, styleOptions } = createCompilerPluginOptions(
     options,
@@ -48,7 +48,7 @@ export function createBrowserCodeBundleOptions(
     entryNames: outputNames.bundles,
     entryPoints,
     target,
-    supported: getFeatureSupport(target),
+    supported: getFeatureSupport(target, isZonelessApp(polyfills)),
     plugins: [
       createSourcemapIgnorelistPlugin(),
       createCompilerPlugin(
@@ -154,8 +154,15 @@ export function createServerCodeBundleOptions(
   target: string[],
   sourceFileCache: SourceFileCache,
 ): BuildOptions {
-  const { serverEntryPoint, workspaceRoot, ssrOptions, watch, externalPackages, prerenderOptions } =
-    options;
+  const {
+    serverEntryPoint,
+    workspaceRoot,
+    ssrOptions,
+    watch,
+    externalPackages,
+    prerenderOptions,
+    polyfills,
+  } = options;
 
   assert(
     serverEntryPoint,
@@ -195,7 +202,7 @@ export function createServerCodeBundleOptions(
       js: `import './polyfills.server.mjs';`,
     },
     entryPoints,
-    supported: getFeatureSupport(target),
+    supported: getFeatureSupport(target, isZonelessApp(polyfills)),
     plugins: [
       createSourcemapIgnorelistPlugin(),
       createCompilerPlugin(
@@ -260,27 +267,26 @@ export function createServerPolyfillBundleOptions(
   target: string[],
   sourceFileCache?: SourceFileCache,
 ): BundlerOptionsFactory | undefined {
-  const polyfills: string[] = [];
+  const serverPolyfills: string[] = [];
   const polyfillsFromConfig = new Set(options.polyfills);
-
-  if (polyfillsFromConfig.has('zone.js')) {
-    polyfills.push('zone.js/node');
+  if (!isZonelessApp(options.polyfills)) {
+    serverPolyfills.push('zone.js/node');
   }
 
   if (
     polyfillsFromConfig.has('@angular/localize') ||
     polyfillsFromConfig.has('@angular/localize/init')
   ) {
-    polyfills.push('@angular/localize/init');
+    serverPolyfills.push('@angular/localize/init');
   }
 
-  polyfills.push('@angular/platform-server/init');
+  serverPolyfills.push('@angular/platform-server/init');
 
   const namespace = 'angular:polyfills-server';
   const polyfillBundleOptions = getEsBuildCommonPolyfillsOptions(
     {
       ...options,
-      polyfills,
+      polyfills: serverPolyfills,
     },
     namespace,
     false,

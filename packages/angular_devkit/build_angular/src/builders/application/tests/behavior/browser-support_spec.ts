@@ -44,7 +44,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       harness.expectFile('dist/browser/main.js.map').content.toContain('Promise<Void123>');
     });
 
-    it('downlevels async functions ', async () => {
+    it('downlevels async functions when zone.js is included as a polyfill', async () => {
       // Add an async function to the project
       await harness.writeFile(
         'src/main.ts',
@@ -53,12 +53,32 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
       harness.useTarget('build', {
         ...BASE_OPTIONS,
+        polyfills: ['zone.js'],
       });
 
       const { result } = await harness.executeOnce();
 
       expect(result?.success).toBe(true);
       harness.expectFile('dist/browser/main.js').content.not.toMatch(/\sasync\s/);
+      harness.expectFile('dist/browser/main.js').content.toContain('"from-async-function"');
+    });
+
+    it('does not downlevels async functions when zone.js is not included as a polyfill', async () => {
+      // Add an async function to the project
+      await harness.writeFile(
+        'src/main.ts',
+        'async function test(): Promise<void> { console.log("from-async-function"); }\ntest();',
+      );
+
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+        polyfills: [],
+      });
+
+      const { result } = await harness.executeOnce();
+
+      expect(result?.success).toBe(true);
+      harness.expectFile('dist/browser/main.js').content.toMatch(/\sasync\s/);
       harness.expectFile('dist/browser/main.js').content.toContain('"from-async-function"');
     });
 
@@ -89,7 +109,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       );
     });
 
-    it('downlevels "for await...of"', async () => {
+    it('downlevels "for await...of" when zone.js is included as a polyfill', async () => {
       // Add an async function to the project
       await harness.writeFile(
         'src/main.ts',
@@ -104,12 +124,38 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
       harness.useTarget('build', {
         ...BASE_OPTIONS,
+        polyfills: ['zone.js'],
       });
 
       const { result } = await harness.executeOnce();
 
       expect(result?.success).toBe(true);
       harness.expectFile('dist/browser/main.js').content.not.toMatch(/\sawait\s/);
+      harness.expectFile('dist/browser/main.js').content.toContain('"for await...of"');
+    });
+
+    it('does not downlevel "for await...of" when zone.js is not included as a polyfill', async () => {
+      // Add an async function to the project
+      await harness.writeFile(
+        'src/main.ts',
+        `
+          (async () => {
+            for await (const o of [1, 2, 3]) {
+              console.log("for await...of");
+            }
+          })();
+          `,
+      );
+
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+        polyfills: [],
+      });
+
+      const { result } = await harness.executeOnce();
+
+      expect(result?.success).toBe(true);
+      harness.expectFile('dist/browser/main.js').content.toMatch(/\sawait\s/);
       harness.expectFile('dist/browser/main.js').content.toContain('"for await...of"');
     });
   });
