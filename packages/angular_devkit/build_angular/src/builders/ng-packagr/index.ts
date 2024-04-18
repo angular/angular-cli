@@ -7,6 +7,7 @@
  */
 
 import { BuilderContext, BuilderOutput, createBuilder } from '@angular-devkit/architect';
+import type { NgPackagrOptions } from 'ng-packagr';
 import { join, resolve } from 'path';
 import { Observable, catchError, from, mapTo, of, switchMap } from 'rxjs';
 import { normalizeCacheOptions } from '../../utils/normalize-cache';
@@ -45,7 +46,7 @@ export function execute(
         context.workspaceRoot,
       );
 
-      const ngPackagrOptions = {
+      const ngPackagrOptions: NgPackagrOptions = {
         cacheEnabled,
         poll: options.poll,
         cacheDirectory: join(cacheDirectory, 'ng-packagr'),
