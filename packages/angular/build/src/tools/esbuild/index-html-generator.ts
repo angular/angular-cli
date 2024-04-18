@@ -12,6 +12,12 @@ import { NormalizedApplicationBuildOptions } from '../../builders/application/op
 import { IndexHtmlGenerator } from '../../utils/index-file/index-html-generator';
 import { BuildOutputFile, BuildOutputFileType, InitialFileRecord } from './bundler-context';
 
+/**
+ * The maximum number of module preload link elements that should be added for
+ * initial scripts.
+ */
+const MODULE_PRELOAD_MAX = 3;
+
 export async function generateIndexHtml(
   initialFiles: Map<string, InitialFileRecord>,
   outputFiles: BuildOutputFile[],
@@ -39,13 +45,20 @@ export async function generateIndexHtml(
   assert(indexHtmlOptions, 'indexHtmlOptions cannot be undefined.');
 
   if (!externalPackages && indexHtmlOptions.preloadInitial) {
+    let modulePreloadCount = 0;
     for (const [key, value] of initialFiles) {
       if (value.entrypoint || value.serverFile) {
         // Entry points are already referenced in the HTML
         continue;
       }
 
-      if (value.type === 'script') {
+      // Only add shallow preloads
+      if (value.depth > 1) {
+        continue;
+      }
+
+      if (value.type === 'script' && modulePreloadCount < MODULE_PRELOAD_MAX) {
+        modulePreloadCount++;
         hints.push({ url: key, mode: 'modulepreload' as const });
       } else if (value.type === 'style') {
         // Provide an "as" value of "style" to ensure external URLs which may not have a
