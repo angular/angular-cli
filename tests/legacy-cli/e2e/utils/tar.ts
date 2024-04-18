@@ -6,9 +6,9 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import fs from 'fs';
-import { normalize } from 'path';
-import { Parse } from 'tar';
+import { createReadStream } from 'node:fs';
+import { normalize } from 'node:path';
+import { Parser } from 'tar';
 
 /**
  * Extract and return the contents of a single file out of a tar file.
@@ -19,21 +19,21 @@ import { Parse } from 'tar';
  */
 export async function extractFile(tarball: string, filePath: string): Promise<Buffer> {
   return new Promise((resolve, reject) => {
-    fs.createReadStream(tarball)
-      .pipe(
-        new Parse({
-          strict: true,
-          filter: (p) => normalize(p) === normalize(filePath),
-          // TODO: @types/tar 'entry' does not have ReadEntry.on
-          onentry: (entry: any) => {
-            const chunks: Buffer[] = [];
+    const parser = new Parser({
+      strict: true,
+      filter: (p) => normalize(p) === normalize(filePath),
+      onentry: (entry) => {
+        const chunks: Buffer[] = [];
 
-            entry.on('data', (chunk: any) => chunks!.push(chunk));
-            entry.on('error', reject);
-            entry.on('finish', () => resolve(Buffer.concat(chunks!)));
-          },
-        }),
-      )
+        entry.on('data', (chunk: any) => chunks!.push(chunk));
+        entry.on('error', reject);
+        entry.on('finish', () => resolve(Buffer.concat(chunks!)));
+      },
+    });
+
+    createReadStream(tarball)
+      // The types returned by 'write(...)' are incompatible between these types.
+      .pipe(parser as any)
       .on('close', () => reject(`${tarball} does not contain ${filePath}`));
   });
 }
