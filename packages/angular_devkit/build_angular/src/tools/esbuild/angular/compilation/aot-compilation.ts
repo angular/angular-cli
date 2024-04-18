@@ -17,10 +17,7 @@ import {
 } from '../angular-host';
 import { createWorkerTransformer } from '../web-worker-transformer';
 import { AngularCompilation, DiagnosticModes, EmitFileResult } from './angular-compilation';
-
-// Temporary deep import for transformer support
-// TODO: Move these to a private exports location or move the implementation into this package.
-const { mergeTransformers, replaceBootstrap } = require('@ngtools/webpack/src/ivy/transformation');
+import { replaceBootstrap } from './jit-bootstrap-transformer';
 
 class AngularCompilationState {
   constructor(
@@ -63,7 +60,7 @@ export class AotCompilation extends AngularCompilation {
       compilerOptionsTransformer?.(originalCompilerOptions) ?? originalCompilerOptions;
 
     // Create Angular compiler host
-    const host = createAngularCompilerHost(compilerOptions, hostOptions);
+    const host = createAngularCompilerHost(ts, compilerOptions, hostOptions);
 
     // Create the Angular specific program that contains the Angular compiler
     const angularProgram = profileSync(
@@ -224,12 +221,12 @@ export class AotCompilation extends AngularCompilation {
       angularCompiler.incrementalCompilation.recordSuccessfulEmit(sourceFile);
       emittedFiles.set(sourceFile, { filename: sourceFile.fileName, contents });
     };
-    const transformers = mergeTransformers(angularCompiler.prepareEmit().transformers, {
-      before: [
-        replaceBootstrap(() => typeScriptProgram.getProgram().getTypeChecker()),
-        webWorkerTransform,
-      ],
-    });
+    const transformers = angularCompiler.prepareEmit().transformers;
+    transformers.before ??= [];
+    transformers.before.push(
+      replaceBootstrap(() => typeScriptProgram.getProgram().getTypeChecker()),
+    );
+    transformers.before.push(webWorkerTransform);
 
     // TypeScript will loop until there are no more affected files in the program
     while (
