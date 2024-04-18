@@ -84,12 +84,9 @@ export default async function (args: CreateOptions, cwd: string): Promise<number
   const packageJsonPath = path.join(projectName, 'package.json');
   const packageJson = JSON.parse(await readFile(packageJsonPath, 'utf-8'));
 
-  if (!packageJson['dependencies']) {
-    packageJson['dependencies'] = {};
-  }
-  if (!packageJson['devDependencies']) {
-    packageJson['devDependencies'] = {};
-  }
+  packageJson['dependencies'] ??= {};
+  packageJson['devDependencies'] ??= {};
+  packageJson['overrides'] ??= {};
 
   // Set the dependencies to the new build we just used.
   for (const packageName of packages.map(({ name }) => name)) {
@@ -99,6 +96,8 @@ export default async function (args: CreateOptions, cwd: string): Promise<number
       packageJson['dependencies'][packageName] = tar;
     } else if (packageName in packageJson['devDependencies']) {
       packageJson['devDependencies'][packageName] = tar;
+    } else {
+      packageJson['overrides'][packageName] = tar;
     }
   }
 
