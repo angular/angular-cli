@@ -1,28 +1,8 @@
 {
   "schematics": {
-    "replace-nguniversal-builders": {
-      "version": "17.0.0",
-      "factory": "./update-17/replace-nguniversal-builders",
-      "description": "Replace usages of '@nguniversal/builders' with '@angular-devkit/build-angular'."
-    },
-    "replace-nguniversal-engines": {
-      "version": "17.0.0",
-      "factory": "./update-17/replace-nguniversal-engines",
-      "description": "Replace usages of '@nguniversal/' packages with '@angular/ssr'."
-    },
-    "update-workspace-config": {
-      "version": "17.0.0",
-      "factory": "./update-17/update-workspace-config",
-      "description": "Replace deprecated options in 'angular.json'."
-    },
-    "add-browser-sync-dependency": {
-      "version": "17.1.0",
-      "factory": "./update-17/add-browser-sync-dependency",
-      "description": "Add 'browser-sync' as dev dependency when '@angular-devkit/build-angular:ssr-dev-server' is used, as it is no longer a direct dependency of '@angular-devkit/build-angular'."
-    },
     "use-application-builder": {
       "version": "18.0.0",
-      "factory": "./update-17/use-application-builder",
+      "factory": "./use-application-builder/migration",
       "description": "Migrate application projects using '@angular-devkit/build-angular:browser' and '@angular-devkit/build-angular:browser-esbuild' to use the '@angular-devkit/build-angular:application' builder. Read more about this here: https://angular.dev/tools/cli/esbuild#using-the-application-builder",
       "optional": true
     }
