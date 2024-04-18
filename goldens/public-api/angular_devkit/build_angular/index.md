@@ -303,6 +303,7 @@ export type KarmaConfigOptions = ConfigOptions & {
 
 // @public
 export interface NgPackagrBuilderOptions {
+    poll?: number;
     project: string;
     tsConfig?: string;
     watch?: boolean;

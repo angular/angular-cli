@@ -47,6 +47,7 @@ export function execute(
 
       const ngPackagrOptions = {
         cacheEnabled,
+        poll: options.poll,
         cacheDirectory: join(cacheDirectory, 'ng-packagr'),
       };
 

@@ -16,6 +16,10 @@
       "type": "boolean",
       "description": "Run build when files change.",
       "default": false
+    },
+    "poll": {
+      "type": "number",
+      "description": "Enable and define the file watching poll time period in milliseconds."
     }
   },
   "additionalProperties": false,
