@@ -12,6 +12,11 @@ ts_json_schema(
     src = "src/builders/application/schema.json",
 )
 
+ts_json_schema(
+    name = "dev-server_schema",
+    src = "src/builders/dev-server/schema.json",
+)
+
 ts_library(
     name = "build",
     package_name = "@angular/build",
@@ -28,6 +33,7 @@ ts_library(
         ],
     ) + [
         "//packages/angular/build:src/builders/application/schema.ts",
+        "//packages/angular/build:src/builders/dev-server/schema.ts",
     ],
     data = glob(
         include = [
@@ -57,11 +63,13 @@ ts_library(
         "@npm//@babel/helper-split-export-declaration",
         "@npm//@types/babel__core",
         "@npm//@types/browserslist",
+        "@npm//@types/inquirer",
         "@npm//@types/less",
         "@npm//@types/node",
         "@npm//@types/picomatch",
         "@npm//@types/semver",
         "@npm//@types/watchpack",
+        "@npm//@vitejs/plugin-basic-ssl",
         "@npm//ansi-colors",
         "@npm//autoprefixer",
         "@npm//browserslist",
@@ -69,6 +77,7 @@ ts_library(
         "@npm//esbuild",
         "@npm//fast-glob",
         "@npm//https-proxy-agent",
+        "@npm//inquirer",
         "@npm//less",
         "@npm//magic-string",
         "@npm//mrmime",
@@ -81,6 +90,7 @@ ts_library(
         "@npm//tslib",
         "@npm//typescript",
         "@npm//undici",
+        "@npm//vite",
         "@npm//watchpack",
     ],
 )
@@ -131,6 +141,11 @@ ts_library(
         "//packages/angular_devkit/architect/testing",
         "//packages/angular_devkit/core",
         "//packages/angular_devkit/core/node",
+
+        # dev server only test deps
+        "@npm//@types/http-proxy",
+        "@npm//http-proxy",
+        "@npm//puppeteer",
 
         # Base dependencies for the application in hello-world-app.
         "@npm//@angular/common",

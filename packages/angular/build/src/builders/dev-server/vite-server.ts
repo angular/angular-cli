@@ -7,7 +7,6 @@
  */
 
 import type { BuilderContext } from '@angular-devkit/architect';
-import type { json } from '@angular-devkit/core';
 import type { Plugin } from 'esbuild';
 import assert from 'node:assert';
 import { readFile } from 'node:fs/promises';
@@ -17,15 +16,13 @@ import { createAngularMemoryPlugin } from '../../tools/vite/angular-memory-plugi
 import { createAngularLocaleDataPlugin } from '../../tools/vite/i18n-locale-plugin';
 import { loadProxyConfiguration, normalizeSourceMaps } from '../../utils';
 import { loadEsmModule } from '../../utils/load-esm';
-import { buildEsbuildBrowser } from '../browser-esbuild';
-import { Schema as BrowserBuilderOptions } from '../browser-esbuild/schema';
+import { ApplicationBuilderOutput } from '../application';
 import {
   type ApplicationBuilderInternalOptions,
   type BuildOutputFile,
   BuildOutputFileType,
   type ExternalResultMetadata,
   JavaScriptTransformer,
-  buildApplicationInternal,
   createRxjsEsmResolutionPlugin,
   getFeatureSupport,
   getSupportedBrowsers,
@@ -43,6 +40,12 @@ interface OutputFileRecord {
   servable: boolean;
 }
 
+export type BuilderAction = (
+  options: ApplicationBuilderInternalOptions,
+  context: BuilderContext,
+  plugins?: Plugin[],
+) => AsyncIterable<ApplicationBuilderOutput>;
+
 /**
  * Build options that are also present on the dev server but are only passed
  * to the build.
@@ -53,6 +56,7 @@ const CONVENIENCE_BUILD_OPTIONS = ['watch', 'poll', 'verbose'] as const;
 export async function* serveWithVite(
   serverOptions: NormalizedDevServerOptions,
   builderName: string,
+  builderAction: BuilderAction,
   context: BuilderContext,
   transformers?: {
     indexHtml?: (content: string) => Promise<string>;
@@ -76,10 +80,11 @@ export async function* serveWithVite(
     }
   }
 
-  const browserOptions = await context.validateOptions<json.JsonObject & BrowserBuilderOptions>(
+  // TODO: Adjust architect to not force a JsonObject derived return type
+  const browserOptions = (await context.validateOptions(
     rawBrowserOptions,
     builderName,
-  );
+  )) as unknown as ApplicationBuilderInternalOptions;
 
   if (browserOptions.prerender || browserOptions.ssr) {
     // Disable prerendering if enabled and force SSR.
@@ -94,7 +99,7 @@ export async function* serveWithVite(
   }
 
   // Set all packages as external to support Vite's prebundle caching
-  browserOptions.externalPackages = serverOptions.prebundle as json.JsonValue;
+  browserOptions.externalPackages = serverOptions.prebundle;
 
   const baseHref = browserOptions.baseHref;
   if (serverOptions.servePath === undefined && baseHref !== undefined) {
@@ -161,25 +166,8 @@ export async function* serveWithVite(
     deferred?.();
   });
 
-  const build =
-    builderName === '@angular-devkit/build-angular:browser-esbuild'
-      ? buildEsbuildBrowser.bind(
-          undefined,
-          browserOptions,
-          context,
-          { write: false },
-          extensions?.buildPlugins,
-        )
-      : buildApplicationInternal.bind(
-          undefined,
-          browserOptions as ApplicationBuilderInternalOptions,
-          context,
-          { write: false },
-          { codePlugins: extensions?.buildPlugins },
-        );
-
   // TODO: Switch this to an architect schedule call when infrastructure settings are supported
-  for await (const result of build()) {
+  for await (const result of builderAction(browserOptions, context, extensions?.buildPlugins)) {
     assert(result.outputFiles, 'Builder did not provide result files.');
 
     // If build failed, nothing to serve

@@ -1,9 +1,14 @@
 {
   "builders": {
     "application": {
-      "implementation": "./src/builders/application",
+      "implementation": "./src/builders/application/index",
       "schema": "./src/builders/application/schema.json",
       "description": "Build an application."
+    },
+    "dev-server": {
+      "implementation": "./src/builders/dev-server/index",
+      "schema": "./src/builders/dev-server/schema.json",
+      "description": "Execute a development server for an application."
     }
   }
 }

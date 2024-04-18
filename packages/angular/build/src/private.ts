@@ -16,6 +16,7 @@
 // Builders
 export { buildApplicationInternal } from './builders/application';
 export { ApplicationBuilderInternalOptions } from './builders/application/options';
+export { serveWithVite } from './builders/dev-server/vite-server';
 
 // Tools
 export * from './tools/babel/plugins';
@@ -26,6 +27,7 @@ export { SassWorkerImplementation } from './tools/sass/sass-service';
 
 // Utilities
 export * from './utils/bundle-calculator';
+export { checkPort } from './utils/check-port';
 export { deleteOutputDir } from './utils/delete-output-dir';
 export { I18nOptions, createI18nOptions, loadTranslations } from './utils/i18n-options';
 export {
@@ -40,15 +42,10 @@ export {
   InlineCriticalCssProcessor,
   type InlineCriticalCssProcessorOptions,
 } from './utils/index-file/inline-critical-css';
+export { loadProxyConfiguration } from './utils/load-proxy-config';
 export { type TranslationLoader, createTranslationLoader } from './utils/load-translations';
 export { purgeStaleBuildCache } from './utils/purge-cache';
 export { augmentAppWithServiceWorker } from './utils/service-worker';
 export { BundleStats, generateBuildStatsTable } from './utils/stats-table';
 export { getSupportedBrowsers } from './utils/supported-browsers';
 export { assertCompatibleAngularVersion } from './utils/version';
-
-// Required for Vite-based dev server only
-export { createRxjsEsmResolutionPlugin } from './tools/esbuild/rxjs-esm-resolution-plugin';
-export { JavaScriptTransformer } from './tools/esbuild/javascript-transformer';
-export { getFeatureSupport, isZonelessApp } from './tools/esbuild/utils';
-export { renderPage } from './utils/server-rendering/render-page';
