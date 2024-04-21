@@ -6,18 +6,6 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { BuildOutputFile, BuildOutputFileType } from '@angular/build';
-import {
-  type ApplicationBuilderInternalOptions,
-  type ExternalResultMetadata,
-  JavaScriptTransformer,
-  buildApplicationInternal,
-  createRxjsEsmResolutionPlugin,
-  getFeatureSupport,
-  getSupportedBrowsers,
-  isZonelessApp,
-  transformSupportedBrowsersToTargets,
-} from '@angular/build/private';
 import type { BuilderContext } from '@angular-devkit/architect';
 import type { json } from '@angular-devkit/core';
 import type { Plugin } from 'esbuild';
@@ -31,6 +19,19 @@ import { loadProxyConfiguration, normalizeSourceMaps } from '../../utils';
 import { loadEsmModule } from '../../utils/load-esm';
 import { buildEsbuildBrowser } from '../browser-esbuild';
 import { Schema as BrowserBuilderOptions } from '../browser-esbuild/schema';
+import {
+  type ApplicationBuilderInternalOptions,
+  type BuildOutputFile,
+  BuildOutputFileType,
+  type ExternalResultMetadata,
+  JavaScriptTransformer,
+  buildApplicationInternal,
+  createRxjsEsmResolutionPlugin,
+  getFeatureSupport,
+  getSupportedBrowsers,
+  isZonelessApp,
+  transformSupportedBrowsersToTargets,
+} from './internal';
 import type { NormalizedDevServerOptions } from './options';
 import type { DevServerBuilderOutput } from './output';
 

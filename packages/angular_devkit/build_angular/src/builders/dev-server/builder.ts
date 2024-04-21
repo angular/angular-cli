@@ -6,13 +6,13 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { type IndexHtmlTransform, purgeStaleBuildCache } from '@angular/build/private';
 import type { BuilderContext } from '@angular-devkit/architect';
 import type { Plugin } from 'esbuild';
 import type http from 'node:http';
 import { EMPTY, Observable, defer, switchMap } from 'rxjs';
 import type { ExecutionTransformer } from '../../transforms';
 import { checkPort } from '../../utils/check-port';
+import { type IndexHtmlTransform, purgeStaleBuildCache } from './internal';
 import { normalizeOptions } from './options';
 import type { DevServerBuilderOutput } from './output';
 import type { Schema as DevServerBuilderOptions } from './schema';
