@@ -14,8 +14,8 @@ import { EMPTY, Observable, defer, switchMap } from 'rxjs';
 import type { ExecutionTransformer } from '../../transforms';
 import { checkPort } from '../../utils/check-port';
 import { normalizeOptions } from './options';
+import type { DevServerBuilderOutput } from './output';
 import type { Schema as DevServerBuilderOptions } from './schema';
-import type { DevServerBuilderOutput } from './webpack-server';
 
 /**
  * A Builder that executes a development server based on the provided browser target option.

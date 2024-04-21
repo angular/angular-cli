@@ -33,7 +33,7 @@ import { getIndexOutputFile } from '../../utils/webpack-browser-config';
 import { buildEsbuildBrowser } from '../browser-esbuild';
 import { Schema as BrowserBuilderOptions } from '../browser-esbuild/schema';
 import type { NormalizedDevServerOptions } from './options';
-import type { DevServerBuilderOutput } from './webpack-server';
+import type { DevServerBuilderOutput } from './output';
 
 interface OutputFileRecord {
   contents: Uint8Array;
