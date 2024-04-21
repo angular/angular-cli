@@ -12,7 +12,6 @@ import { BuilderContext } from '@angular-devkit/architect';
 import { BuilderOutput } from '@angular-devkit/architect';
 import type { ConfigOptions } from 'karma';
 import { Configuration } from 'webpack';
-import { DevServerBuildOutput } from '@angular-devkit/build-webpack';
 import type http from 'node:http';
 import { IndexHtmlTransform } from '@angular/build/private';
 import { json } from '@angular-devkit/core';
@@ -144,10 +143,14 @@ export interface DevServerBuilderOptions {
 }
 
 // @public
-export type DevServerBuilderOutput = DevServerBuildOutput & {
+export interface DevServerBuilderOutput extends BuilderOutput {
+    // (undocumented)
+    address?: string;
+    // (undocumented)
     baseUrl: string;
-    stats: BuildEventStats;
-};
+    // (undocumented)
+    port?: number;
+}
 
 // @public
 export function executeBrowserBuilder(options: BrowserBuilderOptions, context: BuilderContext, transforms?: {

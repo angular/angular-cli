@@ -311,6 +311,7 @@ LARGE_SPECS = {
         "size": "large",
         "flaky": True,
         "extra_deps": [
+            "//packages/angular_devkit/build_webpack",
             "@npm//@types/http-proxy",
             "@npm//http-proxy",
             "@npm//puppeteer",

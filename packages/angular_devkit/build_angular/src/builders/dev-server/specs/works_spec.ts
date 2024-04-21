@@ -8,6 +8,7 @@
 
 import { Architect, BuilderRun } from '@angular-devkit/architect';
 import { DevServerBuilderOutput } from '@angular-devkit/build-angular';
+import { EmittedFiles } from '@angular-devkit/build-webpack';
 import { normalize, virtualFs } from '@angular-devkit/core';
 import { createArchitect, host } from '../../../testing/test-utils';
 
@@ -54,7 +55,7 @@ describe('Dev Server Builder', () => {
     const output = (await run.result) as DevServerBuilderOutput;
     expect(output.success).toBe(true);
     const hasSourceMaps =
-      output.emittedFiles && output.emittedFiles.some((f) => f.extension === '.map');
+      output.emittedFiles && output.emittedFiles.some((f: EmittedFiles) => f.extension === '.map');
     expect(hasSourceMaps).toBe(false, `Expected emitted files not to contain '.map' files.`);
   });
 

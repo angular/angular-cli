@@ -8,8 +8,8 @@
 
 import { createBuilder } from '@angular-devkit/architect';
 import { execute } from './builder';
+import { DevServerBuilderOutput } from './output';
 import { Schema as DevServerBuilderOptions } from './schema';
-import { DevServerBuilderOutput } from './webpack-server';
 
 export { DevServerBuilderOptions, DevServerBuilderOutput, execute as executeDevServerBuilder };
 export default createBuilder<DevServerBuilderOptions, DevServerBuilderOutput>(execute);
