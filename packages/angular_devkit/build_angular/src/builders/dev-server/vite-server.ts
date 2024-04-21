@@ -23,13 +23,12 @@ import type { json } from '@angular-devkit/core';
 import type { Plugin } from 'esbuild';
 import assert from 'node:assert';
 import { readFile } from 'node:fs/promises';
-import { join } from 'node:path';
+import { basename, join } from 'node:path';
 import type { Connect, DepOptimizationConfig, InlineConfig, ViteDevServer } from 'vite';
 import { createAngularMemoryPlugin } from '../../tools/vite/angular-memory-plugin';
 import { createAngularLocaleDataPlugin } from '../../tools/vite/i18n-locale-plugin';
 import { loadProxyConfiguration, normalizeSourceMaps } from '../../utils';
 import { loadEsmModule } from '../../utils/load-esm';
-import { getIndexOutputFile } from '../../utils/webpack-browser-config';
 import { buildEsbuildBrowser } from '../browser-esbuild';
 import { Schema as BrowserBuilderOptions } from '../browser-esbuild/schema';
 import type { NormalizedDevServerOptions } from './options';
@@ -131,8 +130,13 @@ export async function* serveWithVite(
 
   // Extract output index from options
   // TODO: Provide this info from the build results
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const htmlIndexPath = getIndexOutputFile(browserOptions.index as any);
+  let htmlIndexPath = 'index.html';
+  if (browserOptions.index && typeof browserOptions.index !== 'boolean') {
+    htmlIndexPath =
+      typeof browserOptions.index === 'string'
+        ? basename(browserOptions.index)
+        : browserOptions.index.output || 'index.html';
+  }
 
   // dynamically import Vite for ESM compatibility
   const { createServer, normalizePath } = await loadEsmModule<typeof import('vite')>('vite');
