@@ -357,9 +357,6 @@ LARGE_SPECS = {
         "extra_deps": [
             "@npm//@angular/animations",
             "@npm//@angular/material",
-            "@npm//bootstrap",
-            "@npm//jquery",
-            "@npm//popper.js",
         ],
     },
     "prerender": {},
