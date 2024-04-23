@@ -153,6 +153,18 @@ export function executeDevServerBuilder(options: DevServerBuilderOptions, contex
     indexHtmlTransformer?: IndexHtmlTransform;
 }): AsyncIterable<DevServerBuilderOutput>;
 
+// @public
+export function executeExtractI18nBuilder(options: ExtractI18nBuilderOptions, context: BuilderContext, extensions?: ApplicationBuilderExtensions): Promise<BuilderOutput>;
+
+// @public
+export interface ExtractI18nBuilderOptions {
+    buildTarget: string;
+    format?: Format;
+    outFile?: string;
+    outputPath?: string;
+    progress?: boolean;
+}
+
 // (No @packageDocumentation comment for this package)
 
 ```

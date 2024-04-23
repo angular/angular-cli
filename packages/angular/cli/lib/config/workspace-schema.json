@@ -355,6 +355,8 @@
                   "not": {
                     "enum": [
                       "@angular/build:application",
+                      "@angular/build:dev-server",
+                      "@angular/build:extract-i18n",
                       "@angular-devkit/build-angular:application",
                       "@angular-devkit/build-angular:app-shell",
                       "@angular-devkit/build-angular:browser",
@@ -505,6 +507,28 @@
               "additionalProperties": false,
               "properties": {
                 "builder": {
+                  "const": "@angular/build:dev-server"
+                },
+                "defaultConfiguration": {
+                  "type": "string",
+                  "description": "A default named configuration to use when a target configuration is not provided."
+                },
+                "options": {
+                  "$ref": "../../../../angular/build/src/builders/dev-server/schema.json"
+                },
+                "configurations": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "$ref": "../../../../angular/build/src/builders/dev-server/schema.json"
+                  }
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "builder": {
                   "const": "@angular-devkit/build-angular:dev-server"
                 },
                 "defaultConfiguration": {
@@ -518,6 +542,28 @@
                   "type": "object",
                   "additionalProperties": {
                     "$ref": "../../../../angular_devkit/build_angular/src/builders/dev-server/schema.json"
+                  }
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "builder": {
+                  "const": "@angular/build:extract-i18n"
+                },
+                "defaultConfiguration": {
+                  "type": "string",
+                  "description": "A default named configuration to use when a target configuration is not provided."
+                },
+                "options": {
+                  "$ref": "../../../../angular/build/src/builders/extract-i18n/schema.json"
+                },
+                "configurations": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "$ref": "../../../../angular/build/src/builders/extract-i18n/schema.json"
                   }
                 }
               }
