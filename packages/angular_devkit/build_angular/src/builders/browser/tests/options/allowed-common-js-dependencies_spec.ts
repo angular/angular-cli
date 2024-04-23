@@ -18,7 +18,7 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
           aot ? 'AOT' : 'JIT'
         } Mode`, async () => {
           // Add a Common JS dependency
-          await harness.appendToFile('src/app/app.component.ts', `import 'bootstrap';`);
+          await harness.appendToFile('src/app/app.component.ts', `import 'ajv';`);
 
           harness.useTarget('build', {
             ...BASE_OPTIONS,
@@ -32,13 +32,13 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
           expect(logs).toContain(
             jasmine.objectContaining<logging.LogEntry>({
               message: jasmine.stringMatching(
-                /Warning: .+app\.component\.ts depends on 'bootstrap'\. CommonJS or AMD dependencies/,
+                /Warning: .+app\.component\.ts depends on 'ajv'\. CommonJS or AMD dependencies/,
               ),
             }),
           );
           expect(logs).not.toContain(
             jasmine.objectContaining<logging.LogEntry>({
-              message: jasmine.stringMatching('jquery'),
+              message: jasmine.stringMatching('require-from-string'),
             }),
             'Should not warn on transitive CommonJS packages which parent is also CommonJS.',
           );
@@ -51,14 +51,14 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
       await harness.appendToFile(
         'src/app/app.component.ts',
         `
-        import 'bootstrap';
+        import 'ajv';
         import 'zone.js';
       `,
       );
 
       harness.useTarget('build', {
         ...BASE_OPTIONS,
-        allowedCommonJsDependencies: ['bootstrap', 'zone.js'],
+        allowedCommonJsDependencies: ['ajv', 'zone.js'],
       });
 
       const { result, logs } = await harness.executeOnce();
@@ -76,7 +76,7 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
       await harness.appendToFile(
         'src/app/app.component.ts',
         `
-        import 'bootstrap';
+        import 'ajv';
         import 'zone.js';
       `,
       );
