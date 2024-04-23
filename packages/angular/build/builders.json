@@ -9,6 +9,11 @@
       "implementation": "./src/builders/dev-server/index",
       "schema": "./src/builders/dev-server/schema.json",
       "description": "Execute a development server for an application."
+    },
+    "extract-i18n": {
+      "implementation": "./src/builders/extract-i18n/index",
+      "schema": "./src/builders/extract-i18n/schema.json",
+      "description": "Extract i18n messages from an application."
     }
   }
 }

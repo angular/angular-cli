@@ -17,6 +17,11 @@ ts_json_schema(
     src = "src/builders/dev-server/schema.json",
 )
 
+ts_json_schema(
+    name = "extract_i18n_schema",
+    src = "src/builders/extract-i18n/schema.json",
+)
+
 ts_library(
     name = "build",
     package_name = "@angular/build",
@@ -34,6 +39,7 @@ ts_library(
     ) + [
         "//packages/angular/build:src/builders/application/schema.ts",
         "//packages/angular/build:src/builders/dev-server/schema.ts",
+        "//packages/angular/build:src/builders/extract-i18n/schema.ts",
     ],
     data = glob(
         include = [
