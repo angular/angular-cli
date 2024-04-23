@@ -32,11 +32,6 @@ function* updateBuildTarget(
   buildTarget.builder = Builders.Application;
 
   for (const [, options] of allTargetOptions(buildTarget, false)) {
-    // Show warnings for using no longer supported options
-    if (usesNoLongerSupportedOptions(options, context, projectName)) {
-      continue;
-    }
-
     if (options['index'] === '') {
       options['index'] = false;
     }
@@ -82,7 +77,6 @@ function* updateBuildTarget(
     }
 
     // Delete removed options
-    delete options['deployUrl'];
     delete options['vendorChunk'];
     delete options['commonChunk'];
     delete options['resourcesOutputPath'];
@@ -346,20 +340,4 @@ export default function (): Rule {
       rootJson.modify(['compilerOptions', 'allowSyntheticDefaultImports'], undefined);
     }),
   ]);
-}
-
-function usesNoLongerSupportedOptions(
-  { deployUrl }: Record<string, unknown>,
-  context: SchematicContext,
-  projectName: string,
-): boolean {
-  let hasUsage = false;
-  if (typeof deployUrl === 'string') {
-    hasUsage = true;
-    context.logger.warn(
-      `Skipping migration for project "${projectName}". "deployUrl" option is not available in the application builder.`,
-    );
-  }
-
-  return hasUsage;
 }
