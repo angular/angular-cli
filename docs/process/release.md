@@ -107,3 +107,52 @@ Releases should be done in "reverse semver order", meaning they should follow:
 Oldest LTS -> Newest LTS -> Patch -> RC -> Next
 
 This can skip any versions which don't need releases, so most weeks are just "Patch -> Next".
+
+## Releasing a new package
+
+Wombat has some special access requirements which need to be configured to publish a new NPM package.
+
+See [this Wombat doc](http://g3doc/company/teams/cloud-client-libraries/team/automation/docs/npm-publish-service#existing-package)
+and [this postmortem](http://docs/document/d/1emx2mhvF5xMzNUlDrVRYKI_u4iUOnVrg3rV6c5jk2is?resourcekey=0-qpsFbBfwioYT4f6kyUm8ZA&tab=t.0)
+for more info.
+
+Angular is _not_ an organization on NPM, therefore each package is published
+independently and Wombat access needs to be managed individually. This also means
+we can't rely on Wombat already having access to a new package.
+
+In order to configure a brand new NPM package, it first needs to be published
+manually so we can add Wombat access to it. Note that this step can and should be
+done prior to weekly releases. The sooner this can be done, the less likely it
+will block the next weekly release.
+
+1.  Check out the `main` branch, which should always have a `-next` version.
+    - This avoids having the initial publish actually be used in production.
+1.  Trigger a release build locally.
+    ```shell
+    nvm install
+    yarn --frozen-lockfile
+    yarn -s ng-dev release build
+    ```
+1.  Log in to NPM as `angular`.
+    ```shell
+    npm login
+    ```
+    - See these two Valentine entries for authentication details:
+      - https://valentine.corp.google.com/#/show/1460636514618735
+      - https://valentine.corp.google.com/#/show/1531867371192103
+1.  Publish the release.
+    ```shell
+    (cd dist/releases/my-scope/my-pkg/ && npm publish --access public)
+    ```
+1.  Add Wombat to the package.
+    ```shell
+    npm owner add google-wombot @my-scope/my-pkg
+    ```
+1.  Don't forget to logout.
+    ```shell
+    npm logout
+    ```
+1.  File a bug like [b/336626936](http://b/336626936) to ask Wombat maintainers to
+    accept the invite for the new package.
+
+Once Wombat accepts the invite, regular automated releases should work as expected.
