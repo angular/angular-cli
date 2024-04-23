@@ -556,6 +556,7 @@ export async function setupServer(
         outputFiles,
         assets,
         ssr,
+        extraHeaders: serverOptions.headers,
         external: externalMetadata.explicit,
         indexHtmlTransformer,
         extensionMiddleware,
