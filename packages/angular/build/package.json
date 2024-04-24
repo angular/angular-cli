@@ -30,7 +30,6 @@
     "fast-glob": "3.3.2",
     "https-proxy-agent": "7.0.4",
     "inquirer": "9.2.19",
-    "less": "4.2.0",
     "magic-string": "0.30.10",
     "mrmime": "2.0.0",
     "ora": "5.4.1",
@@ -48,6 +47,7 @@
     "@angular/localize": "^18.0.0 || ^18.0.0-next.0",
     "@angular/platform-server": "^18.0.0 || ^18.0.0-next.0",
     "@angular/service-worker": "^18.0.0 || ^18.0.0-next.0",
+    "less": "^4.2.0",
     "tailwindcss": "^2.0.0 || ^3.0.0",
     "typescript": ">=5.4 <5.5"
   },
@@ -59,6 +59,9 @@
       "optional": true
     },
     "@angular/service-worker": {
+      "optional": true
+    },
+    "less": {
       "optional": true
     },
     "tailwindcss": {

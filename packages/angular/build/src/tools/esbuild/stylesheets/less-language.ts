@@ -49,7 +49,26 @@ async function compileString(
   resolver: PluginBuild['resolve'],
   unsafeInlineJavaScript: boolean,
 ): Promise<OnLoadResult> {
-  const less = (lessPreprocessor ??= (await import('less')).default);
+  try {
+    lessPreprocessor ??= (await import('less')).default;
+  } catch {
+    return {
+      errors: [
+        {
+          text: 'Unable to load the "less" stylesheet preprocessor.',
+          location: null,
+          notes: [
+            {
+              text:
+                'Ensure that the "less" Node.js package is installed within the project. ' +
+                "If not present, installation via the project's package manager should resolve the error.",
+            },
+          ],
+        },
+      ],
+    };
+  }
+  const less = lessPreprocessor;
 
   const resolverPlugin: Less.Plugin = {
     install({ FileManager }, pluginManager): void {
