@@ -267,4 +267,22 @@ describe(`Migration to use the application builder`, () => {
     const { stylePreprocessorOptions } = app.architect['build'].options;
     expect(stylePreprocessorOptions).toEqual({ includePaths: ['.'] });
   });
+
+  it('should add "less" dependency when converting to "@angular/build" and a ".less" file is present', async () => {
+    tree.create('/project/app/src/styles.less', '');
+
+    const newTree = await schematicRunner.runSchematic(schematicName, {}, tree);
+
+    const { devDependencies } = JSON.parse(newTree.readContent('/package.json'));
+
+    expect(devDependencies['less']).toBeDefined();
+  });
+
+  it('should not add "less" dependency when converting to "@angular/build" and a ".less" file is present', async () => {
+    const newTree = await schematicRunner.runSchematic(schematicName, {}, tree);
+
+    const { devDependencies } = JSON.parse(newTree.readContent('/package.json'));
+
+    expect(devDependencies['less']).toBeUndefined();
+  });
 });

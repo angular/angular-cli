@@ -245,15 +245,56 @@ function updateProjects(tree: Tree, context: SchematicContext) {
       rules.push(
         addDependency('@angular/build', latestVersions.DevkitBuildAngular, {
           type: DependencyType.Dev,
+          // Always is set here since removePackageJsonDependency below does not automatically
+          // trigger the package manager execution.
           install: InstallBehavior.Always,
           existing: ExistingBehavior.Replace,
         }),
       );
       removePackageJsonDependency(tree, '@angular-devkit/build-angular');
+
+      // Add less dependency if any projects contain a Less stylesheet file.
+      // This check does not consider Node.js packages due to the performance
+      // cost of searching such a large directory structure. A build time error
+      // will provide instructions to install the package in this case.
+      if (hasLessStylesheets(tree)) {
+        rules.push(
+          addDependency('less', latestVersions['less'], {
+            type: DependencyType.Dev,
+            existing: ExistingBehavior.Skip,
+          }),
+        );
+      }
     }
 
     return chain(rules);
   });
+}
+
+/**
+ * Searches the schematic tree for files that have a `.less` extension.
+ *
+ * @param tree A Schematics tree instance to search
+ * @returns true if Less stylesheet files are found; otherwise, false
+ */
+function hasLessStylesheets(tree: Tree) {
+  const directories = [tree.getDir('/')];
+
+  let current;
+  while ((current = directories.pop())) {
+    for (const path of current.subfiles) {
+      if (path.endsWith('.less')) {
+        return true;
+      }
+    }
+
+    for (const path of current.subdirs) {
+      if (path === 'node_modules' || path.startsWith('.')) {
+        continue;
+      }
+      directories.push(current.dir(path));
+    }
+  }
 }
 
 function* visit(
