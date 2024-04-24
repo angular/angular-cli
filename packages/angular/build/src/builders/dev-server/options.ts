@@ -35,7 +35,7 @@ export async function normalizeOptions(
   const cacheOptions = normalizeCacheOptions(projectMetadata, workspaceRoot);
 
   // Target specifier defaults to the current project's build target using a development configuration
-  const buildTargetSpecifier = options.buildTarget ?? options.browserTarget ?? `::development`;
+  const buildTargetSpecifier = options.buildTarget ?? `::development`;
   const buildTarget = targetFromTargetString(buildTargetSpecifier, projectName, 'build');
 
   // Initial options to keep
@@ -46,18 +46,14 @@ export async function normalizeOptions(
     open,
     verbose,
     watch,
-    allowedHosts,
-    disableHostCheck,
     liveReload,
     hmr,
     headers,
     proxyConfig,
     servePath,
-    publicHost,
     ssl,
     sslCert,
     sslKey,
-    forceEsbuild,
     prebundle,
   } = options;
 
@@ -76,15 +72,11 @@ export async function normalizeOptions(
     workspaceRoot,
     projectRoot,
     cacheOptions,
-    allowedHosts,
-    disableHostCheck,
     proxyConfig,
     servePath,
-    publicHost,
     ssl,
     sslCert,
     sslKey,
-    forceEsbuild,
     // Prebundling defaults to true but requires caching to function
     prebundle: cacheOptions.enabled && (prebundle ?? true),
   };
