@@ -16,6 +16,7 @@
     "karma-jasmine-html-reporter": "~2.1.0",
     "karma-jasmine": "~5.1.0",
     "karma": "~6.4.0",
+    "less": "^4.2.0",
     "ng-packagr": "^18.0.0-next.0",
     "protractor": "~7.0.0",
     "rxjs": "~7.8.0",
