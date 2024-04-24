@@ -110,12 +110,7 @@ export enum BuildOutputFileType {
 
 // @public
 export interface DevServerBuilderOptions {
-    allowedHosts?: string[];
-    // @deprecated
-    browserTarget?: string;
-    buildTarget?: string;
-    disableHostCheck?: boolean;
-    forceEsbuild?: boolean;
+    buildTarget: string;
     headers?: {
         [key: string]: string;
     };
@@ -127,7 +122,6 @@ export interface DevServerBuilderOptions {
     port?: number;
     prebundle?: PrebundleUnion;
     proxyConfig?: string;
-    publicHost?: string;
     servePath?: string;
     ssl?: boolean;
     sslCert?: string;
