@@ -9,6 +9,8 @@
 import { BuilderContext, targetFromTargetString } from '@angular-devkit/architect';
 import path from 'node:path';
 import { normalizeCacheOptions } from '../../utils/normalize-cache';
+import { normalizeOptimization } from '../../utils/normalize-optimization';
+import { isEsbuildBased } from './builder';
 import { Schema as DevServerOptions } from './schema';
 
 export type NormalizedDevServerOptions = Awaited<ReturnType<typeof normalizeOptions>>;
@@ -28,7 +30,7 @@ export async function normalizeOptions(
   projectName: string,
   options: DevServerOptions,
 ) {
-  const workspaceRoot = context.workspaceRoot;
+  const { workspaceRoot, logger } = context;
   const projectMetadata = await context.getProjectMetadata(projectName);
   const projectRoot = path.join(workspaceRoot, (projectMetadata.root as string | undefined) ?? '');
 
@@ -37,6 +39,27 @@ export async function normalizeOptions(
   // Target specifier defaults to the current project's build target using a development configuration
   const buildTargetSpecifier = options.buildTarget ?? options.browserTarget ?? `::development`;
   const buildTarget = targetFromTargetString(buildTargetSpecifier, projectName, 'build');
+
+  // Get the application builder options.
+  const browserBuilderName = await context.getBuilderNameForTarget(buildTarget);
+  const rawBuildOptions = await context.getTargetOptions(buildTarget);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const buildOptions = (await context.validateOptions(rawBuildOptions, browserBuilderName)) as any;
+  const optimization = normalizeOptimization(buildOptions.optimization);
+
+  if (options.prebundle !== false && isEsbuildBased(browserBuilderName)) {
+    if (!cacheOptions.enabled) {
+      // Warn if the initial options provided by the user enable prebundling but caching is disabled
+      logger.warn(
+        'Prebundling has been configured but will not be used because caching has been disabled.',
+      );
+    } else if (optimization.scripts) {
+      // Warn if the initial options provided by the user enable prebundling but script optimization is enabled.
+      logger.warn(
+        'Prebundling has been configured but will not be used because scripts optimization is enabled.',
+      );
+    }
+  }
 
   // Initial options to keep
   const {
@@ -86,6 +109,6 @@ export async function normalizeOptions(
     sslKey,
     forceEsbuild,
     // Prebundling defaults to true but requires caching to function
-    prebundle: cacheOptions.enabled && (prebundle ?? true),
+    prebundle: cacheOptions.enabled && !optimization.scripts && (prebundle ?? true),
   };
 }
