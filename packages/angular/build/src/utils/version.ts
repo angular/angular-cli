@@ -56,9 +56,17 @@ export function assertCompatibleAngularVersion(projectRoot: string): void | neve
     return;
   }
 
-  const supportedAngularSemver = projectRequire('@angular-devkit/build-angular/package.json')[
-    'peerDependencies'
-  ]['@angular/compiler-cli'];
+  let supportedAngularSemver;
+  try {
+    supportedAngularSemver = projectRequire('@angular/build/package.json')['peerDependencies'][
+      '@angular/compiler-cli'
+    ];
+  } catch {
+    supportedAngularSemver = projectRequire('@angular-devkit/build-angular/package.json')[
+      'peerDependencies'
+    ]['@angular/compiler-cli'];
+  }
+
   const angularVersion = new SemVer(angularPkgJson['version']);
 
   if (!satisfies(angularVersion, supportedAngularSemver, { includePrerelease: true })) {
