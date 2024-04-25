@@ -481,7 +481,7 @@ describe('augment-index-html', () => {
 
   it('should add image preconnects if it encounters preconnect elements for other resources', async () => {
     const imageDomains = ['https://www.example2.com', 'https://www.example3.com'];
-    const { content, warnings } = await augmentIndexHtml({
+    const { content } = await augmentIndexHtml({
       ...indexGeneratorOptions,
       html: '<html><head><link rel="preconnect" href="https://www.example1.com"></head><body></body></html>',
       imageDomains,
@@ -499,5 +499,39 @@ describe('augment-index-html', () => {
           </body>
         </html>
       `);
+  });
+
+  describe('self-closing tags', () => {
+    it('should return an error when used on a not supported element', async () => {
+      const { errors } = await augmentIndexHtml({
+        ...indexGeneratorOptions,
+        html: `
+          <html>
+            <body>
+              <app-root />
+            </body>
+          </html>'
+        `,
+      });
+
+      expect(errors.length).toEqual(1);
+      expect(errors).toEqual([`Invalid self-closing element in index HTML file: '<app-root />'.`]);
+    });
+
+    it('should not return an error when used on a supported element', async () => {
+      const { errors } = await augmentIndexHtml({
+        ...indexGeneratorOptions,
+        html: `
+          <html>
+            <body>
+              <br />
+              <app-root><app-root>
+            </body>
+          </html>'
+        `,
+      });
+
+      expect(errors.length).toEqual(0);
+    });
   });
 });

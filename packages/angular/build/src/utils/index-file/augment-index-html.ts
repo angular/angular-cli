@@ -48,6 +48,25 @@ export interface FileInfo {
   name?: string;
   extension: string;
 }
+
+/** A list of valid self closing HTML elements */
+const VALID_SELF_CLOSING_TAGS = new Set([
+  'area',
+  'base',
+  'br',
+  'col',
+  'embed',
+  'hr',
+  'img',
+  'input',
+  'link',
+  'meta',
+  'param',
+  'source',
+  'track',
+  'wbr',
+]);
+
 /*
  * Helper function used by the IndexHtmlWebpackPlugin.
  * Can also be directly used by builder, e. g. in order to generate an index.html
@@ -190,7 +209,7 @@ export async function augmentIndexHtml(
   const foundPreconnects = new Set<string>();
 
   rewriter
-    .on('startTag', (tag) => {
+    .on('startTag', (tag, rawTagHtml) => {
       switch (tag.tagName) {
         case 'html':
           // Adjust document locale if specified
@@ -225,6 +244,12 @@ export async function augmentIndexHtml(
             }
           }
           break;
+        default:
+          if (tag.selfClosing && !VALID_SELF_CLOSING_TAGS.has(tag.tagName)) {
+            errors.push(`Invalid self-closing element in index HTML file: '${rawTagHtml}'.`);
+
+            return;
+          }
       }
 
       rewriter.emitStartTag(tag);
