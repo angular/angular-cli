@@ -67,13 +67,6 @@ export function execute(
           );
         }
 
-        // Warn if the initial options provided by the user enable prebundling but caching is disabled
-        if (options.prebundle && !normalizedOptions.cacheOptions.enabled) {
-          context.logger.warn(
-            `Prebundling has been configured but will not be used because caching has been disabled.`,
-          );
-        }
-
         if (options.allowedHosts?.length) {
           context.logger.warn(
             `The "allowedHosts" option will not be used because it is not supported by the "${builderName}" builder.`,
@@ -188,7 +181,7 @@ case.
   };
 }
 
-function isEsbuildBased(
+export function isEsbuildBased(
   builderName: string,
 ): builderName is
   | '@angular/build:application'
