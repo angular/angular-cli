@@ -1,16 +1,20 @@
 [
   [
-    "packages/angular/build/src/tools/esbuild/bundler-context.ts",
-    "packages/angular/build/src/tools/esbuild/utils.ts"
+    "packages/angular_devkit/build_angular/src/builders/dev-server/builder.ts",
+    "packages/angular_devkit/build_angular/src/builders/dev-server/options.ts"
   ],
   [
-    "packages/angular/build/src/tools/esbuild/bundler-execution-result.ts",
+    "packages/angular/build/src/tools/esbuild/bundler-context.ts",
     "packages/angular/build/src/tools/esbuild/utils.ts"
   ],
   [
     "packages/angular/build/src/tools/esbuild/bundler-context.ts",
     "packages/angular/build/src/tools/esbuild/utils.ts",
     "packages/angular/build/src/tools/esbuild/bundler-execution-result.ts"
+  ],
+  [
+    "packages/angular/build/src/tools/esbuild/bundler-execution-result.ts",
+    "packages/angular/build/src/tools/esbuild/utils.ts"
   ],
   [
     "packages/angular/cli/src/analytics/analytics-collector.ts",
