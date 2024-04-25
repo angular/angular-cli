@@ -1,3 +1,15 @@
+<a name="17.3.6"></a>
+
+# 17.3.6 (2024-04-25)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                  |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------ |
+| [dcec59799](https://github.com/angular/angular-cli/commit/dcec59799faac66bf25043984c11944479efcf4d) | fix  | properly configure headers for media resources and HTML page |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="17.3.5"></a>
 
 # 17.3.5 (2024-04-17)
