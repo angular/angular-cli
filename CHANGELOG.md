@@ -1,3 +1,39 @@
+<a name="18.0.0-next.4"></a>
+
+# 18.0.0-next.4 (2024-04-25)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description             |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------- |
+| [4087728c3](https://github.com/angular/angular-cli/commit/4087728c3e6350d85d653e9d053249ff77e639e6) | feat | support for Node.js v22 |
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                                                     |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------------- |
+| [b2ac5fac7](https://github.com/angular/angular-cli/commit/b2ac5fac7d66ccd027f766565fa17c6a3bb18e44) | feat | allow application migration to use new build package in projects where possible |
+| [23cc337aa](https://github.com/angular/angular-cli/commit/23cc337aa34c919e344ab001f5efbb8fe9ce3c7c) | fix  | keep deployUrl option when migrating to application builder                     |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                                    |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------------ |
+| [53c319aaa](https://github.com/angular/angular-cli/commit/53c319aaa95049b8558df80e57fa0a6318003121) | feat | add support for the `poll` option in the library builder                       |
+| [0b03829bc](https://github.com/angular/angular-cli/commit/0b03829bcefea5c250c6a9ff880a737fcc351b2e) | feat | move i18n extraction for application builder to new build system package       |
+| [4ffe07aa2](https://github.com/angular/angular-cli/commit/4ffe07aa24a0fc9ff48461e9c3664d96e92317cf) | feat | move Vite-based dev-server for application builder to new build system package |
+| [d1c632af9](https://github.com/angular/angular-cli/commit/d1c632af9a98d4e8975f198cf205194e2ebff209) | feat | support native async/await when app is zoneless                                |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                                  |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------ |
+| [810d213e1](https://github.com/angular/angular-cli/commit/810d213e1813dd01620173f5f999dca7bccf8ea1) | feat | introduce new official build system package                  |
+| [70dbc7a6e](https://github.com/angular/angular-cli/commit/70dbc7a6e9a7f6d55aeb4e10e8e686b186e6cdf3) | fix  | emit error for invalid self-closing element in index HTML    |
+| [33cd47c85](https://github.com/angular/angular-cli/commit/33cd47c85ea12df57ec7b244beccfa299c927765) | fix  | properly configure headers for media resources and HTML page |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="17.3.6"></a>
 
 # 17.3.6 (2024-04-25)
