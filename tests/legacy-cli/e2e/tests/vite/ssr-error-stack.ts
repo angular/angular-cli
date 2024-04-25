@@ -28,7 +28,7 @@ export default async function () {
   // The error is also sent in the browser, so we don't need to scrap the stderr.
   match(
     text,
-    /something happened.+at eval \(.+\/e2e-test[\\\/]test-project[\\\/]src[\\\/]app[\\\/]app\.component\.ts:\d+:\d+\)/,
+    /something happened.+at eval \(.+[\\/]+e2e-test[\\/]+test-project[\\/]+src[\\/]+app[\\/]+app\.component\.ts:\d+:\d+\)/,
   );
   doesNotMatch(text, /vite-root/);
 }
