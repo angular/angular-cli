@@ -25,6 +25,10 @@ export { emitFilesToDisk } from './tools/esbuild/utils';
 export { transformSupportedBrowsersToTargets } from './tools/esbuild/utils';
 export { SassWorkerImplementation } from './tools/sass/sass-service';
 
+export { SourceFileCache } from './tools/esbuild/angular/source-file-cache';
+export { createJitResourceTransformer } from './tools/esbuild/angular/jit-resource-transformer';
+export { JavaScriptTransformer } from './tools/esbuild/javascript-transformer';
+
 // Utilities
 export * from './utils/bundle-calculator';
 export { checkPort } from './utils/check-port';
