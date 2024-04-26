@@ -1,3 +1,16 @@
+<a name="18.0.0-next.5"></a>
+
+# 18.0.0-next.5 (2024-04-26)
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                                  |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------ |
+| [921fa7cf4](https://github.com/angular/angular-cli/commit/921fa7cf4adc69d3cb6ec7dd5c8d7cace33a502e) | fix  | add missing `ansi-colors` and `picomatch` dependencies       |
+| [791cf75af](https://github.com/angular/angular-cli/commit/791cf75afb0b3b5892c41296bc4049a2c10926e8) | fix  | check both potential build packages in Angular version check |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="18.0.0-next.4"></a>
 
 # 18.0.0-next.4 (2024-04-25)
