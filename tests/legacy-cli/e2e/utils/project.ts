@@ -102,7 +102,7 @@ export async function useSha(): Promise<void> {
         .filter((name) => name.startsWith('@angular/'))
         .forEach((name) => {
           const pkgName = name.split(/\//)[1];
-          if (pkgName === 'cli' || pkgName === 'ssr') {
+          if (pkgName === 'cli' || pkgName === 'ssr' || pkgName === 'build') {
             return;
           }
 
