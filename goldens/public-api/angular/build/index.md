@@ -152,7 +152,7 @@ export function executeExtractI18nBuilder(options: ExtractI18nBuilderOptions, co
 
 // @public
 export interface ExtractI18nBuilderOptions {
-    buildTarget: string;
+    buildTarget?: string;
     format?: Format;
     outFile?: string;
     outputPath?: string;
