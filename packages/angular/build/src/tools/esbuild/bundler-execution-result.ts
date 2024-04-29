@@ -42,6 +42,7 @@ export class ExecutionResult {
   warnings: (Message | PartialMessage)[] = [];
   logs: string[] = [];
   externalMetadata?: ExternalResultMetadata;
+  extraWatchFiles: string[] = [];
 
   constructor(
     private rebuildContexts: BundlerContext[],
@@ -138,7 +139,7 @@ export class ExecutionResult {
       files.push(...this.codeBundleCache.loadResultCache.watchFiles);
     }
 
-    return files;
+    return files.concat(this.extraWatchFiles);
   }
 
   createRebuildState(fileChanges: ChangedFiles): RebuildState {
