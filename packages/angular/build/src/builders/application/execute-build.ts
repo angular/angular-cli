@@ -141,6 +141,11 @@ export async function executeBuild(
     );
   }
 
+  // Watch input index HTML file if configured
+  if (options.indexHtmlOptions) {
+    executionResult.extraWatchFiles.push(options.indexHtmlOptions.input);
+  }
+
   // Perform i18n translation inlining if enabled
   if (i18nOptions.shouldInline) {
     const result = await inlineI18n(options, executionResult, initialFiles);
