@@ -29,6 +29,5 @@
       "description": "Name of the file to output."
     }
   },
-  "additionalProperties": false,
-  "required": ["buildTarget"]
+  "additionalProperties": false
 }
