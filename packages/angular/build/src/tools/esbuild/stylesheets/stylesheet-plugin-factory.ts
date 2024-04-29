@@ -15,6 +15,11 @@ import type { PostcssConfiguration } from '../../../utils/postcss-configuration'
 import { LoadResultCache, createCachedLoad } from '../load-result-cache';
 
 /**
+ * Convenience type for a postcss processor.
+ */
+type PostcssProcessor = import('postcss').Processor;
+
+/**
  * The lazy-loaded instance of the postcss stylesheet postprocessor.
  * It is only imported and initialized if postcss is needed.
  */
@@ -88,10 +93,10 @@ export interface StylesheetLanguage {
 /**
  * Cached postcss instances that can be re-used between various StylesheetPluginFactory instances.
  */
-const postcssProcessor = new Map<string, WeakRef<import('postcss').Processor>>();
+const postcssProcessors = new Map<string, WeakRef<PostcssProcessor>>();
 
 export class StylesheetPluginFactory {
-  private postcssProcessor?: import('postcss').Processor;
+  private postcssProcessor?: PostcssProcessor;
 
   constructor(
     private readonly options: StylesheetPluginOptions,
@@ -121,7 +126,7 @@ export class StylesheetPluginFactory {
       if (options.postcssConfiguration) {
         const postCssInstanceKey = JSON.stringify(options.postcssConfiguration);
 
-        this.postcssProcessor = postcssProcessor.get(postCssInstanceKey)?.deref();
+        this.postcssProcessor = postcssProcessors.get(postCssInstanceKey)?.deref();
 
         if (!this.postcssProcessor) {
           postcss ??= (await import('postcss')).default;
@@ -135,18 +140,18 @@ export class StylesheetPluginFactory {
             this.postcssProcessor.use(plugin(pluginOptions));
           }
 
-          postcssProcessor.set(postCssInstanceKey, new WeakRef(this.postcssProcessor));
+          postcssProcessors.set(postCssInstanceKey, new WeakRef(this.postcssProcessor));
         }
       } else if (options.tailwindConfiguration) {
         const { package: tailwindPackage, file: config } = options.tailwindConfiguration;
         const postCssInstanceKey = tailwindPackage + ':' + config;
-        this.postcssProcessor = postcssProcessor.get(postCssInstanceKey)?.deref();
+        this.postcssProcessor = postcssProcessors.get(postCssInstanceKey)?.deref();
 
         if (!this.postcssProcessor) {
           postcss ??= (await import('postcss')).default;
           const tailwind = await import(tailwindPackage);
           this.postcssProcessor = postcss().use(tailwind.default({ config }));
-          postcssProcessor.set(postCssInstanceKey, new WeakRef(this.postcssProcessor));
+          postcssProcessors.set(postCssInstanceKey, new WeakRef(this.postcssProcessor));
         }
       }
 
@@ -157,7 +162,28 @@ export class StylesheetPluginFactory {
       name: 'angular-' + language.name,
       async setup(build) {
         // Setup postcss if needed
-        const postcssProcessor = await setupPostcss();
+        let postcssProcessor: PostcssProcessor | undefined;
+        build.onStart(async () => {
+          try {
+            postcssProcessor = await setupPostcss();
+          } catch {
+            return {
+              errors: [
+                {
+                  text: 'Unable to load the "postcss" stylesheet processor.',
+                  location: null,
+                  notes: [
+                    {
+                      text:
+                        'Ensure that the "postcss" Node.js package is installed within the project. ' +
+                        "If not present, installation via the project's package manager should resolve the error.",
+                    },
+                  ],
+                },
+              ],
+            };
+          }
+        });
 
         // Add a load callback to support inline Component styles
         build.onLoad(
@@ -212,7 +238,7 @@ async function processStylesheet(
   format: string,
   options: StylesheetPluginOptions,
   build: PluginBuild,
-  postcssProcessor: import('postcss').Processor | undefined,
+  postcssProcessor: PostcssProcessor | undefined,
 ) {
   let result: OnLoadResult;
 
