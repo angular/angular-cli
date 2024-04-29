@@ -273,9 +273,6 @@ function addAppToWorkspaceFile(
       },
       'extract-i18n': {
         builder: Builders.ExtractI18n,
-        options: {
-          buildTarget: `${options.name}:build`,
-        },
       },
       test: options.minimal
         ? undefined
