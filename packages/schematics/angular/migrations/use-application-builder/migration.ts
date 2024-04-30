@@ -27,6 +27,7 @@ import { JSONFile } from '../../utility/json-file';
 import { latestVersions } from '../../utility/latest-versions';
 import {
   TargetDefinition,
+  WorkspaceDefinition,
   allTargetOptions,
   allWorkspaceTargets,
   updateWorkspace,
@@ -265,6 +266,18 @@ function updateProjects(tree: Tree, context: SchematicContext) {
           }),
         );
       }
+
+      // Add postcss dependency if any projects have a custom postcss configuration file.
+      // The build system only supports files in a project root or workspace root with
+      // names of either 'postcss.config.json' or '.postcssrc.json'.
+      if (hasPostcssConfiguration(tree, workspace)) {
+        rules.push(
+          addDependency('postcss', latestVersions['postcss'], {
+            type: DependencyType.Dev,
+            existing: ExistingBehavior.Replace,
+          }),
+        );
+      }
     }
 
     return chain(rules);
@@ -295,6 +308,31 @@ function hasLessStylesheets(tree: Tree) {
       directories.push(current.dir(path));
     }
   }
+}
+
+/**
+ * Searches for a Postcss configuration file within the workspace root
+ * or any of the project roots.
+ *
+ * @param tree A Schematics tree instance to search
+ * @param workspace A Workspace to check for projects
+ * @returns true, if a Postcss configuration file is found; otherwise, false
+ */
+function hasPostcssConfiguration(tree: Tree, workspace: WorkspaceDefinition) {
+  // Add workspace root
+  const searchDirectories = [''];
+
+  // Add each project root
+  for (const { root } of workspace.projects.values()) {
+    if (root) {
+      searchDirectories.push(root);
+    }
+  }
+
+  return searchDirectories.some(
+    (dir) =>
+      tree.exists(join(dir, 'postcss.config.json')) || tree.exists(join(dir, '.postcssrc.json')),
+  );
 }
 
 function* visit(
