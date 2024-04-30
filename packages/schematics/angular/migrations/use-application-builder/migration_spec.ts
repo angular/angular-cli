@@ -278,11 +278,49 @@ describe(`Migration to use the application builder`, () => {
     expect(devDependencies['less']).toBeDefined();
   });
 
-  it('should not add "less" dependency when converting to "@angular/build" and a ".less" file is present', async () => {
+  it('should not add "less" dependency when converting to "@angular/build" and a ".less" file is not present', async () => {
     const newTree = await schematicRunner.runSchematic(schematicName, {}, tree);
 
     const { devDependencies } = JSON.parse(newTree.readContent('/package.json'));
 
     expect(devDependencies['less']).toBeUndefined();
+  });
+
+  it('should add "postcss" dependency when converting to "@angular/build" and postcss.config.json is present', async () => {
+    tree.create('postcss.config.json', '{}');
+
+    const newTree = await schematicRunner.runSchematic(schematicName, {}, tree);
+
+    const { devDependencies } = JSON.parse(newTree.readContent('/package.json'));
+
+    expect(devDependencies['postcss']).toBeDefined();
+  });
+
+  it('should add "postcss" dependency when converting to "@angular/build" and .postcssrc.json is present', async () => {
+    tree.create('.postcssrc.json', '{}');
+
+    const newTree = await schematicRunner.runSchematic(schematicName, {}, tree);
+
+    const { devDependencies } = JSON.parse(newTree.readContent('/package.json'));
+
+    expect(devDependencies['postcss']).toBeDefined();
+  });
+
+  it('should add "postcss" dependency when converting to "@angular/build" and .postcssrc.json is present in project', async () => {
+    tree.create('/project/app/.postcssrc.json', '{}');
+
+    const newTree = await schematicRunner.runSchematic(schematicName, {}, tree);
+
+    const { devDependencies } = JSON.parse(newTree.readContent('/package.json'));
+
+    expect(devDependencies['postcss']).toBeDefined();
+  });
+
+  it('should not add "postcss" dependency when converting to "@angular/build" and a Postcss configuration is not present', async () => {
+    const newTree = await schematicRunner.runSchematic(schematicName, {}, tree);
+
+    const { devDependencies } = JSON.parse(newTree.readContent('/package.json'));
+
+    expect(devDependencies['postcss']).toBeUndefined();
   });
 });
