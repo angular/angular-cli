@@ -1,3 +1,34 @@
+<a name="18.0.0-rc.0"></a>
+
+# 18.0.0-rc.0 (2024-05-01)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                       |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------- |
+| [df4dde95d](https://github.com/angular/angular-cli/commit/df4dde95daa12d5b08b3c4e937f4b4048d645254) | fix  | add `@angular/build` package to update group list |
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                            |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------ |
+| [95a4d6ee5](https://github.com/angular/angular-cli/commit/95a4d6ee56d80dce012cf2306422bb7fd8e0e32d) | fix  | add less dependency in application migration if needed |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                    |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------- |
+| [37fc7f0cc](https://github.com/angular/angular-cli/commit/37fc7f0ccf3b8e6f31a0c5b2eaf4aee52f439472) | fix  | disable Vite prebundling when script optimizations are enabled |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                                    |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------- |
+| [940e382db](https://github.com/angular/angular-cli/commit/940e382db27474dba6479f57e4ffefee04cfca66) | fix  | disable Vite prebundling when script optimizations are enabled |
+| [44b401747](https://github.com/angular/angular-cli/commit/44b401747f78bab208ce863f9c08e7a12f01fe27) | fix  | ensure input index HTML file triggers rebuilds when changed    |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="18.0.0-next.5"></a>
 
 # 18.0.0-next.5 (2024-04-26)
