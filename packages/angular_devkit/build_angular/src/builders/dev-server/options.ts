@@ -7,6 +7,7 @@
  */
 
 import { BuilderContext, targetFromTargetString } from '@angular-devkit/architect';
+import os from 'node:os';
 import path from 'node:path';
 import { normalizeCacheOptions } from '../../utils/normalize-cache';
 import { normalizeOptimization } from '../../utils/normalize-optimization';
@@ -105,8 +106,8 @@ export async function normalizeOptions(
     servePath,
     publicHost,
     ssl,
-    sslCert,
-    sslKey,
+    ...(sslCert ? { sslCert: sslCert.replace(/^~/, os.homedir()) } : {}),
+    ...(sslKey ? { sslKey: sslKey.replace(/^~/, os.homedir()) } : {}),
     forceEsbuild,
     // Prebundling defaults to true but requires caching to function
     prebundle: cacheOptions.enabled && !optimization.scripts && (prebundle ?? true),
