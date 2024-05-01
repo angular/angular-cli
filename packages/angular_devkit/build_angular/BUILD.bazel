@@ -251,6 +251,7 @@ genrule(
 pkg_npm(
     name = "npm_package",
     pkg_deps = [
+        "//packages/angular/build:package.json",
         "//packages/angular_devkit/architect:package.json",
         "//packages/angular_devkit/build_webpack:package.json",
         "//packages/angular_devkit/core:package.json",
