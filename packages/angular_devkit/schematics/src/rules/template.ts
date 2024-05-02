@@ -62,7 +62,7 @@ export function applyContentTemplate<T>(options: T): FileOperator {
         content: Buffer.from(templateImpl(decodedContent, {})(options)),
       };
     } catch (e) {
-      if ((e as NodeJS.ErrnoException).code === 'ERR_ENCODING_INVALID_ENCODED_DATA') {
+      if (e instanceof TypeError) {
         return entry;
       }
 
