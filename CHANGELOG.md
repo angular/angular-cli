@@ -1,3 +1,34 @@
+<a name="18.0.0-rc.1"></a>
+
+# 18.0.0-rc.1 (2024-05-02)
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                               |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------- |
+| [c46aa084f](https://github.com/angular/angular-cli/commit/c46aa084f53be7ebdb8cc450bd81907222d00275) | fix  | add postcss dependency in application migration if needed |
+
+### @angular-devkit/architect
+
+| Commit                                                                                              | Type | Description                                     |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------- |
+| [ddd08efef](https://github.com/angular/angular-cli/commit/ddd08efefecfe9b74db6a866a1bed0216380a28a) | fix  | resolve builder aliases from containing package |
+
+### @angular-devkit/schematics
+
+| Commit                                                                                              | Type | Description                                   |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------- |
+| [80fa03069](https://github.com/angular/angular-cli/commit/80fa0306945616ac99818db4a7364114ebd8cb64) | fix  | use web standard error check for Deno support |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                           |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------- |
+| [b7a0792b3](https://github.com/angular/angular-cli/commit/b7a0792b3286fc98d1343f55b5df89ddf13e36bc) | fix  | add a maximum rendering timeout for SSG               |
+| [2085365e0](https://github.com/angular/angular-cli/commit/2085365e04c9b08dbf2024036b93609046f2f458) | fix  | only generate shallow preload links for initial files |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="18.0.0-rc.0"></a>
 
 # 18.0.0-rc.0 (2024-05-01)
