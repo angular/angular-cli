@@ -103,6 +103,7 @@ async function render({ serverBundlePath, document, url }: RenderRequest): Promi
   }
 
   // The below should really handled by the framework!!!.
+  // See: https://github.com/angular/angular/issues/51549
   let timer: NodeJS.Timeout;
   const renderingTimeout = new Promise<never>(
     (_, reject) =>
