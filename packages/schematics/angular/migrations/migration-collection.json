@@ -3,7 +3,7 @@
     "use-application-builder": {
       "version": "18.0.0",
       "factory": "./use-application-builder/migration",
-      "description": "Migrate application projects using '@angular-devkit/build-angular:browser' and '@angular-devkit/build-angular:browser-esbuild' to use the '@angular-devkit/build-angular:application' builder. Read more about this here: https://angular.dev/tools/cli/esbuild#using-the-application-builder",
+      "description": "Migrate application projects using the '@angular-devkit/build-angular' package's 'browser' and/or 'browser-esbuild' builders to the 'application' builder. Read more about this here: https://angular.dev/tools/cli/esbuild#using-the-application-builder",
       "optional": true
     }
   }
