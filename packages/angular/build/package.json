@@ -38,7 +38,7 @@
     "piscina": "4.4.0",
     "parse5-html-rewriting-stream": "7.0.0",
     "postcss": "8.4.38",
-    "sass": "1.75.0",
+    "sass": "1.76.0",
     "semver": "7.6.0",
     "undici": "6.15.0",
     "vite": "5.2.10",
