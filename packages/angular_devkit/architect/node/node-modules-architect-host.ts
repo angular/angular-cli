@@ -126,7 +126,11 @@ export class WorkspaceNodeModulesArchitectHost implements ArchitectHost<NodeModu
    * @param builderStr The name of the builder to be used.
    * @returns All the info needed for the builder itself.
    */
-  resolveBuilder(builderStr: string, seenBuilders?: Set<string>): Promise<NodeModulesBuilderInfo> {
+  resolveBuilder(
+    builderStr: string,
+    basePath = this._root,
+    seenBuilders?: Set<string>,
+  ): Promise<NodeModulesBuilderInfo> {
     if (seenBuilders?.has(builderStr)) {
       throw new Error(
         'Circular builder alias references detected: ' + [...seenBuilders, builderStr],
@@ -140,7 +144,7 @@ export class WorkspaceNodeModulesArchitectHost implements ArchitectHost<NodeModu
 
     // Resolve and load the builders manifest from the package's `builders` field, if present
     const packageJsonPath = localRequire.resolve(packageName + '/package.json', {
-      paths: [this._root],
+      paths: [basePath],
     });
 
     const packageJson = JSON.parse(readFileSync(packageJsonPath, 'utf-8')) as { builders?: string };
@@ -170,7 +174,11 @@ export class WorkspaceNodeModulesArchitectHost implements ArchitectHost<NodeModu
 
     // Resolve alias reference if entry is a string
     if (typeof builder === 'string') {
-      return this.resolveBuilder(builder, (seenBuilders ?? new Set()).add(builderStr));
+      return this.resolveBuilder(
+        builder,
+        path.dirname(packageJsonPath),
+        (seenBuilders ?? new Set()).add(builderStr),
+      );
     }
 
     // Determine builder implementation path (relative within package only)
