@@ -9,7 +9,7 @@
 import assert from 'assert';
 import glob from 'fast-glob';
 import * as fs from 'fs';
-import template from 'lodash.template';
+import lodash from 'lodash';
 import * as path from 'path';
 import { fileURLToPath } from 'url';
 import {
@@ -19,7 +19,7 @@ import {
 } from '../packages/angular/cli/src/analytics/analytics-parameters.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const userAnalyticsTable = template(
+const userAnalyticsTable = lodash.template(
   fs.readFileSync(path.join(__dirname, './templates/user-analytics-table.ejs'), 'utf-8'),
 );
 
