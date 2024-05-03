@@ -38,8 +38,11 @@ export default async function () {
         ],
       };
     `,
+
     // Add asset
     'public/media.json': JSON.stringify({ dataFromAssets: true }),
+    'public/media with-space.json': JSON.stringify({ dataFromAssetsWithSpace: true }),
+
     // Update component to do an HTTP call to asset.
     'src/app/app.component.ts': `
     import { Component, inject } from '@angular/core';
@@ -53,15 +56,22 @@ export default async function () {
       imports: [CommonModule, RouterOutlet],
       template: \`
         <p>{{ data | json }}</p>
+        <p>{{ dataWithSpace | json }}</p>
         <router-outlet></router-outlet>
       \`,
     })
     export class AppComponent {
       data: any;
+      dataWithSpace: any;
+
       constructor() {
         const http = inject(HttpClient);
         http.get('/media.json').subscribe((d) => {
           this.data = d;
+        });
+
+        http.get('/media%20with-space.json').subscribe((d) => {
+          this.dataWithSpace = d;
         });
       }
     }
@@ -73,5 +83,9 @@ export default async function () {
   await expectFileToMatch(
     'dist/test-project/browser/index.html',
     /<p>{[\S\s]*"dataFromAssets":[\s\S]*true[\S\s]*}<\/p>/,
+  );
+  await expectFileToMatch(
+    'dist/test-project/browser/index.html',
+    /<p>{[\S\s]*"dataFromAssetsWithSpace":[\s\S]*true[\S\s]*}<\/p>/,
   );
 }
