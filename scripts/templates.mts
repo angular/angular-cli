@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import template from 'lodash.template';
+import lodash from 'lodash';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -26,7 +26,7 @@ async function _runTemplate(inputPath: string, outputPath: string) {
   )();
 
   const monorepo = JSON.parse(fs.readFileSync('./.monorepo.json', 'utf-8'));
-  const content = template(fs.readFileSync(inputPath, 'utf-8'))({
+  const content = lodash.template(fs.readFileSync(inputPath, 'utf-8'))({
     monorepo,
     packages: releasePackages.map(({ name }) => name),
     encode: (x: string) => global.encodeURIComponent(x),

@@ -51,8 +51,7 @@
     tslib "^2.3.0"
 
 "@angular/bazel@https://github.com/angular/bazel-builds.git#948ff82ae1a3a606eb3df5f2d9ac86dde5a13774":
-  version "18.1.0-next.0+sha-a0ec2d8"
-  uid "948ff82ae1a3a606eb3df5f2d9ac86dde5a13774"
+  version "18.1.0-next.0"
   resolved "https://github.com/angular/bazel-builds.git#948ff82ae1a3a606eb3df5f2d9ac86dde5a13774"
   dependencies:
     "@microsoft/api-extractor" "^7.24.2"
@@ -69,7 +68,6 @@
 
 "@angular/build-tooling@https://github.com/angular/dev-infra-private-build-tooling-builds.git#051f8ea32487ea8b40cb84f49fba160926ca7399":
   version "0.0.0-8a3082e3b16d9800b6248bf8fe43c516cf473f89"
-  uid "051f8ea32487ea8b40cb84f49fba160926ca7399"
   resolved "https://github.com/angular/dev-infra-private-build-tooling-builds.git#051f8ea32487ea8b40cb84f49fba160926ca7399"
   dependencies:
     "@angular/benchpress" "0.3.0"
@@ -268,7 +266,6 @@
 
 "@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#89546042315de3826640ce06503c92eddb5b3585":
   version "0.0.0-8a3082e3b16d9800b6248bf8fe43c516cf473f89"
-  uid "89546042315de3826640ce06503c92eddb5b3585"
   resolved "https://github.com/angular/dev-infra-private-ng-dev-builds.git#89546042315de3826640ce06503c92eddb5b3585"
   dependencies:
     "@yarnpkg/lockfile" "^1.1.0"
@@ -3588,14 +3585,7 @@
     "@types/node" "*"
     "@types/webpack" "^4"
 
-"@types/lodash.template@^4.5.3":
-  version "4.5.3"
-  resolved "https://registry.yarnpkg.com/@types/lodash.template/-/lodash.template-4.5.3.tgz#1174483eaa761a76a9d68c4adbee4c4e2742f329"
-  integrity sha512-Mo0UYKLu1oXgkV9TVoXZLlXXjyIXlW7ZQRxi/4gQJmzJr63dmicE8gG0OkPjYTKBrBic852q0JzqrtNUWLBIyA==
-  dependencies:
-    "@types/lodash" "*"
-
-"@types/lodash@*", "@types/lodash@^4.14.175":
+"@types/lodash@^4.14.175", "@types/lodash@^4.17.0":
   version "4.17.0"
   resolved "https://registry.yarnpkg.com/@types/lodash/-/lodash-4.17.0.tgz#d774355e41f372d5350a4d0714abb48194a489c3"
   integrity sha512-t7dhREVv6dbNj0q17X12j7yDG4bD/DHYX7o5/DbDxobP0HnGPgpRz2Ej77aL7TZT3DSw13fqUTj8J4mMnqa7WA==
@@ -9248,11 +9238,6 @@ lodash-es@^4.17.21:
   resolved "https://registry.yarnpkg.com/lodash-es/-/lodash-es-4.17.21.tgz#43e626c46e6591b7750beb2b50117390c609e3ee"
   integrity sha512-mKnC+QJ9pWVzv+C4/U3rRsHapFfHvQFoFB92e52xeyGMcX6/OlIl78je1u8vePzYZSkkogMPJ2yjxxsb89cxyw==
 
-lodash._reinterpolate@^3.0.0:
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/lodash._reinterpolate/-/lodash._reinterpolate-3.0.0.tgz#0ccf2d89166af03b3663c796538b75ac6e114d9d"
-  integrity sha512-xYHt68QRoYGjeeM/XOE1uJtvXQAgvszfBhjV4yvsQH0u2i9I6cI6c6/eG4Hh3UAOVn0y/xAXwmTzEay49Q//HA==
-
 lodash.assignwith@^4.2.0:
   version "4.2.0"
   resolved "https://registry.yarnpkg.com/lodash.assignwith/-/lodash.assignwith-4.2.0.tgz#127a97f02adc41751a954d24b0de17e100e038eb"
@@ -9322,21 +9307,6 @@ lodash.once@^4.0.0:
   version "4.1.1"
   resolved "https://registry.yarnpkg.com/lodash.once/-/lodash.once-4.1.1.tgz#0dd3971213c7c56df880977d504c88fb471a97ac"
   integrity sha512-Sb487aTOCr9drQVL8pIxOzVhafOjZN9UU54hiN8PU3uAiSV7lx1yYNpbNmex2PK6dSJoNTSJUUswT651yww3Mg==
-
-lodash.template@^4.5.0:
-  version "4.5.0"
-  resolved "https://registry.yarnpkg.com/lodash.template/-/lodash.template-4.5.0.tgz#f976195cf3f347d0d5f52483569fe8031ccce8ab"
-  integrity sha512-84vYFxIkmidUiFxidA/KjjH9pAycqW+h980j7Fuz5qxRtO9pgB7MDFTdys1N7A5mcucRiDyEq4fusljItR1T/A==
-  dependencies:
-    lodash._reinterpolate "^3.0.0"
-    lodash.templatesettings "^4.0.0"
-
-lodash.templatesettings@^4.0.0:
-  version "4.2.0"
-  resolved "https://registry.yarnpkg.com/lodash.templatesettings/-/lodash.templatesettings-4.2.0.tgz#e481310f049d3cf6d47e912ad09313b154f0fb33"
-  integrity sha512-stgLz+i3Aa9mZgnjr/O+v9ruKZsPsndy7qPZOchbqk2cnTU1ZaldKK+v7m54WoKIyxiuMZTKT2H81F8BeAc3ZQ==
-  dependencies:
-    lodash._reinterpolate "^3.0.0"
 
 lodash@4, lodash@4.17.21, lodash@^4.17.10, lodash@^4.17.14, lodash@^4.17.21, lodash@~4.17.15:
   version "4.17.21"
