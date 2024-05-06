@@ -8,7 +8,7 @@
 
 import { BudgetEntry, BudgetType, ThresholdSeverity, checkBudgets } from './bundle-calculator';
 
-const KB = 1024;
+const kB = 1000;
 
 describe('bundle-calculator', () => {
   describe('checkBudgets()', () => {
@@ -24,11 +24,11 @@ describe('bundle-calculator', () => {
         assets: [
           {
             name: 'foo.js',
-            size: 1.5 * KB,
+            size: 1.5 * kB,
           },
           {
             name: 'bar.js',
-            size: 0.5 * KB,
+            size: 0.5 * kB,
           },
         ],
       };
@@ -55,11 +55,11 @@ describe('bundle-calculator', () => {
         assets: [
           {
             name: 'foo.js',
-            size: 1.5 * KB,
+            size: 1.5 * kB,
           },
           {
             name: 'bar.js',
-            size: 0.5 * KB,
+            size: 0.5 * kB,
           },
         ],
       };
@@ -93,11 +93,11 @@ describe('bundle-calculator', () => {
         assets: [
           {
             name: 'foo.js',
-            size: 0.75 * KB,
+            size: 0.75 * kB,
           },
           {
             name: 'bar.js',
-            size: 0.75 * KB,
+            size: 0.75 * kB,
           },
         ],
       };
@@ -131,11 +131,11 @@ describe('bundle-calculator', () => {
         assets: [
           {
             name: 'foo.js',
-            size: 0.5 * KB,
+            size: 0.5 * kB,
           },
           {
             name: 'bar.js',
-            size: 0.75 * KB,
+            size: 0.75 * kB,
           },
         ],
       };
@@ -169,15 +169,15 @@ describe('bundle-calculator', () => {
         assets: [
           {
             name: 'foo.js',
-            size: 0.75 * KB,
+            size: 0.75 * kB,
           },
           {
             name: 'bar.js',
-            size: 0.75 * KB,
+            size: 0.75 * kB,
           },
           {
             name: 'baz.css',
-            size: 1.5 * KB,
+            size: 1.5 * kB,
           },
         ],
       };
@@ -211,11 +211,11 @@ describe('bundle-calculator', () => {
         assets: [
           {
             name: 'foo.js',
-            size: 0.75 * KB,
+            size: 0.75 * kB,
           },
           {
             name: 'bar.css',
-            size: 0.75 * KB,
+            size: 0.75 * kB,
           },
         ],
       };
@@ -249,11 +249,11 @@ describe('bundle-calculator', () => {
         assets: [
           {
             name: 'foo.css',
-            size: 1.5 * KB,
+            size: 1.5 * kB,
           },
           {
             name: 'bar.js',
-            size: 0.5 * KB,
+            size: 0.5 * kB,
           },
         ],
       };
@@ -282,11 +282,11 @@ describe('bundle-calculator', () => {
         assets: [
           {
             name: 'foo.js',
-            size: 1.5 * KB,
+            size: 1.5 * kB,
           },
           {
             name: 'bar.js',
-            size: 0.5 * KB,
+            size: 0.5 * kB,
           },
         ],
       };
@@ -320,11 +320,11 @@ describe('bundle-calculator', () => {
         assets: [
           {
             name: 'foo.ext',
-            size: 1.5 * KB,
+            size: 1.5 * kB,
           },
           {
             name: 'bar.ext',
-            size: 0.5 * KB,
+            size: 0.5 * kB,
           },
         ],
       };
