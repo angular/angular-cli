@@ -194,31 +194,31 @@ function addAppToWorkspaceFile(
   }
 
   const sourceRoot = join(normalize(projectRoot), 'src');
-  let budgets = [];
+  let budgets: { type: string; maximumWarning: string; maximumError: string }[] = [];
   if (options.strict) {
     budgets = [
       {
         type: 'initial',
-        maximumWarning: '500kb',
-        maximumError: '1mb',
+        maximumWarning: '500kB',
+        maximumError: '1MB',
       },
       {
         type: 'anyComponentStyle',
-        maximumWarning: '2kb',
-        maximumError: '4kb',
+        maximumWarning: '2kB',
+        maximumError: '4kB',
       },
     ];
   } else {
     budgets = [
       {
         type: 'initial',
-        maximumWarning: '2mb',
-        maximumError: '5mb',
+        maximumWarning: '2MB',
+        maximumError: '5MB',
       },
       {
         type: 'anyComponentStyle',
-        maximumWarning: '6kb',
-        maximumError: '10kb',
+        maximumWarning: '6kB',
+        maximumError: '10kB',
       },
     ];
   }
