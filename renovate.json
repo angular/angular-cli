@@ -27,15 +27,15 @@
     },
     {
       "groupName": "angular",
-      "matchPackagePatterns": ["^@angular/.*", "angular/dev-infra"]
+      "matchDepPatterns": ["^@angular/.*", "angular/dev-infra"]
     },
     {
       "groupName": "babel",
-      "matchPackagePatterns": ["^@babel/.*"]
+      "matchDepPatterns": ["^@babel/.*"]
     },
     {
       "groupName": "bazel",
-      "matchPackagePatterns": ["^@bazel/.*", "^build_bazel.*"]
+      "matchDepPatterns": ["^@bazel/.*", "^build_bazel.*"]
     },
     {
       "separateMinorPatch": true,
@@ -57,7 +57,7 @@
         "packages/angular_devkit/schematics_cli/schematic/files/package.json",
         "packages/schematics/angular/utility/latest-versions/package.json"
       ],
-      "matchPackagePatterns": ["*"],
+      "matchDepPatterns": ["*"],
       "groupName": "schematics dependencies",
       "groupSlug": "all-schematics-dependencies",
       "lockFileMaintenance": { "enabled": false }
@@ -69,14 +69,14 @@
         "!packages/schematics/angular/utility/latest-versions/package.json"
       ],
       "excludePackagePatterns": ["^@angular/.*", "angular/dev-infra"],
-      "matchPackagePatterns": ["*"],
+      "matchDepPatterns": ["*"],
       "matchUpdateTypes": ["minor", "patch"],
       "groupName": "all non-major dependencies",
       "groupSlug": "all-minor-patch"
     },
     {
       "matchPaths": [".github/workflows/scorecard.yml"],
-      "matchPackagePatterns": ["*"],
+      "matchDepPatterns": ["*"],
       "groupName": "scorecard action dependencies",
       "groupSlug": "scorecard-action"
     }
