@@ -12,6 +12,7 @@ import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { basename, dirname, extname, join, relative } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import type { CanonicalizeContext, Importer, ImporterResult, Syntax } from 'sass';
+import { assertIsError } from '../../utils/error';
 import { findUrls } from './lexer';
 
 /**
@@ -224,8 +225,16 @@ export class RelativeUrlRebasingImporter extends UrlRebasingImporter {
       let entries;
       try {
         entries = readdirSync(directory, { withFileTypes: true });
-      } catch {
-        return null;
+      } catch (error) {
+        assertIsError(error);
+        // If the containing directory does not exist return null to indicate it cannot be resolved
+        if (error.code === 'ENOENT') {
+          return null;
+        }
+
+        throw new Error(`Error reading directory ["${directory}"] while resolving Sass import`, {
+          cause: error,
+        });
       }
 
       foundDefaults = [];
@@ -236,7 +245,7 @@ export class RelativeUrlRebasingImporter extends UrlRebasingImporter {
         let isFile: boolean;
 
         if (entry.isSymbolicLink()) {
-          const stats = statSync(join(entry.path, entry.name));
+          const stats = statSync(join(directory, entry.name));
           isDirectory = stats.isDirectory();
           isFile = stats.isFile();
         } else {
