@@ -15,7 +15,7 @@ import {
   Exception,
   FileImporter,
   SourceSpan,
-  StringOptionsWithImporter,
+  StringOptions,
   compileString,
 } from 'sass';
 import {
@@ -43,7 +43,7 @@ interface RenderRequestMessage {
   /**
    * The Sass options to provide to the `dart-sass` compile function.
    */
-  options: Omit<StringOptionsWithImporter<'sync'>, 'url'> & { url: string };
+  options: Omit<StringOptions<'sync'>, 'url'> & { url: string };
   /**
    * Indicates the request has a custom importer function on the main thread.
    */
