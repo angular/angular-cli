@@ -269,6 +269,58 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       harness.expectFile('dist/browser/media/logo.svg').toExist();
     });
 
+    it('should rebase a URL with an leading interpolation referencing a local resource', async () => {
+      await harness.writeFiles({
+        'src/styles.scss': `@use 'theme/a';`,
+        'src/theme/a.scss': `
+                            @import './b';
+                            .a {
+                              background-image: url(#{$my-var}logo.svg)
+                            }
+        `,
+        'src/theme/b.scss': `$my-var: "./images/";`,
+        'src/theme/images/logo.svg': `<svg></svg>`,
+      });
+
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+        outputHashing: OutputHashing.None,
+        styles: ['src/styles.scss'],
+      });
+
+      const { result } = await harness.executeOnce();
+      expect(result?.success).toBeTrue();
+
+      harness.expectFile('dist/browser/styles.css').content.toContain(`url("./media/logo.svg")`);
+      harness.expectFile('dist/browser/media/logo.svg').toExist();
+    });
+
+    it('should rebase a URL with an non-leading interpolation referencing a local resource', async () => {
+      await harness.writeFiles({
+        'src/styles.scss': `@use 'theme/a';`,
+        'src/theme/a.scss': `
+                            @import './b';
+                            .a {
+                              background-image: url(./#{$my-var}logo.svg)
+                            }
+        `,
+        'src/theme/b.scss': `$my-var: "./images/";`,
+        'src/theme/images/logo.svg': `<svg></svg>`,
+      });
+
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+        outputHashing: OutputHashing.None,
+        styles: ['src/styles.scss'],
+      });
+
+      const { result } = await harness.executeOnce();
+      expect(result?.success).toBeTrue();
+
+      harness.expectFile('dist/browser/styles.css').content.toContain(`url("./media/logo.svg")`);
+      harness.expectFile('dist/browser/media/logo.svg').toExist();
+    });
+
     it('should not process a URL that has been marked as external', async () => {
       await harness.writeFiles({
         'src/styles.scss': `@use 'theme/a';`,
