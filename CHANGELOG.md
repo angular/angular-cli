@@ -1,3 +1,21 @@
+<a name="17.3.7"></a>
+
+# 17.3.7 (2024-05-08)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                   |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------- |
+| [998c72036](https://github.com/angular/angular-cli/commit/998c720363087f3f0b1748d3f875e5b536a3119d) | fix  | decode URL pathname decoding during SSG fetch |
+
+### @angular-devkit/schematics
+
+| Commit                                                                                              | Type | Description                                   |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------- |
+| [1ab1c6c9e](https://github.com/angular/angular-cli/commit/1ab1c6c9e10ce938402355afed4602b76ac08a0e) | fix  | use web standard error check for Deno support |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="18.0.0-rc.1"></a>
 
 # 18.0.0-rc.1 (2024-05-02)
