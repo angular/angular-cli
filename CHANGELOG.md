@@ -1,3 +1,16 @@
+<a name="18.0.0-rc.2"></a>
+
+# 18.0.0-rc.2 (2024-05-08)
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                        |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------- |
+| [57f448a0f](https://github.com/angular/angular-cli/commit/57f448a0f70c76c1a0ebbe941f82eec1d698e7d4) | fix  | decode URL pathname decoding during SSG fetch      |
+| [17931166d](https://github.com/angular/angular-cli/commit/17931166d83a4b18d2f4eb81f8a445b2365c71aa) | fix  | format sizes using decimal byte units consistently |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="17.3.7"></a>
 
 # 17.3.7 (2024-05-08)
