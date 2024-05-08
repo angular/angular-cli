@@ -84,7 +84,12 @@ abstract class UrlRebasingImporter implements Importer<'sync'> {
       }
 
       // Skip if root-relative, absolute or protocol relative url
-      if (/^((?:\w+:)?\/\/|data:|chrome:|#|\/)/.test(value)) {
+      if (/^((?:\w+:)?\/\/|data:|chrome:|\/)/.test(value)) {
+        continue;
+      }
+
+      // Skip if a fragment identifier but not a Sass interpolation
+      if (value[0] === '#' && value[1] !== '{') {
         continue;
       }
 
