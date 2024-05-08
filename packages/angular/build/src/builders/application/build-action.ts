@@ -180,6 +180,9 @@ export async function* runEsBuildBuildAction(
         logger.info(changes.toDebugString());
       }
 
+      // Clear removed files from current watch files
+      changes.removed.forEach((removedPath) => currentWatchFiles.delete(removedPath));
+
       result = await withProgress('Changes detected. Rebuilding...', () =>
         action(result.createRebuildState(changes)),
       );
