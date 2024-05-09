@@ -6,43 +6,31 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { join } from 'node:path';
+import assert from 'node:assert';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { MessageChannel, Worker } from 'node:worker_threads';
-import {
+import { MessageChannel } from 'node:worker_threads';
+import { Piscina } from 'piscina';
+import type {
   CanonicalizeContext,
   CompileResult,
   Deprecation,
   Exception,
   FileImporter,
   Importer,
-  Logger,
   NodePackageImporter,
   SourceSpan,
   StringOptions,
 } from 'sass';
 import { maxWorkers } from '../../utils/environment-options';
 
+// Polyfill Symbol.dispose if not present
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+(Symbol as any).dispose ??= Symbol('Symbol Dispose');
+
 /**
  * The maximum number of Workers that will be created to execute render requests.
  */
 const MAX_RENDER_WORKERS = maxWorkers;
-
-/**
- * The callback type for the `dart-sass` asynchronous render function.
- */
-type RenderCallback = (error?: Exception, result?: CompileResult) => void;
-
-/**
- * An object containing the contextual information for a specific render request.
- */
-interface RenderRequest {
-  id: number;
-  workerIndex: number;
-  callback: RenderCallback;
-  logger?: Logger;
-  importers?: Importers[];
-}
 
 /**
  * All available importer types.
@@ -83,7 +71,6 @@ export type SerializableWarningMessage = (
  * A response from the Sass render Worker containing the result of the operation.
  */
 interface RenderResponseMessage {
-  id: number;
   error?: Exception;
   result?: Omit<CompileResult, 'loadedUrls'> & { loadedUrls: string[] };
   warnings?: SerializableWarningMessage[];
@@ -96,14 +83,25 @@ interface RenderResponseMessage {
  * the worker which can be up to two times faster than the asynchronous variant.
  */
 export class SassWorkerImplementation {
-  private readonly workers: Worker[] = [];
-  private readonly availableWorkers: number[] = [];
-  private readonly requests = new Map<number, RenderRequest>();
-  private readonly workerPath = join(__dirname, './worker.js');
-  private idCounter = 1;
-  private nextWorkerIndex = 0;
+  #workerPool: Piscina | undefined;
 
-  constructor(private rebase = false) {}
+  constructor(
+    private readonly rebase = false,
+    readonly maxThreads = MAX_RENDER_WORKERS,
+  ) {}
+
+  #ensureWorkerPool(): Piscina {
+    this.#workerPool ??= new Piscina({
+      filename: require.resolve('./worker'),
+      minThreads: 1,
+      maxThreads: this.maxThreads,
+      // Shutdown idle threads after 1 second of inactivity
+      idleTimeout: 1000,
+      recordTiming: false,
+    });
+
+    return this.#workerPool;
+  }
 
   /**
    * Provides information about the Sass implementation.
@@ -126,58 +124,25 @@ export class SassWorkerImplementation {
    * @param source The contents to compile.
    * @param options The `dart-sass` options to use when rendering the stylesheet.
    */
-  compileStringAsync(source: string, options: StringOptions<'async'>): Promise<CompileResult> {
+  async compileStringAsync(
+    source: string,
+    options: StringOptions<'async'>,
+  ): Promise<CompileResult> {
     // The `functions`, `logger` and `importer` options are JavaScript functions that cannot be transferred.
     // If any additional function options are added in the future, they must be excluded as well.
     const { functions, importers, url, logger, ...serializableOptions } = options;
 
-    // The CLI's configuration does not use or expose the ability to defined custom Sass functions
+    // The CLI's configuration does not use or expose the ability to define custom Sass functions
     if (functions && Object.keys(functions).length > 0) {
       throw new Error('Sass custom functions are not supported.');
     }
 
-    return new Promise<CompileResult>((resolve, reject) => {
-      let workerIndex = this.availableWorkers.pop();
-      if (workerIndex === undefined) {
-        if (this.workers.length < MAX_RENDER_WORKERS) {
-          workerIndex = this.workers.length;
-          this.workers.push(this.createWorker());
-        } else {
-          workerIndex = this.nextWorkerIndex++;
-          if (this.nextWorkerIndex >= this.workers.length) {
-            this.nextWorkerIndex = 0;
-          }
-        }
-      }
+    using importerChannel = importers?.length ? this.#createImporterChannel(importers) : undefined;
 
-      const callback: RenderCallback = (error, result) => {
-        if (error) {
-          const url = error.span?.url as string | undefined;
-          if (url) {
-            error.span.url = pathToFileURL(url);
-          }
-
-          reject(error);
-
-          return;
-        }
-
-        if (!result) {
-          reject(new Error('No result.'));
-
-          return;
-        }
-
-        resolve(result);
-      };
-
-      const request = this.createRequest(workerIndex, callback, logger, importers);
-      this.requests.set(request.id, request);
-
-      this.workers[workerIndex].postMessage({
-        id: request.id,
+    const response = (await this.#ensureWorkerPool().run(
+      {
         source,
-        hasImporter: !!importers?.length,
+        importerChannel,
         hasLogger: !!logger,
         rebase: this.rebase,
         options: {
@@ -185,77 +150,68 @@ export class SassWorkerImplementation {
           // URL is not serializable so to convert to string here and back to URL in the worker.
           url: url ? fileURLToPath(url) : undefined,
         },
-      });
-    });
+      },
+      {
+        transferList: importerChannel ? [importerChannel.port] : undefined,
+      },
+    )) as RenderResponseMessage;
+
+    const { result, error, warnings } = response;
+
+    if (warnings && logger?.warn) {
+      for (const { message, span, ...options } of warnings) {
+        logger.warn(message, {
+          ...options,
+          span: span && {
+            ...span,
+            url: span.url ? pathToFileURL(span.url) : undefined,
+          },
+        });
+      }
+    }
+
+    if (error) {
+      // Convert stringified url value required for cloning back to a URL object
+      const url = error.span?.url as string | undefined;
+      if (url) {
+        error.span.url = pathToFileURL(url);
+      }
+
+      throw error;
+    }
+
+    assert(result, 'Sass render worker should always return a result or an error');
+
+    return {
+      ...result,
+      // URL is not serializable so in the worker we convert to string and here back to URL.
+      loadedUrls: result.loadedUrls.map((p) => pathToFileURL(p)),
+    };
   }
 
   /**
    * Shutdown the Sass render worker.
    * Executing this method will stop any pending render requests.
+   * @returns A void promise that resolves when closing is complete.
    */
-  close(): void {
-    for (const worker of this.workers) {
+  async close(): Promise<void> {
+    if (this.#workerPool) {
       try {
-        void worker.terminate();
-      } catch {}
+        await this.#workerPool.destroy();
+      } finally {
+        this.#workerPool = undefined;
+      }
     }
-    this.requests.clear();
   }
 
-  private createWorker(): Worker {
+  #createImporterChannel(importers: Iterable<Importers>) {
     const { port1: mainImporterPort, port2: workerImporterPort } = new MessageChannel();
     const importerSignal = new Int32Array(new SharedArrayBuffer(4));
 
-    const worker = new Worker(this.workerPath, {
-      workerData: { workerImporterPort, importerSignal },
-      transferList: [workerImporterPort],
-    });
-
-    worker.on('message', (response: RenderResponseMessage) => {
-      const request = this.requests.get(response.id);
-      if (!request) {
-        return;
-      }
-
-      this.requests.delete(response.id);
-      this.availableWorkers.push(request.workerIndex);
-
-      if (response.warnings && request.logger?.warn) {
-        for (const { message, span, ...options } of response.warnings) {
-          request.logger.warn(message, {
-            ...options,
-            span: span && {
-              ...span,
-              url: span.url ? pathToFileURL(span.url) : undefined,
-            },
-          });
-        }
-      }
-
-      if (response.result) {
-        request.callback(undefined, {
-          ...response.result,
-          // URL is not serializable so in the worker we convert to string and here back to URL.
-          loadedUrls: response.result.loadedUrls.map((p) => pathToFileURL(p)),
-        });
-      } else {
-        request.callback(response.error);
-      }
-    });
-
     mainImporterPort.on(
       'message',
-      ({ id, url, options }: { id: number; url: string; options: CanonicalizeContext }) => {
-        const request = this.requests.get(id);
-        if (!request?.importers) {
-          mainImporterPort.postMessage(null);
-          Atomics.store(importerSignal, 0, 1);
-          Atomics.notify(importerSignal, 0);
-
-          return;
-        }
-
-        this.processImporters(request.importers, url, {
+      ({ url, options }: { url: string; options: CanonicalizeContext }) => {
+        this.processImporters(importers, url, {
           ...options,
           // URL is not serializable so in the worker we convert to string and here back to URL.
           containingUrl: options.containingUrl
@@ -277,7 +233,13 @@ export class SassWorkerImplementation {
 
     mainImporterPort.unref();
 
-    return worker;
+    return {
+      port: workerImporterPort,
+      signal: importerSignal,
+      [Symbol.dispose]() {
+        mainImporterPort.close();
+      },
+    };
   }
 
   private async processImporters(
@@ -299,21 +261,6 @@ export class SassWorkerImplementation {
     }
 
     return null;
-  }
-
-  private createRequest(
-    workerIndex: number,
-    callback: RenderCallback,
-    logger: Logger | undefined,
-    importers: Importers[] | undefined,
-  ): RenderRequest {
-    return {
-      id: this.idCounter++,
-      workerIndex,
-      callback,
-      logger,
-      importers,
-    };
   }
 
   private isFileImporter(value: Importers): value is FileImporter {
