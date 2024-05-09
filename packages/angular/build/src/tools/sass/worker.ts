@@ -9,7 +9,7 @@
 import mergeSourceMaps, { RawSourceMap } from '@ampproject/remapping';
 import { dirname } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { MessagePort, parentPort, receiveMessageOnPort, workerData } from 'node:worker_threads';
+import { MessagePort, receiveMessageOnPort } from 'node:worker_threads';
 import {
   Deprecation,
   Exception,
@@ -32,11 +32,6 @@ import type { SerializableDeprecation, SerializableWarningMessage } from './sass
  */
 interface RenderRequestMessage {
   /**
-   * The unique request identifier that links the render action with a callback and optional
-   * importer on the main thread.
-   */
-  id: number;
-  /**
    * The contents to compile.
    */
   source: string;
@@ -47,7 +42,10 @@ interface RenderRequestMessage {
   /**
    * Indicates the request has a custom importer function on the main thread.
    */
-  hasImporter: boolean;
+  importerChannel?: {
+    port: MessagePort;
+    signal: Int32Array;
+  };
   /**
    * Indicates the request has a custom logger for warning messages.
    */
@@ -58,28 +56,15 @@ interface RenderRequestMessage {
   rebase: boolean;
 }
 
-if (!parentPort || !workerData) {
-  throw new Error('Sass worker must be executed as a Worker.');
-}
+export default async function renderSassStylesheet(request: RenderRequestMessage) {
+  const { importerChannel, hasLogger, source, options, rebase } = request;
 
-// The importer variables are used to proxy import requests to the main thread
-const { workerImporterPort, importerSignal } = workerData as {
-  workerImporterPort: MessagePort;
-  importerSignal: Int32Array;
-};
-
-parentPort.on('message', (message: RenderRequestMessage) => {
-  if (!parentPort) {
-    throw new Error('"parentPort" is not defined. Sass worker must be executed as a Worker.');
-  }
-
-  const { id, hasImporter, hasLogger, source, options, rebase } = message;
   const entryDirectory = dirname(options.url);
   let warnings: SerializableWarningMessage[] | undefined;
   try {
     const directoryCache = new Map<string, DirectoryEntry>();
     const rebaseSourceMaps = options.sourceMap ? new Map<string, RawSourceMap>() : undefined;
-    if (hasImporter) {
+    if (importerChannel) {
       // When a custom importer function is present, the importer request must be proxied
       // back to the main thread where it can be executed.
       // This process must be synchronous from the perspective of dart-sass. The `Atomics`
@@ -87,18 +72,17 @@ parentPort.on('message', (message: RenderRequestMessage) => {
       // `receiveMessageOnPort` function are used to ensure synchronous behavior.
       const proxyImporter: FileImporter<'sync'> = {
         findFileUrl: (url, { fromImport, containingUrl }) => {
-          Atomics.store(importerSignal, 0, 0);
-          workerImporterPort.postMessage({
-            id,
+          Atomics.store(importerChannel.signal, 0, 0);
+          importerChannel.port.postMessage({
             url,
             options: {
               fromImport,
               containingUrl: containingUrl ? fileURLToPath(containingUrl) : null,
             },
           });
-          Atomics.wait(importerSignal, 0, 0);
+          Atomics.wait(importerChannel.signal, 0, 0);
 
-          const result = receiveMessageOnPort(workerImporterPort)?.message as string | null;
+          const result = receiveMessageOnPort(importerChannel.port)?.message as string | null;
 
           return result ? pathToFileURL(result) : null;
         },
@@ -176,21 +160,20 @@ parentPort.on('message', (message: RenderRequestMessage) => {
       ) as unknown as typeof result.sourceMap;
     }
 
-    parentPort.postMessage({
-      id,
+    return {
       warnings,
       result: {
         ...result,
         // URL is not serializable so to convert to string here and back to URL in the parent.
         loadedUrls: result.loadedUrls.map((p) => fileURLToPath(p)),
       },
-    });
+    };
   } catch (error) {
     // Needed because V8 will only serialize the message and stack properties of an Error instance.
     if (error instanceof Exception) {
       const { span, message, stack, sassMessage, sassStack } = error;
-      parentPort.postMessage({
-        id,
+
+      return {
         warnings,
         error: {
           span: convertSourceSpan(span),
@@ -199,19 +182,19 @@ parentPort.on('message', (message: RenderRequestMessage) => {
           sassMessage,
           sassStack,
         },
-      });
+      };
     } else if (error instanceof Error) {
       const { message, stack } = error;
-      parentPort.postMessage({ id, warnings, error: { message, stack } });
+
+      return { warnings, error: { message, stack } };
     } else {
-      parentPort.postMessage({
-        id,
+      return {
         warnings,
         error: { message: 'An unknown error has occurred.' },
-      });
+      };
     }
   }
-});
+}
 
 /**
  * Converts a Sass SourceSpan object into a serializable form.
