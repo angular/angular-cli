@@ -1082,6 +1082,9 @@ export default class UpdateCommandModule extends CommandModule<UpdateCommandArgs
         numberOfMigrations > 1 ? 's' : ''
       } that can be executed.`,
     );
+    logger.info(
+      'Optional migrations may be skipped and executed after the update process if preferred.',
+    );
     logger.info(''); // Extra trailing newline.
 
     if (!isTTY()) {
