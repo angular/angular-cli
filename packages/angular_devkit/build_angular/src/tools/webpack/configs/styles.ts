@@ -66,7 +66,7 @@ export async function getStylesConfig(wco: WebpackConfigOptions): Promise<Config
   extraPlugins.push({
     apply(compiler) {
       compiler.hooks.shutdown.tap('sass-worker', () => {
-        sassImplementation.close();
+        void sassImplementation.close();
       });
     },
   });
