@@ -23,7 +23,7 @@ function isSassException(error: unknown): error is Exception {
 
 export function shutdownSassWorkerPool(): void {
   if (sassWorkerPool) {
-    sassWorkerPool.close();
+    void sassWorkerPool.close();
     sassWorkerPool = undefined;
   } else if (sassWorkerPoolPromise) {
     void sassWorkerPoolPromise.then(shutdownSassWorkerPool);
