@@ -169,7 +169,7 @@ function createCommonJSModuleError(request: string, importer: string): PartialMe
       {
         text:
           'CommonJS or AMD dependencies can cause optimization bailouts.\n' +
-          'For more information see: https://angular.io/guide/build#configuring-commonjs-dependencies',
+          'For more information see: https://angular.dev/tools/cli/build#configuring-commonjs-dependencies',
       },
     ],
   };
