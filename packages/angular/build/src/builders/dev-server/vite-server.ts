@@ -482,6 +482,15 @@ export async function setupServer(
     css: {
       devSourcemap: true,
     },
+    // Ensure custom 'file' loader build option entries are handled by Vite in application code that
+    // reference third-party libraries. Relative usage is handled directly by the build and not Vite.
+    // Only 'file' loader entries are currently supported directly by Vite.
+    assetsInclude:
+      prebundleLoaderExtensions &&
+      Object.entries(prebundleLoaderExtensions)
+        .filter(([, value]) => value === 'file')
+        // Create a file extension glob for each key
+        .map(([key]) => '*' + key),
     // Vite will normalize the `base` option by adding a leading slash.
     base: serverOptions.servePath,
     resolve: {
