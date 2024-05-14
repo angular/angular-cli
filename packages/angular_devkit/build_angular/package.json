@@ -31,11 +31,11 @@
     "copy-webpack-plugin": "11.0.0",
     "critters": "0.0.22",
     "css-loader": "7.1.1",
-    "esbuild-wasm": "0.21.1",
+    "esbuild-wasm": "0.21.2",
     "fast-glob": "3.3.2",
     "https-proxy-agent": "7.0.4",
     "http-proxy-middleware": "3.0.0",
-    "inquirer": "9.2.20",
+    "inquirer": "9.2.21",
     "jsonc-parser": "3.2.1",
     "karma-source-map-support": "1.4.0",
     "less": "4.2.0",
@@ -54,15 +54,15 @@
     "postcss-loader": "8.1.1",
     "resolve-url-loader": "5.0.0",
     "rxjs": "7.8.1",
-    "sass": "1.77.0",
+    "sass": "1.77.1",
     "sass-loader": "14.2.1",
-    "semver": "7.6.1",
+    "semver": "7.6.2",
     "source-map-loader": "5.0.0",
     "source-map-support": "0.5.21",
     "terser": "5.31.0",
     "tree-kill": "1.2.2",
     "tslib": "2.6.2",
-    "undici": "6.16.0",
+    "undici": "6.16.1",
     "vite": "5.2.11",
     "watchpack": "2.4.1",
     "webpack": "5.91.0",
@@ -72,7 +72,7 @@
     "webpack-subresource-integrity": "5.1.0"
   },
   "optionalDependencies": {
-    "esbuild": "0.21.1"
+    "esbuild": "0.21.2"
   },
   "peerDependencies": {
     "@angular/compiler-cli": "^18.0.0-next.0",
