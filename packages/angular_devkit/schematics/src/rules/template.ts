@@ -62,7 +62,12 @@ export function applyContentTemplate<T>(options: T): FileOperator {
         content: Buffer.from(templateImpl(decodedContent, {})(options)),
       };
     } catch (e) {
-      if (e instanceof TypeError) {
+      // The second part should not be needed. But Jest does not support instanceof correctly.
+      // See: https://github.com/jestjs/jest/issues/2549
+      if (
+        e instanceof TypeError ||
+        (e as NodeJS.ErrnoException).code === 'ERR_ENCODING_INVALID_ENCODED_DATA'
+      ) {
         return entry;
       }
 
