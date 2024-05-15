@@ -63,10 +63,10 @@ export function createCompilerPlugin(
       const preserveSymlinks = build.initialOptions.preserveSymlinks;
 
       // Initialize a worker pool for JavaScript transformations
-      let cacheStore;
+      let cacheStore: LmbdCacheStore | undefined;
       if (pluginOptions.sourceFileCache?.persistentCachePath) {
         cacheStore = new LmbdCacheStore(
-          pluginOptions.sourceFileCache.persistentCachePath + '/angular-compiler.db',
+          path.join(pluginOptions.sourceFileCache.persistentCachePath, 'angular-compiler.db'),
         );
       }
       const javascriptTransformer = new JavaScriptTransformer(
@@ -446,6 +446,7 @@ export function createCompilerPlugin(
         sharedTSCompilationState?.dispose();
         void stylesheetBundler.dispose();
         void compilation.close?.();
+        void cacheStore?.close();
       });
 
       /**
