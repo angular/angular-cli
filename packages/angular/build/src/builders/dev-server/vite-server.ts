@@ -241,6 +241,10 @@ export async function* serveWithVite(
         throw new Error('The builder requires a target.');
       }
 
+      context.logger.info(
+        'NOTE: Raw file sizes do not reflect development server per-request transformations.',
+      );
+
       const { root = '' } = await context.getProjectMetadata(projectName);
       const projectRoot = join(context.workspaceRoot, root as string);
       const browsers = getSupportedBrowsers(projectRoot, context.logger);
