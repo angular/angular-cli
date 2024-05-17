@@ -19,4 +19,4 @@ For example, use the following command to take the latest 10.x.x version and use
 ng update @angular/cli@^10 @angular/core@^10
 ```
 
-For detailed information and guidance on updating your application, see the interactive [Angular Update Guide](https://update.angular.io/).
+For detailed information and guidance on updating your application, see the interactive [Angular Update Guide](https://update.angular.dev/).
