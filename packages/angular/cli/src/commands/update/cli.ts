@@ -81,7 +81,7 @@ export default class UpdateCommandModule extends CommandModule<UpdateCommandArgs
   protected override shouldReportAnalytics = false;
 
   command = 'update [packages..]';
-  describe = 'Updates your workspace and its dependencies. See https://update.angular.io/.';
+  describe = 'Updates your workspace and its dependencies. See https://update.angular.dev/.';
   longDescriptionPath = join(__dirname, 'long-description.md');
 
   builder(localYargs: Argv): Argv<UpdateCommandArgs> {
@@ -716,7 +716,7 @@ export default class UpdateCommandModule extends CommandModule<UpdateCommandArgs
             // Example @angular/core skipped version 3, @angular/cli skipped versions 2-5.
             logger.error(
               `Updating multiple major versions of '${name}' at once is not supported. Please migrate each major version individually.\n` +
-                `For more information about the update process, see https://update.angular.io/.`,
+                `For more information about the update process, see https://update.angular.dev/.`,
             );
           } else {
             const nextMajorVersionFromCurrent = currentMajorVersion + 1;
@@ -725,7 +725,7 @@ export default class UpdateCommandModule extends CommandModule<UpdateCommandArgs
               `Updating multiple major versions of '${name}' at once is not supported. Please migrate each major version individually.\n` +
                 `Run 'ng update ${name}@${nextMajorVersionFromCurrent}' in your workspace directory ` +
                 `to update to latest '${nextMajorVersionFromCurrent}.x' version of '${name}'.\n\n` +
-                `For more information about the update process, see https://update.angular.io/?v=${currentMajorVersion}.0-${nextMajorVersionFromCurrent}.0`,
+                `For more information about the update process, see https://update.angular.dev/?v=${currentMajorVersion}.0-${nextMajorVersionFromCurrent}.0`,
             );
           }
 
