@@ -16,7 +16,7 @@ import { getWorkspace } from '../utilities/config';
 import { forceAutocomplete } from '../utilities/environment-options';
 import { isTTY } from '../utilities/tty';
 import { assertIsError } from './error';
-import { loadEsmModule } from './load-esm';
+import { askConfirmation } from './prompt';
 
 /** Interface for the autocompletion configuration stored in the global workspace. */
 interface CompletionConfig {
@@ -179,24 +179,17 @@ async function shouldPromptForAutocompletionSetup(
 }
 
 async function promptForAutocompletion(): Promise<boolean> {
-  // Dynamically load `inquirer` so users don't have to pay the cost of parsing and executing it for
-  // the 99% of builds that *don't* prompt for autocompletion.
-  const { default: inquirer } = await loadEsmModule<typeof import('inquirer')>('inquirer');
-  const { autocomplete } = await inquirer.prompt<{ autocomplete: boolean }>([
-    {
-      name: 'autocomplete',
-      type: 'confirm',
-      message: `
+  const autocomplete = await askConfirmation(
+    `
 Would you like to enable autocompletion? This will set up your terminal so pressing TAB while typing
 Angular CLI commands will show possible options and autocomplete arguments. (Enabling autocompletion
 will modify configuration files in your home directory.)
-      `
-        .split('\n')
-        .join(' ')
-        .trim(),
-      default: true,
-    },
-  ]);
+        `
+      .split('\n')
+      .join(' ')
+      .trim(),
+    true,
+  );
 
   return autocomplete;
 }

@@ -12,7 +12,7 @@ import type { CommandContext } from '../command-builder/command-module';
 import { colors } from '../utilities/color';
 import { getWorkspace } from '../utilities/config';
 import { analyticsDisabled } from '../utilities/environment-options';
-import { loadEsmModule } from '../utilities/load-esm';
+import { askConfirmation } from '../utilities/prompt';
 import { isTTY } from '../utilities/tty';
 
 /* eslint-disable no-console */
@@ -75,24 +75,19 @@ export async function promptAnalytics(
   }
 
   if (force || isTTY()) {
-    const { default: inquirer } = await loadEsmModule<typeof import('inquirer')>('inquirer');
-    const answers = await inquirer.prompt<{ analytics: boolean }>([
-      {
-        type: 'confirm',
-        name: 'analytics',
-        message: tags.stripIndents`
-           Would you like to share pseudonymous usage data about this project with the Angular Team
-           at Google under Google's Privacy Policy at https://policies.google.com/privacy. For more
-           details and how to change this setting, see https://angular.io/analytics.
+    const answer = await askConfirmation(
+      `
+Would you like to share pseudonymous usage data about this project with the Angular Team
+at Google under Google's Privacy Policy at https://policies.google.com/privacy. For more
+details and how to change this setting, see https://angular.io/analytics.
 
-         `,
-        default: false,
-      },
-    ]);
+  `,
+      false,
+    );
 
-    await setAnalyticsConfig(global, answers.analytics);
+    await setAnalyticsConfig(global, answer);
 
-    if (answers.analytics) {
+    if (answer) {
       console.log('');
       console.log(
         tags.stripIndent`
