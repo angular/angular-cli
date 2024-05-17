@@ -73,7 +73,7 @@ export function assertCompatibleAngularVersion(projectRoot: string): void | neve
     console.error(
       `This version of CLI is only compatible with Angular versions ${supportedAngularSemver},\n` +
         `but Angular version ${angularVersion} was found instead.\n` +
-        'Please visit the link below to find instructions on how to update Angular.\nhttps://update.angular.io/',
+        'Please visit the link below to find instructions on how to update Angular.\nhttps://update.angular.dev/',
     );
 
     process.exit(3);
