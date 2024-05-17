@@ -20,7 +20,7 @@ describe('addEventDispatchContract', () => {
     `);
 
     expect(result).toMatch(
-      /<body>\s*<script type="text\/javascript" id="ng-event-dispatch-contract">.+<\/script>\s*<h1>/,
+      /<body>\s*<script type="text\/javascript" id="ng-event-dispatch-contract">[\s\S]+<\/script>\s*<h1>/,
     );
   });
 });
