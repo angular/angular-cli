@@ -67,6 +67,7 @@ interface MigrationSchematicDescription
   extends SchematicDescription<FileSystemCollectionDescription, FileSystemSchematicDescription> {
   version?: string;
   optional?: boolean;
+  documentation?: string;
 }
 
 interface MigrationSchematicDescriptionWithVersion extends MigrationSchematicDescription {
@@ -1082,10 +1083,6 @@ export default class UpdateCommandModule extends CommandModule<UpdateCommandArgs
         numberOfMigrations > 1 ? 's' : ''
       } that can be executed.`,
     );
-    logger.info(
-      'Optional migrations may be skipped and executed after the update process if preferred.',
-    );
-    logger.info(''); // Extra trailing newline.
 
     if (!isTTY()) {
       for (const migration of optionalMigrations) {
@@ -1098,13 +1095,18 @@ export default class UpdateCommandModule extends CommandModule<UpdateCommandArgs
       return undefined;
     }
 
+    logger.info(
+      'Optional migrations may be skipped and executed after the update process, if preferred.',
+    );
+    logger.info(''); // Extra trailing newline.
+
     const answer = await askChoices(
       `Select the migrations that you'd like to run`,
       optionalMigrations.map((migration) => {
-        const { title } = getMigrationTitleAndDescription(migration);
+        const { title, documentation } = getMigrationTitleAndDescription(migration);
 
         return {
-          name: title,
+          name: `[${colors.white(migration.name)}] ${title}${documentation ? ` (${documentation})` : ''}`,
           value: migration.name,
         };
       }),
@@ -1182,11 +1184,15 @@ function coerceVersionNumber(version: string | undefined): string | undefined {
 function getMigrationTitleAndDescription(migration: MigrationSchematicDescription): {
   title: string;
   description: string;
+  documentation?: string;
 } {
   const [title, ...description] = migration.description.split('. ');
 
   return {
     title: title.endsWith('.') ? title : title + '.',
     description: description.join('.\n  '),
+    documentation: migration.documentation
+      ? new URL(migration.documentation, 'https://angular.dev').href
+      : undefined,
   };
 }
