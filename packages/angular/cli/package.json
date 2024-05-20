@@ -43,8 +43,8 @@
   "ng-update": {
     "migrations": "@schematics/angular/migrations/migration-collection.json",
     "packageGroup": {
-      "@angular/build": "0.0.0-PLACEHOLDER",
       "@angular/cli": "0.0.0-PLACEHOLDER",
+      "@angular/build": "0.0.0-PLACEHOLDER",
       "@angular/ssr": "0.0.0-PLACEHOLDER",
       "@angular-devkit/architect": "0.0.0-EXPERIMENTAL-PLACEHOLDER",
       "@angular-devkit/build-angular": "0.0.0-PLACEHOLDER",
