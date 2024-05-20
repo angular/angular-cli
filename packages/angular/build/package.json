@@ -38,7 +38,6 @@
     "picomatch": "4.0.2",
     "piscina": "4.5.0",
     "parse5-html-rewriting-stream": "7.0.0",
-    "postcss": "8.4.38",
     "sass": "1.77.2",
     "semver": "7.6.2",
     "undici": "6.18.0",
