@@ -1949,6 +1949,11 @@
   resolved "https://registry.yarnpkg.com/@inquirer/figures/-/figures-1.0.1.tgz#d65f0bd0e9511a90b4d3543ee6a3ce7211f29417"
   integrity sha512-mtup3wVKia3ZwULPHcbs4Mor8Voi+iIXEWD7wCNbIO6lYR62oPCTQyrddi5OMYVXHzeCSoneZwJuS8sBvlEwDw==
 
+"@inquirer/figures@^1.0.2":
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/@inquirer/figures/-/figures-1.0.2.tgz#a6af5e9f9969efb9ed3469130566315c36506b8a"
+  integrity sha512-4F1MBwVr3c/m4bAUef6LgkvBfSjzwH+OfldgHqcuacWwSUetFebM2wi58WfG9uk1rR98U6GwLed4asLJbwdV5w==
+
 "@isaacs/cliui@^8.0.2":
   version "8.0.2"
   resolved "https://registry.yarnpkg.com/@isaacs/cliui/-/cliui-8.0.2.tgz#b37667b7bc181c168782259bab42474fbf52b550"
@@ -8596,12 +8601,12 @@ inquirer@9.2.20:
     strip-ansi "^6.0.1"
     wrap-ansi "^6.2.0"
 
-inquirer@9.2.21:
-  version "9.2.21"
-  resolved "https://registry.yarnpkg.com/inquirer/-/inquirer-9.2.21.tgz#8396d24cc6ec423e37e5d46b2b267a436abaa410"
-  integrity sha512-c/dwDruM1FtzeISV+xMHm+JZTmhpmgWPEZI2bU3+Fwu5MhbAX0zMHHxj5warNfttE5NUID3aijrFUpDc2yBvcA==
+inquirer@9.2.22:
+  version "9.2.22"
+  resolved "https://registry.yarnpkg.com/inquirer/-/inquirer-9.2.22.tgz#718cb4153f0d35176aab27d495f8e358d1e2008f"
+  integrity sha512-SqLLa/Oe5rZUagTR9z+Zd6izyatHglbmbvVofo1KzuVB54YHleWzeHNLoR7FOICGOeQSqeLh1cordb3MzhGcEw==
   dependencies:
-    "@inquirer/figures" "^1.0.1"
+    "@inquirer/figures" "^1.0.2"
     "@ljharb/through" "^2.3.13"
     ansi-escapes "^4.3.2"
     chalk "^5.3.0"
@@ -11424,6 +11429,13 @@ piscina@4.4.0, piscina@^4.4.0:
   optionalDependencies:
     nice-napi "^1.0.2"
 
+piscina@4.5.0:
+  version "4.5.0"
+  resolved "https://registry.yarnpkg.com/piscina/-/piscina-4.5.0.tgz#739074b03687958d413b226d358727f648805cb0"
+  integrity sha512-iBaLWI56PFP81cfBSomWTmhOo9W2/yhIOL+Tk8O1vBCpK39cM0tGxB+wgYjG31qq4ohGvysfXSdnj8h7g4rZxA==
+  optionalDependencies:
+    nice-napi "^1.0.2"
+
 pkg-dir@^4.1.0:
   version "4.2.0"
   resolved "https://registry.yarnpkg.com/pkg-dir/-/pkg-dir-4.2.0.tgz#f099133df7ede422e81d1d8448270eeb3e4261f3"
@@ -11829,10 +11841,10 @@ quick-format-unescaped@^4.0.3:
   resolved "https://registry.yarnpkg.com/quick-format-unescaped/-/quick-format-unescaped-4.0.4.tgz#93ef6dd8d3453cbc7970dd614fad4c5954d6b5a7"
   integrity sha512-tYC1Q1hgyRuHgloV/YXs2w15unPVh8qfu/qCTfhTYamaw7fyhumKa2yGpdSo87vY32rIclj+4fWYQXUMs9EHvg==
 
-quicktype-core@23.0.162:
-  version "23.0.162"
-  resolved "https://registry.yarnpkg.com/quicktype-core/-/quicktype-core-23.0.162.tgz#4b4ab5276096d10d4b2879df5cca89365e879f8b"
-  integrity sha512-rFSOLDsnf/BkAfTwS7t0DQGOm12b5sUA3tfNT4JdFGbaf6SiSeKUs6/9eElgeHudhUL1RUGf5D4RDsV+hGk/cQ==
+quicktype-core@23.0.168:
+  version "23.0.168"
+  resolved "https://registry.yarnpkg.com/quicktype-core/-/quicktype-core-23.0.168.tgz#ee322f4ff3e3f102aaa1c70c927a62a01e8cf6a2"
+  integrity sha512-CGMvMM6l7bUIKYCY3T5WLZNdAi5tJ+LETTP5l8YzYoxhNfc7dd8ZpVxFp5S3Q/cme/i5qt27+WzFJVMMxJtSjA==
   dependencies:
     "@glideapps/ts-necessities" "2.2.3"
     browser-or-node "^3.0.0"
@@ -13671,10 +13683,10 @@ undici@6.16.0:
   resolved "https://registry.yarnpkg.com/undici/-/undici-6.16.0.tgz#3b2e3dc617c6bd51b6885f15d58c172cc8b6fc40"
   integrity sha512-HQfVddOTb5PJtfLnJ1Px8bNGyIg/z7WTj1hjUSna1Itsv59Oca9JdclIU08ToNqvWWXjFLRzc9rqjnpfw5UWcQ==
 
-undici@6.17.0:
-  version "6.17.0"
-  resolved "https://registry.yarnpkg.com/undici/-/undici-6.17.0.tgz#893d47b4027cff5409f11eb95d23196383ce9723"
-  integrity sha512-fs13QiDjPIzJ7gFAOal9CSG0c92rT2xw6MuMUJ4H30Eg5GCauLWYCCZA1tInjd6M4y+JZjVCCFr9pFpbhcC64w==
+undici@6.18.0:
+  version "6.18.0"
+  resolved "https://registry.yarnpkg.com/undici/-/undici-6.18.0.tgz#cea3b87182f1ef13c226e2f29b862e6d43004fa3"
+  integrity sha512-nT8jjv/fE9Et1ilR6QoW8ingRTY2Pp4l2RUrdzV5Yz35RJDrtPc1DXvuNqcpsJSGIRHFdt3YKKktTzJA6r0fTA==
 
 unicode-canonical-property-names-ecmascript@^2.0.0:
   version "2.0.0"
