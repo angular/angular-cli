@@ -175,7 +175,7 @@ export async function* serveWithVite(
       // If server is active, send an error notification
       if (result.errors?.length && server) {
         hadError = true;
-        server.ws.send({
+        server.hot.send({
           type: 'error',
           err: {
             message: result.errors[0].text,
@@ -188,7 +188,7 @@ export async function* serveWithVite(
     } else if (hadError && server) {
       hadError = false;
       // Send an empty update to clear the error overlay
-      server.ws.send({
+      server.hot.send({
         'type': 'update',
         updates: [],
       });
@@ -249,9 +249,6 @@ export async function* serveWithVite(
       const projectRoot = join(context.workspaceRoot, root as string);
       const browsers = getSupportedBrowsers(projectRoot, context.logger);
       const target = transformSupportedBrowsersToTargets(browsers);
-      const polyfills = Array.isArray((browserOptions.polyfills ??= []))
-        ? browserOptions.polyfills
-        : [browserOptions.polyfills];
 
       // Setup server and start listening
       const serverConfiguration = await setupServer(
@@ -263,7 +260,7 @@ export async function* serveWithVite(
         !!browserOptions.ssr,
         prebundleTransformer,
         target,
-        isZonelessApp(polyfills),
+        isZonelessApp(browserOptions.polyfills),
         browserOptions.loader as EsbuildLoaderOption | undefined,
         extensions?.middleware,
         transformers?.indexHtml,
@@ -300,7 +297,7 @@ export async function* serveWithVite(
             key: 'r',
             description: 'force reload browser',
             action(server) {
-              server.ws.send({
+              server.hot.send({
                 type: 'full-reload',
                 path: '*',
               });
