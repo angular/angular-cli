@@ -42,7 +42,7 @@ export default async function () {
 
     const { stdout } = await execWithEnv(
       'ng',
-      ['version'],
+      ['config'],
       {
         ...DEFAULT_ENV,
         SHELL: '/bin/bash',
@@ -74,7 +74,7 @@ export default async function () {
 
     const { stdout } = await execWithEnv(
       'ng',
-      ['version'],
+      ['config'],
       {
         ...DEFAULT_ENV,
         SHELL: '/bin/bash',
@@ -112,7 +112,7 @@ export default async function () {
 
     const { stdout: stdout1 } = await execWithEnv(
       'ng',
-      ['version'],
+      ['config'],
       {
         ...DEFAULT_ENV,
         SHELL: '/bin/bash',
@@ -136,7 +136,7 @@ export default async function () {
     // User modifies their configuration and removes `ng completion`.
     await fs.writeFile(bashrc, '# Some new commands...');
 
-    const { stdout: stdout2 } = await execWithEnv('ng', ['version'], {
+    const { stdout: stdout2 } = await execWithEnv('ng', ['config'], {
       ...DEFAULT_ENV,
       SHELL: '/bin/bash',
       HOME: home,
@@ -165,7 +165,7 @@ export default async function () {
 
     const { stdout: stdout1 } = await execWithEnv(
       'ng',
-      ['version'],
+      ['config'],
       {
         ...DEFAULT_ENV,
         SHELL: '/bin/bash',
@@ -178,7 +178,7 @@ export default async function () {
       throw new Error('First execution did not prompt for autocompletion setup.');
     }
 
-    const { stdout: stdout2 } = await execWithEnv('ng', ['version'], {
+    const { stdout: stdout2 } = await execWithEnv('ng', ['config'], {
       ...DEFAULT_ENV,
       SHELL: '/bin/bash',
       HOME: home,
@@ -211,7 +211,7 @@ export default async function () {
 
     const err = await execAndCaptureError(
       'ng',
-      ['version'],
+      ['config'],
       {
         ...DEFAULT_ENV,
         SHELL: '/bin/bash',
@@ -231,7 +231,7 @@ export default async function () {
 
     const { stdout: stdout2 } = await execWithEnv(
       'ng',
-      ['version'],
+      ['config'],
       {
         ...DEFAULT_ENV,
         SHELL: '/bin/bash',
@@ -283,7 +283,7 @@ export default async function () {
 
   // Does *not* prompt user for CI executions.
   {
-    const { stdout } = await execWithEnv('ng', ['version'], {
+    const { stdout } = await execWithEnv('ng', ['config'], {
       ...DEFAULT_ENV,
       CI: 'true',
       NG_FORCE_TTY: undefined,
@@ -296,7 +296,7 @@ export default async function () {
 
   // Does *not* prompt user for non-TTY executions.
   {
-    const { stdout } = await execWithEnv('ng', ['version'], {
+    const { stdout } = await execWithEnv('ng', ['config'], {
       ...DEFAULT_ENV,
       NG_FORCE_TTY: 'false',
     });
@@ -308,7 +308,7 @@ export default async function () {
 
   // Does *not* prompt user for executions without a `$HOME`.
   {
-    const { stdout } = await execWithEnv('ng', ['version'], {
+    const { stdout } = await execWithEnv('ng', ['config'], {
       ...DEFAULT_ENV,
       HOME: undefined,
     });
@@ -323,7 +323,7 @@ export default async function () {
 
   // Does *not* prompt user for executions without a `$SHELL`.
   {
-    const { stdout } = await execWithEnv('ng', ['version'], {
+    const { stdout } = await execWithEnv('ng', ['config'], {
       ...DEFAULT_ENV,
       SHELL: undefined,
     });
@@ -338,7 +338,7 @@ export default async function () {
 
   // Does *not* prompt user for executions from unknown shells.
   {
-    const { stdout } = await execWithEnv('ng', ['version'], {
+    const { stdout } = await execWithEnv('ng', ['config'], {
       ...DEFAULT_ENV,
       SHELL: '/usr/bin/unknown',
     });
@@ -364,7 +364,7 @@ source <(ng completion script)
     `.trim(),
     );
 
-    const { stdout } = await execWithEnv('ng', ['version'], {
+    const { stdout } = await execWithEnv('ng', ['config'], {
       ...DEFAULT_ENV,
       SHELL: '/bin/bash',
       HOME: home,
@@ -383,7 +383,7 @@ source <(ng completion script)
     const bashrc = path.join(home, '.bashrc');
     await fs.writeFile(bashrc, `# Other content...`);
 
-    await execAndWaitForOutputToMatch('ng', ['version'], AUTOCOMPLETION_PROMPT, {
+    await execAndWaitForOutputToMatch('ng', ['config'], AUTOCOMPLETION_PROMPT, {
       ...DEFAULT_ENV,
       SHELL: '/bin/bash',
       HOME: home,
@@ -411,7 +411,7 @@ source <(ng completion script)
       const localCliBinary = path.join(localCliDir, 'ng');
       const pathDirs = process.env['PATH']!.split(':');
       const pathEnvVar = [...pathDirs, localCliDir].join(':');
-      const { stdout } = await execWithEnv(localCliBinary, ['version'], {
+      const { stdout } = await execWithEnv(localCliBinary, ['config'], {
         ...DEFAULT_ENV,
         SHELL: '/bin/bash',
         HOME: home,
@@ -437,7 +437,7 @@ async function windowsTests(): Promise<void> {
     const bashrc = path.join(home, '.bashrc');
     await fs.writeFile(bashrc, `# Other content...`);
 
-    const { stdout } = await execWithEnv('ng', ['version'], { ...env });
+    const { stdout } = await execWithEnv('ng', ['config'], { ...env });
 
     if (AUTOCOMPLETION_PROMPT.test(stdout)) {
       throw new Error(

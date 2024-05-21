@@ -130,8 +130,8 @@ async function shouldPromptForAutocompletionSetup(
     return forceAutocomplete;
   }
 
-  // Don't prompt on `ng update` or `ng completion`.
-  if (command === 'update' || command === 'completion') {
+  // Don't prompt on `ng update`, 'ng version' or `ng completion`.
+  if (['version', 'update', 'completion'].includes(command)) {
     return false;
   }
 

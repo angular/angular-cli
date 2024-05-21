@@ -8,7 +8,7 @@ export default async function () {
   await mockHome(async () => {
     const { stdout } = await execWithEnv(
       'ng',
-      ['version'],
+      ['config'],
       {
         ...process.env,
         NG_FORCE_TTY: '1',
@@ -24,7 +24,7 @@ export default async function () {
 
   // CLI should skip analytics prompt with `NG_CLI_ANALYTICS=false`.
   await mockHome(async () => {
-    const { stdout } = await execWithEnv('ng', ['version'], {
+    const { stdout } = await execWithEnv('ng', ['config'], {
       ...process.env,
       NG_FORCE_TTY: '1',
       NG_CLI_ANALYTICS: 'false',

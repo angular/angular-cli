@@ -176,8 +176,8 @@ export abstract class CommandModule<T extends {} = {}> implements CommandModuleI
 
     const userId = await getAnalyticsUserId(
       this.context,
-      // Don't prompt for `ng update` and `ng analytics` commands.
-      ['update', 'analytics'].includes(this.commandName),
+      // Don't prompt on `ng update`, 'ng version' or `ng analytics`.
+      ['version', 'update', 'analytics'].includes(this.commandName),
     );
 
     return userId ? new AnalyticsCollector(this.context, userId) : undefined;
