@@ -596,6 +596,33 @@ describe('adjust-static-class-members Babel plugin', () => {
   );
 
   it(
+    'wraps class with Angular ɵfac static field (esbuild)',
+    testCase({
+      input: `
+      var Comp2Component = class _Comp2Component {
+        static {
+          this.ɵfac = function Comp2Component_Factory(t) {
+            return new (t || _Comp2Component)();
+          };
+        }
+      };
+    `,
+      expected: `
+      var Comp2Component = /*#__PURE__*/ (() => {
+        let Comp2Component = class _Comp2Component {
+          static {
+            this.ɵfac = function Comp2Component_Factory(t) {
+              return new (t || _Comp2Component)();
+            };
+          }
+        };
+        return Comp2Component;
+      })();
+    `,
+    }),
+  );
+
+  it(
     'wraps class with class decorators when wrapDecorators is true (esbuild output)',
     testCase({
       input: `
