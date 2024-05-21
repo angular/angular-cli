@@ -1,3 +1,36 @@
+<a name="18.0.0-rc.3"></a>
+
+# 18.0.0-rc.3 (2024-05-21)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                              |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------- |
+| [41ab6c8c3](https://github.com/angular/angular-cli/commit/41ab6c8c3486d7cf7c41c18ae3b603376f647605) | fix  | add `--version` option                                   |
+| [1039f6d79](https://github.com/angular/angular-cli/commit/1039f6d7997523dd4657c5c2a06631e6075b7bc0) | fix  | change update guide link to angular.dev                  |
+| [fa99a01ba](https://github.com/angular/angular-cli/commit/fa99a01bad43b78195a082bb9ec746b469b002b3) | fix  | clarify optional migration instructions during ng update |
+| [f4670fcb1](https://github.com/angular/angular-cli/commit/f4670fcb1af20a53501b557fc0e6126afce766d5) | fix  | eliminate prompts during `ng version` command            |
+| [a99ec6a54](https://github.com/angular/angular-cli/commit/a99ec6a5453fb732500ef7abff67f76511a74da3) | fix  | keep cli package first in update package group metadata  |
+
+### @angular-devkit/schematics
+
+| Commit                                                                                              | Type | Description                                                                                               |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------------------------------------------------------- |
+| [86b53c585](https://github.com/angular/angular-cli/commit/86b53c585faf3e31c9931a4eeb792187678b5f7a) | fix  | `SchematicTestRunner.runExternalSchematic` fails with "The encoded data was not valid for encoding utf-8" |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                                                          |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------------------ |
+| [411115303](https://github.com/angular/angular-cli/commit/41111530349db1ac199c3ac1d4eccbde8b023123) | fix  | add console note about development server raw file size                              |
+| [4d7cd5e3e](https://github.com/angular/angular-cli/commit/4d7cd5e3ed303c53b2cc63720b9a577e2f46f170) | fix  | correctly wrap class expressions with static properties or blocks emitted by esbuild |
+| [dff4deaeb](https://github.com/angular/angular-cli/commit/dff4deaeb366d0ff734ae02abdbaa1fcdcd901aa) | fix  | ensure recreated files are watched                                                   |
+| [d10fece2c](https://github.com/angular/angular-cli/commit/d10fece2c17183e18d04733dec22459ced1cc1c8) | fix  | properly rebase Sass url() values with leading interpolations                        |
+| [3f2963835](https://github.com/angular/angular-cli/commit/3f2963835759fa3eed1faf64a7b87d5dcf8a6fa3) | perf | add persistent caching of JavaScript transformations                                 |
+| [a15eb7d1c](https://github.com/angular/angular-cli/commit/a15eb7d1c6a26f5d94da5566f8b4ac1810ea1361) | perf | improve rebuild time for file loader usage with prebundling                          |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="18.0.0-rc.2"></a>
 
 # 18.0.0-rc.2 (2024-05-08)
