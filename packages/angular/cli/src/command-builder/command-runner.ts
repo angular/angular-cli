@@ -19,6 +19,7 @@ import { colors } from '../utilities/color';
 import { AngularWorkspace, getWorkspace } from '../utilities/config';
 import { assertIsError } from '../utilities/error';
 import { PackageManagerUtils } from '../utilities/package-manager';
+import { VERSION } from '../utilities/version';
 import { CommandContext, CommandModuleError } from './command-module';
 import {
   CommandModuleConstructor,
@@ -122,7 +123,7 @@ export async function runCommand(args: string[], logger: logging.Logger): Promis
     .demandCommand(1, demandCommandFailureMessage)
     .recommendCommands()
     .middleware(normalizeOptionsMiddleware)
-    .version(false)
+    .version('version', 'Show Angular CLI version.', VERSION.full)
     .showHelpOnFail(false)
     .strict()
     .fail((msg, err) => {
