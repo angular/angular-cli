@@ -2,7 +2,7 @@
   "name": "lib",
   "version": "0.0.1",
   "peerDependencies": {
-    "@angular/common": "^17.0.0",
-    "@angular/core": "^17.0.0"
+    "@angular/common": "^18.0.0",
+    "@angular/core": "^18.0.0"
   }
 }
