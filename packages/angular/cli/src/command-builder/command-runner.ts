@@ -91,6 +91,11 @@ export async function runCommand(args: string[], logger: logging.Logger): Promis
     usageInstance.help = () => jsonHelpUsage();
   }
 
+  // Add default command to support version option when no subcommand is specified
+  localYargs.command('*', false, (builder) =>
+    builder.version('version', 'Show Angular CLI version.', VERSION.full),
+  );
+
   await localYargs
     .scriptName('ng')
     // https://github.com/yargs/yargs/blob/main/docs/advanced.md#customizing-yargs-parser
@@ -123,7 +128,7 @@ export async function runCommand(args: string[], logger: logging.Logger): Promis
     .demandCommand(1, demandCommandFailureMessage)
     .recommendCommands()
     .middleware(normalizeOptionsMiddleware)
-    .version('version', 'Show Angular CLI version.', VERSION.full)
+    .version(false)
     .showHelpOnFail(false)
     .strict()
     .fail((msg, err) => {

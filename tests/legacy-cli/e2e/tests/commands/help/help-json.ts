@@ -36,11 +36,6 @@ export default async function () {
         'description': 'If provided, a new value for the given configuration key.',
         'positional': 1,
       },
-      {
-        'name': 'version',
-        'type': 'boolean',
-        'description': 'Show Angular CLI version.',
-      },
     ],
   });
 
