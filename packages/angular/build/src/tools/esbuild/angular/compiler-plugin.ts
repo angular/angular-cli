@@ -19,7 +19,6 @@ import assert from 'node:assert';
 import * as path from 'node:path';
 import { maxWorkers, useTypeChecking } from '../../../utils/environment-options';
 import { JavaScriptTransformer } from '../javascript-transformer';
-import { LmbdCacheStore } from '../lmdb-cache-store';
 import { LoadResultCache, createCachedLoad } from '../load-result-cache';
 import { logCumulativeDurations, profileAsync, resetCumulativeDurations } from '../profiling';
 import { BundleStylesheetOptions } from '../stylesheets/bundle-options';
@@ -63,8 +62,9 @@ export function createCompilerPlugin(
       const preserveSymlinks = build.initialOptions.preserveSymlinks;
 
       // Initialize a worker pool for JavaScript transformations
-      let cacheStore: LmbdCacheStore | undefined;
+      let cacheStore: import('../lmdb-cache-store').LmbdCacheStore | undefined;
       if (pluginOptions.sourceFileCache?.persistentCachePath) {
+        const { LmbdCacheStore } = await import('../lmdb-cache-store');
         cacheStore = new LmbdCacheStore(
           path.join(pluginOptions.sourceFileCache.persistentCachePath, 'angular-compiler.db'),
         );
