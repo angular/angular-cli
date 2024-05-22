@@ -1,3 +1,21 @@
+<a name="17.3.8"></a>
+
+# 17.3.8 (2024-05-22)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                              |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------- |
+| [3ada6eb52](https://github.com/angular/angular-cli/commit/3ada6eb5256631ca3a951525fc9814ad0447a41f) | fix  | clarify optional migration instructions during ng update |
+
+### @angular-devkit/schematics
+
+| Commit                                                                                              | Type | Description                                                                                               |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------------------------------------------------------- |
+| [4b6ba8df1](https://github.com/angular/angular-cli/commit/4b6ba8df1ab8f4801fba7ddc38812417e274d960) | fix  | `SchematicTestRunner.runExternalSchematic` fails with "The encoded data was not valid for encoding utf-8" |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="17.3.7"></a>
 
 # 17.3.7 (2024-05-08)
