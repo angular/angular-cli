@@ -45,10 +45,10 @@
     "watchpack": "2.4.1"
   },
   "peerDependencies": {
-    "@angular/compiler-cli": "^18.0.0 || ^18.0.0-next.0",
-    "@angular/localize": "^18.0.0 || ^18.0.0-next.0",
-    "@angular/platform-server": "^18.0.0 || ^18.0.0-next.0",
-    "@angular/service-worker": "^18.0.0 || ^18.0.0-next.0",
+    "@angular/compiler-cli": "^18.0.0",
+    "@angular/localize": "^18.0.0",
+    "@angular/platform-server": "^18.0.0",
+    "@angular/service-worker": "^18.0.0",
     "less": "^4.2.0",
     "postcss": "^8.4.0",
     "tailwindcss": "^2.0.0 || ^3.0.0",
