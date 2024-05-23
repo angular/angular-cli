@@ -407,6 +407,7 @@
                       "@angular/build:extract-i18n",
                       "@angular/build:karma",
                       "@angular/build:ng-packagr",
+                      "@angular/build:unit-test",
                       "@angular-devkit/build-angular:application",
                       "@angular-devkit/build-angular:app-shell",
                       "@angular-devkit/build-angular:browser",
@@ -635,6 +636,28 @@
                   "type": "object",
                   "additionalProperties": {
                     "$ref": "../../../../angular_devkit/build_angular/src/builders/extract-i18n/schema.json"
+                  }
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "builder": {
+                  "const": "@angular/build:unit-test"
+                },
+                "defaultConfiguration": {
+                  "type": "string",
+                  "description": "A default named configuration to use when a target configuration is not provided."
+                },
+                "options": {
+                  "$ref": "../../../../angular/build/src/builders/unit-test/schema.json"
+                },
+                "configurations": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "$ref": "../../../../angular/build/src/builders/unit-test/schema.json"
                   }
                 }
               }

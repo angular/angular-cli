@@ -51,10 +51,12 @@
   "devDependencies": {
     "@angular/ssr": "workspace:*",
     "@angular-devkit/core": "workspace:*",
+    "jsdom": "26.1.0",
     "less": "4.3.0",
     "ng-packagr": "20.0.0-next.8",
     "postcss": "8.5.3",
-    "rxjs": "7.8.2"
+    "rxjs": "7.8.2",
+    "vitest": "3.1.2"
   },
   "peerDependencies": {
     "@angular/core": "0.0.0-ANGULAR-FW-PEER-DEP",
@@ -71,7 +73,8 @@
     "postcss": "^8.4.0",
     "tailwindcss": "^2.0.0 || ^3.0.0 || ^4.0.0",
     "tslib": "^2.3.0",
-    "typescript": ">=5.8 <5.9"
+    "typescript": ">=5.8 <5.9",
+    "vitest": "^3.1.1"
   },
   "peerDependenciesMeta": {
     "@angular/core": {
@@ -105,6 +108,9 @@
       "optional": true
     },
     "tailwindcss": {
+      "optional": true
+    },
+    "vitest": {
       "optional": true
     }
   }

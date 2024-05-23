@@ -36,6 +36,11 @@ ts_json_schema(
     src = "src/builders/ng-packagr/schema.json",
 )
 
+ts_json_schema(
+    name = "unit_test_schema",
+    src = "src/builders/unit-test/schema.json",
+)
+
 copy_to_bin(
     name = "schemas",
     srcs = glob(["**/schema.json"]),
@@ -79,6 +84,7 @@ ts_project(
         "//packages/angular/build:src/builders/extract-i18n/schema.ts",
         "//packages/angular/build:src/builders/karma/schema.ts",
         "//packages/angular/build:src/builders/ng-packagr/schema.ts",
+        "//packages/angular/build:src/builders/unit-test/schema.ts",
     ],
     data = RUNTIME_ASSETS,
     deps = [
@@ -109,6 +115,7 @@ ts_project(
         ":node_modules/source-map-support",
         ":node_modules/tinyglobby",
         ":node_modules/vite",
+        ":node_modules/vitest",
         ":node_modules/watchpack",
         "//:node_modules/@angular/common",
         "//:node_modules/@angular/compiler",
@@ -252,6 +259,36 @@ ts_project(
     ],
 )
 
+ts_project(
+    name = "unit-test_integration_test_lib",
+    testonly = True,
+    srcs = glob(include = ["src/builders/unit-test/tests/**/*.ts"]),
+    deps = [
+        ":build",
+        "//packages/angular/build/private",
+        "//modules/testing/builder",
+        ":node_modules/@angular-devkit/architect",
+        ":node_modules/@angular-devkit/core",
+        "//:node_modules/@types/node",
+
+        # unit test specific test deps
+        ":node_modules/vitest",
+        ":node_modules/jsdom",
+
+        # Base dependencies for the hello-world-app.
+        "//:node_modules/@angular/common",
+        "//:node_modules/@angular/compiler",
+        "//:node_modules/@angular/compiler-cli",
+        "//:node_modules/@angular/core",
+        "//:node_modules/@angular/platform-browser",
+        "//:node_modules/@angular/router",
+        ":node_modules/rxjs",
+        "//:node_modules/tslib",
+        "//:node_modules/typescript",
+        "//:node_modules/zone.js",
+    ],
+)
+
 jasmine_test(
     name = "application_integration_tests",
     size = "large",
@@ -278,6 +315,13 @@ jasmine_test(
         "PUPPETEER_DOWNLOAD_PATH": "../../../node_modules/puppeteer/downloads",
     },
     flaky = True,
+    shard_count = 10,
+)
+
+jasmine_test(
+    name = "unit-test_integration_tests",
+    size = "large",
+    data = [":unit-test_integration_test_lib"],
     shard_count = 10,
 )
 
