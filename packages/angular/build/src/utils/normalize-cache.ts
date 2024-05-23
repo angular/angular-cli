@@ -43,7 +43,12 @@ export function normalizeCacheOptions(
 ): NormalizedCachedOptions {
   const cacheMetadata = hasCacheMetadata(projectMetadata) ? projectMetadata.cli.cache : {};
 
-  const { enabled = true, environment = 'local', path = '.angular/cache' } = cacheMetadata;
+  const {
+    // Webcontainers do not currently benefit from persistent disk caching and can lead to increased browser memory usage
+    enabled = !process.versions.webcontainer,
+    environment = 'local',
+    path = '.angular/cache',
+  } = cacheMetadata;
   const isCI = process.env['CI'] === '1' || process.env['CI']?.toLowerCase() === 'true';
 
   let cacheEnabled = enabled;
