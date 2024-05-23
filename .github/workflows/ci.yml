@@ -21,21 +21,6 @@ defaults:
     shell: bash
 
 jobs:
-  analyze:
-    runs-on: ubuntu-latest
-    outputs:
-      snapshots: ${{ steps.filter.outputs.snapshots }}
-    steps:
-      - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
-        with:
-          persist-credentials: false
-      - uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36 # v3.0.2
-        id: filter
-        with:
-          filters: |
-            snapshots:
-              - 'tests/legacy-cli/e2e/ng-snapshot/package.json'
-
   lint:
     runs-on: ubuntu-latest
     steps:
@@ -122,8 +107,6 @@ jobs:
         run: yarn bazel test --define=E2E_SHARD_TOTAL=6 --define=E2E_SHARD_INDEX=${{ matrix.shard }} --config=e2e //tests/legacy-cli:e2e.${{ matrix.subset }}_node${{ matrix.node }}
 
   e2e-snapshots:
-    needs: analyze
-    if: needs.analyze.outputs.snapshots == 'true'
     strategy:
       fail-fast: false
       matrix:
