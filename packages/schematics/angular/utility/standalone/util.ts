@@ -29,7 +29,10 @@ export async function getMainFilePath(tree: Tree, projectName: string): Promise<
 
   const options = buildTarget.options as Record<string, string>;
 
-  return buildTarget.builder === Builders.Application ? options.browser : options.main;
+  return buildTarget.builder === Builders.Application ||
+    buildTarget.builder === Builders.BuildApplication
+    ? options.browser
+    : options.main;
 }
 
 /**
