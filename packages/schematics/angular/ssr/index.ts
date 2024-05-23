@@ -34,7 +34,7 @@ import { latestVersions } from '../utility/latest-versions';
 import { isStandaloneApp } from '../utility/ng-ast-utils';
 import { targetBuildNotFoundError } from '../utility/project-targets';
 import { getMainFilePath } from '../utility/standalone/util';
-import { getWorkspace } from '../utility/workspace';
+import { ProjectDefinition, getWorkspace } from '../utility/workspace';
 import { Builders } from '../utility/workspace-models';
 
 import { Schema as SSROptions } from './schema';
@@ -332,8 +332,7 @@ function addServerFile(options: ServerOptions, isStandalone: boolean): Rule {
     if (!project) {
       throw new SchematicsException(`Invalid project name (${projectName})`);
     }
-    const isUsingApplicationBuilder =
-      project?.targets?.get('build')?.builder === Builders.Application;
+    const isUsingApplicationBuilder = usingApplicationBuilder(project);
 
     const browserDistDirectory = isUsingApplicationBuilder
       ? (await getApplicationBuilderOutputPaths(host, projectName)).browser
@@ -366,8 +365,8 @@ export default function (options: SSROptions): Rule {
     if (!clientProject) {
       throw targetBuildNotFoundError();
     }
-    const isUsingApplicationBuilder =
-      clientProject.targets.get('build')?.builder === Builders.Application;
+
+    const isUsingApplicationBuilder = usingApplicationBuilder(clientProject);
 
     return chain([
       schematic('server', {
@@ -388,4 +387,12 @@ export default function (options: SSROptions): Rule {
       addDependencies(options, isUsingApplicationBuilder),
     ]);
   };
+}
+
+function usingApplicationBuilder(project: ProjectDefinition) {
+  const buildBuilder = project.targets.get('build')?.builder;
+  const isUsingApplicationBuilder =
+    buildBuilder === Builders.Application || buildBuilder === Builders.BuildApplication;
+
+  return isUsingApplicationBuilder;
 }
