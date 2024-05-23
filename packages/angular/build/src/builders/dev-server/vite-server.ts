@@ -248,7 +248,12 @@ export async function* serveWithVite(
       const { root = '' } = await context.getProjectMetadata(projectName);
       const projectRoot = join(context.workspaceRoot, root as string);
       const browsers = getSupportedBrowsers(projectRoot, context.logger);
+
       const target = transformSupportedBrowsersToTargets(browsers);
+      // Needed for browser-esbuild as polyfills can be a string.
+      const polyfills = Array.isArray((browserOptions.polyfills ??= []))
+        ? browserOptions.polyfills
+        : [browserOptions.polyfills];
 
       // Setup server and start listening
       const serverConfiguration = await setupServer(
@@ -260,7 +265,7 @@ export async function* serveWithVite(
         !!browserOptions.ssr,
         prebundleTransformer,
         target,
-        isZonelessApp(browserOptions.polyfills),
+        isZonelessApp(polyfills),
         browserOptions.loader as EsbuildLoaderOption | undefined,
         extensions?.middleware,
         transformers?.indexHtml,
