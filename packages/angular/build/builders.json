@@ -24,6 +24,11 @@
       "implementation": "./src/builders/ng-packagr/index",
       "schema": "./src/builders/ng-packagr/schema.json",
       "description": "Build a library with ng-packagr."
+    },
+    "unit-test": {
+      "implementation": "./src/builders/unit-test",
+      "schema": "./src/builders/unit-test/schema.json",
+      "description": "[EXPERIMENTAL] Run application unit tests."
     }
   }
 }
