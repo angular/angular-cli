@@ -10,6 +10,7 @@ import { createHash } from 'node:crypto';
 import { extname } from 'node:path';
 import { loadEsmModule } from '../load-esm';
 import { htmlRewritingStream } from './html-rewriting-stream';
+import { VALID_SELF_CLOSING_TAGS } from './valid-self-closing-tags';
 
 export type LoadOutputFileFunctionType = (file: string) => Promise<string>;
 
@@ -48,47 +49,6 @@ export interface FileInfo {
   name?: string;
   extension: string;
 }
-
-/** A list of valid self closing HTML elements */
-const VALID_SELF_CLOSING_TAGS = new Set([
-  'area',
-  'base',
-  'br',
-  'col',
-  'embed',
-  'hr',
-  'img',
-  'input',
-  'link',
-  'meta',
-  'param',
-  'source',
-  'track',
-  'wbr',
-  /** SVG tags */
-  'circle',
-  'ellipse',
-  'line',
-  'path',
-  'polygon',
-  'polyline',
-  'rect',
-  'text',
-  'tspan',
-  'linearGradient',
-  'radialGradient',
-  'stop',
-  'image',
-  'pattern',
-  'defs',
-  'g',
-  'marker',
-  'mask',
-  'style',
-  'symbol',
-  'use',
-  'view',
-]);
 
 /*
  * Helper function used by the IndexHtmlWebpackPlugin.
