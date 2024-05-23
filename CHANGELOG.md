@@ -1,3 +1,24 @@
+<a name="18.0.1"></a>
+
+# 18.0.1 (2024-05-23)
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description               |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------- |
+| [01842f515](https://github.com/angular/angular-cli/commit/01842f5154fe0ec41226d1dd28e099bf57f3d2c9) | fix  | use angular.dev in readme |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                                             |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------------- |
+| [7d253e9cd](https://github.com/angular/angular-cli/commit/7d253e9cd0bb6df829fd4229465f4334d5c134bb) | fix  | avoid rebasing URLs with function calls                                 |
+| [6b6a76a99](https://github.com/angular/angular-cli/commit/6b6a76a998980392d78e1cabc5e5fe4af0ced01c) | fix  | disable persistent disk caching inside webcontainers by default         |
+| [ba70a50b6](https://github.com/angular/angular-cli/commit/ba70a50b6bc45a6b07ff24feed3b36915294063b) | fix  | handle esbuild-browser `polyfills` option as `string` during `ng serve` |
+| [706423aca](https://github.com/angular/angular-cli/commit/706423acad2c431c4125166d078dbad804719d95) | fix  | only import persistent cache store with active caching                  |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="18.0.0"></a>
 
 # 18.0.0 (2024-05-22)
