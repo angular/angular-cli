@@ -49,7 +49,7 @@ yarn ng-dev pr merge <pr>
 
 ### Maintaining LTS branches
 
-Releases that are under Long Term Support (LTS) are listed on [angular.io](https://angular.io/guide/releases#support-policy-and-schedule).
+Releases that are under Long Term Support (LTS) are listed on [angular.dev](https://angular.dev/reference/releases#support-policy-and-schedule).
 
 Since there could be more than one LTS branch at any one time, PR authors who want to
 merge commits into LTS branches must open a pull request against the specific base branch they'd like to target.
