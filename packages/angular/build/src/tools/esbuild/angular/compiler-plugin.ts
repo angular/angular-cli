@@ -492,7 +492,7 @@ function createCompilerOptionsTransformer(
           {
             text:
               'To control ECMA version and features use the Browserslist configuration. ' +
-              'For more information, see https://angular.io/guide/build#configuring-browser-compatibility',
+              'For more information, see https://angular.dev/tools/cli/build#configuring-browser-compatibility',
           },
         ],
       });
