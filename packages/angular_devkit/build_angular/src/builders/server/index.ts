@@ -246,7 +246,7 @@ async function checkTsConfigForPreserveWhitespacesSetting(
       `"preserveWhitespaces" was set in "${tsConfigPath}". ` +
         'Make sure that this setting is set consistently in both "tsconfig.server.json" for your server side ' +
         'and "tsconfig.app.json" for your client side. A mismatched value will cause hydration to break.\n' +
-        'For more information see: https://angular.io/guide/hydration#preserve-whitespaces',
+        'For more information see: https://angular.dev/guide/hydration#preserve-whitespaces-configuration',
     );
   }
 }
