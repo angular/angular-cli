@@ -3,7 +3,7 @@
 Angular CLI includes a first-party build system for Angular applications distributed as `@angular-devkit/build-angular`.
 This build system is responsible for creating a standalone single-page application (SPA) from user source files and third-party dependencies.
 
-`@angular-devkit/build-angular` itself integrates with the rest of Angular CLI by being an [Architect builder](https://angular.io/guide/cli-builder).
+`@angular-devkit/build-angular` itself integrates with the rest of Angular CLI by being an [Architect builder](https://angular.dev/tools/cli/cli-builder).
 This document describes a top level view of the functionality in `@angular-devkit/build-angular`, referred as just the "build system".
 Deprecated or soon to be removed features are not described here.
 
@@ -33,7 +33,7 @@ A given build will load these sources from disk, process them, and bundle them t
 
 ### TypeScript and Ahead-Of-Time Compilation
 
-Angular builds rely heavily on TypeScript-specific functionality for [Ahead-of-Time template compilation](https://angular.io/guide/aot-compiler) (AOT).
+Angular builds rely heavily on TypeScript-specific functionality for [Ahead-of-Time template compilation](https://angular.dev/tools/cli/aot-compiler) (AOT).
 Outside Angular CLI, this is performed by the Angular Compiler (`ngc`), provided by `@angular/compiler-cli`.
 To avail of Ahead-of-Time template compilation within a Webpack compilation we use and distribute the `@ngtools/webpack` Webpack plugin.
 
