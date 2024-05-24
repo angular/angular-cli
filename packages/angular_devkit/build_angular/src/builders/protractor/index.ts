@@ -92,7 +92,7 @@ export async function execute(
   context: BuilderContext,
 ): Promise<BuilderOutput> {
   context.logger.warn(
-    'Protractor has reached end-of-life and is no longer supported by the Angular team. The `protractor` builder will be removed in a future Angular major version. For additional information and alternatives, please see https://blog.angular.io/protractor-deprecation-update-august-2023-2beac7402ce0.',
+    'Protractor has reached end-of-life and is no longer supported by the Angular team. The `protractor` builder will be removed in a future Angular major version. For additional information and alternatives, please see https://blog.angular.dev/protractor-deprecation-update-august-2023-2beac7402ce0.',
   );
 
   // ensure that only one of these options is used
