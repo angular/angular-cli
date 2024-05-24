@@ -3,7 +3,7 @@
 # https://github.com/browserslist/browserslist#queries
 
 # For the full list of supported browsers by the Angular framework, please see:
-# https://angular.io/guide/browser-support
+# https://angular.dev/reference/versions#browser-support
 
 # You can see what browsers were selected by your queries by running:
 #   npx browserslist
