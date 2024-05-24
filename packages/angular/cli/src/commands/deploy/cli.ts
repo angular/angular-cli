@@ -15,7 +15,7 @@ export default class DeployCommandModule
   extends ArchitectCommandModule
   implements CommandModuleImplementation
 {
-  // The below choices should be kept in sync with the list in https://angular.io/guide/deployment
+  // The below choices should be kept in sync with the list in https://angular.dev/tools/cli/deployment
   override missingTargetChoices: MissingTargetChoice[] = [
     {
       name: 'Amazon S3',
