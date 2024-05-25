@@ -11,15 +11,15 @@
     "@angular-devkit/architect": "0.0.0-EXPERIMENTAL-PLACEHOLDER",
     "@angular-devkit/build-webpack": "0.0.0-EXPERIMENTAL-PLACEHOLDER",
     "@angular-devkit/core": "0.0.0-PLACEHOLDER",
-    "@babel/core": "7.24.5",
-    "@babel/generator": "7.24.5",
-    "@babel/helper-annotate-as-pure": "7.22.5",
-    "@babel/helper-split-export-declaration": "7.24.5",
-    "@babel/plugin-transform-async-generator-functions": "7.24.3",
-    "@babel/plugin-transform-async-to-generator": "7.24.1",
-    "@babel/plugin-transform-runtime": "7.24.3",
-    "@babel/preset-env": "7.24.5",
-    "@babel/runtime": "7.24.5",
+    "@babel/core": "7.24.6",
+    "@babel/generator": "7.24.6",
+    "@babel/helper-annotate-as-pure": "7.24.6",
+    "@babel/helper-split-export-declaration": "7.24.6",
+    "@babel/plugin-transform-async-generator-functions": "7.24.6",
+    "@babel/plugin-transform-async-to-generator": "7.24.6",
+    "@babel/plugin-transform-runtime": "7.24.6",
+    "@babel/preset-env": "7.24.6",
+    "@babel/runtime": "7.24.6",
     "@discoveryjs/json-ext": "0.5.7",
     "@ngtools/webpack": "0.0.0-PLACEHOLDER",
     "@vitejs/plugin-basic-ssl": "1.1.0",
@@ -31,7 +31,7 @@
     "copy-webpack-plugin": "11.0.0",
     "critters": "0.0.22",
     "css-loader": "7.1.2",
-    "esbuild-wasm": "0.21.3",
+    "esbuild-wasm": "0.21.4",
     "fast-glob": "3.3.2",
     "https-proxy-agent": "7.0.4",
     "http-proxy-middleware": "3.0.0",
@@ -72,7 +72,7 @@
     "webpack-subresource-integrity": "5.1.0"
   },
   "optionalDependencies": {
-    "esbuild": "0.21.3"
+    "esbuild": "0.21.4"
   },
   "peerDependencies": {
     "@angular/compiler-cli": "^18.0.0-next.0",
