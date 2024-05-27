@@ -130,7 +130,7 @@ export default function (options: PwaOptions): Rule {
 
     await writeWorkspace(host, workspace);
     let assetsDir = posix.join(sourcePath, 'assets');
-
+    let iconsPath: string;
     if (host.exists(assetsDir)) {
       // Add manifest to asset configuration
       const assetEntry = posix.join(
@@ -148,13 +148,17 @@ export default function (options: PwaOptions): Rule {
           target.options = { assets: [assetEntry] };
         }
       }
+      iconsPath = 'assets';
     } else {
       assetsDir = posix.join(project.root, 'public');
+      iconsPath = 'icons';
     }
 
     return chain([
       externalSchematic('@schematics/angular', 'service-worker', swOptions),
-      mergeWith(apply(url('./files/assets'), [template({ ...options }), move(assetsDir)])),
+      mergeWith(
+        apply(url('./files/assets'), [template({ ...options, iconsPath }), move(assetsDir)]),
+      ),
       ...[...indexFiles].map((path) => updateIndexFile(path)),
     ]);
   };

@@ -63,6 +63,15 @@ describe('PWA Schematic', () => {
     });
   });
 
+  it('should reference the icons in the manifest correctly', async () => {
+    const tree = await schematicRunner.runSchematic('ng-add', defaultOptions, appTree);
+    const manifestText = tree.readContent('/projects/bar/public/manifest.webmanifest');
+    const manifest = JSON.parse(manifestText);
+    for (const icon of manifest.icons) {
+      expect(icon.src).toMatch(/^icons\/icon-\d+x\d+.png/);
+    }
+  });
+
   it('should run the service worker schematic', async () => {
     const tree = await schematicRunner.runSchematic('ng-add', defaultOptions, appTree);
     const configText = tree.readContent('/angular.json');
