@@ -277,7 +277,6 @@ describe('Application Schematic', () => {
 
     it('should set values in angular.json correctly', async () => {
       const options = { ...defaultOptions, projectRoot: '' };
-
       const tree = await schematicRunner.runSchematic('application', options, workspaceTree);
 
       const config = JSON.parse(tree.readContent('/angular.json'));
@@ -286,12 +285,14 @@ describe('Application Schematic', () => {
       const buildOpt = prj.architect.build.options;
       expect(buildOpt.index).toEqual('src/index.html');
       expect(buildOpt.browser).toEqual('src/main.ts');
+      expect(buildOpt.assets).toEqual([{ 'glob': '**/*', 'input': 'public' }]);
       expect(buildOpt.polyfills).toEqual(['zone.js']);
       expect(buildOpt.tsConfig).toEqual('tsconfig.app.json');
 
       const testOpt = prj.architect.test.options;
       expect(testOpt.tsConfig).toEqual('tsconfig.spec.json');
       expect(testOpt.karmaConfig).toBeUndefined();
+      expect(testOpt.assets).toEqual([{ 'glob': '**/*', 'input': 'public' }]);
       expect(testOpt.styles).toEqual(['src/styles.css']);
     });
 
@@ -377,6 +378,13 @@ describe('Application Schematic', () => {
       expect(buildOpt.browser).toEqual('foo/src/main.ts');
       expect(buildOpt.polyfills).toEqual(['zone.js']);
       expect(buildOpt.tsConfig).toEqual('foo/tsconfig.app.json');
+      expect(buildOpt.assets).toEqual([{ 'glob': '**/*', 'input': 'foo/public' }]);
+
+      const testOpt = project.architect.test.options;
+      expect(testOpt.tsConfig).toEqual('foo/tsconfig.spec.json');
+      expect(testOpt.karmaConfig).toBeUndefined();
+      expect(testOpt.assets).toEqual([{ 'glob': '**/*', 'input': 'foo/public' }]);
+      expect(testOpt.styles).toEqual(['foo/src/styles.css']);
 
       const appTsConfig = readJsonFile(tree, '/foo/tsconfig.app.json');
       expect(appTsConfig.extends).toEqual('../tsconfig.json');
