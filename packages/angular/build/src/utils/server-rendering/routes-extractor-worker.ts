@@ -7,14 +7,23 @@
  */
 
 import { workerData } from 'node:worker_threads';
-import type { ESMInMemoryFileLoaderWorkerData } from './esm-in-memory-loader/loader-hooks';
 import { patchFetchToLoadInMemoryAssets } from './fetch-patch';
 import { loadEsmModuleFromMemory } from './load-esm-from-memory';
 
-export interface RoutesExtractorWorkerData extends ESMInMemoryFileLoaderWorkerData {
+export interface RoutesExtractorWorkerData {
   document: string;
   verbose: boolean;
   assetFiles: Record</** Destination */ string, /** Source */ string>;
+  /**
+   * Only defined when Node.js version is < 22.2.
+   * TODO: Remove when Node.js versions < 22.2 are no longer supported.
+   */
+  jsOutputFilesForWorker: Record<string, string>;
+  /**
+   * Only defined when Node.js version is < 22.2.
+   * TODO: Remove when Node.js versions < 22.2 are no longer supported.
+   */
+  workspaceRoot: string;
 }
 
 export interface RoutersExtractorWorkerResult {
