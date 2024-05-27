@@ -95,6 +95,9 @@ export class SassWorkerImplementation {
       filename: require.resolve('./worker'),
       minThreads: 1,
       maxThreads: this.maxThreads,
+      // Web containers do not support transferable objects with receiveOnMessagePort which
+      // is used when the Atomics based wait loop is enable.
+      useAtomics: !process.versions.webcontainer,
       // Shutdown idle threads after 1 second of inactivity
       idleTimeout: 1000,
       recordTiming: false,
