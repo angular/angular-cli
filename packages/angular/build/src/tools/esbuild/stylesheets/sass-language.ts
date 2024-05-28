@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import type { OnLoadResult, PartialMessage, ResolveResult } from 'esbuild';
+import type { OnLoadResult, PartialMessage, PartialNote, ResolveResult } from 'esbuild';
 import { dirname, join, relative } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import type { CanonicalizeContext, CompileResult, Exception, Syntax } from 'sass';
@@ -140,7 +140,15 @@ async function compileString(
         },
       ],
       logger: {
-        warn: (text, { deprecation, span }) => {
+        warn: (text, { deprecation, stack, span }) => {
+          const notes: PartialNote[] = [];
+          if (deprecation) {
+            notes.push({ text });
+          }
+          if (stack && !span) {
+            notes.push({ text: stack });
+          }
+
           warnings.push({
             text: deprecation ? 'Deprecation' : text,
             location: span && {
@@ -150,7 +158,7 @@ async function compileString(
               line: span.start.line + 1,
               column: span.start.column,
             },
-            notes: deprecation ? [{ text }] : undefined,
+            notes,
           });
         },
       },
