@@ -321,6 +321,33 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       harness.expectFile('dist/browser/media/logo.svg').toExist();
     });
 
+    it('should not rebase Sass function definition with name ending in "url"', async () => {
+      await harness.writeFiles({
+        'src/styles.scss': `@use 'theme/a';`,
+        'src/theme/a.scss': `
+                            @import './b';
+                            .a {
+                              $asset: my-function-url('logo');
+                              background-image: url($asset)
+                            }
+        `,
+        'src/theme/b.scss': `@function my-function-url($name) { @return "./images/" + $name + ".svg"; }`,
+        'src/theme/images/logo.svg': `<svg></svg>`,
+      });
+
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+        outputHashing: OutputHashing.None,
+        styles: ['src/styles.scss'],
+      });
+
+      const { result } = await harness.executeOnce();
+      expect(result?.success).toBeTrue();
+
+      harness.expectFile('dist/browser/styles.css').content.toContain(`url("./media/logo.svg")`);
+      harness.expectFile('dist/browser/media/logo.svg').toExist();
+    });
+
     it('should not process a URL that has been marked as external', async () => {
       await harness.writeFiles({
         'src/styles.scss': `@use 'theme/a';`,

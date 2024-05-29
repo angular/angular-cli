@@ -49,9 +49,22 @@ export function* findUrls(
 
   // Based on https://www.w3.org/TR/css-syntax-3/#consume-ident-like-token
   while ((pos = contents.indexOf('url(', pos)) !== -1) {
+    width = 1;
+
+    // Ensure whitespace, comma, or colon before `url(`
+    if (pos > 0) {
+      pos -= 2;
+      next();
+      if (!isWhitespace(current) && current !== 0x0027 && current !== 0x003a) {
+        // Skip - not a url token
+        pos += 3;
+        continue;
+      }
+      pos += 1;
+    }
+
     // Set to position of the (
     pos += 3;
-    width = 1;
 
     // Consume all leading whitespace
     while (isWhitespace(next())) {
