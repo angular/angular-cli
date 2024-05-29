@@ -1,7 +1,8 @@
 import { expectFileToMatch } from '../../utils/fs';
 import { execWithEnv, extractNpmEnv, ng, silentNpm } from '../../utils/process';
-import { installPackage, uninstallPackage } from '../../utils/packages';
+import { getActivePackageManager, installPackage, uninstallPackage } from '../../utils/packages';
 import { isPrereleaseCli } from '../../utils/project';
+import { appendFile } from 'node:fs/promises';
 
 export default async function () {
   // Must publish old version to local registry to allow install. This is especially important
@@ -13,7 +14,12 @@ export default async function () {
   // Install outdated and incompatible version
   await installPackage('@schematics/angular@7');
 
-  const tag = (await isPrereleaseCli()) ? '@next' : '';
+  const isPrerelease = await isPrereleaseCli();
+  const tag = isPrerelease ? '@next' : '';
+  if (getActivePackageManager() === 'npm') {
+    await appendFile('.npmrc', '\nlegacy-peer-deps=true');
+  }
+
   await ng('add', `@angular/material${tag}`, '--skip-confirmation');
   await expectFileToMatch('package.json', /@angular\/material/);
 

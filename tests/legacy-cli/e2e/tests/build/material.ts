@@ -1,13 +1,23 @@
+import { appendFile } from 'node:fs/promises';
 import { getGlobalVariable } from '../../utils/env';
 import { readFile, replaceInFile } from '../../utils/fs';
-import { installPackage, installWorkspacePackages } from '../../utils/packages';
+import {
+  getActivePackageManager,
+  installPackage,
+  installWorkspacePackages,
+} from '../../utils/packages';
 import { ng } from '../../utils/process';
 import { isPrereleaseCli, updateJsonFile } from '../../utils/project';
 
 const snapshots = require('../../ng-snapshot/package.json');
 
 export default async function () {
-  let tag = (await isPrereleaseCli()) ? '@next' : '';
+  const isPrerelease = await isPrereleaseCli();
+  let tag = isPrerelease ? '@next' : '';
+  if (getActivePackageManager() === 'npm') {
+    await appendFile('.npmrc', '\nlegacy-peer-deps=true');
+  }
+
   await ng('add', `@angular/material${tag}`, '--skip-confirmation');
 
   const isSnapshotBuild = getGlobalVariable('argv')['ng-snapshots'];

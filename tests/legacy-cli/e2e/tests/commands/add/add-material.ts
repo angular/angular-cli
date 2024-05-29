@@ -1,14 +1,19 @@
 import { assertIsError } from '../../../utils/utils';
 import { expectFileToMatch, rimraf } from '../../../utils/fs';
-import { uninstallPackage } from '../../../utils/packages';
+import { getActivePackageManager, uninstallPackage } from '../../../utils/packages';
 import { ng } from '../../../utils/process';
 import { isPrereleaseCli } from '../../../utils/project';
+import { appendFile } from 'node:fs/promises';
 
 export default async function () {
   // forcibly remove in case another test doesn't clean itself up
   await rimraf('node_modules/@angular/material');
 
-  const tag = (await isPrereleaseCli()) ? '@next' : '';
+  const isPrerelease = await isPrereleaseCli();
+  const tag = isPrerelease ? '@next' : '';
+  if (getActivePackageManager() === 'npm') {
+    await appendFile('.npmrc', '\nlegacy-peer-deps=true');
+  }
 
   try {
     await ng('add', `@angular/material${tag}`, '--unknown', '--skip-confirmation');
