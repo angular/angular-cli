@@ -25,28 +25,6 @@ export interface DirectoryEntry {
 }
 
 /**
- * Ensures that a bare specifier URL path that is intended to be treated as
- * a relative path has a leading `./` or `../` prefix.
- *
- * @param url A bare specifier URL path that should be considered relative.
- * @returns
- */
-function ensureRelative(url: string): string {
-  // Empty
-  if (!url) {
-    return url;
-  }
-
-  // Already relative
-  if (url[0] === '.' && (url[1] === '/' || (url[1] === '.' && url[2] === '/'))) {
-    return url;
-  }
-
-  // Needs prefix
-  return './' + url;
-}
-
-/**
  * A Sass Importer base class that provides the load logic to rebase all `url()` functions
  * within a stylesheet. The rebasing will ensure that the URLs in the output of the Sass compiler
  * reflect the final filesystem location of the output CSS file.
@@ -100,18 +78,15 @@ abstract class UrlRebasingImporter implements Importer<'sync'> {
 
       // Sass variable usage either starts with a `$` or contains a namespace and a `.$`
       const valueNormalized = value[0] === '$' || /^\w+\.\$/.test(value) ? `#{${value}}` : value;
-      const rebasedPath =
-        relative(this.entryDirectory, stylesheetDirectory) + '||file:' + valueNormalized;
+      const rebasedPath = relative(this.entryDirectory, stylesheetDirectory);
 
       // Normalize path separators and escape characters
       // https://developer.mozilla.org/en-US/docs/Web/CSS/url#syntax
-      const rebasedUrl = ensureRelative(
-        rebasedPath.replace(/\\/g, '/').replace(/[()\s'"]/g, '\\$&'),
-      );
+      const rebasedUrl = rebasedPath.replace(/\\/g, '/').replace(/[()\s'"]/g, '\\$&');
 
       updatedContents ??= new MagicString(contents);
       // Always quote the URL to avoid potential downstream parsing problems
-      updatedContents.update(start, end, `"${rebasedUrl}"`);
+      updatedContents.update(start, end, `"${rebasedUrl}||file:${valueNormalized}"`);
     }
 
     if (updatedContents) {
