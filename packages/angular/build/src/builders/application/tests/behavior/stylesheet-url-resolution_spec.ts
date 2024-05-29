@@ -295,6 +295,36 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       harness.expectFile('dist/browser/media/logo.svg').toExist();
     });
 
+    it('should rebase a URL with interpolation using concatenation referencing a local resource', async () => {
+      await harness.writeFiles({
+        'src/styles.scss': `@use 'theme/a';`,
+        'src/theme/a.scss': `
+                            @import './b';
+                            $extra-var: "2";
+                            $postfix-var: "xyz";
+                            .a {
+                              background-image: url("#{$my-var}logo#{$extra-var+ "-" + $postfix-var}.svg")
+                            }
+        `,
+        'src/theme/b.scss': `$my-var: "./images/";`,
+        'src/theme/images/logo2-xyz.svg': `<svg></svg>`,
+      });
+
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+        outputHashing: OutputHashing.None,
+        styles: ['src/styles.scss'],
+      });
+
+      const { result } = await harness.executeOnce();
+      expect(result?.success).toBeTrue();
+
+      harness
+        .expectFile('dist/browser/styles.css')
+        .content.toContain(`url("./media/logo2-xyz.svg")`);
+      harness.expectFile('dist/browser/media/logo2-xyz.svg').toExist();
+    });
+
     it('should rebase a URL with an non-leading interpolation referencing a local resource', async () => {
       await harness.writeFiles({
         'src/styles.scss': `@use 'theme/a';`,
