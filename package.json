@@ -62,7 +62,7 @@
     "@angular/forms": "18.0.0",
     "@angular/localize": "18.0.0",
     "@angular/material": "18.0.0",
-    "@angular/ng-dev": "https://github.com/angular/dev-infra-private-ng-dev-builds.git#81a8f300059bcf368acd9de2af2b53b7842e1c6f",
+    "@angular/ng-dev": "https://github.com/angular/dev-infra-private-ng-dev-builds.git#c44d21e50aad681b895171cb3b3d773c73b3af4b",
     "@angular/platform-browser": "18.0.0",
     "@angular/platform-browser-dynamic": "18.0.0",
     "@angular/platform-server": "18.0.0",
