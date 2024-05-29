@@ -1,3 +1,16 @@
+<a name="18.1.0-next.0"></a>
+
+# 18.1.0-next.0 (2024-05-29)
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------ |
+| [721d50bae](https://github.com/angular/angular-cli/commit/721d50bae9549811a0b065e296f071a3af7745c9) | fix  | avoid escaping rebased Sass URL values     |
+| [f17b78de7](https://github.com/angular/angular-cli/commit/f17b78de7efabd788a315902174700caa1a1eed8) | fix  | improve Sass rebaser ident token detection |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="18.0.2"></a>
 
 # 18.0.2 (2024-05-29)
