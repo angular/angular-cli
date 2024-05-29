@@ -93,16 +93,7 @@ export function setupBundlerContexts(
       new BundlerContext(
         workspaceRoot,
         !!options.watch,
-        createServerCodeBundleOptions(
-          {
-            ...options,
-            // Disable external deps for server bundles.
-            // This is because it breaks Vite 'optimizeDeps' for SSR.
-            externalPackages: false,
-          },
-          nodeTargets,
-          codeBundleCache,
-        ),
+        createServerCodeBundleOptions(options, nodeTargets, codeBundleCache),
       ),
     );
 
