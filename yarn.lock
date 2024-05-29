@@ -264,9 +264,10 @@
     "@material/typography" "15.0.0-canary.7f224ddd4.0"
     tslib "^2.3.0"
 
-"@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#81a8f300059bcf368acd9de2af2b53b7842e1c6f":
-  version "0.0.0-fdd2de038031d1ab55c81c2fe17bd2d10246ffdf"
-  resolved "https://github.com/angular/dev-infra-private-ng-dev-builds.git#81a8f300059bcf368acd9de2af2b53b7842e1c6f"
+"@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#c44d21e50aad681b895171cb3b3d773c73b3af4b":
+  version "0.0.0-239d56b71911f9fa1eeefb6e4505dbe7b0cd81a7"
+  uid c44d21e50aad681b895171cb3b3d773c73b3af4b
+  resolved "https://github.com/angular/dev-infra-private-ng-dev-builds.git#c44d21e50aad681b895171cb3b3d773c73b3af4b"
   dependencies:
     "@octokit/rest" "20.1.1"
     "@types/semver" "^7.3.6"
