@@ -101,6 +101,8 @@ export function createCompilerPlugin(
 
       // Determines if TypeScript should process JavaScript files based on tsconfig `allowJs` option
       let shouldTsIgnoreJs = true;
+      // Determines if transpilation should be handle by TypeScript or esbuild
+      let useTypeScriptTranspilation = true;
 
       // Track incremental component stylesheet builds
       const stylesheetBundler = new ComponentStylesheetBundler(
@@ -250,6 +252,11 @@ export function createCompilerPlugin(
             createCompilerOptionsTransformer(setupWarnings, pluginOptions, preserveSymlinks),
           );
           shouldTsIgnoreJs = !initializationResult.compilerOptions.allowJs;
+          // Isolated modules option ensures safe non-TypeScript transpilation.
+          // Typescript printing support for sourcemaps is not yet integrated.
+          useTypeScriptTranspilation =
+            !initializationResult.compilerOptions.isolatedModules ||
+            !!initializationResult.compilerOptions.sourceMap;
           referencedFiles = initializationResult.referencedFiles;
         } catch (error) {
           (result.errors ??= []).push({
@@ -335,9 +342,10 @@ export function createCompilerPlugin(
         const request = path.normalize(
           pluginOptions.fileReplacements?.[path.normalize(args.path)] ?? args.path,
         );
+        const isJS = /\.[cm]?js$/.test(request);
 
         // Skip TS load attempt if JS TypeScript compilation not enabled and file is JS
-        if (shouldTsIgnoreJs && /\.[cm]?js$/.test(request)) {
+        if (shouldTsIgnoreJs && isJS) {
           return undefined;
         }
 
@@ -356,7 +364,7 @@ export function createCompilerPlugin(
 
           // No TS result indicates the file is not part of the TypeScript program.
           // If allowJs is enabled and the file is JS then defer to the next load hook.
-          if (!shouldTsIgnoreJs && /\.[cm]?js$/.test(request)) {
+          if (!shouldTsIgnoreJs && isJS) {
             return undefined;
           }
 
@@ -366,8 +374,9 @@ export function createCompilerPlugin(
               createMissingFileError(request, args.path, build.initialOptions.absWorkingDir ?? ''),
             ],
           };
-        } else if (typeof contents === 'string') {
-          // A string indicates untransformed output from the TS/NG compiler
+        } else if (typeof contents === 'string' && (useTypeScriptTranspilation || isJS)) {
+          // A string indicates untransformed output from the TS/NG compiler.
+          // This step is unneeded when using esbuild transpilation.
           const sideEffects = await hasSideEffects(request);
           contents = await javascriptTransformer.transformData(
             request,
@@ -382,7 +391,7 @@ export function createCompilerPlugin(
 
         return {
           contents,
-          loader: 'js',
+          loader: useTypeScriptTranspilation || isJS ? 'js' : 'ts',
         };
       });
 
