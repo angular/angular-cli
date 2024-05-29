@@ -63,7 +63,7 @@
     "tree-kill": "1.2.2",
     "tslib": "2.6.2",
     "undici": "6.18.1",
-    "vite": "5.2.11",
+    "vite": "5.2.12",
     "watchpack": "2.4.1",
     "webpack": "5.91.0",
     "webpack-dev-middleware": "7.2.1",
