@@ -1,3 +1,31 @@
+<a name="18.0.2"></a>
+
+# 18.0.2 (2024-05-29)
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                                 |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------- |
+| [9967c04b8](https://github.com/angular/angular-cli/commit/9967c04b86c6928509c80af7144b342616e9681b) | fix  | check both application builder packages in SSR schematic    |
+| [92b48ab14](https://github.com/angular/angular-cli/commit/92b48ab144fbe5b8f89d371b0a8fa94d0d17b72c) | fix  | set builders `assets` option correctly for new applications |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                                      |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------------- |
+| [3bb06c37d](https://github.com/angular/angular-cli/commit/3bb06c37dc20d7af358f007b9928de71f39545d2) | fix  | disable Worker wait loop for Sass compilations in web containers |
+| [c4cf35923](https://github.com/angular/angular-cli/commit/c4cf359233e1044864539383912b9ba0432e149d) | fix  | print Sass `@warn` location                                      |
+| [352879804](https://github.com/angular/angular-cli/commit/3528798042a232779478bf82b4d4f6521fab4c30) | fix  | support valid self-closing MathML tags in HTML index file        |
+| [476f3084a](https://github.com/angular/angular-cli/commit/476f3084aff333a45c4937950abdba65cd420eba) | fix  | support valid self-closing SVG tags in HTML index file           |
+
+### @angular/pwa
+
+| Commit                                                                                              | Type | Description                                                    |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------- |
+| [acbffd236](https://github.com/angular/angular-cli/commit/acbffd2368d3c979b26a4541d3f44387fdba0651) | fix  | set manifest `icons` location to match `assets` builder option |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="18.0.1"></a>
 
 # 18.0.1 (2024-05-23)
