@@ -4,8 +4,6 @@
 
 ```ts
 
-/// <reference types="node" />
-
 import * as fs from 'fs';
 import { Observable } from 'rxjs';
 

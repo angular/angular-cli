@@ -255,10 +255,7 @@ describe('ast utils', () => {
     it('should work for the default scenario', () => {
       const fileContent = `const arr = ['foo'];`;
       const source = getTsSource(filePath, fileContent);
-      const arrayNode = findNodes(
-        source.getChildren().shift() as ts.Node,
-        ts.SyntaxKind.ArrayLiteralExpression,
-      );
+      const arrayNode = findNodes(source.getChildren()[0], ts.SyntaxKind.ArrayLiteralExpression);
       const elements = (arrayNode.pop() as ts.ArrayLiteralExpression).elements;
 
       const change = insertAfterLastOccurrence(
@@ -276,10 +273,7 @@ describe('ast utils', () => {
     it('should work without occurrences', () => {
       const fileContent = `const arr = [];`;
       const source = getTsSource(filePath, fileContent);
-      const arrayNode = findNodes(
-        source.getChildren().shift() as ts.Node,
-        ts.SyntaxKind.ArrayLiteralExpression,
-      );
+      const arrayNode = findNodes(source.getChildren()[0], ts.SyntaxKind.ArrayLiteralExpression);
       const elements = (arrayNode.pop() as ts.ArrayLiteralExpression).elements;
 
       const change = insertAfterLastOccurrence(

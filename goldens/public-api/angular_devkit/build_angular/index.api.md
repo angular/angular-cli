@@ -4,8 +4,6 @@
 
 ```ts
 
-/// <reference types="node" />
-
 import { ApplicationBuilderOptions } from '@angular/build';
 import { buildApplication } from '@angular/build';
 import { BuilderContext } from '@angular-devkit/architect';
