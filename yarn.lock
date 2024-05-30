@@ -66,9 +66,10 @@
     "@angular/core" "^13.0.0 || ^14.0.0-0"
     reflect-metadata "^0.1.13"
 
-"@angular/build-tooling@https://github.com/angular/dev-infra-private-build-tooling-builds.git#8b5a56554a0f7024fc2d0f4abf7260bf37e28150":
-  version "0.0.0-239d56b71911f9fa1eeefb6e4505dbe7b0cd81a7"
-  resolved "https://github.com/angular/dev-infra-private-build-tooling-builds.git#8b5a56554a0f7024fc2d0f4abf7260bf37e28150"
+"@angular/build-tooling@https://github.com/angular/dev-infra-private-build-tooling-builds.git#6dc56eace09095d66cfdb614f66514e4d1af1cfc":
+  version "0.0.0-e805b4cfbbf04cf922ca279de2c49e2f778545ff"
+  uid "6dc56eace09095d66cfdb614f66514e4d1af1cfc"
+  resolved "https://github.com/angular/dev-infra-private-build-tooling-builds.git#6dc56eace09095d66cfdb614f66514e4d1af1cfc"
   dependencies:
     "@angular/benchpress" "0.3.0"
     "@angular/build" "18.0.0-rc.2"
@@ -84,6 +85,7 @@
     "@bazel/typescript" "5.8.1"
     "@microsoft/api-extractor" "7.43.7"
     "@types/browser-sync" "^2.26.3"
+    "@types/minimatch" "^5.1.2"
     "@types/node" "^18.19.21"
     "@types/selenium-webdriver" "^4.1.21"
     "@types/send" "^0.17.1"
@@ -141,10 +143,10 @@
     vite "5.2.11"
     watchpack "2.4.1"
 
-"@angular/cdk@18.0.0":
-  version "18.0.0"
-  resolved "https://registry.yarnpkg.com/@angular/cdk/-/cdk-18.0.0.tgz#6358f553d54969b18a2efa9305e1aa08449d6021"
-  integrity sha512-V0i1SAiT2PTNyugBW0E4fev8G/4XP5FdyX2YD6oc5sNyt3GFcoDNHcz+oEne8+aYVnQ3Ax9Zutq/SQincDHIbw==
+"@angular/cdk@18.0.1":
+  version "18.0.1"
+  resolved "https://registry.yarnpkg.com/@angular/cdk/-/cdk-18.0.1.tgz#7338c85ac88aa57633eb0b55ba5b6deea508a86b"
+  integrity sha512-2fCqX1sz5cM+LncO6ak4EU2ZBm8MWitv5V53go3Iz5dOVOdrvysBt8smEkWZ4nvEKkFYHEPpQo0YlxEWbuTEmA==
   dependencies:
     tslib "^2.3.0"
   optionalDependencies:
@@ -209,10 +211,10 @@
     fast-glob "3.3.2"
     yargs "^17.2.1"
 
-"@angular/material@18.0.0":
-  version "18.0.0"
-  resolved "https://registry.yarnpkg.com/@angular/material/-/material-18.0.0.tgz#8e235d6fd263381b2b3319447cb1efbb0221543a"
-  integrity sha512-4WfMcr4cX3cF7dKz+cXf9YIvhWOJGTP24rbMF5C6eC5K20IK6zgA//Qn0VSTwZkm54Tu9C7kF+CfNLeLy6i5uQ==
+"@angular/material@18.0.1":
+  version "18.0.1"
+  resolved "https://registry.yarnpkg.com/@angular/material/-/material-18.0.1.tgz#83b8e6a7998e0c5c0579b26527dfc183e798b01e"
+  integrity sha512-y8OaESXw32P74Jh2FEr3n7QjqjTlo2Jf+XdgOvp5dd1yxpJ20vnK7ZCEQqCpxdxGAzXqR+2DccKk9tebB9egZw==
   dependencies:
     "@material/animation" "15.0.0-canary.7f224ddd4.0"
     "@material/auto-init" "15.0.0-canary.7f224ddd4.0"
@@ -264,9 +266,10 @@
     "@material/typography" "15.0.0-canary.7f224ddd4.0"
     tslib "^2.3.0"
 
-"@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#c44d21e50aad681b895171cb3b3d773c73b3af4b":
-  version "0.0.0-239d56b71911f9fa1eeefb6e4505dbe7b0cd81a7"
-  resolved "https://github.com/angular/dev-infra-private-ng-dev-builds.git#c44d21e50aad681b895171cb3b3d773c73b3af4b"
+"@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#68feef74970fb464f94ab21be85a314924499aa3":
+  version "0.0.0-e805b4cfbbf04cf922ca279de2c49e2f778545ff"
+  uid "68feef74970fb464f94ab21be85a314924499aa3"
+  resolved "https://github.com/angular/dev-infra-private-ng-dev-builds.git#68feef74970fb464f94ab21be85a314924499aa3"
   dependencies:
     "@octokit/rest" "20.1.1"
     "@types/semver" "^7.3.6"
@@ -4375,7 +4378,7 @@
   resolved "https://registry.yarnpkg.com/@types/mime/-/mime-1.3.5.tgz#1ef302e01cf7d2b5a0fa526790c9123bf1d06690"
   integrity sha512-/pyBZWSLD2n0dcHE3hq8s8ZvcETHtEuF+3E7XVt0Ig2nvsVQXdghHVcEkIWjy9A0wKfTn97a/PSDYohKIlnP/w==
 
-"@types/minimatch@*":
+"@types/minimatch@*", "@types/minimatch@^5.1.2":
   version "5.1.2"
   resolved "https://registry.yarnpkg.com/@types/minimatch/-/minimatch-5.1.2.tgz#07508b45797cb81ec3f273011b054cd0755eddca"
   integrity sha512-K0VQKziLUWkVKiRVrx4a40iPaxTUefQmjtkQofBkYRcoaaL/8rhwDWww9qWbrgicNOgnpIsMxyNIUM4+n6dUIA==
