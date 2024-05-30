@@ -4,8 +4,6 @@
 
 ```ts
 
-/// <reference types="node" />
-
 import { Observable } from 'rxjs';
 import { Operator } from 'rxjs';
 import { PartialObserver } from 'rxjs';

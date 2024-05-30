@@ -4,8 +4,6 @@
 
 ```ts
 
-/// <reference types="node" />
-
 import { BaseException } from '@angular-devkit/core';
 import { JsonObject } from '@angular-devkit/core';
 import { JsonValue } from '@angular-devkit/core';
