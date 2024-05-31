@@ -61,9 +61,10 @@ export function createCompilerPlugin(
       let setupWarnings: PartialMessage[] | undefined = [];
       const preserveSymlinks = build.initialOptions.preserveSymlinks;
 
-      // Initialize a worker pool for JavaScript transformations
+      // Initialize a worker pool for JavaScript transformations.
+      // Webcontainers currently do not support this persistent cache store.
       let cacheStore: import('../lmdb-cache-store').LmbdCacheStore | undefined;
-      if (pluginOptions.sourceFileCache?.persistentCachePath) {
+      if (pluginOptions.sourceFileCache?.persistentCachePath && !process.versions.webcontainer) {
         const { LmbdCacheStore } = await import('../lmdb-cache-store');
         cacheStore = new LmbdCacheStore(
           path.join(pluginOptions.sourceFileCache.persistentCachePath, 'angular-compiler.db'),
