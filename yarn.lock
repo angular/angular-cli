@@ -12244,10 +12244,10 @@ quick-format-unescaped@^4.0.3:
   resolved "https://registry.yarnpkg.com/quick-format-unescaped/-/quick-format-unescaped-4.0.4.tgz#93ef6dd8d3453cbc7970dd614fad4c5954d6b5a7"
   integrity sha512-tYC1Q1hgyRuHgloV/YXs2w15unPVh8qfu/qCTfhTYamaw7fyhumKa2yGpdSo87vY32rIclj+4fWYQXUMs9EHvg==
 
-quicktype-core@23.0.168:
-  version "23.0.168"
-  resolved "https://registry.yarnpkg.com/quicktype-core/-/quicktype-core-23.0.168.tgz#ee322f4ff3e3f102aaa1c70c927a62a01e8cf6a2"
-  integrity sha512-CGMvMM6l7bUIKYCY3T5WLZNdAi5tJ+LETTP5l8YzYoxhNfc7dd8ZpVxFp5S3Q/cme/i5qt27+WzFJVMMxJtSjA==
+quicktype-core@23.0.169:
+  version "23.0.169"
+  resolved "https://registry.yarnpkg.com/quicktype-core/-/quicktype-core-23.0.169.tgz#c8f3a288ee0c473bd49be3ecf841252268a10328"
+  integrity sha512-+qnwUeNNu01k65NCaBJLReLOEg3ZTVrvWpyOjnucHx7/zieU6kzR6lZyYSUqS3P0Bd0RVgf3LDQrREbVLjxuqQ==
   dependencies:
     "@glideapps/ts-necessities" "2.2.3"
     browser-or-node "^3.0.0"
@@ -12778,10 +12778,10 @@ sass@1.77.0:
     immutable "^4.0.0"
     source-map-js ">=0.6.2 <2.0.0"
 
-sass@1.77.3:
-  version "1.77.3"
-  resolved "https://registry.yarnpkg.com/sass/-/sass-1.77.3.tgz#4e93f6197786c05cab2c795c3f0f243470d94836"
-  integrity sha512-WJHo+jmFp0dwRuymPmIovuxHaBntcCyja5hCB0yYY9wWrViEp4kF5Cdai98P72v6FzroPuABqu+ddLMbQWmwzA==
+sass@1.77.4:
+  version "1.77.4"
+  resolved "https://registry.yarnpkg.com/sass/-/sass-1.77.4.tgz#92059c7bfc56b827c56eb116778d157ec017a5cd"
+  integrity sha512-vcF3Ckow6g939GMA4PeU7b2K/9FALXk2KF9J87txdHzXbUF9XRQRwSxcAs/fGaTnJeBFd7UoV22j3lzMLdM0Pw==
   dependencies:
     chokidar ">=3.0.0 <4.0.0"
     immutable "^4.0.0"
