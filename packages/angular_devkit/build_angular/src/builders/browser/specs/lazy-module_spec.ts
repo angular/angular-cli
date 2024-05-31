@@ -65,7 +65,7 @@ describe('Browser Builder lazy modules', () => {
 
       const { files } = await browserBuild(architect, host, target, { aot: true });
       const data = await files['src_app_lazy_lazy_module_ts.js'];
-      expect(data).toContain('this.ɵmod');
+      expect(data).toContain('static ɵmod');
     });
   });
 

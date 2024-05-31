@@ -2,6 +2,7 @@ import assert from 'node:assert';
 import { expectFileToExist, readFile, writeFile, replaceInFile } from '../../utils/fs';
 import { ng } from '../../utils/process';
 import { getGlobalVariable } from '../../utils/env';
+import { updateJsonFile } from '../../utils/project';
 
 const unexpectedStaticFieldErrorMessage =
   'Found unexpected static field. This indicates that the Safari <=v15 ' +
@@ -22,6 +23,10 @@ export default async function () {
 
       title = 'test-project';`,
   );
+
+  await updateJsonFile('tsconfig.json', (tsconfig) => {
+    tsconfig.compilerOptions.useDefineForClassFields = false;
+  });
 
   // Matches two types of static fields that indicate that the Safari bug
   // may still occur. With the workaround this should not appear in bundles.

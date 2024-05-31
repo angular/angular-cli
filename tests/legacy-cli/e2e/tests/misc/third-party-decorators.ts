@@ -16,6 +16,10 @@ export default async function () {
   // This is especially common when testing snapshot builds for new prereleases.
   await installWorkspacePackages({ force: true });
 
+  await updateJsonFile('tsconfig.json', (tsconfig) => {
+    tsconfig.compilerOptions.useDefineForClassFields = false;
+  });
+
   // Create an app that uses ngrx decorators and has e2e tests.
   await writeMultipleFiles({
     './e2e/src/app.po.ts': `
