@@ -30,7 +30,7 @@
     "esbuild": "0.21.4",
     "fast-glob": "3.3.2",
     "https-proxy-agent": "7.0.4",
-    "inquirer": "9.2.22",
+    "inquirer": "9.2.23",
     "lmdb": "3.0.11",
     "magic-string": "0.30.10",
     "mrmime": "2.0.0",
