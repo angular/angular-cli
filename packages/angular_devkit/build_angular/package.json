@@ -41,7 +41,7 @@
     "less": "4.2.0",
     "less-loader": "12.2.0",
     "license-webpack-plugin": "4.0.2",
-    "loader-utils": "3.2.2",
+    "loader-utils": "3.3.0",
     "magic-string": "0.30.10",
     "mini-css-extract-plugin": "2.9.0",
     "mrmime": "2.0.0",
