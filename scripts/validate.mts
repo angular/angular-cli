@@ -8,7 +8,6 @@
 
 import { execSync } from 'child_process';
 import templates from './templates.mjs';
-import validateLicenses from './validate-licenses.mjs';
 import validateUserAnalytics from './validate-user-analytics.mjs';
 
 export default async function (options: { verbose: boolean }) {
@@ -33,10 +32,6 @@ export default async function (options: { verbose: boolean }) {
     }
     error = true;
   }
-
-  console.info('');
-  console.info('Running license validation...');
-  error = (await validateLicenses({})) != 0 || error;
 
   console.info('');
   console.info('Running User Analytics validation...');

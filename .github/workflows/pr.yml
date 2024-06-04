@@ -50,6 +50,10 @@ jobs:
         run: yarn ts-circular-deps check
       - name: Run Validation
         run: yarn -s admin validate
+      - name: Check Package Licenses
+        uses: actions/dependency-review-action@0c155c5e8556a497adf53f2c18edabf945ed8e70 # v4.3.2
+        with:
+          config-file: './.github/dependency-review-config.yml'
       - name: Check tooling setup
         run: yarn -s check-tooling-setup
       - name: Check commit message
