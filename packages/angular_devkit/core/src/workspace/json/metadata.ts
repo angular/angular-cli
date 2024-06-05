@@ -3,7 +3,7 @@
  * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
+ * found in the LICENSE file at https://angular.dev/license
  */
 
 import { JSONPath, Node, findNodeAtLocation, getNodeValue } from 'jsonc-parser';
@@ -39,7 +39,11 @@ export class JsonWorkspaceMetadata {
 
   hasLegacyTargetsName = true;
 
-  constructor(readonly filePath: string, private readonly ast: Node, readonly raw: string) {}
+  constructor(
+    readonly filePath: string,
+    private readonly ast: Node,
+    readonly raw: string,
+  ) {}
 
   get hasChanges(): boolean {
     return this.changes.size > 0;

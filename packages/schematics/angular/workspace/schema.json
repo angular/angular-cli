@@ -33,7 +33,7 @@
       "default": false
     },
     "strict": {
-      "description": "Create a workspace with stricter type checking options. This setting helps improve maintainability and catch bugs ahead of time. For more information, see https://angular.io/strict",
+      "description": "Create a workspace with stricter type checking options. This setting helps improve maintainability and catch bugs ahead of time. For more information, see https://angular.dev/tools/cli/template-typecheck#strict-mode",
       "type": "boolean",
       "default": true
     },

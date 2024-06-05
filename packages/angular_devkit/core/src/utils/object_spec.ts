@@ -3,7 +3,7 @@
  * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
+ * found in the LICENSE file at https://angular.dev/license
  */
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -33,7 +33,11 @@ describe('object', () => {
 
     it('works with simple classes', () => {
       class Data {
-        constructor(private _x = 1, protected _y = 2, public _z = 3) {}
+        constructor(
+          private _x = 1,
+          protected _y = 2,
+          public _z = 3,
+        ) {}
       }
       const data = new Data();
       expect(deepCopy(data)).toEqual(data);

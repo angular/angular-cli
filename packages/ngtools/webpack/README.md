@@ -3,7 +3,7 @@
 Webpack 5.x plugin for the Angular Ahead-of-Time compiler. The plugin also supports Angular JIT mode.
 When this plugin is used outside of the Angular CLI, the Ivy linker will also be needed to support
 the usage of Angular libraries. An example configuration of the Babel-based Ivy linker is provided
-in the linker section. For additional information regarding the linker, please see: https://v13.angular.io/guide/creating-libraries#consuming-partial-ivy-code-outside-the-angular-cli
+in the linker section. For additional information regarding the linker, please see: https://angular.dev/tools/libraries/creating-libraries#consuming-partial-ivy-code-outside-the-angular-cli
 
 ## Usage
 

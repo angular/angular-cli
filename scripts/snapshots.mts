@@ -3,7 +3,7 @@
  * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
+ * found in the LICENSE file at https://angular.dev/license
  */
 
 import { execSync, spawnSync } from 'node:child_process';
@@ -161,7 +161,7 @@ export default async function (opts: SnapshotsOptions) {
 
   if (githubToken) {
     console.info('Setting up global git name.');
-    _exec('git', ['config', '--global', 'user.email', 'circleci@angular.io'], {});
+    _exec('git', ['config', '--global', 'user.email', 'circleci@angular.dev'], {});
     _exec('git', ['config', '--global', 'user.name', 'Angular Builds'], {});
     _exec('git', ['config', '--global', 'push.default', 'simple'], {});
   }

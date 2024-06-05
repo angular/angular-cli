@@ -1,7 +1,7 @@
 # Copyright Google Inc. All Rights Reserved.
 #
 # Use of this source code is governed by an MIT-style license that can be
-# found in the LICENSE file at https://angular.io/license
+# found in the LICENSE file at https://angular.dev/license
 #
 # This filter combines a subproject package.json with the root package.json
 # and performs substitutions to prepare it for release. It should be called

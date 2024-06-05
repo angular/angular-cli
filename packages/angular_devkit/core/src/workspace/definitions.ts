@@ -3,7 +3,7 @@
  * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
+ * found in the LICENSE file at https://angular.dev/license
  */
 
 import { JsonValue } from '../json';
@@ -38,7 +38,10 @@ export type DefinitionCollectionListener<V extends object> = (
 class DefinitionCollection<V extends object> implements ReadonlyMap<string, V> {
   private _map: Map<string, V>;
 
-  constructor(initial?: Record<string, V>, private _listener?: DefinitionCollectionListener<V>) {
+  constructor(
+    initial?: Record<string, V>,
+    private _listener?: DefinitionCollectionListener<V>,
+  ) {
     this._map = new Map(initial && Object.entries(initial));
   }
 
