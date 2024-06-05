@@ -1,3 +1,24 @@
+<a name="18.0.3"></a>
+
+# 18.0.3 (2024-06-05)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                                                                                |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------------------------------------------------------- |
+| [b709d2a24](https://github.com/angular/angular-cli/commit/b709d2a243926f1ab01e8c8a78d68fc57ab4cab3) | fix  | add `schema.json` options to parsed command, also when a version is passed to `ng add <package>@<version>` |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                               |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------- |
+| [43a2a7d13](https://github.com/angular/angular-cli/commit/43a2a7d137328c1f6f865b76585a92f4e5058b13) | fix  | avoid escaping rebased Sass URL values                    |
+| [9acb5c7ca](https://github.com/angular/angular-cli/commit/9acb5c7ca8e6d14379e39f56d2498c0276214210) | fix  | disable JS transformer persistent cache on web containers |
+| [346df4909](https://github.com/angular/angular-cli/commit/346df490976e39d791db5ecfa14eab6a5ad8d99d) | fix  | improve Sass rebaser ident token detection                |
+| [6526a5f59](https://github.com/angular/angular-cli/commit/6526a5f590fbc7f26b9e613af3b5c497e30603b5) | fix  | watch all related files during a Sass error               |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="18.1.0-next.0"></a>
 
 # 18.1.0-next.0 (2024-05-29)
