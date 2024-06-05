@@ -102,6 +102,17 @@
       "type": "number",
       "description": "Enable and define the file watching poll time period in milliseconds."
     },
+    "inspect": {
+      "default": false,
+      "description": "Activate debugging inspector. This option only has an effect when 'SSR' or 'SSG' are enabled.",
+      "oneOf": [
+        {
+          "type": "string",
+          "description": "Activate the inspector on host and port in the format of `[[host:]port]`. See the security warning in https://nodejs.org/docs/latest-v22.x/api/cli.html#warning-binding-inspector-to-a-public-ipport-combination-is-insecure regarding the host parameter usage."
+        },
+        { "type": "boolean" }
+      ]
+    },
     "forceEsbuild": {
       "type": "boolean",
       "description": "Force the development server to use the 'browser-esbuild' builder when building. This is a developer preview option for the esbuild-based build system.",
