@@ -3,7 +3,7 @@
  * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
+ * found in the LICENSE file at https://angular.dev/license
  */
 
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
@@ -42,7 +42,7 @@ describe('callSource', () => {
   });
 
   it('errors if invalid source object', (done) => {
-    const source0: Source = () => ({} as Tree);
+    const source0: Source = () => ({}) as Tree;
 
     callSource(source0, context)
       .toPromise()
@@ -96,7 +96,7 @@ describe('callSource', () => {
 
 describe('callRule', () => {
   it('should throw InvalidRuleResultException when rule result is non-Tree object', async () => {
-    const rule0: Rule = () => ({} as Tree);
+    const rule0: Rule = () => ({}) as Tree;
 
     await expectAsync(callRule(rule0, empty(), context).toPromise()).toBeRejectedWithError(
       InvalidRuleResultException,

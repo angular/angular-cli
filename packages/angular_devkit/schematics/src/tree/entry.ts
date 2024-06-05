@@ -3,14 +3,17 @@
  * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
+ * found in the LICENSE file at https://angular.dev/license
  */
 
 import { Path } from '@angular-devkit/core';
 import { FileEntry } from './interface';
 
 export class SimpleFileEntry implements FileEntry {
-  constructor(private _path: Path, private _content: Buffer) {}
+  constructor(
+    private _path: Path,
+    private _content: Buffer,
+  ) {}
 
   get path() {
     return this._path;
@@ -23,7 +26,10 @@ export class SimpleFileEntry implements FileEntry {
 export class LazyFileEntry implements FileEntry {
   private _content: Buffer | null = null;
 
-  constructor(private _path: Path, private _load: (path?: Path) => Buffer) {}
+  constructor(
+    private _path: Path,
+    private _load: (path?: Path) => Buffer,
+  ) {}
 
   get path() {
     return this._path;

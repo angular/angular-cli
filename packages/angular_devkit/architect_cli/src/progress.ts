@@ -3,7 +3,7 @@
  * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
+ * found in the LICENSE file at https://angular.dev/license
  */
 
 import ProgressBar from 'progress';
@@ -12,7 +12,10 @@ import * as readline from 'readline';
 export class MultiProgressBar<Key, T> {
   private _bars = new Map<Key, { data: T; bar: ProgressBar }>();
 
-  constructor(private _status: string, private _stream = process.stderr) {}
+  constructor(
+    private _status: string,
+    private _stream = process.stderr,
+  ) {}
   private _add(id: Key, data: T): { data: T; bar: ProgressBar } {
     const width = Math.min(80, this._stream.columns || 80);
     const value = {

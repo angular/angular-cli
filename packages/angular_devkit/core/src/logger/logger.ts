@@ -3,7 +3,7 @@
  * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
+ * found in the LICENSE file at https://angular.dev/license
  */
 
 import { EMPTY, Observable, Operator, PartialObserver, Subject, Subscription } from 'rxjs';
@@ -67,7 +67,10 @@ export class Logger extends Observable<LogEntry> implements LoggerApi {
     }
   }
 
-  constructor(public readonly name: string, public readonly parent: Logger | null = null) {
+  constructor(
+    public readonly name: string,
+    public readonly parent: Logger | null = null,
+  ) {
     super();
 
     const path: string[] = [];

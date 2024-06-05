@@ -3,7 +3,7 @@
  * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
+ * found in the LICENSE file at https://angular.dev/license
  */
 
 import { randomUUID } from 'crypto';
@@ -31,7 +31,10 @@ export class AnalyticsCollector {
   private readonly requestParameterStringified: string;
   private readonly userParameters: Record<UserCustomDimension, PrimitiveTypes | undefined>;
 
-  constructor(private context: CommandContext, userId: string) {
+  constructor(
+    private context: CommandContext,
+    userId: string,
+  ) {
     const requestParameters: Partial<Record<RequestParameter, PrimitiveTypes>> = {
       [RequestParameter.ProtocolVersion]: 2,
       [RequestParameter.ClientId]: userId,

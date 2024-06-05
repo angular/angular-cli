@@ -31,7 +31,7 @@
   ·
   <a href="https://github.com/angular/angular-cli/issues">Submit an Issue</a>
   ·
-  <a href="https://blog.angular.dev/">Blog</a>
+  <a href="https://blog.angular.dev">Blog</a>
   <br>
   <br>
 </p>

@@ -3,7 +3,7 @@
  * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
+ * found in the LICENSE file at https://angular.dev/license
  */
 
 import type { ParsedConfiguration } from '@angular/compiler-cli';
@@ -26,9 +26,8 @@ export async function readTsconfig(
   // Load ESM `@angular/compiler-cli` using the TypeScript dynamic import workaround.
   // Once TypeScript provides support for keeping the dynamic import this workaround can be
   // changed to a direct dynamic import.
-  const { formatDiagnostics, readConfiguration } = await loadEsmModule<
-    typeof import('@angular/compiler-cli')
-  >('@angular/compiler-cli');
+  const { formatDiagnostics, readConfiguration } =
+    await loadEsmModule<typeof import('@angular/compiler-cli')>('@angular/compiler-cli');
 
   const configResult = readConfiguration(tsConfigFullPath);
   if (configResult.errors && configResult.errors.length) {

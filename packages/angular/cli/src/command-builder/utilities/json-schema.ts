@@ -3,7 +3,7 @@
  * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
+ * found in the LICENSE file at https://angular.dev/license
  */
 
 import { json } from '@angular-devkit/core';
@@ -165,8 +165,8 @@ export async function parseJsonSchemaToOptions(
     const alias = json.isJsonArray(current.aliases)
       ? [...current.aliases].map((x) => '' + x)
       : current.alias
-      ? ['' + current.alias]
-      : [];
+        ? ['' + current.alias]
+        : [];
     const format = typeof current.format == 'string' ? current.format : undefined;
     const visible = current.visible === undefined || current.visible === true;
     const hidden = !!current.hidden || !visible;

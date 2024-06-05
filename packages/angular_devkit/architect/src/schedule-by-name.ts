@@ -3,7 +3,7 @@
  * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
+ * found in the LICENSE file at https://angular.dev/license
  */
 
 import { json, logging } from '@angular-devkit/core';
@@ -101,7 +101,7 @@ export async function scheduleByName(
           ...output,
           ...(options.target ? { target: options.target } : 0),
           info,
-        } as unknown as BuilderOutput),
+        }) as unknown as BuilderOutput,
     ),
     shareReplay(),
   );

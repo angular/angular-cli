@@ -1,3 +1,3 @@
 # Angular SSR
 
-Read the dev guide [here](https://angular.io/guide/universal).
+Read the dev guide [here](https://angular.dev/guide/ssr).

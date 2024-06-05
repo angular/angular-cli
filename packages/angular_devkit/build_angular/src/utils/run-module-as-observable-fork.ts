@@ -3,7 +3,7 @@
  * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
+ * found in the LICENSE file at https://angular.dev/license
  */
 
 import { BuilderOutput } from '@angular-devkit/architect';
@@ -29,10 +29,10 @@ export function runModuleAsObservableFork(
       // Workaround for https://github.com/nodejs/node/issues/9435
       return !debugArgRegex.test(arg);
     });
-    const forkOptions: ForkOptions = ({
+    const forkOptions: ForkOptions = {
       cwd,
       execArgv,
-    } as {}) as ForkOptions;
+    } as {} as ForkOptions;
 
     // TODO: support passing in a logger to use as stdio streams
     // if (logger) {

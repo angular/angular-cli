@@ -4103,7 +4103,7 @@ Charles Lyding and Doug Parker
 
 ### @schematics/angular
 
-- `classlist.js` and `web-animations-js` are removed from application polyfills and uninstalled from the package. These were only needed for compatibility with Internet Explorer, which is no longer needed now that Angular only supports evergreen browsers. See: https://angular.io/guide/browser-support.
+- `classlist.js` and `web-animations-js` are removed from application polyfills and uninstalled from the package. These were only needed for compatibility with Internet Explorer, which is no longer needed now that Angular only supports evergreen browsers. See: https://angular.dev/reference/versions#browser-support.
 
 Add the following to the polyfills file for an app to re-add these packages:
 
@@ -11017,7 +11017,7 @@ The following options which were used to support the above syntax were removed w
 </h3>
 Critical CSS inlining is now enabled by default. If you wish to turn this off set `inlineCritical` to `false`.
 
-See: https://angular.io/guide/workspace-config#optimization-configuration
+See: https://angular.dev/reference/configs/workspace-config#optimization-configuration
 
 <h3>
     @angular-devkit/build-angular: drop support for zone.js 0.10 (<a href="https://github.com/angular/angular-cli/commit/f309516bcdcee711fc5693b5f14d6fef1cfa5dba">f309516</a>)
@@ -13613,7 +13613,7 @@ Alan Agius, Charles Lyding, Renovate Bot, Joey Perrott
 </h3>
 Critical CSS inlining is now enabled by default. If you wish to turn this off set `inlineCritical` to `false`.
 
-See: https://angular.io/guide/workspace-config#optimization-configuration
+See: https://angular.dev/reference/configs/workspace-config#optimization-configuration
 
 ---
 
