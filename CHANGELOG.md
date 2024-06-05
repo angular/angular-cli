@@ -1,3 +1,31 @@
+<a name="18.1.0-next.1"></a>
+
+# 18.1.0-next.1 (2024-06-05)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                                                                                |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------------------------------------------------------- |
+| [ce8b5a3a7](https://github.com/angular/angular-cli/commit/ce8b5a3a745062f926491d5a299df728b7de8790) | fix  | add `schema.json` options to parsed command, also when a version is passed to `ng add <package>@<version>` |
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                                         |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------- |
+| [22e05dcb4](https://github.com/angular/angular-cli/commit/22e05dcb4a9ae963997c58fad86125ca51b19a36) | fix  | generate new projects with ECMAScript standard class field behavior |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                               |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------- |
+| [687a6c7ec](https://github.com/angular/angular-cli/commit/687a6c7eca740a98129196908689a44c181b33a5) | feat | add `--inspect` option to the dev-server                  |
+| [86a07237e](https://github.com/angular/angular-cli/commit/86a07237e60734686c80e2e231e6238619a04106) | fix  | disable JS transformer persistent cache on web containers |
+| [a5fc020e6](https://github.com/angular/angular-cli/commit/a5fc020e6a616d6a39940f1d616547a911b07781) | fix  | watch all related files during a Sass error               |
+| [dd94a831b](https://github.com/angular/angular-cli/commit/dd94a831b4ce1ca55289fca1818aa26195e81dbc) | perf | enable dependency prebundling for server dependencies     |
+| [3acb77683](https://github.com/angular/angular-cli/commit/3acb7768317bb05a9cd73fa64e081b5ca0326189) | perf | use direct transpilation with isolated modules            |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="18.0.3"></a>
 
 # 18.0.3 (2024-06-05)
