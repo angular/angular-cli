@@ -10,6 +10,7 @@ import type { BuilderContext } from '@angular-devkit/architect';
 import type { Plugin } from 'esbuild';
 import assert from 'node:assert';
 import { readFile } from 'node:fs/promises';
+import inspector from 'node:inspector';
 import { builtinModules } from 'node:module';
 import { basename, join } from 'node:path';
 import type { Connect, DepOptimizationConfig, InlineConfig, ViteDevServer } from 'vite';
@@ -261,6 +262,12 @@ export async function* serveWithVite(
       context.logger.info(
         'NOTE: Raw file sizes do not reflect development server per-request transformations.',
       );
+
+      if (browserOptions.ssr && serverOptions.inspect) {
+        const { host, port } = serverOptions.inspect as { host?: string; port?: number };
+        inspector.open(port, host, true);
+        context.addTeardown(() => inspector.close());
+      }
 
       const { root = '' } = await context.getProjectMetadata(projectName);
       const projectRoot = join(context.workspaceRoot, root as string);

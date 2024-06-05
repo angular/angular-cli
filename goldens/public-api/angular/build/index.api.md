@@ -114,6 +114,7 @@ export interface DevServerBuilderOptions {
     };
     hmr?: boolean;
     host?: string;
+    inspect?: Inspect;
     liveReload?: boolean;
     open?: boolean;
     poll?: number;
