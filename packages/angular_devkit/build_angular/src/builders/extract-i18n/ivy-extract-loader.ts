@@ -3,7 +3,7 @@
  * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
+ * found in the LICENSE file at https://angular.dev/license
  */
 
 import * as nodePath from 'path';
@@ -54,9 +54,8 @@ async function extract(
     // Load ESM `@angular/localize/tools` using the TypeScript dynamic import workaround.
     // Once TypeScript provides support for keeping the dynamic import this workaround can be
     // changed to a direct dynamic import.
-    const localizeToolsModule = await loadEsmModule<typeof import('@angular/localize/tools')>(
-      '@angular/localize/tools',
-    );
+    const localizeToolsModule =
+      await loadEsmModule<typeof import('@angular/localize/tools')>('@angular/localize/tools');
     MessageExtractor = localizeToolsModule.MessageExtractor;
   } catch {
     throw new Error(

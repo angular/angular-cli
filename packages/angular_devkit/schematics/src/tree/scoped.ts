@@ -3,7 +3,7 @@
  * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
+ * found in the LICENSE file at https://angular.dev/license
  */
 
 import {
@@ -28,7 +28,10 @@ import {
 } from './interface';
 
 class ScopedFileEntry implements FileEntry {
-  constructor(private _base: FileEntry, private scope: Path) {}
+  constructor(
+    private _base: FileEntry,
+    private scope: Path,
+  ) {}
 
   get path(): Path {
     return join(NormalizedRoot, relative(this.scope, this._base.path));
@@ -40,7 +43,10 @@ class ScopedFileEntry implements FileEntry {
 }
 
 class ScopedDirEntry implements DirEntry {
-  constructor(private _base: DirEntry, readonly scope: Path) {}
+  constructor(
+    private _base: DirEntry,
+    readonly scope: Path,
+  ) {}
 
   get parent(): DirEntry | null {
     if (!this._base.parent || this._base.path == this.scope) {
@@ -86,7 +92,10 @@ class ScopedDirEntry implements DirEntry {
 export class ScopedTree implements Tree {
   readonly _root: ScopedDirEntry;
 
-  constructor(private _base: Tree, scope: string) {
+  constructor(
+    private _base: Tree,
+    scope: string,
+  ) {
     const normalizedScope = normalize('/' + scope);
     this._root = new ScopedDirEntry(this._base.getDir(normalizedScope), normalizedScope);
   }

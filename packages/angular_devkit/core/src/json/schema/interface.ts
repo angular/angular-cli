@@ -3,7 +3,7 @@
  * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
+ * found in the LICENSE file at https://angular.dev/license
  */
 
 import { ErrorObject, Format } from 'ajv';
@@ -108,7 +108,10 @@ export interface JsonSchemaVisitor {
 }
 
 export interface JsonVisitor {
-  (value: JsonValue, pointer: JsonPointer, schema?: JsonObject, root?: JsonObject | JsonArray):
-    | Observable<JsonValue>
-    | JsonValue;
+  (
+    value: JsonValue,
+    pointer: JsonPointer,
+    schema?: JsonObject,
+    root?: JsonObject | JsonArray,
+  ): Observable<JsonValue> | JsonValue;
 }

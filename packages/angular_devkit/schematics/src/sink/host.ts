@@ -3,7 +3,7 @@
  * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
+ * found in the LICENSE file at https://angular.dev/license
  */
 
 import { Path, virtualFs } from '@angular-devkit/core';
@@ -25,7 +25,10 @@ export class HostSink extends SimpleSinkBase {
   protected _filesToCreate = new Map<Path, Buffer>();
   protected _filesToUpdate = new Map<Path, Buffer>();
 
-  constructor(protected _host: virtualFs.Host, protected _force = false) {
+  constructor(
+    protected _host: virtualFs.Host,
+    protected _force = false,
+  ) {
     super();
   }
 

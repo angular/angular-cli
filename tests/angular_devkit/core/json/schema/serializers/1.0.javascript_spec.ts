@@ -3,7 +3,7 @@
  * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
+ * found in the LICENSE file at https://angular.dev/license
  */
 
 // tslint:disable:no-any
@@ -11,14 +11,13 @@ import { schema } from '@angular-devkit/core';
 
 const { serializers } = schema;
 
-
 export function works(registry: schema.JsonSchemaRegistry, schema: any) {
   const value = {
     'requiredKey': 1,
   };
 
   registry.addSchema('', schema);
-  const v = (new serializers.JavascriptSerializer()).serialize('', registry)(value);
+  const v = new serializers.JavascriptSerializer().serialize('', registry)(value);
 
   expect(v.requiredKey).toBe(1);
   expect(() => delete v.requiredKey).toThrow();
@@ -40,16 +39,18 @@ export function works(registry: schema.JsonSchemaRegistry, schema: any) {
   expect(Object.keys(v.objectKey1)).toEqual(['stringKey', 'stringKeyDefault', 'objectKey']);
 }
 
-
 export function accessUndefined(registry: schema.JsonSchemaRegistry, schema: any) {
   const value = {
     'requiredKey': 1,
   };
 
   registry.addSchema('', schema);
-  const v = (new serializers.JavascriptSerializer({
+  const v = new serializers.JavascriptSerializer({
     allowAccessUndefinedObjects: true,
-  })).serialize('', registry)(value);
+  }).serialize(
+    '',
+    registry,
+  )(value);
 
   // Access an undefined property.
   v.objectKey1.stringKey = 'hello';

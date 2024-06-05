@@ -3,14 +3,13 @@
  * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
+ * found in the LICENSE file at https://angular.dev/license
  */
 
 // tslint:disable:no-any
 import { schema } from '@angular-devkit/core';
 
 const { serializers } = schema;
-
 
 export function works(registry: schema.JsonSchemaRegistry, schema: any) {
   const value = {
@@ -21,7 +20,7 @@ export function works(registry: schema.JsonSchemaRegistry, schema: any) {
 
   registry.addSchema('', schema);
 
-  const v = (new serializers.JavascriptSerializer()).serialize('', registry)(value);
+  const v = new serializers.JavascriptSerializer().serialize('', registry)(value);
 
   expect(v.firstName).toBe('Hans');
   expect(v.lastName).toBe('Larsen');
@@ -30,13 +29,13 @@ export function works(registry: schema.JsonSchemaRegistry, schema: any) {
   v.age = 10;
   expect(v.age).toBe(10);
 
-  expect(() => v.age = -1).toThrow();
-  expect(() => v.age = 'hello').toThrow();
-  expect(() => v.age = []).toThrow();
-  expect(() => v.age = undefined).not.toThrow();
+  expect(() => (v.age = -1)).toThrow();
+  expect(() => (v.age = 'hello')).toThrow();
+  expect(() => (v.age = [])).toThrow();
+  expect(() => (v.age = undefined)).not.toThrow();
 
-  expect(() => v.firstName = 0).toThrow();
-  expect(() => v.firstName = []).toThrow();
+  expect(() => (v.firstName = 0)).toThrow();
+  expect(() => (v.firstName = [])).toThrow();
   // This should throw as the value is required.
-  expect(() => v.firstName = undefined).toThrow();
+  expect(() => (v.firstName = undefined)).toThrow();
 }

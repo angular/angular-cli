@@ -3,7 +3,7 @@
  * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
+ * found in the LICENSE file at https://angular.dev/license
  */
 
 import { BaseException, PriorityQueue, logging } from '@angular-devkit/core';
@@ -178,7 +178,10 @@ export class SchematicEngine<CollectionT extends object, SchematicT extends obje
   >();
   private _taskSchedulers = new Array<TaskScheduler>();
 
-  constructor(private _host: EngineHost<CollectionT, SchematicT>, protected _workflow?: Workflow) {}
+  constructor(
+    private _host: EngineHost<CollectionT, SchematicT>,
+    protected _workflow?: Workflow,
+  ) {}
 
   get workflow() {
     return this._workflow || null;

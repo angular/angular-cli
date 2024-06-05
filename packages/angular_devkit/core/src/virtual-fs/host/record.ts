@@ -3,7 +3,7 @@
  * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
+ * found in the LICENSE file at https://angular.dev/license
  */
 
 import {
@@ -156,7 +156,7 @@ export class CordHost extends SimpleMemoryHost {
           ({
             kind: 'delete',
             path,
-          } as CordHostRecord),
+          }) as CordHostRecord,
       ),
       ...[...this._filesToRename.entries()].map(
         ([from, to]) =>
@@ -164,7 +164,7 @@ export class CordHost extends SimpleMemoryHost {
             kind: 'rename',
             from,
             to,
-          } as CordHostRecord),
+          }) as CordHostRecord,
       ),
       ...[...this._filesToCreate.values()].map(
         (path) =>
@@ -172,7 +172,7 @@ export class CordHost extends SimpleMemoryHost {
             kind: 'create',
             path,
             content: this._read(path),
-          } as CordHostRecord),
+          }) as CordHostRecord,
       ),
       ...[...this._filesToOverwrite.values()].map(
         (path) =>
@@ -180,7 +180,7 @@ export class CordHost extends SimpleMemoryHost {
             kind: 'overwrite',
             path,
             content: this._read(path),
-          } as CordHostRecord),
+          }) as CordHostRecord,
       ),
     ];
   }
@@ -373,8 +373,8 @@ export class CordHost extends SimpleMemoryHost {
     return this._exists(path)
       ? of(true)
       : this.willDelete(path) || this.willRename(path)
-      ? of(false)
-      : this._back.exists(path);
+        ? of(false)
+        : this._back.exists(path);
   }
   override isDirectory(path: Path): Observable<boolean> {
     return this._exists(path) ? super.isDirectory(path) : this._back.isDirectory(path);
@@ -383,16 +383,16 @@ export class CordHost extends SimpleMemoryHost {
     return this._exists(path)
       ? super.isFile(path)
       : this.willDelete(path) || this.willRename(path)
-      ? of(false)
-      : this._back.isFile(path);
+        ? of(false)
+        : this._back.isFile(path);
   }
 
   override stat(path: Path): Observable<Stats | null> | null {
     return this._exists(path)
       ? super.stat(path)
       : this.willDelete(path) || this.willRename(path)
-      ? of(null)
-      : this._back.stat(path);
+        ? of(null)
+        : this._back.stat(path);
   }
 
   override watch(path: Path, options?: HostWatchOptions) {
