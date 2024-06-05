@@ -11,7 +11,7 @@ describe('<%= classify(name) %><%= classify(type) %>', () => {
       <%= standalone ? 'imports' : 'declarations' %>: [<%= classify(name) %><%= classify(type) %>]
     })
     .compileComponents();
-    
+
     fixture = TestBed.createComponent(<%= classify(name) %><%= classify(type) %>);
     component = fixture.componentInstance;
     fixture.detectChanges();
