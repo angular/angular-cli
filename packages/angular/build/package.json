@@ -20,9 +20,9 @@
   "dependencies": {
     "@ampproject/remapping": "2.3.0",
     "@angular-devkit/architect": "0.0.0-EXPERIMENTAL-PLACEHOLDER",
-    "@babel/core": "7.24.6",
-    "@babel/helper-annotate-as-pure": "7.24.6",
-    "@babel/helper-split-export-declaration": "7.24.6",
+    "@babel/core": "7.24.7",
+    "@babel/helper-annotate-as-pure": "7.24.7",
+    "@babel/helper-split-export-declaration": "7.24.7",
     "@vitejs/plugin-basic-ssl": "1.1.0",
     "ansi-colors": "4.1.3",
     "browserslist": "^4.23.0",
