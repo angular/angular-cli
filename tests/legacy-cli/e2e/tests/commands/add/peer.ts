@@ -4,7 +4,7 @@ import { ng } from '../../../utils/process';
 const warning = 'Adding the package may not succeed.';
 
 export default async function () {
-  const { stderr: bad } = await ng(
+  const { stdout: bad } = await ng(
     'add',
     assetDir('add-collection-peer-bad'),
     '--skip-confirmation',
@@ -13,12 +13,12 @@ export default async function () {
     throw new Error('peer warning not shown on bad package');
   }
 
-  const { stderr: base } = await ng('add', assetDir('add-collection'), '--skip-confirmation');
+  const { stdout: base } = await ng('add', assetDir('add-collection'), '--skip-confirmation');
   if (base.includes(warning)) {
     throw new Error('peer warning shown on base package');
   }
 
-  const { stderr: good } = await ng(
+  const { stdout: good } = await ng(
     'add',
     assetDir('add-collection-peer-good'),
     '--skip-confirmation',
