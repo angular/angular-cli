@@ -6,21 +6,19 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { normalize as devkitNormalize, schema } from '@angular-devkit/core';
+import { JsonValue, normalize as devkitNormalize, schema } from '@angular-devkit/core';
 import { Collection, UnsuccessfulWorkflowExecution, formats } from '@angular-devkit/schematics';
 import {
   FileSystemCollectionDescription,
   FileSystemSchematicDescription,
   NodeWorkflow,
 } from '@angular-devkit/schematics/tools';
-import type { CheckboxQuestion, Question } from 'inquirer';
 import { relative, resolve } from 'path';
 import { Argv } from 'yargs';
 import { isPackageNameSafeForAnalytics } from '../analytics/analytics';
 import { EventCustomDimension } from '../analytics/analytics-parameters';
 import { getProjectByCwd, getSchematicDefaults } from '../utilities/config';
 import { assertIsError } from '../utilities/error';
-import { loadEsmModule } from '../utilities/load-esm';
 import { memoize } from '../utilities/memoize';
 import { isTTY } from '../utilities/tty';
 import {
@@ -172,76 +170,98 @@ export abstract class SchematicsCommandModule
 
     if (options.interactive !== false && isTTY()) {
       workflow.registry.usePromptProvider(async (definitions: Array<schema.PromptDefinition>) => {
-        const questions = definitions
-          .filter((definition) => !options.defaults || definition.default === undefined)
-          .map((definition) => {
-            const question: Question = {
-              name: definition.id,
-              message: definition.message,
-              default: definition.default,
-            };
+        let prompts: typeof import('@inquirer/prompts') | undefined;
+        const answers: Record<string, JsonValue> = {};
 
-            const validator = definition.validator;
-            if (validator) {
-              question.validate = (input) => validator(input);
+        for (const definition of definitions) {
+          if (options.defaults && definition.default !== undefined) {
+            continue;
+          }
 
-              // Filter allows transformation of the value prior to validation
-              question.filter = async (input) => {
-                for (const type of definition.propertyTypes) {
-                  let value;
-                  switch (type) {
-                    case 'string':
-                      value = String(input);
-                      break;
-                    case 'integer':
-                    case 'number':
-                      value = Number(input);
-                      break;
-                    default:
-                      value = input;
-                      break;
+          // Only load prompt package if needed
+          prompts ??= await import('@inquirer/prompts');
+
+          switch (definition.type) {
+            case 'confirmation':
+              answers[definition.id] = await prompts.confirm({
+                message: definition.message,
+                default: definition.default as boolean | undefined,
+              });
+              break;
+            case 'list':
+              if (!definition.items?.length) {
+                continue;
+              }
+
+              const choices = definition.items?.map((item) => {
+                return typeof item == 'string'
+                  ? {
+                      name: item,
+                      value: item,
+                    }
+                  : {
+                      name: item.label,
+                      value: item.value,
+                    };
+              });
+
+              answers[definition.id] = await (
+                definition.multiselect ? prompts.checkbox : prompts.select
+              )({
+                message: definition.message,
+                default: definition.default,
+                choices,
+              });
+              break;
+            case 'input':
+              let finalValue: JsonValue | undefined;
+              answers[definition.id] = await prompts.input({
+                message: definition.message,
+                default: definition.default as string | undefined,
+                async validate(value) {
+                  if (definition.validator === undefined) {
+                    return true;
                   }
-                  // Can be a string if validation fails
-                  const isValid = (await validator(value)) === true;
-                  if (isValid) {
-                    return value;
+
+                  let lastValidation: ReturnType<typeof definition.validator> = false;
+                  for (const type of definition.propertyTypes) {
+                    let potential;
+                    switch (type) {
+                      case 'string':
+                        potential = String(value);
+                        break;
+                      case 'integer':
+                      case 'number':
+                        potential = Number(value);
+                        break;
+                      default:
+                        potential = value;
+                        break;
+                    }
+                    lastValidation = await definition.validator(potential);
+
+                    // Can be a string if validation fails
+                    if (lastValidation === true) {
+                      finalValue = potential;
+
+                      return true;
+                    }
                   }
-                }
 
-                return input;
-              };
-            }
+                  return lastValidation;
+                },
+              });
 
-            switch (definition.type) {
-              case 'confirmation':
-                question.type = 'confirm';
-                break;
-              case 'list':
-                question.type = definition.multiselect ? 'checkbox' : 'list';
-                (question as CheckboxQuestion).choices = definition.items?.map((item) => {
-                  return typeof item == 'string'
-                    ? item
-                    : {
-                        name: item.label,
-                        value: item.value,
-                      };
-                });
-                break;
-              default:
-                question.type = definition.type;
-                break;
-            }
-
-            return question;
-          });
-
-        if (questions.length) {
-          const { default: inquirer } = await loadEsmModule<typeof import('inquirer')>('inquirer');
-
-          return inquirer.prompt(questions);
-        } else {
-          return {};
+              // Use validated value if present.
+              // This ensures the correct type is inserted into the final schema options.
+              if (finalValue !== undefined) {
+                answers[definition.id] = finalValue;
+              }
+              break;
+          }
         }
+
+        return answers;
       });
     }
 
