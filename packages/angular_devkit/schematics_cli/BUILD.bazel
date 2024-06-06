@@ -31,14 +31,15 @@ ts_library(
         "//packages/angular_devkit/schematics_cli:schematic/schema.ts",
         # @external_end
     ],
-    data = glob(
+    data = [
+        "blank/schema.json",
+        "collection.json",
+        "package.json",
+        "schematic/schema.json",
+    ] + glob(
         include = [
-            "collection.json",
-            "package.json",
-            "blank/schema.json",
             "blank/project-files/**/*",
             "blank/schematic-files/**/*",
-            "schematic/schema.json",
             "schematic/files/**/*",
         ],
     ),
