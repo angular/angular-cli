@@ -83,7 +83,7 @@
     "@bazel/esbuild": "5.8.1",
     "@bazel/jasmine": "5.8.1",
     "@discoveryjs/json-ext": "0.5.7",
-    "@rollup/plugin-commonjs": "^25.0.0",
+    "@rollup/plugin-commonjs": "^26.0.0",
     "@rollup/plugin-node-resolve": "^13.0.5",
     "@types/babel__core": "7.20.5",
     "@types/browser-sync": "^2.27.0",
