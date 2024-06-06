@@ -49,6 +49,7 @@ export class PackageManagerUtils {
     save: 'dependencies' | 'devDependencies' | true = true,
     extraArgs: string[] = [],
     cwd?: string,
+    progress = true,
   ): Promise<boolean> {
     const packageManagerArgs = this.getArguments();
     const installArgs: string[] = [packageManagerArgs.install, packageName];
@@ -57,7 +58,7 @@ export class PackageManagerUtils {
       installArgs.push(packageManagerArgs.saveDev);
     }
 
-    return this.run([...installArgs, ...extraArgs], { cwd, silent: true });
+    return this.run([...installArgs, ...extraArgs], { cwd, silent: true, progress });
   }
 
   /** Install all packages. */
@@ -75,6 +76,7 @@ export class PackageManagerUtils {
   async installTemp(
     packageName: string,
     extraArgs?: string[],
+    progress = true,
   ): Promise<{
     success: boolean;
     tempNodeModules: string;
@@ -119,7 +121,7 @@ export class PackageManagerUtils {
     ];
 
     return {
-      success: await this.install(packageName, true, installArgs, tempPath),
+      success: await this.install(packageName, true, installArgs, tempPath, progress),
       tempNodeModules,
     };
   }
@@ -162,12 +164,12 @@ export class PackageManagerUtils {
 
   private async run(
     args: string[],
-    options: { cwd?: string; silent?: boolean } = {},
+    options: { cwd?: string; silent?: boolean; progress?: boolean } = {},
   ): Promise<boolean> {
-    const { cwd = process.cwd(), silent = false } = options;
+    const { cwd = process.cwd(), silent = false, progress = true } = options;
 
-    const spinner = new Spinner();
-    spinner.start('Installing packages...');
+    const spinner = progress ? new Spinner() : undefined;
+    spinner?.start('Installing packages...');
 
     return new Promise((resolve) => {
       const bufferedOutput: { stream: NodeJS.WriteStream; data: Buffer }[] = [];
@@ -179,12 +181,12 @@ export class PackageManagerUtils {
         cwd,
       }).on('close', (code: number) => {
         if (code === 0) {
-          spinner.succeed('Packages successfully installed.');
+          spinner?.succeed('Packages successfully installed.');
           resolve(true);
         } else {
-          spinner.stop();
+          spinner?.stop();
           bufferedOutput.forEach(({ stream, data }) => stream.write(data));
-          spinner.fail('Packages installation failed, see above.');
+          spinner?.fail('Packages installation failed, see above.');
           resolve(false);
         }
       });
