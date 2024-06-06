@@ -83,6 +83,7 @@
     "@bazel/esbuild": "5.8.1",
     "@bazel/jasmine": "5.8.1",
     "@discoveryjs/json-ext": "0.5.7",
+    "@inquirer/confirm": "3.1.9",
     "@inquirer/prompts": "5.0.5",
     "@rollup/plugin-commonjs": "^26.0.0",
     "@rollup/plugin-node-resolve": "^13.0.5",
