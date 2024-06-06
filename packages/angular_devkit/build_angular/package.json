@@ -59,7 +59,7 @@
     "semver": "7.6.2",
     "source-map-loader": "5.0.0",
     "source-map-support": "0.5.21",
-    "terser": "5.31.0",
+    "terser": "5.31.1",
     "tree-kill": "1.2.2",
     "tslib": "2.6.3",
     "undici": "6.18.2",
