@@ -7,8 +7,7 @@
  */
 
 import assert from 'node:assert';
-import { AddressInfo, createServer } from 'node:net';
-import { loadEsmModule } from './load-esm';
+import { createServer } from 'node:net';
 import { isTTY } from './tty';
 
 function createInUseError(port: number): Error {
@@ -39,18 +38,16 @@ export async function checkPort(port: number, host: string): Promise<number> {
           return;
         }
 
-        loadEsmModule<typeof import('inquirer')>('inquirer')
-          .then(({ default: { prompt } }) =>
-            prompt({
-              type: 'confirm',
-              name: 'useDifferent',
+        import('@inquirer/confirm')
+          .then(({ default: confirm }) =>
+            confirm({
               message: `Port ${port} is already in use.\nWould you like to use a different port?`,
               default: true,
+              theme: { prefix: '' },
             }),
           )
           .then(
-            (answers) =>
-              answers.useDifferent ? resolve(checkPort(0, host)) : reject(createInUseError(port)),
+            (answer) => (answer ? resolve(checkPort(0, host)) : reject(createInUseError(port))),
             () => reject(createInUseError(port)),
           );
       })
