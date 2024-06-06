@@ -9,12 +9,11 @@
 
 // symbol polyfill must go first
 import 'symbol-observable';
-import type { logging, schema } from '@angular-devkit/core';
+import type { JsonValue, logging, schema } from '@angular-devkit/core';
 import { ProcessOutput, createConsoleLogger } from '@angular-devkit/core/node';
 import { UnsuccessfulWorkflowExecution } from '@angular-devkit/schematics';
 import { NodeWorkflow } from '@angular-devkit/schematics/tools';
 import ansiColors from 'ansi-colors';
-import type { Question, QuestionCollection } from 'inquirer';
 import { existsSync } from 'node:fs';
 import * as path from 'node:path';
 import yargsParser, { camelCase, decamelize } from 'yargs-parser';
@@ -69,71 +68,94 @@ function _listSchematics(workflow: NodeWorkflow, collectionName: string, logger:
 
 function _createPromptProvider(): schema.PromptProvider {
   return async (definitions) => {
-    const questions: QuestionCollection = definitions.map((definition) => {
-      const question: Question = {
-        name: definition.id,
-        message: definition.message,
-        default: definition.default,
-      };
+    let prompts: typeof import('@inquirer/prompts') | undefined;
+    const answers: Record<string, JsonValue> = {};
 
-      const validator = definition.validator;
-      if (validator) {
-        question.validate = (input) => validator(input);
-
-        // Filter allows transformation of the value prior to validation
-        question.filter = async (input) => {
-          for (const type of definition.propertyTypes) {
-            let value;
-            switch (type) {
-              case 'string':
-                value = String(input);
-                break;
-              case 'integer':
-              case 'number':
-                value = Number(input);
-                break;
-              default:
-                value = input;
-                break;
-            }
-            // Can be a string if validation fails
-            const isValid = (await validator(value)) === true;
-            if (isValid) {
-              return value;
-            }
-          }
-
-          return input;
-        };
-      }
+    for (const definition of definitions) {
+      // Only load prompt package if needed
+      prompts ??= await import('@inquirer/prompts');
 
       switch (definition.type) {
         case 'confirmation':
-          return { ...question, type: 'confirm' };
+          answers[definition.id] = await prompts.confirm({
+            message: definition.message,
+            default: definition.default as boolean | undefined,
+          });
+          break;
         case 'list':
-          return {
-            ...question,
-            type: definition.multiselect ? 'checkbox' : 'list',
-            choices:
-              definition.items &&
-              definition.items.map((item) => {
-                if (typeof item == 'string') {
-                  return item;
-                } else {
-                  return {
-                    name: item.label,
-                    value: item.value,
-                  };
-                }
-              }),
-          };
-        default:
-          return { ...question, type: definition.type };
-      }
-    });
-    const { default: inquirer } = await loadEsmModule<typeof import('inquirer')>('inquirer');
+          if (!definition.items?.length) {
+            continue;
+          }
 
-    return inquirer.prompt(questions);
+          const choices = definition.items?.map((item) => {
+            return typeof item == 'string'
+              ? {
+                  name: item,
+                  value: item,
+                }
+              : {
+                  name: item.label,
+                  value: item.value,
+                };
+          });
+
+          answers[definition.id] = await (
+            definition.multiselect ? prompts.checkbox : prompts.select
+          )({
+            message: definition.message,
+            default: definition.default,
+            choices,
+          });
+          break;
+        case 'input':
+          let finalValue: JsonValue | undefined;
+          answers[definition.id] = await prompts.input({
+            message: definition.message,
+            default: definition.default as string | undefined,
+            async validate(value) {
+              if (definition.validator === undefined) {
+                return true;
+              }
+
+              let lastValidation: ReturnType<typeof definition.validator> = false;
+              for (const type of definition.propertyTypes) {
+                let potential;
+                switch (type) {
+                  case 'string':
+                    potential = String(value);
+                    break;
+                  case 'integer':
+                  case 'number':
+                    potential = Number(value);
+                    break;
+                  default:
+                    potential = value;
+                    break;
+                }
+                lastValidation = await definition.validator(potential);
+
+                // Can be a string if validation fails
+                if (lastValidation === true) {
+                  finalValue = potential;
+
+                  return true;
+                }
+              }
+
+              return lastValidation;
+            },
+          });
+
+          // Use validated value if present.
+          // This ensures the correct type is inserted into the final schema options.
+          if (finalValue !== undefined) {
+            answers[definition.id] = finalValue;
+          }
+          break;
+      }
+    }
+
+    return answers;
   };
 }
 
@@ -486,30 +508,4 @@ if (require.main === module) {
     .catch((e) => {
       throw e;
     });
-}
-
-/**
- * Lazily compiled dynamic import loader function.
- */
-let load: (<T>(modulePath: string | URL) => Promise<T>) | undefined;
-
-/**
- * This uses a dynamic import to load a module which may be ESM.
- * CommonJS code can load ESM code via a dynamic import. Unfortunately, TypeScript
- * will currently, unconditionally downlevel dynamic import into a require call.
- * require calls cannot load ESM code and will result in a runtime error. To workaround
- * this, a Function constructor is used to prevent TypeScript from changing the dynamic import.
- * Once TypeScript provides support for keeping the dynamic import this workaround can
- * be dropped.
- *
- * @param modulePath The path of the module to load.
- * @returns A Promise that resolves to the dynamically imported module.
- */
-export function loadEsmModule<T>(modulePath: string | URL): Promise<T> {
-  load ??= new Function('modulePath', `return import(modulePath);`) as Exclude<
-    typeof load,
-    undefined
-  >;
-
-  return load(modulePath);
 }
