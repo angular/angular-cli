@@ -40,6 +40,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
         .content.toEqual(
           `<html><head><base href="/"><link rel="stylesheet" href="styles.css" crossorigin="use-credentials"></head>` +
             `<body><app-root></app-root>` +
+            `<script src="polyfills.js" type="module" crossorigin="use-credentials"></script>` +
             `<script src="main.js" type="module" crossorigin="use-credentials"></script></body></html>`,
         );
     });
@@ -59,6 +60,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
           `<html><head><base href="/">` +
             `<link rel="stylesheet" href="styles.css" crossorigin="anonymous"></head>` +
             `<body><app-root></app-root>` +
+            `<script src="polyfills.js" type="module" crossorigin="anonymous"></script>` +
             `<script src="main.js" type="module" crossorigin="anonymous"></script></body></html>`,
         );
     });
@@ -78,6 +80,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
           `<html><head><base href="/">` +
             `<link rel="stylesheet" href="styles.css"></head>` +
             `<body><app-root></app-root>` +
+            `<script src="polyfills.js" type="module"></script>` +
             `<script src="main.js" type="module"></script></body></html>`,
         );
     });
@@ -96,6 +99,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
           `<html><head><base href="/">` +
             `<link rel="stylesheet" href="styles.css"></head>` +
             `<body><app-root></app-root>` +
+            `<script src="polyfills.js" type="module"></script>` +
             `<script src="main.js" type="module"></script></body></html>`,
         );
     });

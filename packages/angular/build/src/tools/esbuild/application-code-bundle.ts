@@ -6,10 +6,11 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import type { BuildOptions } from 'esbuild';
+import type { BuildOptions, PartialMessage } from 'esbuild';
 import assert from 'node:assert';
 import { createHash } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
+import { createRequire } from 'node:module';
 import { extname, join } from 'node:path';
 import type { NormalizedApplicationBuildOptions } from '../../builders/application/options';
 import { allowMangle } from '../../utils/environment-options';
@@ -403,7 +404,7 @@ function getEsBuildCommonPolyfillsOptions(
     plugins: [createSourcemapIgnorelistPlugin()],
   };
 
-  const polyfills = options.polyfills ? [...options.polyfills] : [];
+  let polyfills = options.polyfills ? [...options.polyfills] : [];
 
   // Angular JIT mode requires the runtime compiler
   if (jit) {
@@ -414,6 +415,9 @@ function getEsBuildCommonPolyfillsOptions(
   // Locale data should go first so that project provided polyfill code can augment if needed.
   let needLocaleDataPlugin = false;
   if (i18nOptions.shouldInline) {
+    // Remove localize polyfill as this is not needed for build time i18n.
+    polyfills = polyfills.filter((path) => !path.startsWith('@angular/localize'));
+
     // Add locale data for all active locales
     // TODO: Inject each individually within the inlining process itself
     for (const locale of i18nOptions.inlineLocales) {
@@ -425,8 +429,36 @@ function getEsBuildCommonPolyfillsOptions(
     polyfills.unshift(`angular:locale/data:${i18nOptions.sourceLocale}`);
     needLocaleDataPlugin = true;
   }
+
   if (needLocaleDataPlugin) {
     buildOptions.plugins?.push(createAngularLocaleDataPlugin());
+  }
+
+  // Add localize polyfill if needed.
+  // TODO: remove in version 19 or later.
+  let warnings: PartialMessage[] | undefined;
+  if (!i18nOptions.shouldInline) {
+    const hasLocalizePolyfill = polyfills.some((path) => path.startsWith('@angular/localize'));
+
+    if (!hasLocalizePolyfill) {
+      const workspaceRequire = createRequire(workspaceRoot + '/');
+
+      try {
+        workspaceRequire('@angular/localize/package.json');
+        polyfills.push('@angular/localize/init');
+
+        (warnings ??= []).push({
+          text: 'Polyfill for "@angular/localize/init" was added automatically.',
+          notes: [
+            {
+              text:
+                'In the future, this functionality will be removed. ' +
+                'Please add this polyfill in the "polyfills" section of your "angular.json" instead.',
+            },
+          ],
+        });
+      } catch {}
+    }
   }
 
   if (polyfills.length === 0) {
@@ -438,40 +470,23 @@ function getEsBuildCommonPolyfillsOptions(
       namespace,
       cache: sourceFileCache?.loadResultCache,
       loadContent: async (_, build) => {
-        let hasLocalizePolyfill = false;
-        let polyfillPaths = polyfills;
+        const polyfillPaths = tryToResolvePolyfillsAsRelative
+          ? await Promise.all(
+              polyfills.map(async (path) => {
+                if (path.startsWith('zone.js') || !extname(path)) {
+                  return path;
+                }
 
-        if (tryToResolvePolyfillsAsRelative) {
-          polyfillPaths = await Promise.all(
-            polyfills.map(async (path) => {
-              hasLocalizePolyfill ||= path.startsWith('@angular/localize');
-              if (path.startsWith('zone.js') || !extname(path)) {
-                return path;
-              }
+                const potentialPathRelative = './' + path;
+                const result = await build.resolve(potentialPathRelative, {
+                  kind: 'import-statement',
+                  resolveDir: workspaceRoot,
+                });
 
-              const potentialPathRelative = './' + path;
-              const result = await build.resolve(potentialPathRelative, {
-                kind: 'import-statement',
-                resolveDir: workspaceRoot,
-              });
-
-              return result.path ? potentialPathRelative : path;
-            }),
-          );
-        } else {
-          hasLocalizePolyfill = polyfills.some((p) => p.startsWith('@angular/localize'));
-        }
-
-        if (!i18nOptions.shouldInline && !hasLocalizePolyfill) {
-          const result = await build.resolve('@angular/localize', {
-            kind: 'import-statement',
-            resolveDir: workspaceRoot,
-          });
-
-          if (result.path) {
-            polyfillPaths.push('@angular/localize/init');
-          }
-        }
+                return result.path ? potentialPathRelative : path;
+              }),
+            )
+          : polyfills;
 
         // Generate module contents with an import statement per defined polyfill
         let contents = polyfillPaths
@@ -491,6 +506,7 @@ function getEsBuildCommonPolyfillsOptions(
           contents,
           loader: 'js',
           resolveDir: workspaceRoot,
+          warnings,
         };
       },
     }),

@@ -36,6 +36,7 @@ describeBuilder(buildEsbuildBrowser, BROWSER_BUILDER_INFO, (harness) => {
         .content.toEqual(
           `<html><head><base href="/"><link rel="stylesheet" href="deployUrl/styles.css"></head>` +
             `<body><app-root></app-root>` +
+            `<script src="deployUrl/polyfills.js" type="module"></script>` +
             `<script src="deployUrl/main.js" type="module"></script></body></html>`,
         );
     });
@@ -54,6 +55,7 @@ describeBuilder(buildEsbuildBrowser, BROWSER_BUILDER_INFO, (harness) => {
         .content.toEqual(
           `<html><head><base href="/"><link rel="stylesheet" href="https://example.com/some/path/styles.css"></head>` +
             `<body><app-root></app-root>` +
+            `<script src="https://example.com/some/path/polyfills.js" type="module"></script>` +
             `<script src="https://example.com/some/path/main.js" type="module"></script></body></html>`,
         );
     });
