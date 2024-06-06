@@ -48,7 +48,7 @@ export default async function () {
         SHELL: '/bin/bash',
         HOME: home,
       },
-      'y' /* stdin: accept prompt */,
+      'y\n' /* stdin: accept prompt */,
     );
 
     if (!AUTOCOMPLETION_PROMPT.test(stdout)) {
@@ -80,7 +80,7 @@ export default async function () {
         SHELL: '/bin/bash',
         HOME: home,
       },
-      'n' /* stdin: reject prompt */,
+      'n\n' /* stdin: reject prompt */,
     );
 
     if (!AUTOCOMPLETION_PROMPT.test(stdout)) {
@@ -118,7 +118,7 @@ export default async function () {
         SHELL: '/bin/bash',
         HOME: home,
       },
-      'y' /* stdin: accept prompt */,
+      'y\n' /* stdin: accept prompt */,
     );
 
     if (!AUTOCOMPLETION_PROMPT.test(stdout1)) {
@@ -171,7 +171,7 @@ export default async function () {
         SHELL: '/bin/bash',
         HOME: home,
       },
-      'n' /* stdin: reject prompt */,
+      'n\n' /* stdin: reject prompt */,
     );
 
     if (!AUTOCOMPLETION_PROMPT.test(stdout1)) {
@@ -217,7 +217,7 @@ export default async function () {
         SHELL: '/bin/bash',
         HOME: home,
       },
-      'y' /* stdin: accept prompt */,
+      'y\n' /* stdin: accept prompt */,
     );
 
     if (!err.message.includes('Failed to append autocompletion setup')) {
@@ -237,7 +237,7 @@ export default async function () {
         SHELL: '/bin/bash',
         HOME: home,
       },
-      'y' /* stdin: accept prompt */,
+      'y\n' /* stdin: accept prompt */,
     );
 
     if (!AUTOCOMPLETION_PROMPT.test(stdout2)) {

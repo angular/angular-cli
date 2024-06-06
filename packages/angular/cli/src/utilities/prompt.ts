@@ -6,14 +6,6 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import type {
-  CheckboxChoiceOptions,
-  CheckboxQuestion,
-  ListChoiceOptions,
-  ListQuestion,
-  Question,
-} from 'inquirer';
-import { loadEsmModule } from './load-esm';
 import { isTTY } from './tty';
 
 export async function askConfirmation(
@@ -25,23 +17,21 @@ export async function askConfirmation(
     return noTTYResponse ?? defaultResponse;
   }
 
-  const question: Question = {
-    type: 'confirm',
-    name: 'confirmation',
-    prefix: '',
+  const { confirm } = await import('@inquirer/prompts');
+  const answer = await confirm({
     message,
     default: defaultResponse,
-  };
+    theme: {
+      prefix: '',
+    },
+  });
 
-  const { default: inquirer } = await loadEsmModule<typeof import('inquirer')>('inquirer');
-  const answers = await inquirer.prompt([question]);
-
-  return answers['confirmation'];
+  return answer;
 }
 
 export async function askQuestion(
   message: string,
-  choices: ListChoiceOptions[],
+  choices: { name: string; value: string | null }[],
   defaultResponseIndex: number,
   noTTYResponse: null | string,
 ): Promise<string | null> {
@@ -49,40 +39,36 @@ export async function askQuestion(
     return noTTYResponse;
   }
 
-  const question: ListQuestion = {
-    type: 'list',
-    name: 'answer',
-    prefix: '',
+  const { select } = await import('@inquirer/prompts');
+  const answer = await select({
     message,
     choices,
     default: defaultResponseIndex,
-  };
+    theme: {
+      prefix: '',
+    },
+  });
 
-  const { default: inquirer } = await loadEsmModule<typeof import('inquirer')>('inquirer');
-  const answers = await inquirer.prompt([question]);
-
-  return answers['answer'];
+  return answer;
 }
 
 export async function askChoices(
   message: string,
-  choices: CheckboxChoiceOptions[],
+  choices: { name: string; value: string }[],
   noTTYResponse: string[] | null,
 ): Promise<string[] | null> {
   if (!isTTY()) {
     return noTTYResponse;
   }
 
-  const question: CheckboxQuestion = {
-    type: 'checkbox',
-    name: 'answer',
-    prefix: '',
+  const { checkbox } = await import('@inquirer/prompts');
+  const answers = await checkbox({
     message,
     choices,
-  };
+    theme: {
+      prefix: '',
+    },
+  });
 
-  const { default: inquirer } = await loadEsmModule<typeof import('inquirer')>('inquirer');
-  const answers = await inquirer.prompt([question]);
-
-  return answers['answer'];
+  return answers;
 }

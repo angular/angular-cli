@@ -14,7 +14,7 @@ export default async function () {
         NG_FORCE_TTY: '1',
         NG_FORCE_AUTOCOMPLETE: 'false',
       },
-      'y' /* stdin */,
+      'n\n' /* stdin */,
     );
 
     if (!ANALYTICS_PROMPT.test(stdout)) {
