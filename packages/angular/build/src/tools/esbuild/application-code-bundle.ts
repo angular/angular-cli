@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import type { BuildOptions } from 'esbuild';
+import type { BuildOptions, PartialMessage } from 'esbuild';
 import assert from 'node:assert';
 import { createHash } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
@@ -403,7 +403,7 @@ function getEsBuildCommonPolyfillsOptions(
     plugins: [createSourcemapIgnorelistPlugin()],
   };
 
-  const polyfills = options.polyfills ? [...options.polyfills] : [];
+  let polyfills = options.polyfills ? [...options.polyfills] : [];
 
   // Angular JIT mode requires the runtime compiler
   if (jit) {
@@ -414,6 +414,9 @@ function getEsBuildCommonPolyfillsOptions(
   // Locale data should go first so that project provided polyfill code can augment if needed.
   let needLocaleDataPlugin = false;
   if (i18nOptions.shouldInline) {
+    // Remove localize polyfill as this is not needed for build time i18n.
+    polyfills = polyfills.filter((path) => !path.startsWith('@angular/localize'));
+
     // Add locale data for all active locales
     // TODO: Inject each individually within the inlining process itself
     for (const locale of i18nOptions.inlineLocales) {
@@ -440,6 +443,7 @@ function getEsBuildCommonPolyfillsOptions(
       loadContent: async (_, build) => {
         let hasLocalizePolyfill = false;
         let polyfillPaths = polyfills;
+        let warnings: PartialMessage[] | undefined;
 
         if (tryToResolvePolyfillsAsRelative) {
           polyfillPaths = await Promise.all(
@@ -462,6 +466,8 @@ function getEsBuildCommonPolyfillsOptions(
           hasLocalizePolyfill = polyfills.some((p) => p.startsWith('@angular/localize'));
         }
 
+        // Add localize polyfill if needed.
+        // TODO: remove in version 19 or later.
         if (!i18nOptions.shouldInline && !hasLocalizePolyfill) {
           const result = await build.resolve('@angular/localize', {
             kind: 'import-statement',
@@ -470,6 +476,17 @@ function getEsBuildCommonPolyfillsOptions(
 
           if (result.path) {
             polyfillPaths.push('@angular/localize/init');
+
+            (warnings ??= []).push({
+              text: 'Polyfill for "@angular/localize/init" was added automatically.',
+              notes: [
+                {
+                  text:
+                    'In the future, this functionality will be removed. ' +
+                    'Please add this polyfill in the "polyfills" section of your "angular.json" instead.',
+                },
+              ],
+            });
           }
         }
 
@@ -490,6 +507,7 @@ function getEsBuildCommonPolyfillsOptions(
         return {
           contents,
           loader: 'js',
+          warnings,
           resolveDir: workspaceRoot,
         };
       },
