@@ -296,10 +296,10 @@ describe('augment-index-html', () => {
         <html>
           <head>
             <base href="/">
-            <link rel="modulepreload" href="x.js">
-            <link rel="modulepreload" href="y/z.js">
           </head>
           <body>
+            <link rel="modulepreload" href="x.js">
+            <link rel="modulepreload" href="y/z.js">
           </body>
         </html>
       `);
@@ -320,10 +320,10 @@ describe('augment-index-html', () => {
         <html>
           <head>
             <base href="/">
-            <link rel="modulepreload" href="x.js">
-            <link rel="modulepreload" href="y/z.js">
           </head>
           <body>
+            <link rel="modulepreload" href="x.js">
+            <link rel="modulepreload" href="y/z.js">
           </body>
         </html>
       `);

@@ -133,7 +133,8 @@ export async function augmentIndexHtml(
     scriptTags.push(`<script ${attrs.join(' ')}></script>`);
   }
 
-  let linkTags: string[] = [];
+  let headerLinkTags: string[] = [];
+  let bodyLinkTags: string[] = [];
   for (const src of stylesheets) {
     const attrs = [`rel="stylesheet"`, `href="${deployUrl}${src}"`];
 
@@ -146,7 +147,7 @@ export async function augmentIndexHtml(
       attrs.push(generateSriAttributes(content));
     }
 
-    linkTags.push(`<link ${attrs.join(' ')}>`);
+    headerLinkTags.push(`<link ${attrs.join(' ')}>`);
   }
 
   if (params.hints?.length) {
@@ -182,7 +183,14 @@ export async function augmentIndexHtml(
         attrs.push(generateSriAttributes(content));
       }
 
-      linkTags.push(`<link ${attrs.join(' ')}>`);
+      const tag = `<link ${attrs.join(' ')}>`;
+      if (hint.mode === 'modulepreload') {
+        // Module preloads should be placed by the inserted script elements in the body since
+        // they are only useful in combination with the scripts.
+        bodyLinkTags.push(tag);
+      } else {
+        headerLinkTags.push(tag);
+      }
     }
   }
 
@@ -240,7 +248,7 @@ export async function augmentIndexHtml(
     .on('endTag', (tag) => {
       switch (tag.tagName) {
         case 'head':
-          for (const linkTag of linkTags) {
+          for (const linkTag of headerLinkTags) {
             rewriter.emitRaw(linkTag);
           }
           if (imageDomains) {
@@ -250,9 +258,14 @@ export async function augmentIndexHtml(
               }
             }
           }
-          linkTags = [];
+          headerLinkTags = [];
           break;
         case 'body':
+          for (const linkTag of bodyLinkTags) {
+            rewriter.emitRaw(linkTag);
+          }
+          bodyLinkTags = [];
+
           // Add script tags
           for (const scriptTag of scriptTags) {
             rewriter.emitRaw(scriptTag);
@@ -269,9 +282,9 @@ export async function augmentIndexHtml(
 
   return {
     content:
-      linkTags.length || scriptTags.length
+      headerLinkTags.length || scriptTags.length
         ? // In case no body/head tags are not present (dotnet partial templates)
-          linkTags.join('') + scriptTags.join('') + content
+          headerLinkTags.join('') + scriptTags.join('') + content
         : content,
     warnings,
     errors,
