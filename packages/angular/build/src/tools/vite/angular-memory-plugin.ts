@@ -14,13 +14,14 @@ import { ServerResponse } from 'node:http';
 import { dirname, extname, join, relative } from 'node:path';
 import type { Connect, Plugin } from 'vite';
 import { renderPage } from '../../utils/server-rendering/render-page';
+import { loadEsmModuleFromMemory } from '../../utils/server-rendering/load-esm-from-memory';
 
 export interface AngularMemoryPluginOptions {
   workspaceRoot: string;
   virtualProjectRoot: string;
   outputFiles: Map<string, { contents: Uint8Array; servable: boolean }>;
   assets: Map<string, string>;
-  ssr: boolean;
+  ssr: boolean | {entry: string, providers: string};
   external?: string[];
   extensionMiddleware?: Connect.NextHandleFunction[];
   extraHeaders?: Record<string, string>;
@@ -221,6 +222,18 @@ export function createAngularMemoryPlugin(options: AngularMemoryPluginOptions): 
           transformIndexHtmlAndAddHeaders(req.url, rawHtml, res, next, async (html) => {
             const resolvedUrls = server.resolvedUrls;
             const baseUrl = resolvedUrls?.local[0] ?? resolvedUrls?.network[0];
+            const providers: [] = [];
+            if (ssr && typeof ssr === 'object' && ssr.providers){
+              const providersModule = await server.ssrLoadModule('/providers.mjs')
+              if (providersModule &&  providersModule.default) {
+                try {
+                  const result = providersModule.default(req, res)
+                  if (result && Array.isArray(result)) providers.push(...result as [])
+                } catch (e) {
+                  throw new Error('Should be export default function which return array of provider')
+                }
+              }
+            }
 
             const { content } = await renderPage({
               document: html,
@@ -233,6 +246,7 @@ export function createAngularMemoryPlugin(options: AngularMemoryPluginOptions): 
               outputFiles: {},
               // TODO: add support for critical css inlining.
               inlineCriticalCss: false,
+              providers
             });
 
             return indexHtmlTransformer && content ? await indexHtmlTransformer(content) : content;

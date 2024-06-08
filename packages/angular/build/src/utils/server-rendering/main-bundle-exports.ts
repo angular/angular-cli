@@ -6,13 +6,18 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import type { ApplicationRef, Type, ɵConsole } from '@angular/core';
+import type { ApplicationRef, Type, ɵConsole, ApplicationConfig } from '@angular/core';
 import type { renderApplication, renderModule, ɵSERVER_CONTEXT } from '@angular/platform-server';
 import type { extractRoutes } from '../routes-extractor/extractor';
+import type { ServerResponse } from 'node:http';
 
 export interface MainServerBundleExports {
   /** Standalone application bootstrapping function. */
   default: (() => Promise<ApplicationRef>) | Type<unknown>;
+}
+
+export interface MainProvidersBundleExports {
+  default: <Req, Res>(req: Req, res: Res) => ApplicationConfig['providers'];
 }
 
 export interface RenderUtilsServerBundleExports {

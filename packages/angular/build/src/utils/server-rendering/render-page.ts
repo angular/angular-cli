@@ -20,6 +20,7 @@ export interface RenderOptions {
   inlineCriticalCss?: boolean;
   loadBundle?: ((path: './main.server.mjs') => Promise<MainServerBundleExports>) &
     ((path: './render-utils.server.mjs') => Promise<RenderUtilsServerBundleExports>);
+  providers: StaticProvider[]
 }
 
 export interface RenderResult {
@@ -40,6 +41,7 @@ export async function renderPage({
   inlineCriticalCss,
   outputFiles,
   loadBundle = loadEsmModuleFromMemory,
+  providers
 }: RenderOptions): Promise<RenderResult> {
   const { default: bootstrapAppFnOrModule } = await loadBundle('./main.server.mjs');
   const { ɵSERVER_CONTEXT, renderModule, renderApplication, ɵresetCompiledComponents, ɵConsole } =
@@ -71,6 +73,7 @@ export async function renderPage({
         return new Console();
       },
     },
+    ...providers
   ];
 
   assert(

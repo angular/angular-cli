@@ -8,11 +8,18 @@
 
 import { assertIsError } from '../error';
 import { loadEsmModule } from '../load-esm';
-import { MainServerBundleExports, RenderUtilsServerBundleExports } from './main-bundle-exports';
+import {
+  MainProvidersBundleExports,
+  MainServerBundleExports,
+  RenderUtilsServerBundleExports
+} from './main-bundle-exports';
 
 export function loadEsmModuleFromMemory(
   path: './main.server.mjs',
 ): Promise<MainServerBundleExports>;
+export function loadEsmModuleFromMemory(
+  path: './providers.mjs',
+): Promise<MainProvidersBundleExports>;
 export function loadEsmModuleFromMemory(
   path: './render-utils.server.mjs',
 ): Promise<RenderUtilsServerBundleExports>;

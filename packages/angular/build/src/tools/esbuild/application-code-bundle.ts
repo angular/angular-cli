@@ -185,6 +185,10 @@ export function createServerCodeBundleOptions(
   if (ssrEntryPoint) {
     entryPoints['server'] = ssrEntryPoint;
   }
+  const providersEntryPoint = ssrOptions?.providers;
+  if (providersEntryPoint) {
+    entryPoints['providers'] = providersEntryPoint;
+  }
 
   const buildOptions: BuildOptions = {
     ...getEsBuildCommonOptions(options),

@@ -94,7 +94,6 @@ export async function* serveWithVite(
     browserOptions.prerender = false;
 
     // Avoid bundling and processing the ssr entry-point as this is not used by the dev-server.
-    browserOptions.ssr = true;
 
     // https://nodejs.org/api/process.html#processsetsourcemapsenabledval
     process.setSourceMapsEnabled(true);
@@ -286,7 +285,7 @@ export async function* serveWithVite(
         assetFiles,
         browserOptions.preserveSymlinks,
         externalMetadata,
-        !!browserOptions.ssr,
+        browserOptions.ssr,
         prebundleTransformer,
         target,
         isZonelessApp(polyfills),
@@ -465,7 +464,7 @@ export async function setupServer(
   assets: Map<string, string>,
   preserveSymlinks: boolean | undefined,
   externalMetadata: ExternalResultMetadata,
-  ssr: boolean,
+  ssr: boolean | {   entry: string;   providers: string; },
   prebundleTransformer: JavaScriptTransformer,
   target: string[],
   zoneless: boolean,
