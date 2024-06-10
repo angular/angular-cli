@@ -7,10 +7,10 @@
  */
 
 import { logging } from '@angular-devkit/core';
-import { format } from 'util';
+import { format, stripVTControlCharacters } from 'node:util';
 import { CommandModuleError } from '../../src/command-builder/command-module';
 import { runCommand } from '../../src/command-builder/command-runner';
-import { colors, removeColor } from '../../src/utilities/color';
+import { colors } from '../../src/utilities/color';
 import { ngDebug } from '../../src/utilities/environment-options';
 import { writeErrorToLogFile } from '../../src/utilities/log-file';
 
@@ -51,7 +51,7 @@ export default async function (options: { cliArgs: string[] }) {
       return;
     }
 
-    const color = colors.enabled ? colorLevels[entry.level] : removeColor;
+    const color = colors.enabled ? colorLevels[entry.level] : stripVTControlCharacters;
     const message = color(entry.message);
 
     switch (entry.level) {
