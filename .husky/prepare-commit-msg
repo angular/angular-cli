@@ -1,1 +1,1 @@
-yarn -s ng-dev commit-message restore-commit-message-draft $1 $2;
+yarn ng-dev commit-message restore-commit-message-draft $1 $2;

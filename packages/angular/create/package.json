@@ -9,9 +9,7 @@
     "code generation",
     "schematics"
   ],
-  "bin": {
-    "create": "./src/index.js"
-  },
+  "bin": "./src/index.js",
   "dependencies": {
     "@angular/cli": "0.0.0-PLACEHOLDER"
   }

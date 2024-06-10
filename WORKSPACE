@@ -111,8 +111,8 @@ load("@build_bazel_rules_nodejs//:index.bzl", "yarn_install")
 yarn_install(
     name = "npm",
     data = [
-        "//:.yarn/releases/yarn-1.22.17.cjs",
-        "//:.yarnrc",
+        "//:.yarn/releases/yarn-4.2.2.cjs",
+        "//:.yarnrc.yml",
         "//:tools/postinstall/patches/@angular+bazel+17.0.0-next.1.patch",
         "//:tools/postinstall/patches/@bazel+concatjs+5.8.1.patch",
     ],
@@ -124,7 +124,7 @@ yarn_install(
     # We prefer to symlink the `node_modules` to only maintain a single install.
     # See https://github.com/angular/dev-infra/pull/446#issuecomment-1059820287 for details.
     symlink_node_modules = True,
-    yarn = "//:.yarn/releases/yarn-1.22.17.cjs",
+    yarn = "//:.yarn/releases/yarn-4.2.2.cjs",
     yarn_lock = "//:yarn.lock",
 )
 
