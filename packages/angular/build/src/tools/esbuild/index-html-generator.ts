@@ -16,7 +16,7 @@ import { BuildOutputFile, BuildOutputFileType, InitialFileRecord } from './bundl
  * The maximum number of module preload link elements that should be added for
  * initial scripts.
  */
-const MODULE_PRELOAD_MAX = 3;
+const MODULE_PRELOAD_MAX = 10;
 
 export async function generateIndexHtml(
   initialFiles: Map<string, InitialFileRecord>,
@@ -45,27 +45,25 @@ export async function generateIndexHtml(
   assert(indexHtmlOptions, 'indexHtmlOptions cannot be undefined.');
 
   if (!externalPackages && indexHtmlOptions.preloadInitial) {
-    let modulePreloadCount = 0;
+    const modulePreloads = [];
     for (const [key, value] of initialFiles) {
       if (value.entrypoint || value.serverFile) {
         // Entry points are already referenced in the HTML
         continue;
       }
 
-      // Only add shallow preloads
-      if (value.depth > 1) {
-        continue;
-      }
-
-      if (value.type === 'script' && modulePreloadCount < MODULE_PRELOAD_MAX) {
-        modulePreloadCount++;
-        hints.push({ url: key, mode: 'modulepreload' as const });
+      if (value.type === 'script') {
+        modulePreloads.push({ url: key, mode: 'modulepreload' as const, depth: value.depth });
       } else if (value.type === 'style') {
         // Provide an "as" value of "style" to ensure external URLs which may not have a
         // file extension are treated as stylesheets.
         hints.push({ url: key, mode: 'preload' as const, as: 'style' });
       }
     }
+
+    // Limit the number of module preloads with smallest depth given priority
+    modulePreloads.sort((a, b) => a.depth - b.depth);
+    hints.push(...modulePreloads.slice(0, MODULE_PRELOAD_MAX));
   }
 
   /** Virtual output path to support reading in-memory files. */
