@@ -18,7 +18,7 @@
     "lint": "eslint --cache --max-warnings=0 \"**/*.@(ts|mts|cts)\"",
     "templates": "yarn admin templates",
     "validate": "yarn admin validate",
-    "postinstall": "yarn webdriver-update && yarn husky && patch-package --patch-dir tools/postinstall/patches",
+    "postinstall": "yarn webdriver-update && yarn husky",
     "//webdriver-update-README": "ChromeDriver version must match Puppeteer Chromium version, see https://github.com/GoogleChrome/puppeteer/releases http://chromedriver.chromium.org/downloads",
     "webdriver-update": "webdriver-manager update --standalone false --gecko false --versions.chrome 106.0.5249.21",
     "public-api:check": "node goldens/public-api/manage.js test",
@@ -53,7 +53,7 @@
   "devDependencies": {
     "@ampproject/remapping": "2.3.0",
     "@angular/animations": "18.1.0-next.1",
-    "@angular/bazel": "https://github.com/angular/bazel-builds.git#71bd2e043e076365effdb6076f33b2d8d6bd6d02",
+    "@angular/bazel": "patch:@angular/bazel@https%3A//github.com/angular/bazel-builds.git%23commit=71bd2e043e076365effdb6076f33b2d8d6bd6d02#~/.yarn/patches/@angular-bazel-https-9848736cf4.patch",
     "@angular/build-tooling": "https://github.com/angular/dev-infra-private-build-tooling-builds.git#5e30807f0fc6f1f00b2ac9186bd5f704b72e6ea6",
     "@angular/cdk": "18.0.2",
     "@angular/common": "18.1.0-next.1",
@@ -80,9 +80,9 @@
     "@babel/runtime": "7.24.7",
     "@bazel/bazelisk": "1.19.0",
     "@bazel/buildifier": "7.1.2",
-    "@bazel/concatjs": "5.8.1",
+    "@bazel/concatjs": "patch:@bazel/concatjs@npm%3A5.8.1#~/.yarn/patches/@bazel-concatjs-npm-5.8.1-1bf81df846.patch",
     "@bazel/esbuild": "5.8.1",
-    "@bazel/jasmine": "5.8.1",
+    "@bazel/jasmine": "patch:@bazel/jasmine@npm%3A5.8.1#~/.yarn/patches/@bazel-jasmine-npm-5.8.1-3370fee155.patch",
     "@discoveryjs/json-ext": "0.5.7",
     "@inquirer/confirm": "3.1.9",
     "@inquirer/prompts": "5.0.5",
@@ -170,7 +170,6 @@
     "ora": "5.4.1",
     "pacote": "18.0.6",
     "parse5-html-rewriting-stream": "7.0.0",
-    "patch-package": "^7.0.1",
     "picomatch": "4.0.2",
     "piscina": "4.5.1",
     "postcss": "8.4.38",
@@ -210,5 +209,8 @@
     "yargs": "17.7.2",
     "yargs-parser": "21.1.1",
     "zone.js": "^0.14.0"
+  },
+  "resolutions": {
+    "@bazel/concatjs@npm:5.8.1": "patch:@bazel/concatjs@npm%3A5.8.1#~/.yarn/patches/@bazel-concatjs-npm-5.8.1-1bf81df846.patch"
   }
 }
