@@ -96,67 +96,21 @@ export interface StylesheetLanguage {
 const postcssProcessors = new Map<string, WeakRef<PostcssProcessor>>();
 
 export class StylesheetPluginFactory {
-  private postcssProcessor?: PostcssProcessor;
-
   constructor(
     private readonly options: StylesheetPluginOptions,
     private readonly cache?: LoadResultCache,
   ) {}
 
   create(language: Readonly<StylesheetLanguage>): Plugin {
+    const { cache, options, setupPostcss } = this;
+
     // Return a noop plugin if no load actions are required
-    if (
-      !language.process &&
-      !this.options.postcssConfiguration &&
-      !this.options.tailwindConfiguration
-    ) {
+    if (!language.process && !options.postcssConfiguration && !options.tailwindConfiguration) {
       return {
         name: 'angular-' + language.name,
         setup() {},
       };
     }
-
-    const { cache, options } = this;
-    const setupPostcss = async () => {
-      // Return already created processor if present
-      if (this.postcssProcessor) {
-        return this.postcssProcessor;
-      }
-
-      if (options.postcssConfiguration) {
-        const postCssInstanceKey = JSON.stringify(options.postcssConfiguration);
-
-        this.postcssProcessor = postcssProcessors.get(postCssInstanceKey)?.deref();
-
-        if (!this.postcssProcessor) {
-          postcss ??= (await import('postcss')).default;
-          this.postcssProcessor = postcss();
-
-          for (const [pluginName, pluginOptions] of options.postcssConfiguration.plugins) {
-            const { default: plugin } = await import(pluginName);
-            if (typeof plugin !== 'function' || plugin.postcss !== true) {
-              throw new Error(`Attempted to load invalid Postcss plugin: "${pluginName}"`);
-            }
-            this.postcssProcessor.use(plugin(pluginOptions));
-          }
-
-          postcssProcessors.set(postCssInstanceKey, new WeakRef(this.postcssProcessor));
-        }
-      } else if (options.tailwindConfiguration) {
-        const { package: tailwindPackage, file: config } = options.tailwindConfiguration;
-        const postCssInstanceKey = tailwindPackage + ':' + config;
-        this.postcssProcessor = postcssProcessors.get(postCssInstanceKey)?.deref();
-
-        if (!this.postcssProcessor) {
-          postcss ??= (await import('postcss')).default;
-          const tailwind = await import(tailwindPackage);
-          this.postcssProcessor = postcss().use(tailwind.default({ config }));
-          postcssProcessors.set(postCssInstanceKey, new WeakRef(this.postcssProcessor));
-        }
-      }
-
-      return this.postcssProcessor;
-    };
 
     return {
       name: 'angular-' + language.name,
@@ -165,7 +119,7 @@ export class StylesheetPluginFactory {
         let postcssProcessor: PostcssProcessor | undefined;
         build.onStart(async () => {
           try {
-            postcssProcessor = await setupPostcss();
+            postcssProcessor = await setupPostcss;
           } catch {
             return {
               errors: [
@@ -228,6 +182,56 @@ export class StylesheetPluginFactory {
         );
       },
     };
+  }
+
+  private setupPostcssPromise: Promise<PostcssProcessor | undefined> | undefined;
+  private get setupPostcss(): Promise<PostcssProcessor | undefined> {
+    return (this.setupPostcssPromise ??= this.initPostcss());
+  }
+
+  private initPostcssCallCount = 0;
+  /**
+   * This method should not be called directly.
+   * Use {@link setupPostcss} instead.
+   */
+  private async initPostcss(): Promise<PostcssProcessor | undefined> {
+    assert.equal(++this.initPostcssCallCount, 1, '`initPostcss` was called more than once.');
+
+    const { options } = this;
+    if (options.postcssConfiguration) {
+      const postCssInstanceKey = JSON.stringify(options.postcssConfiguration);
+      let postcssProcessor = postcssProcessors.get(postCssInstanceKey)?.deref();
+
+      if (!postcssProcessor) {
+        postcss ??= (await import('postcss')).default;
+        postcssProcessor = postcss();
+        for (const [pluginName, pluginOptions] of options.postcssConfiguration.plugins) {
+          const { default: plugin } = await import(pluginName);
+          if (typeof plugin !== 'function' || plugin.postcss !== true) {
+            throw new Error(`Attempted to load invalid Postcss plugin: "${pluginName}"`);
+          }
+
+          postcssProcessor.use(plugin(pluginOptions));
+        }
+
+        postcssProcessors.set(postCssInstanceKey, new WeakRef(postcssProcessor));
+      }
+
+      return postcssProcessor;
+    } else if (options.tailwindConfiguration) {
+      const { package: tailwindPackage, file: config } = options.tailwindConfiguration;
+      const postCssInstanceKey = tailwindPackage + ':' + config;
+      let postcssProcessor = postcssProcessors.get(postCssInstanceKey)?.deref();
+
+      if (!postcssProcessor) {
+        postcss ??= (await import('postcss')).default;
+        const tailwind = await import(tailwindPackage);
+        postcssProcessor = postcss().use(tailwind.default({ config }));
+        postcssProcessors.set(postCssInstanceKey, new WeakRef(postcssProcessor));
+      }
+
+      return postcssProcessor;
+    }
   }
 }
 
