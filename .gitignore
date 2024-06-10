@@ -4,6 +4,14 @@ test-project-host-*
 dist/
 dist-schema/
 
+# Yarn
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+
 # IDEs
 jsconfig.json
 

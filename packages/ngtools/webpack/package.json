@@ -20,7 +20,6 @@
     "url": "https://github.com/angular/angular-cli/issues"
   },
   "homepage": "https://github.com/angular/angular-cli/tree/main/packages/ngtools/webpack",
-  "dependencies": {},
   "peerDependencies": {
     "@angular/compiler-cli": "^18.0.0 || ^18.1.0-next.0",
     "typescript": ">=5.4 <5.6",

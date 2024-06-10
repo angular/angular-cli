@@ -41,7 +41,7 @@ jobs:
           path: .eslintcache
           key: ${{ runner.os }}-${{ hashFiles('.eslintrc.json') }}
       - name: Install node modules
-        run: yarn install --frozen-lockfile --ignore-scripts
+        run: yarn install --immutable
       - name: Run ESLint
         run: yarn lint --cache-strategy content
       - name: Validate NgBot Configuration
@@ -49,13 +49,13 @@ jobs:
       - name: Validate Circular Dependencies
         run: yarn ts-circular-deps check
       - name: Run Validation
-        run: yarn -s admin validate
+        run: yarn admin validate
       - name: Check Package Licenses
         uses: actions/dependency-review-action@72eb03d02c7872a771aacd928f3123ac62ad6d3a # v4.3.3
         with:
           config-file: './.github/dependency-review-config.yml'
       - name: Check tooling setup
-        run: yarn -s check-tooling-setup
+        run: yarn check-tooling-setup
       - name: Check commit message
         # Commit message validation is only done on pull requests as its too late to validate once
         # it has been merged.
@@ -75,7 +75,7 @@ jobs:
       - name: Setup Bazel RBE
         uses: angular/dev-infra/github-actions/bazel/configure-remote@03b8a7dffd1205e061f0bee949024ebefc2a6592
       - name: Install node modules
-        run: yarn install --frozen-lockfile
+        run: yarn install --immutable
       - name: Build release targets
         run: yarn ng-dev release build
       - name: Store PR release packages
@@ -95,7 +95,7 @@ jobs:
       - name: Setup Bazel RBE
         uses: angular/dev-infra/github-actions/bazel/configure-remote@03b8a7dffd1205e061f0bee949024ebefc2a6592
       - name: Install node modules
-        run: yarn install --frozen-lockfile
+        run: yarn install --immutable
       - name: Run module tests
         run: yarn bazel test //modules/...
       - name: Run package tests
@@ -130,7 +130,7 @@ jobs:
       - name: Initialize environment
         uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@03b8a7dffd1205e061f0bee949024ebefc2a6592
       - name: Install node modules
-        run: yarn install --frozen-lockfile
+        run: yarn install --immutable
       - name: Setup Bazel
         uses: angular/dev-infra/github-actions/bazel/setup@03b8a7dffd1205e061f0bee949024ebefc2a6592
       - name: Setup Bazel RBE
@@ -153,7 +153,7 @@ jobs:
       - name: Initialize environment
         uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@03b8a7dffd1205e061f0bee949024ebefc2a6592
       - name: Install node modules
-        run: yarn install --frozen-lockfile
+        run: yarn install --immutable
       - name: Setup Bazel
         uses: angular/dev-infra/github-actions/bazel/setup@03b8a7dffd1205e061f0bee949024ebefc2a6592
       - name: Setup Bazel RBE

@@ -14,7 +14,7 @@ import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const baseDir = resolve(`${__dirname}/..`);
-const bazelCmd = process.env.BAZEL ?? `yarn --cwd "${baseDir}" --silent bazel`;
+const bazelCmd = process.env.BAZEL ?? `yarn --cwd "${baseDir}" bazel`;
 const distRoot = join(baseDir, '/dist');
 
 type BuildMode = 'local' | 'snapshot' | 'release';
