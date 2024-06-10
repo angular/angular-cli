@@ -3,6 +3,14 @@
 set -x -u -e -o pipefail
 
 readonly currentDir=$(cd $(dirname $0); pwd)
+readonly connectVersion="sc-4.9.2-linux"
+readonly connectHash="2f8a3f87e1da4dc9a41bc45ec7c3a2ecdba4c72d72b7d0193f04ad66c5809104"
+
+echo "Downloading Sauce Connect"
+
+curl https://saucelabs.com/downloads/${connectVersion}.tar.gz -o ${currentDir}/${connectVersion}.tar.gz
+echo "${connectHash}  ${currentDir}/${connectVersion}.tar.gz" | shasum -a 256 -c
+tar -xzf ${currentDir}/${connectVersion}.tar.gz -C ${currentDir}
 
 # Command arguments that will be passed to sauce-connect. By default we disable SSL bumping for
 # all requests. This is because SSL bumping is not needed for our test setup and in order
@@ -29,4 +37,4 @@ fi
 
 echo "Starting Sauce Connect. Passed arguments: ${sauceArgs}"
 
-${currentDir}/../../node_modules/sauce-connect-proxy/bin/sc -u ${SAUCE_USERNAME} -k ${SAUCE_ACCESS_KEY} ${sauceArgs}
+${currentDir}/${connectVersion}/bin/sc -u ${SAUCE_USERNAME} -k ${SAUCE_ACCESS_KEY} ${sauceArgs}
