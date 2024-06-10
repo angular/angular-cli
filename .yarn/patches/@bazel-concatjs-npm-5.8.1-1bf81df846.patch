@@ -1,7 +1,7 @@
-diff --git a/node_modules/@bazel/concatjs/internal/build_defs.bzl b/node_modules/@bazel/concatjs/internal/build_defs.bzl
-index 9e5cda6..6c45196 100755
---- a/node_modules/@bazel/concatjs/internal/build_defs.bzl
-+++ b/node_modules/@bazel/concatjs/internal/build_defs.bzl
+diff --git a/internal/build_defs.bzl b/internal/build_defs.bzl
+index 9e5cda684f0456b61d1b6c0f9c56ae021594713f..6c45196bda5880531d32618dfca0dee44c035cb9 100755
+--- a/internal/build_defs.bzl
++++ b/internal/build_defs.bzl
 @@ -76,7 +76,7 @@ _TYPESCRIPT_TYPINGS = Label(
      "//typescript:typescript__typings",
  )
@@ -11,10 +11,10 @@ index 9e5cda6..6c45196 100755
  _TYPESCRIPT_MODULE_KINDS = ["none", "commonjs", "amd", "umd", "system", "es2015", "esnext"]
  
  _DEVMODE_TARGET_DEFAULT = "es2015"
-diff --git a/node_modules/@bazel/concatjs/internal/common/tsconfig.bzl b/node_modules/@bazel/concatjs/internal/common/tsconfig.bzl
-index b01c999..ec3e4cc 100755
---- a/node_modules/@bazel/concatjs/internal/common/tsconfig.bzl
-+++ b/node_modules/@bazel/concatjs/internal/common/tsconfig.bzl
+diff --git a/internal/common/tsconfig.bzl b/internal/common/tsconfig.bzl
+index b01c999f5e02b388f51a508b0b608cf69db9b664..ec3e4ccb321fa230546e34c1c2ea87f7457fa108 100755
+--- a/internal/common/tsconfig.bzl
++++ b/internal/common/tsconfig.bzl
 @@ -278,11 +278,6 @@ def create_tsconfig(
          "declarationDir": "/".join([workspace_path, outdir_path]),
          "stripInternal": True,

@@ -111,10 +111,11 @@ load("@build_bazel_rules_nodejs//:index.bzl", "yarn_install")
 yarn_install(
     name = "npm",
     data = [
+        "//:.yarn/patches/@angular-bazel-https-9848736cf4.patch",
+        "//:.yarn/patches/@bazel-concatjs-npm-5.8.1-1bf81df846.patch",
+        "//:.yarn/patches/@bazel-jasmine-npm-5.8.1-3370fee155.patch",
         "//:.yarn/releases/yarn-4.2.2.cjs",
         "//:.yarnrc.yml",
-        "//:tools/postinstall/patches/@angular+bazel+17.0.0-next.1.patch",
-        "//:tools/postinstall/patches/@bazel+concatjs+5.8.1.patch",
     ],
     # Currently disabled due to:
     #  1. Missing Windows support currently.

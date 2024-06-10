@@ -260,7 +260,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@angular/bazel@https://github.com/angular/bazel-builds.git#71bd2e043e076365effdb6076f33b2d8d6bd6d02":
+"@angular/bazel@https://github.com/angular/bazel-builds.git#commit=71bd2e043e076365effdb6076f33b2d8d6bd6d02":
   version: 18.1.0-next.0+sha-1360110
   resolution: "@angular/bazel@https://github.com/angular/bazel-builds.git#commit=71bd2e043e076365effdb6076f33b2d8d6bd6d02"
   dependencies:
@@ -286,6 +286,35 @@ __metadata:
     types_bundler: ./src/types_bundle/index.mjs
     xi18n: ./src/ngc-wrapped/extract_i18n.mjs
   checksum: 10c0/4bf890149557811d1954c4851d14090a74cb479dccdabf53ce2fc7892456a8f8e28fc969dbb2f19de6f706289d0ee47b4bf11a58941fee525004beb1f609e957
+  languageName: node
+  linkType: hard
+
+"@angular/bazel@patch:@angular/bazel@https%3A//github.com/angular/bazel-builds.git%23commit=71bd2e043e076365effdb6076f33b2d8d6bd6d02#~/.yarn/patches/@angular-bazel-https-9848736cf4.patch":
+  version: 18.1.0-next.0+sha-1360110
+  resolution: "@angular/bazel@patch:@angular/bazel@https%3A//github.com/angular/bazel-builds.git%23commit=71bd2e043e076365effdb6076f33b2d8d6bd6d02#~/.yarn/patches/@angular-bazel-https-9848736cf4.patch::version=18.1.0-next.0%2Bsha-1360110&hash=f67b3e"
+  dependencies:
+    "@microsoft/api-extractor": "npm:^7.24.2"
+    magic-string: "npm:^0.30.0"
+    tslib: "npm:^2.3.0"
+  peerDependencies:
+    "@angular/compiler-cli": 18.1.0-next.0+sha-1360110
+    "@bazel/concatjs": ^5.3.0
+    "@bazel/worker": ^5.3.0
+    "@rollup/plugin-commonjs": ^25.0.0
+    "@rollup/plugin-node-resolve": ^13.0.4
+    rollup: ^2.56.3
+    rollup-plugin-sourcemaps: ^0.6.3
+    terser: ^5.9.0
+    typescript: ">=5.4 <5.5"
+  peerDependenciesMeta:
+    terser:
+      optional: true
+  bin:
+    ngc-wrapped: ./src/ngc-wrapped/index.mjs
+    packager: ./src/ng_package/packager.mjs
+    types_bundler: ./src/types_bundle/index.mjs
+    xi18n: ./src/ngc-wrapped/extract_i18n.mjs
+  checksum: 10c0/b79b1b6692f06eeebfabb95779c88fb4f2070b6152477a4b0ef7e6e3c09255cedfa7fb3d786d6016cb6a2a23c563e77839d662e0e793198ec0b48f5e4ad9d11d
   languageName: node
   linkType: hard
 
@@ -591,7 +620,7 @@ __metadata:
   dependencies:
     "@ampproject/remapping": "npm:2.3.0"
     "@angular/animations": "npm:18.1.0-next.1"
-    "@angular/bazel": "https://github.com/angular/bazel-builds.git#71bd2e043e076365effdb6076f33b2d8d6bd6d02"
+    "@angular/bazel": "patch:@angular/bazel@https%3A//github.com/angular/bazel-builds.git%23commit=71bd2e043e076365effdb6076f33b2d8d6bd6d02#~/.yarn/patches/@angular-bazel-https-9848736cf4.patch"
     "@angular/build-tooling": "https://github.com/angular/dev-infra-private-build-tooling-builds.git#5e30807f0fc6f1f00b2ac9186bd5f704b72e6ea6"
     "@angular/cdk": "npm:18.0.2"
     "@angular/common": "npm:18.1.0-next.1"
@@ -618,9 +647,9 @@ __metadata:
     "@babel/runtime": "npm:7.24.7"
     "@bazel/bazelisk": "npm:1.19.0"
     "@bazel/buildifier": "npm:7.1.2"
-    "@bazel/concatjs": "npm:5.8.1"
+    "@bazel/concatjs": "patch:@bazel/concatjs@npm%3A5.8.1#~/.yarn/patches/@bazel-concatjs-npm-5.8.1-1bf81df846.patch"
     "@bazel/esbuild": "npm:5.8.1"
-    "@bazel/jasmine": "npm:5.8.1"
+    "@bazel/jasmine": "patch:@bazel/jasmine@npm%3A5.8.1#~/.yarn/patches/@bazel-jasmine-npm-5.8.1-3370fee155.patch"
     "@discoveryjs/json-ext": "npm:0.5.7"
     "@inquirer/confirm": "npm:3.1.9"
     "@inquirer/prompts": "npm:5.0.5"
@@ -708,7 +737,6 @@ __metadata:
     ora: "npm:5.4.1"
     pacote: "npm:18.0.6"
     parse5-html-rewriting-stream: "npm:7.0.0"
-    patch-package: "npm:^7.0.1"
     picomatch: "npm:4.0.2"
     piscina: "npm:4.5.1"
     postcss: "npm:8.4.38"
@@ -2682,6 +2710,27 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@bazel/concatjs@patch:@bazel/concatjs@npm%3A5.8.1#~/.yarn/patches/@bazel-concatjs-npm-5.8.1-1bf81df846.patch":
+  version: 5.8.1
+  resolution: "@bazel/concatjs@patch:@bazel/concatjs@npm%3A5.8.1#~/.yarn/patches/@bazel-concatjs-npm-5.8.1-1bf81df846.patch::version=5.8.1&hash=ed928c"
+  dependencies:
+    protobufjs: "npm:6.8.8"
+    source-map-support: "npm:0.5.9"
+    tsutils: "npm:3.21.0"
+  peerDependencies:
+    karma: ">=4.0.0"
+    karma-chrome-launcher: ">=2.0.0"
+    karma-firefox-launcher: ">=1.0.0"
+    karma-jasmine: ">=2.0.0"
+    karma-junit-reporter: ">=2.0.0"
+    karma-requirejs: ">=1.0.0"
+    karma-sourcemap-loader: ">=0.3.0"
+  bin:
+    tsc_wrapped: internal/tsc_wrapped/tsc_wrapped.js
+  checksum: 10c0/8c1c2b0912c72f3bd768d04fc612df5c5341969374fd4f285a5c3c222072c78f622c0d0d312e26cf6f3821b9ab82e70accfec2b141bc75931ab8ec4366f7a2eb
+  languageName: node
+  linkType: hard
+
 "@bazel/esbuild@npm:5.8.1":
   version: 5.8.1
   resolution: "@bazel/esbuild@npm:5.8.1"
@@ -2701,6 +2750,21 @@ __metadata:
   bin:
     bazel-jasmine-runner: jasmine_runner.js
   checksum: 10c0/24220ee9336a511f5ba9787bb1da021e3f92d9e0cdde0581cb13db06d05d4716e6a408eca671f10242aa139a9b3ef04a02e3f3d2cf96266c4c1dc36dc262a999
+  languageName: node
+  linkType: hard
+
+"@bazel/jasmine@patch:@bazel/jasmine@npm%3A5.8.1#~/.yarn/patches/@bazel-jasmine-npm-5.8.1-3370fee155.patch":
+  version: 5.8.1
+  resolution: "@bazel/jasmine@patch:@bazel/jasmine@npm%3A5.8.1#~/.yarn/patches/@bazel-jasmine-npm-5.8.1-3370fee155.patch::version=5.8.1&hash=19675e"
+  dependencies:
+    c8: "npm:~7.5.0"
+    jasmine-reporters: "npm:~2.5.0"
+  peerDependencies:
+    jasmine: ">=2.99.0"
+    jasmine-core: ">=2.99.0"
+  bin:
+    bazel-jasmine-runner: jasmine_runner.js
+  checksum: 10c0/a6e58ab5b125d0512801d0216dfc42b8ef8f66eee640f96adac19fcb445d58336f2630ee4e6e9199b67a23e599567b0a77cc65fb48705c5d0c4a97de893ee114
   languageName: node
   linkType: hard
 
@@ -7865,13 +7929,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"at-least-node@npm:^1.0.0":
-  version: 1.0.0
-  resolution: "at-least-node@npm:1.0.0"
-  checksum: 10c0/4c058baf6df1bc5a1697cf182e2029c58cd99975288a13f9e70068ef5d6f4e1f1fd7c4d2c3c4912eae44797d1725be9700995736deca441b39f3e66d8dee97ef
-  languageName: node
-  linkType: hard
-
 "atob@npm:^2.1.2":
   version: 2.1.2
   resolution: "atob@npm:2.1.2"
@@ -8652,13 +8709,6 @@ __metadata:
   peerDependencies:
     devtools-protocol: "*"
   checksum: 10c0/b48b1eb0a6ea029abf72d0e474b99d421d2e234eb92f743d592804b0130909f942b0dbd86147ba22d7d2d84e4345f4a9994030fcdac83ebee7a8892f575b7539
-  languageName: node
-  linkType: hard
-
-"ci-info@npm:^3.7.0":
-  version: 3.9.0
-  resolution: "ci-info@npm:3.9.0"
-  checksum: 10c0/6f0109e36e111684291d46123d491bc4e7b7a1934c3a20dea28cba89f1d4a03acd892f5f6a81ed3855c38647e285a150e3c9ba062e38943bef57fee6c1554c3a
   languageName: node
   linkType: hard
 
@@ -11029,15 +11079,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"find-yarn-workspace-root@npm:^2.0.0":
-  version: 2.0.0
-  resolution: "find-yarn-workspace-root@npm:2.0.0"
-  dependencies:
-    micromatch: "npm:^4.0.2"
-  checksum: 10c0/b0d3843013fbdaf4e57140e0165889d09fa61745c9e85da2af86e54974f4cc9f1967e40f0d8fc36a79d53091f0829c651d06607d552582e53976f3cd8f4e5689
-  languageName: node
-  linkType: hard
-
 "flat-cache@npm:^3.0.4":
   version: 3.2.0
   resolution: "flat-cache@npm:3.2.0"
@@ -11191,18 +11232,6 @@ __metadata:
     jsonfile: "npm:^4.0.0"
     universalify: "npm:^0.1.0"
   checksum: 10c0/259f7b814d9e50d686899550c4f9ded85c46c643f7fe19be69504888e007fcbc08f306fae8ec495b8b998635e997c9e3e175ff2eeed230524ef1c1684cc96423
-  languageName: node
-  linkType: hard
-
-"fs-extra@npm:^9.0.0":
-  version: 9.1.0
-  resolution: "fs-extra@npm:9.1.0"
-  dependencies:
-    at-least-node: "npm:^1.0.0"
-    graceful-fs: "npm:^4.2.0"
-    jsonfile: "npm:^6.0.1"
-    universalify: "npm:^2.0.0"
-  checksum: 10c0/9b808bd884beff5cb940773018179a6b94a966381d005479f00adda6b44e5e3d4abf765135773d849cc27efe68c349e4a7b86acd7d3306d5932c14f3a4b17a92
   languageName: node
   linkType: hard
 
@@ -11572,7 +11601,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"graceful-fs@npm:^4.1.11, graceful-fs@npm:^4.1.2, graceful-fs@npm:^4.1.3, graceful-fs@npm:^4.1.6, graceful-fs@npm:^4.2.0, graceful-fs@npm:^4.2.10, graceful-fs@npm:^4.2.11, graceful-fs@npm:^4.2.4, graceful-fs@npm:^4.2.6":
+"graceful-fs@npm:^4.1.2, graceful-fs@npm:^4.1.3, graceful-fs@npm:^4.1.6, graceful-fs@npm:^4.2.0, graceful-fs@npm:^4.2.10, graceful-fs@npm:^4.2.11, graceful-fs@npm:^4.2.4, graceful-fs@npm:^4.2.6":
   version: 4.2.11
   resolution: "graceful-fs@npm:4.2.11"
   checksum: 10c0/386d011a553e02bc594ac2ca0bd6d9e4c22d7fa8cfbfc448a6d148c59ea881b092db9dbe3547ae4b88e55f1b01f7c4a2ecc53b310c042793e63aa44cf6c257f2
@@ -12698,7 +12727,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"is-wsl@npm:^2.1.1, is-wsl@npm:^2.2.0":
+"is-wsl@npm:^2.2.0":
   version: 2.2.0
   resolution: "is-wsl@npm:2.2.0"
   dependencies:
@@ -13338,15 +13367,6 @@ __metadata:
   version: 6.0.3
   resolution: "kind-of@npm:6.0.3"
   checksum: 10c0/61cdff9623dabf3568b6445e93e31376bee1cdb93f8ba7033d86022c2a9b1791a1d9510e026e6465ebd701a6dd2f7b0808483ad8838341ac52f003f512e0b4c4
-  languageName: node
-  linkType: hard
-
-"klaw-sync@npm:^6.0.0":
-  version: 6.0.0
-  resolution: "klaw-sync@npm:6.0.0"
-  dependencies:
-    graceful-fs: "npm:^4.1.11"
-  checksum: 10c0/00d8e4c48d0d699b743b3b028e807295ea0b225caf6179f51029e19783a93ad8bb9bccde617d169659fbe99559d73fb35f796214de031d0023c26b906cecd70a
   languageName: node
   linkType: hard
 
@@ -15408,16 +15428,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"open@npm:^7.4.2":
-  version: 7.4.2
-  resolution: "open@npm:7.4.2"
-  dependencies:
-    is-docker: "npm:^2.0.0"
-    is-wsl: "npm:^2.1.1"
-  checksum: 10c0/77573a6a68f7364f3a19a4c80492712720746b63680ee304555112605ead196afe91052bd3c3d165efdf4e9d04d255e87de0d0a77acec11ef47fd5261251813f
-  languageName: node
-  linkType: hard
-
 "opener@npm:^1.5.2":
   version: 1.5.2
   resolution: "opener@npm:1.5.2"
@@ -15739,30 +15749,6 @@ __metadata:
   version: 1.3.3
   resolution: "parseurl@npm:1.3.3"
   checksum: 10c0/90dd4760d6f6174adb9f20cf0965ae12e23879b5f5464f38e92fce8073354341e4b3b76fa3d878351efe7d01e617121955284cfd002ab087fba1a0726ec0b4f5
-  languageName: node
-  linkType: hard
-
-"patch-package@npm:^7.0.1":
-  version: 7.0.2
-  resolution: "patch-package@npm:7.0.2"
-  dependencies:
-    "@yarnpkg/lockfile": "npm:^1.1.0"
-    chalk: "npm:^4.1.2"
-    ci-info: "npm:^3.7.0"
-    cross-spawn: "npm:^7.0.3"
-    find-yarn-workspace-root: "npm:^2.0.0"
-    fs-extra: "npm:^9.0.0"
-    klaw-sync: "npm:^6.0.0"
-    minimist: "npm:^1.2.6"
-    open: "npm:^7.4.2"
-    rimraf: "npm:^2.6.3"
-    semver: "npm:^7.5.3"
-    slash: "npm:^2.0.0"
-    tmp: "npm:^0.0.33"
-    yaml: "npm:^2.2.2"
-  bin:
-    patch-package: index.js
-  checksum: 10c0/f17ce30ca57f85c2891f81bdf501211599514844bb6be1f7a0dd5adae9840b448046269eea96797a367435b894999127d508d93d28af7b27e2feb8ceea7b91d2
   languageName: node
   linkType: hard
 
@@ -17013,7 +16999,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"rimraf@npm:^2.2.8, rimraf@npm:^2.5.2, rimraf@npm:^2.5.4, rimraf@npm:^2.6.3":
+"rimraf@npm:^2.2.8, rimraf@npm:^2.5.2, rimraf@npm:^2.5.4":
   version: 2.7.1
   resolution: "rimraf@npm:2.7.1"
   dependencies:
@@ -17644,13 +17630,6 @@ __metadata:
     "@sigstore/tuf": "npm:^2.3.4"
     "@sigstore/verify": "npm:^1.2.1"
   checksum: 10c0/8906b1074130d430d707e46f15c66eb6996891dc0d068705f1884fb1251a4a367f437267d44102cdebcee34f1768b3f30131a2ec8fb7aac74ba250903a459aa7
-  languageName: node
-  linkType: hard
-
-"slash@npm:^2.0.0":
-  version: 2.0.0
-  resolution: "slash@npm:2.0.0"
-  checksum: 10c0/f83dbd3cb62c41bb8fcbbc6bf5473f3234b97fa1d008f571710a9d3757a28c7169e1811cad1554ccb1cc531460b3d221c9a7b37f549398d9a30707f0a5af9193
   languageName: node
   linkType: hard
 
@@ -20060,7 +20039,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"yaml@npm:^2.2.2, yaml@npm:^2.4.1":
+"yaml@npm:^2.4.1":
   version: 2.4.3
   resolution: "yaml@npm:2.4.3"
   bin:
