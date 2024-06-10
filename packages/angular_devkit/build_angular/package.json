@@ -31,7 +31,7 @@
     "copy-webpack-plugin": "11.0.0",
     "critters": "0.0.22",
     "css-loader": "7.1.2",
-    "esbuild-wasm": "0.21.4",
+    "esbuild-wasm": "0.21.5",
     "fast-glob": "3.3.2",
     "https-proxy-agent": "7.0.4",
     "http-proxy-middleware": "3.0.0",
@@ -62,7 +62,7 @@
     "tree-kill": "1.2.2",
     "tslib": "2.6.3",
     "undici": "6.18.2",
-    "vite": "5.2.12",
+    "vite": "5.2.13",
     "watchpack": "2.4.1",
     "webpack": "5.91.0",
     "webpack-dev-middleware": "7.2.1",
@@ -71,7 +71,7 @@
     "webpack-subresource-integrity": "5.1.0"
   },
   "optionalDependencies": {
-    "esbuild": "0.21.4"
+    "esbuild": "0.21.5"
   },
   "peerDependencies": {
     "@angular/compiler-cli": "^18.0.0 || ^18.1.0-next.0",
