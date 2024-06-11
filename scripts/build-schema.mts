@@ -13,7 +13,7 @@ import { fileURLToPath } from 'node:url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const baseDir = resolve(`${__dirname}/..`);
-const bazelCmd = process.env.BAZEL ?? `yarn --silent bazel`;
+const bazelCmd = process.env.BAZEL ?? `yarn bazel`;
 const distRoot = join(baseDir, '/dist-schema/');
 
 function _clean() {
