@@ -776,6 +776,11 @@ __metadata:
     yargs: "npm:17.7.2"
     yargs-parser: "npm:21.1.1"
     zone.js: "npm:^0.14.0"
+  dependenciesMeta:
+    esbuild:
+      built: true
+    puppeteer:
+      built: true
   languageName: unknown
   linkType: soft
 

@@ -210,6 +210,14 @@
     "yargs-parser": "21.1.1",
     "zone.js": "^0.14.0"
   },
+  "dependenciesMeta": {
+    "esbuild": {
+      "built": true
+    },
+    "puppeteer": {
+      "built": true
+    }
+  },
   "resolutions": {
     "@bazel/concatjs@npm:5.8.1": "patch:@bazel/concatjs@npm%3A5.8.1#~/.yarn/patches/@bazel-concatjs-npm-5.8.1-1bf81df846.patch"
   }
