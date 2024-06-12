@@ -1,3 +1,5 @@
+import { writeFile } from 'node:fs/promises';
+import { join } from 'node:path/posix';
 import { getGlobalVariable } from '../utils/env';
 import { PkgInfo } from '../utils/packages';
 import { globalNpm, extractNpmEnv } from '../utils/process';
@@ -6,25 +8,22 @@ import { isPrereleaseCli } from '../utils/project';
 export default async function () {
   const testRegistry: string = getGlobalVariable('package-registry');
   const packageTars: PkgInfo[] = Object.values(getGlobalVariable('package-tars'));
+  const npmrc = join(getGlobalVariable('tmp-root'), '.npmrc-publish');
+  await writeFile(
+    npmrc,
+    `
+    --registry=${testRegistry}
+    ${testRegistry.replace(/^https?:/, '')}/:_authToken=fake-secret
+    `,
+  );
 
   // Publish packages specified with --package
   await Promise.all(
     packageTars.map(({ path: p }) =>
-      globalNpm(
-        [
-          'publish',
-          `--registry=${testRegistry}`,
-          '--tag',
-          isPrereleaseCli() ? 'next' : 'latest',
-          p,
-        ],
-        {
-          ...extractNpmEnv(),
-          // Also set an auth token value for the local test registry which is required by npm 7+
-          // even though it is never actually used.
-          'NPM_CONFIG__AUTH': 'e2e-testing',
-        },
-      ),
+      globalNpm(['publish', '--tag', isPrereleaseCli() ? 'next' : 'latest', p], {
+        ...extractNpmEnv(),
+        'NPM_CONFIG_USERCONFIG': npmrc,
+      }),
     ),
   );
 }

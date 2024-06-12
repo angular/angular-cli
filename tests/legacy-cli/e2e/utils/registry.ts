@@ -1,5 +1,6 @@
-import { spawn } from 'child_process';
-import { join } from 'path';
+import { ChildProcess, fork } from 'node:child_process';
+import { on } from 'node:events';
+import { join } from 'node:path';
 import { getGlobalVariable } from './env';
 import { writeFile, readFile } from './fs';
 import { mktempd } from './utils';
@@ -8,7 +9,7 @@ export async function createNpmRegistry(
   port: number,
   httpsPort: number,
   withAuthentication = false,
-) {
+): Promise<ChildProcess> {
   // Setup local package registry
   const registryPath = await mktempd('angular-cli-e2e-registry-');
 
@@ -17,16 +18,27 @@ export async function createNpmRegistry(
   );
   configContent = configContent.replace(/\$\{HTTP_PORT\}/g, String(port));
   configContent = configContent.replace(/\$\{HTTPS_PORT\}/g, String(httpsPort));
-  await writeFile(join(registryPath, 'verdaccio.yaml'), configContent);
+  const configPath = join(registryPath, 'verdaccio.yaml');
+  await writeFile(configPath, configContent);
 
-  return spawn(
-    process.execPath,
-    [require.resolve('verdaccio/bin/verdaccio'), '-c', './verdaccio.yaml'],
-    {
-      cwd: registryPath,
-      stdio: 'inherit',
-    },
-  );
+  const verdaccioServer = fork(require.resolve('verdaccio/bin/verdaccio'), ['-c', configPath]);
+  for await (const events of on(verdaccioServer, 'message', {
+    signal: AbortSignal.timeout(30_000),
+  })) {
+    if (
+      events.some(
+        (event: unknown) =>
+          event &&
+          typeof event === 'object' &&
+          'verdaccio_started' in event &&
+          event.verdaccio_started,
+      )
+    ) {
+      break;
+    }
+  }
+
+  return verdaccioServer;
 }
 
 // Token was generated using `echo -n 'testing:s3cret' | openssl base64`.

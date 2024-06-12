@@ -164,7 +164,7 @@
     "mini-css-extract-plugin": "2.9.0",
     "mrmime": "2.0.0",
     "ng-packagr": "18.0.0",
-    "npm": "^8.11.0",
+    "npm": "^10.8.1",
     "npm-package-arg": "11.0.2",
     "open": "10.1.0",
     "ora": "5.4.1",
