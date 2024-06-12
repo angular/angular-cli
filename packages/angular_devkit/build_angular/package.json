@@ -44,7 +44,7 @@
     "magic-string": "0.30.10",
     "mini-css-extract-plugin": "2.9.0",
     "mrmime": "2.0.0",
-    "open": "8.4.2",
+    "open": "10.1.0",
     "ora": "5.4.1",
     "parse5-html-rewriting-stream": "7.0.0",
     "picomatch": "4.0.2",
