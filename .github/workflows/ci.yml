@@ -78,12 +78,6 @@ jobs:
         subset: [npm, yarn, pnpm, esbuild]
         shard: [0, 1, 2, 3, 4, 5]
         exclude:
-          # Exclude Node.js v18 when running on a PR
-          - node: ${{ github.event_name != 'pull_request' && 'none' || '18' }}
-          # Exclude Node.js v20 when running on a PR
-          - node: ${{ github.event_name != 'pull_request' && 'none' || '20' }}
-          # Exclude Windows when running on a PR
-          - os: ${{ github.event_name != 'pull_request' && 'none' || 'windows-latest' }}
           # Skip yarn subset on Windows
           - os: windows-latest
             subset: yarn
