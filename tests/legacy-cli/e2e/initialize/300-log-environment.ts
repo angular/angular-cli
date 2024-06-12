@@ -1,3 +1,4 @@
+import { getActivePackageManager } from '../utils/packages';
 import { exec, ng } from '../utils/process';
 
 export default async function () {
@@ -13,6 +14,6 @@ export default async function () {
     console.log(`  ${envName}: ${process.env[envName]!.replace(/[\n\r]+/g, '\n        ')}`);
   });
 
-  await exec('which', 'ng', 'yarn', 'npm', 'bun', 'pnpm');
+  await exec('which', 'ng', getActivePackageManager());
   await ng('version');
 }
