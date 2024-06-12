@@ -38,7 +38,7 @@
     "parse5-html-rewriting-stream": "7.0.0",
     "picomatch": "4.0.2",
     "piscina": "4.5.1",
-    "sass": "1.77.4",
+    "sass": "1.77.5",
     "semver": "7.6.2",
     "undici": "6.18.2",
     "vite": "5.2.13",
