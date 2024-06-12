@@ -1,7 +1,7 @@
 import { join, resolve } from 'path';
 import { expectFileToExist, readFile, rimraf } from '../../utils/fs';
 import { getActivePackageManager } from '../../utils/packages';
-import { silentNpm, silentYarn } from '../../utils/process';
+import { silentBun, silentNpm, silentPnpm, silentYarn } from '../../utils/process';
 
 export default async function () {
   const currentDirectory = process.cwd();
@@ -20,6 +20,14 @@ export default async function () {
         break;
       case 'yarn':
         await silentYarn('create', '@angular', projectName, '--skip-install', '--style=scss');
+
+        break;
+      case 'bun':
+        await silentBun('create', '@angular', projectName, '--skip-install', '--style=scss');
+
+        break;
+      case 'pnpm':
+        await silentPnpm('create', '@angular', projectName, '--skip-install', '--style=scss');
 
         break;
       default:

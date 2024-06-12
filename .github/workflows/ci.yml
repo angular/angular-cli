@@ -75,7 +75,7 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest]
         node: [18, 20, 22]
-        subset: [npm, yarn, esbuild]
+        subset: [npm, yarn, pnpm, esbuild]
         shard: [0, 1, 2, 3, 4, 5]
         exclude:
           # Exclude Node.js v18 when running on a PR
@@ -87,6 +87,9 @@ jobs:
           # Skip yarn subset on Windows
           - os: windows-latest
             subset: yarn
+          # Skip pnpm subset on Windows
+          - os: windows-latest
+            subset: pnpm
           # Skip Node.js v18 tests on Windows
           - os: windows-latest
             node: 18
@@ -112,7 +115,7 @@ jobs:
       matrix:
         os: [ubuntu-latest]
         node: [18]
-        subset: [npm, yarn, esbuild]
+        subset: [npm, yarn, pnpm, esbuild]
         shard: [0, 1, 2, 3, 4, 5]
     runs-on: ${{ matrix.os }}
     steps:

@@ -19,39 +19,30 @@ Error.stackTraceLimit = Infinity;
 
 /**
  * Here's a short description of those flags:
- *   --debug          If a test fails, block the thread so the temporary directory isn't deleted.
- *   --noproject      Skip creating a project or using one.
- *   --noglobal       Skip linking your local @angular/cli directory. Can save a few seconds.
- *   --nosilent       Never silence ng commands.
- *   --ng-tag=TAG     Use a specific tag for build snapshots. Similar to ng-snapshots but point to a
- *                    tag instead of using the latest `main`.
- *   --ng-snapshots   Install angular snapshot builds in the test project.
- *   --glob           Run tests matching this glob pattern (relative to tests/e2e/).
- *   --ignore         Ignore tests matching this glob pattern.
- *   --reuse=/path    Use a path instead of create a new project. That project should have been
- *                    created, and npm installed. Ideally you want a project created by a previous
- *                    run of e2e.
- *   --nb-shards      Total number of shards that this is part of. Default is 2 if --shard is
- *                    passed in.
- *   --shard          Index of this processes' shard.
- *   --tmpdir=path    Override temporary directory to use for new projects.
- *   --yarn           Use yarn as package manager.
- *   --package=path   An npm package to be published before running tests
+ *   --debug           If a test fails, block the thread so the temporary directory isn't deleted.
+ *   --noproject       Skip creating a project or using one.
+ *   --noglobal        Skip linking your local @angular/cli directory. Can save a few seconds.
+ *   --nosilent        Never silence ng commands.
+ *   --ng-tag=TAG      Use a specific tag for build snapshots. Similar to ng-snapshots but point to a
+ *                     tag instead of using the latest `main`.
+ *   --ng-snapshots    Install angular snapshot builds in the test project.
+ *   --glob            Run tests matching this glob pattern (relative to tests/e2e/).
+ *   --ignore          Ignore tests matching this glob pattern.
+ *   --reuse=/path     Use a path instead of create a new project. That project should have been
+ *                     created, and npm installed. Ideally you want a project created by a previous
+ *                     run of e2e.
+ *   --nb-shards       Total number of shards that this is part of. Default is 2 if --shard is
+ *                     passed in.
+ *   --shard           Index of this processes' shard.
+ *   --tmpdir=path     Override temporary directory to use for new projects.
+ *   --package-manager Package manager to use.
+ *   --package=path    An npm package to be published before running tests
  *
  * If unnamed flags are passed in, the list of tests will be filtered to include only those passed.
  */
 const argv = yargsParser(process.argv.slice(2), {
-  boolean: [
-    'debug',
-    'esbuild',
-    'ng-snapshots',
-    'noglobal',
-    'nosilent',
-    'noproject',
-    'verbose',
-    'yarn',
-  ],
-  string: ['devkit', 'glob', 'reuse', 'ng-tag', 'tmpdir', 'ng-version'],
+  boolean: ['debug', 'esbuild', 'ng-snapshots', 'noglobal', 'nosilent', 'noproject', 'verbose'],
+  string: ['devkit', 'glob', 'reuse', 'ng-tag', 'tmpdir', 'ng-version', 'package-manager'],
   number: ['nb-shards', 'shard'],
   array: ['package', 'ignore'],
   configuration: {
@@ -59,6 +50,7 @@ const argv = yargsParser(process.argv.slice(2), {
     'dot-notation': false,
   },
   default: {
+    'package-manager': 'npm',
     'package': ['./dist/_*.tgz'],
     'debug': !!process.env.BUILD_WORKSPACE_DIRECTORY,
     'glob': process.env.TESTBRIDGE_TEST_ONLY,
@@ -140,8 +132,8 @@ const allTests = glob
     // will be executed on the same shard.
     const fileName = path.basename(name);
     if (
-      (fileName.startsWith('yarn-') && !argv.yarn) ||
-      (fileName.startsWith('npm-') && argv.yarn)
+      (fileName.startsWith('yarn-') && argv['package-manager'] !== 'yarn') ||
+      (fileName.startsWith('npm-') && argv['package-manager'] !== 'npm')
     ) {
       return false;
     }
@@ -197,7 +189,7 @@ if (testsToRun.length == allTests.length) {
 console.log(['Tests:', ...testsToRun].join('\n '));
 
 setGlobalVariable('argv', argv);
-setGlobalVariable('package-manager', argv.yarn ? 'yarn' : 'npm');
+setGlobalVariable('package-manager', argv['package-manager']);
 
 // Use the chrome supplied by bazel or the puppeteer chrome and webdriver-manager driver outside.
 // This is needed by karma-chrome-launcher, protractor etc.

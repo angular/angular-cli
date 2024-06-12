@@ -14,6 +14,9 @@ export default async function () {
     // older versions @angular/cli packages which would cause `npm install` during `ng update` to fail.
     restoreRegistry = await createProjectFromAsset('15.0-project', true);
 
+    // CLI project version
+    const cliMajorProjectVersion = 15;
+
     // If using npm, enable legacy peer deps mode to avoid defects in npm 7+'s peer dependency resolution
     // Example error where 11.2.14 satisfies the SemVer range ^11.0.0 but still fails:
     // npm ERR! Conflicting peer dependency: @angular/compiler-cli@11.2.14
@@ -24,12 +27,6 @@ export default async function () {
     if (getActivePackageManager() === 'npm') {
       await appendFile('.npmrc', '\nlegacy-peer-deps=true');
     }
-
-    // CLI project version
-    const { version: cliVersion } = JSON.parse(
-      await readFile('./node_modules/@angular/cli/package.json'),
-    );
-    const cliMajorProjectVersion = new SemVer(cliVersion).major;
 
     // CLI current version.
     const cliMajorVersion = getNgCLIVersion().major;

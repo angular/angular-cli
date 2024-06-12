@@ -359,6 +359,14 @@ export function silentYarn(...args: string[]) {
   return _exec({ silent: true }, 'yarn', args);
 }
 
+export function silentPnpm(...args: string[]) {
+  return _exec({ silent: true }, 'pnpm', args);
+}
+
+export function silentBun(...args: string[]) {
+  return _exec({ silent: true }, 'bun', args);
+}
+
 export function globalNpm(args: string[], env?: NodeJS.ProcessEnv) {
   if (!process.env.LEGACY_CLI_RUNNER) {
     throw new Error(
@@ -367,10 +375,6 @@ export function globalNpm(args: string[], env?: NodeJS.ProcessEnv) {
   }
 
   return _exec({ silent: true, env }, process.execPath, [require.resolve('npm'), ...args]);
-}
-
-export function npm(...args: string[]) {
-  return _exec({}, 'npm', args);
 }
 
 export function node(...args: string[]) {
