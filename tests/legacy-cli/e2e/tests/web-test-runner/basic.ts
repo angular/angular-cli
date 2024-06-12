@@ -2,9 +2,6 @@ import { noSilentNg } from '../../utils/process';
 import { applyWtrBuilder } from '../../utils/web-test-runner';
 
 export default async function () {
-  // Temporary disable this test until we fix it.
-  return;
-
   await applyWtrBuilder();
 
   const { stderr } = await noSilentNg('test');
