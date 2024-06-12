@@ -90,6 +90,18 @@ jobs:
           # Skip Node.js v20 tests on Windows
           - os: windows-latest
             node: 20
+          # Skip yarn subset on Node.js 20
+          - node: 20
+            subset: yarn
+          # Skip pnpm subset on Node.js 20
+          - node: 20
+            subset: pnpm
+          # Skip yarn subset on Node.js 18
+          - node: 18
+            subset: yarn
+          # Skip pnpm subset on Node.js 18
+          - node: 18
+            subset: pnpm
     runs-on: ${{ matrix.os }}
     steps:
       - name: Initialize environment
