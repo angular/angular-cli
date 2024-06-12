@@ -1,5 +1,5 @@
 import { getGlobalVariable } from './env';
-import { ProcessOutput, silentNpm, silentYarn } from './process';
+import { ProcessOutput, silentBun, silentNpm, silentPnpm, silentYarn } from './process';
 
 export interface PkgInfo {
   readonly name: string;
@@ -7,13 +7,8 @@ export interface PkgInfo {
   readonly path: string;
 }
 
-export function getActivePackageManager(): 'npm' | 'yarn' {
-  const value = getGlobalVariable('package-manager');
-  if (value && value !== 'npm' && value !== 'yarn') {
-    throw new Error('Invalid package manager value: ' + value);
-  }
-
-  return value || 'npm';
+export function getActivePackageManager(): 'npm' | 'yarn' | 'bun' | 'pnpm' {
+  return getGlobalVariable('package-manager');
 }
 
 export async function installWorkspacePackages(options?: { force?: boolean }): Promise<void> {
@@ -26,7 +21,13 @@ export async function installWorkspacePackages(options?: { force?: boolean }): P
       await silentNpm(...npmArgs);
       break;
     case 'yarn':
-      await silentYarn();
+      await silentYarn('install');
+      break;
+    case 'pnpm':
+      await silentPnpm('install');
+      break;
+    case 'bun':
+      await silentBun('install');
       break;
   }
 }
@@ -38,6 +39,10 @@ export async function installPackage(specifier: string, registry?: string): Prom
       return silentNpm('install', specifier, ...registryOption);
     case 'yarn':
       return silentYarn('add', specifier, ...registryOption);
+    case 'bun':
+      return silentBun('add', specifier, ...registryOption);
+    case 'pnpm':
+      return silentPnpm('add', specifier, ...registryOption);
   }
 }
 
@@ -47,6 +52,10 @@ export async function uninstallPackage(name: string): Promise<ProcessOutput> {
       return silentNpm('uninstall', name);
     case 'yarn':
       return silentYarn('remove', name);
+    case 'bun':
+      return silentBun('remove', name);
+    case 'pnpm':
+      return silentPnpm('remove', name);
   }
 }
 

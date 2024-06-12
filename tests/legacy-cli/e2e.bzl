@@ -28,7 +28,7 @@ TEST_TAGS = ["no-remote-exec", "requires-network"]
 
 # Subset of tests for yarn/esbuild
 BROWSER_TESTS = ["tests/misc/browsers.js"]
-YARN_TESTS = ["tests/basic/**", "tests/update/**", "tests/commands/add/**"]
+PACKAGE_MANAGER_SUBSET_TESTS = ["tests/basic/**", "tests/update/**", "tests/commands/add/**", "tests/misc/create-angular.js"]
 ESBUILD_TESTS = [
     "tests/basic/**",
     "tests/build/**",
@@ -72,6 +72,8 @@ def e2e_suites(name, runner, data):
         _e2e_tests(name + "_" + toolchain_name, runner, data = data, toolchain = toolchain, tags = ["manual"])
 
         _e2e_suite(name, runner, "npm", data, toolchain_name, toolchain)
+        _e2e_suite(name, runner, "bun", data, toolchain_name, toolchain)
+        _e2e_suite(name, runner, "pnpm", data, toolchain_name, toolchain)
         _e2e_suite(name, runner, "yarn", data, toolchain_name, toolchain)
         _e2e_suite(name, runner, "esbuild", data, toolchain_name, toolchain)
 
@@ -124,7 +126,7 @@ def _e2e_tests(name, runner, **kwargs):
 
 def _e2e_suite(name, runner, type, data, toolchain_name = "", toolchain = None):
     """
-    Setup a predefined test suite (yarn|esbuild|saucelabs|npm).
+    Setup a predefined test suite (yarn|pnpm|bun|esbuild|saucelabs|npm).
     """
     args = []
     tests = None
@@ -133,9 +135,10 @@ def _e2e_suite(name, runner, type, data, toolchain_name = "", toolchain = None):
     if toolchain_name:
         toolchain_name = "_" + toolchain_name
 
-    if type == "yarn":
-        args.append("--yarn")
-        tests = YARN_TESTS
+    if type == "yarn" or type == "bun" or type == "pnpm":
+        args.append("--package-manager=%s" % type)
+        args.append("--esbuild")
+        tests = PACKAGE_MANAGER_SUBSET_TESTS
         ignore = BROWSER_TESTS + WEBPACK_IGNORE_TESTS
     elif type == "esbuild":
         args.append("--esbuild")
