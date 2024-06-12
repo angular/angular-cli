@@ -59,7 +59,6 @@ ts_library(
         "@npm//@types/node",
         "@npm//@types/npm-package-arg",
         "@npm//@types/pacote",
-        "@npm//@types/resolve",
         "@npm//@types/semver",
         "@npm//@types/yargs",
         "@npm//@types/yarnpkg__lockfile",

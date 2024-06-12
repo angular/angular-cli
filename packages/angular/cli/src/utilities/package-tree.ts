@@ -6,9 +6,10 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import * as fs from 'fs';
-import { dirname, join } from 'path';
-import * as resolve from 'resolve';
+import assert from 'node:assert';
+import { readFile } from 'node:fs/promises';
+import Module, { createRequire } from 'node:module';
+import { dirname, join } from 'node:path';
 import { NgAddSaveDependency } from './package-metadata';
 
 interface PackageJson {
@@ -44,20 +45,29 @@ export interface PackageTreeNode {
 
 export async function readPackageJson(packageJsonPath: string): Promise<PackageJson | undefined> {
   try {
-    return JSON.parse((await fs.promises.readFile(packageJsonPath)).toString());
+    return JSON.parse((await readFile(packageJsonPath)).toString());
   } catch {
     return undefined;
   }
 }
 
 export function findPackageJson(workspaceDir: string, packageName: string): string | undefined {
-  try {
-    // avoid require.resolve here, see: https://github.com/angular/angular-cli/pull/18610#issuecomment-681980185
-    const packageJsonPath = resolve.sync(`${packageName}/package.json`, { basedir: workspaceDir });
+  assert(
+    '_pathCache' in Module && Module._pathCache && typeof Module._pathCache === 'object',
+    `Node.js 'Module' does not contain '_pathCache'`,
+  );
 
-    return packageJsonPath;
+  // Avoid resolve cache problems, see: https://github.com/angular/angular-cli/pull/18610#issuecomment-681980185
+  const originalPathCache = Module._pathCache;
+  try {
+    Module._pathCache = {};
+    const workspaceRequire = createRequire(`${workspaceDir}/`);
+
+    return workspaceRequire.resolve(`${packageName}/package.json`);
   } catch {
     return undefined;
+  } finally {
+    Module._pathCache = originalPathCache;
   }
 }
 
