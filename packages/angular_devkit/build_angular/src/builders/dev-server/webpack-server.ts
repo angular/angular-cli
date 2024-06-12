@@ -35,6 +35,7 @@ import { ExecutionTransformer } from '../../transforms';
 import { normalizeOptimization } from '../../utils';
 import { colors } from '../../utils/color';
 import { I18nOptions, loadTranslations } from '../../utils/i18n-webpack';
+import { loadEsmModule } from '../../utils/load-esm';
 import { NormalizedCachedOptions } from '../../utils/normalize-cache';
 import { generateEntryPoints } from '../../utils/package-chunk-sort';
 import {
@@ -246,7 +247,7 @@ export function serveWebpackBrowser(
             );
 
             if (options.open) {
-              const open = (await import('open')).default;
+              const open = (await loadEsmModule<typeof import('open')>('open')).default;
               await open(serverAddress);
             }
           }
