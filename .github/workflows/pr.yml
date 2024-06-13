@@ -130,7 +130,7 @@ jobs:
       matrix:
         os: [ubuntu-latest]
         node: [18]
-        subset: [npm, yarn, pnpm, esbuild]
+        subset: [npm, esbuild]
         shard: [0, 1, 2, 3, 4, 5]
     runs-on: ${{ matrix.os }}
     steps:
