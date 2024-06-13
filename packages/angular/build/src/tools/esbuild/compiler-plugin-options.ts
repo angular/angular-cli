@@ -42,7 +42,7 @@ export function createCompilerPluginOptions(
   return {
     // JS/TS options
     pluginOptions: {
-      sourcemap: !!sourcemapOptions.scripts,
+      sourcemap: !!sourcemapOptions.scripts && (sourcemapOptions.hidden ? 'external' : true),
       thirdPartySourcemaps: sourcemapOptions.vendor,
       tsconfig,
       jit,
