@@ -6,8 +6,8 @@ import * as path from 'path';
 import { getGlobalVariable, setGlobalVariable } from './e2e/utils/env';
 import { gitClean } from './e2e/utils/git';
 import { createNpmRegistry } from './e2e/utils/registry';
-import { launchTestProcess } from './e2e/utils/process';
-import { delimiter, dirname, join } from 'path';
+import { launchProcess, launchTestProcess } from './e2e/utils/process';
+import { delimiter, dirname, join, resolve } from 'path';
 import { findFreePort } from './e2e/utils/network';
 import { extractFile } from './e2e/utils/tar';
 import { realpathSync } from 'fs';
@@ -298,13 +298,15 @@ function runSetup(absoluteName: string): Promise<void> {
   return (typeof module === 'function' ? module : module.default)();
 }
 
+const invoker = resolve(__dirname, 'e2e/utils/invoke_default_export.js');
+
 /**
  * Run a file from the projects root directory in a subprocess via launchTestProcess().
  */
 function runInitializer(absoluteName: string): Promise<void> {
   process.chdir(getGlobalVariable('projects-root'));
 
-  return launchTestProcess(absoluteName);
+  return launchProcess(invoker, { args: [absoluteName] });
 }
 
 /**
