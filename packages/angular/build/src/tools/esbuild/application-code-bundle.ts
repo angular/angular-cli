@@ -360,7 +360,7 @@ function getEsBuildCommonOptions(options: NormalizedApplicationBuildOptions): Bu
     format: 'esm',
     assetNames: outputNames.media,
     conditions: ['es2020', 'es2015', 'module'],
-    resolveExtensions: ['.ts', '.tsx', '.mjs', '.js'],
+    resolveExtensions: ['.ts', '.tsx', '.mjs', '.js', '.cjs'],
     metafile: true,
     legalComments: options.extractLicenses ? 'none' : 'eof',
     logLevel: options.verbose && !jsonLogs ? 'debug' : 'silent',
