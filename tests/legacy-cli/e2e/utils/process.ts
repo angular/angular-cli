@@ -390,13 +390,24 @@ export function silentGit(...args: string[]) {
 }
 
 /**
- * Launch the given entry in an child process isolated to the test environment.
+ * Launch the given entry in a child process isolated to the test environment.
  *
  * The test environment includes the local NPM registry, isolated NPM globals,
  * the PATH variable only referencing the local node_modules and local NPM
  * registry (not the test runner or standard global node_modules).
  */
-export async function launchTestProcess(entry: string, ...args: any[]): Promise<void> {
+export async function launchProcess(
+  entry: string,
+  {
+    args: inputArgs = [],
+    env: inputEnv = {},
+    nodeOptions = [],
+  }: {
+    args?: string[];
+    env?: Record<string, string>;
+    nodeOptions?: string[];
+  } = {},
+): Promise<void> {
   // NOTE: do NOT use the bazel TEST_TMPDIR. When sandboxing is not enabled the
   // TEST_TMPDIR is not sandboxed and has symlinks into the src dir in a
   // parent directory. Symlinks into the src dir will include package.json,
@@ -407,6 +418,8 @@ export async function launchTestProcess(entry: string, ...args: any[]): Promise<
 
   // Extract explicit environment variables for the test process.
   const env: NodeJS.ProcessEnv = {
+    ...inputEnv,
+
     TEMP,
     TMPDIR: TEMP,
     HOME: TEMP,
@@ -428,10 +441,10 @@ export async function launchTestProcess(entry: string, ...args: any[]): Promise<
     .filter((p) => p.startsWith(tempRoot) || p.startsWith(TEMP) || !p.includes('angular-cli'))
     .join(delimiter);
 
-  const testProcessArgs = [resolve(__dirname, 'test_process'), entry, ...args];
+  const args = [...nodeOptions, entry, ...inputArgs];
 
   return new Promise<void>((resolve, reject) => {
-    spawn(process.execPath, testProcessArgs, {
+    spawn(process.execPath, args, {
       stdio: 'inherit',
       env,
     })
@@ -441,10 +454,14 @@ export async function launchTestProcess(entry: string, ...args: any[]): Promise<
           return;
         }
 
-        reject(`Process error - "${testProcessArgs}`);
+        reject(
+          `Process error (code ${code}) - \`${process.execPath} ${args.map((arg) => `"${arg}"`).join(' ')}\``,
+        );
       })
       .on('error', (err) => {
-        reject(`Process exit error - "${testProcessArgs}]\n\n${err}`);
+        reject(
+          `Process exit error - \`${process.execPath} ${args.map((arg) => `"${arg}"`).join(' ')}]\n\n${err}\``,
+        );
       });
   });
 }

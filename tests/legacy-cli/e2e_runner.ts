@@ -6,12 +6,15 @@ import * as path from 'path';
 import { getGlobalVariable, setGlobalVariable } from './e2e/utils/env';
 import { gitClean } from './e2e/utils/git';
 import { createNpmRegistry } from './e2e/utils/registry';
-import { launchTestProcess } from './e2e/utils/process';
-import { delimiter, dirname, join } from 'path';
+import { launchProcess } from './e2e/utils/process';
+import { delimiter, dirname, join, resolve } from 'path';
 import { findFreePort } from './e2e/utils/network';
 import { extractFile } from './e2e/utils/tar';
 import { realpathSync } from 'fs';
 import { PkgInfo } from './e2e/utils/packages';
+import { after, it, run } from 'node:test';
+import { tap } from 'node:test/reporters';
+import { Readable } from 'node:stream';
 
 Error.stackTraceLimit = Infinity;
 
@@ -63,17 +66,6 @@ const argv = yargsParser(process.argv.slice(2), {
           Number(process.env.TEST_SHARD_INDEX ?? 0),
   },
 });
-
-/**
- * Set the error code of the process to 255.  This is to ensure that if something forces node
- * to exit without finishing properly, the error code will be 255. Right now that code is not used.
- *
- * - 1 When tests succeed we already call `process.exit(0)`, so this doesn't change any correct
- * behaviour.
- *
- * One such case that would force node <= v6 to exit with code 0, is a Promise that doesn't resolve.
- */
-process.exitCode = 255;
 
 /**
  * Mark this process as the main e2e_runner
@@ -214,7 +206,31 @@ Promise.all([findFreePort(), findFreePort(), findPackageTars()])
     try {
       await runSteps(runSetup, allSetups, 'setup');
       await runSteps(runInitializer, allInitializers, 'initializer');
-      await runSteps(runTest, testsToRun, 'test');
+
+      const testPaths = testsToRun.map((relPath) =>
+        path.resolve(path.join(__dirname, 'e2e'), relPath),
+      );
+      const exitCode = await new Promise<number>((resolve) => {
+        let completedTests = 0;
+        let passed = true;
+        (
+          run({ files: testPaths })
+            .on('test:fail', () => {
+              console.log('test:fail'); // DEBUG
+              passed = false;
+            })
+            .on('test:complete', (data) => {
+              console.log('test:complete', data); // DEBUG
+              completedTests++;
+              if (completedTests === testPaths.length) {
+                const exitCode = passed ? 0 : 1;
+                resolve(exitCode);
+              }
+            }) as Readable
+        )
+          .compose(tap)
+          .pipe(process.stdout);
+      });
 
       if (shardId !== null) {
         console.log(colors.green(`Done shard ${shardId} of ${nbShards}.`));
@@ -222,7 +238,7 @@ Promise.all([findFreePort(), findFreePort(), findPackageTars()])
         console.log(colors.green('Done.'));
       }
 
-      process.exitCode = 0;
+      process.exit(exitCode);
     } catch (err) {
       if (err instanceof Error) {
         console.log('\n');
@@ -251,7 +267,7 @@ Promise.all([findFreePort(), findFreePort(), findPackageTars()])
     }
   })
   .catch((err) => {
-    console.error(colors.red(`Unkown Error: ${err}`));
+    console.error(colors.red(`Unknown Error: ${err}`));
     process.exitCode = 1;
   });
 
@@ -263,32 +279,49 @@ async function runSteps(
   const capsType = type[0].toUpperCase() + type.slice(1);
 
   for (const [stepIndex, relativeName] of steps.entries()) {
-    // Make sure this is a windows compatible path.
-    let absoluteName = path.join(e2eRoot, relativeName).replace(SRC_FILE_EXT_RE, '');
-    if (/^win/.test(process.platform)) {
-      absoluteName = absoluteName.replace(/\\/g, path.posix.sep);
+    if (type === 'test') {
+      it(relativeName, execute);
+    } else {
+      await execute();
     }
 
-    const name = relativeName.replace(SRC_FILE_EXT_RE, '');
-    const start = Date.now();
+    async function execute(): Promise<void> {
+      // Make sure this is a windows compatible path.
+      let absoluteName = path.join(e2eRoot, relativeName).replace(SRC_FILE_EXT_RE, '');
+      if (/^win/.test(process.platform)) {
+        absoluteName = absoluteName.replace(/\\/g, path.posix.sep);
+      }
 
-    printHeader(name, stepIndex, steps.length, type);
+      const name = relativeName.replace(SRC_FILE_EXT_RE, '');
+      const start = Date.now();
 
-    // Run the test function with the current file on the logStack.
-    logStack.push(lastLogger().createChild(absoluteName));
-    try {
-      await run(absoluteName);
-    } catch (e) {
-      console.log('\n');
-      console.error(colors.red(`${capsType} "${name}" failed...`));
+      printHeader(name, stepIndex, steps.length, type);
 
-      throw e;
-    } finally {
-      logStack.pop();
+      // Run the test function with the current file on the logStack.
+      logStack.push(lastLogger().createChild(absoluteName));
+      try {
+        await run(absoluteName);
+      } catch (e) {
+        console.log('\n');
+        console.error(colors.red(`${capsType} "${name}" failed...`));
+
+        throw e;
+      } finally {
+        logStack.pop();
+      }
+
+      console.log('----');
+      printFooter(name, type, start);
     }
+  }
 
-    console.log('----');
-    printFooter(name, type, start);
+  // Wait for all `it` tests to complete, since it does not return a usable `Promise`.
+  if (type === 'test') {
+    await new Promise<void>((resolve) => {
+      after(() => {
+        resolve();
+      });
+    });
   }
 }
 
@@ -298,23 +331,40 @@ function runSetup(absoluteName: string): Promise<void> {
   return (typeof module === 'function' ? module : module.default)();
 }
 
+const invoker = resolve(__dirname, 'e2e/utils/invoke_default_export.js');
+
 /**
  * Run a file from the projects root directory in a subprocess via launchTestProcess().
  */
 function runInitializer(absoluteName: string): Promise<void> {
   process.chdir(getGlobalVariable('projects-root'));
 
-  return launchTestProcess(absoluteName);
+  return launchProcess(invoker, { args: [absoluteName] });
 }
 
 /**
  * Run a file from the main 'test-project' directory in a subprocess via launchTestProcess().
  */
 async function runTest(absoluteName: string): Promise<void> {
+  const initialCwd = process.cwd();
   process.chdir(join(getGlobalVariable('projects-root'), 'test-project'));
 
-  await launchTestProcess(absoluteName);
-  await gitClean();
+  try {
+    const testModule = require(absoluteName);
+    const testFunction: () => Promise<void> | void =
+      typeof testModule == 'function'
+        ? testModule
+        : typeof testModule.default == 'function'
+          ? testModule.default
+          : () => {
+              throw new Error('Invalid test module.');
+            };
+
+    await testFunction();
+    await gitClean();
+  } finally {
+    process.chdir(initialCwd);
+  }
 }
 
 function printHeader(
