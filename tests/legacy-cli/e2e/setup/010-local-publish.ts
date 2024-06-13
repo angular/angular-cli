@@ -12,7 +12,6 @@ export default async function () {
   await writeFile(
     npmrc,
     `
-    --registry=${testRegistry}
     ${testRegistry.replace(/^https?:/, '')}/:_authToken=fake-secret
     `,
   );
