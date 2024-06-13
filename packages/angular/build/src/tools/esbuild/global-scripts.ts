@@ -63,7 +63,7 @@ export function createGlobalScriptsBundleOptions(
       assetNames: outputNames.media,
       mainFields: ['script', 'browser', 'main'],
       conditions: ['script'],
-      resolveExtensions: ['.mjs', '.js'],
+      resolveExtensions: ['.mjs', '.js', '.cjs'],
       logLevel: options.verbose && !jsonLogs ? 'debug' : 'silent',
       metafile: true,
       minify: optimizationOptions.scripts,
