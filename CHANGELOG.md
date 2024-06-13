@@ -1,3 +1,25 @@
+<a name="18.1.0-next.2"></a>
+
+# 18.1.0-next.2 (2024-06-13)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                    |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------- |
+| [6d266c146](https://github.com/angular/angular-cli/commit/6d266c146c9e141396236b93f2bfafcb261fd7aa) | fix  | add fallbacks for migration package resolution |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                                                                             |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------------------------------------- |
+| [4ff914a16](https://github.com/angular/angular-cli/commit/4ff914a16525350050c5e8359fb59f9d6f243d27) | fix  | allow additional module preloads up to limit                                                            |
+| [8c379269e](https://github.com/angular/angular-cli/commit/8c379269e0e96a958d7bc93cf065a0ff36be9601) | fix  | do not reference sourcemaps in web workers and global stylesheet bundles when hidden setting is enabled |
+| [461e78f3e](https://github.com/angular/angular-cli/commit/461e78f3ee15e7097bd7f2c975dc460d844f277f) | fix  | generate module preloads next to script elements in index HTML                                          |
+| [f102f815e](https://github.com/angular/angular-cli/commit/f102f815e404bcc2f627b7a52e92b3385eb9be5f) | fix  | Initiate PostCSS only once                                                                              |
+| [fbc6eb322](https://github.com/angular/angular-cli/commit/fbc6eb3225e4b02c62baf3be4274b46e80ba62a4) | fix  | issue warning when auto adding `@angular/localize/init`                                                 |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="18.0.4"></a>
 
 # 18.0.4 (2024-06-13)
