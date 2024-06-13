@@ -124,6 +124,74 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       harness.expectFile('dist/browser/main.js.map').content.toContain('/common/index.ts');
     });
 
+    it(`should not include 'sourceMappingURL' sourcemaps when hidden suboption is true`, async () => {
+      await harness.writeFile('src/styles.css', `div { flex: 1 }`);
+
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+        styles: ['src/styles.css'],
+        sourceMap: { scripts: true, styles: true, hidden: true },
+      });
+
+      const { result } = await harness.executeOnce();
+
+      expect(result?.success).toBeTrue();
+
+      harness.expectFile('dist/browser/main.js.map').toExist();
+      harness
+        .expectFile('dist/browser/main.js')
+        .content.not.toContain('sourceMappingURL=main.js.map');
+
+      harness.expectFile('dist/browser/styles.css.map').toExist();
+      harness
+        .expectFile('dist/browser/styles.css')
+        .content.not.toContain('sourceMappingURL=styles.css.map');
+    });
+
+    it(`should include 'sourceMappingURL' sourcemaps when hidden suboption is false`, async () => {
+      await harness.writeFile('src/styles.css', `div { flex: 1 }`);
+
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+        styles: ['src/styles.css'],
+        sourceMap: { scripts: true, styles: true, hidden: false },
+      });
+
+      const { result } = await harness.executeOnce();
+
+      expect(result?.success).toBeTrue();
+
+      harness.expectFile('dist/browser/main.js.map').toExist();
+      harness.expectFile('dist/browser/main.js').content.toContain('sourceMappingURL=main.js.map');
+
+      harness.expectFile('dist/browser/styles.css.map').toExist();
+      harness
+        .expectFile('dist/browser/styles.css')
+        .content.toContain('sourceMappingURL=styles.css.map');
+    });
+
+    it(`should include 'sourceMappingURL' sourcemaps when hidden suboption is not set`, async () => {
+      await harness.writeFile('src/styles.css', `div { flex: 1 }`);
+
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+        styles: ['src/styles.css'],
+        sourceMap: { scripts: true, styles: true },
+      });
+
+      const { result } = await harness.executeOnce();
+
+      expect(result?.success).toBeTrue();
+
+      harness.expectFile('dist/browser/main.js.map').toExist();
+      harness.expectFile('dist/browser/main.js').content.toContain('sourceMappingURL=main.js.map');
+
+      harness.expectFile('dist/browser/styles.css.map').toExist();
+      harness
+        .expectFile('dist/browser/styles.css')
+        .content.toContain('sourceMappingURL=styles.css.map');
+    });
+
     it('should add "x_google_ignoreList" extension to script sourcemap files when true', async () => {
       harness.useTarget('build', {
         ...BASE_OPTIONS,

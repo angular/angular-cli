@@ -36,7 +36,7 @@ import { setupJitPluginCallbacks } from './jit-plugin-callbacks';
 import { SourceFileCache } from './source-file-cache';
 
 export interface CompilerPluginOptions {
-  sourcemap: boolean;
+  sourcemap: boolean | 'external';
   tsconfig: string;
   jit?: boolean;
   /** Skip TypeScript compilation setup. This is useful to re-use the TypeScript compilation from another plugin. */
@@ -71,7 +71,12 @@ export function createCompilerPlugin(
         );
       }
       const javascriptTransformer = new JavaScriptTransformer(
-        pluginOptions,
+        {
+          sourcemap: !!pluginOptions.sourcemap,
+          thirdPartySourcemaps: pluginOptions.thirdPartySourcemaps,
+          advancedOptimizations: pluginOptions.advancedOptimizations,
+          jit: pluginOptions.jit,
+        },
         maxWorkers,
         cacheStore?.createCache('jstransformer'),
       );
@@ -541,8 +546,8 @@ function createCompilerOptionsTransformer(
     return {
       ...compilerOptions,
       noEmitOnError: false,
-      inlineSources: pluginOptions.sourcemap,
-      inlineSourceMap: pluginOptions.sourcemap,
+      inlineSources: !!pluginOptions.sourcemap,
+      inlineSourceMap: !!pluginOptions.sourcemap,
       mapRoot: undefined,
       sourceRoot: undefined,
       preserveSymlinks,
