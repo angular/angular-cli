@@ -1,3 +1,18 @@
+<a name="18.0.4"></a>
+
+# 18.0.4 (2024-06-13)
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                                                                             |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------------------------------------- |
+| [791ef809d](https://github.com/angular/angular-cli/commit/791ef809d8dfec8fde844e916973a05b2eb5c9d9) | fix  | do not reference sourcemaps in web workers and global stylesheet bundles when hidden setting is enabled |
+| [20fc6ca05](https://github.com/angular/angular-cli/commit/20fc6ca057e5190155474e7377bf9f22aab597dd) | fix  | generate module preloads next to script elements in index HTML                                          |
+| [3a1bf5c8a](https://github.com/angular/angular-cli/commit/3a1bf5c8a52d6ec1eb337f0937bf073de2ea0b62) | fix  | Initiate PostCSS only once                                                                              |
+| [78c611754](https://github.com/angular/angular-cli/commit/78c6117544afa1aa69ef5485f1c3b77b1207f6f1) | fix  | issue warning when auto adding `@angular/localize/init`                                                 |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="18.0.3"></a>
 
 # 18.0.3 (2024-06-05)
