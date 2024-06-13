@@ -677,6 +677,7 @@ function getDepOptimizationConfig({
       supported: getFeatureSupport(target, zoneless),
       plugins,
       loader,
+      resolveExtensions: ['.mjs', '.js', '.cjs'],
     },
   };
 }
