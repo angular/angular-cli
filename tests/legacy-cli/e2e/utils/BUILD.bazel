@@ -6,6 +6,7 @@ ts_library(
     srcs = glob(["**/*.ts"]),
     data = [
         "//tests/legacy-cli/e2e/ng-snapshot",
+        "//tests/legacy-cli/e2e/package-manager",
     ],
     visibility = ["//visibility:public"],
     deps = [

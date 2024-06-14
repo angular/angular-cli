@@ -18,6 +18,7 @@
     "package.json",
     "packages/**/package.json",
     "tests/legacy-cli/e2e/ng-snapshot/package.json",
+    "tests/legacy-cli/e2e/package-manager/package.json",
     ".github/workflows/**/*.yml"
   ],
   "packageRules": [

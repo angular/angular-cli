@@ -1,0 +1,10 @@
+{
+  "description": "Package manager versions for e2e testing",
+  "private": true,
+  "dependencies": {
+    "bun": "1.1.13",
+    "npm": "10.8.1",
+    "pnpm": "9.3.0",
+    "yarn": "1.22.22"
+  }
+}

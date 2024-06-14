@@ -16,7 +16,7 @@ export default async function () {
 
   // Environment variables only
   await expectFileNotToExist('public/manifest.webmanifest');
-  setNpmEnvVarsForAuthentication(false, true);
+  await setNpmEnvVarsForAuthentication(false, true);
   await ng(...command);
   await expectFileToExist('public/manifest.webmanifest');
   await git('clean', '-dxf');

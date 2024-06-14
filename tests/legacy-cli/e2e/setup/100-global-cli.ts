@@ -1,13 +1,7 @@
+import assert from 'node:assert';
 import { getGlobalVariable } from '../utils/env';
 import { getActivePackageManager } from '../utils/packages';
 import { globalNpm } from '../utils/process';
-
-const PACKAGE_MANAGER_VERSION = {
-  'npm': '7.24.0', // TODO: update to latest and fix tests.
-  'yarn': '1.22.22',
-  'pnpm': '9.3.0',
-  'bun': '1.1.13',
-};
 
 export default async function () {
   const argv = getGlobalVariable('argv');
@@ -18,12 +12,18 @@ export default async function () {
   const testRegistry = getGlobalVariable('package-registry');
   const packageManager = getActivePackageManager();
 
+  const version = require('../package-manager/package.json')['dependencies'][packageManager];
+  assert(
+    version,
+    `Package manager '${packageManager}' version not found in '../package-manager/package.json'.`,
+  );
+
   // Install global Angular CLI being tested, npm+yarn used by e2e tests.
   await globalNpm([
     'install',
     '--global',
     `--registry=${testRegistry}`,
     '@angular/cli',
-    `${packageManager}@${PACKAGE_MANAGER_VERSION[packageManager]}`,
+    `${packageManager}@${version}`,
   ]);
 }
