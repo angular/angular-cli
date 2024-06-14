@@ -265,13 +265,7 @@ export default function (api: unknown, options: ApplicationPresetOptions) {
   }
 
   if (options.instrumentCode) {
-    plugins.push([
-      require('babel-plugin-istanbul').default,
-      {
-        inputSourceMap: options.instrumentCode.inputSourceMap ?? false,
-        cwd: options.instrumentCode.includedBasePath,
-      },
-    ]);
+    plugins.push(require('../plugins/add-code-coverage').default);
   }
 
   if (needRuntimeTransform) {
