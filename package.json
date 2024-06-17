@@ -133,7 +133,7 @@
     "debug": "^4.1.1",
     "esbuild": "0.21.5",
     "esbuild-wasm": "0.21.5",
-    "eslint": "8.57.0",
+    "eslint": "9.5.0",
     "eslint-config-prettier": "9.1.0",
     "eslint-plugin-header": "3.1.1",
     "eslint-plugin-import": "2.29.1",
