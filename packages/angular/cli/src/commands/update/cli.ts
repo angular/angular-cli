@@ -30,7 +30,7 @@ import {
 } from '../../command-builder/command-module';
 import { SchematicEngineHost } from '../../command-builder/utilities/schematic-engine-host';
 import { subscribeToWorkflow } from '../../command-builder/utilities/schematic-workflow';
-import { colors } from '../../utilities/color';
+import { colors, figures } from '../../utilities/color';
 import { disableVersionCheck } from '../../utilities/environment-options';
 import { assertIsError } from '../../utilities/error';
 import { writeErrorToLogFile } from '../../utilities/log-file';
@@ -241,7 +241,7 @@ export default class UpdateCommandModule extends CommandModule<UpdateCommandArgs
       }
     }
 
-    logger.info(`Using package manager: ${colors.grey(packageManager.name)}`);
+    logger.info(`Using package manager: ${colors.gray(packageManager.name)}`);
     logger.info('Collecting installed dependencies...');
 
     const rootDependencies = await getProjectDependencies(this.context.root);
@@ -303,12 +303,12 @@ export default class UpdateCommandModule extends CommandModule<UpdateCommandArgs
       return { success: !workflowSubscription.error, files: workflowSubscription.files };
     } catch (e) {
       if (e instanceof UnsuccessfulWorkflowExecution) {
-        logger.error(`${colors.symbols.cross} Migration failed. See above for further details.\n`);
+        logger.error(`${figures.cross} Migration failed. See above for further details.\n`);
       } else {
         assertIsError(e);
         const logPath = writeErrorToLogFile(e);
         logger.fatal(
-          `${colors.symbols.cross} Migration failed: ${e.message}\n` +
+          `${figures.cross} Migration failed: ${e.message}\n` +
             `  See "${logPath}" for further details.\n`,
         );
       }
@@ -438,7 +438,7 @@ export default class UpdateCommandModule extends CommandModule<UpdateCommandArgs
     for (const migration of migrations) {
       const { title, description } = getMigrationTitleAndDescription(migration);
 
-      logger.info(colors.cyan(colors.symbols.pointer) + ' ' + colors.bold(title));
+      logger.info(colors.cyan(figures.pointer) + ' ' + colors.bold(title));
 
       if (description) {
         logger.info('  ' + description);
@@ -1088,7 +1088,7 @@ export default class UpdateCommandModule extends CommandModule<UpdateCommandArgs
     if (!isTTY()) {
       for (const migration of optionalMigrations) {
         const { title } = getMigrationTitleAndDescription(migration);
-        logger.info(colors.cyan(colors.symbols.pointer) + ' ' + colors.bold(title));
+        logger.info(colors.cyan(figures.pointer) + ' ' + colors.bold(title));
         logger.info(colors.gray(`  ng update ${packageName} --name ${migration.name}`));
         logger.info(''); // Extra trailing newline.
       }

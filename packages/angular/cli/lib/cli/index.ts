@@ -10,7 +10,7 @@ import { logging } from '@angular-devkit/core';
 import { format, stripVTControlCharacters } from 'node:util';
 import { CommandModuleError } from '../../src/command-builder/command-module';
 import { runCommand } from '../../src/command-builder/command-runner';
-import { colors } from '../../src/utilities/color';
+import { colors, supportColor } from '../../src/utilities/color';
 import { ngDebug } from '../../src/utilities/environment-options';
 import { writeErrorToLogFile } from '../../src/utilities/log-file';
 
@@ -38,20 +38,21 @@ export default async function (options: { cliArgs: string[] }) {
   const colorLevels: Record<string, (message: string) => string> = {
     info: (s) => s,
     debug: (s) => s,
-    warn: (s) => colors.bold.yellow(s),
-    error: (s) => colors.bold.red(s),
-    fatal: (s) => colors.bold.red(s),
+    warn: (s) => colors.bold(colors.yellow(s)),
+    error: (s) => colors.bold(colors.red(s)),
+    fatal: (s) => colors.bold(colors.red(s)),
   };
   const logger = new logging.IndentLogger('cli-main-logger');
   const logInfo = console.log;
   const logError = console.error;
+  const useColor = supportColor();
 
   const loggerFinished = logger.forEach((entry) => {
     if (!ngDebug && entry.level === 'debug') {
       return;
     }
 
-    const color = colors.enabled ? colorLevels[entry.level] : stripVTControlCharacters;
+    const color = useColor ? colorLevels[entry.level] : stripVTControlCharacters;
     const message = color(entry.message);
 
     switch (entry.level) {

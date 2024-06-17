@@ -6,10 +6,11 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import * as ansiColors from 'ansi-colors';
-import { WriteStream } from 'tty';
+import { WriteStream } from 'node:tty';
 
-function supportColor(): boolean {
+export { color as colors, figures } from 'listr2';
+
+export function supportColor(): boolean {
   if (process.env.FORCE_COLOR !== undefined) {
     // 2 colors: FORCE_COLOR = 0 (Disables colors), depth 1
     // 16 colors: FORCE_COLOR = 1, depth 4
@@ -35,9 +36,3 @@ function supportColor(): boolean {
 
   return false;
 }
-
-// Create a separate instance to prevent unintended global changes to the color configuration
-const colors = ansiColors.create();
-colors.enabled = supportColor();
-
-export { colors };
