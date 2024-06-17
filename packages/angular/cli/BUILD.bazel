@@ -65,7 +65,6 @@ ts_library(
         "@npm//@types/yargs",
         "@npm//@types/yarnpkg__lockfile",
         "@npm//@yarnpkg/lockfile",
-        "@npm//ansi-colors",
         "@npm//ini",
         "@npm//jsonc-parser",
         "@npm//listr2",

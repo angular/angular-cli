@@ -29,7 +29,6 @@
     "@listr2/prompt-adapter-inquirer": "2.0.8",
     "@schematics/angular": "0.0.0-PLACEHOLDER",
     "@yarnpkg/lockfile": "1.1.0",
-    "ansi-colors": "4.1.3",
     "ini": "4.1.3",
     "jsonc-parser": "3.2.1",
     "listr2": "8.2.1",
