@@ -6,10 +6,6 @@ on:
       - main
       - '[0-9]+.[0-9]+.x'
 
-      # Developers can make one-off pushes to `ci-*` branches to manually trigger full CI
-      # prior to opening a pull request.
-      - ci-*
-
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
