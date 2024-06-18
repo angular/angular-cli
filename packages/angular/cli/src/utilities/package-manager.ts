@@ -14,7 +14,6 @@ import { join } from 'path';
 import { PackageManager } from '../../lib/config/workspace-schema';
 import { AngularWorkspace, getProjectByCwd } from './config';
 import { memoize } from './memoize';
-import { Spinner } from './spinner';
 
 interface PackageManagerOptions {
   saveDev: string;
@@ -49,7 +48,6 @@ export class PackageManagerUtils {
     save: 'dependencies' | 'devDependencies' | true = true,
     extraArgs: string[] = [],
     cwd?: string,
-    progress = true,
   ): Promise<boolean> {
     const packageManagerArgs = this.getArguments();
     const installArgs: string[] = [packageManagerArgs.install, packageName];
@@ -58,7 +56,7 @@ export class PackageManagerUtils {
       installArgs.push(packageManagerArgs.saveDev);
     }
 
-    return this.run([...installArgs, ...extraArgs], { cwd, silent: true, progress });
+    return this.run([...installArgs, ...extraArgs], { cwd, silent: true });
   }
 
   /** Install all packages. */
@@ -69,14 +67,13 @@ export class PackageManagerUtils {
       installArgs.push(packageManagerArgs.installAll);
     }
 
-    return this.run([...installArgs, ...extraArgs], { cwd, silent: true, progress: false });
+    return this.run([...installArgs, ...extraArgs], { cwd, silent: true });
   }
 
   /** Install a single package temporary. */
   async installTemp(
     packageName: string,
     extraArgs?: string[],
-    progress = true,
   ): Promise<{
     success: boolean;
     tempNodeModules: string;
@@ -121,7 +118,7 @@ export class PackageManagerUtils {
     ];
 
     return {
-      success: await this.install(packageName, true, installArgs, tempPath, progress),
+      success: await this.install(packageName, true, installArgs, tempPath),
       tempNodeModules,
     };
   }
@@ -164,12 +161,9 @@ export class PackageManagerUtils {
 
   private async run(
     args: string[],
-    options: { cwd?: string; silent?: boolean; progress?: boolean } = {},
+    options: { cwd?: string; silent?: boolean } = {},
   ): Promise<boolean> {
-    const { cwd = process.cwd(), silent = false, progress = true } = options;
-
-    const spinner = progress ? new Spinner() : undefined;
-    spinner?.start('Installing packages...');
+    const { cwd = process.cwd(), silent = false } = options;
 
     return new Promise((resolve) => {
       const bufferedOutput: { stream: NodeJS.WriteStream; data: Buffer }[] = [];
@@ -181,12 +175,9 @@ export class PackageManagerUtils {
         cwd,
       }).on('close', (code: number) => {
         if (code === 0) {
-          spinner?.succeed('Packages successfully installed.');
           resolve(true);
         } else {
-          spinner?.stop();
           bufferedOutput.forEach(({ stream, data }) => stream.write(data));
-          spinner?.fail('Packages installation failed, see above.');
           resolve(false);
         }
       });
