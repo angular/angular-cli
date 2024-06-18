@@ -12,9 +12,10 @@ import {
   FileSystemSchematicDescription,
   NodeWorkflow,
 } from '@angular-devkit/schematics/tools';
-import { SpawnSyncReturns, execSync, spawnSync } from 'child_process';
-import { existsSync, promises as fs } from 'fs';
-import { createRequire } from 'module';
+import { Listr } from 'listr2';
+import { SpawnSyncReturns, execSync, spawnSync } from 'node:child_process';
+import { existsSync, promises as fs } from 'node:fs';
+import { createRequire } from 'node:module';
 import npa from 'npm-package-arg';
 import pickManifest from 'npm-pick-manifest';
 import * as path from 'path';
@@ -73,6 +74,8 @@ interface MigrationSchematicDescription
 interface MigrationSchematicDescriptionWithVersion extends MigrationSchematicDescription {
   version: string;
 }
+
+class CommandError extends Error {}
 
 const ANGULAR_PACKAGES_REGEXP = /^@(?:angular|nguniversal)\//;
 const UPDATE_SCHEMATIC_COLLECTION = path.join(__dirname, 'schematic/collection.json');
@@ -756,21 +759,46 @@ export default class UpdateCommandModule extends CommandModule<UpdateCommandArgs
     );
 
     if (success) {
+      const { root: commandRoot, packageManager } = this.context;
+      const installArgs = this.packageManagerForce(options.verbose) ? ['--force'] : [];
+      const tasks = new Listr([
+        {
+          title: 'Cleaning node modules directory',
+          async task(_, task) {
+            try {
+              await fs.rm(path.join(commandRoot, 'node_modules'), {
+                force: true,
+                recursive: true,
+                maxRetries: 3,
+              });
+            } catch (e) {
+              assertIsError(e);
+              if (e.code === 'ENOENT') {
+                task.skip('Cleaning not required. Node modules directory not found.');
+              }
+            }
+          },
+        },
+        {
+          title: 'Installing packages',
+          async task() {
+            const installationSuccess = await packageManager.installAll(installArgs, commandRoot);
+
+            if (!installationSuccess) {
+              throw new CommandError('Unable to install packages');
+            }
+          },
+        },
+      ]);
+
       try {
-        await fs.rm(path.join(this.context.root, 'node_modules'), {
-          force: true,
-          recursive: true,
-          maxRetries: 3,
-        });
-      } catch {}
+        await tasks.run();
+      } catch (e) {
+        if (e instanceof CommandError) {
+          return 1;
+        }
 
-      const installationSuccess = await this.context.packageManager.installAll(
-        this.packageManagerForce(options.verbose) ? ['--force'] : [],
-        this.context.root,
-      );
-
-      if (!installationSuccess) {
-        return 1;
+        throw e;
       }
     }
 

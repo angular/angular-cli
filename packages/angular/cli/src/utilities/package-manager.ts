@@ -69,7 +69,7 @@ export class PackageManagerUtils {
       installArgs.push(packageManagerArgs.installAll);
     }
 
-    return this.run([...installArgs, ...extraArgs], { cwd, silent: true });
+    return this.run([...installArgs, ...extraArgs], { cwd, silent: true, progress: false });
   }
 
   /** Install a single package temporary. */
