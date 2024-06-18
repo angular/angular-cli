@@ -29,8 +29,7 @@ export async function addNonce(html: string): Promise<string> {
 
   rewriter.on('startTag', (tag) => {
     if (
-      (tag.tagName === 'style' ||
-        (tag.tagName === 'script' && !tag.attrs.some((attr) => attr.name === 'src'))) &&
+      (tag.tagName === 'style' || tag.tagName === 'script') &&
       !tag.attrs.some((attr) => attr.name === 'nonce')
     ) {
       tag.attrs.push({ name: 'nonce', value: nonce });
