@@ -324,7 +324,6 @@ export default class AddCommandModule
             const { success, tempNodeModules } = await packageManager.installTemp(
               context.packageIdentifier.toString(),
               registry ? [`--registry="${registry}"`] : undefined,
-              false,
             );
             const tempRequire = createRequire(tempNodeModules + '/');
             assert(context.collectionName, 'Collection name should always be available');
@@ -343,7 +342,6 @@ export default class AddCommandModule
               context.savePackage,
               registry ? [`--registry="${registry}"`] : undefined,
               undefined,
-              false,
             );
 
             if (!success) {
