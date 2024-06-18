@@ -74,22 +74,22 @@ describe('addNonce', () => {
     expect(result).toContain('<style nonce="{% nonce %}">.a {color: red;}</style>');
   });
 
-  it('should to all inline script tags', async () => {
+  it('should to all script tags', async () => {
     const result = await addNonce(`
       <html>
         <head>
         </head>
         <body>
           <app ngCspNonce="{% nonce %}"></app>
-          <script>console.log('foo');</<script>
+          <script>console.log('foo');</script>
           <script src="./main.js"></script>
-          <script>console.log('bar');</<script>
+          <script>console.log('bar');</script>
         </body>
       </html>
     `);
 
-    expect(result).toContain(`<script nonce="{% nonce %}">console.log('foo');</<script>`);
-    expect(result).toContain('<script src="./main.js"></script>');
-    expect(result).toContain(`<script nonce="{% nonce %}">console.log('bar');</<script>`);
+    expect(result).toContain(`<script nonce="{% nonce %}">console.log('foo');</script>`);
+    expect(result).toContain('<script src="./main.js" nonce="{% nonce %}"></script>');
+    expect(result).toContain(`<script nonce="{% nonce %}">console.log('bar');</script>`);
   });
 });
