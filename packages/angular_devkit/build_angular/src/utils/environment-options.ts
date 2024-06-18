@@ -6,6 +6,8 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
+import { availableParallelism } from 'node:os';
+
 function isDisabled(variable: string): boolean {
   return variable === '0' || variable.toLowerCase() === 'false';
 }
@@ -74,7 +76,9 @@ export const allowMinify = debugOptimize.minify;
  *
  */
 const maxWorkersVariable = process.env['NG_BUILD_MAX_WORKERS'];
-export const maxWorkers = isPresent(maxWorkersVariable) ? +maxWorkersVariable : 4;
+export const maxWorkers = isPresent(maxWorkersVariable)
+  ? +maxWorkersVariable
+  : Math.min(4, availableParallelism());
 
 const parallelTsVariable = process.env['NG_BUILD_PARALLEL_TS'];
 export const useParallelTs = !isPresent(parallelTsVariable) || !isDisabled(parallelTsVariable);
