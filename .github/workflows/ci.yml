@@ -21,7 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Initialize environment
-        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@c88496832e686b534021a01659a239a9e0976af0
+        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@f9a55a8d166809baa07af8b6bb51438a06ea025c
       - name: Install node modules
         run: yarn install --immutable
       - name: Run ESLint
@@ -39,11 +39,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Initialize environment
-        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@c88496832e686b534021a01659a239a9e0976af0
+        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@f9a55a8d166809baa07af8b6bb51438a06ea025c
       - name: Setup Bazel
-        uses: angular/dev-infra/github-actions/bazel/setup@c88496832e686b534021a01659a239a9e0976af0
+        uses: angular/dev-infra/github-actions/bazel/setup@f9a55a8d166809baa07af8b6bb51438a06ea025c
       - name: Setup Bazel RBE
-        uses: angular/dev-infra/github-actions/bazel/configure-remote@c88496832e686b534021a01659a239a9e0976af0
+        uses: angular/dev-infra/github-actions/bazel/configure-remote@f9a55a8d166809baa07af8b6bb51438a06ea025c
       - name: Install node modules
         run: yarn install --immutable
       - name: Build release targets
@@ -53,11 +53,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Initialize environment
-        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@c88496832e686b534021a01659a239a9e0976af0
+        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@f9a55a8d166809baa07af8b6bb51438a06ea025c
       - name: Setup Bazel
-        uses: angular/dev-infra/github-actions/bazel/setup@c88496832e686b534021a01659a239a9e0976af0
+        uses: angular/dev-infra/github-actions/bazel/setup@f9a55a8d166809baa07af8b6bb51438a06ea025c
       - name: Setup Bazel RBE
-        uses: angular/dev-infra/github-actions/bazel/configure-remote@c88496832e686b534021a01659a239a9e0976af0
+        uses: angular/dev-infra/github-actions/bazel/configure-remote@f9a55a8d166809baa07af8b6bb51438a06ea025c
       - name: Install node modules
         run: yarn install --immutable
       - name: Run module tests
@@ -89,13 +89,13 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Initialize environment
-        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@c88496832e686b534021a01659a239a9e0976af0
+        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@f9a55a8d166809baa07af8b6bb51438a06ea025c
       - name: Install node modules
         run: yarn install --immutable
       - name: Setup Bazel
-        uses: angular/dev-infra/github-actions/bazel/setup@c88496832e686b534021a01659a239a9e0976af0
+        uses: angular/dev-infra/github-actions/bazel/setup@f9a55a8d166809baa07af8b6bb51438a06ea025c
       - name: Setup Bazel RBE
-        uses: angular/dev-infra/github-actions/bazel/configure-remote@c88496832e686b534021a01659a239a9e0976af0
+        uses: angular/dev-infra/github-actions/bazel/configure-remote@f9a55a8d166809baa07af8b6bb51438a06ea025c
       - name: Run CLI E2E tests
         run: yarn bazel test --define=E2E_SHARD_TOTAL=6 --define=E2E_SHARD_INDEX=${{ matrix.shard }} --config=e2e //tests/legacy-cli:e2e.${{ matrix.subset }}_node${{ matrix.node }}
 
@@ -110,13 +110,13 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Initialize environment
-        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@c88496832e686b534021a01659a239a9e0976af0
+        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@f9a55a8d166809baa07af8b6bb51438a06ea025c
       - name: Install node modules
         run: yarn install --immutable
       - name: Setup Bazel
-        uses: angular/dev-infra/github-actions/bazel/setup@c88496832e686b534021a01659a239a9e0976af0
+        uses: angular/dev-infra/github-actions/bazel/setup@f9a55a8d166809baa07af8b6bb51438a06ea025c
       - name: Setup Bazel RBE
-        uses: angular/dev-infra/github-actions/bazel/configure-remote@c88496832e686b534021a01659a239a9e0976af0
+        uses: angular/dev-infra/github-actions/bazel/configure-remote@f9a55a8d166809baa07af8b6bb51438a06ea025c
       - name: Run CLI E2E tests
         run: yarn bazel test --define=E2E_SHARD_TOTAL=3 --define=E2E_SHARD_INDEX=${{ matrix.shard }} --config=e2e //tests/legacy-cli:e2e.${{ matrix.subset }}_node${{ matrix.node }}
 
@@ -131,13 +131,13 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Initialize environment
-        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@c88496832e686b534021a01659a239a9e0976af0
+        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@f9a55a8d166809baa07af8b6bb51438a06ea025c
       - name: Install node modules
         run: yarn install --immutable
       - name: Setup Bazel
-        uses: angular/dev-infra/github-actions/bazel/setup@c88496832e686b534021a01659a239a9e0976af0
+        uses: angular/dev-infra/github-actions/bazel/setup@f9a55a8d166809baa07af8b6bb51438a06ea025c
       - name: Setup Bazel RBE
-        uses: angular/dev-infra/github-actions/bazel/configure-remote@c88496832e686b534021a01659a239a9e0976af0
+        uses: angular/dev-infra/github-actions/bazel/configure-remote@f9a55a8d166809baa07af8b6bb51438a06ea025c
       - name: Run CLI E2E tests
         run: yarn bazel test --define=E2E_SHARD_TOTAL=6 --define=E2E_SHARD_INDEX=${{ matrix.shard }} --config=e2e //tests/legacy-cli:e2e.snapshots.${{ matrix.subset }}_node${{ matrix.node }}
 
@@ -148,13 +148,13 @@ jobs:
       SAUCE_TUNNEL_IDENTIFIER: angular-cli-${{ github.workflow }}-${{ github.run_number }}
     steps:
       - name: Initialize environment
-        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@c88496832e686b534021a01659a239a9e0976af0
+        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@f9a55a8d166809baa07af8b6bb51438a06ea025c
       - name: Install node modules
         run: yarn install --immutable
       - name: Setup Bazel
-        uses: angular/dev-infra/github-actions/bazel/setup@c88496832e686b534021a01659a239a9e0976af0
+        uses: angular/dev-infra/github-actions/bazel/setup@f9a55a8d166809baa07af8b6bb51438a06ea025c
       - name: Setup Bazel RBE
-        uses: angular/dev-infra/github-actions/bazel/configure-remote@c88496832e686b534021a01659a239a9e0976af0
+        uses: angular/dev-infra/github-actions/bazel/configure-remote@f9a55a8d166809baa07af8b6bb51438a06ea025c
       - name: Run E2E Browser tests
         env:
           SAUCE_USERNAME: ${{ vars.SAUCE_USERNAME }}
@@ -181,11 +181,11 @@ jobs:
       CIRCLE_BRANCH: ${{ github.ref_name }}
     steps:
       - name: Initialize environment
-        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@c88496832e686b534021a01659a239a9e0976af0
+        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@f9a55a8d166809baa07af8b6bb51438a06ea025c
       - name: Install node modules
         run: yarn install --immutable
       - name: Setup Bazel
-        uses: angular/dev-infra/github-actions/bazel/setup@c88496832e686b534021a01659a239a9e0976af0
+        uses: angular/dev-infra/github-actions/bazel/setup@f9a55a8d166809baa07af8b6bb51438a06ea025c
       - run: yarn admin snapshots --verbose
         env:
           SNAPSHOT_BUILDS_GITHUB_TOKEN: ${{ secrets.SNAPSHOT_BUILDS_GITHUB_TOKEN }}

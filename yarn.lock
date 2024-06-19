@@ -328,9 +328,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@angular/build-tooling@https://github.com/angular/dev-infra-private-build-tooling-builds.git#8bd40f08c88056061158339eca1255735a630da8":
-  version: 0.0.0-c88496832e686b534021a01659a239a9e0976af0
-  resolution: "@angular/build-tooling@https://github.com/angular/dev-infra-private-build-tooling-builds.git#commit=8bd40f08c88056061158339eca1255735a630da8"
+"@angular/build-tooling@https://github.com/angular/dev-infra-private-build-tooling-builds.git#262dbe37d2da168deee0fa25901da397c92a6e88":
+  version: 0.0.0-f9a55a8d166809baa07af8b6bb51438a06ea025c
+  resolution: "@angular/build-tooling@https://github.com/angular/dev-infra-private-build-tooling-builds.git#commit=262dbe37d2da168deee0fa25901da397c92a6e88"
   dependencies:
     "@angular/benchpress": "npm:0.3.0"
     "@angular/build": "npm:18.1.0-next.1"
@@ -361,7 +361,7 @@ __metadata:
     marked-mangle: "npm:^1.1.4"
     preact: "npm:^10.17.1"
     preact-render-to-string: "npm:^6.2.1"
-    prettier: "npm:3.3.1"
+    prettier: "npm:3.3.2"
     protractor: "npm:^7.0.0"
     selenium-webdriver: "npm:^4.18.1"
     send: "npm:^0.18.0"
@@ -375,7 +375,7 @@ __metadata:
   dependenciesMeta:
     re2:
       built: false
-  checksum: 10c0/fdaa01bdb024ce6f37e2e6ca4574aff7452156c881e97bd70f8e45442b512e481f4ad64435c7092c0165f31e385702e724a0c232d19ab6607a5f7f2eb9764097
+  checksum: 10c0/d7baa4daf0ef0bb62908e563a94449c95123958fcd5fdd5561652d810956b5068427feb7fbd02ec01d46f1e84e303d16ad22494f83d3217875ad6a3621e31f78
   languageName: node
   linkType: hard
 
@@ -621,7 +621,7 @@ __metadata:
     "@ampproject/remapping": "npm:2.3.0"
     "@angular/animations": "npm:18.1.0-next.2"
     "@angular/bazel": "patch:@angular/bazel@https%3A//github.com/angular/bazel-builds.git%23commit=71bd2e043e076365effdb6076f33b2d8d6bd6d02#~/.yarn/patches/@angular-bazel-https-9848736cf4.patch"
-    "@angular/build-tooling": "https://github.com/angular/dev-infra-private-build-tooling-builds.git#8bd40f08c88056061158339eca1255735a630da8"
+    "@angular/build-tooling": "https://github.com/angular/dev-infra-private-build-tooling-builds.git#262dbe37d2da168deee0fa25901da397c92a6e88"
     "@angular/cdk": "npm:18.0.3"
     "@angular/common": "npm:18.1.0-next.2"
     "@angular/compiler": "npm:18.1.0-next.2"
@@ -630,7 +630,7 @@ __metadata:
     "@angular/forms": "npm:18.1.0-next.2"
     "@angular/localize": "npm:18.1.0-next.2"
     "@angular/material": "npm:18.0.3"
-    "@angular/ng-dev": "https://github.com/angular/dev-infra-private-ng-dev-builds.git#4156789a26df1a799a5b996fd3fdf8f4b5957db7"
+    "@angular/ng-dev": "https://github.com/angular/dev-infra-private-ng-dev-builds.git#c76591b8d2302378e51fc29619c87c1e947fb9b0"
     "@angular/platform-browser": "npm:18.1.0-next.2"
     "@angular/platform-browser-dynamic": "npm:18.1.0-next.2"
     "@angular/platform-server": "npm:18.1.0-next.2"
@@ -884,9 +884,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#4156789a26df1a799a5b996fd3fdf8f4b5957db7":
-  version: 0.0.0-c88496832e686b534021a01659a239a9e0976af0
-  resolution: "@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#commit=4156789a26df1a799a5b996fd3fdf8f4b5957db7"
+"@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#c76591b8d2302378e51fc29619c87c1e947fb9b0":
+  version: 0.0.0-f9a55a8d166809baa07af8b6bb51438a06ea025c
+  resolution: "@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#commit=c76591b8d2302378e51fc29619c87c1e947fb9b0"
   dependencies:
     "@octokit/rest": "npm:20.1.1"
     "@types/semver": "npm:^7.3.6"
@@ -899,7 +899,7 @@ __metadata:
     typescript: "npm:~4.9.0"
   bin:
     ng-dev: ./bundles/cli.mjs
-  checksum: 10c0/7739b529ae362e46e714719e0182d3d99a5ae014e20917ff5dc526ee64803161d12f666150091686ac31f73bd392ec211bff58654882b6164d7c44ceed6e295b
+  checksum: 10c0/423c45d275b51d74aa6a7dc2f6c20ad6322d4a6b5249202927aef6b2744641104688c4829bfd720ce7460ffd504b7cacd9889ee15954c2cff7a95b1f980de139
   languageName: node
   linkType: hard
 
@@ -15313,16 +15313,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prettier@npm:3.3.1":
-  version: 3.3.1
-  resolution: "prettier@npm:3.3.1"
-  bin:
-    prettier: bin/prettier.cjs
-  checksum: 10c0/c25a709c9f0be670dc6bcb190b622347e1dbeb6c3e7df8b0711724cb64d8647c60b839937a4df4df18e9cfb556c2b08ca9d24d9645eb5488a7fc032a2c4d5cb3
-  languageName: node
-  linkType: hard
-
-"prettier@npm:^3.0.0":
+"prettier@npm:3.3.2, prettier@npm:^3.0.0":
   version: 3.3.2
   resolution: "prettier@npm:3.3.2"
   bin:
