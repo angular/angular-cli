@@ -1,3 +1,29 @@
+<a name="18.1.0-next.3"></a>
+
+# 18.1.0-next.3 (2024-06-20)
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                                          |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------------- |
+| [e3b8b780b](https://github.com/angular/angular-cli/commit/e3b8b780be72d8a0c6247a25e4e1e1ccfbdea67c) | fix  | update schematics to use RouterModule when --routing flag is present |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                  |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------ |
+| [fb2981dc4](https://github.com/angular/angular-cli/commit/fb2981dc4e0ac21f5389bb3b36d5853f8580e5a6) | fix  | use istanbul-lib-instrument directly for karma code coverage |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                                |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------- |
+| [c0ceddf78](https://github.com/angular/angular-cli/commit/c0ceddf78c7ad661419e56517738de526425ca3d) | fix  | add CSP nonce to script with src tags                      |
+| [2324d5a2e](https://github.com/angular/angular-cli/commit/2324d5a2ecedad4330a9cb0e9e66909f95d2ea98) | fix  | automatically resolve `.mjs` files when using Vite         |
+| [dd0704927](https://github.com/angular/angular-cli/commit/dd07049277f5be165825e38015b2bf6ff22620aa) | fix  | use Node.js available parallelism for default worker count |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="18.0.5"></a>
 
 # 18.0.5 (2024-06-20)
