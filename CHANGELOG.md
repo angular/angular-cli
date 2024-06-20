@@ -1,3 +1,29 @@
+<a name="18.0.5"></a>
+
+# 18.0.5 (2024-06-20)
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                                          |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------------- |
+| [5c705e800](https://github.com/angular/angular-cli/commit/5c705e800c17237d82bc9065f22e30b720ddcec0) | fix  | update schematics to use RouterModule when --routing flag is present |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                  |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------ |
+| [86e031dc7](https://github.com/angular/angular-cli/commit/86e031dc7ef6c736e431caf973aca1233d912060) | fix  | use istanbul-lib-instrument directly for karma code coverage |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                                |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------- |
+| [bdd168f37](https://github.com/angular/angular-cli/commit/bdd168f37f7757e0c02971e21e90479555a6e703) | fix  | add CSP nonce to script with src tags                      |
+| [405c14809](https://github.com/angular/angular-cli/commit/405c1480917d50c677be178c817b845f30cc8cce) | fix  | automatically resolve `.mjs` files when using Vite         |
+| [7360a346e](https://github.com/angular/angular-cli/commit/7360a346ed1b329c0620301ce0e0464d5569a42f) | fix  | use Node.js available parallelism for default worker count |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="18.1.0-next.2"></a>
 
 # 18.1.0-next.2 (2024-06-13)
