@@ -1,4 +1,5 @@
-import { join, resolve } from 'path';
+import { equal } from 'node:assert';
+import { join, resolve } from 'node:path';
 import { expectFileToExist, readFile, rimraf } from '../../utils/fs';
 import { getActivePackageManager } from '../../utils/packages';
 import { silentBun, silentNpm, silentPnpm, silentYarn } from '../../utils/process';
@@ -6,7 +7,6 @@ import { silentBun, silentNpm, silentPnpm, silentYarn } from '../../utils/proces
 export default async function () {
   const currentDirectory = process.cwd();
   const newDirectory = resolve('../');
-
   const projectName = 'test-project-create';
 
   try {
@@ -15,19 +15,19 @@ export default async function () {
 
     switch (packageManager) {
       case 'npm':
-        await silentNpm('init', '@angular', projectName, '--', '--skip-install', '--style=scss');
+        await silentNpm('init', '@angular', projectName, '--', '--style=scss');
 
         break;
       case 'yarn':
-        await silentYarn('create', '@angular', projectName, '--skip-install', '--style=scss');
+        await silentYarn('create', '@angular', projectName, '--style=scss');
 
         break;
       case 'bun':
-        await silentBun('create', '@angular', projectName, '--skip-install', '--style=scss');
+        await silentBun('create', '@angular', projectName, '--style=scss');
 
         break;
       case 'pnpm':
-        await silentPnpm('create', '@angular', projectName, '--skip-install', '--style=scss');
+        await silentPnpm('create', '@angular', projectName, '--style=scss');
 
         break;
       default:
@@ -36,9 +36,11 @@ export default async function () {
 
     // Check that package manager has been configured based on the package manager used to invoke the create command.
     const workspace = JSON.parse(await readFile(join(projectName, 'angular.json')));
-    if (workspace.cli?.packageManager !== packageManager) {
-      throw new Error(`Expected 'packageManager' option to be configured to ${packageManager}.`);
-    }
+    equal(
+      workspace.cli?.packageManager,
+      packageManager,
+      `Expected 'packageManager' option to be configured to ${packageManager}.`,
+    );
 
     // Verify styles was create with correct extension.
     await expectFileToExist(join(projectName, 'src/styles.scss'));
