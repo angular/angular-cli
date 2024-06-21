@@ -113,9 +113,13 @@ export class BundlerContext {
       }),
     );
 
+    return BundlerContext.mergeResults(individualResults);
+  }
+
+  static mergeResults(results: BundleContextResult[]): BundleContextResult {
     // Return directly if only one result
-    if (individualResults.length === 1) {
-      return individualResults[0];
+    if (results.length === 1) {
+      return results[0];
     }
 
     let errors: Message[] | undefined;
@@ -127,7 +131,7 @@ export class BundlerContext {
 
     const outputFiles = [];
     let externalConfiguration;
-    for (const result of individualResults) {
+    for (const result of results) {
       warnings.push(...result.warnings);
       if (result.errors) {
         errors ??= [];
