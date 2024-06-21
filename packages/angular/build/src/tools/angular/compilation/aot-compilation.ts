@@ -9,15 +9,15 @@
 import type ng from '@angular/compiler-cli';
 import assert from 'node:assert';
 import ts from 'typescript';
-import { profileAsync, profileSync } from '../../profiling';
+import { profileAsync, profileSync } from '../../esbuild/profiling';
 import {
   AngularHostOptions,
   createAngularCompilerHost,
   ensureSourceFileVersions,
 } from '../angular-host';
-import { createWorkerTransformer } from '../web-worker-transformer';
+import { replaceBootstrap } from '../transformers/jit-bootstrap-transformer';
+import { createWorkerTransformer } from '../transformers/web-worker-transformer';
 import { AngularCompilation, DiagnosticModes, EmitFileResult } from './angular-compilation';
-import { replaceBootstrap } from './jit-bootstrap-transformer';
 
 class AngularCompilationState {
   constructor(

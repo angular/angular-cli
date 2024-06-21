@@ -9,14 +9,14 @@
 import type { Metafile, OutputFile, PluginBuild } from 'esbuild';
 import { readFile } from 'node:fs/promises';
 import { dirname, join, relative } from 'node:path';
-import { LoadResultCache, createCachedLoad } from '../load-result-cache';
-import { ComponentStylesheetBundler } from './component-stylesheets';
 import {
   JIT_NAMESPACE_REGEXP,
   JIT_STYLE_NAMESPACE,
   JIT_TEMPLATE_NAMESPACE,
   parseJitUri,
-} from './uri';
+} from '../../angular/uri';
+import { LoadResultCache, createCachedLoad } from '../load-result-cache';
+import { ComponentStylesheetBundler } from './component-stylesheets';
 
 /**
  * Loads/extracts the contents from a load callback Angular JIT entry.

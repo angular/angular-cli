@@ -18,17 +18,17 @@ import type {
 import assert from 'node:assert';
 import * as path from 'node:path';
 import { maxWorkers, useTypeChecking } from '../../../utils/environment-options';
-import { JavaScriptTransformer } from '../javascript-transformer';
-import { LoadResultCache, createCachedLoad } from '../load-result-cache';
-import { logCumulativeDurations, profileAsync, resetCumulativeDurations } from '../profiling';
-import { BundleStylesheetOptions } from '../stylesheets/bundle-options';
-import { AngularHostOptions } from './angular-host';
+import { AngularHostOptions } from '../../angular/angular-host';
 import {
   AngularCompilation,
   DiagnosticModes,
   NoopCompilation,
   createAngularCompilation,
-} from './compilation';
+} from '../../angular/compilation';
+import { JavaScriptTransformer } from '../javascript-transformer';
+import { LoadResultCache, createCachedLoad } from '../load-result-cache';
+import { logCumulativeDurations, profileAsync, resetCumulativeDurations } from '../profiling';
+import { BundleStylesheetOptions } from '../stylesheets/bundle-options';
 import { SharedTSCompilationState, getSharedCompilationState } from './compilation-state';
 import { ComponentStylesheetBundler } from './component-stylesheets';
 import { FileReferenceTracker } from './file-reference-tracker';
