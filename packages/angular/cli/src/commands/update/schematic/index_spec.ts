@@ -282,4 +282,57 @@ describe('@schematics/update', () => {
     expect(hasPeerdepMsg('typescript')).toBeTruthy();
     expect(hasPeerdepMsg('@angular/localize')).toBeFalsy();
   }, 45000);
+
+  it('does not remove newline at the end of package.json', async () => {
+    const newlineStyles = ['\n', '\r\n'];
+    for (const newline of newlineStyles) {
+      const packageJsonContent = `{
+        "name": "blah",
+        "dependencies": {
+          "@angular-devkit-tests/update-base": "1.0.0"
+        }
+      }${newline}`;
+      const inputTree = new UnitTestTree(
+        new HostTree(
+          new virtualFs.test.TestHost({
+            '/package.json': packageJsonContent,
+          }),
+        ),
+      );
+
+      const resultTree = await schematicRunner.runSchematic(
+        'update',
+        { packages: ['@angular-devkit-tests/update-base'] },
+        inputTree,
+      );
+
+      const resultTreeContent = resultTree.readContent('/package.json');
+      expect(resultTreeContent.endsWith(newline)).toBeTrue();
+    }
+  });
+
+  it('does not add a newline at the end of package.json', async () => {
+    const packageJsonContent = `{
+      "name": "blah",
+      "dependencies": {
+        "@angular-devkit-tests/update-base": "1.0.0"
+      }
+    }`;
+    const inputTree = new UnitTestTree(
+      new HostTree(
+        new virtualFs.test.TestHost({
+          '/package.json': packageJsonContent,
+        }),
+      ),
+    );
+
+    const resultTree = await schematicRunner.runSchematic(
+      'update',
+      { packages: ['@angular-devkit-tests/update-base'] },
+      inputTree,
+    );
+
+    const resultTreeContent = resultTree.readContent('/package.json');
+    expect(resultTreeContent.endsWith('}')).toBeTrue();
+  });
 });

@@ -263,7 +263,7 @@ function _performUpdate(
   logger: logging.LoggerApi,
   migrateOnly: boolean,
 ): void {
-  const packageJsonContent = tree.read('/package.json');
+  const packageJsonContent = tree.read('/package.json')?.toString();
   if (!packageJsonContent) {
     throw new SchematicsException('Could not find a package.json. Are you in a Node project?');
   }
@@ -310,11 +310,12 @@ function _performUpdate(
       logger.warn(`Package ${name} was not found in dependencies.`);
     }
   });
-
-  const newContent = JSON.stringify(packageJson, null, 2);
-  if (packageJsonContent.toString() != newContent || migrateOnly) {
+  const eofMatches = packageJsonContent.match(/\r?\n$/);
+  const eof = eofMatches?.[0] ?? '';
+  const newContent = JSON.stringify(packageJson, null, 2) + eof;
+  if (packageJsonContent != newContent || migrateOnly) {
     if (!migrateOnly) {
-      tree.overwrite('/package.json', JSON.stringify(packageJson, null, 2));
+      tree.overwrite('/package.json', newContent);
     }
 
     const externalMigrations: {}[] = [];
