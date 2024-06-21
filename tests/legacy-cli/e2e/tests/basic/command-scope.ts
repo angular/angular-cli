@@ -1,49 +1,31 @@
-import { homedir } from 'os';
+import assert from 'node:assert/strict';
+import { homedir } from 'node:os';
 import { silentNg } from '../../utils/process';
-import { expectToFail } from '../../utils/utils';
 
 export default async function () {
-  const originalCwd = process.cwd();
+  // Run inside workspace
+  await silentNg('generate', 'component', 'foo', '--dry-run');
 
-  try {
-    // Run inside workspace
-    await silentNg('generate', 'component', 'foo', '--dry-run');
+  // The version command can be run in and outside of a workspace.
+  await silentNg('version');
 
-    // The version command can be run in and outside of a workspace.
-    await silentNg('version');
+  assert.rejects(
+    silentNg('new', 'proj-name', '--dry-run'),
+    /This command is not available when running the Angular CLI inside a workspace\./,
+  );
 
-    const { message: ngNewFailure } = await expectToFail(() =>
-      silentNg('new', 'proj-name', '--dry-run'),
-    );
-    if (
-      !ngNewFailure.includes(
-        'This command is not available when running the Angular CLI inside a workspace.',
-      )
-    ) {
-      throw new Error('ng new should have failed when ran inside a workspace.');
-    }
+  // Change CWD to run outside a workspace.
+  process.chdir(homedir());
 
-    // Chnage CWD to run outside a workspace.
-    process.chdir(homedir());
+  // ng generate can only be ran inside.
+  assert.rejects(
+    silentNg('generate', 'component', 'foo', '--dry-run'),
+    /This command is not available when running the Angular CLI outside a workspace\./,
+  );
 
-    // ng generate can only be ran inside.
-    const { message: ngGenerateFailure } = await expectToFail(() =>
-      silentNg('generate', 'component', 'foo', '--dry-run'),
-    );
-    if (
-      !ngGenerateFailure.includes(
-        'This command is not available when running the Angular CLI outside a workspace.',
-      )
-    ) {
-      throw new Error('ng generate should have failed when ran outside a workspace.');
-    }
+  // ng new can only be ran outside of a workspace
+  await silentNg('new', 'proj-name', '--dry-run');
 
-    // ng new can only be ran outside of a workspace
-    await silentNg('new', 'proj-name', '--dry-run');
-
-    // The version command can be run in and outside of a workspace.
-    await silentNg('version');
-  } finally {
-    process.chdir(originalCwd);
-  }
+  // The version command can be run in and outside of a workspace.
+  await silentNg('version');
 }
