@@ -10,7 +10,7 @@ import type { PartialMessage } from 'esbuild';
 import assert from 'node:assert';
 import { randomUUID } from 'node:crypto';
 import { type MessagePort, receiveMessageOnPort } from 'node:worker_threads';
-import { SourceFileCache } from '../source-file-cache';
+import { SourceFileCache } from '../../esbuild/angular/source-file-cache';
 import type { AngularCompilation, DiagnosticModes } from './angular-compilation';
 import { AotCompilation } from './aot-compilation';
 import { JitCompilation } from './jit-compilation';

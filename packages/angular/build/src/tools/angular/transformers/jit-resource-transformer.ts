@@ -7,7 +7,7 @@
  */
 
 import ts from 'typescript';
-import { generateJitFileUri, generateJitInlineUri } from './uri';
+import { generateJitFileUri, generateJitInlineUri } from '../uri';
 
 /**
  * Creates a TypeScript Transformer to transform Angular Component resource references into

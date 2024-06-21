@@ -9,10 +9,10 @@
 import type ng from '@angular/compiler-cli';
 import type { PartialMessage } from 'esbuild';
 import type ts from 'typescript';
-import { loadEsmModule } from '../../../../utils/load-esm';
-import { profileAsync, profileSync } from '../../profiling';
+import { loadEsmModule } from '../../../utils/load-esm';
+import { convertTypeScriptDiagnostic } from '../../esbuild/angular/diagnostics';
+import { profileAsync, profileSync } from '../../esbuild/profiling';
 import type { AngularHostOptions } from '../angular-host';
-import { convertTypeScriptDiagnostic } from '../diagnostics';
 
 export interface EmitFileResult {
   filename: string;

@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { useParallelTs } from '../../../../utils/environment-options';
+import { useParallelTs } from '../../../utils/environment-options';
 import type { AngularCompilation } from './angular-compilation';
 
 /**
