@@ -11,12 +11,12 @@ function _isTruthy(value: undefined | string): boolean {
   return value !== undefined && value !== '0' && value.toUpperCase() !== 'FALSE';
 }
 
-export function isTTY(): boolean {
+export function isTTY(stream: NodeJS.WriteStream = process.stdout): boolean {
   // If we force TTY, we always return true.
   const force = process.env['NG_FORCE_TTY'];
   if (force !== undefined) {
     return _isTruthy(force);
   }
 
-  return !!process.stdout.isTTY && !_isTruthy(process.env['CI']);
+  return !!stream.isTTY && !_isTruthy(process.env['CI']);
 }
