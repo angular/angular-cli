@@ -8,9 +8,9 @@
 
 // Workspace related rules and types
 export {
-  ProjectDefinition,
-  TargetDefinition,
-  WorkspaceDefinition,
+  type ProjectDefinition,
+  type TargetDefinition,
+  type WorkspaceDefinition,
   getWorkspace as readWorkspace,
   updateWorkspace,
   writeWorkspace,

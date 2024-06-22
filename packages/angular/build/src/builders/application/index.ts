@@ -22,7 +22,7 @@ import {
 } from './options';
 import { Schema as ApplicationBuilderOptions } from './schema';
 
-export { ApplicationBuilderOptions };
+export type { ApplicationBuilderOptions };
 
 export async function* buildApplicationInternal(
   options: ApplicationBuilderInternalOptions,

@@ -82,7 +82,7 @@ async function updateWebdriver() {
   } as unknown as JSON);
 }
 
-export { ProtractorBuilderOptions };
+export type { ProtractorBuilderOptions };
 
 /**
  * @experimental Direct usage of this function is considered experimental.

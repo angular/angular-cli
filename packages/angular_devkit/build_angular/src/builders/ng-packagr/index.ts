@@ -63,5 +63,5 @@ export function execute(
   );
 }
 
-export { NgPackagrBuilderOptions };
+export type { NgPackagrBuilderOptions };
 export default createBuilder<Record<string, string> & NgPackagrBuilderOptions>(execute);

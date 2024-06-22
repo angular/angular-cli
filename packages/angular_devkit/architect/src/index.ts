@@ -9,7 +9,7 @@
 import * as jobs from './jobs';
 
 export * from './api';
-export { Architect, ScheduleOptions } from './architect';
+export { Architect, type ScheduleOptions } from './architect';
 export { createBuilder } from './create-builder';
 
 export { jobs };

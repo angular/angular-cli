@@ -16,11 +16,11 @@ export type { BuildOutputAsset } from './tools/esbuild/bundler-execution-result'
 
 export {
   executeDevServerBuilder,
-  DevServerBuilderOptions,
-  DevServerBuilderOutput,
+  type DevServerBuilderOptions,
+  type DevServerBuilderOutput,
 } from './builders/dev-server';
 
 export {
   execute as executeExtractI18nBuilder,
-  ExtractI18nBuilderOptions,
+  type ExtractI18nBuilderOptions,
 } from './builders/extract-i18n';

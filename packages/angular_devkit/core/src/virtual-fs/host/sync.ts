@@ -64,7 +64,7 @@ export class SyncDelegateHost<T extends object = {}> {
   get capabilities(): HostCapabilities {
     return this._delegate.capabilities;
   }
-  get delegate() {
+  get delegate(): Host<T> {
     return this._delegate;
   }
 

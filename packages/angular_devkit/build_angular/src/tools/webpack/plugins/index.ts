@@ -8,14 +8,14 @@
 
 // Exports the webpack plugins we use internally.
 export { AnyComponentStyleBudgetChecker } from './any-component-style-budget-checker';
-export { ScriptsWebpackPlugin, ScriptsWebpackPluginOptions } from './scripts-webpack-plugin';
+export { ScriptsWebpackPlugin, type ScriptsWebpackPluginOptions } from './scripts-webpack-plugin';
 export { SuppressExtractedTextChunksWebpackPlugin } from './suppress-entry-chunks-webpack-plugin';
-export { RemoveHashPlugin, RemoveHashPluginOptions } from './remove-hash-plugin';
+export { RemoveHashPlugin, type RemoveHashPluginOptions } from './remove-hash-plugin';
 export { DedupeModuleResolvePlugin } from './dedupe-module-resolve-plugin';
 export { CommonJsUsageWarnPlugin } from './common-js-usage-warn-plugin';
 export { JsonStatsPlugin } from './json-stats-plugin';
 export { JavaScriptOptimizerPlugin } from './javascript-optimizer-plugin';
 export {
   default as PostcssCliResources,
-  PostcssCliResourcesOptions,
+  type PostcssCliResourcesOptions,
 } from './postcss-cli-resources';

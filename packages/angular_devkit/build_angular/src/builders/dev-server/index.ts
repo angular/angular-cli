@@ -11,7 +11,11 @@ import { createBuilder } from '@angular-devkit/architect';
 import { execute } from './builder';
 import { Schema as DevServerBuilderOptions } from './schema';
 
-export { DevServerBuilderOptions, DevServerBuilderOutput, execute as executeDevServerBuilder };
+export {
+  type DevServerBuilderOptions,
+  type DevServerBuilderOutput,
+  execute as executeDevServerBuilder,
+};
 export default createBuilder<DevServerBuilderOptions, DevServerBuilderOutput>(execute);
 
 // Temporary export to support specs

@@ -237,7 +237,7 @@ function getBuiltInKarmaConfig(
   };
 }
 
-export { KarmaBuilderOptions };
+export type { KarmaBuilderOptions };
 export default createBuilder<Record<string, string> & KarmaBuilderOptions>(execute);
 
 function getBuiltInMainFile(): string {

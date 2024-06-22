@@ -29,7 +29,7 @@ export * from './rules/url';
 export * from './tree/delegate';
 export * from './tree/empty';
 export * from './tree/host-tree';
-export { UpdateRecorder } from './tree/interface';
+export type { UpdateRecorder } from './tree/interface';
 export * from './engine/schematic';
 export * from './sink/dryrun';
 export * from './sink/host';
