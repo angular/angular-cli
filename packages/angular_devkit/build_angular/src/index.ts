@@ -8,61 +8,62 @@
 
 export * from './transforms';
 
-export {
+export { CrossOrigin, OutputHashing, Type } from './builders/browser/schema';
+export type {
   AssetPattern,
   AssetPatternClass as AssetPatternObject,
   Budget,
-  CrossOrigin,
   FileReplacement,
   OptimizationClass as OptimizationObject,
   OptimizationUnion,
-  OutputHashing,
   Schema as BrowserBuilderOptions,
   SourceMapClass as SourceMapObject,
   SourceMapUnion,
   StylePreprocessorOptions,
-  Type,
 } from './builders/browser/schema';
 
 export {
   buildWebpackBrowser as executeBrowserBuilder,
-  BrowserBuilderOutput,
+  type BrowserBuilderOutput,
 } from './builders/browser';
 
-export { buildApplication, ApplicationBuilderOptions } from '@angular/build';
+export { buildApplication, type ApplicationBuilderOptions } from '@angular/build';
 
 export {
   executeDevServerBuilder,
-  DevServerBuilderOptions,
-  DevServerBuilderOutput,
+  type DevServerBuilderOptions,
+  type DevServerBuilderOutput,
 } from './builders/dev-server';
 
 export {
   execute as executeExtractI18nBuilder,
-  ExtractI18nBuilderOptions,
+  type ExtractI18nBuilderOptions,
 } from './builders/extract-i18n';
 
 export {
   execute as executeKarmaBuilder,
-  KarmaBuilderOptions,
-  KarmaConfigOptions,
+  type KarmaBuilderOptions,
+  type KarmaConfigOptions,
 } from './builders/karma';
 
 export {
   execute as executeProtractorBuilder,
-  ProtractorBuilderOptions,
+  type ProtractorBuilderOptions,
 } from './builders/protractor';
 
 export {
   execute as executeServerBuilder,
-  ServerBuilderOptions,
-  ServerBuilderOutput,
+  type ServerBuilderOptions,
+  type ServerBuilderOutput,
 } from './builders/server';
 
 export {
   execute as executeSSRDevServerBuilder,
-  SSRDevServerBuilderOptions,
-  SSRDevServerBuilderOutput,
+  type SSRDevServerBuilderOptions,
+  type SSRDevServerBuilderOutput,
 } from './builders/ssr-dev-server';
 
-export { execute as executeNgPackagrBuilder, NgPackagrBuilderOptions } from './builders/ng-packagr';
+export {
+  execute as executeNgPackagrBuilder,
+  type NgPackagrBuilderOptions,
+} from './builders/ng-packagr';

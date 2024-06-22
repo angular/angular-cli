@@ -56,4 +56,4 @@ export class WatcherNotifier implements BuilderWatcherFactory {
   }
 }
 
-export { BuilderWatcherFactory };
+export type { BuilderWatcherFactory };

@@ -48,7 +48,7 @@ export class TestHost extends SimpleMemoryHost {
   get records(): TestLogRecord[] {
     return [...this._records];
   }
-  clearRecords() {
+  clearRecords(): void {
     this._records = [];
   }
 
@@ -70,7 +70,7 @@ export class TestHost extends SimpleMemoryHost {
     return _visit(normalize('/'));
   }
 
-  get sync() {
+  get sync(): SyncDelegateHost<{}> {
     if (!this._sync) {
       this._sync = new SyncDelegateHost<{}>(this);
     }
@@ -78,7 +78,7 @@ export class TestHost extends SimpleMemoryHost {
     return this._sync;
   }
 
-  clone() {
+  clone(): TestHost {
     const newHost = new TestHost();
     newHost._cache = new Map(this._cache);
 
@@ -86,22 +86,22 @@ export class TestHost extends SimpleMemoryHost {
   }
 
   // Override parents functions to keep a record of all operators that were done.
-  protected override _write(path: Path, content: FileBuffer) {
+  protected override _write(path: Path, content: FileBuffer): void {
     this._records.push({ kind: 'write', path });
 
     return super._write(path, content);
   }
-  protected override _read(path: Path) {
+  protected override _read(path: Path): ArrayBuffer {
     this._records.push({ kind: 'read', path });
 
     return super._read(path);
   }
-  protected override _delete(path: Path) {
+  protected override _delete(path: Path): void {
     this._records.push({ kind: 'delete', path });
 
     return super._delete(path);
   }
-  protected override _rename(from: Path, to: Path) {
+  protected override _rename(from: Path, to: Path): void {
     this._records.push({ kind: 'rename', from, to });
 
     return super._rename(from, to);
@@ -111,17 +111,17 @@ export class TestHost extends SimpleMemoryHost {
 
     return super._list(path);
   }
-  protected override _exists(path: Path) {
+  protected override _exists(path: Path): boolean {
     this._records.push({ kind: 'exists', path });
 
     return super._exists(path);
   }
-  protected override _isDirectory(path: Path) {
+  protected override _isDirectory(path: Path): boolean {
     this._records.push({ kind: 'isDirectory', path });
 
     return super._isDirectory(path);
   }
-  protected override _isFile(path: Path) {
+  protected override _isFile(path: Path): boolean {
     this._records.push({ kind: 'isFile', path });
 
     return super._isFile(path);
@@ -137,7 +137,7 @@ export class TestHost extends SimpleMemoryHost {
     return super._watch(path, options);
   }
 
-  $write(path: string, content: string) {
+  $write(path: string, content: string): void {
     return super._write(normalize(path), stringToFileBuffer(content));
   }
 
@@ -149,15 +149,15 @@ export class TestHost extends SimpleMemoryHost {
     return super._list(normalize(path));
   }
 
-  $exists(path: string) {
+  $exists(path: string): boolean {
     return super._exists(normalize(path));
   }
 
-  $isDirectory(path: string) {
+  $isDirectory(path: string): boolean {
     return super._isDirectory(normalize(path));
   }
 
-  $isFile(path: string) {
+  $isFile(path: string): boolean {
     return super._isFile(normalize(path));
   }
 }

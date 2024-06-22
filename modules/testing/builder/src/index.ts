@@ -8,8 +8,12 @@
 
 export {
   BuilderHarness,
-  BuilderHarnessExecutionOptions,
-  BuilderHarnessExecutionResult,
+  type BuilderHarnessExecutionOptions,
+  type BuilderHarnessExecutionResult,
 } from './builder-harness';
-export { HarnessFileMatchers, JasmineBuilderHarness, describeBuilder } from './jasmine-helpers';
+export {
+  type HarnessFileMatchers,
+  JasmineBuilderHarness,
+  describeBuilder,
+} from './jasmine-helpers';
 export * from './test-utils';

@@ -15,12 +15,12 @@
 
 // Builders
 export { buildApplicationInternal } from './builders/application';
-export { ApplicationBuilderInternalOptions } from './builders/application/options';
+export type { ApplicationBuilderInternalOptions } from './builders/application/options';
 export { serveWithVite } from './builders/dev-server/vite-server';
 
 // Tools
 export * from './tools/babel/plugins';
-export { ExternalResultMetadata } from './tools/esbuild/bundler-execution-result';
+export type { ExternalResultMetadata } from './tools/esbuild/bundler-execution-result';
 export { emitFilesToDisk } from './tools/esbuild/utils';
 export { transformSupportedBrowsersToTargets } from './tools/esbuild/utils';
 export { SassWorkerImplementation } from './tools/sass/sass-service';
@@ -34,7 +34,7 @@ export { createCompilerPlugin } from './tools/esbuild/angular/compiler-plugin';
 export * from './utils/bundle-calculator';
 export { checkPort } from './utils/check-port';
 export { deleteOutputDir } from './utils/delete-output-dir';
-export { I18nOptions, createI18nOptions, loadTranslations } from './utils/i18n-options';
+export { type I18nOptions, createI18nOptions, loadTranslations } from './utils/i18n-options';
 export {
   IndexHtmlGenerator,
   type IndexHtmlGeneratorOptions,
@@ -51,6 +51,6 @@ export { loadProxyConfiguration } from './utils/load-proxy-config';
 export { type TranslationLoader, createTranslationLoader } from './utils/load-translations';
 export { purgeStaleBuildCache } from './utils/purge-cache';
 export { augmentAppWithServiceWorker } from './utils/service-worker';
-export { BundleStats, generateBuildStatsTable } from './utils/stats-table';
+export { type BundleStats, generateBuildStatsTable } from './utils/stats-table';
 export { getSupportedBrowsers } from './utils/supported-browsers';
 export { assertCompatibleAngularVersion } from './utils/version';

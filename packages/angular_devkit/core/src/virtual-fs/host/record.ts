@@ -400,19 +400,19 @@ export class CordHost extends SimpleMemoryHost {
     return null;
   }
 
-  willCreate(path: Path) {
+  willCreate(path: Path): boolean {
     return this._filesToCreate.has(path);
   }
-  willOverwrite(path: Path) {
+  willOverwrite(path: Path): boolean {
     return this._filesToOverwrite.has(path);
   }
-  willDelete(path: Path) {
+  willDelete(path: Path): boolean {
     return this._filesToDelete.has(path);
   }
-  willRename(path: Path) {
+  willRename(path: Path): boolean {
     return this._filesToRename.has(path);
   }
-  willRenameTo(path: Path, to: Path) {
+  willRenameTo(path: Path, to: Path): boolean {
     return this._filesToRename.get(path) === to;
   }
 }

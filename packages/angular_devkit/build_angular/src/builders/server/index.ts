@@ -53,7 +53,7 @@ export type ServerBuilderOutput = BuilderOutput & {
   }[];
 };
 
-export { ServerBuilderOptions };
+export type { ServerBuilderOptions };
 
 /**
  * @experimental Direct usage of this function is considered experimental.

@@ -12,13 +12,38 @@ index 9e5cda684f0456b61d1b6c0f9c56ae021594713f..6c45196bda5880531d32618dfca0dee4
  
  _DEVMODE_TARGET_DEFAULT = "es2015"
 diff --git a/internal/common/tsconfig.bzl b/internal/common/tsconfig.bzl
-index b01c999f5e02b388f51a508b0b608cf69db9b664..ec3e4ccb321fa230546e34c1c2ea87f7457fa108 100755
+index b01c999f5e02b388f51a508b0b608cf69db9b664..847c23fe4829d0c847e9b4bd1ad698e1ccea720e 100755
 --- a/internal/common/tsconfig.bzl
 +++ b/internal/common/tsconfig.bzl
-@@ -278,11 +278,6 @@ def create_tsconfig(
+@@ -211,9 +211,6 @@ def create_tsconfig(
+         # will convert that to goog.module syntax.
+         "module": "umd" if devmode_manifest or has_node_runtime else "esnext",
+ 
+-        # Has no effect in closure/ES2015 mode. Always true just for simplicity.
+-        "downlevelIteration": True,
+-
+         # Do not type-check the lib.*.d.ts.
+         # We think this shouldn't be necessary but haven't figured out why yet
+         # and builds are faster with the setting on.
+@@ -248,13 +245,6 @@ def create_tsconfig(
+         # "short name" mappings for npm packages, such as "@angular/core"
+         "paths": mapped_module_roots,
+ 
+-        # Inline const enums.
+-        "preserveConstEnums": False,
+-
+-        # permit `@Decorator` syntax and allow runtime reflection on their types.
+-        "experimentalDecorators": True,
+-        "emitDecoratorMetadata": True,
+-
+         # Interpret JSX as React calls (until someone asks for something different)
+         "jsx": "react",
+ 
+@@ -277,12 +267,6 @@ def create_tsconfig(
+         # always emit declaration files in the same location as outDir.
          "declarationDir": "/".join([workspace_path, outdir_path]),
          "stripInternal": True,
- 
+-
 -        # Embed source maps and sources in .js outputs
 -        "inlineSourceMap": True,
 -        "inlineSources": True,

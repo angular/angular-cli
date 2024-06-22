@@ -58,7 +58,7 @@ import { ResolverHost } from './resolver';
 export class AliasHost<StatsT extends object = {}> extends ResolverHost<StatsT> {
   protected _aliases = new Map<Path, Path>();
 
-  protected _resolve(path: Path) {
+  protected _resolve(path: Path): Path {
     let maybeAlias = this._aliases.get(path);
     const sp = split(path);
     const remaining: PathFragment[] = [];

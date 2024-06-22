@@ -10,7 +10,7 @@ import { Budget as BudgetEntry, Type as BudgetType } from '../builders/applicati
 import { formatSize } from './format-bytes';
 
 // Re-export to avoid direct schema importing throughout code
-export { BudgetEntry, BudgetType };
+export { type BudgetEntry, BudgetType };
 
 interface Size {
   size: number;

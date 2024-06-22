@@ -91,11 +91,11 @@ export class SimpleMemoryHost implements Host<{}> {
     this._cache.set(normalize('/'), this._newDirStats());
   }
 
-  protected _toAbsolute(path: Path) {
+  protected _toAbsolute(path: Path): Path {
     return isAbsolute(path) ? path : normalize('/' + path);
   }
 
-  protected _updateWatchers(path: Path, type: HostWatchEventType) {
+  protected _updateWatchers(path: Path, type: HostWatchEventType): void {
     const time = new Date();
     let currentPath = path;
     let parent: Path | null = null;

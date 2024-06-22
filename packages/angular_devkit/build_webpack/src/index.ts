@@ -8,4 +8,4 @@
 
 export * from './builders/webpack';
 export * from './builders/webpack-dev-server';
-export { EmittedFiles } from './utils';
+export type { EmittedFiles } from './utils';

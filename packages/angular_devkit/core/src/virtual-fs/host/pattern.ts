@@ -17,7 +17,7 @@ export type ReplacementFunction = (path: Path) => Path;
 export class PatternMatchingHost<StatsT extends object = {}> extends ResolverHost<StatsT> {
   protected _patterns = new Map<RegExp, ReplacementFunction>();
 
-  addPattern(pattern: string | string[], replacementFn: ReplacementFunction) {
+  addPattern(pattern: string | string[], replacementFn: ReplacementFunction): void {
     const patterns = Array.isArray(pattern) ? pattern : [pattern];
     for (const glob of patterns) {
       const { output } = parseGlob(glob);
@@ -25,7 +25,7 @@ export class PatternMatchingHost<StatsT extends object = {}> extends ResolverHos
     }
   }
 
-  protected _resolve(path: Path) {
+  protected _resolve(path: Path): Path {
     let newPath = path;
     this._patterns.forEach((fn, re) => {
       if (re.test(path)) {
