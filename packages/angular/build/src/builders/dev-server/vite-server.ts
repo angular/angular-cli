@@ -25,7 +25,6 @@ import {
   BuildOutputFileType,
   type ExternalResultMetadata,
   JavaScriptTransformer,
-  createRxjsEsmResolutionPlugin,
   getFeatureSupport,
   getSupportedBrowsers,
   isZonelessApp,
@@ -658,10 +657,6 @@ function getDepOptimizationConfig({
       },
     },
   ];
-
-  if (ssr) {
-    plugins.unshift(createRxjsEsmResolutionPlugin() as ViteEsBuildPlugin);
-  }
 
   return {
     // Exclude any explicitly defined dependencies (currently build defined externals)
