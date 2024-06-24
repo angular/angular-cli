@@ -13,10 +13,13 @@ import { BuildOutputFileType, BundlerContext } from '../../tools/esbuild/bundler
 import { ExecutionResult, RebuildState } from '../../tools/esbuild/bundler-execution-result';
 import { checkCommonJSModules } from '../../tools/esbuild/commonjs-checker';
 import { extractLicenses } from '../../tools/esbuild/license-extractor';
+import { profileAsync } from '../../tools/esbuild/profiling';
 import { calculateEstimatedTransferSizes, logBuildStats } from '../../tools/esbuild/utils';
 import { BudgetCalculatorResult, checkBudgets } from '../../utils/bundle-calculator';
+import { shouldOptimizeChunks } from '../../utils/environment-options';
 import { resolveAssets } from '../../utils/resolve-assets';
 import { getSupportedBrowsers } from '../../utils/supported-browsers';
+import { optimizeChunks } from './chunk-optimizer';
 import { executePostBundleSteps } from './execute-post-bundle';
 import { inlineI18n, loadActiveTranslations } from './i18n';
 import { NormalizedApplicationBuildOptions } from './options';
@@ -59,10 +62,19 @@ export async function executeBuild(
     bundlerContexts = setupBundlerContexts(options, browsers, codeBundleCache);
   }
 
-  const bundlingResult = await BundlerContext.bundleAll(
+  let bundlingResult = await BundlerContext.bundleAll(
     bundlerContexts,
     rebuildState?.fileChanges.all,
   );
+
+  if (options.optimizationOptions.scripts && shouldOptimizeChunks) {
+    bundlingResult = await profileAsync('OPTIMIZE_CHUNKS', () =>
+      optimizeChunks(
+        bundlingResult,
+        options.sourcemapOptions.scripts ? !options.sourcemapOptions.hidden || 'hidden' : false,
+      ),
+    );
+  }
 
   const executionResult = new ExecutionResult(bundlerContexts, codeBundleCache);
   executionResult.addWarnings(bundlingResult.warnings);

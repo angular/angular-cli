@@ -89,6 +89,7 @@ ts_library(
         "@npm//picomatch",
         "@npm//piscina",
         "@npm//postcss",
+        "@npm//rollup",
         "@npm//sass",
         "@npm//semver",
         "@npm//tslib",
