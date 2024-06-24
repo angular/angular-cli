@@ -1,4 +1,5 @@
-import { appendFile } from 'node:fs/promises';
+import assert from 'node:assert/strict';
+import { appendFile, readdir } from 'node:fs/promises';
 import { getGlobalVariable } from '../../utils/env';
 import { readFile, replaceInFile } from '../../utils/fs';
 import {
@@ -6,7 +7,7 @@ import {
   installPackage,
   installWorkspacePackages,
 } from '../../utils/packages';
-import { ng } from '../../utils/process';
+import { execWithEnv, ng } from '../../utils/process';
 import { isPrereleaseCli, updateJsonFile } from '../../utils/project';
 
 const snapshots = require('../../ng-snapshot/package.json');
@@ -89,4 +90,22 @@ export default async function () {
   );
 
   await ng('e2e', '--configuration=production');
+
+  const usingApplicationBuilder = getGlobalVariable('argv')['esbuild'];
+  if (usingApplicationBuilder) {
+    // Test with chunk optimizations to reduce async animations chunk file count
+    await execWithEnv('ng', ['build'], {
+      ...process.env,
+      NG_BUILD_OPTIMIZE_CHUNKS: '1',
+    });
+    const distFiles = await readdir('dist/test-project/browser');
+    const jsCount = distFiles.filter((file) => file.endsWith('.js')).length;
+    // 3 = polyfills, main, and one lazy chunk
+    assert.equal(jsCount, 3);
+
+    await execWithEnv('ng', ['e2e', '--configuration=production'], {
+      ...process.env,
+      NG_BUILD_OPTIMIZE_CHUNKS: '1',
+    });
+  }
 }

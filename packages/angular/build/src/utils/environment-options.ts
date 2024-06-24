@@ -96,3 +96,7 @@ export const useTypeChecking =
 const buildLogsJsonVariable = process.env['NG_BUILD_LOGS_JSON'];
 export const useJSONBuildLogs =
   isPresent(buildLogsJsonVariable) && isEnabled(buildLogsJsonVariable);
+
+const optimizeChunksVariable = process.env['NG_BUILD_OPTIMIZE_CHUNKS'];
+export const shouldOptimizeChunks =
+  isPresent(optimizeChunksVariable) && isEnabled(optimizeChunksVariable);
