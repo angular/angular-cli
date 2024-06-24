@@ -12,6 +12,11 @@ import * as os from 'os';
 import * as path from 'path';
 import { findUp } from './find-up';
 
+interface PackageDependencies {
+  dependencies?: Record<string, string>;
+  devDependencies?: Record<string, string>;
+}
+
 export function findWorkspaceFile(currentDirectory = process.cwd()): string | null {
   const possibleConfigFiles = ['angular.json', '.angular.json'];
   const configFilePath = findUp(possibleConfigFiles, currentDirectory);
@@ -27,7 +32,7 @@ export function findWorkspaceFile(currentDirectory = process.cwd()): string | nu
 
     try {
       const packageJsonText = fs.readFileSync(packageJsonPath, 'utf-8');
-      const packageJson = JSON.parse(packageJsonText);
+      const packageJson = JSON.parse(packageJsonText) as PackageDependencies;
       if (!containsCliDep(packageJson)) {
         // No CLI dependency
         return null;
@@ -41,10 +46,7 @@ export function findWorkspaceFile(currentDirectory = process.cwd()): string | nu
   return configFilePath;
 }
 
-function containsCliDep(obj?: {
-  dependencies?: Record<string, string>;
-  devDependencies?: Record<string, string>;
-}): boolean {
+function containsCliDep(obj?: PackageDependencies): boolean {
   const pkgName = '@angular/cli';
   if (!obj) {
     return false;
