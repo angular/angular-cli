@@ -1045,7 +1045,7 @@ export default class UpdateCommandModule extends CommandModule<UpdateCommandArgs
     if (existsSync(packageJsonPath)) {
       const content = await fs.readFile(packageJsonPath, 'utf-8');
       if (content) {
-        const { bin = {} } = JSON.parse(content);
+        const { bin = {} } = JSON.parse(content) as { bin: Record<string, string> };
         const binKeys = Object.keys(bin);
 
         if (binKeys.length) {

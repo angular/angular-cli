@@ -44,7 +44,7 @@ export interface PackageTreeNode {
 
 export async function readPackageJson(packageJsonPath: string): Promise<PackageJson | undefined> {
   try {
-    return JSON.parse((await fs.promises.readFile(packageJsonPath)).toString());
+    return JSON.parse((await fs.promises.readFile(packageJsonPath)).toString()) as PackageJson;
   } catch {
     return undefined;
   }

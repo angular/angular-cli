@@ -185,7 +185,7 @@ function normalizeValue(value: string | undefined | boolean | number): JsonValue
     // and convert them into a numberic entities.
     // Example: 73b61974-182c-48e4-b4c6-30ddf08c5c98 -> 73.
     // These values should never contain comments, therefore using `JSON.parse` is safe.
-    return JSON.parse(valueString);
+    return JSON.parse(valueString) as JsonValue;
   } catch {
     return value;
   }
