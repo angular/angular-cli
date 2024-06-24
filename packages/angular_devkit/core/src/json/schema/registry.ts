@@ -156,7 +156,7 @@ export class CoreSchemaRegistry implements SchemaRegistry {
           });
           res.on('end', () => {
             try {
-              const json = JSON.parse(data);
+              const json = JSON.parse(data) as JsonObject;
               this._uriCache.set(uri, json);
               resolve(json);
             } catch (err) {
@@ -630,7 +630,7 @@ export class CoreSchemaRegistry implements SchemaRegistry {
     smartDefaults: Map<string, JsonObject>,
   ): Promise<void> {
     for (const [pointer, schema] of smartDefaults.entries()) {
-      const fragments = JSON.parse(pointer);
+      const fragments = JSON.parse(pointer) as string[];
       const source = this._sourceMap.get(schema.$source as string);
       if (!source) {
         continue;

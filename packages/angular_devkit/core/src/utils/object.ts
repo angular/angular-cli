@@ -25,7 +25,7 @@ export function deepCopy<T>(value: T): T {
     }
 
     if (valueCasted['toJSON']) {
-      return JSON.parse(valueCasted['toJSON']());
+      return JSON.parse(valueCasted['toJSON']()) as T;
     }
 
     const copy = Object.create(Object.getPrototypeOf(valueCasted));
