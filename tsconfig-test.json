@@ -7,6 +7,13 @@
     // Istanbul (not Constantinople) as well, and applying both source maps to get the original
     // source in devtools.
     "inlineSources": true,
-    "types": ["node", "jasmine"]
+    "types": ["node", "jasmine"],
+    "plugins": [
+      {
+        "name": "@bazel/tsetse",
+        // TODO: Cleanup tests and remove this rule disable
+        "disabledRules": ["must-type-assert-json-parse"]
+      }
+    ]
   }
 }

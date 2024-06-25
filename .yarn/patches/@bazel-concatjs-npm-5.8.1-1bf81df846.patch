@@ -52,3 +52,18 @@ index b01c999f5e02b388f51a508b0b608cf69db9b664..847c23fe4829d0c847e9b4bd1ad698e1
      }
  
      # "node_modules" still checked for backward compat for ng_module
+diff --git a/internal/tsetse/rules/must_use_promises_rule.js b/internal/tsetse/rules/must_use_promises_rule.js
+index e404d01cf80ab4da4b9cca89005b14a60b7d8c79..85488d9a339982af4495d2b5f4c30effb98a538b 100755
+--- a/internal/tsetse/rules/must_use_promises_rule.js
++++ b/internal/tsetse/rules/must_use_promises_rule.js
+@@ -30,6 +30,10 @@ function checkCallExpression(checker, node) {
+     if (tsutils.isExpressionValueUsed(node) || !inAsyncFunction(node)) {
+         return;
+     }
++    // Sync behavior with @typescript-eslint/no-floating-promises
++    if (node.parent && ts.isVoidExpression(node.parent)) {
++        return;
++    }
+     if (tsutils.isThenableType(checker.typeChecker, node)) {
+         checker.addFailureAtNode(node, FAILURE_STRING);
+     }

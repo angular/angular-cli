@@ -58,7 +58,10 @@ export function angularWebpackLoader(this: LoaderContext<unknown>, content: stri
       let resultMap;
       if (result.map) {
         resultContent = resultContent.replace(/^\/\/# sourceMappingURL=[^\r\n]*/gm, '');
-        resultMap = JSON.parse(result.map);
+        resultMap = JSON.parse(result.map) as Exclude<
+          Parameters<typeof callback>[2],
+          string | undefined
+        >;
         resultMap.sources = resultMap.sources.map((source: string) =>
           path.join(path.dirname(this.resourcePath), source),
         );

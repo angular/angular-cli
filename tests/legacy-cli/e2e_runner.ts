@@ -371,7 +371,7 @@ async function findPackageTars(): Promise<{ [pkg: string]: PkgInfo }> {
   return pkgs.reduce(
     (all, pkg, i) => {
       const json = pkgJsons[i].toString('utf8');
-      const { name, version } = JSON.parse(json);
+      const { name, version } = JSON.parse(json) as { name: string; version: string };
       if (!name) {
         throw new Error(`Package ${pkg} - package.json name/version not found`);
       }

@@ -2426,7 +2426,7 @@ __metadata:
 
 "@bazel/concatjs@patch:@bazel/concatjs@npm%3A5.8.1#~/.yarn/patches/@bazel-concatjs-npm-5.8.1-1bf81df846.patch":
   version: 5.8.1
-  resolution: "@bazel/concatjs@patch:@bazel/concatjs@npm%3A5.8.1#~/.yarn/patches/@bazel-concatjs-npm-5.8.1-1bf81df846.patch::version=5.8.1&hash=6673ab"
+  resolution: "@bazel/concatjs@patch:@bazel/concatjs@npm%3A5.8.1#~/.yarn/patches/@bazel-concatjs-npm-5.8.1-1bf81df846.patch::version=5.8.1&hash=13d359"
   dependencies:
     protobufjs: "npm:6.8.8"
     source-map-support: "npm:0.5.9"
@@ -2441,7 +2441,7 @@ __metadata:
     karma-sourcemap-loader: ">=0.3.0"
   bin:
     tsc_wrapped: internal/tsc_wrapped/tsc_wrapped.js
-  checksum: 10c0/644891b24514c83d9006f6a90abc0c4fc59816bdff56ed4fb4bd6c611ff4dc187c91dee112d98f1f694352b93691c97542aa04834fceabd44679540a5528a889
+  checksum: 10c0/6b51579124bdc15650603d6a621fab7b11d7d4185d0eaa113ec23cad337436b89d690880a9285968e100e405678cc610b59ee335681e13035709dc444cc89733
   languageName: node
   linkType: hard
 

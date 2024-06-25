@@ -12,7 +12,7 @@ export default async function () {
   // `ng add` command itself and not the behavior of npm which may otherwise fail depending
   // on the npm version in use and the version specifier supplied in each test.
   if (getActivePackageManager() === 'npm') {
-    appendFile('.npmrc', '\nforce=true\n');
+    await appendFile('.npmrc', '\nforce=true\n');
   }
 
   const tag = (await isPrereleaseCli()) ? '@next' : '';
