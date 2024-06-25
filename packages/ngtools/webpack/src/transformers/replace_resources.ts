@@ -103,7 +103,7 @@ function visitDecorator(
     return node;
   }
 
-  const objectExpression = args[0] as ts.ObjectLiteralExpression;
+  const objectExpression = args[0];
   const styleReplacements: ts.Expression[] = [];
 
   // visit all properties

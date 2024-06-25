@@ -41,7 +41,7 @@ function buildSelector(options: DirectiveOptions, projectPrefix: string) {
 export default function (options: DirectiveOptions): Rule {
   return async (host: Tree) => {
     const workspace = await getWorkspace(host);
-    const project = workspace.projects.get(options.project as string);
+    const project = workspace.projects.get(options.project);
     if (!project) {
       throw new SchematicsException(`Project "${options.project}" does not exist.`);
     }

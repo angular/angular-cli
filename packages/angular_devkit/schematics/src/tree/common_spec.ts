@@ -58,8 +58,7 @@ export function testTreeVisit({ createTree, sets }: VisitTestSpec) {
           allPaths.push(path);
         });
 
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        expect(allPaths).toEqual(expected!);
+        expect(allPaths).toEqual(expected);
       });
     });
   });

@@ -49,7 +49,7 @@ function getServerModulePath(host: Tree, sourceRoot: string, mainPath: string): 
   if (!expNode) {
     return null;
   }
-  const relativePath = (expNode as ts.ExportDeclaration).moduleSpecifier as ts.StringLiteral;
+  const relativePath = expNode.moduleSpecifier as ts.StringLiteral;
   const modulePath = join(sourceRoot, `${relativePath.text}.ts`);
 
   return modulePath;

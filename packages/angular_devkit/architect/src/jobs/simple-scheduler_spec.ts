@@ -461,6 +461,7 @@ describe('SimpleScheduler', () => {
 
       const job = scheduler.schedule('job', 0);
       let sideValue = '';
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
       const c = job.getChannel('any') as Observable<string>;
       c.subscribe((x) => (sideValue = x));
 
@@ -486,6 +487,7 @@ describe('SimpleScheduler', () => {
 
       const job = scheduler.schedule('job', 0);
       let sideValue = '';
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
       const c = job.getChannel('any', { type: 'number' }) as Observable<string>;
       expect(c).toBeDefined(null);
 

@@ -43,7 +43,7 @@ function buildSelector(options: ComponentOptions, projectPrefix: string) {
 export default function (options: ComponentOptions): Rule {
   return async (host: Tree) => {
     const workspace = await getWorkspace(host);
-    const project = workspace.projects.get(options.project as string);
+    const project = workspace.projects.get(options.project);
 
     if (!project) {
       throw new SchematicsException(`Project "${options.project}" does not exist.`);
@@ -55,7 +55,7 @@ export default function (options: ComponentOptions): Rule {
 
     options.module = findModuleFromOptions(host, options);
 
-    const parsedPath = parseName(options.path as string, options.name);
+    const parsedPath = parseName(options.path, options.name);
     options.name = parsedPath.name;
     options.path = parsedPath.path;
     options.selector =

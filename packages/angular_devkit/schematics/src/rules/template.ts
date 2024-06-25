@@ -138,7 +138,7 @@ export function applyPathTemplate<T extends PathTemplateData>(
           }
 
           // Coerce to string.
-          return '' + (data[pipe] as PathTemplatePipeFunction)(acc);
+          return '' + data[pipe](acc);
         }, '' + replacement);
       }
 

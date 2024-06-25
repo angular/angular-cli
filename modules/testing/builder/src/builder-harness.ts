@@ -204,7 +204,7 @@ export class BuilderHarness<T> {
           // Harness builder targets currently do not support configurations
           return {};
         } else {
-          return (this.builderTargets.get(target)?.options || {}) as json.JsonObject;
+          return this.builderTargets.get(target)?.options || {};
         }
       },
       hasTarget: async (project, target) => {

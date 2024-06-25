@@ -114,7 +114,7 @@ export default custom<ApplicationPresetOptions>(() => {
         }
 
         customOptions.i18n = {
-          ...(i18n as NonNullable<ApplicationPresetOptions['i18n']>),
+          ...i18n,
           pluginCreators: i18nPluginCreators,
         };
 

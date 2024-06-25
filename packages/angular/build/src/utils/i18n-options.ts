@@ -39,7 +39,7 @@ function normalizeTranslationFileOption(
   }
 
   if (Array.isArray(option) && option.every((element) => typeof element === 'string')) {
-    return option as string[];
+    return option;
   }
 
   let errorMessage = `Project i18n locales translation field value for '${locale}' is malformed. `;
