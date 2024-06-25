@@ -245,7 +245,7 @@ export async function* serveWithVite(
         ...new Set([...server.config.server.fs.allow, ...assetFiles.values()]),
       ];
 
-      await handleUpdate(normalizePath, generatedFiles, server, serverOptions, context.logger);
+      handleUpdate(normalizePath, generatedFiles, server, serverOptions, context.logger);
 
       if (requiresServerRestart) {
         // Restart the server to force SSR dep re-optimization when a dependency has been added.

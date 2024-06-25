@@ -355,6 +355,7 @@ export class CoreSchemaRegistry implements SchemaRegistry {
 
       // Validate using ajv
       try {
+        // eslint-disable-next-line @typescript-eslint/await-thenable
         const success = await validator.call(validationContext, data);
 
         if (!success) {

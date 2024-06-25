@@ -57,7 +57,7 @@ describe('Browser Builder build optimizer', () => {
     const boOutput = (await run.result) as BrowserBuilderOutput;
     expect(boOutput.success).toBe(true);
 
-    const boStats = await await lastValueFrom(
+    const boStats = await lastValueFrom(
       host.stat(join(normalize(output.outputs[0].path), 'main.js')),
     );
     if (!boStats) {

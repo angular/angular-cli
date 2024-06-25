@@ -174,7 +174,7 @@ export async function inlineLocales(options: InlineOptions) {
       true,
       localeDataContent,
     );
-    const transformResult = await transformFromAstSync(ast, options.code, {
+    const transformResult = transformFromAstSync(ast, options.code, {
       filename: options.filename,
       // using false ensures that babel will NOT search and process sourcemap comments (large memory usage)
       // The types do not include the false option even though it is valid
