@@ -19,6 +19,6 @@
   "dependencies": {
     "@angular-devkit/core": "0.0.0-PLACEHOLDER",
     "@angular-devkit/schematics": "0.0.0-PLACEHOLDER",
-    "jsonc-parser": "3.2.1"
+    "jsonc-parser": "3.3.1"
   }
 }

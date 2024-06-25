@@ -125,7 +125,7 @@ describe('InlineCriticalCssProcessor', () => {
       '<link href="theme.css" rel="stylesheet" media="print" ngCspMedia="all">',
     );
     // Nonces shouldn't be added inside the `noscript` tags.
-    expect(content).toContain('<noscript><link rel="stylesheet" href="theme.css"></noscript>');
+    expect(content).toContain('<noscript><link href="theme.css" rel="stylesheet"></noscript>');
     expect(content).toContain('<script nonce="{% nonce %}">');
     expect(tags.stripIndents`${content}`).toContain(tags.stripIndents`
     <style nonce="{% nonce %}">
