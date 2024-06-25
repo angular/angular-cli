@@ -104,7 +104,6 @@
     "no-fallthrough": "off",
     "no-underscore-dangle": "off",
     "@typescript-eslint/ban-types": "off",
-    "@typescript-eslint/no-empty-function": "off",
     "@typescript-eslint/no-implied-eval": "off",
     "@typescript-eslint/no-var-requires": "off",
     "@typescript-eslint/no-unsafe-argument": "off",
