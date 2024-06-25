@@ -10,8 +10,7 @@ import { BuilderOutput } from '@angular-devkit/architect';
 import { ForkOptions, fork } from 'child_process';
 import { resolve } from 'path';
 import { Observable } from 'rxjs';
-
-const treeKill = require('tree-kill');
+import treeKill from 'tree-kill';
 
 export function runModuleAsObservableFork(
   cwd: string,
@@ -32,7 +31,7 @@ export function runModuleAsObservableFork(
     const forkOptions: ForkOptions = {
       cwd,
       execArgv,
-    } as {} as ForkOptions;
+    };
 
     // TODO: support passing in a logger to use as stdio streams
     // if (logger) {

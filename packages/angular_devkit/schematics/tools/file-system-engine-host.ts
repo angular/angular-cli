@@ -106,7 +106,7 @@ export class FileSystemEngineHost extends FileSystemEngineHostBase {
 
         // Default handling code is for old tasks that incorrectly export `default` with non-ESM module
         return from(import(path).then((mod) => (mod.default?.default || mod.default)())).pipe(
-          catchError(() => throwError(new UnregisteredTaskException(name))),
+          catchError(() => throwError(() => new UnregisteredTaskException(name))),
         );
       } catch {}
     }

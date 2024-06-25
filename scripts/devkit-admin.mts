@@ -34,16 +34,12 @@ console.error = function (...args) {
   originalConsole.error(colors.red(m), ...rest);
 };
 
-// eslint-disable-next-line @typescript-eslint/no-floating-promises
-(async () => {
-  // code goes here
-  try {
-    const script = await import(`./${scriptName}.mjs`);
-    const exitCode = await script.default(args, cwd);
-    process.exitCode = exitCode || 0;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } catch (err: any) {
-    console.error(err.stack);
-    process.exitCode = 99;
-  }
-})();
+try {
+  const script = await import(`./${scriptName}.mjs`);
+  const exitCode = await script.default(args, cwd);
+  process.exitCode = exitCode || 0;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+} catch (err: any) {
+  console.error(err.stack);
+  process.exitCode = 99;
+}
