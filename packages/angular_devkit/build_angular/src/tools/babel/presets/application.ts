@@ -191,7 +191,7 @@ export default function (api: unknown, options: ApplicationPresetOptions) {
     const includePlugins: string[] = [];
 
     if (safariClassFieldScopeBugBrowsers === undefined) {
-      const browserslist = require('browserslist');
+      const browserslist = require('browserslist') as typeof import('browserslist');
       safariClassFieldScopeBugBrowsers = new Set(
         browserslist([
           // Safari <15 is technically not supported via https://angular.dev/reference/versions#browser-support

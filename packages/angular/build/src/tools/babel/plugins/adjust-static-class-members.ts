@@ -376,8 +376,7 @@ function analyzeClassStaticProperties(
         shouldWrap = false;
         break;
       }
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } else if ((element as any).isStaticBlock()) {
+    } else if (element.isStaticBlock()) {
       // Only need to analyze static blocks
       const body = element.get('body');
 
@@ -387,9 +386,7 @@ function analyzeClassStaticProperties(
         break;
       }
 
-      const expression = body.find((n: NodePath<types.Node>) => n.isExpressionStatement()) as
-        | NodePath<types.ExpressionStatement>
-        | undefined;
+      const expression = body.find((n) => n.isExpressionStatement());
 
       const assignmentExpression = expression?.get('expression');
       if (assignmentExpression?.isAssignmentExpression()) {
