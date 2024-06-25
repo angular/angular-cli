@@ -147,7 +147,6 @@ ts_library(
         "@npm//@discoveryjs/json-ext",
         "@npm//@types/babel__core",
         "@npm//@types/browser-sync",
-        "@npm//@types/browserslist",
         "@npm//@types/karma",
         "@npm//@types/less",
         "@npm//@types/loader-utils",

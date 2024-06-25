@@ -91,7 +91,6 @@
     "@rollup/plugin-node-resolve": "^13.0.5",
     "@types/babel__core": "7.20.5",
     "@types/browser-sync": "^2.27.0",
-    "@types/browserslist": "^4.15.0",
     "@types/express": "^4.16.0",
     "@types/http-proxy": "^1.17.4",
     "@types/ini": "^4.0.0",
