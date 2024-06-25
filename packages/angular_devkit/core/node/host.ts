@@ -208,13 +208,11 @@ export class NodeJsSyncHost implements virtualFs.Host<Stats> {
   }
 
   isDirectory(path: Path): Observable<boolean> {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    return this.stat(path)!.pipe(map((stat) => stat.isDirectory()));
+    return this.stat(path).pipe(map((stat) => stat.isDirectory()));
   }
 
   isFile(path: Path): Observable<boolean> {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    return this.stat(path)!.pipe(map((stat) => stat.isFile()));
+    return this.stat(path).pipe(map((stat) => stat.isFile()));
   }
 
   // Some hosts may not support stat.

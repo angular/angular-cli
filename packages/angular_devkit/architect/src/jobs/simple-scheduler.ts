@@ -418,7 +418,7 @@ export class SimpleScheduler<
 
     const output = outboundBus.pipe(
       filter((x) => x.kind == JobOutboundMessageKind.Output),
-      map((x) => (x as JobOutboundMessageOutput<O>).value),
+      map((x) => x.value),
       shareReplay(1),
     );
 

@@ -97,6 +97,7 @@ export function serveWebpackBrowser(
       logger.warn(`Warning: 'outputHashing' option is disabled when using the dev-server.`);
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
     const browserOptions = (await context.validateOptions(
       {
         ...rawBrowserOptions,

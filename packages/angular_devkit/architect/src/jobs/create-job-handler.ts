@@ -164,10 +164,10 @@ export function createJobHandler<A extends JsonValue, I extends JsonValue, O ext
       if (isPromise(result)) {
         result = from(result);
       } else if (!isObservable(result)) {
-        result = of(result as O);
+        result = of(result);
       }
 
-      subscription = (result as Observable<O>).subscribe(
+      subscription = result.subscribe(
         (value: O) => subject.next({ kind: JobOutboundMessageKind.Output, description, value }),
         (error) => subject.error(error),
         () => complete(),

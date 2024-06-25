@@ -55,7 +55,7 @@ export function callSource(source: Source, context: SchematicContext): Observabl
     }
 
     if (result && TreeSymbol in result) {
-      return result as Tree;
+      return result;
     }
 
     throw new InvalidSourceResultException(result);
@@ -91,7 +91,7 @@ async function callRuleAsync(rule: Rule, tree: Tree, context: SchematicContext):
   }
 
   if (result && TreeSymbol in result) {
-    return result as Tree;
+    return result;
   }
 
   throw new InvalidRuleResultException(result);

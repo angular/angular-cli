@@ -131,7 +131,7 @@ function buildRoute(options: ModuleOptions, modulePath: string) {
 export default function (options: ModuleOptions): Rule {
   return async (host: Tree) => {
     if (options.path === undefined) {
-      options.path = await createDefaultPath(host, options.project as string);
+      options.path = await createDefaultPath(host, options.project);
     }
 
     if (options.module) {
