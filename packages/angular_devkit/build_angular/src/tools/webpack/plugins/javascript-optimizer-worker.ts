@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import remapping from '@ampproject/remapping';
+import remapping, { SourceMapInput } from '@ampproject/remapping';
 import type { BuildFailure, TransformResult } from 'esbuild';
 import { minify } from 'terser';
 import { EsbuildExecutor } from './esbuild-executor';
@@ -79,7 +79,7 @@ interface OptimizeRequest {
      * The source map of the JavaScript asset, if available.
      * This map is merged with all intermediate source maps during optimization.
      */
-    map: object;
+    map: SourceMapInput;
   };
 }
 
@@ -118,11 +118,11 @@ export default async function ({ asset, options }: OptimizeRequest) {
     const partialSourcemaps = [];
 
     if (esbuildResult.map) {
-      partialSourcemaps.unshift(JSON.parse(esbuildResult.map));
+      partialSourcemaps.unshift(JSON.parse(esbuildResult.map) as SourceMapInput);
     }
 
     if (terserResult.map) {
-      partialSourcemaps.unshift(terserResult.map);
+      partialSourcemaps.unshift(terserResult.map as SourceMapInput);
     }
 
     if (asset.map) {

@@ -3,7 +3,7 @@ import { setTimeout } from 'node:timers/promises';
 import { silentNg } from '../../utils/process';
 
 export default async function () {
-  assert.rejects(silentNg('e2e', 'test-project', '--dev-server-target='));
+  await assert.rejects(silentNg('e2e', 'test-project', '--dev-server-target='));
 
   // These should work.
   await silentNg('e2e', 'test-project');

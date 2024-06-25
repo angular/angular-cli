@@ -33,9 +33,6 @@
       "@schematics/angular": ["./packages/schematics/angular"]
     }
   },
-  "bazelOptions": {
-    "suppressTsconfigOverrideWarnings": true
-  },
   "exclude": [
     "packages/angular_devkit/build_angular/src/babel-bazel.d.ts",
     "dist/**/*",

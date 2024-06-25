@@ -204,7 +204,7 @@ async function findCustomJestConfig(dir: string): Promise<string | undefined> {
     return undefined; // No package.json, therefore no Jest configuration in it.
   }
 
-  const json = JSON.parse(packageJson);
+  const json = JSON.parse(packageJson) as { jest?: unknown };
   if ('jest' in json) {
     return packageJsonPath;
   }

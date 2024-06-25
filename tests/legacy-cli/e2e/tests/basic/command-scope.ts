@@ -9,7 +9,7 @@ export default async function () {
   // The version command can be run in and outside of a workspace.
   await silentNg('version');
 
-  assert.rejects(
+  await assert.rejects(
     silentNg('new', 'proj-name', '--dry-run'),
     /This command is not available when running the Angular CLI inside a workspace\./,
   );
@@ -18,7 +18,7 @@ export default async function () {
   process.chdir(homedir());
 
   // ng generate can only be ran inside.
-  assert.rejects(
+  await assert.rejects(
     silentNg('generate', 'component', 'foo', '--dry-run'),
     /This command is not available when running the Angular CLI outside a workspace\./,
   );

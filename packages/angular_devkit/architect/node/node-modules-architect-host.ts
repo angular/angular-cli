@@ -28,7 +28,7 @@ function clone(obj: unknown): unknown {
   try {
     return deserialize(serialize(obj));
   } catch {
-    return JSON.parse(JSON.stringify(obj));
+    return JSON.parse(JSON.stringify(obj)) as unknown;
   }
 }
 

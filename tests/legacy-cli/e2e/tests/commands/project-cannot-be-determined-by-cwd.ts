@@ -25,7 +25,7 @@ export default async function () {
     }
 
     // Help should still work
-    execAndWaitForOutputToMatch('ng', ['build', '--help'], /--configuration/);
+    await execAndWaitForOutputToMatch('ng', ['build', '--help'], /--configuration/);
 
     // Yargs allows positional args to be passed as flags. Verify that in this case the project can be determined.
     await ng('build', '--project=third-app', '--configuration=development');

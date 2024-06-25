@@ -8,7 +8,7 @@ import { readNgVersion } from '../../utils/version';
 
 export default async function () {
   // Enable disk cache
-  updateJsonFile('angular.json', (config) => {
+  await updateJsonFile('angular.json', (config) => {
     config.cli ??= {};
     config.cli.cache = { environment: 'all' };
   });
