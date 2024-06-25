@@ -41,7 +41,7 @@ export abstract class ArchitectBaseCommandModule<T extends object>
   protected readonly missingTargetChoices: MissingTargetChoice[] | undefined;
 
   protected async runSingleTarget(target: Target, options: OtherOptions): Promise<number> {
-    const architectHost = await this.getArchitectHost();
+    const architectHost = this.getArchitectHost();
 
     let builderName: string;
     try {
