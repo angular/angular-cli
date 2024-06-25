@@ -42,6 +42,9 @@ jobs:
           key: ${{ runner.os }}-${{ hashFiles('.eslintrc.json') }}
       - name: Install node modules
         run: yarn install --immutable
+      - name: Generate JSON schema types
+        # Schema types are required to correctly lint the TypeScript code
+        run: yarn admin build-schema
       - name: Run ESLint
         run: yarn lint --cache-strategy content
       - name: Validate NgBot Configuration

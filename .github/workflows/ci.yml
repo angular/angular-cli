@@ -24,6 +24,9 @@ jobs:
         uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@14fe7bcc5313c4920fbb699af1824b63740e8e34
       - name: Install node modules
         run: yarn install --immutable
+      - name: Generate JSON schema types
+        # Schema types are required to correctly lint the TypeScript code
+        run: yarn admin build-schema
       - name: Run ESLint
         run: yarn lint --cache-strategy content
       - name: Validate NgBot Configuration
