@@ -14,7 +14,7 @@ import {
 } from '../../tools/esbuild/bundler-context';
 import { BuildOutputAsset } from '../../tools/esbuild/bundler-execution-result';
 import { generateIndexHtml } from '../../tools/esbuild/index-html-generator';
-import { createOutputFileFromText } from '../../tools/esbuild/utils';
+import { createOutputFile } from '../../tools/esbuild/utils';
 import { maxWorkers } from '../../utils/environment-options';
 import { prerenderPages } from '../../utils/server-rendering/prerender';
 import { augmentAppWithServiceWorkerEsbuild } from '../../utils/service-worker';
@@ -84,14 +84,14 @@ export async function executePostBundleSteps(
 
     additionalHtmlOutputFiles.set(
       indexHtmlOptions.output,
-      createOutputFileFromText(indexHtmlOptions.output, csrContent, BuildOutputFileType.Browser),
+      createOutputFile(indexHtmlOptions.output, csrContent, BuildOutputFileType.Browser),
     );
 
     if (ssrContent) {
       const serverIndexHtmlFilename = 'index.server.html';
       additionalHtmlOutputFiles.set(
         serverIndexHtmlFilename,
-        createOutputFileFromText(serverIndexHtmlFilename, ssrContent, BuildOutputFileType.Server),
+        createOutputFile(serverIndexHtmlFilename, ssrContent, BuildOutputFileType.Server),
       );
 
       ssrIndexContent = ssrContent;
@@ -131,7 +131,7 @@ export async function executePostBundleSteps(
     for (const [path, content] of Object.entries(output)) {
       additionalHtmlOutputFiles.set(
         path,
-        createOutputFileFromText(path, content, BuildOutputFileType.Browser),
+        createOutputFile(path, content, BuildOutputFileType.Browser),
       );
     }
   }
@@ -153,11 +153,7 @@ export async function executePostBundleSteps(
       );
 
       additionalOutputFiles.push(
-        createOutputFileFromText(
-          'ngsw.json',
-          serviceWorkerResult.manifest,
-          BuildOutputFileType.Browser,
-        ),
+        createOutputFile('ngsw.json', serviceWorkerResult.manifest, BuildOutputFileType.Browser),
       );
       additionalAssets.push(...serviceWorkerResult.assetFiles);
     } catch (error) {
