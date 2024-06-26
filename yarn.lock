@@ -747,7 +747,7 @@ __metadata:
     magic-string: "npm:0.30.10"
     mini-css-extract-plugin: "npm:2.9.0"
     mrmime: "npm:2.0.0"
-    ng-packagr: "npm:18.0.0"
+    ng-packagr: "npm:18.1.0-next.0"
     npm: "npm:^10.8.1"
     npm-package-arg: "npm:11.0.2"
     open: "npm:10.1.0"
@@ -13454,9 +13454,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ng-packagr@npm:18.0.0":
-  version: 18.0.0
-  resolution: "ng-packagr@npm:18.0.0"
+"ng-packagr@npm:18.1.0-next.0":
+  version: 18.1.0-next.0
+  resolution: "ng-packagr@npm:18.1.0-next.0"
   dependencies:
     "@rollup/plugin-json": "npm:^6.1.0"
     "@rollup/plugin-node-resolve": "npm:^15.2.3"
@@ -13482,10 +13482,10 @@ __metadata:
     rxjs: "npm:^7.8.1"
     sass: "npm:^1.69.5"
   peerDependencies:
-    "@angular/compiler-cli": ^18.0.0-next.0 || ^18.1.0-next.0
+    "@angular/compiler-cli": ^18.0.0 || ^18.1.0-next.0
     tailwindcss: ^2.0.0 || ^3.0.0
     tslib: ^2.3.0
-    typescript: ">=5.4 <5.5"
+    typescript: ">=5.4 <5.6"
   dependenciesMeta:
     rollup:
       optional: true
@@ -13494,7 +13494,7 @@ __metadata:
       optional: true
   bin:
     ng-packagr: cli/main.js
-  checksum: 10c0/7e8cb80f7a41c6735146aa9ad82fa6917051ff913965cd12f0a4a12421900ad410a8b9cd32109285112405ddeac99ddef75a093abe1d24afa8be7677da521f82
+  checksum: 10c0/d9daa88ef78798119fcfae556ca4265528485216a1a30c271b5575c5ee2d98c9e9d694ea7e550a206fa15b17083fa1107e70cbcdc0a406fd902858cbddf291e5
   languageName: node
   linkType: hard
 
