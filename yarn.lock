@@ -112,7 +112,7 @@ __metadata:
     ora: "npm:5.4.1"
     parse5-html-rewriting-stream: "npm:7.0.0"
     picomatch: "npm:4.0.2"
-    piscina: "npm:4.6.0"
+    piscina: "npm:4.6.1"
     postcss: "npm:8.4.38"
     postcss-loader: "npm:8.1.1"
     resolve-url-loader: "npm:5.0.0"
@@ -413,7 +413,7 @@ __metadata:
     ora: "npm:5.4.1"
     parse5-html-rewriting-stream: "npm:7.0.0"
     picomatch: "npm:4.0.2"
-    piscina: "npm:4.6.0"
+    piscina: "npm:4.6.1"
     sass: "npm:1.77.6"
     semver: "npm:7.6.2"
     undici: "npm:6.19.2"
@@ -755,7 +755,7 @@ __metadata:
     pacote: "npm:18.0.6"
     parse5-html-rewriting-stream: "npm:7.0.0"
     picomatch: "npm:4.0.2"
-    piscina: "npm:4.6.0"
+    piscina: "npm:4.6.1"
     postcss: "npm:8.4.38"
     postcss-loader: "npm:8.1.1"
     prettier: "npm:^3.0.0"
@@ -14563,6 +14563,18 @@ __metadata:
     nice-napi:
       optional: true
   checksum: 10c0/4de10c3ae29b74394097a0966e1e978010dae316478a72a71bfc84a1a96ab807b7ef7d81076277d154e071d744e1ece903329e8e619ce09c08c75d714f639363
+  languageName: node
+  linkType: hard
+
+"piscina@npm:4.6.1":
+  version: 4.6.1
+  resolution: "piscina@npm:4.6.1"
+  dependencies:
+    nice-napi: "npm:^1.0.2"
+  dependenciesMeta:
+    nice-napi:
+      optional: true
+  checksum: 10c0/2225fb42806f8d72bf09f2528bd65721b440dcc63ece957a9542a28b3b958be353dc48802fb11a8af66fdfd28a419300ed28e04573b8bf420e6dcfe63d6f58b5
   languageName: node
   linkType: hard
 

@@ -37,7 +37,7 @@
     "ora": "5.4.1",
     "parse5-html-rewriting-stream": "7.0.0",
     "picomatch": "4.0.2",
-    "piscina": "4.6.0",
+    "piscina": "4.6.1",
     "sass": "1.77.6",
     "semver": "7.6.2",
     "undici": "6.19.2",
