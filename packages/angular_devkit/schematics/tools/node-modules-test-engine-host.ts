@@ -15,38 +15,33 @@ import { NodeModulesEngineHost } from './node-module-engine-host';
  * revert back to using node modules resolution. This is done for testing.
  */
 export class NodeModulesTestEngineHost extends NodeModulesEngineHost {
-  private _collections = new Map<string, string>();
-  private _tasks = [] as TaskConfiguration[];
+  #collections = new Map<string, string>();
+  #tasks: TaskConfiguration[] = [];
 
   get tasks() {
-    return this._tasks;
+    return this.#tasks;
   }
 
   clearTasks() {
-    this._tasks = [];
+    this.#tasks = [];
   }
 
   registerCollection(name: string, path: string) {
-    this._collections.set(name, path);
+    this.#collections.set(name, path);
   }
 
   override transformContext(context: FileSystemSchematicContext): FileSystemSchematicContext {
-    const oldAddTask = context.addTask;
-    context.addTask = (task: TaskConfigurationGenerator<{}>, dependencies?: Array<TaskId>) => {
-      this._tasks.push(task.toConfiguration());
+    const oldAddTask = context.addTask.bind(context);
+    context.addTask = (task: TaskConfigurationGenerator, dependencies?: TaskId[]) => {
+      this.#tasks.push(task.toConfiguration());
 
-      return oldAddTask.call(context, task, dependencies);
+      return oldAddTask(task, dependencies);
     };
 
     return context;
   }
 
   protected override _resolveCollectionPath(name: string, requester?: string): string {
-    const maybePath = this._collections.get(name);
-    if (maybePath) {
-      return maybePath;
-    }
-
-    return super._resolveCollectionPath(name, requester);
+    return this.#collections.get(name) ?? super._resolveCollectionPath(name, requester);
   }
 }
