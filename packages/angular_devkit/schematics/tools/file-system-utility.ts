@@ -8,16 +8,22 @@
 
 import { JsonValue } from '@angular-devkit/core';
 import { FileDoesNotExistException } from '@angular-devkit/schematics';
-import { existsSync, readFileSync } from 'fs';
+import { readFileSync } from 'fs';
 import { ParseError, parse, printParseErrorCode } from 'jsonc-parser';
 
 export function readJsonFile(path: string): JsonValue {
-  if (!existsSync(path)) {
-    throw new FileDoesNotExistException(path);
+  let data;
+  try {
+    data = readFileSync(path, 'utf-8');
+  } catch (e) {
+    if (e && typeof e === 'object' && 'code' in e && e.code === 'ENOENT') {
+      throw new FileDoesNotExistException(path);
+    }
+    throw e;
   }
 
   const errors: ParseError[] = [];
-  const content = parse(readFileSync(path, 'utf-8'), errors, { allowTrailingComma: true });
+  const content = parse(data, errors, { allowTrailingComma: true }) as JsonValue;
 
   if (errors.length) {
     const { error, offset } = errors[0];
