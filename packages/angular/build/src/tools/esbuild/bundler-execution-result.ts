@@ -11,7 +11,7 @@ import { normalize } from 'node:path';
 import type { ChangedFiles } from '../../tools/esbuild/watcher';
 import type { SourceFileCache } from './angular/source-file-cache';
 import type { BuildOutputFile, BuildOutputFileType, BundlerContext } from './bundler-context';
-import { createOutputFileFromText } from './utils';
+import { createOutputFile } from './utils';
 
 export interface BuildOutputAsset {
   source: string;
@@ -49,8 +49,8 @@ export class ExecutionResult {
     private codeBundleCache?: SourceFileCache,
   ) {}
 
-  addOutputFile(path: string, content: string, type: BuildOutputFileType): void {
-    this.outputFiles.push(createOutputFileFromText(path, content, type));
+  addOutputFile(path: string, content: string | Uint8Array, type: BuildOutputFileType): void {
+    this.outputFiles.push(createOutputFile(path, content, type));
   }
 
   addAssets(assets: BuildOutputAsset[]): void {

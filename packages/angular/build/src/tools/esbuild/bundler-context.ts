@@ -55,6 +55,7 @@ export enum BuildOutputFileType {
 
 export interface BuildOutputFile extends OutputFile {
   type: BuildOutputFileType;
+  readonly size: number;
   clone: () => BuildOutputFile;
 }
 

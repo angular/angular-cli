@@ -294,64 +294,104 @@ export async function emitFilesToDisk<T = BuildOutputAsset | BuildOutputFile>(
   }
 }
 
-export function createOutputFileFromText(
+export function createOutputFile(
   path: string,
-  text: string,
+  data: string | Uint8Array,
   type: BuildOutputFileType,
 ): BuildOutputFile {
-  return {
-    path,
-    text,
-    type,
-    get hash() {
-      return createHash('sha256').update(this.text).digest('hex');
-    },
-    get contents() {
-      return Buffer.from(this.text, 'utf-8');
-    },
-    clone(): BuildOutputFile {
-      return createOutputFileFromText(this.path, this.text, this.type);
-    },
-  };
-}
+  if (typeof data === 'string') {
+    let cachedContents: Uint8Array | null = null;
+    let cachedText: string | null = data;
+    let cachedHash: string | null = null;
 
-export function createOutputFileFromData(
-  path: string,
-  data: Uint8Array,
-  type: BuildOutputFileType,
-): BuildOutputFile {
-  return {
-    path,
-    type,
-    get text() {
-      return Buffer.from(data.buffer, data.byteOffset, data.byteLength).toString('utf-8');
-    },
-    get hash() {
-      return createHash('sha256').update(this.text).digest('hex');
-    },
-    get contents() {
-      return data;
-    },
-    clone(): BuildOutputFile {
-      return createOutputFileFromData(this.path, this.contents, this.type);
-    },
-  };
+    return {
+      path,
+      type,
+      get contents(): Uint8Array {
+        cachedContents ??= new TextEncoder().encode(data);
+
+        return cachedContents;
+      },
+      set contents(value: Uint8Array) {
+        cachedContents = value;
+        cachedText = null;
+      },
+      get text(): string {
+        cachedText ??= new TextDecoder('utf-8').decode(this.contents);
+
+        return cachedText;
+      },
+      get size(): number {
+        return this.contents.byteLength;
+      },
+      get hash(): string {
+        cachedHash ??= createHash('sha256')
+          .update(cachedText ?? this.contents)
+          .digest('hex');
+
+        return cachedHash;
+      },
+      clone(): BuildOutputFile {
+        return createOutputFile(this.path, cachedText ?? this.contents, this.type);
+      },
+    };
+  } else {
+    let cachedContents = data;
+    let cachedText: string | null = null;
+    let cachedHash: string | null = null;
+
+    return {
+      get contents(): Uint8Array {
+        return cachedContents;
+      },
+      set contents(value: Uint8Array) {
+        cachedContents = value;
+        cachedText = null;
+      },
+      path,
+      type,
+      get size(): number {
+        return this.contents.byteLength;
+      },
+      get text(): string {
+        cachedText ??= new TextDecoder('utf-8').decode(this.contents);
+
+        return cachedText;
+      },
+      get hash(): string {
+        cachedHash ??= createHash('sha256').update(this.contents).digest('hex');
+
+        return cachedHash;
+      },
+      clone(): BuildOutputFile {
+        return createOutputFile(this.path, this.contents, this.type);
+      },
+    };
+  }
 }
 
 export function convertOutputFile(file: OutputFile, type: BuildOutputFileType): BuildOutputFile {
-  const { path, contents, hash } = file;
+  let { contents: cachedContents } = file;
+  let cachedText: string | null = null;
 
   return {
-    contents,
-    hash,
-    path,
+    get contents(): Uint8Array {
+      return cachedContents;
+    },
+    set contents(value: Uint8Array) {
+      cachedContents = value;
+      cachedText = null;
+    },
+    hash: file.hash,
+    path: file.path,
     type,
-    get text() {
-      return Buffer.from(
-        this.contents.buffer,
-        this.contents.byteOffset,
-        this.contents.byteLength,
-      ).toString('utf-8');
+    get size(): number {
+      return this.contents.byteLength;
+    },
+    get text(): string {
+      cachedText ??= new TextDecoder('utf-8').decode(this.contents);
+
+      return cachedText;
     },
     clone(): BuildOutputFile {
       return convertOutputFile(this, this.type);

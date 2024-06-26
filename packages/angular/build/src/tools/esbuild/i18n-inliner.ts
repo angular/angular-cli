@@ -9,7 +9,7 @@
 import assert from 'node:assert';
 import Piscina from 'piscina';
 import { BuildOutputFile, BuildOutputFileType } from './bundler-context';
-import { createOutputFileFromText } from './utils';
+import { createOutputFile } from './utils';
 
 /**
  * A keyword used to indicate if a JavaScript file may require inlining of translations.
@@ -139,9 +139,9 @@ export class I18nInliner {
         const type = this.#fileToType.get(file);
         assert(type !== undefined, 'localized file should always have a type' + file);
 
-        const resultFiles = [createOutputFileFromText(file, code, type)];
+        const resultFiles = [createOutputFile(file, code, type)];
         if (map) {
-          resultFiles.push(createOutputFileFromText(file + '.map', map, type));
+          resultFiles.push(createOutputFile(file + '.map', map, type));
         }
 
         for (const message of messages) {

@@ -91,6 +91,8 @@ export interface BuildOutputFile extends OutputFile {
     // (undocumented)
     clone: () => BuildOutputFile;
     // (undocumented)
+    readonly size: number;
+    // (undocumented)
     type: BuildOutputFileType;
 }
 
