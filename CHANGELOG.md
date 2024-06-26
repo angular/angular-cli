@@ -1,3 +1,16 @@
+<a name="18.1.0-rc.0"></a>
+
+# 18.1.0-rc.0 (2024-06-26)
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                          |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------- |
+| [3e359da8d](https://github.com/angular/angular-cli/commit/3e359da8dfdbfdb99be13f5c52a7e429c106d4ad) | fix  | address rxjs undefined issues during SSR prebundling |
+| [1e8fd70c6](https://github.com/angular/angular-cli/commit/1e8fd70c6f1bf2735474fcac0f109bd2bafa980e) | fix  | show JavaScript cache store initialization warning   |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="18.0.6"></a>
 
 # 18.0.6 (2024-06-26)
