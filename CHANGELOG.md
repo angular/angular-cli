@@ -1,3 +1,15 @@
+<a name="18.0.6"></a>
+
+# 18.0.6 (2024-06-26)
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                        |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------- |
+| [98a8a8a78](https://github.com/angular/angular-cli/commit/98a8a8a781fd7901f2e1c1d2eb22975ac65f0329) | fix  | show JavaScript cache store initialization warning |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="18.1.0-next.3"></a>
 
 # 18.1.0-next.3 (2024-06-20)
