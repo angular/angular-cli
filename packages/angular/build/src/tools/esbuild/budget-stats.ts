@@ -8,8 +8,12 @@
 
 import type { Metafile } from 'esbuild';
 import type { BudgetStats } from '../../utils/bundle-calculator';
-import type { InitialFileRecord } from './bundler-context';
-import { getEntryPointName } from './utils';
+import {
+  type BuildOutputFile,
+  BuildOutputFileType,
+  type InitialFileRecord,
+} from './bundler-context';
+import { getChunkNameFromMetafile } from './utils';
 
 /**
  * Generates a bundle budget calculator compatible stats object that provides
@@ -21,6 +25,7 @@ import { getEntryPointName } from './utils';
  */
 export function generateBudgetStats(
   metafile: Metafile,
+  outputFiles: BuildOutputFile[],
   initialFiles: Map<string, InitialFileRecord>,
 ): BudgetStats {
   const stats: Required<BudgetStats> = {
@@ -28,23 +33,18 @@ export function generateBudgetStats(
     assets: [],
   };
 
-  for (const [file, entry] of Object.entries(metafile.outputs)) {
+  for (const { path: file, size, type } of outputFiles) {
     if (!file.endsWith('.js') && !file.endsWith('.css')) {
       continue;
     }
 
     // Exclude server bundles
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    if ((entry as any)['ng-platform-server']) {
+    if (type === BuildOutputFileType.Server) {
       continue;
     }
 
     const initialRecord = initialFiles.get(file);
-    let name = initialRecord?.name;
-    if (name === undefined && entry.entryPoint) {
-      // For non-initial lazy modules, convert the entry point file into a Webpack compatible name
-      name = getEntryPointName(entry.entryPoint);
-    }
+    const name = initialRecord?.name ?? getChunkNameFromMetafile(metafile, file);
 
     stats.chunks.push({
       files: [file],
@@ -52,13 +52,25 @@ export function generateBudgetStats(
       names: name ? [name] : undefined,
     });
 
+    stats.assets.push({
+      name: file,
+      size,
+    });
+  }
+
+  // Add component styles from metafile
+  // TODO: Provide this information directly from the AOT compiler
+  for (const entry of Object.values(metafile.outputs)) {
     // 'ng-component' is set by the angular plugin's component stylesheet bundler
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const componentStyle: boolean = (entry as any)['ng-component'];
+    if (!componentStyle) {
+      continue;
+    }
 
     stats.assets.push({
-      // Component styles use the input file while all other outputs use the result file
-      name: (componentStyle && Object.keys(entry.inputs)[0]) || file,
+      // Component styles use the input file
+      name: Object.keys(entry.inputs)[0],
       size: entry.bytes,
       componentStyle,
     });

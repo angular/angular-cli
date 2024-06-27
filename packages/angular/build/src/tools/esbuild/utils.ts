@@ -27,6 +27,7 @@ import { BuildOutputAsset, ExecutionResult } from './bundler-execution-result';
 
 export function logBuildStats(
   metafile: Metafile,
+  outputFiles: BuildOutputFile[],
   initial: Map<string, InitialFileRecord>,
   budgetFailures: BudgetCalculatorResult[] | undefined,
   colors: boolean,
@@ -39,15 +40,9 @@ export function logBuildStats(
   const serverStats: BundleStats[] = [];
   let unchangedCount = 0;
 
-  for (const [file, output] of Object.entries(metafile.outputs)) {
+  for (const { path: file, size, type } of outputFiles) {
     // Only display JavaScript and CSS files
     if (!/\.(?:css|m?js)$/.test(file)) {
-      continue;
-    }
-
-    // Skip internal component resources
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    if ((output as any)['ng-component']) {
       continue;
     }
 
@@ -57,21 +52,16 @@ export function logBuildStats(
       continue;
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const isPlatformServer = (output as any)['ng-platform-server'];
+    const isPlatformServer = type === BuildOutputFileType.Server;
     if (isPlatformServer && !ssrOutputEnabled) {
       // Only log server build stats when SSR is enabled.
       continue;
     }
 
-    let name = initial.get(file)?.name;
-    if (name === undefined && output.entryPoint) {
-      name = getEntryPointName(output.entryPoint);
-    }
-
+    const name = initial.get(file)?.name ?? getChunkNameFromMetafile(metafile, file);
     const stat: BundleStats = {
       initial: initial.has(file),
-      stats: [file, name ?? '-', output.bytes, estimatedTransferSizes?.get(file) ?? '-'],
+      stats: [file, name ?? '-', size, estimatedTransferSizes?.get(file) ?? '-'],
     };
 
     if (isPlatformServer) {
@@ -100,6 +90,12 @@ export function logBuildStats(
   }
 
   return '';
+}
+
+export function getChunkNameFromMetafile(metafile: Metafile, file: string): string | undefined {
+  if (metafile.outputs[file]?.entryPoint) {
+    return getEntryPointName(metafile.outputs[file].entryPoint);
+  }
 }
 
 export async function calculateEstimatedTransferSizes(
