@@ -104,7 +104,7 @@ export async function executeBuild(
   // Analyze files for bundle budget failures if present
   let budgetFailures: BudgetCalculatorResult[] | undefined;
   if (options.budgets) {
-    const compatStats = generateBudgetStats(metafile, initialFiles);
+    const compatStats = generateBudgetStats(metafile, outputFiles, initialFiles);
     budgetFailures = [...checkBudgets(options.budgets, compatStats, true)];
     for (const { message, severity } of budgetFailures) {
       if (severity === 'error') {
@@ -191,6 +191,7 @@ export async function executeBuild(
     executionResult.addLog(
       logBuildStats(
         metafile,
+        outputFiles,
         initialFiles,
         budgetFailures,
         colors,
