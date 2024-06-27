@@ -66,9 +66,7 @@ export function logBuildStats(
 
     let name = initial.get(file)?.name;
     if (name === undefined && output.entryPoint) {
-      name = basename(output.entryPoint)
-        .replace(/\.[cm]?[jt]s$/, '')
-        .replace(/[\\/.]/g, '-');
+      name = getEntryPointName(output.entryPoint);
     }
 
     const stat: BundleStats = {
@@ -535,4 +533,11 @@ export async function logMessages(
 export function isZonelessApp(polyfills: string[] | undefined): boolean {
   // TODO: Instead, we should rely on the presence of zone.js in the polyfills build metadata.
   return !polyfills?.some((p) => p === 'zone.js' || /\.[mc]?[jt]s$/.test(p));
+}
+
+export function getEntryPointName(entryPoint: string): string {
+  return basename(entryPoint)
+    .replace(/(.*:)/, '') // global:bundle.css  -> bundle.css
+    .replace(/\.[cm]?[jt]s$/, '')
+    .replace(/[\\/.]/g, '-');
 }

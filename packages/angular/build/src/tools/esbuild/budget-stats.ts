@@ -7,9 +7,9 @@
  */
 
 import type { Metafile } from 'esbuild';
-import { basename } from 'node:path';
 import type { BudgetStats } from '../../utils/bundle-calculator';
 import type { InitialFileRecord } from './bundler-context';
+import { getEntryPointName } from './utils';
 
 /**
  * Generates a bundle budget calculator compatible stats object that provides
@@ -43,9 +43,7 @@ export function generateBudgetStats(
     let name = initialRecord?.name;
     if (name === undefined && entry.entryPoint) {
       // For non-initial lazy modules, convert the entry point file into a Webpack compatible name
-      name = basename(entry.entryPoint)
-        .replace(/\.[cm]?[jt]s$/, '')
-        .replace(/[\\/.]/g, '-');
+      name = getEntryPointName(entry.entryPoint);
     }
 
     stats.chunks.push({
