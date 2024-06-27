@@ -93,6 +93,39 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       );
     });
 
+    it(`should not warn when non-injected style is not within the baseline threshold`, async () => {
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+        optimization: false,
+        styles: [
+          {
+            input: 'src/lazy-styles.css',
+            inject: false,
+            bundleName: 'lazy-styles',
+          },
+        ],
+        budgets: [
+          { type: Type.Bundle, name: 'lazy-styles', warning: '1kb', error: '1kb', baseline: '2kb' },
+        ],
+      });
+
+      await harness.writeFile(
+        'src/lazy-styles.css',
+        `
+          .foo { color: green; padding: 1px; }
+        `.repeat(24),
+      );
+
+      const { result, logs } = await harness.executeOnce();
+      expect(result?.success).toBeTrue();
+      expect(logs).not.toContain(
+        jasmine.objectContaining<logging.LogEntry>({
+          level: 'warn',
+          message: jasmine.stringMatching('lazy-styles failed to meet minimum budget'),
+        }),
+      );
+    });
+
     CSS_EXTENSIONS.forEach((ext) => {
       it(`shows warnings for large component ${ext} when using 'anyComponentStyle' when AOT`, async () => {
         const cssContent = `
