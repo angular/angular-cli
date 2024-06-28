@@ -33,7 +33,7 @@
     "esbuild-wasm": "0.21.5",
     "fast-glob": "3.3.2",
     "http-proxy-middleware": "3.0.0",
-    "https-proxy-agent": "7.0.4",
+    "https-proxy-agent": "7.0.5",
     "istanbul-lib-instrument": "6.0.2",
     "jsonc-parser": "3.3.1",
     "karma-source-map-support": "1.4.0",
