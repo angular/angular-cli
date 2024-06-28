@@ -126,6 +126,7 @@ export function createAngularMemoryPlugin(options: AngularMemoryPluginOptions): 
         // The base of the URL is unused but required to parse the URL.
         const pathname = pathnameWithoutBasePath(req.url, server.config.base);
         const extension = extname(pathname);
+        const pathnameHasTrailingSlash = pathname[pathname.length - 1] === '/';
 
         // Rewrite all build assets to a vite raw fs URL
         const assetSourcePath = assets.get(pathname);
@@ -146,12 +147,11 @@ export function createAngularMemoryPlugin(options: AngularMemoryPluginOptions): 
         // HTML fallbacking
         // This matches what happens in the vite html fallback middleware.
         // ref: https://github.com/vitejs/vite/blob/main/packages/vite/src/node/server/middlewares/htmlFallback.ts#L9
-        const htmlAssetSourcePath =
-          pathname[pathname.length - 1] === '/'
-            ? // Trailing slash check for `index.html`.
-              assets.get(pathname + 'index.html')
-            : // Non-trailing slash check for fallback `.html`
-              assets.get(pathname + '.html');
+        const htmlAssetSourcePath = pathnameHasTrailingSlash
+          ? // Trailing slash check for `index.html`.
+            assets.get(pathname + 'index.html')
+          : // Non-trailing slash check for fallback `.html`
+            assets.get(pathname + '.html');
 
         if (htmlAssetSourcePath) {
           req.url = `${server.config.base}@fs/${encodeURI(htmlAssetSourcePath)}`;
@@ -177,6 +177,19 @@ export function createAngularMemoryPlugin(options: AngularMemoryPluginOptions): 
             res.end(outputFile.contents);
 
             return;
+          }
+        }
+
+        // If the path has no trailing slash and it matches a servable directory redirect to the same path with slash.
+        // This matches the default express static behaviour.
+        // See: https://github.com/expressjs/serve-static/blob/89fc94567fae632718a2157206c52654680e9d01/index.js#L182
+        if (!pathnameHasTrailingSlash) {
+          for (const assetPath of assets.keys()) {
+            if (pathname === assetPath.substring(0, assetPath.lastIndexOf('/'))) {
+              redirect(res, req.url + '/');
+
+              return;
+            }
           }
         }
 
@@ -361,4 +374,21 @@ function lookupMimeTypeFromRequest(url: string): string | undefined {
   }
 
   return extension && lookupMimeType(extension);
+}
+
+function redirect(res: ServerResponse, location: string): void {
+  res.statusCode = 301;
+  res.setHeader('Content-Type', 'text/html');
+  res.setHeader('Location', location);
+  res.end(`
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Redirecting</title>
+  </head>
+  <body>
+    <pre>Redirecting to <a href="${location}">${location}</a></pre>
+  </body>
+  </html>`);
 }

@@ -11,7 +11,7 @@ import { executeOnceAndFetch } from '../execute-fetch';
 import { describeServeBuilder } from '../jasmine-helpers';
 import { BASE_OPTIONS, DEV_SERVER_BUILDER_INFO } from '../setup';
 
-describeServeBuilder(executeDevServer, DEV_SERVER_BUILDER_INFO, (harness, setupTarget, isVite) => {
+describeServeBuilder(executeDevServer, DEV_SERVER_BUILDER_INFO, (harness, setupTarget) => {
   const javascriptFileContent =
     "import {foo} from 'unresolved'; /* a comment */const foo = `bar`;\n\n\n";
 
@@ -95,31 +95,51 @@ describeServeBuilder(executeDevServer, DEV_SERVER_BUILDER_INFO, (harness, setupT
       expect(await response?.text()).toContain('<h1>Login page</h1>');
     });
 
-    (isVite ? it : xit)(
-      `should return the asset that matches '.html' when path has no trailing '/'`,
-      async () => {
-        await harness.writeFile(
-          'src/login/new.html',
-          '<html><body><h1>Login page</h1></body><html>',
-        );
+    it(`should return the asset that matches '.html' when path has no trailing '/'`, async () => {
+      await harness.writeFile('src/login/new.html', '<html><body><h1>Login page</h1></body><html>');
 
-        setupTarget(harness, {
-          assets: ['src/login'],
-          optimization: {
-            scripts: true,
-          },
-        });
+      setupTarget(harness, {
+        assets: ['src/login'],
+        optimization: {
+          scripts: true,
+        },
+      });
 
-        harness.useTarget('serve', {
-          ...BASE_OPTIONS,
-        });
+      harness.useTarget('serve', {
+        ...BASE_OPTIONS,
+      });
 
-        const { result, response } = await executeOnceAndFetch(harness, 'login/new');
+      const { result, response } = await executeOnceAndFetch(harness, 'login/new');
 
-        expect(result?.success).toBeTrue();
-        expect(await response?.status).toBe(200);
-        expect(await response?.text()).toContain('<h1>Login page</h1>');
-      },
-    );
+      expect(result?.success).toBeTrue();
+      expect(await response?.status).toBe(200);
+      expect(await response?.text()).toContain('<h1>Login page</h1>');
+    });
+
+    it(`should return a redirect when an asset directory is accessed without a trailing '/'`, async () => {
+      await harness.writeFile(
+        'src/login/index.html',
+        '<html><body><h1>Login page</h1></body><html>',
+      );
+
+      setupTarget(harness, {
+        assets: ['src/login'],
+        optimization: {
+          scripts: true,
+        },
+      });
+
+      harness.useTarget('serve', {
+        ...BASE_OPTIONS,
+      });
+
+      const { result, response } = await executeOnceAndFetch(harness, 'login', {
+        request: { redirect: 'manual' },
+      });
+
+      expect(result?.success).toBeTrue();
+      expect(await response?.status).toBe(301);
+      expect(await response?.headers.get('Location')).toBe('/login/');
+    });
   });
 });
