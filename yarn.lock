@@ -97,7 +97,7 @@ __metadata:
     esbuild-wasm: "npm:0.21.5"
     fast-glob: "npm:3.3.2"
     http-proxy-middleware: "npm:3.0.0"
-    https-proxy-agent: "npm:7.0.4"
+    https-proxy-agent: "npm:7.0.5"
     istanbul-lib-instrument: "npm:6.0.2"
     jsonc-parser: "npm:3.3.1"
     karma-source-map-support: "npm:1.4.0"
@@ -406,7 +406,7 @@ __metadata:
     critters: "npm:0.0.24"
     esbuild: "npm:0.21.5"
     fast-glob: "npm:3.3.2"
-    https-proxy-agent: "npm:7.0.4"
+    https-proxy-agent: "npm:7.0.5"
     lmdb: "npm:3.0.12"
     magic-string: "npm:0.30.10"
     mrmime: "npm:2.0.0"
@@ -723,7 +723,7 @@ __metadata:
     fast-glob: "npm:3.3.2"
     http-proxy: "npm:^1.18.1"
     http-proxy-middleware: "npm:3.0.0"
-    https-proxy-agent: "npm:7.0.4"
+    https-proxy-agent: "npm:7.0.5"
     husky: "npm:9.0.11"
     ini: "npm:4.1.3"
     istanbul-lib-instrument: "npm:6.0.2"
@@ -10932,6 +10932,16 @@ __metadata:
     agent-base: "npm:^7.0.2"
     debug: "npm:4"
   checksum: 10c0/bc4f7c38da32a5fc622450b6cb49a24ff596f9bd48dcedb52d2da3fa1c1a80e100fb506bd59b326c012f21c863c69b275c23de1a01d0b84db396822fdf25e52b
+  languageName: node
+  linkType: hard
+
+"https-proxy-agent@npm:7.0.5":
+  version: 7.0.5
+  resolution: "https-proxy-agent@npm:7.0.5"
+  dependencies:
+    agent-base: "npm:^7.0.2"
+    debug: "npm:4"
+  checksum: 10c0/2490e3acec397abeb88807db52cac59102d5ed758feee6df6112ab3ccd8325e8a1ce8bce6f4b66e5470eca102d31e425ace904242e4fa28dbe0c59c4bafa7b2c
   languageName: node
   linkType: hard
 
