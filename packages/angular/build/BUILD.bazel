@@ -67,6 +67,7 @@ ts_library(
         "@npm//@babel/core",
         "@npm//@babel/helper-annotate-as-pure",
         "@npm//@babel/helper-split-export-declaration",
+        "@npm//@babel/plugin-syntax-import-attributes",
         "@npm//@inquirer/confirm",
         "@npm//@types/babel__core",
         "@npm//@types/less",
