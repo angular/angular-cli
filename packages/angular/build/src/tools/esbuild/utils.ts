@@ -180,8 +180,6 @@ export function getFeatureSupport(
     // will be used instead which provides a workaround for the performance issue.
     // For more details: https://bugs.chromium.org/p/v8/issues/detail?id=11536
     'object-rest-spread': false,
-    // Using top-level-await is not guaranteed to be safe with some code optimizations.
-    'top-level-await': false,
   };
 
   // Detect Safari browser versions that have a class field behavior bug
