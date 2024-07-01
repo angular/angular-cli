@@ -93,12 +93,12 @@ __metadata:
     copy-webpack-plugin: "npm:12.0.2"
     critters: "npm:0.0.24"
     css-loader: "npm:7.1.2"
-    esbuild: "npm:0.21.5"
-    esbuild-wasm: "npm:0.21.5"
+    esbuild: "npm:0.22.0"
+    esbuild-wasm: "npm:0.22.0"
     fast-glob: "npm:3.3.2"
     http-proxy-middleware: "npm:3.0.0"
     https-proxy-agent: "npm:7.0.5"
-    istanbul-lib-instrument: "npm:6.0.2"
+    istanbul-lib-instrument: "npm:6.0.3"
     jsonc-parser: "npm:3.3.1"
     karma-source-map-support: "npm:1.4.0"
     less: "npm:4.2.0"
@@ -113,7 +113,7 @@ __metadata:
     parse5-html-rewriting-stream: "npm:7.0.0"
     picomatch: "npm:4.0.2"
     piscina: "npm:4.6.1"
-    postcss: "npm:8.4.38"
+    postcss: "npm:8.4.39"
     postcss-loader: "npm:8.1.1"
     resolve-url-loader: "npm:5.0.0"
     rxjs: "npm:7.8.1"
@@ -238,7 +238,7 @@ __metadata:
   dependencies:
     "@angular-devkit/core": "npm:0.0.0-PLACEHOLDER"
     "@angular-devkit/schematics": "npm:0.0.0-PLACEHOLDER"
-    "@inquirer/prompts": "npm:5.0.7"
+    "@inquirer/prompts": "npm:5.1.0"
     ansi-colors: "npm:4.1.3"
     symbol-observable: "npm:4.0.0"
     yargs-parser: "npm:21.1.1"
@@ -399,12 +399,12 @@ __metadata:
     "@babel/core": "npm:7.24.7"
     "@babel/helper-annotate-as-pure": "npm:7.24.7"
     "@babel/helper-split-export-declaration": "npm:7.24.7"
-    "@inquirer/confirm": "npm:3.1.11"
+    "@inquirer/confirm": "npm:3.1.12"
     "@vitejs/plugin-basic-ssl": "npm:1.1.0"
     ansi-colors: "npm:4.1.3"
     browserslist: "npm:^4.23.0"
     critters: "npm:0.0.24"
-    esbuild: "npm:0.21.5"
+    esbuild: "npm:0.22.0"
     fast-glob: "npm:3.3.2"
     https-proxy-agent: "npm:7.0.5"
     lmdb: "npm:3.0.12"
@@ -529,7 +529,7 @@ __metadata:
     "@angular-devkit/architect": "npm:0.0.0-EXPERIMENTAL-PLACEHOLDER"
     "@angular-devkit/core": "npm:0.0.0-PLACEHOLDER"
     "@angular-devkit/schematics": "npm:0.0.0-PLACEHOLDER"
-    "@inquirer/prompts": "npm:5.0.7"
+    "@inquirer/prompts": "npm:5.1.0"
     "@listr2/prompt-adapter-inquirer": "npm:2.0.13"
     "@schematics/angular": "npm:0.0.0-PLACEHOLDER"
     "@yarnpkg/lockfile": "npm:1.1.0"
@@ -668,8 +668,8 @@ __metadata:
     "@bazel/esbuild": "npm:5.8.1"
     "@bazel/jasmine": "patch:@bazel/jasmine@npm%3A5.8.1#~/.yarn/patches/@bazel-jasmine-npm-5.8.1-3370fee155.patch"
     "@discoveryjs/json-ext": "npm:0.5.7"
-    "@inquirer/confirm": "npm:3.1.11"
-    "@inquirer/prompts": "npm:5.0.7"
+    "@inquirer/confirm": "npm:3.1.12"
+    "@inquirer/prompts": "npm:5.1.0"
     "@listr2/prompt-adapter-inquirer": "npm:2.0.13"
     "@rollup/plugin-commonjs": "npm:^26.0.0"
     "@rollup/plugin-node-resolve": "npm:^13.0.5"
@@ -714,8 +714,8 @@ __metadata:
     critters: "npm:0.0.24"
     css-loader: "npm:7.1.2"
     debug: "npm:^4.1.1"
-    esbuild: "npm:0.21.5"
-    esbuild-wasm: "npm:0.21.5"
+    esbuild: "npm:0.22.0"
+    esbuild-wasm: "npm:0.22.0"
     eslint: "npm:8.57.0"
     eslint-config-prettier: "npm:9.1.0"
     eslint-plugin-header: "npm:3.1.1"
@@ -727,7 +727,7 @@ __metadata:
     https-proxy-agent: "npm:7.0.5"
     husky: "npm:9.0.11"
     ini: "npm:4.1.3"
-    istanbul-lib-instrument: "npm:6.0.2"
+    istanbul-lib-instrument: "npm:6.0.3"
     jasmine: "npm:^5.0.0"
     jasmine-core: "npm:~5.1.0"
     jasmine-spec-reporter: "npm:~7.0.0"
@@ -757,7 +757,7 @@ __metadata:
     parse5-html-rewriting-stream: "npm:7.0.0"
     picomatch: "npm:4.0.2"
     piscina: "npm:4.6.1"
-    postcss: "npm:8.4.38"
+    postcss: "npm:8.4.39"
     postcss-loader: "npm:8.1.1"
     prettier: "npm:^3.0.0"
     protractor: "npm:~7.0.0"
@@ -2597,9 +2597,23 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@esbuild/aix-ppc64@npm:0.22.0":
+  version: 0.22.0
+  resolution: "@esbuild/aix-ppc64@npm:0.22.0"
+  conditions: os=aix & cpu=ppc64
+  languageName: node
+  linkType: hard
+
 "@esbuild/android-arm64@npm:0.21.5":
   version: 0.21.5
   resolution: "@esbuild/android-arm64@npm:0.21.5"
+  conditions: os=android & cpu=arm64
+  languageName: node
+  linkType: hard
+
+"@esbuild/android-arm64@npm:0.22.0":
+  version: 0.22.0
+  resolution: "@esbuild/android-arm64@npm:0.22.0"
   conditions: os=android & cpu=arm64
   languageName: node
   linkType: hard
@@ -2611,9 +2625,23 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@esbuild/android-arm@npm:0.22.0":
+  version: 0.22.0
+  resolution: "@esbuild/android-arm@npm:0.22.0"
+  conditions: os=android & cpu=arm
+  languageName: node
+  linkType: hard
+
 "@esbuild/android-x64@npm:0.21.5":
   version: 0.21.5
   resolution: "@esbuild/android-x64@npm:0.21.5"
+  conditions: os=android & cpu=x64
+  languageName: node
+  linkType: hard
+
+"@esbuild/android-x64@npm:0.22.0":
+  version: 0.22.0
+  resolution: "@esbuild/android-x64@npm:0.22.0"
   conditions: os=android & cpu=x64
   languageName: node
   linkType: hard
@@ -2625,9 +2653,23 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@esbuild/darwin-arm64@npm:0.22.0":
+  version: 0.22.0
+  resolution: "@esbuild/darwin-arm64@npm:0.22.0"
+  conditions: os=darwin & cpu=arm64
+  languageName: node
+  linkType: hard
+
 "@esbuild/darwin-x64@npm:0.21.5":
   version: 0.21.5
   resolution: "@esbuild/darwin-x64@npm:0.21.5"
+  conditions: os=darwin & cpu=x64
+  languageName: node
+  linkType: hard
+
+"@esbuild/darwin-x64@npm:0.22.0":
+  version: 0.22.0
+  resolution: "@esbuild/darwin-x64@npm:0.22.0"
   conditions: os=darwin & cpu=x64
   languageName: node
   linkType: hard
@@ -2639,9 +2681,23 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@esbuild/freebsd-arm64@npm:0.22.0":
+  version: 0.22.0
+  resolution: "@esbuild/freebsd-arm64@npm:0.22.0"
+  conditions: os=freebsd & cpu=arm64
+  languageName: node
+  linkType: hard
+
 "@esbuild/freebsd-x64@npm:0.21.5":
   version: 0.21.5
   resolution: "@esbuild/freebsd-x64@npm:0.21.5"
+  conditions: os=freebsd & cpu=x64
+  languageName: node
+  linkType: hard
+
+"@esbuild/freebsd-x64@npm:0.22.0":
+  version: 0.22.0
+  resolution: "@esbuild/freebsd-x64@npm:0.22.0"
   conditions: os=freebsd & cpu=x64
   languageName: node
   linkType: hard
@@ -2653,9 +2709,23 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@esbuild/linux-arm64@npm:0.22.0":
+  version: 0.22.0
+  resolution: "@esbuild/linux-arm64@npm:0.22.0"
+  conditions: os=linux & cpu=arm64
+  languageName: node
+  linkType: hard
+
 "@esbuild/linux-arm@npm:0.21.5":
   version: 0.21.5
   resolution: "@esbuild/linux-arm@npm:0.21.5"
+  conditions: os=linux & cpu=arm
+  languageName: node
+  linkType: hard
+
+"@esbuild/linux-arm@npm:0.22.0":
+  version: 0.22.0
+  resolution: "@esbuild/linux-arm@npm:0.22.0"
   conditions: os=linux & cpu=arm
   languageName: node
   linkType: hard
@@ -2667,9 +2737,23 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@esbuild/linux-ia32@npm:0.22.0":
+  version: 0.22.0
+  resolution: "@esbuild/linux-ia32@npm:0.22.0"
+  conditions: os=linux & cpu=ia32
+  languageName: node
+  linkType: hard
+
 "@esbuild/linux-loong64@npm:0.21.5":
   version: 0.21.5
   resolution: "@esbuild/linux-loong64@npm:0.21.5"
+  conditions: os=linux & cpu=loong64
+  languageName: node
+  linkType: hard
+
+"@esbuild/linux-loong64@npm:0.22.0":
+  version: 0.22.0
+  resolution: "@esbuild/linux-loong64@npm:0.22.0"
   conditions: os=linux & cpu=loong64
   languageName: node
   linkType: hard
@@ -2681,9 +2765,23 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@esbuild/linux-mips64el@npm:0.22.0":
+  version: 0.22.0
+  resolution: "@esbuild/linux-mips64el@npm:0.22.0"
+  conditions: os=linux & cpu=mips64el
+  languageName: node
+  linkType: hard
+
 "@esbuild/linux-ppc64@npm:0.21.5":
   version: 0.21.5
   resolution: "@esbuild/linux-ppc64@npm:0.21.5"
+  conditions: os=linux & cpu=ppc64
+  languageName: node
+  linkType: hard
+
+"@esbuild/linux-ppc64@npm:0.22.0":
+  version: 0.22.0
+  resolution: "@esbuild/linux-ppc64@npm:0.22.0"
   conditions: os=linux & cpu=ppc64
   languageName: node
   linkType: hard
@@ -2695,9 +2793,23 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@esbuild/linux-riscv64@npm:0.22.0":
+  version: 0.22.0
+  resolution: "@esbuild/linux-riscv64@npm:0.22.0"
+  conditions: os=linux & cpu=riscv64
+  languageName: node
+  linkType: hard
+
 "@esbuild/linux-s390x@npm:0.21.5":
   version: 0.21.5
   resolution: "@esbuild/linux-s390x@npm:0.21.5"
+  conditions: os=linux & cpu=s390x
+  languageName: node
+  linkType: hard
+
+"@esbuild/linux-s390x@npm:0.22.0":
+  version: 0.22.0
+  resolution: "@esbuild/linux-s390x@npm:0.22.0"
   conditions: os=linux & cpu=s390x
   languageName: node
   linkType: hard
@@ -2709,6 +2821,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@esbuild/linux-x64@npm:0.22.0":
+  version: 0.22.0
+  resolution: "@esbuild/linux-x64@npm:0.22.0"
+  conditions: os=linux & cpu=x64
+  languageName: node
+  linkType: hard
+
 "@esbuild/netbsd-x64@npm:0.21.5":
   version: 0.21.5
   resolution: "@esbuild/netbsd-x64@npm:0.21.5"
@@ -2716,9 +2835,30 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@esbuild/netbsd-x64@npm:0.22.0":
+  version: 0.22.0
+  resolution: "@esbuild/netbsd-x64@npm:0.22.0"
+  conditions: os=netbsd & cpu=x64
+  languageName: node
+  linkType: hard
+
+"@esbuild/openbsd-arm64@npm:0.22.0":
+  version: 0.22.0
+  resolution: "@esbuild/openbsd-arm64@npm:0.22.0"
+  conditions: os=openbsd & cpu=arm64
+  languageName: node
+  linkType: hard
+
 "@esbuild/openbsd-x64@npm:0.21.5":
   version: 0.21.5
   resolution: "@esbuild/openbsd-x64@npm:0.21.5"
+  conditions: os=openbsd & cpu=x64
+  languageName: node
+  linkType: hard
+
+"@esbuild/openbsd-x64@npm:0.22.0":
+  version: 0.22.0
+  resolution: "@esbuild/openbsd-x64@npm:0.22.0"
   conditions: os=openbsd & cpu=x64
   languageName: node
   linkType: hard
@@ -2730,9 +2870,23 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@esbuild/sunos-x64@npm:0.22.0":
+  version: 0.22.0
+  resolution: "@esbuild/sunos-x64@npm:0.22.0"
+  conditions: os=sunos & cpu=x64
+  languageName: node
+  linkType: hard
+
 "@esbuild/win32-arm64@npm:0.21.5":
   version: 0.21.5
   resolution: "@esbuild/win32-arm64@npm:0.21.5"
+  conditions: os=win32 & cpu=arm64
+  languageName: node
+  linkType: hard
+
+"@esbuild/win32-arm64@npm:0.22.0":
+  version: 0.22.0
+  resolution: "@esbuild/win32-arm64@npm:0.22.0"
   conditions: os=win32 & cpu=arm64
   languageName: node
   linkType: hard
@@ -2744,9 +2898,23 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@esbuild/win32-ia32@npm:0.22.0":
+  version: 0.22.0
+  resolution: "@esbuild/win32-ia32@npm:0.22.0"
+  conditions: os=win32 & cpu=ia32
+  languageName: node
+  linkType: hard
+
 "@esbuild/win32-x64@npm:0.21.5":
   version: 0.21.5
   resolution: "@esbuild/win32-x64@npm:0.21.5"
+  conditions: os=win32 & cpu=x64
+  languageName: node
+  linkType: hard
+
+"@esbuild/win32-x64@npm:0.22.0":
+  version: 0.22.0
+  resolution: "@esbuild/win32-x64@npm:0.22.0"
   conditions: os=win32 & cpu=x64
   languageName: node
   linkType: hard
@@ -2832,16 +3000,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@inquirer/checkbox@npm:^2.3.7":
-  version: 2.3.7
-  resolution: "@inquirer/checkbox@npm:2.3.7"
+"@inquirer/checkbox@npm:^2.3.8":
+  version: 2.3.8
+  resolution: "@inquirer/checkbox@npm:2.3.8"
   dependencies:
-    "@inquirer/core": "npm:^8.2.4"
+    "@inquirer/core": "npm:^9.0.0"
     "@inquirer/figures": "npm:^1.0.3"
-    "@inquirer/type": "npm:^1.3.3"
+    "@inquirer/type": "npm:^1.4.0"
     ansi-escapes: "npm:^4.3.2"
-    picocolors: "npm:^1.0.1"
-  checksum: 10c0/5672edec826b5243f7876c169b97ff07fd8f57a50c13adb2ff9a6a0b916b60c8cbfaba8f2757dc182acfe022100a8b6c32778b6e27b4b078d8c18a2f3a7d27d2
+    yoctocolors-cjs: "npm:^2.1.1"
+  checksum: 10c0/02162ccf6773833c3677b7f1a6b9e608d4b55151bc3c2e3f1b4a373d6f1aaf67507688642812e068b0f7984a559b0d74b0a6f61cd62b3154a607a9ba0d88ca96
   languageName: node
   linkType: hard
 
@@ -2855,13 +3023,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@inquirer/confirm@npm:3.1.11, @inquirer/confirm@npm:^3.1.11":
-  version: 3.1.11
-  resolution: "@inquirer/confirm@npm:3.1.11"
+"@inquirer/confirm@npm:3.1.12, @inquirer/confirm@npm:^3.1.12":
+  version: 3.1.12
+  resolution: "@inquirer/confirm@npm:3.1.12"
   dependencies:
-    "@inquirer/core": "npm:^8.2.4"
-    "@inquirer/type": "npm:^1.3.3"
-  checksum: 10c0/149970dc4cdca6ffebe1a35841a68b4c90d78e71cdabdb1b8cc06f7e38fc4a628a8a85aa965c488d3cd3226bc726407030e40bfce1736b62b2f1b3e91f027f64
+    "@inquirer/core": "npm:^9.0.0"
+    "@inquirer/type": "npm:^1.4.0"
+  checksum: 10c0/d7bacbe598c3ceeb526d4f9443fc273a6c3a03049a37a163a10b885be3efee84fe094d690f225159e29f8d5aa302ccef7a43eb5f4d61ea66e1fa67362ca870b9
   languageName: node
   linkType: hard
 
@@ -2886,12 +3054,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@inquirer/core@npm:^8.2.4":
-  version: 8.2.4
-  resolution: "@inquirer/core@npm:8.2.4"
+"@inquirer/core@npm:^9.0.0":
+  version: 9.0.0
+  resolution: "@inquirer/core@npm:9.0.0"
   dependencies:
     "@inquirer/figures": "npm:^1.0.3"
-    "@inquirer/type": "npm:^1.3.3"
+    "@inquirer/type": "npm:^1.4.0"
     "@types/mute-stream": "npm:^0.0.4"
     "@types/node": "npm:^20.14.9"
     "@types/wrap-ansi": "npm:^3.0.0"
@@ -2899,33 +3067,33 @@ __metadata:
     cli-spinners: "npm:^2.9.2"
     cli-width: "npm:^4.1.0"
     mute-stream: "npm:^1.0.0"
-    picocolors: "npm:^1.0.1"
     signal-exit: "npm:^4.1.0"
     strip-ansi: "npm:^6.0.1"
     wrap-ansi: "npm:^6.2.0"
-  checksum: 10c0/3328ea52823a59cad4bf6c36b143c7322a2e1430ae040717e63c94680f246c0d628aed3032a2f6890652dd4b7fdb0fec7e324059b74173ffa78ae2a485939f33
+    yoctocolors-cjs: "npm:^2.1.1"
+  checksum: 10c0/c29f4ccb49ce5d7059c9c6285ccb7f0d726ea3366d0259670e65852831426ed10ebc13f0d312a12d34d1b570db1ffc4e9c00b9ee5a699834df2fa32fd2c82822
   languageName: node
   linkType: hard
 
-"@inquirer/editor@npm:^2.1.11":
-  version: 2.1.11
-  resolution: "@inquirer/editor@npm:2.1.11"
+"@inquirer/editor@npm:^2.1.12":
+  version: 2.1.12
+  resolution: "@inquirer/editor@npm:2.1.12"
   dependencies:
-    "@inquirer/core": "npm:^8.2.4"
-    "@inquirer/type": "npm:^1.3.3"
+    "@inquirer/core": "npm:^9.0.0"
+    "@inquirer/type": "npm:^1.4.0"
     external-editor: "npm:^3.1.0"
-  checksum: 10c0/9f09d3490c13359816856e840a6b3308f7f9417cb43988fa59788409239e9d338b37c501b49670de8ee8ad4dcd7d7727d4c0be82d30f0505b56a4a7d966a4fb2
+  checksum: 10c0/9e6d61c0b34885dee4d1c488001cd27c18b10d1df34107e729f06d346b972df6bc55afda8b10e0209ca7d036beda00d99b1c1ca0ec85c024121ab9747ef9a0db
   languageName: node
   linkType: hard
 
-"@inquirer/expand@npm:^2.1.11":
-  version: 2.1.11
-  resolution: "@inquirer/expand@npm:2.1.11"
+"@inquirer/expand@npm:^2.1.12":
+  version: 2.1.12
+  resolution: "@inquirer/expand@npm:2.1.12"
   dependencies:
-    "@inquirer/core": "npm:^8.2.4"
-    "@inquirer/type": "npm:^1.3.3"
-    picocolors: "npm:^1.0.1"
-  checksum: 10c0/1ece2f1c2d1142d40b1bfdc2ad0fc6e7a4917cc114a26d9bbfafc1d1eab38d6a910918695a5a07b36c782d297e57db33eac628615bd56fe2fb90e4f2b6af15c5
+    "@inquirer/core": "npm:^9.0.0"
+    "@inquirer/type": "npm:^1.4.0"
+    yoctocolors-cjs: "npm:^2.1.1"
+  checksum: 10c0/272a009e58cfb477a59f60c62cbd5d5720ced38279e3e9386e4b2a1d5148cc57970b1c8a91a9cd2d6c5141833370b176466c27deed28ff2366f5e86b937e7724
   languageName: node
   linkType: hard
 
@@ -2936,64 +3104,75 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@inquirer/input@npm:^2.1.11":
-  version: 2.1.11
-  resolution: "@inquirer/input@npm:2.1.11"
+"@inquirer/input@npm:^2.1.12":
+  version: 2.1.12
+  resolution: "@inquirer/input@npm:2.1.12"
   dependencies:
-    "@inquirer/core": "npm:^8.2.4"
-    "@inquirer/type": "npm:^1.3.3"
-  checksum: 10c0/30dc51850233b551fd099ed581bfba1465b8b08399f5b4af26d9301f92d84d341a9b82e1aae0892be6c2e34fe2cba939c47a492b96e4ce31887dbf3ff589747d
+    "@inquirer/core": "npm:^9.0.0"
+    "@inquirer/type": "npm:^1.4.0"
+  checksum: 10c0/a8ef3717d20a775edfb1aa893dae27b35fb2b5bdd8f5629da80fbe54c35cecb649d7c2f88a83fe9945a6d0ecf406a81db20b8652e47b3335e2a0757960eda18d
   languageName: node
   linkType: hard
 
-"@inquirer/password@npm:^2.1.11":
-  version: 2.1.11
-  resolution: "@inquirer/password@npm:2.1.11"
+"@inquirer/number@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "@inquirer/number@npm:1.0.0"
   dependencies:
-    "@inquirer/core": "npm:^8.2.4"
-    "@inquirer/type": "npm:^1.3.3"
+    "@inquirer/core": "npm:^9.0.0"
+    "@inquirer/type": "npm:^1.4.0"
+  checksum: 10c0/e8b5fb24b29a8c860c5b228dbfc8f23793be8cc7e003798790a69c5cb1964a48346c5fee45a772409d18881ea6ed5476c54cbb95284f711f36b3b680f8c33814
+  languageName: node
+  linkType: hard
+
+"@inquirer/password@npm:^2.1.12":
+  version: 2.1.12
+  resolution: "@inquirer/password@npm:2.1.12"
+  dependencies:
+    "@inquirer/core": "npm:^9.0.0"
+    "@inquirer/type": "npm:^1.4.0"
     ansi-escapes: "npm:^4.3.2"
-  checksum: 10c0/d6e335fc5abe246bae7d84fefc410618a5901e6484e9d7b3ef3590fb8510a097228fde9e192067b67bc42b8c9901462dbe3246d64696810c6ba96389959ec9ee
+  checksum: 10c0/9c3d5e6c4fc1f9751e99080703f991898662f0b6dfdc4d5f0363a744f735954060786e06ad55e826903f289c78ddeac606c6f1331eb46bb687d6750c0c3b6e7c
   languageName: node
   linkType: hard
 
-"@inquirer/prompts@npm:5.0.7":
-  version: 5.0.7
-  resolution: "@inquirer/prompts@npm:5.0.7"
+"@inquirer/prompts@npm:5.1.0":
+  version: 5.1.0
+  resolution: "@inquirer/prompts@npm:5.1.0"
   dependencies:
-    "@inquirer/checkbox": "npm:^2.3.7"
-    "@inquirer/confirm": "npm:^3.1.11"
-    "@inquirer/editor": "npm:^2.1.11"
-    "@inquirer/expand": "npm:^2.1.11"
-    "@inquirer/input": "npm:^2.1.11"
-    "@inquirer/password": "npm:^2.1.11"
-    "@inquirer/rawlist": "npm:^2.1.11"
-    "@inquirer/select": "npm:^2.3.7"
-  checksum: 10c0/0e064510bee3efb7ddfb41a101d9cdd91c6494129f04045310e872f43ca3ceccbe1d4fe62323651541183c7e7826f2b4a6ff8e8dac68bb3a9f5264c128f85a02
+    "@inquirer/checkbox": "npm:^2.3.8"
+    "@inquirer/confirm": "npm:^3.1.12"
+    "@inquirer/editor": "npm:^2.1.12"
+    "@inquirer/expand": "npm:^2.1.12"
+    "@inquirer/input": "npm:^2.1.12"
+    "@inquirer/number": "npm:^1.0.0"
+    "@inquirer/password": "npm:^2.1.12"
+    "@inquirer/rawlist": "npm:^2.1.12"
+    "@inquirer/select": "npm:^2.3.8"
+  checksum: 10c0/dbce3bf389600d48f7519e034d8741130c01c77553e6e0534d6d30a93befc5859e57232b71a5e872d9b019c5fde6a5c5b23faa3f9f9534521e5b223f3d26da2c
   languageName: node
   linkType: hard
 
-"@inquirer/rawlist@npm:^2.1.11":
-  version: 2.1.11
-  resolution: "@inquirer/rawlist@npm:2.1.11"
+"@inquirer/rawlist@npm:^2.1.12":
+  version: 2.1.12
+  resolution: "@inquirer/rawlist@npm:2.1.12"
   dependencies:
-    "@inquirer/core": "npm:^8.2.4"
-    "@inquirer/type": "npm:^1.3.3"
-    picocolors: "npm:^1.0.1"
-  checksum: 10c0/61aad2aa8acb8708d81702ff1e87c42457aef17b445728c9a299d8eb0dcb04c0664f6ac4d1f1b71c236f9514b110d7ee0e421055ff9e31d36b7ef22ff0624095
+    "@inquirer/core": "npm:^9.0.0"
+    "@inquirer/type": "npm:^1.4.0"
+    yoctocolors-cjs: "npm:^2.1.1"
+  checksum: 10c0/faf01a89cafbe53d0daae7feacb7c3f7fb15407dc725cf638182c76deb5bacffb4fa33d5b39d3f19c3bb4096cabd248f08fe32b96b5ac579ddd7773a03157af9
   languageName: node
   linkType: hard
 
-"@inquirer/select@npm:^2.3.7":
-  version: 2.3.7
-  resolution: "@inquirer/select@npm:2.3.7"
+"@inquirer/select@npm:^2.3.8":
+  version: 2.3.8
+  resolution: "@inquirer/select@npm:2.3.8"
   dependencies:
-    "@inquirer/core": "npm:^8.2.4"
+    "@inquirer/core": "npm:^9.0.0"
     "@inquirer/figures": "npm:^1.0.3"
-    "@inquirer/type": "npm:^1.3.3"
+    "@inquirer/type": "npm:^1.4.0"
     ansi-escapes: "npm:^4.3.2"
-    picocolors: "npm:^1.0.1"
-  checksum: 10c0/384880f23ad5d8616974bae2c8e449ec4080fd13122ab4fa9773f65c0ed615e3afc058c1eb83da9c56aca98d79b219673f953338a5e52a84dc7aec3375074f3d
+    yoctocolors-cjs: "npm:^2.1.1"
+  checksum: 10c0/14a418c2cab3d35fe83bc94ff04d10be76abc2e2fa6e343fabc20c763f7a48a03010553e39ef2185586f874b437bbfd50cea40ff46225c5e75448b14e4de1e1e
   languageName: node
   linkType: hard
 
@@ -3001,6 +3180,15 @@ __metadata:
   version: 1.3.3
   resolution: "@inquirer/type@npm:1.3.3"
   checksum: 10c0/84048694410bb5b2c55dc4e48da6369ce942b9e8f8016d15ef63ab3f9873832a56cc12a50582b5b2b626821bfe29973dfcc19edc90f58490b51df1f4d9d0a074
+  languageName: node
+  linkType: hard
+
+"@inquirer/type@npm:^1.4.0":
+  version: 1.4.0
+  resolution: "@inquirer/type@npm:1.4.0"
+  dependencies:
+    mute-stream: "npm:^1.0.0"
+  checksum: 10c0/927b46eef9195523a5c4d9467fa43dcd8fde6376131c777012dd899b96b5f5c0d7276e03379f61d3209206e65ef82dc45b129eb79fb4dfe61de29d7aed437cd4
   languageName: node
   linkType: hard
 
@@ -9321,12 +9509,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"esbuild-wasm@npm:0.21.5":
-  version: 0.21.5
-  resolution: "esbuild-wasm@npm:0.21.5"
+"esbuild-wasm@npm:0.22.0":
+  version: 0.22.0
+  resolution: "esbuild-wasm@npm:0.22.0"
   bin:
     esbuild: bin/esbuild
-  checksum: 10c0/eb7b8fd0d4c70a368adf57618410ce60f5e77ea9b27a19b52866858ea048e3b008c358b4c5b3e85be8f89cb4ca8a92050bc40b3c648d7ddccdff1cd0f23edfef
+  checksum: 10c0/837faefc4984a3bfd22152b72cad8cdf3364f686bcb0bf6f802e6a910c1fe24470528bcdb4b0e13f1b74ff129ea758d1200645d84a9adf422e2fd683cd7041f3
   languageName: node
   linkType: hard
 
@@ -9407,6 +9595,89 @@ __metadata:
   bin:
     esbuild: bin/esbuild
   checksum: 10c0/fa08508adf683c3f399e8a014a6382a6b65542213431e26206c0720e536b31c09b50798747c2a105a4bbba1d9767b8d3615a74c2f7bf1ddf6d836cd11eb672de
+  languageName: node
+  linkType: hard
+
+"esbuild@npm:0.22.0":
+  version: 0.22.0
+  resolution: "esbuild@npm:0.22.0"
+  dependencies:
+    "@esbuild/aix-ppc64": "npm:0.22.0"
+    "@esbuild/android-arm": "npm:0.22.0"
+    "@esbuild/android-arm64": "npm:0.22.0"
+    "@esbuild/android-x64": "npm:0.22.0"
+    "@esbuild/darwin-arm64": "npm:0.22.0"
+    "@esbuild/darwin-x64": "npm:0.22.0"
+    "@esbuild/freebsd-arm64": "npm:0.22.0"
+    "@esbuild/freebsd-x64": "npm:0.22.0"
+    "@esbuild/linux-arm": "npm:0.22.0"
+    "@esbuild/linux-arm64": "npm:0.22.0"
+    "@esbuild/linux-ia32": "npm:0.22.0"
+    "@esbuild/linux-loong64": "npm:0.22.0"
+    "@esbuild/linux-mips64el": "npm:0.22.0"
+    "@esbuild/linux-ppc64": "npm:0.22.0"
+    "@esbuild/linux-riscv64": "npm:0.22.0"
+    "@esbuild/linux-s390x": "npm:0.22.0"
+    "@esbuild/linux-x64": "npm:0.22.0"
+    "@esbuild/netbsd-x64": "npm:0.22.0"
+    "@esbuild/openbsd-arm64": "npm:0.22.0"
+    "@esbuild/openbsd-x64": "npm:0.22.0"
+    "@esbuild/sunos-x64": "npm:0.22.0"
+    "@esbuild/win32-arm64": "npm:0.22.0"
+    "@esbuild/win32-ia32": "npm:0.22.0"
+    "@esbuild/win32-x64": "npm:0.22.0"
+  dependenciesMeta:
+    "@esbuild/aix-ppc64":
+      optional: true
+    "@esbuild/android-arm":
+      optional: true
+    "@esbuild/android-arm64":
+      optional: true
+    "@esbuild/android-x64":
+      optional: true
+    "@esbuild/darwin-arm64":
+      optional: true
+    "@esbuild/darwin-x64":
+      optional: true
+    "@esbuild/freebsd-arm64":
+      optional: true
+    "@esbuild/freebsd-x64":
+      optional: true
+    "@esbuild/linux-arm":
+      optional: true
+    "@esbuild/linux-arm64":
+      optional: true
+    "@esbuild/linux-ia32":
+      optional: true
+    "@esbuild/linux-loong64":
+      optional: true
+    "@esbuild/linux-mips64el":
+      optional: true
+    "@esbuild/linux-ppc64":
+      optional: true
+    "@esbuild/linux-riscv64":
+      optional: true
+    "@esbuild/linux-s390x":
+      optional: true
+    "@esbuild/linux-x64":
+      optional: true
+    "@esbuild/netbsd-x64":
+      optional: true
+    "@esbuild/openbsd-arm64":
+      optional: true
+    "@esbuild/openbsd-x64":
+      optional: true
+    "@esbuild/sunos-x64":
+      optional: true
+    "@esbuild/win32-arm64":
+      optional: true
+    "@esbuild/win32-ia32":
+      optional: true
+    "@esbuild/win32-x64":
+      optional: true
+  bin:
+    esbuild: bin/esbuild
+  checksum: 10c0/2ca5e6aa0cd3ca01eed05bc878c21ba611d6b05ae9eed30e63c6711bec3a902ab2542cbac3a200de4871d0d8d1f920b88e903618e6958e0848d68eb6a83ef078
   languageName: node
   linkType: hard
 
@@ -11697,16 +11968,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"istanbul-lib-instrument@npm:6.0.2":
-  version: 6.0.2
-  resolution: "istanbul-lib-instrument@npm:6.0.2"
+"istanbul-lib-instrument@npm:6.0.3":
+  version: 6.0.3
+  resolution: "istanbul-lib-instrument@npm:6.0.3"
   dependencies:
     "@babel/core": "npm:^7.23.9"
     "@babel/parser": "npm:^7.23.9"
     "@istanbuljs/schema": "npm:^0.1.3"
     istanbul-lib-coverage: "npm:^3.2.0"
     semver: "npm:^7.5.4"
-  checksum: 10c0/405c6ac037bf8c7ee7495980b0cd5544b2c53078c10534d0c9ceeb92a9ea7dcf8510f58ccfce31336458a8fa6ccef27b570bbb602abaa8c1650f5496a807477c
+  checksum: 10c0/a1894e060dd2a3b9f046ffdc87b44c00a35516f5e6b7baf4910369acca79e506fc5323a816f811ae23d82334b38e3ddeb8b3b331bd2c860540793b59a8689128
   languageName: node
   linkType: hard
 
@@ -14762,7 +15033,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"postcss@npm:8.4.38, postcss@npm:^8.2.14, postcss@npm:^8.4.23, postcss@npm:^8.4.31, postcss@npm:^8.4.33, postcss@npm:^8.4.38":
+"postcss@npm:8.4.39":
+  version: 8.4.39
+  resolution: "postcss@npm:8.4.39"
+  dependencies:
+    nanoid: "npm:^3.3.7"
+    picocolors: "npm:^1.0.1"
+    source-map-js: "npm:^1.2.0"
+  checksum: 10c0/16f5ac3c4e32ee76d1582b3c0dcf1a1fdb91334a45ad755eeb881ccc50318fb8d64047de4f1601ac96e30061df203f0f2e2edbdc0bfc49b9c57bc9fb9bedaea3
+  languageName: node
+  linkType: hard
+
+"postcss@npm:^8.2.14, postcss@npm:^8.4.23, postcss@npm:^8.4.31, postcss@npm:^8.4.33, postcss@npm:^8.4.38":
   version: 8.4.38
   resolution: "postcss@npm:8.4.38"
   dependencies:
@@ -18692,6 +18974,13 @@ __metadata:
   version: 1.0.0
   resolution: "yocto-queue@npm:1.0.0"
   checksum: 10c0/856117aa15cf5103d2a2fb173f0ab4acb12b4b4d0ed3ab249fdbbf612e55d1cadfd27a6110940e24746fb0a78cf640b522cc8bca76f30a3b00b66e90cf82abe0
+  languageName: node
+  linkType: hard
+
+"yoctocolors-cjs@npm:^2.1.1":
+  version: 2.1.1
+  resolution: "yoctocolors-cjs@npm:2.1.1"
+  checksum: 10c0/e7e32c3d0a41e72251e274b34ebf9c371d26be1d351b41ba8feb407ce61e607e5178d1eaefeff7b5f1346a94a4ff4081cf276f2fd8388b432b7798d18800dd7f
   languageName: node
   linkType: hard
 
