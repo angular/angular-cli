@@ -45,6 +45,7 @@ WEBPACK_IGNORE_TESTS = [
     "tests/commands/serve/ssr-http-requests-assets.js",
     "tests/build/prerender/http-requests-assets.js",
     "tests/build/prerender/error-with-sourcemaps.js",
+    "tests/build/wasm-esm.js",
 ]
 
 def _to_glob(patterns):
