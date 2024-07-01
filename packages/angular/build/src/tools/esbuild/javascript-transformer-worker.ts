@@ -60,7 +60,9 @@ async function transformWithBabel(
     options.sourcemap &&
     (!!options.thirdPartySourcemaps || !/[\\/]node_modules[\\/]/.test(filename));
 
-  const plugins: PluginItem[] = [];
+  // @ts-expect-error Import attribute syntax plugin does not currently have type definitions
+  const { default: importAttributePlugin } = await import('@babel/plugin-syntax-import-attributes');
+  const plugins: PluginItem[] = [importAttributePlugin];
 
   // Lazy load the linker plugin only when linking is required
   if (shouldLink) {
