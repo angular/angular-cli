@@ -1,7 +1,7 @@
 import { join } from 'path';
 import { getGlobalVariable } from '../../utils/env';
 import { expectFileToMatch, writeFile } from '../../utils/fs';
-import { installPackage, uninstallPackage } from '../../utils/packages';
+import { uninstallPackage } from '../../utils/packages';
 import { ng } from '../../utils/process';
 import { expectToFail } from '../../utils/utils';
 import { readNgVersion } from '../../utils/version';
@@ -36,15 +36,16 @@ export default async function () {
   // Install correct version
   let localizeVersion = '@angular/localize@' + readNgVersion();
   if (getGlobalVariable('argv')['ng-snapshots']) {
-    localizeVersion = require('../../ng-snapshot/package.json').dependencies['@angular/localize'];
+    // The snapshots job won't work correctly because 'ng add' doesn't support github URLs
+    // localizeVersion = require('../../ng-snapshot/package.json').dependencies['@angular/localize'];
+    return;
   }
-  await installPackage(localizeVersion);
+  await ng('add', localizeVersion, '--skip-confirmation');
 
   // Should not show any warnings when extracting
   const { stderr: message5 } = await ng('extract-i18n');
   if (message5.includes('WARNING')) {
-    // TODO: enable once https://github.com/angular/angular/pull/56300 is released.
-    // throw new Error('Expected no warnings to be shown. STDERR:\n' + message5);
+    throw new Error('Expected no warnings to be shown. STDERR:\n' + message5);
   }
 
   await expectFileToMatch('messages.xlf', 'Hello world');
