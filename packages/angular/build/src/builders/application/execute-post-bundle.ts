@@ -126,7 +126,7 @@ export async function executePostBundleSteps(
 
     allErrors.push(...errors);
     allWarnings.push(...warnings);
-    prerenderedRoutes.push(...Array.from(generatedRoutes));
+    prerenderedRoutes.push(...generatedRoutes);
 
     for (const [path, content] of Object.entries(output)) {
       additionalHtmlOutputFiles.set(

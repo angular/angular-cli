@@ -10,6 +10,7 @@ import assert from 'node:assert';
 import { randomUUID } from 'node:crypto';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
+import { MessagePort } from 'node:worker_threads';
 import { fileURLToPath } from 'url';
 import { JavaScriptTransformer } from '../../../tools/esbuild/javascript-transformer';
 
@@ -21,12 +22,14 @@ import { JavaScriptTransformer } from '../../../tools/esbuild/javascript-transfo
 const MEMORY_URL_SCHEME = 'memory://';
 
 export interface ESMInMemoryFileLoaderWorkerData {
-  outputFiles: Record<string, string>;
+  jsOutputFilesForWorker: Record<string, string>;
   workspaceRoot: string;
 }
 
-let memoryVirtualRootUrl: string;
-let outputFiles: Record<string, string>;
+interface ESMInMemoryFileLoaderResolutionData {
+  memoryVirtualRootUrl: string;
+  outputFiles: Record<string, string>;
+}
 
 const javascriptTransformer = new JavaScriptTransformer(
   // Always enable JIT linking to support applications built with and without AOT.
@@ -36,23 +39,46 @@ const javascriptTransformer = new JavaScriptTransformer(
   1,
 );
 
-export function initialize(data: ESMInMemoryFileLoaderWorkerData) {
-  // This path does not actually exist but is used to overlay the in memory files with the
-  // actual filesystem for resolution purposes.
-  // A custom URL schema (such as `memory://`) cannot be used for the resolve output because
-  // the in-memory files may use `import.meta.url` in ways that assume a file URL.
-  // `createRequire` is one example of this usage.
-  memoryVirtualRootUrl = pathToFileURL(
-    join(data.workspaceRoot, `.angular/prerender-root/${randomUUID()}/`),
-  ).href;
-  outputFiles = data.outputFiles;
+let loaderData: Promise<ESMInMemoryFileLoaderResolutionData>;
+
+export function initialize(data: { port: MessagePort } | ESMInMemoryFileLoaderWorkerData) {
+  loaderData = new Promise<ESMInMemoryFileLoaderResolutionData>((resolve) => {
+    if (!('port' in data)) {
+      /** TODO: Remove when Node.js versions < 22.2 are no longer supported. */
+      resolve({
+        outputFiles: data.jsOutputFilesForWorker,
+        memoryVirtualRootUrl: pathToFileURL(
+          join(data.workspaceRoot, `.angular/prerender-root/${randomUUID()}/`),
+        ).href,
+      });
+
+      return;
+    }
+
+    const { port } = data;
+    port.once(
+      'message',
+      ({ jsOutputFilesForWorker, workspaceRoot }: ESMInMemoryFileLoaderWorkerData) => {
+        resolve({
+          outputFiles: jsOutputFilesForWorker,
+          memoryVirtualRootUrl: pathToFileURL(
+            join(workspaceRoot, `.angular/prerender-root/${randomUUID()}/`),
+          ).href,
+        });
+
+        port.close();
+      },
+    );
+  });
 }
 
-export function resolve(
+export async function resolve(
   specifier: string,
   context: { parentURL: undefined | string },
   nextResolve: Function,
 ) {
+  const { outputFiles, memoryVirtualRootUrl } = await loaderData;
+
   // In-memory files loaded from external code will contain a memory scheme
   if (specifier.startsWith(MEMORY_URL_SCHEME)) {
     let memoryUrl;
@@ -89,7 +115,7 @@ export function resolve(
 
     if (
       specifierUrl?.pathname &&
-      Object.hasOwn(outputFiles, specifierUrl.href.slice(memoryVirtualRootUrl.length))
+      outputFiles[specifierUrl.href.slice(memoryVirtualRootUrl.length)] !== undefined
     ) {
       return {
         format: 'module',
@@ -114,6 +140,7 @@ export function resolve(
 }
 
 export async function load(url: string, context: { format?: string | null }, nextLoad: Function) {
+  const { outputFiles, memoryVirtualRootUrl } = await loaderData;
   const { format } = context;
 
   // Load the file from memory if the URL is based in the virtual root

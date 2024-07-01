@@ -17,6 +17,10 @@
     "packages/angular/build/src/tools/esbuild/utils.ts"
   ],
   [
+    "packages/angular/build/src/utils/server-rendering/prerender-child-process.ts",
+    "packages/angular/build/src/utils/server-rendering/prerender.ts"
+  ],
+  [
     "packages/angular/cli/src/analytics/analytics-collector.ts",
     "packages/angular/cli/src/command-builder/command-module.ts"
   ],
