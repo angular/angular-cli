@@ -23,6 +23,7 @@ import { createRxjsEsmResolutionPlugin } from './rxjs-esm-resolution-plugin';
 import { createSourcemapIgnorelistPlugin } from './sourcemap-ignorelist-plugin';
 import { getFeatureSupport, isZonelessApp } from './utils';
 import { createVirtualModulePlugin } from './virtual-module-plugin';
+import { createWasmPlugin } from './wasm-plugin';
 
 export function createBrowserCodeBundleOptions(
   options: NormalizedApplicationBuildOptions,
@@ -37,6 +38,8 @@ export function createBrowserCodeBundleOptions(
     sourceFileCache,
   );
 
+  const zoneless = isZonelessApp(polyfills);
+
   const buildOptions: BuildOptions = {
     ...getEsBuildCommonOptions(options),
     platform: 'browser',
@@ -48,8 +51,9 @@ export function createBrowserCodeBundleOptions(
     entryNames: outputNames.bundles,
     entryPoints,
     target,
-    supported: getFeatureSupport(target, isZonelessApp(polyfills)),
+    supported: getFeatureSupport(target, zoneless),
     plugins: [
+      createWasmPlugin({ allowAsync: zoneless }),
       createSourcemapIgnorelistPlugin(),
       createCompilerPlugin(
         // JS/TS options
