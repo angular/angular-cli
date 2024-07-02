@@ -20,7 +20,7 @@
     "@babel/plugin-transform-runtime": "7.24.7",
     "@babel/preset-env": "7.24.7",
     "@babel/runtime": "7.24.7",
-    "@discoveryjs/json-ext": "0.5.7",
+    "@discoveryjs/json-ext": "0.6.0",
     "@ngtools/webpack": "0.0.0-PLACEHOLDER",
     "@vitejs/plugin-basic-ssl": "1.1.0",
     "ansi-colors": "4.1.3",
