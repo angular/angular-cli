@@ -193,7 +193,7 @@
     "source-map-support": "0.5.21",
     "symbol-observable": "4.0.0",
     "tar": "^6.1.6",
-    "terser": "5.31.1",
+    "terser": "5.29.2",
     "tree-kill": "1.2.2",
     "ts-node": "^10.9.1",
     "tslib": "2.6.3",
