@@ -29,7 +29,7 @@
     "ansi-colors": "4.1.3",
     "browserslist": "^4.23.0",
     "critters": "0.0.24",
-    "esbuild": "0.22.0",
+    "esbuild": "0.23.0",
     "fast-glob": "3.3.2",
     "https-proxy-agent": "7.0.5",
     "lmdb": "3.0.12",
@@ -43,7 +43,7 @@
     "sass": "1.77.6",
     "semver": "7.6.2",
     "undici": "6.19.2",
-    "vite": "5.3.2",
+    "vite": "5.3.3",
     "watchpack": "2.4.1"
   },
   "peerDependencies": {
