@@ -1,3 +1,34 @@
+<a name="18.1.0-rc.1"></a>
+
+# 18.1.0-rc.1 (2024-07-03)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                                 |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------- |
+| [6c0f60d1b](https://github.com/angular/angular-cli/commit/6c0f60d1bd7d120834d64f4d412829a7e2f061b0) | fix  | make `ng update` to keep newline at the end of package.json |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                  |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------ |
+| [1eb36e593](https://github.com/angular/angular-cli/commit/1eb36e5938b475cc3a81c324812489cf3e596d05) | fix  | reduce the number of max workers to available CPUs minus one |
+| [c6fc0203e](https://github.com/angular/angular-cli/commit/c6fc0203e06680d0bfb13066f809ed636722dec6) | fix  | rollback terser to `5.29.2`                                  |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                                  |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------ |
+| [628d87a94](https://github.com/angular/angular-cli/commit/628d87a9474ad2792b69bfbc501a2c5960b27db9) | feat | support WASM/ES Module integration proposal                  |
+| [fb8e3c39a](https://github.com/angular/angular-cli/commit/fb8e3c39a8b265003e98c8c6b5a9ec898223249f) | fix  | allow top-level await in zoneless applications               |
+| [5ec724338](https://github.com/angular/angular-cli/commit/5ec724338539f7191bee5026d7d1db578c1ce5aa) | fix  | correctly name entry points to match budgets                 |
+| [cd97134a6](https://github.com/angular/angular-cli/commit/cd97134a6e1468c6806c2bd753c934ec91bc3927) | fix  | normalize paths during module resolution in Vite             |
+| [27bd67083](https://github.com/angular/angular-cli/commit/27bd670831e60440ef7a2d2817c5871fbacd9e35) | fix  | redirect to path with trailing slash for asset directories   |
+| [e8a6d6bc4](https://github.com/angular/angular-cli/commit/e8a6d6bc41edcdb0cd58f4c62ddf0199f8c643d2) | fix  | reduce the number of max workers to available CPUs minus one |
+| [3091956f5](https://github.com/angular/angular-cli/commit/3091956f503754f313dbf98a8de6d21d3d01ebe3) | fix  | support import attributes in JavaScript transformer          |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="18.1.0-rc.0"></a>
 
 # 18.1.0-rc.0 (2024-06-26)
