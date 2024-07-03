@@ -6,6 +6,8 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
+import { Target } from '@angular-devkit/architect';
+import { workspaces } from '@angular-devkit/core';
 import { Argv } from 'yargs';
 import { getProjectByCwd } from '../utilities/config';
 import { memoize } from '../utilities/memoize';
@@ -28,7 +30,33 @@ export abstract class ArchitectCommandModule
 {
   abstract readonly multiTarget: boolean;
 
+  findDefaultBuilderName?(
+    project: workspaces.ProjectDefinition,
+    target: Target,
+  ): Promise<string | undefined>;
+
   async builder(argv: Argv): Promise<Argv<ArchitectCommandArgs>> {
+    const target = this.getArchitectTarget();
+
+    // Add default builder if target is not in project and a command default is provided
+    if (this.findDefaultBuilderName && this.context.workspace) {
+      for (const [project, projectDefinition] of this.context.workspace.projects) {
+        if (projectDefinition.targets.has(target)) {
+          continue;
+        }
+
+        const defaultBuilder = await this.findDefaultBuilderName(projectDefinition, {
+          project,
+          target,
+        });
+        if (defaultBuilder) {
+          projectDefinition.targets.set(target, {
+            builder: defaultBuilder,
+          });
+        }
+      }
+    }
+
     const project = this.getArchitectProject();
     const { jsonHelp, getYargsCompletions, help } = this.context.args.options;
 
@@ -60,7 +88,6 @@ export abstract class ArchitectCommandModule
       return localYargs;
     }
 
-    const target = this.getArchitectTarget();
     const schemaOptions = await this.getArchitectTargetOptions({
       project,
       target,
