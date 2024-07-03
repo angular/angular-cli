@@ -37,7 +37,7 @@ console.error = function (...args) {
 try {
   const script = await import(`./${scriptName}.mjs`);
   const exitCode = await script.default(args, cwd);
-  process.exitCode = exitCode || 0;
+  process.exitCode = typeof exitCode === 'number' ? exitCode : 0;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
 } catch (err: any) {
   console.error(err.stack);
