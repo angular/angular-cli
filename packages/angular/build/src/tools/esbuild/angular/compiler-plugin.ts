@@ -275,7 +275,8 @@ export function createCompilerPlugin(
           // Typescript printing support for sourcemaps is not yet integrated.
           useTypeScriptTranspilation =
             !initializationResult.compilerOptions.isolatedModules ||
-            !!initializationResult.compilerOptions.sourceMap;
+            !!initializationResult.compilerOptions.sourceMap ||
+            !!initializationResult.compilerOptions.inlineSourceMap;
           referencedFiles = initializationResult.referencedFiles;
         } catch (error) {
           (result.errors ??= []).push({
@@ -562,6 +563,7 @@ function createCompilerOptionsTransformer(
       noEmitOnError: false,
       inlineSources: !!pluginOptions.sourcemap,
       inlineSourceMap: !!pluginOptions.sourcemap,
+      sourceMap: undefined,
       mapRoot: undefined,
       sourceRoot: undefined,
       preserveSymlinks,
