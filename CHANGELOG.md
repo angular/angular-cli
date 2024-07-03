@@ -1,3 +1,30 @@
+<a name="18.0.7"></a>
+
+# 18.0.7 (2024-07-03)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                                 |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------- |
+| [67bf90131](https://github.com/angular/angular-cli/commit/67bf9013151c4e6a13c91ecf4afd78c863d9e33f) | fix  | make `ng update` to keep newline at the end of package.json |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                  |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------ |
+| [9b43ecbd0](https://github.com/angular/angular-cli/commit/9b43ecbd0395027548781a19345fbcd82261d4f4) | fix  | reduce the number of max workers to available CPUs minus one |
+| [03dad6806](https://github.com/angular/angular-cli/commit/03dad680676c4b2272b65a51dd62d74360e20b78) | fix  | rollback terser to `5.29.2`                                  |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                                  |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------ |
+| [fc928f638](https://github.com/angular/angular-cli/commit/fc928f6386061f34f7cd3ef6bb6d25aa4a33a800) | fix  | correctly name entry points to match budgets                 |
+| [2d51e8607](https://github.com/angular/angular-cli/commit/2d51e86077c4687224e931f49c82a907f5229ae5) | fix  | redirect to path with trailing slash for asset directories   |
+| [16f1c1e01](https://github.com/angular/angular-cli/commit/16f1c1e010090596b7d7c3911f01728e3feecc4d) | fix  | reduce the number of max workers to available CPUs minus one |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="18.0.6"></a>
 
 # 18.0.6 (2024-06-26)
