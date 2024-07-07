@@ -300,7 +300,7 @@
         </a>
         <a
           href="https://www.youtube.com/channel/UCbn1OgGei-DV7aSRo_HaAiw"
-          aria-label="Youtube"
+          aria-label="YouTube"
           target="_blank"
           rel="noopener"
         >
@@ -310,7 +310,7 @@
             viewBox="0 0 29 20"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
-            alt="Youtube"
+            alt="YouTube"
           >
             <path
               fill-rule="evenodd"
