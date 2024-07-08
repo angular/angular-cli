@@ -10,7 +10,6 @@ import { lookup as lookupMimeType } from 'mrmime';
 import { readFile } from 'node:fs/promises';
 import { extname } from 'node:path';
 import { workerData } from 'node:worker_threads';
-import { Response, fetch } from 'undici';
 
 /**
  * This is passed as workerData when setting up the worker via the `piscina` package.
@@ -25,8 +24,7 @@ const assetsCache: Map<string, { headers: undefined | Record<string, string>; co
 const RESOLVE_PROTOCOL = 'resolve:';
 
 export function patchFetchToLoadInMemoryAssets(): void {
-  const global = globalThis as unknown as { fetch: typeof fetch };
-  const originalFetch = global.fetch;
+  const originalFetch = globalThis.fetch;
   const patchedFetch: typeof fetch = async (input, init) => {
     let url: URL;
     if (input instanceof URL) {
@@ -72,5 +70,5 @@ export function patchFetchToLoadInMemoryAssets(): void {
     });
   };
 
-  global.fetch = patchedFetch;
+  globalThis.fetch = patchedFetch;
 }

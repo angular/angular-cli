@@ -198,7 +198,6 @@ ts_library(
         "@npm//tree-kill",
         "@npm//tslib",
         "@npm//typescript",
-        "@npm//undici",
         "@npm//vite",
         "@npm//watchpack",
         "@npm//webpack",
