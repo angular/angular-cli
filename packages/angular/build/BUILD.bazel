@@ -95,7 +95,6 @@ ts_library(
         "@npm//semver",
         "@npm//tslib",
         "@npm//typescript",
-        "@npm//undici",
         "@npm//vite",
         "@npm//watchpack",
     ],
