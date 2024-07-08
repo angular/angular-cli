@@ -5,10 +5,12 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-import { writeFile } from 'node:fs/promises';
+import { readFile, writeFile } from 'node:fs/promises';
+import assert from 'node:assert/strict';
 import { ng } from '../../utils/process';
 import { prependToFile, replaceInFile } from '../../utils/fs';
-import { updateJsonFile } from '../../utils/project';
+import { updateJsonFile, useSha } from '../../utils/project';
+import { installWorkspacePackages } from '../../utils/packages';
 
 /**
  * Compiled and base64 encoded WASM file for the following WAT:
@@ -94,4 +96,13 @@ export default async function () {
   );
 
   await ng('e2e');
+
+  // Setup prerendering and build to test Node.js functionality
+  await ng('add', '@angular/ssr', '--skip-confirmation');
+  await useSha();
+  await installWorkspacePackages();
+
+  await ng('build', '--configuration', 'development', '--prerender');
+  const content = await readFile('dist/test-project/browser/index.html', 'utf-8');
+  assert.match(content, /Hello, 32/);
 }

@@ -123,7 +123,8 @@ export function createWasmPlugin(options: WasmPluginOptions): Plugin {
           // Read from the file system when on Node.js (SSR) and not inline
           if (!inlineWasm && build.initialOptions.platform === 'node') {
             initContents += 'import { readFile } from "node:fs/promises";\n';
-            initContents += 'const wasmData = await readFile(wasmPath);\n';
+            initContents +=
+              'const wasmData = await readFile(new URL(wasmPath, import.meta.url));\n';
           }
 
           // Create initialization function
