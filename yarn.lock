@@ -667,7 +667,6 @@ __metadata:
     "@bazel/bazelisk": "npm:1.19.0"
     "@bazel/buildifier": "npm:7.1.2"
     "@bazel/concatjs": "patch:@bazel/concatjs@npm%3A5.8.1#~/.yarn/patches/@bazel-concatjs-npm-5.8.1-1bf81df846.patch"
-    "@bazel/esbuild": "npm:5.8.1"
     "@bazel/jasmine": "patch:@bazel/jasmine@npm%3A5.8.1#~/.yarn/patches/@bazel-jasmine-npm-5.8.1-3370fee155.patch"
     "@discoveryjs/json-ext": "npm:0.6.0"
     "@inquirer/confirm": "npm:3.1.14"

@@ -1,17 +1,16 @@
 """Re-export of some bazel rules with repository-wide defaults."""
 
-load("@npm//@angular/bazel:index.bzl", _ng_module = "ng_module", _ng_package = "ng_package")
-load("@npm//@bazel/concatjs:index.bzl", _ts_library = "ts_library")
-load("@build_bazel_rules_nodejs//:index.bzl", "copy_to_bin", _js_library = "js_library", _pkg_npm = "pkg_npm")
-load("@rules_pkg//:pkg.bzl", "pkg_tar")
-load("@npm//@bazel/esbuild:index.bzl", "esbuild")
-load("@npm//@angular/build-tooling/bazel:extract_js_module_output.bzl", "extract_js_module_output")
-load("@aspect_bazel_lib//lib:utils.bzl", "to_label")
-load("@aspect_bazel_lib//lib:jq.bzl", "jq")
 load("@aspect_bazel_lib//lib:copy_to_directory.bzl", "copy_to_directory")
+load("@aspect_bazel_lib//lib:jq.bzl", "jq")
+load("@aspect_bazel_lib//lib:utils.bzl", "to_label")
+load("@build_bazel_rules_nodejs//:index.bzl", "copy_to_bin", _js_library = "js_library", _pkg_npm = "pkg_npm")
+load("@npm//@angular/bazel:index.bzl", _ng_module = "ng_module", _ng_package = "ng_package")
+load("@npm//@angular/build-tooling/bazel:extract_js_module_output.bzl", "extract_js_module_output")
+load("@npm//@bazel/concatjs:index.bzl", _ts_library = "ts_library")
+load("@rules_pkg//:pkg.bzl", "pkg_tar")
+load("//:constants.bzl", "RELEASE_ENGINES_NODE", "RELEASE_ENGINES_NPM", "RELEASE_ENGINES_YARN")
 load("//tools:link_package_json_to_tarballs.bzl", "link_package_json_to_tarballs")
 load("//tools:snapshot_repo_filter.bzl", "SNAPSHOT_REPO_JQ_FILTER")
-load("//:constants.bzl", "RELEASE_ENGINES_NODE", "RELEASE_ENGINES_NPM", "RELEASE_ENGINES_YARN")
 
 _DEFAULT_TSCONFIG = "//:tsconfig-build.json"
 _DEFAULT_TSCONFIG_NG = "//:tsconfig-build-ng"
@@ -280,45 +279,4 @@ def ng_package(deps = [], **kwargs):
             "//conditions:default": NO_STAMP_PACKAGE_SUBSTITUTIONS,
         }),
         **kwargs
-    )
-
-def ng_test_library(name, entry_point = None, deps = [], tsconfig = None, **kwargs):
-    local_deps = [
-        # We declare "@angular/core" as default dependencies because
-        # all Angular component unit tests use the `TestBed` and `Component` exports.
-        "@npm//@angular/core",
-    ] + deps
-
-    if not tsconfig:
-        tsconfig = _DEFAULT_TSCONFIG_TEST
-
-    ts_library_name = name + "_ts_library"
-    ts_library(
-        name = ts_library_name,
-        testonly = 1,
-        tsconfig = tsconfig,
-        deps = local_deps,
-        **kwargs
-    )
-
-    esbuild(
-        name,
-        testonly = 1,
-        args = {
-            "keepNames": True,
-            # ensure that esbuild prefers .mjs to .js if both are available
-            # since ts_library produces both
-            "resolveExtensions": [
-                ".mjs",
-                ".js",
-            ],
-        },
-        output = name + "_spec.js",
-        entry_point = entry_point,
-        format = "iife",
-        # We cannot use `ES2017` or higher as that would result in `async/await` not being downleveled.
-        # ZoneJS needs to be able to intercept these as otherwise change detection would not work properly.
-        target = "es2016",
-        platform = "node",
-        deps = [":" + ts_library_name],
     )
