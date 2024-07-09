@@ -10,9 +10,8 @@ import { RuleFactory, SchematicsException, Tree } from '@angular-devkit/schemati
 import { FileSystemCollectionDesc, NodeModulesEngineHost } from '@angular-devkit/schematics/tools';
 import { readFileSync } from 'fs';
 import { parse as parseJson } from 'jsonc-parser';
-import { createRequire } from 'module';
+import { Module, createRequire } from 'module';
 import { dirname, resolve } from 'path';
-import { TextEncoder } from 'util';
 import { Script } from 'vm';
 import { assertIsError } from '../../utilities/error';
 
@@ -204,38 +203,24 @@ function wrap(
 
   // Setup a wrapper function to capture the module's exports
   const schematicCode = readFileSync(schematicFile, 'utf8');
-  // `module` is required due to @angular/localize ng-add being in UMD format
-  const headerCode = '(function() {\nvar exports = {};\nvar module = { exports };\n';
-  const footerCode = exportName
-    ? `\nreturn module.exports['${exportName}'];});`
-    : '\nreturn module.exports;});';
-
-  const script = new Script(headerCode + schematicCode + footerCode, {
+  const script = new Script(Module.wrap(schematicCode), {
     filename: schematicFile,
-    lineOffset: 3,
+    lineOffset: 1,
   });
+  const schematicModule = new Module(schematicFile);
+  const moduleFactory = script.runInThisContext();
 
-  const context = {
-    __dirname: schematicDirectory,
-    __filename: schematicFile,
-    Buffer,
-    // TextEncoder is used by the compiler to generate i18n message IDs. See:
-    // https://github.com/angular/angular/blob/main/packages/compiler/src/i18n/digest.ts#L17
-    // It is referenced globally, because it may be run either on the browser or the server.
-    // Usually Node exposes it globally, but in order for it to work, our custom context
-    // has to expose it too. Issue context: https://github.com/angular/angular/issues/48940.
-    TextEncoder,
-    console,
-    process,
-    get global() {
-      return this;
-    },
-    require: customRequire,
+  return () => {
+    moduleFactory(
+      schematicModule.exports,
+      customRequire,
+      schematicModule,
+      schematicFile,
+      schematicDirectory,
+    );
+
+    return exportName ? schematicModule.exports[exportName] : schematicModule.exports;
   };
-
-  const exportsFactory = script.runInNewContext(context);
-
-  return exportsFactory;
 }
 
 function loadBuiltinModule(id: string): unknown {
