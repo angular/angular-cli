@@ -101,7 +101,6 @@
 
     /* TODO: evaluate usage of these rules and fix issues as needed */
     "no-case-declarations": "off",
-    "no-underscore-dangle": "off",
     "@typescript-eslint/ban-types": "off",
     "@typescript-eslint/no-implied-eval": "off",
     "@typescript-eslint/no-var-requires": "off",
