@@ -1,3 +1,15 @@
+<a name="18.2.0-next.0"></a>
+
+# 18.2.0-next.0 (2024-07-10)
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                              |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------- |
+| [4da922e4f](https://github.com/angular/angular-cli/commit/4da922e4f4e905a1274e70adca1d875c025b8b46) | feat | use isolatedModules in generated project |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="18.1.0"></a>
 
 # 18.1.0 (2024-07-10)
