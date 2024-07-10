@@ -32,6 +32,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
       harness.useTarget('build', {
         ...BASE_OPTIONS,
+        polyfills: ['zone.js'],
         sourceMap: {
           scripts: true,
         },
