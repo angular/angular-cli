@@ -100,7 +100,6 @@
     ],
 
     /* TODO: evaluate usage of these rules and fix issues as needed */
-    "no-case-declarations": "off",
     "@typescript-eslint/ban-types": "off",
     "@typescript-eslint/no-implied-eval": "off",
     "@typescript-eslint/no-var-requires": "off",
@@ -124,6 +123,7 @@
       "rules": {
         "import/no-extraneous-dependencies": ["error", { "devDependencies": true }],
         "max-lines-per-function": "off",
+        "no-case-declarations": "off",
         "no-console": "off"
       }
     }

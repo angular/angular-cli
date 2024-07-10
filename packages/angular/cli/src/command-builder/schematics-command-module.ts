@@ -193,27 +193,25 @@ export abstract class SchematicsCommandModule
                 continue;
               }
 
-              const choices = definition.items?.map((item) => {
-                return typeof item == 'string'
-                  ? {
-                      name: item,
-                      value: item,
-                    }
-                  : {
-                      name: item.label,
-                      value: item.value,
-                    };
-              });
-
               answers[definition.id] = await (
                 definition.multiselect ? prompts.checkbox : prompts.select
               )({
                 message: definition.message,
                 default: definition.default,
-                choices,
+                choices: definition.items?.map((item) =>
+                  typeof item == 'string'
+                    ? {
+                        name: item,
+                        value: item,
+                      }
+                    : {
+                        name: item.label,
+                        value: item.value,
+                      },
+                ),
               });
               break;
-            case 'input':
+            case 'input': {
               let finalValue: JsonValue | undefined;
               answers[definition.id] = await prompts.input({
                 message: definition.message,
@@ -258,6 +256,7 @@ export abstract class SchematicsCommandModule
                 answers[definition.id] = finalValue;
               }
               break;
+            }
           }
         }
 

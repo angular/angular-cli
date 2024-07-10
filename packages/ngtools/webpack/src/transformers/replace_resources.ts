@@ -158,7 +158,7 @@ function visitComponentMetadata(
     case 'moduleId':
       return undefined;
 
-    case 'templateUrl':
+    case 'templateUrl': {
       const url = getResourceUrl(node.initializer);
       if (!url) {
         return node;
@@ -179,9 +179,10 @@ function visitComponentMetadata(
         nodeFactory.createIdentifier('template'),
         importName,
       );
+    }
     case 'styles':
     case 'styleUrl':
-    case 'styleUrls':
+    case 'styleUrls': {
       const isInlineStyle = name === 'styles';
       let styles: Iterable<ts.Expression>;
 
@@ -219,6 +220,7 @@ function visitComponentMetadata(
       }
 
       return undefined;
+    }
     default:
       return node;
   }

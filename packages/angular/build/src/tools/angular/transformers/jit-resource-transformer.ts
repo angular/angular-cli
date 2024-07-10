@@ -210,7 +210,7 @@ function visitComponentMetadata(
 
       return node;
 
-    case 'styleUrls':
+    case 'styleUrls': {
       if (!ts.isArrayLiteralExpression(node.initializer)) {
         return node;
       }
@@ -234,6 +234,7 @@ function visitComponentMetadata(
 
       // The external styles will be added afterwards in combination with any inline styles
       return undefined;
+    }
     default:
       // All other elements are passed through
       return node;

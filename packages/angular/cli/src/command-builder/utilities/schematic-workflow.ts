@@ -10,6 +10,10 @@ import { logging } from '@angular-devkit/core';
 import { NodeWorkflow } from '@angular-devkit/schematics/tools';
 import { colors } from '../../utilities/color';
 
+function removeLeadingSlash(value: string): string {
+  return value[0] === '/' ? value.slice(1) : value;
+}
+
 export function subscribeToWorkflow(
   workflow: NodeWorkflow,
   logger: logging.LoggerApi,
@@ -24,13 +28,14 @@ export function subscribeToWorkflow(
 
   const reporterSubscription = workflow.reporter.subscribe((event) => {
     // Strip leading slash to prevent confusion.
-    const eventPath = event.path.charAt(0) === '/' ? event.path.substring(1) : event.path;
+    const eventPath = removeLeadingSlash(event.path);
 
     switch (event.kind) {
       case 'error':
         error = true;
-        const desc = event.description == 'alreadyExist' ? 'already exists' : 'does not exist';
-        logger.error(`ERROR! ${eventPath} ${desc}.`);
+        logger.error(
+          `ERROR! ${eventPath} ${event.description == 'alreadyExist' ? 'already exists' : 'does not exist'}.`,
+        );
         break;
       case 'update':
         logs.push(`${colors.cyan('UPDATE')} ${eventPath} (${event.content.length} bytes)`);
@@ -45,8 +50,7 @@ export function subscribeToWorkflow(
         files.add(eventPath);
         break;
       case 'rename':
-        const eventToPath = event.to.charAt(0) === '/' ? event.to.substring(1) : event.to;
-        logs.push(`${colors.blue('RENAME')} ${eventPath} => ${eventToPath}`);
+        logs.push(`${colors.blue('RENAME')} ${eventPath} => ${removeLeadingSlash(event.to)}`);
         files.add(eventPath);
         break;
     }

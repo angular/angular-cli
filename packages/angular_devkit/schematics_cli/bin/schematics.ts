@@ -47,6 +47,10 @@ function parseSchematicName(str: string | null): { collection: string; schematic
   return { collection, schematic };
 }
 
+function removeLeadingSlash(value: string): string {
+  return value[0] === '/' ? value.slice(1) : value;
+}
+
 export interface MainOptions {
   args: string[];
   stdout?: ProcessOutput;
@@ -87,27 +91,25 @@ function _createPromptProvider(): schema.PromptProvider {
             continue;
           }
 
-          const choices = definition.items?.map((item) => {
-            return typeof item == 'string'
-              ? {
-                  name: item,
-                  value: item,
-                }
-              : {
-                  name: item.label,
-                  value: item.value,
-                };
-          });
-
           answers[definition.id] = await (
             definition.multiselect ? prompts.checkbox : prompts.select
           )({
             message: definition.message,
             default: definition.default,
-            choices,
+            choices: definition.items.map((item) =>
+              typeof item == 'string'
+                ? {
+                    name: item,
+                    value: item,
+                  }
+                : {
+                    name: item.label,
+                    value: item.value,
+                  },
+            ),
           });
           break;
-        case 'input':
+        case 'input': {
           let finalValue: JsonValue | undefined;
           answers[definition.id] = await prompts.input({
             message: definition.message,
@@ -152,6 +154,7 @@ function _createPromptProvider(): schema.PromptProvider {
             answers[definition.id] = finalValue;
           }
           break;
+        }
       }
     }
 
@@ -287,14 +290,14 @@ export async function main({
   workflow.reporter.subscribe((event) => {
     nothingDone = false;
     // Strip leading slash to prevent confusion.
-    const eventPath = event.path.startsWith('/') ? event.path.slice(1) : event.path;
+    const eventPath = removeLeadingSlash(event.path);
 
     switch (event.kind) {
       case 'error':
         error = true;
-
-        const desc = event.description == 'alreadyExist' ? 'already exists' : 'does not exist';
-        logger.error(`ERROR! ${eventPath} ${desc}.`);
+        logger.error(
+          `ERROR! ${eventPath} ${event.description == 'alreadyExist' ? 'already exists' : 'does not exist'}.`,
+        );
         break;
       case 'update':
         loggingQueue.push(`${colors.cyan('UPDATE')} ${eventPath} (${event.content.length} bytes)`);
@@ -306,8 +309,9 @@ export async function main({
         loggingQueue.push(`${colors.yellow('DELETE')} ${eventPath}`);
         break;
       case 'rename':
-        const eventToPath = event.to.startsWith('/') ? event.to.slice(1) : event.to;
-        loggingQueue.push(`${colors.blue('RENAME')} ${eventPath} => ${eventToPath}`);
+        loggingQueue.push(
+          `${colors.blue('RENAME')} ${eventPath} => ${removeLeadingSlash(event.to)}`,
+        );
         break;
     }
   });

@@ -168,13 +168,16 @@ async function createSerializer(
     case Format.LegacyMigrate:
       return new LegacyMessageIdMigrationSerializer(diagnostics);
     case Format.Arb:
-      const fileSystem = {
-        relative(from: string, to: string): string {
-          return path.relative(from, to);
-        },
-      };
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      return new ArbTranslationSerializer(sourceLocale, basePath as any, fileSystem as any);
+      return new ArbTranslationSerializer(
+        sourceLocale,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        basePath as any,
+        {
+          relative(from: string, to: string): string {
+            return path.relative(from, to);
+          },
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } as any,
+      );
   }
 }

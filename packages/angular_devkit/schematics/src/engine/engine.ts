@@ -370,14 +370,14 @@ export class SchematicEngine<CollectionT extends object, SchematicT extends obje
         return () => new NullTree();
       case 'empty:':
         return () => empty();
-      default:
-        const hostSource = this._host.createSourceFromUrl(url, context);
-        if (!hostSource) {
-          throw new UnknownUrlSourceProtocol(url.toString());
-        }
-
-        return hostSource;
     }
+
+    const hostSource = this._host.createSourceFromUrl(url, context);
+    if (!hostSource) {
+      throw new UnknownUrlSourceProtocol(url.toString());
+    }
+
+    return hostSource;
   }
 
   executePostTasks(): Observable<void> {
