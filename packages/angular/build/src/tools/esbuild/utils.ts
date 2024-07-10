@@ -8,6 +8,7 @@
 
 import { BuilderContext } from '@angular-devkit/architect';
 import { BuildOptions, Metafile, OutputFile, formatMessages } from 'esbuild';
+import { Listr } from 'listr2';
 import { createHash } from 'node:crypto';
 import { constants as fsConstants } from 'node:fs';
 import fs from 'node:fs/promises';
@@ -20,7 +21,6 @@ import {
   NormalizedOutputOptions,
 } from '../../builders/application/options';
 import { BudgetCalculatorResult } from '../../utils/bundle-calculator';
-import { Spinner } from '../../utils/spinner';
 import { BundleStats, generateEsbuildBuildStatsTable } from '../../utils/stats-table';
 import { BuildOutputFile, BuildOutputFileType, InitialFileRecord } from './bundler-context';
 import { BuildOutputAsset, ExecutionResult } from './bundler-execution-result';
@@ -146,14 +146,22 @@ export async function calculateEstimatedTransferSizes(
 }
 
 export async function withSpinner<T>(text: string, action: () => T | Promise<T>): Promise<T> {
-  const spinner = new Spinner(text);
-  spinner.start();
+  let result;
+  const taskList = new Listr(
+    [
+      {
+        title: text,
+        async task() {
+          result = await action();
+        },
+      },
+    ],
+    { rendererOptions: { clearOutput: true } },
+  );
 
-  try {
-    return await action();
-  } finally {
-    spinner.stop();
-  }
+  await taskList.run();
+
+  return result as T;
 }
 
 export async function withNoProgress<T>(text: string, action: () => T | Promise<T>): Promise<T> {

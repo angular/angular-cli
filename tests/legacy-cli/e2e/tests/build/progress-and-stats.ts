@@ -1,3 +1,4 @@
+import assert from 'node:assert/strict';
 import { getGlobalVariable } from '../../utils/env';
 import { ng } from '../../utils/process';
 
@@ -15,7 +16,9 @@ export default async function () {
 
   let logs;
   if (getGlobalVariable('argv')['esbuild']) {
-    logs = ['Building...'];
+    assert.match(stdout, /Building\.\.\./);
+
+    return;
   } else {
     logs = [
       'Browser application bundle generation complete',
