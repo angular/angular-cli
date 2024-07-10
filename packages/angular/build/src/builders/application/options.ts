@@ -13,7 +13,7 @@ import { access, constants } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import path from 'node:path';
 import { normalizeAssetPatterns, normalizeOptimization, normalizeSourceMaps } from '../../utils';
-import { colors } from '../../utils/color';
+import { supportColor } from '../../utils/color';
 import { useJSONBuildLogs } from '../../utils/environment-options';
 import { I18nOptions, createI18nOptions } from '../../utils/i18n-options';
 import { IndexHtmlTransform } from '../../utils/index-file/index-html-generator';
@@ -366,7 +366,7 @@ export async function normalizeOptions(
     plugins: extensions?.codePlugins?.length ? extensions?.codePlugins : undefined,
     loaderExtensions,
     jsonLogs: useJSONBuildLogs,
-    colors: colors.enabled,
+    colors: supportColor(),
     clearScreen,
     define,
   };
