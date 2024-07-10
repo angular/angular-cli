@@ -16,6 +16,6 @@ jobs:
     if: github.repository == 'angular/angular-cli'
     runs-on: ubuntu-latest
     steps:
-      - uses: angular/dev-infra/github-actions/feature-request@ae8bb6bfbf89a5f10b8410e6ccfafc0e2009a940
+      - uses: angular/dev-infra/github-actions/feature-request@fc5ef0f362c3b0373a012b58ae1bde6def471c27
         with:
           angular-robot-key: ${{ secrets.ANGULAR_ROBOT_PRIVATE_KEY }}
