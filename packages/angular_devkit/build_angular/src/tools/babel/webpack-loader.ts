@@ -200,8 +200,7 @@ export default custom<ApplicationPresetOptions>(() => {
                   case 'error':
                     this.emitError(message);
                     break;
-                  case 'info':
-                  // Webpack does not currently have an informational diagnostic
+                  case 'info': // Webpack does not currently have an informational diagnostic
                   case 'warning':
                     this.emitWarning(message);
                     break;
