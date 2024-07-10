@@ -72,7 +72,7 @@ export class ActionList implements Iterable<Action> {
           toDelete.add(action.path);
           break;
 
-        case 'r':
+        case 'r': {
           const maybeCreate = toCreate.get(action.path);
           const maybeOverwrite = toOverwrite.get(action.path);
           if (maybeCreate) {
@@ -100,6 +100,7 @@ export class ActionList implements Iterable<Action> {
             toRename.set(action.path, action.to);
           }
           break;
+        }
       }
     }
 

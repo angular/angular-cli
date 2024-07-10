@@ -132,16 +132,18 @@ function normalizeValue(
   switch (type) {
     case 'project':
       return convertJsonProject(value as ProjectDefinition);
-    case 'projectcollection':
+    case 'projectcollection': {
       const projects = convertJsonProjectCollection(value as Iterable<[string, ProjectDefinition]>);
 
       return isEmpty(projects) ? undefined : projects;
+    }
     case 'target':
       return convertJsonTarget(value as TargetDefinition);
-    case 'targetcollection':
+    case 'targetcollection': {
       const targets = convertJsonTargetCollection(value as Iterable<[string, TargetDefinition]>);
 
       return isEmpty(targets) ? undefined : targets;
+    }
     default:
       return value as JsonValue;
   }

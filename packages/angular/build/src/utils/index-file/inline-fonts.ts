@@ -145,7 +145,7 @@ export class InlineFontsProcessor {
           }
           break;
 
-        case 'link':
+        case 'link': {
           const hrefAttr =
             attrs.some(({ name, value }) => name === 'rel' && value === 'stylesheet') &&
             attrs.find(({ name, value }) => name === 'href' && hrefsContent.has(value));
@@ -157,7 +157,7 @@ export class InlineFontsProcessor {
             rewriter.emitStartTag(tag);
           }
           break;
-
+        }
         default:
           rewriter.emitStartTag(tag);
 

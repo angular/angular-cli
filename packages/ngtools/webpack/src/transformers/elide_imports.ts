@@ -62,9 +62,8 @@ export function elideImports(
     let symbol: ts.Symbol | undefined;
     switch (node.kind) {
       case ts.SyntaxKind.Identifier:
-        const parent = node.parent;
-        if (parent && ts.isShorthandPropertyAssignment(parent)) {
-          const shorthandSymbol = typeChecker.getShorthandAssignmentValueSymbol(parent);
+        if (node.parent && ts.isShorthandPropertyAssignment(node.parent)) {
+          const shorthandSymbol = typeChecker.getShorthandAssignmentValueSymbol(node.parent);
           if (shorthandSymbol) {
             symbol = shorthandSymbol;
           }
