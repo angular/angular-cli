@@ -117,7 +117,7 @@ __metadata:
     postcss-loader: "npm:8.1.1"
     resolve-url-loader: "npm:5.0.0"
     rxjs: "npm:7.8.1"
-    sass: "npm:1.77.6"
+    sass: "npm:1.77.7"
     sass-loader: "npm:14.2.1"
     semver: "npm:7.6.2"
     source-map-loader: "npm:5.0.0"
@@ -416,7 +416,7 @@ __metadata:
     picomatch: "npm:4.0.2"
     piscina: "npm:4.6.1"
     rollup: "npm:4.18.1"
-    sass: "npm:1.77.6"
+    sass: "npm:1.77.7"
     semver: "npm:7.6.2"
     vite: "npm:5.3.3"
     watchpack: "npm:2.4.1"
@@ -537,7 +537,7 @@ __metadata:
     jsonc-parser: "npm:3.3.1"
     listr2: "npm:8.2.3"
     npm-package-arg: "npm:11.0.2"
-    npm-pick-manifest: "npm:9.0.1"
+    npm-pick-manifest: "npm:9.1.0"
     pacote: "npm:18.0.6"
     resolve: "npm:1.22.8"
     semver: "npm:7.6.2"
@@ -767,7 +767,7 @@ __metadata:
     rollup: "npm:4.18.1"
     rollup-plugin-sourcemaps: "npm:^0.6.0"
     rxjs: "npm:7.8.1"
-    sass: "npm:1.77.6"
+    sass: "npm:1.77.7"
     sass-loader: "npm:14.2.1"
     semver: "npm:7.6.2"
     shelljs: "npm:^0.8.5"
@@ -14137,7 +14137,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"npm-pick-manifest@npm:9.0.1, npm-pick-manifest@npm:^9.0.0, npm-pick-manifest@npm:^9.0.1":
+"npm-pick-manifest@npm:9.1.0":
+  version: 9.1.0
+  resolution: "npm-pick-manifest@npm:9.1.0"
+  dependencies:
+    npm-install-checks: "npm:^6.0.0"
+    npm-normalize-package-bin: "npm:^3.0.0"
+    npm-package-arg: "npm:^11.0.0"
+    semver: "npm:^7.3.5"
+  checksum: 10c0/8765f4199755b381323da2bff2202b4b15b59f59dba0d1be3f2f793b591321cd19e1b5a686ef48d9753a6bd4868550da632541a45dfb61809d55664222d73e44
+  languageName: node
+  linkType: hard
+
+"npm-pick-manifest@npm:^9.0.0, npm-pick-manifest@npm:^9.0.1":
   version: 9.0.1
   resolution: "npm-pick-manifest@npm:9.0.1"
   dependencies:
@@ -16304,6 +16316,19 @@ __metadata:
   bin:
     sass: sass.js
   checksum: 10c0/fe5a393c0aa29eda9f83c06be9b94788b61fe8bad0616ee6e3a25d21ab504f430d40c0064fdca89b02b8e426411ae6dcd906c91f2e48c263575c3d392b6daeb1
+  languageName: node
+  linkType: hard
+
+"sass@npm:1.77.7":
+  version: 1.77.7
+  resolution: "sass@npm:1.77.7"
+  dependencies:
+    chokidar: "npm:>=3.0.0 <4.0.0"
+    immutable: "npm:^4.0.0"
+    source-map-js: "npm:>=0.6.2 <2.0.0"
+  bin:
+    sass: sass.js
+  checksum: 10c0/6cacbf4b5165d30a9be0f09438aed85ff0617e5087442e65c23c8464750ff1b9988855a58f36b420b62f992d1e82403f99810aba7731519d3d026847e21a5635
   languageName: node
   linkType: hard
 
