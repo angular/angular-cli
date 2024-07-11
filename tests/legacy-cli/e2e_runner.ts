@@ -1,7 +1,7 @@
+import { parseArgs } from 'node:util';
 import { createConsoleLogger } from '../../packages/angular_devkit/core/node';
 import colors from 'ansi-colors';
 import glob from 'fast-glob';
-import yargsParser from 'yargs-parser';
 import * as path from 'path';
 import { getGlobalVariable, setGlobalVariable } from './e2e/utils/env';
 import { gitClean } from './e2e/utils/git';
@@ -40,29 +40,43 @@ Error.stackTraceLimit = Infinity;
  *
  * If unnamed flags are passed in, the list of tests will be filtered to include only those passed.
  */
-const argv = yargsParser(process.argv.slice(2), {
-  boolean: ['debug', 'esbuild', 'ng-snapshots', 'noglobal', 'nosilent', 'noproject', 'verbose'],
-  string: ['devkit', 'glob', 'reuse', 'ng-tag', 'tmpdir', 'ng-version', 'package-manager'],
-  number: ['nb-shards', 'shard'],
-  array: ['package', 'ignore'],
-  configuration: {
-    'camel-case-expansion': false,
-    'dot-notation': false,
-  },
-  default: {
-    'package-manager': 'npm',
-    'package': ['./dist/_*.tgz'],
-    'debug': !!process.env.BUILD_WORKSPACE_DIRECTORY,
-    'glob': process.env.TESTBRIDGE_TEST_ONLY,
-    'nb-shards':
-      Number(process.env.E2E_SHARD_TOTAL ?? 1) * Number(process.env.TEST_TOTAL_SHARDS ?? 1) || 1,
-    'shard':
-      process.env.E2E_SHARD_INDEX === undefined && process.env.TEST_SHARD_INDEX === undefined
-        ? undefined
-        : Number(process.env.E2E_SHARD_INDEX ?? 0) * Number(process.env.TEST_TOTAL_SHARDS ?? 1) +
-          Number(process.env.TEST_SHARD_INDEX ?? 0),
+const parsed = parseArgs({
+  allowPositionals: true,
+  options: {
+    'debug': { type: 'boolean', default: !!process.env.BUILD_WORKSPACE_DIRECTORY },
+    'esbuild': { type: 'boolean' },
+    'glob': { type: 'string', default: process.env.TESTBRIDGE_TEST_ONLY },
+    'ignore': { type: 'string', multiple: true },
+    'ng-snapshots': { type: 'boolean' },
+    'ng-tag': { type: 'string' },
+    'ng-version': { type: 'string' },
+    'noglobal': { type: 'boolean' },
+    'noproject': { type: 'boolean' },
+    'nosilent': { type: 'boolean' },
+    'package': { type: 'string', multiple: true, default: ['./dist/_*.tgz'] },
+    'package-manager': { type: 'string', default: 'npm' },
+    'reuse': { type: 'string' },
+    'tmpdir': { type: 'string' },
+    'verbose': { type: 'boolean' },
+
+    'nb-shards': { type: 'string' },
+    'shard': { type: 'string' },
   },
 });
+
+const argv = {
+  ...parsed.values,
+  _: parsed.positionals,
+  'nb-shards':
+    parsed.values['nb-shards'] ??
+    (Number(process.env.E2E_SHARD_TOTAL ?? 1) * Number(process.env.TEST_TOTAL_SHARDS ?? 1) || 1),
+  shard:
+    parsed.values.shard ??
+    (process.env.E2E_SHARD_INDEX === undefined && process.env.TEST_SHARD_INDEX === undefined
+      ? undefined
+      : Number(process.env.E2E_SHARD_INDEX ?? 0) * Number(process.env.TEST_TOTAL_SHARDS ?? 1) +
+        Number(process.env.TEST_SHARD_INDEX ?? 0)),
+};
 
 /**
  * Set the error code of the process to 255.  This is to ensure that if something forces node

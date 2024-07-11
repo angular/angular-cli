@@ -1,5 +1,4 @@
 import { join } from 'path';
-import yargsParser from 'yargs-parser';
 import { getGlobalVariable } from '../utils/env';
 import { expectFileToExist } from '../utils/fs';
 import { gitClean } from '../utils/git';
@@ -8,13 +7,13 @@ import { ng } from '../utils/process';
 import { prepareProjectForE2e, updateJsonFile } from '../utils/project';
 
 export default async function () {
-  const argv = getGlobalVariable<yargsParser.Arguments>('argv');
+  const argv: Record<string, unknown> = getGlobalVariable('argv');
 
   if (argv.noproject) {
     return;
   }
 
-  if (argv.reuse) {
+  if (argv.reuse && typeof argv.reuse === 'string') {
     process.chdir(argv.reuse);
     await gitClean();
   } else {
