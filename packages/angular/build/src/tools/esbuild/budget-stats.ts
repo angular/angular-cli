@@ -60,7 +60,10 @@ export function generateBudgetStats(
 
   // Add component styles from metafile
   // TODO: Provide this information directly from the AOT compiler
-  for (const entry of Object.values(metafile.outputs)) {
+  for (const [file, entry] of Object.entries(metafile.outputs)) {
+    if (!file.endsWith('.css')) {
+      continue;
+    }
     // 'ng-component' is set by the angular plugin's component stylesheet bundler
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const componentStyle: boolean = (entry as any)['ng-component'];
