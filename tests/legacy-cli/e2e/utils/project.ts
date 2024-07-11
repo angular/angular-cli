@@ -1,7 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { prerelease, SemVer } from 'semver';
-import yargsParser from 'yargs-parser';
 import { getGlobalVariable } from './env';
 import { readFile, replaceInFile, writeFile } from './fs';
 import { gitCommit } from './git';
@@ -39,7 +38,7 @@ export async function ngServe(...args: string[]) {
 }
 
 export async function prepareProjectForE2e(name: string) {
-  const argv: yargsParser.Arguments = getGlobalVariable('argv');
+  const argv: Record<string, unknown> = getGlobalVariable('argv');
 
   await git('config', 'user.email', 'angular-core+e2e@google.com');
   await git('config', 'user.name', 'Angular CLI E2E');
