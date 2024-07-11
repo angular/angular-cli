@@ -58,7 +58,7 @@
     "semver": "7.6.2",
     "source-map-loader": "5.0.0",
     "source-map-support": "0.5.21",
-    "terser": "5.29.2",
+    "terser": "5.31.2",
     "tree-kill": "1.2.2",
     "tslib": "2.6.3",
     "vite": "5.3.3",

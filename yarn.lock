@@ -122,7 +122,7 @@ __metadata:
     semver: "npm:7.6.2"
     source-map-loader: "npm:5.0.0"
     source-map-support: "npm:0.5.21"
-    terser: "npm:5.29.2"
+    terser: "npm:5.31.2"
     tree-kill: "npm:1.2.2"
     tslib: "npm:2.6.3"
     undici: "npm:6.19.2"
@@ -776,7 +776,7 @@ __metadata:
     source-map-support: "npm:0.5.21"
     symbol-observable: "npm:4.0.0"
     tar: "npm:^6.1.6"
-    terser: "npm:5.29.2"
+    terser: "npm:5.31.2"
     tree-kill: "npm:1.2.2"
     ts-node: "npm:^10.9.1"
     tslib: "npm:2.6.3"
@@ -17461,9 +17461,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"terser@npm:5.29.2":
-  version: 5.29.2
-  resolution: "terser@npm:5.29.2"
+"terser@npm:5.31.2":
+  version: 5.31.2
+  resolution: "terser@npm:5.31.2"
   dependencies:
     "@jridgewell/source-map": "npm:^0.3.3"
     acorn: "npm:^8.8.2"
@@ -17471,7 +17471,7 @@ __metadata:
     source-map-support: "npm:~0.5.20"
   bin:
     terser: bin/terser
-  checksum: 10c0/a6f1e26725e3dc99943d7173a3fca8bee21418a3ff39f37053fecd6a988b5341432d535721642807e9c24604aff64410577e9aed3200d9345c89b176b0ba3d65
+  checksum: 10c0/5b72f58421f69267f67cb60cf4398282afcdec697e9b6f1909035cdf52d9960226fc1df5968e27ba96736b7a7ba76609d0b7b060ee5da7769553940726059b63
   languageName: node
   linkType: hard
 
