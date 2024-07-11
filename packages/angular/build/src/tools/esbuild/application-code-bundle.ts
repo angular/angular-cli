@@ -19,6 +19,7 @@ import { BundlerOptionsFactory } from './bundler-context';
 import { createCompilerPluginOptions } from './compiler-plugin-options';
 import { createExternalPackagesPlugin } from './external-packages-plugin';
 import { createAngularLocaleDataPlugin } from './i18n-locale-plugin';
+import { createLoaderImportAttributePlugin } from './loader-import-attribute-plugin';
 import { createRxjsEsmResolutionPlugin } from './rxjs-esm-resolution-plugin';
 import { createSourcemapIgnorelistPlugin } from './sourcemap-ignorelist-plugin';
 import { getFeatureSupport, isZonelessApp } from './utils';
@@ -53,6 +54,7 @@ export function createBrowserCodeBundleOptions(
     target,
     supported: getFeatureSupport(target, zoneless),
     plugins: [
+      createLoaderImportAttributePlugin(),
       createWasmPlugin({ allowAsync: zoneless, cache: sourceFileCache?.loadResultCache }),
       createSourcemapIgnorelistPlugin(),
       createCompilerPlugin(
@@ -210,6 +212,7 @@ export function createServerCodeBundleOptions(
     entryPoints,
     supported: getFeatureSupport(target, zoneless),
     plugins: [
+      createLoaderImportAttributePlugin(),
       createWasmPlugin({ allowAsync: zoneless, cache: sourceFileCache?.loadResultCache }),
       createSourcemapIgnorelistPlugin(),
       createCompilerPlugin(
