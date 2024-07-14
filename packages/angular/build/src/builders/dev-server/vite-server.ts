@@ -16,6 +16,7 @@ import { basename, join } from 'node:path';
 import type { Connect, DepOptimizationConfig, InlineConfig, ViteDevServer } from 'vite';
 import { createAngularMemoryPlugin } from '../../tools/vite/angular-memory-plugin';
 import { createAngularLocaleDataPlugin } from '../../tools/vite/i18n-locale-plugin';
+import { createRemoveIdPrefixPlugin } from '../../tools/vite/id-prefix-plugin';
 import { loadProxyConfiguration, normalizeSourceMaps } from '../../utils';
 import { loadEsmModule } from '../../utils/load-esm';
 import { ApplicationBuilderOutput } from '../application';
@@ -577,6 +578,7 @@ export async function setupServer(
         extensionMiddleware,
         normalizePath,
       }),
+      createRemoveIdPrefixPlugin(externalMetadata.explicit),
     ],
     // Browser only optimizeDeps. (This does not run for SSR dependencies).
     optimizeDeps: getDepOptimizationConfig({
