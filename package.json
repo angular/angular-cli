@@ -142,6 +142,7 @@
     "http-proxy-middleware": "3.0.0",
     "https-proxy-agent": "7.0.5",
     "husky": "9.1.1",
+    "image-size": "1.1.1",
     "ini": "4.1.3",
     "istanbul-lib-instrument": "6.0.3",
     "jasmine": "^5.0.0",

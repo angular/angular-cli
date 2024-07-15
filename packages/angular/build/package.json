@@ -31,6 +31,7 @@
     "esbuild": "0.23.0",
     "fast-glob": "3.3.2",
     "https-proxy-agent": "7.0.5",
+    "image-size": "1.1.1",
     "listr2": "8.2.3",
     "lmdb": "3.0.12",
     "magic-string": "0.30.10",
