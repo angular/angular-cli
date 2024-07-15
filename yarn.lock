@@ -50,18 +50,18 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@angular-devkit/architect@npm:0.1801.0-rc.0":
-  version: 0.1801.0-rc.0
-  resolution: "@angular-devkit/architect@npm:0.1801.0-rc.0"
+"@angular-devkit/architect@npm:0.1802.0-next.0":
+  version: 0.1802.0-next.0
+  resolution: "@angular-devkit/architect@npm:0.1802.0-next.0"
   dependencies:
-    "@angular-devkit/core": "npm:18.1.0-rc.0"
+    "@angular-devkit/core": "npm:18.2.0-next.0"
     rxjs: "npm:7.8.1"
   dependenciesMeta:
     esbuild:
       built: true
     puppeteer:
       built: true
-  checksum: 10c0/4123a26b0cd75a572a5693e081a4f1a7e7ffd5fe7853bccabd4c4c095fdd1dd44340d003ed7878d632919b38a44e7c3a7ce7e91cd203da29695dc009bd64fa7b
+  checksum: 10c0/2640c88e42a22c0e7fb7250979771eeace379dc9a57aeeee51967dbc610e1e68bf481d8f62eeca0d98d4758377c9e6dc6b3845bbefe0cd67c6ea131e5201188c
   languageName: node
   linkType: hard
 
@@ -208,9 +208,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@angular-devkit/core@npm:18.1.0-rc.0":
-  version: 18.1.0-rc.0
-  resolution: "@angular-devkit/core@npm:18.1.0-rc.0"
+"@angular-devkit/core@npm:18.2.0-next.0":
+  version: 18.2.0-next.0
+  resolution: "@angular-devkit/core@npm:18.2.0-next.0"
   dependencies:
     ajv: "npm:8.16.0"
     ajv-formats: "npm:3.0.1"
@@ -228,7 +228,7 @@ __metadata:
   peerDependenciesMeta:
     chokidar:
       optional: true
-  checksum: 10c0/e259e6c689b07bd25515afb967f5f6814a7a3fbac10c6341dd52e3b64a217a92577073c3b0df1ad02b8185bf4ec49ddb0f9bc21e951e23cab2554d21ce34860a
+  checksum: 10c0/5bd715220b143119058323da6e0a9884f3097d0c7279dc565b42b58e073cba3ab05c860a7af847e8359a9fcdbcc17cdc39632c9482bcb8637683d25782ee5190
   languageName: node
   linkType: hard
 
@@ -338,12 +338,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@angular/build-tooling@https://github.com/angular/dev-infra-private-build-tooling-builds.git#0facc65ef149dbae556c9825a2d7ecf8c8c0c152":
-  version: 0.0.0-fc5ef0f362c3b0373a012b58ae1bde6def471c27
-  resolution: "@angular/build-tooling@https://github.com/angular/dev-infra-private-build-tooling-builds.git#commit=0facc65ef149dbae556c9825a2d7ecf8c8c0c152"
+"@angular/build-tooling@https://github.com/angular/dev-infra-private-build-tooling-builds.git#db6250409bd88010f8e6d43f575aab30934c86d7":
+  version: 0.0.0-c2d0fc40044e7129a986ccf88965a0cb452db01c
+  resolution: "@angular/build-tooling@https://github.com/angular/dev-infra-private-build-tooling-builds.git#commit=db6250409bd88010f8e6d43f575aab30934c86d7"
   dependencies:
     "@angular/benchpress": "npm:0.3.0"
-    "@angular/build": "npm:18.1.0-rc.0"
+    "@angular/build": "npm:18.2.0-next.0"
     "@babel/core": "npm:^7.16.0"
     "@babel/helper-annotate-as-pure": "npm:^7.18.6"
     "@babel/plugin-proposal-async-generator-functions": "npm:^7.20.1"
@@ -386,7 +386,7 @@ __metadata:
   dependenciesMeta:
     re2:
       built: false
-  checksum: 10c0/acb82be2f86e57ebc99336dc205798cb0ea718a157c74726d6eab7e5c3fb5953d856a795cdf5b2f1c50181cc118cc09b9fa4057e05cd06f84b72919e5662f4b8
+  checksum: 10c0/1a6117a6b3830e2b9d66dbabb6dedb841046b29a650e3b31556ff85d1951626927cf8a23ab6bb37ba5fec4bac3ca8f2dc017237118178cba1b5d472d81db82ce
   languageName: node
   linkType: hard
 
@@ -444,23 +444,24 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@angular/build@npm:18.1.0-rc.0":
-  version: 18.1.0-rc.0
-  resolution: "@angular/build@npm:18.1.0-rc.0"
+"@angular/build@npm:18.2.0-next.0":
+  version: 18.2.0-next.0
+  resolution: "@angular/build@npm:18.2.0-next.0"
   dependencies:
     "@ampproject/remapping": "npm:2.3.0"
-    "@angular-devkit/architect": "npm:0.1801.0-rc.0"
+    "@angular-devkit/architect": "npm:0.1802.0-next.0"
     "@babel/core": "npm:7.24.7"
     "@babel/helper-annotate-as-pure": "npm:7.24.7"
     "@babel/helper-split-export-declaration": "npm:7.24.7"
-    "@inquirer/confirm": "npm:3.1.10"
+    "@babel/plugin-syntax-import-attributes": "npm:7.24.7"
+    "@inquirer/confirm": "npm:3.1.14"
     "@vitejs/plugin-basic-ssl": "npm:1.1.0"
     ansi-colors: "npm:4.1.3"
     browserslist: "npm:^4.23.0"
     critters: "npm:0.0.24"
-    esbuild: "npm:0.21.5"
+    esbuild: "npm:0.23.0"
     fast-glob: "npm:3.3.2"
-    https-proxy-agent: "npm:7.0.4"
+    https-proxy-agent: "npm:7.0.5"
     lmdb: "npm:3.0.12"
     magic-string: "npm:0.30.10"
     mrmime: "npm:2.0.0"
@@ -468,16 +469,16 @@ __metadata:
     parse5-html-rewriting-stream: "npm:7.0.0"
     picomatch: "npm:4.0.2"
     piscina: "npm:4.6.1"
-    sass: "npm:1.77.6"
+    rollup: "npm:4.18.1"
+    sass: "npm:1.77.7"
     semver: "npm:7.6.2"
-    undici: "npm:6.19.2"
-    vite: "npm:5.3.1"
+    vite: "npm:5.3.3"
     watchpack: "npm:2.4.1"
   peerDependencies:
-    "@angular/compiler-cli": ^18.0.0 || ^18.1.0-next.0
-    "@angular/localize": ^18.0.0 || ^18.1.0-next.0
-    "@angular/platform-server": ^18.0.0 || ^18.1.0-next.0
-    "@angular/service-worker": ^18.0.0 || ^18.1.0-next.0
+    "@angular/compiler-cli": ^18.0.0 || ^18.2.0-next.0
+    "@angular/localize": ^18.0.0 || ^18.2.0-next.0
+    "@angular/platform-server": ^18.0.0 || ^18.2.0-next.0
+    "@angular/service-worker": ^18.0.0 || ^18.2.0-next.0
     less: ^4.2.0
     postcss: ^8.4.0
     tailwindcss: ^2.0.0 || ^3.0.0
@@ -500,7 +501,7 @@ __metadata:
       optional: true
     tailwindcss:
       optional: true
-  checksum: 10c0/cc8459fcef0414476ac7104a4739a1bfe0320120aaf1333395fbb08be114e076eb6c2be6ed216fa08c4698e89cafb48be4562b8f806fd8158541579200dc27fc
+  checksum: 10c0/6341631225be68c619a1e8a84fff715fe3c09c53a2e2494b20ad8a591c0e31854eea67ef885724eddfe51f0b4f4258331dafcb4f7919b0d33812fd020e7ee867
   languageName: node
   linkType: hard
 
@@ -637,7 +638,7 @@ __metadata:
     "@ampproject/remapping": "npm:2.3.0"
     "@angular/animations": "npm:18.2.0-next.0"
     "@angular/bazel": "patch:@angular/bazel@https%3A//github.com/angular/bazel-builds.git%23commit=71bd2e043e076365effdb6076f33b2d8d6bd6d02#~/.yarn/patches/@angular-bazel-https-9848736cf4.patch"
-    "@angular/build-tooling": "https://github.com/angular/dev-infra-private-build-tooling-builds.git#0facc65ef149dbae556c9825a2d7ecf8c8c0c152"
+    "@angular/build-tooling": "https://github.com/angular/dev-infra-private-build-tooling-builds.git#db6250409bd88010f8e6d43f575aab30934c86d7"
     "@angular/cdk": "npm:18.1.0"
     "@angular/common": "npm:18.2.0-next.0"
     "@angular/compiler": "npm:18.2.0-next.0"
@@ -646,7 +647,7 @@ __metadata:
     "@angular/forms": "npm:18.2.0-next.0"
     "@angular/localize": "npm:18.2.0-next.0"
     "@angular/material": "npm:18.1.0"
-    "@angular/ng-dev": "https://github.com/angular/dev-infra-private-ng-dev-builds.git#9884c913ae31e81ab2c869f0f1123136055d3424"
+    "@angular/ng-dev": "https://github.com/angular/dev-infra-private-ng-dev-builds.git#78558ea2af28cac705193cb716295622281a207c"
     "@angular/platform-browser": "npm:18.2.0-next.0"
     "@angular/platform-browser-dynamic": "npm:18.2.0-next.0"
     "@angular/platform-server": "npm:18.2.0-next.0"
@@ -899,9 +900,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#9884c913ae31e81ab2c869f0f1123136055d3424":
-  version: 0.0.0-fc5ef0f362c3b0373a012b58ae1bde6def471c27
-  resolution: "@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#commit=9884c913ae31e81ab2c869f0f1123136055d3424"
+"@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#78558ea2af28cac705193cb716295622281a207c":
+  version: 0.0.0-c2d0fc40044e7129a986ccf88965a0cb452db01c
+  resolution: "@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#commit=78558ea2af28cac705193cb716295622281a207c"
   dependencies:
     "@octokit/rest": "npm:21.0.0"
     "@types/semver": "npm:^7.3.6"
@@ -915,7 +916,7 @@ __metadata:
     yaml: "npm:2.4.5"
   bin:
     ng-dev: ./bundles/cli.mjs
-  checksum: 10c0/f27fc90126e1defd9f177248662201a93a8542be3379868f06dddca963c47806a853b403925817bdc4ad828554f6285d733e1c6bf4cf59d88ddaac4a94c26897
+  checksum: 10c0/4aeaf078773351f3c708080641330c7c188c3866619f2c068abcb3bebe1ee8f308e13b5780bbbbd77f0db07edc5083f30d9424e8e870a6725de9b642cc3a6614
   languageName: node
   linkType: hard
 
@@ -3211,16 +3212,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@inquirer/confirm@npm:3.1.10":
-  version: 3.1.10
-  resolution: "@inquirer/confirm@npm:3.1.10"
-  dependencies:
-    "@inquirer/core": "npm:^8.2.3"
-    "@inquirer/type": "npm:^1.3.3"
-  checksum: 10c0/a69bc0d21807b8cecb6ab1a9e0653abd255d1dde34083f536ee59df1bf01b1614fd6824b25735d2ddd8e5d81192a67e1da8944dc1713dbaeb75c7c182a4d6b88
-  languageName: node
-  linkType: hard
-
 "@inquirer/confirm@npm:3.1.14, @inquirer/confirm@npm:^3.1.14":
   version: 3.1.14
   resolution: "@inquirer/confirm@npm:3.1.14"
@@ -3228,27 +3219,6 @@ __metadata:
     "@inquirer/core": "npm:^9.0.2"
     "@inquirer/type": "npm:^1.4.0"
   checksum: 10c0/935054f38afb2fc203e638a27a982d7b0be8b4848cff092b7c127cc7635cc62f0dcfdb31b0127cb3f1d2a0bac218085273bb14fab6d6e506f64821a5f536a679
-  languageName: node
-  linkType: hard
-
-"@inquirer/core@npm:^8.2.3":
-  version: 8.2.4
-  resolution: "@inquirer/core@npm:8.2.4"
-  dependencies:
-    "@inquirer/figures": "npm:^1.0.3"
-    "@inquirer/type": "npm:^1.3.3"
-    "@types/mute-stream": "npm:^0.0.4"
-    "@types/node": "npm:^20.14.9"
-    "@types/wrap-ansi": "npm:^3.0.0"
-    ansi-escapes: "npm:^4.3.2"
-    cli-spinners: "npm:^2.9.2"
-    cli-width: "npm:^4.1.0"
-    mute-stream: "npm:^1.0.0"
-    picocolors: "npm:^1.0.1"
-    signal-exit: "npm:^4.1.0"
-    strip-ansi: "npm:^6.0.1"
-    wrap-ansi: "npm:^6.2.0"
-  checksum: 10c0/3328ea52823a59cad4bf6c36b143c7322a2e1430ae040717e63c94680f246c0d628aed3032a2f6890652dd4b7fdb0fec7e324059b74173ffa78ae2a485939f33
   languageName: node
   linkType: hard
 
@@ -9852,86 +9822,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"esbuild@npm:0.21.5, esbuild@npm:^0.21.3, esbuild@npm:~0.21.5":
-  version: 0.21.5
-  resolution: "esbuild@npm:0.21.5"
-  dependencies:
-    "@esbuild/aix-ppc64": "npm:0.21.5"
-    "@esbuild/android-arm": "npm:0.21.5"
-    "@esbuild/android-arm64": "npm:0.21.5"
-    "@esbuild/android-x64": "npm:0.21.5"
-    "@esbuild/darwin-arm64": "npm:0.21.5"
-    "@esbuild/darwin-x64": "npm:0.21.5"
-    "@esbuild/freebsd-arm64": "npm:0.21.5"
-    "@esbuild/freebsd-x64": "npm:0.21.5"
-    "@esbuild/linux-arm": "npm:0.21.5"
-    "@esbuild/linux-arm64": "npm:0.21.5"
-    "@esbuild/linux-ia32": "npm:0.21.5"
-    "@esbuild/linux-loong64": "npm:0.21.5"
-    "@esbuild/linux-mips64el": "npm:0.21.5"
-    "@esbuild/linux-ppc64": "npm:0.21.5"
-    "@esbuild/linux-riscv64": "npm:0.21.5"
-    "@esbuild/linux-s390x": "npm:0.21.5"
-    "@esbuild/linux-x64": "npm:0.21.5"
-    "@esbuild/netbsd-x64": "npm:0.21.5"
-    "@esbuild/openbsd-x64": "npm:0.21.5"
-    "@esbuild/sunos-x64": "npm:0.21.5"
-    "@esbuild/win32-arm64": "npm:0.21.5"
-    "@esbuild/win32-ia32": "npm:0.21.5"
-    "@esbuild/win32-x64": "npm:0.21.5"
-  dependenciesMeta:
-    "@esbuild/aix-ppc64":
-      optional: true
-    "@esbuild/android-arm":
-      optional: true
-    "@esbuild/android-arm64":
-      optional: true
-    "@esbuild/android-x64":
-      optional: true
-    "@esbuild/darwin-arm64":
-      optional: true
-    "@esbuild/darwin-x64":
-      optional: true
-    "@esbuild/freebsd-arm64":
-      optional: true
-    "@esbuild/freebsd-x64":
-      optional: true
-    "@esbuild/linux-arm":
-      optional: true
-    "@esbuild/linux-arm64":
-      optional: true
-    "@esbuild/linux-ia32":
-      optional: true
-    "@esbuild/linux-loong64":
-      optional: true
-    "@esbuild/linux-mips64el":
-      optional: true
-    "@esbuild/linux-ppc64":
-      optional: true
-    "@esbuild/linux-riscv64":
-      optional: true
-    "@esbuild/linux-s390x":
-      optional: true
-    "@esbuild/linux-x64":
-      optional: true
-    "@esbuild/netbsd-x64":
-      optional: true
-    "@esbuild/openbsd-x64":
-      optional: true
-    "@esbuild/sunos-x64":
-      optional: true
-    "@esbuild/win32-arm64":
-      optional: true
-    "@esbuild/win32-ia32":
-      optional: true
-    "@esbuild/win32-x64":
-      optional: true
-  bin:
-    esbuild: bin/esbuild
-  checksum: 10c0/fa08508adf683c3f399e8a014a6382a6b65542213431e26206c0720e536b31c09b50798747c2a105a4bbba1d9767b8d3615a74c2f7bf1ddf6d836cd11eb672de
-  languageName: node
-  linkType: hard
-
 "esbuild@npm:0.23.0, esbuild@npm:^0.23.0":
   version: 0.23.0
   resolution: "esbuild@npm:0.23.0"
@@ -10012,6 +9902,86 @@ __metadata:
   bin:
     esbuild: bin/esbuild
   checksum: 10c0/08c148c067795165798c0467ce02d2d1ecedc096989bded5f0d795c61a1fcbec6c14d0a3c9f4ad6185cc29ec52087acaa335ed6d98be6ad57f7fa4264626bde0
+  languageName: node
+  linkType: hard
+
+"esbuild@npm:^0.21.3, esbuild@npm:~0.21.5":
+  version: 0.21.5
+  resolution: "esbuild@npm:0.21.5"
+  dependencies:
+    "@esbuild/aix-ppc64": "npm:0.21.5"
+    "@esbuild/android-arm": "npm:0.21.5"
+    "@esbuild/android-arm64": "npm:0.21.5"
+    "@esbuild/android-x64": "npm:0.21.5"
+    "@esbuild/darwin-arm64": "npm:0.21.5"
+    "@esbuild/darwin-x64": "npm:0.21.5"
+    "@esbuild/freebsd-arm64": "npm:0.21.5"
+    "@esbuild/freebsd-x64": "npm:0.21.5"
+    "@esbuild/linux-arm": "npm:0.21.5"
+    "@esbuild/linux-arm64": "npm:0.21.5"
+    "@esbuild/linux-ia32": "npm:0.21.5"
+    "@esbuild/linux-loong64": "npm:0.21.5"
+    "@esbuild/linux-mips64el": "npm:0.21.5"
+    "@esbuild/linux-ppc64": "npm:0.21.5"
+    "@esbuild/linux-riscv64": "npm:0.21.5"
+    "@esbuild/linux-s390x": "npm:0.21.5"
+    "@esbuild/linux-x64": "npm:0.21.5"
+    "@esbuild/netbsd-x64": "npm:0.21.5"
+    "@esbuild/openbsd-x64": "npm:0.21.5"
+    "@esbuild/sunos-x64": "npm:0.21.5"
+    "@esbuild/win32-arm64": "npm:0.21.5"
+    "@esbuild/win32-ia32": "npm:0.21.5"
+    "@esbuild/win32-x64": "npm:0.21.5"
+  dependenciesMeta:
+    "@esbuild/aix-ppc64":
+      optional: true
+    "@esbuild/android-arm":
+      optional: true
+    "@esbuild/android-arm64":
+      optional: true
+    "@esbuild/android-x64":
+      optional: true
+    "@esbuild/darwin-arm64":
+      optional: true
+    "@esbuild/darwin-x64":
+      optional: true
+    "@esbuild/freebsd-arm64":
+      optional: true
+    "@esbuild/freebsd-x64":
+      optional: true
+    "@esbuild/linux-arm":
+      optional: true
+    "@esbuild/linux-arm64":
+      optional: true
+    "@esbuild/linux-ia32":
+      optional: true
+    "@esbuild/linux-loong64":
+      optional: true
+    "@esbuild/linux-mips64el":
+      optional: true
+    "@esbuild/linux-ppc64":
+      optional: true
+    "@esbuild/linux-riscv64":
+      optional: true
+    "@esbuild/linux-s390x":
+      optional: true
+    "@esbuild/linux-x64":
+      optional: true
+    "@esbuild/netbsd-x64":
+      optional: true
+    "@esbuild/openbsd-x64":
+      optional: true
+    "@esbuild/sunos-x64":
+      optional: true
+    "@esbuild/win32-arm64":
+      optional: true
+    "@esbuild/win32-ia32":
+      optional: true
+    "@esbuild/win32-x64":
+      optional: true
+  bin:
+    esbuild: bin/esbuild
+  checksum: 10c0/fa08508adf683c3f399e8a014a6382a6b65542213431e26206c0720e536b31c09b50798747c2a105a4bbba1d9767b8d3615a74c2f7bf1ddf6d836cd11eb672de
   languageName: node
   linkType: hard
 
@@ -11520,16 +11490,6 @@ __metadata:
     agent-base: "npm:6"
     debug: "npm:4"
   checksum: 10c0/6dd639f03434003577c62b27cafdb864784ef19b2de430d8ae2a1d45e31c4fd60719e5637b44db1a88a046934307da7089e03d6089ec3ddacc1189d8de8897d1
-  languageName: node
-  linkType: hard
-
-"https-proxy-agent@npm:7.0.4":
-  version: 7.0.4
-  resolution: "https-proxy-agent@npm:7.0.4"
-  dependencies:
-    agent-base: "npm:^7.0.2"
-    debug: "npm:4"
-  checksum: 10c0/bc4f7c38da32a5fc622450b6cb49a24ff596f9bd48dcedb52d2da3fa1c1a80e100fb506bd59b326c012f21c863c69b275c23de1a01d0b84db396822fdf25e52b
   languageName: node
   linkType: hard
 
@@ -15412,7 +15372,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"postcss@npm:8.4.39, postcss@npm:^8.2.14, postcss@npm:^8.4.23, postcss@npm:^8.4.31, postcss@npm:^8.4.33, postcss@npm:^8.4.38, postcss@npm:^8.4.39":
+"postcss@npm:8.4.39, postcss@npm:^8.2.14, postcss@npm:^8.4.23, postcss@npm:^8.4.31, postcss@npm:^8.4.33, postcss@npm:^8.4.39":
   version: 8.4.39
   resolution: "postcss@npm:8.4.39"
   dependencies:
@@ -16551,16 +16511,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"sass@npm:1.77.6, sass@npm:^1.69.5":
-  version: 1.77.6
-  resolution: "sass@npm:1.77.6"
+"sass@npm:1.77.7":
+  version: 1.77.7
+  resolution: "sass@npm:1.77.7"
   dependencies:
     chokidar: "npm:>=3.0.0 <4.0.0"
     immutable: "npm:^4.0.0"
     source-map-js: "npm:>=0.6.2 <2.0.0"
   bin:
     sass: sass.js
-  checksum: 10c0/fe5a393c0aa29eda9f83c06be9b94788b61fe8bad0616ee6e3a25d21ab504f430d40c0064fdca89b02b8e426411ae6dcd906c91f2e48c263575c3d392b6daeb1
+  checksum: 10c0/6cacbf4b5165d30a9be0f09438aed85ff0617e5087442e65c23c8464750ff1b9988855a58f36b420b62f992d1e82403f99810aba7731519d3d026847e21a5635
   languageName: node
   linkType: hard
 
@@ -16574,6 +16534,19 @@ __metadata:
   bin:
     sass: sass.js
   checksum: 10c0/2bfd62794070352c804f949e69bd8bb5b4ec846deeb924251b2c3f7b503170fb1ae186f513f0166907749eb34e0277dee747edcb78c886fb471aac01be1e864c
+  languageName: node
+  linkType: hard
+
+"sass@npm:^1.69.5":
+  version: 1.77.6
+  resolution: "sass@npm:1.77.6"
+  dependencies:
+    chokidar: "npm:>=3.0.0 <4.0.0"
+    immutable: "npm:^4.0.0"
+    source-map-js: "npm:>=0.6.2 <2.0.0"
+  bin:
+    sass: sass.js
+  checksum: 10c0/fe5a393c0aa29eda9f83c06be9b94788b61fe8bad0616ee6e3a25d21ab504f430d40c0064fdca89b02b8e426411ae6dcd906c91f2e48c263575c3d392b6daeb1
   languageName: node
   linkType: hard
 
@@ -18711,46 +18684,6 @@ __metadata:
     core-util-is: "npm:1.0.2"
     extsprintf: "npm:^1.2.0"
   checksum: 10c0/37ccdf8542b5863c525128908ac80f2b476eed36a32cb944de930ca1e2e78584cc435c4b9b4c68d0fc13a47b45ff364b4be43aa74f8804f9050140f660fb660d
-  languageName: node
-  linkType: hard
-
-"vite@npm:5.3.1":
-  version: 5.3.1
-  resolution: "vite@npm:5.3.1"
-  dependencies:
-    esbuild: "npm:^0.21.3"
-    fsevents: "npm:~2.3.3"
-    postcss: "npm:^8.4.38"
-    rollup: "npm:^4.13.0"
-  peerDependencies:
-    "@types/node": ^18.0.0 || >=20.0.0
-    less: "*"
-    lightningcss: ^1.21.0
-    sass: "*"
-    stylus: "*"
-    sugarss: "*"
-    terser: ^5.4.0
-  dependenciesMeta:
-    fsevents:
-      optional: true
-  peerDependenciesMeta:
-    "@types/node":
-      optional: true
-    less:
-      optional: true
-    lightningcss:
-      optional: true
-    sass:
-      optional: true
-    stylus:
-      optional: true
-    sugarss:
-      optional: true
-    terser:
-      optional: true
-  bin:
-    vite: bin/vite.js
-  checksum: 10c0/9317262c02ea2dc324dfdbc20c3c450cd89cc9a16399a41a4bf820a3a1f31cf400878c015135e355ee034853cc2399b5499899d5b1bc462d57642d71083e74b6
   languageName: node
   linkType: hard
 

@@ -34,7 +34,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Initialize environment
-        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@fc5ef0f362c3b0373a012b58ae1bde6def471c27
+        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@c2d0fc40044e7129a986ccf88965a0cb452db01c
       - name: Setup ESLint Caching
         uses: actions/cache@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9 # v4.0.2
         with:
@@ -54,7 +54,7 @@ jobs:
       - name: Run Validation
         run: yarn admin validate
       - name: Check Package Licenses
-        uses: angular/dev-infra/github-actions/linting/licenses@fc5ef0f362c3b0373a012b58ae1bde6def471c27
+        uses: angular/dev-infra/github-actions/linting/licenses@c2d0fc40044e7129a986ccf88965a0cb452db01c
         with:
           allow-dependencies-licenses: 'pkg:npm/thingies@1.21.0'
       - name: Check tooling setup
@@ -72,11 +72,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Initialize environment
-        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@fc5ef0f362c3b0373a012b58ae1bde6def471c27
+        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@c2d0fc40044e7129a986ccf88965a0cb452db01c
       - name: Setup Bazel
-        uses: angular/dev-infra/github-actions/bazel/setup@fc5ef0f362c3b0373a012b58ae1bde6def471c27
+        uses: angular/dev-infra/github-actions/bazel/setup@c2d0fc40044e7129a986ccf88965a0cb452db01c
       - name: Setup Bazel RBE
-        uses: angular/dev-infra/github-actions/bazel/configure-remote@fc5ef0f362c3b0373a012b58ae1bde6def471c27
+        uses: angular/dev-infra/github-actions/bazel/configure-remote@c2d0fc40044e7129a986ccf88965a0cb452db01c
       - name: Install node modules
         run: yarn install --immutable
       - name: Build release targets
@@ -92,11 +92,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Initialize environment
-        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@fc5ef0f362c3b0373a012b58ae1bde6def471c27
+        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@c2d0fc40044e7129a986ccf88965a0cb452db01c
       - name: Setup Bazel
-        uses: angular/dev-infra/github-actions/bazel/setup@fc5ef0f362c3b0373a012b58ae1bde6def471c27
+        uses: angular/dev-infra/github-actions/bazel/setup@c2d0fc40044e7129a986ccf88965a0cb452db01c
       - name: Setup Bazel RBE
-        uses: angular/dev-infra/github-actions/bazel/configure-remote@fc5ef0f362c3b0373a012b58ae1bde6def471c27
+        uses: angular/dev-infra/github-actions/bazel/configure-remote@c2d0fc40044e7129a986ccf88965a0cb452db01c
       - name: Install node modules
         run: yarn install --immutable
       - name: Run module tests
@@ -115,13 +115,13 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Initialize environment
-        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@fc5ef0f362c3b0373a012b58ae1bde6def471c27
+        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@c2d0fc40044e7129a986ccf88965a0cb452db01c
       - name: Install node modules
         run: yarn install --immutable
       - name: Setup Bazel
-        uses: angular/dev-infra/github-actions/bazel/setup@fc5ef0f362c3b0373a012b58ae1bde6def471c27
+        uses: angular/dev-infra/github-actions/bazel/setup@c2d0fc40044e7129a986ccf88965a0cb452db01c
       - name: Setup Bazel RBE
-        uses: angular/dev-infra/github-actions/bazel/configure-remote@fc5ef0f362c3b0373a012b58ae1bde6def471c27
+        uses: angular/dev-infra/github-actions/bazel/configure-remote@c2d0fc40044e7129a986ccf88965a0cb452db01c
       - name: Run CLI E2E tests
         run: yarn bazel test --define=E2E_SHARD_TOTAL=6 --define=E2E_SHARD_INDEX=${{ matrix.shard }} --config=e2e //tests/legacy-cli:e2e.${{ matrix.subset }}_node${{ matrix.node }}
 
@@ -136,13 +136,13 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Initialize environment
-        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@fc5ef0f362c3b0373a012b58ae1bde6def471c27
+        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@c2d0fc40044e7129a986ccf88965a0cb452db01c
       - name: Install node modules
         run: yarn install --immutable
       - name: Setup Bazel
-        uses: angular/dev-infra/github-actions/bazel/setup@fc5ef0f362c3b0373a012b58ae1bde6def471c27
+        uses: angular/dev-infra/github-actions/bazel/setup@c2d0fc40044e7129a986ccf88965a0cb452db01c
       - name: Setup Bazel RBE
-        uses: angular/dev-infra/github-actions/bazel/configure-remote@fc5ef0f362c3b0373a012b58ae1bde6def471c27
+        uses: angular/dev-infra/github-actions/bazel/configure-remote@c2d0fc40044e7129a986ccf88965a0cb452db01c
       - name: Run CLI E2E tests
         run: yarn bazel test --define=E2E_SHARD_TOTAL=3 --define=E2E_SHARD_INDEX=${{ matrix.shard }} --config=e2e //tests/legacy-cli:e2e.${{ matrix.subset }}_node${{ matrix.node }}
 
@@ -159,12 +159,12 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Initialize environment
-        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@fc5ef0f362c3b0373a012b58ae1bde6def471c27
+        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@c2d0fc40044e7129a986ccf88965a0cb452db01c
       - name: Install node modules
         run: yarn install --immutable
       - name: Setup Bazel
-        uses: angular/dev-infra/github-actions/bazel/setup@fc5ef0f362c3b0373a012b58ae1bde6def471c27
+        uses: angular/dev-infra/github-actions/bazel/setup@c2d0fc40044e7129a986ccf88965a0cb452db01c
       - name: Setup Bazel RBE
-        uses: angular/dev-infra/github-actions/bazel/configure-remote@fc5ef0f362c3b0373a012b58ae1bde6def471c27
+        uses: angular/dev-infra/github-actions/bazel/configure-remote@c2d0fc40044e7129a986ccf88965a0cb452db01c
       - name: Run CLI E2E tests
         run: yarn bazel test --define=E2E_SHARD_TOTAL=6 --define=E2E_SHARD_INDEX=${{ matrix.shard }} --config=e2e //tests/legacy-cli:e2e.snapshots.${{ matrix.subset }}_node${{ matrix.node }}
