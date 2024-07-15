@@ -39,8 +39,10 @@ async function _runTemplate(inputPath: string, outputPath: string) {
 }
 
 export default async function (_options: {}): Promise<number> {
-  await _runTemplate('./templates/readme.ejs', '../README.md');
-  await _runTemplate('./templates/contributing.ejs', '../CONTRIBUTING.md');
+  await Promise.all([
+    _runTemplate('./templates/readme.ejs', '../README.md'),
+    _runTemplate('./templates/contributing.ejs', '../CONTRIBUTING.md'),
+  ]);
 
   return 0;
 }
