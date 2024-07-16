@@ -24,7 +24,7 @@
     "@babel/helper-annotate-as-pure": "7.24.7",
     "@babel/helper-split-export-declaration": "7.24.7",
     "@babel/plugin-syntax-import-attributes": "7.24.7",
-    "@inquirer/confirm": "3.1.14",
+    "@inquirer/confirm": "3.1.15",
     "@vitejs/plugin-basic-ssl": "1.1.0",
     "browserslist": "^4.23.0",
     "critters": "0.0.24",
@@ -40,8 +40,8 @@
     "piscina": "4.6.1",
     "rollup": "4.18.1",
     "sass": "1.77.8",
-    "semver": "7.6.2",
-    "vite": "5.3.3",
+    "semver": "7.6.3",
+    "vite": "5.3.4",
     "watchpack": "2.4.1"
   },
   "peerDependencies": {
