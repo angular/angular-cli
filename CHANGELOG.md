@@ -1,3 +1,22 @@
+<a name="18.1.1"></a>
+
+# 18.1.1 (2024-07-17)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                       |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------- |
+| [4f6cee272](https://github.com/angular/angular-cli/commit/4f6cee2721b52427624370f3f81f3edc140774e7) | fix  | skip undefined files when generating budget stats |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                                   |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------- |
+| [96dc7e6ed](https://github.com/angular/angular-cli/commit/96dc7e6ed3317e354fae82d1b42b31250e96d89d) | fix  | remove Vite "/@id/" prefix for explicit external dependencies |
+| [bdef39801](https://github.com/angular/angular-cli/commit/bdef3980160db8c27ae103444a41275351434b78) | fix  | resolve only ".wasm" files                                    |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="18.1.0"></a>
 
 # 18.1.0 (2024-07-10)
