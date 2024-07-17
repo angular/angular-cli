@@ -20,6 +20,7 @@ import {
   ApplicationBuilderInternalOptions,
   normalizeOptions,
 } from './options';
+import { Result, ResultKind } from './results';
 import { Schema as ApplicationBuilderOptions } from './schema';
 
 export type { ApplicationBuilderOptions };
@@ -32,7 +33,7 @@ export async function* buildApplicationInternal(
     write?: boolean;
   },
   extensions?: ApplicationBuilderExtensions,
-): AsyncIterable<ApplicationBuilderOutput> {
+): AsyncIterable<Result> {
   const { workspaceRoot, logger, target } = context;
 
   // Check Angular version.
@@ -44,7 +45,9 @@ export async function* buildApplicationInternal(
   // Determine project name from builder context target
   const projectName = target?.project;
   if (!projectName) {
-    yield { success: false, error: `The 'application' builder requires a target to be specified.` };
+    context.logger.error(`The 'application' builder requires a target to be specified.`);
+    // Only the vite-based dev server current uses the errors value
+    yield { kind: ResultKind.Failure, errors: [] };
 
     return;
   }
@@ -57,19 +60,19 @@ export async function* buildApplicationInternal(
   if (writeServerBundles) {
     const { browser, server } = normalizedOptions.outputOptions;
     if (browser === '') {
-      yield {
-        success: false,
-        error: `'outputPath.browser' cannot be configured to an empty string when SSR is enabled.`,
-      };
+      context.logger.error(
+        `'outputPath.browser' cannot be configured to an empty string when SSR is enabled.`,
+      );
+      yield { kind: ResultKind.Failure, errors: [] };
 
       return;
     }
 
     if (browser === server) {
-      yield {
-        success: false,
-        error: `'outputPath.browser' and 'outputPath.server' cannot be configured to the same value.`,
-      };
+      context.logger.error(
+        `'outputPath.browser' and 'outputPath.server' cannot be configured to the same value.`,
+      );
+      yield { kind: ResultKind.Failure, errors: [] };
 
       return;
     }
@@ -185,7 +188,7 @@ export function buildApplication(
   extensions?: ApplicationBuilderExtensions,
 ): AsyncIterable<ApplicationBuilderOutput>;
 
-export function buildApplication(
+export async function* buildApplication(
   options: ApplicationBuilderOptions,
   context: BuilderContext,
   pluginsOrExtensions?: Plugin[] | ApplicationBuilderExtensions,
@@ -199,7 +202,9 @@ export function buildApplication(
     extensions = pluginsOrExtensions;
   }
 
-  return buildApplicationInternal(options, context, undefined, extensions);
+  for await (const result of buildApplicationInternal(options, context, undefined, extensions)) {
+    yield { success: result.kind !== ResultKind.Failure };
+  }
 }
 
 export default createBuilder(buildApplication);

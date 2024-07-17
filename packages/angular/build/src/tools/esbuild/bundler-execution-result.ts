@@ -43,6 +43,8 @@ export class ExecutionResult {
   logs: string[] = [];
   externalMetadata?: ExternalResultMetadata;
   extraWatchFiles: string[] = [];
+  htmlIndexPath?: string;
+  htmlBaseHref?: string;
 
   constructor(
     private rebuildContexts: BundlerContext[],

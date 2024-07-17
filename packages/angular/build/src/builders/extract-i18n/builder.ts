@@ -64,9 +64,8 @@ export async function execute(
     extensions,
   );
 
-  // Return the builder result if it failed
-  if (!extractionResult.builderResult.success) {
-    return extractionResult.builderResult;
+  if (!extractionResult.success) {
+    return { success: false };
   }
 
   // Perform duplicate message checks

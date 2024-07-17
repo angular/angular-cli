@@ -12,17 +12,16 @@ import assert from 'node:assert';
 import { readFile } from 'node:fs/promises';
 import inspector from 'node:inspector';
 import { builtinModules } from 'node:module';
-import { basename, join } from 'node:path';
+import { join } from 'node:path';
 import type { Connect, DepOptimizationConfig, InlineConfig, ViteDevServer } from 'vite';
 import { createAngularMemoryPlugin } from '../../tools/vite/angular-memory-plugin';
 import { createAngularLocaleDataPlugin } from '../../tools/vite/i18n-locale-plugin';
 import { createRemoveIdPrefixPlugin } from '../../tools/vite/id-prefix-plugin';
 import { loadProxyConfiguration, normalizeSourceMaps } from '../../utils';
 import { loadEsmModule } from '../../utils/load-esm';
-import { ApplicationBuilderOutput } from '../application';
+import { Result, ResultFile, ResultKind } from '../application/results';
 import {
   type ApplicationBuilderInternalOptions,
-  type BuildOutputFile,
   BuildOutputFileType,
   type ExternalResultMetadata,
   JavaScriptTransformer,
@@ -46,7 +45,7 @@ export type BuilderAction = (
   options: ApplicationBuilderInternalOptions,
   context: BuilderContext,
   plugins?: Plugin[],
-) => AsyncIterable<ApplicationBuilderOutput>;
+) => AsyncIterable<Result>;
 
 /**
  * Build options that are also present on the dev server but are only passed
@@ -103,13 +102,6 @@ export async function* serveWithVite(
   // Set all packages as external to support Vite's prebundle caching
   browserOptions.externalPackages = serverOptions.prebundle;
 
-  const baseHref = browserOptions.baseHref;
-  if (serverOptions.servePath === undefined && baseHref !== undefined) {
-    // Remove trailing slash
-    serverOptions.servePath =
-      baseHref !== './' && baseHref[baseHref.length - 1] === '/' ? baseHref.slice(0, -1) : baseHref;
-  }
-
   // The development server currently only supports a single locale when localizing.
   // This matches the behavior of the Webpack-based development server but could be expanded in the future.
   if (
@@ -136,15 +128,8 @@ export async function* serveWithVite(
     1,
   );
 
-  // Extract output index from options
-  // TODO: Provide this info from the build results
+  // The index HTML path will be updated from the build results if provided by the builder
   let htmlIndexPath = 'index.html';
-  if (browserOptions.index && typeof browserOptions.index !== 'boolean') {
-    htmlIndexPath =
-      typeof browserOptions.index === 'string'
-        ? basename(browserOptions.index)
-        : browserOptions.index.output || 'index.html';
-  }
 
   // dynamically import Vite for ESM compatibility
   const { createServer, normalizePath } = await loadEsmModule<typeof import('vite')>('vite');
@@ -170,24 +155,57 @@ export async function* serveWithVite(
 
   // TODO: Switch this to an architect schedule call when infrastructure settings are supported
   for await (const result of builderAction(browserOptions, context, extensions?.buildPlugins)) {
-    assert(result.outputFiles, 'Builder did not provide result files.');
+    switch (result.kind) {
+      case ResultKind.Failure:
+        if (result.errors.length && server) {
+          hadError = true;
+          server.hot.send({
+            type: 'error',
+            err: {
+              message: result.errors[0].text,
+              stack: '',
+              loc: result.errors[0].location ?? undefined,
+            },
+          });
+        }
+        continue;
+      case ResultKind.Full:
+        if (result.detail?.['htmlIndexPath']) {
+          htmlIndexPath = result.detail['htmlIndexPath'] as string;
+        }
+        if (serverOptions.servePath === undefined && result.detail?.['htmlBaseHref']) {
+          const baseHref = result.detail['htmlBaseHref'] as string;
+          // Remove trailing slash
+          serverOptions.servePath =
+            baseHref !== './' && baseHref[baseHref.length - 1] === '/'
+              ? baseHref.slice(0, -1)
+              : baseHref;
+        }
 
-    // If build failed, nothing to serve
-    if (!result.success) {
-      // If server is active, send an error notification
-      if (result.errors?.length && server) {
-        hadError = true;
-        server.hot.send({
-          type: 'error',
-          err: {
-            message: result.errors[0].text,
-            stack: '',
-            loc: result.errors[0].location,
-          },
-        });
-      }
-      continue;
-    } else if (hadError && server) {
+        assetFiles.clear();
+        for (const [outputPath, file] of Object.entries(result.files)) {
+          if (file.origin === 'disk') {
+            assetFiles.set('/' + normalizePath(outputPath), normalizePath(file.inputPath));
+          }
+        }
+        // Analyze result files for changes
+        analyzeResultFiles(normalizePath, htmlIndexPath, result.files, generatedFiles);
+        break;
+      case ResultKind.Incremental:
+        assert(server, 'Builder must provide an initial full build before incremental results.');
+        // TODO: Implement support -- application builder currently does not use
+        break;
+      case ResultKind.ComponentUpdate:
+        assert(serverOptions.hmr, 'Component updates are only supported with HMR enabled.');
+        // TODO: Implement support -- application builder currently does not use
+        break;
+      default:
+        context.logger.warn(`Unknown result kind [${(result as Result).kind}] provided by build.`);
+        continue;
+    }
+
+    // Clear existing error overlay on successful result
+    if (hadError && server) {
       hadError = false;
       // Send an empty update to clear the error overlay
       server.hot.send({
@@ -196,24 +214,16 @@ export async function* serveWithVite(
       });
     }
 
-    // Analyze result files for changes
-    analyzeResultFiles(normalizePath, htmlIndexPath, result.outputFiles, generatedFiles);
-
-    assetFiles.clear();
-    if (result.assetFiles) {
-      for (const asset of result.assetFiles) {
-        assetFiles.set('/' + normalizePath(asset.destination), normalizePath(asset.source));
-      }
-    }
-
     // To avoid disconnecting the array objects from the option, these arrays need to be mutated instead of replaced.
     let requiresServerRestart = false;
-    if (result.externalMetadata) {
-      const { implicitBrowser, implicitServer, explicit } = result.externalMetadata;
-      const implicitServerFiltered = (implicitServer as string[]).filter(
+    if (result.detail?.['externalMetadata']) {
+      const { implicitBrowser, implicitServer, explicit } = result.detail[
+        'externalMetadata'
+      ] as ExternalResultMetadata;
+      const implicitServerFiltered = implicitServer.filter(
         (m) => removeNodeJsBuiltinModules(m) && removeAbsoluteUrls(m),
       );
-      const implicitBrowserFiltered = (implicitBrowser as string[]).filter(removeAbsoluteUrls);
+      const implicitBrowserFiltered = implicitBrowser.filter(removeAbsoluteUrls);
 
       if (browserOptions.ssr && serverOptions.prebundle !== false) {
         const previousImplicitServer = new Set(externalMetadata.implicitServer);
@@ -400,28 +410,33 @@ function handleUpdate(
 function analyzeResultFiles(
   normalizePath: (id: string) => string,
   htmlIndexPath: string,
-  resultFiles: BuildOutputFile[],
+  resultFiles: Record<string, ResultFile>,
   generatedFiles: Map<string, OutputFileRecord>,
 ) {
   const seen = new Set<string>(['/index.html']);
-  for (const file of resultFiles) {
+  for (const [outputPath, file] of Object.entries(resultFiles)) {
+    if (file.origin === 'disk') {
+      continue;
+    }
     let filePath;
-    if (file.path === htmlIndexPath) {
+    if (outputPath === htmlIndexPath) {
       // Convert custom index output path to standard index path for dev-server usage.
       // This mimics the Webpack dev-server behavior.
       filePath = '/index.html';
     } else {
-      filePath = '/' + normalizePath(file.path);
+      filePath = '/' + normalizePath(outputPath);
     }
 
     seen.add(filePath);
+
+    const servable =
+      file.type === BuildOutputFileType.Browser || file.type === BuildOutputFileType.Media;
 
     // Skip analysis of sourcemaps
     if (filePath.endsWith('.map')) {
       generatedFiles.set(filePath, {
         contents: file.contents,
-        servable:
-          file.type === BuildOutputFileType.Browser || file.type === BuildOutputFileType.Media,
+        servable,
         size: file.contents.byteLength,
         updated: false,
       });
@@ -446,8 +461,7 @@ function analyzeResultFiles(
       size: file.contents.byteLength,
       hash: file.hash,
       updated: true,
-      servable:
-        file.type === BuildOutputFileType.Browser || file.type === BuildOutputFileType.Media,
+      servable,
     });
   }
 

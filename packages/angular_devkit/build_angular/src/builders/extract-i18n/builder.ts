@@ -70,6 +70,10 @@ export async function execute(
       context,
       localizeToolsModule.MessageExtractor,
     );
+
+    if (!extractionResult.success) {
+      return { success: false };
+    }
   } else {
     // Purge old build disk cache.
     // Other build systems handle stale cache purging directly.
@@ -77,11 +81,11 @@ export async function execute(
 
     const { extractMessages } = await import('./webpack-extraction');
     extractionResult = await extractMessages(normalizedOptions, builderName, context, transforms);
-  }
 
-  // Return the builder result if it failed
-  if (!extractionResult.builderResult.success) {
-    return extractionResult.builderResult;
+    // Return the builder result if it failed
+    if (!extractionResult.builderResult.success) {
+      return extractionResult.builderResult;
+    }
   }
 
   // Perform duplicate message checks

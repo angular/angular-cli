@@ -6,10 +6,10 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { buildEsbuildBrowser } from '../../index';
+import { buildEsbuildBrowserArchitect } from '../../index';
 import { BASE_OPTIONS, BROWSER_BUILDER_INFO, describeBuilder } from '../setup';
 
-describeBuilder(buildEsbuildBrowser, BROWSER_BUILDER_INFO, (harness) => {
+describeBuilder(buildEsbuildBrowserArchitect, BROWSER_BUILDER_INFO, (harness) => {
   describe('Option: "assets"', () => {
     beforeEach(async () => {
       // Application code is not needed for asset tests

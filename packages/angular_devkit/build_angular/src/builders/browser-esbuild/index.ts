@@ -6,9 +6,15 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import type { ApplicationBuilderOptions, BuildOutputAsset, BuildOutputFile } from '@angular/build';
-import { buildApplicationInternal, deleteOutputDir, emitFilesToDisk } from '@angular/build/private';
-import { BuilderContext, BuilderOutput, createBuilder } from '@angular-devkit/architect';
+import type { ApplicationBuilderOptions } from '@angular/build';
+import {
+  Result,
+  ResultKind,
+  buildApplicationInternal,
+  deleteOutputDir,
+  emitFilesToDisk,
+} from '@angular/build/private';
+import { BuilderContext, createBuilder } from '@angular-devkit/architect';
 import type { Plugin } from 'esbuild';
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -31,12 +37,7 @@ export async function* buildEsbuildBrowser(
     write?: boolean;
   },
   plugins?: Plugin[],
-): AsyncIterable<
-  BuilderOutput & {
-    outputFiles?: BuildOutputFile[];
-    assetFiles?: { source: string; destination: string }[];
-  }
-> {
+): AsyncIterable<Result> {
   // Inform user of status of builder and options
   logBuilderStatusWarnings(userOptions, context);
   const normalizedOptions = normalizeOptions(userOptions);
@@ -55,21 +56,37 @@ export async function* buildEsbuildBrowser(
     },
     plugins && { codePlugins: plugins },
   )) {
-    if (infrastructureSettings?.write !== false && result.outputFiles) {
-      // Write output files
-      await writeResultFiles(result.outputFiles, result.assetFiles, fullOutputPath);
+    // Write the file directly from this builder to maintain webpack output compatibility
+    // and not output browser files into '/browser'.
+    if (
+      infrastructureSettings?.write !== false &&
+      (result.kind === ResultKind.Full || result.kind === ResultKind.Incremental)
+    ) {
+      const directoryExists = new Set<string>();
+      // Writes the output file to disk and ensures the containing directories are present
+      await emitFilesToDisk(Object.entries(result.files), async ([filePath, file]) => {
+        // Ensure output subdirectories exist
+        const basePath = path.dirname(filePath);
+        if (basePath && !directoryExists.has(basePath)) {
+          await fs.mkdir(path.join(fullOutputPath, basePath), { recursive: true });
+          directoryExists.add(basePath);
+        }
+
+        if (file.origin === 'memory') {
+          // Write file contents
+          await fs.writeFile(path.join(fullOutputPath, filePath), file.contents);
+        } else {
+          // Copy file contents
+          await fs.copyFile(
+            file.inputPath,
+            path.join(fullOutputPath, filePath),
+            fs.constants.COPYFILE_FICLONE,
+          );
+        }
+      });
     }
 
-    // The builder system (architect) currently attempts to treat all results as JSON and
-    // attempts to validate the object with a JSON schema validator. This can lead to slow
-    // build completion (even after the actual build is fully complete) or crashes if the
-    // size and/or quantity of output files is large. Architect only requires a `success`
-    // property so that is all that will be passed here if the infrastructure settings have
-    // not been explicitly set to avoid writes. Writing is only disabled when used directly
-    // by the dev server which bypasses the architect behavior.
-    const builderResult =
-      infrastructureSettings?.write === false ? result : { success: result.success };
-    yield builderResult;
+    yield result;
   }
 }
 
@@ -97,42 +114,13 @@ function normalizeOptions(
   };
 }
 
-// We write the file directly from this builder to maintain webpack output compatibility
-// and not output browser files into '/browser'.
-async function writeResultFiles(
-  outputFiles: BuildOutputFile[],
-  assetFiles: BuildOutputAsset[] | undefined,
-  outputPath: string,
+export async function* buildEsbuildBrowserArchitect(
+  options: BrowserBuilderOptions,
+  context: BuilderContext,
 ) {
-  const directoryExists = new Set<string>();
-  const ensureDirectoryExists = async (basePath: string) => {
-    if (basePath && !directoryExists.has(basePath)) {
-      await fs.mkdir(path.join(outputPath, basePath), { recursive: true });
-      directoryExists.add(basePath);
-    }
-  };
-
-  // Writes the output file to disk and ensures the containing directories are present
-  await emitFilesToDisk(outputFiles, async (file: BuildOutputFile) => {
-    // Ensure output subdirectories exist
-    const basePath = path.dirname(file.path);
-    await ensureDirectoryExists(basePath);
-
-    // Write file contents
-    await fs.writeFile(path.join(outputPath, file.path), file.contents);
-  });
-
-  if (assetFiles?.length) {
-    await emitFilesToDisk(assetFiles, async ({ source, destination }) => {
-      const basePath = path.dirname(destination);
-
-      // Ensure output subdirectories exist
-      await ensureDirectoryExists(basePath);
-
-      // Copy file contents
-      await fs.copyFile(source, path.join(outputPath, destination), fs.constants.COPYFILE_FICLONE);
-    });
+  for await (const result of buildEsbuildBrowser(options, context)) {
+    yield { success: result.kind !== ResultKind.Failure };
   }
 }
 
-export default createBuilder(buildEsbuildBrowser);
+export default createBuilder<BrowserBuilderOptions>(buildEsbuildBrowserArchitect);
