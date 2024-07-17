@@ -1,3 +1,23 @@
+<a name="18.2.0-next.1"></a>
+
+# 18.2.0-next.1 (2024-07-17)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                       |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------- |
+| [9baae6e22](https://github.com/angular/angular-cli/commit/9baae6e22c5ad89e2f05b55b46a91ef0fbbe79a2) | fix  | skip undefined files when generating budget stats |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                                   |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------- |
+| [24aaf1e37](https://github.com/angular/angular-cli/commit/24aaf1e37f49735ce97fe72fced3d53b51d6b631) | feat | support import attribute based loader configuration           |
+| [394f9ce35](https://github.com/angular/angular-cli/commit/394f9ce35f876e7f82c6817d9424b32ec1eaa4a2) | fix  | remove Vite "/@id/" prefix for explicit external dependencies |
+| [855a4b841](https://github.com/angular/angular-cli/commit/855a4b84121ab16594bcd1785d648eccefa4baa3) | fix  | resolve only ".wasm" files                                    |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="18.1.1"></a>
 
 # 18.1.1 (2024-07-17)
