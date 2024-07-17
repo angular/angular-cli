@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { buildApplicationInternal } from '@angular/build/private';
+import { Result, ResultKind, buildApplicationInternal } from '@angular/build/private';
 import { BuilderContext, BuilderOutput, createBuilder } from '@angular-devkit/architect';
 import type * as WebTestRunner from '@web/test-runner';
 import { promises as fs } from 'node:fs';
@@ -53,8 +53,8 @@ export default createBuilder(
 
     // Build the tests and abort on any build failure.
     const buildOutput = await buildTests(testFiles, testDir, options, ctx);
-    if (!buildOutput.success) {
-      return buildOutput;
+    if (buildOutput.kind === ResultKind.Failure) {
+      return { success: false };
     }
 
     // Run the built tests.
@@ -68,7 +68,7 @@ async function buildTests(
   outputPath: string,
   options: WtrBuilderOptions,
   ctx: BuilderContext,
-): Promise<BuilderOutput> {
+): Promise<Result> {
   const entryPoints = new Set([
     ...testFiles,
     'jasmine-core/lib/jasmine-core/jasmine.js',

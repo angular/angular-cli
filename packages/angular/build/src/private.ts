@@ -16,6 +16,7 @@
 // Builders
 export { buildApplicationInternal } from './builders/application';
 export type { ApplicationBuilderInternalOptions } from './builders/application/options';
+export { type Result, type ResultFile, ResultKind } from './builders/application/results';
 export { serveWithVite } from './builders/dev-server/vite-server';
 
 // Tools

@@ -6,10 +6,10 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { BuilderContext, BuilderOutput } from '@angular-devkit/architect';
+import { BuilderContext } from '@angular-devkit/architect';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
-import { BuildOutputFile } from '../../tools/esbuild/bundler-context';
+import { BuildOutputFile, BuildOutputFileType } from '../../tools/esbuild/bundler-context';
 import { ExecutionResult, RebuildState } from '../../tools/esbuild/bundler-execution-result';
 import { shutdownSassWorkerPool } from '../../tools/esbuild/stylesheets/sass-language';
 import {
@@ -22,6 +22,7 @@ import { deleteOutputDir } from '../../utils/delete-output-dir';
 import { shouldWatchRoot } from '../../utils/environment-options';
 import { NormalizedCachedOptions } from '../../utils/normalize-cache';
 import { NormalizedApplicationBuildOptions, NormalizedOutputOptions } from './options';
+import { FullResult, Result, ResultKind, ResultMessage } from './results';
 
 // Watch workspace for package manager changes
 const packageWatchFiles = [
@@ -36,9 +37,6 @@ const packageWatchFiles = [
   '.pnp.cjs',
   '.pnp.data.json',
 ];
-
-type BuildActionOutput = (ExecutionResult['outputWithFiles'] | ExecutionResult['output']) &
-  BuilderOutput;
 
 export async function* runEsBuildBuildAction(
   action: (rebuildState?: RebuildState) => Promise<ExecutionResult>,
@@ -61,7 +59,7 @@ export async function* runEsBuildBuildAction(
     colors?: boolean;
     jsonLogs?: boolean;
   },
-): AsyncIterable<BuildActionOutput> {
+): AsyncIterable<Result> {
   const {
     writeToFileSystemFilter,
     writeToFileSystem,
@@ -226,10 +224,24 @@ export async function* runEsBuildBuildAction(
 
 async function writeAndEmitOutput(
   writeToFileSystem: boolean,
-  { outputFiles, output, outputWithFiles, assetFiles }: ExecutionResult,
+  {
+    outputFiles,
+    outputWithFiles,
+    assetFiles,
+    externalMetadata,
+    htmlIndexPath,
+    htmlBaseHref,
+  }: ExecutionResult,
   outputOptions: NormalizedApplicationBuildOptions['outputOptions'],
   writeToFileSystemFilter: ((file: BuildOutputFile) => boolean) | undefined,
-): Promise<BuildActionOutput> {
+): Promise<Result> {
+  if (!outputWithFiles.success) {
+    return {
+      kind: ResultKind.Failure,
+      errors: outputWithFiles.errors as ResultMessage[],
+    };
+  }
+
   if (writeToFileSystem) {
     // Write output files
     const outputFilesToWrite = writeToFileSystemFilter
@@ -238,10 +250,37 @@ async function writeAndEmitOutput(
 
     await writeResultFiles(outputFilesToWrite, assetFiles, outputOptions);
 
-    return output;
+    // Currently unused other than indicating success if writing to disk.
+    return {
+      kind: ResultKind.Full,
+      files: {},
+    };
   } else {
-    // Requires casting due to unneeded `JsonObject` requirement. Remove once fixed.
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return outputWithFiles as any;
+    const result: FullResult = {
+      kind: ResultKind.Full,
+      files: {},
+      detail: {
+        externalMetadata,
+        htmlIndexPath,
+        htmlBaseHref,
+      },
+    };
+    for (const file of outputWithFiles.assetFiles) {
+      result.files[file.destination] = {
+        type: BuildOutputFileType.Browser,
+        inputPath: file.source,
+        origin: 'disk',
+      };
+    }
+    for (const file of outputWithFiles.outputFiles) {
+      result.files[file.path] = {
+        type: file.type,
+        contents: file.contents,
+        origin: 'memory',
+        hash: file.hash,
+      };
+    }
+
+    return result;
   }
 }

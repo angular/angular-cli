@@ -8,14 +8,14 @@
 
 import type { ɵParsedMessage as LocalizeMessage } from '@angular/localize';
 import type { MessageExtractor } from '@angular/localize/tools';
-import type { BuilderContext, BuilderOutput } from '@angular-devkit/architect';
-import assert from 'node:assert';
+import type { BuilderContext } from '@angular-devkit/architect';
 import nodePath from 'node:path';
 import { buildApplicationInternal } from '../application';
 import type {
   ApplicationBuilderExtensions,
   ApplicationBuilderInternalOptions,
 } from '../application/options';
+import { ResultFile, ResultKind } from '../application/results';
 import type { NormalizedExtractI18nOptions } from './options';
 
 export async function extractMessages(
@@ -25,7 +25,7 @@ export async function extractMessages(
   extractorConstructor: typeof MessageExtractor,
   extensions?: ApplicationBuilderExtensions,
 ): Promise<{
-  builderResult: BuilderOutput;
+  success: boolean;
   basePath: string;
   messages: LocalizeMessage[];
   useLegacyIds: boolean;
@@ -49,44 +49,22 @@ export async function extractMessages(
   buildOptions.prerender = false;
 
   // Build the application with the build options
-  let builderResult;
-  try {
-    for await (const result of buildApplicationInternal(
-      buildOptions,
-      context,
-      { write: false },
-      extensions,
-    )) {
-      builderResult = result;
-      break;
-    }
+  const builderResult = await first(
+    buildApplicationInternal(buildOptions, context, { write: false }, extensions),
+  );
 
-    assert(builderResult !== undefined, 'Application builder did not provide a result.');
-  } catch (err) {
-    builderResult = {
-      success: false,
-      error: (err as Error).message,
-    };
-  }
-
-  // Extract messages from each output JavaScript file.
-  // Output files are only present on a successful build.
-  if (builderResult.outputFiles) {
-    // Store the JS and JS map files for lookup during extraction
-    const files = new Map<string, string>();
-    for (const outputFile of builderResult.outputFiles) {
-      if (outputFile.path.endsWith('.js')) {
-        files.set(outputFile.path, outputFile.text);
-      } else if (outputFile.path.endsWith('.js.map')) {
-        files.set(outputFile.path, outputFile.text);
-      }
-    }
-
+  let success = false;
+  if (!builderResult || builderResult.kind === ResultKind.Failure) {
+    context.logger.error('Application build failed.');
+  } else if (builderResult.kind !== ResultKind.Full) {
+    context.logger.error('Application build did not provide a full output.');
+  } else {
     // Setup the localize message extractor based on the in-memory files
-    const extractor = setupLocalizeExtractor(extractorConstructor, files, context);
+    const extractor = setupLocalizeExtractor(extractorConstructor, builderResult.files, context);
 
-    // Attempt extraction of all output JS files
-    for (const filePath of files.keys()) {
+    // Extract messages from each output JavaScript file.
+    // Output files are only present on a successful build.
+    for (const filePath of Object.keys(builderResult.files)) {
       if (!filePath.endsWith('.js')) {
         continue;
       }
@@ -94,10 +72,12 @@ export async function extractMessages(
       const fileMessages = extractor.extractMessages(filePath);
       messages.push(...fileMessages);
     }
+
+    success = true;
   }
 
   return {
-    builderResult,
+    success,
     basePath: context.workspaceRoot,
     messages,
     // Legacy i18n identifiers are not supported with the new application builder
@@ -107,9 +87,10 @@ export async function extractMessages(
 
 function setupLocalizeExtractor(
   extractorConstructor: typeof MessageExtractor,
-  files: Map<string, string>,
+  files: Record<string, ResultFile>,
   context: BuilderContext,
 ): MessageExtractor {
+  const textDecoder = new TextDecoder();
   // Setup a virtual file system instance for the extractor
   // * MessageExtractor itself uses readFile, relative and resolve
   // * Internal SourceFileLoader (sourcemap support) uses dirname, exists, readFile, and resolve
@@ -118,7 +99,11 @@ function setupLocalizeExtractor(
       // Output files are stored as relative to the workspace root
       const requestedPath = nodePath.relative(context.workspaceRoot, path);
 
-      const content = files.get(requestedPath);
+      const file = files[requestedPath];
+      let content;
+      if (file?.origin === 'memory') {
+        content = textDecoder.decode(file.contents);
+      }
       if (content === undefined) {
         throw new Error('Unknown file requested: ' + requestedPath);
       }
@@ -135,7 +120,7 @@ function setupLocalizeExtractor(
       // Output files are stored as relative to the workspace root
       const requestedPath = nodePath.relative(context.workspaceRoot, path);
 
-      return files.has(requestedPath);
+      return files[requestedPath] !== undefined;
     },
     dirname(path: string): string {
       return nodePath.dirname(path);
@@ -168,4 +153,10 @@ function setupLocalizeExtractor(
   });
 
   return extractor;
+}
+
+async function first<T>(iterable: AsyncIterable<T>): Promise<T | undefined> {
+  for await (const value of iterable) {
+    return value;
+  }
 }

@@ -286,10 +286,14 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
             },
           });
 
-          const { result } = await harness.executeOnce();
+          const { result, logs } = await harness.executeOnce({ outputLogsOnFailure: false });
           expect(result?.success).toBeFalse();
-          expect(result?.error).toContain(
-            `'outputPath.browser' cannot be configured to an empty string when SSR is enabled`,
+          expect(logs).toContain(
+            jasmine.objectContaining({
+              message: jasmine.stringMatching(
+                `'outputPath.browser' cannot be configured to an empty string when SSR is enabled`,
+              ),
+            }),
           );
         });
       });
@@ -349,10 +353,14 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
           },
         });
 
-        const { result } = await harness.executeOnce();
+        const { result, logs } = await harness.executeOnce({ outputLogsOnFailure: false });
         expect(result?.success).toBeFalse();
-        expect(result?.error).toContain(
-          `'outputPath.browser' and 'outputPath.server' cannot be configured to the same value`,
+        expect(logs).toContain(
+          jasmine.objectContaining({
+            message: jasmine.stringMatching(
+              `'outputPath.browser' and 'outputPath.server' cannot be configured to the same value`,
+            ),
+          }),
         );
       });
     });
