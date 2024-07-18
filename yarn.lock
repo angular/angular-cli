@@ -129,7 +129,7 @@ __metadata:
     vite: "npm:5.3.4"
     watchpack: "npm:2.4.1"
     webpack: "npm:5.93.0"
-    webpack-dev-middleware: "npm:7.2.1"
+    webpack-dev-middleware: "npm:7.3.0"
     webpack-dev-server: "npm:5.0.4"
     webpack-merge: "npm:6.0.1"
     webpack-subresource-integrity: "npm:5.1.0"
@@ -238,7 +238,7 @@ __metadata:
   dependencies:
     "@angular-devkit/core": "npm:0.0.0-PLACEHOLDER"
     "@angular-devkit/schematics": "npm:0.0.0-PLACEHOLDER"
-    "@inquirer/prompts": "npm:5.1.3"
+    "@inquirer/prompts": "npm:5.2.0"
     ansi-colors: "npm:4.1.3"
     symbol-observable: "npm:4.0.0"
     yargs-parser: "npm:21.1.1"
@@ -529,7 +529,7 @@ __metadata:
     "@angular-devkit/architect": "npm:0.0.0-EXPERIMENTAL-PLACEHOLDER"
     "@angular-devkit/core": "npm:0.0.0-PLACEHOLDER"
     "@angular-devkit/schematics": "npm:0.0.0-PLACEHOLDER"
-    "@inquirer/prompts": "npm:5.1.3"
+    "@inquirer/prompts": "npm:5.2.0"
     "@listr2/prompt-adapter-inquirer": "npm:2.0.13"
     "@schematics/angular": "npm:0.0.0-PLACEHOLDER"
     "@yarnpkg/lockfile": "npm:1.1.0"
@@ -669,7 +669,7 @@ __metadata:
     "@bazel/jasmine": "patch:@bazel/jasmine@npm%3A5.8.1#~/.yarn/patches/@bazel-jasmine-npm-5.8.1-3370fee155.patch"
     "@discoveryjs/json-ext": "npm:0.6.0"
     "@inquirer/confirm": "npm:3.1.15"
-    "@inquirer/prompts": "npm:5.1.3"
+    "@inquirer/prompts": "npm:5.2.0"
     "@listr2/prompt-adapter-inquirer": "npm:2.0.13"
     "@rollup/plugin-commonjs": "npm:^26.0.0"
     "@rollup/plugin-node-resolve": "npm:^13.0.5"
@@ -725,7 +725,7 @@ __metadata:
     http-proxy: "npm:^1.18.1"
     http-proxy-middleware: "npm:3.0.0"
     https-proxy-agent: "npm:7.0.5"
-    husky: "npm:9.0.11"
+    husky: "npm:9.1.1"
     ini: "npm:4.1.3"
     istanbul-lib-instrument: "npm:6.0.3"
     jasmine: "npm:^5.0.0"
@@ -787,7 +787,7 @@ __metadata:
     vite: "npm:5.3.4"
     watchpack: "npm:2.4.1"
     webpack: "npm:5.93.0"
-    webpack-dev-middleware: "npm:7.2.1"
+    webpack-dev-middleware: "npm:7.3.0"
     webpack-dev-server: "npm:5.0.4"
     webpack-merge: "npm:6.0.1"
     webpack-subresource-integrity: "npm:5.1.0"
@@ -3023,7 +3023,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@inquirer/checkbox@npm:^2.3.11":
+"@inquirer/checkbox@npm:^2.4.0":
   version: 2.4.0
   resolution: "@inquirer/checkbox@npm:2.4.0"
   dependencies:
@@ -3137,11 +3137,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@inquirer/prompts@npm:5.1.3":
-  version: 5.1.3
-  resolution: "@inquirer/prompts@npm:5.1.3"
+"@inquirer/prompts@npm:5.2.0":
+  version: 5.2.0
+  resolution: "@inquirer/prompts@npm:5.2.0"
   dependencies:
-    "@inquirer/checkbox": "npm:^2.3.11"
+    "@inquirer/checkbox": "npm:^2.4.0"
     "@inquirer/confirm": "npm:^3.1.15"
     "@inquirer/editor": "npm:^2.1.15"
     "@inquirer/expand": "npm:^2.1.15"
@@ -3149,8 +3149,8 @@ __metadata:
     "@inquirer/number": "npm:^1.0.3"
     "@inquirer/password": "npm:^2.1.15"
     "@inquirer/rawlist": "npm:^2.1.15"
-    "@inquirer/select": "npm:^2.3.11"
-  checksum: 10c0/7ff2cca8add3c93b6080137de9acdc5bec9e474fb74b5feffaffa63140282482e928f2f51967510f65ee48605ef0012856c4c24dcce5adfdd697b7dfb867eadf
+    "@inquirer/select": "npm:^2.4.0"
+  checksum: 10c0/3b88fc1c5889f1952deaafdc3667dd24edc90b894fe298289fba40754c826e23b1f3c9d13252bd97ff0730063e2aa4c328c05daeaa3e66848b8c4fa4b624b1c8
   languageName: node
   linkType: hard
 
@@ -3165,7 +3165,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@inquirer/select@npm:^2.3.11":
+"@inquirer/select@npm:^2.4.0":
   version: 2.4.0
   resolution: "@inquirer/select@npm:2.4.0"
   dependencies:
@@ -11306,12 +11306,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"husky@npm:9.0.11":
-  version: 9.0.11
-  resolution: "husky@npm:9.0.11"
+"husky@npm:9.1.1":
+  version: 9.1.1
+  resolution: "husky@npm:9.1.1"
   bin:
-    husky: bin.mjs
-  checksum: 10c0/2c787dcf74a837fc9a4fea7da907509d4bd9a289f4ea10ecc9d86279e4d4542b0f5f6443a619bccae19e265f2677172cc2b86aae5c932a35a330cc227d914605
+    husky: bin.js
+  checksum: 10c0/56394f5a08201badece23a8599bd76fe8c41e4510a956022fe54897645900c5c5a96a740ffb0604e99e808dffc3714bae982f1cbda4a069082cc713414f17ad3
   languageName: node
   linkType: hard
 
@@ -18570,26 +18570,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"webpack-dev-middleware@npm:7.2.1":
-  version: 7.2.1
-  resolution: "webpack-dev-middleware@npm:7.2.1"
-  dependencies:
-    colorette: "npm:^2.0.10"
-    memfs: "npm:^4.6.0"
-    mime-types: "npm:^2.1.31"
-    on-finished: "npm:^2.4.1"
-    range-parser: "npm:^1.2.1"
-    schema-utils: "npm:^4.0.0"
-  peerDependencies:
-    webpack: ^5.0.0
-  peerDependenciesMeta:
-    webpack:
-      optional: true
-  checksum: 10c0/e3a61098d5fe3325f698f8f97395f8625b96717e690170f3e4704c939dc96cbb57a871730d3ba4d19f06975b558d4f283bdcc801d823463a12da0dbc3844b531
-  languageName: node
-  linkType: hard
-
-"webpack-dev-middleware@npm:^7.1.0":
+"webpack-dev-middleware@npm:7.3.0, webpack-dev-middleware@npm:^7.1.0":
   version: 7.3.0
   resolution: "webpack-dev-middleware@npm:7.3.0"
   dependencies:

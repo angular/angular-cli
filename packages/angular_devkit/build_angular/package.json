@@ -64,7 +64,7 @@
     "vite": "5.3.4",
     "watchpack": "2.4.1",
     "webpack": "5.93.0",
-    "webpack-dev-middleware": "7.2.1",
+    "webpack-dev-middleware": "7.3.0",
     "webpack-dev-server": "5.0.4",
     "webpack-merge": "6.0.1",
     "webpack-subresource-integrity": "5.1.0"
