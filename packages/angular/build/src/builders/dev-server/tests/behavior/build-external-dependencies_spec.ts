@@ -45,5 +45,43 @@ describeServeBuilder(executeDevServer, DEV_SERVER_BUILDER_INFO, (harness, setupT
       expect(text).toContain(`import { BehaviorSubject } from "rxjs";`);
       expect(text).toContain(`import { map } from "rxjs/operators";`);
     });
+
+    it('respects import specifiers when using baseHref with trailing slash', async () => {
+      setupTarget(harness, {
+        externalDependencies: ['rxjs', 'rxjs/operators'],
+        baseHref: '/test/',
+      });
+
+      harness.useTarget('serve', {
+        ...BASE_OPTIONS,
+      });
+
+      const { result, response } = await executeOnceAndFetch(harness, 'main.js');
+
+      expect(result?.success).toBeTrue();
+
+      const text = await response?.text();
+      expect(text).toContain(`import { BehaviorSubject } from "rxjs";`);
+      expect(text).toContain(`import { map } from "rxjs/operators";`);
+    });
+
+    it('respects import specifiers when using baseHref without trailing slash', async () => {
+      setupTarget(harness, {
+        externalDependencies: ['rxjs', 'rxjs/operators'],
+        baseHref: '/test',
+      });
+
+      harness.useTarget('serve', {
+        ...BASE_OPTIONS,
+      });
+
+      const { result, response } = await executeOnceAndFetch(harness, 'main.js');
+
+      expect(result?.success).toBeTrue();
+
+      const text = await response?.text();
+      expect(text).toContain(`import { BehaviorSubject } from "rxjs";`);
+      expect(text).toContain(`import { map } from "rxjs/operators";`);
+    });
   });
 });
