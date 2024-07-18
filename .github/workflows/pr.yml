@@ -55,8 +55,6 @@ jobs:
         run: yarn admin validate
       - name: Check Package Licenses
         uses: angular/dev-infra/github-actions/linting/licenses@c2d0fc40044e7129a986ccf88965a0cb452db01c
-        with:
-          allow-dependencies-licenses: 'pkg:npm/thingies@1.21.0'
       - name: Check tooling setup
         run: yarn check-tooling-setup
       - name: Check commit message
