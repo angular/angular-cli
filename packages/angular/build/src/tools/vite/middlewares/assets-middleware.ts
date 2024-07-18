@@ -87,7 +87,8 @@ export function createAngularAssetsMiddleware(
     if (!pathnameHasTrailingSlash) {
       for (const assetPath of assets.keys()) {
         if (pathname === assetPath.substring(0, assetPath.lastIndexOf('/'))) {
-          const location = req.url + '/';
+          const { pathname, search, hash } = new URL(req.url, 'http://localhost');
+          const location = [pathname, '/', search, hash].join('');
 
           res.statusCode = 301;
           res.setHeader('Content-Type', 'text/html');
