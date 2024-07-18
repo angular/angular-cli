@@ -11,7 +11,7 @@ import type { Plugin } from 'vite';
 // NOTE: the implementation for this Vite plugin is roughly based on:
 // https://github.com/MilanKovacic/vite-plugin-externalize-dependencies
 
-const VITE_ID_PREFIX = '/@id/';
+const VITE_ID_PREFIX = '@id/';
 
 const escapeRegexSpecialChars = (inputString: string): string => {
   return inputString.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
@@ -29,7 +29,7 @@ export function createRemoveIdPrefixPlugin(externals: string[]): Plugin {
 
       const escapedExternals = externals.map(escapeRegexSpecialChars);
       const prefixedExternalRegex = new RegExp(
-        `${VITE_ID_PREFIX}(${escapedExternals.join('|')})`,
+        `${resolvedConfig.base}${VITE_ID_PREFIX}(${escapedExternals.join('|')})`,
         'g',
       );
 
