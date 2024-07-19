@@ -114,7 +114,7 @@ yarn_install(
         "//:.yarn/patches/@angular-bazel-https-9848736cf4.patch",
         "//:.yarn/patches/@bazel-concatjs-npm-5.8.1-1bf81df846.patch",
         "//:.yarn/patches/@bazel-jasmine-npm-5.8.1-3370fee155.patch",
-        "//:.yarn/releases/yarn-4.3.0.cjs",
+        "//:.yarn/releases/yarn-4.3.1.cjs",
         "//:.yarnrc.yml",
     ],
     # Currently disabled due to:
@@ -125,7 +125,7 @@ yarn_install(
     # We prefer to symlink the `node_modules` to only maintain a single install.
     # See https://github.com/angular/dev-infra/pull/446#issuecomment-1059820287 for details.
     symlink_node_modules = True,
-    yarn = "//:.yarn/releases/yarn-4.3.0.cjs",
+    yarn = "//:.yarn/releases/yarn-4.3.1.cjs",
     yarn_lock = "//:yarn.lock",
 )
 
