@@ -73,7 +73,7 @@
     "esbuild": "0.23.0"
   },
   "devDependencies": {
-    "undici": "6.19.2"
+    "undici": "6.19.4"
   },
   "peerDependencies": {
     "@angular/compiler-cli": "^18.0.0 || ^18.2.0-next.0",
