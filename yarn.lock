@@ -338,9 +338,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@angular/build-tooling@https://github.com/angular/dev-infra-private-build-tooling-builds.git#704a1ae7c8f73a52bc332c4edbd917aefbaecd12":
-  version: 0.0.0-3b9536b799d033fe6ab4437131c81c10c7bdd101
-  resolution: "@angular/build-tooling@https://github.com/angular/dev-infra-private-build-tooling-builds.git#commit=704a1ae7c8f73a52bc332c4edbd917aefbaecd12"
+"@angular/build-tooling@https://github.com/angular/dev-infra-private-build-tooling-builds.git#c761c2ab23cfb2d54d627fbbb2b356cceb17b226":
+  version: 0.0.0-41a9f08706cb37aa49d325729adfbb4e95070aba
+  resolution: "@angular/build-tooling@https://github.com/angular/dev-infra-private-build-tooling-builds.git#commit=c761c2ab23cfb2d54d627fbbb2b356cceb17b226"
   dependencies:
     "@angular/benchpress": "npm:0.3.0"
     "@angular/build": "npm:18.2.0-next.1"
@@ -365,7 +365,6 @@ __metadata:
     "@types/ws": "npm:8.5.10"
     "@types/yargs": "npm:^17.0.0"
     browser-sync: "npm:^3.0.0"
-    highlight.js: "npm:^11.8.0"
     html-entities: "npm:^2.4.0"
     marked: "npm:^12.0.0"
     marked-mangle: "npm:^1.1.4"
@@ -375,6 +374,7 @@ __metadata:
     protractor: "npm:^7.0.0"
     selenium-webdriver: "npm:^4.18.1"
     send: "npm:^0.18.0"
+    shiki: "npm:^1.11.0"
     source-map: "npm:^0.7.4"
     tmp: "npm:^0.2.1"
     true-case-path: "npm:^2.2.1"
@@ -386,7 +386,7 @@ __metadata:
   dependenciesMeta:
     re2:
       built: false
-  checksum: 10c0/bf9404583043f44fb5021a9f4cc36f7caf42d202d887da8c76bbe1da54365f11c1ff00a2c1d85349ca45aee0c52e97de3a6203f6caa7cfae240ba645bf04844e
+  checksum: 10c0/4ce193a52d1831930f1a8d0db2ecca742f0c7a44aa8e587ab66fdd5b1781ef599e5736bbfb2a59b5860b2e18419e6c68b0df74b4a74a472d29bcceccafaed916
   languageName: node
   linkType: hard
 
@@ -637,7 +637,7 @@ __metadata:
     "@ampproject/remapping": "npm:2.3.0"
     "@angular/animations": "npm:18.2.0-next.1"
     "@angular/bazel": "patch:@angular/bazel@https%3A//github.com/angular/bazel-builds.git%23commit=71bd2e043e076365effdb6076f33b2d8d6bd6d02#~/.yarn/patches/@angular-bazel-https-9848736cf4.patch"
-    "@angular/build-tooling": "https://github.com/angular/dev-infra-private-build-tooling-builds.git#704a1ae7c8f73a52bc332c4edbd917aefbaecd12"
+    "@angular/build-tooling": "https://github.com/angular/dev-infra-private-build-tooling-builds.git#c761c2ab23cfb2d54d627fbbb2b356cceb17b226"
     "@angular/cdk": "npm:18.1.1"
     "@angular/common": "npm:18.2.0-next.1"
     "@angular/compiler": "npm:18.2.0-next.1"
@@ -646,7 +646,7 @@ __metadata:
     "@angular/forms": "npm:18.2.0-next.1"
     "@angular/localize": "npm:18.2.0-next.1"
     "@angular/material": "npm:18.1.1"
-    "@angular/ng-dev": "https://github.com/angular/dev-infra-private-ng-dev-builds.git#6f7d7d09add8dc2f7e5d1231d0215484180bd99f"
+    "@angular/ng-dev": "https://github.com/angular/dev-infra-private-ng-dev-builds.git#476e5bf8129abc88a58185a72cb801141b1d7dcb"
     "@angular/platform-browser": "npm:18.2.0-next.1"
     "@angular/platform-browser-dynamic": "npm:18.2.0-next.1"
     "@angular/platform-server": "npm:18.2.0-next.1"
@@ -899,11 +899,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#6f7d7d09add8dc2f7e5d1231d0215484180bd99f":
-  version: 0.0.0-3b9536b799d033fe6ab4437131c81c10c7bdd101
-  resolution: "@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#commit=6f7d7d09add8dc2f7e5d1231d0215484180bd99f"
+"@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#476e5bf8129abc88a58185a72cb801141b1d7dcb":
+  version: 0.0.0-41a9f08706cb37aa49d325729adfbb4e95070aba
+  resolution: "@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#commit=476e5bf8129abc88a58185a72cb801141b1d7dcb"
   dependencies:
-    "@octokit/rest": "npm:21.0.0"
+    "@octokit/rest": "npm:21.0.1"
     "@types/semver": "npm:^7.3.6"
     "@types/supports-color": "npm:^8.1.1"
     "@yarnpkg/lockfile": "npm:^1.1.0"
@@ -915,7 +915,7 @@ __metadata:
     yaml: "npm:2.4.5"
   bin:
     ng-dev: ./bundles/cli.mjs
-  checksum: 10c0/9a7d7283e4a244e6f2804a13a115fd07cd6bbc4c4c3a682933d092109dc6d7a78d3f942930fe2dd94556c6e2b289036523cb879e8a9e9da34c217c050f42c83a
+  checksum: 10c0/8aead64557c1fc5a488d4dc00d9854f5a4c9f259d0219cfc799ea2c2662aa806dd0027579e1f093d72320dfc8ea0b86e7ccfb5ee9e778d642013773afe66d938
   languageName: node
   linkType: hard
 
@@ -4598,7 +4598,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@octokit/plugin-request-log@npm:^5.1.0":
+"@octokit/plugin-request-log@npm:^5.3.1":
   version: 5.3.1
   resolution: "@octokit/plugin-request-log@npm:5.3.1"
   peerDependencies:
@@ -4639,15 +4639,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@octokit/rest@npm:21.0.0":
-  version: 21.0.0
-  resolution: "@octokit/rest@npm:21.0.0"
+"@octokit/rest@npm:21.0.1":
+  version: 21.0.1
+  resolution: "@octokit/rest@npm:21.0.1"
   dependencies:
     "@octokit/core": "npm:^6.1.2"
     "@octokit/plugin-paginate-rest": "npm:^11.0.0"
-    "@octokit/plugin-request-log": "npm:^5.1.0"
+    "@octokit/plugin-request-log": "npm:^5.3.1"
     "@octokit/plugin-rest-endpoint-methods": "npm:^13.0.0"
-  checksum: 10c0/05f32338479abaae26c5e5418b2667710830e664edafb0c735740ad1ae5dc25e7c0ea9ef9b7f96d00b81c70c78bbf6e86b9048617a8e9c8f02b4f890dc4bc51a
+  checksum: 10c0/b1d54fa564ef2a96f9d25f17df6bbc845aa4a10eec7dd810b65ed616755a24c5cc9d98ad20cf9ba61eb0c9d8cf5ce44814e544f4247d0c1e4d2fc74f265188d2
   languageName: node
   linkType: hard
 
@@ -5098,6 +5098,15 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@shikijs/core@npm:1.11.0":
+  version: 1.11.0
+  resolution: "@shikijs/core@npm:1.11.0"
+  dependencies:
+    "@types/hast": "npm:^3.0.4"
+  checksum: 10c0/c9e2a5dc43f49534be982e036d41c44247ed7ffd0639fa0fb4bf92b607b3eb57cce9c1f95be9304b1950fa89c056ee31b9d04932ab00aea256386a7a85bcabdd
+  languageName: node
+  linkType: hard
+
 "@sigstore/bundle@npm:^2.3.2":
   version: 2.3.2
   resolution: "@sigstore/bundle@npm:2.3.2"
@@ -5476,6 +5485,15 @@ __metadata:
   dependencies:
     "@types/node": "npm:*"
   checksum: 10c0/235d2fc69741448e853333b7c3d1180a966dd2b8972c8cbcd6b2a0c6cd7f8d582ab2b8e58219dbc62cce8f1b40aa317ff78ea2201cdd8249da5025adebed6f0b
+  languageName: node
+  linkType: hard
+
+"@types/hast@npm:^3.0.4":
+  version: 3.0.4
+  resolution: "@types/hast@npm:3.0.4"
+  dependencies:
+    "@types/unist": "npm:*"
+  checksum: 10c0/3249781a511b38f1d330fd1e3344eed3c4e7ea8eff82e835d35da78e637480d36fad37a78be5a7aed8465d237ad0446abc1150859d0fde395354ea634decf9f7
   languageName: node
   linkType: hard
 
@@ -5958,6 +5976,13 @@ __metadata:
   dependencies:
     source-map: "npm:^0.6.1"
   checksum: 10c0/e225d7da26a7a8b71e71f584ab2b4e14f9bd61e2ae4c72fa14d3d862ebfb8f3c1c24414048f23ea485e93618d3370e6c9d5e5af51b6a836d48ec453a26e419f4
+  languageName: node
+  linkType: hard
+
+"@types/unist@npm:*":
+  version: 3.0.2
+  resolution: "@types/unist@npm:3.0.2"
+  checksum: 10c0/39f220ce184a773c55c18a127062bfc4d0d30c987250cd59bab544d97be6cfec93717a49ef96e81f024b575718f798d4d329eb81c452fc57d6d051af8b043ebf
   languageName: node
   linkType: hard
 
@@ -11031,13 +11056,6 @@ __metadata:
   dependencies:
     function-bind: "npm:^1.1.2"
   checksum: 10c0/3769d434703b8ac66b209a4cca0737519925bbdb61dd887f93a16372b14694c63ff4e797686d87c90f08168e81082248b9b028bad60d4da9e0d1148766f56eb9
-  languageName: node
-  linkType: hard
-
-"highlight.js@npm:^11.8.0":
-  version: 11.10.0
-  resolution: "highlight.js@npm:11.10.0"
-  checksum: 10c0/cd8bf7ef06cbd72ddb83580ecabe769f08f062be8bb82d2eb492d31c17f7480d1f8d14a66fc81deee0601645435f19f04c470510563f847242a41ccff0ab873e
   languageName: node
   linkType: hard
 
@@ -16560,6 +16578,16 @@ __metadata:
   bin:
     shjs: bin/shjs
   checksum: 10c0/feb25289a12e4bcd04c40ddfab51aff98a3729f5c2602d5b1a1b95f6819ec7804ac8147ebd8d9a85dfab69d501bcf92d7acef03247320f51c1552cec8d8e2382
+  languageName: node
+  linkType: hard
+
+"shiki@npm:^1.11.0":
+  version: 1.11.0
+  resolution: "shiki@npm:1.11.0"
+  dependencies:
+    "@shikijs/core": "npm:1.11.0"
+    "@types/hast": "npm:^3.0.4"
+  checksum: 10c0/f3bbc413bab8c46a7bed0ae28bcbe00c32f57f6a2c6f29e6d9390d4e6b56754b05e83f45a5a16e39d05c00baf7cd785f85dc2583a6912fae4f40ea9b40d6fb6a
   languageName: node
   linkType: hard
 
