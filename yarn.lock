@@ -238,7 +238,7 @@ __metadata:
   dependencies:
     "@angular-devkit/core": "npm:0.0.0-PLACEHOLDER"
     "@angular-devkit/schematics": "npm:0.0.0-PLACEHOLDER"
-    "@inquirer/prompts": "npm:5.3.0"
+    "@inquirer/prompts": "npm:5.3.2"
     ansi-colors: "npm:4.1.3"
     symbol-observable: "npm:4.0.0"
     yargs-parser: "npm:21.1.1"
@@ -528,7 +528,7 @@ __metadata:
     "@angular-devkit/architect": "npm:0.0.0-EXPERIMENTAL-PLACEHOLDER"
     "@angular-devkit/core": "npm:0.0.0-PLACEHOLDER"
     "@angular-devkit/schematics": "npm:0.0.0-PLACEHOLDER"
-    "@inquirer/prompts": "npm:5.3.0"
+    "@inquirer/prompts": "npm:5.3.2"
     "@listr2/prompt-adapter-inquirer": "npm:2.0.14"
     "@schematics/angular": "npm:0.0.0-PLACEHOLDER"
     "@yarnpkg/lockfile": "npm:1.1.0"
@@ -668,7 +668,7 @@ __metadata:
     "@bazel/jasmine": "patch:@bazel/jasmine@npm%3A5.8.1#~/.yarn/patches/@bazel-jasmine-npm-5.8.1-3370fee155.patch"
     "@discoveryjs/json-ext": "npm:0.6.0"
     "@inquirer/confirm": "npm:3.1.17"
-    "@inquirer/prompts": "npm:5.3.0"
+    "@inquirer/prompts": "npm:5.3.2"
     "@listr2/prompt-adapter-inquirer": "npm:2.0.14"
     "@rollup/plugin-commonjs": "npm:^26.0.0"
     "@rollup/plugin-node-resolve": "npm:^13.0.5"
@@ -3136,9 +3136,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@inquirer/prompts@npm:5.3.0":
-  version: 5.3.0
-  resolution: "@inquirer/prompts@npm:5.3.0"
+"@inquirer/prompts@npm:5.3.2":
+  version: 5.3.2
+  resolution: "@inquirer/prompts@npm:5.3.2"
   dependencies:
     "@inquirer/checkbox": "npm:^2.4.2"
     "@inquirer/confirm": "npm:^3.1.17"
@@ -3148,9 +3148,9 @@ __metadata:
     "@inquirer/number": "npm:^1.0.5"
     "@inquirer/password": "npm:^2.1.17"
     "@inquirer/rawlist": "npm:^2.1.17"
-    "@inquirer/search": "npm:^1.0.0"
+    "@inquirer/search": "npm:^1.0.2"
     "@inquirer/select": "npm:^2.4.2"
-  checksum: 10c0/c82d1ed633c212377b4d72faee5dd129f94d9924cdc955b16e8b44e8448ef7942df6a26cee6a903c2c73097479d74198fbe9a70c0e8873f0580cec2e151b16ef
+  checksum: 10c0/c7ebddb92b8b1cc6de544b1885502d8b2069fcd281610aae924cff12bee9679cc72c556942255b87317b44c4cca2a5121fc55c51d40f8fb41aecfd3da7f1c037
   languageName: node
   linkType: hard
 
@@ -3165,15 +3165,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@inquirer/search@npm:^1.0.0":
-  version: 1.0.1
-  resolution: "@inquirer/search@npm:1.0.1"
+"@inquirer/search@npm:^1.0.2":
+  version: 1.0.2
+  resolution: "@inquirer/search@npm:1.0.2"
   dependencies:
     "@inquirer/core": "npm:^9.0.5"
     "@inquirer/figures": "npm:^1.0.5"
     "@inquirer/type": "npm:^1.5.1"
     yoctocolors-cjs: "npm:^2.1.2"
-  checksum: 10c0/dbc10b7c8008c35127112991739a4b75ceb3006061ed176774b3c6e19c9522ccace216db9e60b633154ef476c94410c06ce0c1fec8e48a0bdbeb99f4ba7b457b
+  checksum: 10c0/482ee6aa03e57d5ff08668a6581b1ddb12643ef3224ccbd01c612216b070255ca09009c4ad53ab2ddc32b3017fd762af6fda2c313d002edaa75c37a9bd9a9a09
   languageName: node
   linkType: hard
 
