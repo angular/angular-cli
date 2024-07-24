@@ -1,3 +1,18 @@
+<a name="18.1.2"></a>
+
+# 18.1.2 (2024-07-24)
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                         |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------- |
+| [5b9378a3b](https://github.com/angular/angular-cli/commit/5b9378a3be3a1c4f465ba471a120a2edd3a4d2f8) | fix  | account for HTML base HREF for dev-server externals |
+| [3e4ea77d7](https://github.com/angular/angular-cli/commit/3e4ea77d755edce2c88d55b76860e6e91fb03f3c) | fix  | correctly detect comma in Sass URL lexer            |
+| [d868270f1](https://github.com/angular/angular-cli/commit/d868270f1baf0fd5f2c5677691cc9c4e88b47d8f) | fix  | prevent redirection loop                            |
+| [3573ac655](https://github.com/angular/angular-cli/commit/3573ac6555ead2afc34979e284426a0204fff42c) | fix  | serve HTML files directly                           |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="18.2.0-next.1"></a>
 
 # 18.2.0-next.1 (2024-07-17)
