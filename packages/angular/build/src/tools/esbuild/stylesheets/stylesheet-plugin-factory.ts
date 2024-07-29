@@ -165,7 +165,7 @@ export class StylesheetPluginFactory {
 
         // Add a load callback to support files from disk
         build.onLoad(
-          { filter: language.fileFilter },
+          { filter: language.fileFilter, namespace: 'file' },
           createCachedLoad(cache, async (args) => {
             const data = await readFile(args.path, 'utf-8');
 
