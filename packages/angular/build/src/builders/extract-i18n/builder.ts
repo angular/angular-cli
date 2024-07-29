@@ -32,6 +32,18 @@ export async function execute(
     return { success: false };
   }
 
+  const { projectType } = (await context.getProjectMetadata(projectName)) as {
+    projectType?: string;
+  };
+  if (projectType !== 'application') {
+    context.logger.error(
+      `Tried to extract from ${projectName} with 'projectType' ${projectType}, which is not supported.` +
+        ` The 'extract-i18n' builder can only extract from applications.`,
+    );
+
+    return { success: false };
+  }
+
   // Check Angular version.
   assertCompatibleAngularVersion(context.workspaceRoot);
 
