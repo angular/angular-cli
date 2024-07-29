@@ -59,7 +59,7 @@ export function createStylesheetBundleOptions(
     pluginFactory.create(SassStylesheetLanguage),
     pluginFactory.create(LessStylesheetLanguage),
     pluginFactory.create(CssStylesheetLanguage),
-    createCssResourcePlugin(cache),
+    createCssResourcePlugin(),
   ];
 
   if (options.inlineFonts) {

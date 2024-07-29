@@ -7,11 +7,7 @@
  */
 
 import type { Plugin, PluginBuild } from 'esbuild';
-import { readFile } from 'node:fs/promises';
-import { extname, join, relative } from 'node:path';
-import { LoadResultCache, createCachedLoad } from '../load-result-cache';
-
-const CSS_RESOURCE_NAMESPACE = 'angular:css-resource';
+import { extname, join } from 'node:path';
 
 /**
  * Symbol marker used to indicate CSS resource resolution is being attempted.
@@ -27,7 +23,7 @@ const CSS_RESOURCE_RESOLUTION = Symbol('CSS_RESOURCE_RESOLUTION');
  *
  * @returns An esbuild {@link Plugin} instance.
  */
-export function createCssResourcePlugin(cache?: LoadResultCache): Plugin {
+export function createCssResourcePlugin(): Plugin {
   return {
     name: 'angular-css-resource',
     setup(build: PluginBuild): void {
@@ -96,34 +92,8 @@ export function createCssResourcePlugin(cache?: LoadResultCache): Plugin {
           }
         }
 
-        // Return results that are not files since these are most likely specific to another plugin
-        // and cannot be loaded by this plugin.
-        if (result.namespace !== 'file') {
-          return result;
-        }
-
-        // All file results are considered CSS resources and will be loaded via the file loader
-        return {
-          ...result,
-          // Use a relative path to prevent fully resolved paths in the metafile (JSON stats file).
-          // This is only necessary for custom namespaces. esbuild will handle the file namespace.
-          path: relative(build.initialOptions.absWorkingDir ?? '', result.path),
-          namespace: CSS_RESOURCE_NAMESPACE,
-        };
+        return result;
       });
-
-      build.onLoad(
-        { filter: /./, namespace: CSS_RESOURCE_NAMESPACE },
-        createCachedLoad(cache, async (args) => {
-          const resourcePath = join(build.initialOptions.absWorkingDir ?? '', args.path);
-
-          return {
-            contents: await readFile(resourcePath),
-            loader: 'file',
-            watchFiles: [resourcePath],
-          };
-        }),
-      );
     },
   };
 }
