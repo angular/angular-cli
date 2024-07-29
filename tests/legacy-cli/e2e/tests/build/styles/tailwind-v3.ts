@@ -15,7 +15,14 @@ export default async function () {
   await writeFile('src/app/app.component.css', '@tailwind base; @tailwind components;');
 
   // Add Tailwind directives to a global style
-  await writeFile('src/styles.css', '@tailwind base; @tailwind components;');
+  await writeFile(
+    'src/styles.css',
+    `
+      @import url(https://fonts.googleapis.com/css?family=Roboto:400);
+      @tailwind base;
+      @tailwind components;
+    `,
+  );
 
   // Ensure installation warning is present
   const { stderr } = await ng('build', '--configuration=development');

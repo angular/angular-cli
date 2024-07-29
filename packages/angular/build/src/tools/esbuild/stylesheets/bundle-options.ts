@@ -63,7 +63,7 @@ export function createStylesheetBundleOptions(
   ];
 
   if (options.inlineFonts) {
-    plugins.push(createCssInlineFontsPlugin({ cache, cacheOptions: options.cacheOptions }));
+    plugins.unshift(createCssInlineFontsPlugin({ cache, cacheOptions: options.cacheOptions }));
   }
 
   return {
