@@ -400,7 +400,7 @@ __metadata:
     "@babel/helper-annotate-as-pure": "npm:7.24.7"
     "@babel/helper-split-export-declaration": "npm:7.24.7"
     "@babel/plugin-syntax-import-attributes": "npm:7.24.7"
-    "@inquirer/confirm": "npm:3.1.17"
+    "@inquirer/confirm": "npm:3.1.18"
     "@vitejs/plugin-basic-ssl": "npm:1.1.0"
     browserslist: "npm:^4.23.0"
     critters: "npm:0.0.24"
@@ -667,7 +667,7 @@ __metadata:
     "@bazel/concatjs": "patch:@bazel/concatjs@npm%3A5.8.1#~/.yarn/patches/@bazel-concatjs-npm-5.8.1-1bf81df846.patch"
     "@bazel/jasmine": "patch:@bazel/jasmine@npm%3A5.8.1#~/.yarn/patches/@bazel-jasmine-npm-5.8.1-3370fee155.patch"
     "@discoveryjs/json-ext": "npm:0.6.0"
-    "@inquirer/confirm": "npm:3.1.17"
+    "@inquirer/confirm": "npm:3.1.18"
     "@inquirer/prompts": "npm:5.3.2"
     "@listr2/prompt-adapter-inquirer": "npm:2.0.14"
     "@rollup/plugin-commonjs": "npm:^26.0.0"
@@ -2974,7 +2974,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@inquirer/confirm@npm:3.1.17, @inquirer/confirm@npm:^3.1.17":
+"@inquirer/confirm@npm:3.1.18":
+  version: 3.1.18
+  resolution: "@inquirer/confirm@npm:3.1.18"
+  dependencies:
+    "@inquirer/core": "npm:^9.0.6"
+    "@inquirer/type": "npm:^1.5.1"
+  checksum: 10c0/eb2e38afbbc751678ac5d8a21e4c7439e7a3f17b4db3bcf795a0135bc0a97f7c3ba18f5390e88bd36c058cb1194c48fca8e36cc10ef0a473f0ce381eb38bfd1e
+  languageName: node
+  linkType: hard
+
+"@inquirer/confirm@npm:^3.1.17":
   version: 3.1.17
   resolution: "@inquirer/confirm@npm:3.1.17"
   dependencies:
@@ -3002,6 +3012,27 @@ __metadata:
     wrap-ansi: "npm:^6.2.0"
     yoctocolors-cjs: "npm:^2.1.2"
   checksum: 10c0/5cbf43b61213933c0704f80d867f2c854cae00f9c8b4304fa6d9332eb0d143952e65286ccc3fae48bd15095ea85486b556ae95151e7a05a87b770f1867f8257e
+  languageName: node
+  linkType: hard
+
+"@inquirer/core@npm:^9.0.6":
+  version: 9.0.6
+  resolution: "@inquirer/core@npm:9.0.6"
+  dependencies:
+    "@inquirer/figures": "npm:^1.0.5"
+    "@inquirer/type": "npm:^1.5.1"
+    "@types/mute-stream": "npm:^0.0.4"
+    "@types/node": "npm:^20.14.13"
+    "@types/wrap-ansi": "npm:^3.0.0"
+    ansi-escapes: "npm:^4.3.2"
+    cli-spinners: "npm:^2.9.2"
+    cli-width: "npm:^4.1.0"
+    mute-stream: "npm:^1.0.0"
+    signal-exit: "npm:^4.1.0"
+    strip-ansi: "npm:^6.0.1"
+    wrap-ansi: "npm:^6.2.0"
+    yoctocolors-cjs: "npm:^2.1.2"
+  checksum: 10c0/17f3c9404d174cae3a49801436a586f445be244e72fd7a4a3aafd0bb6c712f7ef01c1feb715817c588691a2691908553a1f66e023e5f4fd92e93be53be69e06b
   languageName: node
   linkType: hard
 
@@ -4905,6 +4936,15 @@ __metadata:
   dependencies:
     undici-types: "npm:~5.26.4"
   checksum: 10c0/fc078939cdec05ca60c557bff55d8d96c8e5695e925ee144d8c67efcd9717ed1ec1e18a476257f2dcc8382d1158dae22b24a423ef3cb833ff9f441a80e80c0e6
+  languageName: node
+  linkType: hard
+
+"@types/node@npm:^20.14.13":
+  version: 20.14.13
+  resolution: "@types/node@npm:20.14.13"
+  dependencies:
+    undici-types: "npm:~5.26.4"
+  checksum: 10c0/10bb3ece675308742301c652ab8c6cb88b1ebddebed22316103c58f94fe7eff131edd5f679e487c19077fadb6b5e6b1ad9a60a2cee2869aa1f20452b9761d570
   languageName: node
   linkType: hard
 
