@@ -57,7 +57,7 @@
         "packages/angular_devkit/schematics_cli/schematic/files/package.json",
         "packages/schematics/angular/utility/latest-versions/package.json"
       ],
-      "matchDepPatterns": ["*"],
+      "matchPackageNames": ["*"],
       "groupName": "schematics dependencies",
       "groupSlug": "all-schematics-dependencies",
       "lockFileMaintenance": { "enabled": false }
@@ -69,14 +69,14 @@
         "!packages/schematics/angular/utility/latest-versions/package.json"
       ],
       "excludePackagePatterns": ["^@angular/.*", "angular/dev-infra"],
-      "matchDepPatterns": ["*"],
+      "matchPackageNames": ["*"],
       "matchUpdateTypes": ["minor", "patch"],
       "groupName": "all non-major dependencies",
       "groupSlug": "all-minor-patch"
     },
     {
       "matchPaths": [".github/workflows/scorecard.yml"],
-      "matchDepPatterns": ["*"],
+      "matchPackageNames": ["*"],
       "groupName": "scorecard action dependencies",
       "groupSlug": "scorecard-action"
     }
