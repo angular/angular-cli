@@ -53,7 +53,7 @@ def link_package_json_to_tarballs(name, src, pkg_deps, out):
             name = "%s_%s_filter" % (name, i),
             srcs = srcs,
             cmd = """
-                TAR=$$(dirname $$({abs_path_sandbox} || {abs_path_nosandbox}))/npm_package_archive.tgz
+                TAR=$$({abs_path_sandbox} || {abs_path_nosandbox})/npm_package_archive.tgz
                 PKGNAME=$$(cat $(execpath {pkg_name}))
                 if [[ "$$TAR" != *bazel-out* ]]; then
                     echo "ERROR: package.json passed to substitute_tar_deps must be in the output tree. You can use copy_to_bin to copy a source file to the output tree."
