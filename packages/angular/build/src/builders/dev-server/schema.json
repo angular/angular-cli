@@ -111,5 +111,5 @@
     }
   },
   "additionalProperties": false,
-  "required": ["buildTarget"]
+  "required": []
 }

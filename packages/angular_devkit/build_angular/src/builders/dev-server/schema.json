@@ -137,6 +137,5 @@
       ]
     }
   },
-  "additionalProperties": false,
-  "anyOf": [{ "required": ["buildTarget"] }, { "required": ["browserTarget"] }]
+  "additionalProperties": false
 }

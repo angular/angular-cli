@@ -110,7 +110,7 @@ export enum BuildOutputFileType {
 
 // @public
 export interface DevServerBuilderOptions {
-    buildTarget: string;
+    buildTarget?: string;
     headers?: {
         [key: string]: string;
     };
