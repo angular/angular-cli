@@ -8,9 +8,14 @@
 
 import { BuilderContext, BuilderOutput, createBuilder } from '@angular-devkit/architect';
 import type { Plugin } from 'esbuild';
+import assert from 'node:assert';
+import fs from 'node:fs/promises';
+import path from 'node:path';
 import { BuildOutputFile, BuildOutputFileType } from '../../tools/esbuild/bundler-context';
-import { createJsonBuildManifest } from '../../tools/esbuild/utils';
+import { createJsonBuildManifest, emitFilesToDisk } from '../../tools/esbuild/utils';
 import { colors as ansiColors } from '../../utils/color';
+import { deleteOutputDir } from '../../utils/delete-output-dir';
+import { useJSONBuildLogs } from '../../utils/environment-options';
 import { purgeStaleBuildCache } from '../../utils/purge-cache';
 import { assertCompatibleAngularVersion } from '../../utils/version';
 import { runEsBuildBuildAction } from './build-action';
@@ -18,6 +23,7 @@ import { executeBuild } from './execute-build';
 import {
   ApplicationBuilderExtensions,
   ApplicationBuilderInternalOptions,
+  NormalizedOutputOptions,
   normalizeOptions,
 } from './options';
 import { Result, ResultKind } from './results';
@@ -29,9 +35,6 @@ export async function* buildApplicationInternal(
   options: ApplicationBuilderInternalOptions,
   // TODO: Integrate abort signal support into builder system
   context: BuilderContext & { signal?: AbortSignal },
-  infrastructureSettings?: {
-    write?: boolean;
-  },
   extensions?: ApplicationBuilderExtensions,
 ): AsyncIterable<Result> {
   const { workspaceRoot, logger, target } = context;
@@ -53,11 +56,8 @@ export async function* buildApplicationInternal(
   }
 
   const normalizedOptions = await normalizeOptions(context, projectName, options, extensions);
-  const writeToFileSystem = infrastructureSettings?.write ?? true;
-  const writeServerBundles =
-    writeToFileSystem && !!(normalizedOptions.ssrOptions && normalizedOptions.serverEntryPoint);
 
-  if (writeServerBundles) {
+  if (!normalizedOptions.outputOptions.ignoreServer) {
     const { browser, server } = normalizedOptions.outputOptions;
     if (browser === '') {
       context.logger.error(
@@ -88,7 +88,7 @@ export async function* buildApplicationInternal(
 
   yield* runEsBuildBuildAction(
     async (rebuildState) => {
-      const { prerenderOptions, outputOptions, jsonLogs } = normalizedOptions;
+      const { prerenderOptions, jsonLogs } = normalizedOptions;
 
       const startTime = process.hrtime.bigint();
       const result = await executeBuild(normalizedOptions, context, rebuildState);
@@ -106,9 +106,6 @@ export async function* buildApplicationInternal(
 
         const buildTime = Number(process.hrtime.bigint() - startTime) / 10 ** 9;
         const hasError = result.errors.length > 0;
-        if (writeToFileSystem && !hasError) {
-          result.addLog(`Output location: ${outputOptions.base}\n`);
-        }
 
         result.addLog(
           `Application bundle generation ${hasError ? 'failed' : 'complete'}. [${buildTime.toFixed(3)} seconds]\n`,
@@ -121,7 +118,6 @@ export async function* buildApplicationInternal(
       watch: normalizedOptions.watch,
       preserveSymlinks: normalizedOptions.preserveSymlinks,
       poll: normalizedOptions.poll,
-      deleteOutputPath: normalizedOptions.deleteOutputPath,
       cacheOptions: normalizedOptions.cacheOptions,
       outputOptions: normalizedOptions.outputOptions,
       verbose: normalizedOptions.verbose,
@@ -131,12 +127,6 @@ export async function* buildApplicationInternal(
       clearScreen: normalizedOptions.clearScreen,
       colors: normalizedOptions.colors,
       jsonLogs: normalizedOptions.jsonLogs,
-      writeToFileSystem,
-      // For app-shell and SSG server files are not required by users.
-      // Omit these when SSR is not enabled.
-      writeToFileSystemFilter: writeServerBundles
-        ? undefined
-        : (file) => file.type !== BuildOutputFileType.Server,
       logger,
       signal,
     },
@@ -202,8 +192,80 @@ export async function* buildApplication(
     extensions = pluginsOrExtensions;
   }
 
-  for await (const result of buildApplicationInternal(options, context, undefined, extensions)) {
-    yield { success: result.kind !== ResultKind.Failure };
+  let initial = true;
+  for await (const result of buildApplicationInternal(options, context, extensions)) {
+    const outputOptions = result.detail?.['outputOptions'] as NormalizedOutputOptions | undefined;
+
+    if (initial) {
+      initial = false;
+
+      // Clean the output location if requested.
+      // Output options may not be present if the build failed.
+      if (outputOptions?.clean) {
+        await deleteOutputDir(context.workspaceRoot, outputOptions.base, [
+          outputOptions.browser,
+          outputOptions.server,
+        ]);
+      }
+    }
+
+    if (result.kind === ResultKind.Failure) {
+      yield { success: false };
+      continue;
+    }
+
+    assert(outputOptions, 'Application output options are required for builder usage.');
+    assert(result.kind === ResultKind.Full, 'Application build did not provide a full output.');
+
+    // TODO: Restructure output logging to better handle stdout JSON piping
+    if (!useJSONBuildLogs) {
+      context.logger.info(`Output location: ${outputOptions.base}\n`);
+    }
+
+    // Writes the output files to disk and ensures the containing directories are present
+    const directoryExists = new Set<string>();
+    await emitFilesToDisk(Object.entries(result.files), async ([filePath, file]) => {
+      if (outputOptions.ignoreServer && file.type === BuildOutputFileType.Server) {
+        return;
+      }
+
+      let typeDirectory: string;
+      switch (file.type) {
+        case BuildOutputFileType.Browser:
+        case BuildOutputFileType.Media:
+          typeDirectory = outputOptions.browser;
+          break;
+        case BuildOutputFileType.Server:
+          typeDirectory = outputOptions.server;
+          break;
+        case BuildOutputFileType.Root:
+          typeDirectory = '';
+          break;
+        default:
+          throw new Error(
+            `Unhandled write for file "${filePath}" with type "${BuildOutputFileType[file.type]}".`,
+          );
+      }
+      // NOTE: 'base' is a fully resolved path at this point
+      const fullFilePath = path.join(outputOptions.base, typeDirectory, filePath);
+
+      // Ensure output subdirectories exist
+      const fileBasePath = path.dirname(fullFilePath);
+      if (fileBasePath && !directoryExists.has(fileBasePath)) {
+        await fs.mkdir(fileBasePath, { recursive: true });
+        directoryExists.add(fileBasePath);
+      }
+
+      if (file.origin === 'memory') {
+        // Write file contents
+        await fs.writeFile(fullFilePath, file.contents);
+      } else {
+        // Copy file contents
+        await fs.copyFile(file.inputPath, fullFilePath, fs.constants.COPYFILE_FICLONE);
+      }
+    });
+
+    yield { success: true };
   }
 }
 

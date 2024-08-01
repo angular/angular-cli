@@ -96,7 +96,7 @@ export function execute(
                 return builderName === '@angular-devkit/build-angular:browser-esbuild'
                   ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     buildEsbuildBrowser(options as any, context, { write: false }, codePlugins)
-                  : buildApplicationInternal(options, context, { write: false }, { codePlugins });
+                  : buildApplicationInternal(options, context, { codePlugins });
               },
               context,
               transforms,

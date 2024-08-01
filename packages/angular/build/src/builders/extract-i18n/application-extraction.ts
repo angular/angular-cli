@@ -49,9 +49,7 @@ export async function extractMessages(
   buildOptions.prerender = false;
 
   // Build the application with the build options
-  const builderResult = await first(
-    buildApplicationInternal(buildOptions, context, { write: false }, extensions),
-  );
+  const builderResult = await first(buildApplicationInternal(buildOptions, context, extensions));
 
   let success = false;
   if (!builderResult || builderResult.kind === ResultKind.Failure) {

@@ -67,7 +67,7 @@ export async function* execute(
     normalizedOptions,
     builderName,
     (options, context, plugins) =>
-      buildApplicationInternal(options, context, { write: false }, { codePlugins: plugins }),
+      buildApplicationInternal(options, context, { codePlugins: plugins }),
     context,
     { indexHtml: extensions?.indexHtmlTransformer },
     extensions,

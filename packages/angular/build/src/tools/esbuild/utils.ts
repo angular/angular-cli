@@ -220,62 +220,6 @@ export function getFeatureSupport(
   return supported;
 }
 
-export async function writeResultFiles(
-  outputFiles: BuildOutputFile[],
-  assetFiles: BuildOutputAsset[] | undefined,
-  { base, browser, server }: NormalizedOutputOptions,
-) {
-  const directoryExists = new Set<string>();
-  const ensureDirectoryExists = async (destPath: string) => {
-    const basePath = dirname(destPath);
-    if (!directoryExists.has(basePath)) {
-      await fs.mkdir(join(base, basePath), { recursive: true });
-      directoryExists.add(basePath);
-    }
-  };
-
-  // Writes the output file to disk and ensures the containing directories are present
-  await emitFilesToDisk(outputFiles, async (file: BuildOutputFile) => {
-    let outputDir: string;
-    switch (file.type) {
-      case BuildOutputFileType.Browser:
-      case BuildOutputFileType.Media:
-        outputDir = browser;
-        break;
-      case BuildOutputFileType.Server:
-        outputDir = server;
-        break;
-      case BuildOutputFileType.Root:
-        outputDir = '';
-        break;
-      default:
-        throw new Error(
-          `Unhandled write for file "${file.path}" with type "${BuildOutputFileType[file.type]}".`,
-        );
-    }
-
-    const destPath = join(outputDir, file.path);
-
-    // Ensure output subdirectories exist
-    await ensureDirectoryExists(destPath);
-
-    // Write file contents
-    await fs.writeFile(join(base, destPath), file.contents);
-  });
-
-  if (assetFiles?.length) {
-    await emitFilesToDisk(assetFiles, async ({ source, destination }) => {
-      const destPath = join(browser, destination);
-
-      // Ensure output subdirectories exist
-      await ensureDirectoryExists(destPath);
-
-      // Copy file contents
-      await fs.copyFile(source, join(base, destPath), fsConstants.COPYFILE_FICLONE);
-    });
-  }
-}
-
 const MAX_CONCURRENT_WRITES = 64;
 export async function emitFilesToDisk<T = BuildOutputAsset | BuildOutputFile>(
   files: T[],
