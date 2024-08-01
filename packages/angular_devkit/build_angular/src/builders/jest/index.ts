@@ -97,7 +97,6 @@ export default createBuilder(
           },
         },
         context,
-        { write: false },
       ),
     );
     if (buildResult.kind === ResultKind.Failure) {

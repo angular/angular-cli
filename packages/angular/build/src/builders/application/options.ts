@@ -31,7 +31,10 @@ import {
   OutputPathClass,
 } from './schema';
 
-export type NormalizedOutputOptions = Required<OutputPathClass>;
+export type NormalizedOutputOptions = Required<OutputPathClass> & {
+  clean: boolean;
+  ignoreServer: boolean;
+};
 export type NormalizedApplicationBuildOptions = Awaited<ReturnType<typeof normalizeOptions>>;
 
 export interface ApplicationBuilderExtensions {
@@ -133,29 +136,6 @@ export async function normalizeOptions(
     ? normalizeAssetPatterns(options.assets, workspaceRoot, projectRoot, projectSourceRoot)
     : undefined;
 
-  const outputPath = options.outputPath;
-  const outputOptions: NormalizedOutputOptions = {
-    browser: 'browser',
-    server: 'server',
-    media: 'media',
-    ...(typeof outputPath === 'string' ? undefined : outputPath),
-    base: normalizeDirectoryPath(
-      path.resolve(workspaceRoot, typeof outputPath === 'string' ? outputPath : outputPath.base),
-    ),
-  };
-
-  const outputNames = {
-    bundles:
-      options.outputHashing === OutputHashing.All || options.outputHashing === OutputHashing.Bundles
-        ? '[name]-[hash]'
-        : '[name]',
-    media:
-      outputOptions.media +
-      (options.outputHashing === OutputHashing.All || options.outputHashing === OutputHashing.Media
-        ? '/[name]-[hash]'
-        : '/[name]'),
-  };
-
   let fileReplacements: Record<string, string> | undefined;
   if (options.fileReplacements) {
     for (const replacement of options.fileReplacements) {
@@ -230,6 +210,33 @@ export async function normalizeOptions(
     };
   }
 
+  const outputPath = options.outputPath;
+  const outputOptions: NormalizedOutputOptions = {
+    browser: 'browser',
+    server: 'server',
+    media: 'media',
+    ...(typeof outputPath === 'string' ? undefined : outputPath),
+    base: normalizeDirectoryPath(
+      path.resolve(workspaceRoot, typeof outputPath === 'string' ? outputPath : outputPath.base),
+    ),
+    clean: options.deleteOutputPath ?? true,
+    // For app-shell and SSG server files are not required by users.
+    // Omit these when SSR is not enabled.
+    ignoreServer: ssrOptions === undefined || serverEntryPoint === undefined,
+  };
+
+  const outputNames = {
+    bundles:
+      options.outputHashing === OutputHashing.All || options.outputHashing === OutputHashing.Bundles
+        ? '[name]-[hash]'
+        : '[name]',
+    media:
+      outputOptions.media +
+      (options.outputHashing === OutputHashing.All || options.outputHashing === OutputHashing.Media
+        ? '/[name]-[hash]'
+        : '/[name]'),
+  };
+
   const globalStyles = normalizeGlobalEntries(options.styles, 'styles');
   const globalScripts = normalizeGlobalEntries(options.scripts, 'scripts');
   let indexHtmlOptions;
@@ -303,7 +310,6 @@ export async function normalizeOptions(
     watch,
     progress = true,
     externalPackages,
-    deleteOutputPath,
     namedChunks,
     budgets,
     deployUrl,
@@ -318,7 +324,6 @@ export async function normalizeOptions(
     baseHref,
     cacheOptions,
     crossOrigin,
-    deleteOutputPath,
     externalDependencies,
     extractLicenses,
     inlineStyleLanguage,

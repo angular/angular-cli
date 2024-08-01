@@ -116,7 +116,6 @@ async function buildTests(
         polyfills,
       },
       ctx,
-      { write: false },
     ),
   );
 

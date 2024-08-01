@@ -9,16 +9,10 @@
 import { BuilderContext } from '@angular-devkit/architect';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
-import { BuildOutputFile, BuildOutputFileType } from '../../tools/esbuild/bundler-context';
+import { BuildOutputFileType } from '../../tools/esbuild/bundler-context';
 import { ExecutionResult, RebuildState } from '../../tools/esbuild/bundler-execution-result';
 import { shutdownSassWorkerPool } from '../../tools/esbuild/stylesheets/sass-language';
-import {
-  logMessages,
-  withNoProgress,
-  withSpinner,
-  writeResultFiles,
-} from '../../tools/esbuild/utils';
-import { deleteOutputDir } from '../../utils/delete-output-dir';
+import { logMessages, withNoProgress, withSpinner } from '../../tools/esbuild/utils';
 import { shouldWatchRoot } from '../../utils/environment-options';
 import { NormalizedCachedOptions } from '../../utils/normalize-cache';
 import { NormalizedApplicationBuildOptions, NormalizedOutputOptions } from './options';
@@ -46,12 +40,9 @@ export async function* runEsBuildBuildAction(
     outputOptions: NormalizedOutputOptions;
     logger: BuilderContext['logger'];
     cacheOptions: NormalizedCachedOptions;
-    writeToFileSystem: boolean;
-    writeToFileSystemFilter: ((file: BuildOutputFile) => boolean) | undefined;
     watch?: boolean;
     verbose?: boolean;
     progress?: boolean;
-    deleteOutputPath?: boolean;
     poll?: number;
     signal?: AbortSignal;
     preserveSymlinks?: boolean;
@@ -61,13 +52,10 @@ export async function* runEsBuildBuildAction(
   },
 ): AsyncIterable<Result> {
   const {
-    writeToFileSystemFilter,
-    writeToFileSystem,
     watch,
     poll,
     clearScreen,
     logger,
-    deleteOutputPath,
     cacheOptions,
     outputOptions,
     verbose,
@@ -78,13 +66,6 @@ export async function* runEsBuildBuildAction(
     colors,
     jsonLogs,
   } = options;
-
-  if (deleteOutputPath && writeToFileSystem) {
-    await deleteOutputDir(workspaceRoot, outputOptions.base, [
-      outputOptions.browser,
-      outputOptions.server,
-    ]);
-  }
 
   const withProgress: typeof withSpinner = progress ? withSpinner : withNoProgress;
 
@@ -154,7 +135,7 @@ export async function* runEsBuildBuildAction(
   // Output the first build results after setting up the watcher to ensure that any code executed
   // higher in the iterator call stack will trigger the watcher. This is particularly relevant for
   // unit tests which execute the builder and modify the file system programmatically.
-  yield await writeAndEmitOutput(writeToFileSystem, result, outputOptions, writeToFileSystemFilter);
+  yield await emitOutputResult(result, outputOptions);
 
   // Finish if watch mode is not enabled
   if (!watcher) {
@@ -207,12 +188,7 @@ export async function* runEsBuildBuildAction(
         watcher.remove([...staleWatchFiles]);
       }
 
-      yield await writeAndEmitOutput(
-        writeToFileSystem,
-        result,
-        outputOptions,
-        writeToFileSystemFilter,
-      );
+      yield await emitOutputResult(result, outputOptions);
     }
   } finally {
     // Stop the watcher and cleanup incremental rebuild state
@@ -222,65 +198,55 @@ export async function* runEsBuildBuildAction(
   }
 }
 
-async function writeAndEmitOutput(
-  writeToFileSystem: boolean,
+async function emitOutputResult(
   {
     outputFiles,
-    outputWithFiles,
     assetFiles,
+    errors,
+    warnings,
     externalMetadata,
     htmlIndexPath,
     htmlBaseHref,
   }: ExecutionResult,
   outputOptions: NormalizedApplicationBuildOptions['outputOptions'],
-  writeToFileSystemFilter: ((file: BuildOutputFile) => boolean) | undefined,
 ): Promise<Result> {
-  if (!outputWithFiles.success) {
+  if (errors.length > 0) {
     return {
       kind: ResultKind.Failure,
-      errors: outputWithFiles.errors as ResultMessage[],
-    };
-  }
-
-  if (writeToFileSystem) {
-    // Write output files
-    const outputFilesToWrite = writeToFileSystemFilter
-      ? outputFiles.filter(writeToFileSystemFilter)
-      : outputFiles;
-
-    await writeResultFiles(outputFilesToWrite, assetFiles, outputOptions);
-
-    // Currently unused other than indicating success if writing to disk.
-    return {
-      kind: ResultKind.Full,
-      files: {},
-    };
-  } else {
-    const result: FullResult = {
-      kind: ResultKind.Full,
-      files: {},
+      errors: errors as ResultMessage[],
+      warnings: warnings as ResultMessage[],
       detail: {
-        externalMetadata,
-        htmlIndexPath,
-        htmlBaseHref,
+        outputOptions,
       },
     };
-    for (const file of outputWithFiles.assetFiles) {
-      result.files[file.destination] = {
-        type: BuildOutputFileType.Browser,
-        inputPath: file.source,
-        origin: 'disk',
-      };
-    }
-    for (const file of outputWithFiles.outputFiles) {
-      result.files[file.path] = {
-        type: file.type,
-        contents: file.contents,
-        origin: 'memory',
-        hash: file.hash,
-      };
-    }
-
-    return result;
   }
+
+  const result: FullResult = {
+    kind: ResultKind.Full,
+    warnings: warnings as ResultMessage[],
+    files: {},
+    detail: {
+      externalMetadata,
+      htmlIndexPath,
+      htmlBaseHref,
+      outputOptions,
+    },
+  };
+  for (const file of assetFiles) {
+    result.files[file.destination] = {
+      type: BuildOutputFileType.Browser,
+      inputPath: file.source,
+      origin: 'disk',
+    };
+  }
+  for (const file of outputFiles) {
+    result.files[file.path] = {
+      type: file.type,
+      contents: file.contents,
+      origin: 'memory',
+      hash: file.hash,
+    };
+  }
+
+  return result;
 }

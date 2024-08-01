@@ -51,9 +51,6 @@ export async function* buildEsbuildBrowser(
   for await (const result of buildApplicationInternal(
     normalizedOptions,
     context,
-    {
-      write: false,
-    },
     plugins && { codePlugins: plugins },
   )) {
     // Write the file directly from this builder to maintain webpack output compatibility
