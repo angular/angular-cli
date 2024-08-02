@@ -6,18 +6,17 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import {
-  ApplicationBuilderInternalOptions,
-  buildApplicationInternal,
-} from '@angular/build/private';
+import { ResultKind, buildApplicationInternal } from '@angular/build/private';
 import { BuilderContext, BuilderOutput, createBuilder } from '@angular-devkit/architect';
 import { execFile as execFileCb } from 'node:child_process';
+import { randomUUID } from 'node:crypto';
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { promisify } from 'node:util';
 import { colors } from '../../utils/color';
 import { findTestFiles } from '../../utils/test-files';
 import { OutputHashing } from '../browser-esbuild/schema';
+import { writeTestFiles } from '../web-test-runner/write-test-files';
 import { normalizeOptions } from './options';
 import { Schema as JestBuilderSchema } from './schema';
 
@@ -31,7 +30,7 @@ export default createBuilder(
     );
 
     const options = normalizeOptions(schema);
-    const testOut = 'dist/test-out'; // TODO(dgp1130): Hide in temp directory.
+    const testOut = path.join(context.workspaceRoot, 'dist/test-out', randomUUID()); // TODO(dgp1130): Hide in temp directory.
 
     // Verify Jest installation and get the path to it's binary.
     // We need to `node_modules/.bin/jest`, but there is no means to resolve that directly. Fortunately Jest's `package.json` exports the
@@ -78,33 +77,47 @@ export default createBuilder(
     // Build all the test files.
     const jestGlobal = path.join(__dirname, 'jest-global.mjs');
     const initTestBed = path.join(__dirname, 'init-test-bed.mjs');
-    const buildResult = await build(context, {
-      // Build all the test files and also the `jest-global` and `init-test-bed` scripts.
-      entryPoints: new Set([...testFiles, jestGlobal, initTestBed]),
-      tsConfig: options.tsConfig,
-      polyfills: options.polyfills ?? ['zone.js', 'zone.js/testing'],
-      outputPath: testOut,
-      aot: false,
-      index: false,
-      outputHashing: OutputHashing.None,
-      outExtension: 'mjs', // Force native ESM.
-      optimization: false,
-      sourceMap: {
-        scripts: true,
-        styles: false,
-        vendor: false,
-      },
-    });
-    if (!buildResult.success) {
-      return buildResult;
+    const buildResult = await first(
+      buildApplicationInternal(
+        {
+          // Build all the test files and also the `jest-global` and `init-test-bed` scripts.
+          entryPoints: new Set([...testFiles, jestGlobal, initTestBed]),
+          tsConfig: options.tsConfig,
+          polyfills: options.polyfills ?? ['zone.js', 'zone.js/testing'],
+          outputPath: testOut,
+          aot: false,
+          index: false,
+          outputHashing: OutputHashing.None,
+          outExtension: 'mjs', // Force native ESM.
+          optimization: false,
+          sourceMap: {
+            scripts: true,
+            styles: false,
+            vendor: false,
+          },
+        },
+        context,
+        { write: false },
+      ),
+    );
+    if (buildResult.kind === ResultKind.Failure) {
+      return { success: false };
+    } else if (buildResult.kind !== ResultKind.Full) {
+      return {
+        success: false,
+        error: 'A full build result is required from the application builder.',
+      };
     }
+
+    // Write test files
+    await writeTestFiles(buildResult.files, testOut);
 
     // Execute Jest on the built output directory.
     const jestProc = execFile(process.execPath, [
       '--experimental-vm-modules',
       jest,
 
-      `--rootDir="${path.join(testOut, 'browser')}"`,
+      `--rootDir="${testOut}"`,
       `--config=${path.join(__dirname, 'jest.config.mjs')}`,
       '--testEnvironment=jsdom',
 
@@ -157,22 +170,13 @@ export default createBuilder(
   },
 );
 
-async function build(
-  context: BuilderContext,
-  options: ApplicationBuilderInternalOptions,
-): Promise<BuilderOutput> {
-  try {
-    for await (const _ of buildApplicationInternal(options, context)) {
-      // Nothing to do for each event, just wait for the whole build.
-    }
-
-    return { success: true };
-  } catch (err) {
-    return {
-      success: false,
-      error: (err as Error).message,
-    };
+/** Returns the first item yielded by the given generator and cancels the execution. */
+async function first<T>(generator: AsyncIterable<T>): Promise<T> {
+  for await (const value of generator) {
+    return value;
   }
+
+  throw new Error('Expected generator to emit at least once.');
 }
 
 /** Safely resolves the given Node module string. */
