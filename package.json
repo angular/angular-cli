@@ -113,7 +113,7 @@
     "@types/yargs-parser": "^21.0.0",
     "@types/yarnpkg__lockfile": "^1.1.5",
     "@typescript-eslint/eslint-plugin": "7.18.0",
-    "@typescript-eslint/parser": "7.18.0",
+    "@typescript-eslint/parser": "8.0.1",
     "@vitejs/plugin-basic-ssl": "1.1.0",
     "@web/test-runner": "^0.18.0",
     "@yarnpkg/lockfile": "1.1.0",
