@@ -284,7 +284,7 @@ export function createCompilerPlugin(
             location: null,
             notes: [
               {
-                text: error instanceof Error ? error.stack ?? error.message : `${error}`,
+                text: error instanceof Error ? (error.stack ?? error.message) : `${error}`,
                 location: null,
               },
             ],
@@ -315,7 +315,7 @@ export function createCompilerPlugin(
             location: null,
             notes: [
               {
-                text: error instanceof Error ? error.stack ?? error.message : `${error}`,
+                text: error instanceof Error ? (error.stack ?? error.message) : `${error}`,
                 location: null,
               },
             ],
@@ -537,9 +537,12 @@ function createCompilerOptionsTransformer(
       compilerOptions.compilationMode = 'full';
     }
 
-    // Enable incremental compilation by default if caching is enabled
-    if (pluginOptions.sourceFileCache?.persistentCachePath) {
-      compilerOptions.incremental ??= true;
+    // Enable incremental compilation by default if caching is enabled and incremental is not explicitly disabled
+    if (
+      compilerOptions.incremental !== false &&
+      pluginOptions.sourceFileCache?.persistentCachePath
+    ) {
+      compilerOptions.incremental = true;
       // Set the build info file location to the configured cache directory
       compilerOptions.tsBuildInfoFile = path.join(
         pluginOptions.sourceFileCache?.persistentCachePath,
