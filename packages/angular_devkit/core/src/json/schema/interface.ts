@@ -72,6 +72,7 @@ export type PromptProvider = (
 ) => ObservableInput<{ [id: string]: JsonValue }>;
 
 export interface SchemaRegistry {
+  // eslint-disable-next-line @typescript-eslint/no-wrapper-object-types
   compile(schema: Object): Promise<SchemaValidator>;
 
   /** @private */
