@@ -115,7 +115,12 @@
     "@typescript-eslint/unbound-method": "off",
     "@typescript-eslint/no-unsafe-enum-comparison": "off",
     "@typescript-eslint/no-redundant-type-constituents": "off",
-    "@typescript-eslint/no-base-to-string": "off"
+    "@typescript-eslint/no-base-to-string": "off",
+    "@typescript-eslint/no-empty-object-type": "off",
+    "@typescript-eslint/no-require-imports": "off",
+    "@typescript-eslint/prefer-promise-reject-errors": "off",
+    "@typescript-eslint/only-throw-error": "off",
+    "@typescript-eslint/no-unsafe-function-type": "off"
   },
   "overrides": [
     {

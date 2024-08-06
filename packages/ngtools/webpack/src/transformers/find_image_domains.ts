@@ -20,7 +20,7 @@ const URL_REGEX = /(https?:\/\/[^/]*)\//g;
 export function findImageDomains(imageDomains: Set<string>): ts.TransformerFactory<ts.SourceFile> {
   return (context: ts.TransformationContext) => {
     return (sourceFile: ts.SourceFile) => {
-      const isBuiltinImageLoader = (node: ts.CallExpression): Boolean => {
+      const isBuiltinImageLoader = (node: ts.CallExpression): boolean => {
         return BUILTIN_LOADERS.has(node.expression.getText());
       };
 
@@ -115,7 +115,7 @@ export function findImageDomains(imageDomains: Set<string>): ts.TransformerFacto
         return node;
       }
 
-      function isProvidersFeatureElement(node: ts.Node): Boolean {
+      function isProvidersFeatureElement(node: ts.Node): boolean {
         return (
           ts.isCallExpression(node) &&
           ts.isPropertyAccessExpression(node.expression) &&

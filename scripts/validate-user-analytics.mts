@@ -67,7 +67,7 @@ async function _checkDimensions(dimensionsTable: string) {
   const eventCustomDimensionValues = new Set(Object.values(EventCustomDimension));
 
   console.info('Gathering options for user-analytics...');
-  const schemaUserAnalyticsValidator = (obj: Object) => {
+  const schemaUserAnalyticsValidator = (obj: object) => {
     for (const value of Object.values(obj)) {
       if (value && typeof value === 'object') {
         const userAnalytics = value['x-user-analytics'];
