@@ -24,6 +24,13 @@ interface PackageJson {
   'ng-add'?: {
     save?: NgAddSaveDependency;
   };
+  installConfig?: {
+    pnp?: boolean;
+  };
+}
+
+interface YarnPnp {
+  resolveRequest: (request: string, issuer: string) => string | null;
 }
 
 function getAllDependencies(pkg: PackageJson): Set<[string, string]> {
@@ -50,7 +57,21 @@ export async function readPackageJson(packageJsonPath: string): Promise<PackageJ
   }
 }
 
-export function findPackageJson(workspaceDir: string, packageName: string): string | undefined {
+export function findPackageJson(
+  workspaceDir: string,
+  packageName: string,
+  usingPnP = false,
+): string | undefined {
+  if (usingPnP) {
+    if (fs.existsSync(join(workspaceDir, '.pnp.js'))) {
+      const pnp: YarnPnp = require(join(workspaceDir, '.pnp.js'));
+      const packageJsonPath = pnp.resolveRequest(`${packageName}/package.json`, workspaceDir);
+
+      return packageJsonPath ?? undefined;
+    } else {
+      throw new Error("Could not find .pnp.js of Yarn Plug'n'Play");
+    }
+  }
   try {
     // avoid require.resolve here, see: https://github.com/angular/angular-cli/pull/18610#issuecomment-681980185
     const packageJsonPath = resolve.sync(`${packageName}/package.json`, { basedir: workspaceDir });
@@ -66,10 +87,10 @@ export async function getProjectDependencies(dir: string): Promise<Map<string, P
   if (!pkg) {
     throw new Error('Could not find package.json');
   }
-
+  const usingPnP = !!pkg.installConfig?.pnp;
   const results = new Map<string, PackageTreeNode>();
   for (const [name, version] of getAllDependencies(pkg)) {
-    const packageJsonPath = findPackageJson(dir, name);
+    const packageJsonPath = findPackageJson(dir, name, usingPnP);
     if (!packageJsonPath) {
       continue;
     }
