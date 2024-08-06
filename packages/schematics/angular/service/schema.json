@@ -8,7 +8,7 @@
   "properties": {
     "name": {
       "type": "string",
-      "description": "The name of the service.",
+      "description": "The name of the service. The CLI creates a service and spec files, the files are generated inside src folder if path is not provided.",
       "$default": {
         "$source": "argv",
         "index": 0
