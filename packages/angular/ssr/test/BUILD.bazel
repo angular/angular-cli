@@ -1,0 +1,54 @@
+load("@npm//@angular/build-tooling/bazel/spec-bundling:index.bzl", "spec_bundle")
+load("@npm//@bazel/jasmine:index.bzl", "jasmine_node_test")
+load("//tools:defaults.bzl", "ts_library")
+
+ESM_TESTS = [
+    "app_spec.ts",
+    "app-engine_spec.ts",
+]
+
+ts_library(
+    name = "unit_test_lib",
+    testonly = True,
+    srcs = glob(
+        include = ["**/*_spec.ts"],
+        exclude = ESM_TESTS,
+    ),
+    deps = [
+        "//packages/angular/ssr",
+    ],
+)
+
+ts_library(
+    name = "unit_test_with_esm_deps_lib",
+    testonly = True,
+    srcs = ESM_TESTS + ["testing-utils.ts"],
+    deps = [
+        "//packages/angular/ssr",
+        "@npm//@angular/common",
+        "@npm//@angular/compiler",
+        "@npm//@angular/core",
+        "@npm//@angular/platform-browser",
+        "@npm//@angular/platform-server",
+        "@npm//@angular/router",
+        "@npm//zone.js",
+    ],
+)
+
+spec_bundle(
+    name = "unit_test_with_esm_deps_lib_bundled",
+    downlevel_async_await = False,
+    platform = "node",
+    run_angular_linker = False,
+    deps = [
+        ":unit_test_with_esm_deps_lib",
+    ],
+)
+
+jasmine_node_test(
+    name = "test",
+    deps = [
+        ":unit_test_lib",
+        ":unit_test_with_esm_deps_lib_bundled",
+    ],
+)
