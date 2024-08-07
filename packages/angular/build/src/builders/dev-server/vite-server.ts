@@ -10,7 +10,6 @@ import type { BuilderContext } from '@angular-devkit/architect';
 import type { Plugin } from 'esbuild';
 import assert from 'node:assert';
 import { readFile } from 'node:fs/promises';
-import inspector from 'node:inspector';
 import { builtinModules } from 'node:module';
 import { join } from 'node:path';
 import type { Connect, DepOptimizationConfig, InlineConfig, ViteDevServer } from 'vite';
@@ -275,6 +274,7 @@ export async function* serveWithVite(
 
       if (browserOptions.ssr && serverOptions.inspect) {
         const { host, port } = serverOptions.inspect as { host?: string; port?: number };
+        const { default: inspector } = await import('node:inspector');
         inspector.open(port, host, true);
         context.addTeardown(() => inspector.close());
       }
