@@ -1,3 +1,16 @@
+<a name="18.1.4"></a>
+
+# 18.1.4 (2024-08-07)
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                            |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------ |
+| [f8b092711](https://github.com/angular/angular-cli/commit/f8b092711481a5754ea93bce65d706d261873810) | fix  | allow explicitly disabling TypeScript incremental mode |
+| [f3a5970fc](https://github.com/angular/angular-cli/commit/f3a5970fca0a196b1ac905306257d65bab3b1325) | fix  | lazy load Node.js inspector for dev server             |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="18.1.3"></a>
 
 # 18.1.3 (2024-07-31)
