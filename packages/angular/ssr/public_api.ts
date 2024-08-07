@@ -10,4 +10,9 @@ export {
   CommonEngine,
   type CommonEngineRenderOptions,
   type CommonEngineOptions,
-} from './src/common-engine';
+} from './src/common-engine/common-engine';
+
+// TODO(alanagius): enable at a later stage
+// export { AngularAppEngine } from './src/app-engine';
+// export { AngularServerApp } from './src/app';
+// export { REQUEST, REQUEST_CONTEXT, RESPONSE_INIT } from './src/tokens';

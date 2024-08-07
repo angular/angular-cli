@@ -1,0 +1,46 @@
+diff --git a/bazel/spec-bundling/esbuild.config-tmpl.mjs b/bazel/spec-bundling/esbuild.config-tmpl.mjs
+index b7c0e373287a5a969a7de7362949e2bb082090db..642bbd9a17a0dd8d602746fc3db42fba0e1625a2 100644
+--- a/bazel/spec-bundling/esbuild.config-tmpl.mjs
++++ b/bazel/spec-bundling/esbuild.config-tmpl.mjs
+@@ -6,8 +6,6 @@
+  * found in the LICENSE file at https://angular.io/license
+  */
+ 
+-import {createEsbuildAngularOptimizePlugin} from '@angular/build-tooling/shared-scripts/angular-optimization/esbuild-plugin.mjs';
+-
+ // List of supported features as per ESBuild. See:
+ // https://esbuild.github.io/api/#supported.
+ const supported = {};
+@@ -35,20 +33,4 @@ export default {
+   // https://esbuild.github.io/api/#keep-names.
+   keepNames: true,
+   supported,
+-  plugins: [
+-    await createEsbuildAngularOptimizePlugin({
+-      optimize: undefined,
+-      downlevelAsyncGeneratorsIfPresent: downlevelAsyncAwait,
+-      enableLinker: TMPL_RUN_LINKER
+-        ? {
+-            ensureNoPartialDeclaration: true,
+-            linkerOptions: {
+-              // JIT mode is needed for tests overriding components/modules etc.
+-              linkerJitMode: true,
+-              unknownDeclarationVersionHandling: TMPL_LINKER_UNKNOWN_DECLARATION_HANDLING,
+-            },
+-          }
+-        : undefined,
+-    }),
+-  ],
+ };
+diff --git a/bazel/spec-bundling/spec-bundle.bzl b/bazel/spec-bundling/spec-bundle.bzl
+index f057d94cefb98100eba7d2c04b82578a80594a11..ea4e677df69c0cd4c672658bff42af00a77d5bf5 100644
+--- a/bazel/spec-bundling/spec-bundle.bzl
++++ b/bazel/spec-bundling/spec-bundle.bzl
+@@ -64,7 +64,6 @@ def spec_bundle(
+         name = "%s_config" % name,
+         config_file = ":%s_config_file" % name,
+         testonly = True,
+-        deps = ["@npm//@angular/build-tooling/shared-scripts/angular-optimization:js_lib"],
+     )
+ 
+     if is_browser_test and not workspace_name:

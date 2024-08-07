@@ -14,11 +14,19 @@
   },
   "dependencies": {
     "critters": "0.0.24",
+    "mrmime": "2.0.0",
     "tslib": "^2.3.0"
   },
   "peerDependencies": {
     "@angular/common": "^18.0.0 || ^18.2.0-next.0",
     "@angular/core": "^18.0.0 || ^18.2.0-next.0"
+  },
+  "devDependencies": {
+    "@angular/compiler": "18.2.0-next.2",
+    "@angular/platform-browser": "18.2.0-next.2",
+    "@angular/platform-server": "18.2.0-next.2",
+    "@angular/router": "18.2.0-next.2",
+    "zone.js": "^0.14.0"
   },
   "schematics": "./schematics/collection.json",
   "repository": {
