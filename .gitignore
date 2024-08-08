@@ -54,6 +54,7 @@ yarn-error.log*
 .husky/_
 .bazelrc.user
 .eslintcache
+.cache/
 
 # Mac OSX Finder files.
 **/.DS_Store

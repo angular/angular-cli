@@ -59,6 +59,11 @@ copy_to_bin(
     ],
 )
 
+copy_to_bin(
+    name = "puppeteer_browsers",
+    srcs = [".puppeteerrc.cjs"] + glob([".cache/puppeteer/**"]),
+)
+
 # Detect if the build is running under --stamp
 config_setting(
     name = "stamp",
