@@ -6,9 +6,11 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
+import { ServerAssets } from './assets';
 import { Hooks } from './hooks';
 import { getAngularAppManifest } from './manifest';
 import { ServerRenderContext, render } from './render';
+import { ServerRouter } from './routes/router';
 
 /**
  * Configuration options for initializing a `AngularServerApp` instance.
@@ -54,13 +56,24 @@ export class AngularServerApp {
   readonly isDevMode: boolean;
 
   /**
+   * An instance of ServerAsset that handles server-side asset.
+   * @internal
+   */
+  readonly assets = new ServerAssets(this.manifest);
+
+  /**
+   * The router instance used for route matching and handling.
+   */
+  private router: ServerRouter | undefined;
+
+  /**
    * Creates a new `AngularServerApp` instance with the provided configuration options.
    *
    * @param options - The configuration options for the server application.
    * - `isDevMode`: Flag indicating if the application is in development mode.
    * - `hooks`: Optional hooks for customizing application behavior.
    */
-  constructor(options: AngularServerAppOptions) {
+  constructor(readonly options: AngularServerAppOptions) {
     this.isDevMode = options.isDevMode ?? false;
     this.hooks = options.hooks ?? new Hooks();
   }
@@ -74,31 +87,29 @@ export class AngularServerApp {
    * @param requestContext - Optional additional context for rendering, such as request metadata.
    * @param serverContext - The rendering context.
    *
-   * @returns A promise that resolves to the HTTP response object resulting from the rendering.
+   * @returns A promise that resolves to the HTTP response object resulting from the rendering, or null if no match is found.
    */
-  render(
+  async render(
     request: Request,
     requestContext?: unknown,
     serverContext: ServerRenderContext = ServerRenderContext.SSR,
-  ): Promise<Response> {
-    return render(this, request, serverContext, requestContext);
-  }
+  ): Promise<Response | null> {
+    const url = new URL(request.url);
+    this.router ??= await ServerRouter.from(this.manifest, url);
 
-  /**
-   * Retrieves the content of a server-side asset using its path.
-   *
-   * This method fetches the content of a specific asset defined in the server application's manifest.
-   *
-   * @param path - The path to the server asset.
-   * @returns A promise that resolves to the asset content as a string.
-   * @throws Error If the asset path is not found in the manifest, an error is thrown.
-   */
-  async getServerAsset(path: string): Promise<string> {
-    const asset = this.manifest.assets[path];
-    if (!asset) {
-      throw new Error(`Server asset '${path}' does not exist.`);
+    const matchedRoute = this.router.match(url);
+    if (!matchedRoute) {
+      // Not a known Angular route.
+      return null;
     }
 
-    return asset();
+    const { redirectTo } = matchedRoute;
+    if (redirectTo !== undefined) {
+      // 302 Found is used by default for redirections
+      // See: https://developer.mozilla.org/en-US/docs/Web/API/Response/redirect_static#status
+      return Response.redirect(new URL(redirectTo, url), 302);
+    }
+
+    return render(this, request, serverContext, requestContext);
   }
 }

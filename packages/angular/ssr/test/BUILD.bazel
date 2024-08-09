@@ -5,6 +5,7 @@ load("//tools:defaults.bzl", "ts_library")
 ESM_TESTS = [
     "app_spec.ts",
     "app-engine_spec.ts",
+    "routes/router_spec.ts",
 ]
 
 ts_library(

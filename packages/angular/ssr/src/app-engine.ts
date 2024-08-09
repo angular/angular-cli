@@ -6,7 +6,6 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { lookup as lookupMimeType } from 'mrmime';
 import { AngularServerApp } from './app';
 import { Hooks } from './hooks';
 import { getPotentialLocaleIdFromUrl } from './i18n';
@@ -70,10 +69,6 @@ export class AngularAppEngine {
   async render(request: Request, requestContext?: unknown): Promise<Response | null> {
     // Skip if the request looks like a file but not `/index.html`.
     const url = new URL(request.url);
-    const { pathname } = url;
-    if (isFileLike(pathname) && !pathname.endsWith('/index.html')) {
-      return null;
-    }
 
     const entryPoint = this.getEntryPointFromUrl(url);
     if (!entryPoint) {
@@ -130,21 +125,4 @@ export class AngularAppEngine {
 
     return entryPoint ? [potentialLocale, entryPoint] : null;
   }
-}
-
-/**
- * Determines if the given pathname corresponds to a file-like resource.
- *
- * @param pathname - The pathname to check.
- * @returns True if the pathname appears to be a file, false otherwise.
- */
-function isFileLike(pathname: string): boolean {
-  const dotIndex = pathname.lastIndexOf('.');
-  if (dotIndex === -1) {
-    return false;
-  }
-
-  const extension = pathname.slice(dotIndex);
-
-  return extension === '.ico' || !!lookupMimeType(extension);
 }

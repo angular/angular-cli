@@ -11,7 +11,7 @@ import 'zone.js/node';
 import '@angular/compiler';
 /* eslint-enable import/no-unassigned-import */
 
-import { Component } from '@angular/core';
+import { Component, ɵresetCompiledComponents } from '@angular/core';
 import { AngularServerApp } from '../src/app';
 import { AngularAppEngine } from '../src/app-engine';
 import { setAngularAppEngineManifest } from '../src/manifest';
@@ -21,6 +21,13 @@ describe('AngularAppEngine', () => {
   let appEngine: AngularAppEngine;
 
   describe('Localized app', () => {
+    beforeEach(() => {
+      // Need to clean up GENERATED_COMP_IDS map in `@angular/core`.
+      // Otherwise an incorrect component ID generation collision detected warning will be displayed.
+      // See: https://github.com/angular/angular-cli/issues/25924
+      ɵresetCompiledComponents();
+    });
+
     beforeAll(() => {
       setAngularAppEngineManifest({
         // Note: Although we are testing only one locale, we need to configure two or more
@@ -31,7 +38,7 @@ describe('AngularAppEngine', () => {
             async () => {
               @Component({
                 standalone: true,
-                selector: 'app-home',
+                selector: `app-home-${locale}`,
                 template: `Home works ${locale.toUpperCase()}`,
               })
               class HomeComponent {}
@@ -72,9 +79,7 @@ describe('AngularAppEngine', () => {
       expect(await response?.text()).toContain('Home works IT');
     });
 
-    // TODO: (Angular will render this as it will render all routes even unknown routes)
-    // ERROR RuntimeError: NG04002: Cannot match any routes. URL Segment: 'unknown/page'
-    xit('should return null for requests to unknown pages in a locale', async () => {
+    it('should return null for requests to unknown pages in a locale', async () => {
       const request = new Request('https://example.com/it/unknown/page');
       const response = await appEngine.render(request);
       expect(response).toBeNull();
@@ -88,6 +93,13 @@ describe('AngularAppEngine', () => {
   });
 
   describe('Non-localized app', () => {
+    beforeEach(() => {
+      // Need to clean up GENERATED_COMP_IDS map in `@angular/core`.
+      // Otherwise an incorrect component ID generation collision detected warning will be displayed.
+      // See: https://github.com/angular/angular-cli/issues/25924
+      ɵresetCompiledComponents();
+    });
+
     beforeAll(() => {
       setAngularAppEngineManifest({
         entryPoints: new Map([
@@ -119,9 +131,7 @@ describe('AngularAppEngine', () => {
       expect(response).toBeNull();
     });
 
-    // TODO: (Angular will render this as it will render all routes even unknown routes)
-    // ERROR RuntimeError: NG04002: Cannot match any routes. URL Segment: 'unknown/page'
-    xit('should return null for requests to unknown pages', async () => {
+    it('should return null for requests to unknown pages', async () => {
       const request = new Request('https://example.com/unknown/page');
       const response = await appEngine.render(request);
       expect(response).toBeNull();
