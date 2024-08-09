@@ -24,6 +24,10 @@
     "packages/angular/cli/src/analytics/analytics.ts",
     "packages/angular/cli/src/command-builder/command-module.ts"
   ],
-  ["packages/angular/ssr/src/app.ts", "packages/angular/ssr/src/manifest.ts"],
+  [
+    "packages/angular/ssr/src/app.ts",
+    "packages/angular/ssr/src/assets.ts",
+    "packages/angular/ssr/src/manifest.ts"
+  ],
   ["packages/angular/ssr/src/app.ts", "packages/angular/ssr/src/render.ts"]
 ]

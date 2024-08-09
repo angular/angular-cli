@@ -6,9 +6,11 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
+import { ServerAssets } from './assets';
 import { Hooks } from './hooks';
 import { getAngularAppManifest } from './manifest';
 import { ServerRenderContext, render } from './render';
+import { ServerRouter } from './routes/router';
 
 /**
  * Configuration options for initializing a `AngularServerApp` instance.
@@ -54,6 +56,17 @@ export class AngularServerApp {
   readonly isDevMode: boolean;
 
   /**
+   * An instance of ServerAsset that handles server-side asset.
+   * @internal
+   */
+  readonly assets = new ServerAssets(this.manifest);
+
+  /**
+   * The router instance used for route matching and handling.
+   */
+  private readonly router = new ServerRouter(this.manifest);
+
+  /**
    * Creates a new `AngularServerApp` instance with the provided configuration options.
    *
    * @param options - The configuration options for the server application.
@@ -74,31 +87,34 @@ export class AngularServerApp {
    * @param requestContext - Optional additional context for rendering, such as request metadata.
    * @param serverContext - The rendering context.
    *
-   * @returns A promise that resolves to the HTTP response object resulting from the rendering.
+   * @returns A promise that resolves to the HTTP response object resulting from the rendering, or null if no match is found.
    */
-  render(
+  async render(
     request: Request,
     requestContext?: unknown,
     serverContext: ServerRenderContext = ServerRenderContext.SSR,
-  ): Promise<Response> {
-    return render(this, request, serverContext, requestContext);
-  }
+  ): Promise<Response | null> {
+    const url = new URL(request.url);
+    const router = this.router;
 
-  /**
-   * Retrieves the content of a server-side asset using its path.
-   *
-   * This method fetches the content of a specific asset defined in the server application's manifest.
-   *
-   * @param path - The path to the server asset.
-   * @returns A promise that resolves to the asset content as a string.
-   * @throws Error If the asset path is not found in the manifest, an error is thrown.
-   */
-  async getServerAsset(path: string): Promise<string> {
-    const asset = this.manifest.assets[path];
-    if (!asset) {
-      throw new Error(`Server asset '${path}' does not exist.`);
+    if (router.requiresRoutesToBeBuilt) {
+      // If there are no routes in the manifest, build the routes now.
+      await router.buildRoutes(url, await this.assets.getIndexServerHtml());
     }
 
-    return asset();
+    const matchedRoute = router.match(url);
+    if (!matchedRoute) {
+      // Not a known Angular route.
+      return null;
+    }
+
+    const { redirectTo } = matchedRoute;
+    if (redirectTo) {
+      // 302 Found is used by default for redirections
+      // See: https://developer.mozilla.org/en-US/docs/Web/API/Response/redirect_static#status
+      return Response.redirect(new URL(redirectTo, url), 302);
+    }
+
+    return render(this, request, serverContext, requestContext);
   }
 }

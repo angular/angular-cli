@@ -29,7 +29,7 @@ export function setAngularAppTestingManifest(routes: Routes, baseHref = ''): voi
         `
  <html>
   <head>
-    <base href="/${baseHref}/" />
+    <base href="/${baseHref}" />
   </head>
   <body>
     <app-root></app-root>

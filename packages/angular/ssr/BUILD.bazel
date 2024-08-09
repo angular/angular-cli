@@ -18,11 +18,12 @@ ts_library(
     ),
     module_name = "@angular/ssr",
     deps = [
+        "@npm//@angular/common",
         "@npm//@angular/core",
         "@npm//@angular/platform-server",
+        "@npm//@angular/router",
         "@npm//@types/node",
         "@npm//critters",
-        "@npm//mrmime",
     ],
 )
 
