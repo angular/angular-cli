@@ -11,13 +11,20 @@ import 'zone.js/node';
 import '@angular/compiler';
 /* eslint-enable import/no-unassigned-import */
 
-import { Component } from '@angular/core';
+import { Component, ɵresetCompiledComponents } from '@angular/core';
 import { AngularServerApp } from '../src/app';
 import { ServerRenderContext } from '../src/render';
 import { setAngularAppTestingManifest } from './testing-utils';
 
 describe('AngularServerApp', () => {
   let app: AngularServerApp;
+
+  beforeEach(() => {
+    // Need to clean up GENERATED_COMP_IDS map in `@angular/core`.
+    // Otherwise an incorrect component ID generation collision detected warning will be displayed.
+    // See: https://github.com/angular/angular-cli/issues/25924
+    ɵresetCompiledComponents();
+  });
 
   beforeAll(() => {
     @Component({
@@ -27,7 +34,12 @@ describe('AngularServerApp', () => {
     })
     class HomeComponent {}
 
-    setAngularAppTestingManifest([{ path: 'home', component: HomeComponent }]);
+    setAngularAppTestingManifest([
+      { path: 'home', component: HomeComponent },
+      { path: 'redirect', redirectTo: 'home' },
+      { path: 'redirect/relative', redirectTo: 'home' },
+      { path: 'redirect/absolute', redirectTo: '/home' },
+    ]);
 
     app = new AngularServerApp({
       isDevMode: true,
@@ -37,7 +49,7 @@ describe('AngularServerApp', () => {
   describe('render', () => {
     it(`should include 'ng-server-context="ssr"' by default`, async () => {
       const response = await app.render(new Request('http://localhost/home'));
-      expect(await response.text()).toContain('ng-server-context="ssr"');
+      expect(await response?.text()).toContain('ng-server-context="ssr"');
     });
 
     it(`should include the provided 'ng-server-context' value`, async () => {
@@ -46,32 +58,35 @@ describe('AngularServerApp', () => {
         undefined,
         ServerRenderContext.SSG,
       );
-      expect(await response.text()).toContain('ng-server-context="ssg"');
+      expect(await response?.text()).toContain('ng-server-context="ssg"');
     });
 
     it('should correctly render the content for the requested page', async () => {
       const response = await app.render(new Request('http://localhost/home'));
-      expect(await response.text()).toContain('Home works');
+      expect(await response?.text()).toContain('Home works');
     });
 
     it(`should correctly render the content when the URL ends with 'index.html'`, async () => {
       const response = await app.render(new Request('http://localhost/home/index.html'));
-      expect(await response.text()).toContain('Home works');
-    });
-  });
-
-  describe('getServerAsset', () => {
-    it('should return the content of an existing asset', async () => {
-      const content = await app.getServerAsset('index.server.html');
-      expect(content).toContain('<html>');
+      expect(await response?.text()).toContain('Home works');
     });
 
-    it('should throw an error if the asset does not exist', async () => {
-      await expectAsync(app.getServerAsset('nonexistent.html')).toBeRejectedWith(
-        jasmine.objectContaining({
-          message: jasmine.stringMatching(`Server asset 'nonexistent.html' does not exist`),
-        }),
-      );
+    it('should correctly handle top level redirects', async () => {
+      const response = await app.render(new Request('http://localhost/redirect'));
+      expect(response?.headers.get('location')).toContain('http://localhost/home');
+      expect(response?.status).toBe(302);
+    });
+
+    it('should correctly handle relative nested redirects', async () => {
+      const response = await app.render(new Request('http://localhost/redirect/relative'));
+      expect(response?.headers.get('location')).toContain('http://localhost/redirect/home');
+      expect(response?.status).toBe(302);
+    });
+
+    it('should correctly handle absoloute nested redirects', async () => {
+      const response = await app.render(new Request('http://localhost/redirect/absolute'));
+      expect(response?.headers.get('location')).toContain('http://localhost/home');
+      expect(response?.status).toBe(302);
     });
   });
 });
