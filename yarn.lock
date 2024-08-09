@@ -112,11 +112,11 @@ __metadata:
     semver: "npm:7.6.3"
     source-map-loader: "npm:5.0.0"
     source-map-support: "npm:0.5.21"
-    terser: "npm:5.31.4"
+    terser: "npm:5.31.5"
     tree-kill: "npm:1.2.2"
     tslib: "npm:2.6.3"
-    undici: "npm:6.19.5"
-    vite: "npm:5.3.5"
+    undici: "npm:6.19.7"
+    vite: "npm:5.4.0"
     watchpack: "npm:2.4.1"
     webpack: "npm:5.93.0"
     webpack-dev-middleware: "npm:7.3.0"
@@ -401,7 +401,7 @@ __metadata:
     rollup: "npm:4.20.0"
     sass: "npm:1.77.8"
     semver: "npm:7.6.3"
-    vite: "npm:5.3.5"
+    vite: "npm:5.4.0"
     watchpack: "npm:2.4.1"
   peerDependencies:
     "@angular/compiler-cli": ^18.0.0 || ^18.2.0-next.0
@@ -759,15 +759,15 @@ __metadata:
     source-map-support: "npm:0.5.21"
     symbol-observable: "npm:4.0.0"
     tar: "npm:^6.1.6"
-    terser: "npm:5.31.4"
+    terser: "npm:5.31.5"
     tree-kill: "npm:1.2.2"
     ts-node: "npm:^10.9.1"
     tslib: "npm:2.6.3"
     typescript: "npm:5.5.4"
-    undici: "npm:6.19.5"
+    undici: "npm:6.19.7"
     verdaccio: "npm:5.32.1"
     verdaccio-auth-memory: "npm:^10.0.0"
-    vite: "npm:5.3.5"
+    vite: "npm:5.4.0"
     watchpack: "npm:2.4.1"
     webpack: "npm:5.93.0"
     webpack-dev-middleware: "npm:7.3.0"
@@ -14372,7 +14372,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"postcss@npm:8.4.41":
+"postcss@npm:8.4.41, postcss@npm:^8.4.40":
   version: 8.4.41
   resolution: "postcss@npm:8.4.41"
   dependencies:
@@ -16596,9 +16596,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"terser@npm:5.31.4":
-  version: 5.31.4
-  resolution: "terser@npm:5.31.4"
+"terser@npm:5.31.5":
+  version: 5.31.5
+  resolution: "terser@npm:5.31.5"
   dependencies:
     "@jridgewell/source-map": "npm:^0.3.3"
     acorn: "npm:^8.8.2"
@@ -16606,7 +16606,7 @@ __metadata:
     source-map-support: "npm:~0.5.20"
   bin:
     terser: bin/terser
-  checksum: 10c0/cb47731837623acf657f929a7b6e8a79bfc2b505b2dbe881523c8337c35628af7c37b1b60da1a9a6719be5a3ca06c69b4d9a93e850cdafbc5c91207378acd94b
+  checksum: 10c0/6e7c66c1f4062ee098bff3dc3c396819ebf5f1740f0615be9de39b675a78c732d199f4dcfdcd15bd65f354e37c45bb944360f532a36fe7f7d22f800ca53c2d02
   languageName: node
   linkType: hard
 
@@ -17191,10 +17191,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"undici@npm:6.19.5":
-  version: 6.19.5
-  resolution: "undici@npm:6.19.5"
-  checksum: 10c0/ee2c0a62f3e4333bad8b20e8218c8dea4a5b4f5c8589a92897a7aeb5b321f4118bd5eea2591a4add90b6c7d8049eabd8020725b44f9a1ba0fa1f92a71ed14b14
+"undici@npm:6.19.7":
+  version: 6.19.7
+  resolution: "undici@npm:6.19.7"
+  checksum: 10c0/801d1e66d5bccdd3fcc9ecf1c95b83a593e4867b89e21ed725e35bd4d572b3d3ce1d7feab2a4f2046f65923de70bfafb69ac148c633d1ab30a948d6fec24475a
   languageName: node
   linkType: hard
 
@@ -17598,6 +17598,49 @@ __metadata:
   bin:
     vite: bin/vite.js
   checksum: 10c0/795c7e0dbc94b96c4a0aff0d5d4b349dd28ad8b7b70979c1010f96b4d83f7d6c1700ebd6fed91de2e021b0a3689b9abc2d8017f6dfa8c9a6ca5c7af637d6afc6
+  languageName: node
+  linkType: hard
+
+"vite@npm:5.4.0":
+  version: 5.4.0
+  resolution: "vite@npm:5.4.0"
+  dependencies:
+    esbuild: "npm:^0.21.3"
+    fsevents: "npm:~2.3.3"
+    postcss: "npm:^8.4.40"
+    rollup: "npm:^4.13.0"
+  peerDependencies:
+    "@types/node": ^18.0.0 || >=20.0.0
+    less: "*"
+    lightningcss: ^1.21.0
+    sass: "*"
+    sass-embedded: "*"
+    stylus: "*"
+    sugarss: "*"
+    terser: ^5.4.0
+  dependenciesMeta:
+    fsevents:
+      optional: true
+  peerDependenciesMeta:
+    "@types/node":
+      optional: true
+    less:
+      optional: true
+    lightningcss:
+      optional: true
+    sass:
+      optional: true
+    sass-embedded:
+      optional: true
+    stylus:
+      optional: true
+    sugarss:
+      optional: true
+    terser:
+      optional: true
+  bin:
+    vite: bin/vite.js
+  checksum: 10c0/122de7795e1c3c08cd0acc7d77296f908398266b424492be7310400107f37a3cf4c9506f2b4b16619e57299ca2859b8ca187aac5e25f8e66d84f9204a1d72d18
   languageName: node
   linkType: hard
 
