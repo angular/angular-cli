@@ -6,8 +6,9 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { ApplicationRef, Type } from '@angular/core';
+import type { ApplicationRef, Type } from '@angular/core';
 import type { AngularServerApp } from './app';
+import type { RouteNodeObjectRepresentation } from './routes/route-tree';
 
 /**
  * Manifest for the Angular server application engine, defining entry points.
@@ -49,6 +50,13 @@ export interface AngularAppManifest {
    * Indicates whether critical CSS should be inlined.
    */
   inlineCriticalCss?: boolean;
+
+  /**
+   * The route tree representation for routing configuration.
+   * This represents the routing information of the application, mapping route paths to their corresponding metadata.
+   * It is used to handle route matching and navigation within the server application.
+   */
+  routes?: RouteNodeObjectRepresentation;
 }
 
 /**

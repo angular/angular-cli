@@ -8,6 +8,7 @@
 
 import type { ApplicationRef, StaticProvider, Type } from '@angular/core';
 import { renderApplication, renderModule } from '@angular/platform-server';
+import { stripIndexHtmlFromURL } from './url';
 
 /**
  * Renders an Angular application or module to an HTML string.
@@ -28,13 +29,20 @@ import { renderApplication, renderModule } from '@angular/platform-server';
 export function renderAngular(
   html: string,
   bootstrap: Type<unknown> | (() => Promise<ApplicationRef>),
-  url: string,
+  url: URL,
   platformProviders: StaticProvider[],
 ): Promise<string> {
+  // A request to `http://www.example.com/page/index.html` will render the Angular route corresponding to `http://www.example.com/page`.
+  const normalizedURL = stripIndexHtmlFromURL(url).toString();
+
   return isNgModule(bootstrap)
-    ? renderModule(bootstrap, { url, document: html, extraProviders: platformProviders })
+    ? renderModule(bootstrap, {
+        url: normalizedURL,
+        document: html,
+        extraProviders: platformProviders,
+      })
     : renderApplication(bootstrap, {
-        url,
+        url: normalizedURL,
         document: html,
         platformProviders,
       });
