@@ -197,6 +197,13 @@ export abstract class SchematicsCommandModule
                 definition.multiselect ? prompts.checkbox : prompts.select
               )({
                 message: definition.message,
+                validate: (values) => {
+                  if (!definition.validator) {
+                    return true;
+                  }
+
+                  return definition.validator(Object.values(values).map(({ value }) => value));
+                },
                 default: definition.default,
                 choices: definition.items?.map((item) =>
                   typeof item == 'string'
