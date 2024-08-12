@@ -1,4 +1,4 @@
-import * as path from 'path';
+import { join } from 'node:path';
 import { getGlobalVariable } from '../../utils/env';
 import { exec, execAndWaitForOutputToMatch, silentNpm } from '../../utils/process';
 import { rimraf } from '../../utils/fs';
@@ -14,13 +14,13 @@ export default async function () {
   await exec(process.platform.startsWith('win') ? 'where' : 'which', 'schematics');
 
   const startCwd = process.cwd();
-  const schematicPath = path.join(startCwd, 'test-schematic');
+  const schematicPath = join(startCwd, 'test-schematic');
 
   try {
     // create blank schematic
     await exec('schematics', 'schematic', '--name', 'test-schematic');
 
-    process.chdir(path.join(startCwd, 'test-schematic'));
+    process.chdir(join(startCwd, 'test-schematic'));
     await execAndWaitForOutputToMatch(
       'schematics',
       ['.:', '--list-schematics'],
@@ -29,6 +29,9 @@ export default async function () {
   } finally {
     // restore path
     process.chdir(startCwd);
-    await rimraf(schematicPath);
+    await Promise.all([
+      rimraf(schematicPath),
+      silentNpm('uninstall', '-g', '@angular-devkit/schematics-cli'),
+    ]);
   }
 }

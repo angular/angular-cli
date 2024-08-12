@@ -24,7 +24,12 @@ export default function (options: Schema): Rule {
   const coreVersion = require('@angular-devkit/core/package.json').version;
 
   return (_, context) => {
-    context.addTask(new NodePackageInstallTask(options.name));
+    context.addTask(
+      new NodePackageInstallTask({
+        workingDirectory: options.name,
+        packageManager: options.packageManager,
+      }),
+    );
 
     return mergeWith(
       apply(url('./files'), [

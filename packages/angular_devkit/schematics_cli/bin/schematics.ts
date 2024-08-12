@@ -9,7 +9,7 @@
 
 // symbol polyfill must go first
 import 'symbol-observable';
-import type { JsonValue, logging, schema } from '@angular-devkit/core';
+import { JsonValue, logging, schema } from '@angular-devkit/core';
 import { ProcessOutput, createConsoleLogger } from '@angular-devkit/core/node';
 import { UnsuccessfulWorkflowExecution } from '@angular-devkit/schematics';
 import { NodeWorkflow } from '@angular-devkit/schematics/tools';
@@ -337,6 +337,8 @@ export async function main({
       error = false;
     }
   });
+
+  workflow.registry.addPostTransform(schema.transforms.addUndefinedDefaults);
 
   // Show usage of deprecated options
   workflow.registry.useXDeprecatedProvider((msg) => logger.warn(msg));
