@@ -88,14 +88,16 @@ export function execute(
         return defer(() =>
           Promise.all([import('@angular/build/private'), import('../browser-esbuild')]),
         ).pipe(
-          switchMap(([{ serveWithVite, buildApplicationInternal }, { buildEsbuildBrowser }]) =>
+          switchMap(([{ serveWithVite, buildApplicationInternal }, { convertBrowserOptions }]) =>
             serveWithVite(
               normalizedOptions,
               builderName,
               (options, context, codePlugins) => {
                 return builderName === '@angular-devkit/build-angular:browser-esbuild'
                   ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    buildEsbuildBrowser(options as any, context, { write: false }, codePlugins)
+                    buildApplicationInternal(convertBrowserOptions(options as any), context, {
+                      codePlugins,
+                    })
                   : buildApplicationInternal(options, context, { codePlugins });
               },
               context,

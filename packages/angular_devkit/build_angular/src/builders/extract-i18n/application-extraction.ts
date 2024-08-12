@@ -6,17 +6,13 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import {
-  type ApplicationBuilderInternalOptions,
-  ResultFile,
-  ResultKind,
-  buildApplicationInternal,
-} from '@angular/build/private';
+import type { ApplicationBuilderOptions } from '@angular/build';
+import { ResultFile, ResultKind, buildApplicationInternal } from '@angular/build/private';
 import type { ɵParsedMessage as LocalizeMessage } from '@angular/localize';
 import type { MessageExtractor } from '@angular/localize/tools';
 import type { BuilderContext } from '@angular-devkit/architect';
 import nodePath from 'node:path';
-import { buildEsbuildBrowser } from '../browser-esbuild';
+import { BrowserBuilderOptions, convertBrowserOptions } from '../browser-esbuild';
 import type { NormalizedExtractI18nOptions } from './options';
 
 export async function extractMessages(
@@ -33,30 +29,32 @@ export async function extractMessages(
   const messages: LocalizeMessage[] = [];
 
   // Setup the build options for the application based on the buildTarget option
-  const buildOptions = (await context.validateOptions(
-    await context.getTargetOptions(options.buildTarget),
-    builderName,
-  )) as unknown as ApplicationBuilderInternalOptions;
+  let buildOptions;
+  if (builderName === '@angular-devkit/build-angular:application') {
+    buildOptions = (await context.validateOptions(
+      await context.getTargetOptions(options.buildTarget),
+      builderName,
+    )) as unknown as ApplicationBuilderOptions;
+  } else {
+    buildOptions = convertBrowserOptions(
+      (await context.validateOptions(
+        await context.getTargetOptions(options.buildTarget),
+        builderName,
+      )) as unknown as BrowserBuilderOptions,
+    );
+  }
+
   buildOptions.optimization = false;
   buildOptions.sourceMap = { scripts: true, vendor: true, styles: false };
   buildOptions.localize = false;
   buildOptions.budgets = undefined;
   buildOptions.index = false;
   buildOptions.serviceWorker = false;
+  buildOptions.ssr = false;
+  buildOptions.appShell = false;
+  buildOptions.prerender = false;
 
-  let build;
-  if (builderName === '@angular-devkit/build-angular:application') {
-    build = buildApplicationInternal;
-
-    buildOptions.ssr = false;
-    buildOptions.appShell = false;
-    buildOptions.prerender = false;
-  } else {
-    build = buildEsbuildBrowser;
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const builderResult = await first(build(buildOptions as any, context, { write: false }));
+  const builderResult = await first(buildApplicationInternal(buildOptions, context));
 
   let success = false;
   if (!builderResult || builderResult.kind === ResultKind.Failure) {
