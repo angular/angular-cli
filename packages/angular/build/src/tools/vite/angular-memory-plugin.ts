@@ -29,6 +29,7 @@ export interface AngularMemoryPluginOptions {
   extensionMiddleware?: Connect.NextHandleFunction[];
   indexHtmlTransformer?: (content: string) => Promise<string>;
   normalizePath: (path: string) => string;
+  usedComponentStyles: Map<string, string[]>;
 }
 
 export function createAngularMemoryPlugin(options: AngularMemoryPluginOptions): Plugin {
@@ -42,6 +43,7 @@ export function createAngularMemoryPlugin(options: AngularMemoryPluginOptions): 
     extensionMiddleware,
     indexHtmlTransformer,
     normalizePath,
+    usedComponentStyles,
   } = options;
 
   return {
@@ -113,7 +115,9 @@ export function createAngularMemoryPlugin(options: AngularMemoryPluginOptions): 
       };
 
       // Assets and resources get handled first
-      server.middlewares.use(createAngularAssetsMiddleware(server, assets, outputFiles));
+      server.middlewares.use(
+        createAngularAssetsMiddleware(server, assets, outputFiles, usedComponentStyles),
+      );
 
       if (extensionMiddleware?.length) {
         extensionMiddleware.forEach((middleware) => server.middlewares.use(middleware));

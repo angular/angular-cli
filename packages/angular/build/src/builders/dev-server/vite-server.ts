@@ -151,6 +151,7 @@ export async function* serveWithVite(
     explicitBrowser: [],
     explicitServer: [],
   };
+  const usedComponentStyles = new Map<string, string[]>();
 
   // Add cleanup logic via a builder teardown.
   let deferred: () => void;
@@ -271,7 +272,14 @@ export async function* serveWithVite(
         // This is a workaround for: https://github.com/vitejs/vite/issues/14896
         await server.restart();
       } else {
-        await handleUpdate(normalizePath, generatedFiles, server, serverOptions, context.logger);
+        await handleUpdate(
+          normalizePath,
+          generatedFiles,
+          server,
+          serverOptions,
+          context.logger,
+          usedComponentStyles,
+        );
       }
     } else {
       const projectName = context.target?.project;
@@ -311,6 +319,7 @@ export async function* serveWithVite(
         prebundleTransformer,
         target,
         isZonelessApp(polyfills),
+        usedComponentStyles,
         browserOptions.loader as EsbuildLoaderOption | undefined,
         extensions?.middleware,
         transformers?.indexHtml,
@@ -368,6 +377,7 @@ async function handleUpdate(
   server: ViteDevServer,
   serverOptions: NormalizedDevServerOptions,
   logger: BuilderContext['logger'],
+  usedComponentStyles: Map<string, string[]>,
 ): Promise<void> {
   const updatedFiles: string[] = [];
   let isServerFileUpdated = false;
@@ -403,7 +413,22 @@ async function handleUpdate(
       const timestamp = Date.now();
       server.hot.send({
         type: 'update',
-        updates: updatedFiles.map((filePath) => {
+        updates: updatedFiles.flatMap((filePath) => {
+          // For component styles, an HMR update must be sent for each one with the corresponding
+          // component identifier search parameter (`ngcomp`). The Vite client code will not keep
+          // the existing search parameters when it performs an update and each one must be
+          // specified explicitly. Typically, there is only one each though as specific style files
+          // are not typically reused across components.
+          const componentIds = usedComponentStyles.get(filePath);
+          if (componentIds) {
+            return componentIds.map((id) => ({
+              type: 'css-update',
+              timestamp,
+              path: `${filePath}?ngcomp` + (id ? `=${id}` : ''),
+              acceptedPath: filePath,
+            }));
+          }
+
           return {
             type: 'css-update',
             timestamp,
@@ -508,6 +533,7 @@ export async function setupServer(
   prebundleTransformer: JavaScriptTransformer,
   target: string[],
   zoneless: boolean,
+  usedComponentStyles: Map<string, string[]>,
   prebundleLoaderExtensions: EsbuildLoaderOption | undefined,
   extensionMiddleware?: Connect.NextHandleFunction[],
   indexHtmlTransformer?: (content: string) => Promise<string>,
@@ -616,6 +642,7 @@ export async function setupServer(
         indexHtmlTransformer,
         extensionMiddleware,
         normalizePath,
+        usedComponentStyles,
       }),
       createRemoveIdPrefixPlugin(externalMetadata.explicitBrowser),
     ],
