@@ -9,16 +9,20 @@
 import { lookup as lookupMimeType } from 'mrmime';
 import { extname } from 'node:path';
 import type { Connect, ViteDevServer } from 'vite';
+import { loadEsmModule } from '../../../utils/load-esm';
 import {
   AngularMemoryOutputFiles,
   appendServerConfiguredHeaders,
   pathnameWithoutBasePath,
 } from '../utils';
 
+const COMPONENT_REGEX = /%COMP%/g;
+
 export function createAngularAssetsMiddleware(
   server: ViteDevServer,
   assets: Map<string, string>,
   outputFiles: AngularMemoryOutputFiles,
+  usedComponentStyles: Map<string, string[]>,
 ): Connect.NextHandleFunction {
   return function (req, res, next) {
     if (req.url === undefined || res.writableEnded) {
@@ -69,13 +73,51 @@ export function createAngularAssetsMiddleware(
     if (extension !== '.js' && extension !== '.html') {
       const outputFile = outputFiles.get(pathname);
       if (outputFile?.servable) {
+        const data = outputFile.contents;
+        if (extension === '.css') {
+          // Inject component ID for view encapsulation if requested
+          const componentId = new URL(req.url, 'http://localhost').searchParams.get('ngcomp');
+          if (componentId !== null) {
+            // Record the component style usage for HMR updates
+            const usedIds = usedComponentStyles.get(pathname);
+            if (usedIds === undefined) {
+              usedComponentStyles.set(pathname, [componentId]);
+            } else {
+              usedIds.push(componentId);
+            }
+            // Shim the stylesheet if a component ID is provided
+            if (componentId.length > 0) {
+              // Validate component ID
+              if (/[_.-A-Za-z0-9]+-c\d{9}$/.test(componentId)) {
+                loadEsmModule<typeof import('@angular/compiler')>('@angular/compiler')
+                  .then((compilerModule) => {
+                    const encapsulatedData = compilerModule
+                      .encapsulateStyle(new TextDecoder().decode(data))
+                      .replaceAll(COMPONENT_REGEX, componentId);
+
+                    res.setHeader('Content-Type', 'text/css');
+                    res.setHeader('Cache-Control', 'no-cache');
+                    appendServerConfiguredHeaders(server, res);
+                    res.end(encapsulatedData);
+                  })
+                  .catch((e) => next(e));
+
+                return;
+              } else {
+                // eslint-disable-next-line no-console
+                console.error('Invalid component stylesheet ID request: ' + componentId);
+              }
+            }
+          }
+        }
+
         const mimeType = lookupMimeType(extension);
         if (mimeType) {
           res.setHeader('Content-Type', mimeType);
         }
         res.setHeader('Cache-Control', 'no-cache');
         appendServerConfiguredHeaders(server, res);
-        res.end(outputFile.contents);
+        res.end(data);
 
         return;
       }

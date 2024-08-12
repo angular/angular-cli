@@ -59,6 +59,7 @@ ts_library(
         "//packages/angular_devkit/architect",
         "@npm//@ampproject/remapping",
         "@npm//@angular/common",
+        "@npm//@angular/compiler",
         "@npm//@angular/compiler-cli",
         "@npm//@angular/core",
         "@npm//@angular/localize",
