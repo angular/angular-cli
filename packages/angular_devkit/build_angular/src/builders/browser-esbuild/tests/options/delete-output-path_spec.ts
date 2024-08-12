@@ -6,10 +6,10 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { buildEsbuildBrowserArchitect } from '../../index';
+import { buildEsbuildBrowser } from '../../index';
 import { BASE_OPTIONS, BROWSER_BUILDER_INFO, describeBuilder } from '../setup';
 
-describeBuilder(buildEsbuildBrowserArchitect, BROWSER_BUILDER_INFO, (harness) => {
+describeBuilder(buildEsbuildBrowser, BROWSER_BUILDER_INFO, (harness) => {
   describe('Option: "deleteOutputPath"', () => {
     beforeEach(async () => {
       // Application code is not needed for asset tests
