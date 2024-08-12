@@ -12,6 +12,12 @@
         "index": 0
       }
     },
+    "packageManager": {
+      "description": "The package manager used to install dependencies.",
+      "type": "string",
+      "enum": ["npm", "yarn", "pnpm", "cnpm", "bun"],
+      "default": "npm"
+    },
     "author": {
       "type": "string",
       "description": "Author for the new schematic."

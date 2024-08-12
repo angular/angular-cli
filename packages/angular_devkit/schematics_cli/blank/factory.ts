@@ -90,7 +90,12 @@ export default function (options: Schema): Rule {
         move(options.name),
       ]);
 
-      context.addTask(new NodePackageInstallTask(options.name));
+      context.addTask(
+        new NodePackageInstallTask({
+          workingDirectory: options.name,
+          packageManager: options.packageManager,
+        }),
+      );
     }
 
     return chain([
