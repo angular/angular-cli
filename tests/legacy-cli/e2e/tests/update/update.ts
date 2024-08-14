@@ -39,7 +39,10 @@ export default async function () {
       // - 11 -> 12
       // - 12 -> 13
       const { stdout } = await ng('update', `@angular/cli@${version}`, `@angular/core@${version}`);
-      if (!stdout.includes("Executing migrations of package '@angular/cli'")) {
+      if (
+        !stdout.includes("Executing migrations of package '@angular/cli'") &&
+        !stdout.includes("Optional migrations of package '@angular/cli'")
+      ) {
         throw new Error('Update did not execute migrations for @angular/cli. OUTPUT: \n' + stdout);
       }
       if (!stdout.includes("Executing migrations of package '@angular/core'")) {

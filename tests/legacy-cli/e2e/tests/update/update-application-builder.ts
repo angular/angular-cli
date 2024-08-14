@@ -10,7 +10,7 @@ import { execAndWaitForOutputToMatch, ng, noSilentNg } from '../../utils/process
 import { findFreePort } from '../../utils/network';
 
 export default async function () {
-  await createProjectFromAsset('18-ssr-project-webpack', false, false);
+  await createProjectFromAsset('19-ssr-project-webpack', false, false);
   await ng('update', `@angular/cli`, '--name=use-application-builder');
 
   await Promise.all([
