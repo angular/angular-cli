@@ -167,6 +167,7 @@
     "ng-packagr": "18.2.0-next.0",
     "npm": "^10.8.1",
     "npm-package-arg": "11.0.3",
+    "npm-pick-manifest": "9.1.0",
     "open": "10.1.0",
     "ora": "5.4.1",
     "pacote": "18.0.6",

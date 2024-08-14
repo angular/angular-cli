@@ -734,6 +734,7 @@ __metadata:
     ng-packagr: "npm:18.2.0-next.0"
     npm: "npm:^10.8.1"
     npm-package-arg: "npm:11.0.3"
+    npm-pick-manifest: "npm:9.1.0"
     open: "npm:10.1.0"
     ora: "npm:5.4.1"
     pacote: "npm:18.0.6"
