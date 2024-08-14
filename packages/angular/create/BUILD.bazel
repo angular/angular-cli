@@ -26,6 +26,9 @@ genrule(
 
 pkg_npm(
     name = "npm_package",
+    pkg_deps = [
+        "//packages/angular/cli:package.json",
+    ],
     tags = ["release-package"],
     visibility = ["//visibility:public"],
     deps = [
