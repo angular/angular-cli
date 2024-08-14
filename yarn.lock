@@ -117,7 +117,7 @@ __metadata:
     tslib: "npm:2.6.3"
     undici: "npm:6.19.7"
     vite: "npm:5.4.0"
-    watchpack: "npm:2.4.1"
+    watchpack: "npm:2.4.2"
     webpack: "npm:5.93.0"
     webpack-dev-middleware: "npm:7.3.0"
     webpack-dev-server: "npm:5.0.4"
@@ -405,7 +405,7 @@ __metadata:
     sass: "npm:1.77.8"
     semver: "npm:7.6.3"
     vite: "npm:5.4.0"
-    watchpack: "npm:2.4.1"
+    watchpack: "npm:2.4.2"
   peerDependencies:
     "@angular/compiler-cli": ^18.0.0 || ^18.2.0-next.0
     "@angular/localize": ^18.0.0 || ^18.2.0-next.0
@@ -774,7 +774,7 @@ __metadata:
     verdaccio: "npm:5.32.1"
     verdaccio-auth-memory: "npm:^10.0.0"
     vite: "npm:5.4.0"
-    watchpack: "npm:2.4.1"
+    watchpack: "npm:2.4.2"
     webpack: "npm:5.93.0"
     webpack-dev-middleware: "npm:7.3.0"
     webpack-dev-server: "npm:5.0.4"
@@ -17453,6 +17453,16 @@ __metadata:
     glob-to-regexp: "npm:^0.4.1"
     graceful-fs: "npm:^4.1.2"
   checksum: 10c0/c694de0a61004e587a8a0fdc9cfec20ee692c52032d9ab2c2e99969a37fdab9e6e1bd3164ed506f9a13f7c83e65563d563e0d6b87358470cdb7309b83db78683
+  languageName: node
+  linkType: hard
+
+"watchpack@npm:2.4.2":
+  version: 2.4.2
+  resolution: "watchpack@npm:2.4.2"
+  dependencies:
+    glob-to-regexp: "npm:^0.4.1"
+    graceful-fs: "npm:^4.1.2"
+  checksum: 10c0/ec60a5f0e9efaeca0102fd9126346b3b2d523e01c34030d3fddf5813a7125765121ebdc2552981136dcd2c852deb1af0b39340f2fcc235f292db5399d0283577
   languageName: node
   linkType: hard
 
