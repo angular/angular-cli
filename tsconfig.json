@@ -34,7 +34,6 @@
     }
   },
   "exclude": [
-    "packages/angular_devkit/build_angular/src/babel-bazel.d.ts",
     "dist/**/*",
     "dist-schema/**",
     "goldens/**/*",
