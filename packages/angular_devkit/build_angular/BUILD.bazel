@@ -123,6 +123,7 @@ ts_library(
     deps = [
         "//packages/angular/build",
         "//packages/angular/build:private",
+        "//packages/angular/ssr",
         "//packages/angular_devkit/architect",
         "//packages/angular_devkit/build_webpack",
         "//packages/angular_devkit/core",

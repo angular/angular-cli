@@ -29,26 +29,27 @@ const { document, verbose } = workerData as RoutesExtractorWorkerData;
 
 /** Renders an application based on a provided options. */
 async function extractRoutes(): Promise<RoutersExtractorWorkerResult> {
-  const { extractRoutes } = await loadEsmModuleFromMemory('./render-utils.server.mjs');
+  const { ɵgetRoutesFromAngularRouterConfig: getRoutesFromAngularRouterConfig } =
+    await loadEsmModuleFromMemory('./render-utils.server.mjs');
   const { default: bootstrapAppFnOrModule } = await loadEsmModuleFromMemory('./main.server.mjs');
 
   const skippedRedirects: string[] = [];
   const skippedOthers: string[] = [];
   const routes: string[] = [];
 
-  for await (const { route, success, redirect } of extractRoutes(
+  const { routes: extractRoutes } = await getRoutesFromAngularRouterConfig(
     bootstrapAppFnOrModule,
     document,
-  )) {
-    if (success) {
-      routes.push(route);
-      continue;
-    }
+    new URL('http://localhost'),
+  );
 
-    if (redirect) {
+  for (const { route, redirectTo } of extractRoutes) {
+    if (redirectTo !== undefined) {
       skippedRedirects.push(route);
-    } else {
+    } else if (/[:*]/.test(route)) {
       skippedOthers.push(route);
+    } else {
+      routes.push(route);
     }
   }
 

@@ -65,7 +65,7 @@ export class ServerRouter {
           url,
         );
 
-        for await (let { route, redirectTo } of routes) {
+        for (let { route, redirectTo } of routes) {
           route = joinUrlParts(baseHref, route);
           redirectTo = redirectTo === undefined ? undefined : joinUrlParts(baseHref, redirectTo);
 

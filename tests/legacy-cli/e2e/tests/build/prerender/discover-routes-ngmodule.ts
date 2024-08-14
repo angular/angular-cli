@@ -31,19 +31,17 @@ export default async function () {
         buildOptimizer: false,
       };
     });
-
-    // Angular SSR is not needed to do prerendering but it is the easiest way to enable when usign webpack based builders.
-    await ng(
-      'add',
-      '@angular/ssr',
-      '--project',
-      projectName,
-      '--skip-confirmation',
-      '--skip-install',
-    );
-  } else {
-    await ng('generate', 'server', '--project', projectName, '--skip-install');
   }
+  // Forcibly remove in case another test doesn't clean itself up.
+  await rimraf('node_modules/@angular/ssr');
+  await ng(
+    'add',
+    '@angular/ssr',
+    '--project',
+    projectName,
+    '--skip-confirmation',
+    '--skip-install',
+  );
 
   await useSha();
   await installWorkspacePackages();

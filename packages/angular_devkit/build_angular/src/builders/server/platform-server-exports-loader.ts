@@ -6,33 +6,29 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { readFileSync } from 'node:fs';
-import { dirname, join } from 'node:path';
-
 /**
  * This loader is needed to add additional exports and is a workaround for a Webpack bug that doesn't
  * allow exports from multiple files in the same entry.
  * @see https://github.com/webpack/webpack/issues/15936.
  */
 export default function (
-  this: import('webpack').LoaderContext<{}>,
+  this: import('webpack').LoaderContext<{ angularSSRInstalled: boolean }>,
   content: string,
   map: Parameters<import('webpack').LoaderDefinitionFunction>[1],
 ) {
-  const extractorPath = join(
-    dirname(require.resolve('@angular/build/package.json')),
-    'src/utils/routes-extractor/extractor.js',
-  );
+  const { angularSSRInstalled } = this.getOptions();
 
-  const source =
-    `${content}
+  let source = `${content}
 
   // EXPORTS added by @angular-devkit/build-angular
   export { renderApplication, renderModule, ɵSERVER_CONTEXT } from '@angular/platform-server';
-  ` +
-    // We do not import it directly so that node.js modules are resolved using the correct context.
-    // Remove source map URL comments from the code if a sourcemap is present as this will not match the file.
-    readFileSync(extractorPath, 'utf-8').replace(/^\/\/# sourceMappingURL=[^\r\n]*/gm, '');
+  `;
+
+  if (angularSSRInstalled) {
+    source += `
+      export { ɵgetRoutesFromAngularRouterConfig } from '@angular/ssr';
+    `;
+  }
 
   this.callback(null, source, map);
 

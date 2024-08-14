@@ -49,6 +49,7 @@
     "@angular/localize": "^18.0.0 || ^18.2.0-next.0",
     "@angular/platform-server": "^18.0.0 || ^18.2.0-next.0",
     "@angular/service-worker": "^18.0.0 || ^18.2.0-next.0",
+    "@angular/ssr": "^0.0.0-PLACEHOLDER",
     "less": "^4.2.0",
     "postcss": "^8.4.0",
     "tailwindcss": "^2.0.0 || ^3.0.0",
@@ -62,6 +63,9 @@
       "optional": true
     },
     "@angular/service-worker": {
+      "optional": true
+    },
+    "@angular/ssr": {
       "optional": true
     },
     "less": {
