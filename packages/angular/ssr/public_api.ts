@@ -12,7 +12,4 @@ export {
   type CommonEngineOptions,
 } from './src/common-engine/common-engine';
 
-// TODO(alanagius): enable at a later stage
-// export { AngularAppEngine } from './src/app-engine';
-// export { AngularServerApp } from './src/app';
-// export { REQUEST, REQUEST_CONTEXT, RESPONSE_INIT } from './src/tokens';
+export { getRoutesFromAngularRouterConfig as ɵgetRoutesFromAngularRouterConfig } from './src/routes/ng-routes';

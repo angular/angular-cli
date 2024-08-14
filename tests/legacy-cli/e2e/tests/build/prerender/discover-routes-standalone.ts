@@ -8,15 +8,9 @@ import { deepStrictEqual } from 'node:assert';
 
 export default async function () {
   const useWebpackBuilder = !getGlobalVariable('argv')['esbuild'];
-  if (useWebpackBuilder) {
-    // Forcibly remove in case another test doesn't clean itself up.
-    await rimraf('node_modules/@angular/ssr');
-
-    // Angular SSR is not needed to do prerendering but it is the easiest way to enable when usign webpack based builders.
-    await ng('add', '@angular/ssr', '--skip-confirmation', '--skip-install');
-  } else {
-    await ng('generate', 'server', '--skip-install');
-  }
+  // Forcibly remove in case another test doesn't clean itself up.
+  await rimraf('node_modules/@angular/ssr');
+  await ng('add', '@angular/ssr', '--skip-confirmation', '--skip-install');
 
   await useSha();
   await installWorkspacePackages();

@@ -306,12 +306,15 @@ export function getStatsOptions(verbose = false): WebpackStatsOptions {
 }
 
 /**
- * @param root the workspace root
- * @returns `true` when `@angular/platform-server` is installed.
+ * Checks if a specified package is installed in the given workspace.
+ *
+ * @param root - The root directory of the workspace.
+ * @param name - The name of the package to check for.
+ * @returns `true` if the package is installed, `false` otherwise.
  */
-export function isPlatformServerInstalled(root: string): boolean {
+export function isPackageInstalled(root: string, name: string): boolean {
   try {
-    require.resolve('@angular/platform-server', { paths: [root] });
+    require.resolve(name, { paths: [root] });
 
     return true;
   } catch {

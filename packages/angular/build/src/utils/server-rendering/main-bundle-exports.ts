@@ -8,7 +8,7 @@
 
 import type { ApplicationRef, Type, ɵConsole } from '@angular/core';
 import type { renderApplication, renderModule, ɵSERVER_CONTEXT } from '@angular/platform-server';
-import type { extractRoutes } from '../routes-extractor/extractor';
+import type { ɵgetRoutesFromAngularRouterConfig } from '@angular/ssr';
 
 export interface MainServerBundleExports {
   /** Standalone application bootstrapping function. */
@@ -26,7 +26,7 @@ export interface RenderUtilsServerBundleExports {
   renderApplication: typeof renderApplication;
 
   /** Method to extract routes from the router config. */
-  extractRoutes: typeof extractRoutes;
+  ɵgetRoutesFromAngularRouterConfig: typeof ɵgetRoutesFromAngularRouterConfig;
 
   ɵresetCompiledComponents?: () => void;
 

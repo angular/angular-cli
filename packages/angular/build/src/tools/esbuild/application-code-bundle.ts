@@ -9,8 +9,7 @@
 import type { BuildOptions, PartialMessage } from 'esbuild';
 import assert from 'node:assert';
 import { createHash } from 'node:crypto';
-import { readFile } from 'node:fs/promises';
-import { extname, join } from 'node:path';
+import { extname } from 'node:path';
 import type { NormalizedApplicationBuildOptions } from '../../builders/application/options';
 import { allowMangle } from '../../utils/environment-options';
 import { createCompilerPlugin } from './angular/compiler-plugin';
@@ -246,14 +245,7 @@ export function createServerCodeBundleOptions(
         }
 
         if (prerenderOptions?.discoverRoutes) {
-          // We do not import it directly so that node.js modules are resolved using the correct context.
-          const routesExtractorCode = await readFile(
-            join(__dirname, '../../utils/routes-extractor/extractor.js'),
-            'utf-8',
-          );
-
-          // Remove source map URL comments from the code if a sourcemap is present as this will not match the file.
-          contents.push(routesExtractorCode.replace(/^\/\/# sourceMappingURL=[^\r\n]*/gm, ''));
+          contents.push(`export { ɵgetRoutesFromAngularRouterConfig } from '@angular/ssr';`);
         }
 
         return {

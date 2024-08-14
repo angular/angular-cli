@@ -7,6 +7,7 @@
  */
 
 import type { ApplicationRef, Type } from '@angular/core';
+import type { ɵgetRoutesFromAngularRouterConfig } from '@angular/ssr';
 import assert from 'node:assert';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
@@ -27,10 +28,7 @@ interface ServerBundleExports {
   default?: (() => Promise<ApplicationRef>) | Type<unknown>;
 
   /** Method to extract routes from the router config. */
-  extractRoutes(
-    bootstrapFunctionOrModule: (() => Promise<ApplicationRef>) | Type<unknown>,
-    document: string,
-  ): AsyncIterable<{ success: boolean; route: string }>;
+  ɵgetRoutesFromAngularRouterConfig: typeof ɵgetRoutesFromAngularRouterConfig;
 }
 
 const { zonePackage, serverBundlePath, outputPath, indexFile } =
@@ -39,7 +37,7 @@ const { zonePackage, serverBundlePath, outputPath, indexFile } =
 async function extract(): Promise<string[]> {
   const {
     AppServerModule,
-    extractRoutes,
+    ɵgetRoutesFromAngularRouterConfig: getRoutesFromAngularRouterConfig,
     default: bootstrapAppFn,
   } = (await import(serverBundlePath)) as ServerBundleExports;
 
@@ -53,8 +51,14 @@ async function extract(): Promise<string[]> {
   );
 
   const routes: string[] = [];
-  for await (const { route, success } of extractRoutes(bootstrapAppFnOrModule, document)) {
-    if (success) {
+  const { routes: extractRoutes } = await getRoutesFromAngularRouterConfig(
+    bootstrapAppFnOrModule,
+    document,
+    new URL('http://localhost'),
+  );
+
+  for (const { route, redirectTo } of extractRoutes) {
+    if (redirectTo === undefined && !/[:*]/.test(route)) {
       routes.push(route);
     }
   }
