@@ -1,3 +1,29 @@
+<a name="19.0.0-next.0"></a>
+
+# 19.0.0-next.0 (2024-08-14)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                                     |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------------- |
+| [c5ed0b124](https://github.com/angular/angular-cli/commit/c5ed0b1248dc2d5f895f4c4dc6737269a4854a1e) | fix  | prevent bypassing select/checkbox prompts on validation failure |
+
+### @angular-devkit/schematics-cli
+
+| Commit                                                                                              | Type | Description                                                     |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------------- |
+| [37693c40e](https://github.com/angular/angular-cli/commit/37693c40e3afc4c6dd7c949ea658bdf94146c9d8) | feat | add package manager option to blank schematic                   |
+| [73c243796](https://github.com/angular/angular-cli/commit/73c24379651695d8bb82602ab613e568f1233c2c) | fix  | prevent bypassing select/checkbox prompts on validation failure |
+
+### @angular/ssr
+
+| Commit                                                                                              | Type | Description                                   |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------- |
+| [bca568389](https://github.com/angular/angular-cli/commit/bca56838937f942c5ef902f5c98d018582188e84) | feat | dynamic route resolution using Angular router |
+| [3c9697a8c](https://github.com/angular/angular-cli/commit/3c9697a8c34a5e0f3470bde73f11f9f32107f42e) | feat | introduce new hybrid rendering API            |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="18.2.0"></a>
 
 # 18.2.0 (2024-08-14)
