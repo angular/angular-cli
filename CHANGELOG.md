@@ -1,13 +1,18 @@
-<a name="18.2.0-rc.0"></a>
+<a name="18.2.0"></a>
 
-# 18.2.0-rc.0 (2024-08-07)
+# 18.2.0 (2024-08-14)
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                              |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------- |
+| [4da922e4f](https://github.com/angular/angular-cli/commit/4da922e4f4e905a1274e70adca1d875c025b8b46) | feat | use isolatedModules in generated project |
 
 ### @angular/build
 
-| Commit                                                                                              | Type | Description                                            |
-| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------ |
-| [182ecbd18](https://github.com/angular/angular-cli/commit/182ecbd18817679b27441ffef2431f92910b592f) | fix  | allow explicitly disabling TypeScript incremental mode |
-| [34908a3fc](https://github.com/angular/angular-cli/commit/34908a3fcba304da6916b2113863751500268a8c) | fix  | lazy load Node.js inspector for dev server             |
+| Commit                                                                                              | Type | Description                                         |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------- |
+| [24aaf1e37](https://github.com/angular/angular-cli/commit/24aaf1e37f49735ce97fe72fced3d53b51d6b631) | feat | support import attribute based loader configuration |
 
 <!-- CHANGELOG SPLIT MARKER -->
 
@@ -21,20 +26,6 @@
 | --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------ |
 | [f8b092711](https://github.com/angular/angular-cli/commit/f8b092711481a5754ea93bce65d706d261873810) | fix  | allow explicitly disabling TypeScript incremental mode |
 | [f3a5970fc](https://github.com/angular/angular-cli/commit/f3a5970fca0a196b1ac905306257d65bab3b1325) | fix  | lazy load Node.js inspector for dev server             |
-
-<!-- CHANGELOG SPLIT MARKER -->
-
-<a name="18.2.0-next.3"></a>
-
-# 18.2.0-next.3 (2024-07-31)
-
-### @angular/build
-
-| Commit                                                                                              | Type | Description                                                                   |
-| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------------------- |
-| [636cb6932](https://github.com/angular/angular-cli/commit/636cb6932425b838ccd14ae6ce8b51663e6ded47) | fix  | add CSP `nonce` attribute to script tags when inline critical CSS is disabled |
-| [7d52941a2](https://github.com/angular/angular-cli/commit/7d52941a2e36b1e08001d7042c9d3e258d8e8b34) | fix  | prevent build failures with remote CSS imports when Tailwind is configured    |
-| [0466fb74a](https://github.com/angular/angular-cli/commit/0466fb74a2559e2b3cbcf0828de5b5e10b729ddb) | fix  | resolve error with `extract-i18n` builder for libraries                       |
 
 <!-- CHANGELOG SPLIT MARKER -->
 
@@ -52,21 +43,6 @@
 
 <!-- CHANGELOG SPLIT MARKER -->
 
-<a name="18.2.0-next.2"></a>
-
-# 18.2.0-next.2 (2024-07-24)
-
-### @angular/build
-
-| Commit                                                                                              | Type | Description                                         |
-| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------- |
-| [37a2138cb](https://github.com/angular/angular-cli/commit/37a2138cb474778ef398a8d4129e1c389dde0f44) | fix  | account for HTML base HREF for dev-server externals |
-| [8ff687d03](https://github.com/angular/angular-cli/commit/8ff687d036085508fa18397d7a039ab33cc027c7) | fix  | correctly detect comma in Sass URL lexer            |
-| [6d6937587](https://github.com/angular/angular-cli/commit/6d6937587f8dfa95c951e775f97abde45710c8a6) | fix  | prevent redirection loop                            |
-| [11a140bab](https://github.com/angular/angular-cli/commit/11a140babb72519a030997b7986946adefd0b824) | fix  | serve HTML files directly                           |
-
-<!-- CHANGELOG SPLIT MARKER -->
-
 <a name="18.1.2"></a>
 
 # 18.1.2 (2024-07-24)
@@ -79,26 +55,6 @@
 | [3e4ea77d7](https://github.com/angular/angular-cli/commit/3e4ea77d755edce2c88d55b76860e6e91fb03f3c) | fix  | correctly detect comma in Sass URL lexer            |
 | [d868270f1](https://github.com/angular/angular-cli/commit/d868270f1baf0fd5f2c5677691cc9c4e88b47d8f) | fix  | prevent redirection loop                            |
 | [3573ac655](https://github.com/angular/angular-cli/commit/3573ac6555ead2afc34979e284426a0204fff42c) | fix  | serve HTML files directly                           |
-
-<!-- CHANGELOG SPLIT MARKER -->
-
-<a name="18.2.0-next.1"></a>
-
-# 18.2.0-next.1 (2024-07-17)
-
-### @angular-devkit/build-angular
-
-| Commit                                                                                              | Type | Description                                       |
-| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------- |
-| [9baae6e22](https://github.com/angular/angular-cli/commit/9baae6e22c5ad89e2f05b55b46a91ef0fbbe79a2) | fix  | skip undefined files when generating budget stats |
-
-### @angular/build
-
-| Commit                                                                                              | Type | Description                                                   |
-| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------- |
-| [24aaf1e37](https://github.com/angular/angular-cli/commit/24aaf1e37f49735ce97fe72fced3d53b51d6b631) | feat | support import attribute based loader configuration           |
-| [394f9ce35](https://github.com/angular/angular-cli/commit/394f9ce35f876e7f82c6817d9424b32ec1eaa4a2) | fix  | remove Vite "/@id/" prefix for explicit external dependencies |
-| [855a4b841](https://github.com/angular/angular-cli/commit/855a4b84121ab16594bcd1785d648eccefa4baa3) | fix  | resolve only ".wasm" files                                    |
 
 <!-- CHANGELOG SPLIT MARKER -->
 
@@ -118,18 +74,6 @@
 | --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------- |
 | [96dc7e6ed](https://github.com/angular/angular-cli/commit/96dc7e6ed3317e354fae82d1b42b31250e96d89d) | fix  | remove Vite "/@id/" prefix for explicit external dependencies |
 | [bdef39801](https://github.com/angular/angular-cli/commit/bdef3980160db8c27ae103444a41275351434b78) | fix  | resolve only ".wasm" files                                    |
-
-<!-- CHANGELOG SPLIT MARKER -->
-
-<a name="18.2.0-next.0"></a>
-
-# 18.2.0-next.0 (2024-07-10)
-
-### @schematics/angular
-
-| Commit                                                                                              | Type | Description                              |
-| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------- |
-| [4da922e4f](https://github.com/angular/angular-cli/commit/4da922e4f4e905a1274e70adca1d875c025b8b46) | feat | use isolatedModules in generated project |
 
 <!-- CHANGELOG SPLIT MARKER -->
 
