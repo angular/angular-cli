@@ -81,7 +81,11 @@ export async function prerenderPages(
   }
 
   // Get routes to prerender
-  const { routes: allRoutes, warnings: routesWarnings } = await getAllRoutes(
+  const {
+    routes: allRoutes,
+    warnings: routesWarnings,
+    errors: routesErrors,
+  } = await getAllRoutes(
     workspaceRoot,
     outputFilesForWorker,
     assetsReversed,
@@ -92,11 +96,15 @@ export async function prerenderPages(
     verbose,
   );
 
+  if (routesErrors?.length) {
+    errors.push(...routesErrors);
+  }
+
   if (routesWarnings?.length) {
     warnings.push(...routesWarnings);
   }
 
-  if (allRoutes.size < 1) {
+  if (allRoutes.size < 1 || errors.length > 0) {
     return {
       errors,
       warnings,
@@ -190,22 +198,27 @@ async function renderPages(
       const isAppShellRoute = appShellRoute === route;
       const serverContext: ServerContext = isAppShellRoute ? 'app-shell' : 'ssg';
       const render: Promise<RenderResult> = renderWorker.run({ route, serverContext });
-      const renderResult: Promise<void> = render.then(({ content, warnings, errors }) => {
-        if (content !== undefined) {
-          const outPath = isAppShellRoute
-            ? 'index.html'
-            : posix.join(removeLeadingSlash(route), 'index.html');
-          output[outPath] = content;
-        }
+      const renderResult: Promise<void> = render
+        .then(({ content, warnings, errors }) => {
+          if (content !== undefined) {
+            const outPath = isAppShellRoute
+              ? 'index.html'
+              : posix.join(removeLeadingSlash(route), 'index.html');
+            output[outPath] = content;
+          }
 
-        if (warnings) {
-          warnings.push(...warnings);
-        }
+          if (warnings) {
+            warnings.push(...warnings);
+          }
 
-        if (errors) {
-          errors.push(...errors);
-        }
-      });
+          if (errors) {
+            errors.push(...errors);
+          }
+        })
+        .catch((err) => {
+          errors.push(`An error occurred while prerendering route '${route}'.\n\n${err.stack}`);
+          void renderWorker.destroy();
+        });
 
       renderingPromises.push(renderResult);
     }
@@ -231,7 +244,7 @@ async function getAllRoutes(
   prerenderOptions: PrerenderOptions,
   sourcemap: boolean,
   verbose: boolean,
-): Promise<{ routes: Set<string>; warnings?: string[] }> {
+): Promise<{ routes: Set<string>; warnings?: string[]; errors?: string[] }> {
   const { routesFile, discoverRoutes } = prerenderOptions;
   const routes = new RoutesSet();
   const { route: appShellRoute } = appShellOptions;
@@ -275,8 +288,12 @@ async function getAllRoutes(
     recordTiming: false,
   });
 
+  const errors: string[] = [];
   const { routes: extractedRoutes, warnings }: RoutersExtractorWorkerResult = await renderWorker
     .run({})
+    .catch((err) => {
+      errors.push(`An error occurred while extracting routes.\n\n${err.stack}`);
+    })
     .finally(() => {
       void renderWorker.destroy();
     });
@@ -285,7 +302,7 @@ async function getAllRoutes(
     routes.add(route);
   }
 
-  return { routes, warnings };
+  return { routes, warnings, errors };
 }
 
 function addLeadingSlash(value: string): string {
