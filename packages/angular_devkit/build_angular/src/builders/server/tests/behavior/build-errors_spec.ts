@@ -15,13 +15,14 @@ describeBuilder(execute, SERVER_BUILDER_INFO, (harness) => {
     it('emits errors', async () => {
       harness.useTarget('server', {
         ...BASE_OPTIONS,
-        watch: true,
       });
 
       // Generate an error
       await harness.appendToFile('src/main.server.ts', `const foo: = 'abc';`);
 
-      const { result, logs } = await harness.executeOnce();
+      const { result, logs } = await harness.executeOnce({
+        outputLogsOnFailure: false,
+      });
 
       expect(result?.success).toBeFalse();
       expect(logs).toContain(
