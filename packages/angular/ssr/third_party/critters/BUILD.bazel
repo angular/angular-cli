@@ -1,0 +1,33 @@
+load("@npm//@angular/build-tooling/bazel/esbuild:index.bzl", "esbuild", "esbuild_config")
+load("//tools:defaults.bzl", "js_library")
+
+package(default_visibility = ["//visibility:private"])
+
+esbuild(
+    name = "bundled_critters",
+    config = ":esbuild_config",
+    entry_point = "@npm//:node_modules/critters/dist/critters.mjs",
+    metafile = True,
+    output_dir = "",
+    splitting = True,
+    deps = [
+        "@npm//critters",
+        "@npm//unenv",
+    ],
+)
+
+esbuild_config(
+    name = "esbuild_config",
+    config_file = "esbuild.config.mjs",
+)
+
+js_library(
+    name = "bundled_critters_lib",
+    srcs = [
+        "bundled_critters.d.ts",
+        ":bundled_critters",
+    ],
+    visibility = [
+        "//packages/angular/ssr:__pkg__",
+    ],
+)

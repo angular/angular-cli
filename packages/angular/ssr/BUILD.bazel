@@ -18,6 +18,7 @@ ts_library(
     ),
     module_name = "@angular/ssr",
     deps = [
+        "//packages/angular/ssr/third_party/critters:bundled_critters_lib",
         "@npm//@angular/common",
         "@npm//@angular/core",
         "@npm//@angular/platform-server",
