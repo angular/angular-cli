@@ -185,7 +185,8 @@ export function createCompilerPlugin(
               stylesheetResult = await stylesheetBundler.bundleInline(
                 data,
                 containingFile,
-                styleOptions.inlineStyleLanguage,
+                // Inline stylesheets from a template style element are always CSS
+                containingFile.endsWith('.html') ? 'css' : styleOptions.inlineStyleLanguage,
               );
             }
 
