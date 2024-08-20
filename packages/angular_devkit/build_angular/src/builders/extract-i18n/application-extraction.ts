@@ -11,6 +11,7 @@ import { ResultFile, ResultKind, buildApplicationInternal } from '@angular/build
 import type { ɵParsedMessage as LocalizeMessage } from '@angular/localize';
 import type { MessageExtractor } from '@angular/localize/tools';
 import type { BuilderContext } from '@angular-devkit/architect';
+import { readFileSync } from 'node:fs';
 import nodePath from 'node:path';
 import { BrowserBuilderOptions, convertBrowserOptions } from '../browser-esbuild';
 import type { NormalizedExtractI18nOptions } from './options';
@@ -106,6 +107,8 @@ function setupLocalizeExtractor(
       let content;
       if (file?.origin === 'memory') {
         content = textDecoder.decode(file.contents);
+      } else if (file?.origin === 'disk') {
+        content = readFileSync(file.inputPath, 'utf-8');
       }
       if (content === undefined) {
         throw new Error('Unknown file requested: ' + requestedPath);
