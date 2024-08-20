@@ -9,7 +9,6 @@
 import { type ApplicationBuilderOptions, buildApplication } from '@angular/build';
 import { BuilderContext, BuilderOutput, createBuilder } from '@angular-devkit/architect';
 import type { Plugin } from 'esbuild';
-import { logBuilderStatusWarnings } from './builder-status-warnings';
 import type { Schema as BrowserBuilderOptions } from './schema';
 
 export type { BrowserBuilderOptions };
@@ -31,10 +30,25 @@ export async function* buildEsbuildBrowser(
   },
   plugins?: Plugin[],
 ): AsyncIterable<BuilderOutput> {
-  // Inform user of status of builder and options
-  logBuilderStatusWarnings(userOptions, context);
+  // Warn about any unsupported options
+  if (userOptions['vendorChunk']) {
+    context.logger.warn(
+      `The 'vendorChunk' option is not used by this builder and will be ignored.`,
+    );
+  }
+  if (userOptions['commonChunk'] === false) {
+    context.logger.warn(
+      `The 'commonChunk' option is always enabled by this builder and will be ignored.`,
+    );
+  }
+  if (userOptions['webWorkerTsConfig']) {
+    context.logger.warn(`The 'webWorkerTsConfig' option is not yet supported by this builder.`);
+  }
 
+  // Convert browser builder options to application builder options
   const normalizedOptions = convertBrowserOptions(userOptions);
+
+  // Execute the application builder
   yield* buildApplication(normalizedOptions, context, { codePlugins: plugins });
 }
 
