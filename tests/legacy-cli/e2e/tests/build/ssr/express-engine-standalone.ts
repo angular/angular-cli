@@ -24,6 +24,7 @@ export default async function () {
   await installWorkspacePackages();
 
   await writeMultipleFiles({
+    'src/app/app.component.css': `div { color: #000 }`,
     'src/styles.css': `* { color: #000 }`,
     'src/main.ts': `import { bootstrapApplication } from '@angular/platform-browser';
       import { AppComponent } from './app/app.component';
