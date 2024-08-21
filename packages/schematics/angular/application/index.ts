@@ -204,8 +204,8 @@ function addAppToWorkspaceFile(
       },
       {
         type: 'anyComponentStyle',
-        maximumWarning: '2kB',
-        maximumError: '4kB',
+        maximumWarning: '4kB',
+        maximumError: '8kB',
       },
     ];
   } else {
