@@ -90,14 +90,6 @@ export function getOrCreateAngularServerApp(): AngularServerApp {
 }
 
 /**
- * Resets the instance of `AngularServerApp` to undefined, effectively
- * clearing the reference. Use this to recreate the instance.
- */
-export function resetAngularServerApp(): void {
-  angularServerApp = undefined;
-}
-
-/**
  * Destroys the existing `AngularServerApp` instance, releasing associated resources and resetting the
  * reference to `undefined`.
  *
