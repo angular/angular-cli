@@ -6,9 +6,9 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-export { ServerRenderContext as ɵServerRenderContext } from './src/render';
 export { getRoutesFromAngularRouterConfig as ɵgetRoutesFromAngularRouterConfig } from './src/routes/ng-routes';
 export {
+  ServerRenderContext as ɵServerRenderContext,
   getOrCreateAngularServerApp as ɵgetOrCreateAngularServerApp,
   destroyAngularServerApp as ɵdestroyAngularServerApp,
 } from './src/app';

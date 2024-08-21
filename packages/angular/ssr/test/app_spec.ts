@@ -12,8 +12,7 @@ import '@angular/compiler';
 /* eslint-enable import/no-unassigned-import */
 
 import { Component } from '@angular/core';
-import { AngularServerApp, destroyAngularServerApp } from '../src/app';
-import { ServerRenderContext } from '../src/render';
+import { AngularServerApp, ServerRenderContext, destroyAngularServerApp } from '../src/app';
 import { setAngularAppTestingManifest } from './testing-utils';
 
 describe('AngularServerApp', () => {
@@ -80,6 +79,18 @@ describe('AngularServerApp', () => {
       const response = await app.render(new Request('http://localhost/redirect/absolute'));
       expect(response?.headers.get('location')).toContain('http://localhost/home');
       expect(response?.status).toBe(302);
+    });
+
+    it('should handle request abortion gracefully', async () => {
+      const controller = new AbortController();
+      const request = new Request('http://localhost/home', { signal: controller.signal });
+
+      // Schedule the abortion of the request in the next microtask
+      queueMicrotask(() => {
+        controller.abort();
+      });
+
+      await expectAsync(app.render(request)).toBeRejectedWithError(/Request for: .+ was aborted/);
     });
   });
 });

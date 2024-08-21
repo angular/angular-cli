@@ -28,6 +28,5 @@
     "packages/angular/ssr/src/app.ts",
     "packages/angular/ssr/src/assets.ts",
     "packages/angular/ssr/src/manifest.ts"
-  ],
-  ["packages/angular/ssr/src/app.ts", "packages/angular/ssr/src/render.ts"]
+  ]
 ]
