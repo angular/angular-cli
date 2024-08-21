@@ -1,3 +1,34 @@
+<a name="18.2.1"></a>
+
+# 18.2.1 (2024-08-21)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                                     |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------------- |
+| [05a274a01](https://github.com/angular/angular-cli/commit/05a274a01365c21f69c0412f3455acd14cc6ddc5) | fix  | prevent bypassing select/checkbox prompts on validation failure |
+
+### @angular-devkit/schematics-cli
+
+| Commit                                                                                              | Type | Description                                                     |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------------- |
+| [94e27c88b](https://github.com/angular/angular-cli/commit/94e27c88bb968589bc8b9b5d6536ce6c0ba0b24f) | fix  | prevent bypassing select/checkbox prompts on validation failure |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                    |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------- |
+| [ddeb2b2b9](https://github.com/angular/angular-cli/commit/ddeb2b2b93eaa9d8b659d17357aa2b7a9dc509ce) | fix  | remove outdated browser-esbuild option warning |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                                                  |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------------------------- |
+| [83b2699ab](https://github.com/angular/angular-cli/commit/83b2699abbf58a7c90d2339fa4a01d67aa2d2d33) | fix  | improve error message when an unhandled exception occurs during prerendering |
+| [0be4038a5](https://github.com/angular/angular-cli/commit/0be4038a503626e2e9f44d68fe5599cc6028dd8e) | fix  | support reading on-disk files during i18n extraction                         |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="19.0.0-next.0"></a>
 
 # 19.0.0-next.0 (2024-08-14)
