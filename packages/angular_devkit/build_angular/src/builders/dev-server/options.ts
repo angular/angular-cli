@@ -37,7 +37,7 @@ export async function normalizeOptions(
   const cacheOptions = normalizeCacheOptions(projectMetadata, workspaceRoot);
 
   // Target specifier defaults to the current project's build target using a development configuration
-  const buildTargetSpecifier = options.buildTarget ?? options.browserTarget ?? `::development`;
+  const buildTargetSpecifier = options.buildTarget ?? `::development`;
   const buildTarget = targetFromTargetString(buildTargetSpecifier, projectName, 'build');
 
   // Get the application builder options.

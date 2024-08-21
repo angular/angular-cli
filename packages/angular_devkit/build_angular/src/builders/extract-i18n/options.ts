@@ -34,7 +34,7 @@ export async function normalizeOptions(
   const projectRoot = path.join(workspaceRoot, (projectMetadata.root as string | undefined) ?? '');
 
   // Target specifier defaults to the current project's build target with no specified configuration
-  const buildTargetSpecifier = options.buildTarget ?? options.browserTarget ?? ':';
+  const buildTargetSpecifier = options.buildTarget ?? ':';
   const buildTarget = targetFromTargetString(buildTargetSpecifier, projectName, 'build');
 
   const i18nOptions = createI18nOptions(projectMetadata);

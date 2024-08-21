@@ -15,13 +15,7 @@ import puppeteer, { Browser, Page } from 'puppeteer';
 import { count, debounceTime, finalize, switchMap, take, timeout } from 'rxjs';
 import { executeDevServer } from '../../index';
 import { describeServeBuilder } from '../jasmine-helpers';
-import {
-  BASE_OPTIONS,
-  BUILD_TIMEOUT,
-  DEV_SERVER_BUILDER_INFO,
-  describeBuilder,
-  setupBrowserTarget,
-} from '../setup';
+import { BASE_OPTIONS, BUILD_TIMEOUT, DEV_SERVER_BUILDER_INFO } from '../setup';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 declare const document: any;

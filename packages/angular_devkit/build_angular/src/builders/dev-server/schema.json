@@ -4,12 +4,6 @@
   "description": "Dev Server target options for Build Facade.",
   "type": "object",
   "properties": {
-    "browserTarget": {
-      "type": "string",
-      "description": "A browser builder target to serve in the format of `project:target[:configuration]`. You can also pass in more than one configuration name as a comma-separated list. Example: `project:target:production,staging`.",
-      "pattern": "^[^:\\s]+:[^:\\s]+(:[^\\s]+)?$",
-      "x-deprecated": "Use 'buildTarget' instead."
-    },
     "buildTarget": {
       "type": "string",
       "description": "A build builder target to serve in the format of `project:target[:configuration]`. You can also pass in more than one configuration name as a comma-separated list. Example: `project:target:production,staging`.",
@@ -138,5 +132,5 @@
     }
   },
   "additionalProperties": false,
-  "anyOf": [{ "required": ["buildTarget"] }, { "required": ["browserTarget"] }]
+  "required": ["buildTarget"]
 }
