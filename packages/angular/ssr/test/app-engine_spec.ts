@@ -11,8 +11,8 @@ import 'zone.js/node';
 import '@angular/compiler';
 /* eslint-enable import/no-unassigned-import */
 
-import { Component, ɵresetCompiledComponents } from '@angular/core';
-import { AngularServerApp } from '../src/app';
+import { Component } from '@angular/core';
+import { destroyAngularServerApp, getOrCreateAngularServerApp } from '../src/app';
 import { AngularAppEngine } from '../src/app-engine';
 import { setAngularAppEngineManifest } from '../src/manifest';
 import { setAngularAppTestingManifest } from './testing-utils';
@@ -21,14 +21,9 @@ describe('AngularAppEngine', () => {
   let appEngine: AngularAppEngine;
 
   describe('Localized app', () => {
-    beforeEach(() => {
-      // Need to clean up GENERATED_COMP_IDS map in `@angular/core`.
-      // Otherwise an incorrect component ID generation collision detected warning will be displayed.
-      // See: https://github.com/angular/angular-cli/issues/25924
-      ɵresetCompiledComponents();
-    });
-
     beforeAll(() => {
+      destroyAngularServerApp();
+
       setAngularAppEngineManifest({
         // Note: Although we are testing only one locale, we need to configure two or more
         // to ensure that we test a different code path.
@@ -45,7 +40,10 @@ describe('AngularAppEngine', () => {
 
               setAngularAppTestingManifest([{ path: 'home', component: HomeComponent }], locale);
 
-              return { AngularServerApp };
+              return {
+                ɵgetOrCreateAngularServerApp: getOrCreateAngularServerApp,
+                ɵdestroyAngularServerApp: destroyAngularServerApp,
+              };
             },
           ]),
         ),
@@ -93,14 +91,9 @@ describe('AngularAppEngine', () => {
   });
 
   describe('Non-localized app', () => {
-    beforeEach(() => {
-      // Need to clean up GENERATED_COMP_IDS map in `@angular/core`.
-      // Otherwise an incorrect component ID generation collision detected warning will be displayed.
-      // See: https://github.com/angular/angular-cli/issues/25924
-      ɵresetCompiledComponents();
-    });
-
     beforeAll(() => {
+      destroyAngularServerApp();
+
       setAngularAppEngineManifest({
         entryPoints: new Map([
           [
@@ -115,7 +108,10 @@ describe('AngularAppEngine', () => {
 
               setAngularAppTestingManifest([{ path: 'home', component: HomeComponent }]);
 
-              return { AngularServerApp };
+              return {
+                ɵgetOrCreateAngularServerApp: getOrCreateAngularServerApp,
+                ɵdestroyAngularServerApp: destroyAngularServerApp,
+              };
             },
           ],
         ]),

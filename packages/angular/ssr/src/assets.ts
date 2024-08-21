@@ -27,7 +27,7 @@ export class ServerAssets {
    * @throws Error If the asset path is not found in the manifest, an error is thrown.
    */
   async getServerAsset(path: string): Promise<string> {
-    const asset = this.manifest.assets[path];
+    const asset = this.manifest.assets.get(path);
     if (!asset) {
       throw new Error(`Server asset '${path}' does not exist.`);
     }

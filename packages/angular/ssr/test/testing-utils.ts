@@ -24,9 +24,10 @@ import { setAngularAppManifest } from '../src/manifest';
 export function setAngularAppTestingManifest(routes: Routes, baseHref = ''): void {
   setAngularAppManifest({
     inlineCriticalCss: false,
-    assets: {
-      'index.server.html': async () =>
-        `
+    assets: new Map(
+      Object.entries({
+        'index.server.html': async () =>
+          `
  <html>
   <head>
     <base href="/${baseHref}" />
@@ -35,7 +36,8 @@ export function setAngularAppTestingManifest(routes: Routes, baseHref = ''): voi
     <app-root></app-root>
   </body>
 </html>`,
-    },
+      }),
+    ),
     bootstrap: () => () => {
       @Component({
         standalone: true,

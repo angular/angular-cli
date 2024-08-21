@@ -15,10 +15,12 @@ describe('ServerAsset', () => {
   beforeAll(() => {
     assetManager = new ServerAssets({
       bootstrap: undefined as never,
-      assets: {
-        'index.server.html': async () => '<html>Index</html>',
-        'index.other.html': async () => '<html>Other</html>',
-      },
+      assets: new Map(
+        Object.entries({
+          'index.server.html': async () => '<html>Index</html>',
+          'index.other.html': async () => '<html>Other</html>',
+        }),
+      ),
     });
   });
 

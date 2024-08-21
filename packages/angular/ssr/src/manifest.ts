@@ -6,9 +6,24 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import type { AngularServerApp } from './app';
+import type { destroyAngularServerApp, getOrCreateAngularServerApp } from './app';
 import type { SerializableRouteTreeNode } from './routes/route-tree';
 import { AngularBootstrap } from './utils/ng';
+
+/**
+ * Represents the exports of an Angular server application entry point.
+ */
+export interface EntryPointExports {
+  /**
+   * A reference to the function that creates an Angular server application instance.
+   */
+  ɵgetOrCreateAngularServerApp: typeof getOrCreateAngularServerApp;
+
+  /**
+   * A reference to the function that destroys the `AngularServerApp` instance.
+   */
+  ɵdestroyAngularServerApp: typeof destroyAngularServerApp;
+}
 
 /**
  * Manifest for the Angular server application engine, defining entry points.
@@ -18,11 +33,9 @@ export interface AngularAppEngineManifest {
    * A map of entry points for the server application.
    * Each entry in the map consists of:
    * - `key`: The base href for the entry point.
-   * - `value`: A function that returns a promise resolving to an object containing the `AngularServerApp` type.
+   * - `value`: A function that returns a promise resolving to an object of type `EntryPointExports`.
    */
-  readonly entryPoints: Readonly<
-    Map<string, () => Promise<{ AngularServerApp: typeof AngularServerApp }>>
-  >;
+  readonly entryPoints: Readonly<Map<string, () => Promise<EntryPointExports>>>;
 
   /**
    * The base path for the server application.
@@ -36,12 +49,12 @@ export interface AngularAppEngineManifest {
  */
 export interface AngularAppManifest {
   /**
-   * A record of assets required by the server application.
-   * Each entry in the record consists of:
+   * A map of assets required by the server application.
+   * Each entry in the map consists of:
    * - `key`: The path of the asset.
    * - `value`: A function returning a promise that resolves to the file contents of the asset.
    */
-  readonly assets: Readonly<Record<string, () => Promise<string>>>;
+  readonly assets: Readonly<Map<string, () => Promise<string>>>;
 
   /**
    * The bootstrap mechanism for the server application.

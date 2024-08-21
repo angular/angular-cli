@@ -11,22 +11,17 @@ import 'zone.js/node';
 import '@angular/compiler';
 /* eslint-enable import/no-unassigned-import */
 
-import { Component, ɵresetCompiledComponents } from '@angular/core';
-import { AngularServerApp } from '../src/app';
+import { Component } from '@angular/core';
+import { AngularServerApp, destroyAngularServerApp } from '../src/app';
 import { ServerRenderContext } from '../src/render';
 import { setAngularAppTestingManifest } from './testing-utils';
 
 describe('AngularServerApp', () => {
   let app: AngularServerApp;
 
-  beforeEach(() => {
-    // Need to clean up GENERATED_COMP_IDS map in `@angular/core`.
-    // Otherwise an incorrect component ID generation collision detected warning will be displayed.
-    // See: https://github.com/angular/angular-cli/issues/25924
-    ɵresetCompiledComponents();
-  });
-
   beforeAll(() => {
+    destroyAngularServerApp();
+
     @Component({
       standalone: true,
       selector: 'app-home',
@@ -41,9 +36,7 @@ describe('AngularServerApp', () => {
       { path: 'redirect/absolute', redirectTo: '/home' },
     ]);
 
-    app = new AngularServerApp({
-      isDevMode: true,
-    });
+    app = new AngularServerApp();
   });
 
   describe('render', () => {
@@ -83,7 +76,7 @@ describe('AngularServerApp', () => {
       expect(response?.status).toBe(302);
     });
 
-    it('should correctly handle absoloute nested redirects', async () => {
+    it('should correctly handle absolute nested redirects', async () => {
       const response = await app.render(new Request('http://localhost/redirect/absolute'));
       expect(response?.headers.get('location')).toContain('http://localhost/home');
       expect(response?.status).toBe(302);

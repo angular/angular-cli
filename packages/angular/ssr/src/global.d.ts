@@ -6,10 +6,4 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-export {
-  CommonEngine,
-  type CommonEngineRenderOptions,
-  type CommonEngineOptions,
-} from './src/common-engine/common-engine';
-
-export * from './private_export';
+declare const ngDevMode: boolean | undefined;
