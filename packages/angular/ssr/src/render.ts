@@ -64,25 +64,25 @@ export async function render(
     );
   }
 
-  const { manifest, hooks, isDevMode } = app;
-
-  if (isDevMode) {
+  if (typeof ngDevMode === 'undefined' || ngDevMode) {
     // Need to clean up GENERATED_COMP_IDS map in `@angular/core`.
     // Otherwise an incorrect component ID generation collision detected warning will be displayed in development.
     // See: https://github.com/angular/angular-cli/issues/25924
     ɵresetCompiledComponents();
-
-    // An Angular Console Provider that does not print a set of predefined logs.
-    platformProviders.push({
-      provide: ɵConsole,
-      // Using `useClass` would necessitate decorating `Console` with `@Injectable`,
-      // which would require switching from `ts_library` to `ng_module`. This change
-      // would also necessitate various patches of `@angular/bazel` to support ESM.
-      useFactory: () => new Console(),
-    });
   }
 
-  let html = await app.assets.getIndexServerHtml();
+  // An Angular Console Provider that does not print a set of predefined logs.
+  platformProviders.push({
+    provide: ɵConsole,
+    // Using `useClass` would necessitate decorating `Console` with `@Injectable`,
+    // which would require switching from `ts_library` to `ng_module`. This change
+    // would also necessitate various patches of `@angular/bazel` to support ESM.
+    useFactory: () => new Console(),
+  });
+
+  const { manifest, hooks, assets } = app;
+
+  let html = await assets.getIndexServerHtml();
   // Skip extra microtask if there are no pre hooks.
   if (hooks.has('html:transform:pre')) {
     html = await hooks.run('html:transform:pre', { html });

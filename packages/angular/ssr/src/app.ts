@@ -13,47 +13,22 @@ import { ServerRenderContext, render } from './render';
 import { ServerRouter } from './routes/router';
 
 /**
- * Configuration options for initializing a `AngularServerApp` instance.
- */
-export interface AngularServerAppOptions {
-  /**
-   * Indicates whether the application is in development mode.
-   *
-   * When set to `true`, the application runs in development mode with additional debugging features.
-   */
-  isDevMode?: boolean;
-
-  /**
-   * Optional hooks for customizing the server application's behavior.
-   */
-  hooks?: Hooks;
-}
-
-/**
  * Represents a locale-specific Angular server application managed by the server application engine.
  *
  * The `AngularServerApp` class handles server-side rendering and asset management for a specific locale.
  */
 export class AngularServerApp {
   /**
+   * Hooks for extending or modifying the behavior of the server application.
+   * This instance can be used to attach custom functionality to various events in the server application lifecycle.
+   */
+  hooks = new Hooks();
+
+  /**
    * The manifest associated with this server application.
    * @internal
    */
   readonly manifest = getAngularAppManifest();
-
-  /**
-   * Hooks for extending or modifying the behavior of the server application.
-   * This instance can be used to attach custom functionality to various events in the server application lifecycle.
-   * @internal
-   */
-  readonly hooks: Hooks;
-
-  /**
-   * Specifies if the server application is operating in development mode.
-   * This property controls the activation of features intended for production, such as caching mechanisms.
-   * @internal
-   */
-  readonly isDevMode: boolean;
 
   /**
    * An instance of ServerAsset that handles server-side asset.
@@ -65,18 +40,6 @@ export class AngularServerApp {
    * The router instance used for route matching and handling.
    */
   private router: ServerRouter | undefined;
-
-  /**
-   * Creates a new `AngularServerApp` instance with the provided configuration options.
-   *
-   * @param options - The configuration options for the server application.
-   * - `isDevMode`: Flag indicating if the application is in development mode.
-   * - `hooks`: Optional hooks for customizing application behavior.
-   */
-  constructor(readonly options: AngularServerAppOptions) {
-    this.isDevMode = options.isDevMode ?? false;
-    this.hooks = options.hooks ?? new Hooks();
-  }
 
   /**
    * Renders a response for the given HTTP request using the server application.
@@ -112,4 +75,35 @@ export class AngularServerApp {
 
     return render(this, request, serverContext, requestContext);
   }
+}
+
+let angularServerApp: AngularServerApp | undefined;
+
+/**
+ * Retrieves or creates an instance of `AngularServerApp`.
+ * - If an instance of `AngularServerApp` already exists, it will return the existing one.
+ * - If no instance exists, it will create a new one with the provided options.
+ * @returns The existing or newly created instance of `AngularServerApp`.
+ */
+export function getOrCreateAngularServerApp(): AngularServerApp {
+  return (angularServerApp ??= new AngularServerApp());
+}
+
+/**
+ * Resets the instance of `AngularServerApp` to undefined, effectively
+ * clearing the reference. Use this to recreate the instance.
+ */
+export function resetAngularServerApp(): void {
+  angularServerApp = undefined;
+}
+
+/**
+ * Destroys the existing `AngularServerApp` instance, releasing associated resources and resetting the
+ * reference to `undefined`.
+ *
+ * This function is primarily used to enable the recreation of the `AngularServerApp` instance,
+ * typically when server configuration or application state needs to be refreshed.
+ */
+export function destroyAngularServerApp(): void {
+  angularServerApp = undefined;
 }
