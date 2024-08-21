@@ -237,9 +237,6 @@ export class FileAlreadyExistException extends BaseException {
 // @public (undocumented)
 type FileBuffer = ArrayBuffer;
 
-// @public @deprecated (undocumented)
-const fileBuffer: TemplateTag<FileBuffer>;
-
 // @public (undocumented)
 type FileBufferLike = ArrayBufferLike;
 
@@ -1324,7 +1321,6 @@ declare namespace virtualFs {
         AliasHost,
         stringToFileBuffer,
         fileBufferToString,
-        fileBuffer,
         createSyncHost,
         SyncHostHandler,
         Empty,
