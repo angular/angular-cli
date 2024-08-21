@@ -32,7 +32,7 @@
     "fast-glob": "3.3.2",
     "https-proxy-agent": "7.0.5",
     "listr2": "8.2.4",
-    "lmdb": "3.0.13",
+    "lmdb": "3.0.14",
     "magic-string": "0.30.11",
     "mrmime": "2.0.0",
     "parse5-html-rewriting-stream": "7.0.0",
@@ -41,7 +41,7 @@
     "rollup": "4.21.0",
     "sass": "1.77.8",
     "semver": "7.6.3",
-    "vite": "5.4.1",
+    "vite": "5.4.2",
     "watchpack": "2.4.2"
   },
   "peerDependencies": {
