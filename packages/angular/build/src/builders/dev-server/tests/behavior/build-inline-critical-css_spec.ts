@@ -32,7 +32,7 @@ describeServeBuilder(executeDevServer, DEV_SERVER_BUILDER_INFO, (harness, setupT
       await harness.writeFile('src/main.ts', '');
     });
 
-    it('inlines critical css when enabled in the "browserTarget" options', async () => {
+    it('inlines critical css when enabled in the "buildTarget" options', async () => {
       harness.useTarget('serve', {
         ...BASE_OPTIONS,
       });

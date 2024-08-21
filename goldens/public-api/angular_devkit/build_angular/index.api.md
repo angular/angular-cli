@@ -116,9 +116,7 @@ export enum CrossOrigin {
 // @public
 export interface DevServerBuilderOptions {
     allowedHosts?: string[];
-    // @deprecated
-    browserTarget?: string;
-    buildTarget?: string;
+    buildTarget: string;
     disableHostCheck?: boolean;
     forceEsbuild?: boolean;
     headers?: {
@@ -192,8 +190,6 @@ export type ExecutionTransformer<T> = (input: T) => T | Promise<T>;
 
 // @public
 export interface ExtractI18nBuilderOptions {
-    // @deprecated
-    browserTarget?: string;
     buildTarget?: string;
     format?: Format;
     outFile?: string;

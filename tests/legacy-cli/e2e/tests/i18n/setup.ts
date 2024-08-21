@@ -243,7 +243,7 @@ export async function setupI18nConfig() {
       }
 
       buildConfigs[lang] = { localize: [lang] };
-      serveConfigs[lang] = { browserTarget: `test-project:build:${lang}` };
+      serveConfigs[lang] = { buildTarget: `test-project:build:${lang}` };
       e2eConfigs[lang] = {
         specs: [`./src/app.${lang}.e2e-spec.ts`],
         devServerTarget: `test-project:serve:${lang}`,

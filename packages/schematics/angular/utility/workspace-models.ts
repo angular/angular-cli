@@ -74,14 +74,9 @@ export interface BrowserBuilderOptions extends BrowserBuilderBaseOptions {
 }
 
 export interface ServeBuilderOptions {
-  /**
-   * @deprecated not used since version 17.0.0. Use the property "buildTarget" instead.
-   */
-  browserTarget: string;
-
-  // TODO: make it required, when the deprecated property "browserTarget" is removed.
-  buildTarget?: string;
+  buildTarget: string;
 }
+
 export interface LibraryBuilderOptions {
   tsConfig: string;
   project: string;
