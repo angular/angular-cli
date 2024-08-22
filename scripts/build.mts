@@ -95,9 +95,7 @@ async function _build(logger: Console, mode: BuildMode): Promise<string[]> {
   logger.group(`Building (mode=${mode})...`);
 
   logger.group('Finding targets...');
-  const queryTargetsCmd =
-    `${bazelCmd} query --output=label "attr(name, npm_package_archive, //packages/...` +
-    ' except //packages/angular/ssr/schematics/...)"';
+  const queryTargetsCmd = `${bazelCmd} query --output=label "attr(name, npm_package_archive, //packages/...)"`;
   const targets = (await _exec(queryTargetsCmd, true, logger)).split(/\r?\n/);
   logger.groupEnd();
 
