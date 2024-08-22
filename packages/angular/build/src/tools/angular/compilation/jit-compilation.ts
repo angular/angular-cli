@@ -9,6 +9,7 @@
 import type ng from '@angular/compiler-cli';
 import assert from 'node:assert';
 import ts from 'typescript';
+import { loadEsmModule } from '../../../utils/load-esm';
 import { profileSync } from '../../esbuild/profiling';
 import { AngularHostOptions, createAngularCompilerHost } from '../angular-host';
 import { createJitResourceTransformer } from '../transformers/jit-resource-transformer';
@@ -38,7 +39,9 @@ export class JitCompilation extends AngularCompilation {
     referencedFiles: readonly string[];
   }> {
     // Dynamically load the Angular compiler CLI package
-    const { constructorParametersDownlevelTransform } = await AngularCompilation.loadCompilerCli();
+    const { constructorParametersDownlevelTransform } = await loadEsmModule<
+      typeof import('@angular/compiler-cli/private/tooling')
+    >('@angular/compiler-cli/private/tooling');
 
     // Load the compiler configuration and transform as needed
     const {
