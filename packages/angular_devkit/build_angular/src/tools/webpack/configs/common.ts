@@ -83,11 +83,11 @@ export async function getCommonConfig(wco: WebpackConfigOptions): Promise<Config
   // Load ESM `@angular/compiler-cli` using the TypeScript dynamic import workaround.
   // Once TypeScript provides support for keeping the dynamic import this workaround can be
   // changed to a direct dynamic import.
-  const {
-    GLOBAL_DEFS_FOR_TERSER,
-    GLOBAL_DEFS_FOR_TERSER_WITH_AOT,
-    VERSION: NG_VERSION,
-  } = await loadEsmModule<typeof import('@angular/compiler-cli')>('@angular/compiler-cli');
+  const { VERSION: NG_VERSION } =
+    await loadEsmModule<typeof import('@angular/compiler-cli')>('@angular/compiler-cli');
+  const { GLOBAL_DEFS_FOR_TERSER, GLOBAL_DEFS_FOR_TERSER_WITH_AOT } = await loadEsmModule<
+    typeof import('@angular/compiler-cli/private/tooling')
+  >('@angular/compiler-cli/private/tooling');
 
   // determine hashing format
   const hashFormat = getOutputHashFormat(buildOptions.outputHashing);
