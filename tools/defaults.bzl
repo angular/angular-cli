@@ -24,6 +24,8 @@ NPM_PACKAGE_SUBSTITUTIONS = {
     "0.0.0-ENGINES-NODE": RELEASE_ENGINES_NODE,
     "0.0.0-ENGINES-NPM": RELEASE_ENGINES_NPM,
     "0.0.0-ENGINES-YARN": RELEASE_ENGINES_YARN,
+    # The below is needed for @angular/ssr FESM file.
+    "\\./(.+)/packages/angular/ssr/third_party/critters": "../third_party/critters/index.js",
 }
 
 NO_STAMP_PACKAGE_SUBSTITUTIONS = dict(NPM_PACKAGE_SUBSTITUTIONS, **{
@@ -218,13 +220,14 @@ def pkg_npm(name, pkg_deps = [], use_prodmode_output = False, **kwargs):
         **kwargs
     )
 
-    pkg_tar(
-        name = name + "_archive",
-        srcs = [":%s" % name],
-        extension = "tgz",
-        strip_prefix = "./%s" % name,
-        visibility = visibility,
-    )
+    if pkg_json:
+        pkg_tar(
+            name = name + "_archive",
+            srcs = [":%s" % name],
+            extension = "tgz",
+            strip_prefix = "./%s" % name,
+            visibility = visibility,
+        )
 
 def ng_module(name, tsconfig = None, entry_point = None, testonly = False, deps = [], module_name = None, package_name = None, **kwargs):
     """Default values for ng_module"""
@@ -268,12 +271,6 @@ def ng_module(name, tsconfig = None, entry_point = None, testonly = False, deps 
 def ng_package(deps = [], **kwargs):
     _ng_package(
         deps = deps,
-        externals = [
-            "xhr2",
-            "critters",
-            "express-engine",
-            "express",
-        ],
         substitutions = select({
             "//:stamp": NPM_PACKAGE_SUBSTITUTIONS,
             "//conditions:default": NO_STAMP_PACKAGE_SUBSTITUTIONS,

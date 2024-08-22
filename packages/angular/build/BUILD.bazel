@@ -79,6 +79,7 @@ ts_library(
         "@npm//browserslist",
         "@npm//critters",
         "@npm//esbuild",
+        "@npm//esbuild-wasm",
         "@npm//fast-glob",
         "@npm//https-proxy-agent",
         "@npm//listr2",

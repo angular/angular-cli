@@ -13,7 +13,6 @@
     "save": "dependencies"
   },
   "dependencies": {
-    "critters": "0.0.24",
     "tslib": "^2.3.0"
   },
   "peerDependencies": {

@@ -14,6 +14,7 @@ import { Hooks } from './hooks';
 import { getAngularAppManifest } from './manifest';
 import { ServerRouter } from './routes/router';
 import { REQUEST, REQUEST_CONTEXT, RESPONSE_INIT } from './tokens';
+import { InlineCriticalCssProcessor } from './utils/inline-critical-css';
 import { renderAngular } from './utils/ng';
 
 /**
@@ -51,6 +52,11 @@ export class AngularServerApp {
    * The router instance used for route matching and handling.
    */
   private router: ServerRouter | undefined;
+
+  /**
+   * The `inlineCriticalCssProcessor` is responsible for handling critical CSS inlining.
+   */
+  private inlineCriticalCssProcessor: InlineCriticalCssProcessor | undefined;
 
   /**
    * Renders a response for the given HTTP request using the server application.
@@ -177,10 +183,38 @@ export class AngularServerApp {
       html = await hooks.run('html:transform:pre', { html });
     }
 
-    return new Response(
-      await renderAngular(html, manifest.bootstrap(), new URL(request.url), platformProviders),
-      responseInit,
-    );
+    html = await renderAngular(html, manifest.bootstrap(), new URL(request.url), platformProviders);
+
+    if (manifest.inlineCriticalCss) {
+      // Optionally inline critical CSS.
+      const inlineCriticalCssProcessor = this.getOrCreateInlineCssProcessor();
+      html = await inlineCriticalCssProcessor.process(html);
+    }
+
+    return new Response(html, responseInit);
+  }
+
+  /**
+   * Retrieves or creates the inline critical CSS processor.
+   * If one does not exist, it initializes a new instance.
+   *
+   * @returns The inline critical CSS processor instance.
+   */
+  private getOrCreateInlineCssProcessor(): InlineCriticalCssProcessor {
+    let inlineCriticalCssProcessor = this.inlineCriticalCssProcessor;
+
+    if (!inlineCriticalCssProcessor) {
+      inlineCriticalCssProcessor = new InlineCriticalCssProcessor();
+      inlineCriticalCssProcessor.readFile = (path: string) => {
+        const fileName = path.split('/').pop() ?? path;
+
+        return this.assets.getServerAsset(fileName);
+      };
+
+      this.inlineCriticalCssProcessor = inlineCriticalCssProcessor;
+    }
+
+    return inlineCriticalCssProcessor;
   }
 }
 

@@ -1,0 +1,55 @@
+load("@npm//@angular/build-tooling/bazel/esbuild:index.bzl", "esbuild", "esbuild_config")
+load("//tools:defaults.bzl", "js_library")
+
+package(default_visibility = ["//visibility:public"])
+
+esbuild(
+    name = "bundled_critters",
+    config = ":esbuild_config",
+    entry_point = "@npm//:node_modules/critters/dist/critters.mjs",
+    metafile = True,
+    splitting = True,
+    deps = [
+        "@npm//critters",
+        "@npm//unenv",
+    ],
+)
+
+esbuild_config(
+    name = "esbuild_config",
+    config_file = "esbuild.config.mjs",
+)
+
+js_library(
+    name = "bundled_critters_lib",
+    srcs = [
+        "index.d.ts",
+        ":bundled_critters_files",
+    ],
+    deps = [
+        "@npm//critters",
+    ],
+)
+
+# Filter out esbuild metadata files and only copy the necessary files
+genrule(
+    name = "bundled_critters_files",
+    srcs = [
+        ":bundled_critters",
+    ],
+    outs = [
+        "index.js",
+        "index.js.map",
+        "THIRD_PARTY_LICENSES.txt",
+    ],
+    cmd = """
+        for f in $(locations :bundled_critters); do
+            # Only process files inside the bundled_critters directory
+            if [[ "$${f}" == *bundled_critters ]]; then
+                cp "$${f}/index.js" $(location :index.js)
+                cp "$${f}/index.js.map" $(location :index.js.map)
+                cp "$${f}/THIRD_PARTY_LICENSES.txt" $(location :THIRD_PARTY_LICENSES.txt)
+            fi
+        done
+    """,
+)
