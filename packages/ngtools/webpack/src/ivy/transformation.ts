@@ -47,7 +47,7 @@ export function createAotTransformers(
 
 export function createJitTransformers(
   builder: ts.BuilderProgram,
-  compilerCli: typeof import('@angular/compiler-cli'),
+  compilerCli: typeof import('@angular/compiler-cli/private/tooling'),
   options: {
     inlineStyleFileExtension?: string;
   },
