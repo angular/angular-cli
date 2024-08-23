@@ -1,0 +1,35 @@
+load("@build_bazel_rules_nodejs//:index.bzl", "nodejs_binary")
+load("@npm//@bazel/jasmine:index.bzl", "jasmine_node_test")
+load("//tools:defaults.bzl", "ts_library")
+
+ts_library(
+    name = "unit_test_lib",
+    testonly = True,
+    srcs = glob(["**/*.ts"]),
+    deps = [
+        "@npm//@bazel/runfiles",
+        "@npm//@types/diff",
+    ],
+)
+
+jasmine_node_test(
+    name = "test",
+    srcs = [":unit_test_lib"],
+    data = [
+        "THIRD_PARTY_LICENSES.txt.golden",
+        "//packages/angular/ssr:npm_package",
+        "@npm//diff",
+    ],
+)
+
+nodejs_binary(
+    name = "test.accept",
+    testonly = True,
+    data = [
+        "THIRD_PARTY_LICENSES.txt.golden",
+        ":unit_test_lib",
+        "//packages/angular/ssr:npm_package",
+        "@npm//diff",
+    ],
+    entry_point = ":update-package-golden.ts",
+)

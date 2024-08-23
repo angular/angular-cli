@@ -659,6 +659,7 @@ __metadata:
     "@bazel/buildifier": "npm:7.1.2"
     "@bazel/concatjs": "patch:@bazel/concatjs@npm%3A5.8.1#~/.yarn/patches/@bazel-concatjs-npm-5.8.1-1bf81df846.patch"
     "@bazel/jasmine": "patch:@bazel/jasmine@npm%3A5.8.1#~/.yarn/patches/@bazel-jasmine-npm-5.8.1-3370fee155.patch"
+    "@bazel/runfiles": "npm:^5.8.1"
     "@discoveryjs/json-ext": "npm:0.6.1"
     "@inquirer/confirm": "npm:3.1.22"
     "@inquirer/prompts": "npm:5.3.8"
@@ -667,6 +668,7 @@ __metadata:
     "@rollup/plugin-node-resolve": "npm:^13.0.5"
     "@types/babel__core": "npm:7.20.5"
     "@types/browser-sync": "npm:^2.27.0"
+    "@types/diff": "npm:^5.2.1"
     "@types/express": "npm:^4.16.0"
     "@types/http-proxy": "npm:^1.17.4"
     "@types/ini": "npm:^4.0.0"
@@ -706,6 +708,7 @@ __metadata:
     critters: "npm:0.0.24"
     css-loader: "npm:7.1.2"
     debug: "npm:^4.1.1"
+    diff: "npm:^5.2.0"
     esbuild: "npm:0.23.1"
     esbuild-wasm: "npm:0.23.1"
     eslint: "npm:8.57.0"
@@ -965,6 +968,8 @@ __metadata:
     "@angular/platform-browser": "npm:19.0.0-next.1"
     "@angular/platform-server": "npm:19.0.0-next.1"
     "@angular/router": "npm:19.0.0-next.1"
+    "@bazel/runfiles": "npm:^5.8.1"
+    diff: "npm:^5.2.0"
     tslib: "npm:^2.3.0"
     zone.js: "npm:^0.15.0"
   peerDependencies:
@@ -4866,6 +4871,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/diff@npm:^5.2.1":
+  version: 5.2.1
+  resolution: "@types/diff@npm:5.2.1"
+  checksum: 10c0/62dcab32197ac67f212939cdd79aa3953327a482bec55c6a38ad9de8a0662a9f920b59504609a322fc242593bd9afb3d2704702f4bc98087a13171234b952361
+  languageName: node
+  linkType: hard
+
 "@types/estree@npm:*, @types/estree@npm:1.0.5, @types/estree@npm:^1.0.0, @types/estree@npm:^1.0.5":
   version: 1.0.5
   resolution: "@types/estree@npm:1.0.5"
@@ -8549,7 +8561,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"diff@npm:^5.0.0, diff@npm:^5.1.0":
+"diff@npm:^5.0.0, diff@npm:^5.1.0, diff@npm:^5.2.0":
   version: 5.2.0
   resolution: "diff@npm:5.2.0"
   checksum: 10c0/aed0941f206fe261ecb258dc8d0ceea8abbde3ace5827518ff8d302f0fc9cc81ce116c4d8f379151171336caf0516b79e01abdc1ed1201b6440d895a66689eb4

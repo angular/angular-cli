@@ -13,7 +13,7 @@ ts_library(
     testonly = True,
     srcs = glob(
         include = ["**/*_spec.ts"],
-        exclude = ESM_TESTS,
+        exclude = ESM_TESTS + ["npm_package/**"],
     ),
     deps = [
         "//packages/angular/ssr",
