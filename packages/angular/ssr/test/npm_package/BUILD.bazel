@@ -1,4 +1,5 @@
-load("@build_bazel_rules_nodejs//:index.bzl", "nodejs_binary")
+load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
+load("@bazel_skylib//rules:write_file.bzl", "write_file")
 load("@npm//@bazel/jasmine:index.bzl", "jasmine_node_test")
 load("//tools:defaults.bzl", "ts_library")
 
@@ -8,7 +9,6 @@ ts_library(
     srcs = glob(["**/*.ts"]),
     deps = [
         "@npm//@bazel/runfiles",
-        "@npm//@types/diff",
     ],
 )
 
@@ -16,20 +16,43 @@ jasmine_node_test(
     name = "test",
     srcs = [":unit_test_lib"],
     data = [
-        "THIRD_PARTY_LICENSES.txt.golden",
         "//packages/angular/ssr:npm_package",
-        "@npm//diff",
     ],
 )
 
-nodejs_binary(
-    name = "test.accept",
-    testonly = True,
-    data = [
-        "THIRD_PARTY_LICENSES.txt.golden",
-        ":unit_test_lib",
+genrule(
+    name = "critters_license_file",
+    srcs = [
         "//packages/angular/ssr:npm_package",
-        "@npm//diff",
     ],
-    entry_point = ":update-package-golden.ts",
+    outs = [
+        "THIRD_PARTY_LICENSES.txt",
+    ],
+    cmd = """
+      cp $(location //packages/angular/ssr:npm_package)/third_party/critters/THIRD_PARTY_LICENSES.txt $(location :THIRD_PARTY_LICENSES.txt)
+    """,
+)
+
+diff_test(
+    name = "critters_license_test",
+    failure_message = """
+
+    To accept the new golden file, execute:
+    yarn bazel run //packages/angular/ssr/test/npm_package:critters_license_test.accept
+    """,
+    file1 = ":THIRD_PARTY_LICENSES.txt.golden",
+    file2 = ":critters_license_file",
+)
+
+write_file(
+    name = "critters_license_test.accept",
+    out = "critters_license_file_accept.sh",
+    content =
+        [
+            "#!/usr/bin/env bash",
+            "cd ${BUILD_WORKSPACE_DIRECTORY}",
+            "yarn bazel build //packages/angular/ssr:npm_package",
+            "cp -fv dist/bin/packages/angular/ssr/npm_package/third_party/critters/THIRD_PARTY_LICENSES.txt packages/angular/ssr/test/npm_package/THIRD_PARTY_LICENSES.txt.golden",
+        ],
+    is_executable = True,
 )
