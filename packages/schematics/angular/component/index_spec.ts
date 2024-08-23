@@ -496,4 +496,20 @@ describe('Component Schematic', () => {
       await expectAsync(schematicRunner.runSchematic('component', options, appTree)).toBeRejected();
     });
   });
+
+  it('should export the component as default when exportDefault is true', async () => {
+    const options = { ...defaultOptions, exportDefault: true };
+
+    const tree = await schematicRunner.runSchematic('component', options, appTree);
+    const tsContent = tree.readContent('/projects/bar/src/app/foo/foo.component.ts');
+    expect(tsContent).toContain('export default class FooComponent');
+  });
+
+  it('should export the component as a named export when exportDefault is false', async () => {
+    const options = { ...defaultOptions, exportDefault: false };
+
+    const tree = await schematicRunner.runSchematic('component', options, appTree);
+    const tsContent = tree.readContent('/projects/bar/src/app/foo/foo.component.ts');
+    expect(tsContent).toContain('export class FooComponent');
+  });
 });
