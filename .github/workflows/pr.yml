@@ -97,10 +97,8 @@ jobs:
         uses: angular/dev-infra/github-actions/bazel/configure-remote@8eed650ff101cb2be3949febba829b722e89ff80
       - name: Install node modules
         run: yarn install --immutable
-      - name: Run module tests
-        run: yarn bazel test //modules/...
-      - name: Run package tests
-        run: yarn bazel test //packages/...
+      - name: Run module and package tests
+        run: yarn bazel test //modules/... //packages/...
 
   e2e:
     strategy:
