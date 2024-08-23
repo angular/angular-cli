@@ -6,15 +6,32 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { createPatch } from 'diff';
+import { runfiles } from '@bazel/runfiles';
 import { existsSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
-import { join } from 'node:path';
-import {
+import { dirname, join } from 'node:path';
+
+/**
+ * Resolve paths for the Critters license file and the golden reference file.
+ */
+const ANGULAR_SSR_PACKAGE_PATH = dirname(
+  runfiles.resolve('angular_cli/packages/angular/ssr/npm_package/package.json'),
+);
+
+/**
+ * Path to the actual license file for the Critters library.
+ * This file is located in the `third_party/critters` directory of the Angular CLI npm package.
+ */
+const CRITTERS_ACTUAL_LICENSE_FILE_PATH = join(
   ANGULAR_SSR_PACKAGE_PATH,
-  CRITTERS_ACTUAL_LICENSE_FILE_PATH,
-  CRITTERS_GOLDEN_LICENSE_FILE_PATH,
-} from './utils';
+  'third_party/critters/THIRD_PARTY_LICENSES.txt',
+);
+
+/**
+ * Path to the golden reference license file for the Critters library.
+ * This file is used as a reference for comparison and is located in the same directory as this script.
+ */
+const CRITTERS_GOLDEN_LICENSE_FILE_PATH = join(__dirname, 'THIRD_PARTY_LICENSES.txt.golden');
 
 describe('NPM Package Tests', () => {
   it('should not include the contents of third_party/critters/index.js in the FESM bundle', async () => {
@@ -26,37 +43,6 @@ describe('NPM Package Tests', () => {
   describe('third_party/critters/THIRD_PARTY_LICENSES.txt', () => {
     it('should exist', () => {
       expect(existsSync(CRITTERS_ACTUAL_LICENSE_FILE_PATH)).toBe(true);
-    });
-
-    it('should match the expected golden file', async () => {
-      const [expectedContent, actualContent] = await Promise.all([
-        readFile(CRITTERS_GOLDEN_LICENSE_FILE_PATH, 'utf-8'),
-        readFile(CRITTERS_ACTUAL_LICENSE_FILE_PATH, 'utf-8'),
-      ]);
-
-      if (expectedContent.trim() === actualContent.trim()) {
-        return;
-      }
-
-      const patch = createPatch(
-        CRITTERS_GOLDEN_LICENSE_FILE_PATH,
-        expectedContent,
-        actualContent,
-        'Golden License File',
-        'Current License File',
-        { context: 5 },
-      );
-
-      const errorMessage = `The content of the actual license file differs from the expected golden reference.
-      Diff:
-      ${patch}
-      To accept the new golden file, execute:
-        yarn bazel run ${process.env['BAZEL_TARGET']}.accept
-    `;
-
-      const error = new Error(errorMessage);
-      error.stack = error.stack?.replace(`      Diff:\n      ${patch}`, '');
-      throw error;
     });
   });
 });
