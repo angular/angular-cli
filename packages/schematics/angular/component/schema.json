@@ -130,6 +130,11 @@
       "type": "boolean",
       "default": false,
       "description": "The declaring NgModule exports this component."
+    },
+    "exportDefault": {
+      "type": "boolean",
+      "default": false,
+      "description": "Use default export for the component instead of a named export."
     }
   },
   "required": ["name", "project"]
