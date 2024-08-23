@@ -187,34 +187,16 @@ export class AngularServerApp {
 
     if (manifest.inlineCriticalCss) {
       // Optionally inline critical CSS.
-      const inlineCriticalCssProcessor = this.getOrCreateInlineCssProcessor();
-      html = await inlineCriticalCssProcessor.process(html);
-    }
-
-    return new Response(html, responseInit);
-  }
-
-  /**
-   * Retrieves or creates the inline critical CSS processor.
-   * If one does not exist, it initializes a new instance.
-   *
-   * @returns The inline critical CSS processor instance.
-   */
-  private getOrCreateInlineCssProcessor(): InlineCriticalCssProcessor {
-    let inlineCriticalCssProcessor = this.inlineCriticalCssProcessor;
-
-    if (!inlineCriticalCssProcessor) {
-      inlineCriticalCssProcessor = new InlineCriticalCssProcessor();
-      inlineCriticalCssProcessor.readFile = (path: string) => {
+      this.inlineCriticalCssProcessor ??= new InlineCriticalCssProcessor((path: string) => {
         const fileName = path.split('/').pop() ?? path;
 
         return this.assets.getServerAsset(fileName);
-      };
+      });
 
-      this.inlineCriticalCssProcessor = inlineCriticalCssProcessor;
+      html = await this.inlineCriticalCssProcessor.process(html);
     }
 
-    return inlineCriticalCssProcessor;
+    return new Response(html, responseInit);
   }
 }
 
