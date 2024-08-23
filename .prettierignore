@@ -12,6 +12,6 @@
 /CONTRIBUTING.md
 .yarn/
 dist/
-third_party/
+third_party/github.com/
 /tests/legacy-cli/e2e/assets/
 /tools/test/*.json

@@ -87,10 +87,9 @@ const EXTRACTION_FILE_SEPARATOR = '-'.repeat(80) + '\n';
  * @returns A string containing the content of the output licenses file.
  */
 async function extractLicenses(metafile) {
-  let extractedLicenseContent = `${EXTRACTION_FILE_HEADER}\n${EXTRACTION_FILE_SEPARATOR}`;
-
   const seenPaths = new Set();
   const seenPackages = new Set();
+  const extractedLicenses = {};
 
   for (const entry of Object.values(metafile.outputs)) {
     for (const [inputPath, { bytesInOutput }] of Object.entries(entry.inputs)) {
@@ -186,12 +185,20 @@ async function extractLicenses(metafile) {
       }
 
       // Generate the package's license entry in the output content
-      extractedLicenseContent += `Package: ${packageJson.name}\n`;
-      extractedLicenseContent += `License: ${JSON.stringify(packageJson.license, null, 2)}\n`;
-      extractedLicenseContent += `\n${licenseText}\n`;
+      let extractedLicenseContent = `Package: ${packageJson.name}\n`;
+      extractedLicenseContent += `License: ${JSON.stringify(packageJson.license, undefined, 2)}\n`;
+      extractedLicenseContent += `\n${licenseText.trim().replace(/\r?\n/g, '\n')}\n`;
       extractedLicenseContent += EXTRACTION_FILE_SEPARATOR;
+
+      extractedLicenses[packageJson.name] = extractedLicenseContent;
     }
   }
 
-  return extractedLicenseContent;
+  // Get the keys of the object and sort them and etract and join the values corresponding to the sorted keys
+  const joinedLicenseContent = Object.keys(extractedLicenses)
+    .sort()
+    .map((pkgName) => extractedLicenses[pkgName])
+    .join('');
+
+  return `${EXTRACTION_FILE_HEADER}\n${EXTRACTION_FILE_SEPARATOR}${joinedLicenseContent}`;
 }
