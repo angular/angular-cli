@@ -28,4 +28,5 @@ export const BASE_OPTIONS = Object.freeze<Schema>({
 
   // Disable optimizations
   optimization: false,
+  buildOptimizer: false,
 });
