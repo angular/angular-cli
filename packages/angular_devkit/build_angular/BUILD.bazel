@@ -343,7 +343,6 @@ LARGE_SPECS = {
         "shards": 1,
     },
     "server": {
-        "flaky": True,
         "extra_deps": [
             "@npm//@angular/animations",
         ],
