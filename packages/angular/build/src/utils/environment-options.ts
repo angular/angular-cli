@@ -100,3 +100,7 @@ export const useJSONBuildLogs =
 const optimizeChunksVariable = process.env['NG_BUILD_OPTIMIZE_CHUNKS'];
 export const shouldOptimizeChunks =
   isPresent(optimizeChunksVariable) && isEnabled(optimizeChunksVariable);
+
+const hmrComponentStylesVariable = process.env['NG_HMR_CSTYLES'];
+export const useComponentStyleHmr =
+  isPresent(hmrComponentStylesVariable) && isEnabled(hmrComponentStylesVariable);

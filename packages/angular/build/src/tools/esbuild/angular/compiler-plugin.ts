@@ -48,6 +48,7 @@ export interface CompilerPluginOptions {
   sourceFileCache?: SourceFileCache;
   loadResultCache?: LoadResultCache;
   incremental: boolean;
+  externalRuntimeStyles?: boolean;
 }
 
 // eslint-disable-next-line max-lines-per-function
@@ -152,6 +153,7 @@ export function createCompilerPlugin(
         // Angular compiler which does not have direct knowledge of transitive resource
         // dependencies or web worker processing.
         let modifiedFiles;
+        let invalidatedStylesheetEntries;
         if (
           pluginOptions.sourceFileCache?.modifiedFiles.size &&
           referencedFileTracker &&
@@ -160,7 +162,7 @@ export function createCompilerPlugin(
           // TODO: Differentiate between changed input files and stale output files
           modifiedFiles = referencedFileTracker.update(pluginOptions.sourceFileCache.modifiedFiles);
           pluginOptions.sourceFileCache.invalidate(modifiedFiles);
-          stylesheetBundler.invalidate(modifiedFiles);
+          invalidatedStylesheetEntries = stylesheetBundler.invalidate(modifiedFiles);
         }
 
         if (
@@ -266,6 +268,7 @@ export function createCompilerPlugin(
         // Initialize the Angular compilation for the current build.
         // In watch mode, previous build state will be reused.
         let referencedFiles;
+        let externalStylesheets;
         try {
           const initializationResult = await compilation.initialize(
             pluginOptions.tsconfig,
@@ -280,6 +283,7 @@ export function createCompilerPlugin(
             !!initializationResult.compilerOptions.sourceMap ||
             !!initializationResult.compilerOptions.inlineSourceMap;
           referencedFiles = initializationResult.referencedFiles;
+          externalStylesheets = initializationResult.externalStylesheets;
         } catch (error) {
           (result.errors ??= []).push({
             text: 'Angular compilation initialization failed.',
@@ -302,6 +306,32 @@ export function createCompilerPlugin(
           hasCompilationErrors = await sharedTSCompilationState.waitUntilReady;
 
           return result;
+        }
+
+        if (externalStylesheets) {
+          // Process any new external stylesheets
+          for (const [stylesheetFile, externalId] of externalStylesheets) {
+            await bundleExternalStylesheet(
+              stylesheetBundler,
+              stylesheetFile,
+              externalId,
+              result,
+              additionalResults,
+            );
+          }
+          // Process any updated stylesheets
+          if (invalidatedStylesheetEntries) {
+            for (const stylesheetFile of invalidatedStylesheetEntries) {
+              // externalId is already linked in the bundler context so only enabling is required here
+              await bundleExternalStylesheet(
+                stylesheetBundler,
+                stylesheetFile,
+                true,
+                result,
+                additionalResults,
+              );
+            }
+          }
         }
 
         // Update TypeScript file output cache for all affected files
@@ -500,6 +530,30 @@ export function createCompilerPlugin(
   };
 }
 
+async function bundleExternalStylesheet(
+  stylesheetBundler: ComponentStylesheetBundler,
+  stylesheetFile: string,
+  externalId: string | boolean,
+  result: OnStartResult,
+  additionalResults: Map<
+    string,
+    { outputFiles?: OutputFile[]; metafile?: Metafile; errors?: PartialMessage[] }
+  >,
+) {
+  const { outputFiles, metafile, errors, warnings } = await stylesheetBundler.bundleFile(
+    stylesheetFile,
+    externalId,
+  );
+  if (errors) {
+    (result.errors ??= []).push(...errors);
+  }
+  (result.warnings ??= []).push(...warnings);
+  additionalResults.set(stylesheetFile, {
+    outputFiles,
+    metafile,
+  });
+}
+
 function createCompilerOptionsTransformer(
   setupWarnings: PartialMessage[] | undefined,
   pluginOptions: CompilerPluginOptions,
@@ -572,6 +626,7 @@ function createCompilerOptionsTransformer(
       mapRoot: undefined,
       sourceRoot: undefined,
       preserveSymlinks,
+      externalRuntimeStyles: pluginOptions.externalRuntimeStyles,
     };
   };
 }

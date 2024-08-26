@@ -42,7 +42,7 @@ export async function initialize(request: InitRequest) {
     }
   });
 
-  const { compilerOptions, referencedFiles } = await compilation.initialize(
+  const { compilerOptions, referencedFiles, externalStylesheets } = await compilation.initialize(
     request.tsconfig,
     {
       fileReplacements: request.fileReplacements,
@@ -93,6 +93,7 @@ export async function initialize(request: InitRequest) {
   );
 
   return {
+    externalStylesheets,
     referencedFiles,
     // TODO: Expand? `allowJs`, `isolatedModules`, `sourceMap`, `inlineSourceMap` are the only fields needed currently.
     compilerOptions: {

@@ -37,6 +37,7 @@ export function createCompilerPluginOptions(
     tailwindConfiguration,
     postcssConfiguration,
     publicPath,
+    externalRuntimeStyles,
   } = options;
 
   return {
@@ -51,6 +52,7 @@ export function createCompilerPluginOptions(
       sourceFileCache,
       loadResultCache: sourceFileCache?.loadResultCache,
       incremental: !!options.watch,
+      externalRuntimeStyles,
     },
     // Component stylesheet options
     styleOptions: {

@@ -18,6 +18,7 @@ import { createAngularMemoryPlugin } from '../../tools/vite/angular-memory-plugi
 import { createAngularLocaleDataPlugin } from '../../tools/vite/i18n-locale-plugin';
 import { createRemoveIdPrefixPlugin } from '../../tools/vite/id-prefix-plugin';
 import { loadProxyConfiguration, normalizeSourceMaps } from '../../utils';
+import { useComponentStyleHmr } from '../../utils/environment-options';
 import { loadEsmModule } from '../../utils/load-esm';
 import { Result, ResultFile, ResultKind } from '../application/results';
 import {
@@ -129,6 +130,9 @@ export async function* serveWithVite(
     // https://nodejs.org/api/process.html#processsetsourcemapsenabledval
     process.setSourceMapsEnabled(true);
   }
+
+  // TODO: Enable by default once full support across CLI and FW is integrated
+  browserOptions.externalRuntimeStyles = useComponentStyleHmr;
 
   // Setup the prebundling transformer that will be shared across Vite prebundling requests
   const prebundleTransformer = new JavaScriptTransformer(

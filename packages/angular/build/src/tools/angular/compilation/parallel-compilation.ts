@@ -47,6 +47,7 @@ export class ParallelCompilation extends AngularCompilation {
     affectedFiles: ReadonlySet<SourceFile>;
     compilerOptions: CompilerOptions;
     referencedFiles: readonly string[];
+    externalStylesheets?: ReadonlyMap<string, string>;
   }> {
     const stylesheetChannel = new MessageChannel();
     // The request identifier is required because Angular can issue multiple concurrent requests
