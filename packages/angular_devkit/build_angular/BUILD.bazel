@@ -365,7 +365,7 @@ LARGE_SPECS = {
             "@npm//browser-sync",
             "@npm//express",
             "@npm//undici",
-            "//packages/angular/ssr",
+            "//packages/angular/ssr/node",
         ],
     },
 }

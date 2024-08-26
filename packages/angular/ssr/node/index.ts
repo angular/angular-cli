@@ -6,4 +6,4 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-export * from './private_export';
+export * from './public_api';

@@ -6,8 +6,8 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
+import { ɵInlineCriticalCssProcessor as InlineCriticalCssProcessor } from '@angular/ssr';
 import { readFile } from 'node:fs/promises';
-import { InlineCriticalCssProcessor } from '../utils/inline-critical-css';
 
 export class CommonEngineInlineCriticalCssProcessor {
   private readonly resourceCache = new Map<string, string>();
