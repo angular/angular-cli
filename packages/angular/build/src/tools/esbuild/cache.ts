@@ -126,4 +126,12 @@ export class MemoryCache<V> extends Cache<V, Map<string, V>> {
   values() {
     return this.store.values();
   }
+
+  /**
+   * Provides all the keys/values currently present in the cache instance.
+   * @returns An iterable of all key/value pairs in the cache.
+   */
+  entries() {
+    return this.store.entries();
+  }
 }

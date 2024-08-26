@@ -46,6 +46,7 @@ export class AotCompilation extends AngularCompilation {
     affectedFiles: ReadonlySet<ts.SourceFile>;
     compilerOptions: ng.CompilerOptions;
     referencedFiles: readonly string[];
+    externalStylesheets?: ReadonlyMap<string, string>;
   }> {
     // Dynamically load the Angular compiler CLI package
     const { NgtscProgram, OptimizeFor } = await AngularCompilation.loadCompilerCli();
@@ -58,6 +59,10 @@ export class AotCompilation extends AngularCompilation {
     } = await this.loadConfiguration(tsconfig);
     const compilerOptions =
       compilerOptionsTransformer?.(originalCompilerOptions) ?? originalCompilerOptions;
+
+    if (compilerOptions.externalRuntimeStyles) {
+      hostOptions.externalStylesheets ??= new Map();
+    }
 
     // Create Angular compiler host
     const host = createAngularCompilerHost(ts, compilerOptions, hostOptions);
@@ -121,7 +126,12 @@ export class AotCompilation extends AngularCompilation {
       this.#state?.diagnosticCache,
     );
 
-    return { affectedFiles, compilerOptions, referencedFiles };
+    return {
+      affectedFiles,
+      compilerOptions,
+      referencedFiles,
+      externalStylesheets: hostOptions.externalStylesheets,
+    };
   }
 
   *collectDiagnostics(modes: DiagnosticModes): Iterable<ts.Diagnostic> {
