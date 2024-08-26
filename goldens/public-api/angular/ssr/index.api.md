@@ -4,6 +4,17 @@
 
 ```ts
 
+// @public
+export interface AngularServerAppManager {
+    render(request: Request, requestContext?: unknown): Promise<Response | null>;
+}
+
+// @public
+export function destroyAngularAppEngine(): void;
+
+// @public
+export function getOrCreateAngularAppEngine(): AngularServerAppManager;
+
 // (No @packageDocumentation comment for this package)
 
 ```
