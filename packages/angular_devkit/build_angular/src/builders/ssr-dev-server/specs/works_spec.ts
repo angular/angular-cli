@@ -24,7 +24,7 @@ describe('Serve SSR Builder', () => {
       'src/main.server.ts': `
       import 'zone.js/node';
 
-      import { CommonEngine } from '@angular/ssr';
+      import { CommonEngine } from '@angular/ssr/node';
       import * as express from 'express';
       import { resolve, join } from 'node:path';
       import { AppServerModule } from './app/app.module.server';

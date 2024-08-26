@@ -11,6 +11,11 @@
       "version": "19.0.0",
       "factory": "./update-workspace-config/migration",
       "description": "Update the workspace configuration by replacing deprecated options in 'angular.json' for compatibility with the latest Angular CLI changes."
+    },
+    "update-ssr-imports": {
+      "version": "19.0.0",
+      "factory": "./update-ssr-imports/migration",
+      "description": "Update '@angular/ssr' import paths to use the new '/node' entry point when 'CommonEngine' is detected."
     }
   }
 }

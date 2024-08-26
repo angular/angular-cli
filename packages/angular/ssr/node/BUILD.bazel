@@ -1,0 +1,20 @@
+load("//tools:defaults.bzl", "ts_library")
+
+package(default_visibility = ["//visibility:public"])
+
+ts_library(
+    name = "node",
+    srcs = glob(
+        [
+            "*.ts",
+            "src/**/*.ts",
+        ],
+    ),
+    module_name = "@angular/ssr/node",
+    deps = [
+        "//packages/angular/ssr",
+        "@npm//@angular/core",
+        "@npm//@angular/platform-server",
+        "@npm//@types/node",
+    ],
+)
