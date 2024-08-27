@@ -17,13 +17,13 @@ ts_library(
         ],
     ),
     module_name = "@angular/ssr",
+    tsconfig = "//:tsconfig-build-ng",
     deps = [
         "//packages/angular/ssr/third_party/critters:bundled_critters_lib",
         "@npm//@angular/common",
         "@npm//@angular/core",
         "@npm//@angular/platform-server",
         "@npm//@angular/router",
-        "@npm//@types/node",
     ],
 )
 
@@ -35,6 +35,7 @@ ng_package(
         "//packages/angular/ssr/third_party/critters:bundled_critters_lib",
     ],
     externals = [
+        "tslib",
         "express",
         "../../third_party/critters",
     ],
