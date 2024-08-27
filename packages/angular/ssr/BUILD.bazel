@@ -35,7 +35,8 @@ ng_package(
         "//packages/angular/ssr/third_party/critters:bundled_critters_lib",
     ],
     externals = [
-        "tslib",
+        "@angular/ssr",
+        "@angular/ssr/node",
         "express",
         "../../third_party/critters",
     ],
