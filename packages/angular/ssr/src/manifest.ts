@@ -6,7 +6,6 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import type { destroyAngularServerApp, getOrCreateAngularServerApp } from './app';
 import type { SerializableRouteTreeNode } from './routes/route-tree';
 import { AngularBootstrap } from './utils/ng';
 
@@ -16,13 +15,15 @@ import { AngularBootstrap } from './utils/ng';
 export interface EntryPointExports {
   /**
    * A reference to the function that creates an Angular server application instance.
+   *
+   * @note The return type is `unknown` to prevent circular dependency issues.
    */
-  ɵgetOrCreateAngularServerApp: typeof getOrCreateAngularServerApp;
+  ɵgetOrCreateAngularServerApp: () => unknown;
 
   /**
    * A reference to the function that destroys the `AngularServerApp` instance.
    */
-  ɵdestroyAngularServerApp: typeof destroyAngularServerApp;
+  ɵdestroyAngularServerApp: () => void;
 }
 
 /**
