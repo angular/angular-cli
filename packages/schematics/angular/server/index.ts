@@ -141,6 +141,10 @@ function addDependencies(skipInstall: boolean | undefined): Rule {
     const install = skipInstall ? InstallBehavior.None : InstallBehavior.Auto;
 
     return chain([
+      addDependency('@angular/ssr', latestVersions.AngularSSR, {
+        type: DependencyType.Default,
+        install,
+      }),
       addDependency('@angular/platform-server', coreDep.version, {
         type: DependencyType.Default,
         install,
@@ -154,7 +158,7 @@ function addDependencies(skipInstall: boolean | undefined): Rule {
 }
 
 export default function (options: ServerOptions): Rule {
-  return async (host: Tree, context: SchematicContext) => {
+  return async (host: Tree) => {
     const workspace = await getWorkspace(host);
     const clientProject = workspace.projects.get(options.project);
     if (clientProject?.extensions.projectType !== 'application') {
