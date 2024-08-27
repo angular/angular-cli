@@ -298,10 +298,6 @@ function addDependencies({ skipInstall }: SSROptions, isUsingApplicationBuilder:
   const install = skipInstall ? InstallBehavior.None : InstallBehavior.Auto;
 
   const rules: Rule[] = [
-    addDependency('@angular/ssr', latestVersions.AngularSSR, {
-      type: DependencyType.Default,
-      install,
-    }),
     addDependency('express', latestVersions['express'], {
       type: DependencyType.Default,
       install,
