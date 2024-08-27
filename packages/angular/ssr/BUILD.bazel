@@ -37,7 +37,6 @@ ng_package(
     externals = [
         "@angular/ssr",
         "@angular/ssr/node",
-        "express",
         "../../third_party/critters",
     ],
     nested_packages = [
