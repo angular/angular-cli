@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
+import type { AngularServerApp } from './app';
 import { Hooks } from './hooks';
 import { getPotentialLocaleIdFromUrl } from './i18n';
 import { EntryPointExports, getAngularAppEngineManifest } from './manifest';
@@ -89,7 +90,10 @@ export class AngularAppEngine implements AngularServerAppManager {
     }
 
     const { ɵgetOrCreateAngularServerApp: getOrCreateAngularServerApp } = await entryPoint();
-    const serverApp = getOrCreateAngularServerApp();
+    // Note: Using `instanceof` is not feasible here because `AngularServerApp` will
+    // be located in separate bundles, making `instanceof` checks unreliable.
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+    const serverApp = getOrCreateAngularServerApp() as AngularServerApp;
     serverApp.hooks = this.hooks;
 
     return serverApp.render(request, requestContext);
