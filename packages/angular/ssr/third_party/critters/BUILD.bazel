@@ -6,7 +6,11 @@ package(default_visibility = ["//visibility:public"])
 esbuild(
     name = "bundled_critters",
     config = ":esbuild_config",
-    entry_point = "@npm//:node_modules/critters/dist/critters.mjs",
+    # We should be able to use "@npm//:node_modules/critters/dist/critters.mjs" as entry_point and avoid having to create a file.
+    # But this causes a lot of flakes on Windows due to the linker.
+    # [link_node_modules.js] An error has been reported: [Error: ENOENT: no such file or directory,
+    # unlink 'C:\users\runneradmin\_bazel_runneradmin\whf6gbwo\execroot\angular_cli\node_modules']
+    entry_point = ":index.mjs",
     metafile = True,
     splitting = True,
     deps = [
