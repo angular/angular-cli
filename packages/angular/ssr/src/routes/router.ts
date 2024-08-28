@@ -6,10 +6,9 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { ServerAssets } from '../assets';
 import { AngularAppManifest } from '../manifest';
-import { joinUrlParts, stripIndexHtmlFromURL } from '../utils/url';
-import { getRoutesFromAngularRouterConfig } from './ng-routes';
+import { stripIndexHtmlFromURL } from '../utils/url';
+import { extractRoutesAndCreateRouteTree } from './ng-routes';
 import { RouteTree, RouteTreeNodeMetadata } from './route-tree';
 
 /**
@@ -55,28 +54,11 @@ export class ServerRouter {
 
     // Create and store a new promise for the build process.
     // This prevents concurrent builds by re-using the same promise.
-    ServerRouter.#extractionPromise ??= (async () => {
-      try {
-        const routeTree = new RouteTree();
-        const document = await new ServerAssets(manifest).getIndexServerHtml();
-        const { baseHref, routes } = await getRoutesFromAngularRouterConfig(
-          manifest.bootstrap(),
-          document,
-          url,
-        );
-
-        for (let { route, redirectTo } of routes) {
-          route = joinUrlParts(baseHref, route);
-          redirectTo = redirectTo === undefined ? undefined : joinUrlParts(baseHref, redirectTo);
-
-          routeTree.insert(route, { redirectTo });
-        }
-
-        return new ServerRouter(routeTree);
-      } finally {
+    ServerRouter.#extractionPromise ??= extractRoutesAndCreateRouteTree(url, manifest)
+      .then((routeTree) => new ServerRouter(routeTree))
+      .finally(() => {
         ServerRouter.#extractionPromise = undefined;
-      }
-    })();
+      });
 
     return ServerRouter.#extractionPromise;
   }

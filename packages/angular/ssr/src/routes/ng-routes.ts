@@ -22,9 +22,12 @@ import {
   ɵINTERNAL_SERVER_PLATFORM_PROVIDERS as INTERNAL_SERVER_PLATFORM_PROVIDERS,
 } from '@angular/platform-server';
 import { Route, Router, ɵloadChildren as loadChildrenHelper } from '@angular/router';
+import { ServerAssets } from '../assets';
 import { Console } from '../console';
+import { AngularAppManifest, getAngularAppManifest } from '../manifest';
 import { AngularBootstrap, isNgModule } from '../utils/ng';
 import { joinUrlParts } from '../utils/url';
+import { RouteTree } from './route-tree';
 
 /**
  * Result of extracting routes from an Angular application.
@@ -256,4 +259,40 @@ export async function getRoutesFromAngularRouterConfig(
   } finally {
     platformRef.destroy();
   }
+}
+
+/**
+ * Asynchronously extracts routes from the Angular application configuration
+ * and creates a `RouteTree` to manage server-side routing.
+ *
+ * @param url - The URL for server-side rendering. The URL is used to configure `ServerPlatformLocation`. This configuration is crucial
+ * for ensuring that API requests for relative paths succeed, which is essential for accurate route extraction.
+ * See:
+ *  - https://github.com/angular/angular/blob/d608b857c689d17a7ffa33bbb510301014d24a17/packages/platform-server/src/location.ts#L51
+ *  - https://github.com/angular/angular/blob/6882cc7d9eed26d3caeedca027452367ba25f2b9/packages/platform-server/src/http.ts#L44
+ * @param manifest - An optional `AngularAppManifest` that contains the application's routing and configuration details.
+ * If not provided, the default manifest is retrieved using `getAngularAppManifest()`.
+ *
+ * @returns A promise that resolves to a populated `RouteTree` containing all extracted routes from the Angular application.
+ */
+export async function extractRoutesAndCreateRouteTree(
+  url: URL,
+  manifest: AngularAppManifest = getAngularAppManifest(),
+): Promise<RouteTree> {
+  const routeTree = new RouteTree();
+  const document = await new ServerAssets(manifest).getIndexServerHtml();
+  const { baseHref, routes } = await getRoutesFromAngularRouterConfig(
+    manifest.bootstrap(),
+    document,
+    url,
+  );
+
+  for (let { route, redirectTo } of routes) {
+    route = joinUrlParts(baseHref, route);
+    redirectTo = redirectTo === undefined ? undefined : joinUrlParts(baseHref, redirectTo);
+
+    routeTree.insert(route, { redirectTo });
+  }
+
+  return routeTree;
 }
