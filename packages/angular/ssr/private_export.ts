@@ -6,7 +6,11 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-export { getRoutesFromAngularRouterConfig as ɵgetRoutesFromAngularRouterConfig } from './src/routes/ng-routes';
+// ɵgetRoutesFromAngularRouterConfig is only used by the Webpack based server builder.
+export {
+  getRoutesFromAngularRouterConfig as ɵgetRoutesFromAngularRouterConfig,
+  extractRoutesAndCreateRouteTree as ɵextractRoutesAndCreateRouteTree,
+} from './src/routes/ng-routes';
 export {
   ServerRenderContext as ɵServerRenderContext,
   getOrCreateAngularServerApp as ɵgetOrCreateAngularServerApp,
