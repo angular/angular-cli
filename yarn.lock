@@ -263,23 +263,23 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@angular/bazel@https://github.com/angular/bazel-builds.git#commit=71bd2e043e076365effdb6076f33b2d8d6bd6d02":
-  version: 18.1.0-next.0+sha-1360110
-  resolution: "@angular/bazel@https://github.com/angular/bazel-builds.git#commit=71bd2e043e076365effdb6076f33b2d8d6bd6d02"
+"@angular/bazel@https://github.com/angular/bazel-builds.git#commit=9e6140d1eef8ddf7113d00738f603e9cc3c310f1":
+  version: 19.0.0-next.1+sha-b7f3baf
+  resolution: "@angular/bazel@https://github.com/angular/bazel-builds.git#commit=9e6140d1eef8ddf7113d00738f603e9cc3c310f1"
   dependencies:
     "@microsoft/api-extractor": "npm:^7.24.2"
     magic-string: "npm:^0.30.0"
     tslib: "npm:^2.3.0"
   peerDependencies:
-    "@angular/compiler-cli": 18.1.0-next.0+sha-1360110
+    "@angular/compiler-cli": 19.0.0-next.1+sha-b7f3baf
     "@bazel/concatjs": ^5.3.0
     "@bazel/worker": ^5.3.0
-    "@rollup/plugin-commonjs": ^25.0.0
+    "@rollup/plugin-commonjs": ^26.0.0
     "@rollup/plugin-node-resolve": ^13.0.4
     rollup: ^2.56.3
     rollup-plugin-sourcemaps: ^0.6.3
     terser: ^5.9.0
-    typescript: ">=5.4 <5.5"
+    typescript: ">=5.4 <5.7"
   peerDependenciesMeta:
     terser:
       optional: true
@@ -288,27 +288,27 @@ __metadata:
     packager: ./src/ng_package/packager.mjs
     types_bundler: ./src/types_bundle/index.mjs
     xi18n: ./src/ngc-wrapped/extract_i18n.mjs
-  checksum: 10c0/4bf890149557811d1954c4851d14090a74cb479dccdabf53ce2fc7892456a8f8e28fc969dbb2f19de6f706289d0ee47b4bf11a58941fee525004beb1f609e957
+  checksum: 10c0/9d3c6c9e53d5149b0c3b2ed0d4011f2c528ffbef37c10816bd3abd626532a115a560cbffc7483e878cc4088cd9eb08509b7a77d603617fbb2fa46da75640e2e7
   languageName: node
   linkType: hard
 
-"@angular/bazel@patch:@angular/bazel@https%3A//github.com/angular/bazel-builds.git%23commit=71bd2e043e076365effdb6076f33b2d8d6bd6d02#~/.yarn/patches/@angular-bazel-https-9848736cf4.patch":
-  version: 18.1.0-next.0+sha-1360110
-  resolution: "@angular/bazel@patch:@angular/bazel@https%3A//github.com/angular/bazel-builds.git%23commit=71bd2e043e076365effdb6076f33b2d8d6bd6d02#~/.yarn/patches/@angular-bazel-https-9848736cf4.patch::version=18.1.0-next.0%2Bsha-1360110&hash=f67b3e"
+"@angular/bazel@patch:@angular/bazel@https%3A//github.com/angular/bazel-builds.git%23commit=9e6140d1eef8ddf7113d00738f603e9cc3c310f1#~/.yarn/patches/@angular-bazel-https-9848736cf4.patch":
+  version: 19.0.0-next.1+sha-b7f3baf
+  resolution: "@angular/bazel@patch:@angular/bazel@https%3A//github.com/angular/bazel-builds.git%23commit=9e6140d1eef8ddf7113d00738f603e9cc3c310f1#~/.yarn/patches/@angular-bazel-https-9848736cf4.patch::version=19.0.0-next.1%2Bsha-b7f3baf&hash=f67b3e"
   dependencies:
     "@microsoft/api-extractor": "npm:^7.24.2"
     magic-string: "npm:^0.30.0"
     tslib: "npm:^2.3.0"
   peerDependencies:
-    "@angular/compiler-cli": 18.1.0-next.0+sha-1360110
+    "@angular/compiler-cli": 19.0.0-next.1+sha-b7f3baf
     "@bazel/concatjs": ^5.3.0
     "@bazel/worker": ^5.3.0
-    "@rollup/plugin-commonjs": ^25.0.0
+    "@rollup/plugin-commonjs": ^26.0.0
     "@rollup/plugin-node-resolve": ^13.0.4
     rollup: ^2.56.3
     rollup-plugin-sourcemaps: ^0.6.3
     terser: ^5.9.0
-    typescript: ">=5.4 <5.5"
+    typescript: ">=5.4 <5.7"
   peerDependenciesMeta:
     terser:
       optional: true
@@ -317,7 +317,7 @@ __metadata:
     packager: ./src/ng_package/packager.mjs
     types_bundler: ./src/types_bundle/index.mjs
     xi18n: ./src/ngc-wrapped/extract_i18n.mjs
-  checksum: 10c0/b79b1b6692f06eeebfabb95779c88fb4f2070b6152477a4b0ef7e6e3c09255cedfa7fb3d786d6016cb6a2a23c563e77839d662e0e793198ec0b48f5e4ad9d11d
+  checksum: 10c0/ab84d9bc63a0912ce8c5bef4b8f0ecbde12a92bc52cfe6ad42c5b9d21c63f9b0ed14320854c6ce5e097d819158f90ef173746ca62e337b0add3a79c9ccc931d7
   languageName: node
   linkType: hard
 
@@ -629,7 +629,7 @@ __metadata:
   dependencies:
     "@ampproject/remapping": "npm:2.3.0"
     "@angular/animations": "npm:19.0.0-next.1"
-    "@angular/bazel": "patch:@angular/bazel@https%3A//github.com/angular/bazel-builds.git%23commit=71bd2e043e076365effdb6076f33b2d8d6bd6d02#~/.yarn/patches/@angular-bazel-https-9848736cf4.patch"
+    "@angular/bazel": "patch:@angular/bazel@https%3A//github.com/angular/bazel-builds.git%23commit=9e6140d1eef8ddf7113d00738f603e9cc3c310f1#~/.yarn/patches/@angular-bazel-https-9848736cf4.patch"
     "@angular/build-tooling": "https://github.com/angular/dev-infra-private-build-tooling-builds.git#ad9330fd55709b2a1088d405bcc09fcdf3b4c2b4"
     "@angular/cdk": "npm:19.0.0-next.1"
     "@angular/common": "npm:19.0.0-next.1"
