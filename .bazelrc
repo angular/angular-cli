@@ -143,7 +143,7 @@ build:remote --host_platform=@npm//@angular/build-tooling/bazel/remote-execution
 build:remote --platforms=@npm//@angular/build-tooling/bazel/remote-execution:platform_with_network
 
 # Set remote caching settings
-build:remote --remote_accept_cached=true
+build:remote --remote_accept_cached=false
 
 # Force remote executions to consider the entire run as linux.
 # This is required for OSX cross-platform RBE.
