@@ -3,7 +3,7 @@
 load("@aspect_bazel_lib//lib:copy_to_directory.bzl", "copy_to_directory")
 load("@aspect_bazel_lib//lib:jq.bzl", "jq")
 load("@aspect_bazel_lib//lib:utils.bzl", "to_label")
-load("@build_bazel_rules_nodejs//:index.bzl", "copy_to_bin", _js_library = "js_library", _pkg_npm = "pkg_npm")
+load("@build_bazel_rules_nodejs//:index.bzl", "copy_to_bin", _js_library = "js_library", _nodejs_binary = "nodejs_binary", _nodejs_test = "nodejs_test", _pkg_npm = "pkg_npm")
 load("@npm//@angular/bazel:index.bzl", _ng_module = "ng_module", _ng_package = "ng_package")
 load("@npm//@angular/build-tooling/bazel:extract_js_module_output.bzl", "extract_js_module_output")
 load("@npm//@bazel/concatjs:index.bzl", _ts_library = "ts_library")
@@ -275,5 +275,33 @@ def ng_package(deps = [], **kwargs):
             "//:stamp": NPM_PACKAGE_SUBSTITUTIONS,
             "//conditions:default": NO_STAMP_PACKAGE_SUBSTITUTIONS,
         }),
+        **kwargs
+    )
+
+def nodejs_test(name, templated_args = [], enable_linker = False, **kwargs):
+    if not enable_linker:
+        templated_args = templated_args + [
+            # Disable the linker and rely on patched resolution which works better on Windows
+            # and is less prone to race conditions when targets build concurrently.
+            "--nobazel_run_linker",
+        ]
+
+    _nodejs_test(
+        name = name,
+        templated_args = templated_args,
+        **kwargs
+    )
+
+def nodejs_binary(name, templated_args = [], enable_linker = False, **kwargs):
+    if not enable_linker:
+        templated_args = templated_args + [
+            # Disable the linker and rely on patched resolution which works better on Windows
+            # and is less prone to race conditions when targets build concurrently.
+            "--nobazel_run_linker",
+        ]
+
+    _nodejs_binary(
+        name = name,
+        templated_args = templated_args,
         **kwargs
     )
