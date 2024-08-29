@@ -137,7 +137,7 @@ __metadata:
     ng-packagr: ^19.0.0-next.0
     protractor: ^7.0.0
     tailwindcss: ^2.0.0 || ^3.0.0
-    typescript: ">=5.4 <5.6"
+    typescript: ">=5.5 <5.7"
   dependenciesMeta:
     esbuild:
       optional: true
@@ -415,7 +415,7 @@ __metadata:
     less: ^4.2.0
     postcss: ^8.4.0
     tailwindcss: ^2.0.0 || ^3.0.0
-    typescript: ">=5.4 <5.6"
+    typescript: ">=5.5 <5.7"
   peerDependenciesMeta:
     "@angular/localize":
       optional: true
@@ -774,7 +774,7 @@ __metadata:
     tree-kill: "npm:1.2.2"
     ts-node: "npm:^10.9.1"
     tslib: "npm:2.7.0"
-    typescript: "npm:5.5.4"
+    typescript: "npm:5.6.1-rc"
     undici: "npm:6.19.8"
     unenv: "npm:^1.10.0"
     verdaccio: "npm:5.32.1"
@@ -3406,11 +3406,11 @@ __metadata:
     "@angular-devkit/core": "npm:0.0.0-PLACEHOLDER"
     "@angular/compiler": "npm:19.0.0-next.2"
     "@angular/compiler-cli": "npm:19.0.0-next.2"
-    typescript: "npm:5.5.4"
+    typescript: "npm:5.6.1-rc"
     webpack: "npm:5.94.0"
   peerDependencies:
     "@angular/compiler-cli": ^19.0.0-next.0
-    typescript: ">=5.4 <5.6"
+    typescript: ">=5.5 <5.7"
     webpack: ^5.54.0
   languageName: unknown
   linkType: soft
@@ -16950,6 +16950,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"typescript@npm:5.6.1-rc":
+  version: 5.6.1-rc
+  resolution: "typescript@npm:5.6.1-rc"
+  bin:
+    tsc: bin/tsc
+    tsserver: bin/tsserver
+  checksum: 10c0/9d6e99b7ddbc797ebc8d09e5d7f2f81ce5f288a4e607bcded3c545ced8582796c937fba31bede5660a56f978b2f68e7c4ee85614b307425a2b4617535721509f
+  languageName: node
+  linkType: hard
+
 "typescript@npm:~4.9.0":
   version: 4.9.5
   resolution: "typescript@npm:4.9.5"
@@ -16977,6 +16987,16 @@ __metadata:
     tsc: bin/tsc
     tsserver: bin/tsserver
   checksum: 10c0/73409d7b9196a5a1217b3aaad929bf76294d3ce7d6e9766dd880ece296ee91cf7d7db6b16c6c6c630ee5096eccde726c0ef17c7dfa52b01a243e57ae1f09ef07
+  languageName: node
+  linkType: hard
+
+"typescript@patch:typescript@npm%3A5.6.1-rc#optional!builtin<compat/typescript>":
+  version: 5.6.1-rc
+  resolution: "typescript@patch:typescript@npm%3A5.6.1-rc#optional!builtin<compat/typescript>::version=5.6.1-rc&hash=74658d"
+  bin:
+    tsc: bin/tsc
+    tsserver: bin/tsserver
+  checksum: 10c0/7849a6f82731f33d05dc9401252eeed78cec227aa9b23c316638c12c15ff7ec0903d62aa8718ea0ab5aad2e155a74edcd0c8053b8fdf8020bd1652720d89db7c
   languageName: node
   linkType: hard
 

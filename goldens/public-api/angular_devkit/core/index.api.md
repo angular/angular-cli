@@ -386,7 +386,7 @@ interface JsonVisitor {
 
 // @public (undocumented)
 class LevelCapLogger extends LevelTransformLogger {
-    constructor(name: string, parent: Logger | null, levelCap: LogLevel);
+    constructor(name: string, parent: (Logger | null) | undefined, levelCap: LogLevel);
     // (undocumented)
     readonly levelCap: LogLevel;
     // (undocumented)
@@ -403,7 +403,7 @@ class LevelCapLogger extends LevelTransformLogger {
 
 // @public (undocumented)
 class LevelTransformLogger extends Logger {
-    constructor(name: string, parent: Logger | null, levelTransform: (level: LogLevel) => LogLevel);
+    constructor(name: string, parent: (Logger | null) | undefined, levelTransform: (level: LogLevel) => LogLevel);
     // (undocumented)
     createChild(name: string): Logger;
     // (undocumented)
@@ -553,7 +553,7 @@ function parseJsonPointer(pointer: JsonPointer): string[];
 // @public (undocumented)
 export class PartiallyOrderedSet<T> implements Set<T> {
     // (undocumented)
-    [Symbol.iterator](): Generator<T, void, unknown>;
+    [Symbol.iterator](): Generator<T, undefined, unknown>;
     // (undocumented)
     get [Symbol.toStringTag](): 'Set';
     // (undocumented)

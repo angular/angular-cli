@@ -150,7 +150,7 @@ export class ActionList implements Iterable<Action> {
   get length() {
     return this._actions.length;
   }
-  [Symbol.iterator]() {
+  [Symbol.iterator](): IterableIterator<Action> {
     return this._actions[Symbol.iterator]();
   }
 }
