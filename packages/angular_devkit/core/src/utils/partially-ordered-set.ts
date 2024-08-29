@@ -157,6 +157,8 @@ export class PartiallyOrderedSet<T> implements Set<T> {
         throw new CircularDependencyFoundException();
       }
     }
+
+    return undefined;
   }
 
   get [Symbol.toStringTag](): 'Set' {
