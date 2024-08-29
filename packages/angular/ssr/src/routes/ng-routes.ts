@@ -15,7 +15,6 @@ import {
   platformCore,
   ɵwhenStable as whenStable,
   ɵConsole,
-  ɵresetCompiledComponents,
 } from '@angular/core';
 import {
   INITIAL_CONFIG,
@@ -191,13 +190,6 @@ export async function getRoutesFromAngularRouterConfig(
   document: string,
   url: URL,
 ): Promise<AngularRouterConfigResult> {
-  if (typeof ngDevMode === 'undefined' || ngDevMode) {
-    // Need to clean up GENERATED_COMP_IDS map in `@angular/core`.
-    // Otherwise an incorrect component ID generation collision detected warning will be displayed in development.
-    // See: https://github.com/angular/angular-cli/issues/25924
-    ɵresetCompiledComponents();
-  }
-
   const { protocol, host } = url;
 
   // Create and initialize the Angular platform for server-side rendering.

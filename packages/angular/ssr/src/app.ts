@@ -168,13 +168,6 @@ export class AngularServerApp {
       );
     }
 
-    if (typeof ngDevMode === 'undefined' || ngDevMode) {
-      // Need to clean up GENERATED_COMP_IDS map in `@angular/core`.
-      // Otherwise an incorrect component ID generation collision detected warning will be displayed in development.
-      // See: https://github.com/angular/angular-cli/issues/25924
-      ɵresetCompiledComponents();
-    }
-
     const { manifest, hooks, assets } = this;
 
     let html = await assets.getIndexServerHtml();
@@ -220,5 +213,12 @@ export function getOrCreateAngularServerApp(): AngularServerApp {
  * typically when server configuration or application state needs to be refreshed.
  */
 export function destroyAngularServerApp(): void {
+  if (typeof ngDevMode === 'undefined' || ngDevMode) {
+    // Need to clean up GENERATED_COMP_IDS map in `@angular/core`.
+    // Otherwise an incorrect component ID generation collision detected warning will be displayed in development.
+    // See: https://github.com/angular/angular-cli/issues/25924
+    ɵresetCompiledComponents();
+  }
+
   angularServerApp = undefined;
 }
