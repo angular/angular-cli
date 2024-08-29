@@ -367,9 +367,10 @@ workflows:
             - build
           <<: *only_snapshot_branches
 
-      - test-browsers:
-          requires:
-            - build
+      # Setup is broken in LTS
+      # - test-browsers:
+      #     requires:
+      #       - build
 
       # Windows jobs
       - e2e-cli-win:

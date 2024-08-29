@@ -308,7 +308,11 @@ export class AngularWebpackPlugin {
       compilationFileEmitters.set(compilation, fileEmitters);
       compilation.compiler.webpack.NormalModule.getCompilationHooks(compilation).loader.tap(
         PLUGIN_NAME,
-        (loaderContext: { [AngularPluginSymbol]?: FileEmitterCollection }) => {
+        (context) => {
+          const loaderContext = context as typeof context & {
+            [AngularPluginSymbol]?: FileEmitterCollection;
+          };
+
           loaderContext[AngularPluginSymbol] = fileEmitters;
         },
       );
