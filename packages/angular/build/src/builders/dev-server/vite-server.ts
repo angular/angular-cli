@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
+import type { ɵdestroyAngularServerApp as destroyAngularServerApp } from '@angular/ssr';
 import type { BuilderContext } from '@angular-devkit/architect';
 import type { Plugin } from 'esbuild';
 import assert from 'node:assert';
@@ -38,6 +39,7 @@ interface OutputFileRecord {
   hash?: string;
   updated: boolean;
   servable: boolean;
+  type: BuildOutputFileType;
 }
 
 export type BuilderAction = (
@@ -255,12 +257,12 @@ export async function* serveWithVite(
         ...new Set([...server.config.server.fs.allow, ...assetFiles.values()]),
       ];
 
-      handleUpdate(normalizePath, generatedFiles, server, serverOptions, context.logger);
-
       if (requiresServerRestart) {
         // Restart the server to force SSR dep re-optimization when a dependency has been added.
         // This is a workaround for: https://github.com/vitejs/vite/issues/14896
         await server.restart();
+      } else {
+        await handleUpdate(normalizePath, generatedFiles, server, serverOptions, context.logger);
       }
     } else {
       const projectName = context.target?.project;
@@ -351,19 +353,22 @@ export async function* serveWithVite(
   await new Promise<void>((resolve) => (deferred = resolve));
 }
 
-function handleUpdate(
+async function handleUpdate(
   normalizePath: (id: string) => string,
   generatedFiles: Map<string, OutputFileRecord>,
   server: ViteDevServer,
   serverOptions: NormalizedDevServerOptions,
   logger: BuilderContext['logger'],
-): void {
+): Promise<void> {
   const updatedFiles: string[] = [];
+  let isServerFileUpdated = false;
 
   // Invalidate any updated files
   for (const [file, record] of generatedFiles) {
     if (record.updated) {
       updatedFiles.push(file);
+      isServerFileUpdated ||= record.type === BuildOutputFileType.Server;
+
       const updatedModules = server.moduleGraph.getModulesByFile(
         normalizePath(join(server.config.root, file)),
       );
@@ -373,6 +378,15 @@ function handleUpdate(
 
   if (!updatedFiles.length) {
     return;
+  }
+
+  // clean server apps cache
+  if (isServerFileUpdated) {
+    const { ɵdestroyAngularServerApp } = (await server.ssrLoadModule('/main.server.mjs')) as {
+      ɵdestroyAngularServerApp: typeof destroyAngularServerApp;
+    };
+
+    ɵdestroyAngularServerApp();
   }
 
   if (serverOptions.liveReload || serverOptions.hmr) {
@@ -438,6 +452,7 @@ function analyzeResultFiles(
         contents: file.contents,
         servable,
         size: file.contents.byteLength,
+        type: file.type,
         updated: false,
       });
 
@@ -461,6 +476,7 @@ function analyzeResultFiles(
       size: file.contents.byteLength,
       hash: file.hash,
       updated: true,
+      type: file.type,
       servable,
     });
   }

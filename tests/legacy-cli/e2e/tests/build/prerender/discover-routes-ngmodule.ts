@@ -11,9 +11,6 @@ export default async function () {
 
   const useWebpackBuilder = !getGlobalVariable('argv')['esbuild'];
   if (useWebpackBuilder) {
-    // Forcibly remove in case another test doesn't clean itself up.
-    await rimraf('node_modules/@angular/ssr');
-
     // Setup webpack builder if esbuild is not requested on the commandline
     await updateJsonFile('angular.json', (json) => {
       const build = json['projects'][projectName]['architect']['build'];
@@ -32,6 +29,7 @@ export default async function () {
       };
     });
   }
+
   // Forcibly remove in case another test doesn't clean itself up.
   await rimraf('node_modules/@angular/ssr');
   await ng(

@@ -9,9 +9,10 @@
 import type { BuildOptions, PartialMessage } from 'esbuild';
 import assert from 'node:assert';
 import { createHash } from 'node:crypto';
-import { extname } from 'node:path';
+import { extname, relative } from 'node:path';
 import type { NormalizedApplicationBuildOptions } from '../../builders/application/options';
 import { allowMangle } from '../../utils/environment-options';
+import { SERVER_APP_MANIFEST_FILENAME } from '../../utils/server-rendering/manifest';
 import { createCompilerPlugin } from './angular/compiler-plugin';
 import { SourceFileCache } from './angular/source-file-cache';
 import { BundlerOptionsFactory } from './bundler-context';
@@ -21,7 +22,7 @@ import { createAngularLocaleDataPlugin } from './i18n-locale-plugin';
 import { createLoaderImportAttributePlugin } from './loader-import-attribute-plugin';
 import { createRxjsEsmResolutionPlugin } from './rxjs-esm-resolution-plugin';
 import { createSourcemapIgnorelistPlugin } from './sourcemap-ignorelist-plugin';
-import { getFeatureSupport, isZonelessApp } from './utils';
+import { SERVER_GENERATED_EXTERNALS, getFeatureSupport, isZonelessApp } from './utils';
 import { createVirtualModulePlugin } from './virtual-module-plugin';
 import { createWasmPlugin } from './wasm-plugin';
 
@@ -149,121 +150,6 @@ export function createBrowserPolyfillBundleOptions(
   return hasTypeScriptEntries ? buildOptions : () => buildOptions;
 }
 
-/**
- * Create an esbuild 'build' options object for the server bundle.
- * @param options The builder's user-provider normalized options.
- * @returns An esbuild BuildOptions object.
- */
-export function createServerCodeBundleOptions(
-  options: NormalizedApplicationBuildOptions,
-  target: string[],
-  sourceFileCache: SourceFileCache,
-): BuildOptions {
-  const {
-    serverEntryPoint,
-    workspaceRoot,
-    ssrOptions,
-    watch,
-    externalPackages,
-    prerenderOptions,
-    polyfills,
-  } = options;
-
-  assert(
-    serverEntryPoint,
-    'createServerCodeBundleOptions should not be called without a defined serverEntryPoint.',
-  );
-
-  const { pluginOptions, styleOptions } = createCompilerPluginOptions(
-    options,
-    target,
-    sourceFileCache,
-  );
-
-  const mainServerNamespace = 'angular:server-render-utils';
-  const entryPoints: Record<string, string> = {
-    'render-utils.server': mainServerNamespace,
-    'main.server': serverEntryPoint,
-  };
-
-  const ssrEntryPoint = ssrOptions?.entry;
-  if (ssrEntryPoint) {
-    entryPoints['server'] = ssrEntryPoint;
-  }
-
-  const zoneless = isZonelessApp(polyfills);
-
-  const buildOptions: BuildOptions = {
-    ...getEsBuildCommonOptions(options),
-    platform: 'node',
-    splitting: true,
-    outExtension: { '.js': '.mjs' },
-    // Note: `es2015` is needed for RxJS v6. If not specified, `module` would
-    // match and the ES5 distribution would be bundled and ends up breaking at
-    // runtime with the RxJS testing library.
-    // More details: https://github.com/angular/angular-cli/issues/25405.
-    mainFields: ['es2020', 'es2015', 'module', 'main'],
-    entryNames: '[name]',
-    target,
-    banner: {
-      js: `import './polyfills.server.mjs';`,
-    },
-    entryPoints,
-    supported: getFeatureSupport(target, zoneless),
-    plugins: [
-      createLoaderImportAttributePlugin(),
-      createWasmPlugin({ allowAsync: zoneless, cache: sourceFileCache?.loadResultCache }),
-      createSourcemapIgnorelistPlugin(),
-      createCompilerPlugin(
-        // JS/TS options
-        { ...pluginOptions, noopTypeScriptCompilation: true },
-        // Component stylesheet options
-        styleOptions,
-      ),
-    ],
-  };
-
-  buildOptions.plugins ??= [];
-  if (externalPackages) {
-    buildOptions.packages = 'external';
-  } else {
-    buildOptions.plugins.push(createRxjsEsmResolutionPlugin());
-  }
-
-  buildOptions.plugins.push(
-    createVirtualModulePlugin({
-      namespace: mainServerNamespace,
-      cache: sourceFileCache?.loadResultCache,
-      loadContent: async () => {
-        const contents: string[] = [
-          `export { ɵConsole } from '@angular/core';`,
-          `export { renderApplication, renderModule, ɵSERVER_CONTEXT } from '@angular/platform-server';`,
-        ];
-
-        if (watch) {
-          contents.push(`export { ɵresetCompiledComponents } from '@angular/core';`);
-        }
-
-        if (prerenderOptions?.discoverRoutes) {
-          contents.push(`export { ɵgetRoutesFromAngularRouterConfig } from '@angular/ssr';`);
-        }
-
-        return {
-          contents: contents.join('\n'),
-          loader: 'js',
-          resolveDir: workspaceRoot,
-        };
-      },
-    }),
-  );
-
-  if (options.plugins) {
-    buildOptions.plugins.push(...options.plugins);
-  }
-
-  return buildOptions;
-}
-
 export function createServerPolyfillBundleOptions(
   options: NormalizedApplicationBuildOptions,
   target: string[],
@@ -326,6 +212,156 @@ export function createServerPolyfillBundleOptions(
   return () => buildOptions;
 }
 
+export function createServerMainCodeBundleOptions(
+  options: NormalizedApplicationBuildOptions,
+  target: string[],
+  sourceFileCache: SourceFileCache,
+): BuildOptions {
+  const {
+    serverEntryPoint: mainServerEntryPoint,
+    workspaceRoot,
+    externalPackages,
+    ssrOptions,
+    polyfills,
+  } = options;
+
+  assert(
+    mainServerEntryPoint,
+    'createServerCodeBundleOptions should not be called without a defined serverEntryPoint.',
+  );
+
+  const { pluginOptions, styleOptions } = createCompilerPluginOptions(
+    options,
+    target,
+    sourceFileCache,
+  );
+
+  const mainServerNamespace = 'angular:main-server';
+  const mainServerInjectPolyfillsNamespace = 'angular:main-server-inject-polyfills';
+  const mainServerInjectManifestNamespace = 'angular:main-server-inject-manifest';
+  const zoneless = isZonelessApp(polyfills);
+  const entryPoints: Record<string, string> = {
+    'main.server': mainServerNamespace,
+  };
+
+  const ssrEntryPoint = ssrOptions?.entry;
+
+  if (ssrEntryPoint) {
+    // Old behavior: 'server.ts' was bundled together with the SSR (Server-Side Rendering) code.
+    // This approach combined server-side logic and rendering into a single bundle.
+    entryPoints['server'] = ssrEntryPoint;
+  }
+
+  const buildOptions: BuildOptions = {
+    ...getEsBuildServerCommonOptions(options),
+    target,
+    inject: [mainServerInjectPolyfillsNamespace, mainServerInjectManifestNamespace],
+    entryPoints,
+    supported: getFeatureSupport(target, zoneless),
+    plugins: [
+      createWasmPlugin({ allowAsync: zoneless, cache: sourceFileCache?.loadResultCache }),
+      createSourcemapIgnorelistPlugin(),
+      createCompilerPlugin(
+        // JS/TS options
+        { ...pluginOptions, noopTypeScriptCompilation: true },
+        // Component stylesheet options
+        styleOptions,
+      ),
+    ],
+  };
+
+  buildOptions.plugins ??= [];
+
+  if (externalPackages) {
+    buildOptions.packages = 'external';
+  } else {
+    buildOptions.plugins.push(createRxjsEsmResolutionPlugin());
+  }
+
+  // Mark manifest and polyfills file as external as these are generated by a different bundle step.
+  (buildOptions.external ??= []).push(...SERVER_GENERATED_EXTERNALS);
+
+  buildOptions.plugins.push(
+    createVirtualModulePlugin({
+      namespace: mainServerInjectPolyfillsNamespace,
+      cache: sourceFileCache?.loadResultCache,
+      loadContent: () => ({
+        contents: `import './polyfills.server.mjs';`,
+        loader: 'js',
+        resolveDir: workspaceRoot,
+      }),
+    }),
+    createVirtualModulePlugin({
+      namespace: mainServerInjectManifestNamespace,
+      cache: sourceFileCache?.loadResultCache,
+      loadContent: async () => {
+        const contents: string[] = [
+          // Configure `@angular/ssr` manifest.
+          `import manifest from './${SERVER_APP_MANIFEST_FILENAME}';`,
+          `import { ɵsetAngularAppManifest } from '@angular/ssr';`,
+          `ɵsetAngularAppManifest(manifest);`,
+        ];
+
+        return {
+          contents: contents.join('\n'),
+          loader: 'js',
+          resolveDir: workspaceRoot,
+        };
+      },
+    }),
+    createVirtualModulePlugin({
+      namespace: mainServerNamespace,
+      cache: sourceFileCache?.loadResultCache,
+      loadContent: async () => {
+        const mainServerEntryPointJsImport = entryFileToWorkspaceRelative(
+          workspaceRoot,
+          mainServerEntryPoint,
+        );
+
+        const contents: string[] = [
+          // Re-export all symbols including default export from 'main.server.ts'
+          `export { default } from '${mainServerEntryPointJsImport}';`,
+          `export * from '${mainServerEntryPointJsImport}';`,
+
+          // Add @angular/ssr exports
+          `export {
+            ɵServerRenderContext,
+            ɵdestroyAngularServerApp,
+            ɵextractRoutesAndCreateRouteTree,
+            ɵgetOrCreateAngularServerApp,
+          } from '@angular/ssr';`,
+        ];
+
+        return {
+          contents: contents.join('\n'),
+          loader: 'js',
+          resolveDir: workspaceRoot,
+        };
+      },
+    }),
+  );
+
+  if (options.plugins) {
+    buildOptions.plugins.push(...options.plugins);
+  }
+
+  return buildOptions;
+}
+
+function getEsBuildServerCommonOptions(options: NormalizedApplicationBuildOptions): BuildOptions {
+  return {
+    ...getEsBuildCommonOptions(options),
+    platform: 'node',
+    outExtension: { '.js': '.mjs' },
+    // Note: `es2015` is needed for RxJS v6. If not specified, `module` would
+    // match and the ES5 distribution would be bundled and ends up breaking at
+    // runtime with the RxJS testing library.
+    // More details: https://github.com/angular/angular-cli/issues/25405.
+    mainFields: ['es2020', 'es2015', 'module', 'main'],
+    entryNames: '[name]',
+  };
+}
+
 function getEsBuildCommonOptions(options: NormalizedApplicationBuildOptions): BuildOptions {
   const {
     workspaceRoot,
@@ -339,6 +375,7 @@ function getEsBuildCommonOptions(options: NormalizedApplicationBuildOptions): Bu
     jit,
     loaderExtensions,
     jsonLogs,
+    i18nOptions,
   } = options;
 
   // Ensure unique hashes for i18n translation changes when using post-process inlining.
@@ -346,9 +383,9 @@ function getEsBuildCommonOptions(options: NormalizedApplicationBuildOptions): Bu
   // change when translation files have changed. If this is not done the post processed files may have
   // different content but would retain identical production file names which would lead to browser caching problems.
   let footer;
-  if (options.i18nOptions.shouldInline) {
+  if (i18nOptions.shouldInline) {
     // Update file hashes to include translation file content
-    const i18nHash = Object.values(options.i18nOptions.locales).reduce(
+    const i18nHash = Object.values(i18nOptions.locales).reduce(
       (data, locale) => data + locale.files.map((file) => file.integrity || '').join('|'),
       '',
     );
@@ -377,7 +414,7 @@ function getEsBuildCommonOptions(options: NormalizedApplicationBuildOptions): Bu
     splitting: true,
     chunkNames: options.namedChunks ? '[name]-[hash]' : 'chunk-[hash]',
     tsconfig,
-    external: externalDependencies,
+    external: externalDependencies ? [...externalDependencies] : undefined,
     write: false,
     preserveSymlinks,
     define: {
@@ -490,4 +527,13 @@ function getEsBuildCommonPolyfillsOptions(
   );
 
   return buildOptions;
+}
+
+function entryFileToWorkspaceRelative(workspaceRoot: string, entryFile: string): string {
+  return (
+    './' +
+    relative(workspaceRoot, entryFile)
+      .replace(/.[mc]?ts$/, '')
+      .replace(/\\/g, '/')
+  );
 }

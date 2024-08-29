@@ -10,7 +10,7 @@ import { SourceFileCache } from '../../tools/esbuild/angular/source-file-cache';
 import {
   createBrowserCodeBundleOptions,
   createBrowserPolyfillBundleOptions,
-  createServerCodeBundleOptions,
+  createServerMainCodeBundleOptions,
   createServerPolyfillBundleOptions,
 } from '../../tools/esbuild/application-code-bundle';
 import { BundlerContext } from '../../tools/esbuild/bundler-context';
@@ -35,8 +35,14 @@ export function setupBundlerContexts(
   browsers: string[],
   codeBundleCache: SourceFileCache,
 ): BundlerContext[] {
-  const { appShellOptions, prerenderOptions, serverEntryPoint, ssrOptions, workspaceRoot } =
-    options;
+  const {
+    appShellOptions,
+    prerenderOptions,
+    serverEntryPoint,
+    ssrOptions,
+    workspaceRoot,
+    watch = false,
+  } = options;
   const target = transformSupportedBrowsersToTargets(browsers);
   const bundlerContexts = [];
 
@@ -44,7 +50,7 @@ export function setupBundlerContexts(
   bundlerContexts.push(
     new BundlerContext(
       workspaceRoot,
-      !!options.watch,
+      watch,
       createBrowserCodeBundleOptions(options, target, codeBundleCache),
     ),
   );
@@ -56,9 +62,7 @@ export function setupBundlerContexts(
     codeBundleCache,
   );
   if (browserPolyfillBundleOptions) {
-    bundlerContexts.push(
-      new BundlerContext(workspaceRoot, !!options.watch, browserPolyfillBundleOptions),
-    );
+    bundlerContexts.push(new BundlerContext(workspaceRoot, watch, browserPolyfillBundleOptions));
   }
 
   // Global Stylesheets
@@ -67,7 +71,7 @@ export function setupBundlerContexts(
       const bundleOptions = createGlobalStylesBundleOptions(options, target, initial);
       if (bundleOptions) {
         bundlerContexts.push(
-          new BundlerContext(workspaceRoot, !!options.watch, bundleOptions, () => initial),
+          new BundlerContext(workspaceRoot, watch, bundleOptions, () => initial),
         );
       }
     }
@@ -79,7 +83,7 @@ export function setupBundlerContexts(
       const bundleOptions = createGlobalScriptsBundleOptions(options, target, initial);
       if (bundleOptions) {
         bundlerContexts.push(
-          new BundlerContext(workspaceRoot, !!options.watch, bundleOptions, () => initial),
+          new BundlerContext(workspaceRoot, watch, bundleOptions, () => initial),
         );
       }
     }
@@ -92,8 +96,8 @@ export function setupBundlerContexts(
     bundlerContexts.push(
       new BundlerContext(
         workspaceRoot,
-        !!options.watch,
-        createServerCodeBundleOptions(options, nodeTargets, codeBundleCache),
+        watch,
+        createServerMainCodeBundleOptions(options, nodeTargets, codeBundleCache),
       ),
     );
 
@@ -105,9 +109,7 @@ export function setupBundlerContexts(
     );
 
     if (serverPolyfillBundleOptions) {
-      bundlerContexts.push(
-        new BundlerContext(workspaceRoot, !!options.watch, serverPolyfillBundleOptions),
-      );
+      bundlerContexts.push(new BundlerContext(workspaceRoot, watch, serverPolyfillBundleOptions));
     }
   }
 
