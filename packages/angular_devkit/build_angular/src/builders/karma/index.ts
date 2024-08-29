@@ -98,6 +98,12 @@ export function execute(
 
       karmaOptions.singleRun = singleRun;
 
+      // Workaround https://github.com/angular/angular-cli/issues/28271, by clearing context by default
+      // for single run executions. Not clearing context for multi-run (watched) builds allows the
+      // Jasmine Spec Runner to be visible in the browser after test execution.
+      karmaOptions.client ??= {};
+      karmaOptions.client.clearContext ??= singleRun ?? false; // `singleRun` defaults to `false` per Karma docs.
+
       // Convert browsers from a string to an array
       if (typeof options.browsers === 'string' && options.browsers) {
         karmaOptions.browsers = options.browsers.split(',');
@@ -208,9 +214,6 @@ function getBuiltInKarmaConfig(
       'karma-coverage',
       '@angular-devkit/build-angular/plugins/karma',
     ].map((p) => workspaceRootRequire(p)),
-    client: {
-      clearContext: false, // leave Jasmine Spec Runner output visible in browser
-    },
     jasmineHtmlReporter: {
       suppressAll: true, // removes the duplicated traces
     },
