@@ -1,3 +1,16 @@
+<a name="16.2.15"></a>
+
+# 16.2.15 (2024-08-29)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                 |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------- |
+| [f596a3d5d](https://github.com/angular/angular-cli/commit/f596a3d5def009b5130440113e3c9b450eb98040) | fix  | clear context in Karma by default for single run executions |
+| [56fa051bd](https://github.com/angular/angular-cli/commit/56fa051bd92ad47ea089499a488f3566a93375e6) | fix  | upgrade webpack to `5.94.0`                                 |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="16.2.14"></a>
 
 # 16.2.14 (2024-04-11)
