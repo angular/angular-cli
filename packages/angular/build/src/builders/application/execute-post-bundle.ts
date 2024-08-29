@@ -16,9 +16,13 @@ import { BuildOutputAsset } from '../../tools/esbuild/bundler-execution-result';
 import { generateIndexHtml } from '../../tools/esbuild/index-html-generator';
 import { createOutputFile } from '../../tools/esbuild/utils';
 import { maxWorkers } from '../../utils/environment-options';
+import {
+  SERVER_APP_MANIFEST_FILENAME,
+  generateAngularServerAppManifest,
+} from '../../utils/server-rendering/manifest';
 import { prerenderPages } from '../../utils/server-rendering/prerender';
 import { augmentAppWithServiceWorkerEsbuild } from '../../utils/service-worker';
-import { NormalizedApplicationBuildOptions } from './options';
+import { INDEX_HTML_SERVER, NormalizedApplicationBuildOptions } from './options';
 
 /**
  * Run additional builds steps including SSG, AppShell, Index HTML file and Service worker generation.
@@ -48,25 +52,22 @@ export async function executePostBundleSteps(
   const prerenderedRoutes: string[] = [];
 
   const {
+    baseHref = '/',
     serviceWorker,
     indexHtmlOptions,
     optimizationOptions,
     sourcemapOptions,
+    ssrOptions,
     prerenderOptions,
     appShellOptions,
     workspaceRoot,
     verbose,
   } = options;
 
-  /**
-   * Index HTML content without CSS inlining to be used for server rendering (AppShell, SSG and SSR).
-   *
-   * NOTE: we don't perform critical CSS inlining as this will be done during server rendering.
-   */
-  let ssrIndexContent: string | undefined;
-
-  // When using prerender/app-shell the index HTML file can be regenerated.
-  // Thus, we use a Map so that we do not generate 2 files with the same filename.
+  // Index HTML content without CSS inlining to be used for server rendering (AppShell, SSG and SSR).
+  // NOTE: Critical CSS inlining is deliberately omitted here, as it will be handled during server rendering.
+  // Additionally, when using prerendering or AppShell, the index HTML file may be regenerated.
+  // To prevent generating duplicate files with the same filename, a `Map` is used to store and manage the files.
   const additionalHtmlOutputFiles = new Map<string, BuildOutputFile>();
 
   // Generate index HTML file
@@ -88,21 +89,34 @@ export async function executePostBundleSteps(
     );
 
     if (ssrContent) {
-      const serverIndexHtmlFilename = 'index.server.html';
       additionalHtmlOutputFiles.set(
-        serverIndexHtmlFilename,
-        createOutputFile(serverIndexHtmlFilename, ssrContent, BuildOutputFileType.Server),
+        INDEX_HTML_SERVER,
+        createOutputFile(INDEX_HTML_SERVER, ssrContent, BuildOutputFileType.Server),
       );
-
-      ssrIndexContent = ssrContent;
     }
+  }
+
+  // Create server manifest
+  if (prerenderOptions || appShellOptions || ssrOptions) {
+    additionalOutputFiles.push(
+      createOutputFile(
+        SERVER_APP_MANIFEST_FILENAME,
+        generateAngularServerAppManifest(
+          additionalHtmlOutputFiles,
+          outputFiles,
+          optimizationOptions.styles.inlineCritical ?? false,
+          undefined,
+        ),
+        BuildOutputFileType.Server,
+      ),
+    );
   }
 
   // Pre-render (SSG) and App-shell
   // If localization is enabled, prerendering is handled in the inlining process.
-  if (prerenderOptions || appShellOptions) {
+  if ((prerenderOptions || appShellOptions) && !allErrors.length) {
     assert(
-      ssrIndexContent,
+      indexHtmlOptions,
       'The "index" option is required when using the "ssg" or "appShell" options.',
     );
 
@@ -111,15 +125,15 @@ export async function executePostBundleSteps(
       warnings,
       errors,
       prerenderedRoutes: generatedRoutes,
+      serializableRouteTreeNode,
     } = await prerenderPages(
       workspaceRoot,
+      baseHref,
       appShellOptions,
       prerenderOptions,
-      outputFiles,
+      [...outputFiles, ...additionalOutputFiles],
       assetFiles,
-      ssrIndexContent,
       sourcemapOptions.scripts,
-      optimizationOptions.styles.inlineCritical,
       maxWorkers,
       verbose,
     );
@@ -128,10 +142,31 @@ export async function executePostBundleSteps(
     allWarnings.push(...warnings);
     prerenderedRoutes.push(...Array.from(generatedRoutes));
 
-    for (const [path, content] of Object.entries(output)) {
+    const indexHasBeenPrerendered = generatedRoutes.has(indexHtmlOptions.output);
+
+    for (const [path, { content, appShellRoute }] of Object.entries(output)) {
+      // Update the index contents with the app shell under these conditions:
+      // - Replace 'index.html' with the app shell only if it hasn't been prerendered yet.
+      // - Always replace 'index.csr.html' with the app shell.
+      const filePath = appShellRoute && !indexHasBeenPrerendered ? indexHtmlOptions.output : path;
       additionalHtmlOutputFiles.set(
-        path,
-        createOutputFile(path, content, BuildOutputFileType.Browser),
+        filePath,
+        createOutputFile(filePath, content, BuildOutputFileType.Browser),
+      );
+    }
+
+    if (ssrOptions) {
+      // Regenerate the manifest to append route tree. This is only needed if SSR is enabled.
+      const manifest = additionalOutputFiles.find((f) => f.path === SERVER_APP_MANIFEST_FILENAME);
+      assert(manifest, `${SERVER_APP_MANIFEST_FILENAME} was not found in output files.`);
+
+      manifest.contents = new TextEncoder().encode(
+        generateAngularServerAppManifest(
+          additionalHtmlOutputFiles,
+          outputFiles,
+          optimizationOptions.styles.inlineCritical ?? false,
+          serializableRouteTreeNode,
+        ),
       );
     }
   }
@@ -145,7 +180,7 @@ export async function executePostBundleSteps(
       const serviceWorkerResult = await augmentAppWithServiceWorkerEsbuild(
         workspaceRoot,
         serviceWorker,
-        options.baseHref || '/',
+        baseHref,
         options.indexHtmlOptions?.output,
         // Ensure additional files recently added are used
         [...outputFiles, ...additionalOutputFiles],

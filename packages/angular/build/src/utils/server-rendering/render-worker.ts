@@ -6,41 +6,43 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { workerData } from 'node:worker_threads';
 import type { ESMInMemoryFileLoaderWorkerData } from './esm-in-memory-loader/loader-hooks';
 import { patchFetchToLoadInMemoryAssets } from './fetch-patch';
-import { RenderResult, ServerContext, renderPage } from './render-page';
+import { loadEsmModuleFromMemory } from './load-esm-from-memory';
 
 export interface RenderWorkerData extends ESMInMemoryFileLoaderWorkerData {
-  document: string;
-  inlineCriticalCss?: boolean;
   assetFiles: Record</** Destination */ string, /** Source */ string>;
 }
 
 export interface RenderOptions {
-  route: string;
-  serverContext: ServerContext;
+  url: string;
+  isAppShellRoute: boolean;
 }
 
 /**
- * This is passed as workerData when setting up the worker via the `piscina` package.
+ * Renders each route in routes and writes them to <outputPath>/<route>/index.html.
  */
-const { outputFiles, document, inlineCriticalCss } = workerData as RenderWorkerData;
+async function renderPage({ url, isAppShellRoute }: RenderOptions): Promise<string | null> {
+  const {
+    ɵgetOrCreateAngularServerApp: getOrCreateAngularServerApp,
+    ɵServerRenderContext: ServerRenderContext,
+  } = await loadEsmModuleFromMemory('./main.server.mjs');
+  const angularServerApp = getOrCreateAngularServerApp();
+  const response = await angularServerApp.render(
+    new Request(new URL(url, 'http://local-angular-prerender'), {
+      signal: AbortSignal.timeout(30_000),
+    }),
+    undefined,
+    isAppShellRoute ? ServerRenderContext.AppShell : ServerRenderContext.SSG,
+  );
 
-/** Renders an application based on a provided options. */
-function render(options: RenderOptions): Promise<RenderResult> {
-  return renderPage({
-    ...options,
-    outputFiles,
-    document,
-    inlineCriticalCss,
-  });
+  return response ? response.text() : null;
 }
 
 function initialize() {
   patchFetchToLoadInMemoryAssets();
 
-  return render;
+  return renderPage;
 }
 
 export default initialize();

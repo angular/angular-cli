@@ -14,9 +14,8 @@ import { I18nInliner } from '../../tools/esbuild/i18n-inliner';
 import { maxWorkers } from '../../utils/environment-options';
 import { loadTranslations } from '../../utils/i18n-options';
 import { createTranslationLoader } from '../../utils/load-translations';
-import { urlJoin } from '../../utils/url';
 import { executePostBundleSteps } from './execute-post-bundle';
-import { NormalizedApplicationBuildOptions } from './options';
+import { NormalizedApplicationBuildOptions, getLocaleBaseHref } from './options';
 
 /**
  * Inlines all active locales as specified by the application build options into all
@@ -125,22 +124,6 @@ export async function inlineI18n(
   }
 
   return inlineResult;
-}
-
-function getLocaleBaseHref(
-  baseHref: string | undefined,
-  i18n: NormalizedApplicationBuildOptions['i18nOptions'],
-  locale: string,
-): string | undefined {
-  if (i18n.flatOutput) {
-    return undefined;
-  }
-
-  if (i18n.locales[locale] && i18n.locales[locale].baseHref !== '') {
-    return urlJoin(baseHref || '', i18n.locales[locale].baseHref ?? `/${locale}/`);
-  }
-
-  return undefined;
 }
 
 /**

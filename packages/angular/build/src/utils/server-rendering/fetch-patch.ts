@@ -21,8 +21,6 @@ const { assetFiles } = workerData as {
 const assetsCache: Map<string, { headers: undefined | Record<string, string>; content: Buffer }> =
   new Map();
 
-const RESOLVE_PROTOCOL = 'resolve:';
-
 export function patchFetchToLoadInMemoryAssets(): void {
   const originalFetch = globalThis.fetch;
   const patchedFetch: typeof fetch = async (input, init) => {
@@ -30,17 +28,17 @@ export function patchFetchToLoadInMemoryAssets(): void {
     if (input instanceof URL) {
       url = input;
     } else if (typeof input === 'string') {
-      url = new URL(input, RESOLVE_PROTOCOL + '//');
+      url = new URL(input);
     } else if (typeof input === 'object' && 'url' in input) {
-      url = new URL(input.url, RESOLVE_PROTOCOL + '//');
+      url = new URL(input.url);
     } else {
       return originalFetch(input, init);
     }
 
-    const { protocol } = url;
+    const { hostname } = url;
     const pathname = decodeURIComponent(url.pathname);
 
-    if (protocol !== RESOLVE_PROTOCOL || !assetFiles[pathname]) {
+    if (hostname !== 'local-angular-prerender' || !assetFiles[pathname]) {
       // Only handle relative requests or files that are in assets.
       return originalFetch(input, init);
     }

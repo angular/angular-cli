@@ -122,13 +122,11 @@ export function createAngularMemoryPlugin(options: AngularMemoryPluginOptions): 
       // Returning a function, installs middleware after the main transform middleware but
       // before the built-in HTML middleware
       return () => {
-        server.middlewares.use(angularHtmlFallbackMiddleware);
-
         if (ssr) {
-          server.middlewares.use(
-            createAngularSSRMiddleware(server, outputFiles, indexHtmlTransformer),
-          );
+          server.middlewares.use(createAngularSSRMiddleware(server, indexHtmlTransformer));
         }
+
+        server.middlewares.use(angularHtmlFallbackMiddleware);
 
         server.middlewares.use(
           createAngularIndexHtmlMiddleware(server, outputFiles, indexHtmlTransformer),

@@ -24,12 +24,25 @@ import {
   generateSearchDirectories,
   loadPostcssConfiguration,
 } from '../../utils/postcss-configuration';
+import { urlJoin } from '../../utils/url';
 import {
   Schema as ApplicationBuilderOptions,
   I18NTranslation,
   OutputHashing,
   OutputPathClass,
 } from './schema';
+
+/**
+ * The filename for the client-side rendered HTML template.
+ * This template is used for client-side rendering (CSR) in a web application.
+ */
+export const INDEX_HTML_CSR = 'index.csr.html';
+
+/**
+ * The filename for the server-side rendered HTML template.
+ * This template is used for server-side rendering (SSR) in a web application.
+ */
+export const INDEX_HTML_SERVER = 'index.server.html';
 
 export type NormalizedOutputOptions = Required<OutputPathClass> & {
   clean: boolean;
@@ -252,7 +265,7 @@ export async function normalizeOptions(
        * For instance, accessing `foo.com/` would lead to `foo.com/index.html` being served instead of hitting the server.
        */
       const indexBaseName = path.basename(options.index);
-      indexOutput = ssrOptions && indexBaseName === 'index.html' ? 'index.csr.html' : indexBaseName;
+      indexOutput = ssrOptions && indexBaseName === 'index.html' ? INDEX_HTML_CSR : indexBaseName;
     } else {
       indexOutput = options.index.output || 'index.html';
     }
@@ -531,4 +544,20 @@ function normalizeGlobalEntries(
   }
 
   return [...bundles.values()];
+}
+
+export function getLocaleBaseHref(
+  baseHref: string | undefined,
+  i18n: NormalizedApplicationBuildOptions['i18nOptions'],
+  locale: string,
+): string | undefined {
+  if (i18n.flatOutput) {
+    return undefined;
+  }
+
+  if (i18n.locales[locale] && i18n.locales[locale].baseHref !== '') {
+    return urlJoin(baseHref || '', i18n.locales[locale].baseHref ?? `/${locale}/`);
+  }
+
+  return undefined;
 }
