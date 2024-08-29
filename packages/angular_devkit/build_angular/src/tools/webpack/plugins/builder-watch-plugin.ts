@@ -36,7 +36,7 @@ class TimeInfoMap extends Map<string, { safeTime: number; timestamp: number }> {
 }
 
 // Extract watch related types from the Webpack compiler type since they are not directly exported
-type WebpackWatchFileSystem = Compiler['watchFileSystem'];
+type WebpackWatchFileSystem = NonNullable<Compiler['watchFileSystem']>;
 type WatchOptions = Parameters<WebpackWatchFileSystem['watch']>[4];
 type WatchCallback = Parameters<WebpackWatchFileSystem['watch']>[5];
 
@@ -83,7 +83,7 @@ class BuilderWatchFileSystem implements WebpackWatchFileSystem {
         const missingChanges = new Set<string>();
 
         for (const event of events) {
-          this.inputFileSystem.purge?.(event.path);
+          this.inputFileSystem?.purge?.(event.path);
 
           if (event.type === 'deleted') {
             timeInfo.delete(event.path);
@@ -103,7 +103,7 @@ class BuilderWatchFileSystem implements WebpackWatchFileSystem {
         const timeInfoMap = new Map(timeInfo);
 
         callback(
-          undefined,
+          null,
           timeInfoMap,
           timeInfoMap,
           new Set([...fileChanges, ...directoryChanges, ...missingChanges]),
