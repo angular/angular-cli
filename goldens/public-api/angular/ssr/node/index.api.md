@@ -5,6 +5,8 @@
 ```ts
 
 import { ApplicationRef } from '@angular/core';
+import type { IncomingMessage } from 'node:http';
+import type { ServerResponse } from 'node:http';
 import { StaticProvider } from '@angular/core';
 import { Type } from '@angular/core';
 
@@ -34,6 +36,12 @@ export interface CommonEngineRenderOptions {
     // (undocumented)
     url?: string;
 }
+
+// @public
+export function createWebRequestFromNodeRequest(nodeRequest: IncomingMessage): Request;
+
+// @public
+export function writeResponseToNodeResponse(source: Response, destination: ServerResponse): Promise<void>;
 
 // (No @packageDocumentation comment for this package)
 

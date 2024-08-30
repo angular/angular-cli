@@ -14,6 +14,7 @@ import type { ServerResponse } from 'node:http';
  * @param source - The web-standard `Response` object to stream from.
  * @param destination - The Node.js `ServerResponse` object to stream into.
  * @returns A promise that resolves once the streaming operation is complete.
+ * @developerPreview
  */
 export async function writeResponseToNodeResponse(
   source: Response,

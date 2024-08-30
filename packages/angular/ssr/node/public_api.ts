@@ -11,3 +11,6 @@ export {
   type CommonEngineRenderOptions,
   type CommonEngineOptions,
 } from './src/common-engine/common-engine';
+
+export { writeResponseToNodeResponse } from './src/response';
+export { createWebRequestFromNodeRequest } from './src/request';
