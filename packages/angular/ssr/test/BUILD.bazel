@@ -32,7 +32,6 @@ ts_library(
         "@npm//@angular/platform-browser",
         "@npm//@angular/platform-server",
         "@npm//@angular/router",
-        "@npm//zone.js",
     ],
 )
 
