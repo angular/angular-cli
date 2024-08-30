@@ -7,7 +7,6 @@
  */
 
 import { ServerAssets } from '../src/assets';
-import { AngularAppManifest } from '../src/manifest';
 
 describe('ServerAsset', () => {
   let assetManager: ServerAssets;

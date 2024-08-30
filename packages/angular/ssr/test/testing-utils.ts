@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { Component } from '@angular/core';
+import { Component, provideExperimentalZonelessChangeDetection } from '@angular/core';
 import { bootstrapApplication } from '@angular/platform-browser';
 import { provideServerRendering } from '@angular/platform-server';
 import { RouterOutlet, Routes, provideRouter } from '@angular/router';
@@ -48,7 +48,11 @@ export function setAngularAppTestingManifest(routes: Routes, baseHref = ''): voi
       class AppComponent {}
 
       return bootstrapApplication(AppComponent, {
-        providers: [provideServerRendering(), provideRouter(routes)],
+        providers: [
+          provideServerRendering(),
+          provideExperimentalZonelessChangeDetection(),
+          provideRouter(routes),
+        ],
       });
     },
   });

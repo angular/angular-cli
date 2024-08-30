@@ -7,7 +7,6 @@
  */
 
 /* eslint-disable import/no-unassigned-import */
-import 'zone.js/node';
 import '@angular/compiler';
 /* eslint-enable import/no-unassigned-import */
 

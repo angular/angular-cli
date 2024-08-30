@@ -968,7 +968,6 @@ __metadata:
     "@angular/router": "npm:19.0.0-next.2"
     "@bazel/runfiles": "npm:^5.8.1"
     tslib: "npm:^2.3.0"
-    zone.js: "npm:^0.15.0"
   peerDependencies:
     "@angular/common": ^19.0.0-next.0
     "@angular/core": ^19.0.0-next.0
