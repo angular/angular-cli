@@ -13,6 +13,7 @@ import type { IncomingHttpHeaders, IncomingMessage } from 'node:http';
  *
  * @param nodeRequest - The Node.js `IncomingMessage` object to convert.
  * @returns A Web Standard `Request` object.
+ * @developerPreview
  */
 export function createWebRequestFromNodeRequest(nodeRequest: IncomingMessage): Request {
   const { headers, method = 'GET' } = nodeRequest;
