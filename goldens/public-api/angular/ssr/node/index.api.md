@@ -6,9 +6,15 @@
 
 import { ApplicationRef } from '@angular/core';
 import type { IncomingMessage } from 'node:http';
+import type { IncomingMessage as IncomingMessage_2 } from 'http';
 import type { ServerResponse } from 'node:http';
 import { StaticProvider } from '@angular/core';
 import { Type } from '@angular/core';
+
+// @public
+export interface AngularNodeServerAppManager {
+    render(request: Request | IncomingMessage_2, requestContext?: unknown): Promise<Response | null>;
+}
 
 // @public
 export class CommonEngine {
@@ -39,6 +45,12 @@ export interface CommonEngineRenderOptions {
 
 // @public
 export function createWebRequestFromNodeRequest(nodeRequest: IncomingMessage): Request;
+
+// @public
+export function destroyAngularNodeAppEngine(): void;
+
+// @public
+export function getOrCreateAngularNodeAppEngine(): AngularNodeServerAppManager;
 
 // @public
 export function writeResponseToNodeResponse(source: Response, destination: ServerResponse): Promise<void>;

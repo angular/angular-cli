@@ -12,5 +12,11 @@ export {
   type CommonEngineOptions,
 } from './src/common-engine/common-engine';
 
+export {
+  type AngularNodeServerAppManager,
+  destroyAngularNodeAppEngine,
+  getOrCreateAngularNodeAppEngine,
+} from './src/app-engine';
+
 export { writeResponseToNodeResponse } from './src/response';
 export { createWebRequestFromNodeRequest } from './src/request';
