@@ -1,3 +1,15 @@
+<a name="18.2.3"></a>
+
+# 18.2.3 (2024-09-04)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------ |
+| [482076612](https://github.com/angular/angular-cli/commit/482076612cac4b6565fc1b5e89ff9ca207653f87) | fix  | update `webpack-dev-middleware` to `7.4.2` |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="18.2.2"></a>
 
 # 18.2.2 (2024-08-29)
