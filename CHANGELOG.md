@@ -1,3 +1,21 @@
+<a name="19.0.0-next.3"></a>
+
+# 19.0.0-next.3 (2024-09-04)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                 |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------- |
+| [3ee21631f](https://github.com/angular/angular-cli/commit/3ee21631f481b2e72be2390b5a2cac74824efbb5) | fix  | clear context in Karma by default for single run executions |
+
+### @angular/ssr
+
+| Commit                                                                                              | Type | Description                                                                              |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------------------------------------- |
+| [455b5700c](https://github.com/angular/angular-cli/commit/455b5700c29845829235e17efec320e634553108) | feat | expose `writeResponseToNodeResponse` and `createWebRequestFromNodeRequest` in public API |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="18.2.3"></a>
 
 # 18.2.3 (2024-09-04)
