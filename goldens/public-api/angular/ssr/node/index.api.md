@@ -6,14 +6,14 @@
 
 import { ApplicationRef } from '@angular/core';
 import type { IncomingMessage } from 'node:http';
-import type { IncomingMessage as IncomingMessage_2 } from 'http';
 import type { ServerResponse } from 'node:http';
 import { StaticProvider } from '@angular/core';
 import { Type } from '@angular/core';
 
 // @public
 export interface AngularNodeServerAppManager {
-    render(request: Request | IncomingMessage_2, requestContext?: unknown): Promise<Response | null>;
+    getHeaders(request: IncomingMessage): Readonly<Map<string, string>>;
+    render(request: IncomingMessage, requestContext?: unknown): Promise<Response | null>;
 }
 
 // @public
