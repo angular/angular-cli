@@ -8,8 +8,4 @@
 
 export * from './private_export';
 
-export {
-  type AngularServerAppManager,
-  getOrCreateAngularAppEngine,
-  destroyAngularAppEngine,
-} from './src/app-engine';
+export { AngularAppEngine } from './src/app-engine';

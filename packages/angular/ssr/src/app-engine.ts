@@ -14,47 +14,15 @@ import { stripIndexHtmlFromURL } from './utils/url';
 
 /**
  * Angular server application engine.
- * Manages Angular server applications (including localized ones) and handles rendering requests.
-
- * @developerPreview
- */
-export interface AngularServerAppManager {
-  /**
-   * Renders a response for the given HTTP request using the server application.
-   *
-   * This method processes the request, determines the appropriate route and rendering context,
-   * and returns an HTTP response.
-   *
-   * If the request URL appears to be for a file (excluding `/index.html`), the method returns `null`.
-   * A request to `https://www.example.com/page/index.html` will render the Angular route
-   * corresponding to `https://www.example.com/page`.
-   *
-   * @param request - The incoming HTTP request object to be rendered.
-   * @param requestContext - Optional additional context for the request, such as metadata.
-   * @returns A promise that resolves to a Response object, or `null` if the request URL represents a file (e.g., `./logo.png`)
-   * rather than an application route.
-   */
-  render(request: Request, requestContext?: unknown): Promise<Response | null>;
-
-  /**
-   * Retrieves HTTP headers for a request associated with statically generated (SSG) pages,
-   * based on the URL pathname.
-   *
-   * @param request - The incoming request object.
-   * @returns A `Map` containing the HTTP headers as key-value pairs.
-   * @note This function should be used exclusively for retrieving headers of SSG pages.
-   */
-  getHeaders(request: Request): Readonly<Map<string, string>>;
-}
-
-/**
- * Angular server application engine.
  * Manages Angular server applications (including localized ones), handles rendering requests,
  * and optionally transforms index HTML before rendering.
  *
+ * @note This class should be instantiated once and used as a singleton across the server-side
+ * application to ensure consistent handling of rendering requests and resource management.
+ *
  * @developerPreview
  */
-export class AngularAppEngine implements AngularServerAppManager {
+export class AngularAppEngine {
   /**
    * Hooks for extending or modifying the behavior of the server application.
    * These hooks are used by the Angular CLI when running the development server and
@@ -152,33 +120,4 @@ export class AngularAppEngine implements AngularServerAppManager {
 
     return new Map(headers);
   }
-}
-
-let angularAppEngine: AngularAppEngine | undefined;
-
-/**
- * Retrieves an existing `AngularAppEngine` instance or creates a new one if none exists.
- *
- * This method ensures that only a single instance of `AngularAppEngine` is created and reused across
- * the application lifecycle, providing efficient resource management. If the instance does not exist,
- * it will be instantiated upon the first call.
- *
- * @developerPreview
- * @returns The existing or newly created instance of `AngularAppEngine`.
- */
-export function getOrCreateAngularAppEngine(): AngularServerAppManager {
-  return (angularAppEngine ??= new AngularAppEngine());
-}
-
-/**
- * Destroys the current `AngularAppEngine` instance, releasing any associated resources.
- *
- * This method resets the reference to the `AngularAppEngine` instance to `undefined`, allowing
- * a new instance to be created on the next call to `getOrCreateAngularAppEngine()`. It is typically
- * used when reinitializing the server environment or refreshing the application state is necessary.
- *
- * @developerPreview
- */
-export function destroyAngularAppEngine(): void {
-  angularAppEngine = undefined;
 }

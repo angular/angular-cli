@@ -6,17 +6,23 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { destroyAngularAppEngine, getOrCreateAngularAppEngine } from '@angular/ssr';
+import { AngularAppEngine } from '@angular/ssr';
 import type { IncomingMessage } from 'node:http';
 import { createWebRequestFromNodeRequest } from './request';
 
 /**
  * Angular server application engine.
- * Manages Angular server applications (including localized ones) and handles rendering requests.
-
+ * Manages Angular server applications (including localized ones), handles rendering requests,
+ * and optionally transforms index HTML before rendering.
+ *
+ * @note This class should be instantiated once and used as a singleton across the server-side
+ * application to ensure consistent handling of rendering requests and resource management.
+ *
  * @developerPreview
  */
-export interface AngularNodeServerAppManager {
+export class AngularNodeAppEngine {
+  private readonly angularAppEngine = new AngularAppEngine();
+
   /**
    * Renders an HTTP response based on the incoming request using the Angular server application.
    *
@@ -32,7 +38,9 @@ export interface AngularNodeServerAppManager {
    * @returns A promise that resolves to a `Response` object, or `null` if the request URL is for a static file
    * (e.g., `./logo.png`) rather than an application route.
    */
-  render(request: IncomingMessage, requestContext?: unknown): Promise<Response | null>;
+  render(request: IncomingMessage, requestContext?: unknown): Promise<Response | null> {
+    return this.angularAppEngine.render(createWebRequestFromNodeRequest(request), requestContext);
+  }
 
   /**
    * Retrieves HTTP headers for a request associated with statically generated (SSG) pages,
@@ -43,7 +51,7 @@ export interface AngularNodeServerAppManager {
    * @note This function should be used exclusively for retrieving headers of SSG pages.
    * @example
    * ```typescript
-   * const angularAppEngine = getOrCreateAngularNodeAppEngine();
+   * const angularAppEngine = new AngularNodeAppEngine();
    *
    * app.use(express.static('dist/browser', {
    *   setHeaders: (res, path) => {
@@ -58,51 +66,7 @@ export interface AngularNodeServerAppManager {
      }));
   * ```
   */
-  getHeaders(request: IncomingMessage): Readonly<Map<string, string>>;
-}
-
-/**
- * Angular server application engine.
- * Manages Angular server applications (including localized ones), handles rendering requests,
- * and optionally transforms index HTML before rendering.
- */
-class AngularNodeAppEngine implements AngularNodeServerAppManager {
-  private readonly angularAppEngine = getOrCreateAngularAppEngine();
-
-  render(request: IncomingMessage, requestContext?: unknown): Promise<Response | null> {
-    return this.angularAppEngine.render(createWebRequestFromNodeRequest(request), requestContext);
-  }
-
   getHeaders(request: IncomingMessage): Readonly<Map<string, string>> {
     return this.angularAppEngine.getHeaders(createWebRequestFromNodeRequest(request));
   }
-}
-
-let angularNodeAppEngine: AngularNodeAppEngine | undefined;
-
-/**
- * Retrieves the existing `AngularNodeAppEngine` instance or creates a new one if it doesn't exist.
- *
- * This method ensures that a single instance of `AngularNodeAppEngine` is used throughout the application's lifecycle,
- * promoting efficient resource management. If an instance does not exist, it will be instantiated upon the first call.
- *
- * @developerPreview
- * @returns The existing or newly created instance of `AngularNodeAppEngine`.
- */
-export function getOrCreateAngularNodeAppEngine(): AngularNodeServerAppManager {
-  return (angularNodeAppEngine ??= new AngularNodeAppEngine());
-}
-
-/**
- * Destroys the current `AngularNodeAppEngine` instance and releases any associated resources.
- *
- * This method resets the reference to the `AngularNodeAppEngine` instance to `undefined`, allowing for the creation
- * of a new instance on subsequent calls to `getOrCreateAngularNodeAppEngine()`. This is typically used when
- * reinitializing the server environment or refreshing the application state.
- *
- * @developerPreview
- */
-export function destroyAngularNodeAppEngine(): void {
-  angularNodeAppEngine = undefined;
-  destroyAngularAppEngine();
 }

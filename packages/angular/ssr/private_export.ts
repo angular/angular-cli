@@ -21,6 +21,4 @@ export {
   setAngularAppEngineManifest as ɵsetAngularAppEngineManifest,
 } from './src/manifest';
 
-export { AngularAppEngine as ɵAngularAppEngine } from './src/app-engine';
-
 export { InlineCriticalCssProcessor as ɵInlineCriticalCssProcessor } from './src/utils/inline-critical-css';
