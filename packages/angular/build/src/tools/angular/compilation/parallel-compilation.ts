@@ -10,8 +10,8 @@ import type { CompilerOptions } from '@angular/compiler-cli';
 import type { PartialMessage } from 'esbuild';
 import { createRequire } from 'node:module';
 import { MessageChannel } from 'node:worker_threads';
-import Piscina from 'piscina';
 import type { SourceFile } from 'typescript';
+import { WorkerPool } from '../../../utils/worker-pool';
 import type { AngularHostOptions } from '../angular-host';
 import { AngularCompilation, DiagnosticModes, EmitFileResult } from './angular-compilation';
 
@@ -24,7 +24,7 @@ import { AngularCompilation, DiagnosticModes, EmitFileResult } from './angular-c
  * main Node.js CLI process memory settings with large application code sizes.
  */
 export class ParallelCompilation extends AngularCompilation {
-  readonly #worker: Piscina;
+  readonly #worker: WorkerPool;
 
   constructor(readonly jit: boolean) {
     super();
@@ -32,15 +32,10 @@ export class ParallelCompilation extends AngularCompilation {
     // TODO: Convert to import.meta usage during ESM transition
     const localRequire = createRequire(__filename);
 
-    this.#worker = new Piscina({
-      minThreads: 1,
+    this.#worker = new WorkerPool({
       maxThreads: 1,
       idleTimeout: Infinity,
-      // Web containers do not support transferable objects with receiveOnMessagePort which
-      // is used when the Atomics based wait loop is enable.
-      useAtomics: !process.versions.webcontainer,
       filename: localRequire.resolve('./parallel-worker'),
-      recordTiming: false,
     });
   }
 

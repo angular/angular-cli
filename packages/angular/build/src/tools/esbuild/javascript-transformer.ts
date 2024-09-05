@@ -8,7 +8,7 @@
 
 import { createHash } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
-import Piscina from 'piscina';
+import { WorkerPool } from '../../utils/worker-pool';
 import { Cache } from './cache';
 
 /**
@@ -29,7 +29,7 @@ export interface JavaScriptTransformerOptions {
  * and advanced optimizations.
  */
 export class JavaScriptTransformer {
-  #workerPool: Piscina | undefined;
+  #workerPool: WorkerPool | undefined;
   #commonOptions: Required<JavaScriptTransformerOptions>;
   #fileCacheKeyBase: Uint8Array;
 
@@ -54,14 +54,10 @@ export class JavaScriptTransformer {
     this.#fileCacheKeyBase = Buffer.from(JSON.stringify(this.#commonOptions), 'utf-8');
   }
 
-  #ensureWorkerPool(): Piscina {
-    this.#workerPool ??= new Piscina({
+  #ensureWorkerPool(): WorkerPool {
+    this.#workerPool ??= new WorkerPool({
       filename: require.resolve('./javascript-transformer-worker'),
-      minThreads: 1,
       maxThreads: this.maxThreads,
-      // Shutdown idle threads after 1 second of inactivity
-      idleTimeout: 1000,
-      recordTiming: false,
     });
 
     return this.#workerPool;

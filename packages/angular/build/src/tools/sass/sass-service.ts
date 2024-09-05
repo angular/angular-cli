@@ -9,7 +9,6 @@
 import assert from 'node:assert';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { MessageChannel } from 'node:worker_threads';
-import { Piscina } from 'piscina';
 import type {
   CanonicalizeContext,
   CompileResult,
@@ -22,6 +21,7 @@ import type {
   StringOptions,
 } from 'sass';
 import { maxWorkers } from '../../utils/environment-options';
+import { WorkerPool } from '../../utils/worker-pool';
 
 // Polyfill Symbol.dispose if not present
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -84,24 +84,17 @@ interface RenderResponseMessage {
  * the worker which can be up to two times faster than the asynchronous variant.
  */
 export class SassWorkerImplementation {
-  #workerPool: Piscina | undefined;
+  #workerPool: WorkerPool | undefined;
 
   constructor(
     private readonly rebase = false,
     readonly maxThreads = MAX_RENDER_WORKERS,
   ) {}
 
-  #ensureWorkerPool(): Piscina {
-    this.#workerPool ??= new Piscina({
+  #ensureWorkerPool(): WorkerPool {
+    this.#workerPool ??= new WorkerPool({
       filename: require.resolve('./worker'),
-      minThreads: 1,
       maxThreads: this.maxThreads,
-      // Web containers do not support transferable objects with receiveOnMessagePort which
-      // is used when the Atomics based wait loop is enable.
-      useAtomics: !process.versions.webcontainer,
-      // Shutdown idle threads after 1 second of inactivity
-      idleTimeout: 1000,
-      recordTiming: false,
     });
 
     return this.#workerPool;
