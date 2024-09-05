@@ -6,8 +6,8 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { json } from '@angular-devkit/core';
-import yargs from 'yargs';
+import { json, strings } from '@angular-devkit/core';
+import yargs, { Arguments, Argv, PositionalOptions, Options as YargsOptions } from 'yargs';
 
 /**
  * An option description.
@@ -43,6 +43,55 @@ export interface Option extends yargs.Options {
    * If this is falsey, do not report this option.
    */
   userAnalytics?: string;
+
+  /**
+   * Type of the values in a key/value pair field.
+   */
+  itemValueType?: 'string';
+}
+
+function coerceToStringMap(
+  dashedName: string,
+  value: (string | undefined)[],
+): Record<string, string> | Promise<never> {
+  const stringMap: Record<string, string> = {};
+  for (const pair of value) {
+    // This happens when the flag isn't passed at all.
+    if (pair === undefined) {
+      continue;
+    }
+
+    const eqIdx = pair.indexOf('=');
+    if (eqIdx === -1) {
+      // TODO: Remove workaround once yargs properly handles thrown errors from coerce.
+      // Right now these sometimes end up as uncaught exceptions instead of proper validation
+      // errors with usage output.
+      return Promise.reject(
+        new Error(
+          `Invalid value for argument: ${dashedName}, Given: '${pair}', Expected key=value pair`,
+        ),
+      );
+    }
+    const key = pair.slice(0, eqIdx);
+    const value = pair.slice(eqIdx + 1);
+    stringMap[key] = value;
+  }
+
+  return stringMap;
+}
+
+function isStringMap(node: json.JsonObject): boolean {
+  // Exclude fields with more specific kinds of properties.
+  if (node.properties || node.patternProperties) {
+    return false;
+  }
+
+  // Restrict to additionalProperties with string values.
+  return (
+    json.isJsonObject(node.additionalProperties) &&
+    !node.additionalProperties.enum &&
+    node.additionalProperties.type === 'string'
+  );
 }
 
 export async function parseJsonSchemaToOptions(
@@ -106,10 +155,13 @@ export async function parseJsonSchemaToOptions(
 
           return false;
 
+        case 'object':
+          return isStringMap(current);
+
         default:
           return false;
       }
-    }) as ('string' | 'number' | 'boolean' | 'array')[];
+    }) as ('string' | 'number' | 'boolean' | 'array' | 'object')[];
 
     if (types.length == 0) {
       // This means it's not usable on the command line. e.g. an Object.
@@ -150,7 +202,6 @@ export async function parseJsonSchemaToOptions(
       }
     }
 
-    const type = types[0];
     const $default = current.$default;
     const $defaultIndex =
       json.isJsonObject($default) && $default['$source'] == 'argv' ? $default['index'] : undefined;
@@ -182,7 +233,6 @@ export async function parseJsonSchemaToOptions(
     const option: Option = {
       name,
       description: '' + (current.description === undefined ? '' : current.description),
-      type,
       default: defaultValue,
       choices: enumValues.length ? enumValues : undefined,
       required,
@@ -192,6 +242,14 @@ export async function parseJsonSchemaToOptions(
       userAnalytics,
       deprecated,
       positional,
+      ...(types[0] === 'object'
+        ? {
+            type: 'array',
+            itemValueType: 'string',
+          }
+        : {
+            type: types[0],
+          }),
     };
 
     options.push(option);
@@ -210,4 +268,91 @@ export async function parseJsonSchemaToOptions(
 
     return a.name.localeCompare(b.name);
   });
+}
+
+/**
+ * Adds schema options to a command also this keeps track of options that are required for analytics.
+ * **Note:** This method should be called from the command bundler method.
+ *
+ * @returns A map from option name to analytics configuration.
+ */
+export function addSchemaOptionsToCommand<T>(
+  localYargs: Argv<T>,
+  options: Option[],
+  includeDefaultValues: boolean,
+): Map<string, string> {
+  const booleanOptionsWithNoPrefix = new Set<string>();
+  const keyValuePairOptions = new Set<string>();
+  const optionsWithAnalytics = new Map<string, string>();
+
+  for (const option of options) {
+    const {
+      default: defaultVal,
+      positional,
+      deprecated,
+      description,
+      alias,
+      userAnalytics,
+      type,
+      itemValueType,
+      hidden,
+      name,
+      choices,
+    } = option;
+
+    let dashedName = strings.dasherize(name);
+
+    // Handle options which have been defined in the schema with `no` prefix.
+    if (type === 'boolean' && dashedName.startsWith('no-')) {
+      dashedName = dashedName.slice(3);
+      booleanOptionsWithNoPrefix.add(dashedName);
+    }
+
+    if (itemValueType) {
+      keyValuePairOptions.add(name);
+    }
+
+    const sharedOptions: YargsOptions & PositionalOptions = {
+      alias,
+      hidden,
+      description,
+      deprecated,
+      choices,
+      coerce: itemValueType ? coerceToStringMap.bind(null, dashedName) : undefined,
+      // This should only be done when `--help` is used otherwise default will override options set in angular.json.
+      ...(includeDefaultValues ? { default: defaultVal } : {}),
+    };
+
+    if (positional === undefined) {
+      localYargs = localYargs.option(dashedName, {
+        array: itemValueType ? true : undefined,
+        type: itemValueType ?? type,
+        ...sharedOptions,
+      });
+    } else {
+      localYargs = localYargs.positional(dashedName, {
+        type: type === 'array' || type === 'count' ? 'string' : type,
+        ...sharedOptions,
+      });
+    }
+
+    // Record option of analytics.
+    if (userAnalytics !== undefined) {
+      optionsWithAnalytics.set(name, userAnalytics);
+    }
+  }
+
+  // Handle options which have been defined in the schema with `no` prefix.
+  if (booleanOptionsWithNoPrefix.size) {
+    localYargs.middleware((options: Arguments) => {
+      for (const key of booleanOptionsWithNoPrefix) {
+        if (key in options) {
+          options[`no-${key}`] = !options[key];
+          delete options[key];
+        }
+      }
+    }, false);
+  }
+
+  return optionsWithAnalytics;
 }
