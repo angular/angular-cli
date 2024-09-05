@@ -8,6 +8,7 @@
 
 import { createHash } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
+import { getCompileCacheDir } from 'node:module';
 import Piscina from 'piscina';
 import { Cache } from './cache';
 
@@ -62,6 +63,11 @@ export class JavaScriptTransformer {
       // Shutdown idle threads after 1 second of inactivity
       idleTimeout: 1000,
       recordTiming: false,
+      env: {
+        ...process.env,
+        // Enable compile code caching if enabled for the main process (only exists on Node.js v22.8+)
+        'NODE_COMPILE_CACHE': getCompileCacheDir?.(),
+      },
     });
 
     return this.#workerPool;
