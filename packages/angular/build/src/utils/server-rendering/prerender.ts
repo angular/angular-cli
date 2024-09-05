@@ -9,10 +9,10 @@
 import { readFile } from 'node:fs/promises';
 import { extname, join, posix } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import Piscina from 'piscina';
 import { BuildOutputFile, BuildOutputFileType } from '../../tools/esbuild/bundler-context';
 import { BuildOutputAsset } from '../../tools/esbuild/bundler-execution-result';
 import { urlJoin } from '../url';
+import { WorkerPool } from '../worker-pool';
 import type { RenderWorkerData } from './render-worker';
 import type {
   RoutersExtractorWorkerResult,
@@ -188,7 +188,7 @@ async function renderPages(
     workerExecArgv.push('--enable-source-maps');
   }
 
-  const renderWorker = new Piscina({
+  const renderWorker = new WorkerPool({
     filename: require.resolve('./render-worker'),
     maxThreads: Math.min(allRoutes.size, maxThreads),
     workerData: {
@@ -197,7 +197,6 @@ async function renderPages(
       assetFiles: assetFilesForWorker,
     } as RenderWorkerData,
     execArgv: workerExecArgv,
-    recordTiming: false,
   });
 
   try {
@@ -286,7 +285,7 @@ async function getAllRoutes(
     workerExecArgv.push('--enable-source-maps');
   }
 
-  const renderWorker = new Piscina({
+  const renderWorker = new WorkerPool({
     filename: require.resolve('./routes-extractor-worker'),
     maxThreads: 1,
     workerData: {
@@ -295,7 +294,6 @@ async function getAllRoutes(
       assetFiles: assetFilesForWorker,
     } as RoutesExtractorWorkerData,
     execArgv: workerExecArgv,
-    recordTiming: false,
   });
 
   const errors: string[] = [];
