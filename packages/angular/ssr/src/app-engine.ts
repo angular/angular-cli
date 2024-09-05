@@ -10,6 +10,7 @@ import type { AngularServerApp } from './app';
 import { Hooks } from './hooks';
 import { getPotentialLocaleIdFromUrl } from './i18n';
 import { EntryPointExports, getAngularAppEngineManifest } from './manifest';
+import { stripIndexHtmlFromURL } from './utils/url';
 
 /**
  * Angular server application engine.
@@ -34,12 +35,24 @@ export interface AngularServerAppManager {
    * rather than an application route.
    */
   render(request: Request, requestContext?: unknown): Promise<Response | null>;
+
+  /**
+   * Retrieves HTTP headers for a request associated with statically generated (SSG) pages,
+   * based on the URL pathname.
+   *
+   * @param request - The incoming request object.
+   * @returns A `Map` containing the HTTP headers as key-value pairs.
+   * @note This function should be used exclusively for retrieving headers of SSG pages.
+   */
+  getHeaders(request: Request): Readonly<Map<string, string>>;
 }
 
 /**
  * Angular server application engine.
  * Manages Angular server applications (including localized ones), handles rendering requests,
  * and optionally transforms index HTML before rendering.
+ *
+ * @developerPreview
  */
 export class AngularAppEngine implements AngularServerAppManager {
   /**
@@ -119,6 +132,25 @@ export class AngularAppEngine implements AngularServerAppManager {
     const potentialLocale = getPotentialLocaleIdFromUrl(url, basePath);
 
     return entryPoints.get(potentialLocale);
+  }
+
+  /**
+   * Retrieves HTTP headers for a request associated with statically generated (SSG) pages,
+   * based on the URL pathname.
+   *
+   * @param request - The incoming request object.
+   * @returns A `Map` containing the HTTP headers as key-value pairs.
+   * @note This function should be used exclusively for retrieving headers of SSG pages.
+   */
+  getHeaders(request: Request): Readonly<Map<string, string>> {
+    if (this.manifest.staticPathsHeaders.size === 0) {
+      return new Map();
+    }
+
+    const { pathname } = stripIndexHtmlFromURL(new URL(request.url));
+    const headers = this.manifest.staticPathsHeaders.get(pathname);
+
+    return new Map(headers);
   }
 }
 

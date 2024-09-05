@@ -6,6 +6,7 @@
 
 // @public
 export interface AngularServerAppManager {
+    getHeaders(request: Request): Readonly<Map<string, string>>;
     render(request: Request, requestContext?: unknown): Promise<Response | null>;
 }
 

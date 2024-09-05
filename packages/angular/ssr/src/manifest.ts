@@ -43,6 +43,18 @@ export interface AngularAppEngineManifest {
    * This is used to determine the root path of the application.
    */
   readonly basePath: string;
+
+  /**
+   * A map that associates static paths with their corresponding HTTP headers.
+   * Each entry in the map consists of:
+   * - `key`: The static path as a string.
+   * - `value`: An array of tuples, where each tuple contains:
+   *   - `headerName`: The name of the HTTP header.
+   *   - `headerValue`: The value of the HTTP header.
+   */
+  readonly staticPathsHeaders: Readonly<
+    Map<string, readonly [headerName: string, headerValue: string][]>
+  >;
 }
 
 /**
