@@ -5,16 +5,11 @@
 ```ts
 
 // @public
-export interface AngularServerAppManager {
+export class AngularAppEngine {
     getHeaders(request: Request): Readonly<Map<string, string>>;
     render(request: Request, requestContext?: unknown): Promise<Response | null>;
+    static ɵhooks: Hooks;
 }
-
-// @public
-export function destroyAngularAppEngine(): void;
-
-// @public
-export function getOrCreateAngularAppEngine(): AngularServerAppManager;
 
 // (No @packageDocumentation comment for this package)
 

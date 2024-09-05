@@ -11,7 +11,7 @@ import { StaticProvider } from '@angular/core';
 import { Type } from '@angular/core';
 
 // @public
-export interface AngularNodeServerAppManager {
+export class AngularNodeAppEngine {
     getHeaders(request: IncomingMessage): Readonly<Map<string, string>>;
     render(request: IncomingMessage, requestContext?: unknown): Promise<Response | null>;
 }
@@ -45,12 +45,6 @@ export interface CommonEngineRenderOptions {
 
 // @public
 export function createWebRequestFromNodeRequest(nodeRequest: IncomingMessage): Request;
-
-// @public
-export function destroyAngularNodeAppEngine(): void;
-
-// @public
-export function getOrCreateAngularNodeAppEngine(): AngularNodeServerAppManager;
 
 // @public
 export function writeResponseToNodeResponse(source: Response, destination: ServerResponse): Promise<void>;
