@@ -274,7 +274,7 @@ export async function extractRoutesAndCreateRouteTree(
   const routeTree = new RouteTree();
   const document = await new ServerAssets(manifest).getIndexServerHtml();
   const { baseHref, routes } = await getRoutesFromAngularRouterConfig(
-    manifest.bootstrap(),
+    await manifest.bootstrap(),
     document,
     url,
   );

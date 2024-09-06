@@ -71,9 +71,10 @@ export interface AngularAppManifest {
 
   /**
    * The bootstrap mechanism for the server application.
-   * A function that returns a reference to an NgModule or a function returning a promise that resolves to an ApplicationRef.
+   * A function that returns a promise that resolves to an `NgModule` or a function
+   * returning a promise that resolves to an `ApplicationRef`.
    */
-  readonly bootstrap: () => AngularBootstrap;
+  readonly bootstrap: () => Promise<AngularBootstrap>;
 
   /**
    * Indicates whether critical CSS should be inlined into the HTML.

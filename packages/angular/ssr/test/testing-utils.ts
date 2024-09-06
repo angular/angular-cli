@@ -38,7 +38,7 @@ export function setAngularAppTestingManifest(routes: Routes, baseHref = ''): voi
 </html>`,
       }),
     ),
-    bootstrap: () => () => {
+    bootstrap: async () => () => {
       @Component({
         standalone: true,
         selector: 'app-root',

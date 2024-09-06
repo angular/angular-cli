@@ -89,17 +89,15 @@ export function generateAngularServerAppManifest(
     if (
       file.path === INDEX_HTML_SERVER ||
       file.path === INDEX_HTML_CSR ||
-      file.path.endsWith('.css')
+      (inlineCriticalCss && file.path.endsWith('.css'))
     ) {
       serverAssetsContent.push(`['${file.path}', async () => ${JSON.stringify(file.text)}]`);
     }
   }
 
   const manifestContent = `
-import bootstrap from './main.server.mjs';
-
 export default {
-  bootstrap: () => bootstrap,
+  bootstrap: () => import('./main.server.mjs').then(m => m.default),
   inlineCriticalCss: ${inlineCriticalCss},
   routes: ${JSON.stringify(routes, undefined, 2)},
   assets: new Map([${serverAssetsContent.join(', \n')}]),

@@ -106,24 +106,28 @@ export default async function () {
       `,
   });
 
-  async function ngDevSsr(): Promise<number> {
+  async function spawnServer(): Promise<number> {
     const port = await findFreePort();
-    const validBundleRegEx = useWebpackBuilder ? /Compiled successfully\./ : /complete\./;
+    const runCommand = useWebpackBuilder ? 'serve:ssr' : 'serve:ssr:test-project';
 
     await execAndWaitForOutputToMatch(
-      'ng',
-      [
-        'run',
-        `test-project:${useWebpackBuilder ? 'serve-ssr' : 'serve'}:production`,
-        '--port',
-        String(port),
-      ],
-      validBundleRegEx,
+      'npm',
+      ['run', runCommand],
+      /Node Express server listening on/,
+      {
+        'PORT': String(port),
+      },
     );
 
     return port;
   }
 
-  const port = await ngDevSsr();
+  await ng('build');
+  if (useWebpackBuilder) {
+    // Build server code
+    await ng('run', `test-project:server`);
+  }
+
+  const port = await spawnServer();
   await ng('e2e', `--base-url=http://localhost:${port}`, '--dev-server-target=');
 }
