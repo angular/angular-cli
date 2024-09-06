@@ -15,7 +15,7 @@ import { getAngularAppManifest } from './manifest';
 import { ServerRouter } from './routes/router';
 import { REQUEST, REQUEST_CONTEXT, RESPONSE_INIT } from './tokens';
 import { InlineCriticalCssProcessor } from './utils/inline-critical-css';
-import { renderAngular } from './utils/ng';
+import { AngularBootstrap, renderAngular } from './utils/ng';
 
 /**
  * Enum representing the different contexts in which server rendering can occur.
@@ -57,6 +57,11 @@ export class AngularServerApp {
    * The `inlineCriticalCssProcessor` is responsible for handling critical CSS inlining.
    */
   private inlineCriticalCssProcessor: InlineCriticalCssProcessor | undefined;
+
+  /**
+   * The bootstrap mechanism for the server application.
+   */
+  private boostrap: AngularBootstrap | undefined;
 
   /**
    * Renders a response for the given HTTP request using the server application.
@@ -176,7 +181,9 @@ export class AngularServerApp {
       html = await hooks.run('html:transform:pre', { html });
     }
 
-    html = await renderAngular(html, manifest.bootstrap(), new URL(request.url), platformProviders);
+    this.boostrap ??= await manifest.bootstrap();
+
+    html = await renderAngular(html, this.boostrap, new URL(request.url), platformProviders);
 
     if (manifest.inlineCriticalCss) {
       // Optionally inline critical CSS.
