@@ -46,6 +46,7 @@ things on Windows, at which point it breaks.
 
 On Linux, Bazel tests will run under a sandbox for isolation.
 You can turn off this sandbox by adding the [`local = True`](https://docs.bazel.build/versions/master/be/common-definitions.html#common-attributes-tests) attribute to the rule.
+You can also force local execution by passing `--test_output=streamed`.
 
 Then you will find the intermediate test files in `bazel-out/k8-fastbuild/bin`, followed by the test target path.
 
@@ -58,6 +59,16 @@ causes jasmine to exit with a non-zero exit code.
 
 While testing, you can remove the `shard_count` attribute to prevent sharding and the `flaky`
 attribute to prevent repetition.
+Setting `--test_output=streamed` will disable sharding and `--flaky_test_attempts=1` will disable
+the reruns of tests that have been marked as `flaky`.
+
+The `.bazelrc` includes a config for running tests with remote debugging enabled:
+
+```sh
+yarn bazel test --config=debug //packages/angular/cli:angular-cli_test
+# Also disable reruns of failing tests that were marked as flaky:
+yarn bazel test --config=debug --config=no-sharding //packages/angular/cli:angular-cli_test
+```
 
 NB: For a few tests, sandbox is required as otherwise the rules_nodejs linker symlinks will conflict
 with the yarn workspace symlinks in node_modules.
