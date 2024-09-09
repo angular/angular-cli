@@ -63,11 +63,14 @@ export class ComponentStylesheetBundler {
     );
   }
 
-  async bundleInline(data: string, filename: string, language: string) {
+  async bundleInline(data: string, filename: string, language: string, externalId?: string) {
     // Use a hash of the inline stylesheet content to ensure a consistent identifier. External stylesheets will resolve
     // to the actual stylesheet file path.
     // TODO: Consider xxhash instead for hashing
-    const id = createHash('sha256').update(data).digest('hex');
+    const id = createHash('sha256')
+      .update(data)
+      .update(externalId ?? '')
+      .digest('hex');
     const entry = [language, id, filename].join(';');
 
     const bundlerContext = await this.#inlineContexts.getOrCreate(entry, () => {
@@ -77,7 +80,13 @@ export class ComponentStylesheetBundler {
         const buildOptions = createStylesheetBundleOptions(this.options, loadCache, {
           [entry]: data,
         });
-        buildOptions.entryPoints = [`${namespace};${entry}`];
+        if (externalId) {
+          buildOptions.entryPoints = { [externalId]: `${namespace};${entry}` };
+          delete buildOptions.publicPath;
+        } else {
+          buildOptions.entryPoints = [`${namespace};${entry}`];
+        }
+
         buildOptions.plugins.push({
           name: 'angular-component-styles',
           setup(build) {
@@ -106,7 +115,11 @@ export class ComponentStylesheetBundler {
     });
 
     // Extract the result of the bundling from the output files
-    return this.extractResult(await bundlerContext.bundle(), bundlerContext.watchFiles, false);
+    return this.extractResult(
+      await bundlerContext.bundle(),
+      bundlerContext.watchFiles,
+      !!externalId,
+    );
   }
 
   /**
