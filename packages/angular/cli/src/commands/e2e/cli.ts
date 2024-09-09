@@ -17,6 +17,10 @@ export default class E2eCommandModule
 {
   override missingTargetChoices: MissingTargetChoice[] = [
     {
+      name: 'Playwright',
+      value: 'playwright-ng-schematics',
+    },
+    {
       name: 'Cypress',
       value: '@cypress/schematic',
     },
