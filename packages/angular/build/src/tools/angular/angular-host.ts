@@ -24,6 +24,7 @@ export interface AngularHostOptions {
     data: string,
     containingFile: string,
     stylesheetFile?: string,
+    order?: number,
   ): Promise<string | null>;
   processWebWorker(workerFile: string, containingFile: string): string;
 }
@@ -196,6 +197,9 @@ export function createAngularCompilerHost(
       data,
       context.containingFile,
       context.resourceFile ?? undefined,
+      // TODO: Remove once available in compiler-cli types
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (context as any).order,
     );
 
     return typeof result === 'string' ? { content: result } : null;

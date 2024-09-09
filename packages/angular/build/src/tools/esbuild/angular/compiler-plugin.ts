@@ -16,6 +16,7 @@ import type {
   PluginBuild,
 } from 'esbuild';
 import assert from 'node:assert';
+import { createHash } from 'node:crypto';
 import * as path from 'node:path';
 import { maxWorkers, useTypeChecking } from '../../../utils/environment-options';
 import { AngularHostOptions } from '../../angular/angular-host';
@@ -178,7 +179,7 @@ export function createCompilerPlugin(
           fileReplacements: pluginOptions.fileReplacements,
           modifiedFiles,
           sourceFileCache: pluginOptions.sourceFileCache,
-          async transformStylesheet(data, containingFile, stylesheetFile) {
+          async transformStylesheet(data, containingFile, stylesheetFile, order) {
             let stylesheetResult;
 
             // Stylesheet file only exists for external stylesheets
@@ -190,6 +191,16 @@ export function createCompilerPlugin(
                 containingFile,
                 // Inline stylesheets from a template style element are always CSS
                 containingFile.endsWith('.html') ? 'css' : styleOptions.inlineStyleLanguage,
+                // When external runtime styles are enabled, an identifier for the style that does not change
+                // based on the content is required to avoid emitted JS code changes. Any JS code changes will
+                // invalid the output and force a full page reload for HMR cases. The containing file and order
+                // of the style within the containing file is used.
+                pluginOptions.externalRuntimeStyles
+                  ? createHash('sha-256')
+                      .update(containingFile)
+                      .update((order ?? 0).toString())
+                      .digest('hex')
+                  : undefined,
               );
             }
 
