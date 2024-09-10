@@ -774,7 +774,7 @@ __metadata:
     tree-kill: "npm:1.2.2"
     ts-node: "npm:^10.9.1"
     tslib: "npm:2.7.0"
-    typescript: "npm:5.6.1-rc"
+    typescript: "npm:5.6.2"
     undici: "npm:6.19.8"
     unenv: "npm:^1.10.0"
     verdaccio: "npm:5.32.1"
@@ -3405,7 +3405,7 @@ __metadata:
     "@angular-devkit/core": "npm:0.0.0-PLACEHOLDER"
     "@angular/compiler": "npm:19.0.0-next.3"
     "@angular/compiler-cli": "npm:19.0.0-next.3"
-    typescript: "npm:5.6.1-rc"
+    typescript: "npm:5.6.2"
     webpack: "npm:5.94.0"
   peerDependencies:
     "@angular/compiler-cli": ^19.0.0-next.0
@@ -16838,13 +16838,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@npm:5.6.1-rc":
-  version: 5.6.1-rc
-  resolution: "typescript@npm:5.6.1-rc"
+"typescript@npm:5.6.2":
+  version: 5.6.2
+  resolution: "typescript@npm:5.6.2"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
-  checksum: 10c0/9d6e99b7ddbc797ebc8d09e5d7f2f81ce5f288a4e607bcded3c545ced8582796c937fba31bede5660a56f978b2f68e7c4ee85614b307425a2b4617535721509f
+  checksum: 10c0/3ed8297a8c7c56b7fec282532503d1ac795239d06e7c4966b42d4330c6cf433a170b53bcf93a130a7f14ccc5235de5560df4f1045eb7f3550b46ebed16d3c5e5
   languageName: node
   linkType: hard
 
@@ -16878,13 +16878,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@patch:typescript@npm%3A5.6.1-rc#optional!builtin<compat/typescript>":
-  version: 5.6.1-rc
-  resolution: "typescript@patch:typescript@npm%3A5.6.1-rc#optional!builtin<compat/typescript>::version=5.6.1-rc&hash=74658d"
+"typescript@patch:typescript@npm%3A5.6.2#optional!builtin<compat/typescript>":
+  version: 5.6.2
+  resolution: "typescript@patch:typescript@npm%3A5.6.2#optional!builtin<compat/typescript>::version=5.6.2&hash=74658d"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
-  checksum: 10c0/7849a6f82731f33d05dc9401252eeed78cec227aa9b23c316638c12c15ff7ec0903d62aa8718ea0ab5aad2e155a74edcd0c8053b8fdf8020bd1652720d89db7c
+  checksum: 10c0/e6c1662e4852e22fe4bbdca471dca3e3edc74f6f1df043135c44a18a7902037023ccb0abdfb754595ca9028df8920f2f8492c00fc3cbb4309079aae8b7de71cd
   languageName: node
   linkType: hard
 
