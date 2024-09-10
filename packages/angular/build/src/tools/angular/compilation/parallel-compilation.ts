@@ -52,9 +52,7 @@ export class ParallelCompilation extends AngularCompilation {
   override initialize(
     tsconfig: string,
     hostOptions: AngularHostOptions,
-    compilerOptionsTransformer?:
-      | ((compilerOptions: CompilerOptions) => CompilerOptions)
-      | undefined,
+    compilerOptionsTransformer?: (compilerOptions: CompilerOptions) => CompilerOptions,
   ): Promise<{
     affectedFiles: ReadonlySet<SourceFile>;
     compilerOptions: CompilerOptions;
