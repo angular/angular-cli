@@ -45,6 +45,7 @@ import {
   SimpleScheduler,
   createJobHandler,
 } from './jobs';
+import { mergeOptions } from './options';
 import { scheduleByName, scheduleByTarget } from './schedule-by-name';
 
 const inputSchema = require('./input-schema.json');
@@ -71,10 +72,7 @@ function _createJobHandlerFromBuilderInfo(
       concatMap(async (message) => {
         if (message.kind === JobInboundMessageKind.Input) {
           const v = message.value as BuilderInput;
-          const options = {
-            ...baseOptions,
-            ...v.options,
-          };
+          const options = mergeOptions(baseOptions, v.options);
 
           // Validate v against the options schema.
           const validation = await registry.compile(info.optionSchema);
