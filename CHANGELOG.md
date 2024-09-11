@@ -1,3 +1,30 @@
+<a name="19.0.0-next.4"></a>
+
+# 19.0.0-next.4 (2024-09-11)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                      |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------ |
+| [201b60e1d](https://github.com/angular/angular-cli/commit/201b60e1dd25b4abb7670e21d103b67d4eda0e14) | feat | handle string key/value pairs, e.g. --define     |
+| [ecc107d83](https://github.com/angular/angular-cli/commit/ecc107d83bfdfd9d5dd1087e264892d60361625c) | perf | enable Node.js compile code cache when available |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                                     |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------------- |
+| [4153a6ecf](https://github.com/angular/angular-cli/commit/4153a6ecf6707729a4f0c6a620eeb8d6916588df) | fix  | prevent transformation of Node.js internal dependencies by Vite |
+
+### @angular/ssr
+
+| Commit                                                                                              | Type | Description                                                                                                |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------------------------------------------------------- |
+| [41fb2ed86](https://github.com/angular/angular-cli/commit/41fb2ed86056306406832317178ca5d94aa110e2) | feat | Add `getHeaders` Method to `AngularAppEngine` and `AngularNodeAppEngine` for handling pages static headers |
+| [576ff604c](https://github.com/angular/angular-cli/commit/576ff604cd739a9f41d588fa093ca2568e46826c) | feat | introduce `AngularNodeAppEngine` API for Node.js integration                                               |
+| [e9c9e4995](https://github.com/angular/angular-cli/commit/e9c9e4995e39d9d62d10fe0497e0b98127bc8afa) | fix  | resolve circular dependency issue from main.server.js reference in manifest                                |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="18.2.4"></a>
 
 # 18.2.4 (2024-09-11)
