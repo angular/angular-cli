@@ -1,3 +1,15 @@
+<a name="18.2.4"></a>
+
+# 18.2.4 (2024-09-11)
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                                     |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------------- |
+| [765309a2e](https://github.com/angular/angular-cli/commit/765309a2e1bcd3bb07ff87062fc2dc04e4bce16f) | fix  | prevent transformation of Node.js internal dependencies by Vite |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="19.0.0-next.3"></a>
 
 # 19.0.0-next.3 (2024-09-04)
