@@ -901,6 +901,7 @@ export default class UpdateCommandModule extends CommandModule<UpdateCommandArgs
 
     return success ? 0 : 1;
   }
+
   /**
    * @return Whether or not the commit was successful.
    */

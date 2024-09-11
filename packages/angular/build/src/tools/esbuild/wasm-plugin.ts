@@ -21,6 +21,7 @@ import { LoadResultCache, createCachedLoad } from './load-result-cache';
 export interface WasmPluginOptions {
   /** Allow generation of async (proposal compliant) WASM imports. This requires zoneless to enable async/await. */
   allowAsync?: boolean;
+
   /** Load results cache. */
   cache?: LoadResultCache;
 }

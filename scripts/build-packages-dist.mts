@@ -162,6 +162,7 @@ function getPackageNamesOfTargets(targets: string[]): string[] {
 
 /** Executes the given command in the project directory. */
 function exec(command: string): void;
+
 /** Executes the given command in the project directory and returns its stdout. */
 function exec(command: string, captureStdout: true): string;
 function exec(command: string, captureStdout?: true) {

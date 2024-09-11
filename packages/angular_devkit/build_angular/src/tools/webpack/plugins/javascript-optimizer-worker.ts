@@ -22,10 +22,12 @@ export interface OptimizeRequestOptions {
    * * terser pure_getters option is enabled
    */
   advanced?: boolean;
+
   /**
    * Specifies the string tokens that should be replaced with a defined value.
    */
   define?: Record<string, string>;
+
   /**
    * Controls whether class, function, and variable names should be left intact
    * throughout the output code.
@@ -37,15 +39,18 @@ export interface OptimizeRequestOptions {
    * Within the CLI, this option is linked to the license extraction functionality.
    */
   removeLicenses?: boolean;
+
   /**
    * Controls whether source maps should be generated.
    */
   sourcemap?: boolean;
+
   /**
    * Specifies the list of supported esbuild targets.
    * @see: https://esbuild.github.io/api/#target
    */
   target?: string[];
+
   /**
    * Controls whether esbuild should only use the WASM-variant instead of trying to
    * use the native variant. Some platforms may not support the native-variant and
@@ -71,10 +76,12 @@ interface OptimizeRequest {
      * The name of the JavaScript asset (typically the filename).
      */
     name: string;
+
     /**
      * The source content of the JavaScript asset.
      */
     code: string;
+
     /**
      * The source map of the JavaScript asset, if available.
      * This map is merged with all intermediate source maps during optimization.

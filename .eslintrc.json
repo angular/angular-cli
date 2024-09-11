@@ -33,8 +33,24 @@
     "project": "tsconfig.json",
     "sourceType": "module"
   },
-  "plugins": ["eslint-plugin-import", "header", "@typescript-eslint"],
+  "plugins": ["@stylistic", "@typescript-eslint", "eslint-plugin-import", "header"],
   "rules": {
+    "@stylistic/lines-around-comment": [
+      "error",
+      {
+        "allowArrayStart": true,
+        "allowBlockStart": true,
+        "allowClassStart": true,
+        "allowEnumStart": true,
+        "allowInterfaceStart": true,
+        "allowModuleStart": true,
+        "allowObjectStart": true,
+        "allowTypeStart": true,
+        "beforeBlockComment": true,
+        "ignorePattern": "@license"
+      }
+    ],
+    "@stylistic/spaced-comment": ["error", "always"],
     "@typescript-eslint/consistent-type-assertions": "error",
     "@typescript-eslint/no-explicit-any": "error",
     "@typescript-eslint/no-non-null-assertion": "error",

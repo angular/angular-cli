@@ -23,8 +23,10 @@ const SSG_MARKER_REGEXP = /ng-server-context=["']\w*\|?ssg\|?\w*["']/;
 export interface CommonEngineOptions {
   /** A method that when invoked returns a promise that returns an `ApplicationRef` instance once resolved or an NgModule. */
   bootstrap?: Type<{}> | (() => Promise<ApplicationRef>);
+
   /** A set of platform level providers for all requests. */
   providers?: StaticProvider[];
+
   /** Enable request performance profiling data collection and printing the results in the server console. */
   enablePerformanceProfiler?: boolean;
 }
@@ -32,16 +34,19 @@ export interface CommonEngineOptions {
 export interface CommonEngineRenderOptions {
   /** A method that when invoked returns a promise that returns an `ApplicationRef` instance once resolved or an NgModule. */
   bootstrap?: Type<{}> | (() => Promise<ApplicationRef>);
+
   /** A set of platform level providers for the current request. */
   providers?: StaticProvider[];
   url?: string;
   document?: string;
   documentFilePath?: string;
+
   /**
    * Reduce render blocking requests by inlining critical CSS.
    * Defaults to true.
    */
   inlineCriticalCss?: boolean;
+
   /**
    * Base path location of index file.
    * Defaults to the 'documentFilePath' dirname when not provided.

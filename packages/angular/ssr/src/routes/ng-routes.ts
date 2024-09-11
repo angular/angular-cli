@@ -92,10 +92,13 @@ interface RouteResult {
 async function* traverseRoutesConfig(options: {
   /** The array of route configurations to process. */
   routes: Route[];
+
   /** The Angular compiler used to compile route modules. */
   compiler: Compiler;
+
   /** The parent injector for lazy-loaded modules. */
   parentInjector: Injector;
+
   /** The parent route path to prefix child routes. */
   parentRoute: string;
 }): AsyncIterableIterator<RouteResult> {

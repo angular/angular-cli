@@ -168,6 +168,7 @@ export interface WorkspaceProject<TProjectType extends ProjectType = ProjectType
    * Tool options.
    */
   architect?: WorkspaceTargets<TProjectType>;
+
   /**
    * Tool options.
    */

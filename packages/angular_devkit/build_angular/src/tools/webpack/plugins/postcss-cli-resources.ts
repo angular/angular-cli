@@ -30,6 +30,7 @@ export interface PostcssCliResourcesOptions {
   deployUrl?: string;
   resourcesOutputPath?: string;
   rebaseRootRelative?: boolean;
+
   /** CSS is extracted to a `.css` or is embedded in a `.js` file. */
   extracted?: boolean;
   filename: (resourcePath: string) => string;
