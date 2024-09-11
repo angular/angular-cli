@@ -41,11 +41,13 @@ export enum InstallBehavior {
    * which may install the dependency.
    */
   None,
+
   /**
    * Automatically determine the need to schedule a {@link NodePackageInstallTask} based on
    * previous usage of the {@link addDependency} within the schematic.
    */
   Auto,
+
   /**
    * Always schedule a {@link NodePackageInstallTask} when the rule is executed.
    */
@@ -62,6 +64,7 @@ export enum ExistingBehavior {
    * The dependency will not be added or otherwise changed if it already exists.
    */
   Skip,
+
   /**
    * The dependency's existing specifier will be replaced with the specifier provided in the
    * {@link addDependency} call. A warning will also be shown during schematic execution to
@@ -95,17 +98,20 @@ export function addDependency(
      * dependency will be added. Defaults to {@link DependencyType.Default} (`dependencies`).
      */
     type?: DependencyType;
+
     /**
      * The path of the package manifest file (`package.json`) that will be modified.
      * Defaults to `/package.json`.
      */
     packageJsonPath?: string;
+
     /**
      * The dependency installation behavior to use to determine whether a
      * {@link NodePackageInstallTask} should be scheduled after adding the dependency.
      * Defaults to {@link InstallBehavior.Auto}.
      */
     install?: InstallBehavior;
+
     /**
      * The behavior to use when the dependency already exists within the `package.json`.
      * Defaults to {@link ExistingBehavior.Replace}.

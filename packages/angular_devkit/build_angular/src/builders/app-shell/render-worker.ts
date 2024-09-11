@@ -44,10 +44,12 @@ interface RenderRequest {
    * The path to the server bundle that should be loaded and rendered.
    */
   serverBundlePath: string;
+
   /**
    * The existing HTML document as a string that will be augmented with the rendered application.
    */
   document: string;
+
   /**
    * An optional URL path that represents the Angular route that should be rendered.
    */

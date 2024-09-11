@@ -16,17 +16,22 @@ import { LoadResultCache, createCachedLoad } from './load-result-cache';
 export interface VirtualModulePluginOptions {
   /** Namespace. Example: `angular:polyfills`. */
   namespace: string;
+
   /** If the generated module should be marked as external. */
   external?: boolean;
+
   /** Method to transform the onResolve path. */
   transformPath?: (path: string) => string;
+
   /** Method to provide the module content. */
   loadContent: (
     args: OnLoadArgs,
     build: PluginBuild,
   ) => ReturnType<Parameters<PluginBuild['onLoad']>[1]>;
+
   /** Restrict to only entry points. Defaults to `true`. */
   entryPointOnly?: boolean;
+
   /** Load results cache. */
   cache?: LoadResultCache;
 }

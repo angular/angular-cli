@@ -52,6 +52,7 @@ export interface SerializableVersion {
 export interface SerializableDeprecation extends Omit<Deprecation, 'obsoleteIn' | 'deprecatedIn'> {
   /** The version this deprecation first became active in. */
   deprecatedIn: SerializableVersion | null;
+
   /** The version this deprecation became obsolete in. */
   obsoleteIn: SerializableVersion | null;
 }

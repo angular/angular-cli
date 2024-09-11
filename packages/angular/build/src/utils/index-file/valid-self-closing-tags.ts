@@ -22,6 +22,7 @@ export const VALID_SELF_CLOSING_TAGS = new Set([
   'source',
   'track',
   'wbr',
+
   /** SVG tags */
   'circle',
   'ellipse',
@@ -45,6 +46,7 @@ export const VALID_SELF_CLOSING_TAGS = new Set([
   'symbol',
   'use',
   'view',
+
   /** MathML tags */
   'mspace',
   'mphantom',

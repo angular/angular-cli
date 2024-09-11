@@ -190,6 +190,7 @@ export class StylesheetPluginFactory {
   }
 
   private initPostcssCallCount = 0;
+
   /**
    * This method should not be called directly.
    * Use {@link setupPostcss} instead.

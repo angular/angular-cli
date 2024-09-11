@@ -83,6 +83,7 @@ export interface ServerRouteSSG extends Omit<ServerRouteCommon, 'status'> {
    * Defaults to `SSGFallback.SSR` if not provided.
    */
   fallback?: SSGFallback;
+
   /**
    * A function that returns a Promise resolving to an array of objects, each representing a route path with URL parameters.
    * This function runs in the injector context, allowing access to Angular services and dependencies.

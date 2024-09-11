@@ -709,6 +709,7 @@ function getDepOptimizationConfig({
 }
 
 const nodeJsBuiltinModules = new Set(builtinModules);
+
 /** Remove any Node.js builtin modules to avoid Vite's prebundling from processing them as files. */
 function removeNodeJsBuiltinModules(value: string): boolean {
   return !nodeJsBuiltinModules.has(value);

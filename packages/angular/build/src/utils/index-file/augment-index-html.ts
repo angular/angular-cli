@@ -24,20 +24,25 @@ export interface AugmentIndexHtmlOptions {
   baseHref?: string;
   deployUrl?: string;
   sri: boolean;
+
   /** crossorigin attribute setting of elements that provide CORS support */
   crossOrigin?: CrossOriginValue;
+
   /*
    * Files emitted by the build.
    */
   files: FileInfo[];
+
   /*
    * Function that loads a file used.
    * This allows us to use different routines within the IndexHtmlWebpackPlugin and
    * when used without this plugin.
    */
   loadOutputFile: LoadOutputFileFunctionType;
+
   /** Used to sort the inseration of files in the HTML file */
   entrypoints: Entrypoint[];
+
   /** Used to set the document default locale */
   lang?: string;
   hints?: { url: string; mode: string; as?: string }[];

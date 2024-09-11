@@ -18,6 +18,7 @@ import { LoadResultCache, createCachedLoad } from '../load-result-cache';
 export interface CssInlineFontsPluginOptions {
   /** Disk cache normalized options */
   cacheOptions?: NormalizedCachedOptions;
+
   /** Load results cache. */
   cache?: LoadResultCache;
 }

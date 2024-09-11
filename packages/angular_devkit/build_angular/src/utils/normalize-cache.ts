@@ -14,8 +14,10 @@ const VERSION = '0.0.0-PLACEHOLDER';
 export interface NormalizedCachedOptions {
   /** Whether disk cache is enabled. */
   enabled: boolean;
+
   /** Disk cache path. Example: `/.angular/cache/v12.0.0`. */
   path: string;
+
   /** Disk cache base path. Example: `/.angular/cache`. */
   basePath: string;
 }

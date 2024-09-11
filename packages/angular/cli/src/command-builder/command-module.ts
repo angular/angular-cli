@@ -33,8 +33,10 @@ export type Options<T> = { [key in keyof T as CamelCaseKey<key>]: T[key] };
 export enum CommandScope {
   /** Command can only run inside an Angular workspace. */
   In,
+
   /** Command can only run outside an Angular workspace. */
   Out,
+
   /** Command can run inside and outside an Angular workspace. */
   Both,
 }
@@ -46,6 +48,7 @@ export interface CommandContext {
   globalConfiguration: AngularWorkspace;
   logger: logging.Logger;
   packageManager: PackageManagerUtils;
+
   /** Arguments parsed in free-from without parser configuration. */
   args: {
     positional: string[];
@@ -63,10 +66,13 @@ export interface CommandModuleImplementation<T extends {} = {}>
   extends Omit<YargsCommandModule<{}, T>, 'builder' | 'handler'> {
   /** Scope in which the command can be executed in. */
   scope: CommandScope;
+
   /** Path used to load the long description for the command in JSON help text. */
   longDescriptionPath?: string;
+
   /** Object declaring the options the command accepts, or a function accepting and returning a yargs instance. */
   builder(argv: Argv): Promise<Argv<T>> | Argv<T>;
+
   /** A function which will be passed the parsed argv. */
   run(options: Options<T> & OtherOptions): Promise<number | void> | number | void;
 }

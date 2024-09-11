@@ -35,10 +35,12 @@ interface RenderRequestMessage {
    * The contents to compile.
    */
   source: string;
+
   /**
    * The Sass options to provide to the `dart-sass` compile function.
    */
   options: Omit<StringOptions<'sync'>, 'url'> & { url: string };
+
   /**
    * Indicates the request has a custom importer function on the main thread.
    */
@@ -46,10 +48,12 @@ interface RenderRequestMessage {
     port: MessagePort;
     signal: Int32Array;
   };
+
   /**
    * Indicates the request has a custom logger for warning messages.
    */
   hasLogger: boolean;
+
   /**
    * Indicates paths within url() CSS functions should be rebased.
    */

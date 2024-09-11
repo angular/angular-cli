@@ -275,20 +275,24 @@ export enum JobState {
    * The job was queued and is waiting to start.
    */
   Queued = 'queued',
+
   /**
    * The job description was found, its dependencies (see "Synchronizing and Dependencies")
    * are done running, and the job's argument is validated and the job's code will be executed.
    */
   Ready = 'ready',
+
   /**
    * The job has been started. The job implementation is expected to send this as soon as its
    * work is starting.
    */
   Started = 'started',
+
   /**
    * The job has ended and is done running.
    */
   Ended = 'ended',
+
   /**
    * An error occured and the job stopped because of internal state.
    */

@@ -22,10 +22,12 @@ interface InlineRequest {
    * during Worker initialization.
    */
   filename: string;
+
   /**
    * The locale specifier that should be used during the inlining process of the file.
    */
   locale: string;
+
   /**
    * The translation messages for the locale that should be used during the inlining process of the file.
    */
