@@ -12,7 +12,7 @@ import { Type } from '@angular/core';
 
 // @public
 export class AngularNodeAppEngine {
-    getHeaders(request: IncomingMessage): Readonly<Map<string, string>>;
+    getHeaders(request: IncomingMessage): ReadonlyMap<string, string>;
     render(request: IncomingMessage, requestContext?: unknown): Promise<Response | null>;
 }
 

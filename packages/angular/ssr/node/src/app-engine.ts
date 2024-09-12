@@ -66,7 +66,7 @@ export class AngularNodeAppEngine {
      }));
   * ```
   */
-  getHeaders(request: IncomingMessage): Readonly<Map<string, string>> {
+  getHeaders(request: IncomingMessage): ReadonlyMap<string, string> {
     return this.angularAppEngine.getHeaders(createWebRequestFromNodeRequest(request));
   }
 }
