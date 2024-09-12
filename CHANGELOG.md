@@ -1,3 +1,21 @@
+<a name="19.0.0-next.5"></a>
+
+# 19.0.0-next.5 (2024-09-12)
+
+### @angular-devkit/architect
+
+| Commit                                                                                              | Type | Description                   |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------- |
+| [78f76485f](https://github.com/angular/angular-cli/commit/78f76485fe315ffd0262c1a3732092731235828b) | feat | merge object options from CLI |
+
+### @angular/ssr
+
+| Commit                                                                                              | Type | Description                                 |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------- |
+| [85df4011b](https://github.com/angular/angular-cli/commit/85df4011ba27254ddb7f22dae550272c9c4406dd) | fix  | resolve `bootstrap is not a function` error |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="19.0.0-next.4"></a>
 
 # 19.0.0-next.4 (2024-09-11)
