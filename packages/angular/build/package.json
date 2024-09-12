@@ -38,10 +38,10 @@
     "parse5-html-rewriting-stream": "7.0.0",
     "picomatch": "4.0.2",
     "piscina": "4.6.1",
-    "rollup": "4.21.2",
+    "rollup": "4.21.3",
     "sass": "1.78.0",
     "semver": "7.6.3",
-    "vite": "5.4.3",
+    "vite": "5.4.4",
     "watchpack": "2.4.2"
   },
   "peerDependencies": {
