@@ -6,17 +6,14 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { logging, schema, strings } from '@angular-devkit/core';
+import { logging, schema } from '@angular-devkit/core';
 import { readFileSync } from 'fs';
 import * as path from 'path';
 import yargs, {
-  Arguments,
   ArgumentsCamelCase,
   Argv,
   CamelCaseKey,
-  PositionalOptions,
   CommandModule as YargsCommandModule,
-  Options as YargsOptions,
 } from 'yargs';
 import { Parser as yargsParser } from 'yargs/helpers';
 import { getAnalyticsUserId } from '../analytics/analytics';
