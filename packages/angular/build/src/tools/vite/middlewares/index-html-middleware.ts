@@ -8,11 +8,7 @@
 
 import { extname } from 'node:path';
 import type { Connect, ViteDevServer } from 'vite';
-import {
-  AngularMemoryOutputFiles,
-  appendServerConfiguredHeaders,
-  pathnameWithoutBasePath,
-} from '../utils';
+import { AngularMemoryOutputFiles, pathnameWithoutBasePath } from '../utils';
 
 export function createAngularIndexHtmlMiddleware(
   server: ViteDevServer,
@@ -52,7 +48,6 @@ export function createAngularIndexHtmlMiddleware(
 
         res.setHeader('Content-Type', 'text/html');
         res.setHeader('Cache-Control', 'no-cache');
-        appendServerConfiguredHeaders(server, res);
         res.end(processedHtml);
       })
       .catch((error) => next(error));

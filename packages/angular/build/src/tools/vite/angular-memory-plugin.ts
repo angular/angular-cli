@@ -14,6 +14,7 @@ import type { Connect, Plugin } from 'vite';
 import {
   angularHtmlFallbackMiddleware,
   createAngularAssetsMiddleware,
+  createAngularHeadersMiddleware,
   createAngularIndexHtmlMiddleware,
   createAngularSSRMiddleware,
 } from './middlewares';
@@ -113,6 +114,8 @@ export function createAngularMemoryPlugin(options: AngularMemoryPluginOptions): 
           map: remappedMap as (typeof result)['map'],
         };
       };
+
+      server.middlewares.use(createAngularHeadersMiddleware(server));
 
       // Assets and resources get handled first
       server.middlewares.use(

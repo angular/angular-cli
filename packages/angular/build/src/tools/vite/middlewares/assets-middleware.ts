@@ -10,11 +10,7 @@ import { lookup as lookupMimeType } from 'mrmime';
 import { extname } from 'node:path';
 import type { Connect, ViteDevServer } from 'vite';
 import { loadEsmModule } from '../../../utils/load-esm';
-import {
-  AngularMemoryOutputFiles,
-  appendServerConfiguredHeaders,
-  pathnameWithoutBasePath,
-} from '../utils';
+import { AngularMemoryOutputFiles, pathnameWithoutBasePath } from '../utils';
 
 const COMPONENT_REGEX = /%COMP%/g;
 
@@ -97,7 +93,6 @@ export function createAngularAssetsMiddleware(
 
                     res.setHeader('Content-Type', 'text/css');
                     res.setHeader('Cache-Control', 'no-cache');
-                    appendServerConfiguredHeaders(server, res);
                     res.end(encapsulatedData);
                   })
                   .catch((e) => next(e));
@@ -116,7 +111,6 @@ export function createAngularAssetsMiddleware(
           res.setHeader('Content-Type', mimeType);
         }
         res.setHeader('Cache-Control', 'no-cache');
-        appendServerConfiguredHeaders(server, res);
         res.end(data);
 
         return;
