@@ -7,9 +7,7 @@
  */
 
 import { lookup as lookupMimeType } from 'mrmime';
-import type { IncomingMessage, ServerResponse } from 'node:http';
 import { extname } from 'node:path';
-import type { ViteDevServer } from 'vite';
 
 export type AngularMemoryOutputFiles = Map<string, { contents: Uint8Array; servable: boolean }>;
 
@@ -31,20 +29,4 @@ export function lookupMimeTypeFromRequest(url: string): string | undefined {
   }
 
   return extension && lookupMimeType(extension);
-}
-
-export function appendServerConfiguredHeaders(
-  server: ViteDevServer,
-  res: ServerResponse<IncomingMessage>,
-): void {
-  const headers = server.config.server.headers;
-  if (!headers) {
-    return;
-  }
-
-  for (const [name, value] of Object.entries(headers)) {
-    if (value !== undefined) {
-      res.setHeader(name, value);
-    }
-  }
 }

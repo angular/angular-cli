@@ -9,7 +9,6 @@
 import type { ɵgetOrCreateAngularServerApp as getOrCreateAngularServerApp } from '@angular/ssr';
 import type { ServerResponse } from 'node:http';
 import type { Connect, ViteDevServer } from 'vite';
-import { appendServerConfiguredHeaders } from '../utils';
 
 export function createAngularSSRMiddleware(
   server: ViteDevServer,
@@ -55,7 +54,6 @@ export function createAngularSSRMiddleware(
           return next();
         }
 
-        appendServerConfiguredHeaders(server, res);
         res.end(content);
       })
       .catch((error) => next(error));
