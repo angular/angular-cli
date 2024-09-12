@@ -6,8 +6,14 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
+import { ɵConsole } from '@angular/core';
 import type { ApplicationRef, StaticProvider, Type } from '@angular/core';
-import { renderApplication, renderModule } from '@angular/platform-server';
+import {
+  ɵSERVER_CONTEXT as SERVER_CONTEXT,
+  renderApplication,
+  renderModule,
+} from '@angular/platform-server';
+import { Console } from '../console';
 import { stripIndexHtmlFromURL } from './url';
 
 /**
@@ -33,6 +39,8 @@ export type AngularBootstrap = Type<unknown> | (() => Promise<ApplicationRef>);
  *              correctly handle route-based rendering.
  * @param platformProviders - An array of platform providers to be used during the
  *                             rendering process.
+ * @param serverContext - A string representing the server context, used to provide additional
+ *                        context or metadata during server-side rendering.
  * @returns A promise that resolves to a string containing the rendered HTML.
  */
 export function renderAngular(
@@ -40,7 +48,24 @@ export function renderAngular(
   bootstrap: AngularBootstrap,
   url: URL,
   platformProviders: StaticProvider[],
+  serverContext: string,
 ): Promise<string> {
+  const providers = [
+    {
+      provide: SERVER_CONTEXT,
+      useValue: serverContext,
+    },
+    {
+      // An Angular Console Provider that does not print a set of predefined logs.
+      provide: ɵConsole,
+      // Using `useClass` would necessitate decorating `Console` with `@Injectable`,
+      // which would require switching from `ts_library` to `ng_module`. This change
+      // would also necessitate various patches of `@angular/bazel` to support ESM.
+      useFactory: () => new Console(),
+    },
+    ...platformProviders,
+  ];
+
   // A request to `http://www.example.com/page/index.html` will render the Angular route corresponding to `http://www.example.com/page`.
   const urlToRender = stripIndexHtmlFromURL(url).toString();
 
@@ -48,12 +73,12 @@ export function renderAngular(
     ? renderModule(bootstrap, {
         url: urlToRender,
         document: html,
-        extraProviders: platformProviders,
+        extraProviders: providers,
       })
     : renderApplication(bootstrap, {
         url: urlToRender,
         document: html,
-        platformProviders,
+        platformProviders: providers,
       });
 }
 

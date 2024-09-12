@@ -6,25 +6,34 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { StaticProvider, ɵConsole, ɵresetCompiledComponents } from '@angular/core';
-import { ɵSERVER_CONTEXT as SERVER_CONTEXT } from '@angular/platform-server';
+import { StaticProvider, ɵresetCompiledComponents } from '@angular/core';
 import { ServerAssets } from './assets';
-import { Console } from './console';
 import { Hooks } from './hooks';
 import { getAngularAppManifest } from './manifest';
+import { RenderMode } from './routes/route-config';
 import { ServerRouter } from './routes/router';
 import { REQUEST, REQUEST_CONTEXT, RESPONSE_INIT } from './tokens';
 import { InlineCriticalCssProcessor } from './utils/inline-critical-css';
 import { AngularBootstrap, renderAngular } from './utils/ng';
 
 /**
- * Enum representing the different contexts in which server rendering can occur.
+ * A mapping of `RenderMode` enum values to corresponding string representations.
+ *
+ * This record is used to map each `RenderMode` to a specific string value that represents
+ * the server context. The string values are used internally to differentiate
+ * between various rendering strategies when processing routes.
+ *
+ * - `RenderMode.Prerender` maps to `'ssg'` (Static Site Generation).
+ * - `RenderMode.Server` maps to `'ssr'` (Server-Side Rendering).
+ * - `RenderMode.AppShell` maps to `'app-shell'` (pre-rendered application shell).
+ * - `RenderMode.Client` maps to an empty string `''` (Client-Side Rendering, no server context needed).
  */
-export enum ServerRenderContext {
-  SSR = 'ssr',
-  SSG = 'ssg',
-  AppShell = 'app-shell',
-}
+const SERVER_CONTEXT_VALUE: Record<RenderMode, string> = {
+  [RenderMode.Prerender]: 'ssg',
+  [RenderMode.Server]: 'ssr',
+  [RenderMode.AppShell]: 'app-shell',
+  [RenderMode.Client]: '',
+};
 
 /**
  * Represents a locale-specific Angular server application managed by the server application engine.
@@ -70,18 +79,31 @@ export class AngularServerApp {
    *
    * @param request - The incoming HTTP request to be rendered.
    * @param requestContext - Optional additional context for rendering, such as request metadata.
-   * @param serverContext - The rendering context.
    *
    * @returns A promise that resolves to the HTTP response object resulting from the rendering, or null if no match is found.
    */
-  render(
-    request: Request,
-    requestContext?: unknown,
-    serverContext: ServerRenderContext = ServerRenderContext.SSR,
-  ): Promise<Response | null> {
+  render(request: Request, requestContext?: unknown): Promise<Response | null> {
     return Promise.race([
       this.createAbortPromise(request),
-      this.handleRendering(request, requestContext, serverContext),
+      this.handleRendering(request, /** isSsrMode */ true, requestContext),
+    ]);
+  }
+
+  /**
+   * Renders a page based on the provided URL via server-side rendering and returns the corresponding HTTP response.
+   * The rendering process can be interrupted by an abort signal, where the first resolved promise (either from the abort
+   * or the render process) will dictate the outcome.
+   *
+   * @param url - The full URL to be processed and rendered by the server.
+   * @param signal - (Optional) An `AbortSignal` object that allows for the cancellation of the rendering process.
+   * @returns A promise that resolves to the generated HTTP response object, or `null` if no matching route is found.
+   */
+  renderStatic(url: URL, signal?: AbortSignal): Promise<Response | null> {
+    const request = new Request(url, { signal });
+
+    return Promise.race([
+      this.createAbortPromise(request),
+      this.handleRendering(request, /** isSsrMode */ false),
     ]);
   }
 
@@ -112,15 +134,15 @@ export class AngularServerApp {
    * This method matches the request URL to a route and performs rendering if a matching route is found.
    *
    * @param request - The incoming HTTP request to be processed.
+   * @param isSsrMode - A boolean indicating whether the rendering is performed in server-side rendering (SSR) mode.
    * @param requestContext - Optional additional context for rendering, such as request metadata.
-   * @param serverContext - The rendering context. Defaults to server-side rendering (SSR).
    *
    * @returns A promise that resolves to the rendered response, or null if no matching route is found.
    */
   private async handleRendering(
     request: Request,
+    isSsrMode: boolean,
     requestContext?: unknown,
-    serverContext: ServerRenderContext = ServerRenderContext.SSR,
   ): Promise<Response | null> {
     const url = new URL(request.url);
     this.router ??= await ServerRouter.from(this.manifest, url);
@@ -131,32 +153,33 @@ export class AngularServerApp {
       return null;
     }
 
-    const { redirectTo } = matchedRoute;
+    const { redirectTo, status } = matchedRoute;
     if (redirectTo !== undefined) {
+      // Note: The status code is validated during route extraction.
       // 302 Found is used by default for redirections
       // See: https://developer.mozilla.org/en-US/docs/Web/API/Response/redirect_static#status
-      return Response.redirect(new URL(redirectTo, url), 302);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      return Response.redirect(new URL(redirectTo, url), (status as any) ?? 302);
     }
 
-    const platformProviders: StaticProvider[] = [
-      {
-        provide: SERVER_CONTEXT,
-        useValue: serverContext,
-      },
-      {
-        // An Angular Console Provider that does not print a set of predefined logs.
-        provide: ɵConsole,
-        // Using `useClass` would necessitate decorating `Console` with `@Injectable`,
-        // which would require switching from `ts_library` to `ng_module`. This change
-        // would also necessitate various patches of `@angular/bazel` to support ESM.
-        useFactory: () => new Console(),
-      },
-    ];
+    const { renderMode = isSsrMode ? RenderMode.Server : RenderMode.Prerender, headers } =
+      matchedRoute;
 
-    const isSsrMode = serverContext === ServerRenderContext.SSR;
-    const responseInit: ResponseInit = {};
+    const platformProviders: StaticProvider[] = [];
+    let responseInit: ResponseInit | undefined;
 
     if (isSsrMode) {
+      // Initialize the response with status and headers if available.
+      responseInit = {
+        status,
+        headers: headers ? new Headers(headers) : undefined,
+      };
+
+      if (renderMode === RenderMode.Client) {
+        // Serve the client-side rendered version if the route is configured for CSR.
+        return new Response(await this.assets.getServerAsset('index.csr.html'), responseInit);
+      }
+
       platformProviders.push(
         {
           provide: REQUEST,
@@ -183,7 +206,13 @@ export class AngularServerApp {
 
     this.boostrap ??= await manifest.bootstrap();
 
-    html = await renderAngular(html, this.boostrap, new URL(request.url), platformProviders);
+    html = await renderAngular(
+      html,
+      this.boostrap,
+      new URL(request.url),
+      platformProviders,
+      SERVER_CONTEXT_VALUE[renderMode],
+    );
 
     if (manifest.inlineCriticalCss) {
       // Optionally inline critical CSS.

@@ -325,7 +325,6 @@ export function createServerMainCodeBundleOptions(
 
           // Add @angular/ssr exports
           `export {
-            ɵServerRenderContext,
             ɵdestroyAngularServerApp,
             ɵextractRoutesAndCreateRouteTree,
             ɵgetOrCreateAngularServerApp,

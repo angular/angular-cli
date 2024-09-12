@@ -16,24 +16,18 @@ export interface RenderWorkerData extends ESMInMemoryFileLoaderWorkerData {
 
 export interface RenderOptions {
   url: string;
-  isAppShellRoute: boolean;
 }
 
 /**
  * Renders each route in routes and writes them to <outputPath>/<route>/index.html.
  */
-async function renderPage({ url, isAppShellRoute }: RenderOptions): Promise<string | null> {
-  const {
-    ɵgetOrCreateAngularServerApp: getOrCreateAngularServerApp,
-    ɵServerRenderContext: ServerRenderContext,
-  } = await loadEsmModuleFromMemory('./main.server.mjs');
+async function renderPage({ url }: RenderOptions): Promise<string | null> {
+  const { ɵgetOrCreateAngularServerApp: getOrCreateAngularServerApp } =
+    await loadEsmModuleFromMemory('./main.server.mjs');
   const angularServerApp = getOrCreateAngularServerApp();
-  const response = await angularServerApp.render(
-    new Request(new URL(url, 'http://local-angular-prerender'), {
-      signal: AbortSignal.timeout(30_000),
-    }),
-    undefined,
-    isAppShellRoute ? ServerRenderContext.AppShell : ServerRenderContext.SSG,
+  const response = await angularServerApp.renderStatic(
+    new URL(url, 'http://local-angular-prerender'),
+    AbortSignal.timeout(30_000),
   );
 
   return response ? response.text() : null;

@@ -26,6 +26,8 @@ async function extractRoutes(): Promise<RoutersExtractorWorkerResult> {
 
   const routeTree = await extractRoutesAndCreateRouteTree(
     new URL('http://local-angular-prerender/'),
+    /** manifest */ undefined,
+    /** invokeGetPrerenderParams */ true,
   );
 
   return routeTree.toObject();

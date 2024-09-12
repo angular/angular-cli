@@ -12,7 +12,6 @@ export {
   extractRoutesAndCreateRouteTree as ɵextractRoutesAndCreateRouteTree,
 } from './src/routes/ng-routes';
 export {
-  ServerRenderContext as ɵServerRenderContext,
   getOrCreateAngularServerApp as ɵgetOrCreateAngularServerApp,
   destroyAngularServerApp as ɵdestroyAngularServerApp,
 } from './src/app';

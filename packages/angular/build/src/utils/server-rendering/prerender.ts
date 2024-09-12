@@ -210,12 +210,13 @@ async function renderPages(
         route.slice(baseHrefWithLeadingSlash.length - 1),
       );
 
-      const isAppShellRoute = appShellRoute === routeWithoutBaseHref;
-      const render: Promise<string | null> = renderWorker.run({ url: route, isAppShellRoute });
+      const render: Promise<string | null> = renderWorker.run({ url: route });
       const renderResult: Promise<void> = render
         .then((content) => {
           if (content !== null) {
             const outPath = posix.join(removeLeadingSlash(routeWithoutBaseHref), 'index.html');
+            const isAppShellRoute = appShellRoute === routeWithoutBaseHref;
+
             output[outPath] = { content, appShellRoute: isAppShellRoute };
           }
         })

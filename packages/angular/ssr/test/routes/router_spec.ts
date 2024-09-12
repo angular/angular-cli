@@ -6,8 +6,14 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
+// The compiler is needed as tests are in JIT.
+/* eslint-disable import/no-unassigned-import */
+import '@angular/compiler';
+/* eslint-enable import/no-unassigned-import */
+
 import { Component } from '@angular/core';
 import { AngularAppManifest, getAngularAppManifest } from '../../src/manifest';
+import { RenderMode } from '../../src/routes/route-config';
 import { ServerRouter } from '../../src/routes/router';
 import { setAngularAppTestingManifest } from '../testing-utils';
 
@@ -23,12 +29,18 @@ describe('ServerRouter', () => {
     })
     class DummyComponent {}
 
-    setAngularAppTestingManifest([
-      { path: 'home', component: DummyComponent },
-      { path: 'redirect', redirectTo: 'home' },
-      { path: 'encoding url', component: DummyComponent },
-      { path: 'user/:id', component: DummyComponent },
-    ]);
+    setAngularAppTestingManifest(
+      [
+        { path: 'home', component: DummyComponent },
+        { path: 'redirect', redirectTo: 'home' },
+        { path: 'encoding url', component: DummyComponent },
+        { path: 'user/:id', component: DummyComponent },
+      ],
+      [
+        { path: '/redirect', renderMode: RenderMode.Server, status: 301 },
+        { path: '/**', renderMode: RenderMode.Server },
+      ],
+    );
 
     manifest = getAngularAppManifest();
   });
@@ -40,15 +52,17 @@ describe('ServerRouter', () => {
       // Check that routes are correctly built
       expect(router.match(new URL('http://localhost/home'))).toEqual({
         route: '/home',
-        redirectTo: undefined,
+        renderMode: RenderMode.Server,
       });
       expect(router.match(new URL('http://localhost/redirect'))).toEqual({
         redirectTo: '/home',
         route: '/redirect',
+        renderMode: RenderMode.Server,
+        status: 301,
       });
       expect(router.match(new URL('http://localhost/user/123'))).toEqual({
         route: '/user/:id',
-        redirectTo: undefined,
+        renderMode: RenderMode.Server,
       });
     });
 
@@ -70,9 +84,20 @@ describe('ServerRouter', () => {
       const redirectMetadata = router.match(new URL('http://localhost/redirect'));
       const userMetadata = router.match(new URL('http://localhost/user/123'));
 
-      expect(homeMetadata).toEqual({ route: '/home', redirectTo: undefined });
-      expect(redirectMetadata).toEqual({ redirectTo: '/home', route: '/redirect' });
-      expect(userMetadata).toEqual({ route: '/user/:id', redirectTo: undefined });
+      expect(homeMetadata).toEqual({
+        route: '/home',
+        renderMode: RenderMode.Server,
+      });
+      expect(redirectMetadata).toEqual({
+        redirectTo: '/home',
+        route: '/redirect',
+        status: 301,
+        renderMode: RenderMode.Server,
+      });
+      expect(userMetadata).toEqual({
+        route: '/user/:id',
+        renderMode: RenderMode.Server,
+      });
     });
 
     it('should correctly match URLs ending with /index.html', () => {
@@ -80,14 +105,28 @@ describe('ServerRouter', () => {
       const userMetadata = router.match(new URL('http://localhost/user/123/index.html'));
       const redirectMetadata = router.match(new URL('http://localhost/redirect/index.html'));
 
-      expect(homeMetadata).toEqual({ route: '/home', redirectTo: undefined });
-      expect(redirectMetadata).toEqual({ redirectTo: '/home', route: '/redirect' });
-      expect(userMetadata).toEqual({ route: '/user/:id', redirectTo: undefined });
+      expect(homeMetadata).toEqual({
+        route: '/home',
+        renderMode: RenderMode.Server,
+      });
+      expect(redirectMetadata).toEqual({
+        redirectTo: '/home',
+        route: '/redirect',
+        status: 301,
+        renderMode: RenderMode.Server,
+      });
+      expect(userMetadata).toEqual({
+        route: '/user/:id',
+        renderMode: RenderMode.Server,
+      });
     });
 
     it('should handle encoded URLs', () => {
       const encodedUserMetadata = router.match(new URL('http://localhost/encoding%20url'));
-      expect(encodedUserMetadata).toEqual({ route: '/encoding url', redirectTo: undefined });
+      expect(encodedUserMetadata).toEqual({
+        route: '/encoding url',
+        renderMode: RenderMode.Server,
+      });
     });
   });
 });

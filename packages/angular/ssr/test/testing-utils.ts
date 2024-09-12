@@ -11,6 +11,7 @@ import { bootstrapApplication } from '@angular/platform-browser';
 import { provideServerRendering } from '@angular/platform-server';
 import { RouterOutlet, Routes, provideRouter } from '@angular/router';
 import { setAngularAppManifest } from '../src/manifest';
+import { ServerRoute, provideServerRoutesConfig } from '../src/routes/route-config';
 
 /**
  * Configures the Angular application for testing by setting up the Angular app manifest,
@@ -19,23 +20,40 @@ import { setAngularAppManifest } from '../src/manifest';
  * Angular components and providers for testing purposes.
  *
  * @param routes - An array of route definitions to be used by the Angular Router.
+ * @param serverRoutes - An array of ServerRoute definitions to be used for server-side rendering.
  * @param [baseHref=''] - An optional base href to be used in the HTML template.
  */
-export function setAngularAppTestingManifest(routes: Routes, baseHref = ''): void {
+export function setAngularAppTestingManifest(
+  routes: Routes,
+  serverRoutes: ServerRoute[],
+  baseHref = '',
+): void {
   setAngularAppManifest({
     inlineCriticalCss: false,
     assets: new Map(
       Object.entries({
         'index.server.html': async () =>
-          `
- <html>
-  <head>
-    <base href="/${baseHref}" />
-  </head>
-  <body>
-    <app-root></app-root>
-  </body>
-</html>`,
+          `<html>
+            <head>
+              <title>SSR page</title>
+              <base href="/${baseHref}" />
+            </head>
+            <body>
+              <app-root></app-root>
+            </body>
+          </html>
+        `,
+        'index.csr.html': async () =>
+          `<html>
+            <head>
+              <title>CSR page</title>
+              <base href="/${baseHref}" />
+            </head>
+            <body>
+              <app-root></app-root>
+            </body>
+          </html>
+        `,
       }),
     ),
     bootstrap: async () => () => {
@@ -52,6 +70,7 @@ export function setAngularAppTestingManifest(routes: Routes, baseHref = ''): voi
           provideServerRendering(),
           provideExperimentalZonelessChangeDetection(),
           provideRouter(routes),
+          provideServerRoutesConfig(serverRoutes),
         ],
       });
     },

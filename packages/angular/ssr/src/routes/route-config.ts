@@ -17,27 +17,38 @@ export enum RenderMode {
   AppShell,
 
   /** Server-Side Rendering (SSR) mode, where content is rendered on the server for each request. */
-  SSR,
+  Server,
 
   /** Client-Side Rendering (CSR) mode, where content is rendered on the client side in the browser. */
-  CSR,
+  Client,
 
   /** Static Site Generation (SSG) mode, where content is pre-rendered at build time and served as static files. */
-  SSG,
+  Prerender,
 }
 
 /**
- * Fallback strategies for Static Site Generation (SSG) routes.
+ * Defines the fallback strategies for Static Site Generation (SSG) routes when a pre-rendered path is not available.
+ * This is particularly relevant for routes with parameterized URLs where some paths might not be pre-rendered at build time.
+ *
  * @developerPreview
  */
-export enum SSGFallback {
-  /** Use Server-Side Rendering (SSR) as the fallback for this route. */
-  SSR,
+export enum PrerenderFallback {
+  /**
+   * Fallback to Server-Side Rendering (SSR) if the pre-rendered path is not available.
+   * This strategy dynamically generates the page on the server at request time.
+   */
+  Server,
 
-  /** Use Client-Side Rendering (CSR) as the fallback for this route. */
-  CSR,
+  /**
+   * Fallback to Client-Side Rendering (CSR) if the pre-rendered path is not available.
+   * This strategy allows the page to be rendered on the client side.
+   */
+  Client,
 
-  /** No fallback; Angular will not handle the response if the path is not pre-rendered. */
+  /**
+   * No fallback; if the path is not pre-rendered, the server will not handle the request.
+   * This means the application will not provide any response for paths that are not pre-rendered.
+   */
   None,
 }
 
@@ -66,23 +77,38 @@ export interface ServerRouteAppShell extends Omit<ServerRouteCommon, 'headers' |
 /**
  * A server route that uses Client-Side Rendering (CSR) mode.
  */
-export interface ServerRouteCSR extends ServerRouteCommon {
+export interface ServerRouteClient extends ServerRouteCommon {
   /** Specifies that the route uses Client-Side Rendering (CSR) mode. */
-  renderMode: RenderMode.CSR;
+  renderMode: RenderMode.Client;
 }
 
 /**
  * A server route that uses Static Site Generation (SSG) mode.
  */
-export interface ServerRouteSSG extends Omit<ServerRouteCommon, 'status'> {
+export interface ServerRoutePrerender extends Omit<ServerRouteCommon, 'status'> {
   /** Specifies that the route uses Static Site Generation (SSG) mode. */
-  renderMode: RenderMode.SSG;
+  renderMode: RenderMode.Prerender;
 
+  /** Fallback cannot be specified unless `getPrerenderParams` is used. */
+  fallback?: never;
+}
+
+/**
+ * A server route configuration that uses Static Site Generation (SSG) mode, including support for routes with parameters.
+ */
+export interface ServerRoutePrerenderWithParams extends Omit<ServerRoutePrerender, 'fallback'> {
   /**
-   * Optional fallback strategy to use if the SSG path is not pre-rendered.
-   * Defaults to `SSGFallback.SSR` if not provided.
+   * Optional strategy to use if the SSG path is not pre-rendered.
+   * This is especially relevant for routes with parameterized URLs, where some paths may not be pre-rendered at build time.
+   *
+   * This property determines how to handle requests for paths that are not pre-rendered:
+   * - `PrerenderFallback.Server`: Use Server-Side Rendering (SSR) to dynamically generate the page at request time.
+   * - `PrerenderFallback.Client`: Use Client-Side Rendering (CSR) to fetch and render the page on the client side.
+   * - `PrerenderFallback.None`: No fallback; if the path is not pre-rendered, the server will not handle the request.
+   *
+   * @default `PrerenderFallback.Server` if not provided.
    */
-  fallback?: SSGFallback;
+  fallback?: PrerenderFallback;
 
   /**
    * A function that returns a Promise resolving to an array of objects, each representing a route path with URL parameters.
@@ -96,8 +122,8 @@ export interface ServerRouteSSG extends Omit<ServerRouteCommon, 'status'> {
    * export const serverRouteConfig: ServerRoutes[] = [
    *   {
    *     path: '/product/:id',
-   *     remderMode: RenderMode.SSG,
-   *     async getPrerenderPaths() {
+   *     renderMode: RenderMode.Prerender,
+   *     async getPrerenderParams() {
    *       const productService = inject(ProductService);
    *       const ids = await productService.getIds(); // Assuming this returns ['1', '2', '3']
    *
@@ -107,22 +133,27 @@ export interface ServerRouteSSG extends Omit<ServerRouteCommon, 'status'> {
    * ];
    * ```
    */
-  getPrerenderPaths?: () => Promise<Record<string, string>[]>;
+  getPrerenderParams: () => Promise<Record<string, string>[]>;
 }
 
 /**
  * A server route that uses Server-Side Rendering (SSR) mode.
  */
-export interface ServerRouteSSR extends ServerRouteCommon {
+export interface ServerRouteServer extends ServerRouteCommon {
   /** Specifies that the route uses Server-Side Rendering (SSR) mode. */
-  renderMode: RenderMode.SSR;
+  renderMode: RenderMode.Server;
 }
 
 /**
  * Server route configuration.
  * @developerPreview
  */
-export type ServerRoute = ServerRouteAppShell | ServerRouteCSR | ServerRouteSSG | ServerRouteSSR;
+export type ServerRoute =
+  | ServerRouteAppShell
+  | ServerRouteClient
+  | ServerRoutePrerender
+  | ServerRoutePrerenderWithParams
+  | ServerRouteServer;
 
 /**
  * Token for providing the server routes configuration.

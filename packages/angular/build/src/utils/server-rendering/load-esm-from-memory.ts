@@ -7,11 +7,7 @@
  */
 
 import type { ApplicationRef, Type } from '@angular/core';
-import type {
-  ɵServerRenderContext,
-  ɵextractRoutesAndCreateRouteTree,
-  ɵgetOrCreateAngularServerApp,
-} from '@angular/ssr';
+import type { ɵextractRoutesAndCreateRouteTree, ɵgetOrCreateAngularServerApp } from '@angular/ssr';
 import { assertIsError } from '../error';
 import { loadEsmModule } from '../load-esm';
 
@@ -20,7 +16,6 @@ import { loadEsmModule } from '../load-esm';
  */
 interface MainServerBundleExports {
   default: (() => Promise<ApplicationRef>) | Type<unknown>;
-  ɵServerRenderContext: typeof ɵServerRenderContext;
   ɵextractRoutesAndCreateRouteTree: typeof ɵextractRoutesAndCreateRouteTree;
   ɵgetOrCreateAngularServerApp: typeof ɵgetOrCreateAngularServerApp;
 }
