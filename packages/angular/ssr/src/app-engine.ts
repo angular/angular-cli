@@ -110,7 +110,7 @@ export class AngularAppEngine {
    * @returns A `Map` containing the HTTP headers as key-value pairs.
    * @note This function should be used exclusively for retrieving headers of SSG pages.
    */
-  getHeaders(request: Request): ReadonlyMap<string, string> {
+  getPrerenderHeaders(request: Request): ReadonlyMap<string, string> {
     if (this.manifest.staticPathsHeaders.size === 0) {
       return new Map();
     }

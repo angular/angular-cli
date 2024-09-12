@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
+// The compiler is needed as tests are in JIT.
 /* eslint-disable import/no-unassigned-import */
 import '@angular/compiler';
 /* eslint-enable import/no-unassigned-import */
@@ -14,6 +15,7 @@ import { Component } from '@angular/core';
 import { destroyAngularServerApp, getOrCreateAngularServerApp } from '../src/app';
 import { AngularAppEngine } from '../src/app-engine';
 import { setAngularAppEngineManifest } from '../src/manifest';
+import { RenderMode } from '../src/routes/route-config';
 import { setAngularAppTestingManifest } from './testing-utils';
 
 describe('AngularAppEngine', () => {
@@ -37,7 +39,11 @@ describe('AngularAppEngine', () => {
               })
               class HomeComponent {}
 
-              setAngularAppTestingManifest([{ path: 'home', component: HomeComponent }], locale);
+              setAngularAppTestingManifest(
+                [{ path: 'home', component: HomeComponent }],
+                [{ path: '/**', renderMode: RenderMode.Server }],
+                locale,
+              );
 
               return {
                 ɵgetOrCreateAngularServerApp: getOrCreateAngularServerApp,
@@ -99,10 +105,10 @@ describe('AngularAppEngine', () => {
       });
     });
 
-    describe('getHeaders', () => {
+    describe('getPrerenderHeaders', () => {
       it('should return headers for a known path without index.html', () => {
         const request = new Request('https://example.com/about');
-        const headers = appEngine.getHeaders(request);
+        const headers = appEngine.getPrerenderHeaders(request);
         expect(Object.fromEntries(headers.entries())).toEqual({
           'Cache-Control': 'no-cache',
           'X-Some-Header': 'value',
@@ -111,7 +117,7 @@ describe('AngularAppEngine', () => {
 
       it('should return headers for a known path with index.html', () => {
         const request = new Request('https://example.com/about/index.html');
-        const headers = appEngine.getHeaders(request);
+        const headers = appEngine.getPrerenderHeaders(request);
         expect(Object.fromEntries(headers.entries())).toEqual({
           'Cache-Control': 'no-cache',
           'X-Some-Header': 'value',
@@ -120,7 +126,7 @@ describe('AngularAppEngine', () => {
 
       it('should return no headers for unknown paths', () => {
         const request = new Request('https://example.com/unknown/path');
-        const headers = appEngine.getHeaders(request);
+        const headers = appEngine.getPrerenderHeaders(request);
         expect(headers).toHaveSize(0);
       });
     });
@@ -142,7 +148,10 @@ describe('AngularAppEngine', () => {
               })
               class HomeComponent {}
 
-              setAngularAppTestingManifest([{ path: 'home', component: HomeComponent }]);
+              setAngularAppTestingManifest(
+                [{ path: 'home', component: HomeComponent }],
+                [{ path: '/**', renderMode: RenderMode.Server }],
+              );
 
               return {
                 ɵgetOrCreateAngularServerApp: getOrCreateAngularServerApp,
