@@ -6,7 +6,7 @@
 
 // @public
 export class AngularAppEngine {
-    getHeaders(request: Request): Readonly<Map<string, string>>;
+    getHeaders(request: Request): ReadonlyMap<string, string>;
     render(request: Request, requestContext?: unknown): Promise<Response | null>;
     static ɵhooks: Hooks;
 }
