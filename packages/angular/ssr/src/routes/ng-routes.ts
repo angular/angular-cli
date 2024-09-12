@@ -276,11 +276,8 @@ export async function extractRoutesAndCreateRouteTree(
 ): Promise<RouteTree> {
   const routeTree = new RouteTree();
   const document = await new ServerAssets(manifest).getIndexServerHtml();
-  const { baseHref, routes } = await getRoutesFromAngularRouterConfig(
-    await manifest.bootstrap(),
-    document,
-    url,
-  );
+  const bootstrap = await manifest.bootstrap();
+  const { baseHref, routes } = await getRoutesFromAngularRouterConfig(bootstrap, document, url);
 
   for (let { route, redirectTo } of routes) {
     route = joinUrlParts(baseHref, route);
