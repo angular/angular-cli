@@ -40,7 +40,10 @@ module.exports = function (config) {
     customLaunchers: {
       ChromeHeadlessCI: {
         base: 'ChromeHeadless',
-        flags: ['--disable-gpu']
+        flags: [
+          '--disable-gpu',
+          ...(process.env.CHROME_NO_SANDBOX === '1' ? ['--no-sandbox'] : []),
+        ],
       }
     },
     singleRun: false
