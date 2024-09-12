@@ -20,7 +20,7 @@ export function createAngularAssetsMiddleware(
   outputFiles: AngularMemoryOutputFiles,
   usedComponentStyles: Map<string, string[]>,
 ): Connect.NextHandleFunction {
-  return function (req, res, next) {
+  return function angularAssetsMiddleware(req, res, next) {
     if (req.url === undefined || res.writableEnded) {
       return;
     }

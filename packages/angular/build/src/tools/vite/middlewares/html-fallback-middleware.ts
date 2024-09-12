@@ -12,7 +12,7 @@ import { lookupMimeTypeFromRequest } from '../utils';
 
 export function angularHtmlFallbackMiddleware(
   req: Connect.IncomingMessage,
-  res: ServerResponse,
+  _res: ServerResponse,
   next: Connect.NextFunction,
 ): void {
   // Similar to how it is handled in vite

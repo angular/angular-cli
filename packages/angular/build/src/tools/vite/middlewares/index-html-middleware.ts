@@ -15,7 +15,7 @@ export function createAngularIndexHtmlMiddleware(
   outputFiles: AngularMemoryOutputFiles,
   indexHtmlTransformer: ((content: string) => Promise<string>) | undefined,
 ): Connect.NextHandleFunction {
-  return function (req, res, next) {
+  return function angularIndexHtmlMiddleware(req, res, next) {
     if (!req.url) {
       next();
 

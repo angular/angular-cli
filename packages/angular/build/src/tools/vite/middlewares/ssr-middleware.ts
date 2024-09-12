@@ -16,7 +16,11 @@ export function createAngularSSRMiddleware(
 ): Connect.NextHandleFunction {
   let cachedAngularServerApp: ReturnType<typeof getOrCreateAngularServerApp> | undefined;
 
-  return function (req: Connect.IncomingMessage, res: ServerResponse, next: Connect.NextFunction) {
+  return function angularSSRMiddleware(
+    req: Connect.IncomingMessage,
+    res: ServerResponse,
+    next: Connect.NextFunction,
+  ) {
     if (req.url === undefined) {
       return next();
     }

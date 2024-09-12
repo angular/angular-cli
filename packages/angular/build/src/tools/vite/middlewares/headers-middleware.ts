@@ -20,7 +20,11 @@ import type { Connect, ViteDevServer } from 'vite';
  *          and passes control to the next middleware in the chain.
  */
 export function createAngularHeadersMiddleware(server: ViteDevServer): Connect.NextHandleFunction {
-  return function (_req: Connect.IncomingMessage, res: ServerResponse, next: Connect.NextFunction) {
+  return function angularHeadersMiddleware(
+    _req: Connect.IncomingMessage,
+    res: ServerResponse,
+    next: Connect.NextFunction,
+  ) {
     const headers = server.config.server.headers;
     if (!headers) {
       return next();
