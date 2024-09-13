@@ -1,3 +1,21 @@
+<a name="19.0.0-next.6"></a>
+
+# 19.0.0-next.6 (2024-09-13)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                                    |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------- |
+| [de17cbcb8](https://github.com/angular/angular-cli/commit/de17cbcb88e1f057f93d366c3e2eac4315986e54) | fix  | Revert commit enable Node.js compile code cache when available |
+
+### @angular/ssr
+
+| Commit                                                                                              | Type | Description                          |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------ |
+| [d66aaa3ca](https://github.com/angular/angular-cli/commit/d66aaa3ca458e05b535bec7c1dcb98b0e9c5202e) | feat | add server routing configuration API |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="19.0.0-next.5"></a>
 
 # 19.0.0-next.5 (2024-09-12)
