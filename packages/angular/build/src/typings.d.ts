@@ -17,10 +17,3 @@
 declare module 'esbuild' {
   export * from 'esbuild-wasm';
 }
-
-/**
- * Augment the Node.js module builtin types to support the v22.8+ compile cache functions
- */
-declare module 'node:module' {
-  function getCompileCacheDir(): string | undefined;
-}

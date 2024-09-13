@@ -8,7 +8,7 @@
 
 import type { CompilerOptions } from '@angular/compiler-cli';
 import type { PartialMessage } from 'esbuild';
-import { createRequire, getCompileCacheDir } from 'node:module';
+import { createRequire } from 'node:module';
 import { MessageChannel } from 'node:worker_threads';
 import Piscina from 'piscina';
 import type { SourceFile } from 'typescript';
@@ -41,11 +41,6 @@ export class ParallelCompilation extends AngularCompilation {
       useAtomics: !process.versions.webcontainer,
       filename: localRequire.resolve('./parallel-worker'),
       recordTiming: false,
-      env: {
-        ...process.env,
-        // Enable compile code caching if enabled for the main process (only exists on Node.js v22.8+)
-        'NODE_COMPILE_CACHE': getCompileCacheDir?.(),
-      },
     });
   }
 
