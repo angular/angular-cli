@@ -7,7 +7,6 @@
  */
 
 import assert from 'node:assert';
-import { getCompileCacheDir } from 'node:module';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { MessageChannel } from 'node:worker_threads';
 import { Piscina } from 'piscina';
@@ -103,11 +102,6 @@ export class SassWorkerImplementation {
       // Shutdown idle threads after 1 second of inactivity
       idleTimeout: 1000,
       recordTiming: false,
-      env: {
-        ...process.env,
-        // Enable compile code caching if enabled for the main process (only exists on Node.js v22.8+)
-        'NODE_COMPILE_CACHE': getCompileCacheDir?.(),
-      },
     });
 
     return this.#workerPool;
