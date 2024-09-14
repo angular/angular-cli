@@ -72,7 +72,7 @@ export async function augmentIndexHtml(
     sri,
     deployUrl = '',
     lang,
-    baseHref,
+    baseHref = '/',
     html,
     imageDomains,
   } = params;

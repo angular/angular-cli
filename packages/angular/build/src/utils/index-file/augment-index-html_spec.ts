@@ -53,6 +53,22 @@ describe('augment-index-html', () => {
     `);
   });
 
+  it('should generate base href with fallback value', async () => {
+    const { content } = await augmentIndexHtml({
+      ...indexGeneratorOptions,
+      baseHref: undefined,
+    });
+
+    expect(content).toEqual(oneLineHtml`
+      <html>
+        <head><base href="/">
+      </head>
+        <body>
+        </body>
+      </html>
+    `);
+  });
+
   it('should replace base href value', async () => {
     const { content } = await augmentIndexHtml({
       ...indexGeneratorOptions,
