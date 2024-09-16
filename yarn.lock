@@ -387,7 +387,7 @@ __metadata:
     "@babel/helper-annotate-as-pure": "npm:7.24.7"
     "@babel/helper-split-export-declaration": "npm:7.24.7"
     "@babel/plugin-syntax-import-attributes": "npm:7.25.6"
-    "@inquirer/confirm": "npm:3.2.0"
+    "@inquirer/confirm": "npm:4.0.1"
     "@vitejs/plugin-basic-ssl": "npm:1.1.0"
     browserslist: "npm:^4.23.0"
     critters: "npm:0.0.24"
@@ -663,7 +663,7 @@ __metadata:
     "@bazel/jasmine": "patch:@bazel/jasmine@npm%3A5.8.1#~/.yarn/patches/@bazel-jasmine-npm-5.8.1-3370fee155.patch"
     "@bazel/runfiles": "npm:^5.8.1"
     "@discoveryjs/json-ext": "npm:0.6.1"
-    "@inquirer/confirm": "npm:3.2.0"
+    "@inquirer/confirm": "npm:4.0.1"
     "@inquirer/prompts": "npm:6.0.1"
     "@listr2/prompt-adapter-inquirer": "npm:2.0.15"
     "@rollup/plugin-commonjs": "npm:^26.0.0"
@@ -2980,7 +2980,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@inquirer/confirm@npm:^4.0.1":
+"@inquirer/confirm@npm:4.0.1, @inquirer/confirm@npm:^4.0.1":
   version: 4.0.1
   resolution: "@inquirer/confirm@npm:4.0.1"
   dependencies:
