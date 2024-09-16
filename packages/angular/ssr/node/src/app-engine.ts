@@ -59,7 +59,7 @@ export class AngularNodeAppEngine {
    *     const headers = angularAppEngine.getPrerenderHeaders(res.req);
    *
    *     // Apply the retrieved headers to the response
-   *     for (const { key, value } of headers) {
+   *     for (const [key, value] of headers) {
    *       res.setHeader(key, value);
    *     }
    *   }

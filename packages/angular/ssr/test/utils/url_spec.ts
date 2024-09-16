@@ -6,7 +6,13 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { joinUrlParts, stripIndexHtmlFromURL, stripTrailingSlash } from '../../src/utils/url'; // Adjust the import path as needed
+import {
+  addLeadingSlash,
+  joinUrlParts,
+  stripIndexHtmlFromURL,
+  stripLeadingSlash,
+  stripTrailingSlash,
+} from '../../src/utils/url';
 
 describe('URL Utils', () => {
   describe('stripTrailingSlash', () => {
@@ -23,7 +29,39 @@ describe('URL Utils', () => {
     });
 
     it('should handle URL with only a trailing slash', () => {
-      expect(stripTrailingSlash('/')).toBe('');
+      expect(stripTrailingSlash('/')).toBe('/');
+    });
+  });
+
+  describe('stripLeadingSlash', () => {
+    it('should remove leading slash from URL', () => {
+      expect(stripLeadingSlash('/path/')).toBe('path/');
+    });
+
+    it('should not modify URL if no leading slash is present', () => {
+      expect(stripLeadingSlash('path/')).toBe('path/');
+    });
+
+    it('should handle empty URL', () => {
+      expect(stripLeadingSlash('')).toBe('');
+    });
+
+    it('should handle URL with only a leading slash', () => {
+      expect(stripLeadingSlash('/')).toBe('/');
+    });
+  });
+
+  describe('addLeadingSlash', () => {
+    it('should add a leading slash to a URL without one', () => {
+      expect(addLeadingSlash('path/')).toBe('/path/');
+    });
+
+    it('should not modify URL if it already has a leading slash', () => {
+      expect(addLeadingSlash('/path/')).toBe('/path/');
+    });
+
+    it('should handle empty URL', () => {
+      expect(addLeadingSlash('')).toBe('/');
     });
   });
 
@@ -38,6 +76,10 @@ describe('URL Utils', () => {
 
     it('should handle empty URL parts', () => {
       expect(joinUrlParts('', '', 'path', '', 'to/resource')).toBe('/path/to/resource');
+    });
+
+    it('should handle an all-empty URL parts', () => {
+      expect(joinUrlParts('', '')).toBe('/');
     });
   });
 

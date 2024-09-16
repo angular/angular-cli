@@ -55,7 +55,16 @@ export class ServerRouter {
     // Create and store a new promise for the build process.
     // This prevents concurrent builds by re-using the same promise.
     ServerRouter.#extractionPromise ??= extractRoutesAndCreateRouteTree(url, manifest)
-      .then((routeTree) => new ServerRouter(routeTree))
+      .then(({ routeTree, errors }) => {
+        if (errors.length > 0) {
+          throw new Error(
+            'Error(s) occurred while extracting routes:\n' +
+              errors.map((error) => `- ${error}`).join('\n'),
+          );
+        }
+
+        return new ServerRouter(routeTree);
+      })
       .finally(() => {
         ServerRouter.#extractionPromise = undefined;
       });

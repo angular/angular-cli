@@ -77,6 +77,11 @@ interface AngularRouterConfigResult {
    * If not provided, the default configuration or behavior will be used.
    */
   serverRoutesConfig?: ServerRoute[] | null;
+
+  /**
+   * A list of errors encountered during the route extraction process.
+   */
+  errors: string[];
 }
 
 /**
@@ -86,9 +91,9 @@ interface AngularRouterConfigResult {
  * and lazy-loaded routes. It yields route metadata for each route and its potential variants.
  *
  * @param options - The configuration options for traversing routes.
- * @returns An async iterable iterator of route tree node metadata.
+ * @returns An async iterable iterator yielding either route tree node metadata or an error object with an error message.
  */
-export async function* traverseRoutesConfig({
+async function* traverseRoutesConfig({
   routes,
   compiler,
   parentInjector,
@@ -102,108 +107,103 @@ export async function* traverseRoutesConfig({
   parentRoute: string;
   serverConfigRouteTree: RouteTree<ServerConfigRouteTreeAdditionalMetadata> | undefined;
   invokeGetPrerenderParams: boolean;
-}): AsyncIterableIterator<RouteTreeNodeMetadata> {
+}): AsyncIterableIterator<RouteTreeNodeMetadata | { error: string }> {
   for (const route of routes) {
-    const { path = '', redirectTo, loadChildren, children } = route;
-    const currentRoutePath = joinUrlParts(parentRoute, path);
+    try {
+      const { path = '', redirectTo, loadChildren, children } = route;
+      const currentRoutePath = joinUrlParts(parentRoute, path);
 
-    // Get route metadata from the server config route tree, if available
-    const metadata: ServerConfigRouteTreeNodeMetadata = {
-      ...(serverConfigRouteTree
-        ? getMatchedRouteMetadata(serverConfigRouteTree, currentRoutePath)
-        : undefined),
-      route: currentRoutePath,
-    };
+      // Get route metadata from the server config route tree, if available
+      let matchedMetaData: ServerConfigRouteTreeNodeMetadata | undefined;
+      if (serverConfigRouteTree) {
+        matchedMetaData = serverConfigRouteTree.match(currentRoutePath);
+        if (!matchedMetaData) {
+          yield {
+            error:
+              `The '${currentRoutePath}' route does not match any route defined in the server routing configuration. ` +
+              'Please ensure this route is added to the server routing configuration.',
+          };
 
-    // Handle redirects
-    if (typeof redirectTo === 'string') {
-      const redirectToResolved = resolveRedirectTo(currentRoutePath, redirectTo);
-      if (metadata.status && !VALID_REDIRECT_RESPONSE_CODES.has(metadata.status)) {
-        throw new Error(
-          `The '${metadata.status}' status code is not a valid redirect response code. ` +
-            `Please use one of the following redirect response codes: ${[...VALID_REDIRECT_RESPONSE_CODES.values()].join(', ')}.`,
-        );
+          continue;
+        }
       }
-      yield { ...metadata, redirectTo: redirectToResolved };
-    } else if (metadata.renderMode === RenderMode.Prerender) {
-      // Handle SSG routes
-      yield* handleSSGRoute(metadata, parentInjector, invokeGetPrerenderParams);
-    } else {
-      yield metadata;
-    }
 
-    // Recursively process child routes
-    if (children?.length) {
-      yield* traverseRoutesConfig({
-        routes: children,
-        compiler,
-        parentInjector,
-        parentRoute: currentRoutePath,
-        serverConfigRouteTree,
-        invokeGetPrerenderParams,
-      });
-    }
+      const metadata: ServerConfigRouteTreeNodeMetadata = {
+        ...matchedMetaData,
+        route: currentRoutePath,
+      };
 
-    // Load and process lazy-loaded child routes
-    if (loadChildren) {
-      const loadedChildRoutes = await loadChildrenHelper(
-        route,
-        compiler,
-        parentInjector,
-      ).toPromise();
+      // Handle redirects
+      if (typeof redirectTo === 'string') {
+        const redirectToResolved = resolveRedirectTo(currentRoutePath, redirectTo);
+        if (metadata.status && !VALID_REDIRECT_RESPONSE_CODES.has(metadata.status)) {
+          yield {
+            error:
+              `The '${metadata.status}' status code is not a valid redirect response code. ` +
+              `Please use one of the following redirect response codes: ${[...VALID_REDIRECT_RESPONSE_CODES.values()].join(', ')}.`,
+          };
+          continue;
+        }
+        yield { ...metadata, redirectTo: redirectToResolved };
+      } else if (metadata.renderMode === RenderMode.Prerender) {
+        // Handle SSG routes
+        yield* handleSSGRoute(metadata, parentInjector, invokeGetPrerenderParams);
+      } else {
+        yield metadata;
+      }
 
-      if (loadedChildRoutes) {
-        const { routes: childRoutes, injector = parentInjector } = loadedChildRoutes;
+      // Recursively process child routes
+      if (children?.length) {
         yield* traverseRoutesConfig({
-          routes: childRoutes,
+          routes: children,
           compiler,
-          parentInjector: injector,
+          parentInjector,
           parentRoute: currentRoutePath,
           serverConfigRouteTree,
           invokeGetPrerenderParams,
         });
       }
+
+      // Load and process lazy-loaded child routes
+      if (loadChildren) {
+        const loadedChildRoutes = await loadChildrenHelper(
+          route,
+          compiler,
+          parentInjector,
+        ).toPromise();
+
+        if (loadedChildRoutes) {
+          const { routes: childRoutes, injector = parentInjector } = loadedChildRoutes;
+          yield* traverseRoutesConfig({
+            routes: childRoutes,
+            compiler,
+            parentInjector: injector,
+            parentRoute: currentRoutePath,
+            serverConfigRouteTree,
+            invokeGetPrerenderParams,
+          });
+        }
+      }
+    } catch (error) {
+      yield { error: `Error processing route '${route.path}': ${(error as Error).message}` };
     }
   }
 }
 
 /**
- * Retrieves the matched route metadata from the server configuration route tree.
- *
- * @param serverConfigRouteTree - The server configuration route tree.
- * @param currentRoutePath - The current route path being processed.
- * @returns The metadata associated with the matched route.
- */
-function getMatchedRouteMetadata(
-  serverConfigRouteTree: RouteTree<ServerConfigRouteTreeAdditionalMetadata>,
-  currentRoutePath: string,
-): ServerConfigRouteTreeNodeMetadata {
-  const metadata = serverConfigRouteTree.match(currentRoutePath);
-
-  if (!metadata) {
-    throw new Error(
-      `The '${currentRoutePath}' route does not match any route defined in the server routing configuration. ` +
-        'Please ensure this route is added to the server routing configuration.',
-    );
-  }
-
-  return metadata;
-}
-
-/**
  * Handles SSG (Static Site Generation) routes by invoking `getPrerenderParams` and yielding
- * all parameterized paths.
+ * all parameterized paths, returning any errors encountered.
  *
  * @param metadata - The metadata associated with the route tree node.
  * @param parentInjector - The dependency injection container for the parent route.
  * @param invokeGetPrerenderParams - A flag indicating whether to invoke the `getPrerenderParams` function.
- * @returns An async iterable iterator that yields route tree node metadata for each SSG path.
+ * @returns An async iterable iterator that yields route tree node metadata for each SSG path or errors.
  */
 async function* handleSSGRoute(
   metadata: ServerConfigRouteTreeNodeMetadata,
   parentInjector: Injector,
   invokeGetPrerenderParams: boolean,
-): AsyncIterableIterator<RouteTreeNodeMetadata> {
+): AsyncIterableIterator<RouteTreeNodeMetadata | { error: string }> {
   if (metadata.renderMode !== RenderMode.Prerender) {
     throw new Error(
       `'handleSSGRoute' was called for a route which rendering mode is not prerender.`,
@@ -217,34 +217,52 @@ async function* handleSSGRoute(
     delete meta['getPrerenderParams'];
   }
 
-  if (invokeGetPrerenderParams && URL_PARAMETER_REGEXP.test(currentRoutePath)) {
+  if (!URL_PARAMETER_REGEXP.test(currentRoutePath)) {
+    // Route has no parameters
+    yield {
+      ...meta,
+      route: currentRoutePath,
+    };
+
+    return;
+  }
+
+  if (invokeGetPrerenderParams) {
     if (!getPrerenderParams) {
-      throw new Error(
-        `The '${currentRoutePath}' route uses prerendering and includes parameters, but 'getPrerenderParams' is missing. ` +
+      yield {
+        error:
+          `The '${currentRoutePath}' route uses prerendering and includes parameters, but 'getPrerenderParams' is missing. ` +
           `Please define 'getPrerenderParams' function for this route in your server routing configuration ` +
           `or specify a different 'renderMode'.`,
-      );
+      };
+
+      return;
     }
 
     const parameters = await runInInjectionContext(parentInjector, () => getPrerenderParams());
+    try {
+      for (const params of parameters) {
+        const routeWithResolvedParams = currentRoutePath.replace(URL_PARAMETER_REGEXP, (match) => {
+          const parameterName = match.slice(1);
+          const value = params[parameterName];
+          if (typeof value !== 'string') {
+            throw new Error(
+              `The 'getPrerenderParams' function defined for the '${currentRoutePath}' route ` +
+                `returned a non-string value for parameter '${parameterName}'. ` +
+                `Please make sure the 'getPrerenderParams' function returns values for all parameters ` +
+                'specified in this route.',
+            );
+          }
 
-    for (const params of parameters) {
-      const routeWithResolvedParams = currentRoutePath.replace(URL_PARAMETER_REGEXP, (match) => {
-        const parameterName = match.slice(1);
-        const value = params[parameterName];
-        if (typeof value !== 'string') {
-          throw new Error(
-            `The 'getPrerenderParams' function defined for the '${currentRoutePath}' route ` +
-              `returned a non-string value for parameter '${parameterName}'. ` +
-              `Please make sure the 'getPrerenderParams' function returns values for all parameters ` +
-              'specified in this route.',
-          );
-        }
+          return value;
+        });
 
-        return value;
-      });
+        yield { ...meta, route: routeWithResolvedParams };
+      }
+    } catch (error) {
+      yield { error: `${(error as Error).message}` };
 
-      yield { ...meta, route: routeWithResolvedParams };
+      return;
     }
   }
 
@@ -286,17 +304,31 @@ function resolveRedirectTo(routePath: string, redirectTo: string): string {
  * Builds a server configuration route tree from the given server routes configuration.
  *
  * @param serverRoutesConfig - The array of server routes to be used for configuration.
- * @returns A `RouteTree` populated with the server routes and their metadata.
+
+ * @returns An object containing:
+ * - `serverConfigRouteTree`: A populated `RouteTree` instance, which organizes the server routes
+ *   along with their additional metadata.
+ * - `errors`: An array of strings that list any errors encountered during the route tree construction
+ *   process, such as invalid paths.
  */
-function buildServerConfigRouteTree(
-  serverRoutesConfig: ServerRoute[],
-): RouteTree<ServerConfigRouteTreeAdditionalMetadata> {
+function buildServerConfigRouteTree(serverRoutesConfig: ServerRoute[]): {
+  errors: string[];
+  serverConfigRouteTree: RouteTree<ServerConfigRouteTreeAdditionalMetadata>;
+} {
   const serverConfigRouteTree = new RouteTree<ServerConfigRouteTreeAdditionalMetadata>();
+  const errors: string[] = [];
+
   for (const { path, ...metadata } of serverRoutesConfig) {
+    if (path[0] === '/') {
+      errors.push(`Invalid '${path}' route configuration: the path cannot start with a slash.`);
+
+      continue;
+    }
+
     serverConfigRouteTree.insert(path, metadata);
   }
 
-  return serverConfigRouteTree;
+  return { serverConfigRouteTree, errors };
 }
 
 /**
@@ -304,7 +336,7 @@ function buildServerConfigRouteTree(
  *
  * This function initializes an Angular platform, bootstraps the application or module,
  * and retrieves routes from the Angular router configuration. It handles both module-based
- * and function-based bootstrapping. It yields the resulting routes as `RouteTreeNodeMetadata` objects.
+ * and function-based bootstrapping. It yields the resulting routes as `RouteTreeNodeMetadata` objects or errors.
  *
  * @param bootstrap - A function that returns a promise resolving to an `ApplicationRef` or an Angular module to bootstrap.
  * @param document - The initial HTML document used for server-side rendering.
@@ -313,10 +345,7 @@ function buildServerConfigRouteTree(
  * for ensuring that API requests for relative paths succeed, which is essential for accurate route extraction.
  * @param invokeGetPrerenderParams - A boolean flag indicating whether to invoke `getPrerenderParams` for parameterized SSG routes
  * to handle prerendering paths. Defaults to `false`.
- * See:
- *  - https://github.com/angular/angular/blob/d608b857c689d17a7ffa33bbb510301014d24a17/packages/platform-server/src/location.ts#L51
- *  - https://github.com/angular/angular/blob/6882cc7d9eed26d3caeedca027452367ba25f2b9/packages/platform-server/src/http.ts#L44
- * @returns A promise that resolves to an object of type `AngularRouterConfigResult`.
+ * @returns A promise that resolves to an object of type `AngularRouterConfigResult` or errors.
  */
 export async function getRoutesFromAngularRouterConfig(
   bootstrap: AngularBootstrap,
@@ -355,14 +384,31 @@ export async function getRoutesFromAngularRouterConfig(
     const injector = applicationRef.injector;
     const router = injector.get(Router);
     const routesResults: RouteTreeNodeMetadata[] = [];
+    const errors: string[] = [];
+
+    const baseHref =
+      injector.get(APP_BASE_HREF, null, { optional: true }) ??
+      injector.get(PlatformLocation).getBaseHrefFromDOM();
 
     if (router.config.length) {
       const compiler = injector.get(Compiler);
 
       const serverRoutesConfig = injector.get(SERVER_ROUTES_CONFIG, null, { optional: true });
-      const serverConfigRouteTree = serverRoutesConfig
-        ? buildServerConfigRouteTree(serverRoutesConfig)
-        : undefined;
+      let serverConfigRouteTree: RouteTree<ServerConfigRouteTreeAdditionalMetadata> | undefined;
+
+      if (serverRoutesConfig) {
+        const result = buildServerConfigRouteTree(serverRoutesConfig);
+        serverConfigRouteTree = result.serverConfigRouteTree;
+        errors.push(...result.errors);
+      }
+
+      if (errors.length) {
+        return {
+          baseHref,
+          routes: routesResults,
+          errors,
+        };
+      }
 
       // Retrieve all routes from the Angular router configuration.
       const traverseRoutes = traverseRoutesConfig({
@@ -375,19 +421,20 @@ export async function getRoutesFromAngularRouterConfig(
       });
 
       for await (const result of traverseRoutes) {
-        routesResults.push(result);
+        if ('error' in result) {
+          errors.push(result.error);
+        } else {
+          routesResults.push(result);
+        }
       }
     } else {
       routesResults.push({ route: '', renderMode: RenderMode.Prerender });
     }
 
-    const baseHref =
-      injector.get(APP_BASE_HREF, null, { optional: true }) ??
-      injector.get(PlatformLocation).getBaseHrefFromDOM();
-
     return {
       baseHref,
       routes: routesResults,
+      errors,
     };
   } finally {
     platformRef.destroy();
@@ -407,17 +454,20 @@ export async function getRoutesFromAngularRouterConfig(
  * If not provided, the default manifest is retrieved using `getAngularAppManifest()`.
  * @param invokeGetPrerenderParams - A boolean flag indicating whether to invoke `getPrerenderParams` for parameterized SSG routes
  * to handle prerendering paths. Defaults to `false`.
- * @returns A promise that resolves to a populated `RouteTree` containing all extracted routes from the Angular application.
+ *
+ * @returns A promise that resolves to an object containing:
+ *  - `routeTree`: A populated `RouteTree` containing all extracted routes from the Angular application.
+ *  - `errors`: An array of strings representing any errors encountered during the route extraction process.
  */
 export async function extractRoutesAndCreateRouteTree(
   url: URL,
   manifest: AngularAppManifest = getAngularAppManifest(),
   invokeGetPrerenderParams = false,
-): Promise<RouteTree> {
+): Promise<{ routeTree: RouteTree; errors: string[] }> {
   const routeTree = new RouteTree();
   const document = await new ServerAssets(manifest).getIndexServerHtml();
   const bootstrap = await manifest.bootstrap();
-  const { baseHref, routes } = await getRoutesFromAngularRouterConfig(
+  const { baseHref, routes, errors } = await getRoutesFromAngularRouterConfig(
     bootstrap,
     document,
     url,
@@ -433,5 +483,8 @@ export async function extractRoutesAndCreateRouteTree(
     routeTree.insert(fullRoute, metadata);
   }
 
-  return routeTree;
+  return {
+    routeTree,
+    errors,
+  };
 }

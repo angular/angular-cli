@@ -131,8 +131,7 @@ export class RouteTree<AdditionalMetadata extends Record<string, unknown> = {}> 
    */
   insert(route: string, metadata: RouteTreeNodeMetadataWithoutRoute & AdditionalMetadata): void {
     let node = this.root;
-    const normalizedRoute = stripTrailingSlash(route);
-    const segments = normalizedRoute.split('/');
+    const segments = this.getPathSegments(route);
 
     for (const segment of segments) {
       // Replace parameterized segments (e.g., :id) with a wildcard (*) for matching
@@ -150,7 +149,7 @@ export class RouteTree<AdditionalMetadata extends Record<string, unknown> = {}> 
     // At the leaf node, store the full route and its associated metadata
     node.metadata = {
       ...metadata,
-      route: normalizedRoute,
+      route: segments.join('/'),
     };
 
     node.insertionIndex = this.insertionIndexCounter++;
@@ -165,7 +164,7 @@ export class RouteTree<AdditionalMetadata extends Record<string, unknown> = {}> 
    * @returns The metadata of the best matching route or `undefined` if no match is found.
    */
   match(route: string): (RouteTreeNodeMetadata & AdditionalMetadata) | undefined {
-    const segments = stripTrailingSlash(route).split('/');
+    const segments = this.getPathSegments(route);
 
     return this.traverseBySegments(segments)?.metadata;
   }
@@ -216,6 +215,16 @@ export class RouteTree<AdditionalMetadata extends Record<string, unknown> = {}> 
     for (const childNode of node.children.values()) {
       yield* this.traverse(childNode);
     }
+  }
+
+  /**
+   * Extracts the path segments from a given route string.
+   *
+   * @param route - The route string from which to extract segments.
+   * @returns An array of path segments.
+   */
+  private getPathSegments(route: string): string[] {
+    return stripTrailingSlash(route).split('/');
   }
 
   /**

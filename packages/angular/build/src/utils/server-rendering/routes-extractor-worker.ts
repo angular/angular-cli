@@ -15,22 +15,30 @@ export interface RoutesExtractorWorkerData extends ESMInMemoryFileLoaderWorkerDa
   assetFiles: Record</** Destination */ string, /** Source */ string>;
 }
 
-export type RoutersExtractorWorkerResult = ReturnType<
-  Awaited<ReturnType<typeof ɵextractRoutesAndCreateRouteTree>>['toObject']
+export type SerializableRouteTreeNode = ReturnType<
+  Awaited<ReturnType<typeof ɵextractRoutesAndCreateRouteTree>>['routeTree']['toObject']
 >;
+
+export interface RoutersExtractorWorkerResult {
+  serializedRouteTree: SerializableRouteTreeNode;
+  errors: string[];
+}
 
 /** Renders an application based on a provided options. */
 async function extractRoutes(): Promise<RoutersExtractorWorkerResult> {
   const { ɵextractRoutesAndCreateRouteTree: extractRoutesAndCreateRouteTree } =
     await loadEsmModuleFromMemory('./main.server.mjs');
 
-  const routeTree = await extractRoutesAndCreateRouteTree(
+  const { routeTree, errors } = await extractRoutesAndCreateRouteTree(
     new URL('http://local-angular-prerender/'),
     /** manifest */ undefined,
     /** invokeGetPrerenderParams */ true,
   );
 
-  return routeTree.toObject();
+  return {
+    errors,
+    serializedRouteTree: routeTree.toObject(),
+  };
 }
 
 function initialize() {

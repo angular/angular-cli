@@ -37,8 +37,8 @@ describe('ServerRouter', () => {
         { path: 'user/:id', component: DummyComponent },
       ],
       [
-        { path: '/redirect', renderMode: RenderMode.Server, status: 301 },
-        { path: '/**', renderMode: RenderMode.Server },
+        { path: 'redirect', renderMode: RenderMode.Server, status: 301 },
+        { path: '**', renderMode: RenderMode.Server },
       ],
     );
 
