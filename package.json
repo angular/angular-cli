@@ -85,7 +85,7 @@
     "@bazel/jasmine": "patch:@bazel/jasmine@npm%3A5.8.1#~/.yarn/patches/@bazel-jasmine-npm-5.8.1-3370fee155.patch",
     "@bazel/runfiles": "^5.8.1",
     "@discoveryjs/json-ext": "0.6.1",
-    "@inquirer/confirm": "3.2.0",
+    "@inquirer/confirm": "4.0.1",
     "@inquirer/prompts": "6.0.1",
     "@listr2/prompt-adapter-inquirer": "2.0.15",
     "@rollup/plugin-commonjs": "^26.0.0",
