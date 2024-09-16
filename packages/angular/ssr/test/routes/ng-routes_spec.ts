@@ -29,23 +29,59 @@ describe('extractRoutesAndCreateRouteTree', () => {
   it('should extract routes and create a route tree', async () => {
     setAngularAppTestingManifest(
       [
+        { path: '', component: DummyComponent },
         { path: 'home', component: DummyComponent },
         { path: 'redirect', redirectTo: 'home' },
         { path: 'user/:id', component: DummyComponent },
       ],
       [
-        { path: '/home', renderMode: RenderMode.Client },
-        { path: '/redirect', renderMode: RenderMode.Server, status: 301 },
-        { path: '/**', renderMode: RenderMode.Server },
+        { path: 'home', renderMode: RenderMode.Client },
+        { path: 'redirect', renderMode: RenderMode.Server, status: 301 },
+        { path: '**', renderMode: RenderMode.Server },
       ],
     );
 
-    const routeTree = await extractRoutesAndCreateRouteTree(url);
+    const { routeTree, errors } = await extractRoutesAndCreateRouteTree(url);
+    expect(errors).toHaveSize(0);
     expect(routeTree.toObject()).toEqual([
+      { route: '/', renderMode: RenderMode.Server },
       { route: '/home', renderMode: RenderMode.Client },
       { route: '/redirect', renderMode: RenderMode.Server, status: 301, redirectTo: '/home' },
       { route: '/user/:id', renderMode: RenderMode.Server },
     ]);
+  });
+
+  it('should handle invalid route configuration path', async () => {
+    setAngularAppTestingManifest(
+      [{ path: 'home', component: DummyComponent }],
+      [
+        // This path starts with a slash, which should trigger an error
+        { path: '/invalid', renderMode: RenderMode.Client },
+      ],
+    );
+
+    const { errors } = await extractRoutesAndCreateRouteTree(url);
+    expect(errors[0]).toContain(
+      `Invalid '/invalid' route configuration: the path cannot start with a slash.`,
+    );
+  });
+
+  it('should handle route not matching server routing configuration', async () => {
+    setAngularAppTestingManifest(
+      [
+        { path: 'home', component: DummyComponent },
+        { path: 'about', component: DummyComponent }, // This route is not in the server configuration
+      ],
+      [
+        { path: 'home', renderMode: RenderMode.Client },
+        // 'about' route is missing here
+      ],
+    );
+
+    const { errors } = await extractRoutesAndCreateRouteTree(url);
+    expect(errors[0]).toContain(
+      `The '/about' route does not match any route defined in the server routing configuration.`,
+    );
   });
 
   describe('when `invokeGetPrerenderParams` is true', () => {
@@ -67,7 +103,8 @@ describe('extractRoutesAndCreateRouteTree', () => {
         ],
       );
 
-      const routeTree = await extractRoutesAndCreateRouteTree(url, undefined, true);
+      const { routeTree, errors } = await extractRoutesAndCreateRouteTree(url, undefined, true);
+      expect(errors).toHaveSize(0);
       expect(routeTree.toObject()).toEqual([
         { route: '/user/joe/role/admin', renderMode: RenderMode.Prerender },
         {
@@ -96,11 +133,12 @@ describe('extractRoutesAndCreateRouteTree', () => {
               ];
             },
           },
-          { path: '/**', renderMode: RenderMode.Server },
+          { path: '**', renderMode: RenderMode.Server },
         ],
       );
 
-      const routeTree = await extractRoutesAndCreateRouteTree(url, undefined, true);
+      const { routeTree, errors } = await extractRoutesAndCreateRouteTree(url, undefined, true);
+      expect(errors).toHaveSize(0);
       expect(routeTree.toObject()).toEqual([
         { route: '/home', renderMode: RenderMode.Server },
         { route: '/user/joe/role/admin', renderMode: RenderMode.Prerender },
@@ -130,11 +168,12 @@ describe('extractRoutesAndCreateRouteTree', () => {
               ];
             },
           },
-          { path: '/**', renderMode: RenderMode.Server },
+          { path: '**', renderMode: RenderMode.Server },
         ],
       );
 
-      const routeTree = await extractRoutesAndCreateRouteTree(url, undefined, true);
+      const { routeTree, errors } = await extractRoutesAndCreateRouteTree(url, undefined, true);
+      expect(errors).toHaveSize(0);
       expect(routeTree.toObject()).toEqual([
         { route: '/home', renderMode: RenderMode.Server },
         { route: '/user/joe/role/admin', renderMode: RenderMode.Prerender },
@@ -163,11 +202,12 @@ describe('extractRoutesAndCreateRouteTree', () => {
             ];
           },
         },
-        { path: '/**', renderMode: RenderMode.Server },
+        { path: '**', renderMode: RenderMode.Server },
       ],
     );
 
-    const routeTree = await extractRoutesAndCreateRouteTree(url, undefined, false);
+    const { routeTree, errors } = await extractRoutesAndCreateRouteTree(url, undefined, false);
+    expect(errors).toHaveSize(0);
     expect(routeTree.toObject()).toEqual([
       { route: '/home', renderMode: RenderMode.Server },
       { route: '/user/:id/role/:role', renderMode: RenderMode.Server },

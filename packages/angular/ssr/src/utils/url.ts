@@ -16,11 +16,49 @@
  * ```js
  * stripTrailingSlash('path/'); // 'path'
  * stripTrailingSlash('/path');  // '/path'
+ * stripTrailingSlash('/'); // '/'
+ * stripTrailingSlash(''); // ''
  * ```
  */
 export function stripTrailingSlash(url: string): string {
   // Check if the last character of the URL is a slash
-  return url[url.length - 1] === '/' ? url.slice(0, -1) : url;
+  return url.length > 1 && url[url.length - 1] === '/' ? url.slice(0, -1) : url;
+}
+
+/**
+ * Removes the leading slash from a URL if it exists.
+ *
+ * @param url - The URL string from which to remove the leading slash.
+ * @returns The URL string without a leading slash.
+ *
+ * @example
+ * ```js
+ * stripLeadingSlash('/path'); // 'path'
+ * stripLeadingSlash('/path/');  // 'path/'
+ * stripLeadingSlash('/'); // '/'
+ * stripLeadingSlash(''); // ''
+ * ```
+ */
+export function stripLeadingSlash(url: string): string {
+  // Check if the first character of the URL is a slash
+  return url.length > 1 && url[0] === '/' ? url.slice(1) : url;
+}
+
+/**
+ * Adds a leading slash to a URL if it does not already have one.
+ *
+ * @param url - The URL string to which the leading slash will be added.
+ * @returns The URL string with a leading slash.
+ *
+ * @example
+ * ```js
+ * addLeadingSlash('path'); // '/path'
+ * addLeadingSlash('/path'); // '/path'
+ * ```
+ */
+export function addLeadingSlash(url: string): string {
+  // Check if the URL already starts with a slash
+  return url[0] === '/' ? url : `/${url}`;
 }
 
 /**
@@ -36,12 +74,11 @@ export function stripTrailingSlash(url: string): string {
  * ```js
  * joinUrlParts('path/', '/to/resource'); // '/path/to/resource'
  * joinUrlParts('/path/', 'to/resource'); // '/path/to/resource'
+ * joinUrlParts('', ''); // '/'
  * ```
  */
 export function joinUrlParts(...parts: string[]): string {
-  // Initialize an array with an empty string to always add a leading slash
-  const normalizeParts: string[] = [''];
-
+  const normalizeParts: string[] = [];
   for (const part of parts) {
     if (part === '') {
       // Skip any empty parts
@@ -60,7 +97,7 @@ export function joinUrlParts(...parts: string[]): string {
     }
   }
 
-  return normalizeParts.join('/');
+  return addLeadingSlash(normalizeParts.join('/'));
 }
 
 /**

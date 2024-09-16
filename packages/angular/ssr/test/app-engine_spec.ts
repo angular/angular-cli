@@ -41,7 +41,7 @@ describe('AngularAppEngine', () => {
 
               setAngularAppTestingManifest(
                 [{ path: 'home', component: HomeComponent }],
-                [{ path: '/**', renderMode: RenderMode.Server }],
+                [{ path: '**', renderMode: RenderMode.Server }],
                 locale,
               );
 
@@ -150,7 +150,7 @@ describe('AngularAppEngine', () => {
 
               setAngularAppTestingManifest(
                 [{ path: 'home', component: HomeComponent }],
-                [{ path: '/**', renderMode: RenderMode.Server }],
+                [{ path: '**', renderMode: RenderMode.Server }],
               );
 
               return {

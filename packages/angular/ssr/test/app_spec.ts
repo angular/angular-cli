@@ -41,16 +41,16 @@ describe('AngularServerApp', () => {
       ],
       [
         {
-          path: '/home-csr',
+          path: 'home-csr',
           renderMode: RenderMode.Client,
         },
         {
-          path: '/page-with-status',
+          path: 'page-with-status',
           renderMode: RenderMode.Server,
           status: 201,
         },
         {
-          path: '/page-with-headers',
+          path: 'page-with-headers',
           renderMode: RenderMode.Server,
           headers: {
             'Cache-Control': 'no-cache',
@@ -58,7 +58,7 @@ describe('AngularServerApp', () => {
           },
         },
         {
-          path: '/**',
+          path: '**',
           renderMode: RenderMode.Server,
         },
       ],

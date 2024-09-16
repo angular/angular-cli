@@ -15,8 +15,9 @@ import { BuildOutputAsset } from '../../tools/esbuild/bundler-execution-result';
 import { urlJoin } from '../url';
 import type { RenderWorkerData } from './render-worker';
 import type {
+  RoutersExtractorWorkerResult,
   RoutesExtractorWorkerData,
-  RoutersExtractorWorkerResult as SerializableRouteTreeNode,
+  SerializableRouteTreeNode,
 } from './routes-extractor-worker';
 
 interface PrerenderOptions {
@@ -298,14 +299,15 @@ async function getAllRoutes(
   });
 
   const errors: string[] = [];
-  const serializableRouteTreeNode: SerializableRouteTreeNode = await renderWorker
-    .run({})
-    .catch((err) => {
-      errors.push(`An error occurred while extracting routes.\n\n${err.stack}`);
-    })
-    .finally(() => {
-      void renderWorker.destroy();
-    });
+  const { serializedRouteTree: serializableRouteTreeNode }: RoutersExtractorWorkerResult =
+    await renderWorker
+      .run({})
+      .catch((err) => {
+        errors.push(`An error occurred while extracting routes.\n\n${err.stack}`);
+      })
+      .finally(() => {
+        void renderWorker.destroy();
+      });
 
   const skippedRedirects: string[] = [];
   const skippedOthers: string[] = [];
