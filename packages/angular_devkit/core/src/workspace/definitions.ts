@@ -85,19 +85,19 @@ class DefinitionCollection<V extends object> implements ReadonlyMap<string, V> {
     return this._map.size;
   }
 
-  [Symbol.iterator](): IterableIterator<[string, V]> {
+  [Symbol.iterator](): MapIterator<[string, V]> {
     return this._map[Symbol.iterator]();
   }
 
-  entries(): IterableIterator<[string, V]> {
+  entries(): MapIterator<[string, V]> {
     return this._map.entries();
   }
 
-  keys(): IterableIterator<string> {
+  keys(): MapIterator<string> {
     return this._map.keys();
   }
 
-  values(): IterableIterator<V> {
+  values(): MapIterator<V> {
     return this._map.values();
   }
 }
