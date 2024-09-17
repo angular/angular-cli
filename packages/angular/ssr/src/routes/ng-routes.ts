@@ -93,21 +93,25 @@ interface AngularRouterConfigResult {
  * @param options - The configuration options for traversing routes.
  * @returns An async iterable iterator yielding either route tree node metadata or an error object with an error message.
  */
-async function* traverseRoutesConfig({
-  routes,
-  compiler,
-  parentInjector,
-  parentRoute,
-  serverConfigRouteTree,
-  invokeGetPrerenderParams,
-}: {
+async function* traverseRoutesConfig(options: {
   routes: Route[];
   compiler: Compiler;
   parentInjector: Injector;
   parentRoute: string;
   serverConfigRouteTree: RouteTree<ServerConfigRouteTreeAdditionalMetadata> | undefined;
   invokeGetPrerenderParams: boolean;
+  includePrerenderFallbackRoutes: boolean;
 }): AsyncIterableIterator<RouteTreeNodeMetadata | { error: string }> {
+  const {
+    routes,
+    compiler,
+    parentInjector,
+    parentRoute,
+    serverConfigRouteTree,
+    invokeGetPrerenderParams,
+    includePrerenderFallbackRoutes,
+  } = options;
+
   for (const route of routes) {
     try {
       const { path = '', redirectTo, loadChildren, children } = route;
@@ -147,7 +151,12 @@ async function* traverseRoutesConfig({
         yield { ...metadata, redirectTo: redirectToResolved };
       } else if (metadata.renderMode === RenderMode.Prerender) {
         // Handle SSG routes
-        yield* handleSSGRoute(metadata, parentInjector, invokeGetPrerenderParams);
+        yield* handleSSGRoute(
+          metadata,
+          parentInjector,
+          invokeGetPrerenderParams,
+          includePrerenderFallbackRoutes,
+        );
       } else {
         yield metadata;
       }
@@ -155,12 +164,9 @@ async function* traverseRoutesConfig({
       // Recursively process child routes
       if (children?.length) {
         yield* traverseRoutesConfig({
+          ...options,
           routes: children,
-          compiler,
-          parentInjector,
           parentRoute: currentRoutePath,
-          serverConfigRouteTree,
-          invokeGetPrerenderParams,
         });
       }
 
@@ -175,12 +181,10 @@ async function* traverseRoutesConfig({
         if (loadedChildRoutes) {
           const { routes: childRoutes, injector = parentInjector } = loadedChildRoutes;
           yield* traverseRoutesConfig({
+            ...options,
             routes: childRoutes,
-            compiler,
             parentInjector: injector,
             parentRoute: currentRoutePath,
-            serverConfigRouteTree,
-            invokeGetPrerenderParams,
           });
         }
       }
@@ -197,12 +201,14 @@ async function* traverseRoutesConfig({
  * @param metadata - The metadata associated with the route tree node.
  * @param parentInjector - The dependency injection container for the parent route.
  * @param invokeGetPrerenderParams - A flag indicating whether to invoke the `getPrerenderParams` function.
+ * @param includePrerenderFallbackRoutes - A flag indicating whether to include fallback routes in the result.
  * @returns An async iterable iterator that yields route tree node metadata for each SSG path or errors.
  */
 async function* handleSSGRoute(
   metadata: ServerConfigRouteTreeNodeMetadata,
   parentInjector: Injector,
   invokeGetPrerenderParams: boolean,
+  includePrerenderFallbackRoutes: boolean,
 ): AsyncIterableIterator<RouteTreeNodeMetadata | { error: string }> {
   if (metadata.renderMode !== RenderMode.Prerender) {
     throw new Error(
@@ -267,7 +273,10 @@ async function* handleSSGRoute(
   }
 
   // Handle fallback render modes
-  if (fallback !== PrerenderFallback.None || !invokeGetPrerenderParams) {
+  if (
+    includePrerenderFallbackRoutes &&
+    (fallback !== PrerenderFallback.None || !invokeGetPrerenderParams)
+  ) {
     yield {
       ...meta,
       route: currentRoutePath,
@@ -345,6 +354,8 @@ function buildServerConfigRouteTree(serverRoutesConfig: ServerRoute[]): {
  * for ensuring that API requests for relative paths succeed, which is essential for accurate route extraction.
  * @param invokeGetPrerenderParams - A boolean flag indicating whether to invoke `getPrerenderParams` for parameterized SSG routes
  * to handle prerendering paths. Defaults to `false`.
+ * @param includePrerenderFallbackRoutes - A flag indicating whether to include fallback routes in the result. Defaults to `true`.
+ *
  * @returns A promise that resolves to an object of type `AngularRouterConfigResult` or errors.
  */
 export async function getRoutesFromAngularRouterConfig(
@@ -352,6 +363,7 @@ export async function getRoutesFromAngularRouterConfig(
   document: string,
   url: URL,
   invokeGetPrerenderParams = false,
+  includePrerenderFallbackRoutes = true,
 ): Promise<AngularRouterConfigResult> {
   const { protocol, host } = url;
 
@@ -418,6 +430,7 @@ export async function getRoutesFromAngularRouterConfig(
         parentRoute: '',
         serverConfigRouteTree,
         invokeGetPrerenderParams,
+        includePrerenderFallbackRoutes,
       });
 
       for await (const result of traverseRoutes) {
@@ -454,6 +467,7 @@ export async function getRoutesFromAngularRouterConfig(
  * If not provided, the default manifest is retrieved using `getAngularAppManifest()`.
  * @param invokeGetPrerenderParams - A boolean flag indicating whether to invoke `getPrerenderParams` for parameterized SSG routes
  * to handle prerendering paths. Defaults to `false`.
+ * @param includePrerenderFallbackRoutes - A flag indicating whether to include fallback routes in the result. Defaults to `true`.
  *
  * @returns A promise that resolves to an object containing:
  *  - `routeTree`: A populated `RouteTree` containing all extracted routes from the Angular application.
@@ -463,6 +477,7 @@ export async function extractRoutesAndCreateRouteTree(
   url: URL,
   manifest: AngularAppManifest = getAngularAppManifest(),
   invokeGetPrerenderParams = false,
+  includePrerenderFallbackRoutes = true,
 ): Promise<{ routeTree: RouteTree; errors: string[] }> {
   const routeTree = new RouteTree();
   const document = await new ServerAssets(manifest).getIndexServerHtml();
@@ -472,6 +487,7 @@ export async function extractRoutesAndCreateRouteTree(
     document,
     url,
     invokeGetPrerenderParams,
+    includePrerenderFallbackRoutes,
   );
 
   for (const { route, ...metadata } of routes) {

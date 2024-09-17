@@ -213,4 +213,85 @@ describe('extractRoutesAndCreateRouteTree', () => {
       { route: '/user/:id/role/:role', renderMode: RenderMode.Server },
     ]);
   });
+
+  it('should not include fallback routes for SSG when `includePrerenderFallbackRoutes` is false', async () => {
+    setAngularAppTestingManifest(
+      [
+        { path: 'home', component: DummyComponent },
+        { path: 'user/:id/role/:role', component: DummyComponent },
+      ],
+      [
+        {
+          path: 'user/:id/role/:role',
+          fallback: PrerenderFallback.Client,
+          renderMode: RenderMode.Prerender,
+          async getPrerenderParams() {
+            return [
+              { id: 'joe', role: 'admin' },
+              { id: 'jane', role: 'writer' },
+            ];
+          },
+        },
+        { path: '**', renderMode: RenderMode.Server },
+      ],
+    );
+
+    const { routeTree, errors } = await extractRoutesAndCreateRouteTree(
+      url,
+      /** manifest */ undefined,
+      /** invokeGetPrerenderParams */ true,
+      /** includePrerenderFallbackRoutes */ false,
+    );
+
+    expect(errors).toHaveSize(0);
+    expect(routeTree.toObject()).toEqual([
+      { route: '/home', renderMode: RenderMode.Server },
+      { route: '/user/joe/role/admin', renderMode: RenderMode.Prerender },
+      {
+        route: '/user/jane/role/writer',
+        renderMode: RenderMode.Prerender,
+      },
+    ]);
+  });
+
+  it('should include fallback routes for SSG when `includePrerenderFallbackRoutes` is true', async () => {
+    setAngularAppTestingManifest(
+      [
+        { path: 'home', component: DummyComponent },
+        { path: 'user/:id/role/:role', component: DummyComponent },
+      ],
+      [
+        {
+          path: 'user/:id/role/:role',
+          renderMode: RenderMode.Prerender,
+          fallback: PrerenderFallback.Client,
+          async getPrerenderParams() {
+            return [
+              { id: 'joe', role: 'admin' },
+              { id: 'jane', role: 'writer' },
+            ];
+          },
+        },
+        { path: '**', renderMode: RenderMode.Server },
+      ],
+    );
+
+    const { routeTree, errors } = await extractRoutesAndCreateRouteTree(
+      url,
+      /** manifest */ undefined,
+      /** invokeGetPrerenderParams */ true,
+      /** includePrerenderFallbackRoutes */ true,
+    );
+
+    expect(errors).toHaveSize(0);
+    expect(routeTree.toObject()).toEqual([
+      { route: '/home', renderMode: RenderMode.Server },
+      { route: '/user/joe/role/admin', renderMode: RenderMode.Prerender },
+      {
+        route: '/user/jane/role/writer',
+        renderMode: RenderMode.Prerender,
+      },
+      { route: '/user/:id/role/:role', renderMode: RenderMode.Client },
+    ]);
+  });
 });
