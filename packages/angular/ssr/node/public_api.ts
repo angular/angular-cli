@@ -16,3 +16,4 @@ export { AngularNodeAppEngine } from './src/app-engine';
 
 export { writeResponseToNodeResponse } from './src/response';
 export { createWebRequestFromNodeRequest } from './src/request';
+export { isMainModule } from './src/module';

@@ -47,6 +47,9 @@ export interface CommonEngineRenderOptions {
 export function createWebRequestFromNodeRequest(nodeRequest: IncomingMessage): Request;
 
 // @public
+export function isMainModule(url: string): boolean;
+
+// @public
 export function writeResponseToNodeResponse(source: Response, destination: ServerResponse): Promise<void>;
 
 // (No @packageDocumentation comment for this package)
