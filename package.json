@@ -224,6 +224,7 @@
     }
   },
   "resolutions": {
-    "@bazel/concatjs@npm:5.8.1": "patch:@bazel/concatjs@npm%3A5.8.1#~/.yarn/patches/@bazel-concatjs-npm-5.8.1-1bf81df846.patch"
+    "@bazel/concatjs@npm:5.8.1": "patch:@bazel/concatjs@npm%3A5.8.1#~/.yarn/patches/@bazel-concatjs-npm-5.8.1-1bf81df846.patch",
+    "@microsoft/api-extractor/typescript": "5.6.2"
   }
 }

@@ -51,7 +51,7 @@ export class PartiallyOrderedSet<T> implements Set<T> {
   /**
    * Returns an iterable of [v,v] pairs for every value `v` in the set.
    */
-  *entries(): IterableIterator<[T, T]> {
+  *entries(): SetIterator<[T, T]> {
     for (const item of this) {
       yield [item, item];
     }
@@ -60,14 +60,14 @@ export class PartiallyOrderedSet<T> implements Set<T> {
   /**
    * Despite its name, returns an iterable of the values in the set,
    */
-  keys(): IterableIterator<T> {
+  keys(): SetIterator<T> {
     return this.values();
   }
 
   /**
    * Returns an iterable of values in the set.
    */
-  values(): IterableIterator<T> {
+  values(): SetIterator<T> {
     return this[Symbol.iterator]();
   }
 
