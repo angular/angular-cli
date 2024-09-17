@@ -63,6 +63,12 @@ export function createAngularAssetsMiddleware(
       return;
     }
 
+    // Support HTTP HEAD requests for the virtual output files from the Angular build
+    if (req.method === 'HEAD' && outputFiles.get(pathname)?.servable) {
+      // While a GET will also generate content, the rest of the response is equivalent
+      req.method = 'GET';
+    }
+
     // Resource files are handled directly.
     // Global stylesheets (CSS files) are currently considered resources to workaround
     // dev server sourcemap issues with stylesheets.
