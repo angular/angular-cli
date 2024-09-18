@@ -1,3 +1,15 @@
+<a name="16.2.16"></a>
+
+# 16.2.16 (2024-09-18)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description          |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------- |
+| [12aca0060](https://github.com/angular/angular-cli/commit/12aca0060492c73cec1bbc231119dde6a4b52607) | fix  | update vite to 4.5.5 |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="19.0.0-next.6"></a>
 
 # 19.0.0-next.6 (2024-09-13)
