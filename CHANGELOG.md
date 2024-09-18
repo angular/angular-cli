@@ -1,3 +1,28 @@
+<a name="19.0.0-next.7"></a>
+
+# 19.0.0-next.7 (2024-09-18)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                      |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------ |
+| [f249e7e85](https://github.com/angular/angular-cli/commit/f249e7e856bf16e8c5f154fdb8aff36421649a1b) | perf | enable Node.js compile code cache when available |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                         |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------- |
+| [f6b7cd925](https://github.com/angular/angular-cli/commit/f6b7cd925dacf0ae34cb8e49b4deaf2e5c52ccd4) | fix  | support HTTP HEAD requests for virtual output files |
+
+### @angular/ssr
+
+| Commit                                                                                              | Type | Description                                 |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------- |
+| [f346ee8a8](https://github.com/angular/angular-cli/commit/f346ee8a8819bb2eaf0ffb3d5523b00093be09e5) | feat | add `isMainModule` function                 |
+| [2640bf7a6](https://github.com/angular/angular-cli/commit/2640bf7a680300acf18cf6502c57a00e0a5bfda9) | fix  | correct route extraction and error handling |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="18.2.5"></a>
 
 # 18.2.5 (2024-09-18)
