@@ -1,3 +1,16 @@
+<a name="18.2.5"></a>
+
+# 18.2.5 (2024-09-18)
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                         |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------- |
+| [707431625](https://github.com/angular/angular-cli/commit/7074316257bd736e0d3393368fc93dec9604b49e) | fix  | support HTTP HEAD requests for virtual output files |
+| [1032b3da1](https://github.com/angular/angular-cli/commit/1032b3da1a0f3aaf63d2fd3cd8c6fd3b0d0b578c) | fix  | update vite to `5.4.6`                              |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="16.2.16"></a>
 
 # 16.2.16 (2024-09-18)
