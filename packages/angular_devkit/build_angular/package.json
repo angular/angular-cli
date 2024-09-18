@@ -64,7 +64,7 @@
     "text-table": "0.2.0",
     "tree-kill": "1.2.2",
     "tslib": "2.6.1",
-    "vite": "4.5.3",
+    "vite": "4.5.5",
     "webpack": "5.94.0",
     "webpack-dev-middleware": "6.1.2",
     "webpack-dev-server": "4.15.1",
