@@ -27,6 +27,9 @@ export default async function () {
   `,
   );
 
+  // Ensure localize package is not present initially
+  await uninstallPackage('@angular/localize');
+
   // Should fail if `@angular/localize` is missing
   const { message: message1 } = await expectToFail(() => ng('extract-i18n'));
   if (!message1.includes(`i18n extraction requires the '@angular/localize' package.`)) {
