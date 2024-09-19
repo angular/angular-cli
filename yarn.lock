@@ -40,18 +40,18 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@angular-devkit/architect@npm:0.1900.0-next.6":
-  version: 0.1900.0-next.6
-  resolution: "@angular-devkit/architect@npm:0.1900.0-next.6"
+"@angular-devkit/architect@npm:0.1900.0-next.7":
+  version: 0.1900.0-next.7
+  resolution: "@angular-devkit/architect@npm:0.1900.0-next.7"
   dependencies:
-    "@angular-devkit/core": "npm:19.0.0-next.6"
+    "@angular-devkit/core": "npm:19.0.0-next.7"
     rxjs: "npm:7.8.1"
   dependenciesMeta:
     esbuild:
       built: true
     puppeteer:
       built: true
-  checksum: 10c0/c63e5d1981462dde37ad5ea3f4c0abbd754cd8d52a2f3eb3893c4addb02b5c68a5a267a273d54b1142b5fcf8ff7107923112e5cf7fce2698f36cdba3b7453ea0
+  checksum: 10c0/f61c013cd553afdc8bbf16ca5160d5c07b61f7f27296b31147423eba4d83e32f462fd13c64a7ec814163c2c05046a85731cfc31904f148863152ec577510e9b6
   languageName: node
   linkType: hard
 
@@ -201,9 +201,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@angular-devkit/core@npm:19.0.0-next.6":
-  version: 19.0.0-next.6
-  resolution: "@angular-devkit/core@npm:19.0.0-next.6"
+"@angular-devkit/core@npm:19.0.0-next.7":
+  version: 19.0.0-next.7
+  resolution: "@angular-devkit/core@npm:19.0.0-next.7"
   dependencies:
     ajv: "npm:8.17.1"
     ajv-formats: "npm:3.0.1"
@@ -221,7 +221,7 @@ __metadata:
   peerDependenciesMeta:
     chokidar:
       optional: true
-  checksum: 10c0/0e485ef595399a6f0fc5588e6a1cb89609a7bfa04eae759690b8a43df5618341ec20e3cd85cd757abfb1b8635590e16440811f8338a256604dfa0fe6bd27e680
+  checksum: 10c0/e60bcb737714aca548c4cae7b6c89af585f96ac2088f03d43fc302c053506c30291152f632a3cf97a97fbd234614169f7320d62c5b245e49cff8671fff78d1af
   languageName: node
   linkType: hard
 
@@ -331,12 +331,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@angular/build-tooling@https://github.com/angular/dev-infra-private-build-tooling-builds.git#9b310e6da3c87a36fd668e584bcd857bae8eb144":
-  version: 0.0.0-12e38ba595aa3bbe4230e9568517c7309fca93bc
-  resolution: "@angular/build-tooling@https://github.com/angular/dev-infra-private-build-tooling-builds.git#commit=9b310e6da3c87a36fd668e584bcd857bae8eb144"
+"@angular/build-tooling@https://github.com/angular/dev-infra-private-build-tooling-builds.git#be88545d5fba3809d0b1c7ab2b8dfac966f3d8d2":
+  version: 0.0.0-276e500c61c1fa82066ecfe212b2b0e538b0dbfd
+  resolution: "@angular/build-tooling@https://github.com/angular/dev-infra-private-build-tooling-builds.git#commit=be88545d5fba3809d0b1c7ab2b8dfac966f3d8d2"
   dependencies:
     "@angular/benchpress": "npm:0.3.0"
-    "@angular/build": "npm:19.0.0-next.6"
+    "@angular/build": "npm:19.0.0-next.7"
     "@babel/core": "npm:^7.16.0"
     "@babel/helper-annotate-as-pure": "npm:^7.18.6"
     "@babel/plugin-proposal-async-generator-functions": "npm:^7.20.1"
@@ -373,7 +373,7 @@ __metadata:
   dependenciesMeta:
     re2:
       built: false
-  checksum: 10c0/7494477c5ba516436c711b7c8c072cac693f2bd109b50c99b138c35aa5cd37c36b47c4e219989003289ff6c8cadf8c30c310eda5143bcd0d0d3f9668ef90388f
+  checksum: 10c0/b2df544c3f80250b07cd1093dcb4b81a944b9b2c21cd0a46721978cfd3b80198e90909b181c902eb917bc8e0eb6d5dc21a69129e2adf6aae36f3d776d4bb525d
   languageName: node
   linkType: hard
 
@@ -435,17 +435,17 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@angular/build@npm:19.0.0-next.6":
-  version: 19.0.0-next.6
-  resolution: "@angular/build@npm:19.0.0-next.6"
+"@angular/build@npm:19.0.0-next.7":
+  version: 19.0.0-next.7
+  resolution: "@angular/build@npm:19.0.0-next.7"
   dependencies:
     "@ampproject/remapping": "npm:2.3.0"
-    "@angular-devkit/architect": "npm:0.1900.0-next.6"
+    "@angular-devkit/architect": "npm:0.1900.0-next.7"
     "@babel/core": "npm:7.25.2"
     "@babel/helper-annotate-as-pure": "npm:7.24.7"
     "@babel/helper-split-export-declaration": "npm:7.24.7"
     "@babel/plugin-syntax-import-attributes": "npm:7.25.6"
-    "@inquirer/confirm": "npm:3.2.0"
+    "@inquirer/confirm": "npm:4.0.1"
     "@vitejs/plugin-basic-ssl": "npm:1.1.0"
     browserslist: "npm:^4.23.0"
     critters: "npm:0.0.24"
@@ -453,16 +453,16 @@ __metadata:
     fast-glob: "npm:3.3.2"
     https-proxy-agent: "npm:7.0.5"
     listr2: "npm:8.2.4"
-    lmdb: "npm:3.1.0"
+    lmdb: "npm:3.1.2"
     magic-string: "npm:0.30.11"
     mrmime: "npm:2.0.0"
     parse5-html-rewriting-stream: "npm:7.0.0"
     picomatch: "npm:4.0.2"
-    piscina: "npm:4.6.1"
+    piscina: "npm:4.7.0"
     rollup: "npm:4.21.3"
-    sass: "npm:1.78.0"
+    sass: "npm:1.79.1"
     semver: "npm:7.6.3"
-    vite: "npm:5.4.4"
+    vite: "npm:5.4.6"
     watchpack: "npm:2.4.2"
   peerDependencies:
     "@angular/compiler": ^19.0.0-next.0
@@ -470,7 +470,7 @@ __metadata:
     "@angular/localize": ^19.0.0-next.0
     "@angular/platform-server": ^19.0.0-next.0
     "@angular/service-worker": ^19.0.0-next.0
-    "@angular/ssr": ^19.0.0-next.6
+    "@angular/ssr": ^19.0.0-next.7
     less: ^4.2.0
     postcss: ^8.4.0
     tailwindcss: ^2.0.0 || ^3.0.0
@@ -495,7 +495,7 @@ __metadata:
       optional: true
     tailwindcss:
       optional: true
-  checksum: 10c0/0269b2bce2b56f4945205f13d83e3216ae4defafa7db388b27c6135424fbd4f0f44ad3b753b334c8f3a82276e1fde3f124e322fbada19f494f0d89b525d6d017
+  checksum: 10c0/afa4790822d3a8f8a6ef78e19476f213448ed675fa5106e2e1431f1f46396a3d8fe2e92752e5e2e46451c18f7a7da186baac7f8c8688e1f2e6cc5827bb4ef46c
   languageName: node
   linkType: hard
 
@@ -632,7 +632,7 @@ __metadata:
     "@ampproject/remapping": "npm:2.3.0"
     "@angular/animations": "npm:19.0.0-next.6"
     "@angular/bazel": "patch:@angular/bazel@https%3A//github.com/angular/bazel-builds.git%23commit=9e6140d1eef8ddf7113d00738f603e9cc3c310f1#~/.yarn/patches/@angular-bazel-https-9848736cf4.patch"
-    "@angular/build-tooling": "https://github.com/angular/dev-infra-private-build-tooling-builds.git#9b310e6da3c87a36fd668e584bcd857bae8eb144"
+    "@angular/build-tooling": "https://github.com/angular/dev-infra-private-build-tooling-builds.git#be88545d5fba3809d0b1c7ab2b8dfac966f3d8d2"
     "@angular/cdk": "npm:19.0.0-next.4"
     "@angular/common": "npm:19.0.0-next.6"
     "@angular/compiler": "npm:19.0.0-next.6"
@@ -641,7 +641,7 @@ __metadata:
     "@angular/forms": "npm:19.0.0-next.6"
     "@angular/localize": "npm:19.0.0-next.6"
     "@angular/material": "npm:19.0.0-next.4"
-    "@angular/ng-dev": "https://github.com/angular/dev-infra-private-ng-dev-builds.git#68d080d76124a3255475ef08200eeeec468154e0"
+    "@angular/ng-dev": "https://github.com/angular/dev-infra-private-ng-dev-builds.git#3b5ad167338547109a5829586c172cbfb72837f9"
     "@angular/platform-browser": "npm:19.0.0-next.6"
     "@angular/platform-browser-dynamic": "npm:19.0.0-next.6"
     "@angular/platform-server": "npm:19.0.0-next.6"
@@ -850,9 +850,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#68d080d76124a3255475ef08200eeeec468154e0":
-  version: 0.0.0-12e38ba595aa3bbe4230e9568517c7309fca93bc
-  resolution: "@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#commit=68d080d76124a3255475ef08200eeeec468154e0"
+"@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#3b5ad167338547109a5829586c172cbfb72837f9":
+  version: 0.0.0-276e500c61c1fa82066ecfe212b2b0e538b0dbfd
+  resolution: "@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#commit=3b5ad167338547109a5829586c172cbfb72837f9"
   dependencies:
     "@octokit/rest": "npm:21.0.2"
     "@types/semver": "npm:^7.3.6"
@@ -866,7 +866,7 @@ __metadata:
     yaml: "npm:2.5.1"
   bin:
     ng-dev: ./bundles/cli.mjs
-  checksum: 10c0/26451b062522ea69e4642a061d034b6d6e4d90dbf91583c33388208aa0d786b54b22ee09809f7e6879a6256c7c32a074e4f0e3512f4e590949ce851ba8729c25
+  checksum: 10c0/d757833c4ae249c96426968323a3532ae2d8de6df367557ed10499b966e8be1bd996291c4f3e1d66fa71c7b63b66607f6908d2fc57203ff20a49a6f0a6cc58a0
   languageName: node
   linkType: hard
 
@@ -2970,16 +2970,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@inquirer/confirm@npm:3.2.0":
-  version: 3.2.0
-  resolution: "@inquirer/confirm@npm:3.2.0"
-  dependencies:
-    "@inquirer/core": "npm:^9.1.0"
-    "@inquirer/type": "npm:^1.5.3"
-  checksum: 10c0/a2cbfc8ae9c880bba4cce1993f5c399fb0d12741fdd574917c87fceb40ece62ffa60e35aaadf4e62d7c114f54008e45aee5d6d90497bb62d493996c02725d243
-  languageName: node
-  linkType: hard
-
 "@inquirer/confirm@npm:4.0.1, @inquirer/confirm@npm:^4.0.1":
   version: 4.0.1
   resolution: "@inquirer/confirm@npm:4.0.1"
@@ -2990,7 +2980,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@inquirer/core@npm:^9.1.0, @inquirer/core@npm:^9.2.1":
+"@inquirer/core@npm:^9.2.1":
   version: 9.2.1
   resolution: "@inquirer/core@npm:9.2.1"
   dependencies:
@@ -3124,7 +3114,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@inquirer/type@npm:^1.5.1, @inquirer/type@npm:^1.5.3":
+"@inquirer/type@npm:^1.5.1":
   version: 1.5.5
   resolution: "@inquirer/type@npm:1.5.5"
   dependencies:
@@ -3282,24 +3272,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@lmdb/lmdb-darwin-arm64@npm:3.1.0":
-  version: 3.1.0
-  resolution: "@lmdb/lmdb-darwin-arm64@npm:3.1.0"
-  conditions: os=darwin & cpu=arm64
-  languageName: node
-  linkType: hard
-
 "@lmdb/lmdb-darwin-arm64@npm:3.1.2":
   version: 3.1.2
   resolution: "@lmdb/lmdb-darwin-arm64@npm:3.1.2"
   conditions: os=darwin & cpu=arm64
-  languageName: node
-  linkType: hard
-
-"@lmdb/lmdb-darwin-x64@npm:3.1.0":
-  version: 3.1.0
-  resolution: "@lmdb/lmdb-darwin-x64@npm:3.1.0"
-  conditions: os=darwin & cpu=x64
   languageName: node
   linkType: hard
 
@@ -3310,24 +3286,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@lmdb/lmdb-linux-arm64@npm:3.1.0":
-  version: 3.1.0
-  resolution: "@lmdb/lmdb-linux-arm64@npm:3.1.0"
-  conditions: os=linux & cpu=arm64
-  languageName: node
-  linkType: hard
-
 "@lmdb/lmdb-linux-arm64@npm:3.1.2":
   version: 3.1.2
   resolution: "@lmdb/lmdb-linux-arm64@npm:3.1.2"
   conditions: os=linux & cpu=arm64
-  languageName: node
-  linkType: hard
-
-"@lmdb/lmdb-linux-arm@npm:3.1.0":
-  version: 3.1.0
-  resolution: "@lmdb/lmdb-linux-arm@npm:3.1.0"
-  conditions: os=linux & cpu=arm
   languageName: node
   linkType: hard
 
@@ -3338,24 +3300,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@lmdb/lmdb-linux-x64@npm:3.1.0":
-  version: 3.1.0
-  resolution: "@lmdb/lmdb-linux-x64@npm:3.1.0"
-  conditions: os=linux & cpu=x64
-  languageName: node
-  linkType: hard
-
 "@lmdb/lmdb-linux-x64@npm:3.1.2":
   version: 3.1.2
   resolution: "@lmdb/lmdb-linux-x64@npm:3.1.2"
   conditions: os=linux & cpu=x64
-  languageName: node
-  linkType: hard
-
-"@lmdb/lmdb-win32-x64@npm:3.1.0":
-  version: 3.1.0
-  resolution: "@lmdb/lmdb-win32-x64@npm:3.1.0"
-  conditions: os=win32 & cpu=x64
   languageName: node
   linkType: hard
 
@@ -12478,41 +12426,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lmdb@npm:3.1.0":
-  version: 3.1.0
-  resolution: "lmdb@npm:3.1.0"
-  dependencies:
-    "@lmdb/lmdb-darwin-arm64": "npm:3.1.0"
-    "@lmdb/lmdb-darwin-x64": "npm:3.1.0"
-    "@lmdb/lmdb-linux-arm": "npm:3.1.0"
-    "@lmdb/lmdb-linux-arm64": "npm:3.1.0"
-    "@lmdb/lmdb-linux-x64": "npm:3.1.0"
-    "@lmdb/lmdb-win32-x64": "npm:3.1.0"
-    msgpackr: "npm:^1.10.2"
-    node-addon-api: "npm:^6.1.0"
-    node-gyp: "npm:latest"
-    node-gyp-build-optional-packages: "npm:5.2.2"
-    ordered-binary: "npm:^1.4.1"
-    weak-lru-cache: "npm:^1.2.2"
-  dependenciesMeta:
-    "@lmdb/lmdb-darwin-arm64":
-      optional: true
-    "@lmdb/lmdb-darwin-x64":
-      optional: true
-    "@lmdb/lmdb-linux-arm":
-      optional: true
-    "@lmdb/lmdb-linux-arm64":
-      optional: true
-    "@lmdb/lmdb-linux-x64":
-      optional: true
-    "@lmdb/lmdb-win32-x64":
-      optional: true
-  bin:
-    download-lmdb-prebuilds: bin/download-prebuilds.js
-  checksum: 10c0/50ebcbece67af05b0f269ea8aa0d5a8da30b343cd0259c2d687d67335d4eda866a6f2057d1f5d7fd0c498e6a0fbf3d416ff6e5723852a0a8824cda44493db193
-  languageName: node
-  linkType: hard
-
 "lmdb@npm:3.1.2":
   version: 3.1.2
   resolution: "lmdb@npm:3.1.2"
@@ -14507,18 +14420,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"piscina@npm:4.6.1, piscina@npm:^4.4.0":
-  version: 4.6.1
-  resolution: "piscina@npm:4.6.1"
-  dependencies:
-    nice-napi: "npm:^1.0.2"
-  dependenciesMeta:
-    nice-napi:
-      optional: true
-  checksum: 10c0/2225fb42806f8d72bf09f2528bd65721b440dcc63ece957a9542a28b3b958be353dc48802fb11a8af66fdfd28a419300ed28e04573b8bf420e6dcfe63d6f58b5
-  languageName: node
-  linkType: hard
-
 "piscina@npm:4.7.0":
   version: 4.7.0
   resolution: "piscina@npm:4.7.0"
@@ -14528,6 +14429,18 @@ __metadata:
     "@napi-rs/nice":
       optional: true
   checksum: 10c0/d539857c9140d820173c78c9d6b7c20597ae4ff10a5060ff90ffc1d22a098eccd98f4d16073ce51c6d07e530079fa4d9a31ff7b4477b1411011e108b5b5689d4
+  languageName: node
+  linkType: hard
+
+"piscina@npm:^4.4.0":
+  version: 4.6.1
+  resolution: "piscina@npm:4.6.1"
+  dependencies:
+    nice-napi: "npm:^1.0.2"
+  dependenciesMeta:
+    nice-napi:
+      optional: true
+  checksum: 10c0/2225fb42806f8d72bf09f2528bd65721b440dcc63ece957a9542a28b3b958be353dc48802fb11a8af66fdfd28a419300ed28e04573b8bf420e6dcfe63d6f58b5
   languageName: node
   linkType: hard
 
@@ -15762,19 +15675,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"sass@npm:1.78.0, sass@npm:^1.69.5":
-  version: 1.78.0
-  resolution: "sass@npm:1.78.0"
-  dependencies:
-    chokidar: "npm:>=3.0.0 <4.0.0"
-    immutable: "npm:^4.0.0"
-    source-map-js: "npm:>=0.6.2 <2.0.0"
-  bin:
-    sass: sass.js
-  checksum: 10c0/6577a87c00b03a5a50f3a11b4b6592f28abce34e61812e381535a3b712151bd94db3ca06467d20395431e0f38a23f99e616d6859d771fb6d4617c359f590c48c
-  languageName: node
-  linkType: hard
-
 "sass@npm:1.79.1":
   version: 1.79.1
   resolution: "sass@npm:1.79.1"
@@ -15785,6 +15685,19 @@ __metadata:
   bin:
     sass: sass.js
   checksum: 10c0/187bc885bad2e81e5414a146c9e14a28f622b5aba5c1425f4dd6d8ef2045b66c69de93689503886a8d2cc55d6bcce97b05ee87b074628fefd03e762789f931d0
+  languageName: node
+  linkType: hard
+
+"sass@npm:^1.69.5":
+  version: 1.78.0
+  resolution: "sass@npm:1.78.0"
+  dependencies:
+    chokidar: "npm:>=3.0.0 <4.0.0"
+    immutable: "npm:^4.0.0"
+    source-map-js: "npm:>=0.6.2 <2.0.0"
+  bin:
+    sass: sass.js
+  checksum: 10c0/6577a87c00b03a5a50f3a11b4b6592f28abce34e61812e381535a3b712151bd94db3ca06467d20395431e0f38a23f99e616d6859d771fb6d4617c359f590c48c
   languageName: node
   linkType: hard
 
@@ -17859,49 +17772,6 @@ __metadata:
     core-util-is: "npm:1.0.2"
     extsprintf: "npm:^1.2.0"
   checksum: 10c0/37ccdf8542b5863c525128908ac80f2b476eed36a32cb944de930ca1e2e78584cc435c4b9b4c68d0fc13a47b45ff364b4be43aa74f8804f9050140f660fb660d
-  languageName: node
-  linkType: hard
-
-"vite@npm:5.4.4":
-  version: 5.4.4
-  resolution: "vite@npm:5.4.4"
-  dependencies:
-    esbuild: "npm:^0.21.3"
-    fsevents: "npm:~2.3.3"
-    postcss: "npm:^8.4.43"
-    rollup: "npm:^4.20.0"
-  peerDependencies:
-    "@types/node": ^18.0.0 || >=20.0.0
-    less: "*"
-    lightningcss: ^1.21.0
-    sass: "*"
-    sass-embedded: "*"
-    stylus: "*"
-    sugarss: "*"
-    terser: ^5.4.0
-  dependenciesMeta:
-    fsevents:
-      optional: true
-  peerDependenciesMeta:
-    "@types/node":
-      optional: true
-    less:
-      optional: true
-    lightningcss:
-      optional: true
-    sass:
-      optional: true
-    sass-embedded:
-      optional: true
-    stylus:
-      optional: true
-    sugarss:
-      optional: true
-    terser:
-      optional: true
-  bin:
-    vite: bin/vite.js
-  checksum: 10c0/2752e7dd5584ea7cc057742e8f5cbf2f2bd3a2bceb8794fbd3d52f1e88d362b5ac7f1c70be7a3d01b3d768320c8a8ad0df287fd72f253bf040423c36c67a3e89
   languageName: node
   linkType: hard
 
