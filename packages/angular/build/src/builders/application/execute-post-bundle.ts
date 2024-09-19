@@ -52,7 +52,7 @@ export async function executePostBundleSteps(
   const prerenderedRoutes: string[] = [];
 
   const {
-    baseHref = '/',
+    baseHref,
     serviceWorker,
     indexHtmlOptions,
     optimizationOptions,

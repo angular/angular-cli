@@ -305,13 +305,18 @@ export async function normalizeOptions(
 
   // Initial options to keep
   const {
+    /**
+     * Note: These default values should match those in schema.json.
+     * The reason these defaults are defined here is that, in certain internal builders,
+     * they are either not set or the options are provided.
+     */
+    baseHref = '/',
+    inlineStyleLanguage = 'css',
     allowedCommonJsDependencies,
     aot,
-    baseHref,
     crossOrigin,
     externalDependencies,
     extractLicenses,
-    inlineStyleLanguage = 'css',
     outExtension,
     serviceWorker,
     poll,

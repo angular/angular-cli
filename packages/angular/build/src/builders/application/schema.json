@@ -315,7 +315,8 @@
     },
     "baseHref": {
       "type": "string",
-      "description": "Base url for the application being built."
+      "description": "Specifies the base URL for the application, used to resolve all relative URLs within the app.",
+      "default": "/"
     },
     "verbose": {
       "type": "boolean",
