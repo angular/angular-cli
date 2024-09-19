@@ -661,7 +661,7 @@ __metadata:
     "@bazel/buildifier": "npm:7.3.1"
     "@bazel/concatjs": "patch:@bazel/concatjs@npm%3A5.8.1#~/.yarn/patches/@bazel-concatjs-npm-5.8.1-1bf81df846.patch"
     "@bazel/jasmine": "patch:@bazel/jasmine@npm%3A5.8.1#~/.yarn/patches/@bazel-jasmine-npm-5.8.1-3370fee155.patch"
-    "@bazel/runfiles": "npm:^5.8.1"
+    "@bazel/runfiles": "npm:^6.0.0"
     "@discoveryjs/json-ext": "npm:0.6.1"
     "@inquirer/confirm": "npm:4.0.1"
     "@inquirer/prompts": "npm:6.0.1"
@@ -969,7 +969,7 @@ __metadata:
     "@angular/platform-browser": "npm:19.0.0-next.6"
     "@angular/platform-server": "npm:19.0.0-next.6"
     "@angular/router": "npm:19.0.0-next.6"
-    "@bazel/runfiles": "npm:^5.8.1"
+    "@bazel/runfiles": "npm:^6.0.0"
     tslib: "npm:^2.3.0"
   peerDependencies:
     "@angular/common": ^19.0.0-next.0
@@ -2452,6 +2452,13 @@ __metadata:
   version: 5.8.1
   resolution: "@bazel/runfiles@npm:5.8.1"
   checksum: 10c0/c148ea89839240d918ea615c485fcd0e5c009215ddfa718cc7dd1c3f0e2e278eb8d291b6cd990cd8fc2ade161f98f2defbac8b9c2968e5c5bc4edb98e6ed6bc6
+  languageName: node
+  linkType: hard
+
+"@bazel/runfiles@npm:^6.0.0":
+  version: 6.3.0
+  resolution: "@bazel/runfiles@npm:6.3.0"
+  checksum: 10c0/3d79ae483fee2187a4656eb4a204045692e82ed7ef77c882818e4339936fe406eb1ef3c840b714a253dd1f3c036dc6ebcca635fcc6f9cdde03f980fe3c177d83
   languageName: node
   linkType: hard
 

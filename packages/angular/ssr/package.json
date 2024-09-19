@@ -28,7 +28,7 @@
     "@angular/platform-browser": "19.0.0-next.6",
     "@angular/platform-server": "19.0.0-next.6",
     "@angular/router": "19.0.0-next.6",
-    "@bazel/runfiles": "^5.8.1"
+    "@bazel/runfiles": "^6.0.0"
   },
   "schematics": "./schematics/collection.json",
   "repository": {
