@@ -7,6 +7,7 @@
  */
 
 import { BuilderContext } from '@angular-devkit/architect';
+import assert from 'node:assert';
 import { SourceFileCache } from '../../tools/esbuild/angular/source-file-cache';
 import { generateBudgetStats } from '../../tools/esbuild/budget-stats';
 import { BuildOutputFileType, BundlerContext } from '../../tools/esbuild/bundler-context';
@@ -18,13 +19,19 @@ import { calculateEstimatedTransferSizes, logBuildStats } from '../../tools/esbu
 import { BudgetCalculatorResult, checkBudgets } from '../../utils/bundle-calculator';
 import { shouldOptimizeChunks } from '../../utils/environment-options';
 import { resolveAssets } from '../../utils/resolve-assets';
+import {
+  SERVER_APP_ENGINE_MANIFEST_FILENAME,
+  generateAngularServerAppEngineManifest,
+} from '../../utils/server-rendering/manifest';
 import { getSupportedBrowsers } from '../../utils/supported-browsers';
 import { optimizeChunks } from './chunk-optimizer';
 import { executePostBundleSteps } from './execute-post-bundle';
 import { inlineI18n, loadActiveTranslations } from './i18n';
 import { NormalizedApplicationBuildOptions } from './options';
+import { OutputMode } from './schema';
 import { setupBundlerContexts } from './setup-bundling';
 
+// eslint-disable-next-line max-lines-per-function
 export async function executeBuild(
   options: NormalizedApplicationBuildOptions,
   context: BuilderContext,
@@ -36,8 +43,10 @@ export async function executeBuild(
     i18nOptions,
     optimizationOptions,
     assets,
+    outputMode,
     cacheOptions,
-    prerenderOptions,
+    serverEntryPoint,
+    baseHref,
     ssrOptions,
     verbose,
     colors,
@@ -160,6 +169,15 @@ export async function executeBuild(
     executionResult.htmlBaseHref = options.baseHref;
   }
 
+  // Create server app engine manifest
+  if (serverEntryPoint) {
+    executionResult.addOutputFile(
+      SERVER_APP_ENGINE_MANIFEST_FILENAME,
+      generateAngularServerAppEngineManifest(i18nOptions, baseHref, undefined),
+      BuildOutputFileType.ServerRoot,
+    );
+  }
+
   // Perform i18n translation inlining if enabled
   if (i18nOptions.shouldInline) {
     const result = await inlineI18n(options, executionResult, initialFiles);
@@ -183,8 +201,20 @@ export async function executeBuild(
     executionResult.assetFiles.push(...result.additionalAssets);
   }
 
-  if (prerenderOptions) {
+  if (serverEntryPoint) {
     const prerenderedRoutes = executionResult.prerenderedRoutes;
+
+    // Regenerate the manifest to append prerendered routes data. This is only needed if SSR is enabled.
+    if (outputMode === OutputMode.Server && Object.keys(prerenderedRoutes).length) {
+      const manifest = executionResult.outputFiles.find(
+        (f) => f.path === SERVER_APP_ENGINE_MANIFEST_FILENAME,
+      );
+      assert(manifest, `${SERVER_APP_ENGINE_MANIFEST_FILENAME} was not found in output files.`);
+      manifest.contents = new TextEncoder().encode(
+        generateAngularServerAppEngineManifest(i18nOptions, baseHref, prerenderedRoutes),
+      );
+    }
+
     executionResult.addOutputFile(
       'prerendered-routes.json',
       JSON.stringify({ routes: prerenderedRoutes }, null, 2),

@@ -40,6 +40,7 @@ export interface ApplicationBuilderOptions {
     namedChunks?: boolean;
     optimization?: OptimizationUnion;
     outputHashing?: OutputHashing;
+    outputMode?: OutputMode;
     outputPath: OutputPathUnion;
     poll?: number;
     polyfills?: string[];
@@ -99,13 +100,15 @@ export interface BuildOutputFile extends OutputFile {
 // @public (undocumented)
 export enum BuildOutputFileType {
     // (undocumented)
-    Browser = 1,
+    Browser = 0,
     // (undocumented)
-    Media = 2,
+    Media = 1,
     // (undocumented)
     Root = 4,
     // (undocumented)
-    Server = 3
+    ServerApplication = 2,
+    // (undocumented)
+    ServerRoot = 3
 }
 
 // @public

@@ -42,6 +42,7 @@ ESBUILD_TESTS = [
 
 WEBPACK_IGNORE_TESTS = [
     "tests/vite/**",
+    "tests/server-rendering/server-routes-*",
     "tests/commands/serve/ssr-http-requests-assets.js",
     "tests/build/prerender/http-requests-assets.js",
     "tests/build/prerender/error-with-sourcemaps.js",

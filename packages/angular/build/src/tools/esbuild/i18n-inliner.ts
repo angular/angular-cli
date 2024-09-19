@@ -44,7 +44,8 @@ export class I18nInliner {
     const files = new Map<string, Blob>();
     const pendingMaps = [];
     for (const file of options.outputFiles) {
-      if (file.type === BuildOutputFileType.Root) {
+      if (file.type === BuildOutputFileType.Root || file.type === BuildOutputFileType.ServerRoot) {
+        // Skip also the server entry-point.
         // Skip stats and similar files.
         continue;
       }

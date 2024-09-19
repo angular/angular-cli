@@ -7,9 +7,12 @@
  */
 
 import { BuilderContext } from '@angular-devkit/architect';
-import { join, posix } from 'node:path';
+import { join } from 'node:path';
 import { BuildOutputFileType, InitialFileRecord } from '../../tools/esbuild/bundler-context';
-import { ExecutionResult } from '../../tools/esbuild/bundler-execution-result';
+import {
+  ExecutionResult,
+  PrerenderedRoutesRecord,
+} from '../../tools/esbuild/bundler-execution-result';
 import { I18nInliner } from '../../tools/esbuild/i18n-inliner';
 import { maxWorkers } from '../../utils/environment-options';
 import { loadTranslations } from '../../utils/i18n-options';
@@ -28,7 +31,11 @@ export async function inlineI18n(
   options: NormalizedApplicationBuildOptions,
   executionResult: ExecutionResult,
   initialFiles: Map<string, InitialFileRecord>,
-): Promise<{ errors: string[]; warnings: string[]; prerenderedRoutes: string[] }> {
+): Promise<{
+  errors: string[];
+  warnings: string[];
+  prerenderedRoutes: PrerenderedRoutesRecord;
+}> {
   // Create the multi-threaded inliner with common options and the files generated from the build.
   const inliner = new I18nInliner(
     {
@@ -39,10 +46,14 @@ export async function inlineI18n(
     maxWorkers,
   );
 
-  const inlineResult: { errors: string[]; warnings: string[]; prerenderedRoutes: string[] } = {
+  const inlineResult: {
+    errors: string[];
+    warnings: string[];
+    prerenderedRoutes: PrerenderedRoutesRecord;
+  } = {
     errors: [],
     warnings: [],
-    prerenderedRoutes: [],
+    prerenderedRoutes: {},
   };
 
   // For each active locale, use the inliner to process the output files of the build.
@@ -95,15 +106,11 @@ export async function inlineI18n(
             destination: join(locale, assetFile.destination),
           });
         }
-
-        inlineResult.prerenderedRoutes.push(
-          ...generatedRoutes.map((route) => posix.join('/', locale, route)),
-        );
       } else {
-        inlineResult.prerenderedRoutes.push(...generatedRoutes);
         executionResult.assetFiles.push(...additionalAssets);
       }
 
+      inlineResult.prerenderedRoutes = { ...inlineResult.prerenderedRoutes, ...generatedRoutes };
       updatedOutputFiles.push(...localeOutputFiles);
     }
   } finally {
@@ -112,8 +119,10 @@ export async function inlineI18n(
 
   // Update the result with all localized files.
   executionResult.outputFiles = [
-    // Root files are not modified.
-    ...executionResult.outputFiles.filter(({ type }) => type === BuildOutputFileType.Root),
+    // Root and SSR entry files are not modified.
+    ...executionResult.outputFiles.filter(
+      ({ type }) => type === BuildOutputFileType.Root || type === BuildOutputFileType.ServerRoot,
+    ),
     // Updated files for each locale.
     ...updatedOutputFiles,
   ];

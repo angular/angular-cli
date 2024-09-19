@@ -47,10 +47,11 @@ export interface InitialFileRecord {
 }
 
 export enum BuildOutputFileType {
-  Browser = 1,
-  Media = 2,
-  Server = 3,
-  Root = 4,
+  Browser,
+  Media,
+  ServerApplication,
+  ServerRoot,
+  Root,
 }
 
 export interface BuildOutputFile extends OutputFile {
@@ -147,6 +148,7 @@ export class BundlerContext {
       }
 
       result.initialFiles.forEach((value, key) => initialFiles.set(key, value));
+
       outputFiles.push(...result.outputFiles);
       result.externalImports.browser?.forEach((value) => externalImportsBrowser.add(value));
       result.externalImports.server?.forEach((value) => externalImportsServer.add(value));
@@ -370,7 +372,10 @@ export class BundlerContext {
       if (!/\.([cm]?js|css|wasm)(\.map)?$/i.test(file.path)) {
         fileType = BuildOutputFileType.Media;
       } else if (this.#platformIsServer) {
-        fileType = BuildOutputFileType.Server;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        fileType = (result.metafile as any)['ng-ssr-entry-bundle']
+          ? BuildOutputFileType.ServerRoot
+          : BuildOutputFileType.ServerApplication;
       } else {
         fileType = BuildOutputFileType.Browser;
       }

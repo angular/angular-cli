@@ -88,7 +88,7 @@ export async function* buildApplicationInternal(
 
   yield* runEsBuildBuildAction(
     async (rebuildState) => {
-      const { prerenderOptions, jsonLogs } = normalizedOptions;
+      const { serverEntryPoint, jsonLogs } = normalizedOptions;
 
       const startTime = process.hrtime.bigint();
       const result = await executeBuild(normalizedOptions, context, rebuildState);
@@ -96,8 +96,8 @@ export async function* buildApplicationInternal(
       if (jsonLogs) {
         result.addLog(await createJsonBuildManifest(result, normalizedOptions));
       } else {
-        if (prerenderOptions) {
-          const prerenderedRoutesLength = result.prerenderedRoutes.length;
+        if (serverEntryPoint) {
+          const prerenderedRoutesLength = Object.keys(result.prerenderedRoutes).length;
           let prerenderMsg = `Prerendered ${prerenderedRoutesLength} static route`;
           prerenderMsg += prerenderedRoutesLength !== 1 ? 's.' : '.';
 
@@ -225,7 +225,11 @@ export async function* buildApplication(
     // Writes the output files to disk and ensures the containing directories are present
     const directoryExists = new Set<string>();
     await emitFilesToDisk(Object.entries(result.files), async ([filePath, file]) => {
-      if (outputOptions.ignoreServer && file.type === BuildOutputFileType.Server) {
+      if (
+        outputOptions.ignoreServer &&
+        (file.type === BuildOutputFileType.ServerApplication ||
+          file.type === BuildOutputFileType.ServerRoot)
+      ) {
         return;
       }
 
@@ -235,7 +239,8 @@ export async function* buildApplication(
         case BuildOutputFileType.Media:
           typeDirectory = outputOptions.browser;
           break;
-        case BuildOutputFileType.Server:
+        case BuildOutputFileType.ServerApplication:
+        case BuildOutputFileType.ServerRoot:
           typeDirectory = outputOptions.server;
           break;
         case BuildOutputFileType.Root:

@@ -12,6 +12,7 @@ import {
   createBrowserPolyfillBundleOptions,
   createServerMainCodeBundleOptions,
   createServerPolyfillBundleOptions,
+  createSsrEntryCodeBundleOptions,
 } from '../../tools/esbuild/application-code-bundle';
 import { BundlerContext } from '../../tools/esbuild/bundler-context';
 import { createGlobalScriptsBundleOptions } from '../../tools/esbuild/global-scripts';
@@ -36,9 +37,10 @@ export function setupBundlerContexts(
   codeBundleCache: SourceFileCache,
 ): BundlerContext[] {
   const {
+    outputMode,
+    serverEntryPoint,
     appShellOptions,
     prerenderOptions,
-    serverEntryPoint,
     ssrOptions,
     workspaceRoot,
     watch = false,
@@ -90,9 +92,9 @@ export function setupBundlerContexts(
   }
 
   // Skip server build when none of the features are enabled.
-  if (serverEntryPoint && (prerenderOptions || appShellOptions || ssrOptions)) {
+  if (serverEntryPoint && (outputMode || prerenderOptions || appShellOptions || ssrOptions)) {
     const nodeTargets = [...target, ...getSupportedNodeTargets()];
-    // Server application code
+
     bundlerContexts.push(
       new BundlerContext(
         workspaceRoot,
@@ -100,6 +102,17 @@ export function setupBundlerContexts(
         createServerMainCodeBundleOptions(options, nodeTargets, codeBundleCache),
       ),
     );
+
+    if (outputMode && ssrOptions?.entry) {
+      // New behavior introduced: 'server.ts' is now bundled separately from 'main.server.ts'.
+      bundlerContexts.push(
+        new BundlerContext(
+          workspaceRoot,
+          watch,
+          createSsrEntryCodeBundleOptions(options, nodeTargets, codeBundleCache),
+        ),
+      );
+    }
 
     // Server polyfills code
     const serverPolyfillBundleOptions = createServerPolyfillBundleOptions(

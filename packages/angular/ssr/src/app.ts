@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { StaticProvider, ɵresetCompiledComponents } from '@angular/core';
+import { LOCALE_ID, StaticProvider, ɵresetCompiledComponents } from '@angular/core';
 import { ServerAssets } from './assets';
 import { Hooks } from './hooks';
 import { getAngularAppManifest } from './manifest';
@@ -172,7 +172,10 @@ export class AngularServerApp {
       // Initialize the response with status and headers if available.
       responseInit = {
         status,
-        headers: headers ? new Headers(headers) : undefined,
+        headers: new Headers({
+          'Content-Type': 'text/html;charset=UTF-8',
+          ...headers,
+        }),
       };
 
       if (renderMode === RenderMode.Client) {
@@ -196,7 +199,18 @@ export class AngularServerApp {
       );
     }
 
-    const { manifest, hooks, assets } = this;
+    const {
+      manifest: { bootstrap, inlineCriticalCss, locale },
+      hooks,
+      assets,
+    } = this;
+
+    if (locale !== undefined) {
+      platformProviders.push({
+        provide: LOCALE_ID,
+        useValue: locale,
+      });
+    }
 
     let html = await assets.getIndexServerHtml();
     // Skip extra microtask if there are no pre hooks.
@@ -204,7 +218,7 @@ export class AngularServerApp {
       html = await hooks.run('html:transform:pre', { html });
     }
 
-    this.boostrap ??= await manifest.bootstrap();
+    this.boostrap ??= await bootstrap();
 
     html = await renderAngular(
       html,
@@ -214,7 +228,7 @@ export class AngularServerApp {
       SERVER_CONTEXT_VALUE[renderMode],
     );
 
-    if (manifest.inlineCriticalCss) {
+    if (inlineCriticalCss) {
       // Optionally inline critical CSS.
       this.inlineCriticalCssProcessor ??= new InlineCriticalCssProcessor((path: string) => {
         const fileName = path.split('/').pop() ?? path;

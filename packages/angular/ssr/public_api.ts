@@ -12,7 +12,7 @@ export { AngularAppEngine } from './src/app-engine';
 
 export {
   type PrerenderFallback,
-  type RenderMode,
   type ServerRoute,
   provideServerRoutesConfig,
+  RenderMode,
 } from './src/routes/route-config';

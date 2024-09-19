@@ -10,7 +10,7 @@ import type { AngularServerApp } from './app';
 import { Hooks } from './hooks';
 import { getPotentialLocaleIdFromUrl } from './i18n';
 import { EntryPointExports, getAngularAppEngineManifest } from './manifest';
-import { stripIndexHtmlFromURL } from './utils/url';
+import { stripIndexHtmlFromURL, stripTrailingSlash } from './utils/url';
 
 /**
  * Angular server application engine.
@@ -116,7 +116,7 @@ export class AngularAppEngine {
     }
 
     const { pathname } = stripIndexHtmlFromURL(new URL(request.url));
-    const headers = this.manifest.staticPathsHeaders.get(pathname);
+    const headers = this.manifest.staticPathsHeaders.get(stripTrailingSlash(pathname));
 
     return new Map(headers);
   }

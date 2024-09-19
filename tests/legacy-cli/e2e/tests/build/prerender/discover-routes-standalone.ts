@@ -111,15 +111,15 @@ export default async function () {
       // prerendered-routes.json file is only generated when using esbuild.
       const generatedRoutesStats = await readFile('dist/test-project/prerendered-routes.json');
       deepStrictEqual(JSON.parse(generatedRoutesStats), {
-        routes: [
-          '/',
-          '/lazy-one',
-          '/lazy-one/lazy-one-child',
-          '/lazy-two',
-          '/two',
-          '/two/two-child-one',
-          '/two/two-child-two',
-        ],
+        routes: {
+          '/': {},
+          '/lazy-one': {},
+          '/lazy-one/lazy-one-child': {},
+          '/lazy-two': {},
+          '/two': {},
+          '/two/two-child-one': {},
+          '/two/two-child-two': {},
+        },
       });
     }
   }

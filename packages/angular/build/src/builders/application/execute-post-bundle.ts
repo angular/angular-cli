@@ -12,7 +12,10 @@ import {
   BuildOutputFileType,
   InitialFileRecord,
 } from '../../tools/esbuild/bundler-context';
-import { BuildOutputAsset } from '../../tools/esbuild/bundler-execution-result';
+import {
+  BuildOutputAsset,
+  PrerenderedRoutesRecord,
+} from '../../tools/esbuild/bundler-execution-result';
 import { generateIndexHtml } from '../../tools/esbuild/index-html-generator';
 import { createOutputFile } from '../../tools/esbuild/utils';
 import { maxWorkers } from '../../utils/environment-options';
@@ -20,9 +23,14 @@ import {
   SERVER_APP_MANIFEST_FILENAME,
   generateAngularServerAppManifest,
 } from '../../utils/server-rendering/manifest';
+import {
+  RouteRenderMode,
+  WritableSerializableRouteTreeNode,
+} from '../../utils/server-rendering/models';
 import { prerenderPages } from '../../utils/server-rendering/prerender';
 import { augmentAppWithServiceWorkerEsbuild } from '../../utils/service-worker';
 import { INDEX_HTML_SERVER, NormalizedApplicationBuildOptions } from './options';
+import { OutputMode } from './schema';
 
 /**
  * Run additional builds steps including SSG, AppShell, Index HTML file and Service worker generation.
@@ -43,13 +51,13 @@ export async function executePostBundleSteps(
   warnings: string[];
   additionalOutputFiles: BuildOutputFile[];
   additionalAssets: BuildOutputAsset[];
-  prerenderedRoutes: string[];
+  prerenderedRoutes: PrerenderedRoutesRecord;
 }> {
   const additionalAssets: BuildOutputAsset[] = [];
   const additionalOutputFiles: BuildOutputFile[] = [];
   const allErrors: string[] = [];
   const allWarnings: string[] = [];
-  const prerenderedRoutes: string[] = [];
+  const prerenderedRoutes: PrerenderedRoutesRecord = {};
 
   const {
     baseHref = '/',
@@ -57,11 +65,12 @@ export async function executePostBundleSteps(
     indexHtmlOptions,
     optimizationOptions,
     sourcemapOptions,
-    ssrOptions,
+    outputMode,
+    serverEntryPoint,
     prerenderOptions,
     appShellOptions,
     workspaceRoot,
-    verbose,
+    disableFullServerManifestGeneration,
   } = options;
 
   // Index HTML content without CSS inlining to be used for server rendering (AppShell, SSG and SSR).
@@ -91,13 +100,13 @@ export async function executePostBundleSteps(
     if (ssrContent) {
       additionalHtmlOutputFiles.set(
         INDEX_HTML_SERVER,
-        createOutputFile(INDEX_HTML_SERVER, ssrContent, BuildOutputFileType.Server),
+        createOutputFile(INDEX_HTML_SERVER, ssrContent, BuildOutputFileType.ServerApplication),
       );
     }
   }
 
   // Create server manifest
-  if (prerenderOptions || appShellOptions || ssrOptions) {
+  if (serverEntryPoint) {
     additionalOutputFiles.push(
       createOutputFile(
         SERVER_APP_MANIFEST_FILENAME,
@@ -106,44 +115,41 @@ export async function executePostBundleSteps(
           outputFiles,
           optimizationOptions.styles.inlineCritical ?? false,
           undefined,
+          locale,
         ),
-        BuildOutputFileType.Server,
+        BuildOutputFileType.ServerApplication,
       ),
     );
   }
 
   // Pre-render (SSG) and App-shell
   // If localization is enabled, prerendering is handled in the inlining process.
-  if ((prerenderOptions || appShellOptions) && !allErrors.length) {
+  if (
+    !disableFullServerManifestGeneration &&
+    (prerenderOptions || appShellOptions || (outputMode && serverEntryPoint)) &&
+    !allErrors.length
+  ) {
     assert(
       indexHtmlOptions,
       'The "index" option is required when using the "ssg" or "appShell" options.',
     );
 
-    const {
-      output,
-      warnings,
-      errors,
-      prerenderedRoutes: generatedRoutes,
-      serializableRouteTreeNode,
-    } = await prerenderPages(
+    const { output, warnings, errors, serializableRouteTreeNode } = await prerenderPages(
       workspaceRoot,
       baseHref,
       appShellOptions,
       prerenderOptions,
       [...outputFiles, ...additionalOutputFiles],
       assetFiles,
+      outputMode,
       sourcemapOptions.scripts,
       maxWorkers,
-      verbose,
     );
 
     allErrors.push(...errors);
     allWarnings.push(...warnings);
-    prerenderedRoutes.push(...Array.from(generatedRoutes));
 
-    const indexHasBeenPrerendered = generatedRoutes.has(indexHtmlOptions.output);
-
+    const indexHasBeenPrerendered = output[indexHtmlOptions.output];
     for (const [path, { content, appShellRoute }] of Object.entries(output)) {
       // Update the index contents with the app shell under these conditions:
       // - Replace 'index.html' with the app shell only if it hasn't been prerendered yet.
@@ -155,7 +161,26 @@ export async function executePostBundleSteps(
       );
     }
 
-    if (ssrOptions) {
+    const serializableRouteTreeNodeForManifest: WritableSerializableRouteTreeNode = [];
+
+    for (const metadata of serializableRouteTreeNode) {
+      switch (metadata.renderMode) {
+        case RouteRenderMode.Prerender:
+        case /* Legacy building mode */ undefined: {
+          if (!metadata.redirectTo || outputMode === OutputMode.Static) {
+            prerenderedRoutes[metadata.route] = { headers: metadata.headers };
+          }
+          break;
+        }
+        case RouteRenderMode.Server:
+        case RouteRenderMode.Client:
+          serializableRouteTreeNodeForManifest.push(metadata);
+
+          break;
+      }
+    }
+
+    if (outputMode === OutputMode.Server) {
       // Regenerate the manifest to append route tree. This is only needed if SSR is enabled.
       const manifest = additionalOutputFiles.find((f) => f.path === SERVER_APP_MANIFEST_FILENAME);
       assert(manifest, `${SERVER_APP_MANIFEST_FILENAME} was not found in output files.`);
@@ -165,7 +190,8 @@ export async function executePostBundleSteps(
           additionalHtmlOutputFiles,
           outputFiles,
           optimizationOptions.styles.inlineCritical ?? false,
-          serializableRouteTreeNode,
+          serializableRouteTreeNodeForManifest,
+          locale,
         ),
       );
     }

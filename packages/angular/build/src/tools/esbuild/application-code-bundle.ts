@@ -12,7 +12,10 @@ import { createHash } from 'node:crypto';
 import { extname, relative } from 'node:path';
 import type { NormalizedApplicationBuildOptions } from '../../builders/application/options';
 import { allowMangle } from '../../utils/environment-options';
-import { SERVER_APP_MANIFEST_FILENAME } from '../../utils/server-rendering/manifest';
+import {
+  SERVER_APP_ENGINE_MANIFEST_FILENAME,
+  SERVER_APP_MANIFEST_FILENAME,
+} from '../../utils/server-rendering/manifest';
 import { createCompilerPlugin } from './angular/compiler-plugin';
 import { SourceFileCache } from './angular/source-file-cache';
 import { BundlerOptionsFactory } from './bundler-context';
@@ -220,6 +223,7 @@ export function createServerMainCodeBundleOptions(
   const {
     serverEntryPoint: mainServerEntryPoint,
     workspaceRoot,
+    outputMode,
     externalPackages,
     ssrOptions,
     polyfills,
@@ -245,8 +249,9 @@ export function createServerMainCodeBundleOptions(
   };
 
   const ssrEntryPoint = ssrOptions?.entry;
+  const isOldBehaviour = !outputMode;
 
-  if (ssrEntryPoint) {
+  if (ssrEntryPoint && isOldBehaviour) {
     // Old behavior: 'server.ts' was bundled together with the SSR (Server-Side Rendering) code.
     // This approach combined server-side logic and rendering into a single bundle.
     entryPoints['server'] = ssrEntryPoint;
@@ -329,6 +334,143 @@ export function createServerMainCodeBundleOptions(
             ɵextractRoutesAndCreateRouteTree,
             ɵgetOrCreateAngularServerApp,
           } from '@angular/ssr';`,
+        ];
+
+        return {
+          contents: contents.join('\n'),
+          loader: 'js',
+          resolveDir: workspaceRoot,
+        };
+      },
+    }),
+  );
+
+  if (options.plugins) {
+    buildOptions.plugins.push(...options.plugins);
+  }
+
+  return buildOptions;
+}
+
+export function createSsrEntryCodeBundleOptions(
+  options: NormalizedApplicationBuildOptions,
+  target: string[],
+  sourceFileCache: SourceFileCache,
+): BuildOptions {
+  const { workspaceRoot, ssrOptions, externalPackages } = options;
+  const serverEntryPoint = ssrOptions?.entry;
+  assert(
+    serverEntryPoint,
+    'createSsrEntryCodeBundleOptions should not be called without a defined serverEntryPoint.',
+  );
+
+  const { pluginOptions, styleOptions } = createCompilerPluginOptions(
+    options,
+    target,
+    sourceFileCache,
+  );
+
+  const ssrEntryNamespace = 'angular:ssr-entry';
+  const ssrInjectManifestNamespace = 'angular:ssr-entry-inject-manifest';
+  const ssrInjectRequireNamespace = 'angular:ssr-entry-inject-require';
+  const buildOptions: BuildOptions = {
+    ...getEsBuildServerCommonOptions(options),
+    target,
+    entryPoints: {
+      // TODO: consider renaming to index
+      'server': ssrEntryNamespace,
+    },
+    supported: getFeatureSupport(target, true),
+    plugins: [
+      createSourcemapIgnorelistPlugin(),
+      createCompilerPlugin(
+        // JS/TS options
+        { ...pluginOptions, noopTypeScriptCompilation: true },
+        // Component stylesheet options
+        styleOptions,
+      ),
+    ],
+    inject: [ssrInjectRequireNamespace, ssrInjectManifestNamespace],
+  };
+
+  buildOptions.plugins ??= [];
+
+  if (externalPackages) {
+    buildOptions.packages = 'external';
+  } else {
+    buildOptions.plugins.push(createRxjsEsmResolutionPlugin());
+  }
+
+  // Mark manifest file as external. As this will be generated later on.
+  (buildOptions.external ??= []).push('*/main.server.mjs', ...SERVER_GENERATED_EXTERNALS);
+
+  buildOptions.plugins.push(
+    {
+      name: 'angular-ssr-metadata',
+      setup(build) {
+        build.onEnd((result) => {
+          if (result.metafile) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (result.metafile as any)['ng-ssr-entry-bundle'] = true;
+          }
+        });
+      },
+    },
+    createVirtualModulePlugin({
+      namespace: ssrInjectRequireNamespace,
+      cache: sourceFileCache?.loadResultCache,
+      loadContent: () => {
+        const contents: string[] = [
+          // Note: Needed as esbuild does not provide require shims / proxy from ESModules.
+          // See: https://github.com/evanw/esbuild/issues/1921.
+          `import { createRequire } from 'node:module';`,
+          `globalThis['require'] ??= createRequire(import.meta.url);`,
+        ];
+
+        return {
+          contents: contents.join('\n'),
+          loader: 'js',
+          resolveDir: workspaceRoot,
+        };
+      },
+    }),
+    createVirtualModulePlugin({
+      namespace: ssrInjectManifestNamespace,
+      cache: sourceFileCache?.loadResultCache,
+      loadContent: () => {
+        const contents: string[] = [
+          // Configure `@angular/ssr` app engine manifest.
+          `import manifest from './${SERVER_APP_ENGINE_MANIFEST_FILENAME}';`,
+          `import { ɵsetAngularAppEngineManifest } from '@angular/ssr';`,
+          `ɵsetAngularAppEngineManifest(manifest);`,
+        ];
+
+        return {
+          contents: contents.join('\n'),
+          loader: 'js',
+          resolveDir: workspaceRoot,
+        };
+      },
+    }),
+    createVirtualModulePlugin({
+      namespace: ssrEntryNamespace,
+      cache: sourceFileCache?.loadResultCache,
+      loadContent: () => {
+        const serverEntryPointJsImport = entryFileToWorkspaceRelative(
+          workspaceRoot,
+          serverEntryPoint,
+        );
+        const contents: string[] = [
+          // Re-export all symbols including default export
+          `import * as server from '${serverEntryPointJsImport}';`,
+          `export * from '${serverEntryPointJsImport}';`,
+          // The below is needed to avoid
+          // `Import "default" will always be undefined because there is no matching export` warning when no default is present.
+          `const defaultExportName = 'default';`,
+          `export default server[defaultExportName]`,
+
+          // Add @angular/ssr exports
+          `export { AngularAppEngine } from '@angular/ssr';`,
         ];
 
         return {

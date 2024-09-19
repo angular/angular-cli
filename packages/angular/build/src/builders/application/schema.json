@@ -528,6 +528,11 @@
       "type": "boolean",
       "description": "Generates an application shell during build time.",
       "default": false
+    },
+    "outputMode": {
+      "type": "string",
+      "description": "Defines the build output target. 'static': Generates a static site for deployment on any static hosting service. 'server': Produces an application designed for deployment on a server that supports server-side rendering (SSR).",
+      "enum": ["static", "server"]
     }
   },
   "additionalProperties": false,
