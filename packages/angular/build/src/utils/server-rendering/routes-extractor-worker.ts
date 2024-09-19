@@ -6,33 +6,27 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import type { ɵextractRoutesAndCreateRouteTree } from '@angular/ssr';
-import type { ESMInMemoryFileLoaderWorkerData } from './esm-in-memory-loader/loader-hooks';
+import { OutputMode } from '../../builders/application/schema';
 import { patchFetchToLoadInMemoryAssets } from './fetch-patch';
 import { loadEsmModuleFromMemory } from './load-esm-from-memory';
+import { RoutersExtractorWorkerResult } from './models';
 
-export interface RoutesExtractorWorkerData extends ESMInMemoryFileLoaderWorkerData {
-  assetFiles: Record</** Destination */ string, /** Source */ string>;
-}
-
-export type SerializableRouteTreeNode = ReturnType<
-  Awaited<ReturnType<typeof ɵextractRoutesAndCreateRouteTree>>['routeTree']['toObject']
->;
-
-export interface RoutersExtractorWorkerResult {
-  serializedRouteTree: SerializableRouteTreeNode;
-  errors: string[];
+export interface ExtractRoutesOptions {
+  outputMode?: OutputMode;
 }
 
 /** Renders an application based on a provided options. */
-async function extractRoutes(): Promise<RoutersExtractorWorkerResult> {
+async function extractRoutes({
+  outputMode,
+}: ExtractRoutesOptions): Promise<RoutersExtractorWorkerResult> {
   const { ɵextractRoutesAndCreateRouteTree: extractRoutesAndCreateRouteTree } =
     await loadEsmModuleFromMemory('./main.server.mjs');
 
   const { routeTree, errors } = await extractRoutesAndCreateRouteTree(
     new URL('http://local-angular-prerender/'),
-    /** manifest */ undefined,
-    /** invokeGetPrerenderParams */ true,
+    undefined /** manifest */,
+    true /** invokeGetPrerenderParams */,
+    outputMode === OutputMode.Server /** includePrerenderFallbackRoutes */,
   );
 
   return {

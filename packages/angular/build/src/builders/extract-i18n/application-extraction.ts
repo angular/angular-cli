@@ -17,6 +17,7 @@ import type {
   ApplicationBuilderInternalOptions,
 } from '../application/options';
 import { ResultFile, ResultKind } from '../application/results';
+import { OutputMode } from '../application/schema';
 import type { NormalizedExtractI18nOptions } from './options';
 
 export async function extractMessages(
@@ -44,10 +45,8 @@ export async function extractMessages(
   buildOptions.budgets = undefined;
   buildOptions.index = false;
   buildOptions.serviceWorker = false;
-
-  buildOptions.ssr = false;
-  buildOptions.appShell = false;
-  buildOptions.prerender = false;
+  buildOptions.outputMode = OutputMode.Static;
+  buildOptions.server = undefined;
 
   // Build the application with the build options
   const builderResult = await first(buildApplicationInternal(buildOptions, context, extensions));

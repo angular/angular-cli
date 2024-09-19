@@ -31,6 +31,8 @@ export interface ExternalResultMetadata {
   explicit: string[];
 }
 
+export type PrerenderedRoutesRecord = Record<string, { headers?: Record<string, string> }>;
+
 /**
  * Represents the result of a single builder execute call.
  */
@@ -38,7 +40,7 @@ export class ExecutionResult {
   outputFiles: BuildOutputFile[] = [];
   assetFiles: BuildOutputAsset[] = [];
   errors: (Message | PartialMessage)[] = [];
-  prerenderedRoutes: string[] = [];
+  prerenderedRoutes: PrerenderedRoutesRecord = {};
   warnings: (Message | PartialMessage)[] = [];
   logs: string[] = [];
   externalMetadata?: ExternalResultMetadata;
@@ -77,10 +79,16 @@ export class ExecutionResult {
     }
   }
 
-  addPrerenderedRoutes(routes: string[]): void {
-    this.prerenderedRoutes.push(...routes);
+  addPrerenderedRoutes(routes: PrerenderedRoutesRecord): void {
+    Object.assign(this.prerenderedRoutes, routes);
+
     // Sort the prerendered routes.
-    this.prerenderedRoutes.sort((a, b) => a.localeCompare(b));
+    const sortedObj: PrerenderedRoutesRecord = {};
+    for (const key of Object.keys(this.prerenderedRoutes).sort()) {
+      sortedObj[key] = this.prerenderedRoutes[key];
+    }
+
+    this.prerenderedRoutes = sortedObj;
   }
 
   addWarning(error: PartialMessage | string): void {

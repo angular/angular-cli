@@ -39,7 +39,7 @@ export function generateBudgetStats(
     }
 
     // Exclude server bundles
-    if (type === BuildOutputFileType.Server) {
+    if (type === BuildOutputFileType.ServerApplication || type === BuildOutputFileType.ServerRoot) {
       continue;
     }
 

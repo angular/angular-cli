@@ -114,7 +114,7 @@ describe('AngularServerApp', () => {
       expect(Object.fromEntries(headers)).toEqual({
         'cache-control': 'no-cache',
         'x-some-header': 'value',
-        'content-type': 'text/plain;charset=UTF-8',
+        'content-type': 'text/html;charset=UTF-8',
       });
     });
 
@@ -122,7 +122,7 @@ describe('AngularServerApp', () => {
       const response = await app.render(new Request('http://localhost/home'));
       const headers = response?.headers.entries() ?? [];
       expect(Object.fromEntries(headers)).toEqual({
-        'content-type': 'text/plain;charset=UTF-8', // default header
+        'content-type': 'text/html;charset=UTF-8', // default header
       });
     });
 

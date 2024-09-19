@@ -15,11 +15,19 @@ import { pathToFileURL } from 'node:url';
 import { brotliCompress } from 'node:zlib';
 import { coerce } from 'semver';
 import { NormalizedApplicationBuildOptions } from '../../builders/application/options';
+import { OutputMode } from '../../builders/application/schema';
 import { BudgetCalculatorResult } from '../../utils/bundle-calculator';
-import { SERVER_APP_MANIFEST_FILENAME } from '../../utils/server-rendering/manifest';
+import {
+  SERVER_APP_ENGINE_MANIFEST_FILENAME,
+  SERVER_APP_MANIFEST_FILENAME,
+} from '../../utils/server-rendering/manifest';
 import { BundleStats, generateEsbuildBuildStatsTable } from '../../utils/stats-table';
 import { BuildOutputFile, BuildOutputFileType, InitialFileRecord } from './bundler-context';
-import { BuildOutputAsset, ExecutionResult } from './bundler-execution-result';
+import {
+  BuildOutputAsset,
+  ExecutionResult,
+  PrerenderedRoutesRecord,
+} from './bundler-execution-result';
 
 export function logBuildStats(
   metafile: Metafile,
@@ -48,7 +56,8 @@ export function logBuildStats(
       continue;
     }
 
-    const isPlatformServer = type === BuildOutputFileType.Server;
+    const isPlatformServer =
+      type === BuildOutputFileType.ServerApplication || type === BuildOutputFileType.ServerRoot;
     if (isPlatformServer && !ssrOutputEnabled) {
       // Only log server build stats when SSR is enabled.
       continue;
@@ -412,7 +421,7 @@ interface BuildManifest {
     server?: URL | undefined;
     browser: URL;
   };
-  prerenderedRoutes?: string[];
+  prerenderedRoutes: PrerenderedRoutesRecord;
 }
 
 export async function createJsonBuildManifest(
@@ -423,6 +432,7 @@ export async function createJsonBuildManifest(
     colors: color,
     outputOptions: { base, server, browser },
     ssrOptions,
+    outputMode,
   } = normalizedOptions;
 
   const { warnings, errors, prerenderedRoutes } = result;
@@ -433,7 +443,10 @@ export async function createJsonBuildManifest(
     outputPaths: {
       root: pathToFileURL(base),
       browser: pathToFileURL(join(base, browser)),
-      server: ssrOptions ? pathToFileURL(join(base, server)) : undefined,
+      server:
+        outputMode !== OutputMode.Static && ssrOptions
+          ? pathToFileURL(join(base, server))
+          : undefined,
     },
     prerenderedRoutes,
   };
@@ -495,4 +508,5 @@ export function getEntryPointName(entryPoint: string): string {
 export const SERVER_GENERATED_EXTERNALS = new Set([
   './polyfills.server.mjs',
   './' + SERVER_APP_MANIFEST_FILENAME,
+  './' + SERVER_APP_ENGINE_MANIFEST_FILENAME,
 ]);

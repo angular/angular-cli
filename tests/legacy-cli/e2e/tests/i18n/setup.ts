@@ -102,10 +102,11 @@ export async function setupI18nConfig() {
     `
     import { Component, Inject, LOCALE_ID } from '@angular/core';
     import { DatePipe } from '@angular/common';
+    import { RouterOutlet } from '@angular/router';
 
     @Component({
       selector: 'app-root',
-      imports: [DatePipe],
+      imports: [DatePipe, RouterOutlet],
       standalone: true,
       templateUrl: './app.component.html'
     })
@@ -124,6 +125,7 @@ export async function setupI18nConfig() {
     <p id="locale">{{ locale }}</p>
     <p id="date">{{ jan | date : 'LLLL' }}</p>
     <p id="plural" i18n>Updated {minutes, plural, =0 {just now} =1 {one minute ago} other {{{minutes}} minutes ago}}</p>
+    <router-outlet></router-outlet>
   `,
   );
 

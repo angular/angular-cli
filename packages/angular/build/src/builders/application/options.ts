@@ -29,6 +29,7 @@ import {
   Schema as ApplicationBuilderOptions,
   I18NTranslation,
   OutputHashing,
+  OutputMode,
   OutputPathClass,
 } from './schema';
 
@@ -79,6 +80,16 @@ interface InternalOptions {
    * This is only used by the development server which currently only supports a single locale per build.
    */
   forceI18nFlatOutput?: boolean;
+
+  /**
+   * When set to `true`, disables the generation of a full manifest with routes.
+   *
+   * This option is primarily used during development to improve performance,
+   * as the full manifest is generated at runtime when using the development server.
+   *
+   * @default false
+   */
+  disableFullServerManifestGeneration?: boolean;
 }
 
 /** Full set of options for `application` builder. */
@@ -179,6 +190,37 @@ export async function normalizeOptions(
     }
   }
 
+  // Validate prerender and ssr options when using the outputMode
+  if (options.outputMode === OutputMode.Server) {
+    if (!options.server) {
+      throw new Error('The "server" option is required when "outputMode" is set to "server".');
+    }
+
+    if (typeof options.ssr === 'boolean' || !options.ssr?.entry) {
+      throw new Error('The "ssr.entry" option is required when "outputMode" is set to "server".');
+    }
+  }
+
+  if (options.outputMode) {
+    if (!options.server) {
+      options.ssr = false;
+    }
+
+    if (options.prerender) {
+      context.logger.warn(
+        'The "prerender" option is no longer needed when "outputMode" is specified.',
+      );
+    } else {
+      options.prerender = !!options.server;
+    }
+
+    if (options.appShell) {
+      context.logger.warn(
+        'The "appShell" option is no longer needed when "outputMode" is specified.',
+      );
+    }
+  }
+
   // A configuration file can exist in the project or workspace root
   const searchDirectories = await generateSearchDirectories([projectRoot, workspaceRoot]);
   const postcssConfiguration = await loadPostcssConfiguration(searchDirectories);
@@ -235,7 +277,10 @@ export async function normalizeOptions(
     clean: options.deleteOutputPath ?? true,
     // For app-shell and SSG server files are not required by users.
     // Omit these when SSR is not enabled.
-    ignoreServer: ssrOptions === undefined || serverEntryPoint === undefined,
+    ignoreServer:
+      ((ssrOptions === undefined || serverEntryPoint === undefined) &&
+        options.outputMode === undefined) ||
+      options.outputMode === OutputMode.Static,
   };
 
   const outputNames = {
@@ -317,6 +362,7 @@ export async function normalizeOptions(
     poll,
     polyfills,
     statsJson,
+    outputMode,
     stylePreprocessorOptions,
     subresourceIntegrity,
     verbose,
@@ -328,6 +374,7 @@ export async function normalizeOptions(
     deployUrl,
     clearScreen,
     define,
+    disableFullServerManifestGeneration = false,
   } = options;
 
   // Return all the normalized options
@@ -352,6 +399,7 @@ export async function normalizeOptions(
     serverEntryPoint,
     prerenderOptions,
     appShellOptions,
+    outputMode,
     ssrOptions,
     verbose,
     watch,
@@ -387,6 +435,7 @@ export async function normalizeOptions(
     colors: supportColor(),
     clearScreen,
     define,
+    disableFullServerManifestGeneration,
   };
 }
 
