@@ -10,7 +10,7 @@
     "sdk",
     "Angular DevKit"
   ],
-  "packageManager": "yarn@4.4.0",
+  "packageManager": "yarn@4.5.0",
   "scripts": {
     "admin": "node --no-warnings=ExperimentalWarning --loader ts-node/esm/transpile-only ./scripts/devkit-admin.mjs",
     "test": "bazel test //packages/...",
