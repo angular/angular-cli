@@ -9,6 +9,7 @@
 import type { ɵgetOrCreateAngularServerApp as getOrCreateAngularServerApp } from '@angular/ssr';
 import type { ServerResponse } from 'node:http';
 import type { Connect, ViteDevServer } from 'vite';
+import { loadEsmModule } from '../../../utils/load-esm';
 
 export function createAngularSSRMiddleware(
   server: ViteDevServer,
@@ -30,6 +31,9 @@ export function createAngularSSRMiddleware(
     const url = new URL(req.url, baseUrl);
 
     (async () => {
+      const { writeResponseToNodeResponse, createWebRequestFromNodeRequest } =
+        await loadEsmModule<typeof import('@angular/ssr/node')>('@angular/ssr/node');
+
       const { ɵgetOrCreateAngularServerApp } = (await server.ssrLoadModule('/main.server.mjs')) as {
         ɵgetOrCreateAngularServerApp: typeof getOrCreateAngularServerApp;
       };
@@ -46,20 +50,15 @@ export function createAngularSSRMiddleware(
         cachedAngularServerApp = angularServerApp;
       }
 
-      const response = await angularServerApp.render(
-        new Request(url, { signal: AbortSignal.timeout(30_000) }),
-        undefined,
-      );
+      const webReq = new Request(createWebRequestFromNodeRequest(req), {
+        signal: AbortSignal.timeout(30_000),
+      });
+      const webRes = await angularServerApp.render(webReq);
+      if (!webRes) {
+        return next();
+      }
 
-      return response?.text();
-    })()
-      .then((content) => {
-        if (typeof content !== 'string') {
-          return next();
-        }
-
-        res.end(content);
-      })
-      .catch((error) => next(error));
+      return writeResponseToNodeResponse(webRes, res);
+    })().catch(next);
   };
 }
