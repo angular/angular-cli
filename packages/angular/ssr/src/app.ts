@@ -215,7 +215,7 @@ export class AngularServerApp {
     let html = await assets.getIndexServerHtml();
     // Skip extra microtask if there are no pre hooks.
     if (hooks.has('html:transform:pre')) {
-      html = await hooks.run('html:transform:pre', { html });
+      html = await hooks.run('html:transform:pre', { html, url });
     }
 
     this.boostrap ??= await bootstrap();
@@ -223,7 +223,7 @@ export class AngularServerApp {
     html = await renderAngular(
       html,
       this.boostrap,
-      new URL(request.url),
+      url,
       platformProviders,
       SERVER_CONTEXT_VALUE[renderMode],
     );
