@@ -17,6 +17,11 @@ import type { Connect, DepOptimizationConfig, InlineConfig, ViteDevServer } from
 import { createAngularMemoryPlugin } from '../../tools/vite/angular-memory-plugin';
 import { createAngularLocaleDataPlugin } from '../../tools/vite/i18n-locale-plugin';
 import { createRemoveIdPrefixPlugin } from '../../tools/vite/id-prefix-plugin';
+import {
+  ServerSsrMode,
+  createAngularSetupMiddlewaresPlugin,
+} from '../../tools/vite/setup-middlewares-plugin';
+import { createAngularSsrServerPlugin } from '../../tools/vite/ssr-server-plugin';
 import { loadProxyConfiguration, normalizeSourceMaps } from '../../utils';
 import { loadEsmModule } from '../../utils/load-esm';
 import { Result, ResultFile, ResultKind } from '../application/results';
@@ -313,6 +318,17 @@ export async function* serveWithVite(
         ? browserOptions.polyfills
         : [browserOptions.polyfills];
 
+      let ssrMode: ServerSsrMode = ServerSsrMode.NoSsr;
+      if (
+        browserOptions.outputMode &&
+        typeof browserOptions.ssr === 'object' &&
+        browserOptions.ssr.entry
+      ) {
+        ssrMode = ServerSsrMode.ExternalSsrMiddleware;
+      } else if (browserOptions.server) {
+        ssrMode = ServerSsrMode.InternalSsrMiddleware;
+      }
+
       // Setup server and start listening
       const serverConfiguration = await setupServer(
         serverOptions,
@@ -320,7 +336,7 @@ export async function* serveWithVite(
         assetFiles,
         browserOptions.preserveSymlinks,
         externalMetadata,
-        !!browserOptions.ssr,
+        ssrMode,
         prebundleTransformer,
         target,
         isZonelessApp(polyfills),
@@ -333,12 +349,6 @@ export async function* serveWithVite(
 
       server = await createServer(serverConfiguration);
       await server.listen();
-
-      if (browserOptions.ssr && serverOptions.prebundle !== false) {
-        // Warm up the SSR request and begin optimizing dependencies.
-        // Without this, Vite will only start optimizing SSR modules when the first request is made.
-        void server.warmupRequest('./main.server.mjs', { ssr: true });
-      }
 
       const urls = server.resolvedUrls;
       if (urls && (urls.local.length || urls.network.length)) {
@@ -385,32 +395,35 @@ async function handleUpdate(
   usedComponentStyles: Map<string, string[]>,
 ): Promise<void> {
   const updatedFiles: string[] = [];
-  let isServerFileUpdated = false;
+  let destroyAngularServerAppCalled = false;
 
   // Invalidate any updated files
-  for (const [file, record] of generatedFiles) {
-    if (record.updated) {
-      updatedFiles.push(file);
-      isServerFileUpdated ||= record.type === BuildOutputFileType.ServerApplication;
-
-      const updatedModules = server.moduleGraph.getModulesByFile(
-        normalizePath(join(server.config.root, file)),
-      );
-      updatedModules?.forEach((m) => server?.moduleGraph.invalidateModule(m));
+  for (const [file, { updated, type }] of generatedFiles) {
+    if (!updated) {
+      continue;
     }
+
+    if (type === BuildOutputFileType.ServerApplication && !destroyAngularServerAppCalled) {
+      // Clear the server app cache
+      // This must be done before module invalidation.
+      const { ɵdestroyAngularServerApp } = (await server.ssrLoadModule('/main.server.mjs')) as {
+        ɵdestroyAngularServerApp: typeof destroyAngularServerApp;
+      };
+
+      ɵdestroyAngularServerApp();
+      destroyAngularServerAppCalled = true;
+    }
+
+    updatedFiles.push(file);
+
+    const updatedModules = server.moduleGraph.getModulesByFile(
+      normalizePath(join(server.config.root, file)),
+    );
+    updatedModules?.forEach((m) => server.moduleGraph.invalidateModule(m));
   }
 
   if (!updatedFiles.length) {
     return;
-  }
-
-  // clean server apps cache
-  if (isServerFileUpdated) {
-    const { ɵdestroyAngularServerApp } = (await server.ssrLoadModule('/main.server.mjs')) as {
-      ɵdestroyAngularServerApp: typeof destroyAngularServerApp;
-    };
-
-    ɵdestroyAngularServerApp();
   }
 
   if (serverOptions.liveReload || serverOptions.hmr) {
@@ -534,7 +547,7 @@ export async function setupServer(
   assets: Map<string, string>,
   preserveSymlinks: boolean | undefined,
   externalMetadata: DevServerExternalResultMetadata,
-  ssr: boolean,
+  ssrMode: ServerSsrMode,
   prebundleTransformer: JavaScriptTransformer,
   target: string[],
   zoneless: boolean,
@@ -587,6 +600,9 @@ export async function setupServer(
       preserveSymlinks,
     },
     server: {
+      warmup: {
+        ssrFiles: ['./main.server.mjs', './server.mjs'],
+      },
       port: serverOptions.port,
       strictPort: true,
       host: serverOptions.host,
@@ -637,19 +653,21 @@ export async function setupServer(
     },
     plugins: [
       createAngularLocaleDataPlugin(),
-      createAngularMemoryPlugin({
-        workspaceRoot: serverOptions.workspaceRoot,
-        virtualProjectRoot,
+      createAngularSetupMiddlewaresPlugin({
         outputFiles,
         assets,
-        ssr,
-        external: externalMetadata.explicitBrowser,
         indexHtmlTransformer,
         extensionMiddleware,
-        normalizePath,
         usedComponentStyles,
+        ssrMode,
       }),
       createRemoveIdPrefixPlugin(externalMetadata.explicitBrowser),
+      await createAngularSsrServerPlugin(serverOptions.workspaceRoot),
+      await createAngularMemoryPlugin({
+        virtualProjectRoot,
+        outputFiles,
+        external: externalMetadata.explicitBrowser,
+      }),
     ],
     // Browser only optimizeDeps. (This does not run for SSR dependencies).
     optimizeDeps: getDepOptimizationConfig({

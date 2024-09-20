@@ -6,46 +6,26 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import remapping, { SourceMapInput } from '@ampproject/remapping';
 import assert from 'node:assert';
 import { readFile } from 'node:fs/promises';
-import { dirname, join, relative } from 'node:path';
-import type { Connect, Plugin } from 'vite';
-import {
-  angularHtmlFallbackMiddleware,
-  createAngularAssetsMiddleware,
-  createAngularHeadersMiddleware,
-  createAngularIndexHtmlMiddleware,
-  createAngularSSRMiddleware,
-} from './middlewares';
+import { basename, dirname, join, relative } from 'node:path';
+import type { Plugin } from 'vite';
+import { loadEsmModule } from '../../utils/load-esm';
 import { AngularMemoryOutputFiles } from './utils';
 
 export interface AngularMemoryPluginOptions {
-  workspaceRoot: string;
   virtualProjectRoot: string;
   outputFiles: AngularMemoryOutputFiles;
-  assets: Map<string, string>;
-  ssr: boolean;
   external?: string[];
-  extensionMiddleware?: Connect.NextHandleFunction[];
-  indexHtmlTransformer?: (content: string) => Promise<string>;
-  normalizePath: (path: string) => string;
-  usedComponentStyles: Map<string, string[]>;
 }
 
-export function createAngularMemoryPlugin(options: AngularMemoryPluginOptions): Plugin {
-  const {
-    workspaceRoot,
-    virtualProjectRoot,
-    outputFiles,
-    assets,
-    external,
-    ssr,
-    extensionMiddleware,
-    indexHtmlTransformer,
-    normalizePath,
-    usedComponentStyles,
-  } = options;
+export async function createAngularMemoryPlugin(
+  options: AngularMemoryPluginOptions,
+): Promise<Plugin> {
+  const { virtualProjectRoot, outputFiles, external } = options;
+  const { normalizePath } = await loadEsmModule<typeof import('vite')>('vite');
+  // See: https://github.com/vitejs/vite/blob/a34a73a3ad8feeacc98632c0f4c643b6820bbfda/packages/vite/src/node/server/pluginContainer.ts#L331-L334
+  const defaultImporter = join(virtualProjectRoot, 'index.html');
 
   return {
     name: 'vite:angular-memory',
@@ -59,12 +39,18 @@ export function createAngularMemoryPlugin(options: AngularMemoryPluginOptions): 
         return source;
       }
 
-      if (importer && source[0] === '.' && normalizePath(importer).startsWith(virtualProjectRoot)) {
-        // Remove query if present
-        const [importerFile] = importer.split('?', 1);
-
-        source =
-          '/' + normalizePath(join(dirname(relative(virtualProjectRoot, importerFile)), source));
+      if (importer) {
+        let normalizedSource: string | undefined;
+        if (source[0] === '.' && normalizePath(importer).startsWith(virtualProjectRoot)) {
+          // Remove query if present
+          const [importerFile] = importer.split('?', 1);
+          normalizedSource = join(dirname(relative(virtualProjectRoot, importerFile)), source);
+        } else if (source[0] === '/' && importer === defaultImporter) {
+          normalizedSource = basename(source);
+        }
+        if (normalizedSource) {
+          source = '/' + normalizePath(normalizedSource);
+        }
       }
 
       const [file] = source.split('?', 1);
@@ -90,54 +76,6 @@ export function createAngularMemoryPlugin(options: AngularMemoryPluginOptions): 
         // Vite will inline and add an additional sourcemap URL for the sourcemap.
         code: mapContents ? code.replace(/^\/\/# sourceMappingURL=[^\r\n]*/gm, '') : code,
         map: mapContents && Buffer.from(mapContents).toString('utf-8'),
-      };
-    },
-    // eslint-disable-next-line max-lines-per-function
-    configureServer(server) {
-      const originalssrTransform = server.ssrTransform;
-      server.ssrTransform = async (code, map, url, originalCode) => {
-        const result = await originalssrTransform(code, null, url, originalCode);
-        if (!result || !result.map || !map) {
-          return result;
-        }
-
-        const remappedMap = remapping(
-          [result.map as SourceMapInput, map as SourceMapInput],
-          () => null,
-        );
-
-        // Set the sourcemap root to the workspace root. This is needed since we set a virtual path as root.
-        remappedMap.sourceRoot = normalizePath(workspaceRoot) + '/';
-
-        return {
-          ...result,
-          map: remappedMap as (typeof result)['map'],
-        };
-      };
-
-      server.middlewares.use(createAngularHeadersMiddleware(server));
-
-      // Assets and resources get handled first
-      server.middlewares.use(
-        createAngularAssetsMiddleware(server, assets, outputFiles, usedComponentStyles),
-      );
-
-      if (extensionMiddleware?.length) {
-        extensionMiddleware.forEach((middleware) => server.middlewares.use(middleware));
-      }
-
-      // Returning a function, installs middleware after the main transform middleware but
-      // before the built-in HTML middleware
-      return () => {
-        if (ssr) {
-          server.middlewares.use(createAngularSSRMiddleware(server, indexHtmlTransformer));
-        }
-
-        server.middlewares.use(angularHtmlFallbackMiddleware);
-
-        server.middlewares.use(
-          createAngularIndexHtmlMiddleware(server, outputFiles, indexHtmlTransformer),
-        );
       };
     },
   };
