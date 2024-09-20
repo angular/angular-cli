@@ -10,6 +10,7 @@ import { Hooks } from '../src/hooks';
 
 describe('Hooks', () => {
   let hooks: Hooks & { run: Function };
+  const url = new URL('http://example.com/');
 
   beforeEach(() => {
     hooks = new Hooks() as Hooks & { run: Function };
@@ -33,12 +34,12 @@ describe('Hooks', () => {
       hooks.on('html:transform:pre', ({ html }) => html + '1');
       hooks.on('html:transform:pre', ({ html }) => html + '2');
 
-      const result = await hooks.run('html:transform:pre', { html: 'start' });
+      const result = await hooks.run('html:transform:pre', { html: 'start', url });
       expect(result).toBe('start12');
     });
 
     it('should return the context html if no hooks are registered', async () => {
-      const result = await hooks.run('html:transform:pre', { html: 'start' });
+      const result = await hooks.run('html:transform:pre', { html: 'start', url });
       expect(result).toBe('start');
     });
 

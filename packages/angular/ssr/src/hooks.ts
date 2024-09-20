@@ -7,13 +7,13 @@
  */
 
 /**
- * Handler function type for HTML transformation hooks.
- * It takes an object containing the HTML content to be modified.
+ * Defines a handler function type for transforming HTML content.
+ * This function receives an object with the HTML to be processed.
  *
- * @param ctx - The context object containing the HTML content.
- * @returns The modified HTML content or a promise that resolves to the modified HTML content.
+ * @param ctx - An object containing the URL and HTML content to be transformed.
+ * @returns The transformed HTML as a string or a promise that resolves to the transformed HTML.
  */
-type HtmlTransformHandler = (ctx: { html: string }) => string | Promise<string>;
+type HtmlTransformHandler = (ctx: { url: URL; html: string }) => string | Promise<string>;
 
 /**
  * Defines the names of available hooks for registering and triggering custom logic within the application.
