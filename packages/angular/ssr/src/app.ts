@@ -178,25 +178,26 @@ export class AngularServerApp {
         }),
       };
 
-      if (renderMode === RenderMode.Client) {
+      if (renderMode === RenderMode.Server) {
+        // Configure platform providers for request and response only for SSR.
+        platformProviders.push(
+          {
+            provide: REQUEST,
+            useValue: request,
+          },
+          {
+            provide: REQUEST_CONTEXT,
+            useValue: requestContext,
+          },
+          {
+            provide: RESPONSE_INIT,
+            useValue: responseInit,
+          },
+        );
+      } else if (renderMode === RenderMode.Client) {
         // Serve the client-side rendered version if the route is configured for CSR.
         return new Response(await this.assets.getServerAsset('index.csr.html'), responseInit);
       }
-
-      platformProviders.push(
-        {
-          provide: REQUEST,
-          useValue: request,
-        },
-        {
-          provide: REQUEST_CONTEXT,
-          useValue: requestContext,
-        },
-        {
-          provide: RESPONSE_INIT,
-          useValue: responseInit,
-        },
-      );
     }
 
     const {
