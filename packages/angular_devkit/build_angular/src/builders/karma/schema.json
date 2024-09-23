@@ -267,6 +267,12 @@
         "type": "string"
       }
     },
+    "builderMode": {
+      "type": "string",
+      "description": "Determines how to build the code under test. If set to 'detect', attempts to follow the development builder.",
+      "enum": ["detect", "browser", "application"],
+      "default": "browser"
+    },
     "webWorkerTsConfig": {
       "type": "string",
       "description": "TypeScript configuration for Web Worker modules."

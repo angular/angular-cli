@@ -213,6 +213,7 @@ export interface FileReplacement {
 export interface KarmaBuilderOptions {
     assets?: AssetPattern_2[];
     browsers?: Browsers;
+    builderMode?: BuilderMode;
     codeCoverage?: boolean;
     codeCoverageExclude?: string[];
     exclude?: string[];
