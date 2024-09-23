@@ -8,13 +8,13 @@
 
 import remapping, { SourceMapInput } from '@ampproject/remapping';
 import type { Plugin } from 'vite';
-import { loadEsmModule } from '../../utils/load-esm';
+import { loadEsmModule } from '../../../utils/load-esm';
 
-export async function createAngularSsrServerPlugin(workspaceRoot: string): Promise<Plugin> {
+export async function createAngularSsrTransformPlugin(workspaceRoot: string): Promise<Plugin> {
   const { normalizePath } = await loadEsmModule<typeof import('vite')>('vite');
 
   return {
-    name: 'vite:angular-ssr-server',
+    name: 'vite:angular-ssr-transform',
     enforce: 'pre',
     async configureServer(server) {
       const originalssrTransform = server.ssrTransform;

@@ -10,10 +10,10 @@ import assert from 'node:assert';
 import { readFile } from 'node:fs/promises';
 import { basename, dirname, join, relative } from 'node:path';
 import type { Plugin } from 'vite';
-import { loadEsmModule } from '../../utils/load-esm';
-import { AngularMemoryOutputFiles } from './utils';
+import { loadEsmModule } from '../../../utils/load-esm';
+import { AngularMemoryOutputFiles } from '../utils';
 
-export interface AngularMemoryPluginOptions {
+interface AngularMemoryPluginOptions {
   virtualProjectRoot: string;
   outputFiles: AngularMemoryOutputFiles;
   external?: string[];

@@ -11,7 +11,7 @@ import type { Plugin } from 'vite';
 /**
  * The base module location used to search for locale specific data.
  */
-export const LOCALE_DATA_BASE_MODULE = '@angular/common/locales/global';
+const LOCALE_DATA_BASE_MODULE = '@angular/common/locales/global';
 
 /**
  * Creates a Vite plugin that resolves Angular locale data files from `@angular/common`.
