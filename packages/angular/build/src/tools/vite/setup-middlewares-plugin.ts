@@ -77,9 +77,12 @@ export function createAngularSetupMiddlewaresPlugin(
 
       // Returning a function, installs middleware after the main transform middleware but
       // before the built-in HTML middleware
-      return () => {
+      // eslint-disable-next-line @typescript-eslint/no-misused-promises
+      return async () => {
         if (ssrMode === ServerSsrMode.ExternalSsrMiddleware) {
-          server.middlewares.use(createAngularSsrExternalMiddleware(server, indexHtmlTransformer));
+          server.middlewares.use(
+            await createAngularSsrExternalMiddleware(server, indexHtmlTransformer),
+          );
 
           return;
         }

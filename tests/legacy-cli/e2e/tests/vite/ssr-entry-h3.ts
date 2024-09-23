@@ -2,7 +2,7 @@ import assert from 'node:assert';
 import { setTimeout } from 'node:timers/promises';
 import { replaceInFile, writeMultipleFiles } from '../../utils/fs';
 import { ng, silentNg, waitForAnyProcessOutputToMatch } from '../../utils/process';
-import { installWorkspacePackages, uninstallPackage } from '../../utils/packages';
+import { installPackage, installWorkspacePackages, uninstallPackage } from '../../utils/packages';
 import { ngServe, updateJsonFile, useSha } from '../../utils/project';
 import { getGlobalVariable } from '../../utils/env';
 
@@ -17,6 +17,7 @@ export default async function () {
   await ng('add', '@angular/ssr', '--skip-confirmation', '--skip-install');
   await useSha();
   await installWorkspacePackages();
+  await installPackage('h3@1');
 
   // Update angular.json
   await updateJsonFile('angular.json', (workspaceJson) => {
@@ -60,42 +61,32 @@ export default async function () {
       ];
     `,
     'server.ts': `
-      import { AngularNodeAppEngine, writeResponseToNodeResponse, isMainModule, createNodeRequestHandler } from '@angular/ssr/node';
-      import express from 'express';
-      import { fileURLToPath } from 'node:url';
-      import { dirname, resolve } from 'node:path';
+      import { AngularAppEngine, createRequestHandler } from '@angular/ssr';
+      import { createApp, createRouter, toWebHandler, defineEventHandler, toWebRequest } from 'h3';
 
-      export function app(): express.Express {
-        const server = express();
-        const serverDistFolder = dirname(fileURLToPath(import.meta.url));
-        const browserDistFolder = resolve(serverDistFolder, '../browser');
-        const angularNodeAppEngine = new AngularNodeAppEngine();
+      export function app() {
+        const server = createApp();
+        const router = createRouter();
+        const angularAppEngine = new AngularAppEngine();
 
-        server.use('/api/**', (req, res) => res.json({ hello: 'foo' }));
+        router.use(
+          '/api/**',
+          defineEventHandler(() => ({ hello: 'foo' })),
+        );
 
-        server.get('**', express.static(browserDistFolder, {
-          maxAge: '1y',
-          index: 'index.html'
-        }));
+        router.use(
+          '/**',
+          defineEventHandler((event) => angularAppEngine.render(toWebRequest(event))),
+        );
 
-        server.get('**', (req, res, next) => {
-          angularNodeAppEngine.render(req)
-            .then((response) => response ? writeResponseToNodeResponse(response, res) : next())
-            .catch(next);
-        });
+        server.use(router);
 
         return server;
       }
 
       const server = app();
-      if (isMainModule(import.meta.url)) {
-        const port = process.env['PORT'] || 4000;
-        server.listen(port, () => {
-          console.log(\`Node Express server listening on http://localhost:\${port}\`);
-        });
-      }
-
-      export default createNodeRequestHandler(server);
+      const handler = toWebHandler(server);
+      export default createRequestHandler(handler);
     `,
   });
 

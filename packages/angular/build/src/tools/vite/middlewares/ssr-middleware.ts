@@ -8,8 +8,10 @@
 
 import type {
   AngularAppEngine as SSRAngularAppEngine,
+  createRequestHandler,
   ɵgetOrCreateAngularServerApp as getOrCreateAngularServerApp,
 } from '@angular/ssr';
+import type { createNodeRequestHandler } from '@angular/ssr/node';
 import type { ServerResponse } from 'node:http';
 import type { Connect, ViteDevServer } from 'vite';
 import { loadEsmModule } from '../../../utils/load-esm';
@@ -28,10 +30,6 @@ export function createAngularSsrInternalMiddleware(
     if (req.url === undefined) {
       return next();
     }
-
-    const resolvedUrls = server.resolvedUrls;
-    const baseUrl = resolvedUrls?.local[0] ?? resolvedUrls?.network[0];
-    const url = new URL(req.url, baseUrl);
 
     (async () => {
       const { writeResponseToNodeResponse, createWebRequestFromNodeRequest } =
@@ -66,15 +64,18 @@ export function createAngularSsrInternalMiddleware(
   };
 }
 
-export function createAngularSsrExternalMiddleware(
+export async function createAngularSsrExternalMiddleware(
   server: ViteDevServer,
   indexHtmlTransformer?: (content: string) => Promise<string>,
-): Connect.NextHandleFunction {
+): Promise<Connect.NextHandleFunction> {
   let fallbackWarningShown = false;
   let cachedAngularAppEngine: typeof SSRAngularAppEngine | undefined;
   let angularSsrInternalMiddleware:
     | ReturnType<typeof createAngularSsrInternalMiddleware>
     | undefined;
+
+  const { createWebRequestFromNodeRequest, writeResponseToNodeResponse } =
+    await loadEsmModule<typeof import('@angular/ssr/node')>('@angular/ssr/node');
 
   return function angularSsrExternalMiddleware(
     req: Connect.IncomingMessage,
@@ -89,7 +90,7 @@ export function createAngularSsrExternalMiddleware(
         AngularAppEngine: typeof SSRAngularAppEngine;
       };
 
-      if (typeof handler !== 'function' || !('__ng_node_next_handler__' in handler)) {
+      if (!isSsrNodeRequestHandler(handler) && !isSsrRequestHandler(handler)) {
         if (!fallbackWarningShown) {
           // eslint-disable-next-line no-console
           console.warn(
@@ -104,7 +105,9 @@ export function createAngularSsrExternalMiddleware(
           indexHtmlTransformer,
         );
 
-        return angularSsrInternalMiddleware(req, res, next);
+        angularSsrInternalMiddleware(req, res, next);
+
+        return;
       }
 
       if (cachedAngularAppEngine !== AngularAppEngine) {
@@ -118,7 +121,28 @@ export function createAngularSsrExternalMiddleware(
       }
 
       // Forward the request to the middleware in server.ts
-      return (handler as unknown as Connect.NextHandleFunction)(req, res, next);
+      if (isSsrNodeRequestHandler(handler)) {
+        await handler(req, res, next);
+      } else {
+        const webRes = await handler(createWebRequestFromNodeRequest(req));
+        if (!webRes) {
+          next();
+
+          return;
+        }
+
+        await writeResponseToNodeResponse(webRes, res);
+      }
     })().catch(next);
   };
+}
+
+function isSsrNodeRequestHandler(
+  value: unknown,
+): value is ReturnType<typeof createNodeRequestHandler> {
+  return typeof value === 'function' && '__ng_node_request_handler__' in value;
+}
+
+function isSsrRequestHandler(value: unknown): value is ReturnType<typeof createRequestHandler> {
+  return typeof value === 'function' && '__ng_request_handler__' in value;
 }

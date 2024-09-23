@@ -14,6 +14,9 @@ export class AngularAppEngine {
 }
 
 // @public
+export function createRequestHandler(handler: RequestHandlerFunction): RequestHandlerFunction;
+
+// @public
 export enum PrerenderFallback {
     Client = 1,
     None = 2,
