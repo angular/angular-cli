@@ -7,10 +7,14 @@
  */
 
 import { execute } from '../../index';
-import { BASE_OPTIONS, KARMA_BUILDER_INFO, describeBuilder } from '../setup';
+import { BASE_OPTIONS, KARMA_BUILDER_INFO, describeKarmaBuilder } from '../setup';
 
-describeBuilder(execute, KARMA_BUILDER_INFO, (harness) => {
+describeKarmaBuilder(execute, KARMA_BUILDER_INFO, (harness, setupTarget) => {
   describe('Behavior: "Errors"', () => {
+    beforeEach(() => {
+      setupTarget(harness);
+    });
+
     it('should fail when there is a TypeScript error', async () => {
       harness.useTarget('test', {
         ...BASE_OPTIONS,
