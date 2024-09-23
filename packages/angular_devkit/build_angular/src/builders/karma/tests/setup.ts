@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { Schema } from '../schema';
+import { BuilderMode, Schema } from '../schema';
 import { BuilderHandlerFn } from '@angular-devkit/architect';
 import { json } from '@angular-devkit/core';
 import { ApplicationBuilderOptions as ApplicationSchema, buildApplication } from '@angular/build';
@@ -41,6 +41,7 @@ export const BASE_OPTIONS = Object.freeze<Schema>({
   browsers: 'ChromeHeadlessCI',
   progress: false,
   watch: false,
+  builderMode: BuilderMode.Detect,
 });
 
 const optionSchemaCache = new Map<string, json.schema.JsonSchema>();

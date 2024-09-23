@@ -134,7 +134,9 @@ describeKarmaBuilder(execute, KARMA_BUILDER_INFO, (harness, setupTarget) => {
       expect(logs).toContain(
         jasmine.objectContaining({
           level: 'error',
-          message: jasmine.stringMatching(`Can't resolve 'src/test-style-a.css'`),
+          message: jasmine.stringMatching(
+            /(Can't|Could not) resolve ['"]src\/test-style-a.css['"]/,
+          ),
         }),
       );
     });

@@ -18,8 +18,14 @@ import { BASE_OPTIONS, KARMA_BUILDER_INFO, describeKarmaBuilder } from '../setup
 
 const coveragePath = 'coverage/lcov.info';
 
-describeKarmaBuilder(execute, KARMA_BUILDER_INFO, (harness, setupTarget) => {
+describeKarmaBuilder(execute, KARMA_BUILDER_INFO, (harness, setupTarget, isApplicationBuilder) => {
   describe('Option: "codeCoverageExclude"', () => {
+    if (isApplicationBuilder) {
+      beforeEach(() => {
+        pending('Code coverage not implemented yet for application builder');
+      });
+    }
+
     beforeEach(() => {
       setupTarget(harness);
     });
