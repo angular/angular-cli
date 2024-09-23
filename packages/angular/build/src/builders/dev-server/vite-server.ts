@@ -14,14 +14,14 @@ import { readFile } from 'node:fs/promises';
 import { builtinModules, isBuiltin } from 'node:module';
 import { join } from 'node:path';
 import type { Connect, DepOptimizationConfig, InlineConfig, ViteDevServer } from 'vite';
-import { createAngularMemoryPlugin } from '../../tools/vite/angular-memory-plugin';
-import { createAngularLocaleDataPlugin } from '../../tools/vite/i18n-locale-plugin';
-import { createRemoveIdPrefixPlugin } from '../../tools/vite/id-prefix-plugin';
 import {
   ServerSsrMode,
+  createAngularLocaleDataPlugin,
+  createAngularMemoryPlugin,
   createAngularSetupMiddlewaresPlugin,
-} from '../../tools/vite/setup-middlewares-plugin';
-import { createAngularSsrServerPlugin } from '../../tools/vite/ssr-server-plugin';
+  createAngularSsrTransformPlugin,
+  createRemoveIdPrefixPlugin,
+} from '../../tools/vite/plugins';
 import { loadProxyConfiguration, normalizeSourceMaps } from '../../utils';
 import { loadEsmModule } from '../../utils/load-esm';
 import { Result, ResultFile, ResultKind } from '../application/results';
@@ -662,7 +662,7 @@ export async function setupServer(
         ssrMode,
       }),
       createRemoveIdPrefixPlugin(externalMetadata.explicitBrowser),
-      await createAngularSsrServerPlugin(serverOptions.workspaceRoot),
+      await createAngularSsrTransformPlugin(serverOptions.workspaceRoot),
       await createAngularMemoryPlugin({
         virtualProjectRoot,
         outputFiles,
