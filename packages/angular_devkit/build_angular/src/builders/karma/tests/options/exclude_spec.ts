@@ -7,10 +7,14 @@
  */
 
 import { execute } from '../../index';
-import { BASE_OPTIONS, KARMA_BUILDER_INFO, describeBuilder } from '../setup';
+import { BASE_OPTIONS, KARMA_BUILDER_INFO, describeKarmaBuilder } from '../setup';
 
-describeBuilder(execute, KARMA_BUILDER_INFO, (harness) => {
+describeKarmaBuilder(execute, KARMA_BUILDER_INFO, (harness, setupTarget) => {
   describe('Option: "exclude"', () => {
+    beforeEach(() => {
+      setupTarget(harness);
+    });
+
     beforeEach(async () => {
       await harness.writeFiles({
         'src/app/error.spec.ts': `

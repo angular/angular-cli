@@ -318,7 +318,7 @@ LARGE_SPECS = {
     },
     "extract-i18n": {},
     "karma": {
-        "shards": 3,
+        "shards": 6,
         "size": "large",
         "flaky": True,
         "extra_deps": [

@@ -7,10 +7,14 @@
  */
 
 import { execute } from '../../index';
-import { BASE_OPTIONS, KARMA_BUILDER_INFO, describeBuilder } from '../setup';
+import { BASE_OPTIONS, KARMA_BUILDER_INFO, describeKarmaBuilder } from '../setup';
 
-describeBuilder(execute, KARMA_BUILDER_INFO, (harness) => {
+describeKarmaBuilder(execute, KARMA_BUILDER_INFO, (harness, setupTarget) => {
   describe('Option: "assets"', () => {
+    beforeEach(() => {
+      setupTarget(harness);
+    });
+
     it('includes assets', async () => {
       await harness.writeFiles({
         './src/string-file-asset.txt': 'string-file-asset.txt',
