@@ -9,7 +9,6 @@
 import { JsonValue, Path, basename, dirname, join, normalize } from '@angular-devkit/core';
 import {
   Rule,
-  SchematicContext,
   SchematicsException,
   Tree,
   apply,
@@ -222,7 +221,10 @@ export default function (options: ServerOptions): Rule {
       addRootProvider(
         options.project,
         ({ code, external }) =>
-          code`${external('provideClientHydration', '@angular/platform-browser')}()`,
+          code`${external('provideClientHydration', '@angular/platform-browser')}(${external(
+            'withEventReplay',
+            '@angular/platform-browser',
+          )}())`,
       ),
     ]);
   };
