@@ -10,7 +10,7 @@ import { setTimeout } from 'node:timers/promises';
 import { tags } from '@angular-devkit/core';
 import { last, tap } from 'rxjs';
 import { execute } from '../../index';
-import { BASE_OPTIONS, KARMA_BUILDER_INFO, describeBuilder } from '../setup';
+import { BASE_OPTIONS, KARMA_BUILDER_INFO, describeKarmaBuilder } from '../setup';
 
 // In each of the test below we'll have to call setTimeout to wait for the coverage
 // analysis to be done. This is because karma-coverage performs the analysis
@@ -21,8 +21,12 @@ import { BASE_OPTIONS, KARMA_BUILDER_INFO, describeBuilder } from '../setup';
 
 const coveragePath = 'coverage/lcov.info';
 
-describeBuilder(execute, KARMA_BUILDER_INFO, (harness) => {
+describeKarmaBuilder(execute, KARMA_BUILDER_INFO, (harness, setupTarget, isApplicationBuilder) => {
   describe('Behavior: "codeCoverage"', () => {
+    beforeEach(() => {
+      setupTarget(harness);
+    });
+
     it('should generate coverage report when file was previously processed by Babel', async () => {
       // Force Babel transformation.
       await harness.appendToFile('src/app/app.component.ts', '// async');

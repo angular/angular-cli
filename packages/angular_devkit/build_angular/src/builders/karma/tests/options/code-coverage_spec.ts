@@ -8,7 +8,7 @@
 
 import { setTimeout } from 'node:timers/promises';
 import { execute } from '../../index';
-import { BASE_OPTIONS, KARMA_BUILDER_INFO, describeBuilder } from '../setup';
+import { BASE_OPTIONS, KARMA_BUILDER_INFO, describeKarmaBuilder } from '../setup';
 
 // In each of the test below we'll have to call setTimeout to wait for the coverage
 // analysis to be done. This is because karma-coverage performs the analysis
@@ -19,8 +19,12 @@ import { BASE_OPTIONS, KARMA_BUILDER_INFO, describeBuilder } from '../setup';
 
 const coveragePath = 'coverage/lcov.info';
 
-describeBuilder(execute, KARMA_BUILDER_INFO, (harness) => {
+describeKarmaBuilder(execute, KARMA_BUILDER_INFO, (harness, setupTarget) => {
   describe('Option: "codeCoverage"', () => {
+    beforeEach(() => {
+      setupTarget(harness);
+    });
+
     it('should generate coverage report when option is set to true', async () => {
       harness.useTarget('test', {
         ...BASE_OPTIONS,
