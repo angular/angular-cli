@@ -44,6 +44,9 @@ export interface CommonEngineRenderOptions {
 }
 
 // @public
+export function createNodeRequestHandler<T extends RequestHandlerFunction>(handler: T): T;
+
+// @public
 export function createWebRequestFromNodeRequest(nodeRequest: IncomingMessage): Request;
 
 // @public

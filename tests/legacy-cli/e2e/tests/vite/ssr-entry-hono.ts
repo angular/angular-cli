@@ -1,4 +1,5 @@
 import assert from 'node:assert';
+import { setTimeout } from 'node:timers/promises';
 import { replaceInFile, writeMultipleFiles } from '../../utils/fs';
 import { ng, silentNg, waitForAnyProcessOutputToMatch } from '../../utils/process';
 import { installPackage, installWorkspacePackages, uninstallPackage } from '../../utils/packages';
@@ -60,8 +61,7 @@ export default async function () {
       ];
     `,
     'server.ts': `
-      import { AngularAppEngine } from '@angular/ssr';
-      import { createWebRequestFromNodeRequest, writeResponseToNodeResponse, defineNodeNextHandler } from '@angular/ssr/node';
+      import { AngularAppEngine, createRequestHandler } from '@angular/ssr';
       import { Hono } from 'hono';
 
       export function app() {
@@ -78,18 +78,7 @@ export default async function () {
       }
 
       const server = app();
-      export default defineNodeNextHandler(async (req, res, next) => {
-       try {
-          const webRes = await server.fetch(createWebRequestFromNodeRequest(req));
-          if (webRes) {
-            await writeResponseToNodeResponse(webRes, res);
-          } else {
-            next();
-          }
-        } catch (error) {
-          next(error);
-        }
-      });
+      export default createRequestHandler(server.fetch);
     `,
   });
 
@@ -116,7 +105,7 @@ export default async function () {
   await validateResponse('/api/test', /bar/);
   await validateResponse('/home', /yay home works/);
 
-  async function validateResponse(pathname: string, match: RegExp) {
+  async function validateResponse(pathname: string, match: RegExp): Promise<void> {
     const response = await fetch(new URL(pathname, `http://localhost:${port}`));
     const text = await response.text();
     assert.match(text, match);
@@ -128,9 +117,11 @@ async function modifyFileAndWaitUntilUpdated(
   filePath: string,
   searchValue: string,
   replaceValue: string,
-) {
+): Promise<void> {
   await Promise.all([
-    waitForAnyProcessOutputToMatch(/Application bundle generation complete./),
+    waitForAnyProcessOutputToMatch(/Page reload sent to client/),
     replaceInFile(filePath, searchValue, replaceValue),
   ]);
+
+  await setTimeout(200);
 }

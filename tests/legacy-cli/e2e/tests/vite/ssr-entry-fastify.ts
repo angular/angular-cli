@@ -1,4 +1,5 @@
 import assert from 'node:assert';
+import { setTimeout } from 'node:timers/promises';
 import { replaceInFile, writeMultipleFiles } from '../../utils/fs';
 import { ng, silentNg, waitForAnyProcessOutputToMatch } from '../../utils/process';
 import { installPackage, installWorkspacePackages, uninstallPackage } from '../../utils/packages';
@@ -60,7 +61,7 @@ export default async function () {
       ];
     `,
     'server.ts': `
-      import { AngularNodeAppEngine, writeResponseToNodeResponse, isMainModule, defineNodeNextHandler } from '@angular/ssr/node';
+      import { AngularNodeAppEngine, writeResponseToNodeResponse, isMainModule, createNodeRequestHandler } from '@angular/ssr/node';
       import fastify from 'fastify';
 
       export function app() {
@@ -91,7 +92,7 @@ export default async function () {
         });
       }
 
-      export default defineNodeNextHandler(async (req, res) => {
+      export default createNodeRequestHandler(async (req, res) => {
         await server.ready();
         server.server.emit('request', req, res);
       });
@@ -121,7 +122,7 @@ export default async function () {
   await validateResponse('/api/test', /bar/);
   await validateResponse('/home', /yay home works/);
 
-  async function validateResponse(pathname: string, match: RegExp) {
+  async function validateResponse(pathname: string, match: RegExp): Promise<void> {
     const response = await fetch(new URL(pathname, `http://localhost:${port}`));
     const text = await response.text();
     assert.match(text, match);
@@ -133,9 +134,11 @@ async function modifyFileAndWaitUntilUpdated(
   filePath: string,
   searchValue: string,
   replaceValue: string,
-) {
+): Promise<void> {
   await Promise.all([
-    waitForAnyProcessOutputToMatch(/Application bundle generation complete./),
+    waitForAnyProcessOutputToMatch(/Page reload sent to client/),
     replaceInFile(filePath, searchValue, replaceValue),
   ]);
+
+  await setTimeout(200);
 }
