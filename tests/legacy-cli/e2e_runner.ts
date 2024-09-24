@@ -6,7 +6,7 @@ import * as path from 'path';
 import { getGlobalVariable, setGlobalVariable } from './e2e/utils/env';
 import { gitClean } from './e2e/utils/git';
 import { createNpmRegistry } from './e2e/utils/registry';
-import { launchTestProcess } from './e2e/utils/process';
+import { killAllProcesses, launchTestProcess } from './e2e/utils/process';
 import { delimiter, dirname, join } from 'path';
 import { findFreePort } from './e2e/utils/network';
 import { extractFile } from './e2e/utils/tar';
@@ -328,6 +328,8 @@ async function runTest(absoluteName: string): Promise<void> {
   process.chdir(join(getGlobalVariable('projects-root'), 'test-project'));
 
   await launchTestProcess(absoluteName);
+  // Ensure that we kill all sub-processes of tests. (Such as `ng serve`).
+  await killAllProcesses();
   await gitClean();
 }
 

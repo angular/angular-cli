@@ -104,9 +104,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest]
+        os: [windows-latest]
         node: [22]
-        subset: [npm, esbuild]
+        subset: [npm]
         shard: [0, 1, 2, 3, 4, 5]
     runs-on: ${{ matrix.os }}
     steps:

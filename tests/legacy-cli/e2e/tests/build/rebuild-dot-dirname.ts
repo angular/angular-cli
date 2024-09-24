@@ -18,7 +18,7 @@ export default async function () {
   try {
     process.chdir('./.subdirectory');
 
-    await ng('new', 'subdirectory-test-project', '--skip-install');
+    await ng('new', 'subdirectory-test-project', '--skip-install', '--skip-git');
     process.chdir('./subdirectory-test-project');
 
     await useSha();

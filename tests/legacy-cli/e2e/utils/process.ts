@@ -3,7 +3,6 @@ import { spawn, SpawnOptions } from 'child_process';
 import * as child_process from 'child_process';
 import { concat, defer, EMPTY, from, lastValueFrom, catchError, repeat } from 'rxjs';
 import { getGlobalVariable, getGlobalVariablesEnv } from './env';
-import treeKill from 'tree-kill';
 import { delimiter, join, resolve } from 'path';
 
 interface ExecOptions {
@@ -232,29 +231,13 @@ export function waitForAnyProcessOutputToMatch(
   return Promise.race(matchPromises.concat([timeoutPromise]));
 }
 
-export async function killAllProcesses(signal = 'SIGTERM'): Promise<void> {
-  const processesToKill: Promise<void>[] = [];
-
+export async function killAllProcesses(): Promise<void> {
   while (_processes.length) {
     const childProc = _processes.pop();
-    if (!childProc || childProc.pid === undefined) {
-      continue;
+    if (childProc && !childProc.killed) {
+      childProc.kill();
     }
-
-    processesToKill.push(
-      new Promise<void>((resolve) => {
-        treeKill(childProc.pid!, signal, () => {
-          // Ignore all errors.
-          // This is due to a race condition with the `waitForMatch` logic.
-          // where promises are resolved on matches and not when the process terminates.
-          // Also in some cases in windows we get `The operation attempted is not supported`.
-          resolve();
-        });
-      }),
-    );
   }
-
-  await Promise.all(processesToKill);
 }
 
 export function exec(cmd: string, ...args: string[]) {
