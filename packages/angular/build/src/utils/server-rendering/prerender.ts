@@ -121,6 +121,12 @@ export async function prerenderPages(
   const serializableRouteTreeNodeForPrerender: WritableSerializableRouteTreeNode = [];
   for (const metadata of serializableRouteTreeNode) {
     if (outputMode !== OutputMode.Static && metadata.redirectTo) {
+      // Skip redirects if output mode is not static.
+      continue;
+    }
+
+    if (metadata.route.includes('*')) {
+      // Skip catch all routes from prerender.
       continue;
     }
 
@@ -129,7 +135,6 @@ export async function prerenderPages(
       case RouteRenderMode.Prerender:
       case RouteRenderMode.AppShell:
         serializableRouteTreeNodeForPrerender.push(metadata);
-
         break;
       case RouteRenderMode.Server:
         if (outputMode === OutputMode.Static) {
