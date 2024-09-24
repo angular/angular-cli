@@ -2,7 +2,7 @@ import { setTimeout } from 'node:timers/promises';
 import { getGlobalVariable } from '../../utils/env';
 import { appendToFile, createDir, rimraf } from '../../utils/fs';
 import { installWorkspacePackages } from '../../utils/packages';
-import { ng, waitForAnyProcessOutputToMatch } from '../../utils/process';
+import { killAllProcesses, ng, waitForAnyProcessOutputToMatch } from '../../utils/process';
 import { ngServe, updateJsonFile, useSha } from '../../utils/project';
 
 const goodRegEx = getGlobalVariable('argv')['esbuild']
@@ -52,5 +52,7 @@ export default async function () {
     await waitForAnyProcessOutputToMatch(goodRegEx);
   } finally {
     process.chdir(originalCwd);
+    await killAllProcesses();
+    await setTimeout(100);
   }
 }
