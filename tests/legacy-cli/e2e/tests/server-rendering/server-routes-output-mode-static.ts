@@ -1,5 +1,5 @@
 import { join } from 'node:path';
-import { expectFileToMatch, replaceInFile, writeFile } from '../../utils/fs';
+import { expectFileNotToExist, expectFileToMatch, replaceInFile, writeFile } from '../../utils/fs';
 import { noSilentNg, silentNg } from '../../utils/process';
 import { setupProjectWithSSRAppEngine } from './setup';
 import { existsSync } from 'node:fs';
@@ -35,6 +35,10 @@ export default async function () {
     {
       path: 'ssg/:id',
       component: SsgWithParamsComponent,
+    },
+    {
+      path: '**',
+      component: HomeComponent,
     },
   ];
   `,
@@ -100,4 +104,7 @@ export default async function () {
     !existsSync('dist/test-project/server'),
     'Server directory should not exist when output-mode is static',
   );
+
+  // Should not prerender the catch all
+  await expectFileNotToExist(join('dist/test-project/browser/**/index.html'));
 }
