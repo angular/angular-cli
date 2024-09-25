@@ -1,3 +1,16 @@
+<a name="18.2.6"></a>
+
+# 18.2.6 (2024-09-25)
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                          |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------- |
+| [9d0b67124](https://github.com/angular/angular-cli/commit/9d0b67124e4855c5c4a2101b64f8ed86f8624561) | fix  | allow missing HTML file request to fallback to index |
+| [5fea635b2](https://github.com/angular/angular-cli/commit/5fea635b20b29429e355072c5adc5bf2a597a267) | fix  | update rollup to 4.22.4                              |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="17.3.10"></a>
 
 # 17.3.10 (2024-09-25)
