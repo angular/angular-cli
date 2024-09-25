@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { JsonValue, Path, basename, dirname, join, normalize } from '@angular-devkit/core';
+import { join, normalize } from '@angular-devkit/core';
 import {
   Rule,
   SchematicsException,
@@ -25,7 +25,6 @@ import { getPackageJsonDependency } from '../utility/dependencies';
 import { JSONFile } from '../utility/json-file';
 import { latestVersions } from '../utility/latest-versions';
 import { isStandaloneApp } from '../utility/ng-ast-utils';
-import { relativePathToWorkspaceRoot } from '../utility/paths';
 import { targetBuildNotFoundError } from '../utility/project-targets';
 import { getMainFilePath } from '../utility/standalone/util';
 import { getWorkspace, updateWorkspace } from '../utility/workspace';
@@ -33,65 +32,6 @@ import { Builders } from '../utility/workspace-models';
 import { Schema as ServerOptions } from './schema';
 
 const serverMainEntryName = 'main.server.ts';
-
-function updateConfigFileBrowserBuilder(options: ServerOptions, tsConfigDirectory: Path): Rule {
-  return updateWorkspace((workspace) => {
-    const clientProject = workspace.projects.get(options.project);
-
-    if (clientProject) {
-      // In case the browser builder hashes the assets
-      // we need to add this setting to the server builder
-      // as otherwise when assets it will be requested twice.
-      // One for the server which will be unhashed, and other on the client which will be hashed.
-      const getServerOptions = (options: Record<string, JsonValue | undefined> = {}): {} => {
-        return {
-          buildOptimizer: options?.buildOptimizer,
-          outputHashing: options?.outputHashing === 'all' ? 'media' : options?.outputHashing,
-          fileReplacements: options?.fileReplacements,
-          optimization: options?.optimization === undefined ? undefined : !!options?.optimization,
-          sourceMap: options?.sourceMap,
-          localization: options?.localization,
-          stylePreprocessorOptions: options?.stylePreprocessorOptions,
-          resourcesOutputPath: options?.resourcesOutputPath,
-          deployUrl: options?.deployUrl,
-          i18nMissingTranslation: options?.i18nMissingTranslation,
-          preserveSymlinks: options?.preserveSymlinks,
-          extractLicenses: options?.extractLicenses,
-          inlineStyleLanguage: options?.inlineStyleLanguage,
-          vendorChunk: options?.vendorChunk,
-        };
-      };
-
-      const buildTarget = clientProject.targets.get('build');
-      if (buildTarget?.options) {
-        buildTarget.options.outputPath = `dist/${options.project}/browser`;
-      }
-
-      const buildConfigurations = buildTarget?.configurations;
-      const configurations: Record<string, {}> = {};
-      if (buildConfigurations) {
-        for (const [key, options] of Object.entries(buildConfigurations)) {
-          configurations[key] = getServerOptions(options);
-        }
-      }
-
-      const sourceRoot = clientProject.sourceRoot ?? join(normalize(clientProject.root), 'src');
-      const serverTsConfig = join(tsConfigDirectory, 'tsconfig.server.json');
-      clientProject.targets.add({
-        name: 'server',
-        builder: Builders.Server,
-        defaultConfiguration: 'production',
-        options: {
-          outputPath: `dist/${options.project}/server`,
-          main: join(normalize(sourceRoot), serverMainEntryName),
-          tsConfig: serverTsConfig,
-          ...(buildTarget?.options ? getServerOptions(buildTarget?.options) : {}),
-        },
-        configurations,
-      });
-    }
-  });
-}
 
 function updateConfigFileApplicationBuilder(options: ServerOptions): Rule {
   return updateWorkspace((workspace) => {
@@ -169,11 +109,16 @@ export default function (options: ServerOptions): Rule {
       throw targetBuildNotFoundError();
     }
 
-    const isUsingApplicationBuilder = clientBuildTarget.builder === Builders.Application;
     if (
-      clientProject.targets.has('server') ||
-      (isUsingApplicationBuilder && clientBuildTarget.options?.server !== undefined)
+      clientBuildTarget?.builder !== Builders.Application &&
+      clientBuildTarget?.builder !== Builders.BuildApplication
     ) {
+      throw new SchematicsException(
+        `Ssr schematic requires the project to use "${Builders.Application}" or "${Builders.BuildApplication}" as the build builder.`,
+      );
+    }
+
+    if (clientBuildTarget.options?.server) {
       // Server has already been added.
       return;
     }
@@ -190,33 +135,10 @@ export default function (options: ServerOptions): Rule {
       move(join(normalize(clientProject.root), 'src')),
     ]);
 
-    const clientTsConfig = normalize(clientBuildOptions.tsConfig);
-    const tsConfigExtends = basename(clientTsConfig);
-    const tsConfigDirectory = dirname(clientTsConfig);
-
     return chain([
       mergeWith(templateSource),
-      ...(isUsingApplicationBuilder
-        ? [
-            updateConfigFileApplicationBuilder(options),
-            updateTsConfigFile(clientBuildOptions.tsConfig),
-          ]
-        : [
-            mergeWith(
-              apply(url('./files/root'), [
-                applyTemplates({
-                  ...strings,
-                  ...options,
-                  stripTsExtension: (s: string) => s.replace(/\.ts$/, ''),
-                  tsConfigExtends,
-                  hasLocalizePackage: !!getPackageJsonDependency(host, '@angular/localize'),
-                  relativePathToWorkspaceRoot: relativePathToWorkspaceRoot(tsConfigDirectory),
-                }),
-                move(tsConfigDirectory),
-              ]),
-            ),
-            updateConfigFileBrowserBuilder(options, tsConfigDirectory),
-          ]),
+      updateConfigFileApplicationBuilder(options),
+      updateTsConfigFile(clientBuildOptions.tsConfig),
       addDependencies(options.skipInstall),
       addRootProvider(
         options.project,

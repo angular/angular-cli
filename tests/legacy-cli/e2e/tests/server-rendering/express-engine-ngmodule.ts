@@ -1,4 +1,3 @@
-import { getGlobalVariable } from '../../utils/env';
 import { rimraf, writeMultipleFiles } from '../../utils/fs';
 import { findFreePort } from '../../utils/network';
 import { installWorkspacePackages } from '../../utils/packages';
@@ -16,27 +15,6 @@ export default async function () {
   await useCIChrome('test-project-two', 'projects/test-project-two/e2e/');
   await useCIDefaults('test-project-two');
 
-  const useWebpackBuilder = !getGlobalVariable('argv')['esbuild'];
-
-  if (useWebpackBuilder) {
-    await updateJsonFile('angular.json', (json) => {
-      const build = json['projects']['test-project-two']['architect']['build'];
-      build.builder = '@angular-devkit/build-angular:browser';
-      build.options = {
-        ...build.options,
-        main: build.options.browser,
-        browser: undefined,
-      };
-
-      build.configurations.development = {
-        ...build.configurations.development,
-        vendorChunk: true,
-        namedChunks: true,
-        buildOptimizer: false,
-      };
-    });
-  }
-
   await ng(
     'add',
     '@angular/ssr',
@@ -48,13 +26,11 @@ export default async function () {
   await useSha();
   await installWorkspacePackages();
 
-  if (!useWebpackBuilder) {
-    // Disable prerendering
-    await updateJsonFile('angular.json', (json) => {
-      const build = json['projects']['test-project-two']['architect']['build'];
-      build.configurations.production.prerender = false;
-    });
-  }
+  // Disable prerendering
+  await updateJsonFile('angular.json', (json) => {
+    const build = json['projects']['test-project-two']['architect']['build'];
+    build.configurations.production.prerender = false;
+  });
 
   await writeMultipleFiles({
     'projects/test-project-two/src/app/app.component.css': `div { color: #000 }`,
@@ -69,8 +45,7 @@ export default async function () {
           .catch((err) => console.error(err));
       };
     `,
-    'projects/test-project-two/e2e/src/app.e2e-spec.ts':
-      `
+    'projects/test-project-two/e2e/src/app.e2e-spec.ts': `
       import { browser, by, element } from 'protractor';
       import * as webdriver from 'selenium-webdriver';
 
@@ -120,35 +95,28 @@ export default async function () {
 
           // Make sure there were no client side errors.
           await verifyNoBrowserErrors();
-        });` +
-      // TODO(alanagius): enable the below tests once critical css inlining for SSR is supported with Vite.
-      (useWebpackBuilder
-        ? `
-          it('stylesheets should be configured to load asynchronously', async () => {
-            // Load the page without waiting for Angular since it is not bootstrapped automatically.
-            await browser.driver.get(browser.baseUrl);
-
-            // Test the contents from the server.
-            const styleTag = await browser.driver.findElement(by.css('link[rel="stylesheet"]'));
-            expect(await styleTag.getAttribute('media')).toMatch('all');
-
-            // Make sure there were no client side errors.
-            await verifyNoBrowserErrors();
-          });`
-        : '') +
-      `
         });
+
+        it('stylesheets should be configured to load asynchronously', async () => {
+          // Load the page without waiting for Angular since it is not bootstrapped automatically.
+          await browser.driver.get(browser.baseUrl);
+
+          // Test the contents from the server.
+          const styleTag = await browser.driver.findElement(by.css('link[rel="stylesheet"]'));
+          expect(await styleTag.getAttribute('media')).toMatch('all');
+
+          // Make sure there were no client side errors.
+          await verifyNoBrowserErrors();
+        });
+      });
       `,
   });
 
   async function spawnServer(): Promise<number> {
     const port = await findFreePort();
-
-    const runCommand = useWebpackBuilder ? 'serve:ssr' : `serve:ssr:test-project-two`;
-
     await execAndWaitForOutputToMatch(
       'npm',
-      ['run', runCommand],
+      ['run', 'serve:ssr:test-project-two'],
       /Node Express server listening on/,
       {
         'PORT': String(port),
@@ -159,11 +127,6 @@ export default async function () {
   }
 
   await ng('build', 'test-project-two');
-
-  if (useWebpackBuilder) {
-    // Build server code
-    await ng('run', `test-project-two:server`);
-  }
 
   const port = await spawnServer();
   await ng(

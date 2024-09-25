@@ -153,43 +153,4 @@ describe('Environments Schematic', () => {
       }),
     );
   });
-
-  it('should update the angular.json file replacements option for server configurations', async () => {
-    convertBuilderToLegacyBrowser();
-
-    await schematicRunner.runSchematic(
-      'server',
-      { project: 'foo', skipInstall: true },
-      applicationTree,
-    );
-
-    const tree = await runEnvironmentsSchematic();
-    const workspace = JSON.parse(tree.readContent('/angular.json'));
-
-    const developmentConfiguration =
-      workspace.projects.foo.architect.build.configurations.development;
-    expect(developmentConfiguration).toEqual(
-      jasmine.objectContaining({
-        fileReplacements: [
-          {
-            replace: 'projects/foo/src/environments/environment.ts',
-            with: 'projects/foo/src/environments/environment.development.ts',
-          },
-        ],
-      }),
-    );
-
-    const serverDevelopmentConfiguration =
-      workspace.projects.foo.architect.server.configurations.development;
-    expect(serverDevelopmentConfiguration).toEqual(
-      jasmine.objectContaining({
-        fileReplacements: [
-          {
-            replace: 'projects/foo/src/environments/environment.ts',
-            with: 'projects/foo/src/environments/environment.development.ts',
-          },
-        ],
-      }),
-    );
-  });
 });

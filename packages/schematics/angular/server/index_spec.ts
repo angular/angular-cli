@@ -9,9 +9,6 @@
 import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/testing';
 import { parse as parseJson } from 'jsonc-parser';
 import { Schema as ApplicationOptions, Style } from '../application/schema';
-import { CompilerOptions } from '../third_party/github.com/Microsoft/TypeScript/lib/typescript';
-import { NodeDependencyType, addPackageJsonDependency } from '../utility/dependencies';
-import { Builders } from '../utility/workspace-models';
 import { Schema as WorkspaceOptions } from '../workspace/schema';
 import { Schema as ServerOptions } from './schema';
 
@@ -139,107 +136,6 @@ describe('Server Schematic', () => {
       const tree = await schematicRunner.runSchematic('server', defaultOptions, appTree);
       const contents = tree.readContent('/projects/bar/src/app/app.config.ts');
       expect(contents).toContain(`provideClientHydration(withEventReplay())`);
-    });
-  });
-
-  describe('Legacy browser builder', () => {
-    function convertBuilderToLegacyBrowser(): void {
-      const config = JSON.parse(appTree.readContent('/angular.json'));
-      const build = config.projects.bar.architect.build;
-
-      build.builder = Builders.Browser;
-      build.options = {
-        ...build.options,
-        main: build.options.browser,
-        browser: undefined,
-      };
-
-      build.configurations.development = {
-        ...build.configurations.development,
-        vendorChunk: true,
-        namedChunks: true,
-        buildOptimizer: false,
-      };
-
-      appTree.overwrite('/angular.json', JSON.stringify(config, undefined, 2));
-    }
-
-    beforeEach(async () => {
-      appTree = await schematicRunner.runSchematic('application', appOptions, appTree);
-      convertBuilderToLegacyBrowser();
-    });
-
-    it(`should not add import to '@angular/localize' as type in 'tsconfig.server.json' when it's not a dependency`, async () => {
-      const tree = await schematicRunner.runSchematic('server', defaultOptions, appTree);
-      const { compilerOptions } = tree.readJson('/projects/bar/tsconfig.server.json') as {
-        compilerOptions: CompilerOptions;
-      };
-      expect(compilerOptions.types).not.toContain('@angular/localize');
-    });
-
-    it(`should add import to '@angular/localize' as type in 'tsconfig.server.json' when it's a dependency`, async () => {
-      addPackageJsonDependency(appTree, {
-        name: '@angular/localize',
-        type: NodeDependencyType.Default,
-        version: 'latest',
-      });
-      const tree = await schematicRunner.runSchematic('server', defaultOptions, appTree);
-      const { compilerOptions } = tree.readJson('/projects/bar/tsconfig.server.json') as {
-        compilerOptions: CompilerOptions;
-      };
-      expect(compilerOptions.types).toContain('@angular/localize');
-    });
-
-    it('should update workspace with a server target', async () => {
-      const tree = await schematicRunner.runSchematic('server', defaultOptions, appTree);
-      const filePath = '/angular.json';
-      const contents = tree.readContent(filePath);
-      const config = JSON.parse(contents.toString());
-      const targets = config.projects.bar.architect;
-      expect(targets.server).toBeDefined();
-      expect(targets.server.builder).toBeDefined();
-      const opts = targets.server.options;
-      expect(opts.outputPath).toEqual('dist/bar/server');
-      expect(opts.main).toEqual('projects/bar/src/main.server.ts');
-      expect(opts.tsConfig).toEqual('projects/bar/tsconfig.server.json');
-    });
-
-    it('should update workspace with a build target outputPath', async () => {
-      const tree = await schematicRunner.runSchematic('server', defaultOptions, appTree);
-      const filePath = '/angular.json';
-      const contents = tree.readContent(filePath);
-      const config = JSON.parse(contents.toString());
-      const targets = config.projects.bar.architect;
-      expect(targets.build.options.outputPath).toEqual('dist/bar/browser');
-    });
-
-    it(`should work when 'tsconfig.app.json' has comments`, async () => {
-      const appTsConfigPath = '/projects/bar/tsconfig.app.json';
-      const appTsConfigContent = appTree.readContent(appTsConfigPath);
-      appTree.overwrite(appTsConfigPath, '// comment in json file\n' + appTsConfigContent);
-
-      const tree = await schematicRunner.runSchematic('server', defaultOptions, appTree);
-      const filePath = '/projects/bar/tsconfig.server.json';
-      expect(tree.exists(filePath)).toBeTrue();
-    });
-
-    it('should create a tsconfig file for a generated application', async () => {
-      const tree = await schematicRunner.runSchematic('server', defaultOptions, appTree);
-      const filePath = '/projects/bar/tsconfig.server.json';
-      expect(tree.exists(filePath)).toBeTrue();
-      const contents = parseJson(tree.readContent(filePath).toString());
-      expect(contents).toEqual({
-        extends: './tsconfig.app.json',
-        compilerOptions: {
-          outDir: '../../out-tsc/server',
-          types: ['node'],
-        },
-        files: ['src/main.server.ts'],
-      });
-      const angularConfig = JSON.parse(tree.readContent('angular.json'));
-      expect(angularConfig.projects.bar.architect.server.options.tsConfig).toEqual(
-        'projects/bar/tsconfig.server.json',
-      );
     });
   });
 });
