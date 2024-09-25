@@ -110,7 +110,7 @@ export async function* serveWithVite(
 
   // Disable generating a full manifest with routes.
   // This is done during runtime when using the dev-server.
-  browserOptions.disableFullServerManifestGeneration = true;
+  browserOptions.partialSSRBuild = true;
 
   // The development server currently only supports a single locale when localizing.
   // This matches the behavior of the Webpack-based development server but could be expanded in the future.

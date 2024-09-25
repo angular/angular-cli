@@ -70,7 +70,7 @@ export async function executePostBundleSteps(
     prerenderOptions,
     appShellOptions,
     workspaceRoot,
-    disableFullServerManifestGeneration,
+    partialSSRBuild,
   } = options;
 
   // Index HTML content without CSS inlining to be used for server rendering (AppShell, SSG and SSR).
@@ -125,7 +125,7 @@ export async function executePostBundleSteps(
   // Pre-render (SSG) and App-shell
   // If localization is enabled, prerendering is handled in the inlining process.
   if (
-    !disableFullServerManifestGeneration &&
+    !partialSSRBuild &&
     (prerenderOptions || appShellOptions || (outputMode && serverEntryPoint)) &&
     !allErrors.length
   ) {

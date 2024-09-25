@@ -88,7 +88,7 @@ export async function* buildApplicationInternal(
 
   yield* runEsBuildBuildAction(
     async (rebuildState) => {
-      const { serverEntryPoint, jsonLogs, disableFullServerManifestGeneration } = normalizedOptions;
+      const { serverEntryPoint, jsonLogs, partialSSRBuild } = normalizedOptions;
 
       const startTime = process.hrtime.bigint();
       const result = await executeBuild(normalizedOptions, context, rebuildState);
@@ -96,7 +96,7 @@ export async function* buildApplicationInternal(
       if (jsonLogs) {
         result.addLog(await createJsonBuildManifest(result, normalizedOptions));
       } else {
-        if (serverEntryPoint && !disableFullServerManifestGeneration) {
+        if (serverEntryPoint && !partialSSRBuild) {
           const prerenderedRoutesLength = Object.keys(result.prerenderedRoutes).length;
           let prerenderMsg = `Prerendered ${prerenderedRoutesLength} static route`;
           prerenderMsg += prerenderedRoutesLength !== 1 ? 's.' : '.';
