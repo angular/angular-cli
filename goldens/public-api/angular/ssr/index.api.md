@@ -5,6 +5,7 @@
 ```ts
 
 import { EnvironmentProviders } from '@angular/core';
+import { InjectionToken } from '@angular/core';
 
 // @public
 export class AngularAppEngine {
@@ -33,6 +34,15 @@ export enum RenderMode {
     Prerender = 3,
     Server = 1
 }
+
+// @public
+export const REQUEST: InjectionToken<Request>;
+
+// @public
+export const REQUEST_CONTEXT: InjectionToken<unknown>;
+
+// @public
+export const RESPONSE_INIT: InjectionToken<ResponseInit>;
 
 // @public
 export type ServerRoute = ServerRouteAppShell | ServerRouteClient | ServerRoutePrerender | ServerRoutePrerenderWithParams | ServerRouteServer;
