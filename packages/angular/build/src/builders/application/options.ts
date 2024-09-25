@@ -14,7 +14,7 @@ import { createRequire } from 'node:module';
 import path from 'node:path';
 import { normalizeAssetPatterns, normalizeOptimization, normalizeSourceMaps } from '../../utils';
 import { supportColor } from '../../utils/color';
-import { useJSONBuildLogs } from '../../utils/environment-options';
+import { useJSONBuildLogs, usePartialSsrBuild } from '../../utils/environment-options';
 import { I18nOptions, createI18nOptions } from '../../utils/i18n-options';
 import { IndexHtmlTransform } from '../../utils/index-file/index-html-generator';
 import { normalizeCacheOptions } from '../../utils/normalize-cache';
@@ -82,14 +82,12 @@ interface InternalOptions {
   forceI18nFlatOutput?: boolean;
 
   /**
-   * When set to `true`, disables the generation of a full manifest with routes.
+   * When set to `true`, enables fast SSR in development mode by disabling the full manifest generation and prerendering.
    *
-   * This option is primarily used during development to improve performance,
-   * as the full manifest is generated at runtime when using the development server.
-   *
+   * This option is intended to optimize performance during development by skipping prerendering and route extraction when not required.
    * @default false
    */
-  disableFullServerManifestGeneration?: boolean;
+  partialSSRBuild?: boolean;
 
   /**
    * Enables the use of AOT compiler emitted external runtime styles.
@@ -382,7 +380,7 @@ export async function normalizeOptions(
     deployUrl,
     clearScreen,
     define,
-    disableFullServerManifestGeneration = false,
+    partialSSRBuild = false,
     externalRuntimeStyles,
   } = options;
 
@@ -444,7 +442,7 @@ export async function normalizeOptions(
     colors: supportColor(),
     clearScreen,
     define,
-    disableFullServerManifestGeneration,
+    partialSSRBuild: usePartialSsrBuild || partialSSRBuild,
     externalRuntimeStyles,
   };
 }
