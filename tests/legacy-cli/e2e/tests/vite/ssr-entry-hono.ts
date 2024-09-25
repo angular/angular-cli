@@ -120,8 +120,6 @@ async function modifyFileAndWaitUntilUpdated(
 ): Promise<void> {
   await Promise.all([
     waitForAnyProcessOutputToMatch(/Page reload sent to client/),
-    replaceInFile(filePath, searchValue, replaceValue),
+    setTimeout(100).then(() => replaceInFile(filePath, searchValue, replaceValue)),
   ]);
-
-  await setTimeout(200);
 }
