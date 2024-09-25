@@ -240,44 +240,4 @@ describe('App Shell Schematic', () => {
       );
     });
   });
-
-  describe('Legacy browser builder', () => {
-    function convertBuilderToLegacyBrowser(): void {
-      const config = JSON.parse(appTree.readContent('/angular.json'));
-      const build = config.projects.bar.architect.build;
-
-      build.builder = Builders.Browser;
-      build.options = {
-        ...build.options,
-        main: build.options.browser,
-        browser: undefined,
-      };
-
-      build.configurations.development = {
-        ...build.configurations.development,
-        vendorChunk: true,
-        namedChunks: true,
-        buildOptimizer: false,
-      };
-
-      appTree.overwrite('/angular.json', JSON.stringify(config, undefined, 2));
-    }
-
-    beforeEach(async () => {
-      appTree = await schematicRunner.runSchematic('application', appOptions, appTree);
-      convertBuilderToLegacyBrowser();
-    });
-
-    it('should add app shell configuration', async () => {
-      const tree = await schematicRunner.runSchematic('app-shell', defaultOptions, appTree);
-      const filePath = '/angular.json';
-      const content = tree.readContent(filePath);
-      const workspace = JSON.parse(content);
-      const target = workspace.projects.bar.architect['app-shell'];
-      expect(target.configurations.development.browserTarget).toEqual('bar:build:development');
-      expect(target.configurations.development.serverTarget).toEqual('bar:server:development');
-      expect(target.configurations.production.browserTarget).toEqual('bar:build:production');
-      expect(target.configurations.production.serverTarget).toEqual('bar:server:production');
-    });
-  });
 });

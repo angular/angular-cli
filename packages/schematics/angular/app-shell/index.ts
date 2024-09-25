@@ -141,74 +141,32 @@ function validateProject(mainPath: string): Rule {
 }
 
 function addAppShellConfigToWorkspace(options: AppShellOptions): Rule {
-  return (host, context) => {
-    return updateWorkspace((workspace) => {
-      const project = workspace.projects.get(options.project);
-      if (!project) {
-        return;
-      }
+  return updateWorkspace((workspace) => {
+    const project = workspace.projects.get(options.project);
+    if (!project) {
+      return;
+    }
 
-      const buildTarget = project.targets.get('build');
-      if (buildTarget?.builder === Builders.Application) {
-        // Application builder configuration.
-        const prodConfig = buildTarget.configurations?.production;
-        if (!prodConfig) {
-          throw new SchematicsException(
-            `A "production" configuration is not defined for the "build" builder.`,
-          );
-        }
+    const buildTarget = project.targets.get('build');
+    if (
+      buildTarget?.builder !== Builders.Application &&
+      buildTarget?.builder !== Builders.BuildApplication
+    ) {
+      throw new SchematicsException(
+        `App-shell schematic requires the project to use "${Builders.Application}" or "${Builders.BuildApplication}" as the build builder.`,
+      );
+    }
 
-        prodConfig.appShell = true;
+    // Application builder configuration.
+    const prodConfig = buildTarget.configurations?.production;
+    if (!prodConfig) {
+      throw new SchematicsException(
+        `A "production" configuration is not defined for the "build" builder.`,
+      );
+    }
 
-        return;
-      }
-
-      // Webpack based builders configuration.
-      // Validation of targets is handled already in the main function.
-      // Duplicate keys means that we have configurations in both server and build builders.
-      const serverConfigKeys = project.targets.get('server')?.configurations ?? {};
-      const buildConfigKeys = project.targets.get('build')?.configurations ?? {};
-
-      const configurationNames = Object.keys({
-        ...serverConfigKeys,
-        ...buildConfigKeys,
-      });
-
-      const configurations: Record<string, {}> = {};
-      for (const key of configurationNames) {
-        if (!serverConfigKeys[key]) {
-          context.logger.warn(
-            `Skipped adding "${key}" configuration to "app-shell" target as it's missing from "server" target.`,
-          );
-
-          continue;
-        }
-
-        if (!buildConfigKeys[key]) {
-          context.logger.warn(
-            `Skipped adding "${key}" configuration to "app-shell" target as it's missing from "build" target.`,
-          );
-
-          continue;
-        }
-
-        configurations[key] = {
-          browserTarget: `${options.project}:build:${key}`,
-          serverTarget: `${options.project}:server:${key}`,
-        };
-      }
-
-      project.targets.add({
-        name: 'app-shell',
-        builder: Builders.AppShell,
-        defaultConfiguration: configurations['production'] ? 'production' : undefined,
-        options: {
-          route: APP_SHELL_ROUTE,
-        },
-        configurations,
-      });
-    });
-  };
+    prodConfig.appShell = true;
+  });
 }
 
 function addRouterModule(mainPath: string): Rule {

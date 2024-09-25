@@ -4,7 +4,6 @@ import { installWorkspacePackages, uninstallPackage } from '../../utils/packages
 import { ng } from '../../utils/process';
 import { updateJsonFile, useSha } from '../../utils/project';
 import { langTranslations, setupI18nConfig } from './setup';
-import { expectFileToMatch } from '../../utils/fs';
 
 export default async function () {
   const useWebpackBuilder = !getGlobalVariable('argv')['esbuild'];
