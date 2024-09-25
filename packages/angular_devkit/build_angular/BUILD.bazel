@@ -343,6 +343,7 @@ LARGE_SPECS = {
         "shards": 1,
     },
     "server": {
+        "size": "large",
         "extra_deps": [
             "@npm//@angular/animations",
         ],
