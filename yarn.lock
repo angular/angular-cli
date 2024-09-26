@@ -499,9 +499,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@angular/cdk@npm:19.0.0-next.5":
-  version: 19.0.0-next.5
-  resolution: "@angular/cdk@npm:19.0.0-next.5"
+"@angular/cdk@npm:19.0.0-next.6":
+  version: 19.0.0-next.6
+  resolution: "@angular/cdk@npm:19.0.0-next.6"
   dependencies:
     parse5: "npm:^7.1.2"
     tslib: "npm:^2.3.0"
@@ -512,7 +512,7 @@ __metadata:
   dependenciesMeta:
     parse5:
       optional: true
-  checksum: 10c0/d9770f2436cf9baf3e7a6cc26962d9252b4a2e3655bba4bff44feb8e7f28fbb95470259fe4436f8ec408ce67af150cc6236a9554ea98f656c0e32bd5e2a92626
+  checksum: 10c0/07f057bfedeb530ebd36c5afe3b9d4d75c3ed8280f3c48426ffe9d9c7e9b6efbf3afd15e5a83855eaac213ccf7d1b6e14e6124f01dd3e7423553f2a321771123
   languageName: node
   linkType: hard
 
@@ -633,14 +633,14 @@ __metadata:
     "@angular/animations": "npm:19.0.0-next.7"
     "@angular/bazel": "patch:@angular/bazel@https%3A//github.com/angular/bazel-builds.git%23commit=9e6140d1eef8ddf7113d00738f603e9cc3c310f1#~/.yarn/patches/@angular-bazel-https-9848736cf4.patch"
     "@angular/build-tooling": "https://github.com/angular/dev-infra-private-build-tooling-builds.git#f46197abd29ffd084e616af9b5a66d45193769e6"
-    "@angular/cdk": "npm:19.0.0-next.5"
+    "@angular/cdk": "npm:19.0.0-next.6"
     "@angular/common": "npm:19.0.0-next.7"
     "@angular/compiler": "npm:19.0.0-next.7"
     "@angular/compiler-cli": "npm:19.0.0-next.7"
     "@angular/core": "npm:19.0.0-next.7"
     "@angular/forms": "npm:19.0.0-next.7"
     "@angular/localize": "npm:19.0.0-next.7"
-    "@angular/material": "npm:19.0.0-next.5"
+    "@angular/material": "npm:19.0.0-next.6"
     "@angular/ng-dev": "https://github.com/angular/dev-infra-private-ng-dev-builds.git#39e1a11a2dfafc1284048120362b3a48d7f9a15b"
     "@angular/platform-browser": "npm:19.0.0-next.7"
     "@angular/platform-browser-dynamic": "npm:19.0.0-next.7"
@@ -833,20 +833,20 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@angular/material@npm:19.0.0-next.5":
-  version: 19.0.0-next.5
-  resolution: "@angular/material@npm:19.0.0-next.5"
+"@angular/material@npm:19.0.0-next.6":
+  version: 19.0.0-next.6
+  resolution: "@angular/material@npm:19.0.0-next.6"
   dependencies:
     tslib: "npm:^2.3.0"
   peerDependencies:
     "@angular/animations": ^19.0.0-0 || ^19.1.0-0 || ^19.2.0-0 || ^19.3.0-0 || ^20.0.0-0
-    "@angular/cdk": 19.0.0-next.5
+    "@angular/cdk": 19.0.0-next.6
     "@angular/common": ^19.0.0-0 || ^19.1.0-0 || ^19.2.0-0 || ^19.3.0-0 || ^20.0.0-0
     "@angular/core": ^19.0.0-0 || ^19.1.0-0 || ^19.2.0-0 || ^19.3.0-0 || ^20.0.0-0
     "@angular/forms": ^19.0.0-0 || ^19.1.0-0 || ^19.2.0-0 || ^19.3.0-0 || ^20.0.0-0
     "@angular/platform-browser": ^19.0.0-0 || ^19.1.0-0 || ^19.2.0-0 || ^19.3.0-0 || ^20.0.0-0
     rxjs: ^6.5.3 || ^7.4.0
-  checksum: 10c0/22e319ee8ce0582dd2c965e54bff5127a40dc737f0879b06c3353621d2d4ae7965739f84f14af884cba146d2ac9aa2ab617e8cd4716619905f618fc11a9696f5
+  checksum: 10c0/4aea40a0a260bf6084366733e057243bfbf7202eb755a669305059c5685f8f47235cd89bcc82f269db4740ecffcc77ccdddc957f8deffc5eeceaa9297e35e583
   languageName: node
   linkType: hard
 
