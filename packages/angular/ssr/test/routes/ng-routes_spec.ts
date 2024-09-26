@@ -314,7 +314,7 @@ describe('extractRoutesAndCreateRouteTree', () => {
 
     expect(errors).toHaveSize(1);
     expect(errors[0]).toContain(
-      `The server route 'invalid' does not match any routes defined in the Angular routing configuration`,
+      `The 'invalid' server route does not match any routes defined in the Angular routing configuration`,
     );
   });
 
@@ -337,6 +337,28 @@ describe('extractRoutesAndCreateRouteTree', () => {
     expect(errors).toHaveSize(1);
     expect(errors[0]).toContain(
       `The 'invalid' route does not match any route defined in the server routing configuration`,
+    );
+  });
+
+  it(`should error when 'RenderMode.AppShell' is used on more than one route`, async () => {
+    setAngularAppTestingManifest(
+      [
+        { path: 'home', component: DummyComponent },
+        { path: 'shell', component: DummyComponent },
+      ],
+      [{ path: '**', renderMode: RenderMode.AppShell }],
+    );
+
+    const { errors } = await extractRoutesAndCreateRouteTree(
+      url,
+      /** manifest */ undefined,
+      /** invokeGetPrerenderParams */ false,
+      /** includePrerenderFallbackRoutes */ false,
+    );
+
+    expect(errors).toHaveSize(1);
+    expect(errors[0]).toContain(
+      `Both 'home' and 'shell' routes have their 'renderMode' set to 'AppShell'.`,
     );
   });
 });
