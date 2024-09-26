@@ -50,7 +50,7 @@ export class AngularAppEngine {
   /**
    * A cache that holds entry points, keyed by their potential locale string.
    */
-  private readonly entryPointsCache = new Map<string, EntryPointExports>();
+  private readonly entryPointsCache = new Map<string, Promise<EntryPointExports>>();
 
   /**
    * Renders a response for the given HTTP request using the server application.
@@ -110,9 +110,7 @@ export class AngularAppEngine {
    * @param potentialLocale - The locale string used to find the corresponding entry point.
    * @returns A promise that resolves to the entry point exports or `undefined` if not found.
    */
-  private async getEntryPointExports(
-    potentialLocale: string,
-  ): Promise<EntryPointExports | undefined> {
+  private getEntryPointExports(potentialLocale: string): Promise<EntryPointExports> | undefined {
     const cachedEntryPoint = this.entryPointsCache.get(potentialLocale);
     if (cachedEntryPoint) {
       return cachedEntryPoint;
@@ -124,7 +122,7 @@ export class AngularAppEngine {
       return undefined;
     }
 
-    const entryPointExports = await entryPoint();
+    const entryPointExports = entryPoint();
     this.entryPointsCache.set(potentialLocale, entryPointExports);
 
     return entryPointExports;
@@ -141,7 +139,7 @@ export class AngularAppEngine {
    * @param url - The URL of the request.
    * @returns A promise that resolves to the entry point exports or `undefined` if not found.
    */
-  private getEntryPointExportsForUrl(url: URL): Promise<EntryPointExports | undefined> {
+  private getEntryPointExportsForUrl(url: URL): Promise<EntryPointExports> | undefined {
     const { entryPoints, basePath } = this.manifest;
     if (entryPoints.size === 1) {
       return this.getEntryPointExports('');
