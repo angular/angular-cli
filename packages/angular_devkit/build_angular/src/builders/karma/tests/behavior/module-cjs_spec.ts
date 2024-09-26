@@ -11,8 +11,8 @@ import { BASE_OPTIONS, KARMA_BUILDER_INFO, describeKarmaBuilder } from '../setup
 
 describeKarmaBuilder(execute, KARMA_BUILDER_INFO, (harness, setupTarget) => {
   describe('Behavior: "module commonjs"', () => {
-    beforeEach(() => {
-      setupTarget(harness);
+    beforeEach(async () => {
+      await setupTarget(harness);
     });
 
     it('should work when module is commonjs', async () => {

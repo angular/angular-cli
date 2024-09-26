@@ -18,8 +18,8 @@ describeKarmaBuilder(execute, KARMA_BUILDER_INFO, (harness, setupTarget, isAppli
       });
     }
 
-    beforeEach(() => {
-      setupTarget(harness);
+    beforeEach(async () => {
+      await setupTarget(harness);
     });
 
     it('recovers from compilation failures in watch mode', async () => {

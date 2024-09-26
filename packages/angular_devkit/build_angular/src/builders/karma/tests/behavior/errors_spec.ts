@@ -11,8 +11,8 @@ import { BASE_OPTIONS, KARMA_BUILDER_INFO, describeKarmaBuilder } from '../setup
 
 describeKarmaBuilder(execute, KARMA_BUILDER_INFO, (harness, setupTarget) => {
   describe('Behavior: "Errors"', () => {
-    beforeEach(() => {
-      setupTarget(harness);
+    beforeEach(async () => {
+      await setupTarget(harness);
     });
 
     it('should fail when there is a TypeScript error', async () => {

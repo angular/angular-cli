@@ -27,8 +27,8 @@ describeKarmaBuilder(execute, KARMA_BUILDER_INFO, (harness, setupTarget, isAppli
       });
     }
 
-    beforeEach(() => {
-      setupTarget(harness);
+    beforeEach(async () => {
+      await setupTarget(harness);
     });
 
     it('should generate coverage report when option is set to true', async () => {
