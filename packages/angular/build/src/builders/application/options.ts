@@ -96,6 +96,13 @@ interface InternalOptions {
    * styles.
    */
   externalRuntimeStyles?: boolean;
+
+  /**
+   * Enables instrumentation to collect code coverage data for specific files.
+   *
+   * Used exclusively for tests and shouldn't be used for other kinds of builds.
+   */
+  instrumentForCoverage?: (filename: string) => boolean;
 }
 
 /** Full set of options for `application` builder. */
@@ -382,6 +389,7 @@ export async function normalizeOptions(
     define,
     partialSSRBuild = false,
     externalRuntimeStyles,
+    instrumentForCoverage,
   } = options;
 
   // Return all the normalized options
@@ -444,6 +452,7 @@ export async function normalizeOptions(
     define,
     partialSSRBuild: usePartialSsrBuild || partialSSRBuild,
     externalRuntimeStyles,
+    instrumentForCoverage,
   };
 }
 

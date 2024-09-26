@@ -50,6 +50,7 @@ export interface CompilerPluginOptions {
   loadResultCache?: LoadResultCache;
   incremental: boolean;
   externalRuntimeStyles?: boolean;
+  instrumentForCoverage?: (request: string) => boolean;
 }
 
 // eslint-disable-next-line max-lines-per-function
@@ -441,11 +442,13 @@ export function createCompilerPlugin(
           // A string indicates untransformed output from the TS/NG compiler.
           // This step is unneeded when using esbuild transpilation.
           const sideEffects = await hasSideEffects(request);
+          const instrumentForCoverage = pluginOptions.instrumentForCoverage?.(request);
           contents = await javascriptTransformer.transformData(
             request,
             contents,
             true /* skipLinker */,
             sideEffects,
+            instrumentForCoverage,
           );
 
           // Store as the returned Uint8Array to allow caching the fully transformed code

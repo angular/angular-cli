@@ -15,6 +15,7 @@ import {
 } from '@angular/build/private';
 import { BuilderContext, BuilderOutput } from '@angular-devkit/architect';
 import { randomUUID } from 'crypto';
+import glob from 'fast-glob';
 import * as fs from 'fs/promises';
 import type { Config, ConfigOptions, InlinePluginDef } from 'karma';
 import * as path from 'path';
@@ -87,9 +88,8 @@ async function getProjectSourceRoot(context: BuilderContext): Promise<string> {
 async function collectEntrypoints(
   options: KarmaBuilderOptions,
   context: BuilderContext,
+  projectSourceRoot: string,
 ): Promise<[Set<string>, string[]]> {
-  const projectSourceRoot = await getProjectSourceRoot(context);
-
   // Glob for files to test.
   const testFiles = await findTests(
     options.include ?? [],
@@ -127,14 +127,22 @@ async function initializeApplication(
   }
 
   const testDir = path.join(context.workspaceRoot, 'dist/test-out', randomUUID());
+  const projectSourceRoot = await getProjectSourceRoot(context);
 
   const [karma, [entryPoints, polyfills]] = await Promise.all([
     import('karma'),
-    collectEntrypoints(options, context),
+    collectEntrypoints(options, context, projectSourceRoot),
     fs.rm(testDir, { recursive: true, force: true }),
   ]);
 
   const outputPath = testDir;
+
+  const instrumentForCoverage = options.codeCoverage
+    ? createInstrumentationFilter(
+        projectSourceRoot,
+        getInstrumentationExcludedPaths(context.workspaceRoot, options.codeCoverageExclude ?? []),
+      )
+    : undefined;
 
   // Build tests with `application` builder, using test files as entry points.
   const buildOutput = await first(
@@ -152,6 +160,7 @@ async function initializeApplication(
           styles: true,
           vendor: true,
         },
+        instrumentForCoverage,
         styles: options.styles,
         polyfills,
         webWorkerTsConfig: options.webWorkerTsConfig,
@@ -280,4 +289,25 @@ async function first<T>(generator: AsyncIterable<T>): Promise<T> {
   }
 
   throw new Error('Expected generator to emit at least once.');
+}
+
+function createInstrumentationFilter(includedBasePath: string, excludedPaths: Set<string>) {
+  return (request: string): boolean => {
+    return (
+      !excludedPaths.has(request) &&
+      !/\.(e2e|spec)\.tsx?$|[\\/]node_modules[\\/]/.test(request) &&
+      request.startsWith(includedBasePath)
+    );
+  };
+}
+
+function getInstrumentationExcludedPaths(root: string, excludedPaths: string[]): Set<string> {
+  const excluded = new Set<string>();
+
+  for (const excludeGlob of excludedPaths) {
+    const excludePath = excludeGlob[0] === '/' ? excludeGlob.slice(1) : excludeGlob;
+    glob.sync(excludePath, { cwd: root }).forEach((p) => excluded.add(path.join(root, p)));
+  }
+
+  return excluded;
 }

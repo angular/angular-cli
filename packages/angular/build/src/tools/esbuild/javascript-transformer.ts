@@ -75,6 +75,7 @@ export class JavaScriptTransformer {
     filename: string,
     skipLinker?: boolean,
     sideEffects?: boolean,
+    instrumentForCoverage?: boolean,
   ): Promise<Uint8Array> {
     const data = await readFile(filename);
 
@@ -105,6 +106,7 @@ export class JavaScriptTransformer {
           data,
           skipLinker,
           sideEffects,
+          instrumentForCoverage,
           ...this.#commonOptions,
         },
         {
@@ -141,10 +143,11 @@ export class JavaScriptTransformer {
     data: string,
     skipLinker: boolean,
     sideEffects?: boolean,
+    instrumentForCoverage?: boolean,
   ): Promise<Uint8Array> {
     // Perform a quick test to determine if the data needs any transformations.
     // This allows directly returning the data without the worker communication overhead.
-    if (skipLinker && !this.#commonOptions.advancedOptimizations) {
+    if (skipLinker && !this.#commonOptions.advancedOptimizations && !instrumentForCoverage) {
       const keepSourcemap =
         this.#commonOptions.sourcemap &&
         (!!this.#commonOptions.thirdPartySourcemaps || !/[\\/]node_modules[\\/]/.test(filename));
@@ -160,6 +163,7 @@ export class JavaScriptTransformer {
       data,
       skipLinker,
       sideEffects,
+      instrumentForCoverage,
       ...this.#commonOptions,
     });
   }
