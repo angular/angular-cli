@@ -24,6 +24,7 @@ export const VALID_SELF_CLOSING_TAGS = new Set([
   'wbr',
 
   /** SVG tags */
+  'animate',
   'circle',
   'ellipse',
   'line',
