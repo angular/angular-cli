@@ -93,7 +93,7 @@
     "@stylistic/eslint-plugin": "^2.8.0",
     "@types/babel__core": "7.20.5",
     "@types/browser-sync": "^2.27.0",
-    "@types/express": "^4.16.0",
+    "@types/express": "^5.0.0",
     "@types/http-proxy": "^1.17.4",
     "@types/ini": "^4.0.0",
     "@types/jasmine": "~5.1.0",
