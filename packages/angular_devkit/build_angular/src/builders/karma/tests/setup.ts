@@ -35,7 +35,7 @@ export const KARMA_BUILDER_INFO = Object.freeze({
  * Also disables progress reporting to minimize logging output.
  */
 export const BASE_OPTIONS = Object.freeze<Schema>({
-  polyfills: ['zone.js', 'zone.js/testing'],
+  polyfills: ['./src/polyfills', 'zone.js/testing'],
   tsConfig: 'src/tsconfig.spec.json',
   karmaConfig: 'karma.conf.js',
   browsers: 'ChromeHeadlessCI',
@@ -62,10 +62,10 @@ function getCachedSchema(options: { schemaPath: string }): json.schema.JsonSchem
  * @param harness The builder harness to use when setting up the browser builder target
  * @param extraOptions The additional options that should be used when executing the target.
  */
-export function setupBrowserTarget<T>(
+export async function setupBrowserTarget<T>(
   harness: BuilderHarness<T>,
   extraOptions?: Partial<BrowserSchema>,
-): void {
+): Promise<void> {
   const browserSchema = getCachedSchema(BROWSER_BUILDER_INFO);
 
   harness.withBuilderTarget(
@@ -117,10 +117,10 @@ export const APPLICATION_BUILDER_INFO = Object.freeze({
  * @param harness The builder harness to use when setting up the application builder target
  * @param extraOptions The additional options that should be used when executing the target.
  */
-export function setupApplicationTarget<T>(
+export async function setupApplicationTarget<T>(
   harness: BuilderHarness<T>,
   extraOptions?: Partial<ApplicationSchema>,
-): void {
+): Promise<void> {
   const applicationSchema = getCachedSchema(APPLICATION_BUILDER_INFO);
 
   harness.withBuilderTarget(
@@ -135,6 +135,9 @@ export function setupApplicationTarget<T>(
       optionSchema: applicationSchema,
     },
   );
+
+  // For application-builder based targets, the localize polyfill needs to be explicit.
+  await harness.appendToFile('src/polyfills.ts', `import '@angular/localize/init';`);
 }
 
 /** Runs the test against both an application- and a browser-builder context. */

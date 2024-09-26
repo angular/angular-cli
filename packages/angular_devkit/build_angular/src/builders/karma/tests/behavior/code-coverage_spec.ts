@@ -29,8 +29,8 @@ describeKarmaBuilder(execute, KARMA_BUILDER_INFO, (harness, setupTarget, isAppli
       });
     }
 
-    beforeEach(() => {
-      setupTarget(harness);
+    beforeEach(async () => {
+      await setupTarget(harness);
     });
 
     it('should generate coverage report when file was previously processed by Babel', async () => {

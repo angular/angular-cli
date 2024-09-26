@@ -12,7 +12,6 @@ import {
   ResultKind,
   buildApplicationInternal,
   emitFilesToDisk,
-  purgeStaleBuildCache,
 } from '@angular/build/private';
 import { BuilderContext, BuilderOutput } from '@angular-devkit/architect';
 import { randomUUID } from 'crypto';
@@ -22,7 +21,6 @@ import * as path from 'path';
 import { Observable, catchError, defaultIfEmpty, from, of, switchMap } from 'rxjs';
 import { Configuration } from 'webpack';
 import { ExecutionTransformer } from '../../transforms';
-import { readTsconfig } from '../../utils/read-tsconfig';
 import { OutputHashing } from '../browser-esbuild/schema';
 import { findTests } from './find-tests';
 import { Schema as KarmaBuilderOptions } from './schema';
@@ -108,18 +106,6 @@ async function collectEntrypoints(
   const [polyfills, hasZoneTesting] = extractZoneTesting(options.polyfills);
   if (hasZoneTesting) {
     entryPoints.add('zone.js/testing');
-  }
-
-  const tsConfigPath = path.resolve(context.workspaceRoot, options.tsConfig);
-  const tsConfig = await readTsconfig(tsConfigPath);
-
-  const localizePackageInitEntryPoint = '@angular/localize/init';
-  const hasLocalizeType = tsConfig.options.types?.some(
-    (t) => t === '@angular/localize' || t === localizePackageInitEntryPoint,
-  );
-
-  if (hasLocalizeType) {
-    polyfills.push(localizePackageInitEntryPoint);
   }
 
   return [entryPoints, polyfills];

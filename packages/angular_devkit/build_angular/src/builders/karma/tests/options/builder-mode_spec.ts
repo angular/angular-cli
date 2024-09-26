@@ -14,13 +14,15 @@ const ESBUILD_LOG_TEXT = 'Application bundle generation complete.';
 
 describeKarmaBuilder(execute, KARMA_BUILDER_INFO, (harness, setupTarget, isApplicationTarget) => {
   describe('option: "builderMode"', () => {
-    beforeEach(() => {
-      setupTarget(harness);
+    beforeEach(async () => {
+      await setupTarget(harness);
     });
 
     it('"application" always uses esbuild', async () => {
       harness.useTarget('test', {
         ...BASE_OPTIONS,
+        // Must explicitly provide localize polyfill:
+        polyfills: ['zone.js', '@angular/localize/init', 'zone.js/testing'],
         builderMode: BuilderMode.Application,
       });
 
