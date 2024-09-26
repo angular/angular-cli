@@ -38,6 +38,7 @@ export function createCompilerPluginOptions(
     postcssConfiguration,
     publicPath,
     externalRuntimeStyles,
+    instrumentForCoverage,
   } = options;
 
   return {
@@ -53,6 +54,7 @@ export function createCompilerPluginOptions(
       loadResultCache: sourceFileCache?.loadResultCache,
       incremental: !!options.watch,
       externalRuntimeStyles,
+      instrumentForCoverage,
     },
     // Component stylesheet options
     styleOptions: {

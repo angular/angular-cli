@@ -21,14 +21,8 @@ import { BASE_OPTIONS, KARMA_BUILDER_INFO, describeKarmaBuilder } from '../setup
 
 const coveragePath = 'coverage/lcov.info';
 
-describeKarmaBuilder(execute, KARMA_BUILDER_INFO, (harness, setupTarget, isApplicationBuilder) => {
+describeKarmaBuilder(execute, KARMA_BUILDER_INFO, (harness, setupTarget) => {
   describe('Behavior: "codeCoverage"', () => {
-    if (isApplicationBuilder) {
-      beforeEach(() => {
-        pending('Code coverage not implemented yet for application builder');
-      });
-    }
-
     beforeEach(async () => {
       await setupTarget(harness);
     });

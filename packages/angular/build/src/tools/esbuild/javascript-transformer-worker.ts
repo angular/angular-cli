@@ -21,6 +21,7 @@ interface JavaScriptTransformRequest {
   skipLinker?: boolean;
   sideEffects?: boolean;
   jit: boolean;
+  instrumentForCoverage?: boolean;
 }
 
 const textDecoder = new TextDecoder();
@@ -64,8 +65,13 @@ async function transformWithBabel(
   const { default: importAttributePlugin } = await import('@babel/plugin-syntax-import-attributes');
   const plugins: PluginItem[] = [importAttributePlugin];
 
-  // Lazy load the linker plugin only when linking is required
+  if (options.instrumentForCoverage) {
+    const { default: coveragePlugin } = await import('../babel/plugins/add-code-coverage.js');
+    plugins.push(coveragePlugin);
+  }
+
   if (shouldLink) {
+    // Lazy load the linker plugin only when linking is required
     const linkerPlugin = await createLinkerPlugin(options);
     plugins.push(linkerPlugin);
   }
