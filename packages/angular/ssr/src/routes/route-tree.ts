@@ -207,7 +207,7 @@ export class RouteTree<AdditionalMetadata extends Record<string, unknown> = {}> 
    *
    * @param node - The current node to start the traversal from. Defaults to the root node of the tree.
    */
-  private *traverse(node = this.root): Generator<RouteTreeNodeMetadata & AdditionalMetadata> {
+  *traverse(node = this.root): Generator<RouteTreeNodeMetadata & AdditionalMetadata> {
     if (node.metadata) {
       yield node.metadata;
     }

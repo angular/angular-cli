@@ -66,24 +66,6 @@ describe('extractRoutesAndCreateRouteTree', () => {
     );
   });
 
-  it('should handle route not matching server routing configuration', async () => {
-    setAngularAppTestingManifest(
-      [
-        { path: 'home', component: DummyComponent },
-        { path: 'about', component: DummyComponent }, // This route is not in the server configuration
-      ],
-      [
-        { path: 'home', renderMode: RenderMode.Client },
-        // 'about' route is missing here
-      ],
-    );
-
-    const { errors } = await extractRoutesAndCreateRouteTree(url);
-    expect(errors[0]).toContain(
-      `The '/about' route does not match any route defined in the server routing configuration.`,
-    );
-  });
-
   describe('when `invokeGetPrerenderParams` is true', () => {
     it('should resolve parameterized routes for SSG and add a fallback route if fallback is Server', async () => {
       setAngularAppTestingManifest(
@@ -293,5 +275,68 @@ describe('extractRoutesAndCreateRouteTree', () => {
       },
       { route: '/user/:id/role/:role', renderMode: RenderMode.Client },
     ]);
+  });
+
+  it(`should not error when a catch-all route didn't match any Angular route.`, async () => {
+    setAngularAppTestingManifest(
+      [{ path: 'home', component: DummyComponent }],
+      [
+        { path: 'home', renderMode: RenderMode.Server },
+        { path: '**', renderMode: RenderMode.Server },
+      ],
+    );
+
+    const { errors } = await extractRoutesAndCreateRouteTree(
+      url,
+      /** manifest */ undefined,
+      /** invokeGetPrerenderParams */ false,
+      /** includePrerenderFallbackRoutes */ false,
+    );
+
+    expect(errors).toHaveSize(0);
+  });
+
+  it('should error when a route is not defined in the server routing configuration', async () => {
+    setAngularAppTestingManifest(
+      [{ path: 'home', component: DummyComponent }],
+      [
+        { path: 'home', renderMode: RenderMode.Server },
+        { path: 'invalid', renderMode: RenderMode.Server },
+      ],
+    );
+
+    const { errors } = await extractRoutesAndCreateRouteTree(
+      url,
+      /** manifest */ undefined,
+      /** invokeGetPrerenderParams */ false,
+      /** includePrerenderFallbackRoutes */ false,
+    );
+
+    expect(errors).toHaveSize(1);
+    expect(errors[0]).toContain(
+      `The server route 'invalid' does not match any routes defined in the Angular routing configuration`,
+    );
+  });
+
+  it('should error when a server route is not defined in the Angular routing configuration', async () => {
+    setAngularAppTestingManifest(
+      [
+        { path: 'home', component: DummyComponent },
+        { path: 'invalid', component: DummyComponent },
+      ],
+      [{ path: 'home', renderMode: RenderMode.Server }],
+    );
+
+    const { errors } = await extractRoutesAndCreateRouteTree(
+      url,
+      /** manifest */ undefined,
+      /** invokeGetPrerenderParams */ false,
+      /** includePrerenderFallbackRoutes */ false,
+    );
+
+    expect(errors).toHaveSize(1);
+    expect(errors[0]).toContain(
+      `The 'invalid' route does not match any route defined in the server routing configuration`,
+    );
   });
 });

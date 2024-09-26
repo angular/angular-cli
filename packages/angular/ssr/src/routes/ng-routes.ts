@@ -26,7 +26,7 @@ import { ServerAssets } from '../assets';
 import { Console } from '../console';
 import { AngularAppManifest, getAngularAppManifest } from '../manifest';
 import { AngularBootstrap, isNgModule } from '../utils/ng';
-import { joinUrlParts } from '../utils/url';
+import { joinUrlParts, stripLeadingSlash } from '../utils/url';
 import { PrerenderFallback, RenderMode, SERVER_ROUTES_CONFIG, ServerRoute } from './route-config';
 import { RouteTree, RouteTreeNodeMetadata } from './route-tree';
 
@@ -43,7 +43,10 @@ const VALID_REDIRECT_RESPONSE_CODES = new Set([301, 302, 303, 307, 308]);
 /**
  * Additional metadata for a server configuration route tree.
  */
-type ServerConfigRouteTreeAdditionalMetadata = Partial<ServerRoute>;
+type ServerConfigRouteTreeAdditionalMetadata = Partial<ServerRoute> & {
+  /** Indicates if the route has been matched with the Angular router routes. */
+  matched?: boolean;
+};
 
 /**
  * Metadata for a server configuration route tree node.
@@ -124,18 +127,22 @@ async function* traverseRoutesConfig(options: {
         if (!matchedMetaData) {
           yield {
             error:
-              `The '${currentRoutePath}' route does not match any route defined in the server routing configuration. ` +
+              `The '${stripLeadingSlash(currentRoutePath)}' route does not match any route defined in the server routing configuration. ` +
               'Please ensure this route is added to the server routing configuration.',
           };
 
           continue;
         }
+
+        matchedMetaData.matched = true;
       }
 
       const metadata: ServerConfigRouteTreeNodeMetadata = {
         ...matchedMetaData,
         route: currentRoutePath,
       };
+
+      delete metadata.matched;
 
       // Handle redirects
       if (typeof redirectTo === 'string') {
@@ -189,7 +196,9 @@ async function* traverseRoutesConfig(options: {
         }
       }
     } catch (error) {
-      yield { error: `Error processing route '${route.path}': ${(error as Error).message}` };
+      yield {
+        error: `Error processing route '${stripLeadingSlash(route.path ?? '')}': ${(error as Error).message}`,
+      };
     }
   }
 }
@@ -237,7 +246,7 @@ async function* handleSSGRoute(
     if (!getPrerenderParams) {
       yield {
         error:
-          `The '${currentRoutePath}' route uses prerendering and includes parameters, but 'getPrerenderParams' is missing. ` +
+          `The '${stripLeadingSlash(currentRoutePath)}' route uses prerendering and includes parameters, but 'getPrerenderParams' is missing. ` +
           `Please define 'getPrerenderParams' function for this route in your server routing configuration ` +
           `or specify a different 'renderMode'.`,
       };
@@ -253,7 +262,7 @@ async function* handleSSGRoute(
           const value = params[parameterName];
           if (typeof value !== 'string') {
             throw new Error(
-              `The 'getPrerenderParams' function defined for the '${currentRoutePath}' route ` +
+              `The 'getPrerenderParams' function defined for the '${stripLeadingSlash(currentRoutePath)}' route ` +
                 `returned a non-string value for parameter '${parameterName}'. ` +
                 `Please make sure the 'getPrerenderParams' function returns values for all parameters ` +
                 'specified in this route.',
@@ -438,6 +447,20 @@ export async function getRoutesFromAngularRouterConfig(
           errors.push(result.error);
         } else {
           routesResults.push(result);
+        }
+      }
+
+      if (serverConfigRouteTree) {
+        for (const { route, matched } of serverConfigRouteTree.traverse()) {
+          if (matched || route === '**') {
+            // Skip if matched or it's the catch-all route.
+            continue;
+          }
+
+          errors.push(
+            `The server route '${route}' does not match any routes defined in the Angular routing configuration. ` +
+              'Please verify and if unneeded remove this route from the server configuration.',
+          );
         }
       }
     } else {
