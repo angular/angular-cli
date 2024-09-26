@@ -48,6 +48,11 @@ export class AngularAppEngine {
   private readonly manifest = getAngularAppEngineManifest();
 
   /**
+   * A cache that holds entry points, keyed by their potential locale string.
+   */
+  private readonly entryPointsCache = new Map<string, EntryPointExports>();
+
+  /**
    * Renders a response for the given HTTP request using the server application.
    *
    * This method processes the request, determines the appropriate route and rendering context,
@@ -65,12 +70,12 @@ export class AngularAppEngine {
   async render(request: Request, requestContext?: unknown): Promise<Response | null> {
     // Skip if the request looks like a file but not `/index.html`.
     const url = new URL(request.url);
-    const entryPoint = this.getEntryPointFromUrl(url);
+    const entryPoint = await this.getEntryPointExportsForUrl(url);
     if (!entryPoint) {
       return null;
     }
 
-    const { ɵgetOrCreateAngularServerApp: getOrCreateAngularServerApp } = await entryPoint();
+    const { ɵgetOrCreateAngularServerApp: getOrCreateAngularServerApp } = entryPoint;
     // Note: Using `instanceof` is not feasible here because `AngularServerApp` will
     // be located in separate bundles, making `instanceof` checks unreliable.
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
@@ -78,28 +83,6 @@ export class AngularAppEngine {
     serverApp.hooks = this.hooks;
 
     return serverApp.render(request, requestContext);
-  }
-
-  /**
-   * Retrieves the entry point path and locale for the Angular server application based on the provided URL.
-   *
-   * This method determines the appropriate entry point and locale for rendering the application by examining the URL.
-   * If there is only one entry point available, it is returned regardless of the URL.
-   * Otherwise, the method extracts a potential locale identifier from the URL and looks up the corresponding entry point.
-   *
-   * @param url - The URL used to derive the locale and determine the appropriate entry point.
-   * @returns A function that returns a promise resolving to an object with the `EntryPointExports` type,
-   * or `undefined` if no matching entry point is found for the extracted locale.
-   */
-  private getEntryPointFromUrl(url: URL): (() => Promise<EntryPointExports>) | undefined {
-    const { entryPoints, basePath } = this.manifest;
-    if (entryPoints.size === 1) {
-      return entryPoints.values().next().value;
-    }
-
-    const potentialLocale = getPotentialLocaleIdFromUrl(url, basePath);
-
-    return entryPoints.get(potentialLocale);
   }
 
   /**
@@ -119,5 +102,53 @@ export class AngularAppEngine {
     const headers = this.manifest.staticPathsHeaders.get(stripTrailingSlash(pathname));
 
     return new Map(headers);
+  }
+
+  /**
+   * Retrieves the exports for a specific entry point, caching the result.
+   *
+   * @param potentialLocale - The locale string used to find the corresponding entry point.
+   * @returns A promise that resolves to the entry point exports or `undefined` if not found.
+   */
+  private async getEntryPointExports(
+    potentialLocale: string,
+  ): Promise<EntryPointExports | undefined> {
+    const cachedEntryPoint = this.entryPointsCache.get(potentialLocale);
+    if (cachedEntryPoint) {
+      return cachedEntryPoint;
+    }
+
+    const { entryPoints } = this.manifest;
+    const entryPoint = entryPoints.get(potentialLocale);
+    if (!entryPoint) {
+      return undefined;
+    }
+
+    const entryPointExports = await entryPoint();
+    this.entryPointsCache.set(potentialLocale, entryPointExports);
+
+    return entryPointExports;
+  }
+
+  /**
+   * Retrieves the entry point for a given URL by determining the locale and mapping it to
+   * the appropriate application bundle.
+   *
+   * This method determines the appropriate entry point and locale for rendering the application by examining the URL.
+   * If there is only one entry point available, it is returned regardless of the URL.
+   * Otherwise, the method extracts a potential locale identifier from the URL and looks up the corresponding entry point.
+   *
+   * @param url - The URL of the request.
+   * @returns A promise that resolves to the entry point exports or `undefined` if not found.
+   */
+  private getEntryPointExportsForUrl(url: URL): Promise<EntryPointExports | undefined> {
+    const { entryPoints, basePath } = this.manifest;
+    if (entryPoints.size === 1) {
+      return this.getEntryPointExports('');
+    }
+
+    const potentialLocale = getPotentialLocaleIdFromUrl(url, basePath);
+
+    return this.getEntryPointExports(potentialLocale);
   }
 }
