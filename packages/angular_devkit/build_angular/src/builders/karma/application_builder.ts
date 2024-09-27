@@ -85,11 +85,19 @@ async function getProjectSourceRoot(context: BuilderContext): Promise<string> {
   return path.join(context.workspaceRoot, sourceRoot);
 }
 
+function normalizePolyfills(polyfills: string | string[] | undefined): string[] {
+  if (typeof polyfills === 'string') {
+    return [polyfills];
+  }
+
+  return polyfills ?? [];
+}
+
 async function collectEntrypoints(
   options: KarmaBuilderOptions,
   context: BuilderContext,
   projectSourceRoot: string,
-): Promise<[Set<string>, string[]]> {
+): Promise<Set<string>> {
   // Glob for files to test.
   const testFiles = await findTests(
     options.include ?? [],
@@ -102,13 +110,8 @@ async function collectEntrypoints(
     ...testFiles,
     '@angular-devkit/build-angular/src/builders/karma/init_test_bed.js',
   ]);
-  // Extract `zone.js/testing` to a separate entry point because it needs to be loaded after Jasmine.
-  const [polyfills, hasZoneTesting] = extractZoneTesting(options.polyfills);
-  if (hasZoneTesting) {
-    entryPoints.add('zone.js/testing');
-  }
 
-  return [entryPoints, polyfills];
+  return entryPoints;
 }
 
 async function initializeApplication(
@@ -129,7 +132,7 @@ async function initializeApplication(
   const testDir = path.join(context.workspaceRoot, 'dist/test-out', randomUUID());
   const projectSourceRoot = await getProjectSourceRoot(context);
 
-  const [karma, [entryPoints, polyfills]] = await Promise.all([
+  const [karma, entryPoints] = await Promise.all([
     import('karma'),
     collectEntrypoints(options, context, projectSourceRoot),
     fs.rm(testDir, { recursive: true, force: true }),
@@ -162,7 +165,7 @@ async function initializeApplication(
         },
         instrumentForCoverage,
         styles: options.styles,
-        polyfills,
+        polyfills: normalizePolyfills(options.polyfills),
         webWorkerTsConfig: options.webWorkerTsConfig,
       },
       context,
@@ -184,11 +187,10 @@ async function initializeApplication(
     // Serve polyfills first.
     { pattern: `${testDir}/polyfills.js`, type: 'module' },
     // Allow loading of chunk-* files but don't include them all on load.
-    { pattern: `${testDir}/chunk-*.js`, type: 'module', included: false },
-    // Allow loading of worker-* files but don't include them all on load.
-    { pattern: `${testDir}/worker-*.js`, type: 'module', included: false },
-    // `zone.js/testing`, served but not included on page load.
-    { pattern: `${testDir}/testing.js`, type: 'module', included: false },
+    { pattern: `${testDir}/{chunk,worker}-*.js`, type: 'module', included: false },
+  );
+
+  karmaOptions.files.push(
     // Serve remaining JS on page load, these are the test entrypoints.
     { pattern: `${testDir}/*.js`, type: 'module' },
   );
@@ -264,22 +266,6 @@ export async function writeTestFiles(files: Record<string, ResultFile>, testDir:
       await fs.copyFile(file.inputPath, fullFilePath, fs.constants.COPYFILE_FICLONE);
     }
   });
-}
-
-function extractZoneTesting(
-  polyfills: readonly string[] | string | undefined,
-): [polyfills: string[], hasZoneTesting: boolean] {
-  if (typeof polyfills === 'string') {
-    polyfills = [polyfills];
-  }
-  polyfills ??= [];
-
-  const polyfillsWithoutZoneTesting = polyfills.filter(
-    (polyfill) => polyfill !== 'zone.js/testing',
-  );
-  const hasZoneTesting = polyfills.length !== polyfillsWithoutZoneTesting.length;
-
-  return [polyfillsWithoutZoneTesting, hasZoneTesting];
 }
 
 /** Returns the first item yielded by the given generator and cancels the execution. */
