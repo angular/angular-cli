@@ -133,13 +133,13 @@ describe('Browser Builder lazy modules', () => {
       'src/lazy-module.ts': 'export const value = 42;',
       'src/main.ts': `
         const lazyFileName = 'module';
-        import(/*webpackChunkName: '[request]'*/'./lazy-' + lazyFileName);
+        import('./lazy-' + lazyFileName);
       `,
     });
     host.replaceInFile('src/tsconfig.app.json', '"main.ts"', `"main.ts","lazy-module.ts"`);
 
     const { files } = await browserBuild(architect, host, target);
-    expect(files['lazy-module.js']).toBeDefined();
+    expect(files['common.js']).toBeDefined();
   });
 
   it(`supports making a common bundle for shared lazy modules`, async () => {
