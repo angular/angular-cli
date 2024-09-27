@@ -9,15 +9,10 @@
 import { concatMap, count, debounceTime, take, timeout } from 'rxjs';
 import { execute } from '../../index';
 import { BASE_OPTIONS, KARMA_BUILDER_INFO, describeKarmaBuilder } from '../setup';
+import { BuilderOutput } from '@angular-devkit/architect';
 
 describeKarmaBuilder(execute, KARMA_BUILDER_INFO, (harness, setupTarget, isApplicationBuilder) => {
   describe('Behavior: "Rebuilds"', () => {
-    if (isApplicationBuilder) {
-      beforeEach(() => {
-        pending('--watch not implemented yet for application builder');
-      });
-    }
-
     beforeEach(async () => {
       await setupTarget(harness);
     });
@@ -30,37 +25,48 @@ describeKarmaBuilder(execute, KARMA_BUILDER_INFO, (harness, setupTarget, isAppli
 
       const goodFile = await harness.readFile('src/app/app.component.spec.ts');
 
+      interface OutputCheck {
+        (result: BuilderOutput | undefined): Promise<void>;
+      }
+
+      const expectedSequence: OutputCheck[] = [
+        async (result) => {
+          // Karma run should succeed.
+          // Add a compilation error.
+          expect(result?.success).toBeTrue();
+          // Add an syntax error to a non-main file.
+          await harness.appendToFile('src/app/app.component.spec.ts', `error`);
+        },
+        async (result) => {
+          expect(result?.success).toBeFalse();
+          await harness.writeFile('src/app/app.component.spec.ts', goodFile);
+        },
+        async (result) => {
+          expect(result?.success).toBeTrue();
+        },
+      ];
+      if (isApplicationBuilder) {
+        expectedSequence.unshift(async (result) => {
+          // This is the initial Karma run, it should succeed.
+          // For simplicity, we trigger a run the first time we build in watch mode.
+          expect(result?.success).toBeTrue();
+        });
+      }
+
       const buildCount = await harness
         .execute({ outputLogsOnFailure: false })
         .pipe(
           timeout(60000),
           debounceTime(500),
           concatMap(async ({ result }, index) => {
-            switch (index) {
-              case 0:
-                // Karma run should succeed.
-                // Add a compilation error.
-                expect(result?.success).toBeTrue();
-                // Add an syntax error to a non-main file.
-                await harness.appendToFile('src/app/app.component.spec.ts', `error`);
-                break;
-
-              case 1:
-                expect(result?.success).toBeFalse();
-                await harness.writeFile('src/app/app.component.spec.ts', goodFile);
-                break;
-
-              case 2:
-                expect(result?.success).toBeTrue();
-                break;
-            }
+            await expectedSequence[index](result);
           }),
-          take(3),
+          take(expectedSequence.length),
           count(),
         )
         .toPromise();
 
-      expect(buildCount).toBe(3);
+      expect(buildCount).toBe(expectedSequence.length);
     });
   });
 });
