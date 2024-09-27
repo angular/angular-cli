@@ -168,7 +168,7 @@
     "mrmime": "2.0.0",
     "ng-packagr": "19.0.0-next.3",
     "npm": "^10.8.1",
-    "npm-package-arg": "11.0.3",
+    "npm-package-arg": "12.0.0",
     "npm-pick-manifest": "10.0.0",
     "open": "10.1.0",
     "ora": "5.4.1",
