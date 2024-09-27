@@ -331,9 +331,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@angular/build-tooling@https://github.com/angular/dev-infra-private-build-tooling-builds.git#f46197abd29ffd084e616af9b5a66d45193769e6":
-  version: 0.0.0-0bf58aff56fdef5e8644a591b32e57ca512bd5c7
-  resolution: "@angular/build-tooling@https://github.com/angular/dev-infra-private-build-tooling-builds.git#commit=f46197abd29ffd084e616af9b5a66d45193769e6"
+"@angular/build-tooling@https://github.com/angular/dev-infra-private-build-tooling-builds.git#c530555d0383bcfebd26146969f5ece023bd009e":
+  version: 0.0.0-55c0cd826f5ad56c3bccc7272313c75467543f3f
+  resolution: "@angular/build-tooling@https://github.com/angular/dev-infra-private-build-tooling-builds.git#commit=c530555d0383bcfebd26146969f5ece023bd009e"
   dependencies:
     "@angular/benchpress": "npm:0.3.0"
     "@angular/build": "npm:19.0.0-next.7"
@@ -373,7 +373,7 @@ __metadata:
   dependenciesMeta:
     re2:
       built: false
-  checksum: 10c0/37f8f6719b32633c7c559aea38aa3af5b252c794c0594d5d6a61619c4f20aa71d3865dbf64a14178a125b810f15c36ebf7e4990a24b720ea7f3a8c7ea24de219
+  checksum: 10c0/c405915e7cab4cfe0b7e52026d248d94edbf3b7def6cd6b94a9da4e324019a7e6a88f448d30b73a79815d847cec2e01c30a38492b2275a76beb7a20418a939a4
   languageName: node
   linkType: hard
 
@@ -632,7 +632,7 @@ __metadata:
     "@ampproject/remapping": "npm:2.3.0"
     "@angular/animations": "npm:19.0.0-next.7"
     "@angular/bazel": "patch:@angular/bazel@https%3A//github.com/angular/bazel-builds.git%23commit=9e6140d1eef8ddf7113d00738f603e9cc3c310f1#~/.yarn/patches/@angular-bazel-https-9848736cf4.patch"
-    "@angular/build-tooling": "https://github.com/angular/dev-infra-private-build-tooling-builds.git#f46197abd29ffd084e616af9b5a66d45193769e6"
+    "@angular/build-tooling": "https://github.com/angular/dev-infra-private-build-tooling-builds.git#c530555d0383bcfebd26146969f5ece023bd009e"
     "@angular/cdk": "npm:19.0.0-next.6"
     "@angular/common": "npm:19.0.0-next.7"
     "@angular/compiler": "npm:19.0.0-next.7"
@@ -641,7 +641,7 @@ __metadata:
     "@angular/forms": "npm:19.0.0-next.7"
     "@angular/localize": "npm:19.0.0-next.7"
     "@angular/material": "npm:19.0.0-next.6"
-    "@angular/ng-dev": "https://github.com/angular/dev-infra-private-ng-dev-builds.git#39e1a11a2dfafc1284048120362b3a48d7f9a15b"
+    "@angular/ng-dev": "https://github.com/angular/dev-infra-private-ng-dev-builds.git#6a4827f4275bd211053d60918e6ccaeaeb00bf06"
     "@angular/platform-browser": "npm:19.0.0-next.7"
     "@angular/platform-browser-dynamic": "npm:19.0.0-next.7"
     "@angular/platform-server": "npm:19.0.0-next.7"
@@ -850,9 +850,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#39e1a11a2dfafc1284048120362b3a48d7f9a15b":
-  version: 0.0.0-0bf58aff56fdef5e8644a591b32e57ca512bd5c7
-  resolution: "@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#commit=39e1a11a2dfafc1284048120362b3a48d7f9a15b"
+"@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#6a4827f4275bd211053d60918e6ccaeaeb00bf06":
+  version: 0.0.0-55c0cd826f5ad56c3bccc7272313c75467543f3f
+  resolution: "@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#commit=6a4827f4275bd211053d60918e6ccaeaeb00bf06"
   dependencies:
     "@octokit/rest": "npm:21.0.2"
     "@types/semver": "npm:^7.3.6"
@@ -866,7 +866,7 @@ __metadata:
     yaml: "npm:2.5.1"
   bin:
     ng-dev: ./bundles/cli.mjs
-  checksum: 10c0/9b3e542e1429e5840da3ac374b2d9be635a435e032939751dc53333608e8596f7223eeb6345fa120a28b689b8cde97c172b726573fdb11f5fa80192760bb1000
+  checksum: 10c0/24c732083fef74b21646a6519f9a8db1ebe41bae445d6493721a252fdd2ed154a25ad7fab5e4c8b4486d02671f0e82d99f3a3b2b44991e8f341edcf1e3ca9ad4
   languageName: node
   linkType: hard
 
