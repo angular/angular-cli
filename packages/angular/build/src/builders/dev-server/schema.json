@@ -66,9 +66,39 @@
       "description": "The pathname where the application will be served."
     },
     "hmr": {
-      "type": "boolean",
-      "description": "Enable hot module replacement.",
-      "default": false
+      "description": "Disable or configure HMR connection",
+      "default": false,
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "protocol": {
+              "type": "string",
+              "description": "The WebSocket protocol used for the HMR connection: ws (WebSocket) or wss (WebSocket Secure)."
+            },
+            "host": {
+              "type": "string",
+              "description": "The IP addresses or domain the HMR server should listen on."
+            },
+            "port": {
+              "type": "number",
+              "description": "The port the HMR server should listen on."
+            },
+            "overlay": {
+              "type": "boolean",
+              "description": "Set to false to disable the server error overlay."
+            },
+            "clientPort": {
+              "type": "number",
+              "description": "An advanced option that overrides the port only on the client side, allowing you to serve the websocket on a different port than the client code looks for it on."
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "boolean"
+        }
+      ]
     },
     "watch": {
       "type": "boolean",
