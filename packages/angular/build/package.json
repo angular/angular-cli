@@ -39,8 +39,8 @@
     "parse5-html-rewriting-stream": "7.0.0",
     "picomatch": "4.0.2",
     "piscina": "4.7.0",
-    "rollup": "4.22.4",
-    "sass": "1.79.3",
+    "rollup": "4.22.5",
+    "sass": "1.79.4",
     "semver": "7.6.3",
     "vite": "5.4.8",
     "watchpack": "2.4.2"
