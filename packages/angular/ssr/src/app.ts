@@ -13,8 +13,16 @@ import { getAngularAppManifest } from './manifest';
 import { RenderMode } from './routes/route-config';
 import { ServerRouter } from './routes/router';
 import { REQUEST, REQUEST_CONTEXT, RESPONSE_INIT } from './tokens';
+import { sha256 } from './utils/crypto';
 import { InlineCriticalCssProcessor } from './utils/inline-critical-css';
+import { LRUCache } from './utils/lru-cache';
 import { AngularBootstrap, renderAngular } from './utils/ng';
+
+/**
+ * Maximum number of critical CSS entries the cache can store.
+ * This value determines the capacity of the LRU (Least Recently Used) cache, which stores critical CSS for pages.
+ */
+const MAX_INLINE_CSS_CACHE_ENTRIES = 50;
 
 /**
  * A mapping of `RenderMode` enum values to corresponding string representations.
@@ -71,6 +79,15 @@ export class AngularServerApp {
    * The bootstrap mechanism for the server application.
    */
   private boostrap: AngularBootstrap | undefined;
+
+  /**
+   * Cache for storing critical CSS for pages.
+   * Stores a maximum of MAX_INLINE_CSS_CACHE_ENTRIES entries.
+   *
+   * Uses an LRU (Least Recently Used) eviction policy, meaning that when the cache is full,
+   * the least recently accessed page's critical CSS will be removed to make space for new entries.
+   */
+  private readonly criticalCssLRUCache = new LRUCache<string, string>(MAX_INLINE_CSS_CACHE_ENTRIES);
 
   /**
    * Renders a response for the given HTTP request using the server application.
@@ -237,7 +254,19 @@ export class AngularServerApp {
         return this.assets.getServerAsset(fileName);
       });
 
-      html = await this.inlineCriticalCssProcessor.process(html);
+      if (isSsrMode) {
+        // Only cache if we are running in SSR Mode.
+        const cacheKey = await sha256(html);
+        let htmlWithCriticalCss = this.criticalCssLRUCache.get(cacheKey);
+        if (htmlWithCriticalCss === undefined) {
+          htmlWithCriticalCss = await this.inlineCriticalCssProcessor.process(html);
+          this.criticalCssLRUCache.put(cacheKey, htmlWithCriticalCss);
+        }
+
+        html = htmlWithCriticalCss;
+      } else {
+        html = await this.inlineCriticalCssProcessor.process(html);
+      }
     }
 
     return new Response(html, responseInit);
