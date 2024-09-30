@@ -14,6 +14,7 @@ import { addEventDispatchContract } from './add-event-dispatch-contract';
 import { CrossOriginValue, Entrypoint, FileInfo, augmentIndexHtml } from './augment-index-html';
 import { InlineCriticalCssProcessor } from './inline-critical-css';
 import { InlineFontsProcessor } from './inline-fonts';
+import { addNgcmAttribute } from './ngcm-attribute';
 import { addNonce } from './nonce';
 
 type IndexHtmlGeneratorPlugin = (
@@ -82,6 +83,7 @@ export class IndexHtmlGenerator {
 
     // SSR plugins
     if (options.generateDedicatedSSRContent) {
+      this.csrPlugins.push(addNgcmAttributePlugin());
       this.ssrPlugins.push(addEventDispatchContractPlugin(), addNoncePlugin());
     }
   }
@@ -202,4 +204,8 @@ function postTransformPlugin({ options }: IndexHtmlGenerator): IndexHtmlGenerato
 
 function addEventDispatchContractPlugin(): IndexHtmlGeneratorPlugin {
   return (html) => addEventDispatchContract(html);
+}
+
+function addNgcmAttributePlugin(): IndexHtmlGeneratorPlugin {
+  return (html) => addNgcmAttribute(html);
 }
