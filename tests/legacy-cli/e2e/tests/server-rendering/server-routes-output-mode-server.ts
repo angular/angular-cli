@@ -6,6 +6,11 @@ import { noSilentNg, silentNg } from '../../utils/process';
 import { setupProjectWithSSRAppEngine, spawnServer } from './setup';
 
 export default async function () {
+  if (process.version.startsWith('v18')) {
+    // This is not supported in Node.js version 18 as global web crypto module is not available.
+    return;
+  }
+
   // Setup project
   await setupProjectWithSSRAppEngine();
 
