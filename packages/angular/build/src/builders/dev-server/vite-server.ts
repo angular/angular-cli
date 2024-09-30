@@ -181,7 +181,7 @@ export async function* serveWithVite(
       case ResultKind.Failure:
         if (result.errors.length && server) {
           hadError = true;
-          server.hot.send({
+          server.ws.send({
             type: 'error',
             err: {
               message: result.errors[0].text,
@@ -230,7 +230,7 @@ export async function* serveWithVite(
     if (hadError && server) {
       hadError = false;
       // Send an empty update to clear the error overlay
-      server.hot.send({
+      server.ws.send({
         'type': 'update',
         updates: [],
       });
@@ -369,7 +369,7 @@ export async function* serveWithVite(
             key: 'r',
             description: 'force reload browser',
             action(server) {
-              server.hot.send({
+              server.ws.send({
                 type: 'full-reload',
                 path: '*',
               });
@@ -433,7 +433,7 @@ async function handleUpdate(
   if (serverOptions.liveReload || serverOptions.hmr) {
     if (updatedFiles.every((f) => f.endsWith('.css'))) {
       const timestamp = Date.now();
-      server.hot.send({
+      server.ws.send({
         type: 'update',
         updates: updatedFiles.flatMap((filePath) => {
           // For component styles, an HMR update must be sent for each one with the corresponding
@@ -468,7 +468,7 @@ async function handleUpdate(
 
   // Send reload command to clients
   if (serverOptions.liveReload) {
-    server.hot.send({
+    server.ws.send({
       type: 'full-reload',
       path: '*',
     });
