@@ -34,6 +34,9 @@ export function createAngularSsrInternalMiddleware(
     }
 
     (async () => {
+      // Load the compiler because `@angular/ssr/node` depends on `@angular/` packages,
+      // which must be processed by the runtime linker, even if they are not used.
+      await loadEsmModule('@angular/compiler');
       const { writeResponseToNodeResponse, createWebRequestFromNodeRequest } =
         await loadEsmModule<typeof import('@angular/ssr/node')>('@angular/ssr/node');
 
@@ -75,6 +78,10 @@ export async function createAngularSsrExternalMiddleware(
   let angularSsrInternalMiddleware:
     | ReturnType<typeof createAngularSsrInternalMiddleware>
     | undefined;
+
+  // Load the compiler because `@angular/ssr/node` depends on `@angular/` packages,
+  // which must be processed by the runtime linker, even if they are not used.
+  await loadEsmModule('@angular/compiler');
 
   const { createWebRequestFromNodeRequest, writeResponseToNodeResponse } =
     await loadEsmModule<typeof import('@angular/ssr/node')>('@angular/ssr/node');
