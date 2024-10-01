@@ -26,6 +26,7 @@ const MAIN_SERVER_OUTPUT_FILENAME = 'main.server.mjs';
 const UNSAFE_CHAR_MAP: Record<string, string> = {
   '`': '\\`',
   '$': '\\$',
+  '\\': '\\\\',
 };
 
 /**
@@ -36,7 +37,7 @@ const UNSAFE_CHAR_MAP: Record<string, string> = {
  * @returns The escaped string where unsafe characters are replaced.
  */
 function escapeUnsafeChars(str: string): string {
-  return str.replace(/[$`]/g, (c) => UNSAFE_CHAR_MAP[c]);
+  return str.replace(/[$`\\]/g, (c) => UNSAFE_CHAR_MAP[c]);
 }
 
 /**
