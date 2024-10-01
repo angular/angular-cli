@@ -8,13 +8,15 @@
 
 import type {
   AngularAppEngine as SSRAngularAppEngine,
-  createRequestHandler,
   ɵgetOrCreateAngularServerApp as getOrCreateAngularServerApp,
 } from '@angular/ssr';
-import type { createNodeRequestHandler } from '@angular/ssr/node';
 import type { ServerResponse } from 'node:http';
 import type { Connect, ViteDevServer } from 'vite';
 import { loadEsmModule } from '../../../utils/load-esm';
+import {
+  isSsrNodeRequestHandler,
+  isSsrRequestHandler,
+} from '../../../utils/server-rendering/utils';
 
 export function createAngularSsrInternalMiddleware(
   server: ViteDevServer,
@@ -135,14 +137,4 @@ export async function createAngularSsrExternalMiddleware(
       }
     })().catch(next);
   };
-}
-
-function isSsrNodeRequestHandler(
-  value: unknown,
-): value is ReturnType<typeof createNodeRequestHandler> {
-  return typeof value === 'function' && '__ng_node_request_handler__' in value;
-}
-
-function isSsrRequestHandler(value: unknown): value is ReturnType<typeof createRequestHandler> {
-  return typeof value === 'function' && '__ng_request_handler__' in value;
 }

@@ -21,7 +21,7 @@ const { assetFiles } = workerData as {
 const assetsCache: Map<string, { headers: undefined | Record<string, string>; content: Buffer }> =
   new Map();
 
-export function patchFetchToLoadInMemoryAssets(): void {
+export function patchFetchToLoadInMemoryAssets(baseURL: URL): void {
   const originalFetch = globalThis.fetch;
   const patchedFetch: typeof fetch = async (input, init) => {
     let url: URL;
@@ -38,7 +38,7 @@ export function patchFetchToLoadInMemoryAssets(): void {
     const { hostname } = url;
     const pathname = decodeURIComponent(url.pathname);
 
-    if (hostname !== 'local-angular-prerender' || !assetFiles[pathname]) {
+    if (hostname !== baseURL.hostname || !assetFiles[pathname]) {
       // Only handle relative requests or files that are in assets.
       return originalFetch(input, init);
     }
