@@ -510,7 +510,7 @@ export async function setupServer(
     join(serverOptions.workspaceRoot, `.angular/vite-root`, serverOptions.buildTarget.project),
   );
 
-  const cacheDir = join(serverOptions.cacheOptions.path, 'vite');
+  const cacheDir = join(serverOptions.cacheOptions.path, serverOptions.buildTarget.project, 'vite');
   const configuration: InlineConfig = {
     configFile: false,
     envFile: false,
