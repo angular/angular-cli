@@ -9,8 +9,15 @@
 import { BuilderHandlerFn } from '@angular-devkit/architect';
 import { json } from '@angular-devkit/core';
 import { readFileSync } from 'fs';
-import { BuilderHarness } from './builder-harness';
+import { concatMap, count, firstValueFrom, take, timeout } from 'rxjs';
+import { BuilderHarness, BuilderHarnessExecutionResult } from './builder-harness';
 import { host } from './test-utils';
+
+/**
+ * Maximum time for single build/rebuild
+ * This accounts for CI variability.
+ */
+export const BUILD_TIMEOUT = 25_000;
 
 const optionSchemaCache = new Map<string, json.schema.JsonSchema>();
 
@@ -44,6 +51,24 @@ export class JasmineBuilderHarness<T> extends BuilderHarness<T> {
   }
   expectDirectory(path: string): HarnessDirectoryMatchers {
     return expectDirectory(path, this);
+  }
+
+  async executeWithCases(
+    cases: ((
+      executionResult: BuilderHarnessExecutionResult,
+      index: number,
+    ) => void | Promise<void>)[],
+  ): Promise<void> {
+    const executionCount = await firstValueFrom(
+      this.execute().pipe(
+        timeout(BUILD_TIMEOUT),
+        concatMap(async (result, index) => await cases[index](result, index)),
+        take(cases.length),
+        count(),
+      ),
+    );
+
+    expect(executionCount).toBe(cases.length);
   }
 }
 
