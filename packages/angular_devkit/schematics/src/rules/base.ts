@@ -35,8 +35,14 @@ export function empty(): Source {
 export function chain(rules: Iterable<Rule> | AsyncIterable<Rule>): Rule {
   return async (initialTree, context) => {
     let intermediateTree: Observable<Tree> | undefined;
-    for await (const rule of rules) {
-      intermediateTree = callRule(rule, intermediateTree ?? initialTree, context);
+    if (Symbol.asyncIterator in rules) {
+      for await (const rule of rules) {
+        intermediateTree = callRule(rule, intermediateTree ?? initialTree, context);
+      }
+    } else {
+      for (const rule of rules) {
+        intermediateTree = callRule(rule, intermediateTree ?? initialTree, context);
+      }
     }
 
     return () => intermediateTree;
