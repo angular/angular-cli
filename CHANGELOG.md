@@ -1,3 +1,23 @@
+<a name="18.2.7"></a>
+
+# 18.2.7 (2024-10-02)
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                    |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------- |
+| [3f98193d6](https://github.com/angular/angular-cli/commit/3f98193d6963464bd04b510c2d045938f1418ff3) | fix  | support single quote setting in JetBrains IDEs |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                                                                                |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------------------------------------------------------- |
+| [8274184e1](https://github.com/angular/angular-cli/commit/8274184e1c6fa43cc5101018b6fa86fd636a90ba) | fix  | add `animate` to valid self-closing elements                                                               |
+| [2648e811e](https://github.com/angular/angular-cli/commit/2648e811e7c71e8a68d1eb418d7dcdae42ebf9ff) | fix  | add few more SVG elements animateMotion, animateTransform, and feBlend etc. to valid self-closing elements |
+| [736e126e4](https://github.com/angular/angular-cli/commit/736e126e4836e1c3df32c0ab9ee40e58c16503c0) | fix  | separate Vite cache by project                                                                             |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="19.0.0-next.8"></a>
 
 # 19.0.0-next.8 (2024-09-26)
