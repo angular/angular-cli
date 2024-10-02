@@ -1,3 +1,34 @@
+<a name="19.0.0-next.9"></a>
+
+# 19.0.0-next.9 (2024-10-02)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                       |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------- |
+| [0a4ef3026](https://github.com/angular/angular-cli/commit/0a4ef302635e4665ae9881746867dd80ca0d2dc7) | feat | karma-coverage w/ app builder     |
+| [dcbdca85c](https://github.com/angular/angular-cli/commit/dcbdca85c7fe1a7371b8f6662e0f68e24d56102e) | feat | karma+esbuild+watch               |
+| [9d7613db9](https://github.com/angular/angular-cli/commit/9d7613db9bf8b397d5896fcdf6c7b0efeaffa5d5) | fix  | zone.js/testing + karma + esbuild |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                                                                                |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------------------------------------------------------- |
+| [f63072668](https://github.com/angular/angular-cli/commit/f63072668e44254da78170445ac2417c7bc1aa18) | feat | utilize `ssr.entry` during prerendering to enable access to local API routes                               |
+| [ecfb2b261](https://github.com/angular/angular-cli/commit/ecfb2b261356946d5f4a653f90c0b78db4ef519c) | fix  | add few more SVG elements animateMotion, animateTransform, and feBlend etc. to valid self-closing elements |
+| [87a90afd4](https://github.com/angular/angular-cli/commit/87a90afd4600049b184b32f8f92a0634e25890c0) | fix  | incomplete string escaping or encoding                                                                     |
+| [c0b76e337](https://github.com/angular/angular-cli/commit/c0b76e3377e7f9ded023e5350b9a9ae90a7d31ee) | fix  | separate Vite cache by project                                                                             |
+
+### @angular/ssr
+
+| Commit                                                                                              | Type | Description                                                                           |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------------------- |
+| [50df63196](https://github.com/angular/angular-cli/commit/50df631960550049e7d1779fd2c8fbbcf549b8ef) | fix  | improve handling of route mismatches between Angular server routes and Angular router |
+| [64c52521d](https://github.com/angular/angular-cli/commit/64c52521d052f850aa7ea1aaadfd8a9fcee9c387) | fix  | show error when multiple routes are set with `RenderMode.AppShell`                    |
+| [12ff37adb](https://github.com/angular/angular-cli/commit/12ff37adbed552fc0db97251c30c889ef00e50f3) | perf | cache generated inline CSS for HTML                                                   |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="18.2.7"></a>
 
 # 18.2.7 (2024-10-02)
