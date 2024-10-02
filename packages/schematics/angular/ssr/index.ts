@@ -31,9 +31,7 @@ import {
 } from '../utility';
 import { JSONFile } from '../utility/json-file';
 import { latestVersions } from '../utility/latest-versions';
-import { isStandaloneApp } from '../utility/ng-ast-utils';
 import { targetBuildNotFoundError } from '../utility/project-targets';
-import { getMainFilePath } from '../utility/standalone/util';
 import { getWorkspace } from '../utility/workspace';
 import { Builders } from '../utility/workspace-models';
 
@@ -105,32 +103,18 @@ function addScriptsRule({ project }: SSROptions): Rule {
   };
 }
 
-function updateApplicationBuilderTsConfigRule(options: SSROptions): Rule {
-  return async (host) => {
-    const workspace = await readWorkspace(host);
-    const project = workspace.projects.get(options.project);
-    const buildTarget = project?.targets.get('build');
-    if (!buildTarget || !buildTarget.options) {
-      return;
-    }
-
-    const tsConfigPath = buildTarget.options.tsConfig;
-    if (!tsConfigPath || typeof tsConfigPath !== 'string') {
-      // No tsconfig path
-      return;
-    }
-
-    const tsConfig = new JSONFile(host, tsConfigPath);
-    const filesAstNode = tsConfig.get(['files']);
-    const serverFilePath = 'server.ts';
-    if (Array.isArray(filesAstNode) && !filesAstNode.some(({ text }) => text === serverFilePath)) {
-      tsConfig.modify(['files'], [...filesAstNode, serverFilePath]);
-    }
+function updateTsConfigFile(tsConfigPath: string): Rule {
+  return (host: Tree) => {
+    const json = new JSONFile(host, tsConfigPath);
+    const filesPath = ['files'];
+    const files = new Set((json.get(filesPath) as string[] | undefined) ?? []);
+    files.add('src/server.ts');
+    json.modify(filesPath, [...files]);
   };
 }
 
 function updateApplicationBuilderWorkspaceConfigRule(
-  projectRoot: string,
+  projectSourceRoot: string,
   options: SSROptions,
   { logger }: SchematicContext,
 ): Rule {
@@ -166,15 +150,15 @@ function updateApplicationBuilderWorkspaceConfigRule(
     buildTarget.options = {
       ...buildTarget.options,
       outputPath,
-      prerender: true,
+      outputMode: 'server',
       ssr: {
-        entry: join(normalize(projectRoot), 'server.ts'),
+        entry: join(normalize(projectSourceRoot), 'server.ts'),
       },
     };
   });
 }
 
-function addServerFile(options: ServerOptions, isStandalone: boolean): Rule {
+function addServerFile(options: ServerOptions): Rule {
   return async (host) => {
     const projectName = options.project;
     const workspace = await readWorkspace(host);
@@ -202,9 +186,8 @@ function addServerFile(options: ServerOptions, isStandalone: boolean): Rule {
           ...strings,
           ...options,
           browserDistDirectory,
-          isStandalone,
         }),
-        move(project.root),
+        move(project.sourceRoot ?? posix.join(project.root, 'src')),
       ]),
     );
   };
@@ -212,25 +195,30 @@ function addServerFile(options: ServerOptions, isStandalone: boolean): Rule {
 
 export default function (options: SSROptions): Rule {
   return async (host, context) => {
-    const browserEntryPoint = await getMainFilePath(host, options.project);
-    const isStandalone = isStandaloneApp(host, browserEntryPoint);
-
     const workspace = await getWorkspace(host);
     const clientProject = workspace.projects.get(options.project);
     if (!clientProject) {
       throw targetBuildNotFoundError();
     }
-
     const install = options.skipInstall ? InstallBehavior.None : InstallBehavior.Auto;
+
+    const tsConfigPath = clientProject?.targets.get('build')?.options?.tsConfig;
+    if (!tsConfigPath || typeof tsConfigPath !== 'string') {
+      throw new SchematicsException(`'tsConfig' builder option must be defined as a string.`);
+    }
 
     return chain([
       schematic('server', {
         ...options,
         skipInstall: true,
       }),
-      updateApplicationBuilderWorkspaceConfigRule(clientProject.root, options, context),
-      updateApplicationBuilderTsConfigRule(options),
-      addServerFile(options, isStandalone),
+      updateApplicationBuilderWorkspaceConfigRule(
+        clientProject.sourceRoot ?? posix.join(clientProject.root, 'src'),
+        options,
+        context,
+      ),
+      updateTsConfigFile(tsConfigPath),
+      addServerFile(options),
       addScriptsRule(options),
       addDependency('express', latestVersions['express'], {
         type: DependencyType.Default,

@@ -52,7 +52,7 @@ describe('@angular/ssr ng-add schematic', () => {
   });
 
   it('works', async () => {
-    const filePath = '/projects/test-app/server.ts';
+    const filePath = '/projects/test-app/src/server.ts';
 
     expect(appTree.exists(filePath)).toBeFalse();
     const tree = await schematicRunner.runSchematic('ng-add', defaultOptions, appTree);

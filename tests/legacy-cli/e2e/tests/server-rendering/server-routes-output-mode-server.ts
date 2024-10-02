@@ -2,17 +2,28 @@ import { join } from 'node:path';
 import { existsSync } from 'node:fs';
 import assert from 'node:assert';
 import { expectFileToMatch, writeFile } from '../../utils/fs';
-import { noSilentNg, silentNg } from '../../utils/process';
-import { setupProjectWithSSRAppEngine, spawnServer } from './setup';
+import { execAndWaitForOutputToMatch, ng, noSilentNg, silentNg } from '../../utils/process';
+import { installWorkspacePackages, uninstallPackage } from '../../utils/packages';
+import { useSha } from '../../utils/project';
+import { getGlobalVariable } from '../../utils/env';
+import { findFreePort } from '../../utils/network';
 
 export default async function () {
+  assert(
+    getGlobalVariable('argv')['esbuild'],
+    'This test should not be called in the Webpack suite.',
+  );
+
   if (process.version.startsWith('v18')) {
     // This is not supported in Node.js version 18 as global web crypto module is not available.
     return;
   }
 
-  // Setup project
-  await setupProjectWithSSRAppEngine();
+  // Forcibly remove in case another test doesn't clean itself up.
+  await uninstallPackage('@angular/ssr');
+  await ng('add', '@angular/ssr', '--skip-confirmation', '--skip-install');
+  await useSha();
+  await installWorkspacePackages();
 
   // Add routes
   await writeFile(
@@ -65,7 +76,7 @@ export default async function () {
     `
   import { RenderMode, ServerRoute } from '@angular/ssr';
 
-  export const routes: ServerRoute[] = [
+  export const serverRoutes: ServerRoute[] = [
     {
       path: 'ssg/:id',
       renderMode: RenderMode.Prerender,
@@ -181,4 +192,18 @@ export default async function () {
       );
     }
   }
+}
+
+async function spawnServer(): Promise<number> {
+  const port = await findFreePort();
+  await execAndWaitForOutputToMatch(
+    'npm',
+    ['run', 'serve:ssr:test-project'],
+    /Node Express server listening on/,
+    {
+      'PORT': String(port),
+    },
+  );
+
+  return port;
 }

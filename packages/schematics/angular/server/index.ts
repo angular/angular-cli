@@ -48,6 +48,7 @@ function updateConfigFileApplicationBuilder(options: ServerOptions): Rule {
     }
 
     buildTarget.options ??= {};
+    buildTarget.options.outputMode = 'static';
     buildTarget.options['server'] = posix.join(
       project.sourceRoot ?? posix.join(project.root, 'src'),
       serverMainEntryName,

@@ -323,7 +323,10 @@ export async function normalizeOptions(
        * For instance, accessing `foo.com/` would lead to `foo.com/index.html` being served instead of hitting the server.
        */
       const indexBaseName = path.basename(options.index);
-      indexOutput = ssrOptions && indexBaseName === 'index.html' ? INDEX_HTML_CSR : indexBaseName;
+      indexOutput =
+        ssrOptions && options.outputMode !== OutputMode.Static && indexBaseName === 'index.html'
+          ? INDEX_HTML_CSR
+          : indexBaseName;
     } else {
       indexOutput = options.index.output || 'index.html';
     }

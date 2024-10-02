@@ -1,11 +1,9 @@
 import { match } from 'node:assert';
 import { readFile, writeMultipleFiles } from '../../utils/fs';
 import { noSilentNg, silentNg } from '../../utils/process';
-import { setupProjectWithSSRAppEngine } from './setup';
 
 export default async function () {
   // Setup project
-  await setupProjectWithSSRAppEngine();
 
   await writeMultipleFiles({
     // Add asset
@@ -63,54 +61,6 @@ export default async function () {
           provideHttpClient(withFetch()),
         ],
       };
-    `,
-    'src/app/app.routes.server.ts': `
-    import { RenderMode, ServerRoute } from '@angular/ssr';
-
-    export const routes: ServerRoute[] = [
-      {
-        path: '**',
-        renderMode: RenderMode.Prerender,
-      },
-    ];
-  `,
-    'server.ts': `
-      import { AngularNodeAppEngine, writeResponseToNodeResponse, isMainModule, createNodeRequestHandler } from '@angular/ssr/node';
-      import express from 'express';
-      import { fileURLToPath } from 'node:url';
-      import { dirname, resolve } from 'node:path';
-
-      export function app(): express.Express {
-        const server = express();
-        const serverDistFolder = dirname(fileURLToPath(import.meta.url));
-        const browserDistFolder = resolve(serverDistFolder, '../browser');
-        const angularNodeAppEngine = new AngularNodeAppEngine();
-
-        server.use('/api', (req, res) => res.json({ dataFromAPI: true }));
-
-        server.get('**', express.static(browserDistFolder, {
-          maxAge: '1y',
-          index: 'index.html'
-        }));
-
-        server.get('**', (req, res, next) => {
-          angularNodeAppEngine.render(req)
-            .then((response) => response ? writeResponseToNodeResponse(response, res) : next())
-            .catch(next);
-        });
-
-        return server;
-      }
-
-      const server = app();
-      if (isMainModule(import.meta.url)) {
-        const port = process.env['PORT'] || 4000;
-        server.listen(port, () => {
-          console.log(\`Node Express server listening on http://localhost:\${port}\`);
-        });
-      }
-
-      export default createNodeRequestHandler(server);
     `,
   });
 
