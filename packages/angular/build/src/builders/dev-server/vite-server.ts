@@ -651,6 +651,8 @@ export async function setupServer(
       host: serverOptions.host,
       open: serverOptions.open,
       headers: serverOptions.headers,
+      // Disable the websocket if live reload is disabled (false/undefined are the only valid values)
+      ws: serverOptions.liveReload === false && serverOptions.hmr === false ? false : undefined,
       proxy,
       cors: {
         // Allow preflight requests to be proxied.
@@ -711,6 +713,7 @@ export async function setupServer(
         virtualProjectRoot,
         outputFiles,
         external: externalMetadata.explicitBrowser,
+        skipViteClient: serverOptions.liveReload === false && serverOptions.hmr === false,
       }),
     ],
     // Browser only optimizeDeps. (This does not run for SSR dependencies).
