@@ -28,7 +28,7 @@ export async function findTailwindConfigurationFile(
   );
 
   // A configuration file can exist in the project or workspace root
-  for await (const { root, files } of dirEntries) {
+  for (const { root, files } of await Promise.all(dirEntries)) {
     for (const potentialConfig of tailwindConfigFiles) {
       if (files.has(potentialConfig)) {
         return join(root, potentialConfig);
