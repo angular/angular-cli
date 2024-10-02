@@ -271,6 +271,7 @@ def ng_module(name, tsconfig = None, entry_point = None, testonly = False, deps 
 def ng_package(deps = [], **kwargs):
     _ng_package(
         deps = deps,
+        license = "//:LICENSE",
         substitutions = select({
             "//:stamp": NPM_PACKAGE_SUBSTITUTIONS,
             "//conditions:default": NO_STAMP_PACKAGE_SUBSTITUTIONS,
