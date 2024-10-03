@@ -99,7 +99,7 @@ export async function* serveWithVite(
     builderName,
   )) as unknown as ApplicationBuilderInternalOptions;
 
-  if (browserOptions.prerender) {
+  if (browserOptions.prerender || (browserOptions.outputMode && browserOptions.server)) {
     // Disable prerendering if enabled and force SSR.
     // This is so instead of prerendering all the routes for every change, the page is "prerendered" when it is requested.
     browserOptions.prerender = false;
@@ -330,7 +330,7 @@ export async function* serveWithVite(
         browserOptions.ssr.entry
       ) {
         ssrMode = ServerSsrMode.ExternalSsrMiddleware;
-      } else if (browserOptions.server) {
+      } else if (browserOptions.ssr) {
         ssrMode = ServerSsrMode.InternalSsrMiddleware;
       }
 
