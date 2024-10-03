@@ -103,10 +103,7 @@ export async function optimizeChunks(
     const result = await bundle.generate({
       compact: true,
       sourcemap,
-      chunkFileNames(chunkInfo) {
-        // Do not add hash to file name if already present
-        return /-[a-zA-Z0-9]{8}$/.test(chunkInfo.name) ? '[name].js' : '[name]-[hash].js';
-      },
+      chunkFileNames: (chunkInfo) => `${chunkInfo.name.replace(/-[a-zA-Z0-9]{8}$/, '')}-[hash].js`,
     });
     optimizedOutput = result.output;
   } catch (e) {
