@@ -186,12 +186,7 @@ async function collectEntrypoints(
     projectSourceRoot,
   );
 
-  const entryPoints = new Set([
-    ...testFiles,
-    '@angular-devkit/build-angular/src/builders/karma/init_test_bed.js',
-  ]);
-
-  return entryPoints;
+  return new Set(testFiles);
 }
 
 async function initializeApplication(
@@ -217,6 +212,14 @@ async function initializeApplication(
     collectEntrypoints(options, context, projectSourceRoot),
     fs.rm(outputPath, { recursive: true, force: true }),
   ]);
+
+  let mainName = 'init_test_bed';
+  if (options.main) {
+    entryPoints.add(options.main);
+    mainName = path.basename(options.main, path.extname(options.main));
+  } else {
+    entryPoints.add('@angular-devkit/build-angular/src/builders/karma/init_test_bed.js');
+  }
 
   const instrumentForCoverage = options.codeCoverage
     ? createInstrumentationFilter(
@@ -261,9 +264,18 @@ async function initializeApplication(
   karmaOptions.files.push(
     // Serve polyfills first.
     { pattern: `${outputPath}/polyfills.js`, type: 'module' },
-    // Allow loading of chunk-* files but don't include them all on load.
-    { pattern: `${outputPath}/{chunk,worker}-*.js`, type: 'module', included: false },
+    // Serve global setup script.
+    { pattern: `${outputPath}/${mainName}.js`, type: 'module' },
+    // Serve all source maps.
+    { pattern: `${outputPath}/*.map`, included: false },
   );
+
+  if (hasChunkOrWorkerFiles(buildOutput.files)) {
+    karmaOptions.files.push(
+      // Allow loading of chunk-* files but don't include them all on load.
+      { pattern: `${outputPath}/{chunk,worker}-*.js`, type: 'module', included: false },
+    );
+  }
 
   karmaOptions.files.push(
     // Serve remaining JS on page load, these are the test entrypoints.
@@ -314,6 +326,12 @@ async function initializeApplication(
   }
 
   return [karma, parsedKarmaConfig, buildOptions];
+}
+
+function hasChunkOrWorkerFiles(files: Record<string, unknown>): boolean {
+  return Object.keys(files).some((filename) => {
+    return /(?:^|\/)(?:worker|chunk)[^/]+\.js$/.test(filename);
+  });
 }
 
 export async function writeTestFiles(files: Record<string, ResultFile>, testDir: string) {
