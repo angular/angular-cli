@@ -383,7 +383,7 @@ export abstract class SchematicsCommandModule
   }
 
   private getProjectName(): string | undefined {
-    const { workspace, logger } = this.context;
+    const { workspace } = this.context;
     if (!workspace) {
       return undefined;
     }

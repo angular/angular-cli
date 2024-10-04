@@ -6,9 +6,8 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import * as ts from 'typescript';
+import ts from 'typescript';
 
-const TARGET_TEXT = '@NgModule';
 const BUILTIN_LOADERS = new Set([
   'provideCloudflareLoader',
   'provideCloudinaryLoader',

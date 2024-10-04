@@ -125,7 +125,7 @@ export class AngularWebpackPlugin {
   }
 
   apply(compiler: Compiler): void {
-    const { NormalModuleReplacementPlugin, WebpackError, util } = compiler.webpack;
+    const { NormalModuleReplacementPlugin, util } = compiler.webpack;
     this.webpackCreateHash = util.createHash;
 
     // Setup file replacements with webpack
@@ -648,7 +648,11 @@ export class AngularWebpackPlugin {
     ];
     diagnosticsReporter(diagnostics);
 
-    const transformers = createJitTransformers(builder, this.compilerCli, this.pluginOptions);
+    const transformers = createJitTransformers(
+      builder,
+      this.compilerCliTooling,
+      this.pluginOptions,
+    );
 
     return {
       fileEmitter: this.createFileEmitter(builder, transformers, () => []),
