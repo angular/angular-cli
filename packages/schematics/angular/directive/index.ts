@@ -23,7 +23,7 @@ import {
 import { addDeclarationToNgModule } from '../utility/add-declaration-to-ng-module';
 import { findModuleFromOptions } from '../utility/find-module';
 import { parseName } from '../utility/parse-name';
-import { validateHtmlSelector } from '../utility/validation';
+import { validateClassName, validateHtmlSelector } from '../utility/validation';
 import { buildDefaultPath, getWorkspace } from '../utility/workspace';
 import { Schema as DirectiveOptions } from './schema';
 
@@ -58,6 +58,7 @@ export default function (options: DirectiveOptions): Rule {
     options.selector = options.selector || buildSelector(options, project.prefix || '');
 
     validateHtmlSelector(options.selector);
+    validateClassName(strings.classify(options.name));
 
     const templateSource = apply(url('./files'), [
       options.skipTests ? filter((path) => !path.endsWith('.spec.ts.template')) : noop(),

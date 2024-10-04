@@ -111,6 +111,14 @@ describe('Directive Schematic', () => {
     expect(directiveContent).toContain('class FooDirective');
   });
 
+  it('should error when class name contains invalid characters', async () => {
+    const options = { ...defaultOptions, name: '404' };
+
+    await expectAsync(
+      schematicRunner.runSchematic('component', options, appTree),
+    ).toBeRejectedWithError('Class name "404" is invalid.');
+  });
+
   describe('standalone=false', () => {
     const defaultNonStandaloneOptions: DirectiveOptions = {
       ...defaultOptions,
