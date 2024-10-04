@@ -365,16 +365,6 @@ function unwrapTemplateLiteral(
   return [messageParts, expressions];
 }
 
-function unwrapLocalizeCall(
-  path: NodePath<types.CallExpression>,
-  utils: LocalizeUtilityModule,
-): [TemplateStringsArray, types.Expression[]] {
-  const [messageParts] = utils.unwrapMessagePartsFromLocalizeCall(path);
-  const [expressions] = utils.unwrapSubstitutionsFromLocalizeCall(path);
-
-  return [messageParts, expressions];
-}
-
 async function loadLocaleData(path: string, optimize: boolean): Promise<string> {
   // The path is validated during option processing before the build starts
   const content = await fs.readFile(path, 'utf8');
