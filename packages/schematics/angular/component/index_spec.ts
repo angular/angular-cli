@@ -157,6 +157,14 @@ describe('Component Schematic', () => {
     ).toBeRejectedWithError('Selector "app-1-one" is invalid.');
   });
 
+  it('should error when class name contains invalid characters', async () => {
+    const options = { ...defaultOptions, name: '404' };
+
+    await expectAsync(
+      schematicRunner.runSchematic('component', options, appTree),
+    ).toBeRejectedWithError('Class name "404" is invalid.');
+  });
+
   it('should allow dash in selector before a number', async () => {
     const options = { ...defaultOptions, name: 'one-1' };
 

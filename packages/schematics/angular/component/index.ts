@@ -25,7 +25,7 @@ import {
 import { addDeclarationToNgModule } from '../utility/add-declaration-to-ng-module';
 import { findModuleFromOptions } from '../utility/find-module';
 import { parseName } from '../utility/parse-name';
-import { validateHtmlSelector } from '../utility/validation';
+import { validateClassName, validateHtmlSelector } from '../utility/validation';
 import { buildDefaultPath, getWorkspace } from '../utility/workspace';
 import { Schema as ComponentOptions, Style } from './schema';
 
@@ -62,6 +62,7 @@ export default function (options: ComponentOptions): Rule {
       options.selector || buildSelector(options, (project && project.prefix) || '');
 
     validateHtmlSelector(options.selector);
+    validateClassName(strings.classify(options.name));
 
     const skipStyleFile = options.inlineStyle || options.style === Style.None;
     const templateSource = apply(url('./files'), [
