@@ -51,12 +51,15 @@ export class ParallelCompilation extends AngularCompilation {
   }> {
     const stylesheetChannel = new MessageChannel();
     // The request identifier is required because Angular can issue multiple concurrent requests
-    stylesheetChannel.port1.on('message', ({ requestId, data, containingFile, stylesheetFile }) => {
-      hostOptions
-        .transformStylesheet(data, containingFile, stylesheetFile)
-        .then((value) => stylesheetChannel.port1.postMessage({ requestId, value }))
-        .catch((error) => stylesheetChannel.port1.postMessage({ requestId, error }));
-    });
+    stylesheetChannel.port1.on(
+      'message',
+      ({ requestId, data, containingFile, stylesheetFile, order, className }) => {
+        hostOptions
+          .transformStylesheet(data, containingFile, stylesheetFile, order, className)
+          .then((value) => stylesheetChannel.port1.postMessage({ requestId, value }))
+          .catch((error) => stylesheetChannel.port1.postMessage({ requestId, error }));
+      },
+    );
 
     // The web worker processing is a synchronous operation and uses shared memory combined with
     // the Atomics API to block execution here until a response is received.

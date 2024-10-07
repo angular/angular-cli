@@ -16,7 +16,7 @@ export function createAngularAssetsMiddleware(
   server: ViteDevServer,
   assets: Map<string, string>,
   outputFiles: AngularMemoryOutputFiles,
-  usedComponentStyles: Map<string, string[]>,
+  usedComponentStyles: Map<string, Set<string>>,
 ): Connect.NextHandleFunction {
   return function angularAssetsMiddleware(req, res, next) {
     if (req.url === undefined || res.writableEnded) {
@@ -81,9 +81,9 @@ export function createAngularAssetsMiddleware(
             // Record the component style usage for HMR updates
             const usedIds = usedComponentStyles.get(pathname);
             if (usedIds === undefined) {
-              usedComponentStyles.set(pathname, [componentId]);
+              usedComponentStyles.set(pathname, new Set([componentId]));
             } else {
-              usedIds.push(componentId);
+              usedIds.add(componentId);
             }
             // Shim the stylesheet if a component ID is provided
             if (componentId.length > 0) {
