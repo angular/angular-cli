@@ -98,13 +98,6 @@ export async function* runEsBuildBuildAction(
       `${workspaceRoot.replace(/\\/g, '/')}/**/.*/**`,
     ];
 
-    if (!preserveSymlinks) {
-      // Ignore all node modules directories to avoid excessive file watchers.
-      // Package changes are handled below by watching manifest and lock files.
-      // NOTE: this is not enable when preserveSymlinks is true as this would break `npm link` usages.
-      ignored.push('**/node_modules/**');
-    }
-
     // Setup a watcher
     const { createWatcher } = await import('../../tools/esbuild/watcher');
     watcher = createWatcher({
@@ -119,14 +112,21 @@ export async function* runEsBuildBuildAction(
 
     // Watch the entire project root if 'NG_BUILD_WATCH_ROOT' environment variable is set
     if (shouldWatchRoot) {
+      if (!preserveSymlinks) {
+        // Ignore all node modules directories to avoid excessive file watchers.
+        // Package changes are handled below by watching manifest and lock files.
+        // NOTE: this is not enable when preserveSymlinks is true as this would break `npm link` usages.
+        ignored.push('**/node_modules/**');
+
+        watcher.add(
+          packageWatchFiles
+            .map((file) => path.join(workspaceRoot, file))
+            .filter((file) => existsSync(file)),
+        );
+      }
+
       watcher.add(projectRoot);
     }
-
-    watcher.add(
-      packageWatchFiles
-        .map((file) => path.join(workspaceRoot, file))
-        .filter((file) => existsSync(file)),
-    );
 
     // Watch locations provided by the initial build result
     watcher.add(result.watchFiles);
