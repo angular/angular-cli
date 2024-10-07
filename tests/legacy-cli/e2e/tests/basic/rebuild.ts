@@ -9,7 +9,14 @@ export default async function () {
   const validBundleRegEx = esbuild ? /complete\./ : /Compiled successfully\./;
   const lazyBundleRegEx = esbuild ? /chunk-/ : /src_app_lazy_lazy_component_ts\.js/;
 
+  // Disable component stylesheet HMR to support page reload based rebuild testing.
+  // Ideally this environment variable would be passed directly to the new serve process
+  // but this would require signficant test changes due to the existing `ngServe` signature.
+  const oldHMRValue = process.env['NG_HMR_CSTYLES'];
+  process.env['NG_HMR_CSTYLES'] = '0';
   const port = await ngServe();
+  process.env['NG_HMR_CSTYLES'] = oldHMRValue;
+
   // Add a lazy route.
   await silentNg('generate', 'component', 'lazy');
 

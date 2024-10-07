@@ -182,7 +182,7 @@ export function createCompilerPlugin(
           fileReplacements: pluginOptions.fileReplacements,
           modifiedFiles,
           sourceFileCache: pluginOptions.sourceFileCache,
-          async transformStylesheet(data, containingFile, stylesheetFile, order) {
+          async transformStylesheet(data, containingFile, stylesheetFile, order, className) {
             let stylesheetResult;
 
             // Stylesheet file only exists for external stylesheets
@@ -202,6 +202,7 @@ export function createCompilerPlugin(
                   ? createHash('sha-256')
                       .update(containingFile)
                       .update((order ?? 0).toString())
+                      .update(className ?? '')
                       .digest('hex')
                   : undefined,
               );

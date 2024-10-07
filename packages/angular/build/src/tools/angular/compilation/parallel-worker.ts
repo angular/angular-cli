@@ -48,7 +48,7 @@ export async function initialize(request: InitRequest) {
       fileReplacements: request.fileReplacements,
       sourceFileCache,
       modifiedFiles: sourceFileCache.modifiedFiles,
-      transformStylesheet(data, containingFile, stylesheetFile) {
+      transformStylesheet(data, containingFile, stylesheetFile, order, className) {
         const requestId = randomUUID();
         const resultPromise = new Promise<string>((resolve, reject) =>
           stylesheetRequests.set(requestId, [resolve, reject]),
@@ -59,6 +59,8 @@ export async function initialize(request: InitRequest) {
           data,
           containingFile,
           stylesheetFile,
+          order,
+          className,
         });
 
         return resultPromise;

@@ -48,7 +48,7 @@ interface AngularSetupMiddlewaresPluginOptions {
   assets: Map<string, string>;
   extensionMiddleware?: Connect.NextHandleFunction[];
   indexHtmlTransformer?: (content: string) => Promise<string>;
-  usedComponentStyles: Map<string, string[]>;
+  usedComponentStyles: Map<string, Set<string>>;
   templateUpdates: Map<string, string>;
   ssrMode: ServerSsrMode;
 }

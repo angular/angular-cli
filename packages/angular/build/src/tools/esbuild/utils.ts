@@ -43,6 +43,7 @@ export function logBuildStats(
   const browserStats: BundleStats[] = [];
   const serverStats: BundleStats[] = [];
   let unchangedCount = 0;
+  let componentStyleChange = false;
 
   for (const { path: file, size, type } of outputFiles) {
     // Only display JavaScript and CSS files
@@ -60,6 +61,12 @@ export function logBuildStats(
       type === BuildOutputFileType.ServerApplication || type === BuildOutputFileType.ServerRoot;
     if (isPlatformServer && !ssrOutputEnabled) {
       // Only log server build stats when SSR is enabled.
+      continue;
+    }
+
+    // Skip logging external component stylesheets used for HMR
+    if (metafile.outputs[file] && 'ng-component' in metafile.outputs[file]) {
+      componentStyleChange = true;
       continue;
     }
 
@@ -88,7 +95,11 @@ export function logBuildStats(
 
     return tableText + '\n';
   } else if (changedFiles !== undefined) {
-    return '\nNo output file changes.\n';
+    if (componentStyleChange) {
+      return '\nComponent stylesheet(s) changed.\n';
+    } else {
+      return '\nNo output file changes.\n';
+    }
   }
   if (unchangedCount > 0) {
     return `Unchanged output files: ${unchangedCount}`;

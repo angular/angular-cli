@@ -137,8 +137,13 @@ export async function* serveWithVite(
     process.setSourceMapsEnabled(true);
   }
 
-  // TODO: Enable by default once full support across CLI and FW is integrated
-  browserOptions.externalRuntimeStyles = useComponentStyleHmr;
+  // Enable to support component style hot reloading (`NG_HMR_CSTYLES=0` can be used to disable)
+  browserOptions.externalRuntimeStyles = !!serverOptions.liveReload && useComponentStyleHmr;
+  if (browserOptions.externalRuntimeStyles) {
+    // Preload the @angular/compiler package to avoid first stylesheet request delays.
+    // Once @angular/build is native ESM, this should be re-evaluated.
+    void loadEsmModule('@angular/compiler');
+  }
 
   // Setup the prebundling transformer that will be shared across Vite prebundling requests
   const prebundleTransformer = new JavaScriptTransformer(
@@ -166,7 +171,7 @@ export async function* serveWithVite(
     explicitBrowser: [],
     explicitServer: [],
   };
-  const usedComponentStyles = new Map<string, string[]>();
+  const usedComponentStyles = new Map<string, Set<string>>();
   const templateUpdates = new Map<string, string>();
 
   // Add cleanup logic via a builder teardown.
@@ -423,7 +428,7 @@ async function handleUpdate(
   server: ViteDevServer,
   serverOptions: NormalizedDevServerOptions,
   logger: BuilderContext['logger'],
-  usedComponentStyles: Map<string, string[]>,
+  usedComponentStyles: Map<string, Set<string>>,
 ): Promise<void> {
   const updatedFiles: string[] = [];
   let destroyAngularServerAppCalled = false;
@@ -470,7 +475,7 @@ async function handleUpdate(
           // are not typically reused across components.
           const componentIds = usedComponentStyles.get(filePath);
           if (componentIds) {
-            return componentIds.map((id) => ({
+            return Array.from(componentIds).map((id) => ({
               type: 'css-update',
               timestamp,
               path: `${filePath}?ngcomp` + (id ? `=${id}` : ''),
@@ -582,7 +587,7 @@ export async function setupServer(
   prebundleTransformer: JavaScriptTransformer,
   target: string[],
   zoneless: boolean,
-  usedComponentStyles: Map<string, string[]>,
+  usedComponentStyles: Map<string, Set<string>>,
   templateUpdates: Map<string, string>,
   prebundleLoaderExtensions: EsbuildLoaderOption | undefined,
   extensionMiddleware?: Connect.NextHandleFunction[],
