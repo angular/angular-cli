@@ -32,7 +32,7 @@
     "fast-glob": "3.3.2",
     "https-proxy-agent": "7.0.5",
     "istanbul-lib-instrument": "6.0.3",
-    "listr2": "8.2.4",
+    "listr2": "8.2.5",
     "lmdb": "3.1.3",
     "magic-string": "0.30.11",
     "mrmime": "2.0.0",
