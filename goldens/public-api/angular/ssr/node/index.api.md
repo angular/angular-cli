@@ -12,6 +12,7 @@ import { Type } from '@angular/core';
 
 // @public
 export class AngularNodeAppEngine {
+    constructor();
     getPrerenderHeaders(request: IncomingMessage): ReadonlyMap<string, string>;
     render(request: IncomingMessage, requestContext?: unknown): Promise<Response | null>;
 }

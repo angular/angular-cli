@@ -11,6 +11,7 @@ import { renderApplication, renderModule, ɵSERVER_CONTEXT } from '@angular/plat
 import * as fs from 'node:fs';
 import { dirname, join, normalize, resolve } from 'node:path';
 import { URL } from 'node:url';
+import { attachNodeGlobalErrorHandlers } from '../errors';
 import { CommonEngineInlineCriticalCssProcessor } from './inline-css-processor';
 import {
   noopRunMethodAndMeasurePerf,
@@ -63,7 +64,9 @@ export class CommonEngine {
   private readonly inlineCriticalCssProcessor = new CommonEngineInlineCriticalCssProcessor();
   private readonly pageIsSSG = new Map<string, boolean>();
 
-  constructor(private options?: CommonEngineOptions) {}
+  constructor(private options?: CommonEngineOptions) {
+    attachNodeGlobalErrorHandlers();
+  }
 
   /**
    * Render an HTML document for a specific URL with specified

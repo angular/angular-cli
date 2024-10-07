@@ -8,6 +8,7 @@
 
 import { AngularAppEngine } from '@angular/ssr';
 import type { IncomingMessage } from 'node:http';
+import { attachNodeGlobalErrorHandlers } from './errors';
 import { createWebRequestFromNodeRequest } from './request';
 
 /**
@@ -22,6 +23,10 @@ import { createWebRequestFromNodeRequest } from './request';
  */
 export class AngularNodeAppEngine {
   private readonly angularAppEngine = new AngularAppEngine();
+
+  constructor() {
+    attachNodeGlobalErrorHandlers();
+  }
 
   /**
    * Renders an HTTP response based on the incoming request using the Angular server application.
