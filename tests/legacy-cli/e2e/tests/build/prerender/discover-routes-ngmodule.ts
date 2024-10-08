@@ -118,11 +118,19 @@ export default async function () {
     return;
   }
 
-  await ng('build', projectName, '--configuration=production', '--prerender');
+  await ng('build', projectName, '--configuration=production', '--prerender', '--no-ssr');
   await runExpects();
 
   // Test also JIT mode.
-  await ng('build', projectName, '--configuration=development', '--prerender', '--no-aot');
+  await ng(
+    'build',
+    projectName,
+    '--configuration=development',
+    '--prerender',
+    '--no-ssr',
+    '--no-aot',
+  );
+
   await runExpects();
 
   async function runExpects(): Promise<void> {
@@ -135,6 +143,10 @@ export default async function () {
       'lazy-one/lazy-one-child/index.html': 'lazy-one-child works!',
       'lazy-two/index.html': 'lazy-two works!',
     };
+
+    if (!useWebpackBuilder) {
+      expects['index.csr.html'] = '<app-root></app-root>';
+    }
 
     const distPath = 'dist/' + projectName + '/browser';
     for (const [filePath, fileMatch] of Object.entries(expects)) {
