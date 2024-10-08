@@ -334,7 +334,9 @@ async function getAllRoutes(
     assertIsError(err);
 
     return {
-      errors: [`An error occurred while extracting routes.\n\n${err.stack}`],
+      errors: [
+        `An error occurred while extracting routes.\n\n${err.stack ?? err.message ?? err.code ?? err}`,
+      ],
       serializedRouteTree: [],
     };
   } finally {
