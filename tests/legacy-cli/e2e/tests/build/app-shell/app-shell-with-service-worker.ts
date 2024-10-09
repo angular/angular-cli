@@ -7,8 +7,6 @@ import { updateJsonFile } from '../../../utils/project';
 const snapshots = require('../../../ng-snapshot/package.json');
 
 export default async function () {
-  const useWebpackBuilder = !getGlobalVariable('argv')['esbuild'];
-
   await appendToFile('src/app/app.component.html', '<router-outlet></router-outlet>');
   await ng('generate', 'service-worker', '--project', 'test-project');
   await ng('generate', 'app-shell', '--project', 'test-project');
@@ -51,11 +49,7 @@ export default async function () {
   `,
   );
 
-  if (useWebpackBuilder) {
-    await ng('run', 'test-project:app-shell:production');
-  } else {
-    await ng('build');
-  }
+  await ng('build');
   await expectFileToMatch('dist/test-project/browser/index.html', /app-shell works!/);
 
   await ng('e2e', '--configuration=production');

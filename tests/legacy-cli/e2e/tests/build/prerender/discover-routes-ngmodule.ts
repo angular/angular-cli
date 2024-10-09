@@ -118,18 +118,11 @@ export default async function () {
     return;
   }
 
-  await ng('build', projectName, '--configuration=production', '--prerender', '--no-ssr');
+  await ng('build', projectName, '--configuration=production');
   await runExpects();
 
   // Test also JIT mode.
-  await ng(
-    'build',
-    projectName,
-    '--configuration=development',
-    '--prerender',
-    '--no-ssr',
-    '--no-aot',
-  );
+  await ng('build', projectName, '--configuration=development', '--no-aot');
 
   await runExpects();
 

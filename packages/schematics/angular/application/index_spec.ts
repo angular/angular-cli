@@ -191,7 +191,7 @@ describe('Application Schematic', () => {
 
   it(`should create an application with SSR features when 'ssr=true'`, async () => {
     const options = { ...defaultOptions, ssr: true };
-    const filePath = '/projects/foo/server.ts';
+    const filePath = '/projects/foo/src/server.ts';
     expect(workspaceTree.exists(filePath)).toBeFalse();
     const tree = await schematicRunner.runSchematic('application', options, workspaceTree);
     expect(tree.exists(filePath)).toBeTrue();
@@ -200,7 +200,7 @@ describe('Application Schematic', () => {
   it(`should not create an application with SSR features when 'ssr=false'`, async () => {
     const options = { ...defaultOptions, ssr: false };
     const tree = await schematicRunner.runSchematic('application', options, workspaceTree);
-    expect(tree.exists('/projects/foo/server.ts')).toBeFalse();
+    expect(tree.exists('/projects/foo/src/server.ts')).toBeFalse();
   });
 
   describe(`update package.json`, () => {

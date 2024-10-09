@@ -8,7 +8,6 @@ import { readNgVersion } from '../../utils/version';
 const snapshots = require('../../ng-snapshot/package.json');
 
 export default async function () {
-  const useWebpackBuilder = !getGlobalVariable('argv')['esbuild'];
   const isSnapshotBuild = getGlobalVariable('argv')['ng-snapshots'];
 
   await updateJsonFile('package.json', (packageJson) => {
@@ -48,11 +47,6 @@ export default async function () {
 
     // Enable localization for all locales
     buildOptions.localize = true;
-    if (useWebpackBuilder) {
-      const serverOptions = appArchitect['server'].options;
-      serverOptions.localize = true;
-      serverOptions.outputHashing = 'none';
-    }
 
     // Add locale definitions to the project
     const i18n: Record<string, any> = (appProject.i18n = { locales: {} });
@@ -80,11 +74,7 @@ export default async function () {
   }
 
   // Build each locale and verify the SW output.
-  if (useWebpackBuilder) {
-    await ng('run', 'test-project:app-shell:development');
-  } else {
-    await ng('build', '--output-hashing=none');
-  }
+  await ng('build', '--output-hashing=none');
 
   for (const { lang } of langTranslations) {
     await Promise.all([

@@ -29,22 +29,6 @@ export default async function () {
   await writeMultipleFiles({
     // Replace the template of app.component.html as it makes it harder to debug
     'src/app/app.component.html': '<router-outlet />',
-    'src/app/app.config.server.ts': `
-      import { mergeApplicationConfig, ApplicationConfig } from '@angular/core';
-      import { provideServerRendering } from '@angular/platform-server';
-      import { provideServerRoutesConfig } from '@angular/ssr';
-      import { routes } from './app.routes.server';
-      import { appConfig } from './app.config';
-
-      const serverConfig: ApplicationConfig = {
-        providers: [
-          provideServerRoutesConfig(routes),
-          provideServerRendering()
-        ]
-      };
-
-      export const config = mergeApplicationConfig(appConfig, serverConfig);
-    `,
     'src/app/app.routes.ts': `
       import { Routes } from '@angular/router';
       import { HomeComponent } from './home/home.component';
@@ -56,11 +40,11 @@ export default async function () {
     'src/app/app.routes.server.ts': `
       import { RenderMode, ServerRoute } from '@angular/ssr';
 
-      export const routes: ServerRoute[] = [
+      export const serverRoutes: ServerRoute[] = [
         { path: '**', renderMode: RenderMode.Server }
       ];
     `,
-    'server.ts': `
+    'src/server.ts': `
       import { AngularAppEngine, createRequestHandler } from '@angular/ssr';
       import { createApp, createRouter, toWebHandler, defineEventHandler, toWebRequest } from 'h3';
 
@@ -109,7 +93,7 @@ export default async function () {
   await validateResponse('/home', /yay home works/);
 
   // Modify the API response and validate the change.
-  await modifyFileAndWaitUntilUpdated('server.ts', `{ hello: 'foo' }`, `{ hello: 'bar' }`);
+  await modifyFileAndWaitUntilUpdated('src/server.ts', `{ hello: 'foo' }`, `{ hello: 'bar' }`);
   await validateResponse('/api/test', /bar/);
   await validateResponse('/home', /yay home works/);
 

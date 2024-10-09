@@ -1,11 +1,21 @@
-import { match } from 'node:assert';
-import { readFile, writeMultipleFiles } from '../../utils/fs';
-import { noSilentNg, silentNg } from '../../utils/process';
-import { setupProjectWithSSRAppEngine } from './setup';
+import assert, { match } from 'node:assert';
+import { readFile, writeMultipleFiles } from '../../../utils/fs';
+import { ng, noSilentNg, silentNg } from '../../../utils/process';
+import { getGlobalVariable } from '../../../utils/env';
+import { installWorkspacePackages, uninstallPackage } from '../../../utils/packages';
+import { useSha } from '../../../utils/project';
 
 export default async function () {
-  // Setup project
-  await setupProjectWithSSRAppEngine();
+  assert(
+    getGlobalVariable('argv')['esbuild'],
+    'This test should not be called in the Webpack suite.',
+  );
+
+  // Forcibly remove in case another test doesn't clean itself up.
+  await uninstallPackage('@angular/ssr');
+  await ng('add', '@angular/ssr', '--skip-confirmation', '--skip-install');
+  await useSha();
+  await installWorkspacePackages();
 
   await writeMultipleFiles({
     // Add asset
@@ -64,17 +74,7 @@ export default async function () {
         ],
       };
     `,
-    'src/app/app.routes.server.ts': `
-    import { RenderMode, ServerRoute } from '@angular/ssr';
-
-    export const routes: ServerRoute[] = [
-      {
-        path: '**',
-        renderMode: RenderMode.Prerender,
-      },
-    ];
-  `,
-    'server.ts': `
+    'src/server.ts': `
       import { AngularNodeAppEngine, writeResponseToNodeResponse, isMainModule, createNodeRequestHandler } from '@angular/ssr/node';
       import express from 'express';
       import { fileURLToPath } from 'node:url';
@@ -86,7 +86,7 @@ export default async function () {
         const browserDistFolder = resolve(serverDistFolder, '../browser');
         const angularNodeAppEngine = new AngularNodeAppEngine();
 
-        server.use('/api', (req, res) => res.json({ dataFromAPI: true }));
+        server.get('/api', (req, res) => res.json({ dataFromAPI: true }));
 
         server.get('**', express.static(browserDistFolder, {
           maxAge: '1y',
@@ -98,11 +98,11 @@ export default async function () {
             .then((response) => response ? writeResponseToNodeResponse(response, res) : next())
             .catch(next);
         });
-
         return server;
       }
 
       const server = app();
+
       if (isMainModule(import.meta.url)) {
         const port = process.env['PORT'] || 4000;
         server.listen(port, () => {
@@ -116,7 +116,6 @@ export default async function () {
 
   await silentNg('generate', 'component', 'home');
 
-  // Fix the error
   await noSilentNg('build', '--output-mode=static');
 
   const contents = await readFile('dist/test-project/browser/home/index.html');

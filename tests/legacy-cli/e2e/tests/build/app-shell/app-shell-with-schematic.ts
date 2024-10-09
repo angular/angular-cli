@@ -9,8 +9,6 @@ const snapshots = require('../../../ng-snapshot/package.json');
 export default async function () {
   await appendToFile('src/app/app.component.html', '<router-outlet></router-outlet>');
   await ng('generate', 'app-shell', '--project', 'test-project');
-  // Setup webpack builder if esbuild is not requested on the commandline
-  const useWebpackBuilder = !getGlobalVariable('argv')['esbuild'];
 
   const isSnapshotBuild = getGlobalVariable('argv')['ng-snapshots'];
   if (isSnapshotBuild) {
@@ -31,15 +29,6 @@ export default async function () {
       await installPackage(pkg);
     }
   }
-
-  if (useWebpackBuilder) {
-    await ng('run', 'test-project:app-shell:development');
-    await expectFileToMatch('dist/test-project/browser/index.html', /app-shell works!/);
-
-    await ng('run', 'test-project:app-shell');
-    await expectFileToMatch('dist/test-project/browser/index.html', /app-shell works!/);
-  } else {
-    await ng('build');
-    await expectFileToMatch('dist/test-project/browser/index.html', 'app-shell works!');
-  }
+  await ng('build');
+  await expectFileToMatch('dist/test-project/browser/index.html', 'app-shell works!');
 }

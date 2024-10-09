@@ -1,57 +1,49 @@
-import { APP_BASE_HREF } from '@angular/common';
-import { CommonEngine } from '@angular/ssr/node';
+import {
+  AngularNodeAppEngine,
+  createNodeRequestHandler,
+  isMainModule,
+  writeResponseToNodeResponse,
+} from '@angular/ssr/node';
 import express from 'express';
+import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { dirname, join, resolve } from 'node:path';
-import <% if (isStandalone) { %>bootstrap<% } else { %>AppServerModule<% } %> from './src/main.server';
 
-// The Express app is exported so that it can be used by serverless Functions.
-export function app(): express.Express {
-  const server = express();
-  const serverDistFolder = dirname(fileURLToPath(import.meta.url));
-  const browserDistFolder = resolve(serverDistFolder, '../<%= browserDistDirectory %>');
-  const indexHtml = join(serverDistFolder, 'index.server.html');
+const serverDistFolder = dirname(fileURLToPath(import.meta.url));
+const browserDistFolder = resolve(serverDistFolder, '../<%= browserDistDirectory %>');
 
-  const commonEngine = new CommonEngine();
+const app = express();
+const angularApp = new AngularNodeAppEngine();
 
-  server.set('view engine', 'html');
-  server.set('views', browserDistFolder);
+// Example Express Rest API endpoints
+// app.get('/api/**', (req, res) => { });
 
-  // Example Express Rest API endpoints
-  // server.get('/api/**', (req, res) => { });
-  // Serve static files from /<%= browserDistDirectory %>
-  server.get('**', express.static(browserDistFolder, {
+// Serve static files from /<%= browserDistDirectory %>
+app.get(
+  '**',
+  express.static(browserDistFolder, {
     maxAge: '1y',
     index: 'index.html',
-  }));
+    setHeaders: (res) => {
+      const headers = angularApp.getPrerenderHeaders(res.req);
+      for (const [key, value] of headers) {
+        res.setHeader(key, value);
+      }
+    },
+  }),
+);
 
-  // All regular routes use the Angular engine
-  server.get('**', (req, res, next) => {
-    const { protocol, originalUrl, baseUrl, headers } = req;
+app.get('**', (req, res, next) => {
+  angularApp
+    .render(req)
+    .then((response) => (response ? writeResponseToNodeResponse(response, res) : next()))
+    .catch(next);
+});
 
-    commonEngine
-      .render({
-        <% if (isStandalone) { %>bootstrap<% } else { %>bootstrap: AppServerModule<% } %>,
-        documentFilePath: indexHtml,
-        url: `${protocol}://${headers.host}${originalUrl}`,
-        publicPath: browserDistFolder,
-        providers: [{ provide: APP_BASE_HREF, useValue: baseUrl }],
-      })
-      .then((html) => res.send(html))
-      .catch((err) => next(err));
-  });
-
-  return server;
-}
-
-function run(): void {
+if (isMainModule(import.meta.url)) {
   const port = process.env['PORT'] || 4000;
-
-  // Start up the Node server
-  const server = app();
-  server.listen(port, () => {
+  app.listen(port, () => {
     console.log(`Node Express server listening on http://localhost:${port}`);
   });
 }
 
-run();
+export default createNodeRequestHandler(app);

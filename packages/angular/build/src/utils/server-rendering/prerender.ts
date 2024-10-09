@@ -213,7 +213,7 @@ async function renderPages(
       outputFiles: outputFilesForWorker,
       assetFiles: assetFilesForWorker,
       outputMode,
-      hasSsrEntry: !!outputFilesForWorker['/server.mjs'],
+      hasSsrEntry: !!outputFilesForWorker['server.mjs'],
     } as RenderWorkerData,
     execArgv: workerExecArgv,
   });
@@ -319,7 +319,7 @@ async function getAllRoutes(
       outputFiles: outputFilesForWorker,
       assetFiles: assetFilesForWorker,
       outputMode,
-      hasSsrEntry: !!outputFilesForWorker['/server.mjs'],
+      hasSsrEntry: !!outputFilesForWorker['server.mjs'],
     } as RoutesExtractorWorkerData,
     execArgv: workerExecArgv,
   });

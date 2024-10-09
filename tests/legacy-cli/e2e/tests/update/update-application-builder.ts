@@ -16,7 +16,7 @@ export default async function () {
   await Promise.all([
     expectFileNotToExist('tsconfig.server.json'),
     expectFileToMatch('tsconfig.json', 'esModuleInterop'),
-    expectFileToMatch('server.ts', 'import.meta.url'),
+    expectFileToMatch('src/server.ts', 'import.meta.url'),
   ]);
 
   // Verify project now creates bundles
