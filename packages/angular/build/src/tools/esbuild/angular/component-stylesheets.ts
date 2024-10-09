@@ -33,6 +33,7 @@ export class ComponentStylesheetBundler {
    */
   constructor(
     private readonly options: BundleStylesheetOptions,
+    private readonly defaultInlineLanguage: string,
     private readonly incremental: boolean,
   ) {}
 
@@ -63,7 +64,12 @@ export class ComponentStylesheetBundler {
     );
   }
 
-  async bundleInline(data: string, filename: string, language: string, externalId?: string) {
+  async bundleInline(
+    data: string,
+    filename: string,
+    language = this.defaultInlineLanguage,
+    externalId?: string,
+  ) {
     // Use a hash of the inline stylesheet content to ensure a consistent identifier. External stylesheets will resolve
     // to the actual stylesheet file path.
     // TODO: Consider xxhash instead for hashing

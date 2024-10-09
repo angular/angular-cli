@@ -130,6 +130,7 @@ export function createCompilerPlugin(
       // Track incremental component stylesheet builds
       const stylesheetBundler = new ComponentStylesheetBundler(
         styleOptions,
+        styleOptions.inlineStyleLanguage,
         pluginOptions.incremental,
       );
       let sharedTSCompilationState: SharedTSCompilationState | undefined;
@@ -190,8 +191,8 @@ export function createCompilerPlugin(
               stylesheetResult = await stylesheetBundler.bundleInline(
                 data,
                 containingFile,
-                // Inline stylesheets from a template style element are always CSS
-                containingFile.endsWith('.html') ? 'css' : styleOptions.inlineStyleLanguage,
+                // Inline stylesheets from a template style element are always CSS; Otherwise, use default.
+                containingFile.endsWith('.html') ? 'css' : undefined,
                 // When external runtime styles are enabled, an identifier for the style that does not change
                 // based on the content is required to avoid emitted JS code changes. Any JS code changes will
                 // invalid the output and force a full page reload for HMR cases. The containing file and order
@@ -490,7 +491,6 @@ export function createCompilerPlugin(
           build,
           stylesheetBundler,
           additionalResults,
-          styleOptions.inlineStyleLanguage,
           pluginOptions.loadResultCache,
         );
       }

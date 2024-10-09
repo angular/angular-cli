@@ -66,7 +66,6 @@ export function setupJitPluginCallbacks(
   build: PluginBuild,
   stylesheetBundler: ComponentStylesheetBundler,
   additionalResultFiles: Map<string, { outputFiles?: OutputFile[]; metafile?: Metafile }>,
-  inlineStyleLanguage: string,
   loadCache?: LoadResultCache,
 ): void {
   const root = build.initialOptions.absWorkingDir ?? '';
@@ -114,11 +113,7 @@ export function setupJitPluginCallbacks(
       if (entry.contents === undefined) {
         stylesheetResult = await stylesheetBundler.bundleFile(entry.path);
       } else {
-        stylesheetResult = await stylesheetBundler.bundleInline(
-          entry.contents,
-          entry.path,
-          inlineStyleLanguage,
-        );
+        stylesheetResult = await stylesheetBundler.bundleInline(entry.contents, entry.path);
       }
 
       const { contents, outputFiles, errors, warnings, metafile, referencedFiles } =
