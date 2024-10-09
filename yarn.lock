@@ -115,7 +115,7 @@ __metadata:
     terser: "npm:5.34.1"
     tree-kill: "npm:1.2.2"
     tslib: "npm:2.7.0"
-    undici: "npm:6.19.8"
+    undici: "npm:6.20.0"
     vite: "npm:5.4.8"
     watchpack: "npm:2.4.2"
     webpack: "npm:5.95.0"
@@ -718,7 +718,7 @@ __metadata:
     eslint-config-prettier: "npm:9.1.0"
     eslint-plugin-header: "npm:3.1.1"
     eslint-plugin-import: "npm:2.31.0"
-    express: "npm:4.21.0"
+    express: "npm:4.21.1"
     fast-glob: "npm:3.3.2"
     http-proxy: "npm:^1.18.1"
     http-proxy-middleware: "npm:3.0.3"
@@ -780,7 +780,7 @@ __metadata:
     ts-node: "npm:^10.9.1"
     tslib: "npm:2.7.0"
     typescript: "npm:5.6.2"
-    undici: "npm:6.19.8"
+    undici: "npm:6.20.0"
     unenv: "npm:^1.10.0"
     verdaccio: "npm:6.0.0"
     verdaccio-auth-memory: "npm:^10.0.0"
@@ -8571,6 +8571,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"cookie@npm:0.7.1":
+  version: 0.7.1
+  resolution: "cookie@npm:0.7.1"
+  checksum: 10c0/5de60c67a410e7c8dc8a46a4b72eb0fe925871d057c9a5d2c0e8145c4270a4f81076de83410c4d397179744b478e33cd80ccbcc457abf40a9409ad27dcd21dde
+  languageName: node
+  linkType: hard
+
 "cookie@npm:~0.4.1":
   version: 0.4.2
   resolution: "cookie@npm:0.4.2"
@@ -10265,6 +10272,45 @@ __metadata:
     utils-merge: "npm:1.0.1"
     vary: "npm:~1.1.2"
   checksum: 10c0/4cf7ca328f3fdeb720f30ccb2ea7708bfa7d345f9cc460b64a82bf1b2c91e5b5852ba15a9a11b2a165d6089acf83457fc477dc904d59cd71ed34c7a91762c6cc
+  languageName: node
+  linkType: hard
+
+"express@npm:4.21.1":
+  version: 4.21.1
+  resolution: "express@npm:4.21.1"
+  dependencies:
+    accepts: "npm:~1.3.8"
+    array-flatten: "npm:1.1.1"
+    body-parser: "npm:1.20.3"
+    content-disposition: "npm:0.5.4"
+    content-type: "npm:~1.0.4"
+    cookie: "npm:0.7.1"
+    cookie-signature: "npm:1.0.6"
+    debug: "npm:2.6.9"
+    depd: "npm:2.0.0"
+    encodeurl: "npm:~2.0.0"
+    escape-html: "npm:~1.0.3"
+    etag: "npm:~1.8.1"
+    finalhandler: "npm:1.3.1"
+    fresh: "npm:0.5.2"
+    http-errors: "npm:2.0.0"
+    merge-descriptors: "npm:1.0.3"
+    methods: "npm:~1.1.2"
+    on-finished: "npm:2.4.1"
+    parseurl: "npm:~1.3.3"
+    path-to-regexp: "npm:0.1.10"
+    proxy-addr: "npm:~2.0.7"
+    qs: "npm:6.13.0"
+    range-parser: "npm:~1.2.1"
+    safe-buffer: "npm:5.2.1"
+    send: "npm:0.19.0"
+    serve-static: "npm:1.16.2"
+    setprototypeof: "npm:1.2.0"
+    statuses: "npm:2.0.1"
+    type-is: "npm:~1.6.18"
+    utils-merge: "npm:1.0.1"
+    vary: "npm:~1.1.2"
+  checksum: 10c0/0c287867e5f6129d3def1edd9b63103a53c40d4dc8628839d4b6827e35eb8f0de5a4656f9d85f4457eba584f9871ebb2ad26c750b36bd75d9bbb8bcebdc4892c
   languageName: node
   linkType: hard
 
@@ -18135,10 +18181,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"undici@npm:6.19.8":
-  version: 6.19.8
-  resolution: "undici@npm:6.19.8"
-  checksum: 10c0/07fd8520bce7e34ea29c07ef0de27b734183042cdb4e2f1262cd1fb9b755a6b04ff2471040395dfb1770fb7786069a97c5178bcf706b80a34075994f46feb37c
+"undici@npm:6.20.0":
+  version: 6.20.0
+  resolution: "undici@npm:6.20.0"
+  checksum: 10c0/b74a6e4dcdfc3a6e7f5eab77c24f598c5a8664091797dc4940f86e1ed27e5dc9bef390aa1ecf53f20c7ec0e8809bc3d1518a8c3c560fa5972a6a325d628765be
   languageName: node
   linkType: hard
 
