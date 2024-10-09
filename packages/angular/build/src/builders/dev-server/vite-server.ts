@@ -334,6 +334,13 @@ export async function* serveWithVite(
         ssrMode = ServerSsrMode.InternalSsrMiddleware;
       }
 
+      if (browserOptions.progress !== false && ssrMode !== ServerSsrMode.NoSsr) {
+        // This is a workaround for https://github.com/angular/angular-cli/issues/28336, which is caused by the interaction between `zone.js` and `listr2`.
+        process.once('SIGINT', () => {
+          process.kill(process.pid);
+        });
+      }
+
       // Setup server and start listening
       const serverConfiguration = await setupServer(
         serverOptions,
