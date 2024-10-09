@@ -29,7 +29,7 @@ import {
 } from '../../utils/server-rendering/models';
 import { prerenderPages } from '../../utils/server-rendering/prerender';
 import { augmentAppWithServiceWorkerEsbuild } from '../../utils/service-worker';
-import { INDEX_HTML_SERVER, NormalizedApplicationBuildOptions } from './options';
+import { INDEX_HTML_CSR, INDEX_HTML_SERVER, NormalizedApplicationBuildOptions } from './options';
 import { OutputMode } from './schema';
 
 /**
@@ -154,7 +154,15 @@ export async function executePostBundleSteps(
       // Update the index contents with the app shell under these conditions:
       // - Replace 'index.html' with the app shell only if it hasn't been prerendered yet.
       // - Always replace 'index.csr.html' with the app shell.
-      const filePath = appShellRoute && !indexHasBeenPrerendered ? indexHtmlOptions.output : path;
+      let filePath = path;
+      if (appShellRoute && !indexHasBeenPrerendered) {
+        if (outputMode !== OutputMode.Server && indexHtmlOptions.output === INDEX_HTML_CSR) {
+          filePath = 'index.html';
+        } else {
+          filePath = indexHtmlOptions.output;
+        }
+      }
+
       additionalHtmlOutputFiles.set(
         filePath,
         createOutputFile(filePath, content, BuildOutputFileType.Browser),

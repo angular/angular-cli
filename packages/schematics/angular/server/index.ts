@@ -16,6 +16,7 @@ import {
   chain,
   mergeWith,
   move,
+  renameTemplateFiles,
   strings,
   url,
 } from '@angular-devkit/schematics';
@@ -101,10 +102,8 @@ function updateConfigFileApplicationBuilder(options: ServerOptions): Rule {
     }
 
     const buildTarget = project.targets.get('build');
-    if (buildTarget?.builder !== Builders.Application) {
-      throw new SchematicsException(
-        `This schematic requires "${Builders.Application}" to be used as a build builder.`,
-      );
+    if (!buildTarget) {
+      return;
     }
 
     buildTarget.options ??= {};
@@ -112,6 +111,8 @@ function updateConfigFileApplicationBuilder(options: ServerOptions): Rule {
       project.sourceRoot ?? posix.join(project.root, 'src'),
       serverMainEntryName,
     );
+
+    buildTarget.options['outputMode'] = 'static';
   });
 }
 
@@ -169,7 +170,10 @@ export default function (options: ServerOptions): Rule {
       throw targetBuildNotFoundError();
     }
 
-    const isUsingApplicationBuilder = clientBuildTarget.builder === Builders.Application;
+    const isUsingApplicationBuilder =
+      clientBuildTarget.builder === Builders.Application ||
+      clientBuildTarget.builder === Builders.BuildApplication;
+
     if (
       clientProject.targets.has('server') ||
       (isUsingApplicationBuilder && clientBuildTarget.options?.server !== undefined)
@@ -181,13 +185,17 @@ export default function (options: ServerOptions): Rule {
     const clientBuildOptions = clientBuildTarget.options as Record<string, string>;
     const browserEntryPoint = await getMainFilePath(host, options.project);
     const isStandalone = isStandaloneApp(host, browserEntryPoint);
+    const sourceRoot = clientProject.sourceRoot ?? join(normalize(clientProject.root), 'src');
 
-    const templateSource = apply(url(isStandalone ? './files/standalone-src' : './files/src'), [
+    let filesUrl = `./files/${isUsingApplicationBuilder ? 'application-builder/' : 'server-builder/'}`;
+    filesUrl += isStandalone ? 'standalone-src' : 'ngmodule-src';
+
+    const templateSource = apply(url(filesUrl), [
       applyTemplates({
         ...strings,
         ...options,
       }),
-      move(join(normalize(clientProject.root), 'src')),
+      move(sourceRoot),
     ]);
 
     const clientTsConfig = normalize(clientBuildOptions.tsConfig);
@@ -203,7 +211,7 @@ export default function (options: ServerOptions): Rule {
           ]
         : [
             mergeWith(
-              apply(url('./files/root'), [
+              apply(url('./files/server-builder/root'), [
                 applyTemplates({
                   ...strings,
                   ...options,

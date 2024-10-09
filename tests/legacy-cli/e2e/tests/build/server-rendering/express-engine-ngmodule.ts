@@ -1,9 +1,15 @@
-import { getGlobalVariable } from '../../utils/env';
-import { rimraf, writeMultipleFiles } from '../../utils/fs';
-import { findFreePort } from '../../utils/network';
-import { installWorkspacePackages } from '../../utils/packages';
-import { execAndWaitForOutputToMatch, ng } from '../../utils/process';
-import { updateJsonFile, useCIChrome, useCIDefaults, useSha } from '../../utils/project';
+import { getGlobalVariable } from '../../../utils/env';
+import { rimraf, writeMultipleFiles } from '../../../utils/fs';
+import { findFreePort } from '../../../utils/network';
+import { installWorkspacePackages } from '../../../utils/packages';
+import { execAndWaitForOutputToMatch, ng } from '../../../utils/process';
+import {
+  updateJsonFile,
+  updateServerFileForWebpack,
+  useCIChrome,
+  useCIDefaults,
+  useSha,
+} from '../../../utils/project';
 
 export default async function () {
   // forcibly remove in case another test doesn't clean itself up
@@ -53,7 +59,10 @@ export default async function () {
     await updateJsonFile('angular.json', (json) => {
       const build = json['projects']['test-project-two']['architect']['build'];
       build.configurations.production.prerender = false;
+      build.options.outputMode = undefined;
     });
+
+    await updateServerFileForWebpack('projects/test-project-two/src/server.ts');
   }
 
   await writeMultipleFiles({
@@ -69,8 +78,7 @@ export default async function () {
           .catch((err) => console.error(err));
       };
     `,
-    'projects/test-project-two/e2e/src/app.e2e-spec.ts':
-      `
+    'projects/test-project-two/e2e/src/app.e2e-spec.ts': `
       import { browser, by, element } from 'protractor';
       import * as webdriver from 'selenium-webdriver';
 
@@ -120,24 +128,20 @@ export default async function () {
 
           // Make sure there were no client side errors.
           await verifyNoBrowserErrors();
-        });` +
-      // TODO(alanagius): enable the below tests once critical css inlining for SSR is supported with Vite.
-      (useWebpackBuilder
-        ? `
-          it('stylesheets should be configured to load asynchronously', async () => {
-            // Load the page without waiting for Angular since it is not bootstrapped automatically.
-            await browser.driver.get(browser.baseUrl);
-
-            // Test the contents from the server.
-            const styleTag = await browser.driver.findElement(by.css('link[rel="stylesheet"]'));
-            expect(await styleTag.getAttribute('media')).toMatch('all');
-
-            // Make sure there were no client side errors.
-            await verifyNoBrowserErrors();
-          });`
-        : '') +
-      `
         });
+
+        it('stylesheets should be configured to load asynchronously', async () => {
+          // Load the page without waiting for Angular since it is not bootstrapped automatically.
+          await browser.driver.get(browser.baseUrl);
+
+          // Test the contents from the server.
+          const styleTag = await browser.driver.findElement(by.css('link[rel="stylesheet"]'));
+          expect(await styleTag.getAttribute('media')).toMatch('all');
+
+          // Make sure there were no client side errors.
+          await verifyNoBrowserErrors();
+        });
+      });
       `,
   });
 

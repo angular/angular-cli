@@ -156,17 +156,16 @@ function updateApplicationBuilderTsConfigRule(options: SSROptions): Rule {
       return;
     }
 
-    const tsConfig = new JSONFile(host, tsConfigPath);
-    const filesAstNode = tsConfig.get(['files']);
-    const serverFilePath = 'server.ts';
-    if (Array.isArray(filesAstNode) && !filesAstNode.some(({ text }) => text === serverFilePath)) {
-      tsConfig.modify(['files'], [...filesAstNode, serverFilePath]);
-    }
+    const json = new JSONFile(host, tsConfigPath);
+    const filesPath = ['files'];
+    const files = new Set((json.get(filesPath) as string[] | undefined) ?? []);
+    files.add('src/server.ts');
+    json.modify(filesPath, [...files]);
   };
 }
 
 function updateApplicationBuilderWorkspaceConfigRule(
-  projectRoot: string,
+  projectSourceRoot: string,
   options: SSROptions,
   { logger }: SchematicContext,
 ): Rule {
@@ -202,15 +201,18 @@ function updateApplicationBuilderWorkspaceConfigRule(
     buildTarget.options = {
       ...buildTarget.options,
       outputPath,
-      prerender: true,
+      outputMode: 'server',
       ssr: {
-        entry: join(normalize(projectRoot), 'server.ts'),
+        entry: join(normalize(projectSourceRoot), 'server.ts'),
       },
     };
   });
 }
 
-function updateWebpackBuilderWorkspaceConfigRule(options: SSROptions): Rule {
+function updateWebpackBuilderWorkspaceConfigRule(
+  projectSourceRoot: string,
+  options: SSROptions,
+): Rule {
   return updateWorkspace((workspace) => {
     const projectName = options.project;
     const project = workspace.projects.get(projectName);
@@ -220,7 +222,7 @@ function updateWebpackBuilderWorkspaceConfigRule(options: SSROptions): Rule {
 
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const serverTarget = project.targets.get('server')!;
-    (serverTarget.options ??= {}).main = join(normalize(project.root), 'server.ts');
+    (serverTarget.options ??= {}).main = posix.join(projectSourceRoot, 'server.ts');
 
     const serveSSRTarget = project.targets.get(SERVE_SSR_TARGET_NAME);
     if (serveSSRTarget) {
@@ -287,7 +289,7 @@ function updateWebpackBuilderServerTsConfigRule(options: SSROptions): Rule {
 
     const tsConfig = new JSONFile(host, tsConfigPath);
     const filesAstNode = tsConfig.get(['files']);
-    const serverFilePath = 'server.ts';
+    const serverFilePath = 'src/server.ts';
     if (Array.isArray(filesAstNode) && !filesAstNode.some(({ text }) => text === serverFilePath)) {
       tsConfig.modify(['files'], [...filesAstNode, serverFilePath]);
     }
@@ -320,7 +322,11 @@ function addDependencies({ skipInstall }: SSROptions, isUsingApplicationBuilder:
   return chain(rules);
 }
 
-function addServerFile(options: ServerOptions, isStandalone: boolean): Rule {
+function addServerFile(
+  projectSourceRoot: string,
+  options: ServerOptions,
+  isStandalone: boolean,
+): Rule {
   return async (host) => {
     const projectName = options.project;
     const workspace = await readWorkspace(host);
@@ -344,7 +350,7 @@ function addServerFile(options: ServerOptions, isStandalone: boolean): Rule {
             browserDistDirectory,
             isStandalone,
           }),
-          move(project.root),
+          move(projectSourceRoot),
         ],
       ),
     );
@@ -364,6 +370,8 @@ export default function (options: SSROptions): Rule {
 
     const isUsingApplicationBuilder = usingApplicationBuilder(clientProject);
 
+    const sourceRoot = clientProject.sourceRoot ?? posix.join(clientProject.root, 'src');
+
     return chain([
       schematic('server', {
         ...options,
@@ -371,14 +379,14 @@ export default function (options: SSROptions): Rule {
       }),
       ...(isUsingApplicationBuilder
         ? [
-            updateApplicationBuilderWorkspaceConfigRule(clientProject.root, options, context),
+            updateApplicationBuilderWorkspaceConfigRule(sourceRoot, options, context),
             updateApplicationBuilderTsConfigRule(options),
           ]
         : [
             updateWebpackBuilderServerTsConfigRule(options),
-            updateWebpackBuilderWorkspaceConfigRule(options),
+            updateWebpackBuilderWorkspaceConfigRule(sourceRoot, options),
           ]),
-      addServerFile(options, isStandalone),
+      addServerFile(sourceRoot, options, isStandalone),
       addScriptsRule(options, isUsingApplicationBuilder),
       addDependencies(options, isUsingApplicationBuilder),
     ]);

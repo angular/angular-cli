@@ -6,7 +6,6 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { tags } from '@angular-devkit/core';
 import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/testing';
 
 import { join } from 'node:path';
@@ -77,26 +76,7 @@ describe('SSR Schematic', () => {
         files: string[];
       };
 
-      expect(files).toEqual(['src/main.ts', 'src/main.server.ts', 'server.ts']);
-    });
-
-    it(`should import 'AppServerModule' from 'main.server.ts'`, async () => {
-      const tree = await schematicRunner.runSchematic('ssr', defaultOptions, appTree);
-
-      const filePath = '/projects/test-app/server.ts';
-      const content = tree.readContent(filePath);
-      expect(content).toContain(`import AppServerModule from './src/main.server';`);
-    });
-
-    it(`should pass 'AppServerModule' in the bootstrap parameter.`, async () => {
-      const tree = await schematicRunner.runSchematic('ssr', defaultOptions, appTree);
-
-      const filePath = '/projects/test-app/server.ts';
-      const content = tree.readContent(filePath);
-      expect(tags.oneLine`${content}`).toContain(tags.oneLine`
-      .render({
-        bootstrap: AppServerModule,
-    `);
+      expect(files).toEqual(['src/main.ts', 'src/main.server.ts', 'src/server.ts']);
     });
   });
 
@@ -116,25 +96,6 @@ describe('SSR Schematic', () => {
         },
         appTree,
       );
-    });
-
-    it(`should add default import to 'main.server.ts'`, async () => {
-      const tree = await schematicRunner.runSchematic('ssr', defaultOptions, appTree);
-
-      const filePath = '/projects/test-app/server.ts';
-      const content = tree.readContent(filePath);
-      expect(content).toContain(`import bootstrap from './src/main.server';`);
-    });
-
-    it(`should pass 'AppServerModule' in the bootstrap parameter.`, async () => {
-      const tree = await schematicRunner.runSchematic('ssr', defaultOptions, appTree);
-
-      const filePath = '/projects/test-app/server.ts';
-      const content = tree.readContent(filePath);
-      expect(tags.oneLine`${content}`).toContain(tags.oneLine`
-        .render({
-          bootstrap,
-      `);
     });
 
     it('should add script section in package.json', async () => {
@@ -161,7 +122,7 @@ describe('SSR Schematic', () => {
       const { scripts } = tree.readJson('/package.json') as { scripts: Record<string, string> };
       expect(scripts['serve:ssr:test-app']).toBe(`node dist/test-app/node-server/server.mjs`);
 
-      const serverFileContent = tree.readContent('/projects/test-app/server.ts');
+      const serverFileContent = tree.readContent('/projects/test-app/src/server.ts');
       expect(serverFileContent).toContain(`resolve(serverDistFolder, '../public')`);
     });
 
@@ -239,20 +200,20 @@ describe('SSR Schematic', () => {
         files: string[];
       };
 
-      expect(files).toEqual(['src/main.server.ts', 'server.ts']);
+      expect(files).toEqual(['src/main.server.ts', 'src/server.ts']);
     });
 
     it(`should add export to main file in 'server.ts'`, async () => {
       const tree = await schematicRunner.runSchematic('ssr', defaultOptions, appTree);
 
-      const content = tree.readContent('/projects/test-app/server.ts');
+      const content = tree.readContent('/projects/test-app/src/server.ts');
       expect(content).toContain(`export default AppServerModule`);
     });
 
     it(`should add correct value to 'distFolder'`, async () => {
       const tree = await schematicRunner.runSchematic('ssr', defaultOptions, appTree);
 
-      const content = tree.readContent('/projects/test-app/server.ts');
+      const content = tree.readContent('/projects/test-app/src/server.ts');
       expect(content).toContain(`const distFolder = join(process.cwd(), 'dist/test-app/browser');`);
     });
   });

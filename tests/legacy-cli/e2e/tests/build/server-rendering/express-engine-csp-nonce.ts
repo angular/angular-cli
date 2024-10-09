@@ -1,27 +1,28 @@
-import { getGlobalVariable } from '../../utils/env';
-import { rimraf, writeMultipleFiles } from '../../utils/fs';
-import { findFreePort } from '../../utils/network';
-import { installWorkspacePackages } from '../../utils/packages';
-import { execAndWaitForOutputToMatch, ng } from '../../utils/process';
-import { updateJsonFile, useSha } from '../../utils/project';
+import { getGlobalVariable } from '../../../utils/env';
+import { rimraf, writeMultipleFiles } from '../../../utils/fs';
+import { findFreePort } from '../../../utils/network';
+import { installWorkspacePackages } from '../../../utils/packages';
+import { execAndWaitForOutputToMatch, ng } from '../../../utils/process';
+import { updateJsonFile, updateServerFileForWebpack, useSha } from '../../../utils/project';
 
 export default async function () {
+  const useWebpackBuilder = !getGlobalVariable('argv')['esbuild'];
   // forcibly remove in case another test doesn't clean itself up
   await rimraf('node_modules/@angular/ssr');
-
   await ng('add', '@angular/ssr', '--skip-confirmation', '--skip-install');
-
-  const useWebpackBuilder = !getGlobalVariable('argv')['esbuild'];
-  if (!useWebpackBuilder) {
-    // Disable prerendering
-    await updateJsonFile('angular.json', (json) => {
-      const build = json['projects']['test-project']['architect']['build'];
-      build.configurations.production.prerender = false;
-    });
-  }
 
   await useSha();
   await installWorkspacePackages();
+
+  if (!useWebpackBuilder) {
+    await updateJsonFile('angular.json', (json) => {
+      const build = json['projects']['test-project']['architect']['build'];
+      build.options.outputMode = undefined;
+      build.configurations.production.prerender = false;
+    });
+
+    await updateServerFileForWebpack('src/server.ts');
+  }
 
   await writeMultipleFiles({
     'src/app/app.component.css': `div { color: #000 }`,
@@ -34,8 +35,19 @@ export default async function () {
         bootstrapApplication(AppComponent, appConfig).catch((err) => console.error(err));
       };
       `,
-    'e2e/src/app.e2e-spec.ts':
-      `
+    'src/index.html': `
+      <!doctype html>
+      <html lang="en">
+      <head>
+        <meta charset="utf-8">
+        <base href="/">
+      </head>
+      <body>
+        <app-root ngCspNonce="{% nonce %}"></app-root>
+      </body>
+      </html>
+    `,
+    'e2e/src/app.e2e-spec.ts': `
       import { browser, by, element } from 'protractor';
       import * as webdriver from 'selenium-webdriver';
 
@@ -66,12 +78,12 @@ export default async function () {
           // Load the page without waiting for Angular since it is not bootstrapped automatically.
           await browser.driver.get(browser.baseUrl);
 
-          const style = await browser.driver.findElement(by.css('style[ng-app-id="ng"]'));
-          expect(await style.getText()).not.toBeNull();
+          expect(
+            await element(by.css('style[ng-app-id="ng"]')).getText()
+          ).not.toBeNull();
 
           // Test the contents from the server.
-          const serverDiv = await browser.driver.findElement(by.css('h1'));
-          expect(await serverDiv.getText()).toMatch('Hello');
+          expect(await element(by.css('h1')).getText()).toMatch('Hello');
 
           // Bootstrap the client side app.
           await browser.executeScript('doBootstrap()');
@@ -80,34 +92,50 @@ export default async function () {
           expect(await element(by.css('h1')).getText()).toMatch('Hello');
 
           // Make sure the server styles got replaced by client side ones.
-          expect(await element(by.css('style[ng-app-id="ng"]')).isPresent()).toBeFalsy();
+          expect(
+            await element(by.css('style[ng-app-id="ng"]')).isPresent()
+          ).toBeFalsy();
           expect(await element(by.css('style')).getText()).toMatch('');
 
           // Make sure there were no client side errors.
           await verifyNoBrowserErrors();
-        }); ` +
-      // TODO(alanagius): enable the below tests once critical css inlining for SSR is supported with Vite.
-      (useWebpackBuilder
-        ? `
+        });
+
         it('stylesheets should be configured to load asynchronously', async () => {
           // Load the page without waiting for Angular since it is not bootstrapped automatically.
           await browser.driver.get(browser.baseUrl);
 
           // Test the contents from the server.
-          const styleTag = await browser.driver.findElement(by.css('link[rel="stylesheet"]'));
-          expect(await styleTag.getAttribute('media')).toMatch('all');
+          const linkTag = await browser.driver.findElement(
+            by.css('link[rel="stylesheet"]')
+          );
+          expect(await linkTag.getAttribute('media')).toMatch('all');
+          expect(await linkTag.getAttribute('ngCspMedia')).toBeNull();
+          expect(await linkTag.getAttribute('onload')).toBeNull();
 
           // Make sure there were no client side errors.
           await verifyNoBrowserErrors();
-        });`
-        : '') +
-      `
+        });
+
+        it('style tags all have a nonce attribute', async () => {
+          // Load the page without waiting for Angular since it is not bootstrapped automatically.
+          await browser.driver.get(browser.baseUrl);
+
+          // Test the contents from the server.
+          for (const s of await browser.driver.findElements(by.css('style'))) {
+            expect(await s.getAttribute('nonce')).toBe('{% nonce %}');
+          }
+
+          // Make sure there were no client side errors.
+          await verifyNoBrowserErrors();
+        });
       });
       `,
   });
 
   async function spawnServer(): Promise<number> {
     const port = await findFreePort();
+
     const runCommand = useWebpackBuilder ? 'serve:ssr' : 'serve:ssr:test-project';
 
     await execAndWaitForOutputToMatch(
@@ -123,9 +151,10 @@ export default async function () {
   }
 
   await ng('build');
+
   if (useWebpackBuilder) {
     // Build server code
-    await ng('run', `test-project:server`);
+    await ng('run', 'test-project:server');
   }
 
   const port = await spawnServer();

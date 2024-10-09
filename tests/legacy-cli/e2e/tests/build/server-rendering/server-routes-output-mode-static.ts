@@ -1,14 +1,29 @@
 import { join } from 'node:path';
-import { expectFileNotToExist, expectFileToMatch, replaceInFile, writeFile } from '../../utils/fs';
-import { noSilentNg, silentNg } from '../../utils/process';
-import { setupProjectWithSSRAppEngine } from './setup';
 import { existsSync } from 'node:fs';
-import { expectToFail } from '../../utils/utils';
 import assert from 'node:assert';
+import {
+  expectFileNotToExist,
+  expectFileToMatch,
+  replaceInFile,
+  writeFile,
+} from '../../../utils/fs';
+import { ng, noSilentNg, silentNg } from '../../../utils/process';
+import { installWorkspacePackages, uninstallPackage } from '../../../utils/packages';
+import { useSha } from '../../../utils/project';
+import { getGlobalVariable } from '../../../utils/env';
+import { expectToFail } from '../../../utils/utils';
 
 export default async function () {
-  // Setup project
-  await setupProjectWithSSRAppEngine();
+  assert(
+    getGlobalVariable('argv')['esbuild'],
+    'This test should not be called in the Webpack suite.',
+  );
+
+  // Forcibly remove in case another test doesn't clean itself up.
+  await uninstallPackage('@angular/ssr');
+  await ng('add', '@angular/ssr', '--skip-confirmation', '--skip-install');
+  await useSha();
+  await installWorkspacePackages();
 
   // Add routes
   await writeFile(
@@ -50,7 +65,7 @@ export default async function () {
     `
   import { RenderMode, ServerRoute } from '@angular/ssr';
 
-  export const routes: ServerRoute[] = [
+  export const serverRoutes: ServerRoute[] = [
     {
       path: 'ssg/:id',
       renderMode: RenderMode.Prerender,

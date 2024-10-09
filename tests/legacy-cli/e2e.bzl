@@ -42,10 +42,13 @@ ESBUILD_TESTS = [
 
 WEBPACK_IGNORE_TESTS = [
     "tests/vite/**",
-    "tests/server-rendering/server-routes-*",
+    "tests/build/app-shell/**",
+    "tests/i18n/ivy-localize-app-shell.js",
+    "tests/i18n/ivy-localize-app-shell-service-worker.js",
     "tests/commands/serve/ssr-http-requests-assets.js",
     "tests/build/prerender/http-requests-assets.js",
     "tests/build/prerender/error-with-sourcemaps.js",
+    "tests/build/server-rendering/server-routes-*",
     "tests/build/wasm-esm.js",
 ]
 
