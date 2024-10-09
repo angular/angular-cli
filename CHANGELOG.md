@@ -1,3 +1,40 @@
+<a name="19.0.0-next.10"></a>
+
+# 19.0.0-next.10 (2024-10-09)
+
+## Breaking Changes
+
+### @schematics/angular
+
+- The app-shell schematic is no longer compatible with Webpack-based builders.
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                                           |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------------------- |
+| [292a4b7c2](https://github.com/angular/angular-cli/commit/292a4b7c2f62828606c42258db524341f4a6391e) | feat | update app-shell and ssr schematics to adopt new Server Rendering API |
+| [6dbfc770b](https://github.com/angular/angular-cli/commit/6dbfc770b2d2f72dbc73e39e763f0773435825c6) | fix  | add validation for component and directive class name                 |
+| [7de93e593](https://github.com/angular/angular-cli/commit/7de93e593a9b6439b2f33d0c25c371e14a0e9e38) | fix  | include `index.csr.html` in resources asset group                     |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description       |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------- |
+| [ab6e19e1f](https://github.com/angular/angular-cli/commit/ab6e19e1f9a8781334821048522abe86b149c9c3) | fix  | handle main field |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                                                      |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------------------------- |
+| [549c20a93](https://github.com/angular/angular-cli/commit/549c20a9396b33ae2e6708a8a9a7c77f0167b276) | fix  | `Ctrl + C` not terminating dev-server with SSR                                   |
+| [1d9db138f](https://github.com/angular/angular-cli/commit/1d9db138f34132f62fd008c9b8597489b08018e6) | fix  | always generate a new hash for optimized chunk                                   |
+| [7c50ba9e2](https://github.com/angular/angular-cli/commit/7c50ba9e2faca445c196c69e972ac313547dda54) | fix  | ensure `index.csr.html` is always generated when prerendering or SSR are enabled |
+| [1bb68ba68](https://github.com/angular/angular-cli/commit/1bb68ba6812236a135c1599031bf7e1b7e0d1d79) | fix  | move lmdb to optionalDependencies                                                |
+| [9233e5ef4](https://github.com/angular/angular-cli/commit/9233e5ef471e851a173827df7f74a581381c6373) | fix  | show error message when error stack is undefined                                 |
+| [6c618d495](https://github.com/angular/angular-cli/commit/6c618d495c54394eb2b87aee36ba5436c06557bd) | fix  | update logic to support both internal and external SSR middlewares               |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="18.2.8"></a>
 
 # 18.2.8 (2024-10-09)
