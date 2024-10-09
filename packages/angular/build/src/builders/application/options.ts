@@ -27,6 +27,7 @@ import {
 import { urlJoin } from '../../utils/url';
 import {
   Schema as ApplicationBuilderOptions,
+  ExperimentalPlatform,
   I18NTranslation,
   OutputHashing,
   OutputMode,
@@ -264,10 +265,11 @@ export async function normalizeOptions(
   if (options.ssr === true) {
     ssrOptions = {};
   } else if (typeof options.ssr === 'object') {
-    const { entry } = options.ssr;
+    const { entry, experimentalPlatform = ExperimentalPlatform.Node } = options.ssr;
 
     ssrOptions = {
       entry: entry && path.join(workspaceRoot, entry),
+      platform: experimentalPlatform,
     };
   }
 

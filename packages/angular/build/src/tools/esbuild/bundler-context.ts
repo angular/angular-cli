@@ -276,6 +276,14 @@ export class BundlerContext {
       };
     }
 
+    const {
+      'ng-platform-server': isPlatformServer = false,
+      'ng-ssr-entry-bundle': isSsrEntryBundle = false,
+    } = result.metafile as Metafile & {
+      'ng-platform-server'?: boolean;
+      'ng-ssr-entry-bundle'?: boolean;
+    };
+
     // Find all initial files
     const initialFiles = new Map<string, InitialFileRecord>();
     for (const outputFile of result.outputFiles) {
@@ -299,7 +307,7 @@ export class BundlerContext {
             name,
             type,
             entrypoint: true,
-            serverFile: this.#platformIsServer,
+            serverFile: isPlatformServer,
             depth: 0,
           };
 
@@ -332,7 +340,7 @@ export class BundlerContext {
             type: initialImport.kind === 'import-rule' ? 'style' : 'script',
             entrypoint: false,
             external: initialImport.external,
-            serverFile: this.#platformIsServer,
+            serverFile: isPlatformServer,
             depth: entryRecord.depth + 1,
           };
 
@@ -371,9 +379,8 @@ export class BundlerContext {
       // All files that are not JS, CSS, WASM, or sourcemaps for them are considered media
       if (!/\.([cm]?js|css|wasm)(\.map)?$/i.test(file.path)) {
         fileType = BuildOutputFileType.Media;
-      } else if (this.#platformIsServer) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        fileType = (result.metafile as any)['ng-ssr-entry-bundle']
+      } else if (isPlatformServer) {
+        fileType = isSsrEntryBundle
           ? BuildOutputFileType.ServerRoot
           : BuildOutputFileType.ServerApplication;
       } else {
@@ -384,7 +391,7 @@ export class BundlerContext {
     });
 
     let externalConfiguration = this.#esbuildOptions.external;
-    if (this.#platformIsServer && externalConfiguration) {
+    if (isPlatformServer && externalConfiguration) {
       externalConfiguration = externalConfiguration.filter(
         (dep) => !SERVER_GENERATED_EXTERNALS.has(dep),
       );
@@ -400,7 +407,7 @@ export class BundlerContext {
       outputFiles,
       initialFiles,
       externalImports: {
-        [this.#platformIsServer ? 'server' : 'browser']: externalImports,
+        [isPlatformServer ? 'server' : 'browser']: externalImports,
       },
       externalConfiguration,
       errors: undefined,
@@ -420,10 +427,6 @@ export class BundlerContext {
         }
       }
     }
-  }
-
-  get #platformIsServer(): boolean {
-    return this.#esbuildOptions?.platform === 'node';
   }
 
   /**
