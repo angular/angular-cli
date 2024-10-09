@@ -1,3 +1,23 @@
+<a name="18.2.8"></a>
+
+# 18.2.8 (2024-10-09)
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                           |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------- |
+| [b522002ff](https://github.com/angular/angular-cli/commit/b522002fff763cda2ae1c746efcb2638d0099184) | fix  | add validation for component and directive class name |
+| [dfd2d5c05](https://github.com/angular/angular-cli/commit/dfd2d5c0500777fa5aea91519f6657aed7f3b7d7) | fix  | include `index.csr.html` in resources asset group     |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                    |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------- |
+| [9445916f9](https://github.com/angular/angular-cli/commit/9445916f9b5b9da69623bf86735264d8a5f26fb3) | fix  | `Ctrl + C` not terminating dev-server with SSR |
+| [9b5cfaa8c](https://github.com/angular/angular-cli/commit/9b5cfaa8ce9d12bf450e7527d479ce7a879ea1b8) | fix  | always generate a new hash for optimized chunk |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="18.2.7"></a>
 
 # 18.2.7 (2024-10-02)
