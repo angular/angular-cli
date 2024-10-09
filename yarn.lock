@@ -782,7 +782,7 @@ __metadata:
     tree-kill: "npm:1.2.2"
     ts-node: "npm:^10.9.1"
     tslib: "npm:2.7.0"
-    typescript: "npm:5.6.2"
+    typescript: "npm:5.6.3"
     undici: "npm:6.20.0"
     unenv: "npm:^1.10.0"
     verdaccio: "npm:6.0.0"
@@ -3839,7 +3839,7 @@ __metadata:
     "@angular-devkit/core": "npm:0.0.0-PLACEHOLDER"
     "@angular/compiler": "npm:19.0.0-next.8"
     "@angular/compiler-cli": "npm:19.0.0-next.8"
-    typescript: "npm:5.6.2"
+    typescript: "npm:5.6.3"
     webpack: "npm:5.95.0"
   peerDependencies:
     "@angular/compiler-cli": ^19.0.0-next.0
@@ -17566,6 +17566,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"typescript@npm:5.6.3":
+  version: 5.6.3
+  resolution: "typescript@npm:5.6.3"
+  bin:
+    tsc: bin/tsc
+    tsserver: bin/tsserver
+  checksum: 10c0/44f61d3fb15c35359bc60399cb8127c30bae554cd555b8e2b46d68fa79d680354b83320ad419ff1b81a0bdf324197b29affe6cc28988cd6a74d4ac60c94f9799
+  languageName: node
+  linkType: hard
+
 "typescript@npm:~4.9.0":
   version: 4.9.5
   resolution: "typescript@npm:4.9.5"
@@ -17583,6 +17593,16 @@ __metadata:
     tsc: bin/tsc
     tsserver: bin/tsserver
   checksum: 10c0/94eb47e130d3edd964b76da85975601dcb3604b0c848a36f63ac448d0104e93819d94c8bdf6b07c00120f2ce9c05256b8b6092d23cf5cf1c6fa911159e4d572f
+  languageName: node
+  linkType: hard
+
+"typescript@patch:typescript@npm%3A5.6.3#optional!builtin<compat/typescript>":
+  version: 5.6.3
+  resolution: "typescript@patch:typescript@npm%3A5.6.3#optional!builtin<compat/typescript>::version=5.6.3&hash=8c6c40"
+  bin:
+    tsc: bin/tsc
+    tsserver: bin/tsserver
+  checksum: 10c0/7c9d2e07c81226d60435939618c91ec2ff0b75fbfa106eec3430f0fcf93a584bc6c73176676f532d78c3594fe28a54b36eb40b3d75593071a7ec91301533ace7
   languageName: node
   linkType: hard
 
