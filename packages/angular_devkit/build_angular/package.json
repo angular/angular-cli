@@ -28,7 +28,7 @@
     "babel-loader": "9.2.1",
     "browserslist": "^4.21.5",
     "copy-webpack-plugin": "12.0.2",
-    "critters": "0.0.24",
+    "critters": "0.0.25",
     "css-loader": "7.1.2",
     "esbuild-wasm": "0.24.0",
     "fast-glob": "3.3.2",

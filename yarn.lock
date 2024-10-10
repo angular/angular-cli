@@ -81,7 +81,7 @@ __metadata:
     babel-loader: "npm:9.2.1"
     browserslist: "npm:^4.21.5"
     copy-webpack-plugin: "npm:12.0.2"
-    critters: "npm:0.0.24"
+    critters: "npm:0.0.25"
     css-loader: "npm:7.1.2"
     esbuild: "npm:0.24.0"
     esbuild-wasm: "npm:0.24.0"
@@ -390,7 +390,7 @@ __metadata:
     "@inquirer/confirm": "npm:5.0.0"
     "@vitejs/plugin-basic-ssl": "npm:1.1.0"
     browserslist: "npm:^4.23.0"
-    critters: "npm:0.0.24"
+    critters: "npm:0.0.25"
     esbuild: "npm:0.24.0"
     fast-glob: "npm:3.3.2"
     https-proxy-agent: "npm:7.0.5"
@@ -712,7 +712,7 @@ __metadata:
     buffer: "npm:6.0.3"
     chokidar: "npm:4.0.1"
     copy-webpack-plugin: "npm:12.0.2"
-    critters: "npm:0.0.24"
+    critters: "npm:0.0.25"
     css-loader: "npm:7.1.2"
     debug: "npm:^4.1.1"
     esbuild: "npm:0.24.0"
@@ -8240,6 +8240,21 @@ __metadata:
     postcss: "npm:^8.4.23"
     postcss-media-query-parser: "npm:^0.2.3"
   checksum: 10c0/a8f2fc45200e1e48ec82a1832565ec0c869b338cbb35506e0155c4affee5ed9a7478b956e699bd837926051d4249c93f371add7fb14bb9c383944077d696814e
+  languageName: node
+  linkType: hard
+
+"critters@npm:0.0.25":
+  version: 0.0.25
+  resolution: "critters@npm:0.0.25"
+  dependencies:
+    chalk: "npm:^4.1.0"
+    css-select: "npm:^5.1.0"
+    dom-serializer: "npm:^2.0.0"
+    domhandler: "npm:^5.0.2"
+    htmlparser2: "npm:^8.0.2"
+    postcss: "npm:^8.4.23"
+    postcss-media-query-parser: "npm:^0.2.3"
+  checksum: 10c0/0129ca7f46fd49d69b85b3808c86d69267bda0dce9186b2a49f5e42fabd0e0d9e6153f707e9a8880712ce6bf3e257a696810157706bffafd92f6776fc777729b
   languageName: node
   linkType: hard
 

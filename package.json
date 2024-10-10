@@ -129,7 +129,7 @@
     "buffer": "6.0.3",
     "chokidar": "4.0.1",
     "copy-webpack-plugin": "12.0.2",
-    "critters": "0.0.24",
+    "critters": "0.0.25",
     "css-loader": "7.1.2",
     "debug": "^4.1.1",
     "esbuild": "0.24.0",
