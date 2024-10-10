@@ -20,7 +20,7 @@
   "dependencies": {
     "@ampproject/remapping": "2.3.0",
     "@angular-devkit/architect": "0.0.0-EXPERIMENTAL-PLACEHOLDER",
-    "@babel/core": "7.25.7",
+    "@babel/core": "7.25.8",
     "@babel/helper-annotate-as-pure": "7.25.7",
     "@babel/helper-split-export-declaration": "7.24.7",
     "@babel/plugin-syntax-import-attributes": "7.25.7",
