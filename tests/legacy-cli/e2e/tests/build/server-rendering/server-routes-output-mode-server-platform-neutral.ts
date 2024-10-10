@@ -82,9 +82,7 @@ export default async function () {
       );
 
       app.use(router);
-
-      const handler = toWebHandler(app);
-      export default createRequestHandler(handler);
+      export const reqHandler = createRequestHandler(toWebHandler(app));
     `,
   });
   // Generate components for the above routes

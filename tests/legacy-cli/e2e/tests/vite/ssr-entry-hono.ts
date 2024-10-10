@@ -62,7 +62,7 @@ export default async function () {
       }
 
       const server = app();
-      export default createRequestHandler(server.fetch);
+      export const reqHandler = createRequestHandler(server.fetch);
     `,
   });
 

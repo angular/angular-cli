@@ -69,8 +69,8 @@ export default async function () {
       }
 
       const server = app();
-      const handler = toWebHandler(server);
-      export default createRequestHandler(handler);
+
+      export const reqHandler = createRequestHandler(toWebHandler(server));
     `,
   });
 

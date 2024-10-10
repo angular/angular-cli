@@ -92,20 +92,18 @@ export async function createAngularSsrExternalMiddleware(
     next: Connect.NextFunction,
   ) {
     (async () => {
-      const { default: handler, AngularAppEngine } = (await server.ssrLoadModule(
-        './server.mjs',
-      )) as {
-        default?: unknown;
+      const { reqHandler, AngularAppEngine } = (await server.ssrLoadModule('./server.mjs')) as {
+        reqHandler?: unknown;
         AngularAppEngine: typeof SSRAngularAppEngine;
       };
-
-      if (!isSsrNodeRequestHandler(handler) && !isSsrRequestHandler(handler)) {
+      if (!isSsrNodeRequestHandler(reqHandler) && !isSsrRequestHandler(reqHandler)) {
         if (!fallbackWarningShown) {
           // eslint-disable-next-line no-console
           console.warn(
-            `The default export in 'server.ts' does not provide a Node.js request handler. ` +
+            `The 'reqHandler' export in 'server.ts' is either undefined or does not provide a recognized request handler. ` +
               'Using the internal SSR middleware instead.',
           );
+
           fallbackWarningShown = true;
         }
 
@@ -130,10 +128,10 @@ export async function createAngularSsrExternalMiddleware(
       }
 
       // Forward the request to the middleware in server.ts
-      if (isSsrNodeRequestHandler(handler)) {
-        await handler(req, res, next);
+      if (isSsrNodeRequestHandler(reqHandler)) {
+        await reqHandler(req, res, next);
       } else {
-        const webRes = await handler(createWebRequestFromNodeRequest(req));
+        const webRes = await reqHandler(createWebRequestFromNodeRequest(req));
         if (!webRes) {
           next();
 
