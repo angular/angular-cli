@@ -79,7 +79,7 @@ export default async function () {
         });
       }
 
-      export default createNodeRequestHandler(server);
+      export const reqHandler = createNodeRequestHandler(server);
   `,
   });
 

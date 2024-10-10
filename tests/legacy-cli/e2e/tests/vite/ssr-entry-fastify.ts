@@ -76,7 +76,7 @@ export default async function () {
         });
       }
 
-      export default createNodeRequestHandler(async (req, res) => {
+      export const reqHandler = createNodeRequestHandler(async (req, res) => {
         await server.ready();
         server.server.emit('request', req, res);
       });

@@ -24,7 +24,7 @@ interface MainServerBundleExports {
  * Represents the exports available from the server bundle.
  */
 interface ServerBundleExports {
-  default: unknown;
+  reqHandler?: unknown;
 }
 
 export function loadEsmModuleFromMemory(
