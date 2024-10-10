@@ -698,5 +698,48 @@ describe('Application Schematic', () => {
         }),
       );
     });
+
+    it('should add provideExperimentalZonelessChangeDetection() when experimentalZoneless is true', async () => {
+      const tree = await schematicRunner.runSchematic(
+        'application',
+        {
+          ...defaultOptions,
+          experimentalZoneless: true,
+        },
+        workspaceTree,
+      );
+      const path = '/projects/foo/src/app/app.config.ts';
+      console.log('tree => ', tree);
+      const fileContent = tree.readContent(path);
+      expect(fileContent).toContain('provideExperimentalZonelessChangeDetection()');
+    });
+
+    it('should not add provideExperimentalZonelessChangeDetection() when experimentalZoneless is false', async () => {
+      const tree = await schematicRunner.runSchematic(
+        'application',
+        {
+          ...defaultOptions,
+          experimentalZoneless: false,
+        },
+        workspaceTree,
+      );
+      const path = '/projects/foo/src/app/app.config.ts';
+      const fileContent = tree.readContent(path);
+      expect(fileContent).not.toContain('provideExperimentalZonelessChangeDetection()');
+    });
+
+    it('should not add provideZoneChangeDetection when experimentalZoneless is true', async () => {
+      const tree = await schematicRunner.runSchematic(
+        'application',
+        {
+          ...defaultOptions,
+          experimentalZoneless: true,
+        },
+        workspaceTree,
+      );
+      const path = '/projects/foo/src/app/app.config.ts';
+      const fileContent = tree.readContent(path);
+      expect(fileContent).not.toContain('provideZoneChangeDetection');
+    });
   });
 });

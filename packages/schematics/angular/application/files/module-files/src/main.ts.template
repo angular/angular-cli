@@ -4,7 +4,7 @@
 import { AppModule } from './app/app.module';
 
 platformBrowserDynamic().bootstrapModule(AppModule, {
-  ngZoneEventCoalescing: true<% if(!!viewEncapsulation) { %>,
+  <% if(experimentalZoneless) { %>providers: [provideExperimentalZonelessChangeDetection()]<% } else { %>ngZoneEventCoalescing: true<% } %><% if(!!viewEncapsulation) { %>,
   defaultEncapsulation: ViewEncapsulation.<%= viewEncapsulation %><% } %>
 })
   .catch(err => console.error(err));
