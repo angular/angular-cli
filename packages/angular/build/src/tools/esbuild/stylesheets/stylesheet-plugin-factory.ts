@@ -206,13 +206,8 @@ export class StylesheetPluginFactory {
       if (!postcssProcessor) {
         postcss ??= (await import('postcss')).default;
         postcssProcessor = postcss();
-        for (const [pluginName, pluginOptions] of options.postcssConfiguration.plugins) {
-          const { default: plugin } = await import(pluginName);
-          if (typeof plugin !== 'function' || plugin.postcss !== true) {
-            throw new Error(`Attempted to load invalid Postcss plugin: "${pluginName}"`);
-          }
-
-          postcssProcessor.use(plugin(pluginOptions));
+        for (const plugin of options.postcssConfiguration.plugins) {
+          postcssProcessor.use(plugin);
         }
 
         postcssProcessors.set(postCssInstanceKey, new WeakRef(postcssProcessor));
