@@ -147,7 +147,7 @@
     "ini": "5.0.0",
     "istanbul-lib-instrument": "6.0.3",
     "jasmine": "^5.0.0",
-    "jasmine-core": "~5.3.0",
+    "jasmine-core": "~5.4.0",
     "jasmine-spec-reporter": "~7.0.0",
     "jsonc-parser": "3.3.1",
     "karma": "~6.4.0",
