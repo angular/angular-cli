@@ -91,5 +91,26 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
         });
       });
     }
+
+    it('fails type-checking when import contains differing type', async () => {
+      await setTargetMapping(harness, {
+        'development': './src/wrong.ts',
+        'default': './src/good.ts',
+      });
+
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+        optimization: false,
+      });
+
+      const { result, logs } = await harness.executeOnce({ outputLogsOnFailure: false });
+
+      expect(result?.success).toBeFalse();
+      expect(logs).toContain(
+        jasmine.objectContaining({
+          message: jasmine.stringMatching('TS2339'),
+        }),
+      );
+    });
   });
 });
