@@ -72,7 +72,7 @@ export default async function () {
   await ng('update', '@angular/cli', ...extraUpdateArgs);
 
   // Generate E2E setup
-  await ng('generate', 'e2e', '--related-app-name=fifteen-project');
+  await ng('generate', 'private-e2e', '--related-app-name=fifteen-project');
 
   // Setup testing to use CI Chrome.
   await useCIChrome('fifteen-project', './');
