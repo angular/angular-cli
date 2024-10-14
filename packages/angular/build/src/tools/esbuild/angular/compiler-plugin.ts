@@ -286,7 +286,12 @@ export function createCompilerPlugin(
           const initializationResult = await compilation.initialize(
             pluginOptions.tsconfig,
             hostOptions,
-            createCompilerOptionsTransformer(setupWarnings, pluginOptions, preserveSymlinks),
+            createCompilerOptionsTransformer(
+              setupWarnings,
+              pluginOptions,
+              preserveSymlinks,
+              build.initialOptions.conditions,
+            ),
           );
           shouldTsIgnoreJs = !initializationResult.compilerOptions.allowJs;
           // Isolated modules option ensures safe non-TypeScript transpilation.
@@ -572,6 +577,7 @@ function createCompilerOptionsTransformer(
   setupWarnings: PartialMessage[] | undefined,
   pluginOptions: CompilerPluginOptions,
   preserveSymlinks: boolean | undefined,
+  customConditions: string[] | undefined,
 ): Parameters<AngularCompilation['initialize']>[2] {
   return (compilerOptions) => {
     // target of 9 is ES2022 (using the number avoids an expensive import of typescript just for an enum)
@@ -629,6 +635,12 @@ function createCompilerOptionsTransformer(
         location: null,
         notes: [{ text: `The 'module' option will be set to 'ES2022' instead.` }],
       });
+    }
+
+    // Synchronize custom resolve conditions.
+    // Set if using the supported bundler resolution mode (bundler is the default in new projects)
+    if (compilerOptions.moduleResolution === 100 /* ModuleResolutionKind.Bundler */) {
+      compilerOptions.customConditions = customConditions;
     }
 
     return {

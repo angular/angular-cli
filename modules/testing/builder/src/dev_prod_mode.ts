@@ -16,12 +16,14 @@ export async function setupConditionImport(harness: BuilderHarness<unknown>) {
   // Files that can be used as targets for the conditional import.
   await harness.writeFile('src/good.ts', `export const VALUE = 'good-value';`);
   await harness.writeFile('src/bad.ts', `export const VALUE = 'bad-value';`);
+  await harness.writeFile('src/wrong.ts', `export const VALUE = 1;`);
 
   // Simple application file that accesses conditional code.
   await harness.writeFile(
     'src/main.ts',
     `import {VALUE} from '#target';
 console.log(VALUE);
+console.log(VALUE.length);
 export default 42 as any;
 `,
   );
@@ -29,7 +31,7 @@ export default 42 as any;
   // Ensure that good/bad can be resolved from tsconfig.
   const tsconfig = JSON.parse(harness.readFile('src/tsconfig.app.json')) as TypeScriptConfig;
   tsconfig.compilerOptions.moduleResolution = 'bundler';
-  tsconfig.files.push('good.ts', 'bad.ts');
+  tsconfig.files.push('good.ts', 'bad.ts', 'wrong.ts');
   await harness.writeFile('src/tsconfig.app.json', JSON.stringify(tsconfig));
 }
 
