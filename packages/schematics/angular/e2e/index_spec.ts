@@ -49,7 +49,7 @@ describe('Application Schematic', () => {
   });
 
   it('should create all files of e2e in an application', async () => {
-    const tree = await schematicRunner.runSchematic('e2e', defaultOptions, applicationTree);
+    const tree = await schematicRunner.runSchematic('private-e2e', defaultOptions, applicationTree);
 
     const files = tree.files;
     expect(files).toEqual(
@@ -64,7 +64,11 @@ describe('Application Schematic', () => {
 
   describe('workspace config', () => {
     it('should add e2e targets for the app', async () => {
-      const tree = await schematicRunner.runSchematic('e2e', defaultOptions, applicationTree);
+      const tree = await schematicRunner.runSchematic(
+        'private-e2e',
+        defaultOptions,
+        applicationTree,
+      );
 
       const workspace = JSON.parse(tree.readContent('/angular.json'));
       const targets = workspace.projects.foo.architect;
@@ -72,7 +76,11 @@ describe('Application Schematic', () => {
     });
 
     it('should set the e2e options', async () => {
-      const tree = await schematicRunner.runSchematic('e2e', defaultOptions, applicationTree);
+      const tree = await schematicRunner.runSchematic(
+        'private-e2e',
+        defaultOptions,
+        applicationTree,
+      );
 
       const workspace = JSON.parse(tree.readContent('/angular.json'));
       const { options, configurations } = workspace.projects.foo.architect.e2e;
@@ -82,7 +90,7 @@ describe('Application Schematic', () => {
   });
 
   it('should add an e2e script in package.json', async () => {
-    const tree = await schematicRunner.runSchematic('e2e', defaultOptions, applicationTree);
+    const tree = await schematicRunner.runSchematic('private-e2e', defaultOptions, applicationTree);
 
     const pkg = JSON.parse(tree.readContent('/package.json'));
     expect(pkg.scripts['e2e']).toBe('ng e2e');
