@@ -219,7 +219,7 @@ export async function* serveWithVite(
         // TODO: Implement support -- application builder currently does not use
         break;
       case ResultKind.ComponentUpdate:
-        assert(serverOptions.hmr, 'Component updates are only supported with HMR enabled.');
+        assert(!!serverOptions.hmr, 'Component updates are only supported with HMR enabled.');
         // TODO: Implement support -- application builder currently does not use
         break;
       default:
@@ -438,7 +438,7 @@ async function handleUpdate(
     return;
   }
 
-  if (serverOptions.liveReload || serverOptions.hmr) {
+  if (serverOptions.liveReload || !!serverOptions.hmr) {
     if (updatedFiles.every((f) => f.endsWith('.css'))) {
       const timestamp = Date.now();
       server.ws.send({
@@ -621,6 +621,7 @@ export async function setupServer(
       open: serverOptions.open,
       headers: serverOptions.headers,
       proxy,
+      hmr: serverOptions.hmr,
       cors: {
         // Allow preflight requests to be proxied.
         preflightContinue: true,
