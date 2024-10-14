@@ -10,6 +10,7 @@ import type { Connect, Plugin } from 'vite';
 import {
   angularHtmlFallbackMiddleware,
   createAngularAssetsMiddleware,
+  createAngularComponentMiddleware,
   createAngularHeadersMiddleware,
   createAngularIndexHtmlMiddleware,
   createAngularSsrExternalMiddleware,
@@ -48,6 +49,7 @@ interface AngularSetupMiddlewaresPluginOptions {
   extensionMiddleware?: Connect.NextHandleFunction[];
   indexHtmlTransformer?: (content: string) => Promise<string>;
   usedComponentStyles: Map<string, string[]>;
+  templateUpdates: Map<string, string>;
   ssrMode: ServerSsrMode;
 }
 
@@ -64,11 +66,13 @@ export function createAngularSetupMiddlewaresPlugin(
         extensionMiddleware,
         assets,
         usedComponentStyles,
+        templateUpdates,
         ssrMode,
       } = options;
 
       // Headers, assets and resources get handled first
       server.middlewares.use(createAngularHeadersMiddleware(server));
+      server.middlewares.use(createAngularComponentMiddleware(templateUpdates));
       server.middlewares.use(
         createAngularAssetsMiddleware(server, assets, outputFiles, usedComponentStyles),
       );

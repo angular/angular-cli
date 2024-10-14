@@ -14,3 +14,4 @@ export {
   createAngularSsrInternalMiddleware,
 } from './ssr-middleware';
 export { createAngularHeadersMiddleware } from './headers-middleware';
+export { createAngularComponentMiddleware } from './component-middleware';

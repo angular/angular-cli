@@ -167,6 +167,7 @@ export async function* serveWithVite(
     explicitServer: [],
   };
   const usedComponentStyles = new Map<string, string[]>();
+  const templateUpdates = new Map<string, string>();
 
   // Add cleanup logic via a builder teardown.
   let deferred: () => void;
@@ -211,6 +212,9 @@ export async function* serveWithVite(
             assetFiles.set('/' + normalizePath(outputPath), normalizePath(file.inputPath));
           }
         }
+        // Clear stale template updates on a code rebuilds
+        templateUpdates.clear();
+
         // Analyze result files for changes
         analyzeResultFiles(normalizePath, htmlIndexPath, result.files, generatedFiles);
         break;
@@ -220,8 +224,22 @@ export async function* serveWithVite(
         break;
       case ResultKind.ComponentUpdate:
         assert(serverOptions.hmr, 'Component updates are only supported with HMR enabled.');
-        // TODO: Implement support -- application builder currently does not use
-        break;
+        assert(
+          server,
+          'Builder must provide an initial full build before component update results.',
+        );
+
+        for (const componentUpdate of result.updates) {
+          if (componentUpdate.type === 'template') {
+            templateUpdates.set(componentUpdate.id, componentUpdate.content);
+            server.ws.send('angular:component-update', {
+              id: componentUpdate.id,
+              timestamp: Date.now(),
+            });
+          }
+        }
+        context.logger.info('Component update sent to client(s).');
+        continue;
       default:
         context.logger.warn(`Unknown result kind [${(result as Result).kind}] provided by build.`);
         continue;
@@ -353,6 +371,7 @@ export async function* serveWithVite(
         target,
         isZonelessApp(polyfills),
         usedComponentStyles,
+        templateUpdates,
         browserOptions.loader as EsbuildLoaderOption | undefined,
         extensions?.middleware,
         transformers?.indexHtml,
@@ -460,7 +479,7 @@ async function handleUpdate(
           }
 
           return {
-            type: 'css-update',
+            type: 'css-update' as const,
             timestamp,
             path: filePath,
             acceptedPath: filePath,
@@ -564,6 +583,7 @@ export async function setupServer(
   target: string[],
   zoneless: boolean,
   usedComponentStyles: Map<string, string[]>,
+  templateUpdates: Map<string, string>,
   prebundleLoaderExtensions: EsbuildLoaderOption | undefined,
   extensionMiddleware?: Connect.NextHandleFunction[],
   indexHtmlTransformer?: (content: string) => Promise<string>,
@@ -671,6 +691,7 @@ export async function setupServer(
         indexHtmlTransformer,
         extensionMiddleware,
         usedComponentStyles,
+        templateUpdates,
         ssrMode,
       }),
       createRemoveIdPrefixPlugin(externalMetadata.explicitBrowser),
