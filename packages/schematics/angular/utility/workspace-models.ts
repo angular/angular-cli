@@ -30,7 +30,7 @@ export enum Builders {
   NgPackagr = '@angular-devkit/build-angular:ng-packagr',
   DevServer = '@angular-devkit/build-angular:dev-server',
   ExtractI18n = '@angular-devkit/build-angular:extract-i18n',
-  Protractor = '@angular-devkit/build-angular:protractor',
+  Protractor = '@angular-devkit/build-angular:private-protractor',
   BuildApplication = '@angular/build:application',
 }
 
