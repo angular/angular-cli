@@ -68,7 +68,9 @@ export interface ResultMessage {
 
 export interface ComponentUpdateResult extends BaseResult {
   kind: ResultKind.ComponentUpdate;
-  id: string;
-  type: 'style' | 'template';
-  content: string;
+  updates: {
+    id: string;
+    type: 'style' | 'template';
+    content: string;
+  }[];
 }
