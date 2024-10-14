@@ -80,6 +80,25 @@ export default async function renderSassStylesheet(request: RenderRequestMessage
               containingUrl: containingUrl ? fileURLToPath(containingUrl) : null,
             },
           });
+          // Wait for the main thread to set the signal to 1 and notify, which tells
+          // us that a message can be received on the port.
+          // If the main thread is fast, the signal will already be set to 1, and no
+          // sleep/notify is necessary.
+          // However, there can be a race condition here:
+          // - the main thread sets the signal to 1, but does not get to the notify instruction yet
+          // - the worker does not pause because the signal is set to 1
+          // - the worker very soon enters this method again
+          // - this method sets the signal to 0 and sends the message
+          // - the signal is 0 and so the `Atomics.wait` call blocks
+          // - only now the main thread runs the `notify` from the first invocation, so the
+          //   worker continues.
+          // - but there is no message yet in the port, because the thread should not have been
+          //   waken up yet.
+          // To combat this, wait for a non-0 value _twice_.
+          // Almost every time, this immediately continues with "not-equal", because
+          // the signal is still set to 1, except during the race condition, when the second
+          // wait will wait for the correct notify.
+          Atomics.wait(importerChannel.signal, 0, 0);
           Atomics.wait(importerChannel.signal, 0, 0);
 
           const result = receiveMessageOnPort(importerChannel.port)?.message as string | null;
