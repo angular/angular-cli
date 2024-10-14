@@ -51,7 +51,7 @@ export async function prepareProjectForE2e(name: string) {
 
   console.log(`Project ${name} created... Installing packages.`);
   await installWorkspacePackages();
-  await ng('generate', 'e2e', '--related-app-name', name);
+  await ng('generate', 'private-e2e', '--related-app-name', name);
 
   await useCIChrome(name, 'e2e');
   await useCIChrome(name, '');

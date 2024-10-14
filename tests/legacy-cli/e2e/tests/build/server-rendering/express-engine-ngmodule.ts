@@ -16,7 +16,7 @@ export default async function () {
   await rimraf('node_modules/@angular/ssr');
 
   await ng('generate', 'app', 'test-project-two', '--no-standalone', '--skip-install');
-  await ng('generate', 'e2e', '--related-app-name=test-project-two');
+  await ng('generate', 'private-e2e', '--related-app-name=test-project-two');
 
   // Setup testing to use CI Chrome.
   await useCIChrome('test-project-two', 'projects/test-project-two/e2e/');
