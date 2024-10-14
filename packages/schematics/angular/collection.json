@@ -23,10 +23,10 @@
       "schema": "./application/schema.json",
       "description": "Create an Angular application."
     },
-    "e2e": {
+    "private-e2e": {
       "factory": "./e2e",
       "schema": "./e2e/schema.json",
-      "description": "Create an Angular e2e application.",
+      "description": "PRIVATE API - Do not use.",
       "hidden": true
     },
     "class": {
