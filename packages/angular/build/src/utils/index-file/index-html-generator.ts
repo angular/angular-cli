@@ -12,6 +12,7 @@ import { NormalizedCachedOptions } from '../normalize-cache';
 import { NormalizedOptimizationOptions } from '../normalize-optimization';
 import { addEventDispatchContract } from './add-event-dispatch-contract';
 import { CrossOriginValue, Entrypoint, FileInfo, augmentIndexHtml } from './augment-index-html';
+import { autoCsp } from './auto-csp';
 import { InlineCriticalCssProcessor } from './inline-critical-css';
 import { InlineFontsProcessor } from './inline-fonts';
 import { addNgcmAttribute } from './ngcm-attribute';
@@ -32,6 +33,10 @@ export interface IndexHtmlGeneratorProcessOptions {
   hints?: { url: string; mode: HintMode; as?: string }[];
 }
 
+export interface AutoCspOptions {
+  unsafeEval: boolean;
+}
+
 export interface IndexHtmlGeneratorOptions {
   indexPath: string;
   deployUrl?: string;
@@ -43,6 +48,7 @@ export interface IndexHtmlGeneratorOptions {
   cache?: NormalizedCachedOptions;
   imageDomains?: string[];
   generateDedicatedSSRContent?: boolean;
+  autoCsp?: AutoCspOptions;
 }
 
 export type IndexHtmlTransform = (content: string) => Promise<string>;
@@ -85,6 +91,14 @@ export class IndexHtmlGenerator {
     if (options.generateDedicatedSSRContent) {
       this.csrPlugins.push(addNgcmAttributePlugin());
       this.ssrPlugins.push(addEventDispatchContractPlugin(), addNoncePlugin());
+    }
+
+    // Auto-CSP (as the last step)
+    if (options.autoCsp) {
+      if (options.generateDedicatedSSRContent) {
+        throw new Error('Cannot set both SSR and auto-CSP at the same time.');
+      }
+      this.csrPlugins.push(autoCspPlugin(options.autoCsp.unsafeEval));
     }
   }
 
@@ -196,6 +210,10 @@ function inlineCriticalCssPlugin(generator: IndexHtmlGenerator): IndexHtmlGenera
 
 function addNoncePlugin(): IndexHtmlGeneratorPlugin {
   return (html) => addNonce(html);
+}
+
+function autoCspPlugin(unsafeEval: boolean): IndexHtmlGeneratorPlugin {
+  return (html) => autoCsp(html, unsafeEval);
 }
 
 function postTransformPlugin({ options }: IndexHtmlGenerator): IndexHtmlGeneratorPlugin {

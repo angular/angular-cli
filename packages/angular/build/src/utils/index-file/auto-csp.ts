@@ -80,7 +80,7 @@ export function hashTextContent(scriptText: string): string {
  * @param html Markup that should be processed.
  * @returns The transformed HTML that contains the `<meta>` tag CSP and dynamic loader scripts.
  */
-export async function autoCsp(html: string): Promise<string> {
+export async function autoCsp(html: string, unsafeEval = false): Promise<string> {
   const { rewriter, transformedContent } = await htmlRewritingStream(html);
 
   let openedScriptTag: StartTag | undefined = undefined;
@@ -170,7 +170,11 @@ export async function autoCsp(html: string): Promise<string> {
     if (tag.tagName === 'head') {
       // See what hashes we came up with!
       secondPass.rewriter.emitRaw(
-        `<meta http-equiv="Content-Security-Policy" content="${getStrictCsp(hashes)}">`,
+        `<meta http-equiv="Content-Security-Policy" content="${getStrictCsp(hashes, {
+          enableBrowserFallbacks: true,
+          enableTrustedTypes: false,
+          enableUnsafeEval: unsafeEval,
+        })}">`,
       );
     }
   });

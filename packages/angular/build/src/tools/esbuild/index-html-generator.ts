@@ -80,6 +80,15 @@ export async function generateIndexHtml(
     throw new Error(`Output file does not exist: ${relativefilePath}`);
   };
 
+  // Read the Auto CSP options.
+  const autoCsp = buildOptions.security?.autoCsp;
+  const autoCspOptions =
+    autoCsp === true
+      ? { unsafeEval: false }
+      : autoCsp
+        ? { unsafeEval: !!autoCsp.unsafeEval }
+        : undefined;
+
   // Create an index HTML generator that reads from the in-memory output files
   const indexHtmlGenerator = new IndexHtmlGenerator({
     indexPath: indexHtmlOptions.input,
@@ -94,6 +103,7 @@ export async function generateIndexHtml(
       buildOptions.prerenderOptions ||
       buildOptions.appShellOptions
     ),
+    autoCsp: autoCspOptions,
   });
 
   indexHtmlGenerator.readAsset = readAsset;
