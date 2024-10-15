@@ -8,6 +8,7 @@
 
 import type {
   BuildFailure,
+  Loader,
   Metafile,
   OnStartResult,
   OutputFile,
@@ -461,9 +462,21 @@ export function createCompilerPlugin(
           typeScriptFileCache.set(request, contents);
         }
 
+        let loader: Loader;
+        if (useTypeScriptTranspilation || isJS) {
+          // TypeScript has transpiled to JS or is already JS
+          loader = 'js';
+        } else if (request.at(-1) === 'x') {
+          // TSX and TS have different syntax rules. Only set if input is a TSX file.
+          loader = 'tsx';
+        } else {
+          // Otherwise, directly bundle TS
+          loader = 'ts';
+        }
+
         return {
           contents,
-          loader: useTypeScriptTranspilation || isJS ? 'js' : 'ts',
+          loader,
         };
       });
 

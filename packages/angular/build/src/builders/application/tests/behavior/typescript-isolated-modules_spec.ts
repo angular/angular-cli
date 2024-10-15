@@ -47,5 +47,33 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
       expect(result?.success).toBe(true);
     });
+
+    it('supports TSX files with isolated modules enabled and enabled optimizations', async () => {
+      // Enable tsconfig isolatedModules option in tsconfig
+      await harness.modifyFile('tsconfig.json', (content) => {
+        const tsconfig = JSON.parse(content);
+        tsconfig.compilerOptions.isolatedModules = true;
+        tsconfig.compilerOptions.jsx = 'react-jsx';
+
+        return JSON.stringify(tsconfig);
+      });
+
+      await harness.writeFile('src/types.d.ts', `declare module 'react/jsx-runtime' { jsx: any }`);
+      await harness.writeFile('src/abc.tsx', `export function hello() { return <h1>Hello</h1>; }`);
+      await harness.modifyFile(
+        'src/main.ts',
+        (content) => content + `import { hello } from './abc'; console.log(hello());`,
+      );
+
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+        optimization: true,
+        externalDependencies: ['react'],
+      });
+
+      const { result } = await harness.executeOnce();
+
+      expect(result?.success).toBe(true);
+    });
   });
 });
