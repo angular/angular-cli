@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { NgModule<% if(experimentalZoneless) { %>, provideExperimentalZonelessChangeDetection<% } %> } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 <% if (routing) { %>
 import { AppRoutingModule } from './app-routing.module';<% } %>
@@ -12,7 +12,7 @@ import { AppComponent } from './app.component';
     BrowserModule<% if (routing) { %>,
     AppRoutingModule<% } %>
   ],
-  providers: [],
+  providers: [<% if (experimentalZoneless) { %>provideExperimentalZonelessChangeDetection()<% } %>],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
