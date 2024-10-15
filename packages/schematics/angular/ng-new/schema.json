@@ -138,6 +138,11 @@
       "description": "Creates an application with Server-Side Rendering (SSR) and Static Site Generation (SSG/Prerendering) enabled.",
       "type": "boolean",
       "x-user-analytics": "ep.ng_ssr"
+    },
+    "experimentalZoneless": {
+      "description": "Create an application that does not utilize zone.js.",
+      "type": "boolean",
+      "default": false
     }
   },
   "required": ["name", "version"]

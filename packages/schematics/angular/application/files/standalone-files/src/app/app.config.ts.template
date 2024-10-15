@@ -1,8 +1,10 @@
-import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';<% if (routing) { %>
+import { ApplicationConfig, <% if(!experimentalZoneless) { %>provideZoneChangeDetection<% } else { %>provideExperimentalZonelessChangeDetection<% } %> } from '@angular/core';<% if (routing) { %>
 import { provideRouter } from '@angular/router';
 
 import { routes } from './app.routes';<% } %>
 
 export const appConfig: ApplicationConfig = {
-  providers: [provideZoneChangeDetection({ eventCoalescing: true })<% if (routing) { %>, provideRouter(routes)<% } %>]
+  providers: [
+  <% if(experimentalZoneless) { %>provideExperimentalZonelessChangeDetection()<% } else { %>provideZoneChangeDetection({ eventCoalescing: true })<% } %><% if (routing) {%>, provideRouter(routes)<% } %>
+  ]
 };
