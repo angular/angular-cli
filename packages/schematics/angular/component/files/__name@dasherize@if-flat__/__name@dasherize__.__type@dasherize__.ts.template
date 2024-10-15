@@ -3,7 +3,9 @@ import { <% if(changeDetection !== 'Default') { %>ChangeDetectionStrategy, <% }%
 @Component({<% if(!skipSelector) {%>
   selector: '<%= selector %>',<%}%><% if(standalone) {%>
   standalone: true,
-  imports: [],<%}%><% if(inlineTemplate) { %>
+  imports: [],<%} else { %>
+  standalone: false,
+  <% }%><% if(inlineTemplate) { %>
   template: `
     <p>
       <%= dasherize(name) %> works!

@@ -9,7 +9,8 @@ import { Component } from '@angular/core';
      %><router-outlet /><%
     } %>
   `,<% } else { %>
-  templateUrl: './app.component.html',<% } if(inlineStyle) { %>
+  templateUrl: './app.component.html',<% } %>
+  standalone: false,<% if(inlineStyle) { %>
   styles: []<% } else { %>
   styleUrl: './app.component.<%= style %>'<% } %>
 })
