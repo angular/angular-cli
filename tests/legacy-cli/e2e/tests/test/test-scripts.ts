@@ -19,7 +19,7 @@ export default async function () {
     'src/app/app.component.ts': `
       import { Component } from '@angular/core';
 
-      @Component({ selector: 'app-root', template: '' })
+      @Component({ selector: 'app-root', template: '', standalone: false })
       export class AppComponent {
         stringScriptGlobalProp = stringScriptGlobal;
         inputScriptGlobalProp = inputScriptGlobal;
