@@ -37,6 +37,33 @@
       "type": "string",
       "description": "Customize the base path for the URLs of resources in 'index.html' and component stylesheets. This option is only necessary for specific deployment scenarios, such as with Angular Elements or when utilizing different CDN locations."
     },
+    "security": {
+      "description": "Security features to protect against XSS and other common attacks",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "autoCsp": {
+          "description": "Enables automatic generation of a hash-based Strict Content Security Policy (https://web.dev/articles/strict-csp#choose-hash) based on scripts in index.html. Will default to true once we are out of experimental/preview phases.",
+          "default": false,
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {
+                "unsafeEval": {
+                  "type": "boolean",
+                  "description": "Include the `unsafe-eval` directive (https://web.dev/articles/strict-csp#remove-eval) in the auto-CSP. Please only enable this if you are absolutely sure that you need to, as allowing calls to eval will weaken the XSS defenses provided by the auto-CSP.",
+                  "default": false
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "boolean"
+            }
+          ]
+        }
+      }
+    },
     "scripts": {
       "description": "Global scripts to be included in the build.",
       "type": "array",

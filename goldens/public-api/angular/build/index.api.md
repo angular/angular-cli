@@ -48,6 +48,7 @@ export interface ApplicationBuilderOptions {
     preserveSymlinks?: boolean;
     progress?: boolean;
     scripts?: ScriptElement[];
+    security?: Security;
     server?: string;
     serviceWorker?: ServiceWorker_2;
     sourceMap?: SourceMapUnion;
