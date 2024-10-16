@@ -94,8 +94,9 @@ async function compileString(
   // failing resolution attempts.
   const resolutionCache = new MemoryCache<URL | null>();
   const packageRootCache = new MemoryCache<string | null>();
-
   const warnings: PartialMessage[] = [];
+  const { silenceDeprecations, futureDeprecations, fatalDeprecations } = options.sass ?? {};
+
   try {
     const { css, sourceMap, loadedUrls } = await sassWorkerPool.compileStringAsync(data, {
       url: pathToFileURL(filePath),
@@ -104,6 +105,9 @@ async function compileString(
       loadPaths: options.includePaths,
       sourceMap: options.sourcemap,
       sourceMapIncludeSources: options.sourcemap,
+      silenceDeprecations,
+      fatalDeprecations,
+      futureDeprecations,
       quietDeps: true,
       importers: [
         {
