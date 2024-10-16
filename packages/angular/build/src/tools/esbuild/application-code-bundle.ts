@@ -38,7 +38,7 @@ export function createBrowserCodeBundleOptions(
 ): BuildOptions {
   const { entryPoints, outputNames, polyfills } = options;
 
-  const { pluginOptions, styleOptions } = createCompilerPluginOptions(
+  const { pluginOptions, stylesheetBundler } = createCompilerPluginOptions(
     options,
     target,
     sourceFileCache,
@@ -65,8 +65,8 @@ export function createBrowserCodeBundleOptions(
       createCompilerPlugin(
         // JS/TS options
         pluginOptions,
-        // Component stylesheet options
-        styleOptions,
+        // Component stylesheet bundler
+        stylesheetBundler,
       ),
     ],
   };
@@ -134,7 +134,7 @@ export function createBrowserPolyfillBundleOptions(
   // Only add the Angular TypeScript compiler if TypeScript files are provided in the polyfills
   if (hasTypeScriptEntries) {
     buildOptions.plugins ??= [];
-    const { pluginOptions, styleOptions } = createCompilerPluginOptions(
+    const { pluginOptions, stylesheetBundler } = createCompilerPluginOptions(
       options,
       target,
       sourceFileCache,
@@ -144,7 +144,7 @@ export function createBrowserPolyfillBundleOptions(
         // JS/TS options
         { ...pluginOptions, noopTypeScriptCompilation: true },
         // Component stylesheet options are unused for polyfills but required by the plugin
-        styleOptions,
+        stylesheetBundler,
       ),
     );
   }
@@ -243,7 +243,7 @@ export function createServerMainCodeBundleOptions(
     'createServerCodeBundleOptions should not be called without a defined serverEntryPoint.',
   );
 
-  const { pluginOptions, styleOptions } = createCompilerPluginOptions(
+  const { pluginOptions, stylesheetBundler } = createCompilerPluginOptions(
     options,
     target,
     sourceFileCache,
@@ -278,8 +278,8 @@ export function createServerMainCodeBundleOptions(
       createCompilerPlugin(
         // JS/TS options
         { ...pluginOptions, noopTypeScriptCompilation: true },
-        // Component stylesheet options
-        styleOptions,
+        // Component stylesheet bundler
+        stylesheetBundler,
       ),
     ],
   };
@@ -382,7 +382,7 @@ export function createSsrEntryCodeBundleOptions(
     'createSsrEntryCodeBundleOptions should not be called without a defined serverEntryPoint.',
   );
 
-  const { pluginOptions, styleOptions } = createCompilerPluginOptions(
+  const { pluginOptions, stylesheetBundler } = createCompilerPluginOptions(
     options,
     target,
     sourceFileCache,
@@ -411,8 +411,8 @@ export function createSsrEntryCodeBundleOptions(
       createCompilerPlugin(
         // JS/TS options
         { ...pluginOptions, noopTypeScriptCompilation: true },
-        // Component stylesheet options
-        styleOptions,
+        // Component stylesheet bundler
+        stylesheetBundler,
       ),
     ],
     inject,

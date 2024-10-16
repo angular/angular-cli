@@ -30,7 +30,6 @@ import {
 import { JavaScriptTransformer } from '../javascript-transformer';
 import { LoadResultCache, createCachedLoad } from '../load-result-cache';
 import { logCumulativeDurations, profileAsync, resetCumulativeDurations } from '../profiling';
-import { BundleStylesheetOptions } from '../stylesheets/bundle-options';
 import { SharedTSCompilationState, getSharedCompilationState } from './compilation-state';
 import { ComponentStylesheetBundler } from './component-stylesheets';
 import { FileReferenceTracker } from './file-reference-tracker';
@@ -57,7 +56,7 @@ export interface CompilerPluginOptions {
 // eslint-disable-next-line max-lines-per-function
 export function createCompilerPlugin(
   pluginOptions: CompilerPluginOptions,
-  styleOptions: BundleStylesheetOptions & { inlineStyleLanguage: string },
+  stylesheetBundler: ComponentStylesheetBundler,
 ): Plugin {
   return {
     name: 'angular-compiler',
@@ -128,12 +127,6 @@ export function createCompilerPlugin(
       // Determines if transpilation should be handle by TypeScript or esbuild
       let useTypeScriptTranspilation = true;
 
-      // Track incremental component stylesheet builds
-      const stylesheetBundler = new ComponentStylesheetBundler(
-        styleOptions,
-        styleOptions.inlineStyleLanguage,
-        pluginOptions.incremental,
-      );
       let sharedTSCompilationState: SharedTSCompilationState | undefined;
 
       // To fully invalidate files, track resource referenced files and their referencing source
