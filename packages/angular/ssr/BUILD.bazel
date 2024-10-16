@@ -24,6 +24,7 @@ ts_library(
         "@npm//@angular/core",
         "@npm//@angular/platform-server",
         "@npm//@angular/router",
+        "@npm//tslib",
     ],
 )
 
