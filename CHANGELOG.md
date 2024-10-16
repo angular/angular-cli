@@ -1,3 +1,30 @@
+<a name="19.0.0-next.11"></a>
+
+# 19.0.0-next.11 (2024-10-16)
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                                         |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------- |
+| [755f3a07f](https://github.com/angular/angular-cli/commit/755f3a07f5fe485c1ed8c0c6060d6d5c799c085c) | feat | add option to setup new workspace or application as zoneless mode   |
+| [fcf7443d6](https://github.com/angular/angular-cli/commit/fcf7443d626d1f3e828ebfad464598f7b9ddef12) | fix  | explicitly set standalone:false                                     |
+| [a68e832ae](https://github.com/angular/angular-cli/commit/a68e832aefa0767461e43e3b824f3ef773b02038) | fix  | update browserslist config to include last 2 Android major versions |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                                         |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------- |
+| [b6951f448](https://github.com/angular/angular-cli/commit/b6951f4482418f65e4bd1c15d5f7f051c91d59db) | feat | add `sass` to `stylePreprocessorOptions` in application builder     |
+| [816e3cb86](https://github.com/angular/angular-cli/commit/816e3cb868961c57a68783601b919370076c41dc) | feat | enable component stylesheet hot replacement by default              |
+| [7d883a152](https://github.com/angular/angular-cli/commit/7d883a152e978112245a98f2f737764caa76ec0f) | feat | introduce `ssr.experimentalPlatform` option                         |
+| [c48d6947e](https://github.com/angular/angular-cli/commit/c48d6947ed17eab19822a97492e3686bcf059494) | feat | set development/production condition                                |
+| [13b65dfe1](https://github.com/angular/angular-cli/commit/13b65dfe191ca18a577421019c9a9e285d5c95a3) | fix  | allow direct bundling of TSX files with application builder         |
+| [5f473affc](https://github.com/angular/angular-cli/commit/5f473affcf001888082bf4adc51481c5afca81e0) | fix  | avoid race condition in sass importer                               |
+| [af52fb49b](https://github.com/angular/angular-cli/commit/af52fb49bdd913af8af9bfbe36be279fce70de39) | fix  | synchronize import/export conditions between bundler and TypeScript |
+| [bfa8fec9b](https://github.com/angular/angular-cli/commit/bfa8fec9b17d421925a684e2b642dee70165a879) | fix  | use named export `reqHandler` for server.ts request handling        |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="18.2.9"></a>
 
 # 18.2.9 (2024-10-16)
