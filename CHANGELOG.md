@@ -1,3 +1,22 @@
+<a name="18.2.9"></a>
+
+# 18.2.9 (2024-10-16)
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                                         |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------- |
+| [237f7c5d0](https://github.com/angular/angular-cli/commit/237f7c5d0355e0a90b23156d3aa97f4328c869e7) | fix  | update browserslist config to include last 2 Android major versions |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                                 |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------- |
+| [d749ba6a3](https://github.com/angular/angular-cli/commit/d749ba6a3c3dd7a90317bd9b46e858a842f27696) | fix  | allow direct bundling of TSX files with application builder |
+| [b91c82d89](https://github.com/angular/angular-cli/commit/b91c82d8997c0009ed4bbf5e9cd9c82cb1f7f755) | fix  | avoid race condition in sass importer                       |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="19.0.0-next.10"></a>
 
 # 19.0.0-next.10 (2024-10-09)
