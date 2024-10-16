@@ -11,8 +11,17 @@ import glob from 'fast-glob';
 import assert from 'node:assert';
 import { readFile } from 'node:fs/promises';
 import { extname } from 'node:path';
+import type { Options } from 'sass';
 import type { PostcssConfiguration } from '../../../utils/postcss-configuration';
 import { LoadResultCache, createCachedLoad } from '../load-result-cache';
+
+/**
+ * Configuration options for handling Sass-specific deprecations in a stylesheet plugin.
+ */
+export type StylesheetPluginsass = Pick<
+  Options<'async'>,
+  'futureDeprecations' | 'fatalDeprecations' | 'silenceDeprecations'
+>;
 
 /**
  * Convenience type for a postcss processor.
@@ -60,6 +69,11 @@ export interface StylesheetPluginOptions {
    * and any tailwind usage must be manually configured in the custom postcss usage.
    */
   postcssConfiguration?: PostcssConfiguration;
+
+  /**
+   * Optional Options for configuring Sass behavior.
+   */
+  sass?: StylesheetPluginsass;
 }
 
 /**

@@ -16,7 +16,7 @@ import { CssStylesheetLanguage } from './css-language';
 import { createCssResourcePlugin } from './css-resource-plugin';
 import { LessStylesheetLanguage } from './less-language';
 import { SassStylesheetLanguage } from './sass-language';
-import { StylesheetPluginFactory } from './stylesheet-plugin-factory';
+import { StylesheetPluginFactory, StylesheetPluginsass } from './stylesheet-plugin-factory';
 
 export interface BundleStylesheetOptions {
   workspaceRoot: string;
@@ -26,6 +26,7 @@ export interface BundleStylesheetOptions {
   sourcemap: boolean | 'external' | 'inline' | 'linked';
   outputNames: { bundles: string; media: string };
   includePaths?: string[];
+  sass?: StylesheetPluginsass;
   externalDependencies?: string[];
   target: string[];
   tailwindConfiguration?: { file: string; package: string };
@@ -51,6 +52,7 @@ export function createStylesheetBundleOptions(
       inlineComponentData,
       tailwindConfiguration: options.tailwindConfiguration,
       postcssConfiguration: options.postcssConfiguration,
+      sass: options.sass,
     },
     cache,
   );

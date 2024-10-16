@@ -63,6 +63,9 @@ export function createGlobalStylesBundleOptions(
               bundles: '[name]',
             },
         includePaths: stylePreprocessorOptions?.includePaths,
+        // string[] | undefined' is not assignable to type '(Version | DeprecationOrId)[] | undefined'.
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        sass: stylePreprocessorOptions?.sass as any,
         tailwindConfiguration,
         postcssConfiguration,
         cacheOptions,
