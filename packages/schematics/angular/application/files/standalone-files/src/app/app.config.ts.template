@@ -4,7 +4,5 @@ import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';<% } %>
 
 export const appConfig: ApplicationConfig = {
-  providers: [
-  <% if(experimentalZoneless) { %>provideExperimentalZonelessChangeDetection()<% } else { %>provideZoneChangeDetection({ eventCoalescing: true })<% } %><% if (routing) {%>, provideRouter(routes)<% } %>
-  ]
+  providers: [<% if(experimentalZoneless) { %>provideExperimentalZonelessChangeDetection()<% } else { %>provideZoneChangeDetection({ eventCoalescing: true })<% } %><% if (routing) {%>, provideRouter(routes)<% } %>]
 };
