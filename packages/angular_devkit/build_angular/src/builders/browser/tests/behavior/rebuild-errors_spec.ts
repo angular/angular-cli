@@ -22,7 +22,7 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
 
       const goodDirectiveContents = `
         import { Directive, Input } from '@angular/core';
-        @Directive({ selector: 'dir' })
+        @Directive({ selector: 'dir', standalone: false })
         export class Dir {
           @Input() foo: number;
         }
@@ -61,6 +61,7 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
         import { Component } from '@angular/core'
         @Component({
           selector: 'app-root',
+          standalone: false,
           template: '<dir [foo]="123">',
         })
         export class AppComponent { }
@@ -82,7 +83,7 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
                   'src/app/dir.ts',
                   `
                   import { Directive, Input } from '@angular/core';
-                  @Directive({ selector: 'dir' })
+                  @Directive({ selector: 'dir', standalone: false })
                   export class Dir {
                     @Input() foo: string;
                   }
@@ -162,7 +163,7 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
         'src/app/dir.ts',
         `
         import { Directive, Input } from '@angular/core';
-        @Directive({ selector: 'dir' })
+        @Directive({ selector: 'dir', standalone: false })
         export class Dir {
           @Input() foo: number;
         }
@@ -172,7 +173,7 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
       // Same selector with a different type on the `foo` property but initially no `@Input`
       const goodDirectiveContents = `
         import { Directive } from '@angular/core';
-        @Directive({ selector: 'dir' })
+        @Directive({ selector: 'dir', standalone: false })
         export class Dir2 {
           foo: string;
         }
@@ -210,6 +211,7 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
         import { Component } from '@angular/core'
         @Component({
           selector: 'app-root',
+          standalone: false,
           template: '<dir [foo]="123">',
         })
         export class AppComponent { }
@@ -231,7 +233,7 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
                   'src/app/dir2.ts',
                   `
                   import { Directive, Input } from '@angular/core';
-                  @Directive({ selector: 'dir' })
+                  @Directive({ selector: 'dir', standalone: false })
                   export class Dir2 {
                     @Input() foo: string;
                   }

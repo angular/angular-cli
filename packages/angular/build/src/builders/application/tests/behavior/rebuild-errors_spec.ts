@@ -27,7 +27,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
       const goodDirectiveContents = `
         import { Directive, Input } from '@angular/core';
-        @Directive({ selector: 'dir' })
+        @Directive({ selector: 'dir', standalone: false })
         export class Dir {
           @Input() foo: number;
         }
@@ -66,6 +66,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
         import { Component } from '@angular/core'
         @Component({
           selector: 'app-root',
+          standalone: false,
           template: '<dir [foo]="123">',
         })
         export class AppComponent { }
@@ -87,7 +88,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
                   'src/app/dir.ts',
                   `
                   import { Directive, Input } from '@angular/core';
-                  @Directive({ selector: 'dir' })
+                  @Directive({ selector: 'dir', standalone: false })
                   export class Dir {
                     @Input() foo: string;
                   }

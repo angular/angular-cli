@@ -73,6 +73,7 @@ describe('Browser Builder styles', () => {
 
         @Component({
           selector: 'app-root',
+          standalone: false,
           templateUrl: './app.component.html',
           styleUrls: []
         })
@@ -92,6 +93,7 @@ describe('Browser Builder styles', () => {
 
         @Component({
           selector: 'app-root',
+          standalone: false,
           templateUrl: './app.component.html',
           styles: ['div { mask-composite: add; }'],
         })
@@ -118,6 +120,7 @@ describe('Browser Builder styles', () => {
 
         @Component({
           selector: 'app-root',
+          standalone: false,
           templateUrl: './app.component.html',
           styles: ['div { mask-composite: add; }'],
         })
@@ -637,6 +640,7 @@ describe('Browser Builder styles', () => {
 
         @Component({
           selector: 'app-root',
+          standalone: false,
           templateUrl: './app.component.html',
           styleUrls: ['../styles.css']
         })

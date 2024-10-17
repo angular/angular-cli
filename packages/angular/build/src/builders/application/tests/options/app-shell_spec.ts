@@ -16,6 +16,7 @@ const appShellRouteFiles: Record<string, string> = {
 
     @Component({
       selector: 'app-app-shell',
+      standalone: false,
       styles: ['div { color: #fff; }'],
       template: '<p>app-shell works!</p>',
     })

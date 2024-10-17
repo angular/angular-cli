@@ -23,6 +23,7 @@ describeKarmaBuilder(execute, KARMA_BUILDER_INFO, (harness, setupTarget) => {
 
           @Component({
             selector: 'app-root',
+            standalone: false,
             template: '<p>Hello World</p>'
           })
           export class AppComponent {
@@ -79,6 +80,7 @@ describeKarmaBuilder(execute, KARMA_BUILDER_INFO, (harness, setupTarget) => {
         import { HttpClient } from '@angular/common/http';
         @Component({
           selector: 'app-root',
+          standalone: false,
           template: '<p *ngFor="let asset of css">{{ asset.content }}</p>'
         })
         export class AppComponent {

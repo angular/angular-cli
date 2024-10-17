@@ -61,6 +61,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
           import { Component } from '@angular/core'
           @Component({
             selector: 'app-root',
+            standalone: false,
             template: '<h1>Worker Test</h1>',
           })
           export class AppComponent {
