@@ -532,7 +532,6 @@ export function createCompilerPlugin(
 
       build.onDispose(() => {
         sharedTSCompilationState?.dispose();
-        void stylesheetBundler.dispose();
         void compilation.close?.();
         void cacheStore?.close();
       });

@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
+import { ComponentStylesheetBundler } from '../../tools/esbuild/angular/component-stylesheets';
 import { SourceFileCache } from '../../tools/esbuild/angular/source-file-cache';
 import {
   createBrowserCodeBundleOptions,
@@ -17,10 +18,7 @@ import {
 import { BundlerContext } from '../../tools/esbuild/bundler-context';
 import { createGlobalScriptsBundleOptions } from '../../tools/esbuild/global-scripts';
 import { createGlobalStylesBundleOptions } from '../../tools/esbuild/global-styles';
-import {
-  getSupportedNodeTargets,
-  transformSupportedBrowsersToTargets,
-} from '../../tools/esbuild/utils';
+import { getSupportedNodeTargets } from '../../tools/esbuild/utils';
 import { NormalizedApplicationBuildOptions } from './options';
 
 /**
@@ -33,8 +31,9 @@ import { NormalizedApplicationBuildOptions } from './options';
  */
 export function setupBundlerContexts(
   options: NormalizedApplicationBuildOptions,
-  browsers: string[],
+  target: string[],
   codeBundleCache: SourceFileCache,
+  stylesheetBundler: ComponentStylesheetBundler,
 ): BundlerContext[] {
   const {
     outputMode,
@@ -45,7 +44,6 @@ export function setupBundlerContexts(
     workspaceRoot,
     watch = false,
   } = options;
-  const target = transformSupportedBrowsersToTargets(browsers);
   const bundlerContexts = [];
 
   // Browser application code
@@ -53,7 +51,7 @@ export function setupBundlerContexts(
     new BundlerContext(
       workspaceRoot,
       watch,
-      createBrowserCodeBundleOptions(options, target, codeBundleCache),
+      createBrowserCodeBundleOptions(options, target, codeBundleCache, stylesheetBundler),
     ),
   );
 
@@ -62,6 +60,7 @@ export function setupBundlerContexts(
     options,
     target,
     codeBundleCache,
+    stylesheetBundler,
   );
   if (browserPolyfillBundleOptions) {
     bundlerContexts.push(new BundlerContext(workspaceRoot, watch, browserPolyfillBundleOptions));
@@ -99,7 +98,7 @@ export function setupBundlerContexts(
       new BundlerContext(
         workspaceRoot,
         watch,
-        createServerMainCodeBundleOptions(options, nodeTargets, codeBundleCache),
+        createServerMainCodeBundleOptions(options, nodeTargets, codeBundleCache, stylesheetBundler),
       ),
     );
 
@@ -109,7 +108,7 @@ export function setupBundlerContexts(
         new BundlerContext(
           workspaceRoot,
           watch,
-          createSsrEntryCodeBundleOptions(options, nodeTargets, codeBundleCache),
+          createSsrEntryCodeBundleOptions(options, nodeTargets, codeBundleCache, stylesheetBundler),
         ),
       );
     }
@@ -127,4 +126,52 @@ export function setupBundlerContexts(
   }
 
   return bundlerContexts;
+}
+
+export function createComponentStyleBundler(
+  options: NormalizedApplicationBuildOptions,
+  target: string[],
+): ComponentStylesheetBundler {
+  const {
+    workspaceRoot,
+    optimizationOptions,
+    sourcemapOptions,
+    outputNames,
+    externalDependencies,
+    preserveSymlinks,
+    stylePreprocessorOptions,
+    inlineStyleLanguage,
+    cacheOptions,
+    tailwindConfiguration,
+    postcssConfiguration,
+    publicPath,
+  } = options;
+  const incremental = !!options.watch;
+
+  return new ComponentStylesheetBundler(
+    {
+      workspaceRoot,
+      inlineFonts: !!optimizationOptions.fonts.inline,
+      optimization: !!optimizationOptions.styles.minify,
+      sourcemap:
+        // Hidden component stylesheet sourcemaps are inaccessible which is effectively
+        // the same as being disabled. Disabling has the advantage of avoiding the overhead
+        // of sourcemap processing.
+        sourcemapOptions.styles && !sourcemapOptions.hidden ? 'linked' : false,
+      outputNames,
+      includePaths: stylePreprocessorOptions?.includePaths,
+      // string[] | undefined' is not assignable to type '(Version | DeprecationOrId)[] | undefined'.
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      sass: stylePreprocessorOptions?.sass as any,
+      externalDependencies,
+      target,
+      preserveSymlinks,
+      tailwindConfiguration,
+      postcssConfiguration,
+      cacheOptions,
+      publicPath,
+    },
+    inlineStyleLanguage,
+    incremental,
+  );
 }
