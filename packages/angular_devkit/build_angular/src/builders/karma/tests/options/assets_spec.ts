@@ -47,6 +47,7 @@ describeKarmaBuilder(execute, KARMA_BUILDER_INFO, (harness, setupTarget) => {
 
             @Component({
               selector: 'app-root',
+              standalone: false,
               template: '<p *ngFor="let asset of assets">{{ asset.content }}</p>'
             })
             export class AppComponent {

@@ -22,6 +22,7 @@ describeKarmaBuilder(execute, KARMA_BUILDER_INFO, (harness, setupTarget) => {
 
             @Component({
               selector: 'app-root',
+              standalone: false,
               template: '<button (click)="changeMessage()" class="change">{{ message }}</button>',
             })
             export class AppComponent {

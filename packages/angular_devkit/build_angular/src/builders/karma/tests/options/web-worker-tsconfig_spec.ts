@@ -45,6 +45,7 @@ describeKarmaBuilder(execute, KARMA_BUILDER_INFO, (harness, setupTarget, isAppli
 
         @Component({
           selector: 'app-root',
+          standalone: false,
           template: ''
         })
         export class AppComponent {

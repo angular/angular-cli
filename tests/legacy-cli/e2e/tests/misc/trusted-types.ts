@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { appendToFile, prependToFile, replaceInFile, writeFile } from '../../utils/fs';
+import { replaceInFile, writeFile } from '../../utils/fs';
 import { ng } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';
 

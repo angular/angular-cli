@@ -38,6 +38,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
         import './file-a';
         @Component({
           selector: 'app-root',
+          standalone: false,
           template: 'App component',
         })
         export class AppComponent { }

@@ -33,6 +33,7 @@ describe('Browser Builder allow svg', () => {
 
         @Component({
           selector: 'app-root',
+          standalone: false,
           templateUrl: './app.component.svg',
           styleUrls: []
         })

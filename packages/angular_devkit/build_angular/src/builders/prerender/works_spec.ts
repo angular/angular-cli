@@ -27,6 +27,7 @@ describe('Prerender Builder', () => {
 
         @Component({
           selector: 'app-foo',
+          standalone: false,
           template: '<p>foo works!</p>',
         })
         export class FooComponent {}

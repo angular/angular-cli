@@ -34,6 +34,7 @@ describe('AppShell Builder', () => {
 
       @Component({
         selector: 'app-app-shell',
+        standalone: false,
         templateUrl: './app-shell.component.html',
       })
       export class AppShellComponent implements OnInit {
