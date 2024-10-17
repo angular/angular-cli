@@ -13,7 +13,7 @@ import {
   getLocaleBaseHref,
 } from '../../builders/application/options';
 import type { BuildOutputFile } from '../../tools/esbuild/bundler-context';
-import { PrerenderedRoutesRecord } from '../../tools/esbuild/bundler-execution-result';
+import type { PrerenderedRoutesRecord } from '../../tools/esbuild/bundler-execution-result';
 
 export const SERVER_APP_MANIFEST_FILENAME = 'angular-app-manifest.mjs';
 export const SERVER_APP_ENGINE_MANIFEST_FILENAME = 'angular-app-engine-manifest.mjs';

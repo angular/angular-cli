@@ -18,6 +18,7 @@ import {
   SERVER_APP_MANIFEST_FILENAME,
 } from '../../utils/server-rendering/manifest';
 import { createCompilerPlugin } from './angular/compiler-plugin';
+import { ComponentStylesheetBundler } from './angular/component-stylesheets';
 import { SourceFileCache } from './angular/source-file-cache';
 import { BundlerOptionsFactory } from './bundler-context';
 import { createCompilerPluginOptions } from './compiler-plugin-options';
@@ -34,15 +35,12 @@ import { createWasmPlugin } from './wasm-plugin';
 export function createBrowserCodeBundleOptions(
   options: NormalizedApplicationBuildOptions,
   target: string[],
-  sourceFileCache?: SourceFileCache,
+  sourceFileCache: SourceFileCache,
+  stylesheetBundler: ComponentStylesheetBundler,
 ): BuildOptions {
   const { entryPoints, outputNames, polyfills } = options;
 
-  const { pluginOptions, stylesheetBundler } = createCompilerPluginOptions(
-    options,
-    target,
-    sourceFileCache,
-  );
+  const pluginOptions = createCompilerPluginOptions(options, sourceFileCache);
 
   const zoneless = isZonelessApp(polyfills);
 
@@ -100,7 +98,8 @@ export function createBrowserCodeBundleOptions(
 export function createBrowserPolyfillBundleOptions(
   options: NormalizedApplicationBuildOptions,
   target: string[],
-  sourceFileCache?: SourceFileCache,
+  sourceFileCache: SourceFileCache,
+  stylesheetBundler: ComponentStylesheetBundler,
 ): BuildOptions | BundlerOptionsFactory | undefined {
   const namespace = 'angular:polyfills';
   const polyfillBundleOptions = getEsBuildCommonPolyfillsOptions(
@@ -134,9 +133,9 @@ export function createBrowserPolyfillBundleOptions(
   // Only add the Angular TypeScript compiler if TypeScript files are provided in the polyfills
   if (hasTypeScriptEntries) {
     buildOptions.plugins ??= [];
-    const { pluginOptions, stylesheetBundler } = createCompilerPluginOptions(
+    const pluginOptions = createCompilerPluginOptions(
       options,
-      target,
+
       sourceFileCache,
     );
     buildOptions.plugins.push(
@@ -228,6 +227,7 @@ export function createServerMainCodeBundleOptions(
   options: NormalizedApplicationBuildOptions,
   target: string[],
   sourceFileCache: SourceFileCache,
+  stylesheetBundler: ComponentStylesheetBundler,
 ): BuildOptions {
   const {
     serverEntryPoint: mainServerEntryPoint,
@@ -243,11 +243,7 @@ export function createServerMainCodeBundleOptions(
     'createServerCodeBundleOptions should not be called without a defined serverEntryPoint.',
   );
 
-  const { pluginOptions, stylesheetBundler } = createCompilerPluginOptions(
-    options,
-    target,
-    sourceFileCache,
-  );
+  const pluginOptions = createCompilerPluginOptions(options, sourceFileCache);
 
   const mainServerNamespace = 'angular:main-server';
   const mainServerInjectPolyfillsNamespace = 'angular:main-server-inject-polyfills';
@@ -374,6 +370,7 @@ export function createSsrEntryCodeBundleOptions(
   options: NormalizedApplicationBuildOptions,
   target: string[],
   sourceFileCache: SourceFileCache,
+  stylesheetBundler: ComponentStylesheetBundler,
 ): BuildOptions {
   const { workspaceRoot, ssrOptions, externalPackages } = options;
   const serverEntryPoint = ssrOptions?.entry;
@@ -382,11 +379,7 @@ export function createSsrEntryCodeBundleOptions(
     'createSsrEntryCodeBundleOptions should not be called without a defined serverEntryPoint.',
   );
 
-  const { pluginOptions, stylesheetBundler } = createCompilerPluginOptions(
-    options,
-    target,
-    sourceFileCache,
-  );
+  const pluginOptions = createCompilerPluginOptions(options, sourceFileCache);
 
   const ssrEntryNamespace = 'angular:ssr-entry';
   const ssrInjectManifestNamespace = 'angular:ssr-entry-inject-manifest';
