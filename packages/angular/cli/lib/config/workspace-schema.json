@@ -368,7 +368,6 @@
                       "@angular-devkit/build-angular:prerender",
                       "@angular-devkit/build-angular:jest",
                       "@angular-devkit/build-angular:web-test-runner",
-                      "@angular-devkit/build-angular:protractor",
                       "@angular-devkit/build-angular:server",
                       "@angular-devkit/build-angular:ssr-dev-server"
                     ]
@@ -652,28 +651,6 @@
                   "type": "object",
                   "additionalProperties": {
                     "$ref": "../../../../angular_devkit/build_angular/src/builders/web-test-runner/schema.json"
-                  }
-                }
-              }
-            },
-            {
-              "type": "object",
-              "additionalProperties": false,
-              "properties": {
-                "builder": {
-                  "const": "@angular-devkit/build-angular:protractor"
-                },
-                "defaultConfiguration": {
-                  "type": "string",
-                  "description": "A default named configuration to use when a target configuration is not provided."
-                },
-                "options": {
-                  "$ref": "../../../../angular_devkit/build_angular/src/builders/protractor/schema.json"
-                },
-                "configurations": {
-                  "type": "object",
-                  "additionalProperties": {
-                    "$ref": "../../../../angular_devkit/build_angular/src/builders/protractor/schema.json"
                   }
                 }
               }

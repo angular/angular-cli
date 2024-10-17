@@ -178,7 +178,7 @@
       "projectType": "application",
       "targets": {
         "e2e": {
-          "builder": "@angular-devkit/build-angular:protractor",
+          "builder": "@angular-devkit/build-angular:private-protractor",
           "options": {
             "protractorConfig": "protractor.conf.js",
             "devServerTarget": "app:serve",

@@ -42,10 +42,10 @@
       "schema": "./src/builders/web-test-runner/schema.json",
       "description": "Run unit tests with Web Test Runner."
     },
-    "protractor": {
+    "private-protractor": {
       "implementation": "./src/builders/protractor",
       "schema": "./src/builders/protractor/schema.json",
-      "description": "Run protractor over a dev server."
+      "description": "PRIVATE API - Do not use."
     },
     "server": {
       "implementation": "./src/builders/server",
