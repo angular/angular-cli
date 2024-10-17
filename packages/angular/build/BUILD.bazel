@@ -89,6 +89,7 @@ ts_library(
         "@npm//magic-string",
         "@npm//mrmime",
         "@npm//parse5-html-rewriting-stream",
+        "@npm//parse5-sax-parser",
         "@npm//picomatch",
         "@npm//piscina",
         "@npm//postcss",
