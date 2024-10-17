@@ -11,8 +11,8 @@ describe('AppComponent', () => {
       ],<% } %>
       declarations: [
         AppComponent
-      ],
-      <% if(experimentalZoneless) { %>providers: [provideExperimentalZonelessChangeDetection()]<% } %>
+      ],<% if(experimentalZoneless) { %>
+      providers: [provideExperimentalZonelessChangeDetection()]<% } %>
     }).compileComponents();
   });
 
