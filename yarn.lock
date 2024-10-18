@@ -752,6 +752,7 @@ __metadata:
     ora: "npm:5.4.1"
     pacote: "npm:20.0.0"
     parse5-html-rewriting-stream: "npm:7.0.0"
+    parse5-sax-parser: "npm:7.0.0"
     picomatch: "npm:4.0.2"
     piscina: "npm:4.7.0"
     postcss: "npm:8.4.47"
@@ -14300,7 +14301,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"parse5-sax-parser@npm:^7.0.0":
+"parse5-sax-parser@npm:7.0.0, parse5-sax-parser@npm:^7.0.0":
   version: 7.0.0
   resolution: "parse5-sax-parser@npm:7.0.0"
   dependencies:

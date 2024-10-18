@@ -398,6 +398,7 @@ export async function normalizeOptions(
     partialSSRBuild = false,
     externalRuntimeStyles,
     instrumentForCoverage,
+    security,
   } = options;
 
   // Return all the normalized options
@@ -461,6 +462,7 @@ export async function normalizeOptions(
     partialSSRBuild: usePartialSsrBuild || partialSSRBuild,
     externalRuntimeStyles,
     instrumentForCoverage,
+    security,
   };
 }
 
