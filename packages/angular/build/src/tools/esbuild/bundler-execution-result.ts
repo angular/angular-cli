@@ -9,6 +9,7 @@
 import type { Message, PartialMessage } from 'esbuild';
 import { normalize } from 'node:path';
 import type { ChangedFiles } from '../../tools/esbuild/watcher';
+import type { ComponentStylesheetBundler } from './angular/component-stylesheets';
 import type { SourceFileCache } from './angular/source-file-cache';
 import type { BuildOutputFile, BuildOutputFileType, BundlerContext } from './bundler-context';
 import { createOutputFile } from './utils';
@@ -20,6 +21,7 @@ export interface BuildOutputAsset {
 
 export interface RebuildState {
   rebuildContexts: BundlerContext[];
+  componentStyleBundler: ComponentStylesheetBundler;
   codeBundleCache?: SourceFileCache;
   fileChanges: ChangedFiles;
   previousOutputHashes: Map<string, string>;
@@ -50,6 +52,7 @@ export class ExecutionResult {
 
   constructor(
     private rebuildContexts: BundlerContext[],
+    private componentStyleBundler: ComponentStylesheetBundler,
     private codeBundleCache?: SourceFileCache,
   ) {}
 
@@ -158,6 +161,7 @@ export class ExecutionResult {
     return {
       rebuildContexts: this.rebuildContexts,
       codeBundleCache: this.codeBundleCache,
+      componentStyleBundler: this.componentStyleBundler,
       fileChanges,
       previousOutputHashes: new Map(this.outputFiles.map((file) => [file.path, file.hash])),
     };
@@ -177,5 +181,6 @@ export class ExecutionResult {
 
   async dispose(): Promise<void> {
     await Promise.allSettled(this.rebuildContexts.map((context) => context.dispose()));
+    await this.componentStyleBundler.dispose();
   }
 }

@@ -15,7 +15,11 @@ import { ExecutionResult, RebuildState } from '../../tools/esbuild/bundler-execu
 import { checkCommonJSModules } from '../../tools/esbuild/commonjs-checker';
 import { extractLicenses } from '../../tools/esbuild/license-extractor';
 import { profileAsync } from '../../tools/esbuild/profiling';
-import { calculateEstimatedTransferSizes, logBuildStats } from '../../tools/esbuild/utils';
+import {
+  calculateEstimatedTransferSizes,
+  logBuildStats,
+  transformSupportedBrowsersToTargets,
+} from '../../tools/esbuild/utils';
 import { BudgetCalculatorResult, checkBudgets } from '../../utils/bundle-calculator';
 import { shouldOptimizeChunks } from '../../utils/environment-options';
 import { resolveAssets } from '../../utils/resolve-assets';
@@ -29,7 +33,7 @@ import { executePostBundleSteps } from './execute-post-bundle';
 import { inlineI18n, loadActiveTranslations } from './i18n';
 import { NormalizedApplicationBuildOptions } from './options';
 import { OutputMode } from './schema';
-import { setupBundlerContexts } from './setup-bundling';
+import { createComponentStyleBundler, setupBundlerContexts } from './setup-bundling';
 
 // eslint-disable-next-line max-lines-per-function
 export async function executeBuild(
@@ -63,12 +67,18 @@ export async function executeBuild(
   }
 
   // Reuse rebuild state or create new bundle contexts for code and global stylesheets
-  let bundlerContexts = rebuildState?.rebuildContexts;
-  const codeBundleCache =
-    rebuildState?.codeBundleCache ??
-    new SourceFileCache(cacheOptions.enabled ? cacheOptions.path : undefined);
-  if (bundlerContexts === undefined) {
-    bundlerContexts = setupBundlerContexts(options, browsers, codeBundleCache);
+  let bundlerContexts;
+  let componentStyleBundler;
+  let codeBundleCache;
+  if (rebuildState) {
+    bundlerContexts = rebuildState.rebuildContexts;
+    componentStyleBundler = rebuildState.componentStyleBundler;
+    codeBundleCache = rebuildState.codeBundleCache;
+  } else {
+    const target = transformSupportedBrowsersToTargets(browsers);
+    codeBundleCache = new SourceFileCache(cacheOptions.enabled ? cacheOptions.path : undefined);
+    componentStyleBundler = createComponentStyleBundler(options, target);
+    bundlerContexts = setupBundlerContexts(options, target, codeBundleCache, componentStyleBundler);
   }
 
   let bundlingResult = await BundlerContext.bundleAll(
@@ -85,7 +95,11 @@ export async function executeBuild(
     );
   }
 
-  const executionResult = new ExecutionResult(bundlerContexts, codeBundleCache);
+  const executionResult = new ExecutionResult(
+    bundlerContexts,
+    componentStyleBundler,
+    codeBundleCache,
+  );
   executionResult.addWarnings(bundlingResult.warnings);
 
   // Return if the bundling has errors
