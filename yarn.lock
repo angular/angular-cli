@@ -532,7 +532,7 @@ __metadata:
     listr2: "npm:8.2.5"
     npm-package-arg: "npm:12.0.0"
     npm-pick-manifest: "npm:10.0.0"
-    pacote: "npm:19.0.1"
+    pacote: "npm:20.0.0"
     resolve: "npm:1.22.8"
     semver: "npm:7.6.3"
     symbol-observable: "npm:4.0.0"
@@ -750,7 +750,7 @@ __metadata:
     npm-pick-manifest: "npm:10.0.0"
     open: "npm:10.1.0"
     ora: "npm:5.4.1"
-    pacote: "npm:19.0.1"
+    pacote: "npm:20.0.0"
     parse5-html-rewriting-stream: "npm:7.0.0"
     picomatch: "npm:4.0.2"
     piscina: "npm:4.7.0"
@@ -14182,9 +14182,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"pacote@npm:19.0.1":
-  version: 19.0.1
-  resolution: "pacote@npm:19.0.1"
+"pacote@npm:20.0.0":
+  version: 20.0.0
+  resolution: "pacote@npm:20.0.0"
   dependencies:
     "@npmcli/git": "npm:^6.0.0"
     "@npmcli/installed-package-contents": "npm:^3.0.0"
@@ -14205,7 +14205,7 @@ __metadata:
     tar: "npm:^6.1.11"
   bin:
     pacote: bin/index.js
-  checksum: 10c0/01a1fe755ec7333904c36cd6058e4fcdcfa2869799b929a4a57eb3ac3ca87023825c76aa9e6337904f08f760bff790b592c018357d331acc4c26d2cc273bbc51
+  checksum: 10c0/435c385446ecc81b1eb1584f4fa3cb102e630a22877f39b5c1a92eddfeaf222bd027b205e32632be2801e3bcbe525165cdffb5ceca5c13bbc81f8132fe1ba49e
   languageName: node
   linkType: hard
 
