@@ -142,7 +142,10 @@ export async function autoCsp(html: string): Promise<string> {
       }
     }
     // We are encountering the first start tag that's not <script src="..."> after a string of
-    // consecutive <script src="...">. The first place when we can determine this to be the case is
+    // consecutive <script src="...">. <script> tags without a src attribute will also end a chain
+    // of src attributes that can be loaded in a single loader script, so those will end up here.
+    //
+    // The first place when we can determine this to be the case is
     // during the first opening tag that's not <script src="...">, where we need to insert the
     // dynamic loader script before continuing on with writing the rest of the tags.
     // (One edge case is where there are no more opening tags after the last <script src="..."> is
@@ -280,7 +283,7 @@ function createLoaderScript(srcList: SrcScriptTag[], enableTrustedTypes = false)
   const srcListFormatted = srcList
     .map(
       (s) =>
-        `['${encodeURI(s.src).replaceAll("'", "\\'")}', ${s.type ? "'" + encodeURI(s.type) + "'" : undefined}, ${s.async ? 'true' : 'false'}, ${s.defer ? 'true' : 'false'}]`,
+        `['${encodeURI(s.src).replaceAll("'", "\\'")}', ${s.type ? "'" + s.type + "'" : undefined}, ${s.async ? 'true' : 'false'}, ${s.defer ? 'true' : 'false'}]`,
     )
     .join();
   return enableTrustedTypes
