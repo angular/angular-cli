@@ -8,6 +8,7 @@
 
 import type ng from '@angular/compiler-cli';
 import assert from 'node:assert';
+import { relative } from 'node:path';
 import ts from 'typescript';
 import { profileAsync, profileSync } from '../../esbuild/profiling';
 import {
@@ -47,6 +48,7 @@ export class AotCompilation extends AngularCompilation {
     compilerOptions: ng.CompilerOptions;
     referencedFiles: readonly string[];
     externalStylesheets?: ReadonlyMap<string, string>;
+    templateUpdates?: ReadonlyMap<string, string>;
   }> {
     // Dynamically load the Angular compiler CLI package
     const { NgtscProgram, OptimizeFor } = await AngularCompilation.loadCompilerCli();
@@ -91,6 +93,40 @@ export class AotCompilation extends AngularCompilation {
     );
 
     await profileAsync('NG_ANALYZE_PROGRAM', () => angularCompiler.analyzeAsync());
+
+    let templateUpdates;
+    if (
+      compilerOptions['_enableHmr'] &&
+      hostOptions.modifiedFiles &&
+      hasOnlyTemplates(hostOptions.modifiedFiles)
+    ) {
+      const componentNodes = [...hostOptions.modifiedFiles].flatMap((file) => [
+        ...angularCompiler.getComponentsWithTemplateFile(file),
+      ]);
+
+      for (const node of componentNodes) {
+        if (!ts.isClassDeclaration(node)) {
+          continue;
+        }
+        const componentFilename = node.getSourceFile().fileName;
+        let relativePath = relative(host.getCurrentDirectory(), componentFilename);
+        if (relativePath.startsWith('..')) {
+          relativePath = componentFilename;
+        }
+        const updateId = encodeURIComponent(
+          `${host.getCanonicalFileName(relativePath)}@${node.name?.text}`,
+        );
+        const updateText = angularCompiler.emitHmrUpdateModule(node);
+        if (updateText === null) {
+          // Build is needed if a template cannot be updated
+          templateUpdates = undefined;
+          break;
+        }
+        templateUpdates ??= new Map<string, string>();
+        templateUpdates.set(updateId, updateText);
+      }
+    }
+
     const affectedFiles = profileSync('NG_FIND_AFFECTED', () =>
       findAffectedFiles(typeScriptProgram, angularCompiler, usingBuildInfo),
     );
@@ -131,6 +167,7 @@ export class AotCompilation extends AngularCompilation {
       compilerOptions,
       referencedFiles,
       externalStylesheets: hostOptions.externalStylesheets,
+      templateUpdates,
     };
   }
 
@@ -384,4 +421,17 @@ function findAffectedFiles(
   }
 
   return affectedFiles;
+}
+
+function hasOnlyTemplates(modifiedFiles: Set<string>): boolean {
+  for (const file of modifiedFiles) {
+    const lowerFile = file.toLowerCase();
+    if (lowerFile.endsWith('.html') || lowerFile.endsWith('.svg')) {
+      continue;
+    }
+
+    return false;
+  }
+
+  return true;
 }
