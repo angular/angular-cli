@@ -42,60 +42,62 @@ export async function initialize(request: InitRequest) {
     }
   });
 
-  const { compilerOptions, referencedFiles, externalStylesheets } = await compilation.initialize(
-    request.tsconfig,
-    {
-      fileReplacements: request.fileReplacements,
-      sourceFileCache,
-      modifiedFiles: sourceFileCache.modifiedFiles,
-      transformStylesheet(data, containingFile, stylesheetFile, order, className) {
-        const requestId = randomUUID();
-        const resultPromise = new Promise<string>((resolve, reject) =>
-          stylesheetRequests.set(requestId, [resolve, reject]),
-        );
+  const { compilerOptions, referencedFiles, externalStylesheets, templateUpdates } =
+    await compilation.initialize(
+      request.tsconfig,
+      {
+        fileReplacements: request.fileReplacements,
+        sourceFileCache,
+        modifiedFiles: sourceFileCache.modifiedFiles,
+        transformStylesheet(data, containingFile, stylesheetFile, order, className) {
+          const requestId = randomUUID();
+          const resultPromise = new Promise<string>((resolve, reject) =>
+            stylesheetRequests.set(requestId, [resolve, reject]),
+          );
 
-        request.stylesheetPort.postMessage({
-          requestId,
-          data,
-          containingFile,
-          stylesheetFile,
-          order,
-          className,
-        });
+          request.stylesheetPort.postMessage({
+            requestId,
+            data,
+            containingFile,
+            stylesheetFile,
+            order,
+            className,
+          });
 
-        return resultPromise;
+          return resultPromise;
+        },
+        processWebWorker(workerFile, containingFile) {
+          Atomics.store(request.webWorkerSignal, 0, 0);
+          request.webWorkerPort.postMessage({ workerFile, containingFile });
+
+          Atomics.wait(request.webWorkerSignal, 0, 0);
+          const result = receiveMessageOnPort(request.webWorkerPort)?.message;
+
+          if (result?.error) {
+            throw result.error;
+          }
+
+          return result?.workerCodeFile ?? workerFile;
+        },
       },
-      processWebWorker(workerFile, containingFile) {
-        Atomics.store(request.webWorkerSignal, 0, 0);
-        request.webWorkerPort.postMessage({ workerFile, containingFile });
+      (compilerOptions) => {
+        Atomics.store(request.optionsSignal, 0, 0);
+        request.optionsPort.postMessage(compilerOptions);
 
-        Atomics.wait(request.webWorkerSignal, 0, 0);
-        const result = receiveMessageOnPort(request.webWorkerPort)?.message;
+        Atomics.wait(request.optionsSignal, 0, 0);
+        const result = receiveMessageOnPort(request.optionsPort)?.message;
 
         if (result?.error) {
           throw result.error;
         }
 
-        return result?.workerCodeFile ?? workerFile;
+        return result?.transformedOptions ?? compilerOptions;
       },
-    },
-    (compilerOptions) => {
-      Atomics.store(request.optionsSignal, 0, 0);
-      request.optionsPort.postMessage(compilerOptions);
-
-      Atomics.wait(request.optionsSignal, 0, 0);
-      const result = receiveMessageOnPort(request.optionsPort)?.message;
-
-      if (result?.error) {
-        throw result.error;
-      }
-
-      return result?.transformedOptions ?? compilerOptions;
-    },
-  );
+    );
 
   return {
     externalStylesheets,
+    templateUpdates,
     referencedFiles,
     // TODO: Expand? `allowJs`, `isolatedModules`, `sourceMap`, `inlineSourceMap` are the only fields needed currently.
     compilerOptions: {
