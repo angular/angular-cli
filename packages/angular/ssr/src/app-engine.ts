@@ -30,7 +30,7 @@ export class AngularAppEngine {
    *
    * @private
    */
-  static ɵhooks = new Hooks();
+  static ɵhooks = /* #__PURE__*/ new Hooks();
 
   /**
    * Provides access to the hooks for extending or modifying the server application's behavior.
