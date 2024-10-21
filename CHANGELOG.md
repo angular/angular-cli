@@ -1,3 +1,38 @@
+<a name="19.0.0-next.12"></a>
+
+# 19.0.0-next.12 (2024-10-21)
+
+## Breaking Changes
+
+### @angular-devkit/build-angular
+
+- Protractor is no longer supported.
+
+  Protractor was marked end-of-life in August 2023 (see https://protractortest.org/). Projects still relying on Protractor should consider migrating to another E2E testing framework, several support solid migration paths from Protractor.
+
+  - https://angular.dev/tools/cli/end-to-end
+  - https://blog.angular.dev/the-state-of-end-to-end-testing-with-angular-d175f751cb9c
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type     | Description                              |
+| --------------------------------------------------------------------------------------------------- | -------- | ---------------------------------------- |
+| [62877bdf2](https://github.com/angular/angular-cli/commit/62877bdf2b0449d8c12a167c59d0c24c77467f37) | refactor | remove Protractor builder and schematics |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                           |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------- |
+| [1654acf0f](https://github.com/angular/angular-cli/commit/1654acf0ff3010b619a22d11f17eec9975d8e2a2) | fix  | relax constraints on external stylesheet component id |
+
+### @angular/ssr
+
+| Commit                                                                                              | Type | Description                           |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------- |
+| [44077f54e](https://github.com/angular/angular-cli/commit/44077f54e9a95afa5c1f85cf198aaa3412ee08d8) | fix  | designate package as side-effect free |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="19.0.0-next.11"></a>
 
 # 19.0.0-next.11 (2024-10-16)
