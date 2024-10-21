@@ -20,6 +20,7 @@ ts_library(
     tsconfig = "//:tsconfig-build-ng",
     deps = [
         "//packages/angular/ssr/third_party/critters:bundled_critters_lib",
+        "//packages/angular/ssr/tokens",
         "@npm//@angular/common",
         "@npm//@angular/core",
         "@npm//@angular/platform-server",
@@ -38,6 +39,7 @@ ng_package(
     externals = [
         "@angular/ssr",
         "@angular/ssr/node",
+        "@angular/ssr/tokens",
         "../../third_party/critters",
     ],
     nested_packages = [
@@ -47,6 +49,7 @@ ng_package(
     deps = [
         ":ssr",
         "//packages/angular/ssr/node",
+        "//packages/angular/ssr/tokens",
     ],
 )
 
