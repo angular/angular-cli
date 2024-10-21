@@ -17,5 +17,3 @@ export {
   provideServerRoutesConfig,
   RenderMode,
 } from './src/routes/route-config';
-
-export { REQUEST, RESPONSE_INIT, REQUEST_CONTEXT } from './src/tokens';

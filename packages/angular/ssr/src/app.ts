@@ -7,12 +7,12 @@
  */
 
 import { LOCALE_ID, StaticProvider, ɵresetCompiledComponents } from '@angular/core';
+import { REQUEST, REQUEST_CONTEXT, RESPONSE_INIT } from '@angular/ssr/tokens';
 import { ServerAssets } from './assets';
 import { Hooks } from './hooks';
 import { getAngularAppManifest } from './manifest';
 import { RenderMode } from './routes/route-config';
 import { ServerRouter } from './routes/router';
-import { REQUEST, REQUEST_CONTEXT, RESPONSE_INIT } from './tokens';
 import { sha256 } from './utils/crypto';
 import { InlineCriticalCssProcessor } from './utils/inline-critical-css';
 import { LRUCache } from './utils/lru-cache';
