@@ -195,7 +195,7 @@ export function getFeatureSupport(
   target: string[],
   nativeAsyncAwait: boolean,
 ): BuildOptions['supported'] {
-  const supported: Record<string, boolean> = {
+  return {
     // Native async/await is not supported with Zone.js. Disabling support here will cause
     // esbuild to downlevel async/await, async generators, and for await...of to a Zone.js supported form.
     'async-await': nativeAsyncAwait,
@@ -205,35 +205,6 @@ export function getFeatureSupport(
     // For more details: https://bugs.chromium.org/p/v8/issues/detail?id=11536
     'object-rest-spread': false,
   };
-
-  // Detect Safari browser versions that have a class field behavior bug
-  // See: https://github.com/angular/angular-cli/issues/24355#issuecomment-1333477033
-  // See: https://github.com/WebKit/WebKit/commit/e8788a34b3d5f5b4edd7ff6450b80936bff396f2
-  let safariClassFieldScopeBug = false;
-  for (const browser of target) {
-    let majorVersion;
-    if (browser.startsWith('ios')) {
-      majorVersion = Number(browser.slice(3, 5));
-    } else if (browser.startsWith('safari')) {
-      majorVersion = Number(browser.slice(6, 8));
-    } else {
-      continue;
-    }
-    // Technically, 14.0 is not broken but rather does not have support. However, the behavior
-    // is identical since it would be set to false by esbuild if present as a target.
-    if (majorVersion === 14 || majorVersion === 15) {
-      safariClassFieldScopeBug = true;
-      break;
-    }
-  }
-  // If class field support cannot be used set to false; otherwise leave undefined to allow
-  // esbuild to use `target` to determine support.
-  if (safariClassFieldScopeBug) {
-    supported['class-field'] = false;
-    supported['class-static-field'] = false;
-  }
-
-  return supported;
 }
 
 const MAX_CONCURRENT_WRITES = 64;
