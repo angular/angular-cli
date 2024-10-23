@@ -1,3 +1,16 @@
+<a name="19.0.0-next.13"></a>
+
+# 19.0.0-next.13 (2024-10-23)
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                                          |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------------- |
+| [efb434136](https://github.com/angular/angular-cli/commit/efb434136d8c8df207747ab8fd87b7e2116b7106) | feat | Auto-CSP support as a part of angular.json schema                    |
+| [cc345b02d](https://github.com/angular/angular-cli/commit/cc345b02d814a37bb23d6c3f1baca9595130d010) | fix  | Address build issue in Node.js LTS versions with prerendering or SSR |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="18.2.10"></a>
 
 # 18.2.10 (2024-10-23)
