@@ -1,3 +1,21 @@
+<a name="18.2.10"></a>
+
+# 18.2.10 (2024-10-23)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                               |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------- |
+| [7b775f4e0](https://github.com/angular/angular-cli/commit/7b775f4e008652777bbe7b788dabed02bcc70cc7) | fix  | update `http-proxy-middleware` to `3.0.3` |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                                          |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------------- |
+| [b1e5f51f9](https://github.com/angular/angular-cli/commit/b1e5f51f9111d7da56ebe64cad51936ad659782d) | fix  | Address build issue in Node.js LTS versions with prerendering or SSR |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="18.2.9"></a>
 
 # 18.2.9 (2024-10-16)
