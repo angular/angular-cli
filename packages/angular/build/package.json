@@ -20,10 +20,10 @@
   "dependencies": {
     "@ampproject/remapping": "2.3.0",
     "@angular-devkit/architect": "0.0.0-EXPERIMENTAL-PLACEHOLDER",
-    "@babel/core": "7.25.8",
-    "@babel/helper-annotate-as-pure": "7.25.7",
+    "@babel/core": "7.25.9",
+    "@babel/helper-annotate-as-pure": "7.25.9",
     "@babel/helper-split-export-declaration": "7.24.7",
-    "@babel/plugin-syntax-import-attributes": "7.25.7",
+    "@babel/plugin-syntax-import-attributes": "7.25.9",
     "@inquirer/confirm": "5.0.0",
     "@vitejs/plugin-basic-ssl": "1.1.0",
     "browserslist": "^4.23.0",
@@ -41,7 +41,7 @@
     "rollup": "4.24.0",
     "sass": "1.80.3",
     "semver": "7.6.3",
-    "vite": "5.4.9",
+    "vite": "5.4.10",
     "watchpack": "2.4.2"
   },
   "optionalDependencies": {
