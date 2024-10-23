@@ -58,6 +58,8 @@ export class JavaScriptTransformer {
     this.#workerPool ??= new WorkerPool({
       filename: require.resolve('./javascript-transformer-worker'),
       maxThreads: this.maxThreads,
+      // Prevent passing `--import` (loader-hooks) from parent to child worker.
+      execArgv: [],
     });
 
     return this.#workerPool;
