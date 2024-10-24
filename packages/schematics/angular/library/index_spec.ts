@@ -71,7 +71,7 @@ describe('Library Schematic', () => {
   it('should create a standalone component', async () => {
     const tree = await schematicRunner.runSchematic('library', defaultOptions, workspaceTree);
     const componentContent = tree.readContent('/projects/foo/src/lib/foo.component.ts');
-    expect(componentContent).toContain('standalone: true');
+    expect(componentContent).not.toContain('standalone');
   });
 
   describe('custom projectRoot', () => {

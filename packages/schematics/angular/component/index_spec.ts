@@ -350,7 +350,7 @@ describe('Component Schematic', () => {
     const componentContent = tree.readContent('/projects/bar/src/app/foo/foo.component.ts');
     expect(componentContent).toContain('class FooComponent');
     expect(moduleContent).not.toContain('FooComponent');
-    expect(componentContent).toContain('standalone: true');
+    expect(componentContent).not.toContain('standalone');
   });
 
   it('should declare standalone components in the `imports` of a test', async () => {
