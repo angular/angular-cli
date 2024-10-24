@@ -2,7 +2,6 @@ import { <% if(changeDetection !== 'Default') { %>ChangeDetectionStrategy, <% }%
 
 @Component({<% if(!skipSelector) {%>
   selector: '<%= selector %>',<%}%><% if(standalone) {%>
-  standalone: true,
   imports: [],<%} else { %>
   standalone: false,
   <% }%><% if(inlineTemplate) { %>

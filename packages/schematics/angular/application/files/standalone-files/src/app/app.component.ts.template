@@ -3,7 +3,6 @@ import { RouterOutlet } from '@angular/router';<% } %>
 
 @Component({
   selector: '<%= selector %>',
-  standalone: true,
   imports: [<% if(routing) { %>RouterOutlet<% } %>],<% if(inlineTemplate) { %>
   template: `
     <h1>Welcome to {{title}}!</h1>

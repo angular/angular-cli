@@ -156,7 +156,7 @@ describe('Pipe Schematic', () => {
       const tree = await schematicRunner.runSchematic('pipe', defaultOptions, appTree);
       const moduleContent = tree.readContent('/projects/bar/src/app/app.module.ts');
       const pipeContent = tree.readContent('/projects/bar/src/app/foo.pipe.ts');
-      expect(pipeContent).toContain('standalone: true');
+      expect(pipeContent).not.toContain('standalone');
       expect(pipeContent).toContain('class FooPipe');
       expect(moduleContent).not.toContain('FooPipe');
     });
