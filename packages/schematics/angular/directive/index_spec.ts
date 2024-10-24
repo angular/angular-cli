@@ -107,7 +107,7 @@ describe('Directive Schematic', () => {
     const options = { ...defaultOptions, standalone: true };
     const tree = await schematicRunner.runSchematic('directive', options, appTree);
     const directiveContent = tree.readContent('/projects/bar/src/app/foo.directive.ts');
-    expect(directiveContent).toContain('standalone: true');
+    expect(directiveContent).not.toContain('standalone');
     expect(directiveContent).toContain('class FooDirective');
   });
 

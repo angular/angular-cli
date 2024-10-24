@@ -558,11 +558,10 @@ describe('Application Schematic', () => {
 
   it('should create a standalone component', async () => {
     const options = { ...defaultOptions, standalone: true };
-
     const tree = await schematicRunner.runSchematic('application', options, workspaceTree);
-
     const component = tree.readContent('/projects/foo/src/app/app.component.ts');
-    expect(component).toMatch(/standalone: true/);
+
+    expect(component).not.toContain('standalone');
   });
 
   it('should create routing information by default', async () => {
