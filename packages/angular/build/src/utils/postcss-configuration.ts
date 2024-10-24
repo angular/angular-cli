@@ -6,18 +6,19 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { readFile, readdir } from 'node:fs/promises';
+import { readdir } from 'node:fs/promises';
 import { join } from 'node:path';
+import type { AcceptedPlugin } from 'postcss';
 
 export interface PostcssConfiguration {
-  plugins: [name: string, options?: object | string][];
+  plugins: AcceptedPlugin[];
 }
 
-interface RawPostcssConfiguration {
-  plugins?: Record<string, object | boolean | string> | (string | [string, object])[];
-}
-
-const postcssConfigurationFiles: string[] = ['postcss.config.json', '.postcssrc.json'];
+const postcssConfigurationFiles: string[] = [
+  'postcss.config.js',
+  'postcss.config.cjs',
+  'postcss.config.mjs',
+];
 const tailwindConfigFiles: string[] = [
   'tailwind.config.js',
   'tailwind.config.cjs',
@@ -62,15 +63,6 @@ export function findTailwindConfiguration(
   return findFile(searchDirectories, tailwindConfigFiles);
 }
 
-async function readPostcssConfiguration(
-  configurationFile: string,
-): Promise<RawPostcssConfiguration> {
-  const data = await readFile(configurationFile, 'utf-8');
-  const config = JSON.parse(data) as RawPostcssConfiguration;
-
-  return config;
-}
-
 export async function loadPostcssConfiguration(
   searchDirectories: SearchDirectory[],
 ): Promise<PostcssConfiguration | undefined> {
@@ -79,44 +71,11 @@ export async function loadPostcssConfiguration(
     return undefined;
   }
 
-  const raw = await readPostcssConfiguration(configPath);
+  const config = await import(configPath);
 
   // If no plugins are defined, consider it equivalent to no configuration
-  if (!raw.plugins || typeof raw.plugins !== 'object') {
+  if (!config.plugins || !Array.isArray(config.plugins)) {
     return undefined;
-  }
-
-  // Normalize plugin array form
-  if (Array.isArray(raw.plugins)) {
-    if (raw.plugins.length < 1) {
-      return undefined;
-    }
-
-    const config: PostcssConfiguration = { plugins: [] };
-    for (const element of raw.plugins) {
-      if (typeof element === 'string') {
-        config.plugins.push([element]);
-      } else {
-        config.plugins.push(element);
-      }
-    }
-
-    return config;
-  }
-
-  // Normalize plugin object map form
-  const entries = Object.entries(raw.plugins);
-  if (entries.length < 1) {
-    return undefined;
-  }
-
-  const config: PostcssConfiguration = { plugins: [] };
-  for (const [name, options] of entries) {
-    if (!options || (typeof options !== 'object' && typeof options !== 'string')) {
-      continue;
-    }
-
-    config.plugins.push([name, options]);
   }
 
   return config;
