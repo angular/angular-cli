@@ -48,6 +48,7 @@ export class ComponentStylesheetBundler {
           );
 
           buildOptions.entryPoints = { [externalId]: entry };
+          buildOptions.entryNames = '[name]';
           delete buildOptions.publicPath;
         } else {
           buildOptions.entryPoints = [entry];
@@ -88,6 +89,7 @@ export class ComponentStylesheetBundler {
         });
         if (externalId) {
           buildOptions.entryPoints = { [externalId]: `${namespace};${entry}` };
+          buildOptions.entryNames = '[name]';
           delete buildOptions.publicPath;
         } else {
           buildOptions.entryPoints = [`${namespace};${entry}`];
