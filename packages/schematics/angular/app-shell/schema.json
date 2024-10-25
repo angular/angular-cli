@@ -12,6 +12,11 @@
       "$default": {
         "$source": "projectName"
       }
+    },
+    "serverRouting": {
+      "description": "Creates a server application using the Server Routing API (Developer Preview).",
+      "type": "boolean",
+      "default": false
     }
   },
   "required": ["project"]
