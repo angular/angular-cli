@@ -57,6 +57,10 @@
             "type": "boolean",
             "default": false,
             "description": "Whether or not this schematic can be called from an external schematic, or a tool. This implies hidden: true."
+          },
+          "version": {
+            "type": "string",
+            "description": "Used for an `ng update` migration schematic. Specifies in which version of the library the migration schematic will run when updating"
           }
         },
         "required": ["factory", "description"]
