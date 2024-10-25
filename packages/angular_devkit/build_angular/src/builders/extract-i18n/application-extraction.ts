@@ -53,8 +53,9 @@ export async function extractMessages(
   buildOptions.serviceWorker = false;
   buildOptions.server = undefined;
   buildOptions.ssr = false;
-  buildOptions.appShell = false;
-  buildOptions.prerender = false;
+  buildOptions.appShell = undefined;
+  buildOptions.prerender = undefined;
+  buildOptions.outputMode = undefined;
 
   const builderResult = await first(buildApplicationInternal(buildOptions, context));
 

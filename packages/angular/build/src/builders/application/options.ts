@@ -220,17 +220,17 @@ export async function normalizeOptions(
       options.ssr = false;
     }
 
-    if (options.prerender) {
+    if (options.prerender !== undefined) {
       context.logger.warn(
-        'The "prerender" option is no longer needed when "outputMode" is specified.',
+        'The "prerender" option is not considered when "outputMode" is specified.',
       );
-    } else {
-      options.prerender = !!options.server;
     }
 
-    if (options.appShell) {
+    options.prerender = !!options.server;
+
+    if (options.appShell !== undefined) {
       context.logger.warn(
-        'The "appShell" option is no longer needed when "outputMode" is specified.',
+        'The "appShell" option is not considered when "outputMode" is specified.',
       );
     }
   }
