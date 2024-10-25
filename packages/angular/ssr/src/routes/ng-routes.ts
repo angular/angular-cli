@@ -477,8 +477,6 @@ export async function getRoutesFromAngularRouterConfig(
           );
         }
       }
-    } else {
-      routesResults.push({ route: '', renderMode: RenderMode.Prerender });
     }
 
     return {
