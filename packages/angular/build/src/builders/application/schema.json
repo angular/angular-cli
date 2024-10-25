@@ -18,7 +18,18 @@
     },
     "server": {
       "type": "string",
-      "description": "The full path for the server entry point to the application, relative to the current workspace."
+      "description": "The full path for the server entry point to the application, relative to the current workspace.",
+      "oneOf": [
+        {
+          "type": "string",
+          "description": "The full path for the server entry point to the application, relative to the current workspace."
+        },
+        {
+          "const": false,
+          "type": "boolean",
+          "description": "Indicates that a server entry point is not provided."
+        }
+      ]
     },
     "polyfills": {
       "description": "A list of polyfills to include in the build. Can be a full path for a file, relative to the current workspace or module specifier. Example: 'zone.js'.",
