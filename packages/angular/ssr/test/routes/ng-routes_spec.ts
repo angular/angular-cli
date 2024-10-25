@@ -361,4 +361,18 @@ describe('extractRoutesAndCreateRouteTree', () => {
       `Both 'home' and 'shell' routes have their 'renderMode' set to 'AppShell'.`,
     );
   });
+
+  it('should apply RenderMode matching the wildcard when no Angular routes are defined', async () => {
+    setAngularAppTestingManifest([], [{ path: '**', renderMode: RenderMode.Server }]);
+
+    const { errors, routeTree } = await extractRoutesAndCreateRouteTree(
+      url,
+      /** manifest */ undefined,
+      /** invokeGetPrerenderParams */ false,
+      /** includePrerenderFallbackRoutes */ false,
+    );
+
+    expect(errors).toHaveSize(0);
+    expect(routeTree.toObject()).toEqual([{ route: '/', renderMode: RenderMode.Server }]);
+  });
 });
