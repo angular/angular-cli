@@ -39,6 +39,7 @@ export default async function () {
     projectName,
     '--skip-confirmation',
     '--skip-install',
+    '--server-routing',
   );
 
   await useSha();

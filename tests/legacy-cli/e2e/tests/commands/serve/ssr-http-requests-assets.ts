@@ -8,7 +8,7 @@ import { ngServe, useSha } from '../../../utils/project';
 export default async function () {
   // Forcibly remove in case another test doesn't clean itself up.
   await rimraf('node_modules/@angular/ssr');
-  await ng('add', '@angular/ssr', '--skip-confirmation');
+  await ng('add', '@angular/ssr', '--server-routing', '--skip-confirmation');
   await useSha();
   await installWorkspacePackages();
 

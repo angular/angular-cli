@@ -139,6 +139,10 @@
       "type": "boolean",
       "x-user-analytics": "ep.ng_ssr"
     },
+    "serverRouting": {
+      "description": "Creates a server application using the Server Routing and App Engine APIs (Developer Preview).",
+      "type": "boolean"
+    },
     "experimentalZoneless": {
       "description": "Create an application that does not utilize zone.js.",
       "type": "boolean",

@@ -15,6 +15,10 @@
       "description": "Skip installing dependency packages.",
       "type": "boolean",
       "default": false
+    },
+    "serverRouting": {
+      "description": "Creates a server application using the Server Routing and App Engine APIs (Developer Preview).",
+      "type": "boolean"
     }
   },
   "required": ["project"],

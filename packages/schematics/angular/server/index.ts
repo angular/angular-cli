@@ -14,9 +14,10 @@ import {
   apply,
   applyTemplates,
   chain,
+  filter,
   mergeWith,
   move,
-  renameTemplateFiles,
+  noop,
   strings,
   url,
 } from '@angular-devkit/schematics';
@@ -112,7 +113,9 @@ function updateConfigFileApplicationBuilder(options: ServerOptions): Rule {
       serverMainEntryName,
     );
 
-    buildTarget.options['outputMode'] = 'static';
+    if (options.serverRouting) {
+      buildTarget.options['outputMode'] = 'static';
+    }
   });
 }
 
@@ -191,6 +194,9 @@ export default function (options: ServerOptions): Rule {
     filesUrl += isStandalone ? 'standalone-src' : 'ngmodule-src';
 
     const templateSource = apply(url(filesUrl), [
+      options.serverRouting
+        ? noop()
+        : filter((path) => !path.endsWith('app.routes.server.ts.template')),
       applyTemplates({
         ...strings,
         ...options,
