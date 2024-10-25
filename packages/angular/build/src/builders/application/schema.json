@@ -536,7 +536,6 @@
     },
     "prerender": {
       "description": "Prerender (SSG) pages of your application during build time.",
-      "default": false,
       "oneOf": [
         {
           "type": "boolean",
@@ -586,8 +585,7 @@
     },
     "appShell": {
       "type": "boolean",
-      "description": "Generates an application shell during build time.",
-      "default": false
+      "description": "Generates an application shell during build time."
     },
     "outputMode": {
       "type": "string",
