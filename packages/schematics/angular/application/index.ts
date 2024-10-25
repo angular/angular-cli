@@ -101,6 +101,7 @@ export default function (options: ApplicationOptions): Rule {
       options.ssr
         ? schematic('ssr', {
             project: options.name,
+            serverRouting: options.serverRouting,
             skipInstall: true,
           })
         : noop(),

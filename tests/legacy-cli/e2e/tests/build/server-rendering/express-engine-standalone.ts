@@ -8,7 +8,7 @@ import { updateJsonFile, updateServerFileForWebpack, useSha } from '../../../uti
 export default async function () {
   // forcibly remove in case another test doesn't clean itself up
   await rimraf('node_modules/@angular/ssr');
-  await ng('add', '@angular/ssr', '--skip-confirmation', '--skip-install');
+  await ng('add', '@angular/ssr', '--server-routing', '--skip-confirmation', '--skip-install');
 
   const useWebpackBuilder = !getGlobalVariable('argv')['esbuild'];
   if (!useWebpackBuilder) {

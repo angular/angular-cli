@@ -29,7 +29,8 @@ import {
 import { applyToUpdateRecorder } from '../utility/change';
 import { getAppModulePath, isStandaloneApp } from '../utility/ng-ast-utils';
 import { findBootstrapApplicationCall, getMainFilePath } from '../utility/standalone/util';
-import { getWorkspace } from '../utility/workspace';
+import { getWorkspace, updateWorkspace } from '../utility/workspace';
+import { Builders } from '../utility/workspace-models';
 import { Schema as AppShellOptions } from './schema';
 
 const APP_SHELL_ROUTE = 'shell';
@@ -167,6 +168,29 @@ function getMetadataProperty(metadata: ts.Node, propertyName: string): ts.Proper
   })[0];
 
   return property;
+}
+
+function addAppShellConfigToWorkspace(options: AppShellOptions): Rule {
+  return updateWorkspace((workspace) => {
+    const project = workspace.projects.get(options.project);
+    if (!project) {
+      return;
+    }
+    const buildTarget = project.targets.get('build');
+    if (
+      buildTarget?.builder === Builders.Application ||
+      buildTarget?.builder === Builders.BuildApplication
+    ) {
+      // Application builder configuration.
+      const prodConfig = buildTarget.configurations?.production;
+      if (!prodConfig) {
+        throw new SchematicsException(
+          `A "production" configuration is not defined for the "build" builder.`,
+        );
+      }
+      prodConfig.appShell = true;
+    }
+  });
 }
 
 function addServerRoutes(options: AppShellOptions): Rule {
@@ -349,9 +373,12 @@ export default function (options: AppShellOptions): Rule {
     return chain([
       validateProject(browserEntryPoint),
       schematic('server', options),
-      isStandalone ? noop() : addRouterModule(browserEntryPoint),
-      isStandalone ? addStandaloneServerRoute(options) : addServerRoutes(options),
-      addServerRoutingConfig(options),
+      ...(isStandalone
+        ? [addStandaloneServerRoute(options)]
+        : [addRouterModule(browserEntryPoint), addServerRoutes(options)]),
+      options.serverRouting
+        ? addServerRoutingConfig(options)
+        : addAppShellConfigToWorkspace(options),
       schematic('component', {
         name: 'app-shell',
         module: 'app.module.server.ts',
