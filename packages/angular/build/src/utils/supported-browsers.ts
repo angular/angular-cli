@@ -12,13 +12,14 @@ export function getSupportedBrowsers(
   projectRoot: string,
   logger: { warn(message: string): void },
 ): string[] {
+  // This list should match the last 2 versions of the browsers we support at the release.
   browserslist.defaults = [
-    'last 2 Chrome versions',
-    'last 1 Firefox version',
-    'last 2 Edge major versions',
-    'last 2 Safari major versions',
-    'last 2 iOS major versions',
-    'last 2 Android major versions',
+    'Chrome >= 127',
+    'Edge >= 127',
+    'Firefox >= 129',
+    'Safari >= 16',
+    'ios >= 16',
+    'Android >= 127',
     'Firefox ESR',
   ];
 
