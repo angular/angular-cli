@@ -117,6 +117,12 @@
       "schema": "./library/schema.json",
       "description": "Generate a library project for Angular."
     },
+    "library-secondary-entrypoint": {
+      "aliases": ["secondary"],
+      "factory": "./secondary-entrypoint",
+      "schema": "./secondary-entrypoint/schema.json",
+      "description": "Generate a secondary-entrypoint in a library project for Angular."
+    },
     "web-worker": {
       "factory": "./web-worker",
       "schema": "./web-worker/schema.json",
