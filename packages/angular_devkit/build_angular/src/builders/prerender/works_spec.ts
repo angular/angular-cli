@@ -212,7 +212,7 @@ describe('Prerender Builder', () => {
       /<style>p{color:#000}<\/style><link rel="stylesheet" href="styles\.\w+\.css" media="print" onload="this\.media='all'">/,
     );
 
-    // Validate that critters does not process already critical css inlined stylesheets.
+    // Validate that beasties does not process already critical css inlined stylesheets.
     expect(content).not.toContain(`onload="this.media='print'">`);
     expect(content).not.toContain(`media="print"></noscript>`);
   });
