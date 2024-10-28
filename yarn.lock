@@ -764,7 +764,7 @@ __metadata:
     quicktype-core: "npm:23.0.170"
     resolve-url-loader: "npm:5.0.0"
     rollup: "npm:4.24.2"
-    rollup-license-plugin: "npm:^3.0.0"
+    rollup-license-plugin: "patch:rollup-license-plugin@npm%3A3.0.0#~/.yarn/patches/rollup-license-plugin-npm-3.0.0-038e5f6edc.patch"
     rollup-plugin-sourcemaps: "npm:^0.6.0"
     rxjs: "npm:7.8.1"
     sass: "npm:1.80.4"
@@ -16104,7 +16104,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"rollup-license-plugin@npm:^3.0.0":
+"rollup-license-plugin@npm:3.0.0":
   version: 3.0.0
   resolution: "rollup-license-plugin@npm:3.0.0"
   dependencies:
@@ -16112,6 +16112,17 @@ __metadata:
     node-fetch: "npm:^3.3.2"
     spdx-expression-validate: "npm:^2.0.0"
   checksum: 10c0/b7cd7d336acbd8530ad0583e057c72f9b05e9f274f9cec1f36ad936ea2043503c32bf26b68b496e616447775d747e8d31957cc503c9c35ef7b43630e2e457078
+  languageName: node
+  linkType: hard
+
+"rollup-license-plugin@patch:rollup-license-plugin@npm%3A3.0.0#~/.yarn/patches/rollup-license-plugin-npm-3.0.0-038e5f6edc.patch":
+  version: 3.0.0
+  resolution: "rollup-license-plugin@patch:rollup-license-plugin@npm%3A3.0.0#~/.yarn/patches/rollup-license-plugin-npm-3.0.0-038e5f6edc.patch::version=3.0.0&hash=be9ba3"
+  dependencies:
+    get-npm-tarball-url: "npm:^2.1.0"
+    node-fetch: "npm:^3.3.2"
+    spdx-expression-validate: "npm:^2.0.0"
+  checksum: 10c0/d4f340c704cce97ba36251f43859945c15e5865edacdca71da2470067041ea66bda792a5da63ea02e5d72713731e1a42a898b517fd3ffc59f6887fc1491516b0
   languageName: node
   linkType: hard
 
