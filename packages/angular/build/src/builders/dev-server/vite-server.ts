@@ -42,7 +42,7 @@ import type { DevServerBuilderOutput } from './output';
 interface OutputFileRecord {
   contents: Uint8Array;
   size: number;
-  hash?: string;
+  hash: string;
   updated: boolean;
   servable: boolean;
   type: BuildOutputFileType;
@@ -540,6 +540,7 @@ function analyzeResultFiles(
         contents: file.contents,
         servable,
         size: file.contents.byteLength,
+        hash: file.hash,
         type: file.type,
         updated: false,
       });
