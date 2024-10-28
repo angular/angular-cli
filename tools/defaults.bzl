@@ -25,7 +25,7 @@ NPM_PACKAGE_SUBSTITUTIONS = {
     "0.0.0-ENGINES-NPM": RELEASE_ENGINES_NPM,
     "0.0.0-ENGINES-YARN": RELEASE_ENGINES_YARN,
     # The below is needed for @angular/ssr FESM file.
-    "\\./(.+)/packages/angular/ssr/third_party/critters": "../third_party/critters/index.js",
+    "\\./(.+)/packages/angular/ssr/third_party/beasties": "../third_party/beasties/index.js",
 }
 
 NO_STAMP_PACKAGE_SUBSTITUTIONS = dict(NPM_PACKAGE_SUBSTITUTIONS, **{

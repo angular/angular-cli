@@ -21,7 +21,7 @@ jasmine_node_test(
 )
 
 genrule(
-    name = "critters_license_file",
+    name = "beasties_license_file",
     srcs = [
         "//packages/angular/ssr:npm_package",
     ],
@@ -29,30 +29,30 @@ genrule(
         "THIRD_PARTY_LICENSES.txt",
     ],
     cmd = """
-      cp $(location //packages/angular/ssr:npm_package)/third_party/critters/THIRD_PARTY_LICENSES.txt $(location :THIRD_PARTY_LICENSES.txt)
+      cp $(location //packages/angular/ssr:npm_package)/third_party/beasties/THIRD_PARTY_LICENSES.txt $(location :THIRD_PARTY_LICENSES.txt)
     """,
 )
 
 diff_test(
-    name = "critters_license_test",
+    name = "beasties_license_test",
     failure_message = """
 
     To accept the new golden file, execute:
-    yarn bazel run //packages/angular/ssr/test/npm_package:critters_license_test.accept
+    yarn bazel run //packages/angular/ssr/test/npm_package:beasties_license_test.accept
     """,
     file1 = ":THIRD_PARTY_LICENSES.txt.golden",
-    file2 = ":critters_license_file",
+    file2 = ":beasties_license_file",
 )
 
 write_file(
-    name = "critters_license_test.accept",
-    out = "critters_license_file_accept.sh",
+    name = "beasties_license_test.accept",
+    out = "beasties_license_file_accept.sh",
     content =
         [
             "#!/usr/bin/env bash",
             "cd ${BUILD_WORKSPACE_DIRECTORY}",
             "yarn bazel build //packages/angular/ssr:npm_package",
-            "cp -fv dist/bin/packages/angular/ssr/npm_package/third_party/critters/THIRD_PARTY_LICENSES.txt packages/angular/ssr/test/npm_package/THIRD_PARTY_LICENSES.txt.golden",
+            "cp -fv dist/bin/packages/angular/ssr/npm_package/third_party/beasties/THIRD_PARTY_LICENSES.txt packages/angular/ssr/test/npm_package/THIRD_PARTY_LICENSES.txt.golden",
         ],
     is_executable = True,
 )

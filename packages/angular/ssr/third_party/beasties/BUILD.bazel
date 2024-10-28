@@ -4,13 +4,13 @@ load("//tools:defaults.bzl", "js_library")
 package(default_visibility = ["//visibility:public"])
 
 esbuild(
-    name = "bundled_critters",
+    name = "bundled_beasties",
     config = ":esbuild_config",
-    entry_point = "@npm//:node_modules/critters/dist/critters.mjs",
+    entry_point = "@npm//:node_modules/beasties/dist/index.mjs",
     metafile = True,
     splitting = True,
     deps = [
-        "@npm//critters",
+        "@npm//beasties",
         "@npm//unenv",
     ],
 )
@@ -21,21 +21,21 @@ esbuild_config(
 )
 
 js_library(
-    name = "bundled_critters_lib",
+    name = "bundled_beasties_lib",
     srcs = [
         "index.d.ts",
-        ":bundled_critters_files",
+        ":bundled_beasties_files",
     ],
     deps = [
-        "@npm//critters",
+        "@npm//beasties",
     ],
 )
 
 # Filter out esbuild metadata files and only copy the necessary files
 genrule(
-    name = "bundled_critters_files",
+    name = "bundled_beasties_files",
     srcs = [
-        ":bundled_critters",
+        ":bundled_beasties",
     ],
     outs = [
         "index.js",
@@ -43,9 +43,9 @@ genrule(
         "THIRD_PARTY_LICENSES.txt",
     ],
     cmd = """
-        for f in $(locations :bundled_critters); do
-            # Only process files inside the bundled_critters directory
-            if [[ "$${f}" == *bundled_critters ]]; then
+        for f in $(locations :bundled_beasties); do
+            # Only process files inside the bundled_beasties directory
+            if [[ "$${f}" == *bundled_beasties ]]; then
                 cp "$${f}/index.js" $(location :index.js)
                 cp "$${f}/index.js.map" $(location :index.js.map)
                 cp "$${f}/THIRD_PARTY_LICENSES.txt" $(location :THIRD_PARTY_LICENSES.txt)
