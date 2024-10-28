@@ -119,11 +119,21 @@ export function createAngularAssetsMiddleware(
           }
         }
 
+        // Avoid resending the content if it has not changed since last request
+        const etag = `W/"${outputFile.contents.byteLength}-${outputFile.hash}"`;
+        if (req.headers['if-none-match'] === etag) {
+          res.statusCode = 304;
+          res.end();
+
+          return;
+        }
+
         const mimeType = lookupMimeType(extension);
         if (mimeType) {
           res.setHeader('Content-Type', mimeType);
         }
         res.setHeader('Cache-Control', 'no-cache');
+        res.setHeader('ETag', etag);
         res.end(data);
 
         return;
