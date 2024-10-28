@@ -78,6 +78,13 @@ export function createAngularAssetsMiddleware(
           // Inject component ID for view encapsulation if requested
           const componentId = new URL(req.url, 'http://localhost').searchParams.get('ngcomp');
           if (componentId !== null) {
+            const etag = `W/"${outputFile.contents.byteLength}-${outputFile.hash}-${componentId}"`;
+            if (req.headers['if-none-match'] === etag) {
+              res.statusCode = 304;
+              res.end();
+
+              return;
+            }
             // Record the component style usage for HMR updates
             const usedIds = usedComponentStyles.get(pathname);
             if (usedIds === undefined) {
@@ -98,6 +105,7 @@ export function createAngularAssetsMiddleware(
 
                     res.setHeader('Content-Type', 'text/css');
                     res.setHeader('Cache-Control', 'no-cache');
+                    res.setHeader('ETag', etag);
                     res.end(encapsulatedData);
                   })
                   .catch((e) => next(e));
