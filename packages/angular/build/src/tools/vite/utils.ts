@@ -9,7 +9,10 @@
 import { lookup as lookupMimeType } from 'mrmime';
 import { extname } from 'node:path';
 
-export type AngularMemoryOutputFiles = Map<string, { contents: Uint8Array; servable: boolean }>;
+export type AngularMemoryOutputFiles = Map<
+  string,
+  { contents: Uint8Array; hash: string; servable: boolean }
+>;
 
 export function pathnameWithoutBasePath(url: string, basePath: string): string {
   const parsedUrl = new URL(url, 'http://localhost');
