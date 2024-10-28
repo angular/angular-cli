@@ -18,8 +18,8 @@ export default {
   entryNames: 'index',
   legalComments: 'eof',
   alias: {
-    fs,
-    path,
+    'node:fs': fs,
+    'node:path': path,
   },
   plugins: [
     {

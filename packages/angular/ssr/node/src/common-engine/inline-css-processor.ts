@@ -13,7 +13,7 @@ export class CommonEngineInlineCriticalCssProcessor {
   private readonly resourceCache = new Map<string, string>();
 
   async process(html: string, outputPath: string | undefined): Promise<string> {
-    const critters = new InlineCriticalCssProcessor(async (path) => {
+    const beasties = new InlineCriticalCssProcessor(async (path) => {
       let resourceContent = this.resourceCache.get(path);
       if (resourceContent === undefined) {
         resourceContent = await readFile(path, 'utf-8');
@@ -23,6 +23,6 @@ export class CommonEngineInlineCriticalCssProcessor {
       return resourceContent;
     }, outputPath);
 
-    return critters.process(html);
+    return beasties.process(html);
   }
 }
