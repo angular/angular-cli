@@ -661,11 +661,13 @@ __metadata:
     "@bazel/buildifier": "npm:7.3.1"
     "@bazel/concatjs": "patch:@bazel/concatjs@npm%3A5.8.1#~/.yarn/patches/@bazel-concatjs-npm-5.8.1-1bf81df846.patch"
     "@bazel/jasmine": "patch:@bazel/jasmine@npm%3A5.8.1#~/.yarn/patches/@bazel-jasmine-npm-5.8.1-3370fee155.patch"
+    "@bazel/rollup": "npm:^5.8.1"
     "@bazel/runfiles": "npm:^5.8.1"
     "@discoveryjs/json-ext": "npm:0.6.2"
     "@inquirer/confirm": "npm:5.0.0"
     "@inquirer/prompts": "npm:7.0.0"
     "@listr2/prompt-adapter-inquirer": "npm:2.0.17"
+    "@rollup/plugin-alias": "npm:^5.1.1"
     "@rollup/plugin-commonjs": "npm:^28.0.0"
     "@rollup/plugin-node-resolve": "npm:^13.0.5"
     "@stylistic/eslint-plugin": "npm:^2.8.0"
@@ -762,6 +764,7 @@ __metadata:
     quicktype-core: "npm:23.0.170"
     resolve-url-loader: "npm:5.0.0"
     rollup: "npm:4.24.0"
+    rollup-license-plugin: "npm:^3.0.0"
     rollup-plugin-sourcemaps: "npm:^0.6.0"
     rxjs: "npm:7.8.1"
     sass: "npm:1.80.4"
@@ -2568,6 +2571,19 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@bazel/rollup@npm:^5.8.1":
+  version: 5.8.1
+  resolution: "@bazel/rollup@npm:5.8.1"
+  dependencies:
+    "@bazel/worker": "npm:5.8.1"
+  peerDependencies:
+    rollup: ">=2.3.0 <3.0.0"
+  bin:
+    rollup-worker: index.js
+  checksum: 10c0/e81b89abb4c7403871bbec1cf3bc0ebd767126f56a9701167c701c23d6ff58b22a65ce258d4ebe146dfa9ee45afcb636ebbbf54fd9098886e1f09d9df342e8ca
+  languageName: node
+  linkType: hard
+
 "@bazel/runfiles@npm:5.8.1, @bazel/runfiles@npm:^5.8.1":
   version: 5.8.1
   resolution: "@bazel/runfiles@npm:5.8.1"
@@ -4349,6 +4365,18 @@ __metadata:
   bin:
     browsers: lib/cjs/main-cli.js
   checksum: 10c0/62227a4e3104d8bc8fbd6cd008ff82d63d8b8747ee6bba544d905c86d86b0ff005a1dfb6abbe1db80723733f338a55dd5719b12333f4332c0c7a1f6b007ed660
+  languageName: node
+  linkType: hard
+
+"@rollup/plugin-alias@npm:^5.1.1":
+  version: 5.1.1
+  resolution: "@rollup/plugin-alias@npm:5.1.1"
+  peerDependencies:
+    rollup: ^1.20.0||^2.0.0||^3.0.0||^4.0.0
+  peerDependenciesMeta:
+    rollup:
+      optional: true
+  checksum: 10c0/00592400563b65689631e820bd72ff440f5cd21021bbd2f21b8558582ab58fd109067da77000091e40fcb8c20cabcd3a09b239a30e012bb47f6bc1a15b68ca59
   languageName: node
   linkType: hard
 
@@ -10483,6 +10511,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"get-npm-tarball-url@npm:^2.1.0":
+  version: 2.1.0
+  resolution: "get-npm-tarball-url@npm:2.1.0"
+  checksum: 10c0/af779fa5b9c89a3deaf9640630a23368f5ba6a028a1179872aaf581a59485fb2c2c6bd9b94670de228cfc5f23600c89a01e594879085f7fb4dddf820a63105b8
+  languageName: node
+  linkType: hard
+
 "get-stream@npm:^5.1.0":
   version: 5.2.0
   resolution: "get-stream@npm:5.2.0"
@@ -13717,7 +13752,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"node-fetch@npm:*":
+"node-fetch@npm:*, node-fetch@npm:^3.3.2":
   version: 3.3.2
   resolution: "node-fetch@npm:3.3.2"
   dependencies:
@@ -15756,6 +15791,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"rollup-license-plugin@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "rollup-license-plugin@npm:3.0.0"
+  dependencies:
+    get-npm-tarball-url: "npm:^2.1.0"
+    node-fetch: "npm:^3.3.2"
+    spdx-expression-validate: "npm:^2.0.0"
+  checksum: 10c0/b7cd7d336acbd8530ad0583e057c72f9b05e9f274f9cec1f36ad936ea2043503c32bf26b68b496e616447775d747e8d31957cc503c9c35ef7b43630e2e457078
+  languageName: node
+  linkType: hard
+
 "rollup-plugin-sourcemaps@npm:^0.6.0":
   version: 0.6.3
   resolution: "rollup-plugin-sourcemaps@npm:0.6.3"
@@ -16632,6 +16678,15 @@ __metadata:
     spdx-exceptions: "npm:^2.1.0"
     spdx-license-ids: "npm:^3.0.0"
   checksum: 10c0/965c487e77f4fb173f1c471f3eef4eb44b9f0321adc7f93d95e7620da31faa67d29356eb02523cd7df8a7fc1ec8238773cdbf9e45bd050329d2b26492771b736
+  languageName: node
+  linkType: hard
+
+"spdx-expression-validate@npm:^2.0.0":
+  version: 2.0.0
+  resolution: "spdx-expression-validate@npm:2.0.0"
+  dependencies:
+    spdx-expression-parse: "npm:^3.0.0"
+  checksum: 10c0/fd1e8555e034be72c3a52bd306d04e6035e5d257bea6d39a77d391d236700d32a4647bd1391fc1eaa50c22a67aba6d1004a7569af02e499c8a3afda0bcdb6144
   languageName: node
   linkType: hard
 
