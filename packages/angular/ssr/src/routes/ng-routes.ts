@@ -11,16 +11,11 @@ import {
   ApplicationRef,
   Compiler,
   Injector,
-  createPlatformFactory,
-  platformCore,
   runInInjectionContext,
   ɵwhenStable as whenStable,
   ɵConsole,
 } from '@angular/core';
-import {
-  INITIAL_CONFIG,
-  ɵINTERNAL_SERVER_PLATFORM_PROVIDERS as INTERNAL_SERVER_PLATFORM_PROVIDERS,
-} from '@angular/platform-server';
+import { INITIAL_CONFIG, platformServer } from '@angular/platform-server';
 import { Route, Router, ɵloadChildren as loadChildrenHelper } from '@angular/router';
 import { ServerAssets } from '../assets';
 import { Console } from '../console';
@@ -377,7 +372,7 @@ export async function getRoutesFromAngularRouterConfig(
   const { protocol, host } = url;
 
   // Create and initialize the Angular platform for server-side rendering.
-  const platformRef = createPlatformFactory(platformCore, 'server', [
+  const platformRef = platformServer([
     {
       provide: INITIAL_CONFIG,
       useValue: { document, url: `${protocol}//${host}/` },
@@ -386,8 +381,7 @@ export async function getRoutesFromAngularRouterConfig(
       provide: ɵConsole,
       useFactory: () => new Console(),
     },
-    ...INTERNAL_SERVER_PLATFORM_PROVIDERS,
-  ])();
+  ]);
 
   try {
     let applicationRef: ApplicationRef;
