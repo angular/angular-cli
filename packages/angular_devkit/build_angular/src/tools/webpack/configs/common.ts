@@ -299,7 +299,10 @@ export async function getCommonConfig(wco: WebpackConfigOptions): Promise<Config
   if (scriptsOptimization) {
     extraMinimizers.push(
       new JavaScriptOptimizerPlugin({
-        define: buildOptions.aot ? GLOBAL_DEFS_FOR_TERSER_WITH_AOT : GLOBAL_DEFS_FOR_TERSER,
+        define: {
+          ...(buildOptions.aot ? GLOBAL_DEFS_FOR_TERSER_WITH_AOT : GLOBAL_DEFS_FOR_TERSER),
+          'ngServerMode': isPlatformServer,
+        },
         sourcemap: scriptsSourceMap,
         supportedBrowsers: buildOptions.supportedBrowsers,
         keepIdentifierNames: !allowMangle || isPlatformServer,
