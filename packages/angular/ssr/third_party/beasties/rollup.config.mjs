@@ -23,8 +23,6 @@ const EXTRACTION_FILE_SEPARATOR = '-'.repeat(80) + '\n';
 
 const { path, fs } = nodeless.alias;
 
-console.warn(process.env);
-
 export default {
   plugins: [
     nodeResolve({
