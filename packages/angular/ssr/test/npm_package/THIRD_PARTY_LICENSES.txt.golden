@@ -1,7 +1,7 @@
 
 --------------------------------------------------------------------------------
 Package: beasties
-License: "Apache-2.0"
+License: Apache-2.0
 
 Apache License
                            Version 2.0, January 2004
@@ -207,12 +207,12 @@ Apache License
    limitations under the License.
 --------------------------------------------------------------------------------
 Package: boolbase
-License: "ISC"
+License: ISC
 
 
 --------------------------------------------------------------------------------
 Package: css-select
-License: "BSD-2-Clause"
+License: BSD-2-Clause
 
 Copyright (c) Felix Böhm
 All rights reserved.
@@ -227,7 +227,7 @@ THIS IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRE
 EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 --------------------------------------------------------------------------------
 Package: css-what
-License: "BSD-2-Clause"
+License: BSD-2-Clause
 
 Copyright (c) Felix Böhm
 All rights reserved.
@@ -242,7 +242,7 @@ THIS IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRE
 EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 --------------------------------------------------------------------------------
 Package: dom-serializer
-License: "MIT"
+License: MIT
 
 License
 
@@ -257,7 +257,7 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 --------------------------------------------------------------------------------
 Package: domelementtype
-License: "BSD-2-Clause"
+License: BSD-2-Clause
 
 Copyright (c) Felix Böhm
 All rights reserved.
@@ -272,7 +272,7 @@ THIS IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRE
 EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 --------------------------------------------------------------------------------
 Package: domhandler
-License: "BSD-2-Clause"
+License: BSD-2-Clause
 
 Copyright (c) Felix Böhm
 All rights reserved.
@@ -287,7 +287,7 @@ THIS IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRE
 EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 --------------------------------------------------------------------------------
 Package: domutils
-License: "BSD-2-Clause"
+License: BSD-2-Clause
 
 Copyright (c) Felix Böhm
 All rights reserved.
@@ -302,7 +302,7 @@ THIS IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRE
 EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 --------------------------------------------------------------------------------
 Package: entities
-License: "BSD-2-Clause"
+License: BSD-2-Clause
 
 Copyright (c) Felix Böhm
 All rights reserved.
@@ -317,7 +317,7 @@ THIS IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRE
 EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 --------------------------------------------------------------------------------
 Package: htmlparser2
-License: "MIT"
+License: MIT
 
 Copyright 2010, 2011, Chris Winberry <chris@winberry.net>. All rights reserved.
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -339,7 +339,7 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 IN THE SOFTWARE.
 --------------------------------------------------------------------------------
 Package: nanoid
-License: "MIT"
+License: MIT
 
 The MIT License (MIT)
 
@@ -363,7 +363,7 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 --------------------------------------------------------------------------------
 Package: nth-check
-License: "BSD-2-Clause"
+License: BSD-2-Clause
 
 Copyright (c) Felix Böhm
 All rights reserved.
@@ -378,7 +378,7 @@ THIS IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRE
 EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 --------------------------------------------------------------------------------
 Package: pathe
-License: "MIT"
+License: MIT
 
 MIT License
 
@@ -426,7 +426,7 @@ OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 USE OR OTHER DEALINGS IN THE SOFTWARE.
 --------------------------------------------------------------------------------
 Package: picocolors
-License: "ISC"
+License: ISC
 
 ISC License
 
@@ -445,7 +445,7 @@ ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 --------------------------------------------------------------------------------
 Package: postcss
-License: "MIT"
+License: MIT
 
 The MIT License (MIT)
 
@@ -469,12 +469,12 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 --------------------------------------------------------------------------------
 Package: postcss-media-query-parser
-License: "MIT"
+License: MIT
 
 
 --------------------------------------------------------------------------------
 Package: unenv
-License: "MIT"
+License: MIT
 
 MIT License
 

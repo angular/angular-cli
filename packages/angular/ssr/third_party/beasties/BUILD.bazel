@@ -1,24 +1,7 @@
-load("@npm//@angular/build-tooling/bazel/esbuild:index.bzl", "esbuild", "esbuild_config")
+load("@npm//@bazel/rollup:index.bzl", "rollup_bundle")
 load("//tools:defaults.bzl", "js_library")
 
 package(default_visibility = ["//visibility:public"])
-
-esbuild(
-    name = "bundled_beasties",
-    config = ":esbuild_config",
-    entry_point = "@npm//:node_modules/beasties/dist/index.mjs",
-    metafile = True,
-    splitting = True,
-    deps = [
-        "@npm//beasties",
-        "@npm//unenv",
-    ],
-)
-
-esbuild_config(
-    name = "esbuild_config",
-    config_file = "esbuild.config.mjs",
-)
 
 js_library(
     name = "bundled_beasties_lib",
@@ -52,4 +35,24 @@ genrule(
             fi
         done
     """,
+)
+
+rollup_bundle(
+    name = "bundled_beasties",
+    config_file = ":rollup.config.mjs",
+    entry_points = {
+        "@npm//:node_modules/beasties/dist/index.mjs": "index",
+    },
+    format = "esm",
+    link_workspace_root = True,
+    output_dir = True,
+    sourcemap = "true",
+    deps = [
+        "@npm//@rollup/plugin-alias",
+        "@npm//@rollup/plugin-commonjs",
+        "@npm//@rollup/plugin-node-resolve",
+        "@npm//beasties",
+        "@npm//rollup-license-plugin",
+        "@npm//unenv",
+    ],
 )
