@@ -245,21 +245,6 @@ export function augmentHostWithSubstitutions(
   };
 }
 
-export function augmentHostWithVersioning(host: ts.CompilerHost): void {
-  const baseGetSourceFile = host.getSourceFile;
-  host.getSourceFile = function (...parameters) {
-    const file: (ts.SourceFile & { version?: string }) | undefined = baseGetSourceFile.call(
-      host,
-      ...parameters,
-    );
-    if (file && file.version === undefined) {
-      file.version = createHash('sha256').update(file.text).digest('hex');
-    }
-
-    return file;
-  };
-}
-
 export function augmentProgramWithVersioning(program: ts.Program): void {
   const baseGetSourceFiles = program.getSourceFiles;
   program.getSourceFiles = function (...parameters) {
