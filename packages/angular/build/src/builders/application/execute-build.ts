@@ -10,7 +10,11 @@ import { BuilderContext } from '@angular-devkit/architect';
 import assert from 'node:assert';
 import { SourceFileCache } from '../../tools/esbuild/angular/source-file-cache';
 import { generateBudgetStats } from '../../tools/esbuild/budget-stats';
-import { BuildOutputFileType, BundlerContext } from '../../tools/esbuild/bundler-context';
+import {
+  BuildOutputFileType,
+  BundleContextResult,
+  BundlerContext,
+} from '../../tools/esbuild/bundler-context';
 import { ExecutionResult, RebuildState } from '../../tools/esbuild/bundler-execution-result';
 import { checkCommonJSModules } from '../../tools/esbuild/commonjs-checker';
 import { extractLicenses } from '../../tools/esbuild/license-extractor';
@@ -86,6 +90,23 @@ export async function executeBuild(
     rebuildState?.fileChanges.all,
   );
 
+  if (rebuildState && options.externalRuntimeStyles) {
+    const invalidatedStylesheetEntries = componentStyleBundler.invalidate(
+      rebuildState.fileChanges.all,
+    );
+
+    if (invalidatedStylesheetEntries?.length) {
+      const componentResults: BundleContextResult[] = [];
+      for (const stylesheetFile of invalidatedStylesheetEntries) {
+        // externalId is already linked in the bundler context so only enabling is required here
+        const result = await componentStyleBundler.bundleFile(stylesheetFile, true, true);
+        componentResults.push(result);
+      }
+
+      bundlingResult = BundlerContext.mergeResults([bundlingResult, ...componentResults]);
+    }
+  }
+
   if (options.optimizationOptions.scripts && shouldOptimizeChunks) {
     bundlingResult = await profileAsync('OPTIMIZE_CHUNKS', () =>
       optimizeChunks(
@@ -101,6 +122,11 @@ export async function executeBuild(
     codeBundleCache,
   );
   executionResult.addWarnings(bundlingResult.warnings);
+
+  // Add used external component style referenced files to be watched
+  if (options.externalRuntimeStyles) {
+    executionResult.extraWatchFiles.push(...componentStyleBundler.collectReferencedFiles());
+  }
 
   // Return if the bundling has errors
   if (bundlingResult.errors) {
