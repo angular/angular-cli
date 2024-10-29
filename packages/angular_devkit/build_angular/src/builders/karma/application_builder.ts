@@ -123,7 +123,9 @@ export function execute(
     switchMap(
       ([karma, karmaConfig, buildOptions]) =>
         new Observable<BuilderOutput>((subscriber) => {
-          if (options.watch) {
+          // If `--watch` is explicitly enabled or if we are keeping the Karma
+          // process running, we should hook Karma into the build.
+          if (options.watch ?? !karmaConfig.singleRun) {
             injectKarmaReporter(context, buildOptions, karmaConfig, subscriber);
           }
 
