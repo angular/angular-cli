@@ -42,6 +42,11 @@
       "schema": "./src/builders/web-test-runner/schema.json",
       "description": "Run unit tests with Web Test Runner."
     },
+    "protractor": {
+      "implementation": "./src/builders/protractor-error",
+      "schema": "./src/builders/protractor/schema.json",
+      "description": "Throw an error that Protractor is end-of-life and no longer supported."
+    },
     "private-protractor": {
       "implementation": "./src/builders/protractor",
       "schema": "./src/builders/protractor/schema.json",
