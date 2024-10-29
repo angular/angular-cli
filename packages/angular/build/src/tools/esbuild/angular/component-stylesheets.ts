@@ -6,11 +6,15 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { OutputFile } from 'esbuild';
 import assert from 'node:assert';
 import { createHash } from 'node:crypto';
 import path from 'node:path';
-import { BuildOutputFileType, BundleContextResult, BundlerContext } from '../bundler-context';
+import {
+  BuildOutputFile,
+  BuildOutputFileType,
+  BundleContextResult,
+  BundlerContext,
+} from '../bundler-context';
 import { MemoryCache } from '../cache';
 import {
   BundleStylesheetOptions,
@@ -37,7 +41,14 @@ export class ComponentStylesheetBundler {
     private readonly incremental: boolean,
   ) {}
 
-  async bundleFile(entry: string, externalId?: string | boolean) {
+  /**
+   * Bundle a file-based component stylesheet for use within an AOT compiled Angular application.
+   * @param entry The file path of the stylesheet.
+   * @param externalId Either an external identifier string for initial bundling or a boolean for rebuilds, if external.
+   * @param direct If true, the output will be used directly by the builder; false if used inside the compiler plugin.
+   * @returns A component bundle result object.
+   */
+  async bundleFile(entry: string, externalId?: string | boolean, direct?: boolean) {
     const bundlerContext = await this.#fileContexts.getOrCreate(entry, () => {
       return new BundlerContext(this.options.workspaceRoot, this.incremental, (loadCache) => {
         const buildOptions = createStylesheetBundleOptions(this.options, loadCache);
@@ -62,6 +73,7 @@ export class ComponentStylesheetBundler {
       await bundlerContext.bundle(),
       bundlerContext.watchFiles,
       !!externalId,
+      !!direct,
     );
   }
 
@@ -127,6 +139,7 @@ export class ComponentStylesheetBundler {
       await bundlerContext.bundle(),
       bundlerContext.watchFiles,
       !!externalId,
+      false,
     );
   }
 
@@ -156,6 +169,15 @@ export class ComponentStylesheetBundler {
     return entries;
   }
 
+  collectReferencedFiles(): string[] {
+    const files = [];
+    for (const context of this.#fileContexts.values()) {
+      files.push(...context.watchFiles);
+    }
+
+    return files;
+  }
+
   async dispose(): Promise<void> {
     const contexts = [...this.#fileContexts.values(), ...this.#inlineContexts.values()];
     this.#fileContexts.clear();
@@ -168,61 +190,70 @@ export class ComponentStylesheetBundler {
     result: BundleContextResult,
     referencedFiles: Set<string> | undefined,
     external: boolean,
+    direct: boolean,
   ) {
     let contents = '';
-    let metafile;
-    const outputFiles: OutputFile[] = [];
+    const outputFiles: BuildOutputFile[] = [];
 
-    if (!result.errors) {
-      for (const outputFile of result.outputFiles) {
-        const filename = path.basename(outputFile.path);
-
-        if (outputFile.type === BuildOutputFileType.Media || filename.endsWith('.css.map')) {
-          // The output files could also contain resources (images/fonts/etc.) that were referenced and the map files.
-
-          // Clone the output file to avoid amending the original path which would causes problems during rebuild.
-          const clonedOutputFile = outputFile.clone();
-
-          // Needed for Bazel as otherwise the files will not be written in the correct place,
-          // this is because esbuild will resolve the output file from the outdir which is currently set to `workspaceRoot` twice,
-          // once in the stylesheet and the other in the application code bundler.
-          // Ex: `../../../../../app.component.css.map`.
-          clonedOutputFile.path = path.join(this.options.workspaceRoot, outputFile.path);
-
-          outputFiles.push(clonedOutputFile);
-        } else if (filename.endsWith('.css')) {
-          if (external) {
-            const clonedOutputFile = outputFile.clone();
-            clonedOutputFile.path = path.join(this.options.workspaceRoot, outputFile.path);
-            outputFiles.push(clonedOutputFile);
-            contents = path.posix.join(this.options.publicPath ?? '', filename);
-          } else {
-            contents = outputFile.text;
-          }
-        } else {
-          throw new Error(
-            `Unexpected non CSS/Media file "${filename}" outputted during component stylesheet processing.`,
-          );
-        }
-      }
-
-      metafile = result.metafile;
-      // Remove entryPoint fields from outputs to prevent the internal component styles from being
-      // treated as initial files. Also mark the entry as a component resource for stat reporting.
-      Object.values(metafile.outputs).forEach((output) => {
-        delete output.entryPoint;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (output as any)['ng-component'] = true;
-      });
+    const { errors, warnings } = result;
+    if (errors) {
+      return { errors, warnings, referencedFiles };
     }
 
+    for (const outputFile of result.outputFiles) {
+      const filename = path.basename(outputFile.path);
+
+      if (outputFile.type === BuildOutputFileType.Media || filename.endsWith('.css.map')) {
+        // The output files could also contain resources (images/fonts/etc.) that were referenced and the map files.
+
+        // Clone the output file to avoid amending the original path which would causes problems during rebuild.
+        const clonedOutputFile = outputFile.clone();
+
+        // Needed for Bazel as otherwise the files will not be written in the correct place,
+        // this is because esbuild will resolve the output file from the outdir which is currently set to `workspaceRoot` twice,
+        // once in the stylesheet and the other in the application code bundler.
+        // Ex: `../../../../../app.component.css.map`.
+        if (!direct) {
+          clonedOutputFile.path = path.join(this.options.workspaceRoot, outputFile.path);
+        }
+
+        outputFiles.push(clonedOutputFile);
+      } else if (filename.endsWith('.css')) {
+        if (external) {
+          const clonedOutputFile = outputFile.clone();
+          if (!direct) {
+            clonedOutputFile.path = path.join(this.options.workspaceRoot, outputFile.path);
+          }
+          outputFiles.push(clonedOutputFile);
+          contents = path.posix.join(this.options.publicPath ?? '', filename);
+        } else {
+          contents = outputFile.text;
+        }
+      } else {
+        throw new Error(
+          `Unexpected non CSS/Media file "${filename}" outputted during component stylesheet processing.`,
+        );
+      }
+    }
+
+    const metafile = result.metafile;
+    // Remove entryPoint fields from outputs to prevent the internal component styles from being
+    // treated as initial files. Also mark the entry as a component resource for stat reporting.
+    Object.values(metafile.outputs).forEach((output) => {
+      delete output.entryPoint;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (output as any)['ng-component'] = true;
+    });
+
     return {
-      errors: result.errors,
-      warnings: result.warnings,
+      errors,
+      warnings,
       contents,
       outputFiles,
       metafile,
       referencedFiles,
+      externalImports: result.externalImports,
+      initialFiles: new Map(),
     };
   }
 }
