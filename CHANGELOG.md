@@ -1,3 +1,15 @@
+<a name="18.2.11"></a>
+
+# 18.2.11 (2024-10-30)
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                      |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------ |
+| [87ec15ba2](https://github.com/angular/angular-cli/commit/87ec15ba266436b7b99b0629beaea3e487434115) | fix  | show error message when error stack is undefined |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="19.0.0-next.13"></a>
 
 # 19.0.0-next.13 (2024-10-23)
