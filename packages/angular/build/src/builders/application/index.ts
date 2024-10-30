@@ -7,7 +7,6 @@
  */
 
 import { BuilderContext, BuilderOutput, createBuilder } from '@angular-devkit/architect';
-import type { Plugin } from 'esbuild';
 import assert from 'node:assert';
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -142,26 +141,6 @@ export interface ApplicationBuilderOutput extends BuilderOutput {
  * Builds an application using the `application` builder with the provided
  * options.
  *
- * Usage of the `plugins` parameter is NOT supported and may cause unexpected
- * build output or build failures.
- *
- * @experimental Direct usage of this function is considered experimental.
- *
- * @param options The options defined by the builder's schema to use.
- * @param context An Architect builder context instance.
- * @param plugins An array of plugins to apply to the main code bundling.
- * @returns The build output results of the build.
- */
-export function buildApplication(
-  options: ApplicationBuilderOptions,
-  context: BuilderContext,
-  plugins?: Plugin[],
-): AsyncIterable<ApplicationBuilderOutput>;
-
-/**
- * Builds an application using the `application` builder with the provided
- * options.
- *
  * Usage of the `extensions` parameter is NOT supported and may cause unexpected
  * build output or build failures.
  *
@@ -172,26 +151,11 @@ export function buildApplication(
  * @param extensions An object contain extension points for the build.
  * @returns The build output results of the build.
  */
-export function buildApplication(
-  options: ApplicationBuilderOptions,
-  context: BuilderContext,
-  extensions?: ApplicationBuilderExtensions,
-): AsyncIterable<ApplicationBuilderOutput>;
-
 export async function* buildApplication(
   options: ApplicationBuilderOptions,
   context: BuilderContext,
-  pluginsOrExtensions?: Plugin[] | ApplicationBuilderExtensions,
+  extensions?: ApplicationBuilderExtensions,
 ): AsyncIterable<ApplicationBuilderOutput> {
-  let extensions: ApplicationBuilderExtensions | undefined;
-  if (pluginsOrExtensions && Array.isArray(pluginsOrExtensions)) {
-    extensions = {
-      codePlugins: pluginsOrExtensions,
-    };
-  } else {
-    extensions = pluginsOrExtensions;
-  }
-
   let initial = true;
   for await (const result of buildApplicationInternal(options, context, extensions)) {
     const outputOptions = result.detail?.['outputOptions'] as NormalizedOutputOptions | undefined;
