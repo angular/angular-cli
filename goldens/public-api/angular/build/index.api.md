@@ -10,6 +10,14 @@ import type http from 'node:http';
 import { OutputFile } from 'esbuild';
 import type { Plugin as Plugin_2 } from 'esbuild';
 
+// @public (undocumented)
+export interface ApplicationBuilderExtensions {
+    // (undocumented)
+    codePlugins?: Plugin_2[];
+    // (undocumented)
+    indexHtmlTransformer?: IndexHtmlTransform;
+}
+
 // @public
 export interface ApplicationBuilderOptions {
     allowedCommonJsDependencies?: string[];
@@ -73,9 +81,6 @@ export interface ApplicationBuilderOutput extends BuilderOutput {
     // (undocumented)
     outputFiles?: BuildOutputFile[];
 }
-
-// @public
-export function buildApplication(options: ApplicationBuilderOptions, context: BuilderContext, plugins?: Plugin_2[]): AsyncIterable<ApplicationBuilderOutput>;
 
 // @public
 export function buildApplication(options: ApplicationBuilderOptions, context: BuilderContext, extensions?: ApplicationBuilderExtensions): AsyncIterable<ApplicationBuilderOutput>;

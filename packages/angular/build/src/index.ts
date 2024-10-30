@@ -11,6 +11,7 @@ export {
   type ApplicationBuilderOptions,
   type ApplicationBuilderOutput,
 } from './builders/application';
+export type { ApplicationBuilderExtensions } from './builders/application/options';
 export { type BuildOutputFile, BuildOutputFileType } from './tools/esbuild/bundler-context';
 export type { BuildOutputAsset } from './tools/esbuild/bundler-execution-result';
 
