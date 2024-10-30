@@ -21,6 +21,11 @@ import {
   createStylesheetBundleOptions,
 } from '../stylesheets/bundle-options';
 
+export type ComponentStylesheetResult = BundleContextResult & {
+  contents: string;
+  referencedFiles: Set<string> | undefined;
+};
+
 /**
  * Bundles component stylesheets. A stylesheet can be either an inline stylesheet that
  * is contained within the Component's metadata definition or an external file referenced
@@ -48,7 +53,11 @@ export class ComponentStylesheetBundler {
    * @param direct If true, the output will be used directly by the builder; false if used inside the compiler plugin.
    * @returns A component bundle result object.
    */
-  async bundleFile(entry: string, externalId?: string | boolean, direct?: boolean) {
+  async bundleFile(
+    entry: string,
+    externalId?: string | boolean,
+    direct?: boolean,
+  ): Promise<ComponentStylesheetResult> {
     const bundlerContext = await this.#fileContexts.getOrCreate(entry, () => {
       return new BundlerContext(this.options.workspaceRoot, this.incremental, (loadCache) => {
         const buildOptions = createStylesheetBundleOptions(this.options, loadCache);
@@ -82,7 +91,7 @@ export class ComponentStylesheetBundler {
     filename: string,
     language = this.defaultInlineLanguage,
     externalId?: string,
-  ) {
+  ): Promise<ComponentStylesheetResult> {
     // Use a hash of the inline stylesheet content to ensure a consistent identifier. External stylesheets will resolve
     // to the actual stylesheet file path.
     // TODO: Consider xxhash instead for hashing
@@ -191,13 +200,13 @@ export class ComponentStylesheetBundler {
     referencedFiles: Set<string> | undefined,
     external: boolean,
     direct: boolean,
-  ) {
+  ): ComponentStylesheetResult {
     let contents = '';
     const outputFiles: BuildOutputFile[] = [];
 
     const { errors, warnings } = result;
     if (errors) {
-      return { errors, warnings, referencedFiles };
+      return { errors, warnings, referencedFiles, contents: '' };
     }
 
     for (const outputFile of result.outputFiles) {
