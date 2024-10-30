@@ -185,12 +185,13 @@ export class BundlerContext {
    * All builds use the `write` option with a value of `false` to allow for the output files
    * build result array to be populated.
    *
+   * @param force If true, always rebundle.
    * @returns If output files are generated, the full esbuild BuildResult; if not, the
    * warnings and errors for the attempted build.
    */
-  async bundle(): Promise<BundleContextResult> {
+  async bundle(force?: boolean): Promise<BundleContextResult> {
     // Return existing result if present
-    if (this.#esbuildResult) {
+    if (!force && this.#esbuildResult) {
       return this.#esbuildResult;
     }
 
