@@ -216,7 +216,9 @@ async function renderPages(
           }
         })
         .catch((err) => {
-          errors.push(`An error occurred while prerendering route '${route}'.\n\n${err.stack}`);
+          errors.push(
+            `An error occurred while prerendering route '${route}'.\n\n${err.stack ?? err.message ?? err.code ?? err}`,
+          );
           void renderWorker.destroy();
         });
 
@@ -292,7 +294,9 @@ async function getAllRoutes(
   const { routes: extractedRoutes, warnings }: RoutersExtractorWorkerResult = await renderWorker
     .run({})
     .catch((err) => {
-      errors.push(`An error occurred while extracting routes.\n\n${err.stack}`);
+      errors.push(
+        `An error occurred while extracting routes.\n\n${err.stack ?? err.message ?? err.code ?? err}`,
+      );
     })
     .finally(() => {
       void renderWorker.destroy();
