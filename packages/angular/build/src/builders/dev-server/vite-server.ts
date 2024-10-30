@@ -801,6 +801,9 @@ function getDepOptimizationConfig({
       supported: getFeatureSupport(target, zoneless),
       plugins,
       loader,
+      define: {
+        'ngServerMode': `${ssr}`,
+      },
       resolveExtensions: ['.mjs', '.js', '.cjs'],
     },
   };
