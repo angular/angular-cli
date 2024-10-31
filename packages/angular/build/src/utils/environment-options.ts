@@ -105,6 +105,10 @@ const hmrComponentStylesVariable = process.env['NG_HMR_CSTYLES'];
 export const useComponentStyleHmr =
   !isPresent(hmrComponentStylesVariable) || !isDisabled(hmrComponentStylesVariable);
 
+const hmrComponentTemplateVariable = process.env['NG_HMR_TEMPLATES'];
+export const useComponentTemplateHmr =
+  isPresent(hmrComponentTemplateVariable) && isEnabled(hmrComponentTemplateVariable);
+
 const partialSsrBuildVariable = process.env['NG_BUILD_PARTIAL_SSR'];
 export const usePartialSsrBuild =
   isPresent(partialSsrBuildVariable) && isEnabled(partialSsrBuildVariable);

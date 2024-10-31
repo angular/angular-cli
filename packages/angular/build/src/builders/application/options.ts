@@ -99,6 +99,13 @@ interface InternalOptions {
   externalRuntimeStyles?: boolean;
 
   /**
+   * Enables the AOT compiler to generate template component update functions.
+   * This option is only intended to be used with a development server that can process and serve component
+   * template updates.
+   */
+  templateUpdates?: boolean;
+
+  /**
    * Enables instrumentation to collect code coverage data for specific files.
    *
    * Used exclusively for tests and shouldn't be used for other kinds of builds.
@@ -463,6 +470,7 @@ export async function normalizeOptions(
     externalRuntimeStyles,
     instrumentForCoverage,
     security,
+    templateUpdates: !!options.templateUpdates,
   };
 }
 
