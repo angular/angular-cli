@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { <%= classify(name) %><%= classify(type) %> } from './<%= dasherize(name) %><%= type ? '.' + dasherize(type): '' %>';
+import <% if(!exportDefault) { %>{ <% }%><%= classify(name) %><%= classify(type) %> <% if(!exportDefault) {%>} <% }%>from './<%= dasherize(name) %><%= type ? '.' + dasherize(type): '' %>';
 
 describe('<%= classify(name) %><%= classify(type) %>', () => {
   let component: <%= classify(name) %><%= classify(type) %>;
