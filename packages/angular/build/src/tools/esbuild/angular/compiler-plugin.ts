@@ -51,6 +51,7 @@ export interface CompilerPluginOptions {
   incremental: boolean;
   externalRuntimeStyles?: boolean;
   instrumentForCoverage?: (request: string) => boolean;
+  templateUpdates?: boolean;
 }
 
 // eslint-disable-next-line max-lines-per-function
@@ -656,6 +657,7 @@ function createCompilerOptionsTransformer(
       sourceRoot: undefined,
       preserveSymlinks,
       externalRuntimeStyles: pluginOptions.externalRuntimeStyles,
+      _enableHmr: pluginOptions.templateUpdates,
     };
   };
 }
