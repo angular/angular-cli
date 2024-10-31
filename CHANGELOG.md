@@ -1,3 +1,37 @@
+<a name="19.0.0-rc.0"></a>
+
+# 19.0.0-rc.0 (2024-10-30)
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                  |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------- |
+| [4e2a5fe15](https://github.com/angular/angular-cli/commit/4e2a5fe155006e7154326319ed39e77e5693d9b3) | fix  | enable opt-in for new `@angular/ssr` feature |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                     |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------- |
+| [476f94f51](https://github.com/angular/angular-cli/commit/476f94f51a3403d03ceb9f58ffb4a3564cc52e5a) | fix  | fix --watch regression in karma |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                                            |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------------------- |
+| [06e5176c2](https://github.com/angular/angular-cli/commit/06e5176c2d3b27aaeb117374a8ae402c6a4c6319) | fix  | add warning when `--prerendering` or `--app-shell` are no-ops          |
+| [f8677f6a9](https://github.com/angular/angular-cli/commit/f8677f6a9ba155b04c692814a1bc13f5cc47d94d) | fix  | always record component style usage for HMR updates                    |
+| [099e477a8](https://github.com/angular/angular-cli/commit/099e477a8f1bbcf9d0f415dc6fd4743107c967f7) | fix  | avoid hashing development external component stylesheets               |
+| [0d4558ea5](https://github.com/angular/angular-cli/commit/0d4558ea516a4b8716f2442290e05354c502a49e) | fix  | set `ngServerMode` during vite prebundling                             |
+| [55d7f01b6](https://github.com/angular/angular-cli/commit/55d7f01b66f4867aad4598574582e8505f201c82) | fix  | simplify disabling server features with `--no-server` via command line |
+
+### @angular/ssr
+
+| Commit                                                                                              | Type | Description                                                              |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------ |
+| [0793c78cf](https://github.com/angular/angular-cli/commit/0793c78cfcbfc5d55fe6ce2cb53cada684bcb8dc) | fix  | ensure wildcard RenderMode is applied when no Angular routes are defined |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="18.2.11"></a>
 
 # 18.2.11 (2024-10-30)
