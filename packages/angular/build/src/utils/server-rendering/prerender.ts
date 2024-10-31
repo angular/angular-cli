@@ -7,8 +7,7 @@
  */
 
 import { readFile } from 'node:fs/promises';
-import { extname, join, posix } from 'node:path';
-import { pathToFileURL } from 'node:url';
+import { extname, posix } from 'node:path';
 import { NormalizedApplicationBuildOptions } from '../../builders/application/options';
 import { OutputMode } from '../../builders/application/schema';
 import { BuildOutputFile, BuildOutputFileType } from '../../tools/esbuild/bundler-context';
@@ -16,6 +15,7 @@ import { BuildOutputAsset } from '../../tools/esbuild/bundler-execution-result';
 import { assertIsError } from '../error';
 import { urlJoin } from '../url';
 import { WorkerPool } from '../worker-pool';
+import { IMPORT_EXEC_ARGV } from './esm-in-memory-loader/utils';
 import {
   RouteRenderMode,
   RoutersExtractorWorkerResult,
@@ -194,12 +194,7 @@ async function renderPages(
 }> {
   const output: PrerenderOutput = {};
   const errors: string[] = [];
-
-  const workerExecArgv = [
-    '--import',
-    // Loader cannot be an absolute path on Windows.
-    pathToFileURL(join(__dirname, 'esm-in-memory-loader/register-hooks.js')).href,
-  ];
+  const workerExecArgv = [IMPORT_EXEC_ARGV];
 
   if (sourcemap) {
     workerExecArgv.push('--enable-source-maps');
@@ -301,11 +296,7 @@ async function getAllRoutes(
     return { errors: [], serializedRouteTree: routes };
   }
 
-  const workerExecArgv = [
-    '--import',
-    // Loader cannot be an absolute path on Windows.
-    pathToFileURL(join(__dirname, 'esm-in-memory-loader/register-hooks.js')).href,
-  ];
+  const workerExecArgv = [IMPORT_EXEC_ARGV];
 
   if (sourcemap) {
     workerExecArgv.push('--enable-source-maps');
