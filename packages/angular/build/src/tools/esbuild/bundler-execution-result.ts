@@ -20,7 +20,10 @@ export interface BuildOutputAsset {
 }
 
 export interface RebuildState {
-  rebuildContexts: BundlerContext[];
+  rebuildContexts: {
+    typescriptContexts: BundlerContext[];
+    otherContexts: BundlerContext[];
+  };
   componentStyleBundler: ComponentStylesheetBundler;
   codeBundleCache?: SourceFileCache;
   fileChanges: ChangedFiles;
@@ -51,7 +54,10 @@ export class ExecutionResult {
   htmlBaseHref?: string;
 
   constructor(
-    private rebuildContexts: BundlerContext[],
+    private rebuildContexts: {
+      typescriptContexts: BundlerContext[];
+      otherContexts: BundlerContext[];
+    },
     private componentStyleBundler: ComponentStylesheetBundler,
     private codeBundleCache?: SourceFileCache,
   ) {}
@@ -141,7 +147,9 @@ export class ExecutionResult {
 
   get watchFiles() {
     // Bundler contexts internally normalize file dependencies
-    const files = this.rebuildContexts.flatMap((context) => [...context.watchFiles]);
+    const files = this.rebuildContexts.typescriptContexts
+      .flatMap((context) => [...context.watchFiles])
+      .concat(this.rebuildContexts.otherContexts.flatMap((context) => [...context.watchFiles]));
     if (this.codeBundleCache?.referencedFiles) {
       // These files originate from TS/NG and can have POSIX path separators even on Windows.
       // To ensure path comparisons are valid, all these paths must be normalized.
@@ -156,8 +164,6 @@ export class ExecutionResult {
   }
 
   createRebuildState(fileChanges: ChangedFiles): RebuildState {
-    this.codeBundleCache?.invalidate([...fileChanges.modified, ...fileChanges.removed]);
-
     return {
       rebuildContexts: this.rebuildContexts,
       codeBundleCache: this.codeBundleCache,
@@ -180,7 +186,10 @@ export class ExecutionResult {
   }
 
   async dispose(): Promise<void> {
-    await Promise.allSettled(this.rebuildContexts.map((context) => context.dispose()));
-    await this.componentStyleBundler.dispose();
+    await Promise.allSettled([
+      ...this.rebuildContexts.typescriptContexts.map((context) => context.dispose()),
+      ...this.rebuildContexts.otherContexts.map((context) => context.dispose()),
+      this.componentStyleBundler.dispose(),
+    ]);
   }
 }

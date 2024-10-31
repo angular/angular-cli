@@ -86,6 +86,14 @@ export class ComponentStylesheetBundler {
     );
   }
 
+  bundleAllFiles(external: boolean, direct: boolean) {
+    return Promise.all(
+      Array.from(this.#fileContexts.entries()).map(([entry]) =>
+        this.bundleFile(entry, external, direct),
+      ),
+    );
+  }
+
   async bundleInline(
     data: string,
     filename: string,

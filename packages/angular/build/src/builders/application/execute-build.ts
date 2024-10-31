@@ -74,37 +74,48 @@ export async function executeBuild(
   let bundlerContexts;
   let componentStyleBundler;
   let codeBundleCache;
+  let bundlingResult: BundleContextResult;
   if (rebuildState) {
     bundlerContexts = rebuildState.rebuildContexts;
     componentStyleBundler = rebuildState.componentStyleBundler;
     codeBundleCache = rebuildState.codeBundleCache;
+    const allFileChanges = rebuildState.fileChanges.all;
+
+    // Bundle all contexts that do not require TypeScript changed file checks.
+    // These will automatically use cached results based on the changed files.
+    bundlingResult = await BundlerContext.bundleAll(bundlerContexts.otherContexts, allFileChanges);
+
+    // Check the TypeScript code bundling cache for changes. If invalid, force a rebundle of
+    // all TypeScript related contexts.
+    // TODO: Enable cached bundling for the typescript contexts
+    const forceTypeScriptRebuild = codeBundleCache?.invalidate(allFileChanges);
+    const typescriptResults: BundleContextResult[] = [];
+    for (const typescriptContext of bundlerContexts.typescriptContexts) {
+      typescriptContext.invalidate(allFileChanges);
+      const result = await typescriptContext.bundle(forceTypeScriptRebuild);
+      typescriptResults.push(result);
+    }
+    bundlingResult = BundlerContext.mergeResults([bundlingResult, ...typescriptResults]);
   } else {
     const target = transformSupportedBrowsersToTargets(browsers);
     codeBundleCache = new SourceFileCache(cacheOptions.enabled ? cacheOptions.path : undefined);
     componentStyleBundler = createComponentStyleBundler(options, target);
     bundlerContexts = setupBundlerContexts(options, target, codeBundleCache, componentStyleBundler);
+
+    // Bundle everything on initial build
+    bundlingResult = await BundlerContext.bundleAll([
+      ...bundlerContexts.typescriptContexts,
+      ...bundlerContexts.otherContexts,
+    ]);
   }
 
-  let bundlingResult = await BundlerContext.bundleAll(
-    bundlerContexts,
-    rebuildState?.fileChanges.all,
-  );
-
+  // Update any external component styles if enabled and rebuilding.
+  // TODO: Only attempt rebundling of invalidated styles once incremental build results are supported.
   if (rebuildState && options.externalRuntimeStyles) {
-    const invalidatedStylesheetEntries = componentStyleBundler.invalidate(
-      rebuildState.fileChanges.all,
-    );
+    componentStyleBundler.invalidate(rebuildState.fileChanges.all);
 
-    if (invalidatedStylesheetEntries?.length) {
-      const componentResults: BundleContextResult[] = [];
-      for (const stylesheetFile of invalidatedStylesheetEntries) {
-        // externalId is already linked in the bundler context so only enabling is required here
-        const result = await componentStyleBundler.bundleFile(stylesheetFile, true, true);
-        componentResults.push(result);
-      }
-
-      bundlingResult = BundlerContext.mergeResults([bundlingResult, ...componentResults]);
-    }
+    const componentResults = await componentStyleBundler.bundleAllFiles(true, true);
+    bundlingResult = BundlerContext.mergeResults([bundlingResult, ...componentResults]);
   }
 
   if (options.optimizationOptions.scripts && shouldOptimizeChunks) {
