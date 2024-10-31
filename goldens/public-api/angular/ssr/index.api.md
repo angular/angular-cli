@@ -37,6 +37,40 @@ export enum RenderMode {
 // @public
 export type ServerRoute = ServerRouteAppShell | ServerRouteClient | ServerRoutePrerender | ServerRoutePrerenderWithParams | ServerRouteServer;
 
+// @public
+export interface ServerRouteAppShell extends Omit<ServerRouteCommon, 'headers' | 'status'> {
+    renderMode: RenderMode.AppShell;
+}
+
+// @public
+export interface ServerRouteClient extends ServerRouteCommon {
+    renderMode: RenderMode.Client;
+}
+
+// @public
+export interface ServerRouteCommon {
+    headers?: Record<string, string>;
+    path: string;
+    status?: number;
+}
+
+// @public
+export interface ServerRoutePrerender extends Omit<ServerRouteCommon, 'status'> {
+    fallback?: never;
+    renderMode: RenderMode.Prerender;
+}
+
+// @public
+export interface ServerRoutePrerenderWithParams extends Omit<ServerRoutePrerender, 'fallback'> {
+    fallback?: PrerenderFallback;
+    getPrerenderParams: () => Promise<Record<string, string>[]>;
+}
+
+// @public
+export interface ServerRouteServer extends ServerRouteCommon {
+    renderMode: RenderMode.Server;
+}
+
 // (No @packageDocumentation comment for this package)
 
 ```

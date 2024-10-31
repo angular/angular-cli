@@ -16,4 +16,10 @@ export {
   type ServerRoute,
   provideServerRoutesConfig,
   RenderMode,
+  type ServerRouteAppShell,
+  type ServerRouteClient,
+  type ServerRoutePrerender,
+  type ServerRoutePrerenderWithParams,
+  type ServerRouteServer,
+  type ServerRouteCommon,
 } from './src/routes/route-config';
