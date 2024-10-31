@@ -511,6 +511,9 @@ describe('Component Schematic', () => {
     const tree = await schematicRunner.runSchematic('component', options, appTree);
     const tsContent = tree.readContent('/projects/bar/src/app/foo/foo.component.ts');
     expect(tsContent).toContain('export default class FooComponent');
+
+    const specContent = tree.readContent('/projects/bar/src/app/foo/foo.component.spec.ts');
+    expect(specContent).toContain("import FooComponent from './foo.component';");
   });
 
   it('should export the component as a named export when exportDefault is false', async () => {
@@ -519,5 +522,8 @@ describe('Component Schematic', () => {
     const tree = await schematicRunner.runSchematic('component', options, appTree);
     const tsContent = tree.readContent('/projects/bar/src/app/foo/foo.component.ts');
     expect(tsContent).toContain('export class FooComponent');
+
+    const specContent = tree.readContent('/projects/bar/src/app/foo/foo.component.spec.ts');
+    expect(specContent).toContain("import { FooComponent } from './foo.component';");
   });
 });
