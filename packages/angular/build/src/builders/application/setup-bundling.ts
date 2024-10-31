@@ -126,7 +126,7 @@ export function setupBundlerContexts(
     const serverPolyfillBundleOptions = createServerPolyfillBundleOptions(
       options,
       nodeTargets,
-      codeBundleCache,
+      codeBundleCache.loadResultCache,
     );
 
     if (serverPolyfillBundleOptions) {
