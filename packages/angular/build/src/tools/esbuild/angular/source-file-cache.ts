@@ -25,21 +25,29 @@ export class SourceFileCache extends Map<string, ts.SourceFile> {
     super();
   }
 
-  invalidate(files: Iterable<string>): void {
+  invalidate(files: Iterable<string>): boolean {
     if (files !== this.modifiedFiles) {
       this.modifiedFiles.clear();
     }
+
+    const extraWatchFiles = new Set(this.referencedFiles?.map(path.normalize));
+
+    let invalid = false;
     for (let file of files) {
       file = path.normalize(file);
-      this.loadResultCache.invalidate(file);
+      invalid = this.loadResultCache.invalidate(file) || invalid;
 
       // Normalize separators to allow matching TypeScript Host paths
       if (USING_WINDOWS) {
         file = file.replace(WINDOWS_SEP_REGEXP, path.posix.sep);
       }
 
-      this.delete(file);
+      invalid = this.delete(file) || invalid;
       this.modifiedFiles.add(file);
+
+      invalid = extraWatchFiles.has(file) || invalid;
     }
+
+    return invalid;
   }
 }
