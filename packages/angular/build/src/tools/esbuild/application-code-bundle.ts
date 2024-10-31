@@ -24,6 +24,7 @@ import { BundlerOptionsFactory } from './bundler-context';
 import { createCompilerPluginOptions } from './compiler-plugin-options';
 import { createExternalPackagesPlugin } from './external-packages-plugin';
 import { createAngularLocaleDataPlugin } from './i18n-locale-plugin';
+import type { LoadResultCache } from './load-result-cache';
 import { createLoaderImportAttributePlugin } from './loader-import-attribute-plugin';
 import { createRxjsEsmResolutionPlugin } from './rxjs-esm-resolution-plugin';
 import { createServerBundleMetadata } from './server-bundle-metadata-plugin';
@@ -106,7 +107,7 @@ export function createBrowserPolyfillBundleOptions(
     options,
     namespace,
     true,
-    sourceFileCache,
+    sourceFileCache.loadResultCache,
   );
   if (!polyfillBundleOptions) {
     return;
@@ -184,7 +185,7 @@ export function createServerPolyfillBundleOptions(
     },
     namespace,
     false,
-    sourceFileCache,
+    sourceFileCache?.loadResultCache,
   );
 
   if (!polyfillBundleOptions) {
@@ -602,7 +603,7 @@ function getEsBuildCommonPolyfillsOptions(
   options: NormalizedApplicationBuildOptions,
   namespace: string,
   tryToResolvePolyfillsAsRelative: boolean,
-  sourceFileCache: SourceFileCache | undefined,
+  loadResultCache: LoadResultCache | undefined,
 ): BuildOptions | undefined {
   const { jit, workspaceRoot, i18nOptions } = options;
   const buildOptions: BuildOptions = {
@@ -647,7 +648,7 @@ function getEsBuildCommonPolyfillsOptions(
   buildOptions.plugins?.push(
     createVirtualModulePlugin({
       namespace,
-      cache: sourceFileCache?.loadResultCache,
+      cache: loadResultCache,
       loadContent: async (_, build) => {
         let polyfillPaths = polyfills;
         let warnings: PartialMessage[] | undefined;
