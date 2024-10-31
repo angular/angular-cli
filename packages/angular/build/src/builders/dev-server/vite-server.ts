@@ -23,7 +23,7 @@ import {
   createRemoveIdPrefixPlugin,
 } from '../../tools/vite/plugins';
 import { loadProxyConfiguration, normalizeSourceMaps } from '../../utils';
-import { useComponentStyleHmr } from '../../utils/environment-options';
+import { useComponentStyleHmr, useComponentTemplateHmr } from '../../utils/environment-options';
 import { loadEsmModule } from '../../utils/load-esm';
 import { Result, ResultFile, ResultKind } from '../application/results';
 import {
@@ -143,6 +143,14 @@ export async function* serveWithVite(
     // Preload the @angular/compiler package to avoid first stylesheet request delays.
     // Once @angular/build is native ESM, this should be re-evaluated.
     void loadEsmModule('@angular/compiler');
+  }
+
+  // Enable to support component template hot replacement (`NG_HMR_TEMPLATE=1` can be used to enable)
+  browserOptions.templateUpdates = !!serverOptions.liveReload && useComponentTemplateHmr;
+  if (browserOptions.templateUpdates) {
+    context.logger.warn(
+      'Experimental support for component template hot replacement has been enabled via the "NG_HMR_TEMPLATE" environment variable.',
+    );
   }
 
   // Setup the prebundling transformer that will be shared across Vite prebundling requests
