@@ -109,7 +109,7 @@ __metadata:
     source-map-support: "npm:0.5.21"
     terser: "npm:5.36.0"
     tree-kill: "npm:1.2.2"
-    tslib: "npm:2.8.0"
+    tslib: "npm:2.8.1"
     undici: "npm:6.20.1"
     webpack: "npm:5.96.1"
     webpack-dev-middleware: "npm:7.4.2"
@@ -779,7 +779,7 @@ __metadata:
     terser: "npm:5.36.0"
     tree-kill: "npm:1.2.2"
     ts-node: "npm:^10.9.1"
-    tslib: "npm:2.8.0"
+    tslib: "npm:2.8.1"
     typescript: "npm:5.6.3"
     undici: "npm:6.20.1"
     unenv: "npm:^1.10.0"
@@ -17758,10 +17758,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tslib@npm:2.8.0, tslib@npm:^2.0.0, tslib@npm:^2.0.1, tslib@npm:^2.1.0, tslib@npm:^2.3.0, tslib@npm:^2.4.0, tslib@npm:^2.5.2":
-  version: 2.8.0
-  resolution: "tslib@npm:2.8.0"
-  checksum: 10c0/31e4d14dc1355e9b89e4d3c893a18abb7f90b6886b089c2da91224d0a7752c79f3ddc41bc1aa0a588ac895bd97bb99c5bc2bfdb2f86de849f31caeb3ba79bbe5
+"tslib@npm:2.8.1":
+  version: 2.8.1
+  resolution: "tslib@npm:2.8.1"
+  checksum: 10c0/9c4759110a19c53f992d9aae23aac5ced636e99887b51b9e61def52611732872ff7668757d4e4c61f19691e36f4da981cd9485e869b4a7408d689f6bf1f14e62
   languageName: node
   linkType: hard
 
@@ -17769,6 +17769,13 @@ __metadata:
   version: 1.14.1
   resolution: "tslib@npm:1.14.1"
   checksum: 10c0/69ae09c49eea644bc5ebe1bca4fa4cc2c82b7b3e02f43b84bd891504edf66dbc6b2ec0eef31a957042de2269139e4acff911e6d186a258fb14069cd7f6febce2
+  languageName: node
+  linkType: hard
+
+"tslib@npm:^2.0.0, tslib@npm:^2.0.1, tslib@npm:^2.1.0, tslib@npm:^2.3.0, tslib@npm:^2.4.0, tslib@npm:^2.5.2":
+  version: 2.8.0
+  resolution: "tslib@npm:2.8.0"
+  checksum: 10c0/31e4d14dc1355e9b89e4d3c893a18abb7f90b6886b089c2da91224d0a7752c79f3ddc41bc1aa0a588ac895bd97bb99c5bc2bfdb2f86de849f31caeb3ba79bbe5
   languageName: node
   linkType: hard
 
