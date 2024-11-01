@@ -29,26 +29,20 @@ const angularApp = new AngularNodeAppEngine();
 /**
  * Serve static files from /<%= browserDistDirectory %>
  */
-app.get(
-  '**',
+app.use(
   express.static(browserDistFolder, {
     maxAge: '1y',
-    index: 'index.html',
-    setHeaders: (res) => {
-      const headers = angularApp.getPrerenderHeaders(res.req);
-      for (const [key, value] of headers) {
-        res.setHeader(key, value);
-      }
-    },
+    index: false,
+    redirect: false,
   }),
 );
 
 /**
  * Handle all other requests by rendering the Angular application.
  */
-app.get('**', (req, res, next) => {
+app.use('/**', (req, res, next) => {
   angularApp
-    .render(req)
+    .handle(req)
     .then((response) =>
       response ? writeResponseToNodeResponse(response, res) : next(),
     )

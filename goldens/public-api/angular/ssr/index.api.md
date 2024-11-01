@@ -8,8 +8,7 @@ import { EnvironmentProviders } from '@angular/core';
 
 // @public
 export class AngularAppEngine {
-    getPrerenderHeaders(request: Request): ReadonlyMap<string, string>;
-    render(request: Request, requestContext?: unknown): Promise<Response | null>;
+    handle(request: Request, requestContext?: unknown): Promise<Response | null>;
     static ɵhooks: Hooks;
 }
 

@@ -32,7 +32,7 @@ export async function installWorkspacePackages(options?: { force?: boolean }): P
   }
 }
 
-export async function installPackage(specifier: string, registry?: string): Promise<ProcessOutput> {
+export function installPackage(specifier: string, registry?: string): Promise<ProcessOutput> {
   const registryOption = registry ? [`--registry=${registry}`] : [];
   switch (getActivePackageManager()) {
     case 'npm':
@@ -46,16 +46,25 @@ export async function installPackage(specifier: string, registry?: string): Prom
   }
 }
 
-export async function uninstallPackage(name: string): Promise<ProcessOutput> {
-  switch (getActivePackageManager()) {
-    case 'npm':
-      return silentNpm('uninstall', name);
-    case 'yarn':
-      return silentYarn('remove', name);
-    case 'bun':
-      return silentBun('remove', name);
-    case 'pnpm':
-      return silentPnpm('remove', name);
+export async function uninstallPackage(name: string): Promise<void> {
+  try {
+    switch (getActivePackageManager()) {
+      case 'npm':
+        await silentNpm('uninstall', name);
+        break;
+      case 'yarn':
+        await silentYarn('remove', name);
+        break;
+      case 'bun':
+        await silentBun('remove', name);
+        break;
+      case 'pnpm':
+        await silentPnpm('remove', name);
+        break;
+    }
+  } catch (e) {
+    // Yarn throws an error when trying to remove a package that is not installed.
+    console.error(e);
   }
 }
 

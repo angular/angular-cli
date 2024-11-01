@@ -10,7 +10,7 @@ import { Component, provideExperimentalZonelessChangeDetection } from '@angular/
 import { bootstrapApplication } from '@angular/platform-browser';
 import { provideServerRendering } from '@angular/platform-server';
 import { RouterOutlet, Routes, provideRouter } from '@angular/router';
-import { setAngularAppManifest } from '../src/manifest';
+import { AngularAppManifest, ServerAsset, setAngularAppManifest } from '../src/manifest';
 import { ServerRoute, provideServerRoutesConfig } from '../src/routes/route-config';
 
 /**
@@ -27,11 +27,13 @@ export function setAngularAppTestingManifest(
   routes: Routes,
   serverRoutes: ServerRoute[],
   baseHref = '',
+  additionalServerAssets: Record<string, ServerAsset> = {},
 ): void {
   setAngularAppManifest({
     inlineCriticalCss: false,
     assets: new Map(
       Object.entries({
+        ...additionalServerAssets,
         'index.server.html': async () =>
           `<html>
             <head>
