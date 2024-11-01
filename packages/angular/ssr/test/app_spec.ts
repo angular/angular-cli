@@ -72,17 +72,21 @@ describe('AngularServerApp', () => {
       ],
       undefined,
       {
-        'home-ssg/index.html': async () =>
-          `<html>
-            <head>
-              <title>SSG home page</title>
-              <base href="/" />
-            </head>
-            <body>
-              <app-root>Home SSG works</app-root>
-            </body>
-          </html>
-        `,
+        'home-ssg/index.html': {
+          text: async () =>
+            `<html>
+              <head>
+                <title>SSG home page</title>
+                <base href="/" />
+              </head>
+              <body>
+                <app-root>Home SSG works</app-root>
+              </body>
+            </html>
+          `,
+          size: 28,
+          hash: 'f799132d0a09e0fef93c68a12e443527700eb59e6f67fcb7854c3a60ff082fde',
+        },
       },
     );
 
@@ -183,7 +187,40 @@ describe('AngularServerApp', () => {
         const response = await app.handle(new Request('http://localhost/home-ssg'));
         const headers = response?.headers.entries() ?? [];
         expect(Object.fromEntries(headers)).toEqual({
-          'cache-control': 'max-age=31536000',
+          'etag': '"f799132d0a09e0fef93c68a12e443527700eb59e6f67fcb7854c3a60ff082fde"',
+          'content-length': '28',
+          'x-some-header': 'value',
+          'content-type': 'text/html;charset=UTF-8',
+        });
+      });
+
+      it('should return 304 Not Modified when ETag matches', async () => {
+        const url = 'http://localhost/home-ssg';
+
+        const initialResponse = await app.handle(new Request(url));
+        const etag = initialResponse?.headers.get('etag');
+
+        expect(etag).toBeDefined();
+
+        const conditionalResponse = await app.handle(
+          new Request(url, {
+            headers: {
+              'If-None-Match': etag as string,
+            },
+          }),
+        );
+
+        // Check that the response status is 304 Not Modified
+        expect(conditionalResponse?.status).toBe(304);
+        expect(await conditionalResponse?.text()).toBe('');
+      });
+
+      it('should return configured headers for pages with specific header settings', async () => {
+        const response = await app.handle(new Request('http://localhost/home-ssg'));
+        const headers = response?.headers.entries() ?? [];
+        expect(Object.fromEntries(headers)).toEqual({
+          'etag': '"f799132d0a09e0fef93c68a12e443527700eb59e6f67fcb7854c3a60ff082fde"',
+          'content-length': '28',
           'x-some-header': 'value',
           'content-type': 'text/html;charset=UTF-8',
         });

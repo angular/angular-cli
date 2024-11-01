@@ -516,7 +516,7 @@ export async function extractRoutesAndCreateRouteTree(
   includePrerenderFallbackRoutes = true,
 ): Promise<{ routeTree: RouteTree; errors: string[] }> {
   const routeTree = new RouteTree();
-  const document = await new ServerAssets(manifest).getIndexServerHtml();
+  const document = await new ServerAssets(manifest).getIndexServerHtml().text();
   const bootstrap = await manifest.bootstrap();
   const { baseHref, routes, errors } = await getRoutesFromAngularRouterConfig(
     bootstrap,
