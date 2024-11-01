@@ -9,7 +9,6 @@
 import { lookup as lookupMimeType } from 'mrmime';
 import { extname } from 'node:path';
 import type { Connect, ViteDevServer } from 'vite';
-import { loadEsmModule } from '../../../utils/load-esm';
 import { AngularMemoryOutputFiles, pathnameWithoutBasePath } from '../utils';
 
 export function createAngularAssetsMiddleware(
@@ -17,6 +16,7 @@ export function createAngularAssetsMiddleware(
   assets: Map<string, string>,
   outputFiles: AngularMemoryOutputFiles,
   usedComponentStyles: Map<string, Set<string>>,
+  encapsulateStyle: (style: Uint8Array, componentId: string) => string,
 ): Connect.NextHandleFunction {
   return function angularAssetsMiddleware(req, res, next) {
     if (req.url === undefined || res.writableEnded) {
@@ -73,7 +73,7 @@ export function createAngularAssetsMiddleware(
     if (extension !== '.js' && extension !== '.html') {
       const outputFile = outputFiles.get(pathname);
       if (outputFile?.servable) {
-        const data = outputFile.contents;
+        let data: Uint8Array | string = outputFile.contents;
         if (extension === '.css') {
           // Inject component ID for view encapsulation if requested
           const componentId = new URL(req.url, 'http://localhost').searchParams.get('ngcomp');
@@ -108,22 +108,15 @@ export function createAngularAssetsMiddleware(
                 return;
               }
 
-              loadEsmModule<typeof import('@angular/compiler')>('@angular/compiler')
-                .then((compilerModule) => {
-                  const encapsulatedData = compilerModule.encapsulateStyle(
-                    new TextDecoder().decode(data),
-                    componentId,
-                  );
-
-                  res.setHeader('Content-Type', 'text/css');
-                  res.setHeader('Cache-Control', 'no-cache');
-                  res.setHeader('ETag', etag);
-                  res.end(encapsulatedData);
-                })
-                .catch((e) => next(e));
-
-              return;
+              data = encapsulateStyle(data, componentId);
             }
+
+            res.setHeader('Content-Type', 'text/css');
+            res.setHeader('Cache-Control', 'no-cache');
+            res.setHeader('ETag', etag);
+            res.end(data);
+
+            return;
           }
         }
 

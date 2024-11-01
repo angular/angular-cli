@@ -7,6 +7,7 @@
  */
 
 import type { Connect, Plugin } from 'vite';
+import { loadEsmModule } from '../../../utils/load-esm';
 import {
   angularHtmlFallbackMiddleware,
   createAngularAssetsMiddleware,
@@ -53,13 +54,25 @@ interface AngularSetupMiddlewaresPluginOptions {
   ssrMode: ServerSsrMode;
 }
 
+async function createEncapsulateStyle(): Promise<
+  (style: Uint8Array, componentId: string) => string
+> {
+  const { encapsulateStyle } =
+    await loadEsmModule<typeof import('@angular/compiler')>('@angular/compiler');
+  const decoder = new TextDecoder('utf-8');
+
+  return (style, componentId) => {
+    return encapsulateStyle(decoder.decode(style), componentId);
+  };
+}
+
 export function createAngularSetupMiddlewaresPlugin(
   options: AngularSetupMiddlewaresPluginOptions,
 ): Plugin {
   return {
     name: 'vite:angular-setup-middlewares',
     enforce: 'pre',
-    configureServer(server) {
+    async configureServer(server) {
       const {
         indexHtmlTransformer,
         outputFiles,
@@ -74,7 +87,13 @@ export function createAngularSetupMiddlewaresPlugin(
       server.middlewares.use(createAngularHeadersMiddleware(server));
       server.middlewares.use(createAngularComponentMiddleware(templateUpdates));
       server.middlewares.use(
-        createAngularAssetsMiddleware(server, assets, outputFiles, usedComponentStyles),
+        createAngularAssetsMiddleware(
+          server,
+          assets,
+          outputFiles,
+          usedComponentStyles,
+          await createEncapsulateStyle(),
+        ),
       );
 
       extensionMiddleware?.forEach((middleware) => server.middlewares.use(middleware));
