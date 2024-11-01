@@ -10,7 +10,7 @@ import { Component, provideExperimentalZonelessChangeDetection } from '@angular/
 import { bootstrapApplication } from '@angular/platform-browser';
 import { provideServerRendering } from '@angular/platform-server';
 import { RouterOutlet, Routes, provideRouter } from '@angular/router';
-import { AngularAppManifest, ServerAsset, setAngularAppManifest } from '../src/manifest';
+import { ServerAsset, setAngularAppManifest } from '../src/manifest';
 import { ServerRoute, provideServerRoutesConfig } from '../src/routes/route-config';
 
 /**
@@ -34,8 +34,10 @@ export function setAngularAppTestingManifest(
     assets: new Map(
       Object.entries({
         ...additionalServerAssets,
-        'index.server.html': async () =>
-          `<html>
+        'index.server.html': {
+          size: 25,
+          hash: 'f799132d0a09e0fef93c68a12e443527700eb59e6f67fcb7854c3a60ff082fde',
+          text: async () => `<html>
             <head>
               <title>SSR page</title>
               <base href="/${baseHref}" />
@@ -45,8 +47,12 @@ export function setAngularAppTestingManifest(
             </body>
           </html>
         `,
-        'index.csr.html': async () =>
-          `<html>
+        },
+        'index.csr.html': {
+          size: 25,
+          hash: 'f799132d0a09e0fef93c68a12e443527700eb59e6f67fcb7854c3a60ff082fde',
+          text: async () =>
+            `<html>
             <head>
               <title>CSR page</title>
               <base href="/${baseHref}" />
@@ -56,6 +62,7 @@ export function setAngularAppTestingManifest(
             </body>
           </html>
         `,
+        },
       }),
     ),
     bootstrap: async () => () => {

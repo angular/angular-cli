@@ -7,7 +7,6 @@
  */
 
 import { BuilderContext } from '@angular-devkit/architect';
-import assert from 'node:assert';
 import { SourceFileCache } from '../../tools/esbuild/angular/source-file-cache';
 import { generateBudgetStats } from '../../tools/esbuild/budget-stats';
 import {
@@ -36,7 +35,6 @@ import { optimizeChunks } from './chunk-optimizer';
 import { executePostBundleSteps } from './execute-post-bundle';
 import { inlineI18n, loadActiveTranslations } from './i18n';
 import { NormalizedApplicationBuildOptions } from './options';
-import { OutputMode } from './schema';
 import { createComponentStyleBundler, setupBundlerContexts } from './setup-bundling';
 
 // eslint-disable-next-line max-lines-per-function
@@ -224,7 +222,7 @@ export async function executeBuild(
   if (serverEntryPoint) {
     executionResult.addOutputFile(
       SERVER_APP_ENGINE_MANIFEST_FILENAME,
-      generateAngularServerAppEngineManifest(i18nOptions, baseHref, undefined),
+      generateAngularServerAppEngineManifest(i18nOptions, baseHref),
       BuildOutputFileType.ServerRoot,
     );
   }
@@ -257,26 +255,11 @@ export async function executeBuild(
     executionResult.assetFiles.push(...result.additionalAssets);
   }
 
-  if (serverEntryPoint) {
-    const prerenderedRoutes = executionResult.prerenderedRoutes;
-
-    // Regenerate the manifest to append prerendered routes data. This is only needed if SSR is enabled.
-    if (outputMode === OutputMode.Server && Object.keys(prerenderedRoutes).length) {
-      const manifest = executionResult.outputFiles.find(
-        (f) => f.path === SERVER_APP_ENGINE_MANIFEST_FILENAME,
-      );
-      assert(manifest, `${SERVER_APP_ENGINE_MANIFEST_FILENAME} was not found in output files.`);
-      manifest.contents = new TextEncoder().encode(
-        generateAngularServerAppEngineManifest(i18nOptions, baseHref, prerenderedRoutes),
-      );
-    }
-
-    executionResult.addOutputFile(
-      'prerendered-routes.json',
-      JSON.stringify({ routes: prerenderedRoutes }, null, 2),
-      BuildOutputFileType.Root,
-    );
-  }
+  executionResult.addOutputFile(
+    'prerendered-routes.json',
+    JSON.stringify({ routes: executionResult.prerenderedRoutes }, null, 2),
+    BuildOutputFileType.Root,
+  );
 
   // Write metafile if stats option is enabled
   if (options.stats) {
