@@ -98,26 +98,31 @@ export function createAngularAssetsMiddleware(
             // Shim the stylesheet if a component ID is provided
             if (componentId.length > 0) {
               // Validate component ID
-              if (/^[_.\-\p{Letter}\d]+-c\d+$/u.test(componentId)) {
-                loadEsmModule<typeof import('@angular/compiler')>('@angular/compiler')
-                  .then((compilerModule) => {
-                    const encapsulatedData = compilerModule.encapsulateStyle(
-                      new TextDecoder().decode(data),
-                      componentId,
-                    );
-
-                    res.setHeader('Content-Type', 'text/css');
-                    res.setHeader('Cache-Control', 'no-cache');
-                    res.setHeader('ETag', etag);
-                    res.end(encapsulatedData);
-                  })
-                  .catch((e) => next(e));
+              if (!/^[_.\-\p{Letter}\d]+-c\d+$/u.test(componentId)) {
+                const message = 'Invalid component stylesheet ID request: ' + componentId;
+                // eslint-disable-next-line no-console
+                console.error(message);
+                res.statusCode = 400;
+                res.end(message);
 
                 return;
-              } else {
-                // eslint-disable-next-line no-console
-                console.error('Invalid component stylesheet ID request: ' + componentId);
               }
+
+              loadEsmModule<typeof import('@angular/compiler')>('@angular/compiler')
+                .then((compilerModule) => {
+                  const encapsulatedData = compilerModule.encapsulateStyle(
+                    new TextDecoder().decode(data),
+                    componentId,
+                  );
+
+                  res.setHeader('Content-Type', 'text/css');
+                  res.setHeader('Cache-Control', 'no-cache');
+                  res.setHeader('ETag', etag);
+                  res.end(encapsulatedData);
+                })
+                .catch((e) => next(e));
+
+              return;
             }
           }
         }
