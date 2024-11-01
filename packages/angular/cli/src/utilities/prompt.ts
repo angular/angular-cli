@@ -54,7 +54,7 @@ export async function askQuestion(
 
 export async function askChoices(
   message: string,
-  choices: { name: string; value: string }[],
+  choices: { name: string; value: string; checked?: boolean }[],
   noTTYResponse: string[] | null,
 ): Promise<string[] | null> {
   if (!isTTY()) {
