@@ -208,8 +208,9 @@ export function createAngularCompilerHost(
   host.resourceNameToFileName = function (resourceName, containingFile) {
     const resolvedPath = nodePath.join(nodePath.dirname(containingFile), resourceName);
 
-    // All resource names that have HTML file extensions are assumed to be templates
-    if (resourceName.endsWith('.html') || !hostOptions.externalStylesheets) {
+    // All resource names that have template file extensions are assumed to be templates
+    // TODO: Update compiler to provide the resource type to avoid extension matching here.
+    if (!hostOptions.externalStylesheets || hasTemplateExtension(resolvedPath)) {
       return resolvedPath;
     }
 
@@ -247,4 +248,17 @@ export function createAngularCompilerHost(
   }
 
   return host;
+}
+
+function hasTemplateExtension(file: string): boolean {
+  const extension = nodePath.extname(file).toLowerCase();
+
+  switch (extension) {
+    case '.htm':
+    case '.html':
+    case '.svg':
+      return true;
+  }
+
+  return false;
 }
