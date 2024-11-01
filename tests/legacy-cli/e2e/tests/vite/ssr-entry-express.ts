@@ -63,7 +63,7 @@ export default async function () {
         }));
 
         server.get('**', (req, res, next) => {
-          angularNodeAppEngine.render(req)
+          angularNodeAppEngine.handle(req)
             .then((response) => response ? writeResponseToNodeResponse(response, res) : next())
             .catch(next);
         });

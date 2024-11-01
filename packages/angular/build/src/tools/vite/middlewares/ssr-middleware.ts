@@ -59,7 +59,7 @@ export function createAngularSsrInternalMiddleware(
       const webReq = new Request(createWebRequestFromNodeRequest(req), {
         signal: AbortSignal.timeout(30_000),
       });
-      const webRes = await angularServerApp.render(webReq);
+      const webRes = await angularServerApp.handle(webReq);
       if (!webRes) {
         return next();
       }

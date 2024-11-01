@@ -33,6 +33,7 @@ describe('AngularServerApp', () => {
       [
         { path: 'home', component: HomeComponent },
         { path: 'home-csr', component: HomeComponent },
+        { path: 'home-ssg', component: HomeComponent },
         { path: 'page-with-headers', component: HomeComponent },
         { path: 'page-with-status', component: HomeComponent },
         { path: 'redirect', redirectTo: 'home' },
@@ -43,6 +44,13 @@ describe('AngularServerApp', () => {
         {
           path: 'home-csr',
           renderMode: RenderMode.Client,
+        },
+        {
+          path: 'home-ssg',
+          renderMode: RenderMode.Prerender,
+          headers: {
+            'X-Some-Header': 'value',
+          },
         },
         {
           path: 'page-with-status',
@@ -62,86 +70,129 @@ describe('AngularServerApp', () => {
           renderMode: RenderMode.Server,
         },
       ],
+      undefined,
+      {
+        'home-ssg/index.html': async () =>
+          `<html>
+            <head>
+              <title>SSG home page</title>
+              <base href="/" />
+            </head>
+            <body>
+              <app-root>Home SSG works</app-root>
+            </body>
+          </html>
+        `,
+      },
     );
 
     app = new AngularServerApp();
   });
 
-  describe('render', () => {
-    it('should correctly render the content for the requested page', async () => {
-      const response = await app.render(new Request('http://localhost/home'));
-      expect(await response?.text()).toContain('Home works');
-    });
-
-    it(`should correctly render the content when the URL ends with 'index.html'`, async () => {
-      const response = await app.render(new Request('http://localhost/home/index.html'));
-      expect(await response?.text()).toContain('Home works');
-    });
-
-    it('should correctly handle top level redirects', async () => {
-      const response = await app.render(new Request('http://localhost/redirect'));
-      expect(response?.headers.get('location')).toContain('http://localhost/home');
-      expect(response?.status).toBe(302);
-    });
-
-    it('should correctly handle relative nested redirects', async () => {
-      const response = await app.render(new Request('http://localhost/redirect/relative'));
-      expect(response?.headers.get('location')).toContain('http://localhost/redirect/home');
-      expect(response?.status).toBe(302);
-    });
-
-    it('should correctly handle absolute nested redirects', async () => {
-      const response = await app.render(new Request('http://localhost/redirect/absolute'));
-      expect(response?.headers.get('location')).toContain('http://localhost/home');
-      expect(response?.status).toBe(302);
-    });
-
-    it('should handle request abortion gracefully', async () => {
-      const controller = new AbortController();
-      const request = new Request('http://localhost/home', { signal: controller.signal });
-
-      // Schedule the abortion of the request in the next microtask
-      queueMicrotask(() => {
-        controller.abort();
+  describe('handle', () => {
+    describe('CSR and SSG pages', () => {
+      it('should correctly render the content for the requested page', async () => {
+        const response = await app.handle(new Request('http://localhost/home'));
+        expect(await response?.text()).toContain('Home works');
       });
 
-      await expectAsync(app.render(request)).toBeRejectedWithError(/Request for: .+ was aborted/);
-    });
+      it(`should correctly render the content when the URL ends with 'index.html'`, async () => {
+        const response = await app.handle(new Request('http://localhost/home/index.html'));
+        expect(await response?.text()).toContain('Home works');
+      });
 
-    it('should return configured headers for pages with specific header settings', async () => {
-      const response = await app.render(new Request('http://localhost/page-with-headers'));
-      const headers = response?.headers.entries() ?? [];
-      expect(Object.fromEntries(headers)).toEqual({
-        'cache-control': 'no-cache',
-        'x-some-header': 'value',
-        'content-type': 'text/html;charset=UTF-8',
+      it('should correctly handle top level redirects', async () => {
+        const response = await app.handle(new Request('http://localhost/redirect'));
+        expect(response?.headers.get('location')).toContain('http://localhost/home');
+        expect(response?.status).toBe(302);
+      });
+
+      it('should correctly handle relative nested redirects', async () => {
+        const response = await app.handle(new Request('http://localhost/redirect/relative'));
+        expect(response?.headers.get('location')).toContain('http://localhost/redirect/home');
+        expect(response?.status).toBe(302);
+      });
+
+      it('should correctly handle absolute nested redirects', async () => {
+        const response = await app.handle(new Request('http://localhost/redirect/absolute'));
+        expect(response?.headers.get('location')).toContain('http://localhost/home');
+        expect(response?.status).toBe(302);
+      });
+
+      it('should handle request abortion gracefully', async () => {
+        const controller = new AbortController();
+        const request = new Request('http://localhost/home', { signal: controller.signal });
+
+        // Schedule the abortion of the request in the next microtask
+        queueMicrotask(() => {
+          controller.abort();
+        });
+
+        await expectAsync(app.handle(request)).toBeRejectedWithError(/Request for: .+ was aborted/);
+      });
+
+      it('should return configured headers for pages with specific header settings', async () => {
+        const response = await app.handle(new Request('http://localhost/page-with-headers'));
+        const headers = response?.headers.entries() ?? [];
+        expect(Object.fromEntries(headers)).toEqual({
+          'cache-control': 'no-cache',
+          'x-some-header': 'value',
+          'content-type': 'text/html;charset=UTF-8',
+        });
+      });
+
+      it('should return only default headers for pages without specific header configurations', async () => {
+        const response = await app.handle(new Request('http://localhost/home'));
+        const headers = response?.headers.entries() ?? [];
+        expect(Object.fromEntries(headers)).toEqual({
+          'content-type': 'text/html;charset=UTF-8', // default header
+        });
+      });
+
+      it('should return the configured status for pages with specific status settings', async () => {
+        const response = await app.handle(new Request('http://localhost/page-with-status'));
+        expect(response?.status).toBe(201);
+      });
+
+      it('should return static `index.csr.html` for routes with CSR rendering mode', async () => {
+        const response = await app.handle(new Request('http://localhost/home-csr'));
+        const content = await response?.text();
+
+        expect(content).toContain('<title>CSR page</title>');
+        expect(content).not.toContain('ng-server-context');
+      });
+
+      it('should include `ng-server-context="ssr"` for SSR rendering mode', async () => {
+        const response = await app.handle(new Request('http://localhost/home'));
+        expect(await response?.text()).toContain('ng-server-context="ssr"');
       });
     });
 
-    it('should return only default headers for pages without specific header configurations', async () => {
-      const response = await app.render(new Request('http://localhost/home'));
-      const headers = response?.headers.entries() ?? [];
-      expect(Object.fromEntries(headers)).toEqual({
-        'content-type': 'text/html;charset=UTF-8', // default header
+    describe('SSG pages', () => {
+      it('should correctly serve the content for the requested prerendered page', async () => {
+        const response = await app.handle(new Request('http://localhost/home-ssg'));
+        expect(await response?.text()).toContain('Home SSG works');
       });
-    });
 
-    it('should return the configured status for pages with specific status settings', async () => {
-      const response = await app.render(new Request('http://localhost/page-with-status'));
-      expect(response?.status).toBe(201);
-    });
+      it(`should correctly serve the content for the requested prerendered page when the URL ends with 'index.html'`, async () => {
+        const response = await app.handle(new Request('http://localhost/home-ssg/index.html'));
+        expect(await response?.text()).toContain('Home SSG works');
+      });
 
-    it('should return static `index.csr.html` for routes with CSR rendering mode', async () => {
-      const response = await app.render(new Request('http://localhost/home-csr'));
-      const content = await response?.text();
+      it('should return configured headers for pages with specific header settings', async () => {
+        const response = await app.handle(new Request('http://localhost/home-ssg'));
+        const headers = response?.headers.entries() ?? [];
+        expect(Object.fromEntries(headers)).toEqual({
+          'cache-control': 'max-age=31536000',
+          'x-some-header': 'value',
+          'content-type': 'text/html;charset=UTF-8',
+        });
+      });
 
-      expect(content).toContain('<title>CSR page</title>');
-      expect(content).not.toContain('ng-server-context');
-    });
-
-    it('should include `ng-server-context="ssr"` for SSR rendering mode', async () => {
-      const response = await app.render(new Request('http://localhost/home'));
-      expect(await response?.text()).toContain('ng-server-context="ssr"');
+      it('should return null for a non-prerendered page', async () => {
+        const response = await app.handle(new Request('http://localhost/unknown'));
+        expect(response).toBeNull();
+      });
     });
   });
 });

@@ -78,7 +78,7 @@ export default async function () {
 
       router.use(
         '/**',
-        defineEventHandler((event) => angularAppEngine.render(toWebRequest(event))),
+        defineEventHandler((event) => angularAppEngine.handle(toWebRequest(event))),
       );
 
       app.use(router);

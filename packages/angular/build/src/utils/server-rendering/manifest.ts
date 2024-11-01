@@ -6,9 +6,8 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
+import { extname } from 'node:path';
 import {
-  INDEX_HTML_CSR,
-  INDEX_HTML_SERVER,
   NormalizedApplicationBuildOptions,
   getLocaleBaseHref,
 } from '../../builders/application/options';
@@ -135,11 +134,8 @@ export function generateAngularServerAppManifest(
 ): string {
   const serverAssetsContent: string[] = [];
   for (const file of [...additionalHtmlOutputFiles.values(), ...outputFiles]) {
-    if (
-      file.path === INDEX_HTML_SERVER ||
-      file.path === INDEX_HTML_CSR ||
-      (inlineCriticalCss && file.path.endsWith('.css'))
-    ) {
+    const extension = extname(file.path);
+    if (extension === '.html' || (inlineCriticalCss && extension === '.css')) {
       serverAssetsContent.push(`['${file.path}', async () => \`${escapeUnsafeChars(file.text)}\`]`);
     }
   }

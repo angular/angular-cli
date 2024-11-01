@@ -53,21 +53,34 @@ export class AngularAppEngine {
   private readonly entryPointsCache = new Map<string, Promise<EntryPointExports>>();
 
   /**
-   * Renders a response for the given HTTP request using the server application.
+   * Handles an incoming HTTP request by serving prerendered content, performing server-side rendering,
+   * or delivering a static file for client-side rendered routes based on the `RenderMode` setting.
    *
-   * This method processes the request, determines the appropriate route and rendering context,
-   * and returns an HTTP response.
+   * @param request - The HTTP request to handle.
+   * @param requestContext - Optional context for rendering, such as metadata associated with the request.
+   * @returns A promise that resolves to the resulting HTTP response object, or `null` if no matching Angular route is found.
    *
-   * If the request URL appears to be for a file (excluding `/index.html`), the method returns `null`.
-   * A request to `https://www.example.com/page/index.html` will render the Angular route
+   * @note A request to `https://www.example.com/page/index.html` will serve or render the Angular route
    * corresponding to `https://www.example.com/page`.
-   *
-   * @param request - The incoming HTTP request object to be rendered.
-   * @param requestContext - Optional additional context for the request, such as metadata.
-   * @returns A promise that resolves to a Response object, or `null` if the request URL represents a file (e.g., `./logo.png`)
-   * rather than an application route.
    */
-  async render(request: Request, requestContext?: unknown): Promise<Response | null> {
+  async handle(request: Request, requestContext?: unknown): Promise<Response | null> {
+    const serverApp = await this.getAngularServerAppForRequest(request);
+
+    return serverApp ? serverApp.handle(request, requestContext) : null;
+  }
+
+  /**
+   * Retrieves the Angular server application instance for a given request.
+   *
+   * This method checks if the request URL corresponds to an Angular application entry point.
+   * If so, it initializes or retrieves an instance of the Angular server application for that entry point.
+   * Requests that resemble file requests (except for `/index.html`) are skipped.
+   *
+   * @param request - The incoming HTTP request object.
+   * @returns A promise that resolves to an `AngularServerApp` instance if a valid entry point is found,
+   * or `null` if no entry point matches the request URL.
+   */
+  private async getAngularServerAppForRequest(request: Request): Promise<AngularServerApp | null> {
     // Skip if the request looks like a file but not `/index.html`.
     const url = new URL(request.url);
     const entryPoint = await this.getEntryPointExportsForUrl(url);
@@ -82,26 +95,7 @@ export class AngularAppEngine {
     const serverApp = getOrCreateAngularServerApp() as AngularServerApp;
     serverApp.hooks = this.hooks;
 
-    return serverApp.render(request, requestContext);
-  }
-
-  /**
-   * Retrieves HTTP headers for a request associated with statically generated (SSG) pages,
-   * based on the URL pathname.
-   *
-   * @param request - The incoming request object.
-   * @returns A `Map` containing the HTTP headers as key-value pairs.
-   * @note This function should be used exclusively for retrieving headers of SSG pages.
-   */
-  getPrerenderHeaders(request: Request): ReadonlyMap<string, string> {
-    if (this.manifest.staticPathsHeaders.size === 0) {
-      return new Map();
-    }
-
-    const { pathname } = stripIndexHtmlFromURL(new URL(request.url));
-    const headers = this.manifest.staticPathsHeaders.get(stripTrailingSlash(pathname));
-
-    return new Map(headers);
+    return serverApp;
   }
 
   /**

@@ -54,7 +54,7 @@ export default async function () {
 
         server.get('/api/*', (c) => c.json({ hello: 'foo' }));
         server.get('/*', async (c) => {
-          const res = await angularAppEngine.render(c.req.raw);
+          const res = await angularAppEngine.handle(c.req.raw);
           return res || undefined
         });
 
