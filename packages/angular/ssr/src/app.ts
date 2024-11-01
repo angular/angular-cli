@@ -21,12 +21,6 @@ import { AngularBootstrap, renderAngular } from './utils/ng';
 import { joinUrlParts, stripIndexHtmlFromURL, stripLeadingSlash } from './utils/url';
 
 /**
- * The default maximum age in seconds.
- * Represents the total number of seconds in a 365-day period.
- */
-const DEFAULT_MAX_AGE = 365 * 24 * 60 * 60;
-
-/**
  * Maximum number of critical CSS entries the cache can store.
  * This value determines the capacity of the LRU (Least Recently Used) cache, which stores critical CSS for pages.
  */
@@ -188,18 +182,19 @@ export class AngularServerApp {
       return null;
     }
 
-    // TODO(alanagius): handle etags
+    const { text, hash, size } = this.assets.getServerAsset(assetPath);
+    const etag = `"${hash}"`;
 
-    const content = await this.assets.getServerAsset(assetPath);
-
-    return new Response(content, {
-      headers: {
-        'Content-Type': 'text/html;charset=UTF-8',
-        // 30 days in seconds
-        'Cache-Control': `max-age=${DEFAULT_MAX_AGE}`,
-        ...headers,
-      },
-    });
+    return request.headers.get('if-none-match') === etag
+      ? new Response(undefined, { status: 304, statusText: 'Not Modified' })
+      : new Response(await text(), {
+          headers: {
+            'Content-Length': size.toString(),
+            'ETag': etag,
+            'Content-Type': 'text/html;charset=UTF-8',
+            ...headers,
+          },
+        });
   }
 
   /**
@@ -309,8 +304,10 @@ export class AngularServerApp {
           },
         );
       } else if (renderMode === RenderMode.Client) {
-        // Serve the client-side rendered version if the route is configured for CSR.
-        return new Response(await this.assets.getServerAsset('index.csr.html'), responseInit);
+        return new Response(
+          await this.assets.getServerAsset('index.csr.html').text(),
+          responseInit,
+        );
       }
     }
 
@@ -327,7 +324,7 @@ export class AngularServerApp {
       });
     }
 
-    let html = await assets.getIndexServerHtml();
+    let html = await assets.getIndexServerHtml().text();
     // Skip extra microtask if there are no pre hooks.
     if (hooks.has('html:transform:pre')) {
       html = await hooks.run('html:transform:pre', { html, url });
@@ -348,7 +345,7 @@ export class AngularServerApp {
       this.inlineCriticalCssProcessor ??= new InlineCriticalCssProcessor((path: string) => {
         const fileName = path.split('/').pop() ?? path;
 
-        return this.assets.getServerAsset(fileName);
+        return this.assets.getServerAsset(fileName).text();
       });
 
       // TODO(alanagius): remove once Node.js version 18 is no longer supported.

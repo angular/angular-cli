@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { AngularAppManifest } from './manifest';
+import { AngularAppManifest, ServerAsset } from './manifest';
 
 /**
  * Manages server-side assets.
@@ -22,17 +22,17 @@ export class ServerAssets {
   /**
    * Retrieves the content of a server-side asset using its path.
    *
-   * @param path - The path to the server asset.
-   * @returns A promise that resolves to the asset content as a string.
-   * @throws Error If the asset path is not found in the manifest, an error is thrown.
+   * @param path - The path to the server asset within the manifest.
+   * @returns The server asset associated with the provided path, as a `ServerAsset` object.
+   * @throws Error - Throws an error if the asset does not exist.
    */
-  async getServerAsset(path: string): Promise<string> {
+  getServerAsset(path: string): ServerAsset {
     const asset = this.manifest.assets.get(path);
     if (!asset) {
       throw new Error(`Server asset '${path}' does not exist.`);
     }
 
-    return asset();
+    return asset;
   }
 
   /**
@@ -46,12 +46,12 @@ export class ServerAssets {
   }
 
   /**
-   * Retrieves and caches the content of 'index.server.html'.
+   * Retrieves the asset for 'index.server.html'.
    *
-   * @returns A promise that resolves to the content of 'index.server.html'.
-   * @throws Error If there is an issue retrieving the asset.
+   * @returns The `ServerAsset` object for 'index.server.html'.
+   * @throws Error - Throws an error if 'index.server.html' does not exist.
    */
-  getIndexServerHtml(): Promise<string> {
+  getIndexServerHtml(): ServerAsset {
     return this.getServerAsset('index.server.html');
   }
 }

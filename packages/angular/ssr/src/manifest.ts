@@ -10,9 +10,26 @@ import type { SerializableRouteTreeNode } from './routes/route-tree';
 import { AngularBootstrap } from './utils/ng';
 
 /**
- * A function that returns a promise resolving to the file contents of the asset.
+ * Represents of a server asset stored in the manifest.
  */
-export type ServerAsset = () => Promise<string>;
+export interface ServerAsset {
+  /**
+   * Retrieves the text content of the asset.
+   *
+   * @returns A promise that resolves to the asset's content as a string.
+   */
+  text: () => Promise<string>;
+
+  /**
+   * A hash string representing the asset's content.
+   */
+  hash: string;
+
+  /**
+   * The size of the asset's content in bytes.
+   */
+  size: number;
+}
 
 /**
  * Represents the exports of an Angular server application entry point.

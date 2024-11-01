@@ -50,13 +50,10 @@ function escapeUnsafeChars(str: string): string {
  * includes settings for inlining locales and determining the output structure.
  * @param baseHref - The base HREF for the application. This is used to set the base URL
  * for all relative URLs in the application.
- * @param perenderedRoutes - A record mapping static paths to their associated data.
- * @returns A string representing the content of the SSR server manifest for App Engine.
  */
 export function generateAngularServerAppEngineManifest(
   i18nOptions: NormalizedApplicationBuildOptions['i18nOptions'],
   baseHref: string | undefined,
-  perenderedRoutes: PrerenderedRoutesRecord | undefined = {},
 ): string {
   const entryPointsContent: string[] = [];
 
@@ -78,25 +75,10 @@ export function generateAngularServerAppEngineManifest(
     entryPointsContent.push(`['', () => import('./${MAIN_SERVER_OUTPUT_FILENAME}')]`);
   }
 
-  const staticHeaders: string[] = [];
-  for (const [path, { headers }] of Object.entries(perenderedRoutes)) {
-    if (!headers) {
-      continue;
-    }
-
-    const headersValues: string[] = [];
-    for (const [name, value] of Object.entries(headers)) {
-      headersValues.push(`['${name}', '${encodeURIComponent(value)}']`);
-    }
-
-    staticHeaders.push(`['${path}', [${headersValues.join(', ')}]]`);
-  }
-
   const manifestContent = `
 export default {
   basePath: '${baseHref ?? '/'}',
   entryPoints: new Map([${entryPointsContent.join(', \n')}]),
-  staticPathsHeaders: new Map([${staticHeaders.join(', \n')}]),
 };
   `;
 
@@ -136,7 +118,9 @@ export function generateAngularServerAppManifest(
   for (const file of [...additionalHtmlOutputFiles.values(), ...outputFiles]) {
     const extension = extname(file.path);
     if (extension === '.html' || (inlineCriticalCss && extension === '.css')) {
-      serverAssetsContent.push(`['${file.path}', async () => \`${escapeUnsafeChars(file.text)}\`]`);
+      serverAssetsContent.push(
+        `['${file.path}', { size: ${file.size}, hash: '${file.hash}', text: async () => \`${escapeUnsafeChars(file.text)}\`}]`,
+      );
     }
   }
 
