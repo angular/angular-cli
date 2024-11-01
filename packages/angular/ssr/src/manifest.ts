@@ -10,6 +10,11 @@ import type { SerializableRouteTreeNode } from './routes/route-tree';
 import { AngularBootstrap } from './utils/ng';
 
 /**
+ * A function that returns a promise resolving to the file contents of the asset.
+ */
+export type ServerAsset = () => Promise<string>;
+
+/**
  * Represents the exports of an Angular server application entry point.
  */
 export interface EntryPointExports {
@@ -43,19 +48,6 @@ export interface AngularAppEngineManifest {
    * This is used to determine the root path of the application.
    */
   readonly basePath: string;
-
-  /**
-   * A map that associates static paths with their corresponding HTTP headers.
-   * Each entry in the map consists of:
-   * - `key`: The static path as a string.
-   * - `value`: An array of tuples, where each tuple contains:
-   *   - `headerName`: The name of the HTTP header.
-   *   - `headerValue`: The value of the HTTP header.
-   */
-  readonly staticPathsHeaders: ReadonlyMap<
-    string,
-    readonly [headerName: string, headerValue: string][]
-  >;
 }
 
 /**
@@ -68,7 +60,7 @@ export interface AngularAppManifest {
    * - `key`: The path of the asset.
    * - `value`: A function returning a promise that resolves to the file contents of the asset.
    */
-  readonly assets: ReadonlyMap<string, () => Promise<string>>;
+  readonly assets: ReadonlyMap<string, ServerAsset>;
 
   /**
    * The bootstrap mechanism for the server application.

@@ -54,7 +54,7 @@ export default async function () {
         server.get('/api/*', (req, reply) => reply.send({ hello: 'foo' }));
         server.get('*', async (req, reply) => {
           try {
-            const response = await angularNodeAppEngine.render(req.raw);
+            const response = await angularNodeAppEngine.handle(req.raw);
             if (response) {
               await writeResponseToNodeResponse(response, reply.raw);
             } else {

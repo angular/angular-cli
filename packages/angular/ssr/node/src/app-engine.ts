@@ -24,49 +24,19 @@ export class AngularNodeAppEngine {
   private readonly angularAppEngine = new AngularAppEngine();
 
   /**
-   * Renders an HTTP response based on the incoming request using the Angular server application.
+   * Handles an incoming HTTP request by serving prerendered content, performing server-side rendering,
+   * or delivering a static file for client-side rendered routes based on the `RenderMode` setting.
    *
-   * The method processes the incoming request, determines the appropriate route, and prepares the
-   * rendering context to generate a response. If the request URL corresponds to a static file (excluding `/index.html`),
-   * the method returns `null`.
+   * @param request - The HTTP request to handle.
+   * @param requestContext - Optional context for rendering, such as metadata associated with the request.
+   * @returns A promise that resolves to the resulting HTTP response object, or `null` if no matching Angular route is found.
    *
-   * Example: A request to `https://www.example.com/page/index.html` will render the Angular route
-   * associated with `https://www.example.com/page`.
-   *
-   * @param request - The incoming HTTP request object to be rendered.
-   * @param requestContext - Optional additional context for the request, such as metadata or custom settings.
-   * @returns A promise that resolves to a `Response` object, or `null` if the request URL is for a static file
-   * (e.g., `./logo.png`) rather than an application route.
+   * @note A request to `https://www.example.com/page/index.html` will serve or render the Angular route
+   * corresponding to `https://www.example.com/page`.
    */
-  render(request: IncomingMessage, requestContext?: unknown): Promise<Response | null> {
-    return this.angularAppEngine.render(createWebRequestFromNodeRequest(request), requestContext);
-  }
+  async handle(request: IncomingMessage, requestContext?: unknown): Promise<Response | null> {
+    const webRequest = createWebRequestFromNodeRequest(request);
 
-  /**
-   * Retrieves HTTP headers for a request associated with statically generated (SSG) pages,
-   * based on the URL pathname.
-   *
-   * @param request - The incoming request object.
-   * @returns A `Map` containing the HTTP headers as key-value pairs.
-   * @note This function should be used exclusively for retrieving headers of SSG pages.
-   * @example
-   * ```typescript
-   * const angularAppEngine = new AngularNodeAppEngine();
-   *
-   * app.use(express.static('dist/browser', {
-   *   setHeaders: (res, path) => {
-   *     // Retrieve headers for the current request
-   *     const headers = angularAppEngine.getPrerenderHeaders(res.req);
-   *
-   *     // Apply the retrieved headers to the response
-   *     for (const [key, value] of headers) {
-   *       res.setHeader(key, value);
-   *     }
-   *   }
-     }));
-  * ```
-  */
-  getPrerenderHeaders(request: IncomingMessage): ReadonlyMap<string, string> {
-    return this.angularAppEngine.getPrerenderHeaders(createWebRequestFromNodeRequest(request));
+    return this.angularAppEngine.handle(webRequest, requestContext);
   }
 }

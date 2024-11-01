@@ -36,6 +36,16 @@ export class ServerAssets {
   }
 
   /**
+   * Checks if a specific server-side asset exists.
+   *
+   * @param path - The path to the server asset.
+   * @returns A boolean indicating whether the asset exists.
+   */
+  hasServerAsset(path: string): boolean {
+    return this.manifest.assets.has(path);
+  }
+
+  /**
    * Retrieves and caches the content of 'index.server.html'.
    *
    * @returns A promise that resolves to the content of 'index.server.html'.

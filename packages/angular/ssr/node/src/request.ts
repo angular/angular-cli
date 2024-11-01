@@ -56,7 +56,12 @@ function createRequestHeaders(nodeHeaders: IncomingHttpHeaders): Headers {
  * @returns A `URL` object representing the request URL.
  */
 function createRequestUrl(nodeRequest: IncomingMessage): URL {
-  const { headers, socket, url = '' } = nodeRequest;
+  const {
+    headers,
+    socket,
+    url = '',
+    originalUrl,
+  } = nodeRequest as IncomingMessage & { originalUrl?: string };
   const protocol =
     headers['x-forwarded-proto'] ?? ('encrypted' in socket && socket.encrypted ? 'https' : 'http');
   const hostname = headers['x-forwarded-host'] ?? headers.host ?? headers[':authority'];
@@ -71,5 +76,5 @@ function createRequestUrl(nodeRequest: IncomingMessage): URL {
     hostnameWithPort += `:${port}`;
   }
 
-  return new URL(url, `${protocol}://${hostnameWithPort}`);
+  return new URL(originalUrl ?? url, `${protocol}://${hostnameWithPort}`);
 }
