@@ -68,6 +68,7 @@ interface MigrationSchematicDescription
   extends SchematicDescription<FileSystemCollectionDescription, FileSystemSchematicDescription> {
   version?: string;
   optional?: boolean;
+  recommended?: boolean;
   documentation?: string;
 }
 
@@ -1138,6 +1139,7 @@ export default class UpdateCommandModule extends CommandModule<UpdateCommandArgs
         return {
           name: `[${colors.white(migration.name)}] ${title}${documentation ? ` (${documentation})` : ''}`,
           value: migration.name,
+          checked: migration.recommended,
         };
       }),
       null,
