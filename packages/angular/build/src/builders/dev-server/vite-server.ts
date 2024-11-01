@@ -139,11 +139,6 @@ export async function* serveWithVite(
 
   // Enable to support component style hot reloading (`NG_HMR_CSTYLES=0` can be used to disable)
   browserOptions.externalRuntimeStyles = !!serverOptions.liveReload && useComponentStyleHmr;
-  if (browserOptions.externalRuntimeStyles) {
-    // Preload the @angular/compiler package to avoid first stylesheet request delays.
-    // Once @angular/build is native ESM, this should be re-evaluated.
-    void loadEsmModule('@angular/compiler');
-  }
 
   // Enable to support component template hot replacement (`NG_HMR_TEMPLATE=1` can be used to enable)
   browserOptions.templateUpdates = !!serverOptions.liveReload && useComponentTemplateHmr;
