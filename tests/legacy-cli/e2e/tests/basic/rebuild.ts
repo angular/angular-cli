@@ -6,7 +6,7 @@ import { ngServe } from '../../utils/project';
 
 export default async function () {
   const esbuild = getGlobalVariable('argv')['esbuild'];
-  const validBundleRegEx = esbuild ? /complete\./ : /Compiled successfully\./;
+  const validBundleRegEx = esbuild ? /sent to client/ : /Compiled successfully\./;
   const lazyBundleRegEx = esbuild ? /chunk-/ : /src_app_lazy_lazy_component_ts\.js/;
 
   // Disable component stylesheet HMR to support page reload based rebuild testing.
