@@ -7,7 +7,6 @@
     "packages/angular/build/src/tools/esbuild/angular/component-stylesheets.ts",
     "packages/angular/build/src/tools/esbuild/bundler-context.ts",
     "packages/angular/build/src/tools/esbuild/utils.ts",
-    "packages/angular/build/src/utils/server-rendering/manifest.ts",
     "packages/angular/build/src/tools/esbuild/bundler-execution-result.ts"
   ],
   [
@@ -17,16 +16,18 @@
   [
     "packages/angular/build/src/tools/esbuild/bundler-context.ts",
     "packages/angular/build/src/tools/esbuild/utils.ts",
-    "packages/angular/build/src/utils/server-rendering/manifest.ts"
+    "packages/angular/build/src/tools/esbuild/bundler-execution-result.ts"
   ],
   [
     "packages/angular/build/src/tools/esbuild/bundler-context.ts",
     "packages/angular/build/src/tools/esbuild/utils.ts",
-    "packages/angular/build/src/utils/server-rendering/manifest.ts",
-    "packages/angular/build/src/tools/esbuild/bundler-execution-result.ts"
+    "packages/angular/build/src/utils/server-rendering/manifest.ts"
   ],
   [
     "packages/angular/build/src/tools/esbuild/bundler-execution-result.ts",
+    "packages/angular/build/src/tools/esbuild/utils.ts"
+  ],
+  [
     "packages/angular/build/src/tools/esbuild/utils.ts",
     "packages/angular/build/src/utils/server-rendering/manifest.ts"
   ],
