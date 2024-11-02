@@ -40,6 +40,7 @@ import { OutputMode } from './schema';
  * @param initialFiles A map containing initial file information for the executed build.
  * @param locale A language locale to insert in the index.html.
  */
+// eslint-disable-next-line max-lines-per-function
 export async function executePostBundleSteps(
   options: NormalizedApplicationBuildOptions,
   outputFiles: BuildOutputFile[],
@@ -107,16 +108,19 @@ export async function executePostBundleSteps(
 
   // Create server manifest
   if (serverEntryPoint) {
+    const { manifestContent, serverAssetsChunks } = generateAngularServerAppManifest(
+      additionalHtmlOutputFiles,
+      outputFiles,
+      optimizationOptions.styles.inlineCritical ?? false,
+      undefined,
+      locale,
+    );
+
     additionalOutputFiles.push(
+      ...serverAssetsChunks,
       createOutputFile(
         SERVER_APP_MANIFEST_FILENAME,
-        generateAngularServerAppManifest(
-          additionalHtmlOutputFiles,
-          outputFiles,
-          optimizationOptions.styles.inlineCritical ?? false,
-          undefined,
-          locale,
-        ),
+        manifestContent,
         BuildOutputFileType.ServerApplication,
       ),
     );
@@ -194,15 +198,24 @@ export async function executePostBundleSteps(
       const manifest = additionalOutputFiles.find((f) => f.path === SERVER_APP_MANIFEST_FILENAME);
       assert(manifest, `${SERVER_APP_MANIFEST_FILENAME} was not found in output files.`);
 
-      manifest.contents = new TextEncoder().encode(
-        generateAngularServerAppManifest(
-          additionalHtmlOutputFiles,
-          outputFiles,
-          optimizationOptions.styles.inlineCritical ?? false,
-          serializableRouteTreeNodeForManifest,
-          locale,
-        ),
+      const { manifestContent, serverAssetsChunks } = generateAngularServerAppManifest(
+        additionalHtmlOutputFiles,
+        outputFiles,
+        optimizationOptions.styles.inlineCritical ?? false,
+        serializableRouteTreeNodeForManifest,
+        locale,
       );
+
+      for (const chunk of serverAssetsChunks) {
+        const idx = additionalOutputFiles.findIndex(({ path }) => path === chunk.path);
+        if (idx === -1) {
+          additionalOutputFiles.push(chunk);
+        } else {
+          additionalOutputFiles[idx] = chunk;
+        }
+      }
+
+      manifest.contents = new TextEncoder().encode(manifestContent);
     }
   }
 

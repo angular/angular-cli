@@ -8,7 +8,7 @@
 
 import assert from 'node:assert';
 import { readFile } from 'node:fs/promises';
-import { basename, dirname, join, relative } from 'node:path';
+import { dirname, join, relative } from 'node:path';
 import type { Plugin } from 'vite';
 import { loadEsmModule } from '../../../utils/load-esm';
 import { AngularMemoryOutputFiles } from '../utils';
@@ -24,8 +24,6 @@ export async function createAngularMemoryPlugin(
 ): Promise<Plugin> {
   const { virtualProjectRoot, outputFiles, external } = options;
   const { normalizePath } = await loadEsmModule<typeof import('vite')>('vite');
-  // See: https://github.com/vitejs/vite/blob/a34a73a3ad8feeacc98632c0f4c643b6820bbfda/packages/vite/src/node/server/pluginContainer.ts#L331-L334
-  const defaultImporter = join(virtualProjectRoot, 'index.html');
 
   return {
     name: 'vite:angular-memory',
@@ -40,16 +38,10 @@ export async function createAngularMemoryPlugin(
       }
 
       if (importer) {
-        let normalizedSource: string | undefined;
         if (source[0] === '.' && normalizePath(importer).startsWith(virtualProjectRoot)) {
           // Remove query if present
           const [importerFile] = importer.split('?', 1);
-          normalizedSource = join(dirname(relative(virtualProjectRoot, importerFile)), source);
-        } else if (source[0] === '/' && importer === defaultImporter) {
-          normalizedSource = basename(source);
-        }
-        if (normalizedSource) {
-          source = '/' + normalizePath(normalizedSource);
+          source = '/' + join(dirname(relative(virtualProjectRoot, importerFile)), source);
         }
       }
 
