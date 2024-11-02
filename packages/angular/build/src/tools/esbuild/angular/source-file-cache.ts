@@ -36,6 +36,7 @@ export class SourceFileCache extends Map<string, ts.SourceFile> {
     for (let file of files) {
       file = path.normalize(file);
       invalid = this.loadResultCache.invalidate(file) || invalid;
+      invalid = extraWatchFiles.has(file) || invalid;
 
       // Normalize separators to allow matching TypeScript Host paths
       if (USING_WINDOWS) {
@@ -44,8 +45,6 @@ export class SourceFileCache extends Map<string, ts.SourceFile> {
 
       invalid = this.delete(file) || invalid;
       this.modifiedFiles.add(file);
-
-      invalid = extraWatchFiles.has(file) || invalid;
     }
 
     return invalid;
