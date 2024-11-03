@@ -85,12 +85,15 @@ export function execute(
           );
         }
 
+        // New build system defaults hmr option to the value of liveReload
+        normalizedOptions.hmr ??= normalizedOptions.liveReload;
+
         return defer(() =>
           Promise.all([import('@angular/build/private'), import('../browser-esbuild')]),
         ).pipe(
           switchMap(([{ serveWithVite, buildApplicationInternal }, { convertBrowserOptions }]) =>
             serveWithVite(
-              normalizedOptions,
+              normalizedOptions as typeof normalizedOptions & { hmr: boolean },
               builderName,
               (options, context, codePlugins) => {
                 return builderName === '@angular-devkit/build-angular:browser-esbuild'
@@ -123,6 +126,9 @@ export function execute(
           'Only the "application" and "browser-esbuild" builders support middleware.',
         );
       }
+
+      // Webpack based build systems default to false for hmr option
+      normalizedOptions.hmr ??= false;
 
       // Use Webpack for all other browser targets
       return defer(() => import('./webpack-server')).pipe(
