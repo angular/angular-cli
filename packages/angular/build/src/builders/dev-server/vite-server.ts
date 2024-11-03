@@ -137,8 +137,9 @@ export async function* serveWithVite(
     process.setSourceMapsEnabled(true);
   }
 
-  // Enable to support component style hot reloading (`NG_HMR_CSTYLES=0` can be used to disable)
-  browserOptions.externalRuntimeStyles = !!serverOptions.liveReload && useComponentStyleHmr;
+  // Enable to support component style hot reloading (`NG_HMR_CSTYLES=0` can be used to disable selectively)
+  browserOptions.externalRuntimeStyles =
+    serverOptions.liveReload && serverOptions.hmr && useComponentStyleHmr;
 
   // Enable to support component template hot replacement (`NG_HMR_TEMPLATE=1` can be used to enable)
   browserOptions.templateUpdates = !!serverOptions.liveReload && useComponentTemplateHmr;
@@ -466,7 +467,7 @@ async function handleUpdate(
     return;
   }
 
-  if (serverOptions.liveReload || serverOptions.hmr) {
+  if (serverOptions.hmr) {
     if (updatedFiles.every((f) => f.endsWith('.css'))) {
       const timestamp = Date.now();
       server.ws.send({

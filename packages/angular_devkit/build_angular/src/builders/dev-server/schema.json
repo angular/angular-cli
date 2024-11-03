@@ -84,8 +84,7 @@
     },
     "hmr": {
       "type": "boolean",
-      "description": "Enable hot module replacement.",
-      "default": false
+      "description": "Enable hot module replacement."
     },
     "watch": {
       "type": "boolean",

@@ -67,8 +67,7 @@
     },
     "hmr": {
       "type": "boolean",
-      "description": "Enable hot module replacement.",
-      "default": false
+      "description": "Enable hot module replacement. Defaults to the value of 'liveReload'. Currently, only global and component stylesheets are supported."
     },
     "watch": {
       "type": "boolean",
