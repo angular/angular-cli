@@ -116,7 +116,7 @@ export async function normalizeOptions(
     open,
     verbose,
     watch,
-    liveReload,
+    liveReload: !!liveReload,
     hmr,
     headers,
     workspaceRoot,
