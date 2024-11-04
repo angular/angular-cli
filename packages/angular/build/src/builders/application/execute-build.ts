@@ -49,7 +49,6 @@ export async function executeBuild(
     i18nOptions,
     optimizationOptions,
     assets,
-    outputMode,
     cacheOptions,
     serverEntryPoint,
     baseHref,
@@ -73,10 +72,15 @@ export async function executeBuild(
   let componentStyleBundler;
   let codeBundleCache;
   let bundlingResult: BundleContextResult;
+  let templateUpdates: Map<string, string> | undefined;
   if (rebuildState) {
     bundlerContexts = rebuildState.rebuildContexts;
     componentStyleBundler = rebuildState.componentStyleBundler;
     codeBundleCache = rebuildState.codeBundleCache;
+    templateUpdates = rebuildState.templateUpdates;
+    // Reset template updates for new rebuild
+    templateUpdates?.clear();
+
     const allFileChanges = rebuildState.fileChanges.all;
 
     // Bundle all contexts that do not require TypeScript changed file checks.
@@ -85,7 +89,6 @@ export async function executeBuild(
 
     // Check the TypeScript code bundling cache for changes. If invalid, force a rebundle of
     // all TypeScript related contexts.
-    // TODO: Enable cached bundling for the typescript contexts
     const forceTypeScriptRebuild = codeBundleCache?.invalidate(allFileChanges);
     const typescriptResults: BundleContextResult[] = [];
     for (const typescriptContext of bundlerContexts.typescriptContexts) {
@@ -98,7 +101,16 @@ export async function executeBuild(
     const target = transformSupportedBrowsersToTargets(browsers);
     codeBundleCache = new SourceFileCache(cacheOptions.enabled ? cacheOptions.path : undefined);
     componentStyleBundler = createComponentStyleBundler(options, target);
-    bundlerContexts = setupBundlerContexts(options, target, codeBundleCache, componentStyleBundler);
+    if (options.templateUpdates) {
+      templateUpdates = new Map<string, string>();
+    }
+    bundlerContexts = setupBundlerContexts(
+      options,
+      target,
+      codeBundleCache,
+      componentStyleBundler,
+      templateUpdates,
+    );
 
     // Bundle everything on initial build
     bundlingResult = await BundlerContext.bundleAll([
@@ -129,6 +141,7 @@ export async function executeBuild(
     bundlerContexts,
     componentStyleBundler,
     codeBundleCache,
+    templateUpdates,
   );
   executionResult.addWarnings(bundlingResult.warnings);
 
