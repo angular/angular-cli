@@ -2,6 +2,7 @@ import glob from 'fast-glob';
 import { readFile } from '../../utils/fs';
 
 const CURRENT_SCRIPT_PACKAGES: ReadonlySet<string> = new Set([
+  '@parcel/watcher (install)',
   'esbuild (postinstall)',
   'lmdb (install)',
   'msgpackr-extract (install)',
