@@ -15,7 +15,7 @@ export function createAngularAssetsMiddleware(
   server: ViteDevServer,
   assets: Map<string, string>,
   outputFiles: AngularMemoryOutputFiles,
-  usedComponentStyles: Map<string, Set<string>>,
+  usedComponentStyles: Map<string, Set<string | boolean>>,
   encapsulateStyle: (style: Uint8Array, componentId: string) => string,
 ): Connect.NextHandleFunction {
   return function angularAssetsMiddleware(req, res, next) {
@@ -76,14 +76,19 @@ export function createAngularAssetsMiddleware(
         let data: Uint8Array | string = outputFile.contents;
         if (extension === '.css') {
           // Inject component ID for view encapsulation if requested
-          const componentId = new URL(req.url, 'http://localhost').searchParams.get('ngcomp');
+          const searchParams = new URL(req.url, 'http://localhost').searchParams;
+          const componentId = searchParams.get('ngcomp');
           if (componentId !== null) {
-            // Record the component style usage for HMR updates
+            // Track if the component uses ShadowDOM encapsulation (3 = ViewEncapsulation.ShadowDom)
+            const shadow = searchParams.get('e') === '3';
+
+            // Record the component style usage for HMR updates (true = shadow; false = none; string = emulated)
             const usedIds = usedComponentStyles.get(pathname);
+            const trackingId = componentId || shadow;
             if (usedIds === undefined) {
-              usedComponentStyles.set(pathname, new Set([componentId]));
+              usedComponentStyles.set(pathname, new Set([trackingId]));
             } else {
-              usedIds.add(componentId);
+              usedIds.add(trackingId);
             }
 
             // Report if there are no changes to avoid reprocessing
