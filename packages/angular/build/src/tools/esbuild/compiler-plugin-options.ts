@@ -17,6 +17,7 @@ export function createCompilerPluginOptions(
   options: NormalizedApplicationBuildOptions,
   sourceFileCache: SourceFileCache,
   loadResultCache?: LoadResultCache,
+  templateUpdates?: Map<string, string>,
 ): CreateCompilerPluginParameters[0] {
   const {
     sourcemapOptions,
@@ -26,7 +27,6 @@ export function createCompilerPluginOptions(
     jit,
     externalRuntimeStyles,
     instrumentForCoverage,
-    templateUpdates,
   } = options;
   const incremental = !!options.watch;
 

@@ -16,7 +16,7 @@ import { logMessages, withNoProgress, withSpinner } from '../../tools/esbuild/ut
 import { shouldWatchRoot } from '../../utils/environment-options';
 import { NormalizedCachedOptions } from '../../utils/normalize-cache';
 import { NormalizedApplicationBuildOptions, NormalizedOutputOptions } from './options';
-import { FullResult, Result, ResultKind, ResultMessage } from './results';
+import { ComponentUpdateResult, FullResult, Result, ResultKind, ResultMessage } from './results';
 
 // Watch workspace for package manager changes
 const packageWatchFiles = [
@@ -207,6 +207,7 @@ async function emitOutputResult(
     externalMetadata,
     htmlIndexPath,
     htmlBaseHref,
+    templateUpdates,
   }: ExecutionResult,
   outputOptions: NormalizedApplicationBuildOptions['outputOptions'],
 ): Promise<Result> {
@@ -219,6 +220,20 @@ async function emitOutputResult(
         outputOptions,
       },
     };
+  }
+
+  // Template updates only exist if no other changes have occurred
+  if (templateUpdates?.size) {
+    const updateResult: ComponentUpdateResult = {
+      kind: ResultKind.ComponentUpdate,
+      updates: Array.from(templateUpdates).map(([id, content]) => ({
+        type: 'template',
+        id,
+        content,
+      })),
+    };
+
+    return updateResult;
   }
 
   const result: FullResult = {

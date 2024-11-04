@@ -34,6 +34,7 @@ export function setupBundlerContexts(
   target: string[],
   codeBundleCache: SourceFileCache,
   stylesheetBundler: ComponentStylesheetBundler,
+  templateUpdates: Map<string, string> | undefined,
 ): {
   typescriptContexts: BundlerContext[];
   otherContexts: BundlerContext[];
@@ -55,7 +56,13 @@ export function setupBundlerContexts(
     new BundlerContext(
       workspaceRoot,
       watch,
-      createBrowserCodeBundleOptions(options, target, codeBundleCache, stylesheetBundler),
+      createBrowserCodeBundleOptions(
+        options,
+        target,
+        codeBundleCache,
+        stylesheetBundler,
+        templateUpdates,
+      ),
     ),
   );
 

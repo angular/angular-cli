@@ -38,11 +38,17 @@ export function createBrowserCodeBundleOptions(
   target: string[],
   sourceFileCache: SourceFileCache,
   stylesheetBundler: ComponentStylesheetBundler,
+  templateUpdates: Map<string, string> | undefined,
 ): BundlerOptionsFactory {
   return (loadCache) => {
     const { entryPoints, outputNames, polyfills } = options;
 
-    const pluginOptions = createCompilerPluginOptions(options, sourceFileCache, loadCache);
+    const pluginOptions = createCompilerPluginOptions(
+      options,
+      sourceFileCache,
+      loadCache,
+      templateUpdates,
+    );
 
     const zoneless = isZonelessApp(polyfills);
 
