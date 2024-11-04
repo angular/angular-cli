@@ -28,6 +28,7 @@ export interface RebuildState {
   codeBundleCache?: SourceFileCache;
   fileChanges: ChangedFiles;
   previousOutputHashes: Map<string, string>;
+  templateUpdates?: Map<string, string>;
 }
 
 export interface ExternalResultMetadata {
@@ -60,6 +61,7 @@ export class ExecutionResult {
     },
     private componentStyleBundler: ComponentStylesheetBundler,
     private codeBundleCache?: SourceFileCache,
+    readonly templateUpdates?: Map<string, string>,
   ) {}
 
   addOutputFile(path: string, content: string | Uint8Array, type: BuildOutputFileType): void {
@@ -166,6 +168,7 @@ export class ExecutionResult {
       componentStyleBundler: this.componentStyleBundler,
       fileChanges,
       previousOutputHashes: new Map(this.outputFiles.map((file) => [file.path, file.hash])),
+      templateUpdates: this.templateUpdates,
     };
   }
 

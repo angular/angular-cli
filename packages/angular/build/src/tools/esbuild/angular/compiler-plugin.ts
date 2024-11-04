@@ -51,7 +51,7 @@ export interface CompilerPluginOptions {
   incremental: boolean;
   externalRuntimeStyles?: boolean;
   instrumentForCoverage?: (request: string) => boolean;
-  templateUpdates?: boolean;
+  templateUpdates?: Map<string, string>;
 }
 
 // eslint-disable-next-line max-lines-per-function
@@ -303,6 +303,12 @@ export function createCompilerPlugin(
             !!initializationResult.compilerOptions.inlineSourceMap;
           referencedFiles = initializationResult.referencedFiles;
           externalStylesheets = initializationResult.externalStylesheets;
+          if (initializationResult.templateUpdates) {
+            // Propagate any template updates
+            initializationResult.templateUpdates.forEach((value, key) =>
+              pluginOptions.templateUpdates?.set(key, value),
+            );
+          }
         } catch (error) {
           (result.errors ??= []).push({
             text: 'Angular compilation initialization failed.',
@@ -657,7 +663,7 @@ function createCompilerOptionsTransformer(
       sourceRoot: undefined,
       preserveSymlinks,
       externalRuntimeStyles: pluginOptions.externalRuntimeStyles,
-      _enableHmr: pluginOptions.templateUpdates,
+      _enableHmr: !!pluginOptions.templateUpdates,
     };
   };
 }
