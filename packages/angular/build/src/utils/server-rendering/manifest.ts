@@ -124,16 +124,19 @@ export function generateAngularServerAppManifest(
     const extension = extname(file.path);
     if (extension === '.html' || (inlineCriticalCss && extension === '.css')) {
       const jsChunkFilePath = `assets-chunks/${file.path.replace(/[./]/g, '_')}.mjs`;
+      const escapedContent = escapeUnsafeChars(file.text);
+
       serverAssetsChunks.push(
         createOutputFile(
           jsChunkFilePath,
-          `export default \`${escapeUnsafeChars(file.text)}\`;`,
+          `export default \`${escapedContent}\`;`,
           BuildOutputFileType.ServerApplication,
         ),
       );
 
+      const contentLength = Buffer.byteLength(escapedContent);
       serverAssetsContent.push(
-        `['${file.path}', {size: ${file.size}, hash: '${file.hash}', text: () => import('./${jsChunkFilePath}').then(m => m.default)}]`,
+        `['${file.path}', {size: ${contentLength}, hash: '${file.hash}', text: () => import('./${jsChunkFilePath}').then(m => m.default)}]`,
       );
     }
   }
