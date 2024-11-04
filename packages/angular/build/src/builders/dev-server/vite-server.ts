@@ -404,6 +404,7 @@ export async function* serveWithVite(
             key: 'r',
             description: 'force reload browser',
             action(server) {
+              usedComponentStyles.clear();
               server.ws.send({
                 type: 'full-reload',
                 path: '*',
@@ -431,7 +432,7 @@ async function handleUpdate(
   server: ViteDevServer,
   serverOptions: NormalizedDevServerOptions,
   logger: BuilderContext['logger'],
-  usedComponentStyles: Map<string, Set<string>>,
+  usedComponentStyles: Map<string, Set<string | boolean>>,
 ): Promise<void> {
   const updatedFiles: string[] = [];
   let destroyAngularServerAppCalled = false;
@@ -467,42 +468,57 @@ async function handleUpdate(
 
   if (serverOptions.liveReload || serverOptions.hmr) {
     if (updatedFiles.every((f) => f.endsWith('.css'))) {
+      let requiresReload = false;
       const timestamp = Date.now();
-      server.ws.send({
-        type: 'update',
-        updates: updatedFiles.flatMap((filePath) => {
-          // For component styles, an HMR update must be sent for each one with the corresponding
-          // component identifier search parameter (`ngcomp`). The Vite client code will not keep
-          // the existing search parameters when it performs an update and each one must be
-          // specified explicitly. Typically, there is only one each though as specific style files
-          // are not typically reused across components.
-          const componentIds = usedComponentStyles.get(filePath);
-          if (componentIds) {
-            return Array.from(componentIds).map((id) => ({
-              type: 'css-update',
-              timestamp,
-              path: `${filePath}?ngcomp` + (id ? `=${id}` : ''),
-              acceptedPath: filePath,
-            }));
-          }
+      const updates = updatedFiles.flatMap((filePath) => {
+        // For component styles, an HMR update must be sent for each one with the corresponding
+        // component identifier search parameter (`ngcomp`). The Vite client code will not keep
+        // the existing search parameters when it performs an update and each one must be
+        // specified explicitly. Typically, there is only one each though as specific style files
+        // are not typically reused across components.
+        const componentIds = usedComponentStyles.get(filePath);
+        if (componentIds) {
+          return Array.from(componentIds).map((id) => {
+            if (id === true) {
+              // Shadow DOM components currently require a full reload.
+              // Vite's CSS hot replacement does not support shadow root searching.
+              requiresReload = true;
+            }
 
-          return {
-            type: 'css-update' as const,
-            timestamp,
-            path: filePath,
-            acceptedPath: filePath,
-          };
-        }),
+            return {
+              type: 'css-update' as const,
+              timestamp,
+              path: `${filePath}?ngcomp` + (typeof id === 'string' ? `=${id}` : ''),
+              acceptedPath: filePath,
+            };
+          });
+        }
+
+        return {
+          type: 'css-update' as const,
+          timestamp,
+          path: filePath,
+          acceptedPath: filePath,
+        };
       });
 
-      logger.info('HMR update sent to client(s).');
+      if (!requiresReload) {
+        server.ws.send({
+          type: 'update',
+          updates,
+        });
+        logger.info('HMR update sent to client(s).');
 
-      return;
+        return;
+      }
     }
   }
 
   // Send reload command to clients
   if (serverOptions.liveReload) {
+    // Clear used component tracking on full reload
+    usedComponentStyles.clear();
+
     server.ws.send({
       type: 'full-reload',
       path: '*',
