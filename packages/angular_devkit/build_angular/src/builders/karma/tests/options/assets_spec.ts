@@ -74,8 +74,9 @@ describeKarmaBuilder(execute, KARMA_BUILDER_INFO, (harness, setupTarget) => {
                 declarations: [AppComponent]
               }));
 
-              it('should create the app', () => {
+              it('should create the app', async () => {
                 const fixture = TestBed.createComponent(AppComponent);
+                await fixture.whenStable();
                 const app = fixture.debugElement.componentInstance;
                 expect(app).toBeTruthy();
               });

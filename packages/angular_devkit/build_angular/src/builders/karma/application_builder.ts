@@ -19,6 +19,7 @@ import { BuilderContext, BuilderOutput } from '@angular-devkit/architect';
 import { randomUUID } from 'crypto';
 import glob from 'fast-glob';
 import * as fs from 'fs/promises';
+import { IncomingMessage, ServerResponse } from 'http';
 import type { Config, ConfigOptions, InlinePluginDef } from 'karma';
 import * as path from 'path';
 import { Observable, Subscriber, catchError, defaultIfEmpty, from, of, switchMap } from 'rxjs';
@@ -40,6 +41,71 @@ class ApplicationBuildError extends Error {
   }
 }
 
+interface ServeFileFunction {
+  (
+    filepath: string,
+    rangeHeader: string | string[] | undefined,
+    response: ServerResponse,
+    transform?: (c: string | Uint8Array) => string | Uint8Array,
+    content?: string | Uint8Array,
+    doNotCache?: boolean,
+  ): void;
+}
+
+interface LatestBuildFiles {
+  files: Record<string, ResultFile | undefined>;
+}
+
+const LATEST_BUILD_FILES_TOKEN = 'angularLatestBuildFiles';
+
+class AngularAssetsMiddleware {
+  static readonly $inject = ['serveFile', LATEST_BUILD_FILES_TOKEN];
+
+  static readonly NAME = 'angular-test-assets';
+
+  constructor(
+    private readonly serveFile: ServeFileFunction,
+    private readonly latestBuildFiles: LatestBuildFiles,
+  ) {}
+
+  handle(req: IncomingMessage, res: ServerResponse, next: (err?: unknown) => unknown) {
+    let err = null;
+    try {
+      const url = new URL(`http://${req.headers['host']}${req.url}`);
+      const file = this.latestBuildFiles.files[url.pathname.slice(1)];
+
+      if (file?.origin === 'disk') {
+        this.serveFile(file.inputPath, undefined, res);
+
+        return;
+      } else if (file?.origin === 'memory') {
+        // Include pathname to help with Content-Type headers.
+        this.serveFile(`/unused/${url.pathname}`, undefined, res, undefined, file.contents, true);
+
+        return;
+      }
+    } catch (e) {
+      err = e;
+    }
+    next(err);
+  }
+
+  static createPlugin(initialFiles: LatestBuildFiles): InlinePluginDef {
+    return {
+      [LATEST_BUILD_FILES_TOKEN]: ['value', { files: { ...initialFiles.files } }],
+
+      [`middleware:${AngularAssetsMiddleware.NAME}`]: [
+        'factory',
+        Object.assign((...args: ConstructorParameters<typeof AngularAssetsMiddleware>) => {
+          const inst = new AngularAssetsMiddleware(...args);
+
+          return inst.handle.bind(inst);
+        }, AngularAssetsMiddleware),
+      ],
+    };
+  }
+}
+
 function injectKarmaReporter(
   context: BuilderContext,
   buildOptions: BuildOptions,
@@ -58,9 +124,12 @@ function injectKarmaReporter(
   }
 
   class ProgressNotifierReporter {
-    static $inject = ['emitter'];
+    static $inject = ['emitter', LATEST_BUILD_FILES_TOKEN];
 
-    constructor(private readonly emitter: KarmaEmitter) {
+    constructor(
+      private readonly emitter: KarmaEmitter,
+      private readonly latestBuildFiles: LatestBuildFiles,
+    ) {
       this.startWatchingBuild();
     }
 
@@ -81,6 +150,14 @@ function injectKarmaReporter(
             buildOutput.kind === ResultKind.Incremental ||
             buildOutput.kind === ResultKind.Full
           ) {
+            if (buildOutput.kind === ResultKind.Full) {
+              this.latestBuildFiles.files = buildOutput.files;
+            } else {
+              this.latestBuildFiles.files = {
+                ...this.latestBuildFiles.files,
+                ...buildOutput.files,
+              };
+            }
             await writeTestFiles(buildOutput.files, buildOptions.outputPath);
             this.emitter.refreshFiles();
           }
@@ -237,6 +314,7 @@ async function initializeApplication(
     : undefined;
 
   const buildOptions: BuildOptions = {
+    assets: options.assets,
     entryPoints,
     tsConfig: options.tsConfig,
     outputPath,
@@ -293,7 +371,6 @@ async function initializeApplication(
       },
     );
   }
-
   karmaOptions.files.push(
     // Serve remaining JS on page load, these are the test entrypoints.
     { pattern: `${outputPath}/*.js`, type: 'module', watched: false },
@@ -313,8 +390,9 @@ async function initializeApplication(
   // Remove the webpack plugin/framework:
   // Alternative would be to make the Karma plugin "smart" but that's a tall order
   // with managing unneeded imports etc..
-  const pluginLengthBefore = (parsedKarmaConfig.plugins ?? []).length;
-  parsedKarmaConfig.plugins = (parsedKarmaConfig.plugins ?? []).filter(
+  parsedKarmaConfig.plugins ??= [];
+  const pluginLengthBefore = parsedKarmaConfig.plugins.length;
+  parsedKarmaConfig.plugins = parsedKarmaConfig.plugins.filter(
     (plugin: string | InlinePluginDef) => {
       if (typeof plugin === 'string') {
         return plugin !== 'framework:@angular-devkit/build-angular';
@@ -323,15 +401,20 @@ async function initializeApplication(
       return !plugin['framework:@angular-devkit/build-angular'];
     },
   );
-  parsedKarmaConfig.frameworks = parsedKarmaConfig.frameworks?.filter(
+  parsedKarmaConfig.frameworks ??= [];
+  parsedKarmaConfig.frameworks = parsedKarmaConfig.frameworks.filter(
     (framework: string) => framework !== '@angular-devkit/build-angular',
   );
-  const pluginLengthAfter = (parsedKarmaConfig.plugins ?? []).length;
+  const pluginLengthAfter = parsedKarmaConfig.plugins.length;
   if (pluginLengthBefore !== pluginLengthAfter) {
     context.logger.warn(
       `Ignoring framework "@angular-devkit/build-angular" from karma config file because it's not compatible with the application builder.`,
     );
   }
+
+  parsedKarmaConfig.plugins.push(AngularAssetsMiddleware.createPlugin(buildOutput));
+  parsedKarmaConfig.middleware ??= [];
+  parsedKarmaConfig.middleware.push(AngularAssetsMiddleware.NAME);
 
   // When using code-coverage, auto-add karma-coverage.
   // This was done as part of the karma plugin for webpack.
