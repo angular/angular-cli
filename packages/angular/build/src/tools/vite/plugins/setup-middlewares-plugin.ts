@@ -9,6 +9,7 @@
 import type { Connect, Plugin } from 'vite';
 import { loadEsmModule } from '../../../utils/load-esm';
 import {
+  ComponentStyleRecord,
   angularHtmlFallbackMiddleware,
   createAngularAssetsMiddleware,
   createAngularComponentMiddleware,
@@ -49,7 +50,7 @@ interface AngularSetupMiddlewaresPluginOptions {
   assets: Map<string, string>;
   extensionMiddleware?: Connect.NextHandleFunction[];
   indexHtmlTransformer?: (content: string) => Promise<string>;
-  usedComponentStyles: Map<string, Set<string>>;
+  componentStyles: Map<string, ComponentStyleRecord>;
   templateUpdates: Map<string, string>;
   ssrMode: ServerSsrMode;
 }
@@ -78,7 +79,7 @@ export function createAngularSetupMiddlewaresPlugin(
         outputFiles,
         extensionMiddleware,
         assets,
-        usedComponentStyles,
+        componentStyles,
         templateUpdates,
         ssrMode,
       } = options;
@@ -91,7 +92,7 @@ export function createAngularSetupMiddlewaresPlugin(
           server,
           assets,
           outputFiles,
-          usedComponentStyles,
+          componentStyles,
           await createEncapsulateStyle(),
         ),
       );
