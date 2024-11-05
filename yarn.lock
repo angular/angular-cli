@@ -324,9 +324,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@angular/build-tooling@https://github.com/angular/dev-infra-private-build-tooling-builds.git#0c70bc7159c1aae0128ec6af261d45c9a3b48da5":
-  version: 0.0.0-adf5acca6d96067437cfc4c68f35c59d3e7e763f
-  resolution: "@angular/build-tooling@https://github.com/angular/dev-infra-private-build-tooling-builds.git#commit=0c70bc7159c1aae0128ec6af261d45c9a3b48da5"
+"@angular/build-tooling@https://github.com/angular/dev-infra-private-build-tooling-builds.git#0386111e4e9937afa3740afb7e9ce2a0c35d39b8":
+  version: 0.0.0-c8e09d00cfc4bcefbab8c06f144608cd67d16451
+  resolution: "@angular/build-tooling@https://github.com/angular/dev-infra-private-build-tooling-builds.git#commit=0386111e4e9937afa3740afb7e9ce2a0c35d39b8"
   dependencies:
     "@angular/benchpress": "npm:0.3.0"
     "@angular/build": "npm:19.0.0-rc.0"
@@ -347,7 +347,7 @@ __metadata:
     "@types/selenium-webdriver": "npm:^4.1.21"
     "@types/send": "npm:^0.17.1"
     "@types/tmp": "npm:^0.2.1"
-    "@types/ws": "npm:8.5.12"
+    "@types/ws": "npm:8.5.13"
     "@types/yargs": "npm:^17.0.0"
     browser-sync: "npm:^3.0.0"
     html-entities: "npm:^2.4.0"
@@ -365,7 +365,7 @@ __metadata:
   dependenciesMeta:
     re2:
       built: false
-  checksum: 10c0/68bfbd3f73909b1b1cc3dfabf9685a9be74ff480f53755b30d941375f09d7c55fdca4c2b6f2a96b60024ad9e7efc23775c9ed80f130bc89592c32b199b1f192e
+  checksum: 10c0/b8ee367b359083a1b57112db89bccd1f385182884628b97ce9de03971f2b1a6cd2c14f507fba0cfc32d921f68647f650b9d6ae98c433679d50d9f83d0921be1f
   languageName: node
   linkType: hard
 
@@ -631,7 +631,7 @@ __metadata:
     "@ampproject/remapping": "npm:2.3.0"
     "@angular/animations": "npm:19.0.0-rc.0"
     "@angular/bazel": "patch:@angular/bazel@https%3A//github.com/angular/bazel-builds.git%23commit=07617f0f8540d27f8895b1820a6f994e1e5b7277#~/.yarn/patches/@angular-bazel-https-9848736cf4.patch"
-    "@angular/build-tooling": "https://github.com/angular/dev-infra-private-build-tooling-builds.git#0c70bc7159c1aae0128ec6af261d45c9a3b48da5"
+    "@angular/build-tooling": "https://github.com/angular/dev-infra-private-build-tooling-builds.git#0386111e4e9937afa3740afb7e9ce2a0c35d39b8"
     "@angular/cdk": "npm:19.0.0-rc.0"
     "@angular/common": "npm:19.0.0-rc.0"
     "@angular/compiler": "npm:19.0.0-rc.0"
@@ -640,7 +640,7 @@ __metadata:
     "@angular/forms": "npm:19.0.0-rc.0"
     "@angular/localize": "npm:19.0.0-rc.0"
     "@angular/material": "npm:19.0.0-rc.0"
-    "@angular/ng-dev": "https://github.com/angular/dev-infra-private-ng-dev-builds.git#3a50dcdd05f3c2fdb3a748399f09a3a6df236d0b"
+    "@angular/ng-dev": "https://github.com/angular/dev-infra-private-ng-dev-builds.git#1357f6aab253245fac2c66b40287d0ded76e12b1"
     "@angular/platform-browser": "npm:19.0.0-rc.0"
     "@angular/platform-browser-dynamic": "npm:19.0.0-rc.0"
     "@angular/platform-server": "npm:19.0.0-rc.0"
@@ -852,9 +852,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#3a50dcdd05f3c2fdb3a748399f09a3a6df236d0b":
-  version: 0.0.0-adf5acca6d96067437cfc4c68f35c59d3e7e763f
-  resolution: "@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#commit=3a50dcdd05f3c2fdb3a748399f09a3a6df236d0b"
+"@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#1357f6aab253245fac2c66b40287d0ded76e12b1":
+  version: 0.0.0-c8e09d00cfc4bcefbab8c06f144608cd67d16451
+  resolution: "@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#commit=1357f6aab253245fac2c66b40287d0ded76e12b1"
   dependencies:
     "@octokit/rest": "npm:21.0.2"
     "@types/semver": "npm:^7.3.6"
@@ -868,7 +868,7 @@ __metadata:
     yaml: "npm:2.6.0"
   bin:
     ng-dev: ./bundles/cli.mjs
-  checksum: 10c0/33994ffa5e2b7435a2dc984f8fce3b9115c4336d35d919ced35f49b36f34a6d2af21e3a98eeb3a010173c9f5397aa56e8414c559964fbb07bf7b212fccef6538
+  checksum: 10c0/e294c92f1af71913dc7ee3d903ecd0063050408ab652b71f18181cfb7385a6df366a0724398965f62db7d900c6c8c22b3bc8dbf4195c64da033132e255c90194
   languageName: node
   linkType: hard
 
@@ -5581,21 +5581,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/ws@npm:*, @types/ws@npm:^8.5.10":
+"@types/ws@npm:*, @types/ws@npm:8.5.13, @types/ws@npm:^8.5.10":
   version: 8.5.13
   resolution: "@types/ws@npm:8.5.13"
   dependencies:
     "@types/node": "npm:*"
   checksum: 10c0/a5430aa479bde588e69cb9175518d72f9338b6999e3b2ae16fc03d3bdcff8347e486dc031e4ed14601260463c07e1f9a0d7511dfc653712b047c439c680b0b34
-  languageName: node
-  linkType: hard
-
-"@types/ws@npm:8.5.12":
-  version: 8.5.12
-  resolution: "@types/ws@npm:8.5.12"
-  dependencies:
-    "@types/node": "npm:*"
-  checksum: 10c0/3fd77c9e4e05c24ce42bfc7647f7506b08c40a40fe2aea236ef6d4e96fc7cb4006a81ed1b28ec9c457e177a74a72924f4768b7b4652680b42dfd52bc380e15f9
   languageName: node
   linkType: hard
 
