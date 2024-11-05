@@ -14,7 +14,7 @@ export {
 
 export { AngularNodeAppEngine } from './src/app-engine';
 
-export { createNodeRequestHandler } from './src/handler';
+export { createNodeRequestHandler, type NodeRequestHandlerFunction } from './src/handler';
 export { writeResponseToNodeResponse } from './src/response';
 export { createWebRequestFromNodeRequest } from './src/request';
 export { isMainModule } from './src/module';
