@@ -9,7 +9,7 @@
 export * from './private_export';
 
 export { AngularAppEngine } from './src/app-engine';
-export { createRequestHandler } from './src/handler';
+export { createRequestHandler, type RequestHandlerFunction } from './src/handler';
 
 export {
   type PrerenderFallback,

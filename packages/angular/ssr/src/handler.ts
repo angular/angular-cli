@@ -12,8 +12,11 @@
  * @param request - The incoming HTTP request object.
  * @returns A Promise resolving to a `Response` object, `null`, or directly a `Response`,
  * supporting both synchronous and asynchronous handling.
+ * @developerPreview
  */
-type RequestHandlerFunction = (request: Request) => Promise<Response | null> | null | Response;
+export type RequestHandlerFunction = (
+  request: Request,
+) => Promise<Response | null> | null | Response;
 
 /**
  * Annotates a request handler function with metadata, marking it as a special

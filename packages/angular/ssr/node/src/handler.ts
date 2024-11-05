@@ -16,8 +16,9 @@ import type { IncomingMessage, ServerResponse } from 'node:http';
  * @param next - A callback function that signals the completion of the middleware or forwards the error if provided.
  *
  * @returns A Promise that resolves to void or simply void. The handler can be asynchronous.
+ * @developerPreview
  */
-type RequestHandlerFunction = (
+export type NodeRequestHandlerFunction = (
   req: IncomingMessage,
   res: ServerResponse,
   next: (err?: unknown) => void,
@@ -67,7 +68,7 @@ type RequestHandlerFunction = (
  * ```
  * @developerPreview
  */
-export function createNodeRequestHandler<T extends RequestHandlerFunction>(handler: T): T {
+export function createNodeRequestHandler<T extends NodeRequestHandlerFunction>(handler: T): T {
   (handler as T & { __ng_node_request_handler__?: boolean })['__ng_node_request_handler__'] = true;
 
   return handler;

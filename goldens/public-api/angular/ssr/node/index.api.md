@@ -43,13 +43,16 @@ export interface CommonEngineRenderOptions {
 }
 
 // @public
-export function createNodeRequestHandler<T extends RequestHandlerFunction>(handler: T): T;
+export function createNodeRequestHandler<T extends NodeRequestHandlerFunction>(handler: T): T;
 
 // @public
 export function createWebRequestFromNodeRequest(nodeRequest: IncomingMessage): Request;
 
 // @public
 export function isMainModule(url: string): boolean;
+
+// @public
+export type NodeRequestHandlerFunction = (req: IncomingMessage, res: ServerResponse, next: (err?: unknown) => void) => Promise<void> | void;
 
 // @public
 export function writeResponseToNodeResponse(source: Response, destination: ServerResponse): Promise<void>;
