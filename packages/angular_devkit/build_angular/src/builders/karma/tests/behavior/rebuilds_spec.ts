@@ -6,12 +6,12 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { concatMap, count, debounceTime, take, timeout } from 'rxjs';
+import { concatMap, count, debounceTime, distinctUntilChanged, take, timeout } from 'rxjs';
 import { execute } from '../../index';
 import { BASE_OPTIONS, KARMA_BUILDER_INFO, describeKarmaBuilder } from '../setup';
 import { BuilderOutput } from '@angular-devkit/architect';
 
-describeKarmaBuilder(execute, KARMA_BUILDER_INFO, (harness, setupTarget, isApplicationBuilder) => {
+describeKarmaBuilder(execute, KARMA_BUILDER_INFO, (harness, setupTarget) => {
   describe('Behavior: "Rebuilds"', () => {
     beforeEach(async () => {
       await setupTarget(harness);
@@ -33,31 +33,31 @@ describeKarmaBuilder(execute, KARMA_BUILDER_INFO, (harness, setupTarget, isAppli
         async (result) => {
           // Karma run should succeed.
           // Add a compilation error.
-          expect(result?.success).toBeTrue();
+          expect(result?.success).withContext('Initial test run should succeed').toBeTrue();
           // Add an syntax error to a non-main file.
           await harness.appendToFile('src/app/app.component.spec.ts', `error`);
         },
         async (result) => {
-          expect(result?.success).toBeFalse();
+          expect(result?.success)
+            .withContext('Test should fail after build error was introduced')
+            .toBeFalse();
           await harness.writeFile('src/app/app.component.spec.ts', goodFile);
         },
         async (result) => {
-          expect(result?.success).toBeTrue();
+          expect(result?.success)
+            .withContext('Test should succeed again after build error was fixed')
+            .toBeTrue();
         },
       ];
-      if (isApplicationBuilder) {
-        expectedSequence.unshift(async (result) => {
-          // This is the initial Karma run, it should succeed.
-          // For simplicity, we trigger a run the first time we build in watch mode.
-          expect(result?.success).toBeTrue();
-        });
-      }
 
       const buildCount = await harness
         .execute({ outputLogsOnFailure: false })
         .pipe(
           timeout(60000),
           debounceTime(500),
+          // There may be a sequence of {success:true} events that should be
+          // de-duplicated.
+          distinctUntilChanged((prev, current) => prev.result?.success === current.result?.success),
           concatMap(async ({ result }, index) => {
             await expectedSequence[index](result);
           }),
