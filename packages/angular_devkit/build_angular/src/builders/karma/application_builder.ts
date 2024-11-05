@@ -260,7 +260,7 @@ async function collectEntrypoints(
   options: KarmaBuilderOptions,
   context: BuilderContext,
   projectSourceRoot: string,
-): Promise<Set<string>> {
+): Promise<Map<string, string>> {
   // Glob for files to test.
   const testFiles = await findTests(
     options.include ?? [],
@@ -269,7 +269,28 @@ async function collectEntrypoints(
     projectSourceRoot,
   );
 
-  return new Set(testFiles);
+  const seen = new Set<string>();
+
+  return new Map(
+    Array.from(testFiles, (testFile) => {
+      const relativePath = path
+        .relative(
+          testFile.startsWith(projectSourceRoot) ? projectSourceRoot : context.workspaceRoot,
+          testFile,
+        )
+        .replace(/^[./]+/, '_')
+        .replace(/\//g, '-');
+      let uniqueName = `spec-${path.basename(relativePath, path.extname(relativePath))}`;
+      let suffix = 2;
+      while (seen.has(uniqueName)) {
+        uniqueName = `${relativePath}-${suffix}`;
+        ++suffix;
+      }
+      seen.add(uniqueName);
+
+      return [uniqueName, testFile];
+    }),
+  );
 }
 
 async function initializeApplication(
@@ -298,12 +319,11 @@ async function initializeApplication(
     fs.rm(outputPath, { recursive: true, force: true }),
   ]);
 
-  let mainName = 'init_test_bed';
+  const mainName = 'test_main';
   if (options.main) {
-    entryPoints.add(options.main);
-    mainName = path.basename(options.main, path.extname(options.main));
+    entryPoints.set(mainName, options.main);
   } else {
-    entryPoints.add('@angular-devkit/build-angular/src/builders/karma/init_test_bed.js');
+    entryPoints.set(mainName, '@angular-devkit/build-angular/src/builders/karma/init_test_bed.js');
   }
 
   const instrumentForCoverage = options.codeCoverage
@@ -358,6 +378,8 @@ async function initializeApplication(
     { pattern: `${outputPath}/${mainName}.js`, type: 'module', watched: false },
     // Serve all source maps.
     { pattern: `${outputPath}/*.map`, included: false, watched: false },
+    // These are the test entrypoints.
+    { pattern: `${outputPath}/spec-*.js`, type: 'module', watched: false },
   );
 
   if (hasChunkOrWorkerFiles(buildOutput.files)) {
@@ -371,10 +393,6 @@ async function initializeApplication(
       },
     );
   }
-  karmaOptions.files.push(
-    // Serve remaining JS on page load, these are the test entrypoints.
-    { pattern: `${outputPath}/*.js`, type: 'module', watched: false },
-  );
 
   if (options.styles?.length) {
     // Serve CSS outputs on page load, these are the global styles.
