@@ -38,7 +38,7 @@ export interface EntryPointExports {
   /**
    * A reference to the function that creates an Angular server application instance.
    *
-   * @note The return type is `unknown` to prevent circular dependency issues.
+   * @remarks The return type is `unknown` to prevent circular dependency issues.
    */
   ɵgetOrCreateAngularServerApp: () => unknown;
 

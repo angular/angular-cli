@@ -17,7 +17,7 @@ import { stripIndexHtmlFromURL, stripTrailingSlash } from './utils/url';
  * Manages Angular server applications (including localized ones), handles rendering requests,
  * and optionally transforms index HTML before rendering.
  *
- * @note This class should be instantiated once and used as a singleton across the server-side
+ * @remarks This class should be instantiated once and used as a singleton across the server-side
  * application to ensure consistent handling of rendering requests and resource management.
  *
  * @developerPreview
@@ -60,7 +60,7 @@ export class AngularAppEngine {
    * @param requestContext - Optional context for rendering, such as metadata associated with the request.
    * @returns A promise that resolves to the resulting HTTP response object, or `null` if no matching Angular route is found.
    *
-   * @note A request to `https://www.example.com/page/index.html` will serve or render the Angular route
+   * @remarks A request to `https://www.example.com/page/index.html` will serve or render the Angular route
    * corresponding to `https://www.example.com/page`.
    */
   async handle(request: Request, requestContext?: unknown): Promise<Response | null> {
