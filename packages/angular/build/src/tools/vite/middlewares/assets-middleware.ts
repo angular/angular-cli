@@ -11,11 +11,17 @@ import { extname } from 'node:path';
 import type { Connect, ViteDevServer } from 'vite';
 import { AngularMemoryOutputFiles, pathnameWithoutBasePath } from '../utils';
 
+export interface ComponentStyleRecord {
+  rawContent: Uint8Array;
+  used?: Set<string>;
+  reload?: boolean;
+}
+
 export function createAngularAssetsMiddleware(
   server: ViteDevServer,
   assets: Map<string, string>,
   outputFiles: AngularMemoryOutputFiles,
-  usedComponentStyles: Map<string, Set<string | boolean>>,
+  componentStyles: Map<string, ComponentStyleRecord>,
   encapsulateStyle: (style: Uint8Array, componentId: string) => string,
 ): Connect.NextHandleFunction {
   return function angularAssetsMiddleware(req, res, next) {
@@ -74,21 +80,24 @@ export function createAngularAssetsMiddleware(
       const outputFile = outputFiles.get(pathname);
       if (outputFile?.servable) {
         let data: Uint8Array | string = outputFile.contents;
-        if (extension === '.css') {
+        const componentStyle = componentStyles.get(pathname);
+        if (componentStyle) {
           // Inject component ID for view encapsulation if requested
           const searchParams = new URL(req.url, 'http://localhost').searchParams;
           const componentId = searchParams.get('ngcomp');
           if (componentId !== null) {
             // Track if the component uses ShadowDOM encapsulation (3 = ViewEncapsulation.ShadowDom)
-            const shadow = searchParams.get('e') === '3';
+            // Shadow DOM components currently require a full reload.
+            // Vite's CSS hot replacement does not support shadow root searching.
+            if (searchParams.get('e') === '3') {
+              componentStyle.reload = true;
+            }
 
-            // Record the component style usage for HMR updates (true = shadow; false = none; string = emulated)
-            const usedIds = usedComponentStyles.get(pathname);
-            const trackingId = componentId || shadow;
-            if (usedIds === undefined) {
-              usedComponentStyles.set(pathname, new Set([trackingId]));
+            // Record the component style usage for HMR updates
+            if (componentStyle.used === undefined) {
+              componentStyle.used = new Set([componentId]);
             } else {
-              usedIds.add(trackingId);
+              componentStyle.used.add(componentId);
             }
 
             // Report if there are no changes to avoid reprocessing

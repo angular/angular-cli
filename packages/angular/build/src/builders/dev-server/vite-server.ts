@@ -14,6 +14,7 @@ import { readFile } from 'node:fs/promises';
 import { builtinModules, isBuiltin } from 'node:module';
 import { join } from 'node:path';
 import type { Connect, DepOptimizationConfig, InlineConfig, ViteDevServer } from 'vite';
+import type { ComponentStyleRecord } from '../../tools/vite/middlewares';
 import {
   ServerSsrMode,
   createAngularLocaleDataPlugin,
@@ -175,7 +176,7 @@ export async function* serveWithVite(
     explicitBrowser: [],
     explicitServer: [],
   };
-  const usedComponentStyles = new Map<string, Set<string>>();
+  const componentStyles = new Map<string, ComponentStyleRecord>();
   const templateUpdates = new Map<string, string>();
 
   // Add cleanup logic via a builder teardown.
@@ -232,11 +233,17 @@ export async function* serveWithVite(
             assetFiles.set('/' + normalizePath(outputPath), normalizePath(file.inputPath));
           }
         }
-        // Clear stale template updates on a code rebuilds
+        // Clear stale template updates on code rebuilds
         templateUpdates.clear();
 
         // Analyze result files for changes
-        analyzeResultFiles(normalizePath, htmlIndexPath, result.files, generatedFiles);
+        analyzeResultFiles(
+          normalizePath,
+          htmlIndexPath,
+          result.files,
+          generatedFiles,
+          componentStyles,
+        );
         break;
       case ResultKind.Incremental:
         assert(server, 'Builder must provide an initial full build before incremental results.');
@@ -321,7 +328,7 @@ export async function* serveWithVite(
           server,
           serverOptions,
           context.logger,
-          usedComponentStyles,
+          componentStyles,
         );
       }
     } else {
@@ -380,7 +387,7 @@ export async function* serveWithVite(
         prebundleTransformer,
         target,
         isZonelessApp(polyfills),
-        usedComponentStyles,
+        componentStyles,
         templateUpdates,
         browserOptions.loader as EsbuildLoaderOption | undefined,
         extensions?.middleware,
@@ -406,7 +413,7 @@ export async function* serveWithVite(
             key: 'r',
             description: 'force reload browser',
             action(server) {
-              usedComponentStyles.clear();
+              componentStyles.forEach((record) => record.used?.clear());
               server.ws.send({
                 type: 'full-reload',
                 path: '*',
@@ -434,7 +441,7 @@ async function handleUpdate(
   server: ViteDevServer,
   serverOptions: NormalizedDevServerOptions,
   logger: BuilderContext['logger'],
-  usedComponentStyles: Map<string, Set<string | boolean>>,
+  componentStyles: Map<string, ComponentStyleRecord>,
 ): Promise<void> {
   const updatedFiles: string[] = [];
   let destroyAngularServerAppCalled = false;
@@ -478,15 +485,17 @@ async function handleUpdate(
         // the existing search parameters when it performs an update and each one must be
         // specified explicitly. Typically, there is only one each though as specific style files
         // are not typically reused across components.
-        const componentIds = usedComponentStyles.get(filePath);
-        if (componentIds) {
-          return Array.from(componentIds).map((id) => {
-            if (id === true) {
-              // Shadow DOM components currently require a full reload.
-              // Vite's CSS hot replacement does not support shadow root searching.
-              requiresReload = true;
-            }
+        const record = componentStyles.get(filePath);
+        if (record) {
+          if (record.reload) {
+            // Shadow DOM components currently require a full reload.
+            // Vite's CSS hot replacement does not support shadow root searching.
+            requiresReload = true;
 
+            return [];
+          }
+
+          return Array.from(record.used ?? []).map((id) => {
             return {
               type: 'css-update' as const,
               timestamp,
@@ -519,7 +528,7 @@ async function handleUpdate(
   // Send reload command to clients
   if (serverOptions.liveReload) {
     // Clear used component tracking on full reload
-    usedComponentStyles.clear();
+    componentStyles.forEach((record) => record.used?.clear());
 
     server.ws.send({
       type: 'full-reload',
@@ -535,6 +544,7 @@ function analyzeResultFiles(
   htmlIndexPath: string,
   resultFiles: Record<string, ResultFile>,
   generatedFiles: Map<string, OutputFileRecord>,
+  componentStyles: Map<string, ComponentStyleRecord>,
 ) {
   const seen = new Set<string>(['/index.html']);
   for (const [outputPath, file] of Object.entries(resultFiles)) {
@@ -589,12 +599,25 @@ function analyzeResultFiles(
       type: file.type,
       servable,
     });
+
+    // Record any external component styles
+    if (filePath.endsWith('.css') && /^\/[a-f0-9]{64}\.css$/.test(filePath)) {
+      const componentStyle = componentStyles.get(filePath);
+      if (componentStyle) {
+        componentStyle.rawContent = file.contents;
+      } else {
+        componentStyles.set(filePath, {
+          rawContent: file.contents,
+        });
+      }
+    }
   }
 
   // Clear stale output files
   for (const file of generatedFiles.keys()) {
     if (!seen.has(file)) {
       generatedFiles.delete(file);
+      componentStyles.delete(file);
     }
   }
 }
@@ -609,7 +632,7 @@ export async function setupServer(
   prebundleTransformer: JavaScriptTransformer,
   target: string[],
   zoneless: boolean,
-  usedComponentStyles: Map<string, Set<string>>,
+  componentStyles: Map<string, ComponentStyleRecord>,
   templateUpdates: Map<string, string>,
   prebundleLoaderExtensions: EsbuildLoaderOption | undefined,
   extensionMiddleware?: Connect.NextHandleFunction[],
@@ -719,7 +742,7 @@ export async function setupServer(
         assets,
         indexHtmlTransformer,
         extensionMiddleware,
-        usedComponentStyles,
+        componentStyles,
         templateUpdates,
         ssrMode,
       }),
