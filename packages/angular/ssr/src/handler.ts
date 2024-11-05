@@ -9,11 +9,19 @@
 /**
  * Function for handling HTTP requests in a web environment.
  *
- * @param request - The incoming HTTP request object.
+ * @typeParam ContextType - The type for the optional `requestContext` parameter. Defaults to `unknown`.
+ *
+ * @param request - The incoming HTTP request object
+ * @param requestContext - Optional additional context for rendering, such as request metadata.
  * @returns A Promise resolving to a `Response` object, `null`, or directly a `Response`,
  * supporting both synchronous and asynchronous handling.
+ *
+ * @developerPreview
  */
-type RequestHandlerFunction = (request: Request) => Promise<Response | null> | null | Response;
+export type RequestHandlerFunction<ContextType = unknown> = (
+  request: Request,
+  requestContext?: ContextType,
+) => Promise<Response | null> | null | Response;
 
 /**
  * Annotates a request handler function with metadata, marking it as a special
