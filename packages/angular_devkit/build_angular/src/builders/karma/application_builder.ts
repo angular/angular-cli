@@ -9,6 +9,7 @@
 import { BuildOutputFileType } from '@angular/build';
 import {
   ApplicationBuilderInternalOptions,
+  Result,
   ResultFile,
   ResultKind,
   buildApplicationInternal,
@@ -42,6 +43,7 @@ class ApplicationBuildError extends Error {
 function injectKarmaReporter(
   context: BuilderContext,
   buildOptions: BuildOptions,
+  buildIterator: AsyncIterator<Result>,
   karmaConfig: Config & ConfigOptions,
   subscriber: Subscriber<BuilderOutput>,
 ) {
@@ -64,13 +66,15 @@ function injectKarmaReporter(
 
     private startWatchingBuild() {
       void (async () => {
-        for await (const buildOutput of buildApplicationInternal(
-          {
-            ...buildOptions,
-            watch: true,
-          },
-          context,
-        )) {
+        // This is effectively "for await of but skip what's already consumed".
+        let isDone = false; // to mark the loop condition as "not constant".
+        while (!isDone) {
+          const { done, value: buildOutput } = await buildIterator.next();
+          if (done) {
+            isDone = true;
+            break;
+          }
+
           if (buildOutput.kind === ResultKind.Failure) {
             subscriber.next({ success: false, message: 'Build failed' });
           } else if (
@@ -121,12 +125,12 @@ export function execute(
 ): Observable<BuilderOutput> {
   return from(initializeApplication(options, context, karmaOptions, transforms)).pipe(
     switchMap(
-      ([karma, karmaConfig, buildOptions]) =>
+      ([karma, karmaConfig, buildOptions, buildIterator]) =>
         new Observable<BuilderOutput>((subscriber) => {
           // If `--watch` is explicitly enabled or if we are keeping the Karma
           // process running, we should hook Karma into the build.
-          if (options.watch ?? !karmaConfig.singleRun) {
-            injectKarmaReporter(context, buildOptions, karmaConfig, subscriber);
+          if (buildIterator) {
+            injectKarmaReporter(context, buildOptions, buildIterator, karmaConfig, subscriber);
           }
 
           // Complete the observable once the Karma server returns.
@@ -199,7 +203,9 @@ async function initializeApplication(
     webpackConfiguration?: ExecutionTransformer<Configuration>;
     karmaOptions?: (options: ConfigOptions) => ConfigOptions;
   } = {},
-): Promise<[typeof import('karma'), Config & ConfigOptions, BuildOptions]> {
+): Promise<
+  [typeof import('karma'), Config & ConfigOptions, BuildOptions, AsyncIterator<Result> | null]
+> {
   if (transforms.webpackConfiguration) {
     context.logger.warn(
       `This build is using the application builder but transforms.webpackConfiguration was provided. The transform will be ignored.`,
@@ -247,10 +253,14 @@ async function initializeApplication(
     styles: options.styles,
     polyfills: normalizePolyfills(options.polyfills),
     webWorkerTsConfig: options.webWorkerTsConfig,
+    watch: options.watch ?? !karmaOptions.singleRun,
   };
 
   // Build tests with `application` builder, using test files as entry points.
-  const buildOutput = await first(buildApplicationInternal(buildOptions, context));
+  const [buildOutput, buildIterator] = await first(
+    buildApplicationInternal(buildOptions, context),
+    { cancel: !buildOptions.watch },
+  );
   if (buildOutput.kind === ResultKind.Failure) {
     throw new ApplicationBuildError('Build failed');
   } else if (buildOutput.kind !== ResultKind.Full) {
@@ -265,28 +275,33 @@ async function initializeApplication(
   karmaOptions.files ??= [];
   karmaOptions.files.push(
     // Serve polyfills first.
-    { pattern: `${outputPath}/polyfills.js`, type: 'module' },
+    { pattern: `${outputPath}/polyfills.js`, type: 'module', watched: false },
     // Serve global setup script.
-    { pattern: `${outputPath}/${mainName}.js`, type: 'module' },
+    { pattern: `${outputPath}/${mainName}.js`, type: 'module', watched: false },
     // Serve all source maps.
-    { pattern: `${outputPath}/*.map`, included: false },
+    { pattern: `${outputPath}/*.map`, included: false, watched: false },
   );
 
   if (hasChunkOrWorkerFiles(buildOutput.files)) {
     karmaOptions.files.push(
       // Allow loading of chunk-* files but don't include them all on load.
-      { pattern: `${outputPath}/{chunk,worker}-*.js`, type: 'module', included: false },
+      {
+        pattern: `${outputPath}/{chunk,worker}-*.js`,
+        type: 'module',
+        included: false,
+        watched: false,
+      },
     );
   }
 
   karmaOptions.files.push(
     // Serve remaining JS on page load, these are the test entrypoints.
-    { pattern: `${outputPath}/*.js`, type: 'module' },
+    { pattern: `${outputPath}/*.js`, type: 'module', watched: false },
   );
 
   if (options.styles?.length) {
     // Serve CSS outputs on page load, these are the global styles.
-    karmaOptions.files.push({ pattern: `${outputPath}/*.css`, type: 'css' });
+    karmaOptions.files.push({ pattern: `${outputPath}/*.css`, type: 'css', watched: false });
   }
 
   const parsedKarmaConfig: Config & ConfigOptions = await karma.config.parseConfig(
@@ -327,7 +342,7 @@ async function initializeApplication(
     parsedKarmaConfig.reporters = (parsedKarmaConfig.reporters ?? []).concat(['coverage']);
   }
 
-  return [karma, parsedKarmaConfig, buildOptions];
+  return [karma, parsedKarmaConfig, buildOptions, buildIterator];
 }
 
 function hasChunkOrWorkerFiles(files: Record<string, unknown>): boolean {
@@ -364,9 +379,22 @@ export async function writeTestFiles(files: Record<string, ResultFile>, testDir:
 }
 
 /** Returns the first item yielded by the given generator and cancels the execution. */
-async function first<T>(generator: AsyncIterable<T>): Promise<T> {
+async function first<T>(
+  generator: AsyncIterable<T>,
+  { cancel }: { cancel: boolean },
+): Promise<[T, AsyncIterator<T> | null]> {
+  if (!cancel) {
+    const iterator: AsyncIterator<T> = generator[Symbol.asyncIterator]();
+    const firstValue = await iterator.next();
+    if (firstValue.done) {
+      throw new Error('Expected generator to emit at least once.');
+    }
+
+    return [firstValue.value, iterator];
+  }
+
   for await (const value of generator) {
-    return value;
+    return [value, null];
   }
 
   throw new Error('Expected generator to emit at least once.');
