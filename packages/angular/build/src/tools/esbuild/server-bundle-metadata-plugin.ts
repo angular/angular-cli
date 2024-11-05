@@ -15,7 +15,7 @@ import type { Plugin } from 'esbuild';
  * @param options Optional configuration object.
  * - `ssrEntryBundle`: If `true`, marks the bundle as an SSR entry point.
  *
- * @note We can't rely on `platform: node` or `platform: neutral`, as the latter
+ * @remarks We can't rely on `platform: node` or `platform: neutral`, as the latter
  *       is used for non-SSR-related code too (e.g., global scripts).
  * @returns An esbuild plugin that injects SSR metadata into the build result's metafile.
  */
