@@ -10,6 +10,8 @@ import { EnvironmentProviders, InjectionToken, makeEnvironmentProviders } from '
 
 /**
  * Different rendering modes for server routes.
+ * @see {@link provideServerRoutesConfig}
+ * @see {@link ServerRoute}
  * @developerPreview
  */
 export enum RenderMode {
@@ -29,7 +31,7 @@ export enum RenderMode {
 /**
  * Defines the fallback strategies for Static Site Generation (SSG) routes when a pre-rendered path is not available.
  * This is particularly relevant for routes with parameterized URLs where some paths might not be pre-rendered at build time.
- *
+ * @see {@link ServerRoutePrerenderWithParams}
  * @developerPreview
  */
 export enum PrerenderFallback {
@@ -68,6 +70,7 @@ export interface ServerRouteCommon {
 
 /**
  * A server route that uses AppShell rendering mode.
+ * @see {@link RenderMode}
  */
 export interface ServerRouteAppShell extends Omit<ServerRouteCommon, 'headers' | 'status'> {
   /** Specifies that the route uses AppShell rendering mode. */
@@ -76,6 +79,7 @@ export interface ServerRouteAppShell extends Omit<ServerRouteCommon, 'headers' |
 
 /**
  * A server route that uses Client-Side Rendering (CSR) mode.
+ * @see {@link RenderMode}
  */
 export interface ServerRouteClient extends ServerRouteCommon {
   /** Specifies that the route uses Client-Side Rendering (CSR) mode. */
@@ -84,6 +88,7 @@ export interface ServerRouteClient extends ServerRouteCommon {
 
 /**
  * A server route that uses Static Site Generation (SSG) mode.
+ * @see {@link RenderMode}
  */
 export interface ServerRoutePrerender extends Omit<ServerRouteCommon, 'status'> {
   /** Specifies that the route uses Static Site Generation (SSG) mode. */
@@ -95,6 +100,9 @@ export interface ServerRoutePrerender extends Omit<ServerRouteCommon, 'status'> 
 
 /**
  * A server route configuration that uses Static Site Generation (SSG) mode, including support for routes with parameters.
+ * @see {@link RenderMode}
+ * @see {@link ServerRoutePrerender}
+ * @see {@link PrerenderFallback}
  */
 export interface ServerRoutePrerenderWithParams extends Omit<ServerRoutePrerender, 'fallback'> {
   /**
@@ -138,6 +146,7 @@ export interface ServerRoutePrerenderWithParams extends Omit<ServerRoutePrerende
 
 /**
  * A server route that uses Server-Side Rendering (SSR) mode.
+ *  @see {@link RenderMode}
  */
 export interface ServerRouteServer extends ServerRouteCommon {
   /** Specifies that the route uses Server-Side Rendering (SSR) mode. */
@@ -146,6 +155,7 @@ export interface ServerRouteServer extends ServerRouteCommon {
 
 /**
  * Server route configuration.
+ * @see {@link provideServerRoutesConfig}
  * @developerPreview
  */
 export type ServerRoute =
@@ -166,6 +176,7 @@ export const SERVER_ROUTES_CONFIG = new InjectionToken<ServerRoute[]>('SERVER_RO
  *
  * @param routes - An array of server routes to be provided.
  * @returns An `EnvironmentProviders` object that contains the server routes configuration.
+ * @see {@link ServerRoute}
  * @developerPreview
  */
 export function provideServerRoutesConfig(routes: ServerRoute[]): EnvironmentProviders {
