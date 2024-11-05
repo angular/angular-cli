@@ -34,6 +34,9 @@ export enum RenderMode {
 }
 
 // @public
+export type RequestHandlerFunction = (request: Request) => Promise<Response | null> | null | Response;
+
+// @public
 export type ServerRoute = ServerRouteAppShell | ServerRouteClient | ServerRoutePrerender | ServerRoutePrerenderWithParams | ServerRouteServer;
 
 // @public
