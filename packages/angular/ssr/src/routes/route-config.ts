@@ -169,6 +169,12 @@ export const SERVER_ROUTES_CONFIG = new InjectionToken<ServerRoute[]>('SERVER_RO
  * @developerPreview
  */
 export function provideServerRoutesConfig(routes: ServerRoute[]): EnvironmentProviders {
+  if (typeof ngServerMode === 'undefined' || !ngServerMode) {
+    throw new Error(
+      `The 'provideServerRoutesConfig' function should not be invoked within the browser portion of the application.`,
+    );
+  }
+
   return makeEnvironmentProviders([
     {
       provide: SERVER_ROUTES_CONFIG,
