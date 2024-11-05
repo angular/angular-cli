@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-export { createAngularAssetsMiddleware } from './assets-middleware';
+export { type ComponentStyleRecord, createAngularAssetsMiddleware } from './assets-middleware';
 export { angularHtmlFallbackMiddleware } from './html-fallback-middleware';
 export { createAngularIndexHtmlMiddleware } from './index-html-middleware';
 export {
