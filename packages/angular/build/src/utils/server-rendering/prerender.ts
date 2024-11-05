@@ -219,10 +219,11 @@ async function renderPages(
     const baseHrefWithLeadingSlash = addLeadingSlash(baseHref);
 
     for (const { route, redirectTo, renderMode } of serializableRouteTreeNode) {
-      // Remove base href from file output path.
-      const routeWithoutBaseHref = addLeadingSlash(
-        route.slice(baseHrefWithLeadingSlash.length - 1),
-      );
+      // Remove the base href from the file output path.
+      const routeWithoutBaseHref = addTrailingSlash(route).startsWith(baseHrefWithLeadingSlash)
+        ? addLeadingSlash(route.slice(baseHrefWithLeadingSlash.length - 1))
+        : route;
+
       const outPath = posix.join(removeLeadingSlash(routeWithoutBaseHref), 'index.html');
 
       if (typeof redirectTo === 'string') {
@@ -336,11 +337,15 @@ async function getAllRoutes(
 }
 
 function addLeadingSlash(value: string): string {
-  return value.charAt(0) === '/' ? value : '/' + value;
+  return value[0] === '/' ? value : '/' + value;
+}
+
+function addTrailingSlash(url: string): string {
+  return url[url.length - 1] === '/' ? url : `${url}/`;
 }
 
 function removeLeadingSlash(value: string): string {
-  return value.charAt(0) === '/' ? value.slice(1) : value;
+  return value[0] === '/' ? value.slice(1) : value;
 }
 
 /**
