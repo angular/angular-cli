@@ -56,6 +56,7 @@ export enum PrerenderFallback {
 
 /**
  * Common interface for server routes, providing shared properties.
+ * @developerPreview
  */
 export interface ServerRouteCommon {
   /** The path associated with this route. */
@@ -71,6 +72,7 @@ export interface ServerRouteCommon {
 /**
  * A server route that uses AppShell rendering mode.
  * @see {@link RenderMode}
+ * @developerPreview
  */
 export interface ServerRouteAppShell extends Omit<ServerRouteCommon, 'headers' | 'status'> {
   /** Specifies that the route uses AppShell rendering mode. */
@@ -80,6 +82,7 @@ export interface ServerRouteAppShell extends Omit<ServerRouteCommon, 'headers' |
 /**
  * A server route that uses Client-Side Rendering (CSR) mode.
  * @see {@link RenderMode}
+ * @developerPreview
  */
 export interface ServerRouteClient extends ServerRouteCommon {
   /** Specifies that the route uses Client-Side Rendering (CSR) mode. */
@@ -89,6 +92,7 @@ export interface ServerRouteClient extends ServerRouteCommon {
 /**
  * A server route that uses Static Site Generation (SSG) mode.
  * @see {@link RenderMode}
+ * @developerPreview
  */
 export interface ServerRoutePrerender extends Omit<ServerRouteCommon, 'status'> {
   /** Specifies that the route uses Static Site Generation (SSG) mode. */
@@ -103,6 +107,7 @@ export interface ServerRoutePrerender extends Omit<ServerRouteCommon, 'status'> 
  * @see {@link RenderMode}
  * @see {@link ServerRoutePrerender}
  * @see {@link PrerenderFallback}
+ * @developerPreview
  */
 export interface ServerRoutePrerenderWithParams extends Omit<ServerRoutePrerender, 'fallback'> {
   /**
@@ -146,7 +151,8 @@ export interface ServerRoutePrerenderWithParams extends Omit<ServerRoutePrerende
 
 /**
  * A server route that uses Server-Side Rendering (SSR) mode.
- *  @see {@link RenderMode}
+ * @see {@link RenderMode}
+ * @developerPreview
  */
 export interface ServerRouteServer extends ServerRouteCommon {
   /** Specifies that the route uses Server-Side Rendering (SSR) mode. */
