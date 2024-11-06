@@ -178,6 +178,18 @@ describe('AngularServerApp', () => {
         expect(await response?.text()).toContain('Home SSG works');
       });
 
+      it('should return null if the requested prerendered page is accessed with a non-GET and non-HEAD method', async () => {
+        const responseHead = await app.handle(
+          new Request('http://localhost/home-ssg', { method: 'HEAD' }),
+        );
+        expect(await responseHead?.text()).toContain('Home SSG works');
+
+        const responsePost = await app.handle(
+          new Request('http://localhost/home-ssg', { method: 'POST' }),
+        );
+        expect(responsePost).toBeNull();
+      });
+
       it(`should correctly serve the content for the requested prerendered page when the URL ends with 'index.html'`, async () => {
         const response = await app.handle(new Request('http://localhost/home-ssg/index.html'));
         expect(await response?.text()).toContain('Home SSG works');

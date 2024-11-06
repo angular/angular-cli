@@ -280,6 +280,7 @@ async function getAllRoutes(
 
   if (appShellOptions) {
     routes.push({
+      renderMode: RouteRenderMode.AppShell,
       route: urlJoin(baseHref, appShellOptions.route),
     });
   }
@@ -288,6 +289,7 @@ async function getAllRoutes(
     const routesFromFile = (await readFile(routesFile, 'utf8')).split(/\r?\n/);
     for (const route of routesFromFile) {
       routes.push({
+        renderMode: RouteRenderMode.Prerender,
         route: urlJoin(baseHref, route.trim()),
       });
     }
@@ -321,7 +323,19 @@ async function getAllRoutes(
       {},
     );
 
-    return { errors, serializedRouteTree: [...routes, ...serializedRouteTree] };
+    if (!routes.length) {
+      return { errors, serializedRouteTree };
+    }
+
+    // Merge the routing trees
+    const uniqueRoutes = new Map();
+    for (const item of [...routes, ...serializedRouteTree]) {
+      if (!uniqueRoutes.has(item.route)) {
+        uniqueRoutes.set(item.route, item);
+      }
+    }
+
+    return { errors, serializedRouteTree: Array.from(uniqueRoutes.values()) };
   } catch (err) {
     assertIsError(err);
 

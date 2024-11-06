@@ -133,6 +133,7 @@ async function* traverseRoutesConfig(options: {
       }
 
       const metadata: ServerConfigRouteTreeNodeMetadata = {
+        renderMode: RenderMode.Prerender,
         ...matchedMetaData,
         route: currentRoutePath,
       };

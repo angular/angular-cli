@@ -44,7 +44,10 @@ export function createAngularSsrInternalMiddleware(
         ɵgetOrCreateAngularServerApp: typeof getOrCreateAngularServerApp;
       };
 
-      const angularServerApp = ɵgetOrCreateAngularServerApp();
+      const angularServerApp = ɵgetOrCreateAngularServerApp({
+        allowStaticRouteRender: true,
+      });
+
       // Only Add the transform hook only if it's a different instance.
       if (cachedAngularServerApp !== angularServerApp) {
         angularServerApp.hooks.on('html:transform:pre', async ({ html, url }) => {
@@ -96,6 +99,7 @@ export async function createAngularSsrExternalMiddleware(
         reqHandler?: unknown;
         AngularAppEngine: typeof SSRAngularAppEngine;
       };
+
       if (!isSsrNodeRequestHandler(reqHandler) && !isSsrRequestHandler(reqHandler)) {
         if (!fallbackWarningShown) {
           // eslint-disable-next-line no-console
@@ -118,6 +122,7 @@ export async function createAngularSsrExternalMiddleware(
       }
 
       if (cachedAngularAppEngine !== AngularAppEngine) {
+        AngularAppEngine.ɵallowStaticRouteRender = true;
         AngularAppEngine.ɵhooks.on('html:transform:pre', async ({ html, url }) => {
           const processedHtml = await server.transformIndexHtml(url.pathname, html);
 
