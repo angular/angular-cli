@@ -27,8 +27,8 @@
   },
   "devDependencies": {
     "@angular-devkit/core": "0.0.0-PLACEHOLDER",
-    "@angular/compiler": "19.0.0-rc.0",
-    "@angular/compiler-cli": "19.0.0-rc.0",
+    "@angular/compiler": "19.0.0-rc.1",
+    "@angular/compiler-cli": "19.0.0-rc.1",
     "typescript": "5.6.3",
     "webpack": "5.96.1"
   }
