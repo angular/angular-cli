@@ -6,11 +6,10 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import type { AngularServerApp } from './app';
+import type { AngularServerApp, getOrCreateAngularServerApp } from './app';
 import { Hooks } from './hooks';
 import { getPotentialLocaleIdFromUrl } from './i18n';
 import { EntryPointExports, getAngularAppEngineManifest } from './manifest';
-import { stripIndexHtmlFromURL, stripTrailingSlash } from './utils/url';
 
 /**
  * Angular server application engine.
@@ -24,6 +23,16 @@ import { stripIndexHtmlFromURL, stripTrailingSlash } from './utils/url';
  */
 export class AngularAppEngine {
   /**
+   * A flag to enable or disable the rendering of prerendered routes.
+   *
+   * Typically used during development to avoid prerendering all routes ahead of time,
+   * allowing them to be rendered on the fly as requested.
+   *
+   * @private
+   */
+  static ɵallowStaticRouteRender = false;
+
+  /**
    * Hooks for extending or modifying the behavior of the server application.
    * These hooks are used by the Angular CLI when running the development server and
    * provide extensibility points for the application lifecycle.
@@ -31,16 +40,6 @@ export class AngularAppEngine {
    * @private
    */
   static ɵhooks = /* #__PURE__*/ new Hooks();
-
-  /**
-   * Provides access to the hooks for extending or modifying the server application's behavior.
-   * This allows attaching custom functionality to various server application lifecycle events.
-   *
-   * @internal
-   */
-  get hooks(): Hooks {
-    return AngularAppEngine.ɵhooks;
-  }
 
   /**
    * The manifest for the server application.
@@ -88,12 +87,15 @@ export class AngularAppEngine {
       return null;
     }
 
-    const { ɵgetOrCreateAngularServerApp: getOrCreateAngularServerApp } = entryPoint;
     // Note: Using `instanceof` is not feasible here because `AngularServerApp` will
     // be located in separate bundles, making `instanceof` checks unreliable.
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
-    const serverApp = getOrCreateAngularServerApp() as AngularServerApp;
-    serverApp.hooks = this.hooks;
+    const ɵgetOrCreateAngularServerApp =
+      entryPoint.ɵgetOrCreateAngularServerApp as typeof getOrCreateAngularServerApp;
+
+    const serverApp = ɵgetOrCreateAngularServerApp({
+      allowStaticRouteRender: AngularAppEngine.ɵallowStaticRouteRender,
+      hooks: AngularAppEngine.ɵhooks,
+    });
 
     return serverApp;
   }

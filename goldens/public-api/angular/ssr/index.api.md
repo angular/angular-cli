@@ -9,6 +9,7 @@ import { EnvironmentProviders } from '@angular/core';
 // @public
 export class AngularAppEngine {
     handle(request: Request, requestContext?: unknown): Promise<Response | null>;
+    static ɵallowStaticRouteRender: boolean;
     static ɵhooks: Hooks;
 }
 
