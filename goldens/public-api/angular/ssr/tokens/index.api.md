@@ -7,13 +7,13 @@
 import { InjectionToken } from '@angular/core';
 
 // @public
-export const REQUEST: InjectionToken<Request>;
+export const REQUEST: InjectionToken<Request | null>;
 
 // @public
 export const REQUEST_CONTEXT: InjectionToken<unknown>;
 
 // @public
-export const RESPONSE_INIT: InjectionToken<ResponseInit>;
+export const RESPONSE_INIT: InjectionToken<ResponseInit | null>;
 
 // (No @packageDocumentation comment for this package)
 
