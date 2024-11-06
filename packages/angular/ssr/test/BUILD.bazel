@@ -6,6 +6,7 @@ ESM_TESTS = [
     "app_spec.ts",
     "app-engine_spec.ts",
     "routes/router_spec.ts",
+    "routes/route-tree_spec.ts",
     "routes/ng-routes_spec.ts",
 ]
 

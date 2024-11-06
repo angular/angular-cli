@@ -63,9 +63,8 @@ export interface RouteTreeNodeMetadata {
 
   /**
    * Specifies the rendering mode used for this route.
-   * If not provided, the default rendering mode for the application will be used.
    */
-  renderMode?: RenderMode;
+  renderMode: RenderMode;
 }
 
 /**
