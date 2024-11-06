@@ -1,3 +1,53 @@
+<a name="19.0.0-rc.1"></a>
+
+# 19.0.0-rc.1 (2024-11-06)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                                       |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------- |
+| [b847d4460](https://github.com/angular/angular-cli/commit/b847d4460c352604e1935d494efd761915caaa3f) | fix  | recommend optional application update migration during v19 update |
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                        |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------- |
+| [b1504c3bc](https://github.com/angular/angular-cli/commit/b1504c3bcca4d4c313e5d795ace8b074fb1f8890) | fix  | component spec with export default |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                  |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------- |
+| [2ec877dd0](https://github.com/angular/angular-cli/commit/2ec877dd0dede8f3ee849fe83b4a4427bab96447) | fix  | handle basename collisions   |
+| [43e7aae22](https://github.com/angular/angular-cli/commit/43e7aae2284ff15e0282c9d9597c4f31cf1f60a4) | fix  | remove double-watch in karma |
+| [1e37b5939](https://github.com/angular/angular-cli/commit/1e37b59396a2f815d1671ccecc03ff8441730391) | fix  | serve assets                 |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                                                 |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------------------------- |
+| [ecaf870b5](https://github.com/angular/angular-cli/commit/ecaf870b5cddd5d43d297f1193eb11b8f73757c0) | fix  | always clear dev-server error overlay on non-error result                   |
+| [71534aadc](https://github.com/angular/angular-cli/commit/71534aadc403404e2dc9bc12054f32c3ed157db9) | fix  | check referenced files against native file paths                            |
+| [fed31e064](https://github.com/angular/angular-cli/commit/fed31e064611894934c86ed36e8b0808029d4143) | fix  | correctly use dev-server hmr option to control stylesheet hot replacement   |
+| [b86bb080e](https://github.com/angular/angular-cli/commit/b86bb080e3a58a3320b2f68fb79edcdc98bfa7e9) | fix  | disable dev-server websocket when live reload is disabled                   |
+| [efb2232df](https://github.com/angular/angular-cli/commit/efb2232df5475699a44d0f76a70e2d7de4a71f5a) | fix  | ensure accurate content size in server asset metadata                       |
+| [18a8584ea](https://github.com/angular/angular-cli/commit/18a8584ead439d044760fe2abb4a7f657a0b10e3) | fix  | ensure SVG template URLs are considered templates with external stylesheets |
+| [7502fee28](https://github.com/angular/angular-cli/commit/7502fee28a057b53e60b97f55b5aff5281019f1b) | fix  | Exclude known `--import` from execArgv when spawning workers                |
+| [c41529cc1](https://github.com/angular/angular-cli/commit/c41529cc1d762cf508eccf46c44256df21afe24f) | fix  | handle `APP_BASE_HREF` correctly in prerendered routes                      |
+| [cf0228b82](https://github.com/angular/angular-cli/commit/cf0228b828fc43b1b33d48dc0977ff59abb597c2) | fix  | skip wildcard routes from being listed as prerendered routes                |
+| [c8e1521a2](https://github.com/angular/angular-cli/commit/c8e1521a2bd5b47c811e5d7f9aea7f57e92a4552) | fix  | workaround Vite CSS ShadowDOM hot replacement                               |
+
+### @angular/ssr
+
+| Commit                                                                                              | Type | Description                                                                        |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------------------------------- |
+| [74b3e2d51](https://github.com/angular/angular-cli/commit/74b3e2d51c6cf605abd05da81dc7b4c3ccd9b3ea) | fix  | add validation to prevent use of `provideServerRoutesConfig` in browser context    |
+| [df4e1d360](https://github.com/angular/angular-cli/commit/df4e1d3607c2d5bf71d1234fa730e63cd6ab594b) | fix  | enable serving of prerendered pages in the App Engine                              |
+| [3cf7a5223](https://github.com/angular/angular-cli/commit/3cf7a522318e34daa09f29133e8c3444f154ca0b) | fix  | initialize the DI tokens with `null` to avoid requiring them to be set to optional |
+| [f460b91d4](https://github.com/angular/angular-cli/commit/f460b91d46ea5b0413596c4852c80d71d5308910) | perf | integrate ETags for prerendered pages                                              |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="19.0.0-rc.0"></a>
 
 # 19.0.0-rc.0 (2024-10-30)
