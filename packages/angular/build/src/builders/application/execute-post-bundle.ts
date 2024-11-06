@@ -181,7 +181,10 @@ export async function executePostBundleSteps(
         case /* Legacy building mode */ undefined: {
           if (!metadata.redirectTo) {
             serializableRouteTreeNodeForManifest.push(metadata);
-            prerenderedRoutes[metadata.route] = { headers: metadata.headers };
+
+            if (!metadata.route.includes('*')) {
+              prerenderedRoutes[metadata.route] = { headers: metadata.headers };
+            }
           }
           break;
         }
