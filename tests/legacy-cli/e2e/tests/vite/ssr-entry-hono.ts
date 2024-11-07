@@ -19,13 +19,6 @@ export default async function () {
   await installWorkspacePackages();
   await installPackage('hono@4');
 
-  // Update angular.json
-  await updateJsonFile('angular.json', (workspaceJson) => {
-    const appArchitect = workspaceJson.projects['test-project'].architect;
-    const options = appArchitect.build.options;
-    options.outputMode = 'server';
-  });
-
   await writeMultipleFiles({
     // Replace the template of app.component.html as it makes it harder to debug
     'src/app/app.component.html': '<router-outlet />',

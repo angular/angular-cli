@@ -10,7 +10,7 @@ import { IncomingMessage, Server, createServer, request as requestCb } from 'nod
 import { AddressInfo } from 'node:net';
 import { writeResponseToNodeResponse } from '../src/response';
 
-describe('writeResponseToNodeResponse', () => {
+describe('writeResponseToNodeResponse (HTTP/1.1)', () => {
   let server: Server;
 
   function simulateResponse(

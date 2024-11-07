@@ -7,18 +7,23 @@
  */
 
 import type { ServerResponse } from 'node:http';
+import type { Http2ServerRequest, Http2ServerResponse } from 'node:http2';
 
 /**
- * Streams a web-standard `Response` into a Node.js `ServerResponse`.
+ * Streams a web-standard `Response` into a Node.js `ServerResponse`
+ * or `Http2ServerResponse`.
+ *
+ * This function adapts the web `Response` object to write its content
+ * to a Node.js response object, handling both HTTP/1.1 and HTTP/2.
  *
  * @param source - The web-standard `Response` object to stream from.
- * @param destination - The Node.js `ServerResponse` object to stream into.
+ * @param destination - The Node.js response object (`ServerResponse` or `Http2ServerResponse`) to stream into.
  * @returns A promise that resolves once the streaming operation is complete.
  * @developerPreview
  */
 export async function writeResponseToNodeResponse(
   source: Response,
-  destination: ServerResponse,
+  destination: ServerResponse | Http2ServerResponse<Http2ServerRequest>,
 ): Promise<void> {
   const { status, headers, body } = source;
   destination.statusCode = status;
@@ -66,7 +71,7 @@ export async function writeResponseToNodeResponse(
         break;
       }
 
-      destination.write(value);
+      (destination as ServerResponse).write(value);
     }
   } catch {
     destination.end('Internal server error.');

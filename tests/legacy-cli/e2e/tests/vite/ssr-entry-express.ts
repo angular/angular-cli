@@ -3,7 +3,7 @@ import { setTimeout } from 'node:timers/promises';
 import { replaceInFile, writeMultipleFiles } from '../../utils/fs';
 import { ng, silentNg, waitForAnyProcessOutputToMatch } from '../../utils/process';
 import { installWorkspacePackages, uninstallPackage } from '../../utils/packages';
-import { ngServe, updateJsonFile, useSha } from '../../utils/project';
+import { ngServe, useSha } from '../../utils/project';
 import { getGlobalVariable } from '../../utils/env';
 
 export default async function () {
@@ -17,13 +17,6 @@ export default async function () {
   await ng('add', '@angular/ssr', '--server-routing', '--skip-confirmation', '--skip-install');
   await useSha();
   await installWorkspacePackages();
-
-  // Update angular.json
-  await updateJsonFile('angular.json', (workspaceJson) => {
-    const appArchitect = workspaceJson.projects['test-project'].architect;
-    const options = appArchitect.build.options;
-    options.outputMode = 'server';
-  });
 
   await writeMultipleFiles({
     // Replace the template of app.component.html as it makes it harder to debug
