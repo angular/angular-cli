@@ -186,7 +186,7 @@
     "quicktype-core": "23.0.170",
     "resolve-url-loader": "5.0.0",
     "rollup": "4.24.4",
-    "rollup-license-plugin": "patch:rollup-license-plugin@npm%3A3.0.0#~/.yarn/patches/rollup-license-plugin-npm-3.0.0-038e5f6edc.patch",
+    "rollup-license-plugin": "~3.0.1",
     "rollup-plugin-sourcemaps": "^0.6.0",
     "rxjs": "7.8.1",
     "sass": "1.80.6",
