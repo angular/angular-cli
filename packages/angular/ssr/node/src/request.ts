@@ -7,15 +7,31 @@
  */
 
 import type { IncomingHttpHeaders, IncomingMessage } from 'node:http';
+import type { Http2ServerRequest } from 'node:http2';
 
 /**
- * Converts a Node.js `IncomingMessage` into a Web Standard `Request`.
+ * A set containing all the pseudo-headers defined in the HTTP/2 specification.
  *
- * @param nodeRequest - The Node.js `IncomingMessage` object to convert.
+ * This set can be used to filter out pseudo-headers from a list of headers,
+ * as they are not allowed to be set directly using the `Node.js` Undici API or
+ * the web `Headers` API.
+ */
+const HTTP2_PSEUDO_HEADERS = new Set([':method', ':scheme', ':authority', ':path', ':status']);
+
+/**
+ * Converts a Node.js `IncomingMessage` or `Http2ServerRequest` into a
+ * Web Standard `Request` object.
+ *
+ * This function adapts the Node.js request objects to a format that can
+ * be used by web platform APIs.
+ *
+ * @param nodeRequest - The Node.js request object (`IncomingMessage` or `Http2ServerRequest`) to convert.
  * @returns A Web Standard `Request` object.
  * @developerPreview
  */
-export function createWebRequestFromNodeRequest(nodeRequest: IncomingMessage): Request {
+export function createWebRequestFromNodeRequest(
+  nodeRequest: IncomingMessage | Http2ServerRequest,
+): Request {
   const { headers, method = 'GET' } = nodeRequest;
   const withBody = method !== 'GET' && method !== 'HEAD';
 
@@ -37,6 +53,10 @@ function createRequestHeaders(nodeHeaders: IncomingHttpHeaders): Headers {
   const headers = new Headers();
 
   for (const [name, value] of Object.entries(nodeHeaders)) {
+    if (HTTP2_PSEUDO_HEADERS.has(name)) {
+      continue;
+    }
+
     if (typeof value === 'string') {
       headers.append(name, value);
     } else if (Array.isArray(value)) {
@@ -52,10 +72,10 @@ function createRequestHeaders(nodeHeaders: IncomingHttpHeaders): Headers {
 /**
  * Creates a `URL` object from a Node.js `IncomingMessage`, taking into account the protocol, host, and port.
  *
- * @param nodeRequest - The Node.js `IncomingMessage` object to extract URL information from.
+ * @param nodeRequest - The Node.js `IncomingMessage` or `Http2ServerRequest` object to extract URL information from.
  * @returns A `URL` object representing the request URL.
  */
-function createRequestUrl(nodeRequest: IncomingMessage): URL {
+function createRequestUrl(nodeRequest: IncomingMessage | Http2ServerRequest): URL {
   const {
     headers,
     socket,
