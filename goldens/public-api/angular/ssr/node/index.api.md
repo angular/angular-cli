@@ -5,6 +5,8 @@
 ```ts
 
 import { ApplicationRef } from '@angular/core';
+import type { Http2ServerRequest } from 'node:http2';
+import type { Http2ServerResponse } from 'node:http2';
 import type { IncomingMessage } from 'node:http';
 import type { ServerResponse } from 'node:http';
 import { StaticProvider } from '@angular/core';
@@ -12,7 +14,7 @@ import { Type } from '@angular/core';
 
 // @public
 export class AngularNodeAppEngine {
-    handle(request: IncomingMessage, requestContext?: unknown): Promise<Response | null>;
+    handle(request: IncomingMessage | Http2ServerRequest, requestContext?: unknown): Promise<Response | null>;
 }
 
 // @public
@@ -46,7 +48,7 @@ export interface CommonEngineRenderOptions {
 export function createNodeRequestHandler<T extends NodeRequestHandlerFunction>(handler: T): T;
 
 // @public
-export function createWebRequestFromNodeRequest(nodeRequest: IncomingMessage): Request;
+export function createWebRequestFromNodeRequest(nodeRequest: IncomingMessage | Http2ServerRequest): Request;
 
 // @public
 export function isMainModule(url: string): boolean;
@@ -55,7 +57,7 @@ export function isMainModule(url: string): boolean;
 export type NodeRequestHandlerFunction = (req: IncomingMessage, res: ServerResponse, next: (err?: unknown) => void) => Promise<void> | void;
 
 // @public
-export function writeResponseToNodeResponse(source: Response, destination: ServerResponse): Promise<void>;
+export function writeResponseToNodeResponse(source: Response, destination: ServerResponse | Http2ServerResponse<Http2ServerRequest>): Promise<void>;
 
 // (No @packageDocumentation comment for this package)
 
