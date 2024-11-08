@@ -176,23 +176,10 @@ export async function executePostBundleSteps(
     const serializableRouteTreeNodeForManifest: WritableSerializableRouteTreeNode = [];
 
     for (const metadata of serializableRouteTreeNode) {
-      switch (metadata.renderMode) {
-        case RouteRenderMode.Prerender:
-        case /* Legacy building mode */ undefined: {
-          if (!metadata.redirectTo) {
-            serializableRouteTreeNodeForManifest.push(metadata);
+      serializableRouteTreeNodeForManifest.push(metadata);
 
-            if (!metadata.route.includes('*')) {
-              prerenderedRoutes[metadata.route] = { headers: metadata.headers };
-            }
-          }
-          break;
-        }
-        case RouteRenderMode.Server:
-        case RouteRenderMode.Client:
-          serializableRouteTreeNodeForManifest.push(metadata);
-
-          break;
+      if (metadata.renderMode === RouteRenderMode.Prerender && !metadata.route.includes('*')) {
+        prerenderedRoutes[metadata.route] = { headers: metadata.headers };
       }
     }
 
