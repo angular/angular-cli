@@ -153,7 +153,6 @@ export function createCompilerPlugin(
         let modifiedFiles;
         if (
           pluginOptions.sourceFileCache?.modifiedFiles.size &&
-          referencedFileTracker &&
           !pluginOptions.noopTypeScriptCompilation
         ) {
           // TODO: Differentiate between changed input files and stale output files
@@ -164,6 +163,8 @@ export function createCompilerPlugin(
           if (!pluginOptions.externalRuntimeStyles) {
             stylesheetBundler.invalidate(modifiedFiles);
           }
+          // Remove any stale additional results based on modified files
+          modifiedFiles.forEach((file) => additionalResults.delete(file));
         }
 
         if (
@@ -181,6 +182,7 @@ export function createCompilerPlugin(
           sourceFileCache: pluginOptions.sourceFileCache,
           async transformStylesheet(data, containingFile, stylesheetFile, order, className) {
             let stylesheetResult;
+            let resultSource = stylesheetFile ?? containingFile;
 
             // Stylesheet file only exists for external stylesheets
             if (stylesheetFile) {
@@ -203,6 +205,11 @@ export function createCompilerPlugin(
                       .digest('hex')
                   : undefined,
               );
+              // Adjust result source for inline styles.
+              // There may be multiple inline styles with the same containing file and to ensure that the results
+              // do not overwrite each other the result source identifier needs to be unique for each. The class
+              // name and order fields can be used for this. The structure is arbitrary as long as it is unique.
+              resultSource += `?class=${className}&order=${order}`;
             }
 
             (result.warnings ??= []).push(...stylesheetResult.warnings);
@@ -213,7 +220,7 @@ export function createCompilerPlugin(
             }
 
             const { contents, outputFiles, metafile, referencedFiles } = stylesheetResult;
-            additionalResults.set(stylesheetFile ?? containingFile, {
+            additionalResults.set(resultSource, {
               outputFiles,
               metafile,
             });
