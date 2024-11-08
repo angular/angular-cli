@@ -154,7 +154,16 @@ export class AngularServerApp {
       return null;
     }
 
-    if (matchedRoute.renderMode === RenderMode.Prerender) {
+    const { redirectTo, status, renderMode } = matchedRoute;
+    if (redirectTo !== undefined) {
+      // Note: The status code is validated during route extraction.
+      // 302 Found is used by default for redirections
+      // See: https://developer.mozilla.org/en-US/docs/Web/API/Response/redirect_static#status
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      return Response.redirect(new URL(redirectTo, new URL(request.url)), (status as any) ?? 302);
+    }
+
+    if (renderMode === RenderMode.Prerender) {
       const response = await this.handleServe(request, matchedRoute);
       if (response) {
         return response;
@@ -186,7 +195,7 @@ export class AngularServerApp {
       return null;
     }
 
-    const { url, method } = request;
+    const { method } = request;
     if (method !== 'GET' && method !== 'HEAD') {
       return null;
     }
@@ -228,18 +237,7 @@ export class AngularServerApp {
     matchedRoute: RouteTreeNodeMetadata,
     requestContext?: unknown,
   ): Promise<Response | null> {
-    const { redirectTo, status } = matchedRoute;
-    const url = new URL(request.url);
-
-    if (redirectTo !== undefined) {
-      // Note: The status code is validated during route extraction.
-      // 302 Found is used by default for redirections
-      // See: https://developer.mozilla.org/en-US/docs/Web/API/Response/redirect_static#status
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      return Response.redirect(new URL(redirectTo, url), (status as any) ?? 302);
-    }
-
-    const { renderMode, headers } = matchedRoute;
+    const { renderMode, headers, status } = matchedRoute;
     if (
       !this.allowStaticRouteRender &&
       (renderMode === RenderMode.Prerender || renderMode === RenderMode.AppShell)
@@ -292,7 +290,9 @@ export class AngularServerApp {
       });
     }
 
+    const url = new URL(request.url);
     let html = await assets.getIndexServerHtml().text();
+
     // Skip extra microtask if there are no pre hooks.
     if (hooks.has('html:transform:pre')) {
       html = await hooks.run('html:transform:pre', { html, url });
