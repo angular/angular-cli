@@ -126,8 +126,6 @@ describe('AppShell Builder', () => {
     const fileName = 'dist/index.html';
     const content = virtualFs.fileBufferToString(host.scopedSync().read(normalize(fileName)));
     expect(content).toMatch('Welcome to app');
-    // TODO(alanagius): enable once integration of routes in complete.
-    // expect(content).toMatch('ng-server-context="app-shell"');
   });
 
   it('works with route', async () => {

@@ -29,14 +29,9 @@ export default async function () {
   import { CsrComponent } from './csr/csr.component';
   import { SsrComponent } from './ssr/ssr.component';
   import { SsgComponent } from './ssg/ssg.component';
-  import { AppShellComponent } from './app-shell/app-shell.component';
   import { SsgWithParamsComponent } from './ssg-with-params/ssg-with-params.component';
 
   export const routes: Routes = [
-    {
-      path: 'app-shell',
-      component: AppShellComponent
-    },
     {
       path: '',
       component: HomeComponent,
@@ -89,10 +84,6 @@ export default async function () {
       headers: { 'x-custom': 'csr' },
     },
     {
-      path: 'app-shell',
-      renderMode: RenderMode.AppShell,
-    },
-    {
       path: '**',
       renderMode: RenderMode.Prerender,
       headers: { 'x-custom': 'ssg' },
@@ -102,11 +93,14 @@ export default async function () {
   );
 
   // Generate components for the above routes
-  const componentNames: string[] = ['home', 'ssg', 'ssg-with-params', 'csr', 'ssr', 'app-shell'];
+  const componentNames: string[] = ['home', 'ssg', 'ssg-with-params', 'csr', 'ssr'];
 
   for (const componentName of componentNames) {
     await silentNg('generate', 'component', componentName);
   }
+
+  // Generate app-shell
+  await ng('g', 'app-shell');
 
   await noSilentNg('build', '--output-mode=server');
 
@@ -155,7 +149,7 @@ export default async function () {
     },
     '/csr': {
       content: 'app-shell works',
-      serverContext: 'ng-server-context="app-shell"',
+      serverContext: 'ng-server-context="ssg"',
       headers: {
         'x-custom': 'csr',
       },

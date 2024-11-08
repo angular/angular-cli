@@ -24,26 +24,20 @@ export enum PrerenderFallback {
 }
 
 // @public
-export function provideServerRoutesConfig(routes: ServerRoute[]): EnvironmentProviders;
+export function provideServerRoutesConfig(routes: ServerRoute[], options?: ServerRoutesConfigOptions): EnvironmentProviders;
 
 // @public
 export enum RenderMode {
-    AppShell = 0,
-    Client = 2,
-    Prerender = 3,
-    Server = 1
+    Client = 1,
+    Prerender = 2,
+    Server = 0
 }
 
 // @public
 export type RequestHandlerFunction = (request: Request) => Promise<Response | null> | null | Response;
 
 // @public
-export type ServerRoute = ServerRouteAppShell | ServerRouteClient | ServerRoutePrerender | ServerRoutePrerenderWithParams | ServerRouteServer;
-
-// @public
-export interface ServerRouteAppShell extends Omit<ServerRouteCommon, 'headers' | 'status'> {
-    renderMode: RenderMode.AppShell;
-}
+export type ServerRoute = ServerRouteClient | ServerRoutePrerender | ServerRoutePrerenderWithParams | ServerRouteServer;
 
 // @public
 export interface ServerRouteClient extends ServerRouteCommon {
@@ -67,6 +61,11 @@ export interface ServerRoutePrerender extends Omit<ServerRouteCommon, 'status'> 
 export interface ServerRoutePrerenderWithParams extends Omit<ServerRoutePrerender, 'fallback'> {
     fallback?: PrerenderFallback;
     getPrerenderParams: () => Promise<Record<string, string>[]>;
+}
+
+// @public
+export interface ServerRoutesConfigOptions {
+    appShellRoute?: string;
 }
 
 // @public
