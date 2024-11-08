@@ -431,12 +431,20 @@ export function createCompilerPlugin(
       build.onLoad(
         { filter: /\.[cm]?js$/ },
         createCachedLoad(pluginOptions.loadResultCache, async (args) => {
+          let request = args.path;
+          if (pluginOptions.fileReplacements) {
+            const replacement = pluginOptions.fileReplacements[path.normalize(args.path)];
+            if (replacement) {
+              request = path.normalize(replacement);
+            }
+          }
+
           return profileAsync(
             'NG_EMIT_JS*',
             async () => {
-              const sideEffects = await hasSideEffects(args.path);
+              const sideEffects = await hasSideEffects(request);
               const contents = await javascriptTransformer.transformFile(
-                args.path,
+                request,
                 pluginOptions.jit,
                 sideEffects,
               );
@@ -444,6 +452,7 @@ export function createCompilerPlugin(
               return {
                 contents,
                 loader: 'js',
+                watchFiles: request !== args.path ? [request] : undefined,
               };
             },
             true,
