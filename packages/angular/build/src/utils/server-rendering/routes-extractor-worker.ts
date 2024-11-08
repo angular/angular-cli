@@ -33,7 +33,7 @@ async function extractRoutes(): Promise<RoutersExtractorWorkerResult> {
   const { ɵextractRoutesAndCreateRouteTree: extractRoutesAndCreateRouteTree } =
     await loadEsmModuleFromMemory('./main.server.mjs');
 
-  const { routeTree, errors } = await extractRoutesAndCreateRouteTree(
+  const { routeTree, appShellRoute, errors } = await extractRoutesAndCreateRouteTree(
     serverURL,
     undefined /** manifest */,
     true /** invokeGetPrerenderParams */,
@@ -42,6 +42,7 @@ async function extractRoutes(): Promise<RoutersExtractorWorkerResult> {
 
   return {
     errors,
+    appShellRoute,
     serializedRouteTree: routeTree.toObject(),
   };
 }
