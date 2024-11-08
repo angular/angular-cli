@@ -23,6 +23,7 @@ export type WritableSerializableRouteTreeNode = Writeable<SerializableRouteTreeN
 
 export interface RoutersExtractorWorkerResult {
   serializedRouteTree: SerializableRouteTreeNode;
+  appShellRoute?: string;
   errors: string[];
 }
 
@@ -33,8 +34,7 @@ export interface RoutersExtractorWorkerResult {
  * It maps `RenderMode` enum values to their corresponding numeric identifiers.
  */
 export const RouteRenderMode: Record<keyof typeof RenderMode, RenderMode> = {
-  AppShell: 0,
-  Server: 1,
-  Client: 2,
-  Prerender: 3,
+  Server: 0,
+  Client: 1,
+  Prerender: 2,
 };

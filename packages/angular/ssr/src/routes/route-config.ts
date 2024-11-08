@@ -15,9 +15,6 @@ import { EnvironmentProviders, InjectionToken, makeEnvironmentProviders } from '
  * @developerPreview
  */
 export enum RenderMode {
-  /** AppShell rendering mode, typically used for pre-rendered shells of the application. */
-  AppShell,
-
   /** Server-Side Rendering (SSR) mode, where content is rendered on the server for each request. */
   Server,
 
@@ -67,16 +64,6 @@ export interface ServerRouteCommon {
 
   /** Optional status code to return for this route. */
   status?: number;
-}
-
-/**
- * A server route that uses AppShell rendering mode.
- * @see {@link RenderMode}
- * @developerPreview
- */
-export interface ServerRouteAppShell extends Omit<ServerRouteCommon, 'headers' | 'status'> {
-  /** Specifies that the route uses AppShell rendering mode. */
-  renderMode: RenderMode.AppShell;
 }
 
 /**
@@ -165,27 +152,67 @@ export interface ServerRouteServer extends ServerRouteCommon {
  * @developerPreview
  */
 export type ServerRoute =
-  | ServerRouteAppShell
   | ServerRouteClient
   | ServerRoutePrerender
   | ServerRoutePrerenderWithParams
   | ServerRouteServer;
 
 /**
+ * Configuration options for server routes.
+ *
+ * This interface defines the optional settings available for configuring server routes
+ * in the server-side environment, such as specifying a path to the app shell route.
+ *
+ * @see {@link provideServerRoutesConfig}
+ * @developerPreview
+ */
+
+export interface ServerRoutesConfigOptions {
+  /**
+   * Defines the route to be used as the app shell, which serves as the main entry
+   * point for the application. This route is often used to enable server-side rendering
+   * of the application shell for requests that do not match any specific server route.
+   *
+   * @see {@link https://angular.dev/ecosystem/service-workers/app-shell | App shell pattern on Angular.dev}
+   */
+  appShellRoute?: string;
+}
+
+/**
+ * Configuration value for server routes configuration.
+ * @internal
+ */
+export interface ServerRoutesConfig extends ServerRoutesConfigOptions {
+  routes: ServerRoute[];
+}
+
+/**
  * Token for providing the server routes configuration.
  * @internal
  */
-export const SERVER_ROUTES_CONFIG = new InjectionToken<ServerRoute[]>('SERVER_ROUTES_CONFIG');
+export const SERVER_ROUTES_CONFIG = new InjectionToken<ServerRoutesConfig>('SERVER_ROUTES_CONFIG');
 
 /**
- * Configures the necessary providers for server routes configuration.
+/**
+ * Sets up the necessary providers for configuring server routes.
+ * This function accepts an array of server routes and optional configuration
+ * options, returning an `EnvironmentProviders` object that encapsulates
+ * the server routes and configuration settings.
  *
  * @param routes - An array of server routes to be provided.
+ * @param options - (Optional) An object containing additional configuration options for server routes.
+ * @returns An `EnvironmentProviders` instance with the server routes configuration.
+ *
  * @returns An `EnvironmentProviders` object that contains the server routes configuration.
+ *
  * @see {@link ServerRoute}
+ * @see {@link ServerRoutesConfigOptions}
  * @developerPreview
  */
-export function provideServerRoutesConfig(routes: ServerRoute[]): EnvironmentProviders {
+export function provideServerRoutesConfig(
+  routes: ServerRoute[],
+  options?: ServerRoutesConfigOptions,
+): EnvironmentProviders {
   if (typeof ngServerMode === 'undefined' || !ngServerMode) {
     throw new Error(
       `The 'provideServerRoutesConfig' function should not be invoked within the browser portion of the application.`,
@@ -195,7 +222,7 @@ export function provideServerRoutesConfig(routes: ServerRoute[]): EnvironmentPro
   return makeEnvironmentProviders([
     {
       provide: SERVER_ROUTES_CONFIG,
-      useValue: routes,
+      useValue: { routes, ...options },
     },
   ]);
 }

@@ -200,17 +200,12 @@ describe('App Shell Schematic', () => {
       expect(content).toMatch(/app-shell\.component/);
     });
 
-    it('should update the server routing configuration', async () => {
+    it(`should update the 'provideServerRoutesConfig' call to include 'appShellRoute`, async () => {
       const tree = await schematicRunner.runSchematic('app-shell', defaultOptions, appTree);
-      const content = tree.readContent('/projects/bar/src/app/app.routes.server.ts');
-      expect(tags.oneLine`${content}`).toContain(tags.oneLine`{
-        path: 'shell',
-        renderMode: RenderMode.AppShell
-      },
-      {
-        path: '**',
-        renderMode: RenderMode.Prerender
-      }`);
+      const content = tree.readContent('/projects/bar/src/app/app.config.server.ts');
+      expect(tags.oneLine`${content}`).toContain(
+        tags.oneLine`provideServerRoutesConfig(serverRoutes, { appShellRoute: 'shell' })`,
+      );
     });
 
     it('should define a server route', async () => {

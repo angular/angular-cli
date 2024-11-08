@@ -265,7 +265,7 @@ function addStandaloneServerRoute(options: AppShellOptions): Rule {
       throw new SchematicsException(`Cannot find "${configFilePath}".`);
     }
 
-    const recorder = host.beginUpdate(configFilePath);
+    let recorder = host.beginUpdate(configFilePath);
     let configSourceFile = getSourceFile(host, configFilePath);
     if (!isImported(configSourceFile, 'ROUTES', '@angular/router')) {
       const routesChange = insertImport(
@@ -305,6 +305,24 @@ function addStandaloneServerRoute(options: AppShellOptions): Rule {
     ];
 
     recorder.insertRight(providersLiteral.getStart(), `[\n${updatedProvidersString.join(',\n')}]`);
+
+    if (options.serverRouting) {
+      host.commitUpdate(recorder);
+      configSourceFile = getSourceFile(host, configFilePath);
+      const functionCall = findNodes(configSourceFile, ts.isCallExpression).find(
+        (n) =>
+          ts.isIdentifier(n.expression) && n.expression.getText() === 'provideServerRoutesConfig',
+      );
+
+      if (!functionCall) {
+        throw new SchematicsException(
+          `Cannot find the "provideServerRoutesConfig" function call in "${configFilePath}".`,
+        );
+      }
+
+      recorder = host.beginUpdate(configFilePath);
+      recorder.insertLeft(functionCall.end - 1, `, { appShellRoute: '${APP_SHELL_ROUTE}' }`);
+    }
 
     // Add AppShellComponent import
     const appShellImportChange = insertImport(
@@ -376,9 +394,7 @@ export default function (options: AppShellOptions): Rule {
       ...(isStandalone
         ? [addStandaloneServerRoute(options)]
         : [addRouterModule(browserEntryPoint), addServerRoutes(options)]),
-      options.serverRouting
-        ? addServerRoutingConfig(options)
-        : addAppShellConfigToWorkspace(options),
+      options.serverRouting ? noop() : addAppShellConfigToWorkspace(options),
       schematic('component', {
         name: 'app-shell',
         module: 'app.module.server.ts',

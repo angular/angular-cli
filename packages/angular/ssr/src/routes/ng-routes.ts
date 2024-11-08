@@ -22,7 +22,13 @@ import { Console } from '../console';
 import { AngularAppManifest, getAngularAppManifest } from '../manifest';
 import { AngularBootstrap, isNgModule } from '../utils/ng';
 import { joinUrlParts, stripLeadingSlash } from '../utils/url';
-import { PrerenderFallback, RenderMode, SERVER_ROUTES_CONFIG, ServerRoute } from './route-config';
+import {
+  PrerenderFallback,
+  RenderMode,
+  SERVER_ROUTES_CONFIG,
+  ServerRoute,
+  ServerRoutesConfig,
+} from './route-config';
 import { RouteTree, RouteTreeNodeMetadata } from './route-tree';
 
 /**
@@ -80,6 +86,11 @@ interface AngularRouterConfigResult {
    * A list of errors encountered during the route extraction process.
    */
   errors: string[];
+
+  /**
+   * The specified route for the app-shell, if configured.
+   */
+  appShellRoute?: string;
 }
 
 /**
@@ -317,7 +328,7 @@ function resolveRedirectTo(routePath: string, redirectTo: string): string {
 /**
  * Builds a server configuration route tree from the given server routes configuration.
  *
- * @param serverRoutesConfig - The array of server routes to be used for configuration.
+ * @param serverRoutesConfig - The server routes to be used for configuration.
 
  * @returns An object containing:
  * - `serverConfigRouteTree`: A populated `RouteTree` instance, which organizes the server routes
@@ -325,14 +336,22 @@ function resolveRedirectTo(routePath: string, redirectTo: string): string {
  * - `errors`: An array of strings that list any errors encountered during the route tree construction
  *   process, such as invalid paths.
  */
-function buildServerConfigRouteTree(serverRoutesConfig: ServerRoute[]): {
+function buildServerConfigRouteTree({ routes, appShellRoute }: ServerRoutesConfig): {
   errors: string[];
   serverConfigRouteTree: RouteTree<ServerConfigRouteTreeAdditionalMetadata>;
 } {
+  const serverRoutes: ServerRoute[] = [...routes];
+  if (appShellRoute !== undefined) {
+    serverRoutes.unshift({
+      path: appShellRoute,
+      renderMode: RenderMode.Prerender,
+    });
+  }
+
   const serverConfigRouteTree = new RouteTree<ServerConfigRouteTreeAdditionalMetadata>();
   const errors: string[] = [];
 
-  for (const { path, ...metadata } of serverRoutesConfig) {
+  for (const { path, ...metadata } of serverRoutes) {
     if (path[0] === '/') {
       errors.push(`Invalid '${path}' route configuration: the path cannot start with a slash.`);
 
@@ -442,18 +461,6 @@ export async function getRoutesFromAngularRouterConfig(
         if ('error' in result) {
           errors.push(result.error);
         } else {
-          if (result.renderMode === RenderMode.AppShell) {
-            if (seenAppShellRoute !== undefined) {
-              errors.push(
-                `Error: Both '${seenAppShellRoute}' and '${stripLeadingSlash(result.route)}' routes have ` +
-                  `their 'renderMode' set to 'AppShell'. AppShell renderMode should only be assigned to one route. ` +
-                  `Please review your route configurations to ensure that only one route is set to 'RenderMode.AppShell'.`,
-              );
-            }
-
-            seenAppShellRoute = stripLeadingSlash(result.route);
-          }
-
           routesResults.push(result);
         }
       }
@@ -485,6 +492,7 @@ export async function getRoutesFromAngularRouterConfig(
       baseHref,
       routes: routesResults,
       errors,
+      appShellRoute: serverRoutesConfig?.appShellRoute,
     };
   } finally {
     platformRef.destroy();
@@ -508,6 +516,7 @@ export async function getRoutesFromAngularRouterConfig(
  *
  * @returns A promise that resolves to an object containing:
  *  - `routeTree`: A populated `RouteTree` containing all extracted routes from the Angular application.
+ *  - `appShellRoute`: The specified route for the app-shell, if configured.
  *  - `errors`: An array of strings representing any errors encountered during the route extraction process.
  */
 export async function extractRoutesAndCreateRouteTree(
@@ -515,11 +524,11 @@ export async function extractRoutesAndCreateRouteTree(
   manifest: AngularAppManifest = getAngularAppManifest(),
   invokeGetPrerenderParams = false,
   includePrerenderFallbackRoutes = true,
-): Promise<{ routeTree: RouteTree; errors: string[] }> {
+): Promise<{ routeTree: RouteTree; appShellRoute?: string; errors: string[] }> {
   const routeTree = new RouteTree();
   const document = await new ServerAssets(manifest).getIndexServerHtml().text();
   const bootstrap = await manifest.bootstrap();
-  const { baseHref, routes, errors } = await getRoutesFromAngularRouterConfig(
+  const { baseHref, appShellRoute, routes, errors } = await getRoutesFromAngularRouterConfig(
     bootstrap,
     document,
     url,
@@ -537,6 +546,7 @@ export async function extractRoutesAndCreateRouteTree(
   }
 
   return {
+    appShellRoute,
     routeTree,
     errors,
   };

@@ -340,28 +340,6 @@ describe('extractRoutesAndCreateRouteTree', () => {
     );
   });
 
-  it(`should error when 'RenderMode.AppShell' is used on more than one route`, async () => {
-    setAngularAppTestingManifest(
-      [
-        { path: 'home', component: DummyComponent },
-        { path: 'shell', component: DummyComponent },
-      ],
-      [{ path: '**', renderMode: RenderMode.AppShell }],
-    );
-
-    const { errors } = await extractRoutesAndCreateRouteTree(
-      url,
-      /** manifest */ undefined,
-      /** invokeGetPrerenderParams */ false,
-      /** includePrerenderFallbackRoutes */ false,
-    );
-
-    expect(errors).toHaveSize(1);
-    expect(errors[0]).toContain(
-      `Both 'home' and 'shell' routes have their 'renderMode' set to 'AppShell'.`,
-    );
-  });
-
   it('should apply RenderMode matching the wildcard when no Angular routes are defined', async () => {
     setAngularAppTestingManifest([], [{ path: '**', renderMode: RenderMode.Server }]);
 

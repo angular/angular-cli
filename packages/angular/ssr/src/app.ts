@@ -35,13 +35,11 @@ const MAX_INLINE_CSS_CACHE_ENTRIES = 50;
  *
  * - `RenderMode.Prerender` maps to `'ssg'` (Static Site Generation).
  * - `RenderMode.Server` maps to `'ssr'` (Server-Side Rendering).
- * - `RenderMode.AppShell` maps to `'app-shell'` (pre-rendered application shell).
  * - `RenderMode.Client` maps to an empty string `''` (Client-Side Rendering, no server context needed).
  */
 const SERVER_CONTEXT_VALUE: Record<RenderMode, string> = {
   [RenderMode.Prerender]: 'ssg',
   [RenderMode.Server]: 'ssr',
-  [RenderMode.AppShell]: 'app-shell',
   [RenderMode.Client]: '',
 };
 
@@ -237,11 +235,18 @@ export class AngularServerApp {
     matchedRoute: RouteTreeNodeMetadata,
     requestContext?: unknown,
   ): Promise<Response | null> {
-    const { renderMode, headers, status } = matchedRoute;
-    if (
-      !this.allowStaticRouteRender &&
-      (renderMode === RenderMode.Prerender || renderMode === RenderMode.AppShell)
-    ) {
+    const { redirectTo, status } = matchedRoute;
+
+    if (redirectTo !== undefined) {
+      // Note: The status code is validated during route extraction.
+      // 302 Found is used by default for redirections
+      // See: https://developer.mozilla.org/en-US/docs/Web/API/Response/redirect_static#status
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      return Response.redirect(new URL(redirectTo, new URL(request.url)), (status as any) ?? 302);
+    }
+
+    const { renderMode, headers } = matchedRoute;
+    if (!this.allowStaticRouteRender && renderMode === RenderMode.Prerender) {
       return null;
     }
 
