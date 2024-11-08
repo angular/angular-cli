@@ -160,6 +160,13 @@ export default async function () {
         'x-custom': 'csr',
       },
     },
+    '/redirect': {
+      content: 'ssg works!',
+      serverContext: 'ng-server-context="ssg"',
+      headers: {
+        'x-custom': 'ssg',
+      },
+    },
   };
 
   const port = await spawnServer();
