@@ -158,7 +158,7 @@ export class AngularServerApp {
       // 302 Found is used by default for redirections
       // See: https://developer.mozilla.org/en-US/docs/Web/API/Response/redirect_static#status
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      return Response.redirect(new URL(redirectTo, new URL(request.url)), (status as any) ?? 302);
+      return Response.redirect(new URL(redirectTo, url), (status as any) ?? 302);
     }
 
     if (renderMode === RenderMode.Prerender) {
