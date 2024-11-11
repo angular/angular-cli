@@ -324,14 +324,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@angular/build-tooling@https://github.com/angular/dev-infra-private-build-tooling-builds.git#9f63e93d2e3035ce984c157216bac41d59827bf8":
-  version: 0.0.0-933dcd42f8837d6d6ce3a28419a760edb94f10e6
-  resolution: "@angular/build-tooling@https://github.com/angular/dev-infra-private-build-tooling-builds.git#commit=9f63e93d2e3035ce984c157216bac41d59827bf8"
+"@angular/build-tooling@https://github.com/angular/dev-infra-private-build-tooling-builds.git#027ae92e9eaa20845aaf96e49fae89d0be750c91":
+  version: 0.0.0-1694163487c2ccb7f70660249a545ebc73559654
+  resolution: "@angular/build-tooling@https://github.com/angular/dev-infra-private-build-tooling-builds.git#commit=027ae92e9eaa20845aaf96e49fae89d0be750c91"
   dependencies:
     "@angular/benchpress": "npm:0.3.0"
     "@angular/build": "npm:19.0.0-rc.1"
     "@babel/core": "npm:^7.16.0"
-    "@babel/helper-annotate-as-pure": "npm:^7.18.6"
     "@babel/plugin-proposal-async-generator-functions": "npm:^7.20.1"
     "@bazel/buildifier": "npm:6.3.3"
     "@bazel/concatjs": "npm:5.8.1"
@@ -350,7 +349,6 @@ __metadata:
     "@types/ws": "npm:8.5.13"
     "@types/yargs": "npm:^17.0.0"
     browser-sync: "npm:^3.0.0"
-    html-entities: "npm:^2.4.0"
     prettier: "npm:3.3.3"
     protractor: "npm:^7.0.0"
     selenium-webdriver: "npm:^4.18.1"
@@ -365,7 +363,7 @@ __metadata:
   dependenciesMeta:
     re2:
       built: false
-  checksum: 10c0/bc5e055a6ddc678a7d9e93f9816e1e70c4071617a842c90caf8c50a84e67f72c13d23dd7c92673be0fecc4941944cef9e546365f5b7a83e8f40030e12b564eb3
+  checksum: 10c0/ccdf2b2735f1eecfb34301b0139d2211fb5f1afacec279bfaa7fbabbb213a7aeb6dd386c705dea7642abd5286ac604f3a2e65091c4aaa8cfe7e1a2297df26d36
   languageName: node
   linkType: hard
 
@@ -631,7 +629,7 @@ __metadata:
     "@ampproject/remapping": "npm:2.3.0"
     "@angular/animations": "npm:19.0.0-rc.1"
     "@angular/bazel": "patch:@angular/bazel@https%3A//github.com/angular/bazel-builds.git%23commit=07617f0f8540d27f8895b1820a6f994e1e5b7277#~/.yarn/patches/@angular-bazel-https-9848736cf4.patch"
-    "@angular/build-tooling": "https://github.com/angular/dev-infra-private-build-tooling-builds.git#9f63e93d2e3035ce984c157216bac41d59827bf8"
+    "@angular/build-tooling": "https://github.com/angular/dev-infra-private-build-tooling-builds.git#027ae92e9eaa20845aaf96e49fae89d0be750c91"
     "@angular/cdk": "npm:19.0.0-rc.1"
     "@angular/common": "npm:19.0.0-rc.1"
     "@angular/compiler": "npm:19.0.0-rc.1"
@@ -640,7 +638,7 @@ __metadata:
     "@angular/forms": "npm:19.0.0-rc.1"
     "@angular/localize": "npm:19.0.0-rc.1"
     "@angular/material": "npm:19.0.0-rc.1"
-    "@angular/ng-dev": "https://github.com/angular/dev-infra-private-ng-dev-builds.git#f7a60f3dda6fb0030538446849c28ea90f823383"
+    "@angular/ng-dev": "https://github.com/angular/dev-infra-private-ng-dev-builds.git#2eb75fc8fd434fe57a4b1fc510dc03737b658023"
     "@angular/platform-browser": "npm:19.0.0-rc.1"
     "@angular/platform-browser-dynamic": "npm:19.0.0-rc.1"
     "@angular/platform-server": "npm:19.0.0-rc.1"
@@ -852,9 +850,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#f7a60f3dda6fb0030538446849c28ea90f823383":
-  version: 0.0.0-933dcd42f8837d6d6ce3a28419a760edb94f10e6
-  resolution: "@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#commit=f7a60f3dda6fb0030538446849c28ea90f823383"
+"@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#2eb75fc8fd434fe57a4b1fc510dc03737b658023":
+  version: 0.0.0-1694163487c2ccb7f70660249a545ebc73559654
+  resolution: "@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#commit=2eb75fc8fd434fe57a4b1fc510dc03737b658023"
   dependencies:
     "@octokit/rest": "npm:21.0.2"
     "@types/semver": "npm:^7.3.6"
@@ -868,7 +866,7 @@ __metadata:
     yaml: "npm:2.6.0"
   bin:
     ng-dev: ./bundles/cli.mjs
-  checksum: 10c0/d54241b0c41fca8c108a2b24a0ce5bb2240ebb829f79b47a60d5196833361a4c556ea900c9b58044b2ccf70d2a517f6ee8495e88955009f994f0e63ce6afec78
+  checksum: 10c0/20a53f5741b69f8909d3ab6cf4b1adbc7704b0e1560673717e2f267dcff13c2255951c97d38bf84651c79fccc3a2f8b1bf542f0de9d2aeb9d4bd7be2197eb458
   languageName: node
   linkType: hard
 
@@ -1035,7 +1033,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/helper-annotate-as-pure@npm:7.25.9, @babel/helper-annotate-as-pure@npm:^7.18.6, @babel/helper-annotate-as-pure@npm:^7.25.9":
+"@babel/helper-annotate-as-pure@npm:7.25.9, @babel/helper-annotate-as-pure@npm:^7.25.9":
   version: 7.25.9
   resolution: "@babel/helper-annotate-as-pure@npm:7.25.9"
   dependencies:
