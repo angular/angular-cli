@@ -36,15 +36,6 @@
   <br>
 </p>
 
-<p style="text-align: center">
-  <a href="https://circleci.com/gh/angular/workflows/angular-cli/tree/main">
-    <img src="https://img.shields.io/circleci/build/github/angular/angular-cli/main.svg?logo=circleci&logoColor=fff&label=CircleCI" alt="CI status" />
-  </a>&nbsp;
-  <a href="https://discord.gg/angular">
-    <img src="https://img.shields.io/discord/463752820026376202.svg?logo=discord&logoColor=fff&label=Discord&color=7389d8" alt="Discord conversation" />
-  </a>
-</p>
-
 <hr>
 
 ## Documentation
