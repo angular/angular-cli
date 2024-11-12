@@ -16,6 +16,8 @@
  */
 export type RequestHandlerFunction = (
   request: Request,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ...ignoredArgs: any[]
 ) => Promise<Response | null> | null | Response;
 
 /**
