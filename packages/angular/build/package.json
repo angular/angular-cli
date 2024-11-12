@@ -24,7 +24,7 @@
     "@babel/helper-annotate-as-pure": "7.25.9",
     "@babel/helper-split-export-declaration": "7.24.7",
     "@babel/plugin-syntax-import-attributes": "7.26.0",
-    "@inquirer/confirm": "5.0.1",
+    "@inquirer/confirm": "5.0.2",
     "@vitejs/plugin-basic-ssl": "1.1.0",
     "beasties": "0.1.0",
     "browserslist": "^4.23.0",
@@ -45,7 +45,7 @@
     "watchpack": "2.4.2"
   },
   "optionalDependencies": {
-    "lmdb": "3.1.4"
+    "lmdb": "3.1.5"
   },
   "peerDependencies": {
     "@angular/compiler": "^19.0.0-next.9",
