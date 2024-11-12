@@ -204,7 +204,7 @@ export abstract class SchematicsCommandModule
 
                   return definition.validator(Object.values(values).map(({ value }) => value));
                 },
-                default: definition.default,
+                default: definition.multiselect ? undefined : definition.default,
                 choices: definition.items?.map((item) =>
                   typeof item == 'string'
                     ? {
@@ -212,6 +212,7 @@ export abstract class SchematicsCommandModule
                         value: item,
                       }
                     : {
+                        ...item,
                         name: item.label,
                         value: item.value,
                       },
