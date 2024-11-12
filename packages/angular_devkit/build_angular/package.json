@@ -44,7 +44,7 @@
     "ora": "5.4.1",
     "picomatch": "4.0.2",
     "piscina": "4.7.0",
-    "postcss": "8.4.48",
+    "postcss": "8.4.49",
     "postcss-loader": "8.1.1",
     "resolve-url-loader": "5.0.0",
     "rxjs": "7.8.1",
