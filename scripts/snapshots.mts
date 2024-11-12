@@ -161,7 +161,7 @@ export default async function (opts: SnapshotsOptions) {
 
   if (githubToken) {
     console.info('Setting up global git name.');
-    _exec('git', ['config', '--global', 'user.email', 'circleci@angular.dev'], {});
+    _exec('git', ['config', '--global', 'user.email', 'dev-infra@angular.dev'], {});
     _exec('git', ['config', '--global', 'user.name', 'Angular Builds'], {});
     _exec('git', ['config', '--global', 'push.default', 'simple'], {});
   }

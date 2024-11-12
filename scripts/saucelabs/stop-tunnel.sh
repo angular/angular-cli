@@ -15,7 +15,7 @@ echo "Shutting down Sauce Connect tunnel"
 tunnelProcessId=$(cat ${SAUCE_PID_FILE})
 
 # Kill the process by using the PID that has been read from the pidfile. Note that
-# we cannot use killall because CircleCI base container images don't have it installed.
+# we cannot use killall because CI base container images don't have it installed.
 kill ${tunnelProcessId}
 
 while (ps -p ${tunnelProcessId} &> /dev/null); do
