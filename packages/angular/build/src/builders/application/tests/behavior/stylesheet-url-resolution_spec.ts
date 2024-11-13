@@ -243,6 +243,60 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       harness.expectFile('dist/browser/media/logo.svg').toExist();
     });
 
+    it('should rebase a URL with a hyphen-namespaced Sass variable referencing a local resource', async () => {
+      await harness.writeFiles({
+        'src/styles.scss': `@use 'theme/a';`,
+        'src/theme/a.scss': `
+                            @use './b' as named-hyphen;
+                            .a {
+                              background-image: url(named-hyphen.$my-var)
+                            }
+        `,
+        'src/theme/b.scss': `@forward './c.scss' show $my-var;`,
+        'src/theme/c.scss': `$my-var: "./images/logo.svg";`,
+        'src/theme/images/logo.svg': `<svg></svg>`,
+      });
+
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+        outputHashing: OutputHashing.None,
+        styles: ['src/styles.scss'],
+      });
+
+      const { result } = await harness.executeOnce();
+      expect(result?.success).toBeTrue();
+
+      harness.expectFile('dist/browser/styles.css').content.toContain(`url("./media/logo.svg")`);
+      harness.expectFile('dist/browser/media/logo.svg').toExist();
+    });
+
+    it('should rebase a URL with a underscore-namespaced Sass variable referencing a local resource', async () => {
+      await harness.writeFiles({
+        'src/styles.scss': `@use 'theme/a';`,
+        'src/theme/a.scss': `
+                            @use './b' as named_underscore;
+                            .a {
+                              background-image: url(named_underscore.$my-var)
+                            }
+        `,
+        'src/theme/b.scss': `@forward './c.scss' show $my-var;`,
+        'src/theme/c.scss': `$my-var: "./images/logo.svg";`,
+        'src/theme/images/logo.svg': `<svg></svg>`,
+      });
+
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+        outputHashing: OutputHashing.None,
+        styles: ['src/styles.scss'],
+      });
+
+      const { result } = await harness.executeOnce();
+      expect(result?.success).toBeTrue();
+
+      harness.expectFile('dist/browser/styles.css').content.toContain(`url("./media/logo.svg")`);
+      harness.expectFile('dist/browser/media/logo.svg').toExist();
+    });
+
     it('should rebase a URL with a Sass variable referencing a local resource', async () => {
       await harness.writeFiles({
         'src/styles.scss': `@use 'theme/a';`,

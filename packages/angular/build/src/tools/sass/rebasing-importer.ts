@@ -77,7 +77,8 @@ abstract class UrlRebasingImporter implements Importer<'sync'> {
       }
 
       // Sass variable usage either starts with a `$` or contains a namespace and a `.$`
-      const valueNormalized = value[0] === '$' || /^\w+\.\$/.test(value) ? `#{${value}}` : value;
+      const valueNormalized =
+        value[0] === '$' || /^\w[\w_-]*\.\$/.test(value) ? `#{${value}}` : value;
       const rebasedPath = relative(this.entryDirectory, stylesheetDirectory);
 
       // Normalize path separators and escape characters
