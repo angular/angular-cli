@@ -211,6 +211,7 @@ export interface FileReplacement {
 
 // @public
 export interface KarmaBuilderOptions {
+    aot?: boolean;
     assets?: AssetPattern_2[];
     browsers?: Browsers;
     builderMode?: BuilderMode;

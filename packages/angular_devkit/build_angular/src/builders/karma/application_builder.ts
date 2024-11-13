@@ -338,7 +338,7 @@ async function initializeApplication(
     entryPoints,
     tsConfig: options.tsConfig,
     outputPath,
-    aot: false,
+    aot: options.aot,
     index: false,
     outputHashing: OutputHashing.None,
     optimization: false,
