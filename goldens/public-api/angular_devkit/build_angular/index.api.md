@@ -206,6 +206,7 @@ export type FileReplacement = {
 
 // @public
 export type KarmaBuilderOptions = {
+    aot?: boolean;
     assets?: AssetPattern_2[];
     browsers?: Browsers;
     builderMode?: BuilderMode;
