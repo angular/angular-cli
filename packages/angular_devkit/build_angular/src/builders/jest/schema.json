@@ -32,6 +32,11 @@
         "uniqueItems": true
       },
       "default": []
+    },
+    "aot": {
+      "type": "boolean",
+      "description": "Run tests using Ahead of Time compilation.",
+      "default": false
     }
   },
   "additionalProperties": false,
