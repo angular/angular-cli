@@ -1,3 +1,30 @@
+<a name="19.0.0-rc.2"></a>
+
+# 19.0.0-rc.2 (2024-11-14)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                           |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------- |
+| [52dcd551c](https://github.com/angular/angular-cli/commit/52dcd551ca286b09b370b37757da76e524a685d7) | fix  | support default options for multiselect list x-prompt |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                                   |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------- |
+| [5a7a2925b](https://github.com/angular/angular-cli/commit/5a7a2925b1f649eabbeb0a75452978cddb3f243d) | fix  | add missing redirect in SSR manifest                          |
+| [53b6cd33c](https://github.com/angular/angular-cli/commit/53b6cd33cff6c153608c5fab3093ecc9a02a97df) | fix  | allow .js file replacements in all configuration cases        |
+| [3602bbb77](https://github.com/angular/angular-cli/commit/3602bbb77b8924e89978427d9115f0b1fd7d46b7) | fix  | avoid overwriting inline style bundling additional results    |
+| [172f3c25a](https://github.com/angular/angular-cli/commit/172f3c25a33d51ba290389b8a4742f13df6d7a50) | fix  | improve URL rebasing for hyphenated Sass namespaced variables |
+
+### @angular/ssr
+
+| Commit                                                                                              | Type | Description                                  |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------- |
+| [280ebbda4](https://github.com/angular/angular-cli/commit/280ebbda4c65e19b83448a1bb0de056a2ee5d1c6) | fix  | support for HTTP/2 request/response handling |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="19.0.0-rc.1"></a>
 
 # 19.0.0-rc.1 (2024-11-06)
