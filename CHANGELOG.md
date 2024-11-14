@@ -1,3 +1,22 @@
+<a name="18.2.12"></a>
+
+# 18.2.12 (2024-11-14)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                           |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------- |
+| [c3925ed7f](https://github.com/angular/angular-cli/commit/c3925ed7f8e34fd9816cf5a4e8d63c2c45d31d53) | fix  | support default options for multiselect list x-prompt |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                                   |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------- |
+| [c8bee8415](https://github.com/angular/angular-cli/commit/c8bee8415099dfa03d5309183ebbbaab73b2a0eb) | fix  | allow .js file replacements in all configuration cases        |
+| [93f552112](https://github.com/angular/angular-cli/commit/93f552112c2bbd10bc0cee4afcae5b012242636c) | fix  | improve URL rebasing for hyphenated Sass namespaced variables |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="18.2.11"></a>
 
 # 18.2.11 (2024-10-30)
