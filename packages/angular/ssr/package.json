@@ -22,12 +22,12 @@
     "@angular/router": "^19.0.0-next.0"
   },
   "devDependencies": {
-    "@angular/common": "19.0.0-rc.1",
-    "@angular/compiler": "19.0.0-rc.1",
-    "@angular/core": "19.0.0-rc.1",
-    "@angular/platform-browser": "19.0.0-rc.1",
-    "@angular/platform-server": "19.0.0-rc.1",
-    "@angular/router": "19.0.0-rc.1",
+    "@angular/common": "19.0.0-rc.3",
+    "@angular/compiler": "19.0.0-rc.3",
+    "@angular/core": "19.0.0-rc.3",
+    "@angular/platform-browser": "19.0.0-rc.3",
+    "@angular/platform-server": "19.0.0-rc.3",
+    "@angular/router": "19.0.0-rc.3",
     "@bazel/runfiles": "^5.8.1"
   },
   "sideEffects": false,
