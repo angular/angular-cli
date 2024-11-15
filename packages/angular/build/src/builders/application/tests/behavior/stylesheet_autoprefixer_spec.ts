@@ -200,5 +200,60 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
       harness.expectFile('dist/browser/main.js').content.toMatch(/{\\n\s*hyphens:\s*none;\\n\s*}/);
     });
+
+    it('should add prefixes for listed browsers in inline template styles', async () => {
+      await harness.writeFile(
+        '.browserslistrc',
+        `
+          Safari 15.4
+          Edge 104
+          Firefox 91
+         `,
+      );
+
+      await harness.modifyFile('src/app/app.component.ts', (content) => {
+        return content.replace('styleUrls', 'styles').replace('./app.component.css', '');
+      });
+      await harness.modifyFile('src/app/app.component.html', (content) => {
+        return `<style>aside { hyphens: none; }</style>\n${content}`;
+      });
+
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+      });
+
+      const { result } = await harness.executeOnce();
+      expect(result?.success).toBeTrue();
+
+      harness
+        .expectFile('dist/browser/main.js')
+        // div[_ngcontent-%COMP%] {\n  -webkit-hyphens: none;\n  hyphens: none;\n}\n
+        .content.toMatch(/{\\n\s*-webkit-hyphens:\s*none;\\n\s*hyphens:\s*none;\\n\s*}/);
+    });
+
+    it('should not add prefixes if not required by browsers in inline template styles', async () => {
+      await harness.writeFile(
+        '.browserslistrc',
+        `
+          Edge 110
+         `,
+      );
+
+      await harness.modifyFile('src/app/app.component.ts', (content) => {
+        return content.replace('styleUrls', 'styles').replace('./app.component.css', '');
+      });
+      await harness.modifyFile('src/app/app.component.html', (content) => {
+        return `<style>aside { hyphens: none; }</style>\n${content}`;
+      });
+
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+      });
+
+      const { result } = await harness.executeOnce();
+      expect(result?.success).toBeTrue();
+
+      harness.expectFile('dist/browser/main.js').content.toMatch(/{\\n\s*hyphens:\s*none;\\n\s*}/);
+    });
   });
 });

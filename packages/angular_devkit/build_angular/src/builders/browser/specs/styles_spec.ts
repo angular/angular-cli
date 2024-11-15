@@ -140,6 +140,37 @@ describe('Browser Builder styles', () => {
     expect(await files['main.js']).toContain('-webkit-mask-composite');
   });
 
+  it('supports autoprefixer with inline template styles in AOT mode', async () => {
+    host.writeMultipleFiles({
+      './src/app/app.component.html': `
+        <style>div { mask-composite: add; }</style>
+        <div>{{ title }}</div>
+      `,
+      './src/app/app.component.ts': `
+        import { Component } from '@angular/core';
+
+        @Component({
+          selector: 'app-root',
+          standalone: false,
+          templateUrl: './app.component.html',
+          styles: 'div { font-weight: 500; }',
+        })
+        export class AppComponent {
+          title = 'app';
+        }
+      `,
+      '.browserslistrc': `
+        Safari 15.4
+        Edge 104
+        Firefox 91
+      `,
+    });
+
+    const { files } = await browserBuild(architect, host, target, { aot: true });
+
+    expect(await files['main.js']).toContain('-webkit-mask-composite');
+  });
+
   extensionsWithImportSupport.forEach((ext) => {
     it(`supports imports in ${ext} files`, async () => {
       host.writeMultipleFiles({
