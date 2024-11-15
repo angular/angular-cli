@@ -38,7 +38,7 @@ export function augmentHostWithResources(
 
       resourceLoader.setAffectedResources(filePath, [filePath]);
 
-      return content;
+      return Promise.resolve(content);
     } else {
       return resourceLoader.get(filePath);
     }
