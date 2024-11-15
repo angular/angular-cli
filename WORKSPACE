@@ -1,7 +1,4 @@
-workspace(
-    name = "angular_cli",
-    managed_directories = {"@npm": ["node_modules"]},
-)
+workspace(name = "angular_cli")
 
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
@@ -122,9 +119,6 @@ yarn_install(
     #  2. Incompatibilites with the `ts_library` rule.
     exports_directories_only = False,
     package_json = "//:package.json",
-    # We prefer to symlink the `node_modules` to only maintain a single install.
-    # See https://github.com/angular/dev-infra/pull/446#issuecomment-1059820287 for details.
-    symlink_node_modules = True,
     yarn = "//:.yarn/releases/yarn-4.5.0.cjs",
     yarn_lock = "//:yarn.lock",
 )
