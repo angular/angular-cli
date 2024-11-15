@@ -26,7 +26,7 @@
     "@angular-devkit/core": "0.0.0-PLACEHOLDER",
     "@angular-devkit/schematics": "0.0.0-PLACEHOLDER",
     "@inquirer/prompts": "7.1.0",
-    "@listr2/prompt-adapter-inquirer": "2.0.17",
+    "@listr2/prompt-adapter-inquirer": "2.0.18",
     "@schematics/angular": "0.0.0-PLACEHOLDER",
     "@yarnpkg/lockfile": "1.1.0",
     "ini": "5.0.0",

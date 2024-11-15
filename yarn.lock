@@ -521,7 +521,7 @@ __metadata:
     "@angular-devkit/core": "npm:0.0.0-PLACEHOLDER"
     "@angular-devkit/schematics": "npm:0.0.0-PLACEHOLDER"
     "@inquirer/prompts": "npm:7.1.0"
-    "@listr2/prompt-adapter-inquirer": "npm:2.0.17"
+    "@listr2/prompt-adapter-inquirer": "npm:2.0.18"
     "@schematics/angular": "npm:0.0.0-PLACEHOLDER"
     "@yarnpkg/lockfile": "npm:1.1.0"
     ini: "npm:5.0.0"
@@ -663,7 +663,7 @@ __metadata:
     "@discoveryjs/json-ext": "npm:0.6.3"
     "@inquirer/confirm": "npm:5.0.2"
     "@inquirer/prompts": "npm:7.1.0"
-    "@listr2/prompt-adapter-inquirer": "npm:2.0.17"
+    "@listr2/prompt-adapter-inquirer": "npm:2.0.18"
     "@rollup/plugin-alias": "npm:^5.1.1"
     "@rollup/plugin-commonjs": "npm:^28.0.0"
     "@rollup/plugin-node-resolve": "npm:^13.0.5"
@@ -3167,14 +3167,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@listr2/prompt-adapter-inquirer@npm:2.0.17":
-  version: 2.0.17
-  resolution: "@listr2/prompt-adapter-inquirer@npm:2.0.17"
+"@listr2/prompt-adapter-inquirer@npm:2.0.18":
+  version: 2.0.18
+  resolution: "@listr2/prompt-adapter-inquirer@npm:2.0.18"
   dependencies:
     "@inquirer/type": "npm:^1.5.5"
   peerDependencies:
-    "@inquirer/prompts": ">= 3 < 7"
-  checksum: 10c0/c0798ac53173cf11c54d7f3a46c841f24e278c5ec856389b56a96634c9a0cd3bd9d72a062eb54be1112f6f8bdf70f94f03a8af45e633710b9ef1727ebc869702
+    "@inquirer/prompts": ">= 3 < 8"
+  checksum: 10c0/580d2f0ae414cf3090c2fbfe4623649e448d930b3ff24b0211e64e0e037f1a3ffff5307bc36c10cdc0c4a35fc12f04190585e864c4ce05fbf5f062b41ff29e40
   languageName: node
   linkType: hard
 
