@@ -88,7 +88,7 @@
     "@discoveryjs/json-ext": "0.6.3",
     "@inquirer/confirm": "5.0.2",
     "@inquirer/prompts": "7.1.0",
-    "@listr2/prompt-adapter-inquirer": "2.0.17",
+    "@listr2/prompt-adapter-inquirer": "2.0.18",
     "@rollup/plugin-alias": "^5.1.1",
     "@rollup/plugin-commonjs": "^28.0.0",
     "@rollup/plugin-node-resolve": "^13.0.5",
