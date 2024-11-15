@@ -6,8 +6,14 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { LOCALE_ID, StaticProvider, ɵresetCompiledComponents } from '@angular/core';
-import { REQUEST, REQUEST_CONTEXT, RESPONSE_INIT } from '@angular/ssr/tokens';
+import {
+  LOCALE_ID,
+  REQUEST,
+  REQUEST_CONTEXT,
+  RESPONSE_INIT,
+  StaticProvider,
+  ɵresetCompiledComponents,
+} from '@angular/core';
 import { ServerAssets } from './assets';
 import { Hooks } from './hooks';
 import { getAngularAppManifest } from './manifest';
