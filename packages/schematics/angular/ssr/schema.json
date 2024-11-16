@@ -18,9 +18,7 @@
     },
     "serverRouting": {
       "description": "Creates a server application using the Server Routing and App Engine APIs (Developer Preview).",
-      "x-prompt": "Would you like to use the Server Routing and App Engine APIs (Developer Preview) for this server application?",
-      "type": "boolean",
-      "default": false
+      "type": "boolean"
     }
   },
   "required": ["project"],

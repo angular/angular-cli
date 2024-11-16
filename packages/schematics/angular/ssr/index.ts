@@ -38,6 +38,7 @@ import { ProjectDefinition, getWorkspace } from '../utility/workspace';
 import { Builders } from '../utility/workspace-models';
 
 import { Schema as SSROptions } from './schema';
+import { isTTY } from './tty';
 
 const SERVE_SSR_TARGET_NAME = 'serve-ssr';
 const PRERENDER_TARGET_NAME = 'prerender';
@@ -85,7 +86,7 @@ async function getApplicationBuilderOutputPaths(
   const { outputPath } = architectTarget.options;
   if (outputPath === null || outputPath === undefined) {
     throw new SchematicsException(
-      `outputPath for ${projectName} ${target} target is undeined or null.`,
+      `outputPath for ${projectName} ${target} target is undefined or null.`,
     );
   }
 
@@ -361,19 +362,20 @@ function addServerFile(
   };
 }
 
-export default function (options: SSROptions): Rule {
+export default function (inputOptions: SSROptions): Rule {
   return async (host, context) => {
-    const browserEntryPoint = await getMainFilePath(host, options.project);
+    const browserEntryPoint = await getMainFilePath(host, inputOptions.project);
     const isStandalone = isStandaloneApp(host, browserEntryPoint);
 
     const workspace = await getWorkspace(host);
-    const clientProject = workspace.projects.get(options.project);
+    const clientProject = workspace.projects.get(inputOptions.project);
     if (!clientProject) {
       throw targetBuildNotFoundError();
     }
 
     const isUsingApplicationBuilder = usingApplicationBuilder(clientProject);
-
+    const serverRouting = await isServerRoutingEnabled(isUsingApplicationBuilder, inputOptions);
+    const options = { ...inputOptions, serverRouting };
     const sourceRoot = clientProject.sourceRoot ?? posix.join(clientProject.root, 'src');
 
     return chain([
@@ -403,4 +405,55 @@ function usingApplicationBuilder(project: ProjectDefinition) {
     buildBuilder === Builders.Application || buildBuilder === Builders.BuildApplication;
 
   return isUsingApplicationBuilder;
+}
+
+// Wrap inquirer in a `prompt` function.
+export type Prompt = (message: string, defaultValue: boolean) => Promise<boolean>;
+const defaultPrompter: Prompt = async (message, defaultValue) => {
+  const { confirm } = await import('@inquirer/prompts');
+
+  return await confirm({
+    message,
+    default: defaultValue,
+  });
+};
+
+// Allow the prompt functionality to be overridden to facilitate testing.
+let prompt = defaultPrompter;
+export function setPrompterForTestOnly(prompter?: Prompt): void {
+  prompt = prompter ?? defaultPrompter;
+}
+
+/** Returns whether or not server routing is enabled, potentially prompting the user if necessary. */
+async function isServerRoutingEnabled(
+  isUsingApplicationBuilder: boolean,
+  options: SSROptions,
+): Promise<boolean> {
+  if (!isUsingApplicationBuilder) {
+    if (options.serverRouting) {
+      throw new SchematicsException(
+        'Server routing APIs can only be added to a project using `application` builder.',
+      );
+    } else {
+      return false;
+    }
+  }
+
+  // Use explicit option if provided.
+  if (options.serverRouting !== undefined) {
+    return options.serverRouting;
+  }
+
+  const serverRoutingDefault = false;
+
+  // Use the default if not in an interactive terminal.
+  if (!isTTY()) {
+    return serverRoutingDefault;
+  }
+
+  // Prompt the user if in an interactive terminal and no option was provided.
+  return await prompt(
+    'Would you like to use the Server Routing and App Engine APIs (Developer Preview) for this server application?',
+    /* defaultValue */ serverRoutingDefault,
+  );
 }
