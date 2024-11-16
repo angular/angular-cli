@@ -340,8 +340,8 @@ describe('extractRoutesAndCreateRouteTree', () => {
     );
   });
 
-  it('should apply RenderMode matching the wildcard when no Angular routes are defined', async () => {
-    setAngularAppTestingManifest([], [{ path: '**', renderMode: RenderMode.Server }]);
+  it('should use wildcard configuration when no Angular routes are defined', async () => {
+    setAngularAppTestingManifest([], [{ path: '**', renderMode: RenderMode.Server, status: 201 }]);
 
     const { errors, routeTree } = await extractRoutesAndCreateRouteTree(
       url,
@@ -351,6 +351,8 @@ describe('extractRoutesAndCreateRouteTree', () => {
     );
 
     expect(errors).toHaveSize(0);
-    expect(routeTree.toObject()).toEqual([{ route: '/', renderMode: RenderMode.Server }]);
+    expect(routeTree.toObject()).toEqual([
+      { route: '/', renderMode: RenderMode.Server, status: 201 },
+    ]);
   });
 });
