@@ -32,15 +32,28 @@ export default async function () {
 
   // Forcibly remove in case another test doesn't clean itself up.
   await rimraf('node_modules/@angular/ssr');
-  await ng(
-    'add',
-    '@angular/ssr',
-    '--project',
-    projectName,
-    '--skip-confirmation',
-    '--skip-install',
-    '--server-routing',
-  );
+  if (useWebpackBuilder) {
+    await ng(
+      'add',
+      '@angular/ssr',
+      '--project',
+      projectName,
+      '--skip-confirmation',
+      '--skip-install',
+      // Server routing is not supported on `browser` builder.
+      // '--server-routing',
+    );
+  } else {
+    await ng(
+      'add',
+      '@angular/ssr',
+      '--project',
+      projectName,
+      '--skip-confirmation',
+      '--skip-install',
+      '--server-routing',
+    );
+  }
 
   await useSha();
   await installWorkspacePackages();
