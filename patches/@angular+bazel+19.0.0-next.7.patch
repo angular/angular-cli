@@ -1,7 +1,7 @@
-diff --git a/src/ng_package/packager.mjs b/src/ng_package/packager.mjs
+diff --git a/node_modules/@angular/bazel/src/ng_package/packager.mjs b/node_modules/@angular/bazel/src/ng_package/packager.mjs
 index 5c1f3a2c72e28a90b666c96b2fe9755cdafd5259..47034ceeb0b9ab9c1e9bee50239723a51d2e2e19 100755
---- a/src/ng_package/packager.mjs
-+++ b/src/ng_package/packager.mjs
+--- a/node_modules/@angular/bazel/src/ng_package/packager.mjs
++++ b/node_modules/@angular/bazel/src/ng_package/packager.mjs
 @@ -7,7 +7,7 @@
   */
  import * as fs from 'fs';
