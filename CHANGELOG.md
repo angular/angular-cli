@@ -1,3 +1,36 @@
+<a name="19.0.0-rc.3"></a>
+
+# 19.0.0-rc.3 (2024-11-18)
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                                   |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------- |
+| [4b4e000dd](https://github.com/angular/angular-cli/commit/4b4e000dd60bb43df5c8694eb8a0bc0b45d1cf8d) | fix  | don't show server routing prompt when using `browser` builder |
+| [9e6ab1bf2](https://github.com/angular/angular-cli/commit/9e6ab1bf231b35aceb989337fac55a6136594c5d) | fix  | use default import for `express`                              |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                               |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------- |
+| [ea5ae68da](https://github.com/angular/angular-cli/commit/ea5ae68da9e7f2b598bae2ca9ac8be9c20ce7888) | fix  | bring back style tags in browser builder                  |
+| [25d928b4f](https://github.com/angular/angular-cli/commit/25d928b4fde00ae8396f6b9cfcd92b5254fc49aa) | fix  | fix hanging terminal when `browser-sync` is not installed |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                   |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------- |
+| [2551df533](https://github.com/angular/angular-cli/commit/2551df533d61400c0fda89db77a93378480f5047) | fix  | fully disable component style HMR in JIT mode |
+
+### @angular/ssr
+
+| Commit                                                                                              | Type | Description                                                                           |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------------------- |
+| [4ecf63a77](https://github.com/angular/angular-cli/commit/4ecf63a777871bf214bf42fe1738c206bde3201c) | fix  | export PrerenderFallback                                                              |
+| [fb05e7f0a](https://github.com/angular/angular-cli/commit/fb05e7f0abd9d68ac03f243c7774260619b8a623) | fix  | use wildcard server route configuration on the '/' route when the app router is empty |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="19.0.0-rc.2"></a>
 
 # 19.0.0-rc.2 (2024-11-14)
