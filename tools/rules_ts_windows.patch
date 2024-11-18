@@ -1,0 +1,30 @@
+diff --git a/ts/private/ts_project.bzl b/ts/private/ts_project.bzl
+index 367bba0..a112f8f 100644
+--- a/ts/private/ts_project.bzl
++++ b/ts/private/ts_project.bzl
+@@ -93,25 +93,6 @@ def _ts_project_impl(ctx):
+     elif ctx.attr.supports_workers == 0:
+         supports_workers = False
+ 
+-    host_is_windows = platform_utils.host_platform_is_windows()
+-    if host_is_windows and supports_workers:
+-        supports_workers = False
+-
+-        # buildifier: disable=print
+-        print("""\
+-WARNING: disabling ts_project workers which are not currently supported on Windows hosts.
+-See https://github.com/aspect-build/rules_ts/issues/228 for more details.
+-""")
+-
+-    if ctx.attr.is_typescript_5_or_greater and supports_workers:
+-        supports_workers = False
+-
+-        # buildifier: disable=print
+-        print("""\
+-WARNING: disabling ts_project workers which are not currently supported with TS >= 5.0.0.
+-See https://github.com/aspect-build/rules_ts/issues/361 for more details.
+-""")
+-
+     if supports_workers:
+         execution_requirements["supports-workers"] = "1"
+         execution_requirements["worker-key-mnemonic"] = "TsProject"
