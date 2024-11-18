@@ -195,3 +195,20 @@ npm_translate_lock(
 load("@npm2//:repositories.bzl", "npm_repositories")
 
 npm_repositories()
+
+http_archive(
+    name = "aspect_rules_ts",
+    patch_args = ["-p1"],
+    patches = ["//tools:rules_ts_windows.patch"],
+    sha256 = "9acd128abe77397505148eaa6895faed57839560dbf2177dd6285e51235e2724",
+    strip_prefix = "rules_ts-3.3.1",
+    url = "https://github.com/aspect-build/rules_ts/releases/download/v3.3.1/rules_ts-v3.3.1.tar.gz",
+)
+
+load("@aspect_rules_ts//ts:repositories.bzl", "rules_ts_dependencies")
+
+rules_ts_dependencies(
+    # ts_version_from = "//:package.json",
+    # TODO: Support in https://github.com/aspect-build/rules_ts/blob/main/ts/private/npm_repositories.bzl
+    ts_version = "5.6.2",
+)
