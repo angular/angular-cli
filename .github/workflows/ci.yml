@@ -65,6 +65,8 @@ jobs:
         run: yarn install --immutable
       - name: Run module and package tests
         run: yarn bazel test //modules/... //packages/...
+        env:
+          ASPECT_RULES_JS_FROZEN_PNPM_LOCK: '1'
 
   e2e:
     strategy:

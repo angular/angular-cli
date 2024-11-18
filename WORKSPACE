@@ -1,5 +1,7 @@
 workspace(name = "angular_cli")
 
+DEFAULT_NODE_VERSION = "18.19.1"
+
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
 http_archive(
@@ -26,6 +28,17 @@ http_archive(
 load("@build_bazel_rules_nodejs//:repositories.bzl", "build_bazel_rules_nodejs_dependencies")
 
 build_bazel_rules_nodejs_dependencies()
+
+http_archive(
+    name = "aspect_rules_js",
+    sha256 = "75c25a0f15a9e4592bbda45b57aa089e4bf17f9176fd735351e8c6444df87b52",
+    strip_prefix = "rules_js-2.1.0",
+    url = "https://github.com/aspect-build/rules_js/releases/download/v2.1.0/rules_js-v2.1.0.tar.gz",
+)
+
+load("@aspect_rules_js//js:repositories.bzl", "rules_js_dependencies")
+
+rules_js_dependencies()
 
 http_archive(
     name = "rules_pkg",
@@ -70,7 +83,7 @@ nodejs_register_toolchains(
     name = "nodejs",
     # The below can be removed once @rules_nodejs/nodejs is updated to latest which contains https://github.com/bazelbuild/rules_nodejs/pull/3701
     node_repositories = NODE_18_REPO,
-    node_version = "18.19.1",
+    node_version = DEFAULT_NODE_VERSION,
 )
 
 nodejs_register_toolchains(
@@ -103,16 +116,23 @@ nodejs_register_toolchains(
     node_version = "22.0.0",
 )
 
+load("@aspect_rules_js//js:toolchains.bzl", "rules_js_register_toolchains")
+
+rules_js_register_toolchains(
+    node_repositories = NODE_18_REPO,
+    node_version = DEFAULT_NODE_VERSION,
+)
+
 load("@build_bazel_rules_nodejs//:index.bzl", "yarn_install")
 
 yarn_install(
     name = "npm",
     data = [
-        "//:.yarn/patches/@angular-bazel-https-9848736cf4.patch",
-        "//:.yarn/patches/@bazel-concatjs-npm-5.8.1-1bf81df846.patch",
-        "//:.yarn/patches/@bazel-jasmine-npm-5.8.1-3370fee155.patch",
         "//:.yarn/releases/yarn-4.5.0.cjs",
         "//:.yarnrc.yml",
+        "//:patches/@angular+bazel+19.0.0-next.7.patch",
+        "//:patches/@bazel+concatjs+5.8.1.patch",
+        "//:patches/@bazel+jasmine+5.8.1.patch",
     ],
     # Currently disabled due to:
     #  1. Missing Windows support currently.
@@ -152,3 +172,26 @@ load("@build_bazel_rules_nodejs//toolchains/esbuild:esbuild_repositories.bzl", "
 esbuild_repositories(
     npm_repository = "npm",
 )
+
+load("@aspect_rules_js//npm:repositories.bzl", "npm_translate_lock")
+
+npm_translate_lock(
+    name = "npm2",
+    data = [
+        "//:package.json",
+        "//:pnpm-workspace.yaml",
+    ],
+    npmrc = "//:.npmrc",
+    patches = {
+        # Note: Patches not needed as the existing patches are only
+        # for `rules_nodejs` dependencies :)
+    },
+    pnpm_lock = "//:pnpm-lock.yaml",
+    update_pnpm_lock = True,
+    verify_node_modules_ignored = "//:.bazelignore",
+    yarn_lock = "//:yarn.lock",
+)
+
+load("@npm2//:repositories.bzl", "npm_repositories")
+
+npm_repositories()

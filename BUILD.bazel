@@ -5,6 +5,7 @@
 load("@bazel_skylib//rules:common_settings.bzl", "bool_flag")
 load("@build_bazel_rules_nodejs//:index.bzl", "copy_to_bin")
 load("@npm//@bazel/concatjs:index.bzl", "ts_config")
+load("@npm2//:defs.bzl", "npm_link_all_packages")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -18,6 +19,10 @@ exports_files([
     "tsconfig-build.json",
     "package.json",
 ])
+
+npm_link_all_packages(
+    name = "node_modules",
+)
 
 # Files required by e2e tests
 copy_to_bin(
