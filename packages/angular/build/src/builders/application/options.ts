@@ -381,7 +381,7 @@ export async function normalizeOptions(
   // Initial options to keep
   const {
     allowedCommonJsDependencies,
-    aot,
+    aot = true,
     baseHref,
     crossOrigin,
     externalDependencies,
@@ -469,7 +469,7 @@ export async function normalizeOptions(
     clearScreen,
     define,
     partialSSRBuild: usePartialSsrBuild || partialSSRBuild,
-    externalRuntimeStyles,
+    externalRuntimeStyles: aot && externalRuntimeStyles,
     instrumentForCoverage,
     security,
     templateUpdates: !!options.templateUpdates,
