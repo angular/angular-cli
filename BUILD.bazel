@@ -1,3 +1,5 @@
+load("@aspect_rules_ts//ts:defs.bzl", rules_js_tsconfig = "ts_config")
+
 # Copyright Google Inc. All Rights Reserved.
 #
 # Use of this source code is governed by an MIT-style license that can be
@@ -22,6 +24,15 @@ exports_files([
 
 npm_link_all_packages(
     name = "node_modules",
+)
+
+rules_js_tsconfig(
+    name = "build-tsconfig",
+    src = "tsconfig-build.json",
+    deps = [
+        "tsconfig.json",
+        "//:node_modules/@types/node",
+    ],
 )
 
 # Files required by e2e tests
