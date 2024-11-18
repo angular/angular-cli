@@ -69,17 +69,17 @@
     "undici": "6.21.0"
   },
   "peerDependencies": {
-    "@angular/compiler-cli": "^19.0.0-next.0",
-    "@angular/localize": "^19.0.0-next.0",
-    "@angular/platform-server": "^19.0.0-next.0",
-    "@angular/service-worker": "^19.0.0-next.0",
+    "@angular/compiler-cli": "^19.0.0",
+    "@angular/localize": "^19.0.0",
+    "@angular/platform-server": "^19.0.0",
+    "@angular/service-worker": "^19.0.0",
     "@angular/ssr": "^0.0.0-PLACEHOLDER",
     "@web/test-runner": "^0.19.0",
     "browser-sync": "^3.0.2",
     "jest": "^29.5.0",
     "jest-environment-jsdom": "^29.5.0",
     "karma": "^6.3.0",
-    "ng-packagr": "^19.0.0-next.0",
+    "ng-packagr": "^19.0.0",
     "protractor": "^7.0.0",
     "tailwindcss": "^2.0.0 || ^3.0.0",
     "typescript": ">=5.5 <5.7"
