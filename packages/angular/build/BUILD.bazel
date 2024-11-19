@@ -25,6 +25,11 @@ ts_json_schema(
 )
 
 ts_json_schema(
+    name = "ng_karma_schema",
+    src = "src/builders/karma/schema.json",
+)
+
+ts_json_schema(
     name = "ng_packagr_schema",
     src = "src/builders/ng-packagr/schema.json",
 )
@@ -63,6 +68,7 @@ ts_project(
         "//packages/angular/build:src/builders/application/schema.ts",
         "//packages/angular/build:src/builders/dev-server/schema.ts",
         "//packages/angular/build:src/builders/extract-i18n/schema.ts",
+        "//packages/angular/build:src/builders/karma/schema.ts",
         "//packages/angular/build:src/builders/ng-packagr/schema.ts",
     ],
     data = RUNTIME_ASSETS,
@@ -85,6 +91,7 @@ ts_project(
         "//:node_modules/@babel/plugin-syntax-import-attributes",
         "//:node_modules/@inquirer/confirm",
         "//:node_modules/@types/babel__core",
+        "//:node_modules/@types/karma",
         "//:node_modules/@types/less",
         "//:node_modules/@types/node",
         "//:node_modules/@types/picomatch",
@@ -99,6 +106,7 @@ ts_project(
         "//:node_modules/https-proxy-agent",
         "//:node_modules/istanbul-lib-instrument",
         "//:node_modules/jsonc-parser",
+        "//:node_modules/karma",
         "//:node_modules/less",
         "//:node_modules/listr2",
         "//:node_modules/lmdb",
@@ -200,6 +208,39 @@ ts_project(
     ],
 )
 
+ts_project(
+    name = "karma_integration_test_lib",
+    testonly = True,
+    srcs = glob(include = ["src/builders/karma/tests/**/*.ts"]),
+    deps = [
+        ":build_rjs",
+        "//packages/angular/build/private:private_rjs",
+        "//modules/testing/builder:builder_rjs",
+        ":node_modules/@angular-devkit/architect",
+
+        # karma specific test deps
+        "//:node_modules/karma-chrome-launcher",
+        "//:node_modules/karma-coverage",
+        "//:node_modules/karma-jasmine",
+        "//:node_modules/karma-jasmine-html-reporter",
+        "//:node_modules/puppeteer",
+
+        # Base dependencies for the karma in hello-world-app.
+        "//:node_modules/@angular/common",
+        "//:node_modules/@angular/compiler",
+        "//:node_modules/@angular/compiler-cli",
+        "//:node_modules/@angular/core",
+        "//:node_modules/@angular/platform-browser",
+        "//:node_modules/@angular/platform-browser-dynamic",
+        "//:node_modules/@angular/router",
+        "//:node_modules/rxjs",
+        "//:node_modules/tslib",
+        "//:node_modules/typescript",
+        "//:node_modules/zone.js",
+        "//:node_modules/buffer",
+    ],
+)
+
 jasmine_test(
     name = "application_integration_tests",
     size = "large",
@@ -212,6 +253,19 @@ jasmine_test(
     name = "dev-server_integration_tests",
     size = "large",
     data = [":dev-server_integration_test_lib_rjs"],
+    flaky = True,
+    shard_count = 10,
+)
+
+jasmine_test(
+    name = "karma_integration_tests",
+    size = "large",
+    data = [":karma_integration_test_lib_rjs"],
+    env = {
+        # TODO: Replace Puppeteer downloaded browsers with Bazel-managed browsers,
+        # or standardize to avoid complex configuration like this!
+        "PUPPETEER_DOWNLOAD_PATH": "../../../node_modules/puppeteer/downloads",
+    },
     flaky = True,
     shard_count = 10,
 )

@@ -58,6 +58,7 @@
     "@angular/platform-server": "0.0.0-ANGULAR-FW-PEER-DEP",
     "@angular/service-worker": "0.0.0-ANGULAR-FW-PEER-DEP",
     "@angular/ssr": "^0.0.0-PLACEHOLDER",
+    "karma": "^6.4.0",
     "less": "^4.2.0",
     "ng-packagr": "0.0.0-NG-PACKAGR-PEER-DEP",
     "postcss": "^8.4.0",
@@ -75,6 +76,9 @@
       "optional": true
     },
     "@angular/ssr": {
+      "optional": true
+    },
+    "karma": {
       "optional": true
     },
     "less": {

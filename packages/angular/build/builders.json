@@ -15,6 +15,11 @@
       "schema": "./src/builders/extract-i18n/schema.json",
       "description": "Extract i18n messages from an application."
     },
+    "karma": {
+      "implementation": "./src/builders/karma",
+      "schema": "./src/builders/karma/schema.json",
+      "description": "Run Karma unit tests."
+    },
     "ng-packagr": {
       "implementation": "./src/builders/ng-packagr/index",
       "schema": "./src/builders/ng-packagr/schema.json",

@@ -6,22 +6,16 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { assertCompatibleAngularVersion } from '@angular/build/private';
 import {
-  BuilderContext,
-  BuilderOutput,
+  type Builder,
+  type BuilderContext,
+  type BuilderOutput,
   createBuilder,
-  targetFromTargetString,
 } from '@angular-devkit/architect';
-import { strings } from '@angular-devkit/core';
 import type { ConfigOptions } from 'karma';
 import { createRequire } from 'node:module';
-import * as path from 'node:path';
-import { Observable, from, mergeMap } from 'rxjs';
-import { Configuration } from 'webpack';
-import { ExecutionTransformer } from '../../transforms';
-import { normalizeFileReplacements } from '../../utils';
-import { BuilderMode, Schema as KarmaBuilderOptions } from './schema';
+import path from 'node:path';
+import type { Schema as KarmaBuilderOptions } from './schema';
 
 export type KarmaConfigOptions = ConfigOptions & {
   buildWebpack?: unknown;
@@ -31,42 +25,23 @@ export type KarmaConfigOptions = ConfigOptions & {
 /**
  * @experimental Direct usage of this function is considered experimental.
  */
-export function execute(
+export async function* execute(
   options: KarmaBuilderOptions,
   context: BuilderContext,
   transforms: {
-    webpackConfiguration?: ExecutionTransformer<Configuration>;
     // The karma options transform cannot be async without a refactor of the builder implementation
     karmaOptions?: (options: KarmaConfigOptions) => KarmaConfigOptions;
   } = {},
-): Observable<BuilderOutput> {
-  // Check Angular version.
-  assertCompatibleAngularVersion(context.workspaceRoot);
+): AsyncIterable<BuilderOutput> {
+  const { execute } = await import('./application_builder');
+  const karmaOptions = getBaseKarmaOptions(options, context);
 
-  return from(getExecuteWithBuilder(options, context)).pipe(
-    mergeMap(([useEsbuild, executeWithBuilder]) => {
-      const karmaOptions = getBaseKarmaOptions(options, context, useEsbuild);
-
-      if (useEsbuild && transforms.webpackConfiguration) {
-        context.logger.warn(
-          `This build is using the application builder but transforms.webpackConfiguration was provided. The transform will be ignored.`,
-        );
-      }
-
-      if (useEsbuild && options.fileReplacements) {
-        options.fileReplacements = normalizeFileReplacements(options.fileReplacements, './');
-      }
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      return executeWithBuilder(options as any, context, karmaOptions, transforms);
-    }),
-  );
+  yield* execute(options, context, karmaOptions, transforms);
 }
 
 function getBaseKarmaOptions(
   options: KarmaBuilderOptions,
   context: BuilderContext,
-  useEsbuild: boolean,
 ): KarmaConfigOptions {
   let singleRun: boolean | undefined;
   if (options.watch !== undefined) {
@@ -81,7 +56,7 @@ function getBaseKarmaOptions(
 
   const karmaOptions: KarmaConfigOptions = options.karmaConfig
     ? {}
-    : getBuiltInKarmaConfig(context.workspaceRoot, projectName, useEsbuild);
+    : getBuiltInKarmaConfig(context.workspaceRoot, projectName);
 
   karmaOptions.singleRun = singleRun;
 
@@ -115,25 +90,21 @@ function getBaseKarmaOptions(
 function getBuiltInKarmaConfig(
   workspaceRoot: string,
   projectName: string,
-  useEsbuild: boolean,
 ): ConfigOptions & Record<string, unknown> {
   let coverageFolderName = projectName.charAt(0) === '@' ? projectName.slice(1) : projectName;
-  if (/[A-Z]/.test(coverageFolderName)) {
-    coverageFolderName = strings.dasherize(coverageFolderName);
-  }
+  coverageFolderName = coverageFolderName.toLowerCase();
 
   const workspaceRootRequire = createRequire(workspaceRoot + '/');
 
   // Any changes to the config here need to be synced to: packages/schematics/angular/config/files/karma.conf.js.template
   return {
     basePath: '',
-    frameworks: ['jasmine', ...(useEsbuild ? [] : ['@angular-devkit/build-angular'])],
+    frameworks: ['jasmine'],
     plugins: [
       'karma-jasmine',
       'karma-chrome-launcher',
       'karma-jasmine-html-reporter',
       'karma-coverage',
-      ...(useEsbuild ? [] : ['@angular-devkit/build-angular/plugins/karma']),
     ].map((p) => workspaceRootRequire(p)),
     jasmineHtmlReporter: {
       suppressAll: true, // removes the duplicated traces
@@ -162,77 +133,7 @@ function getBuiltInKarmaConfig(
 }
 
 export type { KarmaBuilderOptions };
-export default createBuilder<Record<string, string> & KarmaBuilderOptions>(execute);
 
-async function getExecuteWithBuilder(
-  options: KarmaBuilderOptions,
-  context: BuilderContext,
-): Promise<
-  [
-    boolean,
-    (
-      | (typeof import('@angular/build/private'))['executeKarmaInternal']
-      | (typeof import('./browser_builder'))['execute']
-    ),
-  ]
-> {
-  const useEsbuild = await checkForEsbuild(options, context);
-  let execute;
-  if (useEsbuild) {
-    const { executeKarmaInternal } = await import('@angular/build/private');
-    execute = executeKarmaInternal;
-  } else {
-    const browserBuilderModule = await import('./browser_builder');
-    execute = browserBuilderModule.execute;
-  }
+const builder: Builder<KarmaBuilderOptions> = createBuilder<KarmaBuilderOptions>(execute);
 
-  return [useEsbuild, execute];
-}
-
-async function checkForEsbuild(
-  options: KarmaBuilderOptions,
-  context: BuilderContext,
-): Promise<boolean> {
-  if (options.builderMode !== BuilderMode.Detect) {
-    return options.builderMode === BuilderMode.Application;
-  }
-
-  // Look up the current project's build target using a development configuration.
-  const buildTargetSpecifier = `::development`;
-  const buildTarget = targetFromTargetString(
-    buildTargetSpecifier,
-    context.target?.project,
-    'build',
-  );
-
-  try {
-    const developmentBuilderName = await context.getBuilderNameForTarget(buildTarget);
-
-    return isEsbuildBased(developmentBuilderName);
-  } catch (e) {
-    if (!(e instanceof Error) || e.message !== 'Project target does not exist.') {
-      throw e;
-    }
-    // If we can't find a development builder, we can't use 'detect'.
-    throw new Error(
-      'Failed to detect the builder used by the application. Please set builderMode explicitly.',
-    );
-  }
-}
-
-function isEsbuildBased(
-  builderName: string,
-): builderName is
-  | '@angular/build:application'
-  | '@angular-devkit/build-angular:application'
-  | '@angular-devkit/build-angular:browser-esbuild' {
-  if (
-    builderName === '@angular/build:application' ||
-    builderName === '@angular-devkit/build-angular:application' ||
-    builderName === '@angular-devkit/build-angular:browser-esbuild'
-  ) {
-    return true;
-  }
-
-  return false;
-}
+export default builder;
