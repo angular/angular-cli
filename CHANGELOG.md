@@ -1,60 +1,183 @@
-<a name="19.0.0-rc.3"></a>
+<a name="19.0.0"></a>
 
-# 19.0.0-rc.3 (2024-11-18)
+# 19.0.0 (2024-11-19)
+
+## Breaking Changes
 
 ### @schematics/angular
 
-| Commit                                                                                              | Type | Description                                                   |
-| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------- |
-| [4b4e000dd](https://github.com/angular/angular-cli/commit/4b4e000dd60bb43df5c8694eb8a0bc0b45d1cf8d) | fix  | don't show server routing prompt when using `browser` builder |
-| [9e6ab1bf2](https://github.com/angular/angular-cli/commit/9e6ab1bf231b35aceb989337fac55a6136594c5d) | fix  | use default import for `express`                              |
+- The app-shell schematic is no longer compatible with Webpack-based builders.
 
 ### @angular-devkit/build-angular
 
-| Commit                                                                                              | Type | Description                                               |
-| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------- |
-| [ea5ae68da](https://github.com/angular/angular-cli/commit/ea5ae68da9e7f2b598bae2ca9ac8be9c20ce7888) | fix  | bring back style tags in browser builder                  |
-| [25d928b4f](https://github.com/angular/angular-cli/commit/25d928b4fde00ae8396f6b9cfcd92b5254fc49aa) | fix  | fix hanging terminal when `browser-sync` is not installed |
+- The `browserTarget` option has been removed from the DevServer and ExtractI18n builders. `buildTarget` is to be used instead.
+- Protractor is no longer supported.
+
+  Protractor was marked end-of-life in August 2023 (see https://protractortest.org/). Projects still relying on Protractor should consider migrating to another E2E testing framework, several support solid migration paths from Protractor.
+
+  - https://angular.dev/tools/cli/end-to-end
+  - https://blog.angular.dev/the-state-of-end-to-end-testing-with-angular-d175f751cb9c
+
+### @angular-devkit/core
+
+- The deprecated `fileBuffer` function is no longer available. Update your code to use `stringToFileBuffer` instead to maintain compatibility.
+
+  **Note:** that this change does not affect application developers.
 
 ### @angular/build
+
+- The `@angular/localize/init` polyfill will no longer be added automatically to projects. To prevent runtime issues, ensure that this polyfill is manually included in the "polyfills" section of your "angular.json" file if your application relies on Angular localization features.
+
+### @angular/ssr
+
+- The `CommonEngine` API now needs to be imported from `@angular/ssr/node`.
+
+  **Before**
+
+  ```ts
+  import { CommonEngine } from '@angular/ssr';
+  ```
+
+  **After**
+
+  ```ts
+  import { CommonEngine } from '@angular/ssr/node';
+  ```
+
+### @angular-devkit/schematics-cli
 
 | Commit                                                                                              | Type | Description                                   |
 | --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------- |
-| [2551df533](https://github.com/angular/angular-cli/commit/2551df533d61400c0fda89db77a93378480f5047) | fix  | fully disable component style HMR in JIT mode |
+| [37693c40e](https://github.com/angular/angular-cli/commit/37693c40e3afc4c6dd7c949ea658bdf94146c9d8) | feat | add package manager option to blank schematic |
 
-### @angular/ssr
+### @schematics/angular
 
-| Commit                                                                                              | Type | Description                                                                           |
-| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------------------- |
-| [4ecf63a77](https://github.com/angular/angular-cli/commit/4ecf63a777871bf214bf42fe1738c206bde3201c) | fix  | export PrerenderFallback                                                              |
-| [fb05e7f0a](https://github.com/angular/angular-cli/commit/fb05e7f0abd9d68ac03f243c7774260619b8a623) | fix  | use wildcard server route configuration on the '/' route when the app router is empty |
-
-<!-- CHANGELOG SPLIT MARKER -->
-
-<a name="19.0.0-rc.2"></a>
-
-# 19.0.0-rc.2 (2024-11-14)
+| Commit                                                                                              | Type | Description                                                                |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------------------- |
+| [a381a3db1](https://github.com/angular/angular-cli/commit/a381a3db187f7b20e5ec8d1e1a1f1bd860426fcd) | feat | add option to export component as default                                  |
+| [755f3a07f](https://github.com/angular/angular-cli/commit/755f3a07f5fe485c1ed8c0c6060d6d5c799c085c) | feat | add option to setup new workspace or application as zoneless mode          |
+| [cfca5442e](https://github.com/angular/angular-cli/commit/cfca5442ec01cc4eff4fe75822eb7ef780ccfef1) | feat | integrate `withEventReplay()` in `provideClientHydration` for new SSR apps |
+| [292a4b7c2](https://github.com/angular/angular-cli/commit/292a4b7c2f62828606c42258db524341f4a6391e) | feat | update app-shell and ssr schematics to adopt new Server Rendering API      |
+| [b1504c3bc](https://github.com/angular/angular-cli/commit/b1504c3bcca4d4c313e5d795ace8b074fb1f8890) | fix  | component spec with export default                                         |
+| [4b4e000dd](https://github.com/angular/angular-cli/commit/4b4e000dd60bb43df5c8694eb8a0bc0b45d1cf8d) | fix  | don't show server routing prompt when using `browser` builder              |
+| [4e2a5fe15](https://github.com/angular/angular-cli/commit/4e2a5fe155006e7154326319ed39e77e5693d9b3) | fix  | enable opt-in for new `@angular/ssr` feature                               |
+| [fcf7443d6](https://github.com/angular/angular-cli/commit/fcf7443d626d1f3e828ebfad464598f7b9ddef12) | fix  | explicitly set standalone:false                                            |
+| [7992218a9](https://github.com/angular/angular-cli/commit/7992218a9c22ea9469bd3386c7dc1d5efc6e51f9) | fix  | remove `declaration` and `sourceMap` from default tsconfig                 |
+| [9e6ab1bf2](https://github.com/angular/angular-cli/commit/9e6ab1bf231b35aceb989337fac55a6136594c5d) | fix  | use default import for `express`                                           |
 
 ### @angular/cli
 
-| Commit                                                                                              | Type | Description                                           |
-| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------- |
-| [52dcd551c](https://github.com/angular/angular-cli/commit/52dcd551ca286b09b370b37757da76e524a685d7) | fix  | support default options for multiselect list x-prompt |
+| Commit                                                                                              | Type | Description                                                       |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------- |
+| [201b60e1d](https://github.com/angular/angular-cli/commit/201b60e1dd25b4abb7670e21d103b67d4eda0e14) | feat | handle string key/value pairs, e.g. --define                      |
+| [b847d4460](https://github.com/angular/angular-cli/commit/b847d4460c352604e1935d494efd761915caaa3f) | fix  | recommend optional application update migration during v19 update |
+| [f249e7e85](https://github.com/angular/angular-cli/commit/f249e7e856bf16e8c5f154fdb8aff36421649a1b) | perf | enable Node.js compile code cache when available                  |
+| [ecc107d83](https://github.com/angular/angular-cli/commit/ecc107d83bfdfd9d5dd1087e264892d60361625c) | perf | enable Node.js compile code cache when available                  |
+
+### @angular-devkit/architect
+
+| Commit                                                                                              | Type | Description                   |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------- |
+| [78f76485f](https://github.com/angular/angular-cli/commit/78f76485fe315ffd0262c1a3732092731235828b) | feat | merge object options from CLI |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type     | Description                                               |
+| --------------------------------------------------------------------------------------------------- | -------- | --------------------------------------------------------- |
+| [0a4ef3026](https://github.com/angular/angular-cli/commit/0a4ef302635e4665ae9881746867dd80ca0d2dc7) | feat     | karma-coverage w/ app builder                             |
+| [dcbdca85c](https://github.com/angular/angular-cli/commit/dcbdca85c7fe1a7371b8f6662e0f68e24d56102e) | feat     | karma+esbuild+watch                                       |
+| [54594b5ab](https://github.com/angular/angular-cli/commit/54594b5abfa4c9301cc369e5dea5f76b71e51ab0) | feat     | support karma with esbuild                                |
+| [ea5ae68da](https://github.com/angular/angular-cli/commit/ea5ae68da9e7f2b598bae2ca9ac8be9c20ce7888) | fix      | bring back style tags in browser builder                  |
+| [476f94f51](https://github.com/angular/angular-cli/commit/476f94f51a3403d03ceb9f58ffb4a3564cc52e5a) | fix      | fix --watch regression in karma                           |
+| [25d928b4f](https://github.com/angular/angular-cli/commit/25d928b4fde00ae8396f6b9cfcd92b5254fc49aa) | fix      | fix hanging terminal when `browser-sync` is not installed |
+| [2ec877dd0](https://github.com/angular/angular-cli/commit/2ec877dd0dede8f3ee849fe83b4a4427bab96447) | fix      | handle basename collisions                                |
+| [ab6e19e1f](https://github.com/angular/angular-cli/commit/ab6e19e1f9a8781334821048522abe86b149c9c3) | fix      | handle main field                                         |
+| [43e7aae22](https://github.com/angular/angular-cli/commit/43e7aae2284ff15e0282c9d9597c4f31cf1f60a4) | fix      | remove double-watch in karma                              |
+| [1e37b5939](https://github.com/angular/angular-cli/commit/1e37b59396a2f815d1671ccecc03ff8441730391) | fix      | serve assets                                              |
+| [9d7613db9](https://github.com/angular/angular-cli/commit/9d7613db9bf8b397d5896fcdf6c7b0efeaffa5d5) | fix      | zone.js/testing + karma + esbuild                         |
+| [e40384e63](https://github.com/angular/angular-cli/commit/e40384e637bc6f92c28f4e572f986ca902938ba2) | refactor | remove deprecated `browserTarget`                         |
+| [62877bdf2](https://github.com/angular/angular-cli/commit/62877bdf2b0449d8c12a167c59d0c24c77467f37) | refactor | remove Protractor builder and schematics                  |
+
+### @angular-devkit/core
+
+| Commit                                                                                              | Type     | Description                                                              |
+| --------------------------------------------------------------------------------------------------- | -------- | ------------------------------------------------------------------------ |
+| [0d8a1006d](https://github.com/angular/angular-cli/commit/0d8a1006d4629d8af1144065ea237ab30916e66e) | refactor | remove deprecated `fileBuffer` function in favor of `stringToFileBuffer` |
 
 ### @angular/build
 
-| Commit                                                                                              | Type | Description                                                   |
-| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------- |
-| [5a7a2925b](https://github.com/angular/angular-cli/commit/5a7a2925b1f649eabbeb0a75452978cddb3f243d) | fix  | add missing redirect in SSR manifest                          |
-| [53b6cd33c](https://github.com/angular/angular-cli/commit/53b6cd33cff6c153608c5fab3093ecc9a02a97df) | fix  | allow .js file replacements in all configuration cases        |
-| [3602bbb77](https://github.com/angular/angular-cli/commit/3602bbb77b8924e89978427d9115f0b1fd7d46b7) | fix  | avoid overwriting inline style bundling additional results    |
-| [172f3c25a](https://github.com/angular/angular-cli/commit/172f3c25a33d51ba290389b8a4742f13df6d7a50) | fix  | improve URL rebasing for hyphenated Sass namespaced variables |
+| Commit                                                                                              | Type     | Description                                                                         |
+| --------------------------------------------------------------------------------------------------- | -------- | ----------------------------------------------------------------------------------- |
+| [b6951f448](https://github.com/angular/angular-cli/commit/b6951f4482418f65e4bd1c15d5f7f051c91d59db) | feat     | add `sass` to `stylePreprocessorOptions` in application builder                     |
+| [efb434136](https://github.com/angular/angular-cli/commit/efb434136d8c8df207747ab8fd87b7e2116b7106) | feat     | Auto-CSP support as a part of angular.json schema                                   |
+| [816e3cb86](https://github.com/angular/angular-cli/commit/816e3cb868961c57a68783601b919370076c41dc) | feat     | enable component stylesheet hot replacement by default                              |
+| [3b00fc908](https://github.com/angular/angular-cli/commit/3b00fc908d4f07282e89677928e00665c8578ab5) | feat     | introduce `outputMode` option to the application builder                            |
+| [7d883a152](https://github.com/angular/angular-cli/commit/7d883a152e978112245a98f2f737764caa76ec0f) | feat     | introduce `ssr.experimentalPlatform` option                                         |
+| [c48d6947e](https://github.com/angular/angular-cli/commit/c48d6947ed17eab19822a97492e3686bcf059494) | feat     | set development/production condition                                                |
+| [f63072668](https://github.com/angular/angular-cli/commit/f63072668e44254da78170445ac2417c7bc1aa18) | feat     | utilize `ssr.entry` during prerendering to enable access to local API routes        |
+| [bbc290133](https://github.com/angular/angular-cli/commit/bbc290133fc93186980ca3c43f221847ba8e858a) | feat     | utilize `ssr.entry` in Vite dev-server when available                               |
+| [5a7a2925b](https://github.com/angular/angular-cli/commit/5a7a2925b1f649eabbeb0a75452978cddb3f243d) | fix      | add missing redirect in SSR manifest                                                |
+| [06e5176c2](https://github.com/angular/angular-cli/commit/06e5176c2d3b27aaeb117374a8ae402c6a4c6319) | fix      | add warning when `--prerendering` or `--app-shell` are no-ops                       |
+| [ecaf870b5](https://github.com/angular/angular-cli/commit/ecaf870b5cddd5d43d297f1193eb11b8f73757c0) | fix      | always clear dev-server error overlay on non-error result                           |
+| [f8677f6a9](https://github.com/angular/angular-cli/commit/f8677f6a9ba155b04c692814a1bc13f5cc47d94d) | fix      | always record component style usage for HMR updates                                 |
+| [099e477a8](https://github.com/angular/angular-cli/commit/099e477a8f1bbcf9d0f415dc6fd4743107c967f7) | fix      | avoid hashing development external component stylesheets                            |
+| [3602bbb77](https://github.com/angular/angular-cli/commit/3602bbb77b8924e89978427d9115f0b1fd7d46b7) | fix      | avoid overwriting inline style bundling additional results                          |
+| [71534aadc](https://github.com/angular/angular-cli/commit/71534aadc403404e2dc9bc12054f32c3ed157db9) | fix      | check referenced files against native file paths                                    |
+| [fed31e064](https://github.com/angular/angular-cli/commit/fed31e064611894934c86ed36e8b0808029d4143) | fix      | correctly use dev-server hmr option to control stylesheet hot replacement           |
+| [b86bb080e](https://github.com/angular/angular-cli/commit/b86bb080e3a58a3320b2f68fb79edcdc98bfa7e9) | fix      | disable dev-server websocket when live reload is disabled                           |
+| [7c50ba9e2](https://github.com/angular/angular-cli/commit/7c50ba9e2faca445c196c69e972ac313547dda54) | fix      | ensure `index.csr.html` is always generated when prerendering or SSR are enabled    |
+| [efb2232df](https://github.com/angular/angular-cli/commit/efb2232df5475699a44d0f76a70e2d7de4a71f5a) | fix      | ensure accurate content size in server asset metadata                               |
+| [18a8584ea](https://github.com/angular/angular-cli/commit/18a8584ead439d044760fe2abb4a7f657a0b10e3) | fix      | ensure SVG template URLs are considered templates with external stylesheets         |
+| [7502fee28](https://github.com/angular/angular-cli/commit/7502fee28a057b53e60b97f55b5aff5281019f1b) | fix      | Exclude known `--import` from execArgv when spawning workers                        |
+| [2551df533](https://github.com/angular/angular-cli/commit/2551df533d61400c0fda89db77a93378480f5047) | fix      | fully disable component style HMR in JIT mode                                       |
+| [c41529cc1](https://github.com/angular/angular-cli/commit/c41529cc1d762cf508eccf46c44256df21afe24f) | fix      | handle `APP_BASE_HREF` correctly in prerendered routes                              |
+| [87a90afd4](https://github.com/angular/angular-cli/commit/87a90afd4600049b184b32f8f92a0634e25890c0) | fix      | incomplete string escaping or encoding                                              |
+| [1bb68ba68](https://github.com/angular/angular-cli/commit/1bb68ba6812236a135c1599031bf7e1b7e0d1d79) | fix      | move lmdb to optionalDependencies                                                   |
+| [a995c8ea6](https://github.com/angular/angular-cli/commit/a995c8ea6d17778af031c2f9797e52739ea4dc81) | fix      | prevent prerendering of catch-all routes                                            |
+| [1654acf0f](https://github.com/angular/angular-cli/commit/1654acf0ff3010b619a22d11f17eec9975d8e2a2) | fix      | relax constraints on external stylesheet component id                               |
+| [0d4558ea5](https://github.com/angular/angular-cli/commit/0d4558ea516a4b8716f2442290e05354c502a49e) | fix      | set `ngServerMode` during vite prebundling                                          |
+| [55d7f01b6](https://github.com/angular/angular-cli/commit/55d7f01b66f4867aad4598574582e8505f201c82) | fix      | simplify disabling server features with `--no-server` via command line              |
+| [cf0228b82](https://github.com/angular/angular-cli/commit/cf0228b828fc43b1b33d48dc0977ff59abb597c2) | fix      | skip wildcard routes from being listed as prerendered routes                        |
+| [af52fb49b](https://github.com/angular/angular-cli/commit/af52fb49bdd913af8af9bfbe36be279fce70de39) | fix      | synchronize import/export conditions between bundler and TypeScript                 |
+| [6c618d495](https://github.com/angular/angular-cli/commit/6c618d495c54394eb2b87aee36ba5436c06557bd) | fix      | update logic to support both internal and external SSR middlewares                  |
+| [bfa8fec9b](https://github.com/angular/angular-cli/commit/bfa8fec9b17d421925a684e2b642dee70165a879) | fix      | use named export `reqHandler` for server.ts request handling                        |
+| [c8e1521a2](https://github.com/angular/angular-cli/commit/c8e1521a2bd5b47c811e5d7f9aea7f57e92a4552) | fix      | workaround Vite CSS ShadowDOM hot replacement                                       |
+| [d6a34034d](https://github.com/angular/angular-cli/commit/d6a34034d7489c09753090642ade4c606cd98ece) | refactor | remove automatic addition of `@angular/localize/init` polyfill and related warnings |
 
 ### @angular/ssr
 
-| Commit                                                                                              | Type | Description                                  |
-| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------- |
-| [280ebbda4](https://github.com/angular/angular-cli/commit/280ebbda4c65e19b83448a1bb0de056a2ee5d1c6) | fix  | support for HTTP/2 request/response handling |
+| Commit                                                                                              | Type | Description                                                                                                |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------------------------------------------------------- |
+| [92209dd2e](https://github.com/angular/angular-cli/commit/92209dd2e93af450e3fc657609efe95c6a6b3963) | feat | add `createRequestHandler` and `createNodeRequestHandler `utilities                                        |
+| [41fb2ed86](https://github.com/angular/angular-cli/commit/41fb2ed86056306406832317178ca5d94aa110e2) | feat | Add `getHeaders` Method to `AngularAppEngine` and `AngularNodeAppEngine` for handling pages static headers |
+| [f346ee8a8](https://github.com/angular/angular-cli/commit/f346ee8a8819bb2eaf0ffb3d5523b00093be09e5) | feat | add `isMainModule` function                                                                                |
+| [d66aaa3ca](https://github.com/angular/angular-cli/commit/d66aaa3ca458e05b535bec7c1dcb98b0e9c5202e) | feat | add server routing configuration API                                                                       |
+| [bca568389](https://github.com/angular/angular-cli/commit/bca56838937f942c5ef902f5c98d018582188e84) | feat | dynamic route resolution using Angular router                                                              |
+| [30c25bf68](https://github.com/angular/angular-cli/commit/30c25bf6885fefea6094ec1815e066e4c6ada097) | feat | export `AngularAppEngine` as public API                                                                    |
+| [455b5700c](https://github.com/angular/angular-cli/commit/455b5700c29845829235e17efec320e634553108) | feat | expose `writeResponseToNodeResponse` and `createWebRequestFromNodeRequest` in public API                   |
+| [9692a9054](https://github.com/angular/angular-cli/commit/9692a9054c3cdbf151df01279c2d268332b1a032) | feat | improve handling of aborted requests in `AngularServerApp`                                                 |
+| [576ff604c](https://github.com/angular/angular-cli/commit/576ff604cd739a9f41d588fa093ca2568e46826c) | feat | introduce `AngularNodeAppEngine` API for Node.js integration                                               |
+| [3c9697a8c](https://github.com/angular/angular-cli/commit/3c9697a8c34a5e0f3470bde73f11f9f32107f42e) | feat | introduce new hybrid rendering API                                                                         |
+| [4b09887a9](https://github.com/angular/angular-cli/commit/4b09887a9c82838ccb7a6c95d66225c7875e562b) | feat | move `CommonEngine` API to `/node` entry-point                                                             |
+| [d43180af5](https://github.com/angular/angular-cli/commit/d43180af5f3e7b29387fd06625bd8e37f3ebad95) | fix  | add missing peer dependency on `@angular/platform-server`                                                  |
+| [74b3e2d51](https://github.com/angular/angular-cli/commit/74b3e2d51c6cf605abd05da81dc7b4c3ccd9b3ea) | fix  | add validation to prevent use of `provideServerRoutesConfig` in browser context                            |
+| [2640bf7a6](https://github.com/angular/angular-cli/commit/2640bf7a680300acf18cf6502c57a00e0a5bfda9) | fix  | correct route extraction and error handling                                                                |
+| [44077f54e](https://github.com/angular/angular-cli/commit/44077f54e9a95afa5c1f85cf198aaa3412ee08d8) | fix  | designate package as side-effect free                                                                      |
+| [df4e1d360](https://github.com/angular/angular-cli/commit/df4e1d3607c2d5bf71d1234fa730e63cd6ab594b) | fix  | enable serving of prerendered pages in the App Engine                                                      |
+| [0793c78cf](https://github.com/angular/angular-cli/commit/0793c78cfcbfc5d55fe6ce2cb53cada684bcb8dc) | fix  | ensure wildcard RenderMode is applied when no Angular routes are defined                                   |
+| [65b6e75a5](https://github.com/angular/angular-cli/commit/65b6e75a5dca581a57a9ac3d61869fdd20f7dc2e) | fix  | export `RESPONSE_INIT`, `REQUEST`, and `REQUEST_CONTEXT` tokens                                            |
+| [4ecf63a77](https://github.com/angular/angular-cli/commit/4ecf63a777871bf214bf42fe1738c206bde3201c) | fix  | export PrerenderFallback                                                                                   |
+| [50df63196](https://github.com/angular/angular-cli/commit/50df631960550049e7d1779fd2c8fbbcf549b8ef) | fix  | improve handling of route mismatches between Angular server routes and Angular router                      |
+| [3cf7a5223](https://github.com/angular/angular-cli/commit/3cf7a522318e34daa09f29133e8c3444f154ca0b) | fix  | initialize the DI tokens with `null` to avoid requiring them to be set to optional                         |
+| [85df4011b](https://github.com/angular/angular-cli/commit/85df4011ba27254ddb7f22dae550272c9c4406dd) | fix  | resolve `bootstrap is not a function` error                                                                |
+| [e9c9e4995](https://github.com/angular/angular-cli/commit/e9c9e4995e39d9d62d10fe0497e0b98127bc8afa) | fix  | resolve circular dependency issue from main.server.js reference in manifest                                |
+| [64c52521d](https://github.com/angular/angular-cli/commit/64c52521d052f850aa7ea1aaadfd8a9fcee9c387) | fix  | show error when multiple routes are set with `RenderMode.AppShell`                                         |
+| [280ebbda4](https://github.com/angular/angular-cli/commit/280ebbda4c65e19b83448a1bb0de056a2ee5d1c6) | fix  | support for HTTP/2 request/response handling                                                               |
+| [fb05e7f0a](https://github.com/angular/angular-cli/commit/fb05e7f0abd9d68ac03f243c7774260619b8a623) | fix  | use wildcard server route configuration on the '/' route when the app router is empty                      |
+| [12ff37adb](https://github.com/angular/angular-cli/commit/12ff37adbed552fc0db97251c30c889ef00e50f3) | perf | cache generated inline CSS for HTML                                                                        |
+| [1d70e3b46](https://github.com/angular/angular-cli/commit/1d70e3b4682806a55d6f7ddacbafcbf615b2a10c) | perf | cache resolved entry-points                                                                                |
+| [f460b91d4](https://github.com/angular/angular-cli/commit/f460b91d46ea5b0413596c4852c80d71d5308910) | perf | integrate ETags for prerendered pages                                                                      |
+| [e52ae7f6f](https://github.com/angular/angular-cli/commit/e52ae7f6f5296a9628cc4a517e82339ac54925bb) | perf | prevent potential stampede in entry-points cache                                                           |
 
 <!-- CHANGELOG SPLIT MARKER -->
 
@@ -77,90 +200,6 @@
 
 <!-- CHANGELOG SPLIT MARKER -->
 
-<a name="19.0.0-rc.1"></a>
-
-# 19.0.0-rc.1 (2024-11-06)
-
-### @angular/cli
-
-| Commit                                                                                              | Type | Description                                                       |
-| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------- |
-| [b847d4460](https://github.com/angular/angular-cli/commit/b847d4460c352604e1935d494efd761915caaa3f) | fix  | recommend optional application update migration during v19 update |
-
-### @schematics/angular
-
-| Commit                                                                                              | Type | Description                        |
-| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------- |
-| [b1504c3bc](https://github.com/angular/angular-cli/commit/b1504c3bcca4d4c313e5d795ace8b074fb1f8890) | fix  | component spec with export default |
-
-### @angular-devkit/build-angular
-
-| Commit                                                                                              | Type | Description                  |
-| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------- |
-| [2ec877dd0](https://github.com/angular/angular-cli/commit/2ec877dd0dede8f3ee849fe83b4a4427bab96447) | fix  | handle basename collisions   |
-| [43e7aae22](https://github.com/angular/angular-cli/commit/43e7aae2284ff15e0282c9d9597c4f31cf1f60a4) | fix  | remove double-watch in karma |
-| [1e37b5939](https://github.com/angular/angular-cli/commit/1e37b59396a2f815d1671ccecc03ff8441730391) | fix  | serve assets                 |
-
-### @angular/build
-
-| Commit                                                                                              | Type | Description                                                                 |
-| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------------------------- |
-| [ecaf870b5](https://github.com/angular/angular-cli/commit/ecaf870b5cddd5d43d297f1193eb11b8f73757c0) | fix  | always clear dev-server error overlay on non-error result                   |
-| [71534aadc](https://github.com/angular/angular-cli/commit/71534aadc403404e2dc9bc12054f32c3ed157db9) | fix  | check referenced files against native file paths                            |
-| [fed31e064](https://github.com/angular/angular-cli/commit/fed31e064611894934c86ed36e8b0808029d4143) | fix  | correctly use dev-server hmr option to control stylesheet hot replacement   |
-| [b86bb080e](https://github.com/angular/angular-cli/commit/b86bb080e3a58a3320b2f68fb79edcdc98bfa7e9) | fix  | disable dev-server websocket when live reload is disabled                   |
-| [efb2232df](https://github.com/angular/angular-cli/commit/efb2232df5475699a44d0f76a70e2d7de4a71f5a) | fix  | ensure accurate content size in server asset metadata                       |
-| [18a8584ea](https://github.com/angular/angular-cli/commit/18a8584ead439d044760fe2abb4a7f657a0b10e3) | fix  | ensure SVG template URLs are considered templates with external stylesheets |
-| [7502fee28](https://github.com/angular/angular-cli/commit/7502fee28a057b53e60b97f55b5aff5281019f1b) | fix  | Exclude known `--import` from execArgv when spawning workers                |
-| [c41529cc1](https://github.com/angular/angular-cli/commit/c41529cc1d762cf508eccf46c44256df21afe24f) | fix  | handle `APP_BASE_HREF` correctly in prerendered routes                      |
-| [cf0228b82](https://github.com/angular/angular-cli/commit/cf0228b828fc43b1b33d48dc0977ff59abb597c2) | fix  | skip wildcard routes from being listed as prerendered routes                |
-| [c8e1521a2](https://github.com/angular/angular-cli/commit/c8e1521a2bd5b47c811e5d7f9aea7f57e92a4552) | fix  | workaround Vite CSS ShadowDOM hot replacement                               |
-
-### @angular/ssr
-
-| Commit                                                                                              | Type | Description                                                                        |
-| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------------------------------- |
-| [74b3e2d51](https://github.com/angular/angular-cli/commit/74b3e2d51c6cf605abd05da81dc7b4c3ccd9b3ea) | fix  | add validation to prevent use of `provideServerRoutesConfig` in browser context    |
-| [df4e1d360](https://github.com/angular/angular-cli/commit/df4e1d3607c2d5bf71d1234fa730e63cd6ab594b) | fix  | enable serving of prerendered pages in the App Engine                              |
-| [3cf7a5223](https://github.com/angular/angular-cli/commit/3cf7a522318e34daa09f29133e8c3444f154ca0b) | fix  | initialize the DI tokens with `null` to avoid requiring them to be set to optional |
-| [f460b91d4](https://github.com/angular/angular-cli/commit/f460b91d46ea5b0413596c4852c80d71d5308910) | perf | integrate ETags for prerendered pages                                              |
-
-<!-- CHANGELOG SPLIT MARKER -->
-
-<a name="19.0.0-rc.0"></a>
-
-# 19.0.0-rc.0 (2024-10-30)
-
-### @schematics/angular
-
-| Commit                                                                                              | Type | Description                                  |
-| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------- |
-| [4e2a5fe15](https://github.com/angular/angular-cli/commit/4e2a5fe155006e7154326319ed39e77e5693d9b3) | fix  | enable opt-in for new `@angular/ssr` feature |
-
-### @angular-devkit/build-angular
-
-| Commit                                                                                              | Type | Description                     |
-| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------- |
-| [476f94f51](https://github.com/angular/angular-cli/commit/476f94f51a3403d03ceb9f58ffb4a3564cc52e5a) | fix  | fix --watch regression in karma |
-
-### @angular/build
-
-| Commit                                                                                              | Type | Description                                                            |
-| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------------------- |
-| [06e5176c2](https://github.com/angular/angular-cli/commit/06e5176c2d3b27aaeb117374a8ae402c6a4c6319) | fix  | add warning when `--prerendering` or `--app-shell` are no-ops          |
-| [f8677f6a9](https://github.com/angular/angular-cli/commit/f8677f6a9ba155b04c692814a1bc13f5cc47d94d) | fix  | always record component style usage for HMR updates                    |
-| [099e477a8](https://github.com/angular/angular-cli/commit/099e477a8f1bbcf9d0f415dc6fd4743107c967f7) | fix  | avoid hashing development external component stylesheets               |
-| [0d4558ea5](https://github.com/angular/angular-cli/commit/0d4558ea516a4b8716f2442290e05354c502a49e) | fix  | set `ngServerMode` during vite prebundling                             |
-| [55d7f01b6](https://github.com/angular/angular-cli/commit/55d7f01b66f4867aad4598574582e8505f201c82) | fix  | simplify disabling server features with `--no-server` via command line |
-
-### @angular/ssr
-
-| Commit                                                                                              | Type | Description                                                              |
-| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------ |
-| [0793c78cf](https://github.com/angular/angular-cli/commit/0793c78cfcbfc5d55fe6ce2cb53cada684bcb8dc) | fix  | ensure wildcard RenderMode is applied when no Angular routes are defined |
-
-<!-- CHANGELOG SPLIT MARKER -->
-
 <a name="18.2.11"></a>
 
 # 18.2.11 (2024-10-30)
@@ -170,19 +209,6 @@
 | Commit                                                                                              | Type | Description                                      |
 | --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------ |
 | [87ec15ba2](https://github.com/angular/angular-cli/commit/87ec15ba266436b7b99b0629beaea3e487434115) | fix  | show error message when error stack is undefined |
-
-<!-- CHANGELOG SPLIT MARKER -->
-
-<a name="19.0.0-next.13"></a>
-
-# 19.0.0-next.13 (2024-10-23)
-
-### @angular/build
-
-| Commit                                                                                              | Type | Description                                                          |
-| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------------- |
-| [efb434136](https://github.com/angular/angular-cli/commit/efb434136d8c8df207747ab8fd87b7e2116b7106) | feat | Auto-CSP support as a part of angular.json schema                    |
-| [cc345b02d](https://github.com/angular/angular-cli/commit/cc345b02d814a37bb23d6c3f1baca9595130d010) | fix  | Address build issue in Node.js LTS versions with prerendering or SSR |
 
 <!-- CHANGELOG SPLIT MARKER -->
 
@@ -216,68 +242,6 @@
 
 <!-- CHANGELOG SPLIT MARKER -->
 
-<a name="19.0.0-next.12"></a>
-
-# 19.0.0-next.12 (2024-10-21)
-
-## Breaking Changes
-
-### @angular-devkit/build-angular
-
-- Protractor is no longer supported.
-
-  Protractor was marked end-of-life in August 2023 (see https://protractortest.org/). Projects still relying on Protractor should consider migrating to another E2E testing framework, several support solid migration paths from Protractor.
-
-  - https://angular.dev/tools/cli/end-to-end
-  - https://blog.angular.dev/the-state-of-end-to-end-testing-with-angular-d175f751cb9c
-
-### @angular-devkit/build-angular
-
-| Commit                                                                                              | Type     | Description                              |
-| --------------------------------------------------------------------------------------------------- | -------- | ---------------------------------------- |
-| [62877bdf2](https://github.com/angular/angular-cli/commit/62877bdf2b0449d8c12a167c59d0c24c77467f37) | refactor | remove Protractor builder and schematics |
-
-### @angular/build
-
-| Commit                                                                                              | Type | Description                                           |
-| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------- |
-| [1654acf0f](https://github.com/angular/angular-cli/commit/1654acf0ff3010b619a22d11f17eec9975d8e2a2) | fix  | relax constraints on external stylesheet component id |
-
-### @angular/ssr
-
-| Commit                                                                                              | Type | Description                           |
-| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------- |
-| [44077f54e](https://github.com/angular/angular-cli/commit/44077f54e9a95afa5c1f85cf198aaa3412ee08d8) | fix  | designate package as side-effect free |
-
-<!-- CHANGELOG SPLIT MARKER -->
-
-<a name="19.0.0-next.11"></a>
-
-# 19.0.0-next.11 (2024-10-16)
-
-### @schematics/angular
-
-| Commit                                                                                              | Type | Description                                                         |
-| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------- |
-| [755f3a07f](https://github.com/angular/angular-cli/commit/755f3a07f5fe485c1ed8c0c6060d6d5c799c085c) | feat | add option to setup new workspace or application as zoneless mode   |
-| [fcf7443d6](https://github.com/angular/angular-cli/commit/fcf7443d626d1f3e828ebfad464598f7b9ddef12) | fix  | explicitly set standalone:false                                     |
-| [a68e832ae](https://github.com/angular/angular-cli/commit/a68e832aefa0767461e43e3b824f3ef773b02038) | fix  | update browserslist config to include last 2 Android major versions |
-
-### @angular/build
-
-| Commit                                                                                              | Type | Description                                                         |
-| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------- |
-| [b6951f448](https://github.com/angular/angular-cli/commit/b6951f4482418f65e4bd1c15d5f7f051c91d59db) | feat | add `sass` to `stylePreprocessorOptions` in application builder     |
-| [816e3cb86](https://github.com/angular/angular-cli/commit/816e3cb868961c57a68783601b919370076c41dc) | feat | enable component stylesheet hot replacement by default              |
-| [7d883a152](https://github.com/angular/angular-cli/commit/7d883a152e978112245a98f2f737764caa76ec0f) | feat | introduce `ssr.experimentalPlatform` option                         |
-| [c48d6947e](https://github.com/angular/angular-cli/commit/c48d6947ed17eab19822a97492e3686bcf059494) | feat | set development/production condition                                |
-| [13b65dfe1](https://github.com/angular/angular-cli/commit/13b65dfe191ca18a577421019c9a9e285d5c95a3) | fix  | allow direct bundling of TSX files with application builder         |
-| [5f473affc](https://github.com/angular/angular-cli/commit/5f473affcf001888082bf4adc51481c5afca81e0) | fix  | avoid race condition in sass importer                               |
-| [af52fb49b](https://github.com/angular/angular-cli/commit/af52fb49bdd913af8af9bfbe36be279fce70de39) | fix  | synchronize import/export conditions between bundler and TypeScript |
-| [bfa8fec9b](https://github.com/angular/angular-cli/commit/bfa8fec9b17d421925a684e2b642dee70165a879) | fix  | use named export `reqHandler` for server.ts request handling        |
-
-<!-- CHANGELOG SPLIT MARKER -->
-
 <a name="18.2.9"></a>
 
 # 18.2.9 (2024-10-16)
@@ -294,43 +258,6 @@
 | --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------- |
 | [d749ba6a3](https://github.com/angular/angular-cli/commit/d749ba6a3c3dd7a90317bd9b46e858a842f27696) | fix  | allow direct bundling of TSX files with application builder |
 | [b91c82d89](https://github.com/angular/angular-cli/commit/b91c82d8997c0009ed4bbf5e9cd9c82cb1f7f755) | fix  | avoid race condition in sass importer                       |
-
-<!-- CHANGELOG SPLIT MARKER -->
-
-<a name="19.0.0-next.10"></a>
-
-# 19.0.0-next.10 (2024-10-09)
-
-## Breaking Changes
-
-### @schematics/angular
-
-- The app-shell schematic is no longer compatible with Webpack-based builders.
-
-### @schematics/angular
-
-| Commit                                                                                              | Type | Description                                                           |
-| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------------------- |
-| [292a4b7c2](https://github.com/angular/angular-cli/commit/292a4b7c2f62828606c42258db524341f4a6391e) | feat | update app-shell and ssr schematics to adopt new Server Rendering API |
-| [6dbfc770b](https://github.com/angular/angular-cli/commit/6dbfc770b2d2f72dbc73e39e763f0773435825c6) | fix  | add validation for component and directive class name                 |
-| [7de93e593](https://github.com/angular/angular-cli/commit/7de93e593a9b6439b2f33d0c25c371e14a0e9e38) | fix  | include `index.csr.html` in resources asset group                     |
-
-### @angular-devkit/build-angular
-
-| Commit                                                                                              | Type | Description       |
-| --------------------------------------------------------------------------------------------------- | ---- | ----------------- |
-| [ab6e19e1f](https://github.com/angular/angular-cli/commit/ab6e19e1f9a8781334821048522abe86b149c9c3) | fix  | handle main field |
-
-### @angular/build
-
-| Commit                                                                                              | Type | Description                                                                      |
-| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------------------------- |
-| [549c20a93](https://github.com/angular/angular-cli/commit/549c20a9396b33ae2e6708a8a9a7c77f0167b276) | fix  | `Ctrl + C` not terminating dev-server with SSR                                   |
-| [1d9db138f](https://github.com/angular/angular-cli/commit/1d9db138f34132f62fd008c9b8597489b08018e6) | fix  | always generate a new hash for optimized chunk                                   |
-| [7c50ba9e2](https://github.com/angular/angular-cli/commit/7c50ba9e2faca445c196c69e972ac313547dda54) | fix  | ensure `index.csr.html` is always generated when prerendering or SSR are enabled |
-| [1bb68ba68](https://github.com/angular/angular-cli/commit/1bb68ba6812236a135c1599031bf7e1b7e0d1d79) | fix  | move lmdb to optionalDependencies                                                |
-| [9233e5ef4](https://github.com/angular/angular-cli/commit/9233e5ef471e851a173827df7f74a581381c6373) | fix  | show error message when error stack is undefined                                 |
-| [6c618d495](https://github.com/angular/angular-cli/commit/6c618d495c54394eb2b87aee36ba5436c06557bd) | fix  | update logic to support both internal and external SSR middlewares               |
 
 <!-- CHANGELOG SPLIT MARKER -->
 
@@ -354,37 +281,6 @@
 
 <!-- CHANGELOG SPLIT MARKER -->
 
-<a name="19.0.0-next.9"></a>
-
-# 19.0.0-next.9 (2024-10-02)
-
-### @angular-devkit/build-angular
-
-| Commit                                                                                              | Type | Description                       |
-| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------- |
-| [0a4ef3026](https://github.com/angular/angular-cli/commit/0a4ef302635e4665ae9881746867dd80ca0d2dc7) | feat | karma-coverage w/ app builder     |
-| [dcbdca85c](https://github.com/angular/angular-cli/commit/dcbdca85c7fe1a7371b8f6662e0f68e24d56102e) | feat | karma+esbuild+watch               |
-| [9d7613db9](https://github.com/angular/angular-cli/commit/9d7613db9bf8b397d5896fcdf6c7b0efeaffa5d5) | fix  | zone.js/testing + karma + esbuild |
-
-### @angular/build
-
-| Commit                                                                                              | Type | Description                                                                                                |
-| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------------------------------------------------------- |
-| [f63072668](https://github.com/angular/angular-cli/commit/f63072668e44254da78170445ac2417c7bc1aa18) | feat | utilize `ssr.entry` during prerendering to enable access to local API routes                               |
-| [ecfb2b261](https://github.com/angular/angular-cli/commit/ecfb2b261356946d5f4a653f90c0b78db4ef519c) | fix  | add few more SVG elements animateMotion, animateTransform, and feBlend etc. to valid self-closing elements |
-| [87a90afd4](https://github.com/angular/angular-cli/commit/87a90afd4600049b184b32f8f92a0634e25890c0) | fix  | incomplete string escaping or encoding                                                                     |
-| [c0b76e337](https://github.com/angular/angular-cli/commit/c0b76e3377e7f9ded023e5350b9a9ae90a7d31ee) | fix  | separate Vite cache by project                                                                             |
-
-### @angular/ssr
-
-| Commit                                                                                              | Type | Description                                                                           |
-| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------------------- |
-| [50df63196](https://github.com/angular/angular-cli/commit/50df631960550049e7d1779fd2c8fbbcf549b8ef) | fix  | improve handling of route mismatches between Angular server routes and Angular router |
-| [64c52521d](https://github.com/angular/angular-cli/commit/64c52521d052f850aa7ea1aaadfd8a9fcee9c387) | fix  | show error when multiple routes are set with `RenderMode.AppShell`                    |
-| [12ff37adb](https://github.com/angular/angular-cli/commit/12ff37adbed552fc0db97251c30c889ef00e50f3) | perf | cache generated inline CSS for HTML                                                   |
-
-<!-- CHANGELOG SPLIT MARKER -->
-
 <a name="18.2.7"></a>
 
 # 18.2.7 (2024-10-02)
@@ -402,44 +298,6 @@
 | [8274184e1](https://github.com/angular/angular-cli/commit/8274184e1c6fa43cc5101018b6fa86fd636a90ba) | fix  | add `animate` to valid self-closing elements                                                               |
 | [2648e811e](https://github.com/angular/angular-cli/commit/2648e811e7c71e8a68d1eb418d7dcdae42ebf9ff) | fix  | add few more SVG elements animateMotion, animateTransform, and feBlend etc. to valid self-closing elements |
 | [736e126e4](https://github.com/angular/angular-cli/commit/736e126e4836e1c3df32c0ab9ee40e58c16503c0) | fix  | separate Vite cache by project                                                                             |
-
-<!-- CHANGELOG SPLIT MARKER -->
-
-<a name="19.0.0-next.8"></a>
-
-# 19.0.0-next.8 (2024-09-26)
-
-### @schematics/angular
-
-| Commit                                                                                              | Type | Description                                                                |
-| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------------------- |
-| [cfca5442e](https://github.com/angular/angular-cli/commit/cfca5442ec01cc4eff4fe75822eb7ef780ccfef1) | feat | integrate `withEventReplay()` in `provideClientHydration` for new SSR apps |
-| [4179bf2e6](https://github.com/angular/angular-cli/commit/4179bf2e6b38eeddb53b4e9989a7c64238ab23ad) | fix  | support single quote setting in JetBrains IDEs                             |
-
-### @angular-devkit/build-angular
-
-| Commit                                                                                              | Type | Description                |
-| --------------------------------------------------------------------------------------------------- | ---- | -------------------------- |
-| [54594b5ab](https://github.com/angular/angular-cli/commit/54594b5abfa4c9301cc369e5dea5f76b71e51ab0) | feat | support karma with esbuild |
-
-### @angular/build
-
-| Commit                                                                                              | Type | Description                                              |
-| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------- |
-| [3b00fc908](https://github.com/angular/angular-cli/commit/3b00fc908d4f07282e89677928e00665c8578ab5) | feat | introduce `outputMode` option to the application builder |
-| [bbc290133](https://github.com/angular/angular-cli/commit/bbc290133fc93186980ca3c43f221847ba8e858a) | feat | utilize `ssr.entry` in Vite dev-server when available    |
-| [dd499499c](https://github.com/angular/angular-cli/commit/dd499499c7e5aeb959cdb1a4442493091c07d667) | fix  | add `animate` to valid self-closing elements             |
-| [13a3e430d](https://github.com/angular/angular-cli/commit/13a3e430da894fee87e4279f51b166f657b29b3f) | fix  | allow missing HTML file request to fallback to index     |
-| [a995c8ea6](https://github.com/angular/angular-cli/commit/a995c8ea6d17778af031c2f9797e52739ea4dc81) | fix  | prevent prerendering of catch-all routes                 |
-
-### @angular/ssr
-
-| Commit                                                                                              | Type | Description                                                         |
-| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------- |
-| [92209dd2e](https://github.com/angular/angular-cli/commit/92209dd2e93af450e3fc657609efe95c6a6b3963) | feat | add `createRequestHandler` and `createNodeRequestHandler `utilities |
-| [65b6e75a5](https://github.com/angular/angular-cli/commit/65b6e75a5dca581a57a9ac3d61869fdd20f7dc2e) | fix  | export `RESPONSE_INIT`, `REQUEST`, and `REQUEST_CONTEXT` tokens     |
-| [1d70e3b46](https://github.com/angular/angular-cli/commit/1d70e3b4682806a55d6f7ddacbafcbf615b2a10c) | perf | cache resolved entry-points                                         |
-| [e52ae7f6f](https://github.com/angular/angular-cli/commit/e52ae7f6f5296a9628cc4a517e82339ac54925bb) | perf | prevent potential stampede in entry-points cache                    |
 
 <!-- CHANGELOG SPLIT MARKER -->
 
@@ -468,31 +326,6 @@
 
 <!-- CHANGELOG SPLIT MARKER -->
 
-<a name="19.0.0-next.7"></a>
-
-# 19.0.0-next.7 (2024-09-18)
-
-### @angular/cli
-
-| Commit                                                                                              | Type | Description                                      |
-| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------ |
-| [f249e7e85](https://github.com/angular/angular-cli/commit/f249e7e856bf16e8c5f154fdb8aff36421649a1b) | perf | enable Node.js compile code cache when available |
-
-### @angular/build
-
-| Commit                                                                                              | Type | Description                                         |
-| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------- |
-| [f6b7cd925](https://github.com/angular/angular-cli/commit/f6b7cd925dacf0ae34cb8e49b4deaf2e5c52ccd4) | fix  | support HTTP HEAD requests for virtual output files |
-
-### @angular/ssr
-
-| Commit                                                                                              | Type | Description                                 |
-| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------- |
-| [f346ee8a8](https://github.com/angular/angular-cli/commit/f346ee8a8819bb2eaf0ffb3d5523b00093be09e5) | feat | add `isMainModule` function                 |
-| [2640bf7a6](https://github.com/angular/angular-cli/commit/2640bf7a680300acf18cf6502c57a00e0a5bfda9) | fix  | correct route extraction and error handling |
-
-<!-- CHANGELOG SPLIT MARKER -->
-
 <a name="18.2.5"></a>
 
 # 18.2.5 (2024-09-18)
@@ -518,69 +351,6 @@
 
 <!-- CHANGELOG SPLIT MARKER -->
 
-<a name="19.0.0-next.6"></a>
-
-# 19.0.0-next.6 (2024-09-13)
-
-### @angular/cli
-
-| Commit                                                                                              | Type | Description                                                    |
-| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------- |
-| [de17cbcb8](https://github.com/angular/angular-cli/commit/de17cbcb88e1f057f93d366c3e2eac4315986e54) | fix  | Revert commit enable Node.js compile code cache when available |
-
-### @angular/ssr
-
-| Commit                                                                                              | Type | Description                          |
-| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------ |
-| [d66aaa3ca](https://github.com/angular/angular-cli/commit/d66aaa3ca458e05b535bec7c1dcb98b0e9c5202e) | feat | add server routing configuration API |
-
-<!-- CHANGELOG SPLIT MARKER -->
-
-<a name="19.0.0-next.5"></a>
-
-# 19.0.0-next.5 (2024-09-12)
-
-### @angular-devkit/architect
-
-| Commit                                                                                              | Type | Description                   |
-| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------- |
-| [78f76485f](https://github.com/angular/angular-cli/commit/78f76485fe315ffd0262c1a3732092731235828b) | feat | merge object options from CLI |
-
-### @angular/ssr
-
-| Commit                                                                                              | Type | Description                                 |
-| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------- |
-| [85df4011b](https://github.com/angular/angular-cli/commit/85df4011ba27254ddb7f22dae550272c9c4406dd) | fix  | resolve `bootstrap is not a function` error |
-
-<!-- CHANGELOG SPLIT MARKER -->
-
-<a name="19.0.0-next.4"></a>
-
-# 19.0.0-next.4 (2024-09-11)
-
-### @angular/cli
-
-| Commit                                                                                              | Type | Description                                      |
-| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------ |
-| [201b60e1d](https://github.com/angular/angular-cli/commit/201b60e1dd25b4abb7670e21d103b67d4eda0e14) | feat | handle string key/value pairs, e.g. --define     |
-| [ecc107d83](https://github.com/angular/angular-cli/commit/ecc107d83bfdfd9d5dd1087e264892d60361625c) | perf | enable Node.js compile code cache when available |
-
-### @angular/build
-
-| Commit                                                                                              | Type | Description                                                     |
-| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------------- |
-| [4153a6ecf](https://github.com/angular/angular-cli/commit/4153a6ecf6707729a4f0c6a620eeb8d6916588df) | fix  | prevent transformation of Node.js internal dependencies by Vite |
-
-### @angular/ssr
-
-| Commit                                                                                              | Type | Description                                                                                                |
-| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------------------------------------------------------- |
-| [41fb2ed86](https://github.com/angular/angular-cli/commit/41fb2ed86056306406832317178ca5d94aa110e2) | feat | Add `getHeaders` Method to `AngularAppEngine` and `AngularNodeAppEngine` for handling pages static headers |
-| [576ff604c](https://github.com/angular/angular-cli/commit/576ff604cd739a9f41d588fa093ca2568e46826c) | feat | introduce `AngularNodeAppEngine` API for Node.js integration                                               |
-| [e9c9e4995](https://github.com/angular/angular-cli/commit/e9c9e4995e39d9d62d10fe0497e0b98127bc8afa) | fix  | resolve circular dependency issue from main.server.js reference in manifest                                |
-
-<!-- CHANGELOG SPLIT MARKER -->
-
 <a name="18.2.4"></a>
 
 # 18.2.4 (2024-09-11)
@@ -590,24 +360,6 @@
 | Commit                                                                                              | Type | Description                                                     |
 | --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------------- |
 | [765309a2e](https://github.com/angular/angular-cli/commit/765309a2e1bcd3bb07ff87062fc2dc04e4bce16f) | fix  | prevent transformation of Node.js internal dependencies by Vite |
-
-<!-- CHANGELOG SPLIT MARKER -->
-
-<a name="19.0.0-next.3"></a>
-
-# 19.0.0-next.3 (2024-09-04)
-
-### @angular-devkit/build-angular
-
-| Commit                                                                                              | Type | Description                                                 |
-| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------- |
-| [3ee21631f](https://github.com/angular/angular-cli/commit/3ee21631f481b2e72be2390b5a2cac74824efbb5) | fix  | clear context in Karma by default for single run executions |
-
-### @angular/ssr
-
-| Commit                                                                                              | Type | Description                                                                              |
-| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------------------------------------- |
-| [455b5700c](https://github.com/angular/angular-cli/commit/455b5700c29845829235e17efec320e634553108) | feat | expose `writeResponseToNodeResponse` and `createWebRequestFromNodeRequest` in public API |
 
 <!-- CHANGELOG SPLIT MARKER -->
 
@@ -636,44 +388,6 @@
 
 <!-- CHANGELOG SPLIT MARKER -->
 
-<a name="19.0.0-next.2"></a>
-
-# 19.0.0-next.2 (2024-08-28)
-
-## Breaking Changes
-
-### @angular/ssr
-
-- The `CommonEngine` API now needs to be imported from `@angular/ssr/node`.
-
-  **Before**
-
-  ```ts
-  import { CommonEngine } from '@angular/ssr';
-  ```
-
-  **After**
-
-  ```ts
-  import { CommonEngine } from '@angular/ssr/node';
-  ```
-
-### @schematics/angular
-
-| Commit                                                                                              | Type | Description                               |
-| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------- |
-| [a381a3db1](https://github.com/angular/angular-cli/commit/a381a3db187f7b20e5ec8d1e1a1f1bd860426fcd) | feat | add option to export component as default |
-
-### @angular/ssr
-
-| Commit                                                                                              | Type | Description                                               |
-| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------- |
-| [30c25bf68](https://github.com/angular/angular-cli/commit/30c25bf6885fefea6094ec1815e066e4c6ada097) | feat | export `AngularAppEngine` as public API                   |
-| [4b09887a9](https://github.com/angular/angular-cli/commit/4b09887a9c82838ccb7a6c95d66225c7875e562b) | feat | move `CommonEngine` API to `/node` entry-point            |
-| [d43180af5](https://github.com/angular/angular-cli/commit/d43180af5f3e7b29387fd06625bd8e37f3ebad95) | fix  | add missing peer dependency on `@angular/platform-server` |
-
-<!-- CHANGELOG SPLIT MARKER -->
-
 <a name="17.3.9"></a>
 
 # 17.3.9 (2024-08-29)
@@ -697,61 +411,6 @@
 | --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------- |
 | [f596a3d5d](https://github.com/angular/angular-cli/commit/f596a3d5def009b5130440113e3c9b450eb98040) | fix  | clear context in Karma by default for single run executions |
 | [56fa051bd](https://github.com/angular/angular-cli/commit/56fa051bd92ad47ea089499a488f3566a93375e6) | fix  | upgrade webpack to `5.94.0`                                 |
-
-<!-- CHANGELOG SPLIT MARKER -->
-
-<a name="19.0.0-next.1"></a>
-
-# 19.0.0-next.1 (2024-08-22)
-
-## Breaking Changes
-
-### @angular-devkit/build-angular
-
-- The `browserTarget` option has been removed from the DevServer and ExtractI18n builders. `buildTarget` is to be used instead.
-
-### @angular-devkit/core
-
-- The deprecated `fileBuffer` function is no longer available. Update your code to use `stringToFileBuffer` instead to maintain compatibility.
-
-  **Note:** that this change does not affect application developers.
-
-### @angular/build
-
-- The `@angular/localize/init` polyfill will no longer be added automatically to projects. To prevent runtime issues, ensure that this polyfill is manually included in the "polyfills" section of your "angular.json" file if your application relies on Angular localization features.
-
-### @schematics/angular
-
-| Commit                                                                                              | Type | Description                                                |
-| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------- |
-| [7992218a9](https://github.com/angular/angular-cli/commit/7992218a9c22ea9469bd3386c7dc1d5efc6e51f9) | fix  | remove `declaration` and `sourceMap` from default tsconfig |
-
-### @angular-devkit/build-angular
-
-| Commit                                                                                              | Type     | Description                                    |
-| --------------------------------------------------------------------------------------------------- | -------- | ---------------------------------------------- |
-| [0b161bc76](https://github.com/angular/angular-cli/commit/0b161bc7616bef9a8f1f9113a50b07291635159d) | fix      | remove outdated browser-esbuild option warning |
-| [e40384e63](https://github.com/angular/angular-cli/commit/e40384e637bc6f92c28f4e572f986ca902938ba2) | refactor | remove deprecated `browserTarget`              |
-
-### @angular-devkit/core
-
-| Commit                                                                                              | Type     | Description                                                              |
-| --------------------------------------------------------------------------------------------------- | -------- | ------------------------------------------------------------------------ |
-| [0d8a1006d](https://github.com/angular/angular-cli/commit/0d8a1006d4629d8af1144065ea237ab30916e66e) | refactor | remove deprecated `fileBuffer` function in favor of `stringToFileBuffer` |
-
-### @angular/build
-
-| Commit                                                                                              | Type     | Description                                                                         |
-| --------------------------------------------------------------------------------------------------- | -------- | ----------------------------------------------------------------------------------- |
-| [71c06c69f](https://github.com/angular/angular-cli/commit/71c06c69f6f472e5ea86f2e5adbd5062a8cc5f2a) | fix      | improve error message when an unhandled exception occurs during prerendering        |
-| [6b544f70e](https://github.com/angular/angular-cli/commit/6b544f70e706b9e13564d4ddbb0f0cb352942b2c) | fix      | support reading on-disk files during i18n extraction                                |
-| [d6a34034d](https://github.com/angular/angular-cli/commit/d6a34034d7489c09753090642ade4c606cd98ece) | refactor | remove automatic addition of `@angular/localize/init` polyfill and related warnings |
-
-### @angular/ssr
-
-| Commit                                                                                              | Type | Description                                                |
-| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------- |
-| [9692a9054](https://github.com/angular/angular-cli/commit/9692a9054c3cdbf151df01279c2d268332b1a032) | feat | improve handling of aborted requests in `AngularServerApp` |
 
 <!-- CHANGELOG SPLIT MARKER -->
 
@@ -783,32 +442,6 @@
 | --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------------------------- |
 | [83b2699ab](https://github.com/angular/angular-cli/commit/83b2699abbf58a7c90d2339fa4a01d67aa2d2d33) | fix  | improve error message when an unhandled exception occurs during prerendering |
 | [0be4038a5](https://github.com/angular/angular-cli/commit/0be4038a503626e2e9f44d68fe5599cc6028dd8e) | fix  | support reading on-disk files during i18n extraction                         |
-
-<!-- CHANGELOG SPLIT MARKER -->
-
-<a name="19.0.0-next.0"></a>
-
-# 19.0.0-next.0 (2024-08-14)
-
-### @angular/cli
-
-| Commit                                                                                              | Type | Description                                                     |
-| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------------- |
-| [c5ed0b124](https://github.com/angular/angular-cli/commit/c5ed0b1248dc2d5f895f4c4dc6737269a4854a1e) | fix  | prevent bypassing select/checkbox prompts on validation failure |
-
-### @angular-devkit/schematics-cli
-
-| Commit                                                                                              | Type | Description                                                     |
-| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------------- |
-| [37693c40e](https://github.com/angular/angular-cli/commit/37693c40e3afc4c6dd7c949ea658bdf94146c9d8) | feat | add package manager option to blank schematic                   |
-| [73c243796](https://github.com/angular/angular-cli/commit/73c24379651695d8bb82602ab613e568f1233c2c) | fix  | prevent bypassing select/checkbox prompts on validation failure |
-
-### @angular/ssr
-
-| Commit                                                                                              | Type | Description                                   |
-| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------- |
-| [bca568389](https://github.com/angular/angular-cli/commit/bca56838937f942c5ef902f5c98d018582188e84) | feat | dynamic route resolution using Angular router |
-| [3c9697a8c](https://github.com/angular/angular-cli/commit/3c9697a8c34a5e0f3470bde73f11f9f32107f42e) | feat | introduce new hybrid rendering API            |
 
 <!-- CHANGELOG SPLIT MARKER -->
 
