@@ -4,7 +4,7 @@
 .npmrc=-1406867100
 modules/testing/builder/package.json=973445093
 package.json=-1990485513
-packages/angular/build/package.json=-1875938558
+packages/angular/build/package.json=517491420
 packages/angular/cli/package.json=-803141029
 packages/angular/pwa/package.json=1108903917
 packages/angular/ssr/package.json=1856194341

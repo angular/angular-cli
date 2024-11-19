@@ -6,11 +6,10 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
+import { findTests } from '@angular/build/private';
 import { pluginName } from 'mini-css-extract-plugin';
 import assert from 'node:assert';
 import type { Compilation, Compiler } from 'webpack';
-
-import { findTests } from './find-tests';
 
 /**
  * The name of the plugin provided to Webpack when tapping Webpack compiler hooks.

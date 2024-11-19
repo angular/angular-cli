@@ -26,6 +26,7 @@ export { buildApplicationInternal } from './builders/application';
 export type { ApplicationBuilderInternalOptions } from './builders/application/options';
 export { type Result, type ResultFile, ResultKind } from './builders/application/results';
 export { serveWithVite } from './builders/dev-server/vite-server';
+export { execute as executeKarmaInternal } from './builders/karma/application_builder';
 
 // Tools
 export * from './tools/babel/plugins';
@@ -82,3 +83,4 @@ export { augmentAppWithServiceWorker } from './utils/service-worker';
 export { type BundleStats, generateBuildStatsTable } from './utils/stats-table';
 export { getSupportedBrowsers } from './utils/supported-browsers';
 export { assertCompatibleAngularVersion } from './utils/version';
+export { findTests, getTestEntrypoints } from './builders/karma/find-tests';
