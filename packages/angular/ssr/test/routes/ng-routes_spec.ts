@@ -355,4 +355,24 @@ describe('extractRoutesAndCreateRouteTree', () => {
       { route: '/', renderMode: RenderMode.Server, status: 201 },
     ]);
   });
+
+  it(`handles a baseHref starting with a "./" path`, async () => {
+    setAngularAppTestingManifest(
+      [{ path: 'home', component: DummyComponent }],
+      [{ path: '**', renderMode: RenderMode.Server }],
+      /** baseHref*/ './example',
+    );
+
+    const { routeTree, errors } = await extractRoutesAndCreateRouteTree(
+      url,
+      /** manifest */ undefined,
+      /** invokeGetPrerenderParams */ true,
+      /** includePrerenderFallbackRoutes */ true,
+    );
+
+    expect(errors).toHaveSize(0);
+    expect(routeTree.toObject()).toEqual([
+      { route: '/example/home', renderMode: RenderMode.Server },
+    ]);
+  });
 });
