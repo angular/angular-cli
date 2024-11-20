@@ -421,12 +421,15 @@ export async function getRoutesFromAngularRouterConfig(
     const routesResults: RouteTreeNodeMetadata[] = [];
     const errors: string[] = [];
 
-    const baseHref =
+    let baseHref =
       injector.get(APP_BASE_HREF, null, { optional: true }) ??
       injector.get(PlatformLocation).getBaseHrefFromDOM();
 
-    const compiler = injector.get(Compiler);
+    if (baseHref.startsWith('./')) {
+      baseHref = baseHref.slice(2);
+    }
 
+    const compiler = injector.get(Compiler);
     const serverRoutesConfig = injector.get(SERVER_ROUTES_CONFIG, null, { optional: true });
     let serverConfigRouteTree: RouteTree<ServerConfigRouteTreeAdditionalMetadata> | undefined;
 

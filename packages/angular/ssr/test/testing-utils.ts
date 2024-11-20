@@ -21,12 +21,12 @@ import { ServerRoute, provideServerRoutesConfig } from '../src/routes/route-conf
  *
  * @param routes - An array of route definitions to be used by the Angular Router.
  * @param serverRoutes - An array of ServerRoute definitions to be used for server-side rendering.
- * @param [baseHref=''] - An optional base href to be used in the HTML template.
+ * @param [baseHref='/'] - An optional base href to be used in the HTML template.
  */
 export function setAngularAppTestingManifest(
   routes: Routes,
   serverRoutes: ServerRoute[],
-  baseHref = '',
+  baseHref = '/',
   additionalServerAssets: Record<string, ServerAsset> = {},
 ): void {
   setAngularAppManifest({
@@ -40,7 +40,7 @@ export function setAngularAppTestingManifest(
           text: async () => `<html>
             <head>
               <title>SSR page</title>
-              <base href="/${baseHref}" />
+              <base href="${baseHref}" />
             </head>
             <body>
               <app-root></app-root>
@@ -55,7 +55,7 @@ export function setAngularAppTestingManifest(
             `<html>
             <head>
               <title>CSR page</title>
-              <base href="/${baseHref}" />
+              <base href="${baseHref}" />
             </head>
             <body>
               <app-root></app-root>
