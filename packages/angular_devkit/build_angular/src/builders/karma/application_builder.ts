@@ -107,7 +107,6 @@ class AngularAssetsMiddleware {
 }
 
 function injectKarmaReporter(
-  context: BuilderContext,
   buildOptions: BuildOptions,
   buildIterator: AsyncIterator<Result>,
   karmaConfig: Config & ConfigOptions,
@@ -207,7 +206,7 @@ export function execute(
           // If `--watch` is explicitly enabled or if we are keeping the Karma
           // process running, we should hook Karma into the build.
           if (buildIterator) {
-            injectKarmaReporter(context, buildOptions, buildIterator, karmaConfig, subscriber);
+            injectKarmaReporter(buildOptions, buildIterator, karmaConfig, subscriber);
           }
 
           // Complete the observable once the Karma server returns.
@@ -352,6 +351,7 @@ async function initializeApplication(
     polyfills: normalizePolyfills(options.polyfills),
     webWorkerTsConfig: options.webWorkerTsConfig,
     watch: options.watch ?? !karmaOptions.singleRun,
+    stylePreprocessorOptions: options.stylePreprocessorOptions,
   };
 
   // Build tests with `application` builder, using test files as entry points.
