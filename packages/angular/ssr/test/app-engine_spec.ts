@@ -42,7 +42,7 @@ describe('AngularAppEngine', () => {
               setAngularAppTestingManifest(
                 [{ path: 'home', component: HomeComponent }],
                 [{ path: '**', renderMode: RenderMode.Server }],
-                locale,
+                '/' + locale,
               );
 
               return {
