@@ -9,7 +9,6 @@
     "noFallthroughCasesInSwitch": true,
     "noImplicitOverride": true,
     "isolatedModules": true,
-    "outDir": "./dist",
     "skipLibCheck": true,
     "strict": true,
     "target": "es2022",
