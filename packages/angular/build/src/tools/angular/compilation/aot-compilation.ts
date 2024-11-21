@@ -66,6 +66,18 @@ export class AotCompilation extends AngularCompilation {
       hostOptions.externalStylesheets ??= new Map();
     }
 
+    // Collect stale source files for HMR analysis of inline component resources
+    let staleSourceFiles;
+    if (compilerOptions['_enableHmr'] && hostOptions.modifiedFiles && this.#state) {
+      for (const modifiedFile of hostOptions.modifiedFiles) {
+        const sourceFile = this.#state.typeScriptProgram.getSourceFile(modifiedFile);
+        if (sourceFile) {
+          staleSourceFiles ??= new Map<string, ts.SourceFile>();
+          staleSourceFiles.set(modifiedFile, sourceFile);
+        }
+      }
+    }
+
     // Create Angular compiler host
     const host = createAngularCompilerHost(ts, compilerOptions, hostOptions);
 
@@ -95,14 +107,12 @@ export class AotCompilation extends AngularCompilation {
     await profileAsync('NG_ANALYZE_PROGRAM', () => angularCompiler.analyzeAsync());
 
     let templateUpdates;
-    if (
-      compilerOptions['_enableHmr'] &&
-      hostOptions.modifiedFiles &&
-      hasOnlyTemplates(hostOptions.modifiedFiles)
-    ) {
-      const componentNodes = [...hostOptions.modifiedFiles].flatMap((file) => [
-        ...angularCompiler.getComponentsWithTemplateFile(file),
-      ]);
+    if (compilerOptions['_enableHmr'] && hostOptions.modifiedFiles && this.#state) {
+      const componentNodes = collectHmrCandidates(
+        hostOptions.modifiedFiles,
+        angularProgram,
+        staleSourceFiles,
+      );
 
       for (const node of componentNodes) {
         if (!ts.isClassDeclaration(node)) {
@@ -423,15 +433,46 @@ function findAffectedFiles(
   return affectedFiles;
 }
 
-function hasOnlyTemplates(modifiedFiles: Set<string>): boolean {
+function collectHmrCandidates(
+  modifiedFiles: Set<string>,
+  { compiler }: ng.NgtscProgram,
+  staleSourceFiles: Map<string, ts.SourceFile> | undefined,
+): Set<ts.ClassDeclaration> {
+  const candidates = new Set<ts.ClassDeclaration>();
+
   for (const file of modifiedFiles) {
-    const lowerFile = file.toLowerCase();
-    if (lowerFile.endsWith('.html') || lowerFile.endsWith('.svg')) {
+    const templateFileNodes = compiler.getComponentsWithTemplateFile(file);
+    if (templateFileNodes.size) {
+      templateFileNodes.forEach((node) => candidates.add(node as ts.ClassDeclaration));
       continue;
     }
 
-    return false;
+    const styleFileNodes = compiler.getComponentsWithStyleFile(file);
+    if (styleFileNodes.size) {
+      styleFileNodes.forEach((node) => candidates.add(node as ts.ClassDeclaration));
+      continue;
+    }
+
+    const staleSource = staleSourceFiles?.get(file);
+    if (staleSource === undefined) {
+      // Unknown file requires a rebuild so clear out the candidates and stop collecting
+      candidates.clear();
+      break;
+    }
+
+    const updatedSource = compiler.getCurrentProgram().getSourceFile(file);
+    if (updatedSource === undefined) {
+      // No longer existing program file requires a rebuild so clear out the candidates and stop collecting
+      candidates.clear();
+      break;
+    }
+
+    // Compare the stale and updated file for changes
+
+    // TODO: Implement -- for now assume a rebuild is needed
+    candidates.clear();
+    break;
   }
 
-  return true;
+  return candidates;
 }
