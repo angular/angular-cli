@@ -35,6 +35,15 @@ rules_js_tsconfig(
     ],
 )
 
+rules_js_tsconfig(
+    name = "test-tsconfig",
+    src = "tsconfig-test.json",
+    deps = [
+        "tsconfig.json",
+        "//:node_modules/@types/node",
+    ],
+)
+
 # Files required by e2e tests
 copy_to_bin(
     name = "config-files",
