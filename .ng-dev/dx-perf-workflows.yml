@@ -1,0 +1,7 @@
+workflows:
+  build-cli:
+    name: Build cli
+    prepare:
+      - bazel clean
+    workflow:
+      - bazel build //packages/angular/cli:npm_package
