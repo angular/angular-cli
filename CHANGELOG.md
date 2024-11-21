@@ -1,3 +1,28 @@
+<a name="19.0.1"></a>
+
+# 19.0.1 (2024-11-21)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                  |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------- |
+| [b63123f20](https://github.com/angular/angular-cli/commit/b63123f20702bd53ea99888b83b4253810ae0a09) | fix  | use stylePreprocessorOptions |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                              |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------- |
+| [74461da64](https://github.com/angular/angular-cli/commit/74461da6439b70b5348c99682842ae20043d9b61) | fix  | ensure accurate content length for server assets         |
+| [1b4dcedd5](https://github.com/angular/angular-cli/commit/1b4dcedd594b5d9a1701cd8d1e9874742c05e47f) | fix  | use `sha256` instead of `sha-256` as hash algorithm name |
+
+### @angular/ssr
+
+| Commit                                                                                              | Type | Description                          |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------ |
+| [8bd2b260e](https://github.com/angular/angular-cli/commit/8bd2b260e2008f1ffc71af0e55b27884c3660c54) | fix  | handle baseHref that start with `./` |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="19.0.0"></a>
 
 # 19.0.0 (2024-11-19)
