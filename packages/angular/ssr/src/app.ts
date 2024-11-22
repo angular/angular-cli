@@ -24,7 +24,12 @@ import { sha256 } from './utils/crypto';
 import { InlineCriticalCssProcessor } from './utils/inline-critical-css';
 import { LRUCache } from './utils/lru-cache';
 import { AngularBootstrap, renderAngular } from './utils/ng';
-import { joinUrlParts, stripIndexHtmlFromURL, stripLeadingSlash } from './utils/url';
+import {
+  buildPathWithParams,
+  joinUrlParts,
+  stripIndexHtmlFromURL,
+  stripLeadingSlash,
+} from './utils/url';
 
 /**
  * Maximum number of critical CSS entries the cache can store.
@@ -160,11 +165,14 @@ export class AngularServerApp {
 
     const { redirectTo, status, renderMode } = matchedRoute;
     if (redirectTo !== undefined) {
-      // Note: The status code is validated during route extraction.
-      // 302 Found is used by default for redirections
-      // See: https://developer.mozilla.org/en-US/docs/Web/API/Response/redirect_static#status
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      return Response.redirect(new URL(redirectTo, url), (status as any) ?? 302);
+      return Response.redirect(
+        new URL(buildPathWithParams(redirectTo, url.pathname), url),
+        // Note: The status code is validated during route extraction.
+        // 302 Found is used by default for redirections
+        // See: https://developer.mozilla.org/en-US/docs/Web/API/Response/redirect_static#status
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (status as any) ?? 302,
+      );
     }
 
     if (renderMode === RenderMode.Prerender) {
@@ -241,17 +249,8 @@ export class AngularServerApp {
     matchedRoute: RouteTreeNodeMetadata,
     requestContext?: unknown,
   ): Promise<Response | null> {
-    const { redirectTo, status } = matchedRoute;
+    const { renderMode, headers, status } = matchedRoute;
 
-    if (redirectTo !== undefined) {
-      // Note: The status code is validated during route extraction.
-      // 302 Found is used by default for redirections
-      // See: https://developer.mozilla.org/en-US/docs/Web/API/Response/redirect_static#status
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      return Response.redirect(new URL(redirectTo, new URL(request.url)), (status as any) ?? 302);
-    }
-
-    const { renderMode, headers } = matchedRoute;
     if (!this.allowStaticRouteRender && renderMode === RenderMode.Prerender) {
       return null;
     }
