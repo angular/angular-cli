@@ -30,7 +30,7 @@ describe('RouteTree', () => {
       expect(routeTreeObj).toEqual([
         { redirectTo: '/home-page', route: '/home', renderMode: RenderMode.Server },
         { redirectTo: '/about-page', route: '/about', renderMode: RenderMode.Server },
-        { route: '/products/:id', renderMode: RenderMode.Server },
+        { route: '/products/*', renderMode: RenderMode.Server },
         { redirectTo: '/api/details-page', route: '/api/details', renderMode: RenderMode.Server },
       ]);
 
@@ -46,7 +46,7 @@ describe('RouteTree', () => {
         renderMode: RenderMode.Server,
       });
       expect(newRouteTree.match('/products/123')).toEqual({
-        route: '/products/:id',
+        route: '/products/*',
         renderMode: RenderMode.Server,
       });
       expect(newRouteTree.match('/api/details')).toEqual({
@@ -71,7 +71,7 @@ describe('RouteTree', () => {
 
       expect(newRouteTree.match('/shop/categories/electronics/products/123')).toEqual({
         redirectTo: '/shop/products',
-        route: '/shop/categories/:category/products/:id',
+        route: '/shop/categories/*/products/*',
         renderMode: RenderMode.Server,
       });
       expect(newRouteTree.match('/shop/cart')).toEqual({
@@ -127,7 +127,7 @@ describe('RouteTree', () => {
       const routeTreeObj = routeTree.toObject();
       expect(routeTreeObj).toEqual([
         { route: '/first', renderMode: RenderMode.Server },
-        { route: '/:id', renderMode: RenderMode.Server },
+        { route: '/*', renderMode: RenderMode.Server },
         { route: '/second', renderMode: RenderMode.Server },
       ]);
 
@@ -137,11 +137,11 @@ describe('RouteTree', () => {
         renderMode: RenderMode.Server,
       });
       expect(newRouteTree.match('/second')).toEqual({
-        route: '/:id',
+        route: '/*',
         renderMode: RenderMode.Server,
       });
       expect(newRouteTree.match('/third')).toEqual({
-        route: '/:id',
+        route: '/*',
         renderMode: RenderMode.Server,
       });
     });
@@ -217,7 +217,7 @@ describe('RouteTree', () => {
     it('should handle parameterized segments as wildcards', () => {
       routeTree.insert('/users/:id', { renderMode: RenderMode.Server });
       expect(routeTree.match('/users/123')).toEqual({
-        route: '/users/:id',
+        route: '/users/*',
         renderMode: RenderMode.Server,
       });
     });
@@ -229,11 +229,11 @@ describe('RouteTree', () => {
       });
 
       expect(routeTree.match('/shop/categories/electronics')).toEqual({
-        route: '/shop/categories/:category',
+        route: '/shop/categories/*',
         renderMode: RenderMode.Server,
       });
       expect(routeTree.match('/shop/categories/electronics/products/456')).toEqual({
-        route: '/shop/categories/:category/products/:id',
+        route: '/shop/categories/*/products/*',
         renderMode: RenderMode.Server,
       });
     });
