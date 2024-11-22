@@ -47,7 +47,7 @@ describe('extractRoutesAndCreateRouteTree', () => {
       { route: '/', renderMode: RenderMode.Server },
       { route: '/home', renderMode: RenderMode.Client },
       { route: '/redirect', renderMode: RenderMode.Server, status: 301, redirectTo: '/home' },
-      { route: '/user/:id', renderMode: RenderMode.Server },
+      { route: '/user/*', renderMode: RenderMode.Server },
     ]);
   });
 
@@ -93,7 +93,7 @@ describe('extractRoutesAndCreateRouteTree', () => {
           route: '/user/jane/role/writer',
           renderMode: RenderMode.Prerender,
         },
-        { route: '/user/:id/role/:role', renderMode: RenderMode.Server },
+        { route: '/user/*/role/*', renderMode: RenderMode.Server },
       ]);
     });
 
@@ -128,7 +128,7 @@ describe('extractRoutesAndCreateRouteTree', () => {
           route: '/user/jane/role/writer',
           renderMode: RenderMode.Prerender,
         },
-        { route: '/user/:id/role/:role', renderMode: RenderMode.Client },
+        { route: '/user/*/role/*', renderMode: RenderMode.Client },
       ]);
     });
 
@@ -165,6 +165,92 @@ describe('extractRoutesAndCreateRouteTree', () => {
         },
       ]);
     });
+
+    it('should extract nested redirects that are not explicitly defined.', async () => {
+      setAngularAppTestingManifest(
+        [
+          {
+            path: '',
+            pathMatch: 'full',
+            redirectTo: 'some',
+          },
+          {
+            path: ':param',
+            children: [
+              {
+                path: '',
+                pathMatch: 'full',
+                redirectTo: 'thing',
+              },
+              {
+                path: 'thing',
+                component: DummyComponent,
+              },
+            ],
+          },
+        ],
+        [
+          {
+            path: ':param',
+            renderMode: RenderMode.Prerender,
+            async getPrerenderParams() {
+              return [{ param: 'some' }];
+            },
+          },
+          { path: '**', renderMode: RenderMode.Prerender },
+        ],
+      );
+
+      const { routeTree, errors } = await extractRoutesAndCreateRouteTree(
+        url,
+        /** manifest */ undefined,
+        /** invokeGetPrerenderParams */ true,
+        /** includePrerenderFallbackRoutes */ true,
+      );
+      expect(errors).toHaveSize(0);
+      expect(routeTree.toObject()).toEqual([
+        { route: '/', renderMode: RenderMode.Prerender, redirectTo: '/some' },
+        { route: '/some', renderMode: RenderMode.Prerender, redirectTo: '/some/thing' },
+        { route: '/some/thing', renderMode: RenderMode.Prerender },
+        { redirectTo: '/*/thing', route: '/*', renderMode: RenderMode.Server },
+        { route: '/*/thing', renderMode: RenderMode.Server },
+      ]);
+    });
+  });
+
+  it('should extract nested redirects that are not explicitly defined.', async () => {
+    setAngularAppTestingManifest(
+      [
+        {
+          path: '',
+          pathMatch: 'full',
+          redirectTo: 'some',
+        },
+        {
+          path: ':param',
+          children: [
+            {
+              path: '',
+              pathMatch: 'full',
+              redirectTo: 'thing',
+            },
+            {
+              path: 'thing',
+              component: DummyComponent,
+            },
+          ],
+        },
+      ],
+      [{ path: '**', renderMode: RenderMode.Server }],
+    );
+
+    const { routeTree, errors } = await extractRoutesAndCreateRouteTree(url);
+    expect(errors).toHaveSize(0);
+    expect(routeTree.toObject()).toEqual([
+      { route: '/', renderMode: RenderMode.Server, redirectTo: '/some' },
+      { route: '/*', renderMode: RenderMode.Server, redirectTo: '/*/thing' },
+      { route: '/*/thing', renderMode: RenderMode.Server },
+    ]);
   });
 
   it('should not resolve parameterized routes for SSG when `invokeGetPrerenderParams` is false', async () => {
@@ -192,7 +278,7 @@ describe('extractRoutesAndCreateRouteTree', () => {
     expect(errors).toHaveSize(0);
     expect(routeTree.toObject()).toEqual([
       { route: '/home', renderMode: RenderMode.Server },
-      { route: '/user/:id/role/:role', renderMode: RenderMode.Server },
+      { route: '/user/*/role/*', renderMode: RenderMode.Server },
     ]);
   });
 
@@ -273,7 +359,7 @@ describe('extractRoutesAndCreateRouteTree', () => {
         route: '/user/jane/role/writer',
         renderMode: RenderMode.Prerender,
       },
-      { route: '/user/:id/role/:role', renderMode: RenderMode.Client },
+      { route: '/user/*/role/*', renderMode: RenderMode.Client },
     ]);
   });
 
