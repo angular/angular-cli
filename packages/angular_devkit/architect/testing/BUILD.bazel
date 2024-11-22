@@ -3,25 +3,26 @@
 # Use of this source code is governed by an MIT-style license that can be
 # found in the LICENSE file at https://angular.dev/license
 
-load("//tools:defaults.bzl", "ts_library")
+load("//tools:interop.bzl", "ts_project")
 
 licenses(["notice"])
 
 package(default_visibility = ["//visibility:public"])
 
-ts_library(
+ts_project(
     name = "testing",
     srcs = glob(
         include = ["**/*.ts"],
         exclude = ["**/*_spec.ts"],
     ),
-    module_name = "@angular-devkit/architect/testing",
-    module_root = "index.d.ts",
-    deps = [
+    interop_deps = [
         "//packages/angular_devkit/architect",
         "//packages/angular_devkit/core",
         "//packages/angular_devkit/core/node",
-        "@npm//@types/node",
-        "@npm//rxjs",
+    ],
+    module_name = "@angular-devkit/architect/testing",
+    deps = [
+        "//:node_modules/@types/node",
+        "//:node_modules/rxjs",
     ],
 )
