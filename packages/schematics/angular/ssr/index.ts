@@ -451,6 +451,12 @@ async function isServerRoutingEnabled(
     return serverRoutingDefault;
   }
 
+  // `inquirer` requires `async_hooks` which isn't supported by webcontainers, therefore we can't prompt in that context.
+  // See: https://github.com/SBoudrias/Inquirer.js/issues/1426
+  if (process.versions.webcontainer) {
+    return serverRoutingDefault;
+  }
+
   // Prompt the user if in an interactive terminal and no option was provided.
   return await prompt(
     'Would you like to use the Server Routing and App Engine APIs (Developer Preview) for this server application?',
