@@ -131,6 +131,7 @@ export class RouteTree<AdditionalMetadata extends Record<string, unknown> = {}> 
   insert(route: string, metadata: RouteTreeNodeMetadataWithoutRoute & AdditionalMetadata): void {
     let node = this.root;
     const segments = this.getPathSegments(route);
+    const normalizedSegments: string[] = [];
 
     for (const segment of segments) {
       // Replace parameterized segments (e.g., :id) with a wildcard (*) for matching
@@ -143,12 +144,13 @@ export class RouteTree<AdditionalMetadata extends Record<string, unknown> = {}> 
       }
 
       node = childNode;
+      normalizedSegments.push(normalizedSegment);
     }
 
     // At the leaf node, store the full route and its associated metadata
     node.metadata = {
       ...metadata,
-      route: segments.join('/'),
+      route: normalizedSegments.join('/'),
     };
 
     node.insertionIndex = this.insertionIndexCounter++;

@@ -576,7 +576,7 @@ export async function extractRoutesAndCreateRouteTree(
     }
 
     const fullRoute = joinUrlParts(baseHref, route);
-    routeTree.insert(fullRoute.replace(URL_PARAMETER_REGEXP, '*'), metadata);
+    routeTree.insert(fullRoute, metadata);
   }
 
   return {
