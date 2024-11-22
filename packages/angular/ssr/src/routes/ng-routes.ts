@@ -21,7 +21,7 @@ import { ServerAssets } from '../assets';
 import { Console } from '../console';
 import { AngularAppManifest, getAngularAppManifest } from '../manifest';
 import { AngularBootstrap, isNgModule } from '../utils/ng';
-import { joinUrlParts, stripLeadingSlash } from '../utils/url';
+import { addTrailingSlash, joinUrlParts, stripLeadingSlash } from '../utils/url';
 import {
   PrerenderFallback,
   RenderMode,
@@ -146,31 +146,36 @@ async function* traverseRoutesConfig(options: {
       const metadata: ServerConfigRouteTreeNodeMetadata = {
         renderMode: RenderMode.Prerender,
         ...matchedMetaData,
-        route: currentRoutePath,
+        // Match Angular router behavior
+        // ['one', 'two', ''] -> 'one/two/'
+        // ['one', 'two', 'three'] -> 'one/two/three'
+        route: path === '' ? addTrailingSlash(currentRoutePath) : currentRoutePath,
       };
 
       delete metadata.presentInClientRouter;
 
-      // Handle redirects
-      if (typeof redirectTo === 'string') {
-        const redirectToResolved = resolveRedirectTo(currentRoutePath, redirectTo);
+      if (metadata.renderMode === RenderMode.Prerender) {
+        // Handle SSG routes
+        yield* handleSSGRoute(
+          typeof redirectTo === 'string' ? redirectTo : undefined,
+          metadata,
+          parentInjector,
+          invokeGetPrerenderParams,
+          includePrerenderFallbackRoutes,
+        );
+      } else if (typeof redirectTo === 'string') {
+        // Handle redirects
         if (metadata.status && !VALID_REDIRECT_RESPONSE_CODES.has(metadata.status)) {
           yield {
             error:
               `The '${metadata.status}' status code is not a valid redirect response code. ` +
               `Please use one of the following redirect response codes: ${[...VALID_REDIRECT_RESPONSE_CODES.values()].join(', ')}.`,
           };
+
           continue;
         }
-        yield { ...metadata, redirectTo: redirectToResolved };
-      } else if (metadata.renderMode === RenderMode.Prerender) {
-        // Handle SSG routes
-        yield* handleSSGRoute(
-          metadata,
-          parentInjector,
-          invokeGetPrerenderParams,
-          includePrerenderFallbackRoutes,
-        );
+
+        yield { ...metadata, redirectTo: resolveRedirectTo(metadata.route, redirectTo) };
       } else {
         yield metadata;
       }
@@ -214,6 +219,7 @@ async function* traverseRoutesConfig(options: {
  * Handles SSG (Static Site Generation) routes by invoking `getPrerenderParams` and yielding
  * all parameterized paths, returning any errors encountered.
  *
+ * @param redirectTo - Optional path to redirect to, if specified.
  * @param metadata - The metadata associated with the route tree node.
  * @param parentInjector - The dependency injection container for the parent route.
  * @param invokeGetPrerenderParams - A flag indicating whether to invoke the `getPrerenderParams` function.
@@ -221,6 +227,7 @@ async function* traverseRoutesConfig(options: {
  * @returns An async iterable iterator that yields route tree node metadata for each SSG path or errors.
  */
 async function* handleSSGRoute(
+  redirectTo: string | undefined,
   metadata: ServerConfigRouteTreeNodeMetadata,
   parentInjector: Injector,
   invokeGetPrerenderParams: boolean,
@@ -237,6 +244,10 @@ async function* handleSSGRoute(
 
   if ('getPrerenderParams' in meta) {
     delete meta['getPrerenderParams'];
+  }
+
+  if (redirectTo !== undefined) {
+    meta.redirectTo = resolveRedirectTo(currentRoutePath, redirectTo);
   }
 
   if (!URL_PARAMETER_REGEXP.test(currentRoutePath)) {
@@ -279,7 +290,14 @@ async function* handleSSGRoute(
           return value;
         });
 
-        yield { ...meta, route: routeWithResolvedParams };
+        yield {
+          ...meta,
+          route: routeWithResolvedParams,
+          redirectTo:
+            redirectTo === undefined
+              ? undefined
+              : resolveRedirectTo(routeWithResolvedParams, redirectTo),
+        };
       }
     } catch (error) {
       yield { error: `${(error as Error).message}` };
@@ -319,7 +337,7 @@ function resolveRedirectTo(routePath: string, redirectTo: string): string {
   }
 
   // Resolve relative redirectTo based on the current route path.
-  const segments = routePath.split('/');
+  const segments = routePath.replace(URL_PARAMETER_REGEXP, '*').split('/');
   segments.pop(); // Remove the last segment to make it relative.
 
   return joinUrlParts(...segments, redirectTo);
@@ -459,7 +477,6 @@ export async function getRoutesFromAngularRouterConfig(
         includePrerenderFallbackRoutes,
       });
 
-      let seenAppShellRoute: string | undefined;
       for await (const result of traverseRoutes) {
         if ('error' in result) {
           errors.push(result.error);
@@ -549,8 +566,17 @@ export async function extractRoutesAndCreateRouteTree(
       metadata.redirectTo = joinUrlParts(baseHref, metadata.redirectTo);
     }
 
+    // Remove undefined fields
+    // Helps avoid unnecessary test updates
+    for (const [key, value] of Object.entries(metadata)) {
+      if (value === undefined) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        delete (metadata as any)[key];
+      }
+    }
+
     const fullRoute = joinUrlParts(baseHref, route);
-    routeTree.insert(fullRoute, metadata);
+    routeTree.insert(fullRoute.replace(URL_PARAMETER_REGEXP, '*'), metadata);
   }
 
   return {

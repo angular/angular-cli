@@ -62,6 +62,23 @@ export function addLeadingSlash(url: string): string {
 }
 
 /**
+ * Adds a trailing slash to a URL if it does not already have one.
+ *
+ * @param url - The URL string to which the trailing slash will be added.
+ * @returns The URL string with a trailing slash.
+ *
+ * @example
+ * ```js
+ * addTrailingSlash('path'); // 'path/'
+ * addTrailingSlash('path/'); // 'path/'
+ * ```
+ */
+export function addTrailingSlash(url: string): string {
+  // Check if the URL already end with a slash
+  return url[url.length - 1] === '/' ? url : `${url}/`;
+}
+
+/**
  * Joins URL parts into a single URL string.
  *
  * This function takes multiple URL segments, normalizes them by removing leading
@@ -127,4 +144,55 @@ export function stripIndexHtmlFromURL(url: URL): URL {
   }
 
   return url;
+}
+
+/**
+ * Resolves `*` placeholders in a path template by mapping them to corresponding segments
+ * from a base path. This is useful for constructing paths dynamically based on a given base path.
+ *
+ * The function processes the `toPath` string, replacing each `*` placeholder with
+ * the corresponding segment from the `fromPath`. If the `toPath` contains no placeholders,
+ * it is returned as-is. Invalid `toPath` formats (not starting with `/`) will throw an error.
+ *
+ * @param toPath - A path template string that may contain `*` placeholders. Each `*` is replaced
+ * by the corresponding segment from the `fromPath`. Static paths (e.g., `/static/path`) are returned
+ * directly without placeholder replacement.
+ * @param fromPath - A base path string, split into segments, that provides values for
+ * replacing `*` placeholders in the `toPath`.
+ * @returns A resolved path string with `*` placeholders replaced by segments from the `fromPath`,
+ * or the `toPath` returned unchanged if it contains no placeholders.
+ *
+ * @throws If the `toPath` does not start with a `/`, indicating an invalid path format.
+ *
+ * @example
+ * ```typescript
+ * // Example with placeholders resolved
+ * const resolvedPath = buildPathWithParams('/*\/details', '/123/abc');
+ * console.log(resolvedPath); // Outputs: '/123/details'
+ *
+ * // Example with a static path
+ * const staticPath = buildPathWithParams('/static/path', '/base/unused');
+ * console.log(staticPath); // Outputs: '/static/path'
+ * ```
+ */
+export function buildPathWithParams(toPath: string, fromPath: string): string {
+  if (toPath[0] !== '/') {
+    throw new Error(`Invalid toPath: The string must start with a '/'. Received: '${toPath}'`);
+  }
+
+  if (fromPath[0] !== '/') {
+    throw new Error(`Invalid fromPath: The string must start with a '/'. Received: '${fromPath}'`);
+  }
+
+  if (!toPath.includes('/*')) {
+    return toPath;
+  }
+
+  const fromPathParts = fromPath.split('/');
+  const toPathParts = toPath.split('/');
+  const resolvedParts = toPathParts.map((part, index) =>
+    toPathParts[index] === '*' ? fromPathParts[index] : part,
+  );
+
+  return joinUrlParts(...resolvedParts);
 }

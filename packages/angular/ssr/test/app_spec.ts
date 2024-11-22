@@ -38,6 +38,7 @@ describe('AngularServerApp', () => {
         { path: 'page-with-status', component: HomeComponent },
         { path: 'redirect', redirectTo: 'home' },
         { path: 'redirect/relative', redirectTo: 'home' },
+        { path: 'redirect/:param/relative', redirectTo: 'home' },
         { path: 'redirect/absolute', redirectTo: '/home' },
       ],
       [
@@ -114,6 +115,12 @@ describe('AngularServerApp', () => {
       it('should correctly handle relative nested redirects', async () => {
         const response = await app.handle(new Request('http://localhost/redirect/relative'));
         expect(response?.headers.get('location')).toContain('http://localhost/redirect/home');
+        expect(response?.status).toBe(302);
+      });
+
+      it('should correctly handle relative nested redirects with parameter', async () => {
+        const response = await app.handle(new Request('http://localhost/redirect/param/relative'));
+        expect(response?.headers.get('location')).toContain('http://localhost/redirect/param/home');
         expect(response?.status).toBe(302);
       });
 
