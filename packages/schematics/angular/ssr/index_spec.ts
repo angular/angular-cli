@@ -108,6 +108,7 @@ describe('SSR Schematic', () => {
 
     afterEach(() => {
       process.env['NG_FORCE_TTY'] = originalTty;
+      delete process.versions.webcontainer;
     });
 
     it('should add script section in package.json', async () => {
@@ -220,6 +221,22 @@ describe('SSR Schematic', () => {
       setPrompterForTestOnly(prompter);
 
       process.env['NG_FORCE_TTY'] = 'FALSE';
+      const tree = await schematicRunner.runSchematic(
+        'ssr',
+        { ...defaultOptions, serverRouting: undefined },
+        appTree,
+      );
+
+      expect(prompter).not.toHaveBeenCalled();
+
+      expect(tree.exists('/projects/test-app/src/app/app.routes.server.ts')).toBeFalse();
+    });
+
+    it('does not prompt when running in a web container', async () => {
+      const prompter = jasmine.createSpy<Prompt>('prompt').and.resolveTo(false);
+      setPrompterForTestOnly(prompter);
+
+      process.versions.webcontainer = 'abc123'; // Simulate webcontainer.
       const tree = await schematicRunner.runSchematic(
         'ssr',
         { ...defaultOptions, serverRouting: undefined },
