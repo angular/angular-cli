@@ -1,9 +1,10 @@
 """Re-export of some bazel rules with repository-wide defaults."""
 
+load("@aspect_bazel_lib//lib:copy_to_bin.bzl", "copy_to_bin")
 load("@aspect_bazel_lib//lib:copy_to_directory.bzl", "copy_to_directory")
 load("@aspect_bazel_lib//lib:jq.bzl", "jq")
 load("@aspect_bazel_lib//lib:utils.bzl", "to_label")
-load("@build_bazel_rules_nodejs//:index.bzl", "copy_to_bin", _js_library = "js_library", _pkg_npm = "pkg_npm")
+load("@build_bazel_rules_nodejs//:index.bzl", _js_library = "js_library", _pkg_npm = "pkg_npm")
 load("@npm//@angular/bazel:index.bzl", _ng_module = "ng_module", _ng_package = "ng_package")
 load("@npm//@angular/build-tooling/bazel:extract_js_module_output.bzl", "extract_js_module_output")
 load("@npm//@bazel/concatjs:index.bzl", _ts_library = "ts_library")
@@ -184,7 +185,10 @@ def pkg_npm(name, pkg_deps = [], use_prodmode_output = False, **kwargs):
                 "substituted/": "",
             },
             exclude_srcs_patterns = [
-                "packages/**/*",  # Exclude compiled outputs of dependent packages
+                # Exclude compiled outputs of dependent packages
+                "packages/**/*",
+                # Exclude `node_modules` which may be pulled by the `js_module_output` runfiles.
+                "node_modules/**/*",
             ],
             allow_overwrites = True,
         )
