@@ -7,14 +7,7 @@
  */
 
 import { APP_BASE_HREF, PlatformLocation } from '@angular/common';
-import {
-  ApplicationRef,
-  Compiler,
-  Injector,
-  runInInjectionContext,
-  ɵwhenStable as whenStable,
-  ɵConsole,
-} from '@angular/core';
+import { ApplicationRef, Compiler, Injector, runInInjectionContext, ɵConsole } from '@angular/core';
 import { INITIAL_CONFIG, platformServer } from '@angular/platform-server';
 import { Route, Router, ɵloadChildren as loadChildrenHelper } from '@angular/router';
 import { ServerAssets } from '../assets';
@@ -432,7 +425,7 @@ export async function getRoutesFromAngularRouterConfig(
     }
 
     // Wait until the application is stable.
-    await whenStable(applicationRef);
+    await applicationRef.whenStable();
 
     const injector = applicationRef.injector;
     const router = injector.get(Router);
