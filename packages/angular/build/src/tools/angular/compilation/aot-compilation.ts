@@ -19,6 +19,14 @@ import {
 import { replaceBootstrap } from '../transformers/jit-bootstrap-transformer';
 import { createWorkerTransformer } from '../transformers/web-worker-transformer';
 import { AngularCompilation, DiagnosticModes, EmitFileResult } from './angular-compilation';
+import { collectHmrCandidates } from './hmr-candidates';
+
+/**
+ * The modified files count limit for performing component HMR analysis.
+ * Performing content analysis for a large amount of files can result in longer rebuild times
+ * than a full rebuild would entail.
+ */
+const HMR_MODIFIED_FILE_LIMIT = 32;
 
 class AngularCompilationState {
   constructor(
@@ -66,9 +74,14 @@ export class AotCompilation extends AngularCompilation {
       hostOptions.externalStylesheets ??= new Map();
     }
 
+    const useHmr =
+      compilerOptions['_enableHmr'] &&
+      hostOptions.modifiedFiles &&
+      hostOptions.modifiedFiles.size <= HMR_MODIFIED_FILE_LIMIT;
+
     // Collect stale source files for HMR analysis of inline component resources
     let staleSourceFiles;
-    if (compilerOptions['_enableHmr'] && hostOptions.modifiedFiles && this.#state) {
+    if (useHmr && hostOptions.modifiedFiles && this.#state) {
       for (const modifiedFile of hostOptions.modifiedFiles) {
         const sourceFile = this.#state.typeScriptProgram.getSourceFile(modifiedFile);
         if (sourceFile) {
@@ -107,7 +120,7 @@ export class AotCompilation extends AngularCompilation {
     await profileAsync('NG_ANALYZE_PROGRAM', () => angularCompiler.analyzeAsync());
 
     let templateUpdates;
-    if (compilerOptions['_enableHmr'] && hostOptions.modifiedFiles && this.#state) {
+    if (useHmr && hostOptions.modifiedFiles && this.#state) {
       const componentNodes = collectHmrCandidates(
         hostOptions.modifiedFiles,
         angularProgram,
@@ -431,48 +444,4 @@ function findAffectedFiles(
   }
 
   return affectedFiles;
-}
-
-function collectHmrCandidates(
-  modifiedFiles: Set<string>,
-  { compiler }: ng.NgtscProgram,
-  staleSourceFiles: Map<string, ts.SourceFile> | undefined,
-): Set<ts.ClassDeclaration> {
-  const candidates = new Set<ts.ClassDeclaration>();
-
-  for (const file of modifiedFiles) {
-    const templateFileNodes = compiler.getComponentsWithTemplateFile(file);
-    if (templateFileNodes.size) {
-      templateFileNodes.forEach((node) => candidates.add(node as ts.ClassDeclaration));
-      continue;
-    }
-
-    const styleFileNodes = compiler.getComponentsWithStyleFile(file);
-    if (styleFileNodes.size) {
-      styleFileNodes.forEach((node) => candidates.add(node as ts.ClassDeclaration));
-      continue;
-    }
-
-    const staleSource = staleSourceFiles?.get(file);
-    if (staleSource === undefined) {
-      // Unknown file requires a rebuild so clear out the candidates and stop collecting
-      candidates.clear();
-      break;
-    }
-
-    const updatedSource = compiler.getCurrentProgram().getSourceFile(file);
-    if (updatedSource === undefined) {
-      // No longer existing program file requires a rebuild so clear out the candidates and stop collecting
-      candidates.clear();
-      break;
-    }
-
-    // Compare the stale and updated file for changes
-
-    // TODO: Implement -- for now assume a rebuild is needed
-    candidates.clear();
-    break;
-  }
-
-  return candidates;
 }
