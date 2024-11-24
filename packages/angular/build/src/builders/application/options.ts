@@ -485,6 +485,8 @@ async function getTailwindConfig(
 
   if (!tailwindConfigurationPath) {
     return undefined;
+  } else {
+    // TODO: Support tailwind V4 in the application builder
   }
 
   // Create a node resolver from the configuration file
