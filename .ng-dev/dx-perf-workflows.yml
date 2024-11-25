@@ -5,3 +5,9 @@ workflows:
       - bazel clean
     workflow:
       - bazel build //packages/angular/cli:npm_package
+  angular-build-integration:
+    name: Angular Build Integration
+    prepare:
+      - bazel clean
+    workflow:
+      - bazel test //packages/angular/build:integration_tests
