@@ -35,7 +35,7 @@
     "istanbul-lib-instrument": "6.0.3",
     "jsonc-parser": "3.3.1",
     "karma-source-map-support": "1.4.0",
-    "less": "4.2.0",
+    "less": "4.2.1",
     "less-loader": "12.2.0",
     "license-webpack-plugin": "4.0.2",
     "loader-utils": "3.3.1",
