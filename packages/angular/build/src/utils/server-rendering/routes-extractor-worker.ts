@@ -38,7 +38,7 @@ async function extractRoutes(): Promise<RoutersExtractorWorkerResult> {
   const { routeTree, appShellRoute, errors } = await extractRoutesAndCreateRouteTree(
     serverURL,
     undefined /** manifest */,
-    true /** invokeGetPrerenderParams */,
+    outputMode !== undefined /** invokeGetPrerenderParams */,
     outputMode === OutputMode.Server /** includePrerenderFallbackRoutes */,
   );
 
