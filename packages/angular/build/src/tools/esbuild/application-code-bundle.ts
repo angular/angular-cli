@@ -254,9 +254,7 @@ export function createServerMainCodeBundleOptions(
 
   return (loadResultCache) => {
     const pluginOptions = createCompilerPluginOptions(options, sourceFileCache, loadResultCache);
-
     const mainServerNamespace = 'angular:main-server';
-    const mainServerInjectPolyfillsNamespace = 'angular:main-server-inject-polyfills';
     const mainServerInjectManifestNamespace = 'angular:main-server-inject-manifest';
     const zoneless = isZonelessApp(polyfills);
     const entryPoints: Record<string, string> = {
@@ -275,7 +273,9 @@ export function createServerMainCodeBundleOptions(
     const buildOptions: BuildOptions = {
       ...getEsBuildServerCommonOptions(options),
       target,
-      inject: [mainServerInjectPolyfillsNamespace, mainServerInjectManifestNamespace],
+      banner: {
+        js: `import './polyfills.server.mjs';`,
+      },
       entryPoints,
       supported: getFeatureSupport(target, zoneless),
       plugins: [
@@ -312,17 +312,9 @@ export function createServerMainCodeBundleOptions(
     buildOptions.plugins.push(
       createServerBundleMetadata(),
       createVirtualModulePlugin({
-        namespace: mainServerInjectPolyfillsNamespace,
-        cache: loadResultCache,
-        loadContent: () => ({
-          contents: `import './polyfills.server.mjs';`,
-          loader: 'js',
-          resolveDir: workspaceRoot,
-        }),
-      }),
-      createVirtualModulePlugin({
         namespace: mainServerInjectManifestNamespace,
         cache: loadResultCache,
+        entryPointOnly: false,
         loadContent: async () => {
           const contents: string[] = [
             // Configure `@angular/ssr` manifest.
@@ -348,16 +340,19 @@ export function createServerMainCodeBundleOptions(
           );
 
           const contents: string[] = [
-            // Re-export all symbols including default export from 'main.server.ts'
-            `export { default } from '${mainServerEntryPointJsImport}';`,
-            `export * from '${mainServerEntryPointJsImport}';`,
+            // Inject manifest
+            `import '${mainServerInjectManifestNamespace}';`,
 
             // Add @angular/ssr exports
             `export {
-            ɵdestroyAngularServerApp,
-            ɵextractRoutesAndCreateRouteTree,
-            ɵgetOrCreateAngularServerApp,
-          } from '@angular/ssr';`,
+              ɵdestroyAngularServerApp,
+              ɵextractRoutesAndCreateRouteTree,
+              ɵgetOrCreateAngularServerApp,
+            } from '@angular/ssr';`,
+
+            // Re-export all symbols including default export from 'main.server.ts'
+            `export { default } from '${mainServerEntryPointJsImport}';`,
+            `export * from '${mainServerEntryPointJsImport}';`,
           ];
 
           return {
@@ -392,22 +387,24 @@ export function createSsrEntryCodeBundleOptions(
 
   return (loadResultCache) => {
     const pluginOptions = createCompilerPluginOptions(options, sourceFileCache, loadResultCache);
-
     const ssrEntryNamespace = 'angular:ssr-entry';
     const ssrInjectManifestNamespace = 'angular:ssr-entry-inject-manifest';
-    const ssrInjectRequireNamespace = 'angular:ssr-entry-inject-require';
     const isNodePlatform = options.ssrOptions?.platform !== ExperimentalPlatform.Neutral;
-
-    const inject: string[] = [ssrInjectManifestNamespace];
-    if (isNodePlatform) {
-      inject.unshift(ssrInjectRequireNamespace);
-    }
 
     const buildOptions: BuildOptions = {
       ...getEsBuildServerCommonOptions(options),
       target,
+      banner: isNodePlatform
+        ? {
+            js: [
+              // Note: Needed as esbuild does not provide require shims / proxy from ESModules.
+              // See: https://github.com/evanw/esbuild/issues/1921.
+              `import { createRequire } from 'node:module';`,
+              `globalThis['require'] ??= createRequire(import.meta.url);`,
+            ].join('\n'),
+          }
+        : undefined,
       entryPoints: {
-        // TODO: consider renaming to index
         'server': ssrEntryNamespace,
       },
       supported: getFeatureSupport(target, true),
@@ -420,7 +417,6 @@ export function createSsrEntryCodeBundleOptions(
           stylesheetBundler,
         ),
       ],
-      inject,
     };
 
     buildOptions.plugins ??= [];
@@ -444,26 +440,9 @@ export function createSsrEntryCodeBundleOptions(
     buildOptions.plugins.push(
       createServerBundleMetadata({ ssrEntryBundle: true }),
       createVirtualModulePlugin({
-        namespace: ssrInjectRequireNamespace,
-        cache: loadResultCache,
-        loadContent: () => {
-          const contents: string[] = [
-            // Note: Needed as esbuild does not provide require shims / proxy from ESModules.
-            // See: https://github.com/evanw/esbuild/issues/1921.
-            `import { createRequire } from 'node:module';`,
-            `globalThis['require'] ??= createRequire(import.meta.url);`,
-          ];
-
-          return {
-            contents: contents.join('\n'),
-            loader: 'js',
-            resolveDir: workspaceRoot,
-          };
-        },
-      }),
-      createVirtualModulePlugin({
         namespace: ssrInjectManifestNamespace,
         cache: loadResultCache,
+        entryPointOnly: false,
         loadContent: () => {
           const contents: string[] = [
             // Configure `@angular/ssr` app engine manifest.
@@ -488,6 +467,9 @@ export function createSsrEntryCodeBundleOptions(
             serverEntryPoint,
           );
           const contents: string[] = [
+            // Configure `@angular/ssr` app engine manifest.
+            `import '${ssrInjectManifestNamespace}';`,
+
             // Re-export all symbols including default export
             `import * as server from '${serverEntryPointJsImport}';`,
             `export * from '${serverEntryPointJsImport}';`,
