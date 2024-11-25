@@ -1,3 +1,28 @@
+<a name="19.0.2"></a>
+
+# 19.0.2 (2024-11-25)
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                             |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------- |
+| [2f53e2af5](https://github.com/angular/angular-cli/commit/2f53e2af55794795979232b0f3e95359299e1aee) | fix  | skip SSR routing prompt in webcontainer |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                                                     |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------------- |
+| [f9da163f8](https://github.com/angular/angular-cli/commit/f9da163f8852800763844ae89e85eaafe0c37f2b) | fix  | minimize reliance on esbuild `inject` to prevent code reordering                |
+| [c497749e6](https://github.com/angular/angular-cli/commit/c497749e670e916e17a4e7fb0acb1abe26d9bd9a) | fix  | prevent errors with parameterized routes when `getPrerenderParams` is undefined |
+
+### @angular/ssr
+
+| Commit                                                                                              | Type | Description                                                     |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------------- |
+| [c8cd90e0f](https://github.com/angular/angular-cli/commit/c8cd90e0f601a6baa05b84e45bbd37b4bf6049f5) | fix  | handle nested redirects not explicitly defined in router config |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="19.0.1"></a>
 
 # 19.0.1 (2024-11-21)
