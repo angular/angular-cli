@@ -13,6 +13,13 @@
  * their existence may change in any future version.
  */
 
+import {
+  CompilerPluginOptions,
+  createCompilerPlugin as internalCreateCompilerPlugin,
+} from './tools/esbuild/angular/compiler-plugin';
+import { ComponentStylesheetBundler } from './tools/esbuild/angular/component-stylesheets';
+import { BundleStylesheetOptions } from './tools/esbuild/stylesheets/bundle-options';
+
 // Builders
 export { buildApplicationInternal } from './builders/application';
 export type { ApplicationBuilderInternalOptions } from './builders/application/options';
@@ -29,7 +36,20 @@ export { SassWorkerImplementation } from './tools/sass/sass-service';
 export { SourceFileCache } from './tools/esbuild/angular/source-file-cache';
 export { createJitResourceTransformer } from './tools/angular/transformers/jit-resource-transformer';
 export { JavaScriptTransformer } from './tools/esbuild/javascript-transformer';
-export { createCompilerPlugin } from './tools/esbuild/angular/compiler-plugin';
+
+export function createCompilerPlugin(
+  pluginOptions: CompilerPluginOptions,
+  styleOptions: BundleStylesheetOptions & { inlineStyleLanguage: string },
+): import('esbuild').Plugin {
+  return internalCreateCompilerPlugin(
+    pluginOptions,
+    new ComponentStylesheetBundler(
+      styleOptions,
+      styleOptions.inlineStyleLanguage,
+      pluginOptions.incremental,
+    ),
+  );
+}
 
 // Utilities
 export * from './utils/bundle-calculator';
