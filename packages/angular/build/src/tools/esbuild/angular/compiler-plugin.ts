@@ -512,6 +512,31 @@ export function createCompilerPlugin(
         }),
       );
 
+      // Add a load handler if there are file replacement option entries for JSON files
+      if (
+        pluginOptions.fileReplacements &&
+        Object.keys(pluginOptions.fileReplacements).some((value) => value.endsWith('.json'))
+      ) {
+        build.onLoad(
+          { filter: /\.json$/ },
+          createCachedLoad(pluginOptions.loadResultCache, async (args) => {
+            const replacement = pluginOptions.fileReplacements?.[path.normalize(args.path)];
+            if (replacement) {
+              return {
+                contents: await import('fs/promises').then(({ readFile }) =>
+                  readFile(path.normalize(replacement)),
+                ),
+                loader: 'json' as const,
+                watchFiles: [replacement],
+              };
+            }
+
+            // If no replacement defined, let esbuild handle it directly
+            return null;
+          }),
+        );
+      }
+
       // Setup bundling of component templates and stylesheets when in JIT mode
       if (pluginOptions.jit) {
         setupJitPluginCallbacks(
