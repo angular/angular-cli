@@ -32,7 +32,7 @@ describe('createWebRequestFromNodeRequest (HTTP/2)', () => {
   async function getNodeRequest(): Promise<Http2ServerRequest> {
     const { req, res } = await new Promise<{
       req: Http2ServerRequest;
-      res: Http2ServerResponse<Http2ServerRequest>;
+      res: Http2ServerResponse;
     }>((resolve) => {
       server.once('request', (req, res) => resolve({ req, res }));
     });
