@@ -17,6 +17,7 @@ import { InlineCriticalCssProcessor } from './inline-critical-css';
 import { InlineFontsProcessor } from './inline-fonts';
 import { addNgcmAttribute } from './ngcm-attribute';
 import { addNonce } from './nonce';
+import { AllowedSRIHash } from '../normalize-hash-func-names';
 
 type IndexHtmlGeneratorPlugin = (
   html: string,
@@ -41,6 +42,7 @@ export interface IndexHtmlGeneratorOptions {
   indexPath: string;
   deployUrl?: string;
   sri?: boolean;
+  sriHashAlgo?: AllowedSRIHash;
   entrypoints: Entrypoint[];
   postTransform?: IndexHtmlTransform;
   crossOrigin?: CrossOriginValue;
@@ -168,7 +170,14 @@ export class IndexHtmlGenerator {
 }
 
 function augmentIndexHtmlPlugin(generator: IndexHtmlGenerator): IndexHtmlGeneratorPlugin {
-  const { deployUrl, crossOrigin, sri = false, entrypoints, imageDomains } = generator.options;
+  const {
+    deployUrl,
+    crossOrigin,
+    sri = false,
+    sriHashAlgo = 'sha384',
+    entrypoints,
+    imageDomains,
+  } = generator.options;
 
   return async (html, options) => {
     const { lang, baseHref, outputPath = '', files, hints } = options;
@@ -179,6 +188,7 @@ function augmentIndexHtmlPlugin(generator: IndexHtmlGenerator): IndexHtmlGenerat
       deployUrl,
       crossOrigin,
       sri,
+      sriHashAlgo,
       lang,
       entrypoints,
       loadOutputFile: (filePath) => generator.readAsset(join(outputPath, filePath)),

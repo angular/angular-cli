@@ -11,6 +11,7 @@ import { extname } from 'node:path';
 import { loadEsmModule } from '../load-esm';
 import { htmlRewritingStream } from './html-rewriting-stream';
 import { VALID_SELF_CLOSING_TAGS } from './valid-self-closing-tags';
+import { AllowedSRIHash } from '../normalize-hash-func-names';
 
 export type LoadOutputFileFunctionType = (file: string) => Promise<string>;
 
@@ -24,6 +25,7 @@ export interface AugmentIndexHtmlOptions {
   baseHref?: string;
   deployUrl?: string;
   sri: boolean;
+  sriHashAlgo?: AllowedSRIHash;
 
   /** crossorigin attribute setting of elements that provide CORS support */
   crossOrigin?: CrossOriginValue;

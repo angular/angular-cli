@@ -39,6 +39,7 @@ export async function generateIndexHtml(
     optimizationOptions,
     crossOrigin,
     subresourceIntegrity,
+    hashFuncNames,
     baseHref,
   } = buildOptions;
 
@@ -94,6 +95,7 @@ export async function generateIndexHtml(
     indexPath: indexHtmlOptions.input,
     entrypoints: indexHtmlOptions.insertionOrder,
     sri: subresourceIntegrity,
+    sriHashAlgo: hashFuncNames,
     optimization: optimizationOptions,
     crossOrigin: crossOrigin,
     deployUrl: buildOptions.publicPath,
