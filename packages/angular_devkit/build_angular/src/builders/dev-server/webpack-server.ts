@@ -263,7 +263,7 @@ export function serveWebpackBrowser(
             ...buildEvent,
             baseUrl: serverAddress,
             stats: generateBuildEventStats(webpackRawStats, browserOptions),
-          };
+          } as DevServerBuilderOutput;
         }),
       );
     }),
