@@ -23,7 +23,7 @@ exports_files([
 ])
 
 npm_link_all_packages(
-    name = "node_modules",
+    name = "root_modules",
 )
 
 rules_js_tsconfig(
@@ -31,7 +31,7 @@ rules_js_tsconfig(
     src = "tsconfig-build.json",
     deps = [
         "tsconfig.json",
-        "//:node_modules/@types/node",
+        "//:root_modules/@types/node",
     ],
 )
 
@@ -40,7 +40,7 @@ rules_js_tsconfig(
     src = "tsconfig-test.json",
     deps = [
         "tsconfig.json",
-        "//:node_modules/@types/node",
+        "//:root_modules/@types/node",
     ],
 )
 

@@ -22,7 +22,7 @@ ts_project(
     ],
     module_name = "@angular-devkit/architect/testing",
     deps = [
-        "//:node_modules/@types/node",
-        "//:node_modules/rxjs",
+        "//:root_modules/@types/node",
+        "//:root_modules/rxjs",
     ],
 )
