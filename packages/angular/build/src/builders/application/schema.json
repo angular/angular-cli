@@ -462,6 +462,14 @@
       "description": "Enables the use of subresource integrity validation.",
       "default": false
     },
+    "hashFuncNames": {
+      "description": "Overrides the default hash function names for subresource integrity validation.",
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": ["sha384"]
+    },
     "serviceWorker": {
       "description": "Generates a service worker configuration.",
       "default": false,

@@ -254,7 +254,7 @@ export async function getCommonConfig(wco: WebpackConfigOptions): Promise<Config
   if (subresourceIntegrity) {
     extraPlugins.push(
       new SubresourceIntegrityPlugin({
-        hashFuncNames: ['sha384'],
+        hashFuncNames: buildOptions.hashFuncNames ?? ['sha384'],
       }),
     );
   }

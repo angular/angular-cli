@@ -12,7 +12,12 @@ import { realpathSync } from 'node:fs';
 import { access, constants } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import path from 'node:path';
-import { normalizeAssetPatterns, normalizeOptimization, normalizeSourceMaps } from '../../utils';
+import {
+  normalizeAssetPatterns,
+  normalizeHashFuncNames,
+  normalizeOptimization,
+  normalizeSourceMaps,
+} from '../../utils';
 import { supportColor } from '../../utils/color';
 import { useJSONBuildLogs, usePartialSsrBuild } from '../../utils/environment-options';
 import { I18nOptions, createI18nOptions } from '../../utils/i18n-options';
@@ -182,6 +187,7 @@ export async function normalizeOptions(
   const assets = options.assets?.length
     ? normalizeAssetPatterns(options.assets, workspaceRoot, projectRoot, projectSourceRoot)
     : undefined;
+  const hashFuncNames = normalizeHashFuncNames(options.hashFuncNames);
 
   let fileReplacements: Record<string, string> | undefined;
   if (options.fileReplacements) {
@@ -429,6 +435,7 @@ export async function normalizeOptions(
     preserveSymlinks,
     stylePreprocessorOptions,
     subresourceIntegrity,
+    hashFuncNames,
     serverEntryPoint,
     prerenderOptions,
     appShellOptions,

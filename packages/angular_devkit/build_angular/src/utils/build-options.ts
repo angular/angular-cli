@@ -53,6 +53,7 @@ export interface BuildOptions {
   namedChunks?: boolean;
   crossOrigin?: CrossOrigin;
   subresourceIntegrity?: boolean;
+  hashFuncNames?: [string, ...string[]];
   serviceWorker?: boolean;
   webWorkerTsConfig?: string;
   statsJson: boolean;

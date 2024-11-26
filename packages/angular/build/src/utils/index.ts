@@ -7,6 +7,7 @@
  */
 
 export * from './normalize-asset-patterns';
+export * from './normalize-hash-func-names';
 export * from './normalize-optimization';
 export * from './normalize-source-maps';
 export * from './load-proxy-config';
