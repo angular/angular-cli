@@ -8,7 +8,7 @@ describe('<%= classify(name) %><%= classify(type) %>', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      <%= standalone ? 'imports' : 'declarations' %>: [<%= classify(name) %><%= classify(type) %>]
+      <%= standalone ? '' : 'declarations' %>: [<%= classify(name) %><%= classify(type) %>]
     })
     .compileComponents();
 
