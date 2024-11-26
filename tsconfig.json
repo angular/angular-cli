@@ -25,6 +25,7 @@
       "@angular-devkit/schematics/tools": ["./packages/angular_devkit/schematics/tools/index"],
       "@angular-devkit/schematics/testing": ["./packages/angular_devkit/schematics/testing/index"],
       "@angular-devkit/architect/testing": ["./packages/angular_devkit/architect/testing/index"],
+      "@angular-devkit/build-webpack": ["./packages/angular_devkit/build_webpack"],
       "@angular-devkit/*": ["./packages/angular_devkit/*/src"],
       "@angular/*": ["./packages/angular/*/src"],
       "@angular/build/private": ["./packages/angular/build/src/private"],
