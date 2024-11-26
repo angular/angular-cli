@@ -17,17 +17,18 @@ export default async function () {
   await execAndWaitForOutputToMatch(
     'ng',
     ['serve', '--port', `${port}`],
-    /Dependencies bundled/,
+    /bundle generation complete/,
     // Use CI:0 to force caching
     { DEBUG: 'vite:deps', CI: '0' },
   );
 
-  // Make request so that vite writes the cache.
-  const response = await fetch(`http://localhost:${port}/main.js`);
-  assert(response.ok, `Expected 'response.ok' to be 'true'.`);
-
   // Wait for vite to write to FS and stablize.
-  await waitForAnyProcessOutputToMatch(/dependencies optimized/, 5000);
+  await Promise.all([
+    waitForAnyProcessOutputToMatch(/dependencies optimized/, 5000),
+    fetch(`http://localhost:${port}/main.js`).then((r) =>
+      assert(r.ok, `Expected 'response.ok' to be 'true'.`),
+    ),
+  ]);
 
   // Terminate the dev-server
   await killAllProcesses();
