@@ -75,7 +75,6 @@
     "import/newline-after-import": "error",
     "import/no-absolute-path": "error",
     "import/no-duplicates": "error",
-    "import/no-extraneous-dependencies": ["off", { "devDependencies": false }],
     "import/no-unassigned-import": ["error", { "allow": ["symbol-observable"] }],
     "import/order": [
       "error",
@@ -142,7 +141,6 @@
     {
       "files": ["!packages/**", "**/*_spec.ts"],
       "rules": {
-        "import/no-extraneous-dependencies": ["error", { "devDependencies": true }],
         "max-lines-per-function": "off",
         "no-case-declarations": "off",
         "no-console": "off"
