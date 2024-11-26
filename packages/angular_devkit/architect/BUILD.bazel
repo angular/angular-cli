@@ -70,8 +70,8 @@ ts_project(
     ],
     module_name = "@angular-devkit/architect",
     deps = [
-        "//:node_modules/@types/node",
-        "//:node_modules/rxjs",
+        "//:root_modules/@types/node",
+        "//:root_modules/rxjs",
     ],
 )
 
@@ -84,8 +84,8 @@ ts_project(
     ],
     deps = [
         ":architect_rjs",
-        "//:node_modules/@types/jasmine",
-        "//:node_modules/rxjs",
+        "//:root_modules/@types/jasmine",
+        "//:root_modules/rxjs",
         "//packages/angular_devkit/architect/testing:testing_rjs",
     ],
 )
