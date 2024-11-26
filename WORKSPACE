@@ -2,6 +2,12 @@ workspace(name = "angular_cli")
 
 DEFAULT_NODE_VERSION = "18.19.1"
 
+# Workaround for: https://github.com/bazel-contrib/bazel-lib/issues/968.
+# Override toolchain for tar on windows.
+register_toolchains(
+    "//tools:windows_tar_system_toolchain",
+)
+
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
 http_archive(
