@@ -77,12 +77,6 @@ jobs:
         subset: [npm, esbuild]
         shard: [0, 1, 2, 3, 4, 5]
         exclude:
-          # Skip yarn subset on Windows
-          - os: windows-latest
-            subset: yarn
-          # Skip pnpm subset on Windows
-          - os: windows-latest
-            subset: pnpm
           # Skip Node.js v18 tests on Windows
           - os: windows-latest
             node: 18
@@ -91,6 +85,10 @@ jobs:
             node: 20
     runs-on: ${{ matrix.os }}
     steps:
+      # Workaround for: https://github.com/bazel-contrib/bazel-lib/issues/968.
+      # TODO(devversion): Remove when Aspect lib issue is fixed.
+      - run: choco install gzip
+        if: ${{matrix.os == 'windows-latest'}}
       - name: Initialize environment
         uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@4693145a16baaefdb7c9f55689b8eefc1fffc246
       - name: Install node modules

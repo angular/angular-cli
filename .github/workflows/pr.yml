@@ -126,6 +126,9 @@ jobs:
   e2e-windows-subset:
     runs-on: windows-latest
     steps:
+      # Workaround for: https://github.com/bazel-contrib/bazel-lib/issues/968.
+      # TODO(devversion): Remove when Aspect lib issue is fixed.
+      - run: choco install gzip
       - name: Initialize environment
         uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@4693145a16baaefdb7c9f55689b8eefc1fffc246
       - name: Install node modules
