@@ -25,7 +25,7 @@
     "@babel/helper-split-export-declaration": "7.24.7",
     "@babel/plugin-syntax-import-attributes": "7.26.0",
     "@inquirer/confirm": "5.0.2",
-    "@vitejs/plugin-basic-ssl": "1.1.0",
+    "@vitejs/plugin-basic-ssl": "1.2.0",
     "beasties": "0.1.0",
     "browserslist": "^4.23.0",
     "esbuild": "0.24.0",
@@ -33,7 +33,7 @@
     "https-proxy-agent": "7.0.5",
     "istanbul-lib-instrument": "6.0.3",
     "listr2": "8.2.5",
-    "magic-string": "0.30.13",
+    "magic-string": "0.30.14",
     "mrmime": "2.0.0",
     "parse5-html-rewriting-stream": "7.0.0",
     "picomatch": "4.0.2",
@@ -41,7 +41,7 @@
     "rollup": "4.27.4",
     "sass": "1.81.0",
     "semver": "7.6.3",
-    "vite": "6.0.0",
+    "vite": "6.0.1",
     "watchpack": "2.4.2"
   },
   "optionalDependencies": {
