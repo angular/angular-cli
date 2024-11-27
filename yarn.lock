@@ -75,7 +75,7 @@ __metadata:
     "@babel/runtime": "npm:7.26.0"
     "@discoveryjs/json-ext": "npm:0.6.3"
     "@ngtools/webpack": "npm:0.0.0-PLACEHOLDER"
-    "@vitejs/plugin-basic-ssl": "npm:1.1.0"
+    "@vitejs/plugin-basic-ssl": "npm:1.2.0"
     ansi-colors: "npm:4.1.3"
     autoprefixer: "npm:10.4.20"
     babel-loader: "npm:9.2.1"
@@ -239,7 +239,7 @@ __metadata:
   dependencies:
     "@angular-devkit/core": "npm:0.0.0-PLACEHOLDER"
     jsonc-parser: "npm:3.3.1"
-    magic-string: "npm:0.30.13"
+    magic-string: "npm:0.30.14"
     ora: "npm:5.4.1"
     rxjs: "npm:7.8.1"
   languageName: unknown
@@ -378,7 +378,7 @@ __metadata:
     "@babel/helper-split-export-declaration": "npm:7.24.7"
     "@babel/plugin-syntax-import-attributes": "npm:7.26.0"
     "@inquirer/confirm": "npm:5.0.2"
-    "@vitejs/plugin-basic-ssl": "npm:1.1.0"
+    "@vitejs/plugin-basic-ssl": "npm:1.2.0"
     beasties: "npm:0.1.0"
     browserslist: "npm:^4.23.0"
     esbuild: "npm:0.24.0"
@@ -387,7 +387,7 @@ __metadata:
     istanbul-lib-instrument: "npm:6.0.3"
     listr2: "npm:8.2.5"
     lmdb: "npm:3.1.6"
-    magic-string: "npm:0.30.13"
+    magic-string: "npm:0.30.14"
     mrmime: "npm:2.0.0"
     parse5-html-rewriting-stream: "npm:7.0.0"
     picomatch: "npm:4.0.2"
@@ -395,7 +395,7 @@ __metadata:
     rollup: "npm:4.27.4"
     sass: "npm:1.81.0"
     semver: "npm:7.6.3"
-    vite: "npm:6.0.0"
+    vite: "npm:6.0.1"
     watchpack: "npm:2.4.2"
   peerDependencies:
     "@angular/compiler": ^19.0.0
@@ -693,7 +693,7 @@ __metadata:
     "@types/yarnpkg__lockfile": "npm:^1.1.5"
     "@typescript-eslint/eslint-plugin": "npm:8.16.0"
     "@typescript-eslint/parser": "npm:8.16.0"
-    "@vitejs/plugin-basic-ssl": "npm:1.1.0"
+    "@vitejs/plugin-basic-ssl": "npm:1.2.0"
     "@web/test-runner": "npm:^0.19.0"
     "@yarnpkg/lockfile": "npm:1.1.0"
     ajv: "npm:8.17.1"
@@ -740,7 +740,7 @@ __metadata:
     lmdb: "npm:3.1.6"
     loader-utils: "npm:3.3.1"
     lodash: "npm:^4.17.21"
-    magic-string: "npm:0.30.13"
+    magic-string: "npm:0.30.14"
     mini-css-extract-plugin: "npm:2.9.2"
     mrmime: "npm:2.0.0"
     ng-packagr: "npm:19.0.1"
@@ -782,7 +782,7 @@ __metadata:
     unenv: "npm:^1.10.0"
     verdaccio: "npm:6.0.2"
     verdaccio-auth-memory: "npm:^10.0.0"
-    vite: "npm:6.0.0"
+    vite: "npm:6.0.1"
     watchpack: "npm:2.4.2"
     webpack: "npm:5.96.1"
     webpack-dev-middleware: "npm:7.4.2"
@@ -6268,6 +6268,15 @@ __metadata:
   peerDependencies:
     vite: ^3.0.0 || ^4.0.0 || ^5.0.0
   checksum: 10c0/98aadf5c7fd229995c67f973b4fb0f987a378031a4edcc5f714b412c00af12a6ecafb96659e76382ff9f8a831aac5243c74548e2807402ea8b02ec122d29f008
+  languageName: node
+  linkType: hard
+
+"@vitejs/plugin-basic-ssl@npm:1.2.0":
+  version: 1.2.0
+  resolution: "@vitejs/plugin-basic-ssl@npm:1.2.0"
+  peerDependencies:
+    vite: ^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0
+  checksum: 10c0/0d360fcca01f91ade6e451edbea09a107ff9e95cd3c3766c7a069d1a168709df92d96c0bd1eccc66e2739a153e07c75a45321ec487450c0da942606200d8441d
   languageName: node
   linkType: hard
 
@@ -13450,7 +13459,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"magic-string@npm:0.30.13, magic-string@npm:^0.30.0, magic-string@npm:^0.30.3":
+"magic-string@npm:0.30.14":
+  version: 0.30.14
+  resolution: "magic-string@npm:0.30.14"
+  dependencies:
+    "@jridgewell/sourcemap-codec": "npm:^1.5.0"
+  checksum: 10c0/c52c2a6e699dfa8a840e13154da35464a40cd8b07049b695a8b282883b0426c0811af1e36ac26860b4267289340b42772c156a5608e87be97b63d510e617e87a
+  languageName: node
+  linkType: hard
+
+"magic-string@npm:^0.30.0, magic-string@npm:^0.30.3":
   version: 0.30.13
   resolution: "magic-string@npm:0.30.13"
   dependencies:
@@ -18761,9 +18779,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"vite@npm:6.0.0":
-  version: 6.0.0
-  resolution: "vite@npm:6.0.0"
+"vite@npm:6.0.1":
+  version: 6.0.1
+  resolution: "vite@npm:6.0.1"
   dependencies:
     esbuild: "npm:^0.24.0"
     fsevents: "npm:~2.3.3"
@@ -18809,7 +18827,7 @@ __metadata:
       optional: true
   bin:
     vite: bin/vite.js
-  checksum: 10c0/2516144161c108452691ec1379aefd8f3201da8f225e628cb1cdb7b35b92d856d990cd31f1c36c0f36517346efe181ea3c096a04bc846c5b0d1416b7b7111af8
+  checksum: 10c0/e4d853eb9042ff29fa4d7cee1484738faaee4b1d9dcf786a94783bebb736b39af0afa7ac1a209000530638098d0a1b240b51f509d32addb028b222453f862916
   languageName: node
   linkType: hard
 
