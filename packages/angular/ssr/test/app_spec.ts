@@ -139,7 +139,12 @@ describe('AngularServerApp', () => {
           controller.abort();
         });
 
-        await expectAsync(app.handle(request)).toBeRejectedWithError(/Request for: .+ was aborted/);
+        try {
+          await app.handle(request);
+          throw new Error('Should not be called.');
+        } catch (e) {
+          expect(e).toBeInstanceOf(DOMException);
+        }
       });
 
       it('should return configured headers for pages with specific header settings', async () => {
