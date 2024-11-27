@@ -35,12 +35,12 @@ async function extractRoutes(): Promise<RoutersExtractorWorkerResult> {
   const { ɵextractRoutesAndCreateRouteTree: extractRoutesAndCreateRouteTree } =
     await loadEsmModuleFromMemory('./main.server.mjs');
 
-  const { routeTree, appShellRoute, errors } = await extractRoutesAndCreateRouteTree(
-    serverURL,
-    undefined /** manifest */,
-    outputMode !== undefined /** invokeGetPrerenderParams */,
-    outputMode === OutputMode.Server /** includePrerenderFallbackRoutes */,
-  );
+  const { routeTree, appShellRoute, errors } = await extractRoutesAndCreateRouteTree({
+    url: serverURL,
+    invokeGetPrerenderParams: outputMode !== undefined,
+    includePrerenderFallbackRoutes: outputMode === OutputMode.Server,
+    signal: AbortSignal.timeout(30_000),
+  });
 
   return {
     errors,
