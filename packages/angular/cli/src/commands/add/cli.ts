@@ -242,6 +242,7 @@ export default class AddCommandModule
                 versionManifest.version,
               );
               found = true;
+              break;
             }
 
             if (!found) {
