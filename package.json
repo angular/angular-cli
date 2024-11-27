@@ -197,7 +197,7 @@
     "source-map-loader": "5.0.0",
     "source-map-support": "0.5.21",
     "symbol-observable": "4.0.0",
-    "tar": "^6.1.6",
+    "tar": "^7.0.0",
     "terser": "5.36.0",
     "tree-kill": "1.2.2",
     "ts-node": "^10.9.1",
