@@ -24,6 +24,7 @@ import { sha256 } from './utils/crypto';
 import { InlineCriticalCssProcessor } from './utils/inline-critical-css';
 import { LRUCache } from './utils/lru-cache';
 import { AngularBootstrap, renderAngular } from './utils/ng';
+import { promiseWithAbort } from './utils/promise';
 import {
   buildPathWithParams,
   joinUrlParts,
@@ -182,10 +183,11 @@ export class AngularServerApp {
       }
     }
 
-    return Promise.race([
-      this.waitForRequestAbort(request),
+    return promiseWithAbort(
       this.handleRendering(request, matchedRoute, requestContext),
-    ]);
+      request.signal,
+      `Request for: ${request.url}`,
+    );
   }
 
   /**
@@ -352,29 +354,6 @@ export class AngularServerApp {
     }
 
     return new Response(html, responseInit);
-  }
-
-  /**
-   * Returns a promise that rejects if the request is aborted.
-   *
-   * @param request - The HTTP request object being monitored for abortion.
-   * @returns A promise that never resolves and rejects with an `AbortError`
-   * if the request is aborted.
-   */
-  private waitForRequestAbort(request: Request): Promise<never> {
-    return new Promise<never>((_, reject) => {
-      request.signal.addEventListener(
-        'abort',
-        () => {
-          const abortError = new Error(
-            `Request for: ${request.url} was aborted.\n${request.signal.reason}`,
-          );
-          abortError.name = 'AbortError';
-          reject(abortError);
-        },
-        { once: true },
-      );
-    });
   }
 }
 
