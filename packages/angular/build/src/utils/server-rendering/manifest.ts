@@ -103,6 +103,8 @@ export default {
  * server-side rendering and routing.
  * @param locale - An optional string representing the locale or language code to be used for
  * the application, helping with localization and rendering content specific to the locale.
+ * @param baseHref - The base HREF for the application. This is used to set the base URL
+ * for all relative URLs in the application.
  *
  * @returns An object containing:
  * - `manifestContent`: A string of the SSR manifest content.
@@ -114,6 +116,7 @@ export function generateAngularServerAppManifest(
   inlineCriticalCss: boolean,
   routes: readonly unknown[] | undefined,
   locale: string | undefined,
+  baseHref: string,
 ): {
   manifestContent: string;
   serverAssetsChunks: BuildOutputFile[];
@@ -142,9 +145,10 @@ export function generateAngularServerAppManifest(
 export default {
   bootstrap: () => import('./main.server.mjs').then(m => m.default),
   inlineCriticalCss: ${inlineCriticalCss},
+  baseHref: '${baseHref}',
+  locale: ${locale !== undefined ? `'${locale}'` : undefined},
   routes: ${JSON.stringify(routes, undefined, 2)},
   assets: new Map([\n${serverAssetsContent.join(', \n')}\n]),
-  locale: ${locale !== undefined ? `'${locale}'` : undefined},
 };
 `;
 

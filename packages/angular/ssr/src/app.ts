@@ -214,8 +214,7 @@ export class AngularServerApp {
       return null;
     }
 
-    const { pathname } = stripIndexHtmlFromURL(new URL(request.url));
-    const assetPath = stripLeadingSlash(joinUrlParts(pathname, 'index.html'));
+    const assetPath = this.buildServerAssetPathFromRequest(request);
     if (!this.assets.hasServerAsset(assetPath)) {
       return null;
     }
@@ -354,6 +353,33 @@ export class AngularServerApp {
     }
 
     return new Response(html, responseInit);
+  }
+
+  /**
+   * Constructs the asset path on the server based on the provided HTTP request.
+   *
+   * This method processes the incoming request URL to derive a path corresponding
+   * to the requested asset. It ensures the path points to the correct file (e.g.,
+   * `index.html`) and removes any base href if it is not part of the asset path.
+   *
+   * @param request - The incoming HTTP request object.
+   * @returns The server-relative asset path derived from the request.
+   */
+  private buildServerAssetPathFromRequest(request: Request): string {
+    let { pathname: assetPath } = new URL(request.url);
+    if (!assetPath.endsWith('/index.html')) {
+      // Append "index.html" to build the default asset path.
+      assetPath = joinUrlParts(assetPath, 'index.html');
+    }
+
+    const { baseHref } = this.manifest;
+    // Check if the asset path starts with the base href and the base href is not (`/` or ``).
+    if (baseHref.length > 1 && assetPath.startsWith(baseHref)) {
+      // Remove the base href from the start of the asset path to align with server-asset expectations.
+      assetPath = assetPath.slice(baseHref.length);
+    }
+
+    return stripLeadingSlash(assetPath);
   }
 }
 
