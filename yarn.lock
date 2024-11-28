@@ -110,7 +110,7 @@ __metadata:
     terser: "npm:5.36.0"
     tree-kill: "npm:1.2.2"
     tslib: "npm:2.8.1"
-    undici: "npm:6.21.0"
+    undici: "npm:7.0.0"
     webpack: "npm:5.96.1"
     webpack-dev-middleware: "npm:7.4.2"
     webpack-dev-server: "npm:5.1.0"
@@ -778,7 +778,7 @@ __metadata:
     ts-node: "npm:^10.9.1"
     tslib: "npm:2.8.1"
     typescript: "npm:5.6.3"
-    undici: "npm:6.21.0"
+    undici: "npm:7.0.0"
     unenv: "npm:^1.10.0"
     verdaccio: "npm:6.0.2"
     verdaccio-auth-memory: "npm:^10.0.0"
@@ -18327,10 +18327,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"undici@npm:6.21.0":
-  version: 6.21.0
-  resolution: "undici@npm:6.21.0"
-  checksum: 10c0/afa9bde6dcf8e0f5cf1ff2fa977ba73dd5510299ddfca0e1f37ff326554172ae31cb3d4a40b5a729601be1f21b96a2684f974d74dab53f9b6930fd47d1949246
+"undici@npm:7.0.0":
+  version: 7.0.0
+  resolution: "undici@npm:7.0.0"
+  checksum: 10c0/6d91d5ea5f858ac9ea8b8e28722167dcb4606dc8f3886b6768de94de96fb0817a7fec974ecbc51c1fec03131e2cc44df49a2ab966f5d2d191f32163776f36d91
   languageName: node
   linkType: hard
 
