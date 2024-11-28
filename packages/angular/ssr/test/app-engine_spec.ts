@@ -34,15 +34,44 @@ describe('AngularAppEngine', () => {
             async () => {
               @Component({
                 standalone: true,
-                selector: `app-home-${locale}`,
-                template: `Home works ${locale.toUpperCase()}`,
+                selector: `app-ssr-${locale}`,
+                template: `SSR works ${locale.toUpperCase()}`,
               })
-              class HomeComponent {}
+              class SSRComponent {}
+
+              @Component({
+                standalone: true,
+                selector: `app-ssg-${locale}`,
+                template: `SSG works ${locale.toUpperCase()}`,
+              })
+              class SSGComponent {}
 
               setAngularAppTestingManifest(
-                [{ path: 'home', component: HomeComponent }],
-                [{ path: '**', renderMode: RenderMode.Server }],
+                [
+                  { path: 'ssg', component: SSGComponent },
+                  { path: 'ssr', component: SSRComponent },
+                ],
+                [
+                  { path: 'ssg', renderMode: RenderMode.Prerender },
+                  { path: '**', renderMode: RenderMode.Server },
+                ],
                 '/' + locale,
+                {
+                  'ssg/index.html': {
+                    size: 25,
+                    hash: 'f799132d0a09e0fef93c68a12e443527700eb59e6f67fcb7854c3a60ff082fde',
+                    text: async () => `<html>
+                      <head>
+                        <title>SSG page</title>
+                        <base href="/${locale}" />
+                      </head>
+                      <body>
+                        SSG works ${locale.toUpperCase()}
+                      </body>
+                    </html>
+                  `,
+                  },
+                },
               );
 
               return {
@@ -58,7 +87,7 @@ describe('AngularAppEngine', () => {
       appEngine = new AngularAppEngine();
     });
 
-    describe('render', () => {
+    describe('handle', () => {
       it('should return null for requests to unknown pages', async () => {
         const request = new Request('https://example.com/unknown/page');
         const response = await appEngine.handle(request);
@@ -66,21 +95,33 @@ describe('AngularAppEngine', () => {
       });
 
       it('should return null for requests with unknown locales', async () => {
-        const request = new Request('https://example.com/es/home');
+        const request = new Request('https://example.com/es/ssr');
         const response = await appEngine.handle(request);
         expect(response).toBeNull();
       });
 
       it('should return a rendered page with correct locale', async () => {
-        const request = new Request('https://example.com/it/home');
+        const request = new Request('https://example.com/it/ssr');
         const response = await appEngine.handle(request);
-        expect(await response?.text()).toContain('Home works IT');
+        expect(await response?.text()).toContain('SSR works IT');
       });
 
       it('should correctly render the content when the URL ends with "index.html" with correct locale', async () => {
-        const request = new Request('https://example.com/it/home/index.html');
+        const request = new Request('https://example.com/it/ssr/index.html');
         const response = await appEngine.handle(request);
-        expect(await response?.text()).toContain('Home works IT');
+        expect(await response?.text()).toContain('SSR works IT');
+      });
+
+      it('should return a serve prerendered page with correct locale', async () => {
+        const request = new Request('https://example.com/it/ssg');
+        const response = await appEngine.handle(request);
+        expect(await response?.text()).toContain('SSG works IT');
+      });
+
+      it('should correctly serve the prerendered content when the URL ends with "index.html" with correct locale', async () => {
+        const request = new Request('https://example.com/it/ssg/index.html');
+        const response = await appEngine.handle(request);
+        expect(await response?.text()).toContain('SSG works IT');
       });
 
       it('should return null for requests to unknown pages in a locale', async () => {

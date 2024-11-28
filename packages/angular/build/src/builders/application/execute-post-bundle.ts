@@ -63,6 +63,7 @@ export async function executePostBundleSteps(
   const {
     baseHref = '/',
     serviceWorker,
+    i18nOptions,
     indexHtmlOptions,
     optimizationOptions,
     sourcemapOptions,
@@ -114,6 +115,7 @@ export async function executePostBundleSteps(
       optimizationOptions.styles.inlineCritical ?? false,
       undefined,
       locale,
+      baseHref,
     );
 
     additionalOutputFiles.push(
@@ -194,6 +196,7 @@ export async function executePostBundleSteps(
         optimizationOptions.styles.inlineCritical ?? false,
         serializableRouteTreeNodeForManifest,
         locale,
+        baseHref,
       );
 
       for (const chunk of serverAssetsChunks) {

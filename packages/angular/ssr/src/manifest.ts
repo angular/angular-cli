@@ -72,6 +72,12 @@ export interface AngularAppEngineManifest {
  */
 export interface AngularAppManifest {
   /**
+   * The base href for the application.
+   * This is used to determine the root path of the application.
+   */
+  readonly baseHref: string;
+
+  /**
    * A map of assets required by the server application.
    * Each entry in the map consists of:
    * - `key`: The path of the asset.
