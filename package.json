@@ -203,7 +203,7 @@
     "ts-node": "^10.9.1",
     "tslib": "2.8.1",
     "typescript": "5.6.3",
-    "undici": "6.21.0",
+    "undici": "7.0.0",
     "unenv": "^1.10.0",
     "verdaccio": "6.0.2",
     "verdaccio-auth-memory": "^10.0.0",
