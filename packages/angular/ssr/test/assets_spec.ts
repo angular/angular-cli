@@ -13,6 +13,7 @@ describe('ServerAsset', () => {
 
   beforeAll(() => {
     assetManager = new ServerAssets({
+      baseHref: '/',
       bootstrap: undefined as never,
       assets: new Map(
         Object.entries({

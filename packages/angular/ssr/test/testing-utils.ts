@@ -31,6 +31,7 @@ export function setAngularAppTestingManifest(
 ): void {
   setAngularAppManifest({
     inlineCriticalCss: false,
+    baseHref,
     assets: new Map(
       Object.entries({
         ...additionalServerAssets,
