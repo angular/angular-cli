@@ -1,4 +1,6 @@
 load("@aspect_bazel_lib//lib/private:tar_toolchain.bzl", "tar_toolchain")
+load("@aspect_rules_js//js:defs.bzl", "js_binary")
+load("@bazel_skylib//rules:copy_file.bzl", "copy_file")
 
 # Copyright Google Inc. All Rights Reserved.
 #
@@ -41,5 +43,23 @@ toolchain(
     exec_compatible_with = ["@platforms//os:windows"],
     toolchain = ":system_tar_exec",
     toolchain_type = "@aspect_bazel_lib//lib:tar_toolchain_type",
+)
+
+# TODO(devversion): Improve this by potentially sharing this common block.
+copy_file(
+    name = "copy_worker_js",
+    src = "@tsc_worker//file",
+    out = "ts_worker.mjs",
+)
+
+js_binary(
+    name = "vanilla_ts_worker",
+    data = [
+        ":copy_worker_js",
+        "//:root_modules/@angular/compiler-cli",
+        "//:root_modules/typescript",
+    ],
+    entry_point = ":copy_worker_js",
+    fixed_args = ["--vanilla-ts"],
 )
 # @external_end
