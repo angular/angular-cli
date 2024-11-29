@@ -94,6 +94,11 @@ def ts_project(name, module_name = None, interop_deps = [], deps = [], testonly 
         testonly = testonly,
         tsconfig = "//:test-tsconfig" if testonly else "//:build-tsconfig",
         declaration = True,
+        # Use the worker from our own Angular rules, as the default worker
+        # from `rules_ts` is incompatible with TS5+ and abandoned. We need
+        # worker for efficient, fast DX and avoiding Windows no-sandbox issues.
+        supports_workers = 1,
+        tsc_worker = "//tools:vanilla_ts_worker",
         deps = ["%s_interop_deps" % name] + deps,
         **kwargs
     )

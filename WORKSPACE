@@ -8,7 +8,7 @@ register_toolchains(
     "//tools:windows_tar_system_toolchain",
 )
 
-load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive", "http_file")
 
 http_archive(
     name = "bazel_skylib",
@@ -37,9 +37,9 @@ build_bazel_rules_nodejs_dependencies()
 
 http_archive(
     name = "aspect_rules_js",
-    sha256 = "75c25a0f15a9e4592bbda45b57aa089e4bf17f9176fd735351e8c6444df87b52",
-    strip_prefix = "rules_js-2.1.0",
-    url = "https://github.com/aspect-build/rules_js/releases/download/v2.1.0/rules_js-v2.1.0.tar.gz",
+    sha256 = "3388abe9b9728ef68ea8d8301f932b11b2c9a271d74741ddd5f3b34d1db843ac",
+    strip_prefix = "rules_js-2.1.1",
+    url = "https://github.com/aspect-build/rules_js/releases/download/v2.1.1/rules_js-v2.1.1.tar.gz",
 )
 
 load("@aspect_rules_js//js:repositories.bzl", "rules_js_dependencies")
@@ -217,4 +217,10 @@ rules_ts_dependencies(
     # ts_version_from = "//:package.json",
     # TODO: Support in https://github.com/aspect-build/rules_ts/blob/main/ts/private/npm_repositories.bzl
     ts_version = "5.6.2",
+)
+
+http_file(
+    name = "tsc_worker",
+    sha256 = "",
+    urls = ["https://raw.githubusercontent.com/devversion/rules_angular/a270a74d1e64577bddba96a5484c7c5d2c5d2770/dist/worker.mjs"],
 )
