@@ -242,7 +242,7 @@ export abstract class ArchitectBaseCommandModule<T extends object>
 
       const packageToInstall = await this.getMissingTargetPackageToInstall(choices);
       if (packageToInstall) {
-        // Example run: `ng add @angular-eslint/schematics`.
+        // Example run: `ng add angular-eslint`.
         const AddCommandModule = (await import('../commands/add/cli')).default;
         await new AddCommandModule(this.context).run({
           interactive: true,
