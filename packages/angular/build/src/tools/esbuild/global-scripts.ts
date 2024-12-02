@@ -36,6 +36,7 @@ export function createGlobalScriptsBundleOptions(
     sourcemapOptions,
     jsonLogs,
     workspaceRoot,
+    define,
   } = options;
 
   const namespace = 'angular:script/global';
@@ -73,6 +74,7 @@ export function createGlobalScriptsBundleOptions(
       platform: 'neutral',
       target,
       preserveSymlinks,
+      define,
       plugins: [
         createSourcemapIgnorelistPlugin(),
         createVirtualModulePlugin({
