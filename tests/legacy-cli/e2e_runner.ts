@@ -370,16 +370,7 @@ async function findPackageTars(): Promise<{ [pkg: string]: PkgInfo }> {
   );
 
   const pkgJsons = await Promise.all(
-    pkgs
-      .map((pkg) => realpathSync(pkg))
-      .map(async (pkg) => {
-        try {
-          return await extractFile(pkg, './package/package.json');
-        } catch (e) {
-          // TODO(bazel): currently the bazel npm packaging does not contain the standard npm ./package directory
-          return await extractFile(pkg, './package.json');
-        }
-      }),
+    pkgs.map((pkg) => realpathSync(pkg)).map((pkg) => extractFile(pkg, './package.json')),
   );
 
   return pkgs.reduce(

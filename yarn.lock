@@ -686,7 +686,6 @@ __metadata:
     "@types/resolve": "npm:^1.17.1"
     "@types/semver": "npm:^7.3.12"
     "@types/shelljs": "npm:^0.8.11"
-    "@types/tar": "npm:^6.1.2"
     "@types/watchpack": "npm:^2.4.4"
     "@types/yargs": "npm:^17.0.20"
     "@types/yargs-parser": "npm:^21.0.0"
@@ -772,7 +771,7 @@ __metadata:
     source-map-loader: "npm:5.0.0"
     source-map-support: "npm:0.5.21"
     symbol-observable: "npm:4.0.0"
-    tar: "npm:^6.1.6"
+    tar: "npm:^7.0.0"
     terser: "npm:5.36.0"
     tree-kill: "npm:1.2.2"
     ts-node: "npm:^10.9.1"
@@ -5450,16 +5449,6 @@ __metadata:
   version: 1.0.12
   resolution: "@types/tapable@npm:1.0.12"
   checksum: 10c0/d6a080f5839b323eb96dd5b65a6c3161c1297d8c2433eb52437912d1c3df54e38fce12ce7a57650f6453d96942298bd0935436e2501d09e407b7f41634483131
-  languageName: node
-  linkType: hard
-
-"@types/tar@npm:^6.1.2":
-  version: 6.1.13
-  resolution: "@types/tar@npm:6.1.13"
-  dependencies:
-    "@types/node": "npm:*"
-    minipass: "npm:^4.0.0"
-  checksum: 10c0/98cc72d444fa622049e86e457a64d859c6effd7c7518d36e7b40b4ab1e7aa9e2412cc868cbef396650485dae07d50d98f662e8a53bb45f4a70eb6c61f80a63c7
   languageName: node
   linkType: hard
 
@@ -13208,13 +13197,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"minipass@npm:^4.0.0":
-  version: 4.2.8
-  resolution: "minipass@npm:4.2.8"
-  checksum: 10c0/4ea76b030d97079f4429d6e8a8affd90baf1b6a1898977c8ccce4701c5a2ba2792e033abc6709373f25c2c4d4d95440d9d5e9464b46b7b76ca44d2ce26d939ce
-  languageName: node
-  linkType: hard
-
 "minipass@npm:^5.0.0":
   version: 5.0.0
   resolution: "minipass@npm:5.0.0"
@@ -16983,7 +16965,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tar@npm:^6.1.11, tar@npm:^6.1.6, tar@npm:^6.2.1":
+"tar@npm:^6.1.11, tar@npm:^6.2.1":
   version: 6.2.1
   resolution: "tar@npm:6.2.1"
   dependencies:
@@ -16997,7 +16979,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tar@npm:^7.4.3":
+"tar@npm:^7.0.0, tar@npm:^7.4.3":
   version: 7.4.3
   resolution: "tar@npm:7.4.3"
   dependencies:
