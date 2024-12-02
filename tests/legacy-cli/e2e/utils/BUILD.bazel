@@ -10,7 +10,6 @@ ts_library(
     visibility = ["//visibility:public"],
     deps = [
         "@npm//@types/semver",
-        "@npm//@types/tar",
         "@npm//ansi-colors",
         "@npm//fast-glob",
         "@npm//npm",
