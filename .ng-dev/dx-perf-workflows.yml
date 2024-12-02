@@ -1,0 +1,14 @@
+workflows:
+  build-cli:
+    name: Build cli
+    prepare:
+      - bazel clean
+    workflow:
+      - bazel build //packages/angular/cli:npm_package
+  angular-build-integration:
+    name: Angular Build Integration
+    disabled: true
+    prepare:
+      - bazel clean
+    workflow:
+      - bazel test //packages/angular/build:integration_tests
