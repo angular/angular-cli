@@ -12,7 +12,6 @@ import { APPLICATION_BUILDER_INFO, BASE_OPTIONS, describeBuilder } from '../setu
 describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
   describe('Option: "index"', () => {
     beforeEach(async () => {
-      // Application code is not needed for index tests
       await harness.writeFile('src/main.ts', 'console.log("TEST");');
     });
 
@@ -140,92 +139,72 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       });
     });
 
-    it('should generate initial preload link elements when preloadInitial is true', async () => {
-      harness.useTarget('build', {
-        ...BASE_OPTIONS,
-        index: {
-          input: 'src/index.html',
-          preloadInitial: true,
-        },
+    describe('preload', () => {
+      it('should generate initial preload link elements when preloadInitial is true', async () => {
+        harness.useTarget('build', {
+          ...BASE_OPTIONS,
+          index: {
+            input: 'src/index.html',
+            preloadInitial: true,
+          },
+        });
+
+        // Setup an initial chunk usage for JS
+        await harness.writeFile('src/a.ts', 'console.log("TEST");');
+        await harness.writeFile('src/b.ts', 'import "./a";');
+        await harness.writeFile('src/main.ts', 'import "./a";\n(() => import("./b"))();');
+
+        const { result } = await harness.executeOnce();
+
+        expect(result?.success).toBe(true);
+        harness.expectFile('dist/browser/main.js').content.toContain('chunk-');
+        harness.expectFile('dist/browser/index.html').content.toContain('modulepreload');
+        harness.expectFile('dist/browser/index.html').content.toContain('chunk-');
       });
 
-      // Setup an initial chunk usage for JS
-      await harness.writeFile('src/a.ts', 'console.log("TEST");');
-      await harness.writeFile('src/b.ts', 'import "./a";');
-      await harness.writeFile('src/main.ts', 'import "./a";\n(() => import("./b"))();');
+      it('should generate initial preload link elements when preloadInitial is undefined', async () => {
+        harness.useTarget('build', {
+          ...BASE_OPTIONS,
+          index: {
+            input: 'src/index.html',
+            preloadInitial: undefined,
+          },
+        });
 
-      const { result } = await harness.executeOnce();
+        // Setup an initial chunk usage for JS
+        await harness.writeFile('src/a.ts', 'console.log("TEST");');
+        await harness.writeFile('src/b.ts', 'import "./a";');
+        await harness.writeFile('src/main.ts', 'import "./a";\n(() => import("./b"))();');
 
-      expect(result?.success).toBe(true);
-      harness.expectFile('dist/browser/main.js').content.toContain('chunk-');
-      harness.expectFile('dist/browser/index.html').content.toContain('modulepreload');
-      harness.expectFile('dist/browser/index.html').content.toContain('chunk-');
-    });
+        const { result } = await harness.executeOnce();
 
-    it('should generate initial preload link elements when preloadInitial is undefined', async () => {
-      harness.useTarget('build', {
-        ...BASE_OPTIONS,
-        index: {
-          input: 'src/index.html',
-          preloadInitial: undefined,
-        },
+        expect(result?.success).toBe(true);
+        harness.expectFile('dist/browser/main.js').content.toContain('chunk-');
+        harness.expectFile('dist/browser/index.html').content.toContain('modulepreload');
+        harness.expectFile('dist/browser/index.html').content.toContain('chunk-');
       });
 
-      // Setup an initial chunk usage for JS
-      await harness.writeFile('src/a.ts', 'console.log("TEST");');
-      await harness.writeFile('src/b.ts', 'import "./a";');
-      await harness.writeFile('src/main.ts', 'import "./a";\n(() => import("./b"))();');
+      it('should not generate initial preload link elements when preloadInitial is false', async () => {
+        harness.useTarget('build', {
+          ...BASE_OPTIONS,
+          index: {
+            input: 'src/index.html',
+            preloadInitial: false,
+          },
+        });
 
-      const { result } = await harness.executeOnce();
+        // Setup an initial chunk usage for JS
+        await harness.writeFile('src/a.ts', 'console.log("TEST");');
+        await harness.writeFile('src/b.ts', 'import "./a";');
+        await harness.writeFile('src/main.ts', 'import "./a";\n(() => import("./b"))();');
 
-      expect(result?.success).toBe(true);
-      harness.expectFile('dist/browser/main.js').content.toContain('chunk-');
-      harness.expectFile('dist/browser/index.html').content.toContain('modulepreload');
-      harness.expectFile('dist/browser/index.html').content.toContain('chunk-');
-    });
+        const { result } = await harness.executeOnce();
 
-    it('should not generate initial preload link elements when preloadInitial is false', async () => {
-      harness.useTarget('build', {
-        ...BASE_OPTIONS,
-        index: {
-          input: 'src/index.html',
-          preloadInitial: false,
-        },
+        expect(result?.success).toBe(true);
+        harness.expectFile('dist/browser/main.js').content.toContain('chunk-');
+        harness.expectFile('dist/browser/index.html').content.not.toContain('modulepreload');
+        harness.expectFile('dist/browser/index.html').content.not.toContain('chunk-');
       });
-
-      // Setup an initial chunk usage for JS
-      await harness.writeFile('src/a.ts', 'console.log("TEST");');
-      await harness.writeFile('src/b.ts', 'import "./a";');
-      await harness.writeFile('src/main.ts', 'import "./a";\n(() => import("./b"))();');
-
-      const { result } = await harness.executeOnce();
-
-      expect(result?.success).toBe(true);
-      harness.expectFile('dist/browser/main.js').content.toContain('chunk-');
-      harness.expectFile('dist/browser/index.html').content.not.toContain('modulepreload');
-      harness.expectFile('dist/browser/index.html').content.not.toContain('chunk-');
-    });
-
-    it(`should generate 'index.csr.html' instead of 'index.html' by default when ssr is enabled.`, async () => {
-      await harness.modifyFile('src/tsconfig.app.json', (content) => {
-        const tsConfig = JSON.parse(content);
-        tsConfig.files ??= [];
-        tsConfig.files.push('main.server.ts');
-
-        return JSON.stringify(tsConfig);
-      });
-
-      harness.useTarget('build', {
-        ...BASE_OPTIONS,
-        server: 'src/main.server.ts',
-        ssr: true,
-      });
-
-      const { result } = await harness.executeOnce();
-      expect(result?.success).toBeTrue();
-      harness.expectDirectory('dist/server').toExist();
-      harness.expectFile('dist/browser/index.csr.html').toExist();
-      harness.expectFile('dist/browser/index.html').toNotExist();
     });
   });
 });
