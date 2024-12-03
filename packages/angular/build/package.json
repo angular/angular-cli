@@ -39,7 +39,7 @@
     "picomatch": "4.0.2",
     "piscina": "4.7.0",
     "rollup": "4.28.0",
-    "sass": "1.81.0",
+    "sass": "1.81.1",
     "semver": "7.6.3",
     "vite": "6.0.2",
     "watchpack": "2.4.2"
