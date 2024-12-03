@@ -65,17 +65,8 @@ export interface FileInfo {
 export async function augmentIndexHtml(
   params: AugmentIndexHtmlOptions,
 ): Promise<{ content: string; warnings: string[]; errors: string[] }> {
-  const {
-    loadOutputFile,
-    files,
-    entrypoints,
-    sri,
-    deployUrl = '',
-    lang,
-    baseHref,
-    html,
-    imageDomains,
-  } = params;
+  const { loadOutputFile, files, entrypoints, sri, deployUrl, lang, baseHref, html, imageDomains } =
+    params;
 
   const warnings: string[] = [];
   const errors: string[] = [];
@@ -117,7 +108,7 @@ export async function augmentIndexHtml(
 
   let scriptTags: string[] = [];
   for (const [src, isModule] of scripts) {
-    const attrs = [`src="${deployUrl}${src}"`];
+    const attrs = [`src="${generateUrl(src, deployUrl)}"`];
 
     // This is also need for non entry-points as they may contain problematic code.
     if (isModule) {
@@ -141,7 +132,7 @@ export async function augmentIndexHtml(
   let headerLinkTags: string[] = [];
   let bodyLinkTags: string[] = [];
   for (const src of stylesheets) {
-    const attrs = [`rel="stylesheet"`, `href="${deployUrl}${src}"`];
+    const attrs = [`rel="stylesheet"`, `href="${generateUrl(src, deployUrl)}"`];
 
     if (crossOrigin !== 'none') {
       attrs.push(`crossorigin="${crossOrigin}"`);
@@ -157,7 +148,7 @@ export async function augmentIndexHtml(
 
   if (params.hints?.length) {
     for (const hint of params.hints) {
-      const attrs = [`rel="${hint.mode}"`, `href="${deployUrl}${hint.url}"`];
+      const attrs = [`rel="${hint.mode}"`, `href="${generateUrl(hint.url, deployUrl)}"`];
 
       if (hint.mode !== 'modulepreload' && crossOrigin !== 'none') {
         // Value is considered anonymous by the browser when not present or empty
@@ -301,6 +292,19 @@ function generateSriAttributes(content: string): string {
   const hash = createHash(algo).update(content, 'utf8').digest('base64');
 
   return `integrity="${algo}-${hash}"`;
+}
+
+function generateUrl(value: string, deployUrl: string | undefined): string {
+  if (!deployUrl) {
+    return value;
+  }
+
+  // Skip if root-relative, absolute or protocol relative url
+  if (/^((?:\w+:)?\/\/|data:|chrome:|\/)/.test(value)) {
+    return value;
+  }
+
+  return `${deployUrl}${value}`;
 }
 
 function updateAttribute(
