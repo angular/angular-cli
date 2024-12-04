@@ -65,7 +65,7 @@ __metadata:
     "@angular-devkit/core": "npm:0.0.0-PLACEHOLDER"
     "@angular/build": "npm:0.0.0-PLACEHOLDER"
     "@babel/core": "npm:7.26.0"
-    "@babel/generator": "npm:7.26.2"
+    "@babel/generator": "npm:7.26.3"
     "@babel/helper-annotate-as-pure": "npm:7.25.9"
     "@babel/helper-split-export-declaration": "npm:7.24.7"
     "@babel/plugin-transform-async-generator-functions": "npm:7.25.9"
@@ -97,21 +97,21 @@ __metadata:
     open: "npm:10.1.0"
     ora: "npm:5.4.1"
     picomatch: "npm:4.0.2"
-    piscina: "npm:4.7.0"
+    piscina: "npm:4.8.0"
     postcss: "npm:8.4.49"
     postcss-loader: "npm:8.1.1"
     resolve-url-loader: "npm:5.0.0"
     rxjs: "npm:7.8.1"
-    sass: "npm:1.81.1"
-    sass-loader: "npm:16.0.3"
+    sass: "npm:1.82.0"
+    sass-loader: "npm:16.0.4"
     semver: "npm:7.6.3"
     source-map-loader: "npm:5.0.0"
     source-map-support: "npm:0.5.21"
     terser: "npm:5.36.0"
     tree-kill: "npm:1.2.2"
     tslib: "npm:2.8.1"
-    undici: "npm:7.0.0"
-    webpack: "npm:5.96.1"
+    undici: "npm:7.1.0"
+    webpack: "npm:5.97.0"
     webpack-dev-middleware: "npm:7.4.2"
     webpack-dev-server: "npm:5.1.0"
     webpack-merge: "npm:6.0.1"
@@ -169,7 +169,7 @@ __metadata:
     "@angular-devkit/architect": "npm:0.0.0-EXPERIMENTAL-PLACEHOLDER"
     "@angular-devkit/core": "npm:0.0.0-PLACEHOLDER"
     rxjs: "npm:7.8.1"
-    webpack: "npm:5.96.1"
+    webpack: "npm:5.97.0"
   peerDependencies:
     webpack: ^5.30.0
     webpack-dev-server: ^5.0.2
@@ -391,9 +391,9 @@ __metadata:
     mrmime: "npm:2.0.0"
     parse5-html-rewriting-stream: "npm:7.0.0"
     picomatch: "npm:4.0.2"
-    piscina: "npm:4.7.0"
+    piscina: "npm:4.8.0"
     rollup: "npm:4.28.0"
-    sass: "npm:1.81.1"
+    sass: "npm:1.82.0"
     semver: "npm:7.6.3"
     vite: "npm:6.0.2"
     watchpack: "npm:2.4.2"
@@ -645,7 +645,7 @@ __metadata:
     "@angular/router": "npm:^19.1.0-next.0"
     "@angular/service-worker": "npm:^19.1.0-next.0"
     "@babel/core": "npm:7.26.0"
-    "@babel/generator": "npm:7.26.2"
+    "@babel/generator": "npm:7.26.3"
     "@babel/helper-annotate-as-pure": "npm:7.25.9"
     "@babel/helper-split-export-declaration": "npm:7.24.7"
     "@babel/plugin-syntax-import-attributes": "npm:7.26.0"
@@ -751,7 +751,7 @@ __metadata:
     pacote: "npm:20.0.0"
     parse5-html-rewriting-stream: "npm:7.0.0"
     picomatch: "npm:4.0.2"
-    piscina: "npm:4.7.0"
+    piscina: "npm:4.8.0"
     postcss: "npm:8.4.49"
     postcss-loader: "npm:8.1.1"
     prettier: "npm:^3.0.0"
@@ -763,8 +763,8 @@ __metadata:
     rollup-license-plugin: "npm:~3.0.1"
     rollup-plugin-sourcemaps: "npm:^0.6.0"
     rxjs: "npm:7.8.1"
-    sass: "npm:1.81.1"
-    sass-loader: "npm:16.0.3"
+    sass: "npm:1.82.0"
+    sass-loader: "npm:16.0.4"
     semver: "npm:7.6.3"
     shelljs: "npm:^0.8.5"
     source-map: "npm:0.7.4"
@@ -777,13 +777,13 @@ __metadata:
     ts-node: "npm:^10.9.1"
     tslib: "npm:2.8.1"
     typescript: "npm:5.7.2"
-    undici: "npm:7.0.0"
+    undici: "npm:7.1.0"
     unenv: "npm:^1.10.0"
     verdaccio: "npm:6.0.2"
     verdaccio-auth-memory: "npm:^10.0.0"
     vite: "npm:6.0.2"
     watchpack: "npm:2.4.2"
-    webpack: "npm:5.96.1"
+    webpack: "npm:5.97.0"
     webpack-dev-middleware: "npm:7.4.2"
     webpack-dev-server: "npm:5.1.0"
     webpack-merge: "npm:6.0.1"
@@ -1023,7 +1023,20 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/generator@npm:7.26.2, @babel/generator@npm:^7.25.9, @babel/generator@npm:^7.26.0":
+"@babel/generator@npm:7.26.3":
+  version: 7.26.3
+  resolution: "@babel/generator@npm:7.26.3"
+  dependencies:
+    "@babel/parser": "npm:^7.26.3"
+    "@babel/types": "npm:^7.26.3"
+    "@jridgewell/gen-mapping": "npm:^0.3.5"
+    "@jridgewell/trace-mapping": "npm:^0.3.25"
+    jsesc: "npm:^3.0.2"
+  checksum: 10c0/54f260558e3e4ec8942da3cde607c35349bb983c3a7c5121243f96893fba3e8cd62e1f1773b2051f936f8c8a10987b758d5c7d76dbf2784e95bb63ab4843fa00
+  languageName: node
+  linkType: hard
+
+"@babel/generator@npm:^7.25.9, @babel/generator@npm:^7.26.0":
   version: 7.26.2
   resolution: "@babel/generator@npm:7.26.2"
   dependencies:
@@ -1276,6 +1289,17 @@ __metadata:
   bin:
     parser: ./bin/babel-parser.js
   checksum: 10c0/751a743087b3a9172a7599f1421830d44c38f065ef781588d2bfb1c98f9b461719a226feb13c868d7a284783eee120c88ea522593118f2668f46ebfb1105c4d7
+  languageName: node
+  linkType: hard
+
+"@babel/parser@npm:^7.26.3":
+  version: 7.26.3
+  resolution: "@babel/parser@npm:7.26.3"
+  dependencies:
+    "@babel/types": "npm:^7.26.3"
+  bin:
+    parser: ./bin/babel-parser.js
+  checksum: 10c0/48f736374e61cfd10ddbf7b80678514ae1f16d0e88bc793d2b505d73d9b987ea786fc8c2f7ee8f8b8c467df062030eb07fd0eb2168f0f541ca1f542775852cad
   languageName: node
   linkType: hard
 
@@ -2145,6 +2169,16 @@ __metadata:
     "@babel/helper-string-parser": "npm:^7.25.9"
     "@babel/helper-validator-identifier": "npm:^7.25.9"
   checksum: 10c0/b694f41ad1597127e16024d766c33a641508aad037abd08d0d1f73af753e1119fa03b4a107d04b5f92cc19c095a594660547ae9bead1db2299212d644b0a5cb8
+  languageName: node
+  linkType: hard
+
+"@babel/types@npm:^7.26.3":
+  version: 7.26.3
+  resolution: "@babel/types@npm:7.26.3"
+  dependencies:
+    "@babel/helper-string-parser": "npm:^7.25.9"
+    "@babel/helper-validator-identifier": "npm:^7.25.9"
+  checksum: 10c0/966c5242c5e55c8704bf7a7418e7be2703a0afa4d19a8480999d5a4ef13d095dd60686615fe5983cb7593b4b06ba3a7de8d6ca501c1d78bdd233a10d90be787b
   languageName: node
   linkType: hard
 
@@ -3599,7 +3633,7 @@ __metadata:
     "@angular/compiler": "npm:19.1.0-next.0"
     "@angular/compiler-cli": "npm:19.1.0-next.0"
     typescript: "npm:5.7.2"
-    webpack: "npm:5.96.1"
+    webpack: "npm:5.97.0"
   peerDependencies:
     "@angular/compiler-cli": ^19.0.0 || ^19.1.0-next.0
     typescript: ">=5.5 <5.8"
@@ -6324,7 +6358,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@webassemblyjs/ast@npm:1.14.1, @webassemblyjs/ast@npm:^1.12.1":
+"@webassemblyjs/ast@npm:1.14.1, @webassemblyjs/ast@npm:^1.14.1":
   version: 1.14.1
   resolution: "@webassemblyjs/ast@npm:1.14.1"
   dependencies:
@@ -6410,7 +6444,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@webassemblyjs/wasm-edit@npm:^1.12.1":
+"@webassemblyjs/wasm-edit@npm:^1.14.1":
   version: 1.14.1
   resolution: "@webassemblyjs/wasm-edit@npm:1.14.1"
   dependencies:
@@ -6451,7 +6485,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@webassemblyjs/wasm-parser@npm:1.14.1, @webassemblyjs/wasm-parser@npm:^1.12.1":
+"@webassemblyjs/wasm-parser@npm:1.14.1, @webassemblyjs/wasm-parser@npm:^1.14.1":
   version: 1.14.1
   resolution: "@webassemblyjs/wasm-parser@npm:1.14.1"
   dependencies:
@@ -15030,6 +15064,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"piscina@npm:4.8.0":
+  version: 4.8.0
+  resolution: "piscina@npm:4.8.0"
+  dependencies:
+    "@napi-rs/nice": "npm:^1.0.1"
+  dependenciesMeta:
+    "@napi-rs/nice":
+      optional: true
+  checksum: 10c0/963ee0dc0862e936c88357b21b0b4fa32407ab21e9600756504411f368dcfae7478c8a19e13d0dd8afed56a8252a8e5967ee4413aa33dd436751b7ee2804531e
+  languageName: node
+  linkType: hard
+
 "pkg-dir@npm:^4.1.0":
   version: 4.2.0
   resolution: "pkg-dir@npm:4.2.0"
@@ -16332,9 +16378,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"sass-loader@npm:16.0.3":
-  version: 16.0.3
-  resolution: "sass-loader@npm:16.0.3"
+"sass-loader@npm:16.0.4":
+  version: 16.0.4
+  resolution: "sass-loader@npm:16.0.4"
   dependencies:
     neo-async: "npm:^2.6.2"
   peerDependencies:
@@ -16354,7 +16400,7 @@ __metadata:
       optional: true
     webpack:
       optional: true
-  checksum: 10c0/2dc188dd0d5276ed0251eee7f245848ccf9df6ec121227462403f322c17a3dbe100fb60d47968f078e585e4aced452eb7fa1a8e55b415d5de3151fa1bbf2d561
+  checksum: 10c0/d57c5fa35620e9022cfa3e5d49f3f9b3e54fb8b2fa9d021c10fe26c8c2f77103e038b6540eb20123a6f73aef23d2beb04033d3b7772588ca3f3c0ba2a4ee40ac
   languageName: node
   linkType: hard
 
@@ -16375,7 +16421,24 @@ __metadata:
   languageName: node
   linkType: hard
 
-"sass@npm:1.81.1, sass@npm:^1.81.0":
+"sass@npm:1.82.0":
+  version: 1.82.0
+  resolution: "sass@npm:1.82.0"
+  dependencies:
+    "@parcel/watcher": "npm:^2.4.1"
+    chokidar: "npm:^4.0.0"
+    immutable: "npm:^5.0.2"
+    source-map-js: "npm:>=0.6.2 <2.0.0"
+  dependenciesMeta:
+    "@parcel/watcher":
+      optional: true
+  bin:
+    sass: sass.js
+  checksum: 10c0/7f86fe6ade4f6018862c448ed69d5c52f485b0125c9dab24e63f679739a04cc7c56562d588e3cf16b5efb4d2c4d0530e62740e1cfd273e2e3707d04d11011736
+  languageName: node
+  linkType: hard
+
+"sass@npm:^1.81.0":
   version: 1.81.1
   resolution: "sass@npm:1.81.1"
   dependencies:
@@ -18151,10 +18214,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"undici@npm:7.0.0":
-  version: 7.0.0
-  resolution: "undici@npm:7.0.0"
-  checksum: 10c0/6d91d5ea5f858ac9ea8b8e28722167dcb4606dc8f3886b6768de94de96fb0817a7fec974ecbc51c1fec03131e2cc44df49a2ab966f5d2d191f32163776f36d91
+"undici@npm:7.1.0":
+  version: 7.1.0
+  resolution: "undici@npm:7.1.0"
+  checksum: 10c0/6fd0a63ca5e585128d67324e29cc49c903bf1752fd3b6f318627bb3765326df6f80c02f9c6fb2636ce3934706920c0b7fe4fe8ae19afe0a698f9ffbd7ef57548
   languageName: node
   linkType: hard
 
@@ -18853,15 +18916,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"webpack@npm:5.96.1":
-  version: 5.96.1
-  resolution: "webpack@npm:5.96.1"
+"webpack@npm:5.97.0":
+  version: 5.97.0
+  resolution: "webpack@npm:5.97.0"
   dependencies:
     "@types/eslint-scope": "npm:^3.7.7"
     "@types/estree": "npm:^1.0.6"
-    "@webassemblyjs/ast": "npm:^1.12.1"
-    "@webassemblyjs/wasm-edit": "npm:^1.12.1"
-    "@webassemblyjs/wasm-parser": "npm:^1.12.1"
+    "@webassemblyjs/ast": "npm:^1.14.1"
+    "@webassemblyjs/wasm-edit": "npm:^1.14.1"
+    "@webassemblyjs/wasm-parser": "npm:^1.14.1"
     acorn: "npm:^8.14.0"
     browserslist: "npm:^4.24.0"
     chrome-trace-event: "npm:^1.0.2"
@@ -18885,7 +18948,7 @@ __metadata:
       optional: true
   bin:
     webpack: bin/webpack.js
-  checksum: 10c0/ae6052fde9a546f79f14987b65823ba4024c6642a8489339ecfee7a351dff93325842aad453295bbdc6b65fb1690e4ef07529db63aa84ece55c7869e991a0039
+  checksum: 10c0/a8714d42defbf52382b61c157f68e161a16d0edf228d8d9abaa7a165f3ee0ac7386a08d28d4dcf8d6740ea5bda0c4d4abfeeb838df029e636c1c28bb2454ac56
   languageName: node
   linkType: hard
 
