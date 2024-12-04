@@ -1,4 +1,5 @@
 import assert from 'node:assert';
+import { setTimeout } from 'node:timers/promises';
 import { ng, waitForAnyProcessOutputToMatch } from '../../utils/process';
 import { installWorkspacePackages, uninstallPackage } from '../../utils/packages';
 import { ngServe, useSha } from '../../utils/project';
@@ -24,18 +25,17 @@ export default async function () {
   const port = await ngServe();
   await validateResponse('/', /Hello,/);
 
+  const appConfigContentsUpdated = `
+    import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
+    ${(await readFile('src/app/app.config.ts')).replace('provideRouter(routes),', 'provideAnimationsAsync(), provideRouter(routes),')}
+  `;
+
   await Promise.all([
     waitForAnyProcessOutputToMatch(
       /new dependencies optimized: @angular\/platform-browser\/animations\/async/,
       6000,
     ),
-    writeFile(
-      'src/app/app.config.ts',
-      `
-        import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
-        ${(await readFile('src/app/app.config.ts')).replace('provideRouter(routes),', 'provideAnimationsAsync(), provideRouter(routes),')}
-      `,
-    ),
+    setTimeout(200).then(() => writeFile('src/app/app.config.ts', appConfigContentsUpdated)),
   ]);
 
   // Verify the app still works.
