@@ -1,3 +1,39 @@
+<a name="19.0.3"></a>
+
+# 19.0.3 (2024-12-04)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                                           |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------------------- |
+| [4e82ca180](https://github.com/angular/angular-cli/commit/4e82ca180b330199b3dffadd9d590c8245dc7785) | fix  | correctly select package versions in descending order during `ng add` |
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                                                                              |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------------------------------------------------- |
+| [28a51cc5e](https://github.com/angular/angular-cli/commit/28a51cc5e4a08f9e9627a1ec160ce462d18b88d2) | fix  | add required type to `CanDeactivate` guard ([#29004](https://github.com/angular/angular-cli/pull/29004)) |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                           |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------- |
+| [f26e1b462](https://github.com/angular/angular-cli/commit/f26e1b462ab012b0863f0889bcd60f5e07ca6fd2) | fix  | add timeout to route extraction                       |
+| [ab4e77c75](https://github.com/angular/angular-cli/commit/ab4e77c75524d42485ac124f4786ab54bc6c404a) | fix  | allow .json file replacements with application builds |
+| [06690d87e](https://github.com/angular/angular-cli/commit/06690d87eb590853eed6166857c9c1559d38d260) | fix  | apply define option to JavaScript from scripts option |
+| [775e6f780](https://github.com/angular/angular-cli/commit/775e6f7808e6edb89d29b72ee5bdc6d2b26cb30e) | fix  | avoid deploy URL usage on absolute preload links      |
+| [21f21eda3](https://github.com/angular/angular-cli/commit/21f21eda39c62e284c6cbee0d0ebfe271f605239) | fix  | ensure correct handling of `index.output` for SSR     |
+
+### @angular/ssr
+
+| Commit                                                                                              | Type | Description                                         |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------- |
+| [75cf47e71](https://github.com/angular/angular-cli/commit/75cf47e71b0584e55750d5350932494f689a7e96) | fix  | apply HTML transformation to CSR responses          |
+| [5880a0230](https://github.com/angular/angular-cli/commit/5880a02306d9f81f030fcdc91fc6aaeb1986e652) | fix  | correctly handle serving of prerendered i18n pages  |
+| [277b8a378](https://github.com/angular/angular-cli/commit/277b8a3786d40cb8477287dcb3ef191ec8939447) | fix  | ensure compatibility for `Http2ServerResponse` type |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="19.0.2"></a>
 
 # 19.0.2 (2024-11-25)
