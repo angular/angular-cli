@@ -47,6 +47,11 @@ export class AngularAppEngine {
   private readonly manifest = getAngularAppEngineManifest();
 
   /**
+   * The number of entry points available in the server application's manifest.
+   */
+  private readonly entryPointsCount = Object.keys(this.manifest.entryPoints).length;
+
+  /**
    * A cache that holds entry points, keyed by their potential locale string.
    */
   private readonly entryPointsCache = new Map<string, Promise<EntryPointExports>>();
@@ -113,7 +118,7 @@ export class AngularAppEngine {
     }
 
     const { entryPoints } = this.manifest;
-    const entryPoint = entryPoints.get(potentialLocale);
+    const entryPoint = entryPoints[potentialLocale];
     if (!entryPoint) {
       return undefined;
     }
@@ -136,8 +141,8 @@ export class AngularAppEngine {
    * @returns A promise that resolves to the entry point exports or `undefined` if not found.
    */
   private getEntryPointExportsForUrl(url: URL): Promise<EntryPointExports> | undefined {
-    const { entryPoints, basePath } = this.manifest;
-    if (entryPoints.size === 1) {
+    const { basePath } = this.manifest;
+    if (this.entryPointsCount === 1) {
       return this.getEntryPointExports('');
     }
 
