@@ -139,7 +139,7 @@ describe('Browser Builder lazy modules', () => {
     host.replaceInFile('src/tsconfig.app.json', '"main.ts"', `"main.ts","lazy-module.ts"`);
 
     const { files } = await browserBuild(architect, host, target);
-    expect(files['common.js']).toBeDefined();
+    expect(files['src_lazy-module_ts.js']).toBeDefined();
   });
 
   it(`supports making a common bundle for shared lazy modules`, async () => {
