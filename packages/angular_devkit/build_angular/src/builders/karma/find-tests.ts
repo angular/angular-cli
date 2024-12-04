@@ -26,6 +26,39 @@ export async function findTests(
   return [...new Set(files.flat())];
 }
 
+interface TestEntrypointsOptions {
+  projectSourceRoot: string;
+  workspaceRoot: string;
+}
+
+/** Generate unique bundle names for a set of test files. */
+export function getTestEntrypoints(
+  testFiles: string[],
+  { projectSourceRoot, workspaceRoot }: TestEntrypointsOptions,
+): Map<string, string> {
+  const seen = new Set<string>();
+
+  return new Map(
+    Array.from(testFiles, (testFile) => {
+      const relativePath = removeRoots(testFile, [projectSourceRoot, workspaceRoot])
+        // Strip leading dots and path separators.
+        .replace(/^[./\\]+/, '')
+        // Replace any path separators with dashes.
+        .replace(/[/\\]/g, '-');
+      const baseName = `spec-${basename(relativePath, extname(relativePath))}`;
+      let uniqueName = baseName;
+      let suffix = 2;
+      while (seen.has(uniqueName)) {
+        uniqueName = `${baseName}-${suffix}`.replace(/([^\w](?:spec|test))-([\d]+)$/, '-$2$1');
+        ++suffix;
+      }
+      seen.add(uniqueName);
+
+      return [uniqueName, testFile];
+    }),
+  );
+}
+
 const normalizePath = (path: string): string => path.replace(/\\/g, '/');
 
 const removeLeadingSlash = (pattern: string): string => {
@@ -43,6 +76,16 @@ const removeRelativeRoot = (path: string, root: string): string => {
 
   return path;
 };
+
+function removeRoots(path: string, roots: string[]): string {
+  for (const root of roots) {
+    if (path.startsWith(root)) {
+      return path.substring(root.length);
+    }
+  }
+
+  return basename(path);
+}
 
 async function findMatchingTests(
   pattern: string,
