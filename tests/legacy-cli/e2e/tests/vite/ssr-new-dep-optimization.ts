@@ -1,10 +1,14 @@
 import assert from 'node:assert';
-import { setTimeout } from 'node:timers/promises';
-import { ng, waitForAnyProcessOutputToMatch } from '../../utils/process';
+import {
+  execAndWaitForOutputToMatch,
+  ng,
+  waitForAnyProcessOutputToMatch,
+} from '../../utils/process';
 import { installWorkspacePackages, uninstallPackage } from '../../utils/packages';
-import { ngServe, useSha } from '../../utils/project';
+import { useSha } from '../../utils/project';
 import { getGlobalVariable } from '../../utils/env';
 import { readFile, writeFile } from '../../utils/fs';
+import { findFreePort } from '../../utils/network';
 
 export default async function () {
   assert(
@@ -22,20 +26,27 @@ export default async function () {
   await useSha();
   await installWorkspacePackages();
 
-  const port = await ngServe();
+  const port = await findFreePort();
+  await execAndWaitForOutputToMatch(
+    'ng',
+    ['serve', '--port', port.toString()],
+    /Application bundle generation complete/,
+    { CI: '0', NO_COLOR: 'true' },
+  );
   await validateResponse('/', /Hello,/);
-
-  const appConfigContentsUpdated = `
-    import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
-    ${(await readFile('src/app/app.config.ts')).replace('provideRouter(routes),', 'provideAnimationsAsync(), provideRouter(routes),')}
-  `;
 
   await Promise.all([
     waitForAnyProcessOutputToMatch(
       /new dependencies optimized: @angular\/platform-browser\/animations\/async/,
       6000,
     ),
-    setTimeout(200).then(() => writeFile('src/app/app.config.ts', appConfigContentsUpdated)),
+    writeFile(
+      'src/app/app.config.ts',
+      `
+      import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
+      ${(await readFile('src/app/app.config.ts')).replace('provideRouter(routes),', 'provideAnimationsAsync(), provideRouter(routes),')}
+    `,
+    ),
   ]);
 
   // Verify the app still works.

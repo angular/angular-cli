@@ -19,7 +19,7 @@ export default async function () {
     ['serve', '--port', `${port}`],
     /bundle generation complete/,
     // Use CI:0 to force caching
-    { DEBUG: 'vite:deps', CI: '0' },
+    { DEBUG: 'vite:deps', CI: '0', NO_COLOR: 'true' },
   );
 
   // Wait for vite to write to FS and stablize.
@@ -33,7 +33,6 @@ export default async function () {
   // Terminate the dev-server
   await killAllProcesses();
 
-  // The Node.js specific module should not be found
   await execAndWaitForOutputToMatch(
     'ng',
     ['serve', '--port=0'],
