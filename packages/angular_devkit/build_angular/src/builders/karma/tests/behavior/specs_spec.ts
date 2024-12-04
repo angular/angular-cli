@@ -24,7 +24,9 @@ describeKarmaBuilder(execute, KARMA_BUILDER_INFO, (harness, setupTarget, isApp) 
 
       // src/app/app.component.spec.ts conflicts with this one:
       await harness.writeFiles({
-        [`src/app/a/${collidingBasename}`]: `/** Success! */`,
+        [`src/app/a/foo-bar/${collidingBasename}`]: `/** Success! */`,
+        [`src/app/a-foo/bar/${collidingBasename}`]: `/** Success! */`,
+        [`src/app/a-foo-bar/${collidingBasename}`]: `/** Success! */`,
         [`src/app/b/${collidingBasename}`]: `/** Success! */`,
       });
 
@@ -36,7 +38,9 @@ describeKarmaBuilder(execute, KARMA_BUILDER_INFO, (harness, setupTarget, isApp) 
         const bundleLog = logs.find((log) =>
           log.message.includes('Application bundle generation complete.'),
         );
-        expect(bundleLog?.message).toContain('spec-app-a-collision.spec.js');
+        expect(bundleLog?.message).toContain('spec-app-a-foo-bar-collision.spec.js');
+        expect(bundleLog?.message).toContain('spec-app-a-foo-bar-collision-2.spec.js');
+        expect(bundleLog?.message).toContain('spec-app-a-foo-bar-collision-3.spec.js');
         expect(bundleLog?.message).toContain('spec-app-b-collision.spec.js');
       }
     });

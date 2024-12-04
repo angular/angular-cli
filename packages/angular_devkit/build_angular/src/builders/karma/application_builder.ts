@@ -26,7 +26,7 @@ import { Observable, Subscriber, catchError, defaultIfEmpty, from, of, switchMap
 import { Configuration } from 'webpack';
 import { ExecutionTransformer } from '../../transforms';
 import { OutputHashing } from '../browser-esbuild/schema';
-import { findTests } from './find-tests';
+import { findTests, getTestEntrypoints } from './find-tests';
 import { Schema as KarmaBuilderOptions } from './schema';
 
 interface BuildOptions extends ApplicationBuilderInternalOptions {
@@ -268,28 +268,7 @@ async function collectEntrypoints(
     projectSourceRoot,
   );
 
-  const seen = new Set<string>();
-
-  return new Map(
-    Array.from(testFiles, (testFile) => {
-      const relativePath = path
-        .relative(
-          testFile.startsWith(projectSourceRoot) ? projectSourceRoot : context.workspaceRoot,
-          testFile,
-        )
-        .replace(/^[./]+/, '_')
-        .replace(/\//g, '-');
-      let uniqueName = `spec-${path.basename(relativePath, path.extname(relativePath))}`;
-      let suffix = 2;
-      while (seen.has(uniqueName)) {
-        uniqueName = `${relativePath}-${suffix}`;
-        ++suffix;
-      }
-      seen.add(uniqueName);
-
-      return [uniqueName, testFile];
-    }),
-  );
+  return getTestEntrypoints(testFiles, { projectSourceRoot, workspaceRoot: context.workspaceRoot });
 }
 
 async function initializeApplication(
