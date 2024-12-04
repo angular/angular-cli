@@ -1,3 +1,11 @@
+<a name="19.1.0-next.0"></a>
+
+# 19.1.0-next.0 (2024-12-04)
+
+Added support for TypeScript 5.7
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="19.0.3"></a>
 
 # 19.0.3 (2024-12-04)
