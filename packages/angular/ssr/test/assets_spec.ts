@@ -15,20 +15,18 @@ describe('ServerAsset', () => {
     assetManager = new ServerAssets({
       baseHref: '/',
       bootstrap: undefined as never,
-      assets: new Map(
-        Object.entries({
-          'index.server.html': {
-            text: async () => '<html>Index</html>',
-            size: 18,
-            hash: 'f799132d0a09e0fef93c68a12e443527700eb59e6f67fcb7854c3a60ff082fde',
-          },
-          'index.other.html': {
-            text: async () => '<html>Other</html>',
-            size: 18,
-            hash: '4a455a99366921d396f5d51c7253c4678764f5e9487f2c27baaa0f33553c8ce3',
-          },
-        }),
-      ),
+      assets: {
+        'index.server.html': {
+          text: async () => '<html>Index</html>',
+          size: 18,
+          hash: 'f799132d0a09e0fef93c68a12e443527700eb59e6f67fcb7854c3a60ff082fde',
+        },
+        'index.other.html': {
+          text: async () => '<html>Other</html>',
+          size: 18,
+          hash: '4a455a99366921d396f5d51c7253c4678764f5e9487f2c27baaa0f33553c8ce3',
+        },
+      },
     });
   });
 

@@ -55,7 +55,7 @@ export function generateAngularServerAppEngineManifest(
   i18nOptions: NormalizedApplicationBuildOptions['i18nOptions'],
   baseHref: string | undefined,
 ): string {
-  const entryPointsContent: string[] = [];
+  const entryPoints: Record<string, string> = {};
 
   if (i18nOptions.shouldInline) {
     for (const locale of i18nOptions.inlineLocales) {
@@ -69,18 +69,22 @@ export function generateAngularServerAppEngineManifest(
       const end = localeWithBaseHref[localeWithBaseHref.length - 1] === '/' ? -1 : undefined;
       localeWithBaseHref = localeWithBaseHref.slice(start, end);
 
-      entryPointsContent.push(`['${localeWithBaseHref}', () => import('${importPath}')]`);
+      entryPoints[localeWithBaseHref] = `() => import('${importPath}')`;
     }
   } else {
-    entryPointsContent.push(`['', () => import('./${MAIN_SERVER_OUTPUT_FILENAME}')]`);
+    entryPoints[''] = `() => import('./${MAIN_SERVER_OUTPUT_FILENAME}')`;
   }
 
   const manifestContent = `
 export default {
   basePath: '${baseHref ?? '/'}',
-  entryPoints: new Map([${entryPointsContent.join(', \n')}]),
+  entryPoints: {
+    ${Object.entries(entryPoints)
+      .map(([key, value]) => `'${key}': ${value}`)
+      .join(',\n    ')}
+  },
 };
-  `;
+`;
 
   return manifestContent;
 }
@@ -122,7 +126,7 @@ export function generateAngularServerAppManifest(
   serverAssetsChunks: BuildOutputFile[];
 } {
   const serverAssetsChunks: BuildOutputFile[] = [];
-  const serverAssetsContent: string[] = [];
+  const serverAssets: Record<string, string> = {};
   for (const file of [...additionalHtmlOutputFiles.values(), ...outputFiles]) {
     const extension = extname(file.path);
     if (extension === '.html' || (inlineCriticalCss && extension === '.css')) {
@@ -135,9 +139,8 @@ export function generateAngularServerAppManifest(
         ),
       );
 
-      serverAssetsContent.push(
-        `['${file.path}', {size: ${file.size}, hash: '${file.hash}', text: () => import('./${jsChunkFilePath}').then(m => m.default)}]`,
-      );
+      serverAssets[file.path] =
+        `{size: ${file.size}, hash: '${file.hash}', text: () => import('./${jsChunkFilePath}').then(m => m.default)}`;
     }
   }
 
@@ -146,9 +149,13 @@ export default {
   bootstrap: () => import('./main.server.mjs').then(m => m.default),
   inlineCriticalCss: ${inlineCriticalCss},
   baseHref: '${baseHref}',
-  locale: ${locale !== undefined ? `'${locale}'` : undefined},
+  locale: ${JSON.stringify(locale)},
   routes: ${JSON.stringify(routes, undefined, 2)},
-  assets: new Map([\n${serverAssetsContent.join(', \n')}\n]),
+  assets: {
+    ${Object.entries(serverAssets)
+      .map(([key, value]) => `'${key}': ${value}`)
+      .join(',\n    ')}
+  },
 };
 `;
 

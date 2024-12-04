@@ -32,40 +32,38 @@ export function setAngularAppTestingManifest(
   setAngularAppManifest({
     inlineCriticalCss: false,
     baseHref,
-    assets: new Map(
-      Object.entries({
-        ...additionalServerAssets,
-        'index.server.html': {
-          size: 25,
-          hash: 'f799132d0a09e0fef93c68a12e443527700eb59e6f67fcb7854c3a60ff082fde',
-          text: async () => `<html>
-            <head>
-              <title>SSR page</title>
-              <base href="${baseHref}" />
-            </head>
-            <body>
-              <app-root></app-root>
-            </body>
-          </html>
-        `,
-        },
-        'index.csr.html': {
-          size: 25,
-          hash: 'f799132d0a09e0fef93c68a12e443527700eb59e6f67fcb7854c3a60ff082fde',
-          text: async () =>
-            `<html>
-            <head>
-              <title>CSR page</title>
-              <base href="${baseHref}" />
-            </head>
-            <body>
-              <app-root></app-root>
-            </body>
-          </html>
-        `,
-        },
-      }),
-    ),
+    assets: {
+      ...additionalServerAssets,
+      'index.server.html': {
+        size: 25,
+        hash: 'f799132d0a09e0fef93c68a12e443527700eb59e6f67fcb7854c3a60ff082fde',
+        text: async () => `<html>
+          <head>
+            <title>SSR page</title>
+            <base href="${baseHref}" />
+          </head>
+          <body>
+            <app-root></app-root>
+          </body>
+        </html>
+      `,
+      },
+      'index.csr.html': {
+        size: 25,
+        hash: 'f799132d0a09e0fef93c68a12e443527700eb59e6f67fcb7854c3a60ff082fde',
+        text: async () =>
+          `<html>
+          <head>
+            <title>CSR page</title>
+            <base href="${baseHref}" />
+          </head>
+          <body>
+            <app-root></app-root>
+          </body>
+        </html>
+      `,
+      },
+    },
     bootstrap: async () => () => {
       @Component({
         standalone: true,

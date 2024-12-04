@@ -10,7 +10,7 @@ import type { SerializableRouteTreeNode } from './routes/route-tree';
 import { AngularBootstrap } from './utils/ng';
 
 /**
- * Represents of a server asset stored in the manifest.
+ * Represents a server asset stored in the manifest.
  */
 export interface ServerAsset {
   /**
@@ -53,12 +53,12 @@ export interface EntryPointExports {
  */
 export interface AngularAppEngineManifest {
   /**
-   * A map of entry points for the server application.
-   * Each entry in the map consists of:
+   * A readonly record of entry points for the server application.
+   * Each entry consists of:
    * - `key`: The base href for the entry point.
    * - `value`: A function that returns a promise resolving to an object of type `EntryPointExports`.
    */
-  readonly entryPoints: ReadonlyMap<string, () => Promise<EntryPointExports>>;
+  readonly entryPoints: Readonly<Record<string, (() => Promise<EntryPointExports>) | undefined>>;
 
   /**
    * The base path for the server application.
@@ -78,12 +78,12 @@ export interface AngularAppManifest {
   readonly baseHref: string;
 
   /**
-   * A map of assets required by the server application.
-   * Each entry in the map consists of:
+   * A readonly record of assets required by the server application.
+   * Each entry consists of:
    * - `key`: The path of the asset.
-   * - `value`: A function returning a promise that resolves to the file contents of the asset.
+   * - `value`: An object of type `ServerAsset`.
    */
-  readonly assets: ReadonlyMap<string, ServerAsset>;
+  readonly assets: Readonly<Record<string, ServerAsset | undefined>>;
 
   /**
    * The bootstrap mechanism for the server application.

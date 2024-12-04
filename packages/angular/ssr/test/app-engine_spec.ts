@@ -18,6 +18,57 @@ import { setAngularAppEngineManifest } from '../src/manifest';
 import { RenderMode } from '../src/routes/route-config';
 import { setAngularAppTestingManifest } from './testing-utils';
 
+function createEntryPoint(locale: string) {
+  return async () => {
+    @Component({
+      standalone: true,
+      selector: `app-ssr-${locale}`,
+      template: `SSR works ${locale.toUpperCase()}`,
+    })
+    class SSRComponent {}
+
+    @Component({
+      standalone: true,
+      selector: `app-ssg-${locale}`,
+      template: `SSG works ${locale.toUpperCase()}`,
+    })
+    class SSGComponent {}
+
+    setAngularAppTestingManifest(
+      [
+        { path: 'ssg', component: SSGComponent },
+        { path: 'ssr', component: SSRComponent },
+      ],
+      [
+        { path: 'ssg', renderMode: RenderMode.Prerender },
+        { path: '**', renderMode: RenderMode.Server },
+      ],
+      '/' + locale,
+      {
+        'ssg/index.html': {
+          size: 25,
+          hash: 'f799132d0a09e0fef93c68a12e443527700eb59e6f67fcb7854c3a60ff082fde',
+          text: async () => `<html>
+            <head>
+              <title>SSG page</title>
+              <base href="/${locale}" />
+            </head>
+            <body>
+              SSG works ${locale.toUpperCase()}
+            </body>
+          </html>
+        `,
+        },
+      },
+    );
+
+    return {
+      ɵgetOrCreateAngularServerApp: getOrCreateAngularServerApp,
+      ɵdestroyAngularServerApp: destroyAngularServerApp,
+    };
+  };
+}
+
 describe('AngularAppEngine', () => {
   let appEngine: AngularAppEngine;
 
@@ -28,59 +79,10 @@ describe('AngularAppEngine', () => {
       setAngularAppEngineManifest({
         // Note: Although we are testing only one locale, we need to configure two or more
         // to ensure that we test a different code path.
-        entryPoints: new Map(
-          ['it', 'en'].map((locale) => [
-            locale,
-            async () => {
-              @Component({
-                standalone: true,
-                selector: `app-ssr-${locale}`,
-                template: `SSR works ${locale.toUpperCase()}`,
-              })
-              class SSRComponent {}
-
-              @Component({
-                standalone: true,
-                selector: `app-ssg-${locale}`,
-                template: `SSG works ${locale.toUpperCase()}`,
-              })
-              class SSGComponent {}
-
-              setAngularAppTestingManifest(
-                [
-                  { path: 'ssg', component: SSGComponent },
-                  { path: 'ssr', component: SSRComponent },
-                ],
-                [
-                  { path: 'ssg', renderMode: RenderMode.Prerender },
-                  { path: '**', renderMode: RenderMode.Server },
-                ],
-                '/' + locale,
-                {
-                  'ssg/index.html': {
-                    size: 25,
-                    hash: 'f799132d0a09e0fef93c68a12e443527700eb59e6f67fcb7854c3a60ff082fde',
-                    text: async () => `<html>
-                      <head>
-                        <title>SSG page</title>
-                        <base href="/${locale}" />
-                      </head>
-                      <body>
-                        SSG works ${locale.toUpperCase()}
-                      </body>
-                    </html>
-                  `,
-                  },
-                },
-              );
-
-              return {
-                ɵgetOrCreateAngularServerApp: getOrCreateAngularServerApp,
-                ɵdestroyAngularServerApp: destroyAngularServerApp,
-              };
-            },
-          ]),
-        ),
+        entryPoints: {
+          it: createEntryPoint('it'),
+          en: createEntryPoint('en'),
+        },
         basePath: '',
       });
 
@@ -143,29 +145,26 @@ describe('AngularAppEngine', () => {
       destroyAngularServerApp();
 
       setAngularAppEngineManifest({
-        entryPoints: new Map([
-          [
-            '',
-            async () => {
-              @Component({
-                standalone: true,
-                selector: 'app-home',
-                template: `Home works`,
-              })
-              class HomeComponent {}
+        entryPoints: {
+          '': async () => {
+            @Component({
+              standalone: true,
+              selector: 'app-home',
+              template: `Home works`,
+            })
+            class HomeComponent {}
 
-              setAngularAppTestingManifest(
-                [{ path: 'home', component: HomeComponent }],
-                [{ path: '**', renderMode: RenderMode.Server }],
-              );
+            setAngularAppTestingManifest(
+              [{ path: 'home', component: HomeComponent }],
+              [{ path: '**', renderMode: RenderMode.Server }],
+            );
 
-              return {
-                ɵgetOrCreateAngularServerApp: getOrCreateAngularServerApp,
-                ɵdestroyAngularServerApp: destroyAngularServerApp,
-              };
-            },
-          ],
-        ]),
+            return {
+              ɵgetOrCreateAngularServerApp: getOrCreateAngularServerApp,
+              ɵdestroyAngularServerApp: destroyAngularServerApp,
+            };
+          },
+        },
         basePath: '',
       });
 
