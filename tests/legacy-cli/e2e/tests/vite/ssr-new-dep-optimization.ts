@@ -1,10 +1,15 @@
 import assert from 'node:assert';
 import { setTimeout } from 'node:timers/promises';
-import { ng, waitForAnyProcessOutputToMatch } from '../../utils/process';
+import {
+  execAndWaitForOutputToMatch,
+  ng,
+  waitForAnyProcessOutputToMatch,
+} from '../../utils/process';
 import { installWorkspacePackages, uninstallPackage } from '../../utils/packages';
-import { ngServe, useSha } from '../../utils/project';
+import { useSha } from '../../utils/project';
 import { getGlobalVariable } from '../../utils/env';
 import { readFile, writeFile } from '../../utils/fs';
+import { findFreePort } from '../../utils/network';
 
 export default async function () {
   assert(
@@ -22,7 +27,14 @@ export default async function () {
   await useSha();
   await installWorkspacePackages();
 
-  const port = await ngServe();
+  // The Node.js specific module should not be found
+  const port = await findFreePort();
+  await execAndWaitForOutputToMatch(
+    'ng',
+    ['serve', '--port', port.toString()],
+    /Application bundle generation complete/,
+    { CI: '0', NO_COLOR: 'true' },
+  );
   await validateResponse('/', /Hello,/);
 
   const appConfigContentsUpdated = `

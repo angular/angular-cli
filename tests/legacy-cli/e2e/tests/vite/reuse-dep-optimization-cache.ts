@@ -39,6 +39,6 @@ export default async function () {
     ['serve', '--port=0'],
     /Hash is consistent\. Skipping/,
     // Use CI:0 to force caching
-    { DEBUG: 'vite:deps', CI: '0' },
+    { DEBUG: 'vite:deps', CI: '0', NO_COLOR: 'true' },
   );
 }
