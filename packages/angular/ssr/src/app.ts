@@ -25,12 +25,7 @@ import { InlineCriticalCssProcessor } from './utils/inline-critical-css';
 import { LRUCache } from './utils/lru-cache';
 import { AngularBootstrap, renderAngular } from './utils/ng';
 import { promiseWithAbort } from './utils/promise';
-import {
-  buildPathWithParams,
-  joinUrlParts,
-  stripIndexHtmlFromURL,
-  stripLeadingSlash,
-} from './utils/url';
+import { buildPathWithParams, joinUrlParts, stripLeadingSlash } from './utils/url';
 
 /**
  * Maximum number of critical CSS entries the cache can store.
@@ -256,6 +251,7 @@ export class AngularServerApp {
       return null;
     }
 
+    const url = new URL(request.url);
     const platformProviders: StaticProvider[] = [];
 
     // Initialize the response with status and headers if available.
@@ -285,7 +281,10 @@ export class AngularServerApp {
       );
     } else if (renderMode === RenderMode.Client) {
       // Serve the client-side rendered version if the route is configured for CSR.
-      return new Response(await this.assets.getServerAsset('index.csr.html').text(), responseInit);
+      let html = await this.assets.getServerAsset('index.csr.html').text();
+      html = await this.runTransformsOnHtml(html, url);
+
+      return new Response(html, responseInit);
     }
 
     const {
@@ -301,16 +300,9 @@ export class AngularServerApp {
       });
     }
 
-    const url = new URL(request.url);
-    let html = await assets.getIndexServerHtml().text();
-
-    // Skip extra microtask if there are no pre hooks.
-    if (hooks.has('html:transform:pre')) {
-      html = await hooks.run('html:transform:pre', { html, url });
-    }
-
     this.boostrap ??= await bootstrap();
-
+    let html = await assets.getIndexServerHtml().text();
+    html = await this.runTransformsOnHtml(html, url);
     html = await renderAngular(
       html,
       this.boostrap,
@@ -380,6 +372,21 @@ export class AngularServerApp {
     }
 
     return stripLeadingSlash(assetPath);
+  }
+
+  /**
+   * Runs the registered transform hooks on the given HTML content.
+   *
+   * @param html - The raw HTML content to be transformed.
+   * @param url - The URL associated with the HTML content, used for context during transformations.
+   * @returns A promise that resolves to the transformed HTML string.
+   */
+  private async runTransformsOnHtml(html: string, url: URL): Promise<string> {
+    if (this.hooks.has('html:transform:pre')) {
+      html = await this.hooks.run('html:transform:pre', { html, url });
+    }
+
+    return html;
   }
 }
 
