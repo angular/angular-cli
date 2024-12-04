@@ -53,7 +53,7 @@ export class JitCompilation extends AngularCompilation {
       compilerOptionsTransformer?.(originalCompilerOptions) ?? originalCompilerOptions;
 
     // Create Angular compiler host
-    const host = createAngularCompilerHost(ts, compilerOptions, hostOptions);
+    const host = createAngularCompilerHost(ts, compilerOptions, hostOptions, undefined);
 
     // Create the TypeScript Program
     const typeScriptProgram = profileSync('TS_CREATE_PROGRAM', () =>

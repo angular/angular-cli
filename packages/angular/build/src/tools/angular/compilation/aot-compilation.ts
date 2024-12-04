@@ -74,25 +74,39 @@ export class AotCompilation extends AngularCompilation {
       hostOptions.externalStylesheets ??= new Map();
     }
 
+    // Reuse the package.json cache from the previous compilation
+    const packageJsonCache = this.#state?.compilerHost
+      .getModuleResolutionCache?.()
+      ?.getPackageJsonInfoCache();
+
     const useHmr =
       compilerOptions['_enableHmr'] &&
       hostOptions.modifiedFiles &&
       hostOptions.modifiedFiles.size <= HMR_MODIFIED_FILE_LIMIT;
 
-    // Collect stale source files for HMR analysis of inline component resources
     let staleSourceFiles;
-    if (useHmr && hostOptions.modifiedFiles && this.#state) {
+    let clearPackageJsonCache = false;
+    if (hostOptions.modifiedFiles && this.#state) {
       for (const modifiedFile of hostOptions.modifiedFiles) {
-        const sourceFile = this.#state.typeScriptProgram.getSourceFile(modifiedFile);
-        if (sourceFile) {
-          staleSourceFiles ??= new Map<string, ts.SourceFile>();
-          staleSourceFiles.set(modifiedFile, sourceFile);
+        // Clear package.json cache if a node modules file was modified
+        if (!clearPackageJsonCache && modifiedFile.includes('node_modules')) {
+          clearPackageJsonCache = true;
+          packageJsonCache?.clear();
+        }
+
+        // Collect stale source files for HMR analysis of inline component resources
+        if (useHmr) {
+          const sourceFile = this.#state.typeScriptProgram.getSourceFile(modifiedFile);
+          if (sourceFile) {
+            staleSourceFiles ??= new Map<string, ts.SourceFile>();
+            staleSourceFiles.set(modifiedFile, sourceFile);
+          }
         }
       }
     }
 
     // Create Angular compiler host
-    const host = createAngularCompilerHost(ts, compilerOptions, hostOptions);
+    const host = createAngularCompilerHost(ts, compilerOptions, hostOptions, packageJsonCache);
 
     // Create the Angular specific program that contains the Angular compiler
     const angularProgram = profileSync(
