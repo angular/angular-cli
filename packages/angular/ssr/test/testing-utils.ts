@@ -10,6 +10,7 @@ import { Component, provideExperimentalZonelessChangeDetection } from '@angular/
 import { bootstrapApplication } from '@angular/platform-browser';
 import { provideServerRendering } from '@angular/platform-server';
 import { RouterOutlet, Routes, provideRouter } from '@angular/router';
+import { destroyAngularServerApp } from '../src/app';
 import { ServerAsset, setAngularAppManifest } from '../src/manifest';
 import { ServerRoute, provideServerRoutesConfig } from '../src/routes/route-config';
 
@@ -29,6 +30,16 @@ export function setAngularAppTestingManifest(
   baseHref = '/',
   additionalServerAssets: Record<string, ServerAsset> = {},
 ): void {
+  destroyAngularServerApp();
+
+  @Component({
+    standalone: true,
+    selector: 'app-root',
+    template: '<router-outlet />',
+    imports: [RouterOutlet],
+  })
+  class AppComponent {}
+
   setAngularAppManifest({
     inlineCriticalCss: false,
     baseHref,
@@ -65,14 +76,6 @@ export function setAngularAppTestingManifest(
       },
     },
     bootstrap: async () => () => {
-      @Component({
-        standalone: true,
-        selector: 'app-root',
-        template: '<router-outlet />',
-        imports: [RouterOutlet],
-      })
-      class AppComponent {}
-
       return bootstrapApplication(AppComponent, {
         providers: [
           provideServerRendering(),

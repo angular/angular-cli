@@ -19,21 +19,21 @@ import { RenderMode } from '../src/routes/route-config';
 import { setAngularAppTestingManifest } from './testing-utils';
 
 function createEntryPoint(locale: string) {
+  @Component({
+    standalone: true,
+    selector: `app-ssr-${locale}`,
+    template: `SSR works ${locale.toUpperCase()}`,
+  })
+  class SSRComponent {}
+
+  @Component({
+    standalone: true,
+    selector: `app-ssg-${locale}`,
+    template: `SSG works ${locale.toUpperCase()}`,
+  })
+  class SSGComponent {}
+
   return async () => {
-    @Component({
-      standalone: true,
-      selector: `app-ssr-${locale}`,
-      template: `SSR works ${locale.toUpperCase()}`,
-    })
-    class SSRComponent {}
-
-    @Component({
-      standalone: true,
-      selector: `app-ssg-${locale}`,
-      template: `SSG works ${locale.toUpperCase()}`,
-    })
-    class SSGComponent {}
-
     setAngularAppTestingManifest(
       [
         { path: 'ssg', component: SSGComponent },
@@ -74,8 +74,6 @@ describe('AngularAppEngine', () => {
 
   describe('Localized app', () => {
     beforeAll(() => {
-      destroyAngularServerApp();
-
       setAngularAppEngineManifest({
         // Note: Although we are testing only one locale, we need to configure two or more
         // to ensure that we test a different code path.
@@ -142,18 +140,16 @@ describe('AngularAppEngine', () => {
 
   describe('Non-localized app', () => {
     beforeAll(() => {
-      destroyAngularServerApp();
+      @Component({
+        standalone: true,
+        selector: 'app-home',
+        template: `Home works`,
+      })
+      class HomeComponent {}
 
       setAngularAppEngineManifest({
         entryPoints: {
           '': async () => {
-            @Component({
-              standalone: true,
-              selector: 'app-home',
-              template: `Home works`,
-            })
-            class HomeComponent {}
-
             setAngularAppTestingManifest(
               [{ path: 'home', component: HomeComponent }],
               [{ path: '**', renderMode: RenderMode.Server }],
