@@ -12,7 +12,7 @@ import '@angular/compiler';
 /* eslint-enable import/no-unassigned-import */
 
 import { Component } from '@angular/core';
-import { AngularServerApp, destroyAngularServerApp } from '../src/app';
+import { AngularServerApp } from '../src/app';
 import { RenderMode } from '../src/routes/route-config';
 import { setAngularAppTestingManifest } from './testing-utils';
 
@@ -20,8 +20,6 @@ describe('AngularServerApp', () => {
   let app: AngularServerApp;
 
   beforeAll(() => {
-    destroyAngularServerApp();
-
     @Component({
       standalone: true,
       selector: 'app-home',
