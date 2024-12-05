@@ -1,3 +1,22 @@
+<a name="19.0.4"></a>
+
+# 19.0.4 (2024-12-05)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                    |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------ |
+| [23667ed4a](https://github.com/angular/angular-cli/commit/23667ed4aa0bedbb591dc0284116402dc42ed95c) | fix  | handle windows spec collisions |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                                  |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------ |
+| [fc41f50b5](https://github.com/angular/angular-cli/commit/fc41f50b53bbffead017b420105eed5bd8573ac1) | fix  | show error when Node.js built-ins are used during `ng serve` |
+| [14451e275](https://github.com/angular/angular-cli/commit/14451e2754caff2c9800cca17e11ffa452575f09) | perf | reuse TS package.json cache when rebuilding                  |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="19.1.0-next.0"></a>
 
 # 19.1.0-next.0 (2024-12-04)
