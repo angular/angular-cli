@@ -321,6 +321,7 @@ LARGE_SPECS = {
             "@npm//karma-jasmine",
             "@npm//karma-jasmine-html-reporter",
             "@npm//puppeteer",
+            "@npm//webpack",
         ],
     },
     "protractor": {
