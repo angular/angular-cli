@@ -13,7 +13,7 @@ import assert from 'node:assert';
 import { readFile } from 'node:fs/promises';
 import { builtinModules, isBuiltin } from 'node:module';
 import { join } from 'node:path';
-import type { Connect, DepOptimizationConfig, InlineConfig, ViteDevServer } from 'vite';
+import type { Connect, InlineConfig, ViteDevServer } from 'vite';
 import type { ComponentStyleRecord } from '../../tools/vite/middlewares';
 import {
   ServerSsrMode,
@@ -23,6 +23,7 @@ import {
   createAngularSsrTransformPlugin,
   createRemoveIdPrefixPlugin,
 } from '../../tools/vite/plugins';
+import { EsbuildLoaderOption, getDepOptimizationConfig } from '../../tools/vite/utils';
 import { loadProxyConfiguration, normalizeSourceMaps } from '../../utils';
 import { useComponentStyleHmr, useComponentTemplateHmr } from '../../utils/environment-options';
 import { loadEsmModule } from '../../utils/load-esm';
@@ -32,7 +33,6 @@ import {
   BuildOutputFileType,
   type ExternalResultMetadata,
   JavaScriptTransformer,
-  getFeatureSupport,
   getSupportedBrowsers,
   isZonelessApp,
   transformSupportedBrowsersToTargets,
@@ -773,91 +773,6 @@ export async function setupServer(
   }
 
   return configuration;
-}
-
-type ViteEsBuildPlugin = NonNullable<
-  NonNullable<DepOptimizationConfig['esbuildOptions']>['plugins']
->[0];
-
-type EsbuildLoaderOption = Exclude<DepOptimizationConfig['esbuildOptions'], undefined>['loader'];
-
-function getDepOptimizationConfig({
-  disabled,
-  exclude,
-  include,
-  target,
-  zoneless,
-  prebundleTransformer,
-  ssr,
-  loader,
-  thirdPartySourcemaps,
-}: {
-  disabled: boolean;
-  exclude: string[];
-  include: string[];
-  target: string[];
-  prebundleTransformer: JavaScriptTransformer;
-  ssr: boolean;
-  zoneless: boolean;
-  loader?: EsbuildLoaderOption;
-  thirdPartySourcemaps: boolean;
-}): DepOptimizationConfig {
-  const plugins: ViteEsBuildPlugin[] = [
-    {
-      name: 'angular-browser-node-built-in',
-      setup(build) {
-        // This namespace is configured by vite.
-        // @see: https://github.com/vitejs/vite/blob/a1dd396da856401a12c921d0cd2c4e97cb63f1b5/packages/vite/src/node/optimizer/esbuildDepPlugin.ts#L109
-        build.onLoad({ filter: /.*/, namespace: 'browser-external' }, (args) => {
-          if (!isBuiltin(args.path)) {
-            return;
-          }
-
-          return {
-            errors: [
-              {
-                text: `The package "${args.path}" wasn't found on the file system but is built into node.`,
-              },
-            ],
-          };
-        });
-      },
-    },
-    {
-      name: `angular-vite-optimize-deps${ssr ? '-ssr' : ''}${
-        thirdPartySourcemaps ? '-vendor-sourcemap' : ''
-      }`,
-      setup(build) {
-        build.onLoad({ filter: /\.[cm]?js$/ }, async (args) => {
-          return {
-            contents: await prebundleTransformer.transformFile(args.path),
-            loader: 'js',
-          };
-        });
-      },
-    },
-  ];
-
-  return {
-    // Exclude any explicitly defined dependencies (currently build defined externals)
-    exclude,
-    // NB: to disable the deps optimizer, set optimizeDeps.noDiscovery to true and optimizeDeps.include as undefined.
-    // Include all implict dependencies from the external packages internal option
-    include: disabled ? undefined : include,
-    noDiscovery: disabled,
-    // Add an esbuild plugin to run the Angular linker on dependencies
-    esbuildOptions: {
-      // Set esbuild supported targets.
-      target,
-      supported: getFeatureSupport(target, zoneless),
-      plugins,
-      loader,
-      define: {
-        'ngServerMode': `${ssr}`,
-      },
-      resolveExtensions: ['.mjs', '.js', '.cjs'],
-    },
-  };
 }
 
 /**
