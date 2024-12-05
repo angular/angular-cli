@@ -7,7 +7,11 @@
  */
 
 import { lookup as lookupMimeType } from 'mrmime';
+import { isBuiltin } from 'node:module';
 import { extname } from 'node:path';
+import type { DepOptimizationConfig } from 'vite';
+import { JavaScriptTransformer } from '../esbuild/javascript-transformer';
+import { getFeatureSupport } from '../esbuild/utils';
 
 export type AngularMemoryOutputFiles = Map<
   string,
@@ -32,4 +36,92 @@ export function lookupMimeTypeFromRequest(url: string): string | undefined {
   }
 
   return extension && lookupMimeType(extension);
+}
+
+type ViteEsBuildPlugin = NonNullable<
+  NonNullable<DepOptimizationConfig['esbuildOptions']>['plugins']
+>[0];
+
+export type EsbuildLoaderOption = Exclude<
+  DepOptimizationConfig['esbuildOptions'],
+  undefined
+>['loader'];
+
+export function getDepOptimizationConfig({
+  disabled,
+  exclude,
+  include,
+  target,
+  zoneless,
+  prebundleTransformer,
+  ssr,
+  loader,
+  thirdPartySourcemaps,
+}: {
+  disabled: boolean;
+  exclude: string[];
+  include: string[];
+  target: string[];
+  prebundleTransformer: JavaScriptTransformer;
+  ssr: boolean;
+  zoneless: boolean;
+  loader?: EsbuildLoaderOption;
+  thirdPartySourcemaps: boolean;
+}): DepOptimizationConfig {
+  const plugins: ViteEsBuildPlugin[] = [
+    {
+      name: 'angular-browser-node-built-in',
+      setup(build) {
+        // This namespace is configured by vite.
+        // @see: https://github.com/vitejs/vite/blob/a1dd396da856401a12c921d0cd2c4e97cb63f1b5/packages/vite/src/node/optimizer/esbuildDepPlugin.ts#L109
+        build.onLoad({ filter: /.*/, namespace: 'browser-external' }, (args) => {
+          if (!isBuiltin(args.path)) {
+            return;
+          }
+
+          return {
+            errors: [
+              {
+                text: `The package "${args.path}" wasn't found on the file system but is built into node.`,
+              },
+            ],
+          };
+        });
+      },
+    },
+    {
+      name: `angular-vite-optimize-deps${ssr ? '-ssr' : ''}${
+        thirdPartySourcemaps ? '-vendor-sourcemap' : ''
+      }`,
+      setup(build) {
+        build.onLoad({ filter: /\.[cm]?js$/ }, async (args) => {
+          return {
+            contents: await prebundleTransformer.transformFile(args.path),
+            loader: 'js',
+          };
+        });
+      },
+    },
+  ];
+
+  return {
+    // Exclude any explicitly defined dependencies (currently build defined externals)
+    exclude,
+    // NB: to disable the deps optimizer, set optimizeDeps.noDiscovery to true and optimizeDeps.include as undefined.
+    // Include all implict dependencies from the external packages internal option
+    include: disabled ? undefined : include,
+    noDiscovery: disabled,
+    // Add an esbuild plugin to run the Angular linker on dependencies
+    esbuildOptions: {
+      // Set esbuild supported targets.
+      target,
+      supported: getFeatureSupport(target, zoneless),
+      plugins,
+      loader,
+      define: {
+        'ngServerMode': `${ssr}`,
+      },
+      resolveExtensions: ['.mjs', '.js', '.cjs'],
+    },
+  };
 }
