@@ -54,6 +54,11 @@ export interface BuilderHarnessExecutionOptions {
   outputLogsOnException: boolean;
   useNativeFileWatching: boolean;
   signal: AbortSignal;
+  additionalExecuteArguments: unknown[];
+}
+
+interface BuilderHandlerFnWithVarArgs<T> extends BuilderHandlerFn<T> {
+  (input: T, context: BuilderContext, ...args: unknown[]): BuilderOutputLike;
 }
 
 /**
@@ -256,7 +261,13 @@ export class BuilderHarness<T> {
       mergeMap((validator) => validator(targetOptions)),
       map((validationResult) => validationResult.data),
       mergeMap((data) =>
-        convertBuilderOutputToObservable(this.builderHandler(data as T & json.JsonObject, context)),
+        convertBuilderOutputToObservable(
+          (this.builderHandler as BuilderHandlerFnWithVarArgs<T>)(
+            data as T & json.JsonObject,
+            context,
+            ...(options.additionalExecuteArguments ?? []),
+          ),
+        ),
       ),
       map((buildResult) => ({ result: buildResult, error: undefined })),
       catchError((error) => {
