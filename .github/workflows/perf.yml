@@ -23,7 +23,7 @@ jobs:
       workflows: ${{ steps.workflows.outputs.workflows }}
     steps:
       - name: Initialize environment
-        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@d4ffcd67a4788bec64b7d61a68d2ba3aa83eed61
+        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@40b2cbdbcc40f36f125d721c4e8decd3bb607ea4
       - name: Install node modules
         run: yarn install --immutable
       - id: workflows
@@ -38,9 +38,9 @@ jobs:
         workflow: ${{ fromJSON(needs.list.outputs.workflows) }}
     steps:
       - name: Initialize environment
-        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@d4ffcd67a4788bec64b7d61a68d2ba3aa83eed61
+        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@40b2cbdbcc40f36f125d721c4e8decd3bb607ea4
       - name: Setup Bazel
-        uses: angular/dev-infra/github-actions/bazel/setup@d4ffcd67a4788bec64b7d61a68d2ba3aa83eed61
+        uses: angular/dev-infra/github-actions/bazel/setup@40b2cbdbcc40f36f125d721c4e8decd3bb607ea4
       - name: Install node modules
         run: yarn install --immutable
       # We utilize the google-github-actions/auth action to allow us to get an active credential using workflow
