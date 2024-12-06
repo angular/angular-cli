@@ -60,6 +60,7 @@ function createEntryPoint(locale: string) {
         `,
         },
       },
+      locale,
     );
 
     return {
@@ -110,12 +111,14 @@ describe('AngularAppEngine', () => {
         const request = new Request('https://example.com/it/ssr/index.html');
         const response = await appEngine.handle(request);
         expect(await response?.text()).toContain('SSR works IT');
+        expect(response?.headers?.get('Content-Language')).toBe('it');
       });
 
       it('should return a serve prerendered page with correct locale', async () => {
         const request = new Request('https://example.com/it/ssg');
         const response = await appEngine.handle(request);
         expect(await response?.text()).toContain('SSG works IT');
+        expect(response?.headers?.get('Content-Language')).toBe('it');
       });
 
       it('should correctly serve the prerendered content when the URL ends with "index.html" with correct locale', async () => {
