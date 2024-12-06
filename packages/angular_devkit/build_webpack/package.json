@@ -21,7 +21,7 @@
   },
   "devDependencies": {
     "@angular-devkit/core": "0.0.0-PLACEHOLDER",
-    "webpack": "5.97.0"
+    "webpack": "5.97.1"
   },
   "peerDependencies": {
     "webpack": "^5.30.0",

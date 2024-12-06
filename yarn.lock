@@ -107,11 +107,11 @@ __metadata:
     semver: "npm:7.6.3"
     source-map-loader: "npm:5.0.0"
     source-map-support: "npm:0.5.21"
-    terser: "npm:5.36.0"
+    terser: "npm:5.37.0"
     tree-kill: "npm:1.2.2"
     tslib: "npm:2.8.1"
     undici: "npm:7.1.0"
-    webpack: "npm:5.97.0"
+    webpack: "npm:5.97.1"
     webpack-dev-middleware: "npm:7.4.2"
     webpack-dev-server: "npm:5.1.0"
     webpack-merge: "npm:6.0.1"
@@ -169,7 +169,7 @@ __metadata:
     "@angular-devkit/architect": "npm:0.0.0-EXPERIMENTAL-PLACEHOLDER"
     "@angular-devkit/core": "npm:0.0.0-PLACEHOLDER"
     rxjs: "npm:7.8.1"
-    webpack: "npm:5.97.0"
+    webpack: "npm:5.97.1"
   peerDependencies:
     webpack: ^5.30.0
     webpack-dev-server: ^5.0.2
@@ -379,7 +379,7 @@ __metadata:
     "@babel/plugin-syntax-import-attributes": "npm:7.26.0"
     "@inquirer/confirm": "npm:5.0.2"
     "@vitejs/plugin-basic-ssl": "npm:1.2.0"
-    beasties: "npm:0.1.0"
+    beasties: "npm:0.2.0"
     browserslist: "npm:^4.23.0"
     esbuild: "npm:0.24.0"
     fast-glob: "npm:3.3.2"
@@ -395,7 +395,7 @@ __metadata:
     rollup: "npm:4.28.0"
     sass: "npm:1.82.0"
     semver: "npm:7.6.3"
-    vite: "npm:6.0.2"
+    vite: "npm:6.0.3"
     watchpack: "npm:2.4.2"
   peerDependencies:
     "@angular/compiler": ^19.0.0 || ^19.1.0-next.0
@@ -700,7 +700,7 @@ __metadata:
     ansi-colors: "npm:4.1.3"
     autoprefixer: "npm:10.4.20"
     babel-loader: "npm:9.2.1"
-    beasties: "npm:0.1.0"
+    beasties: "npm:0.2.0"
     browser-sync: "npm:3.0.3"
     browserslist: "npm:^4.21.5"
     buffer: "npm:6.0.3"
@@ -714,7 +714,7 @@ __metadata:
     eslint-config-prettier: "npm:9.1.0"
     eslint-plugin-header: "npm:3.1.1"
     eslint-plugin-import: "npm:2.31.0"
-    express: "npm:4.21.1"
+    express: "npm:4.21.2"
     fast-glob: "npm:3.3.2"
     http-proxy: "npm:^1.18.1"
     http-proxy-middleware: "npm:3.0.3"
@@ -772,7 +772,7 @@ __metadata:
     source-map-support: "npm:0.5.21"
     symbol-observable: "npm:4.0.0"
     tar: "npm:^7.0.0"
-    terser: "npm:5.36.0"
+    terser: "npm:5.37.0"
     tree-kill: "npm:1.2.2"
     ts-node: "npm:^10.9.1"
     tslib: "npm:2.8.1"
@@ -781,9 +781,9 @@ __metadata:
     unenv: "npm:^1.10.0"
     verdaccio: "npm:6.0.2"
     verdaccio-auth-memory: "npm:^10.0.0"
-    vite: "npm:6.0.2"
+    vite: "npm:6.0.3"
     watchpack: "npm:2.4.2"
-    webpack: "npm:5.97.0"
+    webpack: "npm:5.97.1"
     webpack-dev-middleware: "npm:7.4.2"
     webpack-dev-server: "npm:5.1.0"
     webpack-merge: "npm:6.0.1"
@@ -3430,7 +3430,7 @@ __metadata:
     "@angular/compiler": "npm:19.1.0-next.2"
     "@angular/compiler-cli": "npm:19.1.0-next.2"
     typescript: "npm:5.7.2"
-    webpack: "npm:5.97.0"
+    webpack: "npm:5.97.1"
   peerDependencies:
     "@angular/compiler-cli": ^19.0.0 || ^19.1.0-next.0
     typescript: ">=5.5 <5.8"
@@ -7002,6 +7002,22 @@ __metadata:
   languageName: node
   linkType: hard
 
+"beasties@npm:0.2.0":
+  version: 0.2.0
+  resolution: "beasties@npm:0.2.0"
+  dependencies:
+    css-select: "npm:^5.1.0"
+    css-what: "npm:^6.1.0"
+    dom-serializer: "npm:^2.0.0"
+    domhandler: "npm:^5.0.3"
+    htmlparser2: "npm:^9.1.0"
+    picocolors: "npm:^1.1.1"
+    postcss: "npm:^8.4.49"
+    postcss-media-query-parser: "npm:^0.2.3"
+  checksum: 10c0/f7d885553b0289e3d50bcc7e4ad72a3974cedad4418d714b29afca91ee0cd0fef9f907a8e17bb80622f18ca410279be8ec2d938bc22e2cb2fcd084dad17291fa
+  languageName: node
+  linkType: hard
+
 "before-after-hook@npm:^3.0.2":
   version: 3.0.2
   resolution: "before-after-hook@npm:3.0.2"
@@ -9517,6 +9533,45 @@ __metadata:
   languageName: node
   linkType: hard
 
+"express@npm:4.21.2":
+  version: 4.21.2
+  resolution: "express@npm:4.21.2"
+  dependencies:
+    accepts: "npm:~1.3.8"
+    array-flatten: "npm:1.1.1"
+    body-parser: "npm:1.20.3"
+    content-disposition: "npm:0.5.4"
+    content-type: "npm:~1.0.4"
+    cookie: "npm:0.7.1"
+    cookie-signature: "npm:1.0.6"
+    debug: "npm:2.6.9"
+    depd: "npm:2.0.0"
+    encodeurl: "npm:~2.0.0"
+    escape-html: "npm:~1.0.3"
+    etag: "npm:~1.8.1"
+    finalhandler: "npm:1.3.1"
+    fresh: "npm:0.5.2"
+    http-errors: "npm:2.0.0"
+    merge-descriptors: "npm:1.0.3"
+    methods: "npm:~1.1.2"
+    on-finished: "npm:2.4.1"
+    parseurl: "npm:~1.3.3"
+    path-to-regexp: "npm:0.1.12"
+    proxy-addr: "npm:~2.0.7"
+    qs: "npm:6.13.0"
+    range-parser: "npm:~1.2.1"
+    safe-buffer: "npm:5.2.1"
+    send: "npm:0.19.0"
+    serve-static: "npm:1.16.2"
+    setprototypeof: "npm:1.2.0"
+    statuses: "npm:2.0.1"
+    type-is: "npm:~1.6.18"
+    utils-merge: "npm:1.0.1"
+    vary: "npm:~1.1.2"
+  checksum: 10c0/38168fd0a32756600b56e6214afecf4fc79ec28eca7f7a91c2ab8d50df4f47562ca3f9dee412da7f5cea6b1a1544b33b40f9f8586dbacfbdada0fe90dbb10a1f
+  languageName: node
+  linkType: hard
+
 "extend@npm:^3.0.0, extend@npm:^3.0.2, extend@npm:~3.0.2":
   version: 3.0.2
   resolution: "extend@npm:3.0.2"
@@ -10552,7 +10607,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"htmlparser2@npm:^9.0.0":
+"htmlparser2@npm:^9.0.0, htmlparser2@npm:^9.1.0":
   version: 9.1.0
   resolution: "htmlparser2@npm:9.1.0"
   dependencies:
@@ -14448,6 +14503,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"path-to-regexp@npm:0.1.12":
+  version: 0.1.12
+  resolution: "path-to-regexp@npm:0.1.12"
+  checksum: 10c0/1c6ff10ca169b773f3bba943bbc6a07182e332464704572962d277b900aeee81ac6aa5d060ff9e01149636c30b1f63af6e69dd7786ba6e0ddb39d4dee1f0645b
+  languageName: node
+  linkType: hard
+
 "path-type@npm:^4.0.0":
   version: 4.0.0
   resolution: "path-type@npm:4.0.0"
@@ -17091,7 +17153,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"terser@npm:5.36.0, terser@npm:^5.26.0":
+"terser@npm:5.37.0":
+  version: 5.37.0
+  resolution: "terser@npm:5.37.0"
+  dependencies:
+    "@jridgewell/source-map": "npm:^0.3.3"
+    acorn: "npm:^8.8.2"
+    commander: "npm:^2.20.0"
+    source-map-support: "npm:~0.5.20"
+  bin:
+    terser: bin/terser
+  checksum: 10c0/ff0dc79b0a0da821e7f5bf7a047eab6d04e70e88b62339a0f1d71117db3310e255f5c00738fa3b391f56c3571f800a00047720261ba04ced0241c1f9922199f4
+  languageName: node
+  linkType: hard
+
+"terser@npm:^5.26.0":
   version: 5.36.0
   resolution: "terser@npm:5.36.0"
   dependencies:
@@ -18136,6 +18212,58 @@ __metadata:
   languageName: node
   linkType: hard
 
+"vite@npm:6.0.3":
+  version: 6.0.3
+  resolution: "vite@npm:6.0.3"
+  dependencies:
+    esbuild: "npm:^0.24.0"
+    fsevents: "npm:~2.3.3"
+    postcss: "npm:^8.4.49"
+    rollup: "npm:^4.23.0"
+  peerDependencies:
+    "@types/node": ^18.0.0 || ^20.0.0 || >=22.0.0
+    jiti: ">=1.21.0"
+    less: "*"
+    lightningcss: ^1.21.0
+    sass: "*"
+    sass-embedded: "*"
+    stylus: "*"
+    sugarss: "*"
+    terser: ^5.16.0
+    tsx: ^4.8.1
+    yaml: ^2.4.2
+  dependenciesMeta:
+    fsevents:
+      optional: true
+  peerDependenciesMeta:
+    "@types/node":
+      optional: true
+    jiti:
+      optional: true
+    less:
+      optional: true
+    lightningcss:
+      optional: true
+    sass:
+      optional: true
+    sass-embedded:
+      optional: true
+    stylus:
+      optional: true
+    sugarss:
+      optional: true
+    terser:
+      optional: true
+    tsx:
+      optional: true
+    yaml:
+      optional: true
+  bin:
+    vite: bin/vite.js
+  checksum: 10c0/764ebed14770426a638575b23a51127c630ace873999ab896b0184484d8107e7255cdf64cfb36c65c1ef1d583e44b70a1d14c0f05b89612e834a5806e3964475
+  languageName: node
+  linkType: hard
+
 "void-elements@npm:^2.0.0":
   version: 2.0.1
   resolution: "void-elements@npm:2.0.1"
@@ -18334,9 +18462,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"webpack@npm:5.97.0":
-  version: 5.97.0
-  resolution: "webpack@npm:5.97.0"
+"webpack@npm:5.97.1":
+  version: 5.97.1
+  resolution: "webpack@npm:5.97.1"
   dependencies:
     "@types/eslint-scope": "npm:^3.7.7"
     "@types/estree": "npm:^1.0.6"
@@ -18366,7 +18494,7 @@ __metadata:
       optional: true
   bin:
     webpack: bin/webpack.js
-  checksum: 10c0/a8714d42defbf52382b61c157f68e161a16d0edf228d8d9abaa7a165f3ee0ac7386a08d28d4dcf8d6740ea5bda0c4d4abfeeb838df029e636c1c28bb2454ac56
+  checksum: 10c0/a12d3dc882ca582075f2c4bd88840be8307427245c90a8a0e0b372d73560df13fcf25a61625c9e7edc964981d16b5a8323640562eb48347cf9dd2f8bd1b39d35
   languageName: node
   linkType: hard
 
