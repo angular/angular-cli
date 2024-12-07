@@ -425,11 +425,18 @@ export function buildWebpackBrowser(
   );
 
   function getLocaleBaseHref(i18n: I18nOptions, locale: string): string | undefined {
-    if (i18n.locales[locale] && i18n.locales[locale]?.baseHref !== '') {
-      return urlJoin(options.baseHref || '', i18n.locales[locale].baseHref ?? `/${locale}/`);
+    if (i18n.flatOutput) {
+      return undefined;
     }
 
-    return undefined;
+    const localeData = i18n.locales[locale];
+    if (!localeData) {
+      return undefined;
+    }
+
+    const baseHrefSuffix = localeData.baseHref ?? localeData.subPath + '/';
+
+    return baseHrefSuffix !== '' ? urlJoin(options.baseHref || '', baseHrefSuffix) : undefined;
   }
 }
 

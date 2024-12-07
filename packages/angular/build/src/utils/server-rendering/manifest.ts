@@ -7,10 +7,7 @@
  */
 
 import { extname } from 'node:path';
-import {
-  NormalizedApplicationBuildOptions,
-  getLocaleBaseHref,
-} from '../../builders/application/options';
+import { NormalizedApplicationBuildOptions } from '../../builders/application/options';
 import { type BuildOutputFile, BuildOutputFileType } from '../../tools/esbuild/bundler-context';
 import { createOutputFile } from '../../tools/esbuild/utils';
 
@@ -56,20 +53,11 @@ export function generateAngularServerAppEngineManifest(
   baseHref: string | undefined,
 ): string {
   const entryPoints: Record<string, string> = {};
-
-  if (i18nOptions.shouldInline) {
+  if (i18nOptions.shouldInline && !i18nOptions.flatOutput) {
     for (const locale of i18nOptions.inlineLocales) {
-      const importPath =
-        './' + (i18nOptions.flatOutput ? '' : locale + '/') + MAIN_SERVER_OUTPUT_FILENAME;
-
-      let localeWithBaseHref = getLocaleBaseHref('', i18nOptions, locale) || '/';
-
-      // Remove leading and trailing slashes.
-      const start = localeWithBaseHref[0] === '/' ? 1 : 0;
-      const end = localeWithBaseHref[localeWithBaseHref.length - 1] === '/' ? -1 : undefined;
-      localeWithBaseHref = localeWithBaseHref.slice(start, end);
-
-      entryPoints[localeWithBaseHref] = `() => import('${importPath}')`;
+      const { subPath } = i18nOptions.locales[locale];
+      const importPath = `${subPath ? `${subPath}/` : ''}${MAIN_SERVER_OUTPUT_FILENAME}`;
+      entryPoints[subPath] = `() => import('./${importPath}')`;
     }
   } else {
     entryPoints[''] = `() => import('./${MAIN_SERVER_OUTPUT_FILENAME}')`;
