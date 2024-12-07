@@ -219,7 +219,7 @@ async function renderPages(
     const appShellRouteWithLeadingSlash = appShellRoute && addLeadingSlash(appShellRoute);
     const baseHrefWithLeadingSlash = addLeadingSlash(baseHref);
 
-    for (const { route, redirectTo, renderMode } of serializableRouteTreeNode) {
+    for (const { route, redirectTo } of serializableRouteTreeNode) {
       // Remove the base href from the file output path.
       const routeWithoutBaseHref = addTrailingSlash(route).startsWith(baseHrefWithLeadingSlash)
         ? addLeadingSlash(route.slice(baseHrefWithLeadingSlash.length))

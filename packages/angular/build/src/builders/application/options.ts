@@ -168,7 +168,7 @@ export async function normalizeOptions(
   const i18nOptions: I18nOptions & {
     duplicateTranslationBehavior?: I18NTranslation;
     missingTranslationBehavior?: I18NTranslation;
-  } = createI18nOptions(projectMetadata, options.localize);
+  } = createI18nOptions(projectMetadata, options.localize, context.logger);
   i18nOptions.duplicateTranslationBehavior = options.i18nDuplicateTranslation;
   i18nOptions.missingTranslationBehavior = options.i18nMissingTranslation;
   if (options.forceI18nFlatOutput) {
@@ -645,7 +645,7 @@ function normalizeGlobalEntries(
 }
 
 export function getLocaleBaseHref(
-  baseHref: string | undefined,
+  baseHref: string | undefined = '',
   i18n: NormalizedApplicationBuildOptions['i18nOptions'],
   locale: string,
 ): string | undefined {
@@ -653,9 +653,12 @@ export function getLocaleBaseHref(
     return undefined;
   }
 
-  if (i18n.locales[locale] && i18n.locales[locale].baseHref !== '') {
-    return urlJoin(baseHref || '', i18n.locales[locale].baseHref ?? `/${locale}/`);
+  const localeData = i18n.locales[locale];
+  if (!localeData) {
+    return undefined;
   }
 
-  return undefined;
+  const baseHrefSuffix = localeData.baseHref ?? localeData.subPath + '/';
+
+  return baseHrefSuffix !== '' ? urlJoin(baseHref, baseHrefSuffix) : undefined;
 }

@@ -36,8 +36,7 @@ export async function normalizeOptions(
   // Target specifier defaults to the current project's build target with no specified configuration
   const buildTargetSpecifier = options.buildTarget ?? ':';
   const buildTarget = targetFromTargetString(buildTargetSpecifier, projectName, 'build');
-
-  const i18nOptions = createI18nOptions(projectMetadata);
+  const i18nOptions = createI18nOptions(projectMetadata, /** inline */ false, context.logger);
 
   // Normalize xliff format extensions
   let format = options.format;

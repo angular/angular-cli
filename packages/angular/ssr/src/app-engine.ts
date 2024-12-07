@@ -148,6 +148,6 @@ export class AngularAppEngine {
 
     const potentialLocale = getPotentialLocaleIdFromUrl(url, basePath);
 
-    return this.getEntryPointExports(potentialLocale);
+    return this.getEntryPointExports(potentialLocale) ?? this.getEntryPointExports('');
   }
 }

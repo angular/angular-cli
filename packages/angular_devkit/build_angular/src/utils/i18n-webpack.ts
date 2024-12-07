@@ -43,7 +43,7 @@ export async function configureI18nBuild<T extends BrowserBuilderSchema | Server
   const buildOptions = { ...options };
   const tsConfig = await readTsconfig(buildOptions.tsConfig, context.workspaceRoot);
   const metadata = await context.getProjectMetadata(context.target);
-  const i18n = createI18nOptions(metadata, buildOptions.localize);
+  const i18n = createI18nOptions(metadata, buildOptions.localize, context.logger);
 
   // No additional processing needed if no inlining requested and no source locale defined.
   if (!i18n.shouldInline && !i18n.hasDefinedSourceLocale) {

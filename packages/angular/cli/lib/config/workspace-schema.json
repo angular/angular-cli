@@ -275,18 +275,43 @@
                 },
                 {
                   "type": "object",
-                  "description": "Localization options to use for the source locale",
+                  "description": "Localization options to use for the source locale.",
                   "properties": {
                     "code": {
                       "type": "string",
-                      "description": "Specifies the locale code of the source locale",
+                      "description": "Specifies the locale code of the source locale.",
                       "pattern": "^[a-zA-Z]{2,3}(-[a-zA-Z]{4})?(-([a-zA-Z]{2}|[0-9]{3}))?(-[a-zA-Z]{5,8})?(-x(-[a-zA-Z0-9]{1,8})+)?$"
                     },
                     "baseHref": {
                       "type": "string",
-                      "description": "HTML base HREF to use for the locale (defaults to the locale code)"
+                      "deprecated": true,
+                      "description": "Specifies the HTML base HREF for the locale. Defaults to the locale code if not provided."
+                    },
+                    "subPath": {
+                      "type": "string",
+                      "description": "Defines the subpath for accessing this locale. It serves as the HTML base HREF and the directory name for the output. Defaults to the locale code if not specified.",
+                      "pattern": "^[\\w-]*$"
                     }
                   },
+                  "anyOf": [
+                    {
+                      "required": ["subPath"],
+                      "not": {
+                        "required": ["baseHref"]
+                      }
+                    },
+                    {
+                      "required": ["baseHref"],
+                      "not": {
+                        "required": ["subPath"]
+                      }
+                    },
+                    {
+                      "not": {
+                        "required": ["baseHref", "subPath"]
+                      }
+                    }
+                  ],
                   "additionalProperties": false
                 }
               ]
@@ -299,11 +324,11 @@
                   "oneOf": [
                     {
                       "type": "string",
-                      "description": "Localization file to use for i18n"
+                      "description": "Localization file to use for i18n."
                     },
                     {
                       "type": "array",
-                      "description": "Localization files to use for i18n",
+                      "description": "Localization files to use for i18n.",
                       "items": {
                         "type": "string",
                         "uniqueItems": true
@@ -311,17 +336,17 @@
                     },
                     {
                       "type": "object",
-                      "description": "Localization options to use for the locale",
+                      "description": "Localization options to use for the locale.",
                       "properties": {
                         "translation": {
                           "oneOf": [
                             {
                               "type": "string",
-                              "description": "Localization file to use for i18n"
+                              "description": "Localization file to use for i18n."
                             },
                             {
                               "type": "array",
-                              "description": "Localization files to use for i18n",
+                              "description": "Localization files to use for i18n.",
                               "items": {
                                 "type": "string",
                                 "uniqueItems": true
@@ -331,9 +356,34 @@
                         },
                         "baseHref": {
                           "type": "string",
-                          "description": "HTML base HREF to use for the locale (defaults to the locale code)"
+                          "deprecated": true,
+                          "description": "Specifies the HTML base HREF for the locale. Defaults to the locale code if not provided."
+                        },
+                        "subPath": {
+                          "type": "string",
+                          "description": "Defines the URL segment for accessing this locale. It serves as the HTML base HREF and the directory name for the output. Defaults to the locale code if not specified.",
+                          "pattern": "^[\\w-]*$"
                         }
                       },
+                      "anyOf": [
+                        {
+                          "required": ["subPath"],
+                          "not": {
+                            "required": ["baseHref"]
+                          }
+                        },
+                        {
+                          "required": ["baseHref"],
+                          "not": {
+                            "required": ["subPath"]
+                          }
+                        },
+                        {
+                          "not": {
+                            "required": ["baseHref", "subPath"]
+                          }
+                        }
+                      ],
                       "additionalProperties": false
                     }
                   ]
