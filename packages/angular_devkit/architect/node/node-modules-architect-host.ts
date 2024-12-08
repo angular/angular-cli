@@ -193,7 +193,7 @@ export class WorkspaceNodeModulesArchitectHost implements ArchitectHost<NodeModu
     }
 
     // Determine builder option schema path (relative within package only)
-    const schemaPath = builder.schema && path.normalize(builder.schema);
+    let schemaPath = builder.schema && path.normalize(builder.schema);
     if (!schemaPath) {
       throw new Error('Could not find the schema for builder ' + builderStr);
     }
@@ -203,7 +203,21 @@ export class WorkspaceNodeModulesArchitectHost implements ArchitectHost<NodeModu
       );
     }
 
-    const schemaText = readFileSync(path.join(buildersManifestDirectory, schemaPath), 'utf-8');
+    // The file could be either a package reference or in the local manifest directory.
+    // Node resolution is tried first then reading the file from the manifest directory if resolution fails.
+    try {
+      schemaPath = localRequire.resolve(schemaPath, {
+        paths: [buildersManifestDirectory],
+      });
+    } catch (e) {
+      if ((e as NodeJS.ErrnoException).code === 'MODULE_NOT_FOUND') {
+        schemaPath = path.join(buildersManifestDirectory, schemaPath);
+      } else {
+        throw e;
+      }
+    }
+
+    const schemaText = readFileSync(schemaPath, 'utf-8');
 
     return Promise.resolve({
       name: builderStr,
