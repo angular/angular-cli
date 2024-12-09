@@ -142,7 +142,7 @@ export async function load(url: string, context: { format?: string | null }, nex
 
     if (filePath.includes('@angular/')) {
       // Prepend 'var ngServerMode=true;' to the source.
-      source = new Uint8Array([...NG_SERVER_MODE_INIT_BYTES, ...source]);
+      source = Buffer.concat([NG_SERVER_MODE_INIT_BYTES, source]);
     }
 
     return {
