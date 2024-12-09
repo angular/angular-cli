@@ -70,26 +70,6 @@ export function getDepOptimizationConfig({
 }): DepOptimizationConfig {
   const plugins: ViteEsBuildPlugin[] = [
     {
-      name: 'angular-browser-node-built-in',
-      setup(build) {
-        // This namespace is configured by vite.
-        // @see: https://github.com/vitejs/vite/blob/a1dd396da856401a12c921d0cd2c4e97cb63f1b5/packages/vite/src/node/optimizer/esbuildDepPlugin.ts#L109
-        build.onLoad({ filter: /.*/, namespace: 'browser-external' }, (args) => {
-          if (!isBuiltin(args.path)) {
-            return;
-          }
-
-          return {
-            errors: [
-              {
-                text: `The package "${args.path}" wasn't found on the file system but is built into node.`,
-              },
-            ],
-          };
-        });
-      },
-    },
-    {
       name: `angular-vite-optimize-deps${ssr ? '-ssr' : ''}${
         thirdPartySourcemaps ? '-vendor-sourcemap' : ''
       }`,
