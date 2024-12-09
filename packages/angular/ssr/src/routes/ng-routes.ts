@@ -7,9 +7,17 @@
  */
 
 import { APP_BASE_HREF, PlatformLocation } from '@angular/common';
-import { ApplicationRef, Compiler, Injector, runInInjectionContext, ɵConsole } from '@angular/core';
+import {
+  APP_INITIALIZER,
+  ApplicationRef,
+  Compiler,
+  Injector,
+  inject,
+  runInInjectionContext,
+  ɵConsole,
+} from '@angular/core';
 import { INITIAL_CONFIG, platformServer } from '@angular/platform-server';
-import { Route, Router, ɵloadChildren as loadChildrenHelper } from '@angular/router';
+import { ROUTES, Route, Router, ɵloadChildren as loadChildrenHelper } from '@angular/router';
 import { ServerAssets } from '../assets';
 import { Console } from '../console';
 import { AngularAppManifest, getAngularAppManifest } from '../manifest';
@@ -24,6 +32,12 @@ import {
   ServerRoutesConfig,
 } from './route-config';
 import { RouteTree, RouteTreeNodeMetadata } from './route-tree';
+
+/**
+ * Constant representing the path for route extraction.
+ * This path is used during the route extraction process and does not affect the application's actual routing behavior.
+ */
+const EXTRACT_ROUTES_PATH = 'ng-routes-internal';
 
 /**
  * Regular expression to match segments preceded by a colon in a string.
@@ -407,11 +421,25 @@ export async function getRoutesFromAngularRouterConfig(
   const platformRef = platformServer([
     {
       provide: INITIAL_CONFIG,
-      useValue: { document, url: `${protocol}//${host}/` },
+      // The route below is intentionally configured with a non-existent path
+      // to prevent the root route from rendering during the route extraction process.
+      useValue: { document, url: `${protocol}//${host}/${EXTRACT_ROUTES_PATH}` },
     },
     {
       provide: ɵConsole,
       useFactory: () => new Console(),
+    },
+    {
+      multi: true,
+      provide: APP_INITIALIZER,
+      useFactory: () => {
+        // Adds an 'internal' route to extract routes.
+        // This route doesn't perform any action but ensures the use of a non-existent path to avoid route
+        // mismatch errors in Angular router.
+        return () => {
+          inject(ROUTES).unshift([{ path: EXTRACT_ROUTES_PATH, children: [] }]);
+        };
+      },
     },
   ]);
 
@@ -427,9 +455,15 @@ export async function getRoutesFromAngularRouterConfig(
 
     // Wait until the application is stable.
     await applicationRef.whenStable();
-
     const injector = applicationRef.injector;
     const router = injector.get(Router);
+
+    // Remove the 'internal' route as it is no longer needed.
+    if (router.config[0].path === EXTRACT_ROUTES_PATH) {
+      injector.get(ROUTES).shift();
+      router.config.shift();
+    }
+
     const routesResults: RouteTreeNodeMetadata[] = [];
     const errors: string[] = [];
 
