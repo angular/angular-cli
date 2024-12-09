@@ -200,6 +200,16 @@ export function createServerPolyfillBundleOptions(
     return;
   }
 
+  const jsBanner: string[] = [`globalThis['ngServerMode'] = true;`];
+  if (isNodePlatform) {
+    // Note: Needed as esbuild does not provide require shims / proxy from ESModules.
+    // See: https://github.com/evanw/esbuild/issues/1921.
+    jsBanner.push(
+      `import { createRequire } from 'node:module';`,
+      `globalThis['require'] ??= createRequire(import.meta.url);`,
+    );
+  }
+
   const buildOptions: BuildOptions = {
     ...polyfillBundleOptions,
     platform: isNodePlatform ? 'node' : 'neutral',
@@ -210,16 +220,9 @@ export function createServerPolyfillBundleOptions(
     // More details: https://github.com/angular/angular-cli/issues/25405.
     mainFields: ['es2020', 'es2015', 'module', 'main'],
     entryNames: '[name]',
-    banner: isNodePlatform
-      ? {
-          js: [
-            // Note: Needed as esbuild does not provide require shims / proxy from ESModules.
-            // See: https://github.com/evanw/esbuild/issues/1921.
-            `import { createRequire } from 'node:module';`,
-            `globalThis['require'] ??= createRequire(import.meta.url);`,
-          ].join('\n'),
-        }
-      : undefined,
+    banner: {
+      js: jsBanner.join('\n'),
+    },
     target,
     entryPoints: {
       'polyfills.server': namespace,
@@ -391,19 +394,22 @@ export function createSsrEntryCodeBundleOptions(
     const ssrInjectManifestNamespace = 'angular:ssr-entry-inject-manifest';
     const isNodePlatform = options.ssrOptions?.platform !== ExperimentalPlatform.Neutral;
 
+    const jsBanner: string[] = [`globalThis['ngServerMode'] = true;`];
+    if (isNodePlatform) {
+      // Note: Needed as esbuild does not provide require shims / proxy from ESModules.
+      // See: https://github.com/evanw/esbuild/issues/1921.
+      jsBanner.push(
+        `import { createRequire } from 'node:module';`,
+        `globalThis['require'] ??= createRequire(import.meta.url);`,
+      );
+    }
+
     const buildOptions: BuildOptions = {
       ...getEsBuildServerCommonOptions(options),
       target,
-      banner: isNodePlatform
-        ? {
-            js: [
-              // Note: Needed as esbuild does not provide require shims / proxy from ESModules.
-              // See: https://github.com/evanw/esbuild/issues/1921.
-              `import { createRequire } from 'node:module';`,
-              `globalThis['require'] ??= createRequire(import.meta.url);`,
-            ].join('\n'),
-          }
-        : undefined,
+      banner: {
+        js: jsBanner.join('\n'),
+      },
       entryPoints: {
         'server': ssrEntryNamespace,
       },
