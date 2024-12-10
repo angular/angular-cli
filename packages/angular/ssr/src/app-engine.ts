@@ -8,8 +8,9 @@
 
 import type { AngularServerApp, getOrCreateAngularServerApp } from './app';
 import { Hooks } from './hooks';
-import { getPotentialLocaleIdFromUrl } from './i18n';
+import { getPotentialLocaleIdFromUrl, getPreferredLocale } from './i18n';
 import { EntryPointExports, getAngularAppEngineManifest } from './manifest';
+import { joinUrlParts } from './utils/url';
 
 /**
  * Angular server application engine.
@@ -47,9 +48,11 @@ export class AngularAppEngine {
   private readonly manifest = getAngularAppEngineManifest();
 
   /**
-   * The number of entry points available in the server application's manifest.
+   * A map of supported locales from the server application's manifest.
    */
-  private readonly entryPointsCount = Object.keys(this.manifest.entryPoints).length;
+  private readonly supportedLocales: ReadonlyArray<string> = Object.keys(
+    this.manifest.supportedLocales,
+  );
 
   /**
    * A cache that holds entry points, keyed by their potential locale string.
@@ -70,7 +73,58 @@ export class AngularAppEngine {
   async handle(request: Request, requestContext?: unknown): Promise<Response | null> {
     const serverApp = await this.getAngularServerAppForRequest(request);
 
-    return serverApp ? serverApp.handle(request, requestContext) : null;
+    if (serverApp) {
+      return serverApp.handle(request, requestContext);
+    }
+
+    if (this.supportedLocales.length > 1) {
+      // Redirect to the preferred language if i18n is enabled.
+      return this.redirectBasedOnAcceptLanguage(request);
+    }
+
+    return null;
+  }
+
+  /**
+   * Handles requests for the base path when i18n is enabled.
+   * Redirects the user to a locale-specific path based on the `Accept-Language` header.
+   *
+   * @param request The incoming request.
+   * @returns A `Response` object with a 302 redirect, or `null` if i18n is not enabled
+   *          or the request is not for the base path.
+   */
+  private redirectBasedOnAcceptLanguage(request: Request): Response | null {
+    const { basePath, supportedLocales } = this.manifest;
+
+    // If the request is not for the base path, it's not our responsibility to handle it.
+    const url = new URL(request.url);
+    if (url.pathname !== basePath) {
+      return null;
+    }
+
+    // For requests to the base path (typically '/'), attempt to extract the preferred locale
+    // from the 'Accept-Language' header.
+    const preferredLocale = getPreferredLocale(
+      request.headers.get('Accept-Language') || '*',
+      this.supportedLocales,
+    );
+
+    if (preferredLocale) {
+      const subPath = supportedLocales[preferredLocale];
+      if (subPath !== undefined) {
+        url.pathname = joinUrlParts(url.pathname, subPath);
+
+        return new Response(null, {
+          status: 302, // Use a 302 redirect as language preference may change.
+          headers: {
+            'Location': url.toString(),
+            'Vary': 'Accept-Language',
+          },
+        });
+      }
+    }
+
+    return null;
   }
 
   /**
@@ -142,7 +196,7 @@ export class AngularAppEngine {
    */
   private getEntryPointExportsForUrl(url: URL): Promise<EntryPointExports> | undefined {
     const { basePath } = this.manifest;
-    if (this.entryPointsCount === 1) {
+    if (this.supportedLocales.length === 1) {
       return this.getEntryPointExports('');
     }
 
