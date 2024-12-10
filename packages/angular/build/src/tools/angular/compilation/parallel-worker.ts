@@ -17,6 +17,7 @@ import { JitCompilation } from './jit-compilation';
 
 export interface InitRequest {
   jit: boolean;
+  browserOnlyBuild: boolean;
   tsconfig: string;
   fileReplacements?: Record<string, string>;
   stylesheetPort: MessagePort;
@@ -31,7 +32,9 @@ let compilation: AngularCompilation | undefined;
 const sourceFileCache = new SourceFileCache();
 
 export async function initialize(request: InitRequest) {
-  compilation ??= request.jit ? new JitCompilation() : new AotCompilation();
+  compilation ??= request.jit
+    ? new JitCompilation(request.browserOnlyBuild)
+    : new AotCompilation(request.browserOnlyBuild);
 
   const stylesheetRequests = new Map<string, [(value: string) => void, (reason: Error) => void]>();
   request.stylesheetPort.on('message', ({ requestId, value, error }) => {

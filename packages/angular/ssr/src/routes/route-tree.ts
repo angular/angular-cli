@@ -65,6 +65,11 @@ export interface RouteTreeNodeMetadata {
    * Specifies the rendering mode used for this route.
    */
   renderMode: RenderMode;
+
+  /**
+   * A list of resource that should be preloaded by the browser.
+   */
+  preload?: readonly string[];
 }
 
 /**

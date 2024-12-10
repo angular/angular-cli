@@ -17,6 +17,7 @@ import {
   ensureSourceFileVersions,
 } from '../angular-host';
 import { replaceBootstrap } from '../transformers/jit-bootstrap-transformer';
+import { lazyRoutesTransformer } from '../transformers/lazy-routes-transformer';
 import { createWorkerTransformer } from '../transformers/web-worker-transformer';
 import { AngularCompilation, DiagnosticModes, EmitFileResult } from './angular-compilation';
 import { collectHmrCandidates } from './hmr-candidates';
@@ -46,6 +47,10 @@ class AngularCompilationState {
 
 export class AotCompilation extends AngularCompilation {
   #state?: AngularCompilationState;
+
+  constructor(private readonly browserOnlyBuild: boolean) {
+    super();
+  }
 
   async initialize(
     tsconfig: string,
@@ -314,8 +319,12 @@ export class AotCompilation extends AngularCompilation {
     transformers.before ??= [];
     transformers.before.push(
       replaceBootstrap(() => typeScriptProgram.getProgram().getTypeChecker()),
+      webWorkerTransform,
     );
-    transformers.before.push(webWorkerTransform);
+
+    if (!this.browserOnlyBuild) {
+      transformers.before.push(lazyRoutesTransformer(compilerOptions, compilerHost));
+    }
 
     // Emit is handled in write file callback when using TypeScript
     if (useTypeScriptTranspilation) {

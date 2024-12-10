@@ -7,6 +7,7 @@
  */
 
 import { BuilderContext } from '@angular-devkit/architect';
+import type { Metafile } from 'esbuild';
 import { join } from 'node:path';
 import { BuildOutputFileType, InitialFileRecord } from '../../tools/esbuild/bundler-context';
 import {
@@ -23,11 +24,13 @@ import { NormalizedApplicationBuildOptions, getLocaleBaseHref } from './options'
 /**
  * Inlines all active locales as specified by the application build options into all
  * application JavaScript files created during the build.
+ * @param metafile An esbuild metafile object.
  * @param options The normalized application builder options used to create the build.
  * @param executionResult The result of an executed build.
  * @param initialFiles A map containing initial file information for the executed build.
  */
 export async function inlineI18n(
+  metafile: Metafile,
   options: NormalizedApplicationBuildOptions,
   executionResult: ExecutionResult,
   initialFiles: Map<string, InitialFileRecord>,
@@ -79,6 +82,7 @@ export async function inlineI18n(
         additionalOutputFiles,
         prerenderedRoutes: generatedRoutes,
       } = await executePostBundleSteps(
+        metafile,
         {
           ...options,
           baseHref: getLocaleBaseHref(baseHref, i18nOptions, locale) ?? baseHref,

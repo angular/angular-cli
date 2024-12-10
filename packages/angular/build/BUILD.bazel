@@ -127,6 +127,7 @@ ts_library(
         "@npm//@angular/compiler-cli",
         "@npm//@babel/core",
         "@npm//prettier",
+        "@npm//typescript",
     ],
 )
 

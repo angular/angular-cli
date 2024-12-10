@@ -247,12 +247,13 @@ export async function executeBuild(
 
   // Perform i18n translation inlining if enabled
   if (i18nOptions.shouldInline) {
-    const result = await inlineI18n(options, executionResult, initialFiles);
+    const result = await inlineI18n(metafile, options, executionResult, initialFiles);
     executionResult.addErrors(result.errors);
     executionResult.addWarnings(result.warnings);
     executionResult.addPrerenderedRoutes(result.prerenderedRoutes);
   } else {
     const result = await executePostBundleSteps(
+      metafile,
       options,
       executionResult.outputFiles,
       executionResult.assetFiles,
