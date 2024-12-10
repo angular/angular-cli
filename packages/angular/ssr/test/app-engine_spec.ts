@@ -34,10 +34,32 @@ function createEntryPoint(locale: string) {
   class SSGComponent {}
 
   return async () => {
+    @Component({
+      standalone: true,
+      selector: `app-home-${locale}`,
+      template: `Home works ${locale.toUpperCase()}`,
+    })
+    class HomeComponent {}
+
+    @Component({
+      standalone: true,
+      selector: `app-ssr-${locale}`,
+      template: `SSR works ${locale.toUpperCase()}`,
+    })
+    class SSRComponent {}
+
+    @Component({
+      standalone: true,
+      selector: `app-ssg-${locale}`,
+      template: `SSG works ${locale.toUpperCase()}`,
+    })
+    class SSGComponent {}
+
     setAngularAppTestingManifest(
       [
         { path: 'ssg', component: SSGComponent },
         { path: 'ssr', component: SSRComponent },
+        { path: '', component: HomeComponent },
       ],
       [
         { path: 'ssg', renderMode: RenderMode.Prerender },
@@ -82,7 +104,8 @@ describe('AngularAppEngine', () => {
           it: createEntryPoint('it'),
           en: createEntryPoint('en'),
         },
-        basePath: '',
+        supportedLocales: { 'it': 'it', 'en': 'en' },
+        basePath: '/',
       });
 
       appEngine = new AngularAppEngine();
@@ -133,6 +156,16 @@ describe('AngularAppEngine', () => {
         expect(response).toBeNull();
       });
 
+      it('should redirect to the highest priority locale when the URL is "/"', async () => {
+        const request = new Request('https://example.com/', {
+          headers: { 'Accept-Language': 'fr-CH, fr;q=0.9, it;q=0.8, en;q=0.7, *;q=0.5' },
+        });
+        const response = await appEngine.handle(request);
+        expect(response?.status).toBe(302);
+        expect(response?.headers.get('Location')).toBe('https://example.com/it');
+        expect(response?.headers.get('Vary')).toBe('Accept-Language');
+      });
+
       it('should return null for requests to file-like resources in a locale', async () => {
         const request = new Request('https://example.com/it/logo.png');
         const response = await appEngine.handle(request);
@@ -164,7 +197,8 @@ describe('AngularAppEngine', () => {
             };
           },
         },
-        basePath: '',
+        basePath: '/',
+        supportedLocales: { 'en-US': '' },
       });
 
       appEngine = new AngularAppEngine();

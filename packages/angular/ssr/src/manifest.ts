@@ -55,7 +55,7 @@ export interface AngularAppEngineManifest {
   /**
    * A readonly record of entry points for the server application.
    * Each entry consists of:
-   * - `key`: The base href for the entry point.
+   * - `key`: The url segment for the entry point.
    * - `value`: A function that returns a promise resolving to an object of type `EntryPointExports`.
    */
   readonly entryPoints: Readonly<Record<string, (() => Promise<EntryPointExports>) | undefined>>;
@@ -65,6 +65,14 @@ export interface AngularAppEngineManifest {
    * This is used to determine the root path of the application.
    */
   readonly basePath: string;
+
+  /**
+   * A readonly record mapping supported locales to their respective entry-point paths.
+   * Each entry consists of:
+   * - `key`: The locale identifier (e.g., 'en', 'fr').
+   * - `value`: The url segment associated with that locale.
+   */
+  readonly supportedLocales: Readonly<Record<string, string | undefined>>;
 }
 
 /**

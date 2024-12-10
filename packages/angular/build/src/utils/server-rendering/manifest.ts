@@ -60,19 +60,30 @@ export function generateAngularServerAppEngineManifest(
   baseHref: string | undefined,
 ): string {
   const entryPoints: Record<string, string> = {};
+  const supportedLocales: Record<string, string> = {};
+
   if (i18nOptions.shouldInline && !i18nOptions.flatOutput) {
     for (const locale of i18nOptions.inlineLocales) {
       const { subPath } = i18nOptions.locales[locale];
       const importPath = `${subPath ? `${subPath}/` : ''}${MAIN_SERVER_OUTPUT_FILENAME}`;
       entryPoints[subPath] = `() => import('./${importPath}')`;
+      supportedLocales[locale] = subPath;
     }
   } else {
     entryPoints[''] = `() => import('./${MAIN_SERVER_OUTPUT_FILENAME}')`;
+    supportedLocales[i18nOptions.sourceLocale] = '';
+  }
+
+  // Remove trailing slash but retain leading slash.
+  let basePath = baseHref || '/';
+  if (basePath.length > 1 && basePath[basePath.length - 1] === '/') {
+    basePath = basePath.slice(0, -1);
   }
 
   const manifestContent = `
 export default {
-  basePath: '${baseHref ?? '/'}',
+  basePath: '${basePath}',
+  supportedLocales: ${JSON.stringify(supportedLocales, undefined, 2)},
   entryPoints: {
     ${Object.entries(entryPoints)
       .map(([key, value]) => `'${key}': ${value}`)
