@@ -20,7 +20,7 @@ import { randomUUID } from 'crypto';
 import glob from 'fast-glob';
 import * as fs from 'fs/promises';
 import { IncomingMessage, ServerResponse } from 'http';
-import type { Config, ConfigOptions, InlinePluginDef } from 'karma';
+import type { Config, ConfigOptions, FilePattern, InlinePluginDef } from 'karma';
 import * as path from 'path';
 import { Observable, Subscriber, catchError, defaultIfEmpty, from, of, switchMap } from 'rxjs';
 import { Configuration } from 'webpack';
@@ -101,6 +101,66 @@ class AngularAssetsMiddleware {
 
           return inst.handle.bind(inst);
         }, AngularAssetsMiddleware),
+      ],
+    };
+  }
+}
+
+class AngularPolyfillsPlugin {
+  static readonly $inject = ['config.files'];
+
+  static readonly NAME = 'angular-polyfills';
+
+  static createPlugin(
+    polyfillsFile: FilePattern,
+    jasmineCleanupFiles: FilePattern,
+  ): InlinePluginDef {
+    return {
+      // This has to be a "reporter" because reporters run _after_ frameworks
+      // and karma-jasmine-html-reporter injects additional scripts that may
+      // depend on Jasmine but aren't modules - which means that they would run
+      // _before_ all module code (including jasmine).
+      [`reporter:${AngularPolyfillsPlugin.NAME}`]: [
+        'factory',
+        Object.assign((files: (string | FilePattern)[]) => {
+          // The correct order is zone.js -> jasmine -> zone.js/testing.
+          // Jasmine has to see the patched version of the global `setTimeout`
+          // function so it doesn't cache the unpatched version. And /testing
+          // needs to see the global `jasmine` object so it can patch it.
+          const polyfillsIndex = 0;
+          files.splice(polyfillsIndex, 0, polyfillsFile);
+
+          // Insert just before test_main.js.
+          const zoneTestingIndex = files.findIndex((f) => {
+            if (typeof f === 'string') {
+              return false;
+            }
+
+            return f.pattern.endsWith('/test_main.js');
+          });
+          if (zoneTestingIndex === -1) {
+            throw new Error('Could not find test entrypoint file.');
+          }
+          files.splice(zoneTestingIndex, 0, jasmineCleanupFiles);
+
+          // We need to ensure that all files are served as modules, otherwise
+          // the order in the files list gets really confusing: Karma doesn't
+          // set defer on scripts, so all scripts with type=js will run first,
+          // even if type=module files appeared earlier in `files`.
+          for (const f of files) {
+            if (typeof f === 'string') {
+              throw new Error(`Unexpected string-based file: "${f}"`);
+            }
+            if (f.included === false) {
+              // Don't worry about files that aren't included on the initial
+              // page load. `type` won't affect them.
+              continue;
+            }
+            if ('js' === (f.type ?? 'js')) {
+              f.type = 'module';
+            }
+          }
+        }, AngularPolyfillsPlugin),
       ],
     };
   }
@@ -247,12 +307,27 @@ async function getProjectSourceRoot(context: BuilderContext): Promise<string> {
   return path.join(context.workspaceRoot, sourceRoot);
 }
 
-function normalizePolyfills(polyfills: string | string[] | undefined): string[] {
+function normalizePolyfills(polyfills: string | string[] | undefined): [string[], string[]] {
   if (typeof polyfills === 'string') {
-    return [polyfills];
+    polyfills = [polyfills];
+  } else if (!polyfills) {
+    polyfills = [];
   }
 
-  return polyfills ?? [];
+  const jasmineGlobalEntryPoint =
+    '@angular-devkit/build-angular/src/builders/karma/jasmine_global.js';
+  const jasmineGlobalCleanupEntrypoint =
+    '@angular-devkit/build-angular/src/builders/karma/jasmine_global_cleanup.js';
+
+  const zoneTestingEntryPoint = 'zone.js/testing';
+  const polyfillsExludingZoneTesting = polyfills.filter((p) => p !== zoneTestingEntryPoint);
+
+  return [
+    polyfillsExludingZoneTesting.concat([jasmineGlobalEntryPoint]),
+    polyfillsExludingZoneTesting.length === polyfills.length
+      ? [jasmineGlobalCleanupEntrypoint]
+      : [jasmineGlobalCleanupEntrypoint, zoneTestingEntryPoint],
+  ];
 }
 
 async function collectEntrypoints(
@@ -311,6 +386,11 @@ async function initializeApplication(
       )
     : undefined;
 
+  const [polyfills, jasmineCleanup] = normalizePolyfills(options.polyfills);
+  for (let idx = 0; idx < jasmineCleanup.length; ++idx) {
+    entryPoints.set(`jasmine-cleanup-${idx}`, jasmineCleanup[idx]);
+  }
+
   const buildOptions: BuildOptions = {
     assets: options.assets,
     entryPoints,
@@ -327,7 +407,7 @@ async function initializeApplication(
     },
     instrumentForCoverage,
     styles: options.styles,
-    polyfills: normalizePolyfills(options.polyfills),
+    polyfills,
     webWorkerTsConfig: options.webWorkerTsConfig,
     watch: options.watch ?? !karmaOptions.singleRun,
     stylePreprocessorOptions: options.stylePreprocessorOptions,
@@ -349,10 +429,25 @@ async function initializeApplication(
   // Write test files
   await writeTestFiles(buildOutput.files, buildOptions.outputPath);
 
+  // We need to add this to the beginning *after* the testing framework has
+  // prepended its files.
+  const polyfillsFile: FilePattern = {
+    pattern: `${outputPath}/polyfills.js`,
+    included: true,
+    served: true,
+    type: 'module',
+    watched: false,
+  };
+  const jasmineCleanupFiles: FilePattern = {
+    pattern: `${outputPath}/jasmine-cleanup-*.js`,
+    included: true,
+    served: true,
+    type: 'module',
+    watched: false,
+  };
+
   karmaOptions.files ??= [];
   karmaOptions.files.push(
-    // Serve polyfills first.
-    { pattern: `${outputPath}/polyfills.js`, type: 'module', watched: false },
     // Serve global setup script.
     { pattern: `${outputPath}/${mainName}.js`, type: 'module', watched: false },
     // Serve all source maps.
@@ -412,6 +507,12 @@ async function initializeApplication(
   parsedKarmaConfig.plugins.push(AngularAssetsMiddleware.createPlugin(buildOutput));
   parsedKarmaConfig.middleware ??= [];
   parsedKarmaConfig.middleware.push(AngularAssetsMiddleware.NAME);
+
+  parsedKarmaConfig.plugins.push(
+    AngularPolyfillsPlugin.createPlugin(polyfillsFile, jasmineCleanupFiles),
+  );
+  parsedKarmaConfig.reporters ??= [];
+  parsedKarmaConfig.reporters.push(AngularPolyfillsPlugin.NAME);
 
   // When using code-coverage, auto-add karma-coverage.
   // This was done as part of the karma plugin for webpack.
