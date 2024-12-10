@@ -22,7 +22,7 @@ import { ServerRoute, provideServerRoutesConfig } from '../src/routes/route-conf
  *
  * @param routes - An array of route definitions to be used by the Angular Router.
  * @param serverRoutes - An array of server route definitions for server-side rendering.
- * @param [baseHref='/'] - An optional base href for the HTML template (default is `/`).
+ * @param baseHref - An optional base href to be used in the HTML template.
  * @param additionalServerAssets - A record of additional server assets to include,
  *                                  where the keys are asset paths and the values are asset details.
  * @param locale - An optional locale to configure for the application during testing.

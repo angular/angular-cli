@@ -110,6 +110,26 @@ export interface AngularAppManifest {
    * the application, aiding with localization and rendering content specific to the locale.
    */
   readonly locale?: string;
+
+  /**
+   * Maps entry-point names to their corresponding browser bundles and loading strategies.
+   *
+   * - **Key**: The entry-point name, typically the value of `ɵentryName`.
+   * - **Value**: An array of objects, each representing a browser bundle with:
+   *   - `path`: The filename or URL of the associated JavaScript bundle to preload.
+   *   - `dynamicImport`: A boolean indicating whether the bundle is loaded via a dynamic `import()`.
+   *     If `true`, the bundle is lazily loaded, impacting its preloading behavior.
+   *
+   * ### Example
+   * ```ts
+   * {
+   *   'src/app/lazy/lazy.ts': [{ path: 'src/app/lazy/lazy.js', dynamicImport: true }]
+   * }
+   * ```
+   */
+  readonly entryPointToBrowserMapping?: Readonly<
+    Record<string, ReadonlyArray<{ path: string; dynamicImport: boolean }> | undefined>
+  >;
 }
 
 /**

@@ -13,6 +13,7 @@ import { loadEsmModule } from '../../../utils/load-esm';
 import { profileSync } from '../../esbuild/profiling';
 import { AngularHostOptions, createAngularCompilerHost } from '../angular-host';
 import { createJitResourceTransformer } from '../transformers/jit-resource-transformer';
+import { lazyRoutesTransformer } from '../transformers/lazy-routes-transformer';
 import { createWorkerTransformer } from '../transformers/web-worker-transformer';
 import { AngularCompilation, DiagnosticModes, EmitFileResult } from './angular-compilation';
 
@@ -28,6 +29,10 @@ class JitCompilationState {
 
 export class JitCompilation extends AngularCompilation {
   #state?: JitCompilationState;
+
+  constructor(private readonly browserOnlyBuild: boolean) {
+    super();
+  }
 
   async initialize(
     tsconfig: string,
@@ -116,8 +121,8 @@ export class JitCompilation extends AngularCompilation {
       replaceResourcesTransform,
       webWorkerTransform,
     } = this.#state;
-    const buildInfoFilename =
-      typeScriptProgram.getCompilerOptions().tsBuildInfoFile ?? '.tsbuildinfo';
+    const compilerOptions = typeScriptProgram.getCompilerOptions();
+    const buildInfoFilename = compilerOptions.tsBuildInfoFile ?? '.tsbuildinfo';
 
     const emittedFiles: EmitFileResult[] = [];
     const writeFileCallback: ts.WriteFileCallback = (filename, contents, _a, _b, sourceFiles) => {
@@ -139,6 +144,10 @@ export class JitCompilation extends AngularCompilation {
         webWorkerTransform,
       ],
     };
+
+    if (!this.browserOnlyBuild) {
+      transformers.before.push(lazyRoutesTransformer(compilerOptions, compilerHost));
+    }
 
     // TypeScript will loop until there are no more affected files in the program
     while (

@@ -40,6 +40,7 @@ export interface CompilerPluginOptions {
   sourcemap: boolean | 'external';
   tsconfig: string;
   jit?: boolean;
+  browserOnlyBuild?: boolean;
 
   /** Skip TypeScript compilation setup. This is useful to re-use the TypeScript compilation from another plugin. */
   noopTypeScriptCompilation?: boolean;
@@ -119,7 +120,7 @@ export function createCompilerPlugin(
       // Create new reusable compilation for the appropriate mode based on the `jit` plugin option
       const compilation: AngularCompilation = pluginOptions.noopTypeScriptCompilation
         ? new NoopCompilation()
-        : await createAngularCompilation(!!pluginOptions.jit);
+        : await createAngularCompilation(!!pluginOptions.jit, !!pluginOptions.browserOnlyBuild);
       // Compilation is initially assumed to have errors until emitted
       let hasCompilationErrors = true;
 
