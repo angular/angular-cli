@@ -139,6 +139,7 @@ export class AotCompilation extends AngularCompilation {
         if (relativePath.startsWith('..')) {
           relativePath = componentFilename;
         }
+        relativePath = relativePath.replaceAll('\\', '/');
         const updateId = encodeURIComponent(
           `${host.getCanonicalFileName(relativePath)}@${node.name?.text}`,
         );
