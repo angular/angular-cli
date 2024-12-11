@@ -27,7 +27,7 @@ import { EsbuildLoaderOption, getDepOptimizationConfig } from '../../tools/vite/
 import { loadProxyConfiguration, normalizeSourceMaps } from '../../utils';
 import { useComponentStyleHmr, useComponentTemplateHmr } from '../../utils/environment-options';
 import { loadEsmModule } from '../../utils/load-esm';
-import { Result, ResultFile, ResultKind } from '../application/results';
+import { MemoryFile, Result, ResultFile, ResultKind } from '../application/results';
 import {
   type ApplicationBuilderInternalOptions,
   BuildOutputFileType,
@@ -265,6 +265,11 @@ export async function* serveWithVite(
             });
           }
         }
+
+        if (result.globalStyles) {
+          updateGlobalStyles(result.globalStyles, generatedFiles, server);
+        }
+
         context.logger.info('Component update sent to client(s).');
         continue;
       default:
@@ -608,6 +613,37 @@ function analyzeResultFiles(
       generatedFiles.delete(file);
       componentStyles.delete(file);
     }
+  }
+}
+
+function updateGlobalStyles(
+  file: MemoryFile,
+  generatedFiles: Map<string, OutputFileRecord>,
+  server: ViteDevServer,
+) {
+  const stylesUrl = '/styles.css';
+  const styleHash = generatedFiles.get(stylesUrl);
+  if (file.hash !== styleHash?.hash) {
+    generatedFiles.set(stylesUrl, {
+      contents: file.contents,
+      size: file.contents.byteLength,
+      hash: file.hash,
+      updated: true,
+      type: file.type,
+      servable: true,
+    });
+    const timestamp = Date.now();
+    server.ws.send({
+      type: 'update',
+      updates: [
+        {
+          type: 'css-update' as const,
+          timestamp,
+          path: stylesUrl,
+          acceptedPath: stylesUrl,
+        },
+      ],
+    });
   }
 }
 

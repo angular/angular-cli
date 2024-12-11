@@ -73,4 +73,5 @@ export interface ComponentUpdateResult extends BaseResult {
     type: 'style' | 'template';
     content: string;
   }[];
+  globalStyles?: MemoryFile;
 }

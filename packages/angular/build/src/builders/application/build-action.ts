@@ -223,7 +223,10 @@ async function emitOutputResult(
   }
 
   // Template updates only exist if no other changes have occurred
+  // To support Tailwind CSS the global styles.css build output is included in the update so it can be checked for changes
+  // as the file watcher is only capable of detecting changes to the raw styles.css file.
   if (templateUpdates?.size) {
+    const globalStyles = outputFiles.find((f) => f.path === 'styles.css');
     const updateResult: ComponentUpdateResult = {
       kind: ResultKind.ComponentUpdate,
       updates: Array.from(templateUpdates).map(([id, content]) => ({
@@ -231,6 +234,14 @@ async function emitOutputResult(
         id,
         content,
       })),
+      globalStyles: globalStyles
+        ? {
+            origin: 'memory',
+            hash: globalStyles.hash,
+            type: globalStyles.type,
+            contents: globalStyles.contents,
+          }
+        : undefined,
     };
 
     return updateResult;
