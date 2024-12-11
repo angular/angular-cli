@@ -16,9 +16,12 @@ import { AngularMemoryOutputFiles } from '../utils';
 interface AngularMemoryPluginOptions {
   virtualProjectRoot: string;
   outputFiles: AngularMemoryOutputFiles;
+  templateUpdates?: ReadonlyMap<string, string>;
   external?: string[];
   skipViteClient?: boolean;
 }
+
+const ANGULAR_PREFIX = '/@ng/';
 
 export async function createAngularMemoryPlugin(
   options: AngularMemoryPluginOptions,
@@ -30,7 +33,12 @@ export async function createAngularMemoryPlugin(
     name: 'vite:angular-memory',
     // Ensures plugin hooks run before built-in Vite hooks
     enforce: 'pre',
-    async resolveId(source, importer) {
+    async resolveId(source, importer, { ssr }) {
+      // For SSR with component HMR, pass through as a virtual module
+      if (ssr && source.startsWith(ANGULAR_PREFIX)) {
+        return '\0' + source;
+      }
+
       // Prevent vite from resolving an explicit external dependency (`externalDependencies` option)
       if (external?.includes(source)) {
         // This is still not ideal since Vite will still transform the import specifier to
@@ -51,7 +59,16 @@ export async function createAngularMemoryPlugin(
         return join(virtualProjectRoot, source);
       }
     },
-    load(id) {
+    load(id, loadOptions) {
+      // For SSR component updates, return the component update module or empty if none
+      if (loadOptions?.ssr && id.startsWith(`\0${ANGULAR_PREFIX}`)) {
+        // Extract component identifier (first character is rollup virtual module null)
+        const requestUrl = new URL(id.slice(1), 'http://localhost');
+        const componentId = requestUrl.searchParams.get('c');
+
+        return (componentId && options.templateUpdates?.get(componentId)) ?? '';
+      }
+
       const [file] = id.split('?', 1);
       const relativeFile = '/' + normalizePath(relative(virtualProjectRoot, file));
       const codeContents = outputFiles.get(relativeFile)?.contents;
