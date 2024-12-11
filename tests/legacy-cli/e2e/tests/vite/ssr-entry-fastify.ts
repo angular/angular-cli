@@ -90,6 +90,7 @@ export default async function () {
     'src/app/home/home.component.html',
     'home works',
     'yay home works!!!',
+    true,
   );
   await validateResponse('/api/test', /foo/);
   await validateResponse('/home', /yay home works/);
@@ -111,9 +112,12 @@ async function modifyFileAndWaitUntilUpdated(
   filePath: string,
   searchValue: string,
   replaceValue: string,
+  hmr = false,
 ): Promise<void> {
   await Promise.all([
-    waitForAnyProcessOutputToMatch(/Page reload sent to client/),
+    waitForAnyProcessOutputToMatch(
+      hmr ? /Component update sent to client/ : /Page reload sent to client/,
+    ),
     setTimeout(100).then(() => replaceInFile(filePath, searchValue, replaceValue)),
   ]);
 }
