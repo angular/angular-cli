@@ -33,7 +33,7 @@
     "https-proxy-agent": "7.0.6",
     "istanbul-lib-instrument": "6.0.3",
     "listr2": "8.2.5",
-    "magic-string": "0.30.14",
+    "magic-string": "0.30.15",
     "mrmime": "2.0.0",
     "parse5-html-rewriting-stream": "7.0.0",
     "picomatch": "4.0.2",
