@@ -7,7 +7,16 @@
  */
 
 import { APP_BASE_HREF, PlatformLocation } from '@angular/common';
-import { ApplicationRef, Compiler, Injector, runInInjectionContext, ɵConsole } from '@angular/core';
+import {
+  APP_INITIALIZER,
+  ApplicationRef,
+  Compiler,
+  ComponentRef,
+  Injector,
+  inject,
+  runInInjectionContext,
+  ɵConsole,
+} from '@angular/core';
 import { INITIAL_CONFIG, platformServer } from '@angular/platform-server';
 import { Route, Router, ɵloadChildren as loadChildrenHelper } from '@angular/router';
 import { ServerAssets } from '../assets';
@@ -416,6 +425,18 @@ export async function getRoutesFromAngularRouterConfig(
       // which would require switching from `ts_library` to `ng_module`. This change
       // would also necessitate various patches of `@angular/bazel` to support ESM.
       useFactory: () => new Console(),
+    },
+    {
+      // We cannot replace `ApplicationRef` with a different provider here due to the dependency injection (DI) hierarchy.
+      // This code is running at the platform level, where `ApplicationRef` is provided in the root injector.
+      // As a result, any attempt to replace it will cause the root provider to override the platform provider.
+      // TODO(alanagius): investigate exporting the app config directly which would help with: https://github.com/angular/angular/issues/59144
+      provide: APP_INITIALIZER,
+      multi: true,
+      useFactory: () => () => {
+        const appRef = inject(ApplicationRef);
+        appRef.bootstrap = () => undefined as unknown as ComponentRef<unknown>;
+      },
     },
   ]);
 
