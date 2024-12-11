@@ -466,4 +466,33 @@ describe('extractRoutesAndCreateRouteTree', () => {
       { route: '/example/home', renderMode: RenderMode.Server },
     ]);
   });
+
+  it('should not bootstrap the root component', async () => {
+    @Component({
+      standalone: true,
+      selector: 'app-root',
+      template: '',
+    })
+    class RootComponent {
+      constructor() {
+        throw new Error('RootComponent should not be bootstrapped.');
+      }
+    }
+
+    setAngularAppTestingManifest(
+      [
+        { path: '', component: DummyComponent },
+        { path: 'home', component: DummyComponent },
+      ],
+      [{ path: '**', renderMode: RenderMode.Server }],
+      undefined,
+      undefined,
+      undefined,
+      RootComponent,
+    );
+
+    const { routeTree, errors } = await extractRoutesAndCreateRouteTree({ url });
+    expect(errors).toHaveSize(0);
+    expect(routeTree.toObject()).toHaveSize(2);
+  });
 });
