@@ -21,10 +21,10 @@ export default async function () {
   await installWorkspacePackages();
 
   // Test scenario to verify that the content length, including \r\n, is accurate
-  await replaceInFile('src/app/app.ts', "title = '", "title = 'Title\\r\\n");
+  await replaceInFile('src/app/app.ts', "title = signal('", "title = signal('Title\\r\\n");
 
   // Ensure text has been updated.
-  assert.match(await readFile('src/app/app.ts'), /title = 'Title/);
+  assert.match(await readFile('src/app/app.ts'), /title = signal\('Title/);
 
   // Add routes
   await writeFile(
