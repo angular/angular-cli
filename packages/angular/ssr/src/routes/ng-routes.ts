@@ -476,7 +476,11 @@ export async function getRoutesFromAngularRouterConfig(
       useValue: { document, url: `${protocol}//${host}/` },
     },
     {
+      // An Angular Console Provider that does not print a set of predefined logs.
       provide: ɵConsole,
+      // Using `useClass` would necessitate decorating `Console` with `@Injectable`,
+      // which would require switching from `ts_library` to `ng_module`. This change
+      // would also necessitate various patches of `@angular/bazel` to support ESM.
       useFactory: () => new Console(),
     },
   ]);
