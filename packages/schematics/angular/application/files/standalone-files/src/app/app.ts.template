@@ -1,11 +1,11 @@
-import { Component } from '@angular/core';<% if(routing) { %>
+import { Component, signal } from '@angular/core';<% if(routing) { %>
 import { RouterOutlet } from '@angular/router';<% } %>
 
 @Component({
   selector: '<%= selector %>',
   imports: [<% if(routing) { %>RouterOutlet<% } %>],<% if(inlineTemplate) { %>
   template: `
-    <h1>Welcome to {{title}}!</h1>
+    <h1>Welcome to {{ title() }}!</h1>
 
     <% if (routing) {
      %><router-outlet /><%
@@ -16,5 +16,5 @@ import { RouterOutlet } from '@angular/router';<% } %>
   styleUrl: './app.<%= style %>'<% } %>
 })
 export class App {
-  protected title = '<%= name %>';
+  protected readonly title = signal('<%= name %>');
 }

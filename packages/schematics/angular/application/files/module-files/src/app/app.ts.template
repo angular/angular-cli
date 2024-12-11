@@ -1,9 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 
 @Component({
   selector: '<%= selector %>',<% if(inlineTemplate) { %>
   template: `
-    <h1>Welcome to {{title}}!</h1>
+    <h1>Welcome to {{ title() }}!</h1>
 
     <% if (routing) {
      %><router-outlet /><%
@@ -15,5 +15,5 @@ import { Component } from '@angular/core';
   styleUrl: './app.<%= style %>'<% } %>
 })
 export class App {
-  protected title = '<%= name %>';
+  protected readonly title = signal('<%= name %>');
 }
