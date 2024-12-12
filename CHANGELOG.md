@@ -1,3 +1,31 @@
+<a name="19.0.5"></a>
+
+# 19.0.5 (2024-12-12)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                            |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------- |
+| [6c319e44c](https://github.com/angular/angular-cli/commit/6c319e44c707b93e430da93fe815ba839ab18ea1) | fix  | fix webpack config transform for karma |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                                                                                   |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------------------------------------------- |
+| [251bd9f22](https://github.com/angular/angular-cli/commit/251bd9f226f73529e824b131fa8d08b77aa00d09) | fix  | Fixing auto-csp edge cases where                                                                              |
+| [1047b8635](https://github.com/angular/angular-cli/commit/1047b8635699d55886fff28cbf02d36df224958d) | fix  | handle external `@angular/` packages during SSR ([#29094](https://github.com/angular/angular-cli/pull/29094)) |
+| [376ee9966](https://github.com/angular/angular-cli/commit/376ee996699a9610984f3d3e36b3331557dbeaca) | fix  | provide component HMR update modules to dev-server SSR                                                        |
+| [5ea9ce376](https://github.com/angular/angular-cli/commit/5ea9ce3760a191d13db08f5ae7448ce089e8eacd) | fix  | use consistent path separators for template HMR identifiers                                                   |
+
+### @angular/ssr
+
+| Commit                                                                                              | Type | Description                                             |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------- |
+| [b3c6c7eb2](https://github.com/angular/angular-cli/commit/b3c6c7eb2cc796796d99758368706b0b8682ae69) | fix  | include `Content-Language` header when locale is set    |
+| [4203efb90](https://github.com/angular/angular-cli/commit/4203efb90a38fe2f0d45fabab80dc736e8ca2b7b) | fix  | disable component bootstrapping during route extraction |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="19.0.4"></a>
 
 # 19.0.4 (2024-12-05)
