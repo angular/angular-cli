@@ -78,7 +78,7 @@ export async function createAngularMemoryPlugin(
         const requestUrl = new URL(id.slice(1), 'http://localhost');
         const componentId = requestUrl.searchParams.get('c');
 
-        return (componentId && options.templateUpdates?.get(componentId)) ?? '';
+        return (componentId && options.templateUpdates?.get(encodeURIComponent(componentId))) ?? '';
       }
 
       const [file] = id.split('?', 1);

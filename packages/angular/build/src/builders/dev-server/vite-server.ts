@@ -233,6 +233,12 @@ export async function* serveWithVite(
             assetFiles.set('/' + normalizePath(outputPath), normalizePath(file.inputPath));
           }
         }
+
+        // Invalidate SSR module graph to ensure that only new rebuild is used and not stale component updates
+        if (server && browserOptions.ssr && templateUpdates.size > 0) {
+          server.moduleGraph.invalidateAll();
+        }
+
         // Clear stale template updates on code rebuilds
         templateUpdates.clear();
 
@@ -255,6 +261,16 @@ export async function* serveWithVite(
           server,
           'Builder must provide an initial full build before component update results.',
         );
+
+        // Invalidate SSR module graph to ensure that new component updates are used
+        // TODO: Use fine-grained invalidation of only the component update modules
+        if (browserOptions.ssr) {
+          server.moduleGraph.invalidateAll();
+          const { ɵresetCompiledComponents } = (await server.ssrLoadModule('/main.server.mjs')) as {
+            ɵresetCompiledComponents: () => void;
+          };
+          ɵresetCompiledComponents();
+        }
 
         for (const componentUpdate of result.updates) {
           if (componentUpdate.type === 'template') {
