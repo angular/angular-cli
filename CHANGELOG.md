@@ -1,3 +1,51 @@
+<a name="19.1.0-next.1"></a>
+
+# 19.1.0-next.1 (2024-12-12)
+
+## Deprecations
+
+### @angular/build
+
+- The `baseHref` option under `i18n.locales` and `i18n.sourceLocale` in `angular.json` is deprecated in favor of `subPath`.
+
+  The `subPath` defines the URL segment for the locale, serving as both the HTML base HREF and the directory name for output. By default, if not specified, `subPath` will use the locale code.
+
+### @angular-devkit/architect
+
+| Commit                                                                                              | Type | Description                        |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------- |
+| [2b8a02bac](https://github.com/angular/angular-cli/commit/2b8a02bac098d4ac4f31b0e74bedfc739171e30b) | feat | require build schemas from modules |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                            |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------- |
+| [fb41d182e](https://github.com/angular/angular-cli/commit/fb41d182ee9e50386b0412e07a8bacaaa8c7ce13) | fix  | fix webpack config transform for karma |
+| [9e2d3fbd1](https://github.com/angular/angular-cli/commit/9e2d3fbd1f5ce1eeca8a46d854aa45598e516d90) | fix  | handle windows spec collisions         |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                                                                                   |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------------------------------------------- |
+| [0a570c0c2](https://github.com/angular/angular-cli/commit/0a570c0c2e64c61ce9969975a21c0d9aac8d9f3b) | feat | add support for customizing URL segments with i18n                                                            |
+| [210bf4e2b](https://github.com/angular/angular-cli/commit/210bf4e2b4eeac6cdda7e810752486b74c6c0876) | fix  | Fixing auto-csp edge cases where                                                                              |
+| [d811a7ffb](https://github.com/angular/angular-cli/commit/d811a7ffb0b6aad741e35025e218ea558590b0bb) | fix  | handle external `@angular/` packages during SSR ([#29094](https://github.com/angular/angular-cli/pull/29094)) |
+| [64f32c769](https://github.com/angular/angular-cli/commit/64f32c769f58b4e7306faf73fdae386a30f48a41) | fix  | provide component HMR update modules to dev-server SSR                                                        |
+| [c832bac9b](https://github.com/angular/angular-cli/commit/c832bac9b23cd7e8c354f4e2428c158b9bb45e47) | fix  | show error when Node.js built-ins are used during `ng serve`                                                  |
+| [887599822](https://github.com/angular/angular-cli/commit/88759982241ec2c30e00f62691347893d36bbfac) | fix  | use consistent path separators for template HMR identifiers                                                   |
+| [75998ebab](https://github.com/angular/angular-cli/commit/75998ebabb041f60aab40bf5a11979e8f3615537) | perf | reuse TS package.json cache when rebuilding                                                                   |
+
+### @angular/ssr
+
+| Commit                                                                                              | Type | Description                                                                       |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------------------------------- |
+| [8d7a51dfc](https://github.com/angular/angular-cli/commit/8d7a51dfc9658aa2f0f0c527435c05c2b10f34e5) | feat | add `modulepreload` for lazy-loaded routes                                        |
+| [41ece633b](https://github.com/angular/angular-cli/commit/41ece633b3d42ef110bf6085fe0783ab2a56efcd) | feat | redirect to preferred locale when accessing root route without a specified locale |
+| [d7214e961](https://github.com/angular/angular-cli/commit/d7214e9610588fe1dbd8ce30e51eaac14a038c56) | fix  | include `Content-Language` header when locale is set                              |
+| [10a5b8b6b](https://github.com/angular/angular-cli/commit/10a5b8b6b8ab1f1422adcb66e685af16b2c96549) | fix  | disable component bootstrapping during route extraction                           |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="19.0.5"></a>
 
 # 19.0.5 (2024-12-12)
