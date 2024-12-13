@@ -102,7 +102,7 @@ __metadata:
     postcss-loader: "npm:8.1.1"
     resolve-url-loader: "npm:5.0.0"
     rxjs: "npm:7.8.1"
-    sass: "npm:1.82.0"
+    sass: "npm:1.83.0"
     sass-loader: "npm:16.0.4"
     semver: "npm:7.6.3"
     source-map-loader: "npm:5.0.0"
@@ -393,7 +393,7 @@ __metadata:
     picomatch: "npm:4.0.2"
     piscina: "npm:4.8.0"
     rollup: "npm:4.28.1"
-    sass: "npm:1.82.0"
+    sass: "npm:1.83.0"
     semver: "npm:7.6.3"
     vite: "npm:6.0.3"
     watchpack: "npm:2.4.2"
@@ -763,7 +763,7 @@ __metadata:
     rollup-license-plugin: "npm:~3.0.1"
     rollup-plugin-sourcemaps: "npm:^0.6.0"
     rxjs: "npm:7.8.1"
-    sass: "npm:1.82.0"
+    sass: "npm:1.83.0"
     sass-loader: "npm:16.0.4"
     semver: "npm:7.6.3"
     shelljs: "npm:^0.8.5"
@@ -16086,6 +16086,23 @@ __metadata:
   bin:
     sass: sass.js
   checksum: 10c0/7f86fe6ade4f6018862c448ed69d5c52f485b0125c9dab24e63f679739a04cc7c56562d588e3cf16b5efb4d2c4d0530e62740e1cfd273e2e3707d04d11011736
+  languageName: node
+  linkType: hard
+
+"sass@npm:1.83.0":
+  version: 1.83.0
+  resolution: "sass@npm:1.83.0"
+  dependencies:
+    "@parcel/watcher": "npm:^2.4.1"
+    chokidar: "npm:^4.0.0"
+    immutable: "npm:^5.0.2"
+    source-map-js: "npm:>=0.6.2 <2.0.0"
+  dependenciesMeta:
+    "@parcel/watcher":
+      optional: true
+  bin:
+    sass: sass.js
+  checksum: 10c0/4415361229879a9041d77c953da85482e89032aa4321ba13250a9987d39c80fac6c88af3777f2a2d76a4e8b0c8afbd21c1970fdbe84e0b3ec25fb26741f92beb
   languageName: node
   linkType: hard
 
