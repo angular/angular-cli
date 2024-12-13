@@ -216,7 +216,7 @@ load("@aspect_rules_ts//ts:repositories.bzl", "rules_ts_dependencies")
 rules_ts_dependencies(
     # ts_version_from = "//:package.json",
     # TODO: Support in https://github.com/aspect-build/rules_ts/blob/main/ts/private/npm_repositories.bzl
-    ts_version = "5.6.2",
+    ts_version = "5.7.2",
 )
 
 http_file(
