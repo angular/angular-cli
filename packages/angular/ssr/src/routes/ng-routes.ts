@@ -571,6 +571,10 @@ export async function getRoutesFromAngularRouterConfig(
         }
       }
 
+      // This timeout is necessary to prevent 'adev' from hanging in production builds.
+      // The exact cause is unclear, but removing it leads to the issue.
+      await new Promise((resolve) => setTimeout(resolve, 0));
+
       if (serverConfigRouteTree) {
         for (const { route, presentInClientRouter } of serverConfigRouteTree.traverse()) {
           if (presentInClientRouter || route === '**') {
