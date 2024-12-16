@@ -14,7 +14,7 @@
       "yarn install --frozen-lockfile --non-interactive",
       "yarn bazel run @npm2//:sync"
     ],
-    "fileFilters": [".aspect/rules/external_repository_action_cache/**/*"],
+    "fileFilters": [".aspect/rules/external_repository_action_cache/**/*", "pnpm-lock.yaml"],
     "executionMode": "branch"
   },
   "lockFileMaintenance": {
@@ -32,6 +32,10 @@
     ".github/workflows/**/*.yml"
   ],
   "packageRules": [
+    {
+      "matchManagers": ["pnpm"],
+      "enabled": false
+    },
     {
       "matchPackageNames": ["quicktype-core"],
       "schedule": ["before 4:00am on the first day of the month"]
