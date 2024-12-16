@@ -8,23 +8,18 @@
   "prHourlyLimit": 2,
   "labels": ["target: minor", "action: merge"],
   "timezone": "America/Tijuana",
+  "postUpgradeTasks": {
+    "commands": ["yarn install --frozen-lockfile --non-interactive", "yarn bazel run @npm2//:sync"],
+    "fileFilters": [".aspect/rules/external_repository_action_cache/**/*"],
+    "executionMode": "branch"
+  },
   "lockFileMaintenance": {
     "enabled": true
   },
   "dependencyDashboard": true,
-  "schedule": [
-    "after 10:00pm every weekday",
-    "before 4:00am every weekday",
-    "every weekend"
-  ],
+  "schedule": ["after 10:00pm every weekday", "before 4:00am every weekday", "every weekend"],
   "baseBranches": ["main"],
-  "ignoreDeps": [
-    "@types/node",
-    "@types/express",
-    "build_bazel_rules_nodejs",
-    "rules_pkg",
-    "yarn"
-  ],
+  "ignoreDeps": ["@types/node", "@types/express", "build_bazel_rules_nodejs", "rules_pkg", "yarn"],
   "includePaths": [
     "WORKSPACE",
     "package.json",
