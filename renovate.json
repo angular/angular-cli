@@ -31,11 +31,8 @@
     "tests/legacy-cli/e2e/ng-snapshot/package.json",
     ".github/workflows/**/*.yml"
   ],
+  "ignorePaths": ["pnpm-lock.yaml"],
   "packageRules": [
-    {
-      "matchManagers": ["pnpm"],
-      "enabled": false
-    },
     {
       "matchPackageNames": ["quicktype-core"],
       "schedule": ["before 4:00am on the first day of the month"]
