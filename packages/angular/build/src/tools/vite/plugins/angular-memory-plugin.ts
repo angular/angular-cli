@@ -8,7 +8,7 @@
 
 import assert from 'node:assert';
 import { readFile } from 'node:fs/promises';
-import { dirname, join, relative } from 'node:path';
+import { basename, dirname, join, relative } from 'node:path';
 import type { Plugin } from 'vite';
 import { loadEsmModule } from '../../../utils/load-esm';
 import { AngularMemoryOutputFiles } from '../utils';
@@ -51,6 +51,18 @@ export async function createAngularMemoryPlugin(
           // Remove query if present
           const [importerFile] = importer.split('?', 1);
           source = '/' + join(dirname(relative(virtualProjectRoot, importerFile)), source);
+        } else if (
+          !ssr &&
+          source[0] === '/' &&
+          importer.endsWith('index.html') &&
+          normalizePath(importer).startsWith(virtualProjectRoot)
+        ) {
+          // This is only needed when using SSR and `angularSsrMiddleware` (old style) to correctly resolve
+          // .js files when using lazy-loading.
+          // Remove query if present
+          const [importerFile] = importer.split('?', 1);
+          source =
+            '/' + join(dirname(relative(virtualProjectRoot, importerFile)), basename(source));
         }
       }
 
