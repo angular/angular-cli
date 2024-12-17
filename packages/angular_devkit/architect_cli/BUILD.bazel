@@ -1,4 +1,5 @@
-load("//tools:defaults.bzl", "pkg_npm", "ts_library")
+load("//tools:defaults.bzl", "pkg_npm")
+load("//tools:interop.bzl", "ts_project")
 
 # Copyright Google Inc. All Rights Reserved.
 #
@@ -8,22 +9,23 @@ licenses(["notice"])
 
 package(default_visibility = ["//visibility:public"])
 
-ts_library(
+ts_project(
     name = "architect_cli",
-    package_name = "@angular-devkit/architect-cli",
     srcs = [
         "bin/architect.ts",
     ] + glob(["src/**/*.ts"]),
-    module_name = "@angular-devkit/architect-cli",
-    deps = [
-        "//packages/angular_devkit/architect",
-        "//packages/angular_devkit/architect/node",
+    interop_deps = [
         "//packages/angular_devkit/core",
         "//packages/angular_devkit/core/node",
-        "@npm//@types/node",
-        "@npm//@types/progress",
-        "@npm//@types/yargs-parser",
-        "@npm//ansi-colors",
+    ],
+    module_name = "@angular-devkit/architect-cli",
+    deps = [
+        "//:root_modules/@types/node",
+        "//:root_modules/@types/progress",
+        "//:root_modules/@types/yargs-parser",
+        "//:root_modules/ansi-colors",
+        "//packages/angular_devkit/architect:architect_rjs",
+        "//packages/angular_devkit/architect/node:node_rjs",
     ],
 )
 
