@@ -12,6 +12,7 @@
     "commands": [
       "git restore .yarn/releases/yarn-4.5.0.cjs",
       "yarn install --frozen-lockfile --non-interactive",
+      "yarn bazel build //tools/...",
       "yarn bazel run @npm2//:sync"
     ],
     "fileFilters": [".aspect/rules/external_repository_action_cache/**/*", "pnpm-lock.yaml"],
