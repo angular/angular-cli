@@ -4,30 +4,31 @@
 # found in the LICENSE file at https://angular.dev/license
 
 load("@npm//@bazel/jasmine:index.bzl", "jasmine_node_test")
-load("//tools:defaults.bzl", "ts_library")
+load("//tools:interop.bzl", "ts_project")
 
 licenses(["notice"])
 
 package(default_visibility = ["//visibility:public"])
 
-ts_library(
+ts_project(
     name = "node",
     srcs = glob(
         include = ["**/*.ts"],
         exclude = ["**/*_spec.ts"],
     ),
-    module_name = "@angular-devkit/architect/node",
-    module_root = "index.d.ts",
-    deps = [
-        "//packages/angular_devkit/architect",
+    interop_deps = [
         "//packages/angular_devkit/core",
         "//packages/angular_devkit/core/node",
-        "@npm//@types/node",
-        "@npm//rxjs",
+    ],
+    module_name = "@angular-devkit/architect/node",
+    deps = [
+        "//:root_modules/@types/node",
+        "//:root_modules/rxjs",
+        "//packages/angular_devkit/architect:architect_rjs",
     ],
 )
 
-ts_library(
+ts_project(
     name = "node_test_lib",
     testonly = True,
     srcs = glob(
@@ -35,11 +36,14 @@ ts_library(
             "**/*_spec.ts",
         ],
     ),
-    deps = [
-        ":node",
-        "//packages/angular_devkit/architect",
+    interop_deps = [
         "//tests/angular_devkit/architect/node/jobs:jobs_test_lib",
-        "@npm//rxjs",
+    ],
+    deps = [
+        ":node_rjs",
+        "//:root_modules/@types/jasmine",
+        "//:root_modules/rxjs",
+        "//packages/angular_devkit/architect:architect_rjs",
     ],
 )
 
