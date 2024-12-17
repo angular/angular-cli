@@ -11,7 +11,7 @@
   "postUpgradeTasks": {
     "commands": [
       "git restore .yarn/releases/yarn-4.5.0.cjs",
-      "yarn install --frozen-lockfile --non-interactive",
+      "yarn install --immutable",
       "yarn bazel build //tools/...",
       "yarn bazel run @npm2//:sync"
     ],
