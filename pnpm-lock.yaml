@@ -365,8 +365,8 @@ importers:
         specifier: 19.1.0-next.2
         version: 19.1.0-next.2(@angular/compiler-cli@19.1.0-next.3)(tslib@2.8.1)(typescript@5.7.2)
       npm:
-        specifier: ^10.8.1
-        version: 10.9.2
+        specifier: ^11.0.0
+        version: 11.0.0
       npm-package-arg:
         specifier: 12.0.1
         version: 12.0.1
@@ -10737,9 +10737,9 @@ packages:
       path-key: 3.1.1
     dev: true
 
-  /npm@10.9.2:
-    resolution: {integrity: sha512-iriPEPIkoMYUy3F6f3wwSZAU93E0Eg6cHwIR6jzzOXWSy+SD/rOODEs74cVONHKSx2obXtuUoyidVEhISrisgQ==}
-    engines: {node: ^18.17.0 || >=20.5.0}
+  /npm@11.0.0:
+    resolution: {integrity: sha512-Ed/ylWXSKXx058WUqXYlgb3pafCqXL5vWzZEvwCKFsBl7OYQlNn/u4ESW+ON+OG6Q+uCRLPTDGHreX6aJEDj7A==}
+    engines: {node: ^20.17.0 || >=22.9.0}
     hasBin: true
     dev: true
     bundledDependencies:
@@ -10772,7 +10772,6 @@ packages:
       - libnpmdiff
       - libnpmexec
       - libnpmfund
-      - libnpmhook
       - libnpmorg
       - libnpmpack
       - libnpmpublish
@@ -10810,7 +10809,6 @@ packages:
       - treeverse
       - validate-npm-package-name
       - which
-      - write-file-atomic
 
   /nth-check@2.1.1:
     resolution: {integrity: sha512-lqjrjmaOoAnWfMmBPL+XNnynZh2+swxiX3WUE0s4yEHI6m+AwrK2UZOimIRl3X/4QctVqS8AiZjFqyOGrMXb/w==}
