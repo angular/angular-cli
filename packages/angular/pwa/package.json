@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "@angular-devkit/schematics": "0.0.0-PLACEHOLDER",
-    "@schematics/angular": "0.0.0-PLACEHOLDER",
+    "@schematics/angular": "19.0.5",
     "parse5-html-rewriting-stream": "7.0.0"
   },
   "peerDependencies": {
