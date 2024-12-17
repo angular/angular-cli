@@ -32,6 +32,7 @@ ts_library(
             "src/**/*_spec.ts",
         ],
     ) + [
+        "index.ts",
         "//packages/angular_devkit/build_webpack:src/builders/webpack-dev-server/schema.ts",
         "//packages/angular_devkit/build_webpack:src/builders/webpack/schema.ts",
     ],

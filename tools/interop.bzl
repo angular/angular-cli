@@ -42,6 +42,17 @@ def _ts_project_module_impl(ctx):
     runfiles = ctx.attr.dep[DefaultInfo].default_runfiles
     info = ctx.attr.dep[JsInfo]
 
+    # Filter runfiles to not `node_modules` from Aspect as this interop
+    # target is supposed to be used downstream by `rules_nodejs` consumers,
+    # and mixing pnpm-style node modules with linker node modules is incompatible.
+    filtered = []
+    for f in runfiles.files.to_list():
+        if f.short_path.startswith("node_modules/"):
+            continue
+        filtered.append(f)
+
+    runfiles = ctx.runfiles(files = filtered)
+
     providers = [
         DefaultInfo(
             runfiles = runfiles,
@@ -83,9 +94,21 @@ ts_project_module = rule(
 )
 
 def ts_project(name, module_name = None, interop_deps = [], deps = [], testonly = False, **kwargs):
+    # Pull in the `rules_nodejs` variants of dependencies we know are "hybrid". This
+    # is necessary as we can't mix `npm/node_modules` from RNJS with the pnpm-style
+    # symlink-dependent node modules. In addition, we need to extract `_rjs` interop
+    # dependencies so that we can forward and capture the module mappings for runtime
+    # execution, with regards to first-party dependency linking.
+    rjs_modules_to_rnjs = []
+    for d in deps:
+        if d.startswith("//:root_modules/"):
+            rjs_modules_to_rnjs.append(d.replace("//:root_modules/", "@npm//"))
+        if d.endswith("_rjs"):
+            rjs_modules_to_rnjs.append(d.replace("_rjs", ""))
+
     ts_deps_interop(
         name = "%s_interop_deps" % name,
-        deps = interop_deps,
+        deps = [] + interop_deps + rjs_modules_to_rnjs,
         testonly = testonly,
     )
 
@@ -99,7 +122,7 @@ def ts_project(name, module_name = None, interop_deps = [], deps = [], testonly 
         # worker for efficient, fast DX and avoiding Windows no-sandbox issues.
         supports_workers = 1,
         tsc_worker = "//tools:vanilla_ts_worker",
-        deps = ["%s_interop_deps" % name] + deps,
+        deps = [":%s_interop_deps" % name] + deps,
         **kwargs
     )
 
@@ -107,6 +130,8 @@ def ts_project(name, module_name = None, interop_deps = [], deps = [], testonly 
         name = name,
         testonly = testonly,
         dep = "%s_rjs" % name,
-        deps = interop_deps,
+        # Forwarded dependencies for linker module mapping aspect.
+        # RJS deps can also transitively pull in module mappings from their `interop_deps`.
+        deps = [] + interop_deps + deps,
         module_name = module_name,
     )
