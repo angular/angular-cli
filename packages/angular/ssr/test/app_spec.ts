@@ -106,25 +106,25 @@ describe('AngularServerApp', () => {
 
       it('should correctly handle top level redirects', async () => {
         const response = await app.handle(new Request('http://localhost/redirect'));
-        expect(response?.headers.get('location')).toContain('http://localhost/home');
+        expect(response?.headers.get('location')).toContain('/home');
         expect(response?.status).toBe(302);
       });
 
       it('should correctly handle relative nested redirects', async () => {
         const response = await app.handle(new Request('http://localhost/redirect/relative'));
-        expect(response?.headers.get('location')).toContain('http://localhost/redirect/home');
+        expect(response?.headers.get('location')).toContain('/redirect/home');
         expect(response?.status).toBe(302);
       });
 
       it('should correctly handle relative nested redirects with parameter', async () => {
         const response = await app.handle(new Request('http://localhost/redirect/param/relative'));
-        expect(response?.headers.get('location')).toContain('http://localhost/redirect/param/home');
+        expect(response?.headers.get('location')).toContain('/redirect/param/home');
         expect(response?.status).toBe(302);
       });
 
       it('should correctly handle absolute nested redirects', async () => {
         const response = await app.handle(new Request('http://localhost/redirect/absolute'));
-        expect(response?.headers.get('location')).toContain('http://localhost/home');
+        expect(response?.headers.get('location')).toContain('/home');
         expect(response?.status).toBe(302);
       });
 
