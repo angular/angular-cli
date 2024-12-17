@@ -27,6 +27,7 @@
       "@angular-devkit/architect/*": ["./packages/angular_devkit/architect/*/index"],
       "@angular-devkit/build-webpack": ["./packages/angular_devkit/build_webpack"],
       "@angular-devkit/*": ["./packages/angular_devkit/*/src"],
+      "@angular/ssr": ["./packages/angular/ssr"],
       "@angular/*": ["./packages/angular/*/src"],
       "@angular/build/private": ["./packages/angular/build/src/private"],
       "@ngtools/webpack": ["./packages/ngtools/webpack/src"],
