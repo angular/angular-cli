@@ -193,28 +193,22 @@ export class WorkspaceNodeModulesArchitectHost implements ArchitectHost<NodeModu
     }
 
     // Determine builder option schema path (relative within package only)
-    let schemaPath = builder.schema && path.normalize(builder.schema);
+    let schemaPath = builder.schema;
     if (!schemaPath) {
       throw new Error('Could not find the schema for builder ' + builderStr);
     }
-    if (path.isAbsolute(schemaPath) || schemaPath.startsWith('..')) {
+    if (path.isAbsolute(schemaPath) || path.normalize(schemaPath).startsWith('..')) {
       throw new Error(
-        `Package "${packageName}" has an invalid builder implementation path: "${builderName}" --> "${builder.schema}"`,
+        `Package "${packageName}" has an invalid builder schema path: "${builderName}" --> "${builder.schema}"`,
       );
     }
 
     // The file could be either a package reference or in the local manifest directory.
-    // Node resolution is tried first then reading the file from the manifest directory if resolution fails.
-    try {
-      schemaPath = localRequire.resolve(schemaPath, {
-        paths: [buildersManifestDirectory],
-      });
-    } catch (e) {
-      if ((e as NodeJS.ErrnoException).code === 'MODULE_NOT_FOUND') {
-        schemaPath = path.join(buildersManifestDirectory, schemaPath);
-      } else {
-        throw e;
-      }
+    if (schemaPath.startsWith('.')) {
+      schemaPath = path.join(buildersManifestDirectory, schemaPath);
+    } else {
+      const manifestRequire = createRequire(buildersManifestDirectory + '/');
+      schemaPath = manifestRequire.resolve(schemaPath);
     }
 
     const schemaText = readFileSync(schemaPath, 'utf-8');
