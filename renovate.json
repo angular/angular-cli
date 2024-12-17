@@ -31,7 +31,6 @@
     "tests/legacy-cli/e2e/ng-snapshot/package.json",
     ".github/workflows/**/*.yml"
   ],
-  "ignorePaths": ["pnpm-lock.yaml"],
   "packageRules": [
     {
       "matchPackageNames": ["quicktype-core"],
