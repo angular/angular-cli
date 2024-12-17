@@ -158,7 +158,7 @@
     "mini-css-extract-plugin": "2.9.2",
     "mrmime": "2.0.0",
     "ng-packagr": "19.1.0-next.2",
-    "npm": "^10.8.1",
+    "npm": "^11.0.0",
     "npm-package-arg": "12.0.1",
     "npm-pick-manifest": "10.0.0",
     "open": "10.1.0",
