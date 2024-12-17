@@ -10,7 +10,7 @@
   "timezone": "America/Tijuana",
   "postUpgradeTasks": {
     "commands": [
-      "git restore .yarn/releases/yarn-4.5.0.cjs",
+      "git restore .yarn/releases/yarn-4.5.0.cjs pnpm-lock.yaml",
       "yarn install --immutable",
       "yarn bazel run @npm2//:sync || true"
     ],
