@@ -23,7 +23,7 @@
   "homepage": "https://github.com/angular/angular-cli",
   "dependencies": {
     "@angular-devkit/architect": "0.0.0-EXPERIMENTAL-PLACEHOLDER",
-    "@angular-devkit/core": "0.0.0-PLACEHOLDER",
+    "@angular-devkit/core": "19.0.5",
     "@angular-devkit/schematics": "0.0.0-PLACEHOLDER",
     "@inquirer/prompts": "7.2.0",
     "@listr2/prompt-adapter-inquirer": "2.0.18",

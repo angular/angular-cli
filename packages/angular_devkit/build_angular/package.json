@@ -9,7 +9,7 @@
     "@ampproject/remapping": "2.3.0",
     "@angular-devkit/architect": "0.0.0-EXPERIMENTAL-PLACEHOLDER",
     "@angular-devkit/build-webpack": "0.0.0-EXPERIMENTAL-PLACEHOLDER",
-    "@angular-devkit/core": "0.0.0-PLACEHOLDER",
+    "@angular-devkit/core": "19.0.5",
     "@angular/build": "0.0.0-PLACEHOLDER",
     "@babel/core": "7.26.0",
     "@babel/generator": "7.26.3",

@@ -13,7 +13,7 @@
     "schematics"
   ],
   "dependencies": {
-    "@angular-devkit/core": "0.0.0-PLACEHOLDER",
+    "@angular-devkit/core": "19.0.5",
     "jsonc-parser": "3.3.1",
     "magic-string": "0.30.15",
     "ora": "5.4.1",
