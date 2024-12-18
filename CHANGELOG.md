@@ -1,3 +1,36 @@
+<a name="19.1.0-next.2"></a>
+
+# 19.1.0-next.2 (2024-12-18)
+
+### @angular-devkit/architect
+
+| Commit                                                                                              | Type | Description                                          |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------- |
+| [fe1ae6933](https://github.com/angular/angular-cli/commit/fe1ae6933998104c144b2c8854f362289c8d91c6) | fix  | avoid Node.js resolution for relative builder schema |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                    |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------ |
+| [a9a347014](https://github.com/angular/angular-cli/commit/a9a3470147aaf66ff4784a5b5c26c56d1051a5b3) | fix  | jasmine.clock with app builder |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                               |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------- |
+| [298b554a7](https://github.com/angular/angular-cli/commit/298b554a7a40465444b4c508e2250ecbf459ea47) | feat | enable component template hot replacement by default      |
+| [19bb2d480](https://github.com/angular/angular-cli/commit/19bb2d48097eaf8dcdbf584603210146b5f1b81e) | fix  | force HTTP/1.1 in dev-server SSR with SSL                 |
+| [3b7e6a8c6](https://github.com/angular/angular-cli/commit/3b7e6a8c6e2e018a85b437256040fd9c8161d537) | fix  | invalidate component template updates with dev-server SSR |
+
+### @angular/ssr
+
+| Commit                                                                                              | Type | Description                                                             |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------------- |
+| [1bf9381c8](https://github.com/angular/angular-cli/commit/1bf9381c8c580321c8a473da1735839ecaf5ad76) | fix  | correctly resolve pre-transform resources in Vite SSR without AppEngine |
+| [ad1d7d76f](https://github.com/angular/angular-cli/commit/ad1d7d76fc6b94b8f12841fcfb331e5fb098403e) | fix  | ensure correct `Location` header for redirects behind a proxy           |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="19.0.6"></a>
 
 # 19.0.6 (2024-12-18)
