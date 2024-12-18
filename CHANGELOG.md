@@ -1,3 +1,28 @@
+<a name="19.0.6"></a>
+
+# 19.0.6 (2024-12-18)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                    |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------ |
+| [db7421231](https://github.com/angular/angular-cli/commit/db7421231c3da7bbbfde72dc35642aaf005fbeca) | fix  | jasmine.clock with app builder |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                               |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------- |
+| [5fbc105ed](https://github.com/angular/angular-cli/commit/5fbc105ed0cb76106916660d99fc53d7480dcbc8) | fix  | force HTTP/1.1 in dev-server SSR with SSL |
+
+### @angular/ssr
+
+| Commit                                                                                              | Type | Description                                                             |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------------- |
+| [2f4df6b2b](https://github.com/angular/angular-cli/commit/2f4df6b2be458b3651df49f3bced923e8df4d547) | fix  | correctly resolve pre-transform resources in Vite SSR without AppEngine |
+| [0789a9e13](https://github.com/angular/angular-cli/commit/0789a9e133fed4edc29b108630b2cf91e157127e) | fix  | ensure correct `Location` header for redirects behind a proxy           |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="19.1.0-next.1"></a>
 
 # 19.1.0-next.1 (2024-12-12)
