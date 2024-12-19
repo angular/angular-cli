@@ -156,7 +156,7 @@ class AngularPolyfillsPlugin {
               // page load. `type` won't affect them.
               continue;
             }
-            if ('js' === (f.type ?? 'js')) {
+            if (f.pattern.endsWith('.js') && 'js' === (f.type ?? 'js')) {
               f.type = 'module';
             }
           }
