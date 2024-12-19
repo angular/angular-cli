@@ -8,14 +8,12 @@
 
 import { APP_BASE_HREF, PlatformLocation } from '@angular/common';
 import {
-  APP_INITIALIZER,
   ApplicationRef,
   Compiler,
-  ComponentRef,
   Injector,
-  inject,
   runInInjectionContext,
   ɵConsole,
+  ɵENABLE_ROOT_COMPONENT_BOOTSTRAP,
 } from '@angular/core';
 import { INITIAL_CONFIG, platformServer } from '@angular/platform-server';
 import {
@@ -493,16 +491,8 @@ export async function getRoutesFromAngularRouterConfig(
       useFactory: () => new Console(),
     },
     {
-      // We cannot replace `ApplicationRef` with a different provider here due to the dependency injection (DI) hierarchy.
-      // This code is running at the platform level, where `ApplicationRef` is provided in the root injector.
-      // As a result, any attempt to replace it will cause the root provider to override the platform provider.
-      // TODO(alanagius): investigate exporting the app config directly which would help with: https://github.com/angular/angular/issues/59144
-      provide: APP_INITIALIZER,
-      multi: true,
-      useFactory: () => () => {
-        const appRef = inject(ApplicationRef);
-        appRef.bootstrap = () => undefined as unknown as ComponentRef<unknown>;
-      },
+      provide: ɵENABLE_ROOT_COMPONENT_BOOTSTRAP,
+      useValue: false,
     },
   ]);
 
