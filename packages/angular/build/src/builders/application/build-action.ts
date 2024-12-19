@@ -16,7 +16,14 @@ import { logMessages, withNoProgress, withSpinner } from '../../tools/esbuild/ut
 import { shouldWatchRoot } from '../../utils/environment-options';
 import { NormalizedCachedOptions } from '../../utils/normalize-cache';
 import { NormalizedApplicationBuildOptions, NormalizedOutputOptions } from './options';
-import { ComponentUpdateResult, FullResult, Result, ResultKind, ResultMessage } from './results';
+import {
+  ComponentUpdateResult,
+  FullResult,
+  IncrementalResult,
+  Result,
+  ResultKind,
+  ResultMessage,
+} from './results';
 
 // Watch workspace for package manager changes
 const packageWatchFiles = [
@@ -49,6 +56,7 @@ export async function* runEsBuildBuildAction(
     clearScreen?: boolean;
     colors?: boolean;
     jsonLogs?: boolean;
+    incrementalResults?: boolean;
   },
 ): AsyncIterable<Result> {
   const {
@@ -65,6 +73,7 @@ export async function* runEsBuildBuildAction(
     preserveSymlinks,
     colors,
     jsonLogs,
+    incrementalResults,
   } = options;
 
   const withProgress: typeof withSpinner = progress ? withSpinner : withNoProgress;
@@ -135,7 +144,7 @@ export async function* runEsBuildBuildAction(
   // Output the first build results after setting up the watcher to ensure that any code executed
   // higher in the iterator call stack will trigger the watcher. This is particularly relevant for
   // unit tests which execute the builder and modify the file system programmatically.
-  yield await emitOutputResult(result, outputOptions);
+  yield emitOutputResult(result, outputOptions);
 
   // Finish if watch mode is not enabled
   if (!watcher) {
@@ -162,9 +171,8 @@ export async function* runEsBuildBuildAction(
       // Clear removed files from current watch files
       changes.removed.forEach((removedPath) => currentWatchFiles.delete(removedPath));
 
-      result = await withProgress('Changes detected. Rebuilding...', () =>
-        action(result.createRebuildState(changes)),
-      );
+      const rebuildState = result.createRebuildState(changes);
+      result = await withProgress('Changes detected. Rebuilding...', () => action(rebuildState));
 
       // Log all diagnostic (error/warning/logs) messages
       await logMessages(logger, result, colors, jsonLogs);
@@ -188,7 +196,11 @@ export async function* runEsBuildBuildAction(
         watcher.remove([...staleWatchFiles]);
       }
 
-      yield await emitOutputResult(result, outputOptions);
+      yield emitOutputResult(
+        result,
+        outputOptions,
+        incrementalResults ? rebuildState.previousOutputInfo : undefined,
+      );
     }
   } finally {
     // Stop the watcher and cleanup incremental rebuild state
@@ -198,7 +210,7 @@ export async function* runEsBuildBuildAction(
   }
 }
 
-async function emitOutputResult(
+function emitOutputResult(
   {
     outputFiles,
     assetFiles,
@@ -210,7 +222,8 @@ async function emitOutputResult(
     templateUpdates,
   }: ExecutionResult,
   outputOptions: NormalizedApplicationBuildOptions['outputOptions'],
-): Promise<Result> {
+  previousOutputInfo?: ReadonlyMap<string, { hash: string; type: BuildOutputFileType }>,
+): Result {
   if (errors.length > 0) {
     return {
       kind: ResultKind.Failure,
@@ -222,11 +235,12 @@ async function emitOutputResult(
     };
   }
 
-  // Template updates only exist if no other changes have occurred
-  if (templateUpdates?.size) {
+  // Template updates only exist if no other JS changes have occurred
+  const hasTemplateUpdates = !!templateUpdates?.size;
+  if (hasTemplateUpdates) {
     const updateResult: ComponentUpdateResult = {
       kind: ResultKind.ComponentUpdate,
-      updates: Array.from(templateUpdates).map(([id, content]) => ({
+      updates: Array.from(templateUpdates, ([id, content]) => ({
         type: 'template',
         id,
         content,
@@ -236,6 +250,72 @@ async function emitOutputResult(
     return updateResult;
   }
 
+  // Use an incremental result if previous output information is available
+  if (previousOutputInfo) {
+    const incrementalResult: IncrementalResult = {
+      kind: ResultKind.Incremental,
+      warnings: warnings as ResultMessage[],
+      added: [],
+      removed: [],
+      modified: [],
+      files: {},
+      detail: {
+        externalMetadata,
+        htmlIndexPath,
+        htmlBaseHref,
+        outputOptions,
+      },
+    };
+
+    // Initially assume all previous output files have been removed
+    const removedOutputFiles = new Map(previousOutputInfo);
+
+    for (const file of outputFiles) {
+      removedOutputFiles.delete(file.path);
+
+      const previousHash = previousOutputInfo.get(file.path)?.hash;
+      let needFile = false;
+      if (previousHash === undefined) {
+        needFile = true;
+        incrementalResult.added.push(file.path);
+      } else if (previousHash !== file.hash) {
+        needFile = true;
+        incrementalResult.modified.push(file.path);
+      }
+
+      if (needFile) {
+        incrementalResult.files[file.path] = {
+          type: file.type,
+          contents: file.contents,
+          origin: 'memory',
+          hash: file.hash,
+        };
+      }
+    }
+
+    // Include the removed output files
+    incrementalResult.removed.push(
+      ...Array.from(removedOutputFiles, ([file, { type }]) => ({
+        path: file,
+        type,
+      })),
+    );
+
+    // Always consider asset files as added to ensure new/modified assets are available.
+    // TODO: Consider more comprehensive asset analysis.
+    for (const file of assetFiles) {
+      incrementalResult.added.push(file.destination);
+      incrementalResult.files[file.destination] = {
+        type: BuildOutputFileType.Browser,
+        inputPath: file.source,
+        origin: 'disk',
+      };
+    }
+
+    return incrementalResult;
+  }
+
+  // Otherwise, use a full result
   const result: FullResult = {
     kind: ResultKind.Full,
     warnings: warnings as ResultMessage[],

@@ -126,6 +126,7 @@ export async function* buildApplicationInternal(
       clearScreen: normalizedOptions.clearScreen,
       colors: normalizedOptions.colors,
       jsonLogs: normalizedOptions.jsonLogs,
+      incrementalResults: normalizedOptions.incrementalResults,
       logger,
       signal,
     },
@@ -157,7 +158,8 @@ export async function* buildApplication(
   extensions?: ApplicationBuilderExtensions,
 ): AsyncIterable<ApplicationBuilderOutput> {
   let initial = true;
-  for await (const result of buildApplicationInternal(options, context, extensions)) {
+  const internalOptions = { ...options, incrementalResults: true };
+  for await (const result of buildApplicationInternal(internalOptions, context, extensions)) {
     const outputOptions = result.detail?.['outputOptions'] as NormalizedOutputOptions | undefined;
 
     if (initial) {
@@ -179,7 +181,10 @@ export async function* buildApplication(
     }
 
     assert(outputOptions, 'Application output options are required for builder usage.');
-    assert(result.kind === ResultKind.Full, 'Application build did not provide a full output.');
+    assert(
+      result.kind === ResultKind.Full || result.kind === ResultKind.Incremental,
+      'Application build did not provide a file result output.',
+    );
 
     // TODO: Restructure output logging to better handle stdout JSON piping
     if (!useJSONBuildLogs) {
@@ -197,26 +202,7 @@ export async function* buildApplication(
         return;
       }
 
-      let typeDirectory: string;
-      switch (file.type) {
-        case BuildOutputFileType.Browser:
-        case BuildOutputFileType.Media:
-          typeDirectory = outputOptions.browser;
-          break;
-        case BuildOutputFileType.ServerApplication:
-        case BuildOutputFileType.ServerRoot:
-          typeDirectory = outputOptions.server;
-          break;
-        case BuildOutputFileType.Root:
-          typeDirectory = '';
-          break;
-        default:
-          throw new Error(
-            `Unhandled write for file "${filePath}" with type "${BuildOutputFileType[file.type]}".`,
-          );
-      }
-      // NOTE: 'base' is a fully resolved path at this point
-      const fullFilePath = path.join(outputOptions.base, typeDirectory, filePath);
+      const fullFilePath = generateFullPath(filePath, file.type, outputOptions);
 
       // Ensure output subdirectories exist
       const fileBasePath = path.dirname(fullFilePath);
@@ -234,8 +220,48 @@ export async function* buildApplication(
       }
     });
 
+    // Delete any removed files if incremental
+    if (result.kind === ResultKind.Incremental && result.removed?.length) {
+      await Promise.all(
+        result.removed.map((file) => {
+          const fullFilePath = generateFullPath(file.path, file.type, outputOptions);
+
+          return fs.rm(fullFilePath, { force: true, maxRetries: 3 });
+        }),
+      );
+    }
+
     yield { success: true };
   }
+}
+
+function generateFullPath(
+  filePath: string,
+  type: BuildOutputFileType,
+  outputOptions: NormalizedOutputOptions,
+) {
+  let typeDirectory: string;
+  switch (type) {
+    case BuildOutputFileType.Browser:
+    case BuildOutputFileType.Media:
+      typeDirectory = outputOptions.browser;
+      break;
+    case BuildOutputFileType.ServerApplication:
+    case BuildOutputFileType.ServerRoot:
+      typeDirectory = outputOptions.server;
+      break;
+    case BuildOutputFileType.Root:
+      typeDirectory = '';
+      break;
+    default:
+      throw new Error(
+        `Unhandled write for file "${filePath}" with type "${BuildOutputFileType[type]}".`,
+      );
+  }
+  // NOTE: 'base' is a fully resolved path at this point
+  const fullFilePath = path.join(outputOptions.base, typeDirectory, filePath);
+
+  return fullFilePath;
 }
 
 export default createBuilder(buildApplication);
