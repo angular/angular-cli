@@ -108,6 +108,12 @@ interface InternalOptions {
   templateUpdates?: boolean;
 
   /**
+   * Enables emitting incremental build results when in watch mode. A full build result will only be emitted
+   * for the initial build. This option also requires watch to be enabled to have an effect.
+   */
+  incrementalResults?: boolean;
+
+  /**
    * Enables instrumentation to collect code coverage data for specific files.
    *
    * Used exclusively for tests and shouldn't be used for other kinds of builds.
@@ -475,6 +481,7 @@ export async function normalizeOptions(
     instrumentForCoverage,
     security,
     templateUpdates: !!options.templateUpdates,
+    incrementalResults: !!options.incrementalResults,
   };
 }
 
