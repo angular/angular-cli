@@ -85,6 +85,7 @@
     "@rollup/plugin-node-resolve": "^13.0.5",
     "@stylistic/eslint-plugin": "^2.8.0",
     "@types/babel__core": "7.20.5",
+    "@types/babel__generator": "^7.6.8",
     "@types/browser-sync": "^2.27.0",
     "@types/express": "^4.16.0",
     "@types/http-proxy": "^1.17.4",
