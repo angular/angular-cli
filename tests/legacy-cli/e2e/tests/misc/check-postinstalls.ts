@@ -15,6 +15,7 @@ const POTENTIAL_SCRIPTS: ReadonlyArray<string> = ['preinstall', 'install', 'post
 const FALSE_POSITIVE_PATHS: ReadonlySet<string> = new Set([
   'jasmine-spec-reporter/examples/protractor/package.json',
   'resolve/test/resolver/multirepo/package.json',
+  'resolve/test/list-exports/packages/tests/fixtures/resolve-1/project/test/resolver/multirepo/package.json',
 ]);
 
 const INNER_NODE_MODULES_SEGMENT = '/node_modules/';
