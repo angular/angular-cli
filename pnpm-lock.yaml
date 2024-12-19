@@ -142,6 +142,9 @@ importers:
       '@types/babel__core':
         specifier: 7.20.5
         version: 7.20.5
+      '@types/babel__generator':
+        specifier: ^7.6.8
+        version: 7.6.8
       '@types/browser-sync':
         specifier: ^2.27.0
         version: 2.29.0
@@ -2063,7 +2066,6 @@ packages:
 
   /@bazel/typescript@5.8.1(typescript@5.7.2):
     resolution: {integrity: sha512-NAJ8WQHZL1WE1YmRoCrq/1hhG15Mvy/viWh6TkvFnBeEhNUiQUsA5GYyhU1ztnBIYW03nATO3vwhAEfO7Q0U5g==}
-    deprecated: No longer maintained, https://github.com/aspect-build/rules_ts is the recommended replacement
     hasBin: true
     peerDependencies:
       typescript: 5.7.2
@@ -11864,7 +11866,7 @@ packages:
   /puppeteer@18.2.1:
     resolution: {integrity: sha512-7+UhmYa7wxPh2oMRwA++k8UGVDxh3YdWFB52r9C3tM81T6BU7cuusUSxImz0GEYSOYUKk/YzIhkQ6+vc0gHbxQ==}
     engines: {node: '>=14.1.0'}
-    deprecated: < 22.8.2 is no longer supported
+    deprecated: < 19.4.0 is no longer supported
     dependencies:
       https-proxy-agent: 5.0.1(supports-color@9.4.0)
       progress: 2.0.3

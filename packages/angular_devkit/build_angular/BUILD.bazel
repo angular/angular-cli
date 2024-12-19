@@ -5,7 +5,7 @@
 
 load("@npm//@angular/build-tooling/bazel/api-golden:index.bzl", "api_golden_test_npm_package")
 load("@npm//@bazel/jasmine:index.bzl", "jasmine_node_test")
-load("//tools:defaults.bzl", "pkg_npm", "ts_library")
+load("//tools:defaults.bzl", "pkg_npm")
 load("//tools:interop.bzl", "ts_project")
 load("//tools:ts_json_schema.bzl", "ts_json_schema")
 
@@ -93,6 +93,7 @@ ts_project(
             "src/testing/**/*.ts",
         ],
     ) + [
+        "index.ts",
         "//packages/angular_devkit/build_angular:src/builders/app-shell/schema.ts",
         "//packages/angular_devkit/build_angular:src/builders/browser-esbuild/schema.ts",
         "//packages/angular_devkit/build_angular:src/builders/browser/schema.ts",
@@ -147,6 +148,7 @@ ts_project(
         "//:root_modules/@babel/runtime",
         "//:root_modules/@discoveryjs/json-ext",
         "//:root_modules/@types/babel__core",
+        "//:root_modules/@types/babel__generator",
         "//:root_modules/@types/browser-sync",
         "//:root_modules/@types/karma",
         "//:root_modules/@types/less",
@@ -203,7 +205,7 @@ ts_project(
     ],
 )
 
-ts_library(
+ts_project(
     name = "build_angular_test_lib",
     testonly = True,
     srcs = glob(
@@ -215,15 +217,17 @@ ts_library(
         ],
     ),
     data = glob(["test/**/*"]),
-    deps = [
-        ":build_angular",
-        ":build_angular_test_utils",
-        "//packages/angular_devkit/architect/testing",
+    interop_deps = [
         "//packages/angular_devkit/core",
-        "@npm//fast-glob",
-        "@npm//prettier",
-        "@npm//typescript",
-        "@npm//webpack",
+    ],
+    deps = [
+        ":build_angular_rjs",
+        ":build_angular_test_utils_rjs",
+        "//:root_modules/fast-glob",
+        "//:root_modules/prettier",
+        "//:root_modules/typescript",
+        "//:root_modules/webpack",
+        "//packages/angular_devkit/architect/testing:testing_rjs",
     ],
 )
 
@@ -268,7 +272,7 @@ api_golden_test_npm_package(
 
 # Large build_angular specs
 
-ts_library(
+ts_project(
     name = "build_angular_test_utils",
     testonly = True,
     srcs = glob(
@@ -281,17 +285,19 @@ ts_library(
         ],
     ),
     data = glob(["test/**/*"]),
-    tsconfig = "//:tsconfig-test.json",
-    deps = [
-        ":build_angular",
+    interop_deps = [
         "//modules/testing/builder",
         "//packages/angular/build",
         "//packages/angular/build:private",
-        "//packages/angular_devkit/architect",
-        "//packages/angular_devkit/architect/node",
-        "//packages/angular_devkit/architect/testing",
         "//packages/angular_devkit/core",
         "//packages/angular_devkit/core/node",
+    ],
+    deps = [
+        ":build_angular_rjs",
+        "//:root_modules/@types/jasmine",
+        "//packages/angular_devkit/architect:architect_rjs",
+        "//packages/angular_devkit/architect/node:node_rjs",
+        "//packages/angular_devkit/architect/testing:testing_rjs",
         "@npm//rxjs",
     ],
 )
@@ -302,12 +308,14 @@ LARGE_SPECS = {
         "shards": 10,
         "size": "large",
         "flaky": True,
-        "extra_deps": [
+        "extra_interop_deps": [
             "//packages/angular_devkit/build_webpack",
-            "@npm//@types/http-proxy",
-            "@npm//http-proxy",
-            "@npm//puppeteer",
-            "@npm//undici",
+        ],
+        "extra_deps": [
+            "//:root_modules/@types/http-proxy",
+            "//:root_modules/http-proxy",
+            "//:root_modules/puppeteer",
+            "//:root_modules/undici",
         ],
     },
     "extract-i18n": {},
@@ -316,21 +324,21 @@ LARGE_SPECS = {
         "size": "large",
         "flaky": True,
         "extra_deps": [
-            "@npm//karma",
-            "@npm//karma-chrome-launcher",
-            "@npm//karma-coverage",
-            "@npm//karma-jasmine",
-            "@npm//karma-jasmine-html-reporter",
-            "@npm//puppeteer",
-            "@npm//webpack",
+            "//:root_modules/karma",
+            "//:root_modules/karma-chrome-launcher",
+            "//:root_modules/karma-coverage",
+            "//:root_modules/karma-jasmine",
+            "//:root_modules/karma-jasmine-html-reporter",
+            "//:root_modules/puppeteer",
+            "//:root_modules/webpack",
         ],
     },
     "protractor": {
         "extra_deps": [
-            "@npm//jasmine-spec-reporter",
-            "@npm//protractor",
-            "@npm//puppeteer",
-            "@npm//ts-node",
+            "//:root_modules/jasmine-spec-reporter",
+            "//:root_modules/protractor",
+            "//:root_modules/puppeteer",
+            "//:root_modules/ts-node",
         ],
         # NB: does not run on rbe because webdriver manager uses an absolute path to chromedriver
         "tags": ["no-remote-exec"],
@@ -340,7 +348,7 @@ LARGE_SPECS = {
     "server": {
         "size": "large",
         "extra_deps": [
-            "@npm//@angular/animations",
+            "//:root_modules/@angular/animations",
         ],
     },
     "ng-packagr": {},
@@ -349,55 +357,60 @@ LARGE_SPECS = {
         "size": "large",
         "flaky": True,
         "extra_deps": [
-            "@npm//@angular/animations",
-            "@npm//@angular/material",
+            "//:root_modules/@angular/animations",
+            "//:root_modules/@angular/material",
         ],
     },
     "prerender": {},
     "browser-esbuild": {},
     "ssr-dev-server": {
-        "extra_deps": [
-            "@npm//@types/browser-sync",
-            "@npm//browser-sync",
-            "@npm//express",
-            "@npm//undici",
+        "extra_interop_deps": [
             "//packages/angular/ssr/node",
+        ],
+        "extra_deps": [
+            "//:root_modules/@types/browser-sync",
+            "//:root_modules/browser-sync",
+            "//:root_modules/express",
+            "//:root_modules/undici",
         ],
     },
 }
 
 [
-    ts_library(
+    ts_project(
         name = "build_angular_" + spec + "_test_lib",
         testonly = True,
         srcs = glob(["src/builders/" + spec + "/**/*_spec.ts"]),
-        tsconfig = "//:tsconfig-test.json",
-        deps = [
+        interop_deps = [
             # Dependencies needed to compile and run the specs themselves.
-            ":build_angular",
-            ":build_angular_test_utils",
+            "//packages/angular_devkit/core",
+            "//packages/angular_devkit/core/node",
             "//modules/testing/builder",
             "//packages/angular/build",
             "//packages/angular/build:private",
-            "//packages/angular_devkit/architect",
-            "//packages/angular_devkit/architect/node",
-            "//packages/angular_devkit/architect/testing",
-            "//packages/angular_devkit/core",
-            "//packages/angular_devkit/core/node",
+        ] + LARGE_SPECS[spec].get("extra_interop_deps", []),
+        deps = [
+            # Dependencies needed to compile and run the specs themselves.
+            ":build_angular_rjs",
+            ":build_angular_test_utils_rjs",
+            "//packages/angular_devkit/architect:architect_rjs",
+            "//packages/angular_devkit/architect/node:node_rjs",
+            "//packages/angular_devkit/architect/testing:testing_rjs",
 
             # Base dependencies for the application in hello-world-app.
             # Some tests also require extra dependencies.
-            "@npm//@angular/common",
-            "@npm//@angular/compiler",
-            "@npm//@angular/compiler-cli",
-            "@npm//@angular/core",
-            "@npm//@angular/platform-browser",
-            "@npm//@angular/platform-browser-dynamic",
-            "@npm//@angular/router",
-            "@npm//rxjs",
-            "@npm//tslib",
-            "@npm//typescript",
-            "@npm//zone.js",
+            "//:root_modules/@angular/common",
+            "//:root_modules/@angular/compiler",
+            "//:root_modules/@angular/compiler-cli",
+            "//:root_modules/@angular/core",
+            "//:root_modules/@angular/platform-browser",
+            "//:root_modules/@angular/platform-browser-dynamic",
+            "//:root_modules/@angular/router",
+            "//:root_modules/rxjs",
+            "//:root_modules/tslib",
+            "//:root_modules/typescript",
+            "//:root_modules/zone.js",
+            "//:root_modules/@types/jasmine",
         ] + LARGE_SPECS[spec].get("extra_deps", []),
     )
     for spec in LARGE_SPECS

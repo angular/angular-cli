@@ -351,6 +351,7 @@ __metadata:
     "@rollup/plugin-node-resolve": "npm:^13.0.5"
     "@stylistic/eslint-plugin": "npm:^2.8.0"
     "@types/babel__core": "npm:7.20.5"
+    "@types/babel__generator": "npm:^7.6.8"
     "@types/browser-sync": "npm:^2.27.0"
     "@types/express": "npm:^4.16.0"
     "@types/http-proxy": "npm:^1.17.4"
@@ -4180,7 +4181,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/babel__generator@npm:*":
+"@types/babel__generator@npm:*, @types/babel__generator@npm:^7.6.8":
   version: 7.6.8
   resolution: "@types/babel__generator@npm:7.6.8"
   dependencies:
