@@ -20,11 +20,11 @@ importers:
         specifier: 19.1.0-next.4
         version: 19.1.0-next.4(@angular/core@19.1.0-next.4)
       '@angular/bazel':
-        specifier: https://github.com/angular/bazel-builds.git#c79da6c15ac32645b5e85ee9e098cbf3627e2126
-        version: github.com/angular/bazel-builds/c79da6c15ac32645b5e85ee9e098cbf3627e2126(@angular/compiler-cli@19.1.0-next.4)(@bazel/concatjs@5.8.1)(@bazel/worker@5.8.1)(@rollup/plugin-commonjs@28.0.2)(@rollup/plugin-node-resolve@13.3.0)(@types/node@18.19.68)(rollup-plugin-sourcemaps@0.6.3)(rollup@4.28.1)(terser@5.37.0)(typescript@5.7.2)
+        specifier: https://github.com/angular/bazel-builds.git#5c693d4f8110bb65bc8635506d74ffcb374aaa37
+        version: github.com/angular/bazel-builds/5c693d4f8110bb65bc8635506d74ffcb374aaa37(@angular/compiler-cli@19.1.0-next.4)(@bazel/concatjs@5.8.1)(@bazel/worker@5.8.1)(@rollup/plugin-commonjs@28.0.2)(@rollup/plugin-node-resolve@13.3.0)(@types/node@18.19.68)(rollup-plugin-sourcemaps@0.6.3)(rollup@4.28.1)(terser@5.37.0)(typescript@5.7.2)
       '@angular/build-tooling':
-        specifier: https://github.com/angular/dev-infra-private-build-tooling-builds.git#23a3f5d3df3644a47fefb864aa575c6ff0044cee
-        version: github.com/angular/dev-infra-private-build-tooling-builds/23a3f5d3df3644a47fefb864aa575c6ff0044cee(@angular/compiler-cli@19.1.0-next.4)(@angular/compiler@19.1.0-next.4)(@angular/localize@19.1.0-next.4)(@angular/platform-server@19.1.0-next.4)(@angular/service-worker@19.1.0-next.4)(chokidar@4.0.3)(debug@4.4.0)(karma-chrome-launcher@3.2.0)(karma-firefox-launcher@2.1.3)(karma-jasmine@5.1.0)(karma-junit-reporter@2.0.1)(karma-requirejs@1.1.0)(karma-sourcemap-loader@0.4.0)(karma@6.4.4)(less@4.2.1)(postcss@8.4.49)(rxjs@7.8.1)(terser@5.37.0)(zone.js@0.15.0)
+        specifier: https://github.com/angular/dev-infra-private-build-tooling-builds.git#2dba82de08e41f38a47b088384f591f30fd9de19
+        version: github.com/angular/dev-infra-private-build-tooling-builds/2dba82de08e41f38a47b088384f591f30fd9de19(@angular/compiler-cli@19.1.0-next.4)(@angular/compiler@19.1.0-next.4)(@angular/localize@19.1.0-next.4)(@angular/platform-server@19.1.0-next.4)(@angular/service-worker@19.1.0-next.4)(chokidar@4.0.3)(debug@4.4.0)(karma-chrome-launcher@3.2.0)(karma-firefox-launcher@2.1.3)(karma-jasmine@5.1.0)(karma-junit-reporter@2.0.1)(karma-requirejs@1.1.0)(karma-sourcemap-loader@0.4.0)(karma@6.4.4)(less@4.2.1)(postcss@8.4.49)(rxjs@7.8.1)(terser@5.37.0)(zone.js@0.15.0)
       '@angular/cdk':
         specifier: 19.1.0-next.3
         version: 19.1.0-next.3(@angular/common@19.1.0-next.4)(@angular/core@19.1.0-next.4)(rxjs@7.8.1)
@@ -50,8 +50,8 @@ importers:
         specifier: 19.1.0-next.3
         version: 19.1.0-next.3(@angular/animations@19.1.0-next.4)(@angular/cdk@19.1.0-next.3)(@angular/common@19.1.0-next.4)(@angular/core@19.1.0-next.4)(@angular/forms@19.1.0-next.4)(@angular/platform-browser@19.1.0-next.4)(rxjs@7.8.1)
       '@angular/ng-dev':
-        specifier: https://github.com/angular/dev-infra-private-ng-dev-builds.git#a7f5e0ca6ce8a27aae64f8d342e7fb9f557a8408
-        version: github.com/angular/dev-infra-private-ng-dev-builds/a7f5e0ca6ce8a27aae64f8d342e7fb9f557a8408
+        specifier: https://github.com/angular/dev-infra-private-ng-dev-builds.git#e4435ccb1b275541908b57b02958dc453c2fed43
+        version: github.com/angular/dev-infra-private-ng-dev-builds/e4435ccb1b275541908b57b02958dc453c2fed43
       '@angular/platform-browser':
         specifier: 19.1.0-next.4
         version: 19.1.0-next.4(@angular/animations@19.1.0-next.4)(@angular/common@19.1.0-next.4)(@angular/core@19.1.0-next.4)
@@ -261,7 +261,7 @@ importers:
         version: 7.1.2(webpack@5.97.1)
       debug:
         specifier: ^4.1.1
-        version: 4.4.0(supports-color@9.4.0)
+        version: 4.4.0(supports-color@10.0.0)
       esbuild:
         specifier: 0.24.0
         version: 0.24.0
@@ -294,7 +294,7 @@ importers:
         version: 3.0.3
       https-proxy-agent:
         specifier: 7.0.6
-        version: 7.0.6(supports-color@9.4.0)
+        version: 7.0.6(supports-color@10.0.0)
       husky:
         specifier: 9.1.7
         version: 9.1.7
@@ -625,7 +625,7 @@ packages:
       browserslist: 4.24.3
       esbuild: 0.24.0
       fast-glob: 3.3.2
-      https-proxy-agent: 7.0.6(supports-color@9.4.0)
+      https-proxy-agent: 7.0.6(supports-color@10.0.0)
       istanbul-lib-instrument: 6.0.3
       less: 4.2.1
       listr2: 8.2.5
@@ -908,7 +908,7 @@ packages:
       '@babel/traverse': 7.26.4
       '@babel/types': 7.26.3
       convert-source-map: 2.0.0
-      debug: 4.4.0(supports-color@9.4.0)
+      debug: 4.4.0(supports-color@10.0.0)
       gensync: 1.0.0-beta.2
       json5: 2.2.3
       semver: 6.3.1
@@ -983,7 +983,7 @@ packages:
       '@babel/core': 7.26.0
       '@babel/helper-compilation-targets': 7.25.9
       '@babel/helper-plugin-utils': 7.25.9
-      debug: 4.4.0(supports-color@9.4.0)
+      debug: 4.4.0(supports-color@10.0.0)
       lodash.debounce: 4.0.8
       resolve: 1.22.9
     transitivePeerDependencies:
@@ -1957,7 +1957,7 @@ packages:
       '@babel/parser': 7.26.3
       '@babel/template': 7.25.9
       '@babel/types': 7.26.3
-      debug: 4.4.0(supports-color@9.4.0)
+      debug: 4.4.0(supports-color@10.0.0)
       globals: 11.12.0
     transitivePeerDependencies:
       - supports-color
@@ -2066,6 +2066,7 @@ packages:
 
   /@bazel/typescript@5.8.1(typescript@5.7.2):
     resolution: {integrity: sha512-NAJ8WQHZL1WE1YmRoCrq/1hhG15Mvy/viWh6TkvFnBeEhNUiQUsA5GYyhU1ztnBIYW03nATO3vwhAEfO7Q0U5g==}
+    deprecated: No longer maintained, https://github.com/aspect-build/rules_ts is the recommended replacement
     hasBin: true
     peerDependencies:
       typescript: 5.7.2
@@ -2340,7 +2341,7 @@ packages:
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
     dependencies:
       ajv: 6.12.6
-      debug: 4.4.0(supports-color@9.4.0)
+      debug: 4.4.0(supports-color@10.0.0)
       espree: 9.6.1
       globals: 13.24.0
       ignore: 5.3.2
@@ -2361,7 +2362,7 @@ packages:
     resolution: {integrity: sha512-gXi0awOZLHk3TbW55GZLCPP6O+y/b5X1pBXKBVckFONSwF1z1E5ND2BGJsghQFah+pW7pkkyFb2VhUQI2qhL5w==}
     dev: true
 
-  /@google-cloud/common@5.0.2(supports-color@9.4.0):
+  /@google-cloud/common@5.0.2(supports-color@10.0.0):
     resolution: {integrity: sha512-V7bmBKYQyu0eVG2BFejuUjlBt+zrya6vtsKdY+JxMM/dNntPF41vZ9+LhOshEUH01zOHEqBSvI7Dad7ZS6aUeA==}
     engines: {node: '>=14.0.0'}
     dependencies:
@@ -2370,10 +2371,10 @@ packages:
       arrify: 2.0.1
       duplexify: 4.1.3
       extend: 3.0.2
-      google-auth-library: 9.15.0(supports-color@9.4.0)
+      google-auth-library: 9.15.0(supports-color@10.0.0)
       html-entities: 2.5.2
-      retry-request: 7.0.2(supports-color@9.4.0)
-      teeny-request: 9.0.0(supports-color@9.4.0)
+      retry-request: 7.0.2(supports-color@10.0.0)
+      teeny-request: 9.0.0(supports-color@10.0.0)
     transitivePeerDependencies:
       - encoding
       - supports-color
@@ -2394,11 +2395,11 @@ packages:
     engines: {node: '>=14'}
     dev: true
 
-  /@google-cloud/spanner@7.16.0(supports-color@9.4.0):
+  /@google-cloud/spanner@7.16.0(supports-color@10.0.0):
     resolution: {integrity: sha512-9/rQau/WNgM1Zle9sEJm6jUp1l4sbHtiHGcktQnQc2LPs5EjMMg9eYaP4UfWgDzoxny+3hyKTyhBbAzHR8pQGA==}
     engines: {node: '>=14.0.0'}
     dependencies:
-      '@google-cloud/common': 5.0.2(supports-color@9.4.0)
+      '@google-cloud/common': 5.0.2(supports-color@10.0.0)
       '@google-cloud/precise-date': 4.0.0
       '@google-cloud/projectify': 4.0.0
       '@google-cloud/promisify': 4.0.0
@@ -2414,19 +2415,19 @@ packages:
       duplexify: 4.1.3
       events-intercept: 2.0.0
       extend: 3.0.2
-      google-auth-library: 9.15.0(supports-color@9.4.0)
-      google-gax: 4.4.1(supports-color@9.4.0)
+      google-auth-library: 9.15.0(supports-color@10.0.0)
+      google-gax: 4.4.1(supports-color@10.0.0)
       grpc-gcp: 1.0.1
       is: 3.3.0
       lodash.snakecase: 4.1.1
       merge-stream: 2.0.0
       p-queue: 6.6.2
       protobufjs: 7.4.0
-      retry-request: 7.0.2(supports-color@9.4.0)
+      retry-request: 7.0.2(supports-color@10.0.0)
       split-array-stream: 2.0.0
       stack-trace: 0.0.10
       stream-events: 1.0.5
-      teeny-request: 9.0.0(supports-color@9.4.0)
+      teeny-request: 9.0.0(supports-color@10.0.0)
       through2: 4.0.2
     transitivePeerDependencies:
       - encoding
@@ -2462,7 +2463,7 @@ packages:
     deprecated: Use @eslint/config-array instead
     dependencies:
       '@humanwhocodes/object-schema': 2.0.3
-      debug: 4.4.0(supports-color@9.4.0)
+      debug: 4.4.0(supports-color@10.0.0)
       minimatch: 3.1.2
     transitivePeerDependencies:
       - supports-color
@@ -2816,43 +2817,12 @@ packages:
     dev: true
     optional: true
 
-  /@microsoft/api-extractor-model@7.30.0(@types/node@18.19.68):
-    resolution: {integrity: sha512-26/LJZBrsWDKAkOWRiQbdVgcfd1F3nyJnAiJzsAgpouPk7LtOIj7PK9aJtBaw/pUXrkotEg27RrT+Jm/q0bbug==}
-    dependencies:
-      '@microsoft/tsdoc': 0.15.1
-      '@microsoft/tsdoc-config': 0.17.1
-      '@rushstack/node-core-library': 5.10.0(@types/node@18.19.68)
-    transitivePeerDependencies:
-      - '@types/node'
-    dev: true
-
   /@microsoft/api-extractor-model@7.30.1(@types/node@18.19.68):
     resolution: {integrity: sha512-CTS2PlASJHxVY8hqHORVb1HdECWOEMcMnM6/kDkPr0RZapAFSIHhg9D4jxuE8g+OWYHtPc10LCpmde5pylTRlA==}
     dependencies:
       '@microsoft/tsdoc': 0.15.1
       '@microsoft/tsdoc-config': 0.17.1
       '@rushstack/node-core-library': 5.10.1(@types/node@18.19.68)
-    transitivePeerDependencies:
-      - '@types/node'
-    dev: true
-
-  /@microsoft/api-extractor@7.48.0(@types/node@18.19.68):
-    resolution: {integrity: sha512-FMFgPjoilMUWeZXqYRlJ3gCVRhB7WU/HN88n8OLqEsmsG4zBdX/KQdtJfhq95LQTQ++zfu0Em1LLb73NqRCLYQ==}
-    hasBin: true
-    dependencies:
-      '@microsoft/api-extractor-model': 7.30.0(@types/node@18.19.68)
-      '@microsoft/tsdoc': 0.15.1
-      '@microsoft/tsdoc-config': 0.17.1
-      '@rushstack/node-core-library': 5.10.0(@types/node@18.19.68)
-      '@rushstack/rig-package': 0.5.3
-      '@rushstack/terminal': 0.14.3(@types/node@18.19.68)
-      '@rushstack/ts-command-line': 4.23.1(@types/node@18.19.68)
-      lodash: 4.17.21
-      minimatch: 3.0.8
-      resolve: 1.22.9
-      semver: 7.5.4
-      source-map: 0.6.1
-      typescript: 5.7.2
     transitivePeerDependencies:
       - '@types/node'
     dev: true
@@ -3111,7 +3081,7 @@ packages:
     dependencies:
       agent-base: 7.1.3
       http-proxy-agent: 7.0.2
-      https-proxy-agent: 7.0.6(supports-color@9.4.0)
+      https-proxy-agent: 7.0.6(supports-color@10.0.0)
       lru-cache: 10.4.3
       socks-proxy-agent: 8.0.5
     transitivePeerDependencies:
@@ -3501,7 +3471,7 @@ packages:
     engines: {node: '>=18'}
     hasBin: true
     dependencies:
-      debug: 4.4.0(supports-color@9.4.0)
+      debug: 4.4.0(supports-color@10.0.0)
       extract-zip: 2.0.1
       progress: 2.0.3
       proxy-agent: 6.5.0
@@ -3763,25 +3733,6 @@ packages:
     resolution: {integrity: sha512-zt6OdqaDoOnJ1ZYsCYGt9YmWzDXl4vQdKTyJev62gFhRGKdx7mcT54V9KIjg+d2wi9EXsPvAPKe7i7WjfVWB8g==}
     dev: true
 
-  /@rushstack/node-core-library@5.10.0(@types/node@18.19.68):
-    resolution: {integrity: sha512-2pPLCuS/3x7DCd7liZkqOewGM0OzLyCacdvOe8j6Yrx9LkETGnxul1t7603bIaB8nUAooORcct9fFDOQMbWAgw==}
-    peerDependencies:
-      '@types/node': '*'
-    peerDependenciesMeta:
-      '@types/node':
-        optional: true
-    dependencies:
-      '@types/node': 18.19.68
-      ajv: 8.13.0
-      ajv-draft-04: 1.0.0(ajv@8.13.0)
-      ajv-formats: 3.0.1(ajv@8.13.0)
-      fs-extra: 7.0.1
-      import-lazy: 4.0.0
-      jju: 1.4.0
-      resolve: 1.22.9
-      semver: 7.5.4
-    dev: true
-
   /@rushstack/node-core-library@5.10.1(@types/node@18.19.68):
     resolution: {integrity: sha512-BSb/KcyBHmUQwINrgtzo6jiH0HlGFmrUy33vO6unmceuVKTEyL2q+P0fQq2oB5hvXVWOEUhxB2QvlkZluvUEmg==}
     peerDependencies:
@@ -3808,19 +3759,6 @@ packages:
       strip-json-comments: 3.1.1
     dev: true
 
-  /@rushstack/terminal@0.14.3(@types/node@18.19.68):
-    resolution: {integrity: sha512-csXbZsAdab/v8DbU1sz7WC2aNaKArcdS/FPmXMOXEj/JBBZMvDK0+1b4Qao0kkG0ciB1Qe86/Mb68GjH6/TnMw==}
-    peerDependencies:
-      '@types/node': '*'
-    peerDependenciesMeta:
-      '@types/node':
-        optional: true
-    dependencies:
-      '@rushstack/node-core-library': 5.10.0(@types/node@18.19.68)
-      '@types/node': 18.19.68
-      supports-color: 8.1.1
-    dev: true
-
   /@rushstack/terminal@0.14.4(@types/node@18.19.68):
     resolution: {integrity: sha512-NxACqERW0PHq8Rpq1V6v5iTHEwkRGxenjEW+VWqRYQ8T9puUzgmGHmEZUaUEDHAe9Qyvp0/Ew04sAiQw9XjhJg==}
     peerDependencies:
@@ -3832,17 +3770,6 @@ packages:
       '@rushstack/node-core-library': 5.10.1(@types/node@18.19.68)
       '@types/node': 18.19.68
       supports-color: 8.1.1
-    dev: true
-
-  /@rushstack/ts-command-line@4.23.1(@types/node@18.19.68):
-    resolution: {integrity: sha512-40jTmYoiu/xlIpkkRsVfENtBq4CW3R4azbL0Vmda+fMwHWqss6wwf/Cy/UJmMqIzpfYc2OTnjYP1ZLD3CmyeCA==}
-    dependencies:
-      '@rushstack/terminal': 0.14.3(@types/node@18.19.68)
-      '@types/argparse': 1.0.38
-      argparse: 1.0.10
-      string-argv: 0.3.2
-    transitivePeerDependencies:
-      - '@types/node'
     dev: true
 
   /@rushstack/ts-command-line@4.23.2(@types/node@18.19.68):
@@ -4590,7 +4517,7 @@ packages:
       '@typescript-eslint/types': 8.18.1
       '@typescript-eslint/typescript-estree': 8.18.1(typescript@5.7.2)
       '@typescript-eslint/visitor-keys': 8.18.1
-      debug: 4.4.0(supports-color@9.4.0)
+      debug: 4.4.0(supports-color@10.0.0)
       eslint: 8.57.0
       typescript: 5.7.2
     transitivePeerDependencies:
@@ -4614,7 +4541,7 @@ packages:
     dependencies:
       '@typescript-eslint/typescript-estree': 8.18.1(typescript@5.7.2)
       '@typescript-eslint/utils': 8.18.1(eslint@8.57.0)(typescript@5.7.2)
-      debug: 4.4.0(supports-color@9.4.0)
+      debug: 4.4.0(supports-color@10.0.0)
       eslint: 8.57.0
       ts-api-utils: 1.4.3(typescript@5.7.2)
       typescript: 5.7.2
@@ -4635,7 +4562,7 @@ packages:
     dependencies:
       '@typescript-eslint/types': 8.18.1
       '@typescript-eslint/visitor-keys': 8.18.1
-      debug: 4.4.0(supports-color@9.4.0)
+      debug: 4.4.0(supports-color@10.0.0)
       fast-glob: 3.3.2
       is-glob: 4.0.3
       minimatch: 9.0.5
@@ -5314,11 +5241,11 @@ packages:
       es6-promisify: 5.0.0
     dev: true
 
-  /agent-base@6.0.2(supports-color@9.4.0):
+  /agent-base@6.0.2(supports-color@10.0.0):
     resolution: {integrity: sha512-RZNwNclF7+MS/8bDg70amg32dyeZGZxiDuQmZxKLAlQjr3jGyLx+4Kkk58UO7D2QdgFIQCovuSuZESne6RG6XQ==}
     engines: {node: '>= 6.0.0'}
     dependencies:
-      debug: 4.4.0(supports-color@9.4.0)
+      debug: 4.4.0(supports-color@10.0.0)
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -6803,7 +6730,7 @@ packages:
       ms: 2.1.3
     dev: true
 
-  /debug@4.4.0(supports-color@9.4.0):
+  /debug@4.4.0(supports-color@10.0.0):
     resolution: {integrity: sha512-6WTZ/IxCY/T6BALoZHaE4ctp9xm+Z5kY/pzYaCHRFeyVhojxlrm+46y68HA6hr0TcwEssoxNiDEUJQjfPZ/RYA==}
     engines: {node: '>=6.0'}
     peerDependencies:
@@ -6813,7 +6740,7 @@ packages:
         optional: true
     dependencies:
       ms: 2.1.3
-      supports-color: 9.4.0
+      supports-color: 10.0.0
     dev: true
 
   /decamelize@1.2.0:
@@ -7580,7 +7507,7 @@ packages:
       ajv: 6.12.6
       chalk: 4.1.2
       cross-spawn: 7.0.6
-      debug: 4.4.0(supports-color@9.4.0)
+      debug: 4.4.0(supports-color@10.0.0)
       doctrine: 3.0.0
       escape-string-regexp: 4.0.0
       eslint-scope: 7.2.2
@@ -7823,7 +7750,7 @@ packages:
     engines: {node: '>= 10.17.0'}
     hasBin: true
     dependencies:
-      debug: 4.4.0(supports-color@9.4.0)
+      debug: 4.4.0(supports-color@10.0.0)
       get-stream: 5.2.0
       yauzl: 2.10.0
     optionalDependencies:
@@ -8060,7 +7987,7 @@ packages:
       debug:
         optional: true
     dependencies:
-      debug: 4.4.0(supports-color@9.4.0)
+      debug: 4.4.0(supports-color@10.0.0)
     dev: true
 
   /for-each@0.3.3:
@@ -8229,12 +8156,12 @@ packages:
       is-windows: 1.0.2
     dev: true
 
-  /gaxios@6.7.1(supports-color@9.4.0):
+  /gaxios@6.7.1(supports-color@10.0.0):
     resolution: {integrity: sha512-LDODD4TMYx7XXdpwxAVRAIAuB0bzv0s+ywFonY46k126qzQHT9ygyoa9tncmOiQmmDrik65UYsEkv3lbfqQ3yQ==}
     engines: {node: '>=14'}
     dependencies:
       extend: 3.0.2
-      https-proxy-agent: 7.0.6(supports-color@9.4.0)
+      https-proxy-agent: 7.0.6(supports-color@10.0.0)
       is-stream: 2.0.1
       node-fetch: 2.7.0
       uuid: 9.0.1
@@ -8243,11 +8170,11 @@ packages:
       - supports-color
     dev: true
 
-  /gcp-metadata@6.1.0(supports-color@9.4.0):
+  /gcp-metadata@6.1.0(supports-color@10.0.0):
     resolution: {integrity: sha512-Jh/AIwwgaxan+7ZUUmRLCjtchyDiqh4KjBJ5tW3plBZb5iL/BPcso8A5DlzeD9qlw0duCamnNdpFjxwaT0KyKg==}
     engines: {node: '>=14'}
     dependencies:
-      gaxios: 6.7.1(supports-color@9.4.0)
+      gaxios: 6.7.1(supports-color@10.0.0)
       json-bigint: 1.0.0
     transitivePeerDependencies:
       - encoding
@@ -8317,7 +8244,7 @@ packages:
     dependencies:
       basic-ftp: 5.0.5
       data-uri-to-buffer: 6.0.2
-      debug: 4.4.0(supports-color@9.4.0)
+      debug: 4.4.0(supports-color@10.0.0)
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -8426,22 +8353,22 @@ packages:
       pinkie-promise: 2.0.1
     dev: true
 
-  /google-auth-library@9.15.0(supports-color@9.4.0):
+  /google-auth-library@9.15.0(supports-color@10.0.0):
     resolution: {integrity: sha512-7ccSEJFDFO7exFbO6NRyC+xH8/mZ1GZGG2xxx9iHxZWcjUjJpjWxIMw3cofAKcueZ6DATiukmmprD7yavQHOyQ==}
     engines: {node: '>=14'}
     dependencies:
       base64-js: 1.5.1
       ecdsa-sig-formatter: 1.0.11
-      gaxios: 6.7.1(supports-color@9.4.0)
-      gcp-metadata: 6.1.0(supports-color@9.4.0)
-      gtoken: 7.1.0(supports-color@9.4.0)
+      gaxios: 6.7.1(supports-color@10.0.0)
+      gcp-metadata: 6.1.0(supports-color@10.0.0)
+      gtoken: 7.1.0(supports-color@10.0.0)
       jws: 4.0.0
     transitivePeerDependencies:
       - encoding
       - supports-color
     dev: true
 
-  /google-gax@4.4.1(supports-color@9.4.0):
+  /google-gax@4.4.1(supports-color@10.0.0):
     resolution: {integrity: sha512-Phyp9fMfA00J3sZbJxbbB4jC55b7DBjE3F6poyL3wKMEBVKA79q6BGuHcTiM28yOzVql0NDbRL8MLLh8Iwk9Dg==}
     engines: {node: '>=14'}
     dependencies:
@@ -8450,12 +8377,12 @@ packages:
       '@types/long': 4.0.2
       abort-controller: 3.0.0
       duplexify: 4.1.3
-      google-auth-library: 9.15.0(supports-color@9.4.0)
+      google-auth-library: 9.15.0(supports-color@10.0.0)
       node-fetch: 2.7.0
       object-hash: 3.0.0
       proto3-json-serializer: 2.0.2
       protobufjs: 7.4.0
-      retry-request: 7.0.2(supports-color@9.4.0)
+      retry-request: 7.0.2(supports-color@10.0.0)
       uuid: 9.0.1
     transitivePeerDependencies:
       - encoding
@@ -8486,11 +8413,11 @@ packages:
       '@grpc/grpc-js': 1.12.4
     dev: true
 
-  /gtoken@7.1.0(supports-color@9.4.0):
+  /gtoken@7.1.0(supports-color@10.0.0):
     resolution: {integrity: sha512-pCcEwRi+TKpMlxAQObHDQ56KawURgyAf6jtIY046fJ5tIv3zDe/LEIubckAO8fj6JnAxLdmWkUfNyulQ2iKdEw==}
     engines: {node: '>=14.0.0'}
     dependencies:
-      gaxios: 6.7.1(supports-color@9.4.0)
+      gaxios: 6.7.1(supports-color@10.0.0)
       jws: 4.0.0
     transitivePeerDependencies:
       - encoding
@@ -8673,13 +8600,13 @@ packages:
     resolution: {integrity: sha512-SGeBX54F94Wgu5RH3X5jsDtf4eHyRogWX1XGT3b4HuW3tQPM4AaBzoUji/4AAJNXCEOWZ5O0DgZmJw1947gD5Q==}
     dev: true
 
-  /http-proxy-agent@5.0.0(supports-color@9.4.0):
+  /http-proxy-agent@5.0.0(supports-color@10.0.0):
     resolution: {integrity: sha512-n2hY8YdoRE1i7r6M0w9DIw5GgZN0G25P8zLCRQ8rjXtTU3vsNFBI/vWK/UIeE6g5MUUz6avwAPXmL6Fy9D/90w==}
     engines: {node: '>= 6'}
     dependencies:
       '@tootallnate/once': 2.0.0
-      agent-base: 6.0.2(supports-color@9.4.0)
-      debug: 4.4.0(supports-color@9.4.0)
+      agent-base: 6.0.2(supports-color@10.0.0)
+      debug: 4.4.0(supports-color@10.0.0)
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -8689,7 +8616,7 @@ packages:
     engines: {node: '>= 14'}
     dependencies:
       agent-base: 7.1.3
-      debug: 4.4.0(supports-color@9.4.0)
+      debug: 4.4.0(supports-color@10.0.0)
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -8718,7 +8645,7 @@ packages:
     engines: {node: ^14.15.0 || ^16.10.0 || >=18.0.0}
     dependencies:
       '@types/http-proxy': 1.17.15
-      debug: 4.4.0(supports-color@9.4.0)
+      debug: 4.4.0(supports-color@10.0.0)
       http-proxy: 1.18.1(debug@4.4.0)
       is-glob: 4.0.3
       is-plain-object: 5.0.0
@@ -8774,22 +8701,22 @@ packages:
       - supports-color
     dev: true
 
-  /https-proxy-agent@5.0.1(supports-color@9.4.0):
+  /https-proxy-agent@5.0.1(supports-color@10.0.0):
     resolution: {integrity: sha512-dFcAjpTQFgoLMzC2VwU+C/CbS7uRL0lWmxDITmqm7C+7F0Odmj6s9l6alZc6AELXhrnggM2CeWSXHGOdX2YtwA==}
     engines: {node: '>= 6'}
     dependencies:
-      agent-base: 6.0.2(supports-color@9.4.0)
-      debug: 4.4.0(supports-color@9.4.0)
+      agent-base: 6.0.2(supports-color@10.0.0)
+      debug: 4.4.0(supports-color@10.0.0)
     transitivePeerDependencies:
       - supports-color
     dev: true
 
-  /https-proxy-agent@7.0.6(supports-color@9.4.0):
+  /https-proxy-agent@7.0.6(supports-color@10.0.0):
     resolution: {integrity: sha512-vK9P5/iUfdl95AI+JVyUuIcVtd4ofvtrOr3HNtM2yxC9bnMbEdp3x01OhQNnjb8IJYi38VlTE3mBXwcfvywuSw==}
     engines: {node: '>= 14'}
     dependencies:
       agent-base: 7.1.3
-      debug: 4.4.0(supports-color@9.4.0)
+      debug: 4.4.0(supports-color@10.0.0)
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -9421,7 +9348,7 @@ packages:
     resolution: {integrity: sha512-n3s8EwkdFIJCG3BPKBYvskgXGoy88ARzvegkitk60NxRdwltLOTaH7CUiMRXvwYorl0Q712iEjcWB+fK/MrWVw==}
     engines: {node: '>=10'}
     dependencies:
-      debug: 4.4.0(supports-color@9.4.0)
+      debug: 4.4.0(supports-color@10.0.0)
       istanbul-lib-coverage: 3.2.2
       source-map: 0.6.1
     transitivePeerDependencies:
@@ -9883,7 +9810,7 @@ packages:
     resolution: {integrity: sha512-tmcyQ/wXXuxpDxyNXv5yNNkdAMdFRqwtegBXUaowiQzUKqJehttS0x2j0eOZDQAyloAth5w6wwBImnFzkUz3pQ==}
     engines: {node: '>= 8'}
     dependencies:
-      debug: 4.4.0(supports-color@9.4.0)
+      debug: 4.4.0(supports-color@10.0.0)
       http-errors: 1.8.1
       resolve-path: 1.4.0
     transitivePeerDependencies:
@@ -9909,7 +9836,7 @@ packages:
       content-disposition: 0.5.4
       content-type: 1.0.5
       cookies: 0.9.1
-      debug: 4.4.0(supports-color@9.4.0)
+      debug: 4.4.0(supports-color@10.0.0)
       delegates: 1.0.0
       depd: 2.0.0
       destroy: 1.2.0
@@ -10178,7 +10105,7 @@ packages:
     engines: {node: '>=8.0'}
     dependencies:
       date-format: 4.0.14
-      debug: 4.4.0(supports-color@9.4.0)
+      debug: 4.4.0(supports-color@10.0.0)
       flatted: 3.3.2
       rfdc: 1.4.1
       streamroller: 3.1.5
@@ -11216,10 +11143,10 @@ packages:
     dependencies:
       '@tootallnate/quickjs-emscripten': 0.23.0
       agent-base: 7.1.3
-      debug: 4.4.0(supports-color@9.4.0)
+      debug: 4.4.0(supports-color@10.0.0)
       get-uri: 6.0.4
       http-proxy-agent: 7.0.2
-      https-proxy-agent: 7.0.6(supports-color@9.4.0)
+      https-proxy-agent: 7.0.6(supports-color@10.0.0)
       pac-resolver: 7.0.1
       socks-proxy-agent: 8.0.5
     transitivePeerDependencies:
@@ -11769,9 +11696,9 @@ packages:
     engines: {node: '>= 14'}
     dependencies:
       agent-base: 7.1.3
-      debug: 4.4.0(supports-color@9.4.0)
+      debug: 4.4.0(supports-color@10.0.0)
       http-proxy-agent: 7.0.2
-      https-proxy-agent: 7.0.6(supports-color@9.4.0)
+      https-proxy-agent: 7.0.6(supports-color@10.0.0)
       lru-cache: 7.18.3
       pac-proxy-agent: 7.1.0
       proxy-from-env: 1.1.0
@@ -11834,7 +11761,7 @@ packages:
       debug: 4.3.4
       devtools-protocol: 0.0.1045489
       extract-zip: 2.0.1
-      https-proxy-agent: 5.0.1(supports-color@9.4.0)
+      https-proxy-agent: 5.0.1(supports-color@10.0.0)
       proxy-from-env: 1.1.0
       rimraf: 3.0.2
       tar-fs: 2.1.1
@@ -11853,7 +11780,7 @@ packages:
     dependencies:
       '@puppeteer/browsers': 2.6.1
       chromium-bidi: 0.8.0(devtools-protocol@0.0.1367902)
-      debug: 4.4.0(supports-color@9.4.0)
+      debug: 4.4.0(supports-color@10.0.0)
       devtools-protocol: 0.0.1367902
       typed-query-selector: 2.12.0
       ws: 8.18.0
@@ -11866,9 +11793,9 @@ packages:
   /puppeteer@18.2.1:
     resolution: {integrity: sha512-7+UhmYa7wxPh2oMRwA++k8UGVDxh3YdWFB52r9C3tM81T6BU7cuusUSxImz0GEYSOYUKk/YzIhkQ6+vc0gHbxQ==}
     engines: {node: '>=14.1.0'}
-    deprecated: < 19.4.0 is no longer supported
+    deprecated: < 22.8.2 is no longer supported
     dependencies:
-      https-proxy-agent: 5.0.1(supports-color@9.4.0)
+      https-proxy-agent: 5.0.1(supports-color@10.0.0)
       progress: 2.0.3
       proxy-from-env: 1.1.0
       puppeteer-core: 18.2.1
@@ -12221,13 +12148,13 @@ packages:
       signal-exit: 4.1.0
     dev: true
 
-  /retry-request@7.0.2(supports-color@9.4.0):
+  /retry-request@7.0.2(supports-color@10.0.0):
     resolution: {integrity: sha512-dUOvLMJ0/JJYEn8NrpOaGNE7X3vpI5XlZS/u0ANjqtcZVKnIxP7IgCFwrKTxENw29emmwug53awKtaMm4i9g5w==}
     engines: {node: '>=14'}
     dependencies:
       '@types/request': 2.48.12
       extend: 3.0.2
-      teeny-request: 9.0.0(supports-color@9.4.0)
+      teeny-request: 9.0.0(supports-color@10.0.0)
     transitivePeerDependencies:
       - encoding
       - supports-color
@@ -12578,7 +12505,7 @@ packages:
     resolution: {integrity: sha512-v67WcEouB5GxbTWL/4NeToqcZiAWEq90N888fczVArY8A79J0L4FD7vj5hm3eUMua5EpoQ59wa/oovY6TLvRUA==}
     engines: {node: '>= 18'}
     dependencies:
-      debug: 4.4.0(supports-color@9.4.0)
+      debug: 4.4.0(supports-color@10.0.0)
       destroy: 1.2.0
       encodeurl: 2.0.0
       escape-html: 1.0.3
@@ -12876,7 +12803,7 @@ packages:
     engines: {node: '>= 14'}
     dependencies:
       agent-base: 7.1.3
-      debug: 4.4.0(supports-color@9.4.0)
+      debug: 4.4.0(supports-color@10.0.0)
       socks: 2.8.3
     transitivePeerDependencies:
       - supports-color
@@ -12992,7 +12919,7 @@ packages:
   /spdy-transport@3.0.0:
     resolution: {integrity: sha512-hsLVFE5SjA6TCisWeJXFKniGGOpBgMLmerfO2aCyCU5s7nJ/rpAepqmFifv/GCbSbueEeAJJnmSQ2rKC/g8Fcw==}
     dependencies:
-      debug: 4.4.0(supports-color@9.4.0)
+      debug: 4.4.0(supports-color@10.0.0)
       detect-node: 2.1.0
       hpack.js: 2.1.6
       obuf: 1.1.2
@@ -13006,7 +12933,7 @@ packages:
     resolution: {integrity: sha512-r46gZQZQV+Kl9oItvl1JZZqJKGr+oEkB08A6BzkiR7593/7IbtuncXHd2YoYeTsG4157ZssMu9KYvUHLcjcDoA==}
     engines: {node: '>=6.0.0'}
     dependencies:
-      debug: 4.4.0(supports-color@9.4.0)
+      debug: 4.4.0(supports-color@10.0.0)
       handle-thing: 2.0.1
       http-deceiver: 1.2.7
       select-hose: 2.0.0
@@ -13113,7 +13040,7 @@ packages:
     engines: {node: '>=8.0'}
     dependencies:
       date-format: 4.0.14
-      debug: 4.4.0(supports-color@9.4.0)
+      debug: 4.4.0(supports-color@10.0.0)
       fs-extra: 8.1.0
     transitivePeerDependencies:
       - supports-color
@@ -13245,6 +13172,11 @@ packages:
     resolution: {integrity: sha512-PdHt7hHUJKxvTCgbKX9C1V/ftOcjJQgz8BZwNfV5c4B6dcGqlpelTbJ999jBGZ2jYiPAwcX5dP6oBwVlBlUbxw==}
     dev: true
 
+  /supports-color@10.0.0:
+    resolution: {integrity: sha512-HRVVSbCCMbj7/kdWF9Q+bbckjBHLtHMEoJWlkmYzzdwhYMkjkOwubLM6t7NbWKjgKamGDrWL1++KrjUO1t9oAQ==}
+    engines: {node: '>=18'}
+    dev: true
+
   /supports-color@2.0.0:
     resolution: {integrity: sha512-KKNVtd6pCYgPIKU4cp2733HWYCpplQhddZLBUryaAHou723x+FRzQ5Df824Fj+IyyuiQTRoub4SnIFfIcrp70g==}
     engines: {node: '>=0.8.0'}
@@ -13262,11 +13194,6 @@ packages:
     engines: {node: '>=10'}
     dependencies:
       has-flag: 4.0.0
-    dev: true
-
-  /supports-color@9.4.0:
-    resolution: {integrity: sha512-VL+lNrEoIXww1coLPOmiEmK/0sGigko5COxI09KzHc2VJXJsQ37UaQ+8quuxjDeA7+KnLGTWRyOXSLLR2Wb4jw==}
-    engines: {node: '>=12'}
     dev: true
 
   /supports-preserve-symlinks-flag@1.0.0:
@@ -13354,12 +13281,12 @@ packages:
       yallist: 5.0.0
     dev: true
 
-  /teeny-request@9.0.0(supports-color@9.4.0):
+  /teeny-request@9.0.0(supports-color@10.0.0):
     resolution: {integrity: sha512-resvxdc6Mgb7YEThw6G6bExlXKkv6+YbuzGg9xuXxSgxJF7Ozs+o8Y9+2R3sArdWdW8nOokoQb1yrpFB0pQK2g==}
     engines: {node: '>=14'}
     dependencies:
-      http-proxy-agent: 5.0.0(supports-color@9.4.0)
-      https-proxy-agent: 5.0.1(supports-color@9.4.0)
+      http-proxy-agent: 5.0.0(supports-color@10.0.0)
+      https-proxy-agent: 5.0.1(supports-color@10.0.0)
       node-fetch: 2.7.0
       stream-events: 1.0.5
       uuid: 9.0.1
@@ -13626,7 +13553,7 @@ packages:
     engines: {node: ^18.17.0 || >=20.5.0}
     dependencies:
       '@tufjs/models': 3.0.1
-      debug: 4.4.0(supports-color@9.4.0)
+      debug: 4.4.0(supports-color@10.0.0)
       make-fetch-happen: 14.0.3
     transitivePeerDependencies:
       - supports-color
@@ -13986,7 +13913,7 @@ packages:
       '@verdaccio/config': 8.0.0-next-8.6
       '@verdaccio/core': 8.0.0-next-8.6
       express: 4.21.1
-      https-proxy-agent: 5.0.1(supports-color@9.4.0)
+      https-proxy-agent: 5.0.1(supports-color@10.0.0)
       node-fetch: 2.6.7
     transitivePeerDependencies:
       - encoding
@@ -14040,7 +13967,7 @@ packages:
       clipanion: 4.0.0-rc.4(typanion@3.14.0)
       compression: 1.7.5
       cors: 2.8.5
-      debug: 4.4.0(supports-color@9.4.0)
+      debug: 4.4.0(supports-color@10.0.0)
       envinfo: 7.14.0
       express: 4.21.2
       express-rate-limit: 5.5.1
@@ -14764,15 +14691,15 @@ packages:
     resolution: {integrity: sha512-9oxn0IIjbCZkJ67L+LkhYWRyAy7axphb3VgE2MBDlOqnmHMPWGYMxJxBYFueFq/JGY2GMwS0rU+UCLunEmy5UA==}
     dev: true
 
-  github.com/angular/bazel-builds/c79da6c15ac32645b5e85ee9e098cbf3627e2126(@angular/compiler-cli@19.1.0-next.4)(@bazel/concatjs@5.8.1)(@bazel/worker@5.8.1)(@rollup/plugin-commonjs@28.0.2)(@rollup/plugin-node-resolve@13.3.0)(@types/node@18.19.68)(rollup-plugin-sourcemaps@0.6.3)(rollup@4.28.1)(terser@5.37.0)(typescript@5.7.2):
-    resolution: {tarball: https://codeload.github.com/angular/bazel-builds/tar.gz/c79da6c15ac32645b5e85ee9e098cbf3627e2126}
-    id: github.com/angular/bazel-builds/c79da6c15ac32645b5e85ee9e098cbf3627e2126
+  github.com/angular/bazel-builds/5c693d4f8110bb65bc8635506d74ffcb374aaa37(@angular/compiler-cli@19.1.0-next.4)(@bazel/concatjs@5.8.1)(@bazel/worker@5.8.1)(@rollup/plugin-commonjs@28.0.2)(@rollup/plugin-node-resolve@13.3.0)(@types/node@18.19.68)(rollup-plugin-sourcemaps@0.6.3)(rollup@4.28.1)(terser@5.37.0)(typescript@5.7.2):
+    resolution: {tarball: https://codeload.github.com/angular/bazel-builds/tar.gz/5c693d4f8110bb65bc8635506d74ffcb374aaa37}
+    id: github.com/angular/bazel-builds/5c693d4f8110bb65bc8635506d74ffcb374aaa37
     name: '@angular/bazel'
     version: 19.1.0-next.4
     engines: {node: ^18.19.1 || ^20.11.1 || >=22.0.0}
     hasBin: true
     peerDependencies:
-      '@angular/compiler-cli': 19.1.0-next.4+sha-3d86c58
+      '@angular/compiler-cli': 19.1.0-next.4+sha-b97bc5b
       '@bazel/concatjs': ^5.3.0
       '@bazel/worker': ^5.3.0
       '@rollup/plugin-commonjs': ^28.0.0
@@ -14801,11 +14728,11 @@ packages:
       - '@types/node'
     dev: true
 
-  github.com/angular/dev-infra-private-build-tooling-builds/23a3f5d3df3644a47fefb864aa575c6ff0044cee(@angular/compiler-cli@19.1.0-next.4)(@angular/compiler@19.1.0-next.4)(@angular/localize@19.1.0-next.4)(@angular/platform-server@19.1.0-next.4)(@angular/service-worker@19.1.0-next.4)(chokidar@4.0.3)(debug@4.4.0)(karma-chrome-launcher@3.2.0)(karma-firefox-launcher@2.1.3)(karma-jasmine@5.1.0)(karma-junit-reporter@2.0.1)(karma-requirejs@1.1.0)(karma-sourcemap-loader@0.4.0)(karma@6.4.4)(less@4.2.1)(postcss@8.4.49)(rxjs@7.8.1)(terser@5.37.0)(zone.js@0.15.0):
-    resolution: {tarball: https://codeload.github.com/angular/dev-infra-private-build-tooling-builds/tar.gz/23a3f5d3df3644a47fefb864aa575c6ff0044cee}
-    id: github.com/angular/dev-infra-private-build-tooling-builds/23a3f5d3df3644a47fefb864aa575c6ff0044cee
+  github.com/angular/dev-infra-private-build-tooling-builds/2dba82de08e41f38a47b088384f591f30fd9de19(@angular/compiler-cli@19.1.0-next.4)(@angular/compiler@19.1.0-next.4)(@angular/localize@19.1.0-next.4)(@angular/platform-server@19.1.0-next.4)(@angular/service-worker@19.1.0-next.4)(chokidar@4.0.3)(debug@4.4.0)(karma-chrome-launcher@3.2.0)(karma-firefox-launcher@2.1.3)(karma-jasmine@5.1.0)(karma-junit-reporter@2.0.1)(karma-requirejs@1.1.0)(karma-sourcemap-loader@0.4.0)(karma@6.4.4)(less@4.2.1)(postcss@8.4.49)(rxjs@7.8.1)(terser@5.37.0)(zone.js@0.15.0):
+    resolution: {tarball: https://codeload.github.com/angular/dev-infra-private-build-tooling-builds/tar.gz/2dba82de08e41f38a47b088384f591f30fd9de19}
+    id: github.com/angular/dev-infra-private-build-tooling-builds/2dba82de08e41f38a47b088384f591f30fd9de19
     name: '@angular/build-tooling'
-    version: 0.0.0-36b7540c8baf768285e55e02cb440c5e1eb658fa
+    version: 0.0.0-8e8bf8fcb2b720d1f78c89c0791475f54b3d0b7f
     dependencies:
       '@angular/benchpress': 0.3.0(rxjs@7.8.1)(zone.js@0.15.0)
       '@angular/build': 19.1.0-next.1(@angular/compiler-cli@19.1.0-next.4)(@angular/compiler@19.1.0-next.4)(@angular/localize@19.1.0-next.4)(@angular/platform-server@19.1.0-next.4)(@angular/service-worker@19.1.0-next.4)(@types/node@18.19.68)(chokidar@4.0.3)(less@4.2.1)(postcss@8.4.49)(terser@5.37.0)(typescript@5.7.2)
@@ -14818,7 +14745,7 @@ packages:
       '@bazel/runfiles': 5.8.1
       '@bazel/terser': 5.8.1(terser@5.37.0)
       '@bazel/typescript': 5.8.1(typescript@5.7.2)
-      '@microsoft/api-extractor': 7.48.0(@types/node@18.19.68)
+      '@microsoft/api-extractor': 7.48.1(@types/node@18.19.68)
       '@types/browser-sync': 2.29.0
       '@types/minimatch': 5.1.2
       '@types/node': 18.19.68
@@ -14873,20 +14800,20 @@ packages:
       - zone.js
     dev: true
 
-  github.com/angular/dev-infra-private-ng-dev-builds/a7f5e0ca6ce8a27aae64f8d342e7fb9f557a8408:
-    resolution: {tarball: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/a7f5e0ca6ce8a27aae64f8d342e7fb9f557a8408}
+  github.com/angular/dev-infra-private-ng-dev-builds/e4435ccb1b275541908b57b02958dc453c2fed43:
+    resolution: {tarball: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/e4435ccb1b275541908b57b02958dc453c2fed43}
     name: '@angular/ng-dev'
-    version: 0.0.0-36b7540c8baf768285e55e02cb440c5e1eb658fa
+    version: 0.0.0-8e8bf8fcb2b720d1f78c89c0791475f54b3d0b7f
     hasBin: true
     dependencies:
-      '@google-cloud/spanner': 7.16.0(supports-color@9.4.0)
+      '@google-cloud/spanner': 7.16.0(supports-color@10.0.0)
       '@octokit/rest': 21.0.2
       '@types/semver': 7.5.8
       '@types/supports-color': 8.1.3
       '@yarnpkg/lockfile': 1.1.0
       chalk: 5.3.0
       semver: 7.6.3
-      supports-color: 9.4.0
+      supports-color: 10.0.0
       typed-graphqlify: 3.1.6
       typescript: 5.7.2
       yaml: 2.6.1
