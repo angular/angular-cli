@@ -33,7 +33,7 @@
     "https-proxy-agent": "7.0.6",
     "istanbul-lib-instrument": "6.0.3",
     "listr2": "8.2.5",
-    "magic-string": "0.30.15",
+    "magic-string": "0.30.17",
     "mrmime": "2.0.0",
     "parse5-html-rewriting-stream": "7.0.0",
     "picomatch": "4.0.2",
@@ -41,7 +41,7 @@
     "rollup": "4.28.1",
     "sass": "1.83.0",
     "semver": "7.6.3",
-    "vite": "6.0.3",
+    "vite": "6.0.4",
     "watchpack": "2.4.2"
   },
   "optionalDependencies": {
