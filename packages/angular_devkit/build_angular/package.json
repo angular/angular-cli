@@ -29,7 +29,7 @@
     "browserslist": "^4.21.5",
     "copy-webpack-plugin": "12.0.2",
     "css-loader": "7.1.2",
-    "esbuild-wasm": "0.24.0",
+    "esbuild-wasm": "0.24.2",
     "fast-glob": "3.3.2",
     "http-proxy-middleware": "3.0.3",
     "istanbul-lib-instrument": "6.0.3",
@@ -63,7 +63,7 @@
     "webpack-subresource-integrity": "5.1.0"
   },
   "optionalDependencies": {
-    "esbuild": "0.24.0"
+    "esbuild": "0.24.2"
   },
   "devDependencies": {
     "undici": "7.2.0"
