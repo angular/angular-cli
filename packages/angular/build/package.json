@@ -28,7 +28,7 @@
     "@vitejs/plugin-basic-ssl": "1.2.0",
     "beasties": "0.2.0",
     "browserslist": "^4.23.0",
-    "esbuild": "0.24.0",
+    "esbuild": "0.24.2",
     "fast-glob": "3.3.2",
     "https-proxy-agent": "7.0.6",
     "istanbul-lib-instrument": "6.0.3",
@@ -41,7 +41,7 @@
     "rollup": "4.28.1",
     "sass": "1.83.0",
     "semver": "7.6.3",
-    "vite": "6.0.4",
+    "vite": "6.0.5",
     "watchpack": "2.4.2"
   },
   "optionalDependencies": {
