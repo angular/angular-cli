@@ -53,6 +53,7 @@ jobs:
         run: yarn ng-dev release build
 
   test:
+    needs: build
     runs-on: ubuntu-latest
     steps:
       - name: Initialize environment
@@ -69,6 +70,7 @@ jobs:
           ASPECT_RULES_JS_FROZEN_PNPM_LOCK: '1'
 
   e2e:
+    needs: build
     strategy:
       fail-fast: false
       matrix:
@@ -101,6 +103,7 @@ jobs:
         run: yarn bazel test --define=E2E_SHARD_TOTAL=6 --define=E2E_SHARD_INDEX=${{ matrix.shard }} --config=e2e //tests/legacy-cli:e2e.${{ matrix.subset }}_node${{ matrix.node }}
 
   e2e-package-managers:
+    needs: build
     strategy:
       fail-fast: false
       matrix:
@@ -122,6 +125,7 @@ jobs:
         run: yarn bazel test --define=E2E_SHARD_TOTAL=3 --define=E2E_SHARD_INDEX=${{ matrix.shard }} --config=e2e //tests/legacy-cli:e2e.${{ matrix.subset }}_node${{ matrix.node }}
 
   e2e-snapshots:
+    needs: build
     strategy:
       fail-fast: false
       matrix:
@@ -143,6 +147,7 @@ jobs:
         run: yarn bazel test --define=E2E_SHARD_TOTAL=6 --define=E2E_SHARD_INDEX=${{ matrix.shard }} --config=e2e //tests/legacy-cli:e2e.snapshots.${{ matrix.subset }}_node${{ matrix.node }}
 
   browsers:
+    needs: build
     runs-on: ubuntu-latest
     name: Browser Compatibility Tests
     env:
@@ -177,6 +182,7 @@ jobs:
           path: ${{ env.SAUCE_CONNECT_DIR_IN_HOST }}/sauce-connect.log
 
   publish-snapshots:
+    needs: build
     runs-on: ubuntu-latest
     env:
       CIRCLE_BRANCH: ${{ github.ref_name }}
