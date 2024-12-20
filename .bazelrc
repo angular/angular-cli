@@ -174,3 +174,7 @@ try-import .bazelrc.user
 # Enable runfiles even on Windows.
 # Architect resolves output files from data files, and this isn't possible without runfile support.
 build --enable_runfiles
+
+# TODO: Determine if this is a permanent solution or not.
+build --strategy=TemplateExpand=local
+build --strategy=FileWrite=local
