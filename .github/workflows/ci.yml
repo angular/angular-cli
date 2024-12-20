@@ -70,7 +70,7 @@ jobs:
           ASPECT_RULES_JS_FROZEN_PNPM_LOCK: '1'
 
   e2e:
-    needs: build
+    needs: test
     strategy:
       fail-fast: false
       matrix:
@@ -103,7 +103,7 @@ jobs:
         run: yarn bazel test --define=E2E_SHARD_TOTAL=6 --define=E2E_SHARD_INDEX=${{ matrix.shard }} --config=e2e //tests/legacy-cli:e2e.${{ matrix.subset }}_node${{ matrix.node }}
 
   e2e-package-managers:
-    needs: build
+    needs: test
     strategy:
       fail-fast: false
       matrix:
@@ -125,7 +125,7 @@ jobs:
         run: yarn bazel test --define=E2E_SHARD_TOTAL=3 --define=E2E_SHARD_INDEX=${{ matrix.shard }} --config=e2e //tests/legacy-cli:e2e.${{ matrix.subset }}_node${{ matrix.node }}
 
   e2e-snapshots:
-    needs: build
+    needs: test
     strategy:
       fail-fast: false
       matrix:
