@@ -65,15 +65,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@angular/bazel@https://github.com/angular/bazel-builds.git#5c693d4f8110bb65bc8635506d74ffcb374aaa37":
-  version: 19.1.0-next.4+sha-b97bc5b
-  resolution: "@angular/bazel@https://github.com/angular/bazel-builds.git#commit=5c693d4f8110bb65bc8635506d74ffcb374aaa37"
+"@angular/bazel@https://github.com/angular/bazel-builds.git#722eb514ccf42aaca1642c42ec2d1b70a632142e":
+  version: 19.1.0-next.4+sha-8c5db3c
+  resolution: "@angular/bazel@https://github.com/angular/bazel-builds.git#commit=722eb514ccf42aaca1642c42ec2d1b70a632142e"
   dependencies:
     "@microsoft/api-extractor": "npm:^7.24.2"
     magic-string: "npm:^0.30.0"
     tslib: "npm:^2.3.0"
   peerDependencies:
-    "@angular/compiler-cli": 19.1.0-next.4+sha-b97bc5b
+    "@angular/compiler-cli": 19.1.0-next.4+sha-8c5db3c
     "@bazel/concatjs": ^5.3.0
     "@bazel/worker": ^5.3.0
     "@rollup/plugin-commonjs": ^28.0.0
@@ -90,7 +90,7 @@ __metadata:
     packager: ./src/ng_package/packager.mjs
     types_bundler: ./src/types_bundle/index.mjs
     xi18n: ./src/ngc-wrapped/extract_i18n.mjs
-  checksum: 10c0/ab706080052addf279a2e357670a646d95a5b6de93bd193474cfd3e905056be836a8e6996796acc94c21966d5085b667d9132e0d7f356978fe1cb64f2a1130aa
+  checksum: 10c0/afe235b4df58719f358ccf432638128d6ebf7ba0a2f5282344f9e654b6e21ac21d3bf2c8a87bc865319f47a14fd18142910aed84faabc33426812508c43dd415
   languageName: node
   linkType: hard
 
@@ -310,7 +310,7 @@ __metadata:
   dependencies:
     "@ampproject/remapping": "npm:2.3.0"
     "@angular/animations": "npm:19.1.0-next.4"
-    "@angular/bazel": "https://github.com/angular/bazel-builds.git#5c693d4f8110bb65bc8635506d74ffcb374aaa37"
+    "@angular/bazel": "https://github.com/angular/bazel-builds.git#722eb514ccf42aaca1642c42ec2d1b70a632142e"
     "@angular/build-tooling": "https://github.com/angular/dev-infra-private-build-tooling-builds.git#2dba82de08e41f38a47b088384f591f30fd9de19"
     "@angular/cdk": "npm:19.1.0-next.3"
     "@angular/common": "npm:19.1.0-next.4"
