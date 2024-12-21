@@ -87,6 +87,7 @@ jobs:
           retention-days: 14
 
   test:
+    needs: build
     runs-on: ubuntu-latest
     steps:
       - name: Initialize environment
@@ -103,6 +104,7 @@ jobs:
           ASPECT_RULES_JS_FROZEN_PNPM_LOCK: '1'
 
   e2e:
+    needs: build
     strategy:
       fail-fast: false
       matrix:
@@ -124,6 +126,7 @@ jobs:
         run: yarn bazel test --define=E2E_SHARD_TOTAL=6 --define=E2E_SHARD_INDEX=${{ matrix.shard }} --config=e2e //tests/legacy-cli:e2e.${{ matrix.subset }}_node${{ matrix.node }}
 
   e2e-windows-subset:
+    needs: build
     runs-on: windows-latest
     steps:
       # Workaround for: https://github.com/bazel-contrib/bazel-lib/issues/968.
@@ -141,6 +144,7 @@ jobs:
         run: yarn bazel test --config=e2e //tests/legacy-cli:e2e_node22 --test_filter="tests/basic/{build,rebuild}.ts" --test_arg="--esbuild"
 
   e2e-package-managers:
+    needs: build
     strategy:
       fail-fast: false
       matrix:
@@ -162,7 +166,7 @@ jobs:
         run: yarn bazel test --define=E2E_SHARD_TOTAL=3 --define=E2E_SHARD_INDEX=${{ matrix.shard }} --config=e2e //tests/legacy-cli:e2e.${{ matrix.subset }}_node${{ matrix.node }}
 
   e2e-snapshots:
-    needs: analyze
+    needs: [analyze, build]
     if: needs.analyze.outputs.snapshots == 'true'
     strategy:
       fail-fast: false
