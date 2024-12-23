@@ -1,5 +1,6 @@
 load("@npm//@bazel/jasmine:index.bzl", "jasmine_node_test")
-load("//tools:defaults.bzl", "pkg_npm", "ts_library")
+load("//tools:defaults.bzl", "pkg_npm")
+load("//tools:interop.bzl", "ts_project")
 load("//tools:ts_json_schema.bzl", "ts_json_schema")
 
 # Copyright Google Inc. All Rights Reserved.
@@ -11,9 +12,8 @@ licenses(["notice"])
 package(default_visibility = ["//visibility:public"])
 
 # @angular-devkit/schematics-cli
-ts_library(
+ts_project(
     name = "schematics_cli",
-    package_name = "@angular-devkit/schematics-cli",
     srcs = glob(
         include = ["**/*.ts"],
         exclude = [
@@ -25,11 +25,9 @@ ts_library(
             "node_modules/**",
         ],
     ) + [
-        # @external_begin
         # These files are generated from the JSON schema
         "//packages/angular_devkit/schematics_cli:blank/schema.ts",
         "//packages/angular_devkit/schematics_cli:schematic/schema.ts",
-        # @external_end
     ],
     data = [
         "blank/schema.json",
@@ -43,24 +41,25 @@ ts_library(
             "schematic/files/**/*",
         ],
     ),
-    module_name = "@angular-devkit/schematics-cli",
-    module_root = "bin/schematics.d.ts",
-    deps = [
-        "//packages/angular_devkit/core",
-        "//packages/angular_devkit/core/node",
+    interop_deps = [
         "//packages/angular_devkit/schematics",
         "//packages/angular_devkit/schematics/tasks",
         "//packages/angular_devkit/schematics/tools",
-        "@npm//@inquirer/prompts",
-        "@npm//@types/node",
-        "@npm//@types/yargs-parser",
-        "@npm//ansi-colors",
-        "@npm//symbol-observable",
-        "@npm//yargs-parser",
+    ],
+    module_name = "@angular-devkit/schematics-cli",
+    deps = [
+        "//:root_modules/@inquirer/prompts",
+        "//:root_modules/@types/node",
+        "//:root_modules/@types/yargs-parser",
+        "//:root_modules/ansi-colors",
+        "//:root_modules/symbol-observable",
+        "//:root_modules/yargs-parser",
+        "//packages/angular_devkit/core:core_rjs",
+        "//packages/angular_devkit/core/node:node_rjs",
     ],
 )
 
-ts_library(
+ts_project(
     name = "schematics_cli_test_lib",
     testonly = True,
     srcs = glob(
@@ -69,13 +68,17 @@ ts_library(
         ],
     ),
     deps = [
-        ":schematics_cli",
+        ":schematics_cli_rjs",
     ],
 )
 
 jasmine_node_test(
     name = "schematics_cli_test",
     srcs = [":schematics_cli_test_lib"],
+    data = [
+        # The package is loaded at runtime within the tests
+        ":schematics_cli",
+    ],
 )
 
 ts_json_schema(
