@@ -1,4 +1,4 @@
-load("//tools:defaults.bzl", "ts_library")
+load("//tools:interop.bzl", "ts_project")
 
 # files fetched on 2024-09-10 from
 # https://github.com/microsoft/TypeScript/releases/tag/v5.6.2
@@ -9,13 +9,14 @@ load("//tools:defaults.bzl", "ts_library")
 
 licenses(["notice"])  # Apache 2.0
 
+package(default_visibility = ["//packages/schematics/angular:__subpackages__"])
+
 exports_files([
     "LICENSE",
 ])
 
-ts_library(
+ts_project(
     name = "TypeScript",
     srcs = ["lib/typescript.d.ts"],
     data = ["lib/typescript.js"],
-    visibility = ["//packages/schematics/angular:__subpackages__"],
 )

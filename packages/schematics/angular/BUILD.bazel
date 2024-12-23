@@ -4,7 +4,8 @@
 # found in the LICENSE file at https://angular.dev/license
 
 load("@npm//@bazel/jasmine:index.bzl", "jasmine_node_test")
-load("//tools:defaults.bzl", "pkg_npm", "ts_library")
+load("//tools:defaults.bzl", "pkg_npm")
+load("//tools:interop.bzl", "ts_project")
 load("//tools:ts_json_schema.bzl", "ts_json_schema")
 
 licenses(["notice"])
@@ -35,9 +36,8 @@ ALL_SCHEMA_TARGETS = [
     for (src, name) in ALL_SCHEMA_TARGETS
 ]
 
-ts_library(
+ts_project(
     name = "angular",
-    package_name = "@schematics/angular",
     srcs = glob(
         include = ["**/*.ts"],
         exclude = [
@@ -78,16 +78,18 @@ ts_library(
             "node_modules/**",
         ],
     ),
-    module_name = "@schematics/angular",
-    deps = [
-        "//packages/angular_devkit/core",
+    interop_deps = [
         "//packages/angular_devkit/schematics",
         "//packages/angular_devkit/schematics/tasks",
-        "//packages/schematics/angular/third_party/github.com/Microsoft/TypeScript",
-        "@npm//@inquirer/prompts",
-        "@npm//@types/node",
-        "@npm//browserslist",
-        "@npm//jsonc-parser",
+    ],
+    module_name = "@schematics/angular",
+    deps = [
+        "//:root_modules/@inquirer/prompts",
+        "//:root_modules/@types/node",
+        "//:root_modules/browserslist",
+        "//:root_modules/jsonc-parser",
+        "//packages/angular_devkit/core:core_rjs",
+        "//packages/schematics/angular/third_party/github.com/Microsoft/TypeScript:TypeScript_rjs",
     ],
 )
 
@@ -96,11 +98,11 @@ jasmine_node_test(
     srcs = ["no_typescript_runtime_dep_spec.js"],
     deps = [
         ":angular",
-        "@npm//jasmine",
+        "//:root_modules/@types/jasmine",
     ],
 )
 
-ts_library(
+ts_project(
     name = "angular_test_lib",
     testonly = True,
     srcs = glob(
@@ -113,28 +115,24 @@ ts_library(
             "node_modules/**",
         ],
     ),
-    # @external_begin
-    deps = [
-        ":angular",
-        "//packages/angular_devkit/core",
-        "//packages/angular_devkit/core/node/testing",
+    interop_deps = [
         "//packages/angular_devkit/schematics",
         "//packages/angular_devkit/schematics/tasks",
         "//packages/angular_devkit/schematics/testing",
-        "//packages/schematics/angular/third_party/github.com/Microsoft/TypeScript",
-        "@npm//jsonc-parser",
     ],
-    # @external_end
+    deps = [
+        ":angular_rjs",
+        "//:root_modules/@types/jasmine",
+        "//:root_modules/jsonc-parser",
+        "//packages/angular_devkit/core:core_rjs",
+        "//packages/angular_devkit/core/node/testing:testing_rjs",
+        "//packages/schematics/angular/third_party/github.com/Microsoft/TypeScript:TypeScript_rjs",
+    ],
 )
 
 jasmine_node_test(
     name = "angular_test",
     srcs = [":angular_test_lib"],
-    deps = [
-        "//packages/schematics/angular/third_party/github.com/Microsoft/TypeScript",
-        "@npm//jasmine",
-        "@npm//source-map",
-    ],
 )
 
 genrule(
