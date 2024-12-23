@@ -3,17 +3,18 @@
 # Use of this source code is governed by an MIT-style license that can be
 # found in the LICENSE file at https://angular.dev/license
 
-load("//tools:defaults.bzl", "pkg_npm", "ts_library")
+load("//tools:defaults.bzl", "pkg_npm")
+load("//tools:interop.bzl", "ts_project")
 
 licenses(["notice"])
 
-ts_library(
+ts_project(
     name = "create",
-    package_name = "@angular/create",
     srcs = ["src/index.ts"],
+    module_name = "@angular/create",
     deps = [
+        "//:root_modules/@types/node",
         "//packages/angular/cli:angular-cli",
-        "@npm//@types/node",
     ],
 )
 
