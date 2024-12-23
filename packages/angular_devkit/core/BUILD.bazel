@@ -1,6 +1,7 @@
 load("@npm//@angular/build-tooling/bazel/api-golden:index.bzl", "api_golden_test_npm_package")
 load("@npm//@bazel/jasmine:index.bzl", "jasmine_node_test")
-load("//tools:defaults.bzl", "pkg_npm", "ts_library")
+load("//tools:defaults.bzl", "pkg_npm")
+load("//tools:interop.bzl", "ts_project")
 
 # Copyright Google Inc. All Rights Reserved.
 #
@@ -12,15 +13,14 @@ licenses(["notice"])
 
 # @angular-devkit/core
 
-ts_library(
+ts_project(
     name = "core",
-    package_name = "@angular-devkit/core",
     srcs = glob(
         include = ["src/**/*.ts"],
         exclude = [
             "src/**/*_spec.ts",
         ],
-    ),
+    ) + ["index.ts"],
     data = glob(
         include = ["**/*.json"],
         # NB: we need to exclude the nested node_modules that is laid out by yarn workspaces
@@ -30,16 +30,16 @@ ts_library(
         ],
     ),
     module_name = "@angular-devkit/core",
-    module_root = "src/index.d.ts",
     deps = [
-        "@npm//@types/node",
-        "@npm//@types/picomatch",
-        "@npm//ajv",
-        "@npm//ajv-formats",
-        "@npm//jsonc-parser",
-        "@npm//picomatch",
-        "@npm//rxjs",
-        "@npm//source-map",
+        "//:root_modules/@types/node",
+        "//:root_modules/@types/picomatch",
+        "//:root_modules/@types/jasmine",
+        "//:root_modules/ajv",
+        "//:root_modules/ajv-formats",
+        "//:root_modules/jsonc-parser",
+        "//:root_modules/picomatch",
+        "//:root_modules/rxjs",
+        "//:root_modules/source-map",
         # @node_module: typescript:es2015.proxy
         # @node_module: typescript:es2015.reflect
         # @node_module: typescript:es2015.symbol.wellknown
@@ -49,15 +49,15 @@ ts_library(
 
 # @external_begin
 
-ts_library(
+ts_project(
     name = "core_test_lib",
     testonly = True,
     srcs = glob(["src/**/*_spec.ts"]),
     data = glob(["src/workspace/json/test/**/*.json"]),
     deps = [
-        ":core",
-        "//packages/angular_devkit/core/node",
-        "@npm//rxjs",
+        ":core_rjs",
+        "//:root_modules/rxjs",
+        "//packages/angular_devkit/core/node:node_rjs",
     ],
 )
 
