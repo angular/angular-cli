@@ -32,7 +32,8 @@
       "@angular/*": ["./packages/angular/*/src"],
       "@angular/build/private": ["./packages/angular/build/src/private"],
       "@ngtools/webpack": ["./packages/ngtools/webpack/index"],
-      "@schematics/angular": ["./packages/schematics/angular"]
+      "@schematics/angular": ["./packages/schematics/angular"],
+      "@schematics/angular/utility": ["./packages/schematics/angular/utility/index"]
     }
   },
   "exclude": [
