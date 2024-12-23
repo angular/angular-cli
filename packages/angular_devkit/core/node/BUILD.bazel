@@ -4,13 +4,13 @@
 # found in the LICENSE file at https://angular.dev/license
 
 load("@npm//@bazel/jasmine:index.bzl", "jasmine_node_test")
-load("//tools:defaults.bzl", "ts_library")
+load("//tools:interop.bzl", "ts_project")
 
 licenses(["notice"])
 
 package(default_visibility = ["//visibility:public"])
 
-ts_library(
+ts_project(
     name = "node",
     srcs = glob(
         include = ["**/*.ts"],
@@ -20,18 +20,17 @@ ts_library(
         ],
     ),
     module_name = "@angular-devkit/core/node",
-    module_root = "index.d.ts",
     deps = [
-        "//packages/angular_devkit/core",
-        "@npm//@types/node",
-        "@npm//chokidar",
-        "@npm//rxjs",
+        "//:root_modules/@types/node",
+        "//:root_modules/chokidar",
+        "//:root_modules/rxjs",
+        "//packages/angular_devkit/core:core_rjs",
     ],
 )
 
 # @external_begin
 
-ts_library(
+ts_project(
     name = "node_test_lib",
     testonly = True,
     srcs = glob(
@@ -43,9 +42,10 @@ ts_library(
         ],
     ),
     deps = [
-        ":node",
-        "//packages/angular_devkit/core",
-        "@npm//rxjs",
+        ":node_rjs",
+        "//:root_modules/@types/jasmine",
+        "//:root_modules/rxjs",
+        "//packages/angular_devkit/core:core_rjs",
     ],
 )
 
