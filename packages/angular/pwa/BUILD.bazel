@@ -4,16 +4,16 @@
 # found in the LICENSE file at https://angular.dev/license
 
 load("@npm//@bazel/jasmine:index.bzl", "jasmine_node_test")
-load("//tools:defaults.bzl", "pkg_npm", "ts_library")
+load("//tools:defaults.bzl", "pkg_npm")
+load("//tools:interop.bzl", "ts_project")
 load("//tools:ts_json_schema.bzl", "ts_json_schema")
 
 licenses(["notice"])
 
 package(default_visibility = ["//visibility:public"])
 
-ts_library(
+ts_project(
     name = "pwa",
-    package_name = "@angular/pwa",
     srcs = [
         "pwa/index.ts",
         "//packages/angular/pwa:pwa/schema.ts",
@@ -26,11 +26,14 @@ ts_library(
             "pwa/files/**/*",
         ],
     ),
-    deps = [
+    interop_deps = [
         "//packages/angular_devkit/schematics",
-        "//packages/schematics/angular",
-        "@npm//@types/node",
-        "@npm//parse5-html-rewriting-stream",
+    ],
+    module_name = "@angular/pwa",
+    deps = [
+        "//:root_modules/@types/node",
+        "//:root_modules/parse5-html-rewriting-stream",
+        "//packages/schematics/angular:angular_rjs",
     ],
 )
 
@@ -39,13 +42,16 @@ ts_json_schema(
     src = "pwa/schema.json",
 )
 
-ts_library(
+ts_project(
     name = "pwa_test_lib",
     testonly = True,
     srcs = glob(["pwa/**/*_spec.ts"]),
-    deps = [
-        ":pwa",
+    interop_deps = [
         "//packages/angular_devkit/schematics/testing",
+    ],
+    deps = [
+        ":pwa_rjs",
+        "//:root_modules/@types/jasmine",
     ],
 )
 
