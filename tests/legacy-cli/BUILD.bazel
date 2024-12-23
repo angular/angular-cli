@@ -1,7 +1,7 @@
-load("//tools:defaults.bzl", "ts_library")
+load("//tools:interop.bzl", "ts_project")
 load(":e2e.bzl", "e2e_suites")
 
-ts_library(
+ts_project(
     name = "runner",
     testonly = True,
     srcs = [
@@ -12,11 +12,11 @@ ts_library(
         "verdaccio_auth.yaml",
     ],
     deps = [
-        "//packages/angular_devkit/core",
-        "//packages/angular_devkit/core/node",
-        "//tests/legacy-cli/e2e/utils",
-        "@npm//ansi-colors",
-        "@npm//fast-glob",
+        "//:root_modules/ansi-colors",
+        "//:root_modules/fast-glob",
+        "//packages/angular_devkit/core:core_rjs",
+        "//packages/angular_devkit/core/node:node_rjs",
+        "//tests/legacy-cli/e2e/utils:utils_rjs",
     ],
 )
 
