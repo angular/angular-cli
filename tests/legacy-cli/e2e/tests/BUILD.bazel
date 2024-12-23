@@ -1,19 +1,20 @@
-load("//tools:defaults.bzl", "ts_library")
+load("//tools:interop.bzl", "ts_project")
 
-ts_library(
+package(default_visibility = ["//visibility:public"])
+
+ts_project(
     name = "tests",
     testonly = True,
     srcs = glob(["**/*.ts"]),
     data = [
         "//tests/legacy-cli/e2e/ng-snapshot",
     ],
-    visibility = ["//visibility:public"],
     deps = [
-        "//tests/legacy-cli/e2e/utils",
-        "@npm//@types/express",
-        "@npm//@types/semver",
-        "@npm//express",
-        "@npm//fast-glob",
-        "@npm//semver",
+        "//:root_modules/@types/express",
+        "//:root_modules/@types/semver",
+        "//:root_modules/express",
+        "//:root_modules/fast-glob",
+        "//:root_modules/semver",
+        "//tests/legacy-cli/e2e/utils:utils_rjs",
     ],
 )
