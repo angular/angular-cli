@@ -1,6 +1,7 @@
 load("@npm//@angular/build-tooling/bazel/api-golden:index.bzl", "api_golden_test_npm_package")
 load("@npm//@bazel/jasmine:index.bzl", "jasmine_node_test")
-load("//tools:defaults.bzl", "pkg_npm", "ts_library")
+load("//tools:defaults.bzl", "pkg_npm")
+load("//tools:interop.bzl", "ts_project")
 load("//tools:ts_json_schema.bzl", "ts_json_schema")
 
 licenses(["notice"])
@@ -22,9 +23,8 @@ ts_json_schema(
     src = "src/builders/extract-i18n/schema.json",
 )
 
-ts_library(
+ts_project(
     name = "build",
-    package_name = "@angular/build",
     srcs = glob(
         include = [
             "src/**/*.ts",
@@ -34,9 +34,9 @@ ts_library(
             "src/**/*_spec.ts",
             "src/**/tests/**/*.ts",
             "src/testing/**/*.ts",
-            "src/private.ts",
         ],
     ) + [
+        "index.ts",
         "//packages/angular/build:src/builders/application/schema.ts",
         "//packages/angular/build:src/builders/dev-server/schema.ts",
         "//packages/angular/build:src/builders/extract-i18n/schema.ts",
@@ -52,67 +52,59 @@ ts_library(
         "builders.json",
         "package.json",
     ],
-    module_name = "@angular/build",
-    module_root = "src/index.d.ts",
-    deps = [
+    interop_deps = [
         "//packages/angular/ssr",
         "//packages/angular/ssr/node",
         "//packages/angular_devkit/architect",
-        "@npm//@ampproject/remapping",
-        "@npm//@angular/common",
-        "@npm//@angular/compiler",
-        "@npm//@angular/compiler-cli",
-        "@npm//@angular/core",
-        "@npm//@angular/localize",
-        "@npm//@angular/platform-server",
-        "@npm//@angular/service-worker",
-        "@npm//@babel/core",
-        "@npm//@babel/helper-annotate-as-pure",
-        "@npm//@babel/helper-split-export-declaration",
-        "@npm//@babel/plugin-syntax-import-attributes",
-        "@npm//@inquirer/confirm",
-        "@npm//@types/babel__core",
-        "@npm//@types/less",
-        "@npm//@types/node",
-        "@npm//@types/picomatch",
-        "@npm//@types/semver",
-        "@npm//@types/watchpack",
-        "@npm//@vitejs/plugin-basic-ssl",
-        "@npm//beasties",
-        "@npm//browserslist",
-        "@npm//esbuild",
-        "@npm//esbuild-wasm",
-        "@npm//fast-glob",
-        "@npm//https-proxy-agent",
-        "@npm//listr2",
-        "@npm//lmdb",
-        "@npm//magic-string",
-        "@npm//mrmime",
-        "@npm//parse5-html-rewriting-stream",
-        "@npm//picomatch",
-        "@npm//piscina",
-        "@npm//postcss",
-        "@npm//rollup",
-        "@npm//sass",
-        "@npm//semver",
-        "@npm//tslib",
-        "@npm//typescript",
-        "@npm//vite",
-        "@npm//watchpack",
     ],
-)
-
-ts_library(
-    name = "private",
-    srcs = ["src/private.ts"],
-    module_name = "@angular/build/private",
-    module_root = "src/private.d.ts",
+    module_name = "@angular/build",
     deps = [
-        "//packages/angular/build",
+        "//:root_modules/@ampproject/remapping",
+        "//:root_modules/@angular/common",
+        "//:root_modules/@angular/compiler",
+        "//:root_modules/@angular/compiler-cli",
+        "//:root_modules/@angular/core",
+        "//:root_modules/@angular/localize",
+        "//:root_modules/@angular/platform-server",
+        "//:root_modules/@angular/service-worker",
+        "//:root_modules/@babel/core",
+        "//:root_modules/@babel/helper-annotate-as-pure",
+        "//:root_modules/@babel/helper-split-export-declaration",
+        "//:root_modules/@babel/plugin-syntax-import-attributes",
+        "//:root_modules/@inquirer/confirm",
+        "//:root_modules/@types/babel__core",
+        "//:root_modules/@types/less",
+        "//:root_modules/@types/node",
+        "//:root_modules/@types/picomatch",
+        "//:root_modules/@types/semver",
+        "//:root_modules/@types/watchpack",
+        "//:root_modules/@vitejs/plugin-basic-ssl",
+        "//:root_modules/beasties",
+        "//:root_modules/browserslist",
+        "//:root_modules/esbuild",
+        "//:root_modules/esbuild-wasm",
+        "//:root_modules/fast-glob",
+        "//:root_modules/https-proxy-agent",
+        "//:root_modules/jsonc-parser",
+        "//:root_modules/listr2",
+        "//:root_modules/lmdb",
+        "//:root_modules/magic-string",
+        "//:root_modules/mrmime",
+        "//:root_modules/parse5-html-rewriting-stream",
+        "//:root_modules/picomatch",
+        "//:root_modules/piscina",
+        "//:root_modules/postcss",
+        "//:root_modules/rollup",
+        "//:root_modules/sass",
+        "//:root_modules/semver",
+        "//:root_modules/tslib",
+        "//:root_modules/typescript",
+        "//:root_modules/vite",
+        "//:root_modules/watchpack",
     ],
 )
 
-ts_library(
+ts_project(
     name = "unit_test_lib",
     testonly = True,
     srcs = glob(
@@ -120,13 +112,15 @@ ts_library(
         exclude = ["src/builders/**/tests/**"],
     ),
     deps = [
-        ":build",
-        ":private",
-        "//packages/angular_devkit/core",
-        "//packages/angular_devkit/core/node",
-        "@npm//@angular/compiler-cli",
-        "@npm//@babel/core",
-        "@npm//prettier",
+        ":build_rjs",
+        "//:root_modules/@angular/compiler-cli",
+        "//:root_modules/@babel/core",
+        "//:root_modules/@types/jasmine",
+        "//:root_modules/prettier",
+        "//:root_modules/typescript",
+        "//packages/angular/build/private:private_rjs",
+        "//packages/angular_devkit/core:core_rjs",
+        "//packages/angular_devkit/core/node:node_rjs",
     ],
 )
 
@@ -135,38 +129,38 @@ jasmine_node_test(
     deps = [":unit_test_lib"],
 )
 
-ts_library(
+ts_project(
     name = "integration_test_lib",
     testonly = True,
     srcs = glob(include = ["src/builders/**/tests/**/*.ts"]),
     deps = [
-        ":build",
-        ":private",
-        "//modules/testing/builder",
-        "//packages/angular_devkit/architect",
-        "//packages/angular_devkit/architect/node",
-        "//packages/angular_devkit/architect/testing",
-        "//packages/angular_devkit/core",
-        "//packages/angular_devkit/core/node",
+        ":build_rjs",
+        "//packages/angular/build/private:private_rjs",
+        "//modules/testing/builder:builder_rjs",
+        "//packages/angular_devkit/architect:architect_rjs",
+        "//packages/angular_devkit/architect/node:node_rjs",
+        "//packages/angular_devkit/architect/testing:testing_rjs",
+        "//packages/angular_devkit/core:core_rjs",
+        "//packages/angular_devkit/core/node:node_rjs",
 
         # dev server only test deps
-        "@npm//@types/http-proxy",
-        "@npm//http-proxy",
-        "@npm//puppeteer",
+        "//:root_modules/@types/http-proxy",
+        "//:root_modules/http-proxy",
+        "//:root_modules/puppeteer",
 
         # Base dependencies for the application in hello-world-app.
-        "@npm//@angular/common",
-        "@npm//@angular/compiler",
-        "@npm//@angular/compiler-cli",
-        "@npm//@angular/core",
-        "@npm//@angular/platform-browser",
-        "@npm//@angular/platform-browser-dynamic",
-        "@npm//@angular/router",
-        "@npm//rxjs",
-        "@npm//tslib",
-        "@npm//typescript",
-        "@npm//zone.js",
-        "@npm//buffer",
+        "//:root_modules/@angular/common",
+        "//:root_modules/@angular/compiler",
+        "//:root_modules/@angular/compiler-cli",
+        "//:root_modules/@angular/core",
+        "//:root_modules/@angular/platform-browser",
+        "//:root_modules/@angular/platform-browser-dynamic",
+        "//:root_modules/@angular/router",
+        "//:root_modules/rxjs",
+        "//:root_modules/tslib",
+        "//:root_modules/typescript",
+        "//:root_modules/zone.js",
+        "//:root_modules/buffer",
     ],
 )
 
