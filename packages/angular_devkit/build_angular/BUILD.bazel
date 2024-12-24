@@ -120,8 +120,6 @@ ts_project(
         "package.json",
     ],
     interop_deps = [
-        "//packages/angular/build",
-        "//packages/angular/build:private",
         "//packages/angular/ssr",
         "//packages/angular_devkit/build_webpack",
         "//packages/angular_devkit/core",
@@ -201,6 +199,8 @@ ts_project(
         "//:root_modules/webpack-dev-server",
         "//:root_modules/webpack-merge",
         "//:root_modules/webpack-subresource-integrity",
+        "//packages/angular/build:build_rjs",
+        "//packages/angular/build/private:private_rjs",
         "//packages/angular_devkit/architect",
     ],
 )
@@ -287,14 +287,14 @@ ts_project(
     data = glob(["test/**/*"]),
     interop_deps = [
         "//modules/testing/builder",
-        "//packages/angular/build",
-        "//packages/angular/build:private",
         "//packages/angular_devkit/core",
         "//packages/angular_devkit/core/node",
     ],
     deps = [
         ":build_angular_rjs",
         "//:root_modules/@types/jasmine",
+        "//packages/angular/build:build_rjs",
+        "//packages/angular/build/private:private_rjs",
         "//packages/angular_devkit/architect:architect_rjs",
         "//packages/angular_devkit/architect/node:node_rjs",
         "//packages/angular_devkit/architect/testing:testing_rjs",
@@ -386,13 +386,13 @@ LARGE_SPECS = {
             "//packages/angular_devkit/core",
             "//packages/angular_devkit/core/node",
             "//modules/testing/builder",
-            "//packages/angular/build",
-            "//packages/angular/build:private",
         ] + LARGE_SPECS[spec].get("extra_interop_deps", []),
         deps = [
             # Dependencies needed to compile and run the specs themselves.
             ":build_angular_rjs",
             ":build_angular_test_utils_rjs",
+            "//packages/angular/build:build_rjs",
+            "//packages/angular/build/private:private_rjs",
             "//packages/angular_devkit/architect:architect_rjs",
             "//packages/angular_devkit/architect/node:node_rjs",
             "//packages/angular_devkit/architect/testing:testing_rjs",

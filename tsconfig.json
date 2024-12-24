@@ -29,6 +29,7 @@
       "@angular-devkit/build-angular": ["./packages/angular_devkit/build_angular"],
       "@angular-devkit/*": ["./packages/angular_devkit/*/src"],
       "@angular/ssr": ["./packages/angular/ssr"],
+      "@angular/ssr/node": ["./packages/angular/ssr/node"],
       "@angular/*": ["./packages/angular/*/src"],
       "@angular/build/private": ["./packages/angular/build/src/private"],
       "@ngtools/webpack": ["./packages/ngtools/webpack/index"],
