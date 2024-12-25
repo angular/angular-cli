@@ -430,11 +430,11 @@ __metadata:
     npm-package-arg: "npm:12.0.1"
     npm-pick-manifest: "npm:10.0.0"
     open: "npm:10.1.0"
-    ora: "npm:5.4.1"
     pacote: "npm:20.0.0"
     parse5-html-rewriting-stream: "npm:7.0.0"
     patch-package: "npm:^8.0.0"
     picomatch: "npm:4.0.2"
+    picospinner: "npm:2.0.0"
     piscina: "npm:4.8.0"
     postcss: "npm:8.4.49"
     postcss-loader: "npm:8.1.1"
@@ -14053,7 +14053,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ora@npm:5.4.1, ora@npm:^5.1.0":
+"ora@npm:^5.1.0":
   version: 5.4.1
   resolution: "ora@npm:5.4.1"
   dependencies:
@@ -14529,6 +14529,13 @@ __metadata:
   version: 2.3.1
   resolution: "picomatch@npm:2.3.1"
   checksum: 10c0/26c02b8d06f03206fc2ab8d16f19960f2ff9e81a658f831ecb656d8f17d9edc799e8364b1f4a7873e89d9702dff96204be0fa26fe4181f6843f040f819dac4be
+  languageName: node
+  linkType: hard
+
+"picospinner@npm:2.0.0":
+  version: 2.0.0
+  resolution: "picospinner@npm:2.0.0"
+  checksum: 10c0/f8e4cca484f093c2483e1bc9644e637c297b2f0b45de80a0697690bcde25540d413920abed6fea1d3ce1718518474a3d169ebae6101e0733bd31742cd7e85ee1
   languageName: node
   linkType: hard
 

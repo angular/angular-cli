@@ -181,7 +181,7 @@ ts_project(
         "//:root_modules/mini-css-extract-plugin",
         "//:root_modules/ng-packagr",
         "//:root_modules/open",
-        "//:root_modules/ora",
+        "//:root_modules/picospinner",
         "//:root_modules/piscina",
         "//:root_modules/postcss",
         "//:root_modules/postcss-loader",

@@ -163,11 +163,11 @@
     "npm-package-arg": "12.0.1",
     "npm-pick-manifest": "10.0.0",
     "open": "10.1.0",
-    "ora": "5.4.1",
     "pacote": "20.0.0",
     "parse5-html-rewriting-stream": "7.0.0",
     "patch-package": "^8.0.0",
     "picomatch": "4.0.2",
+    "picospinner": "2.0.0",
     "piscina": "4.8.0",
     "postcss": "8.4.49",
     "postcss-loader": "8.1.1",
@@ -222,5 +222,6 @@
   },
   "resolutions": {
     "typescript": "5.7.2"
-  }
+  },
+  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
 }

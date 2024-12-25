@@ -379,9 +379,6 @@ importers:
       open:
         specifier: 10.1.0
         version: 10.1.0
-      ora:
-        specifier: 5.4.1
-        version: 5.4.1
       pacote:
         specifier: 20.0.0
         version: 20.0.0
@@ -394,6 +391,9 @@ importers:
       picomatch:
         specifier: 4.0.2
         version: 4.0.2
+      picospinner:
+        specifier: 2.0.0
+        version: 2.0.0
       piscina:
         specifier: 4.8.0
         version: 4.8.0
@@ -11692,6 +11692,11 @@ packages:
   /picomatch@4.0.2:
     resolution: {integrity: sha512-M7BAV6Rlcy5u+m6oPhAPFgJTzAioX/6B0DxyvDlo9l8+T3nLKbrczg2WLUyzd45L8RqfUMyGPzekbMvX2Ldkwg==}
     engines: {node: '>=12'}
+    dev: true
+
+  /picospinner@2.0.0:
+    resolution: {integrity: sha512-bRX16jAx5sDlSAEKJ26hKloGU+w2DIkGw0qeUn87WkT8xircacGumNFHS0d/s51S9QbrtoEFwRSAvIvHNstfjA==}
+    engines: {node: '>=18.0.0'}
     dev: true
 
   /pify@2.3.0:

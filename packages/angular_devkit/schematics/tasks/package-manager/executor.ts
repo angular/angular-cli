@@ -8,7 +8,7 @@
 
 import { BaseException } from '@angular-devkit/core';
 import { SpawnOptions, spawn } from 'child_process';
-import ora from 'ora';
+import { Spinner } from 'picospinner';
 import * as path from 'path';
 import { Observable } from 'rxjs';
 import { TaskExecutor, UnsuccessfulWorkflowExecution } from '../../src';
@@ -128,11 +128,8 @@ export default function (
     }
 
     return new Observable((obs) => {
-      const spinner = ora({
-        text: `Installing packages (${taskPackageManagerName})...`,
-        // Workaround for https://github.com/sindresorhus/ora/issues/136.
-        discardStdin: process.platform != 'win32',
-      }).start();
+      const spinner = new Spinner(`Installing packages (${taskPackageManagerName})...`);
+      spinner.start();
       const childProcess = spawn(taskPackageManagerName, args, spawnOptions).on(
         'close',
         (code: number) => {

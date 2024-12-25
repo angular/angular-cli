@@ -15,7 +15,7 @@ import {
 } from '@angular-devkit/architect';
 import * as fs from 'fs';
 import { readFile } from 'node:fs/promises';
-import ora from 'ora';
+import { Spinner } from 'picospinner';
 import * as path from 'path';
 import Piscina from 'piscina';
 import { normalizeOptimization } from '../../utils';
@@ -198,7 +198,8 @@ async function _renderUniversal(
         context.workspaceRoot,
       );
 
-      const spinner = ora(`Prerendering ${routes.length} route(s) to ${outputPath}...`).start();
+      const spinner = new Spinner(`Prerendering ${routes.length} route(s) to ${outputPath}...`);
+      spinner.start();
 
       try {
         const results = (await Promise.all(
@@ -236,7 +237,8 @@ async function _renderUniversal(
       spinner.succeed(`Prerendering routes to ${outputPath} complete.`);
 
       if (browserOptions.serviceWorker) {
-        spinner.start('Generating service worker...');
+        spinner.setText('Generating service worker...');
+        spinner.start();
         try {
           await augmentAppWithServiceWorker(
             projectRoot,
