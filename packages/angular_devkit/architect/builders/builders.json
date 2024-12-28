@@ -20,6 +20,11 @@
       "implementation": "./concat",
       "schema": "./operator-schema.json",
       "description": "A builder that executes many builders one after the other, and stops when one fail. It will succeed if all builders succeeds (and return the last output)"
+    },
+    "habilita": {
+      "implementation": "./habilita",
+      "schema": "./habilita-schema.json",
+      "description": "A builder that logs a message."
     }
   }
 }
