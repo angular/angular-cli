@@ -1,4 +1,4 @@
-load("//tools:defaults.bzl", "ts_library")
+load("//tools:interop.bzl", "ts_project")
 
 # Copyright Google Inc. All Rights Reserved.
 #
@@ -8,7 +8,7 @@ package(default_visibility = ["//visibility:public"])
 
 licenses(["notice"])
 
-ts_library(
+ts_project(
     name = "file_system_engine_host_test_lib",
     srcs = glob(
         include = [
@@ -21,14 +21,11 @@ ts_library(
             "**/*.js",
         ],
     ),
-    deps = [
+    interop_deps = [
         "//packages/angular_devkit/schematics",
-        # ":testing",
-        # "//packages/angular_devkit/core",
-        # "//packages/angular_devkit/core/node",
-        # "@npm//rxjs",
-        #
-        "@npm//@types/jasmine",
-        "@npm//@types/node",
+    ],
+    deps = [
+        "//:root_modules/@types/jasmine",
+        "//:root_modules/@types/node",
     ],
 )
