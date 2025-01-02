@@ -1,4 +1,4 @@
-load("//tools:defaults.bzl", "ts_library")
+load("//tools:interop.bzl", "ts_project")
 
 # Copyright Google Inc. All Rights Reserved.
 #
@@ -8,7 +8,7 @@ package(default_visibility = ["//visibility:public"])
 
 licenses(["notice"])
 
-ts_library(
+ts_project(
     name = "jobs_test_lib",
     srcs = glob(
         include = [
@@ -16,7 +16,7 @@ ts_library(
         ],
     ),
     deps = [
-        "//packages/angular_devkit/architect",
-        "@npm//@types/node",
+        "//:root_modules/@types/node",
+        "//packages/angular_devkit/architect:architect_rjs",
     ],
 )
