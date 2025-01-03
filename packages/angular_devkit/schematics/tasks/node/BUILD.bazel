@@ -1,4 +1,4 @@
-load("//tools:defaults.bzl", "ts_library")
+load("//tools:interop.bzl", "ts_project")
 
 # Copyright Google Inc. All Rights Reserved.
 #
@@ -8,7 +8,7 @@ licenses(["notice"])
 
 package(default_visibility = ["//visibility:public"])
 
-ts_library(
+ts_project(
     name = "node",
     srcs = glob(
         include = ["**/*.ts"],
@@ -16,14 +16,15 @@ ts_library(
             "**/*_spec.ts",
         ],
     ),
-    module_name = "@angular-devkit/schematics/tasks/node",
-    module_root = "index.d.ts",
-    deps = [
+    interop_deps = [
         "//packages/angular_devkit/core",
         "//packages/angular_devkit/core/node",
         "//packages/angular_devkit/schematics",
         "//packages/angular_devkit/schematics/tasks",
-        "@npm//@types/node",
-        "@npm//rxjs",
+    ],
+    module_name = "@angular-devkit/schematics/tasks/node",
+    deps = [
+        "//:root_modules/@types/node",
+        "//:root_modules/rxjs",
     ],
 )
