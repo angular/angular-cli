@@ -1,6 +1,7 @@
 load("@npm//@angular/build-tooling/bazel/api-golden:index.bzl", "api_golden_test_npm_package")
 load("@npm//@bazel/jasmine:index.bzl", "jasmine_node_test")
-load("//tools:defaults.bzl", "pkg_npm", "ts_library")
+load("//tools:defaults.bzl", "pkg_npm")
+load("//tools:interop.bzl", "ts_project")
 
 # Copyright Google Inc. All Rights Reserved.
 #
@@ -12,52 +13,49 @@ licenses(["notice"])
 
 # @angular-devkit/schematics
 
-ts_library(
+ts_project(
     name = "schematics",
-    package_name = "@angular-devkit/schematics",
     srcs = glob(
         include = ["src/**/*.ts"],
         exclude = [
             "src/**/*_spec.ts",
         ],
-    ),
+    ) + ["index.ts"],
     data = [
         "package.json",
     ],
-    module_name = "@angular-devkit/schematics",
-    module_root = "src/index.d.ts",
-    deps = [
+    interop_deps = [
         "//packages/angular_devkit/core",
         "//packages/angular_devkit/core/node",  # TODO: get rid of this for 6.0
-        "@npm//@types/node",
-        "@npm//jsonc-parser",
-        "@npm//magic-string",
-        "@npm//rxjs",
+    ],
+    module_name = "@angular-devkit/schematics",
+    deps = [
+        "//:root_modules/@types/node",
+        "//:root_modules/jsonc-parser",
+        "//:root_modules/magic-string",
+        "//:root_modules/rxjs",
     ],
 )
 
-# @external_begin
-
-ts_library(
+ts_project(
     name = "schematics_test_lib",
     testonly = True,
     srcs = glob(["src/**/*_spec.ts"]),
-    deps = [
-        ":schematics",
+    interop_deps = [
         "//packages/angular_devkit/core",
         "//packages/angular_devkit/core/node",
         "//packages/angular_devkit/schematics/testing",
-        "@npm//rxjs",
+    ],
+    deps = [
+        ":schematics_rjs",
+        "//:root_modules/@types/jasmine",
+        "//:root_modules/rxjs",
     ],
 )
 
 jasmine_node_test(
     name = "schematics_test",
-    srcs = [":schematics_test_lib"],
-    deps = [
-        "@npm//jasmine",
-        "@npm//source-map",
-    ],
+    deps = [":schematics_test_lib"],
 )
 
 genrule(
@@ -96,4 +94,3 @@ api_golden_test_npm_package(
     npm_package = "angular_cli/packages/angular_devkit/schematics/npm_package",
     types = ["@npm//@types/node"],
 )
-# @external_end
