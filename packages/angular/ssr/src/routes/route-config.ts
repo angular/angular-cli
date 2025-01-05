@@ -193,7 +193,6 @@ export interface ServerRoutesConfig extends ServerRoutesConfigOptions {
 export const SERVER_ROUTES_CONFIG = new InjectionToken<ServerRoutesConfig>('SERVER_ROUTES_CONFIG');
 
 /**
-/**
  * Sets up the necessary providers for configuring server routes.
  * This function accepts an array of server routes and optional configuration
  * options, returning an `EnvironmentProviders` object that encapsulates
