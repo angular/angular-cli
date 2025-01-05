@@ -131,6 +131,18 @@ describe('pure-toplevel-functions Babel plugin', () => {
   );
 
   it(
+    'does not annotate _defineProperty function',
+    testCaseNoChange(`
+      class LanguageState {}
+      _defineProperty(
+        LanguageState,
+        'property',
+        'value'
+      );
+    `),
+  );
+
+  it(
     'does not annotate object literal methods',
     testCaseNoChange(`
       const literal = {
