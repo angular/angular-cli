@@ -407,6 +407,7 @@
                       "@angular/build:application",
                       "@angular/build:dev-server",
                       "@angular/build:extract-i18n",
+                      "@angular/build:ng-packagr",
                       "@angular-devkit/build-angular:application",
                       "@angular-devkit/build-angular:app-shell",
                       "@angular-devkit/build-angular:browser",
@@ -789,6 +790,28 @@
                   "type": "object",
                   "additionalProperties": {
                     "$ref": "../../../../angular_devkit/build_angular/src/builders/ng-packagr/schema.json"
+                  }
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "builder": {
+                  "const": "@angular/build:ng-packagr"
+                },
+                "defaultConfiguration": {
+                  "type": "string",
+                  "description": "A default named configuration to use when a target configuration is not provided."
+                },
+                "options": {
+                  "$ref": "../../../../angular/build/src/builders/ng-packagr/schema.json"
+                },
+                "configurations": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "$ref": "../../../../angular/build/src/builders/ng-packagr/schema.json"
                   }
                 }
               }

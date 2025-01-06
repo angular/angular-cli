@@ -23,6 +23,11 @@ ts_json_schema(
     src = "src/builders/extract-i18n/schema.json",
 )
 
+ts_json_schema(
+    name = "ng_packagr_schema",
+    src = "src/builders/ng-packagr/schema.json",
+)
+
 ts_project(
     name = "build",
     srcs = glob(
@@ -40,6 +45,7 @@ ts_project(
         "//packages/angular/build:src/builders/application/schema.ts",
         "//packages/angular/build:src/builders/dev-server/schema.ts",
         "//packages/angular/build:src/builders/extract-i18n/schema.ts",
+        "//packages/angular/build:src/builders/ng-packagr/schema.ts",
     ],
     data = glob(
         include = [
@@ -90,6 +96,7 @@ ts_project(
         "//:root_modules/lmdb",
         "//:root_modules/magic-string",
         "//:root_modules/mrmime",
+        "//:root_modules/ng-packagr",
         "//:root_modules/parse5-html-rewriting-stream",
         "//:root_modules/picomatch",
         "//:root_modules/piscina",
@@ -186,6 +193,7 @@ ts_project(
         "//:root_modules/@angular/platform-browser",
         "//:root_modules/@angular/platform-browser-dynamic",
         "//:root_modules/@angular/router",
+        "//:root_modules/ng-packagr",
         "//:root_modules/rxjs",
         "//:root_modules/tslib",
         "//:root_modules/typescript",
