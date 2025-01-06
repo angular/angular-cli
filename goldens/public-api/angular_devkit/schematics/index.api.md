@@ -493,13 +493,13 @@ export class HostSink extends SimpleSinkBase {
     // (undocumented)
     _done(): Observable<void>;
     // (undocumented)
-    protected _filesToCreate: Map<Path, Buffer<ArrayBufferLike>>;
+    protected _filesToCreate: Map<Path, Buffer>;
     // (undocumented)
     protected _filesToDelete: Set<Path>;
     // (undocumented)
     protected _filesToRename: Set<[Path, Path]>;
     // (undocumented)
-    protected _filesToUpdate: Map<Path, Buffer<ArrayBufferLike>>;
+    protected _filesToUpdate: Map<Path, Buffer>;
     // (undocumented)
     protected _force: boolean;
     // (undocumented)
