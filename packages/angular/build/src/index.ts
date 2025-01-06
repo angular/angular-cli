@@ -21,3 +21,8 @@ export {
   execute as executeExtractI18nBuilder,
   type ExtractI18nBuilderOptions,
 } from './builders/extract-i18n';
+
+export {
+  execute as executeNgPackagrBuilder,
+  type NgPackagrBuilderOptions,
+} from './builders/ng-packagr';
