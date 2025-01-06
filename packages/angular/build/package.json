@@ -29,7 +29,7 @@
     "beasties": "0.2.0",
     "browserslist": "^4.23.0",
     "esbuild": "0.24.2",
-    "fast-glob": "3.3.2",
+    "fast-glob": "3.3.3",
     "https-proxy-agent": "7.0.6",
     "istanbul-lib-instrument": "6.0.3",
     "listr2": "8.2.5",
@@ -38,14 +38,14 @@
     "parse5-html-rewriting-stream": "7.0.0",
     "picomatch": "4.0.2",
     "piscina": "4.8.0",
-    "rollup": "4.29.1",
-    "sass": "1.83.0",
+    "rollup": "4.30.0",
+    "sass": "1.83.1",
     "semver": "7.6.3",
-    "vite": "6.0.5",
+    "vite": "6.0.7",
     "watchpack": "2.4.2"
   },
   "optionalDependencies": {
-    "lmdb": "3.2.0"
+    "lmdb": "3.2.2"
   },
   "peerDependencies": {
     "@angular/compiler": "^19.0.0 || ^19.1.0-next.0",
