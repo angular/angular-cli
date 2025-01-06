@@ -13,6 +13,7 @@ const dependencies = require('./latest-versions/package.json')['dependencies'];
 export const latestVersions: Record<string, string> & {
   Angular: string;
   DevkitBuildAngular: string;
+  AngularBuild: string;
   AngularSSR: string;
 } = {
   ...dependencies,
@@ -21,5 +22,6 @@ export const latestVersions: Record<string, string> & {
   Angular: dependencies['@angular/core'],
 
   DevkitBuildAngular: '^0.0.0-PLACEHOLDER',
+  AngularBuild: '^0.0.0-PLACEHOLDER',
   AngularSSR: '^0.0.0-PLACEHOLDER',
 };
