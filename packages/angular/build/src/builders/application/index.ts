@@ -10,7 +10,7 @@ import { BuilderContext, BuilderOutput, createBuilder } from '@angular-devkit/ar
 import assert from 'node:assert';
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import { BuildOutputFile, BuildOutputFileType } from '../../tools/esbuild/bundler-context';
+import { BuildOutputFileType } from '../../tools/esbuild/bundler-context';
 import { createJsonBuildManifest, emitFilesToDisk } from '../../tools/esbuild/utils';
 import { colors as ansiColors } from '../../utils/color';
 import { deleteOutputDir } from '../../utils/delete-output-dir';
@@ -133,11 +133,6 @@ export async function* buildApplicationInternal(
   );
 }
 
-export interface ApplicationBuilderOutput extends BuilderOutput {
-  outputFiles?: BuildOutputFile[];
-  assetFiles?: { source: string; destination: string }[];
-}
-
 /**
  * Builds an application using the `application` builder with the provided
  * options.
@@ -156,7 +151,7 @@ export async function* buildApplication(
   options: ApplicationBuilderOptions,
   context: BuilderContext,
   extensions?: ApplicationBuilderExtensions,
-): AsyncIterable<ApplicationBuilderOutput> {
+): AsyncIterable<BuilderOutput> {
   let initial = true;
   const internalOptions = { ...options, incrementalResults: true };
   for await (const result of buildApplicationInternal(internalOptions, context, extensions)) {

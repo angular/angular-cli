@@ -71,19 +71,8 @@ export interface ApplicationBuilderOptions {
     webWorkerTsConfig?: string;
 }
 
-// @public (undocumented)
-export interface ApplicationBuilderOutput extends BuilderOutput {
-    // (undocumented)
-    assetFiles?: {
-        source: string;
-        destination: string;
-    }[];
-    // (undocumented)
-    outputFiles?: BuildOutputFile[];
-}
-
 // @public
-export function buildApplication(options: ApplicationBuilderOptions, context: BuilderContext, extensions?: ApplicationBuilderExtensions): AsyncIterable<ApplicationBuilderOutput>;
+export function buildApplication(options: ApplicationBuilderOptions, context: BuilderContext, extensions?: ApplicationBuilderExtensions): AsyncIterable<BuilderOutput>;
 
 // @public (undocumented)
 export interface BuildOutputAsset {
