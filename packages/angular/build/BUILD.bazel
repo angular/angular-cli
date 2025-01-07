@@ -130,9 +130,39 @@ jasmine_node_test(
 )
 
 ts_project(
-    name = "integration_test_lib",
+    name = "application_integration_test_lib",
     testonly = True,
-    srcs = glob(include = ["src/builders/**/tests/**/*.ts"]),
+    srcs = glob(include = ["src/builders/application/tests/**/*.ts"]),
+    deps = [
+        ":build_rjs",
+        "//packages/angular/build/private:private_rjs",
+        "//modules/testing/builder:builder_rjs",
+        "//packages/angular_devkit/architect:architect_rjs",
+        "//packages/angular_devkit/architect/node:node_rjs",
+        "//packages/angular_devkit/architect/testing:testing_rjs",
+        "//packages/angular_devkit/core:core_rjs",
+        "//packages/angular_devkit/core/node:node_rjs",
+
+        # Base dependencies for the application in hello-world-app.
+        "//:root_modules/@angular/common",
+        "//:root_modules/@angular/compiler",
+        "//:root_modules/@angular/compiler-cli",
+        "//:root_modules/@angular/core",
+        "//:root_modules/@angular/platform-browser",
+        "//:root_modules/@angular/platform-browser-dynamic",
+        "//:root_modules/@angular/router",
+        "//:root_modules/rxjs",
+        "//:root_modules/tslib",
+        "//:root_modules/typescript",
+        "//:root_modules/zone.js",
+        "//:root_modules/buffer",
+    ],
+)
+
+ts_project(
+    name = "dev-server_integration_test_lib",
+    testonly = True,
+    srcs = glob(include = ["src/builders/dev-server/tests/**/*.ts"]),
     deps = [
         ":build_rjs",
         "//packages/angular/build/private:private_rjs",
@@ -165,11 +195,19 @@ ts_project(
 )
 
 jasmine_node_test(
-    name = "integration_tests",
+    name = "application_integration_tests",
     size = "large",
     flaky = True,
     shard_count = 10,
-    deps = [":integration_test_lib"],
+    deps = [":application_integration_test_lib"],
+)
+
+jasmine_node_test(
+    name = "dev-server_integration_tests",
+    size = "large",
+    flaky = True,
+    shard_count = 10,
+    deps = [":dev-server_integration_test_lib"],
 )
 
 genrule(
