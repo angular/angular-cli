@@ -147,18 +147,20 @@ export class ExecutionResult {
     };
   }
 
-  get watchFiles() {
-    // Bundler contexts internally normalize file dependencies
-    const files = this.rebuildContexts.typescriptContexts
-      .flatMap((context) => [...context.watchFiles])
-      .concat(this.rebuildContexts.otherContexts.flatMap((context) => [...context.watchFiles]));
-    if (this.codeBundleCache?.referencedFiles) {
+  get watchFiles(): Readonly<string[]> {
+    const { typescriptContexts, otherContexts } = this.rebuildContexts;
+
+    return [
+      // Bundler contexts internally normalize file dependencies.
+      ...typescriptContexts.flatMap((context) => [...context.watchFiles]),
+      ...otherContexts.flatMap((context) => [...context.watchFiles]),
       // These files originate from TS/NG and can have POSIX path separators even on Windows.
       // To ensure path comparisons are valid, all these paths must be normalized.
-      files.push(...this.codeBundleCache.referencedFiles.map(normalize));
-    }
-
-    return files.concat(this.extraWatchFiles);
+      ...(this.codeBundleCache?.referencedFiles?.map(normalize) ?? []),
+      // The assets source files.
+      ...this.assetFiles.map(({ source }) => source),
+      ...this.extraWatchFiles,
+    ];
   }
 
   createRebuildState(fileChanges: ChangedFiles): RebuildState {
