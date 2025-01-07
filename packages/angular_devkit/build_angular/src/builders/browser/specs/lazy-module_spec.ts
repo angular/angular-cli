@@ -98,7 +98,7 @@ describe('Browser Builder lazy modules', () => {
       const run = await architect.scheduleTarget(target, overrides);
       await run.output
         .pipe(
-          debounceTime(1500),
+          debounceTime(1000),
           tap((buildEvent) => {
             buildNumber++;
             switch (buildNumber) {
