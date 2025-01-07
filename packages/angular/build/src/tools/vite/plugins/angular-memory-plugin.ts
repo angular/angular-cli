@@ -22,6 +22,7 @@ interface AngularMemoryPluginOptions {
 }
 
 const ANGULAR_PREFIX = '/@ng/';
+const VITE_FS_PREFIX = '/@fs/';
 
 export async function createAngularMemoryPlugin(
   options: AngularMemoryPluginOptions,
@@ -34,6 +35,10 @@ export async function createAngularMemoryPlugin(
     // Ensures plugin hooks run before built-in Vite hooks
     enforce: 'pre',
     async resolveId(source, importer, { ssr }) {
+      if (source.startsWith(VITE_FS_PREFIX)) {
+        return;
+      }
+
       // For SSR with component HMR, pass through as a virtual module
       if (ssr && source.startsWith(ANGULAR_PREFIX)) {
         return '\0' + source;
