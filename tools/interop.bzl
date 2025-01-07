@@ -1,6 +1,6 @@
 load("@aspect_rules_js//js:providers.bzl", "JsInfo", "js_info")
 load("@aspect_rules_ts//ts:defs.bzl", _ts_project = "ts_project")
-load("@rules_nodejs//nodejs:providers.bzl", "DeclarationInfo", "JSModuleInfo", "LinkablePackageInfo")
+load("@build_bazel_rules_nodejs//:providers.bzl", "DeclarationInfo", "JSEcmaScriptModuleInfo", "JSModuleInfo", "LinkablePackageInfo")
 
 def _ts_deps_interop_impl(ctx):
     types = []
@@ -42,7 +42,7 @@ def _ts_project_module_impl(ctx):
     runfiles = ctx.attr.dep[DefaultInfo].default_runfiles
     info = ctx.attr.dep[JsInfo]
 
-    # Filter runfiles to not `node_modules` from Aspect as this interop
+    # Filter runfiles to not include `node_modules` from Aspect as this interop
     # target is supposed to be used downstream by `rules_nodejs` consumers,
     # and mixing pnpm-style node modules with linker node modules is incompatible.
     filtered_runfiles = []
@@ -57,6 +57,10 @@ def _ts_project_module_impl(ctx):
             runfiles = runfiles,
         ),
         JSModuleInfo(
+            direct_sources = info.sources,
+            sources = depset(transitive = [info.transitive_sources]),
+        ),
+        JSEcmaScriptModuleInfo(
             direct_sources = info.sources,
             sources = depset(transitive = [info.transitive_sources]),
         ),
@@ -89,10 +93,11 @@ ts_project_module = rule(
         # Note: The module aspect from consuming `ts_library` targets will
         # consume the module mappings automatically.
         "module_name": attr.string(),
+        "module_root": attr.string(),
     },
 )
 
-def ts_project(name, module_name = None, interop_deps = [], deps = [], testonly = False, **kwargs):
+def ts_project(name, module_name = None, interop_deps = [], deps = [], tsconfig = None, testonly = False, **kwargs):
     # Pull in the `rules_nodejs` variants of dependencies we know are "hybrid". This
     # is necessary as we can't mix `npm/node_modules` from RNJS with the pnpm-style
     # symlink-dependent node modules. In addition, we need to extract `_rjs` interop
@@ -105,6 +110,9 @@ def ts_project(name, module_name = None, interop_deps = [], deps = [], testonly 
         if d.endswith("_rjs"):
             rjs_modules_to_rnjs.append(d.replace("_rjs", ""))
 
+    if tsconfig == None:
+        tsconfig = "//:test-tsconfig" if testonly else "//:build-tsconfig"
+
     ts_deps_interop(
         name = "%s_interop_deps" % name,
         deps = [] + interop_deps + rjs_modules_to_rnjs,
@@ -114,8 +122,8 @@ def ts_project(name, module_name = None, interop_deps = [], deps = [], testonly 
     _ts_project(
         name = "%s_rjs" % name,
         testonly = testonly,
-        tsconfig = "//:test-tsconfig" if testonly else "//:build-tsconfig",
         declaration = True,
+        tsconfig = tsconfig,
         # Use the worker from our own Angular rules, as the default worker
         # from `rules_ts` is incompatible with TS5+ and abandoned. We need
         # worker for efficient, fast DX and avoiding Windows no-sandbox issues.

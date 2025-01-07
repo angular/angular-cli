@@ -1,12 +1,12 @@
 load("@npm//@angular/build-tooling/bazel/api-golden:index.bzl", "api_golden_test_npm_package")
 load("@rules_pkg//:pkg.bzl", "pkg_tar")
-load("//tools:defaults.bzl", "ng_package", "ts_library")
+load("//tools:defaults.bzl", "ng_package")
+load("//tools:interop.bzl", "ts_project")
 
 package(default_visibility = ["//visibility:public"])
 
-ts_library(
+ts_project(
     name = "ssr",
-    package_name = "@angular/ssr",
     srcs = glob(
         include = [
             "*.ts",
@@ -16,15 +16,23 @@ ts_library(
             "**/*_spec.ts",
         ],
     ),
+    args = [
+        "--lib",
+        "dom,es2020",
+    ],
+    data = [
+        "//packages/angular/ssr/third_party/beasties:beasties_bundled",
+    ],
     module_name = "@angular/ssr",
-    tsconfig = "//:tsconfig-build-ng",
+    source_map = True,
+    tsconfig = "//:build-tsconfig-angular",
     deps = [
-        "//packages/angular/ssr/third_party/beasties:bundled_beasties_lib",
-        "@npm//@angular/common",
-        "@npm//@angular/core",
-        "@npm//@angular/platform-server",
-        "@npm//@angular/router",
-        "@npm//tslib",
+        "//:root_modules/@angular/common",
+        "//:root_modules/@angular/core",
+        "//:root_modules/@angular/platform-server",
+        "//:root_modules/@angular/router",
+        "//:root_modules/tslib",
+        "//packages/angular/ssr/third_party/beasties:beasties_dts",
     ],
 )
 
@@ -33,7 +41,7 @@ ng_package(
     package_name = "@angular/ssr",
     srcs = [
         ":package.json",
-        "//packages/angular/ssr/third_party/beasties:bundled_beasties_lib",
+        "//packages/angular/ssr/third_party/beasties:beasties_bundled",
     ],
     externals = [
         "@angular/ssr",

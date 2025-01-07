@@ -136,7 +136,7 @@ yarn_install(
     data = [
         "//:.yarn/releases/yarn-4.5.0.cjs",
         "//:.yarnrc.yml",
-        "//:patches/@angular+bazel+19.0.0-next.7.patch",
+        "//:patches/@angular+bazel+19.1.0-next.4.patch",
         "//:patches/@bazel+concatjs+5.8.1.patch",
         "//:patches/@bazel+jasmine+5.8.1.patch",
     ],
@@ -222,6 +222,6 @@ rules_ts_dependencies(
 
 http_file(
     name = "tsc_worker",
-    sha256 = "",
-    urls = ["https://raw.githubusercontent.com/devversion/rules_angular/a270a74d1e64577bddba96a5484c7c5d2c5d2770/dist/worker.mjs"],
+    sha256 = "5a5c46846ecda83e05b9da26f1672ad51c59bce08fed88419850d0e29c993b30",
+    urls = ["https://raw.githubusercontent.com/devversion/rules_angular/4b7532ba2b29078d005899cd15b415593d03cceb/dist/worker.mjs"],
 )
