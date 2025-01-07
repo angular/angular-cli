@@ -1,56 +1,35 @@
 load("@npm//@angular/build-tooling/bazel/spec-bundling:index.bzl", "spec_bundle")
 load("@npm//@bazel/jasmine:index.bzl", "jasmine_node_test")
-load("//tools:defaults.bzl", "ts_library")
+load("//tools:interop.bzl", "ts_project")
 
-ESM_TESTS = [
-    "app_spec.ts",
-    "app-engine_spec.ts",
-    "routes/router_spec.ts",
-    "routes/route-tree_spec.ts",
-    "routes/ng-routes_spec.ts",
-]
-
-ts_library(
+ts_project(
     name = "unit_test_lib",
     testonly = True,
     srcs = glob(
-        include = ["**/*_spec.ts"],
-        exclude = ESM_TESTS + ["npm_package/**"],
+        include = ["**/*.ts"],
     ),
     deps = [
-        "//packages/angular/ssr",
-    ],
-)
-
-ts_library(
-    name = "unit_test_with_esm_deps_lib",
-    testonly = True,
-    srcs = ESM_TESTS + ["testing-utils.ts"],
-    deps = [
-        "//packages/angular/ssr",
-        "@npm//@angular/common",
-        "@npm//@angular/compiler",
-        "@npm//@angular/core",
-        "@npm//@angular/platform-browser",
-        "@npm//@angular/platform-server",
-        "@npm//@angular/router",
+        "//:root_modules/@angular/common",
+        "//:root_modules/@angular/compiler",
+        "//:root_modules/@angular/core",
+        "//:root_modules/@angular/platform-browser",
+        "//:root_modules/@angular/platform-server",
+        "//:root_modules/@angular/router",
+        "//packages/angular/ssr:ssr_rjs",
     ],
 )
 
 spec_bundle(
-    name = "unit_test_with_esm_deps_lib_bundled",
+    name = "esm_tests_bundled",
     downlevel_async_await = False,
     platform = "node",
     run_angular_linker = False,
     deps = [
-        ":unit_test_with_esm_deps_lib",
+        ":unit_test_lib",
     ],
 )
 
 jasmine_node_test(
     name = "test",
-    deps = [
-        ":unit_test_lib",
-        ":unit_test_with_esm_deps_lib_bundled",
-    ],
+    deps = [":esm_tests_bundled"],
 )

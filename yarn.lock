@@ -104,9 +104,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@angular/build-tooling@https://github.com/angular/dev-infra-private-build-tooling-builds.git#d0c8ad886b60c5abca85db6a8741cbf494169768":
-  version: 0.0.0-359350bbc10aab1bac85d0eec61a53377078ab82
-  resolution: "@angular/build-tooling@https://github.com/angular/dev-infra-private-build-tooling-builds.git#commit=d0c8ad886b60c5abca85db6a8741cbf494169768"
+"@angular/build-tooling@https://github.com/angular/dev-infra-private-build-tooling-builds.git#e025d180b28460375d9f2292dc86e7c6a459b5b6":
+  version: 0.0.0-f0a9343aa86aac0222d035814dc919282fbdaa19
+  resolution: "@angular/build-tooling@https://github.com/angular/dev-infra-private-build-tooling-builds.git#commit=e025d180b28460375d9f2292dc86e7c6a459b5b6"
   dependencies:
     "@angular/benchpress": "npm:0.3.0"
     "@angular/build": "npm:19.1.0-next.2"
@@ -143,7 +143,7 @@ __metadata:
   dependenciesMeta:
     re2:
       built: false
-  checksum: 10c0/b815c7ec0e5e22d04a321d94b8e9e20af20024e503301c05268407404e23349e18719d738588036e3a9f10e8db054b2afe040a9e02cc407e70e282f881f0cfcc
+  checksum: 10c0/a7998c6a7343edf4645f233f4f18f3227e3d104a9a6cf8f29da2b86d20437c068d8ac02f60fb685c2825cd5d15fe247770a60f13f80c04f26e6c44aba5867965
   languageName: node
   linkType: hard
 
@@ -311,7 +311,7 @@ __metadata:
     "@ampproject/remapping": "npm:2.3.0"
     "@angular/animations": "npm:19.1.0-next.4"
     "@angular/bazel": "https://github.com/angular/bazel-builds.git#cfd7a06c2f972fcef59262995d232e2846b536a2"
-    "@angular/build-tooling": "https://github.com/angular/dev-infra-private-build-tooling-builds.git#d0c8ad886b60c5abca85db6a8741cbf494169768"
+    "@angular/build-tooling": "https://github.com/angular/dev-infra-private-build-tooling-builds.git#e025d180b28460375d9f2292dc86e7c6a459b5b6"
     "@angular/cdk": "npm:19.1.0-next.3"
     "@angular/common": "npm:19.1.0-next.4"
     "@angular/compiler": "npm:19.1.0-next.4"

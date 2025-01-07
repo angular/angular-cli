@@ -1,16 +1,25 @@
+load("@aspect_rules_js//js:defs.bzl", "js_library")
 load("@npm//@bazel/rollup:index.bzl", "rollup_bundle")
-load("//tools:defaults.bzl", "js_library")
 
 package(default_visibility = ["//visibility:public"])
 
 js_library(
-    name = "bundled_beasties_lib",
+    name = "beasties_dts",
     srcs = [
         "index.d.ts",
+    ],
+    deps = [
+        "//:root_modules/beasties",
+    ],
+)
+
+js_library(
+    name = "beasties_bundled",
+    srcs = [
         ":bundled_beasties_files",
     ],
     deps = [
-        "@npm//beasties",
+        "//:root_modules/beasties",
     ],
 )
 

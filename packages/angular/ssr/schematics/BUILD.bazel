@@ -4,7 +4,8 @@
 # found in the LICENSE file at https://angular.dev/license
 
 load("@npm//@bazel/jasmine:index.bzl", "jasmine_node_test")
-load("//tools:defaults.bzl", "pkg_npm", "ts_library")
+load("//tools:defaults.bzl", "pkg_npm")
+load("//tools:interop.bzl", "ts_project")
 load("//tools:ts_json_schema.bzl", "ts_json_schema")
 
 licenses(["notice"])
@@ -44,9 +45,8 @@ filegroup(
     ),
 )
 
-ts_library(
+ts_project(
     name = "schematics",
-    package_name = "@angular/ssr/schematics",
     srcs = glob(
         include = ["**/*.ts"],
         exclude = [
@@ -59,13 +59,14 @@ ts_library(
         for (src, _) in ALL_SCHEMA_TARGETS
     ],
     data = [":schematics_assets"],
+    module_name = "@angular/ssr/schematics",
     deps = [
-        "//packages/angular_devkit/schematics",
-        "//packages/schematics/angular",
+        "//packages/angular_devkit/schematics:schematics_rjs",
+        "//packages/schematics/angular:angular_rjs",
     ],
 )
 
-ts_library(
+ts_project(
     name = "ssr_schematics_test_lib",
     testonly = True,
     srcs = glob(
@@ -77,12 +78,10 @@ ts_library(
             "node_modules/**",
         ],
     ),
-    # @external_begin
     deps = [
-        ":schematics",
-        "//packages/angular_devkit/schematics/testing",
+        ":schematics_rjs",
+        "//packages/angular_devkit/schematics/testing:testing_rjs",
     ],
-    # @external_end
 )
 
 jasmine_node_test(

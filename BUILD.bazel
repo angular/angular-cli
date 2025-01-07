@@ -36,10 +36,19 @@ rules_js_tsconfig(
 )
 
 rules_js_tsconfig(
+    name = "build-tsconfig-angular",
+    src = "tsconfig-build-ng.json",
+    deps = [
+        "tsconfig.json",
+    ],
+)
+
+rules_js_tsconfig(
     name = "test-tsconfig",
     src = "tsconfig-test.json",
     deps = [
         "tsconfig.json",
+        "//:root_modules/@types/jasmine",
         "//:root_modules/@types/node",
     ],
 )

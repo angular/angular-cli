@@ -1,8 +1,8 @@
-load("//tools:defaults.bzl", "ts_library")
+load("//tools:interop.bzl", "ts_project")
 
 package(default_visibility = ["//visibility:public"])
 
-ts_library(
+ts_project(
     name = "node",
     srcs = glob(
         [
@@ -10,11 +10,17 @@ ts_library(
             "src/**/*.ts",
         ],
     ),
+    args = [
+        "--types",
+        "node",
+    ],
     module_name = "@angular/ssr/node",
+    source_map = True,
+    tsconfig = "//:build-tsconfig-angular",
     deps = [
-        "//packages/angular/ssr",
-        "@npm//@angular/core",
-        "@npm//@angular/platform-server",
-        "@npm//@types/node",
+        "//:root_modules/@angular/core",
+        "//:root_modules/@angular/platform-server",
+        "//:root_modules/@types/node",
+        "//packages/angular/ssr:ssr_rjs",
     ],
 )

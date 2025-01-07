@@ -8,7 +8,7 @@
   "compilerOptions": {
     "module": "esnext",
     "target": "es2022",
-    "lib": ["es2020", "dom"],
+    "lib": ["es2020"],
     // don't auto-discover @types/node, it results in a ///<reference in the .d.ts output
     "types": [],
     "sourceMap": true,

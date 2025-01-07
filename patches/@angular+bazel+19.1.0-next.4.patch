@@ -1,5 +1,5 @@
 diff --git a/node_modules/@angular/bazel/src/ng_package/packager.mjs b/node_modules/@angular/bazel/src/ng_package/packager.mjs
-index 5c1f3a2c72e28a90b666c96b2fe9755cdafd5259..47034ceeb0b9ab9c1e9bee50239723a51d2e2e19 100755
+index 7184fd910a6ecaa817d5078a1fb17f78aee9113b..ef3e508cfa8f309ca298a21c0546bba60fae095c 100755
 --- a/node_modules/@angular/bazel/src/ng_package/packager.mjs
 +++ b/node_modules/@angular/bazel/src/ng_package/packager.mjs
 @@ -7,7 +7,7 @@
