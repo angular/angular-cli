@@ -1,14 +1,14 @@
 load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
 load("@npm//@bazel/jasmine:index.bzl", "jasmine_node_test")
-load("//tools:defaults.bzl", "ts_library")
+load("//tools:interop.bzl", "ts_project")
 
-ts_library(
+ts_project(
     name = "unit_test_lib",
     testonly = True,
     srcs = glob(["**/*.ts"]),
     deps = [
-        "@npm//@bazel/runfiles",
+        "//:root_modules/@bazel/runfiles",
     ],
 )
 

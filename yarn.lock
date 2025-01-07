@@ -65,15 +65,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@angular/bazel@https://github.com/angular/bazel-builds.git#07617f0f8540d27f8895b1820a6f994e1e5b7277":
-  version: 19.0.0-next.7+sha-00a79d0
-  resolution: "@angular/bazel@https://github.com/angular/bazel-builds.git#commit=07617f0f8540d27f8895b1820a6f994e1e5b7277"
+"@angular/bazel@https://github.com/angular/bazel-builds.git#cfd7a06c2f972fcef59262995d232e2846b536a2":
+  version: 19.1.0-next.4+sha-b22677d
+  resolution: "@angular/bazel@https://github.com/angular/bazel-builds.git#commit=cfd7a06c2f972fcef59262995d232e2846b536a2"
   dependencies:
     "@microsoft/api-extractor": "npm:^7.24.2"
     magic-string: "npm:^0.30.0"
     tslib: "npm:^2.3.0"
   peerDependencies:
-    "@angular/compiler-cli": 19.0.0-next.7+sha-00a79d0
+    "@angular/compiler-cli": 19.1.0-next.4+sha-b22677d
     "@bazel/concatjs": ^5.3.0
     "@bazel/worker": ^5.3.0
     "@rollup/plugin-commonjs": ^28.0.0
@@ -81,7 +81,7 @@ __metadata:
     rollup: ^2.56.3
     rollup-plugin-sourcemaps: ^0.6.3
     terser: ^5.9.0
-    typescript: ">=5.5 <5.7"
+    typescript: ">=5.5 <5.8"
   peerDependenciesMeta:
     terser:
       optional: true
@@ -90,7 +90,7 @@ __metadata:
     packager: ./src/ng_package/packager.mjs
     types_bundler: ./src/types_bundle/index.mjs
     xi18n: ./src/ngc-wrapped/extract_i18n.mjs
-  checksum: 10c0/18e8c7c6e70261f04756559cfbf6a1e099bbadef5f6206b04c28c5b4bd6e8178713e1361ae0edf21e888efdd90ea45d008374ef57b22ea31d0722566babae8e7
+  checksum: 10c0/8d1d1d9570ffa467282ad7c440600aa8f0f22194851b3e53fa02c859f4d7ea2577397c0b7474cbfad81cfe9e7c50832888ee5af5d65ebf49745d9c088c7366ef
   languageName: node
   linkType: hard
 
@@ -310,7 +310,7 @@ __metadata:
   dependencies:
     "@ampproject/remapping": "npm:2.3.0"
     "@angular/animations": "npm:19.0.0"
-    "@angular/bazel": "https://github.com/angular/bazel-builds.git#07617f0f8540d27f8895b1820a6f994e1e5b7277"
+    "@angular/bazel": "https://github.com/angular/bazel-builds.git#cfd7a06c2f972fcef59262995d232e2846b536a2"
     "@angular/build-tooling": "https://github.com/angular/dev-infra-private-build-tooling-builds.git#a35ad7f4e30ae1fc531517867efcae89cce5afa2"
     "@angular/cdk": "npm:19.0.0-rc.3"
     "@angular/common": "npm:19.0.0"
