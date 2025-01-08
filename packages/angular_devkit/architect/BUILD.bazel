@@ -64,14 +64,12 @@ ts_project(
             "node_modules/**",
         ],
     ),
-    interop_deps = [
-        "//packages/angular_devkit/core",
-        "//packages/angular_devkit/core/node",
-    ],
     module_name = "@angular-devkit/architect",
     deps = [
         "//:root_modules/@types/node",
         "//:root_modules/rxjs",
+        "//packages/angular_devkit/core:core_rjs",
+        "//packages/angular_devkit/core/node:node_rjs",
     ],
 )
 
@@ -79,14 +77,12 @@ ts_project(
     name = "architect_test_lib",
     testonly = True,
     srcs = glob(["src/**/*_spec.ts"]),
-    interop_deps = [
-        "//packages/angular_devkit/core",
-    ],
     deps = [
         ":architect_rjs",
         "//:root_modules/@types/jasmine",
         "//:root_modules/rxjs",
         "//packages/angular_devkit/architect/testing:testing_rjs",
+        "//packages/angular_devkit/core:core_rjs",
     ],
 )
 

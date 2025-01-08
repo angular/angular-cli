@@ -40,11 +40,6 @@ ts_project(
     ) + [
         "//packages/angular/cli:lib/config/schema.json",
     ],
-    interop_deps = [
-        "//packages/angular_devkit/schematics",
-        "//packages/angular_devkit/schematics/tasks",
-        "//packages/angular_devkit/schematics/tools",
-    ],
     module_name = "@angular/cli",
     deps = [
         "//:root_modules/@angular/core",
@@ -71,6 +66,9 @@ ts_project(
         "//packages/angular_devkit/architect/node:node_rjs",
         "//packages/angular_devkit/core:core_rjs",
         "//packages/angular_devkit/core/node:node_rjs",
+        "//packages/angular_devkit/schematics:schematics_rjs",
+        "//packages/angular_devkit/schematics/tasks:tasks_rjs",
+        "//packages/angular_devkit/schematics/tools:tools_rjs",
     ],
 )
 
@@ -138,15 +136,13 @@ ts_project(
             "node_modules/**",
         ],
     ),
-    interop_deps = [
-        "//packages/angular_devkit/schematics",
-        "//packages/angular_devkit/schematics/testing",
-    ],
     deps = [
         ":angular-cli_rjs",
         "//:root_modules/@types/semver",
         "//:root_modules/@types/yargs",
         "//packages/angular_devkit/core:core_rjs",
+        "//packages/angular_devkit/schematics:schematics_rjs",
+        "//packages/angular_devkit/schematics/testing:testing_rjs",
     ],
 )
 

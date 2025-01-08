@@ -119,13 +119,6 @@ ts_project(
         "builders.json",
         "package.json",
     ],
-    interop_deps = [
-        "//packages/angular/ssr",
-        "//packages/angular_devkit/build_webpack",
-        "//packages/angular_devkit/core",
-        "//packages/angular_devkit/core/node",
-        "//packages/ngtools/webpack",
-    ],
     module_name = "@angular-devkit/build-angular",
     deps = [
         "//:root_modules/@ampproject/remapping",
@@ -201,7 +194,12 @@ ts_project(
         "//:root_modules/webpack-subresource-integrity",
         "//packages/angular/build:build_rjs",
         "//packages/angular/build/private:private_rjs",
+        "//packages/angular/ssr:ssr_rjs",
         "//packages/angular_devkit/architect",
+        "//packages/angular_devkit/build_webpack:build_webpack_rjs",
+        "//packages/angular_devkit/core:core_rjs",
+        "//packages/angular_devkit/core/node:node_rjs",
+        "//packages/ngtools/webpack:webpack_rjs",
     ],
 )
 
@@ -217,9 +215,6 @@ ts_project(
         ],
     ),
     data = glob(["test/**/*"]),
-    interop_deps = [
-        "//packages/angular_devkit/core",
-    ],
     deps = [
         ":build_angular_rjs",
         ":build_angular_test_utils_rjs",
@@ -228,6 +223,7 @@ ts_project(
         "//:root_modules/typescript",
         "//:root_modules/webpack",
         "//packages/angular_devkit/architect/testing:testing_rjs",
+        "//packages/angular_devkit/core:core_rjs",
     ],
 )
 
@@ -285,19 +281,17 @@ ts_project(
         ],
     ),
     data = glob(["test/**/*"]),
-    interop_deps = [
-        "//modules/testing/builder",
-        "//packages/angular_devkit/core",
-        "//packages/angular_devkit/core/node",
-    ],
     deps = [
         ":build_angular_rjs",
         "//:root_modules/@types/jasmine",
+        "//modules/testing/builder:builder_rjs",
         "//packages/angular/build:build_rjs",
         "//packages/angular/build/private:private_rjs",
         "//packages/angular_devkit/architect:architect_rjs",
         "//packages/angular_devkit/architect/node:node_rjs",
         "//packages/angular_devkit/architect/testing:testing_rjs",
+        "//packages/angular_devkit/core:core_rjs",
+        "//packages/angular_devkit/core/node:node_rjs",
         "@npm//rxjs",
     ],
 )
@@ -308,10 +302,8 @@ LARGE_SPECS = {
         "shards": 10,
         "size": "large",
         "flaky": True,
-        "extra_interop_deps": [
-            "//packages/angular_devkit/build_webpack",
-        ],
         "extra_deps": [
+            "//packages/angular_devkit/build_webpack:build_webpack_rjs",
             "//:root_modules/@types/http-proxy",
             "//:root_modules/http-proxy",
             "//:root_modules/puppeteer",
@@ -364,10 +356,8 @@ LARGE_SPECS = {
     "prerender": {},
     "browser-esbuild": {},
     "ssr-dev-server": {
-        "extra_interop_deps": [
-            "//packages/angular/ssr/node",
-        ],
         "extra_deps": [
+            "//packages/angular/ssr/node:node_rjs",
             "//:root_modules/@types/browser-sync",
             "//:root_modules/browser-sync",
             "//:root_modules/express",
@@ -381,15 +371,12 @@ LARGE_SPECS = {
         name = "build_angular_" + spec + "_test_lib",
         testonly = True,
         srcs = glob(["src/builders/" + spec + "/**/*_spec.ts"]),
-        interop_deps = [
-            # Dependencies needed to compile and run the specs themselves.
-            "//packages/angular_devkit/core",
-            "//packages/angular_devkit/core/node",
-            "//modules/testing/builder",
-        ] + LARGE_SPECS[spec].get("extra_interop_deps", []),
         deps = [
             # Dependencies needed to compile and run the specs themselves.
             ":build_angular_rjs",
+            "//packages/angular_devkit/core:core_rjs",
+            "//packages/angular_devkit/core/node:node_rjs",
+            "//modules/testing/builder:builder_rjs",
             ":build_angular_test_utils_rjs",
             "//packages/angular/build:build_rjs",
             "//packages/angular/build/private:private_rjs",

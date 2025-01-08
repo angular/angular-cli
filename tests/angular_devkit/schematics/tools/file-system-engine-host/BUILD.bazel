@@ -21,11 +21,9 @@ ts_project(
             "**/*.js",
         ],
     ),
-    interop_deps = [
-        "//packages/angular_devkit/schematics",
-    ],
     deps = [
         "//:root_modules/@types/jasmine",
         "//:root_modules/@types/node",
+        "//packages/angular_devkit/schematics:schematics_rjs",
     ],
 )

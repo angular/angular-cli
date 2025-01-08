@@ -7,13 +7,11 @@ load("@aspect_bazel_lib//lib:utils.bzl", "to_label")
 load("@build_bazel_rules_nodejs//:index.bzl", _js_library = "js_library", _pkg_npm = "pkg_npm")
 load("@npm//@angular/bazel:index.bzl", _ng_module = "ng_module", _ng_package = "ng_package")
 load("@npm//@angular/build-tooling/bazel:extract_js_module_output.bzl", "extract_js_module_output")
-load("@npm//@bazel/concatjs:index.bzl", _ts_library = "ts_library")
 load("@rules_pkg//:pkg.bzl", "pkg_tar")
 load("//:constants.bzl", "RELEASE_ENGINES_NODE", "RELEASE_ENGINES_NPM", "RELEASE_ENGINES_YARN")
 load("//tools:link_package_json_to_tarballs.bzl", "link_package_json_to_tarballs")
 load("//tools:snapshot_repo_filter.bzl", "SNAPSHOT_REPO_JQ_FILTER")
 
-_DEFAULT_TSCONFIG = "//:tsconfig-build.json"
 _DEFAULT_TSCONFIG_NG = "//:tsconfig-build-ng"
 _DEFAULT_TSCONFIG_TEST = "//:tsconfig-test.json"
 
@@ -52,43 +50,6 @@ def _default_module_name(testonly):
         return "@angular/" + pkg[len("packages/angular/"):]
 
     return None
-
-def ts_library(
-        name,
-        tsconfig = None,
-        testonly = False,
-        deps = [],
-        devmode_module = None,
-        devmode_target = None,
-        **kwargs):
-    """Default values for ts_library"""
-    if testonly:
-        # Match the types[] in //packages:tsconfig-test.json
-        deps.append("@npm//@types/jasmine")
-        deps.append("@npm//@types/node")
-    if not tsconfig:
-        if testonly:
-            tsconfig = _DEFAULT_TSCONFIG_TEST
-        else:
-            tsconfig = _DEFAULT_TSCONFIG
-
-    if not devmode_module:
-        devmode_module = "commonjs"
-    if not devmode_target:
-        devmode_target = "es2022"
-
-    _ts_library(
-        name = name,
-        testonly = testonly,
-        deps = deps,
-        # @external_begin
-        tsconfig = tsconfig,
-        devmode_module = devmode_module,
-        devmode_target = devmode_target,
-        prodmode_target = "es2022",
-        # @external_end
-        **kwargs
-    )
 
 js_library = _js_library
 

@@ -24,16 +24,14 @@ ts_project(
     data = [
         "package.json",
     ],
-    interop_deps = [
-        "//packages/angular_devkit/core",
-        "//packages/angular_devkit/core/node",  # TODO: get rid of this for 6.0
-    ],
     module_name = "@angular-devkit/schematics",
     deps = [
         "//:root_modules/@types/node",
         "//:root_modules/jsonc-parser",
         "//:root_modules/magic-string",
         "//:root_modules/rxjs",
+        "//packages/angular_devkit/core:core_rjs",
+        "//packages/angular_devkit/core/node:node_rjs",  # TODO: get rid of this for 6.0
     ],
 )
 
@@ -41,15 +39,13 @@ ts_project(
     name = "schematics_test_lib",
     testonly = True,
     srcs = glob(["src/**/*_spec.ts"]),
-    interop_deps = [
-        "//packages/angular_devkit/core",
-        "//packages/angular_devkit/core/node",
-        "//packages/angular_devkit/schematics/testing",
-    ],
     deps = [
-        ":schematics_rjs",
+        ":schematics",
         "//:root_modules/@types/jasmine",
         "//:root_modules/rxjs",
+        "//packages/angular_devkit/core:core_rjs",
+        "//packages/angular_devkit/core/node:node_rjs",
+        "//packages/angular_devkit/schematics/testing:testing_rjs",
     ],
 )
 

@@ -41,11 +41,6 @@ ts_project(
             "schematic/files/**/*",
         ],
     ),
-    interop_deps = [
-        "//packages/angular_devkit/schematics",
-        "//packages/angular_devkit/schematics/tasks",
-        "//packages/angular_devkit/schematics/tools",
-    ],
     module_name = "@angular-devkit/schematics-cli",
     deps = [
         "//:root_modules/@inquirer/prompts",
@@ -56,6 +51,9 @@ ts_project(
         "//:root_modules/yargs-parser",
         "//packages/angular_devkit/core:core_rjs",
         "//packages/angular_devkit/core/node:node_rjs",
+        "//packages/angular_devkit/schematics:schematics_rjs",
+        "//packages/angular_devkit/schematics/tasks:tasks_rjs",
+        "//packages/angular_devkit/schematics/tools:tools_rjs",
     ],
 )
 

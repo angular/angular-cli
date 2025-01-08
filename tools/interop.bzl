@@ -97,7 +97,9 @@ ts_project_module = rule(
     },
 )
 
-def ts_project(name, module_name = None, interop_deps = [], deps = [], tsconfig = None, testonly = False, **kwargs):
+def ts_project(name, module_name = None, deps = [], tsconfig = None, testonly = False, **kwargs):
+    interop_deps = []
+
     # Pull in the `rules_nodejs` variants of dependencies we know are "hybrid". This
     # is necessary as we can't mix `npm/node_modules` from RNJS with the pnpm-style
     # symlink-dependent node modules. In addition, we need to extract `_rjs` interop
@@ -139,7 +141,7 @@ def ts_project(name, module_name = None, interop_deps = [], deps = [], tsconfig 
         dep = "%s_rjs" % name,
         # Forwarded dependencies for linker module mapping aspect.
         # RJS deps can also transitively pull in module mappings from their `interop_deps`.
-        deps = [] + interop_deps + deps,
+        deps = [] + ["%s_interop_deps" % name] + deps,
         module_name = module_name,
     )
 

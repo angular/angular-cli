@@ -52,11 +52,6 @@ ts_project(
         "builders.json",
         "package.json",
     ],
-    interop_deps = [
-        "//packages/angular/ssr",
-        "//packages/angular/ssr/node",
-        "//packages/angular_devkit/architect",
-    ],
     module_name = "@angular/build",
     deps = [
         "//:root_modules/@ampproject/remapping",
@@ -101,6 +96,9 @@ ts_project(
         "//:root_modules/typescript",
         "//:root_modules/vite",
         "//:root_modules/watchpack",
+        "//packages/angular/ssr:ssr_rjs",
+        "//packages/angular/ssr/node:node_rjs",
+        "//packages/angular_devkit/architect:architect_rjs",
     ],
 )
 
