@@ -422,6 +422,7 @@ export async function* serveWithVite(
         componentStyles,
         templateUpdates,
         browserOptions.loader as EsbuildLoaderOption | undefined,
+        browserOptions.define,
         extensions?.middleware,
         transformers?.indexHtml,
         thirdPartySourcemaps,
@@ -653,6 +654,7 @@ export async function setupServer(
   componentStyles: Map<string, ComponentStyleRecord>,
   templateUpdates: Map<string, string>,
   prebundleLoaderExtensions: EsbuildLoaderOption | undefined,
+  define: ApplicationBuilderInternalOptions['define'],
   extensionMiddleware?: Connect.NextHandleFunction[],
   indexHtmlTransformer?: (content: string) => Promise<string>,
   thirdPartySourcemaps = false,
@@ -765,6 +767,7 @@ export async function setupServer(
         target,
         loader: prebundleLoaderExtensions,
         thirdPartySourcemaps,
+        define,
       }),
     },
     plugins: [
@@ -802,6 +805,7 @@ export async function setupServer(
       zoneless,
       loader: prebundleLoaderExtensions,
       thirdPartySourcemaps,
+      define,
     }),
   };
 
