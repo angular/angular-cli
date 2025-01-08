@@ -670,6 +670,17 @@ export async function setupServer(
     join(serverOptions.workspaceRoot, `.angular/vite-root`, serverOptions.buildTarget.project),
   );
 
+  // Files used for SSR warmup.
+  let ssrFiles: string[] | undefined;
+  switch (ssrMode) {
+    case ServerSsrMode.InternalSsrMiddleware:
+      ssrFiles = ['./main.server.mjs'];
+      break;
+    case ServerSsrMode.ExternalSsrMiddleware:
+      ssrFiles = ['./main.server.mjs', './server.mjs'];
+      break;
+  }
+
   const cacheDir = join(serverOptions.cacheOptions.path, serverOptions.buildTarget.project, 'vite');
   const configuration: InlineConfig = {
     configFile: false,
@@ -701,7 +712,7 @@ export async function setupServer(
     },
     server: {
       warmup: {
-        ssrFiles: ['./main.server.mjs', './server.mjs'],
+        ssrFiles,
       },
       port: serverOptions.port,
       strictPort: true,
