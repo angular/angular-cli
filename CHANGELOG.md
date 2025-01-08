@@ -1,3 +1,34 @@
+<a name="19.0.7"></a>
+
+# 19.0.7 (2025-01-08)
+
+### @angular-devkit/architect
+
+| Commit                                                                                              | Type | Description                                      |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------ |
+| [95c22aeff](https://github.com/angular/angular-cli/commit/95c22aeff4560a199416a20c3622301c5c690119) | fix  | provide better error when builder is not defined |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                       |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------- |
+| [028652992](https://github.com/angular/angular-cli/commit/028652992f0f9cc6fec5de35be7ecf74ec3947c5) | fix  | preserve css type for jasmine.css |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                                             |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------------- |
+| [f7522342a](https://github.com/angular/angular-cli/commit/f7522342a8dd99543422629db6dcf1228c5d7279) | fix  | add asset tracking to application builder watch files                   |
+| [e973643bf](https://github.com/angular/angular-cli/commit/e973643bfbe47447ca522ca59b07a94fe6c03e0b) | fix  | do not mark Babel \_defineProperty helper function as pure              |
+| [881095eec](https://github.com/angular/angular-cli/commit/881095eec5cdc80fe79de8fdbe05ba985bf8210a) | fix  | enable serving files with bundle-like names                             |
+| [db10af0b3](https://github.com/angular/angular-cli/commit/db10af0b3a775619ac71acdd0258cc58e96e948c) | fix  | fix incorrect budget calculation                                        |
+| [c822f8f15](https://github.com/angular/angular-cli/commit/c822f8f154b75a8b8e48e32953bee7ec2763fd13) | fix  | handle relative URLs when constructing new URLs during server fetch     |
+| [b43c648b0](https://github.com/angular/angular-cli/commit/b43c648b02c181c1d98cd3293d89ad8b131a3f51) | fix  | mitigate JS transformer worker execArgv errors                          |
+| [1f2481a4f](https://github.com/angular/angular-cli/commit/1f2481a4f5155368aa571fc6679e3ef8af0ce56f) | fix  | pass `define` option defined in application builder to Vite prebundling |
+| [c94f568a4](https://github.com/angular/angular-cli/commit/c94f568a412384bb8e4b66928f41b60220c8b7f4) | fix  | warn when `@angular/localize/init` is imported directly                 |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="19.1.0-next.2"></a>
 
 # 19.1.0-next.2 (2024-12-18)
