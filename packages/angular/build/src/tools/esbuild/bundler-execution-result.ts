@@ -27,7 +27,8 @@ export interface RebuildState {
   componentStyleBundler: ComponentStylesheetBundler;
   codeBundleCache?: SourceFileCache;
   fileChanges: ChangedFiles;
-  previousOutputInfo: Map<string, { hash: string; type: BuildOutputFileType }>;
+  previousOutputInfo: ReadonlyMap<string, { hash: string; type: BuildOutputFileType }>;
+  previousAssetsInfo: ReadonlyMap<string, string>;
   templateUpdates?: Map<string, string>;
 }
 
@@ -172,12 +173,15 @@ export class ExecutionResult {
       previousOutputInfo: new Map(
         this.outputFiles.map(({ path, hash, type }) => [path, { hash, type }]),
       ),
+      previousAssetsInfo: new Map(
+        this.assetFiles.map(({ source, destination }) => [source, destination]),
+      ),
       templateUpdates: this.templateUpdates,
     };
   }
 
   findChangedFiles(
-    previousOutputHashes: Map<string, { hash: string; type: BuildOutputFileType }>,
+    previousOutputHashes: ReadonlyMap<string, { hash: string; type: BuildOutputFileType }>,
   ): Set<string> {
     const changed = new Set<string>();
     for (const file of this.outputFiles) {
