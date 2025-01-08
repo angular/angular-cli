@@ -45,13 +45,12 @@ def _ts_project_module_impl(ctx):
     # Filter runfiles to not `node_modules` from Aspect as this interop
     # target is supposed to be used downstream by `rules_nodejs` consumers,
     # and mixing pnpm-style node modules with linker node modules is incompatible.
-    filtered = []
+    filtered_runfiles = []
     for f in runfiles.files.to_list():
         if f.short_path.startswith("node_modules/"):
             continue
-        filtered.append(f)
-
-    runfiles = ctx.runfiles(files = filtered)
+        filtered_runfiles.append(f)
+    runfiles = ctx.runfiles(files = filtered_runfiles)
 
     providers = [
         DefaultInfo(
@@ -62,8 +61,8 @@ def _ts_project_module_impl(ctx):
             sources = depset(transitive = [info.transitive_sources]),
         ),
         DeclarationInfo(
-            declarations = info.types,
-            transitive_declarations = info.transitive_types,
+            declarations = _filter_types_depset(info.types),
+            transitive_declarations = _filter_types_depset(info.transitive_types),
             type_blocklisted_declarations = depset(),
         ),
     ]
@@ -135,3 +134,17 @@ def ts_project(name, module_name = None, interop_deps = [], deps = [], testonly 
         deps = [] + interop_deps + deps,
         module_name = module_name,
     )
+
+# Filter type provider to not include `.json` files. `ts_config`
+# targets are included in `ts_project` and their tsconfig json file
+# is included as type. See:
+# https://github.com/aspect-build/rules_ts/blob/main/ts/private/ts_config.bzl#L55C63-L55C68.
+def _filter_types_depset(types_depset):
+    types = []
+
+    for t in types_depset.to_list():
+        if t.short_path.endswith(".json"):
+            continue
+        types.append(t)
+
+    return depset(types)
