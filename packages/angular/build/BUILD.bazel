@@ -227,7 +227,7 @@ pkg_npm(
         ":README.md",
         ":build",
         ":license",
-        ":private",
+        "//packages/angular/build/private",
     ],
 )
 
