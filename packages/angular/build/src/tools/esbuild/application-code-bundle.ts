@@ -20,6 +20,7 @@ import {
 import { createCompilerPlugin } from './angular/compiler-plugin';
 import { ComponentStylesheetBundler } from './angular/component-stylesheets';
 import { SourceFileCache } from './angular/source-file-cache';
+import { createAngularLocalizeInitWarningPlugin } from './angular-localize-init-warning-plugin';
 import { BundlerOptionsFactory } from './bundler-context';
 import { createCompilerPluginOptions } from './compiler-plugin-options';
 import { createExternalPackagesPlugin } from './external-packages-plugin';
@@ -68,6 +69,7 @@ export function createBrowserCodeBundleOptions(
         createLoaderImportAttributePlugin(),
         createWasmPlugin({ allowAsync: zoneless, cache: loadCache }),
         createSourcemapIgnorelistPlugin(),
+        createAngularLocalizeInitWarningPlugin(),
         createCompilerPlugin(
           // JS/TS options
           pluginOptions,
@@ -288,6 +290,7 @@ export function createServerMainCodeBundleOptions(
       plugins: [
         createWasmPlugin({ allowAsync: zoneless, cache: loadResultCache }),
         createSourcemapIgnorelistPlugin(),
+        createAngularLocalizeInitWarningPlugin(),
         createCompilerPlugin(
           // JS/TS options
           { ...pluginOptions, noopTypeScriptCompilation: true },
@@ -427,6 +430,7 @@ export function createSsrEntryCodeBundleOptions(
       supported: getFeatureSupport(target, true),
       plugins: [
         createSourcemapIgnorelistPlugin(),
+        createAngularLocalizeInitWarningPlugin(),
         createCompilerPlugin(
           // JS/TS options
           { ...pluginOptions, noopTypeScriptCompilation: true },
