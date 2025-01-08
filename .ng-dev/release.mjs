@@ -31,6 +31,8 @@ export const release = {
       '@angular-devkit/schematics-cli',
     ],
   },
+  // TODO: Remove after `rules_js` migration.
+  rulesJsInteropMode: true,
   publishRegistry: 'https://wombat-dressing-room.appspot.com',
   releasePrLabels: ['action: merge'],
 };
