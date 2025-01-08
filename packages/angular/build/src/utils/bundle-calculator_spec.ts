@@ -6,9 +6,13 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { BudgetEntry, BudgetType, ThresholdSeverity, checkBudgets } from './bundle-calculator';
-
-const kB = 1000;
+import {
+  BYTES_IN_KILOBYTE,
+  BudgetEntry,
+  BudgetType,
+  ThresholdSeverity,
+  checkBudgets,
+} from './bundle-calculator';
 
 describe('bundle-calculator', () => {
   describe('checkBudgets()', () => {
@@ -24,11 +28,11 @@ describe('bundle-calculator', () => {
         assets: [
           {
             name: 'foo.js',
-            size: 1.5 * kB,
+            size: 1.5 * BYTES_IN_KILOBYTE,
           },
           {
             name: 'bar.js',
-            size: 0.5 * kB,
+            size: 0.5 * BYTES_IN_KILOBYTE,
           },
         ],
       };
@@ -55,11 +59,11 @@ describe('bundle-calculator', () => {
         assets: [
           {
             name: 'foo.js',
-            size: 1.5 * kB,
+            size: 1.5 * BYTES_IN_KILOBYTE,
           },
           {
             name: 'bar.js',
-            size: 0.5 * kB,
+            size: 0.5 * BYTES_IN_KILOBYTE,
           },
         ],
       };
@@ -93,11 +97,11 @@ describe('bundle-calculator', () => {
         assets: [
           {
             name: 'foo.js',
-            size: 0.75 * kB,
+            size: 0.75 * BYTES_IN_KILOBYTE,
           },
           {
             name: 'bar.js',
-            size: 0.75 * kB,
+            size: 0.75 * BYTES_IN_KILOBYTE,
           },
         ],
       };
@@ -131,11 +135,11 @@ describe('bundle-calculator', () => {
         assets: [
           {
             name: 'foo.js',
-            size: 0.5 * kB,
+            size: 0.5 * BYTES_IN_KILOBYTE,
           },
           {
             name: 'bar.js',
-            size: 0.75 * kB,
+            size: 0.75 * BYTES_IN_KILOBYTE,
           },
         ],
       };
@@ -169,15 +173,15 @@ describe('bundle-calculator', () => {
         assets: [
           {
             name: 'foo.js',
-            size: 0.75 * kB,
+            size: 0.75 * BYTES_IN_KILOBYTE,
           },
           {
             name: 'bar.js',
-            size: 0.75 * kB,
+            size: 0.75 * BYTES_IN_KILOBYTE,
           },
           {
             name: 'baz.css',
-            size: 1.5 * kB,
+            size: 1.5 * BYTES_IN_KILOBYTE,
           },
         ],
       };
@@ -211,11 +215,11 @@ describe('bundle-calculator', () => {
         assets: [
           {
             name: 'foo.js',
-            size: 0.75 * kB,
+            size: 0.75 * BYTES_IN_KILOBYTE,
           },
           {
             name: 'bar.css',
-            size: 0.75 * kB,
+            size: 0.75 * BYTES_IN_KILOBYTE,
           },
         ],
       };
@@ -249,11 +253,11 @@ describe('bundle-calculator', () => {
         assets: [
           {
             name: 'foo.css',
-            size: 1.5 * kB,
+            size: 1.5 * BYTES_IN_KILOBYTE,
           },
           {
             name: 'bar.js',
-            size: 0.5 * kB,
+            size: 0.5 * BYTES_IN_KILOBYTE,
           },
         ],
       };
@@ -282,11 +286,11 @@ describe('bundle-calculator', () => {
         assets: [
           {
             name: 'foo.js',
-            size: 1.5 * kB,
+            size: 1.5 * BYTES_IN_KILOBYTE,
           },
           {
             name: 'bar.js',
-            size: 0.5 * kB,
+            size: 0.5 * BYTES_IN_KILOBYTE,
           },
         ],
       };
@@ -320,11 +324,11 @@ describe('bundle-calculator', () => {
         assets: [
           {
             name: 'foo.ext',
-            size: 1.5 * kB,
+            size: 1.5 * BYTES_IN_KILOBYTE,
           },
           {
             name: 'bar.ext',
-            size: 0.5 * kB,
+            size: 0.5 * BYTES_IN_KILOBYTE,
           },
         ],
       };
@@ -337,6 +341,39 @@ describe('bundle-calculator', () => {
         label: 'foo.ext',
         message: jasmine.stringMatching('foo.ext exceeded maximum budget.'),
       });
+    });
+
+    it('does not exceed the individual file budget limit', () => {
+      const budgets: BudgetEntry[] = [
+        {
+          type: BudgetType.Bundle,
+          maximumError: '1000kb',
+        },
+      ];
+      const stats = {
+        chunks: [
+          {
+            id: 0,
+            initial: true,
+            names: ['main'],
+            files: ['main.ext', 'bar.ext'],
+          },
+        ],
+        assets: [
+          {
+            name: 'main.ext',
+            size: 1 * BYTES_IN_KILOBYTE,
+          },
+          {
+            name: 'bar.ext',
+            size: 0.5 * BYTES_IN_KILOBYTE,
+          },
+        ],
+      };
+
+      const failures = Array.from(checkBudgets(budgets, stats));
+
+      expect(failures).toHaveSize(0);
     });
   });
 });
