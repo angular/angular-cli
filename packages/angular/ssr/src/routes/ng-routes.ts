@@ -144,8 +144,24 @@ async function* traverseRoutesConfig(options: {
 
   for (const route of routes) {
     try {
-      const { path = '', redirectTo, loadChildren, loadComponent, children, ɵentryName } = route;
+      const {
+        path = '',
+        matcher,
+        redirectTo,
+        loadChildren,
+        loadComponent,
+        children,
+        ɵentryName,
+      } = route;
       const currentRoutePath = joinUrlParts(parentRoute, path);
+
+      if (matcher) {
+        yield {
+          error: `The route '${stripLeadingSlash(currentRoutePath)}' uses a route matcher which is not supported.`,
+        };
+
+        continue;
+      }
 
       // Get route metadata from the server config route tree, if available
       let matchedMetaData: ServerConfigRouteTreeNodeMetadata | undefined;
