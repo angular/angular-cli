@@ -61,5 +61,50 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
       expect(buildCount).toBe(2);
     });
+
+    it('remove deleted asset from output', async () => {
+      await Promise.all([
+        harness.writeFile('public/asset-two.txt', 'bar'),
+        harness.writeFile('public/asset-one.txt', 'foo'),
+      ]);
+
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+        assets: [
+          {
+            glob: '**/*',
+            input: 'public',
+          },
+        ],
+        watch: true,
+      });
+
+      const buildCount = await harness
+        .execute({ outputLogsOnFailure: false })
+        .pipe(
+          timeout(BUILD_TIMEOUT),
+          concatMap(async ({ result }, index) => {
+            switch (index) {
+              case 0:
+                expect(result?.success).toBeTrue();
+                harness.expectFile('dist/browser/asset-one.txt').toExist();
+                harness.expectFile('dist/browser/asset-two.txt').toExist();
+
+                await harness.removeFile('public/asset-two.txt');
+                break;
+              case 1:
+                expect(result?.success).toBeTrue();
+                harness.expectFile('dist/browser/asset-one.txt').toExist();
+                harness.expectFile('dist/browser/asset-two.txt').toNotExist();
+                break;
+            }
+          }),
+          take(2),
+          count(),
+        )
+        .toPromise();
+
+      expect(buildCount).toBe(2);
+    });
   });
 });
