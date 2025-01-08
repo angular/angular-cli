@@ -171,8 +171,8 @@ build --enable_runfiles
 ####################################################
 
 # TODO(josephperrott): investigate if this can be removed eventually.
-# Prevents the npm package extract from occuring on RBE which overwhelms our quota
-build --modify_execution_info=NpmPackageExtract=+no-remote-exec
+# Prevents the npm package extract from occuring or caching on RBE which overwhelms our quota
+build --modify_execution_info=NpmPackageExtract=+no-remote
 
 ####################################################
 # User bazel configuration
