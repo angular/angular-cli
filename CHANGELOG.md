@@ -1,3 +1,51 @@
+<a name="19.1.0-rc.0"></a>
+
+# 19.1.0-rc.0 (2025-01-08)
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                                     |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------------- |
+| [02825eec5](https://github.com/angular/angular-cli/commit/02825eec53456384ba5b9c19f25dde3cfc95d796) | feat | use `@angular/build` package in library generation schematic    |
+| [88431b756](https://github.com/angular/angular-cli/commit/88431b7564d6757898744597a67fcdc178413128) | fix  | application migration should migrate ng-packagr builder package |
+
+### @angular-devkit/architect
+
+| Commit                                                                                              | Type | Description                                      |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------ |
+| [aa6bf07f3](https://github.com/angular/angular-cli/commit/aa6bf07f35fd0eab9e319ddedadafa06d027da47) | fix  | provide better error when builder is not defined |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                       |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------- |
+| [916979c8a](https://github.com/angular/angular-cli/commit/916979c8a74a90788cf8c2379e08e05d48eb777e) | fix  | preserve css type for jasmine.css |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                                             |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------------- |
+| [2c9d7368f](https://github.com/angular/angular-cli/commit/2c9d7368fc30f3488152e35ac468db5f2a9432f2) | feat | add ng-packagr builder to the package                                   |
+| [2f921219f](https://github.com/angular/angular-cli/commit/2f921219f99c846e04d699ba099928e5fbbd8629) | fix  | add asset tracking to application builder watch files                   |
+| [a5618693a](https://github.com/angular/angular-cli/commit/a5618693a12daf28fdfc1f791dd36889eeff6095) | fix  | do not mark Babel \_defineProperty helper function as pure              |
+| [ef3dc2ed0](https://github.com/angular/angular-cli/commit/ef3dc2ed02cd997ccb0cb7ab6ff563eec31c5d9e) | fix  | enable serving files with bundle-like names                             |
+| [e76800ce5](https://github.com/angular/angular-cli/commit/e76800ce54abf388fd8762fc7a298729fb58650f) | fix  | fix incorrect budget calculation                                        |
+| [a0b4ea23c](https://github.com/angular/angular-cli/commit/a0b4ea23c45ce048fcd9c8fa9d7ef74107a5d07d) | fix  | handle relative URLs when constructing new URLs during server fetch     |
+| [5cc62d4a3](https://github.com/angular/angular-cli/commit/5cc62d4a30d8353fc56aaa6dfb9c58e51cd092f5) | fix  | mitigate JS transformer worker execArgv errors                          |
+| [8639a3b6d](https://github.com/angular/angular-cli/commit/8639a3b6d981ddef84c0f4d70b6a941fc866b82b) | fix  | pass `define` option defined in application builder to Vite prebundling |
+| [48cae815c](https://github.com/angular/angular-cli/commit/48cae815cfd0124217c1b5bc8c92dfdb0b150101) | fix  | skip vite SSR warmup file configuration when SSR is disabled            |
+| [ba16ad6b5](https://github.com/angular/angular-cli/commit/ba16ad6b56e9a1ae0f380141bc1e1253a75fcf6b) | fix  | support incremental build file results in watch mode                    |
+| [bfe9ee36c](https://github.com/angular/angular-cli/commit/bfe9ee36cc4666deca60add57e793242d671b735) | fix  | warn when `@angular/localize/init` is imported directly                 |
+
+### @angular/ssr
+
+| Commit                                                                                              | Type | Description                                                  |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------ |
+| [3feecddbb](https://github.com/angular/angular-cli/commit/3feecddbba0d0559da10a45ad4040faf8e9d5198) | fix  | disable component boostrapping when running route extraction |
+| [6edb90883](https://github.com/angular/angular-cli/commit/6edb90883733040d77647cf24dea7f53b1b6ceaa) | fix  | throw error when using route matchers                        |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="19.0.7"></a>
 
 # 19.0.7 (2025-01-08)
