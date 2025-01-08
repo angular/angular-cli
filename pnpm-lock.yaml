@@ -50,8 +50,8 @@ importers:
         specifier: 19.0.0-rc.3
         version: 19.0.0-rc.3(@angular/animations@19.0.0)(@angular/cdk@19.0.0-rc.3)(@angular/common@19.0.0)(@angular/core@19.0.0)(@angular/forms@19.0.0)(@angular/platform-browser@19.0.0)(rxjs@7.8.1)
       '@angular/ng-dev':
-        specifier: https://github.com/angular/dev-infra-private-ng-dev-builds.git#579163373d32ec04ef9dab6c21e34bfc6d40b127
-        version: github.com/angular/dev-infra-private-ng-dev-builds/579163373d32ec04ef9dab6c21e34bfc6d40b127
+        specifier: https://github.com/angular/dev-infra-private-ng-dev-builds.git#34c97ca953ce02abc95287e350351802ba74b492
+        version: github.com/angular/dev-infra-private-ng-dev-builds/34c97ca953ce02abc95287e350351802ba74b492
       '@angular/platform-browser':
         specifier: 19.0.0
         version: 19.0.0(@angular/animations@19.0.0)(@angular/common@19.0.0)(@angular/core@19.0.0)
@@ -261,7 +261,7 @@ importers:
         version: 7.1.2(webpack@5.96.1)
       debug:
         specifier: ^4.1.1
-        version: 4.3.7(supports-color@9.4.0)
+        version: 4.3.7(supports-color@10.0.0)
       esbuild:
         specifier: 0.24.0
         version: 0.24.0
@@ -294,7 +294,7 @@ importers:
         version: 3.0.3
       https-proxy-agent:
         specifier: 7.0.5
-        version: 7.0.5(supports-color@9.4.0)
+        version: 7.0.5(supports-color@10.0.0)
       husky:
         specifier: 9.1.6
         version: 9.1.6
@@ -625,7 +625,7 @@ packages:
       browserslist: 4.24.2
       esbuild: 0.24.0
       fast-glob: 3.3.2
-      https-proxy-agent: 7.0.5(supports-color@9.4.0)
+      https-proxy-agent: 7.0.5(supports-color@10.0.0)
       istanbul-lib-instrument: 6.0.3
       less: 4.2.0
       listr2: 8.2.5
@@ -905,7 +905,7 @@ packages:
       '@babel/traverse': 7.25.9
       '@babel/types': 7.26.0
       convert-source-map: 2.0.0
-      debug: 4.3.7(supports-color@9.4.0)
+      debug: 4.3.7(supports-color@10.0.0)
       gensync: 1.0.0-beta.2
       json5: 2.2.3
       semver: 6.3.1
@@ -990,7 +990,7 @@ packages:
       '@babel/core': 7.26.0
       '@babel/helper-compilation-targets': 7.25.9
       '@babel/helper-plugin-utils': 7.25.9
-      debug: 4.3.7(supports-color@9.4.0)
+      debug: 4.3.7(supports-color@10.0.0)
       lodash.debounce: 4.0.8
       resolve: 1.22.8
     transitivePeerDependencies:
@@ -1978,7 +1978,7 @@ packages:
       '@babel/parser': 7.26.2
       '@babel/template': 7.25.9
       '@babel/types': 7.26.0
-      debug: 4.3.7(supports-color@9.4.0)
+      debug: 4.3.7(supports-color@10.0.0)
       globals: 11.12.0
     transitivePeerDependencies:
       - supports-color
@@ -2087,6 +2087,7 @@ packages:
 
   /@bazel/typescript@5.8.1(typescript@5.6.3):
     resolution: {integrity: sha512-NAJ8WQHZL1WE1YmRoCrq/1hhG15Mvy/viWh6TkvFnBeEhNUiQUsA5GYyhU1ztnBIYW03nATO3vwhAEfO7Q0U5g==}
+    deprecated: No longer maintained, https://github.com/aspect-build/rules_ts is the recommended replacement
     hasBin: true
     peerDependencies:
       typescript: 5.6.3
@@ -2545,7 +2546,7 @@ packages:
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
     dependencies:
       ajv: 6.12.6
-      debug: 4.3.7(supports-color@9.4.0)
+      debug: 4.3.7(supports-color@10.0.0)
       espree: 9.6.1
       globals: 13.24.0
       ignore: 5.3.2
@@ -2566,7 +2567,7 @@ packages:
     resolution: {integrity: sha512-gXi0awOZLHk3TbW55GZLCPP6O+y/b5X1pBXKBVckFONSwF1z1E5ND2BGJsghQFah+pW7pkkyFb2VhUQI2qhL5w==}
     dev: true
 
-  /@google-cloud/common@5.0.2(supports-color@9.4.0):
+  /@google-cloud/common@5.0.2(supports-color@10.0.0):
     resolution: {integrity: sha512-V7bmBKYQyu0eVG2BFejuUjlBt+zrya6vtsKdY+JxMM/dNntPF41vZ9+LhOshEUH01zOHEqBSvI7Dad7ZS6aUeA==}
     engines: {node: '>=14.0.0'}
     dependencies:
@@ -2575,10 +2576,10 @@ packages:
       arrify: 2.0.1
       duplexify: 4.1.3
       extend: 3.0.2
-      google-auth-library: 9.15.0(supports-color@9.4.0)
+      google-auth-library: 9.15.0(supports-color@10.0.0)
       html-entities: 2.5.2
-      retry-request: 7.0.2(supports-color@9.4.0)
-      teeny-request: 9.0.0(supports-color@9.4.0)
+      retry-request: 7.0.2(supports-color@10.0.0)
+      teeny-request: 9.0.0(supports-color@10.0.0)
     transitivePeerDependencies:
       - encoding
       - supports-color
@@ -2599,17 +2600,18 @@ packages:
     engines: {node: '>=14'}
     dev: true
 
-  /@google-cloud/spanner@7.16.0(supports-color@9.4.0):
-    resolution: {integrity: sha512-9/rQau/WNgM1Zle9sEJm6jUp1l4sbHtiHGcktQnQc2LPs5EjMMg9eYaP4UfWgDzoxny+3hyKTyhBbAzHR8pQGA==}
+  /@google-cloud/spanner@7.17.1(supports-color@10.0.0):
+    resolution: {integrity: sha512-+dTR6wvb2jANVxNe2bF048QCOVRGbesHe8Tm0OFRhvCgv3ot31JFGPyRKukD7y3jAFSBqyX0bIUV9GVNk4oRPQ==}
     engines: {node: '>=14.0.0'}
     dependencies:
-      '@google-cloud/common': 5.0.2(supports-color@9.4.0)
+      '@google-cloud/common': 5.0.2(supports-color@10.0.0)
       '@google-cloud/precise-date': 4.0.0
       '@google-cloud/projectify': 4.0.0
       '@google-cloud/promisify': 4.0.0
       '@grpc/proto-loader': 0.7.13
       '@opentelemetry/api': 1.9.0
       '@opentelemetry/context-async-hooks': 1.28.0(@opentelemetry/api@1.9.0)
+      '@opentelemetry/core': 1.30.0(@opentelemetry/api@1.9.0)
       '@opentelemetry/semantic-conventions': 1.28.0
       '@types/big.js': 6.2.2
       '@types/stack-trace': 0.0.33
@@ -2619,19 +2621,19 @@ packages:
       duplexify: 4.1.3
       events-intercept: 2.0.0
       extend: 3.0.2
-      google-auth-library: 9.15.0(supports-color@9.4.0)
-      google-gax: 4.4.1(supports-color@9.4.0)
+      google-auth-library: 9.15.0(supports-color@10.0.0)
+      google-gax: 4.4.1(supports-color@10.0.0)
       grpc-gcp: 1.0.1
       is: 3.3.0
       lodash.snakecase: 4.1.1
       merge-stream: 2.0.0
       p-queue: 6.6.2
       protobufjs: 7.4.0
-      retry-request: 7.0.2(supports-color@9.4.0)
+      retry-request: 7.0.2(supports-color@10.0.0)
       split-array-stream: 2.0.0
       stack-trace: 0.0.10
       stream-events: 1.0.5
-      teeny-request: 9.0.0(supports-color@9.4.0)
+      teeny-request: 9.0.0(supports-color@10.0.0)
       through2: 4.0.2
     transitivePeerDependencies:
       - encoding
@@ -2667,7 +2669,7 @@ packages:
     deprecated: Use @eslint/config-array instead
     dependencies:
       '@humanwhocodes/object-schema': 2.0.3
-      debug: 4.3.7(supports-color@9.4.0)
+      debug: 4.3.7(supports-color@10.0.0)
       minimatch: 3.1.2
     transitivePeerDependencies:
       - supports-color
@@ -3314,9 +3316,9 @@ packages:
     resolution: {integrity: sha512-OrcNPXdpSl9UX7qPVRWbmWMCSXrcDa2M9DvrbOTj7ao1S4PlqVFYv9/yLKMkrJKZ/V5A/kDBC690or307i26Og==}
     engines: {node: ^16.14.0 || >=18.0.0}
     dependencies:
-      agent-base: 7.1.1(supports-color@9.4.0)
+      agent-base: 7.1.1(supports-color@10.0.0)
       http-proxy-agent: 7.0.2
-      https-proxy-agent: 7.0.5(supports-color@9.4.0)
+      https-proxy-agent: 7.0.5(supports-color@10.0.0)
       lru-cache: 10.4.3
       socks-proxy-agent: 8.0.4
     transitivePeerDependencies:
@@ -3327,9 +3329,9 @@ packages:
     resolution: {integrity: sha512-S79NdEgDQd/NGCay6TCoVzXSj74skRZIKJcpJjC5lOq34SZzyI6MqtiiWoiVWoVrTcGjNeC4ipbh1VIHlpfF5Q==}
     engines: {node: ^18.17.0 || >=20.5.0}
     dependencies:
-      agent-base: 7.1.1(supports-color@9.4.0)
+      agent-base: 7.1.1(supports-color@10.0.0)
       http-proxy-agent: 7.0.2
-      https-proxy-agent: 7.0.5(supports-color@9.4.0)
+      https-proxy-agent: 7.0.5(supports-color@10.0.0)
       lru-cache: 10.4.3
       socks-proxy-agent: 8.0.4
     transitivePeerDependencies:
@@ -3538,6 +3540,16 @@ packages:
       '@opentelemetry/api': 1.9.0
     dev: true
 
+  /@opentelemetry/core@1.30.0(@opentelemetry/api@1.9.0):
+    resolution: {integrity: sha512-Q/3u/K73KUjTCnFUP97ZY+pBjQ1kPEgjOfXj/bJl8zW7GbXdkw6cwuyZk6ZTXkVgCBsYRYUzx4fvYK1jxdb9MA==}
+    engines: {node: '>=14'}
+    peerDependencies:
+      '@opentelemetry/api': '>=1.0.0 <1.10.0'
+    dependencies:
+      '@opentelemetry/api': 1.9.0
+      '@opentelemetry/semantic-conventions': 1.28.0
+    dev: true
+
   /@opentelemetry/semantic-conventions@1.28.0:
     resolution: {integrity: sha512-lp4qAiMTD4sNWW4DbKLBkfiMZ4jbAboJIGOQr5DvciMRI494OapieI9qiODpOt0XBr1LjIDy1xAGAnVs5supTA==}
     engines: {node: '>=14'}
@@ -3726,7 +3738,7 @@ packages:
     engines: {node: '>=18'}
     hasBin: true
     dependencies:
-      debug: 4.3.7(supports-color@9.4.0)
+      debug: 4.3.7(supports-color@10.0.0)
       extract-zip: 2.0.1
       progress: 2.0.3
       proxy-agent: 6.4.0
@@ -4814,7 +4826,7 @@ packages:
       '@typescript-eslint/types': 8.14.0
       '@typescript-eslint/typescript-estree': 8.14.0(typescript@5.6.3)
       '@typescript-eslint/visitor-keys': 8.14.0
-      debug: 4.3.7(supports-color@9.4.0)
+      debug: 4.3.7(supports-color@10.0.0)
       eslint: 8.57.0
       typescript: 5.6.3
     transitivePeerDependencies:
@@ -4840,7 +4852,7 @@ packages:
     dependencies:
       '@typescript-eslint/typescript-estree': 8.14.0(typescript@5.6.3)
       '@typescript-eslint/utils': 8.14.0(eslint@8.57.0)(typescript@5.6.3)
-      debug: 4.3.7(supports-color@9.4.0)
+      debug: 4.3.7(supports-color@10.0.0)
       ts-api-utils: 1.4.0(typescript@5.6.3)
       typescript: 5.6.3
     transitivePeerDependencies:
@@ -4864,7 +4876,7 @@ packages:
     dependencies:
       '@typescript-eslint/types': 8.14.0
       '@typescript-eslint/visitor-keys': 8.14.0
-      debug: 4.3.7(supports-color@9.4.0)
+      debug: 4.3.7(supports-color@10.0.0)
       fast-glob: 3.3.2
       is-glob: 4.0.3
       minimatch: 9.0.5
@@ -4913,7 +4925,7 @@ packages:
       '@verdaccio/logger': 8.0.0-next-8.3
       '@verdaccio/signature': 8.0.0-next-8.1
       '@verdaccio/utils': 8.1.0-next-8.3
-      debug: 4.3.7(supports-color@9.4.0)
+      debug: 4.3.7(supports-color@10.0.0)
       lodash: 4.17.21
       verdaccio-htpasswd: 13.0.0-next-8.3
     transitivePeerDependencies:
@@ -4934,7 +4946,7 @@ packages:
     dependencies:
       '@verdaccio/core': 8.0.0-next-8.3
       '@verdaccio/utils': 8.1.0-next-8.3
-      debug: 4.3.7(supports-color@9.4.0)
+      debug: 4.3.7(supports-color@10.0.0)
       js-yaml: 4.1.0
       lodash: 4.17.21
       minimatch: 7.4.6
@@ -4984,7 +4996,7 @@ packages:
     resolution: {integrity: sha512-7bIOdi+U1xSLRu0s1XxQwrV3zzzFaVaTX7JKFgj2tQvMy9AgzlpjbW1CqaH8OTVEqq03Pwvwj5hQlcvyzCwm1A==}
     engines: {node: '>=18'}
     dependencies:
-      debug: 4.3.7(supports-color@9.4.0)
+      debug: 4.3.7(supports-color@10.0.0)
       lodash: 4.17.21
     transitivePeerDependencies:
       - supports-color
@@ -5013,7 +5025,7 @@ packages:
       '@verdaccio/core': 8.0.0-next-8.3
       '@verdaccio/logger-prettify': 8.0.0-next-8.1
       colorette: 2.0.20
-      debug: 4.3.7(supports-color@9.4.0)
+      debug: 4.3.7(supports-color@10.0.0)
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -5047,7 +5059,7 @@ packages:
       '@verdaccio/core': 8.0.0-next-8.3
       '@verdaccio/url': 13.0.0-next-8.3
       '@verdaccio/utils': 8.1.0-next-8.3
-      debug: 4.3.7(supports-color@9.4.0)
+      debug: 4.3.7(supports-color@10.0.0)
       express: 4.21.0
       express-rate-limit: 5.5.1
       lodash: 4.17.21
@@ -5066,7 +5078,7 @@ packages:
     resolution: {integrity: sha512-lHD/Z2FoPQTtDYz6ZlXhj/lrg0SFirHrwCGt/cibl1GlePpx78WPdo03tgAyl0Qf+I35n484/gR1l9eixBQqYw==}
     engines: {node: '>=18'}
     dependencies:
-      debug: 4.3.7(supports-color@9.4.0)
+      debug: 4.3.7(supports-color@10.0.0)
       jsonwebtoken: 9.0.2
     transitivePeerDependencies:
       - supports-color
@@ -5084,7 +5096,7 @@ packages:
       '@verdaccio/core': 8.0.0-next-8.3
       '@verdaccio/url': 13.0.0-next-8.3
       '@verdaccio/utils': 8.1.0-next-8.3
-      debug: 4.3.7(supports-color@9.4.0)
+      debug: 4.3.7(supports-color@10.0.0)
       gunzip-maybe: 1.4.2
       lodash: 4.17.21
       tar-stream: 3.1.7
@@ -5101,7 +5113,7 @@ packages:
     engines: {node: '>=18'}
     dependencies:
       '@verdaccio/core': 8.0.0-next-8.3
-      debug: 4.3.7(supports-color@9.4.0)
+      debug: 4.3.7(supports-color@10.0.0)
       lodash: 4.17.21
       validator: 13.12.0
     transitivePeerDependencies:
@@ -5534,20 +5546,20 @@ packages:
       es6-promisify: 5.0.0
     dev: true
 
-  /agent-base@6.0.2(supports-color@9.4.0):
+  /agent-base@6.0.2(supports-color@10.0.0):
     resolution: {integrity: sha512-RZNwNclF7+MS/8bDg70amg32dyeZGZxiDuQmZxKLAlQjr3jGyLx+4Kkk58UO7D2QdgFIQCovuSuZESne6RG6XQ==}
     engines: {node: '>= 6.0.0'}
     dependencies:
-      debug: 4.3.7(supports-color@9.4.0)
+      debug: 4.3.7(supports-color@10.0.0)
     transitivePeerDependencies:
       - supports-color
     dev: true
 
-  /agent-base@7.1.1(supports-color@9.4.0):
+  /agent-base@7.1.1(supports-color@10.0.0):
     resolution: {integrity: sha512-H0TSyFNDMomMNJQBn8wFV5YC/2eJ+VXECwOadZJT554xP6cODZHPX3H9QMQECxvrgiSOP1pHjy1sMWQVYJOUOA==}
     engines: {node: '>= 14'}
     dependencies:
-      debug: 4.3.7(supports-color@9.4.0)
+      debug: 4.3.7(supports-color@10.0.0)
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -7056,7 +7068,7 @@ packages:
       ms: 2.1.2
     dev: true
 
-  /debug@4.3.7(supports-color@9.4.0):
+  /debug@4.3.7(supports-color@10.0.0):
     resolution: {integrity: sha512-Er2nc/H7RrMXZBFCEim6TCmMk02Z8vLC2Rbi1KEBggpo0fS6l0S1nnapwmIi3yW/+GOJap1Krg4w0Hg80oCqgQ==}
     engines: {node: '>=6.0'}
     peerDependencies:
@@ -7066,7 +7078,7 @@ packages:
         optional: true
     dependencies:
       ms: 2.1.3
-      supports-color: 9.4.0
+      supports-color: 10.0.0
     dev: true
 
   /decamelize@1.2.0:
@@ -7415,7 +7427,7 @@ packages:
     resolution: {integrity: sha512-TAr+NKeoVTjEVW8P3iHguO1LO6RlUz9O5Y8o7EY0fU+gY1NYqas7NN3slpFtbXEsLMHk0h90fJMfKjRkQ0qUIw==}
     dependencies:
       '@socket.io/component-emitter': 3.1.2
-      debug: 4.3.7(supports-color@9.4.0)
+      debug: 4.3.7(supports-color@10.0.0)
       engine.io-parser: 5.2.3
       ws: 8.17.1
       xmlhttprequest-ssl: 2.1.2
@@ -7441,7 +7453,7 @@ packages:
       base64id: 2.0.0
       cookie: 0.7.2
       cors: 2.8.5
-      debug: 4.3.7(supports-color@9.4.0)
+      debug: 4.3.7(supports-color@10.0.0)
       engine.io-parser: 5.2.3
       ws: 8.17.1
     transitivePeerDependencies:
@@ -7851,7 +7863,7 @@ packages:
       ajv: 6.12.6
       chalk: 4.1.2
       cross-spawn: 7.0.5
-      debug: 4.3.7(supports-color@9.4.0)
+      debug: 4.3.7(supports-color@10.0.0)
       doctrine: 3.0.0
       escape-string-regexp: 4.0.0
       eslint-scope: 7.2.2
@@ -8094,7 +8106,7 @@ packages:
     engines: {node: '>= 10.17.0'}
     hasBin: true
     dependencies:
-      debug: 4.3.7(supports-color@9.4.0)
+      debug: 4.3.7(supports-color@10.0.0)
       get-stream: 5.2.0
       yauzl: 2.10.0
     optionalDependencies:
@@ -8331,7 +8343,7 @@ packages:
       debug:
         optional: true
     dependencies:
-      debug: 4.3.7(supports-color@9.4.0)
+      debug: 4.3.7(supports-color@10.0.0)
     dev: true
 
   /for-each@0.3.3:
@@ -8508,12 +8520,12 @@ packages:
       is-windows: 1.0.2
     dev: true
 
-  /gaxios@6.7.1(supports-color@9.4.0):
+  /gaxios@6.7.1(supports-color@10.0.0):
     resolution: {integrity: sha512-LDODD4TMYx7XXdpwxAVRAIAuB0bzv0s+ywFonY46k126qzQHT9ygyoa9tncmOiQmmDrik65UYsEkv3lbfqQ3yQ==}
     engines: {node: '>=14'}
     dependencies:
       extend: 3.0.2
-      https-proxy-agent: 7.0.5(supports-color@9.4.0)
+      https-proxy-agent: 7.0.5(supports-color@10.0.0)
       is-stream: 2.0.1
       node-fetch: 2.7.0
       uuid: 9.0.1
@@ -8522,11 +8534,11 @@ packages:
       - supports-color
     dev: true
 
-  /gcp-metadata@6.1.0(supports-color@9.4.0):
+  /gcp-metadata@6.1.0(supports-color@10.0.0):
     resolution: {integrity: sha512-Jh/AIwwgaxan+7ZUUmRLCjtchyDiqh4KjBJ5tW3plBZb5iL/BPcso8A5DlzeD9qlw0duCamnNdpFjxwaT0KyKg==}
     engines: {node: '>=14'}
     dependencies:
-      gaxios: 6.7.1(supports-color@9.4.0)
+      gaxios: 6.7.1(supports-color@10.0.0)
       json-bigint: 1.0.0
     transitivePeerDependencies:
       - encoding
@@ -8591,7 +8603,7 @@ packages:
     dependencies:
       basic-ftp: 5.0.5
       data-uri-to-buffer: 6.0.2
-      debug: 4.3.7(supports-color@9.4.0)
+      debug: 4.3.7(supports-color@10.0.0)
       fs-extra: 11.2.0
     transitivePeerDependencies:
       - supports-color
@@ -8701,22 +8713,22 @@ packages:
       pinkie-promise: 2.0.1
     dev: true
 
-  /google-auth-library@9.15.0(supports-color@9.4.0):
+  /google-auth-library@9.15.0(supports-color@10.0.0):
     resolution: {integrity: sha512-7ccSEJFDFO7exFbO6NRyC+xH8/mZ1GZGG2xxx9iHxZWcjUjJpjWxIMw3cofAKcueZ6DATiukmmprD7yavQHOyQ==}
     engines: {node: '>=14'}
     dependencies:
       base64-js: 1.5.1
       ecdsa-sig-formatter: 1.0.11
-      gaxios: 6.7.1(supports-color@9.4.0)
-      gcp-metadata: 6.1.0(supports-color@9.4.0)
-      gtoken: 7.1.0(supports-color@9.4.0)
+      gaxios: 6.7.1(supports-color@10.0.0)
+      gcp-metadata: 6.1.0(supports-color@10.0.0)
+      gtoken: 7.1.0(supports-color@10.0.0)
       jws: 4.0.0
     transitivePeerDependencies:
       - encoding
       - supports-color
     dev: true
 
-  /google-gax@4.4.1(supports-color@9.4.0):
+  /google-gax@4.4.1(supports-color@10.0.0):
     resolution: {integrity: sha512-Phyp9fMfA00J3sZbJxbbB4jC55b7DBjE3F6poyL3wKMEBVKA79q6BGuHcTiM28yOzVql0NDbRL8MLLh8Iwk9Dg==}
     engines: {node: '>=14'}
     dependencies:
@@ -8725,12 +8737,12 @@ packages:
       '@types/long': 4.0.2
       abort-controller: 3.0.0
       duplexify: 4.1.3
-      google-auth-library: 9.15.0(supports-color@9.4.0)
+      google-auth-library: 9.15.0(supports-color@10.0.0)
       node-fetch: 2.7.0
       object-hash: 3.0.0
       proto3-json-serializer: 2.0.2
       protobufjs: 7.4.0
-      retry-request: 7.0.2(supports-color@9.4.0)
+      retry-request: 7.0.2(supports-color@10.0.0)
       uuid: 9.0.1
     transitivePeerDependencies:
       - encoding
@@ -8763,11 +8775,11 @@ packages:
       '@grpc/grpc-js': 1.12.2
     dev: true
 
-  /gtoken@7.1.0(supports-color@9.4.0):
+  /gtoken@7.1.0(supports-color@10.0.0):
     resolution: {integrity: sha512-pCcEwRi+TKpMlxAQObHDQ56KawURgyAf6jtIY046fJ5tIv3zDe/LEIubckAO8fj6JnAxLdmWkUfNyulQ2iKdEw==}
     engines: {node: '>=14.0.0'}
     dependencies:
-      gaxios: 6.7.1(supports-color@9.4.0)
+      gaxios: 6.7.1(supports-color@10.0.0)
       jws: 4.0.0
     transitivePeerDependencies:
       - encoding
@@ -8948,13 +8960,13 @@ packages:
     resolution: {integrity: sha512-SGeBX54F94Wgu5RH3X5jsDtf4eHyRogWX1XGT3b4HuW3tQPM4AaBzoUji/4AAJNXCEOWZ5O0DgZmJw1947gD5Q==}
     dev: true
 
-  /http-proxy-agent@5.0.0(supports-color@9.4.0):
+  /http-proxy-agent@5.0.0(supports-color@10.0.0):
     resolution: {integrity: sha512-n2hY8YdoRE1i7r6M0w9DIw5GgZN0G25P8zLCRQ8rjXtTU3vsNFBI/vWK/UIeE6g5MUUz6avwAPXmL6Fy9D/90w==}
     engines: {node: '>= 6'}
     dependencies:
       '@tootallnate/once': 2.0.0
-      agent-base: 6.0.2(supports-color@9.4.0)
-      debug: 4.3.7(supports-color@9.4.0)
+      agent-base: 6.0.2(supports-color@10.0.0)
+      debug: 4.3.7(supports-color@10.0.0)
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -8963,8 +8975,8 @@ packages:
     resolution: {integrity: sha512-T1gkAiYYDWYx3V5Bmyu7HcfcvL7mUrTWiM6yOfa3PIphViJ/gFPbvidQ+veqSOHci/PxBcDabeUNCzpOODJZig==}
     engines: {node: '>= 14'}
     dependencies:
-      agent-base: 7.1.1(supports-color@9.4.0)
-      debug: 4.3.7(supports-color@9.4.0)
+      agent-base: 7.1.1(supports-color@10.0.0)
+      debug: 4.3.7(supports-color@10.0.0)
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -8993,7 +9005,7 @@ packages:
     engines: {node: ^14.15.0 || ^16.10.0 || >=18.0.0}
     dependencies:
       '@types/http-proxy': 1.17.15
-      debug: 4.3.7(supports-color@9.4.0)
+      debug: 4.3.7(supports-color@10.0.0)
       http-proxy: 1.18.1(debug@4.3.7)
       is-glob: 4.0.3
       is-plain-object: 5.0.0
@@ -9049,22 +9061,22 @@ packages:
       - supports-color
     dev: true
 
-  /https-proxy-agent@5.0.1(supports-color@9.4.0):
+  /https-proxy-agent@5.0.1(supports-color@10.0.0):
     resolution: {integrity: sha512-dFcAjpTQFgoLMzC2VwU+C/CbS7uRL0lWmxDITmqm7C+7F0Odmj6s9l6alZc6AELXhrnggM2CeWSXHGOdX2YtwA==}
     engines: {node: '>= 6'}
     dependencies:
-      agent-base: 6.0.2(supports-color@9.4.0)
-      debug: 4.3.7(supports-color@9.4.0)
+      agent-base: 6.0.2(supports-color@10.0.0)
+      debug: 4.3.7(supports-color@10.0.0)
     transitivePeerDependencies:
       - supports-color
     dev: true
 
-  /https-proxy-agent@7.0.5(supports-color@9.4.0):
+  /https-proxy-agent@7.0.5(supports-color@10.0.0):
     resolution: {integrity: sha512-1e4Wqeblerz+tMKPIq2EMGiiWW1dIjZOksyHWSUm1rmuvw/how9hBHZ38lAGj5ID4Ik6EdkOw7NmWPy6LAwalw==}
     engines: {node: '>= 14'}
     dependencies:
-      agent-base: 7.1.1(supports-color@9.4.0)
-      debug: 4.3.7(supports-color@9.4.0)
+      agent-base: 7.1.1(supports-color@10.0.0)
+      debug: 4.3.7(supports-color@10.0.0)
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -9657,7 +9669,7 @@ packages:
     resolution: {integrity: sha512-n3s8EwkdFIJCG3BPKBYvskgXGoy88ARzvegkitk60NxRdwltLOTaH7CUiMRXvwYorl0Q712iEjcWB+fK/MrWVw==}
     engines: {node: '>=10'}
     dependencies:
-      debug: 4.3.7(supports-color@9.4.0)
+      debug: 4.3.7(supports-color@10.0.0)
       istanbul-lib-coverage: 3.2.2
       source-map: 0.6.1
     transitivePeerDependencies:
@@ -10113,7 +10125,7 @@ packages:
     resolution: {integrity: sha512-tmcyQ/wXXuxpDxyNXv5yNNkdAMdFRqwtegBXUaowiQzUKqJehttS0x2j0eOZDQAyloAth5w6wwBImnFzkUz3pQ==}
     engines: {node: '>= 8'}
     dependencies:
-      debug: 4.3.7(supports-color@9.4.0)
+      debug: 4.3.7(supports-color@10.0.0)
       http-errors: 1.8.1
       resolve-path: 1.4.0
     transitivePeerDependencies:
@@ -10139,7 +10151,7 @@ packages:
       content-disposition: 0.5.4
       content-type: 1.0.5
       cookies: 0.9.1
-      debug: 4.3.7(supports-color@9.4.0)
+      debug: 4.3.7(supports-color@10.0.0)
       delegates: 1.0.0
       depd: 2.0.0
       destroy: 1.2.0
@@ -10426,7 +10438,7 @@ packages:
     engines: {node: '>=8.0'}
     dependencies:
       date-format: 4.0.14
-      debug: 4.3.7(supports-color@9.4.0)
+      debug: 4.3.7(supports-color@10.0.0)
       flatted: 3.3.1
       rfdc: 1.4.1
       streamroller: 3.1.5
@@ -11498,11 +11510,11 @@ packages:
     engines: {node: '>= 14'}
     dependencies:
       '@tootallnate/quickjs-emscripten': 0.23.0
-      agent-base: 7.1.1(supports-color@9.4.0)
-      debug: 4.3.7(supports-color@9.4.0)
+      agent-base: 7.1.1(supports-color@10.0.0)
+      debug: 4.3.7(supports-color@10.0.0)
       get-uri: 6.0.3
       http-proxy-agent: 7.0.2
-      https-proxy-agent: 7.0.5(supports-color@9.4.0)
+      https-proxy-agent: 7.0.5(supports-color@10.0.0)
       pac-resolver: 7.0.1
       socks-proxy-agent: 8.0.4
     transitivePeerDependencies:
@@ -11626,7 +11638,7 @@ packages:
       semver: 7.6.3
       slash: 2.0.0
       tmp: 0.0.33
-      yaml: 2.6.1
+      yaml: 2.7.0
     dev: true
 
   /path-exists@4.0.0:
@@ -12066,10 +12078,10 @@ packages:
     resolution: {integrity: sha512-u0piLU+nCOHMgGjRbimiXmA9kM/L9EHh3zL81xCdp7m+Y2pHIsnmbdDoEDoAz5geaonNR6q6+yOPQs6n4T6sBQ==}
     engines: {node: '>= 14'}
     dependencies:
-      agent-base: 7.1.1(supports-color@9.4.0)
-      debug: 4.3.7(supports-color@9.4.0)
+      agent-base: 7.1.1(supports-color@10.0.0)
+      debug: 4.3.7(supports-color@10.0.0)
       http-proxy-agent: 7.0.2
-      https-proxy-agent: 7.0.5(supports-color@9.4.0)
+      https-proxy-agent: 7.0.5(supports-color@10.0.0)
       lru-cache: 7.18.3
       pac-proxy-agent: 7.0.2
       proxy-from-env: 1.1.0
@@ -12132,7 +12144,7 @@ packages:
       debug: 4.3.4
       devtools-protocol: 0.0.1045489
       extract-zip: 2.0.1
-      https-proxy-agent: 5.0.1(supports-color@9.4.0)
+      https-proxy-agent: 5.0.1(supports-color@10.0.0)
       proxy-from-env: 1.1.0
       rimraf: 3.0.2
       tar-fs: 2.1.1
@@ -12151,7 +12163,7 @@ packages:
     dependencies:
       '@puppeteer/browsers': 2.4.1
       chromium-bidi: 0.8.0(devtools-protocol@0.0.1354347)
-      debug: 4.3.7(supports-color@9.4.0)
+      debug: 4.3.7(supports-color@10.0.0)
       devtools-protocol: 0.0.1354347
       typed-query-selector: 2.12.0
       ws: 8.18.0
@@ -12166,7 +12178,7 @@ packages:
     engines: {node: '>=14.1.0'}
     deprecated: < 22.8.2 is no longer supported
     dependencies:
-      https-proxy-agent: 5.0.1(supports-color@9.4.0)
+      https-proxy-agent: 5.0.1(supports-color@10.0.0)
       progress: 2.0.3
       proxy-from-env: 1.1.0
       puppeteer-core: 18.2.1
@@ -12251,7 +12263,7 @@ packages:
       unicode-properties: 1.4.1
       urijs: 1.19.11
       wordwrap: 1.0.0
-      yaml: 2.6.1
+      yaml: 2.7.0
     transitivePeerDependencies:
       - encoding
     dev: true
@@ -12509,13 +12521,13 @@ packages:
       signal-exit: 4.1.0
     dev: true
 
-  /retry-request@7.0.2(supports-color@9.4.0):
+  /retry-request@7.0.2(supports-color@10.0.0):
     resolution: {integrity: sha512-dUOvLMJ0/JJYEn8NrpOaGNE7X3vpI5XlZS/u0ANjqtcZVKnIxP7IgCFwrKTxENw29emmwug53awKtaMm4i9g5w==}
     engines: {node: '>=14'}
     dependencies:
       '@types/request': 2.48.12
       extend: 3.0.2
-      teeny-request: 9.0.0(supports-color@9.4.0)
+      teeny-request: 9.0.0(supports-color@10.0.0)
     transitivePeerDependencies:
       - encoding
       - supports-color
@@ -12852,7 +12864,7 @@ packages:
     resolution: {integrity: sha512-v67WcEouB5GxbTWL/4NeToqcZiAWEq90N888fczVArY8A79J0L4FD7vj5hm3eUMua5EpoQ59wa/oovY6TLvRUA==}
     engines: {node: '>= 18'}
     dependencies:
-      debug: 4.3.7(supports-color@9.4.0)
+      debug: 4.3.7(supports-color@10.0.0)
       destroy: 1.2.0
       encodeurl: 2.0.0
       escape-html: 1.0.3
@@ -13057,7 +13069,7 @@ packages:
   /socket.io-adapter@2.5.5:
     resolution: {integrity: sha512-eLDQas5dzPgOWCk9GuuJC2lBqItuhKI4uxGgo9aIV7MYbk2h9Q6uULEh8WBzThoI7l+qU9Ast9fVUmkqPP9wYg==}
     dependencies:
-      debug: 4.3.7(supports-color@9.4.0)
+      debug: 4.3.7(supports-color@10.0.0)
       ws: 8.17.1
     transitivePeerDependencies:
       - bufferutil
@@ -13070,7 +13082,7 @@ packages:
     engines: {node: '>=10.0.0'}
     dependencies:
       '@socket.io/component-emitter': 3.1.2
-      debug: 4.3.7(supports-color@9.4.0)
+      debug: 4.3.7(supports-color@10.0.0)
       engine.io-client: 6.6.2
       socket.io-parser: 4.2.4
     transitivePeerDependencies:
@@ -13084,7 +13096,7 @@ packages:
     engines: {node: '>=10.0.0'}
     dependencies:
       '@socket.io/component-emitter': 3.1.2
-      debug: 4.3.7(supports-color@9.4.0)
+      debug: 4.3.7(supports-color@10.0.0)
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -13096,7 +13108,7 @@ packages:
       accepts: 1.3.8
       base64id: 2.0.0
       cors: 2.8.5
-      debug: 4.3.7(supports-color@9.4.0)
+      debug: 4.3.7(supports-color@10.0.0)
       engine.io: 6.6.2
       socket.io-adapter: 2.5.5
       socket.io-parser: 4.2.4
@@ -13118,8 +13130,8 @@ packages:
     resolution: {integrity: sha512-GNAq/eg8Udq2x0eNiFkr9gRg5bA7PXEWagQdeRX4cPSG+X/8V38v637gim9bjFptMk1QWsCTr0ttrJEiXbNnRw==}
     engines: {node: '>= 14'}
     dependencies:
-      agent-base: 7.1.1(supports-color@9.4.0)
-      debug: 4.3.7(supports-color@9.4.0)
+      agent-base: 7.1.1(supports-color@10.0.0)
+      debug: 4.3.7(supports-color@10.0.0)
       socks: 2.8.3
     transitivePeerDependencies:
       - supports-color
@@ -13235,7 +13247,7 @@ packages:
   /spdy-transport@3.0.0:
     resolution: {integrity: sha512-hsLVFE5SjA6TCisWeJXFKniGGOpBgMLmerfO2aCyCU5s7nJ/rpAepqmFifv/GCbSbueEeAJJnmSQ2rKC/g8Fcw==}
     dependencies:
-      debug: 4.3.7(supports-color@9.4.0)
+      debug: 4.3.7(supports-color@10.0.0)
       detect-node: 2.1.0
       hpack.js: 2.1.6
       obuf: 1.1.2
@@ -13249,7 +13261,7 @@ packages:
     resolution: {integrity: sha512-r46gZQZQV+Kl9oItvl1JZZqJKGr+oEkB08A6BzkiR7593/7IbtuncXHd2YoYeTsG4157ZssMu9KYvUHLcjcDoA==}
     engines: {node: '>=6.0.0'}
     dependencies:
-      debug: 4.3.7(supports-color@9.4.0)
+      debug: 4.3.7(supports-color@10.0.0)
       handle-thing: 2.0.1
       http-deceiver: 1.2.7
       select-hose: 2.0.0
@@ -13363,7 +13375,7 @@ packages:
     engines: {node: '>=8.0'}
     dependencies:
       date-format: 4.0.14
-      debug: 4.3.7(supports-color@9.4.0)
+      debug: 4.3.7(supports-color@10.0.0)
       fs-extra: 8.1.0
     transitivePeerDependencies:
       - supports-color
@@ -13490,6 +13502,11 @@ packages:
     resolution: {integrity: sha512-PdHt7hHUJKxvTCgbKX9C1V/ftOcjJQgz8BZwNfV5c4B6dcGqlpelTbJ999jBGZ2jYiPAwcX5dP6oBwVlBlUbxw==}
     dev: true
 
+  /supports-color@10.0.0:
+    resolution: {integrity: sha512-HRVVSbCCMbj7/kdWF9Q+bbckjBHLtHMEoJWlkmYzzdwhYMkjkOwubLM6t7NbWKjgKamGDrWL1++KrjUO1t9oAQ==}
+    engines: {node: '>=18'}
+    dev: true
+
   /supports-color@2.0.0:
     resolution: {integrity: sha512-KKNVtd6pCYgPIKU4cp2733HWYCpplQhddZLBUryaAHou723x+FRzQ5Df824Fj+IyyuiQTRoub4SnIFfIcrp70g==}
     engines: {node: '>=0.8.0'}
@@ -13507,11 +13524,6 @@ packages:
     engines: {node: '>=10'}
     dependencies:
       has-flag: 4.0.0
-    dev: true
-
-  /supports-color@9.4.0:
-    resolution: {integrity: sha512-VL+lNrEoIXww1coLPOmiEmK/0sGigko5COxI09KzHc2VJXJsQ37UaQ+8quuxjDeA7+KnLGTWRyOXSLLR2Wb4jw==}
-    engines: {node: '>=12'}
     dev: true
 
   /supports-preserve-symlinks-flag@1.0.0:
@@ -13599,12 +13611,12 @@ packages:
       yallist: 5.0.0
     dev: true
 
-  /teeny-request@9.0.0(supports-color@9.4.0):
+  /teeny-request@9.0.0(supports-color@10.0.0):
     resolution: {integrity: sha512-resvxdc6Mgb7YEThw6G6bExlXKkv6+YbuzGg9xuXxSgxJF7Ozs+o8Y9+2R3sArdWdW8nOokoQb1yrpFB0pQK2g==}
     engines: {node: '>=14'}
     dependencies:
-      http-proxy-agent: 5.0.0(supports-color@9.4.0)
-      https-proxy-agent: 5.0.1(supports-color@9.4.0)
+      http-proxy-agent: 5.0.0(supports-color@10.0.0)
+      https-proxy-agent: 5.0.1(supports-color@10.0.0)
       node-fetch: 2.7.0
       stream-events: 1.0.5
       uuid: 9.0.1
@@ -13861,7 +13873,7 @@ packages:
     engines: {node: ^18.17.0 || >=20.5.0}
     dependencies:
       '@tufjs/models': 3.0.1
-      debug: 4.3.7(supports-color@9.4.0)
+      debug: 4.3.7(supports-color@10.0.0)
       make-fetch-happen: 14.0.3
     transitivePeerDependencies:
       - supports-color
@@ -14245,7 +14257,7 @@ packages:
       '@verdaccio/config': 8.0.0-next-8.3
       '@verdaccio/core': 8.0.0-next-8.3
       express: 4.21.0
-      https-proxy-agent: 5.0.1(supports-color@9.4.0)
+      https-proxy-agent: 5.0.1(supports-color@10.0.0)
       node-fetch: 2.6.7
     transitivePeerDependencies:
       - encoding
@@ -14268,7 +14280,7 @@ packages:
       apache-md5: 1.1.8
       bcryptjs: 2.4.3
       core-js: 3.37.1
-      debug: 4.3.7(supports-color@9.4.0)
+      debug: 4.3.7(supports-color@10.0.0)
       http-errors: 2.0.0
       unix-crypt-td-js: 1.1.4
     transitivePeerDependencies:
@@ -14299,7 +14311,7 @@ packages:
       clipanion: 4.0.0-rc.4(typanion@3.14.0)
       compression: 1.7.4
       cors: 2.8.5
-      debug: 4.3.7(supports-color@9.4.0)
+      debug: 4.3.7(supports-color@10.0.0)
       envinfo: 7.14.0
       express: 4.21.1
       express-rate-limit: 5.5.1
@@ -14835,8 +14847,8 @@ packages:
     engines: {node: '>=18'}
     dev: true
 
-  /yaml@2.6.1:
-    resolution: {integrity: sha512-7r0XPzioN/Q9kXBro/XPnA6kznR73DHq+GXh5ON7ZozRO6aMjbmiBuKste2wslTFkC5d1dw0GooOCepZXJ2SAg==}
+  /yaml@2.7.0:
+    resolution: {integrity: sha512-+hSoy/QHluxmC9kCIJyL/uyFmLmc+e5CFR5Wa+bpIhIj85LVb9ZH2nVnqrHoSvKogwODv0ClqZkmiSSaIH5LTA==}
     engines: {node: '>= 14'}
     hasBin: true
     dev: true
@@ -15048,23 +15060,23 @@ packages:
       - zone.js
     dev: true
 
-  github.com/angular/dev-infra-private-ng-dev-builds/579163373d32ec04ef9dab6c21e34bfc6d40b127:
-    resolution: {tarball: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/579163373d32ec04ef9dab6c21e34bfc6d40b127}
+  github.com/angular/dev-infra-private-ng-dev-builds/34c97ca953ce02abc95287e350351802ba74b492:
+    resolution: {tarball: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/34c97ca953ce02abc95287e350351802ba74b492}
     name: '@angular/ng-dev'
-    version: 0.0.0-d4ffcd67a4788bec64b7d61a68d2ba3aa83eed61
+    version: 0.0.0-359350bbc10aab1bac85d0eec61a53377078ab82
     hasBin: true
     dependencies:
-      '@google-cloud/spanner': 7.16.0(supports-color@9.4.0)
+      '@google-cloud/spanner': 7.17.1(supports-color@10.0.0)
       '@octokit/rest': 21.0.2
       '@types/semver': 7.5.8
       '@types/supports-color': 8.1.3
       '@yarnpkg/lockfile': 1.1.0
       chalk: 5.3.0
       semver: 7.6.3
-      supports-color: 9.4.0
+      supports-color: 10.0.0
       typed-graphqlify: 3.1.6
       typescript: 5.6.3
-      yaml: 2.6.1
+      yaml: 2.7.0
     transitivePeerDependencies:
       - encoding
     dev: true

@@ -320,7 +320,7 @@ __metadata:
     "@angular/forms": "npm:19.0.0"
     "@angular/localize": "npm:19.0.0"
     "@angular/material": "npm:19.0.0-rc.3"
-    "@angular/ng-dev": "https://github.com/angular/dev-infra-private-ng-dev-builds.git#579163373d32ec04ef9dab6c21e34bfc6d40b127"
+    "@angular/ng-dev": "https://github.com/angular/dev-infra-private-ng-dev-builds.git#34c97ca953ce02abc95287e350351802ba74b492"
     "@angular/platform-browser": "npm:19.0.0"
     "@angular/platform-browser-dynamic": "npm:19.0.0"
     "@angular/platform-server": "npm:19.0.0"
@@ -533,24 +533,24 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#579163373d32ec04ef9dab6c21e34bfc6d40b127":
-  version: 0.0.0-d4ffcd67a4788bec64b7d61a68d2ba3aa83eed61
-  resolution: "@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#commit=579163373d32ec04ef9dab6c21e34bfc6d40b127"
+"@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#34c97ca953ce02abc95287e350351802ba74b492":
+  version: 0.0.0-359350bbc10aab1bac85d0eec61a53377078ab82
+  resolution: "@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#commit=34c97ca953ce02abc95287e350351802ba74b492"
   dependencies:
-    "@google-cloud/spanner": "npm:7.16.0"
+    "@google-cloud/spanner": "npm:7.17.1"
     "@octokit/rest": "npm:21.0.2"
     "@types/semver": "npm:^7.3.6"
     "@types/supports-color": "npm:^8.1.1"
     "@yarnpkg/lockfile": "npm:^1.1.0"
     chalk: "npm:^5.0.1"
     semver: "npm:^7.5.4"
-    supports-color: "npm:9.4.0"
+    supports-color: "npm:10.0.0"
     typed-graphqlify: "npm:^3.1.1"
     typescript: "npm:~4.9.0"
-    yaml: "npm:2.6.1"
+    yaml: "npm:2.7.0"
   bin:
     ng-dev: ./bundles/cli.mjs
-  checksum: 10c0/8da786b9bec7d495784ae668d68febec29762ea72d914a8041e530295c4cacfc08264a5a9813b169ced9726c35c45bf021acc3e215159494b7eca385b16ac0f3
+  checksum: 10c0/a571dc76f4da47ca8b1d6a9a217ea156132b13b96dc7d5b55e076fb7445e2b263496b99ad42e0403ff975ed215df9bee9a62eadfaf98a192bbb4333cdede41db
   languageName: node
   linkType: hard
 
@@ -2409,9 +2409,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@google-cloud/spanner@npm:7.16.0":
-  version: 7.16.0
-  resolution: "@google-cloud/spanner@npm:7.16.0"
+"@google-cloud/spanner@npm:7.17.1":
+  version: 7.17.1
+  resolution: "@google-cloud/spanner@npm:7.17.1"
   dependencies:
     "@google-cloud/common": "npm:^5.0.0"
     "@google-cloud/precise-date": "npm:^4.0.0"
@@ -2420,6 +2420,7 @@ __metadata:
     "@grpc/proto-loader": "npm:^0.7.0"
     "@opentelemetry/api": "npm:^1.9.0"
     "@opentelemetry/context-async-hooks": "npm:^1.26.0"
+    "@opentelemetry/core": "npm:^1.27.0"
     "@opentelemetry/semantic-conventions": "npm:^1.25.1"
     "@types/big.js": "npm:^6.0.0"
     "@types/stack-trace": "npm:0.0.33"
@@ -2443,7 +2444,7 @@ __metadata:
     stream-events: "npm:^1.0.4"
     teeny-request: "npm:^9.0.0"
     through2: "npm:^4.0.0"
-  checksum: 10c0/a89355806a5712374fac8a7011e7f501c8955515885d3cdcac1db76098ceef5f9d59ae7eba4592dbdd57364a26ab0e8fa392942c1523e8b6bbb91f7f3dfe6641
+  checksum: 10c0/a08a330c42281553d4787bc938dc722c0a8508ec37db6cfc1729cb9c2932ad8fb5731e85c8169d4b82e16cecb846da963ec7e77b0dc318baf37b25872638af3f
   languageName: node
   linkType: hard
 
@@ -3595,7 +3596,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@opentelemetry/semantic-conventions@npm:^1.25.1":
+"@opentelemetry/core@npm:^1.27.0":
+  version: 1.30.0
+  resolution: "@opentelemetry/core@npm:1.30.0"
+  dependencies:
+    "@opentelemetry/semantic-conventions": "npm:1.28.0"
+  peerDependencies:
+    "@opentelemetry/api": ">=1.0.0 <1.10.0"
+  checksum: 10c0/52d17b5ddb06ab4241b977ff89b81f69f140edb5c2a78b2188d95fa7bdfdd1aa2dcafb1e2830ab77d557876682ab8f08727ba8f165ea3c39fbb6bf3b86ef33c8
+  languageName: node
+  linkType: hard
+
+"@opentelemetry/semantic-conventions@npm:1.28.0, @opentelemetry/semantic-conventions@npm:^1.25.1":
   version: 1.28.0
   resolution: "@opentelemetry/semantic-conventions@npm:1.28.0"
   checksum: 10c0/deb8a0f744198071e70fea27143cf7c9f7ecb7e4d7b619488c917834ea09b31543c1c2bcea4ec5f3cf68797f0ef3549609c14e859013d9376400ac1499c2b9cb
@@ -17226,10 +17238,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"supports-color@npm:9.4.0, supports-color@npm:^9.4.0":
-  version: 9.4.0
-  resolution: "supports-color@npm:9.4.0"
-  checksum: 10c0/6c24e6b2b64c6a60e5248490cfa50de5924da32cf09ae357ad8ebbf305cc5d2717ba705a9d4cb397d80bbf39417e8fdc8d7a0ce18bd0041bf7b5b456229164e4
+"supports-color@npm:10.0.0":
+  version: 10.0.0
+  resolution: "supports-color@npm:10.0.0"
+  checksum: 10c0/0e7884dfd02a07b3c6e0b235346f58c19f0201f1e44f7807583581761b354688c8577378785b5a4e3b03110809786c4c808e0e086cd91911f7b8bc59132703a8
   languageName: node
   linkType: hard
 
@@ -17255,6 +17267,13 @@ __metadata:
   dependencies:
     has-flag: "npm:^4.0.0"
   checksum: 10c0/ea1d3c275dd604c974670f63943ed9bd83623edc102430c05adb8efc56ba492746b6e95386e7831b872ec3807fd89dd8eb43f735195f37b5ec343e4234cc7e89
+  languageName: node
+  linkType: hard
+
+"supports-color@npm:^9.4.0":
+  version: 9.4.0
+  resolution: "supports-color@npm:9.4.0"
+  checksum: 10c0/6c24e6b2b64c6a60e5248490cfa50de5924da32cf09ae357ad8ebbf305cc5d2717ba705a9d4cb397d80bbf39417e8fdc8d7a0ce18bd0041bf7b5b456229164e4
   languageName: node
   linkType: hard
 
@@ -18989,7 +19008,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"yaml@npm:2.6.1, yaml@npm:^2.2.2":
+"yaml@npm:2.7.0":
+  version: 2.7.0
+  resolution: "yaml@npm:2.7.0"
+  bin:
+    yaml: bin.mjs
+  checksum: 10c0/886a7d2abbd70704b79f1d2d05fe9fb0aa63aefb86e1cb9991837dced65193d300f5554747a872b4b10ae9a12bc5d5327e4d04205f70336e863e35e89d8f4ea9
+  languageName: node
+  linkType: hard
+
+"yaml@npm:^2.2.2":
   version: 2.6.1
   resolution: "yaml@npm:2.6.1"
   bin:
