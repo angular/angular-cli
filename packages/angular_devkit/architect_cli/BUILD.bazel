@@ -14,10 +14,6 @@ ts_project(
     srcs = [
         "bin/architect.ts",
     ] + glob(["src/**/*.ts"]),
-    interop_deps = [
-        "//packages/angular_devkit/core",
-        "//packages/angular_devkit/core/node",
-    ],
     module_name = "@angular-devkit/architect-cli",
     deps = [
         "//:root_modules/@types/node",
@@ -26,6 +22,8 @@ ts_project(
         "//:root_modules/ansi-colors",
         "//packages/angular_devkit/architect:architect_rjs",
         "//packages/angular_devkit/architect/node:node_rjs",
+        "//packages/angular_devkit/core:core_rjs",
+        "//packages/angular_devkit/core/node:node_rjs",
     ],
 )
 
