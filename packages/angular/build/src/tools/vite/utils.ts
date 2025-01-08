@@ -57,6 +57,7 @@ export function getDepOptimizationConfig({
   ssr,
   loader,
   thirdPartySourcemaps,
+  define = {},
 }: {
   disabled: boolean;
   exclude: string[];
@@ -67,6 +68,7 @@ export function getDepOptimizationConfig({
   zoneless: boolean;
   loader?: EsbuildLoaderOption;
   thirdPartySourcemaps: boolean;
+  define: Record<string, string> | undefined;
 }): DepOptimizationConfig {
   const plugins: ViteEsBuildPlugin[] = [
     {
@@ -99,6 +101,7 @@ export function getDepOptimizationConfig({
       plugins,
       loader,
       define: {
+        ...define,
         'ngServerMode': `${ssr}`,
       },
       resolveExtensions: ['.mjs', '.js', '.cjs'],
