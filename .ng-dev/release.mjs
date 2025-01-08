@@ -23,6 +23,7 @@ export const release = {
 
     await assertValidDependencyRanges(newVersion, releasePackages);
   },
+  rulesJsInteropMode: true,
   releaseNotes: {
     groupOrder: [
       '@angular/cli',
