@@ -13,6 +13,7 @@ import { BuildOutputFileType } from '../../tools/esbuild/bundler-context';
 import { ExecutionResult, RebuildState } from '../../tools/esbuild/bundler-execution-result';
 import { shutdownSassWorkerPool } from '../../tools/esbuild/stylesheets/sass-language';
 import { logMessages, withNoProgress, withSpinner } from '../../tools/esbuild/utils';
+import { ChangedFiles } from '../../tools/esbuild/watcher';
 import { shouldWatchRoot } from '../../utils/environment-options';
 import { NormalizedCachedOptions } from '../../utils/normalize-cache';
 import { NormalizedApplicationBuildOptions, NormalizedOutputOptions } from './options';
@@ -199,7 +200,8 @@ export async function* runEsBuildBuildAction(
       for (const outputResult of emitOutputResults(
         result,
         outputOptions,
-        incrementalResults ? rebuildState.previousOutputInfo : undefined,
+        changes,
+        incrementalResults ? rebuildState : undefined,
       )) {
         yield outputResult;
       }
@@ -224,7 +226,8 @@ function* emitOutputResults(
     templateUpdates,
   }: ExecutionResult,
   outputOptions: NormalizedApplicationBuildOptions['outputOptions'],
-  previousOutputInfo?: ReadonlyMap<string, { hash: string; type: BuildOutputFileType }>,
+  changes?: ChangedFiles,
+  rebuildState?: RebuildState,
 ): Iterable<Result> {
   if (errors.length > 0) {
     yield {
@@ -255,7 +258,9 @@ function* emitOutputResults(
   }
 
   // Use an incremental result if previous output information is available
-  if (previousOutputInfo) {
+  if (rebuildState && changes) {
+    const { previousAssetsInfo, previousOutputInfo } = rebuildState;
+
     const incrementalResult: IncrementalResult = {
       kind: ResultKind.Incremental,
       warnings: warnings as ResultMessage[],
@@ -273,7 +278,6 @@ function* emitOutputResults(
 
     // Initially assume all previous output files have been removed
     const removedOutputFiles = new Map(previousOutputInfo);
-
     for (const file of outputFiles) {
       removedOutputFiles.delete(file.path);
 
@@ -304,24 +308,37 @@ function* emitOutputResults(
       }
     }
 
-    // Include the removed output files
+    // Initially assume all previous assets files have been removed
+    const removedAssetFiles = new Map(previousAssetsInfo);
+    for (const { source, destination } of assetFiles) {
+      removedAssetFiles.delete(source);
+
+      if (changes.modified.has(source)) {
+        incrementalResult.modified.push(destination);
+      } else if (!previousAssetsInfo.has(source)) {
+        incrementalResult.added.push(destination);
+      } else {
+        continue;
+      }
+
+      incrementalResult.files[destination] = {
+        type: BuildOutputFileType.Browser,
+        inputPath: source,
+        origin: 'disk',
+      };
+    }
+
+    // Include the removed output and asset files
     incrementalResult.removed.push(
       ...Array.from(removedOutputFiles, ([file, { type }]) => ({
         path: file,
         type,
       })),
-    );
-
-    // Always consider asset files as added to ensure new/modified assets are available.
-    // TODO: Consider more comprehensive asset analysis.
-    for (const file of assetFiles) {
-      incrementalResult.added.push(file.destination);
-      incrementalResult.files[file.destination] = {
+      ...Array.from(removedAssetFiles.values(), (file) => ({
+        path: file,
         type: BuildOutputFileType.Browser,
-        inputPath: file.source,
-        origin: 'disk',
-      };
-    }
+      })),
+    );
 
     yield incrementalResult;
 
