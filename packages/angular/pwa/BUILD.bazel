@@ -26,13 +26,11 @@ ts_project(
             "pwa/files/**/*",
         ],
     ),
-    interop_deps = [
-        "//packages/angular_devkit/schematics",
-    ],
     module_name = "@angular/pwa",
     deps = [
         "//:root_modules/@types/node",
         "//:root_modules/parse5-html-rewriting-stream",
+        "//packages/angular_devkit/schematics:schematics_rjs",
         "//packages/schematics/angular:angular_rjs",
     ],
 )
@@ -46,12 +44,10 @@ ts_project(
     name = "pwa_test_lib",
     testonly = True,
     srcs = glob(["pwa/**/*_spec.ts"]),
-    interop_deps = [
-        "//packages/angular_devkit/schematics/testing",
-    ],
     deps = [
         ":pwa_rjs",
         "//:root_modules/@types/jasmine",
+        "//packages/angular_devkit/schematics/testing:testing_rjs",
     ],
 )
 

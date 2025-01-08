@@ -46,14 +46,12 @@ ts_project(
             "src/**/*_spec_helpers.ts",
         ],
     ),
-    interop_deps = [
-        "//packages/angular_devkit/core",
-    ],
     deps = [
         ":webpack_rjs",
         "//:root_modules/@angular/compiler",
         "//:root_modules/@types/jasmine",
         "//:root_modules/typescript",
+        "//packages/angular_devkit/core:core_rjs",
     ],
 )
 

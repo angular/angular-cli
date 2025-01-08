@@ -78,10 +78,6 @@ ts_project(
             "node_modules/**",
         ],
     ),
-    interop_deps = [
-        "//packages/angular_devkit/schematics",
-        "//packages/angular_devkit/schematics/tasks",
-    ],
     module_name = "@schematics/angular",
     deps = [
         "//:root_modules/@inquirer/prompts",
@@ -89,6 +85,8 @@ ts_project(
         "//:root_modules/browserslist",
         "//:root_modules/jsonc-parser",
         "//packages/angular_devkit/core:core_rjs",
+        "//packages/angular_devkit/schematics:schematics_rjs",
+        "//packages/angular_devkit/schematics/tasks:tasks_rjs",
         "//packages/schematics/angular/third_party/github.com/Microsoft/TypeScript:TypeScript_rjs",
     ],
 )
@@ -115,17 +113,15 @@ ts_project(
             "node_modules/**",
         ],
     ),
-    interop_deps = [
-        "//packages/angular_devkit/schematics",
-        "//packages/angular_devkit/schematics/tasks",
-        "//packages/angular_devkit/schematics/testing",
-    ],
     deps = [
         ":angular_rjs",
         "//:root_modules/@types/jasmine",
         "//:root_modules/jsonc-parser",
         "//packages/angular_devkit/core:core_rjs",
         "//packages/angular_devkit/core/node/testing:testing_rjs",
+        "//packages/angular_devkit/schematics:schematics_rjs",
+        "//packages/angular_devkit/schematics/tasks:tasks_rjs",
+        "//packages/angular_devkit/schematics/testing:testing_rjs",
         "//packages/schematics/angular/third_party/github.com/Microsoft/TypeScript:TypeScript_rjs",
     ],
 )

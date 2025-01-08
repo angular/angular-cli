@@ -16,15 +16,13 @@ ts_project(
         include = ["**/*.ts"],
         exclude = ["**/*_spec.ts"],
     ),
-    interop_deps = [
-        "//packages/angular_devkit/core",
-        "//packages/angular_devkit/core/node",
-    ],
     module_name = "@angular-devkit/architect/node",
     deps = [
         "//:root_modules/@types/node",
         "//:root_modules/rxjs",
         "//packages/angular_devkit/architect:architect_rjs",
+        "//packages/angular_devkit/core:core_rjs",
+        "//packages/angular_devkit/core/node:node_rjs",
     ],
 )
 
@@ -36,14 +34,12 @@ ts_project(
             "**/*_spec.ts",
         ],
     ),
-    interop_deps = [
-        "//tests/angular_devkit/architect/node/jobs:jobs_test_lib",
-    ],
     deps = [
         ":node_rjs",
         "//:root_modules/@types/jasmine",
         "//:root_modules/rxjs",
         "//packages/angular_devkit/architect:architect_rjs",
+        "//tests/angular_devkit/architect/node/jobs:jobs_test_lib_rjs",
     ],
 )
 
