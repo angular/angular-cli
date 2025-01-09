@@ -233,7 +233,7 @@ export function noCacheNormalize(path: string): Path {
   // Match absolute windows path.
   const original = path;
   if (path.match(/^[A-Z]:[/\\]/i)) {
-    path = '\\' + path[0] + '\\' + path.slice(3);
+    path = '\\' + path[0].toUpperCase() + '\\' + path.slice(3);
   }
 
   // We convert Windows paths as well here.
