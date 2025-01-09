@@ -77,17 +77,14 @@ def npm_package(
     _npm_package(
         name = "npm_package",
         visibility = visibility,
-        srcs = [":final_package_json"] + deps,
+        # Note: Order matters here! Last file takes precedence after replaced prefixes.
+        srcs = deps + [":final_package_json"],
         replace_prefixes = {
             "substituted_final/": "",
             "substituted_with_tars/": "",
             "substituted_with_snapshot_repos/": "",
             "substituted/": "",
         },
-        exclude_srcs_patterns = [
-            # Exclude `node_modules` which may be pulled by the `js_module_output` runfiles.
-            "node_modules/**/*",
-        ],
         allow_overwrites = True,
         **kwargs
     )

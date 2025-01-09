@@ -12,7 +12,6 @@ licenses(["notice"])
 
 package(default_visibility = ["//visibility:public"])
 
-# @external_begin
 ts_json_schema(
     name = "builder_input_schema",
     src = "src/input-schema.json",
@@ -37,7 +36,14 @@ ts_json_schema(
     name = "operator_schema",
     src = "builders/operator-schema.json",
 )
-# @external_end
+
+JSON_FILES = glob(
+    include = ["**/*.json"],
+    exclude = [
+        # NB: we need to exclude the nested node_modules that is laid out by yarn workspaces
+        "node_modules/**",
+    ],
+)
 
 ts_project(
     name = "architect",
@@ -56,13 +62,8 @@ ts_project(
         "//packages/angular_devkit/architect:src/progress-schema.ts",
         "//packages/angular_devkit/architect:builders/operator-schema.ts",
     ],
-    data = glob(
-        include = ["**/*.json"],
-        exclude = [
-            # NB: we need to exclude the nested node_modules that is laid out by yarn workspaces
-            "node_modules/**",
-        ],
-    ),
+    # Ensure tests can execute the output JS, relying on schemas/JSON files.
+    data = JSON_FILES,
     module_name = "@angular-devkit/architect",
     deps = [
         "//:root_modules/@types/node",
@@ -104,7 +105,7 @@ npm_package(
         "//packages/angular_devkit/core:package.json",
     ],
     tags = ["release-package"],
-    deps = [
+    deps = JSON_FILES + [
         "README.md",
         ":architect_rjs",
         ":license",
