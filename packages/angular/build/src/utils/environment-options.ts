@@ -103,7 +103,7 @@ export const shouldOptimizeChunks =
 
 const hmrComponentStylesVariable = process.env['NG_HMR_CSTYLES'];
 export const useComponentStyleHmr =
-  !isPresent(hmrComponentStylesVariable) || !isDisabled(hmrComponentStylesVariable);
+  isPresent(hmrComponentStylesVariable) && isEnabled(hmrComponentStylesVariable);
 
 const hmrComponentTemplateVariable = process.env['NG_HMR_TEMPLATES'];
 export const useComponentTemplateHmr =
