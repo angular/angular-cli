@@ -722,7 +722,7 @@ interface RequiredWorkflowExecutionContext {
 }
 
 // @public (undocumented)
-export type Rule = (tree: Tree_2, context: SchematicContext) => Tree_2 | Observable<Tree_2> | Rule | Promise<void | Rule> | void;
+export type Rule = (tree: Tree_2, context: SchematicContext) => Tree_2 | Observable<Tree_2> | Rule | Promise<void | Tree_2 | Rule> | void;
 
 // @public
 export type RuleFactory<T extends object> = (options: T) => Rule;
