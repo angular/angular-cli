@@ -47,6 +47,29 @@ describe('chain', () => {
       .then(done, done.fail);
   });
 
+  it('works with async rules', (done) => {
+    const rulesCalled: Tree[] = [];
+
+    const tree0 = empty();
+    const tree1 = empty();
+    const tree2 = empty();
+    const tree3 = empty();
+
+    const rule0: Rule = async (tree: Tree) => ((rulesCalled[0] = tree), tree1);
+    const rule1: Rule = async (tree: Tree) => ((rulesCalled[1] = tree), tree2);
+    const rule2: Rule = async (tree: Tree) => ((rulesCalled[2] = tree), tree3);
+
+    lastValueFrom(callRule(chain([rule0, rule1, rule2]), tree0, context))
+      .then((result) => {
+        expect(result).not.toBe(tree0);
+        expect(rulesCalled[0]).toBe(tree0);
+        expect(rulesCalled[1]).toBe(tree1);
+        expect(rulesCalled[2]).toBe(tree2);
+        expect(result).toBe(tree3);
+      })
+      .then(done, done.fail);
+  });
+
   it('works with a sync generator of rules', async () => {
     const rulesCalled: Tree[] = [];
 
