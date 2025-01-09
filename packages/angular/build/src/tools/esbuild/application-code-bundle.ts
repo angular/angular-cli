@@ -83,24 +83,7 @@ export function createBrowserCodeBundleOptions(
       buildOptions.plugins?.push(...options.plugins);
     }
 
-    if (options.externalPackages) {
-      // Package files affected by a customized loader should not be implicitly marked as external
-      if (
-        options.loaderExtensions ||
-        options.plugins ||
-        typeof options.externalPackages === 'object'
-      ) {
-        // Plugin must be added after custom plugins to ensure any added loader options are considered
-        buildOptions.plugins?.push(
-          createExternalPackagesPlugin(
-            options.externalPackages !== true ? options.externalPackages : undefined,
-          ),
-        );
-      } else {
-        // Safe to use the packages external option directly
-        buildOptions.packages = 'external';
-      }
-    }
+    appendOptionsForExternalPackages(options, buildOptions);
 
     return buildOptions;
   };
@@ -302,9 +285,7 @@ export function createServerMainCodeBundleOptions(
 
     buildOptions.plugins ??= [];
 
-    if (externalPackages) {
-      buildOptions.packages = 'external';
-    } else {
+    if (!externalPackages) {
       buildOptions.plugins.push(createRxjsEsmResolutionPlugin());
     }
 
@@ -381,6 +362,8 @@ export function createServerMainCodeBundleOptions(
       buildOptions.plugins.push(...options.plugins);
     }
 
+    appendOptionsForExternalPackages(options, buildOptions);
+
     return buildOptions;
   };
 }
@@ -442,9 +425,7 @@ export function createSsrEntryCodeBundleOptions(
 
     buildOptions.plugins ??= [];
 
-    if (externalPackages) {
-      buildOptions.packages = 'external';
-    } else {
+    if (!externalPackages) {
       buildOptions.plugins.push(createRxjsEsmResolutionPlugin());
     }
 
@@ -515,6 +496,8 @@ export function createSsrEntryCodeBundleOptions(
     if (options.plugins) {
       buildOptions.plugins.push(...options.plugins);
     }
+
+    appendOptionsForExternalPackages(options, buildOptions);
 
     return buildOptions;
   };
@@ -720,4 +703,30 @@ function entryFileToWorkspaceRelative(workspaceRoot: string, entryFile: string):
       .replace(/.[mc]?ts$/, '')
       .replace(/\\/g, '/')
   );
+}
+
+function appendOptionsForExternalPackages(
+  options: NormalizedApplicationBuildOptions,
+  buildOptions: BuildOptions,
+): void {
+  if (!options.externalPackages) {
+    return;
+  }
+
+  buildOptions.plugins ??= [];
+
+  // Package files affected by a customized loader should not be implicitly marked as external
+  if (options.loaderExtensions || options.plugins || typeof options.externalPackages === 'object') {
+    // Plugin must be added after custom plugins to ensure any added loader options are considered
+    buildOptions.plugins.push(
+      createExternalPackagesPlugin(
+        options.externalPackages !== true ? options.externalPackages : undefined,
+      ),
+    );
+
+    buildOptions.packages = undefined;
+  } else {
+    // Safe to use the packages external option directly
+    buildOptions.packages = 'external';
+  }
 }
