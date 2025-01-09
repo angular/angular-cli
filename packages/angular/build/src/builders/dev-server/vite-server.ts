@@ -138,7 +138,7 @@ export async function* serveWithVite(
     process.setSourceMapsEnabled(true);
   }
 
-  // Enable to support link-based component style hot reloading (`NG_HMR_CSTYLES=0` can be used to disable selectively)
+  // Enable to support link-based component style hot reloading (`NG_HMR_CSTYLES=1` can be used to enable)
   browserOptions.externalRuntimeStyles =
     serverOptions.liveReload && serverOptions.hmr && useComponentStyleHmr;
 
