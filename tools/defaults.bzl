@@ -8,29 +8,12 @@ load("@build_bazel_rules_nodejs//:index.bzl", _js_library = "js_library", _pkg_n
 load("@npm//@angular/bazel:index.bzl", _ng_module = "ng_module", _ng_package = "ng_package")
 load("@npm//@angular/build-tooling/bazel:extract_js_module_output.bzl", "extract_js_module_output")
 load("@rules_pkg//:pkg.bzl", "pkg_tar")
-load("//:constants.bzl", "RELEASE_ENGINES_NODE", "RELEASE_ENGINES_NPM", "RELEASE_ENGINES_YARN")
 load("//tools:link_package_json_to_tarballs.bzl", "link_package_json_to_tarballs")
 load("//tools:snapshot_repo_filter.bzl", "SNAPSHOT_REPO_JQ_FILTER")
+load("//tools:substitutions.bzl", "NO_STAMP_PACKAGE_SUBSTITUTIONS", "NPM_PACKAGE_SUBSTITUTIONS")
 
 _DEFAULT_TSCONFIG_NG = "//:tsconfig-build-ng"
 _DEFAULT_TSCONFIG_TEST = "//:tsconfig-test.json"
-
-NPM_PACKAGE_SUBSTITUTIONS = {
-    # Version of the local package being built, generated via the `--workspace_status_command` flag.
-    "0.0.0-PLACEHOLDER": "{STABLE_PROJECT_VERSION}",
-    "0.0.0-EXPERIMENTAL-PLACEHOLDER": "{STABLE_PROJECT_EXPERIMENTAL_VERSION}",
-    "BUILD_SCM_HASH-PLACEHOLDER": "{BUILD_SCM_ABBREV_HASH}",
-    "0.0.0-ENGINES-NODE": RELEASE_ENGINES_NODE,
-    "0.0.0-ENGINES-NPM": RELEASE_ENGINES_NPM,
-    "0.0.0-ENGINES-YARN": RELEASE_ENGINES_YARN,
-    # The below is needed for @angular/ssr FESM file.
-    "\\./(.+)/packages/angular/ssr/third_party/beasties": "../third_party/beasties/index.js",
-}
-
-NO_STAMP_PACKAGE_SUBSTITUTIONS = dict(NPM_PACKAGE_SUBSTITUTIONS, **{
-    "0.0.0-PLACEHOLDER": "0.0.0",
-    "0.0.0-EXPERIMENTAL-PLACEHOLDER": "0.0.0",
-})
 
 def _default_module_name(testonly):
     """ Provide better defaults for package names.
