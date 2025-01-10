@@ -18,6 +18,8 @@ export type AngularMemoryOutputFiles = Map<
   { contents: Uint8Array; hash: string; servable: boolean }
 >;
 
+export type AngularOutputAssets = Map<string, { source: string }>;
+
 export function pathnameWithoutBasePath(url: string, basePath: string): string {
   const parsedUrl = new URL(url, 'http://localhost');
   const pathname = decodeURIComponent(parsedUrl.pathname);

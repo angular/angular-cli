@@ -313,10 +313,10 @@ function* emitOutputResults(
     for (const { source, destination } of assetFiles) {
       removedAssetFiles.delete(source);
 
-      if (changes.modified.has(source)) {
-        incrementalResult.modified.push(destination);
-      } else if (!previousAssetsInfo.has(source)) {
+      if (!previousAssetsInfo.has(source)) {
         incrementalResult.added.push(destination);
+      } else if (changes.modified.has(source)) {
+        incrementalResult.modified.push(destination);
       } else {
         continue;
       }
