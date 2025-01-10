@@ -65,7 +65,7 @@ function ensureString(value: unknown, name: string): asserts value is string {
   }
 }
 
-function ensureValidsubPath(value: unknown, name: string): asserts value is string {
+function ensureValidSubPath(value: unknown, name: string): asserts value is string {
   ensureString(value, name);
 
   if (!/^[\w-]*$/.test(value)) {
@@ -121,7 +121,7 @@ export function createI18nOptions(
     }
 
     if (metadata.sourceLocale.subPath !== undefined) {
-      ensureValidsubPath(metadata.sourceLocale.subPath, 'i18n.sourceLocale.subPath');
+      ensureValidSubPath(metadata.sourceLocale.subPath, 'i18n.sourceLocale.subPath');
       rawsubPath = metadata.sourceLocale.subPath;
     }
 
@@ -166,7 +166,7 @@ export function createI18nOptions(
         }
 
         if ('subPath' in options) {
-          ensureString(options.subPath, `i18n.locales.${locale}.subPath`);
+          ensureValidSubPath(options.subPath, `i18n.locales.${locale}.subPath`);
           subPath = options.subPath;
         }
 
