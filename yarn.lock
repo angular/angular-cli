@@ -340,11 +340,11 @@ __metadata:
     "@babel/preset-env": "npm:7.26.0"
     "@babel/runtime": "npm:7.26.0"
     "@bazel/bazelisk": "npm:1.25.0"
-    "@bazel/buildifier": "npm:7.3.1"
+    "@bazel/buildifier": "npm:8.0.0"
     "@bazel/concatjs": "npm:5.8.1"
     "@bazel/jasmine": "npm:5.8.1"
     "@bazel/rollup": "npm:^5.8.1"
-    "@bazel/runfiles": "npm:^5.8.1"
+    "@bazel/runfiles": "npm:^6.0.0"
     "@discoveryjs/json-ext": "npm:0.6.3"
     "@inquirer/confirm": "npm:5.1.1"
     "@inquirer/prompts": "npm:7.2.1"
@@ -1794,12 +1794,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@bazel/buildifier@npm:7.3.1":
-  version: 7.3.1
-  resolution: "@bazel/buildifier@npm:7.3.1"
+"@bazel/buildifier@npm:8.0.0":
+  version: 8.0.0
+  resolution: "@bazel/buildifier@npm:8.0.0"
   bin:
     buildifier: buildifier.js
-  checksum: 10c0/a5f3991691495581b8cb0ff8f97e08789774483f7c9aac3ef90c349ed6bac330921fcd798db55dcb24752d6911e855dd3eabb646029a434a34a876216fd37fa7
+  checksum: 10c0/09d385e3e092643175f703d3bbacb0ea181001f390d5e0cc75c08d4da609d3b8f8f6e40dc95af5ee7a116e1005536f32c275b0c1bfebecb6bed27f435c57ddca
   languageName: node
   linkType: hard
 
@@ -1868,14 +1868,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@bazel/runfiles@npm:5.8.1, @bazel/runfiles@npm:^5.8.1":
+"@bazel/runfiles@npm:5.8.1":
   version: 5.8.1
   resolution: "@bazel/runfiles@npm:5.8.1"
   checksum: 10c0/c148ea89839240d918ea615c485fcd0e5c009215ddfa718cc7dd1c3f0e2e278eb8d291b6cd990cd8fc2ade161f98f2defbac8b9c2968e5c5bc4edb98e6ed6bc6
   languageName: node
   linkType: hard
 
-"@bazel/runfiles@npm:^6.3.1":
+"@bazel/runfiles@npm:^6.0.0, @bazel/runfiles@npm:^6.3.1":
   version: 6.3.1
   resolution: "@bazel/runfiles@npm:6.3.1"
   checksum: 10c0/7b542dcff9e917cc521520db137bd4f4a478796693700e2ec2c27f4beede800c9f4987e20c6b965d81000638f63549160780aea51eca2f0d0275be76fdc5e49f
