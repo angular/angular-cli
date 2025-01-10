@@ -101,8 +101,8 @@ importers:
         specifier: 1.25.0
         version: 1.25.0
       '@bazel/buildifier':
-        specifier: 7.3.1
-        version: 7.3.1
+        specifier: 8.0.0
+        version: 8.0.0
       '@bazel/concatjs':
         specifier: 5.8.1
         version: 5.8.1(karma-chrome-launcher@3.2.0)(karma-firefox-launcher@2.1.3)(karma-jasmine@5.1.0)(karma-junit-reporter@2.0.1)(karma-requirejs@1.1.0)(karma-sourcemap-loader@0.4.0)(karma@6.4.4)(typescript@5.7.3)
@@ -113,8 +113,8 @@ importers:
         specifier: ^5.8.1
         version: 5.8.1(rollup@4.30.1)
       '@bazel/runfiles':
-        specifier: ^5.8.1
-        version: 5.8.1
+        specifier: ^6.0.0
+        version: 6.3.1
       '@discoveryjs/json-ext':
         specifier: 0.6.3
         version: 0.6.3
@@ -1985,8 +1985,8 @@ packages:
     hasBin: true
     dev: true
 
-  /@bazel/buildifier@7.3.1:
-    resolution: {integrity: sha512-qhSjryLo2uHeib/uLc8Yeh6SBisqdf9pPO79QPlyNO3Apc4g9J1Tir/52VdOo9czHTgSasbtOjfWJCPzMoCSIA==}
+  /@bazel/buildifier@8.0.0:
+    resolution: {integrity: sha512-ur5DKaLK6vQjUUptxATC4TpsnBA2leqQDtqSF7qovbNuoCNzOfySJWMof1otT9ATW8ZsJfTFvNSYFRT8+LCVhw==}
     hasBin: true
     dev: true
 
