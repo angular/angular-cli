@@ -4,13 +4,24 @@
 # found in the LICENSE file at https://angular.dev/license
 
 load("@npm//@bazel/jasmine:index.bzl", "jasmine_node_test")
-load("//tools:defaults.bzl", "pkg_npm")
-load("//tools:interop.bzl", "ts_project")
+load("//tools:defaults2.bzl", "npm_package", "ts_project")
 load("//tools:ts_json_schema.bzl", "ts_json_schema")
 
 licenses(["notice"])
 
 package(default_visibility = ["//visibility:public"])
+
+RUNTIME_ASSETS = glob(
+    include = [
+        "pwa/*.js",
+        "pwa/*.mjs",
+        "pwa/files/**/*",
+    ],
+) + [
+    "package.json",
+    "collection.json",
+    "pwa/schema.json",
+]
 
 ts_project(
     name = "pwa",
@@ -18,14 +29,7 @@ ts_project(
         "pwa/index.ts",
         "//packages/angular/pwa:pwa/schema.ts",
     ],
-    data = [
-        "collection.json",
-        "pwa/schema.json",
-    ] + glob(
-        include = [
-            "pwa/files/**/*",
-        ],
-    ),
+    data = RUNTIME_ASSETS,
     module_name = "@angular/pwa",
     deps = [
         "//:root_modules/@types/node",
@@ -63,16 +67,16 @@ genrule(
     cmd = "cp $(execpath //:LICENSE) $@",
 )
 
-pkg_npm(
-    name = "npm_package",
+npm_package(
+    name = "pkg",
     pkg_deps = [
         "//packages/angular_devkit/schematics:package.json",
         "//packages/schematics/angular:package.json",
     ],
     tags = ["release-package"],
-    deps = [
+    deps = RUNTIME_ASSETS + [
         ":README.md",
         ":license",
-        ":pwa",
+        ":pwa_rjs",
     ],
 )
