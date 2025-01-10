@@ -50,8 +50,8 @@ importers:
         specifier: 19.1.0-rc.0
         version: 19.1.0-rc.0(@angular/animations@19.1.0-rc.0)(@angular/cdk@19.1.0-rc.0)(@angular/common@19.1.0-rc.0)(@angular/core@19.1.0-rc.0)(@angular/forms@19.1.0-rc.0)(@angular/platform-browser@19.1.0-rc.0)(rxjs@7.8.1)
       '@angular/ng-dev':
-        specifier: https://github.com/angular/dev-infra-private-ng-dev-builds.git#5d1a3e42cd27a30b988a5d0e40fca332c7a10aa0
-        version: github.com/angular/dev-infra-private-ng-dev-builds/5d1a3e42cd27a30b988a5d0e40fca332c7a10aa0
+        specifier: https://github.com/angular/dev-infra-private-ng-dev-builds.git#2dde6a7f809c2928ab1c7b85afb7fec0c49beafc
+        version: github.com/angular/dev-infra-private-ng-dev-builds/2dde6a7f809c2928ab1c7b85afb7fec0c49beafc
       '@angular/platform-browser':
         specifier: 19.1.0-rc.0
         version: 19.1.0-rc.0(@angular/animations@19.1.0-rc.0)(@angular/common@19.1.0-rc.0)(@angular/core@19.1.0-rc.0)
@@ -14770,10 +14770,10 @@ packages:
       - zone.js
     dev: true
 
-  github.com/angular/dev-infra-private-ng-dev-builds/5d1a3e42cd27a30b988a5d0e40fca332c7a10aa0:
-    resolution: {tarball: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/5d1a3e42cd27a30b988a5d0e40fca332c7a10aa0}
+  github.com/angular/dev-infra-private-ng-dev-builds/2dde6a7f809c2928ab1c7b85afb7fec0c49beafc:
+    resolution: {tarball: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/2dde6a7f809c2928ab1c7b85afb7fec0c49beafc}
     name: '@angular/ng-dev'
-    version: 0.0.0-5b4b2a6258dece411626435f680d2818769f469a
+    version: 0.0.0-7863aba23429b9cdb432a63cb688dd4c61f51ce6
     hasBin: true
     dependencies:
       '@google-cloud/spanner': 7.17.1(supports-color@10.0.0)

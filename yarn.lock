@@ -323,7 +323,7 @@ __metadata:
     "@angular/forms": "npm:19.1.0-rc.0"
     "@angular/localize": "npm:19.1.0-rc.0"
     "@angular/material": "npm:19.1.0-rc.0"
-    "@angular/ng-dev": "https://github.com/angular/dev-infra-private-ng-dev-builds.git#5d1a3e42cd27a30b988a5d0e40fca332c7a10aa0"
+    "@angular/ng-dev": "https://github.com/angular/dev-infra-private-ng-dev-builds.git#2dde6a7f809c2928ab1c7b85afb7fec0c49beafc"
     "@angular/platform-browser": "npm:19.1.0-rc.0"
     "@angular/platform-browser-dynamic": "npm:19.1.0-rc.0"
     "@angular/platform-server": "npm:19.1.0-rc.0"
@@ -536,9 +536,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#5d1a3e42cd27a30b988a5d0e40fca332c7a10aa0":
-  version: 0.0.0-5b4b2a6258dece411626435f680d2818769f469a
-  resolution: "@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#commit=5d1a3e42cd27a30b988a5d0e40fca332c7a10aa0"
+"@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#2dde6a7f809c2928ab1c7b85afb7fec0c49beafc":
+  version: 0.0.0-7863aba23429b9cdb432a63cb688dd4c61f51ce6
+  resolution: "@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#commit=2dde6a7f809c2928ab1c7b85afb7fec0c49beafc"
   dependencies:
     "@google-cloud/spanner": "npm:7.17.1"
     "@octokit/rest": "npm:21.1.0"
@@ -553,7 +553,7 @@ __metadata:
     yaml: "npm:2.7.0"
   bin:
     ng-dev: ./bundles/cli.mjs
-  checksum: 10c0/47d0904ebd62c680aa7c34e5c63059536ce2fa4b8d71671e373e4d089159b780da19a16711798b02c44ed1323b52c195140fd27df3b673b6577547cf3a8ac17e
+  checksum: 10c0/452de4595fae7e7a645b81cc0f5853617ae6a13ceb68d967e3fc15505848bc2a8955cc2b678d2254d83f148d9e47192d0013eac1defbba112e9313026f9291a8
   languageName: node
   linkType: hard
 
