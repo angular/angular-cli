@@ -3,14 +3,25 @@
 # Use of this source code is governed by an MIT-style license that can be
 # found in the LICENSE file at https://angular.dev/license
 
-load("//tools:defaults.bzl", "pkg_npm")
-load("//tools:interop.bzl", "ts_project")
+load("//tools:defaults2.bzl", "npm_package", "ts_project")
 
 licenses(["notice"])
 
+RUNTIME_ASSETS = glob(
+    include = [
+        "src/*.js",
+        "src/*.mjs",
+    ],
+) + [
+    "package.json",
+]
+
 ts_project(
     name = "create",
-    srcs = ["src/index.ts"],
+    srcs = glob([
+        "src/*.ts",
+    ]),
+    data = RUNTIME_ASSETS,
     module_name = "@angular/create",
     deps = [
         "//:root_modules/@types/node",
@@ -25,16 +36,16 @@ genrule(
     cmd = "cp $(execpath //:LICENSE) $@",
 )
 
-pkg_npm(
-    name = "npm_package",
+npm_package(
+    name = "pkg",
     pkg_deps = [
         "//packages/angular/cli:package.json",
     ],
     tags = ["release-package"],
     visibility = ["//visibility:public"],
-    deps = [
+    deps = RUNTIME_ASSETS + [
         ":README.md",
-        ":create",
+        ":create_rjs",
         ":license",
     ],
 )
