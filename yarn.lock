@@ -464,7 +464,7 @@ __metadata:
     ts-node: "npm:^10.9.1"
     tslib: "npm:2.8.1"
     typescript: "npm:5.7.3"
-    undici: "npm:7.2.0"
+    undici: "npm:7.2.1"
     unenv: "npm:^1.10.0"
     verdaccio: "npm:6.0.5"
     verdaccio-auth-memory: "npm:^10.0.0"
@@ -17560,10 +17560,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"undici@npm:7.2.0":
-  version: 7.2.0
-  resolution: "undici@npm:7.2.0"
-  checksum: 10c0/97b8452bae99304b697f79e9b8c094a2c28e6b805f720187af3a01cae2d297788d7ab6fe883577ba94e48fc20f1fbf04ab4fb050c23527bf32f8ada79a26dcb2
+"undici@npm:7.2.1":
+  version: 7.2.1
+  resolution: "undici@npm:7.2.1"
+  checksum: 10c0/55108466484336c1aa1100bc2f9d6c78de7926b447af6b45afec873996cac67f07d968d8363c9bec57887cd474af73c60698e7642c791d80d786cbc6bf5a8a7e
   languageName: node
   linkType: hard
 
