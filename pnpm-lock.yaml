@@ -20,11 +20,11 @@ importers:
         specifier: 19.1.0-rc.0
         version: 19.1.0-rc.0(@angular/core@19.1.0-rc.0)
       '@angular/bazel':
-        specifier: https://github.com/angular/bazel-builds.git#205769f51cbfcd6603dff959233ffb16431fbe04
-        version: github.com/angular/bazel-builds/205769f51cbfcd6603dff959233ffb16431fbe04(@angular/compiler-cli@19.1.0-rc.0)(@bazel/concatjs@5.8.1)(@bazel/worker@5.8.1)(@rollup/plugin-commonjs@28.0.2)(@rollup/plugin-node-resolve@13.3.0)(@types/node@18.19.70)(rollup-plugin-sourcemaps@0.6.3)(rollup@4.30.1)(terser@5.37.0)(typescript@5.7.3)
+        specifier: https://github.com/angular/bazel-builds.git#0efbdb738786a53670fa60a3e7d4885faadfa2fe
+        version: github.com/angular/bazel-builds/0efbdb738786a53670fa60a3e7d4885faadfa2fe(@angular/compiler-cli@19.1.0-rc.0)(@bazel/concatjs@5.8.1)(@bazel/worker@5.8.1)(@rollup/plugin-commonjs@28.0.2)(@rollup/plugin-node-resolve@13.3.0)(@types/node@18.19.70)(rollup-plugin-sourcemaps@0.6.3)(rollup@4.30.1)(terser@5.37.0)(typescript@5.7.3)
       '@angular/build-tooling':
-        specifier: https://github.com/angular/dev-infra-private-build-tooling-builds.git#4b0419ce0fea35aa1ad3e92a882f93ba41199ace
-        version: github.com/angular/dev-infra-private-build-tooling-builds/4b0419ce0fea35aa1ad3e92a882f93ba41199ace(@angular/compiler-cli@19.1.0-rc.0)(@angular/compiler@19.1.0-rc.0)(@angular/localize@19.1.0-rc.0)(@angular/platform-server@19.1.0-rc.0)(@angular/service-worker@19.1.0-rc.0)(chokidar@4.0.3)(debug@4.4.0)(karma-chrome-launcher@3.2.0)(karma-firefox-launcher@2.1.3)(karma-jasmine@5.1.0)(karma-junit-reporter@2.0.1)(karma-requirejs@1.1.0)(karma-sourcemap-loader@0.4.0)(karma@6.4.4)(less@4.2.1)(ng-packagr@19.1.0-next.3)(postcss@8.4.49)(rxjs@7.8.1)(terser@5.37.0)(zone.js@0.15.0)
+        specifier: https://github.com/angular/dev-infra-private-build-tooling-builds.git#11de733259a10bd9fc4079afdfe5733aec6383a1
+        version: github.com/angular/dev-infra-private-build-tooling-builds/11de733259a10bd9fc4079afdfe5733aec6383a1(@angular/compiler-cli@19.1.0-rc.0)(@angular/compiler@19.1.0-rc.0)(@angular/localize@19.1.0-rc.0)(@angular/platform-server@19.1.0-rc.0)(@angular/service-worker@19.1.0-rc.0)(chokidar@4.0.3)(debug@4.4.0)(karma-chrome-launcher@3.2.0)(karma-firefox-launcher@2.1.3)(karma-jasmine@5.1.0)(karma-junit-reporter@2.0.1)(karma-requirejs@1.1.0)(karma-sourcemap-loader@0.4.0)(karma@6.4.4)(less@4.2.1)(ng-packagr@19.1.0-next.3)(postcss@8.4.49)(rxjs@7.8.1)(terser@5.37.0)(zone.js@0.15.0)
       '@angular/cdk':
         specifier: 19.1.0-rc.0
         version: 19.1.0-rc.0(@angular/common@19.1.0-rc.0)(@angular/core@19.1.0-rc.0)(rxjs@7.8.1)
@@ -50,8 +50,8 @@ importers:
         specifier: 19.1.0-rc.0
         version: 19.1.0-rc.0(@angular/animations@19.1.0-rc.0)(@angular/cdk@19.1.0-rc.0)(@angular/common@19.1.0-rc.0)(@angular/core@19.1.0-rc.0)(@angular/forms@19.1.0-rc.0)(@angular/platform-browser@19.1.0-rc.0)(rxjs@7.8.1)
       '@angular/ng-dev':
-        specifier: https://github.com/angular/dev-infra-private-ng-dev-builds.git#2dde6a7f809c2928ab1c7b85afb7fec0c49beafc
-        version: github.com/angular/dev-infra-private-ng-dev-builds/2dde6a7f809c2928ab1c7b85afb7fec0c49beafc
+        specifier: https://github.com/angular/dev-infra-private-ng-dev-builds.git#af7ab37bf65d005745d676f30d9a9759a1757067
+        version: github.com/angular/dev-infra-private-ng-dev-builds/af7ab37bf65d005745d676f30d9a9759a1757067
       '@angular/platform-browser':
         specifier: 19.1.0-rc.0
         version: 19.1.0-rc.0(@angular/animations@19.1.0-rc.0)(@angular/common@19.1.0-rc.0)(@angular/core@19.1.0-rc.0)
@@ -2830,27 +2830,27 @@ packages:
     dev: true
     optional: true
 
-  /@microsoft/api-extractor-model@7.30.1(@types/node@18.19.70):
-    resolution: {integrity: sha512-CTS2PlASJHxVY8hqHORVb1HdECWOEMcMnM6/kDkPr0RZapAFSIHhg9D4jxuE8g+OWYHtPc10LCpmde5pylTRlA==}
+  /@microsoft/api-extractor-model@7.30.2(@types/node@18.19.70):
+    resolution: {integrity: sha512-3/t2F+WhkJgBzSNwlkTIL0tBgUoBqDqL66pT+nh2mPbM0NIDGVGtpqbGWPgHIzn/mn7kGS/Ep8D8po58e8UUIw==}
     dependencies:
       '@microsoft/tsdoc': 0.15.1
       '@microsoft/tsdoc-config': 0.17.1
-      '@rushstack/node-core-library': 5.10.1(@types/node@18.19.70)
+      '@rushstack/node-core-library': 5.10.2(@types/node@18.19.70)
     transitivePeerDependencies:
       - '@types/node'
     dev: true
 
-  /@microsoft/api-extractor@7.49.0(@types/node@18.19.70):
-    resolution: {integrity: sha512-X5b462k0/yl8qWdGx3siq5vyI8fTDU9fRnwqTMlGHqFhLxpASmLWA2EU6nft+ZG8cQM2HRZlr4HSo62UqiAnug==}
+  /@microsoft/api-extractor@7.49.1(@types/node@18.19.70):
+    resolution: {integrity: sha512-jRTR/XbQF2kb+dYn8hfYSicOGA99+Fo00GrsdMwdfE3eIgLtKdH6Qa2M3wZV9S2XmbgCaGX1OdPtYctbfu5jQg==}
     hasBin: true
     dependencies:
-      '@microsoft/api-extractor-model': 7.30.1(@types/node@18.19.70)
+      '@microsoft/api-extractor-model': 7.30.2(@types/node@18.19.70)
       '@microsoft/tsdoc': 0.15.1
       '@microsoft/tsdoc-config': 0.17.1
-      '@rushstack/node-core-library': 5.10.1(@types/node@18.19.70)
+      '@rushstack/node-core-library': 5.10.2(@types/node@18.19.70)
       '@rushstack/rig-package': 0.5.3
-      '@rushstack/terminal': 0.14.4(@types/node@18.19.70)
-      '@rushstack/ts-command-line': 4.23.2(@types/node@18.19.70)
+      '@rushstack/terminal': 0.14.5(@types/node@18.19.70)
+      '@rushstack/ts-command-line': 4.23.3(@types/node@18.19.70)
       lodash: 4.17.21
       minimatch: 3.0.8
       resolve: 1.22.10
@@ -3757,8 +3757,8 @@ packages:
     resolution: {integrity: sha512-zt6OdqaDoOnJ1ZYsCYGt9YmWzDXl4vQdKTyJev62gFhRGKdx7mcT54V9KIjg+d2wi9EXsPvAPKe7i7WjfVWB8g==}
     dev: true
 
-  /@rushstack/node-core-library@5.10.1(@types/node@18.19.70):
-    resolution: {integrity: sha512-BSb/KcyBHmUQwINrgtzo6jiH0HlGFmrUy33vO6unmceuVKTEyL2q+P0fQq2oB5hvXVWOEUhxB2QvlkZluvUEmg==}
+  /@rushstack/node-core-library@5.10.2(@types/node@18.19.70):
+    resolution: {integrity: sha512-xOF/2gVJZTfjTxbo4BDj9RtQq/HFnrrKdtem4JkyRLnwsRz2UDTg8gA1/et10fBx5RxmZD9bYVGST69W8ME5OQ==}
     peerDependencies:
       '@types/node': '*'
     peerDependenciesMeta:
@@ -3783,23 +3783,23 @@ packages:
       strip-json-comments: 3.1.1
     dev: true
 
-  /@rushstack/terminal@0.14.4(@types/node@18.19.70):
-    resolution: {integrity: sha512-NxACqERW0PHq8Rpq1V6v5iTHEwkRGxenjEW+VWqRYQ8T9puUzgmGHmEZUaUEDHAe9Qyvp0/Ew04sAiQw9XjhJg==}
+  /@rushstack/terminal@0.14.5(@types/node@18.19.70):
+    resolution: {integrity: sha512-TEOpNwwmsZVrkp0omnuTUTGZRJKTr6n6m4OITiNjkqzLAkcazVpwR1SOtBg6uzpkIBLgrcNHETqI8rbw3uiUfw==}
     peerDependencies:
       '@types/node': '*'
     peerDependenciesMeta:
       '@types/node':
         optional: true
     dependencies:
-      '@rushstack/node-core-library': 5.10.1(@types/node@18.19.70)
+      '@rushstack/node-core-library': 5.10.2(@types/node@18.19.70)
       '@types/node': 18.19.70
       supports-color: 8.1.1
     dev: true
 
-  /@rushstack/ts-command-line@4.23.2(@types/node@18.19.70):
-    resolution: {integrity: sha512-JJ7XZX5K3ThBBva38aomgsPv1L7FV6XmSOcR6HtM7HDFZJkepqT65imw26h9ggGqMjsY0R9jcl30tzKcVj9aOQ==}
+  /@rushstack/ts-command-line@4.23.3(@types/node@18.19.70):
+    resolution: {integrity: sha512-HazKL8fv4HMQMzrKJCrOrhyBPPdzk7iajUXgsASwjQ8ROo1cmgyqxt/k9+SdmrNLGE1zATgRqMUH3s/6smbRMA==}
     dependencies:
-      '@rushstack/terminal': 0.14.4(@types/node@18.19.70)
+      '@rushstack/terminal': 0.14.5(@types/node@18.19.70)
       '@types/argparse': 1.0.38
       argparse: 1.0.10
       string-argv: 0.3.2
@@ -14660,15 +14660,15 @@ packages:
     resolution: {integrity: sha512-9oxn0IIjbCZkJ67L+LkhYWRyAy7axphb3VgE2MBDlOqnmHMPWGYMxJxBYFueFq/JGY2GMwS0rU+UCLunEmy5UA==}
     dev: true
 
-  github.com/angular/bazel-builds/205769f51cbfcd6603dff959233ffb16431fbe04(@angular/compiler-cli@19.1.0-rc.0)(@bazel/concatjs@5.8.1)(@bazel/worker@5.8.1)(@rollup/plugin-commonjs@28.0.2)(@rollup/plugin-node-resolve@13.3.0)(@types/node@18.19.70)(rollup-plugin-sourcemaps@0.6.3)(rollup@4.30.1)(terser@5.37.0)(typescript@5.7.3):
-    resolution: {tarball: https://codeload.github.com/angular/bazel-builds/tar.gz/205769f51cbfcd6603dff959233ffb16431fbe04}
-    id: github.com/angular/bazel-builds/205769f51cbfcd6603dff959233ffb16431fbe04
+  github.com/angular/bazel-builds/0efbdb738786a53670fa60a3e7d4885faadfa2fe(@angular/compiler-cli@19.1.0-rc.0)(@bazel/concatjs@5.8.1)(@bazel/worker@5.8.1)(@rollup/plugin-commonjs@28.0.2)(@rollup/plugin-node-resolve@13.3.0)(@types/node@18.19.70)(rollup-plugin-sourcemaps@0.6.3)(rollup@4.30.1)(terser@5.37.0)(typescript@5.7.3):
+    resolution: {tarball: https://codeload.github.com/angular/bazel-builds/tar.gz/0efbdb738786a53670fa60a3e7d4885faadfa2fe}
+    id: github.com/angular/bazel-builds/0efbdb738786a53670fa60a3e7d4885faadfa2fe
     name: '@angular/bazel'
     version: 19.2.0-next.0
     engines: {node: ^18.19.1 || ^20.11.1 || >=22.0.0}
     hasBin: true
     peerDependencies:
-      '@angular/compiler-cli': 19.2.0-next.0+sha-0621482
+      '@angular/compiler-cli': 19.2.0-next.0+sha-f978cde
       '@bazel/concatjs': ^5.3.0
       '@bazel/worker': ^5.3.0
       '@rollup/plugin-commonjs': ^28.0.0
@@ -14684,7 +14684,7 @@ packages:
       '@angular/compiler-cli': 19.1.0-rc.0(@angular/compiler@19.1.0-rc.0)(typescript@5.7.3)
       '@bazel/concatjs': 5.8.1(karma-chrome-launcher@3.2.0)(karma-firefox-launcher@2.1.3)(karma-jasmine@5.1.0)(karma-junit-reporter@2.0.1)(karma-requirejs@1.1.0)(karma-sourcemap-loader@0.4.0)(karma@6.4.4)(typescript@5.7.3)
       '@bazel/worker': 5.8.1
-      '@microsoft/api-extractor': 7.49.0(@types/node@18.19.70)
+      '@microsoft/api-extractor': 7.49.1(@types/node@18.19.70)
       '@rollup/plugin-commonjs': 28.0.2(rollup@4.30.1)
       '@rollup/plugin-node-resolve': 13.3.0(rollup@4.30.1)
       magic-string: 0.30.17
@@ -14697,11 +14697,11 @@ packages:
       - '@types/node'
     dev: true
 
-  github.com/angular/dev-infra-private-build-tooling-builds/4b0419ce0fea35aa1ad3e92a882f93ba41199ace(@angular/compiler-cli@19.1.0-rc.0)(@angular/compiler@19.1.0-rc.0)(@angular/localize@19.1.0-rc.0)(@angular/platform-server@19.1.0-rc.0)(@angular/service-worker@19.1.0-rc.0)(chokidar@4.0.3)(debug@4.4.0)(karma-chrome-launcher@3.2.0)(karma-firefox-launcher@2.1.3)(karma-jasmine@5.1.0)(karma-junit-reporter@2.0.1)(karma-requirejs@1.1.0)(karma-sourcemap-loader@0.4.0)(karma@6.4.4)(less@4.2.1)(ng-packagr@19.1.0-next.3)(postcss@8.4.49)(rxjs@7.8.1)(terser@5.37.0)(zone.js@0.15.0):
-    resolution: {tarball: https://codeload.github.com/angular/dev-infra-private-build-tooling-builds/tar.gz/4b0419ce0fea35aa1ad3e92a882f93ba41199ace}
-    id: github.com/angular/dev-infra-private-build-tooling-builds/4b0419ce0fea35aa1ad3e92a882f93ba41199ace
+  github.com/angular/dev-infra-private-build-tooling-builds/11de733259a10bd9fc4079afdfe5733aec6383a1(@angular/compiler-cli@19.1.0-rc.0)(@angular/compiler@19.1.0-rc.0)(@angular/localize@19.1.0-rc.0)(@angular/platform-server@19.1.0-rc.0)(@angular/service-worker@19.1.0-rc.0)(chokidar@4.0.3)(debug@4.4.0)(karma-chrome-launcher@3.2.0)(karma-firefox-launcher@2.1.3)(karma-jasmine@5.1.0)(karma-junit-reporter@2.0.1)(karma-requirejs@1.1.0)(karma-sourcemap-loader@0.4.0)(karma@6.4.4)(less@4.2.1)(ng-packagr@19.1.0-next.3)(postcss@8.4.49)(rxjs@7.8.1)(terser@5.37.0)(zone.js@0.15.0):
+    resolution: {tarball: https://codeload.github.com/angular/dev-infra-private-build-tooling-builds/tar.gz/11de733259a10bd9fc4079afdfe5733aec6383a1}
+    id: github.com/angular/dev-infra-private-build-tooling-builds/11de733259a10bd9fc4079afdfe5733aec6383a1
     name: '@angular/build-tooling'
-    version: 0.0.0-5b4b2a6258dece411626435f680d2818769f469a
+    version: 0.0.0-639449b40067b3c087bcda04e5eab41a3839c736
     dependencies:
       '@angular/benchpress': 0.3.0(rxjs@7.8.1)(zone.js@0.15.0)
       '@angular/build': 19.1.0-rc.0(@angular/compiler-cli@19.1.0-rc.0)(@angular/compiler@19.1.0-rc.0)(@angular/localize@19.1.0-rc.0)(@angular/platform-server@19.1.0-rc.0)(@angular/service-worker@19.1.0-rc.0)(@types/node@18.19.70)(chokidar@4.0.3)(less@4.2.1)(ng-packagr@19.1.0-next.3)(postcss@8.4.49)(terser@5.37.0)(typescript@5.7.3)
@@ -14714,7 +14714,7 @@ packages:
       '@bazel/runfiles': 5.8.1
       '@bazel/terser': 5.8.1(terser@5.37.0)
       '@bazel/typescript': 5.8.1(typescript@5.7.3)
-      '@microsoft/api-extractor': 7.49.0(@types/node@18.19.70)
+      '@microsoft/api-extractor': 7.49.1(@types/node@18.19.70)
       '@types/browser-sync': 2.29.0
       '@types/minimatch': 5.1.2
       '@types/node': 18.19.70
@@ -14770,10 +14770,10 @@ packages:
       - zone.js
     dev: true
 
-  github.com/angular/dev-infra-private-ng-dev-builds/2dde6a7f809c2928ab1c7b85afb7fec0c49beafc:
-    resolution: {tarball: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/2dde6a7f809c2928ab1c7b85afb7fec0c49beafc}
+  github.com/angular/dev-infra-private-ng-dev-builds/af7ab37bf65d005745d676f30d9a9759a1757067:
+    resolution: {tarball: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/af7ab37bf65d005745d676f30d9a9759a1757067}
     name: '@angular/ng-dev'
-    version: 0.0.0-7863aba23429b9cdb432a63cb688dd4c61f51ce6
+    version: 0.0.0-639449b40067b3c087bcda04e5eab41a3839c736
     hasBin: true
     dependencies:
       '@google-cloud/spanner': 7.17.1(supports-color@10.0.0)
