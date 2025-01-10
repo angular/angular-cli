@@ -18,7 +18,7 @@ import {
   createAngularSsrExternalMiddleware,
   createAngularSsrInternalMiddleware,
 } from '../middlewares';
-import { AngularMemoryOutputFiles } from '../utils';
+import { AngularMemoryOutputFiles, AngularOutputAssets } from '../utils';
 
 export enum ServerSsrMode {
   /**
@@ -47,7 +47,7 @@ export enum ServerSsrMode {
 
 interface AngularSetupMiddlewaresPluginOptions {
   outputFiles: AngularMemoryOutputFiles;
-  assets: Map<string, string>;
+  assets: AngularOutputAssets;
   extensionMiddleware?: Connect.NextHandleFunction[];
   indexHtmlTransformer?: (content: string) => Promise<string>;
   componentStyles: Map<string, ComponentStyleRecord>;
