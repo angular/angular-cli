@@ -50,8 +50,8 @@ importers:
         specifier: 19.1.0-rc.0
         version: 19.1.0-rc.0(@angular/animations@19.1.0-rc.0)(@angular/cdk@19.1.0-rc.0)(@angular/common@19.1.0-rc.0)(@angular/core@19.1.0-rc.0)(@angular/forms@19.1.0-rc.0)(@angular/platform-browser@19.1.0-rc.0)(rxjs@7.8.1)
       '@angular/ng-dev':
-        specifier: https://github.com/angular/dev-infra-private-ng-dev-builds.git#8214e3156e6c9eb06089f7c50bec735a2cb73c3b
-        version: github.com/angular/dev-infra-private-ng-dev-builds/8214e3156e6c9eb06089f7c50bec735a2cb73c3b
+        specifier: https://github.com/angular/dev-infra-private-ng-dev-builds.git#2dde6a7f809c2928ab1c7b85afb7fec0c49beafc
+        version: github.com/angular/dev-infra-private-ng-dev-builds/2dde6a7f809c2928ab1c7b85afb7fec0c49beafc
       '@angular/platform-browser':
         specifier: 19.1.0-rc.0
         version: 19.1.0-rc.0(@angular/animations@19.1.0-rc.0)(@angular/common@19.1.0-rc.0)(@angular/core@19.1.0-rc.0)
@@ -3435,7 +3435,7 @@ packages:
       '@octokit/graphql': 8.1.2
       '@octokit/request': 9.1.4
       '@octokit/request-error': 6.1.6
-      '@octokit/types': 13.6.2
+      '@octokit/types': 13.7.0
       before-after-hook: 3.0.2
       universal-user-agent: 7.0.2
     dev: true
@@ -3444,7 +3444,7 @@ packages:
     resolution: {integrity: sha512-XybpFv9Ms4hX5OCHMZqyODYqGTZ3H6K6Vva+M9LR7ib/xr1y1ZnlChYv9H680y77Vd/i/k+thXApeRASBQkzhA==}
     engines: {node: '>= 18'}
     dependencies:
-      '@octokit/types': 13.6.2
+      '@octokit/types': 13.7.0
       universal-user-agent: 7.0.2
     dev: true
 
@@ -3453,22 +3453,22 @@ packages:
     engines: {node: '>= 18'}
     dependencies:
       '@octokit/request': 9.1.4
-      '@octokit/types': 13.6.2
+      '@octokit/types': 13.7.0
       universal-user-agent: 7.0.2
     dev: true
 
-  /@octokit/openapi-types@22.2.0:
-    resolution: {integrity: sha512-QBhVjcUa9W7Wwhm6DBFu6ZZ+1/t/oYxqc2tp81Pi41YNuJinbFRx8B133qVOrAaBbF7D/m0Et6f9/pZt9Rc+tg==}
+  /@octokit/openapi-types@23.0.1:
+    resolution: {integrity: sha512-izFjMJ1sir0jn0ldEKhZ7xegCTj/ObmEDlEfpFrx4k/JyZSMRHbO3/rBwgE7f3m2DHt+RrNGIVw4wSmwnm3t/g==}
     dev: true
 
-  /@octokit/plugin-paginate-rest@11.3.6(@octokit/core@6.1.3):
-    resolution: {integrity: sha512-zcvqqf/+TicbTCa/Z+3w4eBJcAxCFymtc0UAIsR3dEVoNilWld4oXdscQ3laXamTszUZdusw97K8+DrbFiOwjw==}
+  /@octokit/plugin-paginate-rest@11.4.0(@octokit/core@6.1.3):
+    resolution: {integrity: sha512-ttpGck5AYWkwMkMazNCZMqxKqIq1fJBNxBfsFwwfyYKTf914jKkLF0POMS3YkPBwp5g1c2Y4L79gDz01GhSr1g==}
     engines: {node: '>= 18'}
     peerDependencies:
       '@octokit/core': '>=6'
     dependencies:
       '@octokit/core': 6.1.3
-      '@octokit/types': 13.6.2
+      '@octokit/types': 13.7.0
     dev: true
 
   /@octokit/plugin-request-log@5.3.1(@octokit/core@6.1.3):
@@ -3480,21 +3480,21 @@ packages:
       '@octokit/core': 6.1.3
     dev: true
 
-  /@octokit/plugin-rest-endpoint-methods@13.2.6(@octokit/core@6.1.3):
-    resolution: {integrity: sha512-wMsdyHMjSfKjGINkdGKki06VEkgdEldIGstIEyGX0wbYHGByOwN/KiM+hAAlUwAtPkP3gvXtVQA9L3ITdV2tVw==}
+  /@octokit/plugin-rest-endpoint-methods@13.3.0(@octokit/core@6.1.3):
+    resolution: {integrity: sha512-LUm44shlmkp/6VC+qQgHl3W5vzUP99ZM54zH6BuqkJK4DqfFLhegANd+fM4YRLapTvPm4049iG7F3haANKMYvQ==}
     engines: {node: '>= 18'}
     peerDependencies:
       '@octokit/core': '>=6'
     dependencies:
       '@octokit/core': 6.1.3
-      '@octokit/types': 13.6.2
+      '@octokit/types': 13.7.0
     dev: true
 
   /@octokit/request-error@6.1.6:
     resolution: {integrity: sha512-pqnVKYo/at0NuOjinrgcQYpEbv4snvP3bKMRqHaD9kIsk9u1LCpb2smHZi8/qJfgeNqLo5hNW4Z7FezNdEo0xg==}
     engines: {node: '>= 18'}
     dependencies:
-      '@octokit/types': 13.6.2
+      '@octokit/types': 13.7.0
     dev: true
 
   /@octokit/request@9.1.4:
@@ -3503,25 +3503,25 @@ packages:
     dependencies:
       '@octokit/endpoint': 10.1.2
       '@octokit/request-error': 6.1.6
-      '@octokit/types': 13.6.2
+      '@octokit/types': 13.7.0
       fast-content-type-parse: 2.0.1
       universal-user-agent: 7.0.2
     dev: true
 
-  /@octokit/rest@21.0.2:
-    resolution: {integrity: sha512-+CiLisCoyWmYicH25y1cDfCrv41kRSvTq6pPWtRroRJzhsCZWZyCqGyI8foJT5LmScADSwRAnr/xo+eewL04wQ==}
+  /@octokit/rest@21.1.0:
+    resolution: {integrity: sha512-93iLxcKDJboUpmnUyeJ6cRIi7z7cqTZT1K7kRK4LobGxwTwpsa+2tQQbRQNGy7IFDEAmrtkf4F4wBj3D5rVlJQ==}
     engines: {node: '>= 18'}
     dependencies:
       '@octokit/core': 6.1.3
-      '@octokit/plugin-paginate-rest': 11.3.6(@octokit/core@6.1.3)
+      '@octokit/plugin-paginate-rest': 11.4.0(@octokit/core@6.1.3)
       '@octokit/plugin-request-log': 5.3.1(@octokit/core@6.1.3)
-      '@octokit/plugin-rest-endpoint-methods': 13.2.6(@octokit/core@6.1.3)
+      '@octokit/plugin-rest-endpoint-methods': 13.3.0(@octokit/core@6.1.3)
     dev: true
 
-  /@octokit/types@13.6.2:
-    resolution: {integrity: sha512-WpbZfZUcZU77DrSW4wbsSgTPfKcp286q3ItaIgvSbBpZJlu6mnYXAkjZz6LVZPXkEvLIM8McanyZejKTYUHipA==}
+  /@octokit/types@13.7.0:
+    resolution: {integrity: sha512-BXfRP+3P3IN6fd4uF3SniaHKOO4UXWBfkdR3vA8mIvaoO/wLjGN5qivUtW0QRitBHHMcfC41SLhNVYIZZE+wkA==}
     dependencies:
-      '@octokit/openapi-types': 22.2.0
+      '@octokit/openapi-types': 23.0.1
     dev: true
 
   /@opentelemetry/api@1.9.0:
@@ -15311,14 +15311,14 @@ packages:
       - zone.js
     dev: true
 
-  github.com/angular/dev-infra-private-ng-dev-builds/8214e3156e6c9eb06089f7c50bec735a2cb73c3b:
-    resolution: {tarball: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/8214e3156e6c9eb06089f7c50bec735a2cb73c3b}
+  github.com/angular/dev-infra-private-ng-dev-builds/2dde6a7f809c2928ab1c7b85afb7fec0c49beafc:
+    resolution: {tarball: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/2dde6a7f809c2928ab1c7b85afb7fec0c49beafc}
     name: '@angular/ng-dev'
-    version: 0.0.0-0b6f7cbd5a1b8383be81f8ef3ed1caf891c7c25c
+    version: 0.0.0-7863aba23429b9cdb432a63cb688dd4c61f51ce6
     hasBin: true
     dependencies:
       '@google-cloud/spanner': 7.17.1(supports-color@10.0.0)
-      '@octokit/rest': 21.0.2
+      '@octokit/rest': 21.1.0
       '@types/semver': 7.5.8
       '@types/supports-color': 8.1.3
       '@yarnpkg/lockfile': 1.1.0
