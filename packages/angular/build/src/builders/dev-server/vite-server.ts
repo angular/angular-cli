@@ -49,6 +49,11 @@ interface OutputFileRecord {
   type: BuildOutputFileType;
 }
 
+interface OutputAssetRecord {
+  source: string;
+  updated: boolean;
+}
+
 interface DevServerExternalResultMetadata extends Omit<ExternalResultMetadata, 'explicit'> {
   explicitBrowser: string[];
   explicitServer: string[];
@@ -168,7 +173,7 @@ export async function* serveWithVite(
   let serverUrl: URL | undefined;
   let hadError = false;
   const generatedFiles = new Map<string, OutputFileRecord>();
-  const assetFiles = new Map<string, string>();
+  const assetFiles = new Map<string, OutputAssetRecord>();
   const externalMetadata: DevServerExternalResultMetadata = {
     implicitBrowser: [],
     implicitServer: [],
@@ -229,19 +234,15 @@ export async function* serveWithVite(
         assetFiles.clear();
         componentStyles.clear();
         generatedFiles.clear();
-        for (const entry of Object.entries(result.files)) {
-          const [outputPath, file] = entry;
-          if (file.origin === 'disk') {
-            assetFiles.set('/' + normalizePath(outputPath), normalizePath(file.inputPath));
-            continue;
-          }
 
+        for (const [outputPath, file] of Object.entries(result.files)) {
           updateResultRecord(
             outputPath,
             file,
             normalizePath,
             htmlIndexPath,
             generatedFiles,
+            assetFiles,
             componentStyles,
             // The initial build will not yet have a server setup
             !server,
@@ -265,6 +266,7 @@ export async function* serveWithVite(
           generatedFiles.delete(filePath);
           assetFiles.delete(filePath);
         }
+
         for (const modified of result.modified) {
           updateResultRecord(
             modified,
@@ -272,9 +274,11 @@ export async function* serveWithVite(
             normalizePath,
             htmlIndexPath,
             generatedFiles,
+            assetFiles,
             componentStyles,
           );
         }
+
         for (const added of result.added) {
           updateResultRecord(
             added,
@@ -282,6 +286,7 @@ export async function* serveWithVite(
             normalizePath,
             htmlIndexPath,
             generatedFiles,
+            assetFiles,
             componentStyles,
           );
         }
@@ -352,12 +357,16 @@ export async function* serveWithVite(
     if (server) {
       // Update fs allow list to include any new assets from the build option.
       server.config.server.fs.allow = [
-        ...new Set([...server.config.server.fs.allow, ...assetFiles.values()]),
+        ...new Set([
+          ...server.config.server.fs.allow,
+          ...[...assetFiles.values()].map(({ source }) => source),
+        ]),
       ];
 
       await handleUpdate(
         normalizePath,
         generatedFiles,
+        assetFiles,
         server,
         serverOptions,
         context.logger,
@@ -471,15 +480,26 @@ export async function* serveWithVite(
 async function handleUpdate(
   normalizePath: (id: string) => string,
   generatedFiles: Map<string, OutputFileRecord>,
+  assetFiles: Map<string, OutputAssetRecord>,
   server: ViteDevServer,
   serverOptions: NormalizedDevServerOptions,
   logger: BuilderContext['logger'],
   componentStyles: Map<string, ComponentStyleRecord>,
 ): Promise<void> {
   const updatedFiles: string[] = [];
-  let destroyAngularServerAppCalled = false;
+
+  // Invalidate any updated asset
+  for (const [file, record] of assetFiles) {
+    if (!record.updated) {
+      continue;
+    }
+
+    record.updated = false;
+    updatedFiles.push(file);
+  }
 
   // Invalidate any updated files
+  let destroyAngularServerAppCalled = false;
   for (const [file, record] of generatedFiles) {
     if (!record.updated) {
       continue;
@@ -584,10 +604,16 @@ function updateResultRecord(
   normalizePath: (id: string) => string,
   htmlIndexPath: string,
   generatedFiles: Map<string, OutputFileRecord>,
+  assetFiles: Map<string, OutputAssetRecord>,
   componentStyles: Map<string, ComponentStyleRecord>,
   initial = false,
 ): void {
   if (file.origin === 'disk') {
+    assetFiles.set('/' + normalizePath(outputPath), {
+      source: normalizePath(file.inputPath),
+      updated: !initial,
+    });
+
     return;
   }
 
@@ -644,7 +670,7 @@ function updateResultRecord(
 export async function setupServer(
   serverOptions: NormalizedDevServerOptions,
   outputFiles: Map<string, OutputFileRecord>,
-  assets: Map<string, string>,
+  assets: Map<string, OutputAssetRecord>,
   preserveSymlinks: boolean | undefined,
   externalMetadata: DevServerExternalResultMetadata,
   ssrMode: ServerSsrMode,
@@ -743,7 +769,11 @@ export async function setupServer(
         // The first two are required for Vite to function in prebundling mode (the default) and to load
         // the Vite client-side code for browser reloading. These would be available by default but when
         // the `allow` option is explicitly configured, they must be included manually.
-        allow: [cacheDir, join(serverOptions.workspaceRoot, 'node_modules'), ...assets.values()],
+        allow: [
+          cacheDir,
+          join(serverOptions.workspaceRoot, 'node_modules'),
+          ...[...assets.values()].map(({ source }) => source),
+        ],
       },
       // This is needed when `externalDependencies` is used to prevent Vite load errors.
       // NOTE: If Vite adds direct support for externals, this can be removed.
