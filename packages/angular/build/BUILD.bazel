@@ -1,7 +1,6 @@
 load("@npm//@angular/build-tooling/bazel/api-golden:index.bzl", "api_golden_test_npm_package")
 load("@npm//@bazel/jasmine:index.bzl", "jasmine_node_test")
-load("//tools:defaults.bzl", "pkg_npm")
-load("//tools:interop.bzl", "ts_project")
+load("//tools:defaults2.bzl", "npm_package", "ts_project")
 load("//tools:ts_json_schema.bzl", "ts_json_schema")
 
 licenses(["notice"])
@@ -28,6 +27,18 @@ ts_json_schema(
     src = "src/builders/ng-packagr/schema.json",
 )
 
+RUNTIME_ASSETS = glob(
+    include = [
+        "src/**/schema.json",
+        "src/**/*.js",
+        "src/**/*.mjs",
+        "src/**/*.html",
+    ],
+) + [
+    "builders.json",
+    "package.json",
+]
+
 ts_project(
     name = "build",
     srcs = glob(
@@ -47,17 +58,7 @@ ts_project(
         "//packages/angular/build:src/builders/extract-i18n/schema.ts",
         "//packages/angular/build:src/builders/ng-packagr/schema.ts",
     ],
-    data = glob(
-        include = [
-            "src/**/schema.json",
-            "src/**/*.js",
-            "src/**/*.mjs",
-            "src/**/*.html",
-        ],
-    ) + [
-        "builders.json",
-        "package.json",
-    ],
+    data = RUNTIME_ASSETS,
     module_name = "@angular/build",
     deps = [
         "//:root_modules/@ampproject/remapping",
@@ -223,17 +224,17 @@ genrule(
     cmd = "cp $(execpath //:LICENSE) $@",
 )
 
-pkg_npm(
-    name = "npm_package",
+npm_package(
+    name = "pkg",
     pkg_deps = [
         "//packages/angular_devkit/architect:package.json",
     ],
     tags = ["release-package"],
-    deps = [
+    deps = RUNTIME_ASSETS + [
         ":README.md",
-        ":build",
+        ":build_rjs",
         ":license",
-        "//packages/angular/build/private",
+        "//packages/angular/build/private:private_rjs",
     ],
 )
 
