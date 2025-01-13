@@ -19,7 +19,6 @@ import {
   url,
 } from '@angular-devkit/schematics';
 import { JSONFile } from '../utility/json-file';
-import { latestVersions } from '../utility/latest-versions';
 import { relativePathToWorkspaceRoot } from '../utility/paths';
 import { buildDefaultPath, getWorkspace } from '../utility/workspace';
 import { ProjectType } from '../utility/workspace-models';
@@ -34,7 +33,7 @@ function updateTsConfig(packageName: string, ...paths: string[]) {
     const file = new JSONFile(host, 'tsconfig.json');
     const jsonPath = ['compilerOptions', 'paths', packageName];
     const value = file.get(jsonPath);
-    file.modify(jsonPath, Array.isArray(value) ? [...value, ...paths] : paths);
+    file.modify(jsonPath, Array.isArray(value) ? [...paths, ...value] : paths);
   };
 }
 
@@ -50,7 +49,7 @@ export default function (options: LibraryOptions): Rule {
 
       if (project?.extensions.projectType !== ProjectType.Library) {
         throw new SchematicsException(
-          `Secondary Entrypoint schematic requires a project type of "library".`,
+          `Library entrypoint schematic requires a project type of "library".`,
         );
       }
 
@@ -81,8 +80,6 @@ export default function (options: LibraryOptions): Rule {
           secondaryEntryPoint,
           relativePathToWorkspaceRoot: relativePathToWorkspaceRoot(libDir),
           packageName: options.name,
-          angularLatestVersion: latestVersions.Angular.replace(/~|\^/, ''),
-          tsLibLatestVersion: latestVersions['tslib'].replace(/~|\^/, ''),
         }),
         move(libDir),
       ]);
