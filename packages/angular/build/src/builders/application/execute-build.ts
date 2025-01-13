@@ -7,6 +7,7 @@
  */
 
 import { BuilderContext } from '@angular-devkit/architect';
+import { createAngularCompilation } from '../../tools/angular/compilation';
 import { SourceFileCache } from '../../tools/esbuild/angular/source-file-cache';
 import { generateBudgetStats } from '../../tools/esbuild/budget-stats';
 import {
@@ -108,6 +109,8 @@ export async function executeBuild(
       target,
       codeBundleCache,
       componentStyleBundler,
+      // Create new reusable compilation for the appropriate mode based on the `jit` plugin option
+      await createAngularCompilation(!!options.jit, !options.serverEntryPoint),
       templateUpdates,
     );
 
