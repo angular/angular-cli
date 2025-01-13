@@ -5,8 +5,7 @@
 
 load("@npm//@angular/build-tooling/bazel/api-golden:index.bzl", "api_golden_test_npm_package")
 load("@npm//@bazel/jasmine:index.bzl", "jasmine_node_test")
-load("//tools:defaults.bzl", "pkg_npm")
-load("//tools:interop.bzl", "ts_project")
+load("//tools:defaults2.bzl", "npm_package", "ts_project")
 
 licenses(["notice"])
 
@@ -67,13 +66,13 @@ genrule(
     cmd = "cp $(execpath //:LICENSE) $@",
 )
 
-pkg_npm(
-    name = "npm_package",
+npm_package(
+    name = "pkg",
     tags = ["release-package"],
     deps = [
         ":README.md",
         ":license",
-        ":webpack",
+        ":webpack_rjs",
     ],
 )
 
