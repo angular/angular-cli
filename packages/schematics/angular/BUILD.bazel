@@ -4,8 +4,7 @@
 # found in the LICENSE file at https://angular.dev/license
 
 load("@npm//@bazel/jasmine:index.bzl", "jasmine_node_test")
-load("//tools:defaults.bzl", "pkg_npm")
-load("//tools:interop.bzl", "ts_project")
+load("//tools:defaults2.bzl", "npm_package", "ts_project")
 load("//tools:ts_json_schema.bzl", "ts_json_schema")
 
 licenses(["notice"])
@@ -36,6 +35,27 @@ ALL_SCHEMA_TARGETS = [
     for (src, name) in ALL_SCHEMA_TARGETS
 ]
 
+RUNTIME_ASSETS = [
+    "collection.json",
+    "migrations/migration-collection.json",
+    "package.json",
+    "utility/latest-versions/package.json",
+] + glob(
+    include = [
+        "*/schema.json",
+        "*/files/**/*",
+        "*/other-files/**/*",
+        "*/implements-files/**/*",
+        "*/type-files/**/*",
+        "*/functional-files/**/*",
+        "*/class-files/**/*",
+    ],
+    exclude = [
+        # NB: we need to exclude the nested node_modules that is laid out by yarn workspaces
+        "node_modules/**",
+    ],
+)
+
 ts_project(
     name = "angular",
     srcs = glob(
@@ -58,26 +78,7 @@ ts_project(
         "//packages/schematics/angular:" + src.replace(".json", ".ts")
         for (src, _) in ALL_SCHEMA_TARGETS
     ],
-    data = [
-        "collection.json",
-        "migrations/migration-collection.json",
-        "package.json",
-        "utility/latest-versions/package.json",
-    ] + glob(
-        include = [
-            "*/schema.json",
-            "*/files/**/*",
-            "*/other-files/**/*",
-            "*/implements-files/**/*",
-            "*/type-files/**/*",
-            "*/functional-files/**/*",
-            "*/class-files/**/*",
-        ],
-        exclude = [
-            # NB: we need to exclude the nested node_modules that is laid out by yarn workspaces
-            "node_modules/**",
-        ],
-    ),
+    data = RUNTIME_ASSETS,
     module_name = "@schematics/angular",
     deps = [
         "//:root_modules/@inquirer/prompts",
@@ -138,19 +139,22 @@ genrule(
     cmd = "cp $(execpath //:LICENSE) $@",
 )
 
-pkg_npm(
-    name = "npm_package",
+npm_package(
+    name = "pkg",
     pkg_deps = [
         "//packages/angular_devkit/schematics:package.json",
         "//packages/angular_devkit/core:package.json",
     ],
+    stamp_files = [
+        "utility/latest-versions.js",
+    ],
     tags = ["release-package"],
-    deps = [
+    deps = RUNTIME_ASSETS + [
         ":README.md",
-        ":angular",
+        ":angular_rjs",
         ":license",
-        ":migrations/migration-collection.json",
-        ":utility/latest-versions/package.json",
         "//packages/schematics/angular/third_party/github.com/Microsoft/TypeScript:LICENSE",
+        # Force typescript library to be included.
+        "//packages/schematics/angular/third_party/github.com/Microsoft/TypeScript:lib/typescript.js",
     ],
 )
