@@ -170,6 +170,9 @@ npm_package(
         "//packages/angular_devkit/schematics:package.json",
         "//packages/schematics/angular:package.json",
     ],
+    stamp_files = [
+        "src/utilities/version.js",
+    ],
     tags = ["release-package"],
     deps = RUNTIME_ASSETS + [
         ":README.md",
