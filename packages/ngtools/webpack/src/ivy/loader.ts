@@ -12,7 +12,11 @@ import { AngularPluginSymbol, FileEmitterCollection } from './symbol';
 
 const JS_FILE_REGEXP = /\.[cm]?js$/;
 
-export function angularWebpackLoader(this: LoaderContext<unknown>, content: string, map: string) {
+export function angularWebpackLoader(
+  this: LoaderContext<unknown>,
+  content: string,
+  map: string,
+): void {
   const callback = this.async();
   if (!callback) {
     throw new Error('Invalid webpack version');

@@ -46,7 +46,7 @@ export class WebpackResourceLoader {
     }
   }
 
-  update(parentCompilation: Compilation, changedFiles?: Iterable<string>) {
+  update(parentCompilation: Compilation, changedFiles?: Iterable<string>): void {
     this._parentCompilation = parentCompilation;
 
     // Update resource cache and modified resources
@@ -82,23 +82,23 @@ export class WebpackResourceLoader {
     }
   }
 
-  clearParentCompilation() {
+  clearParentCompilation(): void {
     this._parentCompilation = undefined;
   }
 
-  getModifiedResourceFiles() {
+  getModifiedResourceFiles(): Set<string> {
     return this.modifiedResources;
   }
 
-  getResourceDependencies(filePath: string) {
+  getResourceDependencies(filePath: string): Iterable<string> {
     return this._fileDependencies.get(filePath) || [];
   }
 
-  getAffectedResources(file: string) {
+  getAffectedResources(file: string): Iterable<string> {
     return this._reverseDependencies.get(file) || [];
   }
 
-  setAffectedResources(file: string, resources: Iterable<string>) {
+  setAffectedResources(file: string, resources: Iterable<string>): void {
     this._reverseDependencies.set(file, new Set(resources));
   }
 
