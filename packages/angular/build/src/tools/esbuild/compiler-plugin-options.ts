@@ -31,7 +31,6 @@ export function createCompilerPluginOptions(
   const incremental = !!options.watch;
 
   return {
-    browserOnlyBuild: !options.serverEntryPoint,
     sourcemap: !!sourcemapOptions.scripts && (sourcemapOptions.hidden ? 'external' : true),
     thirdPartySourcemaps: sourcemapOptions.vendor,
     tsconfig,
