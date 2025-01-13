@@ -21,12 +21,7 @@ import { createHash } from 'node:crypto';
 import * as path from 'node:path';
 import { maxWorkers, useTypeChecking } from '../../../utils/environment-options';
 import { AngularHostOptions } from '../../angular/angular-host';
-import {
-  AngularCompilation,
-  DiagnosticModes,
-  NoopCompilation,
-  createAngularCompilation,
-} from '../../angular/compilation';
+import { AngularCompilation, DiagnosticModes, NoopCompilation } from '../../angular/compilation';
 import { JavaScriptTransformer } from '../javascript-transformer';
 import { LoadResultCache, createCachedLoad } from '../load-result-cache';
 import { logCumulativeDurations, profileAsync, resetCumulativeDurations } from '../profiling';
@@ -40,10 +35,7 @@ export interface CompilerPluginOptions {
   sourcemap: boolean | 'external';
   tsconfig: string;
   jit?: boolean;
-  browserOnlyBuild?: boolean;
 
-  /** Skip TypeScript compilation setup. This is useful to re-use the TypeScript compilation from another plugin. */
-  noopTypeScriptCompilation?: boolean;
   advancedOptimizations?: boolean;
   thirdPartySourcemaps?: boolean;
   fileReplacements?: Record<string, string>;
@@ -58,6 +50,7 @@ export interface CompilerPluginOptions {
 // eslint-disable-next-line max-lines-per-function
 export function createCompilerPlugin(
   pluginOptions: CompilerPluginOptions,
+  compilationOrFactory: AngularCompilation | (() => Promise<AngularCompilation>),
   stylesheetBundler: ComponentStylesheetBundler,
 ): Plugin {
   return {
@@ -105,6 +98,13 @@ export function createCompilerPlugin(
       build.initialOptions.define ??= {};
       build.initialOptions.define['ngI18nClosureMode'] ??= 'false';
 
+      // The factory is only relevant for compatibility purposes with the private API.
+      // TODO: Update private API in the next major to allow compilation function factory removal here.
+      const compilation =
+        typeof compilationOrFactory === 'function'
+          ? await compilationOrFactory()
+          : compilationOrFactory;
+
       // The in-memory cache of TypeScript file outputs will be used during the build in `onLoad` callbacks for TS files.
       // A string value indicates direct TS/NG output and a Uint8Array indicates fully transformed code.
       const typeScriptFileCache =
@@ -117,10 +117,6 @@ export function createCompilerPlugin(
         { outputFiles?: OutputFile[]; metafile?: Metafile; errors?: PartialMessage[] }
       >();
 
-      // Create new reusable compilation for the appropriate mode based on the `jit` plugin option
-      const compilation: AngularCompilation = pluginOptions.noopTypeScriptCompilation
-        ? new NoopCompilation()
-        : await createAngularCompilation(!!pluginOptions.jit, !!pluginOptions.browserOnlyBuild);
       // Compilation is initially assumed to have errors until emitted
       let hasCompilationErrors = true;
 
@@ -153,8 +149,8 @@ export function createCompilerPlugin(
         // dependencies or web worker processing.
         let modifiedFiles;
         if (
-          pluginOptions.sourceFileCache?.modifiedFiles.size &&
-          !pluginOptions.noopTypeScriptCompilation
+          !(compilation instanceof NoopCompilation) &&
+          pluginOptions.sourceFileCache?.modifiedFiles.size
         ) {
           // TODO: Differentiate between changed input files and stale output files
           modifiedFiles = referencedFileTracker.update(pluginOptions.sourceFileCache.modifiedFiles);
@@ -168,11 +164,7 @@ export function createCompilerPlugin(
           modifiedFiles.forEach((file) => additionalResults.delete(file));
         }
 
-        if (
-          !pluginOptions.noopTypeScriptCompilation &&
-          compilation.update &&
-          pluginOptions.sourceFileCache?.modifiedFiles.size
-        ) {
+        if (compilation.update && pluginOptions.sourceFileCache?.modifiedFiles.size) {
           await compilation.update(modifiedFiles ?? pluginOptions.sourceFileCache.modifiedFiles);
         }
 

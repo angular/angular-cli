@@ -13,6 +13,7 @@
  * their existence may change in any future version.
  */
 
+import { NoopCompilation, createAngularCompilation } from './tools/angular/compilation';
 import {
   CompilerPluginOptions,
   createCompilerPlugin as internalCreateCompilerPlugin,
@@ -38,11 +39,17 @@ export { createJitResourceTransformer } from './tools/angular/transformers/jit-r
 export { JavaScriptTransformer } from './tools/esbuild/javascript-transformer';
 
 export function createCompilerPlugin(
-  pluginOptions: CompilerPluginOptions,
+  pluginOptions: CompilerPluginOptions & {
+    browserOnlyBuild?: boolean;
+    noopTypeScriptCompilation?: boolean;
+  },
   styleOptions: BundleStylesheetOptions & { inlineStyleLanguage: string },
 ): import('esbuild').Plugin {
   return internalCreateCompilerPlugin(
     pluginOptions,
+    pluginOptions.noopTypeScriptCompilation
+      ? new NoopCompilation()
+      : () => createAngularCompilation(!!pluginOptions.jit, !!pluginOptions.browserOnlyBuild),
     new ComponentStylesheetBundler(
       styleOptions,
       styleOptions.inlineStyleLanguage,

@@ -17,6 +17,7 @@ import {
   SERVER_APP_ENGINE_MANIFEST_FILENAME,
   SERVER_APP_MANIFEST_FILENAME,
 } from '../../utils/server-rendering/manifest';
+import { AngularCompilation, NoopCompilation } from '../angular/compilation';
 import { createCompilerPlugin } from './angular/compiler-plugin';
 import { ComponentStylesheetBundler } from './angular/component-stylesheets';
 import { SourceFileCache } from './angular/source-file-cache';
@@ -39,6 +40,7 @@ export function createBrowserCodeBundleOptions(
   target: string[],
   sourceFileCache: SourceFileCache,
   stylesheetBundler: ComponentStylesheetBundler,
+  angularCompilation: AngularCompilation,
   templateUpdates: Map<string, string> | undefined,
 ): BundlerOptionsFactory {
   return (loadCache) => {
@@ -73,6 +75,7 @@ export function createBrowserCodeBundleOptions(
         createCompilerPlugin(
           // JS/TS options
           pluginOptions,
+          angularCompilation,
           // Component stylesheet bundler
           stylesheetBundler,
         ),
@@ -135,7 +138,9 @@ export function createBrowserPolyfillBundleOptions(
     buildOptions.plugins.push(
       createCompilerPlugin(
         // JS/TS options
-        { ...pluginOptions, noopTypeScriptCompilation: true },
+        pluginOptions,
+        // Browser compilation handles the actual Angular code compilation
+        new NoopCompilation(),
         // Component stylesheet options are unused for polyfills but required by the plugin
         stylesheetBundler,
       ),
@@ -276,7 +281,9 @@ export function createServerMainCodeBundleOptions(
         createAngularLocalizeInitWarningPlugin(),
         createCompilerPlugin(
           // JS/TS options
-          { ...pluginOptions, noopTypeScriptCompilation: true },
+          pluginOptions,
+          // Browser compilation handles the actual Angular code compilation
+          new NoopCompilation(),
           // Component stylesheet bundler
           stylesheetBundler,
         ),
@@ -416,7 +423,9 @@ export function createSsrEntryCodeBundleOptions(
         createAngularLocalizeInitWarningPlugin(),
         createCompilerPlugin(
           // JS/TS options
-          { ...pluginOptions, noopTypeScriptCompilation: true },
+          pluginOptions,
+          // Browser compilation handles the actual Angular code compilation
+          new NoopCompilation(),
           // Component stylesheet bundler
           stylesheetBundler,
         ),
