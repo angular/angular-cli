@@ -16,7 +16,7 @@ export interface CompilationWithInlineAngularResource extends Compilation {
   [InlineAngularResourceSymbol]: string;
 }
 
-export default function (this: LoaderContext<{ data?: string }>) {
+export default function (this: LoaderContext<{ data?: string }>): void {
   const callback = this.async();
   const { data } = this.getOptions();
 
