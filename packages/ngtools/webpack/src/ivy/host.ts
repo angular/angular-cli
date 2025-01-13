@@ -21,7 +21,7 @@ export function augmentHostWithResources(
     directTemplateLoading?: boolean;
     inlineStyleFileExtension?: string;
   } = {},
-) {
+): void {
   const resourceHost = host as CompilerHost;
 
   resourceHost.readResource = function (fileName: string) {

@@ -11,13 +11,13 @@
 // This should be false for commited code.
 const _benchmark = false;
 /* eslint-disable no-console */
-export function time(label: string) {
+export function time(label: string): void {
   if (_benchmark) {
     console.time(label);
   }
 }
 
-export function timeEnd(label: string) {
+export function timeEnd(label: string): void {
   if (_benchmark) {
     console.timeEnd(label);
   }
