@@ -12,7 +12,8 @@ import { updateJsonFile } from '../../utils/project';
 
 export default async function () {
   await ng('generate', 'library', 'mylib');
-  await createLibraryEntryPoint('secondary');
+  await ng('generate', 'lib-entry', 'secondary');
+  // await createLibraryEntryPoint('secondary');
   await createLibraryEntryPoint('another');
 
   // Scenario #1 where we use wildcard path mappings for secondary entry-points.

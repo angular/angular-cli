@@ -1,20 +1,20 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema",
   "$id": "SchematicsLibrary",
-  "title": "Secondary Entrypoint Schema",
+  "title": "Library Entrypoint Schema",
   "type": "object",
-  "description": "Creates a secondary entrypoint in a library project in a project.",
+  "description": "Generate an library entrypoint in an Angular library project.",
   "additionalProperties": false,
   "properties": {
     "name": {
       "type": "string",
       "description": "The name of the library.",
-      "pattern": "^(?:@[a-zA-Z0-9-*~][a-zA-Z0-9-*._~]*/)?[a-zA-Z0-9-~][a-zA-Z0-9-._~]*$",
+      "pattern": "^[a-zA-Z0-9-._~]+/?[a-zA-Z0-9-._~]+$",
       "$default": {
         "$source": "argv",
         "index": 0
       },
-      "x-prompt": "What name would you like to use for the secondary entrypoint?"
+      "x-prompt": "What name would you like to use for the entrypoint?"
     },
     "project": {
       "type": "string",
@@ -30,5 +30,8 @@
       "default": "public-api"
     }
   },
-  "required": ["name", "project"]
+  "required": [
+    "name",
+    "project"
+  ]
 }
