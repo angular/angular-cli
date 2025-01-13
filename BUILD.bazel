@@ -6,7 +6,6 @@ load("@aspect_rules_ts//ts:defs.bzl", rules_js_tsconfig = "ts_config")
 # found in the LICENSE file at https://angular.dev/license
 load("@bazel_skylib//rules:common_settings.bzl", "bool_flag")
 load("@build_bazel_rules_nodejs//:index.bzl", "copy_to_bin")
-load("@npm//@bazel/concatjs:index.bzl", "ts_config")
 load("@npm2//:defs.bzl", "npm_link_all_packages")
 
 package(default_visibility = ["//visibility:public"])
@@ -91,12 +90,4 @@ config_setting(
     flag_values = {
         ":enable_snapshot_repo_deps": "true",
     },
-)
-
-ts_config(
-    name = "tsconfig-build-ng",
-    src = "tsconfig-build-ng.json",
-    deps = [
-        ":tsconfig.json",
-    ],
 )
