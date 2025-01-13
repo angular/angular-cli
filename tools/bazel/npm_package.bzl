@@ -13,6 +13,7 @@ def npm_package(
         deps = [],
         visibility = None,
         pkg_deps = [],
+        stamp_files = [],
         pkg_json = "package.json",
         **kwargs):
     if name != "pkg":
@@ -74,11 +75,23 @@ def npm_package(
         stamp_substitutions = get_npm_package_substitutions_for_rjs(),
     )
 
+    stamp_targets = []
+    for f in stamp_files:
+        expand_template(
+            name = "stamp_file_%s" % f,
+            template = f,
+            out = "substituted/%s" % f,
+            substitutions = NO_STAMP_PACKAGE_SUBSTITUTIONS,
+            stamp_substitutions = get_npm_package_substitutions_for_rjs(),
+        )
+
+        stamp_targets.append("stamp_file_%s" % f)
+
     _npm_package(
         name = "npm_package",
         visibility = visibility,
         # Note: Order matters here! Last file takes precedence after replaced prefixes.
-        srcs = deps + [":final_package_json"],
+        srcs = deps + stamp_targets + [":final_package_json"],
         replace_prefixes = {
             "substituted_final/": "",
             "substituted_with_tars/": "",

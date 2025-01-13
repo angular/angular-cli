@@ -229,6 +229,10 @@ npm_package(
     pkg_deps = [
         "//packages/angular_devkit/architect:package.json",
     ],
+    stamp_files = [
+        "src/tools/esbuild/utils.js",
+        "src/utils/normalize-cache.js",
+    ],
     tags = ["release-package"],
     deps = RUNTIME_ASSETS + [
         ":README.md",
