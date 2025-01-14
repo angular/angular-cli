@@ -5,8 +5,7 @@
 
 load("@npm//@angular/build-tooling/bazel/api-golden:index.bzl", "api_golden_test_npm_package")
 load("@npm//@bazel/jasmine:index.bzl", "jasmine_node_test")
-load("//tools:defaults.bzl", "pkg_npm")
-load("//tools:interop.bzl", "ts_project")
+load("//tools:defaults2.bzl", "npm_package", "ts_project")
 load("//tools:ts_json_schema.bzl", "ts_json_schema")
 
 licenses(["notice"])
@@ -78,6 +77,18 @@ ts_json_schema(
     src = "src/builders/web-test-runner/schema.json",
 )
 
+RUNTIME_ASSETS = glob(
+    include = [
+        "src/**/schema.json",
+        "src/**/*.js",
+        "src/**/*.mjs",
+        "src/**/*.html",
+    ],
+) + [
+    "builders.json",
+    "package.json",
+]
+
 ts_project(
     name = "build_angular",
     srcs = glob(
@@ -108,17 +119,7 @@ ts_project(
         "//packages/angular_devkit/build_angular:src/builders/ssr-dev-server/schema.ts",
         "//packages/angular_devkit/build_angular:src/builders/web-test-runner/schema.ts",
     ],
-    data = glob(
-        include = [
-            "src/**/schema.json",
-            "src/**/*.js",
-            "src/**/*.mjs",
-            "src/**/*.html",
-        ],
-    ) + [
-        "builders.json",
-        "package.json",
-    ],
+    data = RUNTIME_ASSETS,
     module_name = "@angular-devkit/build-angular",
     deps = [
         "//:root_modules/@ampproject/remapping",
@@ -239,8 +240,8 @@ genrule(
     cmd = "cp $(execpath //:LICENSE) $@",
 )
 
-pkg_npm(
-    name = "npm_package",
+npm_package(
+    name = "pkg",
     pkg_deps = [
         "//packages/angular/build:package.json",
         "//packages/angular_devkit/architect:package.json",
@@ -248,10 +249,13 @@ pkg_npm(
         "//packages/angular_devkit/core:package.json",
         "//packages/ngtools/webpack:package.json",
     ],
+    stamp_files = [
+        "src/utils/normalize-cache.js",
+    ],
     tags = ["release-package"],
-    deps = [
+    deps = RUNTIME_ASSETS + [
         ":README.md",
-        ":build_angular",
+        ":build_angular_rjs",
         ":license",
     ],
 )
