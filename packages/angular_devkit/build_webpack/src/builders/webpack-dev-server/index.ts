@@ -6,7 +6,8 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { BuilderContext, createBuilder } from '@angular-devkit/architect';
+import { Builder, BuilderContext, createBuilder } from '@angular-devkit/architect';
+import { json } from '@angular-devkit/core';
 import { resolve as pathResolve } from 'path';
 import { Observable, from, isObservable, of, switchMap } from 'rxjs';
 import webpack from 'webpack';
@@ -124,12 +125,15 @@ export function runWebpackDevServer(
   );
 }
 
-export default createBuilder<WebpackDevServerBuilderSchema, DevServerBuildOutput>(
-  (options, context) => {
-    const configPath = pathResolve(context.workspaceRoot, options.webpackConfig);
+const builder: Builder<WebpackDevServerBuilderSchema & json.JsonObject> = createBuilder<
+  WebpackDevServerBuilderSchema,
+  DevServerBuildOutput
+>((options, context) => {
+  const configPath = pathResolve(context.workspaceRoot, options.webpackConfig);
 
-    return from(getWebpackConfig(configPath)).pipe(
-      switchMap((config) => runWebpackDevServer(config, context)),
-    );
-  },
-);
+  return from(getWebpackConfig(configPath)).pipe(
+    switchMap((config) => runWebpackDevServer(config, context)),
+  );
+});
+
+export default builder;

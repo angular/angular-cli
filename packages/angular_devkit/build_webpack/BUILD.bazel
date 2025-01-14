@@ -50,6 +50,7 @@ ts_project(
         "//:node_modules/webpack",
         "//:node_modules/webpack-dev-server",
         "//packages/angular_devkit/architect:architect_rjs",
+        "//packages/angular_devkit/core:core_rjs",
     ],
 )
 
