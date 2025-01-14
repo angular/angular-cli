@@ -6,7 +6,8 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { BuilderContext, BuilderOutput, createBuilder } from '@angular-devkit/architect';
+import { Builder, BuilderContext, BuilderOutput, createBuilder } from '@angular-devkit/architect';
+import { json } from '@angular-devkit/core';
 import assert from 'node:assert';
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -259,4 +260,7 @@ function generateFullPath(
   return fullFilePath;
 }
 
-export default createBuilder(buildApplication);
+const builder: Builder<ApplicationBuilderOptions & json.JsonObject> =
+  createBuilder(buildApplication);
+
+export default builder;
