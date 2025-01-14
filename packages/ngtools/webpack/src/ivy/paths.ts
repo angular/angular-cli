@@ -34,7 +34,7 @@ function externalizeForWindows(path: string): string {
   return result;
 }
 
-export const externalizePath = (() => {
+export const externalizePath: typeof externalizeForWindows = (() => {
   if (process.platform !== 'win32') {
     return (path: string) => path;
   }
