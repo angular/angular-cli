@@ -10,6 +10,6 @@ import * as jobs from './jobs';
 
 export * from './api';
 export { Architect, type ScheduleOptions } from './architect';
-export { createBuilder } from './create-builder';
+export { createBuilder, type Builder } from './create-builder';
 
 export { jobs };

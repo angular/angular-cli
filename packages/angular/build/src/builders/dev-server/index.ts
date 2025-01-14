@@ -6,7 +6,8 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { createBuilder } from '@angular-devkit/architect';
+import { Builder, createBuilder } from '@angular-devkit/architect';
+import { json } from '@angular-devkit/core';
 import { execute } from './builder';
 import type { DevServerBuilderOutput } from './output';
 import type { Schema as DevServerBuilderOptions } from './schema';
@@ -16,7 +17,12 @@ export {
   type DevServerBuilderOutput,
   execute as executeDevServerBuilder,
 };
-export default createBuilder<DevServerBuilderOptions, DevServerBuilderOutput>(execute);
+const builder: Builder<DevServerBuilderOptions & json.JsonObject> = createBuilder<
+  DevServerBuilderOptions,
+  DevServerBuilderOutput
+>(execute);
+
+export default builder;
 
 // Temporary export to support specs
 export { execute as executeDevServer };
