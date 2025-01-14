@@ -9,12 +9,12 @@ ts_project(
         include = ["**/*.ts"],
     ),
     deps = [
-        "//:root_modules/@angular/common",
-        "//:root_modules/@angular/compiler",
-        "//:root_modules/@angular/core",
-        "//:root_modules/@angular/platform-browser",
-        "//:root_modules/@angular/platform-server",
-        "//:root_modules/@angular/router",
+        "//:node_modules/@angular/common",
+        "//:node_modules/@angular/compiler",
+        "//:node_modules/@angular/core",
+        "//:node_modules/@angular/platform-browser",
+        "//:node_modules/@angular/platform-server",
+        "//:node_modules/@angular/router",
         "//packages/angular/ssr:ssr_rjs",
     ],
 )

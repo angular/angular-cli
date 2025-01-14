@@ -20,9 +20,9 @@ ts_project(
     data = ["package.json"],
     module_name = "@angular-devkit/schematics/tasks",
     deps = [
-        "//:root_modules/@types/node",
-        "//:root_modules/ora",
-        "//:root_modules/rxjs",
+        "//:node_modules/@types/node",
+        "//:node_modules/ora",
+        "//:node_modules/rxjs",
         "//packages/angular_devkit/core:core_rjs",
         "//packages/angular_devkit/core/node:node_rjs",
         "//packages/angular_devkit/schematics:schematics_rjs",

@@ -45,10 +45,10 @@ ts_project(
     data = RUNTIME_ASSETS,
     module_name = "@angular-devkit/build-webpack",
     deps = [
-        "//:root_modules/@types/node",
-        "//:root_modules/rxjs",
-        "//:root_modules/webpack",
-        "//:root_modules/webpack-dev-server",
+        "//:node_modules/@types/node",
+        "//:node_modules/rxjs",
+        "//:node_modules/webpack",
+        "//:node_modules/webpack-dev-server",
         "//packages/angular_devkit/architect:architect_rjs",
     ],
 )
@@ -68,7 +68,7 @@ ts_project(
     ),
     deps = [
         ":build_webpack_rjs",
-        "//:root_modules/@types/jasmine",
+        "//:node_modules/@types/jasmine",
         "//packages/angular_devkit/architect:architect_rjs",
         "//packages/angular_devkit/architect/node:node_rjs",
         "//packages/angular_devkit/architect/testing:testing_rjs",
@@ -82,14 +82,14 @@ jasmine_node_test(
     name = "build_webpack_test",
     srcs = [":build_webpack_test_lib"],
     data = [
-        "//:root_modules/@angular/common",
-        "//:root_modules/@angular/compiler",
-        "//:root_modules/@angular/compiler-cli",
-        "//:root_modules/@angular/core",
-        "//:root_modules/@angular/platform-browser",
-        "//:root_modules/@angular/platform-browser-dynamic",
-        "//:root_modules/tslib",
-        "//:root_modules/zone.js",
+        "//:node_modules/@angular/common",
+        "//:node_modules/@angular/compiler",
+        "//:node_modules/@angular/compiler-cli",
+        "//:node_modules/@angular/core",
+        "//:node_modules/@angular/platform-browser",
+        "//:node_modules/@angular/platform-browser-dynamic",
+        "//:node_modules/tslib",
+        "//:node_modules/zone.js",
     ],
 )
 

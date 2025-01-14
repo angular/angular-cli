@@ -16,7 +16,7 @@ ts_project(
         ],
     ),
     deps = [
-        "//:root_modules/@types/node",
+        "//:node_modules/@types/node",
         "//packages/angular_devkit/architect:architect_rjs",
     ],
 )

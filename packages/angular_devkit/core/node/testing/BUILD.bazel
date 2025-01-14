@@ -18,9 +18,9 @@ ts_project(
     ),
     module_name = "@angular-devkit/core/node/testing",
     deps = [
-        "//:root_modules/@types/jasmine",
-        "//:root_modules/@types/node",
-        "//:root_modules/rxjs",
+        "//:node_modules/@types/jasmine",
+        "//:node_modules/@types/node",
+        "//:node_modules/rxjs",
         "//packages/angular_devkit/core:core_rjs",
         "//packages/angular_devkit/core/node:node_rjs",
     ],

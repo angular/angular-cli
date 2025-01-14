@@ -25,10 +25,10 @@ ts_project(
     ],
     module_name = "@angular-devkit/schematics",
     deps = [
-        "//:root_modules/@types/node",
-        "//:root_modules/jsonc-parser",
-        "//:root_modules/magic-string",
-        "//:root_modules/rxjs",
+        "//:node_modules/@types/node",
+        "//:node_modules/jsonc-parser",
+        "//:node_modules/magic-string",
+        "//:node_modules/rxjs",
         "//packages/angular_devkit/core:core_rjs",
         "//packages/angular_devkit/core/node:node_rjs",  # TODO: get rid of this for 6.0
     ],
@@ -40,8 +40,8 @@ ts_project(
     srcs = glob(["src/**/*_spec.ts"]),
     deps = [
         ":schematics",
-        "//:root_modules/@types/jasmine",
-        "//:root_modules/rxjs",
+        "//:node_modules/@types/jasmine",
+        "//:node_modules/rxjs",
         "//packages/angular_devkit/core:core_rjs",
         "//packages/angular_devkit/core/node:node_rjs",
         "//packages/angular_devkit/schematics/testing:testing_rjs",
