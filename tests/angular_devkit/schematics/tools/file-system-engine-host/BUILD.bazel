@@ -22,8 +22,8 @@ ts_project(
         ],
     ),
     deps = [
-        "//:root_modules/@types/jasmine",
-        "//:root_modules/@types/node",
+        "//:node_modules/@types/jasmine",
+        "//:node_modules/@types/node",
         "//packages/angular_devkit/schematics:schematics_rjs",
     ],
 )

@@ -21,9 +21,9 @@ ts_project(
     data = ["package.json"],
     module_name = "@angular-devkit/schematics/tools",
     deps = [
-        "//:root_modules/@types/node",
-        "//:root_modules/jsonc-parser",
-        "//:root_modules/rxjs",
+        "//:node_modules/@types/node",
+        "//:node_modules/jsonc-parser",
+        "//:node_modules/rxjs",
         "//packages/angular_devkit/core:core_rjs",
         "//packages/angular_devkit/core/node:node_rjs",
         "//packages/angular_devkit/schematics:schematics_rjs",
@@ -43,8 +43,8 @@ ts_project(
     ),
     deps = [
         ":tools_rjs",
-        "//:root_modules/@types/jasmine",
-        "//:root_modules/rxjs",
+        "//:node_modules/@types/jasmine",
+        "//:node_modules/rxjs",
         "//packages/angular_devkit/core:core_rjs",
         "//packages/angular_devkit/core/node:node_rjs",
         "//packages/angular_devkit/schematics:schematics_rjs",

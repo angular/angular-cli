@@ -16,7 +16,7 @@ ts_project(
     ),
     data = glob(["projects/**/*"]),
     deps = [
-        "//:root_modules/rxjs",
+        "//:node_modules/rxjs",
         "//packages/angular_devkit/architect:architect_rjs",
         "//packages/angular_devkit/architect/node:node_rjs",
         "//packages/angular_devkit/architect/testing:testing_rjs",

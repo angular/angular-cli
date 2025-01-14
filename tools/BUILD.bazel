@@ -56,8 +56,8 @@ js_binary(
     name = "vanilla_ts_worker",
     data = [
         ":copy_worker_js",
-        "//:root_modules/@angular/compiler-cli",
-        "//:root_modules/typescript",
+        "//:node_modules/@angular/compiler-cli",
+        "//:node_modules/typescript",
     ],
     entry_point = ":copy_worker_js",
     fixed_args = ["--vanilla-ts"],
