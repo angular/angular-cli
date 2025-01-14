@@ -689,6 +689,20 @@ function createCompilerOptionsTransformer(
       });
     }
 
+    if (compilerOptions.isolatedModules && compilerOptions.emitDecoratorMetadata) {
+      setupWarnings?.push({
+        text: `TypeScript compiler option 'isolatedModules' may prevent the 'emitDecoratorMetadata' option from emitting all metadata.`,
+        location: null,
+        notes: [
+          {
+            text:
+              `The 'emitDecoratorMetadata' option is not required by Angular` +
+              'and can be removed if not explictly required by the project.',
+          },
+        ],
+      });
+    }
+
     // Synchronize custom resolve conditions.
     // Set if using the supported bundler resolution mode (bundler is the default in new projects)
     if (compilerOptions.moduleResolution === 100 /* ModuleResolutionKind.Bundler */) {
