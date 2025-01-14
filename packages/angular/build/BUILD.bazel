@@ -107,6 +107,7 @@ ts_project(
         "//packages/angular/ssr:ssr_rjs",
         "//packages/angular/ssr/node:node_rjs",
         "//packages/angular_devkit/architect:architect_rjs",
+        "//packages/angular_devkit/core:core_rjs",
     ],
 )
 
