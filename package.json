@@ -128,7 +128,7 @@
     "esbuild": "0.24.2",
     "esbuild-wasm": "0.24.2",
     "eslint": "8.57.0",
-    "eslint-config-prettier": "9.1.0",
+    "eslint-config-prettier": "10.0.1",
     "eslint-plugin-header": "3.1.1",
     "eslint-plugin-import": "2.31.0",
     "express": "4.21.2",

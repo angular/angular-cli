@@ -397,7 +397,7 @@ __metadata:
     esbuild: "npm:0.24.2"
     esbuild-wasm: "npm:0.24.2"
     eslint: "npm:8.57.0"
-    eslint-config-prettier: "npm:9.1.0"
+    eslint-config-prettier: "npm:10.0.1"
     eslint-plugin-header: "npm:3.1.1"
     eslint-plugin-import: "npm:2.31.0"
     express: "npm:4.21.2"
@@ -8812,14 +8812,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-config-prettier@npm:9.1.0":
-  version: 9.1.0
-  resolution: "eslint-config-prettier@npm:9.1.0"
+"eslint-config-prettier@npm:10.0.1":
+  version: 10.0.1
+  resolution: "eslint-config-prettier@npm:10.0.1"
   peerDependencies:
     eslint: ">=7.0.0"
   bin:
-    eslint-config-prettier: bin/cli.js
-  checksum: 10c0/6d332694b36bc9ac6fdb18d3ca2f6ac42afa2ad61f0493e89226950a7091e38981b66bac2b47ba39d15b73fff2cd32c78b850a9cf9eed9ca9a96bfb2f3a2f10d
+    eslint-config-prettier: build/bin/cli.js
+  checksum: 10c0/e2434931669d211663c0493f2c1640a670a02ba4503a68f056a7eda133f383acbbb983a4a7bd0ad6cb3b2bc4d5731c3be8b32fe28e35087a76fea45f7061ae70
   languageName: node
   linkType: hard
 
