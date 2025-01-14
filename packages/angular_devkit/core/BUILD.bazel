@@ -1,7 +1,6 @@
 load("@npm//@angular/build-tooling/bazel/api-golden:index.bzl", "api_golden_test_npm_package")
 load("@npm//@bazel/jasmine:index.bzl", "jasmine_node_test")
-load("//tools:defaults.bzl", "pkg_npm")
-load("//tools:interop.bzl", "ts_project")
+load("//tools:defaults2.bzl", "npm_package", "ts_project")
 
 # Copyright Google Inc. All Rights Reserved.
 #
@@ -11,7 +10,14 @@ package(default_visibility = ["//visibility:public"])
 
 licenses(["notice"])
 
-# @angular-devkit/core
+RUNTIME_ASSETS = glob(
+    include = ["**/*.json"],
+    # NB: we need to exclude the nested node_modules that is laid out by yarn workspaces
+    exclude = [
+        "node_modules/**",
+        "src/workspace/json/test/**",
+    ],
+)
 
 ts_project(
     name = "core",
@@ -21,14 +27,7 @@ ts_project(
             "src/**/*_spec.ts",
         ],
     ) + ["index.ts"],
-    data = glob(
-        include = ["**/*.json"],
-        # NB: we need to exclude the nested node_modules that is laid out by yarn workspaces
-        exclude = [
-            "node_modules/**",
-            "src/workspace/json/test/**",
-        ],
-    ),
+    data = RUNTIME_ASSETS,
     module_name = "@angular-devkit/core",
     deps = [
         "//:root_modules/@types/node",
@@ -73,15 +72,15 @@ genrule(
     cmd = "cp $(execpath //:LICENSE) $@",
 )
 
-pkg_npm(
-    name = "npm_package",
+npm_package(
+    name = "pkg",
     tags = ["release-package"],
-    deps = [
+    deps = RUNTIME_ASSETS + [
         ":README.md",
-        ":core",
+        ":core_rjs",
         ":license",
-        "//packages/angular_devkit/core/node",
-        "//packages/angular_devkit/core/node/testing",
+        "//packages/angular_devkit/core/node:node_rjs",
+        "//packages/angular_devkit/core/node/testing:testing_rjs",
     ],
 )
 
