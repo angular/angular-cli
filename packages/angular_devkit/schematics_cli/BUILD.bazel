@@ -1,6 +1,5 @@
 load("@npm//@bazel/jasmine:index.bzl", "jasmine_node_test")
-load("//tools:defaults.bzl", "pkg_npm")
-load("//tools:interop.bzl", "ts_project")
+load("//tools:defaults2.bzl", "npm_package", "ts_project")
 load("//tools:ts_json_schema.bzl", "ts_json_schema")
 
 # Copyright Google Inc. All Rights Reserved.
@@ -10,6 +9,19 @@ load("//tools:ts_json_schema.bzl", "ts_json_schema")
 licenses(["notice"])
 
 package(default_visibility = ["//visibility:public"])
+
+RUNTIME_ASSETS = [
+    "blank/schema.json",
+    "collection.json",
+    "package.json",
+    "schematic/schema.json",
+] + glob(
+    include = [
+        "blank/project-files/**/*",
+        "blank/schematic-files/**/*",
+        "schematic/files/**/*",
+    ],
+)
 
 # @angular-devkit/schematics-cli
 ts_project(
@@ -29,18 +41,7 @@ ts_project(
         "//packages/angular_devkit/schematics_cli:blank/schema.ts",
         "//packages/angular_devkit/schematics_cli:schematic/schema.ts",
     ],
-    data = [
-        "blank/schema.json",
-        "collection.json",
-        "package.json",
-        "schematic/schema.json",
-    ] + glob(
-        include = [
-            "blank/project-files/**/*",
-            "blank/schematic-files/**/*",
-            "schematic/files/**/*",
-        ],
-    ),
+    data = RUNTIME_ASSETS,
     module_name = "@angular-devkit/schematics-cli",
     deps = [
         "//:root_modules/@inquirer/prompts",
@@ -96,16 +97,16 @@ genrule(
     cmd = "cp $(execpath //:LICENSE) $@",
 )
 
-pkg_npm(
-    name = "npm_package",
+npm_package(
+    name = "pkg",
     pkg_deps = [
         "//packages/angular_devkit/schematics:package.json",
         "//packages/angular_devkit/core:package.json",
     ],
     tags = ["release-package"],
-    deps = [
+    deps = RUNTIME_ASSETS + [
         ":README.md",
         ":license",
-        ":schematics_cli",
+        ":schematics_cli_rjs",
     ],
 )
