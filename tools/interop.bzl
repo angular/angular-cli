@@ -107,8 +107,8 @@ def ts_project(name, module_name = None, deps = [], tsconfig = None, testonly = 
     # execution, with regards to first-party dependency linking.
     rjs_modules_to_rnjs = []
     for d in deps:
-        if d.startswith("//:root_modules/"):
-            rjs_modules_to_rnjs.append(d.replace("//:root_modules/", "@npm//"))
+        if d.startswith("//:node_modules/"):
+            rjs_modules_to_rnjs.append(d.replace("//:node_modules/", "@npm//"))
         if d.endswith("_rjs"):
             rjs_modules_to_rnjs.append(d.replace("_rjs", ""))
 

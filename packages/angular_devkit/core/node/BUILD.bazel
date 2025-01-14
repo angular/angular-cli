@@ -21,9 +21,9 @@ ts_project(
     ),
     module_name = "@angular-devkit/core/node",
     deps = [
-        "//:root_modules/@types/node",
-        "//:root_modules/chokidar",
-        "//:root_modules/rxjs",
+        "//:node_modules/@types/node",
+        "//:node_modules/chokidar",
+        "//:node_modules/rxjs",
         "//packages/angular_devkit/core:core_rjs",
     ],
 )
@@ -43,8 +43,8 @@ ts_project(
     ),
     deps = [
         ":node_rjs",
-        "//:root_modules/@types/jasmine",
-        "//:root_modules/rxjs",
+        "//:node_modules/@types/jasmine",
+        "//:node_modules/rxjs",
         "//packages/angular_devkit/core:core_rjs",
     ],
 )

@@ -18,9 +18,9 @@ ts_project(
     source_map = True,
     tsconfig = "//:build-tsconfig-angular",
     deps = [
-        "//:root_modules/@angular/core",
-        "//:root_modules/@angular/platform-server",
-        "//:root_modules/@types/node",
+        "//:node_modules/@angular/core",
+        "//:node_modules/@angular/platform-server",
+        "//:node_modules/@types/node",
         "//packages/angular/ssr:ssr_rjs",
     ],
 )

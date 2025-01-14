@@ -10,11 +10,11 @@ ts_project(
         "//tests/legacy-cli/e2e/ng-snapshot",
     ],
     deps = [
-        "//:root_modules/@types/express",
-        "//:root_modules/@types/semver",
-        "//:root_modules/express",
-        "//:root_modules/fast-glob",
-        "//:root_modules/semver",
+        "//:node_modules/@types/express",
+        "//:node_modules/@types/semver",
+        "//:node_modules/express",
+        "//:node_modules/fast-glob",
+        "//:node_modules/semver",
         "//tests/legacy-cli/e2e/utils:utils_rjs",
     ],
 )

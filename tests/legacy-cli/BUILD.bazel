@@ -12,8 +12,8 @@ ts_project(
         "verdaccio_auth.yaml",
     ],
     deps = [
-        "//:root_modules/ansi-colors",
-        "//:root_modules/fast-glob",
+        "//:node_modules/ansi-colors",
+        "//:node_modules/fast-glob",
         "//packages/angular_devkit/core:core_rjs",
         "//packages/angular_devkit/core/node:node_rjs",
         "//tests/legacy-cli/e2e/utils:utils_rjs",
