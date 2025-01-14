@@ -30,15 +30,15 @@ ts_project(
     data = RUNTIME_ASSETS,
     module_name = "@angular-devkit/core",
     deps = [
-        "//:root_modules/@types/node",
-        "//:root_modules/@types/picomatch",
-        "//:root_modules/@types/jasmine",
-        "//:root_modules/ajv",
-        "//:root_modules/ajv-formats",
-        "//:root_modules/jsonc-parser",
-        "//:root_modules/picomatch",
-        "//:root_modules/rxjs",
-        "//:root_modules/source-map",
+        "//:node_modules/@types/node",
+        "//:node_modules/@types/picomatch",
+        "//:node_modules/@types/jasmine",
+        "//:node_modules/ajv",
+        "//:node_modules/ajv-formats",
+        "//:node_modules/jsonc-parser",
+        "//:node_modules/picomatch",
+        "//:node_modules/rxjs",
+        "//:node_modules/source-map",
         # @node_module: typescript:es2015.proxy
         # @node_module: typescript:es2015.reflect
         # @node_module: typescript:es2015.symbol.wellknown
@@ -55,7 +55,7 @@ ts_project(
     data = glob(["src/workspace/json/test/**/*.json"]),
     deps = [
         ":core_rjs",
-        "//:root_modules/rxjs",
+        "//:node_modules/rxjs",
         "//packages/angular_devkit/core/node:node_rjs",
     ],
 )

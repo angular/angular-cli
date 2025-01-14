@@ -27,11 +27,11 @@ ts_project(
     source_map = True,
     tsconfig = "//:build-tsconfig-angular",
     deps = [
-        "//:root_modules/@angular/common",
-        "//:root_modules/@angular/core",
-        "//:root_modules/@angular/platform-server",
-        "//:root_modules/@angular/router",
-        "//:root_modules/tslib",
+        "//:node_modules/@angular/common",
+        "//:node_modules/@angular/core",
+        "//:node_modules/@angular/platform-server",
+        "//:node_modules/@angular/router",
+        "//:node_modules/tslib",
         "//packages/angular/ssr/third_party/beasties:beasties_dts",
     ],
 )

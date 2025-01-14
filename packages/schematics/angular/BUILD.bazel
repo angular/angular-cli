@@ -81,10 +81,10 @@ ts_project(
     data = RUNTIME_ASSETS,
     module_name = "@schematics/angular",
     deps = [
-        "//:root_modules/@inquirer/prompts",
-        "//:root_modules/@types/node",
-        "//:root_modules/browserslist",
-        "//:root_modules/jsonc-parser",
+        "//:node_modules/@inquirer/prompts",
+        "//:node_modules/@types/node",
+        "//:node_modules/browserslist",
+        "//:node_modules/jsonc-parser",
         "//packages/angular_devkit/core:core_rjs",
         "//packages/angular_devkit/schematics:schematics_rjs",
         "//packages/angular_devkit/schematics/tasks:tasks_rjs",
@@ -97,7 +97,7 @@ jasmine_node_test(
     srcs = ["no_typescript_runtime_dep_spec.js"],
     deps = [
         ":angular",
-        "//:root_modules/@types/jasmine",
+        "//:node_modules/@types/jasmine",
     ],
 )
 
@@ -116,8 +116,8 @@ ts_project(
     ),
     deps = [
         ":angular_rjs",
-        "//:root_modules/@types/jasmine",
-        "//:root_modules/jsonc-parser",
+        "//:node_modules/@types/jasmine",
+        "//:node_modules/jsonc-parser",
         "//packages/angular_devkit/core:core_rjs",
         "//packages/angular_devkit/core/node/testing:testing_rjs",
         "//packages/angular_devkit/schematics:schematics_rjs",

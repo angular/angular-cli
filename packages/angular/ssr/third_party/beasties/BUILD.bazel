@@ -9,7 +9,7 @@ js_library(
         "index.d.ts",
     ],
     deps = [
-        "//:root_modules/beasties",
+        "//:node_modules/beasties",
     ],
 )
 
@@ -19,7 +19,7 @@ js_library(
         ":bundled_beasties_files",
     ],
     deps = [
-        "//:root_modules/beasties",
+        "//:node_modules/beasties",
     ],
 )
 

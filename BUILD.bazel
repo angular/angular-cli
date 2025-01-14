@@ -22,16 +22,14 @@ exports_files([
     "package.json",
 ])
 
-npm_link_all_packages(
-    name = "root_modules",
-)
+npm_link_all_packages()
 
 rules_js_tsconfig(
     name = "build-tsconfig",
     src = "tsconfig-build.json",
     deps = [
         "tsconfig.json",
-        "//:root_modules/@types/node",
+        "//:node_modules/@types/node",
     ],
 )
 
@@ -48,8 +46,8 @@ rules_js_tsconfig(
     src = "tsconfig-test.json",
     deps = [
         "tsconfig.json",
-        "//:root_modules/@types/jasmine",
-        "//:root_modules/@types/node",
+        "//:node_modules/@types/jasmine",
+        "//:node_modules/@types/node",
     ],
 )
 

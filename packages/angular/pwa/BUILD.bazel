@@ -32,8 +32,8 @@ ts_project(
     data = RUNTIME_ASSETS,
     module_name = "@angular/pwa",
     deps = [
-        "//:root_modules/@types/node",
-        "//:root_modules/parse5-html-rewriting-stream",
+        "//:node_modules/@types/node",
+        "//:node_modules/parse5-html-rewriting-stream",
         "//packages/angular_devkit/schematics:schematics_rjs",
         "//packages/schematics/angular:angular_rjs",
     ],
@@ -50,7 +50,7 @@ ts_project(
     srcs = glob(["pwa/**/*_spec.ts"]),
     deps = [
         ":pwa_rjs",
-        "//:root_modules/@types/jasmine",
+        "//:node_modules/@types/jasmine",
         "//packages/angular_devkit/schematics/testing:testing_rjs",
     ],
 )

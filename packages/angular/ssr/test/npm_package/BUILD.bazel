@@ -8,7 +8,7 @@ ts_project(
     testonly = True,
     srcs = glob(["**/*.ts"]),
     deps = [
-        "//:root_modules/@bazel/runfiles",
+        "//:node_modules/@bazel/runfiles",
     ],
 )
 
