@@ -2,12 +2,12 @@
   "$schema": "http://json-schema.org/draft-07/schema",
   "$id": "SchematicsAngularWorkspace",
   "title": "Angular Workspace Options Schema",
-  "description": "Initializes an empty workspace and adds the necessary dependencies required by an Angular application.",
+  "description": "Creates a new Angular workspace. A workspace provides a structured environment for developing multiple projects, allowing you to manage dependencies, configurations, and build processes for a collection of applications and libraries. This schematic sets up the basic structure of the workspace and installs the necessary Angular dependencies.",
   "type": "object",
   "additionalProperties": false,
   "properties": {
     "name": {
-      "description": "The name of the workspace.",
+      "description": "The name for the new workspace. This name will be used for the root directory and will be referenced in various configuration files.",
       "type": "string",
       "$default": {
         "$source": "argv",
@@ -15,7 +15,7 @@
       }
     },
     "newProjectRoot": {
-      "description": "The path where new projects will be created.",
+      "description": "The path where new projects will be created within the workspace, relative to the workspace root. By default, new projects are created in the `projects` directory.",
       "type": "string",
       "visible": "false"
     },
@@ -28,17 +28,17 @@
       }
     },
     "minimal": {
-      "description": "Create a workspace without any testing frameworks. (Use for learning purposes only.)",
+      "description": "Create a workspace without any testing frameworks. This is intended for learning purposes and simple experimentation, not for production applications.",
       "type": "boolean",
       "default": false
     },
     "strict": {
-      "description": "Create a workspace with stricter type checking options. This setting helps improve maintainability and catch bugs ahead of time. For more information, see https://angular.dev/tools/cli/template-typecheck#strict-mode",
+      "description": "Enable stricter type checking and bundle budget settings for projects created within the workspace. This helps improve maintainability and catch bugs early on. For more information, see https://angular.dev/tools/cli/template-typecheck#strict-mode",
       "type": "boolean",
       "default": true
     },
     "packageManager": {
-      "description": "The package manager used to install dependencies.",
+      "description": "The package manager to use for installing dependencies.",
       "type": "string",
       "enum": ["npm", "yarn", "pnpm", "cnpm", "bun"]
     }

@@ -1,14 +1,14 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema",
   "$id": "SchematicsAngularResolver",
-  "title": "Angular resolver Options Schema",
+  "title": "Angular Resolver Options Schema",
   "type": "object",
   "additionalProperties": false,
-  "description": "Generates a new, generic resolver definition in the given project.",
+  "description": "Creates a new resolver in your project. Resolvers are used to pre-fetch data before a route is activated, ensuring that the necessary data is available before the component is displayed. This can improve the user experience by preventing delays and loading states. This schematic generates a new resolver with the specified name and options.",
   "properties": {
     "name": {
       "type": "string",
-      "description": "The name of the new resolver.",
+      "description": "The name for the new resolver. This will be used to create the resolver's class and spec files (e.g., `my-resolver.resolver.ts` and `my-resolver.resolver.spec.ts`).",
       "$default": {
         "$source": "argv",
         "index": 0
@@ -17,17 +17,17 @@
     },
     "skipTests": {
       "type": "boolean",
-      "description": "Do not create \"spec.ts\" test files for the new resolver.",
+      "description": "Skip the generation of a unit test file `spec.ts` for the new resolver.",
       "default": false
     },
     "flat": {
       "type": "boolean",
-      "description": "When true (the default), creates the new files at the top level of the current project.",
+      "description": "Creates the new resolver files at the top level of the current project. If set to false, a new folder with the resolver's name will be created to contain the files.",
       "default": true
     },
     "functional": {
       "type": "boolean",
-      "description": "Creates the resolver as a `ResolveFn`.",
+      "description": "Creates the resolver as a function `ResolveFn` instead of a class. Functional resolvers can be simpler for basic scenarios.",
       "default": true
     },
     "path": {
@@ -36,12 +36,12 @@
       "$default": {
         "$source": "workingDirectory"
       },
-      "description": "The path at which to create the interface that defines the resolver, relative to the current workspace.",
+      "description": "The path where the resolver files should be created, relative to the current workspace. If not provided, the resolver will be created in the current directory.",
       "visible": false
     },
     "project": {
       "type": "string",
-      "description": "The name of the project.",
+      "description": "The name of the project where the resolver should be created. If not specified, the CLI will determine the project from the current directory.",
       "$default": {
         "$source": "projectName"
       }
