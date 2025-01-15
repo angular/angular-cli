@@ -317,14 +317,20 @@ export async function getNpmPackageJson(
     fullMetadata: true,
     ...npmrc,
     ...(registry ? { registry } : {}),
-  }).then((response) => {
-    // While pacote type declares that versions cannot be undefined this is not the case.
-    if (!response.versions) {
-      response.versions = {};
-    }
+  })
+    .then((response) => {
+      // While pacote type declares that versions cannot be undefined this is not the case.
+      if (!response.versions) {
+        response.versions = {};
+      }
 
-    return response;
-  });
+      return response;
+    })
+    .catch((err) => {
+      logger.warn(`Could not find ${packageName}`, { err });
+
+      return {} as Partial<NpmRepositoryPackageJson>;
+    });
 
   npmPackageJsonCache.set(packageName, response);
 

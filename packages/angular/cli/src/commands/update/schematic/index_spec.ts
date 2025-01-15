@@ -71,6 +71,28 @@ describe('@schematics/update', () => {
     );
   }, 45000);
 
+  it('ignores dependencies hosted on alternative/private NPM registries', async () => {
+    let newTree = new UnitTestTree(
+      new HostTree(
+        new virtualFs.test.TestHost({
+          '/package.json': `{
+        "name": "blah",
+        "dependencies": {
+          "@fortawesome/pro-thin-svg-icons": "^6.6.0",
+          "@nostr/tools": "npm:@jsr/nostr__tools@^2.10.3"
+        }
+      }`,
+          '/.npmrc': `@jsr:registry=https://npm.jsr.io`,
+        }),
+      ),
+    );
+
+    newTree = await schematicRunner.runSchematic('update', undefined, newTree);
+    const packageJson = JSON.parse(newTree.readContent('/package.json'));
+    expect(packageJson['dependencies']['@fortawesome/pro-thin-svg-icons']).toBe('^6.6.0');
+    expect(packageJson['dependencies']['@nostr/tools']).toBe('npm:@jsr/nostr__tools@^2.10.3');
+  }, 45000);
+
   it('should not error with yarn 2.0 protocols', async () => {
     let newTree = new UnitTestTree(
       new HostTree(
