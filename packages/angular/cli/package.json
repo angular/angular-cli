@@ -25,7 +25,7 @@
     "@angular-devkit/architect": "0.0.0-EXPERIMENTAL-PLACEHOLDER",
     "@angular-devkit/core": "0.0.0-PLACEHOLDER",
     "@angular-devkit/schematics": "0.0.0-PLACEHOLDER",
-    "@inquirer/prompts": "7.2.1",
+    "@inquirer/prompts": "7.2.3",
     "@listr2/prompt-adapter-inquirer": "2.0.18",
     "@schematics/angular": "0.0.0-PLACEHOLDER",
     "@yarnpkg/lockfile": "1.1.0",
