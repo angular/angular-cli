@@ -360,6 +360,7 @@ __metadata:
     "@types/http-proxy": "npm:^1.17.4"
     "@types/ini": "npm:^4.0.0"
     "@types/jasmine": "npm:~5.1.0"
+    "@types/jasmine-reporters": "npm:^2"
     "@types/karma": "npm:^6.3.0"
     "@types/less": "npm:^3.0.3"
     "@types/loader-utils": "npm:^2.0.0"
@@ -410,6 +411,7 @@ __metadata:
     istanbul-lib-instrument: "npm:6.0.3"
     jasmine: "npm:^5.0.0"
     jasmine-core: "npm:~5.5.0"
+    jasmine-reporters: "npm:^2.5.2"
     jasmine-spec-reporter: "npm:~7.0.0"
     jsonc-parser: "npm:3.3.1"
     karma: "npm:~6.4.0"
@@ -4481,7 +4483,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/jasmine@npm:~5.1.0":
+"@types/jasmine-reporters@npm:^2":
+  version: 2.5.3
+  resolution: "@types/jasmine-reporters@npm:2.5.3"
+  dependencies:
+    "@types/jasmine": "npm:*"
+  checksum: 10c0/9e895e1b258bf59fbd7bb8c9079681ad48e1035c33c36e3ab0aa2034fd87e95abf71ef848996c21ca9ecd5a72ce2897cc26162fedf12e0ebaad9969f138a84a4
+  languageName: node
+  linkType: hard
+
+"@types/jasmine@npm:*, @types/jasmine@npm:~5.1.0":
   version: 5.1.5
   resolution: "@types/jasmine@npm:5.1.5"
   checksum: 10c0/904a2a6bfe7478478ec73d502708dc4b4cc46fa554c459cee3e0be01efda96fba7d26ef8bec2f246d9163cc517407b135acabcf6f076c11aa514ed9b79bc67e5
@@ -11325,7 +11336,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jasmine-reporters@npm:~2.5.0":
+"jasmine-reporters@npm:^2.5.2, jasmine-reporters@npm:~2.5.0":
   version: 2.5.2
   resolution: "jasmine-reporters@npm:2.5.2"
   dependencies:
