@@ -63,20 +63,19 @@ In general, cherry picks for LTS should only be done if it meets one of the crit
 
 # Release
 
-Releasing is performed using Angular's unified release tooling. Each week, two releases are expected, `latest` and `next` on npm. For major
-and minor releases, some dependencies need to be manually bumped. The following files contain all the version numbers which need to be
-manually updated:
-
-- [`latest-versions.ts`](/packages/schematics/angular/utility/latest-versions.ts#L=18)
-- [`latest-versions/package.json`](/packages/schematics/angular/utility/latest-versions/package.json)
-- [`@angular/pwa`](/packages/angular/pwa/package.json)
-- [`@angular-devkit/build-angular`](/packages/angular_devkit/build_angular/package.json)
-- [`@ngtools/webpack`](/packages/ngtools/webpack/package.json)
+Releasing is performed using Angular's unified release tooling. Each week, two releases are expected, `latest` and `next` on npm.
 
 **DURING a minor OR major CLI release:**
 
-Once FW releases the actual minor/major release (for example: `13.0.0` or `13.1.0`), the above versions should be updated to match (remove
-`-rc.0` and `-next.0`). This **must** be done as a separate PR which lands _after_ FW releases (or else CI will fail) but _before_ the CLI
+Once FW releases the actual minor/major release (for example: `13.0.0` or `13.1.0`), update dependencies with the following:
+
+1.  Run `sed -i -E "s, \|\| \^13\.1\.0-(next|rc)\.[0-9]+,,g" packages/**/package.json` with the release version to remove prerelease tags.
+    - No need to update `devDependencies` in the root `package.json`, Renovate will get them later.
+2.  Update [`latest-versions/package.json`](packages/schematics/angular/utility/latest-versions/package.json) so `@angular/core` and `ng-packagr` are using the release version (drop `-rc.0` / `-next.0`).
+    - This is the file used by `ng new` to determine versions in the generated `package.json` seen by developers.
+3.  Run `yarn -s bazel run @npm2//:sync` to update the pnpm lockfile.
+
+Merge the above two changes in a separate PR which lands _after_ FW releases (or else CI will fail) but _before_ the CLI
 release PR. Releases are built before the PR is sent for review, so any changes after that point won't be included in the release.
 
 **AFTER a major CLI release:**
