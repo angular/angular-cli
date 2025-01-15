@@ -1,2 +1,4 @@
 packages:
   - .
+  - packages/angular_devkit/architect
+  - packages/angular_devkit/core

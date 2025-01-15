@@ -186,6 +186,8 @@ npm_translate_lock(
     data = [
         "//:package.json",
         "//:pnpm-workspace.yaml",
+        "//packages/angular_devkit/architect:package.json",
+        "//packages/angular_devkit/core:package.json",
     ],
     npmrc = "//:.npmrc",
     patches = {
@@ -225,3 +227,15 @@ http_file(
     sha256 = "5a5c46846ecda83e05b9da26f1672ad51c59bce08fed88419850d0e29c993b30",
     urls = ["https://raw.githubusercontent.com/devversion/rules_angular/4b7532ba2b29078d005899cd15b415593d03cceb/dist/worker.mjs"],
 )
+
+http_archive(
+    name = "aspect_rules_jasmine",
+    sha256 = "0d2f9c977842685895020cac721d8cc4f1b37aae15af46128cf619741dc61529",
+    strip_prefix = "rules_jasmine-2.0.0",
+    url = "https://github.com/aspect-build/rules_jasmine/releases/download/v2.0.0/rules_jasmine-v2.0.0.tar.gz",
+)
+
+load("@aspect_rules_jasmine//jasmine:dependencies.bzl", "rules_jasmine_dependencies")
+
+# Fetch dependencies which users need as well
+rules_jasmine_dependencies()
