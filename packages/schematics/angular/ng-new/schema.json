@@ -3,15 +3,15 @@
   "$id": "SchematicsAngularNgNew",
   "title": "Angular Ng New Options Schema",
   "type": "object",
-  "description": "Creates a new project by combining the workspace and application schematics.",
+  "description": "Creates a new Angular workspace and an initial project. This schematic sets up the foundation for your Angular development, generating the workspace configuration files and an optional starter application. You can customize various aspects of the workspace and the initial project, such as routing, styling, and testing.",
   "additionalProperties": false,
   "properties": {
     "directory": {
       "type": "string",
-      "description": "The directory name to create the workspace in."
+      "description": "The directory where the new workspace and project should be created. If not specified, the workspace will be created in the current directory."
     },
     "name": {
-      "description": "The name of the new workspace and initial project.",
+      "description": "The name for the new workspace and the initial project. This name will be used for the root directory and various identifiers throughout the project.",
       "type": "string",
       "$default": {
         "$source": "argv",
@@ -20,18 +20,18 @@
       "x-prompt": "What name would you like to use for the new workspace and initial project?"
     },
     "skipInstall": {
-      "description": "Do not install dependency packages.",
+      "description": "Skip the automatic installation of packages. You will need to manually install the dependencies later.",
       "type": "boolean",
       "default": false
     },
     "skipGit": {
-      "description": "Do not initialize a git repository.",
+      "description": "Do not initialize a Git repository in the new workspace. By default, a Git repository is initialized to help you track changes to your project.",
       "type": "boolean",
       "default": false,
       "alias": "g"
     },
     "commit": {
-      "description": "Initial git repository commit information.",
+      "description": "Configure the initial Git commit for the new repository.",
       "oneOf": [
         { "type": "boolean" },
         {
@@ -54,24 +54,24 @@
       "default": true
     },
     "newProjectRoot": {
-      "description": "The path where new projects will be created, relative to the new workspace root.",
+      "description": "The path where new projects will be created within the workspace, relative to the workspace root. By default, new projects are created in the `projects` directory.",
       "type": "string",
       "default": "projects"
     },
     "inlineStyle": {
-      "description": "Include styles inline in the component TS file. By default, an external styles file is created and referenced in the component TypeScript file.",
+      "description": "Include the styles for the initial application's root component directly within the `app.component.ts` file. By default, a separate stylesheet file (e.g., `app.component.css`) is created.",
       "type": "boolean",
       "alias": "s",
       "x-user-analytics": "ep.ng_inline_style"
     },
     "inlineTemplate": {
-      "description": "Include template inline in the component TS file. By default, an external template file is created and referenced in the component TypeScript file.",
+      "description": "Include the HTML template for the initial application's root component directly within the `app.component.ts` file. By default, a separate template file (e.g., `app.component.html`) is created.",
       "type": "boolean",
       "alias": "t",
       "x-user-analytics": "ep.ng_inline_template"
     },
     "viewEncapsulation": {
-      "description": "The view encapsulation strategy to use in the initial project.",
+      "description": "Sets the view encapsulation mode for components in the initial project. This determines how component styles are scoped and applied. Options include: `Emulated` (default, styles are scoped to the component), `None` (styles are global), and `ShadowDom` (styles are encapsulated using Shadow DOM).",
       "enum": ["Emulated", "None", "ShadowDom"],
       "type": "string"
     },
@@ -85,41 +85,41 @@
     },
     "routing": {
       "type": "boolean",
-      "description": "Enable routing in the initial project.",
+      "description": "Enable routing in the initial application project. This sets up the necessary files and modules for managing navigation between different views in your application.",
       "x-user-analytics": "ep.ng_routing"
     },
     "prefix": {
       "type": "string",
       "format": "html-selector",
-      "description": "The prefix to apply to generated selectors for the initial project.",
+      "description": "The prefix to apply to generated selectors for the initial project. For example, if the prefix is `my-app` and you generate a component named `my-component`, the selector will be `my-app-my-component`.",
       "minLength": 1,
       "default": "app",
       "alias": "p"
     },
     "style": {
-      "description": "The file extension or preprocessor to use for style files.",
+      "description": "The type of stylesheet files to be created for components in the initial project.",
       "type": "string",
       "enum": ["css", "scss", "sass", "less"],
       "x-user-analytics": "ep.ng_style"
     },
     "skipTests": {
-      "description": "Do not generate \"spec.ts\" test files for the new project.",
+      "description": "Skip the generation of unit test files `spec.ts`.",
       "type": "boolean",
       "default": false,
       "alias": "S"
     },
     "createApplication": {
-      "description": "Create a new initial application project in the 'src' folder of the new workspace. When false, creates an empty workspace with no initial application. You can then use the generate application command so that all applications are created in the projects folder.",
+      "description": "Create a new initial application project in the new workspace. When false, creates an empty workspace with no initial application. You can then use the `ng generate application` command to create applications in the `projects` directory.",
       "type": "boolean",
       "default": true
     },
     "minimal": {
-      "description": "Create a workspace without any testing frameworks. (Use for learning purposes only.)",
+      "description": "Generate a minimal Angular workspace without any testing frameworks. This is intended for learning purposes and simple experimentation, not for production applications.",
       "type": "boolean",
       "default": false
     },
     "strict": {
-      "description": "Creates a workspace with stricter type checking and stricter bundle budgets settings. This setting helps improve maintainability and catch bugs ahead of time. For more information, see https://angular.dev/tools/cli/template-typecheck#strict-mode",
+      "description": "Enable stricter type checking and stricter bundle budgets settings. This setting helps improve maintainability and catch bugs ahead of time. For more information, see https://angular.dev/tools/cli/template-typecheck#strict-mode",
       "type": "boolean",
       "default": true
     },
@@ -135,16 +135,16 @@
       "x-user-analytics": "ep.ng_standalone"
     },
     "ssr": {
-      "description": "Creates an application with Server-Side Rendering (SSR) and Static Site Generation (SSG/Prerendering) enabled.",
+      "description": "Configure the initial application for Server-Side Rendering (SSR) and Static Site Generation (SSG/Prerendering).",
       "type": "boolean",
       "x-user-analytics": "ep.ng_ssr"
     },
     "serverRouting": {
-      "description": "Creates a server application using the Server Routing and App Engine APIs (Developer Preview).",
+      "description": "Create a server application in the initial project using the Server Routing and App Engine APIs (Developer Preview).",
       "type": "boolean"
     },
     "experimentalZoneless": {
-      "description": "Create an application that does not utilize zone.js.",
+      "description": "Create an initial application that does not utilize `zone.js`.",
       "type": "boolean",
       "default": false
     }
