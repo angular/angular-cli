@@ -1,3 +1,15 @@
+<a name="19.1.1"></a>
+
+# 19.1.1 (2025-01-16)
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                 |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------- |
+| [298506751](https://github.com/angular/angular-cli/commit/298506751f2b3788fa2def7f7b4012e9e5465047) | fix  | resolve HMR-prefixed files in SSR with Vite |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="19.1.0"></a>
 
 # 19.1.0 (2025-01-15)
