@@ -10,7 +10,7 @@ load("@npm//@angular/build-tooling/bazel:extract_js_module_output.bzl", "extract
 load("@rules_pkg//:pkg.bzl", "pkg_tar")
 load("//tools:link_package_json_to_tarballs.bzl", "link_package_json_to_tarballs")
 load("//tools:snapshot_repo_filter.bzl", "SNAPSHOT_REPO_JQ_FILTER")
-load("//tools:substitutions.bzl", "NO_STAMP_PACKAGE_SUBSTITUTIONS", "NPM_PACKAGE_SUBSTITUTIONS")
+load("//tools:substitutions.bzl", "substitutions")
 
 _DEFAULT_TSCONFIG_NG = "//:tsconfig-build-ng"
 _DEFAULT_TSCONFIG_TEST = "//:tsconfig-test.json"
@@ -159,8 +159,8 @@ def pkg_npm(name, pkg_deps = [], use_prodmode_output = False, **kwargs):
         package_name = None,
         validate = False,
         substitutions = select({
-            "//:stamp": NPM_PACKAGE_SUBSTITUTIONS,
-            "//conditions:default": NO_STAMP_PACKAGE_SUBSTITUTIONS,
+            "//:stamp": substitutions["legacy"]["stamp"],
+            "//conditions:default": substitutions["legacy"]["nostamp"],
         }),
         visibility = visibility,
         nested_packages = nested_packages,
@@ -221,8 +221,8 @@ def ng_package(deps = [], **kwargs):
         deps = deps,
         license = "//:LICENSE",
         substitutions = select({
-            "//:stamp": NPM_PACKAGE_SUBSTITUTIONS,
-            "//conditions:default": NO_STAMP_PACKAGE_SUBSTITUTIONS,
+            "//:stamp": substitutions["legacy"]["stamp"],
+            "//conditions:default": substitutions["legacy"]["nostamp"],
         }),
         **kwargs
     )
