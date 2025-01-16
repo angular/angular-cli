@@ -8,8 +8,8 @@
 
 /* eslint-disable import/no-extraneous-dependencies */
 import { normalize } from '@angular-devkit/core';
-import { UnitTestTree } from '@angular-devkit/schematics/testing';
 import { of as observableOf } from 'rxjs';
+import { UnitTestTree } from '../../testing';
 import { SchematicContext } from '../engine/interface';
 import { HostTree } from '../tree/host-tree';
 import { FileEntry, MergeStrategy } from '../tree/interface';

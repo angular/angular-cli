@@ -8,12 +8,12 @@
 
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { Path, virtualFs } from '@angular-devkit/core';
-import { HostTree, MergeStrategy, partitionApplyMerge } from '@angular-devkit/schematics';
 import { lastValueFrom, of as observableOf } from 'rxjs';
 import { Rule, SchematicContext, Source } from '../engine/interface';
-import { Tree } from '../tree/interface';
+import { HostTree } from '../tree/host-tree';
+import { MergeStrategy, Tree } from '../tree/interface';
 import { empty } from '../tree/static';
-import { apply, applyToSubtree, chain } from './base';
+import { apply, applyToSubtree, chain, partitionApplyMerge } from './base';
 import { callRule, callSource } from './call';
 import { move } from './move';
 
