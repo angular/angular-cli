@@ -5,9 +5,10 @@
 package.json=-1983260945
 packages/angular/cli/package.json=-1878910022
 packages/angular_devkit/architect/package.json=-1496633956
+packages/angular_devkit/architect_cli/package.json=1551210941
 packages/angular_devkit/core/package.json=339935828
 packages/angular_devkit/schematics/package.json=673943597
 packages/schematics/angular/package.json=251715148
-pnpm-lock.yaml=-1580789254
-pnpm-workspace.yaml=1839001260
+pnpm-lock.yaml=-318777127
+pnpm-workspace.yaml=-1051214858
 yarn.lock=577341343

@@ -188,6 +188,7 @@ npm_translate_lock(
         "//:pnpm-workspace.yaml",
         "//packages/angular/cli:package.json",
         "//packages/angular_devkit/architect:package.json",
+        "//packages/angular_devkit/architect_cli:package.json",
         "//packages/angular_devkit/core:package.json",
         "//packages/angular_devkit/schematics:package.json",
         "//packages/schematics/angular:package.json",
