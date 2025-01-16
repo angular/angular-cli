@@ -340,7 +340,7 @@ __metadata:
     "@babel/preset-env": "npm:7.26.0"
     "@babel/runtime": "npm:7.26.0"
     "@bazel/bazelisk": "npm:1.25.0"
-    "@bazel/buildifier": "npm:8.0.0"
+    "@bazel/buildifier": "npm:8.0.1"
     "@bazel/concatjs": "npm:5.8.1"
     "@bazel/jasmine": "npm:5.8.1"
     "@bazel/rollup": "npm:^5.8.1"
@@ -430,7 +430,7 @@ __metadata:
     magic-string: "npm:0.30.17"
     mini-css-extract-plugin: "npm:2.9.2"
     mrmime: "npm:2.0.0"
-    ng-packagr: "npm:19.1.0-next.4"
+    ng-packagr: "npm:19.1.0"
     npm: "npm:^11.0.0"
     npm-package-arg: "npm:12.0.1"
     npm-pick-manifest: "npm:10.0.0"
@@ -466,7 +466,7 @@ __metadata:
     ts-node: "npm:^10.9.1"
     tslib: "npm:2.8.1"
     typescript: "npm:5.7.3"
-    undici: "npm:7.2.1"
+    undici: "npm:7.2.3"
     unenv: "npm:^1.10.0"
     verdaccio: "npm:6.0.5"
     verdaccio-auth-memory: "npm:^10.0.0"
@@ -1796,12 +1796,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@bazel/buildifier@npm:8.0.0":
-  version: 8.0.0
-  resolution: "@bazel/buildifier@npm:8.0.0"
+"@bazel/buildifier@npm:8.0.1":
+  version: 8.0.1
+  resolution: "@bazel/buildifier@npm:8.0.1"
   bin:
     buildifier: buildifier.js
-  checksum: 10c0/09d385e3e092643175f703d3bbacb0ea181001f390d5e0cc75c08d4da609d3b8f8f6e40dc95af5ee7a116e1005536f32c275b0c1bfebecb6bed27f435c57ddca
+  checksum: 10c0/60f95d0b66e91fadd94b5df2e70aa06630702b2d1aa8b35d64b47ac426e6383ed761919c7f682bde895c1930bfd64add6281d97758b42d327c820d12c8605368
   languageName: node
   linkType: hard
 
@@ -13078,9 +13078,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ng-packagr@npm:19.1.0-next.4":
-  version: 19.1.0-next.4
-  resolution: "ng-packagr@npm:19.1.0-next.4"
+"ng-packagr@npm:19.1.0":
+  version: 19.1.0
+  resolution: "ng-packagr@npm:19.1.0"
   dependencies:
     "@rollup/plugin-json": "npm:^6.1.0"
     "@rollup/wasm-node": "npm:^4.24.0"
@@ -13104,7 +13104,7 @@ __metadata:
     rxjs: "npm:^7.8.1"
     sass: "npm:^1.81.0"
   peerDependencies:
-    "@angular/compiler-cli": ^19.0.0 || ^19.1.0-next.0
+    "@angular/compiler-cli": ^19.0.0 || ^19.1.0-next.0 || ^19.2.0-next.0
     tailwindcss: ^2.0.0 || ^3.0.0
     tslib: ^2.3.0
     typescript: ">=5.5 <5.8"
@@ -13116,7 +13116,7 @@ __metadata:
       optional: true
   bin:
     ng-packagr: cli/main.js
-  checksum: 10c0/5f60347e3fe8621bf7254813abc6ed8ee3bbe85530cc409d8b260f6bd5d8816c7ce71758e076c6e537d391863f251e76b33b08053509c11aa8c540acc114809c
+  checksum: 10c0/7d90c630d66c945bef5613a5fc12b39e6b753a86bb221329502afd1c46ed27b5dfb979f0ad55b26eb8e990a3ec17f9825c272f8b8a217e0f18c9ae0eb8eb0ff3
   languageName: node
   linkType: hard
 
@@ -17387,10 +17387,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"undici@npm:7.2.1":
-  version: 7.2.1
-  resolution: "undici@npm:7.2.1"
-  checksum: 10c0/55108466484336c1aa1100bc2f9d6c78de7926b447af6b45afec873996cac67f07d968d8363c9bec57887cd474af73c60698e7642c791d80d786cbc6bf5a8a7e
+"undici@npm:7.2.3":
+  version: 7.2.3
+  resolution: "undici@npm:7.2.3"
+  checksum: 10c0/1bc8f7799a9c69047d1e057a2c3b0f3d551fd8ced22327686d0eeadf883cb773a69532a42a68883aaa5674370ee00973c73c8b9f37715d63481fe14b7cbdc7ad
   languageName: node
   linkType: hard
 
