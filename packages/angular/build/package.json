@@ -48,14 +48,14 @@
     "lmdb": "3.2.2"
   },
   "peerDependencies": {
-    "@angular/compiler": "^19.0.0 || ^19.1.0-next.0",
-    "@angular/compiler-cli": "^19.0.0 || ^19.1.0-next.0",
-    "@angular/localize": "^19.0.0 || ^19.1.0-next.0",
-    "@angular/platform-server": "^19.0.0 || ^19.1.0-next.0",
-    "@angular/service-worker": "^19.0.0 || ^19.1.0-next.0",
+    "@angular/compiler": "0.0.0-ANGULAR-FW-PEER-DEP",
+    "@angular/compiler-cli": "0.0.0-ANGULAR-FW-PEER-DEP",
+    "@angular/localize": "0.0.0-ANGULAR-FW-PEER-DEP",
+    "@angular/platform-server": "0.0.0-ANGULAR-FW-PEER-DEP",
+    "@angular/service-worker": "0.0.0-ANGULAR-FW-PEER-DEP",
     "@angular/ssr": "^0.0.0-PLACEHOLDER",
     "less": "^4.2.0",
-    "ng-packagr": "^19.0.0 || ^19.1.0-next.0",
+    "ng-packagr": "0.0.0-NG-PACKAGR-PEER-DEP",
     "postcss": "^8.4.0",
     "tailwindcss": "^2.0.0 || ^3.0.0",
     "typescript": ">=5.5 <5.8"

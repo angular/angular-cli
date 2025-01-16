@@ -3,6 +3,11 @@ RELEASE_ENGINES_NODE = "^18.19.1 || ^20.11.1 || >=22.0.0"
 RELEASE_ENGINES_NPM = "^6.11.0 || ^7.5.6 || >=8.0.0"
 RELEASE_ENGINES_YARN = ">= 1.13.0"
 
+NG_PACKAGR_VERSION = "^19.1.0-next.0"
+ANGULAR_FW_VERSION = "^19.1.0-next.0"
+ANGULAR_FW_PEER_DEP = "^19.0.0 || ^19.1.0-next.0"
+NG_PACKAGR_PEER_DEP = "^19.0.0 || ^19.1.0-next.0"
+
 SNAPSHOT_REPOS = {
     "@angular/cli": "angular/cli-builds",
     "@angular/pwa": "angular/angular-pwa-builds",

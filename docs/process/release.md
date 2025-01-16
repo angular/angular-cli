@@ -69,24 +69,14 @@ Releasing is performed using Angular's unified release tooling. Each week, two r
 
 Once FW releases the actual minor/major release (for example: `13.0.0` or `13.1.0`), update dependencies with the following:
 
-1.  Run `sed -i -E "s, \|\| \^13\.1\.0-(next|rc)\.[0-9]+,,g" packages/**/package.json` with the release version to remove prerelease tags.
-    - No need to update `devDependencies` in the root `package.json`, Renovate will get them later.
-2.  Update [`latest-versions/package.json`](packages/schematics/angular/utility/latest-versions/package.json) so `@angular/core` and `ng-packagr` are using the release version (drop `-rc.0` / `-next.0`).
-    - This is the file used by `ng new` to determine versions in the generated `package.json` seen by developers.
-3.  Run `yarn -s bazel run @npm2//:sync` to update the pnpm lockfile.
+1.  Update [`constants.bzl`](../../constants.bzl) so `@angular/core` and `ng-packagr` are using the release version (drop `-next.0`).
 
-Merge the above two changes in a separate PR which lands _after_ FW releases (or else CI will fail) but _before_ the CLI
+Merge the above change in a separate PR which lands _after_ FW releases (or else CI will fail) but _before_ the CLI
 release PR. Releases are built before the PR is sent for review, so any changes after that point won't be included in the release.
-
-**AFTER a major CLI release:**
-
-Once a major release is complete, peer dependencies in the above files will need to be updated to "undo" the above change and add the
-prerelease version segment on `main`. For example, `"@angular/compiler-cli": "^13.0.0-next.0"` should become
-`"@angular/compiler-cli": "^13.0.0 || ^13.1.0-next.0"`. This should be done for all the peer deps in the above files.
 
 **AFTER a minor OR major CLI release:**
 
-`latest-versions.ts` also needs to be updated to use `-next.0` after a major or minor release. However this needs to happen _after_ FW
+`constants.bzl` also needs to be updated to use `-next.0` after a major or minor release. However this needs to happen _after_ FW
 publishes the initial `-next.0` release, which will happen 1 week after the major or minor release.
 
 ## Releasing the CLI
