@@ -1,4 +1,4 @@
-load("//:constants.bzl", "RELEASE_ENGINES_NODE", "RELEASE_ENGINES_NPM", "RELEASE_ENGINES_YARN")
+load("//:constants.bzl", "ANGULAR_FW_PEER_DEP", "ANGULAR_FW_VERSION", "NG_PACKAGR_PEER_DEP", "NG_PACKAGR_VERSION", "RELEASE_ENGINES_NODE", "RELEASE_ENGINES_NPM", "RELEASE_ENGINES_YARN")
 
 NPM_PACKAGE_SUBSTITUTIONS = {
     # Version of the local package being built, generated via the `--workspace_status_command` flag.
@@ -8,6 +8,10 @@ NPM_PACKAGE_SUBSTITUTIONS = {
     "0.0.0-ENGINES-NODE": RELEASE_ENGINES_NODE,
     "0.0.0-ENGINES-NPM": RELEASE_ENGINES_NPM,
     "0.0.0-ENGINES-YARN": RELEASE_ENGINES_YARN,
+    "0.0.0-NG-PACKAGR-VERSION": NG_PACKAGR_VERSION,
+    "0.0.0-NG-PACKAGR-PEER-DEP": NG_PACKAGR_PEER_DEP,
+    "0.0.0-ANGULAR-FW-VERSION": ANGULAR_FW_VERSION,
+    "0.0.0-ANGULAR-FW-PEER-DEP": ANGULAR_FW_PEER_DEP,
     # The below is needed for @angular/ssr FESM file.
     "\\./(.+)/packages/angular/ssr/third_party/beasties": "../third_party/beasties/index.js",
 }

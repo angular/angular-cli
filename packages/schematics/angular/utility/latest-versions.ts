@@ -15,12 +15,13 @@ export const latestVersions: Record<string, string> & {
   DevkitBuildAngular: string;
   AngularBuild: string;
   AngularSSR: string;
+  NgPackagr: string;
 } = {
   ...dependencies,
 
   // As Angular CLI works with same minor versions of Angular Framework, a tilde match for the current
-  Angular: dependencies['@angular/core'],
-
+  Angular: '0.0.0-ANGULAR-FW-VERSION',
+  NgPackagr: '0.0.0-NG-PACKAGR-VERSION',
   DevkitBuildAngular: '^0.0.0-PLACEHOLDER',
   AngularBuild: '^0.0.0-PLACEHOLDER',
   AngularSSR: '^0.0.0-PLACEHOLDER',
