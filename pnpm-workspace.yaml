@@ -2,3 +2,6 @@ packages:
   - .
   - packages/angular_devkit/architect
   - packages/angular_devkit/core
+  - packages/angular_devkit/schematics
+  - packages/angular/cli
+  - packages/schematics/angular
