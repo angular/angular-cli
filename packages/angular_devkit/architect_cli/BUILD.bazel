@@ -1,3 +1,4 @@
+load("@npm2//:defs.bzl", "npm_link_all_packages")
 load("//tools:defaults2.bzl", "npm_package", "ts_project")
 
 # Copyright Google Inc. All Rights Reserved.
@@ -8,6 +9,8 @@ licenses(["notice"])
 
 package(default_visibility = ["//visibility:public"])
 
+npm_link_all_packages()
+
 ts_project(
     name = "architect_cli",
     srcs = [
@@ -15,14 +18,12 @@ ts_project(
     ] + glob(["src/**/*.ts"]),
     module_name = "@angular-devkit/architect-cli",
     deps = [
+        ":node_modules/@angular-devkit/architect",
+        ":node_modules/@angular-devkit/core",
         "//:node_modules/@types/node",
         "//:node_modules/@types/progress",
         "//:node_modules/@types/yargs-parser",
         "//:node_modules/ansi-colors",
-        "//packages/angular_devkit/architect:architect_rjs",
-        "//packages/angular_devkit/architect/node:node_rjs",
-        "//packages/angular_devkit/core:core_rjs",
-        "//packages/angular_devkit/core/node:node_rjs",
     ],
 )
 
