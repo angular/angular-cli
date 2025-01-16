@@ -16,7 +16,7 @@
 # Get the fields from root package.json that should override the project
 # package.json, i.e., every field except the following
 | ($root
-    | del(.bin, .description, .dependencies, .name, .main, .peerDependencies, .optionalDependencies, .typings, .version, .private, .workspaces, .resolutions, .scripts, .["ng-update"])
+    | del(.bin, .description, .dependencies, .name, .main, .peerDependencies, .optionalDependencies, .typings, .version, .private, .workspaces, .resolutions, .scripts, .["ng-update"], .pnpm, .dependenciesMeta)
 ) as $root_overrides
 
 # Use the project package.json as a base and override other fields from root
