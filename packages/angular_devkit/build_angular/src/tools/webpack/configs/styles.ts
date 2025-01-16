@@ -96,6 +96,23 @@ export async function getStylesConfig(wco: WebpackConfigOptions): Promise<Config
       extraPostcssPlugins.push(require(tailwindPackagePath)({ config: tailwindConfigPath }));
     }
   }
+  // Check for tailwind V4
+  // Tailwind V4 uses the new `@tailwindcss/postcss` package
+  try {
+    const tailwindPostCSSPackagePath = require.resolve('@tailwindcss/postcss', { paths: [root] });
+    try {
+      require.resolve('tailwindcss', { paths: [root] });
+      // Tailwind V4 is installed, add the plugin
+      extraPostcssPlugins.push(require(tailwindPostCSSPackagePath)());
+    } catch {
+      logger.warn(
+        `The '@tailwindcss/postcss' package is installed but the 'tailwindcss' package is not installed.` +
+          ` To enable Tailwind CSS, please install the 'tailwindcss' package.`,
+      );
+    }
+  } catch {
+    // Tailwind V4 is not installed, no further action is needed
+  }
 
   const autoprefixer: typeof import('autoprefixer') = require('autoprefixer');
 
