@@ -3,14 +3,16 @@
 # Use of this source code is governed by an MIT-style license that can be
 # found in the LICENSE file at https://angular.dev/license
 
-load("@npm//@bazel/jasmine:index.bzl", "jasmine_node_test")
-load("//tools:defaults2.bzl", "npm_package", "ts_project")
+load("@npm2//:defs.bzl", "npm_link_all_packages")
+load("//tools:defaults2.bzl", "jasmine_test", "npm_package", "ts_project")
 load("//tools:ng_cli_schema_generator.bzl", "cli_json_schema")
 load("//tools:ts_json_schema.bzl", "ts_json_schema")
 
 licenses(["notice"])
 
 package(default_visibility = ["//visibility:public"])
+
+npm_link_all_packages()
 
 RUNTIME_ASSETS = glob(
     include = [
@@ -43,6 +45,10 @@ ts_project(
     data = RUNTIME_ASSETS,
     module_name = "@angular/cli",
     deps = [
+        ":node_modules/@angular-devkit/architect",
+        ":node_modules/@angular-devkit/core",
+        ":node_modules/@angular-devkit/schematics",
+        ":node_modules/resolve",
         "//:node_modules/@angular/core",
         "//:node_modules/@inquirer/prompts",
         "//:node_modules/@listr2/prompt-adapter-inquirer",
@@ -62,14 +68,8 @@ ts_project(
         "//:node_modules/npm-pick-manifest",
         "//:node_modules/pacote",
         "//:node_modules/semver",
+        "//:node_modules/symbol-observable",
         "//:node_modules/yargs",
-        "//packages/angular_devkit/architect:architect_rjs",
-        "//packages/angular_devkit/architect/node:node_rjs",
-        "//packages/angular_devkit/core:core_rjs",
-        "//packages/angular_devkit/core/node:node_rjs",
-        "//packages/angular_devkit/schematics:schematics_rjs",
-        "//packages/angular_devkit/schematics/tasks:tasks_rjs",
-        "//packages/angular_devkit/schematics/tools:tools_rjs",
     ],
 )
 
@@ -148,9 +148,9 @@ ts_project(
     ],
 )
 
-jasmine_node_test(
+jasmine_test(
     name = "angular-cli_test",
-    srcs = [":angular-cli_test_lib"],
+    data = [":angular-cli_test_lib_rjs"],
 )
 
 genrule(
