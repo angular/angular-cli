@@ -1,6 +1,6 @@
 load("@npm//@angular/build-tooling/bazel/api-golden:index.bzl", "api_golden_test_npm_package")
-load("@npm//@bazel/jasmine:index.bzl", "jasmine_node_test")
-load("//tools:defaults2.bzl", "npm_package", "ts_project")
+load("@npm2//:defs.bzl", "npm_link_all_packages")
+load("//tools:defaults2.bzl", "jasmine_test", "npm_package", "ts_project")
 
 # Copyright Google Inc. All Rights Reserved.
 #
@@ -9,6 +9,8 @@ load("//tools:defaults2.bzl", "npm_package", "ts_project")
 package(default_visibility = ["//visibility:public"])
 
 licenses(["notice"])
+
+npm_link_all_packages()
 
 # @angular-devkit/schematics
 
@@ -25,12 +27,11 @@ ts_project(
     ],
     module_name = "@angular-devkit/schematics",
     deps = [
+        ":node_modules/@angular-devkit/core",
         "//:node_modules/@types/node",
         "//:node_modules/jsonc-parser",
         "//:node_modules/magic-string",
         "//:node_modules/rxjs",
-        "//packages/angular_devkit/core:core_rjs",
-        "//packages/angular_devkit/core/node:node_rjs",  # TODO: get rid of this for 6.0
     ],
 )
 
@@ -39,18 +40,17 @@ ts_project(
     testonly = True,
     srcs = glob(["src/**/*_spec.ts"]),
     deps = [
+        ":node_modules/@angular-devkit/core",
         ":schematics",
         "//:node_modules/@types/jasmine",
         "//:node_modules/rxjs",
-        "//packages/angular_devkit/core:core_rjs",
-        "//packages/angular_devkit/core/node:node_rjs",
         "//packages/angular_devkit/schematics/testing:testing_rjs",
     ],
 )
 
-jasmine_node_test(
+jasmine_test(
     name = "schematics_test",
-    deps = [":schematics_test_lib"],
+    data = [":schematics_test_lib_rjs"],
 )
 
 genrule(
