@@ -217,6 +217,7 @@ export async function* serveWithVite(
       });
     }
 
+    let needClientUpdate = true;
     switch (result.kind) {
       case ResultKind.Full:
         if (result.detail?.['htmlIndexPath']) {
@@ -260,6 +261,9 @@ export async function* serveWithVite(
         break;
       case ResultKind.Incremental:
         assert(server, 'Builder must provide an initial full build before incremental results.');
+
+        // Background updates should only update server files/options
+        needClientUpdate = !result.background;
 
         for (const removed of result.removed) {
           const filePath = '/' + normalizePath(removed.path);
@@ -363,15 +367,17 @@ export async function* serveWithVite(
         ]),
       ];
 
-      await handleUpdate(
-        normalizePath,
-        generatedFiles,
-        assetFiles,
-        server,
-        serverOptions,
-        context.logger,
-        componentStyles,
-      );
+      if (needClientUpdate) {
+        await handleUpdate(
+          normalizePath,
+          generatedFiles,
+          assetFiles,
+          server,
+          serverOptions,
+          context.logger,
+          componentStyles,
+        );
+      }
     } else {
       const projectName = context.target?.project;
       if (!projectName) {
