@@ -12,9 +12,9 @@ import { Observable } from 'rxjs';
 import { Path } from '@angular-devkit/core';
 import { PathFragment } from '@angular-devkit/core';
 import { schema } from '@angular-devkit/core';
+import { Subject } from 'rxjs';
 import { Url } from 'url';
 import { virtualFs } from '@angular-devkit/core';
-import { workflow } from '@angular-devkit/schematics';
 
 // @public (undocumented)
 export class CollectionCannotBeResolvedException extends BaseException {
