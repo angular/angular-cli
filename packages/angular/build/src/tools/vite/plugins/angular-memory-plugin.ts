@@ -8,7 +8,8 @@
 
 import assert from 'node:assert';
 import { readFile } from 'node:fs/promises';
-import { basename, dirname, join, relative } from 'node:path';
+import { basename, dirname, join, parse, relative } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import type { Plugin } from 'vite';
 import { loadEsmModule } from '../../../utils/load-esm';
 import { AngularMemoryOutputFiles } from '../utils';
@@ -23,6 +24,7 @@ interface AngularMemoryPluginOptions {
 
 const ANGULAR_PREFIX = '/@ng/';
 const VITE_FS_PREFIX = '/@fs/';
+const FILE_PROTOCOL = 'file:';
 
 export async function createAngularMemoryPlugin(
   options: AngularMemoryPluginOptions,
@@ -40,8 +42,18 @@ export async function createAngularMemoryPlugin(
       }
 
       // For SSR with component HMR, pass through as a virtual module
-      if (ssr && source.startsWith(ANGULAR_PREFIX)) {
-        return '\0' + source;
+      if (ssr && source.startsWith(FILE_PROTOCOL) && source.includes(ANGULAR_PREFIX)) {
+        // Vite will resolve these these files example:
+        // `file:///@ng/component?c=src%2Fapp%2Fapp.component.ts%40AppComponent&t=1737017253850`
+        const sourcePath = fileURLToPath(source);
+        const { root } = parse(sourcePath);
+        const sourceWithoutRoot = normalizePath('/' + sourcePath.slice(root.length));
+
+        if (sourceWithoutRoot.startsWith(ANGULAR_PREFIX)) {
+          const [, query] = source.split('?', 2);
+
+          return `\0${sourceWithoutRoot}?${query}`;
+        }
       }
 
       // Prevent vite from resolving an explicit external dependency (`externalDependencies` option)
