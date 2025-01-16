@@ -6,7 +6,7 @@ load("@aspect_rules_js//npm:defs.bzl", _npm_package = "npm_package")
 load("@rules_pkg//:pkg.bzl", "pkg_tar")
 load("//tools:link_package_json_to_tarballs.bzl", "link_package_json_to_tarballs")
 load("//tools:snapshot_repo_filter.bzl", "SNAPSHOT_REPO_JQ_FILTER")
-load("//tools:substitutions.bzl", "NO_STAMP_PACKAGE_SUBSTITUTIONS", "get_npm_package_substitutions_for_rjs")
+load("//tools:substitutions.bzl", "substitutions")
 
 def npm_package(
         name,
@@ -71,8 +71,8 @@ def npm_package(
             "//conditions:default": "substituted/package.json",
         }),
         out = "substituted_final/package.json",
-        substitutions = NO_STAMP_PACKAGE_SUBSTITUTIONS,
-        stamp_substitutions = get_npm_package_substitutions_for_rjs(),
+        substitutions = substitutions["rjs"]["nostamp"],
+        stamp_substitutions = substitutions["rjs"]["stamp"],
     )
 
     stamp_targets = []
@@ -81,8 +81,8 @@ def npm_package(
             name = "stamp_file_%s" % f,
             template = f,
             out = "substituted/%s" % f,
-            substitutions = NO_STAMP_PACKAGE_SUBSTITUTIONS,
-            stamp_substitutions = get_npm_package_substitutions_for_rjs(),
+            substitutions = substitutions["rjs"]["nostamp"],
+            stamp_substitutions = substitutions["rjs"]["stamp"],
         )
 
         stamp_targets.append("stamp_file_%s" % f)
