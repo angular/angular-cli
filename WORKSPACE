@@ -186,8 +186,11 @@ npm_translate_lock(
     data = [
         "//:package.json",
         "//:pnpm-workspace.yaml",
+        "//packages/angular/cli:package.json",
         "//packages/angular_devkit/architect:package.json",
         "//packages/angular_devkit/core:package.json",
+        "//packages/angular_devkit/schematics:package.json",
+        "//packages/schematics/angular:package.json",
     ],
     npmrc = "//:.npmrc",
     patches = {

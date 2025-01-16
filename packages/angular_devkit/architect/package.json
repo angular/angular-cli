@@ -6,7 +6,7 @@
   "main": "src/index.js",
   "typings": "src/index.d.ts",
   "dependencies": {
-    "@angular-devkit/core": "0.0.0-PLACEHOLDER",
+    "@angular-devkit/core": "workspace:0.0.0-PLACEHOLDER",
     "rxjs": "7.8.1"
   },
   "builders": "./builders/builders.json"
