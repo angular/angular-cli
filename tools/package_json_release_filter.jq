@@ -30,3 +30,8 @@
 
 # Add engines; versions substituted via pkg_npm
 + {"engines": {"node": "0.0.0-ENGINES-NODE", "npm": "0.0.0-ENGINES-NPM", "yarn": "0.0.0-ENGINES-YARN"}}
+
+# Remove all `workspace:` pnpm prefixes. Afterwards we can conveniently rely on
+# substitutions from the stamp values. Note that we are doing it this way because
+# substitutions can apply to multiple files, and `workspace:` can't be reliably replaced.
+| walk(if type == "string" and startswith("workspace:") then sub("workspace:"; "") else . end)
