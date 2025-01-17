@@ -1,3 +1,17 @@
+<a name="19.1.2"></a>
+
+# 19.1.2 (2025-01-17)
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                                        |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------ |
+| [939d1612a](https://github.com/angular/angular-cli/commit/939d1612add13bab9aed6cc77bce0e17555bfe3b) | fix  | perform incremental background file updates with component updates |
+| [304027207](https://github.com/angular/angular-cli/commit/30402720707b7a8b9042a6046692d62a768cdc64) | fix  | prevent full page reload on HMR updates with SSR enabled           |
+| [148acbd58](https://github.com/angular/angular-cli/commit/148acbd58a13b1ba8c4a3349bd6042c24a9f93b5) | fix  | reset component updates on dev-server index request                |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="19.1.1"></a>
 
 # 19.1.1 (2025-01-16)
