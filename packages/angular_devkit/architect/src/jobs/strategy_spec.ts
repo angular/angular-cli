@@ -6,14 +6,14 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { promisify } from 'util';
+import timers from 'node:timers/promises';
 import { JobState } from './api';
 import { createJobHandler } from './create-job-handler';
 import { SimpleJobRegistry } from './simple-registry';
 import { SimpleScheduler } from './simple-scheduler';
 import * as strategy from './strategy';
 
-const flush = promisify(setImmediate);
+const flush = () => timers.setTimeout(1);
 
 describe('strategy.serialize()', () => {
   let registry: SimpleJobRegistry;
@@ -37,7 +37,7 @@ describe('strategy.serialize()', () => {
             setTimeout(() => {
               finished++;
               resolve(input.reduce((a, c) => a + c, 0));
-            }, 10),
+            }, 100),
           );
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
         }) as any,
@@ -94,7 +94,7 @@ describe('strategy.serialize()', () => {
             setTimeout(() => {
               finished++;
               resolve(input.reduce((a, c) => a + c, 0));
-            }, 10),
+            }, 100),
           );
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
         }) as any,
@@ -114,7 +114,7 @@ describe('strategy.serialize()', () => {
             setTimeout(() => {
               finished++;
               resolve(input.reduce((a, c) => a + c, 100));
-            }, 10),
+            }, 100),
           );
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
         }) as any,
@@ -179,7 +179,7 @@ describe('strategy.reuse()', () => {
             setTimeout(() => {
               finished++;
               resolve(input.reduce((a, c) => a + c, 0));
-            }, 10),
+            }, 100),
           );
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
         }) as any,
@@ -254,7 +254,7 @@ describe('strategy.memoize()', () => {
             setTimeout(() => {
               finished++;
               resolve(input.reduce((a, c) => a + c, 0));
-            }, 10),
+            }, 100),
           );
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
         }) as any,
