@@ -250,11 +250,6 @@ export async function* serveWithVite(
           );
         }
 
-        // Invalidate SSR module graph to ensure that only new rebuild is used and not stale component updates
-        if (server && browserOptions.ssr && templateUpdates.size > 0) {
-          server.moduleGraph.invalidateAll();
-        }
-
         // Clear stale template updates on code rebuilds
         templateUpdates.clear();
 
@@ -303,16 +298,6 @@ export async function* serveWithVite(
           'Builder must provide an initial full build before component update results.',
         );
 
-        // Invalidate SSR module graph to ensure that new component updates are used
-        // TODO: Use fine-grained invalidation of only the component update modules
-        if (browserOptions.ssr) {
-          server.moduleGraph.invalidateAll();
-          const { ɵresetCompiledComponents } = (await server.ssrLoadModule('/main.server.mjs')) as {
-            ɵresetCompiledComponents: () => void;
-          };
-          ɵresetCompiledComponents();
-        }
-
         for (const componentUpdate of result.updates) {
           if (componentUpdate.type === 'template') {
             templateUpdates.set(componentUpdate.id, componentUpdate.content);
@@ -322,6 +307,7 @@ export async function* serveWithVite(
             });
           }
         }
+
         context.logger.info('Component update sent to client(s).');
         continue;
       default:
@@ -367,16 +353,15 @@ export async function* serveWithVite(
         ]),
       ];
 
+      const updatedFiles = await invalidateUpdatedFiles(
+        normalizePath,
+        generatedFiles,
+        assetFiles,
+        server,
+      );
+
       if (needClientUpdate) {
-        await handleUpdate(
-          normalizePath,
-          generatedFiles,
-          assetFiles,
-          server,
-          serverOptions,
-          context.logger,
-          componentStyles,
-        );
+        handleUpdate(server, serverOptions, context.logger, componentStyles, updatedFiles);
       }
     } else {
       const projectName = context.target?.project;
@@ -483,15 +468,18 @@ export async function* serveWithVite(
   await new Promise<void>((resolve) => (deferred = resolve));
 }
 
-async function handleUpdate(
+/**
+ * Invalidates any updated asset or generated files and resets their `updated` state.
+ * This function also clears the server application cache when necessary.
+ *
+ * @returns A list of files that were updated and invalidated.
+ */
+async function invalidateUpdatedFiles(
   normalizePath: (id: string) => string,
   generatedFiles: Map<string, OutputFileRecord>,
   assetFiles: Map<string, OutputAssetRecord>,
   server: ViteDevServer,
-  serverOptions: NormalizedDevServerOptions,
-  logger: BuilderContext['logger'],
-  componentStyles: Map<string, ComponentStyleRecord>,
-): Promise<void> {
+): Promise<string[]> {
   const updatedFiles: string[] = [];
 
   // Invalidate any updated asset
@@ -531,13 +519,28 @@ async function handleUpdate(
     updatedModules?.forEach((m) => server.moduleGraph.invalidateModule(m));
   }
 
-  if (!updatedFiles.length) {
-    return;
-  }
-
   if (destroyAngularServerAppCalled) {
     // Trigger module evaluation before reload to initiate dependency optimization.
     await server.ssrLoadModule('/main.server.mjs');
+  }
+
+  return updatedFiles;
+}
+
+/**
+ * Handles updates for the client by sending HMR or full page reload commands
+ * based on the updated files. It also ensures proper tracking of component styles and determines if
+ * a full reload is needed.
+ */
+function handleUpdate(
+  server: ViteDevServer,
+  serverOptions: NormalizedDevServerOptions,
+  logger: BuilderContext['logger'],
+  componentStyles: Map<string, ComponentStyleRecord>,
+  updatedFiles: string[],
+): void {
+  if (!updatedFiles.length) {
+    return;
   }
 
   if (serverOptions.hmr) {
