@@ -295,7 +295,7 @@ function* emitOutputResults(
 
       if (needFile) {
         // Updates to non-JS files must signal an update with the dev server
-        if (!/(?:\.js|\.map)?$/.test(file.path)) {
+        if (!/(?:\.m?js|\.map)?$/.test(file.path)) {
           incrementalResult.background = false;
         }
 
