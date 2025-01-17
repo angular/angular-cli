@@ -151,6 +151,14 @@ export async function* serveWithVite(
   // This will also replace file-based/inline styles as code if external runtime styles are not enabled.
   browserOptions.templateUpdates =
     serverOptions.liveReload && serverOptions.hmr && useComponentTemplateHmr;
+  if (browserOptions.templateUpdates) {
+    context.logger.warn(
+      'Component HMR has been enabled.\n' +
+        'If you encounter application reload issues, you can manually reload the page to bypass HMR and/or disable this feature with the' +
+        ' `--no-hmr` command line option.\n' +
+        'Please consider reporting any issues you encounter here: https://github.com/angular/angular-cli/issues\n',
+    );
+  }
 
   browserOptions.incrementalResults = true;
 
