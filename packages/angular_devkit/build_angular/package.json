@@ -81,7 +81,7 @@
     "karma": "^6.3.0",
     "ng-packagr": "^19.0.0",
     "protractor": "^7.0.0",
-    "tailwindcss": "^2.0.0 || ^3.0.0",
+    "tailwindcss": "^2.0.0 || ^3.0.0 || ^4.0.0",
     "typescript": ">=5.5 <5.7"
   },
   "peerDependenciesMeta": {
