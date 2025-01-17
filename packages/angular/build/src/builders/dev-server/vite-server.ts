@@ -819,6 +819,7 @@ export async function setupServer(
         componentStyles,
         templateUpdates,
         ssrMode,
+        resetComponentUpdates: () => templateUpdates.clear(),
       }),
       createRemoveIdPrefixPlugin(externalMetadata.explicitBrowser),
       await createAngularSsrTransformPlugin(serverOptions.workspaceRoot),

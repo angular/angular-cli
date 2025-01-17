@@ -53,6 +53,7 @@ interface AngularSetupMiddlewaresPluginOptions {
   componentStyles: Map<string, ComponentStyleRecord>;
   templateUpdates: Map<string, string>;
   ssrMode: ServerSsrMode;
+  resetComponentUpdates: () => void;
 }
 
 async function createEncapsulateStyle(): Promise<
@@ -82,6 +83,7 @@ export function createAngularSetupMiddlewaresPlugin(
         componentStyles,
         templateUpdates,
         ssrMode,
+        resetComponentUpdates,
       } = options;
 
       // Headers, assets and resources get handled first
@@ -117,7 +119,12 @@ export function createAngularSetupMiddlewaresPlugin(
 
         server.middlewares.use(angularHtmlFallbackMiddleware);
         server.middlewares.use(
-          createAngularIndexHtmlMiddleware(server, outputFiles, indexHtmlTransformer),
+          createAngularIndexHtmlMiddleware(
+            server,
+            outputFiles,
+            resetComponentUpdates,
+            indexHtmlTransformer,
+          ),
         );
       };
     },
