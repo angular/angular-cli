@@ -242,9 +242,133 @@ function* emitOutputResults(
     return;
   }
 
-  // Template updates only exist if no other JS changes have occurred
+  // Use a full result if there is no rebuild state (no prior build result)
+  if (!rebuildState || !changes) {
+    const result: FullResult = {
+      kind: ResultKind.Full,
+      warnings: warnings as ResultMessage[],
+      files: {},
+      detail: {
+        externalMetadata,
+        htmlIndexPath,
+        htmlBaseHref,
+        outputOptions,
+      },
+    };
+    for (const file of assetFiles) {
+      result.files[file.destination] = {
+        type: BuildOutputFileType.Browser,
+        inputPath: file.source,
+        origin: 'disk',
+      };
+    }
+    for (const file of outputFiles) {
+      result.files[file.path] = {
+        type: file.type,
+        contents: file.contents,
+        origin: 'memory',
+        hash: file.hash,
+      };
+    }
+
+    yield result;
+
+    return;
+  }
+
+  // Template updates only exist if no other JS changes have occurred.
+  // A full page reload may be required based on the following incremental output change analysis.
   const hasTemplateUpdates = !!templateUpdates?.size;
-  if (hasTemplateUpdates) {
+
+  // Use an incremental result if previous output information is available
+  const { previousAssetsInfo, previousOutputInfo } = rebuildState;
+
+  const incrementalResult: IncrementalResult = {
+    kind: ResultKind.Incremental,
+    warnings: warnings as ResultMessage[],
+    // Initially attempt to use a background update of files to support component updates.
+    background: hasTemplateUpdates,
+    added: [],
+    removed: [],
+    modified: [],
+    files: {},
+    detail: {
+      externalMetadata,
+      htmlIndexPath,
+      htmlBaseHref,
+      outputOptions,
+    },
+  };
+
+  // Initially assume all previous output files have been removed
+  const removedOutputFiles = new Map(previousOutputInfo);
+  for (const file of outputFiles) {
+    removedOutputFiles.delete(file.path);
+
+    const previousHash = previousOutputInfo.get(file.path)?.hash;
+    let needFile = false;
+    if (previousHash === undefined) {
+      needFile = true;
+      incrementalResult.added.push(file.path);
+    } else if (previousHash !== file.hash) {
+      needFile = true;
+      incrementalResult.modified.push(file.path);
+    }
+
+    if (needFile) {
+      // Updates to non-JS files must signal an update with the dev server
+      if (!/(?:\.m?js|\.map)$/.test(file.path)) {
+        incrementalResult.background = false;
+      }
+
+      incrementalResult.files[file.path] = {
+        type: file.type,
+        contents: file.contents,
+        origin: 'memory',
+        hash: file.hash,
+      };
+    }
+  }
+
+  // Initially assume all previous assets files have been removed
+  const removedAssetFiles = new Map(previousAssetsInfo);
+  for (const { source, destination } of assetFiles) {
+    removedAssetFiles.delete(source);
+
+    if (!previousAssetsInfo.has(source)) {
+      incrementalResult.added.push(destination);
+      incrementalResult.background = false;
+    } else if (changes.modified.has(source)) {
+      incrementalResult.modified.push(destination);
+      incrementalResult.background = false;
+    } else {
+      continue;
+    }
+
+    incrementalResult.files[destination] = {
+      type: BuildOutputFileType.Browser,
+      inputPath: source,
+      origin: 'disk',
+    };
+  }
+
+  // Include the removed output and asset files
+  incrementalResult.removed.push(
+    ...Array.from(removedOutputFiles, ([file, { type }]) => ({
+      path: file,
+      type,
+    })),
+    ...Array.from(removedAssetFiles.values(), (file) => ({
+      path: file,
+      type: BuildOutputFileType.Browser,
+    })),
+  );
+
+  yield incrementalResult;
+
+  // If there are template updates and the incremental update was background only, a component
+  // update is possible.
+  if (hasTemplateUpdates && incrementalResult.background) {
     const updateResult: ComponentUpdateResult = {
       kind: ResultKind.ComponentUpdate,
       updates: Array.from(templateUpdates, ([id, content]) => ({
@@ -256,122 +380,4 @@ function* emitOutputResults(
 
     yield updateResult;
   }
-
-  // Use an incremental result if previous output information is available
-  if (rebuildState && changes) {
-    const { previousAssetsInfo, previousOutputInfo } = rebuildState;
-
-    const incrementalResult: IncrementalResult = {
-      kind: ResultKind.Incremental,
-      warnings: warnings as ResultMessage[],
-      // These files need to be updated in the dev server but should not signal any updates
-      background: hasTemplateUpdates,
-      added: [],
-      removed: [],
-      modified: [],
-      files: {},
-      detail: {
-        externalMetadata,
-        htmlIndexPath,
-        htmlBaseHref,
-        outputOptions,
-      },
-    };
-
-    // Initially assume all previous output files have been removed
-    const removedOutputFiles = new Map(previousOutputInfo);
-    for (const file of outputFiles) {
-      removedOutputFiles.delete(file.path);
-
-      const previousHash = previousOutputInfo.get(file.path)?.hash;
-      let needFile = false;
-      if (previousHash === undefined) {
-        needFile = true;
-        incrementalResult.added.push(file.path);
-      } else if (previousHash !== file.hash) {
-        needFile = true;
-        incrementalResult.modified.push(file.path);
-      }
-
-      if (needFile) {
-        // Updates to non-JS files must signal an update with the dev server
-        if (!/(?:\.m?js|\.map)?$/.test(file.path)) {
-          incrementalResult.background = false;
-        }
-
-        incrementalResult.files[file.path] = {
-          type: file.type,
-          contents: file.contents,
-          origin: 'memory',
-          hash: file.hash,
-        };
-      }
-    }
-
-    // Initially assume all previous assets files have been removed
-    const removedAssetFiles = new Map(previousAssetsInfo);
-    for (const { source, destination } of assetFiles) {
-      removedAssetFiles.delete(source);
-
-      if (!previousAssetsInfo.has(source)) {
-        incrementalResult.added.push(destination);
-      } else if (changes.modified.has(source)) {
-        incrementalResult.modified.push(destination);
-      } else {
-        continue;
-      }
-
-      incrementalResult.files[destination] = {
-        type: BuildOutputFileType.Browser,
-        inputPath: source,
-        origin: 'disk',
-      };
-    }
-
-    // Include the removed output and asset files
-    incrementalResult.removed.push(
-      ...Array.from(removedOutputFiles, ([file, { type }]) => ({
-        path: file,
-        type,
-      })),
-      ...Array.from(removedAssetFiles.values(), (file) => ({
-        path: file,
-        type: BuildOutputFileType.Browser,
-      })),
-    );
-
-    yield incrementalResult;
-
-    return;
-  }
-
-  // Otherwise, use a full result
-  const result: FullResult = {
-    kind: ResultKind.Full,
-    warnings: warnings as ResultMessage[],
-    files: {},
-    detail: {
-      externalMetadata,
-      htmlIndexPath,
-      htmlBaseHref,
-      outputOptions,
-    },
-  };
-  for (const file of assetFiles) {
-    result.files[file.destination] = {
-      type: BuildOutputFileType.Browser,
-      inputPath: file.source,
-      origin: 'disk',
-    };
-  }
-  for (const file of outputFiles) {
-    result.files[file.path] = {
-      type: file.type,
-      contents: file.contents,
-      origin: 'memory',
-      hash: file.hash,
-    };
-  }
-
-  yield result;
 }
