@@ -46,8 +46,11 @@ export async function createAngularMemoryPlugin(
         // Vite will resolve these these files example:
         // `file:///@ng/component?c=src%2Fapp%2Fapp.component.ts%40AppComponent&t=1737017253850`
         const sourcePath = fileURLToPath(source);
-        const { root } = parse(sourcePath);
-        const sourceWithoutRoot = normalizePath('/' + sourcePath.slice(root.length));
+        const sourceWithoutRoot = sourcePath.startsWith(virtualProjectRoot)
+          ? normalizePath('/' + relative(virtualProjectRoot, sourcePath))
+          : // TODO: remove once https://github.com/angular/angular/blob/4e6017a9f5cda389c5fbf4f2c1519ce1bba23e11/packages/compiler/src/render3/r3_hmr_compiler.ts#L57
+            // is changed from `/@ng` to `./@ng/`
+            normalizePath('/' + sourcePath.slice(parse(sourcePath).root.length));
 
         if (sourceWithoutRoot.startsWith(ANGULAR_PREFIX)) {
           const [, query] = source.split('?', 2);
