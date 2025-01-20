@@ -523,11 +523,17 @@ export async function getRoutesFromAngularRouterConfig(
       applicationRef = await bootstrap();
     }
 
+    const injector = applicationRef.injector;
+    const router = injector.get(Router);
+
+    // Workaround to unblock navigation when `withEnabledBlockingInitialNavigation()` is used.
+    // This is necessary because route extraction disables component bootstrapping.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (router as any).navigationTransitions.afterPreactivation()?.next?.();
+
     // Wait until the application is stable.
     await applicationRef.whenStable();
 
-    const injector = applicationRef.injector;
-    const router = injector.get(Router);
     const routesResults: RouteTreeNodeMetadata[] = [];
     const errors: string[] = [];
 
