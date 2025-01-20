@@ -3,13 +3,15 @@
 # Use of this source code is governed by an MIT-style license that can be
 # found in the LICENSE file at https://angular.dev/license
 
-load("@npm//@bazel/jasmine:index.bzl", "jasmine_node_test")
-load("//tools:defaults2.bzl", "npm_package", "ts_project")
+load("@npm2//:defs.bzl", "npm_link_all_packages")
+load("//tools:defaults2.bzl", "jasmine_test", "npm_package", "ts_project")
 load("//tools:ts_json_schema.bzl", "ts_json_schema")
 
 licenses(["notice"])
 
 package(default_visibility = ["//visibility:public"])
+
+npm_link_all_packages()
 
 RUNTIME_ASSETS = glob(
     include = [
@@ -32,10 +34,10 @@ ts_project(
     data = RUNTIME_ASSETS,
     module_name = "@angular/pwa",
     deps = [
+        ":node_modules/@angular-devkit/schematics",
+        ":node_modules/@schematics/angular",
         "//:node_modules/@types/node",
         "//:node_modules/parse5-html-rewriting-stream",
-        "//packages/angular_devkit/schematics:schematics_rjs",
-        "//packages/schematics/angular:angular_rjs",
     ],
 )
 
@@ -55,9 +57,9 @@ ts_project(
     ],
 )
 
-jasmine_node_test(
+jasmine_test(
     name = "pwa_test",
-    srcs = [":pwa_test_lib"],
+    data = [":pwa_test_lib_rjs"],
 )
 
 genrule(
