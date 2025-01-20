@@ -16,11 +16,12 @@
     "./*.js": "./*.js"
   },
   "dependencies": {
-    "@angular-devkit/architect": "0.0.0-EXPERIMENTAL-PLACEHOLDER",
+    "@angular-devkit/architect": "workspace:0.0.0-EXPERIMENTAL-PLACEHOLDER",
     "rxjs": "7.8.1"
   },
   "devDependencies": {
-    "@angular-devkit/core": "0.0.0-PLACEHOLDER",
+    "@angular-devkit/core": "workspace:0.0.0-PLACEHOLDER",
+    "@ngtools/webpack": "workspace:0.0.0-PLACEHOLDER",
     "webpack": "5.97.1"
   },
   "peerDependencies": {
