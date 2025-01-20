@@ -225,6 +225,15 @@ export async function* serveWithVite(
       });
     }
 
+    if (browserOptions.ssr && server) {
+      // Clean up all Angular cached component IDs on every change.
+      // This is the same thing that happens on the client (browser refresh).
+      const { ɵresetCompiledComponents } = (await server.ssrLoadModule('/main.server.mjs')) as {
+        ɵresetCompiledComponents: () => void;
+      };
+      ɵresetCompiledComponents();
+    }
+
     let needClientUpdate = true;
     switch (result.kind) {
       case ResultKind.Full:
@@ -501,24 +510,13 @@ async function invalidateUpdatedFiles(
   }
 
   // Invalidate any updated files
-  let destroyAngularServerAppCalled = false;
+  let callDestroyAngularServerApp = false;
   for (const [file, record] of generatedFiles) {
     if (!record.updated) {
       continue;
     }
     record.updated = false;
-
-    if (record.type === BuildOutputFileType.ServerApplication && !destroyAngularServerAppCalled) {
-      // Clear the server app cache
-      // This must be done before module invalidation.
-      const { ɵdestroyAngularServerApp } = (await server.ssrLoadModule('/main.server.mjs')) as {
-        ɵdestroyAngularServerApp: typeof destroyAngularServerApp;
-      };
-
-      ɵdestroyAngularServerApp();
-      destroyAngularServerAppCalled = true;
-    }
-
+    callDestroyAngularServerApp ||= record.type === BuildOutputFileType.ServerApplication;
     updatedFiles.push(file);
 
     const updatedModules = server.moduleGraph.getModulesByFile(
@@ -527,9 +525,14 @@ async function invalidateUpdatedFiles(
     updatedModules?.forEach((m) => server.moduleGraph.invalidateModule(m));
   }
 
-  if (destroyAngularServerAppCalled) {
-    // Trigger module evaluation before reload to initiate dependency optimization.
-    await server.ssrLoadModule('/main.server.mjs');
+  // Trigger module evaluation before reload to initiate dependency optimization.
+  // and clear Angular Component IDs
+  if (callDestroyAngularServerApp) {
+    const { ɵdestroyAngularServerApp } = (await server.ssrLoadModule('/main.server.mjs')) as {
+      ɵdestroyAngularServerApp: typeof destroyAngularServerApp;
+    };
+
+    ɵdestroyAngularServerApp();
   }
 
   return updatedFiles;
