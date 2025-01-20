@@ -12,12 +12,12 @@
     "save": false
   },
   "dependencies": {
-    "@angular-devkit/schematics": "0.0.0-PLACEHOLDER",
-    "@schematics/angular": "0.0.0-PLACEHOLDER",
+    "@angular-devkit/schematics": "workspace:0.0.0-PLACEHOLDER",
+    "@schematics/angular": "workspace:0.0.0-PLACEHOLDER",
     "parse5-html-rewriting-stream": "7.0.0"
   },
   "peerDependencies": {
-    "@angular/cli": "0.0.0-ANGULAR-FW-PEER-DEP"
+    "@angular/cli": "workspace:^0.0.0-PLACEHOLDER"
   },
   "peerDependenciesMeta": {
     "@angular/cli": {

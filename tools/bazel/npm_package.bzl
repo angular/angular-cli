@@ -15,6 +15,7 @@ def npm_package(
         pkg_deps = [],
         stamp_files = [],
         pkg_json = "package.json",
+        extra_substitutions = {},
         **kwargs):
     if name != "pkg":
         fail("Expected npm_package to be named `pkg`. " +
@@ -61,6 +62,9 @@ def npm_package(
         out = "substituted_with_snapshot_repos/package.json",
     )
 
+    nostamp_subs = dict(substitutions["rjs"]["nostamp"], **extra_substitutions)
+    stamp_subs = dict(substitutions["rjs"]["stamp"], **extra_substitutions)
+
     expand_template(
         name = "final_package_json",
         template = select({
@@ -71,8 +75,8 @@ def npm_package(
             "//conditions:default": "substituted/package.json",
         }),
         out = "substituted_final/package.json",
-        substitutions = substitutions["rjs"]["nostamp"],
-        stamp_substitutions = substitutions["rjs"]["stamp"],
+        substitutions = nostamp_subs,
+        stamp_substitutions = stamp_subs,
     )
 
     stamp_targets = []
@@ -81,8 +85,8 @@ def npm_package(
             name = "stamp_file_%s" % f,
             template = f,
             out = "substituted/%s" % f,
-            substitutions = substitutions["rjs"]["nostamp"],
-            stamp_substitutions = substitutions["rjs"]["stamp"],
+            substitutions = nostamp_subs,
+            stamp_substitutions = stamp_subs,
         )
 
         stamp_targets.append("stamp_file_%s" % f)
