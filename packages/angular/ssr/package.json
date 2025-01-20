@@ -27,12 +27,12 @@
     }
   },
   "devDependencies": {
-    "@angular/common": "19.1.1",
-    "@angular/compiler": "19.1.1",
-    "@angular/core": "19.1.1",
-    "@angular/platform-browser": "19.1.1",
-    "@angular/platform-server": "19.1.1",
-    "@angular/router": "19.1.1",
+    "@angular/common": "19.1.2",
+    "@angular/compiler": "19.1.2",
+    "@angular/core": "19.1.2",
+    "@angular/platform-browser": "19.1.2",
+    "@angular/platform-server": "19.1.2",
+    "@angular/router": "19.1.2",
     "@bazel/runfiles": "^6.0.0"
   },
   "sideEffects": false,
