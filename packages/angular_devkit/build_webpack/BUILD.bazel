@@ -4,13 +4,15 @@
 # found in the LICENSE file at https://angular.dev/license
 
 load("@npm//@angular/build-tooling/bazel/api-golden:index.bzl", "api_golden_test_npm_package")
-load("@npm//@bazel/jasmine:index.bzl", "jasmine_node_test")
-load("//tools:defaults2.bzl", "npm_package", "ts_project")
+load("@npm2//:defs.bzl", "npm_link_all_packages")
+load("//tools:defaults2.bzl", "jasmine_test", "npm_package", "ts_project")
 load("//tools:ts_json_schema.bzl", "ts_json_schema")
 
 licenses(["notice"])
 
 package(default_visibility = ["//visibility:public"])
+
+npm_link_all_packages()
 
 ts_json_schema(
     name = "webpack_schema",
@@ -45,12 +47,12 @@ ts_project(
     data = RUNTIME_ASSETS,
     module_name = "@angular-devkit/build-webpack",
     deps = [
+        ":node_modules/@angular-devkit/architect",
+        ":node_modules/@angular-devkit/core",
         "//:node_modules/@types/node",
         "//:node_modules/rxjs",
         "//:node_modules/webpack",
         "//:node_modules/webpack-dev-server",
-        "//packages/angular_devkit/architect:architect_rjs",
-        "//packages/angular_devkit/core:core_rjs",
     ],
 )
 
@@ -69,20 +71,17 @@ ts_project(
     ),
     deps = [
         ":build_webpack_rjs",
+        ":node_modules/@angular-devkit/architect",
+        ":node_modules/@angular-devkit/core",
+        ":node_modules/@ngtools/webpack",
         "//:node_modules/@types/jasmine",
-        "//packages/angular_devkit/architect:architect_rjs",
-        "//packages/angular_devkit/architect/node:node_rjs",
-        "//packages/angular_devkit/architect/testing:testing_rjs",
-        "//packages/angular_devkit/core:core_rjs",
-        "//packages/angular_devkit/core/node:node_rjs",
-        "//packages/ngtools/webpack:webpack_rjs",
     ],
 )
 
-jasmine_node_test(
+jasmine_test(
     name = "build_webpack_test",
-    srcs = [":build_webpack_test_lib"],
     data = [
+        "build_webpack_test_lib_rjs",
         "//:node_modules/@angular/common",
         "//:node_modules/@angular/compiler",
         "//:node_modules/@angular/compiler-cli",
@@ -90,6 +89,7 @@ jasmine_node_test(
         "//:node_modules/@angular/platform-browser",
         "//:node_modules/@angular/platform-browser-dynamic",
         "//:node_modules/tslib",
+        "//:node_modules/typescript",
         "//:node_modules/zone.js",
     ],
 )
