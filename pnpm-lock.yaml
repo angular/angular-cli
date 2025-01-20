@@ -580,6 +580,21 @@ importers:
         specifier: 17.7.2
         version: 17.7.2
 
+  packages/angular/pwa:
+    dependencies:
+      '@angular-devkit/schematics':
+        specifier: workspace:0.0.0-PLACEHOLDER
+        version: link:../../angular_devkit/schematics
+      '@angular/cli':
+        specifier: ^19.0.0
+        version: 19.1.3(@types/node@22.10.5)(chokidar@4.0.3)
+      '@schematics/angular':
+        specifier: workspace:0.0.0-PLACEHOLDER
+        version: link:../../schematics/angular
+      parse5-html-rewriting-stream:
+        specifier: 7.0.0
+        version: 7.0.0
+
   packages/angular_devkit/architect:
     dependencies:
       '@angular-devkit/core':
@@ -688,6 +703,16 @@ packages:
       - chokidar
     dev: true
 
+  /@angular-devkit/architect@0.1901.3(chokidar@4.0.3):
+    resolution: {integrity: sha512-bXhcSP23MKGRuKjI0j+JEDssuFwyprVS0czIeNswj2VTuWyx9y8GjnH2kJXeDETbX0pNbUjThkMsk8cZ5b2YTg==}
+    engines: {node: ^18.19.1 || ^20.11.1 || >=22.0.0, npm: ^6.11.0 || ^7.5.6 || >=8.0.0, yarn: '>= 1.13.0'}
+    dependencies:
+      '@angular-devkit/core': 19.1.3(chokidar@4.0.3)
+      rxjs: 7.8.1
+    transitivePeerDependencies:
+      - chokidar
+    dev: false
+
   /@angular-devkit/core@19.1.0-next.2(chokidar@4.0.3):
     resolution: {integrity: sha512-e02oakLxYszcpltPhZDuQ2AKGWXblJLU2Ua7xD57BtjQtZt5c10bvePOvU4M5KnD5KqZUzjYQZtC6nqKOVvkMA==}
     engines: {node: ^18.19.1 || ^20.11.1 || >=22.0.0, npm: ^6.11.0 || ^7.5.6 || >=8.0.0, yarn: '>= 1.13.0'}
@@ -705,6 +730,37 @@ packages:
       rxjs: 7.8.1
       source-map: 0.7.4
     dev: true
+
+  /@angular-devkit/core@19.1.3(chokidar@4.0.3):
+    resolution: {integrity: sha512-of/TKfJ/vL+/qvr4PbDTtqbFJGFHPfu6bEJrIZsLMYA+Mej8SyTx3kDm4LLnKQBtWVYDqkrxvcpOb4+NmHNLfA==}
+    engines: {node: ^18.19.1 || ^20.11.1 || >=22.0.0, npm: ^6.11.0 || ^7.5.6 || >=8.0.0, yarn: '>= 1.13.0'}
+    peerDependencies:
+      chokidar: ^4.0.0
+    peerDependenciesMeta:
+      chokidar:
+        optional: true
+    dependencies:
+      ajv: 8.17.1
+      ajv-formats: 3.0.1(ajv@8.17.1)
+      chokidar: 4.0.3
+      jsonc-parser: 3.3.1
+      picomatch: 4.0.2
+      rxjs: 7.8.1
+      source-map: 0.7.4
+    dev: false
+
+  /@angular-devkit/schematics@19.1.3(chokidar@4.0.3):
+    resolution: {integrity: sha512-DfN45eJQtfXXeQwjb7vDqSJ+8e6BW3rXUB2i6IC2CbOYrLWhMBgfv3/uTm++IbCFW2zX3Yk3yqq3d4yua2no7w==}
+    engines: {node: ^18.19.1 || ^20.11.1 || >=22.0.0, npm: ^6.11.0 || ^7.5.6 || >=8.0.0, yarn: '>= 1.13.0'}
+    dependencies:
+      '@angular-devkit/core': 19.1.3(chokidar@4.0.3)
+      jsonc-parser: 3.3.1
+      magic-string: 0.30.17
+      ora: 5.4.1
+      rxjs: 7.8.1
+    transitivePeerDependencies:
+      - chokidar
+    dev: false
 
   /@angular/animations@19.1.0-rc.0(@angular/core@19.1.0-rc.0):
     resolution: {integrity: sha512-CAbv8Zr7RLYUFh6afw/3k7OHXvpxJvXDl5YeXWw5gBC7j1zHWochCVcEZVqBnrumGllVhxctM7L6gCI0x+EG/g==}
@@ -819,6 +875,35 @@ packages:
     optionalDependencies:
       parse5: 7.2.1
     dev: true
+
+  /@angular/cli@19.1.3(@types/node@22.10.5)(chokidar@4.0.3):
+    resolution: {integrity: sha512-GJGH3Xw7/zm12myA2R4Dg8+ny3p9tW00tx33YIK8vFjOUKycqgWaKfpYCe2s9egrm2Pew/DclHCD+IUwEAz1GQ==}
+    engines: {node: ^18.19.1 || ^20.11.1 || >=22.0.0, npm: ^6.11.0 || ^7.5.6 || >=8.0.0, yarn: '>= 1.13.0'}
+    hasBin: true
+    dependencies:
+      '@angular-devkit/architect': 0.1901.3(chokidar@4.0.3)
+      '@angular-devkit/core': 19.1.3(chokidar@4.0.3)
+      '@angular-devkit/schematics': 19.1.3(chokidar@4.0.3)
+      '@inquirer/prompts': 7.2.1(@types/node@22.10.5)
+      '@listr2/prompt-adapter-inquirer': 2.0.18(@inquirer/prompts@7.2.1)
+      '@schematics/angular': 19.1.3(chokidar@4.0.3)
+      '@yarnpkg/lockfile': 1.1.0
+      ini: 5.0.0
+      jsonc-parser: 3.3.1
+      listr2: 8.2.5
+      npm-package-arg: 12.0.1
+      npm-pick-manifest: 10.0.0
+      pacote: 20.0.0
+      resolve: 1.22.10
+      semver: 7.6.3
+      symbol-observable: 4.0.0
+      yargs: 17.7.2
+    transitivePeerDependencies:
+      - '@types/node'
+      - bluebird
+      - chokidar
+      - supports-color
+    dev: false
 
   /@angular/common@19.1.0-rc.0(@angular/core@19.1.0-rc.0)(rxjs@7.8.1):
     resolution: {integrity: sha512-kDo8El2h4I90Cai2lI7hIV4vMMqEfPz/sM9FmogwzJZ2t5ao5PtutbaoInF3w1xyQj9cnVx2UH5Q0in04uwS4g==}
@@ -2214,7 +2299,6 @@ packages:
 
   /@bazel/typescript@5.8.1(typescript@5.7.3):
     resolution: {integrity: sha512-NAJ8WQHZL1WE1YmRoCrq/1hhG15Mvy/viWh6TkvFnBeEhNUiQUsA5GYyhU1ztnBIYW03nATO3vwhAEfO7Q0U5g==}
-    deprecated: No longer maintained, https://github.com/aspect-build/rules_ts is the recommended replacement
     hasBin: true
     peerDependencies:
       typescript: 5.7.3
@@ -4466,6 +4550,17 @@ packages:
     transitivePeerDependencies:
       - '@types/node'
     dev: true
+
+  /@schematics/angular@19.1.3(chokidar@4.0.3):
+    resolution: {integrity: sha512-LG3OKZG1Dl1lxNIc81jr82WSUaDCYlg/SEJ6A78p8AaZtTFKf14WenJTeG0XZPX45l26BdZSjn9MUTCggxQvGQ==}
+    engines: {node: ^18.19.1 || ^20.11.1 || >=22.0.0, npm: ^6.11.0 || ^7.5.6 || >=8.0.0, yarn: '>= 1.13.0'}
+    dependencies:
+      '@angular-devkit/core': 19.1.3(chokidar@4.0.3)
+      '@angular-devkit/schematics': 19.1.3(chokidar@4.0.3)
+      jsonc-parser: 3.3.1
+    transitivePeerDependencies:
+      - chokidar
+    dev: false
 
   /@sigstore/bundle@3.0.0:
     resolution: {integrity: sha512-XDUYX56iMPAn/cdgh/DTJxz5RWmqKV4pwvUAEKEWJl+HzKdCd/24wUa9JYNMlDSCb7SUHAdtksxYX779Nne/Zg==}
@@ -7793,7 +7888,6 @@ packages:
   /entities@4.5.0:
     resolution: {integrity: sha512-V0hjH4dGPh9Ao5p0MoRY6BVqtwCjhz6vI5LT8AJ55H+4g9/4vbHx1I54fS0XuclLhDHArPQCiMjDxjaL8fPxhw==}
     engines: {node: '>=0.12'}
-    dev: true
 
   /env-paths@2.2.1:
     resolution: {integrity: sha512-+h1lkLKhZMTYjog1VEpJNG7NZJWcuc2DDk/qsqSTRRCOXiLjeQ1d1/udrUGhqMxUgAlwKNZ0cf2uqan5GLuS2A==}
@@ -11835,13 +11929,11 @@ packages:
       entities: 4.5.0
       parse5: 7.2.1
       parse5-sax-parser: 7.0.0
-    dev: true
 
   /parse5-sax-parser@7.0.0:
     resolution: {integrity: sha512-5A+v2SNsq8T6/mG3ahcz8ZtQ0OUFTatxPbeidoMB7tkJSGDY3tdfl4MHovtLQHkEn5CGxijNWRQHhRQ6IRpXKg==}
     dependencies:
       parse5: 7.2.1
-    dev: true
 
   /parse5@6.0.1:
     resolution: {integrity: sha512-Ofn/CTFzRGTTxwpNEs9PP93gXShHcTq255nzRYSKe8AkVpZY7e1fpmTfOyoIvjP5HG7Z2ZM7VS9PPhQGW2pOpw==}
@@ -11851,7 +11943,6 @@ packages:
     resolution: {integrity: sha512-BuBYQYlv1ckiPdQi/ohiivi9Sagc9JG+Ozs0r7b/0iK3sKmrb0b9FdWdBbOdx6hBCM/F9Ir82ofnBhtZOjCRPQ==}
     dependencies:
       entities: 4.5.0
-    dev: true
 
   /parseurl@1.3.3:
     resolution: {integrity: sha512-CiyeOxFT/JZyN5m0z9PfXw4SCBJ6Sygz1Dpl0wqjlhDEGGBP1GnsUVEL0p63hoG1fcj3fHynXi9NYO4nWOL+qQ==}
@@ -12394,7 +12485,7 @@ packages:
   /puppeteer@18.2.1:
     resolution: {integrity: sha512-7+UhmYa7wxPh2oMRwA++k8UGVDxh3YdWFB52r9C3tM81T6BU7cuusUSxImz0GEYSOYUKk/YzIhkQ6+vc0gHbxQ==}
     engines: {node: '>=14.1.0'}
-    deprecated: < 22.8.2 is no longer supported
+    deprecated: < 19.4.0 is no longer supported
     dependencies:
       https-proxy-agent: 5.0.1(supports-color@10.0.0)
       progress: 2.0.3
