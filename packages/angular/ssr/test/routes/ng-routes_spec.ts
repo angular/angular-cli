@@ -12,6 +12,7 @@ import '@angular/compiler';
 /* eslint-enable import/no-unassigned-import */
 
 import { Component } from '@angular/core';
+import { Routes, provideRouter, withEnabledBlockingInitialNavigation } from '@angular/router';
 import { extractRoutesAndCreateRouteTree } from '../../src/routes/ng-routes';
 import { PrerenderFallback, RenderMode } from '../../src/routes/route-config';
 import { setAngularAppTestingManifest } from '../testing-utils';
@@ -489,6 +490,38 @@ describe('extractRoutesAndCreateRouteTree', () => {
       undefined,
       undefined,
       RootComponent,
+    );
+
+    const { routeTree, errors } = await extractRoutesAndCreateRouteTree({ url });
+    expect(errors).toHaveSize(0);
+    expect(routeTree.toObject()).toHaveSize(2);
+  });
+
+  it('should not bootstrap the root component when using `withEnabledBlockingInitialNavigation`', async () => {
+    @Component({
+      standalone: true,
+      selector: 'app-root',
+      template: '',
+    })
+    class RootComponent {
+      constructor() {
+        throw new Error('RootComponent should not be bootstrapped.');
+      }
+    }
+
+    const routes: Routes = [
+      { path: '', component: DummyComponent },
+      { path: 'home', component: DummyComponent },
+    ];
+
+    setAngularAppTestingManifest(
+      routes,
+      [{ path: '**', renderMode: RenderMode.Server }],
+      undefined,
+      undefined,
+      undefined,
+      RootComponent,
+      [provideRouter(routes, withEnabledBlockingInitialNavigation())],
     );
 
     const { routeTree, errors } = await extractRoutesAndCreateRouteTree({ url });
