@@ -1,3 +1,17 @@
+<a name="19.1.3"></a>
+
+# 19.1.3 (2025-01-20)
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                               |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------- |
+| [7d8c34172](https://github.com/angular/angular-cli/commit/7d8c34172bf29fbf61c0c0114c419903804b6b38) | fix  | allow asset changes to reload page on incremental updates |
+| [9fa29af37](https://github.com/angular/angular-cli/commit/9fa29af374060a05a19b32d1f0dee954ec70f451) | fix  | handle relative `@ng/components`                          |
+| [c4de34703](https://github.com/angular/angular-cli/commit/c4de34703f8b17ac96e66f889fa0e3ffff524831) | fix  | perform full reload for templates with `$localize` usage  |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="19.1.2"></a>
 
 # 19.1.2 (2025-01-17)
