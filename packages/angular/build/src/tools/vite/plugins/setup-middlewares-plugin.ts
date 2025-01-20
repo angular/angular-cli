@@ -86,7 +86,7 @@ export function createAngularSetupMiddlewaresPlugin(
 
       // Headers, assets and resources get handled first
       server.middlewares.use(createAngularHeadersMiddleware(server));
-      server.middlewares.use(createAngularComponentMiddleware(templateUpdates));
+      server.middlewares.use(createAngularComponentMiddleware(server, templateUpdates));
       server.middlewares.use(
         createAngularAssetsMiddleware(
           server,

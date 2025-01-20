@@ -6,11 +6,13 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import type { Connect } from 'vite';
+import type { Connect, ViteDevServer } from 'vite';
+import { pathnameWithoutBasePath } from '../utils';
 
 const ANGULAR_COMPONENT_PREFIX = '/@ng/component';
 
 export function createAngularComponentMiddleware(
+  server: ViteDevServer,
   templateUpdates: ReadonlyMap<string, string>,
 ): Connect.NextHandleFunction {
   return function angularComponentMiddleware(req, res, next) {
@@ -18,7 +20,8 @@ export function createAngularComponentMiddleware(
       return;
     }
 
-    if (!req.url.startsWith(ANGULAR_COMPONENT_PREFIX)) {
+    const pathname = pathnameWithoutBasePath(req.url, server.config.base);
+    if (!pathname.includes(ANGULAR_COMPONENT_PREFIX)) {
       next();
 
       return;
