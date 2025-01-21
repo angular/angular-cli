@@ -16,8 +16,8 @@
   ],
   "schematics": "./collection.json",
   "dependencies": {
-    "@angular-devkit/core": "0.0.0-PLACEHOLDER",
-    "@angular-devkit/schematics": "0.0.0-PLACEHOLDER",
+    "@angular-devkit/core": "workspace:0.0.0-PLACEHOLDER",
+    "@angular-devkit/schematics": "workspace:0.0.0-PLACEHOLDER",
     "@inquirer/prompts": "7.2.1",
     "ansi-colors": "4.1.3",
     "symbol-observable": "4.0.0",

@@ -193,6 +193,7 @@ npm_translate_lock(
         "//packages/angular_devkit/build_webpack:package.json",
         "//packages/angular_devkit/core:package.json",
         "//packages/angular_devkit/schematics:package.json",
+        "//packages/angular_devkit/schematics_cli:package.json",
         "//packages/ngtools/webpack:package.json",
         "//packages/schematics/angular:package.json",
     ],
