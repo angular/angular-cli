@@ -8,8 +8,8 @@
 
 /* eslint-disable import/no-extraneous-dependencies */
 import { NodeJsSyncHost } from '@angular-devkit/core/node';
-import { NodeWorkflow } from '@angular-devkit/schematics/tools';
 import * as path from 'path';
+import { NodeWorkflow } from './node-workflow';
 
 describe('NodeWorkflow', () => {
   // TODO: this test seems to either not work on windows or on linux.
