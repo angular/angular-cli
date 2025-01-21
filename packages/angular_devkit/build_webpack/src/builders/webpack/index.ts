@@ -7,7 +7,6 @@
  */
 
 import { Builder, BuilderContext, BuilderOutput, createBuilder } from '@angular-devkit/architect';
-import { json } from '@angular-devkit/core';
 import { resolve as pathResolve } from 'path';
 import { Observable, from, isObservable, of, switchMap } from 'rxjs';
 import webpack from 'webpack';
@@ -121,13 +120,14 @@ export function runWebpack(
   );
 }
 
-const builder: Builder<WebpackBuilderSchema & json.JsonObject> =
-  createBuilder<WebpackBuilderSchema>((options, context) => {
+const builder: Builder<WebpackBuilderSchema> = createBuilder<WebpackBuilderSchema>(
+  (options, context) => {
     const configPath = pathResolve(context.workspaceRoot, options.webpackConfig);
 
     return from(getWebpackConfig(configPath)).pipe(
       switchMap((config) => runWebpack(config, context)),
     );
-  });
+  },
+);
 
 export default builder;

@@ -13,7 +13,6 @@ import { Configuration } from 'webpack';
 import { DevServerBuilderOutput } from '@angular/build';
 import type http from 'node:http';
 import { IndexHtmlTransform } from '@angular/build/private';
-import { json } from '@angular-devkit/core';
 import { Observable } from 'rxjs';
 import type { Plugin as Plugin_2 } from 'esbuild';
 import webpack from 'webpack';
@@ -25,16 +24,16 @@ export { ApplicationBuilderOptions }
 export type AssetPattern = AssetPatternObject | string;
 
 // @public (undocumented)
-export interface AssetPatternObject {
+export type AssetPatternObject = {
     followSymlinks?: boolean;
     glob: string;
     ignore?: string[];
     input: string;
     output?: string;
-}
+};
 
 // @public
-export interface BrowserBuilderOptions {
+export type BrowserBuilderOptions = {
     allowedCommonJsDependencies?: string[];
     aot?: boolean;
     assets?: AssetPattern[];
@@ -75,7 +74,7 @@ export interface BrowserBuilderOptions {
     verbose?: boolean;
     watch?: boolean;
     webWorkerTsConfig?: string;
-}
+};
 
 // @public
 export type BrowserBuilderOutput = BuilderOutput & {
@@ -89,7 +88,7 @@ export type BrowserBuilderOutput = BuilderOutput & {
 };
 
 // @public (undocumented)
-export interface Budget {
+export type Budget = {
     baseline?: string;
     error?: string;
     maximumError?: string;
@@ -99,7 +98,7 @@ export interface Budget {
     name?: string;
     type: Type;
     warning?: string;
-}
+};
 
 export { buildApplication }
 
@@ -114,7 +113,7 @@ export enum CrossOrigin {
 }
 
 // @public
-export interface DevServerBuilderOptions {
+export type DevServerBuilderOptions = {
     allowedHosts?: string[];
     buildTarget: string;
     disableHostCheck?: boolean;
@@ -138,7 +137,7 @@ export interface DevServerBuilderOptions {
     sslKey?: string;
     verbose?: boolean;
     watch?: boolean;
-}
+};
 
 export { DevServerBuilderOutput }
 
@@ -189,28 +188,24 @@ export function executeSSRDevServerBuilder(options: SSRDevServerBuilderOptions, 
 export type ExecutionTransformer<T> = (input: T) => T | Promise<T>;
 
 // @public
-export interface ExtractI18nBuilderOptions {
+export type ExtractI18nBuilderOptions = {
     buildTarget?: string;
     format?: Format;
     outFile?: string;
     outputPath?: string;
     progress?: boolean;
-}
+};
 
 // @public (undocumented)
-export interface FileReplacement {
-    // (undocumented)
+export type FileReplacement = {
     replace?: string;
-    // (undocumented)
     replaceWith?: string;
-    // (undocumented)
     src?: string;
-    // (undocumented)
     with?: string;
-}
+};
 
 // @public
-export interface KarmaBuilderOptions {
+export type KarmaBuilderOptions = {
     assets?: AssetPattern_2[];
     browsers?: Browsers;
     builderMode?: BuilderMode;
@@ -234,7 +229,7 @@ export interface KarmaBuilderOptions {
     tsConfig: string;
     watch?: boolean;
     webWorkerTsConfig?: string;
-}
+};
 
 // @public (undocumented)
 export type KarmaConfigOptions = ConfigOptions & {
@@ -243,19 +238,19 @@ export type KarmaConfigOptions = ConfigOptions & {
 };
 
 // @public
-export interface NgPackagrBuilderOptions {
+export type NgPackagrBuilderOptions = {
     poll?: number;
     project: string;
     tsConfig?: string;
     watch?: boolean;
-}
+};
 
 // @public (undocumented)
-export interface OptimizationObject {
+export type OptimizationObject = {
     fonts?: FontsUnion;
     scripts?: boolean;
     styles?: StylesUnion;
-}
+};
 
 // @public
 export type OptimizationUnion = boolean | OptimizationObject;
@@ -273,7 +268,7 @@ export enum OutputHashing {
 }
 
 // @public
-export interface ProtractorBuilderOptions {
+export type ProtractorBuilderOptions = {
     baseUrl?: string;
     devServerTarget?: string;
     grep?: string;
@@ -284,10 +279,10 @@ export interface ProtractorBuilderOptions {
     specs?: string[];
     suite?: string;
     webdriverUpdate?: boolean;
-}
+};
 
 // @public (undocumented)
-export interface ServerBuilderOptions {
+export type ServerBuilderOptions = {
     assets?: AssetPattern_3[];
     buildOptimizer?: boolean;
     deleteOutputPath?: boolean;
@@ -315,7 +310,7 @@ export interface ServerBuilderOptions {
     vendorChunk?: boolean;
     verbose?: boolean;
     watch?: boolean;
-}
+};
 
 // @public
 export type ServerBuilderOutput = BuilderOutput & {
@@ -328,18 +323,18 @@ export type ServerBuilderOutput = BuilderOutput & {
 };
 
 // @public (undocumented)
-export interface SourceMapObject {
+export type SourceMapObject = {
     hidden?: boolean;
     scripts?: boolean;
     styles?: boolean;
     vendor?: boolean;
-}
+};
 
 // @public
 export type SourceMapUnion = boolean | SourceMapObject;
 
 // @public (undocumented)
-export type SSRDevServerBuilderOptions = Schema & json.JsonObject;
+export type SSRDevServerBuilderOptions = Schema;
 
 // @public (undocumented)
 export type SSRDevServerBuilderOutput = BuilderOutput & {
@@ -348,9 +343,9 @@ export type SSRDevServerBuilderOutput = BuilderOutput & {
 };
 
 // @public
-export interface StylePreprocessorOptions {
+export type StylePreprocessorOptions = {
     includePaths?: string[];
-}
+};
 
 // @public
 export enum Type {

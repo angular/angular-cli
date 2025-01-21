@@ -7,13 +7,11 @@
  */
 
 import { Builder, createBuilder } from '@angular-devkit/architect';
-import { json } from '@angular-devkit/core';
 import { execute } from './builder';
 import type { Schema as NgPackagrBuilderOptions } from './schema';
 
 export { type NgPackagrBuilderOptions, execute };
 
-const builder: Builder<NgPackagrBuilderOptions & json.JsonObject> =
-  createBuilder<NgPackagrBuilderOptions>(execute);
+const builder: Builder<NgPackagrBuilderOptions> = createBuilder<NgPackagrBuilderOptions>(execute);
 
 export default builder;
