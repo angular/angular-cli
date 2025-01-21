@@ -7,7 +7,6 @@
  */
 
 import { Builder, createBuilder } from '@angular-devkit/architect';
-import { json } from '@angular-devkit/core';
 import { execute } from './builder';
 import type { DevServerBuilderOutput } from './output';
 import type { Schema as DevServerBuilderOptions } from './schema';
@@ -17,7 +16,7 @@ export {
   type DevServerBuilderOutput,
   execute as executeDevServerBuilder,
 };
-const builder: Builder<DevServerBuilderOptions & json.JsonObject> = createBuilder<
+const builder: Builder<DevServerBuilderOptions> = createBuilder<
   DevServerBuilderOptions,
   DevServerBuilderOutput
 >(execute);

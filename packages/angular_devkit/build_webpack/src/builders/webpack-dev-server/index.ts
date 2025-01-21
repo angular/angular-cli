@@ -7,7 +7,6 @@
  */
 
 import { Builder, BuilderContext, createBuilder } from '@angular-devkit/architect';
-import { json } from '@angular-devkit/core';
 import { resolve as pathResolve } from 'path';
 import { Observable, from, isObservable, of, switchMap } from 'rxjs';
 import webpack from 'webpack';
@@ -125,7 +124,7 @@ export function runWebpackDevServer(
   );
 }
 
-const builder: Builder<WebpackDevServerBuilderSchema & json.JsonObject> = createBuilder<
+const builder: Builder<WebpackDevServerBuilderSchema> = createBuilder<
   WebpackDevServerBuilderSchema,
   DevServerBuildOutput
 >((options, context) => {
