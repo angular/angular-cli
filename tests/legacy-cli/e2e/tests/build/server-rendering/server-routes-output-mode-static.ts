@@ -101,11 +101,11 @@ export default async function () {
   await replaceInFile('src/app/app.routes.server.ts', 'RenderMode.Server', 'RenderMode.Prerender');
   await noSilentNg('build', '--output-mode=static');
 
-  const expects: Record<string, string> = {
-    'index.html': 'home works!',
-    'ssg/index.html': 'ssg works!',
-    'ssg/one/index.html': 'ssg-with-params works!',
-    'ssg/two/index.html': 'ssg-with-params works!',
+  const expects: Record<string, RegExp | string> = {
+    'index.html': /ng-server-context="ssg".+home works!/,
+    'ssg/index.html': /ng-server-context="ssg".+ssg works!/,
+    'ssg/one/index.html': /ng-server-context="ssg".+ssg-with-params works!/,
+    'ssg/two/index.html': /ng-server-context="ssg".+ssg-with-params works!/,
     // When static redirects as generated as meta tags.
     'ssg-redirect/index.html': '<meta http-equiv="refresh" content="0; url=/ssg">',
   };
