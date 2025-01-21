@@ -33,6 +33,9 @@
     "dist-schema/**",
     "**/node_modules/**/*",
     "**/third_party/**/*",
-    "packages/angular_devkit/schematics_cli/schematic/files/**/*"
+    "packages/angular_devkit/schematics_cli/schematic/files/**/*",
+    "modules/testing/builder/projects/**/*",
+    "packages/angular_devkit/build_angular/test/**/*",
+    "packages/angular_devkit/build_webpack/test/**/*"
   ]
 }
