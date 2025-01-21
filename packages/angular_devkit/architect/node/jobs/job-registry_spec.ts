@@ -8,8 +8,8 @@
 
 import * as path from 'path';
 import { lastValueFrom } from 'rxjs';
-import { NodeModuleJobRegistry } from './job-registry';
 import { jobs } from '../../src';
+import { NodeModuleJobRegistry } from './job-registry';
 
 const root = path.join(__dirname, '../test/jobs');
 
