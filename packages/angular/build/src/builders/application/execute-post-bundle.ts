@@ -184,7 +184,6 @@ export async function executePostBundleSteps(
     }
 
     const serializableRouteTreeNodeForManifest: WritableSerializableRouteTreeNode = [];
-
     for (const metadata of serializableRouteTreeNode) {
       serializableRouteTreeNodeForManifest.push(metadata);
 
