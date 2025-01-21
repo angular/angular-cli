@@ -80,6 +80,7 @@ export function createI18nOptions(
   logger?: {
     warn(message: string): void;
   },
+  ssrEnabled?: boolean,
 ): I18nOptions {
   const { i18n: metadata = {} } = projectMetadata;
 
@@ -110,12 +111,14 @@ export function createI18nOptions(
 
     if (metadata.sourceLocale.baseHref !== undefined) {
       ensureString(metadata.sourceLocale.baseHref, 'i18n.sourceLocale.baseHref');
-      logger?.warn(
-        `The 'baseHref' field under 'i18n.sourceLocale' is deprecated and will be removed in future versions. ` +
-          `Please use 'subPath' instead.\nNote: 'subPath' defines the URL segment for the locale, acting ` +
-          `as both the HTML base HREF and the directory name for output.\nBy default, ` +
-          `if not specified, 'subPath' uses the locale code.`,
-      );
+      if (ssrEnabled) {
+        logger?.warn(
+          `'baseHref' in 'i18n.sourceLocale' may lead to undefined behavior when used with SSR. ` +
+            `Consider using 'subPath' instead.\n\n` +
+            `Note: 'subPath' specifies the URL segment for the locale, serving as both the HTML base HREF ` +
+            `and the output directory name.\nBy default, if not explicitly set, 'subPath' defaults to the locale code.`,
+        );
+      }
 
       rawSourceLocaleBaseHref = metadata.sourceLocale.baseHref;
     }
@@ -156,12 +159,15 @@ export function createI18nOptions(
 
         if ('baseHref' in options) {
           ensureString(options.baseHref, `i18n.locales.${locale}.baseHref`);
-          logger?.warn(
-            `The 'baseHref' field under 'i18n.locales.${locale}' is deprecated and will be removed in future versions. ` +
-              `Please use 'subPath' instead.\nNote: 'subPath' defines the URL segment for the locale, acting ` +
-              `as both the HTML base HREF and the directory name for output.\nBy default, ` +
-              `if not specified, 'subPath' uses the locale code.`,
-          );
+
+          if (ssrEnabled) {
+            logger?.warn(
+              `'baseHref' in 'i18n.locales.${locale}' may lead to undefined behavior when used with SSR. ` +
+                `Consider using 'subPath' instead.\n\n` +
+                `Note: 'subPath' specifies the URL segment for the locale, serving as both the HTML base HREF ` +
+                `and the output directory name.\nBy default, if not explicitly set, 'subPath' defaults to the locale code.`,
+            );
+          }
           baseHref = options.baseHref;
         }
 
