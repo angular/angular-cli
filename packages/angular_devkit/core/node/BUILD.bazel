@@ -3,8 +3,7 @@
 # Use of this source code is governed by an MIT-style license that can be
 # found in the LICENSE file at https://angular.dev/license
 
-load("@npm//@bazel/jasmine:index.bzl", "jasmine_node_test")
-load("//tools:interop.bzl", "ts_project")
+load("//tools:defaults2.bzl", "jasmine_test", "ts_project")
 
 licenses(["notice"])
 
@@ -28,8 +27,6 @@ ts_project(
     ],
 )
 
-# @external_begin
-
 ts_project(
     name = "node_test_lib",
     testonly = True,
@@ -49,11 +46,7 @@ ts_project(
     ],
 )
 
-jasmine_node_test(
+jasmine_test(
     name = "node_test",
-    srcs = [":node_test_lib"],
-    deps = [
-        "@npm//chokidar",
-    ],
+    data = [":node_test_lib_rjs"],
 )
-# @external_end
