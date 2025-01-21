@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { main } from './schematics';
+import { main } from '../bin/schematics';
 
 // We only care about the write method in these mocks of NodeJS.WriteStream.
 class MockWriteStream {
