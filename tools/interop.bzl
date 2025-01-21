@@ -97,7 +97,14 @@ ts_project_module = rule(
     },
 )
 
-def ts_project(name, module_name = None, deps = [], tsconfig = None, testonly = False, **kwargs):
+def ts_project(
+        name,
+        module_name = None,
+        deps = [],
+        tsconfig = None,
+        testonly = False,
+        visibility = None,
+        **kwargs):
     interop_deps = []
 
     # Pull in the `rules_nodejs` variants of dependencies we know are "hybrid". This
@@ -118,6 +125,7 @@ def ts_project(name, module_name = None, deps = [], tsconfig = None, testonly = 
     ts_deps_interop(
         name = "%s_interop_deps" % name,
         deps = [] + interop_deps + rjs_modules_to_rnjs,
+        visibility = visibility,
         testonly = testonly,
     )
 
@@ -126,6 +134,7 @@ def ts_project(name, module_name = None, deps = [], tsconfig = None, testonly = 
         testonly = testonly,
         declaration = True,
         tsconfig = tsconfig,
+        visibility = visibility,
         # Use the worker from our own Angular rules, as the default worker
         # from `rules_ts` is incompatible with TS5+ and abandoned. We need
         # worker for efficient, fast DX and avoiding Windows no-sandbox issues.
@@ -138,6 +147,7 @@ def ts_project(name, module_name = None, deps = [], tsconfig = None, testonly = 
     ts_project_module(
         name = name,
         testonly = testonly,
+        visibility = visibility,
         dep = "%s_rjs" % name,
         # Forwarded dependencies for linker module mapping aspect.
         # RJS deps can also transitively pull in module mappings from their `interop_deps`.

@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { jobs } from '@angular-devkit/architect';
+import { jobs } from '../../../index';
 
 // Export the job using a createJob. We use our own spec file here to do the job.
 export default jobs.createJobHandler<number[], null, number>(

@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { jobs } from '@angular-devkit/architect';
+import { jobs } from '../../src';
 import { JsonValue, schema } from '@angular-devkit/core';
 import { Observable, of } from 'rxjs';
 
