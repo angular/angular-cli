@@ -16,6 +16,7 @@ import { assertIsError } from '../error';
 import { urlJoin } from '../url';
 import { WorkerPool } from '../worker-pool';
 import { IMPORT_EXEC_ARGV } from './esm-in-memory-loader/utils';
+import { SERVER_APP_MANIFEST_FILENAME } from './manifest';
 import {
   RouteRenderMode,
   RoutersExtractorWorkerResult,
@@ -154,6 +155,16 @@ export async function prerenderPages(
       output: {},
       serializableRouteTreeNode,
     };
+  }
+
+  // Add the extracted routes to the manifest file.
+  // We could re-generate it from the start, but that would require a number of options to be passed down.
+  const manifest = outputFilesForWorker[SERVER_APP_MANIFEST_FILENAME];
+  if (manifest) {
+    outputFilesForWorker[SERVER_APP_MANIFEST_FILENAME] = manifest.replace(
+      'routes: undefined,',
+      `routes: ${JSON.stringify(serializableRouteTreeNodeForPrerender, undefined, 2)},`,
+    );
   }
 
   // Render routes
