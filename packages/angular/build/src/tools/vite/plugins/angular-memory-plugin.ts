@@ -8,7 +8,7 @@
 
 import assert from 'node:assert';
 import { readFile } from 'node:fs/promises';
-import { basename, dirname, join, parse, relative } from 'node:path';
+import { basename, dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { Plugin } from 'vite';
 import { loadEsmModule } from '../../../utils/load-esm';
@@ -46,11 +46,7 @@ export async function createAngularMemoryPlugin(
         // Vite will resolve these these files example:
         // `file:///@ng/component?c=src%2Fapp%2Fapp.component.ts%40AppComponent&t=1737017253850`
         const sourcePath = fileURLToPath(source);
-        const sourceWithoutRoot = sourcePath.startsWith(virtualProjectRoot)
-          ? normalizePath('/' + relative(virtualProjectRoot, sourcePath))
-          : // TODO: remove once https://github.com/angular/angular/blob/4e6017a9f5cda389c5fbf4f2c1519ce1bba23e11/packages/compiler/src/render3/r3_hmr_compiler.ts#L57
-            // is changed from `/@ng` to `./@ng/`
-            normalizePath('/' + sourcePath.slice(parse(sourcePath).root.length));
+        const sourceWithoutRoot = normalizePath('/' + relative(virtualProjectRoot, sourcePath));
 
         if (sourceWithoutRoot.startsWith(ANGULAR_PREFIX)) {
           const [, query] = source.split('?', 2);
