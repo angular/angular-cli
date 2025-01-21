@@ -693,6 +693,27 @@ importers:
         specifier: 7.8.1
         version: 7.8.1
 
+  packages/angular_devkit/schematics_cli:
+    dependencies:
+      '@angular-devkit/core':
+        specifier: workspace:0.0.0-PLACEHOLDER
+        version: link:../core
+      '@angular-devkit/schematics':
+        specifier: workspace:0.0.0-PLACEHOLDER
+        version: link:../schematics
+      '@inquirer/prompts':
+        specifier: 7.2.3
+        version: 7.2.3(@types/node@22.10.7)
+      ansi-colors:
+        specifier: 4.1.3
+        version: 4.1.3
+      symbol-observable:
+        specifier: 4.0.0
+        version: 4.0.0
+      yargs-parser:
+        specifier: 21.1.1
+        version: 21.1.1
+
   packages/ngtools/webpack:
     devDependencies:
       '@angular-devkit/core':

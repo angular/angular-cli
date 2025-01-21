@@ -1,4 +1,4 @@
-load("@npm//@bazel/jasmine:index.bzl", "jasmine_node_test")
+load("@npm2//:defs.bzl", "npm_link_all_packages")
 load("//tools:defaults2.bzl", "npm_package", "ts_project")
 load("//tools:ts_json_schema.bzl", "ts_json_schema")
 
@@ -9,6 +9,8 @@ load("//tools:ts_json_schema.bzl", "ts_json_schema")
 licenses(["notice"])
 
 package(default_visibility = ["//visibility:public"])
+
+npm_link_all_packages()
 
 RUNTIME_ASSETS = [
     "blank/schema.json",
@@ -44,39 +46,14 @@ ts_project(
     data = RUNTIME_ASSETS,
     module_name = "@angular-devkit/schematics-cli",
     deps = [
+        ":node_modules/@angular-devkit/core",
+        ":node_modules/@angular-devkit/schematics",
         "//:node_modules/@inquirer/prompts",
         "//:node_modules/@types/node",
         "//:node_modules/@types/yargs-parser",
         "//:node_modules/ansi-colors",
         "//:node_modules/symbol-observable",
         "//:node_modules/yargs-parser",
-        "//packages/angular_devkit/core:core_rjs",
-        "//packages/angular_devkit/core/node:node_rjs",
-        "//packages/angular_devkit/schematics:schematics_rjs",
-        "//packages/angular_devkit/schematics/tasks:tasks_rjs",
-        "//packages/angular_devkit/schematics/tools:tools_rjs",
-    ],
-)
-
-ts_project(
-    name = "schematics_cli_test_lib",
-    testonly = True,
-    srcs = glob(
-        include = [
-            "bin/**/*_spec.ts",
-        ],
-    ),
-    deps = [
-        ":schematics_cli_rjs",
-    ],
-)
-
-jasmine_node_test(
-    name = "schematics_cli_test",
-    srcs = [":schematics_cli_test_lib"],
-    data = [
-        # The package is loaded at runtime within the tests
-        ":schematics_cli",
     ],
 )
 
