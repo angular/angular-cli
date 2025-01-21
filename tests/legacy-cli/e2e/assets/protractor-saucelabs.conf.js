@@ -22,19 +22,19 @@ exports.config = {
     {
       browserName: 'chrome',
       version: '132',
-      platform: 'Linux',
+      platform: 'Windows 11',
       tunnelIdentifier,
     },
     {
       browserName: 'chrome',
       version: '131',
-      platform: 'Linux',
+      platform: 'Windows 11',
       tunnelIdentifier,
     },
     {
       browserName: 'firefox',
       version: '134',
-      platform: 'Linux',
+      platform: 'Windows 11',
       tunnelIdentifier,
     },
     {
