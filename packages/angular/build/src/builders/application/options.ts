@@ -174,7 +174,7 @@ export async function normalizeOptions(
   const i18nOptions: I18nOptions & {
     duplicateTranslationBehavior?: I18NTranslation;
     missingTranslationBehavior?: I18NTranslation;
-  } = createI18nOptions(projectMetadata, options.localize, context.logger);
+  } = createI18nOptions(projectMetadata, options.localize, context.logger, !!options.ssr);
   i18nOptions.duplicateTranslationBehavior = options.i18nDuplicateTranslation;
   i18nOptions.missingTranslationBehavior = options.i18nMissingTranslation;
   if (options.forceI18nFlatOutput) {

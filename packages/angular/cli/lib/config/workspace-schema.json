@@ -284,7 +284,6 @@
                     },
                     "baseHref": {
                       "type": "string",
-                      "deprecated": true,
                       "description": "Specifies the HTML base HREF for the locale. Defaults to the locale code if not provided."
                     },
                     "subPath": {
@@ -356,7 +355,6 @@
                         },
                         "baseHref": {
                           "type": "string",
-                          "deprecated": true,
                           "description": "Specifies the HTML base HREF for the locale. Defaults to the locale code if not provided."
                         },
                         "subPath": {
