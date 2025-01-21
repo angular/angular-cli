@@ -6,12 +6,12 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { jobs } from '@angular-devkit/architect';
 import * as path from 'path';
 import { lastValueFrom } from 'rxjs';
 import { NodeModuleJobRegistry } from './job-registry';
+import { jobs } from '../../src';
 
-const root = path.join(__dirname, '../../../../../tests/angular_devkit/architect/node/jobs');
+const root = path.join(__dirname, '../test/jobs');
 
 describe('NodeModuleJobScheduler', () => {
   it('works', async () => {
