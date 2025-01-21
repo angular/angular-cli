@@ -1,5 +1,4 @@
-load("@npm//@bazel/jasmine:index.bzl", "jasmine_node_test")
-load("//tools:interop.bzl", "ts_project")
+load("//tools:defaults2.bzl", "jasmine_test", "ts_project")
 
 # Copyright Google Inc. All Rights Reserved.
 #
@@ -24,8 +23,7 @@ ts_project(
         "//:node_modules/@types/node",
         "//:node_modules/jsonc-parser",
         "//:node_modules/rxjs",
-        "//packages/angular_devkit/core:core_rjs",
-        "//packages/angular_devkit/core/node:node_rjs",
+        "//packages/angular_devkit/schematics:node_modules/@angular-devkit/core",
         "//packages/angular_devkit/schematics:schematics_rjs",
         "//packages/angular_devkit/schematics/tasks:tasks_rjs",
         "//packages/angular_devkit/schematics/tasks/node:node_rjs",
@@ -45,8 +43,7 @@ ts_project(
         ":tools_rjs",
         "//:node_modules/@types/jasmine",
         "//:node_modules/rxjs",
-        "//packages/angular_devkit/core:core_rjs",
-        "//packages/angular_devkit/core/node:node_rjs",
+        "//packages/angular_devkit/schematics:node_modules/@angular-devkit/core",
         "//packages/angular_devkit/schematics:schematics_rjs",
         "//packages/angular_devkit/schematics/tasks:tasks_rjs",
         "//packages/angular_devkit/schematics/testing:testing_rjs",
@@ -54,7 +51,7 @@ ts_project(
     ],
 )
 
-jasmine_node_test(
+jasmine_test(
     name = "tools_test",
-    deps = [":tools_test_lib"],
+    data = [":tools_test_lib_rjs"],
 )
