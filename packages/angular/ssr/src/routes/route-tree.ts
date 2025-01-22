@@ -79,14 +79,6 @@ export interface RouteTreeNodeMetadata {
  */
 interface RouteTreeNode<AdditionalMetadata extends Record<string, unknown>> {
   /**
-   * The segment value associated with this node.
-   * A segment is a single part of a route path, typically delimited by slashes (`/`).
-   * For example, in the route `/users/:id/profile`, the segments are `users`, `:id`, and `profile`.
-   * Segments can also be wildcards (`*`), which match any segment in that position of the route.
-   */
-  segment: string;
-
-  /**
    * The index indicating the order in which the route was inserted into the tree.
    * This index helps determine the priority of routes during matching, with lower indexes
    * indicating earlier inserted routes.
@@ -116,7 +108,7 @@ export class RouteTree<AdditionalMetadata extends Record<string, unknown> = {}> 
    * The root node of the route tree.
    * All routes are stored and accessed relative to this root node.
    */
-  private readonly root = this.createEmptyRouteTreeNode('<root>');
+  private readonly root = this.createEmptyRouteTreeNode();
 
   /**
    * A counter that tracks the order of route insertion.
@@ -144,7 +136,7 @@ export class RouteTree<AdditionalMetadata extends Record<string, unknown> = {}> 
       let childNode = node.children.get(normalizedSegment);
 
       if (!childNode) {
-        childNode = this.createEmptyRouteTreeNode(normalizedSegment);
+        childNode = this.createEmptyRouteTreeNode();
         node.children.set(normalizedSegment, childNode);
       }
 
@@ -311,15 +303,13 @@ export class RouteTree<AdditionalMetadata extends Record<string, unknown> = {}> 
   }
 
   /**
-   * Creates an empty route tree node with the specified segment.
+   * Creates an empty route tree node.
    * This helper function is used during the tree construction.
    *
-   * @param segment - The route segment that this node represents.
    * @returns A new, empty route tree node.
    */
-  private createEmptyRouteTreeNode(segment: string): RouteTreeNode<AdditionalMetadata> {
+  private createEmptyRouteTreeNode(): RouteTreeNode<AdditionalMetadata> {
     return {
-      segment,
       insertionIndex: -1,
       children: new Map(),
     };
