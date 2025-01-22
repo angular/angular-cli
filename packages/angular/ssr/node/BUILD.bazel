@@ -16,7 +16,7 @@ ts_project(
     ],
     module_name = "@angular/ssr/node",
     source_map = True,
-    tsconfig = "//:build-tsconfig-angular",
+    tsconfig = "//:build-tsconfig-esm",
     deps = [
         "//:node_modules/@angular/core",
         "//:node_modules/@angular/platform-server",
