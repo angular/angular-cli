@@ -1,3 +1,32 @@
+<a name="19.1.4"></a>
+
+# 19.1.4 (2025-01-22)
+
+### @angular-devkit/schematics
+
+| Commit                                                                                              | Type | Description                                                           |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------------------- |
+| [aa6f0d051](https://github.com/angular/angular-cli/commit/aa6f0d051179d31aad2c3be7b79f9fda8de60f34) | fix  | ensure collections can be resolved via test runner in pnpm workspaces |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                                                        |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------------------------------- |
+| [ff8192a35](https://github.com/angular/angular-cli/commit/ff8192a355ca38edb34fb0cfe08ef133629f3f63) | fix  | correct path for `/@ng/components` on Windows                                      |
+| [14d2f7ca0](https://github.com/angular/angular-cli/commit/14d2f7ca0e930fceeea53d307db79f0e963c1d53) | fix  | include extracted routes in the manifest during prerendering                       |
+| [c87a38f5b](https://github.com/angular/angular-cli/commit/c87a38f5b25b3cddd1b2a1ee4b443b10cf03b767) | fix  | only issue invalid i18n config error for duplicate `subPaths` with inlined locales |
+| [d50788cf9](https://github.com/angular/angular-cli/commit/d50788cf9f799ffbe9ba0edde425e6833623686d) | fix  | replace deprecation of `i18n.baseHref` with a warning                              |
+
+### @angular/ssr
+
+| Commit                                                                                              | Type | Description                                                          |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------------- |
+| [bcc5fab75](https://github.com/angular/angular-cli/commit/bcc5fab750c0029e16ad91d277f88113a60b7fa1) | fix  | prevent route matcher error when SSR routing is not used             |
+| [9bacf3981](https://github.com/angular/angular-cli/commit/9bacf3981995626cf935cf1620c391338de1c9df) | fix  | properly manage catch-all routes with base href                      |
+| [59c757781](https://github.com/angular/angular-cli/commit/59c75778112383816da2f729d5ae80705b5828fa) | fix  | unblock route extraction with `withEnabledBlockingInitialNavigation` |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="19.1.3"></a>
 
 # 19.1.3 (2025-01-20)
