@@ -16,7 +16,11 @@ ts_project(
             "src/**/*_spec.ts",
         ],
     ),
-    data = glob(["projects/**/*"]),
+    data = [
+        # Needed at runtime by some builder tests relying on SSR being
+        # resolvable in the test project.
+        ":node_modules/@angular/ssr",
+    ] + glob(["projects/**/*"]),
     deps = [
         ":node_modules/@angular-devkit/architect",
         ":node_modules/@angular-devkit/core",
