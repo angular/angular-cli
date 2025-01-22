@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { addLeadingSlash } from '../utils/url';
+import { addLeadingSlash, stripTrailingSlash } from '../utils/url';
 import { RenderMode } from './route-config';
 
 /**
@@ -230,7 +230,7 @@ export class RouteTree<AdditionalMetadata extends Record<string, unknown> = {}> 
    * @returns An array of path segments.
    */
   private getPathSegments(route: string): string[] {
-    return route.split('/').filter(Boolean);
+    return stripTrailingSlash(route).split('/');
   }
 
   /**
