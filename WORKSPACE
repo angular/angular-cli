@@ -186,6 +186,7 @@ npm_translate_lock(
     data = [
         "//:package.json",
         "//:pnpm-workspace.yaml",
+        "//modules/testing/builder:package.json",
         "//packages/angular/build:package.json",
         "//packages/angular/cli:package.json",
         "//packages/angular/pwa:package.json",

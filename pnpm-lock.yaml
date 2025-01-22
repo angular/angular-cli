@@ -526,6 +526,15 @@ importers:
       puppeteer:
         built: true
 
+  modules/testing/builder:
+    devDependencies:
+      '@angular-devkit/architect':
+        specifier: workspace:*
+        version: link:../../../packages/angular_devkit/architect
+      '@angular-devkit/core':
+        specifier: workspace:*
+        version: link:../../../packages/angular_devkit/core
+
   packages/angular/cli:
     dependencies:
       '@angular-devkit/architect':

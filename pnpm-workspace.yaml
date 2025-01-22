@@ -11,3 +11,4 @@ packages:
   - packages/angular/ssr
   - packages/schematics/angular
   - packages/ngtools/webpack
+  - modules/testing/builder
