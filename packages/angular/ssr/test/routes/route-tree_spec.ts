@@ -150,7 +150,7 @@ describe('RouteTree', () => {
   describe('match', () => {
     it('should handle empty routes', () => {
       routeTree.insert('', { renderMode: RenderMode.Server });
-      expect(routeTree.match('')).toEqual({ route: '', renderMode: RenderMode.Server });
+      expect(routeTree.match('')).toEqual({ route: '/', renderMode: RenderMode.Server });
     });
 
     it('should insert and match basic routes', () => {
@@ -271,6 +271,14 @@ describe('RouteTree', () => {
       });
       expect(routeTree.match('/path/with/slashes')).toEqual({
         route: '/path/with/slashes',
+        renderMode: RenderMode.Server,
+      });
+    });
+
+    it('should correctly match catch-all segments with a prefix', () => {
+      routeTree.insert('/de/**', { renderMode: RenderMode.Server });
+      expect(routeTree.match('/de')).toEqual({
+        route: '/de/**',
         renderMode: RenderMode.Server,
       });
     });
