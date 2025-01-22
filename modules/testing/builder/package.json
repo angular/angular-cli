@@ -1,0 +1,6 @@
+{
+  "devDependencies": {
+    "@angular-devkit/core": "workspace:*",
+    "@angular-devkit/architect": "workspace:*"
+  }
+}

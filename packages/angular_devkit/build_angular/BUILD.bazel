@@ -196,7 +196,7 @@ ts_project(
         "//packages/angular/build:build_rjs",
         "//packages/angular/build/private:private_rjs",
         "//packages/angular/ssr:ssr_rjs",
-        "//packages/angular_devkit/architect",
+        "//packages/angular_devkit/architect:architect_rjs",
         "//packages/angular_devkit/build_webpack:build_webpack_rjs",
         "//packages/angular_devkit/core:core_rjs",
         "//packages/angular_devkit/core/node:node_rjs",
