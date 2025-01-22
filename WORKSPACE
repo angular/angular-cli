@@ -134,6 +134,7 @@ load("@build_bazel_rules_nodejs//:index.bzl", "yarn_install")
 yarn_install(
     name = "npm",
     data = [
+        "//:.puppeteerrc.cjs",
         "//:.yarn/releases/yarn-4.5.0.cjs",
         "//:.yarnrc.yml",
         "//:patches/@angular+bazel+19.1.0-next.4.patch",
