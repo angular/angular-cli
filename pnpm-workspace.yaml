@@ -9,6 +9,7 @@ packages:
   - packages/angular/cli
   - packages/angular/pwa
   - packages/angular/ssr
+  - packages/angular/build
   - packages/schematics/angular
   - packages/ngtools/webpack
   - modules/testing/builder
