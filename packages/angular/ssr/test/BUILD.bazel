@@ -1,6 +1,5 @@
 load("@npm//@angular/build-tooling/bazel/spec-bundling:index.bzl", "spec_bundle")
-load("@npm//@bazel/jasmine:index.bzl", "jasmine_node_test")
-load("//tools:interop.bzl", "ts_project")
+load("//tools:defaults2.bzl", "jasmine_test", "ts_project")
 
 ts_project(
     name = "unit_test_lib",
@@ -8,6 +7,7 @@ ts_project(
     srcs = glob(
         include = ["**/*.ts"],
     ),
+    tsconfig = "//:test-tsconfig-esm",
     deps = [
         "//:node_modules/@angular/common",
         "//:node_modules/@angular/compiler",
@@ -19,6 +19,8 @@ ts_project(
     ],
 )
 
+# TODO: Replace this with a `rules_js` variant, or make the SSR package
+# native ESM compatible! (import extensions etc.)
 spec_bundle(
     name = "esm_tests_bundled",
     downlevel_async_await = False,
@@ -29,7 +31,9 @@ spec_bundle(
     ],
 )
 
-jasmine_node_test(
+jasmine_test(
     name = "test",
-    deps = [":esm_tests_bundled"],
+    data = [
+        ":esm_tests_bundled",
+    ],
 )

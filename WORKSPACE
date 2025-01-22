@@ -186,10 +186,13 @@ npm_translate_lock(
     data = [
         "//:package.json",
         "//:pnpm-workspace.yaml",
+        "//packages/angular/build:package.json",
         "//packages/angular/cli:package.json",
         "//packages/angular/pwa:package.json",
+        "//packages/angular/ssr:package.json",
         "//packages/angular_devkit/architect:package.json",
         "//packages/angular_devkit/architect_cli:package.json",
+        "//packages/angular_devkit/build_angular:package.json",
         "//packages/angular_devkit/build_webpack:package.json",
         "//packages/angular_devkit/core:package.json",
         "//packages/angular_devkit/schematics:package.json",
@@ -245,5 +248,4 @@ http_archive(
 
 load("@aspect_rules_jasmine//jasmine:dependencies.bzl", "rules_jasmine_dependencies")
 
-# Fetch dependencies which users need as well
 rules_jasmine_dependencies()
