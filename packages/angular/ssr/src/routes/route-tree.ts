@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { stripTrailingSlash } from '../utils/url';
+import { addLeadingSlash } from '../utils/url';
 import { RenderMode } from './route-config';
 
 /**
@@ -116,7 +116,7 @@ export class RouteTree<AdditionalMetadata extends Record<string, unknown> = {}> 
    * The root node of the route tree.
    * All routes are stored and accessed relative to this root node.
    */
-  private readonly root = this.createEmptyRouteTreeNode('');
+  private readonly root = this.createEmptyRouteTreeNode('<root>');
 
   /**
    * A counter that tracks the order of route insertion.
@@ -155,7 +155,7 @@ export class RouteTree<AdditionalMetadata extends Record<string, unknown> = {}> 
     // At the leaf node, store the full route and its associated metadata
     node.metadata = {
       ...metadata,
-      route: normalizedSegments.join('/'),
+      route: addLeadingSlash(normalizedSegments.join('/')),
     };
 
     node.insertionIndex = this.insertionIndexCounter++;
@@ -230,7 +230,7 @@ export class RouteTree<AdditionalMetadata extends Record<string, unknown> = {}> 
    * @returns An array of path segments.
    */
   private getPathSegments(route: string): string[] {
-    return stripTrailingSlash(route).split('/');
+    return route.split('/').filter(Boolean);
   }
 
   /**
@@ -246,18 +246,14 @@ export class RouteTree<AdditionalMetadata extends Record<string, unknown> = {}> 
    * @returns The node that best matches the remaining segments or `undefined` if no match is found.
    */
   private traverseBySegments(
-    remainingSegments: string[] | undefined,
+    remainingSegments: string[],
     node = this.root,
   ): RouteTreeNode<AdditionalMetadata> | undefined {
     const { metadata, children } = node;
 
     // If there are no remaining segments and the node has metadata, return this node
-    if (!remainingSegments?.length) {
-      if (metadata) {
-        return node;
-      }
-
-      return;
+    if (!remainingSegments.length) {
+      return metadata ? node : node.children.get('**');
     }
 
     // If the node has no children, end the traversal
