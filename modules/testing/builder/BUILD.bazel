@@ -1,7 +1,9 @@
-load("@npm//@bazel/jasmine:index.bzl", "jasmine_node_test")
-load("//tools:interop.bzl", "ts_project")
+load("@npm2//:defs.bzl", "npm_link_all_packages")
+load("//tools:defaults2.bzl", "jasmine_test", "ts_project")
 
 package(default_visibility = ["//visibility:public"])
+
+npm_link_all_packages()
 
 ts_project(
     name = "builder",
@@ -16,12 +18,9 @@ ts_project(
     ),
     data = glob(["projects/**/*"]),
     deps = [
+        ":node_modules/@angular-devkit/architect",
+        ":node_modules/@angular-devkit/core",
         "//:node_modules/rxjs",
-        "//packages/angular_devkit/architect:architect_rjs",
-        "//packages/angular_devkit/architect/node:node_rjs",
-        "//packages/angular_devkit/architect/testing:testing_rjs",
-        "//packages/angular_devkit/core:core_rjs",
-        "//packages/angular_devkit/core/node:node_rjs",
     ],
 )
 
@@ -35,11 +34,11 @@ ts_project(
     ),
     deps = [
         ":builder_rjs",
-        "//packages/angular_devkit/architect/testing:testing_rjs",
+        ":node_modules/@angular-devkit/architect",
     ],
 )
 
-jasmine_node_test(
+jasmine_test(
     name = "unit_test",
-    srcs = [":unit_test_lib"],
+    data = [":unit_test_lib_rjs"],
 )
