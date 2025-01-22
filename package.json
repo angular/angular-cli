@@ -221,7 +221,10 @@
     }
   },
   "pnpm": {
-    "onlyBuiltDependencies": []
+    "onlyBuiltDependencies": [],
+    "overrides": {
+      "@angular/build": "workspace:*"
+    }
   },
   "resolutions": {
     "typescript": "5.7.3"
