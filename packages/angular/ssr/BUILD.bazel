@@ -1,7 +1,8 @@
+load("@aspect_rules_js//npm:defs.bzl", "npm_package")
 load("@npm//@angular/build-tooling/bazel/api-golden:index.bzl", "api_golden_test_npm_package")
 load("@rules_pkg//:pkg.bzl", "pkg_tar")
 load("//tools:defaults.bzl", "ng_package")
-load("//tools:interop.bzl", "ts_project")
+load("//tools:defaults2.bzl", "ts_project")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -25,7 +26,7 @@ ts_project(
     ],
     module_name = "@angular/ssr",
     source_map = True,
-    tsconfig = "//:build-tsconfig-angular",
+    tsconfig = "//:build-tsconfig-esm",
     deps = [
         "//:node_modules/@angular/common",
         "//:node_modules/@angular/core",
@@ -37,7 +38,7 @@ ts_project(
 )
 
 ng_package(
-    name = "npm_package",
+    name = "angular_package",
     package_name = "@angular/ssr",
     srcs = [
         ":package.json",
@@ -51,7 +52,6 @@ ng_package(
     nested_packages = [
         "//packages/angular/ssr/schematics:npm_package",
     ],
-    tags = ["release-package"],
     deps = [
         ":ssr",
         "//packages/angular/ssr/node",
@@ -65,6 +65,21 @@ pkg_tar(
     strip_prefix = "./npm_package",
     # should not be built unless it is a dependency of another rule
     tags = ["manual"],
+)
+
+# TODO: Replace when `ng_package` creates a valid `rules_js`-compliant npm package.
+npm_package(
+    name = "npm_package",
+    srcs = [":angular_package"],
+    replace_prefixes = {
+        "angular_package/": "",
+    },
+    tags = ["release-package"],
+)
+
+alias(
+    name = "pkg",
+    actual = ":npm_package",
 )
 
 api_golden_test_npm_package(

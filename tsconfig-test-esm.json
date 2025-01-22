@@ -1,0 +1,14 @@
+/**
+ * Root tsconfig file for use building all Angular packages. Note there is no rootDir
+ * and therefore any tsconfig in the package directory will need to define its own
+ * rootDir.
+ */
+{
+  "extends": "./tsconfig-build-esm.json",
+  "compilerOptions": {
+    "sourceMap": false,
+    "inlineSourceMap": true,
+    "inlineSources": true,
+    "types": ["node", "jasmine"]
+  }
+}

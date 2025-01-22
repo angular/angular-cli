@@ -34,18 +34,28 @@ rules_js_tsconfig(
 )
 
 rules_js_tsconfig(
-    name = "build-tsconfig-angular",
-    src = "tsconfig-build-ng.json",
+    name = "test-tsconfig",
+    src = "tsconfig-test.json",
+    deps = [
+        "tsconfig.json",
+        "//:node_modules/@types/jasmine",
+        "//:node_modules/@types/node",
+    ],
+)
+
+rules_js_tsconfig(
+    name = "build-tsconfig-esm",
+    src = "tsconfig-build-esm.json",
     deps = [
         "tsconfig.json",
     ],
 )
 
 rules_js_tsconfig(
-    name = "test-tsconfig",
-    src = "tsconfig-test.json",
+    name = "test-tsconfig-esm",
+    src = "tsconfig-test-esm.json",
     deps = [
-        "tsconfig.json",
+        ":build-tsconfig-esm",
         "//:node_modules/@types/jasmine",
         "//:node_modules/@types/node",
     ],
@@ -92,8 +102,8 @@ config_setting(
 )
 
 ts_config(
-    name = "tsconfig-build-ng",
-    src = "tsconfig-build-ng.json",
+    name = "tsconfig-build-esm",
+    src = "tsconfig-build-esm.json",
     deps = [
         ":tsconfig.json",
     ],

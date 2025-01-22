@@ -16,6 +16,7 @@ def npm_package(
         stamp_files = [],
         pkg_json = "package.json",
         extra_substitutions = {},
+        replace_prefixes = {},
         **kwargs):
     if name != "pkg":
         fail("Expected npm_package to be named `pkg`. " +
@@ -96,12 +97,12 @@ def npm_package(
         visibility = visibility,
         # Note: Order matters here! Last file takes precedence after replaced prefixes.
         srcs = deps + stamp_targets + [":final_package_json"],
-        replace_prefixes = {
+        replace_prefixes = dict({
             "substituted_final/": "",
             "substituted_with_tars/": "",
             "substituted_with_snapshot_repos/": "",
             "substituted/": "",
-        },
+        }, **replace_prefixes),
         allow_overwrites = True,
         **kwargs
     )

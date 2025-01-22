@@ -8,5 +8,6 @@ packages:
   - packages/angular_devkit/schematics_cli
   - packages/angular/cli
   - packages/angular/pwa
+  - packages/angular/ssr
   - packages/schematics/angular
   - packages/ngtools/webpack

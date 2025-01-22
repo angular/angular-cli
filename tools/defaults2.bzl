@@ -8,7 +8,7 @@ def ts_project(**kwargs):
 def npm_package(**kwargs):
     _npm_package(**kwargs)
 
-def jasmine_test(data = [], **kwargs):
+def jasmine_test(data = [], args = [], **kwargs):
     # Create relative path to root, from current package dir. Necessary as
     # we change the `chdir` below to the package directory.
     relative_to_root = "/".join([".."] * len(native.package_name().split("/")))
@@ -18,8 +18,10 @@ def jasmine_test(data = [], **kwargs):
         chdir = native.package_name(),
         args = [
             "--require=%s/node_modules/source-map-support/register.js" % relative_to_root,
-            "**/*.js",
-        ],
+            "**/*spec.js",
+            "**/*spec.mjs",
+            "**/*spec.cjs",
+        ] + args,
         data = data + ["//:node_modules/source-map-support"],
         **kwargs
     )
