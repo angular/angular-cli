@@ -1,7 +1,7 @@
 # @generated
 # Input hashes for repository rule npm_translate_lock(name = "npm2", pnpm_lock = "@//:pnpm-lock.yaml").
 # This file should be checked into version control along with the pnpm-lock.yaml file.
-.npmrc=-2023857461
+.npmrc=-1406867100
 package.json=52016778
 packages/angular/cli/package.json=-1878910022
 packages/angular/pwa/package.json=1108903917
@@ -13,6 +13,6 @@ packages/angular_devkit/schematics/package.json=673943597
 packages/angular_devkit/schematics_cli/package.json=-1663529211
 packages/ngtools/webpack/package.json=1463215526
 packages/schematics/angular/package.json=251715148
-pnpm-lock.yaml=569014751
+pnpm-lock.yaml=836728353
 pnpm-workspace.yaml=1732591250
 yarn.lock=1005429013
