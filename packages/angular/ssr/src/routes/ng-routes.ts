@@ -590,13 +590,13 @@ export async function getRoutesFromAngularRouterConfig(
 
       if (serverConfigRouteTree) {
         for (const { route, presentInClientRouter } of serverConfigRouteTree.traverse()) {
-          if (presentInClientRouter || route === '**') {
+          if (presentInClientRouter || route.endsWith('/**')) {
             // Skip if matched or it's the catch-all route.
             continue;
           }
 
           errors.push(
-            `The '${route}' server route does not match any routes defined in the Angular ` +
+            `The '${stripLeadingSlash(route)}' server route does not match any routes defined in the Angular ` +
               `routing configuration (typically provided as a part of the 'provideRouter' call). ` +
               'Please make sure that the mentioned server route is present in the Angular routing configuration.',
           );
