@@ -501,25 +501,15 @@ async function invalidateUpdatedFiles(
   }
 
   // Invalidate any updated files
-  let destroyAngularServerAppCalled = false;
+  let serverApplicationChanged = false;
   for (const [file, record] of generatedFiles) {
     if (!record.updated) {
       continue;
     }
+
     record.updated = false;
-
-    if (record.type === BuildOutputFileType.ServerApplication && !destroyAngularServerAppCalled) {
-      // Clear the server app cache
-      // This must be done before module invalidation.
-      const { ɵdestroyAngularServerApp } = (await server.ssrLoadModule('/main.server.mjs')) as {
-        ɵdestroyAngularServerApp: typeof destroyAngularServerApp;
-      };
-
-      ɵdestroyAngularServerApp();
-      destroyAngularServerAppCalled = true;
-    }
-
     updatedFiles.push(file);
+    serverApplicationChanged ||= record.type === BuildOutputFileType.ServerApplication;
 
     const updatedModules = server.moduleGraph.getModulesByFile(
       normalizePath(join(server.config.root, file)),
@@ -527,9 +517,14 @@ async function invalidateUpdatedFiles(
     updatedModules?.forEach((m) => server.moduleGraph.invalidateModule(m));
   }
 
-  if (destroyAngularServerAppCalled) {
-    // Trigger module evaluation before reload to initiate dependency optimization.
-    await server.ssrLoadModule('/main.server.mjs');
+  if (serverApplicationChanged) {
+    // Clear the server app cache and
+    // trigger module evaluation before reload to initiate dependency optimization.
+    const { ɵdestroyAngularServerApp } = (await server.ssrLoadModule('/main.server.mjs')) as {
+      ɵdestroyAngularServerApp: typeof destroyAngularServerApp;
+    };
+
+    ɵdestroyAngularServerApp();
   }
 
   return updatedFiles;
