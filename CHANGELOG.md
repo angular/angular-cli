@@ -1,3 +1,15 @@
+<a name="19.2.0-next.0"></a>
+
+# 19.2.0-next.0 (2025-01-23)
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                 |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------- |
+| [8e884a038](https://github.com/angular/angular-cli/commit/8e884a038dbba9bf5d2a973f368fc58633712484) | fix  | handle empty module case to avoid TypeError |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="19.1.4"></a>
 
 # 19.1.4 (2025-01-22)
