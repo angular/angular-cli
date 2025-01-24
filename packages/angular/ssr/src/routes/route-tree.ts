@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { addLeadingSlash, stripTrailingSlash } from '../utils/url';
+import { addLeadingSlash } from '../utils/url';
 import { RenderMode } from './route-config';
 
 /**
@@ -79,13 +79,6 @@ export interface RouteTreeNodeMetadata {
  */
 interface RouteTreeNode<AdditionalMetadata extends Record<string, unknown>> {
   /**
-   * The index indicating the order in which the route was inserted into the tree.
-   * This index helps determine the priority of routes during matching, with lower indexes
-   * indicating earlier inserted routes.
-   */
-  insertionIndex: number;
-
-  /**
    * A map of child nodes, keyed by their corresponding route segment or wildcard.
    */
   children: Map<string, RouteTreeNode<AdditionalMetadata>>;
@@ -111,13 +104,6 @@ export class RouteTree<AdditionalMetadata extends Record<string, unknown> = {}> 
   private readonly root = this.createEmptyRouteTreeNode();
 
   /**
-   * A counter that tracks the order of route insertion.
-   * This ensures that routes are matched in the order they were defined,
-   * with earlier routes taking precedence.
-   */
-  private insertionIndexCounter = 0;
-
-  /**
    * Inserts a new route into the route tree.
    * The route is broken down into segments, and each segment is added to the tree.
    * Parameterized segments (e.g., :id) are normalized to wildcards (*) for matching purposes.
@@ -134,7 +120,6 @@ export class RouteTree<AdditionalMetadata extends Record<string, unknown> = {}> 
       // Replace parameterized segments (e.g., :id) with a wildcard (*) for matching
       const normalizedSegment = segment[0] === ':' ? '*' : segment;
       let childNode = node.children.get(normalizedSegment);
-
       if (!childNode) {
         childNode = this.createEmptyRouteTreeNode();
         node.children.set(normalizedSegment, childNode);
@@ -149,8 +134,6 @@ export class RouteTree<AdditionalMetadata extends Record<string, unknown> = {}> 
       ...metadata,
       route: addLeadingSlash(normalizedSegments.join('/')),
     };
-
-    node.insertionIndex = this.insertionIndexCounter++;
   }
 
   /**
@@ -222,7 +205,7 @@ export class RouteTree<AdditionalMetadata extends Record<string, unknown> = {}> 
    * @returns An array of path segments.
    */
   private getPathSegments(route: string): string[] {
-    return stripTrailingSlash(route).split('/');
+    return route.split('/').filter(Boolean);
   }
 
   /**
@@ -232,74 +215,48 @@ export class RouteTree<AdditionalMetadata extends Record<string, unknown> = {}> 
    * This function prioritizes exact segment matches first, followed by wildcard matches (`*`),
    * and finally deep wildcard matches (`**`) that consume all segments.
    *
-   * @param remainingSegments - The remaining segments of the route path to match.
-   * @param node - The current node in the route tree to start traversal from.
+   * @param segments - The array of route path segments to match against the route tree.
+   * @param node - The current node in the route tree to start traversal from. Defaults to the root node.
+   * @param currentIndex - The index of the segment in `remainingSegments` currently being matched.
+   * Defaults to `0` (the first segment).
    *
    * @returns The node that best matches the remaining segments or `undefined` if no match is found.
    */
   private traverseBySegments(
-    remainingSegments: string[],
+    segments: string[],
     node = this.root,
+    currentIndex = 0,
   ): RouteTreeNode<AdditionalMetadata> | undefined {
-    const { metadata, children } = node;
-
-    // If there are no remaining segments and the node has metadata, return this node
-    if (!remainingSegments.length) {
-      return metadata ? node : node.children.get('**');
+    if (currentIndex >= segments.length) {
+      return node.metadata ? node : node.children.get('**');
     }
 
-    // If the node has no children, end the traversal
-    if (!children.size) {
-      return;
+    if (!node.children.size) {
+      return undefined;
     }
 
-    const [segment, ...restSegments] = remainingSegments;
-    let currentBestMatchNode: RouteTreeNode<AdditionalMetadata> | undefined;
+    const segment = segments[currentIndex];
 
-    // 1. Exact segment match
-    const exactMatchNode = node.children.get(segment);
-    currentBestMatchNode = this.getHigherPriorityNode(
-      currentBestMatchNode,
-      this.traverseBySegments(restSegments, exactMatchNode),
-    );
-
-    // 2. Wildcard segment match (`*`)
-    const wildcardNode = node.children.get('*');
-    currentBestMatchNode = this.getHigherPriorityNode(
-      currentBestMatchNode,
-      this.traverseBySegments(restSegments, wildcardNode),
-    );
-
-    // 3. Deep wildcard segment match (`**`)
-    const deepWildcardNode = node.children.get('**');
-    currentBestMatchNode = this.getHigherPriorityNode(currentBestMatchNode, deepWildcardNode);
-
-    return currentBestMatchNode;
-  }
-
-  /**
-   * Compares two nodes and returns the node with higher priority based on insertion index.
-   * A node with a lower insertion index is prioritized as it was defined earlier.
-   *
-   * @param currentBestMatchNode - The current best match node.
-   * @param candidateNode - The node being evaluated for higher priority based on insertion index.
-   * @returns The node with higher priority (i.e., lower insertion index). If one of the nodes is `undefined`, the other node is returned.
-   */
-  private getHigherPriorityNode(
-    currentBestMatchNode: RouteTreeNode<AdditionalMetadata> | undefined,
-    candidateNode: RouteTreeNode<AdditionalMetadata> | undefined,
-  ): RouteTreeNode<AdditionalMetadata> | undefined {
-    if (!candidateNode) {
-      return currentBestMatchNode;
+    // 1. Attempt exact match with the current segment.
+    const exactMatch = node.children.get(segment);
+    if (exactMatch) {
+      const match = this.traverseBySegments(segments, exactMatch, currentIndex + 1);
+      if (match) {
+        return match;
+      }
     }
 
-    if (!currentBestMatchNode) {
-      return candidateNode;
+    // 2. Attempt wildcard match ('*').
+    const wildcardMatch = node.children.get('*');
+    if (wildcardMatch) {
+      const match = this.traverseBySegments(segments, wildcardMatch, currentIndex + 1);
+      if (match) {
+        return match;
+      }
     }
 
-    return candidateNode.insertionIndex < currentBestMatchNode.insertionIndex
-      ? candidateNode
-      : currentBestMatchNode;
+    // 3. Attempt double wildcard match ('**').
+    return node.children.get('**');
   }
 
   /**
@@ -310,7 +267,6 @@ export class RouteTree<AdditionalMetadata extends Record<string, unknown> = {}> 
    */
   private createEmptyRouteTreeNode(): RouteTreeNode<AdditionalMetadata> {
     return {
-      insertionIndex: -1,
       children: new Map(),
     };
   }
