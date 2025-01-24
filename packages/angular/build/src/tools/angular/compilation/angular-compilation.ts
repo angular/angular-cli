@@ -63,6 +63,9 @@ export abstract class AngularCompilation {
         enableResourceInlining: false,
         supportTestBed: false,
         supportJitMode: false,
+        // Disable removing of comments as TS is quite aggressive with these and can
+        // remove important annotations, such as /* @__PURE__ */ and comments like /* vite-ignore */.
+        removeComments: false,
       }),
     );
   }
