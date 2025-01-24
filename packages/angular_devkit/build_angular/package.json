@@ -66,7 +66,7 @@
     "esbuild": "0.24.2"
   },
   "devDependencies": {
-    "undici": "7.2.3"
+    "undici": "7.3.0"
   },
   "peerDependencies": {
     "@angular/compiler-cli": "0.0.0-ANGULAR-FW-PEER-DEP",
