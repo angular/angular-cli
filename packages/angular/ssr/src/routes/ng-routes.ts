@@ -199,6 +199,7 @@ async function* traverseRoutesConfig(options: {
       if (metadata.renderMode === RenderMode.Prerender) {
         // Handle SSG routes
         yield* handleSSGRoute(
+          serverConfigRouteTree,
           typeof redirectTo === 'string' ? redirectTo : undefined,
           metadata,
           parentInjector,
@@ -301,6 +302,7 @@ function appendPreloadToMetadata(
  * Handles SSG (Static Site Generation) routes by invoking `getPrerenderParams` and yielding
  * all parameterized paths, returning any errors encountered.
  *
+ * @param serverConfigRouteTree - The tree representing the server's routing setup.
  * @param redirectTo - Optional path to redirect to, if specified.
  * @param metadata - The metadata associated with the route tree node.
  * @param parentInjector - The dependency injection container for the parent route.
@@ -309,6 +311,7 @@ function appendPreloadToMetadata(
  * @returns An async iterable iterator that yields route tree node metadata for each SSG path or errors.
  */
 async function* handleSSGRoute(
+  serverConfigRouteTree: RouteTree<ServerConfigRouteTreeAdditionalMetadata> | undefined,
   redirectTo: string | undefined,
   metadata: ServerConfigRouteTreeNodeMetadata,
   parentInjector: Injector,
@@ -352,6 +355,19 @@ async function* handleSSGRoute(
       };
 
       return;
+    }
+
+    if (serverConfigRouteTree) {
+      // Automatically resolve dynamic parameters for nested routes.
+      const catchAllRoutePath = joinUrlParts(currentRoutePath, '**');
+      const match = serverConfigRouteTree.match(catchAllRoutePath);
+      if (match && match.renderMode === RenderMode.Prerender && !('getPrerenderParams' in match)) {
+        serverConfigRouteTree.insert(catchAllRoutePath, {
+          ...match,
+          presentInClientRouter: true,
+          getPrerenderParams,
+        });
+      }
     }
 
     const parameters = await runInInjectionContext(parentInjector, () => getPrerenderParams());
@@ -455,6 +471,13 @@ function buildServerConfigRouteTree({ routes, appShellRoute }: ServerRoutesConfi
     if (path[0] === '/') {
       errors.push(`Invalid '${path}' route configuration: the path cannot start with a slash.`);
 
+      continue;
+    }
+
+    if (path.includes('*') && 'getPrerenderParams' in metadata) {
+      errors.push(
+        `Invalid '${path}' route configuration: 'getPrerenderParams' cannot be used with a '*' or '**' route.`,
+      );
       continue;
     }
 

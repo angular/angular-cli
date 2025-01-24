@@ -7,7 +7,7 @@
  */
 
 import { RenderMode } from '../../src/routes/route-config';
-import { RouteTree } from '../../src/routes/route-tree';
+import { RouteTree, RouteTreeNodeMetadataWithoutRoute } from '../../src/routes/route-tree';
 
 describe('RouteTree', () => {
   let routeTree: RouteTree;
@@ -118,33 +118,6 @@ describe('RouteTree', () => {
       const newRouteTree = RouteTree.fromObject(routeTreeObj);
       expect(newRouteTree.match('/any-path')).toBeUndefined();
     });
-
-    it('should preserve insertion order when converting to and from object', () => {
-      routeTree.insert('/first', { renderMode: RenderMode.Server });
-      routeTree.insert('/:id', { renderMode: RenderMode.Server });
-      routeTree.insert('/second', { renderMode: RenderMode.Server });
-
-      const routeTreeObj = routeTree.toObject();
-      expect(routeTreeObj).toEqual([
-        { route: '/first', renderMode: RenderMode.Server },
-        { route: '/*', renderMode: RenderMode.Server },
-        { route: '/second', renderMode: RenderMode.Server },
-      ]);
-
-      const newRouteTree = RouteTree.fromObject(routeTreeObj);
-      expect(newRouteTree.match('/first')).toEqual({
-        route: '/first',
-        renderMode: RenderMode.Server,
-      });
-      expect(newRouteTree.match('/second')).toEqual({
-        route: '/*',
-        renderMode: RenderMode.Server,
-      });
-      expect(newRouteTree.match('/third')).toEqual({
-        route: '/*',
-        renderMode: RenderMode.Server,
-      });
-    });
   });
 
   describe('match', () => {
@@ -204,12 +177,42 @@ describe('RouteTree', () => {
       });
     });
 
-    it('should prioritize earlier insertions in case of conflicts', () => {
+    it('matches routes correctly with exact, wildcard, and double wildcard patterns', () => {
+      const meta: RouteTreeNodeMetadataWithoutRoute = { renderMode: RenderMode.Client };
+
+      // Set up the route tree with various route configurations
+      routeTree.insert('/', meta);
+      routeTree.insert('/*', meta);
+      routeTree.insert('/*/*', meta);
+      routeTree.insert('/**', meta);
+      routeTree.insert('/blog', meta);
+      routeTree.insert('/blog/*', meta);
+
+      // Test route matches for exact routes
+      expect(routeTree.match('/')?.route).toBe('/');
+      expect(routeTree.match('/blog')?.route).toBe('/blog');
+
+      // Test route matches for single wildcard routes
+      expect(routeTree.match('/something')?.route).toBe('/*');
+      expect(routeTree.match('/blog/article')?.route).toBe('/blog/*');
+
+      // Test route matches for multiple wildcard routes
+      expect(routeTree.match('/something/another')?.route).toBe('/*/*');
+
+      // Additional test for wildcard fallback
+      expect(routeTree.match('/something')?.route).toBe('/*');
+
+      // Test route matches for catch all double wildcard routes
+      expect(routeTree.match('/something/another/nested')?.route).toBe('/**');
+    });
+
+    it('should prefer exact matches in case of conflicts', () => {
       routeTree.insert('/blog/*', { renderMode: RenderMode.Server });
       routeTree.insert('/blog/article', { redirectTo: 'blog', renderMode: RenderMode.Server });
 
       expect(routeTree.match('/blog/article')).toEqual({
-        route: '/blog/*',
+        route: '/blog/article',
+        redirectTo: 'blog',
         renderMode: RenderMode.Server,
       });
     });
