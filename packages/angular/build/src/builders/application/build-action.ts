@@ -300,6 +300,8 @@ function* emitOutputResults(
     },
   };
 
+  let hasCssUpdates = false;
+
   // Initially assume all previous output files have been removed
   const removedOutputFiles = new Map(previousOutputInfo);
   for (const file of outputFiles) {
@@ -316,8 +318,10 @@ function* emitOutputResults(
     }
 
     if (needFile) {
-      // Updates to non-JS files must signal an update with the dev server
-      if (!/(?:\.m?js|\.map)$/.test(file.path)) {
+      if (file.path.endsWith('.css')) {
+        hasCssUpdates = true;
+      } else if (!/(?:\.m?js|\.map)$/.test(file.path)) {
+        // Updates to non-JS files must signal an update with the dev server
         incrementalResult.background = false;
       }
 
@@ -345,6 +349,8 @@ function* emitOutputResults(
       continue;
     }
 
+    hasCssUpdates ||= destination.endsWith('.css');
+
     incrementalResult.files[destination] = {
       type: BuildOutputFileType.Browser,
       inputPath: source,
@@ -369,6 +375,21 @@ function* emitOutputResults(
   // If there are template updates and the incremental update was background only, a component
   // update is possible.
   if (hasTemplateUpdates && incrementalResult.background) {
+    // Template changes may be accompanied by stylesheet changes and these should also be updated hot when possible.
+    if (hasCssUpdates) {
+      const styleResult: IncrementalResult = {
+        kind: ResultKind.Incremental,
+        added: incrementalResult.added.filter(isCssFilePath),
+        removed: incrementalResult.removed.filter(({ path }) => isCssFilePath(path)),
+        modified: incrementalResult.modified.filter(isCssFilePath),
+        files: Object.fromEntries(
+          Object.entries(incrementalResult.files).filter(([path]) => isCssFilePath(path)),
+        ),
+      };
+
+      yield styleResult;
+    }
+
     const updateResult: ComponentUpdateResult = {
       kind: ResultKind.ComponentUpdate,
       updates: Array.from(templateUpdates, ([id, content]) => ({
@@ -380,4 +401,8 @@ function* emitOutputResults(
 
     yield updateResult;
   }
+}
+
+function isCssFilePath(filePath: string): boolean {
+  return /\.css(?:\.map)?$/i.test(filePath);
 }
