@@ -36,6 +36,23 @@
       "type": "string",
       "description": "SSL certificate to use for serving HTTPS."
     },
+    "allowedHosts": {
+      "description": "The hosts that can access the development server. This option sets the Vite option of the same name. For further details: https://vite.dev/config/server-options.html#server-allowedhosts",
+      "default": [],
+      "oneOf": [
+        {
+          "type": "array",
+          "description": "List of hosts that are allowed to access the development server.",
+          "items": {
+            "type": "string"
+          }
+        },
+        {
+          "type": "boolean",
+          "description": "Indicates that all hosts are allowed. This is not recommended and a security risk."
+        }
+      ]
+    },
     "headers": {
       "type": "object",
       "description": "Custom HTTP headers to be added to all responses.",
