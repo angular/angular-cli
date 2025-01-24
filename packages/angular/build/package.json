@@ -41,7 +41,7 @@
     "rollup": "4.30.1",
     "sass": "1.83.1",
     "semver": "7.6.3",
-    "vite": "6.0.7",
+    "vite": "6.0.11",
     "watchpack": "2.4.2"
   },
   "optionalDependencies": {
