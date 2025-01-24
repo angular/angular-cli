@@ -23,6 +23,9 @@ export function createIvyPlugin(
     sourceMap: buildOptions.sourceMap.scripts,
     declaration: false,
     declarationMap: false,
+    // Disable removing of comments as TS is quite aggressive with these and can
+    // remove important annotations, such as /* @__PURE__ */.
+    removeComments: false,
   };
 
   if (tsConfig.options.target === undefined || tsConfig.options.target < ScriptTarget.ES2022) {
