@@ -21,7 +21,7 @@
     "@ampproject/remapping": "2.3.0",
     "@angular-devkit/core": "workspace:0.0.0-PLACEHOLDER",
     "@angular-devkit/architect": "workspace:0.0.0-EXPERIMENTAL-PLACEHOLDER",
-    "@babel/core": "7.26.0",
+    "@babel/core": "7.26.7",
     "@babel/helper-annotate-as-pure": "7.25.9",
     "@babel/helper-split-export-declaration": "7.24.7",
     "@babel/plugin-syntax-import-attributes": "7.26.0",
