@@ -6,11 +6,43 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { EnvironmentProviders, InjectionToken, makeEnvironmentProviders } from '@angular/core';
+import {
+  EnvironmentProviders,
+  InjectionToken,
+  Provider,
+  Type,
+  makeEnvironmentProviders,
+} from '@angular/core';
+import { type DefaultExport, ROUTES, type Route } from '@angular/router';
+
+/**
+ * The internal path used for the app shell route.
+ * @internal
+ */
+const APP_SHELL_ROUTE = 'ng-app-shell';
+
+/**
+ * Identifies a particular kind of `ServerRoutesFeatureKind`.
+ * @see {@link ServerRoutesFeature}
+ * @developerPreview
+ */
+enum ServerRoutesFeatureKind {
+  AppShell,
+}
+
+/**
+ * Helper type to represent a server routes feature.
+ * @see {@link ServerRoutesFeatureKind}
+ * @developerPreview
+ */
+interface ServerRoutesFeature<FeatureKind extends ServerRoutesFeatureKind> {
+  ɵkind: FeatureKind;
+  ɵproviders: Provider[];
+}
 
 /**
  * Different rendering modes for server routes.
- * @see {@link provideServerRoutesConfig}
+ * @see {@link provideServerRouting}
  * @see {@link ServerRoute}
  * @developerPreview
  */
@@ -148,7 +180,7 @@ export interface ServerRouteServer extends ServerRouteCommon {
 
 /**
  * Server route configuration.
- * @see {@link provideServerRoutesConfig}
+ * @see {@link provideServerRouting}
  * @developerPreview
  */
 export type ServerRoute =
@@ -163,8 +195,9 @@ export type ServerRoute =
  * This interface defines the optional settings available for configuring server routes
  * in the server-side environment, such as specifying a path to the app shell route.
  *
- * @see {@link provideServerRoutesConfig}
- * @developerPreview
+ *
+ * @see {@link provideServerRouting}
+ * @deprecated use `provideServerRouting`. This will be removed in version 20.
  */
 
 export interface ServerRoutesConfigOptions {
@@ -172,8 +205,6 @@ export interface ServerRoutesConfigOptions {
    * Defines the route to be used as the app shell, which serves as the main entry
    * point for the application. This route is often used to enable server-side rendering
    * of the application shell for requests that do not match any specific server route.
-   *
-   * @see {@link https://angular.dev/ecosystem/service-workers/app-shell | App shell pattern on Angular.dev}
    */
   appShellRoute?: string;
 }
@@ -182,7 +213,13 @@ export interface ServerRoutesConfigOptions {
  * Configuration value for server routes configuration.
  * @internal
  */
-export interface ServerRoutesConfig extends ServerRoutesConfigOptions {
+export interface ServerRoutesConfig {
+  /**
+   * Defines the route to be used as the app shell.
+   */
+  appShellRoute?: string;
+
+  /** List of server routes for the application. */
   routes: ServerRoute[];
 }
 
@@ -204,6 +241,8 @@ export const SERVER_ROUTES_CONFIG = new InjectionToken<ServerRoutesConfig>('SERV
  *
  * @see {@link ServerRoute}
  * @see {@link ServerRoutesConfigOptions}
+ * @see {@link provideServerRouting}
+ * @deprecated use `provideServerRouting`. This will be removed in version 20.
  * @developerPreview
  */
 export function provideServerRoutesConfig(
@@ -222,4 +261,84 @@ export function provideServerRoutesConfig(
       useValue: { routes, ...options },
     },
   ]);
+}
+
+/**
+ * Sets up the necessary providers for configuring server routes.
+ * This function accepts an array of server routes and optional configuration
+ * options, returning an `EnvironmentProviders` object that encapsulates
+ * the server routes and configuration settings.
+ *
+ * @param routes - An array of server routes to be provided.
+ * @param features - (Optional) server routes features.
+ * @returns An `EnvironmentProviders` instance with the server routes configuration.
+ *
+ * @see {@link ServerRoute}
+ * @see {@link withAppShell}
+ * @developerPreview
+ */
+export function provideServerRouting(
+  routes: ServerRoute[],
+  ...features: ServerRoutesFeature<ServerRoutesFeatureKind>[]
+): EnvironmentProviders {
+  const config: ServerRoutesConfig = { routes };
+  const hasAppShell = features.some((f) => f.ɵkind === ServerRoutesFeatureKind.AppShell);
+  if (hasAppShell) {
+    config.appShellRoute = APP_SHELL_ROUTE;
+  }
+
+  const providers: Provider[] = [
+    {
+      provide: SERVER_ROUTES_CONFIG,
+      useValue: config,
+    },
+  ];
+
+  for (const feature of features) {
+    providers.push(...feature.ɵproviders);
+  }
+
+  return makeEnvironmentProviders(providers);
+}
+
+/**
+ * Configures the app shell route with the provided component.
+ *
+ * The app shell serves as the main entry point for the application and is commonly used
+ * to enable server-side rendering (SSR) of the application shell. It handles requests
+ * that do not match any specific server route, providing a fallback mechanism and improving
+ * perceived performance during navigation.
+ *
+ * This configuration is particularly useful in applications leveraging Progressive Web App (PWA)
+ * patterns, such as service workers, to deliver a seamless user experience.
+ *
+ * @param component The Angular component to render for the app shell route.
+ * @returns A server routes feature configuration for the app shell.
+ *
+ * @see {@link provideServerRouting}
+ * @see {@link https://angular.dev/ecosystem/service-workers/app-shell | App shell pattern on Angular.dev}
+ */
+export function withAppShell(
+  component: Type<unknown> | (() => Promise<Type<unknown> | DefaultExport<Type<unknown>>>),
+): ServerRoutesFeature<ServerRoutesFeatureKind.AppShell> {
+  const routeConfig: Route = {
+    path: APP_SHELL_ROUTE,
+  };
+
+  if ('ɵcmp' in component) {
+    routeConfig.component = component as Type<unknown>;
+  } else {
+    routeConfig.loadComponent = component as () => Promise<Type<unknown>>;
+  }
+
+  return {
+    ɵkind: ServerRoutesFeatureKind.AppShell,
+    ɵproviders: [
+      {
+        provide: ROUTES,
+        useValue: routeConfig,
+        multi: true,
+      },
+    ],
+  };
 }
