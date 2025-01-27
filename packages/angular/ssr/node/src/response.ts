@@ -71,7 +71,10 @@ export async function writeResponseToNodeResponse(
         break;
       }
 
-      (destination as ServerResponse).write(value);
+      const canContinue = (destination as ServerResponse).write(value);
+      if (!canContinue) {
+        await new Promise<void>((resolve) => destination.once('drain', resolve));
+      }
     }
   } catch {
     destination.end('Internal server error.');
