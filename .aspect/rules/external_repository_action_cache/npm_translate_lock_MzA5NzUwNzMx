@@ -4,13 +4,13 @@
 .npmrc=-1406867100
 modules/testing/builder/package.json=-1196120648
 package.json=-2061208187
-packages/angular/build/package.json=-1096831997
+packages/angular/build/package.json=229129757
 packages/angular/cli/package.json=-1878910022
 packages/angular/pwa/package.json=1108903917
 packages/angular/ssr/package.json=1104313629
 packages/angular_devkit/architect/package.json=-1496633956
 packages/angular_devkit/architect_cli/package.json=1551210941
-packages/angular_devkit/build_angular/package.json=1992694251
+packages/angular_devkit/build_angular/package.json=1732310149
 packages/angular_devkit/build_webpack/package.json=373950017
 packages/angular_devkit/core/package.json=339935828
 packages/angular_devkit/schematics/package.json=673943597
