@@ -4,13 +4,15 @@
 # found in the LICENSE file at https://angular.dev/license
 
 load("@npm//@angular/build-tooling/bazel/api-golden:index.bzl", "api_golden_test_npm_package")
-load("@npm//@bazel/jasmine:index.bzl", "jasmine_node_test")
-load("//tools:defaults2.bzl", "npm_package", "ts_project")
+load("@npm2//:defs.bzl", "npm_link_all_packages")
+load("//tools:defaults2.bzl", "jasmine_test", "npm_package", "ts_project")
 load("//tools:ts_json_schema.bzl", "ts_json_schema")
 
 licenses(["notice"])
 
 package(default_visibility = ["//visibility:public"])
+
+npm_link_all_packages()
 
 ts_json_schema(
     name = "app_shell_schema",
@@ -122,6 +124,12 @@ ts_project(
     data = RUNTIME_ASSETS,
     module_name = "@angular-devkit/build-angular",
     deps = [
+        ":node_modules/@angular-devkit/architect",
+        ":node_modules/@angular-devkit/build-webpack",
+        ":node_modules/@angular-devkit/core",
+        ":node_modules/@angular/build",
+        ":node_modules/@angular/ssr",
+        ":node_modules/@ngtools/webpack",
         "//:node_modules/@ampproject/remapping",
         "//:node_modules/@angular/common",
         "//:node_modules/@angular/compiler-cli",
@@ -193,14 +201,6 @@ ts_project(
         "//:node_modules/webpack-dev-server",
         "//:node_modules/webpack-merge",
         "//:node_modules/webpack-subresource-integrity",
-        "//packages/angular/build:build_rjs",
-        "//packages/angular/build/private:private_rjs",
-        "//packages/angular/ssr:ssr_rjs",
-        "//packages/angular_devkit/architect:architect_rjs",
-        "//packages/angular_devkit/build_webpack:build_webpack_rjs",
-        "//packages/angular_devkit/core:core_rjs",
-        "//packages/angular_devkit/core/node:node_rjs",
-        "//packages/ngtools/webpack:webpack_rjs",
     ],
 )
 
@@ -215,7 +215,9 @@ ts_project(
             "src/builders/**/*_spec.ts",
         ],
     ),
-    data = glob(["test/**/*"]),
+    data = [
+        "//packages/angular_devkit/build_angular/test/hello-world-lib",
+    ],
     deps = [
         ":build_angular_rjs",
         ":build_angular_test_utils_rjs",
@@ -228,9 +230,9 @@ ts_project(
     ],
 )
 
-jasmine_node_test(
+jasmine_test(
     name = "build_angular_test",
-    srcs = [":build_angular_test_lib"],
+    data = [":build_angular_test_lib_rjs"],
 )
 
 genrule(
@@ -284,7 +286,9 @@ ts_project(
             "src/**/*_spec.ts",
         ],
     ),
-    data = glob(["test/**/*"]),
+    data = [
+        "//packages/angular_devkit/build_angular/test/hello-world-lib",
+    ],
     deps = [
         ":build_angular_rjs",
         "//:node_modules/@types/jasmine",
@@ -408,9 +412,21 @@ LARGE_SPECS = {
 ]
 
 [
-    jasmine_node_test(
+    jasmine_test(
         name = "build_angular_" + spec + "_test",
         size = LARGE_SPECS[spec].get("size", "medium"),
+        data = [
+            ":build_angular_" + spec + "_test_lib_rjs",
+            # Helpers for `testing/builder` rely on the npm artifact, so we'll make
+            # sure it's available during this test. Notably that the package needs to
+            # available as a parent of `modules/testing/builder` for resolution to work!
+            "//modules/testing/builder:node_modules/@angular-devkit/build-angular",
+        ],
+        env = {
+            # TODO: Replace Puppeteer downloaded browsers with Bazel-managed browsers,
+            # or standardize to avoid complex configuration like this!
+            "PUPPETEER_DOWNLOAD_PATH": "../../../node_modules/puppeteer/downloads",
+        },
         flaky = LARGE_SPECS[spec].get("flaky", False),
         shard_count = LARGE_SPECS[spec].get("shards", 2),
         # These tests are resource intensive and should not be over-parallized as they will
@@ -419,7 +435,6 @@ LARGE_SPECS = {
         tags = [
             "cpu:2",
         ] + LARGE_SPECS[spec].get("tags", []),
-        deps = [":build_angular_" + spec + "_test_lib"],
     )
     for spec in LARGE_SPECS
 ]

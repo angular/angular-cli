@@ -21,6 +21,7 @@ import {
   virtualFs,
   workspaces,
 } from '@angular-devkit/core';
+import path from 'node:path';
 import { firstValueFrom } from 'rxjs';
 
 // Default timeout for large specs is 2.5 minutes.
@@ -41,6 +42,13 @@ export async function createArchitect(workspaceRoot: Path) {
   const registry = new schema.CoreSchemaRegistry();
   registry.addPostTransform(schema.transforms.addUndefinedDefaults);
   const workspaceSysPath = getSystemPath(workspaceRoot);
+
+  // The download path is relative (set from Starlark), so before potentially
+  // changing directories, or executing inside a temporary directory, ensure
+  // the path is absolute.
+  if (process.env['PUPPETEER_DOWNLOAD_PATH']) {
+    process.env.PUPPETEER_DOWNLOAD_PATH = path.resolve(process.env['PUPPETEER_DOWNLOAD_PATH']);
+  }
 
   const { workspace } = await workspaces.readWorkspace(
     workspaceSysPath,

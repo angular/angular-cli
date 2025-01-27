@@ -4,6 +4,7 @@ packages:
   - packages/angular_devkit/architect_cli
   - packages/angular_devkit/core
   - packages/angular_devkit/build_webpack
+  - packages/angular_devkit/build_angular
   - packages/angular_devkit/schematics
   - packages/angular_devkit/schematics_cli
   - packages/angular/cli
