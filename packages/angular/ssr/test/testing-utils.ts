@@ -18,7 +18,7 @@ import { provideServerRendering } from '@angular/platform-server';
 import { RouterOutlet, Routes, provideRouter } from '@angular/router';
 import { destroyAngularServerApp } from '../src/app';
 import { ServerAsset, setAngularAppManifest } from '../src/manifest';
-import { ServerRoute, provideServerRoutesConfig } from '../src/routes/route-config';
+import { ServerRoute, provideServerRouting } from '../src/routes/route-config';
 
 @Component({
   standalone: true,
@@ -97,7 +97,7 @@ export function setAngularAppTestingManifest(
           provideServerRendering(),
           provideExperimentalZonelessChangeDetection(),
           provideRouter(routes),
-          provideServerRoutesConfig(serverRoutes),
+          provideServerRouting(serverRoutes),
           ...extraProviders,
         ],
       });
