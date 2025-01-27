@@ -149,7 +149,12 @@ describe('Browser Builder lazy modules', () => {
       'src/main.ts': `import('./one'); import('./two');`,
     });
 
-    const { files } = await browserBuild(architect, host, target);
+    const { files } = await browserBuild(architect, host, target, {
+      // Preserve symlinks to reliably verify the chunk names. When symlinks
+      // would be dereferenced, the `@angular/common` file can originate from a
+      // less predictable path in e.g. node_modules/.pnpm/<...>`.
+      preserveSymlinks: true,
+    });
     expect(files['src_one_ts.js']).toBeDefined();
     expect(files['src_two_ts.js']).toBeDefined();
     expect(files['default-node_modules_angular_common_fesm2022_http_mjs.js']).toBeDefined();

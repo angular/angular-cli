@@ -143,7 +143,7 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
         expect(result?.success).toBe(true);
 
         expect(logs).toContain(
-          jasmine.objectContaining({ message: jasmine.stringMatching(/styles\.css.+\d+ bytes/) }),
+          jasmine.objectContaining({ message: jasmine.stringMatching(/styles\.css.+\d+ kB/) }),
         );
       });
     });
@@ -410,7 +410,7 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
         expect(result?.success).toBe(true);
 
         expect(logs).toContain(
-          jasmine.objectContaining({ message: jasmine.stringMatching(/styles\.css.+\d+ bytes/) }),
+          jasmine.objectContaining({ message: jasmine.stringMatching(/styles\.css.+\d+ kB/) }),
         );
       });
 
@@ -427,7 +427,7 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
         expect(result?.success).toBe(true);
 
         expect(logs).toContain(
-          jasmine.objectContaining({ message: jasmine.stringMatching(/extra\.css.+\d+ bytes/) }),
+          jasmine.objectContaining({ message: jasmine.stringMatching(/extra\.css.+\d+ kB/) }),
         );
       });
     });

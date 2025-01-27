@@ -221,7 +221,10 @@
     }
   },
   "pnpm": {
-    "onlyBuiltDependencies": [],
+    "onlyBuiltDependencies": [
+      "puppeteer",
+      "webdriver-manager"
+    ],
     "overrides": {
       "@angular/build": "workspace:*"
     }
