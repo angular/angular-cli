@@ -57,7 +57,7 @@
     "less": "^4.2.0",
     "ng-packagr": "^19.0.0",
     "postcss": "^8.4.0",
-    "tailwindcss": "^2.0.0 || ^3.0.0",
+    "tailwindcss": "^2.0.0 || ^3.0.0 || ^4.0.0",
     "typescript": ">=5.5 <5.8"
   },
   "peerDependenciesMeta": {
