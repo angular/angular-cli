@@ -16,6 +16,8 @@ export {
   type ServerRoute,
   type ServerRoutesConfigOptions,
   provideServerRoutesConfig,
+  provideServerRouting,
+  withAppShell,
   RenderMode,
   type ServerRouteClient,
   type ServerRoutePrerender,
