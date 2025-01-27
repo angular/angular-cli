@@ -183,6 +183,10 @@ load("@aspect_rules_js//npm:repositories.bzl", "npm_translate_lock")
 
 npm_translate_lock(
     name = "npm2",
+    custom_postinstalls = {
+        # TODO: Standardize browser management for `rules_js`
+        "webdriver-manager": "node ./bin/webdriver-manager update --standalone false --gecko false --versions.chrome 106.0.5249.21",
+    },
     data = [
         "//:package.json",
         "//:pnpm-workspace.yaml",
@@ -201,6 +205,16 @@ npm_translate_lock(
         "//packages/ngtools/webpack:package.json",
         "//packages/schematics/angular:package.json",
     ],
+    lifecycle_hooks_envs = {
+        # TODO: Standardize browser management for `rules_js`
+        "puppeteer": ["PUPPETEER_DOWNLOAD_PATH=./downloads"],
+    },
+    lifecycle_hooks_execution_requirements = {
+        # Needed for downloading chromedriver.
+        # Also `update-config` of webdriver manager would store an absolute path;
+        # which would then break execution.
+        "webdriver-manager": ["local"],
+    },
     npmrc = "//:.npmrc",
     patches = {
         # Note: Patches not needed as the existing patches are only
