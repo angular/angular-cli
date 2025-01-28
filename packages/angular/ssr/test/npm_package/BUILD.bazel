@@ -1,7 +1,6 @@
 load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
-load("@npm//@bazel/jasmine:index.bzl", "jasmine_node_test")
-load("//tools:interop.bzl", "ts_project")
+load("//tools:defaults2.bzl", "jasmine_test", "ts_project")
 
 ts_project(
     name = "unit_test_lib",
@@ -12,10 +11,10 @@ ts_project(
     ],
 )
 
-jasmine_node_test(
+jasmine_test(
     name = "test",
-    srcs = [":unit_test_lib"],
     data = [
+        "unit_test_lib_rjs",
         "//packages/angular/ssr:npm_package",
     ],
 )
