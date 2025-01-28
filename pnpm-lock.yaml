@@ -547,9 +547,6 @@ importers:
       '@angular-devkit/architect':
         specifier: workspace:0.0.0-EXPERIMENTAL-PLACEHOLDER
         version: link:../../angular_devkit/architect
-      '@angular-devkit/core':
-        specifier: workspace:0.0.0-PLACEHOLDER
-        version: link:../../angular_devkit/core
       '@babel/core':
         specifier: 7.26.7
         version: 7.26.7
@@ -624,6 +621,9 @@ importers:
         specifier: 3.2.2
         version: 3.2.2
     devDependencies:
+      '@angular-devkit/core':
+        specifier: workspace:*
+        version: link:../../angular_devkit/core
       '@angular/ssr':
         specifier: workspace:*
         version: link:../ssr
