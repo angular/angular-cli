@@ -388,7 +388,9 @@ describe('Library Schematic', () => {
     const tree = await schematicRunner.runSchematic('library', defaultOptions, workspaceTree);
 
     const workspace = JSON.parse(tree.readContent('/angular.json'));
-    expect(workspace.projects.foo.architect.build.builder).toBe('@angular/build:ng-packagr');
+    expect(workspace.projects.foo.architect.build.builder).toBe(
+      '@angular-devkit/build-angular:ng-packagr',
+    );
   });
 
   describe('standalone=false', () => {
