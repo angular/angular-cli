@@ -224,6 +224,7 @@ npm_package(
         "//packages/angular_devkit/architect:package.json",
     ],
     stamp_files = [
+        "src/utils/version.js",
         "src/tools/esbuild/utils.js",
         "src/utils/normalize-cache.js",
     ],

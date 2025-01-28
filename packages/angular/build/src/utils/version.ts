@@ -56,17 +56,7 @@ export function assertCompatibleAngularVersion(projectRoot: string): void | neve
     return;
   }
 
-  let supportedAngularSemver;
-  try {
-    supportedAngularSemver = projectRequire('@angular/build/package.json')['peerDependencies'][
-      '@angular/compiler-cli'
-    ];
-  } catch {
-    supportedAngularSemver = projectRequire('@angular-devkit/build-angular/package.json')[
-      'peerDependencies'
-    ]['@angular/compiler-cli'];
-  }
-
+  const supportedAngularSemver = '0.0.0-ANGULAR-FW-PEER-DEP';
   const angularVersion = new SemVer(angularPkgJson['version']);
 
   if (!satisfies(angularVersion, supportedAngularSemver, { includePrerelease: true })) {
