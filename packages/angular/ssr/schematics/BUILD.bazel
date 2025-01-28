@@ -3,9 +3,8 @@
 # Use of this source code is governed by an MIT-style license that can be
 # found in the LICENSE file at https://angular.dev/license
 
-load("@npm//@bazel/jasmine:index.bzl", "jasmine_node_test")
 load("//tools:defaults.bzl", "pkg_npm")
-load("//tools:interop.bzl", "ts_project")
+load("//tools:defaults2.bzl", "jasmine_test", "ts_project")
 load("//tools:ts_json_schema.bzl", "ts_json_schema")
 
 licenses(["notice"])
@@ -61,8 +60,8 @@ ts_project(
     data = [":schematics_assets"],
     module_name = "@angular/ssr/schematics",
     deps = [
-        "//packages/angular_devkit/schematics:schematics_rjs",
-        "//packages/schematics/angular:angular_rjs",
+        "//packages/angular/ssr:node_modules/@angular-devkit/schematics",
+        "//packages/angular/ssr:node_modules/@schematics/angular",
     ],
 )
 
@@ -80,17 +79,14 @@ ts_project(
     ),
     deps = [
         ":schematics_rjs",
-        "//packages/angular_devkit/schematics/testing:testing_rjs",
+        "//packages/angular/ssr:node_modules/@angular-devkit/schematics",
     ],
 )
 
-jasmine_node_test(
+jasmine_test(
     name = "ssr_schematics_test",
-    srcs = [":ssr_schematics_test_lib"],
-    deps = [
-        "@npm//jasmine",
-        "@npm//source-map",
-        "@npm//typescript",
+    data = [
+        ":ssr_schematics_test_lib_rjs",
     ],
 )
 

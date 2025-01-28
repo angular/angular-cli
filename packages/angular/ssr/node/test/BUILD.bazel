@@ -1,6 +1,5 @@
 load("@npm//@angular/build-tooling/bazel/spec-bundling:index.bzl", "spec_bundle")
-load("@npm//@bazel/jasmine:index.bzl", "jasmine_node_test")
-load("//tools:interop.bzl", "ts_project")
+load("//tools:defaults2.bzl", "jasmine_test", "ts_project")
 
 ts_project(
     name = "unit_test_lib",
@@ -22,9 +21,9 @@ spec_bundle(
     ],
 )
 
-jasmine_node_test(
+jasmine_test(
     name = "test",
-    deps = [
+    data = [
         ":esm_tests_bundled",
     ],
 )
