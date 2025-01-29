@@ -38,8 +38,8 @@ export function assertCompatibleAngularVersion(projectRoot: string): void | neve
   }
 
   const supportedAngularSemver = '0.0.0-ANGULAR-FW-PEER-DEP';
-  if (supportedAngularSemver.startsWith('0.0.0')) {
-    // Internal CLI testing version.
+  if (angularPkgJson['version'] === '0.0.0' || supportedAngularSemver.startsWith('0.0.0')) {
+    // Internal CLI and FW testing version.
     return;
   }
 
