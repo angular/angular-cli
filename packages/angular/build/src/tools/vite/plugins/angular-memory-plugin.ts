@@ -8,7 +8,7 @@
 
 import assert from 'node:assert';
 import { readFile } from 'node:fs/promises';
-import { basename, dirname, join, relative } from 'node:path';
+import { dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { Plugin } from 'vite';
 import { loadEsmModule } from '../../../utils/load-esm';
