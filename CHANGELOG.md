@@ -1,3 +1,34 @@
+<a name="19.2.0-next.1"></a>
+
+# 19.2.0-next.1 (2025-01-29)
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                                                |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------------------- |
+| [cae068be3](https://github.com/angular/angular-cli/commit/cae068be373edbad04e06052e87ec7437575e178) | fix  | update library schematic to use `@angular-devkit/build-angular:ng-packagr` |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                                          |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------------- |
+| [694ef8e6e](https://github.com/angular/angular-cli/commit/694ef8e6e486ad66d19b831243193e0123a4b0b1) | fix  | allow tailwindcss 4.x as a peer dependency                           |
+| [1a3ef3b60](https://github.com/angular/angular-cli/commit/1a3ef3b60bb1d383a514dee8a6f95b7e15b5bb2c) | fix  | disable TypeScript `removeComments` option                           |
+| [d4ee36065](https://github.com/angular/angular-cli/commit/d4ee36065d9fe39431414a40ce39e163acfd8278) | fix  | keep background referenced HMR update chunks                         |
+| [531dcdca4](https://github.com/angular/angular-cli/commit/531dcdca46a321d253b1d5a2e40d2b3a90e3ee46) | fix  | support template updates that also trigger global stylesheet changes |
+| [f836be9e6](https://github.com/angular/angular-cli/commit/f836be9e676575fccd4d74eddbc5bf647f7ff1bd) | fix  | support Vite `allowedHosts` option for development server            |
+| [0ddf6aafa](https://github.com/angular/angular-cli/commit/0ddf6aafaa65b3323dc4ee6251d75794ae862ec7) | fix  | utilize bazel stamp instead of resolving peer dependency versions    |
+
+### @angular/ssr
+
+| Commit                                                                                              | Type | Description                                                        |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------ |
+| [4df97d192](https://github.com/angular/angular-cli/commit/4df97d192354a884557229489b4d8607003cc613) | fix  | enhance dynamic route matching for better performance and accuracy |
+| [46581db16](https://github.com/angular/angular-cli/commit/46581db16bc8ed4eda5f0198734146c4e82f9957) | fix  | redirect to locale pathname instead of full URL                    |
+| [ec05c814e](https://github.com/angular/angular-cli/commit/ec05c814ee0ee444479e22ae767109cace18cb0b) | fix  | rename `provideServerRoutesConfig` to `provideServerRouting`       |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="19.1.5"></a>
 
 # 19.1.5 (2025-01-29)
