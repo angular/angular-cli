@@ -53,7 +53,7 @@ ng_package(
         "../../third_party/beasties",
     ],
     nested_packages = [
-        "//packages/angular/ssr/schematics:npm_package",
+        "//packages/angular/ssr/schematics:pkg",
     ],
     deps = [
         ":ssr",
