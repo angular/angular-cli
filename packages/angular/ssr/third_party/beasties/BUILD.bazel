@@ -1,5 +1,5 @@
 load("@aspect_rules_js//js:defs.bzl", "js_library")
-load("@npm//@bazel/rollup:index.bzl", "rollup_bundle")
+load("@npm2//:rollup/package_json.bzl", rollup = "bin")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -16,52 +16,33 @@ js_library(
 js_library(
     name = "beasties_bundled",
     srcs = [
-        ":bundled_beasties_files",
-    ],
-    deps = [
-        "//:node_modules/beasties",
-    ],
-)
-
-# Filter out esbuild metadata files and only copy the necessary files
-genrule(
-    name = "bundled_beasties_files",
-    srcs = [
         ":bundled_beasties",
     ],
-    outs = [
-        "index.js",
-        "index.js.map",
-        "THIRD_PARTY_LICENSES.txt",
-    ],
-    cmd = """
-        for f in $(locations :bundled_beasties); do
-            # Only process files inside the bundled_beasties directory
-            if [[ "$${f}" == *bundled_beasties ]]; then
-                cp "$${f}/index.js" $(location :index.js)
-                cp "$${f}/index.js.map" $(location :index.js.map)
-                cp "$${f}/THIRD_PARTY_LICENSES.txt" $(location :THIRD_PARTY_LICENSES.txt)
-            fi
-        done
-    """,
 )
 
-rollup_bundle(
+rollup.rollup(
     name = "bundled_beasties",
-    config_file = ":rollup.config.mjs",
-    entry_points = {
-        "@npm//:node_modules/beasties/dist/index.mjs": "index",
-    },
-    format = "esm",
-    link_workspace_root = True,
-    output_dir = True,
-    sourcemap = "true",
-    deps = [
-        "@npm//@rollup/plugin-alias",
-        "@npm//@rollup/plugin-commonjs",
-        "@npm//@rollup/plugin-node-resolve",
-        "@npm//beasties",
-        "@npm//rollup-license-plugin",
-        "@npm//unenv",
+    srcs = [
+        "rollup.config.mjs",
+        "//:node_modules/@rollup/plugin-alias",
+        "//:node_modules/@rollup/plugin-commonjs",
+        "//:node_modules/@rollup/plugin-node-resolve",
+        "//:node_modules/beasties",
+        "//:node_modules/rollup-license-plugin",
+        "//:node_modules/unenv",
     ],
+    outs = [
+        "THIRD_PARTY_LICENSES.txt",
+        "index.js",
+        "index.js.map",
+    ],
+    args = [
+        "--format=esm",
+        "--config=$(rootpath rollup.config.mjs)",
+        "--input=node_modules/beasties/dist/index.mjs",
+        "--sourcemap=true",
+        "--dir=packages/angular/ssr/third_party/beasties",
+    ],
+    progress_message = "Bundling beasties",
+    silent_on_success = False,
 )
