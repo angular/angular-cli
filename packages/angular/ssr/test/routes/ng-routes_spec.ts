@@ -167,6 +167,24 @@ describe('extractRoutesAndCreateRouteTree', () => {
         `The 'invalid' route does not match any route defined in the server routing configuration`,
       );
     });
+
+    it('should error when a route with a matcher when render mode is Prerender.', async () => {
+      setAngularAppTestingManifest(
+        [{ matcher: () => null, component: DummyComponent }],
+        [
+          {
+            path: '**',
+            renderMode: RenderMode.Prerender,
+          },
+        ],
+      );
+
+      const { errors } = await extractRoutesAndCreateRouteTree({ url });
+      expect(errors[0]).toContain(
+        `The route '**' is set for prerendering but has a defined matcher. ` +
+          `Routes with matchers cannot use prerendering. Please specify a different 'renderMode'.`,
+      );
+    });
   });
 
   describe('when `invokeGetPrerenderParams` is true', () => {
@@ -328,6 +346,54 @@ describe('extractRoutesAndCreateRouteTree', () => {
         { route: '/*/thing', renderMode: RenderMode.Server },
       ]);
     });
+  });
+
+  it('should extract routes with a route level matcher', async () => {
+    setAngularAppTestingManifest(
+      [
+        {
+          path: '',
+          component: DummyComponent,
+        },
+        {
+          path: 'product',
+          component: DummyComponent,
+          children: [
+            {
+              path: '',
+              component: DummyComponent,
+            },
+            {
+              matcher: () => null,
+              component: DummyComponent,
+            },
+            {
+              path: 'list',
+              component: DummyComponent,
+            },
+          ],
+        },
+      ],
+      [
+        { path: '**', renderMode: RenderMode.Client },
+        { path: 'product', renderMode: RenderMode.Client },
+        { path: 'product/*', renderMode: RenderMode.Client },
+        { path: 'product/**/overview/details', renderMode: RenderMode.Server },
+        { path: 'product/**/overview', renderMode: RenderMode.Server },
+        { path: 'product/**/overview/about', renderMode: RenderMode.Server },
+      ],
+    );
+
+    const { routeTree, errors } = await extractRoutesAndCreateRouteTree({ url });
+    expect(errors).toHaveSize(0);
+    expect(routeTree.toObject()).toEqual([
+      { route: '/', renderMode: RenderMode.Client },
+      { route: '/product', renderMode: RenderMode.Client },
+      { route: '/product/**/overview', renderMode: RenderMode.Server },
+      { route: '/product/**/overview/details', renderMode: RenderMode.Server },
+      { route: '/product/**/overview/about', renderMode: RenderMode.Server },
+      { route: '/product/list', renderMode: RenderMode.Client },
+    ]);
   });
 
   it('should extract nested redirects that are not explicitly defined.', async () => {
