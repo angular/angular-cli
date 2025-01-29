@@ -5,8 +5,8 @@ RELEASE_ENGINES_YARN = ">= 1.13.0"
 
 NG_PACKAGR_VERSION = "^19.2.0-next.0"
 ANGULAR_FW_VERSION = "^19.2.0-next.0"
-ANGULAR_FW_PEER_DEP = "^19.0.0 || ^19.2.0-next.0"
-NG_PACKAGR_PEER_DEP = "^19.0.0 || ^19.2.0-next.0"
+ANGULAR_FW_PEER_DEP = "^19.2.0-next.0"
+NG_PACKAGR_PEER_DEP = "^19.2.0-next.0"
 
 SNAPSHOT_REPOS = {
     "@angular/cli": "angular/cli-builds",
