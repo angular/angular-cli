@@ -33,7 +33,8 @@ export async function assertValidDependencyRanges(
 
   const failures: string[] = [
     ...(await checkPeerDependencies(newVersion, allPackages)),
-    ...(await checkSchematicsAngularLatestVersion(newVersion)),
+    // TODO: Re-enable the following once the checks are performed against the stamped `.js` file instead of the source `.json` file.
+    // ...(await checkSchematicsAngularLatestVersion(newVersion)),
   ];
 
   if (failures.length !== 0) {
