@@ -62,24 +62,12 @@ export async function createAngularMemoryPlugin(
         return source;
       }
 
-      if (importer) {
+      if (importer && source[0] === '.') {
         const normalizedImporter = normalizePath(importer);
-        if (source[0] === '.' && normalizedImporter.startsWith(virtualProjectRoot)) {
+        if (normalizedImporter.startsWith(virtualProjectRoot)) {
           // Remove query if present
           const [importerFile] = normalizedImporter.split('?', 1);
           source = '/' + join(dirname(relative(virtualProjectRoot, importerFile)), source);
-        } else if (
-          !ssr &&
-          source[0] === '/' &&
-          importer.endsWith('index.html') &&
-          normalizedImporter.startsWith(virtualProjectRoot)
-        ) {
-          // This is only needed when using SSR and `angularSsrMiddleware` (old style) to correctly resolve
-          // .js files when using lazy-loading.
-          // Remove query if present
-          const [importerFile] = normalizedImporter.split('?', 1);
-          source =
-            '/' + join(dirname(relative(virtualProjectRoot, importerFile)), basename(source));
         }
       }
 
