@@ -128,7 +128,7 @@
     "debug": "^4.1.1",
     "esbuild": "0.24.2",
     "esbuild-wasm": "0.24.2",
-    "eslint": "8.57.0",
+    "eslint": "9.19.0",
     "eslint-config-prettier": "10.0.1",
     "eslint-plugin-header": "3.1.1",
     "eslint-plugin-import": "2.31.0",
