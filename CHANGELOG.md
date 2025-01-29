@@ -1,3 +1,15 @@
+<a name="18.2.14"></a>
+
+# 18.2.14 (2025-01-29)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                     |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------- |
+| [9d34d28ec](https://github.com/angular/angular-cli/commit/9d34d28ec2965e1b9753556b2721d25ab05c655b) | fix  | remove unused `vite` dependency |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="18.2.13"></a>
 
 # 18.2.13 (2025-01-29)
