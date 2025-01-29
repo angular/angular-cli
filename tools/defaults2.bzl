@@ -1,7 +1,9 @@
 load("@aspect_bazel_lib//lib:copy_to_bin.bzl", _copy_to_bin = "copy_to_bin")
 load("@aspect_rules_jasmine//jasmine:defs.bzl", _jasmine_test = "jasmine_test")
 load("@aspect_rules_js//js:defs.bzl", _js_binary = "js_binary")
+load("@npm//@angular/bazel:index.bzl", _ng_package = "ng_package")
 load("//tools:interop.bzl", _ts_project = "ts_project")
+load("//tools:substitutions.bzl", "substitutions")
 load("//tools/bazel:npm_package.bzl", _npm_package = "npm_package")
 
 def ts_project(**kwargs):
@@ -15,6 +17,17 @@ def copy_to_bin(**kwargs):
 
 def js_binary(**kwargs):
     _js_binary(**kwargs)
+
+def ng_package(deps = [], **kwargs):
+    _ng_package(
+        deps = deps,
+        license = "//:LICENSE",
+        substitutions = select({
+            "//:stamp": substitutions["legacy"]["stamp"],
+            "//conditions:default": substitutions["legacy"]["nostamp"],
+        }),
+        **kwargs
+    )
 
 def jasmine_test(data = [], args = [], **kwargs):
     # Create relative path to root, from current package dir. Necessary as
