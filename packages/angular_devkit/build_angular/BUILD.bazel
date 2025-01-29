@@ -5,7 +5,7 @@
 
 load("@npm//@angular/build-tooling/bazel/api-golden:index.bzl", "api_golden_test_npm_package")
 load("@npm2//:defs.bzl", "npm_link_all_packages")
-load("//tools:defaults2.bzl", "jasmine_test", "npm_package", "ts_project")
+load("//tools:defaults2.bzl", "copy_to_bin", "jasmine_test", "npm_package", "ts_project")
 load("//tools:ts_json_schema.bzl", "ts_json_schema")
 
 licenses(["notice"])
@@ -77,6 +77,11 @@ ts_json_schema(
 ts_json_schema(
     name = "web_test_runner_schema",
     src = "src/builders/web-test-runner/schema.json",
+)
+
+copy_to_bin(
+    name = "schemas",
+    srcs = glob(["**/schema.json"]),
 )
 
 RUNTIME_ASSETS = glob(
