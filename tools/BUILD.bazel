@@ -1,13 +1,6 @@
 load("@aspect_bazel_lib//lib/private:tar_toolchain.bzl", "tar_toolchain")
-load("@aspect_rules_js//js:defs.bzl", "js_binary")
 load("@bazel_skylib//rules:copy_file.bzl", "copy_file")
-
-# Copyright Google Inc. All Rights Reserved.
-#
-# Use of this source code is governed by an MIT-style license that can be
-# found in the LICENSE file at https://angular.dev/license
-# @external_begin
-load("@build_bazel_rules_nodejs//:index.bzl", "nodejs_binary")
+load("//tools:defaults2.bzl", "js_binary")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -15,7 +8,7 @@ exports_files([
     "package_json_release_filter.jq",
 ])
 
-nodejs_binary(
+js_binary(
     name = "ng_cli_schema",
     data = [
         "ng_cli_schema_generator.js",
@@ -23,14 +16,13 @@ nodejs_binary(
     entry_point = "ng_cli_schema_generator.js",
 )
 
-nodejs_binary(
+js_binary(
     name = "quicktype_runner",
     data = [
         "quicktype_runner.js",
-        "@npm//quicktype-core",
+        "//:node_modules/quicktype-core",
     ],
     entry_point = "quicktype_runner.js",
-    templated_args = ["--bazel_patch_module_resolver"],
 )
 
 tar_toolchain(
@@ -62,4 +54,3 @@ js_binary(
     entry_point = ":copy_worker_js",
     fixed_args = ["--vanilla-ts"],
 )
-# @external_end
