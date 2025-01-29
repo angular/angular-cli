@@ -155,7 +155,7 @@ export function visitJson<ContextT>(
   return _visitJsonRecursive(json, visitor, buildJsonPointer([]), schema, refResolver, context);
 }
 
-export function visitJsonSchema(schema: JsonSchema, visitor: JsonSchemaVisitor) {
+export function visitJsonSchema(schema: JsonSchema, visitor: JsonSchemaVisitor): void {
   if (schema === false || schema === true) {
     // Nothing to visit.
     return;

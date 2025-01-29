@@ -120,7 +120,7 @@ export function join(p1: Path, ...others: string[]): Path {
 /**
  * Returns true if a path is absolute.
  */
-export function isAbsolute(p: Path) {
+export function isAbsolute(p: Path): boolean {
   return p.startsWith(NormalizedSep);
 }
 
@@ -166,7 +166,7 @@ export function relative(from: Path, to: Path): Path {
  * Returns a Path that is the resolution of p2, from p1. If p2 is absolute, it will return p2,
  * otherwise will join both p1 and p2.
  */
-export function resolve(p1: Path, p2: Path) {
+export function resolve(p1: Path, p2: Path): Path {
   if (isAbsolute(p2)) {
     return p2;
   } else {

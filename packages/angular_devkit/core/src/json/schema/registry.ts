@@ -173,7 +173,7 @@ export class CoreSchemaRegistry implements SchemaRegistry {
    * @param {JsonVisitor} visitor The visitor to transform every value.
    * @param {JsonVisitor[]} deps A list of other visitors to run before.
    */
-  addPreTransform(visitor: JsonVisitor, deps?: JsonVisitor[]) {
+  addPreTransform(visitor: JsonVisitor, deps?: JsonVisitor[]): void {
     this._pre.add(visitor, deps);
   }
 
@@ -184,7 +184,7 @@ export class CoreSchemaRegistry implements SchemaRegistry {
    * @param {JsonVisitor} visitor The visitor to transform every value.
    * @param {JsonVisitor[]} deps A list of other visitors to run before.
    */
-  addPostTransform(visitor: JsonVisitor, deps?: JsonVisitor[]) {
+  addPostTransform(visitor: JsonVisitor, deps?: JsonVisitor[]): void {
     this._post.add(visitor, deps);
   }
 
@@ -386,7 +386,7 @@ export class CoreSchemaRegistry implements SchemaRegistry {
     this._ajv.addFormat(format.name, format.formatter);
   }
 
-  addSmartDefaultProvider<T>(source: string, provider: SmartDefaultProvider<T>) {
+  addSmartDefaultProvider<T>(source: string, provider: SmartDefaultProvider<T>): void {
     if (this._sourceMap.has(source)) {
       throw new Error(source);
     }
@@ -424,11 +424,11 @@ export class CoreSchemaRegistry implements SchemaRegistry {
     }
   }
 
-  registerUriHandler(handler: UriHandler) {
+  registerUriHandler(handler: UriHandler): void {
     this._uriHandlers.add(handler);
   }
 
-  usePromptProvider(provider: PromptProvider) {
+  usePromptProvider(provider: PromptProvider): void {
     const isSetup = !!this._promptProvider;
 
     this._promptProvider = provider;
