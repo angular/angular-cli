@@ -1,3 +1,34 @@
+<a name="19.1.5"></a>
+
+# 19.1.5 (2025-01-29)
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                                                |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------------------- |
+| [14e3a71e4](https://github.com/angular/angular-cli/commit/14e3a71e46e12a556323fff48998794eecab9896) | fix  | update library schematic to use `@angular-devkit/build-angular:ng-packagr` |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                                          |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------------- |
+| [d53d25fc1](https://github.com/angular/angular-cli/commit/d53d25fc1b80388158643dbdd37aa49b0aa790e0) | fix  | allow tailwindcss 4.x as a peer dependency                           |
+| [bd9d379f0](https://github.com/angular/angular-cli/commit/bd9d379f0401a19d527dc896a96b2671b4c4ed76) | fix  | disable TypeScript `removeComments` option                           |
+| [e73e9102e](https://github.com/angular/angular-cli/commit/e73e9102e3098882dd76a8dbf800d4ba414e0e27) | fix  | handle empty module case to avoid TypeError                          |
+| [bb413456e](https://github.com/angular/angular-cli/commit/bb413456e95a9be49feba95415915ce2ef39b1b5) | fix  | keep background referenced HMR update chunks                         |
+| [2011d3428](https://github.com/angular/angular-cli/commit/2011d34286784156b8c09bb8c6d376d8f902bc00) | fix  | support template updates that also trigger global stylesheet changes |
+| [688019946](https://github.com/angular/angular-cli/commit/688019946358b176eacc872ece72987387a603f1) | fix  | update vite to version 6.0.11                                        |
+
+### @angular/ssr
+
+| Commit                                                                                              | Type | Description                                                        |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------ |
+| [94643d54d](https://github.com/angular/angular-cli/commit/94643d54da1ddadcec1c169aa844a716bec612f6) | fix  | enhance dynamic route matching for better performance and accuracy |
+| [747557aa0](https://github.com/angular/angular-cli/commit/747557aa0aad00f1df2ce7912ab49775e19c60dc) | fix  | redirect to locale pathname instead of full URL                    |
+| [bbbc1eb7a](https://github.com/angular/angular-cli/commit/bbbc1eb7a0c295e0bc4aea95b7292ba484f8a360) | fix  | rename `provideServerRoutesConfig` to `provideServerRouting`       |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="18.2.14"></a>
 
 # 18.2.14 (2025-01-29)
