@@ -56,7 +56,7 @@ import { ResolverHost } from './resolver';
  *     .subscribe(x => expect(x).toBe(content2));
  */
 export class AliasHost<StatsT extends object = {}> extends ResolverHost<StatsT> {
-  protected _aliases = new Map<Path, Path>();
+  protected _aliases: Map<Path, Path> = new Map();
 
   protected _resolve(path: Path): Path {
     let maybeAlias = this._aliases.get(path);

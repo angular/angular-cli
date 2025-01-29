@@ -10,7 +10,7 @@ import { JSONPath, Node, findNodeAtLocation, getNodeValue } from 'jsonc-parser';
 import { JsonValue } from '../../json';
 import { ProjectDefinition, TargetDefinition, WorkspaceDefinition } from '../definitions';
 
-export const JsonWorkspaceSymbol = Symbol.for('@angular/core:workspace-json');
+export const JsonWorkspaceSymbol: unique symbol = Symbol.for('@angular/core:workspace-json');
 
 export interface JsonWorkspaceDefinition extends WorkspaceDefinition {
   [JsonWorkspaceSymbol]: JsonWorkspaceMetadata;

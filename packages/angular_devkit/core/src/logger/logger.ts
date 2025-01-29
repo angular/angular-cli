@@ -101,11 +101,11 @@ export class Logger extends Observable<LogEntry> implements LoggerApi {
     };
   }
 
-  createChild(name: string) {
+  createChild(name: string): Logger {
     return new (this.constructor as typeof Logger)(name, this);
   }
 
-  complete() {
+  complete(): void {
     this._subject.complete();
   }
 
@@ -121,20 +121,20 @@ export class Logger extends Observable<LogEntry> implements LoggerApi {
     this._subject.next(entry);
   }
 
-  debug(message: string, metadata: JsonObject = {}) {
-    return this.log('debug', message, metadata);
+  debug(message: string, metadata: JsonObject = {}): void {
+    this.log('debug', message, metadata);
   }
-  info(message: string, metadata: JsonObject = {}) {
-    return this.log('info', message, metadata);
+  info(message: string, metadata: JsonObject = {}): void {
+    this.log('info', message, metadata);
   }
-  warn(message: string, metadata: JsonObject = {}) {
-    return this.log('warn', message, metadata);
+  warn(message: string, metadata: JsonObject = {}): void {
+    this.log('warn', message, metadata);
   }
-  error(message: string, metadata: JsonObject = {}) {
-    return this.log('error', message, metadata);
+  error(message: string, metadata: JsonObject = {}): void {
+    this.log('error', message, metadata);
   }
-  fatal(message: string, metadata: JsonObject = {}) {
-    return this.log('fatal', message, metadata);
+  fatal(message: string, metadata: JsonObject = {}): void {
+    this.log('fatal', message, metadata);
   }
 
   override toString() {
