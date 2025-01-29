@@ -28,7 +28,6 @@ export default {
     nodeResolve({
       preferBuiltins: false,
       browser: true,
-      jail: process.cwd(),
     }),
     commonjs(),
     alias({
