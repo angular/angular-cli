@@ -1,3 +1,21 @@
+<a name="18.2.13"></a>
+
+# 18.2.13 (2025-01-29)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                                           |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------------------- |
+| [deeaf1883](https://github.com/angular/angular-cli/commit/deeaf18836efddfa1ee56a25e44944ba444d35ac) | fix  | correctly select package versions in descending order during `ng add` |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                   |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------- |
+| [fdddf2c08](https://github.com/angular/angular-cli/commit/fdddf2c0844081667a09f2ffe0b16f77384959b2) | fix  | update vite to version 5.4.14 |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="19.2.0-next.0"></a>
 
 # 19.2.0-next.0 (2025-01-23)
