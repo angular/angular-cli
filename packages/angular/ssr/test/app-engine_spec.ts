@@ -157,12 +157,12 @@ describe('AngularAppEngine', () => {
       });
 
       it('should redirect to the highest priority locale when the URL is "/"', async () => {
-        const request = new Request('https://example.com/', {
+        const request = new Request('https://example.com', {
           headers: { 'Accept-Language': 'fr-CH, fr;q=0.9, it;q=0.8, en;q=0.7, *;q=0.5' },
         });
         const response = await appEngine.handle(request);
         expect(response?.status).toBe(302);
-        expect(response?.headers.get('Location')).toBe('https://example.com/it');
+        expect(response?.headers.get('Location')).toBe('/it');
         expect(response?.headers.get('Vary')).toBe('Accept-Language');
       });
 
