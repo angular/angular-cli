@@ -137,8 +137,6 @@ yarn_install(
         "//:.yarn/releases/yarn-4.5.0.cjs",
         "//:.yarnrc.yml",
         "//:patches/@angular+bazel+19.1.0-next.4.patch",
-        "//:patches/@bazel+concatjs+5.8.1.patch",
-        "//:patches/@bazel+jasmine+5.8.1.patch",
     ],
     # Currently disabled due to:
     #  1. Missing Windows support currently.

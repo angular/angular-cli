@@ -327,9 +327,6 @@ __metadata:
     "@babel/runtime": "npm:7.26.7"
     "@bazel/bazelisk": "npm:1.25.0"
     "@bazel/buildifier": "npm:8.0.1"
-    "@bazel/concatjs": "npm:5.8.1"
-    "@bazel/jasmine": "npm:5.8.1"
-    "@bazel/rollup": "npm:^5.8.1"
     "@bazel/runfiles": "npm:^6.0.0"
     "@discoveryjs/json-ext": "npm:0.6.3"
     "@inquirer/confirm": "npm:5.1.4"
@@ -1842,40 +1839,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@bazel/jasmine@npm:5.8.1":
-  version: 5.8.1
-  resolution: "@bazel/jasmine@npm:5.8.1"
-  dependencies:
-    c8: "npm:~7.5.0"
-    jasmine-reporters: "npm:~2.5.0"
-  peerDependencies:
-    jasmine: ">=2.99.0"
-    jasmine-core: ">=2.99.0"
-  bin:
-    bazel-jasmine-runner: jasmine_runner.js
-  checksum: 10c0/24220ee9336a511f5ba9787bb1da021e3f92d9e0cdde0581cb13db06d05d4716e6a408eca671f10242aa139a9b3ef04a02e3f3d2cf96266c4c1dc36dc262a999
-  languageName: node
-  linkType: hard
-
 "@bazel/protractor@npm:5.8.1":
   version: 5.8.1
   resolution: "@bazel/protractor@npm:5.8.1"
   peerDependencies:
     protractor: ">=5.0.0"
   checksum: 10c0/cc59fab59439973a623259de0381bfa2f4e298c29c6eb584bc4d3e909fafba6e2dd95d1e2eab7419e34b52356d33b4bd6ade8e4daccd753ef395165ac7654267
-  languageName: node
-  linkType: hard
-
-"@bazel/rollup@npm:^5.8.1":
-  version: 5.8.1
-  resolution: "@bazel/rollup@npm:5.8.1"
-  dependencies:
-    "@bazel/worker": "npm:5.8.1"
-  peerDependencies:
-    rollup: ">=2.3.0 <3.0.0"
-  bin:
-    rollup-worker: index.js
-  checksum: 10c0/e81b89abb4c7403871bbec1cf3bc0ebd767126f56a9701167c701c23d6ff58b22a65ce258d4ebe146dfa9ee45afcb636ebbbf54fd9098886e1f09d9df342e8ca
   languageName: node
   linkType: hard
 
@@ -1926,13 +1895,6 @@ __metadata:
   dependencies:
     google-protobuf: "npm:^3.6.1"
   checksum: 10c0/80ced93711aa87a918f62b048ead89d278298cbae40fbc600e76ad12e04670c626ee44f7267b23ccf15d49df2195684cfc7e6f97b4d4e30f4eb0db1b797ca88b
-  languageName: node
-  linkType: hard
-
-"@bcoe/v8-coverage@npm:^0.2.3":
-  version: 0.2.3
-  resolution: "@bcoe/v8-coverage@npm:0.2.3"
-  checksum: 10c0/6b80ae4cb3db53f486da2dc63b6e190a74c8c3cca16bb2733f234a0b6a9382b09b146488ae08e2b22cf00f6c83e20f3e040a2f7894f05c045c946d6a090b1d52
   languageName: node
   linkType: hard
 
@@ -4556,13 +4518,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/is-windows@npm:^1.0.0":
-  version: 1.0.2
-  resolution: "@types/is-windows@npm:1.0.2"
-  checksum: 10c0/284589cdf44b7607020cf8086e32e9bbe39320eb09c48630986f473cb3c29c4dfad7200c347dd4c54ad7d09edabfd1dc8f88f763f4cd395ad9c96b02337ae58e
-  languageName: node
-  linkType: hard
-
 "@types/istanbul-lib-coverage@npm:*, @types/istanbul-lib-coverage@npm:^2.0.1, @types/istanbul-lib-coverage@npm:^2.0.3":
   version: 2.0.6
   resolution: "@types/istanbul-lib-coverage@npm:2.0.6"
@@ -7051,29 +7006,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"c8@npm:~7.5.0":
-  version: 7.5.0
-  resolution: "c8@npm:7.5.0"
-  dependencies:
-    "@bcoe/v8-coverage": "npm:^0.2.3"
-    "@istanbuljs/schema": "npm:^0.1.2"
-    find-up: "npm:^5.0.0"
-    foreground-child: "npm:^2.0.0"
-    furi: "npm:^2.0.0"
-    istanbul-lib-coverage: "npm:^3.0.0"
-    istanbul-lib-report: "npm:^3.0.0"
-    istanbul-reports: "npm:^3.0.2"
-    rimraf: "npm:^3.0.0"
-    test-exclude: "npm:^6.0.0"
-    v8-to-istanbul: "npm:^7.1.0"
-    yargs: "npm:^16.0.0"
-    yargs-parser: "npm:^20.0.0"
-  bin:
-    c8: bin/c8.js
-  checksum: 10c0/6cab052ea50951b53390fd82af2107178587666db37e2305c55c69f08d28bffc3c59503a93b93b0ee5be2874dd35ec80770f49282d8ae37bf7e5739ab8c37b7d
-  languageName: node
-  linkType: hard
-
 "cacache@npm:^19.0.0, cacache@npm:^19.0.1":
   version: 19.0.1
   resolution: "cacache@npm:19.0.1"
@@ -7680,7 +7612,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"convert-source-map@npm:^1.5.1, convert-source-map@npm:^1.6.0, convert-source-map@npm:^1.7.0":
+"convert-source-map@npm:^1.5.1, convert-source-map@npm:^1.7.0":
   version: 1.9.0
   resolution: "convert-source-map@npm:1.9.0"
   checksum: 10c0/281da55454bf8126cbc6625385928c43479f2060984180c42f3a86c8b8c12720a24eac260624a7d1e090004028d2dee78602330578ceec1a08e27cb8bb0a8a5b
@@ -9646,16 +9578,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"foreground-child@npm:^2.0.0":
-  version: 2.0.0
-  resolution: "foreground-child@npm:2.0.0"
-  dependencies:
-    cross-spawn: "npm:^7.0.0"
-    signal-exit: "npm:^3.0.2"
-  checksum: 10c0/6719982783a448162f9a01500757fb2053bc5dcd4d67c7cd30739b38ccc01b39f84e408c30989d1d8774519c021c0498e2450ab127690fb09d7f2568fd94ffcc
-  languageName: node
-  linkType: hard
-
 "foreground-child@npm:^3.1.0":
   version: 3.3.0
   resolution: "foreground-child@npm:3.3.0"
@@ -9861,16 +9783,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"furi@npm:^2.0.0":
-  version: 2.0.0
-  resolution: "furi@npm:2.0.0"
-  dependencies:
-    "@types/is-windows": "npm:^1.0.0"
-    is-windows: "npm:^1.0.2"
-  checksum: 10c0/1a17839667bbfad60d116f4150d6e9e34553ef29d09644e6aacd945433155bd63ba60333c87404398667c8682e1c82c5037de1bbe33fa95eea3e4a438b0dd4a9
-  languageName: node
-  linkType: hard
-
 "gaxios@npm:^6.0.0, gaxios@npm:^6.1.1":
   version: 6.7.1
   resolution: "gaxios@npm:6.7.1"
@@ -10038,7 +9950,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"glob@npm:^7.0.0, glob@npm:^7.0.3, glob@npm:^7.0.6, glob@npm:^7.1.3, glob@npm:^7.1.4, glob@npm:^7.1.7":
+"glob@npm:^7.0.0, glob@npm:^7.0.3, glob@npm:^7.0.6, glob@npm:^7.1.3, glob@npm:^7.1.7":
   version: 7.2.3
   resolution: "glob@npm:7.2.3"
   dependencies:
@@ -11312,13 +11224,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"is-windows@npm:^1.0.2":
-  version: 1.0.2
-  resolution: "is-windows@npm:1.0.2"
-  checksum: 10c0/b32f418ab3385604a66f1b7a3ce39d25e8881dee0bd30816dc8344ef6ff9df473a732bcc1ec4e84fe99b2f229ae474f7133e8e93f9241686cfcf7eebe53ba7a5
-  languageName: node
-  linkType: hard
-
 "is-wsl@npm:^1.1.0":
   version: 1.1.0
   resolution: "is-wsl@npm:1.1.0"
@@ -11506,7 +11411,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jasmine-reporters@npm:^2.5.2, jasmine-reporters@npm:~2.5.0":
+"jasmine-reporters@npm:^2.5.2":
   version: 2.5.2
   resolution: "jasmine-reporters@npm:2.5.2"
   dependencies:
@@ -15477,7 +15382,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"rimraf@npm:3.0.2, rimraf@npm:^3.0.0, rimraf@npm:^3.0.2":
+"rimraf@npm:3.0.2, rimraf@npm:^3.0.2":
   version: 3.0.2
   resolution: "rimraf@npm:3.0.2"
   dependencies:
@@ -17063,17 +16968,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"test-exclude@npm:^6.0.0":
-  version: 6.0.0
-  resolution: "test-exclude@npm:6.0.0"
-  dependencies:
-    "@istanbuljs/schema": "npm:^0.1.2"
-    glob: "npm:^7.1.4"
-    minimatch: "npm:^3.0.4"
-  checksum: 10c0/019d33d81adff3f9f1bfcff18125fb2d3c65564f437d9be539270ee74b994986abb8260c7c2ce90e8f30162178b09dbbce33c6389273afac4f36069c48521f57
-  languageName: node
-  linkType: hard
-
 "text-decoder@npm:^1.1.0":
   version: 1.2.3
   resolution: "text-decoder@npm:1.2.3"
@@ -17834,17 +17728,6 @@ __metadata:
   version: 3.0.1
   resolution: "v8-compile-cache-lib@npm:3.0.1"
   checksum: 10c0/bdc36fb8095d3b41df197f5fb6f11e3a26adf4059df3213e3baa93810d8f0cc76f9a74aaefc18b73e91fe7e19154ed6f134eda6fded2e0f1c8d2272ed2d2d391
-  languageName: node
-  linkType: hard
-
-"v8-to-istanbul@npm:^7.1.0":
-  version: 7.1.2
-  resolution: "v8-to-istanbul@npm:7.1.2"
-  dependencies:
-    "@types/istanbul-lib-coverage": "npm:^2.0.1"
-    convert-source-map: "npm:^1.6.0"
-    source-map: "npm:^0.7.3"
-  checksum: 10c0/a901917e3e321e2c74a9582cbe6652ff2b983040a683c924ce98fbccdfe249cbcb34d7d7913a13a7e4eee9bed3a51c7181b09103f4405d92f4ebac1cc40dc005
   languageName: node
   linkType: hard
 
@@ -18657,7 +18540,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"yargs-parser@npm:^20.0.0, yargs-parser@npm:^20.2.2":
+"yargs-parser@npm:^20.2.2":
   version: 20.2.9
   resolution: "yargs-parser@npm:20.2.9"
   checksum: 10c0/0685a8e58bbfb57fab6aefe03c6da904a59769bd803a722bb098bd5b0f29d274a1357762c7258fb487512811b8063fb5d2824a3415a0a4540598335b3b086c72
@@ -18698,7 +18581,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"yargs@npm:^16.0.0, yargs@npm:^16.1.1":
+"yargs@npm:^16.1.1":
   version: 16.2.0
   resolution: "yargs@npm:16.2.0"
   dependencies:
