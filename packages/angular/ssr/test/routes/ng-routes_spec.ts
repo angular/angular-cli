@@ -636,4 +636,38 @@ describe('extractRoutesAndCreateRouteTree', () => {
     expect(errors).toHaveSize(0);
     expect(routeTree.toObject()).toHaveSize(2);
   });
+
+  it('should give precedence to the first matching route over subsequent ones', async () => {
+    setAngularAppTestingManifest(
+      [
+        {
+          path: '',
+          children: [
+            { path: 'home', component: DummyComponent },
+            { path: '**', component: DummyComponent },
+          ],
+        },
+        // The following routes should be ignored due to Angular's routing behavior:
+        // - ['', '**'] and ['**'] are equivalent, and the first match takes precedence.
+        // - ['', 'home'] and ['home'] are equivalent, and the first match takes precedence.
+        {
+          path: 'home',
+          redirectTo: 'never',
+        },
+        {
+          path: '**',
+          redirectTo: 'never',
+        },
+      ],
+      [{ path: '**', renderMode: RenderMode.Server }],
+    );
+
+    const { routeTree, errors } = await extractRoutesAndCreateRouteTree({ url });
+    expect(errors).toHaveSize(0);
+    expect(routeTree.toObject()).toEqual([
+      { route: '/', renderMode: RenderMode.Server },
+      { route: '/home', renderMode: RenderMode.Server },
+      { route: '/**', renderMode: RenderMode.Server },
+    ]);
+  });
 });
