@@ -66,7 +66,7 @@ export async function executePostBundleSteps(
   const {
     baseHref = '/',
     serviceWorker,
-    i18nOptions,
+    ssrOptions,
     indexHtmlOptions,
     optimizationOptions,
     sourcemapOptions,
@@ -113,7 +113,7 @@ export async function executePostBundleSteps(
 
   // Create server manifest
   const initialFilesPaths = new Set(initialFiles.keys());
-  if (serverEntryPoint) {
+  if (serverEntryPoint && (outputMode || prerenderOptions || appShellOptions || ssrOptions)) {
     const { manifestContent, serverAssetsChunks } = generateAngularServerAppManifest(
       additionalHtmlOutputFiles,
       outputFiles,
