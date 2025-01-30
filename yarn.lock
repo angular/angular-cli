@@ -326,7 +326,7 @@ __metadata:
     "@babel/preset-env": "npm:7.26.7"
     "@babel/runtime": "npm:7.26.7"
     "@bazel/bazelisk": "npm:1.25.0"
-    "@bazel/buildifier": "npm:8.0.1"
+    "@bazel/buildifier": "npm:8.0.2"
     "@bazel/runfiles": "npm:^6.0.0"
     "@discoveryjs/json-ext": "npm:0.6.3"
     "@inquirer/confirm": "npm:5.1.4"
@@ -413,7 +413,7 @@ __metadata:
     magic-string: "npm:0.30.17"
     mini-css-extract-plugin: "npm:2.9.2"
     mrmime: "npm:2.0.0"
-    ng-packagr: "npm:19.1.1"
+    ng-packagr: "npm:19.1.2"
     npm: "npm:^11.0.0"
     npm-package-arg: "npm:12.0.1"
     npm-pick-manifest: "npm:10.0.0"
@@ -437,7 +437,7 @@ __metadata:
     rxjs: "npm:7.8.1"
     sass: "npm:1.83.4"
     sass-loader: "npm:16.0.4"
-    semver: "npm:7.6.3"
+    semver: "npm:7.7.0"
     shelljs: "npm:^0.8.5"
     source-map: "npm:0.7.4"
     source-map-loader: "npm:5.0.0"
@@ -1802,12 +1802,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@bazel/buildifier@npm:8.0.1":
-  version: 8.0.1
-  resolution: "@bazel/buildifier@npm:8.0.1"
+"@bazel/buildifier@npm:8.0.2":
+  version: 8.0.2
+  resolution: "@bazel/buildifier@npm:8.0.2"
   bin:
     buildifier: buildifier.js
-  checksum: 10c0/60f95d0b66e91fadd94b5df2e70aa06630702b2d1aa8b35d64b47ac426e6383ed761919c7f682bde895c1930bfd64add6281d97758b42d327c820d12c8605368
+  checksum: 10c0/3fb23ed34e44f597447e9b60350cac94bbb256167a88c7b02ee026fb15469349e9ae4aa2e46bafc0e51b4cf1a880eac52bf863051de01c32ca96421c149b65f7
   languageName: node
   linkType: hard
 
@@ -13153,9 +13153,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ng-packagr@npm:19.1.1":
-  version: 19.1.1
-  resolution: "ng-packagr@npm:19.1.1"
+"ng-packagr@npm:19.1.2":
+  version: 19.1.2
+  resolution: "ng-packagr@npm:19.1.2"
   dependencies:
     "@rollup/plugin-json": "npm:^6.1.0"
     "@rollup/wasm-node": "npm:^4.24.0"
@@ -13180,7 +13180,7 @@ __metadata:
     sass: "npm:^1.81.0"
   peerDependencies:
     "@angular/compiler-cli": ^19.0.0 || ^19.1.0-next.0 || ^19.2.0-next.0
-    tailwindcss: ^2.0.0 || ^3.0.0
+    tailwindcss: ^2.0.0 || ^3.0.0 || ^4.0.0
     tslib: ^2.3.0
     typescript: ">=5.5 <5.8"
   dependenciesMeta:
@@ -13191,7 +13191,7 @@ __metadata:
       optional: true
   bin:
     ng-packagr: cli/main.js
-  checksum: 10c0/a66392dc48c53ff1579c0bcd20dd61484a306f150df10a7a3cdebbcc029c0def8e7f817266b43c3f16ac3b8cd7eeac2ee374b9488c5798faf2cb8afa5a8040ee
+  checksum: 10c0/901450bc60949a463a8f10697b0ff6240816881480218e534e6a4edf09c6c9aa8626391e56bf295dd67f3d12885dfddcb819cb1b1d0ec915ccb21c5efb8679f3
   languageName: node
   linkType: hard
 
@@ -15818,6 +15818,15 @@ __metadata:
   bin:
     semver: bin/semver.js
   checksum: 10c0/88f33e148b210c153873cb08cfe1e281d518aaa9a666d4d148add6560db5cd3c582f3a08ccb91f38d5f379ead256da9931234ed122057f40bb5766e65e58adaf
+  languageName: node
+  linkType: hard
+
+"semver@npm:7.7.0":
+  version: 7.7.0
+  resolution: "semver@npm:7.7.0"
+  bin:
+    semver: bin/semver.js
+  checksum: 10c0/bcd1c03209b4be7d8ca86c976a0410beba7d4ec1d49d846a4be154b958db1ff5eaee50760c1d4f4070b19dee3236b8672d3e09642c53ea23740398bba2538a2d
   languageName: node
   linkType: hard
 
