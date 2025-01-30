@@ -6,30 +6,33 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { readFile } from 'node:fs/promises';
+import { createRequire } from 'node:module';
+import { fileURLToPath } from 'node:url';
 import semver from 'semver';
 
-export async function checkSchematicsAngularLatestVersion(
-  newVersion: semver.SemVer,
-): Promise<string[]> {
-  const { dependencies } = JSON.parse(
-    await readFile('./packages/schematics/angular/utility/latest-versions/package.json', 'utf-8'),
+export function checkSchematicsAngularLatestVersion(newVersion: semver.SemVer): string[] {
+  // Root of the Angular CLI project.
+  const root = fileURLToPath(new URL('../../../', import.meta.url));
+  const rootRequire = createRequire(root);
+  const { latestVersions } = rootRequire(
+    './dist/releases/schematics/angular/utility/latest-versions.js',
   );
 
-  const keysToCheck = ['ng-packagr', '@angular/core'];
-  const { major, minor } = newVersion;
-  const isPrerelease = !!newVersion.prerelease[0];
+  const keysToCheck = ['Angular', 'NgPackagr'];
+  const { major, minor, prerelease } = newVersion;
+  const isPrerelease = !!prerelease[0];
   const failures: string[] = [];
 
-  let expectedFwDep = `^${major}.${minor}.0`;
+  let expectedVersionDep = `^${major}.${minor}.0`;
   if (isPrerelease) {
-    expectedFwDep = `^${major}.${minor}.0-next.0`;
+    expectedVersionDep += '-next.0';
   }
 
   for (const key of keysToCheck) {
-    if (dependencies[key] !== expectedFwDep) {
+    const latestVersion = latestVersions[key];
+    if (latestVersion !== expectedVersionDep) {
       failures.push(
-        `latest-versions: Invalid dependency range for "${key}". Expected: ${expectedFwDep}`,
+        `latest-versions: Invalid dependency range for "${key}". Expected: ${expectedVersionDep} but got: ${latestVersion}`,
       );
     }
   }
