@@ -557,7 +557,6 @@ export async function getRoutesFromAngularRouterConfig(
     // Wait until the application is stable.
     await applicationRef.whenStable();
 
-    const routesResults: RouteTreeNodeMetadata[] = [];
     const errors: string[] = [];
 
     let baseHref =
@@ -581,11 +580,12 @@ export async function getRoutesFromAngularRouterConfig(
     if (errors.length) {
       return {
         baseHref,
-        routes: routesResults,
+        routes: [],
         errors,
       };
     }
 
+    const routesResults: RouteTreeNodeMetadata[] = [];
     if (router.config.length) {
       // Retrieve all routes from the Angular router configuration.
       const traverseRoutes = traverseRoutesConfig({
@@ -599,11 +599,19 @@ export async function getRoutesFromAngularRouterConfig(
         entryPointToBrowserMapping,
       });
 
-      for await (const result of traverseRoutes) {
-        if ('error' in result) {
-          errors.push(result.error);
-        } else {
-          routesResults.push(result);
+      const seenRoutes: Set<string> = new Set();
+      for await (const routeMetadata of traverseRoutes) {
+        if ('error' in routeMetadata) {
+          errors.push(routeMetadata.error);
+          continue;
+        }
+
+        // If a result already exists for the exact same route, subsequent matches should be ignored.
+        // This aligns with Angular's app router behavior, which prioritizes the first route.
+        const routePath = routeMetadata.route;
+        if (!seenRoutes.has(routePath)) {
+          routesResults.push(routeMetadata);
+          seenRoutes.add(routePath);
         }
       }
 
