@@ -327,21 +327,31 @@ function appendPreloadToMetadata(
   metadata: ServerConfigRouteTreeNodeMetadata,
   includeDynamicImports: boolean,
 ): void {
-  if (!entryPointToBrowserMapping) {
+  const existingPreloads = metadata.preload ?? [];
+  if (!entryPointToBrowserMapping || existingPreloads.length >= MODULE_PRELOAD_MAX) {
     return;
   }
 
   const preload = entryPointToBrowserMapping[entryName];
-
-  if (preload?.length) {
-    // Merge existing preloads with new ones, ensuring uniqueness and limiting the total to the maximum allowed.
-    const preloadPaths =
-      preload
-        .filter(({ dynamicImport }) => includeDynamicImports || !dynamicImport)
-        .map(({ path }) => path) ?? [];
-    const combinedPreloads = [...(metadata.preload ?? []), ...preloadPaths];
-    metadata.preload = Array.from(new Set(combinedPreloads)).slice(0, MODULE_PRELOAD_MAX);
+  if (!preload?.length) {
+    return;
   }
+
+  // Merge existing preloads with new ones, ensuring uniqueness and limiting the total to the maximum allowed.
+  const combinedPreloads: Set<string> = new Set(existingPreloads);
+  for (const { dynamicImport, path } of preload) {
+    if (dynamicImport && !includeDynamicImports) {
+      continue;
+    }
+
+    combinedPreloads.add(path);
+
+    if (combinedPreloads.size === MODULE_PRELOAD_MAX) {
+      break;
+    }
+  }
+
+  metadata.preload = Array.from(combinedPreloads);
 }
 
 /**
