@@ -457,6 +457,41 @@ export async function* serveWithVite(
         }
       });
 
+      // Setup component HMR invalidation
+      // Invalidation occurs when the runtime cannot update a component
+      server.hot.on(
+        'angular:invalidate',
+        (data: { id: string; message?: string; error?: boolean }) => {
+          if (typeof data?.id !== 'string') {
+            context.logger.warn(
+              'Development server client sent invalid internal invalidate event.',
+            );
+          }
+
+          // Clear invalid template update
+          templateUpdates.delete(data.id);
+
+          // Some cases are expected unsupported update scenarios but some may be errors.
+          // If an error occurred, log the error in addition to the invalidation.
+          if (data.error) {
+            context.logger.error(
+              `Component update failed${data.message ? `: ${data.message}` : '.'}` +
+                '\nPlease consider reporting the error at https://github.com/angular/angular-cli/issues',
+            );
+          } else {
+            context.logger.warn(
+              `Component update unsupported${data.message ? `: ${data.message}` : '.'}`,
+            );
+          }
+
+          server?.ws.send({
+            type: 'full-reload',
+            path: '*',
+          });
+          context.logger.info('Page reload sent to client(s).');
+        },
+      );
+
       const urls = server.resolvedUrls;
       if (urls && (urls.local.length || urls.network.length)) {
         serverUrl = new URL(urls.local[0] ?? urls.network[0]);
