@@ -29,8 +29,8 @@ importers:
         specifier: https://github.com/angular/dev-infra-private-build-tooling-builds.git#733a276b47618ffb20e0ba647b0126c7c332c123
         version: github.com/angular/dev-infra-private-build-tooling-builds/733a276b47618ffb20e0ba647b0126c7c332c123(debug@4.4.0)(karma-chrome-launcher@3.2.0)(karma-jasmine@5.1.0)(karma@6.4.4)(rxjs@7.8.1)(terser@5.37.0)(zone.js@0.15.0)
       '@angular/cdk':
-        specifier: 19.2.0-next.1
-        version: 19.2.0-next.1(@angular/common@19.2.0-next.1)(@angular/core@19.2.0-next.1)(rxjs@7.8.1)
+        specifier: 19.2.0-next.2
+        version: 19.2.0-next.2(@angular/common@19.2.0-next.1)(@angular/core@19.2.0-next.1)(rxjs@7.8.1)
       '@angular/common':
         specifier: 19.2.0-next.1
         version: 19.2.0-next.1(@angular/core@19.2.0-next.1)(rxjs@7.8.1)
@@ -50,8 +50,8 @@ importers:
         specifier: 19.2.0-next.1
         version: 19.2.0-next.1(@angular/compiler-cli@19.2.0-next.1)(@angular/compiler@19.2.0-next.1)
       '@angular/material':
-        specifier: 19.2.0-next.1
-        version: 19.2.0-next.1(@angular/animations@19.2.0-next.1)(@angular/cdk@19.2.0-next.1)(@angular/common@19.2.0-next.1)(@angular/core@19.2.0-next.1)(@angular/forms@19.2.0-next.1)(@angular/platform-browser@19.2.0-next.1)(rxjs@7.8.1)
+        specifier: 19.2.0-next.2
+        version: 19.2.0-next.2(@angular/animations@19.2.0-next.1)(@angular/cdk@19.2.0-next.2)(@angular/common@19.2.0-next.1)(@angular/core@19.2.0-next.1)(@angular/forms@19.2.0-next.1)(@angular/platform-browser@19.2.0-next.1)(rxjs@7.8.1)
       '@angular/ng-dev':
         specifier: https://github.com/angular/dev-infra-private-ng-dev-builds.git#38cf39fdbf2300ff161c158851f3e72b3ced81c4
         version: github.com/angular/dev-infra-private-ng-dev-builds/38cf39fdbf2300ff161c158851f3e72b3ced81c4
@@ -1075,8 +1075,8 @@ packages:
       - zone.js
     dev: true
 
-  /@angular/cdk@19.2.0-next.1(@angular/common@19.2.0-next.1)(@angular/core@19.2.0-next.1)(rxjs@7.8.1):
-    resolution: {integrity: sha512-Hvn34v8z8owsq+8qkCws3uwFMMlfoiXkeKVAhcp4Aau+jm9w+nPIL9hD4YuziQ+rqtHghzPPgeSOBC+ADWqUTw==}
+  /@angular/cdk@19.2.0-next.2(@angular/common@19.2.0-next.1)(@angular/core@19.2.0-next.1)(rxjs@7.8.1):
+    resolution: {integrity: sha512-QPIJ8Jb/LZ7MICxCHDKuBc0GDa73TZ3WmiEitR296NUzGcOQalHdu5Xj29WhMTRpNfKORpK+UBfZ6WBlL+nDUA==}
     peerDependencies:
       '@angular/common': ^19.0.0-0 || ^19.1.0-0 || ^19.2.0-0 || ^19.3.0-0 || ^20.0.0-0
       '@angular/core': ^19.0.0-0 || ^19.1.0-0 || ^19.2.0-0 || ^19.3.0-0 || ^20.0.0-0
@@ -1195,11 +1195,11 @@ packages:
       - supports-color
     dev: true
 
-  /@angular/material@19.2.0-next.1(@angular/animations@19.2.0-next.1)(@angular/cdk@19.2.0-next.1)(@angular/common@19.2.0-next.1)(@angular/core@19.2.0-next.1)(@angular/forms@19.2.0-next.1)(@angular/platform-browser@19.2.0-next.1)(rxjs@7.8.1):
-    resolution: {integrity: sha512-5sgxT0928VkqizIXcoEL8VpZV853XUfC4VXjTHWvjOqFSSX/EN88DXqz4VUsOZ9zIfc7hV9Gzi4JQYgTyXCfuQ==}
+  /@angular/material@19.2.0-next.2(@angular/animations@19.2.0-next.1)(@angular/cdk@19.2.0-next.2)(@angular/common@19.2.0-next.1)(@angular/core@19.2.0-next.1)(@angular/forms@19.2.0-next.1)(@angular/platform-browser@19.2.0-next.1)(rxjs@7.8.1):
+    resolution: {integrity: sha512-2RmjzEvUWJrqtkN0Z6Z9+8hT1RJtfOvMITaT+ZkcTKAbu8U2tQEnJgbKbzy57XEu7NbLAamTqXE5065lxpvwsw==}
     peerDependencies:
       '@angular/animations': ^19.0.0-0 || ^19.1.0-0 || ^19.2.0-0 || ^19.3.0-0 || ^20.0.0-0
-      '@angular/cdk': 19.2.0-next.1
+      '@angular/cdk': 19.2.0-next.2
       '@angular/common': ^19.0.0-0 || ^19.1.0-0 || ^19.2.0-0 || ^19.3.0-0 || ^20.0.0-0
       '@angular/core': ^19.0.0-0 || ^19.1.0-0 || ^19.2.0-0 || ^19.3.0-0 || ^20.0.0-0
       '@angular/forms': ^19.0.0-0 || ^19.1.0-0 || ^19.2.0-0 || ^19.3.0-0 || ^20.0.0-0
@@ -1207,7 +1207,7 @@ packages:
       rxjs: ^6.5.3 || ^7.4.0
     dependencies:
       '@angular/animations': 19.2.0-next.1(@angular/core@19.2.0-next.1)
-      '@angular/cdk': 19.2.0-next.1(@angular/common@19.2.0-next.1)(@angular/core@19.2.0-next.1)(rxjs@7.8.1)
+      '@angular/cdk': 19.2.0-next.2(@angular/common@19.2.0-next.1)(@angular/core@19.2.0-next.1)(rxjs@7.8.1)
       '@angular/common': 19.2.0-next.1(@angular/core@19.2.0-next.1)(rxjs@7.8.1)
       '@angular/core': 19.2.0-next.1(rxjs@7.8.1)(zone.js@0.15.0)
       '@angular/forms': 19.2.0-next.1(@angular/common@19.2.0-next.1)(@angular/core@19.2.0-next.1)(@angular/platform-browser@19.2.0-next.1)(rxjs@7.8.1)
