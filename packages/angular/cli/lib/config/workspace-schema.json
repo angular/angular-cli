@@ -162,6 +162,9 @@
         "@schematics/angular:library": {
           "$ref": "../../../../schematics/angular/library/schema.json"
         },
+        "@schematics/angular:library-entrypoint": {
+          "$ref": "../../../../schematics/angular/library-entrypoint/schema.json"
+        },
         "@schematics/angular:pipe": {
           "$ref": "../../../../schematics/angular/pipe/schema.json"
         },
