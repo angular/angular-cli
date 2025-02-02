@@ -133,10 +133,10 @@ describe('Secondary Entrypoint Schematic', () => {
       { ...defaultOptions, name: 'testing', project: '@scope/package' },
       workspaceTree,
     );
-
     const tsConfigJson = getJsonFileContent(tree, 'tsconfig.json');
     expect(tsConfigJson.compilerOptions.paths['@scope/package/testing']).toEqual([
       './dist/scope/package/testing',
+      'libs/*',
     ]);
   });
 });
