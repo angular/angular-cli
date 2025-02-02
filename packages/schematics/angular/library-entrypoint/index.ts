@@ -59,7 +59,7 @@ export default function (options: LibraryOptions): Rule {
 
       const pkg = host.readJson(pkgPath) as { name: string } | null;
       if (pkg === null) {
-        throw new SchematicsException('Could not find package.json');
+        throw new SchematicsException(`Could not find ${pkgPath}`);
       }
 
       const mainEntryPoint = pkg.name;
@@ -80,6 +80,8 @@ export default function (options: LibraryOptions): Rule {
           secondaryEntryPoint,
           relativePathToWorkspaceRoot: relativePathToWorkspaceRoot(libDir),
           packageName: options.name,
+          //TODO: fix this
+          entryFile: 'index.ts',
         }),
         move(libDir),
       ]);

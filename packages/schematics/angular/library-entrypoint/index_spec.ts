@@ -7,10 +7,10 @@
  */
 
 import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/testing';
+import { parse as parseJson } from 'jsonc-parser';
 import { Schema as LibraryOptions } from '../library/schema';
 import { Schema as WorkspaceOptions } from '../workspace/schema';
 import { Schema as GenerateLibrarySchema } from './schema';
-import { parse as parseJson } from 'jsonc-parser';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function getJsonFileContent(tree: UnitTestTree, path: string): any {
@@ -35,7 +35,6 @@ describe('Secondary Entrypoint Schematic', () => {
   };
   const libaryOptions: LibraryOptions = {
     name: 'foo',
-    entryFile: 'my-index',
     standalone: true,
     skipPackageJson: false,
     skipTsConfig: false,
@@ -45,12 +44,12 @@ describe('Secondary Entrypoint Schematic', () => {
   let workspaceTree: UnitTestTree;
   beforeEach(async () => {
     workspaceTree = await schematicRunner.runSchematic('workspace', workspaceOptions);
+    workspaceTree = await schematicRunner.runSchematic('library', libaryOptions, workspaceTree);
   });
 
   it('should create correct files', async () => {
-    workspaceTree = await schematicRunner.runSchematic('library', libaryOptions, workspaceTree);
     const tree = await schematicRunner.runSchematic(
-      'secondary',
+      'library-entrypoint',
       { ...defaultOptions },
       workspaceTree,
     );
@@ -60,37 +59,18 @@ describe('Secondary Entrypoint Schematic', () => {
       jasmine.arrayContaining([
         '/projects/foo/src/lib/foo-secondary/README.md',
         '/projects/foo/src/lib/foo-secondary/ng-package.json',
-        '/projects/foo/src/lib/foo-secondary/src/public-api.ts',
       ]),
     );
   });
 
   it('should set correct main and secondary entrypoints in the README', async () => {
-    workspaceTree = await schematicRunner.runSchematic('library', libaryOptions, workspaceTree);
     const tree = await schematicRunner.runSchematic(
-      'secondary',
+      'library-entrypoint',
       { ...defaultOptions },
       workspaceTree,
     );
     const content = tree.readContent('/projects/foo/src/lib/foo-secondary/README.md');
     expect(content).toMatch('# foo/foo-secondary');
-  });
-
-  it('should set a custom entryfile', async () => {
-    workspaceTree = await schematicRunner.runSchematic('library', libaryOptions, workspaceTree);
-    const tree = await schematicRunner.runSchematic(
-      'secondary',
-      { ...defaultOptions, entryFile: 'my-index' },
-      workspaceTree,
-    );
-    const files = tree.files;
-    expect(files).toEqual(
-      jasmine.arrayContaining([
-        '/projects/foo/src/lib/foo-secondary/README.md',
-        '/projects/foo/src/lib/foo-secondary/ng-package.json',
-        '/projects/foo/src/lib/foo-secondary/src/my-index.ts',
-      ]),
-    );
   });
 
   it('should handle scope packages', async () => {
@@ -100,7 +80,7 @@ describe('Secondary Entrypoint Schematic', () => {
       workspaceTree,
     );
     const tree = await schematicRunner.runSchematic(
-      'secondary',
+      'library-entrypoint',
       { ...defaultOptions, name: 'testing', project: '@scope/package' },
       workspaceTree,
     );
@@ -109,7 +89,6 @@ describe('Secondary Entrypoint Schematic', () => {
       jasmine.arrayContaining([
         '/projects/scope/package/src/lib/testing/README.md',
         '/projects/scope/package/src/lib/testing/ng-package.json',
-        '/projects/scope/package/src/lib/testing/src/public-api.ts',
       ]),
     );
   });
@@ -121,7 +100,7 @@ describe('Secondary Entrypoint Schematic', () => {
       workspaceTree,
     );
     const tree = await schematicRunner.runSchematic(
-      'secondary',
+      'library-entrypoint',
       { ...defaultOptions, name: 'testing', project: '@scope/package' },
       workspaceTree,
     );
@@ -150,14 +129,13 @@ describe('Secondary Entrypoint Schematic', () => {
       }),
     );
     const tree = await schematicRunner.runSchematic(
-      'secondary',
+      'library-entrypoint',
       { ...defaultOptions, name: 'testing', project: '@scope/package' },
       workspaceTree,
     );
 
     const tsConfigJson = getJsonFileContent(tree, 'tsconfig.json');
     expect(tsConfigJson.compilerOptions.paths['@scope/package/testing']).toEqual([
-      'libs/*',
       './dist/scope/package/testing',
     ]);
   });

@@ -13,8 +13,7 @@ import { updateJsonFile } from '../../utils/project';
 export default async function () {
   await ng('generate', 'library', 'mylib');
   await ng('generate', 'lib-entry', 'secondary');
-  // await createLibraryEntryPoint('secondary');
-  await createLibraryEntryPoint('another');
+  await ng('generate', 'lib-entry', 'another');
 
   // Scenario #1 where we use wildcard path mappings for secondary entry-points.
   await updateJsonFile('tsconfig.json', (json) => {
@@ -47,18 +46,4 @@ export default async function () {
   });
 
   await ng('build');
-}
-
-async function createLibraryEntryPoint(name: string): Promise<void> {
-  await createDir(`projects/mylib/${name}`);
-  await writeFile(`projects/mylib/${name}/index.ts`, `export const foo = 'foo';`);
-
-  await writeFile(
-    `projects/mylib/${name}/ng-package.json`,
-    JSON.stringify({
-      lib: {
-        entryFile: 'index.ts',
-      },
-    }),
-  );
 }

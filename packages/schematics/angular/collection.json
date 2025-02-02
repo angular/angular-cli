@@ -121,7 +121,7 @@
       "aliases": ["lib-entry"],
       "factory": "./library-entrypoint",
       "schema": "./library-entrypoint/schema.json",
-      "description": "Generate an library-entrypoint in an Angular library project."
+      "description": "Generate a library-entrypoint in an Angular library project."
     },
     "web-worker": {
       "factory": "./web-worker",

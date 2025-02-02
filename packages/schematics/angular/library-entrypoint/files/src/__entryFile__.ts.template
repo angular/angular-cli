@@ -1,5 +1,0 @@
-/*
- * Public API Surface of <%= dasherize(name) %>
- */
-
-export const greeting = 'Hello Angular World!';
