@@ -25,7 +25,7 @@
     "@angular-devkit/architect": "workspace:0.0.0-EXPERIMENTAL-PLACEHOLDER",
     "@angular-devkit/core": "workspace:0.0.0-PLACEHOLDER",
     "@angular-devkit/schematics": "workspace:0.0.0-PLACEHOLDER",
-    "@inquirer/prompts": "7.2.4",
+    "@inquirer/prompts": "7.3.1",
     "@listr2/prompt-adapter-inquirer": "2.0.18",
     "@schematics/angular": "workspace:0.0.0-PLACEHOLDER",
     "@yarnpkg/lockfile": "1.1.0",
@@ -36,7 +36,7 @@
     "npm-pick-manifest": "10.0.0",
     "pacote": "20.0.0",
     "resolve": "1.22.10",
-    "semver": "7.7.0",
+    "semver": "7.7.1",
     "symbol-observable": "4.0.0",
     "yargs": "17.7.2"
   },
