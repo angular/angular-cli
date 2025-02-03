@@ -38,7 +38,7 @@ function _exec(cmd: string, captureStdout: boolean): Promise<string> {
     proc.stdout.on('data', (data) => {
       console.info(data.toString().trim());
       if (captureStdout) {
-        output += data.toString().trim();
+        output += data.toString();
       }
     });
     proc.stderr.on('data', (data) => console.info(data.toString().trim()));
