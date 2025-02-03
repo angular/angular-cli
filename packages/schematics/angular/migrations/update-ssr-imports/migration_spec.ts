@@ -19,6 +19,14 @@ describe('CommonEngine migration', () => {
   let tree: UnitTestTree;
   beforeEach(() => {
     tree = new UnitTestTree(new EmptyTree());
+    tree.create(
+      'package.json',
+      JSON.stringify({
+        dependencies: {
+          '@angular/ssr': '0.0.0',
+        },
+      }),
+    );
   });
 
   function runMigration(): Promise<UnitTestTree> {
