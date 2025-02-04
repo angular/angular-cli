@@ -23,12 +23,12 @@ jobs:
         with:
           persist-credentials: false
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@1a7989f3955e0c69f0e0ccc14aee54a387a0fd31 #v3.28.8
+        uses: github/codeql-action/init@dd746615b3b9d728a6a37ca2045b68ca76d4841a # v3.28.8
         with:
           languages: javascript-typescript
           build-mode: none
           config-file: .github/codeql/config.yml
       - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@86b04fb0e47484f7282357688f21d5d0e32175fe #v3.28.8
+        uses: github/codeql-action/analyze@dd746615b3b9d728a6a37ca2045b68ca76d4841a # v3.28.8
         with:
           category: '/language:javascript-typescript'
