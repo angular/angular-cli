@@ -19,7 +19,7 @@ interface AngularMemoryPluginOptions {
   outputFiles: AngularMemoryOutputFiles;
   templateUpdates?: ReadonlyMap<string, string>;
   external?: string[];
-  skipViteClient?: boolean;
+  disableViteTransport?: boolean;
 }
 
 const ANGULAR_PREFIX = '/@ng/';
@@ -91,7 +91,7 @@ export async function createAngularMemoryPlugin(
       const codeContents = outputFiles.get(relativeFile)?.contents;
       if (codeContents === undefined) {
         if (relativeFile.endsWith('/node_modules/vite/dist/client/client.mjs')) {
-          return options.skipViteClient ? '' : loadViteClientCode(file);
+          return loadViteClientCode(file, options.disableViteTransport);
         }
 
         return undefined;
@@ -118,9 +118,9 @@ export async function createAngularMemoryPlugin(
  * @param file The absolute path to the Vite client code.
  * @returns
  */
-async function loadViteClientCode(file: string): Promise<string> {
+async function loadViteClientCode(file: string, disableViteTransport = false): Promise<string> {
   const originalContents = await readFile(file, 'utf-8');
-  const updatedContents = originalContents.replace(
+  let updatedContents = originalContents.replace(
     `"You can also disable this overlay by setting ",
       h("code", { part: "config-option-name" }, "server.hmr.overlay"),
       " to ",
@@ -132,6 +132,18 @@ async function loadViteClientCode(file: string): Promise<string> {
   );
 
   assert(originalContents !== updatedContents, 'Failed to update Vite client error overlay text.');
+
+  if (disableViteTransport) {
+    const previousUpdatedContents = updatedContents;
+
+    updatedContents = updatedContents.replace('transport.connect(handleMessage)', '');
+    assert(
+      previousUpdatedContents !== updatedContents,
+      'Failed to update Vite client WebSocket disable.',
+    );
+
+    updatedContents = updatedContents.replace('console.debug("[vite] connecting...")', '');
+  }
 
   return updatedContents;
 }

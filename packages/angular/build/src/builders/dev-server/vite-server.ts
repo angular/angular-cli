@@ -898,7 +898,7 @@ export async function setupServer(
         outputFiles,
         templateUpdates,
         external: externalMetadata.explicitBrowser,
-        skipViteClient: serverOptions.liveReload === false && serverOptions.hmr === false,
+        disableViteTransport: !serverOptions.liveReload,
       }),
     ],
     // Browser only optimizeDeps. (This does not run for SSR dependencies).
