@@ -213,6 +213,8 @@ export async function* serveWithVite(
           },
         });
       }
+
+      yield { baseUrl: '', success: false };
       continue;
     }
     // Clear existing error overlay on successful result
