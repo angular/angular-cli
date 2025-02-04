@@ -38,14 +38,14 @@
     "parse5-html-rewriting-stream": "7.0.0",
     "picomatch": "4.0.2",
     "piscina": "4.8.0",
-    "rollup": "4.34.1",
+    "rollup": "4.34.2",
     "sass": "1.83.4",
     "semver": "7.7.1",
     "vite": "6.0.11",
     "watchpack": "2.4.2"
   },
   "optionalDependencies": {
-    "lmdb": "3.2.2"
+    "lmdb": "3.2.3"
   },
   "devDependencies": {
     "@angular/ssr": "workspace:*",
