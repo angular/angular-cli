@@ -768,6 +768,15 @@ export async function setupServer(
       mainFields: ['es2020', 'browser', 'module', 'main'],
       preserveSymlinks,
     },
+    dev: {
+      // This is needed when `externalDependencies` is used to prevent Vite load errors.
+      // NOTE: If Vite adds direct support for externals, this can be removed.
+      // NOTE: Vite breaks the resolution of browser modules in SSR
+      //       when accessing a url with two or more segments (e.g., 'foo/bar'),
+      //       as they are not re-based from the base href.
+      preTransformRequests:
+        externalMetadata.explicitBrowser.length === 0 && ssrMode === ServerSsrMode.NoSsr,
+    },
     server: {
       warmup: {
         ssrFiles,
@@ -806,13 +815,6 @@ export async function setupServer(
           ...[...assets.values()].map(({ source }) => source),
         ],
       },
-      // This is needed when `externalDependencies` is used to prevent Vite load errors.
-      // NOTE: If Vite adds direct support for externals, this can be removed.
-      // NOTE: Vite breaks the resolution of browser modules in SSR
-      //       when accessing a url with two or more segments (e.g., 'foo/bar'),
-      //       as they are not re-based from the base href.
-      preTransformRequests:
-        externalMetadata.explicitBrowser.length === 0 && ssrMode === ServerSsrMode.NoSsr,
     },
     ssr: {
       // Note: `true` and `/.*/` have different sematics. When true, the `external` option is ignored.
