@@ -3,20 +3,20 @@
 # This file should be checked into version control along with the pnpm-lock.yaml file.
 .npmrc=-1406867100
 modules/testing/builder/package.json=973445093
-package.json=-1652339359
-packages/angular/build/package.json=-579157191
+package.json=-613776971
+packages/angular/build/package.json=-342568896
 packages/angular/cli/package.json=-284191300
 packages/angular/pwa/package.json=1108903917
 packages/angular/ssr/package.json=-1038366877
 packages/angular_devkit/architect/package.json=-1496633956
 packages/angular_devkit/architect_cli/package.json=1551210941
-packages/angular_devkit/build_angular/package.json=-365545205
+packages/angular_devkit/build_angular/package.json=-1998034676
 packages/angular_devkit/build_webpack/package.json=373950017
 packages/angular_devkit/core/package.json=339935828
 packages/angular_devkit/schematics/package.json=673943597
 packages/angular_devkit/schematics_cli/package.json=774399812
 packages/ngtools/webpack/package.json=1373072616
 packages/schematics/angular/package.json=251715148
-pnpm-lock.yaml=-691818088
+pnpm-lock.yaml=1236260500
 pnpm-workspace.yaml=-1056556036
-yarn.lock=1631477188
+yarn.lock=-1159191809
