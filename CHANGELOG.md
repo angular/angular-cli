@@ -1,3 +1,31 @@
+<a name="19.1.6"></a>
+
+# 19.1.6 (2025-02-05)
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                                |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------- |
+| [3f7042672](https://github.com/angular/angular-cli/commit/3f704267223d1881ea40e9de4e6381b9d0e43fe6) | fix  | remove additional newline after standalone property        |
+| [e9778dba0](https://github.com/angular/angular-cli/commit/e9778dba0d75e7f528b600d51504a583485bd033) | fix  | skip ssr migration when `@angular/ssr` is not a dependency |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                                            |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------------------- |
+| [27f833186](https://github.com/angular/angular-cli/commit/27f8331865de35044ddeda7a8c05bb2700b0be6a) | fix  | avoid pre-transform errors with Vite pre-bundling                      |
+| [8f6ee7ed9](https://github.com/angular/angular-cli/commit/8f6ee7ed933ea7394e14fe46d141427839008040) | fix  | ensure full rebuild after initial error build in watch mode            |
+| [2b9c00f68](https://github.com/angular/angular-cli/commit/2b9c00f686145a8613dc2ce7f494193622e02625) | fix  | prevent fallback to serving main.js for unknown requests               |
+| [45abd15b7](https://github.com/angular/angular-cli/commit/45abd15b781bb5bb067a7a52e7a809bb9d141c75) | fix  | prevent server manifest generation when no server features are enabled |
+
+### @angular/ssr
+
+| Commit                                                                                              | Type | Description                                              |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------- |
+| [5bf5e5fd2](https://github.com/angular/angular-cli/commit/5bf5e5fd20e3c33a274a936dd1ce00e07b860226) | fix  | prioritize the first matching route over subsequent ones |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="19.2.0-next.1"></a>
 
 # 19.2.0-next.1 (2025-01-29)
