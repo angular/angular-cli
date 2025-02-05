@@ -232,9 +232,9 @@ http_archive(
     name = "aspect_rules_ts",
     patch_args = ["-p1"],
     patches = ["//tools:rules_ts_windows.patch"],
-    sha256 = "013a10b2b457add73b081780e604778eb50a141709f9194298f97761acdcc169",
-    strip_prefix = "rules_ts-3.4.0",
-    url = "https://github.com/aspect-build/rules_ts/releases/download/v3.4.0/rules_ts-v3.4.0.tar.gz",
+    sha256 = "4263532b2fb4d16f309d80e3597191a1cb2fb69c19e95d91711bd6b97874705e",
+    strip_prefix = "rules_ts-3.5.0",
+    url = "https://github.com/aspect-build/rules_ts/releases/download/v3.5.0/rules_ts-v3.5.0.tar.gz",
 )
 
 load("@aspect_rules_ts//ts:repositories.bzl", "rules_ts_dependencies")
