@@ -32,7 +32,7 @@
     "ini": "5.0.0",
     "jsonc-parser": "3.3.1",
     "listr2": "8.2.5",
-    "npm-package-arg": "12.0.1",
+    "npm-package-arg": "12.0.2",
     "npm-pick-manifest": "10.0.0",
     "pacote": "20.0.0",
     "resolve": "1.22.10",
