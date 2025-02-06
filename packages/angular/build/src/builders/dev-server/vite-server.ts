@@ -734,6 +734,7 @@ function updateResultRecord(
   }
 }
 
+// eslint-disable-next-line max-lines-per-function
 export async function setupServer(
   serverOptions: NormalizedDevServerOptions,
   outputFiles: Map<string, OutputFileRecord>,
@@ -776,6 +777,15 @@ export async function setupServer(
       break;
   }
 
+  /**
+   * Required when using `externalDependencies` to prevent Vite load errors.
+   *
+   * @note Can be removed if Vite introduces native support for externals.
+   * @note Vite misresolves browser modules in SSR when accessing URLs with multiple segments
+   *       (e.g., 'foo/bar'), as they are not correctly re-based from the base href.
+   */
+  const preTransformRequests =
+    externalMetadata.explicitBrowser.length === 0 && ssrMode === ServerSsrMode.NoSsr;
   const cacheDir = join(serverOptions.cacheOptions.path, serverOptions.buildTarget.project, 'vite');
   const configuration: InlineConfig = {
     configFile: false,
@@ -806,15 +816,10 @@ export async function setupServer(
       preserveSymlinks,
     },
     dev: {
-      // This is needed when `externalDependencies` is used to prevent Vite load errors.
-      // NOTE: If Vite adds direct support for externals, this can be removed.
-      // NOTE: Vite breaks the resolution of browser modules in SSR
-      //       when accessing a url with two or more segments (e.g., 'foo/bar'),
-      //       as they are not re-based from the base href.
-      preTransformRequests:
-        externalMetadata.explicitBrowser.length === 0 && ssrMode === ServerSsrMode.NoSsr,
+      preTransformRequests,
     },
     server: {
+      preTransformRequests,
       warmup: {
         ssrFiles,
       },
