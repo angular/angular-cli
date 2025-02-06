@@ -8,6 +8,7 @@
 
 import type { Metafile } from 'esbuild';
 import { extname } from 'node:path';
+import { runInThisContext } from 'node:vm';
 import { NormalizedApplicationBuildOptions } from '../../builders/application/options';
 import { type BuildOutputFile, BuildOutputFileType } from '../../tools/esbuild/bundler-context';
 import { createOutputFile } from '../../tools/esbuild/utils';
@@ -139,20 +140,27 @@ export function generateAngularServerAppManifest(
 } {
   const serverAssetsChunks: BuildOutputFile[] = [];
   const serverAssets: Record<string, string> = {};
+
   for (const file of [...additionalHtmlOutputFiles.values(), ...outputFiles]) {
     const extension = extname(file.path);
     if (extension === '.html' || (inlineCriticalCss && extension === '.css')) {
       const jsChunkFilePath = `assets-chunks/${file.path.replace(/[./]/g, '_')}.mjs`;
+      const escapedContent = escapeUnsafeChars(file.text);
+
       serverAssetsChunks.push(
         createOutputFile(
           jsChunkFilePath,
-          `export default \`${escapeUnsafeChars(file.text)}\`;`,
+          `export default \`${escapedContent}\`;`,
           BuildOutputFileType.ServerApplication,
         ),
       );
 
+      // This is needed because JavaScript engines script parser convert `\r\n` to `\n` in template literals,
+      // which can result in an incorrect byte length.
+      const size = runInThisContext(`new TextEncoder().encode(\`${escapedContent}\`).byteLength`);
+
       serverAssets[file.path] =
-        `{size: ${file.size}, hash: '${file.hash}', text: () => import('./${jsChunkFilePath}').then(m => m.default)}`;
+        `{size: ${size}, hash: '${file.hash}', text: () => import('./${jsChunkFilePath}').then(m => m.default)}`;
     }
   }
 
