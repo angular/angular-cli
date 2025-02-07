@@ -29,12 +29,12 @@
   },
   "devDependencies": {
     "@angular-devkit/schematics": "workspace:*",
-    "@angular/common": "19.2.0-next.1",
-    "@angular/compiler": "19.2.0-next.1",
-    "@angular/core": "19.2.0-next.1",
-    "@angular/platform-browser": "19.2.0-next.1",
-    "@angular/platform-server": "19.2.0-next.1",
-    "@angular/router": "19.2.0-next.1",
+    "@angular/common": "19.2.0-next.2",
+    "@angular/compiler": "19.2.0-next.2",
+    "@angular/core": "19.2.0-next.2",
+    "@angular/platform-browser": "19.2.0-next.2",
+    "@angular/platform-server": "19.2.0-next.2",
+    "@angular/router": "19.2.0-next.2",
     "@bazel/runfiles": "^6.0.0",
     "@schematics/angular": "workspace:*"
   },
