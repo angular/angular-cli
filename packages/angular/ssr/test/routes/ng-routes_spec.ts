@@ -576,6 +576,25 @@ describe('extractRoutesAndCreateRouteTree', () => {
     ]);
   });
 
+  it('handles a baseHref starting with a protocol', async () => {
+    setAngularAppTestingManifest(
+      [{ path: 'home', component: DummyComponent }],
+      [{ path: '**', renderMode: RenderMode.Server }],
+      /** baseHref*/ 'http://foo.com/example/',
+    );
+
+    const { routeTree, errors } = await extractRoutesAndCreateRouteTree({
+      url,
+      invokeGetPrerenderParams: true,
+      includePrerenderFallbackRoutes: true,
+    });
+
+    expect(errors).toHaveSize(0);
+    expect(routeTree.toObject()).toEqual([
+      { route: '/example/home', renderMode: RenderMode.Server },
+    ]);
+  });
+
   it('should not bootstrap the root component', async () => {
     @Component({
       standalone: true,
