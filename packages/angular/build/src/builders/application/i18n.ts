@@ -64,6 +64,11 @@ export async function inlineI18n(
   // For each active locale, use the inliner to process the output files of the build.
   const updatedOutputFiles = [];
   const updatedAssetFiles = [];
+  // Root and SSR entry files are not modified.
+  const unModifiedOutputFiles = executionResult.outputFiles.filter(
+    ({ type }) => type === BuildOutputFileType.Root || type === BuildOutputFileType.ServerRoot,
+  );
+
   try {
     for (const locale of i18nOptions.inlineLocales) {
       // A locale specific set of files is returned from the inliner.
@@ -87,7 +92,7 @@ export async function inlineI18n(
           ...options,
           baseHref: getLocaleBaseHref(baseHref, i18nOptions, locale) ?? baseHref,
         },
-        localeOutputFiles,
+        [...unModifiedOutputFiles, ...localeOutputFiles],
         executionResult.assetFiles,
         initialFiles,
         locale,
@@ -124,9 +129,7 @@ export async function inlineI18n(
   // Update the result with all localized files.
   executionResult.outputFiles = [
     // Root and SSR entry files are not modified.
-    ...executionResult.outputFiles.filter(
-      ({ type }) => type === BuildOutputFileType.Root || type === BuildOutputFileType.ServerRoot,
-    ),
+    ...unModifiedOutputFiles,
     // Updated files for each locale.
     ...updatedOutputFiles,
   ];
