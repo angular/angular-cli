@@ -708,7 +708,9 @@ function createCompilerOptionsTransformer(
       inlineSourceMap: !!pluginOptions.sourcemap,
       sourceMap: undefined,
       mapRoot: undefined,
-      sourceRoot: undefined,
+      // This '.' ensures esbuild retains full file paths in the source map's `sources` field.
+      // Without it, paths may be truncated (e.g., `app.component.ts` instead of `src/app/app.component.ts`).
+      sourceRoot: '.',
       preserveSymlinks,
       externalRuntimeStyles: pluginOptions.externalRuntimeStyles,
       _enableHmr: !!pluginOptions.templateUpdates,
