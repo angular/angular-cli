@@ -184,9 +184,6 @@ export async function executeBuild(
 
   executionResult.outputFiles.push(...outputFiles);
 
-  const changedFiles =
-    rebuildState && executionResult.findChangedFiles(rebuildState.previousOutputInfo);
-
   // Analyze files for bundle budget failures if present
   let budgetFailures: BudgetCalculatorResult[] | undefined;
   if (options.budgets) {
@@ -288,6 +285,8 @@ export async function executeBuild(
   }
 
   if (!jsonLogs) {
+    const changedFiles =
+      rebuildState && executionResult.findChangedFiles(rebuildState.previousOutputInfo);
     executionResult.addLog(
       logBuildStats(
         metafile,
