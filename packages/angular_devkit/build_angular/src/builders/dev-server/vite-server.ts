@@ -485,6 +485,7 @@ export async function setupServer(
       strictPort: true,
       host: serverOptions.host,
       open: serverOptions.open,
+      allowedHosts: serverOptions.allowedHosts,
       headers: serverOptions.headers,
       proxy,
       cors: {

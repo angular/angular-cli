@@ -74,10 +74,7 @@ export function createAngularMemoryPlugin(options: AngularMemoryPluginOptions): 
       const codeContents = outputFiles.get(relativeFile)?.contents;
       if (codeContents === undefined) {
         if (relativeFile.endsWith('/node_modules/vite/dist/client/client.mjs')) {
-          return {
-            code: await loadViteClientCode(file),
-            map: await readFile(file + '.map', 'utf-8'),
-          };
+          return await loadViteClientCode(file);
         }
 
         return;
@@ -309,19 +306,21 @@ export function createAngularMemoryPlugin(options: AngularMemoryPluginOptions): 
  * @param file The absolute path to the Vite client code.
  * @returns
  */
-async function loadViteClientCode(file: string) {
+async function loadViteClientCode(file: string): Promise<string> {
   const originalContents = await readFile(file, 'utf-8');
-  const firstUpdate = originalContents.replace('You can also disable this overlay by setting', '');
-  assert(originalContents !== firstUpdate, 'Failed to update Vite client error overlay text. (1)');
-
-  const secondUpdate = firstUpdate.replace(
-    // eslint-disable-next-line max-len
-    '<code part="config-option-name">server.hmr.overlay</code> to <code part="config-option-value">false</code> in <code part="config-file-name">${hmrConfigName}.</code>',
+  const updatedContents = originalContents.replace(
+    `"You can also disable this overlay by setting ",
+      h("code", { part: "config-option-name" }, "server.hmr.overlay"),
+      " to ",
+      h("code", { part: "config-option-value" }, "false"),
+      " in ",
+      h("code", { part: "config-file-name" }, hmrConfigName),
+      "."`,
     '',
   );
-  assert(firstUpdate !== secondUpdate, 'Failed to update Vite client error overlay text. (2)');
+  assert(originalContents !== updatedContents, 'Failed to update Vite client error overlay text.');
 
-  return secondUpdate;
+  return updatedContents;
 }
 
 function pathnameWithoutBasePath(url: string, basePath: string): string {

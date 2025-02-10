@@ -73,7 +73,7 @@
     },
     "allowedHosts": {
       "type": "array",
-      "description": "List of hosts that are allowed to access the dev server. This option has no effect when using the 'application' or other esbuild-based builders.",
+      "description": "List of hosts that are allowed to access the dev server.",
       "default": [],
       "items": {
         "type": "string"
