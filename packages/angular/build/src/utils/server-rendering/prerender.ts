@@ -228,12 +228,14 @@ async function renderPages(
   try {
     const renderingPromises: Promise<void>[] = [];
     const appShellRouteWithLeadingSlash = appShellRoute && addLeadingSlash(appShellRoute);
-    const baseHrefWithLeadingSlash = addLeadingSlash(baseHref);
+    const baseHrefPathnameWithLeadingSlash = new URL(baseHref, 'http://localhost').pathname;
 
     for (const { route, redirectTo } of serializableRouteTreeNode) {
       // Remove the base href from the file output path.
-      const routeWithoutBaseHref = addTrailingSlash(route).startsWith(baseHrefWithLeadingSlash)
-        ? addLeadingSlash(route.slice(baseHrefWithLeadingSlash.length))
+      const routeWithoutBaseHref = addTrailingSlash(route).startsWith(
+        baseHrefPathnameWithLeadingSlash,
+      )
+        ? addLeadingSlash(route.slice(baseHrefPathnameWithLeadingSlash.length))
         : route;
 
       const outPath = posix.join(removeLeadingSlash(routeWithoutBaseHref), 'index.html');
