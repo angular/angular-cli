@@ -615,13 +615,10 @@ export async function getRoutesFromAngularRouterConfig(
 
     const errors: string[] = [];
 
-    let baseHref =
+    const rawBaseHref =
       injector.get(APP_BASE_HREF, null, { optional: true }) ??
       injector.get(PlatformLocation).getBaseHrefFromDOM();
-
-    if (baseHref.startsWith('./')) {
-      baseHref = baseHref.slice(2);
-    }
+    const { pathname: baseHref } = new URL(rawBaseHref, 'http://localhost');
 
     const compiler = injector.get(Compiler);
     const serverRoutesConfig = injector.get(SERVER_ROUTES_CONFIG, null, { optional: true });
