@@ -7,8 +7,11 @@
  */
 
 import assert from 'node:assert';
+import { createHash } from 'node:crypto';
+import { extname, join } from 'node:path';
 import { WorkerPool } from '../../utils/worker-pool';
 import { BuildOutputFile, BuildOutputFileType } from './bundler-context';
+import type { LmbdCacheStore } from './lmdb-cache-store';
 import { createOutputFile } from './utils';
 
 /**
@@ -24,6 +27,7 @@ export interface I18nInlinerOptions {
   missingTranslation: 'error' | 'warning' | 'ignore';
   outputFiles: BuildOutputFile[];
   shouldOptimize?: boolean;
+  persistentCachePath?: string;
 }
 
 /**
@@ -33,26 +37,30 @@ export interface I18nInlinerOptions {
  * localize function (`$localize`).
  */
 export class I18nInliner {
+  #cacheInitFailed = false;
   #workerPool: WorkerPool;
-  readonly #localizeFiles: ReadonlyMap<string, Blob>;
+  #cache: LmbdCacheStore | undefined;
+  readonly #localizeFiles: ReadonlyMap<string, BuildOutputFile>;
   readonly #unmodifiedFiles: Array<BuildOutputFile>;
-  readonly #fileToType = new Map<string, BuildOutputFileType>();
 
-  constructor(options: I18nInlinerOptions, maxThreads?: number) {
+  constructor(
+    private readonly options: I18nInlinerOptions,
+    maxThreads?: number,
+  ) {
     this.#unmodifiedFiles = [];
+    const { outputFiles, shouldOptimize, missingTranslation } = options;
+    const files = new Map<string, BuildOutputFile>();
 
-    const files = new Map<string, Blob>();
     const pendingMaps = [];
-    for (const file of options.outputFiles) {
+    for (const file of outputFiles) {
       if (file.type === BuildOutputFileType.Root || file.type === BuildOutputFileType.ServerRoot) {
         // Skip also the server entry-point.
         // Skip stats and similar files.
         continue;
       }
 
-      this.#fileToType.set(file.path, file.type);
-
-      if (file.path.endsWith('.js') || file.path.endsWith('.mjs')) {
+      const fileExtension = extname(file.path);
+      if (fileExtension === '.js' || fileExtension === '.mjs') {
         // Check if localizations are present
         const contentBuffer = Buffer.isBuffer(file.contents)
           ? file.contents
@@ -60,15 +68,11 @@ export class I18nInliner {
         const hasLocalize = contentBuffer.includes(LOCALIZE_KEYWORD);
 
         if (hasLocalize) {
-          // A Blob is an immutable data structure that allows sharing the data between workers
-          // without copying until the data is actually used within a Worker. This is useful here
-          // since each file may not actually be processed in each Worker and the Blob avoids
-          // unneeded repeat copying of potentially large JavaScript files.
-          files.set(file.path, new Blob([file.contents]));
+          files.set(file.path, file);
 
           continue;
         }
-      } else if (file.path.endsWith('.js.map')) {
+      } else if (fileExtension === '.map') {
         // The related JS file may not have been checked yet. To ensure that map files are not
         // missed, store any pending map files and check them after all output files.
         pendingMaps.push(file);
@@ -81,7 +85,7 @@ export class I18nInliner {
     // Check if any pending map files should be processed by checking if the parent JS file is present
     for (const file of pendingMaps) {
       if (files.has(file.path.slice(0, -4))) {
-        files.set(file.path, new Blob([file.contents]));
+        files.set(file.path, file);
       } else {
         this.#unmodifiedFiles.push(file);
       }
@@ -94,9 +98,15 @@ export class I18nInliner {
       maxThreads,
       // Extract options to ensure only the named options are serialized and sent to the worker
       workerData: {
-        missingTranslation: options.missingTranslation,
-        shouldOptimize: options.shouldOptimize,
-        files,
+        missingTranslation,
+        shouldOptimize,
+        // A Blob is an immutable data structure that allows sharing the data between workers
+        // without copying until the data is actually used within a Worker. This is useful here
+        // since each file may not actually be processed in each Worker and the Blob avoids
+        // unneeded repeat copying of potentially large JavaScript files.
+        files: new Map<string, Blob>(
+          Array.from(files, ([name, file]) => [name, new Blob([file.contents])]),
+        ),
       },
     });
   }
@@ -113,19 +123,54 @@ export class I18nInliner {
     locale: string,
     translation: Record<string, unknown> | undefined,
   ): Promise<{ outputFiles: BuildOutputFile[]; errors: string[]; warnings: string[] }> {
+    await this.initCache();
+
+    const { shouldOptimize, missingTranslation } = this.options;
     // Request inlining for each file that contains localize calls
     const requests = [];
-    for (const filename of this.#localizeFiles.keys()) {
+
+    let fileCacheKeyBase: Uint8Array | undefined;
+
+    for (const [filename, file] of this.#localizeFiles) {
+      let cacheKey: string | undefined;
       if (filename.endsWith('.map')) {
         continue;
       }
 
-      const fileRequest = this.#workerPool.run({
-        filename,
-        locale,
-        translation,
+      let cacheResultPromise = Promise.resolve(null);
+      if (this.#cache) {
+        fileCacheKeyBase ??= Buffer.from(
+          JSON.stringify({ locale, translation, missingTranslation, shouldOptimize }),
+          'utf-8',
+        );
+
+        // NOTE: If additional options are added, this may need to be updated.
+        // TODO: Consider xxhash or similar instead of SHA256
+        cacheKey = createHash('sha256')
+          .update(file.hash)
+          .update(filename)
+          .update(fileCacheKeyBase)
+          .digest('hex');
+
+        // Failure to get the value should not fail the transform
+        cacheResultPromise = this.#cache.get(cacheKey).catch(() => null);
+      }
+
+      const fileResult = cacheResultPromise.then(async (cachedResult) => {
+        if (cachedResult) {
+          return cachedResult;
+        }
+
+        const result = await this.#workerPool.run({ filename, locale, translation });
+        if (this.#cache && cacheKey) {
+          // Failure to set the value should not fail the transform
+          await this.#cache.set(cacheKey, result).catch(() => {});
+        }
+
+        return result;
       });
-      requests.push(fileRequest);
+
+      requests.push(fileResult);
     }
 
     // Wait for all file requests to complete
@@ -136,7 +181,7 @@ export class I18nInliner {
     const warnings: string[] = [];
     const outputFiles = [
       ...rawResults.flatMap(({ file, code, map, messages }) => {
-        const type = this.#fileToType.get(file);
+        const type = this.#localizeFiles.get(file)?.type;
         assert(type !== undefined, 'localized file should always have a type' + file);
 
         const resultFiles = [createOutputFile(file, code, type)];
@@ -170,5 +215,38 @@ export class I18nInliner {
    */
   close(): Promise<void> {
     return this.#workerPool.destroy();
+  }
+
+  /**
+   * Initializes the cache for storing translated bundles.
+   * If the cache is already initialized, it does nothing.
+   *
+   * @returns A promise that resolves once the cache initialization process is complete.
+   */
+  private async initCache(): Promise<void> {
+    if (this.#cache || this.#cacheInitFailed) {
+      return;
+    }
+
+    const { persistentCachePath } = this.options;
+    // Webcontainers currently do not support this persistent cache store.
+    if (!persistentCachePath || process.versions.webcontainer) {
+      return;
+    }
+
+    // Initialize a persistent cache for i18n transformations.
+    try {
+      const { LmbdCacheStore } = await import('./lmdb-cache-store');
+
+      this.#cache = new LmbdCacheStore(join(persistentCachePath, 'angular-i18n.db'));
+    } catch {
+      this.#cacheInitFailed = true;
+
+      // eslint-disable-next-line no-console
+      console.warn(
+        'Unable to initialize JavaScript cache storage.\n' +
+          'This will not affect the build output content but may result in slower builds.',
+      );
+    }
   }
 }
