@@ -7,7 +7,7 @@
  */
 
 import type { OnLoadResult, PartialMessage, PartialNote, ResolveResult } from 'esbuild';
-import { dirname, join, relative } from 'node:path';
+import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import type { CanonicalizeContext, CompileResult, Exception, Syntax } from 'sass';
 import type { SassWorkerImplementation } from '../../sass/sass-service';
@@ -170,7 +170,7 @@ async function compileString(
 
     return {
       loader: 'css',
-      contents: sourceMap ? `${css}\n${sourceMapToUrlComment(sourceMap, dirname(filePath))}` : css,
+      contents: sourceMap ? `${css}\n${sourceMapToUrlComment(sourceMap)}` : css,
       watchFiles: loadedUrls.map((url) => fileURLToPath(url)),
       warnings,
     };
@@ -199,14 +199,7 @@ async function compileString(
   }
 }
 
-function sourceMapToUrlComment(
-  sourceMap: Exclude<CompileResult['sourceMap'], undefined>,
-  root: string,
-): string {
-  // Remove `file` protocol from all sourcemap sources and adjust to be relative to the input file.
-  // This allows esbuild to correctly process the paths.
-  sourceMap.sources = sourceMap.sources.map((source) => relative(root, fileURLToPath(source)));
-
+function sourceMapToUrlComment(sourceMap: Exclude<CompileResult['sourceMap'], undefined>): string {
   const urlSourceMap = Buffer.from(JSON.stringify(sourceMap), 'utf-8').toString('base64');
 
   return `/*# sourceMappingURL=data:application/json;charset=utf-8;base64,${urlSourceMap} */`;
