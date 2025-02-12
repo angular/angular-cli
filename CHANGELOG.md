@@ -1,3 +1,48 @@
+<a name="19.2.0-next.2"></a>
+
+# 19.2.0-next.2 (2025-02-12)
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                                |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------- |
+| [aa0ae457b](https://github.com/angular/angular-cli/commit/aa0ae457b0f2fe9ad76b52aaca08044cfaf5eff9) | fix  | include default export for Express app                     |
+| [4a5b76a8e](https://github.com/angular/angular-cli/commit/4a5b76a8eee0bbbc4f08b568fee55ca22dff9927) | fix  | remove additional newline after standalone property        |
+| [c716ce152](https://github.com/angular/angular-cli/commit/c716ce15236ef9fe3f25b31a53a30b33c0a47c52) | fix  | skip ssr migration when `@angular/ssr` is not a dependency |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description             |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------- |
+| [ef7ea536f](https://github.com/angular/angular-cli/commit/ef7ea536feae128b9fabaa124cde2bdad3802cba) | feat | add aot option to jest  |
+| [523d539c6](https://github.com/angular/angular-cli/commit/523d539c6633ab223723162f425e0ef2b7b4ff71) | feat | add aot option to karma |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                                            |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------------------- |
+| [beefed839](https://github.com/angular/angular-cli/commit/beefed839f782216c9e4ee28673a95b6be8fb26c) | fix  | always provide Vite client helpers with development server             |
+| [5c1360179](https://github.com/angular/angular-cli/commit/5c1360179cec2f0fad6b2adb4a8e4d6930738976) | fix  | avoid pre-transform errors with Vite pre-bundling                      |
+| [be15b886c](https://github.com/angular/angular-cli/commit/be15b886c75d0ed9834aef38690d3169fcf16ef5) | fix  | configure Vite CORS option                                             |
+| [b24089ef8](https://github.com/angular/angular-cli/commit/b24089ef8630e028883b097d57c9246b6ef085ed) | fix  | ensure full rebuild after initial error build in watch mode            |
+| [880a50c50](https://github.com/angular/angular-cli/commit/880a50c50cafb3ab2e5713aed0c4a20be6648ced) | fix  | exclude unmodified files from logs with `--localize`                   |
+| [b55306989](https://github.com/angular/angular-cli/commit/b5530698962a0421e882f60e2975026cf348e795) | fix  | handle unlocalizable files correctly in localized prerender            |
+| [9a46be8d6](https://github.com/angular/angular-cli/commit/9a46be8d68fbc5acf88f43916985f781db79bcf1) | fix  | prevent fallback to serving main.js for unknown requests               |
+| [9b0d73087](https://github.com/angular/angular-cli/commit/9b0d730871a3a17a2c5ba04f5941a3d0e4fa5845) | fix  | prevent server manifest generation when no server features are enabled |
+| [964fb778b](https://github.com/angular/angular-cli/commit/964fb778b7d9e4811a6987eddc4f0a010bb713f6) | fix  | support per component updates of multi-component files                 |
+| [b50b6ee92](https://github.com/angular/angular-cli/commit/b50b6ee920165d8a2fbfdeb57376ca21aed4a91a) | perf | cache translated i18n bundles for faster builds                        |
+
+### @angular/ssr
+
+| Commit                                                                                              | Type | Description                                                          |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------------- |
+| [9726cd084](https://github.com/angular/angular-cli/commit/9726cd084b76fe605405d562a18d8af91d6657d8) | feat | Add support for route matchers with fine-grained render mode control |
+| [414736bc0](https://github.com/angular/angular-cli/commit/414736bc0f56ea3b5c1a32ed54da7da4c5c3320e) | fix  | accurately calculate content length for static pages with `\r\n`     |
+| [6448f80bf](https://github.com/angular/angular-cli/commit/6448f80bfb4a8900ca78857917314bd15fa4144d) | fix  | prioritize the first matching route over subsequent ones             |
+| [833dc986d](https://github.com/angular/angular-cli/commit/833dc986dbfd8902c0cf6ce9c8eeea9d759a25ce) | fix  | properly handle baseHref with protocol                               |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="19.1.7"></a>
 
 # 19.1.7 (2025-02-12)
