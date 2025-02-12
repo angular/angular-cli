@@ -7,8 +7,8 @@
  */
 
 import { normalize, virtualFs } from '@angular-devkit/core';
-import { HostSink } from '@angular-devkit/schematics';
 import { HostCreateTree, HostTree } from '../tree/host-tree';
+import { HostSink } from './host';
 
 describe('FileSystemSink', () => {
   it('works', (done) => {

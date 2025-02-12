@@ -17,7 +17,6 @@ import {
 import { dirname, join } from 'node:path/posix';
 import ts from '../third_party/github.com/Microsoft/TypeScript/lib/typescript';
 import {
-  addImportToModule,
   addSymbolToNgModuleMetadata,
   findNode,
   findNodes,
@@ -140,19 +139,6 @@ function validateProject(mainPath: string): Rule {
   };
 }
 
-function addRouterModule(mainPath: string): Rule {
-  return (host: Tree) => {
-    const modulePath = getAppModulePath(host, mainPath);
-    const moduleSource = getSourceFile(host, modulePath);
-    const changes = addImportToModule(moduleSource, modulePath, 'RouterModule', '@angular/router');
-    const recorder = host.beginUpdate(modulePath);
-    applyToUpdateRecorder(recorder, changes);
-    host.commitUpdate(recorder);
-
-    return host;
-  };
-}
-
 function getMetadataProperty(metadata: ts.Node, propertyName: string): ts.PropertyAssignment {
   const properties = (metadata as ts.ObjectLiteralExpression).properties;
   const property = properties.filter(ts.isPropertyAssignment).filter((prop) => {
@@ -265,7 +251,7 @@ function addStandaloneServerRoute(options: AppShellOptions): Rule {
       throw new SchematicsException(`Cannot find "${configFilePath}".`);
     }
 
-    let recorder = host.beginUpdate(configFilePath);
+    const recorder = host.beginUpdate(configFilePath);
     let configSourceFile = getSourceFile(host, configFilePath);
     if (!isImported(configSourceFile, 'ROUTES', '@angular/router')) {
       const routesChange = insertImport(
@@ -295,49 +281,30 @@ function addStandaloneServerRoute(options: AppShellOptions): Rule {
     const updatedProvidersString = [
       ...providersLiteral.elements.map((element) => '    ' + element.getText()),
       `    {
-      provide: ROUTES,
-      multi: true,
-      useValue: [{
-        path: '${APP_SHELL_ROUTE}',
-        component: AppShellComponent
-      }]
-    }\n  `,
+        provide: ROUTES,
+        multi: true,
+        useValue: [{
+          path: '${APP_SHELL_ROUTE}',
+          component: AppShellComponent
+        }]
+      }\n  `,
     ];
 
     recorder.insertRight(providersLiteral.getStart(), `[\n${updatedProvidersString.join(',\n')}]`);
 
-    if (options.serverRouting) {
-      host.commitUpdate(recorder);
-      configSourceFile = getSourceFile(host, configFilePath);
-      const functionCall = findNodes(configSourceFile, ts.isCallExpression).find(
-        (n) =>
-          ts.isIdentifier(n.expression) && n.expression.getText() === 'provideServerRoutesConfig',
-      );
-
-      if (!functionCall) {
-        throw new SchematicsException(
-          `Cannot find the "provideServerRoutesConfig" function call in "${configFilePath}".`,
-        );
-      }
-
-      recorder = host.beginUpdate(configFilePath);
-      recorder.insertLeft(functionCall.end - 1, `, { appShellRoute: '${APP_SHELL_ROUTE}' }`);
-    }
-
-    // Add AppShellComponent import
-    const appShellImportChange = insertImport(
-      configSourceFile,
-      configFilePath,
-      'AppShellComponent',
-      './app-shell/app-shell.component',
-    );
-
-    applyToUpdateRecorder(recorder, [appShellImportChange]);
+    applyToUpdateRecorder(recorder, [
+      insertImport(
+        configSourceFile,
+        configFilePath,
+        'AppShellComponent',
+        './app-shell/app-shell.component',
+      ),
+    ]);
     host.commitUpdate(recorder);
   };
 }
 
-function addServerRoutingConfig(options: AppShellOptions): Rule {
+function addServerRoutingConfig(options: AppShellOptions, isStandalone: boolean): Rule {
   return async (host: Tree) => {
     const workspace = await getWorkspace(host);
     const project = workspace.projects.get(options.project);
@@ -345,39 +312,43 @@ function addServerRoutingConfig(options: AppShellOptions): Rule {
       throw new SchematicsException(`Project name "${options.project}" doesn't not exist.`);
     }
 
-    const configFilePath = join(project.sourceRoot ?? 'src', 'app/app.routes.server.ts');
-    if (!host.exists(configFilePath)) {
+    const configFilePath = isStandalone
+      ? join(project.sourceRoot ?? 'src', 'app/app.config.server.ts')
+      : getServerModulePath(host, project.sourceRoot || 'src', 'main.server.ts');
+
+    if (!configFilePath || !host.exists(configFilePath)) {
       throw new SchematicsException(`Cannot find "${configFilePath}".`);
     }
 
-    const sourceFile = getSourceFile(host, configFilePath);
-    const nodes = getSourceNodes(sourceFile);
+    let recorder = host.beginUpdate(configFilePath);
+    const configSourceFile = getSourceFile(host, configFilePath);
+    const functionCall = findNodes(
+      configSourceFile,
+      ts.isCallExpression,
+      /** max */ undefined,
+      /** recursive */ true,
+    ).find(
+      (n) => ts.isIdentifier(n.expression) && n.expression.getText() === 'provideServerRouting',
+    );
 
-    // Find the serverRoutes variable declaration
-    const serverRoutesNode = nodes.find(
-      (node) =>
-        ts.isVariableDeclaration(node) &&
-        node.initializer &&
-        ts.isArrayLiteralExpression(node.initializer) &&
-        node.type &&
-        ts.isArrayTypeNode(node.type) &&
-        node.type.getText().includes('ServerRoute'),
-    ) as ts.VariableDeclaration | undefined;
-
-    if (!serverRoutesNode) {
+    if (!functionCall) {
       throw new SchematicsException(
-        `Cannot find the "ServerRoute" configuration in "${configFilePath}".`,
+        `Cannot find the "provideServerRouting" function call in "${configFilePath}".`,
       );
     }
-    const recorder = host.beginUpdate(configFilePath);
-    const arrayLiteral = serverRoutesNode.initializer as ts.ArrayLiteralExpression;
-    const firstElementPosition =
-      arrayLiteral.elements[0]?.getStart() ?? arrayLiteral.getStart() + 1;
-    const newRouteString = `{
-    path: '${APP_SHELL_ROUTE}',
-    renderMode: RenderMode.AppShell
-  },\n`;
-    recorder.insertLeft(firstElementPosition, newRouteString);
+
+    recorder = host.beginUpdate(configFilePath);
+    recorder.insertLeft(functionCall.end - 1, `, withAppShell(AppShellComponent)`);
+
+    applyToUpdateRecorder(recorder, [
+      insertImport(configSourceFile, configFilePath, 'withAppShell', '@angular/ssr'),
+      insertImport(
+        configSourceFile,
+        configFilePath,
+        'AppShellComponent',
+        './app-shell/app-shell.component',
+      ),
+    ]);
 
     host.commitUpdate(recorder);
   };
@@ -391,10 +362,14 @@ export default function (options: AppShellOptions): Rule {
     return chain([
       validateProject(browserEntryPoint),
       schematic('server', options),
-      ...(isStandalone
-        ? [addStandaloneServerRoute(options)]
-        : [addRouterModule(browserEntryPoint), addServerRoutes(options)]),
-      options.serverRouting ? noop() : addAppShellConfigToWorkspace(options),
+      ...(options.serverRouting
+        ? [noop()]
+        : isStandalone
+          ? [addStandaloneServerRoute(options)]
+          : [addServerRoutes(options)]),
+      options.serverRouting
+        ? addServerRoutingConfig(options, isStandalone)
+        : addAppShellConfigToWorkspace(options),
       schematic('component', {
         name: 'app-shell',
         module: 'app.module.server.ts',

@@ -16,6 +16,7 @@ import { assertIsError } from '../error';
 import { urlJoin } from '../url';
 import { WorkerPool } from '../worker-pool';
 import { IMPORT_EXEC_ARGV } from './esm-in-memory-loader/utils';
+import { SERVER_APP_MANIFEST_FILENAME } from './manifest';
 import {
   RouteRenderMode,
   RoutersExtractorWorkerResult,
@@ -156,6 +157,16 @@ export async function prerenderPages(
     };
   }
 
+  // Add the extracted routes to the manifest file.
+  // We could re-generate it from the start, but that would require a number of options to be passed down.
+  const manifest = outputFilesForWorker[SERVER_APP_MANIFEST_FILENAME];
+  if (manifest) {
+    outputFilesForWorker[SERVER_APP_MANIFEST_FILENAME] = manifest.replace(
+      'routes: undefined,',
+      `routes: ${JSON.stringify(serializableRouteTreeNodeForPrerender, undefined, 2)},`,
+    );
+  }
+
   // Render routes
   const { errors: renderingErrors, output } = await renderPages(
     baseHref,
@@ -165,7 +176,6 @@ export async function prerenderPages(
     workspaceRoot,
     outputFilesForWorker,
     assetsReversed,
-    appShellOptions,
     outputMode,
     appShellRoute ?? appShellOptions?.route,
   );
@@ -188,7 +198,6 @@ async function renderPages(
   workspaceRoot: string,
   outputFilesForWorker: Record<string, string>,
   assetFilesForWorker: Record<string, string>,
-  appShellOptions: AppShellOptions | undefined,
   outputMode: OutputMode | undefined,
   appShellRoute: string | undefined,
 ): Promise<{
@@ -219,12 +228,14 @@ async function renderPages(
   try {
     const renderingPromises: Promise<void>[] = [];
     const appShellRouteWithLeadingSlash = appShellRoute && addLeadingSlash(appShellRoute);
-    const baseHrefWithLeadingSlash = addLeadingSlash(baseHref);
+    const baseHrefPathnameWithLeadingSlash = new URL(baseHref, 'http://localhost').pathname;
 
-    for (const { route, redirectTo, renderMode } of serializableRouteTreeNode) {
+    for (const { route, redirectTo } of serializableRouteTreeNode) {
       // Remove the base href from the file output path.
-      const routeWithoutBaseHref = addTrailingSlash(route).startsWith(baseHrefWithLeadingSlash)
-        ? addLeadingSlash(route.slice(baseHrefWithLeadingSlash.length - 1))
+      const routeWithoutBaseHref = addTrailingSlash(route).startsWith(
+        baseHrefPathnameWithLeadingSlash,
+      )
+        ? addLeadingSlash(route.slice(baseHrefPathnameWithLeadingSlash.length))
         : route;
 
       const outPath = posix.join(removeLeadingSlash(routeWithoutBaseHref), 'index.html');

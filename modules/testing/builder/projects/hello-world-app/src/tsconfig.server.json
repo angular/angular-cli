@@ -3,7 +3,7 @@
   "compilerOptions": {
     "outDir": "../dist-server",
     "baseUrl": "./",
-    "types": ["@angular/localize"]
+    "types": ["@angular/localize", "node"]
   },
   "files": [
     "main.server.ts"

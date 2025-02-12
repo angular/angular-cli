@@ -206,6 +206,8 @@ export interface CreateFileAction extends ActionBase {
 export class DelegateTree implements Tree_2 {
     constructor(_other: Tree_2);
     // (undocumented)
+    [x: symbol]: () => this;
+    // (undocumented)
     get actions(): Action[];
     // (undocumented)
     apply(action: Action, strategy?: MergeStrategy): void;
@@ -518,6 +520,8 @@ export class HostSink extends SimpleSinkBase {
 export class HostTree implements Tree_2 {
     constructor(_backend?: virtualFs.ReadonlyHost<{}>);
     // (undocumented)
+    [x: symbol]: () => this;
+    // (undocumented)
     get actions(): Action[];
     // (undocumented)
     apply(action: Action, strategy?: MergeStrategy): void;
@@ -718,7 +722,7 @@ interface RequiredWorkflowExecutionContext {
 }
 
 // @public (undocumented)
-export type Rule = (tree: Tree_2, context: SchematicContext) => Tree_2 | Observable<Tree_2> | Rule | Promise<void | Rule> | void;
+export type Rule = (tree: Tree_2, context: SchematicContext) => Tree_2 | Observable<Tree_2> | Rule | Promise<void | Tree_2 | Rule> | void;
 
 // @public
 export type RuleFactory<T extends object> = (options: T) => Rule;

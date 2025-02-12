@@ -6,27 +6,22 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { SchematicEngine } from '@angular-devkit/schematics';
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
+import { SchematicEngine } from '../index';
 import { NodeModulesEngineHost } from './node-module-engine-host';
 
 const TMP_DIR = process.env['TEST_TMPDIR'] || os.tmpdir();
 
 describe('NodeModulesEngineHost', () => {
   let tmpDir!: string;
-  let previousDir!: string;
 
   beforeEach(() => {
     tmpDir = fs.mkdtempSync(
       path.join(TMP_DIR, 'angular-devkit-schematics-tools-node-module-engine-host'),
     );
-    previousDir = process.cwd();
-    process.chdir(tmpDir);
   });
-
-  afterEach(() => process.chdir(previousDir));
 
   /** Creates a fake NPM module that can be used to test the node module engine host. */
   function createFakeNpmModule() {
@@ -47,19 +42,11 @@ describe('NodeModulesEngineHost', () => {
   it('should properly create collections with explicit collection path', () => {
     createFakeNpmModule();
 
-    const engineHost = new NodeModulesEngineHost();
+    const engineHost = new NodeModulesEngineHost([tmpDir]);
     const engine = new SchematicEngine(engineHost);
 
-    // Under Bazel 'require.resolve' is patched to use Bazel resolutions from the MANIFEST FILES.
-    // Adding a temporary file won't be enough to make Bazel aware of this file.
-    // We provide the full path here just to verify that the underlying logic works
-    let prefix = '';
-    if (process.env['BAZEL_TARGET']) {
-      prefix = path.join(process.cwd(), 'node_modules');
-    }
-
     expect(() => {
-      engine.createCollection(path.join(prefix, '@angular/core', './schematics/migrations.json'));
+      engine.createCollection(path.join('@angular/core', './schematics/migrations.json'));
     }).not.toThrow();
   });
 });

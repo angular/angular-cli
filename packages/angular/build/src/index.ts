@@ -6,11 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-export {
-  buildApplication,
-  type ApplicationBuilderOptions,
-  type ApplicationBuilderOutput,
-} from './builders/application';
+export { buildApplication, type ApplicationBuilderOptions } from './builders/application';
 export type { ApplicationBuilderExtensions } from './builders/application/options';
 export { type BuildOutputFile, BuildOutputFileType } from './tools/esbuild/bundler-context';
 export type { BuildOutputAsset } from './tools/esbuild/bundler-execution-result';
@@ -25,3 +21,8 @@ export {
   execute as executeExtractI18nBuilder,
   type ExtractI18nBuilderOptions,
 } from './builders/extract-i18n';
+
+export {
+  execute as executeNgPackagrBuilder,
+  type NgPackagrBuilderOptions,
+} from './builders/ng-packagr';

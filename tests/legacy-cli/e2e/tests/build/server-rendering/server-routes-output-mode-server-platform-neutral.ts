@@ -11,6 +11,7 @@ import {
 import { updateJsonFile, useSha } from '../../../utils/project';
 import { getGlobalVariable } from '../../../utils/env';
 import { findFreePort } from '../../../utils/network';
+import { readFile } from 'node:fs/promises';
 
 export default async function () {
   assert(
@@ -67,6 +68,10 @@ export default async function () {
           renderMode: RenderMode.Prerender,
         },
       ];
+    `,
+    'src/app/app.config.ts': `
+      import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
+      ${(await readFile('src/app/app.config.ts', 'utf8')).replace('provideRouter(routes),', 'provideAnimationsAsync(), provideRouter(routes),')}
     `,
     'src/server.ts': `
       import { AngularAppEngine, createRequestHandler } from '@angular/ssr';

@@ -67,12 +67,6 @@ export function execute(
           );
         }
 
-        if (options.allowedHosts?.length) {
-          context.logger.warn(
-            `The "allowedHosts" option will not be used because it is not supported by the "${builderName}" builder.`,
-          );
-        }
-
         if (options.publicHost) {
           context.logger.warn(
             `The "publicHost" option will not be used because it is not supported by the "${builderName}" builder.`,
@@ -88,12 +82,22 @@ export function execute(
         // New build system defaults hmr option to the value of liveReload
         normalizedOptions.hmr ??= normalizedOptions.liveReload;
 
+        // New build system uses Vite's allowedHost option convention of true for disabling host checks
+        if (normalizedOptions.disableHostCheck) {
+          (normalizedOptions as unknown as { allowedHosts: true }).allowedHosts = true;
+        } else {
+          normalizedOptions.allowedHosts ??= [];
+        }
+
         return defer(() =>
           Promise.all([import('@angular/build/private'), import('../browser-esbuild')]),
         ).pipe(
           switchMap(([{ serveWithVite, buildApplicationInternal }, { convertBrowserOptions }]) =>
             serveWithVite(
-              normalizedOptions as typeof normalizedOptions & { hmr: boolean },
+              normalizedOptions as typeof normalizedOptions & {
+                hmr: boolean;
+                allowedHosts: true | string[];
+              },
               builderName,
               (options, context, codePlugins) => {
                 return builderName === '@angular-devkit/build-angular:browser-esbuild'

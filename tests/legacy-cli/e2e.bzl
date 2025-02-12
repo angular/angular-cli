@@ -50,6 +50,8 @@ WEBPACK_IGNORE_TESTS = [
     "tests/build/prerender/error-with-sourcemaps.js",
     "tests/build/server-rendering/server-routes-*",
     "tests/build/wasm-esm.js",
+    "tests/build/auto-csp*",
+    "tests/build/incremental-watch.js",
 ]
 
 def _to_glob(patterns):

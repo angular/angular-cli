@@ -275,18 +275,42 @@
                 },
                 {
                   "type": "object",
-                  "description": "Localization options to use for the source locale",
+                  "description": "Localization options to use for the source locale.",
                   "properties": {
                     "code": {
                       "type": "string",
-                      "description": "Specifies the locale code of the source locale",
+                      "description": "Specifies the locale code of the source locale.",
                       "pattern": "^[a-zA-Z]{2,3}(-[a-zA-Z]{4})?(-([a-zA-Z]{2}|[0-9]{3}))?(-[a-zA-Z]{5,8})?(-x(-[a-zA-Z0-9]{1,8})+)?$"
                     },
                     "baseHref": {
                       "type": "string",
-                      "description": "HTML base HREF to use for the locale (defaults to the locale code)"
+                      "description": "Specifies the HTML base HREF for the locale. Defaults to the locale code if not provided."
+                    },
+                    "subPath": {
+                      "type": "string",
+                      "description": "Defines the subpath for accessing this locale. It serves as the HTML base HREF and the directory name for the output. Defaults to the locale code if not specified.",
+                      "pattern": "^[\\w-]*$"
                     }
                   },
+                  "anyOf": [
+                    {
+                      "required": ["subPath"],
+                      "not": {
+                        "required": ["baseHref"]
+                      }
+                    },
+                    {
+                      "required": ["baseHref"],
+                      "not": {
+                        "required": ["subPath"]
+                      }
+                    },
+                    {
+                      "not": {
+                        "required": ["baseHref", "subPath"]
+                      }
+                    }
+                  ],
                   "additionalProperties": false
                 }
               ]
@@ -299,11 +323,11 @@
                   "oneOf": [
                     {
                       "type": "string",
-                      "description": "Localization file to use for i18n"
+                      "description": "Localization file to use for i18n."
                     },
                     {
                       "type": "array",
-                      "description": "Localization files to use for i18n",
+                      "description": "Localization files to use for i18n.",
                       "items": {
                         "type": "string",
                         "uniqueItems": true
@@ -311,17 +335,17 @@
                     },
                     {
                       "type": "object",
-                      "description": "Localization options to use for the locale",
+                      "description": "Localization options to use for the locale.",
                       "properties": {
                         "translation": {
                           "oneOf": [
                             {
                               "type": "string",
-                              "description": "Localization file to use for i18n"
+                              "description": "Localization file to use for i18n."
                             },
                             {
                               "type": "array",
-                              "description": "Localization files to use for i18n",
+                              "description": "Localization files to use for i18n.",
                               "items": {
                                 "type": "string",
                                 "uniqueItems": true
@@ -331,9 +355,33 @@
                         },
                         "baseHref": {
                           "type": "string",
-                          "description": "HTML base HREF to use for the locale (defaults to the locale code)"
+                          "description": "Specifies the HTML base HREF for the locale. Defaults to the locale code if not provided."
+                        },
+                        "subPath": {
+                          "type": "string",
+                          "description": "Defines the URL segment for accessing this locale. It serves as the HTML base HREF and the directory name for the output. Defaults to the locale code if not specified.",
+                          "pattern": "^[\\w-]*$"
                         }
                       },
+                      "anyOf": [
+                        {
+                          "required": ["subPath"],
+                          "not": {
+                            "required": ["baseHref"]
+                          }
+                        },
+                        {
+                          "required": ["baseHref"],
+                          "not": {
+                            "required": ["subPath"]
+                          }
+                        },
+                        {
+                          "not": {
+                            "required": ["baseHref", "subPath"]
+                          }
+                        }
+                      ],
                       "additionalProperties": false
                     }
                   ]
@@ -357,6 +405,7 @@
                       "@angular/build:application",
                       "@angular/build:dev-server",
                       "@angular/build:extract-i18n",
+                      "@angular/build:ng-packagr",
                       "@angular-devkit/build-angular:application",
                       "@angular-devkit/build-angular:app-shell",
                       "@angular-devkit/build-angular:browser",
@@ -739,6 +788,28 @@
                   "type": "object",
                   "additionalProperties": {
                     "$ref": "../../../../angular_devkit/build_angular/src/builders/ng-packagr/schema.json"
+                  }
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "builder": {
+                  "const": "@angular/build:ng-packagr"
+                },
+                "defaultConfiguration": {
+                  "type": "string",
+                  "description": "A default named configuration to use when a target configuration is not provided."
+                },
+                "options": {
+                  "$ref": "../../../../angular/build/src/builders/ng-packagr/schema.json"
+                },
+                "configurations": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "$ref": "../../../../angular/build/src/builders/ng-packagr/schema.json"
                   }
                 }
               }

@@ -231,7 +231,7 @@ function generateInitHelper(streaming: boolean, wasmContents: Uint8Array) {
   let resultContents;
   if (streaming) {
     const fetchOptions = {
-      integrity: 'sha256-' + createHash('sha-256').update(wasmContents).digest('base64'),
+      integrity: 'sha256-' + createHash('sha256').update(wasmContents).digest('base64'),
     };
     const fetchContents = `fetch(new URL(wasmPath, import.meta.url), ${JSON.stringify(fetchOptions)})`;
     resultContents = `await WebAssembly.instantiateStreaming(${fetchContents}, imports)`;

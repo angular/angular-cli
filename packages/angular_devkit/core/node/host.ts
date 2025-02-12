@@ -71,7 +71,7 @@ export class NodeJsAsyncHost implements virtualFs.Host<Stats> {
 
   read(path: Path): Observable<virtualFs.FileBuffer> {
     return observableFrom(fsPromises.readFile(getSystemPath(path))).pipe(
-      map((buffer) => new Uint8Array(buffer).buffer as virtualFs.FileBuffer),
+      map((buffer) => new Uint8Array(buffer).buffer),
     );
   }
 
@@ -169,7 +169,7 @@ export class NodeJsSyncHost implements virtualFs.Host<Stats> {
     return new Observable((obs) => {
       const buffer = readFileSync(getSystemPath(path));
 
-      obs.next(new Uint8Array(buffer).buffer as virtualFs.FileBuffer);
+      obs.next(new Uint8Array(buffer).buffer);
       obs.complete();
     });
   }

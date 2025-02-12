@@ -1,0 +1,12 @@
+load("//tools:interop.bzl", "ts_project")
+
+package(default_visibility = ["//visibility:public"])
+
+ts_project(
+    name = "private",
+    srcs = ["index.ts"],
+    module_name = "@angular/build/private",
+    deps = [
+        "//packages/angular/build:build_rjs",
+    ],
+)

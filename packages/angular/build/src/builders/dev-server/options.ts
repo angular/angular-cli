@@ -103,6 +103,7 @@ export async function normalizeOptions(
     sslCert,
     sslKey,
     prebundle,
+    allowedHosts,
   } = options;
 
   // Return all the normalized options
@@ -128,5 +129,6 @@ export async function normalizeOptions(
     // Prebundling defaults to true but requires caching to function
     prebundle: cacheOptions.enabled && !optimization.scripts && prebundle,
     inspect,
+    allowedHosts: allowedHosts ? allowedHosts : [],
   };
 }

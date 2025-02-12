@@ -1,7 +1,7 @@
 import { join } from 'node:path';
 import { existsSync } from 'node:fs';
 import assert from 'node:assert';
-import { expectFileToMatch, writeFile } from '../../../utils/fs';
+import { expectFileToMatch, readFile, replaceInFile, writeFile } from '../../../utils/fs';
 import { execAndWaitForOutputToMatch, ng, noSilentNg, silentNg } from '../../../utils/process';
 import { installWorkspacePackages, uninstallPackage } from '../../../utils/packages';
 import { useSha } from '../../../utils/project';
@@ -19,6 +19,12 @@ export default async function () {
   await ng('add', '@angular/ssr', '--server-routing', '--skip-confirmation', '--skip-install');
   await useSha();
   await installWorkspacePackages();
+
+  // Test scenario to verify that the content length, including \r\n, is accurate
+  await replaceInFile('src/app/app.component.ts', "title = '", "title = 'Title\\r\\n");
+
+  // Ensure text has been updated.
+  assert.match(await readFile('src/app/app.component.ts'), /title = 'Title/);
 
   // Add routes
   await writeFile(
@@ -165,6 +171,7 @@ export default async function () {
 
   const port = await spawnServer();
   for (const [pathname, { content, headers, serverContext }] of Object.entries(responseExpects)) {
+    // NOTE: A global 'UND_ERR_SOCKET' may occur due to an incorrect Content-Length header value.
     const res = await fetch(`http://localhost:${port}${pathname}`);
     const text = await res.text();
 

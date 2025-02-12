@@ -13,6 +13,7 @@ import { AngularMemoryOutputFiles, pathnameWithoutBasePath } from '../utils';
 export function createAngularIndexHtmlMiddleware(
   server: ViteDevServer,
   outputFiles: AngularMemoryOutputFiles,
+  resetComponentUpdates: () => void,
   indexHtmlTransformer: ((content: string) => Promise<string>) | undefined,
 ): Connect.NextHandleFunction {
   return function angularIndexHtmlMiddleware(req, res, next) {
@@ -38,6 +39,9 @@ export function createAngularIndexHtmlMiddleware(
 
       return;
     }
+
+    // A request for the index indicates a full page reload request.
+    resetComponentUpdates();
 
     server
       .transformIndexHtml(req.url, Buffer.from(rawHtml).toString('utf-8'))

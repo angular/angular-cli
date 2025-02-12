@@ -4,7 +4,7 @@ import { <%= guardType %> } from '@angular/router';
 import { <%= camelize(name) %>Guard } from './<%= dasherize(name) %>.guard';
 
 describe('<%= camelize(name) %>Guard', () => {
-  const executeGuard: <%= guardType %> = (...guardParameters) => 
+  const executeGuard: <%= guardType %><% if (guardType === 'CanDeactivateFn') { %><unknown><% } %> = (...guardParameters) => 
       TestBed.runInInjectionContext(() => <%= camelize(name) %>Guard(...guardParameters));
 
   beforeEach(() => {

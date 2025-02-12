@@ -52,7 +52,7 @@ const IGNORED_STDOUT_MESSAGES = [
   'Angular is running in development mode. Call enableProdMode() to enable production mode.',
 ];
 
-export type SSRDevServerBuilderOptions = Schema & json.JsonObject;
+export type SSRDevServerBuilderOptions = Schema;
 export type SSRDevServerBuilderOutput = BuilderOutput & {
   baseUrl?: string;
   port?: string;
@@ -62,6 +62,20 @@ export function execute(
   options: SSRDevServerBuilderOptions,
   context: BuilderContext,
 ): Observable<SSRDevServerBuilderOutput> {
+  let browserSync: typeof import('browser-sync');
+  try {
+    browserSync = require('browser-sync');
+  } catch {
+    return of({
+      success: false,
+      error:
+        // eslint-disable-next-line max-len
+        'Required dependency `browser-sync` is not installed, most likely you need to run `npm install browser-sync --save-dev` in your project.',
+    });
+  }
+
+  const bsInstance = browserSync.create();
+
   const browserTarget = targetFromTargetString(options.browserTarget);
   const serverTarget = targetFromTargetString(options.serverTarget);
   const getBaseUrl = (bs: BrowserSyncInstance) =>
@@ -79,19 +93,6 @@ export function execute(
     progress: options.progress,
     verbose: options.verbose,
   } as json.JsonObject);
-
-  let browserSync: typeof import('browser-sync');
-  try {
-    browserSync = require('browser-sync');
-  } catch {
-    return of({
-      success: false,
-      error:
-        '"browser-sync" is not installed, most likely you need to run `npm install browser-sync --save-dev` in your project.',
-    });
-  }
-
-  const bsInstance = browserSync.create();
 
   context.logger.error(tags.stripIndents`
   ****************************************************************************************

@@ -98,7 +98,7 @@ describe('Browser Builder lazy modules', () => {
       const run = await architect.scheduleTarget(target, overrides);
       await run.output
         .pipe(
-          debounceTime(1500),
+          debounceTime(1000),
           tap((buildEvent) => {
             buildNumber++;
             switch (buildNumber) {
@@ -139,7 +139,7 @@ describe('Browser Builder lazy modules', () => {
     host.replaceInFile('src/tsconfig.app.json', '"main.ts"', `"main.ts","lazy-module.ts"`);
 
     const { files } = await browserBuild(architect, host, target);
-    expect(files['common.js']).toBeDefined();
+    expect(files['src_lazy-module_ts.js']).toBeDefined();
   });
 
   it(`supports making a common bundle for shared lazy modules`, async () => {
@@ -149,7 +149,12 @@ describe('Browser Builder lazy modules', () => {
       'src/main.ts': `import('./one'); import('./two');`,
     });
 
-    const { files } = await browserBuild(architect, host, target);
+    const { files } = await browserBuild(architect, host, target, {
+      // Preserve symlinks to reliably verify the chunk names. When symlinks
+      // would be dereferenced, the `@angular/common` file can originate from a
+      // less predictable path in e.g. node_modules/.pnpm/<...>`.
+      preserveSymlinks: true,
+    });
     expect(files['src_one_ts.js']).toBeDefined();
     expect(files['src_two_ts.js']).toBeDefined();
     expect(files['default-node_modules_angular_common_fesm2022_http_mjs.js']).toBeDefined();

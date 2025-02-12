@@ -17,8 +17,17 @@ import {
   ensureSourceFileVersions,
 } from '../angular-host';
 import { replaceBootstrap } from '../transformers/jit-bootstrap-transformer';
+import { lazyRoutesTransformer } from '../transformers/lazy-routes-transformer';
 import { createWorkerTransformer } from '../transformers/web-worker-transformer';
 import { AngularCompilation, DiagnosticModes, EmitFileResult } from './angular-compilation';
+import { collectHmrCandidates } from './hmr-candidates';
+
+/**
+ * The modified files count limit for performing component HMR analysis.
+ * Performing content analysis for a large amount of files can result in longer rebuild times
+ * than a full rebuild would entail.
+ */
+const HMR_MODIFIED_FILE_LIMIT = 32;
 
 class AngularCompilationState {
   constructor(
@@ -38,6 +47,10 @@ class AngularCompilationState {
 
 export class AotCompilation extends AngularCompilation {
   #state?: AngularCompilationState;
+
+  constructor(private readonly browserOnlyBuild: boolean) {
+    super();
+  }
 
   async initialize(
     tsconfig: string,
@@ -66,8 +79,39 @@ export class AotCompilation extends AngularCompilation {
       hostOptions.externalStylesheets ??= new Map();
     }
 
+    // Reuse the package.json cache from the previous compilation
+    const packageJsonCache = this.#state?.compilerHost
+      .getModuleResolutionCache?.()
+      ?.getPackageJsonInfoCache();
+
+    const useHmr =
+      compilerOptions['_enableHmr'] &&
+      hostOptions.modifiedFiles &&
+      hostOptions.modifiedFiles.size <= HMR_MODIFIED_FILE_LIMIT;
+
+    let staleSourceFiles;
+    let clearPackageJsonCache = false;
+    if (hostOptions.modifiedFiles && this.#state) {
+      for (const modifiedFile of hostOptions.modifiedFiles) {
+        // Clear package.json cache if a node modules file was modified
+        if (!clearPackageJsonCache && modifiedFile.includes('node_modules')) {
+          clearPackageJsonCache = true;
+          packageJsonCache?.clear();
+        }
+
+        // Collect stale source files for HMR analysis of inline component resources
+        if (useHmr) {
+          const sourceFile = this.#state.typeScriptProgram.getSourceFile(modifiedFile);
+          if (sourceFile) {
+            staleSourceFiles ??= new Map<string, ts.SourceFile>();
+            staleSourceFiles.set(modifiedFile, sourceFile);
+          }
+        }
+      }
+    }
+
     // Create Angular compiler host
-    const host = createAngularCompilerHost(ts, compilerOptions, hostOptions);
+    const host = createAngularCompilerHost(ts, compilerOptions, hostOptions, packageJsonCache);
 
     // Create the Angular specific program that contains the Angular compiler
     const angularProgram = profileSync(
@@ -95,14 +139,12 @@ export class AotCompilation extends AngularCompilation {
     await profileAsync('NG_ANALYZE_PROGRAM', () => angularCompiler.analyzeAsync());
 
     let templateUpdates;
-    if (
-      compilerOptions['_enableHmr'] &&
-      hostOptions.modifiedFiles &&
-      hasOnlyTemplates(hostOptions.modifiedFiles)
-    ) {
-      const componentNodes = [...hostOptions.modifiedFiles].flatMap((file) => [
-        ...angularCompiler.getComponentsWithTemplateFile(file),
-      ]);
+    if (useHmr && hostOptions.modifiedFiles && this.#state) {
+      const componentNodes = collectHmrCandidates(
+        hostOptions.modifiedFiles,
+        angularProgram,
+        staleSourceFiles,
+      );
 
       for (const node of componentNodes) {
         if (!ts.isClassDeclaration(node)) {
@@ -113,11 +155,16 @@ export class AotCompilation extends AngularCompilation {
         if (relativePath.startsWith('..')) {
           relativePath = componentFilename;
         }
+        relativePath = relativePath.replaceAll('\\', '/');
         const updateId = encodeURIComponent(
           `${host.getCanonicalFileName(relativePath)}@${node.name?.text}`,
         );
         const updateText = angularCompiler.emitHmrUpdateModule(node);
-        if (updateText === null) {
+        // If compiler cannot generate an update for the component, prevent template updates.
+        // Also prevent template updates if $localize is directly present which also currently
+        // prevents a template update at runtime.
+        // TODO: Support localized template update modules and remove this check.
+        if (updateText === null || updateText.includes('$localize')) {
           // Build is needed if a template cannot be updated
           templateUpdates = undefined;
           break;
@@ -277,8 +324,12 @@ export class AotCompilation extends AngularCompilation {
     transformers.before ??= [];
     transformers.before.push(
       replaceBootstrap(() => typeScriptProgram.getProgram().getTypeChecker()),
+      webWorkerTransform,
     );
-    transformers.before.push(webWorkerTransform);
+
+    if (!this.browserOnlyBuild) {
+      transformers.before.push(lazyRoutesTransformer(compilerOptions, compilerHost));
+    }
 
     // Emit is handled in write file callback when using TypeScript
     if (useTypeScriptTranspilation) {
@@ -421,17 +472,4 @@ function findAffectedFiles(
   }
 
   return affectedFiles;
-}
-
-function hasOnlyTemplates(modifiedFiles: Set<string>): boolean {
-  for (const file of modifiedFiles) {
-    const lowerFile = file.toLowerCase();
-    if (lowerFile.endsWith('.html') || lowerFile.endsWith('.svg')) {
-      continue;
-    }
-
-    return false;
-  }
-
-  return true;
 }

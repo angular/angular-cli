@@ -3,34 +3,41 @@
 # Use of this source code is governed by an MIT-style license that can be
 # found in the LICENSE file at https://angular.dev/license
 
-load("@npm//@bazel/jasmine:index.bzl", "jasmine_node_test")
-load("//tools:defaults.bzl", "pkg_npm", "ts_library")
+load("@npm2//:defs.bzl", "npm_link_all_packages")
+load("//tools:defaults2.bzl", "jasmine_test", "npm_package", "ts_project")
 load("//tools:ts_json_schema.bzl", "ts_json_schema")
 
 licenses(["notice"])
 
 package(default_visibility = ["//visibility:public"])
 
-ts_library(
+npm_link_all_packages()
+
+RUNTIME_ASSETS = glob(
+    include = [
+        "pwa/*.js",
+        "pwa/*.mjs",
+        "pwa/files/**/*",
+    ],
+) + [
+    "package.json",
+    "collection.json",
+    "pwa/schema.json",
+]
+
+ts_project(
     name = "pwa",
-    package_name = "@angular/pwa",
     srcs = [
         "pwa/index.ts",
         "//packages/angular/pwa:pwa/schema.ts",
     ],
-    data = [
-        "collection.json",
-        "pwa/schema.json",
-    ] + glob(
-        include = [
-            "pwa/files/**/*",
-        ],
-    ),
+    data = RUNTIME_ASSETS,
+    module_name = "@angular/pwa",
     deps = [
-        "//packages/angular_devkit/schematics",
-        "//packages/schematics/angular",
-        "@npm//@types/node",
-        "@npm//parse5-html-rewriting-stream",
+        ":node_modules/@angular-devkit/schematics",
+        ":node_modules/@schematics/angular",
+        "//:node_modules/@types/node",
+        "//:node_modules/parse5-html-rewriting-stream",
     ],
 )
 
@@ -39,19 +46,20 @@ ts_json_schema(
     src = "pwa/schema.json",
 )
 
-ts_library(
+ts_project(
     name = "pwa_test_lib",
     testonly = True,
     srcs = glob(["pwa/**/*_spec.ts"]),
     deps = [
-        ":pwa",
-        "//packages/angular_devkit/schematics/testing",
+        ":pwa_rjs",
+        "//:node_modules/@types/jasmine",
+        "//packages/angular_devkit/schematics/testing:testing_rjs",
     ],
 )
 
-jasmine_node_test(
+jasmine_test(
     name = "pwa_test",
-    srcs = [":pwa_test_lib"],
+    data = [":pwa_test_lib_rjs"],
 )
 
 genrule(
@@ -61,16 +69,16 @@ genrule(
     cmd = "cp $(execpath //:LICENSE) $@",
 )
 
-pkg_npm(
-    name = "npm_package",
+npm_package(
+    name = "pkg",
     pkg_deps = [
         "//packages/angular_devkit/schematics:package.json",
         "//packages/schematics/angular:package.json",
     ],
     tags = ["release-package"],
-    deps = [
+    deps = RUNTIME_ASSETS + [
         ":README.md",
         ":license",
-        ":pwa",
+        ":pwa_rjs",
     ],
 )

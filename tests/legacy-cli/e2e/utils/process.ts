@@ -77,7 +77,7 @@ function _exec(options: ExecOptions, cmd: string, args: string[]): Promise<Proce
   // Create the error here so the stack shows who called this function.
   const error = new Error();
 
-  return new Promise<ProcessOutput>((resolve, reject) => {
+  const processPromise = new Promise<ProcessOutput>((resolve, reject) => {
     let stdout = '';
     let stderr = '';
     let matched = false;
@@ -158,6 +158,25 @@ function _exec(options: ExecOptions, cmd: string, args: string[]): Promise<Proce
     error.message = err.toString();
     return Promise.reject(error);
   });
+
+  if (!options.waitForMatch) {
+    return processPromise;
+  }
+
+  let timeout: NodeJS.Timeout | undefined;
+  const timeoutPromise: Promise<never> = new Promise((_resolve, reject) => {
+    // Wait for 60 seconds and timeout.
+    const duration = 60_000;
+    timeout = setTimeout(() => {
+      reject(
+        new Error(`Waiting for ${options.waitForMatch} timed out (timeout: ${duration}msec)...`),
+      );
+    }, duration);
+  });
+
+  return Promise.race([timeoutPromise, processPromise]).finally(
+    () => timeout && clearTimeout(timeout),
+  );
 }
 
 export function extractNpmEnv() {

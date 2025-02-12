@@ -21,12 +21,7 @@ import { createHash } from 'node:crypto';
 import * as path from 'node:path';
 import { maxWorkers, useTypeChecking } from '../../../utils/environment-options';
 import { AngularHostOptions } from '../../angular/angular-host';
-import {
-  AngularCompilation,
-  DiagnosticModes,
-  NoopCompilation,
-  createAngularCompilation,
-} from '../../angular/compilation';
+import { AngularCompilation, DiagnosticModes, NoopCompilation } from '../../angular/compilation';
 import { JavaScriptTransformer } from '../javascript-transformer';
 import { LoadResultCache, createCachedLoad } from '../load-result-cache';
 import { logCumulativeDurations, profileAsync, resetCumulativeDurations } from '../profiling';
@@ -41,8 +36,6 @@ export interface CompilerPluginOptions {
   tsconfig: string;
   jit?: boolean;
 
-  /** Skip TypeScript compilation setup. This is useful to re-use the TypeScript compilation from another plugin. */
-  noopTypeScriptCompilation?: boolean;
   advancedOptimizations?: boolean;
   thirdPartySourcemaps?: boolean;
   fileReplacements?: Record<string, string>;
@@ -57,6 +50,7 @@ export interface CompilerPluginOptions {
 // eslint-disable-next-line max-lines-per-function
 export function createCompilerPlugin(
   pluginOptions: CompilerPluginOptions,
+  compilationOrFactory: AngularCompilation | (() => Promise<AngularCompilation>),
   stylesheetBundler: ComponentStylesheetBundler,
 ): Plugin {
   return {
@@ -104,6 +98,13 @@ export function createCompilerPlugin(
       build.initialOptions.define ??= {};
       build.initialOptions.define['ngI18nClosureMode'] ??= 'false';
 
+      // The factory is only relevant for compatibility purposes with the private API.
+      // TODO: Update private API in the next major to allow compilation function factory removal here.
+      const compilation =
+        typeof compilationOrFactory === 'function'
+          ? await compilationOrFactory()
+          : compilationOrFactory;
+
       // The in-memory cache of TypeScript file outputs will be used during the build in `onLoad` callbacks for TS files.
       // A string value indicates direct TS/NG output and a Uint8Array indicates fully transformed code.
       const typeScriptFileCache =
@@ -116,10 +117,6 @@ export function createCompilerPlugin(
         { outputFiles?: OutputFile[]; metafile?: Metafile; errors?: PartialMessage[] }
       >();
 
-      // Create new reusable compilation for the appropriate mode based on the `jit` plugin option
-      const compilation: AngularCompilation = pluginOptions.noopTypeScriptCompilation
-        ? new NoopCompilation()
-        : await createAngularCompilation(!!pluginOptions.jit);
       // Compilation is initially assumed to have errors until emitted
       let hasCompilationErrors = true;
 
@@ -152,8 +149,8 @@ export function createCompilerPlugin(
         // dependencies or web worker processing.
         let modifiedFiles;
         if (
-          pluginOptions.sourceFileCache?.modifiedFiles.size &&
-          !pluginOptions.noopTypeScriptCompilation
+          !(compilation instanceof NoopCompilation) &&
+          pluginOptions.sourceFileCache?.modifiedFiles.size
         ) {
           // TODO: Differentiate between changed input files and stale output files
           modifiedFiles = referencedFileTracker.update(pluginOptions.sourceFileCache.modifiedFiles);
@@ -167,11 +164,7 @@ export function createCompilerPlugin(
           modifiedFiles.forEach((file) => additionalResults.delete(file));
         }
 
-        if (
-          !pluginOptions.noopTypeScriptCompilation &&
-          compilation.update &&
-          pluginOptions.sourceFileCache?.modifiedFiles.size
-        ) {
+        if (compilation.update && pluginOptions.sourceFileCache?.modifiedFiles.size) {
           await compilation.update(modifiedFiles ?? pluginOptions.sourceFileCache.modifiedFiles);
         }
 
@@ -198,7 +191,7 @@ export function createCompilerPlugin(
                 // invalid the output and force a full page reload for HMR cases. The containing file and order
                 // of the style within the containing file is used.
                 pluginOptions.externalRuntimeStyles
-                  ? createHash('sha-256')
+                  ? createHash('sha256')
                       .update(containingFile)
                       .update((order ?? 0).toString())
                       .update(className ?? '')
@@ -512,6 +505,31 @@ export function createCompilerPlugin(
         }),
       );
 
+      // Add a load handler if there are file replacement option entries for JSON files
+      if (
+        pluginOptions.fileReplacements &&
+        Object.keys(pluginOptions.fileReplacements).some((value) => value.endsWith('.json'))
+      ) {
+        build.onLoad(
+          { filter: /\.json$/ },
+          createCachedLoad(pluginOptions.loadResultCache, async (args) => {
+            const replacement = pluginOptions.fileReplacements?.[path.normalize(args.path)];
+            if (replacement) {
+              return {
+                contents: await import('fs/promises').then(({ readFile }) =>
+                  readFile(path.normalize(replacement)),
+                ),
+                loader: 'json' as const,
+                watchFiles: [replacement],
+              };
+            }
+
+            // If no replacement defined, let esbuild handle it directly
+            return null;
+          }),
+        );
+      }
+
       // Setup bundling of component templates and stylesheets when in JIT mode
       if (pluginOptions.jit) {
         setupJitPluginCallbacks(
@@ -660,6 +678,20 @@ function createCompilerOptionsTransformer(
         text: `TypeScript compiler options 'module' values 'CommonJS', 'UMD', 'System' and 'AMD' are not supported.`,
         location: null,
         notes: [{ text: `The 'module' option will be set to 'ES2022' instead.` }],
+      });
+    }
+
+    if (compilerOptions.isolatedModules && compilerOptions.emitDecoratorMetadata) {
+      setupWarnings?.push({
+        text: `TypeScript compiler option 'isolatedModules' may prevent the 'emitDecoratorMetadata' option from emitting all metadata.`,
+        location: null,
+        notes: [
+          {
+            text:
+              `The 'emitDecoratorMetadata' option is not required by Angular` +
+              'and can be removed if not explictly required by the project.',
+          },
+        ],
       });
     }
 

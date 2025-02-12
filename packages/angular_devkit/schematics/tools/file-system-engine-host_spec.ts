@@ -8,10 +8,10 @@
 
 /* eslint-disable @typescript-eslint/no-explicit-any, import/no-extraneous-dependencies */
 import { normalize, virtualFs } from '@angular-devkit/core';
-import { HostSink, HostTree, SchematicEngine } from '@angular-devkit/schematics';
-import { FileSystemEngineHost } from '@angular-devkit/schematics/tools';
 import * as path from 'path';
 import { from, lastValueFrom, of as observableOf } from 'rxjs';
+import { HostSink, HostTree, SchematicEngine } from '../index';
+import { FileSystemEngineHost } from './file-system-engine-host';
 
 describe('FileSystemEngineHost', () => {
   // We need to resolve a file that actually exists, and not just a folder.

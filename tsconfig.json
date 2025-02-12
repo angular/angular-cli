@@ -9,7 +9,6 @@
     "noFallthroughCasesInSwitch": true,
     "noImplicitOverride": true,
     "isolatedModules": true,
-    "outDir": "./dist",
     "skipLibCheck": true,
     "strict": true,
     "target": "es2022",
@@ -17,20 +16,16 @@
     "rootDir": ".",
     "rootDirs": [".", "./dist-schema/bin/"],
     "paths": {
-      "@angular-devkit/core/node": ["./packages/angular_devkit/core/node/index"],
-      "@angular-devkit/core/node/testing": ["./packages/angular_devkit/core/node/testing/index"],
-      "@angular-devkit/schematics/tasks": ["./packages/angular_devkit/schematics/tasks/index"],
-      "@angular-devkit/schematics/tasks/node": [
-        "./packages/angular_devkit/schematics/tasks/node/index"
-      ],
-      "@angular-devkit/schematics/tools": ["./packages/angular_devkit/schematics/tools/index"],
-      "@angular-devkit/schematics/testing": ["./packages/angular_devkit/schematics/testing/index"],
-      "@angular-devkit/architect/testing": ["./packages/angular_devkit/architect/testing/index"],
-      "@angular-devkit/*": ["./packages/angular_devkit/*/src"],
+      "@angular-devkit/build-webpack": ["./packages/angular_devkit/build_webpack"],
+      "@angular-devkit/build-angular": ["./packages/angular_devkit/build_angular"],
+      "@angular-devkit/*": ["./packages/angular_devkit/*/index"],
+      "@angular/ssr": ["./packages/angular/ssr"],
+      "@angular/ssr/node": ["./packages/angular/ssr/node"],
       "@angular/*": ["./packages/angular/*/src"],
       "@angular/build/private": ["./packages/angular/build/src/private"],
-      "@ngtools/webpack": ["./packages/ngtools/webpack/src"],
-      "@schematics/angular": ["./packages/schematics/angular"]
+      "@ngtools/webpack": ["./packages/ngtools/webpack/index"],
+      "@schematics/angular": ["./packages/schematics/angular"],
+      "@schematics/angular/utility": ["./packages/schematics/angular/utility/index"]
     }
   },
   "exclude": [
@@ -39,7 +34,8 @@
     "**/node_modules/**/*",
     "**/third_party/**/*",
     "packages/angular_devkit/schematics_cli/schematic/files/**/*",
-    "packages/angular_devkit/*/test/**/*",
-    "tests/**/*"
+    "modules/testing/builder/projects/**/*",
+    "packages/angular_devkit/build_angular/test/**/*",
+    "packages/angular_devkit/build_webpack/test/**/*"
   ]
 }

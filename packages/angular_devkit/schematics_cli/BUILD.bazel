@@ -1,5 +1,5 @@
-load("@npm//@bazel/jasmine:index.bzl", "jasmine_node_test")
-load("//tools:defaults.bzl", "pkg_npm", "ts_library")
+load("@npm2//:defs.bzl", "npm_link_all_packages")
+load("//tools:defaults2.bzl", "npm_package", "ts_project")
 load("//tools:ts_json_schema.bzl", "ts_json_schema")
 
 # Copyright Google Inc. All Rights Reserved.
@@ -10,10 +10,24 @@ licenses(["notice"])
 
 package(default_visibility = ["//visibility:public"])
 
+npm_link_all_packages()
+
+RUNTIME_ASSETS = [
+    "blank/schema.json",
+    "collection.json",
+    "package.json",
+    "schematic/schema.json",
+] + glob(
+    include = [
+        "blank/project-files/**/*",
+        "blank/schematic-files/**/*",
+        "schematic/files/**/*",
+    ],
+)
+
 # @angular-devkit/schematics-cli
-ts_library(
+ts_project(
     name = "schematics_cli",
-    package_name = "@angular-devkit/schematics-cli",
     srcs = glob(
         include = ["**/*.ts"],
         exclude = [
@@ -25,57 +39,22 @@ ts_library(
             "node_modules/**",
         ],
     ) + [
-        # @external_begin
         # These files are generated from the JSON schema
         "//packages/angular_devkit/schematics_cli:blank/schema.ts",
         "//packages/angular_devkit/schematics_cli:schematic/schema.ts",
-        # @external_end
     ],
-    data = [
-        "blank/schema.json",
-        "collection.json",
-        "package.json",
-        "schematic/schema.json",
-    ] + glob(
-        include = [
-            "blank/project-files/**/*",
-            "blank/schematic-files/**/*",
-            "schematic/files/**/*",
-        ],
-    ),
+    data = RUNTIME_ASSETS,
     module_name = "@angular-devkit/schematics-cli",
-    module_root = "bin/schematics.d.ts",
     deps = [
-        "//packages/angular_devkit/core",
-        "//packages/angular_devkit/core/node",
-        "//packages/angular_devkit/schematics",
-        "//packages/angular_devkit/schematics/tasks",
-        "//packages/angular_devkit/schematics/tools",
-        "@npm//@inquirer/prompts",
-        "@npm//@types/node",
-        "@npm//@types/yargs-parser",
-        "@npm//ansi-colors",
-        "@npm//symbol-observable",
-        "@npm//yargs-parser",
+        ":node_modules/@angular-devkit/core",
+        ":node_modules/@angular-devkit/schematics",
+        "//:node_modules/@inquirer/prompts",
+        "//:node_modules/@types/node",
+        "//:node_modules/@types/yargs-parser",
+        "//:node_modules/ansi-colors",
+        "//:node_modules/symbol-observable",
+        "//:node_modules/yargs-parser",
     ],
-)
-
-ts_library(
-    name = "schematics_cli_test_lib",
-    testonly = True,
-    srcs = glob(
-        include = [
-            "bin/**/*_spec.ts",
-        ],
-    ),
-    deps = [
-        ":schematics_cli",
-    ],
-)
-
-jasmine_node_test(
-    name = "schematics_cli_test",
-    srcs = [":schematics_cli_test_lib"],
 )
 
 ts_json_schema(
@@ -95,16 +74,16 @@ genrule(
     cmd = "cp $(execpath //:LICENSE) $@",
 )
 
-pkg_npm(
-    name = "npm_package",
+npm_package(
+    name = "pkg",
     pkg_deps = [
         "//packages/angular_devkit/schematics:package.json",
         "//packages/angular_devkit/core:package.json",
     ],
     tags = ["release-package"],
-    deps = [
+    deps = RUNTIME_ASSETS + [
         ":README.md",
         ":license",
-        ":schematics_cli",
+        ":schematics_cli_rjs",
     ],
 )

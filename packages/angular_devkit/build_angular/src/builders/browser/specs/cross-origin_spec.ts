@@ -7,10 +7,11 @@
  */
 
 import { Architect } from '@angular-devkit/architect';
-import { BrowserBuilderOutput, CrossOrigin } from '@angular-devkit/build-angular';
 import { join, normalize, virtualFs } from '@angular-devkit/core';
 import { lastValueFrom } from 'rxjs';
 import { createArchitect, host } from '../../../testing/test-utils';
+import { BrowserBuilderOutput } from '../index';
+import { CrossOrigin } from '../schema';
 
 describe('Browser Builder crossOrigin', () => {
   const targetSpec = { project: 'app', target: 'build' };

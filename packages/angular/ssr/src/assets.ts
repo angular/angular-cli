@@ -27,7 +27,7 @@ export class ServerAssets {
    * @throws Error - Throws an error if the asset does not exist.
    */
   getServerAsset(path: string): ServerAsset {
-    const asset = this.manifest.assets.get(path);
+    const asset = this.manifest.assets[path];
     if (!asset) {
       throw new Error(`Server asset '${path}' does not exist.`);
     }
@@ -42,7 +42,7 @@ export class ServerAssets {
    * @returns A boolean indicating whether the asset exists.
    */
   hasServerAsset(path: string): boolean {
-    return this.manifest.assets.has(path);
+    return !!this.manifest.assets[path];
   }
 
   /**

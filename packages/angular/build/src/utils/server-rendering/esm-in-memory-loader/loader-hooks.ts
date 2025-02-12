@@ -14,6 +14,11 @@ import { fileURLToPath } from 'url';
 import { JavaScriptTransformer } from '../../../tools/esbuild/javascript-transformer';
 
 /**
+ * @note For some unknown reason, setting `globalThis.ngServerMode = true` does not work when using ESM loader hooks.
+ */
+const NG_SERVER_MODE_INIT_BYTES = new TextEncoder().encode('var ngServerMode=true;');
+
+/**
  * Node.js ESM loader to redirect imports to in memory files.
  * @see: https://nodejs.org/api/esm.html#loaders for more information about loaders.
  */
@@ -133,7 +138,12 @@ export async function load(url: string, context: { format?: string | null }, nex
   // need linking are ESM only.
   if (format === 'module' && isFileProtocol(url)) {
     const filePath = fileURLToPath(url);
-    const source = await javascriptTransformer.transformFile(filePath);
+    let source = await javascriptTransformer.transformFile(filePath);
+
+    if (filePath.includes('@angular/')) {
+      // Prepend 'var ngServerMode=true;' to the source.
+      source = Buffer.concat([NG_SERVER_MODE_INIT_BYTES, source]);
+    }
 
     return {
       format,

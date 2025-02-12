@@ -13,10 +13,18 @@ import { BuildOutputFileType } from '../../tools/esbuild/bundler-context';
 import { ExecutionResult, RebuildState } from '../../tools/esbuild/bundler-execution-result';
 import { shutdownSassWorkerPool } from '../../tools/esbuild/stylesheets/sass-language';
 import { logMessages, withNoProgress, withSpinner } from '../../tools/esbuild/utils';
+import { ChangedFiles } from '../../tools/esbuild/watcher';
 import { shouldWatchRoot } from '../../utils/environment-options';
 import { NormalizedCachedOptions } from '../../utils/normalize-cache';
 import { NormalizedApplicationBuildOptions, NormalizedOutputOptions } from './options';
-import { ComponentUpdateResult, FullResult, Result, ResultKind, ResultMessage } from './results';
+import {
+  ComponentUpdateResult,
+  FullResult,
+  IncrementalResult,
+  Result,
+  ResultKind,
+  ResultMessage,
+} from './results';
 
 // Watch workspace for package manager changes
 const packageWatchFiles = [
@@ -49,6 +57,7 @@ export async function* runEsBuildBuildAction(
     clearScreen?: boolean;
     colors?: boolean;
     jsonLogs?: boolean;
+    incrementalResults?: boolean;
   },
 ): AsyncIterable<Result> {
   const {
@@ -65,6 +74,7 @@ export async function* runEsBuildBuildAction(
     preserveSymlinks,
     colors,
     jsonLogs,
+    incrementalResults,
   } = options;
 
   const withProgress: typeof withSpinner = progress ? withSpinner : withNoProgress;
@@ -135,12 +145,16 @@ export async function* runEsBuildBuildAction(
   // Output the first build results after setting up the watcher to ensure that any code executed
   // higher in the iterator call stack will trigger the watcher. This is particularly relevant for
   // unit tests which execute the builder and modify the file system programmatically.
-  yield await emitOutputResult(result, outputOptions);
+  yield* emitOutputResults(result, outputOptions);
 
   // Finish if watch mode is not enabled
   if (!watcher) {
     return;
   }
+
+  // Used to force a full result on next rebuild if there were initial errors.
+  // This ensures at least one full result is emitted.
+  let hasInitialErrors = result.errors.length > 0;
 
   // Wait for changes and rebuild as needed
   const currentWatchFiles = new Set(result.watchFiles);
@@ -162,9 +176,8 @@ export async function* runEsBuildBuildAction(
       // Clear removed files from current watch files
       changes.removed.forEach((removedPath) => currentWatchFiles.delete(removedPath));
 
-      result = await withProgress('Changes detected. Rebuilding...', () =>
-        action(result.createRebuildState(changes)),
-      );
+      const rebuildState = result.createRebuildState(changes);
+      result = await withProgress('Changes detected. Rebuilding...', () => action(rebuildState));
 
       // Log all diagnostic (error/warning/logs) messages
       await logMessages(logger, result, colors, jsonLogs);
@@ -188,7 +201,17 @@ export async function* runEsBuildBuildAction(
         watcher.remove([...staleWatchFiles]);
       }
 
-      yield await emitOutputResult(result, outputOptions);
+      for (const outputResult of emitOutputResults(
+        result,
+        outputOptions,
+        changes,
+        incrementalResults && !hasInitialErrors ? rebuildState : undefined,
+      )) {
+        yield outputResult;
+      }
+
+      // Clear initial build errors flag if no errors are now present
+      hasInitialErrors &&= result.errors.length > 0;
     }
   } finally {
     // Stop the watcher and cleanup incremental rebuild state
@@ -198,7 +221,7 @@ export async function* runEsBuildBuildAction(
   }
 }
 
-async function emitOutputResult(
+function* emitOutputResults(
   {
     outputFiles,
     assetFiles,
@@ -210,9 +233,11 @@ async function emitOutputResult(
     templateUpdates,
   }: ExecutionResult,
   outputOptions: NormalizedApplicationBuildOptions['outputOptions'],
-): Promise<Result> {
+  changes?: ChangedFiles,
+  rebuildState?: RebuildState,
+): Iterable<Result> {
   if (errors.length > 0) {
-    return {
+    yield {
       kind: ResultKind.Failure,
       errors: errors as ResultMessage[],
       warnings: warnings as ResultMessage[],
@@ -220,25 +245,59 @@ async function emitOutputResult(
         outputOptions,
       },
     };
+
+    return;
   }
 
-  // Template updates only exist if no other changes have occurred
-  if (templateUpdates?.size) {
-    const updateResult: ComponentUpdateResult = {
-      kind: ResultKind.ComponentUpdate,
-      updates: Array.from(templateUpdates).map(([id, content]) => ({
-        type: 'template',
-        id,
-        content,
-      })),
+  // Use a full result if there is no rebuild state (no prior build result)
+  if (!rebuildState || !changes) {
+    const result: FullResult = {
+      kind: ResultKind.Full,
+      warnings: warnings as ResultMessage[],
+      files: {},
+      detail: {
+        externalMetadata,
+        htmlIndexPath,
+        htmlBaseHref,
+        outputOptions,
+      },
     };
+    for (const file of assetFiles) {
+      result.files[file.destination] = {
+        type: BuildOutputFileType.Browser,
+        inputPath: file.source,
+        origin: 'disk',
+      };
+    }
+    for (const file of outputFiles) {
+      result.files[file.path] = {
+        type: file.type,
+        contents: file.contents,
+        origin: 'memory',
+        hash: file.hash,
+      };
+    }
 
-    return updateResult;
+    yield result;
+
+    return;
   }
 
-  const result: FullResult = {
-    kind: ResultKind.Full,
+  // Template updates only exist if no other JS changes have occurred.
+  // A full page reload may be required based on the following incremental output change analysis.
+  const hasTemplateUpdates = !!templateUpdates?.size;
+
+  // Use an incremental result if previous output information is available
+  const { previousAssetsInfo, previousOutputInfo } = rebuildState;
+
+  const incrementalResult: IncrementalResult = {
+    kind: ResultKind.Incremental,
     warnings: warnings as ResultMessage[],
+    // Initially attempt to use a background update of files to support component updates.
+    background: hasTemplateUpdates,
+    added: [],
+    removed: [],
+    modified: [],
     files: {},
     detail: {
       externalMetadata,
@@ -247,21 +306,119 @@ async function emitOutputResult(
       outputOptions,
     },
   };
-  for (const file of assetFiles) {
-    result.files[file.destination] = {
+
+  let hasCssUpdates = false;
+
+  // Initially assume all previous output files have been removed
+  const removedOutputFiles = new Map(previousOutputInfo);
+  for (const file of outputFiles) {
+    removedOutputFiles.delete(file.path);
+
+    const previousHash = previousOutputInfo.get(file.path)?.hash;
+    let needFile = false;
+    if (previousHash === undefined) {
+      needFile = true;
+      incrementalResult.added.push(file.path);
+    } else if (previousHash !== file.hash) {
+      needFile = true;
+      incrementalResult.modified.push(file.path);
+    }
+
+    if (needFile) {
+      if (file.path.endsWith('.css')) {
+        hasCssUpdates = true;
+      } else if (!/(?:\.m?js|\.map)$/.test(file.path)) {
+        // Updates to non-JS files must signal an update with the dev server
+        incrementalResult.background = false;
+      }
+
+      incrementalResult.files[file.path] = {
+        type: file.type,
+        contents: file.contents,
+        origin: 'memory',
+        hash: file.hash,
+      };
+    }
+  }
+
+  // Initially assume all previous assets files have been removed
+  const removedAssetFiles = new Map(previousAssetsInfo);
+  for (const { source, destination } of assetFiles) {
+    removedAssetFiles.delete(source);
+
+    if (!previousAssetsInfo.has(source)) {
+      incrementalResult.added.push(destination);
+      incrementalResult.background = false;
+    } else if (changes.modified.has(source)) {
+      incrementalResult.modified.push(destination);
+      incrementalResult.background = false;
+    } else {
+      continue;
+    }
+
+    hasCssUpdates ||= destination.endsWith('.css');
+
+    incrementalResult.files[destination] = {
       type: BuildOutputFileType.Browser,
-      inputPath: file.source,
+      inputPath: source,
       origin: 'disk',
     };
   }
-  for (const file of outputFiles) {
-    result.files[file.path] = {
-      type: file.type,
-      contents: file.contents,
-      origin: 'memory',
-      hash: file.hash,
-    };
+
+  // Do not remove stale files yet if there are template updates.
+  // Component chunk files may still be referenced in running browser code.
+  // Module evaluation time component updates will update any of these files.
+  // This typically occurs when a lazy component is changed that has not yet
+  // been accessed at runtime.
+  if (hasTemplateUpdates && incrementalResult.background) {
+    removedOutputFiles.clear();
   }
 
-  return result;
+  // Include the removed output and asset files
+  incrementalResult.removed.push(
+    ...Array.from(removedOutputFiles, ([file, { type }]) => ({
+      path: file,
+      type,
+    })),
+    ...Array.from(removedAssetFiles.values(), (file) => ({
+      path: file,
+      type: BuildOutputFileType.Browser,
+    })),
+  );
+
+  yield incrementalResult;
+
+  // If there are template updates and the incremental update was background only, a component
+  // update is possible.
+  if (hasTemplateUpdates && incrementalResult.background) {
+    // Template changes may be accompanied by stylesheet changes and these should also be updated hot when possible.
+    if (hasCssUpdates) {
+      const styleResult: IncrementalResult = {
+        kind: ResultKind.Incremental,
+        added: incrementalResult.added.filter(isCssFilePath),
+        removed: incrementalResult.removed.filter(({ path }) => isCssFilePath(path)),
+        modified: incrementalResult.modified.filter(isCssFilePath),
+        files: Object.fromEntries(
+          Object.entries(incrementalResult.files).filter(([path]) => isCssFilePath(path)),
+        ),
+      };
+
+      yield styleResult;
+    }
+
+    const updateResult: ComponentUpdateResult = {
+      kind: ResultKind.ComponentUpdate,
+      updates: Array.from(templateUpdates, ([id, content]) => ({
+        type: 'template',
+        id,
+        content,
+      })),
+    };
+
+    yield updateResult;
+  }
+}
+
+function isCssFilePath(filePath: string): boolean {
+  return /\.css(?:\.map)?$/i.test(filePath);
 }

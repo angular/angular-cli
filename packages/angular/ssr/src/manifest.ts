@@ -10,7 +10,7 @@ import type { SerializableRouteTreeNode } from './routes/route-tree';
 import { AngularBootstrap } from './utils/ng';
 
 /**
- * Represents of a server asset stored in the manifest.
+ * Represents a server asset stored in the manifest.
  */
 export interface ServerAsset {
   /**
@@ -53,18 +53,26 @@ export interface EntryPointExports {
  */
 export interface AngularAppEngineManifest {
   /**
-   * A map of entry points for the server application.
-   * Each entry in the map consists of:
-   * - `key`: The base href for the entry point.
+   * A readonly record of entry points for the server application.
+   * Each entry consists of:
+   * - `key`: The url segment for the entry point.
    * - `value`: A function that returns a promise resolving to an object of type `EntryPointExports`.
    */
-  readonly entryPoints: ReadonlyMap<string, () => Promise<EntryPointExports>>;
+  readonly entryPoints: Readonly<Record<string, (() => Promise<EntryPointExports>) | undefined>>;
 
   /**
    * The base path for the server application.
    * This is used to determine the root path of the application.
    */
   readonly basePath: string;
+
+  /**
+   * A readonly record mapping supported locales to their respective entry-point paths.
+   * Each entry consists of:
+   * - `key`: The locale identifier (e.g., 'en', 'fr').
+   * - `value`: The url segment associated with that locale.
+   */
+  readonly supportedLocales: Readonly<Record<string, string | undefined>>;
 }
 
 /**
@@ -72,12 +80,18 @@ export interface AngularAppEngineManifest {
  */
 export interface AngularAppManifest {
   /**
-   * A map of assets required by the server application.
-   * Each entry in the map consists of:
-   * - `key`: The path of the asset.
-   * - `value`: A function returning a promise that resolves to the file contents of the asset.
+   * The base href for the application.
+   * This is used to determine the root path of the application.
    */
-  readonly assets: ReadonlyMap<string, ServerAsset>;
+  readonly baseHref: string;
+
+  /**
+   * A readonly record of assets required by the server application.
+   * Each entry consists of:
+   * - `key`: The path of the asset.
+   * - `value`: An object of type `ServerAsset`.
+   */
+  readonly assets: Readonly<Record<string, ServerAsset | undefined>>;
 
   /**
    * The bootstrap mechanism for the server application.
@@ -104,6 +118,26 @@ export interface AngularAppManifest {
    * the application, aiding with localization and rendering content specific to the locale.
    */
   readonly locale?: string;
+
+  /**
+   * Maps entry-point names to their corresponding browser bundles and loading strategies.
+   *
+   * - **Key**: The entry-point name, typically the value of `ɵentryName`.
+   * - **Value**: An array of objects, each representing a browser bundle with:
+   *   - `path`: The filename or URL of the associated JavaScript bundle to preload.
+   *   - `dynamicImport`: A boolean indicating whether the bundle is loaded via a dynamic `import()`.
+   *     If `true`, the bundle is lazily loaded, impacting its preloading behavior.
+   *
+   * ### Example
+   * ```ts
+   * {
+   *   'src/app/lazy/lazy.ts': [{ path: 'src/app/lazy/lazy.js', dynamicImport: true }]
+   * }
+   * ```
+   */
+  readonly entryPointToBrowserMapping?: Readonly<
+    Record<string, ReadonlyArray<{ path: string; dynamicImport: boolean }> | undefined>
+  >;
 }
 
 /**

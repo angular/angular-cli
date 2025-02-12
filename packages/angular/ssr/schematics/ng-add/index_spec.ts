@@ -14,6 +14,7 @@ import { join } from 'node:path';
 describe('@angular/ssr ng-add schematic', () => {
   const defaultOptions = {
     project: 'test-app',
+    serverRouting: false,
   };
 
   const schematicRunner = new SchematicTestRunner(

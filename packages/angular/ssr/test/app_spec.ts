@@ -12,7 +12,7 @@ import '@angular/compiler';
 /* eslint-enable import/no-unassigned-import */
 
 import { Component } from '@angular/core';
-import { AngularServerApp, destroyAngularServerApp } from '../src/app';
+import { AngularServerApp } from '../src/app';
 import { RenderMode } from '../src/routes/route-config';
 import { setAngularAppTestingManifest } from './testing-utils';
 
@@ -20,8 +20,6 @@ describe('AngularServerApp', () => {
   let app: AngularServerApp;
 
   beforeAll(() => {
-    destroyAngularServerApp();
-
     @Component({
       standalone: true,
       selector: 'app-home',
@@ -38,6 +36,7 @@ describe('AngularServerApp', () => {
         { path: 'page-with-status', component: HomeComponent },
         { path: 'redirect', redirectTo: 'home' },
         { path: 'redirect/relative', redirectTo: 'home' },
+        { path: 'redirect/:param/relative', redirectTo: 'home' },
         { path: 'redirect/absolute', redirectTo: '/home' },
       ],
       [
@@ -107,19 +106,25 @@ describe('AngularServerApp', () => {
 
       it('should correctly handle top level redirects', async () => {
         const response = await app.handle(new Request('http://localhost/redirect'));
-        expect(response?.headers.get('location')).toContain('http://localhost/home');
+        expect(response?.headers.get('location')).toContain('/home');
         expect(response?.status).toBe(302);
       });
 
       it('should correctly handle relative nested redirects', async () => {
         const response = await app.handle(new Request('http://localhost/redirect/relative'));
-        expect(response?.headers.get('location')).toContain('http://localhost/redirect/home');
+        expect(response?.headers.get('location')).toContain('/redirect/home');
+        expect(response?.status).toBe(302);
+      });
+
+      it('should correctly handle relative nested redirects with parameter', async () => {
+        const response = await app.handle(new Request('http://localhost/redirect/param/relative'));
+        expect(response?.headers.get('location')).toContain('/redirect/param/home');
         expect(response?.status).toBe(302);
       });
 
       it('should correctly handle absolute nested redirects', async () => {
         const response = await app.handle(new Request('http://localhost/redirect/absolute'));
-        expect(response?.headers.get('location')).toContain('http://localhost/home');
+        expect(response?.headers.get('location')).toContain('/home');
         expect(response?.status).toBe(302);
       });
 
@@ -132,7 +137,12 @@ describe('AngularServerApp', () => {
           controller.abort();
         });
 
-        await expectAsync(app.handle(request)).toBeRejectedWithError(/Request for: .+ was aborted/);
+        try {
+          await app.handle(request);
+          throw new Error('Should not be called.');
+        } catch (e) {
+          expect(e).toBeInstanceOf(DOMException);
+        }
       });
 
       it('should return configured headers for pages with specific header settings', async () => {

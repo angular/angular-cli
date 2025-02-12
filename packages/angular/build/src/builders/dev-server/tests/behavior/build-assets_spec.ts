@@ -141,5 +141,38 @@ describeServeBuilder(executeDevServer, DEV_SERVER_BUILDER_INFO, (harness, setupT
       expect(await response?.status).toBe(301);
       expect(await response?.headers.get('Location')).toBe('/login/');
     });
+
+    it('serves a JavaScript asset named as a bundle (main.js)', async () => {
+      await harness.writeFile('public/test/main.js', javascriptFileContent);
+
+      setupTarget(harness, {
+        assets: [
+          {
+            glob: '**/*',
+            input: 'public',
+          },
+        ],
+      });
+
+      harness.useTarget('serve', {
+        ...BASE_OPTIONS,
+      });
+
+      const { result, response } = await executeOnceAndFetch(harness, 'test/main.js');
+      expect(result?.success).toBeTrue();
+      expect(await response?.text()).toContain(javascriptFileContent);
+    });
+
+    it('should return 404 when a JavaScript asset named as a bundle (main.js) does not exist', async () => {
+      setupTarget(harness, {});
+
+      harness.useTarget('serve', {
+        ...BASE_OPTIONS,
+      });
+
+      const { result, response } = await executeOnceAndFetch(harness, 'unknown/main.js');
+      expect(result?.success).toBeTrue();
+      expect(response?.status).toBe(404);
+    });
   });
 });

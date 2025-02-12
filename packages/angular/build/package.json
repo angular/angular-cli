@@ -19,45 +19,50 @@
   "builders": "builders.json",
   "dependencies": {
     "@ampproject/remapping": "2.3.0",
-    "@angular-devkit/architect": "0.0.0-EXPERIMENTAL-PLACEHOLDER",
-    "@babel/core": "7.26.0",
+    "@angular-devkit/architect": "workspace:0.0.0-EXPERIMENTAL-PLACEHOLDER",
+    "@babel/core": "7.26.8",
     "@babel/helper-annotate-as-pure": "7.25.9",
     "@babel/helper-split-export-declaration": "7.24.7",
     "@babel/plugin-syntax-import-attributes": "7.26.0",
-    "@inquirer/confirm": "5.0.2",
-    "@vitejs/plugin-basic-ssl": "1.1.0",
-    "beasties": "0.1.0",
+    "@inquirer/confirm": "5.1.5",
+    "@vitejs/plugin-basic-ssl": "1.2.0",
+    "beasties": "0.2.0",
     "browserslist": "^4.23.0",
-    "esbuild": "0.24.0",
-    "fast-glob": "3.3.2",
-    "https-proxy-agent": "7.0.5",
+    "esbuild": "0.24.2",
+    "fast-glob": "3.3.3",
+    "https-proxy-agent": "7.0.6",
     "istanbul-lib-instrument": "6.0.3",
     "listr2": "8.2.5",
-    "magic-string": "0.30.12",
+    "magic-string": "0.30.17",
     "mrmime": "2.0.0",
     "parse5-html-rewriting-stream": "7.0.0",
     "picomatch": "4.0.2",
-    "piscina": "4.7.0",
-    "rollup": "4.25.0",
-    "sass": "1.80.6",
-    "semver": "7.6.3",
-    "vite": "5.4.11",
+    "piscina": "4.8.0",
+    "rollup": "4.34.6",
+    "sass": "1.84.0",
+    "semver": "7.7.1",
+    "vite": "6.1.0",
     "watchpack": "2.4.2"
   },
   "optionalDependencies": {
-    "lmdb": "3.1.5"
+    "lmdb": "3.2.6"
+  },
+  "devDependencies": {
+    "@angular/ssr": "workspace:*",
+    "@angular-devkit/core": "workspace:*"
   },
   "peerDependencies": {
-    "@angular/compiler": "^19.0.0-next.9",
-    "@angular/compiler-cli": "^19.0.0-next.9",
-    "@angular/localize": "^19.0.0-next.9",
-    "@angular/platform-server": "^19.0.0-next.9",
-    "@angular/service-worker": "^19.0.0-next.9",
+    "@angular/compiler": "0.0.0-ANGULAR-FW-PEER-DEP",
+    "@angular/compiler-cli": "0.0.0-ANGULAR-FW-PEER-DEP",
+    "@angular/localize": "0.0.0-ANGULAR-FW-PEER-DEP",
+    "@angular/platform-server": "0.0.0-ANGULAR-FW-PEER-DEP",
+    "@angular/service-worker": "0.0.0-ANGULAR-FW-PEER-DEP",
     "@angular/ssr": "^0.0.0-PLACEHOLDER",
     "less": "^4.2.0",
+    "ng-packagr": "0.0.0-NG-PACKAGR-PEER-DEP",
     "postcss": "^8.4.0",
-    "tailwindcss": "^2.0.0 || ^3.0.0",
-    "typescript": ">=5.5 <5.7"
+    "tailwindcss": "^2.0.0 || ^3.0.0 || ^4.0.0",
+    "typescript": ">=5.5 <5.8"
   },
   "peerDependenciesMeta": {
     "@angular/localize": {
@@ -73,6 +78,9 @@
       "optional": true
     },
     "less": {
+      "optional": true
+    },
+    "ng-packagr": {
       "optional": true
     },
     "postcss": {

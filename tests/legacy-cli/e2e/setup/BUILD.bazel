@@ -1,11 +1,12 @@
-load("//tools:defaults.bzl", "ts_library")
+load("//tools:interop.bzl", "ts_project")
 
-ts_library(
+package(default_visibility = ["//visibility:public"])
+
+ts_project(
     name = "setup",
     testonly = True,
     srcs = glob(["**/*.ts"]),
-    visibility = ["//visibility:public"],
     deps = [
-        "//tests/legacy-cli/e2e/utils",
+        "//tests/legacy-cli/e2e/utils:utils_rjs",
     ],
 )

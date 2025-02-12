@@ -73,7 +73,7 @@ describe('path', () => {
     expect(normalize('\\a\\b\\c')).toBe('/a/b/c');
     expect(normalize('.\\a\\b\\c')).toBe('a/b/c');
     expect(normalize('C:\\a\\b\\c')).toBe('/C/a/b/c');
-    expect(normalize('c:\\a\\b\\c')).toBe('/c/a/b/c');
+    expect(normalize('c:\\a\\b\\c')).toBe('/C/a/b/c');
     expect(normalize('A:\\a\\b\\c')).toBe('/A/a/b/c');
     expect(() => normalize('A:\\..\\..')).toThrow(new InvalidPathException('A:\\..\\..'));
     expect(normalize('\\.\\a\\b\\c')).toBe('/a/b/c');
@@ -131,6 +131,7 @@ describe('path', () => {
       ['/src/app/sub1/test1', '/src/app/sub2/test2', '../../sub2/test2'],
       ['/', '/a/b/c', 'a/b/c'],
       ['/a/b/c', '/d', '../../../d'],
+      ['E:\\abc', 'e:\\abc\\def', 'def'],
     ];
 
     for (const [from, to, result] of tests) {
@@ -161,8 +162,8 @@ describe('path', () => {
   });
 
   it('asWindowsPath', () => {
-    expect(asWindowsPath(normalize('c:/'))).toBe('c:\\');
-    expect(asWindowsPath(normalize('c:/b/'))).toBe('c:\\b');
-    expect(asWindowsPath(normalize('c:/b/c'))).toBe('c:\\b\\c');
+    expect(asWindowsPath(normalize('c:/'))).toBe('C:\\');
+    expect(asWindowsPath(normalize('c:/b/'))).toBe('C:\\b');
+    expect(asWindowsPath(normalize('c:/b/c'))).toBe('C:\\b\\c');
   });
 });

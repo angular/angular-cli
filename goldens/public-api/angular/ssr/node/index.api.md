@@ -57,7 +57,7 @@ export function isMainModule(url: string): boolean;
 export type NodeRequestHandlerFunction = (req: IncomingMessage, res: ServerResponse, next: (err?: unknown) => void) => Promise<void> | void;
 
 // @public
-export function writeResponseToNodeResponse(source: Response, destination: ServerResponse | Http2ServerResponse<Http2ServerRequest>): Promise<void>;
+export function writeResponseToNodeResponse(source: Response, destination: ServerResponse | Http2ServerResponse): Promise<void>;
 
 // (No @packageDocumentation comment for this package)
 

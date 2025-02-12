@@ -27,7 +27,8 @@ export interface RebuildState {
   componentStyleBundler: ComponentStylesheetBundler;
   codeBundleCache?: SourceFileCache;
   fileChanges: ChangedFiles;
-  previousOutputHashes: Map<string, string>;
+  previousOutputInfo: ReadonlyMap<string, { hash: string; type: BuildOutputFileType }>;
+  previousAssetsInfo: ReadonlyMap<string, string>;
   templateUpdates?: Map<string, string>;
 }
 
@@ -147,18 +148,20 @@ export class ExecutionResult {
     };
   }
 
-  get watchFiles() {
-    // Bundler contexts internally normalize file dependencies
-    const files = this.rebuildContexts.typescriptContexts
-      .flatMap((context) => [...context.watchFiles])
-      .concat(this.rebuildContexts.otherContexts.flatMap((context) => [...context.watchFiles]));
-    if (this.codeBundleCache?.referencedFiles) {
+  get watchFiles(): Readonly<string[]> {
+    const { typescriptContexts, otherContexts } = this.rebuildContexts;
+
+    return [
+      // Bundler contexts internally normalize file dependencies.
+      ...typescriptContexts.flatMap((context) => [...context.watchFiles]),
+      ...otherContexts.flatMap((context) => [...context.watchFiles]),
       // These files originate from TS/NG and can have POSIX path separators even on Windows.
       // To ensure path comparisons are valid, all these paths must be normalized.
-      files.push(...this.codeBundleCache.referencedFiles.map(normalize));
-    }
-
-    return files.concat(this.extraWatchFiles);
+      ...(this.codeBundleCache?.referencedFiles?.map(normalize) ?? []),
+      // The assets source files.
+      ...this.assetFiles.map(({ source }) => source),
+      ...this.extraWatchFiles,
+    ];
   }
 
   createRebuildState(fileChanges: ChangedFiles): RebuildState {
@@ -167,15 +170,22 @@ export class ExecutionResult {
       codeBundleCache: this.codeBundleCache,
       componentStyleBundler: this.componentStyleBundler,
       fileChanges,
-      previousOutputHashes: new Map(this.outputFiles.map((file) => [file.path, file.hash])),
+      previousOutputInfo: new Map(
+        this.outputFiles.map(({ path, hash, type }) => [path, { hash, type }]),
+      ),
+      previousAssetsInfo: new Map(
+        this.assetFiles.map(({ source, destination }) => [source, destination]),
+      ),
       templateUpdates: this.templateUpdates,
     };
   }
 
-  findChangedFiles(previousOutputHashes: Map<string, string>): Set<string> {
+  findChangedFiles(
+    previousOutputHashes: ReadonlyMap<string, { hash: string; type: BuildOutputFileType }>,
+  ): Set<string> {
     const changed = new Set<string>();
     for (const file of this.outputFiles) {
-      const previousHash = previousOutputHashes.get(file.path);
+      const previousHash = previousOutputHashes.get(file.path)?.hash;
       if (previousHash === undefined || previousHash !== file.hash) {
         changed.add(file.path);
       }

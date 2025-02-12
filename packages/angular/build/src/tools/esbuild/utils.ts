@@ -40,6 +40,11 @@ export function logBuildStats(
   ssrOutputEnabled?: boolean,
   verbose?: boolean,
 ): string {
+  // Remove the i18n subpath in case the build is using i18n.
+  // en-US/main.js -> main.js
+  const normalizedChangedFiles: Set<string> = new Set(
+    [...(changedFiles ?? [])].map((f) => basename(f)),
+  );
   const browserStats: BundleStats[] = [];
   const serverStats: BundleStats[] = [];
   let unchangedCount = 0;
@@ -52,7 +57,7 @@ export function logBuildStats(
     }
 
     // Show only changed files if a changed list is provided
-    if (changedFiles && !changedFiles.has(file)) {
+    if (normalizedChangedFiles.size && !normalizedChangedFiles.has(file)) {
       ++unchangedCount;
       continue;
     }

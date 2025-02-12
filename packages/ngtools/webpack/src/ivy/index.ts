@@ -9,4 +9,4 @@
 export { angularWebpackLoader as default } from './loader';
 export { type AngularWebpackPluginOptions, AngularWebpackPlugin, imageDomains } from './plugin';
 
-export const AngularWebpackLoaderPath = __filename;
+export const AngularWebpackLoaderPath: string = __filename;

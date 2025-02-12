@@ -39,7 +39,7 @@ import { createAotTransformers, createJitTransformers, mergeTransformers } from 
  */
 const DIAGNOSTICS_AFFECTED_THRESHOLD = 1;
 
-export const imageDomains = new Set<string>();
+export const imageDomains: Set<string> = new Set();
 
 export interface AngularWebpackPluginOptions {
   tsconfig: string;

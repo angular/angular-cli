@@ -147,7 +147,7 @@ describe('Browser Builder service worker', () => {
 
     await run.output
       .pipe(
-        debounceTime(3000),
+        debounceTime(1000),
         tap((buildEvent) => {
           expect(buildEvent.success).toBeTrue();
 

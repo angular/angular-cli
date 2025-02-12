@@ -34,7 +34,7 @@ export function execute(
     karmaOptions?: (options: KarmaConfigOptions) => KarmaConfigOptions;
   } = {},
 ): Observable<BuilderOutput> {
-  return from(initializeBrowser(options, context)).pipe(
+  return from(initializeBrowser(options, context, transforms.webpackConfiguration)).pipe(
     switchMap(async ([karma, webpackConfig]) => {
       const projectName = context.target?.project;
       if (!projectName) {

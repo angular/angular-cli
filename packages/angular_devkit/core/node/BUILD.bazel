@@ -3,14 +3,13 @@
 # Use of this source code is governed by an MIT-style license that can be
 # found in the LICENSE file at https://angular.dev/license
 
-load("@npm//@bazel/jasmine:index.bzl", "jasmine_node_test")
-load("//tools:defaults.bzl", "ts_library")
+load("//tools:defaults2.bzl", "jasmine_test", "ts_project")
 
 licenses(["notice"])
 
 package(default_visibility = ["//visibility:public"])
 
-ts_library(
+ts_project(
     name = "node",
     srcs = glob(
         include = ["**/*.ts"],
@@ -20,18 +19,15 @@ ts_library(
         ],
     ),
     module_name = "@angular-devkit/core/node",
-    module_root = "index.d.ts",
     deps = [
-        "//packages/angular_devkit/core",
-        "@npm//@types/node",
-        "@npm//chokidar",
-        "@npm//rxjs",
+        "//:node_modules/@types/node",
+        "//:node_modules/chokidar",
+        "//:node_modules/rxjs",
+        "//packages/angular_devkit/core:core_rjs",
     ],
 )
 
-# @external_begin
-
-ts_library(
+ts_project(
     name = "node_test_lib",
     testonly = True,
     srcs = glob(
@@ -43,17 +39,14 @@ ts_library(
         ],
     ),
     deps = [
-        ":node",
-        "//packages/angular_devkit/core",
-        "@npm//rxjs",
+        ":node_rjs",
+        "//:node_modules/@types/jasmine",
+        "//:node_modules/rxjs",
+        "//packages/angular_devkit/core:core_rjs",
     ],
 )
 
-jasmine_node_test(
+jasmine_test(
     name = "node_test",
-    srcs = [":node_test_lib"],
-    deps = [
-        "@npm//chokidar",
-    ],
+    data = [":node_test_lib_rjs"],
 )
-# @external_end

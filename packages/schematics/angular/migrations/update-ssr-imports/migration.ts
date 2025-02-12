@@ -8,6 +8,7 @@
 
 import { DirEntry, Rule, UpdateRecorder } from '@angular-devkit/schematics';
 import * as ts from '../../third_party/github.com/Microsoft/TypeScript/lib/typescript';
+import { getPackageJsonDependency } from '../../utility/dependencies';
 
 function* visit(directory: DirEntry): IterableIterator<ts.SourceFile> {
   for (const path of directory.subfiles) {
@@ -46,6 +47,10 @@ function* visit(directory: DirEntry): IterableIterator<ts.SourceFile> {
  */
 export default function (): Rule {
   return (tree) => {
+    if (!getPackageJsonDependency(tree, '@angular/ssr')) {
+      return;
+    }
+
     for (const sourceFile of visit(tree.root)) {
       let recorder: UpdateRecorder | undefined;
 

@@ -37,6 +37,8 @@ import { Builder, BuilderSymbol, BuilderVersionSymbol } from './internal';
 import { JobInboundMessageKind, createJobHandler } from './jobs';
 import { scheduleByName, scheduleByTarget } from './schedule-by-name';
 
+export type { Builder };
+
 // eslint-disable-next-line max-lines-per-function
 export function createBuilder<OptT = json.JsonObject, OutT extends BuilderOutput = BuilderOutput>(
   fn: BuilderHandlerFn<OptT>,
@@ -252,6 +254,9 @@ export function createBuilder<OptT = json.JsonObject, OutT extends BuilderOutput
     handler,
     [BuilderSymbol]: true,
     [BuilderVersionSymbol]: require('../package.json').version,
+    // Only needed for type safety around `Builder` types.
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    __OptionT: null!,
   };
 }
 

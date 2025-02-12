@@ -9,7 +9,7 @@
 import { lookup as lookupMimeType } from 'mrmime';
 import { extname } from 'node:path';
 import type { Connect, ViteDevServer } from 'vite';
-import { AngularMemoryOutputFiles, pathnameWithoutBasePath } from '../utils';
+import { AngularMemoryOutputFiles, AngularOutputAssets, pathnameWithoutBasePath } from '../utils';
 
 export interface ComponentStyleRecord {
   rawContent: Uint8Array;
@@ -19,7 +19,7 @@ export interface ComponentStyleRecord {
 
 export function createAngularAssetsMiddleware(
   server: ViteDevServer,
-  assets: Map<string, string>,
+  assets: AngularOutputAssets,
   outputFiles: AngularMemoryOutputFiles,
   componentStyles: Map<string, ComponentStyleRecord>,
   encapsulateStyle: (style: Uint8Array, componentId: string) => string,
@@ -36,8 +36,8 @@ export function createAngularAssetsMiddleware(
     const pathnameHasTrailingSlash = pathname[pathname.length - 1] === '/';
 
     // Rewrite all build assets to a vite raw fs URL
-    const assetSourcePath = assets.get(pathname);
-    if (assetSourcePath !== undefined) {
+    const asset = assets.get(pathname);
+    if (asset) {
       // Workaround to disable Vite transformer middleware.
       // See: https://github.com/vitejs/vite/blob/746a1daab0395f98f0afbdee8f364cb6cf2f3b3f/packages/vite/src/node/server/middlewares/transform.ts#L201 and
       // https://github.com/vitejs/vite/blob/746a1daab0395f98f0afbdee8f364cb6cf2f3b3f/packages/vite/src/node/server/transformRequest.ts#L204-L206
@@ -45,7 +45,7 @@ export function createAngularAssetsMiddleware(
 
       // The encoding needs to match what happens in the vite static middleware.
       // ref: https://github.com/vitejs/vite/blob/d4f13bd81468961c8c926438e815ab6b1c82735e/packages/vite/src/node/server/middlewares/static.ts#L163
-      req.url = `${server.config.base}@fs/${encodeURI(assetSourcePath)}`;
+      req.url = `${server.config.base}@fs/${encodeURI(asset.source)}`;
       next();
 
       return;
@@ -61,7 +61,7 @@ export function createAngularAssetsMiddleware(
         assets.get(pathname + '.html');
 
     if (htmlAssetSourcePath) {
-      req.url = `${server.config.base}@fs/${encodeURI(htmlAssetSourcePath)}`;
+      req.url = `${server.config.base}@fs/${encodeURI(htmlAssetSourcePath.source)}`;
       next();
 
       return;

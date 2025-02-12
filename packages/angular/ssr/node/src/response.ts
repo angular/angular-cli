@@ -7,7 +7,7 @@
  */
 
 import type { ServerResponse } from 'node:http';
-import type { Http2ServerRequest, Http2ServerResponse } from 'node:http2';
+import type { Http2ServerResponse } from 'node:http2';
 
 /**
  * Streams a web-standard `Response` into a Node.js `ServerResponse`
@@ -23,7 +23,7 @@ import type { Http2ServerRequest, Http2ServerResponse } from 'node:http2';
  */
 export async function writeResponseToNodeResponse(
   source: Response,
-  destination: ServerResponse | Http2ServerResponse<Http2ServerRequest>,
+  destination: ServerResponse | Http2ServerResponse,
 ): Promise<void> {
   const { status, headers, body } = source;
   destination.statusCode = status;
@@ -71,7 +71,10 @@ export async function writeResponseToNodeResponse(
         break;
       }
 
-      (destination as ServerResponse).write(value);
+      const canContinue = (destination as ServerResponse).write(value);
+      if (!canContinue) {
+        await new Promise<void>((resolve) => destination.once('drain', resolve));
+      }
     }
   } catch {
     destination.end('Internal server error.');

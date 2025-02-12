@@ -32,6 +32,7 @@ describe('Application Schematic', () => {
   const defaultOptions: ApplicationOptions = {
     name: 'foo',
     skipPackageJson: false,
+    serverRouting: false,
   };
 
   let workspaceTree: UnitTestTree;

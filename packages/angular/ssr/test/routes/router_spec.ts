@@ -61,7 +61,7 @@ describe('ServerRouter', () => {
         status: 301,
       });
       expect(router.match(new URL('http://localhost/user/123'))).toEqual({
-        route: '/user/:id',
+        route: '/user/*',
         renderMode: RenderMode.Server,
       });
     });
@@ -95,7 +95,7 @@ describe('ServerRouter', () => {
         renderMode: RenderMode.Server,
       });
       expect(userMetadata).toEqual({
-        route: '/user/:id',
+        route: '/user/*',
         renderMode: RenderMode.Server,
       });
     });
@@ -116,7 +116,7 @@ describe('ServerRouter', () => {
         renderMode: RenderMode.Server,
       });
       expect(userMetadata).toEqual({
-        route: '/user/:id',
+        route: '/user/*',
         renderMode: RenderMode.Server,
       });
     });

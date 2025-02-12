@@ -6,8 +6,8 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { basename } from 'path';
-import * as ts from 'typescript';
+import { basename } from 'node:path';
+import ts from 'typescript';
 
 // Test transform helpers.
 const basefileName = 'test-file.ts';
@@ -18,7 +18,10 @@ export function createTypescriptContext(
   useLibs = false,
   extraCompilerOptions: ts.CompilerOptions = {},
   jsxFile = false,
-) {
+): {
+  compilerHost: ts.CompilerHost;
+  program: ts.Program;
+} {
   const fileName = basefileName + (jsxFile ? 'x' : '');
   // Set compiler options.
   const compilerOptions: ts.CompilerOptions = {

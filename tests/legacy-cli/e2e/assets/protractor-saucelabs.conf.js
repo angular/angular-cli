@@ -21,25 +21,25 @@ exports.config = {
   multiCapabilities: [
     {
       browserName: 'chrome',
+      version: '132',
       platform: 'Windows 11',
-      version: '119',
       tunnelIdentifier,
     },
     {
       browserName: 'chrome',
-      platform: 'Windows 11',
-      version: '116',
-      tunnelIdentifier,
-    },
-    {
-      browserName: 'firefox',
-      version: '119',
+      version: '131',
       platform: 'Windows 11',
       tunnelIdentifier,
     },
     {
       browserName: 'firefox',
-      version: '102', // Latest Firefox ESR version as of Sep 2023
+      version: '134',
+      platform: 'Windows 11',
+      tunnelIdentifier,
+    },
+    {
+      browserName: 'firefox',
+      version: '128', // Latest Firefox ESR version as of Jan 2025
       platform: 'Windows 11',
       tunnelIdentifier,
     },
@@ -58,13 +58,13 @@ exports.config = {
     {
       browserName: 'MicrosoftEdge',
       platform: 'Windows 11',
-      version: '118',
+      version: '132',
       tunnelIdentifier,
     },
     {
       browserName: 'MicrosoftEdge',
       platform: 'Windows 11',
-      version: '115',
+      version: '131',
       tunnelIdentifier,
     },
   ],

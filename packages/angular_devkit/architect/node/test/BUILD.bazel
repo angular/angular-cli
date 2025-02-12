@@ -1,0 +1,11 @@
+load("//tools:interop.bzl", "ts_project")
+
+ts_project(
+    name = "test_lib",
+    srcs = glob(["**/*.ts"]),
+    visibility = ["//packages/angular_devkit/architect/node:__pkg__"],
+    deps = [
+        "//:node_modules/@types/node",
+        "//packages/angular_devkit/architect:architect_rjs",
+    ],
+)

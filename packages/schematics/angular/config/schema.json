@@ -4,18 +4,18 @@
   "title": "Angular Config File Options Schema",
   "type": "object",
   "additionalProperties": false,
-  "description": "Generates a configuration file in the given project.",
+  "description": "Generates configuration files for your project. These files control various aspects of your project's build process, testing, and browser compatibility. This schematic helps you create or update essential configuration files with ease.",
   "properties": {
     "project": {
       "type": "string",
-      "description": "The name of the project.",
+      "description": "The name of the project where the configuration file should be created or updated.",
       "$default": {
         "$source": "projectName"
       }
     },
     "type": {
       "type": "string",
-      "description": "Specifies which type of configuration file to create.",
+      "description": "Specifies the type of configuration file to generate.",
       "enum": ["karma", "browserslist"],
       "x-prompt": "Which type of configuration file would you like to create?",
       "$default": {

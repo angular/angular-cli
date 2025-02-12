@@ -398,6 +398,46 @@ describe('augment-index-html', () => {
       `);
   });
 
+  it(`should not add deploy URL to hints with an absolute URL`, async () => {
+    const { content, warnings } = await augmentIndexHtml({
+      ...indexGeneratorOptions,
+      deployUrl: 'https://localhost/',
+      hints: [{ mode: 'preload', url: 'http://example.com/y?b=2' }],
+    });
+
+    expect(warnings).toHaveSize(0);
+    expect(content).toEqual(oneLineHtml`
+        <html>
+          <head>
+            <base href="/">
+            <link rel="preload" href="http://example.com/y?b=2">
+          </head>
+          <body>
+          </body>
+        </html>
+      `);
+  });
+
+  it(`should not add deploy URL to hints with a root-relative URL`, async () => {
+    const { content, warnings } = await augmentIndexHtml({
+      ...indexGeneratorOptions,
+      deployUrl: 'https://example.com/',
+      hints: [{ mode: 'preload', url: '/y?b=2' }],
+    });
+
+    expect(warnings).toHaveSize(0);
+    expect(content).toEqual(oneLineHtml`
+        <html>
+          <head>
+            <base href="/">
+            <link rel="preload" href="/y?b=2">
+          </head>
+          <body>
+          </body>
+        </html>
+      `);
+  });
+
   it('should add `.mjs` script tags', async () => {
     const { content } = await augmentIndexHtml({
       ...indexGeneratorOptions,

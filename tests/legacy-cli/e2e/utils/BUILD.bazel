@@ -1,25 +1,26 @@
-load("//tools:defaults.bzl", "ts_library")
+load("//tools:interop.bzl", "ts_project")
 
-ts_library(
+package(default_visibility = ["//visibility:public"])
+
+ts_project(
     name = "utils",
     testonly = True,
     srcs = glob(["**/*.ts"]),
     data = [
         "//tests/legacy-cli/e2e/ng-snapshot",
     ],
-    visibility = ["//visibility:public"],
     deps = [
-        "@npm//@types/semver",
-        "@npm//@types/tar",
-        "@npm//ansi-colors",
-        "@npm//fast-glob",
-        "@npm//npm",
-        "@npm//protractor",
-        "@npm//rxjs",
-        "@npm//semver",
-        "@npm//tar",
-        "@npm//tree-kill",
-        "@npm//verdaccio",
-        "@npm//verdaccio-auth-memory",
+        "//:node_modules/@types/jasmine",
+        "//:node_modules/@types/semver",
+        "//:node_modules/ansi-colors",
+        "//:node_modules/fast-glob",
+        "//:node_modules/npm",
+        "//:node_modules/protractor",
+        "//:node_modules/rxjs",
+        "//:node_modules/semver",
+        "//:node_modules/tar",
+        "//:node_modules/tree-kill",
+        "//:node_modules/verdaccio",
+        "//:node_modules/verdaccio-auth-memory",
     ],
 )

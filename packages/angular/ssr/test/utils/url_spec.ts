@@ -8,6 +8,8 @@
 
 import {
   addLeadingSlash,
+  addTrailingSlash,
+  buildPathWithParams,
   joinUrlParts,
   stripIndexHtmlFromURL,
   stripLeadingSlash,
@@ -53,10 +55,26 @@ describe('URL Utils', () => {
 
   describe('addLeadingSlash', () => {
     it('should add a leading slash to a URL without one', () => {
+      expect(addLeadingSlash('path')).toBe('/path');
       expect(addLeadingSlash('path/')).toBe('/path/');
     });
 
     it('should not modify URL if it already has a leading slash', () => {
+      expect(addLeadingSlash('/path/')).toBe('/path/');
+    });
+
+    it('should handle empty URL', () => {
+      expect(addLeadingSlash('')).toBe('/');
+    });
+  });
+
+  describe('addTrailingSlash', () => {
+    it('should add a trailing slash to a URL without one', () => {
+      expect(addTrailingSlash('path')).toBe('path/');
+      expect(addTrailingSlash('/path')).toBe('/path/');
+    });
+
+    it('should not modify URL if it already has a trailing slash', () => {
       expect(addLeadingSlash('/path/')).toBe('/path/');
     });
 
@@ -130,6 +148,37 @@ describe('URL Utils', () => {
       const url = new URL('https://www.example.com/page/index.html');
       const result = stripIndexHtmlFromURL(url);
       expect(result.href).toBe('https://www.example.com/page');
+    });
+  });
+
+  describe('buildPathWithParams', () => {
+    it('should return the same URL when there are no placeholders in the toPath', () => {
+      const fromPath = '/base/path';
+      const toPath = '/static/path';
+
+      const result = buildPathWithParams(toPath, fromPath);
+
+      // Since there are no placeholders, the URL remains the same.
+      expect(result.toString()).toBe('/static/path');
+    });
+
+    it('should replace placeholders with corresponding segments from the base URL path', () => {
+      const fromPath = '/base/path';
+      const toPath = '/*/*/details';
+
+      const result = buildPathWithParams(toPath, fromPath);
+
+      expect(result.toString()).toBe('/base/path/details');
+    });
+
+    it('should throw an error if the toPath does not start with "/"', () => {
+      const fromPath = '/base/path';
+      const toPath = 'details';
+
+      // This should throw an error because toPath doesn't start with "/"
+      expect(() => {
+        buildPathWithParams(toPath, fromPath);
+      }).toThrowError(`Invalid toPath: The string must start with a '/'. Received: 'details'`);
     });
   });
 });

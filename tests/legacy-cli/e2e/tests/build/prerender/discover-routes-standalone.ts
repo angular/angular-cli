@@ -59,6 +59,10 @@ export default async function () {
       path: 'lazy-two',
       loadComponent: () => import('./lazy-two/lazy-two.component').then(c => c.LazyTwoComponent),
     },
+    {
+      path: ':param',
+      component: OneComponent,
+    },
   ];
   `,
   );

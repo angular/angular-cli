@@ -32,8 +32,8 @@ export async function assertValidDependencyRanges(
   }
 
   const failures: string[] = [
-    ...(await checkPeerDependencies(newVersion, allPackages)),
-    ...(await checkSchematicsAngularLatestVersion(newVersion)),
+    ...checkPeerDependencies(newVersion, allPackages),
+    ...checkSchematicsAngularLatestVersion(newVersion),
   ];
 
   if (failures.length !== 0) {

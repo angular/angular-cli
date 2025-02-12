@@ -15,3 +15,4 @@
 dist/
 /tests/legacy-cli/e2e/assets/
 /tools/test/*.json
+pnpm-lock.yaml

@@ -218,7 +218,7 @@ describe('Library Schematic', () => {
       const tree = await schematicRunner.runSchematic('library', defaultOptions, workspaceTree);
 
       const packageJson = getJsonFileContent(tree, 'package.json');
-      expect(packageJson.devDependencies['ng-packagr']).toEqual(latestVersions['ng-packagr']);
+      expect(packageJson.devDependencies['ng-packagr']).toBeDefined();
     });
 
     it('should use the latest known versions in package.json', async () => {

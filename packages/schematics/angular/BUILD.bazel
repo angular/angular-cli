@@ -3,13 +3,15 @@
 # Use of this source code is governed by an MIT-style license that can be
 # found in the LICENSE file at https://angular.dev/license
 
-load("@npm//@bazel/jasmine:index.bzl", "jasmine_node_test")
-load("//tools:defaults.bzl", "pkg_npm", "ts_library")
+load("@npm2//:defs.bzl", "npm_link_all_packages")
+load("//tools:defaults2.bzl", "copy_to_bin", "jasmine_test", "npm_package", "ts_project")
 load("//tools:ts_json_schema.bzl", "ts_json_schema")
 
 licenses(["notice"])
 
 package(default_visibility = ["//visibility:public"])
+
+npm_link_all_packages()
 
 # Create a list of Tuple("path/file.json", "path_file") to be used as rules
 ALL_SCHEMA_TARGETS = [
@@ -35,9 +37,34 @@ ALL_SCHEMA_TARGETS = [
     for (src, name) in ALL_SCHEMA_TARGETS
 ]
 
-ts_library(
+copy_to_bin(
+    name = "schemas",
+    srcs = glob(["**/schema.json"]),
+)
+
+RUNTIME_ASSETS = [
+    "collection.json",
+    "migrations/migration-collection.json",
+    "package.json",
+    "utility/latest-versions/package.json",
+] + glob(
+    include = [
+        "*/schema.json",
+        "*/files/**/*",
+        "*/other-files/**/*",
+        "*/implements-files/**/*",
+        "*/type-files/**/*",
+        "*/functional-files/**/*",
+        "*/class-files/**/*",
+    ],
+    exclude = [
+        # NB: we need to exclude the nested node_modules that is laid out by yarn workspaces
+        "node_modules/**",
+    ],
+)
+
+ts_project(
     name = "angular",
-    package_name = "@schematics/angular",
     srcs = glob(
         include = ["**/*.ts"],
         exclude = [
@@ -58,48 +85,29 @@ ts_library(
         "//packages/schematics/angular:" + src.replace(".json", ".ts")
         for (src, _) in ALL_SCHEMA_TARGETS
     ],
-    data = [
-        "collection.json",
-        "migrations/migration-collection.json",
-        "package.json",
-        "utility/latest-versions/package.json",
-    ] + glob(
-        include = [
-            "*/schema.json",
-            "*/files/**/*",
-            "*/other-files/**/*",
-            "*/implements-files/**/*",
-            "*/type-files/**/*",
-            "*/functional-files/**/*",
-            "*/class-files/**/*",
-        ],
-        exclude = [
-            # NB: we need to exclude the nested node_modules that is laid out by yarn workspaces
-            "node_modules/**",
-        ],
-    ),
+    data = RUNTIME_ASSETS,
     module_name = "@schematics/angular",
     deps = [
-        "//packages/angular_devkit/core",
-        "//packages/angular_devkit/schematics",
-        "//packages/angular_devkit/schematics/tasks",
-        "//packages/schematics/angular/third_party/github.com/Microsoft/TypeScript",
-        "@npm//@types/node",
-        "@npm//browserslist",
-        "@npm//jsonc-parser",
+        ":node_modules/@angular-devkit/core",
+        ":node_modules/@angular-devkit/schematics",
+        "//:node_modules/@inquirer/prompts",
+        "//:node_modules/@types/node",
+        "//:node_modules/browserslist",
+        "//:node_modules/jsonc-parser",
+        "//packages/schematics/angular/third_party/github.com/Microsoft/TypeScript:TypeScript_rjs",
     ],
 )
 
-jasmine_node_test(
+jasmine_test(
     name = "no_typescript_runtime_dep_test",
-    srcs = ["no_typescript_runtime_dep_spec.js"],
-    deps = [
-        ":angular",
-        "@npm//jasmine",
+    data = [
+        "no_typescript_runtime_dep_spec.js",
+        ":angular_rjs",
+        "//:node_modules/@types/jasmine",
     ],
 )
 
-ts_library(
+ts_project(
     name = "angular_test_lib",
     testonly = True,
     srcs = glob(
@@ -112,28 +120,19 @@ ts_library(
             "node_modules/**",
         ],
     ),
-    # @external_begin
     deps = [
-        ":angular",
-        "//packages/angular_devkit/core",
-        "//packages/angular_devkit/core/node/testing",
-        "//packages/angular_devkit/schematics",
-        "//packages/angular_devkit/schematics/tasks",
-        "//packages/angular_devkit/schematics/testing",
-        "//packages/schematics/angular/third_party/github.com/Microsoft/TypeScript",
-        "@npm//jsonc-parser",
+        ":angular_rjs",
+        ":node_modules/@angular-devkit/core",
+        ":node_modules/@angular-devkit/schematics",
+        "//:node_modules/@types/jasmine",
+        "//:node_modules/jsonc-parser",
+        "//packages/schematics/angular/third_party/github.com/Microsoft/TypeScript:TypeScript_rjs",
     ],
-    # @external_end
 )
 
-jasmine_node_test(
+jasmine_test(
     name = "angular_test",
-    srcs = [":angular_test_lib"],
-    deps = [
-        "//packages/schematics/angular/third_party/github.com/Microsoft/TypeScript",
-        "@npm//jasmine",
-        "@npm//source-map",
-    ],
+    data = [":angular_test_lib_rjs"],
 )
 
 genrule(
@@ -143,19 +142,22 @@ genrule(
     cmd = "cp $(execpath //:LICENSE) $@",
 )
 
-pkg_npm(
-    name = "npm_package",
+npm_package(
+    name = "pkg",
     pkg_deps = [
         "//packages/angular_devkit/schematics:package.json",
         "//packages/angular_devkit/core:package.json",
     ],
+    stamp_files = [
+        "utility/latest-versions.js",
+    ],
     tags = ["release-package"],
-    deps = [
+    deps = RUNTIME_ASSETS + [
         ":README.md",
-        ":angular",
+        ":angular_rjs",
         ":license",
-        ":migrations/migration-collection.json",
-        ":utility/latest-versions/package.json",
         "//packages/schematics/angular/third_party/github.com/Microsoft/TypeScript:LICENSE",
+        # Force typescript library to be included.
+        "//packages/schematics/angular/third_party/github.com/Microsoft/TypeScript:lib/typescript.js",
     ],
 )

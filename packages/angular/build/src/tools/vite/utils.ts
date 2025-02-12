@@ -7,12 +7,18 @@
  */
 
 import { lookup as lookupMimeType } from 'mrmime';
+import { isBuiltin } from 'node:module';
 import { extname } from 'node:path';
+import type { DepOptimizationConfig } from 'vite';
+import { JavaScriptTransformer } from '../esbuild/javascript-transformer';
+import { getFeatureSupport } from '../esbuild/utils';
 
 export type AngularMemoryOutputFiles = Map<
   string,
   { contents: Uint8Array; hash: string; servable: boolean }
 >;
+
+export type AngularOutputAssets = Map<string, { source: string }>;
 
 export function pathnameWithoutBasePath(url: string, basePath: string): string {
   const parsedUrl = new URL(url, 'http://localhost');
@@ -32,4 +38,75 @@ export function lookupMimeTypeFromRequest(url: string): string | undefined {
   }
 
   return extension && lookupMimeType(extension);
+}
+
+type ViteEsBuildPlugin = NonNullable<
+  NonNullable<DepOptimizationConfig['esbuildOptions']>['plugins']
+>[0];
+
+export type EsbuildLoaderOption = Exclude<
+  DepOptimizationConfig['esbuildOptions'],
+  undefined
+>['loader'];
+
+export function getDepOptimizationConfig({
+  disabled,
+  exclude,
+  include,
+  target,
+  zoneless,
+  prebundleTransformer,
+  ssr,
+  loader,
+  thirdPartySourcemaps,
+  define = {},
+}: {
+  disabled: boolean;
+  exclude: string[];
+  include: string[];
+  target: string[];
+  prebundleTransformer: JavaScriptTransformer;
+  ssr: boolean;
+  zoneless: boolean;
+  loader?: EsbuildLoaderOption;
+  thirdPartySourcemaps: boolean;
+  define: Record<string, string> | undefined;
+}): DepOptimizationConfig {
+  const plugins: ViteEsBuildPlugin[] = [
+    {
+      name: `angular-vite-optimize-deps${ssr ? '-ssr' : ''}${
+        thirdPartySourcemaps ? '-vendor-sourcemap' : ''
+      }`,
+      setup(build) {
+        build.onLoad({ filter: /\.[cm]?js$/ }, async (args) => {
+          return {
+            contents: await prebundleTransformer.transformFile(args.path),
+            loader: 'js',
+          };
+        });
+      },
+    },
+  ];
+
+  return {
+    // Exclude any explicitly defined dependencies (currently build defined externals)
+    exclude,
+    // NB: to disable the deps optimizer, set optimizeDeps.noDiscovery to true and optimizeDeps.include as undefined.
+    // Include all implict dependencies from the external packages internal option
+    include: disabled ? undefined : include,
+    noDiscovery: disabled,
+    // Add an esbuild plugin to run the Angular linker on dependencies
+    esbuildOptions: {
+      // Set esbuild supported targets.
+      target,
+      supported: getFeatureSupport(target, zoneless),
+      plugins,
+      loader,
+      define: {
+        ...define,
+        'ngServerMode': `${ssr}`,
+      },
+      resolveExtensions: ['.mjs', '.js', '.cjs'],
+    },
+  };
 }

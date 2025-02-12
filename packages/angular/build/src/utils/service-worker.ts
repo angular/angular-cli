@@ -126,7 +126,7 @@ export async function augmentAppWithServiceWorker(
   outputPath: string,
   baseHref: string,
   ngswConfigPath?: string,
-  inputputFileSystem = fsPromises,
+  inputFileSystem = fsPromises,
   outputFileSystem = fsPromises,
 ): Promise<void> {
   // Determine the configuration file path
@@ -137,7 +137,7 @@ export async function augmentAppWithServiceWorker(
   // Read the configuration file
   let config: Config | undefined;
   try {
-    const configurationData = await inputputFileSystem.readFile(configPath, 'utf-8');
+    const configurationData = await inputFileSystem.readFile(configPath, 'utf-8');
     config = JSON.parse(configurationData) as Config;
   } catch (error) {
     assertIsError(error);
@@ -161,11 +161,7 @@ export async function augmentAppWithServiceWorker(
   const copy = async (src: string, dest: string): Promise<void> => {
     const resolvedDest = path.join(outputPath, dest);
 
-    return inputputFileSystem === outputFileSystem
-      ? // Native FS (Builder).
-        inputputFileSystem.copyFile(src, resolvedDest, fsConstants.COPYFILE_FICLONE)
-      : // memfs (Webpack): Read the file from the input FS (disk) and write it to the output FS (memory).
-        outputFileSystem.writeFile(resolvedDest, await inputputFileSystem.readFile(src));
+    return outputFileSystem.writeFile(resolvedDest, await inputFileSystem.readFile(src));
   };
 
   await outputFileSystem.writeFile(path.join(outputPath, 'ngsw.json'), result.manifest);

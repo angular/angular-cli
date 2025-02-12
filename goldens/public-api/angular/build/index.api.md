@@ -19,7 +19,7 @@ export interface ApplicationBuilderExtensions {
 }
 
 // @public
-export interface ApplicationBuilderOptions {
+export type ApplicationBuilderOptions = {
     allowedCommonJsDependencies?: string[];
     aot?: boolean;
     appShell?: boolean;
@@ -69,21 +69,10 @@ export interface ApplicationBuilderOptions {
     verbose?: boolean;
     watch?: boolean;
     webWorkerTsConfig?: string;
-}
-
-// @public (undocumented)
-export interface ApplicationBuilderOutput extends BuilderOutput {
-    // (undocumented)
-    assetFiles?: {
-        source: string;
-        destination: string;
-    }[];
-    // (undocumented)
-    outputFiles?: BuildOutputFile[];
-}
+};
 
 // @public
-export function buildApplication(options: ApplicationBuilderOptions, context: BuilderContext, extensions?: ApplicationBuilderExtensions): AsyncIterable<ApplicationBuilderOutput>;
+export function buildApplication(options: ApplicationBuilderOptions, context: BuilderContext, extensions?: ApplicationBuilderExtensions): AsyncIterable<BuilderOutput>;
 
 // @public (undocumented)
 export interface BuildOutputAsset {
@@ -118,7 +107,8 @@ export enum BuildOutputFileType {
 }
 
 // @public
-export interface DevServerBuilderOptions {
+export type DevServerBuilderOptions = {
+    allowedHosts?: AllowedHosts;
     buildTarget: string;
     headers?: {
         [key: string]: string;
@@ -138,7 +128,7 @@ export interface DevServerBuilderOptions {
     sslKey?: string;
     verbose?: boolean;
     watch?: boolean;
-}
+};
 
 // @public
 export interface DevServerBuilderOutput extends BuilderOutput {
@@ -161,13 +151,24 @@ export function executeDevServerBuilder(options: DevServerBuilderOptions, contex
 export function executeExtractI18nBuilder(options: ExtractI18nBuilderOptions, context: BuilderContext, extensions?: ApplicationBuilderExtensions): Promise<BuilderOutput>;
 
 // @public
-export interface ExtractI18nBuilderOptions {
+export function executeNgPackagrBuilder(options: NgPackagrBuilderOptions, context: BuilderContext): AsyncIterableIterator<BuilderOutput>;
+
+// @public
+export type ExtractI18nBuilderOptions = {
     buildTarget?: string;
     format?: Format;
     outFile?: string;
     outputPath?: string;
     progress?: boolean;
-}
+};
+
+// @public
+export type NgPackagrBuilderOptions = {
+    poll?: number;
+    project: string;
+    tsConfig?: string;
+    watch?: boolean;
+};
 
 // (No @packageDocumentation comment for this package)
 

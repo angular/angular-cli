@@ -85,7 +85,7 @@ export default createBuilder(
           tsConfig: options.tsConfig,
           polyfills: options.polyfills ?? ['zone.js', 'zone.js/testing'],
           outputPath: testOut,
-          aot: false,
+          aot: options.aot,
           index: false,
           outputHashing: OutputHashing.None,
           outExtension: 'mjs', // Force native ESM.

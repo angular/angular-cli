@@ -8,22 +8,29 @@
   "prHourlyLimit": 2,
   "labels": ["target: minor", "action: merge"],
   "timezone": "America/Tijuana",
+  "postUpgradeTasks": {
+    "commands": [
+      "git restore .yarn/releases/yarn-4.5.0.cjs pnpm-lock.yaml",
+      "yarn install --immutable",
+      "yarn bazel run @npm2//:sync || true"
+    ],
+    "fileFilters": [".aspect/rules/external_repository_action_cache/**/*", "pnpm-lock.yaml"],
+    "executionMode": "branch"
+  },
   "lockFileMaintenance": {
     "enabled": true
   },
   "dependencyDashboard": true,
-  "schedule": [
-    "after 10:00pm every weekday",
-    "before 4:00am every weekday",
-    "every weekend"
-  ],
+  "schedule": ["after 10:00pm every weekday", "before 4:00am every weekday", "every weekend"],
   "baseBranches": ["main"],
   "ignoreDeps": [
     "@types/node",
     "@types/express",
     "build_bazel_rules_nodejs",
     "rules_pkg",
-    "yarn"
+    "yarn",
+    "esbuild",
+    "esbuild-wasm"
   ],
   "includePaths": [
     "WORKSPACE",
@@ -36,6 +43,10 @@
     {
       "matchPackageNames": ["quicktype-core"],
       "schedule": ["before 4:00am on the first day of the month"]
+    },
+    {
+      "matchCurrentVersion": "/0\\.0\\.0-/",
+      "enabled": false
     },
     {
       "groupName": "angular",

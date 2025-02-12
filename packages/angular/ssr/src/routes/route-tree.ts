@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { stripTrailingSlash } from '../utils/url';
+import { addLeadingSlash } from '../utils/url';
 import { RenderMode } from './route-config';
 
 /**
@@ -65,6 +65,11 @@ export interface RouteTreeNodeMetadata {
    * Specifies the rendering mode used for this route.
    */
   renderMode: RenderMode;
+
+  /**
+   * A list of resource that should be preloaded by the browser.
+   */
+  preload?: readonly string[];
 }
 
 /**
@@ -73,21 +78,6 @@ export interface RouteTreeNodeMetadata {
  * The `AdditionalMetadata` type parameter allows for extending the node metadata with custom data.
  */
 interface RouteTreeNode<AdditionalMetadata extends Record<string, unknown>> {
-  /**
-   * The segment value associated with this node.
-   * A segment is a single part of a route path, typically delimited by slashes (`/`).
-   * For example, in the route `/users/:id/profile`, the segments are `users`, `:id`, and `profile`.
-   * Segments can also be wildcards (`*`), which match any segment in that position of the route.
-   */
-  segment: string;
-
-  /**
-   * The index indicating the order in which the route was inserted into the tree.
-   * This index helps determine the priority of routes during matching, with lower indexes
-   * indicating earlier inserted routes.
-   */
-  insertionIndex: number;
-
   /**
    * A map of child nodes, keyed by their corresponding route segment or wildcard.
    */
@@ -111,14 +101,7 @@ export class RouteTree<AdditionalMetadata extends Record<string, unknown> = {}> 
    * The root node of the route tree.
    * All routes are stored and accessed relative to this root node.
    */
-  private readonly root = this.createEmptyRouteTreeNode('');
-
-  /**
-   * A counter that tracks the order of route insertion.
-   * This ensures that routes are matched in the order they were defined,
-   * with earlier routes taking precedence.
-   */
-  private insertionIndexCounter = 0;
+  private readonly root = this.createEmptyRouteTreeNode();
 
   /**
    * Inserts a new route into the route tree.
@@ -131,27 +114,26 @@ export class RouteTree<AdditionalMetadata extends Record<string, unknown> = {}> 
   insert(route: string, metadata: RouteTreeNodeMetadataWithoutRoute & AdditionalMetadata): void {
     let node = this.root;
     const segments = this.getPathSegments(route);
+    const normalizedSegments: string[] = [];
 
     for (const segment of segments) {
       // Replace parameterized segments (e.g., :id) with a wildcard (*) for matching
       const normalizedSegment = segment[0] === ':' ? '*' : segment;
       let childNode = node.children.get(normalizedSegment);
-
       if (!childNode) {
-        childNode = this.createEmptyRouteTreeNode(normalizedSegment);
+        childNode = this.createEmptyRouteTreeNode();
         node.children.set(normalizedSegment, childNode);
       }
 
       node = childNode;
+      normalizedSegments.push(normalizedSegment);
     }
 
     // At the leaf node, store the full route and its associated metadata
     node.metadata = {
       ...metadata,
-      route: segments.join('/'),
+      route: addLeadingSlash(normalizedSegments.join('/')),
     };
-
-    node.insertionIndex = this.insertionIndexCounter++;
   }
 
   /**
@@ -223,7 +205,7 @@ export class RouteTree<AdditionalMetadata extends Record<string, unknown> = {}> 
    * @returns An array of path segments.
    */
   private getPathSegments(route: string): string[] {
-    return stripTrailingSlash(route).split('/');
+    return route.split('/').filter(Boolean);
   }
 
   /**
@@ -233,91 +215,58 @@ export class RouteTree<AdditionalMetadata extends Record<string, unknown> = {}> 
    * This function prioritizes exact segment matches first, followed by wildcard matches (`*`),
    * and finally deep wildcard matches (`**`) that consume all segments.
    *
-   * @param remainingSegments - The remaining segments of the route path to match.
-   * @param node - The current node in the route tree to start traversal from.
+   * @param segments - The array of route path segments to match against the route tree.
+   * @param node - The current node in the route tree to start traversal from. Defaults to the root node.
+   * @param currentIndex - The index of the segment in `remainingSegments` currently being matched.
+   * Defaults to `0` (the first segment).
    *
    * @returns The node that best matches the remaining segments or `undefined` if no match is found.
    */
   private traverseBySegments(
-    remainingSegments: string[] | undefined,
+    segments: string[],
     node = this.root,
+    currentIndex = 0,
   ): RouteTreeNode<AdditionalMetadata> | undefined {
-    const { metadata, children } = node;
+    if (currentIndex >= segments.length) {
+      return node.metadata ? node : node.children.get('**');
+    }
 
-    // If there are no remaining segments and the node has metadata, return this node
-    if (!remainingSegments?.length) {
-      if (metadata) {
-        return node;
+    if (!node.children.size) {
+      return undefined;
+    }
+
+    const segment = segments[currentIndex];
+
+    // 1. Attempt exact match with the current segment.
+    const exactMatch = node.children.get(segment);
+    if (exactMatch) {
+      const match = this.traverseBySegments(segments, exactMatch, currentIndex + 1);
+      if (match) {
+        return match;
       }
-
-      return;
     }
 
-    // If the node has no children, end the traversal
-    if (!children.size) {
-      return;
+    // 2. Attempt wildcard match ('*').
+    const wildcardMatch = node.children.get('*');
+    if (wildcardMatch) {
+      const match = this.traverseBySegments(segments, wildcardMatch, currentIndex + 1);
+      if (match) {
+        return match;
+      }
     }
 
-    const [segment, ...restSegments] = remainingSegments;
-    let currentBestMatchNode: RouteTreeNode<AdditionalMetadata> | undefined;
-
-    // 1. Exact segment match
-    const exactMatchNode = node.children.get(segment);
-    currentBestMatchNode = this.getHigherPriorityNode(
-      currentBestMatchNode,
-      this.traverseBySegments(restSegments, exactMatchNode),
-    );
-
-    // 2. Wildcard segment match (`*`)
-    const wildcardNode = node.children.get('*');
-    currentBestMatchNode = this.getHigherPriorityNode(
-      currentBestMatchNode,
-      this.traverseBySegments(restSegments, wildcardNode),
-    );
-
-    // 3. Deep wildcard segment match (`**`)
-    const deepWildcardNode = node.children.get('**');
-    currentBestMatchNode = this.getHigherPriorityNode(currentBestMatchNode, deepWildcardNode);
-
-    return currentBestMatchNode;
+    // 3. Attempt double wildcard match ('**').
+    return node.children.get('**');
   }
 
   /**
-   * Compares two nodes and returns the node with higher priority based on insertion index.
-   * A node with a lower insertion index is prioritized as it was defined earlier.
-   *
-   * @param currentBestMatchNode - The current best match node.
-   * @param candidateNode - The node being evaluated for higher priority based on insertion index.
-   * @returns The node with higher priority (i.e., lower insertion index). If one of the nodes is `undefined`, the other node is returned.
-   */
-  private getHigherPriorityNode(
-    currentBestMatchNode: RouteTreeNode<AdditionalMetadata> | undefined,
-    candidateNode: RouteTreeNode<AdditionalMetadata> | undefined,
-  ): RouteTreeNode<AdditionalMetadata> | undefined {
-    if (!candidateNode) {
-      return currentBestMatchNode;
-    }
-
-    if (!currentBestMatchNode) {
-      return candidateNode;
-    }
-
-    return candidateNode.insertionIndex < currentBestMatchNode.insertionIndex
-      ? candidateNode
-      : currentBestMatchNode;
-  }
-
-  /**
-   * Creates an empty route tree node with the specified segment.
+   * Creates an empty route tree node.
    * This helper function is used during the tree construction.
    *
-   * @param segment - The route segment that this node represents.
    * @returns A new, empty route tree node.
    */
-  private createEmptyRouteTreeNode(segment: string): RouteTreeNode<AdditionalMetadata> {
+  private createEmptyRouteTreeNode(): RouteTreeNode<AdditionalMetadata> {
     return {
-      segment,
-      insertionIndex: -1,
       children: new Map(),
     };
   }

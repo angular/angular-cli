@@ -26,7 +26,10 @@ import { AngularCompilation, DiagnosticModes, EmitFileResult } from './angular-c
 export class ParallelCompilation extends AngularCompilation {
   readonly #worker: WorkerPool;
 
-  constructor(readonly jit: boolean) {
+  constructor(
+    private readonly jit: boolean,
+    private readonly browserOnlyBuild: boolean,
+  ) {
     super();
 
     // TODO: Convert to import.meta usage during ESM transition
@@ -99,6 +102,7 @@ export class ParallelCompilation extends AngularCompilation {
         fileReplacements: hostOptions.fileReplacements,
         tsconfig,
         jit: this.jit,
+        browserOnlyBuild: this.browserOnlyBuild,
         stylesheetPort: stylesheetChannel.port2,
         optionsPort: optionsChannel.port2,
         optionsSignal,

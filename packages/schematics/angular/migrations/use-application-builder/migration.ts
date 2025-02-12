@@ -215,6 +215,7 @@ function updateProjects(tree: Tree, context: SchematicContext) {
         case Builders.Application:
         case Builders.DevServer:
         case Builders.ExtractI18n:
+        case Builders.NgPackagr:
           // Ignore application, dev server, and i18n extraction for devkit usage check.
           // Both will be replaced if no other usage is found.
           continue;
@@ -238,6 +239,9 @@ function updateProjects(tree: Tree, context: SchematicContext) {
             break;
           case Builders.ExtractI18n:
             target.builder = '@angular/build:extract-i18n';
+            break;
+          case Builders.NgPackagr:
+            target.builder = '@angular/build:ng-packagr';
             break;
         }
       }

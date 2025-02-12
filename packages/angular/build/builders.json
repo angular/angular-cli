@@ -14,6 +14,11 @@
       "implementation": "./src/builders/extract-i18n/index",
       "schema": "./src/builders/extract-i18n/schema.json",
       "description": "Extract i18n messages from an application."
+    },
+    "ng-packagr": {
+      "implementation": "./src/builders/ng-packagr/index",
+      "schema": "./src/builders/ng-packagr/schema.json",
+      "description": "Build a library with ng-packagr."
     }
   }
 }

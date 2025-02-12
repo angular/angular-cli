@@ -32,6 +32,12 @@ export default async function () {
       };
     }
 
+    // Remove bundle budgets due to the increased size from JIT
+    build.configurations.production = {
+      ...build.configurations.production,
+      budgets: undefined,
+    };
+
     build.options.aot = false;
   });
   // Test it works

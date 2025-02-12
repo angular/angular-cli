@@ -61,5 +61,22 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       harness.expectFile('dist/browser/main.js').content.not.toContain('A_BOOLEAN');
       harness.expectFile('dist/browser/main.js').content.toContain('(true)');
     });
+
+    it('should replace a value in script code', async () => {
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+        define: {
+          'A_BOOLEAN': 'true',
+        },
+        scripts: ['./src/script.js'],
+      });
+
+      await harness.writeFile('src/script.js', 'console.log(A_BOOLEAN);');
+
+      const { result } = await harness.executeOnce();
+      expect(result?.success).toBe(true);
+      harness.expectFile('dist/browser/scripts.js').content.not.toContain('A_BOOLEAN');
+      harness.expectFile('dist/browser/scripts.js').content.toContain('(true)');
+    });
   });
 });

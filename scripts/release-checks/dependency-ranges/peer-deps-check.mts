@@ -16,12 +16,12 @@ export interface PackageJson {
   peerDependencies?: Record<string, string>;
 }
 
-export async function checkPeerDependencies(
+export function checkPeerDependencies(
   newVersion: semver.SemVer,
   allPackages: PackageJson[],
-): Promise<string[]> {
-  const { major, minor } = newVersion;
-  const isPrerelease = !!newVersion.prerelease[0];
+): string[] {
+  const { major, minor, prerelease } = newVersion;
+  const isPrerelease = !!prerelease[0];
   const isMajor = minor === 0;
 
   let expectedFwPeerDep = `^${major}.0.0`;
@@ -58,7 +58,7 @@ function checkPackage(pkgJson: PackageJson, expectedFwPeerDep: string): string[]
 
     if (range !== expectedFwPeerDep) {
       failures.push(
-        `${pkgJson.name}: Unexpected peer dependency range for "${depName}". Expected: ${expectedFwPeerDep}`,
+        `${pkgJson.name}: Unexpected peer dependency range for "${depName}". Expected: ${expectedFwPeerDep} but got: ${range}`,
       );
     }
   }

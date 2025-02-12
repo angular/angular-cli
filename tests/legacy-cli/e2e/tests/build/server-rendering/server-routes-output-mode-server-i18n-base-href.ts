@@ -87,17 +87,18 @@ export default async function () {
 
   // Tests responses
   const port = await spawnServer();
-  const pathname = '/ssr';
-
+  const pathnamesToVerify = ['/ssr', '/ssg'];
   for (const { lang } of langTranslations) {
-    const res = await fetch(`http://localhost:${port}/base/${lang}${pathname}`);
-    const text = await res.text();
+    for (const pathname of pathnamesToVerify) {
+      const res = await fetch(`http://localhost:${port}/base/${lang}${pathname}`);
+      const text = await res.text();
 
-    assert.match(
-      text,
-      new RegExp(`<p id="locale">${lang}</p>`),
-      `Response for '${lang}${pathname}': '<p id="locale">${lang}</p>' was not matched in content.`,
-    );
+      assert.match(
+        text,
+        new RegExp(`<p id="locale">${lang}</p>`),
+        `Response for '${lang}${pathname}': '<p id="locale">${lang}</p>' was not matched in content.`,
+      );
+    }
   }
 }
 

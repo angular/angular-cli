@@ -8,15 +8,17 @@
 
 import type { Compilation, LoaderContext } from 'webpack';
 
-export const InlineAngularResourceLoaderPath = __filename;
+export const InlineAngularResourceLoaderPath: string = __filename;
 
-export const InlineAngularResourceSymbol = Symbol('@ngtools/webpack[angular-resource]');
+export const InlineAngularResourceSymbol: unique symbol = Symbol(
+  '@ngtools/webpack[angular-resource]',
+);
 
 export interface CompilationWithInlineAngularResource extends Compilation {
   [InlineAngularResourceSymbol]: string;
 }
 
-export default function (this: LoaderContext<{ data?: string }>) {
+export default function (this: LoaderContext<{ data?: string }>): void {
   const callback = this.async();
   const { data } = this.getOptions();
 

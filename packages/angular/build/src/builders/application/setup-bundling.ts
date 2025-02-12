@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
+import { AngularCompilation } from '../../tools/angular/compilation';
 import { ComponentStylesheetBundler } from '../../tools/esbuild/angular/component-stylesheets';
 import { SourceFileCache } from '../../tools/esbuild/angular/source-file-cache';
 import {
@@ -34,6 +35,7 @@ export function setupBundlerContexts(
   target: string[],
   codeBundleCache: SourceFileCache,
   stylesheetBundler: ComponentStylesheetBundler,
+  angularCompilation: AngularCompilation,
   templateUpdates: Map<string, string> | undefined,
 ): {
   typescriptContexts: BundlerContext[];
@@ -61,6 +63,7 @@ export function setupBundlerContexts(
         target,
         codeBundleCache,
         stylesheetBundler,
+        angularCompilation,
         templateUpdates,
       ),
     ),

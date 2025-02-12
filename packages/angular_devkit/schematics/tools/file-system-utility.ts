@@ -7,9 +7,9 @@
  */
 
 import { JsonValue } from '@angular-devkit/core';
-import { FileDoesNotExistException } from '@angular-devkit/schematics';
 import { readFileSync } from 'fs';
 import { ParseError, parse, printParseErrorCode } from 'jsonc-parser';
+import { FileDoesNotExistException } from '../src/exception/exception';
 
 export function readJsonFile(path: string): JsonValue {
   let data;

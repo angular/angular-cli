@@ -1,10 +1,7 @@
-# Copyright Google Inc. All Rights Reserved.
-#
-# Use of this source code is governed by an MIT-style license that can be
-# found in the LICENSE file at https://angular.dev/license
+load("@aspect_rules_ts//ts:defs.bzl", rules_js_tsconfig = "ts_config")
 load("@bazel_skylib//rules:common_settings.bzl", "bool_flag")
-load("@build_bazel_rules_nodejs//:index.bzl", "copy_to_bin")
-load("@npm//@bazel/concatjs:index.bzl", "ts_config")
+load("@npm2//:defs.bzl", "npm_link_all_packages")
+load("//tools:defaults2.bzl", "copy_to_bin")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -18,6 +15,45 @@ exports_files([
     "tsconfig-build.json",
     "package.json",
 ])
+
+npm_link_all_packages()
+
+rules_js_tsconfig(
+    name = "build-tsconfig",
+    src = "tsconfig-build.json",
+    deps = [
+        "tsconfig.json",
+        "//:node_modules/@types/node",
+    ],
+)
+
+rules_js_tsconfig(
+    name = "test-tsconfig",
+    src = "tsconfig-test.json",
+    deps = [
+        "tsconfig.json",
+        "//:node_modules/@types/jasmine",
+        "//:node_modules/@types/node",
+    ],
+)
+
+rules_js_tsconfig(
+    name = "build-tsconfig-esm",
+    src = "tsconfig-build-esm.json",
+    deps = [
+        "tsconfig.json",
+    ],
+)
+
+rules_js_tsconfig(
+    name = "test-tsconfig-esm",
+    src = "tsconfig-test-esm.json",
+    deps = [
+        ":build-tsconfig-esm",
+        "//:node_modules/@types/jasmine",
+        "//:node_modules/@types/node",
+    ],
+)
 
 # Files required by e2e tests
 copy_to_bin(
@@ -57,12 +93,4 @@ config_setting(
     flag_values = {
         ":enable_snapshot_repo_deps": "true",
     },
-)
-
-ts_config(
-    name = "tsconfig-build-ng",
-    src = "tsconfig-build-ng.json",
-    deps = [
-        ":tsconfig.json",
-    ],
 )

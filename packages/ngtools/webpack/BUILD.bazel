@@ -4,16 +4,17 @@
 # found in the LICENSE file at https://angular.dev/license
 
 load("@npm//@angular/build-tooling/bazel/api-golden:index.bzl", "api_golden_test_npm_package")
-load("@npm//@bazel/jasmine:index.bzl", "jasmine_node_test")
-load("//tools:defaults.bzl", "pkg_npm", "ts_library")
+load("@npm2//:defs.bzl", "npm_link_all_packages")
+load("//tools:defaults2.bzl", "jasmine_test", "npm_package", "ts_project")
 
 licenses(["notice"])
 
 package(default_visibility = ["//visibility:public"])
 
-ts_library(
+npm_link_all_packages()
+
+ts_project(
     name = "webpack",
-    package_name = "@ngtools/webpack",
     srcs = glob(
         include = [
             "src/**/*.ts",
@@ -22,21 +23,22 @@ ts_library(
             "src/**/*_spec.ts",
             "src/**/*_spec_helpers.ts",
         ],
-    ),
+    ) + [
+        "index.ts",
+    ],
     data = [
         "package.json",
     ],
     module_name = "@ngtools/webpack",
-    module_root = "src/index.d.ts",
     deps = [
-        "@npm//@angular/compiler-cli",
-        "@npm//@types/node",
-        "@npm//typescript",
-        "@npm//webpack",
+        "//:node_modules/@angular/compiler-cli",
+        "//:node_modules/@types/node",
+        "//:node_modules/typescript",
+        "//:node_modules/webpack",
     ],
 )
 
-ts_library(
+ts_project(
     name = "webpack_test_lib",
     testonly = True,
     srcs = glob(
@@ -46,21 +48,20 @@ ts_library(
         ],
     ),
     deps = [
-        ":webpack",
-        "//packages/angular_devkit/core",
-        "@npm//@angular/compiler",
-        "@npm//jasmine",
-        "@npm//typescript",
+        ":node_modules/@angular-devkit/core",
+        ":webpack_rjs",
+        "//:node_modules/@angular/compiler",
+        "//:node_modules/@types/jasmine",
+        "//:node_modules/typescript",
     ],
 )
 
-jasmine_node_test(
+jasmine_test(
     name = "webpack_test",
-    srcs = [":webpack_test_lib"],
-    deps = [
-        "@npm//jasmine",
-        "@npm//source-map",
-        "@npm//tslib",
+    data = [
+        ":webpack_test_lib_rjs",
+        # Needed at runtime for runtime TS compilations performed by tests.
+        "//:node_modules/tslib",
     ],
 )
 
@@ -71,13 +72,13 @@ genrule(
     cmd = "cp $(execpath //:LICENSE) $@",
 )
 
-pkg_npm(
-    name = "npm_package",
+npm_package(
+    name = "pkg",
     tags = ["release-package"],
     deps = [
         ":README.md",
         ":license",
-        ":webpack",
+        ":webpack_rjs",
     ],
 )
 

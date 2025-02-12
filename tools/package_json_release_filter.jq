@@ -16,7 +16,7 @@
 # Get the fields from root package.json that should override the project
 # package.json, i.e., every field except the following
 | ($root
-    | del(.bin, .description, .dependencies, .name, .main, .peerDependencies, .optionalDependencies, .typings, .version, .private, .workspaces, .resolutions, .scripts, .["ng-update"])
+    | del(.bin, .description, .dependencies, .name, .main, .peerDependencies, .optionalDependencies, .typings, .version, .private, .workspaces, .resolutions, .scripts, .["ng-update"], .pnpm, .dependenciesMeta)
 ) as $root_overrides
 
 # Use the project package.json as a base and override other fields from root
@@ -30,3 +30,8 @@
 
 # Add engines; versions substituted via pkg_npm
 + {"engines": {"node": "0.0.0-ENGINES-NODE", "npm": "0.0.0-ENGINES-NPM", "yarn": "0.0.0-ENGINES-YARN"}}
+
+# Remove all `workspace:` pnpm prefixes. Afterwards we can conveniently rely on
+# substitutions from the stamp values. Note that we are doing it this way because
+# substitutions can apply to multiple files, and `workspace:` can't be reliably replaced.
+| walk(if type == "string" and startswith("workspace:") then sub("workspace:"; "") else . end)

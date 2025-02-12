@@ -22,7 +22,7 @@ describe('Browser Builder rebuilds', () => {
   const target = { project: 'app', target: 'build' };
   // Rebuild tests are especially sensitive to time between writes due to file watcher
   // behaviour. Give them a while.
-  const rebuildDebounceTime = 3000;
+  const rebuildDebounceTime = 1000;
   let architect: Architect;
 
   beforeEach(async () => {

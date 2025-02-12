@@ -14,22 +14,26 @@ import type { AngularCompilation } from './angular-compilation';
  * compilation either for AOT or JIT mode. By default a parallel compilation is created
  * that uses a Node.js worker thread.
  * @param jit True, for Angular JIT compilation; False, for Angular AOT compilation.
+ * @param browserOnlyBuild True, for browser only builds; False, for browser and server builds.
  * @returns An instance of an Angular compilation object.
  */
-export async function createAngularCompilation(jit: boolean): Promise<AngularCompilation> {
+export async function createAngularCompilation(
+  jit: boolean,
+  browserOnlyBuild: boolean,
+): Promise<AngularCompilation> {
   if (useParallelTs) {
     const { ParallelCompilation } = await import('./parallel-compilation');
 
-    return new ParallelCompilation(jit);
+    return new ParallelCompilation(jit, browserOnlyBuild);
   }
 
   if (jit) {
     const { JitCompilation } = await import('./jit-compilation');
 
-    return new JitCompilation();
+    return new JitCompilation(browserOnlyBuild);
   } else {
     const { AotCompilation } = await import('./aot-compilation');
 
-    return new AotCompilation();
+    return new AotCompilation(browserOnlyBuild);
   }
 }

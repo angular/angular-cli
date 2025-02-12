@@ -12,10 +12,12 @@ export { AngularAppEngine } from './src/app-engine';
 export { createRequestHandler, type RequestHandlerFunction } from './src/handler';
 
 export {
-  type PrerenderFallback,
+  PrerenderFallback,
   type ServerRoute,
   type ServerRoutesConfigOptions,
   provideServerRoutesConfig,
+  provideServerRouting,
+  withAppShell,
   RenderMode,
   type ServerRouteClient,
   type ServerRoutePrerender,

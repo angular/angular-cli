@@ -194,7 +194,9 @@ export class ScriptsWebpackPlugin {
           const asset = compilation.getAsset(assetName);
           if (asset) {
             const interpolatedFilename = interpolateName(
-              { resourcePath: 'scripts.js' },
+              // TODO: Revisit. Previously due to lack of type safety, this object
+              // was fine, but in practice it doesn't match the type of the loader context.
+              { resourcePath: 'scripts.js' } as Parameters<typeof interpolateName>[0],
               assetName,
               { content: asset.source.source() },
             );

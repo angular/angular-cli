@@ -1,0 +1,18 @@
+/**
+ * Root tsconfig file for use building all Angular packages. Note there is no rootDir
+ * and therefore any tsconfig in the package directory will need to define its own
+ * rootDir.
+ */
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "module": "esnext",
+    "target": "es2022",
+    "lib": ["es2020"],
+    // don't auto-discover @types/node, it results in a ///<reference in the .d.ts output
+    "types": [],
+    "sourceMap": true,
+    "inlineSources": true,
+    "importHelpers": true
+  }
+}

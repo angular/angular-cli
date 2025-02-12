@@ -2,6 +2,7 @@
   "name": "@angular/ssr",
   "version": "0.0.0-PLACEHOLDER",
   "description": "Angular server side rendering utilities",
+  "type": "module",
   "license": "MIT",
   "homepage": "https://github.com/angular/angular-cli",
   "keywords": [
@@ -16,19 +17,26 @@
     "tslib": "^2.3.0"
   },
   "peerDependencies": {
-    "@angular/common": "^19.0.0-next.0",
-    "@angular/core": "^19.0.0-next.0",
-    "@angular/platform-server": "^19.0.0-next.0",
-    "@angular/router": "^19.0.0-next.0"
+    "@angular/common": "0.0.0-ANGULAR-FW-PEER-DEP",
+    "@angular/core": "0.0.0-ANGULAR-FW-PEER-DEP",
+    "@angular/platform-server": "0.0.0-ANGULAR-FW-PEER-DEP",
+    "@angular/router": "0.0.0-ANGULAR-FW-PEER-DEP"
+  },
+  "peerDependenciesMeta": {
+    "@angular/platform-server": {
+      "optional": true
+    }
   },
   "devDependencies": {
-    "@angular/common": "19.0.0-rc.1",
-    "@angular/compiler": "19.0.0-rc.1",
-    "@angular/core": "19.0.0-rc.1",
-    "@angular/platform-browser": "19.0.0-rc.1",
-    "@angular/platform-server": "19.0.0-rc.1",
-    "@angular/router": "19.0.0-rc.1",
-    "@bazel/runfiles": "^5.8.1"
+    "@angular-devkit/schematics": "workspace:*",
+    "@angular/common": "19.2.0-next.2",
+    "@angular/compiler": "19.2.0-next.2",
+    "@angular/core": "19.2.0-next.2",
+    "@angular/platform-browser": "19.2.0-next.2",
+    "@angular/platform-server": "19.2.0-next.2",
+    "@angular/router": "19.2.0-next.2",
+    "@bazel/runfiles": "^6.0.0",
+    "@schematics/angular": "workspace:*"
   },
   "sideEffects": false,
   "schematics": "./schematics/collection.json",

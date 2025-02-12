@@ -1,12 +1,15 @@
+load("@aspect_rules_js//npm:defs.bzl", "npm_package")
 load("@npm//@angular/build-tooling/bazel/api-golden:index.bzl", "api_golden_test_npm_package")
+load("@npm2//:defs.bzl", "npm_link_all_packages")
 load("@rules_pkg//:pkg.bzl", "pkg_tar")
-load("//tools:defaults.bzl", "ng_package", "ts_library")
+load("//tools:defaults2.bzl", "ng_package", "ts_project")
 
 package(default_visibility = ["//visibility:public"])
 
-ts_library(
+npm_link_all_packages()
+
+ts_project(
     name = "ssr",
-    package_name = "@angular/ssr",
     srcs = glob(
         include = [
             "*.ts",
@@ -16,40 +19,44 @@ ts_library(
             "**/*_spec.ts",
         ],
     ),
+    args = [
+        "--lib",
+        "dom,es2020",
+    ],
+    data = [
+        "//packages/angular/ssr/third_party/beasties:beasties_bundled",
+    ],
     module_name = "@angular/ssr",
-    tsconfig = "//:tsconfig-build-ng",
+    source_map = True,
+    tsconfig = "//:build-tsconfig-esm",
     deps = [
-        "//packages/angular/ssr/third_party/beasties:bundled_beasties_lib",
-        "//packages/angular/ssr/tokens",
-        "@npm//@angular/common",
-        "@npm//@angular/core",
-        "@npm//@angular/platform-server",
-        "@npm//@angular/router",
-        "@npm//tslib",
+        "//:node_modules/@angular/common",
+        "//:node_modules/@angular/core",
+        "//:node_modules/@angular/platform-server",
+        "//:node_modules/@angular/router",
+        "//:node_modules/tslib",
+        "//packages/angular/ssr/third_party/beasties:beasties_dts",
     ],
 )
 
 ng_package(
-    name = "npm_package",
+    name = "angular_package",
     package_name = "@angular/ssr",
     srcs = [
         ":package.json",
-        "//packages/angular/ssr/third_party/beasties:bundled_beasties_lib",
+        "//packages/angular/ssr/third_party/beasties:beasties_bundled",
     ],
     externals = [
         "@angular/ssr",
         "@angular/ssr/node",
-        "@angular/ssr/tokens",
         "../../third_party/beasties",
     ],
     nested_packages = [
-        "//packages/angular/ssr/schematics:npm_package",
+        "//packages/angular/ssr/schematics:pkg",
     ],
-    tags = ["release-package"],
     deps = [
         ":ssr",
         "//packages/angular/ssr/node",
-        "//packages/angular/ssr/tokens",
     ],
 )
 
@@ -60,6 +67,21 @@ pkg_tar(
     strip_prefix = "./npm_package",
     # should not be built unless it is a dependency of another rule
     tags = ["manual"],
+)
+
+# TODO: Replace when `ng_package` creates a valid `rules_js`-compliant npm package.
+npm_package(
+    name = "npm_package",
+    srcs = [":angular_package"],
+    replace_prefixes = {
+        "angular_package/": "",
+    },
+    tags = ["release-package"],
+)
+
+alias(
+    name = "pkg",
+    actual = ":npm_package",
 )
 
 api_golden_test_npm_package(

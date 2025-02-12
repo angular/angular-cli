@@ -43,8 +43,8 @@ export class UnitTestTree extends DelegateTree {
 }
 
 export class SchematicTestRunner {
-  private _engineHost = new NodeModulesTestEngineHost();
-  private _engine: SchematicEngine<{}, {}> = new SchematicEngine(this._engineHost);
+  private _engineHost: NodeModulesTestEngineHost;
+  private _engine: SchematicEngine<{}, {}>;
   private _collection: Collection<{}, {}>;
   private _logger: logging.Logger;
 
@@ -52,6 +52,14 @@ export class SchematicTestRunner {
     private _collectionName: string,
     collectionPath: string,
   ) {
+    this._engineHost = new NodeModulesTestEngineHost([
+      // Leverage the specified collection path as an additional base for resolving other
+      // collections by name. This is useful in e.g. pnpm workspaces where `@angular-devkit/schematics`
+      // doesn't necessarily have access to e.g. `@schematics/angular`.
+      collectionPath,
+    ]);
+    this._engine = new SchematicEngine(this._engineHost);
+
     this._engineHost.registerCollection(_collectionName, collectionPath);
     this._logger = new logging.Logger('test');
 

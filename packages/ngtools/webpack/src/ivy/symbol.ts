@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-export const AngularPluginSymbol = Symbol.for('@ngtools/webpack[angular-compiler]');
+export const AngularPluginSymbol: unique symbol = Symbol.for('@ngtools/webpack[angular-compiler]');
 
 export interface EmitFileResult {
   content?: string;

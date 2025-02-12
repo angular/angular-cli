@@ -26,6 +26,18 @@ export class Architect {
 }
 
 // @public
+export interface Builder<OptionT extends json.JsonObject = json.JsonObject> {
+    // (undocumented)
+    [BuilderSymbol]: true;
+    // (undocumented)
+    [BuilderVersionSymbol]: string;
+    // (undocumented)
+    __OptionT: OptionT;
+    // (undocumented)
+    handler: JobHandler<json.JsonObject, BuilderInput, BuilderOutput>;
+}
+
+// @public
 export interface BuilderContext {
     addTeardown(teardown: () => Promise<void> | void): void;
     builder: BuilderInfo;

@@ -17,9 +17,11 @@ import {
   SERVER_APP_ENGINE_MANIFEST_FILENAME,
   SERVER_APP_MANIFEST_FILENAME,
 } from '../../utils/server-rendering/manifest';
+import { AngularCompilation, NoopCompilation } from '../angular/compilation';
 import { createCompilerPlugin } from './angular/compiler-plugin';
 import { ComponentStylesheetBundler } from './angular/component-stylesheets';
 import { SourceFileCache } from './angular/source-file-cache';
+import { createAngularLocalizeInitWarningPlugin } from './angular-localize-init-warning-plugin';
 import { BundlerOptionsFactory } from './bundler-context';
 import { createCompilerPluginOptions } from './compiler-plugin-options';
 import { createExternalPackagesPlugin } from './external-packages-plugin';
@@ -38,6 +40,7 @@ export function createBrowserCodeBundleOptions(
   target: string[],
   sourceFileCache: SourceFileCache,
   stylesheetBundler: ComponentStylesheetBundler,
+  angularCompilation: AngularCompilation,
   templateUpdates: Map<string, string> | undefined,
 ): BundlerOptionsFactory {
   return (loadCache) => {
@@ -68,9 +71,11 @@ export function createBrowserCodeBundleOptions(
         createLoaderImportAttributePlugin(),
         createWasmPlugin({ allowAsync: zoneless, cache: loadCache }),
         createSourcemapIgnorelistPlugin(),
+        createAngularLocalizeInitWarningPlugin(),
         createCompilerPlugin(
           // JS/TS options
           pluginOptions,
+          angularCompilation,
           // Component stylesheet bundler
           stylesheetBundler,
         ),
@@ -81,24 +86,7 @@ export function createBrowserCodeBundleOptions(
       buildOptions.plugins?.push(...options.plugins);
     }
 
-    if (options.externalPackages) {
-      // Package files affected by a customized loader should not be implicitly marked as external
-      if (
-        options.loaderExtensions ||
-        options.plugins ||
-        typeof options.externalPackages === 'object'
-      ) {
-        // Plugin must be added after custom plugins to ensure any added loader options are considered
-        buildOptions.plugins?.push(
-          createExternalPackagesPlugin(
-            options.externalPackages !== true ? options.externalPackages : undefined,
-          ),
-        );
-      } else {
-        // Safe to use the packages external option directly
-        buildOptions.packages = 'external';
-      }
-    }
+    appendOptionsForExternalPackages(options, buildOptions);
 
     return buildOptions;
   };
@@ -150,7 +138,9 @@ export function createBrowserPolyfillBundleOptions(
     buildOptions.plugins.push(
       createCompilerPlugin(
         // JS/TS options
-        { ...pluginOptions, noopTypeScriptCompilation: true },
+        pluginOptions,
+        // Browser compilation handles the actual Angular code compilation
+        new NoopCompilation(),
         // Component stylesheet options are unused for polyfills but required by the plugin
         stylesheetBundler,
       ),
@@ -200,6 +190,20 @@ export function createServerPolyfillBundleOptions(
     return;
   }
 
+  const jsBanner: string[] = [];
+  if (polyfillBundleOptions.external?.length) {
+    jsBanner.push(`globalThis['ngServerMode'] = true;`);
+  }
+
+  if (isNodePlatform) {
+    // Note: Needed as esbuild does not provide require shims / proxy from ESModules.
+    // See: https://github.com/evanw/esbuild/issues/1921.
+    jsBanner.push(
+      `import { createRequire } from 'node:module';`,
+      `globalThis['require'] ??= createRequire(import.meta.url);`,
+    );
+  }
+
   const buildOptions: BuildOptions = {
     ...polyfillBundleOptions,
     platform: isNodePlatform ? 'node' : 'neutral',
@@ -210,16 +214,9 @@ export function createServerPolyfillBundleOptions(
     // More details: https://github.com/angular/angular-cli/issues/25405.
     mainFields: ['es2020', 'es2015', 'module', 'main'],
     entryNames: '[name]',
-    banner: isNodePlatform
-      ? {
-          js: [
-            // Note: Needed as esbuild does not provide require shims / proxy from ESModules.
-            // See: https://github.com/evanw/esbuild/issues/1921.
-            `import { createRequire } from 'node:module';`,
-            `globalThis['require'] ??= createRequire(import.meta.url);`,
-          ].join('\n'),
-        }
-      : undefined,
+    banner: {
+      js: jsBanner.join('\n'),
+    },
     target,
     entryPoints: {
       'polyfills.server': namespace,
@@ -254,9 +251,7 @@ export function createServerMainCodeBundleOptions(
 
   return (loadResultCache) => {
     const pluginOptions = createCompilerPluginOptions(options, sourceFileCache, loadResultCache);
-
     const mainServerNamespace = 'angular:main-server';
-    const mainServerInjectPolyfillsNamespace = 'angular:main-server-inject-polyfills';
     const mainServerInjectManifestNamespace = 'angular:main-server-inject-manifest';
     const zoneless = isZonelessApp(polyfills);
     const entryPoints: Record<string, string> = {
@@ -275,15 +270,20 @@ export function createServerMainCodeBundleOptions(
     const buildOptions: BuildOptions = {
       ...getEsBuildServerCommonOptions(options),
       target,
-      inject: [mainServerInjectPolyfillsNamespace, mainServerInjectManifestNamespace],
+      banner: {
+        js: `import './polyfills.server.mjs';`,
+      },
       entryPoints,
       supported: getFeatureSupport(target, zoneless),
       plugins: [
         createWasmPlugin({ allowAsync: zoneless, cache: loadResultCache }),
         createSourcemapIgnorelistPlugin(),
+        createAngularLocalizeInitWarningPlugin(),
         createCompilerPlugin(
           // JS/TS options
-          { ...pluginOptions, noopTypeScriptCompilation: true },
+          pluginOptions,
+          // Browser compilation handles the actual Angular code compilation
+          new NoopCompilation(),
           // Component stylesheet bundler
           stylesheetBundler,
         ),
@@ -292,9 +292,7 @@ export function createServerMainCodeBundleOptions(
 
     buildOptions.plugins ??= [];
 
-    if (externalPackages) {
-      buildOptions.packages = 'external';
-    } else {
+    if (!externalPackages) {
       buildOptions.plugins.push(createRxjsEsmResolutionPlugin());
     }
 
@@ -312,17 +310,9 @@ export function createServerMainCodeBundleOptions(
     buildOptions.plugins.push(
       createServerBundleMetadata(),
       createVirtualModulePlugin({
-        namespace: mainServerInjectPolyfillsNamespace,
-        cache: loadResultCache,
-        loadContent: () => ({
-          contents: `import './polyfills.server.mjs';`,
-          loader: 'js',
-          resolveDir: workspaceRoot,
-        }),
-      }),
-      createVirtualModulePlugin({
         namespace: mainServerInjectManifestNamespace,
         cache: loadResultCache,
+        entryPointOnly: false,
         loadContent: async () => {
           const contents: string[] = [
             // Configure `@angular/ssr` manifest.
@@ -348,16 +338,22 @@ export function createServerMainCodeBundleOptions(
           );
 
           const contents: string[] = [
-            // Re-export all symbols including default export from 'main.server.ts'
-            `export { default } from '${mainServerEntryPointJsImport}';`,
-            `export * from '${mainServerEntryPointJsImport}';`,
+            // Inject manifest
+            `import '${mainServerInjectManifestNamespace}';`,
 
             // Add @angular/ssr exports
             `export {
-            ɵdestroyAngularServerApp,
-            ɵextractRoutesAndCreateRouteTree,
-            ɵgetOrCreateAngularServerApp,
-          } from '@angular/ssr';`,
+              ɵdestroyAngularServerApp,
+              ɵextractRoutesAndCreateRouteTree,
+              ɵgetOrCreateAngularServerApp,
+            } from '@angular/ssr';`,
+
+            // Need for HMR
+            `export { ɵresetCompiledComponents } from '@angular/core';`,
+
+            // Re-export all symbols including default export from 'main.server.ts'
+            `export { default } from '${mainServerEntryPointJsImport}';`,
+            `export * from '${mainServerEntryPointJsImport}';`,
           ];
 
           return {
@@ -372,6 +368,8 @@ export function createServerMainCodeBundleOptions(
     if (options.plugins) {
       buildOptions.plugins.push(...options.plugins);
     }
+
+    appendOptionsForExternalPackages(options, buildOptions);
 
     return buildOptions;
   };
@@ -392,42 +390,51 @@ export function createSsrEntryCodeBundleOptions(
 
   return (loadResultCache) => {
     const pluginOptions = createCompilerPluginOptions(options, sourceFileCache, loadResultCache);
-
     const ssrEntryNamespace = 'angular:ssr-entry';
     const ssrInjectManifestNamespace = 'angular:ssr-entry-inject-manifest';
-    const ssrInjectRequireNamespace = 'angular:ssr-entry-inject-require';
     const isNodePlatform = options.ssrOptions?.platform !== ExperimentalPlatform.Neutral;
 
-    const inject: string[] = [ssrInjectManifestNamespace];
+    const jsBanner: string[] = [];
+    if (options.externalDependencies?.length) {
+      jsBanner.push(`globalThis['ngServerMode'] = true;`);
+    }
+
     if (isNodePlatform) {
-      inject.unshift(ssrInjectRequireNamespace);
+      // Note: Needed as esbuild does not provide require shims / proxy from ESModules.
+      // See: https://github.com/evanw/esbuild/issues/1921.
+      jsBanner.push(
+        `import { createRequire } from 'node:module';`,
+        `globalThis['require'] ??= createRequire(import.meta.url);`,
+      );
     }
 
     const buildOptions: BuildOptions = {
       ...getEsBuildServerCommonOptions(options),
       target,
+      banner: {
+        js: jsBanner.join('\n'),
+      },
       entryPoints: {
-        // TODO: consider renaming to index
         'server': ssrEntryNamespace,
       },
       supported: getFeatureSupport(target, true),
       plugins: [
         createSourcemapIgnorelistPlugin(),
+        createAngularLocalizeInitWarningPlugin(),
         createCompilerPlugin(
           // JS/TS options
-          { ...pluginOptions, noopTypeScriptCompilation: true },
+          pluginOptions,
+          // Browser compilation handles the actual Angular code compilation
+          new NoopCompilation(),
           // Component stylesheet bundler
           stylesheetBundler,
         ),
       ],
-      inject,
     };
 
     buildOptions.plugins ??= [];
 
-    if (externalPackages) {
-      buildOptions.packages = 'external';
-    } else {
+    if (!externalPackages) {
       buildOptions.plugins.push(createRxjsEsmResolutionPlugin());
     }
 
@@ -444,26 +451,9 @@ export function createSsrEntryCodeBundleOptions(
     buildOptions.plugins.push(
       createServerBundleMetadata({ ssrEntryBundle: true }),
       createVirtualModulePlugin({
-        namespace: ssrInjectRequireNamespace,
-        cache: loadResultCache,
-        loadContent: () => {
-          const contents: string[] = [
-            // Note: Needed as esbuild does not provide require shims / proxy from ESModules.
-            // See: https://github.com/evanw/esbuild/issues/1921.
-            `import { createRequire } from 'node:module';`,
-            `globalThis['require'] ??= createRequire(import.meta.url);`,
-          ];
-
-          return {
-            contents: contents.join('\n'),
-            loader: 'js',
-            resolveDir: workspaceRoot,
-          };
-        },
-      }),
-      createVirtualModulePlugin({
         namespace: ssrInjectManifestNamespace,
         cache: loadResultCache,
+        entryPointOnly: false,
         loadContent: () => {
           const contents: string[] = [
             // Configure `@angular/ssr` app engine manifest.
@@ -488,6 +478,9 @@ export function createSsrEntryCodeBundleOptions(
             serverEntryPoint,
           );
           const contents: string[] = [
+            // Configure `@angular/ssr` app engine manifest.
+            `import '${ssrInjectManifestNamespace}';`,
+
             // Re-export all symbols including default export
             `import * as server from '${serverEntryPointJsImport}';`,
             `export * from '${serverEntryPointJsImport}';`,
@@ -512,6 +505,8 @@ export function createSsrEntryCodeBundleOptions(
     if (options.plugins) {
       buildOptions.plugins.push(...options.plugins);
     }
+
+    appendOptionsForExternalPackages(options, buildOptions);
 
     return buildOptions;
   };
@@ -717,4 +712,30 @@ function entryFileToWorkspaceRelative(workspaceRoot: string, entryFile: string):
       .replace(/.[mc]?ts$/, '')
       .replace(/\\/g, '/')
   );
+}
+
+function appendOptionsForExternalPackages(
+  options: NormalizedApplicationBuildOptions,
+  buildOptions: BuildOptions,
+): void {
+  if (!options.externalPackages) {
+    return;
+  }
+
+  buildOptions.plugins ??= [];
+
+  // Package files affected by a customized loader should not be implicitly marked as external
+  if (options.loaderExtensions || options.plugins || typeof options.externalPackages === 'object') {
+    // Plugin must be added after custom plugins to ensure any added loader options are considered
+    buildOptions.plugins.push(
+      createExternalPackagesPlugin(
+        options.externalPackages !== true ? options.externalPackages : undefined,
+      ),
+    );
+
+    buildOptions.packages = undefined;
+  } else {
+    // Safe to use the packages external option directly
+    buildOptions.packages = 'external';
+  }
 }

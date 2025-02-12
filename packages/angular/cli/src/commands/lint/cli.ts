@@ -18,7 +18,7 @@ export default class LintCommandModule
   override missingTargetChoices: MissingTargetChoice[] = [
     {
       name: 'ESLint',
-      value: '@angular-eslint/schematics',
+      value: 'angular-eslint',
     },
   ];
 

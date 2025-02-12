@@ -1,5 +1,4 @@
-load("@npm//@bazel/jasmine:index.bzl", "jasmine_node_test")
-load("//tools:defaults.bzl", "ts_library")
+load("//tools:defaults2.bzl", "jasmine_test", "ts_project")
 
 # Copyright Google Inc. All Rights Reserved.
 #
@@ -9,7 +8,7 @@ licenses(["notice"])
 
 package(default_visibility = ["//visibility:public"])
 
-ts_library(
+ts_project(
     name = "tools",
     srcs = glob(
         include = ["**/*.ts"],
@@ -20,22 +19,18 @@ ts_library(
     ),
     data = ["package.json"],
     module_name = "@angular-devkit/schematics/tools",
-    module_root = "index.d.ts",
     deps = [
-        "//packages/angular_devkit/core",
-        "//packages/angular_devkit/core/node",
-        "//packages/angular_devkit/schematics",
-        "//packages/angular_devkit/schematics/tasks",
-        "//packages/angular_devkit/schematics/tasks/node",
-        "@npm//@types/node",
-        "@npm//jsonc-parser",
-        "@npm//rxjs",
+        "//:node_modules/@types/node",
+        "//:node_modules/jsonc-parser",
+        "//:node_modules/rxjs",
+        "//packages/angular_devkit/schematics:node_modules/@angular-devkit/core",
+        "//packages/angular_devkit/schematics:schematics_rjs",
+        "//packages/angular_devkit/schematics/tasks:tasks_rjs",
+        "//packages/angular_devkit/schematics/tasks/node:node_rjs",
     ],
 )
 
-# @external_begin
-
-ts_library(
+ts_project(
     name = "tools_test_lib",
     testonly = True,
     srcs = glob(
@@ -45,23 +40,18 @@ ts_library(
         ],
     ),
     deps = [
-        ":tools",
-        "//packages/angular_devkit/core",
-        "//packages/angular_devkit/core/node",
-        "//packages/angular_devkit/schematics",
-        "//packages/angular_devkit/schematics/tasks",
-        "//packages/angular_devkit/schematics/testing",
-        "//tests/angular_devkit/schematics/tools/file-system-engine-host:file_system_engine_host_test_lib",
-        "@npm//rxjs",
+        ":tools_rjs",
+        "//:node_modules/@types/jasmine",
+        "//:node_modules/rxjs",
+        "//packages/angular_devkit/schematics:node_modules/@angular-devkit/core",
+        "//packages/angular_devkit/schematics:schematics_rjs",
+        "//packages/angular_devkit/schematics/tasks:tasks_rjs",
+        "//packages/angular_devkit/schematics/testing:testing_rjs",
+        "//tests/angular_devkit/schematics/tools/file-system-engine-host:file_system_engine_host_test_lib_rjs",
     ],
 )
 
-jasmine_node_test(
+jasmine_test(
     name = "tools_test",
-    srcs = [":tools_test_lib"],
-    deps = [
-        "@npm//jasmine",
-        "@npm//source-map",
-    ],
+    data = [":tools_test_lib_rjs"],
 )
-# @external_end

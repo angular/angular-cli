@@ -12,11 +12,11 @@ export class PriorityQueue<T> {
 
   constructor(private _comparator: (x: T, y: T) => number) {}
 
-  clear() {
+  clear(): void {
     this._items = new Array<T>();
   }
 
-  push(item: T) {
+  push(item: T): void {
     const index = this._items.findIndex((existing) => this._comparator(item, existing) <= 0);
 
     if (index === -1) {

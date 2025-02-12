@@ -3,8 +3,8 @@
 # Use of this source code is governed by an MIT-style license that can be
 # found in the LICENSE file at https://angular.dev/license
 
-load("@npm//@bazel/jasmine:index.bzl", "jasmine_node_test")
-load("//tools:defaults.bzl", "pkg_npm", "ts_library")
+load("@npm2//:defs.bzl", "npm_link_all_packages")
+load("//tools:defaults2.bzl", "jasmine_test", "npm_package", "ts_project")
 load("//tools:ng_cli_schema_generator.bzl", "cli_json_schema")
 load("//tools:ts_json_schema.bzl", "ts_json_schema")
 
@@ -12,9 +12,23 @@ licenses(["notice"])
 
 package(default_visibility = ["//visibility:public"])
 
-ts_library(
+npm_link_all_packages()
+
+RUNTIME_ASSETS = glob(
+    include = [
+        "bin/**/*",
+        "src/**/*.md",
+        "src/**/*.json",
+    ],
+    exclude = [
+        "lib/config/workspace-schema.json",
+    ],
+) + [
+    "//packages/angular/cli:lib/config/schema.json",
+]
+
+ts_project(
     name = "angular-cli",
-    package_name = "@angular/cli",
     srcs = glob(
         include = [
             "lib/**/*.ts",
@@ -24,93 +38,45 @@ ts_library(
             "**/*_spec.ts",
         ],
     ) + [
-        # @external_begin
         # These files are generated from the JSON schema
         "//packages/angular/cli:lib/config/workspace-schema.ts",
         "//packages/angular/cli:src/commands/update/schematic/schema.ts",
-        # @external_end
     ],
-    data = glob(
-        include = [
-            "bin/**/*",
-            "src/**/*.md",
-            "src/**/*.json",
-        ],
-        exclude = [
-            "lib/config/workspace-schema.json",
-        ],
-    ) + [
-        # @external_begin
-        "//packages/angular/cli:lib/config/schema.json",
-        # @external_end
-    ],
+    data = RUNTIME_ASSETS,
     module_name = "@angular/cli",
     deps = [
-        "//packages/angular_devkit/architect",
-        "//packages/angular_devkit/architect/node",
-        "//packages/angular_devkit/core",
-        "//packages/angular_devkit/core/node",
-        "//packages/angular_devkit/schematics",
-        "//packages/angular_devkit/schematics/tasks",
-        "//packages/angular_devkit/schematics/tools",
-        "@npm//@angular/core",
-        "@npm//@inquirer/prompts",
-        "@npm//@listr2/prompt-adapter-inquirer",
-        "@npm//@types/ini",
-        "@npm//@types/node",
-        "@npm//@types/npm-package-arg",
-        "@npm//@types/pacote",
-        "@npm//@types/resolve",
-        "@npm//@types/semver",
-        "@npm//@types/yargs",
-        "@npm//@types/yarnpkg__lockfile",
-        "@npm//@yarnpkg/lockfile",
-        "@npm//ini",
-        "@npm//jsonc-parser",
-        "@npm//listr2",
-        "@npm//npm-package-arg",
-        "@npm//npm-pick-manifest",
-        "@npm//pacote",
-        "@npm//semver",
-        "@npm//yargs",
+        ":node_modules/@angular-devkit/architect",
+        ":node_modules/@angular-devkit/core",
+        ":node_modules/@angular-devkit/schematics",
+        ":node_modules/resolve",
+        "//:node_modules/@angular/core",
+        "//:node_modules/@inquirer/prompts",
+        "//:node_modules/@listr2/prompt-adapter-inquirer",
+        "//:node_modules/@types/ini",
+        "//:node_modules/@types/node",
+        "//:node_modules/@types/npm-package-arg",
+        "//:node_modules/@types/pacote",
+        "//:node_modules/@types/resolve",
+        "//:node_modules/@types/semver",
+        "//:node_modules/@types/yargs",
+        "//:node_modules/@types/yarnpkg__lockfile",
+        "//:node_modules/@yarnpkg/lockfile",
+        "//:node_modules/ini",
+        "//:node_modules/jsonc-parser",
+        "//:node_modules/listr2",
+        "//:node_modules/npm-package-arg",
+        "//:node_modules/npm-pick-manifest",
+        "//:node_modules/pacote",
+        "//:node_modules/semver",
+        "//:node_modules/symbol-observable",
+        "//:node_modules/yargs",
     ],
 )
 
-# @external_begin
 CLI_SCHEMA_DATA = [
-    "//packages/angular/build:src/builders/application/schema.json",
-    "//packages/angular/build:src/builders/dev-server/schema.json",
-    "//packages/angular/build:src/builders/extract-i18n/schema.json",
-    "//packages/angular_devkit/build_angular:src/builders/app-shell/schema.json",
-    "//packages/angular_devkit/build_angular:src/builders/browser/schema.json",
-    "//packages/angular_devkit/build_angular:src/builders/browser-esbuild/schema.json",
-    "//packages/angular_devkit/build_angular:src/builders/dev-server/schema.json",
-    "//packages/angular_devkit/build_angular:src/builders/extract-i18n/schema.json",
-    "//packages/angular_devkit/build_angular:src/builders/jest/schema.json",
-    "//packages/angular_devkit/build_angular:src/builders/web-test-runner/schema.json",
-    "//packages/angular_devkit/build_angular:src/builders/karma/schema.json",
-    "//packages/angular_devkit/build_angular:src/builders/ng-packagr/schema.json",
-    "//packages/angular_devkit/build_angular:src/builders/prerender/schema.json",
-    "//packages/angular_devkit/build_angular:src/builders/ssr-dev-server/schema.json",
-    "//packages/angular_devkit/build_angular:src/builders/protractor/schema.json",
-    "//packages/angular_devkit/build_angular:src/builders/server/schema.json",
-    "//packages/schematics/angular:app-shell/schema.json",
-    "//packages/schematics/angular:application/schema.json",
-    "//packages/schematics/angular:class/schema.json",
-    "//packages/schematics/angular:component/schema.json",
-    "//packages/schematics/angular:directive/schema.json",
-    "//packages/schematics/angular:enum/schema.json",
-    "//packages/schematics/angular:guard/schema.json",
-    "//packages/schematics/angular:interceptor/schema.json",
-    "//packages/schematics/angular:interface/schema.json",
-    "//packages/schematics/angular:library/schema.json",
-    "//packages/schematics/angular:module/schema.json",
-    "//packages/schematics/angular:ng-new/schema.json",
-    "//packages/schematics/angular:pipe/schema.json",
-    "//packages/schematics/angular:resolver/schema.json",
-    "//packages/schematics/angular:service/schema.json",
-    "//packages/schematics/angular:service-worker/schema.json",
-    "//packages/schematics/angular:web-worker/schema.json",
+    "//packages/angular/build:schemas",
+    "//packages/angular_devkit/build_angular:schemas",
+    "//packages/schematics/angular:schemas",
 ]
 
 cli_json_schema(
@@ -131,7 +97,7 @@ ts_json_schema(
     src = "src/commands/update/schematic/schema.json",
 )
 
-ts_library(
+ts_project(
     name = "angular-cli_test_lib",
     testonly = True,
     srcs = glob(
@@ -142,18 +108,18 @@ ts_library(
         ],
     ),
     deps = [
-        ":angular-cli",
-        "//packages/angular_devkit/core",
-        "//packages/angular_devkit/schematics",
-        "//packages/angular_devkit/schematics/testing",
-        "@npm//@types/semver",
-        "@npm//@types/yargs",
+        ":angular-cli_rjs",
+        "//:node_modules/@types/semver",
+        "//:node_modules/@types/yargs",
+        "//packages/angular_devkit/core:core_rjs",
+        "//packages/angular_devkit/schematics:schematics_rjs",
+        "//packages/angular_devkit/schematics/testing:testing_rjs",
     ],
 )
 
-jasmine_node_test(
+jasmine_test(
     name = "angular-cli_test",
-    srcs = [":angular-cli_test_lib"],
+    data = [":angular-cli_test_lib_rjs"],
 )
 
 genrule(
@@ -163,8 +129,8 @@ genrule(
     cmd = "cp $(execpath //:LICENSE) $@",
 )
 
-pkg_npm(
-    name = "npm_package",
+npm_package(
+    name = "pkg",
     pkg_deps = [
         "//packages/angular_devkit/architect:package.json",
         "//packages/angular_devkit/build_angular:package.json",
@@ -173,13 +139,13 @@ pkg_npm(
         "//packages/angular_devkit/schematics:package.json",
         "//packages/schematics/angular:package.json",
     ],
+    stamp_files = [
+        "src/utilities/version.js",
+    ],
     tags = ["release-package"],
-    deps = [
+    deps = RUNTIME_ASSETS + [
         ":README.md",
-        ":angular-cli",
+        ":angular-cli_rjs",
         ":license",
-        ":src/commands/update/schematic/collection.json",
-        ":src/commands/update/schematic/schema.json",
     ],
 )
-# @external_end

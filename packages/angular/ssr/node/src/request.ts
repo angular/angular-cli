@@ -83,18 +83,40 @@ function createRequestUrl(nodeRequest: IncomingMessage | Http2ServerRequest): UR
     originalUrl,
   } = nodeRequest as IncomingMessage & { originalUrl?: string };
   const protocol =
-    headers['x-forwarded-proto'] ?? ('encrypted' in socket && socket.encrypted ? 'https' : 'http');
-  const hostname = headers['x-forwarded-host'] ?? headers.host ?? headers[':authority'];
-  const port = headers['x-forwarded-port'] ?? socket.localPort;
+    getFirstHeaderValue(headers['x-forwarded-proto']) ??
+    ('encrypted' in socket && socket.encrypted ? 'https' : 'http');
+  const hostname =
+    getFirstHeaderValue(headers['x-forwarded-host']) ?? headers.host ?? headers[':authority'];
 
   if (Array.isArray(hostname)) {
     throw new Error('host value cannot be an array.');
   }
 
   let hostnameWithPort = hostname;
-  if (port && !hostname?.includes(':')) {
-    hostnameWithPort += `:${port}`;
+  if (!hostname?.includes(':')) {
+    const port = getFirstHeaderValue(headers['x-forwarded-port']);
+    if (port) {
+      hostnameWithPort += `:${port}`;
+    }
   }
 
   return new URL(originalUrl ?? url, `${protocol}://${hostnameWithPort}`);
+}
+
+/**
+ * Extracts the first value from a multi-value header string.
+ *
+ * @param value - A string or an array of strings representing the header values.
+ *                           If it's a string, values are expected to be comma-separated.
+ * @returns The first trimmed value from the multi-value header, or `undefined` if the input is invalid or empty.
+ *
+ * @example
+ * ```typescript
+ * getFirstHeaderValue("value1, value2, value3"); // "value1"
+ * getFirstHeaderValue(["value1", "value2"]); // "value1"
+ * getFirstHeaderValue(undefined); // undefined
+ * ```
+ */
+function getFirstHeaderValue(value: string | string[] | undefined): string | undefined {
+  return value?.toString().split(',', 1)[0]?.trim();
 }

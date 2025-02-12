@@ -1,9 +1,6 @@
-# Copyright Google Inc. All Rights Reserved.
-#
-# Use of this source code is governed by an MIT-style license that can be
-# found in the LICENSE file at https://angular.dev/license
-# @external_begin
-load("@build_bazel_rules_nodejs//:index.bzl", "nodejs_binary")
+load("@aspect_bazel_lib//lib/private:tar_toolchain.bzl", "tar_toolchain")
+load("@bazel_skylib//rules:copy_file.bzl", "copy_file")
+load("//tools:defaults2.bzl", "js_binary")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -11,7 +8,7 @@ exports_files([
     "package_json_release_filter.jq",
 ])
 
-nodejs_binary(
+js_binary(
     name = "ng_cli_schema",
     data = [
         "ng_cli_schema_generator.js",
@@ -19,13 +16,41 @@ nodejs_binary(
     entry_point = "ng_cli_schema_generator.js",
 )
 
-nodejs_binary(
+js_binary(
     name = "quicktype_runner",
     data = [
         "quicktype_runner.js",
-        "@npm//quicktype-core",
+        "//:node_modules/quicktype-core",
     ],
     entry_point = "quicktype_runner.js",
-    templated_args = ["--bazel_patch_module_resolver"],
 )
-# @external_end
+
+tar_toolchain(
+    name = "system_tar_exec",
+    binary = "tar_system.bat",
+)
+
+toolchain(
+    name = "windows_tar_system_toolchain",
+    exec_compatible_with = ["@platforms//os:windows"],
+    toolchain = ":system_tar_exec",
+    toolchain_type = "@aspect_bazel_lib//lib:tar_toolchain_type",
+)
+
+# TODO(devversion): Improve this by potentially sharing this common block.
+copy_file(
+    name = "copy_worker_js",
+    src = "@tsc_worker//file",
+    out = "ts_worker.mjs",
+)
+
+js_binary(
+    name = "vanilla_ts_worker",
+    data = [
+        ":copy_worker_js",
+        "//:node_modules/@angular/compiler-cli",
+        "//:node_modules/typescript",
+    ],
+    entry_point = ":copy_worker_js",
+    fixed_args = ["--vanilla-ts"],
+)

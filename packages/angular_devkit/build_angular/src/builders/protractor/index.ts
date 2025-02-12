@@ -12,7 +12,7 @@ import {
   createBuilder,
   targetFromTargetString,
 } from '@angular-devkit/architect';
-import { json, tags } from '@angular-devkit/core';
+import { tags } from '@angular-devkit/core';
 import { resolve } from 'path';
 import * as url from 'url';
 import { runModuleAsObservableFork } from '../../utils';
@@ -118,7 +118,7 @@ export async function execute(
       const overrides = {
         watch: false,
         liveReload: false,
-      } as DevServerBuilderOptions & json.JsonObject;
+      } as DevServerBuilderOptions;
 
       if (options.host !== undefined) {
         overrides.host = options.host;

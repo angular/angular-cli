@@ -1,9 +1,11 @@
-load("@npm//@bazel/jasmine:index.bzl", "jasmine_node_test")
-load("//tools:defaults.bzl", "ts_library")
+load("@npm2//:defs.bzl", "npm_link_all_packages")
+load("//tools:defaults2.bzl", "jasmine_test", "ts_project")
 
 package(default_visibility = ["//visibility:public"])
 
-ts_library(
+npm_link_all_packages()
+
+ts_project(
     name = "builder",
     testonly = True,
     srcs = glob(
@@ -14,18 +16,19 @@ ts_library(
             "src/**/*_spec.ts",
         ],
     ),
-    data = glob(["projects/**/*"]),
+    data = [
+        # Needed at runtime by some builder tests relying on SSR being
+        # resolvable in the test project.
+        ":node_modules/@angular/ssr",
+    ] + glob(["projects/**/*"]),
     deps = [
-        "//packages/angular_devkit/architect",
-        "//packages/angular_devkit/architect/node",
-        "//packages/angular_devkit/architect/testing",
-        "//packages/angular_devkit/core",
-        "//packages/angular_devkit/core/node",
-        "@npm//rxjs",
+        ":node_modules/@angular-devkit/architect",
+        ":node_modules/@angular-devkit/core",
+        "//:node_modules/rxjs",
     ],
 )
 
-ts_library(
+ts_project(
     name = "unit_test_lib",
     testonly = True,
     srcs = glob(
@@ -34,12 +37,12 @@ ts_library(
         ],
     ),
     deps = [
-        ":builder",
-        "//packages/angular_devkit/architect/testing",
+        ":builder_rjs",
+        ":node_modules/@angular-devkit/architect",
     ],
 )
 
-jasmine_node_test(
+jasmine_test(
     name = "unit_test",
-    srcs = [":unit_test_lib"],
+    data = [":unit_test_lib_rjs"],
 )
