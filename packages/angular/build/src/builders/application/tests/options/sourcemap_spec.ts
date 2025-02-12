@@ -240,5 +240,22 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
         .content.not.toContain('sourceMappingURL=app.component.css.map');
       harness.expectFile('dist/browser/app.component.css.map').toNotExist();
     });
+
+    it('should generate a correct sourcemap when input file is SCSS', async () => {
+      await harness.writeFile('src/styles.scss', `* { color: red}`);
+
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+        sourceMap: true,
+        styles: ['src/styles.scss'],
+      });
+
+      const { result } = await harness.executeOnce();
+
+      expect(result?.success).toBeTrue();
+      harness
+        .expectFile('dist/browser/styles.css.map')
+        .content.toContain('"sources": ["src/styles.scss"]');
+    });
   });
 });
