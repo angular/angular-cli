@@ -10,7 +10,6 @@
   },
   "private": true,
   "dependencies": {
-    "@angular/animations": "<%= latestVersions.Angular %>",
     "@angular/common": "<%= latestVersions.Angular %>",
     "@angular/compiler": "<%= latestVersions.Angular %>",
     "@angular/core": "<%= latestVersions.Angular %>",

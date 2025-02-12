@@ -69,10 +69,6 @@ export default async function () {
         },
       ];
     `,
-    'src/app/app.config.ts': `
-      import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
-      ${(await readFile('src/app/app.config.ts', 'utf8')).replace('provideRouter(routes),', 'provideAnimationsAsync(), provideRouter(routes),')}
-    `,
     'src/server.ts': `
       import { AngularAppEngine, createRequestHandler } from '@angular/ssr';
       import { createApp, createRouter, toWebHandler, defineEventHandler, toWebRequest } from 'h3';
