@@ -841,6 +841,9 @@ export async function setupServer(
           ? (proxy ?? {})
           : proxy,
       cors: {
+        // This will add the header `Access-Control-Allow-Origin: http://example.com`,
+        // where `http://example.com` is the requesting origin.
+        origin: true,
         // Allow preflight requests to be proxied.
         preflightContinue: true,
       },
