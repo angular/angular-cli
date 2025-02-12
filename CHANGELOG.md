@@ -1,3 +1,32 @@
+<a name="19.1.7"></a>
+
+# 19.1.7 (2025-02-12)
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                            |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------- |
+| [de73b1c0c](https://github.com/angular/angular-cli/commit/de73b1c0c2d5748818d2e94f93f2640d4c6b949c) | fix  | include default export for Express app |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                                 |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------- |
+| [8890a5f76](https://github.com/angular/angular-cli/commit/8890a5f76c252fe383a632880df476e5f63ef931) | fix  | always provide Vite client helpers with development server  |
+| [df1d38846](https://github.com/angular/angular-cli/commit/df1d388465b6f0d3aab5fb4f011cbbe74d3058f4) | fix  | configure Vite CORS option                                  |
+| [a13a49d95](https://github.com/angular/angular-cli/commit/a13a49d95be61d2a2458962d57318f301dede502) | fix  | exclude unmodified files from logs with `--localize`        |
+| [0826315fa](https://github.com/angular/angular-cli/commit/0826315fac1c3fd2d22aa0ea544bd59ef9ed8781) | fix  | handle unlocalizable files correctly in localized prerender |
+| [d2e1c8e9f](https://github.com/angular/angular-cli/commit/d2e1c8e9f5c03a410d8204a5f9b11b4ad9cc9eaa) | perf | cache translated i18n bundles for faster builds             |
+
+### @angular/ssr
+
+| Commit                                                                                              | Type | Description                                                      |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------------- |
+| [f5d974576](https://github.com/angular/angular-cli/commit/f5d97457622897b41e73a859dd1f218fa962be15) | fix  | accurately calculate content length for static pages with `\r\n` |
+| [c26ea1619](https://github.com/angular/angular-cli/commit/c26ea1619095102b21176435af826cf53f0054b1) | fix  | properly handle baseHref with protocol                           |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="19.1.6"></a>
 
 # 19.1.6 (2025-02-05)
