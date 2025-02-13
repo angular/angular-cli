@@ -2,12 +2,6 @@ workspace(name = "angular_cli")
 
 DEFAULT_NODE_VERSION = "20.11.1"
 
-# Workaround for: https://github.com/bazel-contrib/bazel-lib/issues/968.
-# Override toolchain for tar on windows.
-register_toolchains(
-    "//tools:windows_tar_system_toolchain",
-)
-
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive", "http_file")
 
 http_archive(
@@ -149,7 +143,6 @@ register_toolchains(
     "@npm//@angular/build-tooling/bazel/git-toolchain:git_linux_toolchain",
     "@npm//@angular/build-tooling/bazel/git-toolchain:git_macos_x86_toolchain",
     "@npm//@angular/build-tooling/bazel/git-toolchain:git_macos_arm64_toolchain",
-    "@npm//@angular/build-tooling/bazel/git-toolchain:git_windows_toolchain",
 )
 
 load("@npm//@angular/build-tooling/bazel/browsers:browser_repositories.bzl", "browser_repositories")
@@ -216,8 +209,6 @@ npm_repositories()
 
 http_archive(
     name = "aspect_rules_ts",
-    patch_args = ["-p1"],
-    patches = ["//tools:rules_ts_windows.patch"],
     sha256 = "4263532b2fb4d16f309d80e3597191a1cb2fb69c19e95d91711bd6b97874705e",
     strip_prefix = "rules_ts-3.5.0",
     url = "https://github.com/aspect-build/rules_ts/releases/download/v3.5.0/rules_ts-v3.5.0.tar.gz",

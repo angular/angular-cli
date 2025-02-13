@@ -84,9 +84,7 @@ jobs:
             node: 20
     runs-on: ${{ matrix.os }}
     steps:
-      # Workaround for: https://github.com/bazel-contrib/bazel-lib/issues/968.
-      # TODO(devversion): Remove when Aspect lib issue is fixed.
-      - run: choco install gzip
+      - uses: Vampire/setup-wsl@v4
         if: ${{matrix.os == 'windows-latest'}}
       - name: Initialize environment
         uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@0ad6a370f70638e785d6ef1f90dc6ede34684a47

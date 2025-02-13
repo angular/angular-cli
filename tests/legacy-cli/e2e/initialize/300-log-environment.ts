@@ -1,5 +1,6 @@
 import { getActivePackageManager } from '../utils/packages';
 import { exec, ng } from '../utils/process';
+import { isWindowsTestMode } from '../utils/wsl';
 
 export default async function () {
   console.log('Environment:');
@@ -14,6 +15,10 @@ export default async function () {
     console.log(`  ${envName}: ${process.env[envName]!.replace(/[\n\r]+/g, '\n        ')}`);
   });
 
-  await exec('which', 'ng', getActivePackageManager());
+  // On Windows, `which` might not be available.
+  if (!isWindowsTestMode()) {
+    await exec('which', 'ng', getActivePackageManager());
+  }
+
   await ng('version');
 }

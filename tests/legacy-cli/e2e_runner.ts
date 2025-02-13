@@ -204,6 +204,7 @@ console.log(['Tests:', ...testsToRun].join('\n '));
 
 setGlobalVariable('argv', argv);
 setGlobalVariable('package-manager', argv['package-manager']);
+setGlobalVariable('bazel-test-working-dir', process.cwd());
 
 // Use the chrome supplied by bazel or the puppeteer chrome and webdriver-manager driver outside.
 // This is needed by karma-chrome-launcher, protractor etc.
@@ -215,10 +216,19 @@ process.env.CHROME_BIN = path.resolve(process.env.CHROME_BIN!);
 process.env.CHROME_PATH = path.resolve(process.env.CHROME_PATH!);
 process.env.CHROMEDRIVER_BIN = path.resolve(process.env.CHROMEDRIVER_BIN!);
 
-Promise.all([findFreePort(), findFreePort(), findPackageTars()])
-  .then(async ([httpPort, httpsPort, packageTars]) => {
-    setGlobalVariable('package-registry', 'http://localhost:' + httpPort);
-    setGlobalVariable('package-secure-registry', 'http://localhost:' + httpsPort);
+// Find free ports sequentially, reducing the risk of collisions.
+// Note for Windows test mode on CI: Verdaccio runs inside WSL, so we
+// never want to reserve a port in the Windows host.
+const ports = (async () => {
+  const portA = await findFreePort({ neverRunOnWslHost: true });
+  const portB = await findFreePort({ neverRunOnWslHost: true });
+  return [portA, portB];
+})();
+
+Promise.all([ports, findPackageTars()])
+  .then(async ([[httpPort, httpsPort], packageTars]) => {
+    setGlobalVariable('package-registry', 'http://127.0.0.1:' + httpPort);
+    setGlobalVariable('package-secure-registry', 'http://127.0.0.1:' + httpsPort);
     setGlobalVariable('package-tars', packageTars);
 
     // NPM registries for the lifetime of the test execution

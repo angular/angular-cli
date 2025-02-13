@@ -7,6 +7,7 @@ import { gitCommit } from './git';
 import { findFreePort } from './network';
 import { installWorkspacePackages, PkgInfo } from './packages';
 import { execAndWaitForOutputToMatch, git, ng } from './process';
+import { isWindowsTestMode } from './wsl';
 
 export function updateJsonFile(filePath: string, fn: (json: any) => any | void) {
   return readFile(filePath).then((tsConfigJson) => {
@@ -28,11 +29,15 @@ export async function ngServe(...args: string[]) {
   const esbuild = getGlobalVariable('argv')['esbuild'];
   const validBundleRegEx = esbuild ? /complete\./ : /Compiled successfully\./;
 
-  await execAndWaitForOutputToMatch(
-    'ng',
-    ['serve', '--port', String(port), ...args],
-    validBundleRegEx,
-  );
+  const serveArgs = ['serve', '--port', String(port)];
+
+  // On Windows, with WSL network mirroring, we need to listen on all interfaces
+  // so that WSL can fetch/verify contents of the server running on the host.
+  if (isWindowsTestMode()) {
+    serveArgs.push('--host', '0.0.0.0');
+  }
+
+  await execAndWaitForOutputToMatch('ng', [...serveArgs, ...args], validBundleRegEx);
 
   return port;
 }

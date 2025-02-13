@@ -126,12 +126,14 @@ jobs:
         run: yarn bazel test --define=E2E_SHARD_TOTAL=6 --define=E2E_SHARD_INDEX=${{ matrix.shard }} --config=e2e //tests/legacy-cli:e2e.${{ matrix.subset }}_node${{ matrix.node }}
 
   e2e-windows-subset:
-    needs: build
+    # needs: build
     runs-on: windows-latest
     steps:
-      # Workaround for: https://github.com/bazel-contrib/bazel-lib/issues/968.
-      # TODO(devversion): Remove when Aspect lib issue is fixed.
-      - run: choco install gzip
+      # Git checkout converts to CRLF by default. This causes the Aspect lock
+      # files to differ. See: https://github.com/actions/checkout/issues/135.
+      - run: |
+          git config --system core.autocrlf false
+          git config --system core.eol lf
       - name: Initialize environment
         uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@0ad6a370f70638e785d6ef1f90dc6ede34684a47
       - name: Install node modules
@@ -139,9 +141,83 @@ jobs:
       - name: Setup Bazel
         uses: angular/dev-infra/github-actions/bazel/setup@0ad6a370f70638e785d6ef1f90dc6ede34684a47
       - name: Setup Bazel RBE
-        uses: angular/dev-infra/github-actions/bazel/configure-remote@0ad6a370f70638e785d6ef1f90dc6ede34684a47
+        uses: angular/dev-infra/github-actions/bazel/configure-remote@a5e90c88a0fc012de199fe6f148c12b5476d6d1b
+
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        with:
+          detached: true
+
+      - uses: Vampire/setup-wsl@v4
+        with:
+          wsl-conf: |
+            [interop]
+              appendWindowsPath=false
+            [wsl2]
+              networkingMode=mirrored
+          wsl-shell-command: bash --login -euo pipefail
+          additional-packages: |
+            curl
+            ca-certificates
+            g++
+            unzip
+            zip
+            git
+            python3
+            tar
+      - name: Setup nvm
+        shell: wsl-bash {0}
+        run: |
+          curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/master/install.sh | bash
+          export NVM_DIR="$HOME/.nvm"
+          # Note: Specify `--install` due to https://github.com/nvm-sh/nvm/issues/1985.
+          [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" --install
+      - run: nvm install
+        shell: wsl-bash {0}
+      - run: npm install -g yarn@1
+        shell: wsl-bash {0}
+      - name: Install node modules in WSL (re-using from previous install/cache restore)
+        run: yarn install --immutable
+        shell: wsl-bash {0}
+      - name: Determining paths for WSL usage
+        id: wsl_paths
+        run: |
+          cmd_path=$(which cmd.exe)
+          cmd_wsl_path=$(wsl exec wslpath -u $cmd_path)
+          npm_path=$(which npm)
+          npm_wls_path=$(wsl exec wslpath -u "$npm_path")
+          tmp_dir_wsl_path=$(wsl exec wslpath -u "/tmp")
+
+          git_bin=$(which git)
+          git_bin_wsl_path=$(wsl exec wslpath -u "$git_bin")
+
+          echo "cmd_path=$cmd_wsl_path" >> $GITHUB_OUTPUT
+          echo "npm_path=$npm_wls_path" >> $GITHUB_OUTPUT
+          echo "tmp_path=$tmp_dir_wsl_path" >> $GITHUB_OUTPUT
+          echo "git_path=$git_bin_wsl_path" >> $GITHUB_OUTPUT
+      - name: Create link to WSL drive
+        shell: powershell
+        run: New-Item -ItemType SymbolicLink -Path "C:\wsl_root" -Target "\\wsl.localhost\Debian"
       - name: Run CLI E2E tests
-        run: yarn bazel test --config=e2e //tests/legacy-cli:e2e_node22 --test_filter="tests/basic/{build,rebuild}.ts" --test_arg="--esbuild"
+        env:
+          # See: https://devblogs.microsoft.com/commandline/share-environment-vars-between-wsl-and-windows
+          WSLENV: 'GOOGLE_APPLICATION_CREDENTIALS/p'
+        run: |
+          yarn bazel build \
+              --config=e2e //tests/legacy-cli:e2e_node22
+
+          yarn bazel test \
+              --config=e2e //tests/legacy-cli:e2e_node22 \
+              --spawn_strategy=local \
+              --test_filter="tests/basic/{build,rebuild}.ts" \
+              --test_arg="--esbuild" \
+              --test_env="NG_E2E_RUNNER_WSL_ROOT=C:\wsl_root" \
+              --test_env="NG_E2E_RUNNER_WSL_UNC_BASE=\\\\wsl.localhost\Debian" \
+              --test_env="NG_E2E_RUNNER_WINDOWS_CMD=${{steps.wsl_paths.outputs.cmd_path}}" \
+              --test_env="NG_E2E_RUNNER_WINDOWS_NPM=${{steps.wsl_paths.outputs.npm_path}}" \
+              --test_env="NG_E2E_RUNNER_WINDOWS_TMP_DIR=${{steps.wsl_paths.outputs.tmp_path}}" \
+              --test_env="NG_E2E_RUNNER_WINDOWS_GIT_BASH_BIN=${{steps.wsl_paths.outputs.git_path}}"
+        shell: wsl-bash {0}
 
   e2e-package-managers:
     needs: build
@@ -161,7 +237,7 @@ jobs:
       - name: Setup Bazel
         uses: angular/dev-infra/github-actions/bazel/setup@0ad6a370f70638e785d6ef1f90dc6ede34684a47
       - name: Setup Bazel RBE
-        uses: angular/dev-infra/github-actions/bazel/configure-remote@0ad6a370f70638e785d6ef1f90dc6ede34684a47
+        uses: angular/dev-infra/github-actions/bazel/configure-remote@3bfa6d8c9861c6477a52146828382a3d5043005f
       - name: Run CLI E2E tests
         run: yarn bazel test --define=E2E_SHARD_TOTAL=3 --define=E2E_SHARD_INDEX=${{ matrix.shard }} --config=e2e //tests/legacy-cli:e2e.${{ matrix.subset }}_node${{ matrix.node }}
 

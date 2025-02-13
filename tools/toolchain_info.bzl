@@ -9,16 +9,20 @@ TOOLCHAINS_NAMES = [
 
 # this is the list of toolchains that should be used and are registered with nodejs_register_toolchains in the WORKSPACE file
 TOOLCHAINS_VERSIONS = [
-    select({
-        "@bazel_tools//src/conditions:linux_x86_64": "@node20_linux_amd64//:node_toolchain",
-        "@bazel_tools//src/conditions:darwin": "@node20_darwin_amd64//:node_toolchain",
-        "@bazel_tools//src/conditions:windows": "@node20_windows_amd64//:node_toolchain",
-    }),
-    select({
-        "@bazel_tools//src/conditions:linux_x86_64": "@node22_linux_amd64//:node_toolchain",
-        "@bazel_tools//src/conditions:darwin": "@node22_darwin_amd64//:node_toolchain",
-        "@bazel_tools//src/conditions:windows": "@node22_windows_amd64//:node_toolchain",
-    }),
+    (
+        select({
+            "@bazel_tools//src/conditions:linux_x86_64": "@node20_linux_amd64//:node_toolchain",
+            "@bazel_tools//src/conditions:darwin": "@node20_darwin_amd64//:node_toolchain",
+        }),
+        "node20_windows_amd64",
+    ),
+    (
+        select({
+            "@bazel_tools//src/conditions:linux_x86_64": "@node22_linux_amd64//:node_toolchain",
+            "@bazel_tools//src/conditions:darwin": "@node22_darwin_amd64//:node_toolchain",
+        }),
+        "node22_windows_amd64",
+    ),
 ]
 
 # A default toolchain for use when only one is necessary
