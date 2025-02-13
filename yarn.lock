@@ -55,15 +55,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@angular/bazel@https://github.com/angular/bazel-builds.git#4317ed83ce4e897020e668cdfdbb26367b7a93a7":
-  version: 19.2.0-next.2+sha-a7f20eb
-  resolution: "@angular/bazel@https://github.com/angular/bazel-builds.git#commit=4317ed83ce4e897020e668cdfdbb26367b7a93a7"
+"@angular/bazel@https://github.com/angular/bazel-builds.git#cee20fd0958b532ee7c48a5859b682fb5573b2ce":
+  version: 19.2.0-next.2+sha-6789c7e
+  resolution: "@angular/bazel@https://github.com/angular/bazel-builds.git#commit=cee20fd0958b532ee7c48a5859b682fb5573b2ce"
   dependencies:
     "@microsoft/api-extractor": "npm:^7.24.2"
     magic-string: "npm:^0.30.0"
     tslib: "npm:^2.3.0"
   peerDependencies:
-    "@angular/compiler-cli": 19.2.0-next.2+sha-a7f20eb
+    "@angular/compiler-cli": 19.2.0-next.2+sha-6789c7e
     "@bazel/concatjs": ^5.3.0
     "@bazel/worker": ^5.3.0
     "@rollup/plugin-commonjs": ^28.0.0
@@ -80,7 +80,7 @@ __metadata:
     packager: ./src/ng_package/packager.mjs
     types_bundler: ./src/types_bundle/index.mjs
     xi18n: ./src/ngc-wrapped/extract_i18n.mjs
-  checksum: 10c0/3f7e882a753f5c71ed7dd7ce59e5ca4e25d934739a25733bd5123748e157730215177e474d8aa20a04c43f4eacc3c3adecc51e65404d4553c1b3dec5eac9b2f9
+  checksum: 10c0/12ebbc0fe11fe930f1969e816fc86d024bb0dde6388c4618d29e23969333237f93f3fe06f03bb91300eed20553ae9e2d3bde3024bad400e9a823c5bdde04c72b
   languageName: node
   linkType: hard
 
@@ -94,9 +94,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@angular/build-tooling@https://github.com/angular/dev-infra-private-build-tooling-builds.git#abfac3d594a0cd19efb08f07b7c1efa9cb8d3744":
-  version: 0.0.0-06c699a0574071728a3405e372573176faeed949
-  resolution: "@angular/build-tooling@https://github.com/angular/dev-infra-private-build-tooling-builds.git#commit=abfac3d594a0cd19efb08f07b7c1efa9cb8d3744"
+"@angular/build-tooling@https://github.com/angular/dev-infra-private-build-tooling-builds.git#8b9cb5b693628a7806bb668a4735cb21056ea8de":
+  version: 0.0.0-389821c85e153020b32ad72751e683ce127937f0
+  resolution: "@angular/build-tooling@https://github.com/angular/dev-infra-private-build-tooling-builds.git#commit=8b9cb5b693628a7806bb668a4735cb21056ea8de"
   dependencies:
     "@angular/benchpress": "npm:0.3.0"
     "@angular/build": "npm:19.2.0-next.1"
@@ -109,7 +109,7 @@ __metadata:
     "@bazel/runfiles": "npm:5.8.1"
     "@bazel/terser": "npm:5.8.1"
     "@bazel/typescript": "npm:5.8.1"
-    "@microsoft/api-extractor": "npm:7.49.2"
+    "@microsoft/api-extractor": "npm:7.50.0"
     "@types/browser-sync": "npm:^2.26.3"
     "@types/minimatch": "npm:^5.1.2"
     "@types/node": "npm:^18.19.21"
@@ -119,7 +119,7 @@ __metadata:
     "@types/ws": "npm:8.5.14"
     "@types/yargs": "npm:^17.0.0"
     browser-sync: "npm:^3.0.0"
-    prettier: "npm:3.4.2"
+    prettier: "npm:3.5.0"
     protractor: "npm:^7.0.0"
     selenium-webdriver: "npm:^4.18.1"
     send: "npm:^1.0.0"
@@ -133,7 +133,7 @@ __metadata:
   dependenciesMeta:
     re2:
       built: false
-  checksum: 10c0/b6cb5f389af453881fb9a84c206244a50969ef04099b6eee973a667d4f58747ea80ee20cd7ae90378abab27f41e32cc4e3c1ffb5357fb4298f545565f6c30cb3
+  checksum: 10c0/33726a32fc279375bbc9077d028b73107fb407a16778033291dc20ce42c10db54d64a556376ab4c072c0bb1ad2078f91ec00c6451f50484c647c4b81efb9a58a
   languageName: node
   linkType: hard
 
@@ -203,9 +203,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@angular/cdk@npm:19.2.0-next.3":
-  version: 19.2.0-next.3
-  resolution: "@angular/cdk@npm:19.2.0-next.3"
+"@angular/cdk@npm:19.2.0-next.4":
+  version: 19.2.0-next.4
+  resolution: "@angular/cdk@npm:19.2.0-next.4"
   dependencies:
     parse5: "npm:^7.1.2"
     tslib: "npm:^2.3.0"
@@ -216,7 +216,7 @@ __metadata:
   dependenciesMeta:
     parse5:
       optional: true
-  checksum: 10c0/01780a3fde0157871644bed99b4a9d6e883d4e68e0bd017a4f1a66e6d239c1e5c9b0e198960deb75558b9e0ec647a632bc13318496a181f2bd962d760e0062a6
+  checksum: 10c0/0a35230dd9cadb882d8ae88fae962a2e8f0eb32d087f2f7980373fd475aab4061f2dd8855d51846b64a350a2e97cd37a87b57d8eb89ef7bd6473073fbd88d379
   languageName: node
   linkType: hard
 
@@ -299,17 +299,17 @@ __metadata:
   dependencies:
     "@ampproject/remapping": "npm:2.3.0"
     "@angular/animations": "npm:19.2.0-next.2"
-    "@angular/bazel": "https://github.com/angular/bazel-builds.git#4317ed83ce4e897020e668cdfdbb26367b7a93a7"
-    "@angular/build-tooling": "https://github.com/angular/dev-infra-private-build-tooling-builds.git#abfac3d594a0cd19efb08f07b7c1efa9cb8d3744"
-    "@angular/cdk": "npm:19.2.0-next.3"
+    "@angular/bazel": "https://github.com/angular/bazel-builds.git#cee20fd0958b532ee7c48a5859b682fb5573b2ce"
+    "@angular/build-tooling": "https://github.com/angular/dev-infra-private-build-tooling-builds.git#8b9cb5b693628a7806bb668a4735cb21056ea8de"
+    "@angular/cdk": "npm:19.2.0-next.4"
     "@angular/common": "npm:19.2.0-next.2"
     "@angular/compiler": "npm:19.2.0-next.2"
     "@angular/compiler-cli": "npm:19.2.0-next.2"
     "@angular/core": "npm:19.2.0-next.2"
     "@angular/forms": "npm:19.2.0-next.2"
     "@angular/localize": "npm:19.2.0-next.2"
-    "@angular/material": "npm:19.2.0-next.3"
-    "@angular/ng-dev": "https://github.com/angular/dev-infra-private-ng-dev-builds.git#d20f99e83f04ff0648b00cd7b769c06f5a29d2a4"
+    "@angular/material": "npm:19.2.0-next.4"
+    "@angular/ng-dev": "https://github.com/angular/dev-infra-private-ng-dev-builds.git#b3b042152d5a9647c6c036093fa723c52ea0e2c6"
     "@angular/platform-browser": "npm:19.2.0-next.2"
     "@angular/platform-browser-dynamic": "npm:19.2.0-next.2"
     "@angular/platform-server": "npm:19.2.0-next.2"
@@ -504,31 +504,30 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@angular/material@npm:19.2.0-next.3":
-  version: 19.2.0-next.3
-  resolution: "@angular/material@npm:19.2.0-next.3"
+"@angular/material@npm:19.2.0-next.4":
+  version: 19.2.0-next.4
+  resolution: "@angular/material@npm:19.2.0-next.4"
   dependencies:
     tslib: "npm:^2.3.0"
   peerDependencies:
-    "@angular/animations": ^19.0.0-0 || ^19.1.0-0 || ^19.2.0-0 || ^19.3.0-0 || ^20.0.0-0
-    "@angular/cdk": 19.2.0-next.3
+    "@angular/cdk": 19.2.0-next.4
     "@angular/common": ^19.0.0-0 || ^19.1.0-0 || ^19.2.0-0 || ^19.3.0-0 || ^20.0.0-0
     "@angular/core": ^19.0.0-0 || ^19.1.0-0 || ^19.2.0-0 || ^19.3.0-0 || ^20.0.0-0
     "@angular/forms": ^19.0.0-0 || ^19.1.0-0 || ^19.2.0-0 || ^19.3.0-0 || ^20.0.0-0
     "@angular/platform-browser": ^19.0.0-0 || ^19.1.0-0 || ^19.2.0-0 || ^19.3.0-0 || ^20.0.0-0
     rxjs: ^6.5.3 || ^7.4.0
-  checksum: 10c0/fa5cbf59566629ca91fa567601be00c1b6da56f619c419992ad6365cc99cf0a7cb36c972c159dee6d25b671a764a36b37079c4d1f4215358e8cb78aab8635ee0
+  checksum: 10c0/52079cd30fa94a7043f35777882acfe6168cd0eaa9208567d1875ed81b6b79778adfca5a38a0dfdeec11c5eaff7c0d745125bd2789b7446b064c1e80bdb2535a
   languageName: node
   linkType: hard
 
-"@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#d20f99e83f04ff0648b00cd7b769c06f5a29d2a4":
-  version: 0.0.0-06c699a0574071728a3405e372573176faeed949
-  resolution: "@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#commit=d20f99e83f04ff0648b00cd7b769c06f5a29d2a4"
+"@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#b3b042152d5a9647c6c036093fa723c52ea0e2c6":
+  version: 0.0.0-389821c85e153020b32ad72751e683ce127937f0
+  resolution: "@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#commit=b3b042152d5a9647c6c036093fa723c52ea0e2c6"
   dependencies:
     "@google-cloud/spanner": "npm:7.18.1"
     "@octokit/rest": "npm:21.1.0"
     "@types/semver": "npm:^7.3.6"
-    "@types/supports-color": "npm:^8.1.1"
+    "@types/supports-color": "npm:^10.0.0"
     "@yarnpkg/lockfile": "npm:^1.1.0"
     chalk: "npm:^5.0.1"
     semver: "npm:^7.5.4"
@@ -539,7 +538,7 @@ __metadata:
     yaml: "npm:2.7.0"
   bin:
     ng-dev: ./bundles/cli.mjs
-  checksum: 10c0/8541e28887d8543a1b8ccedc1d120bae923ef7d934461887ac4c0d1018026627b7ae734b277c4ec514ff70b266c0ac80242bbc0ad6d7c8dd456d00211d56ca51
+  checksum: 10c0/e9c7f77265865ed051ae5bfae93187eb1578b08e0fd30270d29b4b2da5c5a9b2efc5463f945bf65c44e55e69a57b21f56dd83fc5cd5a8bc39b5cf5f4255354c1
   languageName: node
   linkType: hard
 
@@ -3000,7 +2999,30 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@microsoft/api-extractor@npm:7.49.2, @microsoft/api-extractor@npm:^7.24.2":
+"@microsoft/api-extractor@npm:7.50.0":
+  version: 7.50.0
+  resolution: "@microsoft/api-extractor@npm:7.50.0"
+  dependencies:
+    "@microsoft/api-extractor-model": "npm:7.30.3"
+    "@microsoft/tsdoc": "npm:~0.15.1"
+    "@microsoft/tsdoc-config": "npm:~0.17.1"
+    "@rushstack/node-core-library": "npm:5.11.0"
+    "@rushstack/rig-package": "npm:0.5.3"
+    "@rushstack/terminal": "npm:0.15.0"
+    "@rushstack/ts-command-line": "npm:4.23.5"
+    lodash: "npm:~4.17.15"
+    minimatch: "npm:~3.0.3"
+    resolve: "npm:~1.22.1"
+    semver: "npm:~7.5.4"
+    source-map: "npm:~0.6.1"
+    typescript: "npm:5.7.2"
+  bin:
+    api-extractor: bin/api-extractor
+  checksum: 10c0/3ad37fe2afd15b9705f010099d12a9260bc48564e2d68574f984c481b067c19588a2fa37778486a38515af9edf183d3a75f32560606f7b724f0264099f22955b
+  languageName: node
+  linkType: hard
+
+"@microsoft/api-extractor@npm:^7.24.2":
   version: 7.49.2
   resolution: "@microsoft/api-extractor@npm:7.49.2"
   dependencies:
@@ -4334,6 +4356,21 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@rushstack/terminal@npm:0.15.0":
+  version: 0.15.0
+  resolution: "@rushstack/terminal@npm:0.15.0"
+  dependencies:
+    "@rushstack/node-core-library": "npm:5.11.0"
+    supports-color: "npm:~8.1.1"
+  peerDependencies:
+    "@types/node": "*"
+  peerDependenciesMeta:
+    "@types/node":
+      optional: true
+  checksum: 10c0/44e23353e8a4b8024d10d01b9a05fd8d736ddbe2d595a12bfcd290c27842fef156e2471f5e61eed62bad733bd692ba261f1e642c2b1547a0009927805e74e2a6
+  languageName: node
+  linkType: hard
+
 "@rushstack/ts-command-line@npm:4.23.4":
   version: 4.23.4
   resolution: "@rushstack/ts-command-line@npm:4.23.4"
@@ -4343,6 +4380,18 @@ __metadata:
     argparse: "npm:~1.0.9"
     string-argv: "npm:~0.3.1"
   checksum: 10c0/0f95ce851f589c1b8ab7efed60c7eea98fc181db07526a3f31aec0f255a3cb23c6a4dfeb30bb717b5efd4149a56abc43636d850710141303a6435c850bf64f1e
+  languageName: node
+  linkType: hard
+
+"@rushstack/ts-command-line@npm:4.23.5":
+  version: 4.23.5
+  resolution: "@rushstack/ts-command-line@npm:4.23.5"
+  dependencies:
+    "@rushstack/terminal": "npm:0.15.0"
+    "@types/argparse": "npm:1.0.38"
+    argparse: "npm:~1.0.9"
+    string-argv: "npm:~0.3.1"
+  checksum: 10c0/8c4330620658227bb7af27031d720a826f6a8b92f281cc433393c52968475fddc0031d86477f1676377878130b926b2efb7893edb2d73cdb1fa23444b792e88a
   languageName: node
   linkType: hard
 
@@ -5260,10 +5309,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/supports-color@npm:^8.1.1":
-  version: 8.1.3
-  resolution: "@types/supports-color@npm:8.1.3"
-  checksum: 10c0/03aa3616b403f3deaeb774df6d3a3969845b0c9f449814a83c2c53eb6818f5f9b571ba205330b0ebe8e46f41fd550f581a34b4310b13f0e0448694cfff37ddbf
+"@types/supports-color@npm:^10.0.0":
+  version: 10.0.0
+  resolution: "@types/supports-color@npm:10.0.0"
+  dependencies:
+    supports-color: "npm:*"
+  checksum: 10c0/760b0cb02d92330efcb304cdae54aaa2b07640d55efd7cd52738e5d815c171341f1221d3c6c9a3949b9486eb8836d489521fe9551be420d4e3467b202a1d575c
   languageName: node
   linkType: hard
 
@@ -14993,16 +15044,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prettier@npm:3.4.2":
-  version: 3.4.2
-  resolution: "prettier@npm:3.4.2"
-  bin:
-    prettier: bin/prettier.cjs
-  checksum: 10c0/99e076a26ed0aba4ebc043880d0f08bbb8c59a4c6641cdee6cdadf2205bdd87aa1d7823f50c3aea41e015e99878d37c58d7b5f0e663bba0ef047f94e36b96446
-  languageName: node
-  linkType: hard
-
-"prettier@npm:^3.0.0":
+"prettier@npm:3.5.0, prettier@npm:^3.0.0":
   version: 3.5.0
   resolution: "prettier@npm:3.5.0"
   bin:
@@ -17262,7 +17304,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"supports-color@npm:10.0.0":
+"supports-color@npm:*, supports-color@npm:10.0.0":
   version: 10.0.0
   resolution: "supports-color@npm:10.0.0"
   checksum: 10c0/0e7884dfd02a07b3c6e0b235346f58c19f0201f1e44f7807583581761b354688c8577378785b5a4e3b03110809786c4c808e0e086cd91911f7b8bc59132703a8
