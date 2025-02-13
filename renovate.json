@@ -12,7 +12,7 @@
     "commands": [
       "git restore .yarn/releases/yarn-4.5.0.cjs pnpm-lock.yaml",
       "yarn install --immutable",
-      "yarn bazel sync --only=repo"
+      "yarn bazel sync --only=repo || true"
     ],
     "fileFilters": [".aspect/rules/external_repository_action_cache/**/*", "pnpm-lock.yaml"],
     "executionMode": "branch"
