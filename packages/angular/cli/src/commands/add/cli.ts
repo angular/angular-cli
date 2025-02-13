@@ -100,7 +100,11 @@ export default class AddCommandModule
       // `ng add @angular/localize -- --package-options`.
       .strict(false);
 
-    const collectionName = await this.getCollectionName();
+    const collectionName = this.getCollectionName();
+    if (!collectionName) {
+      return localYargs;
+    }
+
     const workflow = this.getOrCreateWorkflowForBuilder(collectionName);
 
     try {
@@ -401,14 +405,19 @@ export default class AddCommandModule
     return false;
   }
 
-  private async getCollectionName(): Promise<string> {
-    let [, collectionName] = this.context.args.positional;
+  private getCollectionName(): string | undefined {
+    const [, collectionName] = this.context.args.positional;
+    if (!collectionName) {
+      return undefined;
+    }
 
     // The CLI argument may specify also a version, like `ng add @my/lib@13.0.0`,
-    // but here we need only the name of the package, like `@my/lib`
+    // but here we need only the name of the package, like `@my/lib`.
     try {
-      const packageIdentifier = npa(collectionName);
-      collectionName = packageIdentifier.name ?? collectionName;
+      const packageName = npa(collectionName).name;
+      if (packageName) {
+        return packageName;
+      }
     } catch (e) {
       assertIsError(e);
       this.context.logger.error(e.message);
