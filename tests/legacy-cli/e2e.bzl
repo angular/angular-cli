@@ -71,18 +71,25 @@ def e2e_suites(name, runner, data):
     """
 
     # Pre-configured test suites
-    for toolchain_name, toolchain in zip(
+    for toolchain_name, (toolchain, windows_node_repo) in zip(
         TOOLCHAINS_NAMES,
         TOOLCHAINS_VERSIONS,
     ):
         # Default target meant to be run manually for debugging, customizing test cli via bazel
-        _e2e_tests(name + "_" + toolchain_name, runner, data = data, toolchain = toolchain, tags = ["manual"])
+        _e2e_tests(
+            name + "_" + toolchain_name,
+            runner,
+            data = data,
+            toolchain = toolchain,
+            windows_node_repo = windows_node_repo,
+            tags = ["manual"],
+        )
 
-        _e2e_suite(name, runner, "npm", data, toolchain_name, toolchain)
-        _e2e_suite(name, runner, "bun", data, toolchain_name, toolchain)
-        _e2e_suite(name, runner, "pnpm", data, toolchain_name, toolchain)
-        _e2e_suite(name, runner, "yarn", data, toolchain_name, toolchain)
-        _e2e_suite(name, runner, "esbuild", data, toolchain_name, toolchain)
+        _e2e_suite(name, runner, "npm", data, toolchain_name, toolchain, windows_node_repo)
+        _e2e_suite(name, runner, "bun", data, toolchain_name, toolchain, windows_node_repo)
+        _e2e_suite(name, runner, "pnpm", data, toolchain_name, toolchain, windows_node_repo)
+        _e2e_suite(name, runner, "yarn", data, toolchain_name, toolchain, windows_node_repo)
+        _e2e_suite(name, runner, "esbuild", data, toolchain_name, toolchain, windows_node_repo)
 
     # Saucelabs tests are only run on the default toolchain
     _e2e_suite(name, runner, "saucelabs", data)
@@ -119,6 +126,23 @@ def _e2e_tests(name, runner, **kwargs):
     toolchains = toolchains + ["@npm//@angular/build-tooling/bazel/browsers/chromium:toolchain_alias"]
     data = data + ["@npm//@angular/build-tooling/bazel/browsers/chromium"]
 
+    windows_node_repo = kwargs.pop("windows_node_repo", None)
+    windows_node_files = [
+        "@%s//:node_files" % windows_node_repo,
+        "@%s//:npm_files" % windows_node_repo,
+        "@%s//:bin/npm.cmd" % windows_node_repo,
+    ]
+
+    data = select({
+        "@bazel_tools//src/conditions:windows": data + windows_node_files,
+        "//conditions:default": data + windows_node_files,
+        #"//conditions:default": data,
+    })
+
+    env.update({
+        "NG_E2E_WINDOWS_REPO_SHORT_PATH": "../%s" % windows_node_repo,
+    })
+
     nodejs_test(
         name = name,
         templated_args = args,
@@ -131,7 +155,7 @@ def _e2e_tests(name, runner, **kwargs):
         **kwargs
     )
 
-def _e2e_suite(name, runner, type, data, toolchain_name = "", toolchain = None):
+def _e2e_suite(name, runner, type, data, toolchain_name = "", toolchain = None, windows_node_repo = None):
     """
     Setup a predefined test suite (yarn|pnpm|bun|esbuild|saucelabs|npm).
     """
@@ -166,6 +190,7 @@ def _e2e_suite(name, runner, type, data, toolchain_name = "", toolchain = None):
         size = "enormous",
         data = data,
         toolchain = toolchain,
+        windows_node_repo = windows_node_repo,
         shard_count = TEST_SHARD_COUNT,
         templated_args = args + [
             "--glob=%s" % _to_glob(tests) if tests else "",
@@ -180,6 +205,7 @@ def _e2e_suite(name, runner, type, data, toolchain_name = "", toolchain = None):
         size = "enormous",
         data = data,
         toolchain = toolchain,
+        windows_node_repo = windows_node_repo,
         shard_count = TEST_SHARD_COUNT,
         templated_args = args + [
             "--ng-snapshots",

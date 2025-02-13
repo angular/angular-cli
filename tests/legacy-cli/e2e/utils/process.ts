@@ -5,6 +5,7 @@ import { concat, defer, EMPTY, from, lastValueFrom, catchError, repeat } from 'r
 import { getGlobalVariable, getGlobalVariablesEnv } from './env';
 import treeKill from 'tree-kill';
 import { delimiter, join, resolve } from 'node:path';
+import { createWslEnv, interopWslPathForOutsideIfNecessary, isWindowsTestMode } from './wsl';
 
 interface ExecOptions {
   silent?: boolean;
@@ -34,16 +35,18 @@ function _exec(options: ExecOptions, cmd: string, args: string[]): Promise<Proce
 
   const cwd = options.cwd ?? process.cwd();
   const env = options.env ?? process.env;
+  const windowsMode = isWindowsTestMode();
 
   console.log(
     `==========================================================================================`,
   );
 
   // Ensure the custom npm and yarn global bin is on the PATH
-  // https://docs.npmjs.com/cli/v8/configuring-npm/folders#executables
+  // https://docs.npmjs.com/cli/v8/configuring-npm/folders#executables.
+  // On Linux, macOS platforms, `bin/` is needed.
   const paths = [
-    join(getGlobalVariable('yarn-global'), 'bin'),
-    join(getGlobalVariable('npm-global'), process.platform.startsWith('win') ? '' : 'bin'),
+    join(getGlobalVariable('yarn-global'), windowsMode !== null ? '' : 'bin'),
+    join(getGlobalVariable('npm-global'), windowsMode !== null ? '' : 'bin'),
     env.PATH || process.env['PATH'],
   ].join(delimiter);
 
@@ -56,19 +59,35 @@ function _exec(options: ExecOptions, cmd: string, args: string[]): Promise<Proce
     .join(', ')
     .replace(/^(.+)$/, ' [$1]'); // Proper formatting.
 
-  console.log(colors.blue(`Running \`${cmd} ${args.map((x) => `"${x}"`).join(' ')}\`${flags}...`));
-  console.log(colors.blue(`CWD: ${cwd}`));
-
-  const spawnOptions: SpawnOptions = {
+  const spawnOptions: SpawnOptions & Required<Pick<SpawnOptions, 'env'>> = {
     cwd,
     env: { ...env, PATH: paths },
   };
 
-  if (process.platform.startsWith('win')) {
+  // Set by jobs running the e2e runner inside WSL, but want to verify CLI
+  // works well for our Windows users outside of WSL. See `.github/workflows/pr.yml`.
+  if (windowsMode !== null) {
+    // Translate command path to a native Windows path, as we execute
+    // via CMD outside WSL.
     args.unshift('/c', cmd);
-    cmd = 'cmd.exe';
-    spawnOptions['stdio'] = 'pipe';
+    cmd = windowsMode.cmdPath;
+
+    spawnOptions.stdio = 'pipe';
+    // Set WSLENV to propagate configured environment variables.
+    // E.g. NPM registry or other variables.
+    spawnOptions.env['WSLENV'] = createWslEnv(spawnOptions.env);
+
+    // Convert all absolute paths to native Windows paths that are
+    // valid in CMD outside WSL. Relative imports should still work.
+    // Absolute paths will otherwise be invalid when simulating commands
+    // for native Windows users.
+    for (let i = 0; i < args.length; i++) {
+      args[i] = interopWslPathForOutsideIfNecessary(args[i]);
+    }
   }
+
+  console.log(colors.blue(`Running \`${cmd} ${args.map((x) => `"${x}"`).join(' ')}\`${flags}...`));
+  console.log(colors.blue(`CWD: ${cwd}`));
 
   const childProcess = child_process.spawn(cmd, args, spawnOptions);
 
@@ -142,11 +161,11 @@ function _exec(options: ExecOptions, cmd: string, args: string[]): Promise<Proce
         return;
       }
 
-      reject(`Process exit error - "${cmd} ${args.join(' ')}": ${code}...\n\n${envDump()}\n`);
+      reject(`Process exit error - "${cmd} ${args.join(' ')}": Code: ${code}\n\n${envDump()}\n`);
     });
 
     childProcess.on('error', (err) => {
-      reject(`Process error - "${cmd} ${args.join(' ')}": ${err}...\n\n${envDump()}\n`);
+      reject(`Process error - "${cmd} ${args.join(' ')}": ${err}\n\n${envDump()}\n`);
     });
 
     // Provide input to stdin if given.
@@ -393,19 +412,24 @@ export function globalNpm(args: string[], env?: NodeJS.ProcessEnv) {
     );
   }
 
-  return _exec({ silent: true, env }, process.execPath, [require.resolve('npm'), ...args]);
+  const windowsMode = isWindowsTestMode();
+  if (windowsMode) {
+    return _exec({ silent: true, env }, windowsMode.npmBinaryForWindowsPath, args);
+  }
+
+  return _spawnNode([require.resolve('npm'), ...args], { silent: true, env });
 }
 
 export function node(...args: string[]) {
-  return _exec({}, process.execPath, args);
+  return _spawnNode(args);
 }
 
 export function git(...args: string[]) {
-  return _exec({}, process.env.GIT_BIN || 'git', args);
+  return _exec({}, 'git', args);
 }
 
 export function silentGit(...args: string[]) {
-  return _exec({ silent: true }, process.env.GIT_BIN || 'git', args);
+  return _exec({ silent: true }, 'git', args);
 }
 
 /**
@@ -466,4 +490,15 @@ export async function launchTestProcess(entry: string, ...args: any[]): Promise<
         reject(`Process exit error - "${testProcessArgs}]\n\n${err}`);
       });
   });
+}
+
+function _spawnNode(args: string[], opts: ExecOptions = {}) {
+  let nodeBin = process.execPath;
+
+  const windowsMode = isWindowsTestMode();
+  if (windowsMode !== null) {
+    nodeBin = windowsMode.nodeBinaryForWindowsPath;
+  }
+
+  return _exec(opts, nodeBin, args);
 }
