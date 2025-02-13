@@ -53,8 +53,8 @@ importers:
         specifier: 19.1.0-rc.0
         version: 19.1.0-rc.0(@angular/animations@19.1.0-rc.0)(@angular/cdk@19.1.0-rc.0)(@angular/common@19.1.0-rc.0)(@angular/core@19.1.0-rc.0)(@angular/forms@19.1.0-rc.0)(@angular/platform-browser@19.1.0-rc.0)(rxjs@7.8.1)
       '@angular/ng-dev':
-        specifier: https://github.com/angular/dev-infra-private-ng-dev-builds.git#2dde6a7f809c2928ab1c7b85afb7fec0c49beafc
-        version: github.com/angular/dev-infra-private-ng-dev-builds/2dde6a7f809c2928ab1c7b85afb7fec0c49beafc
+        specifier: https://github.com/angular/dev-infra-private-ng-dev-builds.git#9d865e0e4202ed88ccec184739819c09637b5ede
+        version: github.com/angular/dev-infra-private-ng-dev-builds/9d865e0e4202ed88ccec184739819c09637b5ede
       '@angular/platform-browser':
         specifier: 19.1.0-rc.0
         version: 19.1.0-rc.0(@angular/animations@19.1.0-rc.0)(@angular/common@19.1.0-rc.0)(@angular/core@19.1.0-rc.0)
@@ -2704,8 +2704,8 @@ packages:
     engines: {node: '>=14'}
     dev: true
 
-  /@google-cloud/spanner@7.17.1(supports-color@10.0.0):
-    resolution: {integrity: sha512-+dTR6wvb2jANVxNe2bF048QCOVRGbesHe8Tm0OFRhvCgv3ot31JFGPyRKukD7y3jAFSBqyX0bIUV9GVNk4oRPQ==}
+  /@google-cloud/spanner@7.18.1(supports-color@10.0.0):
+    resolution: {integrity: sha512-7CwpTX5njfoUAVQL/otowTm3gjWPn+ceUKKH+KGWr/DuAeDsrc4sZH1LY+t2mt/vvMULS/PlWkAkv6Hk/Oi8cw==}
     engines: {node: '>=14.0.0'}
     dependencies:
       '@google-cloud/common': 5.0.2(supports-color@10.0.0)
@@ -4590,8 +4590,11 @@ packages:
     resolution: {integrity: sha512-O7in6531Bbvlb2KEsJ0dq0CHZvc3iWSR5ZYMtvGgnHA56VgriAN/AU2LorfmcvAl2xc9N5fbCTRyMRRl8nd74g==}
     dev: true
 
-  /@types/supports-color@8.1.3:
-    resolution: {integrity: sha512-Hy6UMpxhE3j1tLpl27exp1XqHD7n8chAiNPzWfz16LPZoMMoSc4dzLl6w9qijkEb/r5O1ozdu1CWGA2L83ZeZg==}
+  /@types/supports-color@10.0.0:
+    resolution: {integrity: sha512-Kpp/hhA8/pcxqBBKmOCIgvwCOJAI5y6TWTHhhqnB6KmuYlKtixKgN/Z7VzhShdgONe2jYREnTQbsrb3E0nt/OQ==}
+    deprecated: This is a stub types definition. supports-color provides its own type definitions, so you do not need this installed.
+    dependencies:
+      supports-color: 10.0.0
     dev: true
 
   /@types/tapable@1.0.12:
@@ -14289,22 +14292,23 @@ packages:
       - zone.js
     dev: true
 
-  github.com/angular/dev-infra-private-ng-dev-builds/2dde6a7f809c2928ab1c7b85afb7fec0c49beafc:
-    resolution: {tarball: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/2dde6a7f809c2928ab1c7b85afb7fec0c49beafc}
+  github.com/angular/dev-infra-private-ng-dev-builds/9d865e0e4202ed88ccec184739819c09637b5ede:
+    resolution: {tarball: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/9d865e0e4202ed88ccec184739819c09637b5ede}
     name: '@angular/ng-dev'
-    version: 0.0.0-7863aba23429b9cdb432a63cb688dd4c61f51ce6
+    version: 0.0.0-b015169b635123c1ab9084f604e36b6342eac171
     hasBin: true
     dependencies:
-      '@google-cloud/spanner': 7.17.1(supports-color@10.0.0)
+      '@google-cloud/spanner': 7.18.1(supports-color@10.0.0)
       '@octokit/rest': 21.1.0
       '@types/semver': 7.5.8
-      '@types/supports-color': 8.1.3
+      '@types/supports-color': 10.0.0
       '@yarnpkg/lockfile': 1.1.0
       chalk: 5.4.1
       semver: 7.6.3
       supports-color: 10.0.0
       typed-graphqlify: 3.1.6
       typescript: 5.7.3
+      which: 5.0.0
       yaml: 2.7.0
     transitivePeerDependencies:
       - encoding
