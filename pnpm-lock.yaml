@@ -26,8 +26,8 @@ importers:
         specifier: https://github.com/angular/bazel-builds.git#cee20fd0958b532ee7c48a5859b682fb5573b2ce
         version: github.com/angular/bazel-builds/cee20fd0958b532ee7c48a5859b682fb5573b2ce(@angular/compiler-cli@19.2.0-next.2)(@rollup/plugin-commonjs@28.0.2)(@rollup/plugin-node-resolve@13.3.0)(@types/node@18.19.75)(rollup-plugin-sourcemaps@0.6.3)(rollup@4.34.6)(terser@5.38.2)(typescript@5.7.3)
       '@angular/build-tooling':
-        specifier: https://github.com/angular/dev-infra-private-build-tooling-builds.git#8b9cb5b693628a7806bb668a4735cb21056ea8de
-        version: github.com/angular/dev-infra-private-build-tooling-builds/8b9cb5b693628a7806bb668a4735cb21056ea8de(debug@4.4.0)(karma-chrome-launcher@3.2.0)(karma-jasmine@5.1.0)(karma@6.4.4)(rxjs@7.8.1)(terser@5.38.2)(zone.js@0.15.0)
+        specifier: https://github.com/angular/dev-infra-private-build-tooling-builds.git#a6a996a69cfc03b3fbe538f11dd24b7bc4b30592
+        version: github.com/angular/dev-infra-private-build-tooling-builds/a6a996a69cfc03b3fbe538f11dd24b7bc4b30592(debug@4.4.0)(karma-chrome-launcher@3.2.0)(karma-jasmine@5.1.0)(karma@6.4.4)(rxjs@7.8.1)(terser@5.38.2)(zone.js@0.15.0)
       '@angular/cdk':
         specifier: 19.2.0-next.4
         version: 19.2.0-next.4(@angular/common@19.2.0-next.2)(@angular/core@19.2.0-next.2)(rxjs@7.8.1)
@@ -53,8 +53,8 @@ importers:
         specifier: 19.2.0-next.4
         version: 19.2.0-next.4(@angular/cdk@19.2.0-next.4)(@angular/common@19.2.0-next.2)(@angular/core@19.2.0-next.2)(@angular/forms@19.2.0-next.2)(@angular/platform-browser@19.2.0-next.2)(rxjs@7.8.1)
       '@angular/ng-dev':
-        specifier: https://github.com/angular/dev-infra-private-ng-dev-builds.git#b3b042152d5a9647c6c036093fa723c52ea0e2c6
-        version: github.com/angular/dev-infra-private-ng-dev-builds/b3b042152d5a9647c6c036093fa723c52ea0e2c6
+        specifier: https://github.com/angular/dev-infra-private-ng-dev-builds.git#9d865e0e4202ed88ccec184739819c09637b5ede
+        version: github.com/angular/dev-infra-private-ng-dev-builds/9d865e0e4202ed88ccec184739819c09637b5ede
       '@angular/platform-browser':
         specifier: 19.2.0-next.2
         version: 19.2.0-next.2(@angular/animations@19.2.0-next.2)(@angular/common@19.2.0-next.2)(@angular/core@19.2.0-next.2)
@@ -14474,11 +14474,11 @@ packages:
       - '@types/node'
     dev: true
 
-  github.com/angular/dev-infra-private-build-tooling-builds/8b9cb5b693628a7806bb668a4735cb21056ea8de(debug@4.4.0)(karma-chrome-launcher@3.2.0)(karma-jasmine@5.1.0)(karma@6.4.4)(rxjs@7.8.1)(terser@5.38.2)(zone.js@0.15.0):
-    resolution: {tarball: https://codeload.github.com/angular/dev-infra-private-build-tooling-builds/tar.gz/8b9cb5b693628a7806bb668a4735cb21056ea8de}
-    id: github.com/angular/dev-infra-private-build-tooling-builds/8b9cb5b693628a7806bb668a4735cb21056ea8de
+  github.com/angular/dev-infra-private-build-tooling-builds/a6a996a69cfc03b3fbe538f11dd24b7bc4b30592(debug@4.4.0)(karma-chrome-launcher@3.2.0)(karma-jasmine@5.1.0)(karma@6.4.4)(rxjs@7.8.1)(terser@5.38.2)(zone.js@0.15.0):
+    resolution: {tarball: https://codeload.github.com/angular/dev-infra-private-build-tooling-builds/tar.gz/a6a996a69cfc03b3fbe538f11dd24b7bc4b30592}
+    id: github.com/angular/dev-infra-private-build-tooling-builds/a6a996a69cfc03b3fbe538f11dd24b7bc4b30592
     name: '@angular/build-tooling'
-    version: 0.0.0-389821c85e153020b32ad72751e683ce127937f0
+    version: 0.0.0-b015169b635123c1ab9084f604e36b6342eac171
     dependencies:
       '@angular/benchpress': 0.3.0(rxjs@7.8.1)(zone.js@0.15.0)
       '@angular/build': link:packages/angular/build
@@ -14529,10 +14529,10 @@ packages:
       - zone.js
     dev: true
 
-  github.com/angular/dev-infra-private-ng-dev-builds/b3b042152d5a9647c6c036093fa723c52ea0e2c6:
-    resolution: {tarball: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/b3b042152d5a9647c6c036093fa723c52ea0e2c6}
+  github.com/angular/dev-infra-private-ng-dev-builds/9d865e0e4202ed88ccec184739819c09637b5ede:
+    resolution: {tarball: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/9d865e0e4202ed88ccec184739819c09637b5ede}
     name: '@angular/ng-dev'
-    version: 0.0.0-389821c85e153020b32ad72751e683ce127937f0
+    version: 0.0.0-b015169b635123c1ab9084f604e36b6342eac171
     hasBin: true
     dependencies:
       '@google-cloud/spanner': 7.18.1(supports-color@10.0.0)
