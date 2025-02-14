@@ -448,7 +448,7 @@ __metadata:
     tree-kill: "npm:1.2.2"
     ts-node: "npm:^10.9.1"
     tslib: "npm:2.8.1"
-    typescript: "npm:5.7.3"
+    typescript: "npm:5.8.1-rc"
     undici: "npm:7.3.0"
     unenv: "npm:^1.10.0"
     verdaccio: "npm:6.0.5"
@@ -17957,23 +17957,23 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@npm:5.7.3":
-  version: 5.7.3
-  resolution: "typescript@npm:5.7.3"
+"typescript@npm:5.8.1-rc":
+  version: 5.8.1-rc
+  resolution: "typescript@npm:5.8.1-rc"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
-  checksum: 10c0/b7580d716cf1824736cc6e628ab4cd8b51877408ba2be0869d2866da35ef8366dd6ae9eb9d0851470a39be17cbd61df1126f9e211d8799d764ea7431d5435afa
+  checksum: 10c0/7692b2584d0bddbab2b9a76457908276cb968935b9e1a89b7429939b1c02c7c47b5b23f1e989e18bf441fc545a311f02e143e7594a3914e240554637011a7d70
   languageName: node
   linkType: hard
 
-"typescript@patch:typescript@npm%3A5.7.3#optional!builtin<compat/typescript>":
-  version: 5.7.3
-  resolution: "typescript@patch:typescript@npm%3A5.7.3#optional!builtin<compat/typescript>::version=5.7.3&hash=8c6c40"
+"typescript@patch:typescript@npm%3A5.8.1-rc#optional!builtin<compat/typescript>":
+  version: 5.8.1-rc
+  resolution: "typescript@patch:typescript@npm%3A5.8.1-rc#optional!builtin<compat/typescript>::version=5.8.1-rc&hash=8c6c40"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
-  checksum: 10c0/3b56d6afa03d9f6172d0b9cdb10e6b1efc9abc1608efd7a3d2f38773d5d8cfb9bbc68dfb72f0a7de5e8db04fc847f4e4baeddcd5ad9c9feda072234f0d788896
+  checksum: 10c0/725401bb453598be8e1f46a63579a5ebf22353188e5e9901e26ebea6c9f3f669cecc41a9ebe91271bb4d1ffa68090071bb063c25c273309cbc91de76c7cbf70e
   languageName: node
   linkType: hard
 

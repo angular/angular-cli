@@ -204,9 +204,9 @@ export interface CreateFileAction extends ActionBase {
 
 // @public (undocumented)
 export class DelegateTree implements Tree_2 {
-    constructor(_other: Tree_2);
     // (undocumented)
-    [x: symbol]: () => this;
+    [TreeSymbol]: () => this;
+    constructor(_other: Tree_2);
     // (undocumented)
     get actions(): Action[];
     // (undocumented)
@@ -518,9 +518,9 @@ export class HostSink extends SimpleSinkBase {
 
 // @public (undocumented)
 export class HostTree implements Tree_2 {
-    constructor(_backend?: virtualFs.ReadonlyHost<{}>);
     // (undocumented)
-    [x: symbol]: () => this;
+    [TreeSymbol]: () => this;
+    constructor(_backend?: virtualFs.ReadonlyHost<{}>);
     // (undocumented)
     get actions(): Action[];
     // (undocumented)
