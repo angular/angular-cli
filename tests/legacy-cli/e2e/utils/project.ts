@@ -192,9 +192,6 @@ export async function useCIChrome(projectName: string, projectDir = ''): Promise
     const project = workspaceJson.projects[projectName];
     const appTargets = project.targets || project.architect;
     appTargets.test.options.browsers = 'ChromeHeadlessNoSandbox';
-    appTargets.test.options.builderMode = getGlobalVariable('argv')['esbuild']
-      ? 'application'
-      : 'browser';
   });
 }
 
