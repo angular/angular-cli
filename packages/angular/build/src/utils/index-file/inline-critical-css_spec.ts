@@ -106,6 +106,26 @@ describe('InlineCriticalCssProcessor', () => {
     expect(content).toContain('<style>body{margin:0}html{color:white}</style>');
   });
 
+  it(`should process the inline 'onload' handlers if a 'autoCsp' is true`, async () => {
+    const inlineCssProcessor = new InlineCriticalCssProcessor({
+      readAsset,
+      autoCsp: true,
+    });
+
+    const { content } = await inlineCssProcessor.process(getContent(''), {
+      outputPath: '/dist/',
+    });
+
+    expect(content).toContain(
+      '<link href="styles.css" rel="stylesheet" media="print" ngCspMedia="all">',
+    );
+    expect(tags.stripIndents`${content}`).toContain(tags.stripIndents`
+    <style>
+    body { margin: 0; }
+    html { color: white; }
+    </style>`);
+  });
+
   it('should process the inline `onload` handlers if a CSP nonce is specified', async () => {
     const inlineCssProcessor = new InlineCriticalCssProcessor({
       readAsset,
