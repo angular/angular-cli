@@ -8,7 +8,7 @@
 
 import { BuilderHandlerFn } from '@angular-devkit/architect';
 import { json } from '@angular-devkit/core';
-import { readFileSync } from 'fs';
+import { readFileSync } from 'node:fs';
 import { concatMap, count, firstValueFrom, take, timeout } from 'rxjs';
 import { BuilderHarness, BuilderHarnessExecutionResult } from './builder-harness';
 import { host } from './test-utils';

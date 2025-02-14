@@ -16,12 +16,12 @@ import {
   emitFilesToDisk,
 } from '@angular/build/private';
 import { BuilderContext, BuilderOutput } from '@angular-devkit/architect';
-import { randomUUID } from 'crypto';
 import glob from 'fast-glob';
-import * as fs from 'fs/promises';
-import { IncomingMessage, ServerResponse } from 'http';
 import type { Config, ConfigOptions, FilePattern, InlinePluginDef } from 'karma';
-import * as path from 'path';
+import { randomUUID } from 'node:crypto';
+import * as fs from 'node:fs/promises';
+import { IncomingMessage, ServerResponse } from 'node:http';
+import * as path from 'node:path';
 import { Observable, Subscriber, catchError, defaultIfEmpty, from, of, switchMap } from 'rxjs';
 import { Configuration } from 'webpack';
 import { ExecutionTransformer } from '../../transforms';

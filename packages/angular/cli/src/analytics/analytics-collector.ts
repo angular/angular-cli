@@ -6,10 +6,10 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { randomUUID } from 'crypto';
-import * as https from 'https';
-import * as os from 'os';
-import * as querystring from 'querystring';
+import { randomUUID } from 'node:crypto';
+import * as https from 'node:https';
+import * as os from 'node:os';
+import * as querystring from 'node:querystring';
 import * as semver from 'semver';
 import type { CommandContext } from '../command-builder/command-module';
 import { ngDebug } from '../utilities/environment-options';

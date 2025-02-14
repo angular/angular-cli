@@ -1,4 +1,4 @@
-import { join } from 'path';
+import { join } from 'node:path';
 import { execAndWaitForOutputToMatch, ng } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';
 import { expectToFail } from '../../utils/utils';

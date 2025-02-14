@@ -6,8 +6,8 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { existsSync } from 'fs';
-import { join } from 'path';
+import { existsSync } from 'node:fs';
+import { join } from 'node:path';
 import { Observable, catchError, from, throwError } from 'rxjs';
 import { RuleFactory, TaskExecutor, UnregisteredTaskException } from '../src';
 import { FileSystemCollectionDesc, FileSystemSchematicDesc } from './description';

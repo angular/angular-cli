@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { parse } from 'url';
+import { parse } from 'node:url';
 import { SchematicContext, Source } from '../engine/interface';
 
 export function url(urlString: string): Source {

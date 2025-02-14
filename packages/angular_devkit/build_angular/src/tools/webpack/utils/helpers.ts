@@ -7,9 +7,9 @@
  */
 
 import type { ObjectPattern } from 'copy-webpack-plugin';
-import { createHash } from 'crypto';
 import glob from 'fast-glob';
-import * as path from 'path';
+import { createHash } from 'node:crypto';
+import * as path from 'node:path';
 import type { Configuration, WebpackOptionsNormalized } from 'webpack';
 import {
   AssetPatternClass,

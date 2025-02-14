@@ -8,8 +8,8 @@
 
 /* eslint-disable @typescript-eslint/unbound-method */
 import type { CompilerHost } from '@angular/compiler-cli';
-import { createHash } from 'crypto';
-import * as path from 'path';
+import { createHash } from 'node:crypto';
+import * as path from 'node:path';
 import * as ts from 'typescript';
 import { WebpackResourceLoader } from '../resource_loader';
 import { normalizePath } from './paths';

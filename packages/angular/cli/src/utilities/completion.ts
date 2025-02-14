@@ -7,10 +7,10 @@
  */
 
 import { json, logging } from '@angular-devkit/core';
-import { execFile } from 'child_process';
-import { promises as fs } from 'fs';
-import * as path from 'path';
-import { env } from 'process';
+import { execFile } from 'node:child_process';
+import { promises as fs } from 'node:fs';
+import * as path from 'node:path';
+import { env } from 'node:process';
 import { colors } from '../utilities/color';
 import { getWorkspace } from '../utilities/config';
 import { forceAutocomplete } from '../utilities/environment-options';

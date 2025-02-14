@@ -7,7 +7,7 @@
  */
 
 import { Architect } from '@angular-devkit/architect';
-import * as path from 'path';
+import * as path from 'node:path';
 import { browserBuild, createArchitect, host } from '../../../testing/test-utils';
 
 // Following the naming conventions from

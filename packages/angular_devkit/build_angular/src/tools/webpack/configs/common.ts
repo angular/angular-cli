@@ -8,7 +8,7 @@
 
 import { AngularWebpackLoaderPath } from '@ngtools/webpack';
 import CopyWebpackPlugin from 'copy-webpack-plugin';
-import * as path from 'path';
+import * as path from 'node:path';
 import {
   Compiler,
   Configuration,

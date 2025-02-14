@@ -7,7 +7,7 @@
  */
 
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { readFileSync } from 'fs';
+import { readFileSync } from 'node:fs';
 import { JsonObject } from '../../json';
 import { stripIndent } from '../../utils/literals';
 import { TargetDefinitionCollection, WorkspaceDefinition } from '../definitions';

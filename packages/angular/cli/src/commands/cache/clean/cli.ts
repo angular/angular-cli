@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { promises as fs } from 'fs';
+import { promises as fs } from 'node:fs';
 import { Argv } from 'yargs';
 import {
   CommandModule,

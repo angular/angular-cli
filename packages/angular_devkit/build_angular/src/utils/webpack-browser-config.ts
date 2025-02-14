@@ -7,7 +7,7 @@
  */
 
 import { BuilderContext } from '@angular-devkit/architect';
-import * as path from 'path';
+import * as path from 'node:path';
 import { Configuration, javascript } from 'webpack';
 import { merge as webpackMerge } from 'webpack-merge';
 import { Schema as BrowserBuilderSchema } from '../builders/browser/schema';

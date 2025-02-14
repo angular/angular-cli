@@ -8,9 +8,9 @@
 
 import 'symbol-observable';
 // symbol polyfill must go first
-import { promises as fs } from 'fs';
-import { createRequire } from 'module';
-import * as path from 'path';
+import { promises as fs } from 'node:fs';
+import { createRequire } from 'node:module';
+import * as path from 'node:path';
 import { SemVer, major } from 'semver';
 import { colors } from '../src/utilities/color';
 import { isWarningEnabled } from '../src/utilities/config';

@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import * as fs from 'fs';
+import * as fs from 'node:fs';
 import { appendToFile } from '../../utils/fs';
 import { ng } from '../../utils/process';
 import { langTranslations, setupI18nConfig } from './setup';

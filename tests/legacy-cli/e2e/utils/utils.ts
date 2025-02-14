@@ -1,7 +1,7 @@
-import assert from 'assert';
-import { mkdtemp, realpath, rm } from 'fs/promises';
-import { tmpdir } from 'os';
-import path from 'path';
+import assert from 'node:assert';
+import { mkdtemp, realpath, rm } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import path from 'node:path';
 
 export function expectToFail(fn: () => Promise<any>, errorMessage?: string): Promise<Error> {
   return fn().then(

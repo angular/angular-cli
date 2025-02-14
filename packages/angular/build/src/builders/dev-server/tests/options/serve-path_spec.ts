@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { URL } from 'url';
+import { URL } from 'node:url';
 import { executeDevServer } from '../../index';
 import { executeOnceAndFetch } from '../execute-fetch';
 import { describeServeBuilder } from '../jasmine-helpers';

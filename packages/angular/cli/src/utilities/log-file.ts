@@ -6,9 +6,9 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { appendFileSync, mkdtempSync, realpathSync } from 'fs';
-import { tmpdir } from 'os';
-import { normalize } from 'path';
+import { appendFileSync, mkdtempSync, realpathSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { normalize } from 'node:path';
 
 let logPath: string | undefined;
 

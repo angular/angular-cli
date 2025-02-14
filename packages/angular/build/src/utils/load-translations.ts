@@ -7,8 +7,8 @@
  */
 
 import type { Diagnostics } from '@angular/localize/tools';
-import { createHash } from 'crypto';
-import * as fs from 'fs';
+import { createHash } from 'node:crypto';
+import * as fs from 'node:fs';
 import { loadEsmModule } from './load-esm';
 
 export type TranslationLoader = (path: string) => {

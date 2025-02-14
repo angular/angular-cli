@@ -8,9 +8,9 @@
 
 /* eslint-disable import/no-extraneous-dependencies */
 import { tags } from '@angular-devkit/core';
-import { createServer } from 'http';
+import { createServer } from 'node:http';
 import { createProxyServer } from 'http-proxy';
-import { AddressInfo } from 'net';
+import { AddressInfo } from 'node:net';
 import puppeteer, { Browser, Page } from 'puppeteer';
 import { count, debounceTime, finalize, switchMap, take, timeout } from 'rxjs';
 import { executeDevServer } from '../../index';

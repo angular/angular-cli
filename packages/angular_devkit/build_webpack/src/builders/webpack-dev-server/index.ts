@@ -7,7 +7,7 @@
  */
 
 import { Builder, BuilderContext, createBuilder } from '@angular-devkit/architect';
-import { resolve as pathResolve } from 'path';
+import { resolve as pathResolve } from 'node:path';
 import { Observable, from, isObservable, of, switchMap } from 'rxjs';
 import webpack from 'webpack';
 import WebpackDevServer from 'webpack-dev-server';

@@ -6,8 +6,8 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { readFileSync } from 'fs';
-import { join } from 'path';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { JsonArray, JsonObject } from '../../json';
 import { stripIndent } from '../../utils/literals';
 import { ProjectDefinitionCollection, WorkspaceDefinition } from '../definitions';

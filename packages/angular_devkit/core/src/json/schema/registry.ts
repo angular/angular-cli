@@ -8,10 +8,10 @@
 
 import Ajv, { SchemaObjCxt, ValidateFunction } from 'ajv';
 import ajvAddFormats from 'ajv-formats';
-import * as http from 'http';
-import * as https from 'https';
+import * as http from 'node:http';
+import * as https from 'node:https';
+import * as Url from 'node:url';
 import { Observable, from, isObservable, lastValueFrom } from 'rxjs';
-import * as Url from 'url';
 import { BaseException } from '../../exception';
 import { PartiallyOrderedSet, deepCopy } from '../../utils';
 import { JsonArray, JsonObject, JsonValue, isJsonObject } from '../utils';

@@ -6,9 +6,9 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { existsSync } from 'fs';
-import * as path from 'path';
-import { URL, pathToFileURL } from 'url';
+import { existsSync } from 'node:fs';
+import * as path from 'node:path';
+import { URL, pathToFileURL } from 'node:url';
 import { Compilation, Configuration } from 'webpack';
 
 export interface EmittedFiles {

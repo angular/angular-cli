@@ -1,4 +1,4 @@
-import { join } from 'path';
+import { join } from 'node:path';
 import { ng, ProcessOutput } from '../../utils/process';
 import { writeMultipleFiles, createDir } from '../../utils/fs';
 import { updateJsonFile } from '../../utils/project';

@@ -8,7 +8,7 @@
 
 import { Rule, SchematicContext, Tree, callRule } from '@angular-devkit/schematics';
 import { SchematicTestRunner } from '@angular-devkit/schematics/testing';
-import { join } from 'path';
+import { join } from 'node:path';
 import { addRootImport, addRootProvider } from './rules';
 
 describe('standalone utilities', () => {

@@ -7,9 +7,9 @@
  */
 
 import { BaseException } from '@angular-devkit/core';
-import { SpawnOptions, spawn } from 'child_process';
+import { SpawnOptions, spawn } from 'node:child_process';
+import * as path from 'node:path';
 import ora from 'ora';
-import * as path from 'path';
 import { Observable } from 'rxjs';
 import { TaskExecutor, UnsuccessfulWorkflowExecution } from '../../src';
 import { NodePackageTaskFactoryOptions, NodePackageTaskOptions } from './options';

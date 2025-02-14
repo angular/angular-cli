@@ -13,7 +13,7 @@ import {
   FileSystemSchematicDescription,
   NodeWorkflow,
 } from '@angular-devkit/schematics/tools';
-import { relative } from 'path';
+import { relative } from 'node:path';
 import { Argv } from 'yargs';
 import { isPackageNameSafeForAnalytics } from '../analytics/analytics';
 import { EventCustomDimension } from '../analytics/analytics-parameters';

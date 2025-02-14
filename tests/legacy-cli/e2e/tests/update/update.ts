@@ -1,4 +1,4 @@
-import { appendFile } from 'fs/promises';
+import { appendFile } from 'node:fs/promises';
 import { SemVer } from 'semver';
 import { createProjectFromAsset } from '../../utils/assets';
 import { expectFileMatchToExist, readFile } from '../../utils/fs';

@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { workerData } from 'worker_threads';
+import { workerData } from 'node:worker_threads';
 import { OutputMode } from '../../builders/application/schema';
 import { ESMInMemoryFileLoaderWorkerData } from './esm-in-memory-loader/loader-hooks';
 import { patchFetchToLoadInMemoryAssets } from './fetch-patch';

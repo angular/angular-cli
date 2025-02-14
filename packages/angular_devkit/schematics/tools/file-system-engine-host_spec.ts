@@ -8,7 +8,7 @@
 
 /* eslint-disable @typescript-eslint/no-explicit-any, import/no-extraneous-dependencies */
 import { normalize, virtualFs } from '@angular-devkit/core';
-import * as path from 'path';
+import * as path from 'node:path';
 import { from, lastValueFrom, of as observableOf } from 'rxjs';
 import { HostSink, HostTree, SchematicEngine } from '../index';
 import { FileSystemEngineHost } from './file-system-engine-host';

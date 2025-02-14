@@ -8,7 +8,7 @@
 
 import { Architect } from '@angular-devkit/architect';
 import { getSystemPath, join, virtualFs } from '@angular-devkit/core';
-import * as fs from 'fs';
+import * as fs from 'node:fs';
 import { browserBuild, createArchitect, host } from '../../../testing/test-utils';
 
 describe('Browser Builder output path', () => {

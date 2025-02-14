@@ -7,7 +7,7 @@
  */
 
 import { lastValueFrom, mergeMap, take, timeout } from 'rxjs';
-import { URL } from 'url';
+import { URL } from 'node:url';
 import {
   BuilderHarness,
   BuilderHarnessExecutionOptions,

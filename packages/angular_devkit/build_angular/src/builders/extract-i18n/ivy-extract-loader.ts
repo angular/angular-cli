@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import * as nodePath from 'path';
+import * as nodePath from 'node:path';
 import { loadEsmModule } from '../../utils/load-esm';
 
 // Extract loader source map parameter type since it is not exported directly

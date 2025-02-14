@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { isAbsolute } from 'path';
+import { isAbsolute } from 'node:path';
 import { Compilation, Compiler, Dependency, Module, NormalModule } from 'webpack';
 import { addWarning } from '../../../utils/webpack-diagnostics';
 

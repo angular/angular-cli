@@ -1,6 +1,6 @@
-import * as fs from 'fs';
+import * as fs from 'node:fs';
 
-import { isAbsolute } from 'path';
+import { isAbsolute } from 'node:path';
 import { getGlobalVariable } from '../../utils/env';
 import { ng } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';

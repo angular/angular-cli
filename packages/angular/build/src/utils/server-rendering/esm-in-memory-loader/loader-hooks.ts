@@ -9,8 +9,7 @@
 import assert from 'node:assert';
 import { randomUUID } from 'node:crypto';
 import { join } from 'node:path';
-import { pathToFileURL } from 'node:url';
-import { fileURLToPath } from 'url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { JavaScriptTransformer } from '../../../tools/esbuild/javascript-transformer';
 
 /**
