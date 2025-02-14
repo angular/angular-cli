@@ -1486,6 +1486,10 @@ declare namespace ts {
                 command: CommandTypes.Quickinfo;
                 arguments: FileLocationRequestArgs;
             }
+            export interface QuickInfoRequestArgs extends FileLocationRequestArgs {
+                /** TODO */
+                verbosityLevel?: number;
+            }
             /**
              * Body of QuickInfoResponse.
              */
@@ -1519,6 +1523,10 @@ declare namespace ts {
                  * JSDoc tags associated with symbol.
                  */
                 tags: JSDocTagInfo[];
+                /**
+                 * TODO
+                 */
+                canIncreaseVerbosityLevel?: boolean;
             }
             /**
              * Quickinfo response message.
@@ -2508,6 +2516,7 @@ declare namespace ts {
                 ES2022 = "es2022",
                 ESNext = "esnext",
                 Node16 = "node16",
+                Node18 = "node18",
                 NodeNext = "nodenext",
                 Preserve = "preserve",
             }
@@ -3633,7 +3642,7 @@ declare namespace ts {
             readDirectory(rootDir: string, extensions: readonly string[], excludes: readonly string[] | undefined, includes: readonly string[] | undefined, depth?: number): string[];
         }
     }
-    const versionMajorMinor = "5.7";
+    const versionMajorMinor = "5.8";
     /** The version of the TypeScript compiler release */
     const version: string;
     /**
@@ -6279,6 +6288,7 @@ declare namespace ts {
         getBigIntType(): Type;
         getBigIntLiteralType(value: PseudoBigInt): BigIntLiteralType;
         getBooleanType(): Type;
+        getUnknownType(): Type;
         getFalseType(): Type;
         getTrueType(): Type;
         getVoidType(): Type;
@@ -6338,6 +6348,7 @@ declare namespace ts {
          * and the operation is cancelled, then it should be discarded, otherwise it is safe to keep.
          */
         runWithCancellationToken<T>(token: CancellationToken, cb: (checker: TypeChecker) => T): T;
+        getTypeArgumentsForResolvedSignature(signature: Signature): readonly Type[] | undefined;
     }
     enum NodeBuilderFlags {
         None = 0,
@@ -6841,11 +6852,15 @@ declare namespace ts {
         String = 0,
         Number = 1,
     }
+    type ElementWithComputedPropertyName = (ClassElement | ObjectLiteralElement) & {
+        name: ComputedPropertyName;
+    };
     interface IndexInfo {
         keyType: Type;
         type: Type;
         isReadonly: boolean;
         declaration?: IndexSignatureDeclaration;
+        components?: ElementWithComputedPropertyName[];
     }
     enum InferencePriority {
         None = 0,
@@ -7016,6 +7031,7 @@ declare namespace ts {
         /** @deprecated */
         keyofStringsOnly?: boolean;
         lib?: string[];
+        libReplacement?: boolean;
         locale?: string;
         mapRoot?: string;
         maxNodeModuleJsDepth?: number;
@@ -7092,6 +7108,7 @@ declare namespace ts {
         /** Paths used to compute primary types search locations */
         typeRoots?: string[];
         verbatimModuleSyntax?: boolean;
+        erasableSyntaxOnly?: boolean;
         esModuleInterop?: boolean;
         useDefineForClassFields?: boolean;
         [option: string]: CompilerOptionsValue | TsConfigSourceFile | undefined;
@@ -7123,6 +7140,7 @@ declare namespace ts {
         ES2022 = 7,
         ESNext = 99,
         Node16 = 100,
+        Node18 = 101,
         NodeNext = 199,
         Preserve = 200,
     }
@@ -7415,8 +7433,9 @@ declare namespace ts {
         NonNullAssertions = 4,
         PartiallyEmittedExpressions = 8,
         ExpressionsWithTypeArguments = 16,
-        Assertions = 6,
-        All = 31,
+        Satisfies = 32,
+        Assertions = 38,
+        All = 63,
         ExcludeJSDocTypeAssertion = -2147483648,
     }
     type ImmediatelyInvokedFunctionExpression = CallExpression & {
@@ -10746,6 +10765,7 @@ declare namespace ts {
         displayParts?: SymbolDisplayPart[];
         documentation?: SymbolDisplayPart[];
         tags?: JSDocTagInfo[];
+        canIncreaseVerbosityLevel?: boolean;
     }
     type RenameInfo = RenameInfoSuccess | RenameInfoFailure;
     interface RenameInfoSuccess {
