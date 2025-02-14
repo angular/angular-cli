@@ -6,8 +6,8 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
+import { Url } from 'node:url';
 import { Observable, mergeMap, of as observableOf, throwError } from 'rxjs';
-import { Url } from 'url';
 import {
   CollectionDescription,
   EngineHost,

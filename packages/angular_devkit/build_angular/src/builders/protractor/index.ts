@@ -13,8 +13,8 @@ import {
   targetFromTargetString,
 } from '@angular-devkit/architect';
 import { tags } from '@angular-devkit/core';
-import { resolve } from 'path';
-import * as url from 'url';
+import { resolve } from 'node:path';
+import * as url from 'node:url';
 import { runModuleAsObservableFork } from '../../utils';
 import { assertIsError } from '../../utils/error';
 import { DevServerBuilderOptions } from '../dev-server/index';

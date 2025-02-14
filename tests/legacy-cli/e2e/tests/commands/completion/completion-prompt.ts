@@ -1,6 +1,6 @@
-import { promises as fs } from 'fs';
-import * as path from 'path';
-import { env } from 'process';
+import { promises as fs } from 'node:fs';
+import * as path from 'node:path';
+import { env } from 'node:process';
 import { getGlobalVariable } from '../../../utils/env';
 import { mockHome } from '../../../utils/utils';
 

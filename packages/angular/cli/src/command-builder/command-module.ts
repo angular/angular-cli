@@ -7,8 +7,8 @@
  */
 
 import { logging, schema } from '@angular-devkit/core';
-import { readFileSync } from 'fs';
-import * as path from 'path';
+import { readFileSync } from 'node:fs';
+import * as path from 'node:path';
 import yargs, {
   ArgumentsCamelCase,
   Argv,

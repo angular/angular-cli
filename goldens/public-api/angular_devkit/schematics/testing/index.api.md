@@ -9,7 +9,7 @@ import { logging } from '@angular-devkit/core';
 import { Observable } from 'rxjs';
 import { Path } from '@angular-devkit/core';
 import { PathFragment } from '@angular-devkit/core';
-import { Url } from 'url';
+import { Url } from 'node:url';
 
 // @public (undocumented)
 export class SchematicTestRunner {

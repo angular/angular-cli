@@ -8,7 +8,7 @@
 
 /* eslint-disable import/no-extraneous-dependencies */
 import { NodeJsSyncHost } from '@angular-devkit/core/node';
-import * as path from 'path';
+import * as path from 'node:path';
 import { NodeWorkflow } from './node-workflow';
 
 describe('NodeWorkflow', () => {

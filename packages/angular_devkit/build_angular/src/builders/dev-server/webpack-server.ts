@@ -18,9 +18,9 @@ import {
   runWebpackDevServer,
 } from '@angular-devkit/build-webpack';
 import { json, tags } from '@angular-devkit/core';
-import * as path from 'path';
+import * as path from 'node:path';
+import * as url from 'node:url';
 import { Observable, concatMap, from, switchMap } from 'rxjs';
-import * as url from 'url';
 import webpack from 'webpack';
 import webpackDevServer from 'webpack-dev-server';
 import { getCommonConfig, getDevServerConfig, getStylesConfig } from '../../tools/webpack/configs';

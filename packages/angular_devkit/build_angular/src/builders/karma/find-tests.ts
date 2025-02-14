@@ -7,8 +7,8 @@
  */
 
 import glob, { isDynamicPattern } from 'fast-glob';
-import { PathLike, constants, promises as fs } from 'fs';
-import { basename, dirname, extname, join, relative } from 'path';
+import { PathLike, constants, promises as fs } from 'node:fs';
+import { basename, dirname, extname, join, relative } from 'node:path';
 
 /* Go through all patterns and find unique list of files */
 export async function findTests(

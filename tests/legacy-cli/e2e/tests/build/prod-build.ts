@@ -1,5 +1,5 @@
-import { statSync } from 'fs';
-import { join } from 'path';
+import { statSync } from 'node:fs';
+import { join } from 'node:path';
 import { getGlobalVariable } from '../../utils/env';
 import { expectFileToExist, expectFileToMatch, readFile } from '../../utils/fs';
 import { noSilentNg } from '../../utils/process';

@@ -1,12 +1,12 @@
 import express from 'express';
-import { dirname, resolve } from 'path';
+import { dirname, resolve } from 'node:path';
 import { getGlobalVariable } from '../../utils/env';
 import { appendToFile, copyFile, createDir, replaceInFile, writeFile } from '../../utils/fs';
 import { installPackage } from '../../utils/packages';
 import { updateJsonFile } from '../../utils/project';
 import { readNgVersion } from '../../utils/version';
-import { Server } from 'http';
-import { AddressInfo } from 'net';
+import { Server } from 'node:http';
+import { AddressInfo } from 'node:net';
 
 // Configurations for each locale.
 const translationFile = 'src/locale/messages.xlf';

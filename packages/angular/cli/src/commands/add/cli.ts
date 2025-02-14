@@ -8,10 +8,10 @@
 
 import { NodePackageDoesNotSupportSchematics } from '@angular-devkit/schematics/tools';
 import { Listr, color, figures } from 'listr2';
-import { createRequire } from 'module';
 import assert from 'node:assert';
+import { createRequire } from 'node:module';
+import { dirname, join } from 'node:path';
 import npa from 'npm-package-arg';
-import { dirname, join } from 'path';
 import { Range, compare, intersects, prerelease, satisfies, valid } from 'semver';
 import { Argv } from 'yargs';
 import { PackageManager } from '../../../lib/config/workspace-schema';

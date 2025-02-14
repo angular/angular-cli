@@ -7,9 +7,9 @@
  */
 
 import type { Config, Filesystem } from '@angular/service-worker/config';
-import * as crypto from 'crypto';
+import * as crypto from 'node:crypto';
 import { existsSync, constants as fsConstants, promises as fsPromises } from 'node:fs';
-import * as path from 'path';
+import * as path from 'node:path';
 import { BuildOutputFile, BuildOutputFileType } from '../tools/esbuild/bundler-context';
 import { BuildOutputAsset } from '../tools/esbuild/bundler-execution-result';
 import { assertIsError } from './error';

@@ -1,5 +1,5 @@
 import express from 'express';
-import * as path from 'path';
+import * as path from 'node:path';
 import { copyProjectAsset } from '../../utils/assets';
 import { replaceInFile } from '../../utils/fs';
 import { ng } from '../../utils/process';

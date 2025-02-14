@@ -1,4 +1,4 @@
-import { appendFile } from 'fs/promises';
+import { appendFile } from 'node:fs/promises';
 import { expectFileToMatch, rimraf } from '../../../utils/fs';
 import { getActivePackageManager, uninstallPackage } from '../../../utils/packages';
 import { ng } from '../../../utils/process';

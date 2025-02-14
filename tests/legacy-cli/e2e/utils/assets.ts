@@ -1,8 +1,8 @@
-import { join } from 'path';
-import { chmod } from 'fs/promises';
+import { join } from 'node:path';
+import { chmod } from 'node:fs/promises';
 import glob from 'fast-glob';
 import { getGlobalVariable } from './env';
-import { resolve } from 'path';
+import { resolve } from 'node:path';
 import { copyFile } from './fs';
 import { installWorkspacePackages, setRegistry } from './packages';
 import { useBuiltPackagesVersions } from './project';

@@ -7,8 +7,8 @@
  */
 
 import { json, logging, schema } from '@angular-devkit/core';
+import { promisify } from 'node:util';
 import { firstValueFrom, lastValueFrom, map, take, tap, timer, toArray } from 'rxjs';
-import { promisify } from 'util';
 import { TestingArchitectHost } from '../testing/testing-architect-host';
 import { BuilderOutput, BuilderRun } from './api';
 import { Architect } from './architect';

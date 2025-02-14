@@ -17,9 +17,9 @@ import {
   traverse,
   types,
 } from '@babel/core';
-import * as fs from 'fs/promises';
-import * as path from 'path';
-import { workerData } from 'worker_threads';
+import * as fs from 'node:fs/promises';
+import * as path from 'node:path';
+import { workerData } from 'node:worker_threads';
 import { InlineOptions } from './bundle-inline-options';
 import { allowMinify, shouldBeautify } from './environment-options';
 import { assertIsError } from './error';

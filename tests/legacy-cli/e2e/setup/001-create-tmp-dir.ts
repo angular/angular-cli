@@ -1,4 +1,4 @@
-import { dirname } from 'path';
+import { dirname } from 'node:path';
 import { getGlobalVariable, setGlobalVariable } from '../utils/env';
 import { mktempd } from '../utils/utils';
 

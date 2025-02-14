@@ -4,7 +4,7 @@
 
 ```ts
 
-import * as fs from 'fs';
+import * as fs from 'node:fs';
 import { Observable } from 'rxjs';
 
 // @public

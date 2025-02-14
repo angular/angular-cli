@@ -6,8 +6,8 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import assert from 'assert';
 import { pluginName } from 'mini-css-extract-plugin';
+import assert from 'node:assert';
 import type { Compilation, Compiler } from 'webpack';
 
 import { findTests } from './find-tests';

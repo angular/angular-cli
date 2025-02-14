@@ -6,9 +6,9 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { statSync } from 'fs';
 import assert from 'node:assert';
-import * as path from 'path';
+import { statSync } from 'node:fs';
+import * as path from 'node:path';
 import { AssetPattern, AssetPatternClass } from '../builders/browser/schema';
 
 export class MissingAssetSourceRootException extends Error {

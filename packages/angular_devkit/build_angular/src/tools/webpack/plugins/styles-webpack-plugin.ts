@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import assert from 'assert';
+import assert from 'node:assert';
 import type { Compilation, Compiler } from 'webpack';
 import { assertIsError } from '../../../utils/error';
 import { addError } from '../../../utils/webpack-diagnostics';

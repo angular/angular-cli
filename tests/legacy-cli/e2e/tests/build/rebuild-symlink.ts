@@ -1,5 +1,5 @@
-import { symlink } from 'fs/promises';
-import { resolve } from 'path';
+import { symlink } from 'node:fs/promises';
+import { resolve } from 'node:path';
 import { appendToFile, expectFileToMatch, writeMultipleFiles } from '../../utils/fs';
 import { execAndWaitForOutputToMatch, waitForAnyProcessOutputToMatch } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';

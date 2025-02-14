@@ -1,5 +1,5 @@
-import { homedir } from 'os';
-import * as path from 'path';
+import { homedir } from 'node:os';
+import * as path from 'node:path';
 import { deleteFile, expectFileToExist } from '../../../utils/fs';
 import { ng, silentNg } from '../../../utils/process';
 import { expectToFail } from '../../../utils/utils';

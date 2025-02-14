@@ -7,7 +7,7 @@
  */
 
 import { interpolateName } from 'loader-utils';
-import * as path from 'path';
+import * as path from 'node:path';
 import { Chunk, Compilation, Compiler, sources as webpackSources } from 'webpack';
 import { assertIsError } from '../../../utils/error';
 import { addError } from '../../../utils/webpack-diagnostics';

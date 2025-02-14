@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import * as nodePath from 'path';
+import * as nodePath from 'node:path';
 
 const normalizationCache = new Map<string, string>();
 

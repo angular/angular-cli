@@ -1,5 +1,5 @@
-import { symlinkSync } from 'fs';
-import { resolve } from 'path';
+import { symlinkSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { expectFileToMatch, writeMultipleFiles } from '../../../utils/fs';
 import { ng } from '../../../utils/process';
 import { updateJsonFile } from '../../../utils/project';

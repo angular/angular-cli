@@ -1,5 +1,5 @@
 import { ng } from '../../../utils/process';
-import { join } from 'path';
+import { join } from 'node:path';
 import { expectFileToExist } from '../../../utils/fs';
 
 export default function () {

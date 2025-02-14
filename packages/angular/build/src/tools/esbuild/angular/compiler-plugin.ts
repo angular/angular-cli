@@ -518,7 +518,7 @@ export function createCompilerPlugin(
             const replacement = pluginOptions.fileReplacements?.[path.normalize(args.path)];
             if (replacement) {
               return {
-                contents: await import('fs/promises').then(({ readFile }) =>
+                contents: await import('node:fs/promises').then(({ readFile }) =>
                   readFile(path.normalize(replacement)),
                 ),
                 loader: 'json' as const,

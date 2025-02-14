@@ -18,7 +18,7 @@ import {
   url,
 } from '@angular-devkit/schematics';
 import { AngularBuilder, readWorkspace, updateWorkspace } from '@schematics/angular/utility';
-import { posix as path } from 'path';
+import { posix as path } from 'node:path';
 import { relativePathToWorkspaceRoot } from '../utility/paths';
 import { Schema as ConfigOptions, Type as ConfigType } from './schema';
 

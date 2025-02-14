@@ -25,7 +25,7 @@ import {
   addRootProvider,
   updateWorkspace,
 } from '@schematics/angular/utility';
-import { posix as path } from 'path';
+import { posix as path } from 'node:path';
 import { JSONFile } from '../utility/json-file';
 import { latestVersions } from '../utility/latest-versions';
 import { Schema as E2eOptions } from './schema';

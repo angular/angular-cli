@@ -1,4 +1,4 @@
-import { join } from 'path';
+import { join } from 'node:path';
 import { createDir, expectFileNotToExist, expectFileToExist, writeFile } from '../../utils/fs';
 import { silentNg } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';

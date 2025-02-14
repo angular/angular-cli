@@ -1,5 +1,5 @@
-import { mkdir } from 'fs/promises';
-import { join } from 'path';
+import { mkdir } from 'node:fs/promises';
+import { join } from 'node:path';
 import { getGlobalVariable, setGlobalVariable } from '../utils/env';
 
 /**

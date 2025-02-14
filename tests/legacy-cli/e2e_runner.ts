@@ -2,15 +2,15 @@ import { parseArgs } from 'node:util';
 import { createConsoleLogger } from '../../packages/angular_devkit/core/node';
 import colors from 'ansi-colors';
 import glob from 'fast-glob';
-import * as path from 'path';
+import * as path from 'node:path';
 import { getGlobalVariable, setGlobalVariable } from './e2e/utils/env';
 import { gitClean } from './e2e/utils/git';
 import { createNpmRegistry } from './e2e/utils/registry';
 import { launchTestProcess } from './e2e/utils/process';
-import { delimiter, dirname, join } from 'path';
+import { delimiter, dirname, join } from 'node:path';
 import { findFreePort } from './e2e/utils/network';
 import { extractFile } from './e2e/utils/tar';
-import { realpathSync } from 'fs';
+import { realpathSync } from 'node:fs';
 import { PkgInfo } from './e2e/utils/packages';
 
 Error.stackTraceLimit = Infinity;

@@ -12,8 +12,8 @@ import { WorkspaceNodeModulesArchitectHost } from '@angular-devkit/architect/nod
 import { JsonValue, json, logging, schema, tags, workspaces } from '@angular-devkit/core';
 import { NodeJsSyncHost, createConsoleLogger } from '@angular-devkit/core/node';
 import * as ansiColors from 'ansi-colors';
-import { existsSync } from 'fs';
-import * as path from 'path';
+import { existsSync } from 'node:fs';
+import * as path from 'node:path';
 import yargsParser, { camelCase, decamelize } from 'yargs-parser';
 import { MultiProgressBar } from '../src/progress';
 

@@ -8,7 +8,7 @@
 
 import { BuilderHandlerFn } from '@angular-devkit/architect';
 import { json } from '@angular-devkit/core';
-import { readFileSync } from 'fs';
+import { readFileSync } from 'node:fs';
 import { JasmineBuilderHarness } from '../../../testing';
 import { host } from '../../../testing/test-utils';
 import { setupApplicationTarget, setupBrowserTarget } from './setup';

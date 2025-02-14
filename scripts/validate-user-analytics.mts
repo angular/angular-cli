@@ -6,12 +6,12 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import assert from 'assert';
 import glob from 'fast-glob';
-import * as fs from 'fs';
 import lodash from 'lodash';
-import * as path from 'path';
-import { fileURLToPath } from 'url';
+import assert from 'node:assert';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import {
   EventCustomDimension,
   EventCustomMetric,

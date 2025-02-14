@@ -8,7 +8,7 @@
 
 /* eslint-disable max-len */
 import { concatMap, count, take, timeout } from 'rxjs';
-import { URL } from 'url';
+import { URL } from 'node:url';
 import { executeDevServer } from '../../index';
 import { describeServeBuilder } from '../jasmine-helpers';
 import { BASE_OPTIONS, BUILD_TIMEOUT, DEV_SERVER_BUILDER_INFO } from '../setup';

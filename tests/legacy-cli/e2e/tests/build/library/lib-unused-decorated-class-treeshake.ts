@@ -1,4 +1,4 @@
-import assert from 'assert';
+import assert from 'node:assert';
 import { appendToFile, expectFileToExist, expectFileToMatch, readFile } from '../../../utils/fs';
 import { ng } from '../../../utils/process';
 import { libraryConsumptionSetup } from './setup';

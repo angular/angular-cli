@@ -1,5 +1,5 @@
-import { promises as fs, constants } from 'fs';
-import { dirname, join } from 'path';
+import { promises as fs, constants } from 'node:fs';
+import { dirname, join } from 'node:path';
 
 export function readFile(fileName: string): Promise<string> {
   return fs.readFile(fileName, 'utf-8');

@@ -6,8 +6,8 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { SpawnOptions, spawn } from 'child_process';
-import { AddressInfo, createConnection, createServer } from 'net';
+import { SpawnOptions, spawn } from 'node:child_process';
+import { AddressInfo, createConnection, createServer } from 'node:net';
 import { Observable, mergeMap, retryWhen, throwError, timer } from 'rxjs';
 import treeKill from 'tree-kill';
 

@@ -7,9 +7,9 @@
  */
 
 import { interpolateName } from 'loader-utils';
-import * as path from 'path';
+import * as path from 'node:path';
+import * as url from 'node:url';
 import { Declaration, Plugin } from 'postcss';
-import * as url from 'url';
 import { assertIsError } from '../../../utils/error';
 
 function wrapUrl(url: string): string {

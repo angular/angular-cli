@@ -1,10 +1,10 @@
 import * as ansiColors from 'ansi-colors';
-import { spawn, SpawnOptions } from 'child_process';
-import * as child_process from 'child_process';
+import { spawn, SpawnOptions } from 'node:child_process';
+import * as child_process from 'node:child_process';
 import { concat, defer, EMPTY, from, lastValueFrom, catchError, repeat } from 'rxjs';
 import { getGlobalVariable, getGlobalVariablesEnv } from './env';
 import treeKill from 'tree-kill';
-import { delimiter, join, resolve } from 'path';
+import { delimiter, join, resolve } from 'node:path';
 
 interface ExecOptions {
   silent?: boolean;

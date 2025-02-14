@@ -9,7 +9,7 @@
 import { purgeStaleBuildCache } from '@angular/build/private';
 import { BuilderContext, BuilderOutput } from '@angular-devkit/architect';
 import type { Config, ConfigOptions } from 'karma';
-import * as path from 'path';
+import * as path from 'node:path';
 import { Observable, defaultIfEmpty, from, switchMap } from 'rxjs';
 import { Configuration } from 'webpack';
 import { getCommonConfig, getStylesConfig } from '../../tools/webpack/configs';
