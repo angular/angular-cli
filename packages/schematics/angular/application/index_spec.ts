@@ -205,13 +205,11 @@ describe('Application Schematic', () => {
   });
 
   describe(`update package.json`, () => {
-    it(`should add build-angular to devDependencies`, async () => {
+    it(`should add @angular/build to devDependencies`, async () => {
       const tree = await schematicRunner.runSchematic('application', defaultOptions, workspaceTree);
 
       const packageJson = JSON.parse(tree.readContent('package.json'));
-      expect(packageJson.devDependencies['@angular-devkit/build-angular']).toEqual(
-        latestVersions.DevkitBuildAngular,
-      );
+      expect(packageJson.devDependencies['@angular/build']).toEqual(latestVersions.AngularBuild);
     });
 
     it('should use the latest known versions in package.json', async () => {
