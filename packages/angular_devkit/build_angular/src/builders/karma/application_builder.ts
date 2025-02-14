@@ -25,6 +25,7 @@ import * as path from 'path';
 import { Observable, Subscriber, catchError, defaultIfEmpty, from, of, switchMap } from 'rxjs';
 import { Configuration } from 'webpack';
 import { ExecutionTransformer } from '../../transforms';
+import { normalizeFileReplacements } from '../../utils';
 import { OutputHashing } from '../browser-esbuild/schema';
 import { findTests, getTestEntrypoints } from './find-tests';
 import { Schema as KarmaBuilderOptions } from './schema';
@@ -400,17 +401,24 @@ async function initializeApplication(
     index: false,
     outputHashing: OutputHashing.None,
     optimization: false,
-    sourceMap: {
-      scripts: true,
-      styles: true,
-      vendor: true,
-    },
+    sourceMap: options.codeCoverage
+      ? {
+          scripts: true,
+          styles: true,
+          vendor: true,
+        }
+      : options.sourceMap,
     instrumentForCoverage,
     styles: options.styles,
+    scripts: options.scripts,
     polyfills,
     webWorkerTsConfig: options.webWorkerTsConfig,
     watch: options.watch ?? !karmaOptions.singleRun,
     stylePreprocessorOptions: options.stylePreprocessorOptions,
+    inlineStyleLanguage: options.inlineStyleLanguage,
+    fileReplacements: options.fileReplacements
+      ? normalizeFileReplacements(options.fileReplacements, './')
+      : undefined,
   };
 
   // Build tests with `application` builder, using test files as entry points.
@@ -447,6 +455,16 @@ async function initializeApplication(
   };
 
   karmaOptions.files ??= [];
+  if (options.scripts?.length) {
+    // This should be more granular to support named bundles.
+    // However, it replicates the behavior of the Karma Webpack-based builder.
+    karmaOptions.files.push({
+      pattern: `${outputPath}/scripts.js`,
+      watched: false,
+      type: 'js',
+    });
+  }
+
   karmaOptions.files.push(
     // Serve global setup script.
     { pattern: `${outputPath}/${mainName}.js`, type: 'module', watched: false },
