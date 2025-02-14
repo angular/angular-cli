@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { dirname, resolve } from 'path';
+import { dirname, resolve } from 'node:path';
 
 export class ExportStringRef<T> {
   private _ref?: T;

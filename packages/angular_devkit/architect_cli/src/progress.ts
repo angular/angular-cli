@@ -6,8 +6,8 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
+import * as readline from 'node:readline';
 import ProgressBar from 'progress';
-import * as readline from 'readline';
 
 export class MultiProgressBar<Key, T> {
   private _bars = new Map<Key, { data: T; bar: ProgressBar }>();

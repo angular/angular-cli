@@ -7,7 +7,7 @@
  */
 
 import type { CompilerHost, CompilerOptions, NgtscProgram } from '@angular/compiler-cli';
-import { strict as assert } from 'assert';
+import { strict as assert } from 'node:assert';
 import * as ts from 'typescript';
 import type { Compilation, Compiler, Module, NormalModule } from 'webpack';
 import { TypeScriptPathsPlugin } from '../paths-plugin';

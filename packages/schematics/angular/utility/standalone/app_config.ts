@@ -7,7 +7,7 @@
  */
 
 import { Tree } from '@angular-devkit/schematics';
-import { dirname, join } from 'path';
+import { dirname, join } from 'node:path';
 import ts from '../../third_party/github.com/Microsoft/TypeScript/lib/typescript';
 import { getSourceFile } from './util';
 

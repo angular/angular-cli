@@ -7,8 +7,8 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { spawnSync } from 'child_process';
-import { join } from 'path';
+import { spawnSync } from 'node:child_process';
+import { join } from 'node:path';
 
 const binPath = join(require.resolve('@angular/cli/package.json'), '../bin/ng.js');
 const args = process.argv.slice(2);

@@ -6,8 +6,8 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { existsSync, mkdirSync } from 'fs';
-import { join } from 'path';
+import { existsSync, mkdirSync } from 'node:fs';
+import { join } from 'node:path';
 import { I18nOptions } from './i18n-webpack';
 
 export function ensureOutputPaths(baseOutputPath: string, i18n: I18nOptions): Map<string, string> {

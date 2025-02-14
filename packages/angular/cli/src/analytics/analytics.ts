@@ -7,7 +7,7 @@
  */
 
 import { json, tags } from '@angular-devkit/core';
-import { randomUUID } from 'crypto';
+import { randomUUID } from 'node:crypto';
 import type { CommandContext } from '../command-builder/command-module';
 import { colors } from '../utilities/color';
 import { getWorkspace } from '../utilities/config';

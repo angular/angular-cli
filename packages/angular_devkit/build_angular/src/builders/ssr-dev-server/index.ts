@@ -21,7 +21,8 @@ import type {
   MiddlewareHandler,
   ProxyOptions,
 } from 'browser-sync';
-import { join, resolve as pathResolve } from 'path';
+import { join, resolve as pathResolve } from 'node:path';
+import * as url from 'node:url';
 import {
   EMPTY,
   Observable,
@@ -41,7 +42,6 @@ import {
   tap,
   zip,
 } from 'rxjs';
-import * as url from 'url';
 import { Schema } from './schema';
 
 import { getAvailablePort, spawnAsObservable, waitUntilServerIsListening } from './utils';

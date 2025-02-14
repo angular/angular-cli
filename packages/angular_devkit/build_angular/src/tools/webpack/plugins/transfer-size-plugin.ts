@@ -6,9 +6,9 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { promisify } from 'util';
+import { promisify } from 'node:util';
+import { brotliCompress } from 'node:zlib';
 import { Compiler } from 'webpack';
-import { brotliCompress } from 'zlib';
 import { addWarning } from '../../../utils/webpack-diagnostics';
 
 const brotliCompressAsync = promisify(brotliCompress);

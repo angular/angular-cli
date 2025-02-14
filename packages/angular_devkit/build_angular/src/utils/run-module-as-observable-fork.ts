@@ -7,8 +7,8 @@
  */
 
 import { BuilderOutput } from '@angular-devkit/architect';
-import { ForkOptions, fork } from 'child_process';
-import { resolve } from 'path';
+import { ForkOptions, fork } from 'node:child_process';
+import { resolve } from 'node:path';
 import { Observable } from 'rxjs';
 import treeKill from 'tree-kill';
 

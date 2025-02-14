@@ -1,4 +1,4 @@
-import { join } from 'path';
+import { join } from 'node:path';
 import { getGlobalVariable } from '../../utils/env';
 import { expectFileToMatch, rimraf, writeFile } from '../../utils/fs';
 import { installPackage, uninstallPackage } from '../../utils/packages';

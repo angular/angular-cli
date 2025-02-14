@@ -13,10 +13,10 @@ import {
   createBuilder,
   targetFromTargetString,
 } from '@angular-devkit/architect';
-import * as fs from 'fs';
+import * as fs from 'node:fs';
 import { readFile } from 'node:fs/promises';
+import * as path from 'node:path';
 import ora from 'ora';
-import * as path from 'path';
 import Piscina from 'piscina';
 import { normalizeOptimization } from '../../utils';
 import { maxWorkers } from '../../utils/environment-options';

@@ -1,4 +1,4 @@
-import * as fs from 'fs';
+import * as fs from 'node:fs';
 import { expectFileToExist } from '../../utils/fs';
 import { ng } from '../../utils/process';
 import { getGlobalVariable } from '../../utils/env';

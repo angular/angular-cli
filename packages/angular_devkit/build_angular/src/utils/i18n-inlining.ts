@@ -8,8 +8,8 @@
 
 import { BuilderContext } from '@angular-devkit/architect';
 import { EmittedFiles } from '@angular-devkit/build-webpack';
-import * as fs from 'fs';
-import * as path from 'path';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
 import { BundleActionExecutor } from './action-executor';
 import { InlineOptions } from './bundle-inline-options';
 import { copyAssets } from './copy-assets';

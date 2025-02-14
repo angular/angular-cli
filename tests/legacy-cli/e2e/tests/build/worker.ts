@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { readdir } from 'fs/promises';
+import { readdir } from 'node:fs/promises';
 import { expectFileToExist, expectFileToMatch, replaceInFile, writeFile } from '../../utils/fs';
 import { ng } from '../../utils/process';
 import { getGlobalVariable } from '../../utils/env';

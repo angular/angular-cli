@@ -8,7 +8,7 @@
 
 import { Rule, SchematicContext } from '@angular-devkit/schematics';
 import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
-import * as path from 'path';
+import * as path from 'node:path';
 
 const installTasks = new WeakMap<SchematicContext, Set<string>>();
 

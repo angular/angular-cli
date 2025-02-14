@@ -7,7 +7,7 @@
  */
 
 import { Target } from '@angular-devkit/architect';
-import { join } from 'path';
+import { join } from 'node:path';
 import { Argv } from 'yargs';
 import { ArchitectBaseCommandModule } from '../../command-builder/architect-base-command-module';
 import {

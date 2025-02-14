@@ -1,4 +1,4 @@
-import * as assert from 'assert';
+import * as assert from 'node:assert';
 import { ngServe } from '../../../utils/project';
 
 export default async function () {

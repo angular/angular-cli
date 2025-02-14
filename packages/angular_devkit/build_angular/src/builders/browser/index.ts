@@ -20,8 +20,8 @@ import {
 import { BuilderContext, BuilderOutput, createBuilder } from '@angular-devkit/architect';
 import { EmittedFiles, WebpackLoggingCallback, runWebpack } from '@angular-devkit/build-webpack';
 import { imageDomains } from '@ngtools/webpack';
-import * as fs from 'fs';
-import * as path from 'path';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
 import { Observable, concatMap, from, map, switchMap } from 'rxjs';
 import webpack, { StatsCompilation } from 'webpack';
 import { getCommonConfig, getStylesConfig } from '../../tools/webpack/configs';

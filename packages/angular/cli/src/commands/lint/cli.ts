@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { join } from 'path';
+import { join } from 'node:path';
 import { MissingTargetChoice } from '../../command-builder/architect-base-command-module';
 import { ArchitectCommandModule } from '../../command-builder/architect-command-module';
 import { CommandModuleImplementation } from '../../command-builder/command-module';

@@ -12,7 +12,7 @@ import {
   IndexHtmlGeneratorOptions,
   IndexHtmlGeneratorProcessOptions,
 } from '@angular/build/private';
-import { basename, dirname, extname } from 'path';
+import { basename, dirname, extname } from 'node:path';
 import { Compilation, Compiler, sources } from 'webpack';
 import { assertIsError } from '../../../utils/error';
 import { addError, addWarning } from '../../../utils/webpack-diagnostics';

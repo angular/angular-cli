@@ -8,7 +8,7 @@
 
 import { Architect } from '@angular-devkit/architect';
 import { normalize, tags } from '@angular-devkit/core';
-import { dirname } from 'path';
+import { dirname } from 'node:path';
 import { browserBuild, createArchitect, host } from '../../../testing/test-utils';
 
 describe('Browser Builder styles', () => {

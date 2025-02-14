@@ -6,8 +6,8 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import * as fs from 'fs';
-import { dirname, join } from 'path';
+import * as fs from 'node:fs';
+import { dirname, join } from 'node:path';
 import * as resolve from 'resolve';
 import { NgAddSaveDependency } from './package-metadata';
 

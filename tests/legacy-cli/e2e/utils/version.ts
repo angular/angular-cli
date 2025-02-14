@@ -1,4 +1,4 @@
-import * as fs from 'fs';
+import * as fs from 'node:fs';
 import * as semver from 'semver';
 
 export function readNgVersion(): string {

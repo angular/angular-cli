@@ -8,10 +8,10 @@
 
 import { BaseException, JsonObject, normalize, virtualFs } from '@angular-devkit/core';
 import { NodeJsSyncHost } from '@angular-devkit/core/node';
-import { existsSync, statSync } from 'fs';
-import { dirname, isAbsolute, join, resolve } from 'path';
+import { existsSync, statSync } from 'node:fs';
+import { dirname, isAbsolute, join, resolve } from 'node:path';
+import { Url } from 'node:url';
 import { Observable, isObservable, lastValueFrom, from as observableFrom, throwError } from 'rxjs';
-import { Url } from 'url';
 import {
   HostCreateTree,
   RuleFactory,

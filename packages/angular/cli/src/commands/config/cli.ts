@@ -7,8 +7,8 @@
  */
 
 import { JsonValue } from '@angular-devkit/core';
-import { randomUUID } from 'crypto';
-import { join } from 'path';
+import { randomUUID } from 'node:crypto';
+import { join } from 'node:path';
 import { Argv } from 'yargs';
 import {
   CommandModule,

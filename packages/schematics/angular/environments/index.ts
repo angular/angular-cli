@@ -8,7 +8,7 @@
 
 import { Rule, SchematicsException, chain } from '@angular-devkit/schematics';
 import { AngularBuilder, TargetDefinition, updateWorkspace } from '@schematics/angular/utility';
-import { posix as path } from 'path';
+import { posix as path } from 'node:path';
 import { Schema as EnvironmentOptions } from './schema';
 
 const ENVIRONMENTS_DIRECTORY = 'environments';

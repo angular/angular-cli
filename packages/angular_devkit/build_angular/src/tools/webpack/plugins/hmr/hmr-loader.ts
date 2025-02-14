@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { join } from 'path';
+import { join } from 'node:path';
 
 export const HmrLoader = __filename;
 const hmrAcceptPath = join(__dirname, './hmr-accept.js').replace(/\\/g, '/');

@@ -1,4 +1,4 @@
-import { join } from 'path';
+import { join } from 'node:path';
 import { execWithEnv } from '../../utils/process';
 
 export default async function () {

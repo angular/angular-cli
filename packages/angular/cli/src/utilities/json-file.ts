@@ -7,7 +7,6 @@
  */
 
 import { JsonValue } from '@angular-devkit/core';
-import { readFileSync, writeFileSync } from 'fs';
 import {
   Node,
   ParseError,
@@ -19,6 +18,7 @@ import {
   parseTree,
   printParseErrorCode,
 } from 'jsonc-parser';
+import { readFileSync, writeFileSync } from 'node:fs';
 import { getEOL } from './eol';
 
 export type InsertionIndex = (properties: string[]) => number;

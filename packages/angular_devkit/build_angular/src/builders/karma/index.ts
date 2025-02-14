@@ -15,8 +15,8 @@ import {
 } from '@angular-devkit/architect';
 import { strings } from '@angular-devkit/core';
 import type { ConfigOptions } from 'karma';
-import { createRequire } from 'module';
-import * as path from 'path';
+import { createRequire } from 'node:module';
+import * as path from 'node:path';
 import { Observable, from, mergeMap } from 'rxjs';
 import { Configuration } from 'webpack';
 import { ExecutionTransformer } from '../../transforms';

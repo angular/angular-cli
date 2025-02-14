@@ -7,8 +7,8 @@
  */
 
 import { tags } from '@angular-devkit/core';
-import { SpawnOptions, spawn } from 'child_process';
-import * as path from 'path';
+import { SpawnOptions, spawn } from 'node:child_process';
+import * as path from 'node:path';
 import { SchematicContext, TaskExecutor } from '../../src';
 import {
   RepositoryInitializerTaskFactoryOptions,

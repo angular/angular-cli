@@ -7,10 +7,10 @@
  */
 
 import { isJsonObject, json } from '@angular-devkit/core';
-import { execSync, spawn } from 'child_process';
-import { existsSync, promises as fs, realpathSync, rmSync } from 'fs';
-import { tmpdir } from 'os';
-import { join } from 'path';
+import { execSync, spawn } from 'node:child_process';
+import { existsSync, promises as fs, realpathSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { PackageManager } from '../../lib/config/workspace-schema';
 import { AngularWorkspace, getProjectByCwd } from './config';
 import { memoize } from './memoize';

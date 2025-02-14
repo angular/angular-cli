@@ -7,7 +7,7 @@
  */
 
 import type { ParsedConfiguration } from '@angular/compiler-cli';
-import * as path from 'path';
+import * as path from 'node:path';
 import { loadEsmModule } from './load-esm';
 
 /**

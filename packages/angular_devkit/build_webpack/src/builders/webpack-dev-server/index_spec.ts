@@ -11,7 +11,7 @@ import { WorkspaceNodeModulesArchitectHost } from '@angular-devkit/architect/nod
 import { TestingArchitectHost } from '@angular-devkit/architect/testing';
 import { schema, workspaces } from '@angular-devkit/core';
 import { NodeJsSyncHost } from '@angular-devkit/core/node';
-import * as path from 'path';
+import * as path from 'node:path';
 import { DevServerBuildOutput } from './index';
 
 describe('Dev Server Builder', () => {

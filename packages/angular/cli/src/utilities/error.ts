@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import assert from 'assert';
+import assert from 'node:assert';
 
 export function assertIsError(value: unknown): asserts value is Error & { code?: string } {
   const isError =

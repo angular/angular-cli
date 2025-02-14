@@ -7,7 +7,7 @@
  */
 
 import { isJsonObject } from '@angular-devkit/core';
-import { resolve } from 'path';
+import { resolve } from 'node:path';
 import { Cache, Environment } from '../../../lib/config/workspace-schema';
 import { AngularWorkspace } from '../../utilities/config';
 

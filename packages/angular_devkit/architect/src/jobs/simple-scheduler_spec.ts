@@ -7,8 +7,8 @@
  */
 
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
+import { promisify } from 'node:util';
 import { EMPTY, Observable, lastValueFrom, map, of, take, timer, toArray } from 'rxjs';
-import { promisify } from 'util';
 import { JobHandlerContext, JobOutboundMessage, JobOutboundMessageKind, JobState } from './api';
 import { createJobHandler } from './create-job-handler';
 import { SimpleJobRegistry } from './simple-registry';

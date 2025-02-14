@@ -7,9 +7,9 @@
  */
 
 import { logging, tags } from '@angular-devkit/core';
-import { existsSync, promises as fsPromises } from 'fs';
-import { extname, posix, resolve } from 'path';
-import { URL, pathToFileURL } from 'url';
+import { existsSync, promises as fsPromises } from 'node:fs';
+import { extname, posix, resolve } from 'node:path';
+import { URL, pathToFileURL } from 'node:url';
 import { Configuration, RuleSetRule } from 'webpack';
 import type { Configuration as DevServerConfiguration } from 'webpack-dev-server';
 import { WebpackConfigOptions, WebpackDevServerOptions } from '../../../utils/build-options';

@@ -8,11 +8,11 @@
 
 import { logging } from '@angular-devkit/core';
 import * as lockfile from '@yarnpkg/lockfile';
-import { existsSync, readFileSync } from 'fs';
 import * as ini from 'ini';
-import { homedir } from 'os';
+import { existsSync, readFileSync } from 'node:fs';
+import { homedir } from 'node:os';
+import * as path from 'node:path';
 import type { Manifest, Packument } from 'pacote';
-import * as path from 'path';
 
 export interface PackageMetadata extends Packument, NgPackageManifestProperties {
   tags: Record<string, PackageManifest>;

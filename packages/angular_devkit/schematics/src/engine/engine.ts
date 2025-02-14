@@ -7,8 +7,8 @@
  */
 
 import { BaseException, PriorityQueue, logging } from '@angular-devkit/core';
+import { Url } from 'node:url';
 import { Observable, concatMap, from as observableFrom } from 'rxjs';
-import { Url } from 'url';
 import { MergeStrategy } from '../tree/interface';
 import { NullTree } from '../tree/null';
 import { empty } from '../tree/static';

@@ -13,7 +13,7 @@ import { PathFragment } from '@angular-devkit/core';
 import { schema } from '@angular-devkit/core';
 import { strings } from '@angular-devkit/core';
 import { Subject } from 'rxjs';
-import { Url } from 'url';
+import { Url } from 'node:url';
 import { virtualFs } from '@angular-devkit/core';
 
 // @public (undocumented)

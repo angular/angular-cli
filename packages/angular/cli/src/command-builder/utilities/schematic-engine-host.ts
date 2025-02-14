@@ -8,11 +8,11 @@
 
 import { RuleFactory, SchematicsException, Tree } from '@angular-devkit/schematics';
 import { FileSystemCollectionDesc, NodeModulesEngineHost } from '@angular-devkit/schematics/tools';
-import { readFileSync } from 'fs';
 import { parse as parseJson } from 'jsonc-parser';
-import { Module, createRequire } from 'module';
-import { dirname, resolve } from 'path';
-import { Script } from 'vm';
+import { readFileSync } from 'node:fs';
+import { Module, createRequire } from 'node:module';
+import { dirname, resolve } from 'node:path';
+import { Script } from 'node:vm';
 import { assertIsError } from '../../utilities/error';
 
 /**

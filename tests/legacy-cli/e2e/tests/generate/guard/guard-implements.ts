@@ -1,4 +1,4 @@
-import { join } from 'path';
+import { join } from 'node:path';
 import { ng } from '../../../utils/process';
 import { expectFileToExist, expectFileToMatch } from '../../../utils/fs';
 

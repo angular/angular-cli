@@ -7,7 +7,7 @@
  */
 
 import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/testing';
-import * as path from 'path';
+import * as path from 'node:path';
 import { Schema as PwaOptions } from './schema';
 
 describe('PWA Schematic', () => {

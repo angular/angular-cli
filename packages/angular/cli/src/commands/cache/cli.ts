@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { join } from 'path';
+import { join } from 'node:path';
 import { Argv } from 'yargs';
 import {
   CommandModule,

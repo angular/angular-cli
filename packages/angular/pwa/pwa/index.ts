@@ -19,9 +19,9 @@ import {
   url,
 } from '@angular-devkit/schematics';
 import { readWorkspace, writeWorkspace } from '@schematics/angular/utility';
-import { posix } from 'path';
-import { Readable } from 'stream';
-import { pipeline } from 'stream/promises';
+import { posix } from 'node:path';
+import { Readable } from 'node:stream';
+import { pipeline } from 'node:stream/promises';
 import { Schema as PwaOptions } from './schema';
 
 function updateIndexFile(path: string): Rule {

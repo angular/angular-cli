@@ -13,7 +13,7 @@ import {
   ThresholdSeverity,
   checkBudgets,
 } from '@angular/build/private';
-import * as path from 'path';
+import * as path from 'node:path';
 import { Compilation, Compiler } from 'webpack';
 import { addError, addWarning } from '../../../utils/webpack-diagnostics';
 
