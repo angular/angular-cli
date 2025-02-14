@@ -10,8 +10,8 @@ export default async function () {
 
   // prepare global scripts test files
   await writeMultipleFiles({
-    'src/string-script.js': `stringScriptGlobal = 'string-scripts.js';`,
-    'src/input-script.js': `inputScriptGlobal = 'input-scripts.js';`,
+    'src/string-script.js': `globalThis.stringScriptGlobal = 'string-scripts.js';`,
+    'src/input-script.js': `globalThis.inputScriptGlobal = 'input-scripts.js';`,
     'src/typings.d.ts': `
       declare var stringScriptGlobal: any;
       declare var inputScriptGlobal: any;
