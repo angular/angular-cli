@@ -112,6 +112,11 @@ export async function* serveWithVite(
     browserOptions.ssr ||= true;
   }
 
+  // Disable auto CSP.
+  browserOptions.security = {
+    autoCsp: false,
+  };
+
   // Set all packages as external to support Vite's prebundle caching
   browserOptions.externalPackages = serverOptions.prebundle;
 

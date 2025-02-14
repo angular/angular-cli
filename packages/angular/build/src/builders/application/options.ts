@@ -386,6 +386,15 @@ export async function normalizeOptions(
     }
   }
 
+  const autoCsp = options.security?.autoCsp;
+  const security = {
+    autoCsp: autoCsp
+      ? {
+          unsafeEval: autoCsp === true ? false : !!autoCsp.unsafeEval,
+        }
+      : undefined,
+  };
+
   // Initial options to keep
   const {
     allowedCommonJsDependencies,
@@ -415,7 +424,6 @@ export async function normalizeOptions(
     partialSSRBuild = false,
     externalRuntimeStyles,
     instrumentForCoverage,
-    security,
   } = options;
 
   // Return all the normalized options
