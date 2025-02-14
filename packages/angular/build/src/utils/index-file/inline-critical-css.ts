@@ -68,6 +68,7 @@ export interface InlineCriticalCssProcessorOptions {
   minify?: boolean;
   deployUrl?: string;
   readAsset?: (path: string) => Promise<string>;
+  autoCsp?: boolean;
 }
 
 /** Partial representation of an `HTMLElement`. */
@@ -163,7 +164,7 @@ class BeastiesExtended extends BeastiesBase {
     const returnValue = await super.embedLinkedStylesheet(link, document);
     const cspNonce = this.findCspNonce(document);
 
-    if (cspNonce) {
+    if (cspNonce || this.optionsExtended.autoCsp) {
       const beastiesMedia = link.getAttribute('onload')?.match(MEDIA_SET_HANDLER_PATTERN);
 
       if (beastiesMedia) {
@@ -180,11 +181,13 @@ class BeastiesExtended extends BeastiesBase {
       // a way of doing that at the moment so we fall back to doing it any time a `link` tag is
       // inserted. We mitigate it by only iterating the direct children of the `<head>` which
       // should be pretty shallow.
-      document.head.children.forEach((child) => {
-        if (child.tagName === 'style' && !child.hasAttribute('nonce')) {
-          child.setAttribute('nonce', cspNonce);
-        }
-      });
+      if (cspNonce) {
+        document.head.children.forEach((child) => {
+          if (child.tagName === 'style' && !child.hasAttribute('nonce')) {
+            child.setAttribute('nonce', cspNonce);
+          }
+        });
+      }
     }
 
     return returnValue;
@@ -215,7 +218,7 @@ class BeastiesExtended extends BeastiesBase {
    */
   private conditionallyInsertCspLoadingScript(
     document: PartialDocument,
-    nonce: string,
+    nonce: string | null,
     link: PartialHTMLElement,
   ): void {
     if (this.addedCspScriptsDocuments.has(document)) {
@@ -223,8 +226,11 @@ class BeastiesExtended extends BeastiesBase {
     }
 
     const script = document.createElement('script');
-    script.setAttribute('nonce', nonce);
     script.textContent = LINK_LOAD_SCRIPT_CONTENT;
+    if (nonce) {
+      script.setAttribute('nonce', nonce);
+    }
+
     // Prepend the script to the head since it needs to
     // run as early as possible, before the `link` tags.
     document.head.insertBefore(script, link);

@@ -98,7 +98,7 @@ export async function autoCsp(html: string, unsafeEval = false): Promise<string>
     scriptContent = [];
   }
 
-  rewriter.on('startTag', (tag, html) => {
+  rewriter.on('startTag', (tag) => {
     if (tag.tagName === 'script') {
       openedScriptTag = tag;
       const src = getScriptAttributeValue(tag, 'src');

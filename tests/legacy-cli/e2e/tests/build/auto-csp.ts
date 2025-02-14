@@ -1,6 +1,6 @@
 import assert from 'node:assert';
 import { getGlobalVariable } from '../../utils/env';
-import { expectFileToMatch, writeMultipleFiles } from '../../utils/fs';
+import { expectFileToMatch, writeFile, writeMultipleFiles } from '../../utils/fs';
 import { findFreePort } from '../../utils/network';
 import { execAndWaitForOutputToMatch, ng } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';
@@ -12,6 +12,9 @@ export default async function () {
     getGlobalVariable('argv')['esbuild'],
     'This test should not be called in the Webpack suite.',
   );
+
+  // Add global css to trigger critical css inlining
+  await writeFile('src/styles.css', `body { color: green }`);
 
   // Turn on auto-CSP
   await updateJsonFile('angular.json', (json) => {
@@ -54,7 +57,7 @@ export default async function () {
       </head>
       <body>
         <app-root></app-root>
-        
+
         <script>
           const inlineScriptBodyCreated = 1338;
           console.warn("Inline Script Body: " + inlineScriptHeadCreated);
@@ -129,6 +132,9 @@ export default async function () {
 
   // Make sure the output files have auto-CSP as a result of `ng build`
   await expectFileToMatch('dist/test-project/browser/index.html', CSP_META_TAG);
+
+  // Make sure if contains the critical CSS inlining CSP code.
+  await expectFileToMatch('dist/test-project/browser/index.html', 'ngCspMedia');
 
   // Make sure that our e2e protractor tests run to confirm that our angular project runs.
   const port = await spawnServer();
