@@ -96,10 +96,14 @@ export default function (options: PwaOptions): Rule {
     for (const target of project.targets.values()) {
       if (
         target.builder === '@angular-devkit/build-angular:browser' ||
-        target.builder === '@angular-devkit/build-angular:application'
+        target.builder === '@angular-devkit/build-angular:application' ||
+        target.builder === '@angular/build:application'
       ) {
         buildTargets.push(target);
-      } else if (target.builder === '@angular-devkit/build-angular:karma') {
+      } else if (
+        target.builder === '@angular-devkit/build-angular:karma' ||
+        target.builder === '@angular/build:karma'
+      ) {
         testTargets.push(target);
       }
     }

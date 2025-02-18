@@ -75,7 +75,8 @@ function* generateConfigurationEnvironments(
   if (
     buildTarget.builder !== AngularBuilder.Browser &&
     buildTarget.builder !== AngularBuilder.BrowserEsbuild &&
-    buildTarget.builder !== AngularBuilder.Application
+    buildTarget.builder !== AngularBuilder.Application &&
+    buildTarget.builder !== AngularBuilder.BuildApplication
   ) {
     yield log(
       'warn',

@@ -53,8 +53,8 @@ function addDependenciesToPackageJson() {
       },
       {
         type: NodeDependencyType.Dev,
-        name: '@angular-devkit/build-angular',
-        version: latestVersions.DevkitBuildAngular,
+        name: '@angular/build',
+        version: latestVersions.AngularBuild,
       },
       {
         type: NodeDependencyType.Dev,
@@ -91,7 +91,7 @@ function addLibToWorkspaceFile(
       prefix: options.prefix,
       targets: {
         build: {
-          builder: Builders.NgPackagr,
+          builder: Builders.BuildNgPackagr,
           defaultConfiguration: 'production',
           options: {
             project: `${projectRoot}/ng-package.json`,
@@ -106,7 +106,7 @@ function addLibToWorkspaceFile(
           },
         },
         test: {
-          builder: Builders.Karma,
+          builder: Builders.BuildKarma,
           options: {
             tsConfig: `${projectRoot}/tsconfig.spec.json`,
             polyfills: ['zone.js', 'zone.js/testing'],
