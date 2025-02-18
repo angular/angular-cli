@@ -16,6 +16,7 @@ import { count, debounceTime, finalize, switchMap, take, timeout } from 'rxjs';
 import { executeDevServer } from '../../index';
 import { describeServeBuilder } from '../jasmine-helpers';
 import { BASE_OPTIONS, BUILD_TIMEOUT, DEV_SERVER_BUILDER_INFO } from '../setup';
+import { loopbackAddr } from '../../../../../../../../tests/legacy-cli/e2e/utils/env';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 declare const document: any;
@@ -102,7 +103,7 @@ async function createProxy(target: string, secure: boolean, ws = true): Promise<
 
   return {
     server,
-    url: `${secure ? 'https' : 'http'}://localhost:${proxyPort}`,
+    url: `${secure ? 'https' : 'http'}://${loopbackAddr}:${proxyPort}`,
   };
 }
 

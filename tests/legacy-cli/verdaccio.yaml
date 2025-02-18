@@ -3,7 +3,7 @@ storage: ./storage
 auth:
   auth-memory:
     users: {}
-listen: 127.0.0.1:${HTTP_PORT}
+listen: 0.0.0.0:${HTTP_PORT}
 uplinks:
   npmjs:
     url: https://registry.npmjs.org/

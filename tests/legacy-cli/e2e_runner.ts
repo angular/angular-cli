@@ -3,7 +3,7 @@ import { createConsoleLogger } from '../../packages/angular_devkit/core/node';
 import colors from 'ansi-colors';
 import glob from 'fast-glob';
 import * as path from 'node:path';
-import { getGlobalVariable, setGlobalVariable } from './e2e/utils/env';
+import { getGlobalVariable, registryAddr, setGlobalVariable } from './e2e/utils/env';
 import { gitClean } from './e2e/utils/git';
 import { createNpmRegistry } from './e2e/utils/registry';
 import { launchTestProcess } from './e2e/utils/process';
@@ -227,8 +227,8 @@ const ports = (async () => {
 
 Promise.all([ports, findPackageTars()])
   .then(async ([[httpPort, httpsPort], packageTars]) => {
-    setGlobalVariable('package-registry', 'http://127.0.0.1:' + httpPort);
-    setGlobalVariable('package-secure-registry', 'http://127.0.0.1:' + httpsPort);
+    setGlobalVariable('package-registry', `http://${registryAddr}:${httpPort}`);
+    setGlobalVariable('package-secure-registry', `http://${registryAddr}:${httpsPort}`);
     setGlobalVariable('package-tars', packageTars);
 
     // NPM registries for the lifetime of the test execution

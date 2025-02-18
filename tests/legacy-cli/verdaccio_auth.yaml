@@ -5,7 +5,7 @@ auth:
       testing:
         name: testing
         password: s3cret
-listen: 127.0.0.1:${HTTPS_PORT}
+listen: 0.0.0.0:${HTTPS_PORT}
 uplinks:
   local:
     url: http://127.0.0.1:${HTTP_PORT}

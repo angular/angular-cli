@@ -14,5 +14,7 @@ yarn bazel test \
     --test_env="NG_E2E_RUNNER_WINDOWS_NPM=C:\Program Files\nodejs\npm" \
     --test_env="NG_E2E_RUNNER_WINDOWS_TMP_DIR=/mnt/c/Users/paulg/AppData/Local/Temp" \
     --test_env="NG_E2E_RUNNER_WINDOWS_GIT_BASH_BIN=/mnt/c/Program Files/Git/bin/git" \
+    --test_env="NG_E2E_RUNNER_WSL_HOST_ADDR=$(ip route show | grep -i default | awk '{ print $3}')" \
+    --test_env="NG_E2E_RUNNER_WSL_VM_ADDR=$(hostname -I)" \
     --test_output=streamed \
     --flaky_test_attempts=1

@@ -1,5 +1,8 @@
 const ENV_PREFIX = 'LEGACY_CLI__';
 
+export const loopbackAddr = process.env.NG_E2E_RUNNER_WSL_HOST_ADDR?.trim() ?? 'localhost';
+export const registryAddr = process.env.NG_E2E_RUNNER_WSL_VM_ADDR?.trim() ?? 'localhost';
+
 export function setGlobalVariable(name: string, value: any) {
   if (value === undefined) {
     delete process.env[ENV_PREFIX + name];

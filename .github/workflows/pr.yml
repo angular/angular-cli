@@ -127,7 +127,7 @@ jobs:
 
   e2e-windows-subset:
     # needs: build
-    runs-on: windows-2025
+    runs-on: windows-latest
     steps:
       # Git checkout converts to CRLF by default. This causes the Aspect lock
       # files to differ. See: https://github.com/actions/checkout/issues/135.
@@ -153,8 +153,6 @@ jobs:
           wsl-conf: |
             [interop]
               appendWindowsPath=false
-            [wsl2]
-              networkingMode=mirrored
           wsl-shell-command: bash --login -euo pipefail
           additional-packages: |
             curl
@@ -213,6 +211,8 @@ jobs:
               --test_env="NG_E2E_RUNNER_WINDOWS_NPM=${{steps.wsl_paths.outputs.npm_path}}" \
               --test_env="NG_E2E_RUNNER_WINDOWS_TMP_DIR=${{steps.wsl_paths.outputs.tmp_path}}" \
               --test_env="NG_E2E_RUNNER_WINDOWS_GIT_BASH_BIN=${{steps.wsl_paths.outputs.git_path}}" \
+              --test_env="NG_E2E_RUNNER_WSL_HOST_ADDR=$(ip route show | grep -i default | awk '{ print $3}')" \
+              --test_env="NG_E2E_RUNNER_WSL_VM_ADDR=$(hostname -I)" \
               --test_output=streamed \
               --strategy=TestRunner=standalone
         shell: wsl-bash {0}
