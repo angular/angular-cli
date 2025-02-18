@@ -32,16 +32,30 @@ describeKarmaBuilder(execute, KARMA_BUILDER_INFO, (harness, setupTarget) => {
 `,
       });
 
-      harness.useTarget('test', {
-        ...BASE_OPTIONS,
-        aot: true,
-        /** Cf. {@link ../builder-mode_spec.ts} */
-        polyfills: ['zone.js', '@angular/localize/init', 'zone.js/testing'],
-        builderMode: BuilderMode.Application,
+      expect(await runTest({ aot: true })).toBeTrue();
+    });
+
+    it('is turned off by default', async () => {
+      await setupTarget(harness);
+
+      await harness.writeFiles({
+        'src/aot.spec.ts': `
+          import { Component } from '@angular/core';
+          
+          describe('Hello', () => {
+            it('should contain jit instructions', () => {
+              @Component({
+                template: 'Hello',
+              })
+              class Hello {}
+
+              expect((Hello as any).ɵcmp.template.toString()).toContain('jit');
+            });
+          });
+`,
       });
 
-      const { result } = await harness.executeOnce();
-      expect(result?.success).toBeTrue();
+      expect(await runTest()).toBeTrue();
     });
 
     it('enables aot with browser builder', async () => {
@@ -76,4 +90,18 @@ describeKarmaBuilder(execute, KARMA_BUILDER_INFO, (harness, setupTarget) => {
       expect(result?.success).toBeTrue();
     });
   });
+
+  async function runTest({ aot }: { aot?: boolean } = {}) {
+    harness.useTarget('test', {
+      ...BASE_OPTIONS,
+      aot,
+      /** Cf. {@link ../builder-mode_spec.ts} */
+      polyfills: ['zone.js', '@angular/localize/init', 'zone.js/testing'],
+      builderMode: BuilderMode.Application,
+    });
+
+    const { result } = await harness.executeOnce();
+
+    return result?.success;
+  }
 });
