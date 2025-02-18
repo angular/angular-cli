@@ -161,6 +161,13 @@ class AngularPolyfillsPlugin {
               f.type = 'module';
             }
           }
+
+          // Add browser sourcemap support as a classic script
+          files.unshift({
+            pattern: localResolve('source-map-support/browser-source-map-support.js'),
+            included: true,
+            watched: false,
+          });
         }, AngularPolyfillsPlugin),
       ],
     };
@@ -321,12 +328,13 @@ function normalizePolyfills(polyfills: string | string[] | undefined): [string[]
 
   const jasmineGlobalEntryPoint = localResolve('./polyfills/jasmine_global.js');
   const jasmineGlobalCleanupEntrypoint = localResolve('./polyfills/jasmine_global_cleanup.js');
+  const sourcemapEntrypoint = localResolve('./polyfills/init_sourcemaps.js');
 
   const zoneTestingEntryPoint = 'zone.js/testing';
   const polyfillsExludingZoneTesting = polyfills.filter((p) => p !== zoneTestingEntryPoint);
 
   return [
-    polyfillsExludingZoneTesting.concat([jasmineGlobalEntryPoint]),
+    polyfillsExludingZoneTesting.concat([jasmineGlobalEntryPoint, sourcemapEntrypoint]),
     polyfillsExludingZoneTesting.length === polyfills.length
       ? [jasmineGlobalCleanupEntrypoint]
       : [jasmineGlobalCleanupEntrypoint, zoneTestingEntryPoint],

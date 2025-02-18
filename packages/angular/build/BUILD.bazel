@@ -120,6 +120,7 @@ ts_project(
         "//:node_modules/rollup",
         "//:node_modules/sass",
         "//:node_modules/semver",
+        "//:node_modules/source-map-support",
         "//:node_modules/tslib",
         "//:node_modules/typescript",
         "//:node_modules/vite",
