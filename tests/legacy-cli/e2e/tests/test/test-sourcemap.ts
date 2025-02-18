@@ -5,11 +5,6 @@ import { ng } from '../../utils/process';
 import { assertIsError } from '../../utils/utils';
 
 export default async function () {
-  if (getGlobalVariable('argv')['esbuild']) {
-    // TODO: enable once this is fixed when using the esbuild builder.
-    return;
-  }
-
   await writeFile(
     'src/app/app.component.spec.ts',
     `

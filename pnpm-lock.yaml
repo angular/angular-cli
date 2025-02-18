@@ -606,6 +606,9 @@ importers:
       semver:
         specifier: 7.7.1
         version: 7.7.1
+      source-map-support:
+        specifier: 0.5.21
+        version: 0.5.21
       vite:
         specifier: 6.1.0
         version: 6.1.0(@types/node@18.19.76)(less@4.2.2)(sass@1.85.0)(terser@5.39.0)
