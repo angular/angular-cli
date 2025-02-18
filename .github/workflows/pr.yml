@@ -213,8 +213,8 @@ jobs:
               --test_env="NG_E2E_RUNNER_WINDOWS_NPM=${{steps.wsl_paths.outputs.npm_path}}" \
               --test_env="NG_E2E_RUNNER_WINDOWS_TMP_DIR=${{steps.wsl_paths.outputs.tmp_path}}" \
               --test_env="NG_E2E_RUNNER_WINDOWS_GIT_BASH_BIN=${{steps.wsl_paths.outputs.git_path}}" \
-              --test_output=streamed
-              --test_strategy=standalone
+              --test_output=streamed \
+              --strategy=TestRunner=standalone
         shell: wsl-bash {0}
 
   e2e-package-managers:
