@@ -127,7 +127,7 @@ jobs:
 
   e2e-windows-subset:
     # needs: build
-    runs-on: windows-latest
+    runs-on: windows-2025
     steps:
       # Git checkout converts to CRLF by default. This causes the Aspect lock
       # files to differ. See: https://github.com/actions/checkout/issues/135.
@@ -203,12 +203,8 @@ jobs:
           # See: https://devblogs.microsoft.com/commandline/share-environment-vars-between-wsl-and-windows
           WSLENV: 'GOOGLE_APPLICATION_CREDENTIALS/p'
         run: |
-          yarn bazel build \
-              --config=e2e //tests/legacy-cli:e2e_node22
-
           yarn bazel test \
               --config=e2e //tests/legacy-cli:e2e_node22 \
-              --spawn_strategy=local \
               --test_filter="tests/basic/{build,rebuild}.ts" \
               --test_arg="--esbuild" \
               --test_env="NG_E2E_RUNNER_WSL_ROOT=C:\wsl_root" \
@@ -216,7 +212,9 @@ jobs:
               --test_env="NG_E2E_RUNNER_WINDOWS_CMD=${{steps.wsl_paths.outputs.cmd_path}}" \
               --test_env="NG_E2E_RUNNER_WINDOWS_NPM=${{steps.wsl_paths.outputs.npm_path}}" \
               --test_env="NG_E2E_RUNNER_WINDOWS_TMP_DIR=${{steps.wsl_paths.outputs.tmp_path}}" \
-              --test_env="NG_E2E_RUNNER_WINDOWS_GIT_BASH_BIN=${{steps.wsl_paths.outputs.git_path}}"
+              --test_env="NG_E2E_RUNNER_WINDOWS_GIT_BASH_BIN=${{steps.wsl_paths.outputs.git_path}}" \
+              --test_output=streamed
+              --test_strategy=standalone
         shell: wsl-bash {0}
 
   e2e-package-managers:

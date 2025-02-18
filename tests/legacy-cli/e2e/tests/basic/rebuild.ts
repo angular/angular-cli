@@ -66,6 +66,8 @@ export default async function () {
     }),
   ]);
   {
+    console.error(`http://localhost:${port}/main.js`);
+    await setTimeout(1000 * 60 * 20);
     const response = await fetch(`http://localhost:${port}/main.js`);
     const body = await response.text();
     if (!body.match(/\$\$_E2E_GOLDEN_VALUE_1/)) {
