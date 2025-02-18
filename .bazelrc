@@ -33,10 +33,6 @@ test:no-sharding --flaky_test_attempts=1 --test_sharding_strategy=disabled
 # See https://github.com/bazelbuild/bazel/issues/4603
 build --symlink_prefix=dist/
 
-# Disable watchfs as it causes tests to be flaky on Windows
-# https://github.com/angular/angular/issues/29541
-build --nowatchfs
-
 # Turn off legacy external runfiles
 build --nolegacy_external_runfiles
 
@@ -161,10 +157,6 @@ build:remote-cache --google_default_credentials
 
 # Fixes use of npm paths with spaces such as some within the puppeteer module
 build --experimental_inprocess_symlink_creation
-
-# Enable runfiles even on Windows.
-# Architect resolves output files from data files, and this isn't possible without runfile support.
-build --enable_runfiles
 
 ####################################################
 # rules_js specific flags

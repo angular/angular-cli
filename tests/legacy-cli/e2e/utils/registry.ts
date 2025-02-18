@@ -25,6 +25,7 @@ export async function createNpmRegistry(
   for await (const events of on(verdaccioServer, 'message', {
     signal: AbortSignal.timeout(30_000),
   })) {
+    console.log('VER:', events);
     if (
       events.some(
         (event: unknown) =>
@@ -49,7 +50,7 @@ export function createNpmConfigForAuthentication(
    * When true, the authentication token will be scoped to the registry URL.
    * @example
    * ```ini
-   * //localhost:4876/:_auth="dGVzdGluZzpzM2NyZXQ="
+   * //127.0.0.1:4876/:_auth="dGVzdGluZzpzM2NyZXQ="
    * ```
    *
    * When false, the authentication will be added as seperate key.
