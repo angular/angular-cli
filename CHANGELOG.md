@@ -1,3 +1,39 @@
+<a name="19.2.0-rc.0"></a>
+
+# 19.2.0-rc.0 (2025-02-19)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                                                |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------------------- |
+| [8c7c7ac69](https://github.com/angular/angular-cli/commit/8c7c7ac691e7f8b3e1585f863a6edbb46c4c31ad) | fix  | correctly parse and resolve relative schematic collection names on Windows |
+| [09f5006b5](https://github.com/angular/angular-cli/commit/09f5006b5ca208a4a9d3692223ca78f8c0226bc8) | fix  | prefer installed package as fallback when listing package groups           |
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                              |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------- |
+| [adf4ea5d4](https://github.com/angular/angular-cli/commit/adf4ea5d4ccb252132301111153619178c5bdabe) | fix  | remove animations module from ng new app |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                   |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------- |
+| [a00a49a65](https://github.com/angular/angular-cli/commit/a00a49a65ae68e6e0f9856d8d0f4d9914031cd05) | feat | add aot to WTR schema                         |
+| [c0c1670a6](https://github.com/angular/angular-cli/commit/c0c1670a647638124f8d24363576a058ea45c1e4) | fix  | pass missing options to Karma esbuild builder |
+| [2bae1a9c0](https://github.com/angular/angular-cli/commit/2bae1a9c0c9eff8087b67c7890b87dc1c279c809) | fix  | support aot option for karma browser builder  |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                               |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------- |
+| [11fab9c7d](https://github.com/angular/angular-cli/commit/11fab9c7dde950e46b2a23d239bb9e29b20f5eff) | feat | add application builder karma testing to package          |
+| [a5fcf8044](https://github.com/angular/angular-cli/commit/a5fcf804428b835cd79bd8fad55c16e614c2be3a) | fix  | provide karma stack trace sourcemap support               |
+| [f92787947](https://github.com/angular/angular-cli/commit/f92787947f3c74900dbd1022bc91aa6ec1907358) | fix  | suppress asset missing warning for `/index.html` requests |
+| [e6deb82c6](https://github.com/angular/angular-cli/commit/e6deb82c6c46b48732c9f7c74eec3f1c8798b355) | fix  | update critical CSS inlining to support `autoCsp`         |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="19.1.8"></a>
 
 # 19.1.8 (2025-02-19)
