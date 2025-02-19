@@ -120,6 +120,7 @@ ts_project(
         ":node_modules/@angular-devkit/core",
         ":node_modules/@angular-devkit/schematics",
         "//:node_modules/@types/jasmine",
+        "//:node_modules/@types/node",
         "//:node_modules/jsonc-parser",
         "//packages/schematics/angular/third_party/github.com/Microsoft/TypeScript:TypeScript_rjs",
     ],

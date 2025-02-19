@@ -20,10 +20,12 @@ ts_project(
     deps = [
         ":node_modules/@angular-devkit/architect",
         ":node_modules/@angular-devkit/core",
+        ":node_modules/progress",
         "//:node_modules/@types/node",
         "//:node_modules/@types/progress",
         "//:node_modules/@types/yargs-parser",
         "//:node_modules/ansi-colors",
+        "//:node_modules/yargs-parser",
     ],
 )
 

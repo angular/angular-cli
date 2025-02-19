@@ -11,6 +11,7 @@ ts_project(
     ],
     deps = [
         "//:node_modules/@types/express",
+        "//:node_modules/@types/node",
         "//:node_modules/@types/semver",
         "//:node_modules/express",
         "//:node_modules/fast-glob",
