@@ -29,8 +29,8 @@ export default async function () {
   const port = await findFreePort();
   await execAndWaitForOutputToMatch(
     'ng',
-    ['serve', '--port', port.toString()],
-    /Application bundle generation complete/,
+    ['serve', '--host', '0.0.0.0', '--port', port.toString()],
+    /Network: http:\/\//,
     { CI: '0', NO_COLOR: 'true' },
   );
   await validateResponse('/', /Hello,/);

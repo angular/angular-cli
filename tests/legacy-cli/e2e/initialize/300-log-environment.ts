@@ -15,10 +15,12 @@ export default async function () {
     console.log(`  ${envName}: ${process.env[envName]!.replace(/[\n\r]+/g, '\n        ')}`);
   });
 
+  console.log(`----`);
+
   // On Windows, `which` might not be available.
   if (isWindowsTestMode()) {
     console.log(
-      `Skipping "$(which ng ${getActivePackageManager})" on Windows ` +
+      `Skipping "$(which ng ${getActivePackageManager()})" on Windows ` +
         `as the command may not be available.`,
     );
   } else {

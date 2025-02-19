@@ -1,6 +1,5 @@
-import { symlinkSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { expectFileToMatch, writeMultipleFiles } from '../../../utils/fs';
+import { crossPlatformSymlink, expectFileToMatch, writeMultipleFiles } from '../../../utils/fs';
 import { ng } from '../../../utils/process';
 import { updateJsonFile } from '../../../utils/project';
 
@@ -10,7 +9,10 @@ export default async function () {
     'src/styles-for-link.scss': `p { color: blue }`,
   });
 
-  symlinkSync(resolve('src/styles-for-link.scss'), resolve('src/styles-linked.scss'));
+  await crossPlatformSymlink(
+    resolve('src/styles-for-link.scss'),
+    resolve('src/styles-linked.scss'),
+  );
 
   await updateJsonFile('angular.json', (workspaceJson) => {
     const appArchitect = workspaceJson.projects['test-project'].architect;

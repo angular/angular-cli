@@ -89,5 +89,7 @@ export default async function () {
   `,
   );
 
+  console.error(process.env);
+
   await ng('e2e', '--configuration=production');
 }

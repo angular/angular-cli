@@ -22,7 +22,10 @@ runs:
 
     - name: Initialize WSL
       id: init_wsl
-      uses: angular/dev-infra/github-actions/setup-wsl@0b004688d62e0fff2dbbb98362ff1b484348116a
+      uses: angular/dev-infra/github-actions/setup-wsl@0000d926624b2fd918e93f1c6b5e2defba9af91f
+      with:
+        wsl_firewall_interface: 'vEthernet (WSL (Hyper-V firewall))'
+
     - name: Install node modules in WSL (re-using from previous install/cache restore)
       run: yarn install --immutable
       shell: wsl-bash {0}
@@ -32,7 +35,7 @@ runs:
     #   * symlink_prefix=/:    Needed as otherwise we will create unix symlinks in the Windows host.
     - run: |
         ${{inputs.command}} \
-          --//e2e/legacy-cli:enable_native_windows_testing=true \
+          --//tests/legacy-cli:enable_native_windows_testing=true \
           --test_env="NG_E2E_RUNNER_WSL_ROOT=${{steps.init_wsl.outputs.wsl_root_path}}" \
           --test_env="NG_E2E_RUNNER_WSL_UNC_BASE=${{steps.init_wsl.outputs.wsl_root_unc_path}}" \
           --test_env="NG_E2E_RUNNER_WINDOWS_CMD=${{steps.init_wsl.outputs.cmd_path}}" \

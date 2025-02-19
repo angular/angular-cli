@@ -14,13 +14,20 @@ let _cachedWindowsTestMode: WindowsWslTestMode | null | undefined = undefined;
 interface WindowsWslTestMode {
   cmdPath: string;
   gitBinaryDirForWindows: string;
-  nodeBinaryForWindowsPath: string;
-  nodeBinaryForWindowsInsideWslPath: string;
   npmBinaryForWindowsPath: string;
   wslRootPath: string;
   wslUncBase: string;
-  windowsChromedriverPath: string;
-  windowsChromiumPath: string;
+
+  // Those binaries are downloaded by Bazel inside WSL but in practice
+  // need to be copied to the host system to function properly.
+  wslRootBinariesNeedingCopy: {
+    chromedriverPath: string;
+    chromiumPath: string;
+    nodePath: string;
+  };
+  copiedWindowsBinaries: {
+    nodePath: string;
+  };
 }
 
 /**
@@ -47,9 +54,7 @@ export function interopWslPathForOutsideIfNecessary(p: string): string {
 
   if (shouldInteropWslPath(p)) {
     return (
-      child_process
-        .execSync(`wslpath -w ${p}`, { encoding: 'utf8' })
-        .trim()
+      wslpath('-w', p)
         // Note: We expect a fake symlinked WSL root directory in our host's
         // main drive. This is necessary because `npm publish` does not work
         // with UNC paths, like `\\wsl.localhost\Debian\<..>`.
@@ -102,22 +107,26 @@ export function isWindowsTestMode(): WindowsWslTestMode | null {
   return (_cachedWindowsTestMode = {
     cmdPath: cmdEnv,
     gitBinaryDirForWindows: path.dirname(gitBinaryForWindows),
+    npmBinaryForWindowsPath: windowsNpmBin,
+    wslRootPath,
+    wslUncBase,
     // We will copy the Node version outside of WSL because NPM might
     // have problems executing with the UNC path. See:
     // https://github.com/npm/cli/issues/7309.
-    nodeBinaryForWindowsPath: path.join(npmDir, 'node.exe'),
-    nodeBinaryForWindowsInsideWslPath: path.resolve(nodeRepositoryDir, 'node.exe'),
-    npmBinaryForWindowsPath: windowsNpmBin,
-    windowsChromedriverPath: path.resolve(
-      bazelTestWorkingDir,
-      `../org_chromium_chromedriver_windows/chromedriver_win32/chromedriver.exe`,
-    ),
-    windowsChromiumPath: path.resolve(
-      bazelTestWorkingDir,
-      `../org_chromium_chromium_windows/chrome-win/chrome.exe`,
-    ),
-    wslRootPath,
-    wslUncBase,
+    wslRootBinariesNeedingCopy: {
+      nodePath: path.resolve(nodeRepositoryDir, 'node.exe'),
+      chromedriverPath: path.resolve(
+        bazelTestWorkingDir,
+        `../org_chromium_chromedriver_windows/chromedriver_win32/chromedriver.exe`,
+      ),
+      chromiumPath: path.resolve(
+        bazelTestWorkingDir,
+        `../org_chromium_chromium_windows/chrome-win/chrome.exe`,
+      ),
+    },
+    copiedWindowsBinaries: {
+      nodePath: path.join(npmDir, 'node.exe'),
+    },
   });
 }
 
@@ -152,4 +161,8 @@ export function createWslEnv(env: NodeJS.ProcessEnv): string {
     }
   }
   return result.join(':');
+}
+
+export function wslpath(...args: string[]): string {
+  return child_process.execSync(`wslpath ${args.join(' ')}`, { encoding: 'utf8' }).trim();
 }

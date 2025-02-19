@@ -38,9 +38,14 @@ export default async function () {
   );
 
   const port = await findFreePort();
-  await execAndWaitForOutputToMatch('ng', ['serve', '--port', `${port}`], /complete/, {
-    NO_COLOR: 'true',
-  });
+  await execAndWaitForOutputToMatch(
+    'ng',
+    ['serve', '--port', `${port}`, '--host', '0.0.0.0'],
+    /complete/,
+    {
+      NO_COLOR: 'true',
+    },
+  );
 
   const [, response] = await Promise.all([
     assert.rejects(

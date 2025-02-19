@@ -64,7 +64,7 @@ export default async function () {
       const server = app();
       if (isMainModule(import.meta.url)) {
         const port = +(process.env['PORT'] || 4000);
-        server.listen({ port }, () => {
+        server.listen({ port, host: '0.0.0.0' }, () => {
           console.log(\`Fastify server listening on http://localhost:\${port}\`);
         });
       }

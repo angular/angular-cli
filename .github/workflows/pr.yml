@@ -127,7 +127,7 @@ jobs:
 
   e2e-windows-subset:
     # needs: build
-    runs-on: windows-latest
+    runs-on: windows-2025
     steps:
       - name: Initialize environment
         uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@d16848fd2ed19fce59488b540fa26a3353c72ad4
@@ -143,7 +143,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-latest]
+        os: [windows-2025]
         node: [22]
         subset: [npm, esbuild]
         shard: [0, 1, 2, 3, 4, 5]

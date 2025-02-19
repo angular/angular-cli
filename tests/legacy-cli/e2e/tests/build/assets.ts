@@ -1,5 +1,10 @@
 import * as fs from 'node:fs';
-import { expectFileToExist, expectFileToMatch, writeFile } from '../../utils/fs';
+import {
+  crossPlatformSymlink,
+  expectFileToExist,
+  expectFileToMatch,
+  writeFile,
+} from '../../utils/fs';
 import { ng } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';
 import { expectToFail } from '../../utils/utils';
@@ -28,7 +33,8 @@ export default async function () {
   fs.writeFileSync('dirToSymlink/subdir1/b.txt', '');
   fs.writeFileSync('dirToSymlink/subdir2/c.txt', '');
   fs.writeFileSync('dirToSymlink/subdir2/subsubdir1/d.txt', '');
-  fs.symlinkSync(process.cwd() + '/dirToSymlink', 'public/symlinkDir');
+
+  await crossPlatformSymlink(process.cwd() + '/dirToSymlink', 'public/symlinkDir');
 
   await ng('build', '--configuration=development');
 

@@ -1,8 +1,9 @@
 import { homedir } from 'node:os';
 import * as path from 'node:path';
 import { deleteFile, expectFileToExist } from '../../../utils/fs';
-import { ng, silentNg } from '../../../utils/process';
+import { ng, node, silentNg } from '../../../utils/process';
 import { expectToFail } from '../../../utils/utils';
+import { isWindowsTestMode, wslpath } from '../../../utils/wsl';
 
 export default async function () {
   let ngError: Error;
@@ -44,6 +45,15 @@ export default async function () {
 
   if (!stdout.includes('true')) {
     throw new Error(`Expected "true", received "${JSON.stringify(stdout)}".`);
+  }
+
+  let homeDir = homedir();
+
+  // In Windows test mode, we don't want to use the WSL homedir, but the
+  // one of the host system.
+  if (isWindowsTestMode()) {
+    const homeDirWinPath = (await node('-p', 'os.homedir()')).stdout.trim();
+    homeDir = wslpath('-u', `"${homeDirWinPath}"`);
   }
 
   await expectFileToExist(path.join(homedir(), '.angular-config.json'));

@@ -1,5 +1,6 @@
 import { promises as fs, constants } from 'node:fs';
 import { dirname, join } from 'node:path';
+import { node } from './process';
 
 export function readFile(fileName: string): Promise<string> {
   return fs.readFile(fileName, 'utf-8');
@@ -7,6 +8,12 @@ export function readFile(fileName: string): Promise<string> {
 
 export function writeFile(fileName: string, content: string, options?: any): Promise<void> {
   return fs.writeFile(fileName, content, options);
+}
+
+export async function crossPlatformSymlink(target: string, destination: string): Promise<void> {
+  // Symlinks created inside WSL cannot work in Windows. We should create symlinks in the
+  // "user environment" similar to how we e.g. launch the Angular CLI (via our process utilities).
+  await node('-e', `fs.symlinkSync(process.argv[1], process.argv[2])`, target, destination);
 }
 
 export function deleteFile(path: string): Promise<void> {

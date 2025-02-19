@@ -126,23 +126,18 @@ def _e2e_tests(name, runner, windows_node_repo, **kwargs):
     toolchains = toolchains + ["@npm//@angular/build-tooling/bazel/browsers/chromium:toolchain_alias"]
     data = data + ["@npm//@angular/build-tooling/bazel/browsers/chromium"]
 
-    windows_node_files = [
+    windows_test_files = [
         "@%s//:node_files" % windows_node_repo,
         "@%s//:npm_files" % windows_node_repo,
         "@%s//:bin/npm.cmd" % windows_node_repo,
+        "@org_chromium_chromedriver_windows//:metadata",
+        "@org_chromium_chromium_windows//:metadata",
     ]
 
     # In Windows native testing mode, add Windows dependencies. Those are not
     # available by default as we technically execute inside Linux/WSL.
-    toolchains = select({
-        "//e2e/legacy-cli:native_windows_testing": toolchains + [
-            "@org_chromium_chromedriver_windows//:metadata",
-            "@org_chromium_chromium_windows//:metadata",
-        ],
-        "//conditions:default": toolchains,
-    })
     data = select({
-        "//e2e/legacy-cli:native_windows_testing": data + windows_node_files,
+        "//tests/legacy-cli:native_windows_testing": data + windows_test_files,
         "//conditions:default": data,
     })
 

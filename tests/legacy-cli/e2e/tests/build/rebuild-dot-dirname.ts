@@ -4,6 +4,7 @@ import { appendToFile, createDir, rimraf } from '../../utils/fs';
 import { installWorkspacePackages } from '../../utils/packages';
 import { killAllProcesses, ng, waitForAnyProcessOutputToMatch } from '../../utils/process';
 import { ngServe, updateJsonFile, useSha } from '../../utils/project';
+import { rm } from 'node:fs/promises';
 
 const goodRegEx = getGlobalVariable('argv')['esbuild']
   ? /Application bundle generation complete\./
@@ -53,6 +54,6 @@ export default async function () {
   } finally {
     process.chdir(originalCwd);
     await killAllProcesses();
-    await setTimeout(100);
+    await setTimeout(500);
   }
 }

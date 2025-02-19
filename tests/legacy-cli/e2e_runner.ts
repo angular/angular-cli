@@ -6,12 +6,13 @@ import * as path from 'node:path';
 import { getGlobalVariable, registryAddr, setGlobalVariable } from './e2e/utils/env';
 import { gitClean } from './e2e/utils/git';
 import { createNpmRegistry } from './e2e/utils/registry';
-import { launchTestProcess } from './e2e/utils/process';
+import { launchTestProcess, node } from './e2e/utils/process';
 import { delimiter, dirname, join } from 'node:path';
 import { findFreePort } from './e2e/utils/network';
 import { extractFile } from './e2e/utils/tar';
 import { realpathSync } from 'node:fs';
 import { PkgInfo } from './e2e/utils/packages';
+import { rm } from 'node:fs/promises';
 import { isWindowsTestMode } from './e2e/utils/wsl';
 
 Error.stackTraceLimit = Infinity;
@@ -207,19 +208,15 @@ setGlobalVariable('argv', argv);
 setGlobalVariable('package-manager', argv['package-manager']);
 setGlobalVariable('bazel-test-working-dir', process.cwd());
 
-const windowsMode = isWindowsTestMode();
-
 // Use the chrome supplied by bazel or the puppeteer chrome and webdriver-manager driver outside.
 // This is needed by karma-chrome-launcher, protractor etc.
 // https://github.com/karma-runner/karma-chrome-launcher#headless-chromium-with-puppeteer
 //
 // Resolve from relative paths to absolute paths within the bazel runfiles tree
 // so subprocesses spawned in a different working directory can still find them.
-process.env.CHROME_BIN = windowsMode?.windowsChromiumPath ?? path.resolve(process.env.CHROME_BIN!);
-process.env.CHROME_PATH =
-  windowsMode?.windowsChromiumPath ?? path.resolve(process.env.CHROME_PATH!);
-process.env.CHROMEDRIVER_BIN =
-  windowsMode?.windowsChromedriverPath ?? path.resolve(process.env.CHROMEDRIVER_BIN!);
+process.env.CHROME_BIN = path.resolve(process.env.CHROME_BIN!);
+process.env.CHROME_PATH = path.resolve(process.env.CHROME_PATH!);
+process.env.CHROMEDRIVER_BIN = path.resolve(process.env.CHROMEDRIVER_BIN!);
 
 // Find free ports sequentially, reducing the risk of collisions.
 // Note for Windows test mode on CI: Verdaccio runs inside WSL, so we
@@ -343,7 +340,27 @@ async function runTest(absoluteName: string): Promise<void> {
   process.chdir(join(getGlobalVariable('projects-root'), 'test-project'));
 
   await launchTestProcess(absoluteName);
+  await cleanTestProject();
+}
+
+async function cleanTestProject() {
   await gitClean();
+
+  const testProject = join(getGlobalVariable('projects-root'), 'test-project');
+
+  // Note: Dist directory is not cleared between tests, as `git clean` doesn't
+  // delete it. For some reason, this is not surfacing on macOS/Linux, but it
+  // generally makes sense to clear dist between tests, so we add this logic.
+  // **Though** currently it's only targeting Windows because `rules_nodejs`
+  // interferes with `rm` and breaks for unexpected reasons.
+  // TODO(devversion): remove this after migration.
+  if (isWindowsTestMode()) {
+    await node(
+      '-e',
+      `fs.rmSync(process.argv[1], {recursive: true, force: true})`,
+      join(testProject, 'dist/'),
+    );
+  }
 }
 
 function printHeader(

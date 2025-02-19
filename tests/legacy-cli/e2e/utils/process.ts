@@ -497,7 +497,7 @@ function _spawnNode(args: string[], opts: ExecOptions = {}) {
 
   const windowsMode = isWindowsTestMode();
   if (windowsMode !== null) {
-    nodeBin = windowsMode.nodeBinaryForWindowsPath;
+    nodeBin = windowsMode.copiedWindowsBinaries.nodePath;
   }
 
   return _exec(opts, nodeBin, args);

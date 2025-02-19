@@ -1,3 +1,5 @@
+import { killAllProcesses } from './process';
+
 const testScript: string = process.argv[2];
 const testModule = require(testScript);
 const testFunction: () => Promise<void> | void =
@@ -16,6 +18,10 @@ const testFunction: () => Promise<void> | void =
     console.error('Test Process error', e);
     process.exitCode = -1;
   } finally {
-    process.exit();
+    // Ensure detached background processes are killed and not
+    // take up resources unnecessarily.
+    killAllProcesses().finally(() => {
+      process.exit();
+    });
   }
 })();

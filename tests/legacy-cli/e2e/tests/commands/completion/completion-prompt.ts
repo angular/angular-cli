@@ -10,6 +10,7 @@ import {
   execWithEnv,
   silentNpm,
 } from '../../../utils/process';
+import { isWindowsTestMode } from '../../../utils/wsl';
 
 const AUTOCOMPLETION_PROMPT = /Would you like to enable autocompletion\?/;
 const DEFAULT_ENV = Object.freeze({
@@ -30,7 +31,7 @@ const testRegistry = getGlobalVariable('package-registry');
 export default async function () {
   // Windows Cmd and Powershell do not support autocompletion. Run a different set of tests to
   // confirm autocompletion skips the prompt appropriately.
-  if (process.platform === 'win32') {
+  if (isWindowsTestMode()) {
     await windowsTests();
     return;
   }
