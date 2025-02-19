@@ -55,13 +55,13 @@ if (version[0] % 2 === 1) {
   );
 
   require('./bootstrap');
-} else if (version[0] < 18 || (version[0] === 18 && version[1] < 19)) {
-  // Error and exit if less than 18.19
+} else if (version[0] < 20 || (version[0] === 20 && version[1] < 11)) {
+  // Error and exit if less than 20.11
   console.error(
     'Node.js version ' +
       process.version +
       ' detected.\n' +
-      'The Angular CLI requires a minimum Node.js version of v18.19.\n\n' +
+      'The Angular CLI requires a minimum Node.js version of v20.11.\n\n' +
       'Please update your Node.js version or visit https://nodejs.org/ for additional instructions.\n',
   );
 
