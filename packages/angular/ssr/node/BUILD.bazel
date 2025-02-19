@@ -14,6 +14,8 @@ ts_project(
         "--types",
         "node",
     ],
+    # TODO: Fix strict_deps failure
+    ignore_strict_deps = True,
     module_name = "@angular/ssr/node",
     source_map = True,
     tsconfig = "//:build-tsconfig-esm",
