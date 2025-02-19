@@ -3,7 +3,7 @@
 # This file should be checked into version control along with the pnpm-lock.yaml file.
 .npmrc=-1406867100
 modules/testing/builder/package.json=973445093
-package.json=-1605519723
+package.json=930862260
 packages/angular/build/package.json=954937711
 packages/angular/cli/package.json=349838588
 packages/angular/pwa/package.json=-1352285148
