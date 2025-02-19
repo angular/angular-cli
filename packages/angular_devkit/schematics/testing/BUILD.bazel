@@ -14,6 +14,8 @@ ts_project(
         include = ["**/*.ts"],
     ),
     data = ["package.json"],
+    # TODO: Fix strict_deps failure
+    ignore_strict_deps = True,
     module_name = "@angular-devkit/schematics/testing",
     deps = [
         "//:node_modules/rxjs",

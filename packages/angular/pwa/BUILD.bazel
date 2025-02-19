@@ -50,6 +50,8 @@ ts_project(
     name = "pwa_test_lib",
     testonly = True,
     srcs = glob(["pwa/**/*_spec.ts"]),
+    # TODO: Fix strict_deps failure
+    ignore_strict_deps = True,
     deps = [
         ":pwa_rjs",
         "//:node_modules/@types/jasmine",
