@@ -1,6 +1,7 @@
 load("@aspect_rules_js//js:providers.bzl", "JsInfo", "js_info")
 load("@aspect_rules_ts//ts:defs.bzl", _ts_project = "ts_project")
 load("@build_bazel_rules_nodejs//:providers.bzl", "DeclarationInfo", "JSEcmaScriptModuleInfo", "JSModuleInfo", "LinkablePackageInfo")
+load("@devinfra//bazel/ts_project:index.bzl", "strict_deps_test")
 
 def _ts_deps_interop_impl(ctx):
     types = []
@@ -104,6 +105,7 @@ def ts_project(
         tsconfig = None,
         testonly = False,
         visibility = None,
+        ignore_strict_deps = False,
         **kwargs):
     interop_deps = []
 
@@ -143,6 +145,13 @@ def ts_project(
         deps = [":%s_interop_deps" % name] + deps,
         **kwargs
     )
+
+    if not ignore_strict_deps:
+        strict_deps_test(
+            name = "%s_strict_deps_test" % name,
+            srcs = kwargs.get("srcs", []),
+            deps = deps,
+        )
 
     ts_project_module(
         name = name,
