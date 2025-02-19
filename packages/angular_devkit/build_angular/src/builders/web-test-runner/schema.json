@@ -249,6 +249,11 @@
     "webWorkerTsConfig": {
       "type": "string",
       "description": "TypeScript configuration for Web Worker modules."
+    },
+    "aot": {
+      "type": "boolean",
+      "description": "Run tests using Ahead of Time compilation.",
+      "default": false
     }
   },
   "additionalProperties": false,

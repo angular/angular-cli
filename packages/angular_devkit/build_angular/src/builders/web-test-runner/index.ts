@@ -100,7 +100,7 @@ async function buildTests(
         entryPoints,
         tsConfig: options.tsConfig,
         outputPath,
-        aot: false,
+        aot: options.aot,
         index: false,
         outputHashing: OutputHashing.None,
         optimization: false,
