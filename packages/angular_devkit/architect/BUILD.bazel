@@ -82,6 +82,7 @@ ts_project(
         ":architect_rjs",
         ":node_modules/@angular-devkit/core",
         "//:node_modules/@types/jasmine",
+        "//:node_modules/@types/node",
         "//:node_modules/rxjs",
         "//packages/angular_devkit/architect/testing:testing_rjs",
     ],

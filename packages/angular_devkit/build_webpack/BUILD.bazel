@@ -74,6 +74,7 @@ ts_project(
         ":node_modules/@angular-devkit/core",
         ":node_modules/@ngtools/webpack",
         "//:node_modules/@types/jasmine",
+        "//:node_modules/@types/node",
     ],
 )
 
