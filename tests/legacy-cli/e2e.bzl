@@ -94,7 +94,7 @@ def e2e_suites(name, runner, data):
     # Saucelabs tests are only run on the default toolchain
     _e2e_suite(name, runner, "saucelabs", data)
 
-def _e2e_tests(name, runner, **kwargs):
+def _e2e_tests(name, runner, windows_node_repo, **kwargs):
     # Always specify all the npm packages
     args = kwargs.pop("templated_args", []) + [
         "--package $(rootpath %s)" % p
@@ -126,17 +126,24 @@ def _e2e_tests(name, runner, **kwargs):
     toolchains = toolchains + ["@npm//@angular/build-tooling/bazel/browsers/chromium:toolchain_alias"]
     data = data + ["@npm//@angular/build-tooling/bazel/browsers/chromium"]
 
-    windows_node_repo = kwargs.pop("windows_node_repo", None)
     windows_node_files = [
         "@%s//:node_files" % windows_node_repo,
         "@%s//:npm_files" % windows_node_repo,
         "@%s//:bin/npm.cmd" % windows_node_repo,
     ]
 
+    # In Windows native testing mode, add Windows dependencies. Those are not
+    # available by default as we technically execute inside Linux/WSL.
+    toolchains = select({
+        "//e2e/legacy-cli:native_windows_testing": toolchains + [
+            "@org_chromium_chromedriver_windows//:metadata",
+            "@org_chromium_chromium_windows//:metadata",
+        ],
+        "//conditions:default": toolchains,
+    })
     data = select({
-        "@bazel_tools//src/conditions:windows": data + windows_node_files,
-        "//conditions:default": data + windows_node_files,
-        #"//conditions:default": data,
+        "//e2e/legacy-cli:native_windows_testing": data + windows_node_files,
+        "//conditions:default": data,
     })
 
     env.update({

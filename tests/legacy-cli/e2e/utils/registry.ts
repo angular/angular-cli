@@ -25,7 +25,6 @@ export async function createNpmRegistry(
   for await (const events of on(verdaccioServer, 'message', {
     signal: AbortSignal.timeout(30_000),
   })) {
-    console.log('VER:', events);
     if (
       events.some(
         (event: unknown) =>

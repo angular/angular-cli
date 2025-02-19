@@ -4,6 +4,13 @@ import path from 'node:path';
 import child_process from 'node:child_process';
 import { getGlobalVariable } from './env';
 
+/** Cached Windows test mode value, avoiding recomputation. */
+let _cachedWindowsTestMode: WindowsWslTestMode | null | undefined = undefined;
+
+/**
+ * Type describing an object that will hold all relevant information
+ * for supporting native Windows testing through WSL.
+ */
 interface WindowsWslTestMode {
   cmdPath: string;
   gitBinaryDirForWindows: string;
@@ -12,14 +19,28 @@ interface WindowsWslTestMode {
   npmBinaryForWindowsPath: string;
   wslRootPath: string;
   wslUncBase: string;
+  windowsChromedriverPath: string;
+  windowsChromiumPath: string;
 }
 
+/**
+ * Path to a temporary directory inside the Windows host file system.
+ * e.g. `/mnt/c/Users/runner/AppData/Local/Temp`
+ */
 export const windowsTmpDir = process.env['NG_E2E_RUNNER_WINDOWS_TMP_DIR'];
 
+/**
+ * Whether the given path needs to be translated to a Windows native path,
+ * using `wslpath -w`. This is useful when detecting paths in CLI arguments.
+ */
 export function shouldInteropWslPath(p: string): boolean {
   return p.startsWith('/') && fs.existsSync(p);
 }
 
+/**
+ * Translates the given Unix WSL path into a Windows host system path, if
+ * necessary, decided via {@link shouldInteropWslPath}.
+ */
 export function interopWslPathForOutsideIfNecessary(p: string): string {
   const windowsMode = isWindowsTestMode();
   assert(windowsMode !== null);
@@ -38,9 +59,20 @@ export function interopWslPathForOutsideIfNecessary(p: string): string {
   return p;
 }
 
+/**
+ * Gets whether we are currently testing native Windows.
+ *
+ * If so, returns an object exposing relevant information for
+ * supporting such testing mode,
+ */
 export function isWindowsTestMode(): WindowsWslTestMode | null {
+  if (_cachedWindowsTestMode !== undefined) {
+    return _cachedWindowsTestMode;
+  }
+
   const cmdEnv = process.env['NG_E2E_RUNNER_WINDOWS_CMD'];
   if (cmdEnv === undefined) {
+    _cachedWindowsTestMode = null;
     return null;
   }
 
@@ -67,7 +99,7 @@ export function isWindowsTestMode(): WindowsWslTestMode | null {
     'bin/nodejs',
   );
 
-  return {
+  return (_cachedWindowsTestMode = {
     cmdPath: cmdEnv,
     gitBinaryDirForWindows: path.dirname(gitBinaryForWindows),
     // We will copy the Node version outside of WSL because NPM might
@@ -76,13 +108,29 @@ export function isWindowsTestMode(): WindowsWslTestMode | null {
     nodeBinaryForWindowsPath: path.join(npmDir, 'node.exe'),
     nodeBinaryForWindowsInsideWslPath: path.resolve(nodeRepositoryDir, 'node.exe'),
     npmBinaryForWindowsPath: windowsNpmBin,
+    windowsChromedriverPath: path.resolve(
+      bazelTestWorkingDir,
+      `../org_chromium_chromedriver_windows/chromedriver_win32/chromedriver.exe`,
+    ),
+    windowsChromiumPath: path.resolve(
+      bazelTestWorkingDir,
+      `../org_chromium_chromium_windows/chrome-win/chrome.exe`,
+    ),
     wslRootPath,
     wslUncBase,
-  };
+  });
 }
 
 /**
+ * Takes the given process environment and computes a `WSLENV` environment
+ * variable value that allows for the process environment to be usable
+ * within the Windows host environment (e.g. in `cmd.exe`).
  *
+ * By default, WSL does not inherit process environment variables, unless
+ * explicitly specified via the `WSLENV` variable; which is also smart enough
+ * to automatically translate paths of environment variables from Unix to Windows.
+ *
+ * See: https://devblogs.microsoft.com/commandline/share-environment-vars-between-wsl-and-windows/
  */
 export function createWslEnv(env: NodeJS.ProcessEnv): string {
   const result: string[] = [];

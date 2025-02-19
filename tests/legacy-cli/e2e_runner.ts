@@ -12,6 +12,7 @@ import { findFreePort } from './e2e/utils/network';
 import { extractFile } from './e2e/utils/tar';
 import { realpathSync } from 'node:fs';
 import { PkgInfo } from './e2e/utils/packages';
+import { isWindowsTestMode } from './e2e/utils/wsl';
 
 Error.stackTraceLimit = Infinity;
 
@@ -206,15 +207,19 @@ setGlobalVariable('argv', argv);
 setGlobalVariable('package-manager', argv['package-manager']);
 setGlobalVariable('bazel-test-working-dir', process.cwd());
 
+const windowsMode = isWindowsTestMode();
+
 // Use the chrome supplied by bazel or the puppeteer chrome and webdriver-manager driver outside.
 // This is needed by karma-chrome-launcher, protractor etc.
 // https://github.com/karma-runner/karma-chrome-launcher#headless-chromium-with-puppeteer
 //
 // Resolve from relative paths to absolute paths within the bazel runfiles tree
 // so subprocesses spawned in a different working directory can still find them.
-process.env.CHROME_BIN = path.resolve(process.env.CHROME_BIN!);
-process.env.CHROME_PATH = path.resolve(process.env.CHROME_PATH!);
-process.env.CHROMEDRIVER_BIN = path.resolve(process.env.CHROMEDRIVER_BIN!);
+process.env.CHROME_BIN = windowsMode?.windowsChromiumPath ?? path.resolve(process.env.CHROME_BIN!);
+process.env.CHROME_PATH =
+  windowsMode?.windowsChromiumPath ?? path.resolve(process.env.CHROME_PATH!);
+process.env.CHROMEDRIVER_BIN =
+  windowsMode?.windowsChromedriverPath ?? path.resolve(process.env.CHROMEDRIVER_BIN!);
 
 // Find free ports sequentially, reducing the risk of collisions.
 // Note for Windows test mode on CI: Verdaccio runs inside WSL, so we

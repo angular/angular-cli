@@ -19,12 +19,10 @@ export default async function () {
   // Publish packages specified with --package
   await Promise.all(
     packageTars.map(({ path: p }) =>
-      fetch(testRegistry).then(() =>
-        globalNpm(['publish', '--tag', isPrereleaseCli() ? 'next' : 'latest', p], {
-          ...extractNpmEnv(),
-          'NPM_CONFIG_USERCONFIG': npmrc,
-        }),
-      ),
+      globalNpm(['publish', '--tag', isPrereleaseCli() ? 'next' : 'latest', p], {
+        ...extractNpmEnv(),
+        'NPM_CONFIG_USERCONFIG': npmrc,
+      }),
     ),
   );
 }

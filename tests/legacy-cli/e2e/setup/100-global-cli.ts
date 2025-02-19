@@ -21,7 +21,6 @@ export default async function () {
   // Install global Angular CLI being tested, npm+yarn used by e2e tests.
   await globalNpm([
     'install',
-    '-verbose',
     '--global',
     `--registry=${testRegistry}`,
     '@angular/cli',

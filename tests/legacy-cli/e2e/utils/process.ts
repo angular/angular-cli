@@ -45,8 +45,8 @@ function _exec(options: ExecOptions, cmd: string, args: string[]): Promise<Proce
   // https://docs.npmjs.com/cli/v8/configuring-npm/folders#executables.
   // On Linux, macOS platforms, `bin/` is needed.
   const paths = [
-    join(getGlobalVariable('yarn-global'), windowsMode !== null ? '' : 'bin'),
-    join(getGlobalVariable('npm-global'), windowsMode !== null ? '' : 'bin'),
+    join(getGlobalVariable('yarn-global'), windowsMode === null ? 'bin' : ''),
+    join(getGlobalVariable('npm-global'), windowsMode === null ? 'bin' : ''),
     env.PATH || process.env['PATH'],
   ].join(delimiter);
 

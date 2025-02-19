@@ -16,7 +16,12 @@ export default async function () {
   });
 
   // On Windows, `which` might not be available.
-  if (!isWindowsTestMode()) {
+  if (isWindowsTestMode()) {
+    console.log(
+      `Skipping "$(which ng ${getActivePackageManager})" on Windows ` +
+        `as the command may not be available.`,
+    );
+  } else {
     await exec('which', 'ng', getActivePackageManager());
   }
 
