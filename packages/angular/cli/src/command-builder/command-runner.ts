@@ -141,7 +141,7 @@ export async function runCommand(args: string[], logger: logging.Logger): Promis
     .wrap(yargs.terminalWidth())
     .parseAsync();
 
-  return process.exitCode ?? 0;
+  return +(process.exitCode ?? 0);
 }
 
 /**

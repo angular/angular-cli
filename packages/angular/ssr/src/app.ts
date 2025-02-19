@@ -326,17 +326,7 @@ export class AngularServerApp {
         return this.assets.getServerAsset(fileName).text();
       });
 
-      // TODO(alanagius): remove once Node.js version 18 is no longer supported.
-      if (renderMode === RenderMode.Server && typeof crypto === 'undefined') {
-        // eslint-disable-next-line no-console
-        console.error(
-          `The global 'crypto' module is unavailable. ` +
-            `If you are running on Node.js, please ensure you are using version 20 or later, ` +
-            `which includes built-in support for the Web Crypto module.`,
-        );
-      }
-
-      if (renderMode === RenderMode.Server && typeof crypto !== 'undefined') {
+      if (renderMode === RenderMode.Server) {
         // Only cache if we are running in SSR Mode.
         const cacheKey = await sha256(html);
         let htmlWithCriticalCss = this.criticalCssLRUCache.get(cacheKey);

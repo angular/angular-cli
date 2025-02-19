@@ -16,7 +16,7 @@ import { writeErrorToLogFile } from '../../src/utilities/log-file';
 
 export { VERSION } from '../../src/utilities/version';
 
-const MIN_NODEJS_VERSION = [18, 13] as const;
+const MIN_NODEJS_VERSION = [20, 11] as const;
 
 /* eslint-disable no-console */
 export default async function (options: { cliArgs: string[] }) {

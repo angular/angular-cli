@@ -1,5 +1,5 @@
 # Engine versions to stamp in a release package.json
-RELEASE_ENGINES_NODE = "^18.19.1 || ^20.11.1 || >=22.0.0"
+RELEASE_ENGINES_NODE = "^20.11.1 || >=22.0.0"
 RELEASE_ENGINES_NPM = "^6.11.0 || ^7.5.6 || >=8.0.0"
 RELEASE_ENGINES_YARN = ">= 1.13.0"
 
