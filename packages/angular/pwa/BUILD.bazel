@@ -53,6 +53,7 @@ ts_project(
     deps = [
         ":pwa_rjs",
         "//:node_modules/@types/jasmine",
+        "//:node_modules/@types/node",
         "//packages/angular_devkit/schematics/testing:testing_rjs",
     ],
 )

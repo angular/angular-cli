@@ -54,6 +54,7 @@ ts_project(
     data = glob(["src/workspace/json/test/**/*.json"]),
     deps = [
         ":core_rjs",
+        "//:node_modules/@types/node",
         "//:node_modules/rxjs",
         "//packages/angular_devkit/core/node:node_rjs",
     ],

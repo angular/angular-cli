@@ -42,6 +42,7 @@ ts_project(
     deps = [
         ":tools_rjs",
         "//:node_modules/@types/jasmine",
+        "//:node_modules/@types/node",
         "//:node_modules/rxjs",
         "//packages/angular_devkit/schematics:node_modules/@angular-devkit/core",
         "//packages/angular_devkit/schematics:schematics_rjs",

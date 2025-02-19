@@ -80,6 +80,7 @@ ts_project(
     ),
     deps = [
         ":schematics_rjs",
+        "//:node_modules/@types/node",
         "//packages/angular_devkit/schematics/testing:testing_rjs",
     ],
 )
