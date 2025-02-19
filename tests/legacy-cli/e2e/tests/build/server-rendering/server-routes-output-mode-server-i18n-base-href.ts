@@ -4,7 +4,7 @@ import { expectFileToMatch, writeFile } from '../../../utils/fs';
 import { execAndWaitForOutputToMatch, ng, noSilentNg, silentNg } from '../../../utils/process';
 import { langTranslations, setupI18nConfig } from '../../i18n/setup';
 import { findFreePort } from '../../../utils/network';
-import { getGlobalVariable } from '../../../utils/env';
+import { getGlobalVariable, loopbackAddr } from '../../../utils/env';
 import { installWorkspacePackages, uninstallPackage } from '../../../utils/packages';
 import { useSha } from '../../../utils/project';
 
@@ -90,7 +90,7 @@ export default async function () {
   const pathnamesToVerify = ['/ssr', '/ssg'];
   for (const { lang } of langTranslations) {
     for (const pathname of pathnamesToVerify) {
-      const res = await fetch(`http://localhost:${port}/base/${lang}${pathname}`);
+      const res = await fetch(`http://${loopbackAddr}:${port}/base/${lang}${pathname}`);
       const text = await res.text();
 
       assert.match(

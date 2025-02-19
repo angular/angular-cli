@@ -2,7 +2,7 @@ import assert from 'node:assert';
 import { ng } from '../../utils/process';
 import { installWorkspacePackages, uninstallPackage } from '../../utils/packages';
 import { ngServe, useSha } from '../../utils/project';
-import { getGlobalVariable } from '../../utils/env';
+import { getGlobalVariable, loopbackAddr } from '../../utils/env';
 
 export default async function () {
   assert(
@@ -28,7 +28,7 @@ export default async function () {
   await validateResponse('/unknown', /Cannot GET/, 404);
 
   async function validateResponse(pathname: string, match: RegExp, status = 200): Promise<void> {
-    const response = await fetch(new URL(pathname, `http://localhost:${port}`));
+    const response = await fetch(new URL(pathname, `http://${loopbackAddr}:${port}`));
     const text = await response.text();
     assert.match(text, match);
     assert.equal(response.status, status);

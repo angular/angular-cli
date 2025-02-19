@@ -9,7 +9,7 @@ import {
   uninstallPackage,
 } from '../../../utils/packages';
 import { updateJsonFile, useSha } from '../../../utils/project';
-import { getGlobalVariable } from '../../../utils/env';
+import { getGlobalVariable, loopbackAddr } from '../../../utils/env';
 import { findFreePort } from '../../../utils/network';
 import { readFile } from 'node:fs/promises';
 
@@ -126,7 +126,7 @@ export default async function () {
     /Server initialized/,
   );
 
-  const res = await fetch(`http://localhost:${port}/ssr`);
+  const res = await fetch(`http://${loopbackAddr}:${port}/ssr`);
   const text = await res.text();
   assert.match(text, new RegExp('ssr works!'));
 }

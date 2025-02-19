@@ -4,7 +4,7 @@ import { expectFileToMatch, writeFile } from '../../../utils/fs';
 import { execAndWaitForOutputToMatch, ng, noSilentNg, silentNg } from '../../../utils/process';
 import { langTranslations, setupI18nConfig } from '../../i18n/setup';
 import { findFreePort } from '../../../utils/network';
-import { getGlobalVariable } from '../../../utils/env';
+import { getGlobalVariable, loopbackAddr } from '../../../utils/env';
 import { installWorkspacePackages, uninstallPackage } from '../../../utils/packages';
 import { useSha } from '../../../utils/project';
 
@@ -99,7 +99,7 @@ export default async function () {
   // We run the tests twice to ensure that the locale ID is set correctly.
   for (const iteration of [1, 2]) {
     for (const { lang, translation } of langTranslations) {
-      const res = await fetch(`http://localhost:${port}/${lang}${pathname}`);
+      const res = await fetch(`http://${loopbackAddr}:${port}/${lang}${pathname}`);
       const text = await res.text();
 
       for (const match of [`<p id="date">${translation.date}</p>`, `<p id="locale">${lang}</p>`]) {

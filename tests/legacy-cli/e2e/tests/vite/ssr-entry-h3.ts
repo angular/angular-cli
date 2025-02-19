@@ -4,7 +4,7 @@ import { replaceInFile, writeMultipleFiles } from '../../utils/fs';
 import { ng, silentNg, waitForAnyProcessOutputToMatch } from '../../utils/process';
 import { installPackage, installWorkspacePackages, uninstallPackage } from '../../utils/packages';
 import { ngServe, useSha } from '../../utils/project';
-import { getGlobalVariable } from '../../utils/env';
+import { getGlobalVariable, loopbackAddr } from '../../utils/env';
 
 export default async function () {
   assert(
@@ -92,7 +92,7 @@ export default async function () {
   await validateResponse('/home', /yay home works/);
 
   async function validateResponse(pathname: string, match: RegExp): Promise<void> {
-    const response = await fetch(new URL(pathname, `http://localhost:${port}`));
+    const response = await fetch(new URL(pathname, `http://${loopbackAddr}:${port}`));
     const text = await response.text();
     assert.match(text, match);
     assert.equal(response.status, 200);

@@ -6,7 +6,7 @@ import {
 } from '../../utils/process';
 import { installWorkspacePackages, uninstallPackage } from '../../utils/packages';
 import { useSha } from '../../utils/project';
-import { getGlobalVariable } from '../../utils/env';
+import { getGlobalVariable, loopbackAddr } from '../../utils/env';
 import { readFile, writeFile } from '../../utils/fs';
 import { findFreePort } from '../../utils/network';
 
@@ -53,7 +53,7 @@ export default async function () {
   await validateResponse('/', /Hello,/);
 
   async function validateResponse(pathname: string, match: RegExp): Promise<void> {
-    const response = await fetch(new URL(pathname, `http://localhost:${port}`));
+    const response = await fetch(new URL(pathname, `http://${loopbackAddr}:${port}`));
     const text = await response.text();
     assert.match(text, match);
   }

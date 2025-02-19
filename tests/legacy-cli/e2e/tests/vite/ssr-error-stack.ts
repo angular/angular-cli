@@ -3,7 +3,7 @@ import { ng } from '../../utils/process';
 import { appendToFile, rimraf } from '../../utils/fs';
 import { ngServe, useSha } from '../../utils/project';
 import { installWorkspacePackages } from '../../utils/packages';
-import { getGlobalVariable } from '../../utils/env';
+import { getGlobalVariable, loopbackAddr } from '../../utils/env';
 
 export default async function () {
   const useWebpackBuilder = !getGlobalVariable('argv')['esbuild'];
@@ -31,7 +31,7 @@ export default async function () {
   );
 
   const port = await ngServe();
-  const response = await fetch(`http://localhost:${port}/`);
+  const response = await fetch(`http://${loopbackAddr}:${port}/`);
   const text = await response.text();
 
   // The error is also sent in the browser, so we don't need to scrap the stderr.

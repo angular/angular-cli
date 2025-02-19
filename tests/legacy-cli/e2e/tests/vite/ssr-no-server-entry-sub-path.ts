@@ -7,7 +7,7 @@ import {
 } from '../../utils/process';
 import { installWorkspacePackages, uninstallPackage } from '../../utils/packages';
 import { useSha } from '../../utils/project';
-import { getGlobalVariable } from '../../utils/env';
+import { getGlobalVariable, loopbackAddr } from '../../utils/env';
 import { findFreePort } from '../../utils/network';
 import { writeFile } from '../../utils/fs';
 
@@ -46,7 +46,7 @@ export default async function () {
     assert.rejects(
       waitForAnyProcessOutputToMatch(/Pre-transform error: Failed to load url/, 8_000),
     ),
-    fetch(`http://localhost:${port}/sub/home`),
+    fetch(`http://${loopbackAddr}:${port}/sub/home`),
   ]);
 
   assert(response.ok, `Expected 'response.ok' to be 'true'.`);

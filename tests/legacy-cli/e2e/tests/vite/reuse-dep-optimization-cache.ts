@@ -6,6 +6,7 @@ import {
   ng,
   waitForAnyProcessOutputToMatch,
 } from '../../utils/process';
+import { loopbackAddr } from '../../utils/env';
 
 export default async function () {
   await ng('cache', 'clean');
@@ -22,7 +23,7 @@ export default async function () {
 
   const [, response] = await Promise.all([
     waitForAnyProcessOutputToMatch(/dependencies optimized/, 10_000),
-    fetch(`http://localhost:${port}/main.js`),
+    fetch(`http://${loopbackAddr}:${port}/main.js`),
   ]);
 
   assert(response.ok, `Expected 'response.ok' to be 'true'.`);

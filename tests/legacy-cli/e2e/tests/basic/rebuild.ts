@@ -1,5 +1,5 @@
 import { setTimeout } from 'node:timers/promises';
-import { getGlobalVariable } from '../../utils/env';
+import { getGlobalVariable, loopbackAddr } from '../../utils/env';
 import { appendToFile, replaceInFile, writeMultipleFiles } from '../../utils/fs';
 import { silentNg, waitForAnyProcessOutputToMatch } from '../../utils/process';
 import { ngServe } from '../../utils/project';
@@ -66,9 +66,7 @@ export default async function () {
     }),
   ]);
   {
-    console.error(`http://localhost:${port}/main.js`);
-    // await setTimeout(1000 * 60 * 20);
-    const response = await fetch(`http://localhost:${port}/main.js`);
+    const response = await fetch(`http://${loopbackAddr}:${port}/main.js`);
     const body = await response.text();
     if (!body.match(/\$\$_E2E_GOLDEN_VALUE_1/)) {
       throw new Error('Expected golden value 1.');
@@ -90,7 +88,7 @@ export default async function () {
   ]);
 
   {
-    const response = await fetch(`http://localhost:${port}/main.js`);
+    const response = await fetch(`http://${loopbackAddr}:${port}/main.js`);
     const body = await response.text();
     if (!body.match(/testingTESTING123/)) {
       throw new Error('Expected component HTML to update.');
@@ -106,7 +104,7 @@ export default async function () {
   ]);
 
   {
-    const response = await fetch(`http://localhost:${port}/main.js`);
+    const response = await fetch(`http://${loopbackAddr}:${port}/main.js`);
     const body = await response.text();
     if (!body.match(/color:\s?blue/)) {
       throw new Error('Expected component CSS to update.');
@@ -122,7 +120,7 @@ export default async function () {
   ]);
 
   {
-    const response = await fetch(`http://localhost:${port}/styles.css`);
+    const response = await fetch(`http://${loopbackAddr}:${port}/styles.css`);
     const body = await response.text();
     if (!body.match(/color:\s?green/)) {
       throw new Error('Expected global CSS to update.');

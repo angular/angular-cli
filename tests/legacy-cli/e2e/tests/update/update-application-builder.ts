@@ -8,6 +8,7 @@ import {
 } from '../../utils/fs';
 import { execAndWaitForOutputToMatch, ng, noSilentNg } from '../../utils/process';
 import { findFreePort } from '../../utils/network';
+import { loopbackAddr } from '../../utils/env';
 
 export default async function () {
   await createProjectFromAsset('19-ssr-project-webpack', false, false);
@@ -30,7 +31,7 @@ export default async function () {
   // Verify that the app runs
   const port = await findFreePort();
   await execAndWaitForOutputToMatch('ng', ['serve', '--port', String(port)], /complete\./);
-  const response = await fetch(`http://localhost:${port}/`);
+  const response = await fetch(`http://${loopbackAddr}:${port}/`);
   const text = await response.text();
   match(text, /app is running!/);
 }

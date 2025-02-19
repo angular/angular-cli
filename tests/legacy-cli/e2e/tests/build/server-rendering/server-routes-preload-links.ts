@@ -3,7 +3,7 @@ import { replaceInFile, writeMultipleFiles } from '../../../utils/fs';
 import { execAndWaitForOutputToMatch, ng, noSilentNg, silentNg } from '../../../utils/process';
 import { installWorkspacePackages, uninstallPackage } from '../../../utils/packages';
 import { ngServe, updateJsonFile, useSha } from '../../../utils/project';
-import { getGlobalVariable } from '../../../utils/env';
+import { getGlobalVariable, loopbackAddr } from '../../../utils/env';
 import { findFreePort } from '../../../utils/network';
 
 export default async function () {
@@ -186,7 +186,7 @@ const RESPONSE_EXPECTS: Record<
 
 async function runTests(port: number): Promise<void> {
   for (const [pathname, { matches, notMatches }] of Object.entries(RESPONSE_EXPECTS)) {
-    const res = await fetch(`http://localhost:${port}${pathname}`);
+    const res = await fetch(`http://${loopbackAddr}:${port}${pathname}`);
     const text = await res.text();
 
     for (const match of matches) {
@@ -194,7 +194,7 @@ async function runTests(port: number): Promise<void> {
 
       // Ensure that the url is correct and it's a 200.
       const link = text.match(match)?.[1];
-      const preloadRes = await fetch(`http://localhost:${port}/${link}`);
+      const preloadRes = await fetch(`http://${loopbackAddr}:${port}/${link}`);
       assert.equal(preloadRes.status, 200);
     }
 

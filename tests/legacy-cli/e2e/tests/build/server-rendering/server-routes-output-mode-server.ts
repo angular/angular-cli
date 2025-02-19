@@ -5,7 +5,7 @@ import { expectFileToMatch, readFile, replaceInFile, writeFile } from '../../../
 import { execAndWaitForOutputToMatch, ng, noSilentNg, silentNg } from '../../../utils/process';
 import { installWorkspacePackages, uninstallPackage } from '../../../utils/packages';
 import { useSha } from '../../../utils/project';
-import { getGlobalVariable } from '../../../utils/env';
+import { getGlobalVariable, loopbackAddr } from '../../../utils/env';
 import { findFreePort } from '../../../utils/network';
 
 export default async function () {
@@ -172,7 +172,7 @@ export default async function () {
   const port = await spawnServer();
   for (const [pathname, { content, headers, serverContext }] of Object.entries(responseExpects)) {
     // NOTE: A global 'UND_ERR_SOCKET' may occur due to an incorrect Content-Length header value.
-    const res = await fetch(`http://localhost:${port}${pathname}`);
+    const res = await fetch(`http://${loopbackAddr}:${port}${pathname}`);
     const text = await res.text();
 
     assert.match(

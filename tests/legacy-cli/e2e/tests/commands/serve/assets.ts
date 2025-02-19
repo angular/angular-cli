@@ -2,7 +2,7 @@ import assert from 'node:assert';
 import { randomUUID } from 'node:crypto';
 import { mkdir, rm, writeFile } from 'node:fs/promises';
 import { ngServe, updateJsonFile } from '../../../utils/project';
-import { getGlobalVariable } from '../../../utils/env';
+import { getGlobalVariable, loopbackAddr } from '../../../utils/env';
 
 export default async function () {
   const outsideDirectoryName = `../outside-${randomUUID()}`;
@@ -22,15 +22,15 @@ export default async function () {
 
     const port = await ngServe();
 
-    let response = await fetch(`http://localhost:${port}/favicon.ico`);
+    let response = await fetch(`http://${loopbackAddr}:${port}/favicon.ico`);
     assert.strictEqual(response.status, 200, 'favicon.ico response should be ok');
 
-    response = await fetch(`http://localhost:${port}/outside/some-asset.xyz`);
+    response = await fetch(`http://${loopbackAddr}:${port}/outside/some-asset.xyz`);
     assert.strictEqual(response.status, 200, 'outside/some-asset.xyz response should be ok');
     assert.strictEqual(await response.text(), 'XYZ', 'outside/some-asset.xyz content is wrong');
 
     // A non-existent HTML file request with accept header should fallback to the index HTML
-    response = await fetch(`http://localhost:${port}/does-not-exist.html`, {
+    response = await fetch(`http://${loopbackAddr}:${port}/does-not-exist.html`, {
       headers: { accept: 'text/html' },
     });
     assert.strictEqual(
@@ -51,7 +51,7 @@ export default async function () {
     }
 
     // A non-existent file without an html accept header should not be found.
-    response = await fetch(`http://localhost:${port}/does-not-exist.png`);
+    response = await fetch(`http://${loopbackAddr}:${port}/does-not-exist.png`);
     assert.strictEqual(response.status, 404, 'non-existent file response should be not found');
   } finally {
     await rm(outsideDirectoryName, { force: true, recursive: true });

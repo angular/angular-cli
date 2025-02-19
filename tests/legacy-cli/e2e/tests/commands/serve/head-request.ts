@@ -1,15 +1,16 @@
+import { loopbackAddr } from '../../../utils/env';
 import { ngServe } from '../../../utils/project';
 
 export default async function () {
   const port = await ngServe();
   // HTML
-  await checkHeadForUrl(`http://localhost:${port}/index.html`);
+  await checkHeadForUrl(`http://${loopbackAddr}:${port}/index.html`);
   // Generated JS
-  await checkHeadForUrl(`http://localhost:${port}/main.js`);
+  await checkHeadForUrl(`http://${loopbackAddr}:${port}/main.js`);
   // Generated CSS
-  await checkHeadForUrl(`http://localhost:${port}/styles.css`);
+  await checkHeadForUrl(`http://${loopbackAddr}:${port}/styles.css`);
   // Configured asset
-  await checkHeadForUrl(`http://localhost:${port}/favicon.ico`);
+  await checkHeadForUrl(`http://${loopbackAddr}:${port}/favicon.ico`);
 }
 
 async function checkHeadForUrl(url: string): Promise<void> {

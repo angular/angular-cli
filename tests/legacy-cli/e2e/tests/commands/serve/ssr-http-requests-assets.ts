@@ -4,7 +4,7 @@ import { killAllProcesses, ng } from '../../../utils/process';
 import { rimraf, writeMultipleFiles } from '../../../utils/fs';
 import { installWorkspacePackages } from '../../../utils/packages';
 import { ngServe, useSha } from '../../../utils/project';
-import { getGlobalVariable } from '../../../utils/env';
+import { getGlobalVariable, loopbackAddr } from '../../../utils/env';
 
 export default async function () {
   const useWebpackBuilder = !getGlobalVariable('argv')['esbuild'];
@@ -75,14 +75,14 @@ export default async function () {
   await ng('generate', 'component', 'home');
   const match = /<p>{[\S\s]*"dataFromAssets":[\s\S]*true[\S\s]*}<\/p>/;
   const port = await ngServe('--no-ssl');
-  assert.match(await (await fetch(`http://localhost:${port}/`)).text(), match);
+  assert.match(await (await fetch(`http://${loopbackAddr}:${port}/`)).text(), match);
 
   await killAllProcesses();
 
   try {
     process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
     const sslPort = await ngServe('--ssl');
-    assert.match(await (await fetch(`https://localhost:${sslPort}/`)).text(), match);
+    assert.match(await (await fetch(`https://${loopbackAddr}:${sslPort}/`)).text(), match);
   } finally {
     process.env.NODE_TLS_REJECT_UNAUTHORIZED = '1';
   }
