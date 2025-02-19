@@ -35,6 +35,7 @@ ts_project(
     deps = [
         ":node_rjs",
         "//:node_modules/@types/jasmine",
+        "//:node_modules/@types/node",
         "//:node_modules/rxjs",
         "//packages/angular_devkit/architect:architect_rjs",
         "//packages/angular_devkit/architect/node/test:test_lib_rjs",
