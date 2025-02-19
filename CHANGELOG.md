@@ -1,3 +1,29 @@
+<a name="19.1.8"></a>
+
+# 19.1.8 (2025-02-19)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                                                |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------------------- |
+| [f76cee637](https://github.com/angular/angular-cli/commit/f76cee6378d1fb103a47c4c9006df344029491c9) | fix  | correctly parse and resolve relative schematic collection names on Windows |
+| [ceba7739c](https://github.com/angular/angular-cli/commit/ceba7739cc72835d080a3c2246209a635212a607) | fix  | prefer installed package as fallback when listing package groups           |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                   |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------- |
+| [c54b9996a](https://github.com/angular/angular-cli/commit/c54b9996adb23ebc0a5e1e159ac4a9b54cbf2f1a) | fix  | pass missing options to Karma esbuild builder |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                               |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------- |
+| [2f60a24dd](https://github.com/angular/angular-cli/commit/2f60a24dd76b3345aef666e7a84099863349c53e) | fix  | suppress asset missing warning for `/index.html` requests |
+| [b8f7952b7](https://github.com/angular/angular-cli/commit/b8f7952b783a83649364107c78f0fb87ac7b3cf3) | fix  | update critical CSS inlining to support `autoCsp`         |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="19.1.7"></a>
 
 # 19.1.7 (2025-02-12)
