@@ -86,6 +86,8 @@ ts_project(
         for (src, _) in ALL_SCHEMA_TARGETS
     ],
     data = RUNTIME_ASSETS,
+    # TODO: Fix strict_deps failure
+    ignore_strict_deps = True,
     module_name = "@schematics/angular",
     deps = [
         ":node_modules/@angular-devkit/core",

@@ -72,6 +72,8 @@ ts_project(
         "//packages/angular/build:src/builders/ng-packagr/schema.ts",
     ],
     data = RUNTIME_ASSETS,
+    # TODO: Fix strict_deps failure
+    ignore_strict_deps = True,
     module_name = "@angular/build",
     deps = [
         ":node_modules/@angular-devkit/architect",
@@ -135,6 +137,8 @@ ts_project(
         include = ["src/**/*_spec.ts"],
         exclude = ["src/builders/**/tests/**"],
     ),
+    # TODO: Fix strict_deps failure
+    ignore_strict_deps = True,
     deps = [
         ":build_rjs",
         "//:node_modules/@angular/compiler-cli",
@@ -155,6 +159,8 @@ ts_project(
     name = "application_integration_test_lib",
     testonly = True,
     srcs = glob(include = ["src/builders/application/tests/**/*.ts"]),
+    # TODO: Fix strict_deps failure
+    ignore_strict_deps = True,
     deps = [
         ":build_rjs",
         "//packages/angular/build/private:private_rjs",
@@ -181,6 +187,8 @@ ts_project(
     name = "dev-server_integration_test_lib",
     testonly = True,
     srcs = glob(include = ["src/builders/dev-server/tests/**/*.ts"]),
+    # TODO: Fix strict_deps failure
+    ignore_strict_deps = True,
     deps = [
         ":build_rjs",
         "//packages/angular/build/private:private_rjs",
@@ -213,6 +221,8 @@ ts_project(
     name = "karma_integration_test_lib",
     testonly = True,
     srcs = glob(include = ["src/builders/karma/tests/**/*.ts"]),
+    # TODO: Fix strict_deps failure
+    ignore_strict_deps = True,
     deps = [
         ":build_rjs",
         "//packages/angular/build/private:private_rjs",

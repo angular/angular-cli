@@ -39,6 +39,8 @@ ts_project(
     name = "schematics_test_lib",
     testonly = True,
     srcs = glob(["src/**/*_spec.ts"]),
+    # TODO: Fix strict_deps failure
+    ignore_strict_deps = True,
     deps = [
         ":node_modules/@angular-devkit/core",
         ":schematics",

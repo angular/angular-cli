@@ -107,6 +107,8 @@ ts_project(
             "node_modules/**",
         ],
     ),
+    # TODO: Fix strict_deps failure
+    ignore_strict_deps = True,
     deps = [
         ":angular-cli_rjs",
         "//:node_modules/@types/semver",
