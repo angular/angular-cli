@@ -58,6 +58,24 @@ describe('Config Schematic', () => {
       expect(tree.exists('projects/foo/karma.conf.js')).toBeTrue();
     });
 
+    it('should include devkit karma plugin by default', async () => {
+      const tree = await runConfigSchematic(ConfigType.Karma);
+      const karmaConf = tree.readText('projects/foo/karma.conf.js');
+      expect(karmaConf).toContain(`'@angular-devkit/build-angular'`);
+    });
+
+    it('should not include devkit karma plugin with angular/build:karma is used', async () => {
+      applicationTree.overwrite(
+        'angular.json',
+        applicationTree
+          .readText('angular.json')
+          .replace('@angular-devkit/build-angular:karma', '@angular/build:karma'),
+      );
+      const tree = await runConfigSchematic(ConfigType.Karma);
+      const karmaConf = tree.readText('projects/foo/karma.conf.js');
+      expect(karmaConf).not.toContain(`'@angular-devkit/build-angular'`);
+    });
+
     it('should set the right coverage folder', async () => {
       const tree = await runConfigSchematic(ConfigType.Karma);
       const karmaConf = tree.readText('projects/foo/karma.conf.js');
