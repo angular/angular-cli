@@ -16,3 +16,4 @@ packages/angular_devkit/schematics_cli/node_modules
 packages/ngtools/webpack/node_modules
 packages/schematics/angular/node_modules
 modules/testing/builder/node_modules
+tests/node_modules
