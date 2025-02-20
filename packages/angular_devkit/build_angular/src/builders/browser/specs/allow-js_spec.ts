@@ -7,10 +7,11 @@
  */
 
 import { Architect } from '@angular-devkit/architect';
-import { BrowserBuilderOutput } from '@angular-devkit/build-angular';
+
 import { join, normalize, relative, virtualFs } from '@angular-devkit/core';
 import { Observable, lastValueFrom, take, tap } from 'rxjs';
 import { createArchitect, host } from '../../../testing/test-utils';
+import { BrowserBuilderOutput } from '../index';
 
 describe('Browser Builder allow js', () => {
   const targetSpec = { project: 'app', target: 'build' };

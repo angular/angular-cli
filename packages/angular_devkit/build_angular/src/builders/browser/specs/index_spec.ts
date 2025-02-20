@@ -7,10 +7,10 @@
  */
 
 import { Architect } from '@angular-devkit/architect';
-import { BrowserBuilderOutput } from '@angular-devkit/build-angular';
 import { join, normalize, tags, virtualFs, workspaces } from '@angular-devkit/core';
 import { lastValueFrom } from 'rxjs';
 import { createArchitect, host } from '../../../testing/test-utils';
+import { BrowserBuilderOutput } from '../index';
 
 describe('Browser Builder index HTML processing', () => {
   const targetSpec = { project: 'app', target: 'build' };
