@@ -41,6 +41,9 @@ export default async function () {
           namedChunks: true,
           buildOptimizer: false,
         };
+
+        const serve = json['projects']['subdirectory-test-project']['architect']['serve'];
+        serve.builder = '@angular-devkit/build-angular:dev-server';
       });
     }
 

@@ -39,6 +39,9 @@ export default async function () {
     };
 
     build.options.aot = false;
+
+    const serve = json['projects']['test-project-two']['architect']['serve'];
+    serve.builder = '@angular-devkit/build-angular:dev-server';
   });
   // Test it works
   await ng('e2e', 'test-project-two', '--configuration=production');

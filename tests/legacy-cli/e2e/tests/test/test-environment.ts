@@ -33,8 +33,8 @@ export default function () {
             production: {
               fileReplacements: [
                 {
-                  src: 'src/environment.ts',
-                  replaceWith: 'src/environment.prod.ts',
+                  replace: 'src/environment.ts',
+                  with: 'src/environment.prod.ts',
                 },
               ],
             },
