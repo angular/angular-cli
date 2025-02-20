@@ -122,7 +122,10 @@ export default function (options: ServiceWorkerOptions): Rule {
     let browserEntryPoint: string | undefined;
     const ngswConfigPath = join(normalize(project.root), 'ngsw-config.json');
 
-    if (buildTarget.builder === Builders.Application) {
+    if (
+      buildTarget.builder === Builders.Application ||
+      buildTarget.builder === Builders.BuildApplication
+    ) {
       browserEntryPoint = buildOptions.browser as string;
       const productionConf = buildTarget.configurations?.production;
       if (productionConf) {

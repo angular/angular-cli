@@ -67,9 +67,13 @@ function addKarmaConfig(options: ConfigOptions): Rule {
       );
     }
 
-    if (testTarget.builder !== AngularBuilder.Karma) {
+    if (
+      testTarget.builder !== AngularBuilder.Karma &&
+      testTarget.builder !== AngularBuilder.BuildKarma
+    ) {
       throw new SchematicsException(
-        `Cannot add a karma configuration as builder for "test" target in project does not use "${AngularBuilder.Karma}".`,
+        `Cannot add a karma configuration as builder for "test" target in project does not` +
+          ` use "${AngularBuilder.Karma}" or "${AngularBuilder.BuildKarma}".`,
       );
     }
 
@@ -88,6 +92,7 @@ function addKarmaConfig(options: ConfigOptions): Rule {
         applyTemplates({
           relativePathToWorkspaceRoot: relativePathToWorkspaceRoot(project.root),
           folderName,
+          needDevkitPlugin: testTarget.builder === AngularBuilder.Karma,
         }),
         move(project.root),
       ]),
