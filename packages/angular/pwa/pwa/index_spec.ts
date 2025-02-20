@@ -169,4 +169,44 @@ describe('PWA Schematic', () => {
       expect(swFlag).toBeTrue();
     });
   });
+
+  describe('@angular-devkit/build-angular:application builder', () => {
+    beforeEach(() => {
+      const config = JSON.parse(appTree.readContent('/angular.json'));
+      const build = config.projects.bar.architect.build;
+
+      build.builder = '@angular-devkit/build-angular:application';
+
+      appTree.overwrite('/angular.json', JSON.stringify(config, undefined, 2));
+    });
+
+    it('should run the service worker schematic', async () => {
+      const tree = await schematicRunner.runSchematic('ng-add', defaultOptions, appTree);
+      const configText = tree.readContent('/angular.json');
+      const config = JSON.parse(configText);
+      const swFlag = config.projects.bar.architect.build.configurations.production.serviceWorker;
+
+      expect(swFlag).toBe('projects/bar/ngsw-config.json');
+    });
+  });
+
+  describe('@angular/build:application builder', () => {
+    beforeEach(() => {
+      const config = JSON.parse(appTree.readContent('/angular.json'));
+      const build = config.projects.bar.architect.build;
+
+      build.builder = '@angular/build:application';
+
+      appTree.overwrite('/angular.json', JSON.stringify(config, undefined, 2));
+    });
+
+    it('should run the service worker schematic', async () => {
+      const tree = await schematicRunner.runSchematic('ng-add', defaultOptions, appTree);
+      const configText = tree.readContent('/angular.json');
+      const config = JSON.parse(configText);
+      const swFlag = config.projects.bar.architect.build.configurations.production.serviceWorker;
+
+      expect(swFlag).toBe('projects/bar/ngsw-config.json');
+    });
+  });
 });
