@@ -9,7 +9,10 @@
 import { Schema } from '../schema';
 import { BuilderHandlerFn } from '@angular-devkit/architect';
 import { json } from '@angular-devkit/core';
-import { ApplicationBuilderOptions as ApplicationSchema, buildApplication } from '@angular/build';
+import {
+  ApplicationBuilderOptions as ApplicationSchema,
+  buildApplication,
+} from '../../../builders/application';
 import * as path from 'node:path';
 import { readFileSync } from 'node:fs';
 import {

@@ -10,7 +10,10 @@ import { json } from '@angular-devkit/core';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { BuilderHarness } from '../../../../../../../modules/testing/builder/src';
-import { ApplicationBuilderOptions as AppilicationSchema, buildApplication } from '@angular/build';
+import {
+  ApplicationBuilderOptions as AppilicationSchema,
+  buildApplication,
+} from '../../../builders/application';
 import { Schema } from '../schema';
 
 // TODO: Consider using package.json imports field instead of relative path
