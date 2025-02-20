@@ -72,8 +72,6 @@ ts_project(
         "//packages/angular/build:src/builders/ng-packagr/schema.ts",
     ],
     data = RUNTIME_ASSETS,
-    # TODO: Fix strict_deps failure
-    ignore_strict_deps = True,
     module_name = "@angular/build",
     deps = [
         ":node_modules/@angular-devkit/architect",
@@ -137,10 +135,9 @@ ts_project(
         include = ["src/**/*_spec.ts"],
         exclude = ["src/builders/**/tests/**"],
     ),
-    # TODO: Fix strict_deps failure
-    ignore_strict_deps = True,
     deps = [
         ":build_rjs",
+        ":node_modules/@angular-devkit/core",
         "//:node_modules/@angular/compiler-cli",
         "//:node_modules/@babel/core",
         "//:node_modules/@types/jasmine",
@@ -159,13 +156,12 @@ ts_project(
     name = "application_integration_test_lib",
     testonly = True,
     srcs = glob(include = ["src/builders/application/tests/**/*.ts"]),
-    # TODO: Fix strict_deps failure
-    ignore_strict_deps = True,
     deps = [
         ":build_rjs",
         "//packages/angular/build/private:private_rjs",
         "//modules/testing/builder:builder_rjs",
         ":node_modules/@angular-devkit/architect",
+        ":node_modules/@angular-devkit/core",
 
         # Base dependencies for the application in hello-world-app.
         "//:node_modules/@angular/common",
@@ -187,16 +183,16 @@ ts_project(
     name = "dev-server_integration_test_lib",
     testonly = True,
     srcs = glob(include = ["src/builders/dev-server/tests/**/*.ts"]),
-    # TODO: Fix strict_deps failure
-    ignore_strict_deps = True,
     deps = [
         ":build_rjs",
         "//packages/angular/build/private:private_rjs",
         "//modules/testing/builder:builder_rjs",
         ":node_modules/@angular-devkit/architect",
+        ":node_modules/@angular-devkit/core",
 
         # dev server only test deps
         "//:node_modules/@types/http-proxy",
+        "//:node_modules/@types/node",
         "//:node_modules/http-proxy",
         "//:node_modules/puppeteer",
 
