@@ -7,8 +7,10 @@
  */
 
 import { Rule, SchematicsException, chain } from '@angular-devkit/schematics';
-import { AngularBuilder, TargetDefinition, updateWorkspace } from '@schematics/angular/utility';
+// TODO: Determine if Builders still needs to be imported as AngularBuilder.
 import { posix as path } from 'node:path';
+import { TargetDefinition, updateWorkspace } from '../utility/workspace';
+import { Builders as AngularBuilder } from '../utility/workspace-models';
 import { Schema as EnvironmentOptions } from './schema';
 
 const ENVIRONMENTS_DIRECTORY = 'environments';

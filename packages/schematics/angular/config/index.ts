@@ -17,9 +17,12 @@ import {
   strings,
   url,
 } from '@angular-devkit/schematics';
-import { AngularBuilder, readWorkspace, updateWorkspace } from '@schematics/angular/utility';
 import { posix as path } from 'node:path';
 import { relativePathToWorkspaceRoot } from '../utility/paths';
+// TODO: Determine if getWorkspace still needs to be imported as readWorkspace.
+import { getWorkspace as readWorkspace, updateWorkspace } from '../utility/workspace';
+// TODO: Determine if Builders still needs to be imported as AngularBuilder.
+import { Builders as AngularBuilder } from '../utility/workspace-models';
 import { Schema as ConfigOptions, Type as ConfigType } from './schema';
 
 export default function (options: ConfigOptions): Rule {
