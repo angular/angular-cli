@@ -6,14 +6,6 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import {
-  ApplicationBuilderInternalOptions,
-  Result,
-  ResultFile,
-  ResultKind,
-  buildApplicationInternal,
-  emitFilesToDisk,
-} from '@angular/build/private';
 import type { BuilderContext, BuilderOutput } from '@angular-devkit/architect';
 import glob from 'fast-glob';
 import type { Config, ConfigOptions, FilePattern, InlinePluginDef, Server } from 'karma';
@@ -24,6 +16,10 @@ import { createRequire } from 'node:module';
 import * as path from 'node:path';
 import { ReadableStreamController } from 'node:stream/web';
 import { BuildOutputFileType } from '../../tools/esbuild/bundler-context';
+import { emitFilesToDisk } from '../../tools/esbuild/utils';
+import { buildApplicationInternal } from '../application/index';
+import { ApplicationBuilderInternalOptions } from '../application/options';
+import { Result, ResultFile, ResultKind } from '../application/results';
 import { OutputHashing } from '../application/schema';
 import { findTests, getTestEntrypoints } from './find-tests';
 import { Schema as KarmaBuilderOptions } from './schema';
