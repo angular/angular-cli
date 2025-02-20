@@ -187,6 +187,7 @@ npm_translate_lock(
         "//packages/angular_devkit/schematics_cli:package.json",
         "//packages/ngtools/webpack:package.json",
         "//packages/schematics/angular:package.json",
+        "//tests:package.json",
     ],
     lifecycle_hooks_envs = {
         # TODO: Standardize browser management for `rules_js`
