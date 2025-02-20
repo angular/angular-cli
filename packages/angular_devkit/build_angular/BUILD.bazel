@@ -127,8 +127,6 @@ ts_project(
         "//packages/angular_devkit/build_angular:src/builders/web-test-runner/schema.ts",
     ],
     data = RUNTIME_ASSETS,
-    # TODO: Fix strict_deps failure
-    ignore_strict_deps = True,
     module_name = "@angular-devkit/build-angular",
     deps = [
         ":node_modules/@angular-devkit/architect",
@@ -170,6 +168,7 @@ ts_project(
         "//:node_modules/ansi-colors",
         "//:node_modules/autoprefixer",
         "//:node_modules/babel-loader",
+        "//:node_modules/browser-sync",
         "//:node_modules/browserslist",
         "//:node_modules/copy-webpack-plugin",
         "//:node_modules/css-loader",
@@ -225,11 +224,10 @@ ts_project(
     data = [
         "//packages/angular_devkit/build_angular/test/hello-world-lib",
     ],
-    # TODO: Fix strict_deps failure
-    ignore_strict_deps = True,
     deps = [
         ":build_angular_rjs",
         ":build_angular_test_utils_rjs",
+        "//:node_modules/@types/node",
         "//:node_modules/fast-glob",
         "//:node_modules/prettier",
         "//:node_modules/typescript",
@@ -298,52 +296,40 @@ ts_project(
     data = [
         "//packages/angular_devkit/build_angular/test/hello-world-lib",
     ],
-    # TODO: Fix strict_deps failure
-    ignore_strict_deps = True,
     deps = [
         ":build_angular_rjs",
+        ":node_modules/@angular-devkit/architect",
+        ":node_modules/@angular-devkit/core",
+        ":node_modules/@angular/build",
         "//:node_modules/@types/jasmine",
+        "//:node_modules/@types/node",
+        "//:node_modules/rxjs",
         "//modules/testing/builder:builder_rjs",
-        "//packages/angular/build:build_rjs",
-        "//packages/angular/build/private:private_rjs",
-        "//packages/angular_devkit/architect:architect_rjs",
-        "//packages/angular_devkit/architect/node:node_rjs",
-        "//packages/angular_devkit/architect/testing:testing_rjs",
-        "//packages/angular_devkit/core:core_rjs",
-        "//packages/angular_devkit/core/node:node_rjs",
     ],
 )
 
 LARGE_SPECS = {
-    "app-shell": {
-        # TODO: Fix strict_deps failure
-        "ignore_strict_deps": True,
-    },
+    "app-shell": {},
     "dev-server": {
-        # TODO: Fix strict_deps failure
-        "ignore_strict_deps": True,
         "shards": 10,
         "size": "large",
         "flaky": True,
         "extra_deps": [
-            "//packages/angular_devkit/build_webpack:build_webpack_rjs",
+            ":build_angular",
             "//:node_modules/@types/http-proxy",
+            "//:node_modules/@types/node",
             "//:node_modules/http-proxy",
             "//:node_modules/puppeteer",
             "//:node_modules/undici",
         ],
     },
-    "extract-i18n": {
-        # TODO: Fix strict_deps failure
-        "ignore_strict_deps": True,
-    },
+    "extract-i18n": {},
     "karma": {
-        # TODO: Fix strict_deps failure
-        "ignore_strict_deps": True,
         "shards": 6,
         "size": "large",
         "flaky": True,
         "extra_deps": [
+            "//:node_modules/@types/node",
             "//:node_modules/karma",
             "//:node_modules/karma-chrome-launcher",
             "//:node_modules/karma-coverage",
@@ -354,8 +340,6 @@ LARGE_SPECS = {
         ],
     },
     "protractor": {
-        # TODO: Fix strict_deps failure
-        "ignore_strict_deps": True,
         "extra_deps": [
             "//:node_modules/jasmine-spec-reporter",
             "//:node_modules/protractor",
@@ -368,39 +352,29 @@ LARGE_SPECS = {
         "shards": 1,
     },
     "server": {
-        # TODO: Fix strict_deps failure
-        "ignore_strict_deps": True,
         "size": "large",
         "extra_deps": [
             "//:node_modules/@angular/animations",
         ],
     },
-    "ng-packagr": {
-        # TODO: Fix strict_deps failure
-        "ignore_strict_deps": True,
-    },
+    "ng-packagr": {},
     "browser": {
-        # TODO: Fix strict_deps failure
-        "ignore_strict_deps": True,
         "shards": 10,
         "size": "large",
         "flaky": True,
         "extra_deps": [
+            "//:node_modules/@types/node",
             "//:node_modules/@angular/animations",
             "//:node_modules/@angular/material",
         ],
     },
-    "prerender": {
-        # TODO: Fix strict_deps failure
-        "ignore_strict_deps": True,
-    },
+    "prerender": {},
     "browser-esbuild": {},
     "ssr-dev-server": {
-        # TODO: Fix strict_deps failure
-        "ignore_strict_deps": True,
         "extra_deps": [
-            "//packages/angular/ssr/node:node_rjs",
+            ":node_modules/@angular/ssr",
             "//:node_modules/@types/browser-sync",
+            "//:node_modules/@types/node",
             "//:node_modules/browser-sync",
             "//:node_modules/express",
             "//:node_modules/undici",
@@ -413,19 +387,15 @@ LARGE_SPECS = {
         name = "build_angular_" + spec + "_test_lib",
         testonly = True,
         srcs = glob(["src/builders/" + spec + "/**/*_spec.ts"]),
-        ignore_strict_deps = LARGE_SPECS[spec].get("ignore_strict_deps", False),
         deps = [
             # Dependencies needed to compile and run the specs themselves.
             ":build_angular_rjs",
-            "//packages/angular_devkit/core:core_rjs",
-            "//packages/angular_devkit/core/node:node_rjs",
-            "//modules/testing/builder:builder_rjs",
             ":build_angular_test_utils_rjs",
-            "//packages/angular/build:build_rjs",
-            "//packages/angular/build/private:private_rjs",
-            "//packages/angular_devkit/architect:architect_rjs",
-            "//packages/angular_devkit/architect/node:node_rjs",
-            "//packages/angular_devkit/architect/testing:testing_rjs",
+            ":node_modules/@angular/build",
+            ":node_modules/@angular-devkit/architect",
+            ":node_modules/@angular-devkit/core",
+            ":node_modules/@angular-devkit/build-webpack",
+            "//modules/testing/builder:builder_rjs",
 
             # Base dependencies for the application in hello-world-app.
             # Some tests also require extra dependencies.

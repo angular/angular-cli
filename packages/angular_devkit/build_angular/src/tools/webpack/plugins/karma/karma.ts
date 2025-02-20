@@ -8,8 +8,8 @@
 
 /* eslint-disable */
 // TODO: cleanup this file, it's copied as is from Angular CLI.
-import * as http from 'http';
-import * as path from 'path';
+import * as http from 'node:http';
+import * as path from 'node:path';
 import webpack from 'webpack';
 import webpackDevMiddleware from 'webpack-dev-middleware';
 
