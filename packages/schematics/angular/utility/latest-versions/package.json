@@ -16,7 +16,7 @@
     "karma-jasmine": "~5.1.0",
     "karma": "~6.4.0",
     "less": "^4.2.0",
-    "postcss": "^8.4.38",
+    "postcss": "^8.5.3",
     "protractor": "~7.0.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
