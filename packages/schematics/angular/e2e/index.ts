@@ -17,17 +17,13 @@ import {
   strings,
   url,
 } from '@angular-devkit/schematics';
-import {
-  AngularBuilder,
-  DependencyType,
-  ExistingBehavior,
-  addDependency,
-  addRootProvider,
-  updateWorkspace,
-} from '@schematics/angular/utility';
 import { posix as path } from 'node:path';
+import { DependencyType, ExistingBehavior, addDependency } from '../utility/dependency';
 import { JSONFile } from '../utility/json-file';
 import { latestVersions } from '../utility/latest-versions';
+import { addRootProvider } from '../utility/standalone';
+import { updateWorkspace } from '../utility/workspace';
+import { Builders as AngularBuilder } from '../utility/workspace-models';
 import { Schema as E2eOptions } from './schema';
 
 /**
