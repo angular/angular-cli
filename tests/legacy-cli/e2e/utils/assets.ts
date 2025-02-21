@@ -8,7 +8,7 @@ import { installWorkspacePackages, setRegistry } from './packages';
 import { useBuiltPackagesVersions } from './project';
 
 export function assetDir(assetName: string) {
-  return join(__dirname, '../assets', assetName);
+  return join(__dirname, '../e2e/assets', assetName);
 }
 
 export function copyProjectAsset(assetName: string, to?: string) {

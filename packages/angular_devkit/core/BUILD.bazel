@@ -1,4 +1,4 @@
-load("@npm//@angular/build-tooling/bazel/api-golden:index.bzl", "api_golden_test_npm_package")
+load("@devinfra//bazel/api-golden:index_rjs.bzl", "api_golden_test_npm_package")
 load("//tools:defaults2.bzl", "jasmine_test", "npm_package", "ts_project")
 
 # Copyright Google Inc. All Rights Reserved.
@@ -90,8 +90,10 @@ api_golden_test_npm_package(
         ":npm_package",
         "//goldens:public-api",
     ],
-    golden_dir = "angular_cli/goldens/public-api/angular_devkit/core",
-    npm_package = "angular_cli/packages/angular_devkit/core/npm_package",
-    types = ["@npm//@types/node"],
+    golden_dir = "goldens/public-api/angular_devkit/core",
+    npm_package = "packages/angular_devkit/core/npm_package",
+    types = {
+        "//:node_modules/@types/node": "node",
+    },
 )
 # @external_end

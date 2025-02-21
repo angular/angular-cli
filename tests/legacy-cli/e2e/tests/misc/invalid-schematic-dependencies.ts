@@ -1,6 +1,12 @@
 import { join } from 'node:path';
 import { expectFileToMatch } from '../../utils/fs';
-import { execWithEnv, extractNpmEnv, ng, silentNpm } from '../../utils/process';
+import {
+  execWithEnv,
+  extractCIAndInfraEnv,
+  extractNpmEnv,
+  ng,
+  silentNpm,
+} from '../../utils/process';
 import { getActivePackageManager, installPackage, uninstallPackage } from '../../utils/packages';
 import { isPrereleaseCli } from '../../utils/project';
 import { appendFile, writeFile } from 'node:fs/promises';
@@ -48,6 +54,7 @@ async function publishOutdated(npmSpecifier: string): Promise<void> {
 
   await execWithEnv('npm', ['publish', stdoutPack.trim(), '--tag=outdated'], {
     ...extractNpmEnv(),
+    ...extractCIAndInfraEnv(),
     'NPM_CONFIG_USERCONFIG': npmrc,
   });
 }

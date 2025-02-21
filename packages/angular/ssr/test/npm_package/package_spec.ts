@@ -6,17 +6,14 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { runfiles } from '@bazel/runfiles';
 import { existsSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
-import { dirname, join } from 'node:path';
+import { join, resolve } from 'node:path';
 
 /**
  * Resolve paths for the Beasties license file and the golden reference file.
  */
-const ANGULAR_SSR_PACKAGE_PATH = dirname(
-  runfiles.resolve('angular_cli/packages/angular/ssr/npm_package/package.json'),
-);
+const ANGULAR_SSR_PACKAGE_PATH = resolve('../../npm_package');
 
 /**
  * Path to the actual license file for the Beasties library.

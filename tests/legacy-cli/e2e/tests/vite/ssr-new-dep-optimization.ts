@@ -31,7 +31,7 @@ export default async function () {
     'ng',
     ['serve', '--port', port.toString()],
     /Application bundle generation complete/,
-    { CI: '0', NO_COLOR: 'true' },
+    { ...process.env, CI: '0', NO_COLOR: 'true' },
   );
   await validateResponse('/', /Hello,/);
 
