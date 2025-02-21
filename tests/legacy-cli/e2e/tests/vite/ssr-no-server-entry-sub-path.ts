@@ -39,6 +39,7 @@ export default async function () {
 
   const port = await findFreePort();
   await execAndWaitForOutputToMatch('ng', ['serve', '--port', `${port}`], /complete/, {
+    ...process.env,
     NO_COLOR: 'true',
   });
 

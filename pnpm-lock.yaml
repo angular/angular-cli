@@ -23,11 +23,11 @@ importers:
         specifier: 19.2.0
         version: 19.2.0(@angular/core@19.2.0)
       '@angular/bazel':
-        specifier: https://github.com/angular/bazel-builds.git#8faa06d66416ce78073ab59539ff03f5253b8d52
-        version: github.com/angular/bazel-builds/8faa06d66416ce78073ab59539ff03f5253b8d52(@angular/compiler-cli@19.2.0)(@rollup/plugin-commonjs@28.0.2)(@rollup/plugin-node-resolve@13.3.0)(@types/node@20.17.19)(rollup-plugin-sourcemaps@0.6.3)(rollup@4.34.9)(terser@5.39.0)(typescript@5.8.2)
+        specifier: https://github.com/angular/bazel-builds.git#58e1a344eed2dfea489cd290a4b4a963f7e3ac65
+        version: github.com/angular/bazel-builds/58e1a344eed2dfea489cd290a4b4a963f7e3ac65(@angular/compiler-cli@19.2.0)(@rollup/plugin-commonjs@28.0.2)(@rollup/plugin-node-resolve@13.3.0)(@types/node@20.17.19)(rollup-plugin-sourcemaps@0.6.3)(rollup@4.34.9)(terser@5.39.0)(typescript@5.8.2)
       '@angular/build-tooling':
-        specifier: https://github.com/angular/dev-infra-private-build-tooling-builds.git#a6a996a69cfc03b3fbe538f11dd24b7bc4b30592
-        version: github.com/angular/dev-infra-private-build-tooling-builds/a6a996a69cfc03b3fbe538f11dd24b7bc4b30592(debug@4.4.0)(karma-chrome-launcher@3.2.0)(karma-jasmine@5.1.0)(karma@6.4.4)(rxjs@7.8.2)(terser@5.39.0)(zone.js@0.15.0)
+        specifier: https://github.com/angular/dev-infra-private-build-tooling-builds.git#d4727212a9d0f7eb63ae3116d73c769d9bd0bdc1
+        version: github.com/angular/dev-infra-private-build-tooling-builds/d4727212a9d0f7eb63ae3116d73c769d9bd0bdc1(debug@4.4.0)(karma-chrome-launcher@3.2.0)(karma-jasmine@5.1.0)(karma@6.4.4)(rxjs@7.8.2)(terser@5.39.0)(zone.js@0.15.0)
       '@angular/cdk':
         specifier: 19.2.1
         version: 19.2.1(@angular/common@19.2.0)(@angular/core@19.2.0)(rxjs@7.8.2)
@@ -106,9 +106,6 @@ importers:
       '@bazel/buildifier':
         specifier: 8.0.3
         version: 8.0.3
-      '@bazel/runfiles':
-        specifier: ^6.0.0
-        version: 6.3.1
       '@discoveryjs/json-ext':
         specifier: 0.6.3
         version: 0.6.3
@@ -136,6 +133,9 @@ importers:
       '@rollup/plugin-commonjs':
         specifier: ^28.0.0
         version: 28.0.2(rollup@4.34.9)
+      '@rollup/plugin-json':
+        specifier: ^6.1.0
+        version: 6.1.0(rollup@4.34.9)
       '@rollup/plugin-node-resolve':
         specifier: ^13.0.5
         version: 13.3.0(rollup@4.34.9)
@@ -735,9 +735,6 @@ importers:
       '@angular/router':
         specifier: 19.2.0
         version: 19.2.0(@angular/common@19.2.0)(@angular/core@19.2.0)(@angular/platform-browser@19.2.0)(rxjs@7.8.2)
-      '@bazel/runfiles':
-        specifier: ^6.0.0
-        version: 6.3.1
       '@schematics/angular':
         specifier: workspace:*
         version: link:../../schematics/angular
@@ -2387,7 +2384,6 @@ packages:
 
   /@bazel/typescript@5.8.1(typescript@5.8.2):
     resolution: {integrity: sha512-NAJ8WQHZL1WE1YmRoCrq/1hhG15Mvy/viWh6TkvFnBeEhNUiQUsA5GYyhU1ztnBIYW03nATO3vwhAEfO7Q0U5g==}
-    deprecated: No longer maintained, https://github.com/aspect-build/rules_ts is the recommended replacement
     hasBin: true
     peerDependencies:
       typescript: 5.8.2
@@ -11578,7 +11574,7 @@ packages:
   /puppeteer@18.2.1:
     resolution: {integrity: sha512-7+UhmYa7wxPh2oMRwA++k8UGVDxh3YdWFB52r9C3tM81T6BU7cuusUSxImz0GEYSOYUKk/YzIhkQ6+vc0gHbxQ==}
     engines: {node: '>=14.1.0'}
-    deprecated: < 22.8.2 is no longer supported
+    deprecated: < 19.4.0 is no longer supported
     requiresBuild: true
     dependencies:
       https-proxy-agent: 5.0.1(supports-color@10.0.0)
@@ -14233,15 +14229,15 @@ packages:
     resolution: {integrity: sha512-9oxn0IIjbCZkJ67L+LkhYWRyAy7axphb3VgE2MBDlOqnmHMPWGYMxJxBYFueFq/JGY2GMwS0rU+UCLunEmy5UA==}
     dev: true
 
-  github.com/angular/bazel-builds/8faa06d66416ce78073ab59539ff03f5253b8d52(@angular/compiler-cli@19.2.0)(@rollup/plugin-commonjs@28.0.2)(@rollup/plugin-node-resolve@13.3.0)(@types/node@20.17.19)(rollup-plugin-sourcemaps@0.6.3)(rollup@4.34.9)(terser@5.39.0)(typescript@5.8.2):
-    resolution: {tarball: https://codeload.github.com/angular/bazel-builds/tar.gz/8faa06d66416ce78073ab59539ff03f5253b8d52}
-    id: github.com/angular/bazel-builds/8faa06d66416ce78073ab59539ff03f5253b8d52
+  github.com/angular/bazel-builds/58e1a344eed2dfea489cd290a4b4a963f7e3ac65(@angular/compiler-cli@19.2.0)(@rollup/plugin-commonjs@28.0.2)(@rollup/plugin-node-resolve@13.3.0)(@types/node@20.17.19)(rollup-plugin-sourcemaps@0.6.3)(rollup@4.34.9)(terser@5.39.0)(typescript@5.8.2):
+    resolution: {tarball: https://codeload.github.com/angular/bazel-builds/tar.gz/58e1a344eed2dfea489cd290a4b4a963f7e3ac65}
+    id: github.com/angular/bazel-builds/58e1a344eed2dfea489cd290a4b4a963f7e3ac65
     name: '@angular/bazel'
-    version: 20.0.0-next.0
+    version: 19.3.0-next.0
     engines: {node: ^18.19.1 || ^20.11.1 || >=22.0.0}
     hasBin: true
     peerDependencies:
-      '@angular/compiler-cli': 20.0.0-next.0+sha-51b8ff2
+      '@angular/compiler-cli': 19.3.0-next.0+sha-8657a0e
       '@bazel/concatjs': ^5.3.0
       '@bazel/worker': ^5.3.0
       '@rollup/plugin-commonjs': ^28.0.0
@@ -14268,11 +14264,11 @@ packages:
       - '@types/node'
     dev: true
 
-  github.com/angular/dev-infra-private-build-tooling-builds/a6a996a69cfc03b3fbe538f11dd24b7bc4b30592(debug@4.4.0)(karma-chrome-launcher@3.2.0)(karma-jasmine@5.1.0)(karma@6.4.4)(rxjs@7.8.2)(terser@5.39.0)(zone.js@0.15.0):
-    resolution: {tarball: https://codeload.github.com/angular/dev-infra-private-build-tooling-builds/tar.gz/a6a996a69cfc03b3fbe538f11dd24b7bc4b30592}
-    id: github.com/angular/dev-infra-private-build-tooling-builds/a6a996a69cfc03b3fbe538f11dd24b7bc4b30592
+  github.com/angular/dev-infra-private-build-tooling-builds/d4727212a9d0f7eb63ae3116d73c769d9bd0bdc1(debug@4.4.0)(karma-chrome-launcher@3.2.0)(karma-jasmine@5.1.0)(karma@6.4.4)(rxjs@7.8.2)(terser@5.39.0)(zone.js@0.15.0):
+    resolution: {tarball: https://codeload.github.com/angular/dev-infra-private-build-tooling-builds/tar.gz/d4727212a9d0f7eb63ae3116d73c769d9bd0bdc1}
+    id: github.com/angular/dev-infra-private-build-tooling-builds/d4727212a9d0f7eb63ae3116d73c769d9bd0bdc1
     name: '@angular/build-tooling'
-    version: 0.0.0-b015169b635123c1ab9084f604e36b6342eac171
+    version: 0.0.0-74aabba6d202918280dafe92f87f9c154476fa86
     dependencies:
       '@angular/benchpress': 0.3.0(rxjs@7.8.2)(zone.js@0.15.0)
       '@angular/build': link:packages/angular/build

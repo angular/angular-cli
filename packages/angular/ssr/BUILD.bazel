@@ -1,5 +1,5 @@
 load("@aspect_rules_js//npm:defs.bzl", "npm_package")
-load("@npm//@angular/build-tooling/bazel/api-golden:index.bzl", "api_golden_test_npm_package")
+load("@devinfra//bazel/api-golden:index_rjs.bzl", "api_golden_test_npm_package")
 load("@npm2//:defs.bzl", "npm_link_all_packages")
 load("@rules_pkg//:pkg.bzl", "pkg_tar")
 load("//tools:defaults2.bzl", "ng_package", "ts_project")
@@ -90,6 +90,6 @@ api_golden_test_npm_package(
         ":npm_package",
         "//goldens:public-api",
     ],
-    golden_dir = "angular_cli/goldens/public-api/angular/ssr",
-    npm_package = "angular_cli/packages/angular/ssr/npm_package",
+    golden_dir = "goldens/public-api/angular/ssr",
+    npm_package = "packages/angular/ssr/npm_package",
 )

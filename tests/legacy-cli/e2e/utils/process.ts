@@ -188,16 +188,16 @@ export function extractNpmEnv() {
     }, {});
 }
 
-function extractCIEnv(): NodeJS.ProcessEnv {
+export function extractCIAndInfraEnv(): NodeJS.ProcessEnv {
   return Object.keys(process.env)
     .filter(
       (v) =>
         v.startsWith('SAUCE_') ||
         v === 'CI' ||
-        v === 'CIRCLECI' ||
         v === 'CHROME_BIN' ||
         v === 'CHROME_PATH' ||
-        v === 'CHROMEDRIVER_BIN',
+        v === 'CHROMEDRIVER_BIN' ||
+        v.startsWith('JS_BINARY__'),
     )
     .reduce<NodeJS.ProcessEnv>((vars, n) => {
       vars[n] = process.env[n];
@@ -214,14 +214,16 @@ function extractNgEnv() {
     }, {});
 }
 
-export function waitForAnyProcessOutputToMatch(
+export async function waitForAnyProcessOutputToMatch(
   match: RegExp,
   timeout = 30000,
 ): Promise<ProcessOutput> {
+  let timeoutId: ReturnType<typeof setTimeout> | null = null;
+
   // Race between _all_ processes, and the timeout. First one to resolve/reject wins.
   const timeoutPromise: Promise<ProcessOutput> = new Promise((_resolve, reject) => {
     // Wait for 30 seconds and timeout.
-    setTimeout(() => {
+    timeoutId = setTimeout(() => {
       reject(new Error(`Waiting for ${match} timed out (timeout: ${timeout}msec)...`));
     }, timeout);
   });
@@ -248,7 +250,11 @@ export function waitForAnyProcessOutputToMatch(
       }),
   );
 
-  return Promise.race(matchPromises.concat([timeoutPromise]));
+  const matchingProcess = await Promise.race(matchPromises.concat([timeoutPromise]));
+  if (timeoutId !== null) {
+    clearTimeout(timeoutId);
+  }
+  return matchingProcess;
 }
 
 export async function killAllProcesses(signal = 'SIGTERM'): Promise<void> {
@@ -393,7 +399,7 @@ export function globalNpm(args: string[], env?: NodeJS.ProcessEnv) {
     );
   }
 
-  return _exec({ silent: true, env }, process.execPath, [require.resolve('npm'), ...args]);
+  return _exec({ silent: true, env }, 'npm', args);
 }
 
 export function node(...args: string[]) {
@@ -435,7 +441,7 @@ export async function launchTestProcess(entry: string, ...args: any[]): Promise<
     BAZEL_TARGET: process.env.BAZEL_TARGET,
 
     ...extractNpmEnv(),
-    ...extractCIEnv(),
+    ...extractCIAndInfraEnv(),
     ...extractNgEnv(),
     ...getGlobalVariablesEnv(),
   };
@@ -447,7 +453,12 @@ export async function launchTestProcess(entry: string, ...args: any[]): Promise<
     .filter((p) => p.startsWith(tempRoot) || p.startsWith(TEMP) || !p.includes('angular-cli'))
     .join(delimiter);
 
-  const testProcessArgs = [resolve(__dirname, 'test_process'), entry, ...args];
+  const testProcessArgs = [
+    // Note: `__dirname` is the bundle directory here.
+    resolve(__dirname, 'e2e/utils/test_process.js'),
+    entry,
+    ...args,
+  ];
 
   return new Promise<void>((resolve, reject) => {
     spawn(process.execPath, testProcessArgs, {

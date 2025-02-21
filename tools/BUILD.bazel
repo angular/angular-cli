@@ -1,8 +1,15 @@
-load("@aspect_bazel_lib//lib/private:tar_toolchain.bzl", "tar_toolchain")
 load("@bazel_skylib//rules:copy_file.bzl", "copy_file")
 load("//tools:defaults2.bzl", "js_binary")
 
 package(default_visibility = ["//visibility:public"])
+
+platform(
+    name = "windows_x64",
+    constraint_values = [
+        "@platforms//os:windows",
+        "@platforms//cpu:x86_64",
+    ],
+)
 
 exports_files([
     "package_json_release_filter.jq",
@@ -23,18 +30,6 @@ js_binary(
         "//:node_modules/quicktype-core",
     ],
     entry_point = "quicktype_runner.js",
-)
-
-tar_toolchain(
-    name = "system_tar_exec",
-    binary = "tar_system.bat",
-)
-
-toolchain(
-    name = "windows_tar_system_toolchain",
-    exec_compatible_with = ["@platforms//os:windows"],
-    toolchain = ":system_tar_exec",
-    toolchain_type = "@aspect_bazel_lib//lib:tar_toolchain_type",
 )
 
 # TODO(devversion): Improve this by potentially sharing this common block.

@@ -35,6 +35,7 @@ ts_deps_interop = rule(
     attrs = {
         "deps": attr.label_list(providers = [DeclarationInfo], mandatory = True),
     },
+    toolchains = ["@devinfra//bazel/git-toolchain:toolchain_type"],
 )
 
 def _ts_project_module_impl(ctx):
@@ -106,6 +107,7 @@ def ts_project(
         testonly = False,
         visibility = None,
         ignore_strict_deps = False,
+        enable_runtime_rnjs_interop = True,
         **kwargs):
     interop_deps = []
 
@@ -115,11 +117,12 @@ def ts_project(
     # dependencies so that we can forward and capture the module mappings for runtime
     # execution, with regards to first-party dependency linking.
     rjs_modules_to_rnjs = []
-    for d in deps:
-        if d.startswith("//:node_modules/"):
-            rjs_modules_to_rnjs.append(d.replace("//:node_modules/", "@npm//"))
-        if d.endswith("_rjs"):
-            rjs_modules_to_rnjs.append(d.replace("_rjs", ""))
+    if enable_runtime_rnjs_interop:
+        for d in deps:
+            if d.startswith("//:node_modules/"):
+                rjs_modules_to_rnjs.append(d.replace("//:node_modules/", "@npm//"))
+            if d.endswith("_rjs"):
+                rjs_modules_to_rnjs.append(d.replace("_rjs", ""))
 
     if tsconfig == None:
         tsconfig = "//:test-tsconfig" if testonly else "//:build-tsconfig"

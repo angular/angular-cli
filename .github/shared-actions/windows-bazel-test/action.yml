@@ -1,0 +1,79 @@
+name: 'Native Windows Bazel e2e test'
+description: 'Runs an Angular CLI e2e Bazel test on native Windows (dispatched from inside WSL)'
+author: 'Angular'
+
+inputs:
+  test_target_name:
+    description: E2E test target name
+    required: true
+  test_args:
+    description: |
+      Text representing the command line arguments that
+      should be passed to the e2e test runner.
+    required: false
+    default: ''
+
+runs:
+  using: composite
+  steps:
+    - name: Setup Bazel RBE
+      uses: angular/dev-infra/github-actions/bazel/configure-remote@2667d139a421977a40c3ea7ec768609fb19a8b9d
+      with:
+        allow_windows_rbe: true
+
+    - name: Initialize WSL
+      id: init_wsl
+      uses: angular/dev-infra/github-actions/setup-wsl@9a3e28a515bf51cd2ecfd5f4d5b17613845e6f44
+      with:
+        wsl_firewall_interface: 'vEthernet (WSL (Hyper-V firewall))'
+
+    - name: Install node modules in WSL (re-using from previous install/cache restore)
+      run: |
+        cd ${{steps.init_wsl.outputs.repo_path}}
+        yarn install --immutable
+      shell: wsl-bash {0}
+
+    - name: Build test binary for Windows (inside WSL)
+      shell: wsl-bash {0}
+      run: |
+        cd ${{steps.init_wsl.outputs.repo_path}}
+        yarn bazel \
+          build --config=e2e //tests/legacy-cli:${{inputs.test_target_name}} --platforms=tools:windows_x64
+      env:
+        # See: https://devblogs.microsoft.com/commandline/share-environment-vars-between-wsl-and-windows
+        WSLENV: 'GOOGLE_APPLICATION_CREDENTIALS/p'
+
+    - name: Copying binary artifact to host
+      shell: wsl-bash {0}
+      run: |
+        cd ${{steps.init_wsl.outputs.repo_path}}
+        tar -cf /tmp/test.tar.gz dist/bin/tests/legacy-cli/${{inputs.test_target_name}}_
+        mkdir /mnt/c/test
+        mv /tmp/test.tar.gz /mnt/c/test
+        (cd /mnt/c/test && tar -xf /mnt/c/test/test.tar.gz)
+
+    - name: Convert symlinks for Windows host
+      shell: wsl-bash {0}
+      run: |
+        cd ${{steps.init_wsl.outputs.repo_path}}
+
+        runfiles_dir="/mnt/c/test/dist/bin/tests/legacy-cli/${{inputs.test_target_name}}_/${{inputs.test_target_name}}.bat.runfiles"
+
+        # Make WSL symlinks compatible on Windows native file system.
+        node scripts/windows-testing/convert-symlinks.mjs $runfiles_dir "${{steps.init_wsl.outputs.cmd_path}}"
+
+        # Needed for resolution because Aspect/Bazel looks for repositories at `<workspace>/external`.
+        # TODO(devversion): consult with Aspect on why this is needed.
+        (cd $runfiles_dir/angular_cli && ${{steps.init_wsl.outputs.cmd_path}} /C "mklink /D external ..")
+
+    - name: Run tests
+      # Note: This is Git Bash.
+      shell: bash
+      env:
+        BAZEL_BINDIR: '.'
+      working-directory: "C:\\test"
+      run: |
+        node "${{github.workspace}}\\scripts\\windows-testing\\parallel-executor.mjs" \
+          $PWD/dist/bin/tests/legacy-cli/${{inputs.test_target_name}}_/${{inputs.test_target_name}}.bat.runfiles \
+          ${{inputs.test_target_name}} \
+          "${{inputs.test_args}}" \
