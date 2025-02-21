@@ -5,16 +5,19 @@ export default async function () {
   // Should be disabled by default.
   await configureTest(undefined /** analytics */);
   await execAndWaitForOutputToMatch('ng', ['analytics', 'info'], /Effective status: disabled/, {
+    ...process.env,
     NG_FORCE_TTY: '0', // Disable prompts
   });
 
   await configureTest('1dba0835-38a3-4957-bf34-9974e2df0df3' /** analytics */);
   await execAndWaitForOutputToMatch('ng', ['analytics', 'info'], /Effective status: enabled/, {
+    ...process.env,
     NG_FORCE_TTY: '0', // Disable prompts
   });
 
   await configureTest(false /** analytics */);
   await execAndWaitForOutputToMatch('ng', ['analytics', 'info'], /Effective status: disabled/, {
+    ...process.env,
     NG_FORCE_TTY: '0', // Disable prompts
   });
 }

@@ -12,6 +12,7 @@ import { findFreePort } from './e2e/utils/network';
 import { extractFile } from './e2e/utils/tar';
 import { realpathSync } from 'node:fs';
 import { PkgInfo } from './e2e/utils/packages';
+import { rm } from 'node:fs/promises';
 
 Error.stackTraceLimit = Infinity;
 
@@ -173,12 +174,16 @@ const tests = allTests.filter((name) => {
   });
 });
 
+console.log(`Running with shard configuration:`);
+console.log(`Total shards: ${nbShards}, current shard: ${shardId}`);
+
 // Remove tests that are not part of this shard.
 const testsToRun = tests.filter((name, i) => shardId === null || i % nbShards == shardId);
 
 if (testsToRun.length === 0) {
   if (shardId !== null && tests.length <= shardId) {
-    console.log(`No tests to run on shard ${shardId}, exiting.`);
+    console.log(`No tests to run on shard ${shardId}, exiting`);
+    console.log(`Without sharding, there were ${tests.length} tests found.`);
     process.exit(0);
   } else {
     console.log(`No tests would be ran, aborting.`);
@@ -328,7 +333,17 @@ async function runTest(absoluteName: string): Promise<void> {
   process.chdir(join(getGlobalVariable('projects-root'), 'test-project'));
 
   await launchTestProcess(absoluteName);
+  await cleanTestProject();
+}
+
+async function cleanTestProject() {
   await gitClean();
+
+  const testProject = join(getGlobalVariable('projects-root'), 'test-project');
+
+  // Note: Dist directory is not cleared between tests, as `git clean`
+  // doesn't delete it.
+  await rm(join(testProject, 'dist/'), { recursive: true, force: true });
 }
 
 function printHeader(

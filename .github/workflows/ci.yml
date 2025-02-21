@@ -74,23 +74,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest]
+        os: [ubuntu-latest]
         node: [18, 20, 22]
         subset: [npm, esbuild]
         shard: [0, 1, 2, 3, 4, 5]
-        exclude:
-          # Skip Node.js v18 tests on Windows
-          - os: windows-latest
-            node: 18
-          # Skip Node.js v20 tests on Windows
-          - os: windows-latest
-            node: 20
     runs-on: ${{ matrix.os }}
     steps:
-      # Workaround for: https://github.com/bazel-contrib/bazel-lib/issues/968.
-      # TODO(devversion): Remove when Aspect lib issue is fixed.
-      - run: choco install gzip
-        if: ${{matrix.os == 'windows-latest'}}
       - name: Initialize environment
         uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@0ad6a370f70638e785d6ef1f90dc6ede34684a47
       - name: Install node modules
@@ -100,7 +89,27 @@ jobs:
       - name: Setup Bazel RBE
         uses: angular/dev-infra/github-actions/bazel/configure-remote@0ad6a370f70638e785d6ef1f90dc6ede34684a47
       - name: Run CLI E2E tests
-        run: yarn bazel test --define=E2E_SHARD_TOTAL=6 --define=E2E_SHARD_INDEX=${{ matrix.shard }} --config=e2e //tests/legacy-cli:e2e.${{ matrix.subset }}_node${{ matrix.node }}
+        run: yarn bazel test --test_env=E2E_SHARD_TOTAL=6 --test_env=E2E_SHARD_INDEX=${{ matrix.shard }} --config=e2e //tests/legacy-cli:e2e.${{ matrix.subset }}_node${{ matrix.node }}
+
+  e2e_windows:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-2025]
+        node: [22]
+        subset: [npm, esbuild]
+        shard: [0, 1, 2, 3, 4, 5]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Initialize environment
+        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@0000d926624b2fd918e93f1c6b5e2defba9af91f
+      - name: Run CLI E2E tests
+        uses: ./.github/shared-actions/windows-bazel-test
+        with:
+          test_target_name: e2e.${{ matrix.subset }}_node${{ matrix.node }}
+        env:
+          E2E_SHARD_TOTAL: 6
+          E2E_SHARD_INDEX: ${{ matrix.shard }}
 
   e2e-package-managers:
     needs: test
@@ -122,7 +131,7 @@ jobs:
       - name: Setup Bazel RBE
         uses: angular/dev-infra/github-actions/bazel/configure-remote@0ad6a370f70638e785d6ef1f90dc6ede34684a47
       - name: Run CLI E2E tests
-        run: yarn bazel test --define=E2E_SHARD_TOTAL=3 --define=E2E_SHARD_INDEX=${{ matrix.shard }} --config=e2e //tests/legacy-cli:e2e.${{ matrix.subset }}_node${{ matrix.node }}
+        run: yarn bazel test --test_env=E2E_SHARD_TOTAL=3 --test_env=E2E_SHARD_INDEX=${{ matrix.shard }} --config=e2e //tests/legacy-cli:e2e.${{ matrix.subset }}_node${{ matrix.node }}
 
   e2e-snapshots:
     needs: test
@@ -144,7 +153,7 @@ jobs:
       - name: Setup Bazel RBE
         uses: angular/dev-infra/github-actions/bazel/configure-remote@0ad6a370f70638e785d6ef1f90dc6ede34684a47
       - name: Run CLI E2E tests
-        run: yarn bazel test --define=E2E_SHARD_TOTAL=6 --define=E2E_SHARD_INDEX=${{ matrix.shard }} --config=e2e //tests/legacy-cli:e2e.snapshots.${{ matrix.subset }}_node${{ matrix.node }}
+        run: yarn bazel test --test_env=E2E_SHARD_TOTAL=6 --test_env=E2E_SHARD_INDEX=${{ matrix.shard }} --config=e2e //tests/legacy-cli:e2e.snapshots.${{ matrix.subset }}_node${{ matrix.node }}
 
   browsers:
     needs: build

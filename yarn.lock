@@ -94,9 +94,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@angular/build-tooling@https://github.com/angular/dev-infra-private-build-tooling-builds.git#a6a996a69cfc03b3fbe538f11dd24b7bc4b30592":
-  version: 0.0.0-b015169b635123c1ab9084f604e36b6342eac171
-  resolution: "@angular/build-tooling@https://github.com/angular/dev-infra-private-build-tooling-builds.git#commit=a6a996a69cfc03b3fbe538f11dd24b7bc4b30592"
+"@angular/build-tooling@https://github.com/angular/dev-infra-private-build-tooling-builds.git#d4727212a9d0f7eb63ae3116d73c769d9bd0bdc1":
+  version: 0.0.0-74aabba6d202918280dafe92f87f9c154476fa86
+  resolution: "@angular/build-tooling@https://github.com/angular/dev-infra-private-build-tooling-builds.git#commit=d4727212a9d0f7eb63ae3116d73c769d9bd0bdc1"
   dependencies:
     "@angular/benchpress": "npm:0.3.0"
     "@angular/build": "npm:19.2.0-next.1"
@@ -133,7 +133,7 @@ __metadata:
   dependenciesMeta:
     re2:
       built: false
-  checksum: 10c0/e700e9ff2f8c55ad2d4983489271c0cef1d8b27d92a8a9d51ebcdad636f9f7b9f306d3960b6b8fd650e8376e3200ec9745bc38708c6cc7a23454afeda0f50aa6
+  checksum: 10c0/9c7dc4060ae176d30fdd8763cd3942a6e9c53a49e43dc75e3a46f09a556588699091f2a5e813732c14ea43e01bca9b79fa3dceb595e8a0f4fcb8962df58209ad
   languageName: node
   linkType: hard
 
@@ -300,7 +300,7 @@ __metadata:
     "@ampproject/remapping": "npm:2.3.0"
     "@angular/animations": "npm:19.2.0-rc.0"
     "@angular/bazel": "https://github.com/angular/bazel-builds.git#58e1a344eed2dfea489cd290a4b4a963f7e3ac65"
-    "@angular/build-tooling": "https://github.com/angular/dev-infra-private-build-tooling-builds.git#a6a996a69cfc03b3fbe538f11dd24b7bc4b30592"
+    "@angular/build-tooling": "https://github.com/angular/dev-infra-private-build-tooling-builds.git#d4727212a9d0f7eb63ae3116d73c769d9bd0bdc1"
     "@angular/cdk": "npm:19.2.0-rc.0"
     "@angular/common": "npm:19.2.0-rc.0"
     "@angular/compiler": "npm:19.2.0-rc.0"
@@ -327,13 +327,13 @@ __metadata:
     "@babel/runtime": "npm:7.26.9"
     "@bazel/bazelisk": "npm:1.25.0"
     "@bazel/buildifier": "npm:8.0.3"
-    "@bazel/runfiles": "npm:^6.0.0"
     "@discoveryjs/json-ext": "npm:0.6.3"
     "@inquirer/confirm": "npm:5.1.6"
     "@inquirer/prompts": "npm:7.3.2"
     "@listr2/prompt-adapter-inquirer": "npm:2.0.18"
     "@rollup/plugin-alias": "npm:^5.1.1"
     "@rollup/plugin-commonjs": "npm:^28.0.0"
+    "@rollup/plugin-json": "npm:^6.1.0"
     "@rollup/plugin-node-resolve": "npm:^13.0.5"
     "@stylistic/eslint-plugin": "npm:^3.0.0"
     "@types/babel__core": "npm:7.20.5"
@@ -1854,7 +1854,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@bazel/runfiles@npm:^6.0.0, @bazel/runfiles@npm:^6.3.1":
+"@bazel/runfiles@npm:^6.3.1":
   version: 6.3.1
   resolution: "@bazel/runfiles@npm:6.3.1"
   checksum: 10c0/7b542dcff9e917cc521520db137bd4f4a478796693700e2ec2c27f4beede800c9f4987e20c6b965d81000638f63549160780aea51eca2f0d0275be76fdc5e49f

@@ -6,9 +6,6 @@ ts_project(
     name = "tests",
     testonly = True,
     srcs = glob(["**/*.ts"]),
-    data = [
-        "//tests/legacy-cli/e2e/ng-snapshot",
-    ],
     deps = [
         "//:node_modules/@types/express",
         "//:node_modules/@types/node",

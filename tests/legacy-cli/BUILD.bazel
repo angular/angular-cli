@@ -1,15 +1,15 @@
+load("@aspect_bazel_lib//lib:directory_path.bzl", "directory_path")
+load("@npm2//:rollup/package_json.bzl", rollup = "bin")
 load("//tools:interop.bzl", "ts_project")
 load(":e2e.bzl", "e2e_suites")
+
+package(default_visibility = ["//visibility:public"])
 
 ts_project(
     name = "runner",
     testonly = True,
     srcs = [
         "e2e_runner.ts",
-    ],
-    data = [
-        "verdaccio.yaml",
-        "verdaccio_auth.yaml",
     ],
     deps = [
         "//:node_modules/@types/node",
@@ -21,17 +21,54 @@ ts_project(
     ],
 )
 
+rollup.rollup(
+    name = "runner_bundled",
+    testonly = True,
+    srcs = [
+        "rollup.config.mjs",
+        ":runner_rjs",
+        "//:node_modules/@rollup/plugin-alias",
+        "//:node_modules/@rollup/plugin-commonjs",
+        "//:node_modules/@rollup/plugin-json",
+        "//:node_modules/@rollup/plugin-node-resolve",
+        "//:node_modules/fast-glob",
+        "//tests/legacy-cli/e2e/initialize:initialize_rjs",
+        "//tests/legacy-cli/e2e/ng-snapshot",
+        "//tests/legacy-cli/e2e/setup:setup_rjs",
+        "//tests/legacy-cli/e2e/tests:tests_rjs",
+    ],
+    args = [
+        "--format=cjs",
+        "--config=./rollup.config.mjs",
+    ],
+    chdir = package_name(),
+    out_dirs = ["runner_bundled_out"],
+    progress_message = "Bundling e2e test runner",
+)
+
+directory_path(
+    name = "runner_entrypoint",
+    testonly = True,
+    directory = ":runner_bundled",
+    path = "./e2e_runner.js",
+)
+
 e2e_suites(
     name = "e2e",
     data = [
-        ":runner",
+        ":runner_bundled",
+        "verdaccio.yaml",
+        "verdaccio_auth.yaml",
 
-        # Tests + setup
-        # Loaded dynamically at runtime, not compiletime deps
+        # Dynamically loaded.
         "//tests/legacy-cli/e2e/assets",
-        "//tests/legacy-cli/e2e/setup",
-        "//tests/legacy-cli/e2e/initialize",
-        "//tests/legacy-cli/e2e/tests",
+        "//:node_modules/verdaccio",
+        "//:node_modules/verdaccio-auth-memory",
+
+        # Extra runtime deps due to bundling issues.
+        # TODO: Clean this up.
+        "//:node_modules/@verdaccio/config",
+        "//:node_modules/express",
     ],
-    runner = ":e2e_runner.ts",
+    runner = ":runner_entrypoint",
 )

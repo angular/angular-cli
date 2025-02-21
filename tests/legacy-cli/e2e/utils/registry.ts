@@ -14,7 +14,7 @@ export async function createNpmRegistry(
   const registryPath = await mktempd('angular-cli-e2e-registry-');
 
   let configContent = await readFile(
-    join(__dirname, '../../', withAuthentication ? 'verdaccio_auth.yaml' : 'verdaccio.yaml'),
+    join(__dirname, '../', withAuthentication ? 'verdaccio_auth.yaml' : 'verdaccio.yaml'),
   );
   configContent = configContent.replace(/\$\{HTTP_PORT\}/g, String(port));
   configContent = configContent.replace(/\$\{HTTPS_PORT\}/g, String(httpsPort));

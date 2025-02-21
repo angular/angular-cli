@@ -122,6 +122,7 @@ export default async function () {
     const port = await findFreePort();
 
     await execAndWaitForOutputToMatch('node', ['serve.js'], /Node Express server listening on/, {
+      ...process.env,
       'PORT': String(port),
     });
 
