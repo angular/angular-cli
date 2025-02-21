@@ -1,4 +1,4 @@
-load("@npm//@angular/build-tooling/bazel/api-golden:index.bzl", "api_golden_test_npm_package")
+load("@devinfra//bazel/api-golden:index_rjs.bzl", "api_golden_test_npm_package")
 load("@npm2//:defs.bzl", "npm_link_all_packages")
 load("//tools:defaults2.bzl", "copy_to_bin", "jasmine_test", "npm_package", "ts_project")
 load("//tools:ts_json_schema.bzl", "ts_json_schema")
@@ -313,6 +313,6 @@ api_golden_test_npm_package(
         ":npm_package",
         "//goldens:public-api",
     ],
-    golden_dir = "angular_cli/goldens/public-api/angular/build",
-    npm_package = "angular_cli/packages/angular/build/npm_package",
+    golden_dir = "goldens/public-api/angular/build",
+    npm_package = "packages/angular/build/npm_package",
 )

@@ -118,6 +118,7 @@ export default async function () {
       ['run', runCommand],
       /Node Express server listening on/,
       {
+        ...process.env,
         'PORT': String(port),
       },
     );

@@ -35,7 +35,6 @@
     "@angular/platform-browser": "19.2.0-rc.0",
     "@angular/platform-server": "19.2.0-rc.0",
     "@angular/router": "19.2.0-rc.0",
-    "@bazel/runfiles": "^6.0.0",
     "@schematics/angular": "workspace:*"
   },
   "sideEffects": false,

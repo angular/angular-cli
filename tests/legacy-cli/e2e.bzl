@@ -1,4 +1,4 @@
-load("@build_bazel_rules_nodejs//:index.bzl", "nodejs_test")
+load("@aspect_rules_js//js:defs.bzl", "js_test")
 load("//tools:toolchain_info.bzl", "TOOLCHAINS_NAMES", "TOOLCHAINS_VERSIONS")
 
 # bazel query --output=label "kind('pkg_tar', //packages/...)"
@@ -87,7 +87,7 @@ def e2e_suites(name, runner, data):
     # Saucelabs tests are only run on the default toolchain
     _e2e_suite(name, runner, "saucelabs", data)
 
-def _e2e_tests(name, runner, **kwargs):
+def _e2e_tests(name, runner, toolchain, **kwargs):
     # Always specify all the npm packages
     args = kwargs.pop("templated_args", []) + [
         "--package $(rootpath %s)" % p
@@ -100,15 +100,12 @@ def _e2e_tests(name, runner, **kwargs):
     # Tags that must always be applied
     tags = kwargs.pop("tags", []) + TEST_TAGS
 
-    # Passthru E2E variables in case it is customized by CI etc
-    configuration_env_vars = kwargs.pop("configuration_env_vars", []) + ["E2E_TEMP", "E2E_SHARD_INDEX", "E2E_SHARD_TOTAL"]
-
     env = kwargs.pop("env", {})
     toolchains = kwargs.pop("toolchains", [])
 
     # The git toolchain + env
     env.update({"GIT_BIN": "$(GIT_BIN_PATH)"})
-    toolchains = toolchains + ["@npm//@angular/build-tooling/bazel/git-toolchain:current_git_toolchain"]
+    toolchains = toolchains + ["@devinfra//bazel/git-toolchain:current_git_toolchain"]
 
     # Chromium browser toolchain
     env.update({
@@ -116,18 +113,24 @@ def _e2e_tests(name, runner, **kwargs):
         "CHROME_PATH": "$(CHROMIUM)",
         "CHROMEDRIVER_BIN": "$(CHROMEDRIVER)",
     })
-    toolchains = toolchains + ["@npm//@angular/build-tooling/bazel/browsers/chromium:toolchain_alias"]
-    data = data + ["@npm//@angular/build-tooling/bazel/browsers/chromium"]
+    toolchains = toolchains + ["@devinfra//bazel/browsers/chromium:toolchain_alias"]
+    data = data + ["@devinfra//bazel/browsers/chromium"]
 
-    nodejs_test(
+    js_test(
         name = name,
-        templated_args = args,
+        fixed_args = args,
         data = data,
         entry_point = runner,
         env = env,
-        configuration_env_vars = configuration_env_vars,
         tags = tags,
         toolchains = toolchains,
+        node_toolchain = toolchain,
+        include_npm = select({
+            # For Windows testing mode, we use the real global NPM as otherwise this
+            # will be a lot of files that need to be brought from WSL to the host FS.
+            "@platforms//os:windows": False,
+            "//conditions:default": True,
+        }),
         **kwargs
     )
 

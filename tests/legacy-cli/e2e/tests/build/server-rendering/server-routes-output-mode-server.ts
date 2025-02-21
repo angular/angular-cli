@@ -204,6 +204,7 @@ async function spawnServer(): Promise<number> {
     ['run', 'serve:ssr:test-project'],
     /Node Express server listening on/,
     {
+      ...process.env,
       'PORT': String(port),
     },
   );

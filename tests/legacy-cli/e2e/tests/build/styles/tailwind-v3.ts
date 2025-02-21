@@ -1,4 +1,4 @@
-import { deleteFile, expectFileToMatch, writeFile } from '../../../utils/fs';
+import { deleteFile, expectFileToMatch, rimraf, writeFile } from '../../../utils/fs';
 import { installPackage, uninstallPackage } from '../../../utils/packages';
 import { ng, silentExec } from '../../../utils/process';
 import { expectToFail } from '../../../utils/utils';
@@ -7,6 +7,10 @@ export default async function () {
   // Temporarily turn off caching until the build cache accounts for the presence of tailwind
   // and its configuration file. Otherwise cached builds without tailwind will cause test failures.
   await ng('cache', 'off');
+
+  // In case a previous test installed tailwindcss, clear it.
+  // (we don't clear node module directories between tests)
+  await rimraf('node_modules/tailwindcss');
 
   // Create configuration file
   await silentExec('npx', 'tailwindcss@3', 'init');
