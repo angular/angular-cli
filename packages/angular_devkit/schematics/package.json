@@ -17,6 +17,6 @@
     "jsonc-parser": "3.3.1",
     "magic-string": "0.30.17",
     "ora": "5.4.1",
-    "rxjs": "7.8.1"
+    "rxjs": "7.8.2"
   }
 }
