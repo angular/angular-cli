@@ -44,7 +44,7 @@
   "devDependencies": {
     "@ampproject/remapping": "2.3.0",
     "@angular/animations": "19.2.0-rc.0",
-    "@angular/bazel": "https://github.com/angular/bazel-builds.git#58e1a344eed2dfea489cd290a4b4a963f7e3ac65",
+    "@angular/bazel": "https://github.com/angular/bazel-builds.git#a196e6bdf7d17a7ed44d08914702a13268187732",
     "@angular/build-tooling": "https://github.com/angular/dev-infra-private-build-tooling-builds.git#a6a996a69cfc03b3fbe538f11dd24b7bc4b30592",
     "@angular/cdk": "19.2.0-rc.0",
     "@angular/common": "19.2.0-rc.0",
@@ -54,7 +54,7 @@
     "@angular/forms": "19.2.0-rc.0",
     "@angular/localize": "19.2.0-rc.0",
     "@angular/material": "19.2.0-rc.0",
-    "@angular/ng-dev": "https://github.com/angular/dev-infra-private-ng-dev-builds.git#252589f7bc8fe6ca13b31e02d506ec52e826cdd2",
+    "@angular/ng-dev": "https://github.com/angular/dev-infra-private-ng-dev-builds.git#260ddc47f4562cb1660ba557dd911589d52008cc",
     "@angular/platform-browser": "19.2.0-rc.0",
     "@angular/platform-browser-dynamic": "19.2.0-rc.0",
     "@angular/platform-server": "19.2.0-rc.0",
