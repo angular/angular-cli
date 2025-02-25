@@ -213,7 +213,7 @@ importers:
         version: 8.25.0(eslint@8.57.0)(typescript@5.8.1-rc)
       '@vitejs/plugin-basic-ssl':
         specifier: 1.2.0
-        version: 1.2.0(vite@6.1.1)
+        version: 1.2.0(vite@6.2.0)
       '@web/test-runner':
         specifier: ^0.20.0
         version: 0.20.0
@@ -431,11 +431,11 @@ importers:
         specifier: 7.8.2
         version: 7.8.2
       sass:
-        specifier: 1.85.0
-        version: 1.85.0
+        specifier: 1.85.1
+        version: 1.85.1
       sass-loader:
         specifier: 16.0.5
-        version: 16.0.5(sass@1.85.0)(webpack@5.98.0)
+        version: 16.0.5(sass@1.85.1)(webpack@5.98.0)
       semver:
         specifier: 7.7.1
         version: 7.7.1
@@ -485,8 +485,8 @@ importers:
         specifier: ^10.0.0
         version: 10.2.2
       vite:
-        specifier: 6.1.1
-        version: 6.1.1(@types/node@20.17.19)(less@4.2.2)(sass@1.85.0)(terser@5.39.0)
+        specifier: 6.2.0
+        version: 6.2.0(@types/node@20.17.19)(less@4.2.2)(sass@1.85.1)(terser@5.39.0)
       watchpack:
         specifier: 2.4.2
         version: 2.4.2
@@ -560,7 +560,7 @@ importers:
         version: 5.1.6(@types/node@20.17.19)
       '@vitejs/plugin-basic-ssl':
         specifier: 1.2.0
-        version: 1.2.0(vite@6.1.1)
+        version: 1.2.0(vite@6.2.0)
       beasties:
         specifier: 0.2.0
         version: 0.2.0
@@ -601,8 +601,8 @@ importers:
         specifier: 4.34.8
         version: 4.34.8
       sass:
-        specifier: 1.85.0
-        version: 1.85.0
+        specifier: 1.85.1
+        version: 1.85.1
       semver:
         specifier: 7.7.1
         version: 7.7.1
@@ -610,8 +610,8 @@ importers:
         specifier: 0.5.21
         version: 0.5.21
       vite:
-        specifier: 6.1.1
-        version: 6.1.1(@types/node@20.17.19)(less@4.2.2)(sass@1.85.0)(terser@5.39.0)
+        specifier: 6.2.0
+        version: 6.2.0(@types/node@20.17.19)(less@4.2.2)(sass@1.85.1)(terser@5.39.0)
       watchpack:
         specifier: 2.4.2
         version: 2.4.2
@@ -813,7 +813,7 @@ importers:
         version: link:../../ngtools/webpack
       '@vitejs/plugin-basic-ssl':
         specifier: 1.2.0
-        version: 1.2.0(vite@6.1.1)
+        version: 1.2.0(vite@6.2.0)
       ansi-colors:
         specifier: 4.1.3
         version: 4.1.3
@@ -890,11 +890,11 @@ importers:
         specifier: 7.8.2
         version: 7.8.2
       sass:
-        specifier: 1.85.0
-        version: 1.85.0
+        specifier: 1.85.1
+        version: 1.85.1
       sass-loader:
         specifier: 16.0.5
-        version: 16.0.5(sass@1.85.0)(webpack@5.98.0)
+        version: 16.0.5(sass@1.85.1)(webpack@5.98.0)
       semver:
         specifier: 7.7.1
         version: 7.7.1
@@ -2435,6 +2435,7 @@ packages:
     engines: {node: '>=18'}
     cpu: [ppc64]
     os: [aix]
+    dev: true
     optional: true
 
   /@esbuild/aix-ppc64@0.25.0:
@@ -2449,6 +2450,7 @@ packages:
     engines: {node: '>=18'}
     cpu: [arm64]
     os: [android]
+    dev: true
     optional: true
 
   /@esbuild/android-arm64@0.25.0:
@@ -2463,6 +2465,7 @@ packages:
     engines: {node: '>=18'}
     cpu: [arm]
     os: [android]
+    dev: true
     optional: true
 
   /@esbuild/android-arm@0.25.0:
@@ -2477,6 +2480,7 @@ packages:
     engines: {node: '>=18'}
     cpu: [x64]
     os: [android]
+    dev: true
     optional: true
 
   /@esbuild/android-x64@0.25.0:
@@ -2491,6 +2495,7 @@ packages:
     engines: {node: '>=18'}
     cpu: [arm64]
     os: [darwin]
+    dev: true
     optional: true
 
   /@esbuild/darwin-arm64@0.25.0:
@@ -2505,6 +2510,7 @@ packages:
     engines: {node: '>=18'}
     cpu: [x64]
     os: [darwin]
+    dev: true
     optional: true
 
   /@esbuild/darwin-x64@0.25.0:
@@ -2519,6 +2525,7 @@ packages:
     engines: {node: '>=18'}
     cpu: [arm64]
     os: [freebsd]
+    dev: true
     optional: true
 
   /@esbuild/freebsd-arm64@0.25.0:
@@ -2533,6 +2540,7 @@ packages:
     engines: {node: '>=18'}
     cpu: [x64]
     os: [freebsd]
+    dev: true
     optional: true
 
   /@esbuild/freebsd-x64@0.25.0:
@@ -2547,6 +2555,7 @@ packages:
     engines: {node: '>=18'}
     cpu: [arm64]
     os: [linux]
+    dev: true
     optional: true
 
   /@esbuild/linux-arm64@0.25.0:
@@ -2561,6 +2570,7 @@ packages:
     engines: {node: '>=18'}
     cpu: [arm]
     os: [linux]
+    dev: true
     optional: true
 
   /@esbuild/linux-arm@0.25.0:
@@ -2575,6 +2585,7 @@ packages:
     engines: {node: '>=18'}
     cpu: [ia32]
     os: [linux]
+    dev: true
     optional: true
 
   /@esbuild/linux-ia32@0.25.0:
@@ -2589,6 +2600,7 @@ packages:
     engines: {node: '>=18'}
     cpu: [loong64]
     os: [linux]
+    dev: true
     optional: true
 
   /@esbuild/linux-loong64@0.25.0:
@@ -2603,6 +2615,7 @@ packages:
     engines: {node: '>=18'}
     cpu: [mips64el]
     os: [linux]
+    dev: true
     optional: true
 
   /@esbuild/linux-mips64el@0.25.0:
@@ -2617,6 +2630,7 @@ packages:
     engines: {node: '>=18'}
     cpu: [ppc64]
     os: [linux]
+    dev: true
     optional: true
 
   /@esbuild/linux-ppc64@0.25.0:
@@ -2631,6 +2645,7 @@ packages:
     engines: {node: '>=18'}
     cpu: [riscv64]
     os: [linux]
+    dev: true
     optional: true
 
   /@esbuild/linux-riscv64@0.25.0:
@@ -2645,6 +2660,7 @@ packages:
     engines: {node: '>=18'}
     cpu: [s390x]
     os: [linux]
+    dev: true
     optional: true
 
   /@esbuild/linux-s390x@0.25.0:
@@ -2659,6 +2675,7 @@ packages:
     engines: {node: '>=18'}
     cpu: [x64]
     os: [linux]
+    dev: true
     optional: true
 
   /@esbuild/linux-x64@0.25.0:
@@ -2673,6 +2690,7 @@ packages:
     engines: {node: '>=18'}
     cpu: [arm64]
     os: [netbsd]
+    dev: true
     optional: true
 
   /@esbuild/netbsd-arm64@0.25.0:
@@ -2687,6 +2705,7 @@ packages:
     engines: {node: '>=18'}
     cpu: [x64]
     os: [netbsd]
+    dev: true
     optional: true
 
   /@esbuild/netbsd-x64@0.25.0:
@@ -2701,6 +2720,7 @@ packages:
     engines: {node: '>=18'}
     cpu: [arm64]
     os: [openbsd]
+    dev: true
     optional: true
 
   /@esbuild/openbsd-arm64@0.25.0:
@@ -2715,6 +2735,7 @@ packages:
     engines: {node: '>=18'}
     cpu: [x64]
     os: [openbsd]
+    dev: true
     optional: true
 
   /@esbuild/openbsd-x64@0.25.0:
@@ -2729,6 +2750,7 @@ packages:
     engines: {node: '>=18'}
     cpu: [x64]
     os: [sunos]
+    dev: true
     optional: true
 
   /@esbuild/sunos-x64@0.25.0:
@@ -2743,6 +2765,7 @@ packages:
     engines: {node: '>=18'}
     cpu: [arm64]
     os: [win32]
+    dev: true
     optional: true
 
   /@esbuild/win32-arm64@0.25.0:
@@ -2757,6 +2780,7 @@ packages:
     engines: {node: '>=18'}
     cpu: [ia32]
     os: [win32]
+    dev: true
     optional: true
 
   /@esbuild/win32-ia32@0.25.0:
@@ -2771,6 +2795,7 @@ packages:
     engines: {node: '>=18'}
     cpu: [x64]
     os: [win32]
+    dev: true
     optional: true
 
   /@esbuild/win32-x64@0.25.0:
@@ -5277,13 +5302,13 @@ packages:
       semver: 7.6.3
     dev: true
 
-  /@vitejs/plugin-basic-ssl@1.2.0(vite@6.1.1):
+  /@vitejs/plugin-basic-ssl@1.2.0(vite@6.2.0):
     resolution: {integrity: sha512-mkQnxTkcldAzIsomk1UuLfAu9n+kpQ3JbHcpCp7d2Oo6ITtji8pHS3QToOWjhPFvNQSnhlkAjmGbhv2QvwO/7Q==}
     engines: {node: '>=14.21.3'}
     peerDependencies:
       vite: ^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0
     dependencies:
-      vite: 6.1.1(@types/node@20.17.19)(less@4.2.2)(sass@1.85.0)(terser@5.39.0)
+      vite: 6.2.0(@types/node@20.17.19)(less@4.2.2)(sass@1.85.1)(terser@5.39.0)
 
   /@web/browser-logs@0.4.1:
     resolution: {integrity: sha512-ypmMG+72ERm+LvP+loj9A64MTXvWMXHUOu773cPO4L1SV/VWg6xA9Pv7vkvkXQX+ItJtCJt+KQ+U6ui2HhSFUw==}
@@ -7650,6 +7675,7 @@ packages:
       '@esbuild/win32-arm64': 0.24.2
       '@esbuild/win32-ia32': 0.24.2
       '@esbuild/win32-x64': 0.24.2
+    dev: true
 
   /esbuild@0.25.0:
     resolution: {integrity: sha512-BXq5mqc8ltbaN34cDqWuYKyNhX8D/Z0J1xdtdQ8UcIIIyJyz+ZMKUt58tF3SrZ85jcfN/PZYhjR5uDQAYNVbuw==}
@@ -10688,7 +10714,7 @@ packages:
       piscina: 4.8.0
       postcss: 8.5.3
       rxjs: 7.8.2
-      sass: 1.85.0
+      sass: 1.85.1
       tslib: 2.8.1
       typescript: 5.8.1-rc
     optionalDependencies:
@@ -12323,7 +12349,7 @@ packages:
   /safer-buffer@2.1.2:
     resolution: {integrity: sha512-YZo3K82SD7Riyi0E1EQPojLz7kpepnSQI9IyPbHHg1XXXevb5dJI7tpyN2ADxGcQbHG7vcyRHk0cbwqcQriUtg==}
 
-  /sass-loader@16.0.5(sass@1.85.0)(webpack@5.98.0):
+  /sass-loader@16.0.5(sass@1.85.1)(webpack@5.98.0):
     resolution: {integrity: sha512-oL+CMBXrj6BZ/zOq4os+UECPL+bWqt6OAC6DWS8Ln8GZRcMDjlJ4JC3FBDuHJdYaFWIdKNIBYmtZtK2MaMkNIw==}
     engines: {node: '>= 18.12.0'}
     peerDependencies:
@@ -12345,11 +12371,11 @@ packages:
         optional: true
     dependencies:
       neo-async: 2.6.2
-      sass: 1.85.0
+      sass: 1.85.1
       webpack: 5.98.0(esbuild@0.25.0)
 
-  /sass@1.85.0:
-    resolution: {integrity: sha512-3ToiC1xZ1Y8aU7+CkgCI/tqyuPXEmYGJXO7H4uqp0xkLXUqp88rQQ4j1HmP37xSJLbCJPaIiv+cT1y+grssrww==}
+  /sass@1.85.1:
+    resolution: {integrity: sha512-Uk8WpxM5v+0cMR0XjX9KfRIacmSG86RH4DCCZjLU2rFh5tyutt9siAXJ7G+YfxQ99Q6wrRMbMlVl6KqUms71ag==}
     engines: {node: '>=14.0.0'}
     hasBin: true
     dependencies:
@@ -13890,8 +13916,8 @@ packages:
       extsprintf: 1.4.1
     dev: true
 
-  /vite@6.1.1(@types/node@20.17.19)(less@4.2.2)(sass@1.85.0)(terser@5.39.0):
-    resolution: {integrity: sha512-4GgM54XrwRfrOp297aIYspIti66k56v16ZnqHvrIM7mG+HjDlAwS7p+Srr7J6fGvEdOJ5JcQ/D9T7HhtdXDTzA==}
+  /vite@6.2.0(@types/node@20.17.19)(less@4.2.2)(sass@1.85.1)(terser@5.39.0):
+    resolution: {integrity: sha512-7dPxoo+WsT/64rDcwoOjk76XHj+TqNTIvHKcuMQ1k4/SeHDaQt5GFAeLYzrimZrMpn/O6DtdI03WUjdxuPM0oQ==}
     engines: {node: ^18.0.0 || ^20.0.0 || >=22.0.0}
     hasBin: true
     peerDependencies:
@@ -13931,11 +13957,11 @@ packages:
         optional: true
     dependencies:
       '@types/node': 20.17.19
-      esbuild: 0.24.2
+      esbuild: 0.25.0
       less: 4.2.2
       postcss: 8.5.3
       rollup: 4.34.8
-      sass: 1.85.0
+      sass: 1.85.1
       terser: 5.39.0
     optionalDependencies:
       fsevents: 2.3.3
