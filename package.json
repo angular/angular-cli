@@ -83,7 +83,7 @@
     "@rollup/plugin-alias": "^5.1.1",
     "@rollup/plugin-commonjs": "^28.0.0",
     "@rollup/plugin-node-resolve": "^13.0.5",
-    "@stylistic/eslint-plugin": "^3.0.0",
+    "@stylistic/eslint-plugin": "^4.0.0",
     "@types/babel__core": "7.20.5",
     "@types/babel__generator": "^7.6.8",
     "@types/browser-sync": "^2.27.0",
