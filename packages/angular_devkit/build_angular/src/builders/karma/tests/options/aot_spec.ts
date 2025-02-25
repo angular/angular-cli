@@ -10,15 +10,15 @@ import { execute } from '../../index';
 import { BASE_OPTIONS, KARMA_BUILDER_INFO, describeKarmaBuilder } from '../setup';
 import { BuilderMode } from '../../schema';
 
-describeKarmaBuilder(execute, KARMA_BUILDER_INFO, (harness, setupTarget) => {
+describeKarmaBuilder(execute, KARMA_BUILDER_INFO, (harness, setupTarget, isApplicationBuilder) => {
   describe('Option: "aot"', () => {
-    it('enables aot with application builder', async () => {
+    it('enables aot', async () => {
       await setupTarget(harness);
 
       await harness.writeFiles({
         'src/aot.spec.ts': `
           import { Component } from '@angular/core';
-
+          
           describe('Hello', () => {
             it('should *not* contain jit instructions', () => {
               @Component({
@@ -32,48 +32,44 @@ describeKarmaBuilder(execute, KARMA_BUILDER_INFO, (harness, setupTarget) => {
 `,
       });
 
-      harness.useTarget('test', {
-        ...BASE_OPTIONS,
-        aot: true,
-        /** Cf. {@link ../builder-mode_spec.ts} */
-        polyfills: ['zone.js', '@angular/localize/init', 'zone.js/testing'],
-        builderMode: BuilderMode.Application,
-      });
-
-      const { result } = await harness.executeOnce();
-      expect(result?.success).toBeTrue();
+      expect(await runTest({ aot: true })).toBeTrue();
     });
 
-    it('enables aot with browser builder', async () => {
+    it('is turned off by default', async () => {
       await setupTarget(harness);
 
       await harness.writeFiles({
         'src/aot.spec.ts': `
           import { Component } from '@angular/core';
-
+          
           describe('Hello', () => {
-            it('should *not* contain jit instructions', () => {
+            it('should contain jit instructions', () => {
               @Component({
                 template: 'Hello',
               })
               class Hello {}
 
-              expect((Hello as any).ɵcmp.template.toString()).not.toContain('jit');
+              expect((Hello as any).ɵcmp.template.toString()).toContain('jit');
             });
           });
 `,
       });
 
-      harness.useTarget('test', {
-        ...BASE_OPTIONS,
-        aot: true,
-        /** Cf. {@link ../builder-mode_spec.ts} */
-        polyfills: ['zone.js', '@angular/localize/init', 'zone.js/testing'],
-        builderMode: BuilderMode.Browser,
-      });
-
-      const { result } = await harness.executeOnce();
-      expect(result?.success).toBeTrue();
+      expect(await runTest()).toBeTrue();
     });
   });
+
+  async function runTest({ aot }: { aot?: boolean } = {}) {
+    harness.useTarget('test', {
+      ...BASE_OPTIONS,
+      aot,
+      /** Cf. {@link ../builder-mode_spec.ts} */
+      polyfills: ['zone.js', '@angular/localize/init', 'zone.js/testing'],
+      builderMode: isApplicationBuilder ? BuilderMode.Application : BuilderMode.Browser,
+    });
+
+    const { result } = await harness.executeOnce();
+
+    return result?.success;
+  }
 });
