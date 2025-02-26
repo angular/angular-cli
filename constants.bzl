@@ -3,10 +3,10 @@ RELEASE_ENGINES_NODE = "^20.11.1 || >=22.0.0"
 RELEASE_ENGINES_NPM = "^6.11.0 || ^7.5.6 || >=8.0.0"
 RELEASE_ENGINES_YARN = ">= 1.13.0"
 
-NG_PACKAGR_VERSION = "^19.2.0-next.0"
-ANGULAR_FW_VERSION = "^19.2.0-next.0 || ^20.0.0-next.0"
-ANGULAR_FW_PEER_DEP = "^19.2.0-next.0 || ^20.0.0 || ^20.0.0-next.0"
-NG_PACKAGR_PEER_DEP = "^19.0.0 || ^19.2.0-next.0"
+NG_PACKAGR_VERSION = "^20.0.0-next.0"
+ANGULAR_FW_VERSION = "^20.0.0-next.0"
+ANGULAR_FW_PEER_DEP = "^20.0.0 || ^20.0.0-next.0"
+NG_PACKAGR_PEER_DEP = "^20.0.0 || ^20.0.0-next.0"
 
 SNAPSHOT_REPOS = {
     "@angular/cli": "angular/cli-builds",
