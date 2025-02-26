@@ -1,3 +1,15 @@
+<a name="19.1.9"></a>
+
+# 19.1.9 (2025-02-26)
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                               |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------- |
+| [2d361e9b0](https://github.com/angular/angular-cli/commit/2d361e9b0ae5409d7ab23f50b089da16497623c1) | fix  | always disable JSON stats with dev-server |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="19.1.8"></a>
 
 # 19.1.8 (2025-02-19)
