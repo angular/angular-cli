@@ -413,7 +413,7 @@ __metadata:
     magic-string: "npm:0.30.17"
     mini-css-extract-plugin: "npm:2.9.2"
     mrmime: "npm:2.0.1"
-    ng-packagr: "npm:19.1.2"
+    ng-packagr: "npm:19.2.0"
     npm: "npm:^11.0.0"
     npm-package-arg: "npm:12.0.2"
     npm-pick-manifest: "npm:10.0.0"
@@ -9031,7 +9031,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"esbuild@npm:0.24.2, esbuild@npm:^0.24.0, esbuild@npm:^0.24.2":
+"esbuild@npm:0.24.2, esbuild@npm:^0.24.2":
   version: 0.24.2
   resolution: "esbuild@npm:0.24.2"
   dependencies:
@@ -9117,7 +9117,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"esbuild@npm:0.25.0":
+"esbuild@npm:0.25.0, esbuild@npm:^0.25.0":
   version: 0.25.0
   resolution: "esbuild@npm:0.25.0"
   dependencies:
@@ -13593,9 +13593,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ng-packagr@npm:19.1.2":
-  version: 19.1.2
-  resolution: "ng-packagr@npm:19.1.2"
+"ng-packagr@npm:19.2.0":
+  version: 19.2.0
+  resolution: "ng-packagr@npm:19.2.0"
   dependencies:
     "@rollup/plugin-json": "npm:^6.1.0"
     "@rollup/wasm-node": "npm:^4.24.0"
@@ -13606,7 +13606,7 @@ __metadata:
     commander: "npm:^13.0.0"
     convert-source-map: "npm:^2.0.0"
     dependency-graph: "npm:^1.0.0"
-    esbuild: "npm:^0.24.0"
+    esbuild: "npm:^0.25.0"
     fast-glob: "npm:^3.3.2"
     find-cache-dir: "npm:^3.3.2"
     injection-js: "npm:^2.4.0"
@@ -13622,7 +13622,7 @@ __metadata:
     "@angular/compiler-cli": ^19.0.0 || ^19.1.0-next.0 || ^19.2.0-next.0
     tailwindcss: ^2.0.0 || ^3.0.0 || ^4.0.0
     tslib: ^2.3.0
-    typescript: ">=5.5 <5.8"
+    typescript: ">=5.5 <5.9"
   dependenciesMeta:
     rollup:
       optional: true
@@ -13631,7 +13631,7 @@ __metadata:
       optional: true
   bin:
     ng-packagr: cli/main.js
-  checksum: 10c0/901450bc60949a463a8f10697b0ff6240816881480218e534e6a4edf09c6c9aa8626391e56bf295dd67f3d12885dfddcb819cb1b1d0ec915ccb21c5efb8679f3
+  checksum: 10c0/69fec8f09c5d4da4889332f0f7a1816f290a13cdf2c91cdabcbf6366a764da580fbfcd33280e38179c59f251d1196572918acece20fd2c57548b5bab125a90e7
   languageName: node
   linkType: hard
 
