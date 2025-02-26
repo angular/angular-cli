@@ -365,8 +365,8 @@ importers:
         specifier: 2.0.1
         version: 2.0.1
       ng-packagr:
-        specifier: 19.1.2
-        version: 19.1.2(@angular/compiler-cli@19.2.0-rc.0)(tslib@2.8.1)(typescript@5.8.1-rc)
+        specifier: 19.2.0
+        version: 19.2.0(@angular/compiler-cli@19.2.0-rc.0)(tslib@2.8.1)(typescript@5.8.1-rc)
       npm:
         specifier: ^11.0.0
         version: 11.1.0
@@ -10575,8 +10575,8 @@ packages:
     engines: {node: '>= 0.4.0'}
     dev: true
 
-  /ng-packagr@19.1.2(@angular/compiler-cli@19.2.0-rc.0)(tslib@2.8.1)(typescript@5.8.1-rc):
-    resolution: {integrity: sha512-h8YDp6YdPwAwbl7rs0lJE7vVugobY6m+JogS0hQ7P+52RmslPT8kRCgdvGLIS1JySwPrDFQkPh2PLBaSjwcRqQ==}
+  /ng-packagr@19.2.0(@angular/compiler-cli@19.2.0-rc.0)(tslib@2.8.1)(typescript@5.8.1-rc):
+    resolution: {integrity: sha512-bDyB9tmXMCL/4IhKcX84zGQlQrZhPhdCaomdJocz6EN57cZWdTP7SGhrswzpdGJY+y89855detet27oJLgR3IQ==}
     engines: {node: ^18.19.1 || >=20.11.1}
     hasBin: true
     peerDependencies:
@@ -10598,7 +10598,7 @@ packages:
       commander: 13.1.0
       convert-source-map: 2.0.0
       dependency-graph: 1.0.0
-      esbuild: 0.24.2
+      esbuild: 0.25.0
       fast-glob: 3.3.3
       find-cache-dir: 3.3.2
       injection-js: 2.4.0
