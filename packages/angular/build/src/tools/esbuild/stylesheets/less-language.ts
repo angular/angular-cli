@@ -130,7 +130,9 @@ async function compileString(
     } as Less.Options);
 
     return {
-      contents: options.sourcemap ? `${css}\n${sourceMapToUrlComment(map)}` : css,
+      // There can be cases where `less` will return an undefined `map` even
+      // though the types do not specify this as a possibility.
+      contents: map ? `${css}\n${sourceMapToUrlComment(map)}` : css,
       loader: 'css',
       watchFiles: [filename, ...imports],
     };
