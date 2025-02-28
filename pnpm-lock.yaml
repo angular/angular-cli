@@ -23,8 +23,8 @@ importers:
         specifier: 19.2.0
         version: 19.2.0(@angular/core@19.2.0)
       '@angular/bazel':
-        specifier: https://github.com/angular/bazel-builds.git#fdef2cfed1cb0ff6ee51d9edb88b5c78684a40ef
-        version: github.com/angular/bazel-builds/fdef2cfed1cb0ff6ee51d9edb88b5c78684a40ef(@angular/compiler-cli@19.2.0)(@rollup/plugin-commonjs@28.0.2)(@rollup/plugin-node-resolve@13.3.0)(@types/node@20.17.19)(rollup-plugin-sourcemaps@0.6.3)(rollup@4.34.8)(terser@5.39.0)(typescript@5.8.1-rc)
+        specifier: https://github.com/angular/bazel-builds.git#8faa06d66416ce78073ab59539ff03f5253b8d52
+        version: github.com/angular/bazel-builds/8faa06d66416ce78073ab59539ff03f5253b8d52(@angular/compiler-cli@19.2.0)(@rollup/plugin-commonjs@28.0.2)(@rollup/plugin-node-resolve@13.3.0)(@types/node@20.17.19)(rollup-plugin-sourcemaps@0.6.3)(rollup@4.34.8)(terser@5.39.0)(typescript@5.8.1-rc)
       '@angular/build-tooling':
         specifier: https://github.com/angular/dev-infra-private-build-tooling-builds.git#a6a996a69cfc03b3fbe538f11dd24b7bc4b30592
         version: github.com/angular/dev-infra-private-build-tooling-builds/a6a996a69cfc03b3fbe538f11dd24b7bc4b30592(debug@4.4.0)(karma-chrome-launcher@3.2.0)(karma-jasmine@5.1.0)(karma@6.4.4)(rxjs@7.8.2)(terser@5.39.0)(zone.js@0.15.0)
@@ -14230,15 +14230,15 @@ packages:
     resolution: {integrity: sha512-9oxn0IIjbCZkJ67L+LkhYWRyAy7axphb3VgE2MBDlOqnmHMPWGYMxJxBYFueFq/JGY2GMwS0rU+UCLunEmy5UA==}
     dev: true
 
-  github.com/angular/bazel-builds/fdef2cfed1cb0ff6ee51d9edb88b5c78684a40ef(@angular/compiler-cli@19.2.0)(@rollup/plugin-commonjs@28.0.2)(@rollup/plugin-node-resolve@13.3.0)(@types/node@20.17.19)(rollup-plugin-sourcemaps@0.6.3)(rollup@4.34.8)(terser@5.39.0)(typescript@5.8.1-rc):
-    resolution: {tarball: https://codeload.github.com/angular/bazel-builds/tar.gz/fdef2cfed1cb0ff6ee51d9edb88b5c78684a40ef}
-    id: github.com/angular/bazel-builds/fdef2cfed1cb0ff6ee51d9edb88b5c78684a40ef
+  github.com/angular/bazel-builds/8faa06d66416ce78073ab59539ff03f5253b8d52(@angular/compiler-cli@19.2.0)(@rollup/plugin-commonjs@28.0.2)(@rollup/plugin-node-resolve@13.3.0)(@types/node@20.17.19)(rollup-plugin-sourcemaps@0.6.3)(rollup@4.34.8)(terser@5.39.0)(typescript@5.8.1-rc):
+    resolution: {tarball: https://codeload.github.com/angular/bazel-builds/tar.gz/8faa06d66416ce78073ab59539ff03f5253b8d52}
+    id: github.com/angular/bazel-builds/8faa06d66416ce78073ab59539ff03f5253b8d52
     name: '@angular/bazel'
     version: 20.0.0-next.0
     engines: {node: ^18.19.1 || ^20.11.1 || >=22.0.0}
     hasBin: true
     peerDependencies:
-      '@angular/compiler-cli': 20.0.0-next.0+sha-08d9081
+      '@angular/compiler-cli': 20.0.0-next.0+sha-51b8ff2
       '@bazel/concatjs': ^5.3.0
       '@bazel/worker': ^5.3.0
       '@rollup/plugin-commonjs': ^28.0.0
