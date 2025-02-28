@@ -55,15 +55,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@angular/bazel@https://github.com/angular/bazel-builds.git#fdef2cfed1cb0ff6ee51d9edb88b5c78684a40ef":
-  version: 20.0.0-next.0+sha-08d9081
-  resolution: "@angular/bazel@https://github.com/angular/bazel-builds.git#commit=fdef2cfed1cb0ff6ee51d9edb88b5c78684a40ef"
+"@angular/bazel@https://github.com/angular/bazel-builds.git#8faa06d66416ce78073ab59539ff03f5253b8d52":
+  version: 20.0.0-next.0+sha-51b8ff2
+  resolution: "@angular/bazel@https://github.com/angular/bazel-builds.git#commit=8faa06d66416ce78073ab59539ff03f5253b8d52"
   dependencies:
     "@microsoft/api-extractor": "npm:^7.24.2"
     magic-string: "npm:^0.30.0"
     tslib: "npm:^2.3.0"
   peerDependencies:
-    "@angular/compiler-cli": 20.0.0-next.0+sha-08d9081
+    "@angular/compiler-cli": 20.0.0-next.0+sha-51b8ff2
     "@bazel/concatjs": ^5.3.0
     "@bazel/worker": ^5.3.0
     "@rollup/plugin-commonjs": ^28.0.0
@@ -80,7 +80,7 @@ __metadata:
     packager: ./src/ng_package/packager.mjs
     types_bundler: ./src/types_bundle/index.mjs
     xi18n: ./src/ngc-wrapped/extract_i18n.mjs
-  checksum: 10c0/0dcf8ae98bf8a99927ee67578833a1a3a027075298bbcd3233b2551d662a7ac2fae9a0feb56608cca4000ed1d0bf9c3ffa44220159c27162b2c7df0fefcdc78d
+  checksum: 10c0/c582964a0172c4a1f62964750b0f70766bbcac01bf1be85ca5b4dac623ef1fdaa92c38ce49ca08e0b0e1b97d8240faa42f06c6aa2d85810b0a3657e15b4b543e
   languageName: node
   linkType: hard
 
@@ -299,7 +299,7 @@ __metadata:
   dependencies:
     "@ampproject/remapping": "npm:2.3.0"
     "@angular/animations": "npm:19.2.0"
-    "@angular/bazel": "https://github.com/angular/bazel-builds.git#fdef2cfed1cb0ff6ee51d9edb88b5c78684a40ef"
+    "@angular/bazel": "https://github.com/angular/bazel-builds.git#8faa06d66416ce78073ab59539ff03f5253b8d52"
     "@angular/build-tooling": "https://github.com/angular/dev-infra-private-build-tooling-builds.git#a6a996a69cfc03b3fbe538f11dd24b7bc4b30592"
     "@angular/cdk": "npm:19.2.1"
     "@angular/common": "npm:19.2.0"
