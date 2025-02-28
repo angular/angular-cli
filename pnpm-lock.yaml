@@ -472,6 +472,9 @@ importers:
       terser:
         specifier: 5.39.0
         version: 5.39.0
+      tinyglobby:
+        specifier: 0.2.12
+        version: 0.2.12
       tree-kill:
         specifier: 1.2.2
         version: 1.2.2
@@ -582,9 +585,6 @@ importers:
       esbuild:
         specifier: 0.25.0
         version: 0.25.0
-      fast-glob:
-        specifier: 3.3.3
-        version: 3.3.3
       https-proxy-agent:
         specifier: 7.0.6
         version: 7.0.6(supports-color@10.0.0)
@@ -621,6 +621,9 @@ importers:
       source-map-support:
         specifier: 0.5.21
         version: 0.5.21
+      tinyglobby:
+        specifier: 0.2.12
+        version: 0.2.12
       vite:
         specifier: 6.2.0
         version: 6.2.0(@types/node@20.17.19)(less@4.2.2)(sass@1.85.1)(terser@5.39.0)

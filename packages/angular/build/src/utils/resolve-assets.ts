@@ -6,8 +6,8 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import glob from 'fast-glob';
 import path from 'node:path';
+import { glob } from 'tinyglobby';
 
 export async function resolveAssets(
   entries: {

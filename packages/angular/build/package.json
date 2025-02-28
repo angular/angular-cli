@@ -29,7 +29,6 @@
     "beasties": "0.2.0",
     "browserslist": "^4.23.0",
     "esbuild": "0.25.0",
-    "fast-glob": "3.3.3",
     "https-proxy-agent": "7.0.6",
     "istanbul-lib-instrument": "6.0.3",
     "listr2": "8.2.5",
@@ -42,6 +41,7 @@
     "sass": "1.85.1",
     "semver": "7.7.1",
     "source-map-support": "0.5.21",
+    "tinyglobby": "0.2.12",
     "vite": "6.2.0",
     "watchpack": "2.4.2"
   },

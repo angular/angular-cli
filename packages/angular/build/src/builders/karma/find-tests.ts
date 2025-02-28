@@ -6,9 +6,9 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import glob, { isDynamicPattern } from 'fast-glob';
 import { PathLike, constants, promises as fs } from 'node:fs';
 import { basename, dirname, extname, join, relative } from 'node:path';
+import { glob, isDynamicPattern } from 'tinyglobby';
 
 /* Go through all patterns and find unique list of files */
 export async function findTests(

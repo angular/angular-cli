@@ -449,6 +449,7 @@ __metadata:
     symbol-observable: "npm:4.0.0"
     tar: "npm:^7.0.0"
     terser: "npm:5.39.0"
+    tinyglobby: "npm:0.2.12"
     tree-kill: "npm:1.2.2"
     ts-node: "npm:^10.9.1"
     tslib: "npm:2.8.1"
@@ -17623,7 +17624,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tinyglobby@npm:^0.2.12":
+"tinyglobby@npm:0.2.12, tinyglobby@npm:^0.2.12":
   version: 0.2.12
   resolution: "tinyglobby@npm:0.2.12"
   dependencies:
