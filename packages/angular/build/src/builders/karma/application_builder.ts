@@ -7,7 +7,6 @@
  */
 
 import type { BuilderContext, BuilderOutput } from '@angular-devkit/architect';
-import glob from 'fast-glob';
 import type { Config, ConfigOptions, FilePattern, InlinePluginDef, Server } from 'karma';
 import { randomUUID } from 'node:crypto';
 import * as fs from 'node:fs/promises';
@@ -15,6 +14,7 @@ import type { IncomingMessage, ServerResponse } from 'node:http';
 import { createRequire } from 'node:module';
 import * as path from 'node:path';
 import { ReadableStreamController } from 'node:stream/web';
+import { globSync } from 'tinyglobby';
 import { BuildOutputFileType } from '../../tools/esbuild/bundler-context';
 import { emitFilesToDisk } from '../../tools/esbuild/utils';
 import { buildApplicationInternal } from '../application/index';
@@ -614,7 +614,7 @@ function getInstrumentationExcludedPaths(root: string, excludedPaths: string[]):
 
   for (const excludeGlob of excludedPaths) {
     const excludePath = excludeGlob[0] === '/' ? excludeGlob.slice(1) : excludeGlob;
-    glob.sync(excludePath, { cwd: root }).forEach((p) => excluded.add(path.join(root, p)));
+    globSync(excludePath, { absolute: true, cwd: root }).forEach((p) => excluded.add(p));
   }
 
   return excluded;

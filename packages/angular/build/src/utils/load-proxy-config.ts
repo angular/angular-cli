@@ -6,12 +6,12 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { isDynamicPattern } from 'fast-glob';
 import { existsSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import { extname, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { makeRe as makeRegExpFromGlob } from 'picomatch';
+import { isDynamicPattern } from 'tinyglobby';
 import { assertIsError } from './error';
 import { loadEsmModule } from './load-esm';
 
