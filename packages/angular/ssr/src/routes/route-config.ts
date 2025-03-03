@@ -190,26 +190,6 @@ export type ServerRoute =
   | ServerRouteServer;
 
 /**
- * Configuration options for server routes.
- *
- * This interface defines the optional settings available for configuring server routes
- * in the server-side environment, such as specifying a path to the app shell route.
- *
- *
- * @see {@link provideServerRouting}
- * @deprecated use `provideServerRouting`. This will be removed in version 20.
- */
-
-export interface ServerRoutesConfigOptions {
-  /**
-   * Defines the route to be used as the app shell, which serves as the main entry
-   * point for the application. This route is often used to enable server-side rendering
-   * of the application shell for requests that do not match any specific server route.
-   */
-  appShellRoute?: string;
-}
-
-/**
  * Configuration value for server routes configuration.
  * @internal
  */
@@ -228,40 +208,6 @@ export interface ServerRoutesConfig {
  * @internal
  */
 export const SERVER_ROUTES_CONFIG = new InjectionToken<ServerRoutesConfig>('SERVER_ROUTES_CONFIG');
-
-/**
- * Sets up the necessary providers for configuring server routes.
- * This function accepts an array of server routes and optional configuration
- * options, returning an `EnvironmentProviders` object that encapsulates
- * the server routes and configuration settings.
- *
- * @param routes - An array of server routes to be provided.
- * @param options - (Optional) An object containing additional configuration options for server routes.
- * @returns An `EnvironmentProviders` instance with the server routes configuration.
- *
- * @see {@link ServerRoute}
- * @see {@link ServerRoutesConfigOptions}
- * @see {@link provideServerRouting}
- * @deprecated use `provideServerRouting`. This will be removed in version 20.
- * @developerPreview
- */
-export function provideServerRoutesConfig(
-  routes: ServerRoute[],
-  options?: ServerRoutesConfigOptions,
-): EnvironmentProviders {
-  if (typeof ngServerMode === 'undefined' || !ngServerMode) {
-    throw new Error(
-      `The 'provideServerRoutesConfig' function should not be invoked within the browser portion of the application.`,
-    );
-  }
-
-  return makeEnvironmentProviders([
-    {
-      provide: SERVER_ROUTES_CONFIG,
-      useValue: { routes, ...options },
-    },
-  ]);
-}
 
 /**
  * Sets up the necessary providers for configuring server routes.
