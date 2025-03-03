@@ -26,9 +26,6 @@ export enum PrerenderFallback {
     Server = 0
 }
 
-// @public @deprecated
-export function provideServerRoutesConfig(routes: ServerRoute[], options?: ServerRoutesConfigOptions): EnvironmentProviders;
-
 // @public
 export function provideServerRouting(routes: ServerRoute[], ...features: ServerRoutesFeature<ServerRoutesFeatureKind>[]): EnvironmentProviders;
 
@@ -67,11 +64,6 @@ export interface ServerRoutePrerender extends Omit<ServerRouteCommon, 'status'> 
 export interface ServerRoutePrerenderWithParams extends Omit<ServerRoutePrerender, 'fallback'> {
     fallback?: PrerenderFallback;
     getPrerenderParams: () => Promise<Record<string, string>[]>;
-}
-
-// @public @deprecated
-export interface ServerRoutesConfigOptions {
-    appShellRoute?: string;
 }
 
 // @public
