@@ -151,7 +151,10 @@ function* updateBuildTarget(
   // Update server file
   const ssrMainFile = serverTarget?.options?.['main'];
   if (typeof ssrMainFile === 'string') {
-    yield deleteFile(ssrMainFile);
+    // Do not delete the server main file if it's the same as the browser file.
+    if (buildTarget.options?.browser !== ssrMainFile) {
+      yield deleteFile(ssrMainFile);
+    }
 
     yield externalSchematic('@schematics/angular', 'ssr', {
       project: projectName,
