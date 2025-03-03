@@ -1,4 +1,4 @@
-load("@npm//@angular/build-tooling/bazel/spec-bundling:index.bzl", "spec_bundle")
+load("@devinfra//bazel/spec-bundling:index_rjs.bzl", "spec_bundle")
 load("//tools:defaults2.bzl", "jasmine_test", "ts_project")
 
 ts_project(
@@ -20,13 +20,8 @@ ts_project(
     ],
 )
 
-# TODO: Replace this with a `rules_js` variant, or make the SSR package
-# native ESM compatible! (import extensions etc.)
 spec_bundle(
     name = "esm_tests_bundled",
-    downlevel_async_await = False,
-    platform = "node",
-    run_angular_linker = False,
     deps = [
         ":unit_test_lib",
     ],

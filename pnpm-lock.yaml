@@ -22,9 +22,6 @@ importers:
       '@angular/animations':
         specifier: 20.0.0-next.1
         version: 20.0.0-next.1(@angular/core@20.0.0-next.1)
-      '@angular/bazel':
-        specifier: https://github.com/angular/bazel-builds.git#8269ca110da4ead292163e7f2614b6407efe40ca
-        version: github.com/angular/bazel-builds/8269ca110da4ead292163e7f2614b6407efe40ca(@angular/compiler-cli@20.0.0-next.1)(@rollup/plugin-commonjs@28.0.3)(@rollup/plugin-node-resolve@13.3.0)(@types/node@20.17.24)(rollup-plugin-sourcemaps@0.6.3)(rollup@4.35.0)(terser@5.39.0)(typescript@5.8.2)
       '@angular/build-tooling':
         specifier: https://github.com/angular/dev-infra-private-build-tooling-builds.git#d4727212a9d0f7eb63ae3116d73c769d9bd0bdc1
         version: github.com/angular/dev-infra-private-build-tooling-builds/d4727212a9d0f7eb63ae3116d73c769d9bd0bdc1(debug@4.4.0)(karma-chrome-launcher@3.2.0)(karma-jasmine@5.1.0)(karma@6.4.4)(rxjs@7.8.2)(terser@5.39.0)(zone.js@0.15.0)
@@ -2511,7 +2508,6 @@ packages:
 
   /@bazel/typescript@5.8.1(typescript@5.8.2):
     resolution: {integrity: sha512-NAJ8WQHZL1WE1YmRoCrq/1hhG15Mvy/viWh6TkvFnBeEhNUiQUsA5GYyhU1ztnBIYW03nATO3vwhAEfO7Q0U5g==}
-    deprecated: No longer maintained, https://github.com/aspect-build/rules_ts is the recommended replacement
     hasBin: true
     peerDependencies:
       typescript: 5.8.2
@@ -3309,16 +3305,6 @@ packages:
       - '@types/node'
     dev: true
 
-  /@microsoft/api-extractor-model@7.30.3(@types/node@20.17.24):
-    resolution: {integrity: sha512-yEAvq0F78MmStXdqz9TTT4PZ05Xu5R8nqgwI5xmUmQjWBQ9E6R2n8HB/iZMRciG4rf9iwI2mtuQwIzDXBvHn1w==}
-    dependencies:
-      '@microsoft/tsdoc': 0.15.1
-      '@microsoft/tsdoc-config': 0.17.1
-      '@rushstack/node-core-library': 5.11.0(@types/node@20.17.24)
-    transitivePeerDependencies:
-      - '@types/node'
-    dev: true
-
   /@microsoft/api-extractor@7.50.0(@types/node@18.19.80):
     resolution: {integrity: sha512-Ds/PHTiVzuENQsmXrJKkSdfgNkr/SDG/2rDef0AWl3BchAnXdO7gXaYsAkNx4gWiC4OngNA3fQfd3+BcQxP1DQ==}
     hasBin: true
@@ -3330,27 +3316,6 @@ packages:
       '@rushstack/rig-package': 0.5.3
       '@rushstack/terminal': 0.15.0(@types/node@18.19.80)
       '@rushstack/ts-command-line': 4.23.5(@types/node@18.19.80)
-      lodash: 4.17.21
-      minimatch: 3.0.8
-      resolve: 1.22.10
-      semver: 7.5.4
-      source-map: 0.6.1
-      typescript: 5.8.2
-    transitivePeerDependencies:
-      - '@types/node'
-    dev: true
-
-  /@microsoft/api-extractor@7.51.1(@types/node@20.17.24):
-    resolution: {integrity: sha512-VoFvIeYXme8QctXDkixy1KIn750kZaFy2snAEOB3nhDFfbBcJNEcvBrpCIQIV09MqI4g9egKUkg+/12WMRC77w==}
-    hasBin: true
-    dependencies:
-      '@microsoft/api-extractor-model': 7.30.3(@types/node@20.17.24)
-      '@microsoft/tsdoc': 0.15.1
-      '@microsoft/tsdoc-config': 0.17.1
-      '@rushstack/node-core-library': 5.11.0(@types/node@20.17.24)
-      '@rushstack/rig-package': 0.5.3
-      '@rushstack/terminal': 0.15.0(@types/node@20.17.24)
-      '@rushstack/ts-command-line': 4.23.5(@types/node@20.17.24)
       lodash: 4.17.21
       minimatch: 3.0.8
       resolve: 1.22.10
@@ -4206,25 +4171,6 @@ packages:
       semver: 7.5.4
     dev: true
 
-  /@rushstack/node-core-library@5.11.0(@types/node@20.17.24):
-    resolution: {integrity: sha512-I8+VzG9A0F3nH2rLpPd7hF8F7l5Xb7D+ldrWVZYegXM6CsKkvWc670RlgK3WX8/AseZfXA/vVrh0bpXe2Y2UDQ==}
-    peerDependencies:
-      '@types/node': '*'
-    peerDependenciesMeta:
-      '@types/node':
-        optional: true
-    dependencies:
-      '@types/node': 20.17.24
-      ajv: 8.13.0
-      ajv-draft-04: 1.0.0(ajv@8.13.0)
-      ajv-formats: 3.0.1(ajv@8.13.0)
-      fs-extra: 11.3.0
-      import-lazy: 4.0.0
-      jju: 1.4.0
-      resolve: 1.22.10
-      semver: 7.5.4
-    dev: true
-
   /@rushstack/rig-package@0.5.3:
     resolution: {integrity: sha512-olzSSjYrvCNxUFZowevC3uz8gvKr3WTpHQ7BkpjtRpA3wK+T0ybep/SRUMfr195gBzJm5gaXw0ZMgjIyHqJUow==}
     dependencies:
@@ -4245,34 +4191,10 @@ packages:
       supports-color: 8.1.1
     dev: true
 
-  /@rushstack/terminal@0.15.0(@types/node@20.17.24):
-    resolution: {integrity: sha512-vXQPRQ+vJJn4GVqxkwRe+UGgzNxdV8xuJZY2zem46Y0p3tlahucH9/hPmLGj2i9dQnUBFiRnoM9/KW7PYw8F4Q==}
-    peerDependencies:
-      '@types/node': '*'
-    peerDependenciesMeta:
-      '@types/node':
-        optional: true
-    dependencies:
-      '@rushstack/node-core-library': 5.11.0(@types/node@20.17.24)
-      '@types/node': 20.17.24
-      supports-color: 8.1.1
-    dev: true
-
   /@rushstack/ts-command-line@4.23.5(@types/node@18.19.80):
     resolution: {integrity: sha512-jg70HfoK44KfSP3MTiL5rxsZH7X1ktX3cZs9Sl8eDu1/LxJSbPsh0MOFRC710lIuYYSgxWjI5AjbCBAl7u3RxA==}
     dependencies:
       '@rushstack/terminal': 0.15.0(@types/node@18.19.80)
-      '@types/argparse': 1.0.38
-      argparse: 1.0.10
-      string-argv: 0.3.2
-    transitivePeerDependencies:
-      - '@types/node'
-    dev: true
-
-  /@rushstack/ts-command-line@4.23.5(@types/node@20.17.24):
-    resolution: {integrity: sha512-jg70HfoK44KfSP3MTiL5rxsZH7X1ktX3cZs9Sl8eDu1/LxJSbPsh0MOFRC710lIuYYSgxWjI5AjbCBAl7u3RxA==}
-    dependencies:
-      '@rushstack/terminal': 0.15.0(@types/node@20.17.24)
       '@types/argparse': 1.0.38
       argparse: 1.0.10
       string-argv: 0.3.2
@@ -11766,7 +11688,7 @@ packages:
   /puppeteer@18.2.1:
     resolution: {integrity: sha512-7+UhmYa7wxPh2oMRwA++k8UGVDxh3YdWFB52r9C3tM81T6BU7cuusUSxImz0GEYSOYUKk/YzIhkQ6+vc0gHbxQ==}
     engines: {node: '>=14.1.0'}
-    deprecated: < 22.8.2 is no longer supported
+    deprecated: < 19.4.0 is no longer supported
     requiresBuild: true
     dependencies:
       https-proxy-agent: 5.0.1(supports-color@10.0.0)
@@ -14438,42 +14360,6 @@ packages:
 
   /zone.js@0.15.0:
     resolution: {integrity: sha512-9oxn0IIjbCZkJ67L+LkhYWRyAy7axphb3VgE2MBDlOqnmHMPWGYMxJxBYFueFq/JGY2GMwS0rU+UCLunEmy5UA==}
-    dev: true
-
-  github.com/angular/bazel-builds/8269ca110da4ead292163e7f2614b6407efe40ca(@angular/compiler-cli@20.0.0-next.1)(@rollup/plugin-commonjs@28.0.3)(@rollup/plugin-node-resolve@13.3.0)(@types/node@20.17.24)(rollup-plugin-sourcemaps@0.6.3)(rollup@4.35.0)(terser@5.39.0)(typescript@5.8.2):
-    resolution: {tarball: https://codeload.github.com/angular/bazel-builds/tar.gz/8269ca110da4ead292163e7f2614b6407efe40ca}
-    id: github.com/angular/bazel-builds/8269ca110da4ead292163e7f2614b6407efe40ca
-    name: '@angular/bazel'
-    version: 20.0.0-next.1
-    engines: {node: ^18.19.1 || ^20.11.1 || >=22.0.0}
-    hasBin: true
-    peerDependencies:
-      '@angular/compiler-cli': 20.0.0-next.1+sha-a02e270
-      '@bazel/concatjs': ^5.3.0
-      '@bazel/worker': ^5.3.0
-      '@rollup/plugin-commonjs': ^28.0.0
-      '@rollup/plugin-node-resolve': ^13.0.4
-      rollup: ^2.56.3
-      rollup-plugin-sourcemaps: ^0.6.3
-      terser: ^5.9.0
-      typescript: 5.8.2
-    peerDependenciesMeta:
-      terser:
-        optional: true
-    dependencies:
-      '@angular/compiler-cli': 20.0.0-next.1(@angular/compiler@20.0.0-next.1)(typescript@5.8.2)
-      '@microsoft/api-extractor': 7.51.1(@types/node@20.17.24)
-      '@rollup/plugin-commonjs': 28.0.3(rollup@4.35.0)
-      '@rollup/plugin-node-resolve': 13.3.0(rollup@4.35.0)
-      magic-string: 0.30.17
-      rollup: 4.35.0
-      rollup-plugin-sourcemaps: 0.6.3(@types/node@20.17.24)(rollup@4.35.0)
-      terser: 5.39.0
-      tinyglobby: 0.2.12
-      tslib: 2.8.1
-      typescript: 5.8.2
-    transitivePeerDependencies:
-      - '@types/node'
     dev: true
 
   github.com/angular/dev-infra-private-build-tooling-builds/d4727212a9d0f7eb63ae3116d73c769d9bd0bdc1(debug@4.4.0)(karma-chrome-launcher@3.2.0)(karma-jasmine@5.1.0)(karma@6.4.4)(rxjs@7.8.2)(terser@5.39.0)(zone.js@0.15.0):
