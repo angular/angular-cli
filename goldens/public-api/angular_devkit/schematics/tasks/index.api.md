@@ -24,19 +24,6 @@ export class NodePackageInstallTask implements TaskConfigurationGenerator<NodePa
     workingDirectory?: string;
 }
 
-// @public @deprecated (undocumented)
-export class NodePackageLinkTask implements TaskConfigurationGenerator<NodePackageTaskOptions> {
-    constructor(packageName?: string | undefined, workingDirectory?: string | undefined);
-    // (undocumented)
-    packageName?: string | undefined;
-    // (undocumented)
-    quiet: boolean;
-    // (undocumented)
-    toConfiguration(): TaskConfiguration<NodePackageTaskOptions>;
-    // (undocumented)
-    workingDirectory?: string | undefined;
-}
-
 // @public (undocumented)
 export class RepositoryInitializerTask implements TaskConfigurationGenerator<RepositoryInitializerTaskOptions> {
     constructor(workingDirectory?: string | undefined, commitOptions?: CommitOptions | undefined);
