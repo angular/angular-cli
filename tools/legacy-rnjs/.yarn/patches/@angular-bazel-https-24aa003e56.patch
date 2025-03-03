@@ -1,0 +1,55 @@
+diff --git a/src/ng_package/packager.mjs b/src/ng_package/packager.mjs
+index 02df6edbc9eeed99217283eacdc9e338f75209e3..2c01640b4dbf50f38fb2ce28589eccb78fc90839 100755
+--- a/src/ng_package/packager.mjs
++++ b/src/ng_package/packager.mjs
+@@ -7,7 +7,7 @@
+  */
+ import * as fs from 'fs';
+ import * as path from 'path';
+-import { analyzeFileAndEnsureNoCrossImports } from './cross_entry_points_imports';
++import { analyzeFileAndEnsureNoCrossImports } from './cross_entry_points_imports.mjs';
+ /**
+  * List of known `package.json` fields which provide information about
+  * supported package formats and their associated entry paths.
+@@ -27,21 +27,21 @@ function main(args) {
+     const params = fs.readFileSync(paramFilePath, 'utf-8').split('\n').map(unquoteParameter);
+     const [
+     // Output directory for the npm package.
+-    outputDirExecPath, 
++    outputDirExecPath,
+     // The package segment of the ng_package rule's label (e.g. 'package/common').
+-    owningPackageName, 
++    owningPackageName,
+     // JSON data capturing metadata of the package being built. See `PackageMetadata`.
+-    metadataArg, 
++    metadataArg,
+     // Path to the package's README.md.
+-    readmeMd, 
++    readmeMd,
+     // Path to the package's LICENSE file.
+-    licenseFile, 
++    licenseFile,
+     // List of rolled-up flat ES2022 modules
+-    fesm2022Arg, 
++    fesm2022Arg,
+     // List of individual ES2022 modules
+-    esm2022Arg, 
++    esm2022Arg,
+     // List of static files that should be copied into the package.
+-    staticFilesArg, 
++    staticFilesArg,
+     // List of all type definitions that need to packaged into the ng_package.
+     typeDefinitionsArg,] = params;
+     const fesm2022 = JSON.parse(fesm2022Arg);
+diff --git a/src/ng_package/rollup.config.js b/src/ng_package/rollup.config.js
+index 61422918fb279064a4869ca2b48b2dcdf8bd0237..95213c660be829ad974449bcf0328ddf633ccc7e 100644
+--- a/src/ng_package/rollup.config.js
++++ b/src/ng_package/rollup.config.js
+@@ -165,7 +165,6 @@ const plugins = [
+   nodeResolve({
+     mainFields: ['es2020', 'es2015', 'module', 'browser'],
+     jail: process.cwd(),
+-    customResolveOptions: {moduleDirectory: nodeModulesRoot},
+   }),
+   stripBannerPlugin,
+   commonjs({ignoreGlobal: true}),
