@@ -614,7 +614,7 @@ function getInstrumentationExcludedPaths(root: string, excludedPaths: string[]):
 
   for (const excludeGlob of excludedPaths) {
     const excludePath = excludeGlob[0] === '/' ? excludeGlob.slice(1) : excludeGlob;
-    globSync(excludePath, { absolute: true, cwd: root }).forEach((p) => excluded.add(p));
+    globSync(excludePath, { cwd: root }).forEach((p) => excluded.add(path.join(root, p)));
   }
 
   return excluded;
