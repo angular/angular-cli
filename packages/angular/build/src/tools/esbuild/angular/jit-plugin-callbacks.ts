@@ -34,23 +34,21 @@ async function loadEntry(
   root: string,
   skipRead?: boolean,
 ): Promise<{ path: string; contents?: string }> {
-  if (entry.startsWith('file:')) {
-    const specifier = join(root, entry.slice(5));
-
-    return {
-      path: specifier,
-      contents: skipRead ? undefined : await readFile(specifier, 'utf-8'),
-    };
-  } else if (entry.startsWith('inline:')) {
+  if (entry.startsWith('inline:')) {
     const [importer, data] = entry.slice(7).split(';', 2);
 
     return {
       path: join(root, importer),
       contents: Buffer.from(data, 'base64').toString(),
     };
-  } else {
-    throw new Error('Invalid data for Angular JIT entry.');
   }
+
+  const path = join(root, entry);
+
+  return {
+    path,
+    contents: skipRead ? undefined : await readFile(path, 'utf-8'),
+  };
 }
 
 /**
@@ -85,7 +83,7 @@ export function setupJitPluginCallbacks(
       return {
         // Use a relative path to prevent fully resolved paths in the metafile (JSON stats file).
         // This is only necessary for custom namespaces. esbuild will handle the file namespace.
-        path: 'file:' + relative(root, join(dirname(args.importer), specifier)),
+        path: relative(root, join(dirname(args.importer), specifier)),
         namespace,
       };
     } else {
