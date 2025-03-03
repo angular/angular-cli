@@ -110,20 +110,18 @@ rules_js_register_toolchains(
 
 load("@build_bazel_rules_nodejs//:index.bzl", "yarn_install")
 
+# TODO(devversion): Remove this once `ng_package` is ported over to `rules_js`.
 yarn_install(
     name = "npm",
     data = [
         "//:.yarn/releases/yarn-4.5.0.cjs",
         "//:.yarnrc.yml",
-        "//:patches/@angular+bazel+20.0.0-next.1.patch",
+        "//tools/legacy-rnjs:.yarn/patches/@angular-bazel-https-67c38b3c32.patch",
     ],
-    # Currently disabled due to:
-    #  1. Missing Windows support currently.
-    #  2. Incompatibilites with the `ts_library` rule.
     exports_directories_only = False,
-    package_json = "//:package.json",
+    package_json = "//tools/legacy-rnjs:package.json",
     yarn = "//:.yarn/releases/yarn-4.5.0.cjs",
-    yarn_lock = "//:yarn.lock",
+    yarn_lock = "//tools/legacy-rnjs:yarn.lock",
 )
 
 http_archive(
