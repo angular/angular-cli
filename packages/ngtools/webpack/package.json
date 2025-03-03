@@ -29,7 +29,7 @@
     "@angular-devkit/core": "workspace:0.0.0-PLACEHOLDER",
     "@angular/compiler": "19.2.0",
     "@angular/compiler-cli": "19.2.0",
-    "typescript": "5.8.1-rc",
+    "typescript": "5.8.2",
     "webpack": "5.98.0"
   }
 }
