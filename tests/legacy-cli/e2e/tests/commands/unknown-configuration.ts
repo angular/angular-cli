@@ -1,17 +1,11 @@
+import assert from 'node:assert';
 import { ng } from '../../utils/process';
+import { expectToFail } from '../../utils/utils';
 
 export default async function () {
-  try {
-    await ng('build', '--configuration', 'invalid');
-    throw new Error('should have failed.');
-  } catch (error) {
-    if (
-      !(
-        error instanceof Error &&
-        error.message.includes(`Configuration 'invalid' is not set in the workspace`)
-      )
-    ) {
-      throw error;
-    }
-  }
+  const error = await expectToFail(() => ng('build', '--configuration', 'invalid'));
+  assert.match(
+    error.message,
+    /Configuration 'invalid' for target 'build' in project 'test-project' is not set in the workspace/,
+  );
 }

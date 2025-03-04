@@ -90,7 +90,9 @@ export class WorkspaceNodeModulesArchitectHost implements ArchitectHost<NodeModu
           }
 
           if (!targetDefinition.configurations?.[configuration]) {
-            throw new Error(`Configuration '${configuration}' is not set in the workspace.`);
+            throw new Error(
+              `Configuration '${configuration}' for target '${target}' in project '${project}' is not set in the workspace.`,
+            );
           }
 
           return (targetDefinition.configurations?.[configuration] ?? {}) as json.JsonObject;
