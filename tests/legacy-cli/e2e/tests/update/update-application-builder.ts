@@ -10,7 +10,7 @@ import { execAndWaitForOutputToMatch, ng, noSilentNg } from '../../utils/process
 import { findFreePort } from '../../utils/network';
 
 export default async function () {
-  await createProjectFromAsset('19-ssr-project-webpack', false, false);
+  await createProjectFromAsset('ssr-project-webpack', false, false);
   await ng('update', `@angular/cli`, '--name=use-application-builder');
 
   await Promise.all([
@@ -23,8 +23,8 @@ export default async function () {
   await noSilentNg('build', '--configuration=production');
 
   await Promise.all([
-    expectFileToExist('dist/18-ssr-project-webpack/server/server.mjs'),
-    expectFileMatchToExist('dist/18-ssr-project-webpack/browser', /main-[a-zA-Z0-9]{8}\.js/),
+    expectFileToExist('dist/ssr-project-webpack/server/server.mjs'),
+    expectFileMatchToExist('dist/ssr-project-webpack/browser', /main-[a-zA-Z0-9]{8}\.js/),
   ]);
 
   // Verify that the app runs

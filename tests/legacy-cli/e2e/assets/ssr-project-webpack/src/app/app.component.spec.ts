@@ -14,16 +14,16 @@ describe('AppComponent', () => {
     expect(app).toBeTruthy();
   });
 
-  it(`should have as title '19-ssr-project-webpack'`, () => {
+  it(`should have as title '20-ssr-project-webpack'`, () => {
     const fixture = TestBed.createComponent(AppComponent);
     const app = fixture.componentInstance;
-    expect(app.title).toEqual('19-ssr-project-webpack');
+    expect(app.title).toEqual('20-ssr-project-webpack');
   });
 
   it('should render title', () => {
     const fixture = TestBed.createComponent(AppComponent);
     fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('.content span')?.textContent).toContain('19-ssr-project-webpack app is running!');
+    expect(compiled.querySelector('.content span')?.textContent).toContain('20-ssr-project-webpack app is running!');
   });
 });

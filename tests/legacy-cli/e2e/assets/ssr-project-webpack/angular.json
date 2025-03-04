@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "18-ssr-project-webpack": {
+    "ssr-project-webpack": {
       "projectType": "application",
       "schematics": {},
       "root": "",
@@ -13,7 +13,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "dist/18-ssr-project-webpack/browser",
+            "outputPath": "dist/ssr-project-webpack/browser",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": [
@@ -60,10 +60,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "18-ssr-project-webpack:build:production"
+              "buildTarget": "ssr-project-webpack:build:production"
             },
             "development": {
-              "buildTarget": "18-ssr-project-webpack:build:development"
+              "buildTarget": "ssr-project-webpack:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -71,7 +71,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "buildTarget": "18-ssr-project-webpack:build"
+            "buildTarget": "ssr-project-webpack:build"
           }
         },
         "test": {
@@ -95,7 +95,7 @@
         "server": {
           "builder": "@angular-devkit/build-angular:server",
           "options": {
-            "outputPath": "dist/18-ssr-project-webpack/server",
+            "outputPath": "dist/ssr-project-webpack/server",
             "main": "server.ts",
             "tsConfig": "tsconfig.server.json"
           },
@@ -117,12 +117,12 @@
           "builder": "@angular-devkit/build-angular:ssr-dev-server",
           "configurations": {
             "development": {
-              "browserTarget": "18-ssr-project-webpack:build:development",
-              "serverTarget": "18-ssr-project-webpack:server:development"
+              "browserTarget": "ssr-project-webpack:build:development",
+              "serverTarget": "ssr-project-webpack:server:development"
             },
             "production": {
-              "browserTarget": "18-ssr-project-webpack:build:production",
-              "serverTarget": "18-ssr-project-webpack:server:production"
+              "browserTarget": "ssr-project-webpack:build:production",
+              "serverTarget": "ssr-project-webpack:server:production"
             }
           },
           "defaultConfiguration": "development"
@@ -136,12 +136,12 @@
           },
           "configurations": {
             "production": {
-              "browserTarget": "18-ssr-project-webpack:build:production",
-              "serverTarget": "18-ssr-project-webpack:server:production"
+              "browserTarget": "ssr-project-webpack:build:production",
+              "serverTarget": "ssr-project-webpack:server:production"
             },
             "development": {
-              "browserTarget": "18-ssr-project-webpack:build:development",
-              "serverTarget": "18-ssr-project-webpack:server:development"
+              "browserTarget": "ssr-project-webpack:build:development",
+              "serverTarget": "ssr-project-webpack:server:development"
             }
           },
           "defaultConfiguration": "production"
