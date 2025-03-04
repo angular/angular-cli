@@ -130,6 +130,11 @@ export class AngularServerApp {
   private boostrap: AngularBootstrap | undefined;
 
   /**
+   * Decorder used to convert a string to a Uint8Array.
+   */
+  private readonly textDecoder = new TextEncoder();
+
+  /**
    * Cache for storing critical CSS for pages.
    * Stores a maximum of MAX_INLINE_CSS_CACHE_ENTRIES entries.
    *
@@ -318,30 +323,46 @@ export class AngularServerApp {
       SERVER_CONTEXT_VALUE[renderMode],
     );
 
-    if (inlineCriticalCss) {
-      // Optionally inline critical CSS.
-      this.inlineCriticalCssProcessor ??= new InlineCriticalCssProcessor((path: string) => {
-        const fileName = path.split('/').pop() ?? path;
-
-        return this.assets.getServerAsset(fileName).text();
-      });
-
-      if (renderMode === RenderMode.Server) {
-        // Only cache if we are running in SSR Mode.
-        const cacheKey = await sha256(html);
-        let htmlWithCriticalCss = this.criticalCssLRUCache.get(cacheKey);
-        if (htmlWithCriticalCss === undefined) {
-          htmlWithCriticalCss = await this.inlineCriticalCssProcessor.process(html);
-          this.criticalCssLRUCache.put(cacheKey, htmlWithCriticalCss);
-        }
-
-        html = htmlWithCriticalCss;
-      } else {
-        html = await this.inlineCriticalCssProcessor.process(html);
-      }
+    if (!inlineCriticalCss) {
+      return new Response(html, responseInit);
     }
 
-    return new Response(html, responseInit);
+    this.inlineCriticalCssProcessor ??= new InlineCriticalCssProcessor((path: string) => {
+      const fileName = path.split('/').pop() ?? path;
+
+      return this.assets.getServerAsset(fileName).text();
+    });
+
+    const { inlineCriticalCssProcessor, criticalCssLRUCache, textDecoder } = this;
+
+    // Use a stream to send the response before inlining critical CSS, improving performance via header flushing.
+    const stream = new ReadableStream({
+      async start(controller) {
+        let htmlWithCriticalCss;
+
+        try {
+          if (renderMode === RenderMode.Server) {
+            const cacheKey = await sha256(html);
+            htmlWithCriticalCss = criticalCssLRUCache.get(cacheKey);
+            if (!htmlWithCriticalCss) {
+              htmlWithCriticalCss = await inlineCriticalCssProcessor.process(html);
+              criticalCssLRUCache.put(cacheKey, htmlWithCriticalCss);
+            }
+          } else {
+            htmlWithCriticalCss = await inlineCriticalCssProcessor.process(html);
+          }
+        } catch (error) {
+          // eslint-disable-next-line no-console
+          console.error(`An error occurred while inlining critical CSS for: ${url}.`, error);
+        }
+
+        controller.enqueue(textDecoder.encode(htmlWithCriticalCss ?? html));
+
+        controller.close();
+      },
+    });
+
+    return new Response(stream, responseInit);
   }
 
   /**
