@@ -25,7 +25,7 @@
     "@babel/helper-split-export-declaration": "7.24.7",
     "@babel/plugin-syntax-import-attributes": "7.26.0",
     "@inquirer/confirm": "5.1.6",
-    "@vitejs/plugin-basic-ssl": "1.2.0",
+    "@vitejs/plugin-basic-ssl": "2.0.0",
     "beasties": "0.2.0",
     "browserslist": "^4.23.0",
     "esbuild": "0.25.0",

@@ -365,7 +365,7 @@ __metadata:
     "@types/yarnpkg__lockfile": "npm:^1.1.5"
     "@typescript-eslint/eslint-plugin": "npm:8.25.0"
     "@typescript-eslint/parser": "npm:8.25.0"
-    "@vitejs/plugin-basic-ssl": "npm:1.2.0"
+    "@vitejs/plugin-basic-ssl": "npm:2.0.0"
     "@web/test-runner": "npm:^0.20.0"
     "@yarnpkg/lockfile": "npm:1.1.0"
     ajv: "npm:8.17.1"
@@ -5940,6 +5940,15 @@ __metadata:
   peerDependencies:
     vite: ^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0
   checksum: 10c0/0d360fcca01f91ade6e451edbea09a107ff9e95cd3c3766c7a069d1a168709df92d96c0bd1eccc66e2739a153e07c75a45321ec487450c0da942606200d8441d
+  languageName: node
+  linkType: hard
+
+"@vitejs/plugin-basic-ssl@npm:2.0.0":
+  version: 2.0.0
+  resolution: "@vitejs/plugin-basic-ssl@npm:2.0.0"
+  peerDependencies:
+    vite: ^6.0.0
+  checksum: 10c0/673f46dc5ee042f6fcfa7ecf514e717e770085f8979d4608cab952f3e9003fe7aed589cc812a67f3dcd5e80655975c6490ce8a07a4b6feef98766003256d4283
   languageName: node
   linkType: hard
 

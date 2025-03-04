@@ -221,8 +221,8 @@ importers:
         specifier: 8.25.0
         version: 8.25.0(eslint@9.21.0)(typescript@5.8.2)
       '@vitejs/plugin-basic-ssl':
-        specifier: 1.2.0
-        version: 1.2.0(vite@6.2.0)
+        specifier: 2.0.0
+        version: 2.0.0(vite@6.2.0)
       '@web/test-runner':
         specifier: ^0.20.0
         version: 0.20.0
@@ -574,8 +574,8 @@ importers:
         specifier: 5.1.6
         version: 5.1.6(@types/node@20.17.19)
       '@vitejs/plugin-basic-ssl':
-        specifier: 1.2.0
-        version: 1.2.0(vite@6.2.0)
+        specifier: 2.0.0
+        version: 2.0.0(vite@6.2.0)
       beasties:
         specifier: 0.2.0
         version: 0.2.0
@@ -824,8 +824,8 @@ importers:
         specifier: workspace:0.0.0-PLACEHOLDER
         version: link:../../ngtools/webpack
       '@vitejs/plugin-basic-ssl':
-        specifier: 1.2.0
-        version: 1.2.0(vite@6.2.0)
+        specifier: 2.0.0
+        version: 2.0.0(vite@6.2.0)
       ansi-colors:
         specifier: 4.1.3
         version: 4.1.3
@@ -2384,6 +2384,7 @@ packages:
 
   /@bazel/typescript@5.8.1(typescript@5.8.2):
     resolution: {integrity: sha512-NAJ8WQHZL1WE1YmRoCrq/1hhG15Mvy/viWh6TkvFnBeEhNUiQUsA5GYyhU1ztnBIYW03nATO3vwhAEfO7Q0U5g==}
+    deprecated: No longer maintained, https://github.com/aspect-build/rules_ts is the recommended replacement
     hasBin: true
     peerDependencies:
       typescript: 5.8.2
@@ -5154,11 +5155,11 @@ packages:
       semver: 7.6.3
     dev: true
 
-  /@vitejs/plugin-basic-ssl@1.2.0(vite@6.2.0):
-    resolution: {integrity: sha512-mkQnxTkcldAzIsomk1UuLfAu9n+kpQ3JbHcpCp7d2Oo6ITtji8pHS3QToOWjhPFvNQSnhlkAjmGbhv2QvwO/7Q==}
-    engines: {node: '>=14.21.3'}
+  /@vitejs/plugin-basic-ssl@2.0.0(vite@6.2.0):
+    resolution: {integrity: sha512-gc9Tjg8bUxBVSTzeWT3Njc0Cl3PakHFKdNfABnZWiUgbxqmHDEn7uECv3fHVylxoYgNzAcmU7ZrILz+BwSo3sA==}
+    engines: {node: ^18.0.0 || ^20.0.0 || >=22.0.0}
     peerDependencies:
-      vite: ^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0
+      vite: ^6.0.0
     dependencies:
       vite: 6.2.0(@types/node@20.17.19)(less@4.2.2)(sass@1.85.1)(terser@5.39.0)
 
@@ -11574,7 +11575,7 @@ packages:
   /puppeteer@18.2.1:
     resolution: {integrity: sha512-7+UhmYa7wxPh2oMRwA++k8UGVDxh3YdWFB52r9C3tM81T6BU7cuusUSxImz0GEYSOYUKk/YzIhkQ6+vc0gHbxQ==}
     engines: {node: '>=14.1.0'}
-    deprecated: < 19.4.0 is no longer supported
+    deprecated: < 22.8.2 is no longer supported
     requiresBuild: true
     dependencies:
       https-proxy-agent: 5.0.1(supports-color@10.0.0)
