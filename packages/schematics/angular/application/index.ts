@@ -120,8 +120,8 @@ function addDependenciesToPackageJson(options: ApplicationOptions) {
       },
       {
         type: NodeDependencyType.Dev,
-        name: '@angular-devkit/build-angular',
-        version: latestVersions.DevkitBuildAngular,
+        name: '@angular/build',
+        version: latestVersions.AngularBuild,
       },
       {
         type: NodeDependencyType.Dev,
@@ -234,7 +234,7 @@ function addAppToWorkspaceFile(
     schematics,
     targets: {
       build: {
-        builder: Builders.Application,
+        builder: Builders.BuildApplication,
         defaultConfiguration: 'production',
         options: {
           outputPath: `dist/${folderName}`,
@@ -260,7 +260,7 @@ function addAppToWorkspaceFile(
         },
       },
       serve: {
-        builder: Builders.DevServer,
+        builder: Builders.BuildDevServer,
         defaultConfiguration: 'development',
         options: {},
         configurations: {
@@ -273,12 +273,12 @@ function addAppToWorkspaceFile(
         },
       },
       'extract-i18n': {
-        builder: Builders.ExtractI18n,
+        builder: Builders.BuildExtractI18n,
       },
       test: options.minimal
         ? undefined
         : {
-            builder: Builders.Karma,
+            builder: Builders.BuildKarma,
             options: {
               polyfills: options.experimentalZoneless ? [] : ['zone.js', 'zone.js/testing'],
               tsConfig: `${projectRoot}tsconfig.spec.json`,

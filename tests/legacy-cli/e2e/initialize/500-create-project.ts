@@ -60,6 +60,12 @@ export default async function () {
         tsconfig.compilerOptions.allowSyntheticDefaultImports = true;
       });
     }
+
+    // Always need `@angular-devkit/build-angular` due to the use of protractor
+    await updateJsonFile('package.json', (packageJson) => {
+      packageJson.devDependencies['@angular-devkit/build-angular'] =
+        packageJson.devDependencies['@angular/build'];
+    });
   }
 
   await prepareProjectForE2e('test-project');

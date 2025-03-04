@@ -46,6 +46,9 @@ export async function extractMessages(
   buildOptions.index = false;
   buildOptions.serviceWorker = false;
   buildOptions.outputMode = OutputMode.Static;
+  buildOptions.appShell = undefined;
+  buildOptions.ssr = undefined;
+  buildOptions.prerender = undefined;
   buildOptions.server = undefined;
 
   // Build the application with the build options
