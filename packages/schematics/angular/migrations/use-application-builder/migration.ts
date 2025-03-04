@@ -460,8 +460,12 @@ function deleteFile(path: string): Rule {
 }
 
 function updateJsonFile(path: string, updater: (json: JSONFile) => void): Rule {
-  return (tree) => {
-    updater(new JSONFile(tree, path));
+  return (tree, ctx) => {
+    if (tree.exists(path)) {
+      updater(new JSONFile(tree, path));
+    } else {
+      ctx.logger.info(`Skipping updating '${path}' as it does not exist.`);
+    }
   };
 }
 
