@@ -241,7 +241,7 @@ class AllScriptCalculator extends Calculator {
 class AllCalculator extends Calculator {
   calculate() {
     const size = this.assets
-      .filter((asset) => !asset.name.endsWith('.map'))
+      .filter((asset) => !asset.name.endsWith('.map') && !asset.componentStyle)
       .map((asset) => this.getAssetSize(asset))
       .reduce((total: number, size: number) => total + size, 0);
 
@@ -269,7 +269,7 @@ class AnyScriptCalculator extends Calculator {
 class AnyCalculator extends Calculator {
   calculate() {
     return this.assets
-      .filter((asset) => !asset.name.endsWith('.map'))
+      .filter((asset) => !asset.name.endsWith('.map') && !asset.componentStyle)
       .map((asset) => ({
         size: this.getAssetSize(asset),
         label: asset.name,
