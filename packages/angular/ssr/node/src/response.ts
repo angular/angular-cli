@@ -44,6 +44,10 @@ export async function writeResponseToNodeResponse(
     }
   }
 
+  if ('flushHeaders' in destination) {
+    destination.flushHeaders();
+  }
+
   if (!body) {
     destination.end();
 
