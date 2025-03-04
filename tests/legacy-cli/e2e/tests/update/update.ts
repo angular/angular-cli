@@ -1,7 +1,6 @@
 import { appendFile } from 'node:fs/promises';
-import { SemVer } from 'semver';
 import { createProjectFromAsset } from '../../utils/assets';
-import { expectFileMatchToExist, readFile } from '../../utils/fs';
+import { expectFileMatchToExist } from '../../utils/fs';
 import { getActivePackageManager } from '../../utils/packages';
 import { ng, noSilentNg } from '../../utils/process';
 import { isPrereleaseCli, useCIChrome, useCIDefaults, getNgCLIVersion } from '../../utils/project';
@@ -12,10 +11,10 @@ export default async function () {
   try {
     // We need to use the public registry because in the local NPM server we don't have
     // older versions @angular/cli packages which would cause `npm install` during `ng update` to fail.
-    restoreRegistry = await createProjectFromAsset('15.0-project', true);
+    restoreRegistry = await createProjectFromAsset('17.0-project', true);
 
     // CLI project version
-    const cliMajorProjectVersion = 15;
+    const cliMajorProjectVersion = 17;
 
     // If using npm, enable legacy peer deps mode to avoid defects in npm 7+'s peer dependency resolution
     // Example error where 11.2.14 satisfies the SemVer range ^11.0.0 but still fails:
@@ -72,15 +71,15 @@ export default async function () {
   await ng('update', '@angular/cli', ...extraUpdateArgs);
 
   // Generate E2E setup
-  await ng('generate', 'private-e2e', '--related-app-name=fifteen-project');
+  await ng('generate', 'private-e2e', '--related-app-name=seventeen-project');
 
   // Setup testing to use CI Chrome.
-  await useCIChrome('fifteen-project', './');
-  await useCIChrome('fifteen-project', './e2e/');
-  await useCIDefaults('fifteen-project');
+  await useCIChrome('seventeen-project', './');
+  await useCIChrome('seventeen-project', './e2e/');
+  await useCIDefaults('seventeen-project');
 
   // Run CLI commands.
-  await ng('generate', 'component', 'my-comp', '--no-standalone');
+  await ng('generate', 'component', 'my-comp');
   await ng('test', '--watch=false');
 
   await ng('e2e');
@@ -88,5 +87,5 @@ export default async function () {
 
   // Verify project now creates bundles
   await noSilentNg('build', '--configuration=production');
-  await expectFileMatchToExist('dist/fifteen-project/', /main\.[0-9a-f]{16}\.js/);
+  await expectFileMatchToExist('dist/seventeen-project/browser', /main-[a-zA-Z0-9]{8}\.js/);
 }
