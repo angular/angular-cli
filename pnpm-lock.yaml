@@ -23,8 +23,8 @@ importers:
         specifier: 20.0.0-next.0
         version: 20.0.0-next.0(@angular/core@20.0.0-next.0)
       '@angular/bazel':
-        specifier: https://github.com/angular/bazel-builds.git#58e1a344eed2dfea489cd290a4b4a963f7e3ac65
-        version: github.com/angular/bazel-builds/58e1a344eed2dfea489cd290a4b4a963f7e3ac65(@angular/compiler-cli@20.0.0-next.0)(@rollup/plugin-commonjs@28.0.2)(@rollup/plugin-node-resolve@13.3.0)(@types/node@20.17.19)(rollup-plugin-sourcemaps@0.6.3)(rollup@4.34.9)(terser@5.39.0)(typescript@5.8.2)
+        specifier: https://github.com/angular/bazel-builds.git#cb6cc91cff9baaa3055775deb0d444aa47d24a67
+        version: github.com/angular/bazel-builds/cb6cc91cff9baaa3055775deb0d444aa47d24a67(@angular/compiler-cli@20.0.0-next.0)(@rollup/plugin-commonjs@28.0.2)(@rollup/plugin-node-resolve@13.3.0)(@types/node@20.17.19)(rollup-plugin-sourcemaps@0.6.3)(rollup@4.34.9)(terser@5.39.0)(typescript@5.8.2)
       '@angular/build-tooling':
         specifier: https://github.com/angular/dev-infra-private-build-tooling-builds.git#d4727212a9d0f7eb63ae3116d73c769d9bd0bdc1
         version: github.com/angular/dev-infra-private-build-tooling-builds/d4727212a9d0f7eb63ae3116d73c769d9bd0bdc1(debug@4.4.0)(karma-chrome-launcher@3.2.0)(karma-jasmine@5.1.0)(karma@6.4.4)(rxjs@7.8.2)(terser@5.39.0)(zone.js@0.15.0)
@@ -53,8 +53,8 @@ importers:
         specifier: 19.2.1
         version: 19.2.1(@angular/cdk@19.2.1)(@angular/common@20.0.0-next.0)(@angular/core@20.0.0-next.0)(@angular/forms@20.0.0-next.0)(@angular/platform-browser@20.0.0-next.0)(rxjs@7.8.2)
       '@angular/ng-dev':
-        specifier: https://github.com/angular/dev-infra-private-ng-dev-builds.git#8e9aa05047bc8adadfafac647079ccf78fec7336
-        version: github.com/angular/dev-infra-private-ng-dev-builds/8e9aa05047bc8adadfafac647079ccf78fec7336
+        specifier: https://github.com/angular/dev-infra-private-ng-dev-builds.git#4b26728d9cc8e1b9d7ce4fc2ab36f7585788337b
+        version: github.com/angular/dev-infra-private-ng-dev-builds/4b26728d9cc8e1b9d7ce4fc2ab36f7585788337b
       '@angular/platform-browser':
         specifier: 20.0.0-next.0
         version: 20.0.0-next.0(@angular/animations@20.0.0-next.0)(@angular/common@20.0.0-next.0)(@angular/core@20.0.0-next.0)
@@ -14230,15 +14230,15 @@ packages:
     resolution: {integrity: sha512-9oxn0IIjbCZkJ67L+LkhYWRyAy7axphb3VgE2MBDlOqnmHMPWGYMxJxBYFueFq/JGY2GMwS0rU+UCLunEmy5UA==}
     dev: true
 
-  github.com/angular/bazel-builds/58e1a344eed2dfea489cd290a4b4a963f7e3ac65(@angular/compiler-cli@20.0.0-next.0)(@rollup/plugin-commonjs@28.0.2)(@rollup/plugin-node-resolve@13.3.0)(@types/node@20.17.19)(rollup-plugin-sourcemaps@0.6.3)(rollup@4.34.9)(terser@5.39.0)(typescript@5.8.2):
-    resolution: {tarball: https://codeload.github.com/angular/bazel-builds/tar.gz/58e1a344eed2dfea489cd290a4b4a963f7e3ac65}
-    id: github.com/angular/bazel-builds/58e1a344eed2dfea489cd290a4b4a963f7e3ac65
+  github.com/angular/bazel-builds/cb6cc91cff9baaa3055775deb0d444aa47d24a67(@angular/compiler-cli@20.0.0-next.0)(@rollup/plugin-commonjs@28.0.2)(@rollup/plugin-node-resolve@13.3.0)(@types/node@20.17.19)(rollup-plugin-sourcemaps@0.6.3)(rollup@4.34.9)(terser@5.39.0)(typescript@5.8.2):
+    resolution: {tarball: https://codeload.github.com/angular/bazel-builds/tar.gz/cb6cc91cff9baaa3055775deb0d444aa47d24a67}
+    id: github.com/angular/bazel-builds/cb6cc91cff9baaa3055775deb0d444aa47d24a67
     name: '@angular/bazel'
-    version: 19.3.0-next.0
+    version: 20.0.0-next.0
     engines: {node: ^18.19.1 || ^20.11.1 || >=22.0.0}
     hasBin: true
     peerDependencies:
-      '@angular/compiler-cli': 19.3.0-next.0+sha-8657a0e
+      '@angular/compiler-cli': 20.0.0-next.0+sha-a58b038
       '@bazel/concatjs': ^5.3.0
       '@bazel/worker': ^5.3.0
       '@rollup/plugin-commonjs': ^28.0.0
@@ -14320,10 +14320,10 @@ packages:
       - zone.js
     dev: true
 
-  github.com/angular/dev-infra-private-ng-dev-builds/8e9aa05047bc8adadfafac647079ccf78fec7336:
-    resolution: {tarball: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/8e9aa05047bc8adadfafac647079ccf78fec7336}
+  github.com/angular/dev-infra-private-ng-dev-builds/4b26728d9cc8e1b9d7ce4fc2ab36f7585788337b:
+    resolution: {tarball: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/4b26728d9cc8e1b9d7ce4fc2ab36f7585788337b}
     name: '@angular/ng-dev'
-    version: 0.0.0-836bdd0543d15904c469f5a0ce869d30a8029971
+    version: 0.0.0-bf0dd632ed129ee8770b09a6e11c6497162b3edb
     hasBin: true
     dependencies:
       '@google-cloud/spanner': 7.18.1(supports-color@10.0.0)
