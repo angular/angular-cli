@@ -15,7 +15,7 @@ describeServeBuilder(executeDevServer, DEV_SERVER_BUILDER_INFO, (harness, setupT
   describe('Behavior: "browser builder external dependencies"', () => {
     beforeEach(async () => {
       setupTarget(harness, {
-        externalDependencies: ['rxjs', 'rxjs/operators'],
+        externalDependencies: ['rxjs'],
       });
 
       await harness.writeFile(
@@ -48,7 +48,7 @@ describeServeBuilder(executeDevServer, DEV_SERVER_BUILDER_INFO, (harness, setupT
 
     it('respects import specifiers when using baseHref with trailing slash', async () => {
       setupTarget(harness, {
-        externalDependencies: ['rxjs', 'rxjs/operators'],
+        externalDependencies: ['rxjs'],
         baseHref: '/test/',
       });
 
@@ -67,7 +67,7 @@ describeServeBuilder(executeDevServer, DEV_SERVER_BUILDER_INFO, (harness, setupT
 
     it('respects import specifiers when using baseHref without trailing slash', async () => {
       setupTarget(harness, {
-        externalDependencies: ['rxjs', 'rxjs/operators'],
+        externalDependencies: ['rxjs/*'],
         baseHref: '/test',
       });
 
