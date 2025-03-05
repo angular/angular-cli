@@ -1,3 +1,55 @@
+<a name="20.0.0-next.0"></a>
+
+# 20.0.0-next.0 (2025-03-05)
+
+## Breaking Changes
+
+### @angular/cli
+
+- Node.js v18 is no longer supported with Angular.
+
+  Before updating a project to Angular v20, the Node.js version must be
+  at least 20.11.1. For the full list of supported Node.js versions,
+  see https://angular.dev/reference/versions.
+
+### @angular-devkit/schematics
+
+- The `NodePackageLinkTask` has been removed without a replacement. Create a custom task if needed.
+
+  Note: This does not affect application developers.
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                   |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------- |
+| [093c5a315](https://github.com/angular/angular-cli/commit/093c5a3152c4282d4afb51df40945283cc94d281) | feat | directly use `@angular/build` in new projects |
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------- |
+| [5e90c1b4e](https://github.com/angular/angular-cli/commit/5e90c1b4ec3f1d05ad00f2f854347a5bf8cb0860) | fix  | remove Node.js v18 support |
+
+### @angular-devkit/schematics
+
+| Commit                                                                                              | Type     | Description                             |
+| --------------------------------------------------------------------------------------------------- | -------- | --------------------------------------- |
+| [e6be37601](https://github.com/angular/angular-cli/commit/e6be37601d57f884a1ddf2cc1ddecf51819b9f51) | refactor | remove deprecated `NodePackageLinkTask` |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                             |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------- |
+| [c8c73185a](https://github.com/angular/angular-cli/commit/c8c73185a66c7c7825e30f7fcedbaacc9ca1c593) | fix  | ensure matching coverage excludes with karma on Windows |
+
+### @angular/ssr
+
+| Commit                                                                                              | Type | Description                                            |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------ |
+| [280693231](https://github.com/angular/angular-cli/commit/280693231e143aa09f841e3179317573a3576545) | perf | optimize response times by introducing header flushing |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="19.2.1"></a>
 
 # 19.2.1 (2025-03-05)
