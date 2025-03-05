@@ -7,7 +7,7 @@ ts_project(
     srcs = glob(["**/*_spec.ts"]),
     deps = [
         "//:node_modules/@types/node",
-        "//packages/angular/ssr/node:node_rjs",
+        "//packages/angular/ssr/node",
     ],
 )
 

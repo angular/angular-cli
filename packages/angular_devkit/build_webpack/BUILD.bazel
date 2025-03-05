@@ -69,7 +69,7 @@ ts_project(
         ],
     ),
     deps = [
-        ":build_webpack_rjs",
+        ":build_webpack",
         ":node_modules/@angular-devkit/architect",
         ":node_modules/@angular-devkit/core",
         ":node_modules/@ngtools/webpack",
@@ -81,7 +81,7 @@ ts_project(
 jasmine_test(
     name = "build_webpack_test",
     data = [
-        "build_webpack_test_lib_rjs",
+        "build_webpack_test_lib",
         "//:node_modules/@angular/common",
         "//:node_modules/@angular/compiler",
         "//:node_modules/@angular/compiler-cli",
@@ -109,7 +109,7 @@ npm_package(
     tags = ["release-package"],
     deps = RUNTIME_ASSETS + [
         ":README.md",
-        ":build_webpack_rjs",
+        ":build_webpack",
         ":license",
     ],
 )

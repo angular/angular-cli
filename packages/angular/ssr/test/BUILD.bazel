@@ -16,7 +16,7 @@ ts_project(
         "//:node_modules/@angular/platform-server",
         "//:node_modules/@angular/router",
         "//:node_modules/@types/node",
-        "//packages/angular/ssr:ssr_rjs",
+        "//packages/angular/ssr",
     ],
 )
 

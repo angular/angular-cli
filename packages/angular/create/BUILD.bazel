@@ -45,7 +45,7 @@ npm_package(
     visibility = ["//visibility:public"],
     deps = RUNTIME_ASSETS + [
         ":README.md",
-        ":create_rjs",
+        ":create",
         ":license",
     ],
 )

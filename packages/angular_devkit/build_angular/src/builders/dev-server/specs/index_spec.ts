@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { DevServerBuilderOutput } from '@angular-devkit/build-angular';
+import { DevServerBuilderOutput } from '../index';
 import { workspaces } from '@angular-devkit/core';
 import { createArchitect, host } from '../../../testing/test-utils';
 

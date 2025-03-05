@@ -79,18 +79,18 @@ ts_project(
     testonly = True,
     srcs = glob(["src/**/*_spec.ts"]),
     deps = [
-        ":architect_rjs",
+        ":architect",
         ":node_modules/@angular-devkit/core",
         "//:node_modules/@types/jasmine",
         "//:node_modules/@types/node",
         "//:node_modules/rxjs",
-        "//packages/angular_devkit/architect/testing:testing_rjs",
+        "//packages/angular_devkit/architect/testing",
     ],
 )
 
 jasmine_test(
     name = "architect_test",
-    data = [":architect_test_lib_rjs"],
+    data = [":architect_test_lib"],
 )
 
 # @external_begin
@@ -109,10 +109,10 @@ npm_package(
     tags = ["release-package"],
     deps = JSON_FILES + [
         "README.md",
-        ":architect_rjs",
+        ":architect",
         ":license",
-        "//packages/angular_devkit/architect/node:node_rjs",
-        "//packages/angular_devkit/architect/testing:testing_rjs",
+        "//packages/angular_devkit/architect/node",
+        "//packages/angular_devkit/architect/testing",
     ],
 )
 

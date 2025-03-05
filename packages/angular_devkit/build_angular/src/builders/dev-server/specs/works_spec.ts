@@ -7,7 +7,7 @@
  */
 
 import { Architect, BuilderRun } from '@angular-devkit/architect';
-import { DevServerBuilderOutput } from '@angular-devkit/build-angular';
+import { DevServerBuilderOutput } from '../index';
 import { EmittedFiles } from '@angular-devkit/build-webpack';
 import { normalize, virtualFs } from '@angular-devkit/core';
 import { createArchitect, host } from '../../../testing/test-utils';

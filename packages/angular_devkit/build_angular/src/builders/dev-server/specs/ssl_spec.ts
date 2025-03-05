@@ -7,7 +7,7 @@
  */
 
 import { Architect, BuilderRun } from '@angular-devkit/architect';
-import { DevServerBuilderOutput } from '@angular-devkit/build-angular';
+import { DevServerBuilderOutput } from '../index';
 import { tags } from '@angular-devkit/core';
 import { Agent, getGlobalDispatcher, setGlobalDispatcher } from 'undici';
 import { createArchitect, host } from '../../../testing/test-utils';
