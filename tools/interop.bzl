@@ -112,7 +112,7 @@ def ts_project(
         tsconfig = "//:test-tsconfig" if testonly else "//:build-tsconfig"
 
     _ts_project(
-        name = "%s_rjs" % name,
+        name = name,
         testonly = testonly,
         declaration = True,
         tsconfig = tsconfig,
@@ -134,10 +134,10 @@ def ts_project(
         )
 
     ts_project_module(
-        name = name,
+        name = "%s_legacy" % name,
         testonly = testonly,
         visibility = visibility,
-        dep = "%s_rjs" % name,
+        dep = name,
         deps = deps,
         module_name = module_name,
     )

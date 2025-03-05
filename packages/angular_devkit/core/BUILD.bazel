@@ -53,16 +53,16 @@ ts_project(
     srcs = glob(["src/**/*_spec.ts"]),
     data = glob(["src/workspace/json/test/**/*.json"]),
     deps = [
-        ":core_rjs",
+        ":core",
         "//:node_modules/@types/node",
         "//:node_modules/rxjs",
-        "//packages/angular_devkit/core/node:node_rjs",
+        "//packages/angular_devkit/core/node",
     ],
 )
 
 jasmine_test(
     name = "core_test",
-    data = [":core_test_lib_rjs"],
+    data = [":core_test_lib"],
 )
 
 genrule(
@@ -77,10 +77,10 @@ npm_package(
     tags = ["release-package"],
     deps = RUNTIME_ASSETS + [
         ":README.md",
-        ":core_rjs",
+        ":core",
         ":license",
-        "//packages/angular_devkit/core/node:node_rjs",
-        "//packages/angular_devkit/core/node/testing:testing_rjs",
+        "//packages/angular_devkit/core/node",
+        "//packages/angular_devkit/core/node/testing",
     ],
 )
 

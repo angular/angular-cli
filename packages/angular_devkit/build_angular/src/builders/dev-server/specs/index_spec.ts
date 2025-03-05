@@ -6,9 +6,9 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { DevServerBuilderOutput } from '@angular-devkit/build-angular';
 import { workspaces } from '@angular-devkit/core';
 import { createArchitect, host } from '../../../testing/test-utils';
+import { DevServerBuilderOutput } from '../index';
 
 describe('Dev Server Builder index', () => {
   const targetSpec = { project: 'app', target: 'serve' };
