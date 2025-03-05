@@ -1,3 +1,30 @@
+<a name="19.2.1"></a>
+
+# 19.2.1 (2025-03-05)
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                                                   |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------------------- |
+| [4c35b5721](https://github.com/angular/angular-cli/commit/4c35b5721b146d3c27f200c2688073c20dbe0a19) | fix  | prevent accidental deletion of `main.ts` during application builder migration |
+| [d7f9cb578](https://github.com/angular/angular-cli/commit/d7f9cb578d164aba830751cffb035bf8d962eca2) | fix  | prevent error when tsconfig file is missing in application builder migration  |
+
+### @angular-devkit/architect
+
+| Commit                                                                                              | Type | Description                                         |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------- |
+| [3ebd7ca7c](https://github.com/angular/angular-cli/commit/3ebd7ca7caeb266308856f47af06bea641b1f8e8) | fix  | improve error message when configuration is missing |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                                       |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------- |
+| [c07330967](https://github.com/angular/angular-cli/commit/c0733096797d45a5cd3ffc18f89a5c75a521accb) | fix  | allow component HMR with a service worker                         |
+| [c989c91c3](https://github.com/angular/angular-cli/commit/c989c91c37cab9571bdfaa91cbd806acd9cf9d19) | fix  | exclude component styles from 'any' and 'all' budget calculations |
+| [96e5dcb5f](https://github.com/angular/angular-cli/commit/96e5dcb5f14b8d16520974b80bb531a190be2343) | fix  | handle undefined `less` stylesheet sourcemap values               |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="19.2.0"></a>
 
 # 19.2.0 (2025-02-26)
