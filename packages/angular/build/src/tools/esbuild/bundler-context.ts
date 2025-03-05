@@ -359,17 +359,16 @@ export class BundlerContext {
     // Collect all external package names
     const externalImports = new Set<string>();
     for (const { imports } of Object.values(result.metafile.outputs)) {
-      for (const importData of imports) {
+      for (const { external, kind, path } of imports) {
         if (
-          !importData.external ||
-          SERVER_GENERATED_EXTERNALS.has(importData.path) ||
-          (importData.kind !== 'import-statement' &&
-            importData.kind !== 'dynamic-import' &&
-            importData.kind !== 'require-call')
+          !external ||
+          SERVER_GENERATED_EXTERNALS.has(path) ||
+          (kind !== 'import-statement' && kind !== 'dynamic-import' && kind !== 'require-call')
         ) {
           continue;
         }
-        externalImports.add(importData.path);
+
+        externalImports.add(path);
       }
     }
 

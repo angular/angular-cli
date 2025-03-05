@@ -433,7 +433,14 @@ export async function normalizeOptions(
     baseHref,
     cacheOptions,
     crossOrigin,
-    externalDependencies,
+    externalDependencies: normalizeExternals(externalDependencies),
+    externalPackages:
+      typeof externalPackages === 'object'
+        ? {
+            ...externalPackages,
+            exclude: normalizeExternals(externalPackages.exclude),
+          }
+        : externalPackages,
     extractLicenses,
     inlineStyleLanguage,
     jit: !aot,
@@ -441,7 +448,6 @@ export async function normalizeOptions(
     polyfills: polyfills === undefined || Array.isArray(polyfills) ? polyfills : [polyfills],
     poll,
     progress,
-    externalPackages,
     preserveSymlinks,
     stylePreprocessorOptions,
     subresourceIntegrity,
@@ -676,4 +682,24 @@ export function getLocaleBaseHref(
   const baseHrefSuffix = localeData.baseHref ?? localeData.subPath + '/';
 
   return baseHrefSuffix !== '' ? urlJoin(baseHref, baseHrefSuffix) : undefined;
+}
+
+/**
+ * Normalizes an array of external dependency paths by ensuring that
+ * wildcard patterns (`/*`) are removed from package names.
+ *
+ * This avoids the need to handle this normalization repeatedly in our plugins,
+ * as esbuild already treats `--external:@foo/bar` as implicitly including
+ * `--external:@foo/bar/*`. By standardizing the input, we ensure consistency
+ * and reduce redundant checks across our plugins.
+ *
+ * @param value - An optional array of dependency paths to normalize.
+ * @returns A new array with wildcard patterns removed from package names, or `undefined` if input is `undefined`.
+ */
+function normalizeExternals(value: string[] | undefined): string[] | undefined {
+  if (!value) {
+    return undefined;
+  }
+
+  return [...new Set(value.map((d) => (d.endsWith('/*') ? d.slice(0, -2) : d)))];
 }

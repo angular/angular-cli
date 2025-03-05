@@ -19,7 +19,13 @@ const EXTERNAL_PACKAGE_RESOLUTION = Symbol('EXTERNAL_PACKAGE_RESOLUTION');
  * @returns An esbuild plugin.
  */
 export function createExternalPackagesPlugin(options?: { exclude?: string[] }): Plugin {
-  const exclusions = options?.exclude?.length ? new Set(options.exclude) : undefined;
+  const exclusions = new Set<string>(options?.exclude);
+  // Similar to esbuild, --external:@foo/bar automatically implies --external:@foo/bar/*,
+  // which matches import paths like @foo/bar/baz.
+  // This means all paths within the @foo/bar package are also marked as external.
+  const exclusionsPrefixes = options?.exclude?.map((exclusion) => exclusion + '/') ?? [];
+  const seenExclusions: Set<string> = new Set();
+  const seenNonExclusions: Set<string> = new Set();
 
   return {
     name: 'angular-external-packages',
@@ -33,7 +39,7 @@ export function createExternalPackagesPlugin(options?: { exclude?: string[] }): 
           .map(([key]) => key);
 
       // Safe to use native packages external option if no loader options or exclusions present
-      if (!exclusions && !loaderOptionKeys?.length) {
+      if (!exclusions.size && !loaderOptionKeys?.length) {
         build.initialOptions.packages = 'external';
 
         return;
@@ -47,8 +53,20 @@ export function createExternalPackagesPlugin(options?: { exclude?: string[] }): 
           return null;
         }
 
-        if (exclusions?.has(args.path)) {
+        if (exclusions.has(args.path) || seenExclusions.has(args.path)) {
           return null;
+        }
+
+        if (!seenNonExclusions.has(args.path)) {
+          for (const exclusion of exclusionsPrefixes) {
+            if (args.path.startsWith(exclusion)) {
+              seenExclusions.add(args.path);
+
+              return null;
+            }
+          }
+
+          seenNonExclusions.add(args.path);
         }
 
         const { importer, kind, resolveDir, namespace, pluginData = {} } = args;
