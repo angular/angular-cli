@@ -136,20 +136,20 @@ ts_project(
         exclude = ["src/builders/**/tests/**"],
     ),
     deps = [
-        ":build_rjs",
+        ":build",
         ":node_modules/@angular-devkit/core",
         "//:node_modules/@angular/compiler-cli",
         "//:node_modules/@babel/core",
         "//:node_modules/@types/jasmine",
         "//:node_modules/prettier",
         "//:node_modules/typescript",
-        "//packages/angular/build/private:private_rjs",
+        "//packages/angular/build/private",
     ],
 )
 
 jasmine_test(
     name = "unit_tests",
-    data = [":unit_test_lib_rjs"],
+    data = [":unit_test_lib"],
 )
 
 ts_project(
@@ -157,9 +157,9 @@ ts_project(
     testonly = True,
     srcs = glob(include = ["src/builders/application/tests/**/*.ts"]),
     deps = [
-        ":build_rjs",
-        "//packages/angular/build/private:private_rjs",
-        "//modules/testing/builder:builder_rjs",
+        ":build",
+        "//packages/angular/build/private",
+        "//modules/testing/builder",
         ":node_modules/@angular-devkit/architect",
         ":node_modules/@angular-devkit/core",
 
@@ -184,9 +184,9 @@ ts_project(
     testonly = True,
     srcs = glob(include = ["src/builders/dev-server/tests/**/*.ts"]),
     deps = [
-        ":build_rjs",
-        "//packages/angular/build/private:private_rjs",
-        "//modules/testing/builder:builder_rjs",
+        ":build",
+        "//packages/angular/build/private",
+        "//modules/testing/builder",
         ":node_modules/@angular-devkit/architect",
         ":node_modules/@angular-devkit/core",
 
@@ -218,9 +218,9 @@ ts_project(
     testonly = True,
     srcs = glob(include = ["src/builders/karma/tests/**/*.ts"]),
     deps = [
-        ":build_rjs",
-        "//packages/angular/build/private:private_rjs",
-        "//modules/testing/builder:builder_rjs",
+        ":build",
+        "//packages/angular/build/private",
+        "//modules/testing/builder",
         ":node_modules/@angular-devkit/architect",
         ":node_modules/@angular-devkit/core",
         "//:node_modules/@types/node",
@@ -251,7 +251,7 @@ ts_project(
 jasmine_test(
     name = "application_integration_tests",
     size = "large",
-    data = [":application_integration_test_lib_rjs"],
+    data = [":application_integration_test_lib"],
     flaky = True,
     shard_count = 10,
 )
@@ -259,7 +259,7 @@ jasmine_test(
 jasmine_test(
     name = "dev-server_integration_tests",
     size = "large",
-    data = [":dev-server_integration_test_lib_rjs"],
+    data = [":dev-server_integration_test_lib"],
     flaky = True,
     shard_count = 10,
 )
@@ -267,7 +267,7 @@ jasmine_test(
 jasmine_test(
     name = "karma_integration_tests",
     size = "large",
-    data = [":karma_integration_test_lib_rjs"],
+    data = [":karma_integration_test_lib"],
     env = {
         # TODO: Replace Puppeteer downloaded browsers with Bazel-managed browsers,
         # or standardize to avoid complex configuration like this!
@@ -297,9 +297,9 @@ npm_package(
     tags = ["release-package"],
     deps = RUNTIME_ASSETS + [
         ":README.md",
-        ":build_rjs",
+        ":build",
         ":license",
-        "//packages/angular/build/private:private_rjs",
+        "//packages/angular/build/private",
     ],
 )
 
