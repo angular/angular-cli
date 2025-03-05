@@ -94,7 +94,7 @@ export async function execute(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     checkFileSystem as any,
     extractionResult.messages,
-    'warning',
+    normalizedOptions.i18nOptions.i18nDuplicateTranslation || 'warning',
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     extractionResult.basePath as any,
   );
