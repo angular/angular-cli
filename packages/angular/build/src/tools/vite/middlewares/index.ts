@@ -15,3 +15,4 @@ export {
 } from './ssr-middleware';
 export { createAngularHeadersMiddleware } from './headers-middleware';
 export { createAngularComponentMiddleware } from './component-middleware';
+export { createChromeDevtoolsMiddleware } from './chrome-devtools-middleware';

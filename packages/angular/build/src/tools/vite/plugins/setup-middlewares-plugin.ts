@@ -17,6 +17,7 @@ import {
   createAngularIndexHtmlMiddleware,
   createAngularSsrExternalMiddleware,
   createAngularSsrInternalMiddleware,
+  createChromeDevtoolsMiddleware,
 } from '../middlewares';
 import { AngularMemoryOutputFiles, AngularOutputAssets } from '../utils';
 
@@ -54,6 +55,7 @@ interface AngularSetupMiddlewaresPluginOptions {
   templateUpdates: Map<string, string>;
   ssrMode: ServerSsrMode;
   resetComponentUpdates: () => void;
+  projectRoot: string;
 }
 
 async function createEncapsulateStyle(): Promise<
@@ -97,6 +99,10 @@ export function createAngularSetupMiddlewaresPlugin(
           componentStyles,
           await createEncapsulateStyle(),
         ),
+      );
+
+      server.middlewares.use(
+        createChromeDevtoolsMiddleware(server.config.cacheDir, options.projectRoot),
       );
 
       extensionMiddleware?.forEach((middleware) => server.middlewares.use(middleware));
