@@ -163,21 +163,49 @@ export async function executeBuild(
   // Analyze external imports if external options are enabled
   if (options.externalPackages || bundlingResult.externalConfiguration) {
     const {
-      externalConfiguration,
-      externalImports: { browser, server },
+      externalConfiguration = [],
+      externalImports: { browser = [], server = [] },
     } = bundlingResult;
-    const implicitBrowser = browser ? [...browser] : [];
-    const implicitServer = server ? [...server] : [];
-    // TODO: Implement wildcard externalConfiguration filtering
-    executionResult.setExternalMetadata(
-      externalConfiguration
-        ? implicitBrowser.filter((value) => !externalConfiguration.includes(value))
-        : implicitBrowser,
-      externalConfiguration
-        ? implicitServer.filter((value) => !externalConfiguration.includes(value))
-        : implicitServer,
-      externalConfiguration,
-    );
+    // Similar to esbuild, --external:@foo/bar automatically implies --external:@foo/bar/*,
+    // which matches import paths like @foo/bar/baz.
+    // This means all paths within the @foo/bar package are also marked as external.
+    const exclusionsPrefixes = externalConfiguration.map((exclusion) => exclusion + '/');
+    const exclusions = new Set(externalConfiguration);
+    const explicitExternal = new Set<string>();
+
+    const isExplicitExternal = (dep: string): boolean => {
+      if (exclusions.has(dep)) {
+        return true;
+      }
+
+      for (const prefix of exclusionsPrefixes) {
+        if (dep.startsWith(prefix)) {
+          return true;
+        }
+      }
+
+      return false;
+    };
+
+    const implicitBrowser: string[] = [];
+    for (const dep of browser) {
+      if (isExplicitExternal(dep)) {
+        explicitExternal.add(dep);
+      } else {
+        implicitBrowser.push(dep);
+      }
+    }
+
+    const implicitServer: string[] = [];
+    for (const dep of server) {
+      if (isExplicitExternal(dep)) {
+        explicitExternal.add(dep);
+      } else {
+        implicitServer.push(dep);
+      }
+    }
+
+    executionResult.setExternalMetadata(implicitBrowser, implicitServer, [...explicitExternal]);
   }
 
   const { metafile, initialFiles, outputFiles } = bundlingResult;

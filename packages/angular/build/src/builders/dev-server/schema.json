@@ -115,7 +115,7 @@
           "type": "object",
           "properties": {
             "exclude": {
-              "description": "List of package imports that should not be prebundled by the development server. The packages will be bundled into the application code itself.",
+              "description": "List of package imports that should not be prebundled by the development server. The packages will be bundled into the application code itself. Note: specifying `@foo/bar` marks all paths within the `@foo/bar` package as excluded, including sub-paths like `@foo/bar/baz`.",
               "type": "array",
               "items": { "type": "string" }
             }

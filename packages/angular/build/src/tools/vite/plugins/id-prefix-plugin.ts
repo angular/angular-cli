@@ -27,7 +27,7 @@ export function createRemoveIdPrefixPlugin(externals: string[]): Plugin {
         return;
       }
 
-      const escapedExternals = externals.map(escapeRegexSpecialChars);
+      const escapedExternals = externals.map((e) => escapeRegexSpecialChars(e) + '(?:/.+)?');
       const prefixedExternalRegex = new RegExp(
         `${resolvedConfig.base}${VITE_ID_PREFIX}(${escapedExternals.join('|')})`,
         'g',
