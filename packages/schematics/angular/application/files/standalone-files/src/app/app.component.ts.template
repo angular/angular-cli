@@ -11,7 +11,7 @@ import { RouterOutlet } from '@angular/router';<% } %>
      %><router-outlet /><%
     } %>
   `,<% } else { %>
-  templateUrl: './app.component.html',<% } if(inlineStyle) { %>
+  templateUrl: './app.component.ng.html',<% } if(inlineStyle) { %>
   styles: [],<% } else { %>
   styleUrl: './app.component.<%= style %>'<% } %>
 })

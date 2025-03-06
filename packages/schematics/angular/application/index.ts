@@ -84,7 +84,7 @@ export default function (options: ApplicationOptions): Rule {
             ? filter((path) => !path.endsWith('tsconfig.spec.json.template'))
             : noop(),
           componentOptions.inlineTemplate
-            ? filter((path) => !path.endsWith('component.html.template'))
+            ? filter((path) => !path.endsWith('.ng.html.template'))
             : noop(),
           applyTemplates({
             utils: strings,
