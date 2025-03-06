@@ -1,22 +1,12 @@
 {
   "schematics": {
     "use-application-builder": {
-      "version": "19.0.0",
+      "version": "20.0.0",
       "factory": "./use-application-builder/migration",
       "description": "Migrate application projects to the new build system. Application projects that are using the '@angular-devkit/build-angular' package's 'browser' and/or 'browser-esbuild' builders will be migrated to use the new 'application' builder. You can read more about this, including known issues and limitations, here: https://angular.dev/tools/cli/build-system-migration",
       "optional": true,
       "recommended": true,
       "documentation": "tools/cli/build-system-migration"
-    },
-    "update-workspace-config": {
-      "version": "19.0.0",
-      "factory": "./update-workspace-config/migration",
-      "description": "Update the workspace configuration by replacing deprecated options in 'angular.json' for compatibility with the latest Angular CLI changes."
-    },
-    "update-ssr-imports": {
-      "version": "19.0.0",
-      "factory": "./update-ssr-imports/migration",
-      "description": "Update '@angular/ssr' import paths to use the new '/node' entry point when 'CommonEngine' is detected."
     }
   }
 }
