@@ -135,6 +135,11 @@
       "type": "boolean",
       "default": false,
       "description": "Use a default export for the component in its TypeScript file instead of a named export."
+    },
+    "ngHtml": {
+      "type": "boolean",
+      "default": true,
+      "description": "Generate component template files with an '.ng.html' file extension instead of '.html'. The '.ng.html' file extension is recommended by the Angular style guide."
     }
   },
   "required": ["name", "project"]
