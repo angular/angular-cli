@@ -49,6 +49,7 @@
     },
     {
       "groupName": "angular",
+      "followTag": "next",
       "matchDepNames": ["/^@angular/.*/", "/angular/dev-infra/"]
     },
     {
