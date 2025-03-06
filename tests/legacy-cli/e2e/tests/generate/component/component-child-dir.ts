@@ -21,7 +21,7 @@ export default async function () {
     const componentDirectory = join(childDirectory, 'test-component');
     await expectFileToExist(join(componentDirectory, 'test-component.component.ts'));
     await expectFileToExist(join(componentDirectory, 'test-component.component.spec.ts'));
-    await expectFileToExist(join(componentDirectory, 'test-component.component.html'));
+    await expectFileToExist(join(componentDirectory, 'test-component.component.ng.html'));
     await expectFileToExist(join(componentDirectory, 'test-component.component.css'));
 
     // Ensure unit test execute and pass

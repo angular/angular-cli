@@ -28,7 +28,7 @@ export default async function () {
         selector: 'app-root',
         standalone: true,
         imports: [CommonModule, RouterOutlet],
-        templateUrl: './app.component.html',
+        templateUrl: './app.component.ng.html',
         styleUrls: ['./app.component.css']
       })
       export class AppComponent {

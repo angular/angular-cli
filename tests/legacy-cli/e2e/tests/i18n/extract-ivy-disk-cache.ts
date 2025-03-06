@@ -15,7 +15,10 @@ export default async function () {
 
   // Setup an i18n enabled component
   await ng('generate', 'component', 'i18n-test');
-  await writeFile(join('src/app/i18n-test', 'i18n-test.component.html'), '<p i18n>Hello world</p>');
+  await writeFile(
+    join('src/app/i18n-test', 'i18n-test.component.ng.html'),
+    '<p i18n>Hello world</p>',
+  );
 
   await writeFile(
     'src/app/app.component.ts',

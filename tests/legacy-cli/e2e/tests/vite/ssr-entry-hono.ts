@@ -20,8 +20,8 @@ export default async function () {
   await installPackage('hono@4');
 
   await writeMultipleFiles({
-    // Replace the template of app.component.html as it makes it harder to debug
-    'src/app/app.component.html': '<router-outlet />',
+    // Replace the template of app.component.ng.html as it makes it harder to debug
+    'src/app/app.component.ng.html': '<router-outlet />',
     'src/app/app.routes.ts': `
       import { Routes } from '@angular/router';
       import { HomeComponent } from './home/home.component';
@@ -70,7 +70,7 @@ export default async function () {
 
   // Modify the home component and validate the change.
   await modifyFileAndWaitUntilUpdated(
-    'src/app/home/home.component.html',
+    'src/app/home/home.component.ng.html',
     'home works',
     'yay home works!!!',
     true,

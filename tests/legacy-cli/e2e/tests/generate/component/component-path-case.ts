@@ -16,7 +16,7 @@ export default async function () {
     // Ensure component is created in the correct location relative to the workspace root
     await expectFileToExist(join(componentDirectory, 'test-component.component.ts'));
     await expectFileToExist(join(componentDirectory, 'test-component.component.spec.ts'));
-    await expectFileToExist(join(componentDirectory, 'test-component.component.html'));
+    await expectFileToExist(join(componentDirectory, 'test-component.component.ng.html'));
     await expectFileToExist(join(componentDirectory, 'test-component.component.css'));
 
     // Generate another component
@@ -25,7 +25,7 @@ export default async function () {
     // Ensure component is created in the correct location relative to the workspace root
     await expectFileToExist(join(componentTwoDirectory, 'test-component-two.component.ts'));
     await expectFileToExist(join(componentTwoDirectory, 'test-component-two.component.spec.ts'));
-    await expectFileToExist(join(componentTwoDirectory, 'test-component-two.component.html'));
+    await expectFileToExist(join(componentTwoDirectory, 'test-component-two.component.ng.html'));
     await expectFileToExist(join(componentTwoDirectory, 'test-component-two.component.css'));
 
     // Ensure unit test execute and pass
