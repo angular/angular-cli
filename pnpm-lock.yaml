@@ -23,14 +23,14 @@ importers:
         specifier: 20.0.0-next.0
         version: 20.0.0-next.0(@angular/core@20.0.0-next.0)
       '@angular/bazel':
-        specifier: https://github.com/angular/bazel-builds.git#cb6cc91cff9baaa3055775deb0d444aa47d24a67
-        version: github.com/angular/bazel-builds/cb6cc91cff9baaa3055775deb0d444aa47d24a67(@angular/compiler-cli@20.0.0-next.0)(@rollup/plugin-commonjs@28.0.2)(@rollup/plugin-node-resolve@13.3.0)(@types/node@20.17.23)(rollup-plugin-sourcemaps@0.6.3)(rollup@4.34.9)(terser@5.39.0)(typescript@5.8.2)
+        specifier: https://github.com/angular/bazel-builds.git#40b05a09a87b74e90f115cf2d9d506ac9483c78c
+        version: github.com/angular/bazel-builds/40b05a09a87b74e90f115cf2d9d506ac9483c78c(@angular/compiler-cli@20.0.0-next.0)(@rollup/plugin-commonjs@28.0.2)(@rollup/plugin-node-resolve@13.3.0)(@types/node@20.17.23)(rollup-plugin-sourcemaps@0.6.3)(rollup@4.34.9)(terser@5.39.0)(typescript@5.8.2)
       '@angular/build-tooling':
         specifier: https://github.com/angular/dev-infra-private-build-tooling-builds.git#d4727212a9d0f7eb63ae3116d73c769d9bd0bdc1
         version: github.com/angular/dev-infra-private-build-tooling-builds/d4727212a9d0f7eb63ae3116d73c769d9bd0bdc1(debug@4.4.0)(karma-chrome-launcher@3.2.0)(karma-jasmine@5.1.0)(karma@6.4.4)(rxjs@7.8.2)(terser@5.39.0)(zone.js@0.15.0)
       '@angular/cdk':
-        specifier: 19.2.1
-        version: 19.2.1(@angular/common@20.0.0-next.0)(@angular/core@20.0.0-next.0)(rxjs@7.8.2)
+        specifier: 20.0.0-next.0
+        version: 20.0.0-next.0(@angular/common@20.0.0-next.0)(@angular/core@20.0.0-next.0)(rxjs@7.8.2)
       '@angular/common':
         specifier: 20.0.0-next.0
         version: 20.0.0-next.0(@angular/core@20.0.0-next.0)(rxjs@7.8.2)
@@ -50,11 +50,11 @@ importers:
         specifier: 20.0.0-next.0
         version: 20.0.0-next.0(@angular/compiler-cli@20.0.0-next.0)(@angular/compiler@20.0.0-next.0)
       '@angular/material':
-        specifier: 19.2.1
-        version: 19.2.1(@angular/cdk@19.2.1)(@angular/common@20.0.0-next.0)(@angular/core@20.0.0-next.0)(@angular/forms@20.0.0-next.0)(@angular/platform-browser@20.0.0-next.0)(rxjs@7.8.2)
+        specifier: 20.0.0-next.0
+        version: 20.0.0-next.0(@angular/cdk@20.0.0-next.0)(@angular/common@20.0.0-next.0)(@angular/core@20.0.0-next.0)(@angular/forms@20.0.0-next.0)(@angular/platform-browser@20.0.0-next.0)(rxjs@7.8.2)
       '@angular/ng-dev':
-        specifier: https://github.com/angular/dev-infra-private-ng-dev-builds.git#4b26728d9cc8e1b9d7ce4fc2ab36f7585788337b
-        version: github.com/angular/dev-infra-private-ng-dev-builds/4b26728d9cc8e1b9d7ce4fc2ab36f7585788337b
+        specifier: https://github.com/angular/dev-infra-private-ng-dev-builds.git#dbcf3afdd0b7d3bd95c71e3df43a210364d3939b
+        version: github.com/angular/dev-infra-private-ng-dev-builds/dbcf3afdd0b7d3bd95c71e3df43a210364d3939b
       '@angular/platform-browser':
         specifier: 20.0.0-next.0
         version: 20.0.0-next.0(@angular/animations@20.0.0-next.0)(@angular/common@20.0.0-next.0)(@angular/core@20.0.0-next.0)
@@ -1096,11 +1096,11 @@ packages:
       - zone.js
     dev: true
 
-  /@angular/cdk@19.2.1(@angular/common@20.0.0-next.0)(@angular/core@20.0.0-next.0)(rxjs@7.8.2):
-    resolution: {integrity: sha512-j7dg18PJIbyeU4DTko3vIK3M2OuUv3H0ZViNddOaLlGN5X93cq4QCGcNhcGm3x3r5rUr/AaexYu+KHMyN8PwmA==}
+  /@angular/cdk@20.0.0-next.0(@angular/common@20.0.0-next.0)(@angular/core@20.0.0-next.0)(rxjs@7.8.2):
+    resolution: {integrity: sha512-3PB0GP6EaEHC/8kkEUwZ3ULjDhXcIfBdlI14eKVpKMDnmVJxg3Yl48k2U6zrWbHR+nPsWqpGd96iKkbSm1YM6g==}
     peerDependencies:
-      '@angular/common': ^19.0.0 || ^20.0.0
-      '@angular/core': ^19.0.0 || ^20.0.0
+      '@angular/common': ^20.0.0-0 || ^20.1.0-0 || ^20.2.0-0 || ^20.3.0-0 || ^21.0.0-0
+      '@angular/core': ^20.0.0-0 || ^20.1.0-0 || ^20.2.0-0 || ^20.3.0-0 || ^21.0.0-0
       rxjs: ^6.5.3 || ^7.4.0
     dependencies:
       '@angular/common': 20.0.0-next.0(@angular/core@20.0.0-next.0)(rxjs@7.8.2)
@@ -1216,17 +1216,17 @@ packages:
       - supports-color
     dev: true
 
-  /@angular/material@19.2.1(@angular/cdk@19.2.1)(@angular/common@20.0.0-next.0)(@angular/core@20.0.0-next.0)(@angular/forms@20.0.0-next.0)(@angular/platform-browser@20.0.0-next.0)(rxjs@7.8.2):
-    resolution: {integrity: sha512-hA+HVIJn/y72vXv/X1JRbrL/tynW95wYMQF2fV3lIeeAmmFKkkzextBaE9rTaiW6pVN6LXoRvLJl2Vyi9jIHzw==}
+  /@angular/material@20.0.0-next.0(@angular/cdk@20.0.0-next.0)(@angular/common@20.0.0-next.0)(@angular/core@20.0.0-next.0)(@angular/forms@20.0.0-next.0)(@angular/platform-browser@20.0.0-next.0)(rxjs@7.8.2):
+    resolution: {integrity: sha512-cexU/AOkVFzPCVh5BtVEzUAewE0KjLQW/8nC6LGSOnbHjJ1tUoM+zHeqiMMDvOKzA7f7YsQg4WddlL++ANF5jA==}
     peerDependencies:
-      '@angular/cdk': 19.2.1
-      '@angular/common': ^19.0.0 || ^20.0.0
-      '@angular/core': ^19.0.0 || ^20.0.0
-      '@angular/forms': ^19.0.0 || ^20.0.0
-      '@angular/platform-browser': ^19.0.0 || ^20.0.0
+      '@angular/cdk': 20.0.0-next.0
+      '@angular/common': ^20.0.0-0 || ^20.1.0-0 || ^20.2.0-0 || ^20.3.0-0 || ^21.0.0-0
+      '@angular/core': ^20.0.0-0 || ^20.1.0-0 || ^20.2.0-0 || ^20.3.0-0 || ^21.0.0-0
+      '@angular/forms': ^20.0.0-0 || ^20.1.0-0 || ^20.2.0-0 || ^20.3.0-0 || ^21.0.0-0
+      '@angular/platform-browser': ^20.0.0-0 || ^20.1.0-0 || ^20.2.0-0 || ^20.3.0-0 || ^21.0.0-0
       rxjs: ^6.5.3 || ^7.4.0
     dependencies:
-      '@angular/cdk': 19.2.1(@angular/common@20.0.0-next.0)(@angular/core@20.0.0-next.0)(rxjs@7.8.2)
+      '@angular/cdk': 20.0.0-next.0(@angular/common@20.0.0-next.0)(@angular/core@20.0.0-next.0)(rxjs@7.8.2)
       '@angular/common': 20.0.0-next.0(@angular/core@20.0.0-next.0)(rxjs@7.8.2)
       '@angular/core': 20.0.0-next.0(rxjs@7.8.2)(zone.js@0.15.0)
       '@angular/forms': 20.0.0-next.0(@angular/common@20.0.0-next.0)(@angular/core@20.0.0-next.0)(@angular/platform-browser@20.0.0-next.0)(rxjs@7.8.2)
@@ -14230,15 +14230,15 @@ packages:
     resolution: {integrity: sha512-9oxn0IIjbCZkJ67L+LkhYWRyAy7axphb3VgE2MBDlOqnmHMPWGYMxJxBYFueFq/JGY2GMwS0rU+UCLunEmy5UA==}
     dev: true
 
-  github.com/angular/bazel-builds/cb6cc91cff9baaa3055775deb0d444aa47d24a67(@angular/compiler-cli@20.0.0-next.0)(@rollup/plugin-commonjs@28.0.2)(@rollup/plugin-node-resolve@13.3.0)(@types/node@20.17.23)(rollup-plugin-sourcemaps@0.6.3)(rollup@4.34.9)(terser@5.39.0)(typescript@5.8.2):
-    resolution: {tarball: https://codeload.github.com/angular/bazel-builds/tar.gz/cb6cc91cff9baaa3055775deb0d444aa47d24a67}
-    id: github.com/angular/bazel-builds/cb6cc91cff9baaa3055775deb0d444aa47d24a67
+  github.com/angular/bazel-builds/40b05a09a87b74e90f115cf2d9d506ac9483c78c(@angular/compiler-cli@20.0.0-next.0)(@rollup/plugin-commonjs@28.0.2)(@rollup/plugin-node-resolve@13.3.0)(@types/node@20.17.23)(rollup-plugin-sourcemaps@0.6.3)(rollup@4.34.9)(terser@5.39.0)(typescript@5.8.2):
+    resolution: {tarball: https://codeload.github.com/angular/bazel-builds/tar.gz/40b05a09a87b74e90f115cf2d9d506ac9483c78c}
+    id: github.com/angular/bazel-builds/40b05a09a87b74e90f115cf2d9d506ac9483c78c
     name: '@angular/bazel'
-    version: 20.0.0-next.0
+    version: 20.0.0-next.1
     engines: {node: ^18.19.1 || ^20.11.1 || >=22.0.0}
     hasBin: true
     peerDependencies:
-      '@angular/compiler-cli': 20.0.0-next.0+sha-a58b038
+      '@angular/compiler-cli': 20.0.0-next.1+sha-cae1fe5
       '@bazel/concatjs': ^5.3.0
       '@bazel/worker': ^5.3.0
       '@rollup/plugin-commonjs': ^28.0.0
@@ -14320,10 +14320,10 @@ packages:
       - zone.js
     dev: true
 
-  github.com/angular/dev-infra-private-ng-dev-builds/4b26728d9cc8e1b9d7ce4fc2ab36f7585788337b:
-    resolution: {tarball: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/4b26728d9cc8e1b9d7ce4fc2ab36f7585788337b}
+  github.com/angular/dev-infra-private-ng-dev-builds/dbcf3afdd0b7d3bd95c71e3df43a210364d3939b:
+    resolution: {tarball: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/dbcf3afdd0b7d3bd95c71e3df43a210364d3939b}
     name: '@angular/ng-dev'
-    version: 0.0.0-bf0dd632ed129ee8770b09a6e11c6497162b3edb
+    version: 0.0.0-60ad70b4632945a3014cf26e045530f8ae2e6e18
     hasBin: true
     dependencies:
       '@google-cloud/spanner': 7.18.1(supports-color@10.0.0)
