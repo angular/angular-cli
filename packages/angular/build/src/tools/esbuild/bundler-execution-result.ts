@@ -127,9 +127,9 @@ export class ExecutionResult {
   setExternalMetadata(
     implicitBrowser: string[],
     implicitServer: string[],
-    explicit: string[] | undefined,
+    explicit: string[],
   ): void {
-    this.externalMetadata = { implicitBrowser, implicitServer, explicit: explicit ?? [] };
+    this.externalMetadata = { implicitBrowser, implicitServer, explicit };
   }
 
   get output() {
