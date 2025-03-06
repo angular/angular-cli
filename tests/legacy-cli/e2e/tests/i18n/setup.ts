@@ -108,7 +108,7 @@ export async function setupI18nConfig() {
       selector: 'app-root',
       imports: [DatePipe, RouterOutlet],
       standalone: true,
-      templateUrl: './app.component.html'
+      templateUrl: './app.component.ng.html'
     })
     export class AppComponent {
       constructor(@Inject(LOCALE_ID) public locale: string) { }
@@ -119,7 +119,7 @@ export async function setupI18nConfig() {
   `,
   );
   await writeFile(
-    `src/app/app.component.html`,
+    `src/app/app.component.ng.html`,
     `
     <p id="hello" i18n="An introduction header for this sample">Hello {{ title }}! </p>
     <p id="locale">{{ locale }}</p>
@@ -140,7 +140,7 @@ export async function setupI18nConfig() {
           <trans-unit id="4286451273117902052" datatype="html">
             <source>Hello <x id="INTERPOLATION" equiv-text="{{ title }}"/>! </source>
             <context-group purpose="location">
-              <context context-type="sourcefile">src/app/app.component.html</context>
+              <context context-type="sourcefile">src/app/app.component.ng.html</context>
               <context context-type="linenumber">2,3</context>
             </context-group>
             <note priority="1" from="description">An introduction header for this sample</note>
@@ -148,14 +148,14 @@ export async function setupI18nConfig() {
           <trans-unit id="4606963464835766483" datatype="html">
             <source>Updated <x id="ICU" equiv-text="{minutes, plural, =0 {just now} =1 {one minute ago} other {{{minutes}} minutes ago}}" xid="1887283401472369100"/></source>
             <context-group purpose="location">
-              <context context-type="sourcefile">src/app/app.component.html</context>
+              <context context-type="sourcefile">src/app/app.component.ng.html</context>
               <context context-type="linenumber">5,6</context>
             </context-group>
           </trans-unit>
           <trans-unit id="2002272803511843863" datatype="html">
             <source>{VAR_PLURAL, plural, =0 {just now} =1 {one minute ago} other {<x id="INTERPOLATION"/> minutes ago}}</source>
             <context-group purpose="location">
-              <context context-type="sourcefile">src/app/app.component.html</context>
+              <context context-type="sourcefile">src/app/app.component.ng.html</context>
               <context context-type="linenumber">5,6</context>
             </context-group>
           </trans-unit>

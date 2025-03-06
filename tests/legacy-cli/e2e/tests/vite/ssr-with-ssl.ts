@@ -18,8 +18,8 @@ export default async function () {
   await installWorkspacePackages();
 
   await writeMultipleFiles({
-    // Replace the template of app.component.html as it makes it harder to debug
-    'src/app/app.component.html': '<router-outlet />',
+    // Replace the template of app.component.ng.html as it makes it harder to debug
+    'src/app/app.component.ng.html': '<router-outlet />',
     'src/app/app.routes.ts': `
       import { Routes } from '@angular/router';
       import { HomeComponent } from './home/home.component';

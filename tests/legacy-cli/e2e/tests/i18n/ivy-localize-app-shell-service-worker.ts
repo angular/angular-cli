@@ -17,7 +17,7 @@ export default async function () {
       : readNgVersion();
   });
 
-  await appendToFile('src/app/app.component.html', '<router-outlet></router-outlet>');
+  await appendToFile('src/app/app.component.ng.html', '<router-outlet></router-outlet>');
 
   // Add app-shell and service-worker
   await silentNg('generate', 'app-shell');
