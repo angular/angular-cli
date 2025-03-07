@@ -6,6 +6,6 @@ ts_project(
     visibility = ["//packages/angular_devkit/architect/node:__pkg__"],
     deps = [
         "//:node_modules/@types/node",
-        "//packages/angular_devkit/architect:architect_rjs",
+        "//packages/angular_devkit/architect",
     ],
 )

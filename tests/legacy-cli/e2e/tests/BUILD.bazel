@@ -13,6 +13,6 @@ ts_project(
         "//:node_modules/express",
         "//:node_modules/fast-glob",
         "//:node_modules/semver",
-        "//tests/legacy-cli/e2e/utils:utils_rjs",
+        "//tests/legacy-cli/e2e/utils",
     ],
 )

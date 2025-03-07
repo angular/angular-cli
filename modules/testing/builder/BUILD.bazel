@@ -38,12 +38,12 @@ ts_project(
         ],
     ),
     deps = [
-        ":builder_rjs",
+        ":builder",
         ":node_modules/@angular-devkit/architect",
     ],
 )
 
 jasmine_test(
     name = "unit_test",
-    data = [":unit_test_lib_rjs"],
+    data = [":unit_test_lib"],
 )

@@ -306,10 +306,10 @@ Our Public API surface is tracked using golden files.
 
 You check all golden files by running:
 ```bash
-yarn public-api:check
+pnpm run public-api:check
 ```
 
 If you modified the public API, the test will fail. To update the golden files you need to run:
 ```bash
-yarn public-api:update
+pnpm run public-api:update
 ```

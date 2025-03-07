@@ -1,4 +1,4 @@
-load("@npm//@angular/build-tooling/bazel/spec-bundling:index.bzl", "spec_bundle")
+load("@devinfra//bazel/spec-bundling:index_rjs.bzl", "spec_bundle")
 load("//tools:defaults2.bzl", "jasmine_test", "ts_project")
 
 ts_project(
@@ -7,16 +7,13 @@ ts_project(
     srcs = glob(["**/*_spec.ts"]),
     deps = [
         "//:node_modules/@types/node",
-        "//packages/angular/ssr/node:node_rjs",
+        "//packages/angular/ssr/node",
     ],
 )
 
 # TODO: Clean this up when this repo runs ESM consistently.
 spec_bundle(
     name = "esm_tests_bundled",
-    downlevel_async_await = False,
-    platform = "node",
-    run_angular_linker = False,
     deps = [
         ":unit_test_lib",
     ],

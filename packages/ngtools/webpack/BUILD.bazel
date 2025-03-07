@@ -49,7 +49,7 @@ ts_project(
     ),
     deps = [
         ":node_modules/@angular-devkit/core",
-        ":webpack_rjs",
+        ":webpack",
         "//:node_modules/@angular/compiler",
         "//:node_modules/@types/jasmine",
         "//:node_modules/typescript",
@@ -59,7 +59,7 @@ ts_project(
 jasmine_test(
     name = "webpack_test",
     data = [
-        ":webpack_test_lib_rjs",
+        ":webpack_test_lib",
         # Needed at runtime for runtime TS compilations performed by tests.
         "//:node_modules/tslib",
     ],
@@ -78,7 +78,7 @@ npm_package(
     deps = [
         ":README.md",
         ":license",
-        ":webpack_rjs",
+        ":webpack",
     ],
 )
 

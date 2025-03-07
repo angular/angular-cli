@@ -13,7 +13,7 @@
  * This is useful during the `rules_js` migration to verify the npm artifact
  * doesn't differ unexpectedly.
  *
- * Example command: yarn diff-release-package @angular/cli
+ * Example command: pnpm diff-release-package @angular/cli
  */
 
 import { GitClient } from '@angular/ng-dev';
