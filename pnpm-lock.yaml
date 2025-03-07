@@ -222,7 +222,7 @@ importers:
         version: 8.26.0(eslint@9.21.0)(typescript@5.8.2)
       '@vitejs/plugin-basic-ssl':
         specifier: 2.0.0
-        version: 2.0.0(vite@6.2.0)
+        version: 2.0.0(vite@6.2.1)
       '@web/test-runner':
         specifier: ^0.20.0
         version: 0.20.0
@@ -278,8 +278,8 @@ importers:
         specifier: 9.21.0
         version: 9.21.0
       eslint-config-prettier:
-        specifier: 10.0.2
-        version: 10.0.2(eslint@9.21.0)
+        specifier: 10.1.1
+        version: 10.1.1(eslint@9.21.0)
       eslint-plugin-header:
         specifier: 3.1.1
         version: 3.1.1(eslint@9.21.0)
@@ -500,8 +500,8 @@ importers:
         specifier: ^10.0.0
         version: 10.2.2
       vite:
-        specifier: 6.2.0
-        version: 6.2.0(@types/node@20.17.23)(less@4.2.2)(sass@1.85.1)(terser@5.39.0)
+        specifier: 6.2.1
+        version: 6.2.1(@types/node@20.17.23)(less@4.2.2)(sass@1.85.1)(terser@5.39.0)
       watchpack:
         specifier: 2.4.2
         version: 2.4.2
@@ -575,7 +575,7 @@ importers:
         version: 5.1.6(@types/node@20.17.23)
       '@vitejs/plugin-basic-ssl':
         specifier: 2.0.0
-        version: 2.0.0(vite@6.2.0)
+        version: 2.0.0(vite@6.2.1)
       beasties:
         specifier: 0.2.0
         version: 0.2.0
@@ -625,8 +625,8 @@ importers:
         specifier: 0.2.12
         version: 0.2.12
       vite:
-        specifier: 6.2.0
-        version: 6.2.0(@types/node@20.17.23)(less@4.2.2)(sass@1.85.1)(terser@5.39.0)
+        specifier: 6.2.1
+        version: 6.2.1(@types/node@20.17.23)(less@4.2.2)(sass@1.85.1)(terser@5.39.0)
       watchpack:
         specifier: 2.4.2
         version: 2.4.2
@@ -825,7 +825,7 @@ importers:
         version: link:../../ngtools/webpack
       '@vitejs/plugin-basic-ssl':
         specifier: 2.0.0
-        version: 2.0.0(vite@6.2.0)
+        version: 2.0.0(vite@6.2.1)
       ansi-colors:
         specifier: 4.1.3
         version: 4.1.3
@@ -5282,13 +5282,13 @@ packages:
       semver: 7.6.3
     dev: true
 
-  /@vitejs/plugin-basic-ssl@2.0.0(vite@6.2.0):
+  /@vitejs/plugin-basic-ssl@2.0.0(vite@6.2.1):
     resolution: {integrity: sha512-gc9Tjg8bUxBVSTzeWT3Njc0Cl3PakHFKdNfABnZWiUgbxqmHDEn7uECv3fHVylxoYgNzAcmU7ZrILz+BwSo3sA==}
     engines: {node: ^18.0.0 || ^20.0.0 || >=22.0.0}
     peerDependencies:
       vite: ^6.0.0
     dependencies:
-      vite: 6.2.0(@types/node@20.17.23)(less@4.2.2)(sass@1.85.1)(terser@5.39.0)
+      vite: 6.2.1(@types/node@20.17.23)(less@4.2.2)(sass@1.85.1)(terser@5.39.0)
 
   /@web/browser-logs@0.4.1:
     resolution: {integrity: sha512-ypmMG+72ERm+LvP+loj9A64MTXvWMXHUOu773cPO4L1SV/VWg6xA9Pv7vkvkXQX+ItJtCJt+KQ+U6ui2HhSFUw==}
@@ -7673,8 +7673,8 @@ packages:
       source-map: 0.6.1
     dev: true
 
-  /eslint-config-prettier@10.0.2(eslint@9.21.0):
-    resolution: {integrity: sha512-1105/17ZIMjmCOJOPNfVdbXafLCLj3hPmkmB7dLgt7XsQ/zkxSuDerE/xgO3RxoHysR1N1whmquY0lSn2O0VLg==}
+  /eslint-config-prettier@10.1.1(eslint@9.21.0):
+    resolution: {integrity: sha512-4EQQr6wXwS+ZJSzaR5ZCrYgLxqvUjdXctaEtBqHcbkW944B1NQyO4qpdHQbXBONfwxXdkAY81HH4+LUfrg+zPw==}
     hasBin: true
     peerDependencies:
       eslint: '>=7.0.0'
@@ -13763,8 +13763,8 @@ packages:
       extsprintf: 1.4.1
     dev: true
 
-  /vite@6.2.0(@types/node@20.17.23)(less@4.2.2)(sass@1.85.1)(terser@5.39.0):
-    resolution: {integrity: sha512-7dPxoo+WsT/64rDcwoOjk76XHj+TqNTIvHKcuMQ1k4/SeHDaQt5GFAeLYzrimZrMpn/O6DtdI03WUjdxuPM0oQ==}
+  /vite@6.2.1(@types/node@20.17.23)(less@4.2.2)(sass@1.85.1)(terser@5.39.0):
+    resolution: {integrity: sha512-n2GnqDb6XPhlt9B8olZPrgMD/es/Nd1RdChF6CBD/fHW6pUyUTt2sQW2fPRX5GiD9XEa6+8A6A4f2vT6pSsE7Q==}
     engines: {node: ^18.0.0 || ^20.0.0 || >=22.0.0}
     hasBin: true
     peerDependencies:
