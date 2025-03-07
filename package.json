@@ -44,7 +44,7 @@
   "devDependencies": {
     "@ampproject/remapping": "2.3.0",
     "@angular/animations": "20.0.0-next.0",
-    "@angular/bazel": "https://github.com/angular/bazel-builds.git#40b05a09a87b74e90f115cf2d9d506ac9483c78c",
+    "@angular/bazel": "https://github.com/angular/bazel-builds.git#3422dcb650e407d2c00ac724acf560ab1506d68c",
     "@angular/build-tooling": "https://github.com/angular/dev-infra-private-build-tooling-builds.git#d4727212a9d0f7eb63ae3116d73c769d9bd0bdc1",
     "@angular/cdk": "20.0.0-next.0",
     "@angular/common": "20.0.0-next.0",
