@@ -15,7 +15,7 @@ To get started locally, follow these instructions:
 To make a local build:
 
 ```shell
-yarn build --local
+pnpm build --local
 ```
 
 This generates a number of tarballs in the `dist/` directory. To actually use
@@ -74,9 +74,9 @@ There are two different test suites which can be run locally:
 
 ### Unit tests
 
-- Run all tests: `yarn bazel test //packages/...`
-- Run a subset of the tests, use the full Bazel target example: `yarn bazel test //packages/schematics/angular:angular_test`
-- For a complete list of test targets use the following Bazel query: `yarn bazel query "tests(//packages/...)"`
+- Run all tests: `pnpm bazel test //packages/...`
+- Run a subset of the tests, use the full Bazel target example: `pnpm bazel test //packages/schematics/angular:angular_test`
+- For a complete list of test targets use the following Bazel query: `pnpm bazel query "tests(//packages/...)"`
 
 When debugging a specific test, change `describe()` or `it()` to `fdescribe()`
 and `fit()` to focus execution to just that one test. This will keep the output clean and speed up execution by not running irrelevant tests.
@@ -85,9 +85,9 @@ You can find more info about debugging [tests with Bazel in the docs.](https://g
 
 ### End to end tests
 
-- For a complete list of test targets use the following Bazel query: `yarn bazel query "tests(//tests/...)"`
-- Run a subset of the tests: `yarn bazel test //tests/legacy-cli:e2e_node18 --config=e2e --test_filter="tests/i18n/ivy-localize-*"`
-- Use `bazel run` to debug failing tests debugging: `yarn bazel run //tests/legacy-cli:e2e_node18 --config=e2e --test_arg="--glob=tests/basic/aot.ts"`
+- For a complete list of test targets use the following Bazel query: `pnpm bazel query "tests(//tests/...)"`
+- Run a subset of the tests: `pnpm bazel test //tests/legacy-cli:e2e_node18 --config=e2e --test_filter="tests/i18n/ivy-localize-*"`
+- Use `bazel run` to debug failing tests debugging: `pnpm bazel run //tests/legacy-cli:e2e_node18 --config=e2e --test_arg="--glob=tests/basic/aot.ts"`
 - Provide additional `e2e_runner` options using `--test_arg`: `--test_arg="--package-manager=yarn"`
 
 When running the debug commands, Node will stop and wait for a debugger to attach.

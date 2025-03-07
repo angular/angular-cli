@@ -26,7 +26,7 @@ const releaseTargetTag = 'release-package';
 const projectDir = join(dirname(fileURLToPath(import.meta.url)), '../');
 
 /** Command that runs Bazel. */
-const bazelCmd = process.env.BAZEL || `yarn bazel`;
+const bazelCmd = process.env.BAZEL || `pnpm -s bazel`;
 
 /** Command that queries Bazel for all release package targets. */
 const queryPackagesCmd =
