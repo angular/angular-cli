@@ -167,7 +167,7 @@
     "npm-package-arg": "12.0.2",
     "npm-pick-manifest": "10.0.0",
     "open": "10.1.0",
-    "ora": "5.4.1",
+    "ora": "8.2.0",
     "pacote": "20.0.0",
     "parse5-html-rewriting-stream": "7.0.0",
     "patch-package": "^8.0.0",
