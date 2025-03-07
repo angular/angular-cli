@@ -113,9 +113,6 @@ importers:
       '@eslint/js':
         specifier: 9.22.0
         version: 9.22.0
-      '@inquirer/confirm':
-        specifier: 5.1.7
-        version: 5.1.7(@types/node@20.17.24)
       '@inquirer/prompts':
         specifier: 7.3.3
         version: 7.3.3(@types/node@20.17.24)
@@ -215,9 +212,6 @@ importers:
       '@typescript-eslint/parser':
         specifier: 8.26.0
         version: 8.26.0(eslint@9.22.0(jiti@1.21.7))(typescript@5.8.2)
-      '@vitejs/plugin-basic-ssl':
-        specifier: 2.0.0
-        version: 2.0.0(vite@6.2.1(@types/node@20.17.24)(jiti@1.21.7)(less@4.2.2)(sass@1.85.1)(terser@5.39.0)(yaml@2.7.0))
       '@web/test-runner':
         specifier: ^0.20.0
         version: 0.20.0
@@ -491,9 +485,6 @@ importers:
       verdaccio-auth-memory:
         specifier: ^10.0.0
         version: 10.2.2
-      vite:
-        specifier: 6.2.1
-        version: 6.2.1(@types/node@20.17.24)(jiti@1.21.7)(less@4.2.2)(sass@1.85.1)(terser@5.39.0)(yaml@2.7.0)
       watchpack:
         specifier: 2.4.2
         version: 2.4.2
@@ -11207,10 +11198,6 @@ snapshots:
       minimatch: 7.4.6
       semver: 7.6.3
 
-  '@vitejs/plugin-basic-ssl@2.0.0(vite@6.2.1(@types/node@20.17.24)(jiti@1.21.7)(less@4.2.2)(sass@1.85.1)(terser@5.39.0)(yaml@2.7.0))':
-    dependencies:
-      vite: 6.2.1(@types/node@20.17.24)(jiti@1.21.7)(less@4.2.2)(sass@1.85.1)(terser@5.39.0)(yaml@2.7.0)
-
   '@vitejs/plugin-basic-ssl@2.0.0(vite@6.2.1(@types/node@22.13.10)(jiti@1.21.7)(less@4.2.2)(sass@1.85.1)(terser@5.39.0)(yaml@2.7.0))':
     dependencies:
       vite: 6.2.1(@types/node@22.13.10)(jiti@1.21.7)(less@4.2.2)(sass@1.85.1)(terser@5.39.0)(yaml@2.7.0)
@@ -16698,20 +16685,6 @@ snapshots:
       assert-plus: 1.0.0
       core-util-is: 1.0.2
       extsprintf: 1.4.1
-
-  vite@6.2.1(@types/node@20.17.24)(jiti@1.21.7)(less@4.2.2)(sass@1.85.1)(terser@5.39.0)(yaml@2.7.0):
-    dependencies:
-      esbuild: 0.25.1
-      postcss: 8.5.3
-      rollup: 4.35.0
-    optionalDependencies:
-      '@types/node': 20.17.24
-      fsevents: 2.3.3
-      jiti: 1.21.7
-      less: 4.2.2
-      sass: 1.85.1
-      terser: 5.39.0
-      yaml: 2.7.0
 
   vite@6.2.1(@types/node@22.13.10)(jiti@1.21.7)(less@4.2.2)(sass@1.85.1)(terser@5.39.0)(yaml@2.7.0):
     dependencies:
