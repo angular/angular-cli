@@ -55,15 +55,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@angular/bazel@https://github.com/angular/bazel-builds.git#40b05a09a87b74e90f115cf2d9d506ac9483c78c":
-  version: 20.0.0-next.1+sha-cae1fe5
-  resolution: "@angular/bazel@https://github.com/angular/bazel-builds.git#commit=40b05a09a87b74e90f115cf2d9d506ac9483c78c"
+"@angular/bazel@https://github.com/angular/bazel-builds.git#3422dcb650e407d2c00ac724acf560ab1506d68c":
+  version: 20.0.0-next.1+sha-aa1ab41
+  resolution: "@angular/bazel@https://github.com/angular/bazel-builds.git#commit=3422dcb650e407d2c00ac724acf560ab1506d68c"
   dependencies:
     "@microsoft/api-extractor": "npm:^7.24.2"
+    fast-glob: "npm:^3.3.3"
     magic-string: "npm:^0.30.0"
     tslib: "npm:^2.3.0"
   peerDependencies:
-    "@angular/compiler-cli": 20.0.0-next.1+sha-cae1fe5
+    "@angular/compiler-cli": 20.0.0-next.1+sha-aa1ab41
     "@bazel/concatjs": ^5.3.0
     "@bazel/worker": ^5.3.0
     "@rollup/plugin-commonjs": ^28.0.0
@@ -80,7 +81,7 @@ __metadata:
     packager: ./src/ng_package/packager.mjs
     types_bundler: ./src/types_bundle/index.mjs
     xi18n: ./src/ngc-wrapped/extract_i18n.mjs
-  checksum: 10c0/629b4b4d37c94397d607ddde7ca5c2583e710bc97e20121cc740cdd3b2b59bdc135118dcde250ba608466db0d7846e2bf407f75a5adc4497d9231c1d24561e7c
+  checksum: 10c0/601301d364725b5603bf672f550caa64d7648521163c446c1f01a54894d9abc40ed11d3c3b100539ed565716980f01fc42fefb9a3c9017f0780a2f8ae1818c08
   languageName: node
   linkType: hard
 
@@ -299,7 +300,7 @@ __metadata:
   dependencies:
     "@ampproject/remapping": "npm:2.3.0"
     "@angular/animations": "npm:20.0.0-next.0"
-    "@angular/bazel": "https://github.com/angular/bazel-builds.git#40b05a09a87b74e90f115cf2d9d506ac9483c78c"
+    "@angular/bazel": "https://github.com/angular/bazel-builds.git#3422dcb650e407d2c00ac724acf560ab1506d68c"
     "@angular/build-tooling": "https://github.com/angular/dev-infra-private-build-tooling-builds.git#d4727212a9d0f7eb63ae3116d73c769d9bd0bdc1"
     "@angular/cdk": "npm:20.0.0-next.0"
     "@angular/common": "npm:20.0.0-next.0"
@@ -9682,7 +9683,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fast-glob@npm:3.3.3, fast-glob@npm:^3.2.9, fast-glob@npm:^3.3.2":
+"fast-glob@npm:3.3.3, fast-glob@npm:^3.2.9, fast-glob@npm:^3.3.2, fast-glob@npm:^3.3.3":
   version: 3.3.3
   resolution: "fast-glob@npm:3.3.3"
   dependencies:
