@@ -12,18 +12,19 @@
   ],
   "scripts": {
     "admin": "node --no-warnings=ExperimentalWarning --loader ts-node/esm/transpile-only ./scripts/devkit-admin.mjs",
+    "bazel": "bazelisk",
     "test": "bazel test //packages/...",
-    "build": "yarn admin build",
+    "build": "pnpm -s admin build",
     "lint": "eslint --cache --max-warnings=0 \"**/*.@(ts|mts|cts)\"",
-    "templates": "yarn admin templates",
-    "validate": "yarn admin validate",
-    "postinstall": "patch-package && yarn webdriver-update && yarn husky",
+    "templates": "pnpm -s admin templates",
+    "validate": "pnpm -s admin validate",
+    "postinstall": "pnpm -s webdriver-update && husky",
     "//webdriver-update-README": "ChromeDriver version must match Puppeteer Chromium version, see https://github.com/GoogleChrome/puppeteer/releases http://chromedriver.chromium.org/downloads",
     "webdriver-update": "webdriver-manager update --standalone false --gecko false --versions.chrome 106.0.5249.21",
     "public-api:check": "node goldens/public-api/manage.js test",
     "ng-dev": "node --no-warnings=ExperimentalWarning --loader ts-node/esm/transpile-only node_modules/@angular/ng-dev/bundles/cli.mjs",
     "public-api:update": "node goldens/public-api/manage.js accept",
-    "ts-circular-deps": "yarn ng-dev ts-circular-deps --config ./scripts/circular-deps-test.conf.mjs",
+    "ts-circular-deps": "pnpm -s ng-dev ts-circular-deps --config ./scripts/circular-deps-test.conf.mjs",
     "check-tooling-setup": "tsc --project .ng-dev/tsconfig.json",
     "diff-release-package": "node --no-warnings=ExperimentalWarning --loader ts-node/esm/transpile-only scripts/diff-release-package.mts"
   },
@@ -31,9 +32,12 @@
     "type": "git",
     "url": "https://github.com/angular/angular-cli.git"
   },
+  "packageManager": "pnpm@9.15.6",
   "engines": {
     "node": "^20.11.1 || >=22.0.0",
-    "npm": "Please use yarn instead of NPM to install dependencies"
+    "npm": "Please use pnpm instead of NPM to install dependencies",
+    "yarn": "Please use pnpm instead of Yarn to install dependencies",
+    "pnpm": "^9.15.6"
   },
   "author": "Angular Authors",
   "license": "MIT",
@@ -169,7 +173,6 @@
     "ora": "5.4.1",
     "pacote": "20.0.0",
     "parse5-html-rewriting-stream": "7.0.0",
-    "patch-package": "^8.0.0",
     "picomatch": "4.0.2",
     "piscina": "4.8.0",
     "postcss": "8.5.3",
@@ -228,6 +231,18 @@
     ],
     "overrides": {
       "@angular/build": "workspace:*"
+    },
+    "packageExtensions": {
+      "grpc-gcp": {
+        "peerDependencies": {
+          "protobufjs": "*"
+        }
+      },
+      "@angular/platform-server": {
+        "peerDependencies": {
+          "rxjs": "*"
+        }
+      }
     }
   },
   "resolutions": {

@@ -114,13 +114,13 @@ load("@build_bazel_rules_nodejs//:index.bzl", "yarn_install")
 yarn_install(
     name = "npm",
     data = [
-        "//:.yarn/releases/yarn-4.5.0.cjs",
-        "//:.yarnrc.yml",
         "//tools/legacy-rnjs:.yarn/patches/@angular-bazel-https-67c38b3c32.patch",
+        "//tools/legacy-rnjs:.yarn/releases/yarn-4.5.0.cjs",
+        "//tools/legacy-rnjs:.yarnrc.yml",
     ],
     exports_directories_only = False,
     package_json = "//tools/legacy-rnjs:package.json",
-    yarn = "//:.yarn/releases/yarn-4.5.0.cjs",
+    yarn = "//tools/legacy-rnjs:.yarn/releases/yarn-4.5.0.cjs",
     yarn_lock = "//tools/legacy-rnjs:yarn.lock",
 )
 
@@ -190,9 +190,7 @@ npm_translate_lock(
         # TODO: Remove when https://github.com/verdaccio/verdaccio/commit/bf0e09a509e8e0a74167b0307d129202bc3f40d2 is available.
         "@verdaccio/config": [""],
     },
-    update_pnpm_lock = True,
     verify_node_modules_ignored = "//:.bazelignore",
-    yarn_lock = "//:yarn.lock",
 )
 
 load("@npm2//:repositories.bzl", "npm_repositories")
