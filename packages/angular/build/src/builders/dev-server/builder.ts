@@ -56,13 +56,6 @@ export async function* execute(
 
   const { builderName, normalizedOptions } = await initialize(options, projectName, context);
 
-  // Warn if the initial options provided by the user enable prebundling but caching is disabled
-  if (options.prebundle && !normalizedOptions.cacheOptions.enabled) {
-    context.logger.warn(
-      `Prebundling has been configured but will not be used because caching has been disabled.`,
-    );
-  }
-
   yield* serveWithVite(
     normalizedOptions,
     builderName,
