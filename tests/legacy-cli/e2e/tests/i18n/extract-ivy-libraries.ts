@@ -24,7 +24,7 @@ export default async function () {
   );
 
   await writeFile(
-    'src/app/app.component.html',
+    'src/app/app.component.ng.html',
     `
       <p i18n>Hello world</p>
       <lib-i18n-lib-test></lib-i18n-lib-test>
@@ -42,7 +42,7 @@ export default async function () {
   await ng('extract-i18n');
   await expectFileToMatch('messages.xlf', 'Hello world');
   await expectFileToMatch('messages.xlf', 'i18n-lib-test works!');
-  await expectFileToMatch('messages.xlf', 'src/app/app.component.html');
+  await expectFileToMatch('messages.xlf', 'src/app/app.component.ng.html');
   await expectFileToMatch(
     'messages.xlf',
     'projects/i18n-lib-test/src/lib/i18n-lib-test.component.ts',

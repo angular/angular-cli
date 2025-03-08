@@ -57,7 +57,7 @@ describe('Application Schematic', () => {
         '/projects/foo/src/styles.css',
         '/projects/foo/src/app/app.module.ts',
         '/projects/foo/src/app/app.component.css',
-        '/projects/foo/src/app/app.component.html',
+        '/projects/foo/src/app/app.component.ng.html',
         '/projects/foo/src/app/app.component.spec.ts',
         '/projects/foo/src/app/app.component.ts',
       ]),
@@ -267,7 +267,7 @@ describe('Application Schematic', () => {
           '/src/main.ts',
           '/src/styles.css',
           '/src/app/app.component.css',
-          '/src/app/app.component.html',
+          '/src/app/app.component.ng.html',
           '/src/app/app.component.spec.ts',
           '/src/app/app.component.ts',
         ]),
@@ -448,7 +448,7 @@ describe('Application Schematic', () => {
     [
       '/projects/foo/tsconfig.spec.json',
       '/projects/foo/src/app/app.component.css',
-      '/projects/foo/src/app/app.component.html',
+      '/projects/foo/src/app/app.component.ng.html',
       '/projects/foo/src/app/app.component.spec.ts',
     ].forEach((x) => expect(files).not.toContain(x));
 
@@ -473,7 +473,7 @@ describe('Application Schematic', () => {
       '/projects/foo/tsconfig.spec.json',
       '/projects/foo/karma.conf.js',
       '/projects/foo/src/test.ts',
-      '/projects/foo/src/app/app.component.html',
+      '/projects/foo/src/app/app.component.ng.html',
       '/projects/foo/src/app/app.component.spec.ts',
     ].forEach((x) => expect(files).not.toContain(x));
 
@@ -510,7 +510,7 @@ describe('Application Schematic', () => {
         '/projects/foo/src/index.html',
         '/projects/foo/src/main.ts',
         '/projects/foo/src/styles.css',
-        '/projects/foo/src/app/app.component.html',
+        '/projects/foo/src/app/app.component.ng.html',
         '/projects/foo/src/app/app.component.ts',
       ]),
     );
@@ -532,7 +532,7 @@ describe('Application Schematic', () => {
         '/projects/foo/src/styles.css',
         '/projects/foo/src/app/app.config.ts',
         '/projects/foo/src/app/app.component.css',
-        '/projects/foo/src/app/app.component.html',
+        '/projects/foo/src/app/app.component.ng.html',
         '/projects/foo/src/app/app.component.spec.ts',
         '/projects/foo/src/app/app.component.ts',
       ]),
@@ -673,7 +673,7 @@ describe('Application Schematic', () => {
           '/projects/foo/src/app/app-routing.module.ts',
           '/projects/foo/src/app/app.module.ts',
           '/projects/foo/src/app/app.component.css',
-          '/projects/foo/src/app/app.component.html',
+          '/projects/foo/src/app/app.component.ng.html',
           '/projects/foo/src/app/app.component.spec.ts',
           '/projects/foo/src/app/app.component.ts',
         ]),

@@ -21,7 +21,9 @@ export default function () {
       .then(() => expectFileToExist(join(componentDir, 'test-component.component.ts')))
       .then(() => expectFileToExist(join(componentDir, 'test-component.component.spec.ts')))
       .then(() =>
-        expectToFail(() => expectFileToExist(join(componentDir, 'test-component.component.html'))),
+        expectToFail(() =>
+          expectFileToExist(join(componentDir, 'test-component.component.ng.html')),
+        ),
       )
       .then(() => expectFileToExist(join(componentDir, 'test-component.component.css')))
 

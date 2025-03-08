@@ -9,7 +9,7 @@ import { <% if(changeDetection !== 'Default') { %>ChangeDetectionStrategy, <% }%
       <%= dasherize(name) %> works!
     </p>
   `<% } else { %>
-  templateUrl: './<%= dasherize(name) %><%= type ? '.' + dasherize(type): '' %>.html'<% } if(inlineStyle) { %>,
+  templateUrl: './<%= dasherize(name) %><%= type ? '.' + dasherize(type): '' %><%= ngext %>.html'<% } if(inlineStyle) { %>,
   styles: `<% if(displayBlock){ %>
     :host {
       display: block;

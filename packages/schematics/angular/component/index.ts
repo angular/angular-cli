@@ -72,6 +72,7 @@ export default function (options: ComponentOptions): Rule {
       applyTemplates({
         ...strings,
         'if-flat': (s: string) => (options.flat ? '' : s),
+        'ngext': options.ngHtml ? '.ng' : '',
         ...options,
       }),
       !options.type

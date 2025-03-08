@@ -30,6 +30,7 @@ describe('Component Schematic', () => {
     module: undefined,
     export: false,
     project: 'bar',
+    ngHtml: false,
   };
 
   const workspaceOptions: WorkspaceOptions = {
@@ -289,6 +290,33 @@ describe('Component Schematic', () => {
     expect(testContent).toContain("describe('Foo'");
     expect(tree.files).toContain('/projects/bar/src/app/foo/foo.css');
     expect(tree.files).toContain('/projects/bar/src/app/foo/foo.html');
+  });
+
+  it('should not use `.ng.html` extension when ngHtml is false', async () => {
+    const options = { ...defaultOptions, ngHtml: false };
+    const tree = await schematicRunner.runSchematic('component', options, appTree);
+    const content = tree.readContent('/projects/bar/src/app/foo/foo.component.ts');
+    expect(content).toContain('foo.component.html');
+    expect(tree.files).toContain('/projects/bar/src/app/foo/foo.component.css');
+    expect(tree.files).toContain('/projects/bar/src/app/foo/foo.component.html');
+  });
+
+  it('should use `.ng.html` extension when ngHtml is true', async () => {
+    const options = { ...defaultOptions, ngHtml: true };
+    const tree = await schematicRunner.runSchematic('component', options, appTree);
+    const content = tree.readContent('/projects/bar/src/app/foo/foo.component.ts');
+    expect(content).toContain('foo.component.ng.html');
+    expect(tree.files).toContain('/projects/bar/src/app/foo/foo.component.css');
+    expect(tree.files).toContain('/projects/bar/src/app/foo/foo.component.ng.html');
+  });
+
+  it('should use `.ng.html` extension when ngHtml is not present', async () => {
+    const options = { ...defaultOptions, ngHtml: undefined };
+    const tree = await schematicRunner.runSchematic('component', options, appTree);
+    const content = tree.readContent('/projects/bar/src/app/foo/foo.component.ts');
+    expect(content).toContain('foo.component.ng.html');
+    expect(tree.files).toContain('/projects/bar/src/app/foo/foo.component.css');
+    expect(tree.files).toContain('/projects/bar/src/app/foo/foo.component.ng.html');
   });
 
   it('should create the right selector with a path in the name', async () => {
