@@ -12,6 +12,7 @@ import assert from 'node:assert';
 import { readFile } from 'node:fs/promises';
 import { extname } from 'node:path';
 import type { Options } from 'sass';
+import { assertIsError } from '../../../utils/error';
 import type { PostcssConfiguration } from '../../../utils/postcss-configuration';
 import { LoadResultCache, createCachedLoad } from '../load-result-cache';
 
@@ -422,8 +423,16 @@ async function compileString(
           },
         ],
       };
-    }
+    } else {
+      assertIsError(error);
 
-    throw error;
+      return {
+        errors: [
+          {
+            text: error.message,
+          },
+        ],
+      };
+    }
   }
 }
