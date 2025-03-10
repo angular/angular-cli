@@ -1,11 +1,11 @@
 diff --git a/node_modules/@angular/bazel/src/ng_package/packager.mjs b/node_modules/@angular/bazel/src/ng_package/packager.mjs
-index dd6ec61..c2a0acf 100755
+index d7faa1d..c3cbd1c 100755
 --- a/node_modules/@angular/bazel/src/ng_package/packager.mjs
 +++ b/node_modules/@angular/bazel/src/ng_package/packager.mjs
 @@ -8,7 +8,7 @@
  import * as fs from 'fs';
  import * as path from 'path';
- import fastGlob from 'fast-glob';
+ import { globSync } from 'tinyglobby';
 -import { analyzeFileAndEnsureNoCrossImports } from './cross_entry_points_imports';
 +import { analyzeFileAndEnsureNoCrossImports } from './cross_entry_points_imports.mjs';
  /**

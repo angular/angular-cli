@@ -55,16 +55,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@angular/bazel@https://github.com/angular/bazel-builds.git#3422dcb650e407d2c00ac724acf560ab1506d68c":
-  version: 20.0.0-next.1+sha-aa1ab41
-  resolution: "@angular/bazel@https://github.com/angular/bazel-builds.git#commit=3422dcb650e407d2c00ac724acf560ab1506d68c"
+"@angular/bazel@https://github.com/angular/bazel-builds.git#8269ca110da4ead292163e7f2614b6407efe40ca":
+  version: 20.0.0-next.1+sha-a02e270
+  resolution: "@angular/bazel@https://github.com/angular/bazel-builds.git#commit=8269ca110da4ead292163e7f2614b6407efe40ca"
   dependencies:
     "@microsoft/api-extractor": "npm:^7.24.2"
-    fast-glob: "npm:^3.3.3"
     magic-string: "npm:^0.30.0"
+    tinyglobby: "npm:^0.2.12"
     tslib: "npm:^2.3.0"
   peerDependencies:
-    "@angular/compiler-cli": 20.0.0-next.1+sha-aa1ab41
+    "@angular/compiler-cli": 20.0.0-next.1+sha-a02e270
     "@bazel/concatjs": ^5.3.0
     "@bazel/worker": ^5.3.0
     "@rollup/plugin-commonjs": ^28.0.0
@@ -81,7 +81,7 @@ __metadata:
     packager: ./src/ng_package/packager.mjs
     types_bundler: ./src/types_bundle/index.mjs
     xi18n: ./src/ngc-wrapped/extract_i18n.mjs
-  checksum: 10c0/601301d364725b5603bf672f550caa64d7648521163c446c1f01a54894d9abc40ed11d3c3b100539ed565716980f01fc42fefb9a3c9017f0780a2f8ae1818c08
+  checksum: 10c0/1871822cd08f233ff3776ef4c7865984924d75781c31d2fe849e6353763daf4800b629d3c0a1b56ef09c857a8a8ce231aa49a1f3d6776f85307c9684f6a6126a
   languageName: node
   linkType: hard
 
@@ -303,7 +303,7 @@ __metadata:
   dependencies:
     "@ampproject/remapping": "npm:2.3.0"
     "@angular/animations": "npm:20.0.0-next.1"
-    "@angular/bazel": "https://github.com/angular/bazel-builds.git#3422dcb650e407d2c00ac724acf560ab1506d68c"
+    "@angular/bazel": "https://github.com/angular/bazel-builds.git#8269ca110da4ead292163e7f2614b6407efe40ca"
     "@angular/build-tooling": "https://github.com/angular/dev-infra-private-build-tooling-builds.git#d4727212a9d0f7eb63ae3116d73c769d9bd0bdc1"
     "@angular/cdk": "npm:20.0.0-next.0"
     "@angular/common": "npm:20.0.0-next.1"
@@ -313,7 +313,7 @@ __metadata:
     "@angular/forms": "npm:20.0.0-next.1"
     "@angular/localize": "npm:20.0.0-next.1"
     "@angular/material": "npm:20.0.0-next.0"
-    "@angular/ng-dev": "https://github.com/angular/dev-infra-private-ng-dev-builds.git#dbcf3afdd0b7d3bd95c71e3df43a210364d3939b"
+    "@angular/ng-dev": "https://github.com/angular/dev-infra-private-ng-dev-builds.git#cab2b0de372f97ebb025e6aff24b9ef72f586666"
     "@angular/platform-browser": "npm:20.0.0-next.1"
     "@angular/platform-browser-dynamic": "npm:20.0.0-next.1"
     "@angular/platform-server": "npm:20.0.0-next.1"
@@ -529,11 +529,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#dbcf3afdd0b7d3bd95c71e3df43a210364d3939b":
-  version: 0.0.0-60ad70b4632945a3014cf26e045530f8ae2e6e18
-  resolution: "@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#commit=dbcf3afdd0b7d3bd95c71e3df43a210364d3939b"
+"@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#cab2b0de372f97ebb025e6aff24b9ef72f586666":
+  version: 0.0.0-f2a610b26cd7a451eddd50eb071dc495e3346a80
+  resolution: "@angular/ng-dev@https://github.com/angular/dev-infra-private-ng-dev-builds.git#commit=cab2b0de372f97ebb025e6aff24b9ef72f586666"
   dependencies:
-    "@google-cloud/spanner": "npm:7.18.1"
+    "@google-cloud/spanner": "npm:7.19.0"
     "@octokit/rest": "npm:21.1.1"
     "@types/semver": "npm:^7.3.6"
     "@types/supports-color": "npm:^10.0.0"
@@ -547,7 +547,7 @@ __metadata:
     yaml: "npm:2.7.0"
   bin:
     ng-dev: ./bundles/cli.mjs
-  checksum: 10c0/c3b08682b69c860dbabd934963a1ea23904b2b09ccb0b33c33a19876f0fadce57e55287e836b5dd23ba574d634f8558f823a88ac20abd974e38c6e0323550406
+  checksum: 10c0/f63ff347521301a5858e646f377b0165dc2cb5a1f5692214634dcf90d9e9eef1149cb6f0ac09e6fa56736b796d4c502980a07ba1f50d487ceb1d28c1144c6332
   languageName: node
   linkType: hard
 
@@ -2448,9 +2448,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@google-cloud/spanner@npm:7.18.1":
-  version: 7.18.1
-  resolution: "@google-cloud/spanner@npm:7.18.1"
+"@google-cloud/spanner@npm:7.19.0":
+  version: 7.19.0
+  resolution: "@google-cloud/spanner@npm:7.19.0"
   dependencies:
     "@google-cloud/common": "npm:^5.0.0"
     "@google-cloud/precise-date": "npm:^4.0.0"
@@ -2483,7 +2483,7 @@ __metadata:
     stream-events: "npm:^1.0.4"
     teeny-request: "npm:^9.0.0"
     through2: "npm:^4.0.0"
-  checksum: 10c0/8dad7f5017be82919fb654f5c7e53b1cae668c9699b1b7aac35d70cd212156e8dff1bfc67a93b467b562a55ecb6ae3834275a4f48a6286297914cfbc06e20505
+  checksum: 10c0/94aa6374f1ae743f0a98457567f1e5037f62478f950fe6b336a4d6a7a184b7542316c5bc3c1fa295c84fab224cf0ffdf317670479b79dd5127f06ca3d8a2897e
   languageName: node
   linkType: hard
 
@@ -9731,7 +9731,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fast-glob@npm:3.3.3, fast-glob@npm:^3.2.9, fast-glob@npm:^3.3.2, fast-glob@npm:^3.3.3":
+"fast-glob@npm:3.3.3, fast-glob@npm:^3.2.9, fast-glob@npm:^3.3.2":
   version: 3.3.3
   resolution: "fast-glob@npm:3.3.3"
   dependencies:
