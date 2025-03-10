@@ -21,7 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Initialize environment
-        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@f2a610b26cd7a451eddd50eb071dc495e3346a80
+        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@b79ac7f5d6689becb7f2d559affbab5afb361389
       - name: Install node modules
         run: pnpm install --frozen-lockfile
       - name: Generate JSON schema types
@@ -42,7 +42,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Initialize environment
-        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@f2a610b26cd7a451eddd50eb071dc495e3346a80
+        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@b79ac7f5d6689becb7f2d559affbab5afb361389
       - name: Setup Bazel
         uses: angular/dev-infra/github-actions/bazel/setup@f2a610b26cd7a451eddd50eb071dc495e3346a80
       - name: Setup Bazel RBE
@@ -57,7 +57,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Initialize environment
-        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@f2a610b26cd7a451eddd50eb071dc495e3346a80
+        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@b79ac7f5d6689becb7f2d559affbab5afb361389
       - name: Setup Bazel
         uses: angular/dev-infra/github-actions/bazel/setup@f2a610b26cd7a451eddd50eb071dc495e3346a80
       - name: Setup Bazel RBE
@@ -81,7 +81,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Initialize environment
-        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@f2a610b26cd7a451eddd50eb071dc495e3346a80
+        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@b79ac7f5d6689becb7f2d559affbab5afb361389
       - name: Install node modules
         run: pnpm install --frozen-lockfile
       - name: Setup Bazel
@@ -102,7 +102,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Initialize environment
-        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@f2a610b26cd7a451eddd50eb071dc495e3346a80
+        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@b79ac7f5d6689becb7f2d559affbab5afb361389
       - name: Run CLI E2E tests
         uses: ./.github/shared-actions/windows-bazel-test
         with:
@@ -123,7 +123,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Initialize environment
-        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@f2a610b26cd7a451eddd50eb071dc495e3346a80
+        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@b79ac7f5d6689becb7f2d559affbab5afb361389
       - name: Install node modules
         run: pnpm install --frozen-lockfile
       - name: Setup Bazel
@@ -145,7 +145,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Initialize environment
-        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@f2a610b26cd7a451eddd50eb071dc495e3346a80
+        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@b79ac7f5d6689becb7f2d559affbab5afb361389
       - name: Install node modules
         run: pnpm install --frozen-lockfile
       - name: Setup Bazel
@@ -163,7 +163,7 @@ jobs:
       SAUCE_TUNNEL_IDENTIFIER: angular-cli-${{ github.workflow }}-${{ github.run_number }}
     steps:
       - name: Initialize environment
-        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@f2a610b26cd7a451eddd50eb071dc495e3346a80
+        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@b79ac7f5d6689becb7f2d559affbab5afb361389
       - name: Install node modules
         run: pnpm install --frozen-lockfile
       - name: Setup Bazel
@@ -197,7 +197,7 @@ jobs:
       CIRCLE_BRANCH: ${{ github.ref_name }}
     steps:
       - name: Initialize environment
-        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@f2a610b26cd7a451eddd50eb071dc495e3346a80
+        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@b79ac7f5d6689becb7f2d559affbab5afb361389
       - name: Install node modules
         run: pnpm install --frozen-lockfile
       - name: Setup Bazel
