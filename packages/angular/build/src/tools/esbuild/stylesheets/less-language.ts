@@ -8,8 +8,6 @@
 
 import type { Location, OnLoadResult, PluginBuild } from 'esbuild';
 import { readFile } from 'node:fs/promises';
-import { isAbsolute } from 'node:path';
-import { pathToFileURL } from 'node:url';
 import { StylesheetLanguage, StylesheetPluginOptions } from './stylesheet-plugin-factory';
 
 /**
@@ -115,7 +113,7 @@ async function compileString(
   };
 
   try {
-    const { imports, map, css } = await less.render(data, {
+    const { imports, css } = await less.render(data, {
       filename,
       paths: options.includePaths,
       plugins: [resolverPlugin],
@@ -123,16 +121,14 @@ async function compileString(
       javascriptEnabled: unsafeInlineJavaScript,
       sourceMap: options.sourcemap
         ? {
-            sourceMapFileInline: false,
+            sourceMapFileInline: true,
             outputSourceFiles: true,
           }
         : undefined,
     } as Less.Options);
 
     return {
-      // There can be cases where `less` will return an undefined `map` even
-      // though the types do not specify this as a possibility.
-      contents: map ? `${css}\n${sourceMapToUrlComment(map)}` : css,
+      contents: css,
       loader: 'css',
       watchFiles: [filename, ...imports],
     };
@@ -193,19 +189,4 @@ function convertExceptionLocation(exception: LessException): Partial<Location> {
     // Middle element represents the line containing the exception
     lineText: exception.extract && exception.extract[Math.trunc(exception.extract.length / 2)],
   };
-}
-
-function sourceMapToUrlComment(sourceMap: string): string {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const map = JSON.parse(sourceMap) as Record<string, any>;
-  // Using file URLs instead of paths ensures that esbuild correctly resolves the source map.
-  // https://github.com/evanw/esbuild/issues/4070
-  // https://github.com/evanw/esbuild/issues/4075
-  map.sources = map.sources.map((source: string) =>
-    source && isAbsolute(source) ? pathToFileURL(source).href : source,
-  );
-
-  const urlSourceMap = Buffer.from(JSON.stringify(map), 'utf-8').toString('base64');
-
-  return `/*# sourceMappingURL=data:application/json;charset=utf-8;base64,${urlSourceMap} */`;
 }
