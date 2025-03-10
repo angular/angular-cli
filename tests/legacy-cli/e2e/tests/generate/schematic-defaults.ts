@@ -12,8 +12,8 @@ export default async function () {
 
   // Generate component in application to verify that it's minimal
   const { stdout } = await ng('generate', 'component', 'foo');
-  if (!stdout.includes('foo.component.scss')) {
-    throw new Error('Expected "foo.component.scss" to exist.');
+  if (!stdout.includes('foo.scss')) {
+    throw new Error('Expected "foo.scss" to exist.');
   }
 
   // Generate another project with different settings
@@ -23,6 +23,7 @@ export default async function () {
     config.projects['test-project-two'].schematics = {
       '@schematics/angular:component': {
         style: 'less',
+        type: 'Component',
       },
     };
   });

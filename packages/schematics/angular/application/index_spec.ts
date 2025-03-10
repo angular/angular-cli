@@ -55,10 +55,10 @@ describe('Application Schematic', () => {
         '/projects/foo/src/main.ts',
         '/projects/foo/src/styles.css',
         '/projects/foo/src/app/app.module.ts',
-        '/projects/foo/src/app/app.component.css',
-        '/projects/foo/src/app/app.component.ng.html',
-        '/projects/foo/src/app/app.component.spec.ts',
-        '/projects/foo/src/app/app.component.ts',
+        '/projects/foo/src/app/app.css',
+        '/projects/foo/src/app/app.ng.html',
+        '/projects/foo/src/app/app.spec.ts',
+        '/projects/foo/src/app/app.ts',
       ]),
     );
   });
@@ -265,10 +265,10 @@ describe('Application Schematic', () => {
           '/src/index.html',
           '/src/main.ts',
           '/src/styles.css',
-          '/src/app/app.component.css',
-          '/src/app/app.component.ng.html',
-          '/src/app/app.component.spec.ts',
-          '/src/app/app.component.ts',
+          '/src/app/app.css',
+          '/src/app/app.ng.html',
+          '/src/app/app.spec.ts',
+          '/src/app/app.ts',
         ]),
       );
     });
@@ -446,9 +446,9 @@ describe('Application Schematic', () => {
     const files = tree.files;
     [
       '/projects/foo/tsconfig.spec.json',
-      '/projects/foo/src/app/app.component.css',
-      '/projects/foo/src/app/app.component.ng.html',
-      '/projects/foo/src/app/app.component.spec.ts',
+      '/projects/foo/src/app/app.css',
+      '/projects/foo/src/app/app.ng.html',
+      '/projects/foo/src/app/app.spec.ts',
     ].forEach((x) => expect(files).not.toContain(x));
 
     expect(files).toEqual(
@@ -458,7 +458,7 @@ describe('Application Schematic', () => {
         '/projects/foo/src/index.html',
         '/projects/foo/src/main.ts',
         '/projects/foo/src/styles.css',
-        '/projects/foo/src/app/app.component.ts',
+        '/projects/foo/src/app/app.ts',
       ]),
     );
   });
@@ -472,8 +472,8 @@ describe('Application Schematic', () => {
       '/projects/foo/tsconfig.spec.json',
       '/projects/foo/karma.conf.js',
       '/projects/foo/src/test.ts',
-      '/projects/foo/src/app/app.component.ng.html',
-      '/projects/foo/src/app/app.component.spec.ts',
+      '/projects/foo/src/app/app.ng.html',
+      '/projects/foo/src/app/app.spec.ts',
     ].forEach((x) => expect(files).not.toContain(x));
 
     expect(files).toEqual(
@@ -483,8 +483,8 @@ describe('Application Schematic', () => {
         '/projects/foo/src/index.html',
         '/projects/foo/src/main.ts',
         '/projects/foo/src/styles.css',
-        '/projects/foo/src/app/app.component.css',
-        '/projects/foo/src/app/app.component.ts',
+        '/projects/foo/src/app/app.css',
+        '/projects/foo/src/app/app.ts',
       ]),
     );
   });
@@ -498,8 +498,8 @@ describe('Application Schematic', () => {
       '/projects/foo/tsconfig.spec.json',
       '/projects/foo/karma.conf.js',
       '/projects/foo/src/test.ts',
-      '/projects/foo/src/app/app.component.css',
-      '/projects/foo/src/app/app.component.spec.ts',
+      '/projects/foo/src/app/app.css',
+      '/projects/foo/src/app/app.spec.ts',
     ].forEach((x) => expect(files).not.toContain(x));
 
     expect(files).toEqual(
@@ -509,8 +509,8 @@ describe('Application Schematic', () => {
         '/projects/foo/src/index.html',
         '/projects/foo/src/main.ts',
         '/projects/foo/src/styles.css',
-        '/projects/foo/src/app/app.component.ng.html',
-        '/projects/foo/src/app/app.component.ts',
+        '/projects/foo/src/app/app.ng.html',
+        '/projects/foo/src/app/app.ts',
       ]),
     );
   });
@@ -530,10 +530,10 @@ describe('Application Schematic', () => {
         '/projects/foo/src/main.ts',
         '/projects/foo/src/styles.css',
         '/projects/foo/src/app/app.config.ts',
-        '/projects/foo/src/app/app.component.css',
-        '/projects/foo/src/app/app.component.ng.html',
-        '/projects/foo/src/app/app.component.spec.ts',
-        '/projects/foo/src/app/app.component.ts',
+        '/projects/foo/src/app/app.css',
+        '/projects/foo/src/app/app.ng.html',
+        '/projects/foo/src/app/app.spec.ts',
+        '/projects/foo/src/app/app.ts',
       ]),
     );
   });
@@ -557,7 +557,7 @@ describe('Application Schematic', () => {
   it('should create a standalone component', async () => {
     const options = { ...defaultOptions, standalone: true };
     const tree = await schematicRunner.runSchematic('application', options, workspaceTree);
-    const component = tree.readContent('/projects/foo/src/app/app.component.ts');
+    const component = tree.readContent('/projects/foo/src/app/app.ts');
 
     expect(component).not.toContain('standalone');
   });
@@ -569,7 +569,7 @@ describe('Application Schematic', () => {
 
     expect(tree.files).toContain('/projects/foo/src/app/app.routes.ts');
 
-    const component = tree.readContent('/projects/foo/src/app/app.component.ts');
+    const component = tree.readContent('/projects/foo/src/app/app.ts');
     expect(component).toContain(`import { RouterOutlet } from '@angular/router';`);
     expect(component).toContain(`imports: [RouterOutlet]`);
 
@@ -654,7 +654,7 @@ describe('Application Schematic', () => {
 
       const path = '/projects/foo/src/app/app.module.ts';
       const content = tree.readContent(path);
-      expect(content).toMatch(/import { AppComponent } from '\.\/app\.component';/);
+      expect(content).toMatch(/import { App } from '\.\/app';/);
     });
 
     it('should create all files of an application', async () => {
@@ -671,10 +671,10 @@ describe('Application Schematic', () => {
           '/projects/foo/src/styles.css',
           '/projects/foo/src/app/app-routing.module.ts',
           '/projects/foo/src/app/app.module.ts',
-          '/projects/foo/src/app/app.component.css',
-          '/projects/foo/src/app/app.component.ng.html',
-          '/projects/foo/src/app/app.component.spec.ts',
-          '/projects/foo/src/app/app.component.ts',
+          '/projects/foo/src/app/app.css',
+          '/projects/foo/src/app/app.ng.html',
+          '/projects/foo/src/app/app.spec.ts',
+          '/projects/foo/src/app/app.ts',
         ]),
       );
     });

@@ -12,6 +12,6 @@ export default async function () {
   await ng('build', '--configuration=development');
   await expectFileToMatch(
     'dist/test-project/browser/main.js.map',
-    'projects/my-lib/src/lib/my-lib.component.ts',
+    'projects/my-lib/src/lib/my-lib.ts',
   );
 }

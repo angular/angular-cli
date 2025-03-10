@@ -7,24 +7,17 @@ import { readNgVersion } from '../../utils/version';
 export default async function () {
   // Setup a library
   await ng('generate', 'library', 'i18n-lib-test');
-  await replaceInFile(
-    'projects/i18n-lib-test/src/lib/i18n-lib-test.component.ts',
-    '<p>',
-    '<p i18n>',
-  );
+  await replaceInFile('projects/i18n-lib-test/src/lib/i18n-lib-test.ts', '<p>', '<p i18n>');
 
   // Build library
   await ng('build', 'i18n-lib-test', '--configuration=development');
 
   // Consume library in application
-  await replaceInFile('src/app/app.component.ts', 'imports: [', 'imports: [I18nLibTestComponent,');
-  await prependToFile(
-    'src/app/app.component.ts',
-    `import { I18nLibTestComponent } from 'i18n-lib-test';`,
-  );
+  await replaceInFile('src/app/app.ts', 'imports: [', 'imports: [I18nLibTest,');
+  await prependToFile('src/app/app.ts', `import { I18nLibTest } from 'i18n-lib-test';`);
 
   await writeFile(
-    'src/app/app.component.ng.html',
+    'src/app/app.ng.html',
     `
       <p i18n>Hello world</p>
       <lib-i18n-lib-test></lib-i18n-lib-test>
@@ -42,11 +35,8 @@ export default async function () {
   await ng('extract-i18n');
   await expectFileToMatch('messages.xlf', 'Hello world');
   await expectFileToMatch('messages.xlf', 'i18n-lib-test works!');
-  await expectFileToMatch('messages.xlf', 'src/app/app.component.ng.html');
-  await expectFileToMatch(
-    'messages.xlf',
-    'projects/i18n-lib-test/src/lib/i18n-lib-test.component.ts',
-  );
+  await expectFileToMatch('messages.xlf', 'src/app/app.ng.html');
+  await expectFileToMatch('messages.xlf', 'projects/i18n-lib-test/src/lib/i18n-lib-test.ts');
 
   await uninstallPackage('@angular/localize');
 }

@@ -6,7 +6,7 @@ import { assertIsError } from '../../utils/utils';
 
 export default async function () {
   await writeFile(
-    'src/app/app.component.spec.ts',
+    'src/app/app.spec.ts',
     `
       it('should fail', () => {
         expect(undefined).toBeTruthy();
@@ -20,7 +20,7 @@ export default async function () {
     throw new Error('ng test should have failed.');
   } catch (error) {
     assertIsError(error);
-    assert.match(error.message, /\(src\/app\/app\.component\.spec\.ts:3:27/);
+    assert.match(error.message, /\(src\/app\/app\.spec\.ts:3:27/);
     assert.doesNotMatch(error.message, /_karma_webpack_/);
   }
 

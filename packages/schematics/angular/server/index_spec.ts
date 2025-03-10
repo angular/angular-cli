@@ -124,7 +124,7 @@ describe('Server Schematic', () => {
       const filePath = '/projects/bar/src/main.server.ts';
       expect(tree.exists(filePath)).toBeTrue();
       const contents = tree.readContent(filePath);
-      expect(contents).toContain(`bootstrapApplication(AppComponent, config)`);
+      expect(contents).toContain(`bootstrapApplication(App, config)`);
     });
 
     it('should create server app config file', async () => {

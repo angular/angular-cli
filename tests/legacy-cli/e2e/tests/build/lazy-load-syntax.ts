@@ -18,7 +18,7 @@ export default async function () {
     'routes: Routes = [];',
     `routes: Routes = [{
       path: 'lazy',
-      loadComponent: () => import('./lazy-comp/lazy-comp.component').then(c => c.LazyCompComponent),
+      loadComponent: () => import('./lazy-comp/lazy-comp').then(c => c.LazyComp),
     }];`,
   );
 

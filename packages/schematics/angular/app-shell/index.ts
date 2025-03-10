@@ -182,7 +182,7 @@ function addServerRoutes(options: AppShellOptions): Rule {
         .filter((node) => node.kind === ts.SyntaxKind.ImportDeclaration)
         .sort((a, b) => a.getStart() - b.getStart());
       const insertPosition = imports[imports.length - 1].getEnd();
-      const routeText = `\n\nconst routes: Routes = [ { path: '${APP_SHELL_ROUTE}', component: AppShellComponent }];`;
+      const routeText = `\n\nconst routes: Routes = [ { path: '${APP_SHELL_ROUTE}', component: AppShell }];`;
       recorder.insertRight(insertPosition, routeText);
       host.commitUpdate(recorder);
     }
@@ -262,7 +262,7 @@ function addStandaloneServerRoute(options: AppShellOptions): Rule {
         multi: true,
         useValue: [{
           path: '${APP_SHELL_ROUTE}',
-          component: AppShellComponent
+          component: AppShell
         }]
       }\n  `,
     ];
@@ -270,12 +270,7 @@ function addStandaloneServerRoute(options: AppShellOptions): Rule {
     recorder.insertRight(providersLiteral.getStart(), `[\n${updatedProvidersString.join(',\n')}]`);
 
     applyToUpdateRecorder(recorder, [
-      insertImport(
-        configSourceFile,
-        configFilePath,
-        'AppShellComponent',
-        './app-shell/app-shell.component',
-      ),
+      insertImport(configSourceFile, configFilePath, 'AppShell', './app-shell/app-shell'),
     ]);
     host.commitUpdate(recorder);
   };
@@ -315,16 +310,11 @@ function addServerRoutingConfig(options: AppShellOptions, isStandalone: boolean)
     }
 
     recorder = host.beginUpdate(configFilePath);
-    recorder.insertLeft(functionCall.end - 1, `, withAppShell(AppShellComponent)`);
+    recorder.insertLeft(functionCall.end - 1, `, withAppShell(AppShell)`);
 
     applyToUpdateRecorder(recorder, [
       insertImport(configSourceFile, configFilePath, 'withAppShell', '@angular/ssr'),
-      insertImport(
-        configSourceFile,
-        configFilePath,
-        'AppShellComponent',
-        './app-shell/app-shell.component',
-      ),
+      insertImport(configSourceFile, configFilePath, 'AppShell', './app-shell/app-shell'),
     ]);
 
     host.commitUpdate(recorder);

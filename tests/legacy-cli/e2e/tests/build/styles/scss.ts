@@ -15,7 +15,7 @@ export default async function () {
       body { background-color: blue; }
     `,
     'src/imported-styles.scss': 'p { background-color: red; }',
-    'src/app/app.component.scss': `
+    'src/app/app.scss': `
         .outer {
           .inner {
             background: #fff;
@@ -29,8 +29,8 @@ export default async function () {
     appArchitect.build.options.styles = [{ input: 'src/styles.scss' }];
   });
 
-  await deleteFile('src/app/app.component.css');
-  await replaceInFile('src/app/app.component.ts', './app.component.css', './app.component.scss');
+  await deleteFile('src/app/app.css');
+  await replaceInFile('src/app/app.ts', './app.css', './app.scss');
 
   await ng('build', '--source-map', '--configuration=development');
 

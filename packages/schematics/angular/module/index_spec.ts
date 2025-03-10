@@ -152,9 +152,9 @@ describe('Module Schematic', () => {
         jasmine.arrayContaining([
           '/projects/bar/src/app/foo/foo.module.ts',
           '/projects/bar/src/app/foo/foo-routing.module.ts',
-          '/projects/bar/src/app/foo/foo.component.ts',
-          '/projects/bar/src/app/foo/foo.component.ng.html',
-          '/projects/bar/src/app/foo/foo.component.css',
+          '/projects/bar/src/app/foo/foo.ts',
+          '/projects/bar/src/app/foo/foo.ng.html',
+          '/projects/bar/src/app/foo/foo.css',
         ]),
       );
 
@@ -170,7 +170,7 @@ describe('Module Schematic', () => {
       );
       expect(fooRoutingModuleContent).toMatch(/RouterModule.forChild\(routes\)/);
       expect(fooRoutingModuleContent).toMatch(
-        /const routes: Routes = \[\r?\n?\s*{ path: '', component: FooComponent }\r?\n?\s*\];/,
+        /const routes: Routes = \[\r?\n?\s*{ path: '', component: Foo }\r?\n?\s*\];/,
       );
     });
 
@@ -179,7 +179,7 @@ describe('Module Schematic', () => {
         '/projects/bar/src/app/app.module.ts',
         `
         import { NgModule } from '@angular/core';
-        import { AppComponent } from './app.component';
+        import { AppComponent } from './app';
 
         @NgModule({
           declarations: [
@@ -202,9 +202,9 @@ describe('Module Schematic', () => {
 
       expect(files).toContain('/projects/bar/src/app/foo/foo.module.ts');
       expect(files).not.toContain('/projects/bar/src/app/foo/foo-routing.module.ts');
-      expect(files).toContain('/projects/bar/src/app/foo/foo.component.ts');
-      expect(files).toContain('/projects/bar/src/app/foo/foo.component.ng.html');
-      expect(files).toContain('/projects/bar/src/app/foo/foo.component.css');
+      expect(files).toContain('/projects/bar/src/app/foo/foo.ts');
+      expect(files).toContain('/projects/bar/src/app/foo/foo.ng.html');
+      expect(files).toContain('/projects/bar/src/app/foo/foo.css');
 
       const appModuleContent = tree.readContent('/projects/bar/src/app/app.module.ts');
       expect(appModuleContent).toMatch(
@@ -214,7 +214,7 @@ describe('Module Schematic', () => {
       const fooModuleContent = tree.readContent('/projects/bar/src/app/foo/foo.module.ts');
       expect(fooModuleContent).toMatch(/RouterModule.forChild\(routes\)/);
       expect(fooModuleContent).toMatch(
-        /const routes: Routes = \[\r?\n?\s*{ path: '', component: FooComponent }\r?\n?\s*\];/,
+        /const routes: Routes = \[\r?\n?\s*{ path: '', component: Foo }\r?\n?\s*\];/,
       );
     });
 
@@ -230,9 +230,9 @@ describe('Module Schematic', () => {
         jasmine.arrayContaining([
           '/projects/bar/src/app/foo.module.ts',
           '/projects/bar/src/app/foo-routing.module.ts',
-          '/projects/bar/src/app/foo.component.ts',
-          '/projects/bar/src/app/foo.component.ng.html',
-          '/projects/bar/src/app/foo.component.css',
+          '/projects/bar/src/app/foo.ts',
+          '/projects/bar/src/app/foo.ng.html',
+          '/projects/bar/src/app/foo.css',
         ]),
       );
 
@@ -271,14 +271,14 @@ describe('Module Schematic', () => {
           '/projects/bar/src/app/foo/foo.module.ts',
           '/projects/bar/src/app/bar/bar-routing.module.ts',
           '/projects/bar/src/app/bar/bar.module.ts',
-          '/projects/bar/src/app/bar/bar.component.ts',
+          '/projects/bar/src/app/bar/bar.ts',
         ]),
       );
 
       const barRoutingModuleContent = tree.readContent(
         '/projects/bar/src/app/bar/bar-routing.module.ts',
       );
-      expect(barRoutingModuleContent).toContain(`path: '', component: BarComponent `);
+      expect(barRoutingModuleContent).toContain(`path: '', component: Bar `);
 
       const fooRoutingModuleContent = tree.readContent(
         '/projects/bar/src/app/foo/foo-routing.module.ts',

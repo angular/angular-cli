@@ -49,16 +49,12 @@ export default async function () {
 
   // Use WASM file in project
   await prependToFile(
-    'src/app/app.component.ts',
+    'src/app/app.ts',
     `
       import { multiply, subtract1 } from './multiply.wasm';
     `,
   );
-  await replaceInFile(
-    'src/app/app.component.ts',
-    "'test-project'",
-    'multiply(4, 5) + subtract1(88)',
-  );
+  await replaceInFile('src/app/app.ts', "'test-project'", 'multiply(4, 5) + subtract1(88)');
 
   // Remove Zone.js from polyfills and make zoneless
   await updateJsonFile('angular.json', (json) => {

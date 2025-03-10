@@ -12,7 +12,7 @@ export default async function () {
   await silentExec('npx', 'tailwindcss@2', 'init');
 
   // Add Tailwind directives to a component style
-  await writeFile('src/app/app.component.css', '@tailwind base; @tailwind components;');
+  await writeFile('src/app/app.css', '@tailwind base; @tailwind components;');
 
   // Add Tailwind directives to a global style
   await writeFile('src/styles.css', '@tailwind base; @tailwind components;');

@@ -27,26 +27,26 @@ export default async function () {
   await installPackage('h3@1');
 
   await writeMultipleFiles({
-    // Replace the template of app.component.ng.html as it makes it harder to debug
-    'src/app/app.component.ng.html': '<router-outlet />',
+    // Replace the template of app.ng.html as it makes it harder to debug
+    'src/app/app.ng.html': '<router-outlet />',
     'src/app/app.routes.ts': `
       import { Routes } from '@angular/router';
-      import { HomeComponent } from './home/home.component';
-      import { SsrComponent } from './ssr/ssr.component';
-      import { SsgWithParamsComponent } from './ssg-with-params/ssg-with-params.component';
+      import { Home } from './home/home';
+      import { Ssr } from './ssr/ssr';
+      import { SsgWithParams } from './ssg-with-params/ssg-with-params';
 
       export const routes: Routes = [
         {
           path: '',
-          component: HomeComponent,
+          component: Home,
         },
         {
           path: 'ssr',
-          component: SsrComponent,
+          component: Ssr,
         },
         {
           path: 'ssg/:id',
-          component: SsgWithParamsComponent,
+          component: SsgWithParams,
         },
       ];
     `,

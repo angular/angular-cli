@@ -5,7 +5,7 @@ import { Routes, RouterModule } from '@angular/router';<% } %>
 import { <%= classify(name) %>RoutingModule } from './<%= dasherize(name) %>-routing.module';<% } %>
 <% if (lazyRouteWithoutRouteModule) { %>
 const routes: Routes = [
-  { path: '', component: <%= classify(name) %>Component }
+  { path: '', component: <%= classify(name) %> }
 ];<% } %>
 
 @NgModule({

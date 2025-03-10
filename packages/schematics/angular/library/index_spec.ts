@@ -55,8 +55,8 @@ describe('Library Schematic', () => {
         '/projects/foo/tsconfig.lib.json',
         '/projects/foo/tsconfig.lib.prod.json',
         '/projects/foo/src/my-index.ts',
-        '/projects/foo/src/lib/foo.component.spec.ts',
-        '/projects/foo/src/lib/foo.component.ts',
+        '/projects/foo/src/lib/foo.spec.ts',
+        '/projects/foo/src/lib/foo.ts',
         '/projects/foo/src/lib/foo.service.spec.ts',
         '/projects/foo/src/lib/foo.service.ts',
       ]),
@@ -70,7 +70,7 @@ describe('Library Schematic', () => {
 
   it('should create a standalone component', async () => {
     const tree = await schematicRunner.runSchematic('library', defaultOptions, workspaceTree);
-    const componentContent = tree.readContent('/projects/foo/src/lib/foo.component.ts');
+    const componentContent = tree.readContent('/projects/foo/src/lib/foo.ts');
     expect(componentContent).not.toContain('standalone');
   });
 
@@ -100,8 +100,8 @@ describe('Library Schematic', () => {
           '/some/other/directory/bar/tsconfig.lib.json',
           '/some/other/directory/bar/tsconfig.lib.prod.json',
           '/some/other/directory/bar/src/my-index.ts',
-          '/some/other/directory/bar/src/lib/foo.component.spec.ts',
-          '/some/other/directory/bar/src/lib/foo.component.ts',
+          '/some/other/directory/bar/src/lib/foo.spec.ts',
+          '/some/other/directory/bar/src/lib/foo.ts',
           '/some/other/directory/bar/src/lib/foo.service.spec.ts',
           '/some/other/directory/bar/src/lib/foo.service.ts',
         ]),
@@ -310,7 +310,7 @@ describe('Library Schematic', () => {
       project: 'foo',
     };
     tree = await schematicRunner.runSchematic('component', componentOptions, tree);
-    expect(tree.exists('/projects/foo/src/lib/comp/comp.component.ts')).toBe(true);
+    expect(tree.exists('/projects/foo/src/lib/comp/comp.ts')).toBe(true);
   });
 
   it(`should support creating scoped libraries`, async () => {
@@ -321,7 +321,7 @@ describe('Library Schematic', () => {
     const pkgJsonPath = '/projects/myscope/mylib/package.json';
     expect(tree.files).toContain(pkgJsonPath);
     expect(tree.files).toContain('/projects/myscope/mylib/src/lib/mylib.service.ts');
-    expect(tree.files).toContain('/projects/myscope/mylib/src/lib/mylib.component.ts');
+    expect(tree.files).toContain('/projects/myscope/mylib/src/lib/mylib.ts');
 
     const pkgJson = JSON.parse(tree.readContent(pkgJsonPath));
     expect(pkgJson.name).toEqual(scopedName);
@@ -409,7 +409,7 @@ describe('Library Schematic', () => {
       );
 
       const fileContent = getFileContent(tree, '/projects/foo/src/lib/foo.module.ts');
-      expect(fileContent).toMatch(/exports: \[\n(\s*) {2}FooComponent\n\1\]/);
+      expect(fileContent).toMatch(/exports: \[\n(\s*) {2}Foo\n\1\]/);
     });
 
     it('should create files', async () => {
@@ -429,8 +429,8 @@ describe('Library Schematic', () => {
           '/projects/foo/tsconfig.lib.prod.json',
           '/projects/foo/src/my-index.ts',
           '/projects/foo/src/lib/foo.module.ts',
-          '/projects/foo/src/lib/foo.component.spec.ts',
-          '/projects/foo/src/lib/foo.component.ts',
+          '/projects/foo/src/lib/foo.spec.ts',
+          '/projects/foo/src/lib/foo.ts',
           '/projects/foo/src/lib/foo.service.spec.ts',
           '/projects/foo/src/lib/foo.service.ts',
         ]),

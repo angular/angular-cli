@@ -16,7 +16,7 @@ export default async function () {
   await replaceInFile(
     'src/app/app.routes.ts',
     'routes: Routes = [];',
-    `routes: Routes = [{path: 'lazy', loadComponent: () => import('./lazy/lazy.component').then(c => c.LazyComponent)}];`,
+    `routes: Routes = [{path: 'lazy', loadComponent: () => import('./lazy/lazy').then(c => c.Lazy)}];`,
   );
 
   // Add lazy route e2e

@@ -28,22 +28,22 @@ export default async function () {
     'src/app/app.routes.ts',
     `
   import { Routes } from '@angular/router';
-  import { HomeComponent } from './home/home.component';
-  import { SsrComponent } from './ssr/ssr.component';
-  import { SsgComponent } from './ssg/ssg.component';
+  import { Home } from './home/home';
+  import { Ssr } from './ssr/ssr';
+  import { Ssg } from './ssg/ssg';
 
   export const routes: Routes = [
     {
       path: '',
-      component: HomeComponent,
+      component: Home,
     },
     {
       path: 'ssg',
-      component: SsgComponent,
+      component: Ssg,
     },
     {
       path: 'ssr',
-      component: SsrComponent,
+      component: Ssr,
     },
   ];
   `,

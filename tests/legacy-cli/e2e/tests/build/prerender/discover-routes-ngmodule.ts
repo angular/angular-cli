@@ -50,25 +50,25 @@ export default async function () {
     `
   import { NgModule } from '@angular/core';
   import { RouterModule, Routes } from '@angular/router';
-  import { OneComponent } from './one/one.component';
-  import { TwoChildOneComponent } from './two-child-one/two-child-one.component';
-  import { TwoChildTwoComponent } from './two-child-two/two-child-two.component';
+  import { One} from './one/one';
+  import { TwoChildOne } from './two-child-one/two-child-one';
+  import { TwoChildTwo } from './two-child-two/two-child-two';
 
   const routes: Routes = [
     {
       path: '',
-      component: OneComponent,
+      component: One,
     },
     {
       path: 'two',
       children: [
         {
           path: 'two-child-one',
-          component: TwoChildOneComponent,
+          component: TwoChildOne,
         },
         {
           path: 'two-child-two',
-          component: TwoChildTwoComponent,
+          component: TwoChildTwo,
         },
       ],
     },

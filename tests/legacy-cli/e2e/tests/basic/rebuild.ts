@@ -7,7 +7,7 @@ import { ngServe } from '../../utils/project';
 export default async function () {
   const esbuild = getGlobalVariable('argv')['esbuild'];
   const validBundleRegEx = esbuild ? /sent to client/ : /Compiled successfully\./;
-  const lazyBundleRegEx = esbuild ? /chunk-/ : /src_app_lazy_lazy_component_ts\.js/;
+  const lazyBundleRegEx = esbuild ? /chunk-/ : /src_app_lazy_lazy_ts\.js/;
 
   // Disable HMR to support page reload based rebuild testing.
   const port = await ngServe('--no-hmr');
@@ -25,7 +25,7 @@ export default async function () {
     replaceInFile(
       'src/app/app.routes.ts',
       'routes: Routes = [];',
-      `routes: Routes = [{path: 'lazy', loadComponent: () => import('./lazy/lazy.component').then(c => c.LazyComponent)}];`,
+      `routes: Routes = [{path: 'lazy', loadComponent: () => import('./lazy/lazy').then(c => c.Lazy)}];`,
     ),
   ]);
 
@@ -83,7 +83,7 @@ export default async function () {
   await Promise.all([
     waitForAnyProcessOutputToMatch(validBundleRegEx),
     writeMultipleFiles({
-      'src/app/app.component.ng.html': '<h1>testingTESTING123</h1>',
+      'src/app/app.ng.html': '<h1>testingTESTING123</h1>',
     }),
   ]);
 
@@ -99,7 +99,7 @@ export default async function () {
   await Promise.all([
     waitForAnyProcessOutputToMatch(validBundleRegEx),
     writeMultipleFiles({
-      'src/app/app.component.css': ':host { color: blue; }',
+      'src/app/app.css': ':host { color: blue; }',
     }),
   ]);
 
