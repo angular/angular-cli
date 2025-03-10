@@ -58,7 +58,7 @@ describe('Ng New Schematic', () => {
     );
   });
 
-  it('should should set the prefix in angular.json and in app.component.ts', async () => {
+  it('should should set the prefix in angular.json and in app.ts', async () => {
     const options = { ...defaultOptions, prefix: 'pre' };
 
     const tree = await schematicRunner.runSchematic('ng-new', options);
@@ -75,7 +75,7 @@ describe('Ng New Schematic', () => {
 
     const tree = await schematicRunner.runSchematic('ng-new', options);
     const moduleContent = tree.readContent('/foo/src/app/app.module.ts');
-    expect(moduleContent).toMatch(/declarations:\s*\[\s*AppComponent\s*\]/m);
+    expect(moduleContent).toMatch(/declarations:\s*\[\s*App\s*\]/m);
   });
 
   it('createApplication=false should create an empty workspace', async () => {

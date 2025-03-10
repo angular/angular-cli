@@ -2,17 +2,17 @@ import { NgModule<% if(experimentalZoneless) { %>, provideExperimentalZonelessCh
 import { BrowserModule } from '@angular/platform-browser';
 <% if (routing) { %>
 import { AppRoutingModule } from './app-routing.module';<% } %>
-import { AppComponent } from './app.component';
+import { App } from './app';
 
 @NgModule({
   declarations: [
-    AppComponent
+    App
   ],
   imports: [
     BrowserModule<% if (routing) { %>,
     AppRoutingModule<% } %>
   ],
   providers: [<% if (experimentalZoneless) { %>provideExperimentalZonelessChangeDetection()<% } %>],
-  bootstrap: [AppComponent]
+  bootstrap: [App]
 })
 export class AppModule { }

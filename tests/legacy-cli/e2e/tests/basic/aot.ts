@@ -8,5 +8,5 @@ import { ng } from '../../utils/process';
 export default async function () {
   await ng('build', '--aot=true', '--configuration=development');
   const content = await readFile('dist/test-project/browser/main.js', 'utf-8');
-  assert.match(content, /AppComponent_Factory/);
+  assert.match(content, /App_Factory/);
 }

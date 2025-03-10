@@ -70,7 +70,7 @@ describe('Web Worker Schematic', () => {
 
   it('should add snippet to sibling file', async () => {
     const tree = await schematicRunner.runSchematic('web-worker', defaultOptions, appTree);
-    const appComponent = tree.readContent('/projects/bar/src/app/app.component.ts');
+    const appComponent = tree.readContent('/projects/bar/src/app/app.ts');
     expect(appComponent).toContain(`new Worker(new URL('./${defaultOptions.name}.worker`);
     expect(appComponent).toContain('console.log(`page got message: ${data}`)');
   });

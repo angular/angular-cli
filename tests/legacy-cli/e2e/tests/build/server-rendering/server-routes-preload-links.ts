@@ -31,7 +31,7 @@ export default async function () {
   export const routes: Routes = [
     {
       path: '',
-      loadComponent: () => import('./home/home.component').then(c => c.HomeComponent),
+      loadComponent: () => import('./home/home').then(c => c.Home),
     },
     {
       path: 'ssg',
@@ -39,11 +39,11 @@ export default async function () {
     },
     {
       path: 'ssr',
-      loadComponent: () => import('./ssr/ssr.component').then(c => c.SsrComponent),
+      loadComponent: () => import('./ssr/ssr').then(c => c.Ssr),
     },
     {
       path: 'csr',
-      loadComponent: () => import('./csr/csr.component').then(c => c.CsrComponent),
+      loadComponent: () => import('./csr/csr').then(c => c.Csr),
     },
   ];
   `,
@@ -72,21 +72,21 @@ export default async function () {
   export const routes: Routes = [
     {
       path: '',
-      loadComponent: () => import('./ssg/ssg.component').then(c => c.SsgComponent),
+      loadComponent: () => import('./ssg-component/ssg-component').then(c => c.SsgComponent),
     },
     {
       path: 'one',
-      loadComponent: () => import('./ssg-one/ssg-one.component').then(c => c.SsgOneComponent),
+      loadComponent: () => import('./ssg-one/ssg-one').then(c => c.SsgOne),
     },
     {
       path: 'two',
-      loadComponent: () => import('./ssg-two/ssg-two.component').then(c => c.SsgTwoComponent),
+      loadComponent: () => import('./ssg-two/ssg-two').then(c => c.SsgTwo),
     },
   ];`,
   });
 
   // Generate components for the above routes
-  const componentNames: string[] = ['home', 'ssg', 'csr', 'ssr', 'ssg-one', 'ssg-two'];
+  const componentNames: string[] = ['home', 'ssg-component', 'csr', 'ssr', 'ssg-one', 'ssg-two'];
 
   for (const componentName of componentNames) {
     await silentNg('generate', 'component', componentName);
@@ -95,18 +95,18 @@ export default async function () {
   // Add a cross-dependency
   await Promise.all([
     replaceInFile(
-      'src/app/ssg-one/ssg-one.component.ts',
-      `OneComponent {`,
-      `OneComponent {
+      'src/app/ssg-one/ssg-one.ts',
+      `One {`,
+      `One {
           async ngOnInit() {
             await import('../cross-dep');
           }
       `,
     ),
     replaceInFile(
-      'src/app/ssg-two/ssg-two.component.ts',
-      `TwoComponent {`,
-      `TwoComponent {
+      'src/app/ssg-two/ssg-two.ts',
+      `Two {`,
+      `Two {
           async ngOnInit() {
             await import('../cross-dep');
           }
@@ -129,58 +129,39 @@ const RESPONSE_EXPECTS: Record<
   }
 > = {
   '/': {
-    matches: [/<link rel="modulepreload" href="(home\.component-[a-zA-Z0-9]{8}\.js)">/],
-    notMatches: [/ssg\.component/, /ssr\.component/, /csr\.component/, /cross-dep-/],
+    matches: [/<link rel="modulepreload" href="(home-[a-zA-Z0-9]{8}\.js)">/],
+    notMatches: [/ssg\-component/, /ssr/, /csr/, /cross-dep-/],
   },
   '/ssg': {
     matches: [
       /<link rel="modulepreload" href="(ssg\.routes-[a-zA-Z0-9]{8}\.js)">/,
-      /<link rel="modulepreload" href="(ssg\.component-[a-zA-Z0-9]{8}\.js)">/,
+      /<link rel="modulepreload" href="(ssg-component-[a-zA-Z0-9]{8}\.js)">/,
     ],
-    notMatches: [
-      /home\.component/,
-      /ssr\.component/,
-      /csr\.component/,
-      /ssg-one\.component/,
-      /ssg-two\.component/,
-      /cross-dep-/,
-    ],
+    notMatches: [/home/, /ssr/, /csr/, /ssg-one/, /ssg-two/, /cross-dep-/],
   },
   '/ssg/one': {
     matches: [
       /<link rel="modulepreload" href="(ssg\.routes-[a-zA-Z0-9]{8}\.js)">/,
-      /<link rel="modulepreload" href="(ssg-one\.component-[a-zA-Z0-9]{8}\.js)">/,
+      /<link rel="modulepreload" href="(ssg-one-[a-zA-Z0-9]{8}\.js)">/,
       /<link rel="modulepreload" href="(cross-dep-[a-zA-Z0-9]{8}\.js)">/,
     ],
-    notMatches: [
-      /home\.component/,
-      /ssr\.component/,
-      /csr\.component/,
-      /ssg-two\.component/,
-      /ssg\.component/,
-    ],
+    notMatches: [/home/, /ssr/, /csr/, /ssg-two/, /ssg\-component/],
   },
   '/ssg/two': {
     matches: [
       /<link rel="modulepreload" href="(ssg\.routes-[a-zA-Z0-9]{8}\.js)">/,
-      /<link rel="modulepreload" href="(ssg-two\.component-[a-zA-Z0-9]{8}\.js)">/,
+      /<link rel="modulepreload" href="(ssg-two-[a-zA-Z0-9]{8}\.js)">/,
       /<link rel="modulepreload" href="(cross-dep-[a-zA-Z0-9]{8}\.js)">/,
     ],
-    notMatches: [
-      /home\.component/,
-      /ssr\.component/,
-      /csr\.component/,
-      /ssg-one\.component/,
-      /ssg\.component/,
-    ],
+    notMatches: [/home/, /ssr/, /csr/, /ssg-one/, /ssg\-component/],
   },
   '/ssr': {
-    matches: [/<link rel="modulepreload" href="(ssr\.component-[a-zA-Z0-9]{8}\.js)">/],
-    notMatches: [/home\.component/, /ssg\.component/, /csr\.component/],
+    matches: [/<link rel="modulepreload" href="(ssr-[a-zA-Z0-9]{8}\.js)">/],
+    notMatches: [/home/, /ssg\-component/, /csr/],
   },
   '/csr': {
-    matches: [/<link rel="modulepreload" href="(csr\.component-[a-zA-Z0-9]{8}\.js)">/],
-    notMatches: [/home\.component/, /ssg\.component/, /ssr\.component/, /cross-dep-/],
+    matches: [/<link rel="modulepreload" href="(csr-[a-zA-Z0-9]{8}\.js)">/],
+    notMatches: [/home/, /ssg\-component/, /ssr/, /cross-dep-/],
   },
 };
 

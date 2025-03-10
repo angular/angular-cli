@@ -33,7 +33,7 @@ export default async function () {
         h1 { background: url('/assets/global-img-absolute.svg'); }
         h2 { background: url('./assets/global-img-relative.png'); }
       `,
-        'src/app/app.component.css': `
+        'src/app/app.css': `
         h3 { background: url('/assets/component-img-absolute.svg'); }
         h4 { background: url('../assets/component-img-relative.png'); }
       `,

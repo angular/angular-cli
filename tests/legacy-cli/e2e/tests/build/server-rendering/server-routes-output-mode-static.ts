@@ -30,18 +30,18 @@ export default async function () {
     'src/app/app.routes.ts',
     `
   import { Routes } from '@angular/router';
-  import { HomeComponent } from './home/home.component';
-  import { SsgComponent } from './ssg/ssg.component';
-  import { SsgWithParamsComponent } from './ssg-with-params/ssg-with-params.component';
+  import { Home } from './home/home';
+  import { Ssg } from './ssg/ssg';
+  import { SsgWithParams } from './ssg-with-params/ssg-with-params';
 
   export const routes: Routes = [
     {
       path: '',
-      component: HomeComponent,
+      component: Home,
     },
     {
       path: 'ssg',
-      component: SsgComponent,
+      component: Ssg,
     },
     {
       path: 'ssg-redirect',
@@ -49,11 +49,11 @@ export default async function () {
     },
     {
       path: 'ssg/:id',
-      component: SsgWithParamsComponent,
+      component: SsgWithParams,
     },
     {
       path: '**',
-      component: HomeComponent,
+      component: Home,
     },
   ];
   `,

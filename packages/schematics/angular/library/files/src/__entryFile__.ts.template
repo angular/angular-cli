@@ -3,5 +3,5 @@
  */
 
 export * from './lib/<%= dasherize(name) %>.service';
-export * from './lib/<%= dasherize(name) %>.component';<% if (!standalone) { %>
+export * from './lib/<%= dasherize(name) %>';<% if (!standalone) { %>
 export * from './lib/<%= dasherize(name) %>.module';<% } %>

@@ -16,7 +16,7 @@ export default async function () {
 
       @include button.core-styles;
     `,
-    'src/app/app.component.scss': `
+    'src/app/app.scss': `
       @use '@material/button/button';
 
       @include button.core-styles;
@@ -28,8 +28,8 @@ export default async function () {
     appArchitect.build.options.styles = ['src/styles.scss'];
   });
 
-  await deleteFile('src/app/app.component.css');
-  await replaceInFile('src/app/app.component.ts', './app.component.css', './app.component.scss');
+  await deleteFile('src/app/app.css');
+  await replaceInFile('src/app/app.ts', './app.css', './app.scss');
 
   await ng('build', '--configuration=development');
 }

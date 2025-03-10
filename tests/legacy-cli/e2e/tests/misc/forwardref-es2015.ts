@@ -5,25 +5,25 @@ import { expectToFail } from '../../utils/utils';
 export default async function () {
   // Update the application to use a forward reference
   await replaceInFile(
-    'src/app/app.component.ts',
+    'src/app/app.ts',
     "import { Component } from '@angular/core';",
     "import { Component, Inject, Injectable, forwardRef } from '@angular/core';",
   );
-  await appendToFile('src/app/app.component.ts', '\n@Injectable() export class Lock { }\n');
+  await appendToFile('src/app/app.ts', '\n@Injectable() export class Lock { }\n');
   await replaceInFile(
-    'src/app/app.component.ts',
-    'export class AppComponent {',
-    'export class AppComponent {\n  constructor(@Inject(forwardRef(() => Lock)) lock: Lock) {}',
+    'src/app/app.ts',
+    'export class App {',
+    'export class App {\n  constructor(@Inject(forwardRef(() => Lock)) lock: Lock) {}',
   );
 
   // Update the application's unit tests to include the new injectable
   await replaceInFile(
-    'src/app/app.component.spec.ts',
-    "import { AppComponent } from './app.component';",
-    "import { AppComponent, Lock } from './app.component';",
+    'src/app/app.spec.ts',
+    "import { App } from './app';",
+    "import { App, Lock } from './app';",
   );
   await replaceInFile(
-    'src/app/app.component.spec.ts',
+    'src/app/app.spec.ts',
     'TestBed.configureTestingModule({',
     'TestBed.configureTestingModule({ providers: [Lock],',
   );

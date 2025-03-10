@@ -31,14 +31,14 @@ export default async function () {
   }
 
   await writeMultipleFiles({
-    'src/app/app.component.css': `div { color: #000 }`,
+    'src/app/app.css': `div { color: #000 }`,
     'src/styles.css': `* { color: #000 }`,
     'src/main.ts': `import { bootstrapApplication } from '@angular/platform-browser';
-      import { AppComponent } from './app/app.component';
+      import { App } from './app/app';
       import { appConfig } from './app/app.config';
 
       (window as any)['doBootstrap'] = () => {
-        bootstrapApplication(AppComponent, appConfig).catch((err) => console.error(err));
+        bootstrapApplication(App, appConfig).catch((err) => console.error(err));
       };
       `,
     'src/index.html': `

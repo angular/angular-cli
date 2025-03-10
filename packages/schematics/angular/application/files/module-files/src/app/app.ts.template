@@ -9,11 +9,11 @@ import { Component } from '@angular/core';
      %><router-outlet /><%
     } %>
   `,<% } else { %>
-  templateUrl: './app.component.ng.html',<% } %>
+  templateUrl: './app.ng.html',<% } %>
   standalone: false,<% if(inlineStyle) { %>
   styles: []<% } else { %>
-  styleUrl: './app.component.<%= style %>'<% } %>
+  styleUrl: './app.<%= style %>'<% } %>
 })
-export class AppComponent {
+export class App {
   title = '<%= name %>';
 }

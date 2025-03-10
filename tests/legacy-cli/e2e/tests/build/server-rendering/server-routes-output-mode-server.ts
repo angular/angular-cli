@@ -21,38 +21,38 @@ export default async function () {
   await installWorkspacePackages();
 
   // Test scenario to verify that the content length, including \r\n, is accurate
-  await replaceInFile('src/app/app.component.ts', "title = '", "title = 'Title\\r\\n");
+  await replaceInFile('src/app/app.ts', "title = '", "title = 'Title\\r\\n");
 
   // Ensure text has been updated.
-  assert.match(await readFile('src/app/app.component.ts'), /title = 'Title/);
+  assert.match(await readFile('src/app/app.ts'), /title = 'Title/);
 
   // Add routes
   await writeFile(
     'src/app/app.routes.ts',
     `
   import { Routes } from '@angular/router';
-  import { HomeComponent } from './home/home.component';
-  import { CsrComponent } from './csr/csr.component';
-  import { SsrComponent } from './ssr/ssr.component';
-  import { SsgComponent } from './ssg/ssg.component';
-  import { SsgWithParamsComponent } from './ssg-with-params/ssg-with-params.component';
+  import { Home } from './home/home';
+  import { Csr } from './csr/csr';
+  import { Ssr } from './ssr/ssr';
+  import { Ssg } from './ssg/ssg';
+  import { SsgWithParams } from './ssg-with-params/ssg-with-params';
 
   export const routes: Routes = [
     {
       path: '',
-      component: HomeComponent,
+      component: Home,
     },
     {
       path: 'ssg',
-      component: SsgComponent,
+      component: Ssg,
     },
     {
       path: 'ssr',
-      component: SsrComponent,
+      component: Ssr,
     },
     {
       path: 'csr',
-      component: CsrComponent,
+      component: Csr,
     },
     {
       path: 'redirect',
@@ -60,7 +60,7 @@ export default async function () {
     },
     {
       path: 'ssg/:id',
-      component: SsgWithParamsComponent,
+      component: SsgWithParams,
     },
   ];
   `,

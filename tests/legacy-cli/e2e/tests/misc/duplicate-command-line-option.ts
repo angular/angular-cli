@@ -15,5 +15,5 @@ export default async function () {
     throw new Error(`Expected stderr to contain: "${warningMatch}".`);
   }
 
-  await expectFileToExist('src/app/test-component/test-component.component.sass');
+  await expectFileToExist('src/app/test-component/test-component.sass');
 }

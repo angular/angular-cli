@@ -15,24 +15,21 @@ export default async function () {
 
   // Setup an i18n enabled component
   await ng('generate', 'component', 'i18n-test');
-  await writeFile(
-    join('src/app/i18n-test', 'i18n-test.component.ng.html'),
-    '<p i18n>Hello world</p>',
-  );
+  await writeFile(join('src/app/i18n-test', 'i18n-test.ng.html'), '<p i18n>Hello world</p>');
 
   await writeFile(
-    'src/app/app.component.ts',
+    'src/app/app.ts',
     `
     import { Component } from '@angular/core';
-    import { I18nTestComponent } from './i18n-test/i18n-test.component';
+    import { I18nTest } from './i18n-test/i18n-test';
 
     @Component({
       standalone: true,
       selector: 'app-root',
-      imports: [I18nTestComponent],
+      imports: [I18nTest],
       template: '<app-i18n-test />'
     })
-    export class AppComponent {}
+    export class App {}
   `,
   );
 

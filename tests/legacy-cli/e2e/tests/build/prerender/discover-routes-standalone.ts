@@ -20,25 +20,25 @@ export default async function () {
     'src/app/app.routes.ts',
     `
   import { Routes } from '@angular/router';
-  import { OneComponent } from './one/one.component';
-  import { TwoChildOneComponent } from './two-child-one/two-child-one.component';
-  import { TwoChildTwoComponent } from './two-child-two/two-child-two.component';
+  import { One } from './one/one';
+  import { TwoChildOne } from './two-child-one/two-child-one';
+  import { TwoChildTwo } from './two-child-two/two-child-two';
 
   export const routes: Routes = [
     {
       path: '',
-      component: OneComponent,
+      component: One,
     },
     {
       path: 'two',
       children: [
         {
           path: 'two-child-one',
-          component: TwoChildOneComponent,
+          component: TwoChildOne,
         },
         {
           path: 'two-child-two',
-          component: TwoChildTwoComponent,
+          component: TwoChildTwo,
         },
       ],
     },
@@ -47,17 +47,17 @@ export default async function () {
       children: [
         {
           path: '',
-          loadComponent: () => import('./lazy-one/lazy-one.component').then(c => c.LazyOneComponent),
+          loadComponent: () => import('./lazy-one/lazy-one').then(c => c.LazyOne),
         },
         {
           path: 'lazy-one-child',
-          loadComponent: () => import('./lazy-one-child/lazy-one-child.component').then(c => c.LazyOneChildComponent),
+          loadComponent: () => import('./lazy-one-child/lazy-one-child').then(c => c.LazyOneChild),
         },
       ],
     },
     {
       path: 'lazy-two',
-      loadComponent: () => import('./lazy-two/lazy-two.component').then(c => c.LazyTwoComponent),
+      loadComponent: () => import('./lazy-two/lazy-two').then(c => c.LazyTwo),
     },
   ];
   `,
