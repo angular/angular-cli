@@ -3,12 +3,12 @@ import { writeFile } from '../../utils/fs';
 
 export default async function () {
   await writeFile(
-    'src/app/app.component.spec.ts',
+    'src/app/app.spec.ts',
     `
   import { TestBed } from '@angular/core/testing';
-  import { AppComponent } from './app.component';
+  import { App } from './app';
 
-  describe('AppComponent', () => {
+  describe('App', () => {
     beforeAll(() => {
       jasmine.clock().install();
     });
@@ -18,11 +18,11 @@ export default async function () {
     });
 
     beforeEach(() => TestBed.configureTestingModule({
-      imports: [AppComponent]
+      imports: [App]
     }));
 
     it('should create the app', () => {
-      const fixture = TestBed.createComponent(AppComponent);
+      const fixture = TestBed.createComponent(App);
       expect(fixture.componentInstance).toBeTruthy();
     });
   });

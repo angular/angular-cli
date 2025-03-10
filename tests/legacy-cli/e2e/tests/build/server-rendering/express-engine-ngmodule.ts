@@ -66,7 +66,7 @@ export default async function () {
   }
 
   await writeMultipleFiles({
-    'projects/test-project-two/src/app/app.component.css': `div { color: #000 }`,
+    'projects/test-project-two/src/app/app.css': `div { color: #000 }`,
     'projects/test-project-two/src/styles.css': `* { color: #000 }`,
     'projects/test-project-two/src/main.ts': `
       import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';

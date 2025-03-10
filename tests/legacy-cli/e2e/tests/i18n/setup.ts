@@ -98,7 +98,7 @@ export const baseHrefs: { [l: string]: string } = {
 export async function setupI18nConfig() {
   // Add component with i18n content, both translations and localeData (plural, dates).
   await writeFile(
-    'src/app/app.component.ts',
+    'src/app/app.ts',
     `
     import { Component, Inject, LOCALE_ID } from '@angular/core';
     import { DatePipe } from '@angular/common';
@@ -108,9 +108,9 @@ export async function setupI18nConfig() {
       selector: 'app-root',
       imports: [DatePipe, RouterOutlet],
       standalone: true,
-      templateUrl: './app.component.ng.html'
+      templateUrl: './app.ng.html'
     })
-    export class AppComponent {
+    export class App {
       constructor(@Inject(LOCALE_ID) public locale: string) { }
       title = 'i18n';
       jan = new Date(2000, 0, 1);
@@ -119,7 +119,7 @@ export async function setupI18nConfig() {
   `,
   );
   await writeFile(
-    `src/app/app.component.ng.html`,
+    `src/app/app.ng.html`,
     `
     <p id="hello" i18n="An introduction header for this sample">Hello {{ title }}! </p>
     <p id="locale">{{ locale }}</p>
@@ -140,7 +140,7 @@ export async function setupI18nConfig() {
           <trans-unit id="4286451273117902052" datatype="html">
             <source>Hello <x id="INTERPOLATION" equiv-text="{{ title }}"/>! </source>
             <context-group purpose="location">
-              <context context-type="sourcefile">src/app/app.component.ng.html</context>
+              <context context-type="sourcefile">src/app/app.ng.html</context>
               <context context-type="linenumber">2,3</context>
             </context-group>
             <note priority="1" from="description">An introduction header for this sample</note>
@@ -148,14 +148,14 @@ export async function setupI18nConfig() {
           <trans-unit id="4606963464835766483" datatype="html">
             <source>Updated <x id="ICU" equiv-text="{minutes, plural, =0 {just now} =1 {one minute ago} other {{{minutes}} minutes ago}}" xid="1887283401472369100"/></source>
             <context-group purpose="location">
-              <context context-type="sourcefile">src/app/app.component.ng.html</context>
+              <context context-type="sourcefile">src/app/app.ng.html</context>
               <context context-type="linenumber">5,6</context>
             </context-group>
           </trans-unit>
           <trans-unit id="2002272803511843863" datatype="html">
             <source>{VAR_PLURAL, plural, =0 {just now} =1 {one minute ago} other {<x id="INTERPOLATION"/> minutes ago}}</source>
             <context-group purpose="location">
-              <context context-type="sourcefile">src/app/app.component.ng.html</context>
+              <context context-type="sourcefile">src/app/app.ng.html</context>
               <context context-type="linenumber">5,6</context>
             </context-group>
           </trans-unit>
@@ -168,7 +168,7 @@ export async function setupI18nConfig() {
   // ng serve support: https://github.com/angular/angular-cli/issues/16248
   await writeFile('src/app/dynamic.ts', `export const abc = 5;`);
   await appendToFile(
-    'src/app/app.component.ts',
+    'src/app/app.ts',
     `
     (async () => { await import('./dynamic'); })();
   `,

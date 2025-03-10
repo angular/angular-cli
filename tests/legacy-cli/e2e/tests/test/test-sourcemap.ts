@@ -6,7 +6,7 @@ import { assertIsError } from '../../utils/utils';
 
 export default async function () {
   await writeFile(
-    'src/app/app.component.spec.ts',
+    'src/app/app.spec.ts',
     `
       it('should fail', () => {
         expect(undefined).toBeTruthy();

@@ -23,7 +23,7 @@ export default async function () {
       : readNgVersion();
   });
 
-  await appendToFile('src/app/app.component.ng.html', '<router-outlet></router-outlet>');
+  await appendToFile('src/app/app.ng.html', '<router-outlet></router-outlet>');
   await ng('generate', 'app-shell', '--project', 'test-project');
 
   if (isSnapshotBuild) {
@@ -62,7 +62,7 @@ export default async function () {
   });
 
   await writeFile(
-    'src/app/app-shell/app-shell.component.ng.html',
+    'src/app/app-shell/app-shell.ng.html',
     '<h1 i18n="An introduction header for this sample">Hello i18n!</h1>',
   );
 
@@ -70,7 +70,7 @@ export default async function () {
   // Extraction of i18n only works on browser targets.
   // Let's add the same translation that there is in the app-shell
   await writeFile(
-    'src/app/app.component.ng.html',
+    'src/app/app.ng.html',
     '<h1 i18n="An introduction header for this sample">Hello i18n!</h1>',
   );
 
@@ -79,9 +79,9 @@ export default async function () {
   await expectFileToMatch('src/locale/messages.xlf', `source-language="en-US"`);
   await expectFileToMatch('src/locale/messages.xlf', `An introduction header for this sample`);
 
-  // Clean up app.component.ng.html so that we can easily
+  // Clean up app.ng.html so that we can easily
   // find the translation text
-  await writeFile('src/app/app.component.ng.html', '<router-outlet></router-outlet>');
+  await writeFile('src/app/app.ng.html', '<router-outlet></router-outlet>');
 
   for (const { lang, translation } of langTranslations) {
     if (lang != 'en-US') {

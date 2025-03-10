@@ -22,7 +22,7 @@ export default async function () {
 
   // Create Error.
   await appendToFile(
-    'src/app/app.component.ts',
+    'src/app/app.ts',
     `
       (() => {
         throw new Error('something happened!');

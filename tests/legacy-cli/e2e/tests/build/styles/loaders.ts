@@ -15,7 +15,7 @@ export default async function () {
       body { background-color: blue; }
     `,
     'src/imported-styles.scss': 'p { background-color: red; }',
-    'src/app/app.component.scss': `
+    'src/app/app.scss': `
       .outer {
         .inner {
           background: #fff;
@@ -24,12 +24,12 @@ export default async function () {
     `,
   });
 
-  await deleteFile('src/app/app.component.css');
+  await deleteFile('src/app/app.css');
   await updateJsonFile('angular.json', (workspaceJson) => {
     const appArchitect = workspaceJson.projects['test-project'].architect;
     appArchitect.build.options.styles = [{ input: 'src/styles.scss' }];
   });
-  await replaceInFile('src/app/app.component.ts', './app.component.css', './app.component.scss');
+  await replaceInFile('src/app/app.ts', './app.css', './app.scss');
 
   await ng('build', '--configuration=development');
 
