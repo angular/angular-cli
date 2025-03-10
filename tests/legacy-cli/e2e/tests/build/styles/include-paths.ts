@@ -10,7 +10,7 @@ export default async function () {
       @import 'variables';
       h1 { color: $primary-color; }
       `,
-    'src/app/app.component.scss': `
+    'src/app/app.scss': `
       @import 'variables';
       h2 { color: $primary-color; }
       `,
@@ -19,16 +19,16 @@ export default async function () {
       @import 'variables';
       h5 { color: @primary-color; }
       `,
-    'src/app/app.component.less': `
+    'src/app/app.less': `
       @import 'variables';
       h6 { color: @primary-color; }
       `,
   });
 
   await replaceInFile(
-    'src/app/app.component.ts',
-    `styleUrl: './app.component.css\'`,
-    `styleUrls: ['./app.component.scss', './app.component.less']`,
+    'src/app/app.ts',
+    `styleUrl: './app.css\'`,
+    `styleUrls: ['./app.scss', './app.less']`,
   );
 
   await updateJsonFile('angular.json', (workspaceJson) => {

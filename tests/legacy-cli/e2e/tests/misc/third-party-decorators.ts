@@ -54,7 +54,7 @@ export default async function () {
         });
       });
     `,
-    './src/app/app.component.ts': `
+    './src/app/app.ts': `
       import { Component } from '@angular/core';
       import { CommonModule } from '@angular/common';
       import { Store, select } from '@ngrx/store';
@@ -77,7 +77,7 @@ export default async function () {
           <button (click)="reset()">Reset Counter</button>
         \`,
       })
-      export class AppComponent {
+      export class App {
         count$: Observable<number>;
 
         constructor(private store: Store<AppState>) {
@@ -118,7 +118,7 @@ export default async function () {
       import { ApplicationConfig, importProvidersFrom } from '@angular/core';
       import { provideRouter } from '@angular/router';
       import { provideProtractorTestingSupport } from '@angular/platform-browser';
-      import { AppComponent } from './app.component';
+      import { App } from './app';
       import { StoreModule } from '@ngrx/store';
       import { StoreDevtoolsModule } from '@ngrx/store-devtools';
       import { EffectsModule } from '@ngrx/effects';

@@ -83,7 +83,7 @@ export default async function () {
   await Promise.all([
     waitForAnyProcessOutputToMatch(validBundleRegEx),
     writeMultipleFiles({
-      'src/app/app.component.ng.html': '<h1>testingTESTING123</h1>',
+      'src/app/app.ng.html': '<h1>testingTESTING123</h1>',
     }),
   ]);
 
@@ -99,7 +99,7 @@ export default async function () {
   await Promise.all([
     waitForAnyProcessOutputToMatch(validBundleRegEx),
     writeMultipleFiles({
-      'src/app/app.component.css': ':host { color: blue; }',
+      'src/app/app.css': ':host { color: blue; }',
     }),
   ]);
 

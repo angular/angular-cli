@@ -21,7 +21,7 @@ export default async function () {
     // Add asset
     'public/media.json': JSON.stringify({ dataFromAssets: true }),
     // Update component to do an HTTP call to asset and API.
-    'src/app/app.component.ts': `
+    'src/app/app.ts': `
     import { Component, inject } from '@angular/core';
     import { JsonPipe } from '@angular/common';
     import { RouterOutlet } from '@angular/router';
@@ -37,7 +37,7 @@ export default async function () {
         <router-outlet></router-outlet>
       \`,
     })
-    export class AppComponent {
+    export class App {
       assetsData: any;
       apiData: any;
 

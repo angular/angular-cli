@@ -5,12 +5,12 @@ export default async function () {
   await ng('generate', 'service', 'user');
 
   // Update the application to use the new service
-  await prependToFile('src/app/app.component.ts', "import { UserService } from './user.service';");
+  await prependToFile('src/app/app.ts', "import { UserService } from './user.service';");
 
   await replaceInFile(
-    'src/app/app.component.ts',
-    'export class AppComponent {',
-    'export class AppComponent {\n  constructor(user: UserService) {}',
+    'src/app/app.ts',
+    'export class App {',
+    'export class App {\n  constructor(user: UserService) {}',
   );
 
   // Execute the application's tests with emitDecoratorMetadata disabled (default)

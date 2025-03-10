@@ -95,7 +95,7 @@ export default async function () {
   // Add a cross-dependency
   await Promise.all([
     replaceInFile(
-      'src/app/ssg-one/ssg-one.component.ts',
+      'src/app/ssg-one/ssg-one.ts',
       `OneComponent {`,
       `OneComponent {
           async ngOnInit() {
@@ -104,7 +104,7 @@ export default async function () {
       `,
     ),
     replaceInFile(
-      'src/app/ssg-two/ssg-two.component.ts',
+      'src/app/ssg-two/ssg-two.ts',
       `TwoComponent {`,
       `TwoComponent {
           async ngOnInit() {

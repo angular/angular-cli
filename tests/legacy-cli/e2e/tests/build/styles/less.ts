@@ -17,7 +17,7 @@ export default function () {
       body { background-color: blue; }
     `,
     'src/imported-styles.less': 'p { background-color: red; }',
-    'src/app/app.component.less': `
+    'src/app/app.less': `
         .outer {
           .inner {
             background: #fff;
@@ -25,16 +25,14 @@ export default function () {
         }
       `,
   })
-    .then(() => deleteFile('src/app/app.component.css'))
+    .then(() => deleteFile('src/app/app.css'))
     .then(() =>
       updateJsonFile('angular.json', (workspaceJson) => {
         const appArchitect = workspaceJson.projects['test-project'].architect;
         appArchitect.build.options.styles = [{ input: 'src/styles.less' }];
       }),
     )
-    .then(() =>
-      replaceInFile('src/app/app.component.ts', './app.component.css', './app.component.less'),
-    )
+    .then(() => replaceInFile('src/app/app.ts', './app.css', './app.less'))
     .then(() => ng('build', '--source-map', '--configuration=development'))
     .then(() =>
       expectFileToMatch(

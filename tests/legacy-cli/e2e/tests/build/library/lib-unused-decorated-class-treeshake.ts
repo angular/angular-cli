@@ -11,7 +11,7 @@ export default async function () {
 
   // Add an unused class as part of the public api.
   await appendToFile(
-    'projects/my-lib/src/lib/my-lib.component.ts',
+    'projects/my-lib/src/lib/my-lib.ts',
     `
     function something() {
       return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
