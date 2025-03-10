@@ -27,17 +27,21 @@ runs:
       with:
         wsl_firewall_interface: 'vEthernet (WSL (Hyper-V firewall))'
 
+    - name: Installing pnpm (in WSL)
+      run: npm install -g pnpm@9
+      shell: wsl-bash {0}
+
     - name: Install node modules in WSL (re-using from previous install/cache restore)
       run: |
         cd ${{steps.init_wsl.outputs.repo_path}}
-        yarn install --immutable
+        pnpm install --frozen-lockfile
       shell: wsl-bash {0}
 
     - name: Build test binary for Windows (inside WSL)
       shell: wsl-bash {0}
       run: |
         cd ${{steps.init_wsl.outputs.repo_path}}
-        yarn bazel \
+        pnpm bazel \
           build --config=e2e //tests/legacy-cli:${{inputs.test_target_name}} --platforms=tools:windows_x64
       env:
         # See: https://devblogs.microsoft.com/commandline/share-environment-vars-between-wsl-and-windows

@@ -84,6 +84,6 @@ npm_package(
     deps = RUNTIME_ASSETS + [
         ":README.md",
         ":license",
-        ":schematics_cli_rjs",
+        ":schematics_cli",
     ],
 )

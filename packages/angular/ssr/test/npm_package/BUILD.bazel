@@ -14,7 +14,7 @@ ts_project(
 jasmine_test(
     name = "test",
     data = [
-        "unit_test_lib_rjs",
+        "unit_test_lib",
         "//packages/angular/ssr:npm_package",
     ],
 )

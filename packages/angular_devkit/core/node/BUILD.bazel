@@ -23,7 +23,7 @@ ts_project(
         "//:node_modules/@types/node",
         "//:node_modules/chokidar",
         "//:node_modules/rxjs",
-        "//packages/angular_devkit/core:core_rjs",
+        "//packages/angular_devkit/core",
     ],
 )
 
@@ -39,15 +39,15 @@ ts_project(
         ],
     ),
     deps = [
-        ":node_rjs",
+        ":node",
         "//:node_modules/@types/jasmine",
         "//:node_modules/@types/node",
         "//:node_modules/rxjs",
-        "//packages/angular_devkit/core:core_rjs",
+        "//packages/angular_devkit/core",
     ],
 )
 
 jasmine_test(
     name = "node_test",
-    data = [":node_test_lib_rjs"],
+    data = [":node_test_lib"],
 )

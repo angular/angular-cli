@@ -1,1 +1,1 @@
-yarn ng-dev format staged;
+pnpm -s ng-dev format staged;

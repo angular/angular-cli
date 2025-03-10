@@ -19,7 +19,7 @@ ts_project(
     deps = [
         "//:node_modules/@types/node",
         "//:node_modules/rxjs",
-        "//packages/angular_devkit/architect:architect_rjs",
+        "//packages/angular_devkit/architect",
         "//packages/angular_devkit/architect:node_modules/@angular-devkit/core",
     ],
 )
@@ -33,16 +33,16 @@ ts_project(
         ],
     ),
     deps = [
-        ":node_rjs",
+        ":node",
         "//:node_modules/@types/jasmine",
         "//:node_modules/@types/node",
         "//:node_modules/rxjs",
-        "//packages/angular_devkit/architect:architect_rjs",
-        "//packages/angular_devkit/architect/node/test:test_lib_rjs",
+        "//packages/angular_devkit/architect",
+        "//packages/angular_devkit/architect/node/test:test_lib",
     ],
 )
 
 jasmine_test(
     name = "node_test",
-    data = [":node_test_lib_rjs"],
+    data = [":node_test_lib"],
 )
