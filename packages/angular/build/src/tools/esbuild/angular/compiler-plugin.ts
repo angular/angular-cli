@@ -19,7 +19,6 @@ import type {
 import assert from 'node:assert';
 import { createHash } from 'node:crypto';
 import * as path from 'node:path';
-import { pathToFileURL } from 'node:url';
 import { maxWorkers, useTypeChecking } from '../../../utils/environment-options';
 import { AngularHostOptions } from '../../angular/angular-host';
 import { AngularCompilation, DiagnosticModes, NoopCompilation } from '../../angular/compilation';
@@ -707,10 +706,6 @@ function createCompilerOptionsTransformer(
     return {
       ...compilerOptions,
       noEmitOnError: false,
-      // Using the path as a URL is necessary here; otherwise, esbuild will not generate source maps correctly.
-      // https://github.com/evanw/esbuild/issues/4070
-      // https://github.com/evanw/esbuild/issues/4075
-      outDir: absWorkingDir ? pathToFileURL(absWorkingDir + '/').href : undefined,
       inlineSources: !!pluginOptions.sourcemap,
       inlineSourceMap: !!pluginOptions.sourcemap,
       sourceMap: undefined,

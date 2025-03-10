@@ -9,7 +9,6 @@
 import { NodePath, PluginObj, types } from '@babel/core';
 import { Visitor, programVisitor } from 'istanbul-lib-instrument';
 import assert from 'node:assert';
-import { fileURLToPath } from 'node:url';
 
 /**
  * A babel plugin factory function for adding istanbul instrumentation.
@@ -23,19 +22,9 @@ export default function (): PluginObj {
     visitor: {
       Program: {
         enter(path, state) {
-          const inputSourceMap = // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            (state.file.inputMap as undefined | { toObject(): Record<string, any> })?.toObject();
-
-          // istanbul does not support URL as sources.
-          if (inputSourceMap?.sources) {
-            inputSourceMap.sources = inputSourceMap.sources.map((s: string) =>
-              s.startsWith('file://') ? fileURLToPath(s) : s,
-            );
-          }
-
           const visitor = programVisitor(types, state.filename, {
             // Babel returns a Converter object from the `convert-source-map` package
-            inputSourceMap,
+            inputSourceMap: (state.file.inputMap as undefined | { toObject(): object })?.toObject(),
           });
           visitors.set(path, visitor);
 
