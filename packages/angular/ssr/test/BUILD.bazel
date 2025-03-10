@@ -24,6 +24,7 @@ spec_bundle(
     name = "esm_tests_bundled",
     deps = [
         ":unit_test_lib",
+        "//packages/angular/ssr/third_party/beasties:beasties_bundled",
     ],
 )
 
