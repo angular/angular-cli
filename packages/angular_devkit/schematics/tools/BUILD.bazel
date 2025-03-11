@@ -23,10 +23,10 @@ ts_project(
         "//:node_modules/@types/node",
         "//:node_modules/jsonc-parser",
         "//:node_modules/rxjs",
+        "//packages/angular_devkit/schematics",
         "//packages/angular_devkit/schematics:node_modules/@angular-devkit/core",
-        "//packages/angular_devkit/schematics:schematics_rjs",
-        "//packages/angular_devkit/schematics/tasks:tasks_rjs",
-        "//packages/angular_devkit/schematics/tasks/node:node_rjs",
+        "//packages/angular_devkit/schematics/tasks",
+        "//packages/angular_devkit/schematics/tasks/node",
     ],
 )
 
@@ -40,19 +40,19 @@ ts_project(
         ],
     ),
     deps = [
-        ":tools_rjs",
+        ":tools",
         "//:node_modules/@types/jasmine",
         "//:node_modules/@types/node",
         "//:node_modules/rxjs",
+        "//packages/angular_devkit/schematics",
         "//packages/angular_devkit/schematics:node_modules/@angular-devkit/core",
-        "//packages/angular_devkit/schematics:schematics_rjs",
-        "//packages/angular_devkit/schematics/tasks:tasks_rjs",
-        "//packages/angular_devkit/schematics/testing:testing_rjs",
-        "//tests/angular_devkit/schematics/tools/file-system-engine-host:file_system_engine_host_test_lib_rjs",
+        "//packages/angular_devkit/schematics/tasks",
+        "//packages/angular_devkit/schematics/testing",
+        "//tests/angular_devkit/schematics/tools/file-system-engine-host:file_system_engine_host_test_lib",
     ],
 )
 
 jasmine_test(
     name = "tools_test",
-    data = [":tools_test_lib_rjs"],
+    data = [":tools_test_lib"],
 )

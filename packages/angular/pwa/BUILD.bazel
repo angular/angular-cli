@@ -52,7 +52,7 @@ ts_project(
     srcs = glob(["pwa/**/*_spec.ts"]),
     deps = [
         ":node_modules/@angular-devkit/schematics",
-        ":pwa_rjs",
+        ":pwa",
         "//:node_modules/@types/jasmine",
         "//:node_modules/@types/node",
     ],
@@ -60,7 +60,7 @@ ts_project(
 
 jasmine_test(
     name = "pwa_test",
-    data = [":pwa_test_lib_rjs"],
+    data = [":pwa_test_lib"],
 )
 
 genrule(
@@ -80,6 +80,6 @@ npm_package(
     deps = RUNTIME_ASSETS + [
         ":README.md",
         ":license",
-        ":pwa_rjs",
+        ":pwa",
     ],
 )

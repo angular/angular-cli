@@ -40,7 +40,7 @@ build --nolegacy_external_runfiles
 # in Bazel 0.21.0 but turned off again in 0.22.0. Follow
 # https://github.com/bazelbuild/bazel/issues/7026 for more details.
 # This flag is needed to so that the bazel cache is not invalidated
-# when running bazel via `yarn bazel`.
+# when running bazel via `pnpm bazel`.
 # See https://github.com/angular/angular/issues/27514.
 build --incompatible_strict_action_env
 run --incompatible_strict_action_env
@@ -83,14 +83,14 @@ test:saucelabs --define=KARMA_WEB_TEST_MODE=SL_REQUIRED
 # Releases should always be stamped with version control info
 # This command assumes node on the path and is a workaround for
 # https://github.com/bazelbuild/bazel/issues/4802
-build:release --workspace_status_command="yarn ng-dev release build-env-stamp --mode=release"
+build:release --workspace_status_command="pnpm -s ng-dev release build-env-stamp --mode=release"
 build:release --stamp
 
-build:snapshot --workspace_status_command="yarn ng-dev release build-env-stamp --mode=snapshot"
+build:snapshot --workspace_status_command="pnpm -s ng-dev release build-env-stamp --mode=snapshot"
 build:snapshot --stamp
 build:snapshot --//:enable_snapshot_repo_deps
 
-build:e2e --workspace_status_command="yarn ng-dev release build-env-stamp --mode=release"
+build:e2e --workspace_status_command="pnpm -s ng-dev release build-env-stamp --mode=release"
 build:e2e --stamp
 test:e2e --test_timeout=3600 --experimental_ui_max_stdouterr_bytes=2097152
 

@@ -1,0 +1,13 @@
+{
+  "name": "angular-cli-legacy-rnjs",
+  "dependencies": {
+    "@angular/bazel": "patch:@angular/bazel@https%3A//github.com/angular/bazel-builds.git%23commit=8269ca110da4ead292163e7f2614b6407efe40ca#~/.yarn/patches/@angular-bazel-https-67c38b3c32.patch",
+    "@bazel/concatjs": "^5.8.1",
+    "@bazel/rollup": "^5.8.1",
+    "@bazel/typescript": "^5.8.1",
+    "@rollup/plugin-commonjs": "^28.0.2",
+    "@rollup/plugin-node-resolve": "^16.0.0",
+    "rollup": "^4.34.9",
+    "rollup-plugin-sourcemaps": "^0.6.3"
+  }
+}

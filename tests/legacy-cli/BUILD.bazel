@@ -15,9 +15,9 @@ ts_project(
         "//:node_modules/@types/node",
         "//:node_modules/ansi-colors",
         "//:node_modules/fast-glob",
-        "//packages/angular_devkit/core:core_rjs",
-        "//packages/angular_devkit/core/node:node_rjs",
-        "//tests/legacy-cli/e2e/utils:utils_rjs",
+        "//packages/angular_devkit/core",
+        "//packages/angular_devkit/core/node",
+        "//tests/legacy-cli/e2e/utils",
     ],
 )
 
@@ -26,16 +26,16 @@ rollup.rollup(
     testonly = True,
     srcs = [
         "rollup.config.mjs",
-        ":runner_rjs",
+        ":runner",
         "//:node_modules/@rollup/plugin-alias",
         "//:node_modules/@rollup/plugin-commonjs",
         "//:node_modules/@rollup/plugin-json",
         "//:node_modules/@rollup/plugin-node-resolve",
         "//:node_modules/fast-glob",
-        "//tests/legacy-cli/e2e/initialize:initialize_rjs",
+        "//tests/legacy-cli/e2e/initialize",
         "//tests/legacy-cli/e2e/ng-snapshot",
-        "//tests/legacy-cli/e2e/setup:setup_rjs",
-        "//tests/legacy-cli/e2e/tests:tests_rjs",
+        "//tests/legacy-cli/e2e/setup",
+        "//tests/legacy-cli/e2e/tests",
     ],
     args = [
         "--format=cjs",

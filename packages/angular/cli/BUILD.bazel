@@ -108,7 +108,7 @@ ts_project(
         ],
     ),
     deps = [
-        ":angular-cli_rjs",
+        ":angular-cli",
         ":node_modules/@angular-devkit/core",
         ":node_modules/@angular-devkit/schematics",
         "//:node_modules/@types/semver",
@@ -120,7 +120,7 @@ ts_project(
 
 jasmine_test(
     name = "angular-cli_test",
-    data = [":angular-cli_test_lib_rjs"],
+    data = [":angular-cli_test_lib"],
 )
 
 genrule(
@@ -146,7 +146,7 @@ npm_package(
     tags = ["release-package"],
     deps = RUNTIME_ASSETS + [
         ":README.md",
-        ":angular-cli_rjs",
+        ":angular-cli",
         ":license",
     ],
 )

@@ -55,8 +55,8 @@ ng_package(
         "//packages/angular/ssr/schematics:pkg",
     ],
     deps = [
-        ":ssr",
-        "//packages/angular/ssr/node",
+        ":ssr_legacy",
+        "//packages/angular/ssr/node:node_legacy",
     ],
 )
 
