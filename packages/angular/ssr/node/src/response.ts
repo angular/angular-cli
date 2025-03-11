@@ -76,7 +76,9 @@ export async function writeResponseToNodeResponse(
       }
 
       const canContinue = (destination as ServerResponse).write(value);
-      if (!canContinue) {
+      if (canContinue === false) {
+        // Explicitly check for `false`, as AWS may return `undefined` even though this is not valid.
+        // See: https://github.com/CodeGenieApp/serverless-express/issues/683
         await new Promise<void>((resolve) => destination.once('drain', resolve));
       }
     }
