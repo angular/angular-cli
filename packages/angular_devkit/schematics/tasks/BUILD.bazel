@@ -25,8 +25,8 @@ ts_project(
         "//:node_modules/@types/node",
         "//:node_modules/ora",
         "//:node_modules/rxjs",
-        "//packages/angular_devkit/core:core_rjs",
-        "//packages/angular_devkit/core/node:node_rjs",
-        "//packages/angular_devkit/schematics:schematics_rjs",
+        "//packages/angular_devkit/core:core",
+        "//packages/angular_devkit/core/node:node",
+        "//packages/angular_devkit/schematics:schematics",
     ],
 )

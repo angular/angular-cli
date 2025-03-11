@@ -137,6 +137,7 @@ ts_project(
         ":node_modules/@angular/build",
         ":node_modules/@angular/ssr",
         ":node_modules/@ngtools/webpack",
+        ":node_modules/@vitejs/plugin-basic-ssl",
         "//:node_modules/@ampproject/remapping",
         "//:node_modules/@angular/common",
         "//:node_modules/@angular/compiler-cli",
@@ -164,7 +165,6 @@ ts_project(
         "//:node_modules/@types/picomatch",
         "//:node_modules/@types/semver",
         "//:node_modules/@types/watchpack",
-        "//:node_modules/@vitejs/plugin-basic-ssl",
         "//:node_modules/@web/test-runner",
         "//:node_modules/ajv",
         "//:node_modules/ansi-colors",
@@ -228,20 +228,20 @@ ts_project(
     # TODO: Fix strict_deps failure
     ignore_strict_deps = True,
     deps = [
-        ":build_angular_rjs",
-        ":build_angular_test_utils_rjs",
+        ":build_angular",
+        ":build_angular_test_utils",
         "//:node_modules/fast-glob",
         "//:node_modules/prettier",
         "//:node_modules/typescript",
         "//:node_modules/webpack",
-        "//packages/angular_devkit/architect/testing:testing_rjs",
-        "//packages/angular_devkit/core:core_rjs",
+        "//packages/angular_devkit/architect/testing",
+        "//packages/angular_devkit/core",
     ],
 )
 
 jasmine_test(
     name = "build_angular_test",
-    data = [":build_angular_test_lib_rjs"],
+    data = [":build_angular_test_lib"],
 )
 
 genrule(
@@ -266,7 +266,7 @@ npm_package(
     tags = ["release-package"],
     deps = RUNTIME_ASSETS + [
         ":README.md",
-        ":build_angular_rjs",
+        ":build_angular",
         ":license",
     ],
 )
@@ -301,16 +301,16 @@ ts_project(
     # TODO: Fix strict_deps failure
     ignore_strict_deps = True,
     deps = [
-        ":build_angular_rjs",
+        ":build_angular",
         "//:node_modules/@types/jasmine",
-        "//modules/testing/builder:builder_rjs",
-        "//packages/angular/build:build_rjs",
-        "//packages/angular/build/private:private_rjs",
-        "//packages/angular_devkit/architect:architect_rjs",
-        "//packages/angular_devkit/architect/node:node_rjs",
-        "//packages/angular_devkit/architect/testing:testing_rjs",
-        "//packages/angular_devkit/core:core_rjs",
-        "//packages/angular_devkit/core/node:node_rjs",
+        "//modules/testing/builder:builder",
+        "//packages/angular/build:build",
+        "//packages/angular/build/private:private",
+        "//packages/angular_devkit/architect:architect",
+        "//packages/angular_devkit/architect/node:node",
+        "//packages/angular_devkit/architect/testing:testing",
+        "//packages/angular_devkit/core:core",
+        "//packages/angular_devkit/core/node:node",
     ],
 )
 
@@ -326,7 +326,7 @@ LARGE_SPECS = {
         "size": "large",
         "flaky": True,
         "extra_deps": [
-            "//packages/angular_devkit/build_webpack:build_webpack_rjs",
+            "//packages/angular_devkit/build_webpack:build_webpack",
             "//:node_modules/@types/http-proxy",
             "//:node_modules/http-proxy",
             "//:node_modules/puppeteer",
@@ -399,7 +399,7 @@ LARGE_SPECS = {
         # TODO: Fix strict_deps failure
         "ignore_strict_deps": True,
         "extra_deps": [
-            "//packages/angular/ssr/node:node_rjs",
+            "//packages/angular/ssr/node:node",
             "//:node_modules/@types/browser-sync",
             "//:node_modules/browser-sync",
             "//:node_modules/express",
@@ -416,16 +416,16 @@ LARGE_SPECS = {
         ignore_strict_deps = LARGE_SPECS[spec].get("ignore_strict_deps", False),
         deps = [
             # Dependencies needed to compile and run the specs themselves.
-            ":build_angular_rjs",
-            "//packages/angular_devkit/core:core_rjs",
-            "//packages/angular_devkit/core/node:node_rjs",
-            "//modules/testing/builder:builder_rjs",
-            ":build_angular_test_utils_rjs",
-            "//packages/angular/build:build_rjs",
-            "//packages/angular/build/private:private_rjs",
-            "//packages/angular_devkit/architect:architect_rjs",
-            "//packages/angular_devkit/architect/node:node_rjs",
-            "//packages/angular_devkit/architect/testing:testing_rjs",
+            ":build_angular",
+            "//packages/angular_devkit/core:core",
+            "//packages/angular_devkit/core/node:node",
+            "//modules/testing/builder:builder",
+            ":build_angular_test_utils",
+            "//packages/angular/build:build",
+            "//packages/angular/build/private:private",
+            "//packages/angular_devkit/architect:architect",
+            "//packages/angular_devkit/architect/node:node",
+            "//packages/angular_devkit/architect/testing:testing",
 
             # Base dependencies for the application in hello-world-app.
             # Some tests also require extra dependencies.
@@ -451,7 +451,7 @@ LARGE_SPECS = {
         name = "build_angular_" + spec + "_test",
         size = LARGE_SPECS[spec].get("size", "medium"),
         data = [
-            ":build_angular_" + spec + "_test_lib_rjs",
+            ":build_angular_" + spec + "_test_lib",
             # Helpers for `testing/builder` rely on the npm artifact, so we'll make
             # sure it's available during this test. Notably that the package needs to
             # available as a parent of `modules/testing/builder` for resolution to work!

@@ -14,7 +14,7 @@ import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const baseDir = resolve(`${__dirname}/..`);
-const bazelCmd = process.env.BAZEL ?? `yarn --cwd "${baseDir}" bazel`;
+const bazelCmd = process.env.BAZEL ?? `pnpm -s bazel`;
 const distRoot = join(baseDir, '/dist');
 
 type BuildMode = 'local' | 'snapshot' | 'release';
@@ -66,6 +66,7 @@ function _exec(cmd: string, captureStdout: boolean, logger: Console): Promise<st
     const proc = spawn(cmd, {
       stdio: 'pipe',
       shell: true,
+      cwd: baseDir,
     });
 
     let output = '';

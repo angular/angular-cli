@@ -46,13 +46,13 @@ ts_project(
         ":schematics",
         "//:node_modules/@types/jasmine",
         "//:node_modules/rxjs",
-        "//packages/angular_devkit/schematics/testing:testing_rjs",
+        "//packages/angular_devkit/schematics/testing",
     ],
 )
 
 jasmine_test(
     name = "schematics_test",
-    data = [":schematics_test_lib_rjs"],
+    data = [":schematics_test_lib"],
 )
 
 genrule(
@@ -72,11 +72,11 @@ npm_package(
         ":README.md",
         ":collection-schema.json",
         ":license",
-        ":schematics_rjs",
+        ":schematics",
+        "//packages/angular_devkit/schematics/tasks",
         "//packages/angular_devkit/schematics/tasks:package.json",
-        "//packages/angular_devkit/schematics/tasks:tasks_rjs",
+        "//packages/angular_devkit/schematics/testing",
         "//packages/angular_devkit/schematics/testing:package.json",
-        "//packages/angular_devkit/schematics/testing:testing_rjs",
         "//packages/angular_devkit/schematics/tools:package.json",
     ],
 )

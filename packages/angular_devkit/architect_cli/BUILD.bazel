@@ -45,7 +45,7 @@ npm_package(
     tags = ["release-package"],
     deps = [
         ":README.md",
-        ":architect_cli_rjs",
+        ":architect_cli",
         ":license",
     ],
 )

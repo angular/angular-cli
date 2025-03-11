@@ -110,18 +110,18 @@ ts_project(
     # TODO: Fix strict_deps failure
     ignore_strict_deps = True,
     deps = [
-        ":angular-cli_rjs",
+        ":angular-cli",
         "//:node_modules/@types/semver",
         "//:node_modules/@types/yargs",
-        "//packages/angular_devkit/core:core_rjs",
-        "//packages/angular_devkit/schematics:schematics_rjs",
-        "//packages/angular_devkit/schematics/testing:testing_rjs",
+        "//packages/angular_devkit/core:core",
+        "//packages/angular_devkit/schematics:schematics",
+        "//packages/angular_devkit/schematics/testing:testing",
     ],
 )
 
 jasmine_test(
     name = "angular-cli_test",
-    data = [":angular-cli_test_lib_rjs"],
+    data = [":angular-cli_test_lib"],
 )
 
 genrule(
@@ -147,7 +147,7 @@ npm_package(
     tags = ["release-package"],
     deps = RUNTIME_ASSETS + [
         ":README.md",
-        ":angular-cli_rjs",
+        ":angular-cli",
         ":license",
     ],
 )
