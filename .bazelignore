@@ -17,3 +17,4 @@ packages/ngtools/webpack/node_modules
 packages/schematics/angular/node_modules
 modules/testing/builder/node_modules
 tests/node_modules
+tools/legacy-rnjs/node_modules
