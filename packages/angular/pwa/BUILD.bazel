@@ -53,16 +53,16 @@ ts_project(
     # TODO: Fix strict_deps failure
     ignore_strict_deps = True,
     deps = [
-        ":pwa_rjs",
+        ":pwa",
         "//:node_modules/@types/jasmine",
         "//:node_modules/@types/node",
-        "//packages/angular_devkit/schematics/testing:testing_rjs",
+        "//packages/angular_devkit/schematics/testing:testing",
     ],
 )
 
 jasmine_test(
     name = "pwa_test",
-    data = [":pwa_test_lib_rjs"],
+    data = [":pwa_test_lib"],
 )
 
 genrule(
@@ -82,6 +82,6 @@ npm_package(
     deps = RUNTIME_ASSETS + [
         ":README.md",
         ":license",
-        ":pwa_rjs",
+        ":pwa",
     ],
 )

@@ -12,18 +12,19 @@
   ],
   "scripts": {
     "admin": "node --no-warnings=ExperimentalWarning --loader ts-node/esm/transpile-only ./scripts/devkit-admin.mjs",
+    "bazel": "bazelisk",
     "test": "bazel test //packages/...",
-    "build": "yarn admin build",
+    "build": "pnpm -s admin build",
     "lint": "eslint --cache --max-warnings=0 \"**/*.@(ts|mts|cts)\"",
-    "templates": "yarn admin templates",
-    "validate": "yarn admin validate",
-    "postinstall": "patch-package && yarn webdriver-update && yarn husky",
+    "templates": "pnpm -s admin templates",
+    "validate": "pnpm -s admin validate",
+    "postinstall": "pnpm -s webdriver-update && husky",
     "//webdriver-update-README": "ChromeDriver version must match Puppeteer Chromium version, see https://github.com/GoogleChrome/puppeteer/releases http://chromedriver.chromium.org/downloads",
     "webdriver-update": "webdriver-manager update --standalone false --gecko false --versions.chrome 106.0.5249.21",
     "public-api:check": "node goldens/public-api/manage.js test",
     "ng-dev": "node --no-warnings=ExperimentalWarning --loader ts-node/esm/transpile-only node_modules/@angular/ng-dev/bundles/cli.mjs",
     "public-api:update": "node goldens/public-api/manage.js accept",
-    "ts-circular-deps": "yarn ng-dev ts-circular-deps --config ./scripts/circular-deps-test.conf.mjs",
+    "ts-circular-deps": "pnpm -s ng-dev ts-circular-deps --config ./scripts/circular-deps-test.conf.mjs",
     "check-tooling-setup": "tsc --project .ng-dev/tsconfig.json",
     "diff-release-package": "node --no-warnings=ExperimentalWarning --loader ts-node/esm/transpile-only scripts/diff-release-package.mts"
   },
@@ -31,9 +32,12 @@
     "type": "git",
     "url": "https://github.com/angular/angular-cli.git"
   },
+  "packageManager": "pnpm@9.15.6",
   "engines": {
     "node": "^18.19.1 || ^20.11.1 || >=22.0.0",
-    "npm": "Please use yarn instead of NPM to install dependencies"
+    "npm": "Please use pnpm instead of NPM to install dependencies",
+    "yarn": "Please use pnpm instead of Yarn to install dependencies",
+    "pnpm": "^9.15.6"
   },
   "author": "Angular Authors",
   "license": "MIT",
@@ -44,7 +48,6 @@
   "devDependencies": {
     "@ampproject/remapping": "2.3.0",
     "@angular/animations": "19.2.0-rc.0",
-    "@angular/bazel": "https://github.com/angular/bazel-builds.git#58e1a344eed2dfea489cd290a4b4a963f7e3ac65",
     "@angular/build-tooling": "https://github.com/angular/dev-infra-private-build-tooling-builds.git#d4727212a9d0f7eb63ae3116d73c769d9bd0bdc1",
     "@angular/cdk": "19.2.0-rc.0",
     "@angular/common": "19.2.0-rc.0",
@@ -73,7 +76,6 @@
     "@bazel/bazelisk": "1.25.0",
     "@bazel/buildifier": "8.0.3",
     "@discoveryjs/json-ext": "0.6.3",
-    "@inquirer/confirm": "5.1.6",
     "@inquirer/prompts": "7.3.2",
     "@listr2/prompt-adapter-inquirer": "2.0.18",
     "@rollup/plugin-alias": "^5.1.1",
@@ -93,7 +95,7 @@
     "@types/less": "^3.0.3",
     "@types/loader-utils": "^2.0.0",
     "@types/lodash": "^4.17.0",
-    "@types/node": "^18.13.0",
+    "@types/node": "18.19.76",
     "@types/npm-package-arg": "^6.1.0",
     "@types/pacote": "^11.1.3",
     "@types/picomatch": "^3.0.0",
@@ -159,14 +161,13 @@
     "mini-css-extract-plugin": "2.9.2",
     "mrmime": "2.0.1",
     "ng-packagr": "19.2.0",
-    "npm": "^11.0.0",
+    "npm": "~10.9.2",
     "npm-package-arg": "12.0.2",
     "npm-pick-manifest": "10.0.0",
     "open": "10.1.0",
     "ora": "5.4.1",
     "pacote": "20.0.0",
     "parse5-html-rewriting-stream": "7.0.0",
-    "patch-package": "^8.0.0",
     "picomatch": "4.0.2",
     "piscina": "4.8.0",
     "postcss": "8.5.2",
@@ -194,7 +195,7 @@
     "ts-node": "^10.9.1",
     "tslib": "2.8.1",
     "typescript": "5.8.1-rc",
-    "undici": "7.3.0",
+    "undici": "6.21.1",
     "unenv": "^1.10.0",
     "verdaccio": "6.0.5",
     "verdaccio-auth-memory": "^10.0.0",
@@ -224,6 +225,18 @@
     ],
     "overrides": {
       "@angular/build": "workspace:*"
+    },
+    "packageExtensions": {
+      "grpc-gcp": {
+        "peerDependencies": {
+          "protobufjs": "*"
+        }
+      },
+      "@angular/platform-server": {
+        "peerDependencies": {
+          "rxjs": "*"
+        }
+      }
     }
   },
   "resolutions": {

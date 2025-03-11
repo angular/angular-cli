@@ -30,7 +30,7 @@ the access group to now include the next caretakers. To perform this update to t
 the caretaker can run:
 
 ```bash
-$ yarn ng-dev caretaker handoff
+$ pnpm ng-dev caretaker handoff
 ```
 
 ## Merging PRs
@@ -39,12 +39,12 @@ The list of PRs which are currently ready to merge (approved with passing status
 be found with [this search](https://github.com/angular/angular-cli/pulls?q=is%3Apr+is%3Aopen+label%3A%22action%3A+merge%22+-is%3Adraft).
 This list should be checked daily and any ready PRs should be merged. For each PR, check the
 `target` label to understand where it should be merged to. You can find which branches a specific
-PR will be merged into with the `yarn ng-dev pr check-target-branches <pr>` command.
+PR will be merged into with the `pnpm ng-dev pr check-target-branches <pr>` command.
 
 When ready to merge a PR, run the following command:
 
-```
-yarn ng-dev pr merge <pr>
+```bash
+pnpm ng-dev pr merge <pr>
 ```
 
 ### Maintaining LTS branches
@@ -88,7 +88,7 @@ After confirming that the above steps have been done or are not necessary, run t
 navigate the prompts:
 
 ```sh
-yarn ng-dev release publish
+pnpm ng-dev release publish
 ```
 
 Releases should be done in "reverse semver order", meaning they should follow:
@@ -119,8 +119,8 @@ will block the next weekly release.
 1.  Trigger a release build locally.
     ```shell
     nvm install
-    yarn --frozen-lockfile
-    yarn -s ng-dev release build
+    pnpm install --frozen-lockfile
+    pnpm ng-dev release build
     ```
 1.  Log in to NPM as `angular`.
     ```shell

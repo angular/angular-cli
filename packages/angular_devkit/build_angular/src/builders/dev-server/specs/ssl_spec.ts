@@ -7,10 +7,10 @@
  */
 
 import { Architect, BuilderRun } from '@angular-devkit/architect';
-import { DevServerBuilderOutput } from '@angular-devkit/build-angular';
 import { tags } from '@angular-devkit/core';
 import { Agent, getGlobalDispatcher, setGlobalDispatcher } from 'undici';
 import { createArchitect, host } from '../../../testing/test-utils';
+import { DevServerBuilderOutput } from '../index';
 
 describe('Dev Server Builder ssl', () => {
   const target = { project: 'app', target: 'serve' };

@@ -15,7 +15,7 @@ export const baseDir = '../';
 export const goldenFile = '../goldens/circular-deps/packages.json';
 export const glob = '../packages/**/*.ts';
 // Command that will be displayed if the golden needs to be updated.
-export const approveCommand = 'yarn ts-circular-deps approve';
+export const approveCommand = 'pnpm ts-circular-deps approve';
 
 /**
  * Custom module resolver that maps specifiers for local packages folder.

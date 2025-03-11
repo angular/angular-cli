@@ -65,15 +65,7 @@ the reruns of tests that have been marked as `flaky`.
 The `.bazelrc` includes a config for running tests with remote debugging enabled:
 
 ```sh
-yarn bazel test --config=debug //packages/angular/cli:angular-cli_test
+pnpm bazel test --config=debug //packages/angular/cli:angular-cli_test
 # Also disable reruns of failing tests that were marked as flaky:
-yarn bazel test --config=debug --config=no-sharding //packages/angular/cli:angular-cli_test
+pnpm bazel test --config=debug --config=no-sharding //packages/angular/cli:angular-cli_test
 ```
-
-NB: For a few tests, sandbox is required as otherwise the rules_nodejs linker symlinks will conflict
-with the yarn workspace symlinks in node_modules.
-
-## Issues
-
-1. Yarn workspaces is not compatible with Bazel-managed deps
-   [(#12736)](https://github.com/angular/angular-cli/issues/12736)

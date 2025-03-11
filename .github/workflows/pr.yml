@@ -34,51 +34,51 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Initialize environment
-        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@0ad6a370f70638e785d6ef1f90dc6ede34684a47
+        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@b79ac7f5d6689becb7f2d559affbab5afb361389
       - name: Setup ESLint Caching
         uses: actions/cache@1bd1e32a3bdc45362d1e726936510720a7c30a57 # v4.2.0
         with:
           path: .eslintcache
           key: ${{ runner.os }}-${{ hashFiles('.eslintrc.json') }}
       - name: Install node modules
-        run: yarn install --immutable
+        run: pnpm install --frozen-lockfile
       - name: Generate JSON schema types
         # Schema types are required to correctly lint the TypeScript code
-        run: yarn admin build-schema
+        run: pnpm admin build-schema
       - name: Run ESLint
-        run: yarn lint --cache-strategy content
+        run: pnpm lint --cache-strategy content
       - name: Validate NgBot Configuration
-        run: yarn ng-dev ngbot verify
+        run: pnpm ng-dev ngbot verify
       - name: Validate Circular Dependencies
-        run: yarn ts-circular-deps check
+        run: pnpm ts-circular-deps check
       - name: Run Validation
-        run: yarn admin validate
+        run: pnpm admin validate
       - name: Check Package Licenses
         uses: angular/dev-infra/github-actions/linting/licenses@0ad6a370f70638e785d6ef1f90dc6ede34684a47
       - name: Check tooling setup
-        run: yarn check-tooling-setup
+        run: pnpm check-tooling-setup
       - name: Check commit message
         # Commit message validation is only done on pull requests as its too late to validate once
         # it has been merged.
-        run: yarn ng-dev commit-message validate-range ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }}
+        run: pnpm ng-dev commit-message validate-range ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }}
       - name: Check code format
         # Code formatting checks are only done on pull requests as its too late to validate once
         # it has been merged.
-        run: yarn ng-dev format changed --check ${{ github.event.pull_request.base.sha }}
+        run: pnpm ng-dev format changed --check ${{ github.event.pull_request.base.sha }}
 
   build:
     runs-on: ubuntu-latest
     steps:
       - name: Initialize environment
-        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@0ad6a370f70638e785d6ef1f90dc6ede34684a47
+        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@b79ac7f5d6689becb7f2d559affbab5afb361389
       - name: Setup Bazel
         uses: angular/dev-infra/github-actions/bazel/setup@0ad6a370f70638e785d6ef1f90dc6ede34684a47
       - name: Setup Bazel RBE
         uses: angular/dev-infra/github-actions/bazel/configure-remote@0ad6a370f70638e785d6ef1f90dc6ede34684a47
       - name: Install node modules
-        run: yarn install --immutable
+        run: pnpm install --frozen-lockfile
       - name: Build release targets
-        run: yarn ng-dev release build
+        run: pnpm ng-dev release build
       - name: Store PR release packages
         uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4.6.0
         with:
@@ -91,15 +91,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Initialize environment
-        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@0ad6a370f70638e785d6ef1f90dc6ede34684a47
+        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@b79ac7f5d6689becb7f2d559affbab5afb361389
       - name: Setup Bazel
         uses: angular/dev-infra/github-actions/bazel/setup@0ad6a370f70638e785d6ef1f90dc6ede34684a47
       - name: Setup Bazel RBE
         uses: angular/dev-infra/github-actions/bazel/configure-remote@0ad6a370f70638e785d6ef1f90dc6ede34684a47
       - name: Install node modules
-        run: yarn install --immutable
+        run: pnpm install --frozen-lockfile
       - name: Run module and package tests
-        run: yarn bazel test //modules/... //packages/...
+        run: pnpm bazel test //modules/... //packages/...
         env:
           ASPECT_RULES_JS_FROZEN_PNPM_LOCK: '1'
 
@@ -115,22 +115,22 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Initialize environment
-        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@0ad6a370f70638e785d6ef1f90dc6ede34684a47
+        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@b79ac7f5d6689becb7f2d559affbab5afb361389
       - name: Install node modules
-        run: yarn install --immutable
+        run: pnpm install --frozen-lockfile
       - name: Setup Bazel
         uses: angular/dev-infra/github-actions/bazel/setup@0ad6a370f70638e785d6ef1f90dc6ede34684a47
       - name: Setup Bazel RBE
         uses: angular/dev-infra/github-actions/bazel/configure-remote@0ad6a370f70638e785d6ef1f90dc6ede34684a47
       - name: Run CLI E2E tests
-        run: yarn bazel test --test_env=E2E_SHARD_TOTAL=6 --test_env=E2E_SHARD_INDEX=${{ matrix.shard }} --config=e2e //tests/legacy-cli:e2e.${{ matrix.subset }}_node${{ matrix.node }}
+        run: pnpm bazel test --test_env=E2E_SHARD_TOTAL=6 --test_env=E2E_SHARD_INDEX=${{ matrix.shard }} --config=e2e //tests/legacy-cli:e2e.${{ matrix.subset }}_node${{ matrix.node }}
 
   e2e-windows-subset:
     needs: build
     runs-on: windows-2025
     steps:
       - name: Initialize environment
-        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@0000d926624b2fd918e93f1c6b5e2defba9af91f
+        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@b79ac7f5d6689becb7f2d559affbab5afb361389
       - name: Run CLI E2E tests
         uses: ./.github/shared-actions/windows-bazel-test
         with:
@@ -149,15 +149,15 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Initialize environment
-        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@0ad6a370f70638e785d6ef1f90dc6ede34684a47
+        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@b79ac7f5d6689becb7f2d559affbab5afb361389
       - name: Install node modules
-        run: yarn install --immutable
+        run: pnpm install --frozen-lockfile
       - name: Setup Bazel
         uses: angular/dev-infra/github-actions/bazel/setup@0ad6a370f70638e785d6ef1f90dc6ede34684a47
       - name: Setup Bazel RBE
         uses: angular/dev-infra/github-actions/bazel/configure-remote@0ad6a370f70638e785d6ef1f90dc6ede34684a47
       - name: Run CLI E2E tests
-        run: yarn bazel test --test_env=E2E_SHARD_TOTAL=3 --test_env=E2E_SHARD_INDEX=${{ matrix.shard }} --config=e2e //tests/legacy-cli:e2e.${{ matrix.subset }}_node${{ matrix.node }}
+        run: pnpm bazel test --test_env=E2E_SHARD_TOTAL=3 --test_env=E2E_SHARD_INDEX=${{ matrix.shard }} --config=e2e //tests/legacy-cli:e2e.${{ matrix.subset }}_node${{ matrix.node }}
 
   e2e-snapshots:
     needs: [analyze, build]
@@ -172,12 +172,12 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Initialize environment
-        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@0ad6a370f70638e785d6ef1f90dc6ede34684a47
+        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@b79ac7f5d6689becb7f2d559affbab5afb361389
       - name: Install node modules
-        run: yarn install --immutable
+        run: pnpm install --frozen-lockfile
       - name: Setup Bazel
         uses: angular/dev-infra/github-actions/bazel/setup@0ad6a370f70638e785d6ef1f90dc6ede34684a47
       - name: Setup Bazel RBE
         uses: angular/dev-infra/github-actions/bazel/configure-remote@0ad6a370f70638e785d6ef1f90dc6ede34684a47
       - name: Run CLI E2E tests
-        run: yarn bazel test --test_env=E2E_SHARD_TOTAL=6 --test_env=E2E_SHARD_INDEX=${{ matrix.shard }} --config=e2e //tests/legacy-cli:e2e.snapshots.${{ matrix.subset }}_node${{ matrix.node }}
+        run: pnpm bazel test --test_env=E2E_SHARD_TOTAL=6 --test_env=E2E_SHARD_INDEX=${{ matrix.shard }} --config=e2e //tests/legacy-cli:e2e.snapshots.${{ matrix.subset }}_node${{ matrix.node }}

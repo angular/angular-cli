@@ -106,9 +106,9 @@ describe('Identifying third-party code in source maps', () => {
     // All sources in the main map are first-party.
     expect(mainMap.sources.filter((_, i) => !mainMap[IGNORE_LIST].includes(i))).toEqual([
       './src/app/app.component.ts',
-      './src/app/app.component.css',
       './src/app/app.module.ts',
       './src/main.ts',
+      './src/app/app.component.css',
     ]);
 
     // Only some sources in the polyfills map are first-party.

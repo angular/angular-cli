@@ -7,6 +7,6 @@ ts_project(
     srcs = ["index.ts"],
     module_name = "@angular/build/private",
     deps = [
-        "//packages/angular/build:build_rjs",
+        "//packages/angular/build",
     ],
 )

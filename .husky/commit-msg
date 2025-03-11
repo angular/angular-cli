@@ -1,1 +1,1 @@
-yarn ng-dev commit-message pre-commit-validate --file $1;
+pnpm -s ng-dev commit-message pre-commit-validate --file $1;

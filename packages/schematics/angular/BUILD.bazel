@@ -96,7 +96,7 @@ ts_project(
         "//:node_modules/@types/node",
         "//:node_modules/browserslist",
         "//:node_modules/jsonc-parser",
-        "//packages/schematics/angular/third_party/github.com/Microsoft/TypeScript:TypeScript_rjs",
+        "//packages/schematics/angular/third_party/github.com/Microsoft/TypeScript",
     ],
 )
 
@@ -104,7 +104,7 @@ jasmine_test(
     name = "no_typescript_runtime_dep_test",
     data = [
         "no_typescript_runtime_dep_spec.js",
-        ":angular_rjs",
+        ":angular",
         "//:node_modules/@types/jasmine",
     ],
 )
@@ -123,19 +123,19 @@ ts_project(
         ],
     ),
     deps = [
-        ":angular_rjs",
+        ":angular",
         ":node_modules/@angular-devkit/core",
         ":node_modules/@angular-devkit/schematics",
         "//:node_modules/@types/jasmine",
         "//:node_modules/@types/node",
         "//:node_modules/jsonc-parser",
-        "//packages/schematics/angular/third_party/github.com/Microsoft/TypeScript:TypeScript_rjs",
+        "//packages/schematics/angular/third_party/github.com/Microsoft/TypeScript",
     ],
 )
 
 jasmine_test(
     name = "angular_test",
-    data = [":angular_test_lib_rjs"],
+    data = [":angular_test_lib"],
 )
 
 genrule(
@@ -157,7 +157,7 @@ npm_package(
     tags = ["release-package"],
     deps = RUNTIME_ASSETS + [
         ":README.md",
-        ":angular_rjs",
+        ":angular",
         ":license",
         "//packages/schematics/angular/third_party/github.com/Microsoft/TypeScript:LICENSE",
         # Force typescript library to be included.

@@ -8,6 +8,6 @@ ts_project(
     srcs = glob(["**/*.ts"]),
     deps = [
         "//:node_modules/@types/node",
-        "//tests/legacy-cli/e2e/utils:utils_rjs",
+        "//tests/legacy-cli/e2e/utils",
     ],
 )

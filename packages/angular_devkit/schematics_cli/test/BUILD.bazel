@@ -6,7 +6,7 @@ ts_project(
     testonly = True,
     srcs = glob(["**/*"]),
     deps = [
-        "//packages/angular_devkit/schematics_cli:schematics_cli_rjs",
+        "//packages/angular_devkit/schematics_cli",
     ],
 )
 
@@ -23,7 +23,7 @@ npm_link_package(
 jasmine_test(
     name = "schematics_cli_test",
     data = [
-        ":schematics_cli_test_lib_rjs",
+        ":schematics_cli_test_lib",
         # The npm package itself is needed for the test at runtime, so we
         # link it into this folder as `node_modules/@angular-devkit/schematics-cli`.
         ":node_modules/@angular-devkit/schematics-cli",

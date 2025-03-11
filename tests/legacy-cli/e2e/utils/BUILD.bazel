@@ -9,8 +9,6 @@ ts_project(
     data = [
         "//tests/legacy-cli/e2e/ng-snapshot",
     ],
-    # TODO(devversion): Remove
-    enable_runtime_rnjs_interop = False,
     deps = [
         "//:node_modules/@types/jasmine",
         "//:node_modules/@types/node",
