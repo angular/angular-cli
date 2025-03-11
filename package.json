@@ -32,12 +32,12 @@
     "type": "git",
     "url": "https://github.com/angular/angular-cli.git"
   },
-  "packageManager": "pnpm@9.15.6",
+  "packageManager": "pnpm@10.6.2",
   "engines": {
     "node": "^20.11.1 || >=22.0.0",
     "npm": "Please use pnpm instead of NPM to install dependencies",
     "yarn": "Please use pnpm instead of Yarn to install dependencies",
-    "pnpm": "^9.15.6"
+    "pnpm": "^10.0.0"
   },
   "author": "Angular Authors",
   "license": "MIT",
