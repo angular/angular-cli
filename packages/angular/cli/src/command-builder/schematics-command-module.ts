@@ -143,27 +143,21 @@ export abstract class SchematicsCommandModule
       workingDir === '' ? undefined : workingDir,
     );
 
-    let shouldReportAnalytics = true;
     workflow.engineHost.registerOptionsTransform(async (schematic, options) => {
-      // Report analytics
-      if (shouldReportAnalytics) {
-        shouldReportAnalytics = false;
+      const {
+        collection: { name: collectionName },
+        name: schematicName,
+      } = schematic;
 
-        const {
-          collection: { name: collectionName },
-          name: schematicName,
-        } = schematic;
+      const analytics = isPackageNameSafeForAnalytics(collectionName)
+        ? await this.getAnalytics()
+        : undefined;
 
-        const analytics = isPackageNameSafeForAnalytics(collectionName)
-          ? await this.getAnalytics()
-          : undefined;
-
-        analytics?.reportSchematicRunEvent({
-          [EventCustomDimension.SchematicCollectionName]: collectionName,
-          [EventCustomDimension.SchematicName]: schematicName,
-          ...this.getAnalyticsParameters(options as unknown as {}),
-        });
-      }
+      analytics?.reportSchematicRunEvent({
+        [EventCustomDimension.SchematicCollectionName]: collectionName,
+        [EventCustomDimension.SchematicName]: schematicName,
+        ...this.getAnalyticsParameters(options as unknown as {}),
+      });
 
       return options;
     });
