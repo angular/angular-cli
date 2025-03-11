@@ -162,7 +162,7 @@ describeServeBuilder(
             // See: https://github.com/angular/angular-cli/pull/17624
             // eslint-disable-next-line max-len
             // executablePath: '/Users/<USERNAME>/git/angular-cli/node_modules/puppeteer/.local-chromium/mac-818858/chrome-mac/Chromium.app/Contents/MacOS/Chromium',
-            ignoreHTTPSErrors: true,
+            acceptInsecureCerts: true,
             args: ['--no-sandbox', '--disable-gpu'],
           });
         });

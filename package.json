@@ -176,7 +176,7 @@
     "postcss-loader": "8.1.1",
     "prettier": "^3.0.0",
     "protractor": "~7.0.0",
-    "puppeteer": "18.2.1",
+    "puppeteer": "24.4.0",
     "quicktype-core": "23.0.171",
     "resolve-url-loader": "5.0.0",
     "rollup": "4.35.0",
