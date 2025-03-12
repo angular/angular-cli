@@ -92,16 +92,25 @@ describe('find-module', () => {
       options = { name: 'foo' };
     });
 
-    it('should find a module', () => {
-      tree.create('/projects/my-proj/src/app.module.ts', '');
+    it('should find a module with a decorator', () => {
+      tree.create('/projects/my-proj/src/app.module.ts', '@NgModule');
       options.module = 'app.module.ts';
       options.path = '/projects/my-proj/src';
       const modPath = findModuleFromOptions(tree, options) as string;
       expect(modPath).toEqual('/projects/my-proj/src/app.module.ts');
     });
 
+    it('should not find module-like file without a decorator', () => {
+      tree.create('/projects/my-proj/src/app.module.ts', '');
+      options.module = 'app.module.ts';
+      options.path = '/projects/my-proj/src';
+      expect(() => findModuleFromOptions(tree, options) as string).toThrowError(
+        /Specified module 'app.module.ts' does not exist/,
+      );
+    });
+
     it('should find a module when name has underscore', () => {
-      tree.create('/projects/my-proj/src/feature_module/app_test.module.ts', '');
+      tree.create('/projects/my-proj/src/feature_module/app_test.module.ts', '@NgModule');
       options.path = '/projects/my-proj/src';
       options.name = 'feature_module/new_component';
       const modPath = findModuleFromOptions(tree, options) as string;
@@ -109,7 +118,7 @@ describe('find-module', () => {
     });
 
     it('should find a module when name has uppercase', () => {
-      tree.create('/projects/my-proj/src/featureModule/appTest.module.ts', '');
+      tree.create('/projects/my-proj/src/featureModule/appTest.module.ts', '@NgModule');
       options.path = '/projects/my-proj/src';
       options.name = 'featureModule/newComponent';
       const modPath = findModuleFromOptions(tree, options) as string;
@@ -117,7 +126,7 @@ describe('find-module', () => {
     });
 
     it('should find a module if flat is true', () => {
-      tree.create('/projects/my-proj/src/module/app_test.module.ts', '');
+      tree.create('/projects/my-proj/src/module/app_test.module.ts', '@NgModule');
       options.path = '/projects/my-proj/src';
       options.flat = true;
       options.name = '/module/directive';
@@ -126,7 +135,7 @@ describe('find-module', () => {
     });
 
     it('should find a module in a sub dir', () => {
-      tree.create('/projects/my-proj/src/admin/foo.module.ts', '');
+      tree.create('/projects/my-proj/src/admin/foo.module.ts', '@NgModule');
       options.name = 'other/test';
       options.module = 'admin/foo';
       options.path = '/projects/my-proj/src';
@@ -135,7 +144,7 @@ describe('find-module', () => {
     });
 
     it('should find a module in a sub dir (2)', () => {
-      tree.create('/projects/my-proj/src/admin/foo.module.ts', '');
+      tree.create('/projects/my-proj/src/admin/foo.module.ts', '@NgModule');
       options.name = 'admin/hello';
       options.module = 'foo';
       options.path = '/projects/my-proj/src';
@@ -144,7 +153,7 @@ describe('find-module', () => {
     });
 
     it('should find a module using custom ext', () => {
-      tree.create('/projects/my-proj/src/app_module.ts', '');
+      tree.create('/projects/my-proj/src/app_module.ts', '@NgModule');
       options.module = 'app';
       options.path = '/projects/my-proj/src';
       options.moduleExt = '_module.ts';
@@ -164,7 +173,7 @@ describe('find-module', () => {
     });
 
     it('should ignore custom ext if module or ${module}.ts exists', () => {
-      tree.create('/projects/my-proj/src/app.module.ts', '');
+      tree.create('/projects/my-proj/src/app.module.ts', '@NgModule');
       options.path = '/projects/my-proj/src';
       options.moduleExt = '_module.ts';
       let modPath;
