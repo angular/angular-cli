@@ -35,7 +35,7 @@
       "schedule": ["before 4:00am on the first day of the month"]
     },
     {
-      "matchCurrentVersion": "/0\\.0\\.0-/",
+      "matchCurrentVersion": "/^[~^]?0\\.0\\.0-/",
       "enabled": false
     },
     {
