@@ -47,5 +47,39 @@ describeServeBuilder(executeDevServer, DEV_SERVER_BUILDER_INFO, (harness, setupT
       expect(response?.headers.get('Cache-Control')).toEqual('no-cache');
       expect(output).toBe('');
     });
+
+    it('sets ngHmrMode define to true when HMR is enabled', async () => {
+      harness.useTarget('serve', {
+        ...BASE_OPTIONS,
+        hmr: true,
+      });
+
+      await harness.writeFile(
+        'src/main.ts',
+        'declare const ngHmrMode: boolean; console.log(`HMR=${ngHmrMode}`);',
+      );
+
+      const { result, content } = await executeOnceAndFetch(harness, 'main.js');
+
+      expect(result?.success).toBeTrue();
+      expect(content).toContain('HMR=${true}');
+    });
+
+    it('sets ngHmrMode define to false when HMR is disabled', async () => {
+      harness.useTarget('serve', {
+        ...BASE_OPTIONS,
+        hmr: false,
+      });
+
+      await harness.writeFile(
+        'src/main.ts',
+        'declare const ngHmrMode: boolean; console.log(`HMR=${ngHmrMode}`);',
+      );
+
+      const { result, content } = await executeOnceAndFetch(harness, 'main.js');
+
+      expect(result?.success).toBeTrue();
+      expect(content).toContain('HMR=${false}');
+    });
   });
 });
