@@ -1,3 +1,30 @@
+<a name="19.2.2"></a>
+
+# 19.2.2 (2025-03-12)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                            |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------- |
+| [0ee24e29b](https://github.com/angular/angular-cli/commit/0ee24e29b9bb24e92ca3159a13a21fac78974fd7) | fix  | record analytics for nested schematics |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                           |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------- |
+| [4575265f0](https://github.com/angular/angular-cli/commit/4575265f0b6dcfe81a729f60264e148d93302a10) | fix  | exclude all entrypoints of a library from prebundling |
+| [83fcffbb7](https://github.com/angular/angular-cli/commit/83fcffbb7d2ede1b08b4145dcedd46ef328bb2f8) | fix  | handle postcss compilation errors gracefully          |
+| [78297ee47](https://github.com/angular/angular-cli/commit/78297ee47c9c381b08cd3649d369765c0b73d4f9) | fix  | provide `extract-i18n` does not respect               |
+| [b18b9c8f2](https://github.com/angular/angular-cli/commit/b18b9c8f249df7b79caebc5ffca07198c14b9a72) | fix  | remove duplicate prebundling warning                  |
+
+### @angular/ssr
+
+| Commit                                                                                              | Type | Description                                                  |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------ |
+| [e6e8ce960](https://github.com/angular/angular-cli/commit/e6e8ce960a8048e7bfbaafa4ea013bb05d9897aa) | fix  | prevent stream draining if `write` does not return a boolean |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="20.0.0-next.0"></a>
 
 # 20.0.0-next.0 (2025-03-05)
