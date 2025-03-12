@@ -59,7 +59,7 @@ export function findModuleFromOptions(host: Tree, options: ModuleOptions): Path 
       );
 
       for (const sc of candidateFiles) {
-        if (host.exists(sc)) {
+        if (host.exists(sc) && host.readText(sc).includes('@NgModule')) {
           return normalize(sc);
         }
       }
