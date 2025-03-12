@@ -600,6 +600,7 @@ function getEsBuildCommonOptions(options: NormalizedApplicationBuildOptions): Bu
       ...(optimizationOptions.scripts ? { 'ngDevMode': 'false' } : undefined),
       'ngJitMode': jit ? 'true' : 'false',
       'ngServerMode': 'false',
+      'ngHmrMode': options.templateUpdates ? 'true' : 'false',
     },
     loader: loaderExtensions,
     footer,
