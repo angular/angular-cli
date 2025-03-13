@@ -1,3 +1,15 @@
+<a name="19.2.3"></a>
+
+# 19.2.3 (2025-03-13)
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description           |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------- |
+| [5a739820b](https://github.com/angular/angular-cli/commit/5a739820be5cc7cb25e159a1f2283db92e741f78) | fix  | update babel packages |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="19.2.2"></a>
 
 # 19.2.2 (2025-03-12)
