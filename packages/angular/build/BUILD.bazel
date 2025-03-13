@@ -1,6 +1,6 @@
 load("@devinfra//bazel/api-golden:index_rjs.bzl", "api_golden_test_npm_package")
 load("@npm2//:defs.bzl", "npm_link_all_packages")
-load("//tools:defaults2.bzl", "copy_to_bin", "jasmine_test", "npm_package", "ts_project")
+load("//tools:defaults.bzl", "copy_to_bin", "jasmine_test", "npm_package", "ts_project")
 load("//tools:ts_json_schema.bzl", "ts_json_schema")
 
 licenses(["notice"])
@@ -72,7 +72,6 @@ ts_project(
         "//packages/angular/build:src/builders/ng-packagr/schema.ts",
     ],
     data = RUNTIME_ASSETS,
-    module_name = "@angular/build",
     deps = [
         ":node_modules/@angular-devkit/architect",
         ":node_modules/@angular-devkit/core",
@@ -158,12 +157,8 @@ ts_project(
     srcs = glob(include = ["src/builders/application/tests/**/*.ts"]),
     deps = [
         ":build",
-        "//packages/angular/build/private",
-        "//modules/testing/builder",
         ":node_modules/@angular-devkit/architect",
-        ":node_modules/@angular-devkit/core",
-
-        # Base dependencies for the application in hello-world-app.
+        ":node_modules/@angular-devkit/core",  # Base dependencies for the application in hello-world-app.
         "//:node_modules/@angular/common",
         "//:node_modules/@angular/compiler",
         "//:node_modules/@angular/compiler-cli",
@@ -171,11 +166,13 @@ ts_project(
         "//:node_modules/@angular/platform-browser",
         "//:node_modules/@angular/platform-browser-dynamic",
         "//:node_modules/@angular/router",
+        "//:node_modules/buffer",
         "//:node_modules/rxjs",
         "//:node_modules/tslib",
         "//:node_modules/typescript",
         "//:node_modules/zone.js",
-        "//:node_modules/buffer",
+        "//modules/testing/builder",
+        "//packages/angular/build/private",
     ],
 )
 
@@ -185,18 +182,8 @@ ts_project(
     srcs = glob(include = ["src/builders/dev-server/tests/**/*.ts"]),
     deps = [
         ":build",
-        "//packages/angular/build/private",
-        "//modules/testing/builder",
         ":node_modules/@angular-devkit/architect",
-        ":node_modules/@angular-devkit/core",
-
-        # dev server only test deps
-        "//:node_modules/@types/http-proxy",
-        "//:node_modules/@types/node",
-        "//:node_modules/http-proxy",
-        "//:node_modules/puppeteer",
-
-        # Base dependencies for the application in hello-world-app.
+        ":node_modules/@angular-devkit/core",  # dev server only test deps
         "//:node_modules/@angular/common",
         "//:node_modules/@angular/compiler",
         "//:node_modules/@angular/compiler-cli",
@@ -204,12 +191,18 @@ ts_project(
         "//:node_modules/@angular/platform-browser",
         "//:node_modules/@angular/platform-browser-dynamic",
         "//:node_modules/@angular/router",
+        "//:node_modules/@types/http-proxy",
+        "//:node_modules/@types/node",
+        "//:node_modules/buffer",
+        "//:node_modules/http-proxy",
         "//:node_modules/ng-packagr",
+        "//:node_modules/puppeteer",  # Base dependencies for the application in hello-world-app.
         "//:node_modules/rxjs",
         "//:node_modules/tslib",
         "//:node_modules/typescript",
         "//:node_modules/zone.js",
-        "//:node_modules/buffer",
+        "//modules/testing/builder",
+        "//packages/angular/build/private",
     ],
 )
 
@@ -219,20 +212,8 @@ ts_project(
     srcs = glob(include = ["src/builders/karma/tests/**/*.ts"]),
     deps = [
         ":build",
-        "//packages/angular/build/private",
-        "//modules/testing/builder",
         ":node_modules/@angular-devkit/architect",
         ":node_modules/@angular-devkit/core",
-        "//:node_modules/@types/node",
-
-        # karma specific test deps
-        "//:node_modules/karma-chrome-launcher",
-        "//:node_modules/karma-coverage",
-        "//:node_modules/karma-jasmine",
-        "//:node_modules/karma-jasmine-html-reporter",
-        "//:node_modules/puppeteer",
-
-        # Base dependencies for the karma in hello-world-app.
         "//:node_modules/@angular/common",
         "//:node_modules/@angular/compiler",
         "//:node_modules/@angular/compiler-cli",
@@ -240,11 +221,19 @@ ts_project(
         "//:node_modules/@angular/platform-browser",
         "//:node_modules/@angular/platform-browser-dynamic",
         "//:node_modules/@angular/router",
+        "//:node_modules/@types/node",  # karma specific test deps
+        "//:node_modules/buffer",
+        "//:node_modules/karma-chrome-launcher",
+        "//:node_modules/karma-coverage",
+        "//:node_modules/karma-jasmine",
+        "//:node_modules/karma-jasmine-html-reporter",
+        "//:node_modules/puppeteer",  # Base dependencies for the karma in hello-world-app.
         "//:node_modules/rxjs",
         "//:node_modules/tslib",
         "//:node_modules/typescript",
         "//:node_modules/zone.js",
-        "//:node_modules/buffer",
+        "//modules/testing/builder",
+        "//packages/angular/build/private",
     ],
 )
 
