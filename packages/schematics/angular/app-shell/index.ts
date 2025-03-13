@@ -27,9 +27,9 @@ import {
 } from '../utility/ast-utils';
 import { applyToUpdateRecorder } from '../utility/change';
 import { getAppModulePath, isStandaloneApp } from '../utility/ng-ast-utils';
+import { isUsingApplicationBuilder, targetBuildNotFoundError } from '../utility/project-targets';
 import { findBootstrapApplicationCall, getMainFilePath } from '../utility/standalone/util';
-import { getWorkspace, updateWorkspace } from '../utility/workspace';
-import { Builders } from '../utility/workspace-models';
+import { getWorkspace } from '../utility/workspace';
 import { Schema as AppShellOptions } from './schema';
 
 const APP_SHELL_ROUTE = 'shell';
@@ -154,29 +154,6 @@ function getMetadataProperty(metadata: ts.Node, propertyName: string): ts.Proper
   })[0];
 
   return property;
-}
-
-function addAppShellConfigToWorkspace(options: AppShellOptions): Rule {
-  return updateWorkspace((workspace) => {
-    const project = workspace.projects.get(options.project);
-    if (!project) {
-      return;
-    }
-    const buildTarget = project.targets.get('build');
-    if (
-      buildTarget?.builder === Builders.Application ||
-      buildTarget?.builder === Builders.BuildApplication
-    ) {
-      // Application builder configuration.
-      const prodConfig = buildTarget.configurations?.production;
-      if (!prodConfig) {
-        throw new SchematicsException(
-          `A "production" configuration is not defined for the "build" builder.`,
-        );
-      }
-      prodConfig.appShell = true;
-    }
-  });
 }
 
 function addServerRoutes(options: AppShellOptions): Rule {
@@ -359,17 +336,21 @@ export default function (options: AppShellOptions): Rule {
     const browserEntryPoint = await getMainFilePath(tree, options.project);
     const isStandalone = isStandaloneApp(tree, browserEntryPoint);
 
+    const workspace = await getWorkspace(tree);
+    const project = workspace.projects.get(options.project);
+    if (!project) {
+      throw targetBuildNotFoundError();
+    }
+
     return chain([
       validateProject(browserEntryPoint),
       schematic('server', options),
-      ...(options.serverRouting
+      ...(isUsingApplicationBuilder(project)
         ? [noop()]
         : isStandalone
           ? [addStandaloneServerRoute(options)]
           : [addServerRoutes(options)]),
-      options.serverRouting
-        ? addServerRoutingConfig(options, isStandalone)
-        : addAppShellConfigToWorkspace(options),
+      addServerRoutingConfig(options, isStandalone),
       schematic('component', {
         name: 'app-shell',
         module: 'app.module.server.ts',

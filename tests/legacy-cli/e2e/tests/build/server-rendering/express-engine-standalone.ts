@@ -15,7 +15,7 @@ export default async function () {
     // `--server-routing` not supported in `browser` builder.
     await ng('add', '@angular/ssr', '--skip-confirmation', '--skip-install');
   } else {
-    await ng('add', '@angular/ssr', '--server-routing', '--skip-confirmation', '--skip-install');
+    await ng('add', '@angular/ssr', '--skip-confirmation', '--skip-install');
   }
 
   if (!useWebpackBuilder) {

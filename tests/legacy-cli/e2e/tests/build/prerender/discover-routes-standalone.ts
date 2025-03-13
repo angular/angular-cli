@@ -1,7 +1,7 @@
 import { join } from 'node:path';
 import { getGlobalVariable } from '../../../utils/env';
-import { expectFileToMatch, readFile, rimraf, writeFile } from '../../../utils/fs';
-import { installWorkspacePackages } from '../../../utils/packages';
+import { expectFileToMatch, readFile, writeFile } from '../../../utils/fs';
+import { installWorkspacePackages, uninstallPackage } from '../../../utils/packages';
 import { ng } from '../../../utils/process';
 import { useSha } from '../../../utils/project';
 import { deepStrictEqual } from 'node:assert';
@@ -9,7 +9,7 @@ import { deepStrictEqual } from 'node:assert';
 export default async function () {
   const useWebpackBuilder = !getGlobalVariable('argv')['esbuild'];
   // Forcibly remove in case another test doesn't clean itself up.
-  await rimraf('node_modules/@angular/ssr');
+  await uninstallPackage('@angular/ssr');
   await ng('add', '@angular/ssr', '--skip-confirmation', '--skip-install');
 
   await useSha();
@@ -58,10 +58,6 @@ export default async function () {
     {
       path: 'lazy-two',
       loadComponent: () => import('./lazy-two/lazy-two.component').then(c => c.LazyTwoComponent),
-    },
-    {
-      path: ':param',
-      component: OneComponent,
     },
   ];
   `,

@@ -16,10 +16,6 @@
       "description": "Skip the automatic installation of packages. You will need to manually install the dependencies later.",
       "type": "boolean",
       "default": false
-    },
-    "serverRouting": {
-      "description": "Configure the server application to use the Angular Server Routing API and App Engine APIs (currently in Developer Preview).",
-      "type": "boolean"
     }
   },
   "required": ["project"],
