@@ -18,8 +18,6 @@ import { createWebRequestFromNodeRequest } from './request';
  *
  * @remarks This class should be instantiated once and used as a singleton across the server-side
  * application to ensure consistent handling of rendering requests and resource management.
- *
- * @developerPreview
  */
 export class AngularNodeAppEngine {
   private readonly angularAppEngine = new AngularAppEngine();

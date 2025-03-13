@@ -27,7 +27,6 @@ const HTTP2_PSEUDO_HEADERS = new Set([':method', ':scheme', ':authority', ':path
  *
  * @param nodeRequest - The Node.js request object (`IncomingMessage` or `Http2ServerRequest`) to convert.
  * @returns A Web Standard `Request` object.
- * @developerPreview
  */
 export function createWebRequestFromNodeRequest(
   nodeRequest: IncomingMessage | Http2ServerRequest,
