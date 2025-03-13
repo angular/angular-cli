@@ -1,3 +1,15 @@
+<a name="17.3.13"></a>
+
+# 17.3.13 (2025-03-13)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description           |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------- |
+| [22901df02](https://github.com/angular/angular-cli/commit/22901df0261812a3408ff9d7a7690bf6b87ec2a3) | fix  | update babel packages |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="19.2.3"></a>
 
 # 19.2.3 (2025-03-13)
