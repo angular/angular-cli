@@ -19,7 +19,6 @@ import type { Http2ServerResponse } from 'node:http2';
  * @param source - The web-standard `Response` object to stream from.
  * @param destination - The Node.js response object (`ServerResponse` or `Http2ServerResponse`) to stream into.
  * @returns A promise that resolves once the streaming operation is complete.
- * @developerPreview
  */
 export async function writeResponseToNodeResponse(
   source: Response,

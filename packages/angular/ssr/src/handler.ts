@@ -12,7 +12,6 @@
  * @param request - The incoming HTTP request object.
  * @returns A Promise resolving to a `Response` object, `null`, or directly a `Response`,
  * supporting both synchronous and asynchronous handling.
- * @developerPreview
  */
 export type RequestHandlerFunction = (
   request: Request,
@@ -39,7 +38,6 @@ export type RequestHandlerFunction = (
  * const handler = toWebHandler(app);
  * export default createRequestHandler(handler);
  * ```
- * @developerPreview
  */
 export function createRequestHandler(handler: RequestHandlerFunction): RequestHandlerFunction {
   (handler as RequestHandlerFunction & { __ng_request_handler__?: boolean })[

@@ -23,7 +23,6 @@ import { fileURLToPath } from 'node:url';
  *
  * @param url The URL of the module to check. This should typically be `import.meta.url`.
  * @returns `true` if the provided URL represents the main entry point, otherwise `false`.
- * @developerPreview
  */
 export function isMainModule(url: string): boolean {
   return url.startsWith('file:') && argv[1] === fileURLToPath(url);

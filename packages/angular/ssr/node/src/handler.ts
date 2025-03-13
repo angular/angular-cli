@@ -16,7 +16,6 @@ import type { IncomingMessage, ServerResponse } from 'node:http';
  * @param next - A callback function that signals the completion of the middleware or forwards the error if provided.
  *
  * @returns A Promise that resolves to void or simply void. The handler can be asynchronous.
- * @developerPreview
  */
 export type NodeRequestHandlerFunction = (
   req: IncomingMessage,
@@ -66,7 +65,6 @@ export type NodeRequestHandlerFunction = (
  *   res.send('Hello from Fastify with Node Next Handler!');
  * }));
  * ```
- * @developerPreview
  */
 export function createNodeRequestHandler<T extends NodeRequestHandlerFunction>(handler: T): T {
   (handler as T & { __ng_node_request_handler__?: boolean })['__ng_node_request_handler__'] = true;
