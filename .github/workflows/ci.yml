@@ -21,7 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Initialize environment
-        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@b79ac7f5d6689becb7f2d559affbab5afb361389
+        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@47572aba6019f368057c00966ac7ce354b1d65bc
       - name: Install node modules
         run: pnpm install --frozen-lockfile
       - name: Generate JSON schema types
@@ -42,11 +42,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Initialize environment
-        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@b79ac7f5d6689becb7f2d559affbab5afb361389
+        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@47572aba6019f368057c00966ac7ce354b1d65bc
       - name: Setup Bazel
-        uses: angular/dev-infra/github-actions/bazel/setup@f2a610b26cd7a451eddd50eb071dc495e3346a80
+        uses: angular/dev-infra/github-actions/bazel/setup@47572aba6019f368057c00966ac7ce354b1d65bc
       - name: Setup Bazel RBE
-        uses: angular/dev-infra/github-actions/bazel/configure-remote@f2a610b26cd7a451eddd50eb071dc495e3346a80
+        uses: angular/dev-infra/github-actions/bazel/configure-remote@47572aba6019f368057c00966ac7ce354b1d65bc
       - name: Install node modules
         run: pnpm install --frozen-lockfile
       - name: Build release targets
@@ -57,11 +57,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Initialize environment
-        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@b79ac7f5d6689becb7f2d559affbab5afb361389
+        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@47572aba6019f368057c00966ac7ce354b1d65bc
       - name: Setup Bazel
-        uses: angular/dev-infra/github-actions/bazel/setup@f2a610b26cd7a451eddd50eb071dc495e3346a80
+        uses: angular/dev-infra/github-actions/bazel/setup@47572aba6019f368057c00966ac7ce354b1d65bc
       - name: Setup Bazel RBE
-        uses: angular/dev-infra/github-actions/bazel/configure-remote@f2a610b26cd7a451eddd50eb071dc495e3346a80
+        uses: angular/dev-infra/github-actions/bazel/configure-remote@47572aba6019f368057c00966ac7ce354b1d65bc
       - name: Install node modules
         run: pnpm install --frozen-lockfile
       - name: Run module and package tests
@@ -81,13 +81,13 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Initialize environment
-        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@b79ac7f5d6689becb7f2d559affbab5afb361389
+        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@47572aba6019f368057c00966ac7ce354b1d65bc
       - name: Install node modules
         run: pnpm install --frozen-lockfile
       - name: Setup Bazel
-        uses: angular/dev-infra/github-actions/bazel/setup@f2a610b26cd7a451eddd50eb071dc495e3346a80
+        uses: angular/dev-infra/github-actions/bazel/setup@47572aba6019f368057c00966ac7ce354b1d65bc
       - name: Setup Bazel RBE
-        uses: angular/dev-infra/github-actions/bazel/configure-remote@f2a610b26cd7a451eddd50eb071dc495e3346a80
+        uses: angular/dev-infra/github-actions/bazel/configure-remote@47572aba6019f368057c00966ac7ce354b1d65bc
       - name: Run CLI E2E tests
         run: pnpm bazel test --test_env=E2E_SHARD_TOTAL=6 --test_env=E2E_SHARD_INDEX=${{ matrix.shard }} --config=e2e //tests/legacy-cli:e2e.${{ matrix.subset }}_node${{ matrix.node }}
 
@@ -102,7 +102,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Initialize environment
-        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@b79ac7f5d6689becb7f2d559affbab5afb361389
+        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@47572aba6019f368057c00966ac7ce354b1d65bc
       - name: Run CLI E2E tests
         uses: ./.github/shared-actions/windows-bazel-test
         with:
@@ -123,13 +123,13 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Initialize environment
-        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@b79ac7f5d6689becb7f2d559affbab5afb361389
+        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@47572aba6019f368057c00966ac7ce354b1d65bc
       - name: Install node modules
         run: pnpm install --frozen-lockfile
       - name: Setup Bazel
-        uses: angular/dev-infra/github-actions/bazel/setup@f2a610b26cd7a451eddd50eb071dc495e3346a80
+        uses: angular/dev-infra/github-actions/bazel/setup@47572aba6019f368057c00966ac7ce354b1d65bc
       - name: Setup Bazel RBE
-        uses: angular/dev-infra/github-actions/bazel/configure-remote@f2a610b26cd7a451eddd50eb071dc495e3346a80
+        uses: angular/dev-infra/github-actions/bazel/configure-remote@47572aba6019f368057c00966ac7ce354b1d65bc
       - name: Run CLI E2E tests
         run: pnpm bazel test --test_env=E2E_SHARD_TOTAL=3 --test_env=E2E_SHARD_INDEX=${{ matrix.shard }} --config=e2e //tests/legacy-cli:e2e.${{ matrix.subset }}_node${{ matrix.node }}
 
@@ -145,13 +145,13 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Initialize environment
-        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@b79ac7f5d6689becb7f2d559affbab5afb361389
+        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@47572aba6019f368057c00966ac7ce354b1d65bc
       - name: Install node modules
         run: pnpm install --frozen-lockfile
       - name: Setup Bazel
-        uses: angular/dev-infra/github-actions/bazel/setup@f2a610b26cd7a451eddd50eb071dc495e3346a80
+        uses: angular/dev-infra/github-actions/bazel/setup@47572aba6019f368057c00966ac7ce354b1d65bc
       - name: Setup Bazel RBE
-        uses: angular/dev-infra/github-actions/bazel/configure-remote@f2a610b26cd7a451eddd50eb071dc495e3346a80
+        uses: angular/dev-infra/github-actions/bazel/configure-remote@47572aba6019f368057c00966ac7ce354b1d65bc
       - name: Run CLI E2E tests
         run: pnpm bazel test --test_env=E2E_SHARD_TOTAL=6 --test_env=E2E_SHARD_INDEX=${{ matrix.shard }} --config=e2e //tests/legacy-cli:e2e.snapshots.${{ matrix.subset }}_node${{ matrix.node }}
 
@@ -163,13 +163,13 @@ jobs:
       SAUCE_TUNNEL_IDENTIFIER: angular-cli-${{ github.workflow }}-${{ github.run_number }}
     steps:
       - name: Initialize environment
-        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@b79ac7f5d6689becb7f2d559affbab5afb361389
+        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@47572aba6019f368057c00966ac7ce354b1d65bc
       - name: Install node modules
         run: pnpm install --frozen-lockfile
       - name: Setup Bazel
-        uses: angular/dev-infra/github-actions/bazel/setup@f2a610b26cd7a451eddd50eb071dc495e3346a80
+        uses: angular/dev-infra/github-actions/bazel/setup@47572aba6019f368057c00966ac7ce354b1d65bc
       - name: Setup Bazel RBE
-        uses: angular/dev-infra/github-actions/bazel/configure-remote@f2a610b26cd7a451eddd50eb071dc495e3346a80
+        uses: angular/dev-infra/github-actions/bazel/configure-remote@47572aba6019f368057c00966ac7ce354b1d65bc
       - name: Run E2E Browser tests
         env:
           SAUCE_USERNAME: ${{ vars.SAUCE_USERNAME }}
@@ -197,11 +197,11 @@ jobs:
       CIRCLE_BRANCH: ${{ github.ref_name }}
     steps:
       - name: Initialize environment
-        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@b79ac7f5d6689becb7f2d559affbab5afb361389
+        uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@47572aba6019f368057c00966ac7ce354b1d65bc
       - name: Install node modules
         run: pnpm install --frozen-lockfile
       - name: Setup Bazel
-        uses: angular/dev-infra/github-actions/bazel/setup@f2a610b26cd7a451eddd50eb071dc495e3346a80
+        uses: angular/dev-infra/github-actions/bazel/setup@47572aba6019f368057c00966ac7ce354b1d65bc
       - run: pnpm admin snapshots --verbose
         env:
           SNAPSHOT_BUILDS_GITHUB_TOKEN: ${{ secrets.SNAPSHOT_BUILDS_GITHUB_TOKEN }}

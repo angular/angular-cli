@@ -120,8 +120,12 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
       expect(result?.success).toBe(true);
 
-      harness.expectFile('dist/browser/main.js.map').content.toContain('/core/index.ts');
-      harness.expectFile('dist/browser/main.js.map').content.toContain('/common/index.ts');
+      harness
+        .expectFile('dist/browser/main.js.map')
+        .content.toContain('/core/src/application/application_ref.ts');
+      harness
+        .expectFile('dist/browser/main.js.map')
+        .content.toContain('/common/src/directives/ng_if.ts');
     });
 
     it(`should not include 'sourceMappingURL' sourcemaps when hidden suboption is true`, async () => {
