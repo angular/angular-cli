@@ -438,7 +438,8 @@ async function initializeApplication(
   await writeTestFiles(buildOutput.files, buildOptions.outputPath);
 
   // We need to add this to the beginning *after* the testing framework has
-  // prepended its files.
+  // prepended its files. The output path is required for each since they are
+  // added later in the test process via a plugin.
   const polyfillsFile: FilePattern = {
     pattern: `${outputPath}/polyfills.js`,
     included: true,
@@ -454,12 +455,14 @@ async function initializeApplication(
     watched: false,
   };
 
+  karmaOptions.basePath = outputPath;
+
   karmaOptions.files ??= [];
   if (options.scripts?.length) {
     // This should be more granular to support named bundles.
     // However, it replicates the behavior of the Karma Webpack-based builder.
     karmaOptions.files.push({
-      pattern: `${outputPath}/scripts.js`,
+      pattern: `scripts.js`,
       watched: false,
       type: 'js',
     });
@@ -467,18 +470,18 @@ async function initializeApplication(
 
   karmaOptions.files.push(
     // Serve global setup script.
-    { pattern: `${outputPath}/${mainName}.js`, type: 'module', watched: false },
+    { pattern: `${mainName}.js`, type: 'module', watched: false },
     // Serve all source maps.
-    { pattern: `${outputPath}/*.map`, included: false, watched: false },
+    { pattern: `*.map`, included: false, watched: false },
     // These are the test entrypoints.
-    { pattern: `${outputPath}/spec-*.js`, type: 'module', watched: false },
+    { pattern: `spec-*.js`, type: 'module', watched: false },
   );
 
   if (hasChunkOrWorkerFiles(buildOutput.files)) {
     karmaOptions.files.push(
       // Allow loading of chunk-* files but don't include them all on load.
       {
-        pattern: `${outputPath}/{chunk,worker}-*.js`,
+        pattern: `{chunk,worker}-*.js`,
         type: 'module',
         included: false,
         watched: false,
@@ -488,7 +491,7 @@ async function initializeApplication(
 
   if (options.styles?.length) {
     // Serve CSS outputs on page load, these are the global styles.
-    karmaOptions.files.push({ pattern: `${outputPath}/*.css`, type: 'css', watched: false });
+    karmaOptions.files.push({ pattern: `*.css`, type: 'css', watched: false });
   }
 
   const parsedKarmaConfig: Config & ConfigOptions = await karma.config.parseConfig(

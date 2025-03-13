@@ -20,7 +20,7 @@ export default async function () {
     throw new Error('ng test should have failed.');
   } catch (error) {
     assertIsError(error);
-    assert.match(error.message, /src\/app\/app\.component\.spec\.ts/);
+    assert.match(error.message, /\(src\/app\/app\.component\.spec\.ts:3:27/);
     assert.doesNotMatch(error.message, /_karma_webpack_/);
   }
 
