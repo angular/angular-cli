@@ -1,3 +1,15 @@
+<a name="18.2.15"></a>
+
+# 18.2.15 (2025-03-13)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description           |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------- |
+| [255c8a50d](https://github.com/angular/angular-cli/commit/255c8a50d2214747c8121e963afcd96cbff39293) | fix  | update babel packages |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="18.2.14"></a>
 
 # 18.2.14 (2025-01-29)
