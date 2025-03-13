@@ -28,7 +28,7 @@ import { JSONFile } from '../utility/json-file';
 import { latestVersions } from '../utility/latest-versions';
 import { isStandaloneApp } from '../utility/ng-ast-utils';
 import { relativePathToWorkspaceRoot } from '../utility/paths';
-import { targetBuildNotFoundError } from '../utility/project-targets';
+import { isUsingApplicationBuilder, targetBuildNotFoundError } from '../utility/project-targets';
 import { getMainFilePath } from '../utility/standalone/util';
 import { getWorkspace, updateWorkspace } from '../utility/workspace';
 import { Builders } from '../utility/workspace-models';
@@ -113,9 +113,7 @@ function updateConfigFileApplicationBuilder(options: ServerOptions): Rule {
       serverMainEntryName,
     );
 
-    if (options.serverRouting) {
-      buildTarget.options['outputMode'] = 'static';
-    }
+    buildTarget.options['outputMode'] = 'static';
   });
 }
 
@@ -173,13 +171,11 @@ export default function (options: ServerOptions): Rule {
       throw targetBuildNotFoundError();
     }
 
-    const isUsingApplicationBuilder =
-      clientBuildTarget.builder === Builders.Application ||
-      clientBuildTarget.builder === Builders.BuildApplication;
+    const usingApplicationBuilder = isUsingApplicationBuilder(clientProject);
 
     if (
       clientProject.targets.has('server') ||
-      (isUsingApplicationBuilder && clientBuildTarget.options?.server !== undefined)
+      (usingApplicationBuilder && clientBuildTarget.options?.server !== undefined)
     ) {
       // Server has already been added.
       return;
@@ -190,13 +186,10 @@ export default function (options: ServerOptions): Rule {
     const isStandalone = isStandaloneApp(host, browserEntryPoint);
     const sourceRoot = clientProject.sourceRoot ?? join(normalize(clientProject.root), 'src');
 
-    let filesUrl = `./files/${isUsingApplicationBuilder ? 'application-builder/' : 'server-builder/'}`;
+    let filesUrl = `./files/${usingApplicationBuilder ? 'application-builder/' : 'server-builder/'}`;
     filesUrl += isStandalone ? 'standalone-src' : 'ngmodule-src';
 
     const templateSource = apply(url(filesUrl), [
-      options.serverRouting
-        ? noop()
-        : filter((path) => !path.endsWith('app.routes.server.ts.template')),
       applyTemplates({
         ...strings,
         ...options,
@@ -210,7 +203,7 @@ export default function (options: ServerOptions): Rule {
 
     return chain([
       mergeWith(templateSource),
-      ...(isUsingApplicationBuilder
+      ...(usingApplicationBuilder
         ? [
             updateConfigFileApplicationBuilder(options),
             updateTsConfigFile(clientBuildOptions.tsConfig),

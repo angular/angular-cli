@@ -32,13 +32,11 @@ import {
 import { JSONFile } from '../utility/json-file';
 import { latestVersions } from '../utility/latest-versions';
 import { isStandaloneApp } from '../utility/ng-ast-utils';
-import { targetBuildNotFoundError } from '../utility/project-targets';
+import { isUsingApplicationBuilder, targetBuildNotFoundError } from '../utility/project-targets';
 import { getMainFilePath } from '../utility/standalone/util';
-import { ProjectDefinition, getWorkspace } from '../utility/workspace';
-import { Builders } from '../utility/workspace-models';
+import { getWorkspace } from '../utility/workspace';
 
 import { Schema as SSROptions } from './schema';
-import { isTTY } from './tty';
 
 const SERVE_SSR_TARGET_NAME = 'serve-ssr';
 const PRERENDER_TARGET_NAME = 'prerender';
@@ -202,8 +200,7 @@ function updateApplicationBuilderWorkspaceConfigRule(
     buildTarget.options = {
       ...buildTarget.options,
       outputPath,
-      outputMode: options.serverRouting ? 'server' : undefined,
-      prerender: options.serverRouting ? undefined : true,
+      outputMode: 'server',
       ssr: {
         entry: join(normalize(projectSourceRoot), 'server.ts'),
       },
@@ -336,46 +333,37 @@ function addServerFile(
     if (!project) {
       throw new SchematicsException(`Invalid project name (${projectName})`);
     }
-    const isUsingApplicationBuilder = usingApplicationBuilder(project);
-
-    const browserDistDirectory = isUsingApplicationBuilder
+    const usingApplicationBuilder = isUsingApplicationBuilder(project);
+    const browserDistDirectory = usingApplicationBuilder
       ? (await getApplicationBuilderOutputPaths(host, projectName)).browser
       : await getLegacyOutputPaths(host, projectName, 'build');
 
-    const applicationBuilderFiles =
-      'application-builder' + (options.serverRouting ? '' : '-common-engine');
-
     return mergeWith(
-      apply(
-        url(`./files/${isUsingApplicationBuilder ? applicationBuilderFiles : 'server-builder'}`),
-        [
-          applyTemplates({
-            ...strings,
-            ...options,
-            browserDistDirectory,
-            isStandalone,
-          }),
-          move(projectSourceRoot),
-        ],
-      ),
+      apply(url(`./files/${usingApplicationBuilder ? 'application-builder' : 'server-builder'}`), [
+        applyTemplates({
+          ...strings,
+          ...options,
+          browserDistDirectory,
+          isStandalone,
+        }),
+        move(projectSourceRoot),
+      ]),
     );
   };
 }
 
-export default function (inputOptions: SSROptions): Rule {
+export default function (options: SSROptions): Rule {
   return async (host, context) => {
-    const browserEntryPoint = await getMainFilePath(host, inputOptions.project);
+    const browserEntryPoint = await getMainFilePath(host, options.project);
     const isStandalone = isStandaloneApp(host, browserEntryPoint);
 
     const workspace = await getWorkspace(host);
-    const clientProject = workspace.projects.get(inputOptions.project);
+    const clientProject = workspace.projects.get(options.project);
     if (!clientProject) {
       throw targetBuildNotFoundError();
     }
 
-    const isUsingApplicationBuilder = usingApplicationBuilder(clientProject);
-    const serverRouting = await isServerRoutingEnabled(isUsingApplicationBuilder, inputOptions);
-    const options = { ...inputOptions, serverRouting };
+    const usingApplicationBuilder = isUsingApplicationBuilder(clientProject);
     const sourceRoot = clientProject.sourceRoot ?? posix.join(clientProject.root, 'src');
 
     return chain([
@@ -383,7 +371,7 @@ export default function (inputOptions: SSROptions): Rule {
         ...options,
         skipInstall: true,
       }),
-      ...(isUsingApplicationBuilder
+      ...(usingApplicationBuilder
         ? [
             updateApplicationBuilderWorkspaceConfigRule(sourceRoot, options, context),
             updateApplicationBuilderTsConfigRule(options),
@@ -393,73 +381,8 @@ export default function (inputOptions: SSROptions): Rule {
             updateWebpackBuilderWorkspaceConfigRule(sourceRoot, options),
           ]),
       addServerFile(sourceRoot, options, isStandalone),
-      addScriptsRule(options, isUsingApplicationBuilder),
-      addDependencies(options, isUsingApplicationBuilder),
+      addScriptsRule(options, usingApplicationBuilder),
+      addDependencies(options, usingApplicationBuilder),
     ]);
   };
-}
-
-function usingApplicationBuilder(project: ProjectDefinition) {
-  const buildBuilder = project.targets.get('build')?.builder;
-  const isUsingApplicationBuilder =
-    buildBuilder === Builders.Application || buildBuilder === Builders.BuildApplication;
-
-  return isUsingApplicationBuilder;
-}
-
-// Wrap inquirer in a `prompt` function.
-export type Prompt = (message: string, defaultValue: boolean) => Promise<boolean>;
-const defaultPrompter: Prompt = async (message, defaultValue) => {
-  const { confirm } = await import('@inquirer/prompts');
-
-  return await confirm({
-    message,
-    default: defaultValue,
-  });
-};
-
-// Allow the prompt functionality to be overridden to facilitate testing.
-let prompt = defaultPrompter;
-export function setPrompterForTestOnly(prompter?: Prompt): void {
-  prompt = prompter ?? defaultPrompter;
-}
-
-/** Returns whether or not server routing is enabled, potentially prompting the user if necessary. */
-async function isServerRoutingEnabled(
-  isUsingApplicationBuilder: boolean,
-  options: SSROptions,
-): Promise<boolean> {
-  if (!isUsingApplicationBuilder) {
-    if (options.serverRouting) {
-      throw new SchematicsException(
-        'Server routing APIs can only be added to a project using `application` builder.',
-      );
-    } else {
-      return false;
-    }
-  }
-
-  // Use explicit option if provided.
-  if (options.serverRouting !== undefined) {
-    return options.serverRouting;
-  }
-
-  const serverRoutingDefault = false;
-
-  // Use the default if not in an interactive terminal.
-  if (!isTTY()) {
-    return serverRoutingDefault;
-  }
-
-  // `inquirer` requires `async_hooks` which isn't supported by webcontainers, therefore we can't prompt in that context.
-  // See: https://github.com/SBoudrias/Inquirer.js/issues/1426
-  if (process.versions.webcontainer) {
-    return serverRoutingDefault;
-  }
-
-  // Prompt the user if in an interactive terminal and no option was provided.
-  return await prompt(
-    'Would you like to use the Server Routing and App Engine APIs (Developer Preview) for this server application?',
-    /* defaultValue */ serverRoutingDefault,
-  );
 }

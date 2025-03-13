@@ -10,12 +10,10 @@ import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/te
 
 import { join } from 'node:path';
 import { Schema as ServerOptions } from './schema';
-import { Prompt, setPrompterForTestOnly } from './index';
 
 describe('SSR Schematic', () => {
   const defaultOptions: ServerOptions = {
     project: 'test-app',
-    serverRouting: false,
   };
 
   const schematicRunner = new SchematicTestRunner(
@@ -32,10 +30,6 @@ describe('SSR Schematic', () => {
   };
 
   beforeEach(async () => {
-    setPrompterForTestOnly((message) => {
-      return fail(`Unmocked prompt: ${message}`) as never;
-    });
-
     appTree = await schematicRunner.runExternalSchematic(
       '@schematics/angular',
       'workspace',
@@ -163,90 +157,6 @@ describe('SSR Schematic', () => {
         server: 'node-server',
       });
     });
-
-    it('generates server routing configuration when enabled', async () => {
-      const tree = await schematicRunner.runSchematic(
-        'ssr',
-        { ...defaultOptions, serverRouting: true },
-        appTree,
-      );
-
-      expect(tree.exists('/projects/test-app/src/app/app.routes.server.ts')).toBeTrue();
-    });
-
-    it('does not generate server routing configuration when disabled', async () => {
-      const tree = await schematicRunner.runSchematic(
-        'ssr',
-        { ...defaultOptions, serverRouting: false },
-        appTree,
-      );
-
-      expect(tree.exists('/projects/test-app/src/app/app.routes.server.ts')).toBeFalse();
-    });
-
-    it('generates server routing configuration when prompt is accepted by the user', async () => {
-      const prompter = jasmine.createSpy<Prompt>('prompt').and.resolveTo(true);
-      setPrompterForTestOnly(prompter);
-
-      process.env['NG_FORCE_TTY'] = 'TRUE';
-      const tree = await schematicRunner.runSchematic(
-        'ssr',
-        { ...defaultOptions, serverRouting: undefined },
-        appTree,
-      );
-
-      expect(prompter).toHaveBeenCalledTimes(1);
-
-      expect(tree.exists('/projects/test-app/src/app/app.routes.server.ts')).toBeTrue();
-    });
-
-    it('does not generate server routing configuration when prompt is rejected by the user', async () => {
-      const prompter = jasmine.createSpy<Prompt>('prompt').and.resolveTo(false);
-      setPrompterForTestOnly(prompter);
-
-      process.env['NG_FORCE_TTY'] = 'TRUE';
-      const tree = await schematicRunner.runSchematic(
-        'ssr',
-        { ...defaultOptions, serverRouting: undefined },
-        appTree,
-      );
-
-      expect(prompter).toHaveBeenCalledTimes(1);
-
-      expect(tree.exists('/projects/test-app/src/app/app.routes.server.ts')).toBeFalse();
-    });
-
-    it('defaults to skipping server route generation when not in an interactive terminal', async () => {
-      const prompter = jasmine.createSpy<Prompt>('prompt').and.resolveTo(false);
-      setPrompterForTestOnly(prompter);
-
-      process.env['NG_FORCE_TTY'] = 'FALSE';
-      const tree = await schematicRunner.runSchematic(
-        'ssr',
-        { ...defaultOptions, serverRouting: undefined },
-        appTree,
-      );
-
-      expect(prompter).not.toHaveBeenCalled();
-
-      expect(tree.exists('/projects/test-app/src/app/app.routes.server.ts')).toBeFalse();
-    });
-
-    it('does not prompt when running in a web container', async () => {
-      const prompter = jasmine.createSpy<Prompt>('prompt').and.resolveTo(false);
-      setPrompterForTestOnly(prompter);
-
-      process.versions.webcontainer = 'abc123'; // Simulate webcontainer.
-      const tree = await schematicRunner.runSchematic(
-        'ssr',
-        { ...defaultOptions, serverRouting: undefined },
-        appTree,
-      );
-
-      expect(prompter).not.toHaveBeenCalled();
-
-      expect(tree.exists('/projects/test-app/src/app/app.routes.server.ts')).toBeFalse();
-    });
   });
 
   describe('Legacy browser builder', () => {
@@ -312,28 +222,6 @@ describe('SSR Schematic', () => {
 
       const content = tree.readContent('/projects/test-app/src/server.ts');
       expect(content).toContain(`const distFolder = join(process.cwd(), 'dist/test-app/browser');`);
-    });
-
-    it('throws an exception when used with `serverRouting`', async () => {
-      await expectAsync(
-        schematicRunner.runSchematic('ssr', { ...defaultOptions, serverRouting: true }, appTree),
-      ).toBeRejectedWithError(/Server routing APIs.*`application` builder/);
-    });
-
-    it('automatically disables `serverRouting` and does not prompt for it', async () => {
-      const prompter = jasmine.createSpy<Prompt>('prompt').and.resolveTo(false);
-      setPrompterForTestOnly(prompter);
-
-      process.env['NG_FORCE_TTY'] = 'TRUE';
-      const tree = await schematicRunner.runSchematic(
-        'ssr',
-        { ...defaultOptions, serverRouting: undefined },
-        appTree,
-      );
-
-      expect(prompter).not.toHaveBeenCalled();
-
-      expect(tree.exists('/projects/test-app/src/app/app.routes.server.ts')).toBeFalse();
     });
   });
 });

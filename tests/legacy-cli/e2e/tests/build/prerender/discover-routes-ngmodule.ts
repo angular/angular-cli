@@ -1,7 +1,7 @@
 import { join } from 'node:path';
 import { getGlobalVariable } from '../../../utils/env';
-import { expectFileToMatch, rimraf, writeFile } from '../../../utils/fs';
-import { installWorkspacePackages } from '../../../utils/packages';
+import { expectFileToMatch, writeFile } from '../../../utils/fs';
+import { installWorkspacePackages, uninstallPackage } from '../../../utils/packages';
 import { ng } from '../../../utils/process';
 import { updateJsonFile, useSha } from '../../../utils/project';
 
@@ -31,29 +31,15 @@ export default async function () {
   }
 
   // Forcibly remove in case another test doesn't clean itself up.
-  await rimraf('node_modules/@angular/ssr');
-  if (useWebpackBuilder) {
-    await ng(
-      'add',
-      '@angular/ssr',
-      '--project',
-      projectName,
-      '--skip-confirmation',
-      '--skip-install',
-      // Server routing is not supported on `browser` builder.
-      // '--server-routing',
-    );
-  } else {
-    await ng(
-      'add',
-      '@angular/ssr',
-      '--project',
-      projectName,
-      '--skip-confirmation',
-      '--skip-install',
-      '--server-routing',
-    );
-  }
+  await uninstallPackage('@angular/ssr');
+  await ng(
+    'add',
+    '@angular/ssr',
+    '--project',
+    projectName,
+    '--skip-confirmation',
+    '--skip-install',
+  );
 
   await useSha();
   await installWorkspacePackages();

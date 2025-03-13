@@ -19,7 +19,6 @@ describe('App Shell Schematic', () => {
   );
   const defaultOptions: AppShellOptions = {
     project: 'bar',
-    serverRouting: true,
   };
 
   const workspaceOptions: WorkspaceOptions = {

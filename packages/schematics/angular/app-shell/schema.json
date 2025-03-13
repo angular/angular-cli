@@ -12,11 +12,6 @@
       "$default": {
         "$source": "projectName"
       }
-    },
-    "serverRouting": {
-      "description": "Set up a server application using the Server Routing and App Engine APIs (Developer Preview).",
-      "type": "boolean",
-      "default": false
     }
   },
   "required": ["project"]
