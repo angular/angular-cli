@@ -119,10 +119,22 @@ async function transformDir(p) {
   }
 }
 
-function exec(cmd) {
+function exec(cmd, maxRetries = 2) {
   return new Promise((resolve, reject) => {
     childProcess.exec(cmd, { cwd: rootDir }, (error) => {
       if (error !== null) {
+        // Windows command spawned within WSL (which is untypical) seem to be flaky rarely.
+        // This logic tries to make it fully stable by re-trying if this surfaces:
+        // See: https://github.com/microsoft/WSL/issues/8677.
+        if (
+          maxRetries > 0 &&
+          error.stderr !== undefined &&
+          error.stderr.includes(`accept4 failed 110`)
+        ) {
+          resolve(exec(cmd, maxRetries - 1));
+          return;
+        }
+
         reject(error);
       } else {
         resolve();
