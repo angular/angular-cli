@@ -1,6 +1,7 @@
 .git
 dist
 node_modules
+packages/angular/build/node_modules
 packages/angular/cli/node_modules
 packages/angular/create/node_modules
 packages/angular/pwa/node_modules
