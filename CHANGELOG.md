@@ -1,3 +1,46 @@
+<a name="20.0.0-next.1"></a>
+
+# 20.0.0-next.1 (2025-03-13)
+
+## Breaking Changes
+
+### @angular/build
+
+- TypeScript versions less than 5.8 are no longer supported.
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                                   |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------- |
+| [03180fe03](https://github.com/angular/angular-cli/commit/03180fe0358662f8fd3255ad546994da3e3bda9c) | feat | use TypeScript module preserve option for new projects        |
+| [dc2f65999](https://github.com/angular/angular-cli/commit/dc2f65999a64453a26b61c96080b732fdc4147c8) | fix  | generate component templates with a `.ng.html` file extension |
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                            |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------- |
+| [2d03d8f11](https://github.com/angular/angular-cli/commit/2d03d8f11325cfba72b43f531e4bc27140d45caf) | fix  | record analytics for nested schematics |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                               |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------- |
+| [31c81e9c6](https://github.com/angular/angular-cli/commit/31c81e9c6859e68d00828b345d996d1aff431b25) | feat | drop support for TypeScript older than 5.8                |
+| [3c9172159](https://github.com/angular/angular-cli/commit/3c9172159c72f3c8ea116557ba5bf917a15d2f07) | feat | integrate Chrome automatic workspace folders              |
+| [f0dd60be1](https://github.com/angular/angular-cli/commit/f0dd60be1ec72d9c8674471965b11be83083a0f1) | fix  | exclude all entrypoints of a library from prebundling     |
+| [3e3516785](https://github.com/angular/angular-cli/commit/3e35167855b3eacb9f45948ef75e999956819490) | fix  | handle postcss compilation errors gracefully              |
+| [5bea3de4c](https://github.com/angular/angular-cli/commit/5bea3de4cb2ffa26ad04aced22be3ff11f519f92) | fix  | invalidate `com.chrome.devtools.json` if project is moved |
+| [b100c71cc](https://github.com/angular/angular-cli/commit/b100c71ccd39ff62203f16cbe543ba77b98bbe1d) | fix  | provide `extract-i18n` does not respect                   |
+| [beab546bf](https://github.com/angular/angular-cli/commit/beab546bf2680d568af12e51e948a100098ae3fd) | fix  | remove duplicate prebundling warning                      |
+
+### @angular/ssr
+
+| Commit                                                                                              | Type | Description                                                  |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------ |
+| [ee8466de5](https://github.com/angular/angular-cli/commit/ee8466de520c3db08579be376dbd2b98795f50a8) | fix  | prevent stream draining if `write` does not return a boolean |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="19.2.2"></a>
 
 # 19.2.2 (2025-03-12)
