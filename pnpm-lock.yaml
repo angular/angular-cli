@@ -92,12 +92,6 @@ importers:
       '@eslint/js':
         specifier: 9.22.0
         version: 9.22.0
-      '@inquirer/prompts':
-        specifier: 7.3.3
-        version: 7.3.3(@types/node@20.17.24)
-      '@listr2/prompt-adapter-inquirer':
-        specifier: 2.0.18
-        version: 2.0.18(@inquirer/prompts@7.3.3(@types/node@20.17.24))
       '@rollup/plugin-alias':
         specifier: ^5.1.1
         version: 5.1.1(rollup@4.35.0)
@@ -194,9 +188,6 @@ importers:
       '@web/test-runner':
         specifier: ^0.20.0
         version: 0.20.0
-      '@yarnpkg/lockfile':
-        specifier: 1.1.0
-        version: 1.1.0
       ajv:
         specifier: 8.17.1
         version: 8.17.1
@@ -263,9 +254,6 @@ importers:
       husky:
         specifier: 9.1.7
         version: 9.1.7
-      ini:
-        specifier: 5.0.0
-        version: 5.0.0
       istanbul-lib-instrument:
         specifier: 6.0.3
         version: 6.0.3
@@ -326,21 +314,12 @@ importers:
       npm:
         specifier: ^11.0.0
         version: 11.2.0
-      npm-package-arg:
-        specifier: 12.0.2
-        version: 12.0.2
-      npm-pick-manifest:
-        specifier: 10.0.0
-        version: 10.0.0
       open:
         specifier: 10.1.0
         version: 10.1.0
       ora:
         specifier: 5.4.1
         version: 5.4.1
-      pacote:
-        specifier: 20.0.0
-        version: 20.0.0
       parse5-html-rewriting-stream:
         specifier: 7.0.0
         version: 7.0.0
@@ -428,9 +407,6 @@ importers:
       watchpack:
         specifier: 2.4.2
         version: 2.4.2
-      yargs:
-        specifier: 17.7.2
-        version: 17.7.2
       yargs-parser:
         specifier: 21.1.1
         version: 21.1.1

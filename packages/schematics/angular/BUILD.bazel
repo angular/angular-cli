@@ -90,7 +90,6 @@ ts_project(
     deps = [
         ":node_modules/@angular-devkit/core",
         ":node_modules/@angular-devkit/schematics",
-        "//:node_modules/@inquirer/prompts",
         "//:node_modules/@types/node",
         "//:node_modules/browserslist",
         "//:node_modules/jsonc-parser",
