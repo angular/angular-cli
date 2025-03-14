@@ -202,7 +202,7 @@ importers:
         version: 0.2.0
       browser-sync:
         specifier: 3.0.3
-        version: 3.0.3(debug@4.4.0)
+        version: 3.0.3
       browserslist:
         specifier: ^4.21.5
         version: 4.24.4
@@ -212,9 +212,6 @@ importers:
       chokidar:
         specifier: 4.0.3
         version: 4.0.3
-      debug:
-        specifier: ^4.1.1
-        version: 4.4.0(supports-color@10.0.0)
       esbuild:
         specifier: 0.25.1
         version: 0.25.1
@@ -274,7 +271,7 @@ importers:
         version: 3.3.1
       karma:
         specifier: ~6.4.0
-        version: 6.4.4(debug@4.4.0)
+        version: 6.4.4
       karma-chrome-launcher:
         specifier: ~3.2.0
         version: 3.2.0
@@ -283,10 +280,10 @@ importers:
         version: 2.2.1
       karma-jasmine:
         specifier: ~5.1.0
-        version: 5.1.0(karma@6.4.4(debug@4.4.0))
+        version: 5.1.0(karma@6.4.4)
       karma-jasmine-html-reporter:
         specifier: ~2.1.0
-        version: 2.1.0(jasmine-core@5.6.0)(karma-jasmine@5.1.0(karma@6.4.4(debug@4.4.0)))(karma@6.4.4(debug@4.4.0))
+        version: 2.1.0(jasmine-core@5.6.0)(karma-jasmine@5.1.0(karma@6.4.4))(karma@6.4.4)
       karma-source-map-support:
         specifier: 1.4.0
         version: 1.4.0
@@ -817,7 +814,7 @@ importers:
         version: 7.4.2(webpack@5.98.0(esbuild@0.25.1))
       webpack-dev-server:
         specifier: 5.2.0
-        version: 5.2.0(debug@4.4.0)(webpack@5.98.0(esbuild@0.25.1))
+        version: 5.2.0(webpack@5.98.0(esbuild@0.25.1))
       webpack-merge:
         specifier: 6.0.1
         version: 6.0.1
@@ -856,7 +853,7 @@ importers:
         version: 5.98.0(esbuild@0.25.1)
       webpack-dev-server:
         specifier: 5.2.0
-        version: 5.2.0(debug@4.4.0)(webpack@5.98.0(esbuild@0.25.1))
+        version: 5.2.0(webpack@5.98.0(esbuild@0.25.1))
 
   packages/angular_devkit/core:
     dependencies:
@@ -11095,7 +11092,7 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  browser-sync@3.0.3(debug@4.4.0):
+  browser-sync@3.0.3:
     dependencies:
       browser-sync-client: 3.0.3
       browser-sync-ui: 3.0.3
@@ -12737,7 +12734,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  http-proxy-middleware@2.0.7(@types/express@4.17.21)(debug@4.4.0):
+  http-proxy-middleware@2.0.7(@types/express@4.17.21):
     dependencies:
       '@types/http-proxy': 1.17.16
       http-proxy: 1.18.1(debug@4.4.0)
@@ -13315,22 +13312,22 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  karma-jasmine-html-reporter@2.1.0(jasmine-core@5.6.0)(karma-jasmine@5.1.0(karma@6.4.4(debug@4.4.0)))(karma@6.4.4(debug@4.4.0)):
+  karma-jasmine-html-reporter@2.1.0(jasmine-core@5.6.0)(karma-jasmine@5.1.0(karma@6.4.4))(karma@6.4.4):
     dependencies:
       jasmine-core: 5.6.0
-      karma: 6.4.4(debug@4.4.0)
-      karma-jasmine: 5.1.0(karma@6.4.4(debug@4.4.0))
+      karma: 6.4.4
+      karma-jasmine: 5.1.0(karma@6.4.4)
 
-  karma-jasmine@5.1.0(karma@6.4.4(debug@4.4.0)):
+  karma-jasmine@5.1.0(karma@6.4.4):
     dependencies:
       jasmine-core: 4.6.1
-      karma: 6.4.4(debug@4.4.0)
+      karma: 6.4.4
 
   karma-source-map-support@1.4.0:
     dependencies:
       source-map-support: 0.5.21
 
-  karma@6.4.4(debug@4.4.0):
+  karma@6.4.4:
     dependencies:
       '@colors/colors': 1.5.0
       body-parser: 1.20.3
@@ -15857,7 +15854,7 @@ snapshots:
     optionalDependencies:
       webpack: 5.98.0(esbuild@0.25.1)
 
-  webpack-dev-server@5.2.0(debug@4.4.0)(webpack@5.98.0(esbuild@0.25.1)):
+  webpack-dev-server@5.2.0(webpack@5.98.0(esbuild@0.25.1)):
     dependencies:
       '@types/bonjour': 3.5.13
       '@types/connect-history-api-fallback': 1.5.4
@@ -15874,7 +15871,7 @@ snapshots:
       connect-history-api-fallback: 2.0.0
       express: 4.21.2
       graceful-fs: 4.2.11
-      http-proxy-middleware: 2.0.7(@types/express@4.17.21)(debug@4.4.0)
+      http-proxy-middleware: 2.0.7(@types/express@4.17.21)
       ipaddr.js: 2.2.0
       launch-editor: 2.10.0
       open: 10.1.0
