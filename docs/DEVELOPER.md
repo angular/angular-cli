@@ -89,8 +89,8 @@ You can find more info about debugging [tests with Bazel in the docs.](https://g
 ### End to end tests
 
 - For a complete list of test targets use the following Bazel query: `pnpm bazel query "tests(//tests/...)"`
-- Run a subset of the tests: `pnpm bazel test //tests/legacy-cli:e2e_node18 --config=e2e --test_filter="tests/i18n/ivy-localize-*"`
-- Use `bazel run` to debug failing tests debugging: `pnpm bazel run //tests/legacy-cli:e2e_node18 --config=e2e --test_arg="--glob=tests/basic/aot.ts"`
+- Run a subset of the tests: `pnpm bazel test //tests/legacy-cli:e2e_node22 --config=e2e --test_filter="tests/i18n/ivy-localize-*"`
+- Use `bazel run` to debug failing tests debugging: `JS_BINARY__PATCH_NODE_FS=0 pnpm bazel run //tests/legacy-cli:e2e_node22 --config=e2e --test_arg="--glob=tests/basic/aot.ts"`
 - Provide additional `e2e_runner` options using `--test_arg`: `--test_arg="--package-manager=yarn"`
 
 When running the debug commands, Node will stop and wait for a debugger to attach.
