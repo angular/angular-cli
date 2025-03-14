@@ -8,7 +8,7 @@
 
 import 'symbol-observable';
 // symbol polyfill must go first
-import { promises as fs } from 'node:fs';
+import { readFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import * as path from 'node:path';
 import { SemVer, major } from 'semver';
@@ -62,7 +62,7 @@ let forceExit = false;
     let localVersion = cli.VERSION?.full;
     if (!localVersion) {
       try {
-        const localPackageJson = await fs.readFile(
+        const localPackageJson = await readFile(
           path.join(path.dirname(projectLocalCli), '../../package.json'),
           'utf-8',
         );
