@@ -8,7 +8,7 @@
 
 import { json, logging } from '@angular-devkit/core';
 import { execFile } from 'node:child_process';
-import { promises as fs } from 'node:fs';
+import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { env } from 'node:process';
 import { colors } from '../utilities/color';

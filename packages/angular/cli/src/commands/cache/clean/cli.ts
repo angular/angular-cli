@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { promises as fs } from 'node:fs';
+import { rm } from 'node:fs/promises';
 import { Argv } from 'yargs';
 import {
   CommandModule,
@@ -28,7 +28,7 @@ export class CacheCleanModule extends CommandModule implements CommandModuleImpl
   run(): Promise<void> {
     const { path } = getCacheConfig(this.context.workspace);
 
-    return fs.rm(path, {
+    return rm(path, {
       force: true,
       recursive: true,
       maxRetries: 3,
