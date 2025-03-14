@@ -185,12 +185,6 @@ export default function (options: LibraryOptions): Rule {
         standalone: options.standalone,
         project: packageName,
       }),
-      schematic('service', {
-        name: options.name,
-        flat: true,
-        path: sourceDir,
-        project: packageName,
-      }),
       (_tree: Tree, context: SchematicContext) => {
         if (!options.skipPackageJson && !options.skipInstall) {
           context.addTask(new NodePackageInstallTask());
