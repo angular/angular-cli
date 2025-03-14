@@ -57,8 +57,6 @@ describe('Library Schematic', () => {
         '/projects/foo/src/my-index.ts',
         '/projects/foo/src/lib/foo.spec.ts',
         '/projects/foo/src/lib/foo.ts',
-        '/projects/foo/src/lib/foo.service.spec.ts',
-        '/projects/foo/src/lib/foo.service.ts',
       ]),
     );
   });
@@ -102,8 +100,6 @@ describe('Library Schematic', () => {
           '/some/other/directory/bar/src/my-index.ts',
           '/some/other/directory/bar/src/lib/foo.spec.ts',
           '/some/other/directory/bar/src/lib/foo.ts',
-          '/some/other/directory/bar/src/lib/foo.service.spec.ts',
-          '/some/other/directory/bar/src/lib/foo.service.ts',
         ]),
       );
     });
@@ -207,10 +203,8 @@ describe('Library Schematic', () => {
     const project = config.projects.pascalCasedName;
     expect(project).toBeDefined();
     expect(project.root).toEqual('projects/pascal-cased-name');
-    const svcContent = tree.readContent(
-      '/projects/pascal-cased-name/src/lib/pascal-cased-name.service.ts',
-    );
-    expect(svcContent).toMatch(/providedIn: 'root'/);
+    const svcContent = tree.readContent('/projects/pascal-cased-name/src/lib/pascal-cased-name.ts');
+    expect(svcContent).toContain('@Component');
   });
 
   describe(`update package.json`, () => {
@@ -320,7 +314,6 @@ describe('Library Schematic', () => {
 
     const pkgJsonPath = '/projects/myscope/mylib/package.json';
     expect(tree.files).toContain(pkgJsonPath);
-    expect(tree.files).toContain('/projects/myscope/mylib/src/lib/mylib.service.ts');
     expect(tree.files).toContain('/projects/myscope/mylib/src/lib/mylib.ts');
 
     const pkgJson = JSON.parse(tree.readContent(pkgJsonPath));
@@ -431,8 +424,6 @@ describe('Library Schematic', () => {
           '/projects/foo/src/lib/foo.module.ts',
           '/projects/foo/src/lib/foo.spec.ts',
           '/projects/foo/src/lib/foo.ts',
-          '/projects/foo/src/lib/foo.service.spec.ts',
-          '/projects/foo/src/lib/foo.service.ts',
         ]),
       );
     });
