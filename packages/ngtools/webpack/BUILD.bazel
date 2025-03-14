@@ -31,10 +31,10 @@ ts_project(
     ],
     module_name = "@ngtools/webpack",
     deps = [
+        ":node_modules/webpack",
         "//:node_modules/@angular/compiler-cli",
         "//:node_modules/@types/node",
         "//:node_modules/typescript",
-        "//:node_modules/webpack",
     ],
 )
 
@@ -61,6 +61,7 @@ jasmine_test(
     data = [
         ":webpack_test_lib",
         # Needed at runtime for runtime TS compilations performed by tests.
+        ":node_modules/webpack",
         "//:node_modules/tslib",
     ],
 )
