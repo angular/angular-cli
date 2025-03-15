@@ -153,7 +153,7 @@
     "postcss": "8.5.3",
     "prettier": "^3.0.0",
     "protractor": "~7.0.0",
-    "puppeteer": "18.2.1",
+    "puppeteer": "24.4.0",
     "quicktype-core": "23.0.171",
     "rollup": "4.35.0",
     "rollup-license-plugin": "~3.0.1",
