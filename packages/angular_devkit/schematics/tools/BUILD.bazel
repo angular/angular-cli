@@ -1,4 +1,4 @@
-load("//tools:defaults2.bzl", "jasmine_test", "ts_project")
+load("//tools:defaults.bzl", "jasmine_test", "ts_project")
 
 # Copyright Google Inc. All Rights Reserved.
 #
@@ -18,7 +18,6 @@ ts_project(
         ],
     ),
     data = ["package.json"],
-    module_name = "@angular-devkit/schematics/tools",
     deps = [
         "//:node_modules/@types/node",
         "//:node_modules/jsonc-parser",

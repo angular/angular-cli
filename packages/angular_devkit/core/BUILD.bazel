@@ -1,5 +1,5 @@
 load("@devinfra//bazel/api-golden:index_rjs.bzl", "api_golden_test_npm_package")
-load("//tools:defaults2.bzl", "jasmine_test", "npm_package", "ts_project")
+load("//tools:defaults.bzl", "jasmine_test", "npm_package", "ts_project")
 
 # Copyright Google Inc. All Rights Reserved.
 #
@@ -27,7 +27,6 @@ ts_project(
         ],
     ) + ["index.ts"],
     data = RUNTIME_ASSETS,
-    module_name = "@angular-devkit/core",
     deps = [
         "//:node_modules/@types/node",
         "//:node_modules/@types/picomatch",
