@@ -17,7 +17,7 @@ export async function libraryConsumptionSetup(): Promise<void> {
     export class MyLibComponent {}`,
     './src/app/app.ts': `
     import { Component } from '@angular/core';
-    import { MyLibService, MyLibComponent } from 'my-lib';
+    import { MyLibComponent } from 'my-lib';
 
     @Component({
       standalone: true,
@@ -28,8 +28,7 @@ export async function libraryConsumptionSetup(): Promise<void> {
     export class App {
       title = 'test-project';
 
-      constructor(myLibService: MyLibService) {
-        console.log(myLibService);
+      constructor() {
       }
     }
   `,

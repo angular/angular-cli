@@ -15,6 +15,9 @@ export default function (options: ServiceOptions): Rule {
   const flat = options.flat;
   options.flat = true;
 
+  // Schematic templates require a defined type value
+  options.type ??= '';
+
   return generateFromFiles(options, {
     'if-flat': (s: string) => (flat ? '' : s),
   });

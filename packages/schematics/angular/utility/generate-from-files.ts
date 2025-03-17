@@ -7,12 +7,14 @@
  */
 
 import {
+  FileOperator,
   Rule,
   Tree,
   apply,
   applyTemplates,
   chain,
   filter,
+  forEach,
   mergeWith,
   move,
   noop,
@@ -31,6 +33,7 @@ export interface GenerateFromFilesOptions {
   project: string;
   skipTests?: boolean;
   templateFilesDirectory?: string;
+  type?: string;
 }
 
 export function generateFromFiles(
@@ -56,6 +59,16 @@ export function generateFromFiles(
         ...options,
         ...extraTemplateValues,
       }),
+      !options.type
+        ? forEach(((file) => {
+            return file.path.includes('..')
+              ? {
+                  content: file.content,
+                  path: file.path.replace('..', '.'),
+                }
+              : file;
+          }) as FileOperator)
+        : noop(),
       move(parsedPath.path + (options.flat ? '' : '/' + strings.dasherize(options.name))),
     ]);
 
