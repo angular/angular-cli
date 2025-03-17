@@ -1,4 +1,4 @@
-load("//tools:interop.bzl", "ts_project")
+load("//tools:defaults.bzl", "ts_project")
 
 # files fetched on 2025-03-03 from
 # https://github.com/microsoft/TypeScript/releases/tag/v5.8.2

@@ -2,7 +2,7 @@ load("@aspect_rules_js//npm:defs.bzl", "npm_package")
 load("@devinfra//bazel/api-golden:index_rjs.bzl", "api_golden_test_npm_package")
 load("@npm2//:defs.bzl", "npm_link_all_packages")
 load("@rules_pkg//:pkg.bzl", "pkg_tar")
-load("//tools:defaults2.bzl", "ng_package", "ts_project")
+load("//tools:defaults.bzl", "ng_package", "ts_project")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -26,7 +26,6 @@ ts_project(
     data = [
         "//packages/angular/ssr/third_party/beasties:beasties_bundled",
     ],
-    module_name = "@angular/ssr",
     source_map = True,
     tsconfig = "//:build-tsconfig-esm",
     deps = [

@@ -1,6 +1,6 @@
 load("@aspect_bazel_lib//lib:directory_path.bzl", "directory_path")
 load("@npm2//:rollup/package_json.bzl", rollup = "bin")
-load("//tools:interop.bzl", "ts_project")
+load("//tools:defaults.bzl", "ts_project")
 load(":e2e.bzl", "e2e_suites")
 
 package(default_visibility = ["//visibility:public"])

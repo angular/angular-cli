@@ -3,7 +3,7 @@
 # Use of this source code is governed by an MIT-style license that can be
 # found in the LICENSE file at https://angular.dev/license
 
-load("//tools:defaults2.bzl", "jasmine_test", "ts_project")
+load("//tools:defaults.bzl", "jasmine_test", "ts_project")
 
 licenses(["notice"])
 
@@ -15,7 +15,6 @@ ts_project(
         include = ["**/*.ts"],
         exclude = ["**/*_spec.ts"],
     ),
-    module_name = "@angular-devkit/architect/node",
     deps = [
         "//:node_modules/@types/node",
         "//:node_modules/rxjs",

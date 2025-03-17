@@ -1,4 +1,4 @@
-load("//tools:interop.bzl", "ts_project")
+load("//tools:defaults.bzl", "ts_project")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -16,7 +16,6 @@ ts_project(
     ],
     # TODO: Fix strict_deps failure
     ignore_strict_deps = True,
-    module_name = "@angular/ssr/node",
     source_map = True,
     tsconfig = "//:build-tsconfig-esm",
     deps = [

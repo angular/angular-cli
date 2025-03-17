@@ -5,7 +5,7 @@
 
 load("@devinfra//bazel/api-golden:index_rjs.bzl", "api_golden_test_npm_package")
 load("@npm2//:defs.bzl", "npm_link_all_packages")
-load("//tools:defaults2.bzl", "jasmine_test", "npm_package", "ts_project")
+load("//tools:defaults.bzl", "jasmine_test", "npm_package", "ts_project")
 load("//tools:ts_json_schema.bzl", "ts_json_schema")
 
 package(default_visibility = ["//visibility:public"])
@@ -66,7 +66,6 @@ ts_project(
     ],
     # Ensure tests can execute the output JS, relying on schemas/JSON files.
     data = JSON_FILES,
-    module_name = "@angular-devkit/architect",
     deps = [
         ":node_modules/@angular-devkit/core",
         "//:node_modules/@types/node",

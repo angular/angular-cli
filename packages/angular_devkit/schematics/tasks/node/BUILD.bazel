@@ -1,4 +1,4 @@
-load("//tools:interop.bzl", "ts_project")
+load("//tools:defaults.bzl", "ts_project")
 
 # Copyright Google Inc. All Rights Reserved.
 #
@@ -16,7 +16,6 @@ ts_project(
             "**/*_spec.ts",
         ],
     ),
-    module_name = "@angular-devkit/schematics/tasks/node",
     deps = [
         "//:node_modules/@types/node",
         "//:node_modules/rxjs",

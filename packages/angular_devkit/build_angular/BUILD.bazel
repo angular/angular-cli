@@ -5,7 +5,7 @@
 
 load("@devinfra//bazel/api-golden:index_rjs.bzl", "api_golden_test_npm_package")
 load("@npm2//:defs.bzl", "npm_link_all_packages")
-load("//tools:defaults2.bzl", "copy_to_bin", "jasmine_test", "npm_package", "ts_project")
+load("//tools:defaults.bzl", "copy_to_bin", "jasmine_test", "npm_package", "ts_project")
 load("//tools:ts_json_schema.bzl", "ts_json_schema")
 
 licenses(["notice"])
@@ -127,7 +127,6 @@ ts_project(
         "//packages/angular_devkit/build_angular:src/builders/web-test-runner/schema.ts",
     ],
     data = RUNTIME_ASSETS,
-    module_name = "@angular-devkit/build-angular",
     deps = [
         ":node_modules/@angular-devkit/architect",
         ":node_modules/@angular-devkit/build-webpack",
@@ -394,9 +393,7 @@ LARGE_SPECS = {
             ":node_modules/@angular-devkit/architect",
             ":node_modules/@angular-devkit/core",
             ":node_modules/@angular-devkit/build-webpack",
-            "//modules/testing/builder",
-
-            # Base dependencies for the application in hello-world-app.
+            "//modules/testing/builder",  # Base dependencies for the application in hello-world-app.
             # Some tests also require extra dependencies.
             "//:node_modules/@angular/common",
             "//:node_modules/@angular/compiler",

@@ -1,5 +1,5 @@
 load("@devinfra//bazel/spec-bundling:index_rjs.bzl", "spec_bundle")
-load("//tools:defaults2.bzl", "jasmine_test", "ts_project")
+load("//tools:defaults.bzl", "jasmine_test", "ts_project")
 
 ts_project(
     name = "unit_test_lib",

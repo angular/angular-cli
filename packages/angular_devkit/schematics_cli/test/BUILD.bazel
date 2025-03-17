@@ -1,5 +1,5 @@
 load("@aspect_rules_js//npm:defs.bzl", "npm_link_package")
-load("//tools:defaults2.bzl", "jasmine_test", "ts_project")
+load("//tools:defaults.bzl", "jasmine_test", "ts_project")
 
 ts_project(
     name = "schematics_cli_test_lib",
