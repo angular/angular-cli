@@ -32,6 +32,9 @@
     "rxjs": "7.8.2",
     "source-map": "0.7.4"
   },
+  "devDependencies": {
+    "chokidar": "4.0.3"
+  },
   "peerDependencies": {
     "chokidar": "^4.0.0"
   },

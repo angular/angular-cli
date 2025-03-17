@@ -21,10 +21,10 @@ ts_project(
     module_name = "@angular-devkit/schematics/tools",
     deps = [
         "//:node_modules/@types/node",
-        "//:node_modules/jsonc-parser",
         "//:node_modules/rxjs",
         "//packages/angular_devkit/schematics",
         "//packages/angular_devkit/schematics:node_modules/@angular-devkit/core",
+        "//packages/angular_devkit/schematics:node_modules/jsonc-parser",
         "//packages/angular_devkit/schematics/tasks",
         "//packages/angular_devkit/schematics/tasks/node",
     ],

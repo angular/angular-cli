@@ -90,9 +90,9 @@ ts_project(
     deps = [
         ":node_modules/@angular-devkit/core",
         ":node_modules/@angular-devkit/schematics",
+        ":node_modules/jsonc-parser",
         "//:node_modules/@types/node",
         "//:node_modules/browserslist",
-        "//:node_modules/jsonc-parser",
         "//packages/schematics/angular/third_party/github.com/Microsoft/TypeScript",
     ],
 )
@@ -123,9 +123,9 @@ ts_project(
         ":angular",
         ":node_modules/@angular-devkit/core",
         ":node_modules/@angular-devkit/schematics",
+        ":node_modules/jsonc-parser",
         "//:node_modules/@types/jasmine",
         "//:node_modules/@types/node",
-        "//:node_modules/jsonc-parser",
         "//packages/schematics/angular/third_party/github.com/Microsoft/TypeScript",
     ],
 )

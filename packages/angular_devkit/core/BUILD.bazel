@@ -1,4 +1,5 @@
 load("@devinfra//bazel/api-golden:index_rjs.bzl", "api_golden_test_npm_package")
+load("@npm2//:defs.bzl", "npm_link_all_packages")
 load("//tools:defaults2.bzl", "jasmine_test", "npm_package", "ts_project")
 
 # Copyright Google Inc. All Rights Reserved.
@@ -8,6 +9,8 @@ load("//tools:defaults2.bzl", "jasmine_test", "npm_package", "ts_project")
 package(default_visibility = ["//visibility:public"])
 
 licenses(["notice"])
+
+npm_link_all_packages()
 
 RUNTIME_ASSETS = glob(
     include = ["**/*.json"],
@@ -29,19 +32,15 @@ ts_project(
     data = RUNTIME_ASSETS,
     module_name = "@angular-devkit/core",
     deps = [
+        ":node_modules/ajv",
+        ":node_modules/ajv-formats",
+        ":node_modules/jsonc-parser",
+        ":node_modules/picomatch",
+        ":node_modules/source-map",
+        "//:node_modules/@types/jasmine",
         "//:node_modules/@types/node",
         "//:node_modules/@types/picomatch",
-        "//:node_modules/@types/jasmine",
-        "//:node_modules/ajv",
-        "//:node_modules/ajv-formats",
-        "//:node_modules/jsonc-parser",
-        "//:node_modules/picomatch",
         "//:node_modules/rxjs",
-        "//:node_modules/source-map",
-        # @node_module: typescript:es2015.proxy
-        # @node_module: typescript:es2015.reflect
-        # @node_module: typescript:es2015.symbol.wellknown
-        # @typings: source_map
     ],
 )
 
