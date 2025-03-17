@@ -28,8 +28,8 @@ ts_project(
     module_name = "@angular-devkit/schematics",
     deps = [
         ":node_modules/@angular-devkit/core",
+        ":node_modules/jsonc-parser",
         "//:node_modules/@types/node",
-        "//:node_modules/jsonc-parser",
         "//:node_modules/magic-string",
         "//:node_modules/rxjs",
     ],
