@@ -46,15 +46,15 @@ describe('Service Schematic', () => {
 
     const tree = await schematicRunner.runSchematic('service', options, appTree);
     const files = tree.files;
-    expect(files).toContain('/projects/bar/src/app/foo/foo.service.spec.ts');
-    expect(files).toContain('/projects/bar/src/app/foo/foo.service.ts');
+    expect(files).toContain('/projects/bar/src/app/foo/foo.spec.ts');
+    expect(files).toContain('/projects/bar/src/app/foo/foo.ts');
   });
 
   it('service should be tree-shakeable', async () => {
     const options = { ...defaultOptions };
 
     const tree = await schematicRunner.runSchematic('service', options, appTree);
-    const content = tree.readContent('/projects/bar/src/app/foo/foo.service.ts');
+    const content = tree.readContent('/projects/bar/src/app/foo/foo.ts');
     expect(content).toMatch(/providedIn: 'root'/);
   });
 
@@ -63,8 +63,8 @@ describe('Service Schematic', () => {
 
     const tree = await schematicRunner.runSchematic('service', options, appTree);
     const files = tree.files;
-    expect(files).toContain('/projects/bar/src/app/foo/foo.service.ts');
-    expect(files).not.toContain('/projects/bar/src/app/foo/foo.service.spec.ts');
+    expect(files).toContain('/projects/bar/src/app/foo/foo.ts');
+    expect(files).not.toContain('/projects/bar/src/app/foo/foo.spec.ts');
   });
 
   it('should respect the sourceRoot value', async () => {
@@ -72,6 +72,24 @@ describe('Service Schematic', () => {
     config.projects.bar.sourceRoot = 'projects/bar/custom';
     appTree.overwrite('/angular.json', JSON.stringify(config, null, 2));
     appTree = await schematicRunner.runSchematic('service', defaultOptions, appTree);
-    expect(appTree.files).toContain('/projects/bar/custom/app/foo/foo.service.ts');
+    expect(appTree.files).toContain('/projects/bar/custom/app/foo/foo.ts');
+  });
+
+  it('should respect the type option', async () => {
+    const options = { ...defaultOptions, type: 'Service' };
+    const tree = await schematicRunner.runSchematic('service', options, appTree);
+    const content = tree.readContent('/projects/bar/src/app/foo/foo.service.ts');
+    const testContent = tree.readContent('/projects/bar/src/app/foo/foo.service.spec.ts');
+    expect(content).toContain('export class FooService');
+    expect(testContent).toContain("describe('FooService'");
+  });
+
+  it('should allow empty string in the type option', async () => {
+    const options = { ...defaultOptions, type: '' };
+    const tree = await schematicRunner.runSchematic('service', options, appTree);
+    const content = tree.readContent('/projects/bar/src/app/foo/foo.ts');
+    const testContent = tree.readContent('/projects/bar/src/app/foo/foo.spec.ts');
+    expect(content).toContain('export class Foo');
+    expect(testContent).toContain("describe('Foo'");
   });
 });
