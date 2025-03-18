@@ -1,5 +1,15 @@
 {
   "schematics": {
+    "replace-provide-server-rendering-import": {
+      "version": "20.0.0",
+      "factory": "./replace-provide-server-rendering-import/migration",
+      "description": "Migrate imports of 'provideServerRendering' from '@angular/platform-server' to '@angular/ssr'."
+    },
+    "replace-provide-server-routing": {
+      "version": "20.0.0",
+      "factory": "./replace-provide-server-routing/migration",
+      "description": "Migrate 'provideServerRendering' to use 'withRoutes' and remove 'provideServerRouting' from '@angular/ssr'."
+    },
     "use-application-builder": {
       "version": "20.0.0",
       "factory": "./use-application-builder/migration",
