@@ -257,10 +257,8 @@ Promise.all([findFreePort(), findFreePort(), findPackageTars()])
         console.log(`Current Directory: ${process.cwd()}`);
         console.log('Will loop forever while you debug... CTRL-C to quit.');
 
-        /* eslint-disable no-constant-condition */
-        while (1) {
-          // That's right!
-        }
+        // Wait forever until user explicitly cancels.
+        await new Promise(() => {});
       }
 
       process.exitCode = 1;
