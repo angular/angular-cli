@@ -23,9 +23,7 @@ describe(`Migration to use the 'provideServerRendering' from '@angular/ssr'`, ()
     tree.create(
       '/package.json',
       JSON.stringify({
-        dependencies: {
-          '@angular/ssr': '0.0.0',
-        },
+        dependencies: {},
       }),
     );
   });
@@ -71,5 +69,23 @@ describe(`Migration to use the 'provideServerRendering' from '@angular/ssr'`, ()
       "import { provideServerRendering, provideServerRouting } from '@angular/ssr';",
     );
     expect(content.match(/@angular\/ssr/g) || []).toHaveSize(1);
+  });
+
+  it(`should add '@angular/ssr' when import has been changed`, async () => {
+    tree.create('test.ts', `import { provideServerRendering } from '@angular/platform-server';`);
+    const newTree = await schematicRunner.runSchematic(schematicName, {}, tree);
+    const { dependencies } = newTree.readJson('package.json') as {
+      dependencies: Record<string, string>;
+    };
+    expect(dependencies['@angular/ssr']).toBeDefined();
+  });
+
+  it(`should not add '@angular/ssr' dependency if no imports have been updated`, async () => {
+    tree.create('test.ts', `import { provideClientHydration } from '@angular/platform-browser';`);
+    const newTree = await schematicRunner.runSchematic(schematicName, {}, tree);
+    const { dependencies } = newTree.readJson('package.json') as {
+      dependencies: Record<string, string>;
+    };
+    expect(dependencies['@angular/ssr']).toBeUndefined();
   });
 });
