@@ -14,11 +14,10 @@ import {
   provideExperimentalZonelessChangeDetection,
 } from '@angular/core';
 import { bootstrapApplication } from '@angular/platform-browser';
-import { provideServerRendering } from '@angular/platform-server';
 import { RouterOutlet, Routes, provideRouter } from '@angular/router';
 import { destroyAngularServerApp } from '../src/app';
 import { ServerAsset, setAngularAppManifest } from '../src/manifest';
-import { ServerRoute, provideServerRouting } from '../src/routes/route-config';
+import { ServerRoute, provideServerRendering, withRoutes } from '../src/routes/route-config';
 
 @Component({
   standalone: true,
@@ -94,10 +93,9 @@ export function setAngularAppTestingManifest(
     bootstrap: async () => () => {
       return bootstrapApplication(rootComponent, {
         providers: [
-          provideServerRendering(),
           provideExperimentalZonelessChangeDetection(),
           provideRouter(routes),
-          provideServerRouting(serverRoutes),
+          provideServerRendering(withRoutes(serverRoutes)),
           ...extraProviders,
         ],
       });

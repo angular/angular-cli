@@ -300,12 +300,12 @@ function addServerRoutingConfig(options: AppShellOptions, isStandalone: boolean)
       /** max */ undefined,
       /** recursive */ true,
     ).find(
-      (n) => ts.isIdentifier(n.expression) && n.expression.getText() === 'provideServerRouting',
+      (n) => ts.isIdentifier(n.expression) && n.expression.getText() === 'provideServerRendering',
     );
 
     if (!functionCall) {
       throw new SchematicsException(
-        `Cannot find the "provideServerRouting" function call in "${configFilePath}".`,
+        `Cannot find the "provideServerRendering" function call in "${configFilePath}".`,
       );
     }
 
