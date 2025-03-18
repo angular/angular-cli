@@ -13,7 +13,6 @@ ts_project(
         "//:node_modules/@angular/compiler",
         "//:node_modules/@angular/core",
         "//:node_modules/@angular/platform-browser",
-        "//:node_modules/@angular/platform-server",
         "//:node_modules/@angular/router",
         "//:node_modules/@types/node",
         "//packages/angular/ssr",

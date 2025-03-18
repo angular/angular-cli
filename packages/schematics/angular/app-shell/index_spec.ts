@@ -123,11 +123,11 @@ describe('App Shell Schematic', () => {
       expect(content).toMatch(/app-shell/);
     });
 
-    it(`should update the 'provideServerRouting' call to include 'withAppShell'`, async () => {
+    it(`should update the 'provideServerRendering' call to include 'withAppShell'`, async () => {
       const tree = await schematicRunner.runSchematic('app-shell', defaultOptions, appTree);
       const content = tree.readContent('/projects/bar/src/app/app.config.server.ts');
       expect(tags.oneLine`${content}`).toContain(
-        tags.oneLine`provideServerRouting(serverRoutes, withAppShell(AppShell))`,
+        tags.oneLine`provideServerRendering(withRoutes(serverRoutes), withAppShell(AppShell))`,
       );
     });
 

@@ -24,12 +24,6 @@ const CRITTERS_ACTUAL_LICENSE_FILE_PATH = join(
   'third_party/beasties/THIRD_PARTY_LICENSES.txt',
 );
 
-/**
- * Path to the golden reference license file for the Beasties library.
- * This file is used as a reference for comparison and is located in the same directory as this script.
- */
-const CRITTERS_GOLDEN_LICENSE_FILE_PATH = join(__dirname, 'THIRD_PARTY_LICENSES.txt.golden');
-
 describe('NPM Package Tests', () => {
   it('should not include the contents of third_party/beasties/index.js in the FESM bundle', async () => {
     const fesmFilePath = join(ANGULAR_SSR_PACKAGE_PATH, 'fesm2022/ssr.mjs');
