@@ -36,8 +36,8 @@ ts_project(
     deps = [
         ":node_modules/@angular-devkit/schematics",
         ":node_modules/@schematics/angular",
+        ":node_modules/parse5-html-rewriting-stream",
         "//:node_modules/@types/node",
-        "//:node_modules/parse5-html-rewriting-stream",
     ],
 )
 

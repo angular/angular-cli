@@ -14,9 +14,6 @@ importers:
 
   .:
     devDependencies:
-      '@ampproject/remapping':
-        specifier: 2.3.0
-        version: 2.3.0
       '@angular/animations':
         specifier: 20.0.0-next.2
         version: 20.0.0-next.2(@angular/core@20.0.0-next.2)
@@ -278,27 +275,12 @@ importers:
       karma-source-map-support:
         specifier: 1.4.0
         version: 1.4.0
-      less:
-        specifier: 4.2.2
-        version: 4.2.2
       listr2:
         specifier: 8.2.5
         version: 8.2.5
-      lmdb:
-        specifier: 3.2.6
-        version: 3.2.6
       lodash:
         specifier: ^4.17.21
         version: 4.17.21
-      magic-string:
-        specifier: 0.30.17
-        version: 0.30.17
-      mrmime:
-        specifier: 2.0.1
-        version: 2.0.1
-      ng-packagr:
-        specifier: 20.0.0-next.1
-        version: 20.0.0-next.1(@angular/compiler-cli@20.0.0-next.2(@angular/compiler@20.0.0-next.2)(typescript@5.8.2))(tslib@2.8.1)(typescript@5.8.2)
       npm:
         specifier: ^11.0.0
         version: 11.2.0
@@ -308,15 +290,6 @@ importers:
       ora:
         specifier: 5.4.1
         version: 5.4.1
-      parse5-html-rewriting-stream:
-        specifier: 7.0.0
-        version: 7.0.0
-      piscina:
-        specifier: 4.9.0
-        version: 4.9.0
-      postcss:
-        specifier: 8.5.3
-        version: 8.5.3
       prettier:
         specifier: ^3.0.0
         version: 3.5.3
@@ -341,9 +314,6 @@ importers:
       rxjs:
         specifier: 7.8.2
         version: 7.8.2
-      sass:
-        specifier: 1.85.1
-        version: 1.85.1
       semver:
         specifier: 7.7.1
         version: 7.7.1
@@ -359,9 +329,6 @@ importers:
       tar:
         specifier: ^7.0.0
         version: 7.4.3
-      tinyglobby:
-        specifier: 0.2.12
-        version: 0.2.12
       tree-kill:
         specifier: 1.2.2
         version: 1.2.2
@@ -386,9 +353,6 @@ importers:
       verdaccio-auth-memory:
         specifier: ^10.0.0
         version: 10.2.2
-      watchpack:
-        specifier: 2.4.2
-        version: 2.4.2
       yargs-parser:
         specifier: 21.1.1
         version: 21.1.1
@@ -510,6 +474,15 @@ importers:
       '@angular/ssr':
         specifier: workspace:*
         version: link:../ssr
+      less:
+        specifier: 4.2.2
+        version: 4.2.2
+      ng-packagr:
+        specifier: 20.0.0-next.1
+        version: 20.0.0-next.1(@angular/compiler-cli@20.0.0-next.2(@angular/compiler@20.0.0-next.2)(typescript@5.8.2))(tslib@2.8.1)(typescript@5.8.2)
+      postcss:
+        specifier: 8.5.3
+        version: 8.5.3
 
   packages/angular/cli:
     dependencies:
@@ -817,6 +790,9 @@ importers:
       '@angular/ssr':
         specifier: workspace:*
         version: link:../../angular/ssr
+      ng-packagr:
+        specifier: 20.0.0-next.1
+        version: 20.0.0-next.1(@angular/compiler-cli@20.0.0-next.2(@angular/compiler@20.0.0-next.2)(typescript@5.8.2))(tslib@2.8.1)(typescript@5.8.2)
       undici:
         specifier: 7.5.0
         version: 7.5.0
@@ -11636,7 +11612,8 @@ snapshots:
   detect-libc@1.0.3:
     optional: true
 
-  detect-libc@2.0.3: {}
+  detect-libc@2.0.3:
+    optional: true
 
   detect-node@2.1.0: {}
 
@@ -13457,6 +13434,7 @@ snapshots:
       '@lmdb/lmdb-linux-arm64': 3.2.6
       '@lmdb/lmdb-linux-x64': 3.2.6
       '@lmdb/lmdb-win32-x64': 3.2.6
+    optional: true
 
   loader-runner@4.3.0: {}
 
@@ -13737,6 +13715,7 @@ snapshots:
   msgpackr@1.11.2:
     optionalDependencies:
       msgpackr-extract: 3.0.3
+    optional: true
 
   multicast-dns@7.2.5:
     dependencies:
@@ -13799,7 +13778,8 @@ snapshots:
 
   nice-try@1.0.5: {}
 
-  node-addon-api@6.1.0: {}
+  node-addon-api@6.1.0:
+    optional: true
 
   node-addon-api@7.1.1:
     optional: true
@@ -13831,6 +13811,7 @@ snapshots:
   node-gyp-build-optional-packages@5.2.2:
     dependencies:
       detect-libc: 2.0.3
+    optional: true
 
   node-gyp@11.1.0:
     dependencies:
@@ -14017,7 +13998,8 @@ snapshots:
       strip-ansi: 6.0.1
       wcwidth: 1.0.1
 
-  ordered-binary@1.5.3: {}
+  ordered-binary@1.5.3:
+    optional: true
 
   os-tmpdir@1.0.2: {}
 
@@ -15773,7 +15755,8 @@ snapshots:
     dependencies:
       defaults: 1.0.4
 
-  weak-lru-cache@1.2.2: {}
+  weak-lru-cache@1.2.2:
+    optional: true
 
   web-streams-polyfill@3.3.3: {}
 

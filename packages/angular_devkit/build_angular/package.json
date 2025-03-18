@@ -66,8 +66,9 @@
     "esbuild": "0.25.1"
   },
   "devDependencies": {
-    "undici": "7.5.0",
-    "@angular/ssr": "workspace:*"
+    "@angular/ssr": "workspace:*",
+    "ng-packagr": "20.0.0-next.1",
+    "undici": "7.5.0"
   },
   "peerDependencies": {
     "@angular/compiler-cli": "0.0.0-ANGULAR-FW-PEER-DEP",
