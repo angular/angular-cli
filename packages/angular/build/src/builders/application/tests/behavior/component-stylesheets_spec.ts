@@ -45,7 +45,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       harness.expectFile('dist/browser/main.js').content.not.toContain('variables');
     });
 
-    it('should generater an error for a missing stylesheet with AOT', async () => {
+    it('should generate an error for a missing stylesheet with AOT', async () => {
       await harness.modifyFile('src/app/app.component.ts', (content) => {
         return content.replace('./app.component.css', './not-present.css');
       });
@@ -64,7 +64,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       );
     });
 
-    it('should generater an error for a missing stylesheet with JIT', async () => {
+    it('should generate an error for a missing stylesheet with JIT', async () => {
       await harness.modifyFile('src/app/app.component.ts', (content) => {
         return content.replace('./app.component.css', './not-present.css');
       });
