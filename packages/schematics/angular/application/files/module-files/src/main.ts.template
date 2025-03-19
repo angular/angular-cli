@@ -1,8 +1,8 @@
 <% if(!!viewEncapsulation) { %>import { ViewEncapsulation } from '@angular/core';
-<% }%>import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+<% }%>import { platformBrowser } from '@angular/platform-browser';
 import { AppModule } from './app/app.module';
 
-platformBrowserDynamic().bootstrapModule(AppModule, {
+platformBrowser().bootstrapModule(AppModule, {
   <% if(!experimentalZoneless) { %>ngZoneEventCoalescing: true,<% } %><% if(!!viewEncapsulation) { %>
   defaultEncapsulation: ViewEncapsulation.<%= viewEncapsulation %><% } %>
 })
