@@ -295,7 +295,7 @@ export async function normalizeOptions(
     };
   }
 
-  const outputPath = options.outputPath;
+  const outputPath = options.outputPath ?? path.join(workspaceRoot, 'dist', projectName);
   const outputOptions: NormalizedOutputOptions = {
     browser: 'browser',
     server: 'server',
