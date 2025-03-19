@@ -15,7 +15,6 @@
     "@angular/core": "<%= latestVersions.Angular %>",
     "@angular/forms": "<%= latestVersions.Angular %>",
     "@angular/platform-browser": "<%= latestVersions.Angular %>",
-    "@angular/platform-browser-dynamic": "<%= latestVersions.Angular %>",
     "@angular/router": "<%= latestVersions.Angular %>",
     "rxjs": "<%= latestVersions['rxjs'] %>",
     "tslib": "<%= latestVersions['tslib'] %>",

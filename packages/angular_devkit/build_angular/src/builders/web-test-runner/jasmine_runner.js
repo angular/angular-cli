@@ -7,10 +7,7 @@
  */
 
 import { getTestBed } from '@angular/core/testing';
-import {
-  BrowserDynamicTestingModule,
-  platformBrowserDynamicTesting,
-} from '@angular/platform-browser-dynamic/testing';
+import { BrowserTestingModule, platformBrowserTesting } from '@angular/platform-browser/testing';
 import {
   getConfig,
   sessionFailed,
@@ -67,7 +64,7 @@ export async function runJasmineTests(jasmineEnv) {
   jasmine.DEFAULT_TIMEOUT_INTERVAL = config.defaultTimeoutInterval;
 
   // Initialize `TestBed` automatically for users. This assumes we already evaluated `zone.js/testing`.
-  getTestBed().initTestEnvironment(BrowserDynamicTestingModule, platformBrowserDynamicTesting(), {
+  getTestBed().initTestEnvironment(BrowserTestingModule, platformBrowserTesting(), {
     errorOnUnknownElements: true,
     errorOnUnknownProperties: true,
   });

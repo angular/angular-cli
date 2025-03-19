@@ -36,9 +36,9 @@ describe('Browser Builder Web Worker support', () => {
       });
     `,
     'src/main.ts': `
-      import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+      import { platformBrowser } from '@angular/platform-browser';
       import { AppModule } from './app/app.module';
-      platformBrowserDynamic().bootstrapModule(AppModule).catch(err => console.error(err));
+      platformBrowser().bootstrapModule(AppModule).catch(err => console.error(err));
 
       const worker = new Worker(new URL('./app/app.worker', import.meta.url), { type: 'module' });
       worker.onmessage = ({ data }) => {

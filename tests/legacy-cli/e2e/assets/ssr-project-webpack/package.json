@@ -20,7 +20,6 @@
     "@angular/core": "^20.0.0-next.0",
     "@angular/forms": "^20.0.0-next.0",
     "@angular/platform-browser": "^20.0.0-next.0",
-    "@angular/platform-browser-dynamic": "^20.0.0-next.0",
     "@angular/platform-server": "^20.0.0-next.0",
     "@angular/router": "^20.0.0-next.0",
     "@angular/ssr": "^20.0.0-next.0",
