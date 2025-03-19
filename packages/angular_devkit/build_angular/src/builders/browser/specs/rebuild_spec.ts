@@ -55,10 +55,10 @@ describe('Browser Builder rebuilds', () => {
         export let X = '$$_E2E_GOLDEN_VALUE_2';
       `,
       'src/main.ts': `
-        import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+        import { platformBrowser } from '@angular/platform-browser';
         import { AppModule } from './app/app.module';
 
-        platformBrowserDynamic().bootstrapModule(AppModule);
+        platformBrowser().bootstrapModule(AppModule);
 
         import * as m from './app/app.module';
         console.log(m.X);

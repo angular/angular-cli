@@ -91,11 +91,11 @@ describe('AppShell Builder', () => {
       export class AppServerModule {}
     `,
     'src/main.ts': `
-      import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+      import { platformBrowser } from '@angular/platform-browser';
       import { AppModule } from './app/app.module';
 
       document.addEventListener('DOMContentLoaded', () => {
-        platformBrowserDynamic().bootstrapModule(AppModule)
+        platformBrowser().bootstrapModule(AppModule)
         .catch(err => console.log(err));
       });
     `,

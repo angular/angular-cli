@@ -402,7 +402,6 @@ LARGE_SPECS = {
             "//:node_modules/@angular/compiler-cli",
             "//:node_modules/@angular/core",
             "//:node_modules/@angular/platform-browser",
-            "//:node_modules/@angular/platform-browser-dynamic",
             "//:node_modules/@angular/router",
             "//:node_modules/rxjs",
             "//:node_modules/tslib",

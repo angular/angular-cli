@@ -69,10 +69,10 @@ const appShellRouteFiles: Record<string, string> = {
     export class AppServerModule {}
   `,
   'src/main.ts': `
-    import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+    import { platformBrowser } from '@angular/platform-browser';
     import { AppModule } from './app/app.module';
 
-    platformBrowserDynamic().bootstrapModule(AppModule).catch(err => console.log(err));
+    platformBrowser().bootstrapModule(AppModule).catch(err => console.log(err));
   `,
   'src/app/app-routing.module.ts': `
     import { NgModule } from '@angular/core';

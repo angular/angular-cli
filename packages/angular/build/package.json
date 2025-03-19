@@ -60,6 +60,7 @@
     "@angular/compiler": "0.0.0-ANGULAR-FW-PEER-DEP",
     "@angular/compiler-cli": "0.0.0-ANGULAR-FW-PEER-DEP",
     "@angular/localize": "0.0.0-ANGULAR-FW-PEER-DEP",
+    "@angular/platform-browser": "0.0.0-ANGULAR-FW-PEER-DEP",
     "@angular/platform-server": "0.0.0-ANGULAR-FW-PEER-DEP",
     "@angular/service-worker": "0.0.0-ANGULAR-FW-PEER-DEP",
     "@angular/ssr": "^0.0.0-PLACEHOLDER",
@@ -72,6 +73,9 @@
   },
   "peerDependenciesMeta": {
     "@angular/localize": {
+      "optional": true
+    },
+    "@angular/platform-browser": {
       "optional": true
     },
     "@angular/platform-server": {

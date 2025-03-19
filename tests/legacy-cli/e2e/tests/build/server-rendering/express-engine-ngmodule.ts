@@ -69,11 +69,11 @@ export default async function () {
     'projects/test-project-two/src/app/app.css': `div { color: #000 }`,
     'projects/test-project-two/src/styles.css': `* { color: #000 }`,
     'projects/test-project-two/src/main.ts': `
-      import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+      import { platformBrowser } from '@angular/platform-browser';
       import { AppModule } from './app/app.module';
 
       (window as any)['doBootstrap'] = () => {
-        platformBrowserDynamic()
+        platformBrowser()
           .bootstrapModule(AppModule)
           .catch((err) => console.error(err));
       };
