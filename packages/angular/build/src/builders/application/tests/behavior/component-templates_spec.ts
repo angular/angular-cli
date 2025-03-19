@@ -11,7 +11,7 @@ import { APPLICATION_BUILDER_INFO, BASE_OPTIONS, describeBuilder } from '../setu
 
 describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
   describe('Behavior: "Component Templates"', () => {
-    it('should generater an error for a missing template', async () => {
+    it('should generate an error for a missing template', async () => {
       await harness.modifyFile('src/app/app.component.ts', (content) => {
         return content.replace('./app.component.html', './not-present.html');
       });
