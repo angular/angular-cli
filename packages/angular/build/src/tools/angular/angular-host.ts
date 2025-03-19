@@ -208,6 +208,9 @@ export function createAngularCompilerHost(
 
   host.resourceNameToFileName = function (resourceName, containingFile) {
     const resolvedPath = nodePath.join(nodePath.dirname(containingFile), resourceName);
+    if (!this.fileExists(resolvedPath)) {
+      return null;
+    }
 
     // All resource names that have template file extensions are assumed to be templates
     // TODO: Update compiler to provide the resource type to avoid extension matching here.
