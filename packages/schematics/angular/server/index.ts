@@ -14,10 +14,8 @@ import {
   apply,
   applyTemplates,
   chain,
-  filter,
   mergeWith,
   move,
-  noop,
   strings,
   url,
 } from '@angular-devkit/schematics';
