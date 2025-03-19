@@ -11,8 +11,8 @@
     "isolatedModules": true,
     "skipLibCheck": true,
     "strict": true,
-    "target": "es2022",
-    "lib": ["es2022"],
+    "target": "es2023",
+    "lib": ["es2023"],
     "rootDir": ".",
     "rootDirs": [".", "./dist-schema/bin/"],
     "paths": {
