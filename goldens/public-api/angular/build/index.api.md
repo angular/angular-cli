@@ -49,7 +49,7 @@ export type ApplicationBuilderOptions = {
     optimization?: OptimizationUnion;
     outputHashing?: OutputHashing;
     outputMode?: OutputMode;
-    outputPath: OutputPathUnion;
+    outputPath?: OutputPathUnion;
     poll?: number;
     polyfills?: string[];
     prerender?: PrerenderUnion;
