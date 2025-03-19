@@ -6,22 +6,10 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import {
-  Rule,
-  SchematicsException,
-  Tree,
-  apply,
-  applyTemplates,
-  chain,
-  filter,
-  mergeWith,
-  move,
-  noop,
-  strings,
-  url,
-} from '@angular-devkit/schematics';
+import { Rule, SchematicsException, Tree, chain, strings } from '@angular-devkit/schematics';
 import { addDeclarationToNgModule } from '../utility/add-declaration-to-ng-module';
 import { findModuleFromOptions } from '../utility/find-module';
+import { generateFromFiles } from '../utility/generate-from-files';
 import { parseName } from '../utility/parse-name';
 import { validateClassName, validateHtmlSelector } from '../utility/validation';
 import { buildDefaultPath, getWorkspace } from '../utility/workspace';
@@ -52,6 +40,9 @@ export default function (options: DirectiveOptions): Rule {
 
     options.module = findModuleFromOptions(host, options);
 
+    // Schematic templates require a defined type value
+    options.type ??= '';
+
     const parsedPath = parseName(options.path, options.name);
     options.name = parsedPath.name;
     options.path = parsedPath.path;
@@ -60,23 +51,13 @@ export default function (options: DirectiveOptions): Rule {
     validateHtmlSelector(options.selector);
     validateClassName(strings.classify(options.name));
 
-    const templateSource = apply(url('./files'), [
-      options.skipTests ? filter((path) => !path.endsWith('.spec.ts.template')) : noop(),
-      applyTemplates({
-        ...strings,
-        'if-flat': (s: string) => (options.flat ? '' : s),
-        ...options,
-      }),
-      move(parsedPath.path),
-    ]);
-
     return chain([
       addDeclarationToNgModule({
         type: 'directive',
 
         ...options,
       }),
-      mergeWith(templateSource),
+      generateFromFiles(options),
     ]);
   };
 }
