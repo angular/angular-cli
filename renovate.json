@@ -20,9 +20,19 @@
     "package.json",
     "packages/**/package.json",
     "tests/legacy-cli/e2e/ng-snapshot/package.json",
-    ".github/workflows/**/*.yml"
+    ".github/workflows/**/*.yml",
+    ".nvmrc"
   ],
   "packageRules": [
+    {
+      "matchDepNames": ["node"],
+      "matchUpdateTypes": ["minor", "patch"]
+    },
+    {
+      "enabled": false,
+      "matchDepNames": ["node"],
+      "matchUpdateTypes": ["major"]
+    },
     {
       "matchPackageNames": ["quicktype-core"],
       "schedule": ["before 4:00am on the first day of the month"]
