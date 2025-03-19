@@ -1,3 +1,22 @@
+<a name="19.2.4"></a>
+
+# 19.2.4 (2025-03-19)
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                                                  |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------------------------- |
+| [0a4e96bda](https://github.com/angular/angular-cli/commit/0a4e96bda054876332c5603a3bc972c3ec1eb0bf) | fix  | replace `@angular/platform-browser-dynamic` with `@angular/platform-browser` |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                          |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------- |
+| [b0b643e46](https://github.com/angular/angular-cli/commit/b0b643e46f1009be66423fdff568d042717c5e2b) | fix  | ensure errors for missing component resources        |
+| [2cd763e89](https://github.com/angular/angular-cli/commit/2cd763e893788cfb38260d48eef40afa574a6a70) | fix  | ensure relative karma stack traces for test failures |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="17.3.13"></a>
 
 # 17.3.13 (2025-03-13)
