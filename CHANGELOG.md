@@ -1,3 +1,44 @@
+<a name="20.0.0-next.2"></a>
+
+# 20.0.0-next.2 (2025-03-19)
+
+## Breaking Changes
+
+### @schematics/angular
+
+- `--server-routing` option has been removed from several schematics. Server routing will be used when using the application builder.
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                                                              |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------------------------------------- |
+| [26fd4ea73](https://github.com/angular/angular-cli/commit/26fd4ea73ad2a0148ae587d582134c68a0bf4b86) | feat | add migrations for server rendering updates                                              |
+| [18e13e2ce](https://github.com/angular/angular-cli/commit/18e13e2ceed931d29aa5582980c7d6d1f66c9787) | feat | remove `--server-routing` option                                                         |
+| [86d241629](https://github.com/angular/angular-cli/commit/86d241629ff51f0bb5988e81cac8658b01704d49) | fix  | add `@angular/ssr` dependency only when `provideServerRendering` import has been updated |
+| [da6ef626f](https://github.com/angular/angular-cli/commit/da6ef626f960b187a7862f0caa3d8aed38224ac2) | fix  | ensure app-shell schematic consistently uses `withAppShell`                              |
+| [f126f8d34](https://github.com/angular/angular-cli/commit/f126f8d34b087dd3a916dfb93cd255aac4d6c309) | fix  | ensure module discovery checks for an NgModule decorator                                 |
+| [23fc8e1e1](https://github.com/angular/angular-cli/commit/23fc8e1e176f23442876b086bff52dd5f35abbc0) | fix  | generate components without a `.component` extension/type                                |
+| [8d715fa94](https://github.com/angular/angular-cli/commit/8d715fa948d432b18d06bcf42eed3a7681383523) | fix  | generate directives without a .directive extension/type                                  |
+| [bc0f07b48](https://github.com/angular/angular-cli/commit/bc0f07b484300848ee81c5719c58909b40f99deb) | fix  | generate services without a .service extension/type                                      |
+| [c0de72317](https://github.com/angular/angular-cli/commit/c0de723173549f62a524b6e6c58c6d80c8054581) | fix  | replace `@angular/platform-browser-dynamic` with `@angular/platform-browser`             |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                          |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------- |
+| [f4be83119](https://github.com/angular/angular-cli/commit/f4be831197010a17394264bc74b1eb385ba95028) | feat | Support Sass package importers                       |
+| [cb2ab43ab](https://github.com/angular/angular-cli/commit/cb2ab43abcf0e3c1a2cc584a326e1eea5eede7a8) | fix  | ensure errors for missing component resources        |
+| [f780e8beb](https://github.com/angular/angular-cli/commit/f780e8beb3ccea27ef0442d1d3814ec2a668057d) | fix  | ensure relative karma stack traces for test failures |
+
+### @angular/ssr
+
+| Commit                                                                                              | Type | Description                                                                           |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------------------- |
+| [33b9de3eb](https://github.com/angular/angular-cli/commit/33b9de3eb1fa596a4d5a975d05275739f2f7b8ae) | feat | expose `provideServerRendering` and remove `provideServerRouting`                     |
+| [cdfc50c29](https://github.com/angular/angular-cli/commit/cdfc50c29a2aa6f32d172b505a0ef09e563dfc59) | feat | stabilize `AngularNodeAppEngine`, `AngularAppEngine`, and `provideServerRouting` APIs |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="19.2.4"></a>
 
 # 19.2.4 (2025-03-19)
