@@ -1,5 +1,6 @@
 {
   "devDependencies": {
-    "@angular-devkit/schematics": "workspace:*"
+    "@angular-devkit/schematics": "workspace:*",
+    "tree-kill": "1.2.2"
   }
 }

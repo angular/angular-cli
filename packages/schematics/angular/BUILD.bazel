@@ -92,7 +92,6 @@ ts_project(
         ":node_modules/@angular-devkit/schematics",
         ":node_modules/jsonc-parser",
         "//:node_modules/@types/node",
-        "//:node_modules/browserslist",
         "//packages/schematics/angular/third_party/github.com/Microsoft/TypeScript",
     ],
 )
