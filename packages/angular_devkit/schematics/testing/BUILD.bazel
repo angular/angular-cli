@@ -16,9 +16,9 @@ ts_project(
     data = ["package.json"],
     module_name = "@angular-devkit/schematics/testing",
     deps = [
-        "//:node_modules/rxjs",
         "//packages/angular_devkit/schematics",
         "//packages/angular_devkit/schematics:node_modules/@angular-devkit/core",
+        "//packages/angular_devkit/schematics:node_modules/rxjs",
         "//packages/angular_devkit/schematics/tasks/node",
         "//packages/angular_devkit/schematics/tools",
     ],

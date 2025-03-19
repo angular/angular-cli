@@ -20,8 +20,8 @@ ts_project(
     deps = [
         "//:node_modules/@types/jasmine",
         "//:node_modules/@types/node",
-        "//:node_modules/rxjs",
         "//packages/angular_devkit/core",
+        "//packages/angular_devkit/core:node_modules/rxjs",
         "//packages/angular_devkit/core/node",
     ],
 )

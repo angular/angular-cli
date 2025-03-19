@@ -21,9 +21,9 @@ ts_project(
     module_name = "@angular-devkit/core/node",
     deps = [
         "//:node_modules/@types/node",
-        "//:node_modules/rxjs",
         "//packages/angular_devkit/core",
         "//packages/angular_devkit/core:node_modules/chokidar",
+        "//packages/angular_devkit/core:node_modules/rxjs",
     ],
 )
 
@@ -42,8 +42,8 @@ ts_project(
         ":node",
         "//:node_modules/@types/jasmine",
         "//:node_modules/@types/node",
-        "//:node_modules/rxjs",
         "//packages/angular_devkit/core",
+        "//packages/angular_devkit/core:node_modules/rxjs",
     ],
 )
 

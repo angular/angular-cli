@@ -36,11 +36,11 @@ ts_project(
         ":node_modules/ajv-formats",
         ":node_modules/jsonc-parser",
         ":node_modules/picomatch",
+        ":node_modules/rxjs",
         ":node_modules/source-map",
         "//:node_modules/@types/jasmine",
         "//:node_modules/@types/node",
         "//:node_modules/@types/picomatch",
-        "//:node_modules/rxjs",
     ],
 )
 
@@ -53,8 +53,8 @@ ts_project(
     data = glob(["src/workspace/json/test/**/*.json"]),
     deps = [
         ":core",
+        ":node_modules/rxjs",
         "//:node_modules/@types/node",
-        "//:node_modules/rxjs",
         "//packages/angular_devkit/core/node",
     ],
 )

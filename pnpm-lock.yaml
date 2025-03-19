@@ -275,9 +275,6 @@ importers:
       rollup-plugin-sourcemaps:
         specifier: ^0.6.0
         version: 0.6.3(@types/node@20.17.24)(rollup@4.36.0)
-      rxjs:
-        specifier: 7.8.2
-        version: 7.8.2
       semver:
         specifier: 7.7.1
         version: 7.7.1
@@ -340,6 +337,9 @@ importers:
       '@angular/ssr':
         specifier: workspace:*
         version: link:../../../packages/angular/ssr
+      rxjs:
+        specifier: 7.8.2
+        version: 7.8.2
 
   packages/angular/build:
     dependencies:
@@ -444,6 +444,9 @@ importers:
       postcss:
         specifier: 8.5.3
         version: 8.5.3
+      rxjs:
+        specifier: 7.8.2
+        version: 7.8.2
 
   packages/angular/cli:
     dependencies:
@@ -885,6 +888,9 @@ importers:
       '@angular-devkit/schematics':
         specifier: workspace:*
         version: link:../packages/angular_devkit/schematics
+      rxjs:
+        specifier: 7.8.2
+        version: 7.8.2
       tree-kill:
         specifier: 1.2.2
         version: 1.2.2

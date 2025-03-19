@@ -3,6 +3,7 @@
     "@angular-devkit/core": "workspace:*",
     "@angular-devkit/architect": "workspace:*",
     "@angular/ssr": "workspace:*",
-    "@angular-devkit/build-angular": "workspace:*"
+    "@angular-devkit/build-angular": "workspace:*",
+    "rxjs": "7.8.2"
   }
 }
