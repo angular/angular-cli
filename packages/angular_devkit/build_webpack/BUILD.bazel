@@ -48,10 +48,10 @@ ts_project(
     module_name = "@angular-devkit/build-webpack",
     deps = [
         ":node_modules/@angular-devkit/architect",
+        ":node_modules/rxjs",
         ":node_modules/webpack",
         ":node_modules/webpack-dev-server",
         "//:node_modules/@types/node",
-        "//:node_modules/rxjs",
     ],
 )
 

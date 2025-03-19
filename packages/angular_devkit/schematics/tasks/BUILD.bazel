@@ -21,9 +21,9 @@ ts_project(
     module_name = "@angular-devkit/schematics/tasks",
     deps = [
         "//:node_modules/@types/node",
-        "//:node_modules/rxjs",
         "//packages/angular_devkit/schematics",
         "//packages/angular_devkit/schematics:node_modules/@angular-devkit/core",
         "//packages/angular_devkit/schematics:node_modules/ora",
+        "//packages/angular_devkit/schematics:node_modules/rxjs",
     ],
 )

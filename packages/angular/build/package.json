@@ -54,7 +54,8 @@
     "@angular-devkit/core": "workspace:*",
     "less": "4.2.2",
     "ng-packagr": "20.0.0-next.1",
-    "postcss": "8.5.3"
+    "postcss": "8.5.3",
+    "rxjs": "7.8.2"
   },
   "peerDependencies": {
     "@angular/compiler": "0.0.0-ANGULAR-FW-PEER-DEP",

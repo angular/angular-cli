@@ -1,6 +1,7 @@
 {
   "devDependencies": {
     "@angular-devkit/schematics": "workspace:*",
+    "rxjs": "7.8.2",
     "tree-kill": "1.2.2"
   }
 }

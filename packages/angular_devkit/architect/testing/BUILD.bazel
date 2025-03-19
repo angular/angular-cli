@@ -18,8 +18,8 @@ ts_project(
     module_name = "@angular-devkit/architect/testing",
     deps = [
         "//:node_modules/@types/node",
-        "//:node_modules/rxjs",
         "//packages/angular_devkit/architect",
         "//packages/angular_devkit/architect:node_modules/@angular-devkit/core",
+        "//packages/angular_devkit/architect:node_modules/rxjs",
     ],
 )
