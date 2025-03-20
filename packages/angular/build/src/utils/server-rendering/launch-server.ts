@@ -33,7 +33,7 @@ export async function launchServer(): Promise<URL> {
       // handle request
       if (isSsrNodeRequestHandler(reqHandler)) {
         await reqHandler(req, res, (e) => {
-          throw e;
+          throw e ?? new Error(`Unable to handle request: '${req.url}'.`);
         });
       } else {
         const webRes = await reqHandler(createWebRequestFromNodeRequest(req));

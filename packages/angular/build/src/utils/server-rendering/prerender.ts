@@ -113,7 +113,7 @@ export async function prerenderPages(
     outputMode,
   ).catch((err) => {
     return {
-      errors: [`An error occurred while extracting routes.\n\n${err.stack ?? err.message ?? err}`],
+      errors: [`An error occurred while extracting routes.\n\n${err.message ?? err.stack ?? err}`],
       serializedRouteTree: [],
       appShellRoute: undefined,
     };
@@ -258,7 +258,7 @@ async function renderPages(
         })
         .catch((err) => {
           errors.push(
-            `An error occurred while prerendering route '${route}'.\n\n${err.stack ?? err.message ?? err.code ?? err}`,
+            `An error occurred while prerendering route '${route}'.\n\n${err.message ?? err.stack ?? err.code ?? err}`,
           );
           void renderWorker.destroy();
         });
@@ -359,7 +359,7 @@ async function getAllRoutes(
 
     return {
       errors: [
-        `An error occurred while extracting routes.\n\n${err.stack ?? err.message ?? err.code ?? err}`,
+        `An error occurred while extracting routes.\n\n${err.message ?? err.stack ?? err.code ?? err}`,
       ],
       serializedRouteTree: [],
     };
