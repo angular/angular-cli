@@ -102,6 +102,14 @@ export class AngularServerApp {
   constructor(private readonly options: Readonly<AngularServerAppOptions> = {}) {
     this.allowStaticRouteRender = this.options.allowStaticRouteRender ?? false;
     this.hooks = options.hooks ?? new Hooks();
+
+    if (this.manifest.inlineCriticalCss) {
+      this.inlineCriticalCssProcessor = new InlineCriticalCssProcessor((path: string) => {
+        const fileName = path.split('/').pop() ?? path;
+
+        return this.assets.getServerAsset(fileName).text();
+      });
+    }
   }
 
   /**
@@ -267,7 +275,7 @@ export class AngularServerApp {
     const platformProviders: StaticProvider[] = [];
 
     const {
-      manifest: { bootstrap, inlineCriticalCss, locale },
+      manifest: { bootstrap, locale },
       assets,
     } = this;
 
@@ -315,7 +323,8 @@ export class AngularServerApp {
     this.boostrap ??= await bootstrap();
     let html = await assets.getIndexServerHtml().text();
     html = await this.runTransformsOnHtml(html, url, preload);
-    html = await renderAngular(
+
+    const { content } = await renderAngular(
       html,
       this.boostrap,
       url,
@@ -323,41 +332,38 @@ export class AngularServerApp {
       SERVER_CONTEXT_VALUE[renderMode],
     );
 
-    if (!inlineCriticalCss) {
-      return new Response(html, responseInit);
-    }
-
-    this.inlineCriticalCssProcessor ??= new InlineCriticalCssProcessor((path: string) => {
-      const fileName = path.split('/').pop() ?? path;
-
-      return this.assets.getServerAsset(fileName).text();
-    });
-
     const { inlineCriticalCssProcessor, criticalCssLRUCache, textDecoder } = this;
 
-    // Use a stream to send the response before inlining critical CSS, improving performance via header flushing.
+    // Use a stream to send the response before finishing rendering and inling critical CSS, improving performance via header flushing.
     const stream = new ReadableStream({
       async start(controller) {
-        let htmlWithCriticalCss;
+        const renderedHtml = await content();
 
+        if (!inlineCriticalCssProcessor) {
+          controller.enqueue(textDecoder.encode(renderedHtml));
+          controller.close();
+
+          return;
+        }
+
+        let htmlWithCriticalCss;
         try {
           if (renderMode === RenderMode.Server) {
-            const cacheKey = await sha256(html);
+            const cacheKey = await sha256(renderedHtml);
             htmlWithCriticalCss = criticalCssLRUCache.get(cacheKey);
             if (!htmlWithCriticalCss) {
-              htmlWithCriticalCss = await inlineCriticalCssProcessor.process(html);
+              htmlWithCriticalCss = await inlineCriticalCssProcessor.process(renderedHtml);
               criticalCssLRUCache.put(cacheKey, htmlWithCriticalCss);
             }
           } else {
-            htmlWithCriticalCss = await inlineCriticalCssProcessor.process(html);
+            htmlWithCriticalCss = await inlineCriticalCssProcessor.process(renderedHtml);
           }
         } catch (error) {
           // eslint-disable-next-line no-console
           console.error(`An error occurred while inlining critical CSS for: ${url}.`, error);
         }
 
-        controller.enqueue(textDecoder.encode(htmlWithCriticalCss ?? html));
-
+        controller.enqueue(textDecoder.encode(htmlWithCriticalCss ?? renderedHtml));
         controller.close();
       },
     });

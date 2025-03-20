@@ -6,12 +6,18 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { ɵConsole } from '@angular/core';
-import type { ApplicationRef, StaticProvider, Type } from '@angular/core';
 import {
+  ApplicationRef,
+  type PlatformRef,
+  type StaticProvider,
+  type Type,
+  ɵConsole,
+} from '@angular/core';
+import {
+  INITIAL_CONFIG,
   ɵSERVER_CONTEXT as SERVER_CONTEXT,
-  renderApplication,
-  renderModule,
+  platformServer,
+  ɵrenderInternal as renderInternal,
 } from '@angular/platform-server';
 import { Console } from '../console';
 import { stripIndexHtmlFromURL } from './url';
@@ -41,16 +47,26 @@ export type AngularBootstrap = Type<unknown> | (() => Promise<ApplicationRef>);
  *                             rendering process.
  * @param serverContext - A string representing the server context, used to provide additional
  *                        context or metadata during server-side rendering.
- * @returns A promise that resolves to a string containing the rendered HTML.
+ * @returns A promise resolving to an object containing a `content` method, which returns a
+ *          promise that resolves to the rendered HTML string.
  */
-export function renderAngular(
+export async function renderAngular(
   html: string,
   bootstrap: AngularBootstrap,
   url: URL,
   platformProviders: StaticProvider[],
   serverContext: string,
-): Promise<string> {
-  const providers = [
+): Promise<{ content: () => Promise<string> }> {
+  // A request to `http://www.example.com/page/index.html` will render the Angular route corresponding to `http://www.example.com/page`.
+  const urlToRender = stripIndexHtmlFromURL(url).toString();
+  const platformRef = platformServer([
+    {
+      provide: INITIAL_CONFIG,
+      useValue: {
+        url: urlToRender,
+        document: html,
+      },
+    },
     {
       provide: SERVER_CONTEXT,
       useValue: serverContext,
@@ -64,22 +80,34 @@ export function renderAngular(
       useFactory: () => new Console(),
     },
     ...platformProviders,
-  ];
+  ]);
 
-  // A request to `http://www.example.com/page/index.html` will render the Angular route corresponding to `http://www.example.com/page`.
-  const urlToRender = stripIndexHtmlFromURL(url).toString();
+  try {
+    let applicationRef: ApplicationRef;
+    if (isNgModule(bootstrap)) {
+      const moduleRef = await platformRef.bootstrapModule(bootstrap);
+      applicationRef = moduleRef.injector.get(ApplicationRef);
+    } else {
+      applicationRef = await bootstrap();
+    }
 
-  return isNgModule(bootstrap)
-    ? renderModule(bootstrap, {
-        url: urlToRender,
-        document: html,
-        extraProviders: providers,
-      })
-    : renderApplication(bootstrap, {
-        url: urlToRender,
-        document: html,
-        platformProviders: providers,
-      });
+    // Block until application is stable.
+    await applicationRef.whenStable();
+
+    return {
+      content: async () => {
+        try {
+          return renderInternal(platformRef, applicationRef);
+        } finally {
+          await asyncDestroyPlatform(platformRef);
+        }
+      },
+    };
+  } catch (error) {
+    await asyncDestroyPlatform(platformRef);
+
+    throw error;
+  }
 }
 
 /**
@@ -92,4 +120,19 @@ export function renderAngular(
  */
 export function isNgModule(value: AngularBootstrap): value is Type<unknown> {
   return 'ɵmod' in value;
+}
+
+/**
+ * Gracefully destroys the application in a macrotask, allowing pending promises to resolve
+ * and surfacing any potential errors to the user.
+ *
+ * @param platformRef - The platform reference to be destroyed.
+ */
+function asyncDestroyPlatform(platformRef: PlatformRef): Promise<void> {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      platformRef.destroy();
+      resolve();
+    }, 0);
+  });
 }
