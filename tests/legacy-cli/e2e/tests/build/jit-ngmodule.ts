@@ -23,6 +23,7 @@ export default async function () {
         main: build.options.browser,
         browser: undefined,
         buildOptimizer: false,
+        outputPath: 'dist/test-project-two',
       };
 
       build.configurations.development = {

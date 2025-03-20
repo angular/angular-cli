@@ -81,12 +81,9 @@ async function getApplicationBuilderOutputPaths(
     throw new SchematicsException(`Cannot find 'options' for ${projectName} ${target} target.`);
   }
 
-  const { outputPath } = architectTarget.options;
-  if (outputPath === null || outputPath === undefined) {
-    throw new SchematicsException(
-      `outputPath for ${projectName} ${target} target is undefined or null.`,
-    );
-  }
+  let { outputPath } = architectTarget.options;
+  // Use default if not explicitly specified
+  outputPath ??= posix.join('dist', projectName);
 
   const defaultDirs = {
     server: DEFAULT_SERVER_DIR,
