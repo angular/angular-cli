@@ -118,7 +118,7 @@ describe('SSR Schematic', () => {
       const build = config.projects['test-app'].architect.build;
 
       build.options.outputPath = {
-        base: build.options.outputPath,
+        base: 'dist/test-app',
         browser: 'public',
         server: 'node-server',
       };
@@ -139,7 +139,7 @@ describe('SSR Schematic', () => {
       const build = config.projects['test-app'].architect.build;
 
       build.options.outputPath = {
-        base: build.options.outputPath,
+        base: 'dist/test-app',
         browser: '',
         server: 'node-server',
       };

@@ -236,7 +236,6 @@ function addAppToWorkspaceFile(
         builder: Builders.BuildApplication,
         defaultConfiguration: 'production',
         options: {
-          outputPath: `dist/${folderName}`,
           index: `${sourceRoot}/index.html`,
           browser: `${sourceRoot}/main.ts`,
           polyfills: options.experimentalZoneless ? [] : ['zone.js'],

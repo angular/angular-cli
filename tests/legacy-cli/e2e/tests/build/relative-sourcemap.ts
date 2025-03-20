@@ -18,6 +18,7 @@ export default async function () {
         ...build.options,
         main: build.options.browser,
         browser: undefined,
+        outputPath: 'dist/secondary-project',
       };
 
       build.configurations.development = {

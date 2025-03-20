@@ -33,6 +33,7 @@ export default async function () {
           ...build.options,
           main: build.options.browser,
           browser: undefined,
+          outputPath: 'dist/subdirectory-test-project',
         };
 
         build.configurations.development = {
