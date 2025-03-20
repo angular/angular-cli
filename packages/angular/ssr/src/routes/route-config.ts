@@ -296,7 +296,7 @@ export function withRoutes(
  * ```
  *
  * @see {@link provideServerRendering}
- * @see {@link https://angular.dev/ecosystem/service-workers/app-shell | App shell pattern on Angular.dev}
+ * @see {@link https://angular.dev/ecosystem/service-workers/app-shell App shell pattern on Angular.dev}
  */
 export function withAppShell(
   component: Type<unknown> | (() => Promise<Type<unknown> | DefaultExport<Type<unknown>>>),
