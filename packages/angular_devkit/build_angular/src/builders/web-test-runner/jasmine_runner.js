@@ -7,7 +7,8 @@
  */
 
 import { getTestBed } from '@angular/core/testing';
-import { BrowserTestingModule, platformBrowserTesting } from '@angular/platform-browser/testing';
+import { platformBrowser } from '@angular/platform-browser';
+import { BrowserTestingModule } from '@angular/platform-browser/testing';
 import {
   getConfig,
   sessionFailed,
@@ -64,7 +65,8 @@ export async function runJasmineTests(jasmineEnv) {
   jasmine.DEFAULT_TIMEOUT_INTERVAL = config.defaultTimeoutInterval;
 
   // Initialize `TestBed` automatically for users. This assumes we already evaluated `zone.js/testing`.
-  getTestBed().initTestEnvironment(BrowserTestingModule, platformBrowserTesting(), {
+  // TODO(alanagius): replace with `platformBrowserTesting` once https://github.com/angular/angular/pull/60480 is released.
+  getTestBed().initTestEnvironment(BrowserTestingModule, platformBrowser(), {
     errorOnUnknownElements: true,
     errorOnUnknownProperties: true,
   });
