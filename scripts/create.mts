@@ -10,7 +10,7 @@ import assert from 'node:assert';
 import * as child_process from 'node:child_process';
 import { copyFile, readFile, rm, writeFile } from 'node:fs/promises';
 import * as path from 'node:path';
-import { fileURLToPath, pathToFileURL } from 'node:url';
+import { pathToFileURL } from 'node:url';
 import build from './build.mjs';
 import { packages } from './packages.mjs';
 
@@ -18,7 +18,7 @@ export interface CreateOptions extends Record<string, unknown> {
   _: string[];
 }
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const __dirname = import.meta.dirname;
 
 async function _exec(command: string, args: string[], opts: { cwd?: string }) {
   const { status, error, stderr, stdout } = child_process.spawnSync(command, args, { ...opts });
