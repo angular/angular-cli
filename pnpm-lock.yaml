@@ -248,9 +248,6 @@ importers:
       lodash:
         specifier: ^4.17.21
         version: 4.17.21
-      npm:
-        specifier: ^11.0.0
-        version: 11.2.0
       prettier:
         specifier: ^3.0.0
         version: 3.5.3
@@ -284,9 +281,6 @@ importers:
       symbol-observable:
         specifier: 4.0.0
         version: 4.0.0
-      tar:
-        specifier: ^7.0.0
-        version: 7.4.3
       ts-node:
         specifier: ^10.9.1
         version: 10.9.2(@types/node@20.17.24)(typescript@5.8.2)
@@ -302,12 +296,6 @@ importers:
       unenv:
         specifier: ^1.10.0
         version: 1.10.0
-      verdaccio:
-        specifier: 6.0.5
-        version: 6.0.5(encoding@0.1.13)
-      verdaccio-auth-memory:
-        specifier: ^10.0.0
-        version: 10.2.2
       yargs-parser:
         specifier: 21.1.1
         version: 21.1.1
@@ -885,12 +873,24 @@ importers:
       '@angular-devkit/schematics':
         specifier: workspace:*
         version: link:../packages/angular_devkit/schematics
+      npm:
+        specifier: ^11.0.0
+        version: 11.2.0
       rxjs:
         specifier: 7.8.2
         version: 7.8.2
+      tar:
+        specifier: 7.4.3
+        version: 7.4.3
       tree-kill:
         specifier: 1.2.2
         version: 1.2.2
+      verdaccio:
+        specifier: 6.0.5
+        version: 6.0.5(encoding@0.1.13)
+      verdaccio-auth-memory:
+        specifier: 10.2.2
+        version: 10.2.2
 
 packages:
 
@@ -6570,7 +6570,6 @@ packages:
     engines: {node: '>=0.6.0', teleport: '>=0.2.0'}
     deprecated: |-
       You or someone you depend on is using Q, the JavaScript Promise library that gave JavaScript developers strong feelings about promises. They can almost certainly migrate to the native JavaScript promise now. Thank you literally everyone for joining me in this bet against the odds. Be excellent to each other.
-
       (For a CapTP with native promises, see @endo/eventual-send and @endo/captp)
 
   qjobs@1.2.0:
