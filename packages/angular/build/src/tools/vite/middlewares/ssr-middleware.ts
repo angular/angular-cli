@@ -40,14 +40,15 @@ export function createAngularSsrInternalMiddleware(
       const { writeResponseToNodeResponse, createWebRequestFromNodeRequest } =
         await loadEsmModule<typeof import('@angular/ssr/node')>('@angular/ssr/node');
 
-      // The following is necessary because accessing the module after invalidation may result in an empty module,
-      // which can trigger a `TypeError: ɵgetOrCreateAngularServerApp is not a function` error.
-      // TODO: look into why.
-      await server.ssrLoadModule('/main.server.mjs');
-
       const { ɵgetOrCreateAngularServerApp } = (await server.ssrLoadModule('/main.server.mjs')) as {
         ɵgetOrCreateAngularServerApp: typeof getOrCreateAngularServerApp;
       };
+
+      // `ɵgetOrCreateAngularServerApp` can be undefined right after an error.
+      // See: https://github.com/angular/angular-cli/issues/29907
+      if (!ɵgetOrCreateAngularServerApp) {
+        return next();
+      }
 
       const angularServerApp = ɵgetOrCreateAngularServerApp({
         allowStaticRouteRender: true,
