@@ -95,13 +95,16 @@ export async function renderAngular(
     await applicationRef.whenStable();
 
     return {
-      content: async () => {
-        try {
-          return renderInternal(platformRef, applicationRef);
-        } finally {
-          await asyncDestroyPlatform(platformRef);
-        }
-      },
+      content: () =>
+        new Promise<string>((resolve, reject) => {
+          // Defer rendering to the next event loop iteration to avoid blocking, as most operations in `renderInternal` are synchronous.
+          setTimeout(() => {
+            renderInternal(platformRef, applicationRef)
+              .then(resolve)
+              .catch(reject)
+              .finally(() => void asyncDestroyPlatform(platformRef));
+          }, 0);
+        }),
     };
   } catch (error) {
     await asyncDestroyPlatform(platformRef);
