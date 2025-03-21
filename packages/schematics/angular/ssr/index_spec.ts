@@ -130,7 +130,7 @@ describe('SSR Schematic', () => {
       expect(scripts['serve:ssr:test-app']).toBe(`node dist/test-app/node-server/server.mjs`);
 
       const serverFileContent = tree.readContent('/projects/test-app/src/server.ts');
-      expect(serverFileContent).toContain(`resolve(serverDistFolder, '../public')`);
+      expect(serverFileContent).toContain(`join(import.meta.dirname, '../public')`);
     });
 
     it(`removes "outputPath.browser" when it's an empty string`, async () => {

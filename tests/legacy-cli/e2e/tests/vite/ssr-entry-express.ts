@@ -39,13 +39,11 @@ export default async function () {
     'src/server.ts': `
       import { AngularNodeAppEngine, writeResponseToNodeResponse, isMainModule, createNodeRequestHandler } from '@angular/ssr/node';
       import express from 'express';
-      import { fileURLToPath } from 'node:url';
-      import { dirname, resolve } from 'node:path';
+      import { join } from 'node:path';
 
       export function app(): express.Express {
         const server = express();
-        const serverDistFolder = dirname(fileURLToPath(import.meta.url));
-        const browserDistFolder = resolve(serverDistFolder, '../browser');
+        const browserDistFolder = join(import.meta.dirname, '../browser');
         const angularNodeAppEngine = new AngularNodeAppEngine();
 
         server.use('/api/**', (req, res) => res.json({ hello: 'foo' }));

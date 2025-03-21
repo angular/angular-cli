@@ -8,8 +8,7 @@
  */
 
 import colors from 'ansi-colors';
-import path, { dirname } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import path from 'node:path';
 import yargsParser from 'yargs-parser';
 
 const args = yargsParser(process.argv.slice(2), {
@@ -21,7 +20,7 @@ const args = yargsParser(process.argv.slice(2), {
 const scriptName = args._.shift();
 
 const cwd = process.cwd();
-const scriptDir = dirname(fileURLToPath(import.meta.url));
+const scriptDir = import.meta.dirname;
 process.chdir(path.join(scriptDir, '..'));
 
 const originalConsole = { ...console };
