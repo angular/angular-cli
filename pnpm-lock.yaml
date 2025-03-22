@@ -42,8 +42,8 @@ importers:
         specifier: 20.0.0-next.3
         version: 20.0.0-next.3(ytwihe4lr4cvkw42tsewzwfy4m)
       '@angular/ng-dev':
-        specifier: https://github.com/angular/dev-infra-private-ng-dev-builds.git#3e60055cec07598ad7160ba36dd08bf57ae2be98
-        version: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/3e60055cec07598ad7160ba36dd08bf57ae2be98(encoding@0.1.13)
+        specifier: https://github.com/angular/dev-infra-private-ng-dev-builds.git#e6534df23185ef6242fa2a6c04ca9567af750acb
+        version: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/e6534df23185ef6242fa2a6c04ca9567af750acb(encoding@0.1.13)
       '@angular/platform-browser':
         specifier: 20.0.0-next.3
         version: 20.0.0-next.3(@angular/animations@20.0.0-next.3(@angular/core@20.0.0-next.3(@angular/compiler@20.0.0-next.3)(rxjs@7.8.2)(zone.js@0.15.0)))(@angular/common@20.0.0-next.3(@angular/core@20.0.0-next.3(@angular/compiler@20.0.0-next.3)(rxjs@7.8.2)(zone.js@0.15.0))(rxjs@7.8.2))(@angular/core@20.0.0-next.3(@angular/compiler@20.0.0-next.3)(rxjs@7.8.2)(zone.js@0.15.0))
@@ -968,9 +968,9 @@ packages:
       '@angular/platform-browser': ^20.0.0-0 || ^20.1.0-0 || ^20.2.0-0 || ^20.3.0-0 || ^21.0.0-0
       rxjs: ^6.5.3 || ^7.4.0
 
-  '@angular/ng-dev@https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/3e60055cec07598ad7160ba36dd08bf57ae2be98':
-    resolution: {tarball: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/3e60055cec07598ad7160ba36dd08bf57ae2be98}
-    version: 0.0.0-78bd12c8526c396fc85e5ac3d72c039dc7e0a51a
+  '@angular/ng-dev@https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/e6534df23185ef6242fa2a6c04ca9567af750acb':
+    resolution: {tarball: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/e6534df23185ef6242fa2a6c04ca9567af750acb}
+    version: 0.0.0-ad960c29189d0bfccbd35c4d47d3d7bff9da3666
     hasBin: true
 
   '@angular/platform-browser@20.0.0-next.3':
@@ -1742,12 +1742,16 @@ packages:
     resolution: {integrity: sha512-MmaX6HeSvyPbWGwFq7mXdo0uQZLGBYCwziiLIGq5JVX+/bdI3SAq6bP98trV5eTWfLuvsMcIC1YJOF2vfteLFA==}
     engines: {node: '>=14.0.0'}
 
+  '@google-cloud/promisify@4.0.0':
+    resolution: {integrity: sha512-Orxzlfb9c67A15cq2JQEyVc7wEsmFBmHjZWZYQMUyJ1qivXyMwdyNOs9odi79hze+2zqdTtu1E19IM/FtqZ10g==}
+    engines: {node: '>=14'}
+
   '@google-cloud/promisify@4.1.0':
     resolution: {integrity: sha512-G/FQx5cE/+DqBbOpA5jKsegGwdPniU6PuIEMt+qxWgFxvxuFOzVmp6zYchtYuwAWV5/8Dgs0yAmjvNZv3uXLQg==}
     engines: {node: '>=18'}
 
-  '@google-cloud/spanner@7.19.0':
-    resolution: {integrity: sha512-EQUGFc6l5h4spSbVKtURt+6OY+vFkACkXvdcDFISwB2++VWigeTOE0gFVJMUrko0HaKxOKfWW80+GYZCUToTcA==}
+  '@google-cloud/spanner@7.19.1':
+    resolution: {integrity: sha512-a7WlM4T3g5hslSBxQpsCxlH2IGgeVVEnDP5/v51kNlKv/W5PhBMqaHanodkUjbjegsQNlWAkqLClzIwtldfSXg==}
     engines: {node: '>=14.0.0'}
 
   '@grpc/grpc-js@1.13.0':
@@ -8041,9 +8045,9 @@ snapshots:
       rxjs: 7.8.2
       tslib: 2.8.1
 
-  '@angular/ng-dev@https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/3e60055cec07598ad7160ba36dd08bf57ae2be98(encoding@0.1.13)':
+  '@angular/ng-dev@https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/e6534df23185ef6242fa2a6c04ca9567af750acb(encoding@0.1.13)':
     dependencies:
-      '@google-cloud/spanner': 7.19.0(encoding@0.1.13)(supports-color@10.0.0)
+      '@google-cloud/spanner': 7.19.1(encoding@0.1.13)(supports-color@10.0.0)
       '@octokit/rest': 21.1.1
       '@types/semver': 7.5.8
       '@types/supports-color': 10.0.0
@@ -8922,14 +8926,16 @@ snapshots:
 
   '@google-cloud/projectify@4.0.0': {}
 
+  '@google-cloud/promisify@4.0.0': {}
+
   '@google-cloud/promisify@4.1.0': {}
 
-  '@google-cloud/spanner@7.19.0(encoding@0.1.13)(supports-color@10.0.0)':
+  '@google-cloud/spanner@7.19.1(encoding@0.1.13)(supports-color@10.0.0)':
     dependencies:
       '@google-cloud/common': 5.0.2(encoding@0.1.13)(supports-color@10.0.0)
       '@google-cloud/precise-date': 4.0.0
       '@google-cloud/projectify': 4.0.0
-      '@google-cloud/promisify': 4.1.0
+      '@google-cloud/promisify': 4.0.0
       '@grpc/proto-loader': 0.7.13
       '@opentelemetry/api': 1.9.0
       '@opentelemetry/context-async-hooks': 1.30.1(@opentelemetry/api@1.9.0)
