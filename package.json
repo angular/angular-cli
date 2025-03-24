@@ -34,7 +34,7 @@
   },
   "packageManager": "pnpm@9.15.6",
   "engines": {
-    "node": "^20.11.1 || >=22.0.0",
+    "node": "^20.11.1 || >=22.11.0",
     "npm": "Please use pnpm instead of NPM to install dependencies",
     "yarn": "Please use pnpm instead of Yarn to install dependencies",
     "pnpm": "^9.15.6"
