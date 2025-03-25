@@ -75,7 +75,6 @@ __metadata:
     "@babel/runtime": "npm:7.26.10"
     "@discoveryjs/json-ext": "npm:0.6.1"
     "@ngtools/webpack": "npm:0.0.0-PLACEHOLDER"
-    "@vitejs/plugin-basic-ssl": "npm:1.1.0"
     ansi-colors: "npm:4.1.3"
     autoprefixer: "npm:10.4.20"
     babel-loader: "npm:9.1.3"
