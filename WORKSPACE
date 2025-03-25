@@ -31,9 +31,9 @@ build_bazel_rules_nodejs_dependencies()
 
 http_archive(
     name = "aspect_rules_js",
-    sha256 = "7ee67690ed4d6b5c8cbf6d47bb68b639192a29397a9fe3d513981fecc25a5653",
-    strip_prefix = "rules_js-2.3.2",
-    url = "https://github.com/aspect-build/rules_js/releases/download/v2.3.2/rules_js-v2.3.2.tar.gz",
+    sha256 = "05576ae674015b112b7c40c165735386eb9917affe8013e310d5602a093f2382",
+    strip_prefix = "rules_js-2.3.3",
+    url = "https://github.com/aspect-build/rules_js/releases/download/v2.3.3/rules_js-v2.3.3.tar.gz",
 )
 
 load("@aspect_rules_js//js:repositories.bzl", "rules_js_dependencies")
