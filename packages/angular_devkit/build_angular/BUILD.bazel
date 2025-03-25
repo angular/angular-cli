@@ -154,7 +154,6 @@ ts_library(
         "@npm//@types/picomatch",
         "@npm//@types/semver",
         "@npm//@types/watchpack",
-        "@npm//@vitejs/plugin-basic-ssl",
         "@npm//@web/test-runner",
         "@npm//ajv",
         "@npm//ansi-colors",
