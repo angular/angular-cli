@@ -209,6 +209,82 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       harness.expectFile('dist/browser/main.js.map').content.toContain('"x_google_ignoreList"');
     });
 
+    it(`should not include 'sourcesContent' field when 'sourcesContent' suboption is false`, async () => {
+      await harness.writeFile('src/styles.css', `div { flex: 1 }`);
+
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+        styles: ['src/styles.css'],
+        sourceMap: { scripts: true, styles: true, sourcesContent: false },
+      });
+
+      const { result } = await harness.executeOnce();
+
+      expect(result?.success).toBeTrue();
+
+      harness.expectFile('dist/browser/main.js.map').content.not.toContain('"sourcesContent"');
+
+      harness.expectFile('dist/browser/styles.css.map').toExist();
+      harness.expectFile('dist/browser/styles.css.map').content.not.toContain('"sourcesContent"');
+    });
+
+    it(`should include 'sourcesContent' field when 'sourcesContent' suboption is true`, async () => {
+      await harness.writeFile('src/styles.css', `div { flex: 1 }`);
+
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+        styles: ['src/styles.css'],
+        sourceMap: { scripts: true, styles: true, sourcesContent: true },
+      });
+
+      const { result } = await harness.executeOnce();
+
+      expect(result?.success).toBeTrue();
+
+      harness.expectFile('dist/browser/main.js.map').content.toContain('"sourcesContent"');
+
+      harness.expectFile('dist/browser/styles.css.map').toExist();
+      harness.expectFile('dist/browser/styles.css.map').content.toContain('"sourcesContent"');
+    });
+
+    it(`should include 'sourcesContent' field when 'sourcesContent' suboption is not present`, async () => {
+      await harness.writeFile('src/styles.css', `div { flex: 1 }`);
+
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+        styles: ['src/styles.css'],
+        sourceMap: { scripts: true, styles: true },
+      });
+
+      const { result } = await harness.executeOnce();
+
+      expect(result?.success).toBeTrue();
+
+      harness.expectFile('dist/browser/main.js.map').content.toContain('"sourcesContent"');
+
+      harness.expectFile('dist/browser/styles.css.map').toExist();
+      harness.expectFile('dist/browser/styles.css.map').content.toContain('"sourcesContent"');
+    });
+
+    it(`should include 'sourcesContent' field when 'sourceMap' is true`, async () => {
+      await harness.writeFile('src/styles.css', `div { flex: 1 }`);
+
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+        styles: ['src/styles.css'],
+        sourceMap: true,
+      });
+
+      const { result } = await harness.executeOnce();
+
+      expect(result?.success).toBeTrue();
+
+      harness.expectFile('dist/browser/main.js.map').content.toContain('"sourcesContent"');
+
+      harness.expectFile('dist/browser/styles.css.map').toExist();
+      harness.expectFile('dist/browser/styles.css.map').content.toContain('"sourcesContent"');
+    });
+
     it('should generate component sourcemaps when sourcemaps when true', async () => {
       await harness.writeFile('src/app/app.component.css', `* { color: red}`);
 

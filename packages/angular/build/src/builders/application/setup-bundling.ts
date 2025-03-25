@@ -177,6 +177,7 @@ export function createComponentStyleBundler(
         // the same as being disabled. Disabling has the advantage of avoiding the overhead
         // of sourcemap processing.
         sourcemapOptions.styles && !sourcemapOptions.hidden ? 'linked' : false,
+      sourcesContent: sourcemapOptions.sourcesContent,
       outputNames,
       includePaths: stylePreprocessorOptions?.includePaths,
       // string[] | undefined' is not assignable to type '(Version | DeprecationOrId)[] | undefined'.

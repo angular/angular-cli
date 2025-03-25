@@ -24,6 +24,7 @@ export interface BundleStylesheetOptions {
   inlineFonts: boolean;
   preserveSymlinks?: boolean;
   sourcemap: boolean | 'external' | 'inline' | 'linked';
+  sourcesContent?: boolean;
   outputNames: { bundles: string; media: string };
   includePaths?: string[];
   sass?: StylesheetPluginsass;
@@ -77,6 +78,7 @@ export function createStylesheetBundleOptions(
     minify: options.optimization,
     metafile: true,
     sourcemap: options.sourcemap,
+    sourcesContent: options.sourcesContent,
     outdir: options.workspaceRoot,
     write: false,
     platform: 'browser',

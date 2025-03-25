@@ -370,6 +370,11 @@
               "type": "boolean",
               "description": "Resolve vendor packages source maps.",
               "default": false
+            },
+            "sourcesContent": {
+              "type": "boolean",
+              "description": "Output original source content for files within the source map.",
+              "default": true
             }
           },
           "additionalProperties": false
