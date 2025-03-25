@@ -11,7 +11,8 @@ const isNodeV22orHigher = Number(process.versions.node.split('.', 1)[0]) >= 22;
 export default async function () {
   await writeFile('public/.file', '');
   await writeFile('public/test.abc', 'hello world');
-  const originalStats = fs.statSync('public/test.abc', { bigint: true });
+
+  const originalStats = fs.statSync('public/favicon.ico', { bigint: true });
 
   await ng('build', '--configuration=development');
 
@@ -22,9 +23,10 @@ export default async function () {
 
   // Timestamp preservation only supported with application build system on Node.js v22+
   if (isNodeV22orHigher && getGlobalVariable('argv')['esbuild']) {
-    const outputStats = fs.statSync('dist/test-project/browser/test.abc', { bigint: true });
-    assert(
-      originalStats.mtimeMs === outputStats.mtimeMs,
+    const outputStats = fs.statSync('dist/test-project/browser/favicon.ico', { bigint: true });
+    assert.equal(
+      originalStats.mtimeMs,
+      outputStats.mtimeMs,
       'Asset file modified timestamp should be preserved.',
     );
   }
