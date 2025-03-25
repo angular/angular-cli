@@ -25,6 +25,7 @@ import { findTests, getTestEntrypoints } from './find-tests';
 import { Schema as KarmaBuilderOptions } from './schema';
 
 const localResolve = createRequire(__filename).resolve;
+const isWindows = process.platform === 'win32';
 
 interface BuildOptions extends ApplicationBuilderInternalOptions {
   // We know that it's always a string since we set it.
@@ -69,7 +70,14 @@ class AngularAssetsMiddleware {
     let err = null;
     try {
       const url = new URL(`http://${req.headers['host']}${req.url}`);
-      const file = this.latestBuildFiles.files[url.pathname.slice(1)];
+      // Remove the leading slash from the URL path and convert to platform specific.
+      // The latest build files will use the platform path separator.
+      let pathname = url.pathname.slice(1);
+      if (isWindows) {
+        pathname = pathname.replaceAll(path.posix.sep, path.win32.sep);
+      }
+
+      const file = this.latestBuildFiles.files[pathname];
 
       if (file?.origin === 'disk') {
         this.serveFile(file.inputPath, undefined, res);
