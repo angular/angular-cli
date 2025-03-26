@@ -1,3 +1,18 @@
+<a name="19.2.5"></a>
+
+# 19.2.5 (2025-03-26)
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                                             |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------------- |
+| [20455e2a6](https://github.com/angular/angular-cli/commit/20455e2a64558fcbb11906cb414a99d3976645d6) | fix  | correct handling of response/request errors                             |
+| [32b1dcd91](https://github.com/angular/angular-cli/commit/32b1dcd91b9f351bb6baa54f52c81c465185e01b) | fix  | handle undefined `getOrCreateAngularServerApp` during error compilation |
+| [7552a9fec](https://github.com/angular/angular-cli/commit/7552a9fec971f64ff27d78754ed13654e9a56b43) | fix  | normalize karma asset paths before lookup                               |
+| [1eb5b4357](https://github.com/angular/angular-cli/commit/1eb5b43575ab9908122606b94c0aaa53718678aa) | fix  | update vite to 6.2.3                                                    |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="19.2.4"></a>
 
 # 19.2.4 (2025-03-19)
