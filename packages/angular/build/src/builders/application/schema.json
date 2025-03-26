@@ -293,6 +293,13 @@
         "type": "string"
       }
     },
+    "conditions": {
+      "description": "Custom package resolution conditions used to resolve conditional exports/imports. Defaults to ['module', 'development'/'production']. The following special conditions are always present if the requirements are satisfied: 'default', 'import', 'require', 'browser', 'node'.",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
     "fileReplacements": {
       "description": "Replace compilation source files with other compilation source files in the build.",
       "type": "array",
