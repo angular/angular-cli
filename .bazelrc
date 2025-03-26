@@ -135,6 +135,7 @@ build:remote --platforms=@devinfra//bazel/remote-execution:platform_with_network
 
 # Set remote caching settings
 build:remote --remote_accept_cached=true
+build:remote --remote_upload_local_results=false
 
 # Force remote executions to consider the entire run as linux.
 # This is required for OSX cross-platform RBE.
@@ -147,7 +148,7 @@ build:remote --google_default_credentials
 # Use HTTP remote cache
 build:remote-cache --remote_cache=https://storage.googleapis.com/angular-team-cache
 build:remote-cache --remote_accept_cached=true
-build:remote-cache --remote_upload_local_results=true
+build:remote-cache --remote_upload_local_results=false
 build:remote-cache --google_default_credentials
 
 ###############################
