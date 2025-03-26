@@ -498,6 +498,7 @@ export async function normalizeOptions(
     security,
     templateUpdates: !!options.templateUpdates,
     incrementalResults: !!options.incrementalResults,
+    customConditions: options.conditions,
   };
 }
 
