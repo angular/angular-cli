@@ -234,7 +234,7 @@ load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 
 git_repository(
     name = "devinfra",
-    commit = "be69a70efc9f2331083d76073427c0c81ec15a1e",
+    commit = "5663ac5a55be066ceb7499d4f86a0883386554af",
     remote = "https://github.com/angular/dev-infra.git",
 )
 
