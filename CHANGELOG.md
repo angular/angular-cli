@@ -1,3 +1,46 @@
+<a name="20.0.0-next.3"></a>
+
+# 20.0.0-next.3 (2025-03-26)
+
+## Breaking Changes
+
+### @angular/cli
+
+- Node.js versions from 22.0 to 22.10 are no longer supported
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                                           |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------------------- |
+| [9e6b9b537](https://github.com/angular/angular-cli/commit/9e6b9b5379d0448578b3bfb6100852dea7febe75) | fix  | add type checking of host bindings to strict config                   |
+| [381d35fe4](https://github.com/angular/angular-cli/commit/381d35fe40f062713eac550a12b58c30c1ec33a9) | fix  | remove empty `scripts` option value from new applications             |
+| [a910fe9ae](https://github.com/angular/angular-cli/commit/a910fe9ae0423146f6509c5b9c45c88415365c9f) | fix  | remove explicit `outputPath` option value from generated applications |
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                            |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------ |
+| [64732534e](https://github.com/angular/angular-cli/commit/64732534ecb84d702bde2469466a05e765879f9a) | fix  | update minimum supported Node.js 22 version to 22.11.0 |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                                             |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------------- |
+| [c1de63300](https://github.com/angular/angular-cli/commit/c1de633007c423cfd9113cc781b5647e59306146) | feat | allow control of source map sources content for application builds      |
+| [9b682e625](https://github.com/angular/angular-cli/commit/9b682e62519e761477e6266650239bf58026a9f4) | feat | support a default outputPath option for applications                    |
+| [156a14e38](https://github.com/angular/angular-cli/commit/156a14e387d83002fa01b33d574a6fbc078dad84) | fix  | correct handling of response/request errors                             |
+| [a8817a3b2](https://github.com/angular/angular-cli/commit/a8817a3b2a9a94bdfcba4bf690e217e7d2d4686c) | fix  | handle undefined `getOrCreateAngularServerApp` during error compilation |
+| [bd917d92a](https://github.com/angular/angular-cli/commit/bd917d92a653b1a5ece7ab96adfde8f8d282c34a) | fix  | normalize karma asset paths before lookup                               |
+
+### @angular/ssr
+
+| Commit                                                                                              | Type | Description                                     |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------- |
+| [63428f3f1](https://github.com/angular/angular-cli/commit/63428f3f1e2ffd427011ea8a17b70f8829ae0bdf) | perf | flush headers prior to start rendering the HTML |
+| [6bd7b9b4a](https://github.com/angular/angular-cli/commit/6bd7b9b4a59240caa4f19185570aec8263d8a0a7) | perf | optimized request handling performance          |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="19.2.5"></a>
 
 # 19.2.5 (2025-03-26)
