@@ -1,3 +1,21 @@
+<a name="18.2.16"></a>
+
+# 18.2.16 (2025-03-26)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                         |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------- |
+| [4267a80c5](https://github.com/angular/angular-cli/commit/4267a80c5cd1e9e6aaae0f9090e21c2d71a6887f) | fix  | remove `@vitejs/plugin-basic-ssl` from dependencies |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description           |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------- |
+| [9c2904d0d](https://github.com/angular/angular-cli/commit/9c2904d0d3a7b2790b27d21c1ff23e6d8a01c4f0) | fix  | update vite to 5.4.15 |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="18.2.15"></a>
 
 # 18.2.15 (2025-03-13)
