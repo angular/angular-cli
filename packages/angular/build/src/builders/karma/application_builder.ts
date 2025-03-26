@@ -361,6 +361,7 @@ async function collectEntrypoints(
   return getTestEntrypoints(testFiles, { projectSourceRoot, workspaceRoot: context.workspaceRoot });
 }
 
+// eslint-disable-next-line max-lines-per-function
 async function initializeApplication(
   options: KarmaBuilderOptions,
   context: BuilderContext,
@@ -507,6 +508,17 @@ async function initializeApplication(
     transforms.karmaOptions ? transforms.karmaOptions(karmaOptions) : karmaOptions,
     { promiseConfig: true, throwErrors: true },
   );
+
+  // Check for jsdom which does not support executing ESM scripts.
+  // If present, remove jsdom and issue a warning.
+  const updatedBrowsers = parsedKarmaConfig.browsers?.filter((browser) => browser !== 'jsdom');
+  if (parsedKarmaConfig.browsers?.length !== updatedBrowsers?.length) {
+    parsedKarmaConfig.browsers = updatedBrowsers;
+    context.logger.warn(
+      `'jsdom' does not support ESM code execution and cannot be used for karma testing.` +
+        ` The 'jsdom' entry has been removed from the 'browsers' option.`,
+    );
+  }
 
   // Remove the webpack plugin/framework:
   // Alternative would be to make the Karma plugin "smart" but that's a tall order

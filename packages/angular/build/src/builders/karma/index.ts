@@ -68,7 +68,7 @@ function getBaseKarmaOptions(
 
   // Convert browsers from a string to an array
   if (typeof options.browsers === 'string' && options.browsers) {
-    karmaOptions.browsers = options.browsers.split(',');
+    karmaOptions.browsers = options.browsers.split(',').map((browser) => browser.trim());
   } else if (options.browsers === false) {
     karmaOptions.browsers = [];
   }
