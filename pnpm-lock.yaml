@@ -436,8 +436,8 @@ importers:
         specifier: 4.2.2
         version: 4.2.2
       ng-packagr:
-        specifier: 20.0.0-next.1
-        version: 20.0.0-next.1(@angular/compiler-cli@20.0.0-next.4(@angular/compiler@20.0.0-next.4)(typescript@5.8.2))(tslib@2.8.1)(typescript@5.8.2)
+        specifier: 20.0.0-next.2
+        version: 20.0.0-next.2(@angular/compiler-cli@20.0.0-next.4(@angular/compiler@20.0.0-next.4)(typescript@5.8.2))(tslib@2.8.1)(typescript@5.8.2)
       postcss:
         specifier: 8.5.3
         version: 8.5.3
@@ -735,8 +735,8 @@ importers:
         specifier: 7.4.2
         version: 7.4.2(webpack@5.98.0(esbuild@0.25.1))
       webpack-dev-server:
-        specifier: 5.2.0
-        version: 5.2.0(webpack@5.98.0(esbuild@0.25.1))
+        specifier: 5.2.1
+        version: 5.2.1(webpack@5.98.0(esbuild@0.25.1))
       webpack-merge:
         specifier: 6.0.1
         version: 6.0.1
@@ -758,8 +758,8 @@ importers:
         specifier: 3.0.3
         version: 3.0.3
       ng-packagr:
-        specifier: 20.0.0-next.1
-        version: 20.0.0-next.1(@angular/compiler-cli@20.0.0-next.4(@angular/compiler@20.0.0-next.4)(typescript@5.8.2))(tslib@2.8.1)(typescript@5.8.2)
+        specifier: 20.0.0-next.2
+        version: 20.0.0-next.2(@angular/compiler-cli@20.0.0-next.4(@angular/compiler@20.0.0-next.4)(typescript@5.8.2))(tslib@2.8.1)(typescript@5.8.2)
       undici:
         specifier: 7.5.0
         version: 7.5.0
@@ -783,8 +783,8 @@ importers:
         specifier: 5.98.0
         version: 5.98.0(esbuild@0.25.1)
       webpack-dev-server:
-        specifier: 5.2.0
-        version: 5.2.0(webpack@5.98.0(esbuild@0.25.1))
+        specifier: 5.2.1
+        version: 5.2.1(webpack@5.98.0(esbuild@0.25.1))
 
   packages/angular_devkit/core:
     dependencies:
@@ -5934,9 +5934,9 @@ packages:
     resolution: {integrity: sha512-dBpDMdxv9Irdq66304OLfEmQ9tbNRFnFTuZiLo+bD+r332bBmMJ8GBLXklIXXgxd3+v9+KUnZaUR5PJMa75Gsg==}
     engines: {node: '>= 0.4.0'}
 
-  ng-packagr@20.0.0-next.1:
-    resolution: {integrity: sha512-6v6t7R9U3UVHx0MywijxWMiQ0OujNCPDaWK/Ih7hUfNmBAIqeF+bdlKc+BnItcHSTyaouethcSQCttxAhpmOXQ==}
-    engines: {node: ^18.19.1 || >=20.11.1}
+  ng-packagr@20.0.0-next.2:
+    resolution: {integrity: sha512-JVlv4DBWSRmr6sccKHsvCg9QayT0D7Fcx2LeeCk35Ppi1/kZCMTAtpsRQg3x28A9x/Bxw5CfNsDvtsWvAcbKyQ==}
+    engines: {node: ^20.11.1 || >=22.11.0}
     hasBin: true
     peerDependencies:
       '@angular/compiler-cli': ^20.0.0 || ^20.0.0-next.0
@@ -7711,8 +7711,8 @@ packages:
       webpack:
         optional: true
 
-  webpack-dev-server@5.2.0:
-    resolution: {integrity: sha512-90SqqYXA2SK36KcT6o1bvwvZfJFcmoamqeJY7+boioffX9g9C0wjjJRGUrQIuh43pb0ttX7+ssavmj/WN2RHtA==}
+  webpack-dev-server@5.2.1:
+    resolution: {integrity: sha512-ml/0HIj9NLpVKOMq+SuBPLHcmbG+TGIjXRHsYfZwocUBIqEvws8NnS/V9AFQ5FKP+tgn5adwVwRrTEpGL33QFQ==}
     engines: {node: '>= 18.12.0'}
     hasBin: true
     peerDependencies:
@@ -13729,8 +13729,9 @@ snapshots:
 
   netmask@2.0.2: {}
 
-  ng-packagr@20.0.0-next.1(@angular/compiler-cli@20.0.0-next.4(@angular/compiler@20.0.0-next.4)(typescript@5.8.2))(tslib@2.8.1)(typescript@5.8.2):
+  ng-packagr@20.0.0-next.2(@angular/compiler-cli@20.0.0-next.4(@angular/compiler@20.0.0-next.4)(typescript@5.8.2))(tslib@2.8.1)(typescript@5.8.2):
     dependencies:
+      '@ampproject/remapping': 2.3.0
       '@angular/compiler-cli': 20.0.0-next.4(@angular/compiler@20.0.0-next.4)(typescript@5.8.2)
       '@rollup/plugin-json': 6.1.0(rollup@4.37.0)
       '@rollup/wasm-node': 4.37.0
@@ -15773,11 +15774,12 @@ snapshots:
     optionalDependencies:
       webpack: 5.98.0(esbuild@0.25.1)
 
-  webpack-dev-server@5.2.0(webpack@5.98.0(esbuild@0.25.1)):
+  webpack-dev-server@5.2.1(webpack@5.98.0(esbuild@0.25.1)):
     dependencies:
       '@types/bonjour': 3.5.13
       '@types/connect-history-api-fallback': 1.5.4
       '@types/express': 4.17.21
+      '@types/express-serve-static-core': 4.19.6
       '@types/serve-index': 1.9.4
       '@types/serve-static': 1.15.7
       '@types/sockjs': 0.3.36
