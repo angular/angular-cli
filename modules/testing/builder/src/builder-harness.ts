@@ -104,7 +104,11 @@ export class BuilderHarness<T> {
       ...builderInfo,
     };
 
-    this.schemaRegistry.addPostTransform(json.schema.transforms.addUndefinedDefaults);
+    if (builderInfo?.builderName?.startsWith('@angular/build:')) {
+      this.schemaRegistry.addPostTransform(json.schema.transforms.addUndefinedObjectDefaults);
+    } else {
+      this.schemaRegistry.addPostTransform(json.schema.transforms.addUndefinedDefaults);
+    }
   }
 
   private resolvePath(path: string): string {

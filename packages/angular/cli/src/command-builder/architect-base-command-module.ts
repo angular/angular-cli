@@ -52,10 +52,16 @@ export abstract class ArchitectBaseCommandModule<T extends object>
       return this.onMissingTarget(e.message);
     }
 
+    const isAngularBuild = builderName.startsWith('@angular/build:');
+
     const { logger } = this.context;
-    const run = await this.getArchitect().scheduleTarget(target, options as json.JsonObject, {
-      logger,
-    });
+    const run = await this.getArchitect(isAngularBuild).scheduleTarget(
+      target,
+      options as json.JsonObject,
+      {
+        logger,
+      },
+    );
 
     const analytics = isPackageNameSafeForAnalytics(builderName)
       ? await this.getAnalytics()
@@ -150,13 +156,17 @@ export abstract class ArchitectBaseCommandModule<T extends object>
   }
 
   private _architect: Architect | undefined;
-  protected getArchitect(): Architect {
+  protected getArchitect(skipUndefinedArrayTransform: boolean): Architect {
     if (this._architect) {
       return this._architect;
     }
 
     const registry = new json.schema.CoreSchemaRegistry();
-    registry.addPostTransform(json.schema.transforms.addUndefinedDefaults);
+    if (skipUndefinedArrayTransform) {
+      registry.addPostTransform(json.schema.transforms.addUndefinedObjectDefaults);
+    } else {
+      registry.addPostTransform(json.schema.transforms.addUndefinedDefaults);
+    }
     registry.useXDeprecatedProvider((msg) => this.context.logger.warn(msg));
 
     const architectHost = this.getArchitectHost();
