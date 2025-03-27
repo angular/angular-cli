@@ -40,7 +40,7 @@ jobs:
       - name: Initialize environment
         uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@b79ac7f5d6689becb7f2d559affbab5afb361389
       - name: Setup Bazel
-        uses: angular/dev-infra/github-actions/bazel/setup@0ad6a370f70638e785d6ef1f90dc6ede34684a47
+        uses: angular/dev-infra/github-actions/bazel/setup@e3c0efecadda0e0fbb616abcdf447c788959ca64
       - name: Install node modules
         run: pnpm install --frozen-lockfile
       # We utilize the google-github-actions/auth action to allow us to get an active credential using workflow
