@@ -16,11 +16,6 @@ inputs:
 runs:
   using: composite
   steps:
-    - name: Setup Bazel RBE
-      uses: angular/dev-infra/github-actions/bazel/configure-remote@2667d139a421977a40c3ea7ec768609fb19a8b9d
-      with:
-        allow_windows_rbe: true
-
     - name: Initialize WSL
       id: init_wsl
       uses: angular/dev-infra/github-actions/setup-wsl@9a3e28a515bf51cd2ecfd5f4d5b17613845e6f44

@@ -151,6 +151,9 @@ build:remote-cache --remote_accept_cached=true
 build:remote-cache --remote_upload_local_results=false
 build:remote-cache --google_default_credentials
 
+# Additional flags added when running a "trusted build" with additional access
+build:trusted-build --remote_upload_local_results=true
+
 ###############################
 # NodeJS rules settings
 # These settings are required for rules_nodejs
