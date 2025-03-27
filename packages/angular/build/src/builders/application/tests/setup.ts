@@ -13,7 +13,7 @@ import { Schema } from '../schema';
 export * from '../../../../../../../modules/testing/builder/src';
 
 export const APPLICATION_BUILDER_INFO = Object.freeze({
-  name: '@angular-devkit/build-angular:application',
+  name: '@angular/build:application',
   schemaPath: __dirname + '/../schema.json',
 });
 

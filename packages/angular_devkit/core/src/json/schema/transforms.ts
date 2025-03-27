@@ -11,10 +11,27 @@ import { JsonPointer } from './interface';
 import { JsonSchema } from './schema';
 import { getTypesOfSchema } from './utility';
 
+export function addUndefinedObjectDefaults(
+  value: JsonValue,
+  _pointer: JsonPointer,
+  schema?: JsonSchema,
+): JsonValue {
+  return transformUndefined(value, _pointer, schema, true);
+}
+
 export function addUndefinedDefaults(
   value: JsonValue,
   _pointer: JsonPointer,
   schema?: JsonSchema,
+): JsonValue {
+  return transformUndefined(value, _pointer, schema, false);
+}
+
+function transformUndefined(
+  value: JsonValue,
+  _pointer: JsonPointer,
+  schema?: JsonSchema,
+  onlyObjects?: boolean,
 ): JsonValue {
   if (typeof schema === 'boolean' || schema === undefined) {
     return value;
@@ -45,7 +62,7 @@ export function addUndefinedDefaults(
     return value;
   }
 
-  if (type === 'array') {
+  if (!onlyObjects && type === 'array') {
     return value == undefined ? [] : value;
   }
 
@@ -94,7 +111,7 @@ export function addUndefinedDefaults(
           });
 
         if (adjustedSchema && isJsonObject(adjustedSchema)) {
-          newValue[propName] = addUndefinedDefaults(value, _pointer, adjustedSchema);
+          newValue[propName] = transformUndefined(value, _pointer, adjustedSchema, onlyObjects);
         }
       }
     }

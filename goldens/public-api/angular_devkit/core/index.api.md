@@ -18,6 +18,9 @@ import { ValidateFunction } from 'ajv';
 // @public (undocumented)
 function addUndefinedDefaults(value: JsonValue, _pointer: JsonPointer, schema?: JsonSchema): JsonValue;
 
+// @public (undocumented)
+function addUndefinedObjectDefaults(value: JsonValue, _pointer: JsonPointer, schema?: JsonSchema): JsonValue;
+
 // @public
 class AliasHost<StatsT extends object = {}> extends ResolverHost<StatsT> {
     // (undocumented)
@@ -1297,6 +1300,7 @@ class TransformLogger extends Logger {
 
 declare namespace transforms {
     export {
+        addUndefinedObjectDefaults,
         addUndefinedDefaults
     }
 }
