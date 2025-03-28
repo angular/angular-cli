@@ -546,6 +546,7 @@ function getEsBuildCommonOptions(options: NormalizedApplicationBuildOptions): Bu
     loaderExtensions,
     jsonLogs,
     i18nOptions,
+    customConditions,
   } = options;
 
   // Ensure unique hashes for i18n translation changes when using post-process inlining.
@@ -563,18 +564,29 @@ function getEsBuildCommonOptions(options: NormalizedApplicationBuildOptions): Bu
     footer = { js: `/**i18n:${createHash('sha256').update(i18nHash).digest('hex')}*/` };
   }
 
+  // Core conditions that are always included
+  const conditions = [
+    // Required to support rxjs 7.x which will use es5 code if this condition is not present
+    'es2015',
+    'es2020',
+  ];
+
+  // Append custom conditions if present
+  if (customConditions) {
+    conditions.push(...customConditions);
+  } else {
+    // Include default conditions
+    conditions.push('module');
+    conditions.push(optimizationOptions.scripts ? 'production' : 'development');
+  }
+
   return {
     absWorkingDir: workspaceRoot,
     format: 'esm',
     bundle: true,
     packages: 'bundle',
     assetNames: outputNames.media,
-    conditions: [
-      'es2020',
-      'es2015',
-      'module',
-      optimizationOptions.scripts ? 'production' : 'development',
-    ],
+    conditions,
     resolveExtensions: ['.ts', '.tsx', '.mjs', '.js', '.cjs'],
     metafile: true,
     legalComments: options.extractLicenses ? 'none' : 'eof',

@@ -22,7 +22,7 @@ export * from '../../../../../../../modules/testing/builder/src';
 
 // TODO: Remove and use import after Vite-based dev server is moved to new package
 export const APPLICATION_BUILDER_INFO = Object.freeze({
-  name: '@angular-devkit/build-angular:application',
+  name: '@angular/build:application',
   schemaPath: path.join(
     path.dirname(require.resolve('@angular/build/package.json')),
     'src/builders/application/schema.json',
@@ -49,7 +49,7 @@ export const APPLICATION_BASE_OPTIONS = Object.freeze<AppilicationSchema>({
 });
 
 export const DEV_SERVER_BUILDER_INFO = Object.freeze({
-  name: '@angular-devkit/build-angular:dev-server',
+  name: '@angular/build:dev-server',
   schemaPath: __dirname + '/../schema.json',
 });
 

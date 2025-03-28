@@ -28,6 +28,7 @@ export type ApplicationBuilderOptions = {
     browser: string;
     budgets?: Budget[];
     clearScreen?: boolean;
+    conditions?: string[];
     crossOrigin?: CrossOrigin;
     define?: {
         [key: string]: string;
