@@ -127,7 +127,7 @@
     "npm": "^11.0.0",
     "prettier": "^3.0.0",
     "protractor": "~7.0.0",
-    "puppeteer": "18.2.1",
+    "puppeteer": "24.4.0",
     "quicktype-core": "23.0.171",
     "rollup": "4.37.0",
     "rollup-license-plugin": "~3.0.1",
