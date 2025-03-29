@@ -577,6 +577,7 @@ function getEsBuildCommonOptions(options: NormalizedApplicationBuildOptions): Bu
     ],
     resolveExtensions: ['.ts', '.tsx', '.mjs', '.js', '.cjs'],
     metafile: true,
+    charset: 'utf8',
     legalComments: options.extractLicenses ? 'none' : 'eof',
     logLevel: options.verbose && !jsonLogs ? 'debug' : 'silent',
     minifyIdentifiers: optimizationOptions.scripts && allowMangle,
