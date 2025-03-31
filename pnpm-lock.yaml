@@ -352,9 +352,6 @@ importers:
       '@babel/helper-split-export-declaration':
         specifier: 7.24.7
         version: 7.24.7
-      '@babel/plugin-syntax-import-attributes':
-        specifier: 7.26.0
-        version: 7.26.0(@babel/core@7.26.10)
       '@inquirer/confirm':
         specifier: 5.1.8
         version: 5.1.8(@types/node@20.17.28)

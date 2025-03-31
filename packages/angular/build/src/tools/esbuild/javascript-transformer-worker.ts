@@ -61,9 +61,7 @@ async function transformWithBabel(
     options.sourcemap &&
     (!!options.thirdPartySourcemaps || !/[\\/]node_modules[\\/]/.test(filename));
 
-  // @ts-expect-error Import attribute syntax plugin does not currently have type definitions
-  const { default: importAttributePlugin } = await import('@babel/plugin-syntax-import-attributes');
-  const plugins: PluginItem[] = [importAttributePlugin];
+  const plugins: PluginItem[] = [];
 
   if (options.instrumentForCoverage) {
     const { default: coveragePlugin } = await import('../babel/plugins/add-code-coverage.js');
