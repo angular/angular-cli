@@ -81,7 +81,6 @@ ts_project(
         ":node_modules/@babel/core",
         ":node_modules/@babel/helper-annotate-as-pure",
         ":node_modules/@babel/helper-split-export-declaration",
-        ":node_modules/@babel/plugin-syntax-import-attributes",
         ":node_modules/@inquirer/confirm",
         ":node_modules/@vitejs/plugin-basic-ssl",
         ":node_modules/browserslist",

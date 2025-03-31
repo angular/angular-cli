@@ -23,7 +23,6 @@
     "@babel/core": "7.26.10",
     "@babel/helper-annotate-as-pure": "7.25.9",
     "@babel/helper-split-export-declaration": "7.24.7",
-    "@babel/plugin-syntax-import-attributes": "7.26.0",
     "@inquirer/confirm": "5.1.8",
     "@vitejs/plugin-basic-ssl": "2.0.0",
     "beasties": "0.2.0",
