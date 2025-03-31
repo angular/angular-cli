@@ -259,10 +259,12 @@ export async function normalizeOptions(
     : await getTailwindConfig(searchDirectories, workspaceRoot, context);
 
   let serverEntryPoint: string | undefined;
-  if (options.server) {
+  if (typeof options.server === 'string') {
+    if (options.server === '') {
+      throw new Error('The "server" option cannot be an empty string.');
+    }
+
     serverEntryPoint = path.join(workspaceRoot, options.server);
-  } else if (options.server === '') {
-    throw new Error('The "server" option cannot be an empty string.');
   }
 
   let prerenderOptions;
