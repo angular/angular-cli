@@ -57,8 +57,8 @@ export type ApplicationBuilderOptions = {
     progress?: boolean;
     scripts?: ScriptElement[];
     security?: Security;
-    server?: string;
-    serviceWorker?: ServiceWorker_2;
+    server?: Serv;
+    serviceWorker?: Serv;
     sourceMap?: SourceMapUnion;
     ssr?: SsrUnion;
     statsJson?: boolean;

@@ -17,7 +17,6 @@
       "description": "The full path for the browser entry point to the application, relative to the current workspace."
     },
     "server": {
-      "type": "string",
       "description": "The full path for the server entry point to the application, relative to the current workspace.",
       "oneOf": [
         {
