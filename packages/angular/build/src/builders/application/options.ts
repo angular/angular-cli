@@ -9,7 +9,7 @@
 import type { BuilderContext } from '@angular-devkit/architect';
 import type { Plugin } from 'esbuild';
 import { realpathSync } from 'node:fs';
-import { access, constants } from 'node:fs/promises';
+import { access, constants, readFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import path from 'node:path';
 import { normalizeAssetPatterns, normalizeOptimization, normalizeSourceMaps } from '../../utils';
@@ -499,6 +499,7 @@ export async function normalizeOptions(
     templateUpdates: !!options.templateUpdates,
     incrementalResults: !!options.incrementalResults,
     customConditions: options.conditions,
+    frameworkVersion: await findFrameworkVersion(projectRoot),
   };
 }
 
@@ -705,4 +706,23 @@ function normalizeExternals(value: string[] | undefined): string[] | undefined {
   }
 
   return [...new Set(value.map((d) => (d.endsWith('/*') ? d.slice(0, -2) : d)))];
+}
+
+async function findFrameworkVersion(projectRoot: string): Promise<string> {
+  // Create a custom require function for ESM compliance.
+  // NOTE: The trailing slash is significant.
+  const projectResolve = createRequire(projectRoot + '/').resolve;
+
+  try {
+    const manifestPath = projectResolve('@angular/core/package.json');
+    const manifestData = await readFile(manifestPath, 'utf-8');
+    const manifestObject = JSON.parse(manifestData) as { version: string };
+    const version = manifestObject.version;
+
+    return version;
+  } catch {
+    throw new Error(
+      'Error: It appears that "@angular/core" is missing as a dependency. Please ensure it is included in your project.',
+    );
+  }
 }
