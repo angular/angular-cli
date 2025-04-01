@@ -38,11 +38,11 @@
     "picomatch": "4.0.2",
     "piscina": "4.9.2",
     "rollup": "4.38.0",
-    "sass": "1.86.0",
+    "sass": "1.86.1",
     "semver": "7.7.1",
     "source-map-support": "0.5.21",
     "tinyglobby": "0.2.12",
-    "vite": "6.2.3",
+    "vite": "6.2.4",
     "watchpack": "2.4.2"
   },
   "optionalDependencies": {
