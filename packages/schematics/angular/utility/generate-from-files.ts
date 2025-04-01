@@ -60,14 +60,17 @@ export function generateFromFiles(
         ...extraTemplateValues,
       }),
       !options.type
-        ? forEach(((file) => {
-            return file.path.includes('..')
-              ? {
-                  content: file.content,
-                  path: file.path.replace('..', '.'),
-                }
-              : file;
-          }) as FileOperator)
+        ? forEach((file) => {
+            let filePath: string = file.path;
+            while (filePath.includes('..')) {
+              filePath = filePath.replaceAll('..', '.');
+            }
+
+            return {
+              content: file.content,
+              path: filePath,
+            } as ReturnType<FileOperator>;
+          })
         : noop(),
       move(parsedPath.path + (options.flat ? '' : '/' + strings.dasherize(options.name))),
     ]);
