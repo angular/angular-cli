@@ -7,7 +7,7 @@
  */
 
 import { BaseException } from '@angular-devkit/core';
-import { dirname, join, resolve } from 'node:path';
+import { dirname, resolve } from 'node:path';
 import { RuleFactory } from '../src';
 import { FileSystemCollectionDesc, FileSystemSchematicDesc } from './description';
 import { ExportStringRef } from './export-ref';
@@ -46,20 +46,14 @@ export class NodeModulesEngineHost extends FileSystemEngineHostBase {
       }
     }
 
-    const relativeBase = requester ? dirname(requester) : process.cwd();
     let collectionPath: string | undefined = undefined;
-
-    if (name.startsWith('.')) {
-      name = resolve(relativeBase, name);
-    }
-
     const resolveOptions = {
       paths: requester ? [dirname(requester), ...(this.paths || [])] : this.paths,
     };
 
     // Try to resolve as a package
     try {
-      const packageJsonPath = require.resolve(join(name, 'package.json'), resolveOptions);
+      const packageJsonPath = require.resolve(`${name}/package.json`, resolveOptions);
       const { schematics } = require(packageJsonPath);
 
       if (!schematics || typeof schematics !== 'string') {
