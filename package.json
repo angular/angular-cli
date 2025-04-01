@@ -106,7 +106,7 @@
     "eslint-config-prettier": "10.1.1",
     "eslint-plugin-header": "3.1.1",
     "eslint-plugin-import": "2.31.0",
-    "express": "4.21.2",
+    "express": "5.1.0",
     "fast-glob": "3.3.3",
     "globals": "16.0.0",
     "http-proxy": "^1.18.1",
