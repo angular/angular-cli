@@ -20,7 +20,6 @@
     "@angular-devkit/schematics": "workspace:0.0.0-PLACEHOLDER",
     "@inquirer/prompts": "7.4.0",
     "ansi-colors": "4.1.3",
-    "symbol-observable": "4.0.0",
     "yargs-parser": "21.1.1"
   }
 }

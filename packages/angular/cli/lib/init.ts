@@ -6,8 +6,6 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import 'symbol-observable';
-// symbol polyfill must go first
 import { readFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import * as path from 'node:path';
