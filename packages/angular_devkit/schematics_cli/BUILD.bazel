@@ -52,7 +52,6 @@ ts_project(
         "//:node_modules/@types/node",
         "//:node_modules/@types/yargs-parser",
         "//:node_modules/ansi-colors",
-        "//:node_modules/symbol-observable",
         "//:node_modules/yargs-parser",
     ],
 )

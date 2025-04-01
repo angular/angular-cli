@@ -281,9 +281,6 @@ importers:
       source-map-support:
         specifier: 0.5.21
         version: 0.5.21
-      symbol-observable:
-        specifier: 4.0.0
-        version: 4.0.0
       tar:
         specifier: ^7.0.0
         version: 7.4.3
@@ -492,9 +489,6 @@ importers:
       semver:
         specifier: 7.7.1
         version: 7.7.1
-      symbol-observable:
-        specifier: 4.0.0
-        version: 4.0.0
       yargs:
         specifier: 17.7.2
         version: 17.7.2
@@ -565,9 +559,6 @@ importers:
       progress:
         specifier: 2.0.3
         version: 2.0.3
-      symbol-observable:
-        specifier: 4.0.0
-        version: 4.0.0
       yargs-parser:
         specifier: 21.1.1
         version: 21.1.1
@@ -843,9 +834,6 @@ importers:
       ansi-colors:
         specifier: 4.1.3
         version: 4.1.3
-      symbol-observable:
-        specifier: 4.0.0
-        version: 4.0.0
       yargs-parser:
         specifier: 21.1.1
         version: 21.1.1
@@ -7190,10 +7178,6 @@ packages:
   supports-preserve-symlinks-flag@1.0.0:
     resolution: {integrity: sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==}
     engines: {node: '>= 0.4'}
-
-  symbol-observable@4.0.0:
-    resolution: {integrity: sha512-b19dMThMV4HVFynSAM1++gBHAbk2Tc/osgLIBZMKsyqh34jb2e8Os7T6ZW/Bt3pJFdBTd2JwAnAAEQV7rSNvcQ==}
-    engines: {node: '>=0.10'}
 
   table-layout@4.1.1:
     resolution: {integrity: sha512-iK5/YhZxq5GO5z8wb0bY1317uDF3Zjpha0QFFLA8/trAoiLbQD0HUbMesEaxyzUgDxi2QlcbM8IvqOlEjgoXBA==}
@@ -15133,8 +15117,6 @@ snapshots:
       has-flag: 4.0.0
 
   supports-preserve-symlinks-flag@1.0.0: {}
-
-  symbol-observable@4.0.0: {}
 
   table-layout@4.1.1:
     dependencies:

@@ -121,14 +121,6 @@ export default [
       'import/newline-after-import': 'error',
       'import/no-absolute-path': 'error',
       'import/no-duplicates': 'error',
-
-      'import/no-unassigned-import': [
-        'error',
-        {
-          allow: ['symbol-observable'],
-        },
-      ],
-
       'import/order': [
         'error',
         {

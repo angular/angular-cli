@@ -7,8 +7,6 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-// symbol polyfill must go first
-import 'symbol-observable';
 import { JsonValue, logging, schema } from '@angular-devkit/core';
 import { ProcessOutput, createConsoleLogger } from '@angular-devkit/core/node';
 import { UnsuccessfulWorkflowExecution } from '@angular-devkit/schematics';

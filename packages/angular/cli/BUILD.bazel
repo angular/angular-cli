@@ -69,7 +69,6 @@ ts_project(
         "//:node_modules/@types/yarnpkg__lockfile",
         "//:node_modules/listr2",
         "//:node_modules/semver",
-        "//:node_modules/symbol-observable",
     ],
 )
 
