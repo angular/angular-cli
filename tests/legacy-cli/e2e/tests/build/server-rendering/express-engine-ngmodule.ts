@@ -5,7 +5,7 @@ import { installWorkspacePackages } from '../../../utils/packages';
 import { execAndWaitForOutputToMatch, ng } from '../../../utils/process';
 import {
   updateJsonFile,
-  updateServerFileForWebpack,
+  updateServerFileForEsbuild,
   useCIChrome,
   useCIDefaults,
   useSha,
@@ -62,7 +62,7 @@ export default async function () {
       build.options.outputMode = undefined;
     });
 
-    await updateServerFileForWebpack('projects/test-project-two/src/server.ts');
+    await updateServerFileForEsbuild('projects/test-project-two/src/server.ts');
   }
 
   await writeMultipleFiles({

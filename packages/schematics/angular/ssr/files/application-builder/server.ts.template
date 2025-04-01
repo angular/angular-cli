@@ -18,7 +18,7 @@ const angularApp = new AngularNodeAppEngine();
  *
  * Example:
  * ```ts
- * app.get('/api/**', (req, res) => {
+ * app.get('/api/{*splat}', (req, res) => {
  *   // Handle API request
  * });
  * ```
@@ -38,7 +38,7 @@ app.use(
 /**
  * Handle all other requests by rendering the Angular application.
  */
-app.use('/**', (req, res, next) => {
+app.use((req, res, next) => {
   angularApp
     .handle(req)
     .then((response) =>
@@ -53,7 +53,11 @@ app.use('/**', (req, res, next) => {
  */
 if (isMainModule(import.meta.url)) {
   const port = process.env['PORT'] || 4000;
-  app.listen(port, () => {
+  app.listen(port, (error) => {
+    if (error) {
+      throw error;
+    }
+
     console.log(`Node Express server listening on http://localhost:${port}`);
   });
 }

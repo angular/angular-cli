@@ -3,20 +3,14 @@ import { rimraf, writeMultipleFiles } from '../../../utils/fs';
 import { findFreePort } from '../../../utils/network';
 import { installWorkspacePackages } from '../../../utils/packages';
 import { execAndWaitForOutputToMatch, ng } from '../../../utils/process';
-import { updateJsonFile, updateServerFileForWebpack, useSha } from '../../../utils/project';
+import { updateJsonFile, updateServerFileForEsbuild, useSha } from '../../../utils/project';
 
 export default async function () {
   // forcibly remove in case another test doesn't clean itself up
   await rimraf('node_modules/@angular/ssr');
 
   const useWebpackBuilder = !getGlobalVariable('argv')['esbuild'];
-
-  if (useWebpackBuilder) {
-    // `--server-routing` not supported in `browser` builder.
-    await ng('add', '@angular/ssr', '--skip-confirmation', '--skip-install');
-  } else {
-    await ng('add', '@angular/ssr', '--skip-confirmation', '--skip-install');
-  }
+  await ng('add', '@angular/ssr', '--skip-confirmation', '--skip-install');
 
   if (!useWebpackBuilder) {
     // Disable prerendering
@@ -25,7 +19,7 @@ export default async function () {
       build.options.outputMode = undefined;
     });
 
-    await updateServerFileForWebpack('src/server.ts');
+    await updateServerFileForEsbuild('src/server.ts');
   }
 
   await useSha();

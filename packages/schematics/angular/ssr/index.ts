@@ -24,6 +24,7 @@ import { posix } from 'node:path';
 import { Schema as ServerOptions } from '../server/schema';
 import {
   DependencyType,
+  ExistingBehavior,
   InstallBehavior,
   addDependency,
   readWorkspace,
@@ -299,10 +300,12 @@ function addDependencies({ skipInstall }: SSROptions, isUsingApplicationBuilder:
     addDependency('express', latestVersions['express'], {
       type: DependencyType.Default,
       install,
+      existing: ExistingBehavior.Replace,
     }),
     addDependency('@types/express', latestVersions['@types/express'], {
       type: DependencyType.Dev,
       install,
+      existing: ExistingBehavior.Replace,
     }),
   ];
 
