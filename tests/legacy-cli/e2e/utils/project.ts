@@ -205,7 +205,7 @@ export function isPrereleaseCli(): boolean {
   return (prerelease(getNgCLIVersion())?.length ?? 0) > 0;
 }
 
-export function updateServerFileForWebpack(filepath: string): Promise<void> {
+export function updateServerFileForEsbuild(filepath: string): Promise<void> {
   return writeFile(
     filepath,
     `
@@ -227,13 +227,13 @@ export function updateServerFileForWebpack(filepath: string): Promise<void> {
       server.set('view engine', 'html');
       server.set('views', browserDistFolder);
 
-      server.get('**', express.static(browserDistFolder, {
+      server.use(express.static(browserDistFolder, {
         maxAge: '1y',
-        index: 'index.html',
+        index: false,
       }));
 
       // All regular routes use the Angular engine
-      server.get('**', (req, res, next) => {
+      server.use((req, res, next) => {
         const { protocol, originalUrl, baseUrl, headers } = req;
 
         commonEngine
@@ -254,7 +254,10 @@ export function updateServerFileForWebpack(filepath: string): Promise<void> {
     function run(): void {
       const port = process.env['PORT'] || 4000;
       const server = app();
-      server.listen(port, () => {
+      server.listen(port, (error) => {
+        if (error) {
+          throw error;
+        }
         console.log(\`Node Express server listening on http://localhost:\${port}\`);
       });
     }

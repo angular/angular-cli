@@ -158,7 +158,6 @@ function* updateBuildTarget(
 
     yield externalSchematic('@schematics/angular', 'ssr', {
       project: projectName,
-      skipInstall: true,
     });
   }
 }

@@ -39,11 +39,12 @@ describe('Serve SSR Builder', () => {
           server.set('view engine', 'html');
           server.set('views', distFolder);
 
-          server.get('*.*', express.static(distFolder, {
-            maxAge: '1y'
+          server.use(express.static(distFolder, {
+            maxAge: '1y',
+            index: false,
           }));
 
-          server.get('*', (req, res, next) => {
+          server.use((req, res, next) => {
             commonEngine
               .render({
                 bootstrap: AppServerModule,

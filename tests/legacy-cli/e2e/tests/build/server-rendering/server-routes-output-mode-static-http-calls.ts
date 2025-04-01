@@ -84,14 +84,16 @@ export default async function () {
         const browserDistFolder = join(import.meta.dirname, '../browser');
         const angularNodeAppEngine = new AngularNodeAppEngine();
 
-        server.get('/api', (req, res) => res.json({ dataFromAPI: true }));
+        server.get('/api', (req, res) => {
+          res.json({ dataFromAPI: true })
+        });
 
-        server.get('**', express.static(browserDistFolder, {
+        server.use(express.static(browserDistFolder, {
           maxAge: '1y',
           index: 'index.html'
         }));
 
-        server.get('**', (req, res, next) => {
+        server.use((req, res, next) => {
           angularNodeAppEngine.handle(req)
             .then((response) => response ? writeResponseToNodeResponse(response, res) : next())
             .catch(next);
@@ -103,7 +105,10 @@ export default async function () {
 
       if (isMainModule(import.meta.url)) {
         const port = process.env['PORT'] || 4000;
-        server.listen(port, () => {
+        server.listen(port, (error) => {
+          if (error) {
+            throw error;
+          }
           console.log(\`Node Express server listening on http://localhost:\${port}\`);
         });
       }
