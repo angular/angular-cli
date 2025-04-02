@@ -10,6 +10,11 @@
       "factory": "./replace-provide-server-routing/migration",
       "description": "Migrate 'provideServerRendering' to use 'withRoutes' and remove 'provideServerRouting' from '@angular/ssr'."
     },
+    "update-module-resolution": {
+      "version": "20.0.0",
+      "factory": "./update-module-resolution/migration",
+      "description": "Update 'moduleResolution' to 'bundler' in TypeScript configurations. You can read more about this, here: https://www.typescriptlang.org/tsconfig/#moduleResolution"
+    },
     "use-application-builder": {
       "version": "20.0.0",
       "factory": "./use-application-builder/migration",
