@@ -62,6 +62,23 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
         harness.expectFile('dist/browser/index.html').content.toContain('TEST_123');
       });
 
+      it('should use the the index.html file within the project source root when not present', async () => {
+        harness.useTarget('build', {
+          ...BASE_OPTIONS,
+          index: undefined,
+        });
+
+        await harness.writeFile(
+          'src/index.html',
+          '<html><head><title>TEST_123</title></head><body></body>',
+        );
+
+        const { result } = await harness.executeOnce();
+
+        expect(result?.success).toBe(true);
+        harness.expectFile('dist/browser/index.html').content.toContain('TEST_123');
+      });
+
       // TODO: Build needs to be fixed to not throw an unhandled exception for this case
       xit('should fail build when a string path to non-existent file', async () => {
         harness.useTarget('build', {
