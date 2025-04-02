@@ -1,3 +1,22 @@
+<a name="19.2.6"></a>
+
+# 19.2.6 (2025-04-02)
+
+### @angular-devkit/schematics
+
+| Commit                                                                                              | Type | Description                                                                |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------------------- |
+| [e5aec562f](https://github.com/angular/angular-cli/commit/e5aec562feb0d293e88d560ea4ec0720e90dbc11) | fix  | properly resolve relative schematics when executed from a nested directory |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                     |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------- |
+| [76cfd364a](https://github.com/angular/angular-cli/commit/76cfd364a8b398153c09ce29c5672272ac0bce23) | fix  | correctly handle `false` value in server option |
+| [d69188c6b](https://github.com/angular/angular-cli/commit/d69188c6be2b851e3dfb84e2bd8d209062d7a283) | fix  | update vite to 6.2.4 due to a security issues   |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="18.2.17"></a>
 
 # 18.2.17 (2025-04-02)
