@@ -40,9 +40,6 @@ export default function (options: DirectiveOptions): Rule {
 
     options.module = findModuleFromOptions(host, options);
 
-    // Schematic templates require a defined type value
-    options.type ??= '';
-
     const parsedPath = parseName(options.path, options.name);
     options.name = parsedPath.name;
     options.path = parsedPath.path;

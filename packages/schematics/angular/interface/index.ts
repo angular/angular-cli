@@ -11,7 +11,5 @@ import { generateFromFiles } from '../utility/generate-from-files';
 import { Schema as InterfaceOptions } from './schema';
 
 export default function (options: InterfaceOptions): Rule {
-  options.type = options.type ? `.${options.type}` : '';
-
   return generateFromFiles(options);
 }
