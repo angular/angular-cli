@@ -69,8 +69,8 @@
     "@angular/ssr": "workspace:*",
     "@web/test-runner": "0.20.0",
     "browser-sync": "3.0.3",
-    "ng-packagr": "20.0.0-next.2",
-    "undici": "7.6.0"
+    "ng-packagr": "20.0.0-next.3",
+    "undici": "7.7.0"
   },
   "peerDependencies": {
     "@angular/compiler-cli": "0.0.0-ANGULAR-FW-PEER-DEP",
