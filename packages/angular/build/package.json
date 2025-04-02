@@ -37,7 +37,7 @@
     "parse5-html-rewriting-stream": "7.0.0",
     "picomatch": "4.0.2",
     "piscina": "4.9.2",
-    "rollup": "4.38.0",
+    "rollup": "4.39.0",
     "sass": "1.86.1",
     "semver": "7.7.1",
     "source-map-support": "0.5.21",
@@ -52,7 +52,7 @@
     "@angular/ssr": "workspace:*",
     "@angular-devkit/core": "workspace:*",
     "less": "4.2.2",
-    "ng-packagr": "20.0.0-next.2",
+    "ng-packagr": "20.0.0-next.3",
     "postcss": "8.5.3",
     "rxjs": "7.8.2"
   },
