@@ -40,7 +40,7 @@ export type ApplicationBuilderOptions = {
     fileReplacements?: FileReplacement[];
     i18nDuplicateTranslation?: I18NTranslation;
     i18nMissingTranslation?: I18NTranslation;
-    index: IndexUnion;
+    index?: IndexUnion;
     inlineStyleLanguage?: InlineStyleLanguage;
     loader?: {
         [key: string]: any;
