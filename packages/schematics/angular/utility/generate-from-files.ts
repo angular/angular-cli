@@ -45,6 +45,9 @@ export function generateFromFiles(
     options.prefix ??= '';
     options.flat ??= true;
 
+    // Schematic templates require a defined type value
+    options.type ??= '';
+
     const parsedPath = parseName(options.path, options.name);
     options.name = parsedPath.name;
     options.path = parsedPath.path;
