@@ -210,7 +210,7 @@
     "undici": "6.11.1",
     "verdaccio": "5.29.2",
     "verdaccio-auth-memory": "^10.0.0",
-    "vite": "5.4.15",
+    "vite": "5.4.16",
     "watchpack": "2.4.0",
     "webpack": "5.94.0",
     "webpack-dev-middleware": "6.1.2",
@@ -220,5 +220,6 @@
     "yargs": "17.7.2",
     "yargs-parser": "21.1.1",
     "zone.js": "^0.14.0"
-  }
+  },
+  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
 }
