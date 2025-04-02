@@ -1,6 +1,6 @@
 {
   "name": "@angular/devkit-repo",
-  "version": "17.3.14",
+  "version": "17.3.15",
   "private": true,
   "description": "Software Development Kit for Angular",
   "bin": {
