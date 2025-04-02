@@ -1,3 +1,29 @@
+<a name="20.0.0-next.4"></a>
+
+# 20.0.0-next.4 (2025-04-02)
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                             |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------- |
+| [1e137ca84](https://github.com/angular/angular-cli/commit/1e137ca848839402bc214fbccdc04243862d01d0) | feat | add migration to update `moduleResolution` to `bundler` |
+
+### @angular-devkit/schematics
+
+| Commit                                                                                              | Type | Description                                                                |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------------------- |
+| [4955ee0aa](https://github.com/angular/angular-cli/commit/4955ee0aa31c1021b6369c29a250dd5a9a3f11cd) | fix  | properly resolve relative schematics when executed from a nested directory |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                            |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------ |
+| [d067cedf0](https://github.com/angular/angular-cli/commit/d067cedf05051e3a0f237d50306e1e4c881a0328) | feat | support custom resolution conditions with applications |
+| [8a89438be](https://github.com/angular/angular-cli/commit/8a89438bef66e00d9795a5684c2b91dfdc102b3f) | fix  | correctly handle `false` value in server option        |
+| [52fbffcd7](https://github.com/angular/angular-cli/commit/52fbffcd7bb129720a10e6bf865e4e3a01f939d6) | fix  | warn and remove jsdom launcher when used with karma    |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="19.2.6"></a>
 
 # 19.2.6 (2025-04-02)
