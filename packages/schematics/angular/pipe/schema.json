@@ -61,6 +61,11 @@
       "type": "boolean",
       "default": false,
       "description": "Automatically export the pipe from the specified NgModule, making it accessible to other modules in the application."
+    },
+    "typeSeparator": {
+      "type": "string",
+      "default": "-",
+      "enum": ["-", "."]
     }
   },
   "required": ["name", "project"]
