@@ -199,9 +199,9 @@ npm_repositories()
 
 http_archive(
     name = "aspect_rules_ts",
-    sha256 = "d584e4bc80674d046938563678117d17df962fe105395f6b1efe2e8a248b8100",
-    strip_prefix = "rules_ts-3.5.1",
-    url = "https://github.com/aspect-build/rules_ts/releases/download/v3.5.1/rules_ts-v3.5.1.tar.gz",
+    sha256 = "fa5659a511f236b1ae6112258bff602fa20a40324b282734c841bc1e857797f3",
+    strip_prefix = "rules_ts-3.5.2",
+    url = "https://github.com/aspect-build/rules_ts/releases/download/v3.5.2/rules_ts-v3.5.2.tar.gz",
 )
 
 load("@aspect_rules_ts//ts:repositories.bzl", "rules_ts_dependencies")
