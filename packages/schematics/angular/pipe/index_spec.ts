@@ -56,6 +56,25 @@ describe('Pipe Schematic', () => {
     it('should create a pipe', async () => {
       const tree = await schematicRunner.runSchematic('pipe', defaultNonStandaloneOptions, appTree);
       const files = tree.files;
+      expect(files).toContain('/projects/bar/src/app/foo-pipe.spec.ts');
+      expect(files).toContain('/projects/bar/src/app/foo-pipe.ts');
+      const moduleContent = getFileContent(tree, '/projects/bar/src/app/app.module.ts');
+      expect(moduleContent).toMatch(/import.*Foo.*from '.\/foo-pipe'/);
+      expect(moduleContent).toMatch(/declarations:\s*\[[^\]]+?,\r?\n\s+FooPipe\r?\n/m);
+      const fileContent = tree.readContent('/projects/bar/src/app/foo-pipe.ts');
+      expect(fileContent).toContain('transform(value: unknown, ...args: unknown[])');
+    });
+
+    it('should use a `.` type separator when specified', async () => {
+      const tree = await schematicRunner.runSchematic(
+        'pipe',
+        {
+          ...defaultNonStandaloneOptions,
+          typeSeparator: '.',
+        },
+        appTree,
+      );
+      const files = tree.files;
       expect(files).toContain('/projects/bar/src/app/foo.pipe.spec.ts');
       expect(files).toContain('/projects/bar/src/app/foo.pipe.ts');
       const moduleContent = getFileContent(tree, '/projects/bar/src/app/app.module.ts');
@@ -65,13 +84,32 @@ describe('Pipe Schematic', () => {
       expect(fileContent).toContain('transform(value: unknown, ...args: unknown[])');
     });
 
+    it('should use a `-` type separator when specified', async () => {
+      const tree = await schematicRunner.runSchematic(
+        'pipe',
+        {
+          ...defaultNonStandaloneOptions,
+          typeSeparator: '-',
+        },
+        appTree,
+      );
+      const files = tree.files;
+      expect(files).toContain('/projects/bar/src/app/foo-pipe.spec.ts');
+      expect(files).toContain('/projects/bar/src/app/foo-pipe.ts');
+      const moduleContent = getFileContent(tree, '/projects/bar/src/app/app.module.ts');
+      expect(moduleContent).toMatch(/import.*Foo.*from '.\/foo-pipe'/);
+      expect(moduleContent).toMatch(/declarations:\s*\[[^\]]+?,\r?\n\s+FooPipe\r?\n/m);
+      const fileContent = tree.readContent('/projects/bar/src/app/foo-pipe.ts');
+      expect(fileContent).toContain('transform(value: unknown, ...args: unknown[])');
+    });
+
     it('should import into a specified module', async () => {
       const options = { ...defaultNonStandaloneOptions, module: 'app.module.ts' };
 
       const tree = await schematicRunner.runSchematic('pipe', options, appTree);
       const appModule = getFileContent(tree, '/projects/bar/src/app/app.module.ts');
 
-      expect(appModule).toMatch(/import { FooPipe } from '.\/foo.pipe'/);
+      expect(appModule).toMatch(/import { FooPipe } from '.\/foo-pipe'/);
     });
 
     it('should fail if specified module does not exist', async () => {
@@ -94,7 +132,7 @@ describe('Pipe Schematic', () => {
       appTree = await schematicRunner.runSchematic('pipe', options, appTree);
 
       const content = appTree.readContent('/projects/bar/src/app/admin/module/module.module.ts');
-      expect(content).toMatch(/import { FooPipe } from '\.\.\/\.\.\/foo.pipe'/);
+      expect(content).toMatch(/import { FooPipe } from '\.\.\/\.\.\/foo-pipe'/);
     });
 
     it('should export the pipe', async () => {
@@ -110,10 +148,10 @@ describe('Pipe Schematic', () => {
 
       const tree = await schematicRunner.runSchematic('pipe', options, appTree);
       const files = tree.files;
-      expect(files).toContain('/projects/bar/src/app/foo/foo.pipe.spec.ts');
-      expect(files).toContain('/projects/bar/src/app/foo/foo.pipe.ts');
+      expect(files).toContain('/projects/bar/src/app/foo/foo-pipe.spec.ts');
+      expect(files).toContain('/projects/bar/src/app/foo/foo-pipe.ts');
       const moduleContent = getFileContent(tree, '/projects/bar/src/app/app.module.ts');
-      expect(moduleContent).toMatch(/import.*Foo.*from '.\/foo\/foo.pipe'/);
+      expect(moduleContent).toMatch(/import.*Foo.*from '.\/foo\/foo-pipe'/);
       expect(moduleContent).toMatch(/declarations:\s*\[[^\]]+?,\r?\n\s+FooPipe\r?\n/m);
     });
 
@@ -124,7 +162,7 @@ describe('Pipe Schematic', () => {
       const options = { ...defaultNonStandaloneOptions, module: routingFileName };
       const tree = await schematicRunner.runSchematic('pipe', options, newTree);
       const content = getFileContent(tree, routingModulePath);
-      expect(content).toMatch(/import { FooPipe } from '.\/foo.pipe/);
+      expect(content).toMatch(/import { FooPipe } from '.\/foo-pipe/);
     });
 
     it('should respect the sourceRoot value', async () => {
@@ -143,7 +181,7 @@ describe('Pipe Schematic', () => {
         '/projects/bar/custom/app/app.module.ts',
       );
       appTree = await schematicRunner.runSchematic('pipe', defaultNonStandaloneOptions, appTree);
-      expect(appTree.files).toContain('/projects/bar/custom/app/foo.pipe.ts');
+      expect(appTree.files).toContain('/projects/bar/custom/app/foo-pipe.ts');
     });
   });
 
@@ -155,7 +193,7 @@ describe('Pipe Schematic', () => {
     it('should create a standalone pipe', async () => {
       const tree = await schematicRunner.runSchematic('pipe', defaultOptions, appTree);
       const moduleContent = tree.readContent('/projects/bar/src/app/app.module.ts');
-      const pipeContent = tree.readContent('/projects/bar/src/app/foo.pipe.ts');
+      const pipeContent = tree.readContent('/projects/bar/src/app/foo-pipe.ts');
       expect(pipeContent).not.toContain('standalone');
       expect(pipeContent).toContain('class FooPipe');
       expect(moduleContent).not.toContain('FooPipe');
@@ -166,8 +204,8 @@ describe('Pipe Schematic', () => {
 
       const tree = await schematicRunner.runSchematic('pipe', options, appTree);
       const files = tree.files;
-      expect(files).not.toContain('/projects/bar/src/app/foo.pipe.spec.ts');
-      expect(files).toContain('/projects/bar/src/app/foo.pipe.ts');
+      expect(files).not.toContain('/projects/bar/src/app/foo-pipe.spec.ts');
+      expect(files).toContain('/projects/bar/src/app/foo-pipe.ts');
     });
 
     it('should error when class name contains invalid characters', async () => {
