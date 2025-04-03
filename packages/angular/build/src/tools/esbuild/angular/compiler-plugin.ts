@@ -35,6 +35,7 @@ export interface CompilerPluginOptions {
   sourcemap: boolean | 'external';
   tsconfig: string;
   jit?: boolean;
+  includeTestMetadata?: boolean;
 
   advancedOptimizations?: boolean;
   thirdPartySourcemaps?: boolean;
@@ -292,7 +293,6 @@ export function createCompilerPlugin(
               pluginOptions,
               preserveSymlinks,
               build.initialOptions.conditions,
-              build.initialOptions.absWorkingDir,
             ),
           );
           shouldTsIgnoreJs = !initializationResult.compilerOptions.allowJs;
@@ -623,7 +623,6 @@ function createCompilerOptionsTransformer(
   pluginOptions: CompilerPluginOptions,
   preserveSymlinks: boolean | undefined,
   customConditions: string[] | undefined,
-  absWorkingDir: string | undefined,
 ): Parameters<AngularCompilation['initialize']>[2] {
   return (compilerOptions) => {
     // target of 9 is ES2022 (using the number avoids an expensive import of typescript just for an enum)
@@ -714,6 +713,7 @@ function createCompilerOptionsTransformer(
       preserveSymlinks,
       externalRuntimeStyles: pluginOptions.externalRuntimeStyles,
       _enableHmr: !!pluginOptions.templateUpdates,
+      supportTestBed: !!pluginOptions.includeTestMetadata,
     };
   };
 }

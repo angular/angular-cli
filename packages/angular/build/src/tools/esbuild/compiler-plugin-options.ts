@@ -27,6 +27,7 @@ export function createCompilerPluginOptions(
     jit,
     externalRuntimeStyles,
     instrumentForCoverage,
+    optimizationOptions,
   } = options;
   const incremental = !!options.watch;
 
@@ -43,5 +44,6 @@ export function createCompilerPluginOptions(
     externalRuntimeStyles,
     instrumentForCoverage,
     templateUpdates,
+    includeTestMetadata: !optimizationOptions.scripts,
   };
 }
