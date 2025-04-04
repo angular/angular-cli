@@ -84,12 +84,12 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
     });
 
     it('warns when IE is present in browserslist', async () => {
-      await harness.appendToFile(
+      await harness.writeFile(
         '.browserslistrc',
         `
-           IE 9
-           IE 11
-         `,
+          IE 9
+          IE 11
+        `,
       );
 
       harness.useTarget('build', {
@@ -102,10 +102,30 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       expect(logs).toContain(
         jasmine.objectContaining({
           level: 'warn',
-          message:
-            `One or more browsers which are configured in the project's Browserslist ` +
-            'configuration will be ignored as ES5 output is not supported by the Angular CLI.\n' +
-            'Ignored browsers: ie 11, ie 9',
+          message: jasmine.stringContaining('ES5 output is not supported'),
+        }),
+      );
+
+      // Don't duplicate the error.
+      expect(logs).not.toContain(
+        jasmine.objectContaining({
+          message: jasmine.stringContaining("fall outside Angular's browser support"),
+        }),
+      );
+    });
+
+    it("warns when targeting a browser outside Angular's minimum support", async () => {
+      await harness.writeFile('.browserslistrc', 'Chrome >= 100');
+
+      harness.useTarget('build', BASE_OPTIONS);
+
+      const { result, logs } = await harness.executeOnce();
+      expect(result?.success).toBeTrue();
+
+      expect(logs).toContain(
+        jasmine.objectContaining({
+          level: 'warn',
+          message: jasmine.stringContaining("fall outside Angular's browser support"),
         }),
       );
     });
