@@ -58,6 +58,11 @@
       },
       "default": ["CanActivate"],
       "x-prompt": "Which type of guard would you like to create?"
+    },
+    "typeSeparator": {
+      "type": "string",
+      "default": "-",
+      "enum": ["-", "."]
     }
   },
   "required": ["name", "project"]
