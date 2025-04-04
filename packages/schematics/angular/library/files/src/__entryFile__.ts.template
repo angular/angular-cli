@@ -3,4 +3,4 @@
  */
 
 export * from './lib/<%= dasherize(name) %>';<% if (!standalone) { %>
-export * from './lib/<%= dasherize(name) %>.module';<% } %>
+export * from './lib/<%= dasherize(name) %>-module';<% } %>
