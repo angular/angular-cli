@@ -745,70 +745,70 @@ describe('Application Schematic', () => {
       );
     });
 
-    it('should add provideExperimentalZonelessChangeDetection() in app-module.ts when experimentalZoneless is true', async () => {
+    it('should add provideZonelessChangeDetection() in app-module.ts when zoneless is true', async () => {
       const tree = await schematicRunner.runSchematic(
         'application',
         {
           ...defaultOptions,
-          experimentalZoneless: true,
+          zoneless: true,
           standalone: false,
         },
         workspaceTree,
       );
       const path = '/projects/foo/src/app/app-module.ts';
       const fileContent = tree.readContent(path);
-      expect(fileContent).toContain('provideExperimentalZonelessChangeDetection()');
+      expect(fileContent).toContain('provideZonelessChangeDetection()');
     });
 
-    it('should not add provideExperimentalZonelessChangeDetection() in app-module.ts when experimentalZoneless is false', async () => {
+    it('should not add provideZonelessChangeDetection() in app-module.ts when zoneless is false', async () => {
       const tree = await schematicRunner.runSchematic(
         'application',
         {
           ...defaultOptions,
-          experimentalZoneless: false,
+          zoneless: false,
           standalone: false,
         },
         workspaceTree,
       );
       const path = '/projects/foo/src/app/app-module.ts';
       const fileContent = tree.readContent(path);
-      expect(fileContent).not.toContain('provideExperimentalZonelessChangeDetection()');
+      expect(fileContent).not.toContain('provideZonelessChangeDetection()');
     });
 
-    it('should add provideExperimentalZonelessChangeDetection() when experimentalZoneless is true', async () => {
+    it('should add provideZonelessChangeDetection() when zoneless is true', async () => {
       const tree = await schematicRunner.runSchematic(
         'application',
         {
           ...defaultOptions,
-          experimentalZoneless: true,
+          zoneless: true,
         },
         workspaceTree,
       );
       const path = '/projects/foo/src/app/app.config.ts';
       const fileContent = tree.readContent(path);
-      expect(fileContent).toContain('provideExperimentalZonelessChangeDetection()');
+      expect(fileContent).toContain('provideZonelessChangeDetection()');
     });
 
-    it('should not add provideExperimentalZonelessChangeDetection() when experimentalZoneless is false', async () => {
+    it('should not add provideZonelessChangeDetection() when zoneless is false', async () => {
       const tree = await schematicRunner.runSchematic(
         'application',
         {
           ...defaultOptions,
-          experimentalZoneless: false,
+          zoneless: false,
         },
         workspaceTree,
       );
       const path = '/projects/foo/src/app/app.config.ts';
       const fileContent = tree.readContent(path);
-      expect(fileContent).not.toContain('provideExperimentalZonelessChangeDetection()');
+      expect(fileContent).not.toContain('provideZonelessChangeDetection()');
     });
 
-    it('should not add provideZoneChangeDetection when experimentalZoneless is true', async () => {
+    it('should not add provideZoneChangeDetection when zoneless is true', async () => {
       const tree = await schematicRunner.runSchematic(
         'application',
         {
           ...defaultOptions,
-          experimentalZoneless: true,
+          zoneless: true,
         },
         workspaceTree,
       );
