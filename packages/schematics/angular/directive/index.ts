@@ -39,7 +39,15 @@ export default function (options: DirectiveOptions): Rule {
     }
 
     options.module = findModuleFromOptions(host, options);
-
+    try {
+      options.module = findModuleFromOptions(host, options);
+    } catch {
+      options.module = findModuleFromOptions(host, {
+        ...options,
+        moduleExt: '-module.ts',
+        routingModuleExt: '-routing-module.ts',
+      });
+    }
     const parsedPath = parseName(options.path, options.name);
     options.name = parsedPath.name;
     options.path = parsedPath.path;

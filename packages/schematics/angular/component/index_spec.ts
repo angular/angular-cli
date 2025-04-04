@@ -374,7 +374,7 @@ describe('Component Schematic', () => {
   it('should create a standalone component', async () => {
     const options = { ...defaultOptions, standalone: true };
     const tree = await schematicRunner.runSchematic('component', options, appTree);
-    const moduleContent = tree.readContent('/projects/bar/src/app/app.module.ts');
+    const moduleContent = tree.readContent('/projects/bar/src/app/app-module.ts');
     const componentContent = tree.readContent('/projects/bar/src/app/foo/foo.component.ts');
     expect(componentContent).toContain('class FooComponent');
     expect(moduleContent).not.toContain('FooComponent');
@@ -416,13 +416,13 @@ describe('Component Schematic', () => {
           '/projects/baz/src/app/foo/foo.component.ts',
         ]),
       );
-      const moduleContent = tree.readContent('/projects/baz/src/app/app.module.ts');
+      const moduleContent = tree.readContent('/projects/baz/src/app/app-module.ts');
       expect(moduleContent).toMatch(/import.*Foo.*from '.\/foo\/foo.component'/);
       expect(moduleContent).toMatch(/declarations:\s*\[[^\]]+?,\r?\n\s+FooComponent\r?\n/m);
     });
 
     it('should use the module flag even if the module is a routing module', async () => {
-      const routingFileName = 'app-routing.module.ts';
+      const routingFileName = 'app-routing-module.ts';
       const routingModulePath = `/projects/baz/src/app/${routingFileName}`;
       const newTree = createAppModule(appTree, routingModulePath);
       const options = { ...defaultNonStandaloneOptions, module: routingFileName };
@@ -435,7 +435,7 @@ describe('Component Schematic', () => {
       const options = { ...defaultNonStandaloneOptions, name: 'dir/test-component' };
 
       const tree = await schematicRunner.runSchematic('component', options, appTree);
-      const content = tree.readContent('/projects/baz/src/app/app.module.ts');
+      const content = tree.readContent('/projects/baz/src/app/app-module.ts');
       expect(content).toMatch(
         /import { TestComponentComponent } from '\.\/dir\/test-component\/test-component.component'/,
       );
@@ -455,7 +455,7 @@ describe('Component Schematic', () => {
       };
       appTree = await schematicRunner.runSchematic('component', options, appTree);
 
-      const content = appTree.readContent('/projects/baz/src/app/admin/module/module.module.ts');
+      const content = appTree.readContent('/projects/baz/src/app/admin/module/module-module.ts');
       expect(content).toMatch(
         /import { TestComponentComponent } from '..\/..\/other\/test-component\/test-component.component'/,
       );
@@ -463,7 +463,7 @@ describe('Component Schematic', () => {
 
     it('should find the closest module', async () => {
       const options = { ...defaultNonStandaloneOptions };
-      const fooModule = '/projects/baz/src/app/foo/foo.module.ts';
+      const fooModule = '/projects/baz/src/app/foo/foo-module.ts';
       appTree.create(
         fooModule,
         `
@@ -486,15 +486,15 @@ describe('Component Schematic', () => {
       const options = { ...defaultNonStandaloneOptions, export: true };
 
       const tree = await schematicRunner.runSchematic('component', options, appTree);
-      const appModuleContent = tree.readContent('/projects/baz/src/app/app.module.ts');
+      const appModuleContent = tree.readContent('/projects/baz/src/app/app-module.ts');
       expect(appModuleContent).toMatch(/exports: \[\n(\s*) {2}FooComponent\n\1\]/);
     });
 
     it('should import into a specified module', async () => {
-      const options = { ...defaultNonStandaloneOptions, module: 'app.module.ts' };
+      const options = { ...defaultNonStandaloneOptions, module: 'app-module.ts' };
 
       const tree = await schematicRunner.runSchematic('component', options, appTree);
-      const appModule = tree.readContent('/projects/baz/src/app/app.module.ts');
+      const appModule = tree.readContent('/projects/baz/src/app/app-module.ts');
 
       expect(appModule).toMatch(/import { FooComponent } from '.\/foo\/foo.component'/);
     });
@@ -511,8 +511,8 @@ describe('Component Schematic', () => {
 
       // move the module
       appTree.rename(
-        '/projects/baz/src/app/app.module.ts',
-        '/projects/baz/custom/app/app.module.ts',
+        '/projects/baz/src/app/app-module.ts',
+        '/projects/baz/custom/app/app-module.ts',
       );
       appTree = await schematicRunner.runSchematic(
         'component',

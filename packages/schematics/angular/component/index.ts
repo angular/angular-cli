@@ -53,7 +53,15 @@ export default function (options: ComponentOptions): Rule {
       options.path = buildDefaultPath(project);
     }
 
-    options.module = findModuleFromOptions(host, options);
+    try {
+      options.module = findModuleFromOptions(host, options);
+    } catch {
+      options.module = findModuleFromOptions(host, {
+        ...options,
+        moduleExt: '-module.ts',
+        routingModuleExt: '-routing-module.ts',
+      });
+    }
 
     // Schematic templates require a defined type value
     options.type ??= '';
