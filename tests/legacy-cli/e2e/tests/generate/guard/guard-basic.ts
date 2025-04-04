@@ -6,13 +6,10 @@ export default async function () {
   // Does not create a sub directory.
   const guardDir = join('src', 'app');
 
-  await ng('generate', 'guard', 'test-guard');
+  await ng('generate', 'guard', 'test');
   await expectFileToExist(guardDir);
-  await expectFileToExist(join(guardDir, 'test-guard.guard.ts'));
-  await expectFileToMatch(
-    join(guardDir, 'test-guard.guard.ts'),
-    /export const testGuardGuard: CanActivateFn/,
-  );
-  await expectFileToExist(join(guardDir, 'test-guard.guard.spec.ts'));
+  await expectFileToExist(join(guardDir, 'test-guard.ts'));
+  await expectFileToMatch(join(guardDir, 'test-guard.ts'), /export const testGuard: CanActivateFn/);
+  await expectFileToExist(join(guardDir, 'test-guard.spec.ts'));
   await ng('test', '--watch=false');
 }

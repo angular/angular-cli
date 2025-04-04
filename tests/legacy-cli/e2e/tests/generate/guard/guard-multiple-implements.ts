@@ -16,11 +16,11 @@ export default async function () {
     '--no-functional',
   );
   await expectFileToExist(guardDir);
-  await expectFileToExist(join(guardDir, 'multiple.guard.ts'));
+  await expectFileToExist(join(guardDir, 'multiple-guard.ts'));
   await expectFileToMatch(
-    join(guardDir, 'multiple.guard.ts'),
+    join(guardDir, 'multiple-guard.ts'),
     /implements CanActivate, CanDeactivate<unknown>/,
   );
-  await expectFileToExist(join(guardDir, 'multiple.guard.spec.ts'));
+  await expectFileToExist(join(guardDir, 'multiple-guard.spec.ts'));
   await ng('test', '--watch=false');
 }
