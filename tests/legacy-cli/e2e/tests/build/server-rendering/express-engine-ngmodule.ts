@@ -70,7 +70,7 @@ export default async function () {
     'projects/test-project-two/src/styles.css': `* { color: #000 }`,
     'projects/test-project-two/src/main.ts': `
       import { platformBrowser } from '@angular/platform-browser';
-      import { AppModule } from './app/app.module';
+      import { AppModule } from './app/app-module';
 
       (window as any)['doBootstrap'] = () => {
         platformBrowser()

@@ -40,7 +40,7 @@ function buildRelativeModulePath(options: ModuleOptions, modulePath: string): st
   const importModulePath = join(
     options.path ?? '',
     options.flat ? '' : strings.dasherize(options.name),
-    strings.dasherize(options.name) + '.module',
+    strings.dasherize(options.name) + options.typeSeparator + 'module',
   );
 
   return buildRelativePath(modulePath, importModulePath);
@@ -113,9 +113,12 @@ function addRouteDeclarationToNgModule(
 }
 
 function getRoutingModulePath(host: Tree, modulePath: string): string | undefined {
-  const routingModulePath = modulePath.endsWith(ROUTING_MODULE_EXT)
-    ? modulePath
-    : modulePath.replace(MODULE_EXT, ROUTING_MODULE_EXT);
+  const routingModulePath =
+    modulePath.endsWith(ROUTING_MODULE_EXT) || modulePath.endsWith('-routing-module.ts')
+      ? modulePath
+      : modulePath
+          .replace(MODULE_EXT, ROUTING_MODULE_EXT)
+          .replace('-module.ts', '-routing-module.ts');
 
   return host.exists(routingModulePath) ? routingModulePath : undefined;
 }
@@ -135,7 +138,15 @@ export default function (options: ModuleOptions): Rule {
     }
 
     if (options.module) {
-      options.module = findModuleFromOptions(host, options);
+      try {
+        options.module = findModuleFromOptions(host, options);
+      } catch {
+        options.module = findModuleFromOptions(host, {
+          ...options,
+          moduleExt: '-module.ts',
+          routingModuleExt: '-routing-module.ts',
+        });
+      }
     }
 
     let routingModulePath;
@@ -153,7 +164,7 @@ export default function (options: ModuleOptions): Rule {
     const templateSource = apply(url('./files'), [
       options.routing || (isLazyLoadedModuleGen && routingModulePath)
         ? noop()
-        : filter((path) => !path.endsWith('-routing.module.ts.template')),
+        : filter((path) => !path.includes('-routing')),
       applyTemplates({
         ...strings,
         'if-flat': (s: string) => (options.flat ? '' : s),
@@ -167,7 +178,7 @@ export default function (options: ModuleOptions): Rule {
     const moduleDasherized = strings.dasherize(options.name);
     const modulePath = `${
       !options.flat ? moduleDasherized + '/' : ''
-    }${moduleDasherized}.module.ts`;
+    }${moduleDasherized}${options.typeSeparator}module.ts`;
 
     const componentOptions: ComponentOptions = {
       module: modulePath,

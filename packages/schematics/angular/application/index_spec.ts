@@ -54,7 +54,7 @@ describe('Application Schematic', () => {
         '/projects/foo/src/index.html',
         '/projects/foo/src/main.ts',
         '/projects/foo/src/styles.css',
-        '/projects/foo/src/app/app.module.ts',
+        '/projects/foo/src/app/app-module.ts',
         '/projects/foo/src/app/app.css',
         '/projects/foo/src/app/app.ng.html',
         '/projects/foo/src/app/app.spec.ts',
@@ -542,7 +542,7 @@ describe('Application Schematic', () => {
     const options = { ...defaultOptions, standalone: true };
 
     const tree = await schematicRunner.runSchematic('application', options, workspaceTree);
-    const moduleFiles = tree.files.filter((file) => file.endsWith('.module.ts'));
+    const moduleFiles = tree.files.filter((file) => file.endsWith('-module.ts'));
     expect(moduleFiles.length).toEqual(0);
   });
 
@@ -625,11 +625,11 @@ describe('Application Schematic', () => {
       const tree = await schematicRunner.runSchematic('application', options, workspaceTree);
 
       const files = tree.files;
-      expect(files).toContain('/projects/foo/src/app/app.module.ts');
-      expect(files).toContain('/projects/foo/src/app/app-routing.module.ts');
-      const moduleContent = tree.readContent('/projects/foo/src/app/app.module.ts');
-      expect(moduleContent).toMatch(/import { AppRoutingModule } from '.\/app-routing.module'/);
-      const routingModuleContent = tree.readContent('/projects/foo/src/app/app-routing.module.ts');
+      expect(files).toContain('/projects/foo/src/app/app-module.ts');
+      expect(files).toContain('/projects/foo/src/app/app-routing-module.ts');
+      const moduleContent = tree.readContent('/projects/foo/src/app/app-module.ts');
+      expect(moduleContent).toMatch(/import { AppRoutingModule } from '.\/app-routing-module'/);
+      const routingModuleContent = tree.readContent('/projects/foo/src/app/app-routing-module.ts');
       expect(routingModuleContent).toMatch(/RouterModule.forRoot\(routes\)/);
     });
 
@@ -640,7 +640,7 @@ describe('Application Schematic', () => {
         workspaceTree,
       );
 
-      const path = '/projects/foo/src/app/app.module.ts';
+      const path = '/projects/foo/src/app/app-module.ts';
       const content = tree.readContent(path);
       expect(content).toMatch(/import { BrowserModule } from '@angular\/platform-browser';/);
     });
@@ -652,7 +652,7 @@ describe('Application Schematic', () => {
         workspaceTree,
       );
 
-      const path = '/projects/foo/src/app/app.module.ts';
+      const path = '/projects/foo/src/app/app-module.ts';
       const content = tree.readContent(path);
       expect(content).toMatch(/import { App } from '\.\/app';/);
     });
@@ -669,8 +669,8 @@ describe('Application Schematic', () => {
           '/projects/foo/tsconfig.spec.json',
           '/projects/foo/src/main.ts',
           '/projects/foo/src/styles.css',
-          '/projects/foo/src/app/app-routing.module.ts',
-          '/projects/foo/src/app/app.module.ts',
+          '/projects/foo/src/app/app-routing-module.ts',
+          '/projects/foo/src/app/app-module.ts',
           '/projects/foo/src/app/app.css',
           '/projects/foo/src/app/app.ng.html',
           '/projects/foo/src/app/app.spec.ts',
@@ -696,7 +696,7 @@ describe('Application Schematic', () => {
       );
     });
 
-    it('should add provideExperimentalZonelessChangeDetection() in app.module.ts when experimentalZoneless is true', async () => {
+    it('should add provideExperimentalZonelessChangeDetection() in app-module.ts when experimentalZoneless is true', async () => {
       const tree = await schematicRunner.runSchematic(
         'application',
         {
@@ -706,12 +706,12 @@ describe('Application Schematic', () => {
         },
         workspaceTree,
       );
-      const path = '/projects/foo/src/app/app.module.ts';
+      const path = '/projects/foo/src/app/app-module.ts';
       const fileContent = tree.readContent(path);
       expect(fileContent).toContain('provideExperimentalZonelessChangeDetection()');
     });
 
-    it('should not add provideExperimentalZonelessChangeDetection() in app.module.ts when experimentalZoneless is false', async () => {
+    it('should not add provideExperimentalZonelessChangeDetection() in app-module.ts when experimentalZoneless is false', async () => {
       const tree = await schematicRunner.runSchematic(
         'application',
         {
@@ -721,7 +721,7 @@ describe('Application Schematic', () => {
         },
         workspaceTree,
       );
-      const path = '/projects/foo/src/app/app.module.ts';
+      const path = '/projects/foo/src/app/app-module.ts';
       const fileContent = tree.readContent(path);
       expect(fileContent).not.toContain('provideExperimentalZonelessChangeDetection()');
     });

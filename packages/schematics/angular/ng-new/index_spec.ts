@@ -41,7 +41,7 @@ describe('Ng New Schematic', () => {
       ]),
     );
 
-    expect(files).not.toEqual(jasmine.arrayContaining(['/bar/src/app/app.module.ts']));
+    expect(files).not.toEqual(jasmine.arrayContaining(['/bar/src/app/app-module.ts']));
   });
 
   it('should create module files of a standalone=false application', async () => {
@@ -53,7 +53,7 @@ describe('Ng New Schematic', () => {
       jasmine.arrayContaining([
         '/bar/tsconfig.app.json',
         '/bar/src/main.ts',
-        '/bar/src/app/app.module.ts',
+        '/bar/src/app/app-module.ts',
       ]),
     );
   });
@@ -74,7 +74,7 @@ describe('Ng New Schematic', () => {
     };
 
     const tree = await schematicRunner.runSchematic('ng-new', options);
-    const moduleContent = tree.readContent('/foo/src/app/app.module.ts');
+    const moduleContent = tree.readContent('/foo/src/app/app-module.ts');
     expect(moduleContent).toMatch(/declarations:\s*\[\s*App\s*\]/m);
   });
 

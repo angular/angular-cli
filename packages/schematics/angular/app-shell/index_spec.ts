@@ -69,12 +69,12 @@ describe('App Shell Schematic', () => {
     });
 
     it('should not fail when AppModule have imported RouterModule already', async () => {
-      const updateRecorder = appTree.beginUpdate('/projects/bar/src/app/app.module.ts');
+      const updateRecorder = appTree.beginUpdate('/projects/bar/src/app/app-module.ts');
       updateRecorder.insertLeft(0, "import { RouterModule } from '@angular/router';");
       appTree.commitUpdate(updateRecorder);
 
       const tree = await schematicRunner.runSchematic('app-shell', defaultOptions, appTree);
-      const filePath = '/projects/bar/src/app/app.module.ts';
+      const filePath = '/projects/bar/src/app/app-module.ts';
       const content = tree.readContent(filePath);
       expect(content).toMatch(/import { RouterModule } from '@angular\/router';/);
     });

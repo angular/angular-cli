@@ -63,7 +63,7 @@ describe('Library Schematic', () => {
 
   it('should not add reference to module file in entry-file', async () => {
     const tree = await schematicRunner.runSchematic('library', defaultOptions, workspaceTree);
-    expect(tree.readContent('/projects/foo/src/my-index.ts')).not.toContain('foo.module');
+    expect(tree.readContent('/projects/foo/src/my-index.ts')).not.toContain('foo-module');
   });
 
   it('should create a standalone component', async () => {
@@ -400,7 +400,7 @@ describe('Library Schematic', () => {
         workspaceTree,
       );
 
-      const fileContent = getFileContent(tree, '/projects/foo/src/lib/foo.module.ts');
+      const fileContent = getFileContent(tree, '/projects/foo/src/lib/foo-module.ts');
       expect(fileContent).toMatch(/exports: \[\n(\s*) {2}Foo\n\1\]/);
     });
 
@@ -420,7 +420,7 @@ describe('Library Schematic', () => {
           '/projects/foo/tsconfig.lib.json',
           '/projects/foo/tsconfig.lib.prod.json',
           '/projects/foo/src/my-index.ts',
-          '/projects/foo/src/lib/foo.module.ts',
+          '/projects/foo/src/lib/foo-module.ts',
           '/projects/foo/src/lib/foo.spec.ts',
           '/projects/foo/src/lib/foo.ts',
         ]),

@@ -159,7 +159,7 @@ describe('Directive Schematic', () => {
       const files = tree.files;
       expect(files).toContain('/projects/baz/src/app/foo.spec.ts');
       expect(files).toContain('/projects/baz/src/app/foo.ts');
-      const moduleContent = tree.readContent('/projects/baz/src/app/app.module.ts');
+      const moduleContent = tree.readContent('/projects/baz/src/app/app-module.ts');
       expect(moduleContent).toMatch(/import.*Foo.*from '.\/foo'/);
       expect(moduleContent).toMatch(/declarations:\s*\[[^\]]+?,\r?\n\s+Foo\r?\n/m);
     });
@@ -176,8 +176,8 @@ describe('Directive Schematic', () => {
 
       // move the module
       appTree.rename(
-        '/projects/baz/src/app/app.module.ts',
-        '/projects/baz/custom/app/app.module.ts',
+        '/projects/baz/src/app/app-module.ts',
+        '/projects/baz/custom/app/app-module.ts',
       );
       appTree = await schematicRunner.runSchematic(
         'directive',
@@ -190,7 +190,7 @@ describe('Directive Schematic', () => {
 
     it('should find the closest module', async () => {
       const options = { ...defaultNonStandaloneOptions, flat: false };
-      const fooModule = '/projects/baz/src/app/foo/foo.module.ts';
+      const fooModule = '/projects/baz/src/app/foo/foo-module.ts';
       appTree.create(
         fooModule,
         `
@@ -213,15 +213,15 @@ describe('Directive Schematic', () => {
       const options = { ...defaultNonStandaloneOptions, export: true };
 
       const tree = await schematicRunner.runSchematic('directive', options, appTree);
-      const appModuleContent = tree.readContent('/projects/baz/src/app/app.module.ts');
+      const appModuleContent = tree.readContent('/projects/baz/src/app/app-module.ts');
       expect(appModuleContent).toMatch(/exports: \[\n(\s*) {2}Foo\n\1\]/);
     });
 
     it('should import into a specified module', async () => {
-      const options = { ...defaultNonStandaloneOptions, module: 'app.module.ts' };
+      const options = { ...defaultNonStandaloneOptions, module: 'app-module.ts' };
 
       const tree = await schematicRunner.runSchematic('directive', options, appTree);
-      const appModule = tree.readContent('/projects/baz/src/app/app.module.ts');
+      const appModule = tree.readContent('/projects/baz/src/app/app-module.ts');
 
       expect(appModule).toMatch(/import { Foo } from '.\/foo'/);
     });
