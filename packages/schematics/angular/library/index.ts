@@ -93,9 +93,6 @@ function addLibToWorkspaceFile(
         build: {
           builder: Builders.BuildNgPackagr,
           defaultConfiguration: 'production',
-          options: {
-            project: `${projectRoot}/ng-package.json`,
-          },
           configurations: {
             production: {
               tsConfig: `${projectRoot}/tsconfig.lib.prod.json`,

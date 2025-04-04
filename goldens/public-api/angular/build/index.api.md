@@ -166,7 +166,7 @@ export type ExtractI18nBuilderOptions = {
 // @public
 export type NgPackagrBuilderOptions = {
     poll?: number;
-    project: string;
+    project?: string;
     tsConfig?: string;
     watch?: boolean;
 };

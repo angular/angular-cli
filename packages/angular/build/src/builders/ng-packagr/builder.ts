@@ -30,7 +30,7 @@ export async function* execute(
   // Purge old build disk cache.
   await purgeStaleBuildCache(context);
 
-  const root = context.workspaceRoot;
+  const workspaceRoot = context.workspaceRoot;
   let packager;
   try {
     packager = (await import('ng-packagr')).ngPackagr();
@@ -47,18 +47,22 @@ export async function* execute(
     throw error;
   }
 
-  packager.forProject(resolve(root, options.project));
-
-  if (options.tsConfig) {
-    packager.withTsConfig(resolve(root, options.tsConfig));
-  }
-
   const projectName = context.target?.project;
   if (!projectName) {
     throw new Error('The builder requires a target.');
   }
 
   const metadata = await context.getProjectMetadata(projectName);
+  const ngPackagrConfig = options.project
+    ? join(workspaceRoot, options.project)
+    : join(workspaceRoot, (metadata.root as string | undefined) ?? '', 'ng-package.json');
+
+  packager.forProject(ngPackagrConfig);
+
+  if (options.tsConfig) {
+    packager.withTsConfig(resolve(workspaceRoot, options.tsConfig));
+  }
+
   const { enabled: cacheEnabled, path: cacheDirectory } = normalizeCacheOptions(
     metadata,
     context.workspaceRoot,
