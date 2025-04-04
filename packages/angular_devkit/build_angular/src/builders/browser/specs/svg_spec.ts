@@ -57,7 +57,11 @@ describe('Browser Builder allow svg', () => {
         host.scopedSync().read(join(outputPath, 'main.js')),
       );
 
-      expect(content).toContain('ɵɵnamespaceSVG');
+      // Verify that the svg contents are present in the main bundle,
+      // e.g. as template instructions.
+      expect(content).toContain('Hello World');
+
+      // Verify that the svg contents are *not* present as a separate file.
       expect(host.scopedSync().exists(normalize('dist/app.component.svg'))).toBe(
         false,
         'should not copy app.component.svg to dist',
