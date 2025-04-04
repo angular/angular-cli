@@ -6,12 +6,10 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { Rule } from '@angular-devkit/schematics';
+import type { Rule } from '@angular-devkit/schematics';
 import { generateFromFiles } from '../utility/generate-from-files';
-import { Schema as EnumOptions } from './schema';
+import type { Schema as EnumOptions } from './schema';
 
 export default function (options: EnumOptions): Rule {
-  options.type = options.type ? `.${options.type}` : '';
-
   return generateFromFiles(options);
 }
