@@ -14,6 +14,7 @@ import { Type } from '@angular/core';
 
 // @public
 export class AngularNodeAppEngine {
+    constructor();
     handle(request: IncomingMessage | Http2ServerRequest, requestContext?: unknown): Promise<Response | null>;
 }
 

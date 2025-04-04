@@ -9,6 +9,7 @@
 import { AngularAppEngine } from '@angular/ssr';
 import type { IncomingMessage } from 'node:http';
 import type { Http2ServerRequest } from 'node:http2';
+import { attachNodeGlobalErrorHandlers } from './errors';
 import { createWebRequestFromNodeRequest } from './request';
 
 /**
@@ -21,6 +22,10 @@ import { createWebRequestFromNodeRequest } from './request';
  */
 export class AngularNodeAppEngine {
   private readonly angularAppEngine = new AngularAppEngine();
+
+  constructor() {
+    attachNodeGlobalErrorHandlers();
+  }
 
   /**
    * Handles an incoming HTTP request by serving prerendered content, performing server-side rendering,
