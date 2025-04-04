@@ -1,4 +1,4 @@
-import { ApplicationConfig, provideBrowserGlobalErrorListeners, <% if(!experimentalZoneless) { %>provideZoneChangeDetection<% } else { %>provideExperimentalZonelessChangeDetection<% } %> } from '@angular/core';<% if (routing) { %>
+import { ApplicationConfig, provideBrowserGlobalErrorListeners, <% if(!zoneless) { %>provideZoneChangeDetection<% } else { %>provideZonelessChangeDetection<% } %> } from '@angular/core';<% if (routing) { %>
 import { provideRouter } from '@angular/router';
 
 import { routes } from './app.routes';<% } %>
@@ -6,7 +6,7 @@ import { routes } from './app.routes';<% } %>
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
-    <% if(experimentalZoneless) { %>provideExperimentalZonelessChangeDetection()<% } else { %>provideZoneChangeDetection({ eventCoalescing: true })<% } %>,
+    <% if(zoneless) { %>provideZonelessChangeDetection()<% } else { %>provideZoneChangeDetection({ eventCoalescing: true })<% } %>,
     <% if (routing) {%>provideRouter(routes)<% } %>
   ]
 };

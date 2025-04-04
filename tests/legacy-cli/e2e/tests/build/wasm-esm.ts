@@ -65,12 +65,12 @@ export default async function () {
   await replaceInFile(
     'src/app/app.config.ts',
     'provideZoneChangeDetection',
-    'provideExperimentalZonelessChangeDetection',
+    'provideZonelessChangeDetection',
   );
   await replaceInFile(
     'src/app/app.config.ts',
     'provideZoneChangeDetection({ eventCoalescing: true })',
-    'provideExperimentalZonelessChangeDetection()',
+    'provideZonelessChangeDetection()',
   );
 
   await ng('build');
