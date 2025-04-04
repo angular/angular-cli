@@ -59,7 +59,7 @@ export async function executeBuild(
   } = options;
 
   // TODO: Consider integrating into watch mode. Would require full rebuild on target changes.
-  const browsers = getSupportedBrowsers(projectRoot, context.logger);
+  const browsers = await getSupportedBrowsers(projectRoot, context.logger);
 
   // Load active translations if inlining
   // TODO: Integrate into watch mode and only load changed translations

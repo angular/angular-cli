@@ -10,6 +10,11 @@ overrides:
 
 packageExtensionsChecksum: ea5f588691095a73da0f9364791a5f26
 
+patchedDependencies:
+  bl2bl:
+    hash: ysjdjtmgjh6un4h4a4h53f55eu
+    path: patches/bl2bl.patch
+
 importers:
 
   .:
@@ -173,6 +178,9 @@ importers:
       beasties:
         specifier: 0.2.0
         version: 0.2.0
+      bl2bl:
+        specifier: ^0.2.0
+        version: 0.2.0(patch_hash=ysjdjtmgjh6un4h4a4h53f55eu)
       buffer:
         specifier: 6.0.3
         version: 6.0.3
@@ -1989,6 +1997,9 @@ packages:
     cpu: [x64]
     os: [win32]
 
+  '@mdn/browser-compat-data@6.0.3':
+    resolution: {integrity: sha512-v/CYYHzCWSh83AkPK5zDkpmf6ZtawSk2AY5jedKJzpMFb/vlqSkvl8AHdLD7cd7ARZnzG22paQubfszdh8X+NA==}
+
   '@msgpackr-extract/msgpackr-extract-darwin-arm64@3.0.3':
     resolution: {integrity: sha512-QZHtlVgbAdy2zAqNA9Gu1UpIuI8Xvsd1v8ic6B2pZmeFnFcMWiPLfWXh7TVw4eGEZ/C9TH281KwhVoeQUKbyjw==}
     cpu: [arm64]
@@ -3455,6 +3466,9 @@ packages:
     resolution: {integrity: sha512-lGe34o6EHj9y3Kts9R4ZYs/Gr+6N7MCaMlIFA3F1R2O5/m7K06AxfSeO5530PEERE6/WyEg3lsuyw4GHlPZHog==}
     engines: {node: ^4.5.0 || >= 5.9}
 
+  baseline-browser-mapping@2.2.0:
+    resolution: {integrity: sha512-tLVamSyLn6h5kp7aDzBIPiNnx+ighswrdRs9ug3aeBgSXFQG2nFj1EfWvWTD1Y/ra9GDS8znPwMxTEitF6cC/g==}
+
   basic-ftp@5.0.5:
     resolution: {integrity: sha512-4Bcg1P8xhUuqcii/S0Z9wiHIrQVPMermM1any+MX5GeGD7faD3/msQUDGLol9wOcz4/jbg/WJnGqoJF6LiBdtg==}
     engines: {node: '>=10.0.0'}
@@ -3487,6 +3501,10 @@ packages:
   binary-extensions@2.3.0:
     resolution: {integrity: sha512-Ceh+7ox5qe7LJuLHoY0feh3pHuUDHAcRUeyL2VYghZwfpkNIy/+8Ocg0a3UuSoYzavmylwuLWQOf3hl0jjMMIw==}
     engines: {node: '>=8'}
+
+  bl2bl@0.2.0:
+    resolution: {integrity: sha512-XvxNiCArO6VPaSJLxnr7+fBZXSda+lczl3iQGzLZmhLzp/TN4GfTryleQJYwvxQ4KXsaDqosDzU1Nykj3WVOFw==}
+    hasBin: true
 
   bl@4.1.0:
     resolution: {integrity: sha512-1W07cM9gS6DcLperZfFSj+bWLtaPGSOHWhPiGzXmvVJbRLdG82sH/Kn8EtW1VqWVA54AKf2h5k5BbnIbwF3h6w==}
@@ -7718,6 +7736,9 @@ packages:
   weak-lru-cache@1.2.2:
     resolution: {integrity: sha512-DEAoo25RfSYMuTGc9vPJzZcZullwIqRDSI9LOy+fkCJPi6hykCnfKaXTuPBDuXAUcqHXyOgFtHNp/kB2FjYHbw==}
 
+  web-features@2.32.0:
+    resolution: {integrity: sha512-Mk0UtT7UUKFEF4Gi4uFS56ZROpU+9RixxnsYuAkyEqghuQFoVapFaMGAh0wd3Ob41FbJkRPaZoPYpDUOX8/m9w==}
+
   web-streams-polyfill@3.3.3:
     resolution: {integrity: sha512-d2JWLCivmZYTSIoge9MsgFCZrt571BikcWGYkjC1khllbTeDlGqZ2D8vD8E/lJa8WGWbb7Plm8/XJYV7IJHZZw==}
     engines: {node: '>= 8'}
@@ -9242,6 +9263,8 @@ snapshots:
 
   '@lmdb/lmdb-win32-x64@3.2.6':
     optional: true
+
+  '@mdn/browser-compat-data@6.0.3': {}
 
   '@msgpackr-extract/msgpackr-extract-darwin-arm64@3.0.3':
     optional: true
@@ -10948,6 +10971,11 @@ snapshots:
 
   base64id@2.0.0: {}
 
+  baseline-browser-mapping@2.2.0:
+    dependencies:
+      '@mdn/browser-compat-data': 6.0.3
+      web-features: 2.32.0
+
   basic-ftp@5.0.5: {}
 
   batch@0.6.1: {}
@@ -10978,6 +11006,11 @@ snapshots:
   bignumber.js@9.1.2: {}
 
   binary-extensions@2.3.0: {}
+
+  bl2bl@0.2.0(patch_hash=ysjdjtmgjh6un4h4a4h53f55eu):
+    dependencies:
+      '@mdn/browser-compat-data': 6.0.3
+      baseline-browser-mapping: 2.2.0
 
   bl@4.1.0:
     dependencies:
@@ -15887,6 +15920,8 @@ snapshots:
 
   weak-lru-cache@1.2.2:
     optional: true
+
+  web-features@2.32.0: {}
 
   web-streams-polyfill@3.3.3: {}
 
