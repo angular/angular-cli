@@ -361,7 +361,6 @@ describe('Library Schematic', () => {
     const project = config.projects.foo;
     expect(project.root).toEqual('foo');
     const { options, configurations } = project.architect.build;
-    expect(options.project).toEqual('foo/ng-package.json');
     expect(configurations.production.tsConfig).toEqual('foo/tsconfig.lib.prod.json');
 
     const libTsConfig = getJsonFileContent(tree, '/foo/tsconfig.lib.json');
