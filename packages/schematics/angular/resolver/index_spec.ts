@@ -48,9 +48,9 @@ describe('resolver Schematic', () => {
       appTree,
     );
     const files = tree.files;
-    expect(files).toContain('/projects/bar/src/app/foo.resolver.spec.ts');
-    expect(files).toContain('/projects/bar/src/app/foo.resolver.ts');
-    const fileString = tree.readContent('/projects/bar/src/app/foo.resolver.ts');
+    expect(files).toContain('/projects/bar/src/app/foo-resolver.spec.ts');
+    expect(files).toContain('/projects/bar/src/app/foo-resolver.ts');
+    const fileString = tree.readContent('/projects/bar/src/app/foo-resolver.ts');
     expect(fileString).toContain('export class FooResolver implements Resolve<boolean>');
   });
 
@@ -59,8 +59,30 @@ describe('resolver Schematic', () => {
 
     const tree = await schematicRunner.runSchematic('resolver', options, appTree);
     const files = tree.files;
-    expect(files).not.toContain('/projects/bar/src/app/foo.resolver.spec.ts');
+    expect(files).not.toContain('/projects/bar/src/app/foo-resolver.spec.ts');
+    expect(files).toContain('/projects/bar/src/app/foo-resolver.ts');
+  });
+
+  it('should use a `.` type separator when specified', async () => {
+    const options = { ...defaultOptions, typeSeparator: '.' };
+
+    const tree = await schematicRunner.runSchematic('resolver', options, appTree);
+    const files = tree.files;
+    expect(files).toContain('/projects/bar/src/app/foo.resolver.spec.ts');
     expect(files).toContain('/projects/bar/src/app/foo.resolver.ts');
+    const specContent = tree.readContent('/projects/bar/src/app/foo.resolver.spec.ts');
+    expect(specContent).toContain(`'./foo.resolver'`);
+  });
+
+  it('should use a `-` type separator when specified', async () => {
+    const options = { ...defaultOptions, typeSeparator: '-' };
+
+    const tree = await schematicRunner.runSchematic('resolver', options, appTree);
+    const files = tree.files;
+    expect(files).toContain('/projects/bar/src/app/foo-resolver.spec.ts');
+    expect(files).toContain('/projects/bar/src/app/foo-resolver.ts');
+    const specContent = tree.readContent('/projects/bar/src/app/foo-resolver.spec.ts');
+    expect(specContent).toContain(`'./foo-resolver'`);
   });
 
   it('should respect the flat flag', async () => {
@@ -68,8 +90,8 @@ describe('resolver Schematic', () => {
 
     const tree = await schematicRunner.runSchematic('resolver', options, appTree);
     const files = tree.files;
-    expect(files).toContain('/projects/bar/src/app/foo/foo.resolver.spec.ts');
-    expect(files).toContain('/projects/bar/src/app/foo/foo.resolver.ts');
+    expect(files).toContain('/projects/bar/src/app/foo/foo-resolver.spec.ts');
+    expect(files).toContain('/projects/bar/src/app/foo/foo-resolver.ts');
   });
 
   it('should respect the sourceRoot value', async () => {
@@ -77,12 +99,12 @@ describe('resolver Schematic', () => {
     config.projects.bar.sourceRoot = 'projects/bar/custom';
     appTree.overwrite('/angular.json', JSON.stringify(config, null, 2));
     appTree = await schematicRunner.runSchematic('resolver', defaultOptions, appTree);
-    expect(appTree.files).toContain('/projects/bar/custom/app/foo.resolver.ts');
+    expect(appTree.files).toContain('/projects/bar/custom/app/foo-resolver.ts');
   });
 
   it('should create a functional resolver', async () => {
     const tree = await schematicRunner.runSchematic('resolver', defaultOptions, appTree);
-    const fileString = tree.readContent('/projects/bar/src/app/foo.resolver.ts');
+    const fileString = tree.readContent('/projects/bar/src/app/foo-resolver.ts');
     expect(fileString).toContain(
       'export const fooResolver: ResolveFn<boolean> = (route, state) => {',
     );
@@ -90,7 +112,7 @@ describe('resolver Schematic', () => {
 
   it('should create a helper function to run a functional resolver in a test', async () => {
     const tree = await schematicRunner.runSchematic('resolver', defaultOptions, appTree);
-    const fileString = tree.readContent('/projects/bar/src/app/foo.resolver.spec.ts');
+    const fileString = tree.readContent('/projects/bar/src/app/foo-resolver.spec.ts');
     expect(fileString).toContain(
       'const executeResolver: ResolveFn<boolean> = (...resolverParameters) => ',
     );

@@ -45,6 +45,12 @@
       "$default": {
         "$source": "projectName"
       }
+    },
+    "typeSeparator": {
+      "type": "string",
+      "default": "-",
+      "enum": ["-", "."],
+      "description": "The separator character to use before the type within the generated file's name. For example, if you set the option to `.`, the file will be named `example.resolver.ts`."
     }
   },
   "required": ["name", "project"]
