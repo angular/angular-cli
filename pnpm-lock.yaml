@@ -10,19 +10,24 @@ overrides:
 
 packageExtensionsChecksum: d67b1f07b351844d00c57cbace376860
 
+patchedDependencies:
+  bl2bl:
+    hash: ysjdjtmgjh6un4h4a4h53f55eu
+    path: patches/bl2bl.patch
+
 importers:
 
   .:
     devDependencies:
       '@angular/animations':
         specifier: 20.0.0-next.6
-        version: 20.0.0-next.6(@angular/common@20.0.0-next.6(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(rxjs@7.8.2)(zone.js@0.15.0))(rxjs@7.8.2))(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(rxjs@7.8.2)(zone.js@0.15.0))
+        version: 20.0.0-next.6(@angular/common@20.0.0-next.6(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0)))(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0))
       '@angular/cdk':
         specifier: 20.0.0-next.6
-        version: 20.0.0-next.6(@angular/common@20.0.0-next.6(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(rxjs@7.8.2)(zone.js@0.15.0))(rxjs@7.8.2))(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(rxjs@7.8.2)(zone.js@0.15.0))(rxjs@7.8.2)
+        version: 20.0.0-next.6(@angular/common@20.0.0-next.6(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0)))(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0))
       '@angular/common':
         specifier: 20.0.0-next.6
-        version: 20.0.0-next.6(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(rxjs@7.8.2)(zone.js@0.15.0))(rxjs@7.8.2)
+        version: 20.0.0-next.6(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0))
       '@angular/compiler':
         specifier: 20.0.0-next.6
         version: 20.0.0-next.6
@@ -31,31 +36,31 @@ importers:
         version: 20.0.0-next.6(@angular/compiler@20.0.0-next.6)(typescript@5.8.3)
       '@angular/core':
         specifier: 20.0.0-next.6
-        version: 20.0.0-next.6(@angular/compiler@20.0.0-next.6)(rxjs@7.8.2)(zone.js@0.15.0)
+        version: 20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0)
       '@angular/forms':
         specifier: 20.0.0-next.6
-        version: 20.0.0-next.6(@angular/common@20.0.0-next.6(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(rxjs@7.8.2)(zone.js@0.15.0))(rxjs@7.8.2))(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(rxjs@7.8.2)(zone.js@0.15.0))(@angular/platform-browser@20.0.0-next.6(@angular/animations@20.0.0-next.6(@angular/common@20.0.0-next.6(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(rxjs@7.8.2)(zone.js@0.15.0))(rxjs@7.8.2))(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(rxjs@7.8.2)(zone.js@0.15.0)))(@angular/common@20.0.0-next.6(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(rxjs@7.8.2)(zone.js@0.15.0))(rxjs@7.8.2))(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(rxjs@7.8.2)(zone.js@0.15.0)))(rxjs@7.8.2)
+        version: 20.0.0-next.6(@angular/common@20.0.0-next.6(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0)))(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0))(@angular/platform-browser@20.0.0-next.6(@angular/animations@20.0.0-next.6(@angular/common@20.0.0-next.6(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0)))(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0)))(@angular/common@20.0.0-next.6(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0)))(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0)))
       '@angular/localize':
         specifier: 20.0.0-next.6
         version: 20.0.0-next.6(@angular/compiler-cli@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(typescript@5.8.3))(@angular/compiler@20.0.0-next.6)
       '@angular/material':
         specifier: 20.0.0-next.6
-        version: 20.0.0-next.6(hgc3ejd44uohyk77n2ezskte2i)
+        version: 20.0.0-next.6(2qxkvyozhfwuwhelyxnascttxy)
       '@angular/ng-dev':
         specifier: https://github.com/angular/dev-infra-private-ng-dev-builds.git#ae9fb7555f2c12b329a2dd1212518134d6a13edf
-        version: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/ae9fb7555f2c12b329a2dd1212518134d6a13edf(encoding@0.1.13)
+        version: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/ae9fb7555f2c12b329a2dd1212518134d6a13edf
       '@angular/platform-browser':
         specifier: 20.0.0-next.6
-        version: 20.0.0-next.6(@angular/animations@20.0.0-next.6(@angular/common@20.0.0-next.6(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(rxjs@7.8.2)(zone.js@0.15.0))(rxjs@7.8.2))(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(rxjs@7.8.2)(zone.js@0.15.0)))(@angular/common@20.0.0-next.6(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(rxjs@7.8.2)(zone.js@0.15.0))(rxjs@7.8.2))(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(rxjs@7.8.2)(zone.js@0.15.0))
+        version: 20.0.0-next.6(@angular/animations@20.0.0-next.6(@angular/common@20.0.0-next.6(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0)))(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0)))(@angular/common@20.0.0-next.6(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0)))(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0))
       '@angular/platform-server':
         specifier: 20.0.0-next.6
-        version: 20.0.0-next.6(@angular/common@20.0.0-next.6(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(rxjs@7.8.2)(zone.js@0.15.0))(rxjs@7.8.2))(@angular/compiler@20.0.0-next.6)(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(rxjs@7.8.2)(zone.js@0.15.0))(@angular/platform-browser@20.0.0-next.6(@angular/animations@20.0.0-next.6(@angular/common@20.0.0-next.6(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(rxjs@7.8.2)(zone.js@0.15.0))(rxjs@7.8.2))(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(rxjs@7.8.2)(zone.js@0.15.0)))(@angular/common@20.0.0-next.6(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(rxjs@7.8.2)(zone.js@0.15.0))(rxjs@7.8.2))(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(rxjs@7.8.2)(zone.js@0.15.0)))(rxjs@7.8.2)
+        version: 20.0.0-next.6(@angular/common@20.0.0-next.6(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0)))(@angular/compiler@20.0.0-next.6)(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0))(@angular/platform-browser@20.0.0-next.6(@angular/animations@20.0.0-next.6(@angular/common@20.0.0-next.6(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0)))(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0)))(@angular/common@20.0.0-next.6(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0)))(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0)))
       '@angular/router':
         specifier: 20.0.0-next.6
-        version: 20.0.0-next.6(@angular/common@20.0.0-next.6(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(rxjs@7.8.2)(zone.js@0.15.0))(rxjs@7.8.2))(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(rxjs@7.8.2)(zone.js@0.15.0))(@angular/platform-browser@20.0.0-next.6(@angular/animations@20.0.0-next.6(@angular/common@20.0.0-next.6(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(rxjs@7.8.2)(zone.js@0.15.0))(rxjs@7.8.2))(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(rxjs@7.8.2)(zone.js@0.15.0)))(@angular/common@20.0.0-next.6(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(rxjs@7.8.2)(zone.js@0.15.0))(rxjs@7.8.2))(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(rxjs@7.8.2)(zone.js@0.15.0)))(rxjs@7.8.2)
+        version: 20.0.0-next.6(@angular/common@20.0.0-next.6(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0)))(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0))(@angular/platform-browser@20.0.0-next.6(@angular/animations@20.0.0-next.6(@angular/common@20.0.0-next.6(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0)))(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0)))(@angular/common@20.0.0-next.6(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0)))(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0)))
       '@angular/service-worker':
         specifier: 20.0.0-next.6
-        version: 20.0.0-next.6(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(rxjs@7.8.2)(zone.js@0.15.0))(rxjs@7.8.2)
+        version: 20.0.0-next.6(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0))
       '@bazel/bazelisk':
         specifier: 1.26.0
         version: 1.26.0
@@ -64,7 +69,7 @@ importers:
         version: 8.0.3
       '@eslint/compat':
         specifier: 1.2.8
-        version: 1.2.8(eslint@9.24.0(jiti@1.21.7))
+        version: 1.2.8(eslint@9.24.0)
       '@eslint/eslintrc':
         specifier: 3.3.1
         version: 3.3.1
@@ -85,7 +90,7 @@ importers:
         version: 16.0.1(rollup@4.39.0)
       '@stylistic/eslint-plugin':
         specifier: ^4.0.0
-        version: 4.2.0(eslint@9.24.0(jiti@1.21.7))(typescript@5.8.3)
+        version: 4.2.0(eslint@9.24.0)(typescript@5.8.3)
       '@types/babel__core':
         specifier: 7.20.5
         version: 7.20.5
@@ -160,10 +165,10 @@ importers:
         version: 1.1.9
       '@typescript-eslint/eslint-plugin':
         specifier: 8.29.1
-        version: 8.29.1(@typescript-eslint/parser@8.29.1(eslint@9.24.0(jiti@1.21.7))(typescript@5.8.3))(eslint@9.24.0(jiti@1.21.7))(typescript@5.8.3)
+        version: 8.29.1(@typescript-eslint/parser@8.29.1(eslint@9.24.0)(typescript@5.8.3))(eslint@9.24.0)(typescript@5.8.3)
       '@typescript-eslint/parser':
         specifier: 8.29.1
-        version: 8.29.1(eslint@9.24.0(jiti@1.21.7))(typescript@5.8.3)
+        version: 8.29.1(eslint@9.24.0)(typescript@5.8.3)
       ajv:
         specifier: 8.17.1
         version: 8.17.1
@@ -173,6 +178,9 @@ importers:
       beasties:
         specifier: 0.3.2
         version: 0.3.2
+      bl2bl:
+        specifier: ^0.2.0
+        version: 0.2.0(patch_hash=ysjdjtmgjh6un4h4a4h53f55eu)
       buffer:
         specifier: 6.0.3
         version: 6.0.3
@@ -184,16 +192,16 @@ importers:
         version: 0.25.2
       eslint:
         specifier: 9.24.0
-        version: 9.24.0(jiti@1.21.7)
+        version: 9.24.0
       eslint-config-prettier:
         specifier: 10.1.2
-        version: 10.1.2(eslint@9.24.0(jiti@1.21.7))
+        version: 10.1.2(eslint@9.24.0)
       eslint-plugin-header:
         specifier: 3.1.1
-        version: 3.1.1(eslint@9.24.0(jiti@1.21.7))
+        version: 3.1.1(eslint@9.24.0)
       eslint-plugin-import:
         specifier: 2.31.0
-        version: 2.31.0(@typescript-eslint/parser@8.29.1(eslint@9.24.0(jiti@1.21.7))(typescript@5.8.3))(eslint@9.24.0(jiti@1.21.7))
+        version: 2.31.0(@typescript-eslint/parser@8.29.1(eslint@9.24.0)(typescript@5.8.3))(eslint@9.24.0)
       express:
         specifier: 5.1.0
         version: 5.1.0
@@ -259,10 +267,10 @@ importers:
         version: 7.0.0
       puppeteer:
         specifier: 18.2.1
-        version: 18.2.1(encoding@0.1.13)
+        version: 18.2.1
       quicktype-core:
         specifier: 23.0.171
-        version: 23.0.171(encoding@0.1.13)
+        version: 23.0.171
       rollup:
         specifier: 4.39.0
         version: 4.39.0
@@ -298,7 +306,7 @@ importers:
         version: 1.10.0
       verdaccio:
         specifier: 6.1.2
-        version: 6.1.2(encoding@0.1.13)
+        version: 6.1.2
       verdaccio-auth-memory:
         specifier: ^10.0.0
         version: 10.2.2
@@ -1990,6 +1998,9 @@ packages:
     cpu: [x64]
     os: [win32]
 
+  '@mdn/browser-compat-data@6.0.5':
+    resolution: {integrity: sha512-Uvhix3jFcKxN/0YnLtecdRId7qRCYuxzdCL7n3UYVhozQXoVg2r1yWZ2ozUNb1vRlz0HrM2exUmIDts9lX/RDQ==}
+
   '@msgpackr-extract/msgpackr-extract-darwin-arm64@3.0.3':
     resolution: {integrity: sha512-QZHtlVgbAdy2zAqNA9Gu1UpIuI8Xvsd1v8ic6B2pZmeFnFcMWiPLfWXh7TVw4eGEZ/C9TH281KwhVoeQUKbyjw==}
     cpu: [arm64]
@@ -3439,6 +3450,9 @@ packages:
     resolution: {integrity: sha512-lGe34o6EHj9y3Kts9R4ZYs/Gr+6N7MCaMlIFA3F1R2O5/m7K06AxfSeO5530PEERE6/WyEg3lsuyw4GHlPZHog==}
     engines: {node: ^4.5.0 || >= 5.9}
 
+  baseline-browser-mapping@2.2.0:
+    resolution: {integrity: sha512-tLVamSyLn6h5kp7aDzBIPiNnx+ighswrdRs9ug3aeBgSXFQG2nFj1EfWvWTD1Y/ra9GDS8znPwMxTEitF6cC/g==}
+
   basic-ftp@5.0.5:
     resolution: {integrity: sha512-4Bcg1P8xhUuqcii/S0Z9wiHIrQVPMermM1any+MX5GeGD7faD3/msQUDGLol9wOcz4/jbg/WJnGqoJF6LiBdtg==}
     engines: {node: '>=10.0.0'}
@@ -3472,6 +3486,10 @@ packages:
   binary-extensions@2.3.0:
     resolution: {integrity: sha512-Ceh+7ox5qe7LJuLHoY0feh3pHuUDHAcRUeyL2VYghZwfpkNIy/+8Ocg0a3UuSoYzavmylwuLWQOf3hl0jjMMIw==}
     engines: {node: '>=8'}
+
+  bl2bl@0.2.0:
+    resolution: {integrity: sha512-XvxNiCArO6VPaSJLxnr7+fBZXSda+lczl3iQGzLZmhLzp/TN4GfTryleQJYwvxQ4KXsaDqosDzU1Nykj3WVOFw==}
+    hasBin: true
 
   bl@4.1.0:
     resolution: {integrity: sha512-1W07cM9gS6DcLperZfFSj+bWLtaPGSOHWhPiGzXmvVJbRLdG82sH/Kn8EtW1VqWVA54AKf2h5k5BbnIbwF3h6w==}
@@ -7674,6 +7692,9 @@ packages:
   weak-lru-cache@1.2.2:
     resolution: {integrity: sha512-DEAoo25RfSYMuTGc9vPJzZcZullwIqRDSI9LOy+fkCJPi6hykCnfKaXTuPBDuXAUcqHXyOgFtHNp/kB2FjYHbw==}
 
+  web-features@2.33.0:
+    resolution: {integrity: sha512-oLzTO29Ax9TyQGNoNxpC+2Hj9if7lm2tuuAiEAb01BxcBt7yH40LAmIDg5PtuJ39lnwqm4wELATIKhj6WlJJpQ==}
+
   web-streams-polyfill@3.3.3:
     resolution: {integrity: sha512-d2JWLCivmZYTSIoge9MsgFCZrt571BikcWGYkjC1khllbTeDlGqZ2D8vD8E/lJa8WGWbb7Plm8/XJYV7IJHZZw==}
     engines: {node: '>= 8'}
@@ -7976,19 +7997,30 @@ snapshots:
       '@angular/common': 20.0.0-next.6(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(rxjs@7.8.2)(zone.js@0.15.0))(rxjs@7.8.2)
       '@angular/core': 20.0.0-next.6(@angular/compiler@20.0.0-next.6)(rxjs@7.8.2)(zone.js@0.15.0)
       tslib: 2.8.1
+    optional: true
 
-  '@angular/cdk@20.0.0-next.6(@angular/common@20.0.0-next.6(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(rxjs@7.8.2)(zone.js@0.15.0))(rxjs@7.8.2))(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(rxjs@7.8.2)(zone.js@0.15.0))(rxjs@7.8.2)':
+  '@angular/animations@20.0.0-next.6(@angular/common@20.0.0-next.6(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0)))(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0))':
     dependencies:
-      '@angular/common': 20.0.0-next.6(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(rxjs@7.8.2)(zone.js@0.15.0))(rxjs@7.8.2)
-      '@angular/core': 20.0.0-next.6(@angular/compiler@20.0.0-next.6)(rxjs@7.8.2)(zone.js@0.15.0)
+      '@angular/common': 20.0.0-next.6(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0))
+      '@angular/core': 20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0)
+      tslib: 2.8.1
+
+  '@angular/cdk@20.0.0-next.6(@angular/common@20.0.0-next.6(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0)))(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0))':
+    dependencies:
+      '@angular/common': 20.0.0-next.6(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0))
+      '@angular/core': 20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0)
       parse5: 7.2.1
-      rxjs: 7.8.2
       tslib: 2.8.1
 
   '@angular/common@20.0.0-next.6(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(rxjs@7.8.2)(zone.js@0.15.0))(rxjs@7.8.2)':
     dependencies:
       '@angular/core': 20.0.0-next.6(@angular/compiler@20.0.0-next.6)(rxjs@7.8.2)(zone.js@0.15.0)
       rxjs: 7.8.2
+      tslib: 2.8.1
+
+  '@angular/common@20.0.0-next.6(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0))':
+    dependencies:
+      '@angular/core': 20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0)
       tslib: 2.8.1
 
   '@angular/compiler-cli@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(typescript@5.8.3)':
@@ -8018,12 +8050,18 @@ snapshots:
     optionalDependencies:
       '@angular/compiler': 20.0.0-next.6
 
-  '@angular/forms@20.0.0-next.6(@angular/common@20.0.0-next.6(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(rxjs@7.8.2)(zone.js@0.15.0))(rxjs@7.8.2))(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(rxjs@7.8.2)(zone.js@0.15.0))(@angular/platform-browser@20.0.0-next.6(@angular/animations@20.0.0-next.6(@angular/common@20.0.0-next.6(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(rxjs@7.8.2)(zone.js@0.15.0))(rxjs@7.8.2))(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(rxjs@7.8.2)(zone.js@0.15.0)))(@angular/common@20.0.0-next.6(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(rxjs@7.8.2)(zone.js@0.15.0))(rxjs@7.8.2))(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(rxjs@7.8.2)(zone.js@0.15.0)))(rxjs@7.8.2)':
+  '@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0)':
     dependencies:
-      '@angular/common': 20.0.0-next.6(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(rxjs@7.8.2)(zone.js@0.15.0))(rxjs@7.8.2)
-      '@angular/core': 20.0.0-next.6(@angular/compiler@20.0.0-next.6)(rxjs@7.8.2)(zone.js@0.15.0)
-      '@angular/platform-browser': 20.0.0-next.6(@angular/animations@20.0.0-next.6(@angular/common@20.0.0-next.6(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(rxjs@7.8.2)(zone.js@0.15.0))(rxjs@7.8.2))(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(rxjs@7.8.2)(zone.js@0.15.0)))(@angular/common@20.0.0-next.6(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(rxjs@7.8.2)(zone.js@0.15.0))(rxjs@7.8.2))(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(rxjs@7.8.2)(zone.js@0.15.0))
-      rxjs: 7.8.2
+      tslib: 2.8.1
+      zone.js: 0.15.0
+    optionalDependencies:
+      '@angular/compiler': 20.0.0-next.6
+
+  '@angular/forms@20.0.0-next.6(@angular/common@20.0.0-next.6(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0)))(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0))(@angular/platform-browser@20.0.0-next.6(@angular/animations@20.0.0-next.6(@angular/common@20.0.0-next.6(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0)))(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0)))(@angular/common@20.0.0-next.6(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0)))(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0)))':
+    dependencies:
+      '@angular/common': 20.0.0-next.6(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0))
+      '@angular/core': 20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0)
+      '@angular/platform-browser': 20.0.0-next.6(@angular/animations@20.0.0-next.6(@angular/common@20.0.0-next.6(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0)))(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0)))(@angular/common@20.0.0-next.6(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0)))(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0))
       tslib: 2.8.1
 
   '@angular/localize@20.0.0-next.6(@angular/compiler-cli@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(typescript@5.8.3))(@angular/compiler@20.0.0-next.6)':
@@ -8037,19 +8075,18 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@angular/material@20.0.0-next.6(hgc3ejd44uohyk77n2ezskte2i)':
+  '@angular/material@20.0.0-next.6(2qxkvyozhfwuwhelyxnascttxy)':
     dependencies:
-      '@angular/cdk': 20.0.0-next.6(@angular/common@20.0.0-next.6(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(rxjs@7.8.2)(zone.js@0.15.0))(rxjs@7.8.2))(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(rxjs@7.8.2)(zone.js@0.15.0))(rxjs@7.8.2)
-      '@angular/common': 20.0.0-next.6(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(rxjs@7.8.2)(zone.js@0.15.0))(rxjs@7.8.2)
-      '@angular/core': 20.0.0-next.6(@angular/compiler@20.0.0-next.6)(rxjs@7.8.2)(zone.js@0.15.0)
-      '@angular/forms': 20.0.0-next.6(@angular/common@20.0.0-next.6(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(rxjs@7.8.2)(zone.js@0.15.0))(rxjs@7.8.2))(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(rxjs@7.8.2)(zone.js@0.15.0))(@angular/platform-browser@20.0.0-next.6(@angular/animations@20.0.0-next.6(@angular/common@20.0.0-next.6(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(rxjs@7.8.2)(zone.js@0.15.0))(rxjs@7.8.2))(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(rxjs@7.8.2)(zone.js@0.15.0)))(@angular/common@20.0.0-next.6(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(rxjs@7.8.2)(zone.js@0.15.0))(rxjs@7.8.2))(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(rxjs@7.8.2)(zone.js@0.15.0)))(rxjs@7.8.2)
-      '@angular/platform-browser': 20.0.0-next.6(@angular/animations@20.0.0-next.6(@angular/common@20.0.0-next.6(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(rxjs@7.8.2)(zone.js@0.15.0))(rxjs@7.8.2))(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(rxjs@7.8.2)(zone.js@0.15.0)))(@angular/common@20.0.0-next.6(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(rxjs@7.8.2)(zone.js@0.15.0))(rxjs@7.8.2))(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(rxjs@7.8.2)(zone.js@0.15.0))
-      rxjs: 7.8.2
+      '@angular/cdk': 20.0.0-next.6(@angular/common@20.0.0-next.6(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0)))(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0))
+      '@angular/common': 20.0.0-next.6(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0))
+      '@angular/core': 20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0)
+      '@angular/forms': 20.0.0-next.6(@angular/common@20.0.0-next.6(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0)))(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0))(@angular/platform-browser@20.0.0-next.6(@angular/animations@20.0.0-next.6(@angular/common@20.0.0-next.6(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0)))(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0)))(@angular/common@20.0.0-next.6(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0)))(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0)))
+      '@angular/platform-browser': 20.0.0-next.6(@angular/animations@20.0.0-next.6(@angular/common@20.0.0-next.6(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0)))(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0)))(@angular/common@20.0.0-next.6(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0)))(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0))
       tslib: 2.8.1
 
-  '@angular/ng-dev@https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/ae9fb7555f2c12b329a2dd1212518134d6a13edf(encoding@0.1.13)':
+  '@angular/ng-dev@https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/ae9fb7555f2c12b329a2dd1212518134d6a13edf':
     dependencies:
-      '@google-cloud/spanner': 7.19.1(encoding@0.1.13)(supports-color@10.0.0)
+      '@google-cloud/spanner': 7.19.1(supports-color@10.0.0)
       '@octokit/rest': 21.1.1
       '@types/semver': 7.7.0
       '@types/supports-color': 10.0.0
@@ -8072,6 +8109,14 @@ snapshots:
     optionalDependencies:
       '@angular/animations': 20.0.0-next.6(@angular/common@20.0.0-next.6(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(rxjs@7.8.2)(zone.js@0.15.0))(rxjs@7.8.2))(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(rxjs@7.8.2)(zone.js@0.15.0))
 
+  '@angular/platform-browser@20.0.0-next.6(@angular/animations@20.0.0-next.6(@angular/common@20.0.0-next.6(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0)))(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0)))(@angular/common@20.0.0-next.6(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0)))(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0))':
+    dependencies:
+      '@angular/common': 20.0.0-next.6(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0))
+      '@angular/core': 20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0)
+      tslib: 2.8.1
+    optionalDependencies:
+      '@angular/animations': 20.0.0-next.6(@angular/common@20.0.0-next.6(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0)))(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0))
+
   '@angular/platform-server@20.0.0-next.6(@angular/common@20.0.0-next.6(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(rxjs@7.8.2)(zone.js@0.15.0))(rxjs@7.8.2))(@angular/compiler@20.0.0-next.6)(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(rxjs@7.8.2)(zone.js@0.15.0))(@angular/platform-browser@20.0.0-next.6(@angular/animations@20.0.0-next.6(@angular/common@20.0.0-next.6(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(rxjs@7.8.2)(zone.js@0.15.0))(rxjs@7.8.2))(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(rxjs@7.8.2)(zone.js@0.15.0)))(@angular/common@20.0.0-next.6(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(rxjs@7.8.2)(zone.js@0.15.0))(rxjs@7.8.2))(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(rxjs@7.8.2)(zone.js@0.15.0)))(rxjs@7.8.2)':
     dependencies:
       '@angular/common': 20.0.0-next.6(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(rxjs@7.8.2)(zone.js@0.15.0))(rxjs@7.8.2)
@@ -8079,6 +8124,15 @@ snapshots:
       '@angular/core': 20.0.0-next.6(@angular/compiler@20.0.0-next.6)(rxjs@7.8.2)(zone.js@0.15.0)
       '@angular/platform-browser': 20.0.0-next.6(@angular/animations@20.0.0-next.6(@angular/common@20.0.0-next.6(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(rxjs@7.8.2)(zone.js@0.15.0))(rxjs@7.8.2))(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(rxjs@7.8.2)(zone.js@0.15.0)))(@angular/common@20.0.0-next.6(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(rxjs@7.8.2)(zone.js@0.15.0))(rxjs@7.8.2))(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(rxjs@7.8.2)(zone.js@0.15.0))
       rxjs: 7.8.2
+      tslib: 2.8.1
+      xhr2: 0.2.1
+
+  '@angular/platform-server@20.0.0-next.6(@angular/common@20.0.0-next.6(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0)))(@angular/compiler@20.0.0-next.6)(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0))(@angular/platform-browser@20.0.0-next.6(@angular/animations@20.0.0-next.6(@angular/common@20.0.0-next.6(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0)))(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0)))(@angular/common@20.0.0-next.6(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0)))(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0)))':
+    dependencies:
+      '@angular/common': 20.0.0-next.6(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0))
+      '@angular/compiler': 20.0.0-next.6
+      '@angular/core': 20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0)
+      '@angular/platform-browser': 20.0.0-next.6(@angular/animations@20.0.0-next.6(@angular/common@20.0.0-next.6(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0)))(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0)))(@angular/common@20.0.0-next.6(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0)))(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0))
       tslib: 2.8.1
       xhr2: 0.2.1
 
@@ -8090,10 +8144,16 @@ snapshots:
       rxjs: 7.8.2
       tslib: 2.8.1
 
-  '@angular/service-worker@20.0.0-next.6(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(rxjs@7.8.2)(zone.js@0.15.0))(rxjs@7.8.2)':
+  '@angular/router@20.0.0-next.6(@angular/common@20.0.0-next.6(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0)))(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0))(@angular/platform-browser@20.0.0-next.6(@angular/animations@20.0.0-next.6(@angular/common@20.0.0-next.6(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0)))(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0)))(@angular/common@20.0.0-next.6(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0)))(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0)))':
     dependencies:
-      '@angular/core': 20.0.0-next.6(@angular/compiler@20.0.0-next.6)(rxjs@7.8.2)(zone.js@0.15.0)
-      rxjs: 7.8.2
+      '@angular/common': 20.0.0-next.6(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0))
+      '@angular/core': 20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0)
+      '@angular/platform-browser': 20.0.0-next.6(@angular/animations@20.0.0-next.6(@angular/common@20.0.0-next.6(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0)))(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0)))(@angular/common@20.0.0-next.6(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0)))(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0))
+      tslib: 2.8.1
+
+  '@angular/service-worker@20.0.0-next.6(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0))':
+    dependencies:
+      '@angular/core': 20.0.0-next.6(@angular/compiler@20.0.0-next.6)(zone.js@0.15.0)
       tslib: 2.8.1
 
   '@babel/code-frame@7.26.2':
@@ -8859,16 +8919,16 @@ snapshots:
   '@esbuild/win32-x64@0.25.2':
     optional: true
 
-  '@eslint-community/eslint-utils@4.5.1(eslint@9.24.0(jiti@1.21.7))':
+  '@eslint-community/eslint-utils@4.5.1(eslint@9.24.0)':
     dependencies:
-      eslint: 9.24.0(jiti@1.21.7)
+      eslint: 9.24.0
       eslint-visitor-keys: 3.4.3
 
   '@eslint-community/regexpp@4.12.1': {}
 
-  '@eslint/compat@1.2.8(eslint@9.24.0(jiti@1.21.7))':
+  '@eslint/compat@1.2.8(eslint@9.24.0)':
     optionalDependencies:
-      eslint: 9.24.0(jiti@1.21.7)
+      eslint: 9.24.0
 
   '@eslint/config-array@0.20.0':
     dependencies:
@@ -8913,17 +8973,17 @@ snapshots:
 
   '@glideapps/ts-necessities@2.2.3': {}
 
-  '@google-cloud/common@5.0.2(encoding@0.1.13)(supports-color@10.0.0)':
+  '@google-cloud/common@5.0.2(supports-color@10.0.0)':
     dependencies:
       '@google-cloud/projectify': 4.0.0
       '@google-cloud/promisify': 4.0.0
       arrify: 2.0.1
       duplexify: 4.1.3
       extend: 3.0.2
-      google-auth-library: 9.15.1(encoding@0.1.13)(supports-color@10.0.0)
+      google-auth-library: 9.15.1(supports-color@10.0.0)
       html-entities: 2.6.0
-      retry-request: 7.0.2(encoding@0.1.13)(supports-color@10.0.0)
-      teeny-request: 9.0.0(encoding@0.1.13)(supports-color@10.0.0)
+      retry-request: 7.0.2(supports-color@10.0.0)
+      teeny-request: 9.0.0(supports-color@10.0.0)
     transitivePeerDependencies:
       - encoding
       - supports-color
@@ -8934,9 +8994,9 @@ snapshots:
 
   '@google-cloud/promisify@4.0.0': {}
 
-  '@google-cloud/spanner@7.19.1(encoding@0.1.13)(supports-color@10.0.0)':
+  '@google-cloud/spanner@7.19.1(supports-color@10.0.0)':
     dependencies:
-      '@google-cloud/common': 5.0.2(encoding@0.1.13)(supports-color@10.0.0)
+      '@google-cloud/common': 5.0.2(supports-color@10.0.0)
       '@google-cloud/precise-date': 4.0.0
       '@google-cloud/projectify': 4.0.0
       '@google-cloud/promisify': 4.0.0
@@ -8953,19 +9013,19 @@ snapshots:
       duplexify: 4.1.3
       events-intercept: 2.0.0
       extend: 3.0.2
-      google-auth-library: 9.15.1(encoding@0.1.13)(supports-color@10.0.0)
-      google-gax: 4.4.1(encoding@0.1.13)(supports-color@10.0.0)
+      google-auth-library: 9.15.1(supports-color@10.0.0)
+      google-gax: 4.4.1(supports-color@10.0.0)
       grpc-gcp: 1.0.1(protobufjs@7.4.0)
       is: 3.3.0
       lodash.snakecase: 4.1.1
       merge-stream: 2.0.0
       p-queue: 6.6.2
       protobufjs: 7.4.0
-      retry-request: 7.0.2(encoding@0.1.13)(supports-color@10.0.0)
+      retry-request: 7.0.2(supports-color@10.0.0)
       split-array-stream: 2.0.0
       stack-trace: 0.0.10
       stream-events: 1.0.5
-      teeny-request: 9.0.0(encoding@0.1.13)(supports-color@10.0.0)
+      teeny-request: 9.0.0(supports-color@10.0.0)
       through2: 4.0.2
     transitivePeerDependencies:
       - encoding
@@ -9202,6 +9262,8 @@ snapshots:
 
   '@lmdb/lmdb-win32-x64@3.2.6':
     optional: true
+
+  '@mdn/browser-compat-data@6.0.5': {}
 
   '@msgpackr-extract/msgpackr-extract-darwin-arm64@3.0.3':
     optional: true
@@ -9689,10 +9751,10 @@ snapshots:
 
   '@socket.io/component-emitter@3.1.2': {}
 
-  '@stylistic/eslint-plugin@4.2.0(eslint@9.24.0(jiti@1.21.7))(typescript@5.8.3)':
+  '@stylistic/eslint-plugin@4.2.0(eslint@9.24.0)(typescript@5.8.3)':
     dependencies:
-      '@typescript-eslint/utils': 8.29.0(eslint@9.24.0(jiti@1.21.7))(typescript@5.8.3)
-      eslint: 9.24.0(jiti@1.21.7)
+      '@typescript-eslint/utils': 8.29.0(eslint@9.24.0)(typescript@5.8.3)
+      eslint: 9.24.0
       eslint-visitor-keys: 4.2.0
       espree: 10.3.0
       estraverse: 5.3.0
@@ -10082,15 +10144,15 @@ snapshots:
       '@types/node': 20.17.30
     optional: true
 
-  '@typescript-eslint/eslint-plugin@8.29.1(@typescript-eslint/parser@8.29.1(eslint@9.24.0(jiti@1.21.7))(typescript@5.8.3))(eslint@9.24.0(jiti@1.21.7))(typescript@5.8.3)':
+  '@typescript-eslint/eslint-plugin@8.29.1(@typescript-eslint/parser@8.29.1(eslint@9.24.0)(typescript@5.8.3))(eslint@9.24.0)(typescript@5.8.3)':
     dependencies:
       '@eslint-community/regexpp': 4.12.1
-      '@typescript-eslint/parser': 8.29.1(eslint@9.24.0(jiti@1.21.7))(typescript@5.8.3)
+      '@typescript-eslint/parser': 8.29.1(eslint@9.24.0)(typescript@5.8.3)
       '@typescript-eslint/scope-manager': 8.29.1
-      '@typescript-eslint/type-utils': 8.29.1(eslint@9.24.0(jiti@1.21.7))(typescript@5.8.3)
-      '@typescript-eslint/utils': 8.29.1(eslint@9.24.0(jiti@1.21.7))(typescript@5.8.3)
+      '@typescript-eslint/type-utils': 8.29.1(eslint@9.24.0)(typescript@5.8.3)
+      '@typescript-eslint/utils': 8.29.1(eslint@9.24.0)(typescript@5.8.3)
       '@typescript-eslint/visitor-keys': 8.29.1
-      eslint: 9.24.0(jiti@1.21.7)
+      eslint: 9.24.0
       graphemer: 1.4.0
       ignore: 5.3.2
       natural-compare: 1.4.0
@@ -10099,14 +10161,14 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@typescript-eslint/parser@8.29.1(eslint@9.24.0(jiti@1.21.7))(typescript@5.8.3)':
+  '@typescript-eslint/parser@8.29.1(eslint@9.24.0)(typescript@5.8.3)':
     dependencies:
       '@typescript-eslint/scope-manager': 8.29.1
       '@typescript-eslint/types': 8.29.1
       '@typescript-eslint/typescript-estree': 8.29.1(typescript@5.8.3)
       '@typescript-eslint/visitor-keys': 8.29.1
       debug: 4.4.0(supports-color@10.0.0)
-      eslint: 9.24.0(jiti@1.21.7)
+      eslint: 9.24.0
       typescript: 5.8.3
     transitivePeerDependencies:
       - supports-color
@@ -10121,12 +10183,12 @@ snapshots:
       '@typescript-eslint/types': 8.29.1
       '@typescript-eslint/visitor-keys': 8.29.1
 
-  '@typescript-eslint/type-utils@8.29.1(eslint@9.24.0(jiti@1.21.7))(typescript@5.8.3)':
+  '@typescript-eslint/type-utils@8.29.1(eslint@9.24.0)(typescript@5.8.3)':
     dependencies:
       '@typescript-eslint/typescript-estree': 8.29.1(typescript@5.8.3)
-      '@typescript-eslint/utils': 8.29.1(eslint@9.24.0(jiti@1.21.7))(typescript@5.8.3)
+      '@typescript-eslint/utils': 8.29.1(eslint@9.24.0)(typescript@5.8.3)
       debug: 4.4.0(supports-color@10.0.0)
-      eslint: 9.24.0(jiti@1.21.7)
+      eslint: 9.24.0
       ts-api-utils: 2.1.0(typescript@5.8.3)
       typescript: 5.8.3
     transitivePeerDependencies:
@@ -10164,24 +10226,24 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@typescript-eslint/utils@8.29.0(eslint@9.24.0(jiti@1.21.7))(typescript@5.8.3)':
+  '@typescript-eslint/utils@8.29.0(eslint@9.24.0)(typescript@5.8.3)':
     dependencies:
-      '@eslint-community/eslint-utils': 4.5.1(eslint@9.24.0(jiti@1.21.7))
+      '@eslint-community/eslint-utils': 4.5.1(eslint@9.24.0)
       '@typescript-eslint/scope-manager': 8.29.0
       '@typescript-eslint/types': 8.29.0
       '@typescript-eslint/typescript-estree': 8.29.0(typescript@5.8.3)
-      eslint: 9.24.0(jiti@1.21.7)
+      eslint: 9.24.0
       typescript: 5.8.3
     transitivePeerDependencies:
       - supports-color
 
-  '@typescript-eslint/utils@8.29.1(eslint@9.24.0(jiti@1.21.7))(typescript@5.8.3)':
+  '@typescript-eslint/utils@8.29.1(eslint@9.24.0)(typescript@5.8.3)':
     dependencies:
-      '@eslint-community/eslint-utils': 4.5.1(eslint@9.24.0(jiti@1.21.7))
+      '@eslint-community/eslint-utils': 4.5.1(eslint@9.24.0)
       '@typescript-eslint/scope-manager': 8.29.1
       '@typescript-eslint/types': 8.29.1
       '@typescript-eslint/typescript-estree': 8.29.1(typescript@5.8.3)
-      eslint: 9.24.0(jiti@1.21.7)
+      eslint: 9.24.0
       typescript: 5.8.3
     transitivePeerDependencies:
       - supports-color
@@ -10888,6 +10950,11 @@ snapshots:
 
   base64id@2.0.0: {}
 
+  baseline-browser-mapping@2.2.0:
+    dependencies:
+      '@mdn/browser-compat-data': 6.0.5
+      web-features: 2.33.0
+
   basic-ftp@5.0.5: {}
 
   batch@0.6.1: {}
@@ -10918,6 +10985,11 @@ snapshots:
   bignumber.js@9.2.0: {}
 
   binary-extensions@2.3.0: {}
+
+  bl2bl@0.2.0(patch_hash=ysjdjtmgjh6un4h4a4h53f55eu):
+    dependencies:
+      '@mdn/browser-compat-data': 6.0.5
+      baseline-browser-mapping: 2.2.0
 
   bl@4.1.0:
     dependencies:
@@ -11397,15 +11469,15 @@ snapshots:
 
   create-require@1.1.1: {}
 
-  cross-fetch@3.1.5(encoding@0.1.13):
+  cross-fetch@3.1.5:
     dependencies:
-      node-fetch: 2.6.7(encoding@0.1.13)
+      node-fetch: 2.6.7
     transitivePeerDependencies:
       - encoding
 
-  cross-fetch@4.1.0(encoding@0.1.13):
+  cross-fetch@4.1.0:
     dependencies:
-      node-fetch: 2.7.0(encoding@0.1.13)
+      node-fetch: 2.7.0
     transitivePeerDependencies:
       - encoding
 
@@ -11894,9 +11966,9 @@ snapshots:
     optionalDependencies:
       source-map: 0.6.1
 
-  eslint-config-prettier@10.1.2(eslint@9.24.0(jiti@1.21.7)):
+  eslint-config-prettier@10.1.2(eslint@9.24.0):
     dependencies:
-      eslint: 9.24.0(jiti@1.21.7)
+      eslint: 9.24.0
 
   eslint-import-resolver-node@0.3.9:
     dependencies:
@@ -11906,21 +11978,21 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  eslint-module-utils@2.12.0(@typescript-eslint/parser@8.29.1(eslint@9.24.0(jiti@1.21.7))(typescript@5.8.3))(eslint-import-resolver-node@0.3.9)(eslint@9.24.0(jiti@1.21.7)):
+  eslint-module-utils@2.12.0(@typescript-eslint/parser@8.29.1(eslint@9.24.0)(typescript@5.8.3))(eslint-import-resolver-node@0.3.9)(eslint@9.24.0):
     dependencies:
       debug: 3.2.7
     optionalDependencies:
-      '@typescript-eslint/parser': 8.29.1(eslint@9.24.0(jiti@1.21.7))(typescript@5.8.3)
-      eslint: 9.24.0(jiti@1.21.7)
+      '@typescript-eslint/parser': 8.29.1(eslint@9.24.0)(typescript@5.8.3)
+      eslint: 9.24.0
       eslint-import-resolver-node: 0.3.9
     transitivePeerDependencies:
       - supports-color
 
-  eslint-plugin-header@3.1.1(eslint@9.24.0(jiti@1.21.7)):
+  eslint-plugin-header@3.1.1(eslint@9.24.0):
     dependencies:
-      eslint: 9.24.0(jiti@1.21.7)
+      eslint: 9.24.0
 
-  eslint-plugin-import@2.31.0(@typescript-eslint/parser@8.29.1(eslint@9.24.0(jiti@1.21.7))(typescript@5.8.3))(eslint@9.24.0(jiti@1.21.7)):
+  eslint-plugin-import@2.31.0(@typescript-eslint/parser@8.29.1(eslint@9.24.0)(typescript@5.8.3))(eslint@9.24.0):
     dependencies:
       '@rtsao/scc': 1.1.0
       array-includes: 3.1.8
@@ -11929,9 +12001,9 @@ snapshots:
       array.prototype.flatmap: 1.3.3
       debug: 3.2.7
       doctrine: 2.1.0
-      eslint: 9.24.0(jiti@1.21.7)
+      eslint: 9.24.0
       eslint-import-resolver-node: 0.3.9
-      eslint-module-utils: 2.12.0(@typescript-eslint/parser@8.29.1(eslint@9.24.0(jiti@1.21.7))(typescript@5.8.3))(eslint-import-resolver-node@0.3.9)(eslint@9.24.0(jiti@1.21.7))
+      eslint-module-utils: 2.12.0(@typescript-eslint/parser@8.29.1(eslint@9.24.0)(typescript@5.8.3))(eslint-import-resolver-node@0.3.9)(eslint@9.24.0)
       hasown: 2.0.2
       is-core-module: 2.16.1
       is-glob: 4.0.3
@@ -11943,7 +12015,7 @@ snapshots:
       string.prototype.trimend: 1.0.9
       tsconfig-paths: 3.15.0
     optionalDependencies:
-      '@typescript-eslint/parser': 8.29.1(eslint@9.24.0(jiti@1.21.7))(typescript@5.8.3)
+      '@typescript-eslint/parser': 8.29.1(eslint@9.24.0)(typescript@5.8.3)
     transitivePeerDependencies:
       - eslint-import-resolver-typescript
       - eslint-import-resolver-webpack
@@ -11963,9 +12035,9 @@ snapshots:
 
   eslint-visitor-keys@4.2.0: {}
 
-  eslint@9.24.0(jiti@1.21.7):
+  eslint@9.24.0:
     dependencies:
-      '@eslint-community/eslint-utils': 4.5.1(eslint@9.24.0(jiti@1.21.7))
+      '@eslint-community/eslint-utils': 4.5.1(eslint@9.24.0)
       '@eslint-community/regexpp': 4.12.1
       '@eslint/config-array': 0.20.0
       '@eslint/config-helpers': 0.2.1
@@ -12000,8 +12072,6 @@ snapshots:
       minimatch: 3.1.2
       natural-compare: 1.4.0
       optionator: 0.9.4
-    optionalDependencies:
-      jiti: 1.21.7
     transitivePeerDependencies:
       - supports-color
 
@@ -12372,20 +12442,20 @@ snapshots:
 
   functions-have-names@1.2.3: {}
 
-  gaxios@6.7.1(encoding@0.1.13)(supports-color@10.0.0):
+  gaxios@6.7.1(supports-color@10.0.0):
     dependencies:
       extend: 3.0.2
       https-proxy-agent: 7.0.6(supports-color@10.0.0)
       is-stream: 2.0.1
-      node-fetch: 2.7.0(encoding@0.1.13)
+      node-fetch: 2.7.0
       uuid: 9.0.1
     transitivePeerDependencies:
       - encoding
       - supports-color
 
-  gcp-metadata@6.1.1(encoding@0.1.13)(supports-color@10.0.0):
+  gcp-metadata@6.1.1(supports-color@10.0.0):
     dependencies:
-      gaxios: 6.7.1(encoding@0.1.13)(supports-color@10.0.0)
+      gaxios: 6.7.1(supports-color@10.0.0)
       google-logging-utils: 0.0.2
       json-bigint: 1.0.0
     transitivePeerDependencies:
@@ -12503,31 +12573,31 @@ snapshots:
       pify: 2.3.0
       pinkie-promise: 2.0.1
 
-  google-auth-library@9.15.1(encoding@0.1.13)(supports-color@10.0.0):
+  google-auth-library@9.15.1(supports-color@10.0.0):
     dependencies:
       base64-js: 1.5.1
       ecdsa-sig-formatter: 1.0.11
-      gaxios: 6.7.1(encoding@0.1.13)(supports-color@10.0.0)
-      gcp-metadata: 6.1.1(encoding@0.1.13)(supports-color@10.0.0)
-      gtoken: 7.1.0(encoding@0.1.13)(supports-color@10.0.0)
+      gaxios: 6.7.1(supports-color@10.0.0)
+      gcp-metadata: 6.1.1(supports-color@10.0.0)
+      gtoken: 7.1.0(supports-color@10.0.0)
       jws: 4.0.0
     transitivePeerDependencies:
       - encoding
       - supports-color
 
-  google-gax@4.4.1(encoding@0.1.13)(supports-color@10.0.0):
+  google-gax@4.4.1(supports-color@10.0.0):
     dependencies:
       '@grpc/grpc-js': 1.13.2
       '@grpc/proto-loader': 0.7.13
       '@types/long': 4.0.2
       abort-controller: 3.0.0
       duplexify: 4.1.3
-      google-auth-library: 9.15.1(encoding@0.1.13)(supports-color@10.0.0)
-      node-fetch: 2.7.0(encoding@0.1.13)
+      google-auth-library: 9.15.1(supports-color@10.0.0)
+      node-fetch: 2.7.0
       object-hash: 3.0.0
       proto3-json-serializer: 2.0.2
       protobufjs: 7.4.0
-      retry-request: 7.0.2(encoding@0.1.13)(supports-color@10.0.0)
+      retry-request: 7.0.2(supports-color@10.0.0)
       uuid: 9.0.1
     transitivePeerDependencies:
       - encoding
@@ -12546,9 +12616,9 @@ snapshots:
       '@grpc/grpc-js': 1.13.2
       protobufjs: 7.4.0
 
-  gtoken@7.1.0(encoding@0.1.13)(supports-color@10.0.0):
+  gtoken@7.1.0(supports-color@10.0.0):
     dependencies:
-      gaxios: 6.7.1(encoding@0.1.13)(supports-color@10.0.0)
+      gaxios: 6.7.1(supports-color@10.0.0)
       jws: 4.0.0
     transitivePeerDependencies:
       - encoding
@@ -13801,17 +13871,13 @@ snapshots:
 
   node-fetch-native@1.6.6: {}
 
-  node-fetch@2.6.7(encoding@0.1.13):
+  node-fetch@2.6.7:
     dependencies:
       whatwg-url: 5.0.0
-    optionalDependencies:
-      encoding: 0.1.13
 
-  node-fetch@2.7.0(encoding@0.1.13):
+  node-fetch@2.7.0:
     dependencies:
       whatwg-url: 5.0.0
-    optionalDependencies:
-      encoding: 0.1.13
 
   node-fetch@3.3.2:
     dependencies:
@@ -14399,9 +14465,9 @@ snapshots:
 
   punycode@2.3.1: {}
 
-  puppeteer-core@18.2.1(encoding@0.1.13):
+  puppeteer-core@18.2.1:
     dependencies:
-      cross-fetch: 3.1.5(encoding@0.1.13)
+      cross-fetch: 3.1.5
       debug: 4.3.4
       devtools-protocol: 0.0.1045489
       extract-zip: 2.0.1
@@ -14431,12 +14497,12 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  puppeteer@18.2.1(encoding@0.1.13):
+  puppeteer@18.2.1:
     dependencies:
       https-proxy-agent: 5.0.1(supports-color@10.0.0)
       progress: 2.0.3
       proxy-from-env: 1.1.0
-      puppeteer-core: 18.2.1(encoding@0.1.13)
+      puppeteer-core: 18.2.1
     transitivePeerDependencies:
       - bufferutil
       - encoding
@@ -14461,12 +14527,12 @@ snapshots:
 
   quick-format-unescaped@4.0.4: {}
 
-  quicktype-core@23.0.171(encoding@0.1.13):
+  quicktype-core@23.0.171:
     dependencies:
       '@glideapps/ts-necessities': 2.2.3
       browser-or-node: 3.0.0
       collection-utils: 1.0.1
-      cross-fetch: 4.1.0(encoding@0.1.13)
+      cross-fetch: 4.1.0
       is-url: 1.2.4
       js-base64: 3.7.7
       lodash: 4.17.21
@@ -14664,11 +14730,11 @@ snapshots:
       onetime: 7.0.0
       signal-exit: 4.1.0
 
-  retry-request@7.0.2(encoding@0.1.13)(supports-color@10.0.0):
+  retry-request@7.0.2(supports-color@10.0.0):
     dependencies:
       '@types/request': 2.48.12
       extend: 3.0.2
-      teeny-request: 9.0.0(encoding@0.1.13)(supports-color@10.0.0)
+      teeny-request: 9.0.0(supports-color@10.0.0)
     transitivePeerDependencies:
       - encoding
       - supports-color
@@ -15374,11 +15440,11 @@ snapshots:
       mkdirp: 3.0.1
       yallist: 5.0.0
 
-  teeny-request@9.0.0(encoding@0.1.13)(supports-color@10.0.0):
+  teeny-request@9.0.0(supports-color@10.0.0):
     dependencies:
       http-proxy-agent: 5.0.0(supports-color@10.0.0)
       https-proxy-agent: 5.0.1(supports-color@10.0.0)
-      node-fetch: 2.7.0(encoding@0.1.13)
+      node-fetch: 2.7.0
       stream-events: 1.0.5
       uuid: 9.0.1
     transitivePeerDependencies:
@@ -15698,13 +15764,13 @@ snapshots:
 
   vary@1.1.2: {}
 
-  verdaccio-audit@13.0.0-next-8.15(encoding@0.1.13):
+  verdaccio-audit@13.0.0-next-8.15:
     dependencies:
       '@verdaccio/config': 8.0.0-next-8.15
       '@verdaccio/core': 8.0.0-next-8.15
       express: 4.21.2
       https-proxy-agent: 5.0.1(supports-color@10.0.0)
-      node-fetch: 2.6.7(encoding@0.1.13)
+      node-fetch: 2.6.7
     transitivePeerDependencies:
       - encoding
       - supports-color
@@ -15726,7 +15792,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  verdaccio@6.1.2(encoding@0.1.13):
+  verdaccio@6.1.2:
     dependencies:
       '@cypress/request': 3.0.8
       '@verdaccio/auth': 8.0.0-next-8.15
@@ -15758,7 +15824,7 @@ snapshots:
       mkdirp: 1.0.4
       pkginfo: 0.4.1
       semver: 7.6.3
-      verdaccio-audit: 13.0.0-next-8.15(encoding@0.1.13)
+      verdaccio-audit: 13.0.0-next-8.15
       verdaccio-htpasswd: 13.0.0-next-8.15
     transitivePeerDependencies:
       - encoding
@@ -15801,6 +15867,8 @@ snapshots:
 
   weak-lru-cache@1.2.2:
     optional: true
+
+  web-features@2.33.0: {}
 
   web-streams-polyfill@3.3.3: {}
 

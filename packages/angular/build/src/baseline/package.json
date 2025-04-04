@@ -1,0 +1,12 @@
+{
+  "// 1": "This defines the `bl2bl` configuration which generates a",
+  "// 2": " `.browserslistrc` file based on the configured Baseline date.",
+  "// 3": " This date serves as the source of truth for Angular CLI's default",
+  "// 4": " browser set used to determine what downleveling is necessary",
+  "bl2bl": {
+    "baselineThreshold": "2025-03-31",
+    "useBrowserslistrc": true,
+    "downstreamBrowsers": false,
+    "savePrevious": false
+  }
+}
