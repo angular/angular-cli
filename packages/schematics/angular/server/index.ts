@@ -27,6 +27,7 @@ import { latestVersions } from '../utility/latest-versions';
 import { isStandaloneApp } from '../utility/ng-ast-utils';
 import { relativePathToWorkspaceRoot } from '../utility/paths';
 import { isUsingApplicationBuilder, targetBuildNotFoundError } from '../utility/project-targets';
+import { resolveBootstrappedComponentData } from '../utility/standalone/app_component';
 import { getMainFilePath } from '../utility/standalone/util';
 import { getWorkspace, updateWorkspace } from '../utility/workspace';
 import { Builders } from '../utility/workspace-models';
@@ -187,10 +188,24 @@ export default function (options: ServerOptions): Rule {
     let filesUrl = `./files/${usingApplicationBuilder ? 'application-builder/' : 'server-builder/'}`;
     filesUrl += isStandalone ? 'standalone-src' : 'ngmodule-src';
 
+    const { componentName, componentImportPathInSameFile, moduleName, moduleImportPathInSameFile } =
+      resolveBootstrappedComponentData(host, browserEntryPoint) || {
+        componentName: 'App',
+        componentImportPathInSameFile: './app/app',
+        moduleName: 'AppModule',
+        moduleImportPathInSameFile: './app/app.module',
+      };
     const templateSource = apply(url(filesUrl), [
       applyTemplates({
         ...strings,
         ...options,
+        appComponentName: componentName,
+        appComponentPath: componentImportPathInSameFile,
+        appModuleName: moduleName,
+        appModulePath:
+          moduleImportPathInSameFile === null
+            ? null
+            : `./${posix.basename(moduleImportPathInSameFile)}`,
       }),
       move(sourceRoot),
     ]);
