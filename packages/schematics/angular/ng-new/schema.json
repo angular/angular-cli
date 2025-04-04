@@ -139,7 +139,7 @@
       "type": "boolean",
       "x-user-analytics": "ep.ng_ssr"
     },
-    "experimentalZoneless": {
+    "zoneless": {
       "description": "Create an initial application that does not utilize `zone.js`.",
       "type": "boolean",
       "default": false

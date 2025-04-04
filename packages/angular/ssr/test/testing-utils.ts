@@ -11,7 +11,7 @@ import {
   EnvironmentProviders,
   Provider,
   Type,
-  provideExperimentalZonelessChangeDetection,
+  provideZonelessChangeDetection,
 } from '@angular/core';
 import { bootstrapApplication } from '@angular/platform-browser';
 import { RouterOutlet, Routes, provideRouter } from '@angular/router';
@@ -93,7 +93,7 @@ export function setAngularAppTestingManifest(
     bootstrap: async () => () => {
       return bootstrapApplication(rootComponent, {
         providers: [
-          provideExperimentalZonelessChangeDetection(),
+          provideZonelessChangeDetection(),
           provideRouter(routes),
           provideServerRendering(withRoutes(serverRoutes)),
           ...extraProviders,
