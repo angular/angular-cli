@@ -6,12 +6,12 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { Rule } from '@angular-devkit/schematics';
+import type { Rule } from '@angular-devkit/schematics';
 import { generateFromFiles } from '../utility/generate-from-files';
-import { Schema } from './schema';
+import type { Schema as ResolverOptions } from './schema';
 
-export default function (options: Schema): Rule {
-  return options.functional
-    ? generateFromFiles({ ...options, templateFilesDirectory: './functional-files' })
-    : generateFromFiles({ ...options, templateFilesDirectory: './class-files' });
+export default function (options: ResolverOptions): Rule {
+  const templateFilesDirectory = options.functional ? './functional-files' : './class-files';
+
+  return generateFromFiles({ ...options, templateFilesDirectory });
 }
