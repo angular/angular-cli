@@ -14,14 +14,20 @@ import {
   filter,
   mergeWith,
   move,
+  noop,
   strings,
   url,
 } from '@angular-devkit/schematics';
+import { promises as fs } from 'node:fs';
 import { posix as path } from 'node:path';
 import { relativePathToWorkspaceRoot } from '../utility/paths';
 import { getWorkspace as readWorkspace, updateWorkspace } from '../utility/workspace';
 import { Builders as AngularBuilder } from '../utility/workspace-models';
 import { Schema as ConfigOptions, Type as ConfigType } from './schema';
+import { JSONFile } from '../utility/json-file';
+import { addPackageJsonDependency, NodeDependencyType } from '../utility/dependencies';
+import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
+import { latestVersions } from '../utility/latest-versions';
 
 export default function (options: ConfigOptions): Rule {
   switch (options.type) {
@@ -35,20 +41,42 @@ export default function (options: ConfigOptions): Rule {
 }
 
 function addBrowserslistConfig(options: ConfigOptions): Rule {
-  return async (host) => {
+  return async (host, context) => {
     const workspace = await readWorkspace(host);
     const project = workspace.projects.get(options.project);
     if (!project) {
       throw new SchematicsException(`Project name "${options.project}" doesn't not exist.`);
     }
 
-    return mergeWith(
-      apply(url('./files'), [
-        filter((p) => p.endsWith('.browserslistrc.template')),
-        applyTemplates({}),
-        move(project.root),
-      ]),
+    // Read Angular's default vendored `.browserslistrc` file.
+    const config = JSON.parse(
+      await fs.readFile(path.join(__dirname, 'baseline/package.json'), 'utf8'),
     );
+    const widelyAvailableOnDate = config.bl2bl.baselineThreshold as string;
+
+    const pkgJson = new JSONFile(host, 'package.json');
+    pkgJson.modify(
+      ['browserslist'],
+      ['extends browserslist-config-baseline'],
+      /* insertInOrder */ false,
+    );
+    pkgJson.modify(
+      ['browserslist-config-baseline'],
+      {
+        widelyAvailableOnDate,
+      },
+      /* insertInOrder */ false,
+    );
+
+    addPackageJsonDependency(host, {
+      type: NodeDependencyType.Dev,
+      name: 'browserslist-config-baseline',
+      version: latestVersions['browserslist-config-baseline'],
+    });
+
+    context.addTask(new NodePackageInstallTask());
+
+    return noop;
   };
 }
 

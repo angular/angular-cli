@@ -47,6 +47,12 @@ bl2bl_bin.bl2bl(
     chdir = "%s/src/baseline" % package_name(),
 )
 
+filegroup(
+    name = "angular_baseline_config",
+    srcs = ["src/browserslist/package.json"],
+    visibility = ["//packages/schematics/angular:__pkg__"],
+)
+
 RUNTIME_ASSETS = glob(
     include = [
         "src/**/schema.json",
