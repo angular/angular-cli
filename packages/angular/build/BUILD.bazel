@@ -45,6 +45,7 @@ bl2bl_bin.bl2bl(
     srcs = ["src/browserslist/package.json"],
     outs = ["src/browserslist/.browserslistrc"],
     chdir = "%s/src/browserslist" % package_name(),
+    visibility = ["//packages/schematics/angular:__pkg__"],
 )
 
 RUNTIME_ASSETS = glob(
