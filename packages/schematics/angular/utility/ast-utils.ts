@@ -343,7 +343,7 @@ export function getDecoratorMetadata(
 export function getMetadataField(
   node: ts.ObjectLiteralExpression,
   metadataField: string,
-): ts.ObjectLiteralElement[] {
+): ts.PropertyAssignment[] {
   return (
     node.properties
       .filter(ts.isPropertyAssignment)
@@ -561,13 +561,9 @@ export function getRouterModuleDeclaration(source: ts.SourceFile): ts.Expression
   }
 
   const matchingProperties = getMetadataField(node, 'imports');
-  if (!matchingProperties) {
-    return;
-  }
+  const assignment = matchingProperties[0];
 
-  const assignment = matchingProperties[0] as ts.PropertyAssignment;
-
-  if (assignment.initializer.kind !== ts.SyntaxKind.ArrayLiteralExpression) {
+  if (!assignment || assignment.initializer.kind !== ts.SyntaxKind.ArrayLiteralExpression) {
     return;
   }
 
