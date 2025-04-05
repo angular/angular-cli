@@ -36,14 +36,14 @@ export type NormalizedBrowserBuilderSchema = BrowserBuilderSchema &
     polyfills: string[];
   };
 
-export function normalizeBrowserSchema(
+export async function normalizeBrowserSchema(
   workspaceRoot: string,
   projectRoot: string,
   projectSourceRoot: string | undefined,
   options: BrowserBuilderSchema,
   metadata: json.JsonObject,
   logger: logging.LoggerApi,
-): NormalizedBrowserBuilderSchema {
+): Promise<NormalizedBrowserBuilderSchema> {
   return {
     ...options,
     cache: normalizeCacheOptions(metadata, workspaceRoot),
@@ -73,6 +73,6 @@ export function normalizeBrowserSchema(
     // A value of 0 is falsy and will disable polling rather then enable
     // 500 ms is a sensible default in this case
     poll: options.poll === 0 ? 500 : options.poll,
-    supportedBrowsers: getSupportedBrowsers(projectRoot, logger),
+    supportedBrowsers: await getSupportedBrowsers(projectRoot, logger),
   };
 }

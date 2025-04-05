@@ -1,0 +1,21 @@
+diff --git a/bin/cli.js b/bin/cli.js
+index d1a554e6de9e9b4497ffeae5476b3e838c79b408..2bd1955d7120a7992fe6676b1d4da47a7be1b153 100755
+--- a/bin/cli.js
++++ b/bin/cli.js
+@@ -114,6 +114,7 @@ import("baseline-browser-mapping").then((bbm) => {
+   });
+ 
+   // Behaviour varies depending on whether userBrowserslistrc=true or false
++  const originallyHadBrowserslistrc = Boolean(packageJSON["browserslist"]);
+   if (!bl2blConfig.useBrowserslistrc) {
+     // if false, add baselineVersions to packageJSON object for later
+     packageJSON["browserslist"] = browserslistOutput;
+@@ -149,7 +150,7 @@ import("baseline-browser-mapping").then((bbm) => {
+   }
+ 
+   // Whatever happens, update package.json as long as the packageJSON object isn't null
+-  if (packageJSON != null) {
++  if (packageJSON != null && (!bl2blConfig.useBrowserslistrc || originallyHadBrowserslistrc)) {
+     fs.writeFileSync(
+       process.cwd() + "/package.json",
+       JSON.stringify(packageJSON, null, 2),

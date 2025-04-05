@@ -99,6 +99,7 @@
     "ajv": "8.17.1",
     "ansi-colors": "4.1.3",
     "beasties": "0.2.0",
+    "bl2bl": "^0.2.0",
     "buffer": "6.0.3",
     "esbuild": "0.25.2",
     "esbuild-wasm": "0.25.2",
@@ -173,9 +174,18 @@
           "rxjs": "*"
         }
       }
+    },
+    "patchedDependencies": {
+      "bl2bl": "patches/bl2bl.patch"
     }
   },
   "resolutions": {
     "typescript": "5.8.2"
+  },
+  "bl2bl": {
+    "baselineThreshold": "widely available",
+    "useBrowserslistrc": false,
+    "downstreamBrowsers": false,
+    "savePrevious": true
   }
 }

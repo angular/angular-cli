@@ -1,0 +1,8 @@
+{
+  "bl2bl": {
+    "baselineThreshold": "2025-03-31",
+    "useBrowserslistrc": true,
+    "downstreamBrowsers": false,
+    "savePrevious": false
+  }
+}

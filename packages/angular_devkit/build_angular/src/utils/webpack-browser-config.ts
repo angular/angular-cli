@@ -145,7 +145,7 @@ export async function generateBrowserWebpackConfigFromContext(
   const sourceRoot = projectMetadata.sourceRoot as string | undefined;
   const projectSourceRoot = sourceRoot ? path.join(workspaceRoot, sourceRoot) : undefined;
 
-  const normalizedOptions = normalizeBrowserSchema(
+  const normalizedOptions = await normalizeBrowserSchema(
     workspaceRoot,
     projectRoot,
     projectSourceRoot,

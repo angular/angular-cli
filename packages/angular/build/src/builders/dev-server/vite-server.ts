@@ -398,7 +398,7 @@ export async function* serveWithVite(
 
       const { root = '' } = await context.getProjectMetadata(projectName);
       const projectRoot = join(context.workspaceRoot, root as string);
-      const browsers = getSupportedBrowsers(projectRoot, context.logger);
+      const browsers = await getSupportedBrowsers(projectRoot, context.logger);
 
       const target = transformSupportedBrowsersToTargets(browsers);
       // Needed for browser-esbuild as polyfills can be a string.
