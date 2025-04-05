@@ -58,7 +58,7 @@ describe('Pipe Schematic', () => {
       const files = tree.files;
       expect(files).toContain('/projects/bar/src/app/foo-pipe.spec.ts');
       expect(files).toContain('/projects/bar/src/app/foo-pipe.ts');
-      const moduleContent = getFileContent(tree, '/projects/bar/src/app/app.module.ts');
+      const moduleContent = getFileContent(tree, '/projects/bar/src/app/app-module.ts');
       expect(moduleContent).toMatch(/import.*Foo.*from '.\/foo-pipe'/);
       expect(moduleContent).toMatch(/declarations:\s*\[[^\]]+?,\r?\n\s+FooPipe\r?\n/m);
       const fileContent = tree.readContent('/projects/bar/src/app/foo-pipe.ts');
@@ -77,7 +77,7 @@ describe('Pipe Schematic', () => {
       const files = tree.files;
       expect(files).toContain('/projects/bar/src/app/foo.pipe.spec.ts');
       expect(files).toContain('/projects/bar/src/app/foo.pipe.ts');
-      const moduleContent = getFileContent(tree, '/projects/bar/src/app/app.module.ts');
+      const moduleContent = getFileContent(tree, '/projects/bar/src/app/app-module.ts');
       expect(moduleContent).toMatch(/import.*Foo.*from '.\/foo.pipe'/);
       expect(moduleContent).toMatch(/declarations:\s*\[[^\]]+?,\r?\n\s+FooPipe\r?\n/m);
       const fileContent = tree.readContent('/projects/bar/src/app/foo.pipe.ts');
@@ -96,7 +96,7 @@ describe('Pipe Schematic', () => {
       const files = tree.files;
       expect(files).toContain('/projects/bar/src/app/foo-pipe.spec.ts');
       expect(files).toContain('/projects/bar/src/app/foo-pipe.ts');
-      const moduleContent = getFileContent(tree, '/projects/bar/src/app/app.module.ts');
+      const moduleContent = getFileContent(tree, '/projects/bar/src/app/app-module.ts');
       expect(moduleContent).toMatch(/import.*Foo.*from '.\/foo-pipe'/);
       expect(moduleContent).toMatch(/declarations:\s*\[[^\]]+?,\r?\n\s+FooPipe\r?\n/m);
       const fileContent = tree.readContent('/projects/bar/src/app/foo-pipe.ts');
@@ -104,10 +104,10 @@ describe('Pipe Schematic', () => {
     });
 
     it('should import into a specified module', async () => {
-      const options = { ...defaultNonStandaloneOptions, module: 'app.module.ts' };
+      const options = { ...defaultNonStandaloneOptions, module: 'app-module.ts' };
 
       const tree = await schematicRunner.runSchematic('pipe', options, appTree);
-      const appModule = getFileContent(tree, '/projects/bar/src/app/app.module.ts');
+      const appModule = getFileContent(tree, '/projects/bar/src/app/app-module.ts');
 
       expect(appModule).toMatch(/import { FooPipe } from '.\/foo-pipe'/);
     });
@@ -131,7 +131,7 @@ describe('Pipe Schematic', () => {
       const options = { ...defaultNonStandaloneOptions, module: 'admin/module' };
       appTree = await schematicRunner.runSchematic('pipe', options, appTree);
 
-      const content = appTree.readContent('/projects/bar/src/app/admin/module/module.module.ts');
+      const content = appTree.readContent('/projects/bar/src/app/admin/module/module-module.ts');
       expect(content).toMatch(/import { FooPipe } from '\.\.\/\.\.\/foo-pipe'/);
     });
 
@@ -139,7 +139,7 @@ describe('Pipe Schematic', () => {
       const options = { ...defaultNonStandaloneOptions, export: true };
 
       const tree = await schematicRunner.runSchematic('pipe', options, appTree);
-      const appModuleContent = getFileContent(tree, '/projects/bar/src/app/app.module.ts');
+      const appModuleContent = getFileContent(tree, '/projects/bar/src/app/app-module.ts');
       expect(appModuleContent).toMatch(/exports: \[\n(\s*) {2}FooPipe\n\1\]/);
     });
 
@@ -150,13 +150,13 @@ describe('Pipe Schematic', () => {
       const files = tree.files;
       expect(files).toContain('/projects/bar/src/app/foo/foo-pipe.spec.ts');
       expect(files).toContain('/projects/bar/src/app/foo/foo-pipe.ts');
-      const moduleContent = getFileContent(tree, '/projects/bar/src/app/app.module.ts');
+      const moduleContent = getFileContent(tree, '/projects/bar/src/app/app-module.ts');
       expect(moduleContent).toMatch(/import.*Foo.*from '.\/foo\/foo-pipe'/);
       expect(moduleContent).toMatch(/declarations:\s*\[[^\]]+?,\r?\n\s+FooPipe\r?\n/m);
     });
 
     it('should use the module flag even if the module is a routing module', async () => {
-      const routingFileName = 'app-routing.module.ts';
+      const routingFileName = 'app-routing-module.ts';
       const routingModulePath = `/projects/bar/src/app/${routingFileName}`;
       const newTree = createAppModule(appTree, routingModulePath);
       const options = { ...defaultNonStandaloneOptions, module: routingFileName };
@@ -177,8 +177,8 @@ describe('Pipe Schematic', () => {
 
       // move the module
       appTree.rename(
-        '/projects/bar/src/app/app.module.ts',
-        '/projects/bar/custom/app/app.module.ts',
+        '/projects/bar/src/app/app-module.ts',
+        '/projects/bar/custom/app/app-module.ts',
       );
       appTree = await schematicRunner.runSchematic('pipe', defaultNonStandaloneOptions, appTree);
       expect(appTree.files).toContain('/projects/bar/custom/app/foo-pipe.ts');
@@ -192,7 +192,7 @@ describe('Pipe Schematic', () => {
     });
     it('should create a standalone pipe', async () => {
       const tree = await schematicRunner.runSchematic('pipe', defaultOptions, appTree);
-      const moduleContent = tree.readContent('/projects/bar/src/app/app.module.ts');
+      const moduleContent = tree.readContent('/projects/bar/src/app/app-module.ts');
       const pipeContent = tree.readContent('/projects/bar/src/app/foo-pipe.ts');
       expect(pipeContent).not.toContain('standalone');
       expect(pipeContent).toContain('class FooPipe');

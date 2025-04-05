@@ -46,7 +46,7 @@ export default async function () {
 
   // Add routes
   await writeFile(
-    `projects/${projectName}/src/app/app-routing.module.ts`,
+    `projects/${projectName}/src/app/app-routing-module.ts`,
     `
   import { NgModule } from '@angular/core';
   import { RouterModule, Routes } from '@angular/router';
@@ -91,9 +91,9 @@ export default async function () {
 
   // Generate lazy routes
   const lazyModules: [route: string, moduleName: string][] = [
-    ['lazy-one', 'app.module'],
-    ['lazy-one-child', 'lazy-one/lazy-one.module'],
-    ['lazy-two', 'app.module'],
+    ['lazy-one', 'app-module'],
+    ['lazy-one-child', 'lazy-one/lazy-one-module'],
+    ['lazy-two', 'app-module'],
   ];
 
   for (const [route, moduleName] of lazyModules) {

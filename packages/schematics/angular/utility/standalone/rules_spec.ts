@@ -74,7 +74,7 @@ describe('standalone utilities', () => {
         host,
       );
 
-      const content = readFile('app/app.module.ts');
+      const content = readFile('app/app-module.ts');
 
       assertContains(content, `import { MyModule } from '@my/module';`);
       assertContains(content, `imports: [BrowserModule, MyModule.forRoot([])]`);
@@ -326,7 +326,7 @@ describe('standalone utilities', () => {
         host,
       );
 
-      const content = readFile('app/app.module.ts');
+      const content = readFile('app/app-module.ts');
 
       assertContains(content, `import { BrowserModule as BrowserModule_alias } from '@my/module';`);
       assertContains(content, `imports: [BrowserModule, BrowserModule_alias.forRoot([])]`);
@@ -420,7 +420,7 @@ describe('standalone utilities', () => {
         host,
       );
 
-      const content = readFile('app/app.module.ts');
+      const content = readFile('app/app-module.ts');
 
       assertContains(content, `import { SOME_TOKEN } from '@my/module';`);
       assertContains(content, `providers: [{ provide: SOME_TOKEN, useValue: 123 }]`);

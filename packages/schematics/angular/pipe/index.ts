@@ -18,7 +18,15 @@ import { Schema as PipeOptions } from './schema';
 export default function (options: PipeOptions): Rule {
   return async (host: Tree) => {
     options.path ??= await createDefaultPath(host, options.project);
-    options.module = findModuleFromOptions(host, options);
+    try {
+      options.module = findModuleFromOptions(host, options);
+    } catch {
+      options.module = findModuleFromOptions(host, {
+        ...options,
+        moduleExt: '-module.ts',
+        routingModuleExt: '-routing-module.ts',
+      });
+    }
 
     const parsedPath = parseName(options.path, options.name);
     options.name = parsedPath.name;
