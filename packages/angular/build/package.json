@@ -51,7 +51,7 @@
   "devDependencies": {
     "@angular/ssr": "workspace:*",
     "@angular-devkit/core": "workspace:*",
-    "less": "4.2.2",
+    "less": "4.3.0",
     "ng-packagr": "20.0.0-next.5",
     "postcss": "8.5.3",
     "rxjs": "7.8.2"
