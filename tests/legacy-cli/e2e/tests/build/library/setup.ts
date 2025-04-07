@@ -6,13 +6,13 @@ export async function libraryConsumptionSetup(): Promise<void> {
 
   // Force an external template
   await writeMultipleFiles({
-    'projects/my-lib/src/lib/my-lib.ng.html': `<p>my-lib works!</p>`,
+    'projects/my-lib/src/lib/my-lib.html': `<p>my-lib works!</p>`,
     'projects/my-lib/src/lib/my-lib.ts': `import { Component } from '@angular/core';
 
     @Component({
       standalone: true,
       selector: 'lib-my-lib',
-      templateUrl: './my-lib.ng.html',
+      templateUrl: './my-lib.html',
     })
     export class MyLibComponent {}`,
     './src/app/app.ts': `

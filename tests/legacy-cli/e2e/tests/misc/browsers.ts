@@ -11,7 +11,7 @@ export default async function () {
   }
 
   // Workaround for https://github.com/angular/angular/issues/32192
-  await replaceInFile('src/app/app.ng.html', /class="material-icons"/g, '');
+  await replaceInFile('src/app/app.html', /class="material-icons"/g, '');
 
   await ng('build');
 

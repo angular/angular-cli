@@ -17,7 +17,7 @@ export default async function () {
   await prependToFile('src/app/app.ts', `import { I18nLibTest } from 'i18n-lib-test';`);
 
   await writeFile(
-    'src/app/app.ng.html',
+    'src/app/app.html',
     `
       <p i18n>Hello world</p>
       <lib-i18n-lib-test></lib-i18n-lib-test>
@@ -35,7 +35,7 @@ export default async function () {
   await ng('extract-i18n');
   await expectFileToMatch('messages.xlf', 'Hello world');
   await expectFileToMatch('messages.xlf', 'i18n-lib-test works!');
-  await expectFileToMatch('messages.xlf', 'src/app/app.ng.html');
+  await expectFileToMatch('messages.xlf', 'src/app/app.html');
   await expectFileToMatch('messages.xlf', 'projects/i18n-lib-test/src/lib/i18n-lib-test.ts');
 
   await uninstallPackage('@angular/localize');

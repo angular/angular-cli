@@ -7,7 +7,7 @@ import { updateJsonFile } from '../../../utils/project';
 const snapshots = require('../../../ng-snapshot/package.json');
 
 export default async function () {
-  await appendToFile('src/app/app.ng.html', '<router-outlet></router-outlet>');
+  await appendToFile('src/app/app.html', '<router-outlet></router-outlet>');
   await ng('generate', 'service-worker', '--project', 'test-project');
   await ng('generate', 'app-shell', '--project', 'test-project');
 

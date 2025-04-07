@@ -20,7 +20,7 @@ export default async function () {
 
   await writeMultipleFiles({
     // Replace the template of app.ng.html as it makes it harder to debug
-    'src/app/app.ng.html': '<router-outlet />',
+    'src/app/app.html': '<router-outlet />',
     'src/app/app.routes.ts': `
       import { Routes } from '@angular/router';
       import { Home } from './home/home';
@@ -94,7 +94,7 @@ export default async function () {
 
   // Modify the home component and validate the change.
   await modifyFileAndWaitUntilUpdated(
-    'src/app/home/home.ng.html',
+    'src/app/home/home.html',
     'home works',
     'yay home works!!!',
     true,

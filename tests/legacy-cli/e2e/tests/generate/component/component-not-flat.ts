@@ -19,7 +19,7 @@ export default function () {
       .then(() => expectFileToExist(componentDir))
       .then(() => expectFileToExist(join(componentDir, 'test-component.ts')))
       .then(() => expectFileToExist(join(componentDir, 'test-component.spec.ts')))
-      .then(() => expectFileToExist(join(componentDir, 'test-component.ng.html')))
+      .then(() => expectFileToExist(join(componentDir, 'test-component.html')))
       .then(() => expectFileToExist(join(componentDir, 'test-component.css')))
 
       // Try to run the unit tests.
