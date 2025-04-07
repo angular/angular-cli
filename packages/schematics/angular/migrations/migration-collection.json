@@ -15,6 +15,11 @@
       "factory": "./update-module-resolution/migration",
       "description": "Update 'moduleResolution' to 'bundler' in TypeScript configurations. You can read more about this, here: https://www.typescriptlang.org/tsconfig/#moduleResolution"
     },
+    "previous-style-guide": {
+      "version": "20.0.0",
+      "factory": "./previous-style-guide/migration",
+      "description": "Update workspace generation defaults to maintain previous style guide behavior."
+    },
     "use-application-builder": {
       "version": "20.0.0",
       "factory": "./use-application-builder/migration",
