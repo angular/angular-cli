@@ -2001,8 +2001,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@mdn/browser-compat-data@6.0.6':
-    resolution: {integrity: sha512-awlDnCGbtdkyLieMpIKJQEgK7mxnL3he4UHm5AGn+asofiemlx4LVHM0FsYmp6O1irAClPNS135zZLhD2SZi+A==}
+  '@mdn/browser-compat-data@6.0.8':
+    resolution: {integrity: sha512-l21VIVT7ozAQJFT16HHmCndeNMhMuYMlhRA8+W59cCsorW6oXZDm3v+lQKxIZwTLHnKfAt0i6f2ih6h9GS0OaQ==}
 
   '@msgpackr-extract/msgpackr-extract-darwin-arm64@3.0.3':
     resolution: {integrity: sha512-QZHtlVgbAdy2zAqNA9Gu1UpIuI8Xvsd1v8ic6B2pZmeFnFcMWiPLfWXh7TVw4eGEZ/C9TH281KwhVoeQUKbyjw==}
@@ -5972,7 +5972,6 @@ packages:
   node-domexception@1.0.0:
     resolution: {integrity: sha512-/jKZoMpw0F8GRwl4/eLROPA3cfcXtLApP0QzLmUT/HuPCZWyB7IY9ZrMeKw2O/nFIqPQB3PVM9aYm0F312AXDQ==}
     engines: {node: '>=10.5.0'}
-    deprecated: Use your platform's native DOMException instead
 
   node-fetch-native@1.6.6:
     resolution: {integrity: sha512-8Mc2HhqPdlIfedsuZoc3yioPuzp6b+L5jRCRY1QzuWZh2EGJVQrGppC6V6cF0bLdbW0+O2YpqCA25aF/1lvipQ==}
@@ -7715,8 +7714,8 @@ packages:
   weak-lru-cache@1.2.2:
     resolution: {integrity: sha512-DEAoo25RfSYMuTGc9vPJzZcZullwIqRDSI9LOy+fkCJPi6hykCnfKaXTuPBDuXAUcqHXyOgFtHNp/kB2FjYHbw==}
 
-  web-features@2.33.0:
-    resolution: {integrity: sha512-oLzTO29Ax9TyQGNoNxpC+2Hj9if7lm2tuuAiEAb01BxcBt7yH40LAmIDg5PtuJ39lnwqm4wELATIKhj6WlJJpQ==}
+  web-features@2.34.0:
+    resolution: {integrity: sha512-jv8rxEhmj0UcQ3v5EyH9cNN6ztyNjUZJfImgUdGtxYYYRi3BKWw00LPQ2HQn7Y61kxEbah5G1SQaXz+yskKLUA==}
 
   web-streams-polyfill@3.3.3:
     resolution: {integrity: sha512-d2JWLCivmZYTSIoge9MsgFCZrt571BikcWGYkjC1khllbTeDlGqZ2D8vD8E/lJa8WGWbb7Plm8/XJYV7IJHZZw==}
@@ -9243,7 +9242,7 @@ snapshots:
   '@lmdb/lmdb-win32-x64@3.2.6':
     optional: true
 
-  '@mdn/browser-compat-data@6.0.6': {}
+  '@mdn/browser-compat-data@6.0.8': {}
 
   '@msgpackr-extract/msgpackr-extract-darwin-arm64@3.0.3':
     optional: true
@@ -10938,8 +10937,8 @@ snapshots:
 
   baseline-browser-mapping@2.2.1:
     dependencies:
-      '@mdn/browser-compat-data': 6.0.6
-      web-features: 2.33.0
+      '@mdn/browser-compat-data': 6.0.8
+      web-features: 2.34.0
 
   basic-ftp@5.0.5: {}
 
@@ -12200,7 +12199,7 @@ snapshots:
 
   extract-zip@2.0.1:
     dependencies:
-      debug: 4.4.0(supports-color@10.0.0)
+      debug: 4.3.4
       get-stream: 5.2.0
       yauzl: 2.10.0
     optionalDependencies:
@@ -15869,7 +15868,7 @@ snapshots:
   weak-lru-cache@1.2.2:
     optional: true
 
-  web-features@2.33.0: {}
+  web-features@2.34.0: {}
 
   web-streams-polyfill@3.3.3: {}
 
