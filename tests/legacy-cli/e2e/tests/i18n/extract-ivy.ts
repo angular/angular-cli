@@ -9,7 +9,7 @@ import { readNgVersion } from '../../utils/version';
 export default async function () {
   // Setup an i18n enabled component
   await ng('generate', 'component', 'i18n-test');
-  await writeFile(join('src/app/i18n-test', 'i18n-test.ng.html'), '<p i18n>Hello world</p>');
+  await writeFile(join('src/app/i18n-test', 'i18n-test.html'), '<p i18n>Hello world</p>');
   // Actually use the generated component to ensure it is present in the application output
   await writeFile(
     'src/app/app.ts',

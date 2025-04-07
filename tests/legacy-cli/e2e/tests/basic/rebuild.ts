@@ -83,7 +83,7 @@ export default async function () {
   await Promise.all([
     waitForAnyProcessOutputToMatch(validBundleRegEx),
     writeMultipleFiles({
-      'src/app/app.ng.html': '<h1>testingTESTING123</h1>',
+      'src/app/app.html': '<h1>testingTESTING123</h1>',
     }),
   ]);
 
