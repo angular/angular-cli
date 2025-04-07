@@ -45,6 +45,12 @@
       "type": "boolean",
       "description": "Creates the interceptor as a function `HttpInterceptorFn` instead of a class. Functional interceptors can be simpler for basic scenarios.",
       "default": true
+    },
+    "typeSeparator": {
+      "type": "string",
+      "default": "-",
+      "enum": ["-", "."],
+      "description": "The separator character to use before the type within the generated file's name. For example, if you set the option to `.`, the file will be named `example.interceptor.ts`."
     }
   },
   "required": ["name", "project"]
