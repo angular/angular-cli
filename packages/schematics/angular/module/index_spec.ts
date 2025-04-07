@@ -153,7 +153,7 @@ describe('Module Schematic', () => {
           '/projects/bar/src/app/foo/foo-module.ts',
           '/projects/bar/src/app/foo/foo-routing-module.ts',
           '/projects/bar/src/app/foo/foo.ts',
-          '/projects/bar/src/app/foo/foo.ng.html',
+          '/projects/bar/src/app/foo/foo.html',
           '/projects/bar/src/app/foo/foo.css',
         ]),
       );
@@ -203,7 +203,7 @@ describe('Module Schematic', () => {
       expect(files).toContain('/projects/bar/src/app/foo/foo-module.ts');
       expect(files).not.toContain('/projects/bar/src/app/foo/foo-routing-module.ts');
       expect(files).toContain('/projects/bar/src/app/foo/foo.ts');
-      expect(files).toContain('/projects/bar/src/app/foo/foo.ng.html');
+      expect(files).toContain('/projects/bar/src/app/foo/foo.html');
       expect(files).toContain('/projects/bar/src/app/foo/foo.css');
 
       const appModuleContent = tree.readContent('/projects/bar/src/app/app-module.ts');
@@ -231,7 +231,7 @@ describe('Module Schematic', () => {
           '/projects/bar/src/app/foo-module.ts',
           '/projects/bar/src/app/foo-routing-module.ts',
           '/projects/bar/src/app/foo.ts',
-          '/projects/bar/src/app/foo.ng.html',
+          '/projects/bar/src/app/foo.html',
           '/projects/bar/src/app/foo.css',
         ]),
       );
