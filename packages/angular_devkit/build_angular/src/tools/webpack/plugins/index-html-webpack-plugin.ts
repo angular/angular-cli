@@ -60,7 +60,7 @@ export class IndexHtmlWebpackPlugin extends IndexHtmlGenerator {
             }
 
             files.push({
-              name: chunk.name,
+              name: chunk.name ?? undefined,
               file,
               extension: extname(file),
             });

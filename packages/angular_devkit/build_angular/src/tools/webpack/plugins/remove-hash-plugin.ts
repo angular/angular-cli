@@ -19,7 +19,7 @@ export class RemoveHashPlugin {
 
   apply(compiler: Compiler): void {
     compiler.hooks.compilation.tap('remove-hash-plugin', (compilation) => {
-      const assetPath = (path: string, data: { chunk?: { name: string } }) => {
+      const assetPath = (path: string, data: { chunk?: { name?: string | null } }) => {
         const chunkName = data.chunk?.name;
         const { chunkNames, hashFormat } = this.options;
 
