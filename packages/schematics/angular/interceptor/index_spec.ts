@@ -47,8 +47,30 @@ describe('Interceptor Schematic', () => {
     const tree = await schematicRunner.runSchematic('interceptor', options, appTree);
 
     const files = tree.files;
+    expect(files).toContain('/projects/bar/src/app/foo/foo-interceptor.spec.ts');
+    expect(files).toContain('/projects/bar/src/app/foo/foo-interceptor.ts');
+  });
+
+  it('should use a `.` type separator when specified', async () => {
+    const options = { ...defaultOptions, typeSeparator: '.' };
+
+    const tree = await schematicRunner.runSchematic('interceptor', options, appTree);
+    const files = tree.files;
     expect(files).toContain('/projects/bar/src/app/foo/foo.interceptor.spec.ts');
     expect(files).toContain('/projects/bar/src/app/foo/foo.interceptor.ts');
+    const specContent = tree.readContent('/projects/bar/src/app/foo/foo.interceptor.spec.ts');
+    expect(specContent).toContain(`'./foo.interceptor'`);
+  });
+
+  it('should use a `-` type separator when specified', async () => {
+    const options = { ...defaultOptions, typeSeparator: '-' };
+
+    const tree = await schematicRunner.runSchematic('interceptor', options, appTree);
+    const files = tree.files;
+    expect(files).toContain('/projects/bar/src/app/foo/foo-interceptor.spec.ts');
+    expect(files).toContain('/projects/bar/src/app/foo/foo-interceptor.ts');
+    const specContent = tree.readContent('/projects/bar/src/app/foo/foo-interceptor.spec.ts');
+    expect(specContent).toContain(`'./foo-interceptor'`);
   });
 
   it('should respect the skipTests flag', async () => {
@@ -57,8 +79,8 @@ describe('Interceptor Schematic', () => {
     const tree = await schematicRunner.runSchematic('interceptor', options, appTree);
 
     const files = tree.files;
-    expect(files).toContain('/projects/bar/src/app/foo/foo.interceptor.ts');
-    expect(files).not.toContain('/projects/bar/src/app/foo/foo.interceptor.spec.ts');
+    expect(files).toContain('/projects/bar/src/app/foo/foo-interceptor.ts');
+    expect(files).not.toContain('/projects/bar/src/app/foo/foo-interceptor.spec.ts');
   });
 
   it('should respect the sourceRoot value', async () => {
@@ -67,7 +89,7 @@ describe('Interceptor Schematic', () => {
     appTree.overwrite('/angular.json', JSON.stringify(config, null, 2));
     appTree = await schematicRunner.runSchematic('interceptor', defaultOptions, appTree);
 
-    expect(appTree.files).toContain('/projects/bar/custom/app/foo/foo.interceptor.ts');
+    expect(appTree.files).toContain('/projects/bar/custom/app/foo/foo-interceptor.ts');
   });
 
   it('should create a functional interceptor', async () => {
@@ -77,7 +99,7 @@ describe('Interceptor Schematic', () => {
       appTree,
     );
 
-    const fileString = tree.readContent('/projects/bar/src/app/foo/foo.interceptor.ts');
+    const fileString = tree.readContent('/projects/bar/src/app/foo/foo-interceptor.ts');
     expect(fileString).toContain(
       'export const fooInterceptor: HttpInterceptorFn = (req, next) => {',
     );
@@ -90,7 +112,7 @@ describe('Interceptor Schematic', () => {
       appTree,
     );
 
-    const fileString = tree.readContent('/projects/bar/src/app/foo/foo.interceptor.spec.ts');
+    const fileString = tree.readContent('/projects/bar/src/app/foo/foo-interceptor.spec.ts');
     expect(fileString).toContain('const interceptor: HttpInterceptorFn = (req, next) => ');
     expect(fileString).toContain('TestBed.runInInjectionContext(() => fooInterceptor(req, next));');
   });

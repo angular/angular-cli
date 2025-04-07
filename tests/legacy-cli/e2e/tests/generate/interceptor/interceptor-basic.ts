@@ -7,10 +7,10 @@ export default function () {
   const interceptorDir = join('src', 'app');
 
   return (
-    ng('generate', 'interceptor', 'test-interceptor')
+    ng('generate', 'interceptor', 'test')
       .then(() => expectFileToExist(interceptorDir))
-      .then(() => expectFileToExist(join(interceptorDir, 'test-interceptor.interceptor.ts')))
-      .then(() => expectFileToExist(join(interceptorDir, 'test-interceptor.interceptor.spec.ts')))
+      .then(() => expectFileToExist(join(interceptorDir, 'test-interceptor.ts')))
+      .then(() => expectFileToExist(join(interceptorDir, 'test-interceptor.spec.ts')))
 
       // Try to run the unit tests.
       .then(() => ng('test', '--watch=false'))
