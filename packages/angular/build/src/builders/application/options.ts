@@ -703,5 +703,12 @@ function normalizeExternals(value: string[] | undefined): string[] | undefined {
     return undefined;
   }
 
-  return [...new Set(value.map((d) => (d.endsWith('/*') ? d.slice(0, -2) : d)))];
+  return [
+    ...new Set(
+      value.map((d) =>
+        // remove "/*" wildcard in the end if provided string is not path-like
+        d.endsWith('/*') && !/^\.{0,2}\//.test(d) ? d.slice(0, -2) : d,
+      ),
+    ),
+  ];
 }
