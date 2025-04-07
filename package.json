@@ -167,11 +167,6 @@
         "peerDependencies": {
           "protobufjs": "*"
         }
-      },
-      "@angular/platform-server": {
-        "peerDependencies": {
-          "rxjs": "*"
-        }
       }
     }
   },
