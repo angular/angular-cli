@@ -131,7 +131,6 @@
     "quicktype-core": "23.0.171",
     "rollup": "4.39.0",
     "rollup-license-plugin": "~3.0.1",
-    "rollup-plugin-sourcemaps": "^0.6.0",
     "semver": "7.7.1",
     "shelljs": "^0.9.0",
     "source-map-support": "0.5.21",
