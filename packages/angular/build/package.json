@@ -25,7 +25,7 @@
     "@babel/helper-split-export-declaration": "7.24.7",
     "@inquirer/confirm": "5.1.9",
     "@vitejs/plugin-basic-ssl": "2.0.0",
-    "beasties": "0.2.0",
+    "beasties": "0.3.2",
     "browserslist": "^4.23.0",
     "esbuild": "0.25.2",
     "https-proxy-agent": "7.0.6",
@@ -51,7 +51,7 @@
   "devDependencies": {
     "@angular/ssr": "workspace:*",
     "@angular-devkit/core": "workspace:*",
-    "less": "4.2.2",
+    "less": "4.3.0",
     "ng-packagr": "20.0.0-next.5",
     "postcss": "8.5.3",
     "rxjs": "7.8.2"
