@@ -356,8 +356,9 @@ export async function* serveWithVite(
       externalMetadata.implicitServer.length = 0;
       externalMetadata.implicitBrowser.length = 0;
 
-      externalMetadata.explicitBrowser.push(...explicit);
-      externalMetadata.explicitServer.push(...explicit, ...builtinModules);
+      const externalDeps = browserOptions.externalDependencies ?? [];
+      externalMetadata.explicitBrowser.push(...explicit, ...externalDeps);
+      externalMetadata.explicitServer.push(...explicit, ...externalDeps, ...builtinModules);
       externalMetadata.implicitServer.push(...implicitServerFiltered);
       externalMetadata.implicitBrowser.push(...implicitBrowserFiltered);
 
