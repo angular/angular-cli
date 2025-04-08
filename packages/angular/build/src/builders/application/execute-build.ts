@@ -171,7 +171,6 @@ export async function executeBuild(
     // This means all paths within the @foo/bar package are also marked as external.
     const exclusionsPrefixes = externalConfiguration.map((exclusion) => exclusion + '/');
     const exclusions = new Set(externalConfiguration);
-    const explicitExternal = new Set<string>();
 
     const isExplicitExternal = (dep: string): boolean => {
       if (exclusions.has(dep)) {
@@ -189,23 +188,19 @@ export async function executeBuild(
 
     const implicitBrowser: string[] = [];
     for (const dep of browser) {
-      if (isExplicitExternal(dep)) {
-        explicitExternal.add(dep);
-      } else {
+      if (!isExplicitExternal(dep)) {
         implicitBrowser.push(dep);
       }
     }
 
     const implicitServer: string[] = [];
     for (const dep of server) {
-      if (isExplicitExternal(dep)) {
-        explicitExternal.add(dep);
-      } else {
+      if (!isExplicitExternal(dep)) {
         implicitServer.push(dep);
       }
     }
 
-    executionResult.setExternalMetadata(implicitBrowser, implicitServer, [...explicitExternal]);
+    executionResult.setExternalMetadata(implicitBrowser, implicitServer, [...exclusions]);
   }
 
   const { metafile, initialFiles, outputFiles } = bundlingResult;
