@@ -1,3 +1,16 @@
+<a name="17.3.16"></a>
+
+# 17.3.16 (2025-04-09)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                     |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------- |
+| [5aa53b40c](https://github.com/angular/angular-cli/commit/5aa53b40c34e1555548d201f840a5ffc01f14601) | fix  | remove undici from dependencies |
+| [fce61564d](https://github.com/angular/angular-cli/commit/fce61564ded8c476ef1c257d2844b1a1560af732) | fix  | update vite to 5.4.17           |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="17.3.15"></a>
 
 # 17.3.15 (2025-04-02)
