@@ -70,13 +70,28 @@ describe('SSR Schematic', () => {
       expect((schematicRunner.tasks[0].options as { command: string }).command).toBe('install');
     });
 
-    it(`should update 'tsconfig.app.json' files with Express main file`, async () => {
+    it(`should not update 'tsconfig.app.json' files with Express main file already included`, async () => {
       const tree = await schematicRunner.runSchematic('ssr', defaultOptions, appTree);
       const { files } = tree.readJson('/projects/test-app/tsconfig.app.json') as {
         files: string[];
       };
 
-      expect(files).toEqual(['src/main.ts', 'src/main.server.ts', 'src/server.ts']);
+      expect(files).toBeUndefined();
+    });
+
+    it(`should update 'tsconfig.app.json' files with Express main file if not included`, async () => {
+      const appTsConfigContent = appTree.readJson('/projects/test-app/tsconfig.app.json') as {
+        include?: string[];
+      };
+      appTsConfigContent.include = [];
+      appTree.overwrite('/projects/test-app/tsconfig.app.json', JSON.stringify(appTsConfigContent));
+
+      const tree = await schematicRunner.runSchematic('ssr', defaultOptions, appTree);
+      const { files } = tree.readJson('/projects/test-app/tsconfig.app.json') as {
+        files: string[];
+      };
+
+      expect(files).toContain('src/server.ts');
     });
   });
 

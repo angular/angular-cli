@@ -154,6 +154,13 @@ function updateApplicationBuilderTsConfigRule(options: SSROptions): Rule {
     }
 
     const json = new JSONFile(host, tsConfigPath);
+
+    // Skip adding the files entry if the server entry would already be included
+    const include = json.get(['include']);
+    if (Array.isArray(include) && include.includes('src/**/*.ts')) {
+      return;
+    }
+
     const filesPath = ['files'];
     const files = new Set((json.get(filesPath) as string[] | undefined) ?? []);
     files.add('src/server.ts');
