@@ -1,3 +1,43 @@
+<a name="20.0.0-next.5"></a>
+
+# 20.0.0-next.5 (2025-04-09)
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                                           |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------------------- |
+| [fdc6291dd](https://github.com/angular/angular-cli/commit/fdc6291dda4903f418667d415b05367390cf829d) | feat | add update migration to keep previous style guide generation behavior |
+| [90615a88b](https://github.com/angular/angular-cli/commit/90615a88b10535d7f0197008b9d48ceac4409c23) | fix  | default component templates to not use `.ng.html` extension           |
+| [5fc595144](https://github.com/angular/angular-cli/commit/5fc5951440c9306c4349fa3f8dbcb1b584441fe8) | fix  | generate guards with a dash type separator                            |
+| [040282d8f](https://github.com/angular/angular-cli/commit/040282d8fd5838266785997442c4f5a269666cf3) | fix  | generate interceptors with a dash type separator                      |
+| [070d60fb3](https://github.com/angular/angular-cli/commit/070d60fb383bb14d39f969942641253e54980fcf) | fix  | generate modules with a dash type separator                           |
+| [e6083b57b](https://github.com/angular/angular-cli/commit/e6083b57bb5b38db14264253095a9729738d22f2) | fix  | generate pipes with a dash type separator                             |
+| [92e193c0b](https://github.com/angular/angular-cli/commit/92e193c0b9a2b85b68d83c5f378d30fc8d10f13e) | fix  | generate resolvers with a dash type separator                         |
+| [ea1143ddd](https://github.com/angular/angular-cli/commit/ea1143ddd801b775828f0b62788f4cce0dd7e9ce) | fix  | infer app component name and path in server schematic                 |
+| [661609e3e](https://github.com/angular/angular-cli/commit/661609e3e583198828baf236338db17b6222f4d8) | fix  | set explicit type in library schematic                                |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                                 |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------- |
+| [3e24a59a9](https://github.com/angular/angular-cli/commit/3e24a59a9db9f11a80fa616c68be4380c4816ed5) | fix  | disable TypeScript `composite` option with Angular compiler |
+| [6f913ad5e](https://github.com/angular/angular-cli/commit/6f913ad5e4d8ad9932ef2607851e3b8776e1af3a) | fix  | include component test metadata in development builds       |
+| [fc0e05fea](https://github.com/angular/angular-cli/commit/fc0e05fea89598204a7e5de494da897c396c4e52) | fix  | skip normalization of relative externals                    |
+
+### @angular/ssr
+
+| Commit                                                                                              | Type | Description                                      |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------ |
+| [319b8e0c2](https://github.com/angular/angular-cli/commit/319b8e0c2a0cd30ab96576464b4172a1f76a97a6) | fix  | manage unhandled errors in zoneless applications |
+
+### @ngtools/webpack
+
+| Commit                                                                                              | Type | Description                                               |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------- |
+| [427bd846f](https://github.com/angular/angular-cli/commit/427bd846f552b393cb969472a05488ac11d47e9f) | fix  | disable TypeScript composite option with Angular compiler |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="19.2.7"></a>
 
 # 19.2.7 (2025-04-09)
