@@ -61,7 +61,6 @@
     "terser": "5.29.1",
     "tree-kill": "1.2.2",
     "tslib": "2.6.2",
-    "undici": "6.11.1",
     "vite": "~5.4.17",
     "watchpack": "2.4.0",
     "webpack": "5.94.0",

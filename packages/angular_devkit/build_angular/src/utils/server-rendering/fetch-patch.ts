@@ -10,7 +10,6 @@ import { lookup as lookupMimeType } from 'mrmime';
 import { readFile } from 'node:fs/promises';
 import { extname } from 'node:path';
 import { workerData } from 'node:worker_threads';
-import { Response, fetch } from 'undici';
 
 /**
  * This is passed as workerData when setting up the worker via the `piscina` package.

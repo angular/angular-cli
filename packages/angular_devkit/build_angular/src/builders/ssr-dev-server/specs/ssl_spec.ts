@@ -9,6 +9,7 @@
 import { Architect } from '@angular-devkit/architect';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import * as browserSync from 'browser-sync';
+// eslint-disable-next-line import/no-extraneous-dependencies
 import { Agent, getGlobalDispatcher, setGlobalDispatcher } from 'undici';
 import { createArchitect, host } from '../../../testing/test-utils';
 import { SSRDevServerBuilderOutput } from '../index';
