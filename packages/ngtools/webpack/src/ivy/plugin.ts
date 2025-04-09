@@ -410,6 +410,7 @@ export class AngularWebpackPlugin {
       this.pluginOptions.tsconfig,
       this.pluginOptions.compilerOptions,
     );
+    compilerOptions.composite = false;
     compilerOptions.noEmitOnError = false;
     compilerOptions.suppressOutputPathCheck = true;
     compilerOptions.outDir = undefined;
