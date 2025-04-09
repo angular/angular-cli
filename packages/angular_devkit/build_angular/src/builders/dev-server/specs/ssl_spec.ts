@@ -9,6 +9,7 @@
 import { Architect, BuilderRun } from '@angular-devkit/architect';
 import { DevServerBuilderOutput } from '@angular-devkit/build-angular';
 import { tags } from '@angular-devkit/core';
+// eslint-disable-next-line import/no-extraneous-dependencies
 import { Agent, getGlobalDispatcher, setGlobalDispatcher } from 'undici';
 import { createArchitect, host } from '../../../testing/test-utils';
 
