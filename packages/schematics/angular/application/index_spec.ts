@@ -93,8 +93,13 @@ describe('Application Schematic', () => {
   it('should set the right paths in the tsconfig.app.json', async () => {
     const tree = await schematicRunner.runSchematic('application', defaultOptions, workspaceTree);
 
-    const { files, extends: _extends } = readJsonFile(tree, '/projects/foo/tsconfig.app.json');
-    expect(files).toEqual(['src/main.ts']);
+    const {
+      include,
+      exclude,
+      extends: _extends,
+    } = readJsonFile(tree, '/projects/foo/tsconfig.app.json');
+    expect(include).toEqual(['src/**/*.ts']);
+    expect(exclude).toEqual(['src/**/*.spec.ts']);
     expect(_extends).toBe('../../tsconfig.json');
   });
 
