@@ -11,7 +11,7 @@ export default async function () {
     await updateJsonFile('package.json', (json) => {
       json.dependencies = {
         ...json.dependencies,
-        'tslib': '2.0.0',
+        'tslib': '^2.0.0',
         'tslib-1': 'npm:tslib@1.13.0',
         'tslib-1-copy': 'npm:tslib@1.13.0',
       };
@@ -56,7 +56,7 @@ export default async function () {
       throw new Error('Expected stderr to contain [DedupeModuleResolvePlugin] log for tslib.');
     }
 
-    await expectFileToMatch(outFile, './node_modules/tslib/tslib.es6.js');
+    await expectFileToMatch(outFile, './node_modules/tslib/tslib.es6.mjs');
   } finally {
     await rimraf('node_modules/tslib');
     await gitClean();

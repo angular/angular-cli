@@ -73,6 +73,7 @@
     "undici": "7.7.0"
   },
   "peerDependencies": {
+    "@angular/core": "0.0.0-ANGULAR-FW-PEER-DEP",
     "@angular/compiler-cli": "0.0.0-ANGULAR-FW-PEER-DEP",
     "@angular/localize": "0.0.0-ANGULAR-FW-PEER-DEP",
     "@angular/platform-browser": "0.0.0-ANGULAR-FW-PEER-DEP",
@@ -90,6 +91,9 @@
     "typescript": ">=5.8 <5.9"
   },
   "peerDependenciesMeta": {
+    "@angular/core": {
+      "optional": true
+    },
     "@angular/localize": {
       "optional": true
     },
