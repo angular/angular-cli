@@ -57,6 +57,7 @@
     "rxjs": "7.8.2"
   },
   "peerDependencies": {
+    "@angular/core": "0.0.0-ANGULAR-FW-PEER-DEP",
     "@angular/compiler": "0.0.0-ANGULAR-FW-PEER-DEP",
     "@angular/compiler-cli": "0.0.0-ANGULAR-FW-PEER-DEP",
     "@angular/localize": "0.0.0-ANGULAR-FW-PEER-DEP",
@@ -69,9 +70,13 @@
     "ng-packagr": "0.0.0-NG-PACKAGR-PEER-DEP",
     "postcss": "^8.4.0",
     "tailwindcss": "^2.0.0 || ^3.0.0 || ^4.0.0",
+    "tslib": "^2.3.0",
     "typescript": ">=5.8 <5.9"
   },
   "peerDependenciesMeta": {
+    "@angular/core": {
+      "optional": true
+    },
     "@angular/localize": {
       "optional": true
     },
