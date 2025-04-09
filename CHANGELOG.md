@@ -1,3 +1,16 @@
+<a name="19.2.7"></a>
+
+# 19.2.7 (2025-04-09)
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                           |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------- |
+| [7f1e8c677](https://github.com/angular/angular-cli/commit/7f1e8c6777dbf60e2a3864774a8c4140bb76f640) | fix  | include component test metadata in development builds |
+| [74cd4edd5](https://github.com/angular/angular-cli/commit/74cd4edd5bbf5ae03a910be036f6e7fa7db35642) | fix  | skip normalization of relative externals              |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="18.2.18"></a>
 
 # 18.2.18 (2025-04-09)
