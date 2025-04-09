@@ -2,8 +2,7 @@
 /* To learn more about Angular compiler options: https://angular.dev/reference/configs/angular-compiler-options. */
 {
   "compileOnSave": false,
-  "compilerOptions": {
-    "outDir": "./dist/out-tsc",<% if (strict) { %>
+  "compilerOptions": {<% if (strict) { %>
     "strict": true,
     "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": true,

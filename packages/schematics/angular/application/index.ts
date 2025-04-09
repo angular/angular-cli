@@ -33,7 +33,7 @@ import { getWorkspace, updateWorkspace } from '../utility/workspace';
 import { Builders, ProjectType } from '../utility/workspace-models';
 import { Schema as ApplicationOptions, Style } from './schema';
 
-function updateTsConfig(...paths: string[]) {
+function addTsProjectReference(...paths: string[]) {
   return (host: Tree) => {
     if (!host.exists('tsconfig.json')) {
       return host;
@@ -55,10 +55,10 @@ export default function (options: ApplicationOptions): Rule {
 
     return chain([
       addAppToWorkspaceFile(options, appDir, folderName),
-      updateTsConfig(
-        join(normalize(appDir), 'tsconfig.app.json'),
-        join(normalize(appDir), 'tsconfig.spec.json'),
-      ),
+      addTsProjectReference(join(normalize(appDir), 'tsconfig.app.json')),
+      options.skipTests
+        ? noop()
+        : addTsProjectReference(join(normalize(appDir), 'tsconfig.spec.json')),
       options.standalone
         ? noop()
         : schematic('module', {

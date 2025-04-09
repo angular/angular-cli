@@ -119,10 +119,6 @@ function updateConfigFileApplicationBuilder(options: ServerOptions): Rule {
 function updateTsConfigFile(tsConfigPath: string): Rule {
   return (host: Tree) => {
     const json = new JSONFile(host, tsConfigPath);
-    const filesPath = ['files'];
-    const files = new Set((json.get(filesPath) as string[] | undefined) ?? []);
-    files.add('src/' + serverMainEntryName);
-    json.modify(filesPath, [...files]);
 
     const typePath = ['compilerOptions', 'types'];
     const types = new Set((json.get(typePath) as string[] | undefined) ?? []);
