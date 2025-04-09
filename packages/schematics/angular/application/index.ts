@@ -26,11 +26,27 @@ import {
 import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
 import { Schema as ComponentOptions } from '../component/schema';
 import { NodeDependencyType, addPackageJsonDependency } from '../utility/dependencies';
+import { JSONFile } from '../utility/json-file';
 import { latestVersions } from '../utility/latest-versions';
 import { relativePathToWorkspaceRoot } from '../utility/paths';
 import { getWorkspace, updateWorkspace } from '../utility/workspace';
 import { Builders, ProjectType } from '../utility/workspace-models';
 import { Schema as ApplicationOptions, Style } from './schema';
+
+function updateTsConfig(...paths: string[]) {
+  return (host: Tree) => {
+    if (!host.exists('tsconfig.json')) {
+      return host;
+    }
+
+    const newReferences = paths.map((path) => ({ path }));
+
+    const file = new JSONFile(host, 'tsconfig.json');
+    const jsonPath = ['references'];
+    const value = file.get(jsonPath);
+    file.modify(jsonPath, Array.isArray(value) ? [...value, ...newReferences] : newReferences);
+  };
+}
 
 export default function (options: ApplicationOptions): Rule {
   return async (host: Tree, context: SchematicContext) => {
@@ -39,6 +55,10 @@ export default function (options: ApplicationOptions): Rule {
 
     return chain([
       addAppToWorkspaceFile(options, appDir, folderName),
+      updateTsConfig(
+        join(normalize(appDir), 'tsconfig.app.json'),
+        join(normalize(appDir), 'tsconfig.spec.json'),
+      ),
       options.standalone
         ? noop()
         : schematic('module', {

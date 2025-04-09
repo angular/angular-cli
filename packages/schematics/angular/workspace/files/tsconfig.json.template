@@ -22,5 +22,6 @@
     "strictInputAccessModifiers": true,
     "typeCheckHostBindings": true,
     "strictTemplates": true<% } %>
-  }
+  },
+  "files": []
 }
