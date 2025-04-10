@@ -31,7 +31,7 @@
     "css-loader": "7.1.2",
     "esbuild-wasm": "0.25.2",
     "fast-glob": "3.3.3",
-    "http-proxy-middleware": "3.0.3",
+    "http-proxy-middleware": "3.0.5",
     "istanbul-lib-instrument": "6.0.3",
     "jsonc-parser": "3.3.1",
     "karma-source-map-support": "1.4.0",
@@ -67,10 +67,10 @@
   },
   "devDependencies": {
     "@angular/ssr": "workspace:*",
-    "@web/test-runner": "0.20.0",
+    "@web/test-runner": "0.20.1",
     "browser-sync": "3.0.4",
-    "ng-packagr": "20.0.0-next.5",
-    "undici": "7.7.0"
+    "ng-packagr": "20.0.0-next.6",
+    "undici": "7.8.0"
   },
   "peerDependencies": {
     "@angular/core": "0.0.0-ANGULAR-FW-PEER-DEP",

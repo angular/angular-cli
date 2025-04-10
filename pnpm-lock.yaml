@@ -57,8 +57,8 @@ importers:
         specifier: 20.0.0-next.6
         version: 20.0.0-next.6(@angular/core@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(rxjs@7.8.2)(zone.js@0.15.0))(rxjs@7.8.2)
       '@bazel/bazelisk':
-        specifier: 1.25.0
-        version: 1.25.0
+        specifier: 1.26.0
+        version: 1.26.0
       '@bazel/buildifier':
         specifier: 8.0.3
         version: 8.0.3
@@ -186,8 +186,8 @@ importers:
         specifier: 9.24.0
         version: 9.24.0(jiti@1.21.7)
       eslint-config-prettier:
-        specifier: 10.1.1
-        version: 10.1.1(eslint@9.24.0(jiti@1.21.7))
+        specifier: 10.1.2
+        version: 10.1.2(eslint@9.24.0(jiti@1.21.7))
       eslint-plugin-header:
         specifier: 3.1.1
         version: 3.1.1(eslint@9.24.0(jiti@1.21.7))
@@ -207,8 +207,8 @@ importers:
         specifier: ^1.18.1
         version: 1.18.1(debug@4.4.0)
       http-proxy-middleware:
-        specifier: 3.0.3
-        version: 3.0.3
+        specifier: 3.0.5
+        version: 3.0.5
       husky:
         specifier: 9.1.7
         version: 9.1.7
@@ -243,8 +243,8 @@ importers:
         specifier: 1.4.0
         version: 1.4.0
       listr2:
-        specifier: 8.2.5
-        version: 8.2.5
+        specifier: 8.3.2
+        version: 8.3.2
       lodash:
         specifier: ^4.17.21
         version: 4.17.21
@@ -291,8 +291,8 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
       undici:
-        specifier: 7.7.0
-        version: 7.7.0
+        specifier: 7.8.0
+        version: 7.8.0
       unenv:
         specifier: ^1.10.0
         version: 1.10.0
@@ -354,7 +354,7 @@ importers:
         version: 5.1.9(@types/node@20.17.30)
       '@vitejs/plugin-basic-ssl':
         specifier: 2.0.0
-        version: 2.0.0(vite@6.2.5(@types/node@20.17.30)(jiti@1.21.7)(less@4.3.0)(sass@1.86.3)(terser@5.39.0)(yaml@2.7.1))
+        version: 2.0.0(vite@6.2.6(@types/node@20.17.30)(jiti@1.21.7)(less@4.3.0)(sass@1.86.3)(terser@5.39.0)(yaml@2.7.1))
       beasties:
         specifier: 0.3.2
         version: 0.3.2
@@ -374,8 +374,8 @@ importers:
         specifier: 3.3.1
         version: 3.3.1
       listr2:
-        specifier: 8.2.5
-        version: 8.2.5
+        specifier: 8.3.2
+        version: 8.3.2
       magic-string:
         specifier: 0.30.17
         version: 0.30.17
@@ -407,8 +407,8 @@ importers:
         specifier: 0.2.12
         version: 0.2.12
       vite:
-        specifier: 6.2.5
-        version: 6.2.5(@types/node@20.17.30)(jiti@1.21.7)(less@4.3.0)(sass@1.86.3)(terser@5.39.0)(yaml@2.7.1)
+        specifier: 6.2.6
+        version: 6.2.6(@types/node@20.17.30)(jiti@1.21.7)(less@4.3.0)(sass@1.86.3)(terser@5.39.0)(yaml@2.7.1)
       watchpack:
         specifier: 2.4.2
         version: 2.4.2
@@ -427,8 +427,8 @@ importers:
         specifier: 4.3.0
         version: 4.3.0
       ng-packagr:
-        specifier: 20.0.0-next.5
-        version: 20.0.0-next.5(@angular/compiler-cli@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(typescript@5.8.3))(tslib@2.8.1)(typescript@5.8.3)
+        specifier: 20.0.0-next.6
+        version: 20.0.0-next.6(@angular/compiler-cli@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(typescript@5.8.3))(tslib@2.8.1)(typescript@5.8.3)
       postcss:
         specifier: 8.5.3
         version: 8.5.3
@@ -451,8 +451,8 @@ importers:
         specifier: 7.4.1
         version: 7.4.1(@types/node@20.17.30)
       '@listr2/prompt-adapter-inquirer':
-        specifier: 2.0.18
-        version: 2.0.18(@inquirer/prompts@7.4.1(@types/node@20.17.30))
+        specifier: 2.0.21
+        version: 2.0.21(@inquirer/prompts@7.4.1(@types/node@20.17.30))
       '@schematics/angular':
         specifier: workspace:0.0.0-PLACEHOLDER
         version: link:../../schematics/angular
@@ -466,8 +466,8 @@ importers:
         specifier: 3.3.1
         version: 3.3.1
       listr2:
-        specifier: 8.2.5
-        version: 8.2.5
+        specifier: 8.3.2
+        version: 8.3.2
       npm-package-arg:
         specifier: 12.0.2
         version: 12.0.2
@@ -613,7 +613,7 @@ importers:
         version: link:../../ngtools/webpack
       '@vitejs/plugin-basic-ssl':
         specifier: 2.0.0
-        version: 2.0.0(vite@6.2.5(@types/node@20.17.30)(jiti@1.21.7)(less@4.3.0)(sass@1.86.3)(terser@5.39.0)(yaml@2.7.1))
+        version: 2.0.0(vite@6.2.6(@types/node@20.17.30)(jiti@1.21.7)(less@4.3.0)(sass@1.86.3)(terser@5.39.0)(yaml@2.7.1))
       ansi-colors:
         specifier: 4.1.3
         version: 4.1.3
@@ -639,8 +639,8 @@ importers:
         specifier: 3.3.3
         version: 3.3.3
       http-proxy-middleware:
-        specifier: 3.0.3
-        version: 3.0.3
+        specifier: 3.0.5
+        version: 3.0.5
       istanbul-lib-instrument:
         specifier: 6.0.3
         version: 6.0.3
@@ -737,17 +737,17 @@ importers:
         specifier: workspace:*
         version: link:../../angular/ssr
       '@web/test-runner':
-        specifier: 0.20.0
-        version: 0.20.0
+        specifier: 0.20.1
+        version: 0.20.1
       browser-sync:
         specifier: 3.0.4
         version: 3.0.4
       ng-packagr:
-        specifier: 20.0.0-next.5
-        version: 20.0.0-next.5(@angular/compiler-cli@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(typescript@5.8.3))(tslib@2.8.1)(typescript@5.8.3)
+        specifier: 20.0.0-next.6
+        version: 20.0.0-next.6(@angular/compiler-cli@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(typescript@5.8.3))(tslib@2.8.1)(typescript@5.8.3)
       undici:
-        specifier: 7.7.0
-        version: 7.7.0
+        specifier: 7.8.0
+        version: 7.8.0
 
   packages/angular_devkit/build_webpack:
     dependencies:
@@ -1489,8 +1489,8 @@ packages:
     resolution: {integrity: sha512-H45s8fVLYjbhFH62dIJ3WtmJ6RSPt/3DRO0ZcT2SUiYiQyz3BLVb9ADEnLl91m74aQPS3AzzeajZHYOalWe3bg==}
     engines: {node: '>=6.9.0'}
 
-  '@bazel/bazelisk@1.25.0':
-    resolution: {integrity: sha512-IgesSUh9EwwLI9+Vs5rb/sx7vh6cI97CRLPqw9+/egFzeZlB5S2fTsKwbdDxtTVPjQMGS3GY64tTNsgejVFeKg==}
+  '@bazel/bazelisk@1.26.0':
+    resolution: {integrity: sha512-bTNcHdGyEQ9r7SczEYUa0gkEQhJo1ld2BjXI8fWBvsUeoHi03QpUs2HZgDbjjrpQFQqG2ZbO7ihZvH8MjhUTHw==}
     hasBin: true
 
   '@bazel/buildifier@8.0.3':
@@ -1954,8 +1954,8 @@ packages:
   '@leichtgewicht/ip-codec@2.0.5':
     resolution: {integrity: sha512-Vo+PSpZG2/fmgmiNzYK9qWRh8h/CHrwD0mo1h1DzL4yzHNSfWYujGTYsWGreD000gcgmZ7K4Ys6Tx9TxtsKdDw==}
 
-  '@listr2/prompt-adapter-inquirer@2.0.18':
-    resolution: {integrity: sha512-0hz44rAcrphyXcA8IS7EJ2SCoaBZD2u5goE8S/e+q/DL+dOGpqpcLidVOFeLG3VgML62SXmfRLAhWt0zL1oW4Q==}
+  '@listr2/prompt-adapter-inquirer@2.0.21':
+    resolution: {integrity: sha512-can62OlOPusZwYfKfd0SV6znsSFbiuJw/lvvRSAAdzqUCTE/Vn8FydLGAfEvGbDALdfqvazSj6tnVJKQxj9iXw==}
     engines: {node: '>=18.0.0'}
     peerDependencies:
       '@inquirer/prompts': '>= 3 < 8'
@@ -3049,8 +3049,8 @@ packages:
     resolution: {integrity: sha512-GzfK5disEJ6wEjoPwx8AVNwUe9gYIiwc+x//QYxYDAFKUp4Xb1OJAGLc2l2gVrSQmtPGLKrTRcW90Hv4pEq1qA==}
     engines: {node: '>=18.0.0'}
 
-  '@web/test-runner-chrome@0.18.0':
-    resolution: {integrity: sha512-EkB70HtHwY36pIbgn9HzqtKAv+i53qa0/UBrs+H0m8j24TxIEH9oWIdF9O/RFxjYpla7fIvZMhOFOjejgrRU5g==}
+  '@web/test-runner-chrome@0.18.1':
+    resolution: {integrity: sha512-eO6ctCaqSguGM6G3cFobGHnrEs9wlv9Juj/Akyr4XLjeEMTheNULdvOXw9Bygi+QC/ir/0snMmt+/YKnfy8rYA==}
     engines: {node: '>=18.0.0'}
 
   '@web/test-runner-commands@0.9.0':
@@ -3069,8 +3069,8 @@ packages:
     resolution: {integrity: sha512-ZL9F6FXd0DBQvo/h/+mSfzFTSRVxzV9st/AHhpgABtUtV/AIpVE9to6+xdkpu6827kwjezdpuadPfg+PlrBWqQ==}
     engines: {node: '>=18.0.0'}
 
-  '@web/test-runner@0.20.0':
-    resolution: {integrity: sha512-xN+4wgEm5xh0VSiC08eUYXW0QDt/NuzZyey4s7Nnjyjs9NkuJHd1jG9aNzfgL1edpJJ/RldHc0KiM2to1h2kxQ==}
+  '@web/test-runner@0.20.1':
+    resolution: {integrity: sha512-MTN8D1WCeCdkUWJIeG9yauUbRkk9g0zGFnBbI5smtPE91NpXFMfRd8nShIvxQnHx9fNTmK+OCYKnOSlq5DLLVA==}
     engines: {node: '>=18.0.0'}
     hasBin: true
 
@@ -3340,9 +3340,6 @@ packages:
   async-function@1.0.0:
     resolution: {integrity: sha512-hsU18Ae8CDTR6Kgu9DYf0EbCr/a5iGL0rytQDobUcdpYOKokk8LEjVphnXkDkgpi0wYVsqrXuP0bZxJaTqdgoA==}
     engines: {node: '>= 0.4'}
-
-  async-mutex@0.4.0:
-    resolution: {integrity: sha512-eJFZ1YhRR8UN8eBLoNzcDPcy/jqjsg6I1AP+KvWQX80BqOSW1oJPJXDylPUEeMr2ZQvHgnQ//Lp6f3RQ1zI7HA==}
 
   async@2.6.4:
     resolution: {integrity: sha512-mzo5dfJYwAn29PeiJ0zvwTo04zj8HDJj0Mn8TD7sno7q12prdbnasKJHhkm2c1LgrhlJ0teaea8860oxi51mGA==}
@@ -4293,8 +4290,8 @@ packages:
     engines: {node: '>=6.0'}
     hasBin: true
 
-  eslint-config-prettier@10.1.1:
-    resolution: {integrity: sha512-4EQQr6wXwS+ZJSzaR5ZCrYgLxqvUjdXctaEtBqHcbkW944B1NQyO4qpdHQbXBONfwxXdkAY81HH4+LUfrg+zPw==}
+  eslint-config-prettier@10.1.2:
+    resolution: {integrity: sha512-Epgp/EofAUeEpIdZkW60MHKvPyru1ruQJxPL+WIycnaPApuseK0Zpkrh/FwL9oIpQvIhJwV7ptOy0DWUjTlCiA==}
     hasBin: true
     peerDependencies:
       eslint: '>=7.0.0'
@@ -4885,8 +4882,8 @@ packages:
       '@types/express':
         optional: true
 
-  http-proxy-middleware@3.0.3:
-    resolution: {integrity: sha512-usY0HG5nyDUwtqpiZdETNbmKtw3QQ1jwYFZ9wi5iHzX2BcILwQKtYDJPo7XHTsu5Z0B2Hj3W9NNnbd+AjFWjqg==}
+  http-proxy-middleware@3.0.5:
+    resolution: {integrity: sha512-GLZZm1X38BPY4lkXA01jhwxvDoOkkXqjgVyUzVxiEK4iuRu03PZoYHhHRwxnfhQMDuaxi3vVri0YgSro/1oWqg==}
     engines: {node: ^14.15.0 || ^16.10.0 || >=18.0.0}
 
   http-proxy@1.18.1:
@@ -5558,8 +5555,8 @@ packages:
   lines-and-columns@1.2.4:
     resolution: {integrity: sha512-7ylylesZQ/PV29jhEDl3Ufjo6ZX7gCqJr5F7PKrqc93v7fzSymt1BpwEU8nAUXs8qzzvqhbjhK5QZg6Mt/HkBg==}
 
-  listr2@8.2.5:
-    resolution: {integrity: sha512-iyAZCeyD+c1gPyE9qpFu8af0Y+MRtmKOncdGoA2S5EY8iFq99dmmvkNnHiWo+pj0s7yH7l3KPIgee77tKpXPWQ==}
+  listr2@8.3.2:
+    resolution: {integrity: sha512-vsBzcU4oE+v0lj4FhVLzr9dBTv4/fHIa57l+GCwovP8MoFNZJTOhGU8PXd4v2VJCbECAaijBiHntiekFMLvo0g==}
     engines: {node: '>=18.0.0'}
 
   lmdb@3.2.6:
@@ -5920,8 +5917,8 @@ packages:
     resolution: {integrity: sha512-dBpDMdxv9Irdq66304OLfEmQ9tbNRFnFTuZiLo+bD+r332bBmMJ8GBLXklIXXgxd3+v9+KUnZaUR5PJMa75Gsg==}
     engines: {node: '>= 0.4.0'}
 
-  ng-packagr@20.0.0-next.5:
-    resolution: {integrity: sha512-fWG2bU6NupYTDxlB2rklvKfdso/hZq/UH5iU8HncZ9yzRvDUQmUIBg2NvBI72ZX1Jg0+/d65OyVns23l/38rnw==}
+  ng-packagr@20.0.0-next.6:
+    resolution: {integrity: sha512-naul5aMAJRla4Mj40bc9ku7FyJu6cZyl+/2D+U8FukorRdwjf2Db4C3RMtjtkKNIBEfHmADOyJmvuevQnxiTKQ==}
     engines: {node: ^20.11.1 || >=22.11.0}
     hasBin: true
     peerDependencies:
@@ -7494,8 +7491,8 @@ packages:
   undici-types@6.19.8:
     resolution: {integrity: sha512-ve2KP6f/JnbPBFyobGHuerC9g1FYGn/F8n1LWTwNxCEzd6IfqTwUQcNXgEtmmQ6DlRrC1hrSrBnCZPokRrDHjw==}
 
-  undici@7.7.0:
-    resolution: {integrity: sha512-tZ6+5NBq4KH35rr46XJ2JPFKxfcBlYNaqLF/wyWIO9RMHqqU/gx/CLB1Y2qMcgB8lWw/bKHa7qzspqCN7mUHvA==}
+  undici@7.8.0:
+    resolution: {integrity: sha512-vFv1GA99b7eKO1HG/4RPu2Is3FBTWBrmzqzO0mz+rLxN3yXkE4mqRcb8g8fHxzX4blEysrNZLqg5RbJLqX5buA==}
     engines: {node: '>=20.18.1'}
 
   unenv@1.10.0:
@@ -7620,8 +7617,8 @@ packages:
     resolution: {integrity: sha512-ZZKSmDAEFOijERBLkmYfJ+vmk3w+7hOLYDNkRCuRuMJGEmqYNCNLyBBFwWKVMhfwaEF3WOd0Zlw86U/WC/+nYw==}
     engines: {'0': node >=0.6.0}
 
-  vite@6.2.5:
-    resolution: {integrity: sha512-j023J/hCAa4pRIUH6J9HemwYfjB5llR2Ps0CWeikOtdR8+pAURAk0DoJC5/mm9kd+UgdnIy7d6HE4EAvlYhPhA==}
+  vite@6.2.6:
+    resolution: {integrity: sha512-9xpjNl3kR4rVDZgPNdTL0/c6ao4km69a/2ihNQbcANz8RuCOK3hQBmLSJf3bRKVQjVMda+YvizNE8AwvogcPbw==}
     engines: {node: ^18.0.0 || ^20.0.0 || >=22.0.0}
     hasBin: true
     peerDependencies:
@@ -8754,7 +8751,7 @@ snapshots:
       '@babel/helper-string-parser': 7.25.9
       '@babel/helper-validator-identifier': 7.25.9
 
-  '@bazel/bazelisk@1.25.0': {}
+  '@bazel/bazelisk@1.26.0': {}
 
   '@bazel/buildifier@8.0.3': {}
 
@@ -9183,7 +9180,7 @@ snapshots:
 
   '@leichtgewicht/ip-codec@2.0.5': {}
 
-  '@listr2/prompt-adapter-inquirer@2.0.18(@inquirer/prompts@7.4.1(@types/node@20.17.30))':
+  '@listr2/prompt-adapter-inquirer@2.0.21(@inquirer/prompts@7.4.1(@types/node@20.17.30))':
     dependencies:
       '@inquirer/prompts': 7.4.1(@types/node@20.17.30)
       '@inquirer/type': 1.5.5
@@ -10346,9 +10343,9 @@ snapshots:
       minimatch: 7.4.6
       semver: 7.7.1
 
-  '@vitejs/plugin-basic-ssl@2.0.0(vite@6.2.5(@types/node@20.17.30)(jiti@1.21.7)(less@4.3.0)(sass@1.86.3)(terser@5.39.0)(yaml@2.7.1))':
+  '@vitejs/plugin-basic-ssl@2.0.0(vite@6.2.6(@types/node@20.17.30)(jiti@1.21.7)(less@4.3.0)(sass@1.86.3)(terser@5.39.0)(yaml@2.7.1))':
     dependencies:
-      vite: 6.2.5(@types/node@20.17.30)(jiti@1.21.7)(less@4.3.0)(sass@1.86.3)(terser@5.39.0)(yaml@2.7.1)
+      vite: 6.2.6(@types/node@20.17.30)(jiti@1.21.7)(less@4.3.0)(sass@1.86.3)(terser@5.39.0)(yaml@2.7.1)
 
   '@web/browser-logs@0.4.1':
     dependencies:
@@ -10420,11 +10417,10 @@ snapshots:
       '@types/parse5': 6.0.3
       parse5: 6.0.1
 
-  '@web/test-runner-chrome@0.18.0':
+  '@web/test-runner-chrome@0.18.1':
     dependencies:
       '@web/test-runner-core': 0.13.4
       '@web/test-runner-coverage-v8': 0.8.0
-      async-mutex: 0.4.0
       chrome-launcher: 0.15.2
       puppeteer-core: 24.6.0
     transitivePeerDependencies:
@@ -10495,12 +10491,12 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  '@web/test-runner@0.20.0':
+  '@web/test-runner@0.20.1':
     dependencies:
       '@web/browser-logs': 0.4.1
       '@web/config-loader': 0.3.3
       '@web/dev-server': 0.4.6
-      '@web/test-runner-chrome': 0.18.0
+      '@web/test-runner-chrome': 0.18.1
       '@web/test-runner-commands': 0.9.0
       '@web/test-runner-core': 0.13.4
       '@web/test-runner-mocha': 0.9.0
@@ -10798,10 +10794,6 @@ snapshots:
   async-each-series@0.1.1: {}
 
   async-function@1.0.0: {}
-
-  async-mutex@0.4.0:
-    dependencies:
-      tslib: 2.8.1
 
   async@2.6.4:
     dependencies:
@@ -11902,7 +11894,7 @@ snapshots:
     optionalDependencies:
       source-map: 0.6.1
 
-  eslint-config-prettier@10.1.1(eslint@9.24.0(jiti@1.21.7)):
+  eslint-config-prettier@10.1.2(eslint@9.24.0(jiti@1.21.7)):
     dependencies:
       eslint: 9.24.0(jiti@1.21.7)
 
@@ -12698,7 +12690,7 @@ snapshots:
     transitivePeerDependencies:
       - debug
 
-  http-proxy-middleware@3.0.3:
+  http-proxy-middleware@3.0.5:
     dependencies:
       '@types/http-proxy': 1.17.16
       debug: 4.4.0(supports-color@10.0.0)
@@ -13424,7 +13416,7 @@ snapshots:
 
   lines-and-columns@1.2.4: {}
 
-  listr2@8.2.5:
+  listr2@8.3.2:
     dependencies:
       cli-truncate: 4.0.0
       colorette: 2.0.20
@@ -13768,7 +13760,7 @@ snapshots:
 
   netmask@2.0.2: {}
 
-  ng-packagr@20.0.0-next.5(@angular/compiler-cli@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(typescript@5.8.3))(tslib@2.8.1)(typescript@5.8.3):
+  ng-packagr@20.0.0-next.6(@angular/compiler-cli@20.0.0-next.6(@angular/compiler@20.0.0-next.6)(typescript@5.8.3))(tslib@2.8.1)(typescript@5.8.3):
     dependencies:
       '@ampproject/remapping': 2.3.0
       '@angular/compiler-cli': 20.0.0-next.6(@angular/compiler@20.0.0-next.6)(typescript@5.8.3)
@@ -15618,7 +15610,7 @@ snapshots:
 
   undici-types@6.19.8: {}
 
-  undici@7.7.0: {}
+  undici@7.8.0: {}
 
   unenv@1.10.0:
     dependencies:
@@ -15778,7 +15770,7 @@ snapshots:
       core-util-is: 1.0.2
       extsprintf: 1.3.0
 
-  vite@6.2.5(@types/node@20.17.30)(jiti@1.21.7)(less@4.3.0)(sass@1.86.3)(terser@5.39.0)(yaml@2.7.1):
+  vite@6.2.6(@types/node@20.17.30)(jiti@1.21.7)(less@4.3.0)(sass@1.86.3)(terser@5.39.0)(yaml@2.7.1):
     dependencies:
       esbuild: 0.25.2
       postcss: 8.5.3
