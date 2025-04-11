@@ -23,6 +23,7 @@
     ".github/workflows/**/*.yml",
     ".nvmrc"
   ],
+  "ignorePaths": ["packages/angular/build/src/baseline/package.json"],
   "packageRules": [
     {
       "matchDepNames": ["node"],

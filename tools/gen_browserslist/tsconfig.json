@@ -1,0 +1,6 @@
+{
+  "extends": "../../tsconfig-build-esm.json",
+  "compilerOptions": {
+    "types": ["node"]
+  }
+}

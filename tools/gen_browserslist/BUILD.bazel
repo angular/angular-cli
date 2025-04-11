@@ -1,0 +1,29 @@
+load("@aspect_rules_js//js:defs.bzl", "js_binary")
+load("@aspect_rules_ts//ts:defs.bzl", "ts_config")
+load("//tools:defaults2.bzl", "ts_project")
+
+js_binary(
+    name = "gen_browserslist",
+    data = [":gen_browserslist_lib"],
+    entry_point = "index.js",
+    visibility = ["//:__subpackages__"],
+)
+
+ts_project(
+    name = "gen_browserslist_lib",
+    srcs = ["index.ts"],
+    source_map = True,
+    tsconfig = ":tsconfig",
+    deps = [
+        "//:node_modules/baseline-browser-mapping",
+    ],
+)
+
+ts_config(
+    name = "tsconfig",
+    src = "tsconfig.json",
+    deps = [
+        "//:build-tsconfig-esm",
+        "//:node_modules/@types/node",
+    ],
+)

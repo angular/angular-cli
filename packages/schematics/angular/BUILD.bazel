@@ -42,11 +42,20 @@ copy_to_bin(
     srcs = glob(["**/schema.json"]),
 )
 
+# Vendor the Baseline configuration into this package.
+genrule(
+    name = "angular_baseline_config",
+    srcs = ["//packages/angular/build:angular_baseline_config"],
+    outs = ["config/baseline/package.json"],
+    cmd = "cp $< $@",
+)
+
 RUNTIME_ASSETS = [
     "collection.json",
     "migrations/migration-collection.json",
     "package.json",
     "utility/latest-versions/package.json",
+    ":angular_baseline_config",
 ] + glob(
     include = [
         "*/schema.json",
