@@ -698,7 +698,10 @@ function createCompilerOptionsTransformer(
 
     // Synchronize custom resolve conditions.
     // Set if using the supported bundler resolution mode (bundler is the default in new projects)
-    if (compilerOptions.moduleResolution === 100 /* ModuleResolutionKind.Bundler */) {
+    if (
+      compilerOptions.moduleResolution === 100 /* ModuleResolutionKind.Bundler */ ||
+      compilerOptions.module === 200 /** ModuleKind.Preserve */
+    ) {
       compilerOptions.customConditions = customConditions;
     }
 
