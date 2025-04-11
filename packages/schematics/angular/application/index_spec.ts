@@ -93,8 +93,13 @@ describe('Application Schematic', () => {
   it('should set the right paths in the tsconfig.app.json', async () => {
     const tree = await schematicRunner.runSchematic('application', defaultOptions, workspaceTree);
 
-    const { files, extends: _extends } = readJsonFile(tree, '/projects/foo/tsconfig.app.json');
-    expect(files).toEqual(['src/main.ts']);
+    const {
+      include,
+      exclude,
+      extends: _extends,
+    } = readJsonFile(tree, '/projects/foo/tsconfig.app.json');
+    expect(include).toEqual(['src/**/*.ts']);
+    expect(exclude).toEqual(['src/**/*.spec.ts']);
     expect(_extends).toBe('../../tsconfig.json');
   });
 
@@ -103,6 +108,18 @@ describe('Application Schematic', () => {
 
     const { extends: _extends } = readJsonFile(tree, '/projects/foo/tsconfig.spec.json');
     expect(_extends).toBe('../../tsconfig.json');
+  });
+
+  it('should add project references in the root tsconfig.json', async () => {
+    const tree = await schematicRunner.runSchematic('application', defaultOptions, workspaceTree);
+
+    const { references } = readJsonFile(tree, '/tsconfig.json');
+    expect(references).toContain(
+      jasmine.objectContaining({ path: 'projects/foo/tsconfig.app.json' }),
+    );
+    expect(references).toContain(
+      jasmine.objectContaining({ path: 'projects/foo/tsconfig.spec.json' }),
+    );
   });
 
   it('should install npm dependencies when `skipInstall` is false', async () => {

@@ -167,7 +167,6 @@ describe('Server Schematic', () => {
       const filePath = '/projects/bar/tsconfig.app.json';
       const contents = parseJson(tree.readContent(filePath).toString());
       expect(contents.compilerOptions.types).toEqual(['node']);
-      expect(contents.files).toEqual(['src/main.ts', 'src/main.server.ts']);
     });
 
     it(`should add 'provideClientHydration' to the providers list`, async () => {
