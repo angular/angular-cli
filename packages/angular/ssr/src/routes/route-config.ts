@@ -142,8 +142,17 @@ export interface ServerRoutePrerenderWithParams extends Omit<ServerRoutePrerende
    * A function that returns a Promise resolving to an array of objects, each representing a route path with URL parameters.
    * This function runs in the injector context, allowing access to Angular services and dependencies.
    *
-   * @returns A Promise resolving to an array where each element is an object with string keys (representing URL parameter names)
-   * and string values (representing the corresponding values for those parameters in the route path).
+   * @returns A Promise resolving to an array of values that define route parameters for prerendering:
+   *
+   * - If the route `path` contains named parameters (e.g., `/product/:id`), each element should be an object
+   *   where keys are parameter names and values are their corresponding values.
+   *   Example: `{ id: '123' }` results in `/product/123`.
+   *
+   * - If the route `path` uses a catch-all (`**`) or wildcard structure (e.g., `/product/**`), each element should
+   *   be a string array representing full path segments.
+   *   Example: `['category', '123']` results in `/product/category/123`.
+   *
+   * The array returned determines the number of prerendered routes generated for a given configuration.
    *
    * @example
    * ```typescript
@@ -160,8 +169,24 @@ export interface ServerRoutePrerenderWithParams extends Omit<ServerRoutePrerende
    *   },
    * ];
    * ```
+   *
+   * @example
+   * ```typescript
+   * export const serverRouteConfig: ServerRoutes[] = [
+   *   {
+   *     path: '/product/**',
+   *     renderMode: RenderMode.Prerender,
+   *     async getPrerenderParams() {
+   *       const productService = inject(ProductService);
+   *       const ids = await productService.getIds(); // Assuming this returns ['1', '2', '3']
+   *
+   *       return ids.map(id => (['category', id])); // Generates paths like: [['category', '1'], ['category', '2'], ['category', '3']]
+   *     },
+   *   },
+   * ];
+   * ```
    */
-  getPrerenderParams: () => Promise<Record<string, string>[]>;
+  getPrerenderParams: () => Promise<(string[] | Record<string, string>)[]>;
 }
 
 /**
