@@ -40,6 +40,15 @@ function createWorkSpaceConfig(tree: UnitTestTree) {
   tree.create('/package.json', JSON.stringify({}, undefined, 2));
 }
 
+function addWorkspaceTarget(tree: UnitTestTree, targetName: string, targetEntry: unknown): void {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const workspaceContent = tree.readJson('/angular.json') as Record<string, any>;
+
+  workspaceContent['projects']['app']['architect'][targetName] = targetEntry;
+
+  tree.overwrite('/angular.json', JSON.stringify(workspaceContent));
+}
+
 describe(`Migration to use the application builder`, () => {
   const schematicName = 'use-application-builder';
   const schematicRunner = new SchematicTestRunner(
@@ -100,6 +109,25 @@ describe(`Migration to use the application builder`, () => {
       base: 'dist/project',
       media: 'resources',
     });
+  });
+
+  it(`should remove 'builderMode' from karma options`, async () => {
+    addWorkspaceTarget(tree, 'test', {
+      'builder': Builders.Karma,
+      'options': {
+        'builderMode': 'detect',
+        'polyfills': ['zone.js', 'zone.js/testing'],
+        'tsConfig': 'projects/app-a/tsconfig.spec.json',
+      },
+    });
+
+    const newTree = await schematicRunner.runSchematic(schematicName, {}, tree);
+    const {
+      projects: { app },
+    } = JSON.parse(newTree.readContent('/angular.json'));
+
+    const { builderMode } = app.architect['test'].options;
+    expect(builderMode).toBeUndefined();
   });
 
   it('should remove tilde prefix from CSS @import specifiers', async () => {
