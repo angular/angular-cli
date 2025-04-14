@@ -5,10 +5,10 @@
 ```ts
 
 import { ApplicationRef } from '@angular/core';
-import type { Http2ServerRequest } from 'node:http2';
-import type { Http2ServerResponse } from 'node:http2';
-import type { IncomingMessage } from 'node:http';
-import type { ServerResponse } from 'node:http';
+import { Http2ServerRequest } from 'node:http2';
+import { Http2ServerResponse } from 'node:http2';
+import { IncomingMessage } from 'node:http';
+import { ServerResponse } from 'node:http';
 import { StaticProvider } from '@angular/core';
 import { Type } from '@angular/core';
 
