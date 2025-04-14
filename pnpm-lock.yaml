@@ -248,6 +248,9 @@ importers:
       lodash:
         specifier: ^4.17.21
         version: 4.17.21
+      magic-string:
+        specifier: 0.30.17
+        version: 0.30.17
       npm:
         specifier: ^11.0.0
         version: 11.3.0
@@ -269,6 +272,12 @@ importers:
       rollup-license-plugin:
         specifier: ~3.0.1
         version: 3.0.2
+      rollup-plugin-dts:
+        specifier: 6.2.1
+        version: 6.2.1(rollup@4.40.0)(typescript@5.8.3)
+      rollup-plugin-sourcemaps2:
+        specifier: 0.5.0
+        version: 0.5.0(@types/node@20.17.30)(rollup@4.40.0)
       semver:
         specifier: 7.7.1
         version: 7.7.1
@@ -6551,7 +6560,6 @@ packages:
     engines: {node: '>=0.6.0', teleport: '>=0.2.0'}
     deprecated: |-
       You or someone you depend on is using Q, the JavaScript Promise library that gave JavaScript developers strong feelings about promises. They can almost certainly migrate to the native JavaScript promise now. Thank you literally everyone for joining me in this bet against the odds. Be excellent to each other.
-
       (For a CapTP with native promises, see @endo/eventual-send and @endo/captp)
 
   qjobs@1.2.0:
@@ -6750,6 +6758,16 @@ packages:
     peerDependencies:
       rollup: ^3.29.4 || ^4
       typescript: 5.8.3
+
+  rollup-plugin-sourcemaps2@0.5.0:
+    resolution: {integrity: sha512-ozRq2fRuJYkA2cRT1CxaWNovtdBbrlXMK/vKIm5Q7rLUHx4jF21jZu1plO+VNOWPDAn+q1CaIAWKQL5QGej6Bw==}
+    engines: {node: '>=18.0.0'}
+    peerDependencies:
+      '@types/node': '>=18.0.0'
+      rollup: '>=4'
+    peerDependenciesMeta:
+      '@types/node':
+        optional: true
 
   rollup@4.40.0:
     resolution: {integrity: sha512-Noe455xmA96nnqH5piFtLobsGbCij7Tu+tb3c1vYjNbTkfzGqXqQXG3wJaYXkRZuQ0vEYN4bhwg7QnIrqB5B+w==}
@@ -14651,6 +14669,13 @@ snapshots:
       typescript: 5.8.3
     optionalDependencies:
       '@babel/code-frame': 7.26.2
+
+  rollup-plugin-sourcemaps2@0.5.0(@types/node@20.17.30)(rollup@4.40.0):
+    dependencies:
+      '@rollup/pluginutils': 5.1.4(rollup@4.40.0)
+      rollup: 4.40.0
+    optionalDependencies:
+      '@types/node': 20.17.30
 
   rollup@4.40.0:
     dependencies:
