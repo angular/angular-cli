@@ -3,7 +3,7 @@
 # Use of this source code is governed by an MIT-style license that can be
 # found in the LICENSE file at https://angular.dev/license
 
-load("@aspect_rules_js//npm:defs.bzl", "npm_package")
+load("@aspect_rules_js//js:defs.bzl", "js_library")
 load("//tools:defaults.bzl", "jasmine_test", "ts_project")
 load("//tools:ts_json_schema.bzl", "ts_json_schema")
 
@@ -91,8 +91,8 @@ jasmine_test(
     ],
 )
 
-# This package is intended to be combined into the main @angular/ssr package as a dep.
-npm_package(
+# This target is used as nested_package in the main @angular/ssr package as a dep.
+js_library(
     name = "pkg",
     srcs = [
         "package.json",

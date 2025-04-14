@@ -274,3 +274,24 @@ esbuild_register_toolchains(
     name = "esbuild",
     esbuild_version = LATEST_ESBUILD_VERSION,
 )
+
+git_repository(
+    name = "rules_angular",
+    commit = "bc8e690770319b8780761f797773bfd47f47dfdc",
+    remote = "https://github.com/devversion/rules_angular.git",
+)
+
+load("@rules_angular//setup:step_1.bzl", "rules_angular_step1")
+
+rules_angular_step1()
+
+load("@rules_angular//setup:step_2.bzl", "rules_angular_step2")
+
+rules_angular_step2()
+
+load("@rules_angular//setup:step_3.bzl", "rules_angular_step3")
+
+rules_angular_step3(
+    angular_compiler_cli = "//:node_modules/@angular/compiler-cli",
+    typescript = "//:node_modules/typescript",
+)
