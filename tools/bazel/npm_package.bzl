@@ -63,8 +63,8 @@ def npm_package(
         out = "substituted_with_snapshot_repos/package.json",
     )
 
-    nostamp_subs = dict(substitutions["rjs"]["nostamp"], **extra_substitutions)
-    stamp_subs = dict(substitutions["rjs"]["stamp"], **extra_substitutions)
+    nostamp_subs = dict(substitutions["nostamp"], **extra_substitutions)
+    stamp_subs = dict(substitutions["stamp"], **extra_substitutions)
 
     expand_template(
         name = "final_package_json",

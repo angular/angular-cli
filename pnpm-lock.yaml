@@ -413,9 +413,15 @@ importers:
       rollup-license-plugin:
         specifier: ~3.0.1
         version: 3.0.2
+      rollup-plugin-dts:
+        specifier: 6.2.1
+        version: 6.2.1(rollup@4.34.8)(typescript@5.8.1-rc)
       rollup-plugin-sourcemaps:
         specifier: ^0.6.0
         version: 0.6.3(@types/node@18.19.76)(rollup@4.34.8)
+      rollup-plugin-sourcemaps2:
+        specifier: 0.5.0
+        version: 0.5.0(@types/node@18.19.76)(rollup@4.34.8)
       rxjs:
         specifier: 7.8.1
         version: 7.8.1
@@ -7138,6 +7144,23 @@ packages:
   rollup-license-plugin@3.0.2:
     resolution: {integrity: sha512-68LWDlUKxqLO4Si3Extca4X7P99tU7s0KLnVUzN6h6SDihGAWYMQ0q73XLnHbUmG0IFgvC0AzuYvbogceQ9Hcw==}
     engines: {node: '>=18.0.0'}
+
+  rollup-plugin-dts@6.2.1:
+    resolution: {integrity: sha512-sR3CxYUl7i2CHa0O7bA45mCrgADyAQ0tVtGSqi3yvH28M+eg1+g5d7kQ9hLvEz5dorK3XVsH5L2jwHLQf72DzA==}
+    engines: {node: '>=16'}
+    peerDependencies:
+      rollup: ^3.29.4 || ^4
+      typescript: 5.8.1-rc
+
+  rollup-plugin-sourcemaps2@0.5.0:
+    resolution: {integrity: sha512-ozRq2fRuJYkA2cRT1CxaWNovtdBbrlXMK/vKIm5Q7rLUHx4jF21jZu1plO+VNOWPDAn+q1CaIAWKQL5QGej6Bw==}
+    engines: {node: '>=18.0.0'}
+    peerDependencies:
+      '@types/node': '>=18.0.0'
+      rollup: '>=4'
+    peerDependenciesMeta:
+      '@types/node':
+        optional: true
 
   rollup-plugin-sourcemaps@0.6.3:
     resolution: {integrity: sha512-paFu+nT1xvuO1tPFYXGe+XnQvg4Hjqv/eIhG8i5EspfYYPBKL57X7iVbfv55aNVASg3dzWvES9dmWsL2KhfByw==}
@@ -15571,6 +15594,21 @@ snapshots:
       get-npm-tarball-url: 2.1.0
       node-fetch: 3.3.2
       spdx-expression-validate: 2.0.0
+
+  rollup-plugin-dts@6.2.1(rollup@4.34.8)(typescript@5.8.1-rc):
+    dependencies:
+      magic-string: 0.30.17
+      rollup: 4.34.8
+      typescript: 5.8.1-rc
+    optionalDependencies:
+      '@babel/code-frame': 7.26.2
+
+  rollup-plugin-sourcemaps2@0.5.0(@types/node@18.19.76)(rollup@4.34.8):
+    dependencies:
+      '@rollup/pluginutils': 5.1.4(rollup@4.34.8)
+      rollup: 4.34.8
+    optionalDependencies:
+      '@types/node': 18.19.76
 
   rollup-plugin-sourcemaps@0.6.3(@types/node@18.19.76)(rollup@4.34.8):
     dependencies:

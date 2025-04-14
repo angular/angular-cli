@@ -1,7 +1,7 @@
 load("@aspect_bazel_lib//lib:copy_to_bin.bzl", _copy_to_bin = "copy_to_bin")
 load("@aspect_rules_jasmine//jasmine:defs.bzl", _jasmine_test = "jasmine_test")
 load("@aspect_rules_js//js:defs.bzl", _js_binary = "js_binary")
-load("@npm//@angular/bazel:index.bzl", _ng_package = "ng_package")
+load("@rules_angular//src/ng_package:index.bzl", _ng_package = "ng_package")
 load("//tools:interop.bzl", _ts_project = "ts_project")
 load("//tools:substitutions.bzl", "substitutions")
 load("//tools/bazel:npm_package.bzl", _npm_package = "npm_package")
@@ -23,8 +23,8 @@ def ng_package(deps = [], **kwargs):
         deps = deps,
         license = "//:LICENSE",
         substitutions = select({
-            "//:stamp": substitutions["legacy"]["stamp"],
-            "//conditions:default": substitutions["legacy"]["nostamp"],
+            "//:stamp": substitutions["stamp"],
+            "//conditions:default": substitutions["nostamp"],
         }),
         **kwargs
     )
