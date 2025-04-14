@@ -74,6 +74,11 @@ export class ComponentStylesheetBundler {
           buildOptions.entryPoints = [entry];
         }
 
+        // Angular encapsulation does not support nesting
+        // See: https://github.com/angular/angular/issues/58996
+        buildOptions.supported ??= {};
+        buildOptions.supported['nesting'] = false;
+
         return buildOptions;
       });
     });
@@ -123,6 +128,11 @@ export class ComponentStylesheetBundler {
         } else {
           buildOptions.entryPoints = [`${namespace};${entry}`];
         }
+
+        // Angular encapsulation does not support nesting
+        // See: https://github.com/angular/angular/issues/58996
+        buildOptions.supported ??= {};
+        buildOptions.supported['nesting'] = false;
 
         buildOptions.plugins.push({
           name: 'angular-component-styles',
