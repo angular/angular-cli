@@ -448,7 +448,10 @@ export async function* serveWithVite(
         componentStyles,
         templateUpdates,
         browserOptions.loader as EsbuildLoaderOption | undefined,
-        browserOptions.define,
+        {
+          ...browserOptions.define,
+          'ngHmrMode': browserOptions.templateUpdates ? 'true' : 'false',
+        },
         extensions?.middleware,
         transformers?.indexHtml,
         thirdPartySourcemaps,
