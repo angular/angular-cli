@@ -1,5 +1,5 @@
 load("@bazel_skylib//rules:copy_file.bzl", "copy_file")
-load("//tools:defaults2.bzl", "js_binary")
+load("//tools:defaults.bzl", "js_binary")
 
 package(default_visibility = ["//visibility:public"])
 

@@ -4,7 +4,7 @@
 # found in the LICENSE file at https://angular.dev/license
 
 load("@npm2//:defs.bzl", "npm_link_all_packages")
-load("//tools:defaults2.bzl", "copy_to_bin", "jasmine_test", "npm_package", "ts_project")
+load("//tools:defaults.bzl", "copy_to_bin", "jasmine_test", "npm_package", "ts_project")
 load("//tools:ts_json_schema.bzl", "ts_json_schema")
 
 licenses(["notice"])

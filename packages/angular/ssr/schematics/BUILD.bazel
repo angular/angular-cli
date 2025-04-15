@@ -4,7 +4,7 @@
 # found in the LICENSE file at https://angular.dev/license
 
 load("@aspect_rules_js//npm:defs.bzl", "npm_package")
-load("//tools:defaults2.bzl", "jasmine_test", "ts_project")
+load("//tools:defaults.bzl", "jasmine_test", "ts_project")
 load("//tools:ts_json_schema.bzl", "ts_json_schema")
 
 licenses(["notice"])
