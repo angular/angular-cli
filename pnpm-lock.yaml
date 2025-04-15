@@ -874,6 +874,12 @@ importers:
         specifier: 1.2.2
         version: 1.2.2
 
+  tools/baseline_browserslist:
+    devDependencies:
+      baseline-browser-mapping:
+        specifier: ^2.2.0
+        version: 2.2.0
+
 packages:
 
   '@ampproject/remapping@2.3.0':
@@ -1989,6 +1995,9 @@ packages:
     resolution: {integrity: sha512-XlqVtILonQnG+9fH2N3Aytria7P/1fwDgDhl29rde96uH2sLB8CHORIf2PfuLVzFQJ7Uqp8py9AYwr3ZUCFfWg==}
     cpu: [x64]
     os: [win32]
+
+  '@mdn/browser-compat-data@6.0.6':
+    resolution: {integrity: sha512-awlDnCGbtdkyLieMpIKJQEgK7mxnL3he4UHm5AGn+asofiemlx4LVHM0FsYmp6O1irAClPNS135zZLhD2SZi+A==}
 
   '@msgpackr-extract/msgpackr-extract-darwin-arm64@3.0.3':
     resolution: {integrity: sha512-QZHtlVgbAdy2zAqNA9Gu1UpIuI8Xvsd1v8ic6B2pZmeFnFcMWiPLfWXh7TVw4eGEZ/C9TH281KwhVoeQUKbyjw==}
@@ -3419,6 +3428,9 @@ packages:
   base64id@2.0.0:
     resolution: {integrity: sha512-lGe34o6EHj9y3Kts9R4ZYs/Gr+6N7MCaMlIFA3F1R2O5/m7K06AxfSeO5530PEERE6/WyEg3lsuyw4GHlPZHog==}
     engines: {node: ^4.5.0 || >= 5.9}
+
+  baseline-browser-mapping@2.2.0:
+    resolution: {integrity: sha512-tLVamSyLn6h5kp7aDzBIPiNnx+ighswrdRs9ug3aeBgSXFQG2nFj1EfWvWTD1Y/ra9GDS8znPwMxTEitF6cC/g==}
 
   basic-ftp@5.0.5:
     resolution: {integrity: sha512-4Bcg1P8xhUuqcii/S0Z9wiHIrQVPMermM1any+MX5GeGD7faD3/msQUDGLol9wOcz4/jbg/WJnGqoJF6LiBdtg==}
@@ -7654,6 +7666,9 @@ packages:
   weak-lru-cache@1.2.2:
     resolution: {integrity: sha512-DEAoo25RfSYMuTGc9vPJzZcZullwIqRDSI9LOy+fkCJPi6hykCnfKaXTuPBDuXAUcqHXyOgFtHNp/kB2FjYHbw==}
 
+  web-features@2.33.0:
+    resolution: {integrity: sha512-oLzTO29Ax9TyQGNoNxpC+2Hj9if7lm2tuuAiEAb01BxcBt7yH40LAmIDg5PtuJ39lnwqm4wELATIKhj6WlJJpQ==}
+
   web-streams-polyfill@3.3.3:
     resolution: {integrity: sha512-d2JWLCivmZYTSIoge9MsgFCZrt571BikcWGYkjC1khllbTeDlGqZ2D8vD8E/lJa8WGWbb7Plm8/XJYV7IJHZZw==}
     engines: {node: '>= 8'}
@@ -9182,6 +9197,8 @@ snapshots:
 
   '@lmdb/lmdb-win32-x64@3.2.6':
     optional: true
+
+  '@mdn/browser-compat-data@6.0.6': {}
 
   '@msgpackr-extract/msgpackr-extract-darwin-arm64@3.0.3':
     optional: true
@@ -10836,6 +10853,11 @@ snapshots:
   base64-js@1.5.1: {}
 
   base64id@2.0.0: {}
+
+  baseline-browser-mapping@2.2.0:
+    dependencies:
+      '@mdn/browser-compat-data': 6.0.6
+      web-features: 2.33.0
 
   basic-ftp@5.0.5: {}
 
@@ -15750,6 +15772,8 @@ snapshots:
 
   weak-lru-cache@1.2.2:
     optional: true
+
+  web-features@2.33.0: {}
 
   web-streams-polyfill@3.3.3: {}
 
