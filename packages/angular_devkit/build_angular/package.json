@@ -40,7 +40,7 @@
     "license-webpack-plugin": "4.0.2",
     "loader-utils": "3.3.1",
     "mini-css-extract-plugin": "2.9.2",
-    "open": "10.1.0",
+    "open": "10.1.1",
     "ora": "5.4.1",
     "picomatch": "4.0.2",
     "piscina": "4.9.2",
