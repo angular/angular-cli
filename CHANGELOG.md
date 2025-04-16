@@ -1,3 +1,26 @@
+<a name="20.0.0-next.6"></a>
+
+# 20.0.0-next.6 (2025-04-16)
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                                    |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------- |
+| [d6f594fe0](https://github.com/angular/angular-cli/commit/d6f594fe0f8f21d9c0e2abedb5c8433a1aa5c157) | feat | generate applications using TypeScript project references      |
+| [8654b3fea](https://github.com/angular/angular-cli/commit/8654b3fea4e2ba5af651e6c2a4afddaf6fc42802) | fix  | application migration should migrate karma builder package     |
+| [be6f13ec1](https://github.com/angular/angular-cli/commit/be6f13ec16f01851d38b900dbfc4df7ccfb94d16) | fix  | remove setting files tsconfig field with SSR/Server generation |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                                          |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------------- |
+| [d5a409a79](https://github.com/angular/angular-cli/commit/d5a409a79da16d368a6c0c588f9c987355ead529) | fix  | include `module` value check when adding custom conditions           |
+| [95d16dc52](https://github.com/angular/angular-cli/commit/95d16dc52113a1d5f67c95a5f6d82e5e937f299c) | fix  | pass `preserveSymlinks` option to Karma esbuild builder              |
+| [3d997feb6](https://github.com/angular/angular-cli/commit/3d997feb689b838a9777b7727bf937098c7d5e83) | fix  | prevent nested CSS in components                                     |
+| [6e6315d72](https://github.com/angular/angular-cli/commit/6e6315d72686a88f29ec9e7565b463e302fdbed8) | fix  | properly resolve transitive external dependencies in vite-dev-server |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="19.2.8"></a>
 
 # 19.2.8 (2025-04-16)
