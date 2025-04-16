@@ -1,0 +1,5 @@
+# TODO(devversion): Investigate bzlmod and use it where possible.
+
+module(
+    name = "angular_cli",
+)
