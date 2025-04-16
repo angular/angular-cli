@@ -280,3 +280,10 @@ rules_angular_step3(
     angular_compiler_cli = "//:node_modules/@angular/compiler-cli",
     typescript = "//:node_modules/typescript",
 )
+
+http_archive(
+    name = "aspect_rules_rollup",
+    sha256 = "c4062681968f5dcd3ce01e09e4ba73670c064744a7046211763e17c98ab8396e",
+    strip_prefix = "rules_rollup-2.0.0",
+    url = "https://github.com/aspect-build/rules_rollup/releases/download/v2.0.0/rules_rollup-v2.0.0.tar.gz",
+)
