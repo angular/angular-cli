@@ -154,12 +154,8 @@ build:remote-cache --google_default_credentials
 # Additional flags added when running a "trusted build" with additional access
 build:trusted-build --remote_upload_local_results=true
 
-###############################
-# NodeJS rules settings
-# These settings are required for rules_nodejs
-###############################
-
-# Fixes use of npm paths with spaces such as some within the puppeteer module
+# Fixes issues with browser archives and files with spaces. Could be
+# removed in Bazel 8 when Bazel runfiles supports spaces.
 build --experimental_inprocess_symlink_creation
 
 ####################################################
@@ -169,6 +165,11 @@ build --experimental_inprocess_symlink_creation
 # TODO(josephperrott): investigate if this can be removed eventually.
 # Prevents the npm package extract from occuring or caching on RBE which overwhelms our quota
 build --modify_execution_info=NpmPackageExtract=+no-remote
+
+# Allow the Bazel server to check directory sources for changes. `rules_js` previously
+# heavily relied on this, but still uses directory "inputs" in some cases.
+# See: https://github.com/aspect-build/rules_js/issues/1408.
+startup --host_jvm_args=-DBAZEL_TRACK_SOURCE_DIRECTORIES=1
 
 ####################################################
 # User bazel configuration

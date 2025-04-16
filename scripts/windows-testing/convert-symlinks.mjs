@@ -26,7 +26,7 @@ const skipDirectories = [
   '_windows_amd64/bin/nodejs/node_modules',
 ];
 
-const workspaceRootPaths = [/.*\.runfiles\/angular_cli\//, /^.*-fastbuild\/bin\//];
+const workspaceRootPaths = [/.*\.runfiles\/_main\//, /^.*-fastbuild\/bin\//];
 
 // Copying can be parallelized and doesn't cause any WSL flakiness (no exe is invoked).
 const parallelCopyTasks = [];
