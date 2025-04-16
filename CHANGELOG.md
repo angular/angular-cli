@@ -1,3 +1,18 @@
+<a name="19.2.8"></a>
+
+# 19.2.8 (2025-04-16)
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                                          |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------------- |
+| [4a8a4a083](https://github.com/angular/angular-cli/commit/4a8a4a0837af6a095a1e4ad6ae07436073324a7a) | fix  | include `module` value check when adding custom conditions           |
+| [00cd0d123](https://github.com/angular/angular-cli/commit/00cd0d1235ed13781689ae4c4636371dab46b493) | fix  | prevent nested CSS in components                                     |
+| [a297c4153](https://github.com/angular/angular-cli/commit/a297c4153fd72581cbcf8136c9524c415c561f53) | fix  | properly resolve transitive external dependencies in vite-dev-server |
+| [8ab033e8e](https://github.com/angular/angular-cli/commit/8ab033e8e56d26c75d8871f81291e702b8985adc) | fix  | update vite to 6.2.6                                                 |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="19.2.7"></a>
 
 # 19.2.7 (2025-04-09)
