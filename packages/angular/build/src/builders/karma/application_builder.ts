@@ -67,7 +67,6 @@ class AngularAssetsMiddleware {
   ) {}
 
   handle(req: IncomingMessage, res: ServerResponse, next: (err?: unknown) => unknown) {
-    let err = null;
     try {
       const url = new URL(`http://${req.headers['host']}${req.url}`);
       // Remove the leading slash from the URL path and convert to platform specific.
@@ -78,21 +77,24 @@ class AngularAssetsMiddleware {
       }
 
       const file = this.latestBuildFiles.files[pathname];
-
-      if (file?.origin === 'disk') {
-        this.serveFile(file.inputPath, undefined, res);
-
-        return;
-      } else if (file?.origin === 'memory') {
-        // Include pathname to help with Content-Type headers.
-        this.serveFile(`/unused/${url.pathname}`, undefined, res, undefined, file.contents, true);
+      if (!file) {
+        next();
 
         return;
       }
+
+      switch (file.origin) {
+        case 'disk':
+          this.serveFile(file.inputPath, undefined, res);
+          break;
+        case 'memory':
+          // Include pathname to help with Content-Type headers.
+          this.serveFile(`/unused/${url.pathname}`, undefined, res, undefined, file.contents, true);
+          break;
+      }
     } catch (e) {
-      err = e;
+      next(e);
     }
-    next(err);
   }
 
   static createPlugin(initialFiles: LatestBuildFiles): InlinePluginDef {
