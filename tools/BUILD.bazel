@@ -1,4 +1,3 @@
-load("@bazel_skylib//rules:copy_file.bzl", "copy_file")
 load("//tools:defaults.bzl", "js_binary")
 
 package(default_visibility = ["//visibility:public"])
@@ -30,22 +29,4 @@ js_binary(
         "//:node_modules/quicktype-core",
     ],
     entry_point = "quicktype_runner.js",
-)
-
-# TODO(devversion): Improve this by potentially sharing this common block.
-copy_file(
-    name = "copy_worker_js",
-    src = "@tsc_worker//file",
-    out = "ts_worker.mjs",
-)
-
-js_binary(
-    name = "vanilla_ts_worker",
-    data = [
-        ":copy_worker_js",
-        "//:node_modules/@angular/compiler-cli",
-        "//:node_modules/typescript",
-    ],
-    entry_point = ":copy_worker_js",
-    fixed_args = ["--vanilla-ts"],
 )

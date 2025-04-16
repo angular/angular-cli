@@ -9,7 +9,7 @@ async function main() {
   const maxShards = 4;
 
   const testEntrypoint = path.resolve(runfilesDir, '../', targetName);
-  const testWorkingDir = path.resolve(runfilesDir, 'angular_cli');
+  const testWorkingDir = path.resolve(runfilesDir, '_main');
   const tasks = [];
   const progress = {};
 

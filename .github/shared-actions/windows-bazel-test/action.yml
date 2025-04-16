@@ -63,7 +63,7 @@ runs:
 
         # Needed for resolution because Aspect/Bazel looks for repositories at `<workspace>/external`.
         # TODO(devversion): consult with Aspect on why this is needed.
-        (cd $runfiles_dir/angular_cli && ${{steps.init_wsl.outputs.cmd_path}} /C "mklink /D external ..")
+        (cd $runfiles_dir/_main && ${{steps.init_wsl.outputs.cmd_path}} /C "mklink /D external ..")
 
     - name: Run tests
       # Note: This is Git Bash.

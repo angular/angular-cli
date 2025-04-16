@@ -3,6 +3,7 @@ import { createConsoleLogger } from '../../packages/angular_devkit/core/node';
 import colors from 'ansi-colors';
 import glob from 'fast-glob';
 import * as path from 'node:path';
+import * as fs from 'node:fs';
 import { getGlobalVariable, setGlobalVariable } from './e2e/utils/env';
 import { gitClean } from './e2e/utils/git';
 import { createNpmRegistry } from './e2e/utils/registry';
@@ -78,6 +79,11 @@ const argv = {
       : Number(process.env.E2E_SHARD_INDEX ?? 0) * Number(process.env.TEST_TOTAL_SHARDS ?? 1) +
         Number(process.env.TEST_SHARD_INDEX ?? 0)),
 };
+
+// Indicate sharding support for Bazel.
+if (process.env['TEST_SHARD_STATUS_FILE']) {
+  fs.writeFileSync(process.env['TEST_SHARD_STATUS_FILE'], '', 'utf8');
+}
 
 /**
  * Set the error code of the process to 255.  This is to ensure that if something forces node
