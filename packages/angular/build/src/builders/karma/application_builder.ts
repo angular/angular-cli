@@ -408,6 +408,7 @@ async function initializeApplication(
     entryPoints,
     tsConfig: options.tsConfig,
     outputPath,
+    preserveSymlinks: options.preserveSymlinks,
     aot: options.aot,
     index: false,
     outputHashing: OutputHashing.None,
