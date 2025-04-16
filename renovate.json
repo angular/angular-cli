@@ -18,11 +18,11 @@
   "includePaths": [
     "WORKSPACE",
     "package.json",
-    "packages/**/package.json",
-    "tests/legacy-cli/e2e/ng-snapshot/package.json",
+    "**/package.json",
     ".github/workflows/**/*.yml",
     ".nvmrc"
   ],
+  "ignorePaths": ["tests/legacy-cli/e2e/assets/**", "tests/schematics/update/packages/**"],
   "packageRules": [
     {
       "matchDepNames": ["node"],
