@@ -55,10 +55,10 @@ export default function (options: ApplicationOptions): Rule {
 
     return chain([
       addAppToWorkspaceFile(options, appDir, folderName),
-      addTsProjectReference(join(normalize(appDir), 'tsconfig.app.json')),
+      addTsProjectReference('./' + join(normalize(appDir), 'tsconfig.app.json')),
       options.skipTests
         ? noop()
-        : addTsProjectReference(join(normalize(appDir), 'tsconfig.spec.json')),
+        : addTsProjectReference('./' + join(normalize(appDir), 'tsconfig.spec.json')),
       options.standalone
         ? noop()
         : schematic('module', {
