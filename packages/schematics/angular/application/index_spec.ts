@@ -115,10 +115,10 @@ describe('Application Schematic', () => {
 
     const { references } = readJsonFile(tree, '/tsconfig.json');
     expect(references).toContain(
-      jasmine.objectContaining({ path: 'projects/foo/tsconfig.app.json' }),
+      jasmine.objectContaining({ path: './projects/foo/tsconfig.app.json' }),
     );
     expect(references).toContain(
-      jasmine.objectContaining({ path: 'projects/foo/tsconfig.spec.json' }),
+      jasmine.objectContaining({ path: './projects/foo/tsconfig.spec.json' }),
     );
   });
 
@@ -131,10 +131,10 @@ describe('Application Schematic', () => {
 
     const { references } = readJsonFile(tree, '/tsconfig.json');
     expect(references).toContain(
-      jasmine.objectContaining({ path: 'projects/foo/tsconfig.app.json' }),
+      jasmine.objectContaining({ path: './projects/foo/tsconfig.app.json' }),
     );
     expect(references).not.toContain(
-      jasmine.objectContaining({ path: 'projects/foo/tsconfig.spec.json' }),
+      jasmine.objectContaining({ path: './projects/foo/tsconfig.spec.json' }),
     );
   });
 
