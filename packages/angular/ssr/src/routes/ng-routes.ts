@@ -382,6 +382,7 @@ async function* handleSSGRoute(
 
   const { route: currentRoutePath, fallback, ...meta } = metadata;
   const getPrerenderParams = 'getPrerenderParams' in meta ? meta.getPrerenderParams : undefined;
+  const isCatchAllRoute = currentRoutePath.endsWith('**');
 
   if ('getPrerenderParams' in meta) {
     delete meta['getPrerenderParams'];
@@ -391,7 +392,10 @@ async function* handleSSGRoute(
     meta.redirectTo = resolveRedirectTo(currentRoutePath, redirectTo);
   }
 
-  if (!URL_PARAMETER_REGEXP.test(currentRoutePath)) {
+  if (
+    (isCatchAllRoute && !getPrerenderParams) ||
+    (!isCatchAllRoute && !URL_PARAMETER_REGEXP.test(currentRoutePath))
+  ) {
     // Route has no parameters
     yield {
       ...meta,
@@ -415,7 +419,9 @@ async function* handleSSGRoute(
 
     if (serverConfigRouteTree) {
       // Automatically resolve dynamic parameters for nested routes.
-      const catchAllRoutePath = joinUrlParts(currentRoutePath, '**');
+      const catchAllRoutePath = isCatchAllRoute
+        ? currentRoutePath
+        : joinUrlParts(currentRoutePath, '**');
       const match = serverConfigRouteTree.match(catchAllRoutePath);
       if (match && match.renderMode === RenderMode.Prerender && !('getPrerenderParams' in match)) {
         serverConfigRouteTree.insert(catchAllRoutePath, {
@@ -429,20 +435,38 @@ async function* handleSSGRoute(
     const parameters = await runInInjectionContext(parentInjector, () => getPrerenderParams());
     try {
       for (const params of parameters) {
-        const routeWithResolvedParams = currentRoutePath.replace(URL_PARAMETER_REGEXP, (match) => {
-          const parameterName = match.slice(1);
-          const value = params[parameterName];
-          if (typeof value !== 'string') {
+        const isParamsArray = Array.isArray(params);
+
+        if (isParamsArray) {
+          if (!isCatchAllRoute) {
             throw new Error(
-              `The 'getPrerenderParams' function defined for the '${stripLeadingSlash(currentRoutePath)}' route ` +
-                `returned a non-string value for parameter '${parameterName}'. ` +
-                `Please make sure the 'getPrerenderParams' function returns values for all parameters ` +
-                'specified in this route.',
+              `The 'getPrerenderParams' function for the '${stripLeadingSlash(currentRoutePath)}' ` +
+                `route returned an array '${JSON.stringify(params)}', which is not valid for catch-all routes.`,
             );
           }
+        } else if (isCatchAllRoute) {
+          throw new Error(
+            `The 'getPrerenderParams' function for the '${stripLeadingSlash(currentRoutePath)}' ` +
+              `route returned an object '${JSON.stringify(params)}', which is not valid for parameterized routes.`,
+          );
+        }
 
-          return value;
-        });
+        const routeWithResolvedParams = isParamsArray
+          ? currentRoutePath.replace('**', params.join('/'))
+          : currentRoutePath.replace(URL_PARAMETER_REGEXP, (match) => {
+              const parameterName = match.slice(1);
+              const value = params[parameterName];
+              if (typeof value !== 'string') {
+                throw new Error(
+                  `The 'getPrerenderParams' function defined for the '${stripLeadingSlash(currentRoutePath)}' route ` +
+                    `returned a non-string value for parameter '${parameterName}'. ` +
+                    `Please make sure the 'getPrerenderParams' function returns values for all parameters ` +
+                    'specified in this route.',
+                );
+              }
+
+              return value;
+            });
 
         yield {
           ...meta,
@@ -530,9 +554,9 @@ function buildServerConfigRouteTree({ routes, appShellRoute }: ServerRoutesConfi
       continue;
     }
 
-    if (path.includes('*') && 'getPrerenderParams' in metadata) {
+    if ('getPrerenderParams' in metadata && (path.includes('/*/') || path.endsWith('/*'))) {
       errors.push(
-        `Invalid '${path}' route configuration: 'getPrerenderParams' cannot be used with a '*' or '**' route.`,
+        `Invalid '${path}' route configuration: 'getPrerenderParams' cannot be used with a '*' route.`,
       );
       continue;
     }

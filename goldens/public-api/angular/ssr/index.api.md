@@ -63,7 +63,7 @@ export interface ServerRoutePrerender extends Omit<ServerRouteCommon, 'status'> 
 // @public
 export interface ServerRoutePrerenderWithParams extends Omit<ServerRoutePrerender, 'fallback'> {
     fallback?: PrerenderFallback;
-    getPrerenderParams: () => Promise<Record<string, string>[]>;
+    getPrerenderParams: () => Promise<(string[] | Record<string, string>)[]>;
 }
 
 // @public
