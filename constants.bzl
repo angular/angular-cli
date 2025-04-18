@@ -8,6 +8,13 @@ ANGULAR_FW_VERSION = "^20.0.0-next.0"
 ANGULAR_FW_PEER_DEP = "^20.0.0 || ^20.0.0-next.0"
 NG_PACKAGR_PEER_DEP = "^20.0.0 || ^20.0.0-next.0"
 
+# Baseline widely-available date in `YYYY-MM-DD` format which defines Angular's
+# browser support. This date serves as the source of truth for the Angular CLI's
+# default browser set used to determine what downleveling is necessary.
+#
+# See: https://web.dev/baseline
+BASELINE_DATE = "2025-03-31"
+
 SNAPSHOT_REPOS = {
     "@angular/cli": "angular/cli-builds",
     "@angular/pwa": "angular/angular-pwa-builds",

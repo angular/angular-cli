@@ -17,6 +17,7 @@ import {
   strings,
   url,
 } from '@angular-devkit/schematics';
+import { readFile } from 'node:fs/promises';
 import { posix as path } from 'node:path';
 import { relativePathToWorkspaceRoot } from '../utility/paths';
 import { getWorkspace as readWorkspace, updateWorkspace } from '../utility/workspace';
@@ -42,10 +43,13 @@ function addBrowserslistConfig(options: ConfigOptions): Rule {
       throw new SchematicsException(`Project name "${options.project}" doesn't not exist.`);
     }
 
+    // Read Angular's default vendored `.browserslistrc` file.
+    const config = await readFile(path.join(__dirname, '.browserslistrc'), 'utf8');
+
     return mergeWith(
       apply(url('./files'), [
         filter((p) => p.endsWith('.browserslistrc.template')),
-        applyTemplates({}),
+        applyTemplates({ config }),
         move(project.root),
       ]),
     );

@@ -2,16 +2,10 @@
 # For additional information regarding the format and rule options, please see:
 # https://github.com/browserslist/browserslist#queries
 
-# For the full list of supported browsers by the Angular framework, please see:
+# For Angular's browser support policy, please see:
 # https://angular.dev/reference/versions#browser-support
 
 # You can see what browsers were selected by your queries by running:
 #   npx browserslist
 
-last 2 Chrome versions
-last 1 Firefox version
-last 2 Edge major versions
-last 2 Safari major versions
-last 2 iOS major versions
-last 2 Android major versions
-Firefox ESR
+<%= config %>

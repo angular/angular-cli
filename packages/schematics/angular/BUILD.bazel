@@ -4,8 +4,10 @@
 # found in the LICENSE file at https://angular.dev/license
 
 load("@npm2//:defs.bzl", "npm_link_all_packages")
+load("//:constants.bzl", "BASELINE_DATE")
 load("//tools:defaults.bzl", "copy_to_bin", "jasmine_test", "npm_package", "ts_project")
 load("//tools:ts_json_schema.bzl", "ts_json_schema")
+load("//tools/baseline_browserslist:baseline_browserslist.bzl", "baseline_browserslist")
 
 licenses(["notice"])
 
@@ -42,11 +44,18 @@ copy_to_bin(
     srcs = glob(["**/schema.json"]),
 )
 
+baseline_browserslist(
+    name = "angular_browserslist",
+    out = "config/.browserslistrc",
+    baseline = BASELINE_DATE,
+)
+
 RUNTIME_ASSETS = [
     "collection.json",
     "migrations/migration-collection.json",
     "package.json",
     "utility/latest-versions/package.json",
+    ":angular_browserslist",
 ] + glob(
     include = [
         "*/schema.json",

@@ -145,3 +145,34 @@ will block the next weekly release.
     accept the invite for the new package.
 
 Once Wombat accepts the invite, regular automated releases should work as expected.
+
+## Updating Browser Support
+
+Angular's browser support is defined by a [Baseline](https://web.dev/baseline)
+"widely available" date. Before a new major version is released, this should be
+updated to approximately the current date.
+
+A few weeks before a major (around feature freeze):
+
+1.  Update `BASELINE_DATE` in
+    [`/constants.bzl`](/constants.bzl) to the end of the most recent month.
+    - For example, if it is currently May 12th, set `baselineThreshold` to April
+      30th.
+    - Picking a date at the end of a month makes it easier to cross-reference
+      Angular's support with other tools (like MDN) which state Baseline support
+      using month specificity.
+    - You can view the generated `browserlist` configuration with:
+      ```shell
+      bazel build //packages/angular/build:angular_browserslist
+      cat dist/bin/packages/angular/build/.browserslistrc
+      ```
+    - Commit and merge the change, no other alterations or automation is
+      necessary in the CLI repo.
+2.  Update
+    [`/.browserslistrc`](https://github.com/ng-packagr/ng-packagr/tree/main/.browserslistrc)
+    in the `ng-packagr` repo.
+    - Use the generated configuration from above.
+3.  Update
+    [`angular.dev` documentation](https://github.com/angular/angular/tree/main/adev/src/content/reference/versions.md#browser-support)
+    to specify the date used and link to [browsersl.ist](https://browsersl.ist)
+    with the generated configuration.

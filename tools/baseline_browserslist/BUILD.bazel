@@ -1,0 +1,52 @@
+load("@aspect_rules_js//js:defs.bzl", "js_binary")
+load("@aspect_rules_ts//ts:defs.bzl", "ts_config")
+load("@npm2//:defs.bzl", "npm_link_all_packages")
+load("//tools:defaults.bzl", "jasmine_test", "ts_project")
+
+npm_link_all_packages()
+
+js_binary(
+    name = "baseline_browserslist",
+    data = [":baseline_browserslist_lib"],
+    entry_point = "index.mjs",
+    visibility = ["//:__subpackages__"],
+)
+
+ts_project(
+    name = "baseline_browserslist_lib",
+    srcs = [
+        "generate_browserslist.mts",
+        "index.mts",
+    ],
+    source_map = True,
+    tsconfig = ":build_tsconfig",
+    deps = [":node_modules/baseline-browser-mapping"],
+)
+
+ts_project(
+    name = "baseline_browserslist_test_lib",
+    testonly = True,
+    srcs = ["generate_browserslist_spec.mts"],
+    tsconfig = ":test_tsconfig",
+    deps = [":baseline_browserslist_lib"],
+)
+
+jasmine_test(
+    name = "baseline_browserslist_test",
+    data = [":baseline_browserslist_test_lib"],
+)
+
+ts_config(
+    name = "build_tsconfig",
+    src = "tsconfig-build.json",
+    deps = [
+        "//:build-tsconfig-esm",
+        "//:node_modules/@types/node",
+    ],
+)
+
+ts_config(
+    name = "test_tsconfig",
+    src = "tsconfig-test.json",
+    deps = ["//:test-tsconfig-esm"],
+)
