@@ -17,6 +17,7 @@ import { ReadableStreamController } from 'node:stream/web';
 import { globSync } from 'tinyglobby';
 import { BuildOutputFileType } from '../../tools/esbuild/bundler-context';
 import { emitFilesToDisk } from '../../tools/esbuild/utils';
+import { createVirtualModulePlugin } from '../../tools/esbuild/virtual-module-plugin';
 import { buildApplicationInternal } from '../application/index';
 import { ApplicationBuilderInternalOptions } from '../application/options';
 import { Result, ResultFile, ResultKind } from '../application/results';
@@ -385,7 +386,7 @@ async function initializeApplication(
   if (options.main) {
     entryPoints.set(mainName, options.main);
   } else {
-    entryPoints.set(mainName, localResolve('./polyfills/init_test_bed.js'));
+    entryPoints.set(mainName, 'angular:test-bed-init');
   }
 
   const instrumentForCoverage = options.codeCoverage
@@ -431,9 +432,30 @@ async function initializeApplication(
     externalDependencies: options.externalDependencies,
   };
 
+  const virtualTestBedInit = createVirtualModulePlugin({
+    namespace: 'angular:test-bed-init',
+    loadContent: async () => {
+      const contents: string[] = [
+        // Initialize the Angular testing environment
+        `import { getTestBed } from '@angular/core/testing';`,
+        `import { BrowserTestingModule, platformBrowserTesting } from '@angular/platform-browser/testing';`,
+        `getTestBed().initTestEnvironment(BrowserTestingModule, platformBrowserTesting(), {`,
+        `  errorOnUnknownElements: true,`,
+        `  errorOnUnknownProperties: true,`,
+        '});',
+      ];
+
+      return {
+        contents: contents.join('\n'),
+        loader: 'js',
+        resolveDir: projectSourceRoot,
+      };
+    },
+  });
+
   // Build tests with `application` builder, using test files as entry points.
   const [buildOutput, buildIterator] = await first(
-    buildApplicationInternal(buildOptions, context),
+    buildApplicationInternal(buildOptions, context, { codePlugins: [virtualTestBedInit] }),
     { cancel: !buildOptions.watch },
   );
   if (buildOutput.kind === ResultKind.Failure) {
