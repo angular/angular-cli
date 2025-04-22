@@ -1,4 +1,4 @@
-load("//tools:defaults2.bzl", "copy_to_bin")
+load("//tools:defaults.bzl", "copy_to_bin")
 
 copy_to_bin(
     name = "ng-snapshot",
