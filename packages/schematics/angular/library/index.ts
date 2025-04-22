@@ -43,6 +43,21 @@ function updateTsConfig(packageName: string, ...paths: string[]) {
   };
 }
 
+function addTsProjectReference(...paths: string[]) {
+  return (host: Tree) => {
+    if (!host.exists('tsconfig.json')) {
+      return host;
+    }
+
+    const newReferences = paths.map((path) => ({ path }));
+
+    const file = new JSONFile(host, 'tsconfig.json');
+    const jsonPath = ['references'];
+    const value = file.get(jsonPath);
+    file.modify(jsonPath, Array.isArray(value) ? [...value, ...newReferences] : newReferences);
+  };
+}
+
 function addDependenciesToPackageJson() {
   return (host: Tree) => {
     [
@@ -162,6 +177,12 @@ export default function (options: LibraryOptions): Rule {
       addLibToWorkspaceFile(options, libDir, packageName),
       options.skipPackageJson ? noop() : addDependenciesToPackageJson(),
       options.skipTsConfig ? noop() : updateTsConfig(packageName, './' + distRoot),
+      options.skipTsConfig
+        ? noop()
+        : addTsProjectReference(
+            './' + join(libDir, 'tsconfig.lib.json'),
+            './' + join(libDir, 'tsconfig.spec.json'),
+          ),
       options.standalone
         ? noop()
         : schematic('module', {
