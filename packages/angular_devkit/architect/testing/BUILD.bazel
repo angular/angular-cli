@@ -3,7 +3,7 @@
 # Use of this source code is governed by an MIT-style license that can be
 # found in the LICENSE file at https://angular.dev/license
 
-load("//tools:interop.bzl", "ts_project")
+load("//tools:defaults.bzl", "ts_project")
 
 licenses(["notice"])
 
@@ -17,12 +17,11 @@ ts_project(
     ),
     # TODO: Fix strict_deps failure
     ignore_strict_deps = True,
-    module_name = "@angular-devkit/architect/testing",
     deps = [
         "//:node_modules/@types/node",
         "//:node_modules/rxjs",
-        "//packages/angular_devkit/architect:architect",
-        "//packages/angular_devkit/core:core",
-        "//packages/angular_devkit/core/node:node",
+        "//packages/angular_devkit/architect",
+        "//packages/angular_devkit/core",
+        "//packages/angular_devkit/core/node",
     ],
 )

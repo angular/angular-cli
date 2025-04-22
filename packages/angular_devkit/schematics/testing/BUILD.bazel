@@ -1,4 +1,4 @@
-load("//tools:interop.bzl", "ts_project")
+load("//tools:defaults.bzl", "ts_project")
 
 # Copyright Google Inc. All Rights Reserved.
 #
@@ -16,12 +16,11 @@ ts_project(
     data = ["package.json"],
     # TODO: Fix strict_deps failure
     ignore_strict_deps = True,
-    module_name = "@angular-devkit/schematics/testing",
     deps = [
         "//:node_modules/rxjs",
-        "//packages/angular_devkit/core:core",
-        "//packages/angular_devkit/schematics:schematics",
-        "//packages/angular_devkit/schematics/tasks/node:node",
-        "//packages/angular_devkit/schematics/tools:tools",
+        "//packages/angular_devkit/core",
+        "//packages/angular_devkit/schematics",
+        "//packages/angular_devkit/schematics/tasks/node",
+        "//packages/angular_devkit/schematics/tools",
     ],
 )

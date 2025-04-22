@@ -1,13 +1,44 @@
 load("@aspect_bazel_lib//lib:copy_to_bin.bzl", _copy_to_bin = "copy_to_bin")
 load("@aspect_rules_jasmine//jasmine:defs.bzl", _jasmine_test = "jasmine_test")
 load("@aspect_rules_js//js:defs.bzl", _js_binary = "js_binary")
+load("@aspect_rules_ts//ts:defs.bzl", _ts_project = "ts_project")
+load("@devinfra//bazel/ts_project:index.bzl", "strict_deps_test")
 load("@rules_angular//src/ng_package:index.bzl", _ng_package = "ng_package")
-load("//tools:interop.bzl", _ts_project = "ts_project")
 load("//tools:substitutions.bzl", "substitutions")
 load("//tools/bazel:npm_package.bzl", _npm_package = "npm_package")
 
-def ts_project(**kwargs):
-    _ts_project(**kwargs)
+def ts_project(
+        name,
+        deps = [],
+        tsconfig = None,
+        testonly = False,
+        visibility = None,
+        ignore_strict_deps = False,
+        **kwargs):
+    if tsconfig == None:
+        tsconfig = "//:test-tsconfig" if testonly else "//:build-tsconfig"
+
+    _ts_project(
+        name = name,
+        testonly = testonly,
+        declaration = True,
+        tsconfig = tsconfig,
+        visibility = visibility,
+        # Use the worker from our own Angular rules, as the default worker
+        # from `rules_ts` is incompatible with TS5+ and abandoned. We need
+        # worker for efficient, fast DX and avoiding Windows no-sandbox issues.
+        supports_workers = 1,
+        tsc_worker = "//tools:vanilla_ts_worker",
+        deps = deps,
+        **kwargs
+    )
+
+    if not ignore_strict_deps:
+        strict_deps_test(
+            name = "%s_strict_deps_test" % name,
+            srcs = kwargs.get("srcs", []),
+            deps = deps,
+        )
 
 def npm_package(**kwargs):
     _npm_package(**kwargs)

@@ -1,4 +1,4 @@
-load("//tools:interop.bzl", "ts_project")
+load("//tools:defaults.bzl", "ts_project")
 
 # Copyright Google Inc. All Rights Reserved.
 #
@@ -26,6 +26,6 @@ ts_project(
     deps = [
         "//:node_modules/@types/jasmine",
         "//:node_modules/@types/node",
-        "//packages/angular_devkit/schematics:schematics",
+        "//packages/angular_devkit/schematics",
     ],
 )

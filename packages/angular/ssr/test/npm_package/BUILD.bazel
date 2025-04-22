@@ -1,6 +1,6 @@
 load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
 load("@bazel_skylib//rules:write_file.bzl", "write_file")
-load("//tools:defaults2.bzl", "jasmine_test", "ts_project")
+load("//tools:defaults.bzl", "jasmine_test", "ts_project")
 
 ts_project(
     name = "unit_test_lib",
