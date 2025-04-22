@@ -293,6 +293,24 @@ describe('Library Schematic', () => {
 
       const tsConfigJson = getJsonFileContent(tree, 'tsconfig.json');
       expect(tsConfigJson.compilerOptions.paths).toBeUndefined();
+      expect(tsConfigJson.references).not.toContain(
+        jasmine.objectContaining({ path: './projects/foo/tsconfig.lib.json' }),
+      );
+      expect(tsConfigJson.references).not.toContain(
+        jasmine.objectContaining({ path: './projects/foo/tsconfig.spec.json' }),
+      );
+    });
+
+    it('should add project references in the root tsconfig.json', async () => {
+      const tree = await schematicRunner.runSchematic('library', defaultOptions, workspaceTree);
+
+      const { references } = getJsonFileContent(tree, '/tsconfig.json');
+      expect(references).toContain(
+        jasmine.objectContaining({ path: './projects/foo/tsconfig.lib.json' }),
+      );
+      expect(references).toContain(
+        jasmine.objectContaining({ path: './projects/foo/tsconfig.spec.json' }),
+      );
     });
   });
 
