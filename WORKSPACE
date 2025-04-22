@@ -123,22 +123,6 @@ rules_js_register_toolchains(
     node_version = DEFAULT_NODE_VERSION,
 )
 
-load("@build_bazel_rules_nodejs//:index.bzl", "yarn_install")
-
-# TODO(devversion): Remove this once `ng_package` is ported over to `rules_js`.
-yarn_install(
-    name = "npm",
-    data = [
-        "//tools/legacy-rnjs:.yarn/patches/@angular-bazel-https-67c38b3c32.patch",
-        "//tools/legacy-rnjs:.yarn/releases/yarn-4.5.0.cjs",
-        "//tools/legacy-rnjs:.yarnrc.yml",
-    ],
-    exports_directories_only = False,
-    package_json = "//tools/legacy-rnjs:package.json",
-    yarn = "//tools/legacy-rnjs:.yarn/releases/yarn-4.5.0.cjs",
-    yarn_lock = "//tools/legacy-rnjs:yarn.lock",
-)
-
 http_archive(
     name = "aspect_bazel_lib",
     sha256 = "57a777c5d4d0b79ad675995ee20fc1d6d2514a1ef3000d98f5c70cf0c09458a3",
@@ -248,7 +232,7 @@ load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 
 git_repository(
     name = "devinfra",
-    commit = "feae4f916da946bfc789ff5a9203c3536b624277",
+    commit = "4090da1485c668f645a967bde605368bc4d62c5d",
     remote = "https://github.com/angular/dev-infra.git",
 )
 
