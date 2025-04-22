@@ -22,7 +22,6 @@ ts_project(
         "src/*.ts",
     ]),
     data = RUNTIME_ASSETS,
-    module_name = "@angular/create",
     deps = [
         "//:node_modules/@types/node",
         "//packages/angular/cli:angular-cli",

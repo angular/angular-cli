@@ -25,7 +25,6 @@ ts_project(
     data = [
         "//packages/angular/ssr/third_party/beasties:beasties_bundled",
     ],
-    module_name = "@angular/ssr",
     source_map = True,
     tsconfig = "//:build-tsconfig-esm",
     deps = [

@@ -95,7 +95,6 @@ ts_project(
         for (src, _) in ALL_SCHEMA_TARGETS
     ],
     data = RUNTIME_ASSETS,
-    module_name = "@schematics/angular",
     deps = [
         ":node_modules/@angular-devkit/core",
         ":node_modules/@angular-devkit/schematics",

@@ -32,7 +32,6 @@ ts_project(
         "//packages/angular/pwa:pwa/schema.ts",
     ],
     data = RUNTIME_ASSETS,
-    module_name = "@angular/pwa",
     deps = [
         ":node_modules/@angular-devkit/schematics",
         ":node_modules/@schematics/angular",

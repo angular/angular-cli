@@ -18,7 +18,6 @@ ts_project(
             "**/*_spec.ts",
         ],
     ),
-    module_name = "@angular-devkit/core/node",
     deps = [
         "//:node_modules/@types/node",
         "//packages/angular_devkit/core",

@@ -45,7 +45,6 @@ ts_project(
         "//packages/angular_devkit/build_webpack:src/builders/webpack/schema.ts",
     ],
     data = RUNTIME_ASSETS,
-    module_name = "@angular-devkit/build-webpack",
     deps = [
         ":node_modules/@angular-devkit/architect",
         ":node_modules/rxjs",

@@ -30,7 +30,6 @@ ts_project(
         ],
     ) + ["index.ts"],
     data = RUNTIME_ASSETS,
-    module_name = "@angular-devkit/core",
     deps = [
         ":node_modules/ajv",
         ":node_modules/ajv-formats",

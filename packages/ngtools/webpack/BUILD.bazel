@@ -29,7 +29,6 @@ ts_project(
     data = [
         "package.json",
     ],
-    module_name = "@ngtools/webpack",
     deps = [
         ":node_modules/webpack",
         "//:node_modules/@angular/compiler-cli",
