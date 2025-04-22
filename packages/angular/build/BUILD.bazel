@@ -81,7 +81,6 @@ ts_project(
         "//packages/angular/build:src/builders/ng-packagr/schema.ts",
     ],
     data = RUNTIME_ASSETS,
-    module_name = "@angular/build",
     deps = [
         ":node_modules/@ampproject/remapping",
         ":node_modules/@angular-devkit/architect",

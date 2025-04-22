@@ -15,7 +15,6 @@ ts_project(
         include = ["**/*.ts"],
         exclude = ["**/*_spec.ts"],
     ),
-    module_name = "@angular-devkit/architect/node",
     deps = [
         "//:node_modules/@types/node",
         "//packages/angular_devkit/architect",

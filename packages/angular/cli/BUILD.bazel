@@ -43,7 +43,6 @@ ts_project(
         "//packages/angular/cli:src/commands/update/schematic/schema.ts",
     ],
     data = RUNTIME_ASSETS,
-    module_name = "@angular/cli",
     deps = [
         ":node_modules/@angular-devkit/architect",
         ":node_modules/@angular-devkit/core",

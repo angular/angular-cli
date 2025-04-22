@@ -25,7 +25,6 @@ ts_project(
     data = [
         "package.json",
     ],
-    module_name = "@angular-devkit/schematics",
     deps = [
         ":node_modules/@angular-devkit/core",
         ":node_modules/jsonc-parser",

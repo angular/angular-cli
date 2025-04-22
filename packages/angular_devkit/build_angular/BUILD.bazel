@@ -127,7 +127,6 @@ ts_project(
         "//packages/angular_devkit/build_angular:src/builders/web-test-runner/schema.ts",
     ],
     data = RUNTIME_ASSETS,
-    module_name = "@angular-devkit/build-angular",
     deps = [
         ":node_modules/@ampproject/remapping",
         ":node_modules/@angular-devkit/architect",

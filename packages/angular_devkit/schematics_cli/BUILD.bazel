@@ -44,7 +44,6 @@ ts_project(
         "//packages/angular_devkit/schematics_cli:schematic/schema.ts",
     ],
     data = RUNTIME_ASSETS,
-    module_name = "@angular-devkit/schematics-cli",
     deps = [
         ":node_modules/@angular-devkit/core",
         ":node_modules/@angular-devkit/schematics",

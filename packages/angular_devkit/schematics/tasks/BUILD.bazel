@@ -1,4 +1,4 @@
-load("//tools:interop.bzl", "ts_project")
+load("//tools:defaults.bzl", "ts_project")
 
 # Copyright Google Inc. All Rights Reserved.
 #
@@ -18,7 +18,6 @@ ts_project(
         ],
     ),
     data = ["package.json"],
-    module_name = "@angular-devkit/schematics/tasks",
     deps = [
         "//:node_modules/@types/node",
         "//packages/angular_devkit/schematics",

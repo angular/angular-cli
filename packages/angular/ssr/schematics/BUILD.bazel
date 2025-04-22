@@ -57,7 +57,6 @@ ts_project(
         "//packages/angular/ssr/schematics:" + src.replace(".json", ".ts")
         for (src, _) in ALL_SCHEMA_TARGETS
     ],
-    module_name = "@angular/ssr/schematics",
     deps = [
         "//packages/angular/ssr:node_modules/@angular-devkit/schematics",
         "//packages/angular/ssr:node_modules/@schematics/angular",
