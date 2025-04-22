@@ -13,9 +13,9 @@ describe('generate_browserslist', () => {
     it('generates a `browserslist` file', () => {
       expect(generateBrowserslist('2025-03-31').trim()).toBe(
         `
-Chrome >= 107
-ChromeAndroid >= 107
-Edge >= 107
+Chrome >= 105
+ChromeAndroid >= 105
+Edge >= 105
 Firefox >= 104
 FirefoxAndroid >= 104
 Safari >= 16
