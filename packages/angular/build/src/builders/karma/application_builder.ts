@@ -67,32 +67,30 @@ class AngularAssetsMiddleware {
   ) {}
 
   handle(req: IncomingMessage, res: ServerResponse, next: (err?: unknown) => unknown) {
-    let err = null;
-    try {
-      const url = new URL(`http://${req.headers['host']}${req.url}`);
-      // Remove the leading slash from the URL path and convert to platform specific.
-      // The latest build files will use the platform path separator.
-      let pathname = url.pathname.slice(1);
-      if (isWindows) {
-        pathname = pathname.replaceAll(path.posix.sep, path.win32.sep);
-      }
+    const url = new URL(`http://${req.headers['host']}${req.url}`);
+    // Remove the leading slash from the URL path and convert to platform specific.
+    // The latest build files will use the platform path separator.
+    let pathname = url.pathname.slice(1);
+    if (isWindows) {
+      pathname = pathname.replaceAll(path.posix.sep, path.win32.sep);
+    }
 
-      const file = this.latestBuildFiles.files[pathname];
+    const file = this.latestBuildFiles.files[pathname];
+    if (!file) {
+      next();
 
-      if (file?.origin === 'disk') {
+      return;
+    }
+
+    switch (file.origin) {
+      case 'disk':
         this.serveFile(file.inputPath, undefined, res);
-
-        return;
-      } else if (file?.origin === 'memory') {
+        break;
+      case 'memory':
         // Include pathname to help with Content-Type headers.
         this.serveFile(`/unused/${url.pathname}`, undefined, res, undefined, file.contents, true);
-
-        return;
-      }
-    } catch (e) {
-      err = e;
+        break;
     }
-    next(err);
   }
 
   static createPlugin(initialFiles: LatestBuildFiles): InlinePluginDef {
