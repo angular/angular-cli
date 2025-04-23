@@ -1,3 +1,30 @@
+<a name="20.0.0-next.7"></a>
+
+# 20.0.0-next.7 (2025-04-23)
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                      |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------ |
+| [e03f2b899](https://github.com/angular/angular-cli/commit/e03f2b89992cb1e34a57f9cd5beef77674c116b6) | feat | Add global error listeners to new app generation |
+| [672ae14cd](https://github.com/angular/angular-cli/commit/672ae14cd21d02a3b4727e2febd88747b9e4c684) | fix  | drop composite in tsconfig                       |
+| [5e8c6494d](https://github.com/angular/angular-cli/commit/5e8c6494d3eb5a0f61e8b07de4c53233147e9d46) | fix  | relative tsconfig paths in references            |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                                |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------- |
+| [e80963036](https://github.com/angular/angular-cli/commit/e8096303659f4f02ac05fe8f655bb29bc12fda28) | feat | expand browser support policy to widely available Baseline |
+| [566de64cb](https://github.com/angular/angular-cli/commit/566de64cbeebeb532db3c0f4ed1dd607c31dedf1) | fix  | use virtual module for Karma TestBed initialization        |
+
+### @angular/ssr
+
+| Commit                                                                                              | Type | Description                                      |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------ |
+| [8bfcae4c1](https://github.com/angular/angular-cli/commit/8bfcae4c1ba19c9bbd75ddb1ed61ddbf6fa2b76b) | fix  | support `getPrerenderParams` for wildcard routes |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="19.2.9"></a>
 
 # 19.2.9 (2025-04-23)
