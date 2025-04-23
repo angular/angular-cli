@@ -146,6 +146,10 @@ export interface ServerRoutePrerenderWithParams extends Omit<ServerRoutePrerende
    * A function that returns a Promise resolving to an array of objects, each representing a route path with URL parameters.
    * This function runs in the injector context, allowing access to Angular services and dependencies.
    *
+   * It also works for catch-all routes (e.g., `/**`), where the parameter name will be `**` and the return value will be
+   * the segments of the path, such as `/foo/bar`. These routes can also be combined, e.g., `/product/:id/**`,
+   * where both a parameterized segment (`:id`) and a catch-all segment (`**`) can be used together to handle more complex paths.
+   *
    * @returns A Promise resolving to an array where each element is an object with string keys (representing URL parameter names)
    * and string values (representing the corresponding values for those parameters in the route path).
    *
@@ -159,7 +163,17 @@ export interface ServerRoutePrerenderWithParams extends Omit<ServerRoutePrerende
    *       const productService = inject(ProductService);
    *       const ids = await productService.getIds(); // Assuming this returns ['1', '2', '3']
    *
-   *       return ids.map(id => ({ id })); // Generates paths like: [{ id: '1' }, { id: '2' }, { id: '3' }]
+   *       return ids.map(id => ({ id })); // Generates paths like: ['product/1', 'product/2', 'product/3']
+   *     },
+   *   },
+   *   {
+   *     path: '/product/:id/**',
+   *     renderMode: RenderMode.Prerender,
+   *     async getPrerenderParams() {
+   *       return [
+   *         { id: '1', '**': 'laptop/3' },
+   *         { id: '2', '**': 'laptop/4' }
+   *       ]; // Generates paths like: ['product/1/laptop/3', 'product/2/laptop/4']
    *     },
    *   },
    * ];
