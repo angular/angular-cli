@@ -38,6 +38,11 @@ describe('AngularServerApp', () => {
         { path: 'redirect/relative', redirectTo: 'home' },
         { path: 'redirect/:param/relative', redirectTo: 'home' },
         { path: 'redirect/absolute', redirectTo: '/home' },
+        {
+          path: 'redirect-to-function',
+          redirectTo: () => 'home',
+          pathMatch: 'full',
+        },
       ],
       [
         {
@@ -106,25 +111,25 @@ describe('AngularServerApp', () => {
 
       it('should correctly handle top level redirects', async () => {
         const response = await app.handle(new Request('http://localhost/redirect'));
-        expect(response?.headers.get('location')).toContain('/home');
+        expect(response?.headers.get('location')).toBe('/home');
         expect(response?.status).toBe(302);
       });
 
       it('should correctly handle relative nested redirects', async () => {
         const response = await app.handle(new Request('http://localhost/redirect/relative'));
-        expect(response?.headers.get('location')).toContain('/redirect/home');
+        expect(response?.headers.get('location')).toBe('/redirect/home');
         expect(response?.status).toBe(302);
       });
 
       it('should correctly handle relative nested redirects with parameter', async () => {
         const response = await app.handle(new Request('http://localhost/redirect/param/relative'));
-        expect(response?.headers.get('location')).toContain('/redirect/param/home');
+        expect(response?.headers.get('location')).toBe('/redirect/param/home');
         expect(response?.status).toBe(302);
       });
 
       it('should correctly handle absolute nested redirects', async () => {
         const response = await app.handle(new Request('http://localhost/redirect/absolute'));
-        expect(response?.headers.get('location')).toContain('/home');
+        expect(response?.headers.get('location')).toBe('/home');
         expect(response?.status).toBe(302);
       });
 
@@ -251,6 +256,14 @@ describe('AngularServerApp', () => {
       it('should return null for a non-prerendered page', async () => {
         const response = await app.handle(new Request('http://localhost/unknown'));
         expect(response).toBeNull();
+      });
+    });
+
+    describe('SSR pages', () => {
+      it('returns a 302 status and redirects to the correct location when redirectTo is a function', async () => {
+        const response = await app.handle(new Request('http://localhost/redirect-to-function'));
+        expect(response?.headers.get('location')).toBe('/home');
+        expect(response?.status).toBe(302);
       });
     });
   });

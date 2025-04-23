@@ -53,6 +53,16 @@ describe('extractRoutesAndCreateRouteTree', () => {
   });
 
   describe('route configuration validation', () => {
+    it('should error when a redirect uses an invalid status code', async () => {
+      setAngularAppTestingManifest(
+        [{ path: '', redirectTo: () => 'home', pathMatch: 'full' }],
+        [{ path: '', renderMode: RenderMode.Server, status: 404 }],
+      );
+
+      const { errors } = await extractRoutesAndCreateRouteTree({ url });
+      expect(errors[0]).toContain(`The '404' status code is not a valid redirect response code.`);
+    });
+
     it(`should error when a route starts with a '/'`, async () => {
       setAngularAppTestingManifest(
         [{ path: 'home', component: DummyComponent }],
@@ -88,7 +98,7 @@ describe('extractRoutesAndCreateRouteTree', () => {
       );
     });
 
-    it(`should not error when a catch-all route didn't match any Angular route.`, async () => {
+    it(`should not error when a catch-all route didn't match any Angular route`, async () => {
       setAngularAppTestingManifest(
         [{ path: 'home', component: DummyComponent }],
         [

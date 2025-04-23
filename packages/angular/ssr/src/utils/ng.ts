@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
+import { APP_BASE_HREF, PlatformLocation } from '@angular/common';
 import {
   ApplicationRef,
   type PlatformRef,
@@ -19,8 +20,9 @@ import {
   platformServer,
   ɵrenderInternal as renderInternal,
 } from '@angular/platform-server';
+import { Router } from '@angular/router';
 import { Console } from '../console';
-import { stripIndexHtmlFromURL } from './url';
+import { joinUrlParts, stripIndexHtmlFromURL } from './url';
 
 /**
  * Represents the bootstrap mechanism for an Angular application.
@@ -35,20 +37,17 @@ export type AngularBootstrap = Type<unknown> | (() => Promise<ApplicationRef>);
  * Renders an Angular application or module to an HTML string.
  *
  * This function determines whether the provided `bootstrap` value is an Angular module
- * or a bootstrap function and calls the appropriate rendering method (`renderModule` or
- * `renderApplication`) based on that determination.
+ * or a bootstrap function and invokes the appropriate rendering method (`renderModule` or `renderApplication`).
  *
- * @param html - The HTML string to be used as the initial document content.
- * @param bootstrap - Either an Angular module type or a function that returns a promise
- *                    resolving to an `ApplicationRef`.
- * @param url - The URL of the application. This is used for server-side rendering to
- *              correctly handle route-based rendering.
- * @param platformProviders - An array of platform providers to be used during the
- *                             rendering process.
- * @param serverContext - A string representing the server context, used to provide additional
- *                        context or metadata during server-side rendering.
- * @returns A promise resolving to an object containing a `content` method, which returns a
- *          promise that resolves to the rendered HTML string.
+ * @param html - The initial HTML document content.
+ * @param bootstrap - An Angular module type or a function returning a promise that resolves to an `ApplicationRef`.
+ * @param url - The application URL, used for route-based rendering in SSR.
+ * @param platformProviders - An array of platform providers for the rendering process.
+ * @param serverContext - A string representing the server context, providing additional metadata for SSR.
+ * @returns A promise resolving to an object containing:
+ *          - `hasNavigationError`: Indicates if a navigation error occurred.
+ *          - `redirectTo`: (Optional) The redirect URL if a navigation redirect occurred.
+ *          - `content`: A function returning a promise that resolves to the rendered HTML string.
  */
 export async function renderAngular(
   html: string,
@@ -56,7 +55,7 @@ export async function renderAngular(
   url: URL,
   platformProviders: StaticProvider[],
   serverContext: string,
-): Promise<{ content: () => Promise<string> }> {
+): Promise<{ hasNavigationError: boolean; redirectTo?: string; content: () => Promise<string> }> {
   // A request to `http://www.example.com/page/index.html` will render the Angular route corresponding to `http://www.example.com/page`.
   const urlToRender = stripIndexHtmlFromURL(url).toString();
   const platformRef = platformServer([
@@ -82,6 +81,9 @@ export async function renderAngular(
     ...platformProviders,
   ]);
 
+  let redirectTo: string | undefined;
+  let hasNavigationError = true;
+
   try {
     let applicationRef: ApplicationRef;
     if (isNgModule(bootstrap)) {
@@ -94,7 +96,29 @@ export async function renderAngular(
     // Block until application is stable.
     await applicationRef.whenStable();
 
+    // TODO(alanagius): Find a way to avoid rendering here especially for redirects as any output will be discarded.
+    const envInjector = applicationRef.injector;
+    const router = envInjector.get(Router);
+    const lastSuccessfulNavigation = router.lastSuccessfulNavigation;
+
+    if (lastSuccessfulNavigation?.finalUrl) {
+      hasNavigationError = false;
+
+      const { finalUrl, initialUrl } = lastSuccessfulNavigation;
+      const finalUrlStringified = finalUrl.toString();
+
+      if (initialUrl.toString() !== finalUrlStringified) {
+        const baseHref =
+          envInjector.get(APP_BASE_HREF, null, { optional: true }) ??
+          envInjector.get(PlatformLocation).getBaseHrefFromDOM();
+
+        redirectTo = joinUrlParts(baseHref, finalUrlStringified);
+      }
+    }
+
     return {
+      hasNavigationError,
+      redirectTo,
       content: () =>
         new Promise<string>((resolve, reject) => {
           // Defer rendering to the next event loop iteration to avoid blocking, as most operations in `renderInternal` are synchronous.
@@ -110,6 +134,10 @@ export async function renderAngular(
     await asyncDestroyPlatform(platformRef);
 
     throw error;
+  } finally {
+    if (hasNavigationError || redirectTo) {
+      void asyncDestroyPlatform(platformRef);
+    }
   }
 }
 
@@ -134,7 +162,10 @@ export function isNgModule(value: AngularBootstrap): value is Type<unknown> {
 function asyncDestroyPlatform(platformRef: PlatformRef): Promise<void> {
   return new Promise((resolve) => {
     setTimeout(() => {
-      platformRef.destroy();
+      if (!platformRef.destroyed) {
+        platformRef.destroy();
+      }
+
       resolve();
     }, 0);
   });
