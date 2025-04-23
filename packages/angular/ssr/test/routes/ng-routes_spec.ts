@@ -68,26 +68,6 @@ describe('extractRoutesAndCreateRouteTree', () => {
       );
     });
 
-    it("should error when 'getPrerenderParams' is used with a '**' route", async () => {
-      setAngularAppTestingManifest(
-        [{ path: 'home', component: DummyComponent }],
-        [
-          {
-            path: '**',
-            renderMode: RenderMode.Prerender,
-            getPrerenderParams() {
-              return Promise.resolve([]);
-            },
-          },
-        ],
-      );
-
-      const { errors } = await extractRoutesAndCreateRouteTree({ url });
-      expect(errors[0]).toContain(
-        "Invalid '**' route configuration: 'getPrerenderParams' cannot be used with a '*' or '**' route.",
-      );
-    });
-
     it("should error when 'getPrerenderParams' is used with a '*' route", async () => {
       setAngularAppTestingManifest(
         [{ path: 'invalid/:id', component: DummyComponent }],
@@ -104,7 +84,7 @@ describe('extractRoutesAndCreateRouteTree', () => {
 
       const { errors } = await extractRoutesAndCreateRouteTree({ url });
       expect(errors[0]).toContain(
-        "Invalid 'invalid/*' route configuration: 'getPrerenderParams' cannot be used with a '*' or '**' route.",
+        "Invalid 'invalid/*' route configuration: 'getPrerenderParams' cannot be used with a '*' route.",
       );
     });
 
@@ -259,7 +239,7 @@ describe('extractRoutesAndCreateRouteTree', () => {
       ]);
     });
 
-    it('should resolve parameterized routes for SSG and not add a fallback route if fallback is None', async () => {
+    it('should resolve parameterized routes for SSG add a fallback route if fallback is Server', async () => {
       setAngularAppTestingManifest(
         [
           { path: 'home', component: DummyComponent },
@@ -293,6 +273,44 @@ describe('extractRoutesAndCreateRouteTree', () => {
           route: '/user/jane/role/writer',
           renderMode: RenderMode.Prerender,
         },
+      ]);
+    });
+
+    it('should resolve catch all routes for SSG and add a fallback route if fallback is Server', async () => {
+      setAngularAppTestingManifest(
+        [
+          { path: 'home', component: DummyComponent },
+          { path: 'user/:name/**', component: DummyComponent },
+        ],
+        [
+          {
+            path: 'user/:name/**',
+            renderMode: RenderMode.Prerender,
+            fallback: PrerenderFallback.Server,
+            async getPrerenderParams() {
+              return [
+                { name: 'joe', '**': 'role/admin' },
+                { name: 'jane', '**': 'role/writer' },
+              ];
+            },
+          },
+          { path: '**', renderMode: RenderMode.Server },
+        ],
+      );
+
+      const { routeTree, errors } = await extractRoutesAndCreateRouteTree({
+        url,
+        invokeGetPrerenderParams: true,
+      });
+      expect(errors).toHaveSize(0);
+      expect(routeTree.toObject()).toEqual([
+        { route: '/home', renderMode: RenderMode.Server },
+        { route: '/user/joe/role/admin', renderMode: RenderMode.Prerender },
+        {
+          route: '/user/jane/role/writer',
+          renderMode: RenderMode.Prerender,
+        },
+        { route: '/user/*/**', renderMode: RenderMode.Server },
       ]);
     });
 
