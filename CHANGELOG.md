@@ -1,3 +1,21 @@
+<a name="20.0.0-next.8"></a>
+
+# 20.0.0-next.8 (2025-04-23)
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                            |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------ |
+| [0ab1ddf63](https://github.com/angular/angular-cli/commit/0ab1ddf632b7305db28a2f87f5c6b099a44669f6) | feat | generate libraries using TypeScript project references |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                  |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------- |
+| [12def3a2e](https://github.com/angular/angular-cli/commit/12def3a2e907ca8e7d530cea1b39bba90e153144) | feat | add experimental vitest unit-testing support |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="20.0.0-next.7"></a>
 
 # 20.0.0-next.7 (2025-04-23)
