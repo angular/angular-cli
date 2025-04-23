@@ -436,8 +436,8 @@ importers:
         specifier: 4.3.0
         version: 4.3.0
       ng-packagr:
-        specifier: 20.0.0-next.6
-        version: 20.0.0-next.6(@angular/compiler-cli@20.0.0-next.7(@angular/compiler@20.0.0-next.7)(typescript@5.8.3))(tslib@2.8.1)(typescript@5.8.3)
+        specifier: 20.0.0-next.8
+        version: 20.0.0-next.8(@angular/compiler-cli@20.0.0-next.7(@angular/compiler@20.0.0-next.7)(typescript@5.8.3))(tslib@2.8.1)(typescript@5.8.3)
       postcss:
         specifier: 8.5.3
         version: 8.5.3
@@ -752,8 +752,8 @@ importers:
         specifier: 3.0.4
         version: 3.0.4
       ng-packagr:
-        specifier: 20.0.0-next.6
-        version: 20.0.0-next.6(@angular/compiler-cli@20.0.0-next.7(@angular/compiler@20.0.0-next.7)(typescript@5.8.3))(tslib@2.8.1)(typescript@5.8.3)
+        specifier: 20.0.0-next.8
+        version: 20.0.0-next.8(@angular/compiler-cli@20.0.0-next.7(@angular/compiler@20.0.0-next.7)(typescript@5.8.3))(tslib@2.8.1)(typescript@5.8.3)
       undici:
         specifier: 7.8.0
         version: 7.8.0
@@ -5947,8 +5947,8 @@ packages:
     resolution: {integrity: sha512-dBpDMdxv9Irdq66304OLfEmQ9tbNRFnFTuZiLo+bD+r332bBmMJ8GBLXklIXXgxd3+v9+KUnZaUR5PJMa75Gsg==}
     engines: {node: '>= 0.4.0'}
 
-  ng-packagr@20.0.0-next.6:
-    resolution: {integrity: sha512-naul5aMAJRla4Mj40bc9ku7FyJu6cZyl+/2D+U8FukorRdwjf2Db4C3RMtjtkKNIBEfHmADOyJmvuevQnxiTKQ==}
+  ng-packagr@20.0.0-next.8:
+    resolution: {integrity: sha512-jmvpjZ0YTW54zc5bRLI+i2SULrx8SxSccpa6lR8PlCPj/6hRbOwWz5YpDbhhDJRzflb1TXB7M29z/Ux18ghe+g==}
     engines: {node: ^20.11.1 || >=22.11.0}
     hasBin: true
     peerDependencies:
@@ -5972,6 +5972,7 @@ packages:
   node-domexception@1.0.0:
     resolution: {integrity: sha512-/jKZoMpw0F8GRwl4/eLROPA3cfcXtLApP0QzLmUT/HuPCZWyB7IY9ZrMeKw2O/nFIqPQB3PVM9aYm0F312AXDQ==}
     engines: {node: '>=10.5.0'}
+    deprecated: Use your platform's native DOMException instead
 
   node-fetch-native@1.6.6:
     resolution: {integrity: sha512-8Mc2HhqPdlIfedsuZoc3yioPuzp6b+L5jRCRY1QzuWZh2EGJVQrGppC6V6cF0bLdbW0+O2YpqCA25aF/1lvipQ==}
@@ -13816,7 +13817,7 @@ snapshots:
 
   netmask@2.0.2: {}
 
-  ng-packagr@20.0.0-next.6(@angular/compiler-cli@20.0.0-next.7(@angular/compiler@20.0.0-next.7)(typescript@5.8.3))(tslib@2.8.1)(typescript@5.8.3):
+  ng-packagr@20.0.0-next.8(@angular/compiler-cli@20.0.0-next.7(@angular/compiler@20.0.0-next.7)(typescript@5.8.3))(tslib@2.8.1)(typescript@5.8.3):
     dependencies:
       '@ampproject/remapping': 2.3.0
       '@angular/compiler-cli': 20.0.0-next.7(@angular/compiler@20.0.0-next.7)(typescript@5.8.3)
