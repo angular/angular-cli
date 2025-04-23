@@ -174,15 +174,7 @@ export class AngularServerApp {
 
     const { redirectTo, status, renderMode } = matchedRoute;
     if (redirectTo !== undefined) {
-      return new Response(null, {
-        // Note: The status code is validated during route extraction.
-        // 302 Found is used by default for redirections
-        // See: https://developer.mozilla.org/en-US/docs/Web/API/Response/redirect_static#status
-        status: status ?? 302,
-        headers: {
-          'Location': buildPathWithParams(redirectTo, url.pathname),
-        },
-      });
+      return createRedirectResponse(buildPathWithParams(redirectTo, url.pathname), status);
     }
 
     if (renderMode === RenderMode.Prerender) {
@@ -324,7 +316,7 @@ export class AngularServerApp {
     let html = await assets.getIndexServerHtml().text();
     html = await this.runTransformsOnHtml(html, url, preload);
 
-    const { content } = await renderAngular(
+    const result = await renderAngular(
       html,
       this.boostrap,
       url,
@@ -332,12 +324,20 @@ export class AngularServerApp {
       SERVER_CONTEXT_VALUE[renderMode],
     );
 
+    if (result.hasNavigationError) {
+      return null;
+    }
+
+    if (result.redirectTo) {
+      return createRedirectResponse(result.redirectTo, status);
+    }
+
     const { inlineCriticalCssProcessor, criticalCssLRUCache, textDecoder } = this;
 
     // Use a stream to send the response before finishing rendering and inling critical CSS, improving performance via header flushing.
     const stream = new ReadableStream({
       async start(controller) {
-        const renderedHtml = await content();
+        const renderedHtml = await result.content();
 
         if (!inlineCriticalCssProcessor) {
           controller.enqueue(textDecoder.encode(renderedHtml));
@@ -483,4 +483,21 @@ function appendPreloadHintsToHtml(html: string, preload: readonly string[]): str
     ...preload.map((val) => `<link rel="modulepreload" href="${val}">`),
     html.slice(bodyCloseIdx),
   ].join('\n');
+}
+
+/**
+ * Creates an HTTP redirect response with a specified location and status code.
+ *
+ * @param location - The URL to which the response should redirect.
+ * @param status - The HTTP status code for the redirection. Defaults to 302 (Found).
+ *                 See: https://developer.mozilla.org/en-US/docs/Web/API/Response/redirect_static#status
+ * @returns A `Response` object representing the HTTP redirect.
+ */
+function createRedirectResponse(location: string, status = 302): Response {
+  return new Response(null, {
+    status,
+    headers: {
+      'Location': location,
+    },
+  });
 }

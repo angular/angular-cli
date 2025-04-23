@@ -160,15 +160,20 @@ async function* handleRoute(options: {
         invokeGetPrerenderParams,
         includePrerenderFallbackRoutes,
       );
-    } else if (typeof redirectTo === 'string') {
+    } else if (redirectTo !== undefined) {
       if (metadata.status && !VALID_REDIRECT_RESPONSE_CODES.has(metadata.status)) {
         yield {
           error:
             `The '${metadata.status}' status code is not a valid redirect response code. ` +
             `Please use one of the following redirect response codes: ${[...VALID_REDIRECT_RESPONSE_CODES.values()].join(', ')}.`,
         };
+      } else if (typeof redirectTo === 'string') {
+        yield {
+          ...metadata,
+          redirectTo: resolveRedirectTo(metadata.route, redirectTo),
+        };
       } else {
-        yield { ...metadata, redirectTo: resolveRedirectTo(metadata.route, redirectTo) };
+        yield metadata;
       }
     } else {
       yield metadata;
