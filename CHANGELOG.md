@@ -1,3 +1,27 @@
+<a name="19.2.9"></a>
+
+# 19.2.9 (2025-04-23)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                            |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------- |
+| [de52cc2c8](https://github.com/angular/angular-cli/commit/de52cc2c813e49a06828ff9e9ef0543fa63a9929) | fix  | update http-proxy-middleware to v3.0.5 |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                             |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------- |
+| [cc5229a45](https://github.com/angular/angular-cli/commit/cc5229a4507848d4d2bcf7409ffa56a7c4b2a136) | fix  | pass `preserveSymlinks` option to Karma esbuild builder |
+
+### @angular/ssr
+
+| Commit                                                                                              | Type | Description                                      |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------ |
+| [a4e415ea6](https://github.com/angular/angular-cli/commit/a4e415ea6ab204b6d5f5974c6f0a073d66c40faf) | fix  | support `getPrerenderParams` for wildcard routes |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="18.2.19"></a>
 
 # 18.2.19 (2025-04-23)
