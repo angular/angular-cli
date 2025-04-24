@@ -18,6 +18,14 @@
       "description": "The name of the test runner to use for test execution.",
       "enum": ["vitest"]
     },
+    "browsers": {
+      "description": "A list of browsers to use for test execution. If undefined, jsdom on Node.js will be used instead of a browser.",
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1
+    },
     "include": {
       "type": "array",
       "items": {
