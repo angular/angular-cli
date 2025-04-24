@@ -9,6 +9,7 @@
 import type { BuilderContext, BuilderOutput } from '@angular-devkit/architect';
 import assert from 'node:assert';
 import { randomUUID } from 'node:crypto';
+import { createRequire } from 'node:module';
 import path from 'node:path';
 import { createVirtualModulePlugin } from '../../tools/esbuild/virtual-module-plugin';
 import { loadEsmModule } from '../../utils/load-esm';
@@ -133,6 +134,28 @@ export async function* execute(
 
   let instance: import('vitest/node').Vitest | undefined;
 
+  // Setup vitest browser options if configured
+  let browser: import('vitest/node').BrowserConfigOptions | undefined;
+  if (normalizedOptions.browsers) {
+    const provider = findBrowserProvider(projectSourceRoot);
+    if (!provider) {
+      context.logger.error(
+        'The "browsers" option requires either "playwright" or "webdriverio" to be installed within the project.' +
+          ' Please install one of these packages and rerun the test command.',
+      );
+
+      return { success: false };
+    }
+
+    browser = {
+      enabled: true,
+      provider,
+      instances: normalizedOptions.browsers.map((browserName) => ({
+        browser: browserName,
+      })),
+    };
+  }
+
   for await (const result of buildApplicationInternal(buildOptions, context, extensions)) {
     if (result.kind === ResultKind.Failure) {
       continue;
@@ -153,8 +176,11 @@ export async function* execute(
       test: {
         root: outputPath,
         setupFiles,
-        environment: 'jsdom',
+        // Use `jsdom` if no browsers are explicitly configured.
+        // `node` is effectively no "environment" and the default.
+        environment: browser ? 'node' : 'jsdom',
         watch: normalizedOptions.watch,
+        browser,
         coverage: {
           enabled: normalizedOptions.codeCoverage,
           exclude: normalizedOptions.codeCoverageExclude,
@@ -167,5 +193,22 @@ export async function* execute(
     const testModules = instance.state.getTestModules();
 
     yield { success: testModules.every((testModule) => testModule.ok()) };
+  }
+}
+
+function findBrowserProvider(
+  projectSourceRoot: string,
+): import('vitest/node').BrowserBuiltinProvider | undefined {
+  const projectResolver = createRequire(projectSourceRoot + '/').resolve;
+
+  // These must be installed in the project to be used
+  const vitestBuiltinProviders = ['playwright', 'webdriverio'] as const;
+
+  for (const providerName of vitestBuiltinProviders) {
+    try {
+      projectResolver(providerName);
+
+      return providerName;
+    } catch {}
   }
 }
