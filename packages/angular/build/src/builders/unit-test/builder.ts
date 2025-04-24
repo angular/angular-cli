@@ -22,6 +22,7 @@ import { ResultKind } from '../application/results';
 import { OutputHashing } from '../application/schema';
 import { writeTestFiles } from '../karma/application_builder';
 import { findTests, getTestEntrypoints } from '../karma/find-tests';
+import { useKarmaBuilder } from './karma-bridge';
 import { normalizeOptions } from './options';
 import type { Schema as UnitTestOptions } from './schema';
 
@@ -51,6 +52,14 @@ export async function* execute(
 
   const normalizedOptions = await normalizeOptions(context, projectName, options);
   const { projectSourceRoot, workspaceRoot, runnerName } = normalizedOptions;
+
+  // Translate options and use karma builder directly if specified
+  if (runnerName === 'karma') {
+    const karmaBridge = await useKarmaBuilder(context, normalizedOptions);
+    yield* karmaBridge;
+
+    return;
+  }
 
   if (runnerName !== 'vitest') {
     context.logger.error('Unknown test runner: ' + runnerName);

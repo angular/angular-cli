@@ -16,7 +16,7 @@
     "runner": {
       "type": "string",
       "description": "The name of the test runner to use for test execution.",
-      "enum": ["vitest"]
+      "enum": ["karma", "vitest"]
     },
     "browsers": {
       "description": "A list of browsers to use for test execution. If undefined, jsdom on Node.js will be used instead of a browser.",
