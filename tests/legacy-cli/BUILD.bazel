@@ -1,5 +1,5 @@
 load("@aspect_bazel_lib//lib:directory_path.bzl", "directory_path")
-load("@npm2//:rollup/package_json.bzl", rollup = "bin")
+load("@npm//:rollup/package_json.bzl", rollup = "bin")
 load("//tools:defaults.bzl", "ts_project")
 load(":e2e.bzl", "e2e_suites")
 

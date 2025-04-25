@@ -1,4 +1,4 @@
-load("@npm2//:defs.bzl", "npm_link_all_packages")
+load("@npm//:defs.bzl", "npm_link_all_packages")
 
 # Copyright Google Inc. All Rights Reserved.
 #

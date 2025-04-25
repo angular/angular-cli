@@ -1,5 +1,5 @@
 load("@devinfra//bazel/api-golden:index_rjs.bzl", "api_golden_test_npm_package")
-load("@npm2//:defs.bzl", "npm_link_all_packages")
+load("@npm//:defs.bzl", "npm_link_all_packages")
 load("//:constants.bzl", "BASELINE_DATE")
 load("//tools:defaults.bzl", "copy_to_bin", "jasmine_test", "npm_package", "ts_project")
 load("//tools:ts_json_schema.bzl", "ts_json_schema")
