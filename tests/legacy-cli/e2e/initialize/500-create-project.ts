@@ -35,6 +35,7 @@ export default async function () {
           main: build.options.browser,
           browser: undefined,
           outputPath: 'dist/test-project/browser',
+          index: 'src/index.html',
         };
 
         build.configurations.development = {

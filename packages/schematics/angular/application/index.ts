@@ -256,7 +256,6 @@ function addAppToWorkspaceFile(
         builder: Builders.BuildApplication,
         defaultConfiguration: 'production',
         options: {
-          index: `${sourceRoot}/index.html`,
           browser: `${sourceRoot}/main.ts`,
           polyfills: options.zoneless ? undefined : ['zone.js'],
           tsConfig: `${projectRoot}tsconfig.app.json`,
