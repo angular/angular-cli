@@ -24,6 +24,7 @@ export default async function () {
         browser: undefined,
         buildOptimizer: false,
         outputPath: 'dist/test-project-two',
+        index: 'src/index.html',
       };
 
       build.configurations.development = {

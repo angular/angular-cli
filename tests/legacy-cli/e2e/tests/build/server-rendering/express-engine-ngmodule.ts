@@ -32,6 +32,7 @@ export default async function () {
         ...build.options,
         main: build.options.browser,
         browser: undefined,
+        index: 'src/index.html',
       };
 
       build.configurations.development = {
