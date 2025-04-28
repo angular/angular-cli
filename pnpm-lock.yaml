@@ -18,8 +18,8 @@ importers:
         specifier: 20.0.0-next.8
         version: 20.0.0-next.8(@angular/common@20.0.0-next.8(@angular/core@20.0.0-next.8(@angular/compiler@20.0.0-next.8)(rxjs@7.8.2)(zone.js@0.15.0))(rxjs@7.8.2))(@angular/core@20.0.0-next.8(@angular/compiler@20.0.0-next.8)(rxjs@7.8.2)(zone.js@0.15.0))
       '@angular/cdk':
-        specifier: 20.0.0-next.7
-        version: 20.0.0-next.7(@angular/common@20.0.0-next.8(@angular/core@20.0.0-next.8(@angular/compiler@20.0.0-next.8)(rxjs@7.8.2)(zone.js@0.15.0))(rxjs@7.8.2))(@angular/core@20.0.0-next.8(@angular/compiler@20.0.0-next.8)(rxjs@7.8.2)(zone.js@0.15.0))(rxjs@7.8.2)
+        specifier: 20.0.0-next.8
+        version: 20.0.0-next.8(@angular/common@20.0.0-next.8(@angular/core@20.0.0-next.8(@angular/compiler@20.0.0-next.8)(rxjs@7.8.2)(zone.js@0.15.0))(rxjs@7.8.2))(@angular/core@20.0.0-next.8(@angular/compiler@20.0.0-next.8)(rxjs@7.8.2)(zone.js@0.15.0))(rxjs@7.8.2)
       '@angular/common':
         specifier: 20.0.0-next.8
         version: 20.0.0-next.8(@angular/core@20.0.0-next.8(@angular/compiler@20.0.0-next.8)(rxjs@7.8.2)(zone.js@0.15.0))(rxjs@7.8.2)
@@ -39,11 +39,11 @@ importers:
         specifier: 20.0.0-next.8
         version: 20.0.0-next.8(@angular/compiler-cli@20.0.0-next.8(@angular/compiler@20.0.0-next.8)(typescript@5.8.3))(@angular/compiler@20.0.0-next.8)
       '@angular/material':
-        specifier: 20.0.0-next.7
-        version: 20.0.0-next.7(4364ahp6ca6ngxb64n34iirp34)
+        specifier: 20.0.0-next.8
+        version: 20.0.0-next.8(xkh3rgfd6kh4s63neut5dc6bd4)
       '@angular/ng-dev':
-        specifier: https://github.com/angular/dev-infra-private-ng-dev-builds.git#a2f15a74df60d01395a3694ea1b7f9572f75343e
-        version: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/a2f15a74df60d01395a3694ea1b7f9572f75343e(encoding@0.1.13)
+        specifier: https://github.com/angular/dev-infra-private-ng-dev-builds.git#716f2825babbb756d3fb9cf3485f8e341c4fbe99
+        version: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/716f2825babbb756d3fb9cf3485f8e341c4fbe99(encoding@0.1.13)
       '@angular/platform-browser':
         specifier: 20.0.0-next.8
         version: 20.0.0-next.8(@angular/animations@20.0.0-next.8(@angular/common@20.0.0-next.8(@angular/core@20.0.0-next.8(@angular/compiler@20.0.0-next.8)(rxjs@7.8.2)(zone.js@0.15.0))(rxjs@7.8.2))(@angular/core@20.0.0-next.8(@angular/compiler@20.0.0-next.8)(rxjs@7.8.2)(zone.js@0.15.0)))(@angular/common@20.0.0-next.8(@angular/core@20.0.0-next.8(@angular/compiler@20.0.0-next.8)(rxjs@7.8.2)(zone.js@0.15.0))(rxjs@7.8.2))(@angular/core@20.0.0-next.8(@angular/compiler@20.0.0-next.8)(rxjs@7.8.2)(zone.js@0.15.0))
@@ -911,8 +911,8 @@ packages:
       '@angular/common': 20.0.0-next.8
       '@angular/core': 20.0.0-next.8
 
-  '@angular/cdk@20.0.0-next.7':
-    resolution: {integrity: sha512-a8o/WcUnEfEcv/3h6pbnkcG62l79tfWBNtcgPQHuJWNo+12B0kUnFsadkFFoGxeEmNDKNdFFWQYrcG3iWPDgNg==}
+  '@angular/cdk@20.0.0-next.8':
+    resolution: {integrity: sha512-QDI5TOdnfzBXrhbmv68NV0PqqikpEDHaiVkt742XB3XY9MjgVNH0D9fdQucn+vzfEhWs9lABuxXY/IBdI7iqaQ==}
     peerDependencies:
       '@angular/common': ^20.0.0-0 || ^20.1.0-0 || ^20.2.0-0 || ^20.3.0-0 || ^21.0.0-0
       '@angular/core': ^20.0.0-0 || ^20.1.0-0 || ^20.2.0-0 || ^20.3.0-0 || ^21.0.0-0
@@ -965,19 +965,19 @@ packages:
       '@angular/compiler': 20.0.0-next.8
       '@angular/compiler-cli': 20.0.0-next.8
 
-  '@angular/material@20.0.0-next.7':
-    resolution: {integrity: sha512-l8k3z6lRWSFef74QZsfouxztKFcOWNEmwvfAmwQIFLllawLEkni4wGt5TrHLxiU9ttxdoSJ0cePEAKmWpkrIAQ==}
+  '@angular/material@20.0.0-next.8':
+    resolution: {integrity: sha512-KNUTlYILituqHptwgWn7YVzWJ26LybJF48XfJKEb2EhMIyz1Hkw9LkE8AZTvspCqaX3nJSqURcN5vmeXfWy9tw==}
     peerDependencies:
-      '@angular/cdk': 20.0.0-next.7
+      '@angular/cdk': 20.0.0-next.8
       '@angular/common': ^20.0.0-0 || ^20.1.0-0 || ^20.2.0-0 || ^20.3.0-0 || ^21.0.0-0
       '@angular/core': ^20.0.0-0 || ^20.1.0-0 || ^20.2.0-0 || ^20.3.0-0 || ^21.0.0-0
       '@angular/forms': ^20.0.0-0 || ^20.1.0-0 || ^20.2.0-0 || ^20.3.0-0 || ^21.0.0-0
       '@angular/platform-browser': ^20.0.0-0 || ^20.1.0-0 || ^20.2.0-0 || ^20.3.0-0 || ^21.0.0-0
       rxjs: ^6.5.3 || ^7.4.0
 
-  '@angular/ng-dev@https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/a2f15a74df60d01395a3694ea1b7f9572f75343e':
-    resolution: {tarball: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/a2f15a74df60d01395a3694ea1b7f9572f75343e}
-    version: 0.0.0-fec9cb5488198bc741f06afab62e5b3c56e9541a
+  '@angular/ng-dev@https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/716f2825babbb756d3fb9cf3485f8e341c4fbe99':
+    resolution: {tarball: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/716f2825babbb756d3fb9cf3485f8e341c4fbe99}
+    version: 0.0.0-46b594244e02f9c26b67f22d1756bae31230e517
     hasBin: true
 
   '@angular/platform-browser@20.0.0-next.8':
@@ -8251,7 +8251,7 @@ snapshots:
       '@angular/core': 20.0.0-next.8(@angular/compiler@20.0.0-next.8)(rxjs@7.8.2)(zone.js@0.15.0)
       tslib: 2.8.1
 
-  '@angular/cdk@20.0.0-next.7(@angular/common@20.0.0-next.8(@angular/core@20.0.0-next.8(@angular/compiler@20.0.0-next.8)(rxjs@7.8.2)(zone.js@0.15.0))(rxjs@7.8.2))(@angular/core@20.0.0-next.8(@angular/compiler@20.0.0-next.8)(rxjs@7.8.2)(zone.js@0.15.0))(rxjs@7.8.2)':
+  '@angular/cdk@20.0.0-next.8(@angular/common@20.0.0-next.8(@angular/core@20.0.0-next.8(@angular/compiler@20.0.0-next.8)(rxjs@7.8.2)(zone.js@0.15.0))(rxjs@7.8.2))(@angular/core@20.0.0-next.8(@angular/compiler@20.0.0-next.8)(rxjs@7.8.2)(zone.js@0.15.0))(rxjs@7.8.2)':
     dependencies:
       '@angular/common': 20.0.0-next.8(@angular/core@20.0.0-next.8(@angular/compiler@20.0.0-next.8)(rxjs@7.8.2)(zone.js@0.15.0))(rxjs@7.8.2)
       '@angular/core': 20.0.0-next.8(@angular/compiler@20.0.0-next.8)(rxjs@7.8.2)(zone.js@0.15.0)
@@ -8311,9 +8311,9 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@angular/material@20.0.0-next.7(4364ahp6ca6ngxb64n34iirp34)':
+  '@angular/material@20.0.0-next.8(xkh3rgfd6kh4s63neut5dc6bd4)':
     dependencies:
-      '@angular/cdk': 20.0.0-next.7(@angular/common@20.0.0-next.8(@angular/core@20.0.0-next.8(@angular/compiler@20.0.0-next.8)(rxjs@7.8.2)(zone.js@0.15.0))(rxjs@7.8.2))(@angular/core@20.0.0-next.8(@angular/compiler@20.0.0-next.8)(rxjs@7.8.2)(zone.js@0.15.0))(rxjs@7.8.2)
+      '@angular/cdk': 20.0.0-next.8(@angular/common@20.0.0-next.8(@angular/core@20.0.0-next.8(@angular/compiler@20.0.0-next.8)(rxjs@7.8.2)(zone.js@0.15.0))(rxjs@7.8.2))(@angular/core@20.0.0-next.8(@angular/compiler@20.0.0-next.8)(rxjs@7.8.2)(zone.js@0.15.0))(rxjs@7.8.2)
       '@angular/common': 20.0.0-next.8(@angular/core@20.0.0-next.8(@angular/compiler@20.0.0-next.8)(rxjs@7.8.2)(zone.js@0.15.0))(rxjs@7.8.2)
       '@angular/core': 20.0.0-next.8(@angular/compiler@20.0.0-next.8)(rxjs@7.8.2)(zone.js@0.15.0)
       '@angular/forms': 20.0.0-next.8(@angular/common@20.0.0-next.8(@angular/core@20.0.0-next.8(@angular/compiler@20.0.0-next.8)(rxjs@7.8.2)(zone.js@0.15.0))(rxjs@7.8.2))(@angular/core@20.0.0-next.8(@angular/compiler@20.0.0-next.8)(rxjs@7.8.2)(zone.js@0.15.0))(@angular/platform-browser@20.0.0-next.8(@angular/animations@20.0.0-next.8(@angular/common@20.0.0-next.8(@angular/core@20.0.0-next.8(@angular/compiler@20.0.0-next.8)(rxjs@7.8.2)(zone.js@0.15.0))(rxjs@7.8.2))(@angular/core@20.0.0-next.8(@angular/compiler@20.0.0-next.8)(rxjs@7.8.2)(zone.js@0.15.0)))(@angular/common@20.0.0-next.8(@angular/core@20.0.0-next.8(@angular/compiler@20.0.0-next.8)(rxjs@7.8.2)(zone.js@0.15.0))(rxjs@7.8.2))(@angular/core@20.0.0-next.8(@angular/compiler@20.0.0-next.8)(rxjs@7.8.2)(zone.js@0.15.0)))(rxjs@7.8.2)
@@ -8321,7 +8321,7 @@ snapshots:
       rxjs: 7.8.2
       tslib: 2.8.1
 
-  '@angular/ng-dev@https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/a2f15a74df60d01395a3694ea1b7f9572f75343e(encoding@0.1.13)':
+  '@angular/ng-dev@https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/716f2825babbb756d3fb9cf3485f8e341c4fbe99(encoding@0.1.13)':
     dependencies:
       '@google-cloud/spanner': 7.19.1(encoding@0.1.13)(supports-color@10.0.0)
       '@octokit/rest': 21.1.1
