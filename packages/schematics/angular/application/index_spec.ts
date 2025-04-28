@@ -138,6 +138,22 @@ describe('Application Schematic', () => {
     );
   });
 
+  it('should not add spec project reference in the root tsconfig.json with "minimal" enabled', async () => {
+    const tree = await schematicRunner.runSchematic(
+      'application',
+      { ...defaultOptions, minimal: true },
+      workspaceTree,
+    );
+
+    const { references } = readJsonFile(tree, '/tsconfig.json');
+    expect(references).toContain(
+      jasmine.objectContaining({ path: './projects/foo/tsconfig.app.json' }),
+    );
+    expect(references).not.toContain(
+      jasmine.objectContaining({ path: './projects/foo/tsconfig.spec.json' }),
+    );
+  });
+
   it('should install npm dependencies when `skipInstall` is false', async () => {
     await schematicRunner.runSchematic(
       'application',
