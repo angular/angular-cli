@@ -9,6 +9,7 @@
 import { type BuilderContext, targetFromTargetString } from '@angular-devkit/architect';
 import path from 'node:path';
 import { normalizeCacheOptions } from '../../utils/normalize-cache';
+import { getProjectRootPaths } from '../../utils/project-metadata';
 import type { Schema as UnitTestOptions } from './schema';
 
 export type NormalizedUnitTestOptions = Awaited<ReturnType<typeof normalizeOptions>>;
@@ -21,12 +22,7 @@ export async function normalizeOptions(
   // Setup base paths based on workspace root and project information
   const workspaceRoot = context.workspaceRoot;
   const projectMetadata = await context.getProjectMetadata(projectName);
-  const projectRoot = normalizeDirectoryPath(
-    path.join(workspaceRoot, (projectMetadata.root as string | undefined) ?? ''),
-  );
-  const projectSourceRoot = normalizeDirectoryPath(
-    path.join(workspaceRoot, (projectMetadata.sourceRoot as string | undefined) ?? 'src'),
-  );
+  const { projectRoot, projectSourceRoot } = getProjectRootPaths(workspaceRoot, projectMetadata);
 
   // Gather persistent caching option and provide a project specific cache location
   const cacheOptions = normalizeCacheOptions(projectMetadata, workspaceRoot);
