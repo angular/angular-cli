@@ -18,6 +18,7 @@ import { globSync } from 'tinyglobby';
 import { BuildOutputFileType } from '../../tools/esbuild/bundler-context';
 import { emitFilesToDisk } from '../../tools/esbuild/utils';
 import { createVirtualModulePlugin } from '../../tools/esbuild/virtual-module-plugin';
+import { getProjectRootPaths } from '../../utils/project-metadata';
 import { buildApplicationInternal } from '../application/index';
 import { ApplicationBuilderInternalOptions } from '../application/options';
 import { Result, ResultFile, ResultKind } from '../application/results';
@@ -317,9 +318,9 @@ async function getProjectSourceRoot(context: BuilderContext): Promise<string> {
   }
 
   const projectMetadata = await context.getProjectMetadata(projectName);
-  const sourceRoot = (projectMetadata.sourceRoot ?? projectMetadata.root ?? '') as string;
+  const { projectSourceRoot } = getProjectRootPaths(context.workspaceRoot, projectMetadata);
 
-  return path.join(context.workspaceRoot, sourceRoot);
+  return projectSourceRoot;
 }
 
 function normalizePolyfills(polyfills: string | string[] | undefined): [string[], string[]] {

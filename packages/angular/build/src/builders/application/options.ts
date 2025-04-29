@@ -24,6 +24,7 @@ import {
   generateSearchDirectories,
   loadPostcssConfiguration,
 } from '../../utils/postcss-configuration';
+import { getProjectRootPaths, normalizeDirectoryPath } from '../../utils/project-metadata';
 import { urlJoin } from '../../utils/url';
 import {
   Schema as ApplicationBuilderOptions,
@@ -160,12 +161,7 @@ export async function normalizeOptions(
       // ref: https://github.com/nodejs/node/issues/7726
       realpathSync(context.workspaceRoot);
   const projectMetadata = await context.getProjectMetadata(projectName);
-  const projectRoot = normalizeDirectoryPath(
-    path.join(workspaceRoot, (projectMetadata.root as string | undefined) ?? ''),
-  );
-  const projectSourceRoot = normalizeDirectoryPath(
-    path.join(workspaceRoot, (projectMetadata.sourceRoot as string | undefined) ?? 'src'),
-  );
+  const { projectRoot, projectSourceRoot } = getProjectRootPaths(workspaceRoot, projectMetadata);
 
   // Gather persistent caching option and provide a project specific cache location
   const cacheOptions = normalizeCacheOptions(projectMetadata, workspaceRoot);
@@ -611,21 +607,6 @@ function normalizeEntryPoints(
 
     return entryPointPaths;
   }
-}
-
-/**
- * Normalize a directory path string.
- * Currently only removes a trailing slash if present.
- * @param path A path string.
- * @returns A normalized path string.
- */
-function normalizeDirectoryPath(path: string): string {
-  const last = path[path.length - 1];
-  if (last === '/' || last === '\\') {
-    return path.slice(0, -1);
-  }
-
-  return path;
 }
 
 function normalizeGlobalEntries(
