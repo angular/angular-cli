@@ -258,7 +258,7 @@ function addAppToWorkspaceFile(
         options: {
           index: `${sourceRoot}/index.html`,
           browser: `${sourceRoot}/main.ts`,
-          polyfills: options.zoneless ? [] : ['zone.js'],
+          polyfills: options.zoneless ? undefined : ['zone.js'],
           tsConfig: `${projectRoot}tsconfig.app.json`,
           inlineStyleLanguage,
           assets: [{ 'glob': '**/*', 'input': `${projectRoot}public` }],
@@ -297,7 +297,7 @@ function addAppToWorkspaceFile(
         : {
             builder: Builders.BuildKarma,
             options: {
-              polyfills: options.zoneless ? [] : ['zone.js', 'zone.js/testing'],
+              polyfills: options.zoneless ? undefined : ['zone.js', 'zone.js/testing'],
               tsConfig: `${projectRoot}tsconfig.spec.json`,
               inlineStyleLanguage,
               assets: [{ 'glob': '**/*', 'input': `${projectRoot}public` }],
