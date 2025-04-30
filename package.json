@@ -146,7 +146,7 @@
     "express": "4.18.3",
     "fast-glob": "3.3.2",
     "http-proxy": "^1.18.1",
-    "http-proxy-middleware": "2.0.7",
+    "http-proxy-middleware": "2.0.8",
     "https-proxy-agent": "7.0.4",
     "husky": "9.0.11",
     "ini": "4.1.2",
