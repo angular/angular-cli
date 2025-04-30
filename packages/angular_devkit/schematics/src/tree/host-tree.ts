@@ -107,7 +107,7 @@ export class HostTree implements Tree {
 
   private _dirCache = new Map<Path, HostDirEntry>();
 
-  [TreeSymbol]() {
+  [TreeSymbol](): this {
     return this;
   }
 
@@ -132,19 +132,19 @@ export class HostTree implements Tree {
     return normalize('/' + path);
   }
 
-  protected _willCreate(path: Path) {
+  protected _willCreate(path: Path): boolean {
     return this._record.willCreate(path);
   }
 
-  protected _willOverwrite(path: Path) {
+  protected _willOverwrite(path: Path): boolean {
     return this._record.willOverwrite(path);
   }
 
-  protected _willDelete(path: Path) {
+  protected _willDelete(path: Path): boolean {
     return this._record.willDelete(path);
   }
 
-  protected _willRename(path: Path) {
+  protected _willRename(path: Path): boolean {
     return this._record.willRename(path);
   }
 

@@ -90,10 +90,10 @@ export class CollectionImpl<CollectionT extends object, SchematicT extends objec
     public readonly baseDescriptions?: Array<CollectionDescription<CollectionT>>,
   ) {}
 
-  get description() {
+  get description(): CollectionDescription<CollectionT> {
     return this._description;
   }
-  get name() {
+  get name(): string {
     return this.description.name || '<unknown>';
   }
 
@@ -183,10 +183,10 @@ export class SchematicEngine<CollectionT extends object, SchematicT extends obje
     protected _workflow?: Workflow,
   ) {}
 
-  get workflow() {
+  get workflow(): Workflow | null {
     return this._workflow || null;
   }
-  get defaultMergeStrategy() {
+  get defaultMergeStrategy(): MergeStrategy {
     return this._host.defaultMergeStrategy || MergeStrategy.Default;
   }
 

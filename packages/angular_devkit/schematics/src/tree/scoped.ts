@@ -197,7 +197,7 @@ export class ScopedTree implements Tree {
     return scopedActions;
   }
 
-  [TreeSymbol]() {
+  [TreeSymbol](): this {
     return this;
   }
 
