@@ -15,10 +15,10 @@ export class SimpleFileEntry implements FileEntry {
     private _content: Buffer,
   ) {}
 
-  get path() {
+  get path(): Path {
     return this._path;
   }
-  get content() {
+  get content(): Buffer {
     return this._content;
   }
 }
@@ -31,10 +31,10 @@ export class LazyFileEntry implements FileEntry {
     private _load: (path?: Path) => Buffer,
   ) {}
 
-  get path() {
+  get path(): Path {
     return this._path;
   }
-  get content() {
+  get content(): Buffer {
     return this._content || (this._content = this._load(this._path));
   }
 }

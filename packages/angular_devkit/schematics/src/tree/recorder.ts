@@ -59,11 +59,11 @@ export class UpdateRecorderBase implements UpdateRecorder {
     return new UpdateRecorderBase(entry.content, entry.path);
   }
 
-  get path() {
+  get path(): string {
     return this._path;
   }
 
-  protected _assertIndex(index: number) {
+  protected _assertIndex(index: number): void {
     if (index < 0 || index > this.content.original.length) {
       throw new IndexOutOfBoundException(index, 0, this.content.original.length);
     }

@@ -27,7 +27,7 @@ let _id = 1;
 export class ActionList implements Iterable<Action> {
   private _actions: Action[] = [];
 
-  protected _action(action: Partial<Action>) {
+  protected _action(action: Partial<Action>): void {
     this._actions.push({
       ...(action as Action),
       id: _id++,
@@ -35,20 +35,20 @@ export class ActionList implements Iterable<Action> {
     });
   }
 
-  create(path: Path, content: Buffer) {
+  create(path: Path, content: Buffer): void {
     this._action({ kind: 'c', path, content });
   }
-  overwrite(path: Path, content: Buffer) {
+  overwrite(path: Path, content: Buffer): void {
     this._action({ kind: 'o', path, content });
   }
-  rename(path: Path, to: Path) {
+  rename(path: Path, to: Path): void {
     this._action({ kind: 'r', path, to });
   }
-  delete(path: Path) {
+  delete(path: Path): void {
     this._action({ kind: 'd', path });
   }
 
-  optimize() {
+  optimize(): void {
     const toCreate = new Map<Path, Buffer>();
     const toRename = new Map<Path, Path>();
     const toOverwrite = new Map<Path, Buffer>();
@@ -122,13 +122,13 @@ export class ActionList implements Iterable<Action> {
     });
   }
 
-  push(action: Action) {
+  push(action: Action): void {
     this._actions.push(action);
   }
-  get(i: number) {
+  get(i: number): Action {
     return this._actions[i];
   }
-  has(action: Action) {
+  has(action: Action): boolean {
     for (let i = 0; i < this._actions.length; i++) {
       const a = this._actions[i];
       if (a.id == action.id) {
@@ -144,10 +144,10 @@ export class ActionList implements Iterable<Action> {
   find(predicate: (value: Action) => boolean): Action | null {
     return this._actions.find(predicate) || null;
   }
-  forEach(fn: (value: Action, index: number, array: Action[]) => void, thisArg?: {}) {
+  forEach(fn: (value: Action, index: number, array: Action[]) => void, thisArg?: {}): void {
     this._actions.forEach(fn, thisArg);
   }
-  get length() {
+  get length(): number {
     return this._actions.length;
   }
   [Symbol.iterator](): IterableIterator<Action> {
