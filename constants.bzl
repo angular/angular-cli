@@ -13,7 +13,7 @@ NG_PACKAGR_PEER_DEP = "^20.0.0 || ^20.0.0-next.0"
 # default browser set used to determine what downleveling is necessary.
 #
 # See: https://web.dev/baseline
-BASELINE_DATE = "2025-03-31"
+BASELINE_DATE = "2025-04-30"
 
 SNAPSHOT_REPOS = {
     "@angular/cli": "angular/cli-builds",
