@@ -43,11 +43,11 @@ export class NullTreeDirEntry implements DirEntry {
     return null;
   }
 
-  visit() {}
+  visit(): void {}
 }
 
 export class NullTree implements Tree {
-  [TreeSymbol]() {
+  [TreeSymbol](): this {
     return this;
   }
 
@@ -74,10 +74,10 @@ export class NullTree implements Tree {
   get(_path: string) {
     return null;
   }
-  getDir(path: string) {
+  getDir(path: string): NullTreeDirEntry {
     return new NullTreeDirEntry(normalize('/' + path));
   }
-  visit() {}
+  visit(): void {}
 
   // Change content of host files.
   beginUpdate(path: string): never {

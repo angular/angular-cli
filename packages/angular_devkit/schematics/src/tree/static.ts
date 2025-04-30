@@ -10,15 +10,19 @@ import { SchematicsException } from '../exception/exception';
 import { FilterHostTree, HostTree } from './host-tree';
 import { FilePredicate, MergeStrategy, Tree } from './interface';
 
-export function empty() {
+export function empty(): HostTree {
   return new HostTree();
 }
 
-export function branch(tree: Tree) {
+export function branch(tree: Tree): Tree {
   return tree.branch();
 }
 
-export function merge(tree: Tree, other: Tree, strategy: MergeStrategy = MergeStrategy.Default) {
+export function merge(
+  tree: Tree,
+  other: Tree,
+  strategy: MergeStrategy = MergeStrategy.Default,
+): Tree {
   tree.merge(other, strategy);
 
   return tree;

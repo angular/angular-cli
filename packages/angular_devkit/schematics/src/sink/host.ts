@@ -86,7 +86,7 @@ export class HostSink extends SimpleSinkBase {
     return EMPTY;
   }
 
-  _done() {
+  _done(): Observable<void> {
     // Really commit everything to the actual filesystem.
     return concatObservables(
       observableFrom([...this._filesToDelete.values()]).pipe(

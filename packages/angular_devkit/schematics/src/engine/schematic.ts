@@ -41,10 +41,10 @@ export class SchematicImpl<CollectionT extends object, SchematicT extends object
     }
   }
 
-  get description() {
+  get description(): SchematicDescription<CollectionT, SchematicT> {
     return this._description;
   }
-  get collection() {
+  get collection(): Collection<CollectionT, SchematicT> {
     return this._collection;
   }
 
