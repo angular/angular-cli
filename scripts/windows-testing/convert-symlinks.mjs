@@ -26,97 +26,64 @@ const skipDirectories = [
   '_windows_amd64/bin/nodejs/node_modules',
 ];
 
-const workspaceRootPaths = [/.*\.runfiles\/_main\//, /^.*-fastbuild\/bin\//];
-
-// Copying can be parallelized and doesn't cause any WSL flakiness (no exe is invoked).
-const parallelCopyTasks = [];
+// Dereferencing can be parallelized and doesn't cause any WSL flakiness (no exe is invoked).
+const dereferenceFns = [];
+// Re-linking can be parallelized, but should only be in batched. WSL exe is involved and it can be flaky.
+// Note: Relinking should not happen during removing & copying of dereference tasks.
+const relinkFns = [];
 
 async function transformDir(p) {
-  // We perform all command executions in parallel here to speed up.
-  // Note that we can't parallelize for the full recursive directory,
-  // as WSL and its interop would otherwise end up with some flaky errors.
-  // See: https://github.com/microsoft/WSL/issues/8677.
-  const tasks = [];
   // We explore directories after all files were checked at this level.
   const directoriesToVisit = [];
 
   for (const file of await fs.readdir(p, { withFileTypes: true })) {
     const subPath = path.join(p, file.name);
-
     if (skipDirectories.some((d) => subPath.endsWith(d))) {
       continue;
     }
 
     if (file.isSymbolicLink()) {
-      // Allow for parallel processing of directory entries.
-      tasks.push(
-        (async () => {
-          let target = '';
-          try {
-            target = await fs.realpath(subPath);
-          } catch (e) {
-            if (debug) {
-              console.error('Skipping', subPath);
-            }
-            return;
-          }
+      let realTarget = '';
+      let linkTarget = '';
 
-          await fs.rm(subPath);
+      try {
+        realTarget = await fs.realpath(subPath);
+        linkTarget = await fs.readlink(subPath);
+      } catch (e) {
+        throw new Error(`Skipping; cannot dereference & read link: ${subPath}: ${e}`);
+      }
 
-          const subPathId = relativizeForSimilarWorkspacePaths(subPath);
-          const targetPathId = relativizeForSimilarWorkspacePaths(target);
-          const isSelfLink = subPathId === targetPathId;
+      // Transform relative links but preserve them.
+      // This is needed for pnpm.
+      if (!path.isAbsolute(linkTarget)) {
+        relinkFns.push(async () => {
+          const wslSubPath = path.relative(rootDir, subPath).replace(/\//g, '\\');
+          const linkTargetWindowsPath = linkTarget.replace(/\//g, '\\');
 
-          // This is an actual file that needs to be copied. Copy contents.
-          //   - the target path is equivalent to the link. This is a self-link from `.runfiles` to `bin/`.
-          //   - the target path is outside any of our workspace roots.
-          if (isSelfLink || targetPathId.startsWith('..')) {
-            parallelCopyTasks.push(exec(`cp -Rf ${target} ${subPath}`));
-            return;
-          }
+          await fs.unlink(subPath);
 
-          const relativeSubPath = relativizeToRoot(subPath);
-          const targetAtDestination = path.relative(path.dirname(subPathId), targetPathId);
-          const targetAtDestinationWindowsPath = targetAtDestination.replace(/\//g, '\\');
-
-          const wslSubPath = relativeSubPath.replace(/\//g, '\\');
-
-          if (debug) {
-            console.log({
-              targetAtDestination,
-              subPath,
-              relativeSubPath,
-              target,
-              targetPathId,
-              subPathId,
-            });
-          }
-
-          if ((await fs.stat(target)).isDirectory()) {
+          if ((await fs.stat(realTarget)).isDirectory()) {
             // This is a symlink to a directory, create a dir junction.
             // Re-create this symlink on the Windows FS using the Windows mklink command.
-            await exec(
-              `${cmdPath} /c mklink /d "${wslSubPath}" "${targetAtDestinationWindowsPath}"`,
-            );
+            await exec(`${cmdPath} /c mklink /d "${wslSubPath}" "${linkTargetWindowsPath}"`);
           } else {
             // This is a symlink to a file, create a file junction.
             // Re-create this symlink on the Windows FS using the Windows mklink command.
-            await exec(`${cmdPath} /c mklink "${wslSubPath}" "${targetAtDestinationWindowsPath}"`);
+            await exec(`${cmdPath} /c mklink "${wslSubPath}" "${linkTargetWindowsPath}"`);
           }
-        })(),
-      );
+        });
+      } else {
+        dereferenceFns.push(async () => {
+          await fs.unlink(subPath);
+          await fs.cp(realTarget, subPath, { recursive: true });
+        });
+      }
     } else if (file.isDirectory()) {
       directoriesToVisit.push(subPath);
     }
   }
 
-  // Wait for all commands/tasks to complete, executed in parallel.
-  await Promise.all(tasks);
-
-  // Descend into other directories, sequentially to avoid WSL interop errors.
-  for (const d of directoriesToVisit) {
-    await transformDir(d);
-  }
+  await Promise.all(directoriesToVisit.map((d) => transformDir(d)));
 }
 
 function exec(cmd, maxRetries = 2) {
@@ -143,27 +110,19 @@ function exec(cmd, maxRetries = 2) {
   });
 }
 
-function relativizeForSimilarWorkspacePaths(p) {
-  const workspaceRootMatch = workspaceRootPaths.find((r) => r.test(p));
-  if (workspaceRootMatch !== undefined) {
-    return p.replace(workspaceRootMatch, '');
-  }
-
-  return path.relative(rootDir, p);
-}
-
-function relativizeToRoot(p) {
-  const res = path.relative(rootDir, p);
-  if (!res.startsWith('..')) {
-    return res;
-  }
-
-  throw new Error('Could not relativize to root: ' + p);
-}
-
 try {
   await transformDir(rootDir);
-  await Promise.all(parallelCopyTasks);
+
+  // Dereference first.
+  await Promise.all(dereferenceFns.map((fn) => fn()));
+
+  // Re-link symlinks to work inside Windows.
+  // This is done in batches to avoid flakiness due to WSL
+  // See: https://github.com/microsoft/WSL/issues/8677.
+  const batchSize = 100;
+  for (let i = 0; i < relinkFns.length; i += batchSize) {
+    await Promise.all(relinkFns.slice(i, i + batchSize).map((fn) => fn()));
+  }
 } catch (err) {
   console.error('Could not convert symlinks:', err);
   process.exitCode = 1;
