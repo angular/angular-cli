@@ -1,3 +1,31 @@
+<a name="20.0.0-next.9"></a>
+
+# 20.0.0-next.9 (2025-04-30)
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                              |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------- |
+| [5876577af](https://github.com/angular/angular-cli/commit/5876577af163b534846e720b0184558197dce741) | feat | Add prompt for new apps to be zoneless                   |
+| [c557a19ef](https://github.com/angular/angular-cli/commit/c557a19ef4eed9f2d805bb235d3819c69a1aaef6) | fix  | avoid empty polyfill option for new zoneless application |
+| [148498c2b](https://github.com/angular/angular-cli/commit/148498c2bcd0feb495dc0aa14b6a4555ac01facb) | fix  | Remove experimental from zoneless                        |
+| [0f7dc2cd8](https://github.com/angular/angular-cli/commit/0f7dc2cd8f76f928e64e734563a433ff6a0d478c) | fix  | skip spec project reference for minimal ng new           |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                                                |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------------------- |
+| [d6ea6b09f](https://github.com/angular/angular-cli/commit/d6ea6b09f182433f859a78d4a4d38a9db521e593) | feat | add experimental vitest browser support to unit-testing                    |
+| [05485ede7](https://github.com/angular/angular-cli/commit/05485ede7b472f98120c51f28bd485eeb635bac2) | fix  | ensure `com.chrome.devtools.json` is consistently served after initial run |
+
+### @angular/ssr
+
+| Commit                                                                                              | Type | Description                              |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------- |
+| [2d11e8e45](https://github.com/angular/angular-cli/commit/2d11e8e45b29cf879ee72ffbcf438198d73ffaba) | fix  | return 302 when redirectTo is a function |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="19.2.10"></a>
 
 # 19.2.10 (2025-04-30)
