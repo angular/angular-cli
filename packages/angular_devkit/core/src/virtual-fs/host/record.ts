@@ -68,11 +68,11 @@ export type CordHostRecord = CordHostCreate | CordHostOverwrite | CordHostRename
  * the create/overwrite records IIF the files does/doesn't already exist.
  */
 export class CordHost extends SimpleMemoryHost {
-  protected _filesToCreate = new Set<Path>();
-  protected _filesToRename = new Map<Path, Path>();
-  protected _filesToRenameRevert = new Map<Path, Path>();
-  protected _filesToDelete = new Set<Path>();
-  protected _filesToOverwrite = new Set<Path>();
+  protected _filesToCreate: Set<Path> = new Set();
+  protected _filesToRename: Map<Path, Path> = new Map();
+  protected _filesToRenameRevert: Map<Path, Path> = new Map();
+  protected _filesToDelete: Set<Path> = new Set();
+  protected _filesToOverwrite: Set<Path> = new Set();
 
   constructor(protected _back: ReadonlyHost) {
     super();

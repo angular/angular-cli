@@ -36,15 +36,16 @@ import {
 
 export interface SimpleMemoryHostStats {
   readonly content: FileBuffer | null;
+  inspect(): string;
 }
 
 export class SimpleMemoryHost implements Host<{}> {
-  protected _cache = new Map<Path, Stats<SimpleMemoryHostStats>>();
+  protected _cache: Map<Path, Stats<SimpleMemoryHostStats>> = new Map();
   private _watchers = new Map<Path, [HostWatchOptions, Subject<HostWatchEvent>][]>();
 
-  protected _newDirStats() {
+  protected _newDirStats(): Stats<SimpleMemoryHostStats> {
     return {
-      inspect() {
+      inspect(): string {
         return '<Directory>';
       },
 
@@ -64,7 +65,10 @@ export class SimpleMemoryHost implements Host<{}> {
       content: null,
     };
   }
-  protected _newFileStats(content: FileBuffer, oldStats?: Stats<SimpleMemoryHostStats>) {
+  protected _newFileStats(
+    content: FileBuffer,
+    oldStats?: Stats<SimpleMemoryHostStats>,
+  ): Stats<SimpleMemoryHostStats> {
     return {
       inspect() {
         return `<File size(${content.byteLength})>`;

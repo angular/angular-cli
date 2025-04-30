@@ -389,7 +389,7 @@ interface JsonVisitor {
 
 // @public (undocumented)
 class LevelCapLogger extends LevelTransformLogger {
-    constructor(name: string, parent: (Logger | null) | undefined, levelCap: LogLevel);
+    constructor(name: string, parent: Logger | null, levelCap: LogLevel);
     // (undocumented)
     readonly levelCap: LogLevel;
     // (undocumented)
@@ -406,7 +406,7 @@ class LevelCapLogger extends LevelTransformLogger {
 
 // @public (undocumented)
 class LevelTransformLogger extends Logger {
-    constructor(name: string, parent: (Logger | null) | undefined, levelTransform: (level: LogLevel) => LogLevel);
+    constructor(name: string, parent: Logger | null, levelTransform: (level: LogLevel) => LogLevel);
     // (undocumented)
     createChild(name: string): Logger;
     // (undocumented)
@@ -556,7 +556,7 @@ function parseJsonPointer(pointer: JsonPointer): string[];
 // @public (undocumented)
 export class PartiallyOrderedSet<T> implements Set<T> {
     // (undocumented)
-    [Symbol.iterator](): Generator<T, undefined, unknown>;
+    [Symbol.iterator](): IterableIterator<T, undefined, unknown>;
     // (undocumented)
     get [Symbol.toStringTag](): 'Set';
     // (undocumented)
@@ -941,29 +941,9 @@ class SimpleMemoryHost implements Host<{}> {
     // (undocumented)
     protected _list(path: Path): PathFragment[];
     // (undocumented)
-    protected _newDirStats(): {
-        inspect(): string;
-        isFile(): boolean;
-        isDirectory(): boolean;
-        size: number;
-        atime: Date;
-        ctime: Date;
-        mtime: Date;
-        birthtime: Date;
-        content: null;
-    };
+    protected _newDirStats(): Stats<SimpleMemoryHostStats>;
     // (undocumented)
-    protected _newFileStats(content: FileBuffer, oldStats?: Stats<SimpleMemoryHostStats>): {
-        inspect(): string;
-        isFile(): boolean;
-        isDirectory(): boolean;
-        size: number;
-        atime: Date;
-        ctime: Date;
-        mtime: Date;
-        birthtime: Date;
-        content: ArrayBuffer;
-    };
+    protected _newFileStats(content: FileBuffer, oldStats?: Stats<SimpleMemoryHostStats>): Stats<SimpleMemoryHostStats>;
     // (undocumented)
     read(path: Path): Observable<FileBuffer>;
     // (undocumented)
@@ -995,6 +975,8 @@ class SimpleMemoryHost implements Host<{}> {
 interface SimpleMemoryHostStats {
     // (undocumented)
     readonly content: FileBuffer | null;
+    // (undocumented)
+    inspect(): string;
 }
 
 // @public (undocumented)
