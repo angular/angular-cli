@@ -33,7 +33,7 @@
     "esbuild-wasm": "0.20.1",
     "fast-glob": "3.3.2",
     "https-proxy-agent": "7.0.4",
-    "http-proxy-middleware": "2.0.7",
+    "http-proxy-middleware": "2.0.8",
     "inquirer": "9.2.15",
     "jsonc-parser": "3.2.1",
     "karma-source-map-support": "1.4.0",
