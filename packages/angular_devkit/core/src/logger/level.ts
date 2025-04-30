@@ -12,7 +12,7 @@ import { LogLevel, Logger } from './logger';
 export class LevelTransformLogger extends Logger {
   constructor(
     public override readonly name: string,
-    public override readonly parent: Logger | null = null,
+    public override readonly parent: Logger | null,
     public readonly levelTransform: (level: LogLevel) => LogLevel,
   ) {
     super(name, parent);
@@ -38,7 +38,7 @@ export class LevelCapLogger extends LevelTransformLogger {
 
   constructor(
     public override readonly name: string,
-    public override readonly parent: Logger | null = null,
+    public override readonly parent: Logger | null,
     public readonly levelCap: LogLevel,
   ) {
     super(name, parent, (level: LogLevel) => {

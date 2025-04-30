@@ -41,15 +41,13 @@ export type PathFragment = Path & {
 
 /**
  * The Separator for normalized path.
- * @type {Path}
  */
-export const NormalizedSep = '/' as Path;
+export const NormalizedSep: Path = '/' as Path;
 
 /**
  * The root of a normalized path.
- * @type {Path}
  */
-export const NormalizedRoot = NormalizedSep;
+export const NormalizedRoot: Path = NormalizedSep;
 
 /**
  * Split a path into multiple path fragments. Each fragments except the last one will end with
@@ -192,7 +190,7 @@ let normalizedCache = new Map<string, Path>();
  * Reset the cache. This is only useful for testing.
  * @private
  */
-export function resetNormalizeCache() {
+export function resetNormalizeCache(): void {
   normalizedCache = new Map<string, Path>();
 }
 

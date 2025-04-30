@@ -35,7 +35,7 @@ function escapeKey(key: string): string | number {
 }
 
 export class JsonWorkspaceMetadata {
-  readonly changes = new Map<string, JsonChange>();
+  readonly changes: Map<string, JsonChange> = new Map();
 
   hasLegacyTargetsName = true;
 

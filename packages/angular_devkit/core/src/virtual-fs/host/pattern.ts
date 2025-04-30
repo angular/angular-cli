@@ -15,7 +15,7 @@ export type ReplacementFunction = (path: Path) => Path;
 /**
  */
 export class PatternMatchingHost<StatsT extends object = {}> extends ResolverHost<StatsT> {
-  protected _patterns = new Map<RegExp, ReplacementFunction>();
+  protected _patterns: Map<RegExp, ReplacementFunction> = new Map();
 
   addPattern(pattern: string | string[], replacementFn: ReplacementFunction): void {
     const patterns = Array.isArray(pattern) ? pattern : [pattern];
