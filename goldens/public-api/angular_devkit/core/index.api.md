@@ -554,11 +554,11 @@ function oneLine(strings: TemplateStringsArray, ...values: any[]): string;
 function parseJsonPointer(pointer: JsonPointer): string[];
 
 // @public (undocumented)
-export class PartiallyOrderedSet<T> implements Set<T> {
+export class PartiallyOrderedSet<T> {
     // (undocumented)
     [Symbol.iterator](): IterableIterator<T, undefined, unknown>;
     // (undocumented)
-    get [Symbol.toStringTag](): 'Set';
+    get [Symbol.toStringTag](): 'PartiallyOrderedSet';
     // (undocumented)
     add(item: T, deps?: Set<T> | T[]): this;
     // (undocumented)
