@@ -19,7 +19,7 @@ export class CircularDependencyFoundException extends BaseException {
   }
 }
 
-export class PartiallyOrderedSet<T> implements Set<T> {
+export class PartiallyOrderedSet<T> {
   private _items = new Map<T, Set<T>>();
 
   protected _checkCircularDependencies(item: T, deps: Set<T>): void {
@@ -161,7 +161,7 @@ export class PartiallyOrderedSet<T> implements Set<T> {
     return undefined;
   }
 
-  get [Symbol.toStringTag](): 'Set' {
-    return 'Set';
+  get [Symbol.toStringTag](): 'PartiallyOrderedSet' {
+    return 'PartiallyOrderedSet';
   }
 }
