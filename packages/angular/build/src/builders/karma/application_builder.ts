@@ -84,7 +84,7 @@ class AngularAssetsMiddleware {
       const file = this.latestBuildFiles.files[pathname];
 
       if (file?.origin === 'disk') {
-        this.serveFile(file.inputPath, undefined, res);
+        this.serveFile(file.inputPath, undefined, res, undefined, undefined, /* doNotCache */ true);
 
         return;
       } else if (file?.origin === 'memory') {
