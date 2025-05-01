@@ -10,6 +10,7 @@ import { concatMap, count, debounceTime, distinctUntilChanged, take, timeout } f
 import { execute } from '../../index';
 import { BASE_OPTIONS, KARMA_BUILDER_INFO, describeKarmaBuilder } from '../setup';
 import { BuilderOutput } from '@angular-devkit/architect';
+import { randomBytes } from 'node:crypto';
 
 describeKarmaBuilder(execute, KARMA_BUILDER_INFO, (harness, setupTarget) => {
   describe('Behavior: "Rebuilds"', () => {
@@ -58,6 +59,60 @@ describeKarmaBuilder(execute, KARMA_BUILDER_INFO, (harness, setupTarget) => {
           // There may be a sequence of {success:true} events that should be
           // de-duplicated.
           distinctUntilChanged((prev, current) => prev.result?.success === current.result?.success),
+          concatMap(async ({ result }, index) => {
+            await expectedSequence[index](result);
+          }),
+          take(expectedSequence.length),
+          count(),
+        )
+        .toPromise();
+
+      expect(buildCount).toBe(expectedSequence.length);
+    });
+
+    it('correctly serves binary assets on rebuilds', async () => {
+      await harness.writeFiles({
+        './src/random.bin': randomBytes(1024),
+        './src/app/app.component.spec.ts': `
+            describe('AppComponent', () => {
+              it('should fetch binary file with correct size', async () => {
+                const resp = await fetch('/random.bin');
+                const data = await resp.arrayBuffer();
+                expect(data.byteLength).toBe(1024);
+              });
+            });`,
+      });
+
+      harness.useTarget('test', {
+        ...BASE_OPTIONS,
+        watch: true,
+        assets: ['src/random.bin'],
+      });
+
+      interface OutputCheck {
+        (result: BuilderOutput | undefined): Promise<void>;
+      }
+
+      const expectedSequence: OutputCheck[] = [
+        async (result) => {
+          // Karma run should succeed.
+          expect(result?.success).withContext('Initial test run should succeed').toBeTrue();
+          // Modify test file to trigger a rebuild
+          await harness.appendToFile(
+            'src/app/app.component.spec.ts',
+            `\n;console.log('modified');`,
+          );
+        },
+        async (result) => {
+          expect(result?.success).withContext('Test should succeed again').toBeTrue();
+        },
+      ];
+
+      const buildCount = await harness
+        .execute({ outputLogsOnFailure: true })
+        .pipe(
+          timeout(60000),
+          debounceTime(500),
           concatMap(async ({ result }, index) => {
             await expectedSequence[index](result);
           }),
