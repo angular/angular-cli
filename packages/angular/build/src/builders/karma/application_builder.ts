@@ -86,7 +86,7 @@ class AngularAssetsMiddleware {
 
     switch (file.origin) {
       case 'disk':
-        this.serveFile(file.inputPath, undefined, res);
+        this.serveFile(file.inputPath, undefined, res, undefined, undefined, /* doNotCache */ true);
         break;
       case 'memory':
         // Include pathname to help with Content-Type headers.
