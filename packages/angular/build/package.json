@@ -20,8 +20,8 @@
   "dependencies": {
     "@ampproject/remapping": "2.3.0",
     "@angular-devkit/architect": "workspace:0.0.0-EXPERIMENTAL-PLACEHOLDER",
-    "@babel/core": "7.26.10",
-    "@babel/helper-annotate-as-pure": "7.25.9",
+    "@babel/core": "7.27.1",
+    "@babel/helper-annotate-as-pure": "7.27.1",
     "@babel/helper-split-export-declaration": "7.24.7",
     "@inquirer/confirm": "5.1.9",
     "@vitejs/plugin-basic-ssl": "2.0.0",
@@ -53,7 +53,7 @@
     "@angular-devkit/core": "workspace:*",
     "jsdom": "26.1.0",
     "less": "4.3.0",
-    "ng-packagr": "20.0.0-next.8",
+    "ng-packagr": "20.0.0-rc.0",
     "postcss": "8.5.3",
     "rxjs": "7.8.2",
     "vitest": "3.1.2"
