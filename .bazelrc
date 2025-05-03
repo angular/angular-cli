@@ -52,6 +52,9 @@ build --experimental_remote_merkle_tree_cache
 # Ensure that tags applied in BUILDs propagate to actions
 common --experimental_allow_tags_propagation
 
+# Don't check if output files have been modified
+build --noexperimental_check_output_files
+
 # Ensure sandboxing is enabled even for exclusive tests
 test --incompatible_exclusive_test_sandboxed
 
