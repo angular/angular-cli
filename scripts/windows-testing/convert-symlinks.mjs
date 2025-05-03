@@ -75,7 +75,8 @@ async function transformDir(p) {
       } else {
         dereferenceFns.push(async () => {
           await fs.unlink(subPath);
-          await fs.cp(realTarget, subPath, { recursive: true });
+          // Note: NodeJS `fs.cp` can have issues when sources are readonly.
+          await exec(`cp -R ${realTarget} ${subPath}`);
         });
       }
     } else if (file.isDirectory()) {
@@ -86,7 +87,7 @@ async function transformDir(p) {
   await Promise.all(directoriesToVisit.map((d) => transformDir(d)));
 }
 
-function exec(cmd, maxRetries = 2) {
+function exec(cmd, maxRetries = 3) {
   return new Promise((resolve, reject) => {
     childProcess.exec(cmd, { cwd: rootDir }, (error) => {
       if (error !== null) {
@@ -119,7 +120,7 @@ try {
   // Re-link symlinks to work inside Windows.
   // This is done in batches to avoid flakiness due to WSL
   // See: https://github.com/microsoft/WSL/issues/8677.
-  const batchSize = 100;
+  const batchSize = 75;
   for (let i = 0; i < relinkFns.length; i += batchSize) {
     await Promise.all(relinkFns.slice(i, i + batchSize).map((fn) => fn()));
   }
