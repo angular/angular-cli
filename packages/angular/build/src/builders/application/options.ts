@@ -177,7 +177,12 @@ export async function normalizeOptions(
     i18nOptions.flatOutput = true;
   }
 
-  const entryPoints = normalizeEntryPoints(workspaceRoot, options.browser, options.entryPoints);
+  const entryPoints = normalizeEntryPoints(
+    workspaceRoot,
+    projectSourceRoot,
+    options.browser,
+    options.entryPoints,
+  );
   const tsconfig = path.join(workspaceRoot, options.tsConfig);
   const optimizationOptions = normalizeOptimization(options.optimization);
   const sourcemapOptions = normalizeSourceMaps(options.sourceMap ?? false);
@@ -545,26 +550,25 @@ async function getTailwindConfig(
  */
 function normalizeEntryPoints(
   workspaceRoot: string,
+  projectSourceRoot: string,
   browser: string | undefined,
-  entryPoints: Set<string> | Map<string, string> = new Set(),
+  entryPoints: Set<string> | Map<string, string> | undefined,
 ): Record<string, string> {
   if (browser === '') {
     throw new Error('`browser` option cannot be an empty string.');
   }
 
   // `browser` and `entryPoints` are mutually exclusive.
-  if (browser && entryPoints.size > 0) {
+  if (browser && entryPoints) {
     throw new Error('Only one of `browser` or `entryPoints` may be provided.');
   }
-  if (!browser && entryPoints.size === 0) {
-    // Schema should normally reject this case, but programmatic usages of the builder might make this mistake.
-    throw new Error('Either `browser` or at least one `entryPoints` value must be provided.');
-  }
 
-  // Schema types force `browser` to always be provided, but it may be omitted when the builder is invoked programmatically.
   if (browser) {
     // Use `browser` alone.
     return { 'main': path.join(workspaceRoot, browser) };
+  } else if (!entryPoints) {
+    // Default browser entry if no explicit entry points
+    return { 'main': path.join(projectSourceRoot, 'main.ts') };
   } else if (entryPoints instanceof Map) {
     return Object.fromEntries(
       Array.from(entryPoints.entries(), ([name, entryPoint]) => {
