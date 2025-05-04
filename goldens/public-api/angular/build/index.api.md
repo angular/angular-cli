@@ -25,7 +25,7 @@ export type ApplicationBuilderOptions = {
     appShell?: boolean;
     assets?: AssetPattern[];
     baseHref?: string;
-    browser: string;
+    browser?: string;
     budgets?: Budget[];
     clearScreen?: boolean;
     conditions?: string[];
