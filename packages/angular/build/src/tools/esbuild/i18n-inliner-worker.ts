@@ -16,10 +16,35 @@ import { loadEsmModule } from '../../utils/load-esm';
 /**
  * The options passed to the inliner for each file request
  */
-interface InlineRequest {
+interface InlineFileRequest {
   /**
    * The filename that should be processed. The data for the file is provided to the Worker
    * during Worker initialization.
+   */
+  filename: string;
+
+  /**
+   * The locale specifier that should be used during the inlining process of the file.
+   */
+  locale: string;
+
+  /**
+   * The translation messages for the locale that should be used during the inlining process of the file.
+   */
+  translation?: Record<string, unknown>;
+}
+
+/**
+ * The options passed to the inliner for each code request
+ */
+interface InlineCodeRequest {
+  /**
+   * The code that should be processed.
+   */
+  code: string;
+
+  /**
+   * The filename to use in error and warning messages for the provided code.
    */
   filename: string;
 
@@ -47,9 +72,9 @@ const { files, missingTranslation, shouldOptimize } = (workerData || {}) as {
  * This function is the main entry for the Worker's action that is called by the worker pool.
  *
  * @param request An InlineRequest object representing the options for inlining
- * @returns An array containing the inlined file and optional map content.
+ * @returns An object containing the inlined file and optional map content.
  */
-export default async function inlineLocale(request: InlineRequest) {
+export default async function inlineFile(request: InlineFileRequest) {
   const data = files.get(request.filename);
 
   assert(data !== undefined, `Invalid inline request for file '${request.filename}'.`);
@@ -66,6 +91,22 @@ export default async function inlineLocale(request: InlineRequest) {
     file: request.filename,
     code: result.code,
     map: result.map,
+    messages: result.diagnostics.messages,
+  };
+}
+
+/**
+ * Inlines the provided locale and translation into JavaScript code that contains `$localize` usage.
+ * This function is a secondary entry primarily for use with component HMR update modules.
+ *
+ * @param request An InlineRequest object representing the options for inlining
+ * @returns An object containing the inlined code.
+ */
+export async function inlineCode(request: InlineCodeRequest) {
+  const result = await transformWithBabel(request.code, undefined, request);
+
+  return {
+    output: result.code,
     messages: result.diagnostics.messages,
   };
 }
@@ -138,7 +179,7 @@ async function createI18nPlugins(locale: string, translation: Record<string, unk
 async function transformWithBabel(
   code: string,
   map: SourceMapInput | undefined,
-  options: InlineRequest,
+  options: InlineFileRequest,
 ) {
   let ast;
   try {

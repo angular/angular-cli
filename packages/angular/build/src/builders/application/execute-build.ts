@@ -285,8 +285,10 @@ export async function executeBuild(
       i18nOptions.hasDefinedSourceLocale ? i18nOptions.sourceLocale : undefined,
     );
 
-    executionResult.addErrors(result.errors);
-    executionResult.addWarnings(result.warnings);
+    // Deduplicate and add errors and warnings
+    executionResult.addErrors([...new Set(result.errors)]);
+    executionResult.addWarnings([...new Set(result.warnings)]);
+
     executionResult.addPrerenderedRoutes(result.prerenderedRoutes);
     executionResult.outputFiles.push(...result.additionalOutputFiles);
     executionResult.assetFiles.push(...result.additionalAssets);
