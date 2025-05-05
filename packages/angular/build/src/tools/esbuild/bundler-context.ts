@@ -18,6 +18,7 @@ import {
   context,
 } from 'esbuild';
 import assert from 'node:assert';
+import { builtinModules } from 'node:module';
 import { basename, extname, join, relative } from 'node:path';
 import { LoadResultCache, MemoryLoadResultCache } from './load-result-cache';
 import { SERVER_GENERATED_EXTERNALS, convertOutputFile } from './utils';
@@ -245,7 +246,7 @@ export class BundlerContext {
         // When incremental always add any files from the load result cache
         if (this.#loadCache) {
           for (const file of this.#loadCache.watchFiles) {
-            if (!isInternalAngularFileOrEsBuildDefine(file)) {
+            if (!isInternalAngularFile(file)) {
               // watch files are fully resolved paths
               this.watchFiles.add(file);
             }
@@ -260,10 +261,12 @@ export class BundlerContext {
     if (this.incremental) {
       // Add input files except virtual angular files which do not exist on disk
       for (const input of Object.keys(result.metafile.inputs)) {
-        if (!isInternalAngularFileOrEsBuildDefine(input)) {
-          // input file paths are always relative to the workspace root
-          this.watchFiles.add(join(this.workspaceRoot, input));
+        if (isInternalAngularFile(input) || isInternalBundlerFile(input)) {
+          continue;
         }
+
+        // Input file paths are always relative to the workspace root
+        this.watchFiles.add(join(this.workspaceRoot, input));
       }
     }
 
@@ -417,12 +420,12 @@ export class BundlerContext {
   #addErrorsToWatch(result: BuildFailure | BuildResult): void {
     for (const error of result.errors) {
       let file = error.location?.file;
-      if (file && !isInternalAngularFileOrEsBuildDefine(file)) {
+      if (file && !isInternalAngularFile(file)) {
         this.watchFiles.add(join(this.workspaceRoot, file));
       }
       for (const note of error.notes) {
         file = note.location?.file;
-        if (file && !isInternalAngularFileOrEsBuildDefine(file)) {
+        if (file && !isInternalAngularFile(file)) {
           this.watchFiles.add(join(this.workspaceRoot, file));
         }
       }
@@ -475,6 +478,23 @@ export class BundlerContext {
   }
 }
 
-function isInternalAngularFileOrEsBuildDefine(file: string) {
-  return file.startsWith('angular:') || file.startsWith('<define:');
+function isInternalAngularFile(file: string) {
+  return file.startsWith('angular:');
+}
+
+function isInternalBundlerFile(file: string) {
+  // Bundler virtual files such as "<define:???>" or "<runtime>"
+  if (file[0] === '<' && file.at(-1) === '>') {
+    return true;
+  }
+
+  const DISABLED_BUILTIN = '(disabled):';
+
+  // Disabled node builtins such as "/some/path/(disabled):fs"
+  const disabledIndex = file.indexOf(DISABLED_BUILTIN);
+  if (disabledIndex >= 0) {
+    return builtinModules.includes(file.slice(disabledIndex + DISABLED_BUILTIN.length));
+  }
+
+  return false;
 }
