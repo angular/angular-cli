@@ -161,10 +161,7 @@ export class AotCompilation extends AngularCompilation {
         );
         const updateText = angularCompiler.emitHmrUpdateModule(node);
         // If compiler cannot generate an update for the component, prevent template updates.
-        // Also prevent template updates if $localize is directly present which also currently
-        // prevents a template update at runtime.
-        // TODO: Support localized template update modules and remove this check.
-        if (updateText === null || updateText.includes('$localize')) {
+        if (updateText === null) {
           // Build is needed if a template cannot be updated
           templateUpdates = undefined;
           break;

@@ -140,6 +140,30 @@ export async function inlineI18n(
     executionResult.assetFiles = updatedAssetFiles;
   }
 
+  // Inline any template updates if present
+  if (executionResult.templateUpdates?.size) {
+    // The development server only allows a single locale but issue a warning if used programmatically (experimental)
+    // with multiple locales and template HMR.
+    if (i18nOptions.inlineLocales.size > 1) {
+      inlineResult.warnings.push(
+        `Component HMR updates can only be inlined with a single locale. The first locale will be used.`,
+      );
+    }
+    const firstLocale = [...i18nOptions.inlineLocales][0];
+
+    for (const [id, content] of executionResult.templateUpdates) {
+      const templateUpdateResult = await inliner.inlineTemplateUpdate(
+        firstLocale,
+        i18nOptions.locales[firstLocale].translation,
+        content,
+        id,
+      );
+      executionResult.templateUpdates.set(id, templateUpdateResult.code);
+      inlineResult.errors.push(...templateUpdateResult.errors);
+      inlineResult.warnings.push(...templateUpdateResult.warnings);
+    }
+  }
+
   return inlineResult;
 }
 
