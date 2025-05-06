@@ -23,7 +23,7 @@ interface PartialPackageInfo {
 /**
  * Major versions of Node.js that are officially supported by Angular.
  */
-const SUPPORTED_NODE_MAJORS = [20, 22];
+const SUPPORTED_NODE_MAJORS = [20, 22, 24];
 
 const PACKAGE_PATTERNS = [
   /^@angular\/.*/,
