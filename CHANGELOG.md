@@ -1,3 +1,45 @@
+<a name="20.0.0-rc.0"></a>
+
+# 20.0.0-rc.0 (2025-05-07)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                         |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------- |
+| [e513cd4aa](https://github.com/angular/angular-cli/commit/e513cd4aa218e5ab634f05c18b6aa90f223e096c) | fix  | add Node.js 24 as supported version |
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                        |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------- |
+| [901ab60d9](https://github.com/angular/angular-cli/commit/901ab60d9f63fcff17213dbf7fe17e4a46835974) | fix  | remove explicit index option from new applications |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                           |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------- |
+| [635999d4e](https://github.com/angular/angular-cli/commit/635999d4ef6045c50526193f1ead3dd4542a225b) | fix  | correctly set i18n subPath in webpack browser builder |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                      |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------ |
+| [f36a27272](https://github.com/angular/angular-cli/commit/f36a27272f3f7e2673d692d73286280f4c6d357a) | fix  | allow a default application `browser` option     |
+| [f42f5c14c](https://github.com/angular/angular-cli/commit/f42f5c14c0c51d7705bee7b67afc317c45fb9230) | fix  | allow component HMR for templates with i18n      |
+| [ffaf8aa19](https://github.com/angular/angular-cli/commit/ffaf8aa194ccb4b541c4c5291da5a58c86635f1d) | fix  | avoid attempting to watch bundler internal files |
+| [ba844ae16](https://github.com/angular/angular-cli/commit/ba844ae16922961cef306553e49ce91b856f94d2) | fix  | avoid internal karma request cache for assets    |
+| [7bb1f8747](https://github.com/angular/angular-cli/commit/7bb1f87478d441e35b73b920c8bfcd4376a3422d) | fix  | enable unit-test reporters option                |
+| [1cd65a08d](https://github.com/angular/angular-cli/commit/1cd65a08d5278134115f33ff0e666aee420faf8a) | fix  | perform testing module cleanup when using Vitest |
+| [22ba07444](https://github.com/angular/angular-cli/commit/22ba07444192872278c7508b4af084fd39f9b3bd) | perf | fix unnecessary esbuild rebuilds                 |
+
+### @angular/pwa
+
+| Commit                                                                                              | Type | Description                                         |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------- |
+| [fa0a06f9f](https://github.com/angular/angular-cli/commit/fa0a06f9f92b28929fc775074245a0b97c3d9adc) | fix  | support using default index option when not present |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="20.0.0-next.9"></a>
 
 # 20.0.0-next.9 (2025-04-30)
