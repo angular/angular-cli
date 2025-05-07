@@ -567,15 +567,15 @@ export class PartiallyOrderedSet<T> {
     clear(): void;
     // (undocumented)
     delete(item: T): boolean;
-    entries(): SetIterator<[T, T]>;
+    entries(): IterableIterator<[T, T]>;
     // (undocumented)
     forEach(callbackfn: (value: T, value2: T, set: PartiallyOrderedSet<T>) => void, thisArg?: any): void;
     // (undocumented)
     has(item: T): boolean;
-    keys(): SetIterator<T>;
+    keys(): IterableIterator<T>;
     // (undocumented)
     get size(): number;
-    values(): SetIterator<T>;
+    values(): IterableIterator<T>;
 }
 
 // @public
