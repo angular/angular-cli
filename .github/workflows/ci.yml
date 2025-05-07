@@ -81,7 +81,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest]
-        node: [20, 22]
+        node: [20, 22, 24]
         subset: [npm, esbuild]
         shard: [0, 1, 2, 3, 4, 5]
     runs-on: ${{ matrix.os }}
