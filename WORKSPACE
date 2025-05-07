@@ -110,9 +110,9 @@ rules_js_register_toolchains(
 
 http_archive(
     name = "aspect_bazel_lib",
-    sha256 = "2be8a5df0b20b0ed37604b050da01dbf7ad45ad44768c0d478b64779b9f58412",
-    strip_prefix = "bazel-lib-2.15.3",
-    url = "https://github.com/aspect-build/bazel-lib/releases/download/v2.15.3/bazel-lib-v2.15.3.tar.gz",
+    sha256 = "fc8fe1be58ae39f84a8613d554534760c7f0819d407afcc98bbcbd990523bfed",
+    strip_prefix = "bazel-lib-2.16.0",
+    url = "https://github.com/aspect-build/bazel-lib/releases/download/v2.16.0/bazel-lib-v2.16.0.tar.gz",
 )
 
 load("@aspect_bazel_lib//lib:repositories.bzl", "aspect_bazel_lib_dependencies", "aspect_bazel_lib_register_toolchains")
