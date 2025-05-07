@@ -1,3 +1,23 @@
+<a name="19.2.11"></a>
+
+# 19.2.11 (2025-05-07)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                           |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------- |
+| [9eaf34405](https://github.com/angular/angular-cli/commit/9eaf344056b8772b623b0bfc27a66ad985941ae6) | fix  | correctly set i18n subPath in webpack browser builder |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                      |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------ |
+| [cba66a85c](https://github.com/angular/angular-cli/commit/cba66a85c0bb26813d320281072495473a2d14e3) | fix  | avoid attempting to watch bundler internal files |
+| [009fc3776](https://github.com/angular/angular-cli/commit/009fc377636817a4dc178908245695d5cff29e75) | fix  | avoid internal karma request cache for assets    |
+| [b43da3949](https://github.com/angular/angular-cli/commit/b43da39499ca477a896f7f957debb05ceed1372a) | perf | fix unnecessary esbuild rebuilds                 |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="20.0.0-next.9"></a>
 
 # 20.0.0-next.9 (2025-04-30)
