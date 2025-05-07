@@ -29,7 +29,7 @@
     "copy-webpack-plugin": "12.0.2",
     "critters": "0.0.24",
     "css-loader": "7.1.2",
-    "esbuild-wasm": "0.23.0",
+    "esbuild-wasm": "0.25.1",
     "fast-glob": "3.3.2",
     "http-proxy-middleware": "3.0.5",
     "https-proxy-agent": "7.0.5",
@@ -68,7 +68,7 @@
     "webpack-subresource-integrity": "5.1.0"
   },
   "optionalDependencies": {
-    "esbuild": "0.23.0"
+    "esbuild": "0.25.1"
   },
   "devDependencies": {
     "undici": "6.19.7"
