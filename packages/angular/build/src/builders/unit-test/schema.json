@@ -65,6 +65,11 @@
       "items": {
         "type": "string"
       }
+    },
+    "providersFile": {
+      "type": "string",
+      "description": "TypeScript file that exports an array of Angular providers to use during test execution. The array must be a default export.",
+      "minLength": 1
     }
   },
   "additionalProperties": false,
