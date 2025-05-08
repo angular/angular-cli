@@ -52,6 +52,7 @@ export async function normalizeOptions(
     reporters,
     browsers,
     watch,
+    providersFile: options.providersFile && path.join(workspaceRoot, options.providersFile),
   };
 }
 
