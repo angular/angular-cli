@@ -12,6 +12,7 @@ import { randomUUID } from 'node:crypto';
 import { createRequire } from 'node:module';
 import path from 'node:path';
 import { createVirtualModulePlugin } from '../../tools/esbuild/virtual-module-plugin';
+import { assertIsError } from '../../utils/error';
 import { loadEsmModule } from '../../utils/load-esm';
 import { buildApplicationInternal } from '../application';
 import type {
@@ -31,6 +32,7 @@ export type { UnitTestOptions };
 /**
  * @experimental Direct usage of this function is considered experimental.
  */
+// eslint-disable-next-line max-lines-per-function
 export async function* execute(
   options: UnitTestOptions,
   context: BuilderContext,
@@ -84,7 +86,22 @@ export async function* execute(
   const entryPoints = getTestEntrypoints(testFiles, { projectSourceRoot, workspaceRoot });
   entryPoints.set('init-testbed', 'angular:test-bed-init');
 
-  const { startVitest } = await loadEsmModule<typeof import('vitest/node')>('vitest/node');
+  let vitestNodeModule;
+  try {
+    vitestNodeModule = await loadEsmModule<typeof import('vitest/node')>('vitest/node');
+  } catch (error: unknown) {
+    assertIsError(error);
+    if (error.code !== 'ERR_MODULE_NOT_FOUND') {
+      throw error;
+    }
+
+    context.logger.error(
+      'The `vitest` package was not found. Please install the package and rerun the test command.',
+    );
+
+    return;
+  }
+  const { startVitest } = vitestNodeModule;
 
   // Setup test file build options based on application build target options
   const buildTargetOptions = (await context.validateOptions(
