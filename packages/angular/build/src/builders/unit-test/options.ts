@@ -32,7 +32,8 @@ export async function normalizeOptions(
   const buildTargetSpecifier = options.buildTarget ?? `::development`;
   const buildTarget = targetFromTargetString(buildTargetSpecifier, projectName, 'build');
 
-  const { codeCoverage, codeCoverageExclude, tsConfig, runner, reporters, browsers } = options;
+  const { codeCoverage, codeCoverageExclude, tsConfig, runner, reporters, browsers, watch } =
+    options;
 
   return {
     // Project/workspace information
@@ -50,8 +51,7 @@ export async function normalizeOptions(
     tsConfig,
     reporters,
     browsers,
-    // TODO: Implement watch support
-    watch: false,
+    watch,
   };
 }
 

@@ -100,6 +100,7 @@ export async function* execute(
   const buildOptions: ApplicationBuilderInternalOptions = {
     ...buildTargetOptions,
     watch: normalizedOptions.watch,
+    incrementalResults: normalizedOptions.watch,
     outputPath,
     index: false,
     browser: undefined,
@@ -171,44 +172,52 @@ export async function* execute(
     };
   }
 
-  for await (const result of buildApplicationInternal(buildOptions, context, extensions)) {
-    if (result.kind === ResultKind.Failure) {
-      continue;
-    } else if (result.kind !== ResultKind.Full) {
-      assert.fail('A full build result is required from the application builder.');
-    }
+  const setupFiles = ['init-testbed.js'];
+  if (buildTargetOptions?.polyfills?.length) {
+    setupFiles.push('polyfills.js');
+  }
 
-    assert(result.files, 'Builder did not provide result files.');
+  try {
+    for await (const result of buildApplicationInternal(buildOptions, context, extensions)) {
+      if (result.kind === ResultKind.Failure) {
+        continue;
+      } else if (result.kind !== ResultKind.Full && result.kind !== ResultKind.Incremental) {
+        assert.fail(
+          'A full and/or incremental build result is required from the application builder.',
+        );
+      }
+      assert(result.files, 'Builder did not provide result files.');
 
-    await writeTestFiles(result.files, outputPath);
+      await writeTestFiles(result.files, outputPath);
 
-    const setupFiles = ['init-testbed.js'];
-    if (buildTargetOptions?.polyfills?.length) {
-      setupFiles.push('polyfills.js');
-    }
-
-    instance ??= await startVitest('test', undefined /* cliFilters */, undefined /* options */, {
-      test: {
-        root: outputPath,
-        setupFiles,
-        // Use `jsdom` if no browsers are explicitly configured.
-        // `node` is effectively no "environment" and the default.
-        environment: browser ? 'node' : 'jsdom',
-        watch: normalizedOptions.watch,
-        browser,
-        reporters: normalizedOptions.reporters ?? ['default'],
-        coverage: {
-          enabled: normalizedOptions.codeCoverage,
-          exclude: normalizedOptions.codeCoverageExclude,
-          excludeAfterRemap: true,
+      instance ??= await startVitest('test', undefined /* cliFilters */, undefined /* options */, {
+        test: {
+          root: outputPath,
+          setupFiles,
+          // Use `jsdom` if no browsers are explicitly configured.
+          // `node` is effectively no "environment" and the default.
+          environment: browser ? 'node' : 'jsdom',
+          watch: normalizedOptions.watch,
+          browser,
+          reporters: normalizedOptions.reporters ?? ['default'],
+          coverage: {
+            enabled: normalizedOptions.codeCoverage,
+            exclude: normalizedOptions.codeCoverageExclude,
+            excludeAfterRemap: true,
+          },
         },
-      },
-    });
+      });
 
-    // Check if all the tests pass to calculate the result
-    const testModules = instance.state.getTestModules();
+      // Check if all the tests pass to calculate the result
+      const testModules = instance.state.getTestModules();
 
-    yield { success: testModules.every((testModule) => testModule.ok()) };
+      yield { success: testModules.every((testModule) => testModule.ok()) };
+    }
+  } finally {
+    if (normalizedOptions.watch) {
+      // Vitest will automatically close if not using watch mode
+      await instance?.close();
+    }
   }
 }
 
