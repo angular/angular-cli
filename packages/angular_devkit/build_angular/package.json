@@ -48,7 +48,7 @@
     "postcss-loader": "8.1.1",
     "resolve-url-loader": "5.0.0",
     "rxjs": "7.8.2",
-    "sass": "1.87.0",
+    "sass": "1.88.0",
     "sass-loader": "16.0.5",
     "semver": "7.7.1",
     "source-map-loader": "5.0.0",
@@ -70,7 +70,7 @@
     "@web/test-runner": "0.20.1",
     "browser-sync": "3.0.4",
     "ng-packagr": "20.0.0-rc.0",
-    "undici": "7.8.0"
+    "undici": "7.9.0"
   },
   "peerDependencies": {
     "@angular/core": "0.0.0-ANGULAR-FW-PEER-DEP",
