@@ -152,6 +152,7 @@ jobs:
 
   e2e-snapshots:
     needs: test
+    if: github.ref == 'refs/heads/main'
     strategy:
       fail-fast: false
       matrix:
