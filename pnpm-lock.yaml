@@ -42,8 +42,8 @@ importers:
         specifier: 20.0.0-rc.0
         version: 20.0.0-rc.0(s3hqhtlo3u2ktlkecz27drcsye)
       '@angular/ng-dev':
-        specifier: https://github.com/angular/dev-infra-private-ng-dev-builds.git#14ea8ca5b4adfb73a1f4ad531116cd448379a0a3
-        version: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/14ea8ca5b4adfb73a1f4ad531116cd448379a0a3(encoding@0.1.13)
+        specifier: https://github.com/angular/dev-infra-private-ng-dev-builds.git#7bcd0c29704c0655acadf644172f261af643be92
+        version: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/7bcd0c29704c0655acadf644172f261af643be92(encoding@0.1.13)
       '@angular/platform-browser':
         specifier: 20.0.0-rc.0
         version: 20.0.0-rc.0(@angular/animations@20.0.0-rc.0(@angular/common@20.0.0-rc.0(@angular/core@20.0.0-rc.0(@angular/compiler@20.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.15.0))(rxjs@7.8.2))(@angular/core@20.0.0-rc.0(@angular/compiler@20.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.15.0)))(@angular/common@20.0.0-rc.0(@angular/core@20.0.0-rc.0(@angular/compiler@20.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.15.0))(rxjs@7.8.2))(@angular/core@20.0.0-rc.0(@angular/compiler@20.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.15.0))
@@ -975,9 +975,9 @@ packages:
       '@angular/platform-browser': ^20.0.0-0 || ^20.1.0-0 || ^20.2.0-0 || ^20.3.0-0 || ^21.0.0-0
       rxjs: ^6.5.3 || ^7.4.0
 
-  '@angular/ng-dev@https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/14ea8ca5b4adfb73a1f4ad531116cd448379a0a3':
-    resolution: {tarball: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/14ea8ca5b4adfb73a1f4ad531116cd448379a0a3}
-    version: 0.0.0-030487ad792aad6856c48b2d1e699b0d96e11a7b
+  '@angular/ng-dev@https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/7bcd0c29704c0655acadf644172f261af643be92':
+    resolution: {tarball: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/7bcd0c29704c0655acadf644172f261af643be92}
+    version: 0.0.0-d344104dedb9e84e90acbc1bcc533cb33d883799
     hasBin: true
 
   '@angular/platform-browser@20.0.0-rc.0':
@@ -8322,7 +8322,7 @@ snapshots:
       rxjs: 7.8.2
       tslib: 2.8.1
 
-  '@angular/ng-dev@https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/14ea8ca5b4adfb73a1f4ad531116cd448379a0a3(encoding@0.1.13)':
+  '@angular/ng-dev@https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/7bcd0c29704c0655acadf644172f261af643be92(encoding@0.1.13)':
     dependencies:
       '@google-cloud/spanner': 7.21.0(encoding@0.1.13)(supports-color@10.0.0)
       '@octokit/rest': 21.1.1
