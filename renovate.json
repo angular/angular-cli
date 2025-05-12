@@ -1,73 +1,8 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "rangeStrategy": "replace",
-  "semanticCommits": "enabled",
-  "semanticCommitType": "build",
-  "semanticCommitScope": "",
-  "separateMajorMinor": false,
-  "prHourlyLimit": 2,
-  "labels": ["target: minor", "action: merge"],
-  "timezone": "America/Tijuana",
-  "lockFileMaintenance": {
-    "enabled": true
-  },
-  "dependencyDashboard": true,
-  "schedule": ["after 10:00pm every weekday", "before 4:00am every weekday", "every weekend"],
-  "baseBranches": ["main"],
-  "ignoreDeps": ["@types/node", "build_bazel_rules_nodejs", "rules_pkg", "yarn"],
-  "includePaths": [
-    "WORKSPACE",
-    "package.json",
-    "**/package.json",
-    ".github/workflows/**/*.yml",
-    ".nvmrc"
-  ],
+  "extends": ["github>angular/dev-infra//renovate-presets/default.json5"],
   "ignorePaths": ["tests/legacy-cli/e2e/assets/**", "tests/schematics/update/packages/**"],
   "packageRules": [
-    {
-      "matchDepNames": ["node"],
-      "matchUpdateTypes": ["minor", "patch"]
-    },
-    {
-      "enabled": false,
-      "matchDepNames": ["node"],
-      "matchUpdateTypes": ["major"]
-    },
-    {
-      "matchPackageNames": ["quicktype-core"],
-      "schedule": ["before 4:00am on the first day of the month"]
-    },
-    {
-      "matchCurrentVersion": "/^[~^]?0\\.0\\.0-/",
-      "enabled": false
-    },
-    {
-      "groupName": "angular",
-      "followTag": "next",
-      "matchDepNames": ["/^@angular/.*/", "/angular/dev-infra/"]
-    },
-    {
-      "groupName": "babel",
-      "matchDepNames": ["/^@babel/.*/"]
-    },
-    {
-      "groupName": "bazel",
-      "matchDepNames": ["/^@bazel/.*/", "/^build_bazel.*/"]
-    },
-    {
-      "separateMinorPatch": true,
-      "matchPackageNames": ["typescript", "rxjs", "tslib"]
-    },
-    {
-      "enabled": false,
-      "matchPackageNames": ["typescript", "rxjs", "tslib"],
-      "matchUpdateTypes": ["major"]
-    },
-    {
-      "enabled": false,
-      "matchPackageNames": ["typescript"],
-      "matchUpdateTypes": ["minor"]
-    },
     {
       "matchFileNames": [
         "packages/angular_devkit/schematics_cli/blank/project-files/package.json",
@@ -76,27 +11,9 @@
       ],
       "matchPackageNames": ["*"],
       "groupName": "schematics dependencies",
-      "groupSlug": "all-schematics-dependencies",
       "lockFileMaintenance": {
         "enabled": false
       }
-    },
-    {
-      "matchFileNames": [
-        "!packages/angular_devkit/schematics_cli/blank/project-files/package.json",
-        "!packages/angular_devkit/schematics_cli/schematic/files/package.json",
-        "!packages/schematics/angular/utility/latest-versions/package.json"
-      ],
-      "matchPackageNames": ["*", "!/^@angular/.*/", "!/angular/dev-infra/"],
-      "matchUpdateTypes": ["minor", "patch"],
-      "groupName": "all non-major dependencies",
-      "groupSlug": "all-minor-patch"
-    },
-    {
-      "matchFileNames": [".github/workflows/scorecard.yml"],
-      "matchPackageNames": ["*"],
-      "groupName": "scorecard action dependencies",
-      "groupSlug": "scorecard-action"
     }
   ]
 }
