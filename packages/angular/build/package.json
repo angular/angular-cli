@@ -39,7 +39,7 @@
     "piscina": "5.0.0",
     "rollup": "4.40.2",
     "sass": "1.88.0",
-    "semver": "7.7.1",
+    "semver": "7.7.2",
     "source-map-support": "0.5.21",
     "tinyglobby": "0.2.13",
     "vite": "6.3.5",
