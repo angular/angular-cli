@@ -194,7 +194,7 @@ export async function* execute(
   // Add setup file entries for TestBed initialization and project polyfills
   const setupFiles = ['init-testbed.js'];
   if (buildTargetOptions?.polyfills?.length) {
-    setupFiles.push('polyfills.js');
+    setupFiles.unshift('polyfills.js');
   }
 
   try {
