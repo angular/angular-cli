@@ -213,6 +213,7 @@ export async function* execute(
       instance ??= await startVitest('test', undefined /* cliFilters */, undefined /* options */, {
         test: {
           root: outputPath,
+          globals: true,
           setupFiles,
           // Use `jsdom` if no browsers are explicitly configured.
           // `node` is effectively no "environment" and the default.
