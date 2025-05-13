@@ -206,10 +206,9 @@ http_archive(
 load("@aspect_rules_ts//ts:repositories.bzl", "rules_ts_dependencies")
 
 rules_ts_dependencies(
-    # ts_version_from = "//:package.json",
-    # Obtained by: curl --silent https://registry.npmjs.org/typescript/5.7.2 | jq -r '.dist.integrity'
-    ts_integrity = "sha512-i5t66RHxDvVN40HfDd1PsEThGNnlMCMT3jMUuoh9/0TaqWevNontacunWyN02LA9/fIbEWlcHZcgTKb9QoaLfg==",
-    ts_version = "5.7.2",
+    # Obtained by: curl --silent https://registry.npmjs.org/typescript/5.8.3 | jq -r '.dist.integrity'
+    ts_integrity = "sha512-p1diW6TqL9L07nNxvRMM7hMMw4c5XOo/1ibL4aAIGmSAt9slTE1Xgw5KWuof2uTOvCg9BY7ZRi+GaF+7sfgPeQ==",
+    ts_version_from = "//:package.json",
 )
 
 http_file(
