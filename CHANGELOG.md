@@ -1,3 +1,15 @@
+<a name="19.2.12"></a>
+
+# 19.2.12 (2025-05-14)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                                 |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------- |
+| [0098c38c6](https://github.com/angular/angular-cli/commit/0098c38c6d77310effa8c647e1bbfb32fb92afc5) | fix  | properly handle Node.js `require()` errors with ESM modules |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="19.2.11"></a>
 
 # 19.2.11 (2025-05-07)
