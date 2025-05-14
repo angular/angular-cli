@@ -28,7 +28,7 @@ import { getAppModulePath, isStandaloneApp } from '../utility/ng-ast-utils';
 import { relativePathToWorkspaceRoot } from '../utility/paths';
 import { targetBuildNotFoundError } from '../utility/project-targets';
 import { findAppConfig } from '../utility/standalone/app_config';
-import { findBootstrapApplicationCall } from '../utility/standalone/util';
+import { findBootstrapApplicationCall, getMainFilePath } from '../utility/standalone/util';
 import { Builders } from '../utility/workspace-models';
 import { Schema as ServiceWorkerOptions } from './schema';
 
@@ -119,20 +119,18 @@ export default function (options: ServiceWorkerOptions): Rule {
     }
 
     const buildOptions = buildTarget.options as Record<string, string | boolean>;
-    let browserEntryPoint: string | undefined;
+    const browserEntryPoint = await getMainFilePath(host, options.project);
     const ngswConfigPath = join(normalize(project.root), 'ngsw-config.json');
 
     if (
       buildTarget.builder === Builders.Application ||
       buildTarget.builder === Builders.BuildApplication
     ) {
-      browserEntryPoint = buildOptions.browser as string;
       const productionConf = buildTarget.configurations?.production;
       if (productionConf) {
         productionConf.serviceWorker = ngswConfigPath;
       }
     } else {
-      browserEntryPoint = buildOptions.main as string;
       buildOptions.serviceWorker = true;
       buildOptions.ngswConfigPath = ngswConfigPath;
     }

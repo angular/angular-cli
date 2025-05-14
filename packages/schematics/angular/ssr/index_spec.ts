@@ -182,7 +182,7 @@ describe('SSR Schematic', () => {
       build.builder = '@angular-devkit/build-angular:browser';
       build.options = {
         ...build.options,
-        main: build.options.browser,
+        main: 'projects/test-app/src/main.ts',
         browser: undefined,
       };
 

@@ -203,7 +203,7 @@ describe('Service Worker Schematic', () => {
       build.builder = Builders.Browser;
       build.options = {
         ...build.options,
-        main: build.options.browser,
+        main: 'projects/bar/src/main.ts',
         browser: undefined,
       };
 
