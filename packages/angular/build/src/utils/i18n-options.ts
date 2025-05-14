@@ -6,7 +6,6 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { DiagnosticHandlingStrategy } from '@angular/localize/tools';
 import path from 'node:path';
 import type { TranslationLoader } from './load-translations';
 
@@ -29,7 +28,6 @@ export interface I18nOptions {
   flatOutput?: boolean;
   readonly shouldInline: boolean;
   hasDefinedSourceLocale?: boolean;
-  i18nDuplicateTranslation?: DiagnosticHandlingStrategy;
 }
 
 function normalizeTranslationFileOption(
