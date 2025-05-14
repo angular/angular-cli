@@ -158,6 +158,7 @@ export function executeNgPackagrBuilder(options: NgPackagrBuilderOptions, contex
 export type ExtractI18nBuilderOptions = {
     buildTarget?: string;
     format?: Format;
+    i18nDuplicateTranslation?: I18NDuplicateTranslation;
     outFile?: string;
     outputPath?: string;
     progress?: boolean;
