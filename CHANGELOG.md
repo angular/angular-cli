@@ -1,3 +1,32 @@
+<a name="20.0.0-rc.1"></a>
+
+# 20.0.0-rc.1 (2025-05-14)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                                 |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------- |
+| [5093ce0a6](https://github.com/angular/angular-cli/commit/5093ce0a6c85429a402fcccbdb63f1d1db75bcf6) | fix  | properly handle Node.js `require()` errors with ESM modules |
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                           |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------- |
+| [3cf6ab0f7](https://github.com/angular/angular-cli/commit/3cf6ab0f77b23b8717e79b7125ea930cb018ebc5) | fix  | support using default browser option when not present |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                                   |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------- |
+| [e36bf964a](https://github.com/angular/angular-cli/commit/e36bf964a776b04f6a9193387692274865e1630b) | fix  | allow TestBed provider configuration with vitest unit-testing |
+| [769961e4a](https://github.com/angular/angular-cli/commit/769961e4a9a67f88f8fb4b7de80dea67825219f9) | fix  | allow vitest-based unit testing to use watch option           |
+| [c7f2cb596](https://github.com/angular/angular-cli/commit/c7f2cb59684a264bb4ecab2024d8a8c58efbefa7) | fix  | provide vitest globals in unit-test builder                   |
+| [0d40cdecd](https://github.com/angular/angular-cli/commit/0d40cdecd0fdc1b03d2cafcdd5321db0d31b56ee) | fix  | setup unit-test polyfills before TestBed init                 |
+| [fa3dc6387](https://github.com/angular/angular-cli/commit/fa3dc6387db971be265c1c5391c71a23c62df15c) | fix  | show unit-test error for missing vitest browser package       |
+| [247cd3352](https://github.com/angular/angular-cli/commit/247cd335217d9997995321b4b235c40480adadb3) | fix  | show unit-test error for missing vitest package               |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="19.2.12"></a>
 
 # 19.2.12 (2025-05-14)
