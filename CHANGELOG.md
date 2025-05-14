@@ -1,3 +1,15 @@
+<a name="20.0.0-rc.2"></a>
+
+# 20.0.0-rc.2 (2025-05-14)
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                          |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------- |
+| [d2bfc6bd4](https://github.com/angular/angular-cli/commit/d2bfc6bd4eb0892e9eb6205838158142b716d21c) | fix  | revert setup unit-test polyfills before TestBed init |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="20.0.0-rc.1"></a>
 
 # 20.0.0-rc.1 (2025-05-14)
