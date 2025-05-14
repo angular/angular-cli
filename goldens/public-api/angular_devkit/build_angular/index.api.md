@@ -191,6 +191,7 @@ export type ExecutionTransformer<T> = (input: T) => T | Promise<T>;
 export type ExtractI18nBuilderOptions = {
     buildTarget?: string;
     format?: Format;
+    i18nDuplicateTranslation?: I18NDuplicateTranslation;
     outFile?: string;
     outputPath?: string;
     progress?: boolean;
