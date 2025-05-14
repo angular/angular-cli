@@ -147,6 +147,34 @@ describe('Extract i18n Target', () => {
     expect(fullLog).toContain('Duplicate messages with id');
   });
 
+  it('issues errors for duplicate message identifiers', async () => {
+    host.appendToFile(
+      'src/app/app.component.ts',
+      'const c = $localize`:@@message-2:message contents`; const d = $localize`:@@message-2:different message contents`;',
+    );
+
+    const logger = new logging.Logger('');
+    const logs: string[] = [];
+    logger.subscribe((e) => logs.push(e.message));
+
+    const run = await architect.scheduleTarget(
+      extractI18nTargetSpec,
+      {
+        i18nDuplicateTranslation: 'error',
+      },
+      { logger },
+    );
+    await expectAsync(run.result).toBeResolvedTo(jasmine.objectContaining({ success: false }));
+
+    await run.stop();
+
+    expect(host.scopedSync().exists(extractionFile)).toBe(false);
+
+    const fullLog = logs.join();
+    expect(fullLog).toContain('Duplicate messages with id');
+    expect(fullLog).toContain('Extraction Failed');
+  });
+
   it('ignores inline styles', async () => {
     host.appendToFile('src/app/app.component.html', '<p i18n>i18n test</p>');
     host.replaceInFile('src/app/app.component.ts', 'styleUrls', 'styles');
