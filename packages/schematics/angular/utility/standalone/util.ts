@@ -7,6 +7,7 @@
  */
 
 import { SchematicsException, Tree } from '@angular-devkit/schematics';
+import { join } from 'node:path/posix';
 import ts from '../../third_party/github.com/Microsoft/TypeScript/lib/typescript';
 import { Change, applyToUpdateRecorder } from '../change';
 import { targetBuildNotFoundError } from '../project-targets';
@@ -23,16 +24,23 @@ export async function getMainFilePath(tree: Tree, projectName: string): Promise<
   const project = workspace.projects.get(projectName);
   const buildTarget = project?.targets.get('build');
 
-  if (!buildTarget) {
+  if (!project || !buildTarget) {
     throw targetBuildNotFoundError();
   }
 
   const options = buildTarget.options as Record<string, string>;
 
-  return buildTarget.builder === Builders.Application ||
+  if (
+    buildTarget.builder === Builders.Application ||
     buildTarget.builder === Builders.BuildApplication
-    ? options.browser
-    : options.main;
+  ) {
+    // These builders support a default of `<project_source_root>/main.ts`
+    const projectSourceRoot = project.sourceRoot ?? join(project.root, 'src');
+
+    return options.browser ?? join(projectSourceRoot, 'main.ts');
+  }
+
+  return options.main;
 }
 
 /**

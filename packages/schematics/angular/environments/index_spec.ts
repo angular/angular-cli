@@ -50,7 +50,7 @@ describe('Environments Schematic', () => {
     build.builder = Builders.Browser;
     build.options = {
       ...build.options,
-      main: build.options.browser,
+      main: 'projects/foo/src/main.ts',
       browser: undefined,
     };
 
