@@ -10,6 +10,7 @@ import { type BuilderContext, targetFromTargetString } from '@angular-devkit/arc
 import path from 'node:path';
 import { normalizeCacheOptions } from '../../utils/normalize-cache';
 import { getProjectRootPaths } from '../../utils/project-metadata';
+import { isTTY } from '../../utils/tty';
 import type { Schema as UnitTestOptions } from './schema';
 
 export type NormalizedUnitTestOptions = Awaited<ReturnType<typeof normalizeOptions>>;
@@ -32,8 +33,7 @@ export async function normalizeOptions(
   const buildTargetSpecifier = options.buildTarget ?? `::development`;
   const buildTarget = targetFromTargetString(buildTargetSpecifier, projectName, 'build');
 
-  const { codeCoverage, codeCoverageExclude, tsConfig, runner, reporters, browsers, watch } =
-    options;
+  const { codeCoverage, codeCoverageExclude, tsConfig, runner, reporters, browsers } = options;
 
   return {
     // Project/workspace information
@@ -51,7 +51,7 @@ export async function normalizeOptions(
     tsConfig,
     reporters,
     browsers,
-    watch,
+    watch: options.watch ?? isTTY(),
     debug: options.debug ?? false,
     providersFile: options.providersFile && path.join(workspaceRoot, options.providersFile),
   };
