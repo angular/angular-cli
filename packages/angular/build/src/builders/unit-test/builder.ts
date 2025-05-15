@@ -183,6 +183,7 @@ export async function* execute(
   // Setup vitest browser options if configured
   const { browser, errors } = setupBrowserConfiguration(
     normalizedOptions.browsers,
+    normalizedOptions.debug,
     projectSourceRoot,
   );
   if (errors?.length) {
@@ -196,6 +197,13 @@ export async function* execute(
   if (buildTargetOptions?.polyfills?.length) {
     setupFiles.push('polyfills.js');
   }
+  const debugOptions = normalizedOptions.debug
+    ? {
+        inspectBrk: true,
+        isolate: false,
+        fileParallelism: false,
+      }
+    : {};
 
   try {
     for await (const result of buildApplicationInternal(buildOptions, context, extensions)) {
@@ -226,6 +234,7 @@ export async function* execute(
             exclude: normalizedOptions.codeCoverageExclude,
             excludeAfterRemap: true,
           },
+          ...debugOptions,
         },
       });
 
@@ -259,6 +268,7 @@ function findBrowserProvider(
 
 function setupBrowserConfiguration(
   browsers: string[] | undefined,
+  debug: boolean,
   projectSourceRoot: string,
 ): { browser?: import('vitest/node').BrowserConfigOptions; errors?: string[] } {
   if (browsers === undefined) {
@@ -284,6 +294,15 @@ function setupBrowserConfiguration(
     errors.push(
       'The "browsers" option requires either "playwright" or "webdriverio" to be installed within the project.' +
         ' Please install one of these packages and rerun the test command.',
+    );
+  }
+
+  // Vitest current requires the playwright browser provider to use the inspect-brk option used by "debug"
+  if (debug && provider !== 'playwright') {
+    errors ??= [];
+    errors.push(
+      'Debugging browser mode tests currently requires the use of "playwright".' +
+        ' Please install this package and rerun the test command.',
     );
   }
 
