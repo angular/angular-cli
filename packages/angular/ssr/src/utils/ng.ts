@@ -20,7 +20,7 @@ import {
   platformServer,
   ɵrenderInternal as renderInternal,
 } from '@angular/platform-server';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Console } from '../console';
 import { joinUrlParts, stripIndexHtmlFromURL } from './url';
 
@@ -98,10 +98,13 @@ export async function renderAngular(
 
     // TODO(alanagius): Find a way to avoid rendering here especially for redirects as any output will be discarded.
     const envInjector = applicationRef.injector;
+    const routerIsProvided = !!envInjector.get(ActivatedRoute, null);
     const router = envInjector.get(Router);
     const lastSuccessfulNavigation = router.lastSuccessfulNavigation;
 
-    if (lastSuccessfulNavigation?.finalUrl) {
+    if (!routerIsProvided) {
+      hasNavigationError = false;
+    } else if (lastSuccessfulNavigation?.finalUrl) {
       hasNavigationError = false;
 
       const { finalUrl, initialUrl } = lastSuccessfulNavigation;
