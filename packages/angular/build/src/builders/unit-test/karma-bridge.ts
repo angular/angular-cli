@@ -15,6 +15,12 @@ export async function useKarmaBuilder(
   context: BuilderContext,
   unitTestOptions: NormalizedUnitTestOptions,
 ): Promise<AsyncIterable<BuilderOutput>> {
+  if (unitTestOptions.debug) {
+    context.logger.warn(
+      'The "karma" test runner does not support the "debug" option. The option will be ignored.',
+    );
+  }
+
   const buildTargetOptions = (await context.validateOptions(
     await context.getTargetOptions(unitTestOptions.buildTarget),
     await context.getBuilderNameForTarget(unitTestOptions.buildTarget),

@@ -46,6 +46,11 @@
       "type": "boolean",
       "description": "Run build when files change."
     },
+    "debug": {
+      "type": "boolean",
+      "description": "Initialize the test runner to support using the Node Inspector for test debugging.",
+      "default": false
+    },
     "codeCoverage": {
       "type": "boolean",
       "description": "Output a code coverage report.",
