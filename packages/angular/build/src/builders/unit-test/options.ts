@@ -54,18 +54,3 @@ export async function normalizeOptions(
     watch: false,
   };
 }
-
-/**
- * Normalize a directory path string.
- * Currently only removes a trailing slash if present.
- * @param path A path string.
- * @returns A normalized path string.
- */
-function normalizeDirectoryPath(path: string): string {
-  const last = path[path.length - 1];
-  if (last === '/' || last === '\\') {
-    return path.slice(0, -1);
-  }
-
-  return path;
-}
