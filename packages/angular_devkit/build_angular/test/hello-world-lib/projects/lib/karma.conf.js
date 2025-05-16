@@ -42,7 +42,7 @@ module.exports = function (config) {
         base: 'ChromeHeadless',
         flags: [
           '--disable-gpu',
-          ...(process.env.CHROME_NO_SANDBOX === '1' ? ['--no-sandbox'] : []),
+          '--no-sandbox'
         ],
       }
     },
