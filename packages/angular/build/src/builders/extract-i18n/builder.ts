@@ -90,16 +90,23 @@ export async function execute(
       return path.relative(from, to);
     },
   };
+  const duplicateTranslationBehavior = normalizedOptions.i18nOptions.duplicateTranslationBehavior;
   const diagnostics = checkDuplicateMessages(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     checkFileSystem as any,
     extractionResult.messages,
-    normalizedOptions.i18nOptions.i18nDuplicateTranslation || 'warning',
+    duplicateTranslationBehavior,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     extractionResult.basePath as any,
   );
-  if (diagnostics.messages.length > 0) {
-    context.logger.warn(diagnostics.formatDiagnostics(''));
+  if (diagnostics.messages.length > 0 && duplicateTranslationBehavior !== 'ignore') {
+    if (duplicateTranslationBehavior === 'error') {
+      context.logger.error(`Extraction Failed: ${diagnostics.formatDiagnostics('')}`);
+
+      return { success: false };
+    } else {
+      context.logger.warn(diagnostics.formatDiagnostics(''));
+    }
   }
 
   // Serialize all extracted messages
