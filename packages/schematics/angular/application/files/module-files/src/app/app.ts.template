@@ -15,5 +15,5 @@ import { Component } from '@angular/core';
   styleUrl: './app.<%= style %>'<% } %>
 })
 export class App {
-  title = '<%= name %>';
+  protected title = '<%= name %>';
 }
