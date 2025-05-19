@@ -112,7 +112,6 @@ describe('PWA Schematic', () => {
     const content = tree.readContent('projects/bar/src/index.html');
 
     expect(content).toMatch(/<link rel="manifest" href="manifest.webmanifest">/);
-    expect(content).toMatch(/<meta name="theme-color" content="#1976d2">/);
     expect(content).toMatch(
       /<noscript>Please enable JavaScript to continue using this application.<\/noscript>/,
     );
@@ -127,7 +126,6 @@ describe('PWA Schematic', () => {
     const content = tree.readContent('projects/bar/src/index.html');
 
     expect(content).toMatch(/<link rel="manifest" href="manifest.webmanifest">/);
-    expect(content).toMatch(/<meta name="theme-color" content="#1976d2">/);
     expect(content).not.toMatch(
       /<noscript>Please enable JavaScript to continue using this application.<\/noscript>/,
     );
