@@ -276,8 +276,8 @@ importers:
         specifier: 6.2.1
         version: 6.2.1(rollup@4.41.0)(typescript@5.8.3)
       rollup-plugin-sourcemaps2:
-        specifier: 0.5.1
-        version: 0.5.1(@types/node@20.17.46)(rollup@4.41.0)
+        specifier: 0.5.2
+        version: 0.5.2(@types/node@20.17.46)(rollup@4.41.0)
       semver:
         specifier: 7.7.2
         version: 7.7.2
@@ -6902,8 +6902,8 @@ packages:
       rollup: ^3.29.4 || ^4
       typescript: 5.8.3
 
-  rollup-plugin-sourcemaps2@0.5.1:
-    resolution: {integrity: sha512-y8yq66AM3gD2636cb6+mqGvrTnYJrCQt7lhzXxFShKxOA52PGtfsQdooOYtZWtXYc5bWsNXpD7CEs1m36CGZmw==}
+  rollup-plugin-sourcemaps2@0.5.2:
+    resolution: {integrity: sha512-NTz5Y5ySYH9cZZF+qteTHN2x3dnFggTKzCtiN3NhtMvIEXdkOsZVBh6r6xrwsyDnZAhmKRsttwTfXfJVoanM6w==}
     engines: {node: '>=18.0.0'}
     peerDependencies:
       '@types/node': '>=18.0.0'
@@ -15049,7 +15049,7 @@ snapshots:
     optionalDependencies:
       '@babel/code-frame': 7.27.1
 
-  rollup-plugin-sourcemaps2@0.5.1(@types/node@20.17.46)(rollup@4.41.0):
+  rollup-plugin-sourcemaps2@0.5.2(@types/node@20.17.46)(rollup@4.41.0):
     dependencies:
       '@rollup/pluginutils': 5.1.4(rollup@4.41.0)
       rollup: 4.41.0
