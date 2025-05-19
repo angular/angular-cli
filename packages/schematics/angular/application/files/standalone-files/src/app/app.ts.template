@@ -16,5 +16,5 @@ import { RouterOutlet } from '@angular/router';<% } %>
   styleUrl: './app.<%= style %>'<% } %>
 })
 export class App {
-  title = '<%= name %>';
+  protected title = '<%= name %>';
 }
