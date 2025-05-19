@@ -45,7 +45,6 @@ function updateIndexFile(path: string): Rule {
     rewriter.on('endTag', (endTag) => {
       if (endTag.tagName === 'head') {
         rewriter.emitRaw('  <link rel="manifest" href="manifest.webmanifest">\n');
-        rewriter.emitRaw('  <meta name="theme-color" content="#1976d2">\n');
       } else if (endTag.tagName === 'body' && needsNoScript) {
         rewriter.emitRaw(
           '  <noscript>Please enable JavaScript to continue using this application.</noscript>\n',
