@@ -217,39 +217,47 @@ export async function* execute(
 
       await writeTestFiles(result.files, outputPath);
 
-      instance ??= await startVitest('test', undefined /* cliFilters */, undefined /* options */, {
-        test: {
-          root: outputPath,
-          globals: true,
-          setupFiles,
-          // Use `jsdom` if no browsers are explicitly configured.
-          // `node` is effectively no "environment" and the default.
-          environment: browser ? 'node' : 'jsdom',
-          watch: normalizedOptions.watch,
-          browser,
-          reporters: normalizedOptions.reporters ?? ['default'],
-          coverage: {
-            enabled: normalizedOptions.codeCoverage,
-            excludeAfterRemap: true,
-          },
-          ...debugOptions,
+      instance ??= await startVitest(
+        'test',
+        undefined /* cliFilters */,
+        {
+          // Disable configuration file resolution/loading
+          config: false,
         },
-        plugins: [
-          {
-            name: 'angular-coverage-exclude',
-            configureVitest(context) {
-              // Adjust coverage excludes to not include the otherwise automatically inserted included unit tests.
-              // Vite does this as a convenience but is problematic for the bundling strategy employed by the
-              // builder's test setup. To workaround this, the excludes are adjusted here to only automatically
-              // exclude the TypeScript source test files.
-              context.project.config.coverage.exclude = [
-                ...(normalizedOptions.codeCoverageExclude ?? []),
-                '**/*.{test,spec}.?(c|m)ts',
-              ];
+        {
+          test: {
+            root: outputPath,
+            globals: true,
+            setupFiles,
+            // Use `jsdom` if no browsers are explicitly configured.
+            // `node` is effectively no "environment" and the default.
+            environment: browser ? 'node' : 'jsdom',
+            watch: normalizedOptions.watch,
+            browser,
+            reporters: normalizedOptions.reporters ?? ['default'],
+            coverage: {
+              enabled: normalizedOptions.codeCoverage,
+              excludeAfterRemap: true,
             },
+            ...debugOptions,
           },
-        ],
-      });
+          plugins: [
+            {
+              name: 'angular-coverage-exclude',
+              configureVitest(context) {
+                // Adjust coverage excludes to not include the otherwise automatically inserted included unit tests.
+                // Vite does this as a convenience but is problematic for the bundling strategy employed by the
+                // builder's test setup. To workaround this, the excludes are adjusted here to only automatically
+                // exclude the TypeScript source test files.
+                context.project.config.coverage.exclude = [
+                  ...(normalizedOptions.codeCoverageExclude ?? []),
+                  '**/*.{test,spec}.?(c|m)ts',
+                ];
+              },
+            },
+          ],
+        },
+      );
 
       // Check if all the tests pass to calculate the result
       const testModules = instance.state.getTestModules();
