@@ -275,7 +275,7 @@ esbuild_register_toolchains(
 
 git_repository(
     name = "rules_angular",
-    commit = "c0d7927a33802db438c01d2ae8ad1884e6c363fd",
+    commit = "5b9b1fc545736b8b602a216f89134c1f20d3009c",
     remote = "https://github.com/devversion/rules_angular.git",
 )
 
