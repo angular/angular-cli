@@ -169,7 +169,7 @@ async function addProxyConfig(
     throw new Error(`Proxy configuration file ${proxyPath} does not exist.`);
   }
 
-  let proxyConfiguration: Record<string, object> | object[];
+  let proxyConfiguration;
 
   switch (extname(proxyPath)) {
     case '.json': {
@@ -194,11 +194,9 @@ async function addProxyConfig(
       // Load the ESM configuration file using the TypeScript dynamic import workaround.
       // Once TypeScript provides support for keeping the dynamic import this workaround can be
       // changed to a direct dynamic import.
-      proxyConfiguration = (
-        await loadEsmModule<{ default: Record<string, object> | object[] }>(
-          pathToFileURL(proxyPath),
-        )
-      ).default;
+      proxyConfiguration = await loadEsmModule<{ default: Record<string, object> | object[] }>(
+        pathToFileURL(proxyPath),
+      );
       break;
     case '.cjs':
       proxyConfiguration = require(proxyPath);
@@ -217,12 +215,14 @@ async function addProxyConfig(
         // Load the ESM configuration file using the TypeScript dynamic import workaround.
         // Once TypeScript provides support for keeping the dynamic import this workaround can be
         // changed to a direct dynamic import.
-        proxyConfiguration = (
-          await loadEsmModule<{ default: Record<string, object> | object[] }>(
-            pathToFileURL(proxyPath),
-          )
-        ).default;
+        proxyConfiguration = await loadEsmModule<{ default: Record<string, object> | object[] }>(
+          pathToFileURL(proxyPath),
+        );
       }
+  }
+
+  if ('default' in proxyConfiguration) {
+    proxyConfiguration = proxyConfiguration.default;
   }
 
   return normalizeProxyConfiguration(proxyConfiguration);

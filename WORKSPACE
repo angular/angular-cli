@@ -1,7 +1,5 @@
 workspace(name = "angular_cli")
 
-DEFAULT_NODE_VERSION = "20.11.1"
-
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive", "http_file")
 
 http_archive(
@@ -61,65 +59,65 @@ rules_pkg_dependencies()
 # Setup the Node.js toolchain
 load("@rules_nodejs//nodejs:repositories.bzl", "nodejs_register_toolchains")
 
-NODE_20_REPO = {
-    "20.11.1-darwin_arm64": ("node-v20.11.1-darwin-arm64.tar.gz", "node-v20.11.1-darwin-arm64", "e0065c61f340e85106a99c4b54746c5cee09d59b08c5712f67f99e92aa44995d"),
-    "20.11.1-darwin_amd64": ("node-v20.11.1-darwin-x64.tar.gz", "node-v20.11.1-darwin-x64", "c52e7fb0709dbe63a4cbe08ac8af3479188692937a7bd8e776e0eedfa33bb848"),
-    "20.11.1-linux_arm64": ("node-v20.11.1-linux-arm64.tar.xz", "node-v20.11.1-linux-arm64", "c957f29eb4e341903520caf362534f0acd1db7be79c502ae8e283994eed07fe1"),
-    "20.11.1-linux_ppc64le": ("node-v20.11.1-linux-ppc64le.tar.xz", "node-v20.11.1-linux-ppc64le", "51343cacf5cdf5c4b5e93e919d19dd373d6ef43d5f2c666eae299f26e31d08b5"),
-    "20.11.1-linux_s390x": ("node-v20.11.1-linux-s390x.tar.xz", "node-v20.11.1-linux-s390x", "b32616b705cd0ddbb230b95c693e3d7a37becc2ced9bcadea8dc824cceed6be0"),
-    "20.11.1-linux_amd64": ("node-v20.11.1-linux-x64.tar.xz", "node-v20.11.1-linux-x64", "d8dab549b09672b03356aa2257699f3de3b58c96e74eb26a8b495fbdc9cf6fbe"),
-    "20.11.1-windows_amd64": ("node-v20.11.1-win-x64.zip", "node-v20.11.1-win-x64", "bc032628d77d206ffa7f133518a6225a9c5d6d9210ead30d67e294ff37044bda"),
+# Set the default nodejs toolchain to the latest supported major version
+
+NODE_24_VERSION = "24.0.0"
+
+NODE_24_REPO = {
+    "24.0.0-darwin_arm64": ("node-v24.0.0-darwin-arm64.tar.gz", "node-v24.0.0-darwin-arm64", "194e2f3dd3ec8c2adcaa713ed40f44c5ca38467880e160974ceac1659be60121"),
+    "24.0.0-darwin_amd64": ("node-v24.0.0-darwin-x64.tar.gz", "node-v24.0.0-darwin-x64", "f716b3ce14a7e37a6cbf97c9de10d444d7da07ef833cd8da81dd944d111e6a4a"),
+    "24.0.0-linux_arm64": ("node-v24.0.0-linux-arm64.tar.xz", "node-v24.0.0-linux-arm64", "d40ec7ffe0b82b02dce94208c84351424099bd70fa3a42b65c46d95322305040"),
+    "24.0.0-linux_ppc64le": ("node-v24.0.0-linux-ppc64le.tar.xz", "node-v24.0.0-linux-ppc64le", "cfa0e8d51a2f9a446f1bfb81cdf4c7e95336ad622e2aa230e3fa1d093c63d77d"),
+    "24.0.0-linux_s390x": ("node-v24.0.0-linux-s390x.tar.xz", "node-v24.0.0-linux-s390x", "e37a04c7ee05416ec1234fd3255e05b6b81287eb0424a57441c8b69f0a155021"),
+    "24.0.0-linux_amd64": ("node-v24.0.0-linux-x64.tar.xz", "node-v24.0.0-linux-x64", "59b8af617dccd7f9f68cc8451b2aee1e86d6bd5cb92cd51dd6216a31b707efd7"),
+    "24.0.0-windows_amd64": ("node-v24.0.0-win-x64.zip", "node-v24.0.0-win-x64", "3d0fff80c87bb9a8d7f49f2f27832aa34a1477d137af46f5b14df5498be81304"),
 }
 
-# Set the default nodejs toolchain to the latest supported major version
 nodejs_register_toolchains(
     name = "nodejs",
-    # The below can be removed once @rules_nodejs/nodejs is updated to latest which contains https://github.com/bazelbuild/rules_nodejs/pull/3701
-    node_repositories = NODE_20_REPO,
-    node_version = DEFAULT_NODE_VERSION,
+    node_repositories = NODE_24_REPO,
+    node_version = NODE_24_VERSION,
 )
 
 nodejs_register_toolchains(
     name = "node20",
-    # The below can be removed once @rules_nodejs/nodejs is updated to latest which contains https://github.com/bazelbuild/rules_nodejs/pull/3701
-    node_repositories = NODE_20_REPO,
-    node_version = "20.11.1",
+    node_repositories = {
+        "20.19.0-darwin_arm64": ("node-v20.19.0-darwin-arm64.tar.gz", "node-v20.19.0-darwin-arm64", "c016cd1975a264a29dc1b07c6fbe60d5df0a0c2beb4113c0450e3d998d1a0d9c"),
+        "20.19.0-darwin_amd64": ("node-v20.19.0-darwin-x64.tar.gz", "node-v20.19.0-darwin-x64", "a8554af97d6491fdbdabe63d3a1cfb9571228d25a3ad9aed2df856facb131b20"),
+        "20.19.0-linux_arm64": ("node-v20.19.0-linux-arm64.tar.xz", "node-v20.19.0-linux-arm64", "dbe339e55eb393955a213e6b872066880bb9feceaa494f4d44c7aac205ec2ab9"),
+        "20.19.0-linux_ppc64le": ("node-v20.19.0-linux-ppc64le.tar.xz", "node-v20.19.0-linux-ppc64le", "84937108f005679e60b486ed8e801cebfe923f02b76d8e710463d32f82181f65"),
+        "20.19.0-linux_s390x": ("node-v20.19.0-linux-s390x.tar.xz", "node-v20.19.0-linux-s390x", "11f8ee99d792a83bba7b29911e0229dd6cd5e88987d7416346067db1cc76d89a"),
+        "20.19.0-linux_amd64": ("node-v20.19.0-linux-x64.tar.xz", "node-v20.19.0-linux-x64", "b4e336584d62abefad31baecff7af167268be9bb7dd11f1297112e6eed3ca0d5"),
+        "20.19.0-windows_amd64": ("node-v20.19.0-win-x64.zip", "node-v20.19.0-win-x64", "be72284c7bc62de07d5a9fd0ae196879842c085f11f7f2b60bf8864c0c9d6a4f"),
+    },
+    node_version = "20.19.0",
 )
 
 nodejs_register_toolchains(
     name = "node22",
-    # The below can be removed once @rules_nodejs/nodejs is updated to latest which contains https://github.com/bazelbuild/rules_nodejs/pull/3701
     node_repositories = {
-        "22.11.0-darwin_arm64": ("node-v22.11.0-darwin-arm64.tar.gz", "node-v22.11.0-darwin-arm64", "2e89afe6f4e3aa6c7e21c560d8a0453d84807e97850bbb819b998531a22bdfde"),
-        "22.11.0-darwin_amd64": ("node-v22.11.0-darwin-x64.tar.gz", "node-v22.11.0-darwin-x64", "668d30b9512137b5f5baeef6c1bb4c46efff9a761ba990a034fb6b28b9da2465"),
-        "22.11.0-linux_arm64": ("node-v22.11.0-linux-arm64.tar.xz", "node-v22.11.0-linux-arm64", "6031d04b98f59ff0f7cb98566f65b115ecd893d3b7870821171708cdbaf7ae6e"),
-        "22.11.0-linux_ppc64le": ("node-v22.11.0-linux-ppc64le.tar.xz", "node-v22.11.0-linux-ppc64le", "d1d49d7d611b104b6d616e18ac439479d8296aa20e3741432de0e85f4735a81e"),
-        "22.11.0-linux_s390x": ("node-v22.11.0-linux-s390x.tar.xz", "node-v22.11.0-linux-s390x", "f474ed77d6b13d66d07589aee1c2b9175be4c1b165483e608ac1674643064a99"),
-        "22.11.0-linux_amd64": ("node-v22.11.0-linux-x64.tar.xz", "node-v22.11.0-linux-x64", "83bf07dd343002a26211cf1fcd46a9d9534219aad42ee02847816940bf610a72"),
-        "22.11.0-windows_amd64": ("node-v22.11.0-win-x64.zip", "node-v22.11.0-win-x64", "905373a059aecaf7f48c1ce10ffbd5334457ca00f678747f19db5ea7d256c236"),
+        "22.12.0-darwin_arm64": ("node-v22.12.0-darwin-arm64.tar.gz", "node-v22.12.0-darwin-arm64", "293dcc6c2408da21562d135b0412525e381bb6fe150d688edb58fe850d0f3e13"),
+        "22.12.0-darwin_amd64": ("node-v22.12.0-darwin-x64.tar.gz", "node-v22.12.0-darwin-x64", "52bc25dd026db7247c3c00439afdb83e95087248267f02d6c1a7250d1f896173"),
+        "22.12.0-linux_arm64": ("node-v22.12.0-linux-arm64.tar.xz", "node-v22.12.0-linux-arm64", "8cfd5a8b9afae5a2e0bd86b0148ca31d2589c0ea669c2d0b11c132e35d90ed68"),
+        "22.12.0-linux_ppc64le": ("node-v22.12.0-linux-ppc64le.tar.xz", "node-v22.12.0-linux-ppc64le", "199a606ba1ee86cce6d6b369c71f9d00873d2836a6662592afc3b6a5923e2004"),
+        "22.12.0-linux_s390x": ("node-v22.12.0-linux-s390x.tar.xz", "node-v22.12.0-linux-s390x", "9b517f8006eb4b451d40c461cbe64f93c6455566dbe2613387ab02412bc06d35"),
+        "22.12.0-linux_amd64": ("node-v22.12.0-linux-x64.tar.xz", "node-v22.12.0-linux-x64", "22982235e1b71fa8850f82edd09cdae7e3f32df1764a9ec298c72d25ef2c164f"),
+        "22.12.0-windows_amd64": ("node-v22.12.0-win-x64.zip", "node-v22.12.0-win-x64", "2b8f2256382f97ad51e29ff71f702961af466c4616393f767455501e6aece9b8"),
     },
-    node_version = "22.11.0",
+    node_version = "22.12.0",
 )
 
 nodejs_register_toolchains(
     name = "node24",
-    node_repositories = {
-        "24.0.0-darwin_arm64": ("node-v24.0.0-darwin-arm64.tar.gz", "node-v24.0.0-darwin-arm64", "194e2f3dd3ec8c2adcaa713ed40f44c5ca38467880e160974ceac1659be60121"),
-        "24.0.0-darwin_amd64": ("node-v24.0.0-darwin-x64.tar.gz", "node-v24.0.0-darwin-x64", "f716b3ce14a7e37a6cbf97c9de10d444d7da07ef833cd8da81dd944d111e6a4a"),
-        "24.0.0-linux_arm64": ("node-v24.0.0-linux-arm64.tar.xz", "node-v24.0.0-linux-arm64", "d40ec7ffe0b82b02dce94208c84351424099bd70fa3a42b65c46d95322305040"),
-        "24.0.0-linux_ppc64le": ("node-v24.0.0-linux-ppc64le.tar.xz", "node-v24.0.0-linux-ppc64le", "cfa0e8d51a2f9a446f1bfb81cdf4c7e95336ad622e2aa230e3fa1d093c63d77d"),
-        "24.0.0-linux_s390x": ("node-v24.0.0-linux-s390x.tar.xz", "node-v24.0.0-linux-s390x", "e37a04c7ee05416ec1234fd3255e05b6b81287eb0424a57441c8b69f0a155021"),
-        "24.0.0-linux_amd64": ("node-v24.0.0-linux-x64.tar.xz", "node-v24.0.0-linux-x64", "59b8af617dccd7f9f68cc8451b2aee1e86d6bd5cb92cd51dd6216a31b707efd7"),
-        "24.0.0-windows_amd64": ("node-v24.0.0-win-x64.zip", "node-v24.0.0-win-x64", "3d0fff80c87bb9a8d7f49f2f27832aa34a1477d137af46f5b14df5498be81304"),
-    },
-    node_version = "24.0.0",
+    node_repositories = NODE_24_REPO,
+    node_version = NODE_24_VERSION,
 )
 
 load("@aspect_rules_js//js:toolchains.bzl", "rules_js_register_toolchains")
 
 rules_js_register_toolchains(
-    node_repositories = NODE_20_REPO,
-    node_version = DEFAULT_NODE_VERSION,
+    node_repositories = NODE_24_REPO,
+    node_version = NODE_24_VERSION,
 )
 
 http_archive(
