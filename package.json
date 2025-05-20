@@ -141,7 +141,7 @@
     "ts-node": "^10.9.1",
     "tslib": "2.8.1",
     "typescript": "5.8.3",
-    "undici": "7.9.0",
+    "undici": "7.10.0",
     "unenv": "^1.10.0",
     "verdaccio": "6.1.2",
     "verdaccio-auth-memory": "^10.0.0",
