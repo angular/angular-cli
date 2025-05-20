@@ -7,7 +7,7 @@ To get started locally, follow these instructions:
 1. If you haven't done it already, [make a fork of this repo](https://github.com/angular/angular-cli/fork).
 2. If you are on Windows, see [the extra steps needed for contributing on Windows](#windows)
 3. Clone to your local computer using `git`.
-4. Make sure that you have Node `v20.18.1` or higher installed. See instructions [here](https://nodejs.org/en/download/).
+4. Make sure that you have Node `v20.19.0` or higher installed. See instructions [here](https://nodejs.org/en/download/).
 5. Install `pnpm`.
    - You can install pnpm by running `npm i -g pnpm@9`.
    - See detailed instructions [here](https://pnpm.io/installation).

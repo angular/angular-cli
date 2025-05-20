@@ -310,19 +310,22 @@ export function loadEsmModule<T>(modulePath: string | URL): Promise<T> {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function getBuilder(builderPath: string): Promise<any> {
+  let builder;
   switch (path.extname(builderPath)) {
     case '.mjs':
       // Load the ESM configuration file using the TypeScript dynamic import workaround.
       // Once TypeScript provides support for keeping the dynamic import this workaround can be
       // changed to a direct dynamic import.
-      return (await loadEsmModule<{ default: unknown }>(pathToFileURL(builderPath))).default;
+      builder = (await loadEsmModule<{ default: unknown }>(pathToFileURL(builderPath))).default;
+      break;
     case '.cjs':
-      return localRequire(builderPath);
+      builder = localRequire(builderPath);
+      break;
     default:
       // The file could be either CommonJS or ESM.
       // CommonJS is tried first then ESM if loading fails.
       try {
-        return localRequire(builderPath);
+        builder = localRequire(builderPath);
       } catch (e) {
         if (
           (e as NodeJS.ErrnoException).code === 'ERR_REQUIRE_ESM' ||
@@ -331,10 +334,13 @@ async function getBuilder(builderPath: string): Promise<any> {
           // Load the ESM configuration file using the TypeScript dynamic import workaround.
           // Once TypeScript provides support for keeping the dynamic import this workaround can be
           // changed to a direct dynamic import.
-          return (await loadEsmModule<{ default: unknown }>(pathToFileURL(builderPath))).default;
+          builder = await loadEsmModule<{ default: unknown }>(pathToFileURL(builderPath));
         }
 
         throw e;
       }
+      break;
   }
+
+  return 'default' in builder ? builder.default : builder;
 }
