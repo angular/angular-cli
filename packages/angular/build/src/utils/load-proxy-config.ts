@@ -53,8 +53,7 @@ export async function loadProxyConfiguration(
       // Load the ESM configuration file using the TypeScript dynamic import workaround.
       // Once TypeScript provides support for keeping the dynamic import this workaround can be
       // changed to a direct dynamic import.
-      proxyConfiguration = (await loadEsmModule<{ default: unknown }>(pathToFileURL(proxyPath)))
-        .default;
+      proxyConfiguration = await loadEsmModule<{ default: unknown }>(pathToFileURL(proxyPath));
       break;
     case '.cjs':
       proxyConfiguration = require(proxyPath);
@@ -71,13 +70,16 @@ export async function loadProxyConfiguration(
           // Load the ESM configuration file using the TypeScript dynamic import workaround.
           // Once TypeScript provides support for keeping the dynamic import this workaround can be
           // changed to a direct dynamic import.
-          proxyConfiguration = (await loadEsmModule<{ default: unknown }>(pathToFileURL(proxyPath)))
-            .default;
+          proxyConfiguration = await loadEsmModule<{ default: unknown }>(pathToFileURL(proxyPath));
           break;
         }
 
         throw e;
       }
+  }
+
+  if ('default' in proxyConfiguration) {
+    proxyConfiguration = proxyConfiguration.default;
   }
 
   return normalizeProxyConfiguration(proxyConfiguration);

@@ -76,19 +76,23 @@ export async function getWebpackConfig(configPath: string): Promise<Configuratio
     throw new Error(`Webpack configuration file ${configPath} does not exist.`);
   }
 
+  let config;
   switch (path.extname(configPath)) {
     case '.mjs':
       // Load the ESM configuration file using the TypeScript dynamic import workaround.
       // Once TypeScript provides support for keeping the dynamic import this workaround can be
       // changed to a direct dynamic import.
-      return (await loadEsmModule<{ default: Configuration }>(pathToFileURL(configPath))).default;
+      config = await loadEsmModule<{ default: Configuration }>(pathToFileURL(configPath));
+      break;
     case '.cjs':
-      return require(configPath);
+      config = require(configPath);
+      break;
     default:
       // The file could be either CommonJS or ESM.
       // CommonJS is tried first then ESM if loading fails.
       try {
-        return require(configPath);
+        config = require(configPath);
+        break;
       } catch (e) {
         if (
           (e as NodeJS.ErrnoException).code === 'ERR_REQUIRE_ESM' ||
@@ -97,11 +101,12 @@ export async function getWebpackConfig(configPath: string): Promise<Configuratio
           // Load the ESM configuration file using the TypeScript dynamic import workaround.
           // Once TypeScript provides support for keeping the dynamic import this workaround can be
           // changed to a direct dynamic import.
-          return (await loadEsmModule<{ default: Configuration }>(pathToFileURL(configPath)))
-            .default;
+          config = await loadEsmModule<{ default: Configuration }>(pathToFileURL(configPath));
         }
 
         throw e;
       }
   }
+
+  return 'default' in config ? config.default : config;
 }
