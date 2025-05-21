@@ -160,12 +160,12 @@ export async function* serveWithVite(
 
   // Enable to support link-based component style hot reloading (`NG_HMR_CSTYLES=1` can be used to enable)
   browserOptions.externalRuntimeStyles =
-    serverOptions.liveReload && serverOptions.hmr && useComponentStyleHmr;
+    browserOptions.aot && serverOptions.liveReload && serverOptions.hmr && useComponentStyleHmr;
 
   // Enable to support component template hot replacement (`NG_HMR_TEMPLATE=0` can be used to disable selectively)
   // This will also replace file-based/inline styles as code if external runtime styles are not enabled.
   browserOptions.templateUpdates =
-    serverOptions.liveReload && serverOptions.hmr && useComponentTemplateHmr;
+    browserOptions.aot && serverOptions.liveReload && serverOptions.hmr && useComponentTemplateHmr;
   if (browserOptions.templateUpdates) {
     context.logger.warn(
       'Component HMR has been enabled.\n' +
