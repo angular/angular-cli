@@ -6,12 +6,12 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import ora from 'ora';
+import ora, { type Ora } from 'ora';
 import { colors } from './color';
 import { isTTY } from './tty';
 
 export class Spinner {
-  private readonly spinner: ora.Ora;
+  private readonly spinner: Ora;
 
   /** When false, only fail messages will be displayed. */
   enabled = true;
