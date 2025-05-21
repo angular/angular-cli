@@ -422,8 +422,8 @@ importers:
         specifier: 6.3.5
         version: 6.3.5(@types/node@20.17.48)(jiti@1.21.7)(less@4.3.0)(sass@1.89.0)(terser@5.39.2)(yaml@2.8.0)
       watchpack:
-        specifier: 2.4.3
-        version: 2.4.3
+        specifier: 2.4.4
+        version: 2.4.4
     optionalDependencies:
       lmdb:
         specifier: 3.3.0
@@ -7849,8 +7849,8 @@ packages:
     resolution: {integrity: sha512-o8qghlI8NZHU1lLPrpi2+Uq7abh4GGPpYANlalzWxyWteJOCsr/P+oPBA49TOLu5FTZO4d3F9MnWJfiMo4BkmA==}
     engines: {node: '>=18'}
 
-  watchpack@2.4.3:
-    resolution: {integrity: sha512-adBYQLivcg1jbdKEJeqScJJFvgm4qY9+3tXw+jdG6lkVeqRJEtiQmSWjmth8GKmDZuX7sYM4YFxQsf0AzMfGGw==}
+  watchpack@2.4.4:
+    resolution: {integrity: sha512-c5EGNOiyxxV5qmTtAB7rbiXxi1ooX1pQKMLX/MIabJjRA0SJBQOjKF+KSVfHkr9U1cADPon0mRiVe/riyaiDUA==}
     engines: {node: '>=10.13.0'}
 
   wbuf@1.7.3:
@@ -16167,7 +16167,7 @@ snapshots:
     dependencies:
       xml-name-validator: 5.0.0
 
-  watchpack@2.4.3:
+  watchpack@2.4.4:
     dependencies:
       glob-to-regexp: 0.4.1
       graceful-fs: 4.2.11
@@ -16296,7 +16296,7 @@ snapshots:
       schema-utils: 4.3.2
       tapable: 2.2.1
       terser-webpack-plugin: 5.3.14(esbuild@0.25.4)(webpack@5.99.9(esbuild@0.25.4))
-      watchpack: 2.4.3
+      watchpack: 2.4.4
       webpack-sources: 3.2.3
     transitivePeerDependencies:
       - '@swc/core'
