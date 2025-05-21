@@ -35,6 +35,13 @@ export interface CompilerPluginOptions {
   sourcemap: boolean | 'external';
   tsconfig: string;
   jit?: boolean;
+
+  /**
+   * Include class metadata and JIT information in built code.
+   * The Angular TestBed APIs require additional metadata for the Angular aspects of the application
+   * such as Components, Modules, Pipes, etc.
+   * TestBed may also leverage JIT capabilities during testing (e.g., overrideComponent).
+   */
   includeTestMetadata?: boolean;
 
   advancedOptimizations?: boolean;
@@ -89,7 +96,7 @@ export function createCompilerPlugin(
           sourcemap: !!pluginOptions.sourcemap,
           thirdPartySourcemaps: pluginOptions.thirdPartySourcemaps,
           advancedOptimizations: pluginOptions.advancedOptimizations,
-          jit: pluginOptions.jit,
+          jit: pluginOptions.jit || pluginOptions.includeTestMetadata,
         },
         maxWorkers,
         cacheStore?.createCache('jstransformer'),
@@ -717,6 +724,7 @@ function createCompilerOptionsTransformer(
       externalRuntimeStyles: pluginOptions.externalRuntimeStyles,
       _enableHmr: !!pluginOptions.templateUpdates,
       supportTestBed: !!pluginOptions.includeTestMetadata,
+      supportJitMode: !!pluginOptions.includeTestMetadata,
     };
   };
 }
