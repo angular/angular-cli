@@ -1,3 +1,49 @@
+<a name="20.0.0-rc.3"></a>
+
+# 20.0.0-rc.3 (2025-05-21)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                          |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------- |
+| [787e510dc](https://github.com/angular/angular-cli/commit/787e510dccabf30589194fcefdb74a687dfa3945) | fix  | update min Node.js support to 20.19, 22.12, and 24.0 |
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                    |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------ |
+| [b13805a77](https://github.com/angular/angular-cli/commit/b13805a77a5654a352a6c6f760965c326977ff14) | fix  | use protected for class member |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                   |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------- |
+| [a42e045ba](https://github.com/angular/angular-cli/commit/a42e045bab3bfbeb0bb69c3406fd0a76ae263cdf) | fix  | respect i18nDuplicateTranslation option when duplicates exist |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                                  |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------ |
+| [b155ba1dc](https://github.com/angular/angular-cli/commit/b155ba1dcdbc3c506311e4434c37f1b4c77c7572) | fix  | enable unit-test builder watch outside CI                    |
+| [7877d9a97](https://github.com/angular/angular-cli/commit/7877d9a971dbef5025fdb9a40f49f36e9b42569d) | fix  | ensure disabled vitest config loading                        |
+| [aec95042b](https://github.com/angular/angular-cli/commit/aec95042b4d690c25645af590788c608b4b353dc) | fix  | exclude only source test files with unit-test vitest support |
+| [c51a540ce](https://github.com/angular/angular-cli/commit/c51a540ce4fb191811d2be06a9937f11826b38a5) | fix  | provide direct debugging support for unit test builder       |
+| [eee816f79](https://github.com/angular/angular-cli/commit/eee816f79b4464286dcecc16f53c06be8afd4ccf) | fix  | use global unit-test hooks during TestBed init               |
+
+### @angular/pwa
+
+| Commit                                                                                              | Type | Description                                               |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------- |
+| [5b43174f1](https://github.com/angular/angular-cli/commit/5b43174f129d10648258ac33961a55f341649af6) | fix  | remove `background_color` and `theme_color` from manifest |
+
+### @angular/ssr
+
+| Commit                                                                                              | Type | Description                               |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------- |
+| [059c10eb4](https://github.com/angular/angular-cli/commit/059c10eb4df72b0d67f73783826e2bbae611ad35) | fix  | SSR should work without `@angular/router` |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="19.2.13"></a>
 
 # 19.2.13 (2025-05-21)
