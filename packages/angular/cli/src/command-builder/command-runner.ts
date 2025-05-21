@@ -138,7 +138,7 @@ export async function runCommand(args: string[], logger: logging.Logger): Promis
         : // Unknown exception, re-throw.
           err;
     })
-    .wrap(yargs.terminalWidth())
+    .wrap(localYargs.terminalWidth())
     .parseAsync();
 
   return +(process.exitCode ?? 0);

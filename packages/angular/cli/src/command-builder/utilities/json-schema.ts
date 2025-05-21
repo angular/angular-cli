@@ -7,12 +7,12 @@
  */
 
 import { json, strings } from '@angular-devkit/core';
-import yargs, { Arguments, Argv, PositionalOptions, Options as YargsOptions } from 'yargs';
+import type { Arguments, Argv, PositionalOptions, Options as YargsOptions } from 'yargs';
 
 /**
  * An option description.
  */
-export interface Option extends yargs.Options {
+export interface Option extends YargsOptions {
   /**
    * The name of the option.
    */

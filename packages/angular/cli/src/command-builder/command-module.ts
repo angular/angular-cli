@@ -9,12 +9,14 @@
 import { logging, schema } from '@angular-devkit/core';
 import { readFileSync } from 'node:fs';
 import * as path from 'node:path';
-import yargs, {
+import yargs from 'yargs';
+import type {
   ArgumentsCamelCase,
   Argv,
   CamelCaseKey,
   CommandModule as YargsCommandModule,
-} from 'yargs';
+  // Resolution mode is required due to CamelCaseKey missing from esm types
+} from 'yargs' with { 'resolution-mode': 'require' };
 import { Parser as yargsParser } from 'yargs/helpers';
 import { getAnalyticsUserId } from '../analytics/analytics';
 import { AnalyticsCollector } from '../analytics/analytics-collector';
