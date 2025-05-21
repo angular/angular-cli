@@ -1,3 +1,15 @@
+<a name="19.2.13"></a>
+
+# 19.2.13 (2025-05-21)
+
+### @angular/pwa
+
+| Commit                                                                                              | Type | Description                                               |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------- |
+| [ad2fb2959](https://github.com/angular/angular-cli/commit/ad2fb29597e22767618d046fef3fb54bf8e95b5d) | fix  | remove `background_color` and `theme_color` from manifest |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="19.2.12"></a>
 
 # 19.2.12 (2025-05-14)
