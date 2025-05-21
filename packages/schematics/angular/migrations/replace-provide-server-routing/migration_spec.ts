@@ -61,6 +61,30 @@ describe(`Migration to replace 'provideServerRouting' with 'provideServerRenderi
     expect(content).not.toContain(`provideServerRouting(serverRoutes)`);
   });
 
+  it('should remove "provideServerRoutesConfig" and update "provideServerRendering"', async () => {
+    tree.overwrite(
+      'src/app/app.config.ts',
+      `
+      import { ApplicationConfig } from '@angular/core';
+      import { provideServerRendering, provideServerRoutesConfig } from '@angular/ssr';
+      import { serverRoutes } from './app.routes';
+
+      const serverConfig: ApplicationConfig = {
+        providers: [
+          provideServerRendering(),
+          provideServerRoutesConfig(serverRoutes)
+        ]
+      };
+      `,
+    );
+
+    const newTree = await schematicRunner.runSchematic(schematicName, {}, tree);
+    const content = newTree.readContent('src/app/app.config.ts');
+
+    expect(content).toContain(`providers: [provideServerRendering(withRoutes(serverRoutes))]`);
+    expect(content).not.toContain(`provideServerRoutesConfig(serverRoutes)`);
+  });
+
   it('should correctly handle provideServerRouting with extra arguments', async () => {
     tree.overwrite(
       'src/app/app.config.ts',

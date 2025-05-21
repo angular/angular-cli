@@ -16,7 +16,11 @@ function* visit(directory: DirEntry): IterableIterator<[fileName: string, conten
       const entry = directory.file(path);
       if (entry) {
         const content = entry.content;
-        if (content.includes('provideServerRouting') && content.includes('@angular/ssr')) {
+        if (
+          (content.includes('provideServerRouting') ||
+            content.includes('provideServerRoutesConfig')) &&
+          content.includes('@angular/ssr')
+        ) {
           // Only need to rename the import so we can just string replacements.
           yield [entry.path, content.toString()];
         }
@@ -63,7 +67,8 @@ export default function (): Rule {
               if (
                 ts.isCallExpression(el) &&
                 ts.isIdentifier(el.expression) &&
-                el.expression.text === 'provideServerRouting'
+                (el.expression.text === 'provideServerRouting' ||
+                  el.expression.text === 'provideServerRoutesConfig')
               ) {
                 const [withRouteVal, ...others] = el.arguments.map((arg) => arg.getText());
 
@@ -99,7 +104,7 @@ export default function (): Rule {
           const elements = namedBindings.elements;
           const updatedElements = elements
             .map((el) => el.getText())
-            .filter((x) => x !== 'provideServerRouting');
+            .filter((x) => x !== 'provideServerRouting' && x !== 'provideServerRoutesConfig');
 
           updatedElements.push('withRoutes');
 
