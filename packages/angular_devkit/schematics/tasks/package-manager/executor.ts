@@ -10,7 +10,6 @@ import { BaseException } from '@angular-devkit/core';
 import { SpawnOptions, spawn } from 'node:child_process';
 import * as path from 'node:path';
 import ora from 'ora';
-import { Observable } from 'rxjs';
 import { TaskExecutor, UnsuccessfulWorkflowExecution } from '../../src';
 import { NodePackageTaskFactoryOptions, NodePackageTaskOptions } from './options';
 
@@ -127,7 +126,7 @@ export default function (
       args.push('--force');
     }
 
-    return new Observable((obs) => {
+    return new Promise<void>((resolve, reject) => {
       const spinner = ora({
         text: `Installing packages (${taskPackageManagerName})...`,
         // Workaround for https://github.com/sindresorhus/ora/issues/136.
@@ -139,14 +138,13 @@ export default function (
           if (code === 0) {
             spinner.succeed('Packages installed successfully.');
             spinner.stop();
-            obs.next();
-            obs.complete();
+            resolve();
           } else {
             if (options.hideOutput) {
               bufferedOutput.forEach(({ stream, data }) => stream.write(data));
             }
             spinner.fail('Package install failed, see above.');
-            obs.error(new UnsuccessfulWorkflowExecution());
+            reject(new UnsuccessfulWorkflowExecution());
           }
         },
       );
