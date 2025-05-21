@@ -18,7 +18,7 @@ describeServeBuilder(executeDevServer, DEV_SERVER_BUILDER_INFO, (harness, setupT
       setupTarget(harness, {});
     });
 
-    it('shows message with opt out steps by default', async () => {
+    it('shows message with documentation by default', async () => {
       harness.useTarget('serve', {
         ...BASE_OPTIONS,
       });
@@ -33,12 +33,12 @@ describeServeBuilder(executeDevServer, DEV_SERVER_BUILDER_INFO, (harness, setupT
       );
       expect(logs).toContain(
         jasmine.objectContaining<logging.LogEntry>({
-          message: jasmine.stringMatching('--no-hmr'),
+          message: jasmine.stringMatching('angular.dev/hmr'),
         }),
       );
     });
 
-    it('shows message with opt out steps when explicitly enabled', async () => {
+    it('shows message with documentation when explicitly enabled', async () => {
       harness.useTarget('serve', {
         ...BASE_OPTIONS,
         hmr: true,
@@ -54,12 +54,12 @@ describeServeBuilder(executeDevServer, DEV_SERVER_BUILDER_INFO, (harness, setupT
       );
       expect(logs).toContain(
         jasmine.objectContaining<logging.LogEntry>({
-          message: jasmine.stringMatching('--no-hmr'),
+          message: jasmine.stringMatching('angular.dev/hmr'),
         }),
       );
     });
 
-    it('does not show enabled message with opt out steps when explicitly disabled', async () => {
+    it('does not show enabled message with documentation when explicitly disabled', async () => {
       harness.useTarget('serve', {
         ...BASE_OPTIONS,
         hmr: false,
@@ -75,7 +75,7 @@ describeServeBuilder(executeDevServer, DEV_SERVER_BUILDER_INFO, (harness, setupT
       );
       expect(logs).not.toContain(
         jasmine.objectContaining<logging.LogEntry>({
-          message: jasmine.stringMatching('--no-hmr'),
+          message: jasmine.stringMatching('angular.dev/hmr'),
         }),
       );
     });
