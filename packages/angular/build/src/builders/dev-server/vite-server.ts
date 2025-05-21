@@ -168,10 +168,7 @@ export async function* serveWithVite(
     browserOptions.aot && serverOptions.liveReload && serverOptions.hmr && useComponentTemplateHmr;
   if (browserOptions.templateUpdates) {
     context.logger.warn(
-      'Component HMR has been enabled.\n' +
-        'If you encounter application reload issues, you can manually reload the page to bypass HMR and/or disable this feature with the' +
-        ' `--no-hmr` command line option.\n' +
-        'Please consider reporting any issues you encounter here: https://github.com/angular/angular-cli/issues\n',
+      'Component HMR has been enabled, see https://angular.dev/hmr for more info.',
     );
   }
 
