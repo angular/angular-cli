@@ -171,8 +171,8 @@ importers:
         specifier: 4.1.3
         version: 4.1.3
       beasties:
-        specifier: 0.3.3
-        version: 0.3.3
+        specifier: 0.3.4
+        version: 0.3.4
       buffer:
         specifier: 6.0.3
         version: 6.0.3
@@ -368,8 +368,8 @@ importers:
         specifier: 2.0.0
         version: 2.0.0(vite@6.3.5(@types/node@20.17.48)(jiti@1.21.7)(less@4.3.0)(sass@1.89.0)(terser@5.39.2)(yaml@2.8.0))
       beasties:
-        specifier: 0.3.3
-        version: 0.3.3
+        specifier: 0.3.4
+        version: 0.3.4
       browserslist:
         specifier: ^4.23.0
         version: 4.24.5
@@ -755,8 +755,8 @@ importers:
         specifier: workspace:*
         version: link:../../angular/ssr
       '@web/test-runner':
-        specifier: 0.20.1
-        version: 0.20.1
+        specifier: 0.20.2
+        version: 0.20.2
       browser-sync:
         specifier: 3.0.4
         version: 3.0.4
@@ -3138,8 +3138,8 @@ packages:
     resolution: {integrity: sha512-ZL9F6FXd0DBQvo/h/+mSfzFTSRVxzV9st/AHhpgABtUtV/AIpVE9to6+xdkpu6827kwjezdpuadPfg+PlrBWqQ==}
     engines: {node: '>=18.0.0'}
 
-  '@web/test-runner@0.20.1':
-    resolution: {integrity: sha512-MTN8D1WCeCdkUWJIeG9yauUbRkk9g0zGFnBbI5smtPE91NpXFMfRd8nShIvxQnHx9fNTmK+OCYKnOSlq5DLLVA==}
+  '@web/test-runner@0.20.2':
+    resolution: {integrity: sha512-zfEGYEDnS0EI8qgoWFjmtkIXhqP15W40NW3dCaKtbxj5eU0a7E53f3GV/tZGD0GlZKF8d4Fyw+AFrwOJU9Z4GA==}
     engines: {node: '>=18.0.0'}
     hasBin: true
 
@@ -3528,8 +3528,8 @@ packages:
   bcryptjs@2.4.3:
     resolution: {integrity: sha512-V/Hy/X9Vt7f3BbPJEi8BdVFMByHi+jNXrYkW3huaybV/kQ0KJg0Y6PkEMbn+zeT+i+SiKZ/HMqJGIIt4LZDqNQ==}
 
-  beasties@0.3.3:
-    resolution: {integrity: sha512-Mba3V4hTPrM7P2CSidueg71JZ0G+DyK7maBqp4/uax/PQznwdFti9cOW6Z3lTxBRH84kRICN0TyQ0MSSmufaAw==}
+  beasties@0.3.4:
+    resolution: {integrity: sha512-NmzN1zN1cvGccXFyZ73335+ASXwBlVWcUPssiUDIlFdfyatHPRRufjCd5w8oPaQPvVnf9ELklaCGb1gi9FBwIw==}
     engines: {node: '>=14.0.0'}
 
   before-after-hook@3.0.2:
@@ -10762,7 +10762,7 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  '@web/test-runner@0.20.1':
+  '@web/test-runner@0.20.2':
     dependencies:
       '@web/browser-logs': 0.4.1
       '@web/config-loader': 0.3.3
@@ -11176,7 +11176,7 @@ snapshots:
 
   bcryptjs@2.4.3: {}
 
-  beasties@0.3.3:
+  beasties@0.3.4:
     dependencies:
       css-select: 5.1.0
       css-what: 6.1.0
