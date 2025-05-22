@@ -27,6 +27,14 @@ interface JavaScriptTransformRequest {
 const textDecoder = new TextDecoder();
 const textEncoder = new TextEncoder();
 
+/**
+ * The function name prefix for all Angular partial compilation functions.
+ * Used to determine if linking of a JavaScript file is required.
+ * If any additional declarations are added or otherwise changed in the linker,
+ * the names MUST begin with this prefix.
+ */
+const LINKER_DECLARATION_PREFIX = 'ɵɵngDeclare';
+
 export default async function transformJavaScript(
   request: JavaScriptTransformRequest,
 ): Promise<unknown> {
@@ -45,11 +53,6 @@ export default async function transformJavaScript(
 let linkerPluginCreator:
   | typeof import('@angular/compiler-cli/linker/babel').createEs2015LinkerPlugin
   | undefined;
-
-/**
- * Cached instance of the compiler-cli linker's needsLinking function.
- */
-let needsLinking: typeof import('@angular/compiler-cli/linker').needsLinking | undefined;
 
 async function transformWithBabel(
   filename: string,
@@ -125,17 +128,10 @@ async function requiresLinking(path: string, source: string): Promise<boolean> {
     return false;
   }
 
-  if (!needsLinking) {
-    // Load ESM `@angular/compiler-cli/linker` using the TypeScript dynamic import workaround.
-    // Once TypeScript provides support for keeping the dynamic import this workaround can be
-    // changed to a direct dynamic import.
-    const linkerModule = await loadEsmModule<typeof import('@angular/compiler-cli/linker')>(
-      '@angular/compiler-cli/linker',
-    );
-    needsLinking = linkerModule.needsLinking;
-  }
-
-  return needsLinking(path, source);
+  // Check if the source code includes one of the declaration functions.
+  // There is a low chance of a false positive but the names are fairly unique
+  // and the result would be an unnecessary no-op additional plugin pass.
+  return source.includes(LINKER_DECLARATION_PREFIX);
 }
 
 async function createLinkerPlugin(options: Omit<JavaScriptTransformRequest, 'filename' | 'data'>) {
