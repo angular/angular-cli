@@ -56,6 +56,10 @@ export class JavaScriptTransformer {
   }
 
   #ensureWorkerPool(): WorkerPool {
+    if (this.#workerPool) {
+      return this.#workerPool;
+    }
+
     const workerPoolOptions: WorkerPoolOptions = {
       filename: require.resolve('./javascript-transformer-worker'),
       maxThreads: this.maxThreads,
@@ -67,7 +71,7 @@ export class JavaScriptTransformer {
       workerPoolOptions.execArgv = filteredExecArgv;
     }
 
-    this.#workerPool ??= new WorkerPool(workerPoolOptions);
+    this.#workerPool = new WorkerPool(workerPoolOptions);
 
     return this.#workerPool;
   }
