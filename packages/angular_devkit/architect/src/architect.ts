@@ -48,9 +48,6 @@ import {
 import { mergeOptions } from './options';
 import { scheduleByName, scheduleByTarget } from './schedule-by-name';
 
-const inputSchema = require('./input-schema.json');
-const outputSchema = require('./output-schema.json');
-
 function _createJobHandlerFromBuilderInfo(
   info: BuilderInfo,
   target: Target | undefined,
@@ -60,9 +57,9 @@ function _createJobHandlerFromBuilderInfo(
 ): Observable<BuilderJobHandler> {
   const jobDescription: BuilderDescription = {
     name: target ? `{${targetStringFromTarget(target)}}` : info.builderName,
-    argument: { type: 'object' },
-    input: inputSchema,
-    output: outputSchema,
+    argument: true,
+    input: true,
+    output: true,
     info,
   };
 
@@ -279,8 +276,6 @@ function _getTargetOptionsFactory(host: ArchitectHost) {
     },
     {
       name: '..getTargetOptions',
-      output: { type: 'object' },
-      argument: inputSchema.properties.target,
     },
   );
 }
@@ -298,10 +293,6 @@ function _getProjectMetadataFactory(host: ArchitectHost) {
     },
     {
       name: '..getProjectMetadata',
-      output: { type: 'object' },
-      argument: {
-        oneOf: [{ type: 'string' }, inputSchema.properties.target],
-      },
     },
   );
 }
@@ -318,8 +309,6 @@ function _getBuilderNameForTargetFactory(host: ArchitectHost) {
     },
     {
       name: '..getBuilderNameForTarget',
-      output: { type: 'string' },
-      argument: inputSchema.properties.target,
     },
   );
 }
@@ -344,11 +333,6 @@ function _validateOptionsFactory(host: ArchitectHost, registry: json.schema.Sche
     },
     {
       name: '..validateOptions',
-      output: { type: 'object' },
-      argument: {
-        type: 'array',
-        items: [{ type: 'string' }, { type: 'object' }],
-      },
     },
   );
 }
