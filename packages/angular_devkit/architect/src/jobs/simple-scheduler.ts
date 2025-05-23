@@ -155,11 +155,22 @@ export class SimpleScheduler<
           channels: handler.jobDescription.channels || {},
         };
 
+        const noopValidator = noopSchemaValidator();
+
         const handlerWithExtra = Object.assign(handler.bind(undefined), {
           jobDescription: description,
-          argumentV: this._schemaRegistry.compile(description.argument),
-          inputV: this._schemaRegistry.compile(description.input),
-          outputV: this._schemaRegistry.compile(description.output),
+          argumentV:
+            description.argument === true
+              ? noopValidator
+              : this._schemaRegistry.compile(description.argument),
+          inputV:
+            description.input === true
+              ? noopValidator
+              : this._schemaRegistry.compile(description.input),
+          outputV:
+            description.output === true
+              ? noopValidator
+              : this._schemaRegistry.compile(description.output),
         }) as JobHandlerWithExtra;
         this._internalJobDescriptionMap.set(name, handlerWithExtra);
 
@@ -545,4 +556,11 @@ export class SimpleScheduler<
 
     return this._createJob(name, argument, handler, inboundBus, outboundBus);
   }
+}
+
+async function noopSchemaValidator(): Promise<schema.SchemaValidator> {
+  return async (data: JsonValue) => ({
+    data,
+    success: true,
+  });
 }
