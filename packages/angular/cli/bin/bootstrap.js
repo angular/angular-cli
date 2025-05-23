@@ -19,9 +19,9 @@
  */
 
 // Enable on-disk code caching if available (Node.js 22.8+)
-// Skip if running inside Bazel via a RUNFILES environment variable check. The cache does not work
-// well with Bazel's hermeticity requirements.
-if (!process.env['RUNFILES']) {
+// Skip if running inside Bazel via a RUNFILES environment variable check and no explicit cache
+// location defined. The default cache location does not work well with Bazel's hermeticity requirements.
+if (!process.env['RUNFILES'] || process.env['NODE_COMPILE_CACHE']) {
   try {
     const { enableCompileCache } = require('node:module');
 
