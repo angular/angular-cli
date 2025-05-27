@@ -1,3 +1,22 @@
+<a name="20.0.0-rc.4"></a>
+
+# 20.0.0-rc.4 (2025-05-27)
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                                     |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------------- |
+| [bcc0892a6](https://github.com/angular/angular-cli/commit/bcc0892a65f00e68709e84c380f448a5e0fd05e7) | fix  | migrate `provideServerRoutesConfig` to `provideServerRendering` |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                     |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------- |
+| [4c0d873b0](https://github.com/angular/angular-cli/commit/4c0d873b069b2671d7a0f98bcdc9b86ef48a8cd6) | fix  | include full metadata for AOT unit-testing      |
+| [5ff6188c4](https://github.com/angular/angular-cli/commit/5ff6188c4330b009201a64a23d0090bfcec0612f) | perf | directly check code for Angular partial linking |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="20.0.0-rc.3"></a>
 
 # 20.0.0-rc.3 (2025-05-21)
