@@ -145,7 +145,7 @@
     "unenv": "^1.10.0",
     "verdaccio": "6.1.2",
     "verdaccio-auth-memory": "^10.0.0",
-    "yargs-parser": "21.1.1",
+    "yargs-parser": "22.0.0",
     "zone.js": "^0.15.0"
   },
   "dependenciesMeta": {
