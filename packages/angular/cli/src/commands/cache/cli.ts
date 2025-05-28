@@ -40,7 +40,7 @@ export default class CacheCommandModule
     ].sort();
 
     for (const module of subcommands) {
-      localYargs = addCommandModuleToYargs(localYargs, module, this.context);
+      addCommandModuleToYargs(module, this.context);
     }
 
     return localYargs.demandCommand(1, demandCommandFailureMessage).strict();

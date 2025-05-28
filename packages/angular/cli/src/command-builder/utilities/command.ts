@@ -20,11 +20,10 @@ export type CommandModuleConstructor = Partial<CommandModuleImplementation> & {
   new (context: CommandContext): Partial<CommandModuleImplementation> & CommandModule;
 };
 
-export function addCommandModuleToYargs<T extends object, U extends CommandModuleConstructor>(
-  localYargs: Argv<T>,
+export function addCommandModuleToYargs<U extends CommandModuleConstructor>(
   commandModule: U,
   context: CommandContext,
-): Argv<T> {
+): void {
   const cmd = new commandModule(context);
   const {
     args: {
@@ -35,7 +34,7 @@ export function addCommandModuleToYargs<T extends object, U extends CommandModul
 
   const describe = jsonHelp ? cmd.fullDescribe : cmd.describe;
 
-  return localYargs.command({
+  context.yargsInstance.command({
     command: cmd.command,
     aliases: cmd.aliases,
     describe:
@@ -58,7 +57,7 @@ export function addCommandModuleToYargs<T extends object, U extends CommandModul
         );
       }
 
-      return cmd.builder(argv) as Argv<T>;
+      return cmd.builder(argv) as Argv;
     },
     handler: (args) => cmd.handler(args),
   });
