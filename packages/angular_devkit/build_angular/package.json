@@ -69,7 +69,7 @@
     "@angular/ssr": "workspace:*",
     "@web/test-runner": "0.20.2",
     "browser-sync": "3.0.4",
-    "ng-packagr": "20.0.0-rc.0",
+    "ng-packagr": "20.0.0",
     "undici": "7.9.0"
   },
   "peerDependencies": {
