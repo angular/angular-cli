@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import * as yargs from 'yargs';
+import type { Arguments, Argv } from 'yargs';
 
 /**
  * A Yargs middleware that normalizes non Array options when the argument has been provided multiple times.
@@ -17,21 +17,23 @@ import * as yargs from 'yargs';
  *
  * See: https://github.com/yargs/yargs-parser/pull/163#issuecomment-516566614
  */
-export function normalizeOptionsMiddleware(args: yargs.Arguments): void {
-  // `getOptions` is not included in the types even though it's public API.
-  // https://github.com/yargs/yargs/issues/2098
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { array } = (yargs as any).getOptions();
-  const arrayOptions = new Set(array);
+export function createNormalizeOptionsMiddleware(localeYargs: Argv): (args: Arguments) => void {
+  return (args: Arguments) => {
+    // `getOptions` is not included in the types even though it's public API.
+    // https://github.com/yargs/yargs/issues/2098
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { array } = (localeYargs as any).getOptions();
+    const arrayOptions = new Set(array);
 
-  for (const [key, value] of Object.entries(args)) {
-    if (key !== '_' && Array.isArray(value) && !arrayOptions.has(key)) {
-      const newValue = value.pop();
-      // eslint-disable-next-line no-console
-      console.warn(
-        `Option '${key}' has been specified multiple times. The value '${newValue}' will be used.`,
-      );
-      args[key] = newValue;
+    for (const [key, value] of Object.entries(args)) {
+      if (key !== '_' && Array.isArray(value) && !arrayOptions.has(key)) {
+        const newValue = value.pop();
+        // eslint-disable-next-line no-console
+        console.warn(
+          `Option '${key}' has been specified multiple times. The value '${newValue}' will be used.`,
+        );
+        args[key] = newValue;
+      }
     }
-  }
+  };
 }

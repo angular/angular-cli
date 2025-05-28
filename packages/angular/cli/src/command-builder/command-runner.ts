@@ -27,7 +27,7 @@ import {
   demandCommandFailureMessage,
 } from './utilities/command';
 import { jsonHelpUsage } from './utilities/json-help';
-import { normalizeOptionsMiddleware } from './utilities/normalize-options-middleware';
+import { createNormalizeOptionsMiddleware } from './utilities/normalize-options-middleware';
 
 const yargsParser = Parser as unknown as typeof Parser.default;
 
@@ -62,11 +62,14 @@ export async function runCommand(args: string[], logger: logging.Logger): Promis
   }
 
   const root = workspace?.basePath ?? process.cwd();
+  const localYargs = yargs(args);
+
   const context: CommandContext = {
     globalConfiguration,
     workspace,
     logger,
     currentDirectory: process.cwd(),
+    yargsInstance: localYargs,
     root,
     packageManager: new PackageManagerUtils({ globalConfiguration, workspace, root }),
     args: {
@@ -80,15 +83,14 @@ export async function runCommand(args: string[], logger: logging.Logger): Promis
     },
   };
 
-  let localYargs = yargs(args);
   for (const CommandModule of await getCommandsToRegister(positional[0])) {
-    localYargs = addCommandModuleToYargs(localYargs, CommandModule, context);
+    addCommandModuleToYargs(CommandModule, context);
   }
 
   if (jsonHelp) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const usageInstance = (localYargs as any).getInternalMethods().getUsageInstance();
-    usageInstance.help = () => jsonHelpUsage();
+    usageInstance.help = () => jsonHelpUsage(localYargs);
   }
 
   // Add default command to support version option when no subcommand is specified
@@ -127,7 +129,7 @@ export async function runCommand(args: string[], logger: logging.Logger): Promis
     .epilogue('For more information, see https://angular.dev/cli/.\n')
     .demandCommand(1, demandCommandFailureMessage)
     .recommendCommands()
-    .middleware(normalizeOptionsMiddleware)
+    .middleware(createNormalizeOptionsMiddleware(localYargs))
     .version(false)
     .showHelpOnFail(false)
     .strict()

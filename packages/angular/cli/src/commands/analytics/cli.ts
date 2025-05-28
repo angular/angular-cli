@@ -41,7 +41,7 @@ export default class AnalyticsCommandModule
     ].sort(); // sort by class name.
 
     for (const module of subcommands) {
-      localYargs = addCommandModuleToYargs(localYargs, module, this.context);
+      addCommandModuleToYargs(module, this.context);
     }
 
     return localYargs.demandCommand(1, demandCommandFailureMessage).strict();

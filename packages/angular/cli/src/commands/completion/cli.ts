@@ -7,7 +7,7 @@
  */
 
 import { join } from 'node:path';
-import yargs, { Argv } from 'yargs';
+import { Argv } from 'yargs';
 import { CommandModule, CommandModuleImplementation } from '../../command-builder/command-module';
 import { addCommandModuleToYargs } from '../../command-builder/utilities/command';
 import { colors } from '../../utilities/color';
@@ -23,7 +23,9 @@ export default class CompletionCommandModule
   longDescriptionPath = join(__dirname, 'long-description.md');
 
   builder(localYargs: Argv): Argv {
-    return addCommandModuleToYargs(localYargs, CompletionScriptCommandModule, this.context);
+    addCommandModuleToYargs(CompletionScriptCommandModule, this.context);
+
+    return localYargs;
   }
 
   async run(): Promise<number> {
@@ -69,6 +71,6 @@ class CompletionScriptCommandModule extends CommandModule implements CommandModu
   }
 
   run(): void {
-    yargs.showCompletionScript();
+    this.context.yargsInstance.showCompletionScript();
   }
 }
