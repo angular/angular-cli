@@ -1,3 +1,16 @@
+<a name="19.2.14"></a>
+
+# 19.2.14 (2025-05-28)
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                             |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------- |
+| [a3504fd45](https://github.com/angular/angular-cli/commit/a3504fd45602ec73ce1781e46e6c92b6042a51da) | fix  | HMR requires AOT do not show HMR enabled when using JIT |
+| [5ce9f96a4](https://github.com/angular/angular-cli/commit/5ce9f96a4efeb4efabe3c161ab596d049a1edd97) | fix  | include full metadata for AOT unit-testing              |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="20.0.0-rc.4"></a>
 
 # 20.0.0-rc.4 (2025-05-27)
