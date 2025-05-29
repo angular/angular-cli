@@ -195,6 +195,13 @@ describe('Library Schematic', () => {
     expect(workspace.projects.foo.prefix).toEqual('pre');
   });
 
+  it(`should not add zone.js to test polyfills when no zone.js dependency`, async () => {
+    const tree = await schematicRunner.runSchematic('library', defaultOptions, workspaceTree);
+
+    const workspace = getJsonFileContent(tree, '/angular.json');
+    expect(workspace.projects.foo.architect.test.options.polyfills).toBeUndefined();
+  });
+
   it('should handle a pascalCasedName', async () => {
     const options = { ...defaultOptions, name: 'pascalCasedName' };
     const tree = await schematicRunner.runSchematic('library', options, workspaceTree);
