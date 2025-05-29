@@ -17,8 +17,7 @@
     "@angular/platform-browser": "<%= latestVersions.Angular %>",
     "@angular/router": "<%= latestVersions.Angular %>",
     "rxjs": "<%= latestVersions['rxjs'] %>",
-    "tslib": "<%= latestVersions['tslib'] %>",
-    "zone.js": "<%= latestVersions['zone.js'] %>"
+    "tslib": "<%= latestVersions['tslib'] %>"
   },
   "devDependencies": {
     "@angular/cli": "<%= '^' + version %>",

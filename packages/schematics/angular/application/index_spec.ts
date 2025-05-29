@@ -268,6 +268,48 @@ describe('Application Schematic', () => {
       expect(pkg.devDependencies['typescript']).toEqual(latestVersions['typescript']);
     });
 
+    it('should include zone.js if "zoneless" option is false', async () => {
+      const tree = await schematicRunner.runSchematic(
+        'application',
+        {
+          ...defaultOptions,
+          zoneless: false,
+        },
+        workspaceTree,
+      );
+
+      const pkg = JSON.parse(tree.readContent('/package.json'));
+      expect(pkg.dependencies['zone.js']).toEqual(latestVersions['zone.js']);
+    });
+
+    it('should include zone.js if "zoneless" option is not present', async () => {
+      const tree = await schematicRunner.runSchematic(
+        'application',
+        {
+          ...defaultOptions,
+          zoneless: undefined,
+        },
+        workspaceTree,
+      );
+
+      const pkg = JSON.parse(tree.readContent('/package.json'));
+      expect(pkg.dependencies['zone.js']).toEqual(latestVersions['zone.js']);
+    });
+
+    it('should not include zone.js if "zoneless" option is true', async () => {
+      const tree = await schematicRunner.runSchematic(
+        'application',
+        {
+          ...defaultOptions,
+          zoneless: true,
+        },
+        workspaceTree,
+      );
+
+      const pkg = JSON.parse(tree.readContent('/package.json'));
+      expect(pkg.dependencies['zone.js']).toBeUndefined();
+    });
+
     it(`should not override existing users dependencies`, async () => {
       const oldPackageJson = workspaceTree.readContent('package.json');
       workspaceTree.overwrite(
