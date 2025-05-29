@@ -122,9 +122,9 @@ rules_js_register_toolchains(
 
 http_archive(
     name = "aspect_bazel_lib",
-    sha256 = "fc8fe1be58ae39f84a8613d554534760c7f0819d407afcc98bbcbd990523bfed",
-    strip_prefix = "bazel-lib-2.16.0",
-    url = "https://github.com/aspect-build/bazel-lib/releases/download/v2.16.0/bazel-lib-v2.16.0.tar.gz",
+    sha256 = "5abc179be6bedadf422be598c1af918c7ebb8a2c5dfae6d319ebe6ec5dbec86a",
+    strip_prefix = "bazel-lib-2.17.0",
+    url = "https://github.com/aspect-build/bazel-lib/releases/download/v2.17.0/bazel-lib-v2.17.0.tar.gz",
 )
 
 load("@aspect_bazel_lib//lib:repositories.bzl", "aspect_bazel_lib_dependencies", "aspect_bazel_lib_register_toolchains")
@@ -273,7 +273,7 @@ esbuild_register_toolchains(
 
 git_repository(
     name = "rules_angular",
-    commit = "e820ef96082bcf07e432f40a1aa0fdd4cf5f4412",
+    commit = "8952a28010d584280cf674c41f684a36c22dec08",
     remote = "https://github.com/devversion/rules_angular.git",
 )
 
