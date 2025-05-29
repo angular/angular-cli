@@ -232,6 +232,8 @@ function updateProjects(tree: Tree, context: SchematicContext) {
 
     // Use @angular/build directly if there is no devkit package usage
     if (!hasAngularDevkitUsage) {
+      const karmaConfigFiles = new Set<string>();
+
       for (const [, target] of allWorkspaceTargets(workspace)) {
         switch (target.builder) {
           case Builders.Application:
@@ -245,9 +247,15 @@ function updateProjects(tree: Tree, context: SchematicContext) {
             break;
           case Builders.Karma:
             target.builder = '@angular/build:karma';
-            // Remove "builderMode" option since the builder will always use "application"
             for (const [, karmaOptions] of allTargetOptions(target)) {
+              // Remove "builderMode" option since the builder will always use "application"
               delete karmaOptions['builderMode'];
+
+              // Collect custom karma configurations for @angular-devkit/build-angular plugin removal
+              const karmaConfig = karmaOptions['karmaConfig'];
+              if (karmaConfig && typeof karmaConfig === 'string') {
+                karmaConfigFiles.add(karmaConfig);
+              }
             }
             break;
           case Builders.NgPackagr:
@@ -291,6 +299,34 @@ function updateProjects(tree: Tree, context: SchematicContext) {
             existing: ExistingBehavior.Replace,
           }),
         );
+      }
+
+      for (const karmaConfigFile of karmaConfigFiles) {
+        if (!tree.exists(karmaConfigFile)) {
+          continue;
+        }
+
+        try {
+          const originalKarmaConfigText = tree.readText(karmaConfigFile);
+          const updatedKarmaConfigText = originalKarmaConfigText
+            .replaceAll(`require('@angular-devkit/build-angular/plugins/karma'),`, '')
+            .replaceAll(`require('@angular-devkit/build-angular/plugins/karma')`, '');
+
+          if (updatedKarmaConfigText.includes('@angular-devkit/build-angular/plugins')) {
+            throw new Error(
+              'Migration does not support found usage of "@angular-devkit/build-angular".',
+            );
+          } else {
+            tree.overwrite(karmaConfigFile, updatedKarmaConfigText);
+          }
+        } catch (error) {
+          const reason = error instanceof Error ? `Reason: ${error.message}` : '';
+          context.logger.warn(
+            `Unable to update custom karma configuration file ("${karmaConfigFile}"). ` +
+              reason +
+              '\nReferences to the "@angular-devkit/build-angular" package within the file may need to be removed manually.',
+          );
+        }
       }
     }
 
