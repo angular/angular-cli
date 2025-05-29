@@ -122,6 +122,7 @@ export async function* execute(
     index: false,
     browser: undefined,
     server: undefined,
+    outputMode: undefined,
     localize: false,
     budgets: [],
     serviceWorker: false,
