@@ -22,7 +22,11 @@ import {
 } from '@angular-devkit/schematics';
 import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
 import { join } from 'node:path/posix';
-import { NodeDependencyType, addPackageJsonDependency } from '../utility/dependencies';
+import {
+  NodeDependencyType,
+  addPackageJsonDependency,
+  getPackageJsonDependency,
+} from '../utility/dependencies';
 import { JSONFile } from '../utility/json-file';
 import { latestVersions } from '../utility/latest-versions';
 import { relativePathToWorkspaceRoot } from '../utility/paths';
@@ -96,6 +100,7 @@ function addLibToWorkspaceFile(
   options: LibraryOptions,
   projectRoot: string,
   projectName: string,
+  hasZoneDependency: boolean,
 ): Rule {
   return updateWorkspace((workspace) => {
     workspace.projects.add({
@@ -121,7 +126,7 @@ function addLibToWorkspaceFile(
           builder: Builders.BuildKarma,
           options: {
             tsConfig: `${projectRoot}/tsconfig.spec.json`,
-            polyfills: ['zone.js', 'zone.js/testing'],
+            polyfills: hasZoneDependency ? ['zone.js', 'zone.js/testing'] : undefined,
           },
         },
       },
@@ -172,9 +177,11 @@ export default function (options: LibraryOptions): Rule {
       move(libDir),
     ]);
 
+    const hasZoneDependency = getPackageJsonDependency(host, 'zone.js') !== null;
+
     return chain([
       mergeWith(templateSource),
-      addLibToWorkspaceFile(options, libDir, packageName),
+      addLibToWorkspaceFile(options, libDir, packageName, hasZoneDependency),
       options.skipPackageJson ? noop() : addDependenciesToPackageJson(),
       options.skipTsConfig ? noop() : updateTsConfig(packageName, './' + distRoot),
       options.skipTsConfig
