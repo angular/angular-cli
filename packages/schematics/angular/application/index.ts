@@ -149,6 +149,14 @@ function addDependenciesToPackageJson(options: ApplicationOptions) {
       },
     ].forEach((dependency) => addPackageJsonDependency(host, dependency));
 
+    if (!options.zoneless) {
+      addPackageJsonDependency(host, {
+        type: NodeDependencyType.Default,
+        name: 'zone.js',
+        version: latestVersions['zone.js'],
+      });
+    }
+
     if (!options.skipInstall) {
       context.addTask(new NodePackageInstallTask());
     }

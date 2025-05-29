@@ -58,7 +58,6 @@ describe('Workspace Schematic', () => {
     const pkg = JSON.parse(tree.readContent('/package.json'));
     expect(pkg.dependencies['@angular/core']).toEqual(latestVersions.Angular);
     expect(pkg.dependencies['rxjs']).toEqual(latestVersions['rxjs']);
-    expect(pkg.dependencies['zone.js']).toEqual(latestVersions['zone.js']);
     expect(pkg.devDependencies['typescript']).toEqual(latestVersions['typescript']);
   });
 
