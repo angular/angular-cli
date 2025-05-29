@@ -95,9 +95,16 @@ export class JSONFile {
       },
     });
 
-    this.content = applyEdits(this.content, edits);
-    this.host.overwrite(this.path, this.content);
-    this._jsonAst = undefined;
+    if (edits.length > 0) {
+      const editedContent = applyEdits(this.content, edits);
+
+      // Update the file content if it changed
+      if (editedContent !== this.content) {
+        this.content = editedContent;
+        this.host.overwrite(this.path, editedContent);
+        this._jsonAst = undefined;
+      }
+    }
   }
 
   remove(jsonPath: JSONPath): void {
