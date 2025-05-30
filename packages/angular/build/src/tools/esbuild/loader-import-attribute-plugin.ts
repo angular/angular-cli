@@ -9,7 +9,7 @@
 import type { Loader, Plugin } from 'esbuild';
 import { readFile } from 'node:fs/promises';
 
-const SUPPORTED_LOADERS: Loader[] = ['binary', 'file', 'text'];
+const SUPPORTED_LOADERS: Loader[] = ['base64', 'binary', 'dataurl', 'file', 'text'];
 
 export function createLoaderImportAttributePlugin(): Plugin {
   return {

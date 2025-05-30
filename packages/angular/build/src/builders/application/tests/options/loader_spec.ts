@@ -108,6 +108,55 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       harness.expectFile('dist/browser/main.js').content.not.toContain('ABC');
     });
 
+    it('should inline base64 content for file extension set to "base64"', async () => {
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+        loader: {
+          '.unknown': 'base64',
+        },
+      });
+
+      await harness.writeFile(
+        './src/types.d.ts',
+        'declare module "*.unknown" { const content: string; export default content; }',
+      );
+      await harness.writeFile('./src/a.unknown', 'ABC');
+      await harness.writeFile(
+        'src/main.ts',
+        'import contents from "./a.unknown";\n console.log(contents);',
+      );
+
+      const { result } = await harness.executeOnce();
+      expect(result?.success).toBe(true);
+      // Should contain the base64 encoding used esbuild and not the text content
+      harness.expectFile('dist/browser/main.js').content.toContain('QUJD');
+      harness.expectFile('dist/browser/main.js').content.not.toContain('ABC');
+    });
+
+    it('should inline dataurl content for file extension set to "dataurl"', async () => {
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+        loader: {
+          '.svg': 'dataurl',
+        },
+      });
+
+      await harness.writeFile(
+        './src/types.d.ts',
+        'declare module "*.svg" { const content: string; export default content; }',
+      );
+      await harness.writeFile('./src/a.svg', 'ABC');
+      await harness.writeFile(
+        'src/main.ts',
+        'import contents from "./a.svg";\n console.log(contents);',
+      );
+
+      const { result } = await harness.executeOnce();
+      expect(result?.success).toBe(true);
+      // Should contain the dataurl encoding used esbuild and not the text content
+      harness.expectFile('dist/browser/main.js').content.toContain('data:image/svg+xml,ABC');
+    });
+
     it('should emit an output file for file extension set to "file"', async () => {
       harness.useTarget('build', {
         ...BASE_OPTIONS,

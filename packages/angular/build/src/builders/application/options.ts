@@ -206,13 +206,22 @@ export async function normalizeOptions(
     }
   }
 
-  let loaderExtensions: Record<string, 'text' | 'binary' | 'file'> | undefined;
+  let loaderExtensions:
+    | Record<string, 'text' | 'binary' | 'file' | 'dataurl' | 'base64'>
+    | undefined;
   if (options.loader) {
     for (const [extension, value] of Object.entries(options.loader)) {
       if (extension[0] !== '.' || /\.[cm]?[jt]sx?$/.test(extension)) {
         continue;
       }
-      if (value !== 'text' && value !== 'binary' && value !== 'file' && value !== 'empty') {
+      if (
+        value !== 'text' &&
+        value !== 'binary' &&
+        value !== 'file' &&
+        value !== 'dataurl' &&
+        value !== 'base64' &&
+        value !== 'empty'
+      ) {
         continue;
       }
       loaderExtensions ??= {};
