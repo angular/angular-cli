@@ -577,6 +577,35 @@ async function initializeApplication(
   parsedKarmaConfig.reporters ??= [];
   parsedKarmaConfig.reporters.push(AngularPolyfillsPlugin.NAME);
 
+  // Adjust karma junit reporter outDir location to maintain previous (devkit) behavior
+  // The base path for the reporter was previously the workspace root.
+  // To keep the files in the same location, the reporter's output directory is adjusted
+  // to be relative to the workspace root when using junit.
+  if (parsedKarmaConfig.reporters?.some((reporter) => reporter === 'junit')) {
+    if ('junitReporter' in parsedKarmaConfig) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const junitReporterOptions = (parsedKarmaConfig as any)['junitReporter'] as {
+        outputDir?: unknown;
+      };
+      if (junitReporterOptions.outputDir == undefined) {
+        junitReporterOptions.outputDir = context.workspaceRoot;
+      } else if (
+        typeof junitReporterOptions.outputDir === 'string' &&
+        !path.isAbsolute(junitReporterOptions.outputDir)
+      ) {
+        junitReporterOptions.outputDir = path.join(
+          context.workspaceRoot,
+          junitReporterOptions.outputDir,
+        );
+      }
+    } else {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (parsedKarmaConfig as any)['junitReporter'] = {
+        outputDir: context.workspaceRoot,
+      };
+    }
+  }
+
   // When using code-coverage, auto-add karma-coverage.
   // This was done as part of the karma plugin for webpack.
   if (
