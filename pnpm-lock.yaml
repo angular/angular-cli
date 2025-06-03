@@ -600,8 +600,8 @@ importers:
         specifier: 7.27.4
         version: 7.27.4
       '@babel/generator':
-        specifier: 7.27.3
-        version: 7.27.3
+        specifier: 7.27.5
+        version: 7.27.5
       '@babel/helper-annotate-as-pure':
         specifier: 7.27.3
         version: 7.27.3
@@ -738,8 +738,8 @@ importers:
         specifier: 7.4.2
         version: 7.4.2(webpack@5.99.9(esbuild@0.25.5))
       webpack-dev-server:
-        specifier: 5.2.1
-        version: 5.2.1(webpack@5.99.9(esbuild@0.25.5))
+        specifier: 5.2.2
+        version: 5.2.2(webpack@5.99.9(esbuild@0.25.5))
       webpack-merge:
         specifier: 6.0.1
         version: 6.0.1
@@ -786,8 +786,8 @@ importers:
         specifier: 5.99.9
         version: 5.99.9(esbuild@0.25.5)
       webpack-dev-server:
-        specifier: 5.2.1
-        version: 5.2.1(webpack@5.99.9(esbuild@0.25.5))
+        specifier: 5.2.2
+        version: 5.2.2(webpack@5.99.9(esbuild@0.25.5))
 
   packages/angular_devkit/core:
     dependencies:
@@ -1046,6 +1046,10 @@ packages:
     resolution: {integrity: sha512-xnlJYj5zepml8NXtjkG0WquFUv8RskFqyFcVgTBp5k+NaA/8uw/K+OSVf8AMGw5e9HKP2ETd5xpK5MLZQD6b4Q==}
     engines: {node: '>=6.9.0'}
 
+  '@babel/generator@7.27.5':
+    resolution: {integrity: sha512-ZGhA37l0e/g2s1Cnzdix0O3aLYm66eF8aufiVteOgnwxgnRP8GoyMj7VWsgWnQbVKXyge7hqrFh2K2TQM6t1Hw==}
+    engines: {node: '>=6.9.0'}
+
   '@babel/helper-annotate-as-pure@7.27.3':
     resolution: {integrity: sha512-fXSwMQqitTGeHLBC08Eq5yXz2m37E4pJX1qAU1+2cNedz/ifv/bVXft90VeSav5nFO61EcNgwr0aJxbyPaWBPg==}
     engines: {node: '>=6.9.0'}
@@ -1135,6 +1139,11 @@ packages:
 
   '@babel/parser@7.27.4':
     resolution: {integrity: sha512-BRmLHGwpUqLFR2jzx9orBuX/ABDkj2jLKOXrHDTN2aOKL+jFDDKaRNo9nyYsIl9h/UE/7lMKdDjKQQyxKKDZ7g==}
+    engines: {node: '>=6.0.0'}
+    hasBin: true
+
+  '@babel/parser@7.27.5':
+    resolution: {integrity: sha512-OsQd175SxWkGlzbny8J3K8TnnDD0N3lrIUtB92xwyRpzaenGZhxDvxN/JgU00U3CDZNj9tPuDJ5H0WS4Nt3vKg==}
     engines: {node: '>=6.0.0'}
     hasBin: true
 
@@ -7934,8 +7943,8 @@ packages:
       webpack:
         optional: true
 
-  webpack-dev-server@5.2.1:
-    resolution: {integrity: sha512-ml/0HIj9NLpVKOMq+SuBPLHcmbG+TGIjXRHsYfZwocUBIqEvws8NnS/V9AFQ5FKP+tgn5adwVwRrTEpGL33QFQ==}
+  webpack-dev-server@5.2.2:
+    resolution: {integrity: sha512-QcQ72gh8a+7JO63TAx/6XZf/CWhgMzu5m0QirvPfGvptOusAxG12w2+aua1Jkjr7hzaWDnJ2n6JFeexMHI+Zjg==}
     engines: {node: '>= 18.12.0'}
     hasBin: true
     peerDependencies:
@@ -8376,7 +8385,7 @@ snapshots:
     dependencies:
       '@ampproject/remapping': 2.3.0
       '@babel/code-frame': 7.27.1
-      '@babel/generator': 7.27.3
+      '@babel/generator': 7.27.5
       '@babel/helper-compilation-targets': 7.27.2
       '@babel/helper-module-transforms': 7.27.3(@babel/core@7.27.1)
       '@babel/helpers': 7.27.4
@@ -8415,6 +8424,14 @@ snapshots:
   '@babel/generator@7.27.3':
     dependencies:
       '@babel/parser': 7.27.4
+      '@babel/types': 7.27.3
+      '@jridgewell/gen-mapping': 0.3.8
+      '@jridgewell/trace-mapping': 0.3.25
+      jsesc: 3.1.0
+
+  '@babel/generator@7.27.5':
+    dependencies:
+      '@babel/parser': 7.27.5
       '@babel/types': 7.27.3
       '@jridgewell/gen-mapping': 0.3.8
       '@jridgewell/trace-mapping': 0.3.25
@@ -8550,6 +8567,10 @@ snapshots:
       '@babel/types': 7.27.3
 
   '@babel/parser@7.27.4':
+    dependencies:
+      '@babel/types': 7.27.3
+
+  '@babel/parser@7.27.5':
     dependencies:
       '@babel/types': 7.27.3
 
@@ -9032,7 +9053,7 @@ snapshots:
   '@babel/traverse@7.27.4':
     dependencies:
       '@babel/code-frame': 7.27.1
-      '@babel/generator': 7.27.3
+      '@babel/generator': 7.27.5
       '@babel/parser': 7.27.4
       '@babel/template': 7.27.2
       '@babel/types': 7.27.3
@@ -10102,7 +10123,7 @@ snapshots:
 
   '@types/connect-history-api-fallback@1.5.4':
     dependencies:
-      '@types/express-serve-static-core': 4.19.6
+      '@types/express-serve-static-core': 5.0.6
       '@types/node': 20.17.57
 
   '@types/connect@3.4.38':
@@ -12526,7 +12547,7 @@ snapshots:
 
   extract-zip@2.0.1:
     dependencies:
-      debug: 4.3.4
+      debug: 4.4.1(supports-color@10.0.0)
       get-stream: 5.2.0
       yauzl: 2.10.0
     optionalDependencies:
@@ -16334,7 +16355,7 @@ snapshots:
     optionalDependencies:
       webpack: 5.99.9(esbuild@0.25.5)
 
-  webpack-dev-server@5.2.1(webpack@5.99.9(esbuild@0.25.5)):
+  webpack-dev-server@5.2.2(webpack@5.99.9(esbuild@0.25.5)):
     dependencies:
       '@types/bonjour': 3.5.13
       '@types/connect-history-api-fallback': 1.5.4
