@@ -31,7 +31,6 @@ try {
 }
 
 const rawCommandName = process.argv[2];
-
 if (rawCommandName === '--get-yargs-completions' || rawCommandName === 'completion') {
   // Skip Node.js supported checks when running ng completion.
   // A warning at this stage could cause a broken source action (`source <(ng completion script)`) when in the shell init script.
@@ -43,8 +42,9 @@ if (rawCommandName === '--get-yargs-completions' || rawCommandName === 'completi
 // This node version check ensures that extremely old versions of node are not used.
 // These may not support ES2015 features such as const/let/async/await/etc.
 // These would then crash with a hard to diagnose error message.
-var version = process.versions.node.split('.').map((part) => Number(part));
-if (version[0] % 2 === 1) {
+const [major, minor] = process.versions.node.split('.', 2).map((part) => Number(part));
+
+if (major % 2 === 1) {
   // Allow new odd numbered releases with a warning (currently v17+)
   console.warn(
     'Node.js version ' +
@@ -55,13 +55,13 @@ if (version[0] % 2 === 1) {
   );
 
   require('./bootstrap');
-} else if (version[0] < 20 || (version[0] === 20 && version[1] < 11)) {
-  // Error and exit if less than 20.11
+} else if (major < 20 || (major === 20 && minor < 19) || (major === 22 && minor < 12)) {
+  // Error and exit if less than 20.19 or 22.12
   console.error(
     'Node.js version ' +
       process.version +
       ' detected.\n' +
-      'The Angular CLI requires a minimum Node.js version of v20.11.\n\n' +
+      'The Angular CLI requires a minimum Node.js version of v20.19 or v22.12.\n\n' +
       'Please update your Node.js version or visit https://nodejs.org/ for additional instructions.\n',
   );
 
