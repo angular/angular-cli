@@ -1,3 +1,30 @@
+<a name="20.0.1"></a>
+
+# 20.0.1 (2025-06-04)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                      |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------ |
+| [0883248cb](https://github.com/angular/angular-cli/commit/0883248cbdebcad09393349a0a5d9487b2a452ae) | fix  | improve Node.js version check and error messages |
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                                            |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------------------- |
+| [525ddcbd2](https://github.com/angular/angular-cli/commit/525ddcbd290525e4dac2547c352cf6c774d728a2) | fix  | only overwrite JSON file if actually changed                           |
+| [83c820e5a](https://github.com/angular/angular-cli/commit/83c820e5ab55d01662417a51e4cc8d094e409fc6) | fix  | remove karma config devkit package usages during application migration |
+| [87266b38a](https://github.com/angular/angular-cli/commit/87266b38a09ce783ac6d18f532ebe1f8ae5954c0) | fix  | skip zone.js dependency for zoneless applications                      |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                           |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------- |
+| [e5efdc577](https://github.com/angular/angular-cli/commit/e5efdc577be913870b29173345b8194b87420474) | fix  | also disable outputMode in vitest unit-tests          |
+| [5814393db](https://github.com/angular/angular-cli/commit/5814393dbb2f9227ce10f1df77a8deee06c7d1c5) | fix  | resolve junit karma reporter output to workspace root |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="20.0.0"></a>
 
 # 20.0.0 (2025-05-28)
