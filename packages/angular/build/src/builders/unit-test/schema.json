@@ -64,6 +64,23 @@
       },
       "default": []
     },
+    "codeCoverageReporters": {
+      "type": "array",
+      "description": "Reporters to use for code coverage results.",
+      "items": {
+        "oneOf": [
+          {
+            "$ref": "#/definitions/coverage-reporters"
+          },
+          {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 2,
+            "items": [{ "$ref": "#/definitions/coverage-reporters" }, { "type": "object" }]
+          }
+        ]
+      }
+    },
     "reporters": {
       "type": "array",
       "description": "Test runner reporters to use. Directly passed to the test runner.",
@@ -78,5 +95,10 @@
     }
   },
   "additionalProperties": false,
-  "required": ["buildTarget", "tsConfig", "runner"]
+  "required": ["buildTarget", "tsConfig", "runner"],
+  "definitions": {
+    "coverage-reporters": {
+      "enum": ["html", "lcov", "lcovonly", "text", "text-summary", "cobertura"]
+    }
+  }
 }
