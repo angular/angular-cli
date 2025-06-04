@@ -33,7 +33,7 @@ export async function normalizeOptions(
   const buildTargetSpecifier = options.buildTarget ?? `::development`;
   const buildTarget = targetFromTargetString(buildTargetSpecifier, projectName, 'build');
 
-  const { codeCoverage, codeCoverageExclude, tsConfig, runner, reporters, browsers } = options;
+  const { tsConfig, runner, reporters, browsers } = options;
 
   return {
     // Project/workspace information
@@ -46,8 +46,16 @@ export async function normalizeOptions(
     include: options.include ?? ['**/*.spec.ts'],
     exclude: options.exclude ?? [],
     runnerName: runner,
-    codeCoverage,
-    codeCoverageExclude,
+    codeCoverage: options.codeCoverage
+      ? {
+          exclude: options.codeCoverageExclude,
+          reporters: options.codeCoverageReporters?.map((entry) =>
+            typeof entry === 'string'
+              ? ([entry, {}] as [string, Record<string, unknown>])
+              : (entry as [string, Record<string, unknown>]),
+          ),
+        }
+      : undefined,
     tsConfig,
     reporters,
     browsers,

@@ -237,7 +237,8 @@ export async function* execute(
             browser,
             reporters: normalizedOptions.reporters ?? ['default'],
             coverage: {
-              enabled: normalizedOptions.codeCoverage,
+              enabled: !!normalizedOptions.codeCoverage,
+              reporter: normalizedOptions.codeCoverage?.reporters,
               excludeAfterRemap: true,
             },
             ...debugOptions,
@@ -251,7 +252,7 @@ export async function* execute(
                 // builder's test setup. To workaround this, the excludes are adjusted here to only automatically
                 // exclude the TypeScript source test files.
                 context.project.config.coverage.exclude = [
-                  ...(normalizedOptions.codeCoverageExclude ?? []),
+                  ...(normalizedOptions.codeCoverage?.exclude ?? []),
                   '**/*.{test,spec}.?(c|m)ts',
                 ];
               },
