@@ -21,7 +21,7 @@ npm_link_package(
 )
 
 jasmine_test(
-    name = "schematics_cli_test",
+    name = "test",
     data = [
         ":schematics_cli_test_lib",
         # The npm package itself is needed for the test at runtime, so we

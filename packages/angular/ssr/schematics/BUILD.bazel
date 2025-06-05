@@ -83,7 +83,7 @@ ts_project(
 )
 
 jasmine_test(
-    name = "ssr_schematics_test",
+    name = "test",
     data = [
         ":schematics_assets",
         ":ssr_schematics_test_lib",

@@ -52,6 +52,6 @@ ts_project(
 )
 
 jasmine_test(
-    name = "tools_test",
+    name = "test",
     data = [":tools_test_lib"],
 )
