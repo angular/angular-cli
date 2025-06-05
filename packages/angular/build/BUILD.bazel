@@ -162,7 +162,7 @@ ts_project(
 )
 
 jasmine_test(
-    name = "unit_tests",
+    name = "test",
     data = [":unit_test_lib"],
 )
 
