@@ -143,6 +143,15 @@ describe('find-module', () => {
       expect(modPath).toEqual('/projects/my-proj/src/admin/foo.module.ts');
     });
 
+    it('should find a module in a sub dir when using the `-module` suffix', () => {
+      tree.create('/projects/my-proj/src/admin/foo-module.ts', '@NgModule');
+      options.name = 'other/test';
+      options.module = 'admin/foo';
+      options.path = '/projects/my-proj/src';
+      const modPath = findModuleFromOptions(tree, options) as string;
+      expect(modPath).toEqual('/projects/my-proj/src/admin/foo-module.ts');
+    });
+
     it('should find a module in a sub dir (2)', () => {
       tree.create('/projects/my-proj/src/admin/foo.module.ts', '@NgModule');
       options.name = 'admin/hello';
