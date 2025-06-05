@@ -19,24 +19,24 @@ workflows:
     prepare:
       - bazel clean
     workflow:
-      - bazel test //packages/ngtools/webpack:webpack_test
+      - bazel test //packages/ngtools/webpack:test
 
   devkit-core-tests:
     name: '@angular/devkit/core tests'
     prepare:
       - bazel clean
     workflow:
-      - bazel test //packages/angular_devkit/core:core_test
+      - bazel test //packages/angular_devkit/core:test
 
   devkit-core-tests-rerun:
     name: '@angular/devkit/core return test'
     prepare:
       - bazel clean
     workflow:
-      - bazel test //packages/angular_devkit/core:core_test
+      - bazel test //packages/angular_devkit/core:test
       # Add a single line to the beginning of a file to trigger a rebuild/retest
       - sed -i '1i // comment' packages/angular_devkit/core/src/workspace/core_spec.ts
-      - bazel test //packages/angular_devkit/core:core_test
+      - bazel test //packages/angular_devkit/core:test
     cleanup:
       # Remove the single line added
       - sed -i '1d' packages/angular_devkit/core/src/workspace/core_spec.ts
