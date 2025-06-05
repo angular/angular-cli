@@ -1,3 +1,22 @@
+<a name="20.1.0-next.0"></a>
+
+# 20.1.0-next.0 (2025-06-05)
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                              |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------- |
+| [0b7d48c7c](https://github.com/angular/angular-cli/commit/0b7d48c7cafb49aa3cac7d9da831eff039b3e047) | fix  | correctly detect modules using new file extension format |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                      |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------ |
+| [1159cf081](https://github.com/angular/angular-cli/commit/1159cf08103081d2b851e59bc1c5fb200f114982) | feat | add code coverage reporters option for unit-test |
+| [8f305ef0b](https://github.com/angular/angular-cli/commit/8f305ef0ba91ec9bf6417b7084965205cf5488e7) | feat | add dataurl, base64 loaders                      |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="20.0.1"></a>
 
 # 20.0.1 (2025-06-04)
