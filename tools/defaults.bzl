@@ -65,9 +65,10 @@ def jasmine_test(data = [], args = [], **kwargs):
         chdir = native.package_name(),
         args = [
             "--require=%s/node_modules/source-map-support/register.js" % relative_to_root,
-            "**/*spec.js",
-            "**/*spec.mjs",
-            "**/*spec.cjs",
+            # Escape so that the `js_binary` launcher triggers Bash expansion.
+            "'**/*+(.|_)spec.js'",
+            "'**/*+(.|_)spec.mjs'",
+            "'**/*+(.|_)spec.cjs'",
         ] + args,
         data = data + ["//:node_modules/source-map-support"],
         **kwargs
