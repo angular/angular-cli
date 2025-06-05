@@ -27,7 +27,9 @@ import { addImportToModule, addRouteDeclarationToModule } from '../utility/ast-u
 import { InsertChange } from '../utility/change';
 import {
   MODULE_EXT,
+  MODULE_EXT_LEGACY,
   ROUTING_MODULE_EXT,
+  ROUTING_MODULE_EXT_LEGACY,
   buildRelativePath,
   findModuleFromOptions,
 } from '../utility/find-module';
@@ -114,11 +116,11 @@ function addRouteDeclarationToNgModule(
 
 function getRoutingModulePath(host: Tree, modulePath: string): string | undefined {
   const routingModulePath =
-    modulePath.endsWith(ROUTING_MODULE_EXT) || modulePath.endsWith('-routing-module.ts')
+    modulePath.endsWith(ROUTING_MODULE_EXT_LEGACY) || modulePath.endsWith(ROUTING_MODULE_EXT)
       ? modulePath
       : modulePath
-          .replace(MODULE_EXT, ROUTING_MODULE_EXT)
-          .replace('-module.ts', '-routing-module.ts');
+          .replace(MODULE_EXT_LEGACY, ROUTING_MODULE_EXT_LEGACY)
+          .replace(MODULE_EXT, ROUTING_MODULE_EXT);
 
   return host.exists(routingModulePath) ? routingModulePath : undefined;
 }
@@ -138,15 +140,7 @@ export default function (options: ModuleOptions): Rule {
     }
 
     if (options.module) {
-      try {
-        options.module = findModuleFromOptions(host, options);
-      } catch {
-        options.module = findModuleFromOptions(host, {
-          ...options,
-          moduleExt: '-module.ts',
-          routingModuleExt: '-routing-module.ts',
-        });
-      }
+      options.module = findModuleFromOptions(host, options);
     }
 
     let routingModulePath;

@@ -38,15 +38,7 @@ export default function (options: DirectiveOptions): Rule {
       options.path = buildDefaultPath(project);
     }
 
-    try {
-      options.module = findModuleFromOptions(host, options);
-    } catch {
-      options.module = findModuleFromOptions(host, {
-        ...options,
-        moduleExt: '-module.ts',
-        routingModuleExt: '-routing-module.ts',
-      });
-    }
+    options.module = findModuleFromOptions(host, options);
     const parsedPath = parseName(options.path, options.name);
     options.name = parsedPath.name;
     options.path = parsedPath.path;
