@@ -117,7 +117,7 @@ ts_project(
 )
 
 jasmine_test(
-    name = "angular-cli_test",
+    name = "test",
     data = [":angular-cli_test_lib"],
 )
 

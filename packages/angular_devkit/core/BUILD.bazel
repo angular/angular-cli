@@ -59,7 +59,7 @@ ts_project(
 )
 
 jasmine_test(
-    name = "core_test",
+    name = "test",
     data = [":core_test_lib"],
 )
 

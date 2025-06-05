@@ -32,7 +32,7 @@ ts_project(
 )
 
 jasmine_test(
-    name = "baseline_browserslist_test",
+    name = "test",
     data = [":baseline_browserslist_test_lib"],
 )
 
