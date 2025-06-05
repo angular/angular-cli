@@ -20,8 +20,10 @@ export interface ModuleOptions {
   standalone?: boolean;
 }
 
-export const MODULE_EXT = '.module.ts';
-export const ROUTING_MODULE_EXT = '-routing.module.ts';
+export const MODULE_EXT = '-module.ts';
+export const ROUTING_MODULE_EXT = '-routing-module.ts';
+export const MODULE_EXT_LEGACY = '.module.ts';
+export const ROUTING_MODULE_EXT_LEGACY = '-routing.module.ts';
 
 /**
  * Find the module referred by a set of options passed to the schematics.
@@ -31,13 +33,10 @@ export function findModuleFromOptions(host: Tree, options: ModuleOptions): Path 
     return undefined;
   }
 
-  const moduleExt = options.moduleExt || MODULE_EXT;
-  const routingModuleExt = options.routingModuleExt || ROUTING_MODULE_EXT;
-
   if (!options.module) {
     const pathToCheck = (options.path || '') + '/' + options.name;
 
-    return normalize(findModule(host, pathToCheck, moduleExt, routingModuleExt));
+    return normalize(findModule(host, pathToCheck, options.moduleExt, options.routingModuleExt));
   } else {
     const modulePath = normalize(`/${options.path}/${options.module}`);
     const componentPath = normalize(`/${options.path}/${options.name}`);
@@ -53,14 +52,21 @@ export function findModuleFromOptions(host: Tree, options: ModuleOptions): Path 
     }
 
     const candidatesDirs = [...candidateSet].sort((a, b) => b.length - a.length);
-    for (const c of candidatesDirs) {
-      const candidateFiles = ['', `${moduleBaseName}.ts`, `${moduleBaseName}${moduleExt}`].map(
-        (x) => join(c, x),
+    const candidateFiles: string[] = ['', `${moduleBaseName}.ts`];
+    if (options.moduleExt) {
+      candidateFiles.push(`${moduleBaseName}${options.moduleExt}`);
+    } else {
+      candidateFiles.push(
+        `${moduleBaseName}${MODULE_EXT}`,
+        `${moduleBaseName}${MODULE_EXT_LEGACY}`,
       );
+    }
 
+    for (const c of candidatesDirs) {
       for (const sc of candidateFiles) {
-        if (host.exists(sc) && host.readText(sc).includes('@NgModule')) {
-          return normalize(sc);
+        const scPath = join(c, sc);
+        if (host.exists(scPath) && host.readText(scPath).includes('@NgModule')) {
+          return normalize(scPath);
         }
       }
     }
@@ -78,15 +84,22 @@ export function findModuleFromOptions(host: Tree, options: ModuleOptions): Path 
 export function findModule(
   host: Tree,
   generateDir: string,
-  moduleExt = MODULE_EXT,
-  routingModuleExt = ROUTING_MODULE_EXT,
+  moduleExt?: string,
+  routingModuleExt?: string,
 ): Path {
   let dir: DirEntry | null = host.getDir('/' + generateDir);
   let foundRoutingModule = false;
 
+  const moduleExtensions: string[] = moduleExt ? [moduleExt] : [MODULE_EXT, MODULE_EXT_LEGACY];
+  const routingModuleExtensions: string[] = routingModuleExt
+    ? [routingModuleExt]
+    : [ROUTING_MODULE_EXT, ROUTING_MODULE_EXT_LEGACY];
+
   while (dir) {
-    const allMatches = dir.subfiles.filter((p) => p.endsWith(moduleExt));
-    const filteredMatches = allMatches.filter((p) => !p.endsWith(routingModuleExt));
+    const allMatches = dir.subfiles.filter((p) => moduleExtensions.some((m) => p.endsWith(m)));
+    const filteredMatches = allMatches.filter(
+      (p) => !routingModuleExtensions.some((m) => p.endsWith(m)),
+    );
 
     foundRoutingModule = foundRoutingModule || allMatches.length !== filteredMatches.length;
 
