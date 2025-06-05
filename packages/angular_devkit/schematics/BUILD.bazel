@@ -48,7 +48,7 @@ ts_project(
 )
 
 jasmine_test(
-    name = "schematics_test",
+    name = "test",
     data = [":schematics_test_lib"],
 )
 

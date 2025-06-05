@@ -58,7 +58,7 @@ ts_project(
 )
 
 jasmine_test(
-    name = "pwa_test",
+    name = "test",
     data = [":pwa_test_lib"],
 )
 
