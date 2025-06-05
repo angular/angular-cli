@@ -46,4 +46,4 @@ workflows:
     prepare:
       - bazel clean
     workflow:
-      - bazel test //packages/angular/build:unit_tests
+      - bazel test //packages/angular/build:test
