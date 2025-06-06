@@ -113,7 +113,7 @@ export async function* execute(
     buildTargetOptions.polyfills.push('zone.js/testing');
   }
 
-  const outputPath = path.join(context.workspaceRoot, 'dist/test-out', randomUUID());
+  const outputPath = path.join(context.workspaceRoot, generateOutputPath());
   const buildOptions: ApplicationBuilderInternalOptions = {
     ...buildTargetOptions,
     watch: normalizedOptions.watch,
@@ -342,4 +342,11 @@ function setupBrowserConfiguration(
   };
 
   return { browser };
+}
+
+function generateOutputPath(): string {
+  const datePrefix = new Date().toISOString().replaceAll(/[-:.]/g, '');
+  const uuidSuffix = randomUUID().slice(0, 8);
+
+  return path.join('dist', 'test-out', `${datePrefix}-${uuidSuffix}`);
 }
