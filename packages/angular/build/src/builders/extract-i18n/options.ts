@@ -6,10 +6,11 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
+import { type DiagnosticHandlingStrategy } from '@angular/localize/tools';
 import { BuilderContext, targetFromTargetString } from '@angular-devkit/architect';
 import { fail } from 'node:assert';
 import path from 'node:path';
-import { createI18nOptions } from '../../utils/i18n-options';
+import { type I18nOptions, createI18nOptions } from '../../utils/i18n-options';
 import { Schema as ExtractI18nOptions, Format } from './schema';
 
 export type NormalizedExtractI18nOptions = Awaited<ReturnType<typeof normalizeOptions>>;
@@ -36,7 +37,12 @@ export async function normalizeOptions(
   // Target specifier defaults to the current project's build target with no specified configuration
   const buildTargetSpecifier = options.buildTarget ?? ':';
   const buildTarget = targetFromTargetString(buildTargetSpecifier, projectName, 'build');
-  const i18nOptions = createI18nOptions(projectMetadata, /** inline */ false, context.logger);
+  const i18nOptions: I18nOptions & {
+    duplicateTranslationBehavior: DiagnosticHandlingStrategy;
+  } = {
+    ...createI18nOptions(projectMetadata, /** inline */ false, context.logger),
+    duplicateTranslationBehavior: options.i18nDuplicateTranslation || 'warning',
+  };
 
   // Normalize xliff format extensions
   let format = options.format;
