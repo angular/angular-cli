@@ -8,7 +8,7 @@
     "@types/node": "^20.17.19",
     "browser-sync": "^3.0.0",
     "express": "^5.1.0",
-    "jasmine-core": "~5.7.0",
+    "jasmine-core": "~5.8.0",
     "jasmine-spec-reporter": "~7.0.0",
     "karma-chrome-launcher": "~3.2.0",
     "karma-coverage": "~2.2.0",
