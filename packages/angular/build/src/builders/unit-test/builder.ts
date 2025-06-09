@@ -224,37 +224,61 @@ export async function* execute(
         {
           // Disable configuration file resolution/loading
           config: false,
+          root: workspaceRoot,
+          project: ['base', projectName],
+          name: 'base',
+          include: [],
+          reporters: normalizedOptions.reporters ?? ['default'],
+          watch: normalizedOptions.watch,
+          coverage: {
+            enabled: !!normalizedOptions.codeCoverage,
+            reporter: normalizedOptions.codeCoverage?.reporters,
+            excludeAfterRemap: true,
+            exclude: normalizedOptions.codeCoverage?.exclude,
+          },
+          ...debugOptions,
         },
         {
-          test: {
-            root: outputPath,
-            globals: true,
-            setupFiles,
-            // Use `jsdom` if no browsers are explicitly configured.
-            // `node` is effectively no "environment" and the default.
-            environment: browser ? 'node' : 'jsdom',
-            watch: normalizedOptions.watch,
-            browser,
-            reporters: normalizedOptions.reporters ?? ['default'],
-            coverage: {
-              enabled: !!normalizedOptions.codeCoverage,
-              reporter: normalizedOptions.codeCoverage?.reporters,
-              excludeAfterRemap: true,
-            },
-            ...debugOptions,
-          },
           plugins: [
             {
-              name: 'angular-coverage-exclude',
-              configureVitest(context) {
-                // Adjust coverage excludes to not include the otherwise automatically inserted included unit tests.
-                // Vite does this as a convenience but is problematic for the bundling strategy employed by the
-                // builder's test setup. To workaround this, the excludes are adjusted here to only automatically
-                // exclude the TypeScript source test files.
-                context.project.config.coverage.exclude = [
-                  ...(normalizedOptions.codeCoverage?.exclude ?? []),
-                  '**/*.{test,spec}.?(c|m)ts',
-                ];
+              name: 'angular:project-init',
+              async configureVitest(context) {
+                // Create a subproject that can be configured with plugins for browser mode.
+                // Plugins defined directly in the vite overrides will not be present in the
+                // browser specific Vite instance.
+                await context.injectTestProjects({
+                  test: {
+                    name: projectName,
+                    root: outputPath,
+                    globals: true,
+                    setupFiles,
+                    // Use `jsdom` if no browsers are explicitly configured.
+                    // `node` is effectively no "environment" and the default.
+                    environment: browser ? 'node' : 'jsdom',
+                    browser,
+                  },
+                  plugins: [
+                    {
+                      name: 'angular:html-index',
+                      transformIndexHtml() {
+                        // Add all global stylesheets
+                        return (
+                          Object.entries(result.files)
+                            // TODO: Expand this to all configured global stylesheets
+                            .filter(([file]) => file === 'styles.css')
+                            .map(([styleUrl]) => ({
+                              tag: 'link',
+                              attrs: {
+                                'href': styleUrl,
+                                'rel': 'stylesheet',
+                              },
+                              injectTo: 'head',
+                            }))
+                        );
+                      },
+                    },
+                  ],
+                });
               },
             },
           ],
