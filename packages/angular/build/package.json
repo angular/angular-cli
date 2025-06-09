@@ -37,7 +37,7 @@
     "parse5-html-rewriting-stream": "7.1.0",
     "picomatch": "4.0.2",
     "piscina": "5.0.0",
-    "rollup": "4.41.1",
+    "rollup": "4.42.0",
     "sass": "1.89.1",
     "semver": "7.7.2",
     "source-map-support": "0.5.21",
@@ -56,7 +56,7 @@
     "ng-packagr": "20.1.0-next.0",
     "postcss": "8.5.4",
     "rxjs": "7.8.2",
-    "vitest": "3.2.2"
+    "vitest": "3.2.3"
   },
   "peerDependencies": {
     "@angular/core": "0.0.0-ANGULAR-FW-PEER-DEP",
