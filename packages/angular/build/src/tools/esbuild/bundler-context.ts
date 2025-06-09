@@ -366,6 +366,7 @@ export class BundlerContext {
         if (
           !external ||
           SERVER_GENERATED_EXTERNALS.has(path) ||
+          isInternalAngularFile(path) ||
           (kind !== 'import-statement' && kind !== 'dynamic-import' && kind !== 'require-call')
         ) {
           continue;
