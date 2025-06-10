@@ -49,12 +49,12 @@ function addTsProjectReference(...paths: string[]) {
 }
 
 export default function (options: ApplicationOptions): Rule {
-  return async (host: Tree, context: SchematicContext) => {
+  return async (host: Tree) => {
     const { appDir, appRootSelector, componentOptions, folderName, sourceDir } =
       await getAppOptions(host, options);
 
     return chain([
-      addAppToWorkspaceFile(options, appDir, folderName),
+      addAppToWorkspaceFile(options, appDir),
       addTsProjectReference('./' + join(normalize(appDir), 'tsconfig.app.json')),
       options.skipTests || options.minimal
         ? noop()
@@ -157,6 +157,14 @@ function addDependenciesToPackageJson(options: ApplicationOptions) {
       });
     }
 
+    if (options.style === Style.Less) {
+      addPackageJsonDependency(host, {
+        type: NodeDependencyType.Dev,
+        name: 'less',
+        version: latestVersions['less'],
+      });
+    }
+
     if (!options.skipInstall) {
       context.addTask(new NodePackageInstallTask());
     }
@@ -165,11 +173,7 @@ function addDependenciesToPackageJson(options: ApplicationOptions) {
   };
 }
 
-function addAppToWorkspaceFile(
-  options: ApplicationOptions,
-  appDir: string,
-  folderName: string,
-): Rule {
+function addAppToWorkspaceFile(options: ApplicationOptions, appDir: string): Rule {
   let projectRoot = appDir;
   if (projectRoot) {
     projectRoot += '/';
