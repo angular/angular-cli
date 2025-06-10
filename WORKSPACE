@@ -105,15 +105,15 @@ nodejs_register_toolchains(
     name = "node22",
     # The below can be removed once @rules_nodejs/nodejs is updated to latest which contains https://github.com/bazelbuild/rules_nodejs/pull/3701
     node_repositories = {
-        "22.0.0-darwin_arm64": ("node-v22.0.0-darwin-arm64.tar.gz", "node-v22.0.0-darwin-arm64", "ea96d349cfaa67aa87ceeaa3e5b52c9167f7ac302fd8d1ff162d0785e9dc0785"),
-        "22.0.0-darwin_amd64": ("node-v22.0.0-darwin-x64.tar.gz", "node-v22.0.0-darwin-x64", "422a3887ff5418f0a4552d89cf99346ab8ab51bb5d384660baa88b8444d2c111"),
-        "22.0.0-linux_arm64": ("node-v22.0.0-linux-arm64.tar.xz", "node-v22.0.0-linux-arm64", "83711d29cbe46375bdffab5419f3d831892e24294169272f6c39edc364556241"),
-        "22.0.0-linux_ppc64le": ("node-v22.0.0-linux-ppc64le.tar.xz", "node-v22.0.0-linux-ppc64le", "2b3fb8707a79243bfb3131312b86716ddc3855bce21bb168095b6b916798e5e9"),
-        "22.0.0-linux_s390x": ("node-v22.0.0-linux-s390x.tar.xz", "node-v22.0.0-linux-s390x", "89a8efeeb9f94ce9ea251b8109e079c14919f4c0dc2cbc9f545ec47ef0886737"),
-        "22.0.0-linux_amd64": ("node-v22.0.0-linux-x64.tar.xz", "node-v22.0.0-linux-x64", "9122e50f2642afd5f6078cafd1f52ede60fc464284384f05c18a04d13d07ae5a"),
-        "22.0.0-windows_amd64": ("node-v22.0.0-win-x64.zip", "node-v22.0.0-win-x64", "32d639b47d4c0a651ff8f8d7d41a454168a3d4045be37985f9a810cf8cef6174"),
+        "22.16.0-darwin_arm64": ("node-v22.16.0-darwin-arm64.tar.gz", "node-v22.16.0-darwin-arm64", "1d7f34ec4c03e12d8b33481e5c4560432d7dc31a0ef3ff5a4d9a8ada7cf6ecc9"),
+        "22.16.0-darwin_amd64": ("node-v22.16.0-darwin-x64.tar.gz", "node-v22.16.0-darwin-x64", "838d400f7e66c804e5d11e2ecb61d6e9e878611146baff69d6a2def3cc23f4ac"),
+        "22.16.0-linux_arm64": ("node-v22.16.0-linux-arm64.tar.xz", "node-v22.16.0-linux-arm64", "eab80cb88f8fda1e65f5e8d0420c9809bdb320b03fd34976ab7161b6e703b910"),
+        "22.16.0-linux_ppc64le": ("node-v22.16.0-linux-ppc64le.tar.xz", "node-v22.16.0-linux-ppc64le", "02b082697a4f73dcd02e89d185e004af69a8462c13fa62caf403e7f717b79754"),
+        "22.16.0-linux_s390x": ("node-v22.16.0-linux-s390x.tar.xz", "node-v22.16.0-linux-s390x", "b3603dcbea7b1ef87cfd3bf986ff9697609359356d82334de6217838d3cce640"),
+        "22.16.0-linux_amd64": ("node-v22.16.0-linux-x64.tar.xz", "node-v22.16.0-linux-x64", "f4cb75bb036f0d0eddf6b79d9596df1aaab9ddccd6a20bf489be5abe9467e84e"),
+        "22.16.0-windows_amd64": ("node-v22.16.0-win-x64.zip", "node-v22.16.0-win-x64", "21c2d9735c80b8f86dab19305aa6a9f6f59bbc808f68de3eef09d5832e3bfbbd"),
     },
-    node_version = "22.0.0",
+    node_version = "22.16.0",
 )
 
 load("@aspect_rules_js//js:toolchains.bzl", "rules_js_register_toolchains")
