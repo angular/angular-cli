@@ -282,6 +282,20 @@ describe('Application Schematic', () => {
       expect(pkg.dependencies['zone.js']).toEqual(latestVersions['zone.js']);
     });
 
+    it('should add "less" to devDependencies when Less is selected as the style option', async () => {
+      const tree = await schematicRunner.runSchematic(
+        'application',
+        {
+          ...defaultOptions,
+          style: Style.Less,
+        },
+        workspaceTree,
+      );
+
+      const pkg = JSON.parse(tree.readContent('/package.json'));
+      expect(pkg.devDependencies['less']).toEqual(latestVersions['less']);
+    });
+
     it('should include zone.js if "zoneless" option is not present', async () => {
       const tree = await schematicRunner.runSchematic(
         'application',
