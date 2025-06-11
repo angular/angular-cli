@@ -232,9 +232,12 @@ export async function* execute(
           watch: normalizedOptions.watch,
           coverage: {
             enabled: !!normalizedOptions.codeCoverage,
-            reporter: normalizedOptions.codeCoverage?.reporters,
             excludeAfterRemap: true,
             exclude: normalizedOptions.codeCoverage?.exclude,
+            // Special handling for `reporter` due to an undefined value causing upstream failures
+            ...(normalizedOptions.codeCoverage?.reporters
+              ? { reporters: normalizedOptions.codeCoverage.reporters }
+              : {}),
           },
           ...debugOptions,
         },
