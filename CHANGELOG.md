@@ -1,3 +1,22 @@
+<a name="20.0.2"></a>
+
+# 20.0.2 (2025-06-11)
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                                           |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------------------- |
+| [bf64a0f2d](https://github.com/angular/angular-cli/commit/bf64a0f2dcc2cbd5dc56e575dd337c16f2a3342b) | fix  | add `less` as a devDependency when selected as the style preprocessor |
+| [cb258a3e1](https://github.com/angular/angular-cli/commit/cb258a3e1525cda985109692fb88449259119ff2) | fix  | correctly detect modules using new file extension format              |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                                |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------- |
+| [424f1cbbf](https://github.com/angular/angular-cli/commit/424f1cbbfb709b4d6f480e6321ec1a152813cf5c) | fix  | do not consider internal Angular files as external imports |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="20.0.1"></a>
 
 # 20.0.1 (2025-06-04)
