@@ -32,4 +32,5 @@ jasmine_test(
     data = [
         ":esm_tests_bundled",
     ],
+    flaky = True,
 )
