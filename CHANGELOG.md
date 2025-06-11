@@ -1,3 +1,15 @@
+<a name="18.2.20"></a>
+
+# 18.2.20 (2025-06-11)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                            | Type | Description                                    |
+| ------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------- |
+| [f048078](https://github.com/angular/angular-cli/commit/f048078ab6012b5da4dff024c107f42f79693682) | fix  | update dependency webpack-dev-server to v5.2.2 |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="20.1.0-next.0"></a>
 
 # 20.1.0-next.0 (2025-06-05)
