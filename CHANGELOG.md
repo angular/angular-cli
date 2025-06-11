@@ -1,3 +1,25 @@
+<a name="20.1.0-next.1"></a>
+
+# 20.1.0-next.1 (2025-06-11)
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                                           |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------------------- |
+| [1c19e0dcd](https://github.com/angular/angular-cli/commit/1c19e0dcd4a87fbf542201e09a402a8fccdfcd88) | feat | use signal in app component                                           |
+| [42f45a39e](https://github.com/angular/angular-cli/commit/42f45a39e63ab3ee1ba8d1b9af8d2e397ca07159) | fix  | add `less` as a devDependency when selected as the style preprocessor |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                                |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------- |
+| [e36cbba11](https://github.com/angular/angular-cli/commit/e36cbba11ecc0d95a0e7ff0e8184212ca824e87a) | fix  | do not consider internal Angular files as external imports |
+| [a415a4999](https://github.com/angular/angular-cli/commit/a415a4999f337f5bc3c0ee626aaba58b6c5ad4e1) | fix  | improve default coverage reporter handling for vitest      |
+| [f177f5508](https://github.com/angular/angular-cli/commit/f177f5508adb23f604d9abb5f4a33f3af5f32561) | fix  | support injecting global styles into vitest unit-tests     |
+| [917af12ae](https://github.com/angular/angular-cli/commit/917af12aeb82b1437e7b43a03ae80b58a09f0224) | fix  | use date/time based output path for vitest unit-test       |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="20.0.2"></a>
 
 # 20.0.2 (2025-06-11)
