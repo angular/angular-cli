@@ -69,6 +69,7 @@ export default function (options: ApplicationOptions): Rule {
             routingScope: 'Root',
             path: sourceDir,
             project: options.name,
+            typeSeparator: undefined,
           }),
       schematic('component', {
         name: 'app',
