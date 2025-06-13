@@ -119,6 +119,7 @@ class AngularPolyfillsPlugin {
   static createPlugin(
     polyfillsFile: FilePattern,
     jasmineCleanupFiles: FilePattern,
+    scriptsFiles: FilePattern[],
   ): InlinePluginDef {
     return {
       // This has to be a "reporter" because reporters run _after_ frameworks
@@ -161,15 +162,13 @@ class AngularPolyfillsPlugin {
               // page load. `type` won't affect them.
               continue;
             }
-            if (f.pattern === 'scripts.js') {
-              // Don't consider "scripts" option files as module types.
-              // This should be expanded if custom scripts bundle names support is added.
-              continue;
-            }
             if (f.pattern.endsWith('.js') && 'js' === (f.type ?? 'js')) {
               f.type = 'module';
             }
           }
+
+          // Add "scripts" option files as classic scripts
+          files.unshift(...scriptsFiles);
 
           // Add browser sourcemap support as a classic script
           files.unshift({
@@ -493,17 +492,28 @@ async function initializeApplication(
 
   karmaOptions.basePath = outputPath;
 
-  karmaOptions.files ??= [];
+  const scriptsFiles: FilePattern[] = [];
   if (options.scripts?.length) {
-    // This should be more granular to support named bundles.
-    // However, it replicates the behavior of the Karma Webpack-based builder.
-    karmaOptions.files.push({
-      pattern: `scripts.js`,
-      watched: false,
-      type: 'js',
-    });
+    const outputScripts = new Set<string>();
+    for (const scriptEntry of options.scripts) {
+      const outputName =
+        typeof scriptEntry === 'string'
+          ? 'scripts.js'
+          : `${scriptEntry.bundleName ?? 'scripts'}.js`;
+
+      if (outputScripts.has(outputName)) {
+        continue;
+      }
+      outputScripts.add(outputName);
+      scriptsFiles.push({
+        pattern: `${outputPath}/${outputName}`,
+        watched: false,
+        type: 'js',
+      });
+    }
   }
 
+  karmaOptions.files ??= [];
   karmaOptions.files.push(
     // Serve global setup script.
     { pattern: `${mainName}.js`, type: 'module', watched: false },
@@ -577,7 +587,7 @@ async function initializeApplication(
   parsedKarmaConfig.middleware.push(AngularAssetsMiddleware.NAME);
 
   parsedKarmaConfig.plugins.push(
-    AngularPolyfillsPlugin.createPlugin(polyfillsFile, jasmineCleanupFiles),
+    AngularPolyfillsPlugin.createPlugin(polyfillsFile, jasmineCleanupFiles, scriptsFiles),
   );
   parsedKarmaConfig.reporters ??= [];
   parsedKarmaConfig.reporters.push(AngularPolyfillsPlugin.NAME);
