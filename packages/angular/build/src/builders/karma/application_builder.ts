@@ -161,6 +161,11 @@ class AngularPolyfillsPlugin {
               // page load. `type` won't affect them.
               continue;
             }
+            if (f.pattern === 'scripts.js') {
+              // Don't consider "scripts" option files as module types.
+              // This should be expanded if custom scripts bundle names support is added.
+              continue;
+            }
             if (f.pattern.endsWith('.js') && 'js' === (f.type ?? 'js')) {
               f.type = 'module';
             }
