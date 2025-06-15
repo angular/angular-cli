@@ -1,0 +1,28 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "SchematicsLibrary",
+  "title": "Library Entrypoint Schema",
+  "type": "object",
+  "description": "Generate a library entrypoint in an Angular library project.",
+  "additionalProperties": false,
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "The name of the entrypoint to create.",
+      "pattern": "^[a-zA-Z0-9-._~]+/?[a-zA-Z0-9-._~]+$",
+      "$default": {
+        "$source": "argv",
+        "index": 0
+      },
+      "x-prompt": "What name would you like to use for the entrypoint?"
+    },
+    "project": {
+      "type": "string",
+      "description": "The name of the project.",
+      "$default": {
+        "$source": "projectName"
+      }
+    }
+  },
+  "required": ["name", "project"]
+}
