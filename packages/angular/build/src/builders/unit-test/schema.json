@@ -98,7 +98,16 @@
   "required": ["buildTarget", "tsConfig", "runner"],
   "definitions": {
     "coverage-reporters": {
-      "enum": ["html", "lcov", "lcovonly", "text", "text-summary", "cobertura"]
+      "enum": [
+        "html",
+        "lcov",
+        "lcovonly",
+        "text",
+        "text-summary",
+        "cobertura",
+        "json",
+        "json-summary"
+      ]
     }
   }
 }
