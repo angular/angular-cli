@@ -236,7 +236,7 @@ export async function* execute(
             exclude: normalizedOptions.codeCoverage?.exclude,
             // Special handling for `reporter` due to an undefined value causing upstream failures
             ...(normalizedOptions.codeCoverage?.reporters
-              ? { reporters: normalizedOptions.codeCoverage.reporters }
+              ? { reporter: normalizedOptions.codeCoverage.reporters }
               : {}),
           },
           ...debugOptions,
