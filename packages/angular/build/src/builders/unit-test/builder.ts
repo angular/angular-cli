@@ -233,7 +233,7 @@ export async function* execute(
           coverage: {
             enabled: !!normalizedOptions.codeCoverage,
             excludeAfterRemap: true,
-            exclude: normalizedOptions.codeCoverage?.exclude,
+            exclude: normalizedOptions.codeCoverage?.exclude ?? [],
             // Special handling for `reporter` due to an undefined value causing upstream failures
             ...(normalizedOptions.codeCoverage?.reporters
               ? { reporters: normalizedOptions.codeCoverage.reporters }
