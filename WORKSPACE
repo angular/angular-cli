@@ -14,7 +14,7 @@ http_archive(
 http_archive(
     name = "io_bazel_rules_webtesting",
     sha256 = "e9abb7658b6a129740c0b3ef6f5a2370864e102a5ba5ffca2cea565829ed825a",
-    urls = ["https://github.com/bazelbuild/rules_webtesting/releases/download/0.3.5/rules_webtesting.tar.gz"],
+    urls = ["https://github.com/bazelbuild/rules_webtesting/releases/download/0.4.1/rules_webtesting.tar.gz"],
 )
 
 http_archive(
@@ -31,7 +31,7 @@ http_archive(
     name = "aspect_rules_js",
     sha256 = "83e5af4d17385d1c3268c31ae217dbfc8525aa7bcf52508dc6864baffc8b9501",
     strip_prefix = "rules_js-2.3.7",
-    url = "https://github.com/aspect-build/rules_js/releases/download/v2.3.7/rules_js-v2.3.7.tar.gz",
+    url = "https://github.com/aspect-build/rules_js/releases/download/v2.3.8/rules_js-v2.3.7.tar.gz",
 )
 
 load("@aspect_rules_js//js:repositories.bzl", "rules_js_dependencies")
@@ -124,7 +124,7 @@ http_archive(
     name = "aspect_bazel_lib",
     sha256 = "e5131e44db23459bd1ed04635f2ae5436bc83f5e38629e07b75c0bf206f09245",
     strip_prefix = "bazel-lib-2.17.1",
-    url = "https://github.com/aspect-build/bazel-lib/releases/download/v2.17.1/bazel-lib-v2.17.1.tar.gz",
+    url = "https://github.com/aspect-build/bazel-lib/releases/download/v2.19.4/bazel-lib-v2.17.1.tar.gz",
 )
 
 load("@aspect_bazel_lib//lib:repositories.bzl", "aspect_bazel_lib_dependencies", "aspect_bazel_lib_register_toolchains")
