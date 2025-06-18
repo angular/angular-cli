@@ -1,3 +1,24 @@
+<a name="20.0.3"></a>
+
+# 20.0.3 (2025-06-18)
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                               |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------- |
+| [e90a808c0](https://github.com/angular/angular-cli/commit/e90a808c0100beb319bae36ca3b771ee2da89435) | fix  | include `main.server.ts` in `tsconfig.files` when present |
+| [5c48b8e0a](https://github.com/angular/angular-cli/commit/5c48b8e0ac38a108740ebb290dc1e666ce390806) | fix  | reset module `typeSeparator` when generating applications |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                           |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------- |
+| [56f426e25](https://github.com/angular/angular-cli/commit/56f426e2548b86c00d4da19b9f7b5cf97dc79104) | fix  | include custom bundle name scripts with karma         |
+| [dfe3a8b73](https://github.com/angular/angular-cli/commit/dfe3a8b7342dd492e42ec48052612255ba76c09b) | fix  | increase worker idle timeout                          |
+| [e6d27bd5e](https://github.com/angular/angular-cli/commit/e6d27bd5e3fe64f597621e0d5c08060cea64a302) | fix  | set scripts option output as classic script for karma |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="20.0.2"></a>
 
 # 20.0.2 (2025-06-11)
