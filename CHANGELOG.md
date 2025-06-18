@@ -1,3 +1,27 @@
+<a name="20.1.0-next.2"></a>
+
+# 20.1.0-next.2 (2025-06-18)
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                               |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------- |
+| [c43711177](https://github.com/angular/angular-cli/commit/c43711177b13b15ae4fbc7a009ae137bdc3fea4d) | fix  | include `main.server.ts` in `tsconfig.files` when present |
+| [4be58ee8c](https://github.com/angular/angular-cli/commit/4be58ee8c9896107925507a60cc8dd830c93bb7e) | fix  | reset module `typeSeparator` when generating applications |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                            |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------ |
+| [c19cd2985](https://github.com/angular/angular-cli/commit/c19cd2985cbf1ea8c1c15f020bc530d6768cb0fa) | fix  | coverage reporter option                               |
+| [049e6886f](https://github.com/angular/angular-cli/commit/049e6886f88267158d85ca72020fec728c3de0ac) | fix  | include custom bundle name scripts with karma          |
+| [1d76d0ee5](https://github.com/angular/angular-cli/commit/1d76d0ee59d54a889b564bdf85f183fd08ddc860) | fix  | increase worker idle timeout                           |
+| [2672f6ec1](https://github.com/angular/angular-cli/commit/2672f6ec17de6e05b19acda0e0b09a6715c9f83f) | fix  | json and json-summary as vitest coverage reporters     |
+| [60a16a82a](https://github.com/angular/angular-cli/commit/60a16a82a99718a527e2c6b588d1489fba5bd500) | fix  | set scripts option output as classic script for karma  |
+| [130c65014](https://github.com/angular/angular-cli/commit/130c650146595f237bc3285302d0075ba0387546) | fix  | use an empty array as default value for vitest exclude |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="20.0.3"></a>
 
 # 20.0.3 (2025-06-18)
