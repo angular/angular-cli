@@ -401,8 +401,8 @@ importers:
         specifier: 4.0.2
         version: 4.0.2
       piscina:
-        specifier: 5.0.0
-        version: 5.0.0
+        specifier: 5.1.1
+        version: 5.1.1
       rollup:
         specifier: 4.40.2
         version: 4.40.2
@@ -693,8 +693,8 @@ importers:
         specifier: 4.0.2
         version: 4.0.2
       piscina:
-        specifier: 5.0.0
-        version: 5.0.0
+        specifier: 5.1.1
+        version: 5.1.1
       postcss:
         specifier: 8.5.3
         version: 8.5.3
@@ -6554,9 +6554,9 @@ packages:
     resolution: {integrity: sha512-i85pKRCt4qMjZ1+L7sy2Ag4t1atFcdbEt76+7iRJn1g2BvsnRMGu9p8pivl9fs63M2kF/A0OacFZhTub+m/qMg==}
     hasBin: true
 
-  piscina@5.0.0:
-    resolution: {integrity: sha512-R+arufwL7sZvGjAhSMK3TfH55YdGOqhpKXkcwQJr432AAnJX/xxX19PA4QisrmJ+BTTfZVggaz6HexbkQq1l1Q==}
-    engines: {node: '>=18.x'}
+  piscina@5.1.1:
+    resolution: {integrity: sha512-9rPDIPsCwOivatEZGM8+apgM7AiTDLSnpwMmLaSmdm2PeND8bFJzZLZZxyrJjLH8Xx/MpKoVaKf+vZOWALNHbw==}
+    engines: {node: '>=20.x'}
 
   pkce-challenge@5.0.0:
     resolution: {integrity: sha512-ueGLflrrnvwB3xuo/uGob5pd5FN7l0MsLf0Z87o/UQmRtwjvfylfc9MurIxRAWywCYTgrvpXBcqjV4OfCYGCIQ==}
@@ -14185,7 +14185,7 @@ snapshots:
       jsonc-parser: 3.3.1
       less: 4.3.0
       ora: 8.2.0
-      piscina: 5.0.0
+      piscina: 5.1.1
       postcss: 8.5.3
       rollup-plugin-dts: 6.2.1(rollup@4.40.2)(typescript@5.8.3)
       rxjs: 7.8.2
@@ -14624,7 +14624,7 @@ snapshots:
       sonic-boom: 4.2.0
       thread-stream: 3.1.0
 
-  piscina@5.0.0:
+  piscina@5.1.1:
     optionalDependencies:
       '@napi-rs/nice': 1.0.1
 
