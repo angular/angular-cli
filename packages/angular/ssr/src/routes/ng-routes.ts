@@ -148,7 +148,7 @@ async function* handleRoute(options: {
 
     const { redirectTo, loadChildren, loadComponent, children, ɵentryName } = route;
     if (ɵentryName && loadComponent) {
-      appendPreloadToMetadata(ɵentryName, entryPointToBrowserMapping, metadata, true);
+      appendPreloadToMetadata(ɵentryName, entryPointToBrowserMapping, metadata);
     }
 
     if (metadata.renderMode === RenderMode.Prerender) {
@@ -192,11 +192,7 @@ async function* handleRoute(options: {
     // Load and process lazy-loaded child routes
     if (loadChildren) {
       if (ɵentryName) {
-        // When using `loadChildren`, the entire feature area (including multiple routes) is loaded.
-        // As a result, we do not want all dynamic-import dependencies to be preload, because it involves multiple dependencies
-        // across different child routes. In contrast, `loadComponent` only loads a single component, which allows
-        // for precise control over preloading, ensuring that the files preloaded are exactly those required for that specific route.
-        appendPreloadToMetadata(ɵentryName, entryPointToBrowserMapping, metadata, false);
+        appendPreloadToMetadata(ɵentryName, entryPointToBrowserMapping, metadata);
       }
 
       const loadedChildRoutes = await loadChildrenHelper(
@@ -336,7 +332,6 @@ function appendPreloadToMetadata(
   entryName: string,
   entryPointToBrowserMapping: EntryPointToBrowserMapping,
   metadata: ServerConfigRouteTreeNodeMetadata,
-  includeDynamicImports: boolean,
 ): void {
   const existingPreloads = metadata.preload ?? [];
   if (!entryPointToBrowserMapping || existingPreloads.length >= MODULE_PRELOAD_MAX) {
@@ -350,13 +345,8 @@ function appendPreloadToMetadata(
 
   // Merge existing preloads with new ones, ensuring uniqueness and limiting the total to the maximum allowed.
   const combinedPreloads: Set<string> = new Set(existingPreloads);
-  for (const { dynamicImport, path } of preload) {
-    if (dynamicImport && !includeDynamicImports) {
-      continue;
-    }
-
-    combinedPreloads.add(path);
-
+  for (const href of preload) {
+    combinedPreloads.add(href);
     if (combinedPreloads.size === MODULE_PRELOAD_MAX) {
       break;
     }
