@@ -37,7 +37,11 @@ export function describeBuilder<T>(
   });
 
   describe(options.name || builderHandler.name, () => {
-    beforeEach(() => host.initialize().toPromise());
+    beforeEach(async () => {
+      harness.resetProjectMetadata();
+
+      await host.initialize().toPromise();
+    });
 
     afterEach(() => host.restore().toPromise());
 

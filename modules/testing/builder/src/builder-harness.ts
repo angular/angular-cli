@@ -115,6 +115,10 @@ export class BuilderHarness<T> {
     return join(getSystemPath(this.host.root()), path);
   }
 
+  resetProjectMetadata(): void {
+    this.projectMetadata = DEFAULT_PROJECT_METADATA;
+  }
+
   useProject(name: string, metadata: Record<string, unknown> = {}): this {
     if (!name) {
       throw new Error('Project name cannot be an empty string.');
