@@ -105,7 +105,7 @@
     "eslint": "9.29.0",
     "eslint-config-prettier": "10.1.5",
     "eslint-plugin-header": "3.1.1",
-    "eslint-plugin-import": "2.31.0",
+    "eslint-plugin-import": "2.32.0",
     "express": "5.1.0",
     "fast-glob": "3.3.3",
     "globals": "16.2.0",
@@ -143,7 +143,7 @@
     "typescript": "5.8.3",
     "undici": "7.10.0",
     "unenv": "^1.10.0",
-    "verdaccio": "6.1.2",
+    "verdaccio": "6.1.4",
     "verdaccio-auth-memory": "^10.0.0",
     "yargs-parser": "22.0.0",
     "zone.js": "^0.15.0"

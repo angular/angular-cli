@@ -192,8 +192,8 @@ importers:
         specifier: 3.1.1
         version: 3.1.1(eslint@9.29.0(jiti@1.21.7))
       eslint-plugin-import:
-        specifier: 2.31.0
-        version: 2.31.0(@typescript-eslint/parser@8.34.1(eslint@9.29.0(jiti@1.21.7))(typescript@5.8.3))(eslint@9.29.0(jiti@1.21.7))
+        specifier: 2.32.0
+        version: 2.32.0(@typescript-eslint/parser@8.34.1(eslint@9.29.0(jiti@1.21.7))(typescript@5.8.3))(eslint@9.29.0(jiti@1.21.7))
       express:
         specifier: 5.1.0
         version: 5.1.0
@@ -306,8 +306,8 @@ importers:
         specifier: ^1.10.0
         version: 1.10.0
       verdaccio:
-        specifier: 6.1.2
-        version: 6.1.2(encoding@0.1.13)
+        specifier: 6.1.4
+        version: 6.1.4(encoding@0.1.13)
       verdaccio-auth-memory:
         specifier: ^10.0.0
         version: 10.2.2
@@ -342,7 +342,7 @@ importers:
         version: 7.8.2
       vitest:
         specifier: 3.2.4
-        version: 3.2.4(@types/node@20.19.0)(jiti@1.21.7)(jsdom@26.1.0)(less@4.3.0)(sass@1.89.2)(terser@5.43.0)(yaml@2.8.0)
+        version: 3.2.4(@types/node@20.19.0)(jiti@1.21.7)(jsdom@26.1.0)(less@4.3.0)(sass@1.89.2)(terser@5.43.1)(yaml@2.8.0)
 
   packages/angular/build:
     dependencies:
@@ -366,7 +366,7 @@ importers:
         version: 5.1.12(@types/node@20.19.0)
       '@vitejs/plugin-basic-ssl':
         specifier: 2.0.0
-        version: 2.0.0(vite@6.3.5(@types/node@20.19.0)(jiti@1.21.7)(less@4.3.0)(sass@1.89.2)(terser@5.43.0)(yaml@2.8.0))
+        version: 2.0.0(vite@6.3.5(@types/node@20.19.0)(jiti@1.21.7)(less@4.3.0)(sass@1.89.2)(terser@5.43.1)(yaml@2.8.0))
       beasties:
         specifier: 0.3.4
         version: 0.3.4
@@ -420,7 +420,7 @@ importers:
         version: 0.2.14
       vite:
         specifier: 6.3.5
-        version: 6.3.5(@types/node@20.19.0)(jiti@1.21.7)(less@4.3.0)(sass@1.89.2)(terser@5.43.0)(yaml@2.8.0)
+        version: 6.3.5(@types/node@20.19.0)(jiti@1.21.7)(less@4.3.0)(sass@1.89.2)(terser@5.43.1)(yaml@2.8.0)
       watchpack:
         specifier: 2.4.4
         version: 2.4.4
@@ -452,7 +452,7 @@ importers:
         version: 7.8.2
       vitest:
         specifier: 3.2.4
-        version: 3.2.4(@types/node@20.19.0)(jiti@1.21.7)(jsdom@26.1.0)(less@4.3.0)(sass@1.89.2)(terser@5.43.0)(yaml@2.8.0)
+        version: 3.2.4(@types/node@20.19.0)(jiti@1.21.7)(jsdom@26.1.0)(less@4.3.0)(sass@1.89.2)(terser@5.43.1)(yaml@2.8.0)
 
   packages/angular/cli:
     dependencies:
@@ -631,7 +631,7 @@ importers:
         version: link:../../ngtools/webpack
       '@vitejs/plugin-basic-ssl':
         specifier: 2.0.0
-        version: 2.0.0(vite@6.3.5(@types/node@20.19.0)(jiti@1.21.7)(less@4.3.0)(sass@1.89.2)(terser@5.43.0)(yaml@2.8.0))
+        version: 2.0.0(vite@6.3.5(@types/node@20.19.0)(jiti@1.21.7)(less@4.3.0)(sass@1.89.2)(terser@5.43.1)(yaml@2.8.0))
       ansi-colors:
         specifier: 4.1.3
         version: 4.1.3
@@ -723,8 +723,8 @@ importers:
         specifier: 0.5.21
         version: 0.5.21
       terser:
-        specifier: 5.43.0
-        version: 5.43.0
+        specifier: 5.43.1
+        version: 5.43.1
       tree-kill:
         specifier: 1.2.2
         version: 1.2.2
@@ -3049,20 +3049,20 @@ packages:
     resolution: {integrity: sha512-xoh5rJ+tgsRKoXnkBPFRLZ7rjKM0AfVbC68UZ/ECXoDbfggb9RbEySN359acY1vS3qZ0jVTVWzbtfapwm5ztxw==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
 
-  '@verdaccio/auth@8.0.0-next-8.15':
-    resolution: {integrity: sha512-vAfzGOHbPcPXMCI90jqm/qSZ1OUBnOGzudZA3+YtherncdwADekvXbdJlZVclcfmZ0sRbfVG5Xpf88aETiwfcw==}
+  '@verdaccio/auth@8.0.0-next-8.17':
+    resolution: {integrity: sha512-xGlKcinIBemO7ElJ8a4DeSzHVy4/N3Q6lpfC2LSgtiDIRf1xIsv9FtF6bAlMlrYrTtG6gccbpiFKNbz95J66Gg==}
     engines: {node: '>=18'}
 
   '@verdaccio/commons-api@10.2.0':
     resolution: {integrity: sha512-F/YZANu4DmpcEV0jronzI7v2fGVWkQ5Mwi+bVmV+ACJ+EzR0c9Jbhtbe5QyLUuzR97t8R5E/Xe53O0cc2LukdQ==}
     engines: {node: '>=8'}
 
-  '@verdaccio/config@8.0.0-next-8.15':
-    resolution: {integrity: sha512-oEzQB+xeqaFAy54veMshqpt1hlZCYNkqoKuwkt7O8J43Fo/beiLluKUVneXckzi+pg1yvvGT7lNCbvuUQrxxQg==}
+  '@verdaccio/config@8.0.0-next-8.17':
+    resolution: {integrity: sha512-W2ZDSJYaSsOOf7BTENgAy8g7xLfe1z7XPspvyh0Oe4KsBSdaZT5HADkJPVCepyQ5Em2ILpeb2CHoVKrVFMU45A==}
     engines: {node: '>=18'}
 
-  '@verdaccio/core@8.0.0-next-8.15':
-    resolution: {integrity: sha512-d5r/ZSkCri7s1hvV35enptquV5LJ81NqMYJnsjuryIUnvwn1yaqLlcdd6zIL08unzCSr7qDdUAdwGRRm6PKzng==}
+  '@verdaccio/core@8.0.0-next-8.17':
+    resolution: {integrity: sha512-75vXD0f9C4Ow6CfoGvVneK3Rtnn4+HJCf2t7/Sc+OPN68siiXiLpTeJv0mn8gQ/7x4Tqz+3ISiP0fb0dFmtPHw==}
     engines: {node: '>=18'}
 
   '@verdaccio/file-locking@10.3.1':
@@ -3073,55 +3073,55 @@ packages:
     resolution: {integrity: sha512-Sugx6XYp8nEJ9SmBoEOExEIQQ0T0q8fcyc/afWdiSNDGWviqqSx2IriCvtMwKZrE4XG0BQo6bXO+A8AOOoo7KQ==}
     engines: {node: '>=18'}
 
-  '@verdaccio/loaders@8.0.0-next-8.6':
-    resolution: {integrity: sha512-yuqD8uAZJcgzuNHjV6C438UNT5r2Ai9+SnUlO34AHZdWSYcluO3Zj5R3p5uf+C7YPCE31pUD27wBU74xVbUoBw==}
+  '@verdaccio/loaders@8.0.0-next-8.7':
+    resolution: {integrity: sha512-P/suPNKZ39dEvb6Q2309eFpX8ydY/Ae3JNF51LJVJ/Ixkecz6RIjBdVfzTKS3obIKIIHmdHb1x2BQlarEGrA6A==}
     engines: {node: '>=18'}
 
   '@verdaccio/local-storage-legacy@11.0.2':
     resolution: {integrity: sha512-7AXG7qlcVFmF+Nue2oKaraprGRtaBvrQIOvc/E89+7hAe399V01KnZI6E/ET56u7U9fq0MSlp92HBcdotlpUXg==}
     engines: {node: '>=12'}
 
-  '@verdaccio/logger-commons@8.0.0-next-8.15':
-    resolution: {integrity: sha512-nF7VgBC2cl5ufv+mZEwBHHyZFb1F0+kVkuRMf3Tyk+Qp4lXilC9MRZ0oc+RnzsDbNmJ6IZHgHNbs6aJrNfaRGg==}
+  '@verdaccio/logger-commons@8.0.0-next-8.17':
+    resolution: {integrity: sha512-Hx9RiuAHY2pFm+3MEANOyNK0feC5TwrYfdS0fQAykMDXxnNSBZiX4qS8vaxwUmiiJ180v2dszdxcKSbqODAcjg==}
     engines: {node: '>=18'}
 
   '@verdaccio/logger-prettify@8.0.0-next-8.2':
     resolution: {integrity: sha512-WMXnZPLw5W7GSIQE8UOTp6kRIwiTmnnoJbMmyMlGiNrsRaFKTqk09R5tKUgOyGgd4Lu6yncLbmdm5UjAuwHf1Q==}
     engines: {node: '>=18'}
 
-  '@verdaccio/logger@8.0.0-next-8.15':
-    resolution: {integrity: sha512-3gjhqvB87JUNDHFMN3YG4IweS9EgbCpAWZatNYzcoIWOoGiEaFQQBSM592CaFiI0yf8acyqWkNa1V95L1NMbRg==}
+  '@verdaccio/logger@8.0.0-next-8.17':
+    resolution: {integrity: sha512-vvr7xPDNFtrcWaLr6dmoc8OusOLOekHnHCgAza0REvd9mGB205pG/u+BHyeo7wzU+7ZyzqlfX4c9bABi7TiUXw==}
     engines: {node: '>=18'}
 
-  '@verdaccio/middleware@8.0.0-next-8.15':
-    resolution: {integrity: sha512-xsCLGbnhqcYwE8g/u9wxNLfDcESpr9ptEZ8Ce7frVTphU7kYIL48QCDPMzug7U+AguNtCq4v4zcoY1PaOQ8mgw==}
+  '@verdaccio/middleware@8.0.0-next-8.17':
+    resolution: {integrity: sha512-bFNMLobLycABKj4xHSdm4T7UEksJE/ZhZLrVhAJs2yVxwZQaVeSS2UkMWb47yYEURCEjgro232XD8r8CKdP9XA==}
     engines: {node: '>=18'}
 
   '@verdaccio/search-indexer@8.0.0-next-8.4':
     resolution: {integrity: sha512-Oea9m9VDqdlDPyQ9+fpcxZk0sIYH2twVK+YbykHpSYpjZRzz9hJfIr/uUwAgpWq83zAl2YDbz4zR3TjzjrWQig==}
     engines: {node: '>=18'}
 
-  '@verdaccio/signature@8.0.0-next-8.7':
-    resolution: {integrity: sha512-sqP+tNzUtVIwUtt1ZHwYoxsO3roDLK7GW8c8Hj0SNaON+9ele9z4NBhaor+g95zRuLy6xtw/RgOvpyLon/vPrA==}
+  '@verdaccio/signature@8.0.0-next-8.9':
+    resolution: {integrity: sha512-SBYK1u5FuQm1wgZpNovCJ3uNlHyTIuU9dBa4JfWsJii1G+gjKDcoZD0CilQtgX4mi4Tg/HP15kkEOT5snShmpA==}
     engines: {node: '>=18'}
 
   '@verdaccio/streams@10.2.1':
     resolution: {integrity: sha512-OojIG/f7UYKxC4dYX8x5ax8QhRx1b8OYUAMz82rUottCuzrssX/4nn5QE7Ank0DUSX3C9l/HPthc4d9uKRJqJQ==}
     engines: {node: '>=12', npm: '>=5'}
 
-  '@verdaccio/tarball@13.0.0-next-8.15':
-    resolution: {integrity: sha512-oSNmq7zD/iPIC5HpJbOJjW/lb0JV9k3jLwI6sG7kPgm+UIxVAOV4fKQOAD18HpHl/WjkF247NA6zGlAB94Habw==}
+  '@verdaccio/tarball@13.0.0-next-8.17':
+    resolution: {integrity: sha512-EBILrSBTLpr0PI3An2Fh0v5ImTlZoX3bUfXGckL5WWUlyjysFAej3i7CAItZ56Ya0RGoqmHeHWfh/z4WjuKS9A==}
     engines: {node: '>=18'}
 
-  '@verdaccio/ui-theme@8.0.0-next-8.15':
-    resolution: {integrity: sha512-k9BAM7rvbUqB2JPReNgXKUVTzBkdmIrNw0f6/7uyO+9cp7eVuarrPBnVF0oMc7jzVNBZRCpUksrhMZ0KwDZTpw==}
+  '@verdaccio/ui-theme@8.0.0-next-8.17':
+    resolution: {integrity: sha512-eQ/XUUVpg9C8iR+AYh12BgvUURts9dAH5NeJhu3ORvVRXC8+XQbbPWVHW6Wyx44tViqEo4Xei/Pi7Glvx++tlw==}
 
-  '@verdaccio/url@13.0.0-next-8.15':
-    resolution: {integrity: sha512-1N/dGhw7cZMhupf/Xlm73beiL3oCaAiyo9DTumjF3aTcJnipVcT1hoj6CSj9RIX54824rUK9WVmo83dk0KPnjw==}
+  '@verdaccio/url@13.0.0-next-8.17':
+    resolution: {integrity: sha512-t4zppnbBOji0NZYXAUxqWSzmyb9CPaFHTPpt1aOweVNYAxap7TDrUUWCc4qoHQqL/CWqX1LhWFHJf1L+ADpjQQ==}
     engines: {node: '>=18'}
 
-  '@verdaccio/utils@8.1.0-next-8.15':
-    resolution: {integrity: sha512-efg/bunOUMVXV+MlljJCrpuT+OQRrQS4wJyGL92B3epUGlgZ8DXs+nxN5v59v1a6AocAdSKwHgZS0g9txmBhOg==}
+  '@verdaccio/utils@8.1.0-next-8.17':
+    resolution: {integrity: sha512-keYHW0EwvWrDxh/X/QKZtn7N59TXlBUpEwsBygmgTFp3oZnFRliPqmzHIouDtMfXliwJ2iqH+N+zqFBU6JFP2w==}
     engines: {node: '>=18'}
 
   '@vitejs/plugin-basic-ssl@2.0.0':
@@ -4472,8 +4472,8 @@ packages:
   eslint-import-resolver-node@0.3.9:
     resolution: {integrity: sha512-WFj2isz22JahUv+B788TlO3N6zL3nNJGU8CcZbPZvVEkBPaJdCV4vy5wyghty5ROFbCRnm132v8BScu5/1BQ8g==}
 
-  eslint-module-utils@2.12.0:
-    resolution: {integrity: sha512-wALZ0HFoytlyh/1+4wuZ9FJCD/leWHQzzrxJ8+rebyReSLk7LApMyd3WJaLVoN+D5+WIdJyDK1c6JnE65V4Zyg==}
+  eslint-module-utils@2.12.1:
+    resolution: {integrity: sha512-L8jSWTze7K2mTg0vos/RuLRS5soomksDPoJLXIslC7c8Wmut3bx7CPpJijDcBZtxQ5lrbUdM+s0OlNbz0DCDNw==}
     engines: {node: '>=4'}
     peerDependencies:
       '@typescript-eslint/parser': '*'
@@ -4498,8 +4498,8 @@ packages:
     peerDependencies:
       eslint: '>=7.7.0'
 
-  eslint-plugin-import@2.31.0:
-    resolution: {integrity: sha512-ixmkI62Rbc2/w8Vfxyh1jQRTdRTF52VxwRVHl/ykPAmqG+Nb7/kNn+byLP0LxPgI7zWA16Jt82SybJInmMia3A==}
+  eslint-plugin-import@2.32.0:
+    resolution: {integrity: sha512-whOE1HFo/qJDyX4SnXzP4N6zOWn79WhnCUY/iDR0mPfQZO8wcYE4JClzI2oZrhBnnMUCBCHZhO6VQyoBU95mZA==}
     engines: {node: '>=4'}
     peerDependencies:
       '@typescript-eslint/parser': '*'
@@ -5974,6 +5974,10 @@ packages:
   minimalistic-assert@1.0.1:
     resolution: {integrity: sha512-UtJcAD4yEaGtjPezWuO9wC4nwUnVH/8/Im3yEHQP4b67cXlD/Qr9hdITCU1xDbSEXg2XKNaP8jsReV7vQd00/A==}
 
+  minimatch@10.0.1:
+    resolution: {integrity: sha512-ethXTt3SGGR+95gudmqJ1eNhRO7eGEGIgYA9vnPatK4/etz2MEVDno5GMCibdMTuBMyElzIlgxMna3K94XDIDQ==}
+    engines: {node: 20 || >=22}
+
   minimatch@3.1.2:
     resolution: {integrity: sha512-J7p63hRiAjw1NDEww1W7i37+ByIrOWO5XQQAzZ3VOcL0PNybwpfmV/N05zFAzwQ9USyEcX6t3UO+K5aqBQOIHw==}
 
@@ -6591,8 +6595,8 @@ packages:
   pino-std-serializers@7.0.0:
     resolution: {integrity: sha512-e906FRY0+tV27iq4juKzSYPbUj2do2X2JX4EzSca1631EB2QJQUqGbDuERal7LCtOpxl6x3+nvo9NPZcmjkiFA==}
 
-  pino@9.6.0:
-    resolution: {integrity: sha512-i85pKRCt4qMjZ1+L7sy2Ag4t1atFcdbEt76+7iRJn1g2BvsnRMGu9p8pivl9fs63M2kF/A0OacFZhTub+m/qMg==}
+  pino@9.7.0:
+    resolution: {integrity: sha512-vnMCM6xZTb1WDmLvtG2lE/2p+t9hDEIvTWJsu6FejkE62vB7gDhvzrpFR4Cw2to+9JNQxVnkAKVPA1KPB98vWg==}
     hasBin: true
 
   piscina@5.1.1:
@@ -6693,8 +6697,8 @@ packages:
   process-warning@1.0.0:
     resolution: {integrity: sha512-du4wfLyj4yCZq1VupnVSZmRsPJsNuxoDQFdCFHLaYiEbFBD7QE0a+I4D7hOxrVnh78QE/YipFAj9lXHiXocV+Q==}
 
-  process-warning@4.0.1:
-    resolution: {integrity: sha512-3c2LzQ3rY9d0hc1emcsHhfT9Jwz0cChib/QN89oME2R451w5fy3f0afAhERFZAwrbDU43wk12d0ORBpDVME50Q==}
+  process-warning@5.0.0:
+    resolution: {integrity: sha512-a39t9ApHNx2L4+HBnQKqxxHNs1r7KF+Intd8Q/g1bUh6q0WIp9voPXJ/x0j+ZL45KF1pJd9+q2jLIRMfvEshkA==}
 
   process@0.11.10:
     resolution: {integrity: sha512-cdGef/drWFoydD1JsMzuFf8100nZl+GT+yacc2bEced5f9Rjk4z+WtFUTBu9PhOi9j/jfmBPu0mMEY4wIdAF8A==}
@@ -6773,6 +6777,7 @@ packages:
     engines: {node: '>=0.6.0', teleport: '>=0.2.0'}
     deprecated: |-
       You or someone you depend on is using Q, the JavaScript Promise library that gave JavaScript developers strong feelings about promises. They can almost certainly migrate to the native JavaScript promise now. Thank you literally everyone for joining me in this bet against the odds. Be excellent to each other.
+
       (For a CapTP with native promises, see @endo/eventual-send and @endo/captp)
 
   qjobs@1.2.0:
@@ -7079,16 +7084,6 @@ packages:
 
   semver@6.3.1:
     resolution: {integrity: sha512-BR7VvDCVHO+q2xBEWskxS6DJE1qRnb7DxzUrogb71CWoSficBxYsiAGd+Kl0mmq/MprG9yArRkyrQxTO6XjMzA==}
-    hasBin: true
-
-  semver@7.6.3:
-    resolution: {integrity: sha512-oVekP1cKtI+CTDvHWYFUcMtsK/00wmAEfyqKfNdARm8u1wNVhSgaX7A8d4UuIlUI5e84iEwOhs7ZPYRmzU9U6A==}
-    engines: {node: '>=10'}
-    hasBin: true
-
-  semver@7.7.1:
-    resolution: {integrity: sha512-hlq8tAfn0m/61p4BVRcPzIGr6LKiMwo4VM6dGi6pt4qcRkmNzTcWq6eCEjEh+qXjkMDvPlOFFSGwQjoEa6gyMA==}
-    engines: {node: '>=10'}
     hasBin: true
 
   semver@7.7.2:
@@ -7510,8 +7505,8 @@ packages:
       uglify-js:
         optional: true
 
-  terser@5.43.0:
-    resolution: {integrity: sha512-CqNNxKSGKSZCunSvwKLTs8u8sGGlp27sxNZ4quGh0QeNuyHM0JSEM/clM9Mf4zUp6J+tO2gUXhgXT2YMMkwfKQ==}
+  terser@5.43.1:
+    resolution: {integrity: sha512-+6erLbBm0+LROX2sPXlUYx/ux5PyE9K/a92Wrt6oA+WDAoFTdpHE5tCYCI5PNzq2y8df4rA+QgHLJuR4jNymsg==}
     engines: {node: '>=10'}
     hasBin: true
 
@@ -7837,20 +7832,20 @@ packages:
     resolution: {integrity: sha512-BNGbWLfd0eUPabhkXUVm0j8uuvREyTh5ovRa/dyow/BqAbZJyC+5fU+IzQOzmAKzYqYRAISoRhdQr3eIZ/PXqg==}
     engines: {node: '>= 0.8'}
 
-  verdaccio-audit@13.0.0-next-8.15:
-    resolution: {integrity: sha512-Aeau0u0fi5l4PoSDyOV6glz2FDO9+ofvogJIELV4H6fhDXhgPc2MnoKuaUgOT//khESLle/a6YfcLY2/KNLs6g==}
+  verdaccio-audit@13.0.0-next-8.17:
+    resolution: {integrity: sha512-OQ96ZsH1LVIL1IBVv1WRLYoTAQX1B3QiDXRTqIOwR951MIQzGEEE9qxHqwR4OYqnjRiLAgsKfCdsJats1zUvPA==}
     engines: {node: '>=18'}
 
   verdaccio-auth-memory@10.2.2:
     resolution: {integrity: sha512-JCAnSqwq2l1UPt0hQcPn1B3X9mYpJ5zMsDvuDdmnlWLkrIDx2Wev5fluW0HC9hcFMITFl/DJj/DyzYOOqwhFSQ==}
     engines: {node: '>=8'}
 
-  verdaccio-htpasswd@13.0.0-next-8.15:
-    resolution: {integrity: sha512-rQg5oZ/rReDAM4g4W68hvtzReTbM6vduvVtobHsQxhbtbotEuUjP6O8uaROYtgZ60giGva5Tub2SOm2T9Ln9Dw==}
+  verdaccio-htpasswd@13.0.0-next-8.17:
+    resolution: {integrity: sha512-+NdlWzTYS7bj7dw3lJwuOtksEeMgHy5q7cZHNfjpNOUoPZQZ51U3RL1+aZXQVzj3N0iVZrVueh8V9bd+laqT2Q==}
     engines: {node: '>=18'}
 
-  verdaccio@6.1.2:
-    resolution: {integrity: sha512-HQCquycSQkA+tKRVqMjIVRzmhzTciLfScvKIhhiwZZ9Qd13e2KJQTOdB7QrSacfJuPpl94TA5EZ7XmVRQKk3ag==}
+  verdaccio@6.1.4:
+    resolution: {integrity: sha512-8CTC2EKobiWnWPg7Qt1Sa9na8BDq+vot9vLnFCaTQbKA2M+3sI4otj5PSJN553GlVg33k9XwpjyqTDgfEgu40A==}
     engines: {node: '>=18'}
     hasBin: true
 
@@ -10571,16 +10566,15 @@ snapshots:
       '@typescript-eslint/types': 8.34.1
       eslint-visitor-keys: 4.2.1
 
-  '@verdaccio/auth@8.0.0-next-8.15':
+  '@verdaccio/auth@8.0.0-next-8.17':
     dependencies:
-      '@verdaccio/config': 8.0.0-next-8.15
-      '@verdaccio/core': 8.0.0-next-8.15
-      '@verdaccio/loaders': 8.0.0-next-8.6
-      '@verdaccio/signature': 8.0.0-next-8.7
-      '@verdaccio/utils': 8.1.0-next-8.15
-      debug: 4.4.0
+      '@verdaccio/config': 8.0.0-next-8.17
+      '@verdaccio/core': 8.0.0-next-8.17
+      '@verdaccio/loaders': 8.0.0-next-8.7
+      '@verdaccio/signature': 8.0.0-next-8.9
+      debug: 4.4.1(supports-color@10.0.0)
       lodash: 4.17.21
-      verdaccio-htpasswd: 13.0.0-next-8.15
+      verdaccio-htpasswd: 13.0.0-next-8.17
     transitivePeerDependencies:
       - supports-color
 
@@ -10589,25 +10583,25 @@ snapshots:
       http-errors: 2.0.0
       http-status-codes: 2.2.0
 
-  '@verdaccio/config@8.0.0-next-8.15':
+  '@verdaccio/config@8.0.0-next-8.17':
     dependencies:
-      '@verdaccio/core': 8.0.0-next-8.15
-      '@verdaccio/utils': 8.1.0-next-8.15
-      debug: 4.4.0
+      '@verdaccio/core': 8.0.0-next-8.17
+      debug: 4.4.1(supports-color@10.0.0)
       js-yaml: 4.1.0
       lodash: 4.17.21
       minimatch: 7.4.6
     transitivePeerDependencies:
       - supports-color
 
-  '@verdaccio/core@8.0.0-next-8.15':
+  '@verdaccio/core@8.0.0-next-8.17':
     dependencies:
       ajv: 8.17.1
       core-js: 3.40.0
       http-errors: 2.0.0
       http-status-codes: 2.3.0
+      minimatch: 10.0.1
       process-warning: 1.0.0
-      semver: 7.7.1
+      semver: 7.7.2
 
   '@verdaccio/file-locking@10.3.1':
     dependencies:
@@ -10617,7 +10611,7 @@ snapshots:
     dependencies:
       lockfile: 1.0.4
 
-  '@verdaccio/loaders@8.0.0-next-8.6':
+  '@verdaccio/loaders@8.0.0-next-8.7':
     dependencies:
       debug: 4.4.0
       lodash: 4.17.21
@@ -10637,12 +10631,12 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@verdaccio/logger-commons@8.0.0-next-8.15':
+  '@verdaccio/logger-commons@8.0.0-next-8.17':
     dependencies:
-      '@verdaccio/core': 8.0.0-next-8.15
+      '@verdaccio/core': 8.0.0-next-8.17
       '@verdaccio/logger-prettify': 8.0.0-next-8.2
       colorette: 2.0.20
-      debug: 4.4.0
+      debug: 4.4.1(supports-color@10.0.0)
     transitivePeerDependencies:
       - supports-color
 
@@ -10654,20 +10648,19 @@ snapshots:
       pino-abstract-transport: 1.2.0
       sonic-boom: 3.8.1
 
-  '@verdaccio/logger@8.0.0-next-8.15':
+  '@verdaccio/logger@8.0.0-next-8.17':
     dependencies:
-      '@verdaccio/logger-commons': 8.0.0-next-8.15
-      pino: 9.6.0
+      '@verdaccio/logger-commons': 8.0.0-next-8.17
+      pino: 9.7.0
     transitivePeerDependencies:
       - supports-color
 
-  '@verdaccio/middleware@8.0.0-next-8.15':
+  '@verdaccio/middleware@8.0.0-next-8.17':
     dependencies:
-      '@verdaccio/config': 8.0.0-next-8.15
-      '@verdaccio/core': 8.0.0-next-8.15
-      '@verdaccio/url': 13.0.0-next-8.15
-      '@verdaccio/utils': 8.1.0-next-8.15
-      debug: 4.4.0
+      '@verdaccio/config': 8.0.0-next-8.17
+      '@verdaccio/core': 8.0.0-next-8.17
+      '@verdaccio/url': 13.0.0-next-8.17
+      debug: 4.4.1(supports-color@10.0.0)
       express: 4.21.2
       express-rate-limit: 5.5.1
       lodash: 4.17.21
@@ -10678,49 +10671,48 @@ snapshots:
 
   '@verdaccio/search-indexer@8.0.0-next-8.4': {}
 
-  '@verdaccio/signature@8.0.0-next-8.7':
+  '@verdaccio/signature@8.0.0-next-8.9':
     dependencies:
-      '@verdaccio/config': 8.0.0-next-8.15
-      debug: 4.4.0
+      '@verdaccio/config': 8.0.0-next-8.17
+      '@verdaccio/core': 8.0.0-next-8.17
+      debug: 4.4.1(supports-color@10.0.0)
       jsonwebtoken: 9.0.2
     transitivePeerDependencies:
       - supports-color
 
   '@verdaccio/streams@10.2.1': {}
 
-  '@verdaccio/tarball@13.0.0-next-8.15':
+  '@verdaccio/tarball@13.0.0-next-8.17':
     dependencies:
-      '@verdaccio/core': 8.0.0-next-8.15
-      '@verdaccio/url': 13.0.0-next-8.15
-      '@verdaccio/utils': 8.1.0-next-8.15
-      debug: 4.4.0
+      '@verdaccio/core': 8.0.0-next-8.17
+      '@verdaccio/url': 13.0.0-next-8.17
+      debug: 4.4.1(supports-color@10.0.0)
       gunzip-maybe: 1.4.2
-      lodash: 4.17.21
       tar-stream: 3.1.7
     transitivePeerDependencies:
       - supports-color
 
-  '@verdaccio/ui-theme@8.0.0-next-8.15': {}
+  '@verdaccio/ui-theme@8.0.0-next-8.17': {}
 
-  '@verdaccio/url@13.0.0-next-8.15':
+  '@verdaccio/url@13.0.0-next-8.17':
     dependencies:
-      '@verdaccio/core': 8.0.0-next-8.15
-      debug: 4.4.0
+      '@verdaccio/core': 8.0.0-next-8.17
+      debug: 4.4.1(supports-color@10.0.0)
       lodash: 4.17.21
       validator: 13.12.0
     transitivePeerDependencies:
       - supports-color
 
-  '@verdaccio/utils@8.1.0-next-8.15':
+  '@verdaccio/utils@8.1.0-next-8.17':
     dependencies:
-      '@verdaccio/core': 8.0.0-next-8.15
+      '@verdaccio/core': 8.0.0-next-8.17
       lodash: 4.17.21
       minimatch: 7.4.6
-      semver: 7.7.1
+      semver: 7.7.2
 
-  '@vitejs/plugin-basic-ssl@2.0.0(vite@6.3.5(@types/node@20.19.0)(jiti@1.21.7)(less@4.3.0)(sass@1.89.2)(terser@5.43.0)(yaml@2.8.0))':
+  '@vitejs/plugin-basic-ssl@2.0.0(vite@6.3.5(@types/node@20.19.0)(jiti@1.21.7)(less@4.3.0)(sass@1.89.2)(terser@5.43.1)(yaml@2.8.0))':
     dependencies:
-      vite: 6.3.5(@types/node@20.19.0)(jiti@1.21.7)(less@4.3.0)(sass@1.89.2)(terser@5.43.0)(yaml@2.8.0)
+      vite: 6.3.5(@types/node@20.19.0)(jiti@1.21.7)(less@4.3.0)(sass@1.89.2)(terser@5.43.1)(yaml@2.8.0)
 
   '@vitest/expect@3.2.4':
     dependencies:
@@ -10730,13 +10722,13 @@ snapshots:
       chai: 5.2.0
       tinyrainbow: 2.0.0
 
-  '@vitest/mocker@3.2.4(vite@6.3.5(@types/node@20.19.0)(jiti@1.21.7)(less@4.3.0)(sass@1.89.2)(terser@5.43.0)(yaml@2.8.0))':
+  '@vitest/mocker@3.2.4(vite@6.3.5(@types/node@20.19.0)(jiti@1.21.7)(less@4.3.0)(sass@1.89.2)(terser@5.43.1)(yaml@2.8.0))':
     dependencies:
       '@vitest/spy': 3.2.4
       estree-walker: 3.0.3
       magic-string: 0.30.17
     optionalDependencies:
-      vite: 6.3.5(@types/node@20.19.0)(jiti@1.21.7)(less@4.3.0)(sass@1.89.2)(terser@5.43.0)(yaml@2.8.0)
+      vite: 6.3.5(@types/node@20.19.0)(jiti@1.21.7)(less@4.3.0)(sass@1.89.2)(terser@5.43.1)(yaml@2.8.0)
 
   '@vitest/pretty-format@3.2.4':
     dependencies:
@@ -12359,7 +12351,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  eslint-module-utils@2.12.0(@typescript-eslint/parser@8.34.1(eslint@9.29.0(jiti@1.21.7))(typescript@5.8.3))(eslint-import-resolver-node@0.3.9)(eslint@9.29.0(jiti@1.21.7)):
+  eslint-module-utils@2.12.1(@typescript-eslint/parser@8.34.1(eslint@9.29.0(jiti@1.21.7))(typescript@5.8.3))(eslint-import-resolver-node@0.3.9)(eslint@9.29.0(jiti@1.21.7)):
     dependencies:
       debug: 3.2.7
     optionalDependencies:
@@ -12373,7 +12365,7 @@ snapshots:
     dependencies:
       eslint: 9.29.0(jiti@1.21.7)
 
-  eslint-plugin-import@2.31.0(@typescript-eslint/parser@8.34.1(eslint@9.29.0(jiti@1.21.7))(typescript@5.8.3))(eslint@9.29.0(jiti@1.21.7)):
+  eslint-plugin-import@2.32.0(@typescript-eslint/parser@8.34.1(eslint@9.29.0(jiti@1.21.7))(typescript@5.8.3))(eslint@9.29.0(jiti@1.21.7)):
     dependencies:
       '@rtsao/scc': 1.1.0
       array-includes: 3.1.9
@@ -12384,7 +12376,7 @@ snapshots:
       doctrine: 2.1.0
       eslint: 9.29.0(jiti@1.21.7)
       eslint-import-resolver-node: 0.3.9
-      eslint-module-utils: 2.12.0(@typescript-eslint/parser@8.34.1(eslint@9.29.0(jiti@1.21.7))(typescript@5.8.3))(eslint-import-resolver-node@0.3.9)(eslint@9.29.0(jiti@1.21.7))
+      eslint-module-utils: 2.12.1(@typescript-eslint/parser@8.34.1(eslint@9.29.0(jiti@1.21.7))(typescript@5.8.3))(eslint-import-resolver-node@0.3.9)(eslint@9.29.0(jiti@1.21.7))
       hasown: 2.0.2
       is-core-module: 2.16.1
       is-glob: 4.0.3
@@ -14114,6 +14106,10 @@ snapshots:
 
   minimalistic-assert@1.0.1: {}
 
+  minimatch@10.0.1:
+    dependencies:
+      brace-expansion: 2.0.2
+
   minimatch@3.1.2:
     dependencies:
       brace-expansion: 1.1.12
@@ -14682,14 +14678,14 @@ snapshots:
 
   pino-std-serializers@7.0.0: {}
 
-  pino@9.6.0:
+  pino@9.7.0:
     dependencies:
       atomic-sleep: 1.0.0
       fast-redact: 3.5.0
       on-exit-leak-free: 2.1.2
       pino-abstract-transport: 2.0.0
       pino-std-serializers: 7.0.0
-      process-warning: 4.0.1
+      process-warning: 5.0.0
       quick-format-unescaped: 4.0.4
       real-require: 0.2.0
       safe-stable-stringify: 2.5.0
@@ -14779,7 +14775,7 @@ snapshots:
 
   process-warning@1.0.0: {}
 
-  process-warning@4.0.1: {}
+  process-warning@5.0.0: {}
 
   process@0.11.10: {}
 
@@ -15304,10 +15300,6 @@ snapshots:
   semver@5.7.2: {}
 
   semver@6.3.1: {}
-
-  semver@7.6.3: {}
-
-  semver@7.7.1: {}
 
   semver@7.7.2: {}
 
@@ -15881,12 +15873,12 @@ snapshots:
       jest-worker: 27.5.1
       schema-utils: 4.3.2
       serialize-javascript: 6.0.2
-      terser: 5.43.0
+      terser: 5.43.1
       webpack: 5.99.9(esbuild@0.25.5)
     optionalDependencies:
       esbuild: 0.25.5
 
-  terser@5.43.0:
+  terser@5.43.1:
     dependencies:
       '@jridgewell/source-map': 0.3.6
       acorn: 8.15.0
@@ -16196,10 +16188,10 @@ snapshots:
 
   vary@1.1.2: {}
 
-  verdaccio-audit@13.0.0-next-8.15(encoding@0.1.13):
+  verdaccio-audit@13.0.0-next-8.17(encoding@0.1.13):
     dependencies:
-      '@verdaccio/config': 8.0.0-next-8.15
-      '@verdaccio/core': 8.0.0-next-8.15
+      '@verdaccio/config': 8.0.0-next-8.17
+      '@verdaccio/core': 8.0.0-next-8.17
       express: 4.21.2
       https-proxy-agent: 5.0.1(supports-color@10.0.0)
       node-fetch: 2.6.7(encoding@0.1.13)
@@ -16211,42 +16203,42 @@ snapshots:
     dependencies:
       '@verdaccio/commons-api': 10.2.0
 
-  verdaccio-htpasswd@13.0.0-next-8.15:
+  verdaccio-htpasswd@13.0.0-next-8.17:
     dependencies:
-      '@verdaccio/core': 8.0.0-next-8.15
+      '@verdaccio/core': 8.0.0-next-8.17
       '@verdaccio/file-locking': 13.0.0-next-8.3
       apache-md5: 1.1.8
       bcryptjs: 2.4.3
       core-js: 3.40.0
-      debug: 4.4.0
+      debug: 4.4.1(supports-color@10.0.0)
       http-errors: 2.0.0
       unix-crypt-td-js: 1.1.4
     transitivePeerDependencies:
       - supports-color
 
-  verdaccio@6.1.2(encoding@0.1.13):
+  verdaccio@6.1.4(encoding@0.1.13):
     dependencies:
       '@cypress/request': 3.0.8
-      '@verdaccio/auth': 8.0.0-next-8.15
-      '@verdaccio/config': 8.0.0-next-8.15
-      '@verdaccio/core': 8.0.0-next-8.15
-      '@verdaccio/loaders': 8.0.0-next-8.6
+      '@verdaccio/auth': 8.0.0-next-8.17
+      '@verdaccio/config': 8.0.0-next-8.17
+      '@verdaccio/core': 8.0.0-next-8.17
+      '@verdaccio/loaders': 8.0.0-next-8.7
       '@verdaccio/local-storage-legacy': 11.0.2
-      '@verdaccio/logger': 8.0.0-next-8.15
-      '@verdaccio/middleware': 8.0.0-next-8.15
+      '@verdaccio/logger': 8.0.0-next-8.17
+      '@verdaccio/middleware': 8.0.0-next-8.17
       '@verdaccio/search-indexer': 8.0.0-next-8.4
-      '@verdaccio/signature': 8.0.0-next-8.7
+      '@verdaccio/signature': 8.0.0-next-8.9
       '@verdaccio/streams': 10.2.1
-      '@verdaccio/tarball': 13.0.0-next-8.15
-      '@verdaccio/ui-theme': 8.0.0-next-8.15
-      '@verdaccio/url': 13.0.0-next-8.15
-      '@verdaccio/utils': 8.1.0-next-8.15
+      '@verdaccio/tarball': 13.0.0-next-8.17
+      '@verdaccio/ui-theme': 8.0.0-next-8.17
+      '@verdaccio/url': 13.0.0-next-8.17
+      '@verdaccio/utils': 8.1.0-next-8.17
       JSONStream: 1.3.5
       async: 3.2.6
       clipanion: 4.0.0-rc.4
       compression: 1.8.0
       cors: 2.8.5
-      debug: 4.4.0
+      debug: 4.4.1(supports-color@10.0.0)
       envinfo: 7.14.0
       express: 4.21.2
       handlebars: 4.7.8
@@ -16255,9 +16247,9 @@ snapshots:
       mime: 3.0.0
       mkdirp: 1.0.4
       pkginfo: 0.4.1
-      semver: 7.6.3
-      verdaccio-audit: 13.0.0-next-8.15(encoding@0.1.13)
-      verdaccio-htpasswd: 13.0.0-next-8.15
+      semver: 7.7.2
+      verdaccio-audit: 13.0.0-next-8.17(encoding@0.1.13)
+      verdaccio-htpasswd: 13.0.0-next-8.17
     transitivePeerDependencies:
       - encoding
       - supports-color
@@ -16268,13 +16260,13 @@ snapshots:
       core-util-is: 1.0.2
       extsprintf: 1.3.0
 
-  vite-node@3.2.4(@types/node@20.19.0)(jiti@1.21.7)(less@4.3.0)(sass@1.89.2)(terser@5.43.0)(yaml@2.8.0):
+  vite-node@3.2.4(@types/node@20.19.0)(jiti@1.21.7)(less@4.3.0)(sass@1.89.2)(terser@5.43.1)(yaml@2.8.0):
     dependencies:
       cac: 6.7.14
       debug: 4.4.1(supports-color@10.0.0)
       es-module-lexer: 1.7.0
       pathe: 2.0.3
-      vite: 6.3.5(@types/node@20.19.0)(jiti@1.21.7)(less@4.3.0)(sass@1.89.2)(terser@5.43.0)(yaml@2.8.0)
+      vite: 6.3.5(@types/node@20.19.0)(jiti@1.21.7)(less@4.3.0)(sass@1.89.2)(terser@5.43.1)(yaml@2.8.0)
     transitivePeerDependencies:
       - '@types/node'
       - jiti
@@ -16289,7 +16281,7 @@ snapshots:
       - tsx
       - yaml
 
-  vite@6.3.5(@types/node@20.19.0)(jiti@1.21.7)(less@4.3.0)(sass@1.89.2)(terser@5.43.0)(yaml@2.8.0):
+  vite@6.3.5(@types/node@20.19.0)(jiti@1.21.7)(less@4.3.0)(sass@1.89.2)(terser@5.43.1)(yaml@2.8.0):
     dependencies:
       esbuild: 0.25.5
       fdir: 6.4.6(picomatch@4.0.2)
@@ -16303,14 +16295,14 @@ snapshots:
       jiti: 1.21.7
       less: 4.3.0
       sass: 1.89.2
-      terser: 5.43.0
+      terser: 5.43.1
       yaml: 2.8.0
 
-  vitest@3.2.4(@types/node@20.19.0)(jiti@1.21.7)(jsdom@26.1.0)(less@4.3.0)(sass@1.89.2)(terser@5.43.0)(yaml@2.8.0):
+  vitest@3.2.4(@types/node@20.19.0)(jiti@1.21.7)(jsdom@26.1.0)(less@4.3.0)(sass@1.89.2)(terser@5.43.1)(yaml@2.8.0):
     dependencies:
       '@types/chai': 5.2.2
       '@vitest/expect': 3.2.4
-      '@vitest/mocker': 3.2.4(vite@6.3.5(@types/node@20.19.0)(jiti@1.21.7)(less@4.3.0)(sass@1.89.2)(terser@5.43.0)(yaml@2.8.0))
+      '@vitest/mocker': 3.2.4(vite@6.3.5(@types/node@20.19.0)(jiti@1.21.7)(less@4.3.0)(sass@1.89.2)(terser@5.43.1)(yaml@2.8.0))
       '@vitest/pretty-format': 3.2.4
       '@vitest/runner': 3.2.4
       '@vitest/snapshot': 3.2.4
@@ -16328,8 +16320,8 @@ snapshots:
       tinyglobby: 0.2.14
       tinypool: 1.1.1
       tinyrainbow: 2.0.0
-      vite: 6.3.5(@types/node@20.19.0)(jiti@1.21.7)(less@4.3.0)(sass@1.89.2)(terser@5.43.0)(yaml@2.8.0)
-      vite-node: 3.2.4(@types/node@20.19.0)(jiti@1.21.7)(less@4.3.0)(sass@1.89.2)(terser@5.43.0)(yaml@2.8.0)
+      vite: 6.3.5(@types/node@20.19.0)(jiti@1.21.7)(less@4.3.0)(sass@1.89.2)(terser@5.43.1)(yaml@2.8.0)
+      vite-node: 3.2.4(@types/node@20.19.0)(jiti@1.21.7)(less@4.3.0)(sass@1.89.2)(terser@5.43.1)(yaml@2.8.0)
       why-is-node-running: 2.3.0
     optionalDependencies:
       '@types/node': 20.19.0
