@@ -143,17 +143,15 @@ const RESPONSE_EXPECTS: Record<
     matches: [
       /<link rel="modulepreload" href="(ssg\.routes-[a-zA-Z0-9]{8}\.js)">/,
       /<link rel="modulepreload" href="(ssg-one-[a-zA-Z0-9]{8}\.js)">/,
-      /<link rel="modulepreload" href="(cross-dep-[a-zA-Z0-9]{8}\.js)">/,
     ],
-    notMatches: [/home/, /ssr/, /csr/, /ssg-two/, /ssg\-component/],
+    notMatches: [/home/, /ssr/, /csr/, /ssg-two/, /ssg\-component/, /cross-dep-/],
   },
   '/ssg/two': {
     matches: [
       /<link rel="modulepreload" href="(ssg\.routes-[a-zA-Z0-9]{8}\.js)">/,
       /<link rel="modulepreload" href="(ssg-two-[a-zA-Z0-9]{8}\.js)">/,
-      /<link rel="modulepreload" href="(cross-dep-[a-zA-Z0-9]{8}\.js)">/,
     ],
-    notMatches: [/home/, /ssr/, /csr/, /ssg-one/, /ssg\-component/],
+    notMatches: [/home/, /ssr/, /csr/, /ssg-one/, /ssg\-component/, /cross-dep-/],
   },
   '/ssr': {
     matches: [/<link rel="modulepreload" href="(ssr-[a-zA-Z0-9]{8}\.js)">/],

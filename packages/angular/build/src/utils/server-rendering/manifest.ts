@@ -201,34 +201,22 @@ function generateLazyLoadedFilesMappings(
   metafile: Metafile,
   initialFiles: Set<string>,
   publicPath = '',
-): Record<string, FilesMapping[]> {
-  const entryPointToBundles: Record<string, FilesMapping[]> = {};
+): Record<string, string[]> {
+  const entryPointToBundles: Record<string, string[]> = {};
   for (const [fileName, { entryPoint, exports, imports }] of Object.entries(metafile.outputs)) {
     // Skip files that don't have an entryPoint, no exports, or are not .js
     if (!entryPoint || exports?.length < 1 || !fileName.endsWith('.js')) {
       continue;
     }
 
-    const importedPaths: FilesMapping[] = [
-      {
-        path: `${publicPath}${fileName}`,
-        dynamicImport: false,
-      },
-    ];
+    const importedPaths: string[] = [`${publicPath}${fileName}`];
 
     for (const { kind, external, path } of imports) {
-      if (
-        external ||
-        initialFiles.has(path) ||
-        (kind !== 'dynamic-import' && kind !== 'import-statement')
-      ) {
+      if (external || initialFiles.has(path) || kind !== 'import-statement') {
         continue;
       }
 
-      importedPaths.push({
-        path: `${publicPath}${path}`,
-        dynamicImport: kind === 'dynamic-import',
-      });
+      importedPaths.push(`${publicPath}${path}`);
     }
 
     entryPointToBundles[entryPoint] = importedPaths;
