@@ -43,7 +43,7 @@ importers:
         version: 20.1.0-next.1(l32yggn2tzdh3a577e6frrsqxm)
       '@angular/ng-dev':
         specifier: https://github.com/angular/dev-infra-private-ng-dev-builds.git#af92dd0055dbfb437c73fd2ab963149a4341d018
-        version: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/af92dd0055dbfb437c73fd2ab963149a4341d018(encoding@0.1.13)
+        version: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/af92dd0055dbfb437c73fd2ab963149a4341d018(@modelcontextprotocol/sdk@1.13.1)(encoding@0.1.13)
       '@angular/platform-browser':
         specifier: 20.1.0-next.2
         version: 20.1.0-next.2(@angular/animations@20.1.0-next.2(@angular/common@20.1.0-next.2(@angular/core@20.1.0-next.2(@angular/compiler@20.1.0-next.2)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@20.1.0-next.2(@angular/compiler@20.1.0-next.2)(rxjs@7.8.2)(zone.js@0.15.1)))(@angular/common@20.1.0-next.2(@angular/core@20.1.0-next.2(@angular/compiler@20.1.0-next.2)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@20.1.0-next.2(@angular/compiler@20.1.0-next.2)(rxjs@7.8.2)(zone.js@0.15.1))
@@ -471,6 +471,9 @@ importers:
       '@listr2/prompt-adapter-inquirer':
         specifier: 2.0.22
         version: 2.0.22(@inquirer/prompts@7.5.3(@types/node@20.19.1))
+      '@modelcontextprotocol/sdk':
+        specifier: 1.13.1
+        version: 1.13.1
       '@schematics/angular':
         specifier: workspace:0.0.0-PLACEHOLDER
         version: link:../../schematics/angular
@@ -2074,6 +2077,10 @@ packages:
 
   '@mdn/browser-compat-data@6.0.25':
     resolution: {integrity: sha512-S2XYLTeiJIKHa1nTghEKPzGktxc1fGMfIbNb/A6BwXUwl97FrLJyLYkLfvWHZv2kLCiMZekC/5hpeoLM/qvreA==}
+
+  '@modelcontextprotocol/sdk@1.13.1':
+    resolution: {integrity: sha512-8q6+9aF0yA39/qWT/uaIj6zTpC+Qu07DnN/lb9mjoquCJsAh6l3HyYqc9O3t2j7GilseOQOQimLg7W3By6jqvg==}
+    engines: {node: '>=18'}
 
   '@msgpackr-extract/msgpackr-extract-darwin-arm64@3.0.3':
     resolution: {integrity: sha512-QZHtlVgbAdy2zAqNA9Gu1UpIuI8Xvsd1v8ic6B2pZmeFnFcMWiPLfWXh7TVw4eGEZ/C9TH281KwhVoeQUKbyjw==}
@@ -4572,6 +4579,14 @@ packages:
     resolution: {integrity: sha512-mQw+2fkQbALzQ7V0MY0IqdnXNOeTtP4r0lN9z7AAawCXgqea7bDii20AYrIBrFd/Hx0M2Ocz6S111CaFkUcb0Q==}
     engines: {node: '>=0.8.x'}
 
+  eventsource-parser@3.0.2:
+    resolution: {integrity: sha512-6RxOBZ/cYgd8usLwsEl+EC09Au/9BcmCKYF2/xbml6DNczf7nv0MQb+7BA2F+li6//I+28VNlQR37XfQtcAJuA==}
+    engines: {node: '>=18.0.0'}
+
+  eventsource@3.0.7:
+    resolution: {integrity: sha512-CRT1WTyuQoD771GW56XEZFQ/ZoSfWid1alKGDYMmkt2yl8UXrVR4pspqWNEcqKvVIzg6PAltWjxcSSPrboA4iA==}
+    engines: {node: '>=18.0.0'}
+
   execa@5.1.1:
     resolution: {integrity: sha512-8uSpZZocAZRBAPIEINJj3Lo9HyGitllczc27Eh5YYojjMFMn8yHMDMaUHE2Jqfq05D/wucwI4JGURyXt1vchyg==}
     engines: {node: '>=10'}
@@ -4589,6 +4604,12 @@ packages:
 
   express-rate-limit@5.5.1:
     resolution: {integrity: sha512-MTjE2eIbHv5DyfuFz4zLYWxpqVhEhkTiwFGuB74Q9CSou2WHO52nlE5y3Zlg6SIsiYUIPj6ifFxnkPz6O3sIUg==}
+
+  express-rate-limit@7.5.0:
+    resolution: {integrity: sha512-eB5zbQh5h+VenMPM3fh+nw1YExi5nMr6HUCR62ELSP11huvxm/Uir1H1QEyTkk5QX6A58pX6NmaTMceKZ0Eodg==}
+    engines: {node: '>= 16'}
+    peerDependencies:
+      express: ^4.11 || 5 || ^5.0.0-beta.1
 
   express@4.21.2:
     resolution: {integrity: sha512-28HqgMZAmih1Czt9ny7qr6ek2qddF4FclbMzwhCREB6OFfH+rXAnuNCwo1/wFvrtbgsQDb4kSbX9de9lFbrXnA==}
@@ -6598,6 +6619,10 @@ packages:
     resolution: {integrity: sha512-9rPDIPsCwOivatEZGM8+apgM7AiTDLSnpwMmLaSmdm2PeND8bFJzZLZZxyrJjLH8Xx/MpKoVaKf+vZOWALNHbw==}
     engines: {node: '>=20.x'}
 
+  pkce-challenge@5.0.0:
+    resolution: {integrity: sha512-ueGLflrrnvwB3xuo/uGob5pd5FN7l0MsLf0Z87o/UQmRtwjvfylfc9MurIxRAWywCYTgrvpXBcqjV4OfCYGCIQ==}
+    engines: {node: '>=16.20.0'}
+
   pkg-dir@8.0.0:
     resolution: {integrity: sha512-4peoBq4Wks0riS0z8741NVv+/8IiTvqnZAr8QGgtdifrtpdXbNw/FxRS1l6NFqm4EMzuS0EDqNNx4XGaz8cuyQ==}
     engines: {node: '>=18'}
@@ -6772,7 +6797,6 @@ packages:
     engines: {node: '>=0.6.0', teleport: '>=0.2.0'}
     deprecated: |-
       You or someone you depend on is using Q, the JavaScript Promise library that gave JavaScript developers strong feelings about promises. They can almost certainly migrate to the native JavaScript promise now. Thank you literally everyone for joining me in this bet against the odds. Be excellent to each other.
-
       (For a CapTP with native promises, see @endo/eventual-send and @endo/captp)
 
   qjobs@1.2.0:
@@ -8403,10 +8427,10 @@ snapshots:
       rxjs: 7.8.2
       tslib: 2.8.1
 
-  '@angular/ng-dev@https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/af92dd0055dbfb437c73fd2ab963149a4341d018(encoding@0.1.13)':
+  '@angular/ng-dev@https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/af92dd0055dbfb437c73fd2ab963149a4341d018(@modelcontextprotocol/sdk@1.13.1)(encoding@0.1.13)':
     dependencies:
       '@google-cloud/spanner': 8.0.0(supports-color@10.0.0)
-      '@google/genai': 1.6.0(encoding@0.1.13)(supports-color@10.0.0)
+      '@google/genai': 1.6.0(@modelcontextprotocol/sdk@1.13.1)(encoding@0.1.13)(supports-color@10.0.0)
       '@octokit/rest': 22.0.0
       '@types/semver': 7.7.0
       '@types/supports-color': 10.0.0
@@ -9358,12 +9382,14 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@google/genai@1.6.0(encoding@0.1.13)(supports-color@10.0.0)':
+  '@google/genai@1.6.0(@modelcontextprotocol/sdk@1.13.1)(encoding@0.1.13)(supports-color@10.0.0)':
     dependencies:
       google-auth-library: 9.15.1(encoding@0.1.13)(supports-color@10.0.0)
       ws: 8.18.2
       zod: 3.25.67
       zod-to-json-schema: 3.24.5(zod@3.25.67)
+    optionalDependencies:
+      '@modelcontextprotocol/sdk': 1.13.1
     transitivePeerDependencies:
       - bufferutil
       - encoding
@@ -9606,6 +9632,22 @@ snapshots:
     optional: true
 
   '@mdn/browser-compat-data@6.0.25': {}
+
+  '@modelcontextprotocol/sdk@1.13.1':
+    dependencies:
+      ajv: 6.12.6
+      content-type: 1.0.5
+      cors: 2.8.5
+      cross-spawn: 7.0.6
+      eventsource: 3.0.7
+      express: 5.1.0
+      express-rate-limit: 7.5.0(express@5.1.0)
+      pkce-challenge: 5.0.0
+      raw-body: 3.0.0
+      zod: 3.25.67
+      zod-to-json-schema: 3.24.5(zod@3.25.67)
+    transitivePeerDependencies:
+      - supports-color
 
   '@msgpackr-extract/msgpackr-extract-darwin-arm64@3.0.3':
     optional: true
@@ -12519,6 +12561,12 @@ snapshots:
 
   events@3.3.0: {}
 
+  eventsource-parser@3.0.2: {}
+
+  eventsource@3.0.7:
+    dependencies:
+      eventsource-parser: 3.0.2
+
   execa@5.1.1:
     dependencies:
       cross-spawn: 7.0.6
@@ -12538,6 +12586,10 @@ snapshots:
   exponential-backoff@3.1.2: {}
 
   express-rate-limit@5.5.1: {}
+
+  express-rate-limit@7.5.0(express@5.1.0):
+    dependencies:
+      express: 5.1.0
 
   express@4.21.2:
     dependencies:
@@ -14760,6 +14812,8 @@ snapshots:
   piscina@5.1.1:
     optionalDependencies:
       '@napi-rs/nice': 1.0.1
+
+  pkce-challenge@5.0.0: {}
 
   pkg-dir@8.0.0:
     dependencies:

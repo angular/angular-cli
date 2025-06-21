@@ -49,6 +49,7 @@ ts_project(
         ":node_modules/@angular-devkit/schematics",
         ":node_modules/@inquirer/prompts",
         ":node_modules/@listr2/prompt-adapter-inquirer",
+        ":node_modules/@modelcontextprotocol/sdk",
         ":node_modules/@yarnpkg/lockfile",
         ":node_modules/ini",
         ":node_modules/jsonc-parser",
