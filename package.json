@@ -69,7 +69,7 @@
     "@rollup/plugin-commonjs": "^28.0.0",
     "@rollup/plugin-json": "^6.1.0",
     "@rollup/plugin-node-resolve": "16.0.1",
-    "@stylistic/eslint-plugin": "^4.0.0",
+    "@stylistic/eslint-plugin": "^5.0.0",
     "@types/babel__core": "7.20.5",
     "@types/babel__generator": "^7.6.8",
     "@types/browser-sync": "^2.27.0",
