@@ -24,10 +24,12 @@ import { OutputHashing } from '../application/schema';
 import { writeTestFiles } from '../karma/application_builder';
 import { findTests, getTestEntrypoints } from '../karma/find-tests';
 import { useKarmaBuilder } from './karma-bridge';
-import { normalizeOptions } from './options';
+import { NormalizedUnitTestOptions, normalizeOptions } from './options';
 import type { Schema as UnitTestOptions } from './schema';
 
 export type { UnitTestOptions };
+
+type VitestCoverageOption = Exclude<import('vitest/node').InlineConfig['coverage'], undefined>;
 
 /**
  * @experimental Direct usage of this function is considered experimental.
@@ -230,15 +232,11 @@ export async function* execute(
           include: [],
           reporters: normalizedOptions.reporters ?? ['default'],
           watch: normalizedOptions.watch,
-          coverage: {
-            enabled: !!normalizedOptions.codeCoverage,
-            excludeAfterRemap: true,
-            exclude: normalizedOptions.codeCoverage?.exclude ?? [],
-            // Special handling for `reporter` due to an undefined value causing upstream failures
-            ...(normalizedOptions.codeCoverage?.reporters
-              ? { reporter: normalizedOptions.codeCoverage.reporters }
-              : {}),
-          },
+          coverage: generateCoverageOption(
+            normalizedOptions.codeCoverage,
+            workspaceRoot,
+            outputPath,
+          ),
           ...debugOptions,
         },
         {
@@ -249,7 +247,7 @@ export async function* execute(
                 // Create a subproject that can be configured with plugins for browser mode.
                 // Plugins defined directly in the vite overrides will not be present in the
                 // browser specific Vite instance.
-                await context.injectTestProjects({
+                const [project] = await context.injectTestProjects({
                   test: {
                     name: projectName,
                     root: outputPath,
@@ -282,6 +280,15 @@ export async function* execute(
                     },
                   ],
                 });
+
+                // Adjust coverage excludes to not include the otherwise automatically inserted included unit tests.
+                // Vite does this as a convenience but is problematic for the bundling strategy employed by the
+                // builder's test setup. To workaround this, the excludes are adjusted here to only automaticallyAdd commentMore actions
+                // exclude the TypeScript source test files.
+                project.config.coverage.exclude = [
+                  ...(normalizedOptions.codeCoverage?.exclude ?? []),
+                  '**/*.{test,spec}.?(c|m)ts',
+                ];
               },
             },
           ],
@@ -376,4 +383,25 @@ function generateOutputPath(): string {
   const uuidSuffix = randomUUID().slice(0, 8);
 
   return path.join('dist', 'test-out', `${datePrefix}-${uuidSuffix}`);
+}
+function generateCoverageOption(
+  codeCoverage: NormalizedUnitTestOptions['codeCoverage'],
+  workspaceRoot: string,
+  outputPath: string,
+): VitestCoverageOption {
+  if (!codeCoverage) {
+    return {
+      enabled: false,
+    };
+  }
+
+  return {
+    enabled: true,
+    excludeAfterRemap: true,
+    include: [`${path.relative(workspaceRoot, outputPath)}/**`],
+    // Special handling for `reporter` due to an undefined value causing upstream failures
+    ...(codeCoverage.reporters
+      ? ({ reporter: codeCoverage.reporters } satisfies VitestCoverageOption)
+      : {}),
+  };
 }
