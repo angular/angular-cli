@@ -366,7 +366,7 @@ importers:
         version: 5.1.12(@types/node@20.19.1)
       '@vitejs/plugin-basic-ssl':
         specifier: 2.0.0
-        version: 2.0.0(vite@6.3.5(@types/node@20.19.1)(jiti@1.21.7)(less@4.3.0)(sass@1.89.2)(terser@5.43.0)(yaml@2.8.0))
+        version: 2.0.0(vite@7.0.0(@types/node@20.19.1)(jiti@1.21.7)(less@4.3.0)(sass@1.89.2)(terser@5.43.0)(yaml@2.8.0))
       beasties:
         specifier: 0.3.4
         version: 0.3.4
@@ -419,8 +419,8 @@ importers:
         specifier: 0.2.14
         version: 0.2.14
       vite:
-        specifier: 6.3.5
-        version: 6.3.5(@types/node@20.19.1)(jiti@1.21.7)(less@4.3.0)(sass@1.89.2)(terser@5.43.0)(yaml@2.8.0)
+        specifier: 7.0.0
+        version: 7.0.0(@types/node@20.19.1)(jiti@1.21.7)(less@4.3.0)(sass@1.89.2)(terser@5.43.0)(yaml@2.8.0)
       watchpack:
         specifier: 2.4.4
         version: 2.4.4
@@ -631,7 +631,7 @@ importers:
         version: link:../../ngtools/webpack
       '@vitejs/plugin-basic-ssl':
         specifier: 2.0.0
-        version: 2.0.0(vite@6.3.5(@types/node@20.19.1)(jiti@1.21.7)(less@4.3.0)(sass@1.89.2)(terser@5.43.0)(yaml@2.8.0))
+        version: 2.0.0(vite@7.0.0(@types/node@20.19.1)(jiti@1.21.7)(less@4.3.0)(sass@1.89.2)(terser@5.43.0)(yaml@2.8.0))
       ansi-colors:
         specifier: 4.1.3
         version: 4.1.3
@@ -7903,6 +7903,46 @@ packages:
       yaml:
         optional: true
 
+  vite@7.0.0:
+    resolution: {integrity: sha512-ixXJB1YRgDIw2OszKQS9WxGHKwLdCsbQNkpJN171udl6szi/rIySHL6/Os3s2+oE4P/FLD4dxg4mD7Wust+u5g==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    hasBin: true
+    peerDependencies:
+      '@types/node': ^20.19.0 || >=22.12.0
+      jiti: '>=1.21.0'
+      less: ^4.0.0
+      lightningcss: ^1.21.0
+      sass: ^1.70.0
+      sass-embedded: ^1.70.0
+      stylus: '>=0.54.8'
+      sugarss: ^5.0.0
+      terser: ^5.16.0
+      tsx: ^4.8.1
+      yaml: ^2.4.2
+    peerDependenciesMeta:
+      '@types/node':
+        optional: true
+      jiti:
+        optional: true
+      less:
+        optional: true
+      lightningcss:
+        optional: true
+      sass:
+        optional: true
+      sass-embedded:
+        optional: true
+      stylus:
+        optional: true
+      sugarss:
+        optional: true
+      terser:
+        optional: true
+      tsx:
+        optional: true
+      yaml:
+        optional: true
+
   vitest@3.2.4:
     resolution: {integrity: sha512-LUCP5ev3GURDysTWiP47wRRUpLKMOfPh+yKTx3kVIEiu5KOMeqzpnYNsKyOoVrULivR8tLcks4+lga33Whn90A==}
     engines: {node: ^18.0.0 || ^20.0.0 || >=22.0.0}
@@ -10693,9 +10733,9 @@ snapshots:
       minimatch: 7.4.6
       semver: 7.7.1
 
-  '@vitejs/plugin-basic-ssl@2.0.0(vite@6.3.5(@types/node@20.19.1)(jiti@1.21.7)(less@4.3.0)(sass@1.89.2)(terser@5.43.0)(yaml@2.8.0))':
+  '@vitejs/plugin-basic-ssl@2.0.0(vite@7.0.0(@types/node@20.19.1)(jiti@1.21.7)(less@4.3.0)(sass@1.89.2)(terser@5.43.0)(yaml@2.8.0))':
     dependencies:
-      vite: 6.3.5(@types/node@20.19.1)(jiti@1.21.7)(less@4.3.0)(sass@1.89.2)(terser@5.43.0)(yaml@2.8.0)
+      vite: 7.0.0(@types/node@20.19.1)(jiti@1.21.7)(less@4.3.0)(sass@1.89.2)(terser@5.43.0)(yaml@2.8.0)
 
   '@vitest/expect@3.2.4':
     dependencies:
@@ -16291,7 +16331,7 @@ snapshots:
       debug: 4.4.1(supports-color@10.0.0)
       es-module-lexer: 1.7.0
       pathe: 2.0.3
-      vite: 6.3.5(@types/node@20.19.1)(jiti@1.21.7)(less@4.3.0)(sass@1.89.2)(terser@5.43.0)(yaml@2.8.0)
+      vite: 7.0.0(@types/node@20.19.1)(jiti@1.21.7)(less@4.3.0)(sass@1.89.2)(terser@5.43.0)(yaml@2.8.0)
     transitivePeerDependencies:
       - '@types/node'
       - jiti
@@ -16307,6 +16347,23 @@ snapshots:
       - yaml
 
   vite@6.3.5(@types/node@20.19.1)(jiti@1.21.7)(less@4.3.0)(sass@1.89.2)(terser@5.43.0)(yaml@2.8.0):
+    dependencies:
+      esbuild: 0.25.5
+      fdir: 6.4.6(picomatch@4.0.2)
+      picomatch: 4.0.2
+      postcss: 8.5.6
+      rollup: 4.44.0
+      tinyglobby: 0.2.14
+    optionalDependencies:
+      '@types/node': 20.19.1
+      fsevents: 2.3.3
+      jiti: 1.21.7
+      less: 4.3.0
+      sass: 1.89.2
+      terser: 5.43.0
+      yaml: 2.8.0
+
+  vite@7.0.0(@types/node@20.19.1)(jiti@1.21.7)(less@4.3.0)(sass@1.89.2)(terser@5.43.0)(yaml@2.8.0):
     dependencies:
       esbuild: 0.25.5
       fdir: 6.4.6(picomatch@4.0.2)
