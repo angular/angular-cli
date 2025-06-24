@@ -56,7 +56,7 @@ describe('createWebRequestFromNodeRequest (HTTP/2)', () => {
     server.close(done);
   });
 
-  describe('GET Handling', () => {
+  describe('GET handling', () => {
     it('should correctly handle a basic GET request', async () => {
       const nodeRequest = await extractNodeRequest(() => {
         client
@@ -106,9 +106,48 @@ describe('createWebRequestFromNodeRequest (HTTP/2)', () => {
       expect(webRequest.headers.get('x-custom-header1')).toBe('value1');
       expect(webRequest.headers.get('x-custom-header2')).toBe('value2');
     });
+
+    it('should correctly handle the referer header', async () => {
+      const referer = 'http://test-referer-site.com/page';
+      const nodeRequest = await extractNodeRequest(() => {
+        client
+          .request({
+            ':path': '/with-referer',
+            ':method': 'GET',
+            referer,
+          })
+          .end();
+      });
+
+      expect(nodeRequest.headers['referer']).toBe(referer);
+
+      const webRequest = createWebRequestFromNodeRequest(nodeRequest);
+      expect(webRequest.headers.get('referer')).toBe(referer);
+      expect(webRequest.referrer).toBe(referer);
+      expect(webRequest.url).toBe(`http://localhost:${port}/with-referer`);
+    });
+
+    it('should handle an invalid referer header gracefully', async () => {
+      const invalidReferer = '/invalid-referer';
+      const nodeRequest = await extractNodeRequest(() => {
+        client
+          .request({
+            ':path': '/with-referer',
+            ':method': 'GET',
+            referer: invalidReferer,
+          })
+          .end();
+      });
+
+      expect(nodeRequest.headers['referer']).toBe(invalidReferer);
+
+      const webRequest = createWebRequestFromNodeRequest(nodeRequest);
+      expect(webRequest.headers.get('referer')).toBe(invalidReferer);
+      expect(webRequest.referrer).toBe('about:client');
+    });
   });
 
-  describe('POST Handling', () => {
+  describe('POST handling', () => {
     it('should handle POST request with JSON body and correct response', async () => {
       const postData = JSON.stringify({ message: 'Hello from POST' });
       const nodeRequest = await extractNodeRequest(() => {
