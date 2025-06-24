@@ -10,7 +10,9 @@ import { APP_BASE_HREF, PlatformLocation } from '@angular/common';
 import {
   ApplicationRef,
   Compiler,
+  EnvironmentInjector,
   Injector,
+  createEnvironmentInjector,
   runInInjectionContext,
   ɵConsole,
   ɵENABLE_ROOT_COMPONENT_BOOTSTRAP,
@@ -195,14 +197,22 @@ async function* handleRoute(options: {
         appendPreloadToMetadata(ɵentryName, entryPointToBrowserMapping, metadata);
       }
 
+      const routeInjector = route.providers
+        ? createEnvironmentInjector(
+            route.providers,
+            parentInjector.get(EnvironmentInjector),
+            `Route: ${route.path}`,
+          )
+        : parentInjector;
+
       const loadedChildRoutes = await loadChildrenHelper(
         route,
         compiler,
-        parentInjector,
+        routeInjector,
       ).toPromise();
 
       if (loadedChildRoutes) {
-        const { routes: childRoutes, injector = parentInjector } = loadedChildRoutes;
+        const { routes: childRoutes, injector = routeInjector } = loadedChildRoutes;
         yield* traverseRoutesConfig({
           ...options,
           routes: childRoutes,
