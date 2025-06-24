@@ -8,6 +8,16 @@
     "watch": "ng build --watch --configuration development"<% if (!minimal) { %>,
     "test": "ng test"<% } %>
   },
+  "prettier": {
+    "overrides": [
+      {
+        "files": "*.html",
+        "options": {
+          "parser": "angular"
+        }
+      }
+    ]
+  },
   "private": true,
   "dependencies": {
     "@angular/common": "<%= latestVersions.Angular %>",
