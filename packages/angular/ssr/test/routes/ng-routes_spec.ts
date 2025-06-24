@@ -11,8 +11,13 @@
 import '@angular/compiler';
 /* eslint-enable import/no-unassigned-import */
 
-import { Component } from '@angular/core';
-import { Routes, provideRouter, withEnabledBlockingInitialNavigation } from '@angular/router';
+import { Component, InjectionToken, Injector, inject } from '@angular/core';
+import {
+  Route,
+  Routes,
+  provideRouter,
+  withEnabledBlockingInitialNavigation,
+} from '@angular/router';
 import { extractRoutesAndCreateRouteTree } from '../../src/routes/ng-routes';
 import { PrerenderFallback, RenderMode } from '../../src/routes/route-config';
 import { setAngularAppTestingManifest } from '../testing-utils';
@@ -715,6 +720,38 @@ describe('extractRoutesAndCreateRouteTree', () => {
       { route: '/', renderMode: RenderMode.Server },
       { route: '/home', renderMode: RenderMode.Server },
       { route: '/**', renderMode: RenderMode.Server },
+    ]);
+  });
+
+  it(`should create and run route level injector when 'loadChildren' is used`, async () => {
+    const ChildRoutes = new InjectionToken<Route[]>('Child Routes');
+    setAngularAppTestingManifest(
+      [
+        {
+          path: '',
+          component: DummyComponent,
+          providers: [
+            {
+              provide: ChildRoutes,
+              useValue: [
+                {
+                  path: 'home',
+                  component: DummyComponent,
+                },
+              ],
+            },
+          ],
+          loadChildren: () => inject(ChildRoutes),
+        },
+      ],
+      [{ path: '**', renderMode: RenderMode.Server }],
+    );
+
+    const { routeTree, errors } = await extractRoutesAndCreateRouteTree({ url });
+    expect(errors).toHaveSize(0);
+    expect(routeTree.toObject()).toEqual([
+      { route: '/', renderMode: RenderMode.Server },
+      { route: '/home', renderMode: RenderMode.Server },
     ]);
   });
 });
