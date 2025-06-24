@@ -7,7 +7,6 @@
  */
 
 import { lookup as lookupMimeType } from 'mrmime';
-import { isBuiltin } from 'node:module';
 import { extname } from 'node:path';
 import type { DepOptimizationConfig } from 'vite';
 import { JavaScriptTransformer } from '../esbuild/javascript-transformer';

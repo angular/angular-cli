@@ -121,13 +121,13 @@ export async function createAngularMemoryPlugin(
 async function loadViteClientCode(file: string, disableViteTransport = false): Promise<string> {
   const originalContents = await readFile(file, 'utf-8');
   let updatedContents = originalContents.replace(
-    `"You can also disable this overlay by setting ",
-      h("code", { part: "config-option-name" }, "server.hmr.overlay"),
-      " to ",
-      h("code", { part: "config-option-value" }, "false"),
-      " in ",
-      h("code", { part: "config-file-name" }, hmrConfigName),
-      "."`,
+    '"You can also disable this overlay by setting ", ' +
+      'h("code", { part: "config-option-name" }, "server.hmr.overlay"), ' +
+      '" to ", ' +
+      'h("code", { part: "config-option-value" }, "false"), ' +
+      '" in ", ' +
+      'h("code", { part: "config-file-name" }, hmrConfigName), ' +
+      '"."',
     '',
   );
 
