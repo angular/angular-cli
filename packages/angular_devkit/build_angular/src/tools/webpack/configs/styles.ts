@@ -6,14 +6,18 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { SassWorkerImplementation } from '@angular/build/private';
+import {
+  SassWorkerImplementation,
+  findTailwindConfiguration,
+  generateSearchDirectories,
+  loadPostcssConfiguration,
+} from '@angular/build/private';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import * as path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import type { FileImporter } from 'sass';
 import type { Configuration, LoaderContext, RuleSetUseItem } from 'webpack';
 import { WebpackConfigOptions } from '../../../utils/build-options';
-import { findTailwindConfigurationFile } from '../../../utils/tailwind';
 import {
   AnyComponentStyleBudgetChecker,
   PostcssCliResources,
@@ -75,25 +79,39 @@ export async function getStylesConfig(wco: WebpackConfigOptions): Promise<Config
 
   const extraPostcssPlugins: import('postcss').Plugin[] = [];
 
-  // Attempt to setup Tailwind CSS
-  // Only load Tailwind CSS plugin if configuration file was found.
-  // This acts as a guard to ensure the project actually wants to use Tailwind CSS.
-  // The package may be unknowningly present due to a third-party transitive package dependency.
-  const tailwindConfigPath = await findTailwindConfigurationFile(root, projectRoot);
-  if (tailwindConfigPath) {
-    let tailwindPackagePath;
-    try {
-      tailwindPackagePath = require.resolve('tailwindcss', { paths: [root] });
-    } catch {
-      const relativeTailwindConfigPath = path.relative(root, tailwindConfigPath);
-      logger.warn(
-        `Tailwind CSS configuration file found (${relativeTailwindConfigPath})` +
-          ` but the 'tailwindcss' package is not installed.` +
-          ` To enable Tailwind CSS, please install the 'tailwindcss' package.`,
-      );
+  const searchDirectories = await generateSearchDirectories([projectRoot, root]);
+  const postcssConfig = await loadPostcssConfiguration(searchDirectories);
+
+  if (postcssConfig) {
+    for (const [pluginName, pluginOptions] of postcssConfig.plugins) {
+      const { default: plugin } = await import(pluginName);
+      if (typeof plugin !== 'function' || plugin.postcss !== true) {
+        throw new Error(`Attempted to load invalid Postcss plugin: "${pluginName}"`);
+      }
+
+      extraPostcssPlugins.push(plugin(pluginOptions));
     }
-    if (tailwindPackagePath) {
-      extraPostcssPlugins.push(require(tailwindPackagePath)({ config: tailwindConfigPath }));
+  } else {
+    // Attempt to setup Tailwind CSS
+    // Only load Tailwind CSS plugin if configuration file was found.
+    // This acts as a guard to ensure the project actually wants to use Tailwind CSS.
+    // The package may be unknowningly present due to a third-party transitive package dependency.
+    const tailwindConfigPath = findTailwindConfiguration(searchDirectories);
+    if (tailwindConfigPath) {
+      let tailwindPackagePath;
+      try {
+        tailwindPackagePath = require.resolve('tailwindcss', { paths: [root] });
+      } catch {
+        const relativeTailwindConfigPath = path.relative(root, tailwindConfigPath);
+        logger.warn(
+          `Tailwind CSS configuration file found (${relativeTailwindConfigPath})` +
+            ` but the 'tailwindcss' package is not installed.` +
+            ` To enable Tailwind CSS, please install the 'tailwindcss' package.`,
+        );
+      }
+      if (tailwindPackagePath) {
+        extraPostcssPlugins.push(require(tailwindPackagePath)({ config: tailwindConfigPath }));
+      }
     }
   }
 

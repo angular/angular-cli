@@ -84,3 +84,8 @@ export { type BundleStats, generateBuildStatsTable } from './utils/stats-table';
 export { getSupportedBrowsers } from './utils/supported-browsers';
 export { assertCompatibleAngularVersion } from './utils/version';
 export { findTests, getTestEntrypoints } from './builders/karma/find-tests';
+export {
+  findTailwindConfiguration,
+  generateSearchDirectories,
+  loadPostcssConfiguration,
+} from './utils/postcss-configuration';
