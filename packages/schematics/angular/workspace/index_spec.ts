@@ -133,4 +133,10 @@ describe('Workspace Schematic', () => {
     const { tasks } = parseJson(tree.readContent('.vscode/tasks.json').toString());
     expect(tasks).not.toContain(jasmine.objectContaining({ type: 'npm', script: 'test' }));
   });
+
+  it('should include prettier config overrides for Angular templates', async () => {
+    const tree = await schematicRunner.runSchematic('workspace', defaultOptions);
+    const pkg = JSON.parse(tree.readContent('/package.json'));
+    expect(pkg.prettier).withContext('package.json#prettier is present').toBeTruthy();
+  });
 });
