@@ -33,12 +33,14 @@ export function createWebRequestFromNodeRequest(
 ): Request {
   const { headers, method = 'GET' } = nodeRequest;
   const withBody = method !== 'GET' && method !== 'HEAD';
+  const referrer = headers.referer && URL.canParse(headers.referer) ? headers.referer : undefined;
 
   return new Request(createRequestUrl(nodeRequest), {
     method,
     headers: createRequestHeaders(headers),
     body: withBody ? nodeRequest : undefined,
     duplex: withBody ? 'half' : undefined,
+    referrer,
   });
 }
 
