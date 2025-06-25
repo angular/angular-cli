@@ -18,7 +18,7 @@ runs:
   steps:
     - name: Initialize WSL
       id: init_wsl
-      uses: angular/dev-infra/github-actions/setup-wsl@92edde46390984cf9182d3d1e5c4c7651f75171f
+      uses: angular/dev-infra/github-actions/setup-wsl@f3ac6ef8b4291287e19d23c2a708dbc4ac24293a
       with:
         wsl_firewall_interface: 'vEthernet (WSL (Hyper-V firewall))'
 
