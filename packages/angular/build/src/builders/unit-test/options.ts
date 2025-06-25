@@ -64,3 +64,7 @@ export async function normalizeOptions(
     providersFile: options.providersFile && path.join(workspaceRoot, options.providersFile),
   };
 }
+
+export function injectTestingPolyfills(polyfills: string[] = []): string[] {
+  return polyfills.includes('zone.js') ? [...polyfills, 'zone.js/testing'] : polyfills;
+}

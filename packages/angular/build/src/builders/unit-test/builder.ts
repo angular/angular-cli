@@ -24,7 +24,7 @@ import { OutputHashing } from '../application/schema';
 import { writeTestFiles } from '../karma/application_builder';
 import { findTests, getTestEntrypoints } from '../karma/find-tests';
 import { useKarmaBuilder } from './karma-bridge';
-import { NormalizedUnitTestOptions, normalizeOptions } from './options';
+import { NormalizedUnitTestOptions, injectTestingPolyfills, normalizeOptions } from './options';
 import type { Schema as UnitTestOptions } from './schema';
 
 export type { UnitTestOptions };
@@ -111,9 +111,7 @@ export async function* execute(
     await context.getBuilderNameForTarget(normalizedOptions.buildTarget),
   )) as unknown as ApplicationBuilderInternalOptions;
 
-  if (buildTargetOptions.polyfills?.includes('zone.js')) {
-    buildTargetOptions.polyfills.push('zone.js/testing');
-  }
+  buildTargetOptions.polyfills = injectTestingPolyfills(buildTargetOptions.polyfills);
 
   const outputPath = path.join(context.workspaceRoot, generateOutputPath());
   const buildOptions: ApplicationBuilderInternalOptions = {
