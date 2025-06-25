@@ -9,7 +9,7 @@
 import type { BuilderContext, BuilderOutput } from '@angular-devkit/architect';
 import type { ApplicationBuilderInternalOptions } from '../application/options';
 import type { KarmaBuilderOptions } from '../karma';
-import type { NormalizedUnitTestOptions } from './options';
+import { type NormalizedUnitTestOptions, injectTestingPolyfills } from './options';
 
 export async function useKarmaBuilder(
   context: BuilderContext,
@@ -25,6 +25,8 @@ export async function useKarmaBuilder(
     await context.getTargetOptions(unitTestOptions.buildTarget),
     await context.getBuilderNameForTarget(unitTestOptions.buildTarget),
   )) as unknown as ApplicationBuilderInternalOptions;
+
+  buildTargetOptions.polyfills = injectTestingPolyfills(buildTargetOptions.polyfills);
 
   const options: KarmaBuilderOptions = {
     tsConfig: unitTestOptions.tsConfig,
