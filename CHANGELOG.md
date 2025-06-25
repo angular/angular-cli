@@ -1,3 +1,22 @@
+<a name="20.0.4"></a>
+
+# 20.0.4 (2025-06-25)
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                 |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------- |
+| [2316fe29d](https://github.com/angular/angular-cli/commit/2316fe29de57c593e5ccb8be612d3918b60d9761) | fix  | add missing prettier config |
+
+### @angular/ssr
+
+| Commit                                                                                              | Type | Description                                                      |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------------- |
+| [309742289](https://github.com/angular/angular-cli/commit/30974228988d7ff96741fe0515c35275e8a6bc0a) | fix  | avoid preloading unnecessary dynamic bundles                     |
+| [82691b98f](https://github.com/angular/angular-cli/commit/82691b98fa458febf40a16beb91b24c4b6c519c9) | fix  | ensure correct referer header handling in web request conversion |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="20.1.0-next.2"></a>
 
 # 20.1.0-next.2 (2025-06-18)
