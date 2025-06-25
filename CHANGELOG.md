@@ -1,3 +1,22 @@
+<a name="20.0.4"></a>
+
+# 20.0.4 (2025-06-25)
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                 |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------- |
+| [2316fe29d](https://github.com/angular/angular-cli/commit/2316fe29de57c593e5ccb8be612d3918b60d9761) | fix  | add missing prettier config |
+
+### @angular/ssr
+
+| Commit                                                                                              | Type | Description                                                      |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------------- |
+| [309742289](https://github.com/angular/angular-cli/commit/30974228988d7ff96741fe0515c35275e8a6bc0a) | fix  | avoid preloading unnecessary dynamic bundles                     |
+| [82691b98f](https://github.com/angular/angular-cli/commit/82691b98fa458febf40a16beb91b24c4b6c519c9) | fix  | ensure correct referer header handling in web request conversion |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="20.0.3"></a>
 
 # 20.0.3 (2025-06-18)
@@ -1080,7 +1099,6 @@
 - Protractor is no longer supported.
 
   Protractor was marked end-of-life in August 2023 (see https://protractortest.org/). Projects still relying on Protractor should consider migrating to another E2E testing framework, several support solid migration paths from Protractor.
-
   - https://angular.dev/tools/cli/end-to-end
   - https://blog.angular.dev/the-state-of-end-to-end-testing-with-angular-d175f751cb9c
 
@@ -3891,7 +3909,6 @@ Alan Agius, Charles Lyding, Doug Parker, Joey Perrott and Piotr Wysocki
   ```scss
   @import 'font-awesome/scss/font-awesome';
   ```
-
   - By default the CLI will use Sass modern API, While not recommended, users can still opt to use legacy API by setting `NG_BUILD_LEGACY_SASS=1`.
 
 - Internally the Angular CLI now always set the TypeScript `target` to `ES2022` and `useDefineForClassFields` to `false` unless the target is set to `ES2022` or later in the TypeScript configuration. To control ECMA version and features use the Browerslist configuration.
@@ -4715,7 +4732,6 @@ Alan Agius, Charles Lyding and Doug Parker
 ### @angular/cli
 
 - Several changes to the `ng analytics` command syntax.
-
   - `ng analytics project <setting>` has been replaced with `ng analytics <setting>`
   - `ng analytics <setting>` has been replaced with `ng analytics <setting> --global`
 
@@ -4726,7 +4742,6 @@ Alan Agius, Charles Lyding and Doug Parker
 - `--configuration` cannot be used with `ng run`. Provide the configuration as part of the target. Ex: `ng run project:builder:configuration`.
 - Deprecated `ng x18n` and `ng i18n-extract` commands have been removed in favor of `ng extract-i18n`.
 - Several changes in the Angular CLI commands and arguments handling.
-
   - `ng help` has been removed in favour of the `—-help` option.
   - `ng —-version` has been removed in favour of `ng version` and `ng v`.
   - Deprecated camel cased arguments are no longer supported. Ex. using `—-sourceMap` instead of `—-source-map` will result in an error.
@@ -4746,7 +4761,6 @@ Alan Agius, Charles Lyding and Doug Parker
 - `browser` and `karma` builders `script` and `styles` options input files extensions are now validated.
 
   Valid extensions for `scripts` are:
-
   - `.js`
   - `.cjs`
   - `.mjs`
@@ -4755,7 +4769,6 @@ Alan Agius, Charles Lyding and Doug Parker
   - `.mjsx`
 
   Valid extensions for `styles` are:
-
   - `.css`
   - `.less`
   - `.sass`
@@ -4798,7 +4811,6 @@ Alan Agius, Charles Lyding and Doug Parker
 ### @ngtools/webpack
 
 - `ivy` namespace has been removed from the public API.
-
   - `ivy.AngularWebpackPlugin` -> `AngularWebpackPlugin`
   - `ivy.AngularPluginOptions` -> `AngularPluginOptions`
 
