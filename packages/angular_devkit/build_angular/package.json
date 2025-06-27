@@ -22,7 +22,6 @@
     "@babel/runtime": "7.27.6",
     "@discoveryjs/json-ext": "0.6.3",
     "@ngtools/webpack": "workspace:0.0.0-PLACEHOLDER",
-    "@vitejs/plugin-basic-ssl": "2.0.0",
     "ansi-colors": "4.1.3",
     "autoprefixer": "10.4.21",
     "babel-loader": "10.0.0",
