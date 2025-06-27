@@ -19,7 +19,7 @@ import { JobDescription, JobHandler } from './jobs';
  * Using Symbol.for() as it's a global registry that's the same for all installations of
  * Architect (if some libraries depends directly on architect instead of sharing the files).
  */
-export const BuilderSymbol = Symbol.for('@angular-devkit/architect:builder');
+export const BuilderSymbol: unique symbol = Symbol.for('@angular-devkit/architect:builder');
 
 /**
  * BuilderVersionSymbol used for knowing which version of the library createBuilder() came from.
@@ -27,7 +27,7 @@ export const BuilderSymbol = Symbol.for('@angular-devkit/architect:builder');
  * Using Symbol.for() as it's a global registry that's the same for all installations of
  * Architect (if some libraries depends directly on architect instead of sharing the files).
  */
-export const BuilderVersionSymbol = Symbol.for('@angular-devkit/architect:version');
+export const BuilderVersionSymbol: unique symbol = Symbol.for('@angular-devkit/architect:version');
 
 /**
  * A Specialization of the JobHandler type. This exposes BuilderDescription as the job description

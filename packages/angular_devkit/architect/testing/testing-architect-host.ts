@@ -23,7 +23,7 @@ export class TestingArchitectHost implements ArchitectHost {
    */
   constructor(
     public workspaceRoot = '',
-    public currentDirectory = workspaceRoot,
+    public currentDirectory: string = workspaceRoot,
     private _backendHost: ArchitectHost | null = null,
   ) {}
 
@@ -32,11 +32,11 @@ export class TestingArchitectHost implements ArchitectHost {
     builder: Builder,
     description = 'Testing only builder.',
     optionSchema: json.schema.JsonSchema = { type: 'object' },
-  ) {
+  ): void {
     this._builderImportMap.set(builderName, builder);
     this._builderMap.set(builderName, { builderName, description, optionSchema });
   }
-  async addBuilderFromPackage(packageName: string) {
+  async addBuilderFromPackage(packageName: string): Promise<void> {
     const packageJson = await import(packageName + '/package.json');
     if (!('builders' in packageJson)) {
       throw new Error('Invalid package.json, builders key not found.');
@@ -64,7 +64,7 @@ export class TestingArchitectHost implements ArchitectHost {
       this.addBuilder(`${packageJson.name}:${builderName}`, handler, b.description, optionsSchema);
     }
   }
-  addTarget(target: Target, builderName: string, options: json.JsonObject = {}) {
+  addTarget(target: Target, builderName: string, options: json.JsonObject = {}): void {
     this._targetMap.set(targetStringFromTarget(target), { builderName, options });
   }
 

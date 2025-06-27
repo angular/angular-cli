@@ -126,7 +126,7 @@ export class TestProjectHost extends NodeJsSyncHost {
     });
   }
 
-  replaceInFile(path: string, match: RegExp | string, replacement: string) {
+  replaceInFile(path: string, match: RegExp | string, replacement: string): void {
     const content = virtualFs.fileBufferToString(this.scopedSync().read(normalize(path)));
     this.scopedSync().write(
       normalize(path),
@@ -134,7 +134,7 @@ export class TestProjectHost extends NodeJsSyncHost {
     );
   }
 
-  appendToFile(path: string, str: string) {
+  appendToFile(path: string, str: string): void {
     const content = virtualFs.fileBufferToString(this.scopedSync().read(normalize(path)));
     this.scopedSync().write(normalize(path), virtualFs.stringToFileBuffer(content.concat(str)));
   }
@@ -147,7 +147,7 @@ export class TestProjectHost extends NodeJsSyncHost {
     return fileName || undefined;
   }
 
-  copyFile(from: string, to: string) {
+  copyFile(from: string, to: string): void {
     const content = this.scopedSync().read(normalize(from));
     this.scopedSync().write(normalize(to), content);
   }

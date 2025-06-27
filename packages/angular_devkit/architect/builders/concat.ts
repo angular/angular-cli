@@ -6,12 +6,11 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { json } from '@angular-devkit/core';
 import { concatMap, first, from, last, map, of, switchMap } from 'rxjs';
-import { BuilderOutput, BuilderRun, createBuilder } from '../src';
+import { Builder, BuilderOutput, BuilderRun, createBuilder } from '../src';
 import { Schema as OperatorSchema } from './operator-schema';
 
-export default createBuilder<json.JsonObject & OperatorSchema>((options, context) => {
+const builder: Builder<OperatorSchema> = createBuilder((options, context) => {
   const allRuns: (() => Promise<BuilderRun>)[] = [];
 
   context.reportProgress(
@@ -61,3 +60,5 @@ export default createBuilder<json.JsonObject & OperatorSchema>((options, context
     last(),
   );
 });
+
+export default builder;

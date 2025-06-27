@@ -364,7 +364,7 @@ export class Architect {
     this._scheduler = new SimpleScheduler(jobRegistry, registry);
   }
 
-  has(name: JobName) {
+  has(name: JobName): Observable<boolean> {
     return this._scheduler.has(name);
   }
 
