@@ -11,7 +11,7 @@
     "@angular-devkit/build-webpack": "workspace:0.0.0-EXPERIMENTAL-PLACEHOLDER",
     "@angular-devkit/core": "workspace:0.0.0-PLACEHOLDER",
     "@angular/build": "workspace:0.0.0-PLACEHOLDER",
-    "@babel/core": "7.27.4",
+    "@babel/core": "7.27.7",
     "@babel/generator": "7.27.5",
     "@babel/helper-annotate-as-pure": "7.27.3",
     "@babel/helper-split-export-declaration": "7.24.7",
@@ -69,7 +69,7 @@
     "@web/test-runner": "0.20.2",
     "browser-sync": "3.0.4",
     "ng-packagr": "20.1.0-next.0",
-    "undici": "7.10.0"
+    "undici": "7.11.0"
   },
   "peerDependencies": {
     "@angular/core": "0.0.0-ANGULAR-FW-PEER-DEP",
