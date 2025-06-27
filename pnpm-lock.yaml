@@ -632,9 +632,6 @@ importers:
       '@ngtools/webpack':
         specifier: workspace:0.0.0-PLACEHOLDER
         version: link:../../ngtools/webpack
-      '@vitejs/plugin-basic-ssl':
-        specifier: 2.0.0
-        version: 2.0.0(vite@7.0.0(@types/node@20.19.1)(jiti@1.21.7)(less@4.3.0)(sass@1.89.2)(terser@5.43.1)(yaml@2.8.0))
       ansi-colors:
         specifier: 4.1.3
         version: 4.1.3
