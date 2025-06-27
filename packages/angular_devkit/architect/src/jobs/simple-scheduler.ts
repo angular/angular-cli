@@ -185,7 +185,7 @@ export class SimpleScheduler<
    * @param name The name of the job.
    * @returns A description, or null if the job is not registered.
    */
-  getDescription(name: JobName) {
+  getDescription(name: JobName): Observable<JobDescription | null> {
     return concat(
       this._getInternalDescription(name).pipe(map((x) => x && x.jobDescription)),
       of(null),
@@ -197,7 +197,7 @@ export class SimpleScheduler<
    * @param name The name of the job.
    * @returns True if the job exists, false otherwise.
    */
-  has(name: JobName) {
+  has(name: JobName): Observable<boolean> {
     return this.getDescription(name).pipe(map((x) => x !== null));
   }
 
@@ -209,7 +209,7 @@ export class SimpleScheduler<
    *
    * Jobs already running are NOT paused. This is pausing the scheduler only.
    */
-  pause() {
+  pause(): () => void {
     let called = false;
     this._pauseCounter++;
 

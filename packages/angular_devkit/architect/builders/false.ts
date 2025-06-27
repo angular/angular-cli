@@ -6,9 +6,11 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { createBuilder } from '../src';
+import { type Builder, createBuilder } from '../src';
 
-export default createBuilder(() => ({
+const builder: Builder<{}> = createBuilder(() => ({
   success: false,
   error: 'False builder always errors.',
 }));
+
+export default builder;

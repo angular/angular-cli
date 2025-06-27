@@ -121,7 +121,7 @@ export class WorkspaceNodeModulesArchitectHost implements ArchitectHost<NodeModu
     }
   }
 
-  async getBuilderNameForTarget(target: Target) {
+  async getBuilderNameForTarget(target: Target): Promise<string> {
     return this.workspaceHost.getBuilderName(target.project, target.target);
   }
 
@@ -134,7 +134,7 @@ export class WorkspaceNodeModulesArchitectHost implements ArchitectHost<NodeModu
    */
   resolveBuilder(
     builderStr: string,
-    basePath = this._root,
+    basePath: string = this._root,
     seenBuilders?: Set<string>,
   ): Promise<NodeModulesBuilderInfo> {
     if (seenBuilders?.has(builderStr)) {
@@ -228,11 +228,11 @@ export class WorkspaceNodeModulesArchitectHost implements ArchitectHost<NodeModu
     });
   }
 
-  async getCurrentDirectory() {
+  async getCurrentDirectory(): Promise<string> {
     return process.cwd();
   }
 
-  async getWorkspaceRoot() {
+  async getWorkspaceRoot(): Promise<string> {
     return this._root;
   }
 

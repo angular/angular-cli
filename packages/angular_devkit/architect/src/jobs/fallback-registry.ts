@@ -27,7 +27,7 @@ export class FallbackRegistry<
     >[] = [],
   ) {}
 
-  addFallback(registry: Registry) {
+  addFallback(registry: Registry): void {
     this._fallbacks.push(registry);
   }
 
