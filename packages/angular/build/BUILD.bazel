@@ -294,7 +294,7 @@ jasmine_test(
     size = "large",
     data = [":application_integration_test_lib"],
     flaky = True,
-    shard_count = 10,
+    shard_count = 20,
 )
 
 jasmine_test(
