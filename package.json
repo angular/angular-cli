@@ -143,7 +143,7 @@
     "typescript": "5.8.3",
     "undici": "7.11.0",
     "unenv": "^1.10.0",
-    "verdaccio": "6.1.2",
+    "verdaccio": "6.1.5",
     "verdaccio-auth-memory": "^10.0.0",
     "yargs-parser": "22.0.0",
     "zone.js": "^0.15.0"
