@@ -1,3 +1,21 @@
+<a name="20.0.5"></a>
+
+# 20.0.5 (2025-07-01)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                         |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------- |
+| [1ebd53df7](https://github.com/angular/angular-cli/commit/1ebd53df7168307f699a9f9ae8f5ef5b9bcf352c) | fix  | remove unused `@vitejs/plugin-basic-ssl` dependency |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                             |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------- |
+| [05cebdbcd](https://github.com/angular/angular-cli/commit/05cebdbcd1466bf5c95eb724a784aeb8c7ac083f) | fix  | proxy karma request from `/` to `/base` |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="20.0.4"></a>
 
 # 20.0.4 (2025-06-25)
@@ -1099,6 +1117,7 @@
 - Protractor is no longer supported.
 
   Protractor was marked end-of-life in August 2023 (see https://protractortest.org/). Projects still relying on Protractor should consider migrating to another E2E testing framework, several support solid migration paths from Protractor.
+
   - https://angular.dev/tools/cli/end-to-end
   - https://blog.angular.dev/the-state-of-end-to-end-testing-with-angular-d175f751cb9c
 
@@ -3909,6 +3928,7 @@ Alan Agius, Charles Lyding, Doug Parker, Joey Perrott and Piotr Wysocki
   ```scss
   @import 'font-awesome/scss/font-awesome';
   ```
+
   - By default the CLI will use Sass modern API, While not recommended, users can still opt to use legacy API by setting `NG_BUILD_LEGACY_SASS=1`.
 
 - Internally the Angular CLI now always set the TypeScript `target` to `ES2022` and `useDefineForClassFields` to `false` unless the target is set to `ES2022` or later in the TypeScript configuration. To control ECMA version and features use the Browerslist configuration.
@@ -4732,6 +4752,7 @@ Alan Agius, Charles Lyding and Doug Parker
 ### @angular/cli
 
 - Several changes to the `ng analytics` command syntax.
+
   - `ng analytics project <setting>` has been replaced with `ng analytics <setting>`
   - `ng analytics <setting>` has been replaced with `ng analytics <setting> --global`
 
@@ -4761,6 +4782,7 @@ Alan Agius, Charles Lyding and Doug Parker
 - `browser` and `karma` builders `script` and `styles` options input files extensions are now validated.
 
   Valid extensions for `scripts` are:
+
   - `.js`
   - `.cjs`
   - `.mjs`
@@ -4769,6 +4791,7 @@ Alan Agius, Charles Lyding and Doug Parker
   - `.mjsx`
 
   Valid extensions for `styles` are:
+
   - `.css`
   - `.less`
   - `.sass`
