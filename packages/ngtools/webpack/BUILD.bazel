@@ -57,6 +57,7 @@ ts_project(
 
 jasmine_test(
     name = "test",
+    size = "medium",
     data = [
         ":webpack_test_lib",
         # Needed at runtime for runtime TS compilations performed by tests.
