@@ -9,7 +9,8 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
-import type { AngularWorkspace } from '../../utilities/config';
+import { z } from 'zod';
+import { AngularWorkspace } from '../../utilities/config';
 import { VERSION } from '../../utilities/version';
 
 export async function createMcpServer(context: {
@@ -28,9 +29,12 @@ export async function createMcpServer(context: {
     'instructions',
     'instructions://best-practices',
     {
-      title: 'Angular System Instructions',
+      title: 'Angular Best Practices and Code Generation Guide',
       description:
-        'A set of instructions to help LLMs generate correct code that follows Angular best practices.',
+        "A comprehensive guide detailing Angular's best practices for code generation and development. " +
+        'This guide should be used as a reference by an LLM to ensure any generated code ' +
+        'adheres to modern Angular standards, including the use of standalone components, ' +
+        'typed forms, modern control flow syntax, and other current conventions.',
       mimeType: 'text/markdown',
     },
     async () => {
@@ -46,18 +50,43 @@ export async function createMcpServer(context: {
   server.registerTool(
     'list_projects',
     {
-      title: 'List projects',
+      title: 'List Angular Projects',
       description:
-        'List projects within an Angular workspace.' +
-        ' This information is read from the `angular.json` file at the root path of the Angular workspace',
+        'Lists the names of all applications and libraries defined within an Angular workspace. ' +
+        'It reads the `angular.json` configuration file to identify the projects. ' +
+        'By default, it searches from the current working directory, but a different path can be specified.',
+      inputSchema: {
+        workingDirectory: z
+          .string()
+          .optional()
+          .describe(
+            'Optionally use a filesystem directory as the initial location to search for an Angular Workspace root path.' +
+              ' The root path is determined by the presence of an `angular.json` file.',
+          ),
+      },
+      annotations: {
+        readOnlyHint: true,
+      },
     },
-    () => {
-      if (!context.workspace) {
+    async ({ workingDirectory }) => {
+      let workspace: AngularWorkspace | undefined;
+      if (!workingDirectory || workingDirectory === context.workspace?.basePath) {
+        workspace = context.workspace;
+      } else {
+        try {
+          workspace = await AngularWorkspace.load(path.join(workingDirectory, 'angular.json'));
+        } catch {}
+      }
+
+      if (!workspace) {
         return {
           content: [
             {
-              type: 'text',
-              text: 'Not within an Angular project.',
+              type: 'text' as const,
+              text:
+                'No Angular workspace found.' +
+                ' An `angular.json` file, which marks the root of a workspace,' +
+                ' could not be located in the current directory or any of its parent directories.',
             },
           ],
         };
@@ -66,10 +95,8 @@ export async function createMcpServer(context: {
       return {
         content: [
           {
-            type: 'text',
-            text:
-              'Projects in the Angular workspace: ' +
-              [...context.workspace.projects.keys()].join(','),
+            type: 'text' as const,
+            text: 'Projects in the Angular workspace: ' + [...workspace.projects.keys()].join(','),
           },
         ],
       };
