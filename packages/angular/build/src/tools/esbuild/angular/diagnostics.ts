@@ -75,9 +75,13 @@ export function convertTypeScriptDiagnostic(
 ): PartialMessage {
   let codePrefix = 'TS';
   let code = `${diagnostic.code}`;
-  if (diagnostic.source === 'ngtsc') {
+
+  // Custom ngtsc diagnostics are prefixed with -99 which isn't a valid TypeScript diagnostic code.
+  // Strip it and mark the diagnostic as coming from Angular. Note that we can't rely on
+  // `diagnostic.source`, because it isn't always produced. This is identical to:
+  // https://github.com/angular/angular/blob/main/packages/compiler-cli/src/ngtsc/diagnostics/src/util.ts
+  if (code.startsWith('-99')) {
     codePrefix = 'NG';
-    // Remove `-99` Angular prefix from diagnostic code
     code = code.slice(3);
   }
 
