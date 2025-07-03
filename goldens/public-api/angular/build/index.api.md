@@ -6,6 +6,7 @@
 
 import { BuilderContext } from '@angular-devkit/architect';
 import { BuilderOutput } from '@angular-devkit/architect';
+import type { ConfigOptions } from 'karma';
 import type http from 'node:http';
 import { OutputFile } from 'esbuild';
 import type { Plugin as Plugin_2 } from 'esbuild';
@@ -152,7 +153,15 @@ export function executeDevServerBuilder(options: DevServerBuilderOptions, contex
 export function executeExtractI18nBuilder(options: ExtractI18nBuilderOptions, context: BuilderContext, extensions?: ApplicationBuilderExtensions): Promise<BuilderOutput>;
 
 // @public
+export function executeKarmaBuilder(options: KarmaBuilderOptions, context: BuilderContext, transforms?: {
+    karmaOptions?: (options: KarmaConfigOptions) => KarmaConfigOptions;
+}): AsyncIterable<BuilderOutput>;
+
+// @public
 export function executeNgPackagrBuilder(options: NgPackagrBuilderOptions, context: BuilderContext): AsyncIterableIterator<BuilderOutput>;
+
+// @public
+export function executeUnitTestBuilder(options: UnitTestBuilderOptions, context: BuilderContext, extensions?: ApplicationBuilderExtensions): AsyncIterable<BuilderOutput>;
 
 // @public
 export type ExtractI18nBuilderOptions = {
@@ -165,10 +174,61 @@ export type ExtractI18nBuilderOptions = {
 };
 
 // @public
+export type KarmaBuilderOptions = {
+    aot?: boolean;
+    assets?: AssetPattern_2[];
+    browsers?: Browsers;
+    codeCoverage?: boolean;
+    codeCoverageExclude?: string[];
+    define?: {
+        [key: string]: string;
+    };
+    exclude?: string[];
+    externalDependencies?: string[];
+    fileReplacements?: FileReplacement_2[];
+    include?: string[];
+    inlineStyleLanguage?: InlineStyleLanguage_2;
+    karmaConfig?: string;
+    loader?: {
+        [key: string]: any;
+    };
+    main?: string;
+    poll?: number;
+    polyfills?: string[];
+    preserveSymlinks?: boolean;
+    progress?: boolean;
+    reporters?: string[];
+    scripts?: ScriptElement_2[];
+    sourceMap?: SourceMapUnion_2;
+    stylePreprocessorOptions?: StylePreprocessorOptions_2;
+    styles?: StyleElement_2[];
+    tsConfig: string;
+    watch?: boolean;
+    webWorkerTsConfig?: string;
+};
+
+// @public
 export type NgPackagrBuilderOptions = {
     poll?: number;
     project?: string;
     tsConfig?: string;
+    watch?: boolean;
+};
+
+// @public
+export type UnitTestBuilderOptions = {
+    browsers?: string[];
+    buildTarget: string;
+    codeCoverage?: boolean;
+    codeCoverageExclude?: string[];
+    codeCoverageReporters?: SchemaCodeCoverageReporter[];
+    debug?: boolean;
+    exclude?: string[];
+    include?: string[];
+    providersFile?: string;
+    reporters?: string[];
+    runner: Runner;
+    tsConfig: string;
     watch?: boolean;
 };
 

@@ -11,14 +11,14 @@ import path from 'node:path';
 import { normalizeCacheOptions } from '../../utils/normalize-cache';
 import { getProjectRootPaths } from '../../utils/project-metadata';
 import { isTTY } from '../../utils/tty';
-import type { Schema as UnitTestOptions } from './schema';
+import type { Schema as UnitTestBuilderOptions } from './schema';
 
-export type NormalizedUnitTestOptions = Awaited<ReturnType<typeof normalizeOptions>>;
+export type NormalizedUnitTestBuilderOptions = Awaited<ReturnType<typeof normalizeOptions>>;
 
 export async function normalizeOptions(
   context: BuilderContext,
   projectName: string,
-  options: UnitTestOptions,
+  options: UnitTestBuilderOptions,
 ) {
   // Setup base paths based on workspace root and project information
   const workspaceRoot = context.workspaceRoot;

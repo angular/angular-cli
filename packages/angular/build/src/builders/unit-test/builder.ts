@@ -24,10 +24,14 @@ import { OutputHashing } from '../application/schema';
 import { writeTestFiles } from '../karma/application_builder';
 import { findTests, getTestEntrypoints } from '../karma/find-tests';
 import { useKarmaBuilder } from './karma-bridge';
-import { NormalizedUnitTestOptions, injectTestingPolyfills, normalizeOptions } from './options';
-import type { Schema as UnitTestOptions } from './schema';
+import {
+  NormalizedUnitTestBuilderOptions,
+  injectTestingPolyfills,
+  normalizeOptions,
+} from './options';
+import type { Schema as UnitTestBuilderOptions } from './schema';
 
-export type { UnitTestOptions };
+export type { UnitTestBuilderOptions };
 
 type VitestCoverageOption = Exclude<import('vitest/node').InlineConfig['coverage'], undefined>;
 
@@ -36,7 +40,7 @@ type VitestCoverageOption = Exclude<import('vitest/node').InlineConfig['coverage
  */
 // eslint-disable-next-line max-lines-per-function
 export async function* execute(
-  options: UnitTestOptions,
+  options: UnitTestBuilderOptions,
   context: BuilderContext,
   extensions: ApplicationBuilderExtensions = {},
 ): AsyncIterable<BuilderOutput> {
@@ -383,7 +387,7 @@ function generateOutputPath(): string {
   return path.join('dist', 'test-out', `${datePrefix}-${uuidSuffix}`);
 }
 function generateCoverageOption(
-  codeCoverage: NormalizedUnitTestOptions['codeCoverage'],
+  codeCoverage: NormalizedUnitTestBuilderOptions['codeCoverage'],
   workspaceRoot: string,
   outputPath: string,
 ): VitestCoverageOption {

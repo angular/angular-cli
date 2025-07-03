@@ -7,10 +7,10 @@
  */
 
 import { type Builder, createBuilder } from '@angular-devkit/architect';
-import { type UnitTestOptions, execute } from './builder';
+import { type UnitTestBuilderOptions, execute } from './builder';
 
-export { type UnitTestOptions, execute };
+export { type UnitTestBuilderOptions, execute };
 
-const builder: Builder<UnitTestOptions> = createBuilder(execute);
+const builder: Builder<UnitTestBuilderOptions> = createBuilder(execute);
 
 export default builder;

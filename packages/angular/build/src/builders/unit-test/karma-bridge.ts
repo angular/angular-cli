@@ -9,11 +9,11 @@
 import type { BuilderContext, BuilderOutput } from '@angular-devkit/architect';
 import type { ApplicationBuilderInternalOptions } from '../application/options';
 import type { KarmaBuilderOptions } from '../karma';
-import { type NormalizedUnitTestOptions, injectTestingPolyfills } from './options';
+import { type NormalizedUnitTestBuilderOptions, injectTestingPolyfills } from './options';
 
 export async function useKarmaBuilder(
   context: BuilderContext,
-  unitTestOptions: NormalizedUnitTestOptions,
+  unitTestOptions: NormalizedUnitTestBuilderOptions,
 ): Promise<AsyncIterable<BuilderOutput>> {
   if (unitTestOptions.debug) {
     context.logger.warn(
