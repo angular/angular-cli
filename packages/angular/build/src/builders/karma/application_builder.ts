@@ -84,13 +84,22 @@ class AngularAssetsMiddleware {
       return;
     }
 
+    // Implementation of serverFile can be found here:
+    // https://github.com/karma-runner/karma/blob/84f85e7016efc2266fa6b3465f494a3fa151c85c/lib/middleware/common.js#L10
     switch (file.origin) {
       case 'disk':
         this.serveFile(file.inputPath, undefined, res, undefined, undefined, /* doNotCache */ true);
         break;
       case 'memory':
         // Include pathname to help with Content-Type headers.
-        this.serveFile(`/unused/${url.pathname}`, undefined, res, undefined, file.contents, true);
+        this.serveFile(
+          `/unused/${url.pathname}`,
+          undefined,
+          res,
+          undefined,
+          file.contents,
+          /* doNotCache */ false,
+        );
         break;
     }
   }
@@ -508,6 +517,7 @@ async function initializeApplication(
       scriptsFiles.push({
         pattern: `${outputPath}/${outputName}`,
         watched: false,
+        included: typeof scriptEntry === 'string' ? true : scriptEntry.inject !== false,
         type: 'js',
       });
     }

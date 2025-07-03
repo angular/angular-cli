@@ -107,9 +107,6 @@ function getBuiltInKarmaConfig(
       'karma-jasmine-html-reporter',
       'karma-coverage',
     ].map((p) => workspaceRootRequire(p)),
-    proxies: {
-      '/': '/base/',
-    },
     jasmineHtmlReporter: {
       suppressAll: true, // removes the duplicated traces
     },
