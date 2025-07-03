@@ -26,3 +26,9 @@ export {
   execute as executeNgPackagrBuilder,
   type NgPackagrBuilderOptions,
 } from './builders/ng-packagr';
+export {
+  execute as executeUnitTestBuilder,
+  type UnitTestBuilderOptions,
+} from './builders/unit-test';
+
+export { execute as executeKarmaBuilder, type KarmaBuilderOptions } from './builders/karma';
