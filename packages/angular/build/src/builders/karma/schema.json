@@ -229,7 +229,7 @@
     },
     "watch": {
       "type": "boolean",
-      "description": "Run build when files change.",
+      "description": "Re-run tests when source files change.",
       "default": true
     },
     "poll": {
