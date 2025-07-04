@@ -44,7 +44,7 @@
     },
     "watch": {
       "type": "boolean",
-      "description": "Run build when files change."
+      "description": "Re-run tests when source files change. Defaults to `true` in TTY environments and `false` otherwise."
     },
     "debug": {
       "type": "boolean",
