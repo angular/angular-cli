@@ -15,6 +15,7 @@ import {
 import type { ConfigOptions } from 'karma';
 import { createRequire } from 'node:module';
 import path from 'node:path';
+import { NormalizedKarmaBuilderOptions, normalizeOptions } from './options';
 import type { Schema as KarmaBuilderOptions } from './schema';
 
 export type KarmaConfigOptions = ConfigOptions & {
@@ -34,19 +35,17 @@ export async function* execute(
   } = {},
 ): AsyncIterable<BuilderOutput> {
   const { execute } = await import('./application_builder');
-  const karmaOptions = getBaseKarmaOptions(options, context);
+  const normalizedOptions = normalizeOptions(options);
+  const karmaOptions = getBaseKarmaOptions(normalizedOptions, context);
 
-  yield* execute(options, context, karmaOptions, transforms);
+  yield* execute(normalizedOptions, context, karmaOptions, transforms);
 }
 
 function getBaseKarmaOptions(
-  options: KarmaBuilderOptions,
+  options: NormalizedKarmaBuilderOptions,
   context: BuilderContext,
 ): KarmaConfigOptions {
-  let singleRun: boolean | undefined;
-  if (options.watch !== undefined) {
-    singleRun = !options.watch;
-  }
+  const singleRun = !options.watch;
 
   // Determine project name from builder context target
   const projectName = context.target?.project;
@@ -67,21 +66,12 @@ function getBaseKarmaOptions(
   karmaOptions.client.clearContext ??= singleRun ?? false; // `singleRun` defaults to `false` per Karma docs.
 
   // Convert browsers from a string to an array
-  if (typeof options.browsers === 'string' && options.browsers) {
-    karmaOptions.browsers = options.browsers.split(',').map((browser) => browser.trim());
-  } else if (options.browsers === false) {
-    karmaOptions.browsers = [];
+  if (options.browsers) {
+    karmaOptions.browsers = options.browsers;
   }
 
   if (options.reporters) {
-    // Split along commas to make it more natural, and remove empty strings.
-    const reporters = options.reporters
-      .reduce<string[]>((acc, curr) => acc.concat(curr.split(',')), [])
-      .filter((x) => !!x);
-
-    if (reporters.length > 0) {
-      karmaOptions.reporters = reporters;
-    }
+    karmaOptions.reporters = options.reporters;
   }
 
   return karmaOptions;
