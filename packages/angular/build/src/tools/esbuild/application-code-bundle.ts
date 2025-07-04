@@ -34,6 +34,7 @@ import { createSourcemapIgnorelistPlugin } from './sourcemap-ignorelist-plugin';
 import { SERVER_GENERATED_EXTERNALS, getFeatureSupport, isZonelessApp } from './utils';
 import { createVirtualModulePlugin } from './virtual-module-plugin';
 import { createWasmPlugin } from './wasm-plugin';
+import { createBazelSandboxPlugin } from './sandbox-plugin-bazel';
 
 export function createBrowserCodeBundleOptions(
   options: NormalizedApplicationBuildOptions,
@@ -603,6 +604,19 @@ function getEsBuildCommonOptions(options: NormalizedApplicationBuildOptions): Bu
     } else {
       // Safe to use the packages external option directly
       packages = 'external';
+    }
+  }
+
+  // Inject the Bazel sandbox plugin only when specifically enabled to be fully backward compatible.
+  // Most users will never need this and as such should not have it influence their builds.
+  if (
+    process.env.ENABLE_BAZEL_SANDBOX_PLUGIN === 'true' ||
+    process.env.ENABLE_BAZEL_SANDBOX_PLUGIN === '1'
+  ) {
+    const bindir = process.env.BAZEL_BINDIR;
+    const execroot = process.env.JS_BINARY__EXECROOT;
+    if (bindir && execroot) {
+      plugins.push(createBazelSandboxPlugin({ bindir, execroot }));
     }
   }
 
