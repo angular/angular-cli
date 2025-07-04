@@ -24,7 +24,7 @@ import { ApplicationBuilderInternalOptions } from '../application/options';
 import { Result, ResultFile, ResultKind } from '../application/results';
 import { OutputHashing } from '../application/schema';
 import { findTests, getTestEntrypoints } from './find-tests';
-import { Schema as KarmaBuilderOptions } from './schema';
+import { NormalizedKarmaBuilderOptions } from './options';
 
 const localResolve = createRequire(__filename).resolve;
 const isWindows = process.platform === 'win32';
@@ -275,7 +275,7 @@ function injectKarmaReporter(
 }
 
 export function execute(
-  options: KarmaBuilderOptions,
+  options: NormalizedKarmaBuilderOptions,
   context: BuilderContext,
   karmaOptions: ConfigOptions,
   transforms: {
@@ -359,14 +359,14 @@ function normalizePolyfills(polyfills: string | string[] | undefined): [string[]
 }
 
 async function collectEntrypoints(
-  options: KarmaBuilderOptions,
+  options: NormalizedKarmaBuilderOptions,
   context: BuilderContext,
   projectSourceRoot: string,
 ): Promise<Map<string, string>> {
   // Glob for files to test.
   const testFiles = await findTests(
-    options.include ?? [],
-    options.exclude ?? [],
+    options.include,
+    options.exclude,
     context.workspaceRoot,
     projectSourceRoot,
   );
@@ -376,7 +376,7 @@ async function collectEntrypoints(
 
 // eslint-disable-next-line max-lines-per-function
 async function initializeApplication(
-  options: KarmaBuilderOptions,
+  options: NormalizedKarmaBuilderOptions,
   context: BuilderContext,
   karmaOptions: ConfigOptions,
   transforms: {
@@ -435,7 +435,7 @@ async function initializeApplication(
     scripts: options.scripts,
     polyfills,
     webWorkerTsConfig: options.webWorkerTsConfig,
-    watch: options.watch ?? !karmaOptions.singleRun,
+    watch: options.watch,
     stylePreprocessorOptions: options.stylePreprocessorOptions,
     inlineStyleLanguage: options.inlineStyleLanguage,
     fileReplacements: options.fileReplacements,
