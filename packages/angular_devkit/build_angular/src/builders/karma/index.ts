@@ -45,20 +45,29 @@ export function execute(
 
   return from(getExecuteWithBuilder(options, context)).pipe(
     mergeMap(([useEsbuild, executeWithBuilder]) => {
-      const karmaOptions = getBaseKarmaOptions(options, context, useEsbuild);
+      if (useEsbuild) {
+        if (transforms.webpackConfiguration) {
+          context.logger.warn(
+            `This build is using the application builder but transforms.webpackConfiguration was provided. The transform will be ignored.`,
+          );
+        }
 
-      if (useEsbuild && transforms.webpackConfiguration) {
-        context.logger.warn(
-          `This build is using the application builder but transforms.webpackConfiguration was provided. The transform will be ignored.`,
-        );
+        if (options.fileReplacements) {
+          options.fileReplacements = normalizeFileReplacements(options.fileReplacements, './');
+        }
+
+        if (typeof options.polyfills === 'string') {
+          options.polyfills = [options.polyfills];
+        }
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        return executeWithBuilder(options as any, context, transforms);
+      } else {
+        const karmaOptions = getBaseKarmaOptions(options, context);
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        return executeWithBuilder(options as any, context, karmaOptions, transforms);
       }
-
-      if (useEsbuild && options.fileReplacements) {
-        options.fileReplacements = normalizeFileReplacements(options.fileReplacements, './');
-      }
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      return executeWithBuilder(options as any, context, karmaOptions, transforms);
     }),
   );
 }
@@ -66,7 +75,6 @@ export function execute(
 function getBaseKarmaOptions(
   options: KarmaBuilderOptions,
   context: BuilderContext,
-  useEsbuild: boolean,
 ): KarmaConfigOptions {
   let singleRun: boolean | undefined;
   if (options.watch !== undefined) {
@@ -81,7 +89,7 @@ function getBaseKarmaOptions(
 
   const karmaOptions: KarmaConfigOptions = options.karmaConfig
     ? {}
-    : getBuiltInKarmaConfig(context.workspaceRoot, projectName, useEsbuild);
+    : getBuiltInKarmaConfig(context.workspaceRoot, projectName);
 
   karmaOptions.singleRun = singleRun;
 
@@ -115,7 +123,6 @@ function getBaseKarmaOptions(
 function getBuiltInKarmaConfig(
   workspaceRoot: string,
   projectName: string,
-  useEsbuild: boolean,
 ): ConfigOptions & Record<string, unknown> {
   let coverageFolderName = projectName.charAt(0) === '@' ? projectName.slice(1) : projectName;
   if (/[A-Z]/.test(coverageFolderName)) {
@@ -127,13 +134,13 @@ function getBuiltInKarmaConfig(
   // Any changes to the config here need to be synced to: packages/schematics/angular/config/files/karma.conf.js.template
   return {
     basePath: '',
-    frameworks: ['jasmine', ...(useEsbuild ? [] : ['@angular-devkit/build-angular'])],
+    frameworks: ['jasmine', '@angular-devkit/build-angular'],
     plugins: [
       'karma-jasmine',
       'karma-chrome-launcher',
       'karma-jasmine-html-reporter',
       'karma-coverage',
-      ...(useEsbuild ? [] : ['@angular-devkit/build-angular/plugins/karma']),
+      '@angular-devkit/build-angular/plugins/karma',
     ].map((p) => workspaceRootRequire(p)),
     jasmineHtmlReporter: {
       suppressAll: true, // removes the duplicated traces
@@ -171,7 +178,7 @@ async function getExecuteWithBuilder(
   [
     boolean,
     (
-      | (typeof import('@angular/build/private'))['executeKarmaInternal']
+      | (typeof import('@angular/build'))['executeKarmaBuilder']
       | (typeof import('./browser_builder'))['execute']
     ),
   ]
@@ -179,8 +186,8 @@ async function getExecuteWithBuilder(
   const useEsbuild = await checkForEsbuild(options, context);
   let execute;
   if (useEsbuild) {
-    const { executeKarmaInternal } = await import('@angular/build/private');
-    execute = executeKarmaInternal;
+    const { executeKarmaBuilder } = await import('@angular/build');
+    execute = executeKarmaBuilder;
   } else {
     const browserBuilderModule = await import('./browser_builder');
     execute = browserBuilderModule.execute;

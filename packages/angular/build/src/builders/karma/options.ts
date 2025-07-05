@@ -6,12 +6,23 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
+import type { BuilderContext } from '@angular-devkit/architect';
+import { resolve } from 'node:path';
 import { Schema as KarmaBuilderOptions } from './schema';
 
-export type NormalizedKarmaBuilderOptions = Awaited<ReturnType<typeof normalizeOptions>>;
+export type NormalizedKarmaBuilderOptions = ReturnType<typeof normalizeOptions>;
 
-export function normalizeOptions(options: KarmaBuilderOptions) {
-  const { watch = true, include = [], exclude = [], reporters = [], browsers, ...rest } = options;
+export function normalizeOptions(context: BuilderContext, options: KarmaBuilderOptions) {
+  const {
+    sourceMap,
+    karmaConfig,
+    browsers,
+    watch = true,
+    include = [],
+    exclude = [],
+    reporters = [],
+    ...rest
+  } = options;
 
   let normalizedBrowsers: string[] | undefined;
   if (typeof options.browsers === 'string' && options.browsers) {
@@ -25,12 +36,23 @@ export function normalizeOptions(options: KarmaBuilderOptions) {
     .reduce<string[]>((acc, curr) => acc.concat(curr.split(',')), [])
     .filter((x) => !!x);
 
+  // Sourcemaps are always needed when code coverage is enabled.
+  const normalizedSourceMap = options.codeCoverage
+    ? {
+        scripts: true,
+        styles: true,
+        vendor: true,
+      }
+    : sourceMap;
+
   return {
+    ...rest,
+    sourceMap: normalizedSourceMap,
+    karmaConfig: karmaConfig ? resolve(context.workspaceRoot, karmaConfig) : undefined,
     reporters: normalizedReporters.length ? normalizedReporters : undefined,
     browsers: normalizedBrowsers,
     watch,
     include,
     exclude,
-    ...rest,
   };
 }
