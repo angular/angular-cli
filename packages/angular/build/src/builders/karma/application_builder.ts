@@ -12,7 +12,7 @@ import { randomUUID } from 'node:crypto';
 import * as fs from 'node:fs/promises';
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import { createRequire } from 'node:module';
-import * as path from 'node:path';
+import path from 'node:path';
 import { ReadableStreamController } from 'node:stream/web';
 import { globSync } from 'tinyglobby';
 import { BuildOutputFileType } from '../../tools/esbuild/bundler-context';
@@ -24,7 +24,9 @@ import { ApplicationBuilderInternalOptions } from '../application/options';
 import { Result, ResultFile, ResultKind } from '../application/results';
 import { OutputHashing } from '../application/schema';
 import { findTests, getTestEntrypoints } from './find-tests';
+import { NormalizedKarmaBuilderOptions, normalizeOptions } from './options';
 import { Schema as KarmaBuilderOptions } from './schema';
+import type { KarmaConfigOptions } from './index';
 
 const localResolve = createRequire(__filename).resolve;
 const isWindows = process.platform === 'win32';
@@ -277,19 +279,21 @@ function injectKarmaReporter(
 export function execute(
   options: KarmaBuilderOptions,
   context: BuilderContext,
-  karmaOptions: ConfigOptions,
   transforms: {
     // The karma options transform cannot be async without a refactor of the builder implementation
     karmaOptions?: (options: ConfigOptions) => ConfigOptions;
   } = {},
 ): AsyncIterable<BuilderOutput> {
+  const normalizedOptions = normalizeOptions(context, options);
+  const karmaOptions = getBaseKarmaOptions(normalizedOptions, context);
+
   let karmaServer: Server;
 
   return new ReadableStream({
     async start(controller) {
       let init;
       try {
-        init = await initializeApplication(options, context, karmaOptions, transforms);
+        init = await initializeApplication(normalizedOptions, context, karmaOptions, transforms);
       } catch (err) {
         if (err instanceof ApplicationBuildError) {
           controller.enqueue({ success: false, message: err.message });
@@ -336,13 +340,9 @@ async function getProjectSourceRoot(context: BuilderContext): Promise<string> {
   return projectSourceRoot;
 }
 
-function normalizePolyfills(polyfills: string | string[] | undefined): [string[], string[]] {
-  if (typeof polyfills === 'string') {
-    polyfills = [polyfills];
-  } else if (!polyfills) {
-    polyfills = [];
-  }
-
+function normalizePolyfills(
+  polyfills: string[] | undefined = [],
+): [polyfills: string[], jasmineCleanup: string[]] {
   const jasmineGlobalEntryPoint = localResolve('./polyfills/jasmine_global.js');
   const jasmineGlobalCleanupEntrypoint = localResolve('./polyfills/jasmine_global_cleanup.js');
   const sourcemapEntrypoint = localResolve('./polyfills/init_sourcemaps.js');
@@ -359,14 +359,14 @@ function normalizePolyfills(polyfills: string | string[] | undefined): [string[]
 }
 
 async function collectEntrypoints(
-  options: KarmaBuilderOptions,
+  options: NormalizedKarmaBuilderOptions,
   context: BuilderContext,
   projectSourceRoot: string,
 ): Promise<Map<string, string>> {
   // Glob for files to test.
   const testFiles = await findTests(
-    options.include ?? [],
-    options.exclude ?? [],
+    options.include,
+    options.exclude,
     context.workspaceRoot,
     projectSourceRoot,
   );
@@ -376,7 +376,7 @@ async function collectEntrypoints(
 
 // eslint-disable-next-line max-lines-per-function
 async function initializeApplication(
-  options: KarmaBuilderOptions,
+  options: NormalizedKarmaBuilderOptions,
   context: BuilderContext,
   karmaOptions: ConfigOptions,
   transforms: {
@@ -423,19 +423,13 @@ async function initializeApplication(
     index: false,
     outputHashing: OutputHashing.None,
     optimization: false,
-    sourceMap: options.codeCoverage
-      ? {
-          scripts: true,
-          styles: true,
-          vendor: true,
-        }
-      : options.sourceMap,
+    sourceMap: options.sourceMap,
     instrumentForCoverage,
     styles: options.styles,
     scripts: options.scripts,
     polyfills,
     webWorkerTsConfig: options.webWorkerTsConfig,
-    watch: options.watch ?? !karmaOptions.singleRun,
+    watch: options.watch,
     stylePreprocessorOptions: options.stylePreprocessorOptions,
     inlineStyleLanguage: options.inlineStyleLanguage,
     fileReplacements: options.fileReplacements,
@@ -551,7 +545,7 @@ async function initializeApplication(
   }
 
   const parsedKarmaConfig: Config & ConfigOptions = await karma.config.parseConfig(
-    options.karmaConfig && path.resolve(context.workspaceRoot, options.karmaConfig),
+    options.karmaConfig,
     transforms.karmaOptions ? transforms.karmaOptions(karmaOptions) : karmaOptions,
     { promiseConfig: true, throwErrors: true },
   );
@@ -717,4 +711,84 @@ function getInstrumentationExcludedPaths(root: string, excludedPaths: string[]):
   }
 
   return excluded;
+}
+function getBaseKarmaOptions(
+  options: NormalizedKarmaBuilderOptions,
+  context: BuilderContext,
+): KarmaConfigOptions {
+  const singleRun = !options.watch;
+
+  // Determine project name from builder context target
+  const projectName = context.target?.project;
+  if (!projectName) {
+    throw new Error(`The 'karma' builder requires a target to be specified.`);
+  }
+
+  const karmaOptions: KarmaConfigOptions = options.karmaConfig
+    ? {}
+    : getBuiltInKarmaConfig(context.workspaceRoot, projectName);
+
+  karmaOptions.singleRun = singleRun;
+
+  // Workaround https://github.com/angular/angular-cli/issues/28271, by clearing context by default
+  // for single run executions. Not clearing context for multi-run (watched) builds allows the
+  // Jasmine Spec Runner to be visible in the browser after test execution.
+  karmaOptions.client ??= {};
+  karmaOptions.client.clearContext ??= singleRun ?? false; // `singleRun` defaults to `false` per Karma docs.
+
+  // Convert browsers from a string to an array
+  if (options.browsers) {
+    karmaOptions.browsers = options.browsers;
+  }
+
+  if (options.reporters) {
+    karmaOptions.reporters = options.reporters;
+  }
+
+  return karmaOptions;
+}
+
+function getBuiltInKarmaConfig(
+  workspaceRoot: string,
+  projectName: string,
+): ConfigOptions & Record<string, unknown> {
+  let coverageFolderName = projectName.charAt(0) === '@' ? projectName.slice(1) : projectName;
+  coverageFolderName = coverageFolderName.toLowerCase();
+
+  const workspaceRootRequire = createRequire(workspaceRoot + '/');
+
+  // Any changes to the config here need to be synced to: packages/schematics/angular/config/files/karma.conf.js.template
+  return {
+    basePath: '',
+    frameworks: ['jasmine'],
+    plugins: [
+      'karma-jasmine',
+      'karma-chrome-launcher',
+      'karma-jasmine-html-reporter',
+      'karma-coverage',
+    ].map((p) => workspaceRootRequire(p)),
+    jasmineHtmlReporter: {
+      suppressAll: true, // removes the duplicated traces
+    },
+    coverageReporter: {
+      dir: path.join(workspaceRoot, 'coverage', coverageFolderName),
+      subdir: '.',
+      reporters: [{ type: 'html' }, { type: 'text-summary' }],
+    },
+    reporters: ['progress', 'kjhtml'],
+    browsers: ['Chrome'],
+    customLaunchers: {
+      // Chrome configured to run in a bazel sandbox.
+      // Disable the use of the gpu and `/dev/shm` because it causes Chrome to
+      // crash on some environments.
+      // See:
+      //   https://github.com/puppeteer/puppeteer/blob/v1.0.0/docs/troubleshooting.md#tips
+      //   https://stackoverflow.com/questions/50642308/webdriverexception-unknown-error-devtoolsactiveport-file-doesnt-exist-while-t
+      ChromeHeadlessNoSandbox: {
+        base: 'ChromeHeadless',
+        flags: ['--no-sandbox', '--headless', '--disable-gpu', '--disable-dev-shm-usage'],
+      },
+    },
+    restartOnFileChange: true,
+  };
 }
