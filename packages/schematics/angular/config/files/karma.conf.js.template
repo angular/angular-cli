@@ -4,6 +4,7 @@
 module.exports = function (config) {
   config.set({
     basePath: '',
+    rootUrl: '/',
     frameworks: ['jasmine'<% if (needDevkitPlugin) { %>, '@angular-devkit/build-angular'<% } %>],
     plugins: [
       require('karma-jasmine'),
