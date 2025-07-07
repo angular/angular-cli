@@ -12,7 +12,7 @@ import { ContentHasMutatedException } from '../exception/exception';
 import { FileEntry, UpdateRecorder } from './interface';
 
 export class IndexOutOfBoundException extends BaseException {
-  constructor(index: number, min: number, max = Infinity) {
+  constructor(index: number, min: number, max: number = Infinity) {
     super(`Index ${index} outside of range [${min}, ${max}].`);
   }
 }

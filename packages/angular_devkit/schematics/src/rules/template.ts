@@ -12,7 +12,7 @@ import { FileOperator, Rule } from '../engine/interface';
 import { FileEntry } from '../tree/interface';
 import { chain, composeFileOperators, forEach, when } from './base';
 
-export const TEMPLATE_FILENAME_RE = /\.template$/;
+export const TEMPLATE_FILENAME_RE: RegExp = /\.template$/;
 
 export class OptionIsNotDefinedException extends BaseException {
   constructor(name: string) {

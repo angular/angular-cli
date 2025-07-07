@@ -20,10 +20,10 @@ import { CreateFileAction } from '../tree/action';
 import { SimpleSinkBase } from './sink';
 
 export class HostSink extends SimpleSinkBase {
-  protected _filesToDelete = new Set<Path>();
-  protected _filesToRename = new Set<[Path, Path]>();
-  protected _filesToCreate = new Map<Path, Buffer>();
-  protected _filesToUpdate = new Map<Path, Buffer>();
+  protected _filesToDelete: Set<Path> = new Set();
+  protected _filesToRename: Set<[Path, Path]> = new Set();
+  protected _filesToCreate: Map<Path, Buffer<ArrayBufferLike>> = new Map();
+  protected _filesToUpdate: Map<Path, Buffer<ArrayBufferLike>> = new Map();
 
   constructor(
     protected _host: virtualFs.Host,

@@ -44,9 +44,9 @@ export type DryRunEvent =
   | DryRunRenameEvent;
 
 export class DryRunSink extends HostSink {
-  protected _subject = new Subject<DryRunEvent>();
-  protected _fileDoesNotExistExceptionSet = new Set<string>();
-  protected _fileAlreadyExistExceptionSet = new Set<string>();
+  protected _subject: Subject<DryRunEvent> = new Subject();
+  protected _fileDoesNotExistExceptionSet: Set<string> = new Set();
+  protected _fileAlreadyExistExceptionSet: Set<string> = new Set();
 
   readonly reporter: Observable<DryRunEvent> = this._subject.asObservable();
 
@@ -72,7 +72,7 @@ export class DryRunSink extends HostSink {
     this._fileDoesNotExistExceptionSet.add(path);
   }
 
-  override _done() {
+  override _done(): Observable<void> {
     this._fileAlreadyExistExceptionSet.forEach((path) => {
       this._subject.next({
         kind: 'error',
