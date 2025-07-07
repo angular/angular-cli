@@ -9,6 +9,7 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
+import { z } from 'zod';
 import type { AngularWorkspace } from '../../utilities/config';
 import { VERSION } from '../../utilities/version';
 
@@ -30,10 +31,10 @@ export async function createMcpServer(context: {
     {
       title: 'Angular Best Practices and Code Generation Guide',
       description:
-        "A comprehensive guide detailing Angular's best practices for code generation and development. " +
-        'This guide should be used as a reference by an LLM to ensure any generated code ' +
-        'adheres to modern Angular standards, including the use of standalone components, ' +
-        'typed forms, modern control flow syntax, and other current conventions.',
+        "A comprehensive guide detailing Angular's best practices for code generation and development." +
+        ' This guide should be used as a reference by an LLM to ensure any generated code' +
+        ' adheres to modern Angular standards, including the use of standalone components,' +
+        ' typed forms, modern control flow syntax, and other current conventions.',
       mimeType: 'text/markdown',
     },
     async () => {
@@ -56,6 +57,34 @@ export async function createMcpServer(context: {
       annotations: {
         readOnlyHint: true,
       },
+      outputSchema: {
+        projects: z.array(
+          z.object({
+            name: z
+              .string()
+              .describe('The name of the project, as defined in the `angular.json` file.'),
+            type: z
+              .enum(['application', 'library'])
+              .optional()
+              .describe(`The type of the project, either 'application' or 'library'.`),
+            root: z
+              .string()
+              .describe('The root directory of the project, relative to the workspace root.'),
+            sourceRoot: z
+              .string()
+              .describe(
+                `The root directory of the project's source files, relative to the workspace root.`,
+              ),
+            selectorPrefix: z
+              .string()
+              .optional()
+              .describe(
+                'The prefix to use for component selectors.' +
+                  ` For example, a prefix of 'app' would result in selectors like '<app-my-component>'.`,
+              ),
+          }),
+        ),
+      },
     },
     async () => {
       const { workspace } = context;
@@ -74,13 +103,28 @@ export async function createMcpServer(context: {
         };
       }
 
+      const projects = [];
+      // Convert to output format
+      for (const [name, project] of workspace.projects.entries()) {
+        projects.push({
+          name,
+          type: project.extensions['projectType'] as 'application' | 'library' | undefined,
+          root: project.root,
+          sourceRoot: project.sourceRoot ?? path.posix.join(project.root, 'src'),
+          selectorPrefix: project.extensions['prefix'] as string,
+        });
+      }
+
+      // The structuredContent field is newer and may not be supported by all hosts.
+      // A text representation of the content is also provided for compatibility.
       return {
         content: [
           {
             type: 'text' as const,
-            text: 'Projects in the Angular workspace: ' + [...workspace.projects.keys()].join(','),
+            text: `Projects in the Angular workspace:\n${JSON.stringify(projects)}`,
           },
         ],
+        structuredContent: { projects },
       };
     },
   );
