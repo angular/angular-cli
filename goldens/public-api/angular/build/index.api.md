@@ -228,6 +228,7 @@ export type UnitTestBuilderOptions = {
     providersFile?: string;
     reporters?: string[];
     runner: Runner;
+    setupFiles?: string[];
     tsConfig: string;
     watch?: boolean;
 };

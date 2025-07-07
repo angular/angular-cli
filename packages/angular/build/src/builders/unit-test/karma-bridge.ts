@@ -21,6 +21,12 @@ export async function useKarmaBuilder(
     );
   }
 
+  if (unitTestOptions.setupFiles.length) {
+    context.logger.warn(
+      'The "karma" test runner does not support the "setupFiles" option. The option will be ignored.',
+    );
+  }
+
   const buildTargetOptions = (await context.validateOptions(
     await context.getTargetOptions(unitTestOptions.buildTarget),
     await context.getBuilderNameForTarget(unitTestOptions.buildTarget),
