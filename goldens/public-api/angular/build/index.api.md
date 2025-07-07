@@ -153,9 +153,7 @@ export function executeDevServerBuilder(options: DevServerBuilderOptions, contex
 export function executeExtractI18nBuilder(options: ExtractI18nBuilderOptions, context: BuilderContext, extensions?: ApplicationBuilderExtensions): Promise<BuilderOutput>;
 
 // @public
-export function executeKarmaBuilder(options: KarmaBuilderOptions, context: BuilderContext, transforms?: {
-    karmaOptions?: (options: KarmaConfigOptions) => KarmaConfigOptions;
-}): AsyncIterable<BuilderOutput>;
+export function executeKarmaBuilder(options: KarmaBuilderOptions, context: BuilderContext, transforms?: KarmaBuilderTransformsOptions): AsyncIterable<BuilderOutput>;
 
 // @public
 export function executeNgPackagrBuilder(options: NgPackagrBuilderOptions, context: BuilderContext): AsyncIterableIterator<BuilderOutput>;
