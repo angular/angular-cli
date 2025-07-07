@@ -87,7 +87,7 @@ export class CollectionImpl<CollectionT extends object, SchematicT extends objec
   constructor(
     private _description: CollectionDescription<CollectionT>,
     private _engine: SchematicEngine<CollectionT, SchematicT>,
-    public readonly baseDescriptions?: Array<CollectionDescription<CollectionT>>,
+    public readonly baseDescriptions?: CollectionDescription<CollectionT>[] | undefined,
   ) {}
 
   get description(): CollectionDescription<CollectionT> {
@@ -180,7 +180,7 @@ export class SchematicEngine<CollectionT extends object, SchematicT extends obje
 
   constructor(
     private _host: EngineHost<CollectionT, SchematicT>,
-    protected _workflow?: Workflow,
+    protected _workflow?: Workflow | undefined,
   ) {}
 
   get workflow(): Workflow | null {

@@ -86,7 +86,7 @@ export function asSource(rule: Rule): Source {
   return (context) => callRule(rule, staticEmpty(), context);
 }
 
-export function branchAndMerge(rule: Rule, strategy = MergeStrategy.Default): Rule {
+export function branchAndMerge(rule: Rule, strategy: MergeStrategy = MergeStrategy.Default): Rule {
   return (tree, context) => {
     return callRule(rule, tree.branch(), context).pipe(
       map((branch) => tree.merge(branch, strategy || context.strategy)),

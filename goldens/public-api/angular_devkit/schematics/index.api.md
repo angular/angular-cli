@@ -170,9 +170,9 @@ export type CollectionDescription<CollectionMetadataT extends object> = Collecti
 
 // @public (undocumented)
 export class CollectionImpl<CollectionT extends object, SchematicT extends object> implements Collection<CollectionT, SchematicT> {
-    constructor(_description: CollectionDescription<CollectionT>, _engine: SchematicEngine<CollectionT, SchematicT>, baseDescriptions?: Array<CollectionDescription<CollectionT>> | undefined);
+    constructor(_description: CollectionDescription<CollectionT>, _engine: SchematicEngine<CollectionT, SchematicT>, baseDescriptions?: CollectionDescription<CollectionT>[] | undefined);
     // (undocumented)
-    readonly baseDescriptions?: Array<CollectionDescription<CollectionT>> | undefined;
+    readonly baseDescriptions?: CollectionDescription<CollectionT>[] | undefined;
     // (undocumented)
     createSchematic(name: string, allowPrivate?: boolean): Schematic<CollectionT, SchematicT>;
     // (undocumented)
