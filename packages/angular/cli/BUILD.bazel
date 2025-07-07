@@ -58,6 +58,7 @@ ts_project(
         ":node_modules/pacote",
         ":node_modules/resolve",
         ":node_modules/yargs",
+        ":node_modules/zod",
         "//:node_modules/@angular/core",
         "//:node_modules/@types/ini",
         "//:node_modules/@types/node",

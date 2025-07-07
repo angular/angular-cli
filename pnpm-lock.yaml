@@ -507,6 +507,9 @@ importers:
       yargs:
         specifier: 18.0.0
         version: 18.0.0
+      zod:
+        specifier: 3.25.75
+        version: 3.25.75
 
   packages/angular/pwa:
     dependencies:
@@ -8334,8 +8337,8 @@ packages:
     peerDependencies:
       zod: ^3.24.1
 
-  zod@3.25.67:
-    resolution: {integrity: sha512-idA2YXwpCdqUSKRCACDE6ItZD9TZzy3OZMtpfLoh6oPR47lipysRrJfjzMqFxQ3uJuUPyUeWe1r9vLH33xO/Qw==}
+  zod@3.25.75:
+    resolution: {integrity: sha512-OhpzAmVzabPOL6C3A3gpAifqr9MqihV/Msx3gor2b2kviCgcb+HM9SEOpMWwwNp9MRunWnhtAKUoo0AHhjyPPg==}
 
   zone.js@0.15.1:
     resolution: {integrity: sha512-XE96n56IQpJM7NAoXswY3XRLcWFW83xe0BiAOeMD7K5k5xecOeul3Qcpx6GqEeeHNkW5DWL5zOyTbEfB4eti8w==}
@@ -9433,8 +9436,8 @@ snapshots:
     dependencies:
       google-auth-library: 9.15.1(encoding@0.1.13)(supports-color@10.0.0)
       ws: 8.18.2
-      zod: 3.25.67
-      zod-to-json-schema: 3.24.5(zod@3.25.67)
+      zod: 3.25.75
+      zod-to-json-schema: 3.24.5(zod@3.25.75)
     optionalDependencies:
       '@modelcontextprotocol/sdk': 1.13.3
     transitivePeerDependencies:
@@ -9692,8 +9695,8 @@ snapshots:
       express-rate-limit: 7.5.0(express@5.1.0)
       pkce-challenge: 5.0.0
       raw-body: 3.0.0
-      zod: 3.25.67
-      zod-to-json-schema: 3.24.5(zod@3.25.67)
+      zod: 3.25.75
+      zod-to-json-schema: 3.24.5(zod@3.25.75)
     transitivePeerDependencies:
       - supports-color
 
@@ -11738,7 +11741,7 @@ snapshots:
     dependencies:
       devtools-protocol: 0.0.1452169
       mitt: 3.0.1
-      zod: 3.25.67
+      zod: 3.25.75
 
   cli-cursor@3.1.0:
     dependencies:
@@ -16880,10 +16883,10 @@ snapshots:
 
   yoctocolors-cjs@2.1.2: {}
 
-  zod-to-json-schema@3.24.5(zod@3.25.67):
+  zod-to-json-schema@3.24.5(zod@3.25.75):
     dependencies:
-      zod: 3.25.67
+      zod: 3.25.75
 
-  zod@3.25.67: {}
+  zod@3.25.75: {}
 
   zone.js@0.15.1: {}
