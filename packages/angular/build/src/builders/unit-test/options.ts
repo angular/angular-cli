@@ -62,6 +62,9 @@ export async function normalizeOptions(
     watch: options.watch ?? isTTY(),
     debug: options.debug ?? false,
     providersFile: options.providersFile && path.join(workspaceRoot, options.providersFile),
+    setupFiles: options.setupFiles
+      ? options.setupFiles.map((setupFile) => path.join(workspaceRoot, setupFile))
+      : [],
   };
 }
 
