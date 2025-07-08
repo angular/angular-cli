@@ -31,7 +31,7 @@
     "https-proxy-agent": "7.0.6",
     "istanbul-lib-instrument": "6.0.3",
     "jsonc-parser": "3.3.1",
-    "listr2": "8.3.3",
+    "listr2": "9.0.0",
     "magic-string": "0.30.17",
     "mrmime": "2.0.1",
     "parse5-html-rewriting-stream": "7.1.0",
