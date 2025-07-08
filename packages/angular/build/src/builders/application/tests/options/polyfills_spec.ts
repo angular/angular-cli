@@ -20,9 +20,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
     for (const [suitName, baseUrl] of testsVariants) {
       describe(suitName, () => {
         beforeEach(async () => {
-          beforeEach(async () => {
-            await harness.writeFile('src/main.ts', 'console.log("TEST");');
-          });
+          await harness.writeFile('src/main.ts', 'console.log("TEST");');
 
           await harness.modifyFile('tsconfig.json', (content) => {
             const tsconfig = JSON.parse(content);
