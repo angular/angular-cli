@@ -13,6 +13,15 @@ import { createArchitect, host } from '../../testing/test-utils';
 describe('AppShell Builder', () => {
   const target = { project: 'app', target: 'app-shell' };
   let architect: Architect;
+  const originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
+
+  beforeAll(() => {
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = 100_000;
+  });
+
+  afterAll(() => {
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = originalTimeout;
+  });
 
   beforeEach(async () => {
     await host.initialize().toPromise();

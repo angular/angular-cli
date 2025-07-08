@@ -19,13 +19,20 @@ import {
 } from '@angular-devkit/core';
 import { debounceTime, map, take, tap } from 'rxjs';
 
-// Default timeout for large specs is 2.5 minutes.
-jasmine.DEFAULT_TIMEOUT_INTERVAL = 150000;
-
 describe('NgPackagr Builder', () => {
   const workspaceRoot = join(normalize(__dirname), `../../../test/hello-world-lib/`);
   const host = new TestProjectHost(workspaceRoot);
   let architect: Architect;
+
+  const originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
+
+  beforeAll(() => {
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = 80_000;
+  });
+
+  afterAll(() => {
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = originalTimeout;
+  });
 
   beforeEach(async () => {
     await host.initialize().toPromise();
