@@ -243,8 +243,8 @@ importers:
         specifier: 1.4.0
         version: 1.4.0
       listr2:
-        specifier: 8.3.3
-        version: 8.3.3
+        specifier: 9.0.0
+        version: 9.0.0
       lodash:
         specifier: ^4.17.21
         version: 4.17.21
@@ -386,8 +386,8 @@ importers:
         specifier: 3.3.1
         version: 3.3.1
       listr2:
-        specifier: 8.3.3
-        version: 8.3.3
+        specifier: 9.0.0
+        version: 9.0.0
       magic-string:
         specifier: 0.30.17
         version: 0.30.17
@@ -470,7 +470,7 @@ importers:
         version: 7.6.0(@types/node@20.19.1)
       '@listr2/prompt-adapter-inquirer':
         specifier: 3.0.0
-        version: 3.0.0(@inquirer/prompts@7.6.0(@types/node@20.19.1))(@types/node@20.19.1)(listr2@8.3.3)
+        version: 3.0.0(@inquirer/prompts@7.6.0(@types/node@20.19.1))(@types/node@20.19.1)(listr2@9.0.0)
       '@modelcontextprotocol/sdk':
         specifier: 1.15.0
         version: 1.15.0
@@ -487,8 +487,8 @@ importers:
         specifier: 3.3.1
         version: 3.3.1
       listr2:
-        specifier: 8.3.3
-        version: 8.3.3
+        specifier: 9.0.0
+        version: 9.0.0
       npm-package-arg:
         specifier: 12.0.2
         version: 12.0.2
@@ -5805,9 +5805,9 @@ packages:
   lines-and-columns@1.2.4:
     resolution: {integrity: sha512-7ylylesZQ/PV29jhEDl3Ufjo6ZX7gCqJr5F7PKrqc93v7fzSymt1BpwEU8nAUXs8qzzvqhbjhK5QZg6Mt/HkBg==}
 
-  listr2@8.3.3:
-    resolution: {integrity: sha512-LWzX2KsqcB1wqQ4AHgYb4RsDXauQiqhjLk+6hjbaeHG4zpjjVAB6wC/gz6X0l+Du1cN3pUB5ZlrvTbhGSNnUQQ==}
-    engines: {node: '>=18.0.0'}
+  listr2@9.0.0:
+    resolution: {integrity: sha512-GfY05XaD+8IHEEgmjM+tUzgiDpHW7O+cKDL+RTemW7M9lMbCXVraf11Tro0vK9oRCvJVCkwecEpru9iv0PF8Tg==}
+    engines: {node: '>=20.0.0'}
 
   lmdb@3.4.1:
     resolution: {integrity: sha512-hoG9RIv42kdGJiieyElgWcKCTaw5S6Jqwyd1gLSVdsJ3+8MVm8e4yLronThiRJI9DazFAAs9xfB9nWeMQ2DWKA==}
@@ -9708,11 +9708,11 @@ snapshots:
 
   '@leichtgewicht/ip-codec@2.0.5': {}
 
-  '@listr2/prompt-adapter-inquirer@3.0.0(@inquirer/prompts@7.6.0(@types/node@20.19.1))(@types/node@20.19.1)(listr2@8.3.3)':
+  '@listr2/prompt-adapter-inquirer@3.0.0(@inquirer/prompts@7.6.0(@types/node@20.19.1))(@types/node@20.19.1)(listr2@9.0.0)':
     dependencies:
       '@inquirer/prompts': 7.6.0(@types/node@20.19.1)
       '@inquirer/type': 3.0.7(@types/node@20.19.1)
-      listr2: 8.3.3
+      listr2: 9.0.0
     transitivePeerDependencies:
       - '@types/node'
 
@@ -14107,7 +14107,7 @@ snapshots:
 
   lines-and-columns@1.2.4: {}
 
-  listr2@8.3.3:
+  listr2@9.0.0:
     dependencies:
       cli-truncate: 4.0.0
       colorette: 2.0.20

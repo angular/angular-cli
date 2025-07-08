@@ -122,7 +122,7 @@
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
     "karma-source-map-support": "1.4.0",
-    "listr2": "8.3.3",
+    "listr2": "9.0.0",
     "lodash": "^4.17.21",
     "npm": "^11.0.0",
     "magic-string": "0.30.17",
