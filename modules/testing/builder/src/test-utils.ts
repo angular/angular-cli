@@ -24,8 +24,8 @@ import {
 import path from 'node:path';
 import { firstValueFrom } from 'rxjs';
 
-// Default timeout for large specs is 2.5 minutes.
-jasmine.DEFAULT_TIMEOUT_INTERVAL = 150000;
+// Default timeout for large specs is 60s.
+jasmine.DEFAULT_TIMEOUT_INTERVAL = 60_000;
 
 export const workspaceRoot = join(normalize(__dirname), `../projects/hello-world-app/`);
 export const host = new TestProjectHost(workspaceRoot);

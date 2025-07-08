@@ -11,6 +11,16 @@ import { join, normalize, virtualFs } from '@angular-devkit/core';
 import { createArchitect, host } from '../../testing/test-utils';
 
 describe('Prerender Builder', () => {
+  const originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
+
+  beforeAll(() => {
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = 100_000;
+  });
+
+  afterAll(() => {
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = originalTimeout;
+  });
+
   const target = { project: 'app', target: 'prerender' };
   let architect: Architect;
 
