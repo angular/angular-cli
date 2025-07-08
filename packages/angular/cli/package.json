@@ -26,7 +26,7 @@
     "@angular-devkit/core": "workspace:0.0.0-PLACEHOLDER",
     "@angular-devkit/schematics": "workspace:0.0.0-PLACEHOLDER",
     "@inquirer/prompts": "7.6.0",
-    "@listr2/prompt-adapter-inquirer": "2.0.22",
+    "@listr2/prompt-adapter-inquirer": "3.0.0",
     "@modelcontextprotocol/sdk": "1.15.0",
     "@schematics/angular": "workspace:0.0.0-PLACEHOLDER",
     "@yarnpkg/lockfile": "1.1.0",
