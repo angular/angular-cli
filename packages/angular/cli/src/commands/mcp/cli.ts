@@ -43,7 +43,10 @@ export default class McpCommandModule extends CommandModule implements CommandMo
       return;
     }
 
-    const server = await createMcpServer({ workspace: this.context.workspace });
+    const server = await createMcpServer(
+      { workspace: this.context.workspace },
+      this.context.logger,
+    );
     const transport = new StdioServerTransport();
     await server.connect(transport);
   }
