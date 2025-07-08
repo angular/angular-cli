@@ -16,71 +16,73 @@ const testsVariants: [suitName: string, baseUrl: string | undefined][] = [
 ];
 
 describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
-  for (const [suitName, baseUrl] of testsVariants) {
-    describe(suitName, () => {
-      beforeEach(async () => {
-        await harness.modifyFile('tsconfig.json', (content) => {
-          const tsconfig = JSON.parse(content);
-          tsconfig.compilerOptions.baseUrl = baseUrl;
+  describe('Option: polyfills', () => {
+    for (const [suitName, baseUrl] of testsVariants) {
+      describe(suitName, () => {
+        beforeEach(async () => {
+          await harness.modifyFile('tsconfig.json', (content) => {
+            const tsconfig = JSON.parse(content);
+            tsconfig.compilerOptions.baseUrl = baseUrl;
 
-          return JSON.stringify(tsconfig);
-        });
-      });
-
-      it('uses a provided TypeScript file', async () => {
-        harness.useTarget('build', {
-          ...BASE_OPTIONS,
-          polyfills: ['src/polyfills.ts'],
+            return JSON.stringify(tsconfig);
+          });
         });
 
-        const { result } = await harness.executeOnce();
+        it('uses a provided TypeScript file', async () => {
+          harness.useTarget('build', {
+            ...BASE_OPTIONS,
+            polyfills: ['src/polyfills.ts'],
+          });
 
-        expect(result?.success).toBe(true);
+          const { result } = await harness.executeOnce();
 
-        harness.expectFile('dist/browser/polyfills.js').toExist();
-      });
+          expect(result?.success).toBe(true);
 
-      it('uses a provided JavaScript file', async () => {
-        await harness.writeFile('src/polyfills.js', `console.log('main');`);
-
-        harness.useTarget('build', {
-          ...BASE_OPTIONS,
-          polyfills: ['src/polyfills.js'],
+          harness.expectFile('dist/browser/polyfills.js').toExist();
         });
 
-        const { result } = await harness.executeOnce();
+        it('uses a provided JavaScript file', async () => {
+          await harness.writeFile('src/polyfills.js', `console.log('main');`);
 
-        expect(result?.success).toBe(true);
+          harness.useTarget('build', {
+            ...BASE_OPTIONS,
+            polyfills: ['src/polyfills.js'],
+          });
 
-        harness.expectFile('dist/browser/polyfills.js').content.toContain(`console.log("main")`);
-      });
+          const { result } = await harness.executeOnce();
 
-      it('fails and shows an error when file does not exist', async () => {
-        harness.useTarget('build', {
-          ...BASE_OPTIONS,
-          polyfills: ['src/missing.ts'],
+          expect(result?.success).toBe(true);
+
+          harness.expectFile('dist/browser/polyfills.js').content.toContain(`console.log("main")`);
         });
 
-        const { result, logs } = await harness.executeOnce({ outputLogsOnFailure: false });
+        it('fails and shows an error when file does not exist', async () => {
+          harness.useTarget('build', {
+            ...BASE_OPTIONS,
+            polyfills: ['src/missing.ts'],
+          });
 
-        expect(result?.success).toBe(false);
-        expect(logs).toContain(
-          jasmine.objectContaining({ message: jasmine.stringMatching('Could not resolve') }),
-        );
+          const { result, logs } = await harness.executeOnce({ outputLogsOnFailure: false });
 
-        harness.expectFile('dist/browser/polyfills.js').toNotExist();
-      });
+          expect(result?.success).toBe(false);
+          expect(logs).toContain(
+            jasmine.objectContaining({ message: jasmine.stringMatching('Could not resolve') }),
+          );
 
-      it('resolves module specifiers in array', async () => {
-        harness.useTarget('build', {
-          ...BASE_OPTIONS,
-          polyfills: ['zone.js', 'zone.js/testing'],
+          harness.expectFile('dist/browser/polyfills.js').toNotExist();
         });
 
-        const { result } = await harness.executeOnce();
-        expect(result?.success).toBeTrue();
-        harness.expectFile('dist/browser/polyfills.js').toExist();
+        it('resolves module specifiers in array', async () => {
+          harness.useTarget('build', {
+            ...BASE_OPTIONS,
+            polyfills: ['zone.js', 'zone.js/testing'],
+          });
+
+          const { result } = await harness.executeOnce();
+          expect(result?.success).toBeTrue();
+          harness.expectFile('dist/browser/polyfills.js').toExist();
+        });
       });
-    });
-  }
+    }
+  });
 });

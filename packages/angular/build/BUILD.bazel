@@ -291,15 +291,15 @@ ts_project(
 
 jasmine_test(
     name = "application_integration_tests",
-    size = "large",
+    size = "medium",
     data = [":application_integration_test_lib"],
     flaky = True,
-    shard_count = 20,
+    shard_count = 25,
 )
 
 jasmine_test(
     name = "dev-server_integration_tests",
-    size = "large",
+    size = "medium",
     data = [":dev-server_integration_test_lib"],
     flaky = True,
     shard_count = 10,
@@ -307,7 +307,7 @@ jasmine_test(
 
 jasmine_test(
     name = "karma_integration_tests",
-    size = "large",
+    size = "medium",
     data = [":karma_integration_test_lib"],
     env = {
         # TODO: Replace Puppeteer downloaded browsers with Bazel-managed browsers,
@@ -320,9 +320,9 @@ jasmine_test(
 
 jasmine_test(
     name = "unit-test_integration_tests",
-    size = "large",
+    size = "small",
     data = [":unit-test_integration_test_lib"],
-    shard_count = 10,
+    shard_count = 5,
 )
 
 genrule(

@@ -263,7 +263,7 @@ export class BuilderHarness<T> {
     }
 
     const logs: logging.LogEntry[] = [];
-    context.logger.subscribe((e) => logs.push(e));
+    const logger$ = context.logger.subscribe((e) => logs.push(e));
 
     return observableFrom(this.schemaRegistry.compile(this.builderInfo.optionSchema)).pipe(
       mergeMap((validator) => validator(targetOptions)),
@@ -302,6 +302,7 @@ export class BuilderHarness<T> {
       }),
       finalize(() => {
         this.watcherNotifier = undefined;
+        logger$.unsubscribe();
 
         for (const teardown of context.teardowns) {
           // eslint-disable-next-line @typescript-eslint/no-floating-promises
