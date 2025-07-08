@@ -10,28 +10,28 @@ import { buildApplication } from '../../index';
 import { APPLICATION_BUILDER_INFO, BASE_OPTIONS, describeBuilder } from '../setup';
 
 describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
-  beforeEach(async () => {
-    // Add a global stylesheet media file
-    await harness.writeFile('src/styles.css', `h1 { background: url('./spectrum.png')}`);
-    // Add a component stylesheet media file
-    await harness.writeFile('src/app/abc.svg', '');
-    await harness.writeFile('src/app/app.component.css', `h2 { background: url('./abc.svg')}`);
+  describe('Option: "outputPath"', () => {
+    beforeEach(async () => {
+      // Add a global stylesheet media file
+      await harness.writeFile('src/styles.css', `h1 { background: url('./spectrum.png')}`);
+      // Add a component stylesheet media file
+      await harness.writeFile('src/app/abc.svg', '');
+      await harness.writeFile('src/app/app.component.css', `h2 { background: url('./abc.svg')}`);
 
-    // Enable SSR
-    await harness.modifyFile('src/tsconfig.app.json', (content) => {
-      const tsConfig = JSON.parse(content);
-      tsConfig.files ??= [];
-      tsConfig.files.push('main.server.ts', 'server.ts');
+      // Enable SSR
+      await harness.modifyFile('src/tsconfig.app.json', (content) => {
+        const tsConfig = JSON.parse(content);
+        tsConfig.files ??= [];
+        tsConfig.files.push('main.server.ts', 'server.ts');
 
-      return JSON.stringify(tsConfig);
+        return JSON.stringify(tsConfig);
+      });
+
+      // Application server code is not needed in this test
+      await harness.writeFile('src/main.server.ts', `console.log('Hello!');`);
+      await harness.writeFile('src/server.ts', `console.log('Hello!');`);
     });
 
-    // Application server code is not needed in this test
-    await harness.writeFile('src/main.server.ts', `console.log('Hello!');`);
-    await harness.writeFile('src/server.ts', `console.log('Hello!');`);
-  });
-
-  describe('Option: "outputPath"', () => {
     describe(`when option value is is a string`, () => {
       beforeEach(() => {
         harness.useTarget('build', {
