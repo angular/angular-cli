@@ -32,8 +32,8 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       await harness.writeFile('src/server.ts', `console.log('Hello!');`);
     });
 
-    describe(`when option value is is a string`, () => {
-      beforeEach(() => {
+    describe('when option value is a string', () => {
+      it('should emit browser, media and server files in their respective directories', async () => {
         harness.useTarget('build', {
           ...BASE_OPTIONS,
           polyfills: [],
@@ -44,34 +44,20 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
             entry: 'src/server.ts',
           },
         });
-      });
 
-      it(`should emit browser bundles in 'browser' directory`, async () => {
         const { result } = await harness.executeOnce();
         expect(result?.success).toBeTrue();
 
         harness.expectFile('dist/browser/main.js').toExist();
-      });
-
-      it(`should emit media files in 'browser/media' directory`, async () => {
-        const { result } = await harness.executeOnce();
-        expect(result?.success).toBeTrue();
-
         harness.expectFile('dist/browser/media/spectrum.png').toExist();
         harness.expectFile('dist/browser/media/abc.svg').toExist();
-      });
-
-      it(`should emit server bundles in 'server' directory`, async () => {
-        const { result } = await harness.executeOnce();
-        expect(result?.success).toBeTrue();
-
         harness.expectFile('dist/server/server.mjs').toExist();
       });
     });
 
-    describe(`when option value is an object`, () => {
+    describe('when option value is an object', () => {
       describe(`'media' is set to 'resources'`, () => {
-        beforeEach(() => {
+        it('should emit browser, media and server files in their respective directories', async () => {
           harness.useTarget('build', {
             ...BASE_OPTIONS,
             polyfills: [],
@@ -85,33 +71,19 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
               entry: 'src/server.ts',
             },
           });
-        });
 
-        it(`should emit browser bundles in 'browser' directory`, async () => {
           const { result } = await harness.executeOnce();
           expect(result?.success).toBeTrue();
 
           harness.expectFile('dist/browser/main.js').toExist();
-        });
-
-        it(`should emit media files in 'browser/resource' directory`, async () => {
-          const { result } = await harness.executeOnce();
-          expect(result?.success).toBeTrue();
-
           harness.expectFile('dist/browser/resource/spectrum.png').toExist();
           harness.expectFile('dist/browser/resource/abc.svg').toExist();
-        });
-
-        it(`should emit server bundles in 'server' directory`, async () => {
-          const { result } = await harness.executeOnce();
-          expect(result?.success).toBeTrue();
-
           harness.expectFile('dist/server/server.mjs').toExist();
         });
       });
 
       describe(`'media' is set to ''`, () => {
-        beforeEach(() => {
+        it('should emit browser, media and server files in their respective directories', async () => {
           harness.useTarget('build', {
             ...BASE_OPTIONS,
             polyfills: [],
@@ -125,36 +97,20 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
               entry: 'src/server.ts',
             },
           });
-        });
 
-        it(`should emit browser bundles in 'browser' directory`, async () => {
           const { result } = await harness.executeOnce();
           expect(result?.success).toBeTrue();
 
           harness.expectFile('dist/browser/main.js').toExist();
-        });
-
-        it(`should emit media files in 'browser' directory`, async () => {
-          const { result } = await harness.executeOnce();
-          expect(result?.success).toBeTrue();
-
           harness.expectFile('dist/browser/spectrum.png').toExist();
           harness.expectFile('dist/browser/abc.svg').toExist();
-
-          // Component CSS should not be considered media
-          harness.expectFile('dist/browser/app.component.css').toNotExist();
-        });
-
-        it(`should emit server bundles in 'server' directory`, async () => {
-          const { result } = await harness.executeOnce();
-          expect(result?.success).toBeTrue();
-
           harness.expectFile('dist/server/server.mjs').toExist();
+          harness.expectFile('dist/browser/app.component.css').toNotExist();
         });
       });
 
       describe(`'server' is set to 'node-server'`, () => {
-        beforeEach(() => {
+        it('should emit browser, media and server files in their respective directories', async () => {
           harness.useTarget('build', {
             ...BASE_OPTIONS,
             polyfills: [],
@@ -168,33 +124,19 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
               entry: 'src/server.ts',
             },
           });
-        });
 
-        it(`should emit browser bundles in 'browser' directory`, async () => {
           const { result } = await harness.executeOnce();
           expect(result?.success).toBeTrue();
 
           harness.expectFile('dist/browser/main.js').toExist();
-        });
-
-        it(`should emit media files in 'browser/media' directory`, async () => {
-          const { result } = await harness.executeOnce();
-          expect(result?.success).toBeTrue();
-
           harness.expectFile('dist/browser/media/spectrum.png').toExist();
           harness.expectFile('dist/browser/media/abc.svg').toExist();
-        });
-
-        it(`should emit server bundles in 'node-server' directory`, async () => {
-          const { result } = await harness.executeOnce();
-          expect(result?.success).toBeTrue();
-
           harness.expectFile('dist/node-server/server.mjs').toExist();
         });
       });
 
       describe(`'browser' is set to 'public'`, () => {
-        beforeEach(() => {
+        it('should emit browser, media and server files in their respective directories', async () => {
           harness.useTarget('build', {
             ...BASE_OPTIONS,
             polyfills: [],
@@ -208,51 +150,19 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
               entry: 'src/server.ts',
             },
           });
-        });
 
-        it(`should emit browser bundles in 'public' directory`, async () => {
           const { result } = await harness.executeOnce();
           expect(result?.success).toBeTrue();
 
           harness.expectFile('dist/public/main.js').toExist();
-        });
-
-        it(`should emit media files in 'public/media' directory`, async () => {
-          const { result } = await harness.executeOnce();
-          expect(result?.success).toBeTrue();
-
           harness.expectFile('dist/public/media/spectrum.png').toExist();
           harness.expectFile('dist/public/media/abc.svg').toExist();
-        });
-
-        it(`should emit server bundles in 'server' directory`, async () => {
-          const { result } = await harness.executeOnce();
-          expect(result?.success).toBeTrue();
-
           harness.expectFile('dist/server/server.mjs').toExist();
         });
       });
 
       describe(`'browser' is set to ''`, () => {
-        it(`should emit browser bundles in '' directory`, async () => {
-          harness.useTarget('build', {
-            ...BASE_OPTIONS,
-            polyfills: [],
-            server: 'src/main.server.ts',
-            outputPath: {
-              base: 'dist',
-              browser: '',
-            },
-            ssr: false,
-          });
-
-          const { result } = await harness.executeOnce();
-          expect(result?.success).toBeTrue();
-
-          harness.expectFile('dist/main.js').toExist();
-        });
-
-        it(`should emit media files in 'media' directory`, async () => {
+        it('should emit browser and media files in the root output directory when ssr is disabled', async () => {
           harness.useTarget('build', {
             ...BASE_OPTIONS,
             polyfills: [],
@@ -268,11 +178,12 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
           const { result } = await harness.executeOnce();
           expect(result?.success).toBeTrue();
 
+          harness.expectFile('dist/main.js').toExist();
           harness.expectFile('dist/media/spectrum.png').toExist();
           harness.expectFile('dist/media/abc.svg').toExist();
         });
 
-        it(`should error when ssr is enabled`, async () => {
+        it('should error when ssr is enabled', async () => {
           harness.useTarget('build', {
             ...BASE_OPTIONS,
             polyfills: [],
@@ -298,8 +209,8 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
         });
       });
 
-      describe(`'server' is set ''`, () => {
-        beforeEach(() => {
+      describe(`'server' is set to ''`, () => {
+        it('should emit browser, media and server files in their respective directories', async () => {
           harness.useTarget('build', {
             ...BASE_OPTIONS,
             polyfills: [],
@@ -313,27 +224,13 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
               entry: 'src/server.ts',
             },
           });
-        });
 
-        it(`should emit browser bundles in 'browser' directory`, async () => {
           const { result } = await harness.executeOnce();
           expect(result?.success).toBeTrue();
 
           harness.expectFile('dist/browser/main.js').toExist();
-        });
-
-        it(`should emit media files in 'browser/media' directory`, async () => {
-          const { result } = await harness.executeOnce();
-          expect(result?.success).toBeTrue();
-
           harness.expectFile('dist/browser/media/spectrum.png').toExist();
           harness.expectFile('dist/browser/media/abc.svg').toExist();
-        });
-
-        it(`should emit server bundles in '' directory`, async () => {
-          const { result } = await harness.executeOnce();
-          expect(result?.success).toBeTrue();
-
           harness.expectFile('dist/server.mjs').toExist();
         });
       });
