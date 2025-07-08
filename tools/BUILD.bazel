@@ -30,3 +30,11 @@ js_binary(
     ],
     entry_point = "quicktype_runner.js",
 )
+
+js_binary(
+    name = "ng_example_db",
+    data = [
+        "example_db_generator.js",
+    ],
+    entry_point = "example_db_generator.js",
+)
