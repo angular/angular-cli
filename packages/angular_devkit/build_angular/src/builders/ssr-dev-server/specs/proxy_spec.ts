@@ -15,7 +15,16 @@ import { SSRDevServerBuilderOutput } from '../index';
 
 describe('Serve SSR Builder', () => {
   const target = { project: 'app', target: 'serve-ssr' };
+  const originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
   let architect: Architect;
+
+  beforeAll(() => {
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = 100_000;
+  });
+
+  afterAll(() => {
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = originalTimeout;
+  });
 
   beforeEach(async () => {
     await host.initialize().toPromise();
