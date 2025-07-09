@@ -134,7 +134,11 @@ export async function* execute(
     optimization: false,
     tsConfig: normalizedOptions.tsConfig,
     entryPoints,
-    externalDependencies: ['vitest', ...(buildTargetOptions.externalDependencies ?? [])],
+    externalDependencies: [
+      'vitest',
+      '@vitest/browser/context',
+      ...(buildTargetOptions.externalDependencies ?? []),
+    ],
   };
   extensions ??= {};
   extensions.codePlugins ??= [];
