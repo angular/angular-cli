@@ -1,3 +1,23 @@
+<a name="20.0.6"></a>
+
+# 20.0.6 (2025-07-09)
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                              |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------- |
+| [5542445d3](https://github.com/angular/angular-cli/commit/5542445d30685a2ebbf66d15848a5abc657863c8) | fix  | remove constructor from service template |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                             |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------- |
+| [0836ad28f](https://github.com/angular/angular-cli/commit/0836ad28f8e4702f8ba12beef615d60c01a7947c) | fix  | correctly remap Angular diagnostics                     |
+| [c475e546b](https://github.com/angular/angular-cli/commit/c475e546bfdfee0c098e5198325b52a53882d034) | fix  | exclude `@vitest/browser/context` from esbuild bundling |
+| [1a2da161e](https://github.com/angular/angular-cli/commit/1a2da161e73f4f1fe876329adf8ed89f9044b404) | fix  | failed to proxy error for assets                        |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="20.0.5"></a>
 
 # 20.0.5 (2025-07-01)
