@@ -124,6 +124,10 @@
         ]
       }
     },
+    "outputFile": {
+      "type": "string",
+      "description": "The file to output the test report to. If not specified, the test runner will output to the console."
+    },
     "providersFile": {
       "type": "string",
       "description": "TypeScript file that exports an array of Angular providers to use during test execution. The array must be a default export.",

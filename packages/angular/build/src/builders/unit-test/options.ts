@@ -65,6 +65,7 @@ export async function normalizeOptions(
     tsConfig,
     buildProgress: progress,
     reporters: normalizeReporterOption(options.reporters),
+    outputFile: options.outputFile,
     browsers,
     watch: options.watch ?? isTTY(),
     debug: options.debug ?? false,
