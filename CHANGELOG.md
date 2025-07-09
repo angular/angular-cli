@@ -1,18 +1,48 @@
-<a name="20.1.0-rc.0"></a>
+<a name="20.1.0"></a>
 
-# 20.1.0-rc.0 (2025-07-01)
+# 20.1.0 (2025-07-09)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                           |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------- |
+| [dc45c186e](https://github.com/angular/angular-cli/commit/dc45c186ec16e345b75ffcd57961a8e0cfd4b649) | feat | add initial MCP server implementation |
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                 |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------- |
+| [1c19e0dcd](https://github.com/angular/angular-cli/commit/1c19e0dcd4a87fbf542201e09a402a8fccdfcd88) | feat | use signal in app component |
 
 ### @angular-devkit/build-angular
 
-| Commit                                                                                              | Type | Description                                         |
-| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------- |
-| [f1d41b069](https://github.com/angular/angular-cli/commit/f1d41b069db6cd3ab83561113567b8e5f4bf25d8) | fix  | remove unused `@vitejs/plugin-basic-ssl` dependency |
+| Commit                                                                                              | Type | Description                                          |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------- |
+| [49a09737d](https://github.com/angular/angular-cli/commit/49a09737d5412c302d09b40de198251bb99789d1) | feat | provide partial custom postcss configuration support |
 
 ### @angular/build
 
-| Commit                                                                                              | Type | Description                             |
-| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------- |
-| [73f57f3c9](https://github.com/angular/angular-cli/commit/73f57f3c9e0d9434c0f8507508dfe30f6a402861) | fix  | proxy karma request from `/` to `/base` |
+| Commit                                                                                              | Type | Description                                                   |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------- |
+| [1159cf081](https://github.com/angular/angular-cli/commit/1159cf08103081d2b851e59bc1c5fb200f114982) | feat | add code coverage reporters option for unit-test              |
+| [8f305ef0b](https://github.com/angular/angular-cli/commit/8f305ef0ba91ec9bf6417b7084965205cf5488e7) | feat | add dataurl, base64 loaders                                   |
+| [adfeee0a4](https://github.com/angular/angular-cli/commit/adfeee0a4c95a03d430054eeecd4cca1bdb0efeb) | fix  | adjust coverage includes/excludes for unit-test vitest runner |
+| [c19cd2985](https://github.com/angular/angular-cli/commit/c19cd2985cbf1ea8c1c15f020bc530d6768cb0fa) | fix  | coverage reporter option                                      |
+| [8879716ca](https://github.com/angular/angular-cli/commit/8879716cac9b2134db2795b1810595ea56e9d421) | fix  | expose unit test and karma builder API                        |
+| [a415a4999](https://github.com/angular/angular-cli/commit/a415a4999f337f5bc3c0ee626aaba58b6c5ad4e1) | fix  | improve default coverage reporter handling for vitest         |
+| [e0de8680d](https://github.com/angular/angular-cli/commit/e0de8680d1ea25aa71024d7b89beaa1e75889c47) | fix  | inject zone.js/testing before karma builder execution         |
+| [2672f6ec1](https://github.com/angular/angular-cli/commit/2672f6ec17de6e05b19acda0e0b09a6715c9f83f) | fix  | json and json-summary as vitest coverage reporters            |
+| [b67fdfd6b](https://github.com/angular/angular-cli/commit/b67fdfd6bc422bd6a46db923470579c760c5ec27) | fix  | resolve "Controller is already closed" error in Karma         |
+| [2784883ec](https://github.com/angular/angular-cli/commit/2784883ecfb63e4aa6a6c69fd10e457316b4958c) | fix  | support extra test setup files with unit-test vitest runner   |
+| [f177f5508](https://github.com/angular/angular-cli/commit/f177f5508adb23f604d9abb5f4a33f3af5f32561) | fix  | support injecting global styles into vitest unit-tests        |
+| [130c65014](https://github.com/angular/angular-cli/commit/130c650146595f237bc3285302d0075ba0387546) | fix  | use an empty array as default value for vitest exclude        |
+| [917af12ae](https://github.com/angular/angular-cli/commit/917af12aeb82b1437e7b43a03ae80b58a09f0224) | fix  | use date/time based output path for vitest unit-test          |
+
+### @angular/ssr
+
+| Commit                                                                                              | Type | Description                                                                     |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------------- |
+| [21b5852f1](https://github.com/angular/angular-cli/commit/21b5852f120dd42ea4ae9fce043e04ec61da16dd) | fix  | ensure `loadChildren` runs in correct injection context during route extraction |
 
 <!-- CHANGELOG SPLIT MARKER -->
 
@@ -31,45 +61,6 @@
 | Commit                                                                                              | Type | Description                             |
 | --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------- |
 | [05cebdbcd](https://github.com/angular/angular-cli/commit/05cebdbcd1466bf5c95eb724a784aeb8c7ac083f) | fix  | proxy karma request from `/` to `/base` |
-
-<!-- CHANGELOG SPLIT MARKER -->
-
-<a name="20.1.0-next.3"></a>
-
-# 20.1.0-next.3 (2025-06-25)
-
-### @angular/cli
-
-| Commit                                                                                              | Type | Description                           |
-| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------- |
-| [dc45c186e](https://github.com/angular/angular-cli/commit/dc45c186ec16e345b75ffcd57961a8e0cfd4b649) | feat | add initial MCP server implementation |
-
-### @schematics/angular
-
-| Commit                                                                                              | Type | Description                 |
-| --------------------------------------------------------------------------------------------------- | ---- | --------------------------- |
-| [4221a33cc](https://github.com/angular/angular-cli/commit/4221a33cc7dee8a46464345f09005795f217ad02) | fix  | add missing prettier config |
-
-### @angular-devkit/build-angular
-
-| Commit                                                                                              | Type | Description                                          |
-| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------- |
-| [49a09737d](https://github.com/angular/angular-cli/commit/49a09737d5412c302d09b40de198251bb99789d1) | feat | provide partial custom postcss configuration support |
-
-### @angular/build
-
-| Commit                                                                                              | Type | Description                                                   |
-| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------- |
-| [adfeee0a4](https://github.com/angular/angular-cli/commit/adfeee0a4c95a03d430054eeecd4cca1bdb0efeb) | fix  | adjust coverage includes/excludes for unit-test vitest runner |
-| [e0de8680d](https://github.com/angular/angular-cli/commit/e0de8680d1ea25aa71024d7b89beaa1e75889c47) | fix  | inject zone.js/testing before karma builder execution         |
-
-### @angular/ssr
-
-| Commit                                                                                              | Type | Description                                                                     |
-| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------------- |
-| [861a61a3b](https://github.com/angular/angular-cli/commit/861a61a3b26a3e88105641084415f45a07cb56b5) | fix  | avoid preloading unnecessary dynamic bundles                                    |
-| [21b5852f1](https://github.com/angular/angular-cli/commit/21b5852f120dd42ea4ae9fce043e04ec61da16dd) | fix  | ensure `loadChildren` runs in correct injection context during route extraction |
-| [1c5bd2ef2](https://github.com/angular/angular-cli/commit/1c5bd2ef2fa95a789e14ab8c497b48e125ceb4f8) | fix  | ensure correct referer header handling in web request conversion                |
 
 <!-- CHANGELOG SPLIT MARKER -->
 
@@ -92,30 +83,6 @@
 
 <!-- CHANGELOG SPLIT MARKER -->
 
-<a name="20.1.0-next.2"></a>
-
-# 20.1.0-next.2 (2025-06-18)
-
-### @schematics/angular
-
-| Commit                                                                                              | Type | Description                                               |
-| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------- |
-| [c43711177](https://github.com/angular/angular-cli/commit/c43711177b13b15ae4fbc7a009ae137bdc3fea4d) | fix  | include `main.server.ts` in `tsconfig.files` when present |
-| [4be58ee8c](https://github.com/angular/angular-cli/commit/4be58ee8c9896107925507a60cc8dd830c93bb7e) | fix  | reset module `typeSeparator` when generating applications |
-
-### @angular/build
-
-| Commit                                                                                              | Type | Description                                            |
-| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------ |
-| [c19cd2985](https://github.com/angular/angular-cli/commit/c19cd2985cbf1ea8c1c15f020bc530d6768cb0fa) | fix  | coverage reporter option                               |
-| [049e6886f](https://github.com/angular/angular-cli/commit/049e6886f88267158d85ca72020fec728c3de0ac) | fix  | include custom bundle name scripts with karma          |
-| [1d76d0ee5](https://github.com/angular/angular-cli/commit/1d76d0ee59d54a889b564bdf85f183fd08ddc860) | fix  | increase worker idle timeout                           |
-| [2672f6ec1](https://github.com/angular/angular-cli/commit/2672f6ec17de6e05b19acda0e0b09a6715c9f83f) | fix  | json and json-summary as vitest coverage reporters     |
-| [60a16a82a](https://github.com/angular/angular-cli/commit/60a16a82a99718a527e2c6b588d1489fba5bd500) | fix  | set scripts option output as classic script for karma  |
-| [130c65014](https://github.com/angular/angular-cli/commit/130c650146595f237bc3285302d0075ba0387546) | fix  | use an empty array as default value for vitest exclude |
-
-<!-- CHANGELOG SPLIT MARKER -->
-
 <a name="20.0.3"></a>
 
 # 20.0.3 (2025-06-18)
@@ -134,28 +101,6 @@
 | [56f426e25](https://github.com/angular/angular-cli/commit/56f426e2548b86c00d4da19b9f7b5cf97dc79104) | fix  | include custom bundle name scripts with karma         |
 | [dfe3a8b73](https://github.com/angular/angular-cli/commit/dfe3a8b7342dd492e42ec48052612255ba76c09b) | fix  | increase worker idle timeout                          |
 | [e6d27bd5e](https://github.com/angular/angular-cli/commit/e6d27bd5e3fe64f597621e0d5c08060cea64a302) | fix  | set scripts option output as classic script for karma |
-
-<!-- CHANGELOG SPLIT MARKER -->
-
-<a name="20.1.0-next.1"></a>
-
-# 20.1.0-next.1 (2025-06-11)
-
-### @schematics/angular
-
-| Commit                                                                                              | Type | Description                                                           |
-| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------------------- |
-| [1c19e0dcd](https://github.com/angular/angular-cli/commit/1c19e0dcd4a87fbf542201e09a402a8fccdfcd88) | feat | use signal in app component                                           |
-| [42f45a39e](https://github.com/angular/angular-cli/commit/42f45a39e63ab3ee1ba8d1b9af8d2e397ca07159) | fix  | add `less` as a devDependency when selected as the style preprocessor |
-
-### @angular/build
-
-| Commit                                                                                              | Type | Description                                                |
-| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------- |
-| [e36cbba11](https://github.com/angular/angular-cli/commit/e36cbba11ecc0d95a0e7ff0e8184212ca824e87a) | fix  | do not consider internal Angular files as external imports |
-| [a415a4999](https://github.com/angular/angular-cli/commit/a415a4999f337f5bc3c0ee626aaba58b6c5ad4e1) | fix  | improve default coverage reporter handling for vitest      |
-| [f177f5508](https://github.com/angular/angular-cli/commit/f177f5508adb23f604d9abb5f4a33f3af5f32561) | fix  | support injecting global styles into vitest unit-tests     |
-| [917af12ae](https://github.com/angular/angular-cli/commit/917af12aeb82b1437e7b43a03ae80b58a09f0224) | fix  | use date/time based output path for vitest unit-test       |
 
 <!-- CHANGELOG SPLIT MARKER -->
 
@@ -199,25 +144,6 @@
 | Commit                                                                                            | Type | Description                                    |
 | ------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------- |
 | [f048078](https://github.com/angular/angular-cli/commit/f048078ab6012b5da4dff024c107f42f79693682) | fix  | update dependency webpack-dev-server to v5.2.2 |
-
-<!-- CHANGELOG SPLIT MARKER -->
-
-<a name="20.1.0-next.0"></a>
-
-# 20.1.0-next.0 (2025-06-05)
-
-### @schematics/angular
-
-| Commit                                                                                              | Type | Description                                              |
-| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------- |
-| [0b7d48c7c](https://github.com/angular/angular-cli/commit/0b7d48c7cafb49aa3cac7d9da831eff039b3e047) | fix  | correctly detect modules using new file extension format |
-
-### @angular/build
-
-| Commit                                                                                              | Type | Description                                      |
-| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------ |
-| [1159cf081](https://github.com/angular/angular-cli/commit/1159cf08103081d2b851e59bc1c5fb200f114982) | feat | add code coverage reporters option for unit-test |
-| [8f305ef0b](https://github.com/angular/angular-cli/commit/8f305ef0ba91ec9bf6417b7084965205cf5488e7) | feat | add dataurl, base64 loaders                      |
 
 <!-- CHANGELOG SPLIT MARKER -->
 
