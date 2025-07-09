@@ -12,6 +12,7 @@ import path from 'node:path';
 import { z } from 'zod';
 import type { AngularWorkspace } from '../../utilities/config';
 import { VERSION } from '../../utilities/version';
+import { registerDocSearchTool } from './tools/doc-search';
 
 export async function createMcpServer(context: {
   workspace?: AngularWorkspace;
@@ -128,6 +129,8 @@ export async function createMcpServer(context: {
       };
     },
   );
+
+  await registerDocSearchTool(server);
 
   return server;
 }

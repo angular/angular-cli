@@ -30,6 +30,7 @@
     "@modelcontextprotocol/sdk": "1.13.3",
     "@schematics/angular": "workspace:0.0.0-PLACEHOLDER",
     "@yarnpkg/lockfile": "1.1.0",
+    "algoliasearch": "5.32.0",
     "ini": "5.0.0",
     "jsonc-parser": "3.3.1",
     "listr2": "8.3.3",
