@@ -223,6 +223,7 @@ export type UnitTestBuilderOptions = {
     debug?: boolean;
     exclude?: string[];
     include?: string[];
+    outputFile?: string;
     progress?: boolean;
     providersFile?: string;
     reporters?: SchemaReporter[];
