@@ -6,11 +6,10 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { concatMap, count, take, timeout } from 'rxjs';
 import { executeDevServer } from '../../index';
 import { executeOnceAndFetch } from '../execute-fetch';
 import { describeServeBuilder } from '../jasmine-helpers';
-import { BASE_OPTIONS, BUILD_TIMEOUT, DEV_SERVER_BUILDER_INFO } from '../setup';
+import { BASE_OPTIONS, DEV_SERVER_BUILDER_INFO } from '../setup';
 
 const manifest = {
   index: '/index.html',
@@ -179,48 +178,40 @@ describeServeBuilder(
           watch: true,
         });
 
-        const buildCount = await harness
-          .execute()
-          .pipe(
-            timeout(BUILD_TIMEOUT),
-            concatMap(async ({ result }, index) => {
-              expect(result?.success).toBeTrue();
-              const response = await fetch(new URL('ngsw.json', `${result?.baseUrl}`));
-              const { hashTable } = (await response.json()) as { hashTable: object };
-              const hashTableEntries = Object.keys(hashTable);
+        await harness.executeWithCases([
+          async ({ result }) => {
+            expect(result?.success).toBeTrue();
+            const response = await fetch(new URL('ngsw.json', `${result?.baseUrl}`));
+            const { hashTable } = (await response.json()) as { hashTable: object };
+            const hashTableEntries = Object.keys(hashTable);
 
-              switch (index) {
-                case 0:
-                  expect(hashTableEntries).toEqual([
-                    '/assets/folder-asset.txt',
-                    '/favicon.ico',
-                    '/index.html',
-                    '/media/spectrum.png',
-                  ]);
+            expect(hashTableEntries).toEqual([
+              '/assets/folder-asset.txt',
+              '/favicon.ico',
+              '/index.html',
+              '/media/spectrum.png',
+            ]);
 
-                  await harness.writeFile(
-                    'src/assets/folder-new-asset.txt',
-                    harness.readFile('src/assets/folder-asset.txt'),
-                  );
-                  break;
+            await harness.writeFile(
+              'src/assets/folder-new-asset.txt',
+              harness.readFile('src/assets/folder-asset.txt'),
+            );
+          },
+          async ({ result }) => {
+            expect(result?.success).toBeTrue();
+            const response = await fetch(new URL('ngsw.json', `${result?.baseUrl}`));
+            const { hashTable } = (await response.json()) as { hashTable: object };
+            const hashTableEntries = Object.keys(hashTable);
 
-                case 1:
-                  expect(hashTableEntries).toEqual([
-                    '/assets/folder-asset.txt',
-                    '/assets/folder-new-asset.txt',
-                    '/favicon.ico',
-                    '/index.html',
-                    '/media/spectrum.png',
-                  ]);
-                  break;
-              }
-            }),
-            take(2),
-            count(),
-          )
-          .toPromise();
-
-        expect(buildCount).toBe(2);
+            expect(hashTableEntries).toEqual([
+              '/assets/folder-asset.txt',
+              '/assets/folder-new-asset.txt',
+              '/favicon.ico',
+              '/index.html',
+              '/media/spectrum.png',
+            ]);
+          },
+        ]);
       });
     });
   },

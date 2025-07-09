@@ -68,12 +68,6 @@ export const BASE_OPTIONS = Object.freeze<Schema>({
 });
 
 /**
- * Maximum time for single build/rebuild
- * This accounts for CI variability.
- */
-export const BUILD_TIMEOUT = 25_000;
-
-/**
  * Cached browser builder option schema
  */
 let browserSchema: json.schema.JsonSchema | undefined;

@@ -6,7 +6,6 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { concatMap, count, take, timeout } from 'rxjs';
 import { buildApplication } from '../../index';
 import { APPLICATION_BUILDER_INFO, BASE_OPTIONS, describeBuilder } from '../setup';
 
@@ -20,32 +19,23 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
           aot,
         });
 
-        const buildCount = await harness
-          .execute({ outputLogsOnFailure: false })
-          .pipe(
-            timeout(30_000),
-            concatMap(async ({ result }, index) => {
-              switch (index) {
-                case 0:
-                  expect(result?.success).toBeTrue();
-                  // Touch a file without doing any changes.
-                  await harness.modifyFile('src/app/app.component.ts', (content) => content);
-                  break;
-                case 1:
-                  expect(result?.success).toBeTrue();
-                  await harness.removeFile('src/app/app.component.ts');
-                  break;
-                case 2:
-                  expect(result?.success).toBeFalse();
-                  break;
-              }
-            }),
-            take(3),
-            count(),
-          )
-          .toPromise();
-
-        expect(buildCount).toBe(3);
+        await harness.executeWithCases(
+          [
+            async ({ result }) => {
+              expect(result?.success).toBeTrue();
+              // Touch a file without doing any changes.
+              await harness.modifyFile('src/app/app.component.ts', (content) => content);
+            },
+            async ({ result }) => {
+              expect(result?.success).toBeTrue();
+              await harness.removeFile('src/app/app.component.ts');
+            },
+            ({ result }) => {
+              expect(result?.success).toBeFalse();
+            },
+          ],
+          { outputLogsOnFailure: false },
+        );
       });
     }
   });

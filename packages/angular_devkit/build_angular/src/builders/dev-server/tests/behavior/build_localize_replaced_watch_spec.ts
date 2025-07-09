@@ -7,11 +7,10 @@
  */
 
 /* eslint-disable max-len */
-import { concatMap, count, take, timeout } from 'rxjs';
 import { URL } from 'node:url';
 import { executeDevServer } from '../../index';
 import { describeServeBuilder } from '../jasmine-helpers';
-import { BASE_OPTIONS, BUILD_TIMEOUT, DEV_SERVER_BUILDER_INFO } from '../setup';
+import { BASE_OPTIONS, DEV_SERVER_BUILDER_INFO } from '../setup';
 
 describeServeBuilder(
   executeDevServer,
@@ -53,31 +52,24 @@ describeServeBuilder(
         `,
           );
 
-          const buildCount = await harness
-            .execute()
-            .pipe(
-              timeout(BUILD_TIMEOUT * 2),
-              concatMap(async ({ result }, index) => {
-                expect(result?.success).toBe(true);
+          await harness.executeWithCases([
+            async ({ result }) => {
+              expect(result?.success).toBe(true);
 
-                const response = await fetch(new URL('main.js', `${result?.baseUrl}`));
-                expect(await response?.text()).not.toContain('$localize`:');
+              const response = await fetch(new URL('main.js', `${result?.baseUrl}`));
+              expect(await response?.text()).not.toContain('$localize`:');
 
-                switch (index) {
-                  case 0: {
-                    await harness.modifyFile('src/app/app.component.html', (content) =>
-                      content.replace('introduction', 'intro'),
-                    );
-                    break;
-                  }
-                }
-              }),
-              take(2),
-              count(),
-            )
-            .toPromise();
+              await harness.modifyFile('src/app/app.component.html', (content) =>
+                content.replace('introduction', 'intro'),
+              );
+            },
+            async ({ result }) => {
+              expect(result?.success).toBe(true);
 
-          expect(buildCount).toBe(2);
+              const response = await fetch(new URL('main.js', `${result?.baseUrl}`));
+              expect(await response?.text()).not.toContain('$localize`:');
+            },
+          ]);
         });
       },
     );

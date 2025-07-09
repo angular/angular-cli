@@ -6,8 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { concatMap, count, take, timeout } from 'rxjs';
-import { BUILD_TIMEOUT, buildWebpackBrowser } from '../../index';
+import { buildWebpackBrowser } from '../../index';
 import { BASE_OPTIONS, BROWSER_BUILDER_INFO, describeBuilder } from '../setup';
 
 describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
@@ -45,33 +44,19 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
 
       await harness.writeFile('src/locales/messages.fr.xlf', TRANSLATION_FILE_CONTENT);
 
-      const buildCount = await harness
-        .execute()
-        .pipe(
-          timeout(BUILD_TIMEOUT),
-          concatMap(async ({ result }, index) => {
-            expect(result?.success).toBe(true);
+      await harness.executeWithCases([
+        async ({ result }) => {
+          expect(result?.success).toBe(true);
+          harness.expectFile('dist/fr/main.js').content.toContain('Bonjour');
 
-            switch (index) {
-              case 0: {
-                harness.expectFile('dist/fr/main.js').content.toContain('Bonjour');
-
-                // Trigger rebuild
-                await harness.appendToFile('src/app/app.component.html', '\n\n');
-                break;
-              }
-              case 1: {
-                harness.expectFile('dist/fr/main.js').content.toContain('Bonjour');
-                break;
-              }
-            }
-          }),
-          take(2),
-          count(),
-        )
-        .toPromise();
-
-      expect(buildCount).toBe(2);
+          // Trigger rebuild
+          await harness.appendToFile('src/app/app.component.html', '\n\n');
+        },
+        ({ result }) => {
+          expect(result?.success).toBe(true);
+          harness.expectFile('dist/fr/main.js').content.toContain('Bonjour');
+        },
+      ]);
     });
   });
 });
