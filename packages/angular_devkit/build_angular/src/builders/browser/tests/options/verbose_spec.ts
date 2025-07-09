@@ -7,8 +7,7 @@
  */
 
 import { logging } from '@angular-devkit/core';
-import { concatMap, count, take, timeout } from 'rxjs';
-import { BUILD_TIMEOUT, buildWebpackBrowser } from '../../index';
+import { buildWebpackBrowser } from '../../index';
 import { BASE_OPTIONS, BROWSER_BUILDER_INFO, describeBuilder } from '../setup';
 
 // The below plugin is only enabled when verbose option is set to true.
@@ -73,34 +72,23 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
         watch: true,
       });
 
-      await harness
-        .execute()
-        .pipe(
-          timeout(BUILD_TIMEOUT),
-          concatMap(async ({ result, logs }, index) => {
-            expect(result?.success).toBeTrue();
-
-            switch (index) {
-              case 0:
-                // Amend file
-                await harness.appendToFile('/src/main.ts', ' ');
-                break;
-              case 1:
-                expect(logs).toContain(
-                  jasmine.objectContaining<logging.LogEntry>({
-                    message: jasmine.stringMatching(
-                      /angular\.watch-files-logs-plugin\n\s+Modified files:\n.+main\.ts/,
-                    ),
-                  }),
-                );
-
-                break;
-            }
-          }),
-          take(2),
-          count(),
-        )
-        .toPromise();
+      await harness.executeWithCases([
+        async ({ result }) => {
+          expect(result?.success).toBeTrue();
+          // Amend file
+          await harness.appendToFile('/src/main.ts', ' ');
+        },
+        ({ result, logs }) => {
+          expect(result?.success).toBeTrue();
+          expect(logs).toContain(
+            jasmine.objectContaining<logging.LogEntry>({
+              message: jasmine.stringMatching(
+                /angular\.watch-files-logs-plugin\n\s+Modified files:\n.+main\.ts/,
+              ),
+            }),
+          );
+        },
+      ]);
     });
 
     it('should not include error stacktraces when false', async () => {

@@ -6,7 +6,6 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { concatMap, count, take, timeout } from 'rxjs';
 import { buildApplication } from '../../index';
 import { APPLICATION_BUILDER_INFO, BASE_OPTIONS, describeBuilder } from '../setup';
 
@@ -29,43 +28,28 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
         watch: true,
       });
 
-      const buildCount = await harness
-        .execute({ outputLogsOnFailure: false })
-        .pipe(
-          timeout(30000),
-          concatMap(async ({ result }, index) => {
-            switch (index) {
-              case 0:
-                expect(result?.success).toBe(true);
-                harness.expectFile('dist/browser/index.html').content.toContain('charset="utf-8"');
+      await harness.executeWithCases([
+        async ({ result }) => {
+          expect(result?.success).toBe(true);
+          harness.expectFile('dist/browser/index.html').content.toContain('charset="utf-8"');
 
-                await harness.modifyFile('src/index.html', (content) =>
-                  content.replace('charset="utf-8"', 'abc'),
-                );
-                break;
-              case 1:
-                expect(result?.success).toBe(true);
-                harness
-                  .expectFile('dist/browser/index.html')
-                  .content.not.toContain('charset="utf-8"');
+          await harness.modifyFile('src/index.html', (content) =>
+            content.replace('charset="utf-8"', 'abc'),
+          );
+        },
+        async ({ result }) => {
+          expect(result?.success).toBe(true);
+          harness.expectFile('dist/browser/index.html').content.not.toContain('charset="utf-8"');
 
-                await harness.modifyFile('src/index.html', (content) =>
-                  content.replace('abc', 'charset="utf-8"'),
-                );
-                break;
-              case 2:
-                expect(result?.success).toBe(true);
-                harness.expectFile('dist/browser/index.html').content.toContain('charset="utf-8"');
-
-                break;
-            }
-          }),
-          take(3),
-          count(),
-        )
-        .toPromise();
-
-      expect(buildCount).toBe(3);
+          await harness.modifyFile('src/index.html', (content) =>
+            content.replace('abc', 'charset="utf-8"'),
+          );
+        },
+        ({ result }) => {
+          expect(result?.success).toBe(true);
+          harness.expectFile('dist/browser/index.html').content.toContain('charset="utf-8"');
+        },
+      ]);
     });
   });
 });

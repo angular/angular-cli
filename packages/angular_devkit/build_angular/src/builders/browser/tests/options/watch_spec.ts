@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { concatMap, count, take, timeout } from 'rxjs';
+import { timeout } from 'rxjs';
 import { buildWebpackBrowser } from '../../index';
 import { BASE_OPTIONS, BROWSER_BUILDER_INFO, describeBuilder } from '../setup';
 
@@ -77,33 +77,21 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
         watch: true,
       });
 
-      const buildCount = await harness
-        .execute()
-        .pipe(
-          timeout(30000),
-          concatMap(async ({ result }, index) => {
-            expect(result?.success).toBe(true);
+      await harness.executeWithCases([
+        async ({ result }) => {
+          expect(result?.success).toBe(true);
+          harness.expectFile('dist/main.js').content.not.toContain('abcd1234');
 
-            switch (index) {
-              case 0:
-                harness.expectFile('dist/main.js').content.not.toContain('abcd1234');
-
-                await harness.modifyFile(
-                  'src/main.ts',
-                  (content) => content + 'console.log("abcd1234");',
-                );
-                break;
-              case 1:
-                harness.expectFile('dist/main.js').content.toContain('abcd1234');
-                break;
-            }
-          }),
-          take(2),
-          count(),
-        )
-        .toPromise();
-
-      expect(buildCount).toBe(2);
+          await harness.modifyFile(
+            'src/main.ts',
+            (content) => content + 'console.log("abcd1234");',
+          );
+        },
+        ({ result }) => {
+          expect(result?.success).toBe(true);
+          harness.expectFile('dist/main.js').content.toContain('abcd1234');
+        },
+      ]);
     });
   });
 });

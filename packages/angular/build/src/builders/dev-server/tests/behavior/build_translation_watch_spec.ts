@@ -7,11 +7,10 @@
  */
 
 /* eslint-disable max-len */
-import { concatMap, count, take, timeout } from 'rxjs';
 import { URL } from 'node:url';
 import { executeDevServer } from '../../index';
 import { describeServeBuilder } from '../jasmine-helpers';
-import { BASE_OPTIONS, BUILD_TIMEOUT, DEV_SERVER_BUILDER_INFO } from '../setup';
+import { BASE_OPTIONS, DEV_SERVER_BUILDER_INFO } from '../setup';
 
 describeServeBuilder(
   executeDevServer,
@@ -30,7 +29,7 @@ describeServeBuilder(
           },
           i18n: {
             locales: {
-              'fr': 'src/locales/messages.fr.xlf',
+              fr: 'src/locales/messages.fr.xlf',
             },
           },
         });
@@ -53,38 +52,26 @@ describeServeBuilder(
 
         await harness.writeFile('src/locales/messages.fr.xlf', TRANSLATION_FILE_CONTENT);
 
-        const buildCount = await harness
-          .execute()
-          .pipe(
-            timeout(BUILD_TIMEOUT),
-            concatMap(async ({ result }, index) => {
-              expect(result?.success).toBe(true);
+        await harness.executeWithCases([
+          async ({ result }) => {
+            expect(result?.success).toBe(true);
 
-              const mainUrl = new URL('main.js', `${result?.baseUrl}`);
+            const mainUrl = new URL('main.js', `${result?.baseUrl}`);
+            const response = await fetch(mainUrl);
+            expect(await response?.text()).toContain('Bonjour');
 
-              switch (index) {
-                case 0: {
-                  const response = await fetch(mainUrl);
-                  expect(await response?.text()).toContain('Bonjour');
+            await harness.modifyFile('src/locales/messages.fr.xlf', (content) =>
+              content.replace('Bonjour', 'Salut'),
+            );
+          },
+          async ({ result }) => {
+            expect(result?.success).toBe(true);
 
-                  await harness.modifyFile('src/locales/messages.fr.xlf', (content) =>
-                    content.replace('Bonjour', 'Salut'),
-                  );
-                  break;
-                }
-                case 1: {
-                  const response = await fetch(mainUrl);
-                  expect(await response?.text()).toContain('Salut');
-                  break;
-                }
-              }
-            }),
-            take(2),
-            count(),
-          )
-          .toPromise();
-
-        expect(buildCount).toBe(2);
+            const mainUrl = new URL('main.js', `${result?.baseUrl}`);
+            const response = await fetch(mainUrl);
+            expect(await response?.text()).toContain('Salut');
+          },
+        ]);
       });
     });
   },

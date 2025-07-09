@@ -12,10 +12,9 @@ import { createServer } from 'node:http';
 import { createProxyServer } from 'http-proxy';
 import { AddressInfo } from 'node:net';
 import puppeteer, { Browser, Page } from 'puppeteer';
-import { count, debounceTime, finalize, switchMap, take, timeout } from 'rxjs';
 import { executeDevServer } from '../../index';
 import { describeServeBuilder } from '../jasmine-helpers';
-import { BASE_OPTIONS, BUILD_TIMEOUT, DEV_SERVER_BUILDER_INFO } from '../setup';
+import { BASE_OPTIONS, DEV_SERVER_BUILDER_INFO } from '../setup';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 declare const document: any;
@@ -190,38 +189,24 @@ describeServeBuilder(
 
           await harness.writeFile('src/app/app.component.html', '<p>{{ title }}</p>');
 
-          const buildCount = await harness
-            .execute()
-            .pipe(
-              debounceTime(1000),
-              timeout(BUILD_TIMEOUT * 2),
-              switchMap(async ({ result }, index) => {
-                expect(result?.success).toBeTrue();
-                if (typeof result?.baseUrl !== 'string') {
-                  throw new Error('Expected "baseUrl" to be a string.');
-                }
+          await harness.executeWithCases([
+            async ({ result }) => {
+              expect(result?.success).toBeTrue();
+              if (typeof result?.baseUrl !== 'string') {
+                throw new Error('Expected "baseUrl" to be a string.');
+              }
 
-                switch (index) {
-                  case 0:
-                    await goToPageAndWaitForWS(page, result.baseUrl);
-                    await harness.modifyFile('src/app/app.component.ts', (content) =>
-                      content.replace(`'app'`, `'app-live-reload'`),
-                    );
-                    break;
-                  case 1:
-                    const innerText = await page.evaluate(
-                      () => document.querySelector('p').innerText,
-                    );
-                    expect(innerText).toBe('app-live-reload');
-                    break;
-                }
-              }),
-              take(2),
-              count(),
-            )
-            .toPromise();
-
-          expect(buildCount).toBe(2);
+              await goToPageAndWaitForWS(page, result.baseUrl);
+              await harness.modifyFile('src/app/app.component.ts', (content) =>
+                content.replace(`'app'`, `'app-live-reload'`),
+              );
+            },
+            async ({ result }) => {
+              expect(result?.success).toBeTrue();
+              const innerText = await page.evaluate(() => document.querySelector('p').innerText);
+              expect(innerText).toBe('app-live-reload');
+            },
+          ]);
         });
 
         it('works without http -> http proxy', async () => {
@@ -232,42 +217,29 @@ describeServeBuilder(
           await harness.writeFile('src/app/app.component.html', '<p>{{ title }}</p>');
 
           let proxy: ProxyInstance | undefined;
-          const buildCount = await harness
-            .execute()
-            .pipe(
-              debounceTime(1000),
-              timeout(BUILD_TIMEOUT * 2),
-              switchMap(async ({ result }, index) => {
+          try {
+            await harness.executeWithCases([
+              async ({ result }) => {
                 expect(result?.success).toBeTrue();
                 if (typeof result?.baseUrl !== 'string') {
                   throw new Error('Expected "baseUrl" to be a string.');
                 }
 
-                switch (index) {
-                  case 0:
-                    proxy = await createProxy(result.baseUrl, false);
-                    await goToPageAndWaitForWS(page, proxy.url);
-                    await harness.modifyFile('src/app/app.component.ts', (content) =>
-                      content.replace(`'app'`, `'app-live-reload'`),
-                    );
-                    break;
-                  case 1:
-                    const innerText = await page.evaluate(
-                      () => document.querySelector('p').innerText,
-                    );
-                    expect(innerText).toBe('app-live-reload');
-                    break;
-                }
-              }),
-              take(2),
-              count(),
-              finalize(() => {
-                proxy?.server.close();
-              }),
-            )
-            .toPromise();
-
-          expect(buildCount).toBe(2);
+                proxy = await createProxy(result.baseUrl, false);
+                await goToPageAndWaitForWS(page, proxy.url);
+                await harness.modifyFile('src/app/app.component.ts', (content) =>
+                  content.replace(`'app'`, `'app-live-reload'`),
+                );
+              },
+              async ({ result }) => {
+                expect(result?.success).toBeTrue();
+                const innerText = await page.evaluate(() => document.querySelector('p').innerText);
+                expect(innerText).toBe('app-live-reload');
+              },
+            ]);
+          } finally {
+            proxy?.server.close();
+          }
         });
 
         it('works without https -> http proxy', async () => {
@@ -278,42 +250,29 @@ describeServeBuilder(
           await harness.writeFile('src/app/app.component.html', '<p>{{ title }}</p>');
 
           let proxy: ProxyInstance | undefined;
-          const buildCount = await harness
-            .execute()
-            .pipe(
-              debounceTime(1000),
-              timeout(BUILD_TIMEOUT * 2),
-              switchMap(async ({ result }, index) => {
+          try {
+            await harness.executeWithCases([
+              async ({ result }) => {
                 expect(result?.success).toBeTrue();
                 if (typeof result?.baseUrl !== 'string') {
                   throw new Error('Expected "baseUrl" to be a string.');
                 }
 
-                switch (index) {
-                  case 0:
-                    proxy = await createProxy(result.baseUrl, true);
-                    await goToPageAndWaitForWS(page, proxy.url);
-                    await harness.modifyFile('src/app/app.component.ts', (content) =>
-                      content.replace(`'app'`, `'app-live-reload'`),
-                    );
-                    break;
-                  case 1:
-                    const innerText = await page.evaluate(
-                      () => document.querySelector('p').innerText,
-                    );
-                    expect(innerText).toBe('app-live-reload');
-                    break;
-                }
-              }),
-              take(2),
-              count(),
-              finalize(() => {
-                proxy?.server.close();
-              }),
-            )
-            .toPromise();
-
-          expect(buildCount).toBe(2);
+                proxy = await createProxy(result.baseUrl, true);
+                await goToPageAndWaitForWS(page, proxy.url);
+                await harness.modifyFile('src/app/app.component.ts', (content) =>
+                  content.replace(`'app'`, `'app-live-reload'`),
+                );
+              },
+              async ({ result }) => {
+                expect(result?.success).toBeTrue();
+                const innerText = await page.evaluate(() => document.querySelector('p').innerText);
+                expect(innerText).toBe('app-live-reload');
+              },
+            ]);
+          } finally {
+            proxy?.server.close();
+          }
         });
       },
     );

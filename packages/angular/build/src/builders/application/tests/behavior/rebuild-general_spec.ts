@@ -6,7 +6,6 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { concatMap, count, take, timeout } from 'rxjs';
 import { buildApplication } from '../../index';
 import { APPLICATION_BUILDER_INFO, BASE_OPTIONS, describeBuilder } from '../setup';
 
@@ -45,68 +44,54 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       `,
       );
 
-      const buildCount = await harness
-        .execute({ outputLogsOnFailure: false })
-        .pipe(
-          timeout(BUILD_TIMEOUT),
-          concatMap(async ({ result, logs }, index) => {
-            switch (index) {
-              case 0:
-                expect(result?.success).toBeTrue();
-                harness.expectFile('dist/browser/main.js').content.toContain('FILE-A');
+      await harness.executeWithCases(
+        [
+          async ({ result }) => {
+            expect(result?.success).toBeTrue();
+            harness.expectFile('dist/browser/main.js').content.toContain('FILE-A');
 
-                // Delete the imported file
-                await harness.removeFile('src/app/file-a.ts');
+            // Delete the imported file
+            await harness.removeFile('src/app/file-a.ts');
+          },
+          async ({ result }) => {
+            // Should fail from missing import
+            expect(result?.success).toBeFalse();
 
-                break;
-              case 1:
-                // Should fail from missing import
-                expect(result?.success).toBeFalse();
+            // Remove the failing import
+            await harness.modifyFile('src/app/app.component.ts', (content) =>
+              content.replace(`import './file-a';`, ''),
+            );
+          },
+          async ({ result }) => {
+            expect(result?.success).toBeTrue();
 
-                // Remove the failing import
-                await harness.modifyFile('src/app/app.component.ts', (content) =>
-                  content.replace(`import './file-a';`, ''),
-                );
+            harness.expectFile('dist/browser/main.js').content.not.toContain('FILE-A');
 
-                break;
-              case 2:
-                expect(result?.success).toBeTrue();
+            // Recreate the file and the import
+            await harness.writeFile('src/app/file-a.ts', fileAContent);
+            await harness.modifyFile(
+              'src/app/app.component.ts',
+              (content) => `import './file-a';\n` + content,
+            );
+          },
+          async ({ result }) => {
+            expect(result?.success).toBeTrue();
 
-                harness.expectFile('dist/browser/main.js').content.not.toContain('FILE-A');
+            harness.expectFile('dist/browser/main.js').content.toContain('FILE-A');
 
-                // Recreate the file and the import
-                await harness.writeFile('src/app/file-a.ts', fileAContent);
-                await harness.modifyFile(
-                  'src/app/app.component.ts',
-                  (content) => `import './file-a';\n` + content,
-                );
+            // Change the imported file
+            await harness.modifyFile('src/app/file-a.ts', (content) =>
+              content.replace('FILE-A', 'FILE-B'),
+            );
+          },
+          ({ result }) => {
+            expect(result?.success).toBeTrue();
 
-                break;
-              case 3:
-                expect(result?.success).toBeTrue();
-
-                harness.expectFile('dist/browser/main.js').content.toContain('FILE-A');
-
-                // Change the imported file
-                await harness.modifyFile('src/app/file-a.ts', (content) =>
-                  content.replace('FILE-A', 'FILE-B'),
-                );
-
-                break;
-              case 4:
-                expect(result?.success).toBeTrue();
-
-                harness.expectFile('dist/browser/main.js').content.toContain('FILE-B');
-
-                break;
-            }
-          }),
-          take(5),
-          count(),
-        )
-        .toPromise();
-
-      expect(buildCount).toBe(5);
+            harness.expectFile('dist/browser/main.js').content.toContain('FILE-B');
+          },
+        ],
+        { outputLogsOnFailure: false },
+      );
     });
   });
 });

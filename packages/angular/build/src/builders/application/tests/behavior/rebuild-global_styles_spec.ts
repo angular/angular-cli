@@ -6,15 +6,8 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { concatMap, count, take, timeout } from 'rxjs';
 import { buildApplication } from '../../index';
 import { APPLICATION_BUILDER_INFO, BASE_OPTIONS, describeBuilder } from '../setup';
-
-/**
- * Maximum time in milliseconds for single build/rebuild
- * This accounts for CI variability.
- */
-export const BUILD_TIMEOUT = 30_000;
 
 describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
   describe('Behavior: "Rebuilds when global stylesheets change"', () => {
@@ -33,41 +26,31 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       await harness.writeFile('src/styles.scss', "@import './a';");
       await harness.writeFile('src/a.scss', '$primary: aqua;\\nh1 { color: $primary; }');
 
-      const buildCount = await harness
-        .execute({ outputLogsOnFailure: false })
-        .pipe(
-          timeout(30000),
-          concatMap(async ({ result }, index) => {
-            switch (index) {
-              case 0:
-                expect(result?.success).toBe(true);
-                harness.expectFile('dist/browser/styles.css').content.toContain('color: aqua');
-                harness.expectFile('dist/browser/styles.css').content.not.toContain('color: blue');
+      await harness.executeWithCases(
+        [
+          async ({ result }) => {
+            expect(result?.success).toBe(true);
+            harness.expectFile('dist/browser/styles.css').content.toContain('color: aqua');
+            harness.expectFile('dist/browser/styles.css').content.not.toContain('color: blue');
 
-                await harness.writeFile(
-                  'src/a.scss',
-                  'invalid-invalid-invalid\\nh1 { color: $primary; }',
-                );
-                break;
-              case 1:
-                expect(result?.success).toBe(false);
+            await harness.writeFile(
+              'src/a.scss',
+              'invalid-invalid-invalid\\nh1 { color: $primary; }',
+            );
+          },
+          async ({ result }) => {
+            expect(result?.success).toBe(false);
 
-                await harness.writeFile('src/a.scss', '$primary: blue;\\nh1 { color: $primary; }');
-                break;
-              case 2:
-                expect(result?.success).toBe(true);
-                harness.expectFile('dist/browser/styles.css').content.not.toContain('color: aqua');
-                harness.expectFile('dist/browser/styles.css').content.toContain('color: blue');
-
-                break;
-            }
-          }),
-          take(3),
-          count(),
-        )
-        .toPromise();
-
-      expect(buildCount).toBe(3);
+            await harness.writeFile('src/a.scss', '$primary: blue;\\nh1 { color: $primary; }');
+          },
+          ({ result }) => {
+            expect(result?.success).toBe(true);
+            harness.expectFile('dist/browser/styles.css').content.not.toContain('color: aqua');
+            harness.expectFile('dist/browser/styles.css').content.toContain('color: blue');
+          },
+        ],
+        { outputLogsOnFailure: false },
+      );
     });
 
     it('rebuilds Sass stylesheet after error on initial build from import', async () => {
@@ -80,37 +63,28 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       await harness.writeFile('src/styles.scss', "@import './a';");
       await harness.writeFile('src/a.scss', 'invalid-invalid-invalid\\nh1 { color: $primary; }');
 
-      const buildCount = await harness
-        .execute({ outputLogsOnFailure: false })
-        .pipe(
-          timeout(30000),
-          concatMap(async ({ result }, index) => {
-            switch (index) {
-              case 0:
-                expect(result?.success).toBe(false);
+      await harness.executeWithCases(
+        [
+          async ({ result }) => {
+            expect(result?.success).toBe(false);
 
-                await harness.writeFile('src/a.scss', '$primary: aqua;\\nh1 { color: $primary; }');
-                break;
-              case 1:
-                expect(result?.success).toBe(true);
-                harness.expectFile('dist/browser/styles.css').content.toContain('color: aqua');
-                harness.expectFile('dist/browser/styles.css').content.not.toContain('color: blue');
+            await harness.writeFile('src/a.scss', '$primary: aqua;\\nh1 { color: $primary; }');
+          },
+          async ({ result }) => {
+            expect(result?.success).toBe(true);
+            harness.expectFile('dist/browser/styles.css').content.toContain('color: aqua');
+            harness.expectFile('dist/browser/styles.css').content.not.toContain('color: blue');
 
-                await harness.writeFile('src/a.scss', '$primary: blue;\\nh1 { color: $primary; }');
-                break;
-              case 2:
-                expect(result?.success).toBe(true);
-                harness.expectFile('dist/browser/styles.css').content.not.toContain('color: aqua');
-                harness.expectFile('dist/browser/styles.css').content.toContain('color: blue');
-                break;
-            }
-          }),
-          take(3),
-          count(),
-        )
-        .toPromise();
-
-      expect(buildCount).toBe(3);
+            await harness.writeFile('src/a.scss', '$primary: blue;\\nh1 { color: $primary; }');
+          },
+          ({ result }) => {
+            expect(result?.success).toBe(true);
+            harness.expectFile('dist/browser/styles.css').content.not.toContain('color: aqua');
+            harness.expectFile('dist/browser/styles.css').content.toContain('color: blue');
+          },
+        ],
+        { outputLogsOnFailure: false },
+      );
     });
 
     it('rebuilds dependent Sass stylesheets after error on initial build from import', async () => {
@@ -127,45 +101,36 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       await harness.writeFile('src/other.scss', "@import './a'; h1 { color: green; }");
       await harness.writeFile('src/a.scss', 'invalid-invalid-invalid\\nh1 { color: $primary; }');
 
-      const buildCount = await harness
-        .execute({ outputLogsOnFailure: false })
-        .pipe(
-          timeout(30000),
-          concatMap(async ({ result }, index) => {
-            switch (index) {
-              case 0:
-                expect(result?.success).toBe(false);
+      await harness.executeWithCases(
+        [
+          async ({ result }) => {
+            expect(result?.success).toBe(false);
 
-                await harness.writeFile('src/a.scss', '$primary: aqua;\\nh1 { color: $primary; }');
-                break;
-              case 1:
-                expect(result?.success).toBe(true);
-                harness.expectFile('dist/browser/styles.css').content.toContain('color: aqua');
-                harness.expectFile('dist/browser/styles.css').content.not.toContain('color: blue');
+            await harness.writeFile('src/a.scss', '$primary: aqua;\\nh1 { color: $primary; }');
+          },
+          async ({ result }) => {
+            expect(result?.success).toBe(true);
+            harness.expectFile('dist/browser/styles.css').content.toContain('color: aqua');
+            harness.expectFile('dist/browser/styles.css').content.not.toContain('color: blue');
 
-                harness.expectFile('dist/browser/other.css').content.toContain('color: green');
-                harness.expectFile('dist/browser/other.css').content.toContain('color: aqua');
-                harness.expectFile('dist/browser/other.css').content.not.toContain('color: blue');
+            harness.expectFile('dist/browser/other.css').content.toContain('color: green');
+            harness.expectFile('dist/browser/other.css').content.toContain('color: aqua');
+            harness.expectFile('dist/browser/other.css').content.not.toContain('color: blue');
 
-                await harness.writeFile('src/a.scss', '$primary: blue;\\nh1 { color: $primary; }');
-                break;
-              case 2:
-                expect(result?.success).toBe(true);
-                harness.expectFile('dist/browser/styles.css').content.not.toContain('color: aqua');
-                harness.expectFile('dist/browser/styles.css').content.toContain('color: blue');
+            await harness.writeFile('src/a.scss', '$primary: blue;\\nh1 { color: $primary; }');
+          },
+          ({ result }) => {
+            expect(result?.success).toBe(true);
+            harness.expectFile('dist/browser/styles.css').content.not.toContain('color: aqua');
+            harness.expectFile('dist/browser/styles.css').content.toContain('color: blue');
 
-                harness.expectFile('dist/browser/other.css').content.toContain('color: green');
-                harness.expectFile('dist/browser/other.css').content.not.toContain('color: aqua');
-                harness.expectFile('dist/browser/other.css').content.toContain('color: blue');
-                break;
-            }
-          }),
-          take(3),
-          count(),
-        )
-        .toPromise();
-
-      expect(buildCount).toBe(3);
+            harness.expectFile('dist/browser/other.css').content.toContain('color: green');
+            harness.expectFile('dist/browser/other.css').content.not.toContain('color: aqua');
+            harness.expectFile('dist/browser/other.css').content.toContain('color: blue');
+          },
+        ],
+        { outputLogsOnFailure: false },
+      );
     });
   });
 });

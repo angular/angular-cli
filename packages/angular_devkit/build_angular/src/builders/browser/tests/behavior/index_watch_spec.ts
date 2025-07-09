@@ -6,8 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { concatMap, count, take, timeout } from 'rxjs';
-import { BUILD_TIMEOUT, buildWebpackBrowser } from '../../index';
+import { buildWebpackBrowser } from '../../index';
 import { BASE_OPTIONS, BROWSER_BUILDER_INFO, describeBuilder } from '../setup';
 
 describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
@@ -18,36 +17,24 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
         watch: true,
       });
 
-      const buildCount = await harness
-        .execute()
-        .pipe(
-          timeout(BUILD_TIMEOUT),
-          concatMap(async ({ result }, index) => {
-            expect(result?.success).toBe(true);
+      await harness.executeWithCases([
+        async ({ result }) => {
+          expect(result?.success).toBe(true);
 
-            switch (index) {
-              case 0: {
-                harness.expectFile('dist/index.html').content.toContain('HelloWorldApp');
-                harness.expectFile('dist/index.html').content.not.toContain('UpdatedPageTitle');
+          harness.expectFile('dist/index.html').content.toContain('HelloWorldApp');
+          harness.expectFile('dist/index.html').content.not.toContain('UpdatedPageTitle');
 
-                // Trigger rebuild
-                await harness.modifyFile('src/index.html', (s) =>
-                  s.replace('HelloWorldApp', 'UpdatedPageTitle'),
-                );
-                break;
-              }
-              case 1: {
-                harness.expectFile('dist/index.html').content.toContain('UpdatedPageTitle');
-                break;
-              }
-            }
-          }),
-          take(2),
-          count(),
-        )
-        .toPromise();
+          // Trigger rebuild
+          await harness.modifyFile('src/index.html', (s) =>
+            s.replace('HelloWorldApp', 'UpdatedPageTitle'),
+          );
+        },
+        ({ result }) => {
+          expect(result?.success).toBe(true);
 
-      expect(buildCount).toBe(2);
+          harness.expectFile('dist/index.html').content.toContain('UpdatedPageTitle');
+        },
+      ]);
     });
   });
 });
