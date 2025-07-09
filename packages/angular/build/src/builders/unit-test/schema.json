@@ -19,7 +19,7 @@
       "enum": ["karma", "vitest"]
     },
     "browsers": {
-      "description": "A list of browsers to use for test execution. If undefined, jsdom on Node.js will be used instead of a browser.",
+      "description": "A list of browsers to use for test execution. If undefined, jsdom on Node.js will be used instead of a browser. For Vitest and Karma, browser names ending with 'Headless' (e.g., 'ChromeHeadless') will enable headless mode for that browser.",
       "type": "array",
       "items": {
         "type": "string"
