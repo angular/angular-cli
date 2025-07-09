@@ -7,7 +7,6 @@
  */
 
 import type { logging } from '@angular-devkit/core';
-import { concatMap, count, firstValueFrom, take, timeout } from 'rxjs';
 import { buildApplication } from '../../index';
 import { OutputHashing } from '../../schema';
 import { APPLICATION_BUILDER_INFO, BASE_OPTIONS, describeBuilder } from '../setup';
@@ -42,51 +41,39 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
         ssr: true,
       });
 
-      const buildCount = await firstValueFrom(
-        harness.execute({ outputLogsOnFailure: false }).pipe(
-          timeout(30_000),
-          concatMap(async ({ result, logs }, index) => {
-            switch (index) {
-              case 0:
-                expect(result?.success).toBeTrue();
+      await harness.executeWithCases(
+        [
+          async ({ result }) => {
+            expect(result?.success).toBeTrue();
 
-                // Add valid code
-                await harness.appendToFile('src/lazy.ts', `console.log('foo');`);
+            // Add valid code
+            await harness.appendToFile('src/lazy.ts', `console.log('foo');`);
+          },
+          async ({ result }) => {
+            expect(result?.success).toBeTrue();
 
-                break;
-              case 1:
-                expect(result?.success).toBeTrue();
+            // Update type of 'foo' to invalid (number -> string)
+            await harness.writeFile('src/lazy.ts', `export const foo: string = 1;`);
+          },
+          async ({ result, logs }) => {
+            expect(result?.success).toBeFalse();
+            expect(logs).toContain(
+              jasmine.objectContaining<logging.LogEntry>({
+                message: jasmine.stringMatching(
+                  `Type 'number' is not assignable to type 'string'.`,
+                ),
+              }),
+            );
 
-                // Update type of 'foo' to invalid (number -> string)
-                await harness.writeFile('src/lazy.ts', `export const foo: string = 1;`);
-
-                break;
-              case 2:
-                expect(result?.success).toBeFalse();
-                expect(logs).toContain(
-                  jasmine.objectContaining<logging.LogEntry>({
-                    message: jasmine.stringMatching(
-                      `Type 'number' is not assignable to type 'string'.`,
-                    ),
-                  }),
-                );
-
-                // Fix TS error
-                await harness.writeFile('src/lazy.ts', `export const foo: string = "1";`);
-
-                break;
-              case 3:
-                expect(result?.success).toBeTrue();
-
-                break;
-            }
-          }),
-          take(4),
-          count(),
-        ),
+            // Fix TS error
+            await harness.writeFile('src/lazy.ts', `export const foo: string = "1";`);
+          },
+          ({ result }) => {
+            expect(result?.success).toBeTrue();
+          },
+        ],
+        { outputLogsOnFailure: false },
       );
-
-      expect(buildCount).toBe(4);
     });
   });
 });

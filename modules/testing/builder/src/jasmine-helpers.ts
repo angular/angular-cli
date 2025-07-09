@@ -9,15 +9,19 @@
 import { BuilderHandlerFn } from '@angular-devkit/architect';
 import { json } from '@angular-devkit/core';
 import { readFileSync } from 'node:fs';
-import { concatMap, count, firstValueFrom, take, timeout } from 'rxjs';
-import { BuilderHarness, BuilderHarnessExecutionResult } from './builder-harness';
+import { concatMap, count, debounceTime, firstValueFrom, take, timeout } from 'rxjs';
+import {
+  BuilderHarness,
+  BuilderHarnessExecutionOptions,
+  BuilderHarnessExecutionResult,
+} from './builder-harness';
 import { host } from './test-utils';
 
 /**
  * Maximum time for single build/rebuild
  * This accounts for CI variability.
  */
-export const BUILD_TIMEOUT = 25_000;
+export const BUILD_TIMEOUT = 30_000;
 
 const optionSchemaCache = new Map<string, json.schema.JsonSchema>();
 
@@ -62,10 +66,12 @@ export class JasmineBuilderHarness<T> extends BuilderHarness<T> {
       executionResult: BuilderHarnessExecutionResult,
       index: number,
     ) => void | Promise<void>)[],
+    options?: Partial<BuilderHarnessExecutionOptions> & { timeout?: number },
   ): Promise<void> {
     const executionCount = await firstValueFrom(
-      this.execute().pipe(
-        timeout(BUILD_TIMEOUT),
+      this.execute(options).pipe(
+        timeout(options?.timeout ?? BUILD_TIMEOUT),
+        debounceTime(100), // This is needed as sometimes 2 events for the same change fire with webpack.
         concatMap(async (result, index) => await cases[index](result, index)),
         take(cases.length),
         count(),
@@ -118,13 +124,17 @@ export function expectFile<T>(path: string, harness: BuilderHarness<T>): Harness
   return {
     toExist() {
       const exists = harness.hasFile(path);
-      expect(exists).toBe(true, 'Expected file to exist: ' + path);
+      expect(exists)
+        .withContext('Expected file to exist: ' + path)
+        .toBeTrue();
 
       return exists;
     },
     toNotExist() {
       const exists = harness.hasFile(path);
-      expect(exists).toBe(false, 'Expected file to not exist: ' + path);
+      expect(exists)
+        .withContext('Expected file to exist: ' + path)
+        .toBeFalse();
 
       return !exists;
     },
@@ -170,13 +180,17 @@ export function expectDirectory<T>(
   return {
     toExist() {
       const exists = harness.hasDirectory(path);
-      expect(exists).toBe(true, 'Expected directory to exist: ' + path);
+      expect(exists)
+        .withContext('Expected directory to exist: ' + path)
+        .toBeTrue();
 
       return exists;
     },
     toNotExist() {
       const exists = harness.hasDirectory(path);
-      expect(exists).toBe(false, 'Expected directory to not exist: ' + path);
+      expect(exists)
+        .withContext('Expected directory to not exist: ' + path)
+        .toBeFalse();
 
       return !exists;
     },

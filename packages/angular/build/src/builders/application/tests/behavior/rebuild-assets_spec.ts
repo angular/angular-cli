@@ -6,15 +6,8 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { concatMap, count, take, timeout } from 'rxjs';
 import { buildApplication } from '../../index';
 import { APPLICATION_BUILDER_INFO, BASE_OPTIONS, describeBuilder } from '../setup';
-
-/**
- * Maximum time in milliseconds for single build/rebuild
- * This accounts for CI variability.
- */
-const BUILD_TIMEOUT = 10_000;
 
 describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
   describe('Behavior: "Rebuilds when input asset changes"', () => {
@@ -36,30 +29,18 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
         watch: true,
       });
 
-      const buildCount = await harness
-        .execute({ outputLogsOnFailure: false })
-        .pipe(
-          timeout(BUILD_TIMEOUT),
-          concatMap(async ({ result }, index) => {
-            switch (index) {
-              case 0:
-                expect(result?.success).toBeTrue();
-                harness.expectFile('dist/browser/asset.txt').content.toContain('foo');
+      await harness.executeWithCases([
+        async ({ result }) => {
+          expect(result?.success).toBeTrue();
+          harness.expectFile('dist/browser/asset.txt').content.toContain('foo');
 
-                await harness.writeFile('public/asset.txt', 'bar');
-                break;
-              case 1:
-                expect(result?.success).toBeTrue();
-                harness.expectFile('dist/browser/asset.txt').content.toContain('bar');
-                break;
-            }
-          }),
-          take(2),
-          count(),
-        )
-        .toPromise();
-
-      expect(buildCount).toBe(2);
+          await harness.writeFile('public/asset.txt', 'bar');
+        },
+        ({ result }) => {
+          expect(result?.success).toBeTrue();
+          harness.expectFile('dist/browser/asset.txt').content.toContain('bar');
+        },
+      ]);
     });
 
     it('remove deleted asset from output', async () => {
@@ -79,32 +60,21 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
         watch: true,
       });
 
-      const buildCount = await harness
-        .execute({ outputLogsOnFailure: false })
-        .pipe(
-          timeout(BUILD_TIMEOUT),
-          concatMap(async ({ result }, index) => {
-            switch (index) {
-              case 0:
-                expect(result?.success).toBeTrue();
-                harness.expectFile('dist/browser/asset-one.txt').toExist();
-                harness.expectFile('dist/browser/asset-two.txt').toExist();
+      await harness.executeWithCases([
+        async ({ result }) => {
+          expect(result?.success).toBeTrue();
+          harness.expectFile('dist/browser/asset-one.txt').toExist();
+          harness.expectFile('dist/browser/asset-two.txt').toExist();
 
-                await harness.removeFile('public/asset-two.txt');
-                break;
-              case 1:
-                expect(result?.success).toBeTrue();
-                harness.expectFile('dist/browser/asset-one.txt').toExist();
-                harness.expectFile('dist/browser/asset-two.txt').toNotExist();
-                break;
-            }
-          }),
-          take(2),
-          count(),
-        )
-        .toPromise();
+          await harness.removeFile('public/asset-two.txt');
+        },
 
-      expect(buildCount).toBe(2);
+        ({ result }) => {
+          expect(result?.success).toBeTrue();
+          harness.expectFile('dist/browser/asset-one.txt').toExist();
+          harness.expectFile('dist/browser/asset-two.txt').toNotExist();
+        },
+      ]);
     });
   });
 });

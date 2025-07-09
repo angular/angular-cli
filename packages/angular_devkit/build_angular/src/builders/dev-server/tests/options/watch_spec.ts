@@ -6,10 +6,10 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { TimeoutError, concatMap, count, take, timeout } from 'rxjs';
+import { TimeoutError } from 'rxjs';
 import { executeDevServer } from '../../index';
 import { describeServeBuilder } from '../jasmine-helpers';
-import { BASE_OPTIONS, BUILD_TIMEOUT, DEV_SERVER_BUILDER_INFO } from '../setup';
+import { BASE_OPTIONS, DEV_SERVER_BUILDER_INFO } from '../setup';
 
 describeServeBuilder(executeDevServer, DEV_SERVER_BUILDER_INFO, (harness, setupTarget) => {
   describe('Option: "watch"', () => {
@@ -24,32 +24,28 @@ describeServeBuilder(executeDevServer, DEV_SERVER_BUILDER_INFO, (harness, setupT
       });
 
       await harness
-        .execute()
-        .pipe(
-          timeout(BUILD_TIMEOUT),
-          concatMap(async ({ result }, index) => {
-            expect(result?.success).toBe(true);
+        .executeWithCases(
+          [
+            async ({ result }) => {
+              expect(result?.success).toBeTrue();
 
-            switch (index) {
-              case 0:
-                await harness.modifyFile(
-                  'src/main.ts',
-                  (content) => content + 'console.log("abcd1234");',
-                );
-                break;
-              case 1:
-                fail('Expected files to not be watched.');
-                break;
-            }
-          }),
-          take(2),
+              await harness.modifyFile(
+                'src/main.ts',
+                (content) => content + 'console.log("abcd1234");',
+              );
+            },
+            () => {
+              fail('Expected files to not be watched.');
+            },
+          ],
+          { timeout: 25_000 },
         )
-        .toPromise()
         .catch((error) => {
           // Timeout is expected if watching is disabled
           if (error instanceof TimeoutError) {
             return;
           }
+
           throw error;
         });
     });
@@ -60,30 +56,19 @@ describeServeBuilder(executeDevServer, DEV_SERVER_BUILDER_INFO, (harness, setupT
         watch: undefined,
       });
 
-      const buildCount = await harness
-        .execute()
-        .pipe(
-          timeout(BUILD_TIMEOUT),
-          concatMap(async ({ result }, index) => {
-            expect(result?.success).toBe(true);
+      await harness.executeWithCases([
+        async ({ result }) => {
+          expect(result?.success).toBe(true);
 
-            switch (index) {
-              case 0:
-                await harness.modifyFile(
-                  'src/main.ts',
-                  (content) => content + 'console.log("abcd1234");',
-                );
-                break;
-              case 1:
-                break;
-            }
-          }),
-          take(2),
-          count(),
-        )
-        .toPromise();
-
-      expect(buildCount).toBe(2);
+          await harness.modifyFile(
+            'src/main.ts',
+            (content) => content + 'console.log("abcd1234");',
+          );
+        },
+        ({ result }) => {
+          expect(result?.success).toBe(true);
+        },
+      ]);
     });
 
     it('watches for file changes when true', async () => {
@@ -92,30 +77,19 @@ describeServeBuilder(executeDevServer, DEV_SERVER_BUILDER_INFO, (harness, setupT
         watch: true,
       });
 
-      const buildCount = await harness
-        .execute()
-        .pipe(
-          timeout(BUILD_TIMEOUT),
-          concatMap(async ({ result }, index) => {
-            expect(result?.success).toBe(true);
+      await harness.executeWithCases([
+        async ({ result }) => {
+          expect(result?.success).toBe(true);
 
-            switch (index) {
-              case 0:
-                await harness.modifyFile(
-                  'src/main.ts',
-                  (content) => content + 'console.log("abcd1234");',
-                );
-                break;
-              case 1:
-                break;
-            }
-          }),
-          take(2),
-          count(),
-        )
-        .toPromise();
-
-      expect(buildCount).toBe(2);
+          await harness.modifyFile(
+            'src/main.ts',
+            (content) => content + 'console.log("abcd1234");',
+          );
+        },
+        ({ result }) => {
+          expect(result?.success).toBe(true);
+        },
+      ]);
     });
   });
 });

@@ -492,19 +492,7 @@ describe('Browser Builder styles', () => {
     await browserBuild(architect, host, target, overrides);
   });
 
-  it('causes equal failure for tilde and tilde-slash url()', async () => {
-    host.writeMultipleFiles({
-      'src/styles.css': `
-        body {
-          background-image: url('~/does-not-exist.jpg');
-        }
-      `,
-    });
-
-    const overrides = { optimization: true };
-    const run = await architect.scheduleTarget(target, overrides);
-    await expectAsync(run.result).toBeResolvedTo(jasmine.objectContaining({ success: false }));
-
+  it('causes equal failure for tilde url()', async () => {
     host.writeMultipleFiles({
       'src/styles.css': `
         body {
@@ -513,9 +501,22 @@ describe('Browser Builder styles', () => {
       `,
     });
 
-    const run2 = await architect.scheduleTarget(target, overrides);
-    await expectAsync(run2.result).toBeResolvedTo(jasmine.objectContaining({ success: false }));
-    await run2.stop();
+    const run = await architect.scheduleTarget(target, { optimization: true });
+    await expectAsync(run.result).toBeResolvedTo(jasmine.objectContaining({ success: false }));
+    await run.stop();
+  });
+
+  it('causes equal failure for tilde-slash url()', async () => {
+    host.writeMultipleFiles({
+      'src/styles.css': `
+        body {
+          background-image: url('~/does-not-exist.jpg');
+        }
+      `,
+    });
+
+    const run = await architect.scheduleTarget(target, { optimization: true });
+    await expectAsync(run.result).toBeResolvedTo(jasmine.objectContaining({ success: false }));
     await run.stop();
   });
 
@@ -583,9 +584,7 @@ describe('Browser Builder styles', () => {
       const { files } = await browserBuild(architect, host, target, overrides);
       expect(await files['styles.css']).toMatch(/\.one(.|\n|\r)*\.two(.|\n|\r)*\.three/);
     });
-  });
 
-  extensionsWithImportSupport.forEach((ext) => {
     it(`adjusts relative resource URLs when using @import in ${ext} (global)`, async () => {
       host.copyFile('src/spectrum.png', './src/more-styles/images/global-img-relative.png');
       host.writeMultipleFiles({
@@ -659,7 +658,7 @@ describe('Browser Builder styles', () => {
     result = await browserBuild(architect, host, target, { optimization: true });
 
     expect(await result.files['styles.css']).toContain('rgba(0,0,0,.15)');
-  });
+  }, 80_000);
 
   it('works when using the same css file in `styles` and `stylesUrl`', async () => {
     host.writeMultipleFiles({
