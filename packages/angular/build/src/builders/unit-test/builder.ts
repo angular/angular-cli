@@ -239,6 +239,7 @@ export async function* execute(
           name: 'base',
           include: [],
           reporters: normalizedOptions.reporters ?? ['default'],
+          outputFile: normalizedOptions.outputFile,
           watch: normalizedOptions.watch,
           coverage: generateCoverageOption(
             normalizedOptions.codeCoverage,

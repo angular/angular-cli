@@ -33,7 +33,7 @@ export async function normalizeOptions(
   const buildTargetSpecifier = options.buildTarget ?? `::development`;
   const buildTarget = targetFromTargetString(buildTargetSpecifier, projectName, 'build');
 
-  const { tsConfig, runner, reporters, browsers } = options;
+  const { tsConfig, runner, reporters, outputFile, browsers } = options;
 
   return {
     // Project/workspace information
@@ -58,6 +58,7 @@ export async function normalizeOptions(
       : undefined,
     tsConfig,
     reporters,
+    outputFile,
     browsers,
     watch: options.watch ?? isTTY(),
     debug: options.debug ?? false,
