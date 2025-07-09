@@ -135,8 +135,8 @@ export class VitestExecutor implements TestExecutor {
   }
 
   private async initializeVitest(): Promise<Vitest> {
-    const { codeCoverage, reporters, workspaceRoot, browsers, debug, watch } = this.options;
-
+    const { codeCoverage, reporters, outputFile, workspaceRoot, browsers, debug, watch } =
+      this.options;
     let vitestNodeModule;
     try {
       vitestNodeModule = await loadEsmModule<typeof import('vitest/node')>('vitest/node');
@@ -196,6 +196,7 @@ export class VitestExecutor implements TestExecutor {
         name: 'base',
         include: [],
         reporters: reporters ?? ['default'],
+        outputFile,
         watch,
         coverage: generateCoverageOption(codeCoverage),
         ...debugOptions,
