@@ -9,7 +9,7 @@
 import { HttpsProxyAgent } from 'https-proxy-agent';
 import { createHash } from 'node:crypto';
 import { readFile, rm, writeFile } from 'node:fs/promises';
-import * as https from 'node:https';
+import { Agent, get as httpsGet } from 'node:https';
 import { join } from 'node:path';
 import { NormalizedCachedOptions } from '../normalize-cache';
 import { htmlRewritingStream } from './html-rewriting-stream';
@@ -194,56 +194,49 @@ export class InlineFontsProcessor {
       } catch {}
     }
 
-    let agent: HttpsProxyAgent<string> | undefined;
     const httpsProxy = process.env.HTTPS_PROXY ?? process.env.https_proxy;
-
-    if (httpsProxy) {
-      agent = new HttpsProxyAgent(httpsProxy);
-    }
-
     const data = await new Promise<string>((resolve, reject) => {
       let rawResponse = '';
-      https
-        .get(
-          url,
-          {
-            agent,
-            headers: {
-              /**
-               * Always use a Windows UA. This is because Google fonts will including hinting in fonts for Windows.
-               * Hinting is a technique used with Windows files to improve appearance however
-               * results in 20-50% larger file sizes.
-               *
-               * @see http://google3/java/com/google/fonts/css/OpenSansWebFontsCssBuilder.java?l=22
-               * @see https://fonts.google.com/knowledge/glossary/hinting (short)
-               * @see https://glyphsapp.com/learn/hinting-manual-truetype-hinting (deep dive)
-               */
-              'user-agent':
-                'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-            },
+      httpsGet(
+        url,
+        {
+          // TODO(alanagius): remove casting https://github.com/TooTallNate/proxy-agents/issues/379 is fixed.
+          agent: httpsProxy ? (new HttpsProxyAgent(httpsProxy) as Agent) : undefined,
+          headers: {
+            /**
+             * Always use a Windows UA. This is because Google fonts will including hinting in fonts for Windows.
+             * Hinting is a technique used with Windows files to improve appearance however
+             * results in 20-50% larger file sizes.
+             *
+             * @see http://google3/java/com/google/fonts/css/OpenSansWebFontsCssBuilder.java?l=22
+             * @see https://fonts.google.com/knowledge/glossary/hinting (short)
+             * @see https://glyphsapp.com/learn/hinting-manual-truetype-hinting (deep dive)
+             */
+            'user-agent':
+              'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
           },
-          (res) => {
-            if (res.statusCode !== 200) {
-              reject(
-                new Error(
-                  `Inlining of fonts failed. ${url} returned status code: ${res.statusCode}.`,
-                ),
-              );
+        },
+        (res) => {
+          if (res.statusCode !== 200) {
+            reject(
+              new Error(
+                `Inlining of fonts failed. ${url} returned status code: ${res.statusCode}.`,
+              ),
+            );
 
-              return;
-            }
+            return;
+          }
 
-            res.on('data', (chunk) => (rawResponse += chunk)).on('end', () => resolve(rawResponse));
-          },
-        )
-        .on('error', (e) =>
-          reject(
-            new Error(
-              `Inlining of fonts failed. An error has occurred while retrieving ${url} over the internet.\n` +
-                e.message,
-            ),
+          res.on('data', (chunk) => (rawResponse += chunk)).on('end', () => resolve(rawResponse));
+        },
+      ).on('error', (e) =>
+        reject(
+          new Error(
+            `Inlining of fonts failed. An error has occurred while retrieving ${url} over the internet.\n` +
+              e.message,
           ),
-        );
+        ),
+      );
     });
 
     if (cacheFile) {
