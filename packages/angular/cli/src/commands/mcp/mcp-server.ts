@@ -11,9 +11,11 @@ import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import type { AngularWorkspace } from '../../utilities/config';
 import { VERSION } from '../../utilities/version';
+import { registerInstructionsResource } from './resources/instructions';
 import { registerBestPracticesTool } from './tools/best-practices';
 import { registerDocSearchTool } from './tools/doc-search';
 import { registerFindExampleTool } from './tools/examples';
+import { registerModernizeTool } from './tools/modernize';
 import { registerListProjectsTool } from './tools/projects';
 
 export async function createMcpServer(
@@ -39,29 +41,9 @@ export async function createMcpServer(
     },
   );
 
-  server.registerResource(
-    'instructions',
-    'instructions://best-practices',
-    {
-      title: 'Angular Best Practices and Code Generation Guide',
-      description:
-        "A comprehensive guide detailing Angular's best practices for code generation and development." +
-        ' This guide should be used as a reference by an LLM to ensure any generated code' +
-        ' adheres to modern Angular standards, including the use of standalone components,' +
-        ' typed forms, modern control flow syntax, and other current conventions.',
-      mimeType: 'text/markdown',
-    },
-    async () => {
-      const text = await readFile(
-        path.join(__dirname, 'instructions', 'best-practices.md'),
-        'utf-8',
-      );
-
-      return { contents: [{ uri: 'instructions://best-practices', text }] };
-    },
-  );
-
+  registerInstructionsResource(server);
   registerBestPracticesTool(server);
+  registerModernizeTool(server);
 
   // If run outside an Angular workspace (e.g., globally) skip the workspace specific tools.
   if (context.workspace) {
