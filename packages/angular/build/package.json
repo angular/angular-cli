@@ -34,7 +34,7 @@
     "listr2": "9.0.0",
     "magic-string": "0.30.17",
     "mrmime": "2.0.1",
-    "parse5-html-rewriting-stream": "7.1.0",
+    "parse5-html-rewriting-stream": "8.0.0",
     "picomatch": "4.0.2",
     "piscina": "5.1.2",
     "rollup": "4.44.2",
