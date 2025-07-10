@@ -240,7 +240,8 @@ async function inlineLocalesDirect(ast: ParseResult, options: InlineOptions) {
   for (const locale of i18n.inlineLocales) {
     const content = new ReplaceSource(
       inputMap
-        ? new SourceMapSource(options.code, options.filename, inputMap)
+        ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          new SourceMapSource(options.code, options.filename, inputMap as any)
         : new OriginalSource(options.code, options.filename),
     );
 
