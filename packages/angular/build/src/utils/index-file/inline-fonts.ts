@@ -9,7 +9,7 @@
 import { HttpsProxyAgent } from 'https-proxy-agent';
 import { createHash } from 'node:crypto';
 import { readFile, rm, writeFile } from 'node:fs/promises';
-import { Agent, get as httpsGet } from 'node:https';
+import { get as httpsGet } from 'node:https';
 import { join } from 'node:path';
 import { NormalizedCachedOptions } from '../normalize-cache';
 import { htmlRewritingStream } from './html-rewriting-stream';
@@ -200,8 +200,7 @@ export class InlineFontsProcessor {
       httpsGet(
         url,
         {
-          // TODO(alanagius): remove casting https://github.com/TooTallNate/proxy-agents/issues/379 is fixed.
-          agent: httpsProxy ? (new HttpsProxyAgent(httpsProxy) as Agent) : undefined,
+          agent: httpsProxy ? new HttpsProxyAgent(httpsProxy) : undefined,
           headers: {
             /**
              * Always use a Windows UA. This is because Google fonts will including hinting in fonts for Windows.
