@@ -13,6 +13,7 @@ import { extname, relative } from 'node:path';
 import type { NormalizedApplicationBuildOptions } from '../../builders/application/options';
 import { ExperimentalPlatform } from '../../builders/application/schema';
 import { allowMangle } from '../../utils/environment-options';
+import { toPosixPath } from '../../utils/path';
 import {
   SERVER_APP_ENGINE_MANIFEST_FILENAME,
   SERVER_APP_MANIFEST_FILENAME,
@@ -719,9 +720,7 @@ function getEsBuildCommonPolyfillsOptions(
         }
 
         // Generate module contents with an import statement per defined polyfill
-        let contents = polyfillPaths
-          .map((file) => `import '${file.replace(/\\/g, '/')}';`)
-          .join('\n');
+        let contents = polyfillPaths.map((file) => `import '${toPosixPath(file)}';`).join('\n');
 
         // The below should be done after loading `$localize` as otherwise the locale will be overridden.
         if (i18nOptions.shouldInline) {
@@ -746,10 +745,5 @@ function getEsBuildCommonPolyfillsOptions(
 }
 
 function entryFileToWorkspaceRelative(workspaceRoot: string, entryFile: string): string {
-  return (
-    './' +
-    relative(workspaceRoot, entryFile)
-      .replace(/.[mc]?ts$/, '')
-      .replace(/\\/g, '/')
-  );
+  return './' + toPosixPath(relative(workspaceRoot, entryFile).replace(/.[mc]?ts$/, ''));
 }

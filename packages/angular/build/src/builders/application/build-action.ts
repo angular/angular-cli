@@ -16,6 +16,7 @@ import { logMessages, withNoProgress, withSpinner } from '../../tools/esbuild/ut
 import { ChangedFiles } from '../../tools/esbuild/watcher';
 import { shouldWatchRoot } from '../../utils/environment-options';
 import { NormalizedCachedOptions } from '../../utils/normalize-cache';
+import { toPosixPath } from '../../utils/path';
 import { NormalizedApplicationBuildOptions, NormalizedOutputOptions } from './options';
 import {
   ComponentUpdateResult,
@@ -105,7 +106,7 @@ export async function* runEsBuildBuildAction(
       // Ignore the output and cache paths to avoid infinite rebuild cycles
       outputOptions.base,
       cacheOptions.basePath,
-      `${workspaceRoot.replace(/\\/g, '/')}/**/.*/**`,
+      `${toPosixPath(workspaceRoot)}/**/.*/**`,
     ];
 
     // Setup a watcher

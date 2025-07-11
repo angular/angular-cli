@@ -13,6 +13,7 @@ import { OutputMode } from '../../builders/application/schema';
 import { BuildOutputFile, BuildOutputFileType } from '../../tools/esbuild/bundler-context';
 import { BuildOutputAsset } from '../../tools/esbuild/bundler-execution-result';
 import { assertIsError } from '../error';
+import { toPosixPath } from '../path';
 import { urlJoin } from '../url';
 import { WorkerPool } from '../worker-pool';
 import { IMPORT_EXEC_ARGV } from './esm-in-memory-loader/utils';
@@ -94,7 +95,7 @@ export async function prerenderPages(
 
   const assetsReversed: Record</** Destination */ string, /** Source */ string> = {};
   for (const { source, destination } of assets) {
-    assetsReversed[addLeadingSlash(destination.replace(/\\/g, posix.sep))] = source;
+    assetsReversed[addLeadingSlash(toPosixPath(destination))] = source;
   }
 
   // Get routes to prerender
