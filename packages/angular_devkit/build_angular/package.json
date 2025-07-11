@@ -55,7 +55,7 @@
     "terser": "5.43.1",
     "tree-kill": "1.2.2",
     "tslib": "2.8.1",
-    "webpack": "5.100.0",
+    "webpack": "5.100.1",
     "webpack-dev-middleware": "7.4.2",
     "webpack-dev-server": "5.2.2",
     "webpack-merge": "6.0.1",
