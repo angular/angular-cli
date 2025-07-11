@@ -14,6 +14,7 @@ import path from 'node:path';
 import { createVirtualModulePlugin } from '../../tools/esbuild/virtual-module-plugin';
 import { assertIsError } from '../../utils/error';
 import { loadEsmModule } from '../../utils/load-esm';
+import { toPosixPath } from '../../utils/path';
 import { buildApplicationInternal } from '../application';
 import type {
   ApplicationBuilderExtensions,
@@ -117,7 +118,7 @@ export async function* execute(
 
   buildTargetOptions.polyfills = injectTestingPolyfills(buildTargetOptions.polyfills);
 
-  const outputPath = path.join(context.workspaceRoot, generateOutputPath());
+  const outputPath = toPosixPath(path.join(context.workspaceRoot, generateOutputPath()));
   const buildOptions: ApplicationBuilderInternalOptions = {
     ...buildTargetOptions,
     watch: normalizedOptions.watch,
@@ -156,10 +157,11 @@ export async function* execute(
         `import { BrowserTestingModule, platformBrowserTesting } from '@angular/platform-browser/testing';`,
         '',
         normalizedOptions.providersFile
-          ? `import providers from './${path
-              .relative(projectSourceRoot, normalizedOptions.providersFile)
-              .replace(/.[mc]?ts$/, '')
-              .replace(/\\/g, '/')}'`
+          ? `import providers from './${toPosixPath(
+              path
+                .relative(projectSourceRoot, normalizedOptions.providersFile)
+                .replace(/.[mc]?ts$/, ''),
+            )}'`
           : 'const providers = [];',
         '',
         // Same as https://github.com/angular/angular/blob/05a03d3f975771bb59c7eefd37c01fa127ee2229/packages/core/testing/src/test_hooks.ts#L21-L29
@@ -406,7 +408,7 @@ function generateCoverageOption(
   return {
     enabled: true,
     excludeAfterRemap: true,
-    include: [`${path.relative(workspaceRoot, outputPath)}/**`],
+    include: [`${toPosixPath(path.relative(workspaceRoot, outputPath))}/**`],
     // Special handling for `reporter` due to an undefined value causing upstream failures
     ...(codeCoverage.reporters
       ? ({ reporter: codeCoverage.reporters } satisfies VitestCoverageOption)
