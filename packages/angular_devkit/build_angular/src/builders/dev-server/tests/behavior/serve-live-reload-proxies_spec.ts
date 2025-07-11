@@ -135,6 +135,14 @@ async function goToPageAndWaitForWS(page: Page, url: string): Promise<void> {
   ]);
 
   await client.detach();
+
+  // Workaround for:
+  //   Stack:
+  //   error properties: Object({ errno: -104, code: 'ECONNRESET', syscall: 'read' })
+  //       at TCP.onStreamRead (node:internal/stream_base_commons:216:20)
+  // Message:
+  //   Expected 'app' to be 'app-live-reload'.
+  await setTimeoutPromise(500);
 }
 
 describeServeBuilder(
@@ -205,9 +213,6 @@ describeServeBuilder(
             async ({ result }) => {
               expect(result?.success).toBeTrue();
 
-              // Wait for page to reload.
-              await setTimeoutPromise(500);
-
               const innerText = await page.evaluate(() => document.querySelector('p').innerText);
               expect(innerText).toBe('app-live-reload');
             },
@@ -239,9 +244,6 @@ describeServeBuilder(
                 },
                 async ({ result }) => {
                   expect(result?.success).toBeTrue();
-
-                  // Wait for page to reload.
-                  await setTimeoutPromise(500);
 
                   const innerText = await page.evaluate(
                     () => document.querySelector('p').innerText,
@@ -282,9 +284,6 @@ describeServeBuilder(
                 },
                 async ({ result }) => {
                   expect(result?.success).toBeTrue();
-
-                  // Wait for page to reload.
-                  await setTimeoutPromise(500);
 
                   const innerText = await page.evaluate(
                     () => document.querySelector('p').innerText,
