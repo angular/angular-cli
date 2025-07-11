@@ -8,6 +8,7 @@
 
 import assert from 'node:assert';
 import { NormalizedApplicationBuildOptions } from '../../builders/application/options';
+import { toPosixPath } from '../../utils/path';
 import { BundlerOptionsFactory } from './bundler-context';
 import { createStylesheetBundleOptions } from './stylesheets/bundle-options';
 import { createVirtualModulePlugin } from './virtual-module-plugin';
@@ -91,7 +92,7 @@ export function createGlobalStylesBundleOptions(
           assert(files, `global style name should always be found [${args.path}]`);
 
           return {
-            contents: files.map((file) => `@import '${file.replace(/\\/g, '/')}';`).join('\n'),
+            contents: files.map((file) => `@import '${toPosixPath(file)}';`).join('\n'),
             loader: 'css',
             resolveDir: workspaceRoot,
           };

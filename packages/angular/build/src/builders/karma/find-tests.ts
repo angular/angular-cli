@@ -9,6 +9,7 @@
 import { PathLike, constants, promises as fs } from 'node:fs';
 import { basename, dirname, extname, join, relative } from 'node:path';
 import { glob, isDynamicPattern } from 'tinyglobby';
+import { toPosixPath } from '../../utils/path';
 
 /* Go through all patterns and find unique list of files */
 export async function findTests(
@@ -59,8 +60,6 @@ export function getTestEntrypoints(
   );
 }
 
-const normalizePath = (path: string): string => path.replace(/\\/g, '/');
-
 const removeLeadingSlash = (pattern: string): string => {
   if (pattern.charAt(0) === '/') {
     return pattern.substring(1);
@@ -94,10 +93,10 @@ async function findMatchingTests(
   projectSourceRoot: string,
 ): Promise<string[]> {
   // normalize pattern, glob lib only accepts forward slashes
-  let normalizedPattern = normalizePath(pattern);
+  let normalizedPattern = toPosixPath(pattern);
   normalizedPattern = removeLeadingSlash(normalizedPattern);
 
-  const relativeProjectRoot = normalizePath(relative(workspaceRoot, projectSourceRoot) + '/');
+  const relativeProjectRoot = toPosixPath(relative(workspaceRoot, projectSourceRoot) + '/');
 
   // remove relativeProjectRoot to support relative paths from root
   // such paths are easy to get when running scripts via IDEs
@@ -125,7 +124,7 @@ async function findMatchingTests(
 
   // normalize the patterns in the ignore list
   const normalizedIgnorePatternList = ignore.map((pattern: string) =>
-    removeRelativeRoot(removeLeadingSlash(normalizePath(pattern)), relativeProjectRoot),
+    removeRelativeRoot(removeLeadingSlash(toPosixPath(pattern)), relativeProjectRoot),
   );
 
   return glob(normalizedPattern, {

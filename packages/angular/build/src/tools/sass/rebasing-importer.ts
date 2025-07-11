@@ -13,6 +13,7 @@ import { basename, dirname, extname, join, relative } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import type { CanonicalizeContext, Importer, ImporterResult, Syntax } from 'sass';
 import { assertIsError } from '../../utils/error';
+import { toPosixPath } from '../../utils/path';
 import { findUrls } from './lexer';
 
 /**
@@ -83,7 +84,7 @@ abstract class UrlRebasingImporter implements Importer<'sync'> {
 
       // Normalize path separators and escape characters
       // https://developer.mozilla.org/en-US/docs/Web/CSS/url#syntax
-      const rebasedUrl = rebasedPath.replace(/\\/g, '/').replace(/[()\s'"]/g, '\\$&');
+      const rebasedUrl = toPosixPath(rebasedPath).replace(/[()\s'"]/g, '\\$&');
 
       updatedContents ??= new MagicString(contents);
       // Always quote the URL to avoid potential downstream parsing problems

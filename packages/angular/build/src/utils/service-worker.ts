@@ -14,6 +14,7 @@ import { BuildOutputFile, BuildOutputFileType } from '../tools/esbuild/bundler-c
 import { BuildOutputAsset } from '../tools/esbuild/bundler-execution-result';
 import { assertIsError } from './error';
 import { loadEsmModule } from './load-esm';
+import { toPosixPath } from './path';
 
 class CliFilesystem implements Filesystem {
   constructor(
@@ -52,7 +53,7 @@ class CliFilesystem implements Filesystem {
 
       if (stats.isFile()) {
         // Uses posix paths since the service worker expects URLs
-        items.push('/' + path.relative(this.base, entryPath).replace(/\\/g, '/'));
+        items.push('/' + toPosixPath(path.relative(this.base, entryPath)));
       } else if (stats.isDirectory()) {
         subdirectories.push(entryPath);
       }
@@ -75,11 +76,11 @@ class ResultFilesystem implements Filesystem {
   ) {
     for (const file of outputFiles) {
       if (file.type === BuildOutputFileType.Media || file.type === BuildOutputFileType.Browser) {
-        this.fileReaders.set('/' + file.path.replace(/\\/g, '/'), async () => file.contents);
+        this.fileReaders.set('/' + toPosixPath(file.path), async () => file.contents);
       }
     }
     for (const file of assetFiles) {
-      this.fileReaders.set('/' + file.destination.replace(/\\/g, '/'), () =>
+      this.fileReaders.set('/' + toPosixPath(file.destination), () =>
         fsPromises.readFile(file.source),
       );
     }
