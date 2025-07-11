@@ -28,6 +28,7 @@ import { loadProxyConfiguration, normalizeSourceMaps } from '../../utils';
 import { useComponentStyleHmr, useComponentTemplateHmr } from '../../utils/environment-options';
 import { loadEsmModule } from '../../utils/load-esm';
 import { Result, ResultFile, ResultKind } from '../application/results';
+import { OutputHashing } from '../application/schema';
 import {
   type ApplicationBuilderInternalOptions,
   BuildOutputFileType,
@@ -156,6 +157,19 @@ export async function* serveWithVite(
   if (scriptsSourcemaps && browserOptions.server) {
     // https://nodejs.org/api/process.html#processsetsourcemapsenabledval
     process.setSourceMapsEnabled(true);
+  }
+
+  if (
+    serverOptions.hmr &&
+    (browserOptions.outputHashing === OutputHashing.All ||
+      browserOptions.outputHashing === OutputHashing.Bundles)
+  ) {
+    serverOptions.hmr = false;
+
+    context.logger.warn(
+      `Hot Module Replacement (HMR) is disabled because the 'outputHashing' option is set to '${browserOptions.outputHashing}'. ` +
+        'HMR is incompatible with this setting.',
+    );
   }
 
   const componentsHmrCanBeUsed =
