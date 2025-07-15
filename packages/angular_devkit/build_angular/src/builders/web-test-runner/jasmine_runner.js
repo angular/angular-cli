@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
+import { NgModule } from '@angular/core';
 import { getTestBed } from '@angular/core/testing';
 import { BrowserTestingModule, platformBrowserTesting } from '@angular/platform-browser/testing';
 import {
@@ -63,8 +64,13 @@ export async function runJasmineTests(jasmineEnv) {
   // eslint-disable-next-line no-undef
   jasmine.DEFAULT_TIMEOUT_INTERVAL = config.defaultTimeoutInterval;
 
+  @NgModule({
+    providers: [typeof window.Zone !== 'undefined' ? provideZoneChangeDetection() : []],
+  })
+  class TestModule {}
+
   // Initialize `TestBed` automatically for users. This assumes we already evaluated `zone.js/testing`.
-  getTestBed().initTestEnvironment(BrowserTestingModule, platformBrowserTesting(), {
+  getTestBed().initTestEnvironment([BrowserTestingModule, TestModule], platformBrowserTesting(), {
     errorOnUnknownElements: true,
     errorOnUnknownProperties: true,
   });

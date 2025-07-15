@@ -17,7 +17,9 @@ import { RunnerOptions } from '../api';
 function createTestBedInitVirtualFile(
   providersFile: string | undefined,
   projectSourceRoot: string,
+  polyfills: string[] = [],
 ): string {
+  const usesZoneJS = polyfills.includes('zone.js');
   let providersImport = 'const providers = [];';
   if (providersFile) {
     const relativePath = path.relative(projectSourceRoot, providersFile);
@@ -28,7 +30,7 @@ function createTestBedInitVirtualFile(
 
   return `
     // Initialize the Angular testing environment
-    import { NgModule } from '@angular/core';
+    import { NgModule${usesZoneJS ? ', provideZoneChangeDetection' : ''} } from '@angular/core';
     import { getTestBed, ɵgetCleanupHook as getCleanupHook } from '@angular/core/testing';
     import { BrowserTestingModule, platformBrowserTesting } from '@angular/platform-browser/testing';
     ${providersImport}
@@ -36,7 +38,7 @@ function createTestBedInitVirtualFile(
     beforeEach(getCleanupHook(false));
     afterEach(getCleanupHook(true));
     @NgModule({
-      providers,
+      providers: [${usesZoneJS ? 'provideZoneChangeDetection(), ' : ''}...providers],
     })
     export class TestModule {}
     getTestBed().initTestEnvironment([BrowserTestingModule, TestModule], platformBrowserTesting(), {
@@ -113,7 +115,11 @@ export async function getVitestBuildOptions(
 
   buildOptions.polyfills = injectTestingPolyfills(buildOptions.polyfills);
 
-  const testBedInitContents = createTestBedInitVirtualFile(providersFile, projectSourceRoot);
+  const testBedInitContents = createTestBedInitVirtualFile(
+    providersFile,
+    projectSourceRoot,
+    buildOptions.polyfills,
+  );
 
   return {
     buildOptions,

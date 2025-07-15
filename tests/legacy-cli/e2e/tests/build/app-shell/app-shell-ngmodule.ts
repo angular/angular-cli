@@ -7,7 +7,15 @@ import { updateJsonFile } from '../../../utils/project';
 const snapshots = require('../../../ng-snapshot/package.json');
 
 export default async function () {
-  await ng('generate', 'app', 'test-project-two', '--routing', '--no-standalone', '--skip-install');
+  await ng(
+    'generate',
+    'app',
+    'test-project-two',
+    '--routing',
+    '--no-standalone',
+    '--skip-install',
+    '--no-zoneless',
+  );
   await ng('generate', 'app-shell', '--project', 'test-project-two');
 
   const isSnapshotBuild = getGlobalVariable('argv')['ng-snapshots'];
