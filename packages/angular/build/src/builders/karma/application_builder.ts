@@ -436,14 +436,18 @@ async function initializeApplication(
     externalDependencies: options.externalDependencies,
   };
 
+  const usesZoneJS = buildOptions.polyfills.includes('zone.js');
   const virtualTestBedInit = createVirtualModulePlugin({
     namespace: 'angular:test-bed-init',
     loadContent: async () => {
       const contents: string[] = [
         // Initialize the Angular testing environment
+        `import { NgModule${usesZoneJS ? ', provideZoneChangeDetection' : ''} } from '@angular/core';`,
         `import { getTestBed } from '@angular/core/testing';`,
         `import { BrowserTestingModule, platformBrowserTesting } from '@angular/platform-browser/testing';`,
-        `getTestBed().initTestEnvironment(BrowserTestingModule, platformBrowserTesting(), {`,
+        `@NgModule({ providers: [${usesZoneJS ? 'provideZoneChangeDetection(), ' : ''}], })`,
+        `export class TestModule {}`,
+        `getTestBed().initTestEnvironment([BrowserTestingModule, TestModule], platformBrowserTesting(), {`,
         `  errorOnUnknownElements: true,`,
         `  errorOnUnknownProperties: true,`,
         '});',

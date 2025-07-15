@@ -296,7 +296,7 @@ describe('Application Schematic', () => {
       expect(pkg.devDependencies['less']).toEqual(latestVersions['less']);
     });
 
-    it('should include zone.js if "zoneless" option is not present', async () => {
+    it('should _not_ include zone.js if "zoneless" option is not present', async () => {
       const tree = await schematicRunner.runSchematic(
         'application',
         {
@@ -307,7 +307,7 @@ describe('Application Schematic', () => {
       );
 
       const pkg = JSON.parse(tree.readContent('/package.json'));
-      expect(pkg.dependencies['zone.js']).toEqual(latestVersions['zone.js']);
+      expect(pkg.dependencies['zone.js']).toBeUndefined();
     });
 
     it('should not include zone.js if "zoneless" option is true', async () => {
@@ -800,7 +800,7 @@ describe('Application Schematic', () => {
       );
     });
 
-    it('should add provideZonelessChangeDetection() in app-module.ts when zoneless is true', async () => {
+    it('should not add provideZonelessChangeDetection() in app-module.ts when zoneless is true', async () => {
       const tree = await schematicRunner.runSchematic(
         'application',
         {
@@ -812,25 +812,10 @@ describe('Application Schematic', () => {
       );
       const path = '/projects/foo/src/app/app-module.ts';
       const fileContent = tree.readContent(path);
-      expect(fileContent).toContain('provideZonelessChangeDetection()');
-    });
-
-    it('should not add provideZonelessChangeDetection() in app-module.ts when zoneless is false', async () => {
-      const tree = await schematicRunner.runSchematic(
-        'application',
-        {
-          ...defaultOptions,
-          zoneless: false,
-          standalone: false,
-        },
-        workspaceTree,
-      );
-      const path = '/projects/foo/src/app/app-module.ts';
-      const fileContent = tree.readContent(path);
       expect(fileContent).not.toContain('provideZonelessChangeDetection()');
     });
 
-    it('should add provideZonelessChangeDetection() when zoneless is true', async () => {
+    it('should not add any change detection provider when zoneless is true', async () => {
       const tree = await schematicRunner.runSchematic(
         'application',
         {
@@ -841,35 +826,7 @@ describe('Application Schematic', () => {
       );
       const path = '/projects/foo/src/app/app.config.ts';
       const fileContent = tree.readContent(path);
-      expect(fileContent).toContain('provideZonelessChangeDetection()');
-    });
-
-    it('should not add provideZonelessChangeDetection() when zoneless is false', async () => {
-      const tree = await schematicRunner.runSchematic(
-        'application',
-        {
-          ...defaultOptions,
-          zoneless: false,
-        },
-        workspaceTree,
-      );
-      const path = '/projects/foo/src/app/app.config.ts';
-      const fileContent = tree.readContent(path);
-      expect(fileContent).not.toContain('provideZonelessChangeDetection()');
-    });
-
-    it('should not add provideZoneChangeDetection when zoneless is true', async () => {
-      const tree = await schematicRunner.runSchematic(
-        'application',
-        {
-          ...defaultOptions,
-          zoneless: true,
-        },
-        workspaceTree,
-      );
-      const path = '/projects/foo/src/app/app.config.ts';
-      const fileContent = tree.readContent(path);
-      expect(fileContent).not.toContain('provideZoneChangeDetection');
+      expect(fileContent).not.toMatch(/provideZone(less)?ChangeDetection/gi);
     });
   });
 
