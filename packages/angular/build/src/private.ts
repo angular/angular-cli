@@ -58,6 +58,9 @@ export function createCompilerPlugin(
   );
 }
 
+export type { AngularCompilation } from './tools/angular/compilation';
+export { createAngularCompilation };
+
 // Utilities
 export * from './utils/bundle-calculator';
 export { checkPort } from './utils/check-port';

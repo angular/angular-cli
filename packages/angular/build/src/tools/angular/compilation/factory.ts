@@ -20,8 +20,9 @@ import type { AngularCompilation } from './angular-compilation';
 export async function createAngularCompilation(
   jit: boolean,
   browserOnlyBuild: boolean,
+  parallel: boolean = useParallelTs,
 ): Promise<AngularCompilation> {
-  if (useParallelTs) {
+  if (parallel) {
     const { ParallelCompilation } = await import('./parallel-compilation');
 
     return new ParallelCompilation(jit, browserOnlyBuild);
