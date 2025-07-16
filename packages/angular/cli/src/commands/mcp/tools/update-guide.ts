@@ -8,7 +8,7 @@
 
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { z } from 'zod';
-import { ApplicationComplexity, RECOMMENDATIONS, type Step } from '../recommendations.js';
+import { ApplicationComplexity, RECOMMENDATIONS, type Step } from '../recommendations';
 
 interface Option {
   id: keyof Step;

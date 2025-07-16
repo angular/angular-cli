@@ -13,7 +13,7 @@ import { z } from 'zod';
 import type { AngularWorkspace } from '../../utilities/config';
 import { VERSION } from '../../utilities/version';
 import { registerDocSearchTool } from './tools/doc-search';
-import { registerUpdateTool } from './tools/update';
+import { registerUpdateTool } from './tools/update-guide';
 
 export async function createMcpServer(context: {
   workspace?: AngularWorkspace;
