@@ -1,3 +1,16 @@
+<a name="20.1.1"></a>
+
+# 20.1.1 (2025-07-16)
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                                                          |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------------------ |
+| [541b33f8d](https://github.com/angular/angular-cli/commit/541b33f8d977c1fe8f609099a8b8ed1c5f8e827e) | fix  | emit a warning when `outputHashing` is set to `all` or `bundles` when HMR is enabled |
+| [558a0fe92](https://github.com/angular/angular-cli/commit/558a0fe9275e68e0b768de3ee2e5bee0d6d84a6e) | fix  | normalize code coverage include paths to POSIX                                       |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="20.1.0"></a>
 
 # 20.1.0 (2025-07-09)
@@ -4056,6 +4069,7 @@ Alan Agius, Charles Lyding, Doug Parker, Joey Perrott and Piotr Wysocki
   ```scss
   @import 'font-awesome/scss/font-awesome';
   ```
+
   - By default the CLI will use Sass modern API, While not recommended, users can still opt to use legacy API by setting `NG_BUILD_LEGACY_SASS=1`.
 
 - Internally the Angular CLI now always set the TypeScript `target` to `ES2022` and `useDefineForClassFields` to `false` unless the target is set to `ES2022` or later in the TypeScript configuration. To control ECMA version and features use the Browerslist configuration.
