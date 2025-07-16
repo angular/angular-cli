@@ -232,48 +232,15 @@ export async function registerUpdateTool(server: McpServer): Promise<void> {
         }
       }
 
-      // Generate markdown output
-      let markdown = `# Angular Update Guide: v${fromVersion} → v${toVersion}\n\n`;
-      markdown += `**Application complexity:** ${complexity}\n`;
-      markdown += `**Options:** ${
-        Object.entries(options)
-          .filter(([_, value]) => value)
-          .map(([key]) => key)
-          .join(', ') || 'none'
-      }\n\n`;
-
-      if (beforeSteps.length > 0) {
-        markdown += `## Before Updating (Optional preparations)\n\n`;
-        markdown += `These steps can be performed before the update to prepare your application:\n\n`;
-        beforeSteps.forEach((step, index) => {
-          markdown += `### ${index + 1}. ${step.step}\n\n`;
-          markdown += `${step.action}\n\n`;
-        });
-      }
-
-      if (duringSteps.length > 0) {
-        markdown += `## During Update (Required)\n\n`;
-        markdown += `These steps must be performed as part of the update process:\n\n`;
-        duringSteps.forEach((step, index) => {
-          markdown += `### ${index + 1}. ${step.step}\n\n`;
-          markdown += `${step.action}\n\n`;
-        });
-      }
-
-      if (afterSteps.length > 0) {
-        markdown += `## After Update (Follow-up)\n\n`;
-        markdown += `These steps should be performed after the main update:\n\n`;
-        afterSteps.forEach((step, index) => {
-          markdown += `### ${index + 1}. ${step.step}\n\n`;
-          markdown += `${step.action}\n\n`;
-        });
-      }
-
-      if (beforeSteps.length === 0 && duringSteps.length === 0 && afterSteps.length === 0) {
-        markdown += `## No Specific Steps Required\n\n`;
-        markdown += `Based on your configuration, no specific migration steps are required for updating from v${fromVersion} to v${toVersion}. `;
-        markdown += `You can proceed with the standard Angular update process using \`ng update\`.\n\n`;
-      }
+      const markdown = generateUpdateGuideMarkdown(
+        fromVersion,
+        toVersion,
+        complexity,
+        options,
+        beforeSteps,
+        duringSteps,
+        afterSteps,
+      );
 
       return {
         content: [
@@ -285,4 +252,71 @@ export async function registerUpdateTool(server: McpServer): Promise<void> {
       };
     },
   );
+}
+
+/**
+ * Generates markdown output for the Angular update guide.
+ *
+ * @param fromVersion The source Angular version
+ * @param toVersion The target Angular version
+ * @param complexity The application complexity level
+ * @param options The selected options (ngUpgrade, material)
+ * @param beforeSteps Steps to perform before updating
+ * @param duringSteps Steps to perform during the update
+ * @param afterSteps Steps to perform after the update
+ * @returns The generated markdown string
+ */
+function generateUpdateGuideMarkdown(
+  fromVersion: string,
+  toVersion: string,
+  complexity: string,
+  options: { ngUpgrade: boolean; material: boolean },
+  beforeSteps: Step[],
+  duringSteps: Step[],
+  afterSteps: Step[],
+): string {
+  let markdown = `# Angular Update Guide: v${fromVersion} → v${toVersion}\n\n`;
+  markdown += `**Application complexity:** ${complexity}\n`;
+  markdown += `**Options:** ${
+    Object.entries(options)
+      .filter(([_, value]) => value)
+      .map(([key]) => key)
+      .join(', ') || 'none'
+  }\n\n`;
+
+  if (beforeSteps.length > 0) {
+    markdown += `## Before Updating (Optional preparations)\n\n`;
+    markdown += `These steps can be performed before the update to prepare your application:\n\n`;
+    beforeSteps.forEach((step, index) => {
+      markdown += `### ${index + 1}. ${step.step}\n\n`;
+      markdown += `${step.action}\n\n`;
+    });
+  }
+
+  if (duringSteps.length > 0) {
+    markdown += `## During Update (Required)\n\n`;
+    markdown += `These steps must be performed as part of the update process:\n\n`;
+    duringSteps.forEach((step, index) => {
+      markdown += `### ${index + 1}. ${step.step}\n\n`;
+      markdown += `${step.action}\n\n`;
+    });
+  }
+
+  if (afterSteps.length > 0) {
+    markdown += `## After Update (Follow-up)\n\n`;
+    markdown += `These steps should be performed after the main update:\n\n`;
+    afterSteps.forEach((step, index) => {
+      markdown += `### ${index + 1}. ${step.step}\n\n`;
+      markdown += `${step.action}\n\n`;
+    });
+  }
+
+  if (beforeSteps.length === 0 && duringSteps.length === 0 && afterSteps.length === 0) {
+    markdown += `## No Specific Steps Required\n\n`;
+    markdown += `Based on your configuration, no specific migration steps are required for updating `;
+    markdown += `from v${fromVersion} to v${toVersion}. `;
+    markdown += `You can proceed with the standard Angular update process using \`ng update\`.\n\n`;
+  }
+
+  return markdown;
 }

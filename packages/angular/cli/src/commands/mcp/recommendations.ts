@@ -9,6 +9,8 @@
 // Note: this file is copied from:
 // https://github.com/angular/angular/blob/main/adev/src/app/features/update/recommendations.ts
 // A better sync mechanism should be implemented in the future
+// Disabling the max-len rule as it seems the eslint format is different in the Angular repo.
+/* eslint-disable max-len */
 
 export enum ApplicationComplexity {
   Basic = 1,
