@@ -89,13 +89,13 @@ export async function registerUpdateTool(server: McpServer): Promise<void> {
       },
       inputSchema: {
         fromVersion: z
-          .string()
+          .enum(versions.map((v) => v.name) as [string, ...string[]])
           .describe(
             'The current Angular version to migrate from (e.g., "18.0", "19.0").' +
               ' Must be a valid Angular version.',
           ),
         toVersion: z
-          .string()
+          .enum(versions.map((v) => v.name) as [string, ...string[]])
           .describe(
             'The target Angular version to migrate to (e.g., "19.0", "20.0").' +
               ' Must be a valid Angular version and higher than fromVersion.',
