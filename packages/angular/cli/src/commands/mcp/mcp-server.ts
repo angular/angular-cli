@@ -12,6 +12,7 @@ import path from 'node:path';
 import { z } from 'zod';
 import type { AngularWorkspace } from '../../utilities/config';
 import { VERSION } from '../../utilities/version';
+import { registerBestPracticesTool } from './tools/best-practices';
 import { registerDocSearchTool } from './tools/doc-search';
 
 export async function createMcpServer(context: {
@@ -47,6 +48,8 @@ export async function createMcpServer(context: {
       return { contents: [{ uri: 'instructions://best-practices', text }] };
     },
   );
+
+  registerBestPracticesTool(server);
 
   server.registerTool(
     'list_projects',
