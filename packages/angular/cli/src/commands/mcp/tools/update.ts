@@ -81,7 +81,7 @@ export async function registerUpdateTool(server: McpServer): Promise<void> {
     {
       title: 'Angular Update Guide',
       description:
-        'Generates a list of migration steps to update an Angular application from one version to another.' +
+        'Provides a list of migration steps to update an Angular application from one version to another.' +
         ' This tool provides the same recommendations as the official Angular Update Guide at angular.dev/update-guide.' +
         ' The steps are organized into before, during, and after categories based on when they should be performed.',
       annotations: {
@@ -105,8 +105,10 @@ export async function registerUpdateTool(server: McpServer): Promise<void> {
           .optional()
           .default('basic')
           .describe(
-            'The complexity level of your application.' +
-              ' "basic" for simple apps, "medium" for standard apps, "advanced" for complex apps with custom configurations.',
+            'The complexity level of your application. ' +
+              '"basic" is for for all Angular developers, ' +
+              '"medium" adds information that\'s of interest to more advanced Angular developers, ' +
+              '"advanced" shows all the information we have about this update..',
           ),
         includeAngularMaterial: z
           .boolean()
@@ -236,7 +238,6 @@ export async function registerUpdateTool(server: McpServer): Promise<void> {
         fromVersion,
         toVersion,
         complexity,
-        options,
         beforeSteps,
         duringSteps,
         afterSteps,
@@ -260,7 +261,6 @@ export async function registerUpdateTool(server: McpServer): Promise<void> {
  * @param fromVersion The source Angular version
  * @param toVersion The target Angular version
  * @param complexity The application complexity level
- * @param options The selected options (ngUpgrade, material)
  * @param beforeSteps Steps to perform before updating
  * @param duringSteps Steps to perform during the update
  * @param afterSteps Steps to perform after the update
@@ -270,52 +270,61 @@ function generateUpdateGuideMarkdown(
   fromVersion: string,
   toVersion: string,
   complexity: string,
-  options: { ngUpgrade: boolean; material: boolean },
   beforeSteps: Step[],
   duringSteps: Step[],
   afterSteps: Step[],
 ): string {
-  let markdown = `# Angular Update Guide: v${fromVersion} → v${toVersion}\n\n`;
-  markdown += `**Application complexity:** ${complexity}\n`;
-  markdown += `**Options:** ${
-    Object.entries(options)
-      .filter(([_, value]) => value)
-      .map(([key]) => key)
-      .join(', ') || 'none'
-  }\n\n`;
+  // Get version numbers for comparison
+  const fromVersionObj = versions.find((v) => v.name === fromVersion);
+  const toVersionObj = versions.find((v) => v.name === toVersion);
 
-  if (beforeSteps.length > 0) {
-    markdown += `## Before Updating (Optional preparations)\n\n`;
-    markdown += `These steps can be performed before the update to prepare your application:\n\n`;
-    beforeSteps.forEach((step, index) => {
-      markdown += `### ${index + 1}. ${step.step}\n\n`;
-      markdown += `${step.action}\n\n`;
-    });
-  }
+  let markdown = `# Guide to update your Angular application v${fromVersion} → v${toVersion}`;
+  markdown += ` for ${complexity} applications\n\n`;
 
-  if (duringSteps.length > 0) {
-    markdown += `## During Update (Required)\n\n`;
-    markdown += `These steps must be performed as part of the update process:\n\n`;
-    duringSteps.forEach((step, index) => {
-      markdown += `### ${index + 1}. ${step.step}\n\n`;
-      markdown += `${step.action}\n\n`;
-    });
-  }
+  if (fromVersionObj && toVersionObj) {
+    if (fromVersionObj.number > toVersionObj.number) {
+      markdown += `> **Warning:** We do not support downgrading versions of Angular.\n\n`;
+    }
 
-  if (afterSteps.length > 0) {
-    markdown += `## After Update (Follow-up)\n\n`;
-    markdown += `These steps should be performed after the main update:\n\n`;
-    afterSteps.forEach((step, index) => {
-      markdown += `### ${index + 1}. ${step.step}\n\n`;
-      markdown += `${step.action}\n\n`;
-    });
+    if (toVersionObj.number - fromVersionObj.number > 150 && fromVersionObj.number > 240) {
+      markdown += `> **Warning:** Be sure to follow the guide below to migrate your application to the new version.`;
+      markdown += `You can't run \`ng update\` to update Angular applications more than one major version at a time.\n\n`;
+    }
   }
 
   if (beforeSteps.length === 0 && duringSteps.length === 0 && afterSteps.length === 0) {
-    markdown += `## No Specific Steps Required\n\n`;
-    markdown += `Based on your configuration, no specific migration steps are required for updating `;
-    markdown += `from v${fromVersion} to v${toVersion}. `;
-    markdown += `You can proceed with the standard Angular update process using \`ng update\`.\n\n`;
+    markdown += `There aren't any recommendations for moving between these versions.\n\n`;
+
+    return markdown;
+  }
+
+  markdown += `## Before you update\n\n`;
+  if (beforeSteps.length > 0) {
+    beforeSteps.forEach((step) => {
+      markdown += `- [ ] ${step.action}\n\n`;
+    });
+  } else {
+    markdown += `You don't need to do anything before moving between these versions.\n\n`;
+  }
+
+  markdown += `## Update to the new version\n\n`;
+  if (duringSteps.length > 0) {
+    markdown += `Review these changes and perform the actions to update your application.\n\n`;
+    duringSteps.forEach((step) => {
+      markdown += `- [ ] ${step.action}\n\n`;
+    });
+  } else {
+    markdown += `There aren't any recommendations for moving between these versions.\n\n`;
+  }
+
+  markdown += `## After you update\n\n`;
+  if (afterSteps.length > 0) {
+    markdown += `These steps should be performed after the main update:\n\n`;
+    afterSteps.forEach((step) => {
+      markdown += `- [ ] ${step.action}\n\n`;
+    });
+  } else {
+    markdown += `You don't need to do anything after moving between these versions.\n\n`;
   }
 
   return markdown;
