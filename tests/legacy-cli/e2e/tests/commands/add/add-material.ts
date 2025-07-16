@@ -28,7 +28,7 @@ export default async function () {
     'add',
     `@angular/material${tag}`,
     '--theme',
-    'custom',
+    'azure-blue',
     '--verbose',
     '--skip-confirmation',
   );
