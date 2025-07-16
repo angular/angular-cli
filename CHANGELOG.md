@@ -1,3 +1,16 @@
+<a name="20.1.1"></a>
+
+# 20.1.1 (2025-07-16)
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                                                          |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------------------ |
+| [541b33f8d](https://github.com/angular/angular-cli/commit/541b33f8d977c1fe8f609099a8b8ed1c5f8e827e) | fix  | emit a warning when `outputHashing` is set to `all` or `bundles` when HMR is enabled |
+| [558a0fe92](https://github.com/angular/angular-cli/commit/558a0fe9275e68e0b768de3ee2e5bee0d6d84a6e) | fix  | normalize code coverage include paths to POSIX                                       |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="20.1.0"></a>
 
 # 20.1.0 (2025-07-09)
