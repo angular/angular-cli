@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
+import * as crypto from 'node:crypto';
 import * as fs from 'node:fs';
 import * as os from 'node:os';
 import * as path from 'node:path';
@@ -20,7 +21,9 @@ export class TempScopedNodeJsSyncHost extends virtualFs.ScopedHost<fs.Stats> {
   protected override _root: Path;
 
   constructor() {
-    const root = normalize(path.join(os.tmpdir(), `devkit-host-${+Date.now()}-${process.pid}`));
+    const root = normalize(
+      path.join(os.tmpdir(), `devkit-host-${crypto.randomUUID()}-${process.pid}`),
+    );
     fs.mkdirSync(getSystemPath(root));
 
     super(new NodeJsSyncHost(), root);
