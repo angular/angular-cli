@@ -96,13 +96,15 @@ export async function renderAngular(
     // Block until application is stable.
     await applicationRef.whenStable();
 
+    const { destroyed } = applicationRef;
+
     // TODO(alanagius): Find a way to avoid rendering here especially for redirects as any output will be discarded.
     const envInjector = applicationRef.injector;
-    const routerIsProvided = !!envInjector.get(ActivatedRoute, null);
-    const router = envInjector.get(Router);
-    const lastSuccessfulNavigation = router.lastSuccessfulNavigation;
+    const routerIsProvided = destroyed ? false : !!envInjector.get(ActivatedRoute, null);
+    const router = destroyed ? null : envInjector.get(Router);
+    const lastSuccessfulNavigation = router?.lastSuccessfulNavigation;
 
-    if (!routerIsProvided) {
+    if (!router || !routerIsProvided) {
       hasNavigationError = false;
     } else if (lastSuccessfulNavigation?.finalUrl) {
       hasNavigationError = false;
