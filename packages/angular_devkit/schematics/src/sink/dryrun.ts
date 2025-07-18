@@ -23,12 +23,12 @@ export interface DryRunDeleteEvent {
 export interface DryRunCreateEvent {
   kind: 'create';
   path: string;
-  content: Buffer;
+  content: ArrayBufferLike;
 }
 export interface DryRunUpdateEvent {
   kind: 'update';
   path: string;
-  content: Buffer;
+  content: ArrayBufferLike;
 }
 export interface DryRunRenameEvent {
   kind: 'rename';
