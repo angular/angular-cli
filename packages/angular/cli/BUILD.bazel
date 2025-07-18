@@ -5,6 +5,7 @@
 
 load("@npm//:defs.bzl", "npm_link_all_packages")
 load("//tools:defaults.bzl", "jasmine_test", "npm_package", "ts_project")
+load("//tools:example_db_generator.bzl", "cli_example_db")
 load("//tools:ng_cli_schema_generator.bzl", "cli_json_schema")
 load("//tools:ts_json_schema.bzl", "ts_json_schema")
 
@@ -25,6 +26,7 @@ RUNTIME_ASSETS = glob(
     ],
 ) + [
     "//packages/angular/cli:lib/config/schema.json",
+    "//packages/angular/cli:lib/code-examples.db",
 ]
 
 ts_project(
@@ -72,6 +74,17 @@ ts_project(
         "//:node_modules/listr2",
         "//:node_modules/semver",
     ],
+)
+
+cli_example_db(
+    name = "cli_example_database",
+    srcs = glob(
+        include = [
+            "lib/examples/**/*.md",
+        ],
+    ),
+    out = "lib/code-examples.db",
+    path = "packages/angular/cli/lib/examples",
 )
 
 CLI_SCHEMA_DATA = [

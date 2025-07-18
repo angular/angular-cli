@@ -14,10 +14,14 @@ import type { AngularWorkspace } from '../../utilities/config';
 import { VERSION } from '../../utilities/version';
 import { registerBestPracticesTool } from './tools/best-practices';
 import { registerDocSearchTool } from './tools/doc-search';
+import { registerFindExampleTool } from './tools/examples';
 
-export async function createMcpServer(context: {
-  workspace?: AngularWorkspace;
-}): Promise<McpServer> {
+export async function createMcpServer(
+  context: {
+    workspace?: AngularWorkspace;
+  },
+  logger: { warn(text: string): void },
+): Promise<McpServer> {
   const server = new McpServer({
     name: 'angular-cli-server',
     version: VERSION.full,
@@ -134,6 +138,17 @@ export async function createMcpServer(context: {
   );
 
   await registerDocSearchTool(server);
+
+  // sqlite database support requires Node.js 22.16+
+  const [nodeMajor, nodeMinor] = process.versions.node.split('.', 2).map(Number);
+  if (nodeMajor < 22 || (nodeMajor === 22 && nodeMinor < 16)) {
+    logger.warn(
+      `MCP tool 'find_examples' requires Node.js 22.16 (or higher). ` +
+        ' Registration of this tool has been skipped.',
+    );
+  } else {
+    await registerFindExampleTool(server, path.join(__dirname, '../../../lib/code-examples.db'));
+  }
 
   return server;
 }
