@@ -122,7 +122,7 @@ export class TestProjectHost extends NodeJsSyncHost {
         content = content.buffer.slice(content.byteOffset, content.byteOffset + content.byteLength);
       }
 
-      this.scopedSync().write(normalize(fileName), content);
+      this.scopedSync().write(normalize(fileName), content as ArrayBufferLike);
     });
   }
 

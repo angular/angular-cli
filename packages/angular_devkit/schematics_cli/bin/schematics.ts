@@ -305,10 +305,14 @@ export async function main({
         );
         break;
       case 'update':
-        loggingQueue.push(`${colors.cyan('UPDATE')} ${eventPath} (${event.content.length} bytes)`);
+        loggingQueue.push(
+          `${colors.cyan('UPDATE')} ${eventPath} (${(event.content as unknown as Buffer).length} bytes)`,
+        );
         break;
       case 'create':
-        loggingQueue.push(`${colors.green('CREATE')} ${eventPath} (${event.content.length} bytes)`);
+        loggingQueue.push(
+          `${colors.green('CREATE')} ${eventPath} (${(event.content as unknown as Buffer).length} bytes)`,
+        );
         break;
       case 'delete':
         loggingQueue.push(`${colors.yellow('DELETE')} ${eventPath}`);
