@@ -10,7 +10,7 @@ import { TextDecoder, TextEncoder } from 'node:util';
 import { FileBuffer } from './interface';
 
 export function stringToFileBuffer(str: string): FileBuffer {
-  return new TextEncoder().encode(str).buffer;
+  return new TextEncoder().encode(str).buffer as FileBuffer;
 }
 
 export function fileBufferToString(fileBuffer: FileBuffer): string {

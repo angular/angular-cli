@@ -22,8 +22,8 @@ import { SimpleSinkBase } from './sink';
 export class HostSink extends SimpleSinkBase {
   protected _filesToDelete: Set<Path> = new Set();
   protected _filesToRename: Set<[Path, Path]> = new Set();
-  protected _filesToCreate: Map<Path, Buffer<ArrayBufferLike>> = new Map();
-  protected _filesToUpdate: Map<Path, Buffer<ArrayBufferLike>> = new Map();
+  protected _filesToCreate: Map<Path, ArrayBufferLike> = new Map();
+  protected _filesToUpdate: Map<Path, ArrayBufferLike> = new Map();
 
   constructor(
     protected _host: virtualFs.Host,
@@ -58,13 +58,15 @@ export class HostSink extends SimpleSinkBase {
   }
 
   protected _overwriteFile(path: Path, content: Buffer): Observable<void> {
-    this._filesToUpdate.set(path, content);
+    // TODO: `as unknown` was necessary during TS 5.9 update. Figure out a long-term solution.
+    this._filesToUpdate.set(path, content as unknown as ArrayBufferLike);
 
     return EMPTY;
   }
 
   protected _createFile(path: Path, content: Buffer): Observable<void> {
-    this._filesToCreate.set(path, content);
+    // TODO: `as unknown` was necessary during TS 5.9 update. Figure out a long-term solution.
+    this._filesToCreate.set(path, content as unknown as ArrayBufferLike);
 
     return EMPTY;
   }

@@ -149,12 +149,12 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
         [
           async () => {
             // Add invalid block syntax
-            await harness.appendToFile('src/app/app.component.html', '@one');
+            await harness.appendToFile('src/app/app.component.html', '@if-one');
           },
           async ({ logs }) => {
             expect(logs).toContain(
               jasmine.objectContaining<logging.LogEntry>({
-                message: jasmine.stringContaining('@one'),
+                message: jasmine.stringContaining('@if-one'),
               }),
             );
 
@@ -165,42 +165,42 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
           async ({ logs }) => {
             expect(logs).toContain(
               jasmine.objectContaining<logging.LogEntry>({
-                message: jasmine.stringContaining('@one'),
+                message: jasmine.stringContaining('@if-one'),
               }),
             );
 
             // Add more invalid block syntax
-            await harness.appendToFile('src/app/app.component.html', '@two');
+            await harness.appendToFile('src/app/app.component.html', '@if-two');
           },
           async ({ logs }) => {
             expect(logs).toContain(
               jasmine.objectContaining<logging.LogEntry>({
-                message: jasmine.stringContaining('@one'),
+                message: jasmine.stringContaining('@if-one'),
               }),
             );
             expect(logs).toContain(
               jasmine.objectContaining<logging.LogEntry>({
-                message: jasmine.stringContaining('@two'),
+                message: jasmine.stringContaining('@if-two'),
               }),
             );
 
             // Add more invalid block syntax
-            await harness.appendToFile('src/app/app.component.html', '@three');
+            await harness.appendToFile('src/app/app.component.html', '@if-three');
           },
           async ({ logs }) => {
             expect(logs).toContain(
               jasmine.objectContaining<logging.LogEntry>({
-                message: jasmine.stringContaining('@one'),
+                message: jasmine.stringContaining('@if-one'),
               }),
             );
             expect(logs).toContain(
               jasmine.objectContaining<logging.LogEntry>({
-                message: jasmine.stringContaining('@two'),
+                message: jasmine.stringContaining('@if-two'),
               }),
             );
             expect(logs).toContain(
               jasmine.objectContaining<logging.LogEntry>({
-                message: jasmine.stringContaining('@three'),
+                message: jasmine.stringContaining('@if-three'),
               }),
             );
 
@@ -211,17 +211,17 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
           ({ logs }) => {
             expect(logs).not.toContain(
               jasmine.objectContaining<logging.LogEntry>({
-                message: jasmine.stringContaining('@one'),
+                message: jasmine.stringContaining('@if-one'),
               }),
             );
             expect(logs).not.toContain(
               jasmine.objectContaining<logging.LogEntry>({
-                message: jasmine.stringContaining('@two'),
+                message: jasmine.stringContaining('@if-two'),
               }),
             );
             expect(logs).not.toContain(
               jasmine.objectContaining<logging.LogEntry>({
-                message: jasmine.stringContaining('@three'),
+                message: jasmine.stringContaining('@if-three'),
               }),
             );
           },

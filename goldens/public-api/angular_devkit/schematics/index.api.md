@@ -274,7 +274,7 @@ export interface DirEntry {
 // @public (undocumented)
 export interface DryRunCreateEvent {
     // (undocumented)
-    content: Buffer;
+    content: ArrayBufferLike;
     // (undocumented)
     kind: 'create';
     // (undocumented)
@@ -334,7 +334,7 @@ export class DryRunSink extends HostSink {
 // @public (undocumented)
 export interface DryRunUpdateEvent {
     // (undocumented)
-    content: Buffer;
+    content: ArrayBufferLike;
     // (undocumented)
     kind: 'update';
     // (undocumented)
@@ -495,13 +495,13 @@ export class HostSink extends SimpleSinkBase {
     // (undocumented)
     _done(): Observable<void>;
     // (undocumented)
-    protected _filesToCreate: Map<Path, Buffer<ArrayBufferLike>>;
+    protected _filesToCreate: Map<Path, ArrayBufferLike>;
     // (undocumented)
     protected _filesToDelete: Set<Path>;
     // (undocumented)
     protected _filesToRename: Set<[Path, Path]>;
     // (undocumented)
-    protected _filesToUpdate: Map<Path, Buffer<ArrayBufferLike>>;
+    protected _filesToUpdate: Map<Path, ArrayBufferLike>;
     // (undocumented)
     protected _force: boolean;
     // (undocumented)
