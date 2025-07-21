@@ -64,23 +64,25 @@ export function jsonHelpUsage(localYargs: Argv): string {
   const descriptions = usageInstance.getDescriptions();
   const groups = localYargsInstance.getGroups();
   const positional = groups[usageInstance.getPositionalGroupName()] as string[] | undefined;
-
+  const seen = new Set<string>();
   const hidden = new Set(hiddenOptions);
   const normalizeOptions: JsonHelpOption[] = [];
   const allAliases = new Set([...Object.values<string[]>(aliases).flat()]);
 
+  // Reverted order of https://github.com/yargs/yargs/blob/971e351705f0fbc5566c6ed1dfd707fa65e11c0d/lib/usage.ts#L419-L424
   for (const [names, type] of [
+    [number, 'number'],
     [array, 'array'],
     [string, 'string'],
     [boolean, 'boolean'],
-    [number, 'number'],
   ]) {
     for (const name of names) {
-      if (allAliases.has(name) || hidden.has(name)) {
+      if (allAliases.has(name) || hidden.has(name) || seen.has(name)) {
         // Ignore hidden, aliases and already visited option.
         continue;
       }
 
+      seen.add(name);
       const positionalIndex = positional?.indexOf(name) ?? -1;
       const alias = aliases[name];
 
