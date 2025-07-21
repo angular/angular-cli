@@ -53,9 +53,14 @@ export async function registerDocSearchTool(server: McpServer): Promise<void> {
           .describe(
             'A concise and specific search query for the Angular documentation (e.g., "NgModule" or "standalone components").',
           ),
+        includeTopContent: z
+          .boolean()
+          .optional()
+          .default(true)
+          .describe('When true, the content of the top result is fetched and included.'),
       },
     },
-    async ({ query }) => {
+    async ({ query, includeTopContent }) => {
       if (!client) {
         const dcip = createDecipheriv(
           'aes-256-gcm',
@@ -71,38 +76,98 @@ export async function registerDocSearchTool(server: McpServer): Promise<void> {
 
       const { results } = await client.search(createSearchArguments(query));
 
-      // Convert results into text content entries instead of stringifying the entire object
-      const content = results.flatMap((result) =>
-        (result as SearchResponse).hits.map((hit) => {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const hierarchy = Object.values(hit.hierarchy as any).filter(
-            (x) => typeof x === 'string',
-          );
-          const title = hierarchy.pop();
-          const description = hierarchy.join(' > ');
+      const allHits = results.flatMap((result) => (result as SearchResponse).hits);
 
-          return {
-            type: 'text' as const,
-            text: `## ${title}\n${description}\nURL: ${hit.url}`,
-          };
-        }),
-      );
-
-      // Return the search results if any are found
-      if (content.length > 0) {
-        return { content };
+      if (allHits.length === 0) {
+        return {
+          content: [
+            {
+              type: 'text' as const,
+              text: 'No results found.',
+            },
+          ],
+        };
       }
 
-      return {
-        content: [
-          {
-            type: 'text' as const,
-            text: 'No results found.',
-          },
-        ],
-      };
+      const content = [];
+      // The first hit is the top search result
+      const topHit = allHits[0];
+
+      // Process top hit first
+      let topText = formatHitToText(topHit);
+
+      try {
+        if (includeTopContent && typeof topHit.url === 'string') {
+          const url = new URL(topHit.url);
+
+          // Only fetch content from angular.dev
+          if (url.hostname === 'angular.dev' || url.hostname.endsWith('.angular.dev')) {
+            const response = await fetch(url);
+            if (response.ok) {
+              const html = await response.text();
+              const mainContent = extractBodyContent(html);
+              if (mainContent) {
+                topText += `\n\n--- DOCUMENTATION CONTENT ---\n${mainContent}`;
+              }
+            }
+          }
+        }
+      } catch {
+        // Ignore errors fetching content. The basic info is still returned.
+      }
+      content.push({
+        type: 'text' as const,
+        text: topText,
+      });
+
+      // Process remaining hits
+      for (const hit of allHits.slice(1)) {
+        content.push({
+          type: 'text' as const,
+          text: formatHitToText(hit),
+        });
+      }
+
+      return { content };
     },
   );
+}
+
+/**
+ * Extracts the content of the `<body>` element from an HTML string.
+ *
+ * @param html The HTML content of a page.
+ * @returns The content of the `<body>` element, or `undefined` if not found.
+ */
+function extractBodyContent(html: string): string | undefined {
+  // TODO: Use '<main>' element instead of '<body>' when available in angular.dev HTML.
+  const mainTagStart = html.indexOf('<body');
+  if (mainTagStart === -1) {
+    return undefined;
+  }
+
+  const mainTagEnd = html.lastIndexOf('</body>');
+  if (mainTagEnd <= mainTagStart) {
+    return undefined;
+  }
+
+  // Add 7 to include '</body>'
+  return html.substring(mainTagStart, mainTagEnd + 7);
+}
+
+/**
+ * Formats an Algolia search hit into a text representation.
+ *
+ * @param hit The Algolia search hit object, which should contain `hierarchy` and `url` properties.
+ * @returns A formatted string with title, description, and URL.
+ */
+function formatHitToText(hit: Record<string, unknown>): string {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const hierarchy = Object.values(hit.hierarchy as any).filter((x) => typeof x === 'string');
+  const title = hierarchy.pop();
+  const description = hierarchy.join(' > ');
+
+  return `## ${title}\n${description}\nURL: ${hit.url}`;
 }
 
 /**
