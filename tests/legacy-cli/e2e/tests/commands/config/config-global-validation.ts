@@ -1,3 +1,4 @@
+import assert from 'node:assert/strict';
 import { homedir } from 'node:os';
 import * as path from 'node:path';
 import { deleteFile, expectFileToExist } from '../../../utils/fs';
@@ -8,43 +9,28 @@ export default async function () {
   let ngError: Error;
 
   ngError = await expectToFail(() => silentNg('config', 'cli.completion.prompted', 'true'));
-
-  if (
-    !ngError.message.includes('Data path "/cli" must NOT have additional properties(completion).')
-  ) {
-    throw new Error('Should have failed with must NOT have additional properties(completion).');
-  }
+  assert.match(
+    ngError.message,
+    /Data path "\/cli" must NOT have additional properties\(completion\)\./,
+  );
 
   ngError = await expectToFail(() =>
     silentNg('config', '--global', 'cli.completion.invalid', 'true'),
   );
-
-  if (
-    !ngError.message.includes(
-      'Data path "/cli/completion" must NOT have additional properties(invalid).',
-    )
-  ) {
-    throw new Error('Should have failed with must NOT have additional properties(invalid).');
-  }
+  assert.match(
+    ngError.message,
+    /Data path "\/cli\/completion" must NOT have additional properties\(invalid\)\./,
+  );
 
   ngError = await expectToFail(() => silentNg('config', '--global', 'cli.cache.enabled', 'true'));
-
-  if (!ngError.message.includes('Data path "/cli" must NOT have additional properties(cache).')) {
-    throw new Error('Should have failed with must NOT have additional properties(cache).');
-  }
+  assert.match(ngError.message, /Data path "\/cli" must NOT have additional properties\(cache\)\./);
 
   ngError = await expectToFail(() => silentNg('config', 'cli.completion.prompted'));
-
-  if (!ngError.message.includes('Value cannot be found.')) {
-    throw new Error('Should have failed with Value cannot be found.');
-  }
+  assert.match(ngError.message, /Value cannot be found\./);
 
   await ng('config', '--global', 'cli.completion.prompted', 'true');
   const { stdout } = await silentNg('config', '--global', 'cli.completion.prompted');
-
-  if (!stdout.includes('true')) {
-    throw new Error(`Expected "true", received "${JSON.stringify(stdout)}".`);
-  }
+  assert.match(stdout, /true/);
 
   await expectFileToExist(path.join(homedir(), '.angular-config.json'));
   await deleteFile(path.join(homedir(), '.angular-config.json'));

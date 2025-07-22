@@ -1,3 +1,4 @@
+import assert from 'node:assert/strict';
 import { assetDir } from '../../../utils/assets';
 import { ng } from '../../../utils/process';
 
@@ -9,21 +10,15 @@ export default async function () {
     assetDir('add-collection-peer-bad'),
     '--skip-confirmation',
   );
-  if (!bad.includes(warning)) {
-    throw new Error('peer warning not shown on bad package');
-  }
+  assert.match(bad, new RegExp(warning), 'peer warning not shown on bad package');
 
   const { stdout: base } = await ng('add', assetDir('add-collection'), '--skip-confirmation');
-  if (base.includes(warning)) {
-    throw new Error('peer warning shown on base package');
-  }
+  assert.doesNotMatch(base, new RegExp(warning), 'peer warning shown on base package');
 
   const { stdout: good } = await ng(
     'add',
     assetDir('add-collection-peer-good'),
     '--skip-confirmation',
   );
-  if (good.includes(warning)) {
-    throw new Error('peer warning shown on good package');
-  }
+  assert.doesNotMatch(good, new RegExp(warning), 'peer warning shown on good package');
 }

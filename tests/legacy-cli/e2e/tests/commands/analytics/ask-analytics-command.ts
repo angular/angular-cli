@@ -1,3 +1,4 @@
+import assert from 'node:assert/strict';
 import { execWithEnv } from '../../../utils/process';
 import { mockHome } from '../../../utils/utils';
 
@@ -17,9 +18,7 @@ export default async function () {
       'n\n' /* stdin */,
     );
 
-    if (!ANALYTICS_PROMPT.test(stdout)) {
-      throw new Error('CLI did not prompt for analytics permission.');
-    }
+    assert.match(stdout, ANALYTICS_PROMPT, 'CLI did not prompt for analytics permission.');
   });
 
   // CLI should skip analytics prompt with `NG_CLI_ANALYTICS=false`.
@@ -31,9 +30,11 @@ export default async function () {
       NG_FORCE_AUTOCOMPLETE: 'false',
     });
 
-    if (ANALYTICS_PROMPT.test(stdout)) {
-      throw new Error('CLI prompted for analytics permission when it should be forced off.');
-    }
+    assert.doesNotMatch(
+      stdout,
+      ANALYTICS_PROMPT,
+      'CLI prompted for analytics permission when it should be forced off.',
+    );
   });
 
   // CLI should skip analytics prompt during `ng update`.
@@ -44,10 +45,10 @@ export default async function () {
       NG_FORCE_AUTOCOMPLETE: 'false',
     });
 
-    if (ANALYTICS_PROMPT.test(stdout)) {
-      throw new Error(
-        'CLI prompted for analytics permission during an update where it should not' + ' have.',
-      );
-    }
+    assert.doesNotMatch(
+      stdout,
+      ANALYTICS_PROMPT,
+      'CLI prompted for analytics permission during an update where it should not have.',
+    );
   });
 }

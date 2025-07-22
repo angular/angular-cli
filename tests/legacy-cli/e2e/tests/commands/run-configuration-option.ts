@@ -1,3 +1,4 @@
+import assert from 'node:assert/strict';
 import { silentNg } from '../../utils/process';
 import { expectToFail } from '../../utils/utils';
 
@@ -9,9 +10,7 @@ export default async function () {
       silentNg('run', 'test-project:build:development', '--configuration=production'),
     );
 
-    if (!message.includes(errorMatch)) {
-      throw new Error(`Expected error to include '${errorMatch}' but didn't.\n\n${message}`);
-    }
+    assert.ok(message.includes(errorMatch));
   }
 
   {
@@ -19,8 +18,6 @@ export default async function () {
       silentNg('run', 'test-project:build', '--configuration=production'),
     );
 
-    if (!message.includes(errorMatch)) {
-      throw new Error(`Expected error to include '${errorMatch}' but didn't.\n\n${message}`);
-    }
+    assert.ok(message.includes(errorMatch));
   }
 }

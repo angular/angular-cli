@@ -1,3 +1,4 @@
+import assert from 'node:assert/strict';
 import { silentNg } from '../../../utils/process';
 
 export default async function () {
@@ -42,31 +43,21 @@ export default async function () {
   const { stdout } = await silentNg('config', '--help', '--json-help');
   const output = JSON.stringify(JSON.parse(stdout.trim()));
 
-  if (output !== addHelpOutputSnapshot) {
-    throw new Error(
-      `ng config JSON help output didn\'t match snapshot.\n\nExpected "${output}" to be "${addHelpOutputSnapshot}".`,
-    );
-  }
+  assert.strictEqual(
+    output,
+    addHelpOutputSnapshot,
+    `ng config JSON help output didn\'t match snapshot.`,
+  );
 
   const { stdout: stdout2 } = await silentNg('--help', '--json-help');
-  try {
-    JSON.parse(stdout2.trim());
-  } catch (error) {
-    throw new Error(
-      `'ng --help ---json-help' failed to return JSON.\n${
-        error instanceof Error ? error.message : error
-      }`,
-    );
-  }
+  assert.doesNotThrow(
+    () => JSON.parse(stdout2.trim()),
+    `'ng --help ---json-help' failed to return JSON.`,
+  );
 
   const { stdout: stdout3 } = await silentNg('generate', '--help', '--json-help');
-  try {
-    JSON.parse(stdout3.trim());
-  } catch (error) {
-    throw new Error(
-      `'ng generate --help ---json-help' failed to return JSON.\n${
-        error instanceof Error ? error.message : error
-      }`,
-    );
-  }
+  assert.doesNotThrow(
+    () => JSON.parse(stdout3.trim()),
+    `'ng generate --help ---json-help' failed to return JSON.`,
+  );
 }
