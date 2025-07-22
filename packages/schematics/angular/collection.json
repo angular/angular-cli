@@ -131,6 +131,11 @@
       "factory": "./config",
       "schema": "./config/schema.json",
       "description": "Generates a configuration file."
+    },
+    "ai-config": {
+      "factory": "./ai-config",
+      "schema": "./ai-config/schema.json",
+      "description": "Generates an AI tool configuration file."
     }
   }
 }

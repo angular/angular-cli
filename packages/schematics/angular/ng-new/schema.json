@@ -142,6 +142,15 @@
     "zoneless": {
       "description": "Create an initial application that does not utilize `zone.js`.",
       "type": "boolean"
+    },
+    "aiConfig": {
+      "type": "array",
+      "uniqueItems": true,
+      "description": "Specifies which AI tools to generate configuration files for. These file are used to improve the outputs of AI tools by following the best practices.",
+      "items": {
+        "type": "string",
+        "enum": ["none", "gemini", "copilot", "claude", "cursor", "jetbrains", "windsurf"]
+      }
     }
   },
   "required": ["name", "version"]

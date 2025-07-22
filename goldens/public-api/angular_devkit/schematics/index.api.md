@@ -637,7 +637,10 @@ export enum MergeStrategy {
 export function mergeWith(source: Source, strategy?: MergeStrategy): Rule;
 
 // @public (undocumented)
-export function move(from: string, to?: string): Rule;
+export function move(from: string, to: string): Rule;
+
+// @public (undocumented)
+export function move(to: string): Rule;
 
 // @public (undocumented)
 export function noop(): Rule;

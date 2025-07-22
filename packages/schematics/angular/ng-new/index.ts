@@ -65,6 +65,9 @@ export default function (options: NgNewOptions): Rule {
       apply(empty(), [
         schematic('workspace', workspaceOptions),
         options.createApplication ? schematic('application', applicationOptions) : noop,
+        schematic('ai-config', {
+          tool: options.aiConfig?.length ? options.aiConfig : undefined,
+        }),
         move(options.directory),
       ]),
     ),
