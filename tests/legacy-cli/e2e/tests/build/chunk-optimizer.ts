@@ -15,5 +15,5 @@ export default async function () {
   });
 
   const content = await readFile('dist/test-project/browser/main.js', 'utf-8');
-  assert.match(content, /\\u0275\\u0275defineComponent/);
+  assert.match(content, /ɵɵdefineComponent/u);
 }

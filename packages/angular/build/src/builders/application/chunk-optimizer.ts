@@ -7,7 +7,7 @@
  */
 
 import assert from 'node:assert';
-import { rollup } from 'rollup';
+import { rolldown } from 'rolldown';
 import {
   BuildOutputFile,
   BuildOutputFileType,
@@ -65,7 +65,7 @@ export async function optimizeChunks(
   let bundle;
   let optimizedOutput;
   try {
-    bundle = await rollup({
+    bundle = await rolldown({
       input: mainFile,
       plugins: [
         {
@@ -101,7 +101,7 @@ export async function optimizeChunks(
     });
 
     const result = await bundle.generate({
-      compact: true,
+      minify: { mangle: false, compress: false, removeWhitespace: true },
       sourcemap,
       chunkFileNames: (chunkInfo) => `${chunkInfo.name.replace(/-[a-zA-Z0-9]{8}$/, '')}-[hash].js`,
     });
