@@ -1,3 +1,4 @@
+import assert from 'node:assert/strict';
 import { expectFileToMatch, writeMultipleFiles } from '../../utils/fs';
 import { ng } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';
@@ -42,8 +43,5 @@ export default async function () {
   );
 
   // Non injected styles should be listed under lazy chunk files
-  if (!/Lazy chunk files[\s\S]+renamed-lazy-style\.css/m.test(stdout)) {
-    console.log(stdout);
-    throw new Error(`Expected "renamed-lazy-style.css" to be listed under "Lazy chunk files".`);
-  }
+  assert.match(stdout, /Lazy chunk files[\s\S]+renamed-lazy-style\.css/m);
 }

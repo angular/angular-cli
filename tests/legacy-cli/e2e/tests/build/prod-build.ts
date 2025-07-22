@@ -1,3 +1,4 @@
+import assert from 'node:assert/strict';
 import { statSync } from 'node:fs';
 import { join } from 'node:path';
 import { getGlobalVariable } from '../../utils/env';
@@ -10,17 +11,15 @@ function verifySize(bundle: string, baselineBytes: number) {
   const maxSize = baselineBytes + percentageBaseline;
   const minSize = baselineBytes - percentageBaseline;
 
-  if (size >= maxSize) {
-    throw new Error(
-      `Expected ${bundle} size to be less than ${maxSize / 1024}Kb but it was ${size / 1024}Kb.`,
-    );
-  }
+  assert(
+    size < maxSize,
+    `Expected ${bundle} size to be less than ${maxSize / 1024}Kb but it was ${size / 1024}Kb.`,
+  );
 
-  if (size <= minSize) {
-    throw new Error(
-      `Expected ${bundle} size to be greater than ${minSize / 1024}Kb but it was ${size / 1024}Kb.`,
-    );
-  }
+  assert(
+    size > minSize,
+    `Expected ${bundle} size to be greater than ${minSize / 1024}Kb but it was ${size / 1024}Kb.`,
+  );
 }
 
 export default async function () {

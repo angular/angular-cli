@@ -1,7 +1,8 @@
+import assert from 'node:assert/strict';
 import * as fs from 'node:fs';
+import { getGlobalVariable } from '../../utils/env';
 import { expectFileToExist } from '../../utils/fs';
 import { ng } from '../../utils/process';
-import { getGlobalVariable } from '../../utils/env';
 
 export default async function () {
   const useWebpackBuilder = !getGlobalVariable('argv')['esbuild'];
@@ -30,9 +31,7 @@ async function testForSourceMaps(expectedNumberOfFiles: number): Promise<void> {
 
     ++count;
 
-    if (!files.includes(file + '.map')) {
-      throw new Error('Sourcemap not generated for ' + file);
-    }
+    assert(files.includes(file + '.map'), 'Sourcemap not generated for ' + file);
 
     const content = fs.readFileSync('./dist/test-project/browser/' + file, 'utf8');
     let lastLineIndex = content.lastIndexOf('\n');
@@ -41,15 +40,15 @@ async function testForSourceMaps(expectedNumberOfFiles: number): Promise<void> {
       lastLineIndex = content.lastIndexOf('\n', lastLineIndex - 1);
     }
     const comment = lastLineIndex !== -1 && content.slice(lastLineIndex).trim();
-    if (comment !== `//# sourceMappingURL=${file}.map`) {
-      console.log('CONTENT:\n' + content);
-      throw new Error('Sourcemap comment not generated for ' + file);
-    }
-  }
-
-  if (count < expectedNumberOfFiles) {
-    throw new Error(
-      `Javascript file count is low. Expected ${expectedNumberOfFiles} but found ${count}`,
+    assert.equal(
+      comment,
+      `//# sourceMappingURL=${file}.map`,
+      'Sourcemap comment not generated for ' + file,
     );
   }
+
+  assert(
+    count >= expectedNumberOfFiles,
+    `Javascript file count is low. Expected ${expectedNumberOfFiles} but found ${count}`,
+  );
 }

@@ -1,3 +1,4 @@
+import assert from 'node:assert/strict';
 import { getGlobalVariable } from '../../utils/env';
 import {
   expectFileMatchToExist,
@@ -55,9 +56,10 @@ export default async function () {
     `dist/test-project/browser/${filenameBuild2}`,
     'try{console.log()}catch{}',
   );
-  if (filenameBuild1 === filenameBuild2) {
-    throw new Error(
-      'Contents of the built file changed between builds, but the content hash stayed the same!',
-    );
-  }
+
+  assert.notEqual(
+    filenameBuild1,
+    filenameBuild2,
+    'Contents of the built file changed between builds, but the content hash stayed the same!',
+  );
 }
