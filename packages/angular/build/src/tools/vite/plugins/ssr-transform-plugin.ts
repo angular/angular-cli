@@ -7,7 +7,6 @@
  */
 
 import remapping, { SourceMapInput } from '@ampproject/remapping';
-import type { SourceDescription } from 'rollup';
 import type { Plugin } from 'vite';
 import { loadEsmModule } from '../../../utils/load-esm';
 
@@ -28,7 +27,8 @@ export async function createAngularSsrTransformPlugin(workspaceRoot: string): Pr
 
       return {
         code,
-        map: remappedMap as SourceDescription['map'],
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        map: remappedMap as any,
       };
     },
   };
