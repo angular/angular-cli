@@ -1,0 +1,39 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "SchematicsAngularAIConfig",
+  "title": "Angular AI Config File Options Schema",
+  "type": "object",
+  "additionalProperties": false,
+  "description": "Generates AI configuration files for Angular projects. This schematic creates configuration files that help AI tools follow Angular best practices, improving the quality of AI-generated code and suggestions.",
+  "properties": {
+    "tool": {
+      "type": "array",
+      "uniqueItems": true,
+      "default": "none",
+      "x-prompt": "Which AI tools do you want to configure with Angular best practices? https://angular.dev/ai/develop-with-ai",
+      "description": "Specifies which AI tools to generate configuration files for. These file are used to improve the outputs of AI tools by following the best practices.",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "enum": ["none", "gemini", "copilot", "claude", "cursor", "jetbrains", "windsurf"]
+      }
+    }
+  },
+  "if": {
+    "properties": {
+      "tool": {
+        "contains": {
+          "const": "none"
+        }
+      }
+    },
+    "required": ["tool"]
+  },
+  "then": {
+    "properties": {
+      "tool": {
+        "maxItems": 1
+      }
+    }
+  }
+}
