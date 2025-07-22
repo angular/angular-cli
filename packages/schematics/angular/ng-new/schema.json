@@ -144,6 +144,12 @@
       "x-prompt": "Do you want to create a 'zoneless' application without zone.js (Developer Preview)?",
       "type": "boolean",
       "default": false
+    },
+    "aiConfig": {
+      "description": "Create an AI configuration file for the project. This file is used to improve the outputs of AI tools by following the best practices.",
+      "default": "none",
+      "type": "string",
+      "enum": ["gemini", "copilot", "claude", "cursor", "windsurf", "all", "none"]
     }
   },
   "required": ["name", "version"]

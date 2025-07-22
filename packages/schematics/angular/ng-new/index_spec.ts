@@ -103,4 +103,13 @@ describe('Ng New Schematic', () => {
     const { cli } = JSON.parse(tree.readContent('/bar/angular.json'));
     expect(cli.packageManager).toBe('npm');
   });
+
+  it('should add ai config file when aiConfig is set', async () => {
+    const options = { ...defaultOptions, aiConfig: 'gemini' };
+
+    const tree = await schematicRunner.runSchematic('ng-new', options);
+    const files = tree.files;
+    expect(files).toContain('/bar/.gemini/GEMINI.md');
+    expect(tree.readContent('/bar/.gemini/GEMINI.md')).toMatch(/^You are an expert in TypeScript/);
+  });
 });

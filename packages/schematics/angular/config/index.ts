@@ -11,6 +11,7 @@ import {
   SchematicsException,
   apply,
   applyTemplates,
+  chain,
   filter,
   mergeWith,
   move,
@@ -24,12 +25,40 @@ import { getWorkspace as readWorkspace, updateWorkspace } from '../utility/works
 import { Builders as AngularBuilder } from '../utility/workspace-models';
 import { Schema as ConfigOptions, Type as ConfigType } from './schema';
 
+const geminiFile: ContextFileInfo = { rulesName: 'GEMINI.md', directory: '.gemini' };
+const copilotFile: ContextFileInfo = {
+  rulesName: 'copilot-instructions.md',
+  directory: '.github',
+};
+const claudeFile: ContextFileInfo = { rulesName: 'CLAUDE.md', directory: '.claude' };
+const windsurfFile: ContextFileInfo = {
+  rulesName: 'guidelines.md',
+  directory: path.join('.windsurf', 'rules'),
+};
+
+// Cursor file is a bit different, it has a front matter section.
+const cursorFile: ContextFileInfo = {
+  rulesName: 'cursor.mdc',
+  directory: path.join('.cursor', 'rules'),
+  frontmatter: `---\ncontext: true\npriority: high\nscope: project\n---`,
+};
+
+const AI_TOOLS = {
+  'gemini': geminiFile,
+  'claude': claudeFile,
+  'copilot': copilotFile,
+  'cursor': cursorFile,
+  'windsurf': windsurfFile,
+};
+
 export default function (options: ConfigOptions): Rule {
   switch (options.type) {
     case ConfigType.Karma:
       return addKarmaConfig(options);
     case ConfigType.Browserslist:
       return addBrowserslistConfig(options);
+    case ConfigType.Ai:
+      return addAiContextFile(options);
     default:
       throw new SchematicsException(`"${options.type}" is an unknown configuration file type.`);
   }
@@ -102,4 +131,41 @@ function addKarmaConfig(options: ConfigOptions): Rule {
       ]),
     );
   });
+}
+
+interface ContextFileInfo {
+  rulesName: string;
+  directory: string;
+  frontmatter?: string;
+}
+
+function addAiContextFile(options: ConfigOptions): Rule {
+  const selectedTool = options.tool as keyof typeof AI_TOOLS;
+  const files: ContextFileInfo[] =
+    options.tool === 'all' ? Object.values(AI_TOOLS) : [AI_TOOLS[selectedTool]];
+
+  return async (host) => {
+    const workspace = await readWorkspace(host);
+    const project = workspace.projects.get(options.project);
+    if (!project) {
+      throw new SchematicsException(`Project name "${options.project}" doesn't not exist.`);
+    }
+
+    const rules = files.map(({ rulesName, directory, frontmatter }) =>
+      mergeWith(
+        apply(url('./files'), [
+          // Keep only the single source template
+          filter((p) => p.endsWith('__rulesName__.template')),
+          applyTemplates({
+            ...strings,
+            rulesName,
+            frontmatter: frontmatter ?? '',
+          }),
+          move(directory),
+        ]),
+      ),
+    );
+
+    return chain(rules);
+  };
 }
