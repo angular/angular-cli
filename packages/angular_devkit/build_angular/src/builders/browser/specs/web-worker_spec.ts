@@ -124,7 +124,7 @@ describe('Browser Builder Web Worker support', () => {
     );
     expect(workerContent).toContain('hello from worker');
     expect(workerContent).toContain('bar');
-    expect(workerContent).toContain('"hello"===e&&postMessage');
+    expect(workerContent).toContain('"hello"===o&&postMessage');
 
     // Main bundle should reference hashed worker bundle.
     const mainBundle = host.fileMatchExists(outputPath, /main\.[0-9a-f]{16}\.js/) as string;
