@@ -1,3 +1,4 @@
+import assert from 'node:assert/strict';
 import { setTimeout } from 'node:timers/promises';
 import { getGlobalVariable } from '../../utils/env';
 import { appendToFile, replaceInFile, writeMultipleFiles } from '../../utils/fs';
@@ -68,15 +69,9 @@ export default async function () {
   {
     const response = await fetch(`http://localhost:${port}/main.js`);
     const body = await response.text();
-    if (!body.match(/\$\$_E2E_GOLDEN_VALUE_1/)) {
-      throw new Error('Expected golden value 1.');
-    }
-    if (!body.match(/\$\$_E2E_GOLDEN_VALUE_2/)) {
-      throw new Error('Expected golden value 2.');
-    }
-    if (!body.match(/\$\$_E2E_GOLDEN_VALUE_3/)) {
-      throw new Error('Expected golden value 3.');
-    }
+    assert.match(body, /\$\$_E2E_GOLDEN_VALUE_1/);
+    assert.match(body, /\$\$_E2E_GOLDEN_VALUE_2/);
+    assert.match(body, /\$\$_E2E_GOLDEN_VALUE_3/);
   }
 
   await setTimeout(500);
@@ -90,9 +85,7 @@ export default async function () {
   {
     const response = await fetch(`http://localhost:${port}/main.js`);
     const body = await response.text();
-    if (!body.match(/testingTESTING123/)) {
-      throw new Error('Expected component HTML to update.');
-    }
+    assert.match(body, /testingTESTING123/);
   }
 
   await setTimeout(500);
@@ -106,9 +99,7 @@ export default async function () {
   {
     const response = await fetch(`http://localhost:${port}/main.js`);
     const body = await response.text();
-    if (!body.match(/color:\s?blue/)) {
-      throw new Error('Expected component CSS to update.');
-    }
+    assert.match(body, /color:\s?blue/);
   }
 
   await setTimeout(500);
@@ -122,8 +113,6 @@ export default async function () {
   {
     const response = await fetch(`http://localhost:${port}/styles.css`);
     const body = await response.text();
-    if (!body.match(/color:\s?green/)) {
-      throw new Error('Expected global CSS to update.');
-    }
+    assert.match(body, /color:\s?green/);
   }
 }

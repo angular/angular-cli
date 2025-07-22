@@ -4,15 +4,8 @@ import { ng } from '../../utils/process';
 
 export default async function () {
   const { stderr: stderrProgress, stdout } = await ng('build', '--progress');
-  if (!stdout.includes('Initial total')) {
-    throw new Error(`Expected stdout to contain 'Initial total' but it did not.\n${stdout}`);
-  }
-
-  if (!stdout.includes('Estimated transfer size')) {
-    throw new Error(
-      `Expected stdout to contain 'Estimated transfer size' but it did not.\n${stdout}`,
-    );
-  }
+  assert.match(stdout, /Initial total/);
+  assert.match(stdout, /Estimated transfer size/);
 
   let logs;
   if (getGlobalVariable('argv')['esbuild']) {
@@ -28,15 +21,11 @@ export default async function () {
   }
 
   for (const log of logs) {
-    if (!stderrProgress.includes(log)) {
-      throw new Error(`Expected stderr to contain '${log}' but didn't.\n${stderrProgress}`);
-    }
+    assert.match(stderrProgress, new RegExp(log));
   }
 
   const { stderr: stderrNoProgress } = await ng('build', '--no-progress');
   for (const log of logs) {
-    if (stderrNoProgress.includes(log)) {
-      throw new Error(`Expected stderr not to contain '${log}' but it did.\n${stderrProgress}`);
-    }
+    assert.doesNotMatch(stderrNoProgress, new RegExp(log));
   }
 }

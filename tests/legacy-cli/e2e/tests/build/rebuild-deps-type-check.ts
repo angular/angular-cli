@@ -1,6 +1,7 @@
-import { waitForAnyProcessOutputToMatch, execAndWaitForOutputToMatch } from '../../utils/process';
-import { writeFile, prependToFile, appendToFile } from '../../utils/fs';
+import assert from 'node:assert/strict';
 import { getGlobalVariable } from '../../utils/env';
+import { appendToFile, prependToFile, writeFile } from '../../utils/fs';
+import { execAndWaitForOutputToMatch, waitForAnyProcessOutputToMatch } from '../../utils/process';
 
 const doneRe = getGlobalVariable('argv')['esbuild']
   ? /Application bundle generation complete\./
@@ -69,14 +70,11 @@ export default function () {
         ]),
       )
       .then((results) => {
-        const stderr = results[0].stderr;
-        if (
-          !stderr.includes(
-            "Argument of type 'string' is not assignable to parameter of type 'number'",
-          )
-        ) {
-          throw new Error('Expected an error but none happened.');
-        }
+        const { stderr } = results[0];
+        assert.match(
+          stderr,
+          /Argument of type 'string' is not assignable to parameter of type 'number'/,
+        );
       })
       // Change an UNRELATED file and the error should still happen.
       // Should trigger a rebuild, this time an error is also expected.
@@ -92,14 +90,11 @@ export default function () {
         ]),
       )
       .then((results) => {
-        const stderr = results[0].stderr;
-        if (
-          !stderr.includes(
-            "Argument of type 'string' is not assignable to parameter of type 'number'",
-          )
-        ) {
-          throw new Error('Expected an error to still be there but none was.');
-        }
+        const { stderr } = results[0];
+        assert.match(
+          stderr,
+          /Argument of type 'string' is not assignable to parameter of type 'number'/,
+        );
       })
       // Fix the error!
       .then(() =>
@@ -116,14 +111,11 @@ export default function () {
         ]),
       )
       .then((results) => {
-        const stderr = results[0].stderr;
-        if (
-          stderr.includes(
-            "Argument of type 'string' is not assignable to parameter of type 'number'",
-          )
-        ) {
-          throw new Error('Expected no error but an error was shown.');
-        }
+        const { stderr } = results[0];
+        assert.doesNotMatch(
+          stderr,
+          /Argument of type 'string' is not assignable to parameter of type 'number'/,
+        );
       })
   );
 }

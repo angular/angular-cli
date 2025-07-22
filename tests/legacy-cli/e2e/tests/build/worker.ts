@@ -6,10 +6,11 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
+import assert from 'node:assert/strict';
 import { readdir } from 'node:fs/promises';
+import { getGlobalVariable } from '../../utils/env';
 import { expectFileToExist, expectFileToMatch, replaceInFile, writeFile } from '../../utils/fs';
 import { ng } from '../../utils/process';
-import { getGlobalVariable } from '../../utils/env';
 import { expectToFail } from '../../utils/utils';
 
 export default async function () {
@@ -83,9 +84,7 @@ async function getWorkerOutputFile(useWebpackBuilder: boolean): Promise<string> 
     fileName = files.find((f) => /worker-[\dA-Z]{8}\.js/.test(f));
   }
 
-  if (!fileName) {
-    throw new Error('Cannot determine worker output file name.');
-  }
+  assert(fileName, 'Cannot determine worker output file name.');
 
   return fileName;
 }
