@@ -16,13 +16,36 @@
     "type": {
       "type": "string",
       "description": "Specifies the type of configuration file to generate.",
-      "enum": ["karma", "browserslist"],
+      "enum": ["karma", "browserslist", "ai"],
       "x-prompt": "Which type of configuration file would you like to create?",
       "$default": {
         "$source": "argv",
         "index": 0
       }
+    },
+    "tool": {
+      "type": "string",
+      "description": "Specifies the AI tool to configure when type is 'ai'.",
+      "enum": ["gemini", "copilot", "claude", "cursor", "windsurf", "all"]
     }
   },
-  "required": ["project", "type"]
+  "required": ["project", "type"],
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "not": {
+              "const": "ai"
+            }
+          }
+        }
+      },
+      "then": {
+        "not": {
+          "required": ["tool"]
+        }
+      }
+    }
+  ]
 }
