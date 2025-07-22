@@ -1,3 +1,4 @@
+import assert from 'node:assert/strict';
 import { appendFile } from 'node:fs/promises';
 import { expectFileToMatch } from '../../../utils/fs';
 import { getActivePackageManager, uninstallPackage } from '../../../utils/packages';
@@ -21,24 +22,32 @@ export default async function () {
   await expectFileToMatch('package.json', /@angular\/localize/);
 
   const output1 = await ng('add', '@angular/localize', '--skip-confirmation');
-  if (!output1.stdout.includes('Skipping installation: Package already installed')) {
-    throw new Error('Installation was not skipped');
-  }
+  assert.match(
+    output1.stdout,
+    /Skipping installation: Package already installed/,
+    'Installation was not skipped',
+  );
 
   const output2 = await ng('add', '@angular/localize@latest', '--skip-confirmation');
-  if (output2.stdout.includes('Skipping installation: Package already installed')) {
-    throw new Error('Installation should not have been skipped');
-  }
+  assert.doesNotMatch(
+    output2.stdout,
+    /Skipping installation: Package already installed/,
+    'Installation should not have been skipped',
+  );
 
   const output3 = await ng('add', '@angular/localize@19.1.0', '--skip-confirmation');
-  if (output3.stdout.includes('Skipping installation: Package already installed')) {
-    throw new Error('Installation should not have been skipped');
-  }
+  assert.doesNotMatch(
+    output3.stdout,
+    /Skipping installation: Package already installed/,
+    'Installation should not have been skipped',
+  );
 
   const output4 = await ng('add', '@angular/localize@19', '--skip-confirmation');
-  if (!output4.stdout.includes('Skipping installation: Package already installed')) {
-    throw new Error('Installation was not skipped');
-  }
+  assert.match(
+    output4.stdout,
+    /Skipping installation: Package already installed/,
+    'Installation was not skipped',
+  );
 
   await uninstallPackage('@angular/localize');
 }

@@ -1,6 +1,7 @@
+import assert from 'node:assert/strict';
 import { join } from 'node:path';
+import { createDir, expectFileToExist, writeMultipleFiles } from '../../utils/fs';
 import { ng } from '../../utils/process';
-import { writeMultipleFiles, createDir, expectFileToExist } from '../../utils/fs';
 import { updateJsonFile } from '../../utils/project';
 
 export default async function () {
@@ -55,24 +56,15 @@ export default async function () {
 
   // should display schematics for all schematics
   const { stdout: stdout1 } = await ng('generate', '--help');
-  if (!stdout1.includes('ng generate component')) {
-    throw new Error(`Didn't show schematics of '@schematics/angular'.`);
-  }
-
-  if (!stdout1.includes('ng generate fake')) {
-    throw new Error(`Didn't show schematics of 'fake-schematics'.`);
-  }
+  assert.match(stdout1, /ng generate component/);
+  assert.match(stdout1, /ng generate fake/);
 
   // check registration order. Both schematics contain a component schematic verify that the first one wins.
-  if (!stdout1.includes(fakeComponentSchematicDesc)) {
-    throw new Error(`Didn't show fake component description.`);
-  }
+  assert.match(stdout1, new RegExp(fakeComponentSchematicDesc));
 
   // Verify execution based on ordering
   const { stdout: stdout2 } = await ng('generate', 'component');
-  if (!stdout2.includes('fake component schematic run')) {
-    throw new Error(`stdout didn't contain 'fake component schematic run'.`);
-  }
+  assert.match(stdout2, /fake component schematic run/);
 
   await updateJsonFile('angular.json', (json) => {
     json.cli ??= {};
@@ -80,12 +72,8 @@ export default async function () {
   });
 
   const { stdout: stdout3 } = await ng('generate', '--help');
-  if (!stdout3.includes('ng generate component [name]')) {
-    throw new Error(`Didn't show component description from @schematics/angular.`);
-  }
-  if (stdout3.includes(fakeComponentSchematicDesc)) {
-    throw new Error(`Shown fake component description, when it shouldn't.`);
-  }
+  assert.match(stdout3, /ng generate component \[name\]/);
+  assert.doesNotMatch(stdout3, new RegExp(fakeComponentSchematicDesc));
 
   // Verify execution based on ordering
   const projectDir = join('src', 'app');

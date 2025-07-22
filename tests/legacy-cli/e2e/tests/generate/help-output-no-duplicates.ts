@@ -1,3 +1,4 @@
+import assert from 'node:assert/strict';
 import { ng } from '../../utils/process';
 
 export default async function () {
@@ -5,13 +6,10 @@ export default async function () {
   const { stdout } = await ng('generate', 'component', '--help');
   const firstIndex = stdout.indexOf('--prefix');
 
-  if (firstIndex < 0) {
-    console.log(stdout);
-    throw new Error('--prefix was not part of the help output.');
-  }
-
-  if (firstIndex !== stdout.lastIndexOf('--prefix')) {
-    console.log(stdout);
-    throw new Error('--prefix first and last index were different. Possible duplicate output!');
-  }
+  assert.ok(firstIndex >= 0, '--prefix was not part of the help output.');
+  assert.strictEqual(
+    firstIndex,
+    stdout.lastIndexOf('--prefix'),
+    '--prefix first and last index were different. Possible duplicate output!',
+  );
 }

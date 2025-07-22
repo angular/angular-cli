@@ -1,6 +1,7 @@
+import assert from 'node:assert/strict';
 import { join } from 'node:path';
-import { ng, ProcessOutput } from '../../utils/process';
-import { writeMultipleFiles, createDir } from '../../utils/fs';
+import { createDir, writeMultipleFiles } from '../../utils/fs';
+import { ng } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';
 
 export default function () {
@@ -75,12 +76,8 @@ export default function () {
       )
       .then(() => ng('generate', 'fake-schematics:fake', '--help'))
       .then(({ stdout }) => {
-        if (!/ng generate fake-schematics:fake <a> \[b\]/.test(stdout)) {
-          throw new Error('Help signature is wrong (1).');
-        }
-        if (!/opt-a[\s\S]*opt-b[\s\S]*opt-c/.test(stdout)) {
-          throw new Error('Help signature options are incorrect.');
-        }
+        assert.match(stdout, /ng generate fake-schematics:fake <a> \[b\]/);
+        assert.match(stdout, /opt-a[\s\S]*opt-b[\s\S]*opt-c/);
       })
       // set up default collection.
       .then(() =>
@@ -92,12 +89,8 @@ export default function () {
       .then(() => ng('generate', 'fake', '--help'))
       // verify same output
       .then(({ stdout }) => {
-        if (!/ng generate fake <a> \[b\]/.test(stdout)) {
-          throw new Error('Help signature is wrong (2).');
-        }
-        if (!/opt-a[\s\S]*opt-b[\s\S]*opt-c/.test(stdout)) {
-          throw new Error('Help signature options are incorrect.');
-        }
+        assert.match(stdout, /ng generate fake <a> \[b\]/);
+        assert.match(stdout, /opt-a[\s\S]*opt-b[\s\S]*opt-c/);
       })
 
       // should print all the available schematics in a collection
@@ -123,9 +116,7 @@ export default function () {
       )
       .then(() => ng('generate', '--help'))
       .then(({ stdout }) => {
-        if (!/fake[\s\S]*fake-two/.test(stdout)) {
-          throw new Error(`Help result is wrong, it didn't contain all the schematics.`);
-        }
+        assert.match(stdout, /fake[\s\S]*fake-two/);
       })
   );
 }

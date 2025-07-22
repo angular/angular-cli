@@ -3,6 +3,7 @@ import * as path from 'node:path';
 import { env } from 'node:process';
 import { getGlobalVariable } from '../../../utils/env';
 import { mockHome } from '../../../utils/utils';
+import assert from 'node:assert/strict';
 
 import {
   execAndCaptureError,
@@ -51,20 +52,24 @@ export default async function () {
       'y\n' /* stdin: accept prompt */,
     );
 
-    if (!AUTOCOMPLETION_PROMPT.test(stdout)) {
-      throw new Error('CLI execution did not prompt for autocompletion setup when it should have.');
-    }
+    assert.match(
+      stdout,
+      AUTOCOMPLETION_PROMPT,
+      'CLI execution did not prompt for autocompletion setup when it should have.',
+    );
 
     const bashrcContents = await fs.readFile(bashrc, 'utf-8');
-    if (!bashrcContents.includes('source <(ng completion script)')) {
-      throw new Error(
-        'Autocompletion was *not* added to `~/.bashrc` after accepting the setup prompt.',
-      );
-    }
+    assert.match(
+      bashrcContents,
+      /source <\(ng completion script\)/,
+      'Autocompletion was *not* added to `~/.bashrc` after accepting the setup prompt.',
+    );
 
-    if (!stdout.includes('Appended `source <(ng completion script)`')) {
-      throw new Error('CLI did not print that it successfully set up autocompletion.');
-    }
+    assert.match(
+      stdout,
+      /Appended `source <\(ng completion script\)`/,
+      'CLI did not print that it successfully set up autocompletion.',
+    );
   });
 
   // Does nothing if the user rejects the autocompletion prompt.
@@ -83,26 +88,30 @@ export default async function () {
       'n\n' /* stdin: reject prompt */,
     );
 
-    if (!AUTOCOMPLETION_PROMPT.test(stdout)) {
-      throw new Error('CLI execution did not prompt for autocompletion setup when it should have.');
-    }
+    assert.match(
+      stdout,
+      AUTOCOMPLETION_PROMPT,
+      'CLI execution did not prompt for autocompletion setup when it should have.',
+    );
 
     const bashrcContents = await fs.readFile(bashrc, 'utf-8');
-    if (bashrcContents.includes('ng completion')) {
-      throw new Error(
-        'Autocompletion was incorrectly added to `~/.bashrc` after refusing the setup prompt.',
-      );
-    }
+    assert.doesNotMatch(
+      bashrcContents,
+      /ng completion/,
+      'Autocompletion was incorrectly added to `~/.bashrc` after refusing the setup prompt.',
+    );
 
-    if (stdout.includes('Appended `source <(ng completion script)`')) {
-      throw new Error(
-        "CLI printed that it successfully set up autocompletion when it actually didn't.",
-      );
-    }
+    assert.doesNotMatch(
+      stdout,
+      /Appended `source <\(ng completion script\)`/,
+      "CLI printed that it successfully set up autocompletion when it actually didn't.",
+    );
 
-    if (!stdout.includes("Ok, you won't be prompted again.")) {
-      throw new Error('CLI did not inform the user they will not be prompted again.');
-    }
+    assert.match(
+      stdout,
+      /Ok, you won't be prompted again\./,
+      'CLI did not inform the user they will not be prompted again.',
+    );
   });
 
   // Does *not* prompt if the user already accepted (even if they delete the completion config).
@@ -121,17 +130,19 @@ export default async function () {
       'y\n' /* stdin: accept prompt */,
     );
 
-    if (!AUTOCOMPLETION_PROMPT.test(stdout1)) {
-      throw new Error('First execution did not prompt for autocompletion setup.');
-    }
+    assert.match(
+      stdout1,
+      AUTOCOMPLETION_PROMPT,
+      'First execution did not prompt for autocompletion setup.',
+    );
 
     const bashrcContents1 = await fs.readFile(bashrc, 'utf-8');
-    if (!bashrcContents1.includes('source <(ng completion script)')) {
-      throw new Error(
-        '`~/.bashrc` file was not updated after the user accepted the autocompletion' +
-          ` prompt. Contents:\n${bashrcContents1}`,
-      );
-    }
+    assert.match(
+      bashrcContents1,
+      /source <\(ng completion script\)/,
+      '`~/.bashrc` file was not updated after the user accepted the autocompletion' +
+        ` prompt. Contents:\n${bashrcContents1}`,
+    );
 
     // User modifies their configuration and removes `ng completion`.
     await fs.writeFile(bashrc, '# Some new commands...');
@@ -142,20 +153,20 @@ export default async function () {
       HOME: home,
     });
 
-    if (AUTOCOMPLETION_PROMPT.test(stdout2)) {
-      throw new Error(
-        'Subsequent execution after rejecting autocompletion setup prompted again' +
-          ' when it should not have.',
-      );
-    }
+    assert.doesNotMatch(
+      stdout2,
+      AUTOCOMPLETION_PROMPT,
+      'Subsequent execution after rejecting autocompletion setup prompted again' +
+        ' when it should not have.',
+    );
 
     const bashrcContents2 = await fs.readFile(bashrc, 'utf-8');
-    if (bashrcContents2 !== '# Some new commands...') {
-      throw new Error(
-        '`~/.bashrc` file was incorrectly modified when using a modified `~/.bashrc`' +
-          ` after previously accepting the autocompletion prompt. Contents:\n${bashrcContents2}`,
-      );
-    }
+    assert.strictEqual(
+      bashrcContents2,
+      '# Some new commands...',
+      '`~/.bashrc` file was incorrectly modified when using a modified `~/.bashrc`' +
+        ` after previously accepting the autocompletion prompt. Contents:\n${bashrcContents2}`,
+    );
   });
 
   // Does *not* prompt if the user already rejected.
@@ -174,9 +185,11 @@ export default async function () {
       'n\n' /* stdin: reject prompt */,
     );
 
-    if (!AUTOCOMPLETION_PROMPT.test(stdout1)) {
-      throw new Error('First execution did not prompt for autocompletion setup.');
-    }
+    assert.match(
+      stdout1,
+      AUTOCOMPLETION_PROMPT,
+      'First execution did not prompt for autocompletion setup.',
+    );
 
     const { stdout: stdout2 } = await execWithEnv('ng', ['config'], {
       ...DEFAULT_ENV,
@@ -184,20 +197,20 @@ export default async function () {
       HOME: home,
     });
 
-    if (AUTOCOMPLETION_PROMPT.test(stdout2)) {
-      throw new Error(
-        'Subsequent execution after rejecting autocompletion setup prompted again' +
-          ' when it should not have.',
-      );
-    }
+    assert.doesNotMatch(
+      stdout2,
+      AUTOCOMPLETION_PROMPT,
+      'Subsequent execution after rejecting autocompletion setup prompted again' +
+        ' when it should not have.',
+    );
 
     const bashrcContents = await fs.readFile(bashrc, 'utf-8');
-    if (bashrcContents !== '# Other commands...') {
-      throw new Error(
-        '`~/.bashrc` file was incorrectly modified when the user never accepted the' +
-          ` autocompletion prompt. Contents:\n${bashrcContents}`,
-      );
-    }
+    assert.strictEqual(
+      bashrcContents,
+      '# Other commands...',
+      '`~/.bashrc` file was incorrectly modified when the user never accepted the' +
+        ` autocompletion prompt. Contents:\n${bashrcContents}`,
+    );
   });
 
   // Prompts user again on subsequent execution after accepting prompt but failing to setup.
@@ -220,11 +233,11 @@ export default async function () {
       'y\n' /* stdin: accept prompt */,
     );
 
-    if (!err.message.includes('Failed to append autocompletion setup')) {
-      throw new Error(
-        `Failed first execution did not print the expected error message. Actual:\n${err.message}`,
-      );
-    }
+    assert.match(
+      err.message,
+      /Failed to append autocompletion setup/,
+      `Failed first execution did not print the expected error message. Actual:\n${err.message}`,
+    );
 
     // User corrects file permissions between executions.
     await fs.chmod(bashrc, 0o777);
@@ -240,20 +253,20 @@ export default async function () {
       'y\n' /* stdin: accept prompt */,
     );
 
-    if (!AUTOCOMPLETION_PROMPT.test(stdout2)) {
-      throw new Error(
-        'Subsequent execution after failed autocompletion setup did not prompt again when it should' +
-          ' have.',
-      );
-    }
+    assert.match(
+      stdout2,
+      AUTOCOMPLETION_PROMPT,
+      'Subsequent execution after failed autocompletion setup did not prompt again when it should' +
+        ' have.',
+    );
 
     const bashrcContents = await fs.readFile(bashrc, 'utf-8');
-    if (!bashrcContents.includes('ng completion script')) {
-      throw new Error(
-        '`~/.bashrc` file does not include `ng completion` after the user never accepted the' +
-          ` autocompletion prompt a second time. Contents:\n${bashrcContents}`,
-      );
-    }
+    assert.match(
+      bashrcContents,
+      /ng completion script/,
+      '`~/.bashrc` file does not include `ng completion` after the user never accepted the' +
+        ` autocompletion prompt a second time. Contents:\n${bashrcContents}`,
+    );
   });
 
   // Does *not* prompt for `ng update` commands.
@@ -264,9 +277,11 @@ export default async function () {
       HOME: home,
     });
 
-    if (AUTOCOMPLETION_PROMPT.test(stdout)) {
-      throw new Error('`ng update` command incorrectly prompted for autocompletion setup.');
-    }
+    assert.doesNotMatch(
+      stdout,
+      AUTOCOMPLETION_PROMPT,
+      '`ng update` command incorrectly prompted for autocompletion setup.',
+    );
   });
 
   // Does *not* prompt for `ng completion` commands.
@@ -276,9 +291,11 @@ export default async function () {
       HOME: home,
     });
 
-    if (AUTOCOMPLETION_PROMPT.test(stdout)) {
-      throw new Error('`ng completion` command incorrectly prompted for autocompletion setup.');
-    }
+    assert.doesNotMatch(
+      stdout,
+      AUTOCOMPLETION_PROMPT,
+      '`ng completion` command incorrectly prompted for autocompletion setup.',
+    );
   });
 
   // Does *not* prompt user for CI executions.
@@ -289,9 +306,11 @@ export default async function () {
       NG_FORCE_TTY: undefined,
     });
 
-    if (AUTOCOMPLETION_PROMPT.test(stdout)) {
-      throw new Error('CI execution prompted for autocompletion setup but should not have.');
-    }
+    assert.doesNotMatch(
+      stdout,
+      AUTOCOMPLETION_PROMPT,
+      'CI execution prompted for autocompletion setup but should not have.',
+    );
   }
 
   // Does *not* prompt user for non-TTY executions.
@@ -301,9 +320,11 @@ export default async function () {
       NG_FORCE_TTY: 'false',
     });
 
-    if (AUTOCOMPLETION_PROMPT.test(stdout)) {
-      throw new Error('Non-TTY execution prompted for autocompletion setup but should not have.');
-    }
+    assert.doesNotMatch(
+      stdout,
+      AUTOCOMPLETION_PROMPT,
+      'Non-TTY execution prompted for autocompletion setup but should not have.',
+    );
   }
 
   // Does *not* prompt user for executions without a `$HOME`.
@@ -313,12 +334,12 @@ export default async function () {
       HOME: undefined,
     });
 
-    if (AUTOCOMPLETION_PROMPT.test(stdout)) {
-      throw new Error(
-        'Execution without a `$HOME` value prompted for autocompletion setup but' +
-          ' should not have.',
-      );
-    }
+    assert.doesNotMatch(
+      stdout,
+      AUTOCOMPLETION_PROMPT,
+      'Execution without a `$HOME` value prompted for autocompletion setup but' +
+        ' should not have.',
+    );
   }
 
   // Does *not* prompt user for executions without a `$SHELL`.
@@ -328,12 +349,12 @@ export default async function () {
       SHELL: undefined,
     });
 
-    if (AUTOCOMPLETION_PROMPT.test(stdout)) {
-      throw new Error(
-        'Execution without a `$SHELL` value prompted for autocompletion setup but' +
-          ' should not have.',
-      );
-    }
+    assert.doesNotMatch(
+      stdout,
+      AUTOCOMPLETION_PROMPT,
+      'Execution without a `$SHELL` value prompted for autocompletion setup but' +
+        ' should not have.',
+    );
   }
 
   // Does *not* prompt user for executions from unknown shells.
@@ -343,12 +364,12 @@ export default async function () {
       SHELL: '/usr/bin/unknown',
     });
 
-    if (AUTOCOMPLETION_PROMPT.test(stdout)) {
-      throw new Error(
-        'Execution with an unknown `$SHELL` value prompted for autocompletion setup' +
-          ' but should not have.',
-      );
-    }
+    assert.doesNotMatch(
+      stdout,
+      AUTOCOMPLETION_PROMPT,
+      'Execution with an unknown `$SHELL` value prompted for autocompletion setup' +
+        ' but should not have.',
+    );
   }
 
   // Does *not* prompt user when an RC file already uses `ng completion`.
@@ -370,12 +391,12 @@ source <(ng completion script)
       HOME: home,
     });
 
-    if (AUTOCOMPLETION_PROMPT.test(stdout)) {
-      throw new Error(
-        "Execution with an existing `ng completion` line in the user's RC file" +
-          ' prompted for autocompletion setup but should not have.',
-      );
-    }
+    assert.doesNotMatch(
+      stdout,
+      AUTOCOMPLETION_PROMPT,
+      "Execution with an existing `ng completion` line in the user's RC file" +
+        ' prompted for autocompletion setup but should not have.',
+    );
   });
 
   // Prompts when a global CLI install is present on the system.
@@ -418,12 +439,12 @@ source <(ng completion script)
         PATH: pathEnvVar,
       });
 
-      if (AUTOCOMPLETION_PROMPT.test(stdout)) {
-        throw new Error(
-          'Execution without a global CLI install prompted for autocompletion setup but should' +
-            ' not have.',
-        );
-      }
+      assert.doesNotMatch(
+        stdout,
+        AUTOCOMPLETION_PROMPT,
+        'Execution without a global CLI install prompted for autocompletion setup but should' +
+          ' not have.',
+      );
     } finally {
       // Reinstall global CLI for remainder of the tests.
       await silentNpm(['install', '--global', '@angular/cli', `--registry=${testRegistry}`]);
@@ -439,11 +460,11 @@ async function windowsTests(): Promise<void> {
 
     const { stdout } = await execWithEnv('ng', ['config'], { ...env });
 
-    if (AUTOCOMPLETION_PROMPT.test(stdout)) {
-      throw new Error(
-        'Execution prompted to set up autocompletion on Windows despite not actually being' +
-          ' supported.',
-      );
-    }
+    assert.doesNotMatch(
+      stdout,
+      AUTOCOMPLETION_PROMPT,
+      'Execution prompted to set up autocompletion on Windows despite not actually being' +
+        ' supported.',
+    );
   });
 }

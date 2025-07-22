@@ -1,3 +1,4 @@
+import assert from 'node:assert/strict';
 import { ngServe } from '../../../utils/project';
 
 export default async function () {
@@ -16,10 +17,10 @@ async function checkHeadForUrl(url: string): Promise<void> {
   const result = await fetch(url, { method: 'HEAD' });
   const content = await result.blob();
 
-  if (content.size !== 0) {
-    throw new Error(`Expected "size" to be "0" but got "${content.size}".`);
-  }
-  if (result.status !== 200) {
-    throw new Error(`Expected "status" to be "200" but got "${result.status}".`);
-  }
+  assert.strictEqual(content.size, 0, `Expected "size" to be "0" but got "${content.size}".`);
+  assert.strictEqual(
+    result.status,
+    200,
+    `Expected "status" to be "200" but got "${result.status}".`,
+  );
 }

@@ -1,3 +1,4 @@
+import assert from 'node:assert/strict';
 import { getGlobalVariable } from '../../../utils/env';
 import { expectFileToExist, readFile, rimraf } from '../../../utils/fs';
 import { installWorkspacePackages } from '../../../utils/packages';
@@ -17,9 +18,7 @@ export default async function () {
   const hasPWADep = Object.keys({ ...dependencies, ...devDependencies }).some(
     (d) => d === '@angular/pwa',
   );
-  if (hasPWADep) {
-    throw new Error(`Expected 'package.json' not to contain a dependency on '@angular/pwa'.`);
-  }
+  assert.ok(!hasPWADep, `Expected 'package.json' not to contain a dependency on '@angular/pwa'.`);
 
   const isSnapshotBuild = getGlobalVariable('argv')['ng-snapshots'];
   if (isSnapshotBuild) {
@@ -55,13 +54,10 @@ export default async function () {
   }));
   const emptyAssetGroups = assetGroups.filter(({ urlCount }) => urlCount === 0);
 
-  if (assetGroups.length === 0) {
-    throw new Error("Expected 'ngsw.json' to contain at least one asset-group.");
-  }
-  if (emptyAssetGroups.length > 0) {
-    throw new Error(
-      'Expected all asset-groups to contain at least one URL, but the following groups are empty: ' +
-        emptyAssetGroups.map(({ name }) => name).join(', '),
-    );
-  }
+  assert.ok(assetGroups.length > 0, "Expected 'ngsw.json' to contain at least one asset-group.");
+  assert.ok(
+    emptyAssetGroups.length === 0,
+    'Expected all asset-groups to contain at least one URL, but the following groups are empty: ' +
+      emptyAssetGroups.map(({ name }) => name).join(', '),
+  );
 }

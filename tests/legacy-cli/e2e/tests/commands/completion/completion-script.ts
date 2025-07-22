@@ -1,3 +1,4 @@
+import assert from 'node:assert/strict';
 import { exec, execAndWaitForOutputToMatch } from '../../../utils/process';
 
 export default async function () {
@@ -62,9 +63,9 @@ export default async function () {
     'run',
     'test-project:build',
   );
-  if (noServeStdout.includes(':serve')) {
-    throw new Error(
-      `':serve' should not have been listed as a completion option.\nSTDOUT:\n${noServeStdout}`,
-    );
-  }
+  assert.doesNotMatch(
+    noServeStdout,
+    /:serve/,
+    `':serve' should not have been listed as a completion option.\nSTDOUT:\n${noServeStdout}`,
+  );
 }
