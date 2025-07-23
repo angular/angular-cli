@@ -29,9 +29,9 @@ build_bazel_rules_nodejs_dependencies()
 
 http_archive(
     name = "aspect_rules_js",
-    sha256 = "304c51726b727d53277dd28fcda1b8e43b7e46818530b8d6265e7be98d5e2b25",
-    strip_prefix = "rules_js-2.3.8",
-    url = "https://github.com/aspect-build/rules_js/releases/download/v2.3.8/rules_js-v2.3.8.tar.gz",
+    sha256 = "961393890a58de989ad7aa36ce147fc9b15a77c8144454889bf068bdd12c5165",
+    strip_prefix = "rules_js-2.4.0",
+    url = "https://github.com/aspect-build/rules_js/releases/download/v2.4.0/rules_js-v2.4.0.tar.gz",
 )
 
 load("@aspect_rules_js//js:repositories.bzl", "rules_js_dependencies")
@@ -122,9 +122,9 @@ rules_js_register_toolchains(
 
 http_archive(
     name = "aspect_bazel_lib",
-    sha256 = "9a44f457810ce64ec36a244cc7c807607541ab88f2535e07e0bf2976ef4b73fe",
-    strip_prefix = "bazel-lib-2.19.4",
-    url = "https://github.com/aspect-build/bazel-lib/releases/download/v2.19.4/bazel-lib-v2.19.4.tar.gz",
+    sha256 = "3522895fa13b97e8b27e3b642045682aa4233ae1a6b278aad6a3b483501dc9f2",
+    strip_prefix = "bazel-lib-2.20.0",
+    url = "https://github.com/aspect-build/bazel-lib/releases/download/v2.20.0/bazel-lib-v2.20.0.tar.gz",
 )
 
 load("@aspect_bazel_lib//lib:repositories.bzl", "aspect_bazel_lib_dependencies", "aspect_bazel_lib_register_toolchains")
