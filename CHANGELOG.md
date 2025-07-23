@@ -1,3 +1,27 @@
+<a name="20.2.0-next.1"></a>
+
+# 20.2.0-next.1 (2025-07-23)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                                       |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------- |
+| [fefa7a46f](https://github.com/angular/angular-cli/commit/fefa7a46f5733fd77852a61fddc3120b1bb4b202) | fix  | `define` option is being included multiple times in the JSON help |
+
+### @angular-devkit/core
+
+| Commit                                                                                              | Type | Description                                                                   |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------------------- |
+| [7595e1f88](https://github.com/angular/angular-cli/commit/7595e1f8887bafd344ec939e647e3fca8bbd98be) | fix  | use crypto.randomUUID instead of Date.now for unique string in tmp file names |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                               |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------- |
+| [fb06bb505](https://github.com/angular/angular-cli/commit/fb06bb5050e92eb4d0f95d7774552d0902163f6a) | feat | add headless mode for vitest browser mode |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="20.1.2"></a>
 
 # 20.1.2 (2025-07-23)
@@ -4113,6 +4137,7 @@ Alan Agius, Charles Lyding, Doug Parker, Joey Perrott and Piotr Wysocki
   ```scss
   @import 'font-awesome/scss/font-awesome';
   ```
+
   - By default the CLI will use Sass modern API, While not recommended, users can still opt to use legacy API by setting `NG_BUILD_LEGACY_SASS=1`.
 
 - Internally the Angular CLI now always set the TypeScript `target` to `ES2022` and `useDefineForClassFields` to `false` unless the target is set to `ES2022` or later in the TypeScript configuration. To control ECMA version and features use the Browerslist configuration.
