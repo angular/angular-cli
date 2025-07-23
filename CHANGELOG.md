@@ -1,3 +1,21 @@
+<a name="20.1.2"></a>
+
+# 20.1.2 (2025-07-23)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                                       |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------- |
+| [96785224f](https://github.com/angular/angular-cli/commit/96785224f55291cd60553aead07ead10d9d2fbda) | fix  | `define` option is being included multiple times in the JSON help |
+
+### @angular-devkit/core
+
+| Commit                                                                                              | Type | Description                                                                   |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------------------- |
+| [0d0040bdf](https://github.com/angular/angular-cli/commit/0d0040bdf58a82e18f7669363b6f149313524bfc) | fix  | use crypto.randomUUID instead of Date.now for unique string in tmp file names |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="20.1.1"></a>
 
 # 20.1.1 (2025-07-16)
