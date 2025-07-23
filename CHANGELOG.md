@@ -1,3 +1,21 @@
+<a name="20.1.2"></a>
+
+# 20.1.2 (2025-07-23)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                                       |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------- |
+| [96785224f](https://github.com/angular/angular-cli/commit/96785224f55291cd60553aead07ead10d9d2fbda) | fix  | `define` option is being included multiple times in the JSON help |
+
+### @angular-devkit/core
+
+| Commit                                                                                              | Type | Description                                                                   |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------------------- |
+| [0d0040bdf](https://github.com/angular/angular-cli/commit/0d0040bdf58a82e18f7669363b6f149313524bfc) | fix  | use crypto.randomUUID instead of Date.now for unique string in tmp file names |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="20.2.0-next.0"></a>
 
 # 20.2.0-next.0 (2025-07-16)
@@ -4095,7 +4113,6 @@ Alan Agius, Charles Lyding, Doug Parker, Joey Perrott and Piotr Wysocki
   ```scss
   @import 'font-awesome/scss/font-awesome';
   ```
-
   - By default the CLI will use Sass modern API, While not recommended, users can still opt to use legacy API by setting `NG_BUILD_LEGACY_SASS=1`.
 
 - Internally the Angular CLI now always set the TypeScript `target` to `ES2022` and `useDefineForClassFields` to `false` unless the target is set to `ES2022` or later in the TypeScript configuration. To control ECMA version and features use the Browerslist configuration.
