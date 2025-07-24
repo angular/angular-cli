@@ -1,3 +1,15 @@
+<a name="20.1.3"></a>
+
+# 20.1.3 (2025-07-24)
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description              |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------ |
+| [ea5cd0e81](https://github.com/angular/angular-cli/commit/ea5cd0e81196467ea66f50c106cffec1cd8a1a56) | fix  | update `vite` to `7.0.6` |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="20.1.2"></a>
 
 # 20.1.2 (2025-07-23)
