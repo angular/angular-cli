@@ -55,7 +55,6 @@ ts_project(
         ":node_modules/ini",
         ":node_modules/jsonc-parser",
         ":node_modules/npm-package-arg",
-        ":node_modules/npm-pick-manifest",
         ":node_modules/pacote",
         ":node_modules/resolve",
         ":node_modules/yargs",

@@ -19,7 +19,6 @@ import { createRequire } from 'node:module';
 import * as path from 'node:path';
 import { join, resolve } from 'node:path';
 import npa from 'npm-package-arg';
-import pickManifest from 'npm-pick-manifest';
 import * as semver from 'semver';
 import { Argv } from 'yargs';
 import { PackageManager } from '../../../lib/config/workspace-schema';
@@ -231,9 +230,11 @@ export default class UpdateCommandModule extends CommandModule<UpdateCommandArgs
           logger.warn('Package specifier has no effect when using "migrate-only" option.');
         }
 
-        // If next option is used and no specifier supplied, use next tag
-        if (options.next && packageIdentifier.rawSpec === '*') {
-          packageIdentifier.fetchSpec = 'next';
+        // Wildcard uses the next tag if next option is used otherwise use latest tag.
+        // Wildcard is present if no selector is provided on the command line.
+        if (packageIdentifier.rawSpec === '*') {
+          packageIdentifier.fetchSpec = options.next ? 'next' : 'latest';
+          packageIdentifier.type = 'tag';
         }
 
         packages.push(packageIdentifier as PackageIdentifier);
@@ -665,36 +666,45 @@ export default class UpdateCommandModule extends CommandModule<UpdateCommandArgs
       // Try to find a package version based on the user requested package specifier
       // registry specifier types are either version, range, or tag
       let manifest: PackageManifest | undefined;
-      if (
-        requestIdentifier.type === 'version' ||
-        requestIdentifier.type === 'range' ||
-        requestIdentifier.type === 'tag'
-      ) {
-        try {
-          manifest = pickManifest(metadata, requestIdentifier.fetchSpec);
-        } catch (e) {
-          assertIsError(e);
-          if (e.code === 'ETARGET') {
-            // If not found and next was used and user did not provide a specifier, try latest.
-            // Package may not have a next tag.
-            if (
-              requestIdentifier.type === 'tag' &&
-              requestIdentifier.fetchSpec === 'next' &&
-              !requestIdentifier.rawSpec
-            ) {
-              try {
-                manifest = pickManifest(metadata, 'latest');
-              } catch (e) {
-                assertIsError(e);
-                if (e.code !== 'ETARGET' && e.code !== 'ENOVERSIONS') {
-                  throw e;
-                }
-              }
-            }
-          } else if (e.code !== 'ENOVERSIONS') {
-            throw e;
+      switch (requestIdentifier.type) {
+        case 'tag':
+          manifest = metadata.tags[requestIdentifier.fetchSpec];
+          // If not found and next option was used and user did not provide a specifier, try latest.
+          // Package may not have a next tag.
+          if (
+            !manifest &&
+            requestIdentifier.fetchSpec === 'next' &&
+            requestIdentifier.rawSpec === '*'
+          ) {
+            manifest = metadata.tags['latest'];
           }
-        }
+          break;
+        case 'version':
+          manifest = metadata.versions[requestIdentifier.fetchSpec];
+          break;
+        case 'range':
+          for (const potentialManifest of Object.values(metadata.versions)) {
+            // Ignore deprecated package versions
+            if (potentialManifest.deprecated) {
+              continue;
+            }
+            // Only consider versions that are within the range
+            if (
+              !semver.satisfies(potentialManifest.version, requestIdentifier.fetchSpec, {
+                loose: true,
+              })
+            ) {
+              continue;
+            }
+            // Update the used manifest if current potential is newer than existing or there is not one yet
+            if (
+              !manifest ||
+              semver.gt(potentialManifest.version, manifest.version, { loose: true })
+            ) {
+              manifest = potentialManifest;
+            }
+          }
+          break;
       }
 
       if (!manifest) {
