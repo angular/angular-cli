@@ -1,3 +1,15 @@
+<a name="20.1.3"></a>
+
+# 20.1.3 (2025-07-24)
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description              |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------ |
+| [ea5cd0e81](https://github.com/angular/angular-cli/commit/ea5cd0e81196467ea66f50c106cffec1cd8a1a56) | fix  | update `vite` to `7.0.6` |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="20.2.0-next.1"></a>
 
 # 20.2.0-next.1 (2025-07-23)
@@ -4137,7 +4149,6 @@ Alan Agius, Charles Lyding, Doug Parker, Joey Perrott and Piotr Wysocki
   ```scss
   @import 'font-awesome/scss/font-awesome';
   ```
-
   - By default the CLI will use Sass modern API, While not recommended, users can still opt to use legacy API by setting `NG_BUILD_LEGACY_SASS=1`.
 
 - Internally the Angular CLI now always set the TypeScript `target` to `ES2022` and `useDefineForClassFields` to `false` unless the target is set to `ES2022` or later in the TypeScript configuration. To control ECMA version and features use the Browerslist configuration.
