@@ -493,8 +493,8 @@ importers:
         specifier: 9.0.1
         version: 9.0.1
       npm-package-arg:
-        specifier: 12.0.2
-        version: 12.0.2
+        specifier: 13.0.0
+        version: 13.0.0
       pacote:
         specifier: 21.0.0
         version: 21.0.0
@@ -5171,6 +5171,10 @@ packages:
     resolution: {integrity: sha512-Rw/B2DNQaPBICNXEm8balFz9a6WpZrkCGpcWFpy7nCj+NyhSdqXipmfvtmWt9xGfp0wZnBxB+iVpLmQMYt47Tw==}
     engines: {node: ^18.17.0 || >=20.5.0}
 
+  hosted-git-info@9.0.0:
+    resolution: {integrity: sha512-gEf705MZLrDPkbbhi8PnoO4ZwYgKoNL+ISZ3AjZMht2r3N5tuTwncyDi6Fv2/qDnMmZxgs0yI8WDOyR8q3G+SQ==}
+    engines: {node: ^20.17.0 || >=22.9.0}
+
   hpack.js@2.1.6:
     resolution: {integrity: sha512-zJxVehUdMGIKsRaNt7apO2Gqp0BdqW5yaiGHXXmbpvxgBYVZnAql+BJb4RO5ad2MgpbZKn5G6nMnegrH1FcNYQ==}
 
@@ -6388,6 +6392,10 @@ packages:
   npm-package-arg@12.0.2:
     resolution: {integrity: sha512-f1NpFjNI9O4VbKMOlA5QoBq/vSQPORHcTZ2feJpFkTHJ9eQkdlmZEKSjcAhxTGInC7RlEyScT9ui67NaOsjFWA==}
     engines: {node: ^18.17.0 || >=20.5.0}
+
+  npm-package-arg@13.0.0:
+    resolution: {integrity: sha512-+t2etZAGcB7TbbLHfDwooV9ppB2LhhcT6A+L9cahsf9mEUAoQ6CktLEVvEnpD0N5CkX7zJqnPGaFtoQDy9EkHQ==}
+    engines: {node: ^20.17.0 || >=22.9.0}
 
   npm-packlist@10.0.0:
     resolution: {integrity: sha512-rht9U6nS8WOBDc53eipZNPo5qkAV4X2rhKE2Oj1DYUQ3DieXfj0mKkVmjnf3iuNdtMd8WfLdi2L6ASkD/8a+Kg==}
@@ -13480,6 +13488,10 @@ snapshots:
     dependencies:
       lru-cache: 10.4.3
 
+  hosted-git-info@9.0.0:
+    dependencies:
+      lru-cache: 11.1.0
+
   hpack.js@2.1.6:
     dependencies:
       inherits: 2.0.4
@@ -14779,6 +14791,13 @@ snapshots:
   npm-package-arg@12.0.2:
     dependencies:
       hosted-git-info: 8.1.0
+      proc-log: 5.0.0
+      semver: 7.7.2
+      validate-npm-package-name: 6.0.2
+
+  npm-package-arg@13.0.0:
+    dependencies:
+      hosted-git-info: 9.0.0
       proc-log: 5.0.0
       semver: 7.7.2
       validate-npm-package-name: 6.0.2
