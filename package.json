@@ -140,7 +140,7 @@
     "tar": "^7.0.0",
     "ts-node": "^10.9.1",
     "tslib": "2.8.1",
-    "typescript": "5.9.0-beta",
+    "typescript": "5.9.1-rc",
     "undici": "7.12.0",
     "unenv": "^1.10.0",
     "verdaccio": "6.1.5",
@@ -173,6 +173,6 @@
     }
   },
   "resolutions": {
-    "typescript": "5.9.0-beta"
+    "typescript": "5.9.1-rc"
   }
 }
