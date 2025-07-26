@@ -10,6 +10,8 @@ import { join, normalize } from '@angular-devkit/core';
 import { Rule } from '../engine/interface';
 import { noop } from './base';
 
+export function move(from: string, to: string): Rule;
+export function move(to: string): Rule;
 export function move(from: string, to?: string): Rule {
   if (to === undefined) {
     to = from;
