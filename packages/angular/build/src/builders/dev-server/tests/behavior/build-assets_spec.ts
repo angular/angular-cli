@@ -12,6 +12,11 @@ import { describeServeBuilder } from '../jasmine-helpers';
 import { BASE_OPTIONS, DEV_SERVER_BUILDER_INFO } from '../setup';
 
 describeServeBuilder(executeDevServer, DEV_SERVER_BUILDER_INFO, (harness, setupTarget) => {
+  beforeEach(async () => {
+    // Application code is not needed for these tests
+    await harness.writeFile('src/main.ts', 'console.log("TEST");');
+  });
+
   const javascriptFileContent =
     "import {foo} from 'unresolved'; /* a comment */const foo = `bar`;\n\n\n";
 
@@ -51,6 +56,42 @@ describeServeBuilder(executeDevServer, DEV_SERVER_BUILDER_INFO, (harness, setupT
 
       expect(result?.success).toBeTrue();
       expect(await response?.text()).toContain(javascriptFileContent);
+    });
+
+    it('serves a project CSS asset unmodified', async () => {
+      const cssFileContent = 'p { color: blue };';
+      await harness.writeFile('src/extra.css', cssFileContent);
+
+      setupTarget(harness, {
+        assets: ['src/extra.css'],
+      });
+
+      harness.useTarget('serve', {
+        ...BASE_OPTIONS,
+      });
+
+      const { result, response } = await executeOnceAndFetch(harness, 'extra.css');
+
+      expect(result?.success).toBeTrue();
+      expect(await response?.text()).toBe(cssFileContent);
+    });
+
+    it('serves a project SCSS asset unmodified', async () => {
+      const cssFileContent = 'p { color: blue };';
+      await harness.writeFile('src/extra.scss', cssFileContent);
+
+      setupTarget(harness, {
+        assets: ['src/extra.scss'],
+      });
+
+      harness.useTarget('serve', {
+        ...BASE_OPTIONS,
+      });
+
+      const { result, response } = await executeOnceAndFetch(harness, 'extra.scss');
+
+      expect(result?.success).toBeTrue();
+      expect(await response?.text()).toBe(cssFileContent);
     });
 
     it('should return 404 for non existing assets', async () => {
