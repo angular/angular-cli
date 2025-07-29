@@ -16,3 +16,6 @@ dist/
 /tests/legacy-cli/e2e/assets/
 /tools/test/*.json
 pnpm-lock.yaml
+
+# This is a symbolic link.
+packages/angular/cli/src/commands/ai/setup-gemini-cli/extension/GEMINI.md

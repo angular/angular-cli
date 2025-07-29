@@ -10,6 +10,7 @@ import { CommandModuleConstructor } from '../command-builder/utilities/command';
 
 export type CommandNames =
   | 'add'
+  | 'ai'
   | 'analytics'
   | 'build'
   | 'cache'
@@ -40,6 +41,9 @@ export const RootCommands: Record<
 > = {
   'add': {
     factory: () => import('./add/cli'),
+  },
+  'ai': {
+    factory: () => import('./ai/cli'),
   },
   'analytics': {
     factory: () => import('./analytics/cli'),
