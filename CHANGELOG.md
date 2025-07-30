@@ -1,3 +1,21 @@
+<a name="20.2.0-next.2"></a>
+
+# 20.2.0-next.2 (2025-07-30)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                            |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------ |
+| [193b39416](https://github.com/angular/angular-cli/commit/193b39416731fa439fea7da8c06d5d287df99bc1) | fix  | skip workspace-specific tools when outside a workspace |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                 |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------- |
+| [7a183730c](https://github.com/angular/angular-cli/commit/7a183730c77689fb9e63625f5ef20aef1cefb88b) | fix  | skip vite transformation of CSS-like assets |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="20.1.4"></a>
 
 # 20.1.4 (2025-07-30)
@@ -4167,6 +4185,7 @@ Alan Agius, Charles Lyding, Doug Parker, Joey Perrott and Piotr Wysocki
   ```scss
   @import 'font-awesome/scss/font-awesome';
   ```
+
   - By default the CLI will use Sass modern API, While not recommended, users can still opt to use legacy API by setting `NG_BUILD_LEGACY_SASS=1`.
 
 - Internally the Angular CLI now always set the TypeScript `target` to `ES2022` and `useDefineForClassFields` to `false` unless the target is set to `ES2022` or later in the TypeScript configuration. To control ECMA version and features use the Browerslist configuration.
