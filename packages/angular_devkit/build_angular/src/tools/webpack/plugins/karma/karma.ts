@@ -18,6 +18,7 @@ import { createConsoleLogger } from '@angular-devkit/core/node';
 import { logging } from '@angular-devkit/core';
 import { BuildOptions } from '../../../../utils/build-options';
 import { normalizeSourceMaps } from '../../../../utils/index';
+import assert from 'node:assert';
 
 const KARMA_APPLICATION_PATH = '_karma_webpack_';
 
@@ -141,6 +142,8 @@ const init: any = (config: any, emitter: any) => {
     isBlocked = true;
     callback?.();
   }
+
+  assert(compiler, 'Webpack compiler factory did not return a compiler instance.');
 
   compiler.hooks.invalid.tap('karma', () => handler());
   compiler.hooks.watchRun.tapAsync('karma', (_: any, callback: () => void) => handler(callback));

@@ -22,7 +22,7 @@
   "devDependencies": {
     "@angular-devkit/core": "workspace:0.0.0-PLACEHOLDER",
     "@ngtools/webpack": "workspace:0.0.0-PLACEHOLDER",
-    "webpack": "5.100.2",
+    "webpack": "5.101.0",
     "webpack-dev-server": "5.2.2"
   },
   "peerDependencies": {
