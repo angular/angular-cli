@@ -1,3 +1,21 @@
+<a name="20.1.4"></a>
+
+# 20.1.4 (2025-07-30)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                            |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------ |
+| [2d753cc62](https://github.com/angular/angular-cli/commit/2d753cc62c9a801c40923a43e4af5f74b22700e0) | fix  | skip workspace-specific tools when outside a workspace |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                 |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------- |
+| [42d72ef4d](https://github.com/angular/angular-cli/commit/42d72ef4d99380dbb1c0e03e3e3abfb2223fa539) | fix  | skip vite transformation of CSS-like assets |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="20.1.3"></a>
 
 # 20.1.3 (2025-07-24)
