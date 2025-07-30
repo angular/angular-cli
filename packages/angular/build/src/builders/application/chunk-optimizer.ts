@@ -6,8 +6,20 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
+/**
+ * @fileoverview This file provides a function to optimize JavaScript chunks using rolldown.
+ * It is designed to be used after an esbuild build to further optimize the output.
+ * The main function, `optimizeChunks`, takes the result of an esbuild build,
+ * identifies the main browser entry point, and then uses rolldown to rebundle
+ * and optimize the chunks. This process can result in smaller and more efficient
+ * code by combining and restructuring the original chunks. The file also includes
+ * helper functions to convert rolldown's output into an esbuild-compatible
+ * metafile, allowing for consistent analysis and reporting of the build output.
+ */
+
+import type { Message, Metafile } from 'esbuild';
 import assert from 'node:assert';
-import { rolldown } from 'rolldown';
+import { type OutputAsset, type OutputChunk, rolldown } from 'rolldown';
 import {
   BuildOutputFile,
   BuildOutputFileType,
@@ -17,6 +29,145 @@ import {
 import { createOutputFile } from '../../tools/esbuild/utils';
 import { assertIsError } from '../../utils/error';
 
+/**
+ * Converts the output of a rolldown build into an esbuild-compatible metafile.
+ * @param rolldownOutput The output of a rolldown build.
+ * @param originalMetafile The original esbuild metafile from the build.
+ * @returns An esbuild-compatible metafile.
+ */
+function rolldownToEsbuildMetafile(
+  rolldownOutput: (OutputChunk | OutputAsset)[],
+  originalMetafile: Metafile,
+): Metafile {
+  const newMetafile: Metafile = {
+    inputs: originalMetafile.inputs,
+    outputs: {},
+  };
+
+  const intermediateChunkSizes: Record<string, number> = {};
+  for (const [path, output] of Object.entries(originalMetafile.outputs)) {
+    intermediateChunkSizes[path] = Object.values(output.inputs).reduce(
+      (s, i) => s + i.bytesInOutput,
+      0,
+    );
+  }
+
+  for (const chunk of rolldownOutput) {
+    if (chunk.type === 'asset') {
+      newMetafile.outputs[chunk.fileName] = {
+        bytes:
+          typeof chunk.source === 'string'
+            ? Buffer.byteLength(chunk.source, 'utf8')
+            : chunk.source.length,
+        inputs: {},
+        imports: [],
+        exports: [],
+      };
+      continue;
+    }
+
+    const newOutputInputs: Record<string, { bytesInOutput: number }> = {};
+    if (chunk.modules) {
+      for (const [moduleId, renderedModule] of Object.entries(chunk.modules)) {
+        const originalOutputEntry = originalMetafile.outputs[moduleId];
+        if (!originalOutputEntry?.inputs) {
+          continue;
+        }
+
+        const totalOriginalBytesInModule = intermediateChunkSizes[moduleId];
+        if (totalOriginalBytesInModule === 0) {
+          continue;
+        }
+
+        for (const [originalInputPath, originalInputInfo] of Object.entries(
+          originalOutputEntry.inputs,
+        )) {
+          const proportion = originalInputInfo.bytesInOutput / totalOriginalBytesInModule;
+          const newBytesInOutput = Math.floor(renderedModule.renderedLength * proportion);
+
+          const existing = newOutputInputs[originalInputPath];
+          if (existing) {
+            existing.bytesInOutput += newBytesInOutput;
+          } else {
+            newOutputInputs[originalInputPath] = { bytesInOutput: newBytesInOutput };
+          }
+
+          if (!newMetafile.inputs[originalInputPath]) {
+            newMetafile.inputs[originalInputPath] = originalMetafile.inputs[originalInputPath];
+          }
+        }
+      }
+    }
+
+    const imports = [
+      ...chunk.imports.map((path) => ({ path, kind: 'import-statement' as const })),
+      ...(chunk.dynamicImports?.map((path) => ({ path, kind: 'dynamic-import' as const })) ?? []),
+    ];
+
+    newMetafile.outputs[chunk.fileName] = {
+      bytes: Buffer.byteLength(chunk.code, 'utf8'),
+      inputs: newOutputInputs,
+      imports,
+      exports: chunk.exports ?? [],
+      entryPoint:
+        chunk.isEntry && chunk.facadeModuleId
+          ? originalMetafile.outputs[chunk.facadeModuleId]?.entryPoint
+          : undefined,
+    };
+  }
+
+  return newMetafile;
+}
+
+/**
+ * Creates an InitialFileRecord object with a specified depth.
+ * @param depth The depth of the file in the dependency graph.
+ * @returns An InitialFileRecord object.
+ */
+function createInitialFileRecord(depth: number): InitialFileRecord {
+  return {
+    type: 'script',
+    entrypoint: false,
+    external: false,
+    serverFile: false,
+    depth,
+  };
+}
+
+/**
+ * Creates an esbuild message object for a chunk optimization failure.
+ * @param message The error message detailing the cause of the failure.
+ * @returns A partial esbuild message object.
+ */
+function createChunkOptimizationFailureMessage(message: string): Message {
+  // Most of these fields are not actually needed for printing the error
+  return {
+    id: '',
+    text: 'Chunk optimization failed',
+    detail: undefined,
+    pluginName: '',
+    location: null,
+    notes: [
+      {
+        text: message,
+        location: null,
+      },
+    ],
+  };
+}
+
+/**
+ * Optimizes the chunks of a build result using rolldown.
+ *
+ * This function takes the output of an esbuild build, identifies the main browser entry point,
+ * and uses rolldown to bundle and optimize the JavaScript chunks. The optimized chunks
+ * replace the original ones in the build result, and the metafile is updated to reflect
+ * the changes.
+ *
+ * @param original The original build result from esbuild.
+ * @param sourcemap A boolean or 'hidden' to control sourcemap generation.
+ * @returns A promise that resolves to the updated build result with optimized chunks.
+ */
 export async function optimizeChunks(
   original: BundleContextResult,
   sourcemap: boolean | 'hidden',
@@ -40,8 +191,8 @@ export async function optimizeChunks(
     }
   }
 
-  // No action required if no browser main entrypoint
-  if (!mainFile) {
+  // No action required if no browser main entrypoint or metafile for stats
+  if (!mainFile || !original.metafile) {
     return original;
   }
 
@@ -110,27 +261,29 @@ export async function optimizeChunks(
     assertIsError(e);
 
     return {
-      errors: [
-        // Most of these fields are not actually needed for printing the error
-        {
-          id: '',
-          text: 'Chunk optimization failed',
-          detail: undefined,
-          pluginName: '',
-          location: null,
-          notes: [
-            {
-              text: e.message,
-              location: null,
-            },
-          ],
-        },
-      ],
+      errors: [createChunkOptimizationFailureMessage(e.message)],
       warnings: original.warnings,
     };
   } finally {
     await bundle?.close();
   }
+
+  // Update metafile
+  const newMetafile = rolldownToEsbuildMetafile(optimizedOutput, original.metafile);
+  // Add back the outputs that were not part of the optimization
+  for (const [path, output] of Object.entries(original.metafile.outputs)) {
+    if (usedChunks.has(path)) {
+      continue;
+    }
+
+    newMetafile.outputs[path] = output;
+    for (const inputPath of Object.keys(output.inputs)) {
+      if (!newMetafile.inputs[inputPath]) {
+        newMetafile.inputs[inputPath] = original.metafile.inputs[inputPath];
+      }
+    }
+  }
+  original.metafile = newMetafile;
 
   // Remove used chunks and associated sourcemaps from the original result
   original.outputFiles = original.outputFiles.filter(
@@ -192,13 +345,7 @@ export async function optimizeChunks(
         continue;
       }
 
-      const record: InitialFileRecord = {
-        type: 'script',
-        entrypoint: false,
-        external: false,
-        serverFile: false,
-        depth: entryRecord.depth + 1,
-      };
+      const record = createInitialFileRecord(entryRecord.depth + 1);
 
       entriesToAnalyze.push([importPath, record]);
     }
