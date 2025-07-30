@@ -7,6 +7,7 @@
  */
 
 import { Builder, BuilderContext, createBuilder } from '@angular-devkit/architect';
+import assert from 'node:assert';
 import { resolve as pathResolve } from 'node:path';
 import { Observable, from, isObservable, of, switchMap } from 'rxjs';
 import webpack from 'webpack';
@@ -72,6 +73,8 @@ export function runWebpackDevServer(
     switchMap(
       (webpackCompiler) =>
         new Observable<DevServerBuildOutput>((obs) => {
+          assert(webpackCompiler, 'Webpack compiler factory did not return a compiler instance.');
+
           const devServerConfig = options.devServerConfig || config.devServer || {};
           devServerConfig.host ??= 'localhost';
 

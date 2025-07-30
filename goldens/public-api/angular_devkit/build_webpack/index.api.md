@@ -65,7 +65,7 @@ export type WebpackDevServerFactory = typeof WebpackDevServer;
 // @public (undocumented)
 export interface WebpackFactory {
     // (undocumented)
-    (config: webpack.Configuration): Observable<webpack.Compiler> | webpack.Compiler;
+    (config: webpack.Configuration): Observable<webpack.Compiler | null> | webpack.Compiler | null;
 }
 
 // @public (undocumented)

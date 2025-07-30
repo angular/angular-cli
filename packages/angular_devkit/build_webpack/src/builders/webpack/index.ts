@@ -7,6 +7,7 @@
  */
 
 import { Builder, BuilderContext, BuilderOutput, createBuilder } from '@angular-devkit/architect';
+import assert from 'node:assert';
 import { resolve as pathResolve } from 'node:path';
 import { Observable, from, isObservable, of, switchMap } from 'rxjs';
 import webpack from 'webpack';
@@ -19,7 +20,7 @@ export interface WebpackLoggingCallback {
   (stats: webpack.Stats, config: webpack.Configuration): void;
 }
 export interface WebpackFactory {
-  (config: webpack.Configuration): Observable<webpack.Compiler> | webpack.Compiler;
+  (config: webpack.Configuration): Observable<webpack.Compiler | null> | webpack.Compiler | null;
 }
 
 export type BuildResult = BuilderOutput & {
@@ -64,6 +65,8 @@ export function runWebpack(
     switchMap(
       (webpackCompiler) =>
         new Observable<BuildResult>((obs) => {
+          assert(webpackCompiler, 'Webpack compiler factory did not return a compiler instance.');
+
           const callback = (err?: Error | null, stats?: webpack.Stats) => {
             if (err) {
               return obs.error(err);
