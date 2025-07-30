@@ -55,8 +55,7 @@ export async function createMcpServer(context: {
   registerBestPracticesTool(server);
 
   // If run outside an Angular workspace (e.g., globally) skip the workspace specific tools.
-  // Currently only the `list_projects` tool.
-  if (!context.workspace) {
+  if (context.workspace) {
     registerListProjectsTool(server, context);
   }
 
