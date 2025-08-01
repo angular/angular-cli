@@ -1,6 +1,6 @@
 load("//tools:defaults.bzl", "ts_project")
 
-# files fetched on 2025-07-25
+# files fetched on 2025-08-01
 
 # Commands to update from node_modules:
 # cp node_modules/typescript/lib/typescript.d.ts packages/schematics/angular/third_party/github.com/Microsoft/TypeScript/lib/typescript.d.ts
