@@ -9,7 +9,7 @@
 import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/testing';
 import { Schema as ApplicationOptions } from '../application/schema';
 import { Schema as WorkspaceOptions } from '../workspace/schema';
-import { Schema as ConfigOptions, Type as ConfigType } from './schema';
+import { Schema as ConfigOptions, Tool as ConfigTool, Type as ConfigType } from './schema';
 
 describe('Config Schematic', () => {
   const schematicRunner = new SchematicTestRunner(
@@ -32,12 +32,15 @@ describe('Config Schematic', () => {
   };
 
   let applicationTree: UnitTestTree;
-  function runConfigSchematic(type: ConfigType): Promise<UnitTestTree> {
+  function runConfigSchematic(type: ConfigType, tool?: ConfigTool): Promise<UnitTestTree>;
+  function runConfigSchematic(type: ConfigType.Ai, tool: ConfigTool): Promise<UnitTestTree>;
+  function runConfigSchematic(type: ConfigType, tool?: ConfigTool): Promise<UnitTestTree> {
     return schematicRunner.runSchematic<ConfigOptions>(
       'config',
       {
         project: 'foo',
         type,
+        tool,
       },
       applicationTree,
     );
@@ -95,6 +98,40 @@ describe('Config Schematic', () => {
     it('should create a .browserslistrc file', async () => {
       const tree = await runConfigSchematic(ConfigType.Browserslist);
       expect(tree.readContent('projects/foo/.browserslistrc')).toContain('Chrome >=');
+    });
+  });
+
+  describe(`when 'type' is 'ai'`, () => {
+    it('should create a GEMINI.MD file', async () => {
+      const tree = await runConfigSchematic(ConfigType.Ai, ConfigTool.Gemini);
+      expect(tree.readContent('.gemini/GEMINI.md')).toMatch(/^You are an expert in TypeScript/);
+    });
+
+    it('should create a copilot-instructions.md file', async () => {
+      const tree = await runConfigSchematic(ConfigType.Ai, ConfigTool.Copilot);
+      expect(tree.readContent('.github/copilot-instructions.md')).toContain(
+        'You are an expert in TypeScript',
+      );
+    });
+
+    it('should create a cursor file', async () => {
+      const tree = await runConfigSchematic(ConfigType.Ai, ConfigTool.Cursor);
+      const cursorFile = tree.readContent('.cursor/rules/cursor.mdc');
+      expect(cursorFile).toContain('You are an expert in TypeScript');
+      expect(cursorFile).toContain('context: true');
+      expect(cursorFile).toContain('---\n\nYou are an expert in TypeScript');
+    });
+
+    it('should create a windsurf file', async () => {
+      const tree = await runConfigSchematic(ConfigType.Ai, ConfigTool.Windsurf);
+      expect(tree.readContent('.windsurf/rules/guidelines.md')).toContain(
+        'You are an expert in TypeScript',
+      );
+    });
+
+    it('should create a claude file', async () => {
+      const tree = await runConfigSchematic(ConfigType.Ai, ConfigTool.Claude);
+      expect(tree.readContent('.claude/CLAUDE.md')).toContain('You are an expert in TypeScript');
     });
   });
 });
