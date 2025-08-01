@@ -19,7 +19,7 @@ To start using the Angular CLI MCP Server, add this configuration to your host:
   "mcpServers": {
     "angular-cli": {
       "command": "npx",
-      "args": ["@angular/cli", "mcp"]
+      "args": ["-y", "@angular/cli", "mcp"]
     }
   }
 }
