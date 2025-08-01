@@ -43,7 +43,7 @@ importers:
         version: 20.2.0-next.2(3m62r3ewvvunun6afr6d2wefvm)
       '@angular/ng-dev':
         specifier: https://github.com/angular/dev-infra-private-ng-dev-builds.git#ee016d9031a302c2dbcfa5d0ea7195ae7094290d
-        version: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/ee016d9031a302c2dbcfa5d0ea7195ae7094290d(@modelcontextprotocol/sdk@1.17.0)(encoding@0.1.13)
+        version: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/ee016d9031a302c2dbcfa5d0ea7195ae7094290d(@modelcontextprotocol/sdk@1.17.1)(encoding@0.1.13)
       '@angular/platform-browser':
         specifier: 20.2.0-next.2
         version: 20.2.0-next.2(@angular/animations@20.2.0-next.2(@angular/common@20.2.0-next.2(@angular/core@20.2.0-next.2(@angular/compiler@20.2.0-next.2)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@20.2.0-next.2(@angular/compiler@20.2.0-next.2)(rxjs@7.8.2)(zone.js@0.15.1)))(@angular/common@20.2.0-next.2(@angular/core@20.2.0-next.2(@angular/compiler@20.2.0-next.2)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@20.2.0-next.2(@angular/compiler@20.2.0-next.2)(rxjs@7.8.2)(zone.js@0.15.1))
@@ -472,8 +472,8 @@ importers:
         specifier: 3.0.1
         version: 3.0.1(@inquirer/prompts@7.8.0(@types/node@22.17.0))(@types/node@22.17.0)(listr2@9.0.1)
       '@modelcontextprotocol/sdk':
-        specifier: 1.17.0
-        version: 1.17.0
+        specifier: 1.17.1
+        version: 1.17.1
       '@schematics/angular':
         specifier: workspace:0.0.0-PLACEHOLDER
         version: link:../../schematics/angular
@@ -2152,8 +2152,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@modelcontextprotocol/sdk@1.17.0':
-    resolution: {integrity: sha512-qFfbWFA7r1Sd8D697L7GkTd36yqDuTkvz0KfOGkgXR8EUhQn3/EDNIR/qUdQNMT8IjmasBvHWuXeisxtXTQT2g==}
+  '@modelcontextprotocol/sdk@1.17.1':
+    resolution: {integrity: sha512-CPle1OQehbWqd25La9Ack5B07StKIxh4+Bf19qnpZKJC1oI22Y0czZHbifjw1UoczIfKBwBDAp/dFxvHG13B5A==}
     engines: {node: '>=18'}
 
   '@msgpackr-extract/msgpackr-extract-darwin-arm64@3.0.3':
@@ -8744,10 +8744,10 @@ snapshots:
       rxjs: 7.8.2
       tslib: 2.8.1
 
-  '@angular/ng-dev@https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/ee016d9031a302c2dbcfa5d0ea7195ae7094290d(@modelcontextprotocol/sdk@1.17.0)(encoding@0.1.13)':
+  '@angular/ng-dev@https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/ee016d9031a302c2dbcfa5d0ea7195ae7094290d(@modelcontextprotocol/sdk@1.17.1)(encoding@0.1.13)':
     dependencies:
       '@google-cloud/spanner': 8.0.0(supports-color@10.0.0)
-      '@google/genai': 1.11.0(@modelcontextprotocol/sdk@1.17.0)(encoding@0.1.13)(supports-color@10.0.0)
+      '@google/genai': 1.11.0(@modelcontextprotocol/sdk@1.17.1)(encoding@0.1.13)(supports-color@10.0.0)
       '@octokit/rest': 22.0.0
       '@types/semver': 7.7.0
       '@types/supports-color': 10.0.0
@@ -9731,12 +9731,12 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@google/genai@1.11.0(@modelcontextprotocol/sdk@1.17.0)(encoding@0.1.13)(supports-color@10.0.0)':
+  '@google/genai@1.11.0(@modelcontextprotocol/sdk@1.17.1)(encoding@0.1.13)(supports-color@10.0.0)':
     dependencies:
       google-auth-library: 9.15.1(encoding@0.1.13)(supports-color@10.0.0)
       ws: 8.18.3
     optionalDependencies:
-      '@modelcontextprotocol/sdk': 1.17.0
+      '@modelcontextprotocol/sdk': 1.17.1
     transitivePeerDependencies:
       - bufferutil
       - encoding
@@ -9980,7 +9980,7 @@ snapshots:
   '@lmdb/lmdb-win32-x64@3.4.2':
     optional: true
 
-  '@modelcontextprotocol/sdk@1.17.0':
+  '@modelcontextprotocol/sdk@1.17.1':
     dependencies:
       ajv: 6.12.6
       content-type: 1.0.5
