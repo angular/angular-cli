@@ -20,41 +20,89 @@ import {
 } from 'jsonc-parser';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { getEOL } from './eol';
+import { assertIsError } from './error';
 
+/** A function that returns an index to insert a new property in a JSON object. */
 export type InsertionIndex = (properties: string[]) => number;
+
+/** A JSON path. */
 export type JSONPath = (string | number)[];
 
-/** @internal */
+/**
+ * Represents a JSON file, allowing for reading, modifying, and saving.
+ * This class uses `jsonc-parser` to preserve comments and formatting, including
+ * indentation and end-of-line sequences.
+ * @internal
+ */
 export class JSONFile {
-  content: string;
-  private eol: string;
+  /** The raw content of the JSON file. */
+  #content: string;
 
-  constructor(private readonly path: string) {
-    const buffer = readFileSync(this.path);
-    if (buffer) {
-      this.content = buffer.toString();
-    } else {
-      throw new Error(`Could not read '${path}'.`);
-    }
+  /** The end-of-line sequence used in the file. */
+  #eol: string;
 
-    this.eol = getEOL(this.content);
+  /** Whether the file uses spaces for indentation. */
+  #insertSpaces = true;
+
+  /** The number of spaces or tabs used for indentation. */
+  #tabSize = 2;
+
+  /** The path to the JSON file. */
+  #path: string;
+
+  /** The parsed JSON abstract syntax tree. */
+  #jsonAst: Node | undefined;
+
+  /** The raw content of the JSON file. */
+  public get content(): string {
+    return this.#content;
   }
 
-  private _jsonAst: Node | undefined;
+  /**
+   * Creates an instance of JSONFile.
+   * @param path The path to the JSON file.
+   */
+  constructor(path: string) {
+    this.#path = path;
+    try {
+      this.#content = readFileSync(this.#path, 'utf-8');
+    } catch (e) {
+      assertIsError(e);
+      // We don't have to worry about ENOENT, since we'll be creating the file.
+      if (e.code !== 'ENOENT') {
+        throw e;
+      }
+
+      this.#content = '';
+    }
+
+    this.#eol = getEOL(this.#content);
+    this.#detectIndentation();
+  }
+
+  /**
+   * Gets the parsed JSON abstract syntax tree.
+   * The AST is lazily parsed and cached.
+   */
   private get JsonAst(): Node | undefined {
-    if (this._jsonAst) {
-      return this._jsonAst;
+    if (this.#jsonAst) {
+      return this.#jsonAst;
     }
 
     const errors: ParseError[] = [];
-    this._jsonAst = parseTree(this.content, errors, { allowTrailingComma: true });
+    this.#jsonAst = parseTree(this.#content, errors, { allowTrailingComma: true });
     if (errors.length) {
-      formatError(this.path, errors);
+      formatError(this.#path, errors);
     }
 
-    return this._jsonAst;
+    return this.#jsonAst;
   }
 
+  /**
+   * Gets a value from the JSON file at a specific path.
+   * @param jsonPath The path to the value.
+   * @returns The value at the given path, or `undefined` if not found.
+   */
   get(jsonPath: JSONPath): unknown {
     const jsonAstNode = this.JsonAst;
     if (!jsonAstNode) {
@@ -70,6 +118,13 @@ export class JSONFile {
     return node === undefined ? undefined : getNodeValue(node);
   }
 
+  /**
+   * Modifies a value in the JSON file.
+   * @param jsonPath The path to the value to modify.
+   * @param value The new value to insert.
+   * @param insertInOrder A function to determine the insertion index, or `false` to insert at the end.
+   * @returns `true` if the modification was successful, `false` otherwise.
+   */
   modify(
     jsonPath: JSONPath,
     value: JsonValue | undefined,
@@ -89,13 +144,12 @@ export class JSONFile {
       getInsertionIndex = insertInOrder;
     }
 
-    const edits = modify(this.content, jsonPath, value, {
+    const edits = modify(this.#content, jsonPath, value, {
       getInsertionIndex,
-      // TODO: use indentation from original file.
       formattingOptions: {
-        insertSpaces: true,
-        tabSize: 2,
-        eol: this.eol,
+        insertSpaces: this.#insertSpaces,
+        tabSize: this.#tabSize,
+        eol: this.#eol,
       },
     });
 
@@ -103,21 +157,45 @@ export class JSONFile {
       return false;
     }
 
-    this.content = applyEdits(this.content, edits);
-    this._jsonAst = undefined;
+    this.#content = applyEdits(this.#content, edits);
+    this.#jsonAst = undefined;
 
     return true;
   }
 
+  /**
+   * Deletes a value from the JSON file at a specific path.
+   * @param jsonPath The path to the value to delete.
+   * @returns `true` if the deletion was successful, `false` otherwise.
+   */
+  delete(jsonPath: JSONPath): boolean {
+    return this.modify(jsonPath, undefined);
+  }
+
+  /** Saves the modified content back to the file. */
   save(): void {
-    writeFileSync(this.path, this.content);
+    writeFileSync(this.#path, this.#content);
+  }
+
+  /** Detects the indentation of the file. */
+  #detectIndentation(): void {
+    // Find the first line that has indentation.
+    const match = this.#content.match(/^(?:( )+|\t+)\S/m);
+    if (match) {
+      this.#insertSpaces = !!match[1];
+      this.#tabSize = match[0].length - 1;
+    }
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function readAndParseJson(path: string): any {
+/**
+ * Reads and parses a JSON file, supporting comments and trailing commas.
+ * @param path The path to the JSON file.
+ * @returns The parsed JSON object.
+ */
+export function readAndParseJson<T extends JsonValue>(path: string): T {
   const errors: ParseError[] = [];
-  const content = parse(readFileSync(path, 'utf-8'), errors, { allowTrailingComma: true });
+  const content = parse(readFileSync(path, 'utf-8'), errors, { allowTrailingComma: true }) as T;
   if (errors.length) {
     formatError(path, errors);
   }
@@ -125,6 +203,11 @@ export function readAndParseJson(path: string): any {
   return content;
 }
 
+/**
+ * Formats a JSON parsing error and throws an exception.
+ * @param path The path to the file that failed to parse.
+ * @param errors The list of parsing errors.
+ */
 function formatError(path: string, errors: ParseError[]): never {
   const { error, offset } = errors[0];
   throw new Error(
@@ -134,7 +217,11 @@ function formatError(path: string, errors: ParseError[]): never {
   );
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function parseJson(content: string): any {
-  return parse(content, undefined, { allowTrailingComma: true });
+/**
+ * Parses a JSON string, supporting comments and trailing commas.
+ * @param content The JSON string to parse.
+ * @returns The parsed JSON object.
+ */
+export function parseJson<T extends JsonValue>(content: string): T {
+  return parse(content, undefined, { allowTrailingComma: true }) as T;
 }
