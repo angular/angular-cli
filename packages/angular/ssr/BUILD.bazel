@@ -1,4 +1,4 @@
-load("@devinfra//bazel/api-golden:index_rjs.bzl", "api_golden_test_npm_package")
+load("@devinfra//bazel/api-golden:index.bzl", "api_golden_test_npm_package")
 load("@npm//:defs.bzl", "npm_link_all_packages")
 load("@rules_pkg//:pkg.bzl", "pkg_tar")
 load("//tools:defaults.bzl", "ng_package", "ts_project")

@@ -44,5 +44,4 @@ rollup.rollup(
         "--dir=packages/angular/ssr/third_party/beasties",
     ],
     progress_message = "Bundling beasties",
-    silent_on_success = False,
 )
