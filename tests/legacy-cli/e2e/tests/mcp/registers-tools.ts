@@ -1,4 +1,4 @@
-import { chdir } from 'process';
+import { chdir } from 'node:process';
 import { exec, ProcessOutput, silentNpm } from '../../utils/process';
 import assert from 'node:assert/strict';
 
