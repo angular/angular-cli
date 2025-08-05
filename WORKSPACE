@@ -230,7 +230,7 @@ load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 
 git_repository(
     name = "devinfra",
-    commit = "dfe138678e4edb4789fbe40ae7792c046de3b4bd",
+    commit = "361ceb676a715e1aedf3d6cd64ecae5dee6a3e5f",
     remote = "https://github.com/angular/dev-infra.git",
 )
 
@@ -241,10 +241,6 @@ setup_dependencies_1()
 load("@devinfra//bazel:setup_dependencies_2.bzl", "setup_dependencies_2")
 
 setup_dependencies_2()
-
-load("@devinfra//bazel/browsers:browser_repositories.bzl", "browser_repositories")
-
-browser_repositories()
 
 register_toolchains(
     "@devinfra//bazel/git-toolchain:git_linux_toolchain",
@@ -298,3 +294,17 @@ http_archive(
     strip_prefix = "rules_rollup-2.0.1",
     url = "https://github.com/aspect-build/rules_rollup/releases/download/v2.0.1/rules_rollup-v2.0.1.tar.gz",
 )
+
+git_repository(
+    name = "rules_browsers",
+    commit = "56ef8007ea07cd1916429bca8bb523433b0e9cdc",
+    remote = "https://github.com/devversion/rules_browsers.git",
+)
+
+load("@rules_browsers//setup:step_1.bzl", "rules_browsers_setup_1")
+
+rules_browsers_setup_1()
+
+load("@rules_browsers//setup:step_2.bzl", "rules_browsers_setup_2")
+
+rules_browsers_setup_2()
