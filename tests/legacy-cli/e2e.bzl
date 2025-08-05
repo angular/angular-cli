@@ -111,12 +111,12 @@ def _e2e_tests(name, runner, toolchain, **kwargs):
 
     # Chromium browser toolchain
     env.update({
-        "CHROME_BIN": "$(CHROMIUM)",
-        "CHROME_PATH": "$(CHROMIUM)",
+        "CHROME_BIN": "$(CHROME-HEADLESS-SHELL)",
+        "CHROME_PATH": "$(CHROME-HEADLESS-SHELL)",
         "CHROMEDRIVER_BIN": "$(CHROMEDRIVER)",
     })
-    toolchains = toolchains + ["@devinfra//bazel/browsers/chromium:toolchain_alias"]
-    data = data + ["@devinfra//bazel/browsers/chromium"]
+    toolchains = toolchains + ["@rules_browsers//src/browsers/chromium:toolchain_alias"]
+    data = data + ["@rules_browsers//src/browsers/chromium"]
 
     js_test(
         name = name,
