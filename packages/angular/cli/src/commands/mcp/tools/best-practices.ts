@@ -11,6 +11,8 @@ import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 
 export function registerBestPracticesTool(server: McpServer): void {
+  let bestPracticesText;
+
   server.registerTool(
     'get_best_practices',
     {
@@ -27,7 +29,7 @@ export function registerBestPracticesTool(server: McpServer): void {
       },
     },
     async () => {
-      const text = await readFile(
+      bestPracticesText ??= await readFile(
         path.join(__dirname, '..', 'instructions', 'best-practices.md'),
         'utf-8',
       );
@@ -36,7 +38,11 @@ export function registerBestPracticesTool(server: McpServer): void {
         content: [
           {
             type: 'text',
-            text,
+            text: bestPracticesText,
+            annotations: {
+              audience: ['assistant'],
+              priority: 0.9,
+            },
           },
         ],
       };
