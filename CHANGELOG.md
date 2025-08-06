@@ -1,3 +1,15 @@
+<a name="20.1.5"></a>
+
+# 20.1.5 (2025-08-06)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                               |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------- |
+| [48ca04474](https://github.com/angular/angular-cli/commit/48ca044745f49bc7fc365a621827294f4cc82c50) | fix  | cache MCP best practices content and add tool annotations |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="20.1.4"></a>
 
 # 20.1.4 (2025-07-30)
