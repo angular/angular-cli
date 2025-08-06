@@ -60,6 +60,7 @@ export function createCompilerPlugin(
 
 export type { AngularCompilation } from './tools/angular/compilation';
 export { createAngularCompilation };
+export { ComponentStylesheetBundler } from './tools/esbuild/angular/component-stylesheets';
 
 // Utilities
 export * from './utils/bundle-calculator';
