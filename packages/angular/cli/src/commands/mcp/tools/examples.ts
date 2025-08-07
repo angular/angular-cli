@@ -7,6 +7,8 @@
  */
 
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
+import { glob, readFile } from 'node:fs/promises';
+import path from 'node:path';
 import { z } from 'zod';
 
 /**
@@ -18,9 +20,19 @@ import { z } from 'zod';
  * @param server The MCP server instance.
  * @param exampleDatabasePath The path to the SQLite database file containing the examples.
  */
-export function registerFindExampleTool(server: McpServer, exampleDatabasePath: string): void {
+export async function registerFindExampleTool(
+  server: McpServer,
+  exampleDatabasePath: string,
+): Promise<void> {
   let db: import('node:sqlite').DatabaseSync | undefined;
   let queryStatement: import('node:sqlite').StatementSync | undefined;
+
+  // Runtime directory of examples uses an in-memory database
+  if (process.env['NG_MCP_EXAMPLES_DIR']) {
+    db = await setupRuntimeExamples(process.env['NG_MCP_EXAMPLES_DIR']);
+  }
+
+  suppressSqliteWarning();
 
   server.registerTool(
     'find_examples',
@@ -67,11 +79,11 @@ Examples of queries:
       },
     },
     async ({ query }) => {
-      if (!db || !queryStatement) {
-        suppressSqliteWarning();
-
+      if (!db) {
         const { DatabaseSync } = await import('node:sqlite');
         db = new DatabaseSync(exampleDatabasePath, { readOnly: true });
+      }
+      if (!queryStatement) {
         queryStatement = db.prepare('SELECT * from examples WHERE examples MATCH ? ORDER BY rank;');
       }
 
@@ -171,4 +183,28 @@ function suppressSqliteWarning() {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any, prefer-rest-params
     return originalProcessEmit.apply(process, arguments as any);
   };
+}
+
+async function setupRuntimeExamples(
+  examplesPath: string,
+): Promise<import('node:sqlite').DatabaseSync> {
+  const { DatabaseSync } = await import('node:sqlite');
+  const db = new DatabaseSync(':memory:');
+
+  db.exec(`CREATE VIRTUAL TABLE examples USING fts5(content, tokenize = 'porter ascii');`);
+
+  const insertStatement = db.prepare('INSERT INTO examples(content) VALUES(?);');
+
+  db.exec('BEGIN TRANSACTION');
+  for await (const entry of glob('*.md', { cwd: examplesPath, withFileTypes: true })) {
+    if (!entry.isFile()) {
+      continue;
+    }
+
+    const example = await readFile(path.join(entry.parentPath, entry.name), 'utf-8');
+    insertStatement.run(example);
+  }
+  db.exec('END TRANSACTION');
+
+  return db;
 }
