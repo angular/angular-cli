@@ -22,17 +22,22 @@ export async function createMcpServer(
   },
   logger: { warn(text: string): void },
 ): Promise<McpServer> {
-  const server = new McpServer({
-    name: 'angular-cli-server',
-    version: VERSION.full,
-    capabilities: {
-      resources: {},
-      tools: {},
+  const server = new McpServer(
+    {
+      name: 'angular-cli-server',
+      version: VERSION.full,
     },
-    instructions:
-      'For Angular development, this server provides tools to adhere to best practices, search documentation, and find code examples. ' +
-      'When writing or modifying Angular code, use the MCP server and its tools instead of direct shell commands where possible.',
-  });
+    {
+      capabilities: {
+        resources: {},
+        tools: {},
+        logging: {},
+      },
+      instructions:
+        'For Angular development, this server provides tools to adhere to best practices, search documentation, and find code examples. ' +
+        'When writing or modifying Angular code, use the MCP server and its tools instead of direct shell commands where possible.',
+    },
+  );
 
   server.registerResource(
     'instructions',
