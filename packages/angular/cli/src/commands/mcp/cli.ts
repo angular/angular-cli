@@ -33,14 +33,20 @@ export default class McpCommandModule extends CommandModule implements CommandMo
   longDescriptionPath = undefined;
 
   builder(localYargs: Argv): Argv {
-    return localYargs.option('read-only', {
-      type: 'boolean',
-      default: false,
-      describe: 'Only register read-only tools.',
-    });
+    return localYargs
+      .option('read-only', {
+        type: 'boolean',
+        default: false,
+        describe: 'Only register read-only tools.',
+      })
+      .option('local-only', {
+        type: 'boolean',
+        default: false,
+        describe: 'Only register tools that do not require internet access.',
+      });
   }
 
-  async run(options: { readOnly: boolean }): Promise<void> {
+  async run(options: { readOnly: boolean; localOnly: boolean }): Promise<void> {
     if (isTTY()) {
       this.context.logger.info(INTERACTIVE_MESSAGE);
 
@@ -48,7 +54,11 @@ export default class McpCommandModule extends CommandModule implements CommandMo
     }
 
     const server = await createMcpServer(
-      { workspace: this.context.workspace, readOnly: options.readOnly },
+      {
+        workspace: this.context.workspace,
+        readOnly: options.readOnly,
+        localOnly: options.localOnly,
+      },
       this.context.logger,
     );
     const transport = new StdioServerTransport();
