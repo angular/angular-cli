@@ -16,13 +16,14 @@ import { DOC_SEARCH_TOOL } from './tools/doc-search';
 import { FIND_EXAMPLE_TOOL } from './tools/examples';
 import { MODERNIZE_TOOL } from './tools/modernize';
 import { LIST_PROJECTS_TOOL } from './tools/projects';
-import { registerTools } from './tools/tool-registry';
+import { McpToolDeclaration, registerTools } from './tools/tool-registry';
 
 export async function createMcpServer(
   context: {
     workspace?: AngularWorkspace;
     readOnly?: boolean;
     localOnly?: boolean;
+    experimentalTools?: string[];
   },
   logger: { warn(text: string): void },
 ): Promise<McpServer> {
@@ -53,12 +54,30 @@ export async function createMcpServer(
     FIND_EXAMPLE_TOOL,
   ];
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const experimentalToolDeclarations: McpToolDeclaration<any, any>[] = [];
+
   if (context.readOnly) {
     toolDeclarations = toolDeclarations.filter((tool) => tool.isReadOnly);
   }
 
   if (context.localOnly) {
     toolDeclarations = toolDeclarations.filter((tool) => tool.isLocalOnly);
+  }
+
+  if (context.experimentalTools?.length) {
+    const experimentalToolsMap = new Map(
+      experimentalToolDeclarations.map((tool) => [tool.name, tool]),
+    );
+
+    for (const toolName of context.experimentalTools) {
+      const tool = experimentalToolsMap.get(toolName);
+      if (tool) {
+        toolDeclarations.push(tool);
+      } else {
+        logger.warn(`Unknown experimental tool: ${toolName}`);
+      }
+    }
   }
 
   await registerTools(
