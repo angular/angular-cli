@@ -6,8 +6,8 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { z } from 'zod';
+import { declareTool } from './tool-registry';
 
 interface Transformation {
   name: string;
@@ -125,38 +125,33 @@ export async function runModernization(input: ModernizeInput) {
   };
 }
 
-export function registerModernizeTool(server: McpServer): void {
-  server.registerTool(
-    'modernize',
-    {
-      title: 'Modernize Angular Code',
-      description:
-        '<Purpose>\n' +
-        'This tool modernizes Angular code by applying the latest best practices and syntax improvements, ' +
-        'ensuring it is idiomatic, readable, and maintainable.\n\n' +
-        '</Purpose>\n' +
-        '<Use Cases>\n' +
-        '* After generating new code: Run this tool immediately after creating new Angular components, directives, ' +
-        'or services to ensure they adhere to modern standards.\n' +
-        '* On existing code: Apply to existing TypeScript files (.ts) and Angular templates (.ng.html) to update ' +
-        'them with the latest features, such as the new built-in control flow syntax.\n\n' +
-        '* When the user asks for a specific transformation: When the transformation list is populated, ' +
-        'these specific ones will be ran on the inputs.\n' +
-        '</Use Cases>\n' +
-        '<Transformations>\n' +
-        TRANSFORMATIONS.map((t) => `* ${t.name}: ${t.description}`).join('\n') +
-        '\n</Transformations>\n',
-      annotations: {
-        readOnlyHint: true,
-      },
-      inputSchema: modernizeInputSchema.shape,
-      outputSchema: {
-        instructions: z
-          .array(z.string())
-          .optional()
-          .describe('A list of instructions on how to run the migrations.'),
-      },
-    },
-    (input) => runModernization(input),
-  );
-}
+export const MODERNIZE_TOOL = declareTool({
+  name: 'modernize',
+  title: 'Modernize Angular Code',
+  description:
+    '<Purpose>\n' +
+    'This tool modernizes Angular code by applying the latest best practices and syntax improvements, ' +
+    'ensuring it is idiomatic, readable, and maintainable.\n\n' +
+    '</Purpose>\n' +
+    '<Use Cases>\n' +
+    '* After generating new code: Run this tool immediately after creating new Angular components, directives, ' +
+    'or services to ensure they adhere to modern standards.\n' +
+    '* On existing code: Apply to existing TypeScript files (.ts) and Angular templates (.ng.html) to update ' +
+    'them with the latest features, such as the new built-in control flow syntax.\n\n' +
+    '* When the user asks for a specific transformation: When the transformation list is populated, ' +
+    'these specific ones will be ran on the inputs.\n' +
+    '</Use Cases>\n' +
+    '<Transformations>\n' +
+    TRANSFORMATIONS.map((t) => `* ${t.name}: ${t.description}`).join('\n') +
+    '\n</Transformations>\n',
+  inputSchema: modernizeInputSchema.shape,
+  outputSchema: {
+    instructions: z
+      .array(z.string())
+      .optional()
+      .describe('A list of instructions on how to run the migrations.'),
+  },
+  isLocalOnly: true,
+  isReadOnly: true,
+  factory: () => (input) => runModernization(input),
+});
