@@ -55,10 +55,6 @@ export const FIND_EXAMPLE_TOOL = declareTool({
   isReadOnly: true,
   isLocalOnly: true,
   shouldRegister: ({ logger }) => {
-    if (process.env['NG_MCP_CODE_EXAMPLES'] !== '1') {
-      return false;
-    }
-
     // sqlite database support requires Node.js 22.16+
     const [nodeMajor, nodeMinor] = process.versions.node.split('.', 2).map(Number);
     if (nodeMajor < 22 || (nodeMajor === 22 && nodeMinor < 16)) {

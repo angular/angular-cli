@@ -46,16 +46,13 @@ export async function createMcpServer(
 
   registerInstructionsResource(server);
 
-  let toolDeclarations = [
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let toolDeclarations: McpToolDeclaration<any, any>[] = [
     BEST_PRACTICES_TOOL,
     DOC_SEARCH_TOOL,
     LIST_PROJECTS_TOOL,
-    MODERNIZE_TOOL,
-    FIND_EXAMPLE_TOOL,
   ];
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const experimentalToolDeclarations: McpToolDeclaration<any, any>[] = [];
+  const experimentalToolDeclarations = [FIND_EXAMPLE_TOOL, MODERNIZE_TOOL];
 
   if (context.readOnly) {
     toolDeclarations = toolDeclarations.filter((tool) => tool.isReadOnly);
@@ -65,12 +62,17 @@ export async function createMcpServer(
     toolDeclarations = toolDeclarations.filter((tool) => tool.isLocalOnly);
   }
 
-  if (context.experimentalTools?.length) {
+  const enabledExperimentalTools = new Set(context.experimentalTools);
+  if (process.env['NG_MCP_CODE_EXAMPLES'] === '1') {
+    enabledExperimentalTools.add('find_examples');
+  }
+
+  if (enabledExperimentalTools.size > 0) {
     const experimentalToolsMap = new Map(
       experimentalToolDeclarations.map((tool) => [tool.name, tool]),
     );
 
-    for (const toolName of context.experimentalTools) {
+    for (const toolName of enabledExperimentalTools) {
       const tool = experimentalToolsMap.get(toolName);
       if (tool) {
         toolDeclarations.push(tool);
