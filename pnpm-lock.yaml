@@ -43,7 +43,7 @@ importers:
         version: 20.2.0-next.2(w423afz5ha7yajtqnfzupgowry)
       '@angular/ng-dev':
         specifier: https://github.com/angular/dev-infra-private-ng-dev-builds.git#9aea3ff6c63a7a692d33e91956641887e8c6b838
-        version: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/9aea3ff6c63a7a692d33e91956641887e8c6b838(@modelcontextprotocol/sdk@1.17.1)(encoding@0.1.13)
+        version: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/9aea3ff6c63a7a692d33e91956641887e8c6b838(@modelcontextprotocol/sdk@1.17.2)(encoding@0.1.13)
       '@angular/platform-browser':
         specifier: 20.2.0-next.3
         version: 20.2.0-next.3(@angular/animations@20.2.0-next.3(@angular/common@20.2.0-next.3(@angular/core@20.2.0-next.3(@angular/compiler@20.2.0-next.3)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@20.2.0-next.3(@angular/compiler@20.2.0-next.3)(rxjs@7.8.2)(zone.js@0.15.1)))(@angular/common@20.2.0-next.3(@angular/core@20.2.0-next.3(@angular/compiler@20.2.0-next.3)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@20.2.0-next.3(@angular/compiler@20.2.0-next.3)(rxjs@7.8.2)(zone.js@0.15.1))
@@ -63,8 +63,8 @@ importers:
         specifier: 8.2.1
         version: 8.2.1
       '@eslint/compat':
-        specifier: 1.3.1
-        version: 1.3.1(eslint@9.32.0(jiti@1.21.7))
+        specifier: 1.3.2
+        version: 1.3.2(eslint@9.32.0(jiti@1.21.7))
       '@eslint/eslintrc':
         specifier: 3.3.1
         version: 3.3.1
@@ -366,7 +366,7 @@ importers:
         version: 5.1.14(@types/node@22.17.0)
       '@vitejs/plugin-basic-ssl':
         specifier: 2.1.0
-        version: 2.1.0(vite@7.1.0(@types/node@22.17.0)(jiti@1.21.7)(less@4.4.0)(sass@1.90.0)(terser@5.43.1)(yaml@2.8.0))
+        version: 2.1.0(vite@7.1.1(@types/node@22.17.0)(jiti@1.21.7)(less@4.4.0)(sass@1.90.0)(terser@5.43.1)(yaml@2.8.0))
       beasties:
         specifier: 0.3.5
         version: 0.3.5
@@ -419,8 +419,8 @@ importers:
         specifier: 0.2.14
         version: 0.2.14
       vite:
-        specifier: 7.1.0
-        version: 7.1.0(@types/node@22.17.0)(jiti@1.21.7)(less@4.4.0)(sass@1.90.0)(terser@5.43.1)(yaml@2.8.0)
+        specifier: 7.1.1
+        version: 7.1.1(@types/node@22.17.0)(jiti@1.21.7)(less@4.4.0)(sass@1.90.0)(terser@5.43.1)(yaml@2.8.0)
       watchpack:
         specifier: 2.4.4
         version: 2.4.4
@@ -472,8 +472,8 @@ importers:
         specifier: 3.0.1
         version: 3.0.1(@inquirer/prompts@7.8.0(@types/node@22.17.0))(@types/node@22.17.0)(listr2@9.0.1)
       '@modelcontextprotocol/sdk':
-        specifier: 1.17.1
-        version: 1.17.1
+        specifier: 1.17.2
+        version: 1.17.2
       '@schematics/angular':
         specifier: workspace:0.0.0-PLACEHOLDER
         version: link:../../schematics/angular
@@ -898,8 +898,8 @@ importers:
   tools/baseline_browserslist:
     devDependencies:
       baseline-browser-mapping:
-        specifier: 2.5.9
-        version: 2.5.9
+        specifier: 2.6.2
+        version: 2.6.2
 
 packages:
 
@@ -1817,8 +1817,8 @@ packages:
     resolution: {integrity: sha512-CCZCDJuduB9OUkFkY2IgppNZMi2lBQgD2qzwXkEia16cge2pijY/aXi96CJMquDMn3nJdlPV1A5KrJEXwfLNzQ==}
     engines: {node: ^12.0.0 || ^14.0.0 || >=16.0.0}
 
-  '@eslint/compat@1.3.1':
-    resolution: {integrity: sha512-k8MHony59I5EPic6EQTCNOuPoVBnoYXkP+20xvwFjN7t0qI3ImyvyBgg+hIVPwC8JaxVjjUZld+cLfBLFDLucg==}
+  '@eslint/compat@1.3.2':
+    resolution: {integrity: sha512-jRNwzTbd6p2Rw4sZ1CgWRS8YMtqG15YyZf7zvb6gY2rB2u6n+2Z+ELW0GtL0fQgyl0pr4Y/BzBfng/BdsereRA==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
     peerDependencies:
       eslint: ^8.40 || 9
@@ -2170,8 +2170,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@modelcontextprotocol/sdk@1.17.1':
-    resolution: {integrity: sha512-CPle1OQehbWqd25La9Ack5B07StKIxh4+Bf19qnpZKJC1oI22Y0czZHbifjw1UoczIfKBwBDAp/dFxvHG13B5A==}
+  '@modelcontextprotocol/sdk@1.17.2':
+    resolution: {integrity: sha512-EFLRNXR/ixpXQWu6/3Cu30ndDFIFNaqUXcTqsGebujeMan9FzhAaFFswLRiFj61rgygDRr8WO1N+UijjgRxX9g==}
     engines: {node: '>=18'}
 
   '@msgpackr-extract/msgpackr-extract-darwin-arm64@3.0.3':
@@ -3744,8 +3744,9 @@ packages:
     resolution: {integrity: sha512-lGe34o6EHj9y3Kts9R4ZYs/Gr+6N7MCaMlIFA3F1R2O5/m7K06AxfSeO5530PEERE6/WyEg3lsuyw4GHlPZHog==}
     engines: {node: ^4.5.0 || >= 5.9}
 
-  baseline-browser-mapping@2.5.9:
-    resolution: {integrity: sha512-zLiKT+KRL0ycpFalSR3ZOzn/yqZov6blFJ1SIOkKZVWswXUbDa1MgxwArNil2WUxjTtPdrJvLUvHmDPC4zZ0/w==}
+  baseline-browser-mapping@2.6.2:
+    resolution: {integrity: sha512-CHQ3H0Pssx8FVP1NIEsmwqk7Bxhp5HkqeuojhtM14avB0XHLcAVLRujxzxPGUvy+U7WOE8UGRt4V+MrgsgjOrg==}
+    hasBin: true
 
   basic-ftp@5.0.5:
     resolution: {integrity: sha512-4Bcg1P8xhUuqcii/S0Z9wiHIrQVPMermM1any+MX5GeGD7faD3/msQUDGLol9wOcz4/jbg/WJnGqoJF6LiBdtg==}
@@ -8120,8 +8121,8 @@ packages:
       yaml:
         optional: true
 
-  vite@7.1.0:
-    resolution: {integrity: sha512-3jdAy3NhBJYsa/lCFcnRfbK4kNkO/bhijFCnv5ByUQk/eekYagoV2yQSISUrhpV+5JiY5hmwOh7jNnQ68dFMuQ==}
+  vite@7.1.1:
+    resolution: {integrity: sha512-yJ+Mp7OyV+4S+afWo+QyoL9jFWD11QFH0i5i7JypnfTcA1rmgxCbiA8WwAICDEtZ1Z1hzrVhN8R8rGTqkTY8ZQ==}
     engines: {node: ^20.19.0 || >=22.12.0}
     hasBin: true
     peerDependencies:
@@ -8701,10 +8702,10 @@ snapshots:
       rxjs: 7.8.2
       tslib: 2.8.1
 
-  '@angular/ng-dev@https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/9aea3ff6c63a7a692d33e91956641887e8c6b838(@modelcontextprotocol/sdk@1.17.1)(encoding@0.1.13)':
+  '@angular/ng-dev@https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/9aea3ff6c63a7a692d33e91956641887e8c6b838(@modelcontextprotocol/sdk@1.17.2)(encoding@0.1.13)':
     dependencies:
       '@google-cloud/spanner': 8.0.0(supports-color@10.0.0)
-      '@google/genai': 1.12.0(@modelcontextprotocol/sdk@1.17.1)(encoding@0.1.13)(supports-color@10.0.0)
+      '@google/genai': 1.12.0(@modelcontextprotocol/sdk@1.17.2)(encoding@0.1.13)(supports-color@10.0.0)
       '@octokit/rest': 22.0.0
       '@types/semver': 7.7.0
       '@types/supports-color': 10.0.0
@@ -9586,7 +9587,7 @@ snapshots:
 
   '@eslint-community/regexpp@4.12.1': {}
 
-  '@eslint/compat@1.3.1(eslint@9.32.0(jiti@1.21.7))':
+  '@eslint/compat@1.3.2(eslint@9.32.0(jiti@1.21.7))':
     optionalDependencies:
       eslint: 9.32.0(jiti@1.21.7)
 
@@ -9688,12 +9689,12 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@google/genai@1.12.0(@modelcontextprotocol/sdk@1.17.1)(encoding@0.1.13)(supports-color@10.0.0)':
+  '@google/genai@1.12.0(@modelcontextprotocol/sdk@1.17.2)(encoding@0.1.13)(supports-color@10.0.0)':
     dependencies:
       google-auth-library: 9.15.1(encoding@0.1.13)(supports-color@10.0.0)
       ws: 8.18.3
     optionalDependencies:
-      '@modelcontextprotocol/sdk': 1.17.1
+      '@modelcontextprotocol/sdk': 1.17.2
     transitivePeerDependencies:
       - bufferutil
       - encoding
@@ -9953,7 +9954,7 @@ snapshots:
   '@lmdb/lmdb-win32-x64@3.4.2':
     optional: true
 
-  '@modelcontextprotocol/sdk@1.17.1':
+  '@modelcontextprotocol/sdk@1.17.2':
     dependencies:
       ajv: 6.12.6
       content-type: 1.0.5
@@ -11152,9 +11153,9 @@ snapshots:
       lodash: 4.17.21
       minimatch: 7.4.6
 
-  '@vitejs/plugin-basic-ssl@2.1.0(vite@7.1.0(@types/node@22.17.0)(jiti@1.21.7)(less@4.4.0)(sass@1.90.0)(terser@5.43.1)(yaml@2.8.0))':
+  '@vitejs/plugin-basic-ssl@2.1.0(vite@7.1.1(@types/node@22.17.0)(jiti@1.21.7)(less@4.4.0)(sass@1.90.0)(terser@5.43.1)(yaml@2.8.0))':
     dependencies:
-      vite: 7.1.0(@types/node@22.17.0)(jiti@1.21.7)(less@4.4.0)(sass@1.90.0)(terser@5.43.1)(yaml@2.8.0)
+      vite: 7.1.1(@types/node@22.17.0)(jiti@1.21.7)(less@4.4.0)(sass@1.90.0)(terser@5.43.1)(yaml@2.8.0)
 
   '@vitest/expect@3.2.4':
     dependencies:
@@ -11766,7 +11767,7 @@ snapshots:
 
   base64id@2.0.0: {}
 
-  baseline-browser-mapping@2.5.9: {}
+  baseline-browser-mapping@2.6.2: {}
 
   basic-ftp@5.0.5: {}
 
@@ -16836,7 +16837,7 @@ snapshots:
       debug: 4.4.1(supports-color@10.0.0)
       es-module-lexer: 1.7.0
       pathe: 2.0.3
-      vite: 7.1.0(@types/node@22.17.0)(jiti@1.21.7)(less@4.4.0)(sass@1.90.0)(terser@5.43.1)(yaml@2.8.0)
+      vite: 7.1.1(@types/node@22.17.0)(jiti@1.21.7)(less@4.4.0)(sass@1.90.0)(terser@5.43.1)(yaml@2.8.0)
     transitivePeerDependencies:
       - '@types/node'
       - jiti
@@ -16868,7 +16869,7 @@ snapshots:
       terser: 5.43.1
       yaml: 2.8.0
 
-  vite@7.1.0(@types/node@22.17.0)(jiti@1.21.7)(less@4.4.0)(sass@1.90.0)(terser@5.43.1)(yaml@2.8.0):
+  vite@7.1.1(@types/node@22.17.0)(jiti@1.21.7)(less@4.4.0)(sass@1.90.0)(terser@5.43.1)(yaml@2.8.0):
     dependencies:
       esbuild: 0.25.8
       fdir: 6.4.6(picomatch@4.0.3)
