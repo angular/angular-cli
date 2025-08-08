@@ -22,6 +22,7 @@ export async function createMcpServer(
   context: {
     workspace?: AngularWorkspace;
     readOnly?: boolean;
+    localOnly?: boolean;
   },
   logger: { warn(text: string): void },
 ): Promise<McpServer> {
@@ -54,6 +55,10 @@ export async function createMcpServer(
 
   if (context.readOnly) {
     toolDeclarations = toolDeclarations.filter((tool) => tool.isReadOnly);
+  }
+
+  if (context.localOnly) {
+    toolDeclarations = toolDeclarations.filter((tool) => tool.isLocalOnly);
   }
 
   await registerTools(
