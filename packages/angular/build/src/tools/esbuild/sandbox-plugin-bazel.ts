@@ -12,11 +12,12 @@
 
 import type { OnResolveResult, Plugin, PluginBuild, ResolveOptions } from 'esbuild';
 import { stat } from 'node:fs/promises';
-import { join } from 'node:path';
+import path, { join } from 'node:path';
 
 export interface CreateBazelSandboxPluginOptions {
   bindir: string;
   execroot: string;
+  runfiles?: string;
 }
 
 // Under Bazel, esbuild will follow symlinks out of the sandbox when the sandbox is enabled. See https://github.com/aspect-build/rules_esbuild/issues/58.
@@ -25,6 +26,7 @@ export interface CreateBazelSandboxPluginOptions {
 export function createBazelSandboxPlugin({
   bindir,
   execroot,
+  runfiles,
 }: CreateBazelSandboxPluginOptions): Plugin {
   return {
     name: 'bazel-sandbox',
@@ -40,7 +42,14 @@ export function createBazelSandboxPlugin({
         }
         otherOptions.pluginData.executedSandboxPlugin = true;
 
-        return await resolveInExecroot({ build, bindir, execroot, importPath, otherOptions });
+        return await resolveInExecroot({
+          build,
+          bindir,
+          execroot,
+          runfiles,
+          importPath,
+          otherOptions,
+        });
       });
     },
   };
@@ -50,14 +59,30 @@ interface ResolveInExecrootOptions {
   build: PluginBuild;
   bindir: string;
   execroot: string;
+  runfiles?: string;
   importPath: string;
   otherOptions: ResolveOptions;
+}
+
+const EXTERNAL_PREFIX = 'external/';
+
+function removeExternalPathPrefix(filePath: string): string {
+  // Normalize to relative path without leading slash.
+  if (filePath.startsWith('/')) {
+    filePath = filePath.substring(1);
+  }
+  // Remove the EXTERNAL_PREFIX if present.
+  if (filePath.startsWith(EXTERNAL_PREFIX)) {
+    filePath = filePath.substring(EXTERNAL_PREFIX.length);
+  }
+  return filePath;
 }
 
 async function resolveInExecroot({
   build,
   bindir,
   execroot,
+  runfiles,
   importPath,
   otherOptions,
 }: ResolveInExecrootOptions): Promise<OnResolveResult> {
@@ -85,8 +110,39 @@ async function resolveInExecroot({
         `Error: esbuild resolved a path outside of BAZEL_BINDIR (${bindir}): ${result.path}`,
       );
     }
-    // Otherwise remap the bindir-relative path
-    const correctedPath = join(execroot, result.path.substring(result.path.indexOf(bindir)));
+    // Get the path under the bindir for the file. This allows us to map into
+    // the execroot or the runfiles directory (if present).
+    // Example:
+    //   bindir             = bazel-out/<arch>/bin
+    //   result.path        = <base>/execroot/bazel-out/<arch>/bin/external/repo+/path/file.ts
+    //   binDirRelativePath = external/repo+/path/file.ts
+    const binDirRelativePath = result.path.substring(
+      result.path.indexOf(bindir) + bindir.length + 1,
+    );
+    // We usually remap into the bindir. However, when sources are provided
+    // as `data` (runfiles), they will be in the runfiles root instead. The
+    // runfiles path is absolute and under the bindir, so we don't need to
+    // join anything to it. The execroot does not include the bindir, so there
+    // we add it again after previously removing it from the result path.
+    const remapBase = runfiles ?? path.join(execroot, bindir);
+    // The path relative to the remapBase also differs between runfiles and
+    // bindir, but only if the file is in an external repository. External
+    // repositories appear under `external/repo+` in the bindir, whereas they
+    // are directly under `repo+` in the runfiles tree. This difference needs
+    // to be accounted for by removing a potential `external/` prefix when
+    // mapping into runfiles.
+    const remapBaseRelativePath = runfiles
+      ? removeExternalPathPrefix(binDirRelativePath)
+      : binDirRelativePath;
+    // Join the paths back together. The results will look slightly different
+    // between runfiles and bindir, but this is intentional.
+    // Source path:
+    //   <bin>/external/repo+/path/file.ts
+    // Example in bindir:
+    //   <sandbox-bin>/external/repo+/path/file.ts
+    // Example in runfiles:
+    //   <sandbox-bin>/path/bin.runfiles/repo+/path/file.ts
+    const correctedPath = join(remapBase, remapBaseRelativePath);
     if (process.env.JS_BINARY__LOG_DEBUG) {
       // eslint-disable-next-line no-console
       console.error(
