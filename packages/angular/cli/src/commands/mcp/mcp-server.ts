@@ -21,6 +21,7 @@ import { registerTools } from './tools/tool-registry';
 export async function createMcpServer(
   context: {
     workspace?: AngularWorkspace;
+    readOnly?: boolean;
   },
   logger: { warn(text: string): void },
 ): Promise<McpServer> {
@@ -43,13 +44,17 @@ export async function createMcpServer(
 
   registerInstructionsResource(server);
 
-  const toolDeclarations = [
+  let toolDeclarations = [
     BEST_PRACTICES_TOOL,
     DOC_SEARCH_TOOL,
     LIST_PROJECTS_TOOL,
     MODERNIZE_TOOL,
     FIND_EXAMPLE_TOOL,
   ];
+
+  if (context.readOnly) {
+    toolDeclarations = toolDeclarations.filter((tool) => tool.isReadOnly);
+  }
 
   await registerTools(
     server,
