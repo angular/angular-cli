@@ -33,10 +33,14 @@ export default class McpCommandModule extends CommandModule implements CommandMo
   longDescriptionPath = undefined;
 
   builder(localYargs: Argv): Argv {
-    return localYargs;
+    return localYargs.option('read-only', {
+      type: 'boolean',
+      default: false,
+      describe: 'Only register read-only tools.',
+    });
   }
 
-  async run(): Promise<void> {
+  async run(options: { readOnly: boolean }): Promise<void> {
     if (isTTY()) {
       this.context.logger.info(INTERACTIVE_MESSAGE);
 
@@ -44,7 +48,7 @@ export default class McpCommandModule extends CommandModule implements CommandMo
     }
 
     const server = await createMcpServer(
-      { workspace: this.context.workspace },
+      { workspace: this.context.workspace, readOnly: options.readOnly },
       this.context.logger,
     );
     const transport = new StdioServerTransport();
