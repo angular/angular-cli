@@ -7,20 +7,23 @@
  */
 
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import type { AngularWorkspace } from '../../utilities/config';
 import { VERSION } from '../../utilities/version';
 import { registerInstructionsResource } from './resources/instructions';
-import { registerBestPracticesTool } from './tools/best-practices';
-import { registerDocSearchTool } from './tools/doc-search';
-import { registerFindExampleTool } from './tools/examples';
-import { registerModernizeTool } from './tools/modernize';
-import { registerListProjectsTool } from './tools/projects';
+import { BEST_PRACTICES_TOOL } from './tools/best-practices';
+import { DOC_SEARCH_TOOL } from './tools/doc-search';
+import { FIND_EXAMPLE_TOOL } from './tools/examples';
+import { MODERNIZE_TOOL } from './tools/modernize';
+import { LIST_PROJECTS_TOOL } from './tools/projects';
+import { McpToolDeclaration, registerTools } from './tools/tool-registry';
 
 export async function createMcpServer(
   context: {
     workspace?: AngularWorkspace;
+    readOnly?: boolean;
+    localOnly?: boolean;
+    experimentalTools?: string[];
   },
   logger: { warn(text: string): void },
 ): Promise<McpServer> {
@@ -42,28 +45,52 @@ export async function createMcpServer(
   );
 
   registerInstructionsResource(server);
-  registerBestPracticesTool(server);
-  registerModernizeTool(server);
 
-  // If run outside an Angular workspace (e.g., globally) skip the workspace specific tools.
-  if (context.workspace) {
-    registerListProjectsTool(server, context);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let toolDeclarations: McpToolDeclaration<any, any>[] = [
+    BEST_PRACTICES_TOOL,
+    DOC_SEARCH_TOOL,
+    LIST_PROJECTS_TOOL,
+  ];
+  const experimentalToolDeclarations = [FIND_EXAMPLE_TOOL, MODERNIZE_TOOL];
+
+  if (context.readOnly) {
+    toolDeclarations = toolDeclarations.filter((tool) => tool.isReadOnly);
   }
 
-  await registerDocSearchTool(server);
+  if (context.localOnly) {
+    toolDeclarations = toolDeclarations.filter((tool) => tool.isLocalOnly);
+  }
 
+  const enabledExperimentalTools = new Set(context.experimentalTools);
   if (process.env['NG_MCP_CODE_EXAMPLES'] === '1') {
-    // sqlite database support requires Node.js 22.16+
-    const [nodeMajor, nodeMinor] = process.versions.node.split('.', 2).map(Number);
-    if (nodeMajor < 22 || (nodeMajor === 22 && nodeMinor < 16)) {
-      logger.warn(
-        `MCP tool 'find_examples' requires Node.js 22.16 (or higher). ` +
-          ' Registration of this tool has been skipped.',
-      );
-    } else {
-      await registerFindExampleTool(server, path.join(__dirname, '../../../lib/code-examples.db'));
+    enabledExperimentalTools.add('find_examples');
+  }
+
+  if (enabledExperimentalTools.size > 0) {
+    const experimentalToolsMap = new Map(
+      experimentalToolDeclarations.map((tool) => [tool.name, tool]),
+    );
+
+    for (const toolName of enabledExperimentalTools) {
+      const tool = experimentalToolsMap.get(toolName);
+      if (tool) {
+        toolDeclarations.push(tool);
+      } else {
+        logger.warn(`Unknown experimental tool: ${toolName}`);
+      }
     }
   }
+
+  await registerTools(
+    server,
+    {
+      workspace: context.workspace,
+      logger,
+      exampleDatabasePath: path.join(__dirname, '../../../lib/code-examples.db'),
+    },
+    toolDeclarations,
+  );
 
   return server;
 }
