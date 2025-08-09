@@ -297,7 +297,7 @@ http_archive(
 
 git_repository(
     name = "rules_browsers",
-    commit = "56ef8007ea07cd1916429bca8bb523433b0e9cdc",
+    commit = "c3f7358828a6e9c2b08c23bc33b8982f8daea9e5",
     remote = "https://github.com/devversion/rules_browsers.git",
 )
 
