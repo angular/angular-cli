@@ -242,12 +242,15 @@ export async function getWorkspaceRaw(
 
 export async function validateWorkspace(data: json.JsonObject, isGlobal: boolean): Promise<void> {
   const schema = readAndParseJson(workspaceSchemaPath);
+  if (!isJsonObject(schema)) {
+    throw new Error('Workspace schema is not a JSON object.');
+  }
 
   // We should eventually have a dedicated global config schema and use that to validate.
   const schemaToValidate: json.schema.JsonSchema = isGlobal
     ? {
         '$ref': '#/definitions/global',
-        definitions: schema['definitions'],
+        definitions: schema['definitions'] as json.JsonObject,
       }
     : schema;
 
