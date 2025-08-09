@@ -23,6 +23,7 @@ import {
   RepositoryInitializerTask,
 } from '@angular-devkit/schematics/tasks';
 import { Schema as ApplicationOptions } from '../application/schema';
+import { Tool as AiTool, Schema as ConfigOptions, Type as ConfigType } from '../config/schema';
 import { Schema as WorkspaceOptions } from '../workspace/schema';
 import { Schema as NgNewOptions } from './schema';
 
@@ -60,11 +61,18 @@ export default function (options: NgNewOptions): Rule {
     zoneless: options.zoneless,
   };
 
+  const configOptions: ConfigOptions = {
+    project: options.name,
+    type: ConfigType.Ai,
+    tool: options.aiConfig as unknown as AiTool,
+  };
+
   return chain([
     mergeWith(
       apply(empty(), [
         schematic('workspace', workspaceOptions),
         options.createApplication ? schematic('application', applicationOptions) : noop,
+        options.aiConfig !== 'none' ? schematic('config', configOptions) : noop,
         move(options.directory),
       ]),
     ),
