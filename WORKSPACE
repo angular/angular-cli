@@ -18,16 +18,6 @@ http_archive(
 )
 
 http_archive(
-    name = "build_bazel_rules_nodejs",
-    sha256 = "5dd1e5dea1322174c57d3ca7b899da381d516220793d0adef3ba03b9d23baa8e",
-    urls = ["https://github.com/bazelbuild/rules_nodejs/releases/download/5.8.3/rules_nodejs-5.8.3.tar.gz"],
-)
-
-load("@build_bazel_rules_nodejs//:repositories.bzl", "build_bazel_rules_nodejs_dependencies")
-
-build_bazel_rules_nodejs_dependencies()
-
-http_archive(
     name = "aspect_rules_js",
     sha256 = "961393890a58de989ad7aa36ce147fc9b15a77c8144454889bf068bdd12c5165",
     strip_prefix = "rules_js-2.4.0",
@@ -133,12 +123,6 @@ aspect_bazel_lib_dependencies()
 
 aspect_bazel_lib_register_toolchains()
 
-load("@build_bazel_rules_nodejs//toolchains/esbuild:esbuild_repositories.bzl", "esbuild_repositories")
-
-esbuild_repositories(
-    npm_repository = "npm",
-)
-
 load("@aspect_rules_js//npm:repositories.bzl", "npm_translate_lock")
 
 npm_translate_lock(
@@ -230,7 +214,7 @@ load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 
 git_repository(
     name = "devinfra",
-    commit = "361ceb676a715e1aedf3d6cd64ecae5dee6a3e5f",
+    commit = "0b24ffe8d1f7144d6302dafcc214790e708e598a",
     remote = "https://github.com/angular/dev-infra.git",
 )
 
