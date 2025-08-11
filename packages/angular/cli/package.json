@@ -25,7 +25,7 @@
     "@angular-devkit/architect": "workspace:0.0.0-EXPERIMENTAL-PLACEHOLDER",
     "@angular-devkit/core": "workspace:0.0.0-PLACEHOLDER",
     "@angular-devkit/schematics": "workspace:0.0.0-PLACEHOLDER",
-    "@inquirer/prompts": "7.8.0",
+    "@inquirer/prompts": "7.8.1",
     "@listr2/prompt-adapter-inquirer": "3.0.1",
     "@modelcontextprotocol/sdk": "1.17.2",
     "@schematics/angular": "workspace:0.0.0-PLACEHOLDER",
