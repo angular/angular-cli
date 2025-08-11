@@ -35,6 +35,9 @@ export interface McpToolDeclaration<TInput extends ZodRawShape, TOutput extends 
   isLocalOnly?: boolean;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type AnyMcpToolDeclaration = McpToolDeclaration<any, any>;
+
 export function declareTool<TInput extends ZodRawShape, TOutput extends ZodRawShape>(
   declaration: McpToolDeclaration<TInput, TOutput>,
 ): McpToolDeclaration<TInput, TOutput> {
@@ -44,8 +47,7 @@ export function declareTool<TInput extends ZodRawShape, TOutput extends ZodRawSh
 export async function registerTools(
   server: McpServer,
   context: McpToolContext,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  declarations: McpToolDeclaration<any, any>[],
+  declarations: AnyMcpToolDeclaration[],
 ): Promise<void> {
   for (const declaration of declarations) {
     if (declaration.shouldRegister && !(await declaration.shouldRegister(context))) {

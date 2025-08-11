@@ -16,10 +16,22 @@ import { DOC_SEARCH_TOOL } from './tools/doc-search';
 import { FIND_EXAMPLE_TOOL } from './tools/examples';
 import { MODERNIZE_TOOL } from './tools/modernize';
 import { LIST_PROJECTS_TOOL } from './tools/projects';
-import { McpToolDeclaration, registerTools } from './tools/tool-registry';
+import { AnyMcpToolDeclaration, registerTools } from './tools/tool-registry';
+
+/**
+ * The set of tools that are enabled by default for the MCP server.
+ * These tools are considered stable and suitable for general use.
+ */
+const STABLE_TOOLS = [BEST_PRACTICES_TOOL, DOC_SEARCH_TOOL, LIST_PROJECTS_TOOL] as const;
+
+/**
+ * The set of tools that are available but not enabled by default.
+ * These tools are considered experimental and may have limitations.
+ */
+const EXPERIMENTAL_TOOLS = [FIND_EXAMPLE_TOOL, MODERNIZE_TOOL] as const;
 
 export async function createMcpServer(
-  context: {
+  options: {
     workspace?: AngularWorkspace;
     readOnly?: boolean;
     localOnly?: boolean;
@@ -46,46 +58,15 @@ export async function createMcpServer(
 
   registerInstructionsResource(server);
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let toolDeclarations: McpToolDeclaration<any, any>[] = [
-    BEST_PRACTICES_TOOL,
-    DOC_SEARCH_TOOL,
-    LIST_PROJECTS_TOOL,
-  ];
-  const experimentalToolDeclarations = [FIND_EXAMPLE_TOOL, MODERNIZE_TOOL];
-
-  if (context.readOnly) {
-    toolDeclarations = toolDeclarations.filter((tool) => tool.isReadOnly);
-  }
-
-  if (context.localOnly) {
-    toolDeclarations = toolDeclarations.filter((tool) => tool.isLocalOnly);
-  }
-
-  const enabledExperimentalTools = new Set(context.experimentalTools);
-  if (process.env['NG_MCP_CODE_EXAMPLES'] === '1') {
-    enabledExperimentalTools.add('find_examples');
-  }
-
-  if (enabledExperimentalTools.size > 0) {
-    const experimentalToolsMap = new Map(
-      experimentalToolDeclarations.map((tool) => [tool.name, tool]),
-    );
-
-    for (const toolName of enabledExperimentalTools) {
-      const tool = experimentalToolsMap.get(toolName);
-      if (tool) {
-        toolDeclarations.push(tool);
-      } else {
-        logger.warn(`Unknown experimental tool: ${toolName}`);
-      }
-    }
-  }
+  const toolDeclarations = assembleToolDeclarations(STABLE_TOOLS, EXPERIMENTAL_TOOLS, {
+    ...options,
+    logger,
+  });
 
   await registerTools(
     server,
     {
-      workspace: context.workspace,
+      workspace: options.workspace,
       logger,
       exampleDatabasePath: path.join(__dirname, '../../../lib/code-examples.db'),
     },
@@ -93,4 +74,45 @@ export async function createMcpServer(
   );
 
   return server;
+}
+
+export function assembleToolDeclarations(
+  stableDeclarations: readonly AnyMcpToolDeclaration[],
+  experimentalDeclarations: readonly AnyMcpToolDeclaration[],
+  options: {
+    readOnly?: boolean;
+    localOnly?: boolean;
+    experimentalTools?: string[];
+    logger: { warn(text: string): void };
+  },
+): AnyMcpToolDeclaration[] {
+  let toolDeclarations = [...stableDeclarations];
+
+  if (options.readOnly) {
+    toolDeclarations = toolDeclarations.filter((tool) => tool.isReadOnly);
+  }
+
+  if (options.localOnly) {
+    toolDeclarations = toolDeclarations.filter((tool) => tool.isLocalOnly);
+  }
+
+  const enabledExperimentalTools = new Set(options.experimentalTools);
+  if (process.env['NG_MCP_CODE_EXAMPLES'] === '1') {
+    enabledExperimentalTools.add('find_examples');
+  }
+
+  if (enabledExperimentalTools.size > 0) {
+    const experimentalToolsMap = new Map(experimentalDeclarations.map((tool) => [tool.name, tool]));
+
+    for (const toolName of enabledExperimentalTools) {
+      const tool = experimentalToolsMap.get(toolName);
+      if (tool) {
+        toolDeclarations.push(tool);
+      } else {
+        options.logger.warn(`Unknown experimental tool: ${toolName}`);
+      }
+    }
+  }
+
+  return toolDeclarations;
 }
