@@ -14,6 +14,8 @@ export default async function () {
   await updateJsonFile('angular.json', (config) => {
     const build = config.projects['test-project'].architect.build;
     build.options.aot = false;
+    build.configurations.production.budgets = undefined;
+
     if (!getGlobalVariable('argv')['esbuild']) {
       build.configurations.production.buildOptimizer = false;
     }
