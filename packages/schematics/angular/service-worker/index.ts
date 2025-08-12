@@ -23,7 +23,7 @@ import * as ts from '../third_party/github.com/Microsoft/TypeScript/lib/typescri
 import { addDependency, addRootProvider, readWorkspace, writeWorkspace } from '../utility';
 import { addSymbolToNgModuleMetadata, insertImport } from '../utility/ast-utils';
 import { applyToUpdateRecorder } from '../utility/change';
-import { getPackageJsonDependency } from '../utility/dependencies';
+import { getDependency } from '../utility/dependency';
 import { getAppModulePath, isStandaloneApp } from '../utility/ng-ast-utils';
 import { relativePathToWorkspaceRoot } from '../utility/paths';
 import { targetBuildNotFoundError } from '../utility/project-targets';
@@ -34,7 +34,7 @@ import { Schema as ServiceWorkerOptions } from './schema';
 
 function addDependencies(): Rule {
   return (host: Tree) => {
-    const coreDep = getPackageJsonDependency(host, '@angular/core');
+    const coreDep = getDependency(host, '@angular/core');
     if (!coreDep) {
       throw new SchematicsException('Could not find "@angular/core" version.');
     }
