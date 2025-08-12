@@ -15,7 +15,14 @@ import {
   callRule,
   chain,
 } from '@angular-devkit/schematics';
-import { DependencyType, ExistingBehavior, InstallBehavior, addDependency } from './dependency';
+import {
+  DependencyType,
+  ExistingBehavior,
+  InstallBehavior,
+  addDependency,
+  getDependency,
+  removeDependency,
+} from './dependency';
 
 interface LogEntry {
   type: 'warn';
@@ -482,5 +489,198 @@ describe('addDependency', () => {
       undefined,
       `Path "/abc/package.json" does not exist.`,
     );
+  });
+});
+
+describe('removeDependency', () => {
+  it('removes a package from "dependencies"', async () => {
+    const tree = new EmptyTree();
+    tree.create(
+      '/package.json',
+      JSON.stringify({
+        dependencies: { '@angular/core': '^14.0.0' },
+      }),
+    );
+
+    const rule = removeDependency('@angular/core');
+    await testRule(rule, tree);
+
+    expect(tree.readJson('/package.json')).toEqual({
+      dependencies: {},
+    });
+  });
+
+  it('removes a package from "devDependencies"', async () => {
+    const tree = new EmptyTree();
+    tree.create(
+      '/package.json',
+      JSON.stringify({
+        devDependencies: { typescript: '~4.7.2' },
+      }),
+    );
+
+    const rule = removeDependency('typescript');
+    await testRule(rule, tree);
+
+    expect(tree.readJson('/package.json')).toEqual({
+      devDependencies: {},
+    });
+  });
+
+  it('removes a package from "peerDependencies"', async () => {
+    const tree = new EmptyTree();
+    tree.create(
+      '/package.json',
+      JSON.stringify({
+        peerDependencies: { rxjs: '^7.0.0' },
+      }),
+    );
+
+    const rule = removeDependency('rxjs');
+    await testRule(rule, tree);
+
+    expect(tree.readJson('/package.json')).toEqual({
+      peerDependencies: {},
+    });
+  });
+
+  it('does not change manifest if package is not found', async () => {
+    const tree = new EmptyTree();
+    const manifest = { dependencies: { '@angular/core': '^14.0.0' } };
+    tree.create('/package.json', JSON.stringify(manifest));
+
+    const rule = removeDependency('typescript');
+    await testRule(rule, tree);
+
+    expect(tree.readJson('/package.json')).toEqual(manifest);
+  });
+
+  it('schedules a package install task by default', async () => {
+    const tree = new EmptyTree();
+    tree.create('/package.json', JSON.stringify({ dependencies: { '@angular/core': '1.0.0' } }));
+
+    const rule = removeDependency('@angular/core');
+    const { tasks } = await testRule(rule, tree);
+
+    expect(tasks.map((task) => task.toConfiguration())).toEqual([
+      {
+        name: 'node-package',
+        options: jasmine.objectContaining({ command: 'install', workingDirectory: '/' }),
+      },
+    ]);
+  });
+
+  it('does not schedule a package install task if package not found', async () => {
+    const tree = new EmptyTree();
+    tree.create('/package.json', JSON.stringify({ dependencies: {} }));
+
+    const rule = removeDependency('@angular/core');
+    const { tasks } = await testRule(rule, tree);
+
+    expect(tasks).toEqual([]);
+  });
+
+  it('does not schedule a package install task when install behavior is none', async () => {
+    const tree = new EmptyTree();
+    tree.create('/package.json', JSON.stringify({ dependencies: { '@angular/core': '1.0.0' } }));
+
+    const rule = removeDependency('@angular/core', { install: InstallBehavior.None });
+    const { tasks } = await testRule(rule, tree);
+
+    expect(tasks).toEqual([]);
+  });
+
+  it('uses specified manifest when provided via "packageJsonPath" option', async () => {
+    const tree = new EmptyTree();
+    tree.create('/package.json', JSON.stringify({ dependencies: { '@angular/core': '1.0.0' } }));
+    tree.create(
+      '/abc/package.json',
+      JSON.stringify({ dependencies: { '@angular/core': '1.0.0' } }),
+    );
+
+    const rule = removeDependency('@angular/core', { packageJsonPath: '/abc/package.json' });
+    await testRule(rule, tree);
+
+    expect(tree.readJson('/package.json')).toEqual({ dependencies: { '@angular/core': '1.0.0' } });
+    expect(tree.readJson('/abc/package.json')).toEqual({ dependencies: {} });
+  });
+});
+
+describe('getDependency', () => {
+  it('returns a dependency found in "dependencies"', () => {
+    const tree = new EmptyTree();
+    tree.create(
+      '/package.json',
+      JSON.stringify({
+        dependencies: { '@angular/core': '^14.0.0' },
+      }),
+    );
+
+    const dep = getDependency(tree, '@angular/core');
+    expect(dep).toEqual({
+      type: DependencyType.Default,
+      name: '@angular/core',
+      version: '^14.0.0',
+    });
+  });
+
+  it('returns a dependency found in "devDependencies"', () => {
+    const tree = new EmptyTree();
+    tree.create(
+      '/package.json',
+      JSON.stringify({
+        devDependencies: { typescript: '~4.7.2' },
+      }),
+    );
+
+    const dep = getDependency(tree, 'typescript');
+    expect(dep).toEqual({
+      type: DependencyType.Dev,
+      name: 'typescript',
+      version: '~4.7.2',
+    });
+  });
+
+  it('returns a dependency found in "peerDependencies"', () => {
+    const tree = new EmptyTree();
+    tree.create(
+      '/package.json',
+      JSON.stringify({
+        peerDependencies: { rxjs: '^7.0.0' },
+      }),
+    );
+
+    const dep = getDependency(tree, 'rxjs');
+    expect(dep).toEqual({
+      type: DependencyType.Peer,
+      name: 'rxjs',
+      version: '^7.0.0',
+    });
+  });
+
+  it('returns null if a dependency is not found', () => {
+    const tree = new EmptyTree();
+    tree.create('/package.json', JSON.stringify({}));
+
+    const dep = getDependency(tree, '@angular/core');
+    expect(dep).toBeNull();
+  });
+
+  it('returns a dependency from a specified manifest path', () => {
+    const tree = new EmptyTree();
+    tree.create('/package.json', JSON.stringify({}));
+    tree.create(
+      '/abc/package.json',
+      JSON.stringify({
+        dependencies: { '@angular/core': '^14.0.0' },
+      }),
+    );
+
+    const dep = getDependency(tree, '@angular/core', '/abc/package.json');
+    expect(dep).toEqual({
+      type: DependencyType.Default,
+      name: '@angular/core',
+      version: '^14.0.0',
+    });
   });
 });
