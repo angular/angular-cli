@@ -35,6 +35,13 @@ import { getWorkspace, updateWorkspace } from '../utility/workspace';
 import { Builders, ProjectType } from '../utility/workspace-models';
 import { Schema as LibraryOptions } from './schema';
 
+const LIBRARY_DEV_DEPENDENCIES = [
+  { name: '@angular/compiler-cli', version: latestVersions.Angular },
+  { name: '@angular/build', version: latestVersions.AngularBuild },
+  { name: 'ng-packagr', version: latestVersions.NgPackagr },
+  { name: 'typescript', version: latestVersions['typescript'] },
+];
+
 function updateTsConfig(packageName: string, ...paths: string[]) {
   return (host: Tree) => {
     if (!host.exists('tsconfig.json')) {
@@ -65,24 +72,14 @@ function addTsProjectReference(...paths: string[]) {
 
 function addDependenciesToPackageJson(): Rule {
   return chain([
-    addDependency('@angular/compiler-cli', latestVersions.Angular, {
-      type: DependencyType.Dev,
-      existing: ExistingBehavior.Skip,
-    }),
-    addDependency('@angular/build', latestVersions.AngularBuild, {
-      type: DependencyType.Dev,
-      existing: ExistingBehavior.Skip,
-    }),
-    addDependency('ng-packagr', latestVersions.NgPackagr, {
-      type: DependencyType.Dev,
-      existing: ExistingBehavior.Skip,
-    }),
+    ...LIBRARY_DEV_DEPENDENCIES.map((dependency) =>
+      addDependency(dependency.name, dependency.version, {
+        type: DependencyType.Dev,
+        existing: ExistingBehavior.Skip,
+      }),
+    ),
     addDependency('tslib', latestVersions['tslib'], {
       type: DependencyType.Default,
-      existing: ExistingBehavior.Skip,
-    }),
-    addDependency('typescript', latestVersions['typescript'], {
-      type: DependencyType.Dev,
       existing: ExistingBehavior.Skip,
     }),
   ]);

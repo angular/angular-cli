@@ -10,7 +10,6 @@ import { JsonObject, join, normalize } from '@angular-devkit/core';
 import {
   MergeStrategy,
   Rule,
-  SchematicContext,
   Tree,
   apply,
   applyTemplates,
@@ -23,7 +22,6 @@ import {
   strings,
   url,
 } from '@angular-devkit/schematics';
-import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
 import { Schema as ComponentOptions } from '../component/schema';
 import {
   DependencyType,
@@ -37,6 +35,12 @@ import { relativePathToWorkspaceRoot } from '../utility/paths';
 import { getWorkspace, updateWorkspace } from '../utility/workspace';
 import { Builders, ProjectType } from '../utility/workspace-models';
 import { Schema as ApplicationOptions, Style } from './schema';
+
+const APPLICATION_DEV_DEPENDENCIES = [
+  { name: '@angular/compiler-cli', version: latestVersions.Angular },
+  { name: '@angular/build', version: latestVersions.AngularBuild },
+  { name: 'typescript', version: latestVersions['typescript'] },
+];
 
 function addTsProjectReference(...paths: string[]) {
   return (host: Tree) => {
@@ -136,23 +140,13 @@ export default function (options: ApplicationOptions): Rule {
 }
 
 function addDependenciesToPackageJson(options: ApplicationOptions): Rule {
-  const rules: Rule[] = [
-    addDependency('@angular/compiler-cli', latestVersions.Angular, {
+  const rules: Rule[] = APPLICATION_DEV_DEPENDENCIES.map((dependency) =>
+    addDependency(dependency.name, dependency.version, {
       type: DependencyType.Dev,
       existing: ExistingBehavior.Skip,
       install: options.skipInstall ? InstallBehavior.None : InstallBehavior.Auto,
     }),
-    addDependency('@angular/build', latestVersions.AngularBuild, {
-      type: DependencyType.Dev,
-      existing: ExistingBehavior.Skip,
-      install: options.skipInstall ? InstallBehavior.None : InstallBehavior.Auto,
-    }),
-    addDependency('typescript', latestVersions['typescript'], {
-      type: DependencyType.Dev,
-      existing: ExistingBehavior.Skip,
-      install: options.skipInstall ? InstallBehavior.None : InstallBehavior.Auto,
-    }),
-  ];
+  );
 
   if (!options.zoneless) {
     rules.push(
