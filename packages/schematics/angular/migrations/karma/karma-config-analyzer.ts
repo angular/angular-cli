@@ -119,6 +119,15 @@ export function analyzeKarmaConfig(content: string): KarmaConfigAnalysis {
       }
       case ts.SyntaxKind.PropertyAccessExpression: {
         const propAccessExpr = node as ts.PropertyAccessExpression;
+
+        // Handle config constants like `config.LOG_INFO`
+        if (
+          ts.isIdentifier(propAccessExpr.expression) &&
+          propAccessExpr.expression.text === 'config'
+        ) {
+          return `config.${propAccessExpr.name.text}`;
+        }
+
         const value = extractValue(propAccessExpr.expression);
         if (isRequireInfo(value)) {
           const currentExport = value.export
