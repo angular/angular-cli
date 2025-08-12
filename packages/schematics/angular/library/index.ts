@@ -8,7 +8,6 @@
 
 import {
   Rule,
-  SchematicContext,
   Tree,
   apply,
   applyTemplates,
@@ -20,11 +19,11 @@ import {
   strings,
   url,
 } from '@angular-devkit/schematics';
-import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
 import { join } from 'node:path/posix';
 import {
   DependencyType,
   ExistingBehavior,
+  InstallBehavior,
   addDependency,
   getDependency,
 } from '../utility/dependency';
@@ -70,17 +69,19 @@ function addTsProjectReference(...paths: string[]) {
   };
 }
 
-function addDependenciesToPackageJson(): Rule {
+function addDependenciesToPackageJson(skipInstall: boolean): Rule {
   return chain([
     ...LIBRARY_DEV_DEPENDENCIES.map((dependency) =>
       addDependency(dependency.name, dependency.version, {
         type: DependencyType.Dev,
         existing: ExistingBehavior.Skip,
+        install: skipInstall ? InstallBehavior.None : InstallBehavior.Auto,
       }),
     ),
     addDependency('tslib', latestVersions['tslib'], {
       type: DependencyType.Default,
       existing: ExistingBehavior.Skip,
+      install: skipInstall ? InstallBehavior.None : InstallBehavior.Auto,
     }),
   ]);
 }
@@ -171,7 +172,7 @@ export default function (options: LibraryOptions): Rule {
     return chain([
       mergeWith(templateSource),
       addLibToWorkspaceFile(options, libDir, packageName, hasZoneDependency),
-      options.skipPackageJson ? noop() : addDependenciesToPackageJson(),
+      options.skipPackageJson ? noop() : addDependenciesToPackageJson(!!options.skipInstall),
       options.skipTsConfig ? noop() : updateTsConfig(packageName, './' + distRoot),
       options.skipTsConfig
         ? noop()
@@ -203,11 +204,6 @@ export default function (options: LibraryOptions): Rule {
         // inherits its `type` from the workspace.
         type: '',
       }),
-      (_tree: Tree, context: SchematicContext) => {
-        if (!options.skipPackageJson && !options.skipInstall) {
-          context.addTask(new NodePackageInstallTask());
-        }
-      },
     ]);
   };
 }
