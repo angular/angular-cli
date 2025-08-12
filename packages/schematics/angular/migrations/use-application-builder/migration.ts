@@ -15,12 +15,11 @@ import {
   externalSchematic,
 } from '@angular-devkit/schematics';
 import { dirname, join } from 'node:path/posix';
-import { removePackageJsonDependency } from '../../utility/dependencies';
 import {
   DependencyType,
   ExistingBehavior,
-  InstallBehavior,
   addDependency,
+  removeDependency,
 } from '../../utility/dependency';
 import { JSONFile } from '../../utility/json-file';
 import { latestVersions } from '../../utility/latest-versions';
@@ -270,13 +269,10 @@ function updateProjects(tree: Tree, context: SchematicContext) {
       rules.push(
         addDependency('@angular/build', latestVersions.DevkitBuildAngular, {
           type: DependencyType.Dev,
-          // Always is set here since removePackageJsonDependency below does not automatically
-          // trigger the package manager execution.
-          install: InstallBehavior.Always,
           existing: ExistingBehavior.Replace,
         }),
+        removeDependency('@angular-devkit/build-angular'),
       );
-      removePackageJsonDependency(tree, '@angular-devkit/build-angular');
 
       // Add less dependency if any projects contain a Less stylesheet file.
       // This check does not consider Node.js packages due to the performance

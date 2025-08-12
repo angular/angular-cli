@@ -25,7 +25,12 @@ import {
 } from '@angular-devkit/schematics';
 import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
 import { Schema as ComponentOptions } from '../component/schema';
-import { NodeDependencyType, addPackageJsonDependency } from '../utility/dependencies';
+import {
+  DependencyType,
+  ExistingBehavior,
+  InstallBehavior,
+  addDependency,
+} from '../utility/dependency';
 import { JSONFile } from '../utility/json-file';
 import { latestVersions } from '../utility/latest-versions';
 import { relativePathToWorkspaceRoot } from '../utility/paths';
@@ -130,48 +135,46 @@ export default function (options: ApplicationOptions): Rule {
   };
 }
 
-function addDependenciesToPackageJson(options: ApplicationOptions) {
-  return (host: Tree, context: SchematicContext) => {
-    [
-      {
-        type: NodeDependencyType.Dev,
-        name: '@angular/compiler-cli',
-        version: latestVersions.Angular,
-      },
-      {
-        type: NodeDependencyType.Dev,
-        name: '@angular/build',
-        version: latestVersions.AngularBuild,
-      },
-      {
-        type: NodeDependencyType.Dev,
-        name: 'typescript',
-        version: latestVersions['typescript'],
-      },
-    ].forEach((dependency) => addPackageJsonDependency(host, dependency));
+function addDependenciesToPackageJson(options: ApplicationOptions): Rule {
+  const rules: Rule[] = [
+    addDependency('@angular/compiler-cli', latestVersions.Angular, {
+      type: DependencyType.Dev,
+      existing: ExistingBehavior.Skip,
+      install: options.skipInstall ? InstallBehavior.None : InstallBehavior.Auto,
+    }),
+    addDependency('@angular/build', latestVersions.AngularBuild, {
+      type: DependencyType.Dev,
+      existing: ExistingBehavior.Skip,
+      install: options.skipInstall ? InstallBehavior.None : InstallBehavior.Auto,
+    }),
+    addDependency('typescript', latestVersions['typescript'], {
+      type: DependencyType.Dev,
+      existing: ExistingBehavior.Skip,
+      install: options.skipInstall ? InstallBehavior.None : InstallBehavior.Auto,
+    }),
+  ];
 
-    if (!options.zoneless) {
-      addPackageJsonDependency(host, {
-        type: NodeDependencyType.Default,
-        name: 'zone.js',
-        version: latestVersions['zone.js'],
-      });
-    }
+  if (!options.zoneless) {
+    rules.push(
+      addDependency('zone.js', latestVersions['zone.js'], {
+        type: DependencyType.Default,
+        existing: ExistingBehavior.Skip,
+        install: options.skipInstall ? InstallBehavior.None : InstallBehavior.Auto,
+      }),
+    );
+  }
 
-    if (options.style === Style.Less) {
-      addPackageJsonDependency(host, {
-        type: NodeDependencyType.Dev,
-        name: 'less',
-        version: latestVersions['less'],
-      });
-    }
+  if (options.style === Style.Less) {
+    rules.push(
+      addDependency('less', latestVersions['less'], {
+        type: DependencyType.Dev,
+        existing: ExistingBehavior.Skip,
+        install: options.skipInstall ? InstallBehavior.None : InstallBehavior.Auto,
+      }),
+    );
+  }
 
-    if (!options.skipInstall) {
-      context.addTask(new NodePackageInstallTask());
-    }
-
-    return host;
-  };
+  return chain(rules);
 }
 
 function addAppToWorkspaceFile(options: ApplicationOptions, appDir: string): Rule {

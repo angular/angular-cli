@@ -23,10 +23,11 @@ import {
 import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
 import { join } from 'node:path/posix';
 import {
-  NodeDependencyType,
-  addPackageJsonDependency,
-  getPackageJsonDependency,
-} from '../utility/dependencies';
+  DependencyType,
+  ExistingBehavior,
+  addDependency,
+  getDependency,
+} from '../utility/dependency';
 import { JSONFile } from '../utility/json-file';
 import { latestVersions } from '../utility/latest-versions';
 import { relativePathToWorkspaceRoot } from '../utility/paths';
@@ -62,38 +63,29 @@ function addTsProjectReference(...paths: string[]) {
   };
 }
 
-function addDependenciesToPackageJson() {
-  return (host: Tree) => {
-    [
-      {
-        type: NodeDependencyType.Dev,
-        name: '@angular/compiler-cli',
-        version: latestVersions.Angular,
-      },
-      {
-        type: NodeDependencyType.Dev,
-        name: '@angular/build',
-        version: latestVersions.AngularBuild,
-      },
-      {
-        type: NodeDependencyType.Dev,
-        name: 'ng-packagr',
-        version: latestVersions.NgPackagr,
-      },
-      {
-        type: NodeDependencyType.Default,
-        name: 'tslib',
-        version: latestVersions['tslib'],
-      },
-      {
-        type: NodeDependencyType.Dev,
-        name: 'typescript',
-        version: latestVersions['typescript'],
-      },
-    ].forEach((dependency) => addPackageJsonDependency(host, dependency));
-
-    return host;
-  };
+function addDependenciesToPackageJson(): Rule {
+  return chain([
+    addDependency('@angular/compiler-cli', latestVersions.Angular, {
+      type: DependencyType.Dev,
+      existing: ExistingBehavior.Skip,
+    }),
+    addDependency('@angular/build', latestVersions.AngularBuild, {
+      type: DependencyType.Dev,
+      existing: ExistingBehavior.Skip,
+    }),
+    addDependency('ng-packagr', latestVersions.NgPackagr, {
+      type: DependencyType.Dev,
+      existing: ExistingBehavior.Skip,
+    }),
+    addDependency('tslib', latestVersions['tslib'], {
+      type: DependencyType.Default,
+      existing: ExistingBehavior.Skip,
+    }),
+    addDependency('typescript', latestVersions['typescript'], {
+      type: DependencyType.Dev,
+      existing: ExistingBehavior.Skip,
+    }),
+  ]);
 }
 
 function addLibToWorkspaceFile(
@@ -177,7 +169,7 @@ export default function (options: LibraryOptions): Rule {
       move(libDir),
     ]);
 
-    const hasZoneDependency = getPackageJsonDependency(host, 'zone.js') !== null;
+    const hasZoneDependency = getDependency(host, 'zone.js') !== null;
 
     return chain([
       mergeWith(templateSource),

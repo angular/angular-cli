@@ -7,8 +7,8 @@
  */
 
 import { DirEntry, Rule } from '@angular-devkit/schematics';
-import * as ts from '../../third_party/github.com/Microsoft/TypeScript/lib/typescript';
-import { NodeDependencyType, addPackageJsonDependency } from '../../utility/dependencies';
+import ts from '../../third_party/github.com/Microsoft/TypeScript/lib/typescript';
+import { addDependency } from '../../utility/dependency';
 import { latestVersions } from '../../utility/latest-versions';
 
 function* visit(directory: DirEntry): IterableIterator<[fileName: string, contents: string]> {
@@ -39,7 +39,7 @@ function* visit(directory: DirEntry): IterableIterator<[fileName: string, conten
 
 export default function (): Rule {
   return async (tree) => {
-    let angularSSRAdded = false;
+    let rule: Rule | undefined;
 
     for (const [filePath, content] of visit(tree.root)) {
       let updatedContent = content;
@@ -100,17 +100,12 @@ export default function (): Rule {
       if (content !== updatedContent) {
         tree.overwrite(filePath, updatedContent);
 
-        if (!angularSSRAdded) {
-          addPackageJsonDependency(tree, {
-            name: '@angular/ssr',
-            version: latestVersions.AngularSSR,
-            type: NodeDependencyType.Default,
-            overwrite: false,
-          });
-
-          angularSSRAdded = true;
+        if (rule === undefined) {
+          rule = addDependency('@angular/ssr', latestVersions.AngularSSR);
         }
       }
     }
+
+    return rule;
   };
 }
