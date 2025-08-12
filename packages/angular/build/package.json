@@ -18,12 +18,12 @@
   },
   "builders": "builders.json",
   "dependencies": {
-    "@ampproject/remapping": "2.3.0",
     "@angular-devkit/architect": "workspace:0.0.0-EXPERIMENTAL-PLACEHOLDER",
     "@babel/core": "7.28.0",
     "@babel/helper-annotate-as-pure": "7.27.3",
     "@babel/helper-split-export-declaration": "7.24.7",
     "@inquirer/confirm": "5.1.14",
+    "@jridgewell/remapping": "2.3.5",
     "@vitejs/plugin-basic-ssl": "2.1.0",
     "beasties": "0.3.5",
     "browserslist": "^4.23.0",

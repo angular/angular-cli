@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { RawSourceMap } from '@ampproject/remapping';
+import { RawSourceMap } from '@jridgewell/remapping';
 import MagicString from 'magic-string';
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { basename, dirname, extname, join, relative } from 'node:path';
