@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { Rule, SchematicContext } from '@angular-devkit/schematics';
+import { Rule, SchematicContext, Tree } from '@angular-devkit/schematics';
 import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
 import * as path from 'node:path';
 
@@ -71,6 +71,55 @@ export enum ExistingBehavior {
    * notify the user of the replacement.
    */
   Replace,
+}
+
+/**
+ * Represents a dependency found in a package manifest.
+ */
+export interface Dependency {
+  /**
+   * The type of the dependency.
+   */
+  type: DependencyType;
+
+  /**
+   * The name of the package.
+   */
+  name: string;
+
+  /**
+   * The version specifier of the package.
+   */
+  version: string;
+}
+
+/**
+ * Gets information about a dependency from a `package.json` file.
+ *
+ * @param tree The schematic's virtual file system representation.
+ * @param name The name of the package to check.
+ * @param packageJsonPath The path to the `package.json` file. Defaults to `/package.json`.
+ * @returns An object containing the dependency's type and version, or null if not found.
+ */
+export function getDependency(
+  tree: Tree,
+  name: string,
+  packageJsonPath = '/package.json',
+): Dependency | null {
+  const manifest = tree.readJson(packageJsonPath) as MinimalPackageManifest;
+
+  for (const type of [DependencyType.Default, DependencyType.Dev, DependencyType.Peer]) {
+    const section = manifest[type];
+    if (section?.[name]) {
+      return {
+        type,
+        name,
+        version: section[name],
+      };
+    }
+  }
+
+  return null;
 }
 
 /**
@@ -174,6 +223,62 @@ export function addDependency(
       );
       installPaths.add(packageJsonPath);
       installTasks.set(context, installPaths);
+    }
+  };
+}
+
+/**
+ * Removes a package from the package.json in the project root.
+ *
+ * @param name The name of the package to remove.
+ * @param options An optional object that can contain a path of a manifest file to modify.
+ * @returns A Schematics {@link Rule}
+ */
+export function removeDependency(
+  name: string,
+  options: {
+    /**
+     * The path of the package manifest file (`package.json`) that will be modified.
+     * Defaults to `/package.json`.
+     */
+    packageJsonPath?: string;
+
+    /**
+     * The dependency installation behavior to use to determine whether a
+     * {@link NodePackageInstallTask} should be scheduled after removing the dependency.
+     * Defaults to {@link InstallBehavior.Auto}.
+     */
+    install?: InstallBehavior;
+  } = {},
+): Rule {
+  const { packageJsonPath = '/package.json', install = InstallBehavior.Auto } = options;
+
+  return (tree, context) => {
+    const manifest = tree.readJson(packageJsonPath) as MinimalPackageManifest;
+    let wasRemoved = false;
+
+    for (const type of [DependencyType.Default, DependencyType.Dev, DependencyType.Peer]) {
+      const dependencySection = manifest[type];
+      if (dependencySection?.[name]) {
+        delete dependencySection[name];
+        wasRemoved = true;
+      }
+    }
+
+    if (wasRemoved) {
+      tree.overwrite(packageJsonPath, JSON.stringify(manifest, null, 2));
+
+      const installPaths = installTasks.get(context) ?? new Set<string>();
+      if (
+        install === InstallBehavior.Always ||
+        (install === InstallBehavior.Auto && !installPaths.has(packageJsonPath))
+      ) {
+        context.addTask(
+          new NodePackageInstallTask({ workingDirectory: path.dirname(packageJsonPath) }),
+        );
+        installPaths.add(packageJsonPath);
+        installTasks.set(context, installPaths);
+      }
     }
   };
 }
