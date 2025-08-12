@@ -73,8 +73,8 @@ describe('Karma Config Analyzer', () => {
     expect(dirInfo.isCall).toBe(true);
     expect(dirInfo.arguments as unknown).toEqual(['__dirname', './coverage/test-project']);
 
-    // config.LOG_INFO is a variable, so it should be flagged as unsupported
-    expect(hasUnsupportedValues).toBe(true);
+    expect(settings.get('logLevel') as unknown).toBe('config.LOG_INFO');
+    expect(hasUnsupportedValues).toBe(false);
   });
 
   it('should return an empty map for an empty config file', () => {
