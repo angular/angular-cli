@@ -9,6 +9,8 @@
     "test": "ng test"<% } %>
   },
   "prettier": {
+    "printWidth": 100,
+    "singleQuote": true,
     "overrides": [
       {
         "files": "*.html",
