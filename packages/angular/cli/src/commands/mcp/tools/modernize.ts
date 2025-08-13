@@ -36,9 +36,8 @@ const TRANSFORMATIONS: Array<Transformation> = [
     documentationUrl: 'https://angular.dev/guide/testing/dependency-injection',
   },
   {
-    name: 'inject-flags',
-    description:
-      'Updates `inject` calls from using the InjectFlags enum to a more modern and readable options object.',
+    name: 'inject',
+    description: 'Converts usages of constructor-based injection to the inject() function.',
     documentationUrl: 'https://angular.dev/reference/migrations/inject-function',
   },
   {
