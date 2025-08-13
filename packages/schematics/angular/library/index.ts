@@ -188,6 +188,9 @@ export default function (options: LibraryOptions): Rule {
             flat: true,
             path: sourceDir,
             project: packageName,
+            // Explicitly set the `typeSeparator` this also ensures that the generated files are valid even if the `module` schematic
+            // inherits its `typeSeparator` from the workspace.
+            typeSeparator: '-',
           }),
       schematic('component', {
         name: options.name,
