@@ -26,7 +26,7 @@ export const BEST_PRACTICES_TOOL = declareTool({
 
     return async () => {
       bestPracticesText ??= await readFile(
-        path.join(__dirname, '..', 'instructions', 'best-practices.md'),
+        path.join(__dirname, '..', 'resources', 'best-practices.md'),
         'utf-8',
       );
 
