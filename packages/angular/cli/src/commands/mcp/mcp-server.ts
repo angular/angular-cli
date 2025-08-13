@@ -15,6 +15,7 @@ import { BEST_PRACTICES_TOOL } from './tools/best-practices';
 import { DOC_SEARCH_TOOL } from './tools/doc-search';
 import { FIND_EXAMPLE_TOOL } from './tools/examples';
 import { MODERNIZE_TOOL } from './tools/modernize';
+import { ZONELESS_MIGRATION_TOOL } from './tools/onpush-zoneless-migration/zoneless-migration';
 import { LIST_PROJECTS_TOOL } from './tools/projects';
 import { AnyMcpToolDeclaration, registerTools } from './tools/tool-registry';
 
@@ -28,7 +29,11 @@ const STABLE_TOOLS = [BEST_PRACTICES_TOOL, DOC_SEARCH_TOOL, LIST_PROJECTS_TOOL] 
  * The set of tools that are available but not enabled by default.
  * These tools are considered experimental and may have limitations.
  */
-export const EXPERIMENTAL_TOOLS = [FIND_EXAMPLE_TOOL, MODERNIZE_TOOL] as const;
+export const EXPERIMENTAL_TOOLS = [
+  FIND_EXAMPLE_TOOL,
+  MODERNIZE_TOOL,
+  ZONELESS_MIGRATION_TOOL,
+] as const;
 
 export async function createMcpServer(
   options: {
