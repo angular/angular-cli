@@ -35,16 +35,16 @@ describe('Modernize Tool', () => {
 
   it('should return instructions for multiple transformations', async () => {
     const instructions = await getInstructions({
-      transformations: ['self-closing-tags-migration', 'test-bed-get'],
+      transformations: ['self-closing-tags-migration', 'inject'],
     });
 
     const expectedInstructions = [
       'To run the self-closing-tags-migration migration, execute the following command: ' +
         '`ng generate @angular/core:self-closing-tags-migration`.\nFor more information, ' +
         'see https://angular.dev/reference/migrations/self-closing-tags.',
-      'To run the test-bed-get migration, execute the following command: ' +
-        '`ng generate @angular/core:test-bed-get`.\nFor more information, ' +
-        'see https://angular.dev/guide/testing/dependency-injection.',
+      'To run the inject migration, execute the following command: ' +
+        '`ng generate @angular/core:inject`.\nFor more information, ' +
+        'see https://angular.dev/reference/migrations/inject-function.',
     ];
 
     expect(instructions?.sort()).toEqual(expectedInstructions.sort());
