@@ -9,6 +9,7 @@
     "tool": {
       "type": "array",
       "uniqueItems": true,
+      "minItems": 0,
       "default": "none",
       "x-prompt": "Which AI tools do you want to configure with Angular best practices? https://angular.dev/ai/develop-with-ai",
       "description": "Specifies which AI tools to generate configuration files for. These file are used to improve the outputs of AI tools by following the best practices.",
