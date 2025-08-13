@@ -438,8 +438,8 @@ importers:
         specifier: 4.4.0
         version: 4.4.0
       ng-packagr:
-        specifier: 20.2.0-next.1
-        version: 20.2.0-next.1(@angular/compiler-cli@20.2.0-rc.0(@angular/compiler@20.2.0-rc.0)(typescript@5.9.2))(tslib@2.8.1)(typescript@5.9.2)
+        specifier: 20.2.0-rc.0
+        version: 20.2.0-rc.0(@angular/compiler-cli@20.2.0-rc.0(@angular/compiler@20.2.0-rc.0)(typescript@5.9.2))(tslib@2.8.1)(typescript@5.9.2)
       postcss:
         specifier: 8.5.6
         version: 8.5.6
@@ -760,8 +760,8 @@ importers:
         specifier: 3.0.4
         version: 3.0.4(bufferutil@4.0.9)
       ng-packagr:
-        specifier: 20.2.0-next.1
-        version: 20.2.0-next.1(@angular/compiler-cli@20.2.0-rc.0(@angular/compiler@20.2.0-rc.0)(typescript@5.9.2))(tslib@2.8.1)(typescript@5.9.2)
+        specifier: 20.2.0-rc.0
+        version: 20.2.0-rc.0(@angular/compiler-cli@20.2.0-rc.0(@angular/compiler@20.2.0-rc.0)(typescript@5.9.2))(tslib@2.8.1)(typescript@5.9.2)
       undici:
         specifier: 7.13.0
         version: 7.13.0
@@ -6728,8 +6728,8 @@ packages:
     resolution: {integrity: sha512-dBpDMdxv9Irdq66304OLfEmQ9tbNRFnFTuZiLo+bD+r332bBmMJ8GBLXklIXXgxd3+v9+KUnZaUR5PJMa75Gsg==}
     engines: {node: '>= 0.4.0'}
 
-  ng-packagr@20.2.0-next.1:
-    resolution: {integrity: sha512-cqGaUssFYkZf+BHQMozRlfZePb/XCe9QFyyqZkGHRCxbh4rFfkL3m0t3wAOGQtgm4BY784ylXpSI26hXi9zqOQ==}
+  ng-packagr@20.2.0-rc.0:
+    resolution: {integrity: sha512-MOlpETmrkVV/2/vn0ilzqJijYO1IC1U5ZcW0rEeuq3DkB7zhayhc1YWi5+R5wZsB9fmVBIb/l282T7HpYwi0Bw==}
     engines: {node: ^20.19.0 || ^22.12.0 || >=24.0.0}
     hasBin: true
     peerDependencies:
@@ -15778,7 +15778,7 @@ snapshots:
 
   netmask@2.0.2: {}
 
-  ng-packagr@20.2.0-next.1(@angular/compiler-cli@20.2.0-rc.0(@angular/compiler@20.2.0-rc.0)(typescript@5.9.2))(tslib@2.8.1)(typescript@5.9.2):
+  ng-packagr@20.2.0-rc.0(@angular/compiler-cli@20.2.0-rc.0(@angular/compiler@20.2.0-rc.0)(typescript@5.9.2))(tslib@2.8.1)(typescript@5.9.2):
     dependencies:
       '@ampproject/remapping': 2.3.0
       '@angular/compiler-cli': 20.2.0-rc.0(@angular/compiler@20.2.0-rc.0)(typescript@5.9.2)
