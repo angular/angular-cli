@@ -7,11 +7,11 @@
  */
 
 import type { BuilderContext, BuilderOutput } from '@angular-devkit/architect';
-import type { ApplicationBuilderInternalOptions } from '../application/options';
-import type { KarmaBuilderOptions } from '../karma';
-import { type NormalizedUnitTestBuilderOptions, injectTestingPolyfills } from './options';
+import type { ApplicationBuilderInternalOptions } from '../../../application/options';
+import type { KarmaBuilderOptions } from '../../../karma';
+import { type NormalizedUnitTestBuilderOptions, injectTestingPolyfills } from '../../options';
 
-export async function useKarmaBuilder(
+export async function useKarmaRunner(
   context: BuilderContext,
   unitTestOptions: NormalizedUnitTestBuilderOptions,
 ): Promise<AsyncIterable<BuilderOutput>> {
@@ -61,7 +61,7 @@ export async function useKarmaBuilder(
     aot: buildTargetOptions.aot,
   };
 
-  const { execute } = await import('../karma');
+  const { execute } = await import('../../../karma');
 
   return execute(options, context);
 }
