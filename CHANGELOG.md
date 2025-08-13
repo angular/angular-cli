@@ -1,3 +1,28 @@
+<a name="20.2.0-rc.0"></a>
+
+# 20.2.0-rc.0 (2025-08-13)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                   |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------- |
+| [b4de9a1bf](https://github.com/angular/angular-cli/commit/b4de9a1bf50a35404fb79eb3f120faafd0ce825a) | feat | add --experimental-tool option to mcp command |
+| [755ba70fd](https://github.com/angular/angular-cli/commit/755ba70fd7ef38793d15797ba402020c375c3295) | feat | add --local-only option to mcp command        |
+| [59d7ef343](https://github.com/angular/angular-cli/commit/59d7ef343b6f1feea37a019935578c560d3d5e41) | feat | add --read-only option to mcp command         |
+| [4e92eb6f1](https://github.com/angular/angular-cli/commit/4e92eb6f17cb30259bc8e8d1979bbd9989bc5ad0) | feat | add modernize tool to the MCP server          |
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                                             |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------------- |
+| [2e3cfd598](https://github.com/angular/angular-cli/commit/2e3cfd598c9366d0036a52cd18024317b33e6fca) | feat | add migration to remove default Karma configurations                    |
+| [d80dae276](https://github.com/angular/angular-cli/commit/d80dae276e9554c13e0c37640d0db8acafc9d48b) | feat | add schematics to generate ai context files.                            |
+| [6a78ef0ce](https://github.com/angular/angular-cli/commit/6a78ef0cec4875be76d9241499db67ddac6e14df) | fix  | add extra prettier config                                               |
+| [e46d9c54f](https://github.com/angular/angular-cli/commit/e46d9c54f07e32dc05e29a3533ce1bd063ff9f61) | fix  | correct configure the `typeSeparator` in the library schematic          |
+| [b017f84fd](https://github.com/angular/angular-cli/commit/b017f84fdaf36bc0fcad2241846665c73b52b6d8) | fix  | improve coverage directory handling for Karma configuration comparisons |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="20.1.6"></a>
 
 # 20.1.6 (2025-08-13)
@@ -4222,6 +4247,7 @@ Alan Agius, Charles Lyding, Doug Parker, Joey Perrott and Piotr Wysocki
   ```scss
   @import 'font-awesome/scss/font-awesome';
   ```
+
   - By default the CLI will use Sass modern API, While not recommended, users can still opt to use legacy API by setting `NG_BUILD_LEGACY_SASS=1`.
 
 - Internally the Angular CLI now always set the TypeScript `target` to `ES2022` and `useDefineForClassFields` to `false` unless the target is set to `ES2022` or later in the TypeScript configuration. To control ECMA version and features use the Browerslist configuration.
