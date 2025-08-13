@@ -5,8 +5,8 @@ This example demonstrates how to use the `@if` control flow block in an Angular 
 ## Angular Template
 
 ```html
-<!-- The @if directive will only render this div if the 'isVisible' field in the component is true. -->
-@if (isVisible) {
+<!-- The @if directive will only render this div if the 'isVisible' signal in the component is true. -->
+@if (isVisible()) {
 <div>This content is conditionally displayed.</div>
 }
 ```
@@ -18,11 +18,11 @@ import { Component } from '@angular/core';
 
 @Component({
   selector: 'app-example',
-  templateUrl: './example.component.html',
-  styleUrls: ['./example.component.css'],
+  templateUrl: './example.html',
+  styleUrl: './example.css',
 })
-export class ExampleComponent {
-  // This boolean field controls the visibility of the element in the template.
-  isVisible: boolean = true;
+export class Example {
+  // This boolean signal controls the visibility of the element in the template.
+  protected readonly isVisible = signal(true);
 }
 ```
