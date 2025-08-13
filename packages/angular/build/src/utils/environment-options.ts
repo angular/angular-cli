@@ -8,22 +8,48 @@
 
 import { availableParallelism } from 'node:os';
 
-function isDisabled(variable: string): boolean {
-  return variable === '0' || variable.toLowerCase() === 'false';
-}
+/** A set of strings that are considered "truthy" when parsing environment variables. */
+const TRUTHY_VALUES = new Set(['1', 'true']);
 
-function isEnabled(variable: string): boolean {
-  return variable === '1' || variable.toLowerCase() === 'true';
-}
+/** A set of strings that are considered "falsy" when parsing environment variables. */
+const FALSY_VALUES = new Set(['0', 'false']);
 
+/**
+ * Checks if an environment variable is present and has a non-empty value.
+ * @param variable The environment variable to check.
+ * @returns `true` if the variable is a non-empty string.
+ */
 function isPresent(variable: string | undefined): variable is string {
   return typeof variable === 'string' && variable !== '';
+}
+
+/**
+ * Parses an environment variable into a boolean or undefined.
+ * @returns `true` if the variable is truthy ('1', 'true').
+ * @returns `false` if the variable is falsy ('0', 'false').
+ * @returns `undefined` if the variable is not present or has an unknown value.
+ */
+function parseTristate(variable: string | undefined): boolean | undefined {
+  if (!isPresent(variable)) {
+    return undefined;
+  }
+
+  const value = variable.toLowerCase();
+  if (TRUTHY_VALUES.has(value)) {
+    return true;
+  }
+  if (FALSY_VALUES.has(value)) {
+    return false;
+  }
+
+  // TODO: Consider whether a warning is useful in this case of a malformed value
+  return undefined;
 }
 
 // Optimization and mangling
 const debugOptimizeVariable = process.env['NG_BUILD_DEBUG_OPTIMIZE'];
 const debugOptimize = (() => {
-  if (!isPresent(debugOptimizeVariable) || isDisabled(debugOptimizeVariable)) {
+  if (!isPresent(debugOptimizeVariable) || parseTristate(debugOptimizeVariable) === false) {
     return {
       mangle: true,
       minify: true,
@@ -37,7 +63,7 @@ const debugOptimize = (() => {
     beautify: true,
   };
 
-  if (isEnabled(debugOptimizeVariable)) {
+  if (parseTristate(debugOptimizeVariable) === true) {
     return debugValue;
   }
 
@@ -58,12 +84,22 @@ const debugOptimize = (() => {
   return debugValue;
 })();
 
-const mangleVariable = process.env['NG_BUILD_MANGLE'];
-export const allowMangle = isPresent(mangleVariable)
-  ? !isDisabled(mangleVariable)
-  : debugOptimize.mangle;
+/**
+ * Allows disabling of code mangling when the `NG_BUILD_MANGLE` environment variable is set to `0` or `false`.
+ * This is useful for debugging build output.
+ */
+export const allowMangle = parseTristate(process.env['NG_BUILD_MANGLE']) ?? debugOptimize.mangle;
 
+/**
+ * Allows beautification of build output when the `NG_BUILD_DEBUG_OPTIMIZE` environment variable is enabled.
+ * This is useful for debugging build output.
+ */
 export const shouldBeautify = debugOptimize.beautify;
+
+/**
+ * Allows disabling of code minification when the `NG_BUILD_DEBUG_OPTIMIZE` environment variable is enabled.
+ * This is useful for debugging build output.
+ */
 export const allowMinify = debugOptimize.minify;
 
 /**
@@ -76,39 +112,56 @@ export const allowMinify = debugOptimize.minify;
  *
  */
 const maxWorkersVariable = process.env['NG_BUILD_MAX_WORKERS'];
+
+/**
+ * The maximum number of workers to use for parallel processing.
+ * This can be controlled by the `NG_BUILD_MAX_WORKERS` environment variable.
+ */
 export const maxWorkers = isPresent(maxWorkersVariable)
   ? +maxWorkersVariable
   : Math.min(4, Math.max(availableParallelism() - 1, 1));
 
-const parallelTsVariable = process.env['NG_BUILD_PARALLEL_TS'];
-export const useParallelTs = !isPresent(parallelTsVariable) || !isDisabled(parallelTsVariable);
+/**
+ * When `NG_BUILD_PARALLEL_TS` is set to `0` or `false`, parallel TypeScript compilation is disabled.
+ */
+export const useParallelTs = parseTristate(process.env['NG_BUILD_PARALLEL_TS']) !== false;
 
-const debugPerfVariable = process.env['NG_BUILD_DEBUG_PERF'];
-export const debugPerformance = isPresent(debugPerfVariable) && isEnabled(debugPerfVariable);
+/**
+ * When `NG_BUILD_DEBUG_PERF` is enabled, performance debugging information is printed.
+ */
+export const debugPerformance = parseTristate(process.env['NG_BUILD_DEBUG_PERF']) === true;
 
-const watchRootVariable = process.env['NG_BUILD_WATCH_ROOT'];
-export const shouldWatchRoot = isPresent(watchRootVariable) && isEnabled(watchRootVariable);
+/**
+ * When `NG_BUILD_WATCH_ROOT` is enabled, the build will watch the root directory for changes.
+ */
+export const shouldWatchRoot = parseTristate(process.env['NG_BUILD_WATCH_ROOT']) === true;
 
-const typeCheckingVariable = process.env['NG_BUILD_TYPE_CHECK'];
-export const useTypeChecking =
-  !isPresent(typeCheckingVariable) || !isDisabled(typeCheckingVariable);
+/**
+ * When `NG_BUILD_TYPE_CHECK` is set to `0` or `false`, type checking is disabled.
+ */
+export const useTypeChecking = parseTristate(process.env['NG_BUILD_TYPE_CHECK']) !== false;
 
-const buildLogsJsonVariable = process.env['NG_BUILD_LOGS_JSON'];
-export const useJSONBuildLogs =
-  isPresent(buildLogsJsonVariable) && isEnabled(buildLogsJsonVariable);
+/**
+ * When `NG_BUILD_LOGS_JSON` is enabled, build logs will be output in JSON format.
+ */
+export const useJSONBuildLogs = parseTristate(process.env['NG_BUILD_LOGS_JSON']) === true;
 
-const optimizeChunksVariable = process.env['NG_BUILD_OPTIMIZE_CHUNKS'];
-export const shouldOptimizeChunks =
-  isPresent(optimizeChunksVariable) && isEnabled(optimizeChunksVariable);
+/**
+ * When `NG_BUILD_OPTIMIZE_CHUNKS` is enabled, the build will optimize chunks.
+ */
+export const shouldOptimizeChunks = parseTristate(process.env['NG_BUILD_OPTIMIZE_CHUNKS']) === true;
 
-const hmrComponentStylesVariable = process.env['NG_HMR_CSTYLES'];
-export const useComponentStyleHmr =
-  isPresent(hmrComponentStylesVariable) && isEnabled(hmrComponentStylesVariable);
+/**
+ * When `NG_HMR_CSTYLES` is enabled, component styles will be hot-reloaded.
+ */
+export const useComponentStyleHmr = parseTristate(process.env['NG_HMR_CSTYLES']) === true;
 
-const hmrComponentTemplateVariable = process.env['NG_HMR_TEMPLATES'];
-export const useComponentTemplateHmr =
-  !isPresent(hmrComponentTemplateVariable) || !isDisabled(hmrComponentTemplateVariable);
+/**
+ * When `NG_HMR_TEMPLATES` is set to `0` or `false`, component templates will not be hot-reloaded.
+ */
+export const useComponentTemplateHmr = parseTristate(process.env['NG_HMR_TEMPLATES']) !== false;
 
-const partialSsrBuildVariable = process.env['NG_BUILD_PARTIAL_SSR'];
-export const usePartialSsrBuild =
-  isPresent(partialSsrBuildVariable) && isEnabled(partialSsrBuildVariable);
+/**
+ * When `NG_BUILD_PARTIAL_SSR` is enabled, a partial server-side rendering build will be performed.
+ */
+export const usePartialSsrBuild = parseTristate(process.env['NG_BUILD_PARTIAL_SSR']) === true;
