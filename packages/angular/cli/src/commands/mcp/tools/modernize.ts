@@ -135,7 +135,7 @@ export const MODERNIZE_TOOL = declareTool({
     '<Use Cases>\n' +
     '* After generating new code: Run this tool immediately after creating new Angular components, directives, ' +
     'or services to ensure they adhere to modern standards.\n' +
-    '* On existing code: Apply to existing TypeScript files (.ts) and Angular templates (.ng.html) to update ' +
+    '* On existing code: Apply to existing TypeScript files (.ts) and Angular templates (.html) to update ' +
     'them with the latest features, such as the new built-in control flow syntax.\n\n' +
     '* When the user asks for a specific transformation: When the transformation list is populated, ' +
     'these specific ones will be ran on the inputs.\n' +
