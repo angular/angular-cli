@@ -16,7 +16,7 @@ function updateProjects(tree: Tree): Rule {
   return updateWorkspace(async (workspace) => {
     const removableKarmaConfigs = new Map<string, boolean>();
 
-    for (const [, project] of workspace.projects) {
+    for (const [projectName, project] of workspace.projects) {
       for (const [, target] of project.targets) {
         let needDevkitPlugin = false;
         switch (target.builder) {
@@ -46,9 +46,9 @@ function updateProjects(tree: Tree): Rule {
             } else {
               const diff = await compareKarmaConfigToDefault(
                 analysis,
-                project.root,
-                needDevkitPlugin,
+                projectName,
                 karmaConfig,
+                needDevkitPlugin,
               );
               isRemovable = !hasDifferences(diff) && diff.isReliable;
             }

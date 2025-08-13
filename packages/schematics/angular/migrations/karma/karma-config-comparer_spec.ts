@@ -255,11 +255,11 @@ describe('Karma Config Comparer', () => {
     let defaultConfig: string;
 
     beforeAll(async () => {
-      defaultConfig = await generateDefaultKarmaConfig('..', 'test-project', true);
+      defaultConfig = await generateDefaultKarmaConfig('.', 'test-project', true);
     });
 
     it('should find no differences for the default config', async () => {
-      const diff = await compareKarmaConfigToDefault(defaultConfig, 'test-project', true);
+      const diff = await compareKarmaConfigToDefault(defaultConfig, 'test-project', '', true);
 
       expect(diff.isReliable).toBe(true);
       expect(diff.added.size).toBe(0);
@@ -272,7 +272,7 @@ describe('Karma Config Comparer', () => {
         .replace(`restartOnFileChange: true`, `restartOnFileChange: false`)
         .replace(`reporters: ['progress', 'kjhtml']`, `reporters: ['dots']`);
 
-      const diff = await compareKarmaConfigToDefault(modifiedConfig, 'test-project', true);
+      const diff = await compareKarmaConfigToDefault(modifiedConfig, 'test-project', '', true);
 
       expect(diff.isReliable).toBe(true);
       expect(diff.added.size).toBe(0);
@@ -288,15 +288,15 @@ describe('Karma Config Comparer', () => {
 
     it('should return an unreliable diff if the project config has unsupported values', async () => {
       const modifiedConfig = defaultConfig.replace(`browsers: ['Chrome']`, `browsers: myBrowsers`);
-      const diff = await compareKarmaConfigToDefault(modifiedConfig, 'test-project', true);
+      const diff = await compareKarmaConfigToDefault(modifiedConfig, 'test-project', '', true);
 
       expect(diff.isReliable).toBe(false);
       expect(diff.removed.has('browsers')).toBe(true);
     });
 
     it('should find no differences when devkit plugin is not needed', async () => {
-      const projectConfig = await generateDefaultKarmaConfig('..', 'test-project', false);
-      const diff = await compareKarmaConfigToDefault(projectConfig, 'test-project', false);
+      const projectConfig = await generateDefaultKarmaConfig('.', 'test-project', false);
+      const diff = await compareKarmaConfigToDefault(projectConfig, 'test-project', '', false);
 
       expect(diff.isReliable).toBe(true);
       expect(diff.added.size).toBe(0);

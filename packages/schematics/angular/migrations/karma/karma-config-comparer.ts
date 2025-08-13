@@ -120,9 +120,9 @@ export function hasDifferences(diff: KarmaConfigDiff): boolean {
  */
 export async function compareKarmaConfigToDefault(
   projectConfigContent: string,
-  projectRoot: string,
+  projectName: string,
+  karmaConfigPath: string,
   needDevkitPlugin: boolean,
-  karmaConfigPath?: string,
 ): Promise<KarmaConfigDiff>;
 
 /**
@@ -135,16 +135,16 @@ export async function compareKarmaConfigToDefault(
  */
 export async function compareKarmaConfigToDefault(
   projectAnalysis: KarmaConfigAnalysis,
-  projectRoot: string,
+  projectName: string,
+  karmaConfigPath: string,
   needDevkitPlugin: boolean,
-  karmaConfigPath?: string,
 ): Promise<KarmaConfigDiff>;
 
 export async function compareKarmaConfigToDefault(
   projectConfigOrAnalysis: string | KarmaConfigAnalysis,
-  projectRoot: string,
+  projectName: string,
+  karmaConfigPath: string,
   needDevkitPlugin: boolean,
-  karmaConfigPath?: string,
 ): Promise<KarmaConfigDiff> {
   const projectAnalysis =
     typeof projectConfigOrAnalysis === 'string'
@@ -152,8 +152,8 @@ export async function compareKarmaConfigToDefault(
       : projectConfigOrAnalysis;
 
   const defaultContent = await generateDefaultKarmaConfig(
-    relativePathToWorkspaceRoot(karmaConfigPath ? path.dirname(karmaConfigPath) : projectRoot),
-    path.basename(projectRoot),
+    relativePathToWorkspaceRoot(path.dirname(karmaConfigPath)),
+    projectName,
     needDevkitPlugin,
   );
   const defaultAnalysis = analyzeKarmaConfig(defaultContent);
