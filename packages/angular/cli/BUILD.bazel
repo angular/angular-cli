@@ -72,6 +72,7 @@ ts_project(
         "//:node_modules/@types/yarnpkg__lockfile",
         "//:node_modules/listr2",
         "//:node_modules/semver",
+        "//:node_modules/typescript",
     ],
 )
 
@@ -124,10 +125,12 @@ ts_project(
         ":angular-cli",
         ":node_modules/@angular-devkit/core",
         ":node_modules/@angular-devkit/schematics",
+        ":node_modules/@modelcontextprotocol/sdk",
         ":node_modules/yargs",
         "//:node_modules/@types/semver",
         "//:node_modules/@types/yargs",
         "//:node_modules/semver",
+        "//:node_modules/typescript",
     ],
 )
 
