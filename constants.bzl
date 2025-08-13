@@ -5,7 +5,7 @@ RELEASE_ENGINES_YARN = ">= 1.13.0"
 
 NG_PACKAGR_VERSION = "^20.2.0-next.0"
 ANGULAR_FW_VERSION = "^20.2.0-next.0"
-ANGULAR_FW_PEER_DEP = "^20.0.0 || ^20.2.0-next.0"
+ANGULAR_FW_PEER_DEP = "^20.0.0 || ^20.2.0-next.0 || ^21.0.0-next.0"
 NG_PACKAGR_PEER_DEP = "^20.0.0 || ^20.2.0-next.0"
 
 # Baseline widely-available date in `YYYY-MM-DD` format which defines Angular's
