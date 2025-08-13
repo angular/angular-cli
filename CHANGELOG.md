@@ -1,3 +1,16 @@
+<a name="20.1.6"></a>
+
+# 20.1.6 (2025-08-13)
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                                    |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------- |
+| [584bc1d41](https://github.com/angular/angular-cli/commit/584bc1d4173e7f129aa20e829f1dfb03e1e0dc9e) | fix  | add extra prettier config                                      |
+| [02b0506fd](https://github.com/angular/angular-cli/commit/02b0506fde638b89510e5a78b3d190ba60a8d6ba) | fix  | correct configure the `typeSeparator` in the library schematic |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="20.2.0-next.3"></a>
 
 # 20.2.0-next.3 (2025-08-08)
@@ -4209,7 +4222,6 @@ Alan Agius, Charles Lyding, Doug Parker, Joey Perrott and Piotr Wysocki
   ```scss
   @import 'font-awesome/scss/font-awesome';
   ```
-
   - By default the CLI will use Sass modern API, While not recommended, users can still opt to use legacy API by setting `NG_BUILD_LEGACY_SASS=1`.
 
 - Internally the Angular CLI now always set the TypeScript `target` to `ES2022` and `useDefineForClassFields` to `false` unless the target is set to `ES2022` or later in the TypeScript configuration. To control ECMA version and features use the Browerslist configuration.
