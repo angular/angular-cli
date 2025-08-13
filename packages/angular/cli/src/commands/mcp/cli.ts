@@ -10,7 +10,7 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import { Argv } from 'yargs';
 import { CommandModule, CommandModuleImplementation } from '../../command-builder/command-module';
 import { isTTY } from '../../utilities/tty';
-import { createMcpServer } from './mcp-server';
+import { EXPERIMENTAL_TOOLS, createMcpServer } from './mcp-server';
 
 const INTERACTIVE_MESSAGE = `
 To start using the Angular CLI MCP Server, add this configuration to your host:
@@ -25,6 +25,8 @@ To start using the Angular CLI MCP Server, add this configuration to your host:
 }
 
 Exact configuration may differ depending on the host.
+
+For more information and documentation, visit: https://angular.dev/ai/mcp
 `;
 
 export default class McpCommandModule extends CommandModule implements CommandModuleImplementation {
@@ -49,6 +51,8 @@ export default class McpCommandModule extends CommandModule implements CommandMo
         alias: 'E',
         array: true,
         describe: 'Enable an experimental tool.',
+        choices: EXPERIMENTAL_TOOLS.map(({ name }) => name),
+        hidden: true,
       });
   }
 
