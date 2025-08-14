@@ -11,10 +11,10 @@ export default async function () {
   try {
     // We need to use the public registry because in the local NPM server we don't have
     // older versions @angular/cli packages which would cause `npm install` during `ng update` to fail.
-    restoreRegistry = await createProjectFromAsset('17.0-project', true);
+    restoreRegistry = await createProjectFromAsset('18.0-project', true);
 
     // CLI project version
-    const cliMajorProjectVersion = 17;
+    const cliMajorProjectVersion = 18;
 
     // If using npm, enable legacy peer deps mode to avoid defects in npm 7+'s peer dependency resolution
     // Example error where 11.2.14 satisfies the SemVer range ^11.0.0 but still fails:
@@ -71,12 +71,12 @@ export default async function () {
   await ng('update', '@angular/cli', ...extraUpdateArgs);
 
   // Generate E2E setup
-  await ng('generate', 'private-e2e', '--related-app-name=seventeen-project');
+  await ng('generate', 'private-e2e', '--related-app-name=eighteen-project');
 
   // Setup testing to use CI Chrome.
-  await useCIChrome('seventeen-project', './');
-  await useCIChrome('seventeen-project', './e2e/');
-  await useCIDefaults('seventeen-project');
+  await useCIChrome('eighteen-project', './');
+  await useCIChrome('eighteen-project', './e2e/');
+  await useCIDefaults('eighteen-project');
 
   // Run CLI commands.
   await ng('generate', 'component', 'my-comp');
@@ -87,5 +87,5 @@ export default async function () {
 
   // Verify project now creates bundles
   await noSilentNg('build', '--configuration=production');
-  await expectFileMatchToExist('dist/seventeen-project/browser', /main-[a-zA-Z0-9]{8}\.js/);
+  await expectFileMatchToExist('dist/eighteen-project/browser', /main-[a-zA-Z0-9]{8}\.js/);
 }
