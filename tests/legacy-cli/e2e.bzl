@@ -117,8 +117,8 @@ def _e2e_tests(name, runner, toolchain, **kwargs):
         "CHROME_PATH": "$(CHROME-HEADLESS-SHELL)",
         "CHROMEDRIVER_BIN": "$(CHROMEDRIVER)",
     })
-    toolchains = toolchains + ["@rules_browsers//src/browsers/chromium:toolchain_alias"]
-    data = data + ["@rules_browsers//src/browsers/chromium"]
+    toolchains = toolchains + ["@rules_browsers//browsers/chromium:toolchain_alias"]
+    data = data + ["@rules_browsers//browsers/chromium"]
 
     js_test(
         name = name,
