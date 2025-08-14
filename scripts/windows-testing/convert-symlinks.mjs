@@ -1,4 +1,12 @@
 /**
+ * @license
+ * Copyright Google LLC All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.dev/license
+ */
+
+/**
  * @fileoverview Script that takes a directory and converts all its Unix symlinks
  * to relative Windows-compatible symlinks. This is necessary because when building
  * tests via Bazel inside WSL; the output cannot simply be used outside WSL to perform
@@ -13,14 +21,12 @@
  *  - https://pnpm.io/symlinked-node-modules-structure.
  */
 
-import path from 'node:path';
-import fs from 'node:fs/promises';
 import childProcess from 'node:child_process';
+import fs from 'node:fs/promises';
+import path from 'node:path';
 
 const [rootDir, cmdPath] = process.argv.slice(2);
 
-// GitHub actions can set this environment variable when pressing the "re-run" button.
-const debug = process.env.ACTIONS_STEP_DEBUG === 'true';
 const skipDirectories = [
   // Modules that we don't need and would unnecessarily slow-down this.
   '_windows_amd64/bin/nodejs/node_modules',
@@ -87,7 +93,7 @@ async function transformDir(p) {
   await Promise.all(directoriesToVisit.map((d) => transformDir(d)));
 }
 
-function exec(cmd, maxRetries = 3) {
+function exec(cmd, maxRetries = 5, retryDelay = 200) {
   return new Promise((resolve, reject) => {
     childProcess.exec(cmd, { cwd: rootDir }, (error) => {
       if (error !== null) {
@@ -99,7 +105,11 @@ function exec(cmd, maxRetries = 3) {
           error.stderr !== undefined &&
           error.stderr.includes(`accept4 failed 110`)
         ) {
-          resolve(exec(cmd, maxRetries - 1));
+          // Add a small delay before the retry
+          setTimeout(() => {
+            resolve(exec(cmd, maxRetries - 1, retryDelay));
+          }, retryDelay);
+
           return;
         }
 
