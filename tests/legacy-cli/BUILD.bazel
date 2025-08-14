@@ -67,7 +67,6 @@ e2e_suites(
 
         # Extra runtime deps due to bundling issues.
         # TODO: Clean this up.
-        "//:node_modules/@verdaccio/config",
         "//:node_modules/express",
     ],
     runner = ":runner_entrypoint",

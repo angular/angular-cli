@@ -41,7 +41,7 @@ def link_package_json_to_tarballs(name, src, pkg_deps, out):
         # for the tar for this package as that would create a circular dependency.
         pkg_label = to_label(pkg_dep)
         if pkg_label.package != src_pkg:
-            pkg_tar = "@%s//%s:npm_package_archive.tgz" % (pkg_label.workspace_name, pkg_label.package)
+            pkg_tar = "@@%s//%s:npm_package_archive.tgz" % (pkg_label.repo_name, pkg_label.package)
             srcs.append(pkg_tar)
 
         # Deriving the absolute path to the tar in the execroot requries different
