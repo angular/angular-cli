@@ -29,19 +29,21 @@ export default async function () {
   );
 
   // Ensure 'list_projects' is registered when inside an Angular workspace
-  const { stdout: stdoutInsideWorkspace } = await runInspector('--method', 'tools/list');
+  try {
+    const { stdout: stdoutInsideWorkspace } = await runInspector('--method', 'tools/list');
 
-  assert.match(stdoutInsideWorkspace, /"list_projects"/);
-  assert.match(stdoutInsideWorkspace, /"get_best_practices"/);
-  assert.match(stdoutInsideWorkspace, /"search_documentation"/);
+    assert.match(stdoutInsideWorkspace, /"list_projects"/);
+    assert.match(stdoutInsideWorkspace, /"get_best_practices"/);
+    assert.match(stdoutInsideWorkspace, /"search_documentation"/);
 
-  chdir('..');
+    chdir('..');
 
-  const { stdout: stdoutOutsideWorkspace } = await runInspector('--method', 'tools/list');
+    const { stdout: stdoutOutsideWorkspace } = await runInspector('--method', 'tools/list');
 
-  assert.doesNotMatch(stdoutOutsideWorkspace, /"list_projects"/);
-  assert.match(stdoutOutsideWorkspace, /"get_best_practices"/);
-  assert.match(stdoutInsideWorkspace, /"search_documentation"/);
-
-  silentNpm('uninstall', '-g', MCP_INSPECTOR_PACKAGE_NAME);
+    assert.doesNotMatch(stdoutOutsideWorkspace, /"list_projects"/);
+    assert.match(stdoutOutsideWorkspace, /"get_best_practices"/);
+    assert.match(stdoutInsideWorkspace, /"search_documentation"/);
+  } finally {
+    await silentNpm('uninstall', '-g', MCP_INSPECTOR_PACKAGE_NAME);
+  }
 }
