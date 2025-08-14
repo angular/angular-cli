@@ -18,16 +18,15 @@ runs:
   steps:
     - name: Initialize WSL
       id: init_wsl
-      uses: angular/dev-infra/github-actions/setup-wsl@fbdd8b7df383ae8fb34907a98353c1e8f0f5e528
+      uses: angular/dev-infra/github-actions/setup-wsl@66a623888d17a9f2f9f4558fad5b07e78dde525e
       with:
         wsl_firewall_interface: 'vEthernet (WSL (Hyper-V firewall))'
 
-    - name: Installing pnpm (in WSL)
-      run: npm install -g pnpm@9
-      shell: wsl-bash {0}
-
     - name: Install node modules in WSL (re-using from previous install/cache restore)
       run: |
+        export NVM_DIR="$HOME/.nvm"
+        [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+
         cd ${{steps.init_wsl.outputs.repo_path}}
         pnpm install --frozen-lockfile
       shell: wsl-bash {0}
@@ -35,6 +34,9 @@ runs:
     - name: Build test binary for Windows (inside WSL)
       shell: wsl-bash {0}
       run: |
+        export NVM_DIR="$HOME/.nvm"
+        [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+
         cd ${{steps.init_wsl.outputs.repo_path}}
         pnpm bazel \
           build --config=e2e //tests/legacy-cli:${{inputs.test_target_name}} --platforms=tools:windows_x64
@@ -54,6 +56,9 @@ runs:
     - name: Convert symlinks for Windows host
       shell: wsl-bash {0}
       run: |
+        export NVM_DIR="$HOME/.nvm"
+        [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+
         cd ${{steps.init_wsl.outputs.repo_path}}
 
         runfiles_dir="/mnt/c/test/dist/bin/tests/legacy-cli/${{inputs.test_target_name}}_/${{inputs.test_target_name}}.bat.runfiles"
