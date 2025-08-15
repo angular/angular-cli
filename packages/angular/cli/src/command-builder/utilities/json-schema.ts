@@ -8,6 +8,7 @@
 
 import { json, strings } from '@angular-devkit/core';
 import type { Arguments, Argv, PositionalOptions, Options as YargsOptions } from 'yargs';
+import { EventCustomDimension } from '../../analytics/analytics-parameters';
 
 /**
  * An option description.
@@ -278,10 +279,10 @@ export function addSchemaOptionsToCommand<T>(
   localYargs: Argv<T>,
   options: Option[],
   includeDefaultValues: boolean,
-): Map<string, string> {
+): Map<string, EventCustomDimension> {
   const booleanOptionsWithNoPrefix = new Set<string>();
   const keyValuePairOptions = new Set<string>();
-  const optionsWithAnalytics = new Map<string, string>();
+  const optionsWithAnalytics = new Map<string, EventCustomDimension>();
 
   for (const option of options) {
     const {
@@ -336,7 +337,7 @@ export function addSchemaOptionsToCommand<T>(
 
     // Record option of analytics.
     if (userAnalytics !== undefined) {
-      optionsWithAnalytics.set(name, userAnalytics);
+      optionsWithAnalytics.set(name, userAnalytics as EventCustomDimension);
     }
   }
 
