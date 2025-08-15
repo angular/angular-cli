@@ -27,7 +27,7 @@
     "@angular-devkit/schematics": "workspace:0.0.0-PLACEHOLDER",
     "@inquirer/prompts": "7.8.2",
     "@listr2/prompt-adapter-inquirer": "3.0.1",
-    "@modelcontextprotocol/sdk": "1.17.2",
+    "@modelcontextprotocol/sdk": "1.17.3",
     "@schematics/angular": "workspace:0.0.0-PLACEHOLDER",
     "@yarnpkg/lockfile": "1.1.0",
     "algoliasearch": "5.35.0",
