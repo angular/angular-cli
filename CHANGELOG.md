@@ -1,3 +1,22 @@
+<a name="20.2.0-rc.1"></a>
+
+# 20.2.0-rc.1 (2025-08-15)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                      |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------ |
+| [8ba6b0bcc](https://github.com/angular/angular-cli/commit/8ba6b0bcc8c8087875d14a0aefc6b7b52f39ce2a) | fix  | use correct path for MCP get_best_practices tool |
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                                    |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------- |
+| [ffe6fb916](https://github.com/angular/angular-cli/commit/ffe6fb916d496da1c6c20942f6e6b05a679b0f7d) | fix  | allow AI config prompt to be skipped without selecting a value |
+| [6a79f9a75](https://github.com/angular/angular-cli/commit/6a79f9a75cdcbb0761c4044066748f4eb788a57f) | fix  | zoneless is now stable                                         |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="20.2.0-rc.0"></a>
 
 # 20.2.0-rc.0 (2025-08-13)
