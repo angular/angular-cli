@@ -133,7 +133,7 @@ try {
   // Re-link symlinks to work inside Windows.
   // This is done in batches to avoid flakiness due to WSL
   // See: https://github.com/microsoft/WSL/issues/8677.
-  const batchSize = 75;
+  const batchSize = 50;
   for (let i = 0; i < relinkFns.length; i += batchSize) {
     await Promise.all(relinkFns.slice(i, i + batchSize).map((fn) => fn()));
   }
