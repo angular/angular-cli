@@ -100,7 +100,7 @@ export async function renderAngular(
     const envInjector = applicationRef.injector;
     const routerIsProvided = !!envInjector.get(ActivatedRoute, null);
     const router = envInjector.get(Router);
-    const lastSuccessfulNavigation = router.lastSuccessfulNavigation;
+    const lastSuccessfulNavigation = router.lastSuccessfulNavigation();
 
     if (!routerIsProvided) {
       hasNavigationError = false;
