@@ -24,6 +24,7 @@
 import childProcess from 'node:child_process';
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import { setTimeout } from 'node:timers/promises';
 
 const [rootDir, cmdPath] = process.argv.slice(2);
 
@@ -93,32 +94,34 @@ async function transformDir(p) {
   await Promise.all(directoriesToVisit.map((d) => transformDir(d)));
 }
 
-function exec(cmd, maxRetries = 5, retryDelay = 200) {
-  return new Promise((resolve, reject) => {
-    childProcess.exec(cmd, { cwd: rootDir }, (error) => {
-      if (error !== null) {
-        // Windows command spawned within WSL (which is untypical) seem to be flaky rarely.
-        // This logic tries to make it fully stable by re-trying if this surfaces:
-        // See: https://github.com/microsoft/WSL/issues/8677.
-        if (
-          maxRetries > 0 &&
-          error.stderr !== undefined &&
-          error.stderr.includes(`accept4 failed 110`)
-        ) {
-          // Add a small delay before the retry
-          setTimeout(() => {
-            resolve(exec(cmd, maxRetries - 1, retryDelay));
-          }, retryDelay);
+async function exec(cmd, maxRetries = 5, retryDelay = 100) {
+  let attempts = 0;
+  while (attempts <= maxRetries) {
+    try {
+      await new Promise((resolve, reject) => {
+        childProcess.exec(cmd, { cwd: rootDir }, (error) => {
+          if (error) {
+            reject(error);
+          } else {
+            resolve();
+          }
+        });
+      });
 
-          return;
-        }
-
-        reject(error);
+      return;
+    } catch (error) {
+      // Windows command spawned within WSL (which is untypical) seem to be flaky.
+      // This logic tries to make it fully stable by re-trying if this surfaces:
+      // See: https://github.com/microsoft/WSL/issues/8677.
+      if (attempts < maxRetries && error.stderr?.includes('accept4 failed 110')) {
+        // Add a delay before the next attempt
+        await setTimeout(retryDelay);
+        attempts++;
       } else {
-        resolve();
+        throw error;
       }
-    });
-  });
+    }
+  }
 }
 
 try {
