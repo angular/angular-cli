@@ -120,7 +120,7 @@
     },
     "zoneless": {
       "description": "Generate an application that does not use `zone.js`.",
-      "x-prompt": "Do you want to create a 'zoneless' application without zone.js (Developer Preview)?",
+      "x-prompt": "Do you want to create a 'zoneless' application without zone.js?",
       "type": "boolean",
       "default": false
     }
