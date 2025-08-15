@@ -64,7 +64,7 @@ async function main(packageName: string) {
   console.log(`--> Cloned snapshot repo.`);
 
   const bazelBinDir = childProcess
-    .spawnSync(bazel, ['info', 'bazel-bin'], {
+    .spawnSync(`${bazel} info bazel-bin`, {
       shell: true,
       encoding: 'utf8',
       stdio: ['pipe', 'pipe', 'inherit'],
@@ -79,15 +79,11 @@ async function main(packageName: string) {
   // Delete old directory to avoid surprises, or stamping being outdated.
   await deleteDir(outputPath);
 
-  childProcess.spawnSync(
-    bazel,
-    ['build', `//packages/${targetDir}:npm_package`, '--config=snapshot'],
-    {
-      shell: true,
-      stdio: 'inherit',
-      encoding: 'utf8',
-    },
-  );
+  childProcess.spawnSync(`${bazel} build //packages/${targetDir}:npm_package --config=snapshot`, {
+    shell: true,
+    stdio: 'inherit',
+    encoding: 'utf8',
+  });
 
   console.log('--> Built npm package with --config=snapshot');
   console.error(`--> Output: ${outputPath}`);
