@@ -41,7 +41,7 @@ export default function (
       };
 
       return new Promise<void>((resolve, reject) => {
-        spawn('git', args, spawnOptions).on('close', (code: number) => {
+        spawn(`git ${args.join(' ')}`, spawnOptions).on('close', (code: number) => {
           if (code === 0) {
             resolve();
           } else {
