@@ -8,7 +8,6 @@
 
 import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/testing';
 import { parse as parseJson } from 'jsonc-parser';
-import { getFileContent } from '../../angular/utility/test';
 import { Schema as ComponentOptions } from '../component/schema';
 import { latestVersions } from '../utility/latest-versions';
 import { Schema as WorkspaceOptions } from '../workspace/schema';
@@ -16,7 +15,7 @@ import { Schema as GenerateLibrarySchema } from './schema';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function getJsonFileContent(tree: UnitTestTree, path: string): any {
-  return parseJson(tree.readContent(path).toString());
+  return tree.readJson(path);
 }
 
 describe('Library Schematic', () => {
@@ -119,7 +118,7 @@ describe('Library Schematic', () => {
   it('should create a package.json named "foo"', async () => {
     const tree = await schematicRunner.runSchematic('library', defaultOptions, workspaceTree);
 
-    const fileContent = getFileContent(tree, '/projects/foo/package.json');
+    const fileContent = tree.readText('/projects/foo/package.json');
     expect(fileContent).toMatch(/"name": "foo"/);
   });
 
@@ -134,14 +133,14 @@ describe('Library Schematic', () => {
   it('should add sideEffects: false flag to package.json named "foo"', async () => {
     const tree = await schematicRunner.runSchematic('library', defaultOptions, workspaceTree);
 
-    const fileContent = getFileContent(tree, '/projects/foo/package.json');
+    const fileContent = tree.readText('/projects/foo/package.json');
     expect(fileContent).toMatch(/"sideEffects": false/);
   });
 
   it('should create a README.md named "foo"', async () => {
     const tree = await schematicRunner.runSchematic('library', defaultOptions, workspaceTree);
 
-    const fileContent = getFileContent(tree, '/projects/foo/README.md');
+    const fileContent = tree.readText('/projects/foo/README.md');
     expect(fileContent).toMatch(/# Foo/);
   });
 
@@ -425,7 +424,7 @@ describe('Library Schematic', () => {
         workspaceTree,
       );
 
-      const fileContent = getFileContent(tree, '/projects/foo/src/lib/foo-module.ts');
+      const fileContent = tree.readText('/projects/foo/src/lib/foo-module.ts');
       expect(fileContent).toMatch(/exports: \[\n(\s*) {2}Foo\n\1\]/);
     });
 
