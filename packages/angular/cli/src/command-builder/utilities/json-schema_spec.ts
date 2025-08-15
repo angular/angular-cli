@@ -7,7 +7,7 @@
  */
 
 import { json, schema } from '@angular-devkit/core';
-import yargs, { positional } from 'yargs';
+import yargs from 'yargs';
 
 import { addSchemaOptionsToCommand, parseJsonSchemaToOptions } from './json-schema';
 
@@ -74,6 +74,13 @@ describe('parseJsonSchemaToOptions', () => {
           'type': 'string',
           'enum': ['always', 'surprise-me', 'never'],
         },
+        'arrayWithChoices': {
+          'type': 'array',
+          'items': {
+            'type': 'string',
+            'enum': ['always', 'never'],
+          },
+        },
         'extendable': {
           'type': 'object',
           'properties': {},
@@ -96,6 +103,24 @@ describe('parseJsonSchemaToOptions', () => {
           jasmine.objectContaining({
             'maxSize': 42,
           }),
+        );
+      });
+    });
+
+    describe('type=array, enum', () => {
+      it('parses valid option value', async () => {
+        expect(
+          await parse(['--arrayWithChoices', 'always', '--arrayWithChoices', 'never']),
+        ).toEqual(
+          jasmine.objectContaining({
+            'arrayWithChoices': ['always', 'never'],
+          }),
+        );
+      });
+
+      it('rejects non-enum values', async () => {
+        await expectAsync(parse(['--arrayWithChoices', 'yes'])).toBeRejectedWithError(
+          /Argument: array-with-choices, Given: "yes", Choices:/,
         );
       });
     });
