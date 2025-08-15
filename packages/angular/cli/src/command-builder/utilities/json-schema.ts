@@ -148,7 +148,7 @@ export async function parseJsonSchemaToOptions(
           if (
             json.isJsonObject(current.items) &&
             typeof current.items.type == 'string' &&
-            ['boolean', 'number', 'string'].includes(current.items.type)
+            isValidTypeForEnum(current.items.type)
           ) {
             return true;
           }
@@ -169,17 +169,15 @@ export async function parseJsonSchemaToOptions(
     }
 
     // Only keep enum values we support (booleans, numbers and strings).
-    const enumValues = ((json.isJsonArray(current.enum) && current.enum) || []).filter((x) => {
-      switch (typeof x) {
-        case 'boolean':
-        case 'number':
-        case 'string':
-          return true;
-
-        default:
-          return false;
-      }
-    }) as (string | true | number)[];
+    const enumValues = (
+      (json.isJsonArray(current.enum) && current.enum) ||
+      (json.isJsonObject(current.items) &&
+        json.isJsonArray(current.items.enum) &&
+        current.items.enum) ||
+      []
+    )
+      .filter((value) => isValidTypeForEnum(typeof value))
+      .sort() as (string | true | number)[];
 
     let defaultValue: string | number | boolean | undefined = undefined;
     if (current.default !== undefined) {
@@ -355,4 +353,9 @@ export function addSchemaOptionsToCommand<T>(
   }
 
   return optionsWithAnalytics;
+}
+
+const VALID_ENUM_TYPES = new Set(['boolean', 'number', 'string']);
+function isValidTypeForEnum(value: string): boolean {
+  return VALID_ENUM_TYPES.has(value);
 }
