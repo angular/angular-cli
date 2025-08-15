@@ -168,7 +168,7 @@ export class PackageManagerUtils {
     return new Promise((resolve) => {
       const bufferedOutput: { stream: NodeJS.WriteStream; data: Buffer }[] = [];
 
-      const childProcess = spawn(this.name, args, {
+      const childProcess = spawn(`${this.name} ${args.join(' ')}`, {
         // Always pipe stderr to allow for failures to be reported
         stdio: silent ? ['ignore', 'ignore', 'pipe'] : 'pipe',
         shell: true,
