@@ -37,11 +37,13 @@ ESBUILD_TESTS = [
     "tests/commands/serve/ssr-http-requests-assets.js",
     "tests/i18n/**",
     "tests/vite/**",
+    "tests/vitest/**",
     "tests/test/**",
 ]
 
 WEBPACK_IGNORE_TESTS = [
     "tests/vite/**",
+    "tests/vitest/**",
     "tests/build/app-shell/**",
     "tests/i18n/ivy-localize-app-shell.js",
     "tests/i18n/ivy-localize-app-shell-service-worker.js",
