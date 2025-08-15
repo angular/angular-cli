@@ -147,6 +147,7 @@
       "type": "array",
       "uniqueItems": true,
       "description": "Specifies which AI tools to generate configuration files for. These file are used to improve the outputs of AI tools by following the best practices.",
+      "x-user-analytics": "ep.ng_ai_config_tool",
       "items": {
         "type": "string",
         "enum": ["none", "gemini", "copilot", "claude", "cursor", "jetbrains", "windsurf"]
