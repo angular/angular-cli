@@ -180,9 +180,9 @@ npm_repositories()
 
 http_archive(
     name = "aspect_rules_ts",
-    sha256 = "09af62a0d46918d815b5f48b5ed0f5349b62c15fc42fcc3fef5c246504ff8d99",
-    strip_prefix = "rules_ts-3.6.3",
-    url = "https://github.com/aspect-build/rules_ts/releases/download/v3.6.3/rules_ts-v3.6.3.tar.gz",
+    sha256 = "6fd16aa24c2e8547b72561ece1c7d307b77a5f98f0402934396f6eefbac59aa2",
+    strip_prefix = "rules_ts-3.7.0",
+    url = "https://github.com/aspect-build/rules_ts/releases/download/v3.7.0/rules_ts-v3.7.0.tar.gz",
 )
 
 load("@aspect_rules_ts//ts:repositories.bzl", "rules_ts_dependencies")
@@ -253,7 +253,7 @@ esbuild_register_toolchains(
 
 git_repository(
     name = "rules_angular",
-    commit = "c8af5c0d27c66387e9e7df3c4dd3155ce7582609",
+    commit = "a957283cdef0ade1fc6d1d7404f14577cebd3642",
     remote = "https://github.com/devversion/rules_angular.git",
 )
 
@@ -281,7 +281,7 @@ http_archive(
 
 git_repository(
     name = "rules_browsers",
-    commit = "c9a70ad79258e2ffc498075623f9f974920a4025",
+    commit = "8ee9ae3216ef26516c8ef20537c89857343cdc3a",
     remote = "https://github.com/devversion/rules_browsers.git",
 )
 
