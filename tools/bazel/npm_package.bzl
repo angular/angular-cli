@@ -45,7 +45,7 @@ def npm_package(
         pkg_label = to_label(pkg_dep)
         if pkg_label.name != "package.json":
             fail("ERROR: only package.json files allowed in pkg_deps of pkg_npm macro")
-        pkg_deps_copies.append("@%s//%s:package_json_copy" % (pkg_label.workspace_name, pkg_label.package))
+        pkg_deps_copies.append("@@%s//%s:package_json_copy" % (pkg_label.repo_name, pkg_label.package))
 
     # Substitute dependencies on other packages in this repo with tarballs.
     link_package_json_to_tarballs(
