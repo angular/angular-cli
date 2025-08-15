@@ -6,7 +6,11 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import type { BuilderContext, BuilderOutput } from '@angular-devkit/architect';
+import {
+  type BuilderContext,
+  type BuilderOutput,
+  targetStringFromTarget,
+} from '@angular-devkit/architect';
 import assert from 'node:assert';
 import { createVirtualModulePlugin } from '../../tools/esbuild/virtual-module-plugin';
 import { assertIsError } from '../../utils/error';
@@ -22,99 +26,77 @@ import type { Schema as UnitTestBuilderOptions } from './schema';
 
 export type { UnitTestBuilderOptions };
 
-/**
- * @experimental Direct usage of this function is considered experimental.
- */
-export async function* execute(
-  options: UnitTestBuilderOptions,
-  context: BuilderContext,
-  extensions?: ApplicationBuilderExtensions,
-): AsyncIterable<BuilderOutput> {
-  // Determine project name from builder context target
-  const projectName = context.target?.project;
-  if (!projectName) {
-    context.logger.error(`The builder requires a target to be specified.`);
-
-    return;
+async function loadTestRunner(runnerName: string): Promise<TestRunner> {
+  // Harden against directory traversal
+  if (!/^[a-zA-Z0-9-]+$/.test(runnerName)) {
+    throw new Error(
+      `Invalid runner name "${runnerName}". Runner names can only contain alphanumeric characters and hyphens.`,
+    );
   }
 
-  context.logger.warn(
-    `NOTE: The "unit-test" builder is currently EXPERIMENTAL and not ready for production use.`,
-  );
-
-  const normalizedOptions = await normalizeOptions(context, projectName, options);
-  const { runnerName, projectSourceRoot } = normalizedOptions;
-
-  // Dynamically load the requested runner
-  let runner: TestRunner;
+  let runnerModule;
   try {
-    const { default: runnerModule } = await import(`./runners/${runnerName}/index`);
-    runner = runnerModule;
+    runnerModule = await import(`./runners/${runnerName}/index`);
   } catch (e) {
     assertIsError(e);
-    if (e.code !== 'ERR_MODULE_NOT_FOUND') {
-      throw e;
+    if (e.code === 'ERR_MODULE_NOT_FOUND') {
+      throw new Error(`Unknown test runner "${runnerName}".`);
     }
-    context.logger.error(`Unknown test runner "${runnerName}".`);
-
-    return;
+    throw new Error(
+      `Failed to load the '${runnerName}' test runner. The package may be corrupted or improperly installed.\n` +
+        `Error: ${e.message}`,
+    );
   }
 
-  // Create the stateful executor once
-  await using executor = await runner.createExecutor(context, normalizedOptions);
-
-  if (runner.isStandalone) {
-    yield* executor.execute({
-      kind: ResultKind.Full,
-      files: {},
-    });
-
-    return;
+  const runner = runnerModule.default;
+  if (
+    !runner ||
+    typeof runner.getBuildOptions !== 'function' ||
+    typeof runner.createExecutor !== 'function'
+  ) {
+    throw new Error(
+      `The loaded test runner '${runnerName}' does not appear to be a valid TestRunner implementation.`,
+    );
   }
 
-  // Get base build options from the buildTarget
-  const buildTargetOptions = (await context.validateOptions(
-    await context.getTargetOptions(normalizedOptions.buildTarget),
-    await context.getBuilderNameForTarget(normalizedOptions.buildTarget),
-  )) as unknown as ApplicationBuilderInternalOptions;
+  return runner;
+}
 
-  // Get runner-specific build options from the hook
-  const { buildOptions: runnerBuildOptions, virtualFiles } = await runner.getBuildOptions(
-    normalizedOptions,
-    buildTargetOptions,
-  );
-
-  if (virtualFiles) {
-    extensions ??= {};
-    extensions.codePlugins ??= [];
-    for (const [namespace, contents] of Object.entries(virtualFiles)) {
-      extensions.codePlugins.push(
-        createVirtualModulePlugin({
-          namespace,
-          loadContent: () => {
-            return {
-              contents,
-              loader: 'js',
-              resolveDir: projectSourceRoot,
-            };
-          },
-        }),
-      );
-    }
+function prepareBuildExtensions(
+  virtualFiles: Record<string, string> | undefined,
+  projectSourceRoot: string,
+  extensions?: ApplicationBuilderExtensions,
+): ApplicationBuilderExtensions | undefined {
+  if (!virtualFiles) {
+    return extensions;
   }
 
-  const { watch, tsConfig } = normalizedOptions;
+  extensions ??= {};
+  extensions.codePlugins ??= [];
+  for (const [namespace, contents] of Object.entries(virtualFiles)) {
+    extensions.codePlugins.push(
+      createVirtualModulePlugin({
+        namespace,
+        loadContent: () => {
+          return {
+            contents,
+            loader: 'js',
+            resolveDir: projectSourceRoot,
+          };
+        },
+      }),
+    );
+  }
 
-  // Prepare and run the application build
-  const applicationBuildOptions = {
-    // Base options
-    ...buildTargetOptions,
-    watch,
-    tsConfig,
-    // Runner specific
-    ...runnerBuildOptions,
-  } satisfies ApplicationBuilderInternalOptions;
+  return extensions;
+}
 
+async function* runBuildAndTest(
+  executor: import('./runners/api').TestExecutor,
+  applicationBuildOptions: ApplicationBuilderInternalOptions,
+  context: BuilderContext,
+  extensions: ApplicationBuilderExtensions | undefined,
+): AsyncIterable<BuilderOutput> {
   for await (const buildResult of buildApplicationInternal(
     applicationBuildOptions,
     context,
@@ -137,4 +119,79 @@ export async function* execute(
     // Pass the build artifacts to the executor
     yield* executor.execute(buildResult);
   }
+}
+
+/**
+ * @experimental Direct usage of this function is considered experimental.
+ */
+export async function* execute(
+  options: UnitTestBuilderOptions,
+  context: BuilderContext,
+  extensions?: ApplicationBuilderExtensions,
+): AsyncIterable<BuilderOutput> {
+  // Determine project name from builder context target
+  const projectName = context.target?.project;
+  if (!projectName) {
+    context.logger.error(`The builder requires a target to be specified.`);
+
+    return;
+  }
+
+  context.logger.warn(
+    `NOTE: The "unit-test" builder is currently EXPERIMENTAL and not ready for production use.`,
+  );
+
+  const normalizedOptions = await normalizeOptions(context, projectName, options);
+  const runner = await loadTestRunner(normalizedOptions.runnerName);
+
+  await using executor = await runner.createExecutor(context, normalizedOptions);
+
+  if (runner.isStandalone) {
+    yield* executor.execute({
+      kind: ResultKind.Full,
+      files: {},
+    });
+
+    return;
+  }
+
+  // Get base build options from the buildTarget
+  let buildTargetOptions: ApplicationBuilderInternalOptions;
+  try {
+    buildTargetOptions = (await context.validateOptions(
+      await context.getTargetOptions(normalizedOptions.buildTarget),
+      await context.getBuilderNameForTarget(normalizedOptions.buildTarget),
+    )) as unknown as ApplicationBuilderInternalOptions;
+  } catch (e) {
+    assertIsError(e);
+    context.logger.error(
+      `Could not load build target options for "${targetStringFromTarget(normalizedOptions.buildTarget)}".\n` +
+        `Please check your 'angular.json' configuration.\n` +
+        `Error: ${e.message}`,
+    );
+
+    return;
+  }
+
+  // Get runner-specific build options from the hook
+  const { buildOptions: runnerBuildOptions, virtualFiles } = await runner.getBuildOptions(
+    normalizedOptions,
+    buildTargetOptions,
+  );
+
+  const finalExtensions = prepareBuildExtensions(
+    virtualFiles,
+    normalizedOptions.projectSourceRoot,
+    extensions,
+  );
+
+  // Prepare and run the application build
+  const applicationBuildOptions = {
+    ...buildTargetOptions,
+    ...runnerBuildOptions,
+    watch: normalizedOptions.watch,
+    tsConfig: normalizedOptions.tsConfig,
+  } satisfies ApplicationBuilderInternalOptions;
+
+  yield* runBuildAndTest(executor, applicationBuildOptions, context, finalExtensions);
 }
