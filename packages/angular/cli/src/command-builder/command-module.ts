@@ -89,7 +89,10 @@ export abstract class CommandModule<T extends {} = {}> implements CommandModuleI
   protected readonly shouldReportAnalytics: boolean = true;
   readonly scope: CommandScope = CommandScope.Both;
 
-  private readonly optionsWithAnalytics = new Map<string, string>();
+  private readonly optionsWithAnalytics = new Map<
+    string,
+    EventCustomDimension | EventCustomMetric
+  >();
 
   constructor(protected readonly context: CommandContext) {}
 
@@ -236,12 +239,16 @@ export abstract class CommandModule<T extends {} = {}> implements CommandModuleI
     ]);
 
     for (const [name, ua] of this.optionsWithAnalytics) {
+      if (!validEventCustomDimensionAndMetrics.has(ua)) {
+        continue;
+      }
+
       const value = options[name];
-      if (
-        (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') &&
-        validEventCustomDimensionAndMetrics.has(ua as EventCustomDimension | EventCustomMetric)
-      ) {
-        parameters[ua as EventCustomDimension | EventCustomMetric] = value;
+      if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+        parameters[ua] = value;
+      } else if (Array.isArray(value)) {
+        // GA doesn't allow array as values.
+        parameters[ua] = value.sort().join(', ');
       }
     }
 
