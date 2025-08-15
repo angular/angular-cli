@@ -132,7 +132,7 @@ export default function (
         // Workaround for https://github.com/sindresorhus/ora/issues/136.
         discardStdin: process.platform != 'win32',
       }).start();
-      const childProcess = spawn(taskPackageManagerName, args, spawnOptions).on(
+      const childProcess = spawn(`${taskPackageManagerName} ${args.join(' ')}`, spawnOptions).on(
         'close',
         (code: number) => {
           if (code === 0) {
