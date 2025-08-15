@@ -70,8 +70,10 @@ ts_project(
         "//:node_modules/@types/semver",
         "//:node_modules/@types/yargs",
         "//:node_modules/@types/yarnpkg__lockfile",
+        "//:node_modules/fast-glob",
         "//:node_modules/listr2",
         "//:node_modules/semver",
+        "//:node_modules/typescript",
     ],
 )
 
@@ -127,6 +129,7 @@ ts_project(
         ":node_modules/yargs",
         "//:node_modules/@types/semver",
         "//:node_modules/@types/yargs",
+        "//:node_modules/fast-glob",
         "//:node_modules/semver",
     ],
 )
