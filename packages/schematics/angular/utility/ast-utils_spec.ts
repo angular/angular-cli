@@ -10,7 +10,6 @@ import { tags } from '@angular-devkit/core';
 import { HostTree } from '@angular-devkit/schematics';
 import * as ts from '../third_party/github.com/Microsoft/TypeScript/lib/typescript';
 import { Change, InsertChange } from '../utility/change';
-import { getFileContent } from '../utility/test';
 import {
   addDeclarationToModule,
   addExportToModule,
@@ -38,7 +37,7 @@ function applyChanges(path: string, content: string, changes: Change[]): string 
   }
   tree.commitUpdate(exportRecorder);
 
-  return getFileContent(tree, path);
+  return tree.readText(path);
 }
 
 describe('ast utils', () => {
