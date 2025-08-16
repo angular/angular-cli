@@ -28,7 +28,7 @@ const STABLE_TOOLS = [BEST_PRACTICES_TOOL, DOC_SEARCH_TOOL, LIST_PROJECTS_TOOL] 
  * The set of tools that are available but not enabled by default.
  * These tools are considered experimental and may have limitations.
  */
-const EXPERIMENTAL_TOOLS = [FIND_EXAMPLE_TOOL, MODERNIZE_TOOL] as const;
+export const EXPERIMENTAL_TOOLS = [FIND_EXAMPLE_TOOL, MODERNIZE_TOOL] as const;
 
 export async function createMcpServer(
   options: {
