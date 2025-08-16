@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import remapping, { SourceMapInput } from '@ampproject/remapping';
+import remapping, { SourceMapInput } from '@jridgewell/remapping';
 import type { BuildFailure, TransformResult } from 'esbuild';
 import { minify } from 'terser';
 import { EsbuildExecutor } from './esbuild-executor';

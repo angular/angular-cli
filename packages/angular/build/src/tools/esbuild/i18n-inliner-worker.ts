@@ -6,8 +6,8 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import remapping, { SourceMapInput } from '@ampproject/remapping';
 import { PluginObj, parseSync, transformFromAstAsync, types } from '@babel/core';
+import remapping, { SourceMapInput } from '@jridgewell/remapping';
 import assert from 'node:assert';
 import { workerData } from 'node:worker_threads';
 import { assertIsError } from '../../utils/error';

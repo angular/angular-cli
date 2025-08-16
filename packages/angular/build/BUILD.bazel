@@ -88,7 +88,6 @@ ts_project(
     ],
     data = RUNTIME_ASSETS,
     deps = [
-        ":node_modules/@ampproject/remapping",
         ":node_modules/@angular-devkit/architect",
         ":node_modules/@angular-devkit/core",
         ":node_modules/@angular/ssr",
@@ -96,6 +95,7 @@ ts_project(
         ":node_modules/@babel/helper-annotate-as-pure",
         ":node_modules/@babel/helper-split-export-declaration",
         ":node_modules/@inquirer/confirm",
+        ":node_modules/@jridgewell/remapping",
         ":node_modules/@vitejs/plugin-basic-ssl",
         ":node_modules/browserslist",
         ":node_modules/https-proxy-agent",

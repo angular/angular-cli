@@ -6,7 +6,6 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import remapping from '@ampproject/remapping';
 import {
   NodePath,
   ParseResult,
@@ -17,6 +16,7 @@ import {
   traverse,
   types,
 } from '@babel/core';
+import remapping from '@jridgewell/remapping';
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { workerData } from 'node:worker_threads';
