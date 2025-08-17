@@ -112,9 +112,9 @@ rules_js_register_toolchains(
 
 http_archive(
     name = "aspect_bazel_lib",
-    sha256 = "3522895fa13b97e8b27e3b642045682aa4233ae1a6b278aad6a3b483501dc9f2",
-    strip_prefix = "bazel-lib-2.20.0",
-    url = "https://github.com/aspect-build/bazel-lib/releases/download/v2.20.0/bazel-lib-v2.20.0.tar.gz",
+    sha256 = "6d636cfdecc7f5c1a5d82b9790fb5d5d5e8aa6ea8b53a71a75f1ba53c8d29f61",
+    strip_prefix = "bazel-lib-2.21.0",
+    url = "https://github.com/aspect-build/bazel-lib/releases/download/v2.21.0/bazel-lib-v2.21.0.tar.gz",
 )
 
 load("@aspect_bazel_lib//lib:repositories.bzl", "aspect_bazel_lib_dependencies", "aspect_bazel_lib_register_toolchains")
@@ -180,9 +180,9 @@ npm_repositories()
 
 http_archive(
     name = "aspect_rules_ts",
-    sha256 = "09af62a0d46918d815b5f48b5ed0f5349b62c15fc42fcc3fef5c246504ff8d99",
-    strip_prefix = "rules_ts-3.6.3",
-    url = "https://github.com/aspect-build/rules_ts/releases/download/v3.6.3/rules_ts-v3.6.3.tar.gz",
+    sha256 = "6fd16aa24c2e8547b72561ece1c7d307b77a5f98f0402934396f6eefbac59aa2",
+    strip_prefix = "rules_ts-3.7.0",
+    url = "https://github.com/aspect-build/rules_ts/releases/download/v3.7.0/rules_ts-v3.7.0.tar.gz",
 )
 
 load("@aspect_rules_ts//ts:repositories.bzl", "rules_ts_dependencies")
@@ -253,7 +253,7 @@ esbuild_register_toolchains(
 
 git_repository(
     name = "rules_angular",
-    commit = "c8af5c0d27c66387e9e7df3c4dd3155ce7582609",
+    commit = "a957283cdef0ade1fc6d1d7404f14577cebd3642",
     remote = "https://github.com/devversion/rules_angular.git",
 )
 
@@ -281,7 +281,7 @@ http_archive(
 
 git_repository(
     name = "rules_browsers",
-    commit = "c9a70ad79258e2ffc498075623f9f974920a4025",
+    commit = "8ee9ae3216ef26516c8ef20537c89857343cdc3a",
     remote = "https://github.com/devversion/rules_browsers.git",
 )
 
