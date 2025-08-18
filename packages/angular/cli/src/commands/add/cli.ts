@@ -28,6 +28,7 @@ import { assertIsError } from '../../utilities/error';
 import {
   NgAddSaveDependency,
   PackageManifest,
+  PackageMetadata,
   fetchPackageManifest,
   fetchPackageMetadata,
 } from '../../utilities/package-metadata';
@@ -288,40 +289,16 @@ export default class AddCommandModule
     }
 
     // Allow prelease versions if the CLI itself is a prerelease
-    const allowPrereleases = prerelease(VERSION.full);
-
-    const versionExclusions = packageVersionExclusions[packageMetadata.name];
-    const versionManifests = Object.values(packageMetadata.versions).filter(
-      (value: PackageManifest) => {
-        // Already checked the 'latest' version
-        if (latestManifest.version === value.version) {
-          return false;
-        }
-        // Prerelease versions are not stable and should not be considered by default
-        if (!allowPrereleases && prerelease(value.version)) {
-          return false;
-        }
-        // Deprecated versions should not be used or considered
-        if (value.deprecated) {
-          return false;
-        }
-        // Excluded package versions should not be considered
-        if (
-          versionExclusions &&
-          satisfies(value.version, versionExclusions, { includePrerelease: true })
-        ) {
-          return false;
-        }
-
-        return true;
-      },
-    );
-
-    // Sort in reverse SemVer order so that the newest compatible version is chosen
-    versionManifests.sort((a, b) => compare(b.version, a.version, true));
+    const allowPrereleases = !!prerelease(VERSION.full);
+    const versionManifests = this.#getPotentialVersionManifests(packageMetadata, allowPrereleases);
 
     let found = false;
     for (const versionManifest of versionManifests) {
+      // Already checked the 'latest' version
+      if (latestManifest?.version === versionManifest.version) {
+        continue;
+      }
+
       const conflicts = await this.getPeerDependencyConflicts(versionManifest);
       if (conflicts) {
         if (options.verbose || rejectionReasons.length < DEFAULT_CONFLICT_DISPLAY_LIMIT) {
@@ -352,6 +329,37 @@ export default class AddCommandModule
         context.packageIdentifier.toString(),
       )}.`;
     }
+  }
+
+  #getPotentialVersionManifests(
+    packageMetadata: PackageMetadata,
+    allowPrereleases: boolean,
+  ): PackageManifest[] {
+    const versionExclusions = packageVersionExclusions[packageMetadata.name];
+    const versionManifests = Object.values(packageMetadata.versions).filter(
+      (value: PackageManifest) => {
+        // Prerelease versions are not stable and should not be considered by default
+        if (!allowPrereleases && prerelease(value.version)) {
+          return false;
+        }
+        // Deprecated versions should not be used or considered
+        if (value.deprecated) {
+          return false;
+        }
+        // Excluded package versions should not be considered
+        if (
+          versionExclusions &&
+          satisfies(value.version, versionExclusions, { includePrerelease: true })
+        ) {
+          return false;
+        }
+
+        return true;
+      },
+    );
+
+    // Sort in reverse SemVer order so that the newest compatible version is chosen
+    return versionManifests.sort((a, b) => compare(b.version, a.version, true));
   }
 
   private async loadPackageInfoTask(
