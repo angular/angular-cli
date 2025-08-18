@@ -7,6 +7,7 @@ const PACKAGE_MANAGER_VERSION = {
   'yarn': '1.22.22',
   'pnpm': '9.3.0',
   'bun': '1.1.13',
+  'deno': '2.4.4',
 };
 
 export default async function () {
