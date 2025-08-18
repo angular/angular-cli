@@ -50,6 +50,7 @@ interface AddCommandTaskContext {
   collectionName?: string;
   executeSchematic: AddCommandModule['executeSchematic'];
   getPeerDependencyConflicts: AddCommandModule['getPeerDependencyConflicts'];
+  dryRun?: boolean;
 }
 
 type AddCommandTaskWrapper = ListrTaskWrapper<
@@ -161,6 +162,7 @@ export default class AddCommandModule
       packageIdentifier,
       executeSchematic: this.executeSchematic.bind(this),
       getPeerDependencyConflicts: this.getPeerDependencyConflicts.bind(this),
+      dryRun: options.dryRun,
     };
 
     const tasks = new Listr<AddCommandTaskContext>(
@@ -183,11 +185,21 @@ export default class AddCommandModule
         },
         {
           title: 'Confirming installation',
-          enabled: !skipConfirmation,
+          enabled: !skipConfirmation && !options.dryRun,
           task: (context, task) => this.confirmInstallationTask(context, task),
           rendererOptions: { persistentOutput: true },
         },
         {
+          title: 'Installing package',
+          skip: (context) => {
+            if (context.dryRun) {
+              return `Skipping package installation. Would install package ${color.blue(
+                context.packageIdentifier.toString(),
+              )}.`;
+            }
+
+            return false;
+          },
           task: (context, task) => this.installPackageTask(context, task, options),
           rendererOptions: { bottomBar: Infinity },
         },
@@ -201,6 +213,12 @@ export default class AddCommandModule
     try {
       const result = await tasks.run(taskContext);
       assert(result.collectionName, 'Collection name should always be available');
+
+      if (options.dryRun) {
+        logger.info('The package schematic would be executed next.');
+
+        return;
+      }
 
       return this.executeSchematic({ ...options, collection: result.collectionName });
     } catch (e) {
