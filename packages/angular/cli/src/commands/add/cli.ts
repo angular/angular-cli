@@ -7,7 +7,7 @@
  */
 
 import { NodePackageDoesNotSupportSchematics } from '@angular-devkit/schematics/tools';
-import { Listr, color, figures } from 'listr2';
+import { Listr, ListrRenderer, ListrTaskWrapper, color, figures } from 'listr2';
 import assert from 'node:assert';
 import { createRequire } from 'node:module';
 import { dirname, join } from 'node:path';
@@ -51,6 +51,12 @@ interface AddCommandTaskContext {
   executeSchematic: AddCommandModule['executeSchematic'];
   hasMismatchedPeer: AddCommandModule['hasMismatchedPeer'];
 }
+
+type AddCommandTaskWrapper = ListrTaskWrapper<
+  AddCommandTaskContext,
+  typeof ListrRenderer,
+  typeof ListrRenderer
+>;
 
 /**
  * The set of packages that should have certain versions excluded from consideration
@@ -121,10 +127,9 @@ export default class AddCommandModule
     return localYargs;
   }
 
-  // eslint-disable-next-line max-lines-per-function
   async run(options: Options<AddCommandArgs> & OtherOptions): Promise<number | void> {
-    const { logger, packageManager } = this.context;
-    const { verbose, registry, collection, skipConfirmation } = options;
+    const { logger } = this.context;
+    const { collection, skipConfirmation } = options;
 
     let packageIdentifier;
     try {
@@ -156,208 +161,40 @@ export default class AddCommandModule
       hasMismatchedPeer: this.hasMismatchedPeer.bind(this),
     };
 
-    const tasks = new Listr<AddCommandTaskContext>([
-      {
-        title: 'Determining Package Manager',
-        task(context, task) {
-          context.usingYarn = packageManager.name === PackageManager.Yarn;
-          task.output = `Using package manager: ${color.dim(packageManager.name)}`;
+    const tasks = new Listr<AddCommandTaskContext>(
+      [
+        {
+          title: 'Determining Package Manager',
+          task: (context, task) => this.determinePackageManagerTask(context, task),
+          rendererOptions: { persistentOutput: true },
         },
-        rendererOptions: { persistentOutput: true },
-      },
-      {
-        title: 'Searching for compatible package version',
-        enabled: packageIdentifier.type === 'range' && packageIdentifier.rawSpec === '*',
-        async task(context, task) {
-          assert(
-            context.packageIdentifier.name,
-            'Registry package identifiers should always have a name.',
-          );
-
-          // only package name provided; search for viable version
-          // plus special cases for packages that did not have peer deps setup
-          let packageMetadata;
-          try {
-            packageMetadata = await fetchPackageMetadata(context.packageIdentifier.name, logger, {
-              registry,
-              usingYarn: context.usingYarn,
-              verbose,
-            });
-          } catch (e) {
-            assertIsError(e);
-            throw new CommandError(
-              `Unable to load package information from registry: ${e.message}`,
-            );
-          }
-
-          // Start with the version tagged as `latest` if it exists
-          const latestManifest = packageMetadata.tags['latest'];
-          if (latestManifest) {
-            context.packageIdentifier = npa.resolve(latestManifest.name, latestManifest.version);
-          }
-
-          // Adjust the version based on name and peer dependencies
-          if (
-            latestManifest?.peerDependencies &&
-            Object.keys(latestManifest.peerDependencies).length === 0
-          ) {
-            task.output = `Found compatible package version: ${color.blue(latestManifest.version)}.`;
-          } else if (!latestManifest || (await context.hasMismatchedPeer(latestManifest))) {
-            // 'latest' is invalid so search for most recent matching package
-
-            // Allow prelease versions if the CLI itself is a prerelease
-            const allowPrereleases = prerelease(VERSION.full);
-
-            const versionExclusions = packageVersionExclusions[packageMetadata.name];
-            const versionManifests = Object.values(packageMetadata.versions).filter(
-              (value: PackageManifest) => {
-                // Prerelease versions are not stable and should not be considered by default
-                if (!allowPrereleases && prerelease(value.version)) {
-                  return false;
-                }
-                // Deprecated versions should not be used or considered
-                if (value.deprecated) {
-                  return false;
-                }
-                // Excluded package versions should not be considered
-                if (
-                  versionExclusions &&
-                  satisfies(value.version, versionExclusions, { includePrerelease: true })
-                ) {
-                  return false;
-                }
-
-                return true;
-              },
-            );
-
-            // Sort in reverse SemVer order so that the newest compatible version is chosen
-            versionManifests.sort((a, b) => compare(b.version, a.version, true));
-
-            let found = false;
-            for (const versionManifest of versionManifests) {
-              const mismatch = await context.hasMismatchedPeer(versionManifest);
-              if (mismatch) {
-                continue;
-              }
-
-              context.packageIdentifier = npa.resolve(
-                versionManifest.name,
-                versionManifest.version,
-              );
-              found = true;
-              break;
-            }
-
-            if (!found) {
-              task.output = "Unable to find compatible package. Using 'latest' tag.";
-            } else {
-              task.output = `Found compatible package version: ${color.blue(context.packageIdentifier.toString())}.`;
-            }
-          } else {
-            task.output = `Found compatible package version: ${color.blue(context.packageIdentifier.toString())}.`;
-          }
+        {
+          title: 'Searching for compatible package version',
+          enabled: packageIdentifier.type === 'range' && packageIdentifier.rawSpec === '*',
+          task: (context, task) => this.findCompatiblePackageVersionTask(context, task, options),
+          rendererOptions: { persistentOutput: true },
         },
-        rendererOptions: { persistentOutput: true },
-      },
-      {
-        title: 'Loading package information from registry',
-        async task(context, task) {
-          let manifest;
-          try {
-            manifest = await fetchPackageManifest(context.packageIdentifier.toString(), logger, {
-              registry,
-              verbose,
-              usingYarn: context.usingYarn,
-            });
-          } catch (e) {
-            assertIsError(e);
-            throw new CommandError(
-              `Unable to fetch package information for '${context.packageIdentifier}': ${e.message}`,
-            );
-          }
-
-          context.savePackage = manifest['ng-add']?.save;
-          context.collectionName = manifest.name;
-
-          if (await context.hasMismatchedPeer(manifest)) {
-            task.output = color.yellow(
-              figures.warning +
-                ' Package has unmet peer dependencies. Adding the package may not succeed.',
-            );
-          }
+        {
+          title: 'Loading package information from registry',
+          task: (context, task) => this.loadPackageInfoTask(context, task, options),
+          rendererOptions: { persistentOutput: true },
         },
-        rendererOptions: { persistentOutput: true },
-      },
-      {
-        title: 'Confirming installation',
-        enabled: !skipConfirmation,
-        async task(context, task) {
-          if (!isTTY()) {
-            task.output =
-              `'--skip-confirmation' can be used to bypass installation confirmation. ` +
-              `Ensure package name is correct prior to '--skip-confirmation' option usage.`;
-            throw new CommandError('No terminal detected');
-          }
-
-          const { ListrInquirerPromptAdapter } = await import('@listr2/prompt-adapter-inquirer');
-          const { confirm } = await import('@inquirer/prompts');
-          const shouldProceed = await task.prompt(ListrInquirerPromptAdapter).run(confirm, {
-            message:
-              `The package ${color.blue(context.packageIdentifier.toString())} will be installed and executed.\n` +
-              'Would you like to proceed?',
-            default: true,
-            theme: { prefix: '' },
-          });
-
-          if (!shouldProceed) {
-            throw new CommandError('Command aborted');
-          }
+        {
+          title: 'Confirming installation',
+          enabled: !skipConfirmation,
+          task: (context, task) => this.confirmInstallationTask(context, task),
+          rendererOptions: { persistentOutput: true },
         },
-        rendererOptions: { persistentOutput: true },
-      },
-      {
-        async task(context, task) {
-          // Only show if installation will actually occur
-          task.title = 'Installing package';
-
-          if (context.savePackage === false) {
-            task.title += ' in temporary location';
-
-            // Temporary packages are located in a different directory
-            // Hence we need to resolve them using the temp path
-            const { success, tempNodeModules } = await packageManager.installTemp(
-              context.packageIdentifier.toString(),
-              registry ? [`--registry="${registry}"`] : undefined,
-            );
-            const tempRequire = createRequire(tempNodeModules + '/');
-            assert(context.collectionName, 'Collection name should always be available');
-            const resolvedCollectionPath = tempRequire.resolve(
-              join(context.collectionName, 'package.json'),
-            );
-
-            if (!success) {
-              throw new CommandError('Unable to install package');
-            }
-
-            context.collectionName = dirname(resolvedCollectionPath);
-          } else {
-            const success = await packageManager.install(
-              context.packageIdentifier.toString(),
-              context.savePackage,
-              registry ? [`--registry="${registry}"`] : undefined,
-              undefined,
-            );
-
-            if (!success) {
-              throw new CommandError('Unable to install package');
-            }
-          }
+        {
+          task: (context, task) => this.installPackageTask(context, task, options),
+          rendererOptions: { bottomBar: Infinity },
         },
-        rendererOptions: { bottomBar: Infinity },
+        // TODO: Rework schematic execution as a task and insert here
+      ],
+      {
+        /* options */
       },
-      // TODO: Rework schematic execution as a task and insert here
-    ]);
+    );
 
     try {
       const result = await tasks.run(taskContext);
@@ -366,10 +203,222 @@ export default class AddCommandModule
       return this.executeSchematic({ ...options, collection: result.collectionName });
     } catch (e) {
       if (e instanceof CommandError) {
+        logger.error(e.message);
+
         return 1;
       }
 
       throw e;
+    }
+  }
+
+  private determinePackageManagerTask(
+    context: AddCommandTaskContext,
+    task: AddCommandTaskWrapper,
+  ): void {
+    const { packageManager } = this.context;
+    context.usingYarn = packageManager.name === PackageManager.Yarn;
+    task.output = `Using package manager: ${color.dim(packageManager.name)}`;
+  }
+
+  private async findCompatiblePackageVersionTask(
+    context: AddCommandTaskContext,
+    task: AddCommandTaskWrapper,
+    options: Options<AddCommandArgs>,
+  ): Promise<void> {
+    const { logger } = this.context;
+    const { verbose, registry } = options;
+
+    assert(
+      context.packageIdentifier.name,
+      'Registry package identifiers should always have a name.',
+    );
+
+    // only package name provided; search for viable version
+    // plus special cases for packages that did not have peer deps setup
+    let packageMetadata;
+    try {
+      packageMetadata = await fetchPackageMetadata(context.packageIdentifier.name, logger, {
+        registry,
+        usingYarn: context.usingYarn,
+        verbose,
+      });
+    } catch (e) {
+      assertIsError(e);
+      throw new CommandError(`Unable to load package information from registry: ${e.message}`);
+    }
+
+    // Start with the version tagged as `latest` if it exists
+    const latestManifest = packageMetadata.tags['latest'];
+    if (latestManifest) {
+      context.packageIdentifier = npa.resolve(latestManifest.name, latestManifest.version);
+    }
+
+    // Adjust the version based on name and peer dependencies
+    if (
+      latestManifest?.peerDependencies &&
+      Object.keys(latestManifest.peerDependencies).length === 0
+    ) {
+      task.output = `Found compatible package version: ${color.blue(latestManifest.version)}.`;
+    } else if (!latestManifest || (await context.hasMismatchedPeer(latestManifest))) {
+      // 'latest' is invalid so search for most recent matching package
+
+      // Allow prelease versions if the CLI itself is a prerelease
+      const allowPrereleases = prerelease(VERSION.full);
+
+      const versionExclusions = packageVersionExclusions[packageMetadata.name];
+      const versionManifests = Object.values(packageMetadata.versions).filter(
+        (value: PackageManifest) => {
+          // Prerelease versions are not stable and should not be considered by default
+          if (!allowPrereleases && prerelease(value.version)) {
+            return false;
+          }
+          // Deprecated versions should not be used or considered
+          if (value.deprecated) {
+            return false;
+          }
+          // Excluded package versions should not be considered
+          if (
+            versionExclusions &&
+            satisfies(value.version, versionExclusions, { includePrerelease: true })
+          ) {
+            return false;
+          }
+
+          return true;
+        },
+      );
+
+      // Sort in reverse SemVer order so that the newest compatible version is chosen
+      versionManifests.sort((a, b) => compare(b.version, a.version, true));
+
+      let found = false;
+      for (const versionManifest of versionManifests) {
+        const mismatch = await context.hasMismatchedPeer(versionManifest);
+        if (mismatch) {
+          continue;
+        }
+
+        context.packageIdentifier = npa.resolve(versionManifest.name, versionManifest.version);
+        found = true;
+        break;
+      }
+
+      if (!found) {
+        task.output = "Unable to find compatible package. Using 'latest' tag.";
+      } else {
+        task.output = `Found compatible package version: ${color.blue(
+          context.packageIdentifier.toString(),
+        )}.`;
+      }
+    } else {
+      task.output = `Found compatible package version: ${color.blue(
+        context.packageIdentifier.toString(),
+      )}.`;
+    }
+  }
+
+  private async loadPackageInfoTask(
+    context: AddCommandTaskContext,
+    task: AddCommandTaskWrapper,
+    options: Options<AddCommandArgs>,
+  ): Promise<void> {
+    const { logger } = this.context;
+    const { verbose, registry } = options;
+
+    let manifest;
+    try {
+      manifest = await fetchPackageManifest(context.packageIdentifier.toString(), logger, {
+        registry,
+        verbose,
+        usingYarn: context.usingYarn,
+      });
+    } catch (e) {
+      assertIsError(e);
+      throw new CommandError(
+        `Unable to fetch package information for '${context.packageIdentifier}': ${e.message}`,
+      );
+    }
+
+    context.savePackage = manifest['ng-add']?.save;
+    context.collectionName = manifest.name;
+
+    if (await context.hasMismatchedPeer(manifest)) {
+      task.output = color.yellow(
+        figures.warning +
+          ' Package has unmet peer dependencies. Adding the package may not succeed.',
+      );
+    }
+  }
+
+  private async confirmInstallationTask(
+    context: AddCommandTaskContext,
+    task: AddCommandTaskWrapper,
+  ): Promise<void> {
+    if (!isTTY()) {
+      task.output =
+        `'--skip-confirmation' can be used to bypass installation confirmation. ` +
+        `Ensure package name is correct prior to '--skip-confirmation' option usage.`;
+      throw new CommandError('No terminal detected');
+    }
+
+    const { ListrInquirerPromptAdapter } = await import('@listr2/prompt-adapter-inquirer');
+    const { confirm } = await import('@inquirer/prompts');
+    const shouldProceed = await task.prompt(ListrInquirerPromptAdapter).run(confirm, {
+      message:
+        `The package ${color.blue(context.packageIdentifier.toString())} will be installed and executed.\n` +
+        'Would you like to proceed?',
+      default: true,
+      theme: { prefix: '' },
+    });
+
+    if (!shouldProceed) {
+      throw new CommandError('Command aborted');
+    }
+  }
+
+  private async installPackageTask(
+    context: AddCommandTaskContext,
+    task: AddCommandTaskWrapper,
+    options: Options<AddCommandArgs>,
+  ): Promise<void> {
+    const { packageManager } = this.context;
+    const { registry } = options;
+
+    // Only show if installation will actually occur
+    task.title = 'Installing package';
+
+    if (context.savePackage === false) {
+      task.title += ' in temporary location';
+
+      // Temporary packages are located in a different directory
+      // Hence we need to resolve them using the temp path
+      const { success, tempNodeModules } = await packageManager.installTemp(
+        context.packageIdentifier.toString(),
+        registry ? [`--registry="${registry}"`] : undefined,
+      );
+      const tempRequire = createRequire(tempNodeModules + '/');
+      assert(context.collectionName, 'Collection name should always be available');
+      const resolvedCollectionPath = tempRequire.resolve(
+        join(context.collectionName, 'package.json'),
+      );
+
+      if (!success) {
+        throw new CommandError('Unable to install package');
+      }
+
+      context.collectionName = dirname(resolvedCollectionPath);
+    } else {
+      const success = await packageManager.install(
+        context.packageIdentifier.toString(),
+        context.savePackage,
+        registry ? [`--registry="${registry}"`] : undefined,
+        undefined,
+      );
+
+      if (!success) {
+        throw new CommandError('Unable to install package');
+      }
     }
   }
 
