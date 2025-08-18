@@ -83,6 +83,7 @@ export default class AddCommandModule
   protected override allowPrivateSchematics = true;
   private readonly schematicName = 'ng-add';
   private rootRequire = createRequire(this.context.root + '/');
+  #projectVersionCache = new Map<string, string | null>();
 
   override async builder(argv: Argv): Promise<Argv<AddCommandArgs>> {
     const localYargs = (await super.builder(argv))
@@ -131,6 +132,7 @@ export default class AddCommandModule
   }
 
   async run(options: Options<AddCommandArgs> & OtherOptions): Promise<number | void> {
+    this.#projectVersionCache.clear();
     const { logger } = this.context;
     const { collection, skipConfirmation } = options;
 
@@ -567,6 +569,11 @@ export default class AddCommandModule
   }
 
   private async findProjectVersion(name: string): Promise<string | null> {
+    const cachedVersion = this.#projectVersionCache.get(name);
+    if (cachedVersion !== undefined) {
+      return cachedVersion;
+    }
+
     const { logger, root } = this.context;
     let installedPackage;
     try {
@@ -576,6 +583,7 @@ export default class AddCommandModule
     if (installedPackage) {
       try {
         const installed = await fetchPackageManifest(dirname(installedPackage), logger);
+        this.#projectVersionCache.set(name, installed.version);
 
         return installed.version;
       } catch {}
@@ -590,9 +598,13 @@ export default class AddCommandModule
       const version =
         projectManifest.dependencies?.[name] || projectManifest.devDependencies?.[name];
       if (version) {
+        this.#projectVersionCache.set(name, version);
+
         return version;
       }
     }
+
+    this.#projectVersionCache.set(name, null);
 
     return null;
   }
