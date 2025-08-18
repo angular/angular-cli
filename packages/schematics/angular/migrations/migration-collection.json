@@ -1,27 +1,7 @@
 {
   "schematics": {
-    "replace-provide-server-rendering-import": {
-      "version": "20.0.0",
-      "factory": "./replace-provide-server-rendering-import/migration",
-      "description": "Migrate imports of 'provideServerRendering' from '@angular/platform-server' to '@angular/ssr'."
-    },
-    "replace-provide-server-routing": {
-      "version": "20.0.0",
-      "factory": "./replace-provide-server-routing/migration",
-      "description": "Migrate 'provideServerRendering' to use 'withRoutes', and remove 'provideServerRouting' and 'provideServerRoutesConfig' from '@angular/ssr'."
-    },
-    "update-module-resolution": {
-      "version": "20.0.0",
-      "factory": "./update-module-resolution/migration",
-      "description": "Update 'moduleResolution' to 'bundler' in TypeScript configurations. You can read more about this, here: https://www.typescriptlang.org/tsconfig/#moduleResolution"
-    },
-    "previous-style-guide": {
-      "version": "20.0.0",
-      "factory": "./previous-style-guide/migration",
-      "description": "Update workspace generation defaults to maintain previous style guide behavior."
-    },
     "use-application-builder": {
-      "version": "20.0.0",
+      "version": "21.0.0",
       "factory": "./use-application-builder/migration",
       "description": "Migrate application projects to the new build system. Application projects that are using the '@angular-devkit/build-angular' package's 'browser' and/or 'browser-esbuild' builders will be migrated to use the new 'application' builder. You can read more about this, including known issues and limitations, here: https://angular.dev/tools/cli/build-system-migration",
       "optional": true,
@@ -29,7 +9,7 @@
       "documentation": "tools/cli/build-system-migration"
     },
     "remove-default-karma-config": {
-      "version": "20.2.0",
+      "version": "21.0.0",
       "factory": "./karma/migration",
       "description": "Remove any karma configuration files that only contain the default content. The default configuration is automatically available without a specific project file."
     }
