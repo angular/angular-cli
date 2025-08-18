@@ -49,7 +49,7 @@ interface AddCommandTaskContext {
   savePackage?: NgAddSaveDependency;
   collectionName?: string;
   executeSchematic: AddCommandModule['executeSchematic'];
-  hasMismatchedPeer: AddCommandModule['hasMismatchedPeer'];
+  getPeerDependencyConflicts: AddCommandModule['getPeerDependencyConflicts'];
 }
 
 type AddCommandTaskWrapper = ListrTaskWrapper<
@@ -69,6 +69,8 @@ const packageVersionExclusions: Record<string, string | Range> = {
   // @angular/material@7.x versions have unbounded peer dependency ranges (>=7.0.0).
   '@angular/material': '7.x',
 };
+
+const DEFAULT_CONFLICT_DISPLAY_LIMIT = 5;
 
 export default class AddCommandModule
   extends SchematicsCommandModule
@@ -158,7 +160,7 @@ export default class AddCommandModule
     const taskContext: AddCommandTaskContext = {
       packageIdentifier,
       executeSchematic: this.executeSchematic.bind(this),
-      hasMismatchedPeer: this.hasMismatchedPeer.bind(this),
+      getPeerDependencyConflicts: this.getPeerDependencyConflicts.bind(this),
     };
 
     const tasks = new Listr<AddCommandTaskContext>(
@@ -248,69 +250,83 @@ export default class AddCommandModule
       throw new CommandError(`Unable to load package information from registry: ${e.message}`);
     }
 
+    const rejectionReasons: string[] = [];
+
     // Start with the version tagged as `latest` if it exists
     const latestManifest = packageMetadata.tags['latest'];
     if (latestManifest) {
-      context.packageIdentifier = npa.resolve(latestManifest.name, latestManifest.version);
+      const latestConflicts = await this.getPeerDependencyConflicts(latestManifest);
+      if (latestConflicts) {
+        // 'latest' is invalid so search for most recent matching package
+        rejectionReasons.push(...latestConflicts);
+      } else {
+        context.packageIdentifier = npa.resolve(latestManifest.name, latestManifest.version);
+        task.output = `Found compatible package version: ${color.blue(latestManifest.version)}.`;
+
+        return;
+      }
     }
 
-    // Adjust the version based on name and peer dependencies
-    if (
-      latestManifest?.peerDependencies &&
-      Object.keys(latestManifest.peerDependencies).length === 0
-    ) {
-      task.output = `Found compatible package version: ${color.blue(latestManifest.version)}.`;
-    } else if (!latestManifest || (await context.hasMismatchedPeer(latestManifest))) {
-      // 'latest' is invalid so search for most recent matching package
+    // Allow prelease versions if the CLI itself is a prerelease
+    const allowPrereleases = prerelease(VERSION.full);
 
-      // Allow prelease versions if the CLI itself is a prerelease
-      const allowPrereleases = prerelease(VERSION.full);
-
-      const versionExclusions = packageVersionExclusions[packageMetadata.name];
-      const versionManifests = Object.values(packageMetadata.versions).filter(
-        (value: PackageManifest) => {
-          // Prerelease versions are not stable and should not be considered by default
-          if (!allowPrereleases && prerelease(value.version)) {
-            return false;
-          }
-          // Deprecated versions should not be used or considered
-          if (value.deprecated) {
-            return false;
-          }
-          // Excluded package versions should not be considered
-          if (
-            versionExclusions &&
-            satisfies(value.version, versionExclusions, { includePrerelease: true })
-          ) {
-            return false;
-          }
-
-          return true;
-        },
-      );
-
-      // Sort in reverse SemVer order so that the newest compatible version is chosen
-      versionManifests.sort((a, b) => compare(b.version, a.version, true));
-
-      let found = false;
-      for (const versionManifest of versionManifests) {
-        const mismatch = await context.hasMismatchedPeer(versionManifest);
-        if (mismatch) {
-          continue;
+    const versionExclusions = packageVersionExclusions[packageMetadata.name];
+    const versionManifests = Object.values(packageMetadata.versions).filter(
+      (value: PackageManifest) => {
+        // Already checked the 'latest' version
+        if (latestManifest.version === value.version) {
+          return false;
+        }
+        // Prerelease versions are not stable and should not be considered by default
+        if (!allowPrereleases && prerelease(value.version)) {
+          return false;
+        }
+        // Deprecated versions should not be used or considered
+        if (value.deprecated) {
+          return false;
+        }
+        // Excluded package versions should not be considered
+        if (
+          versionExclusions &&
+          satisfies(value.version, versionExclusions, { includePrerelease: true })
+        ) {
+          return false;
         }
 
-        context.packageIdentifier = npa.resolve(versionManifest.name, versionManifest.version);
-        found = true;
-        break;
+        return true;
+      },
+    );
+
+    // Sort in reverse SemVer order so that the newest compatible version is chosen
+    versionManifests.sort((a, b) => compare(b.version, a.version, true));
+
+    let found = false;
+    for (const versionManifest of versionManifests) {
+      const conflicts = await this.getPeerDependencyConflicts(versionManifest);
+      if (conflicts) {
+        if (options.verbose || rejectionReasons.length < DEFAULT_CONFLICT_DISPLAY_LIMIT) {
+          rejectionReasons.push(...conflicts);
+        }
+        continue;
       }
 
-      if (!found) {
-        task.output = "Unable to find compatible package. Using 'latest' tag.";
-      } else {
-        task.output = `Found compatible package version: ${color.blue(
-          context.packageIdentifier.toString(),
-        )}.`;
+      context.packageIdentifier = npa.resolve(versionManifest.name, versionManifest.version);
+      found = true;
+      break;
+    }
+
+    if (!found) {
+      let message = `Unable to find compatible package. Using 'latest' tag.`;
+      if (rejectionReasons.length > 0) {
+        message +=
+          '\nThis is often because of incompatible peer dependencies.\n' +
+          'These versions were rejected due to the following conflicts:\n' +
+          rejectionReasons
+            .slice(0, options.verbose ? undefined : DEFAULT_CONFLICT_DISPLAY_LIMIT)
+            .map((r) => `  - ${r}`)
+            .join('\n');
       }
+      task.output = message;
     } else {
       task.output = `Found compatible package version: ${color.blue(
         context.packageIdentifier.toString(),
@@ -343,7 +359,7 @@ export default class AddCommandModule
     context.savePackage = manifest['ng-add']?.save;
     context.collectionName = manifest.name;
 
-    if (await context.hasMismatchedPeer(manifest)) {
+    if (await this.getPeerDependencyConflicts(manifest)) {
       task.output = color.yellow(
         figures.warning +
           ' Package has unmet peer dependencies. Adding the package may not succeed.',
@@ -563,7 +579,8 @@ export default class AddCommandModule
     return null;
   }
 
-  private async hasMismatchedPeer(manifest: PackageManifest): Promise<boolean> {
+  private async getPeerDependencyConflicts(manifest: PackageManifest): Promise<string[] | false> {
+    const conflicts: string[] = [];
     for (const peer in manifest.peerDependencies) {
       let peerIdentifier;
       try {
@@ -586,7 +603,10 @@ export default class AddCommandModule
             !intersects(version, peerIdentifier.rawSpec, options) &&
             !satisfies(version, peerIdentifier.rawSpec, options)
           ) {
-            return true;
+            conflicts.push(
+              `Package "${manifest.name}@${manifest.version}" has an incompatible peer dependency to "` +
+                `${peer}@${peerIdentifier.rawSpec}" (requires "${version}" in project).`,
+            );
           }
         } catch {
           // Not found or invalid so ignore
@@ -598,6 +618,6 @@ export default class AddCommandModule
       }
     }
 
-    return false;
+    return conflicts.length > 0 && conflicts;
   }
 }
