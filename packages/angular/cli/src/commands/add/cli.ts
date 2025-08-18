@@ -610,43 +610,50 @@ export default class AddCommandModule
   }
 
   private async getPeerDependencyConflicts(manifest: PackageManifest): Promise<string[] | false> {
-    const conflicts: string[] = [];
-    for (const peer in manifest.peerDependencies) {
+    if (!manifest.peerDependencies) {
+      return false;
+    }
+
+    const checks = Object.entries(manifest.peerDependencies).map(async ([peer, range]) => {
       let peerIdentifier;
       try {
-        peerIdentifier = npa.resolve(peer, manifest.peerDependencies[peer]);
+        peerIdentifier = npa.resolve(peer, range);
       } catch {
         this.context.logger.warn(`Invalid peer dependency ${peer} found in package.`);
-        continue;
+
+        return null;
       }
 
-      if (peerIdentifier.type === 'version' || peerIdentifier.type === 'range') {
-        try {
-          const version = await this.findProjectVersion(peer);
-          if (!version) {
-            continue;
-          }
-
-          const options = { includePrerelease: true };
-
-          if (
-            !intersects(version, peerIdentifier.rawSpec, options) &&
-            !satisfies(version, peerIdentifier.rawSpec, options)
-          ) {
-            conflicts.push(
-              `Package "${manifest.name}@${manifest.version}" has an incompatible peer dependency to "` +
-                `${peer}@${peerIdentifier.rawSpec}" (requires "${version}" in project).`,
-            );
-          }
-        } catch {
-          // Not found or invalid so ignore
-          continue;
-        }
-      } else {
+      if (peerIdentifier.type !== 'version' && peerIdentifier.type !== 'range') {
         // type === 'tag' | 'file' | 'directory' | 'remote' | 'git'
-        // Cannot accurately compare these as the tag/location may have changed since install
+        // Cannot accurately compare these as the tag/location may have changed since install.
+        return null;
       }
-    }
+
+      try {
+        const version = await this.findProjectVersion(peer);
+        if (!version) {
+          return null;
+        }
+
+        const options = { includePrerelease: true };
+        if (
+          !intersects(version, peerIdentifier.rawSpec, options) &&
+          !satisfies(version, peerIdentifier.rawSpec, options)
+        ) {
+          return (
+            `Package "${manifest.name}@${manifest.version}" has an incompatible peer dependency to "` +
+            `${peer}@${peerIdentifier.rawSpec}" (requires "${version}" in project).`
+          );
+        }
+      } catch {
+        // Not found or invalid so ignore
+      }
+
+      return null;
+    });
+
+    const conflicts = (await Promise.all(checks)).filter((result): result is string => !!result);
 
     return conflicts.length > 0 && conflicts;
   }
