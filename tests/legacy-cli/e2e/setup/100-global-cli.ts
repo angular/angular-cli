@@ -7,9 +7,10 @@ const PACKAGE_MANAGER_VERSION = {
   'yarn': '1.22.22',
   'pnpm': '10.17.1',
   'bun': '1.3.2',
+  'deno': '2.4.4',
 };
 
-export default async function () {
+export default async function() {
   const argv = getGlobalVariable('argv');
   if (argv.noglobal) {
     return;

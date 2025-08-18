@@ -2,7 +2,7 @@ import { equal } from 'node:assert';
 import { join, resolve } from 'node:path';
 import { expectFileToExist, readFile, rimraf } from '../../utils/fs';
 import { getActivePackageManager } from '../../utils/packages';
-import { silentBun, silentNpm, silentPnpm, silentYarn } from '../../utils/process';
+import { silentBun, silentDeno, silentNpm, silentPnpm, silentYarn } from '../../utils/process';
 
 export default async function () {
   const currentDirectory = process.cwd();
@@ -24,6 +24,10 @@ export default async function () {
         break;
       case 'bun':
         await silentBun('create', '@angular', projectName, '--style=scss');
+
+        break;
+      case 'deno':
+        await silentDeno('init', '--npm', '@angular', projectName, '--style=scss');
 
         break;
       case 'pnpm':
