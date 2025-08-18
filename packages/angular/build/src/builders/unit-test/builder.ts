@@ -191,6 +191,7 @@ export async function* execute(
     ...runnerBuildOptions,
     watch: normalizedOptions.watch,
     tsConfig: normalizedOptions.tsConfig,
+    progress: normalizedOptions.buildProgress ?? buildTargetOptions.progress,
   } satisfies ApplicationBuilderInternalOptions;
 
   yield* runBuildAndTest(executor, applicationBuildOptions, context, finalExtensions);
