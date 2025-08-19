@@ -128,7 +128,6 @@ ts_project(
     ],
     data = RUNTIME_ASSETS,
     deps = [
-        ":node_modules/@ampproject/remapping",
         ":node_modules/@angular-devkit/architect",
         ":node_modules/@angular-devkit/build-webpack",
         ":node_modules/@angular-devkit/core",
@@ -144,6 +143,7 @@ ts_project(
         ":node_modules/@babel/preset-env",
         ":node_modules/@babel/runtime",
         ":node_modules/@discoveryjs/json-ext",
+        ":node_modules/@jridgewell/remapping",
         ":node_modules/@ngtools/webpack",
         ":node_modules/@web/test-runner",
         ":node_modules/ansi-colors",
