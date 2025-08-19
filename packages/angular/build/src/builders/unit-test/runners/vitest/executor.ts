@@ -9,7 +9,8 @@
 import type { BuilderOutput } from '@angular-devkit/architect';
 import assert from 'node:assert';
 import { randomUUID } from 'node:crypto';
-import { createRequire } from 'node:module';
+import { rmSync } from 'node:fs';
+import { rm } from 'node:fs/promises';
 import path from 'node:path';
 import type { InlineConfig, Vitest } from 'vitest/node';
 import { assertIsError } from '../../../../utils/error';
@@ -30,10 +31,17 @@ export class VitestExecutor implements TestExecutor {
   private readonly outputPath: string;
   private latestBuildResult: FullResult | IncrementalResult | undefined;
 
+  // Graceful shutdown signal handler
+  // This is needed to remove the temporary output directory on Ctrl+C
+  private readonly sigintListener = () => {
+    rmSync(this.outputPath, { recursive: true, force: true });
+  };
+
   constructor(projectName: string, options: NormalizedUnitTestBuilderOptions) {
     this.projectName = projectName;
     this.options = options;
     this.outputPath = toPosixPath(path.join(options.workspaceRoot, generateOutputPath()));
+    process.on('SIGINT', this.sigintListener);
   }
 
   async *execute(buildResult: FullResult | IncrementalResult): AsyncIterable<BuilderOutput> {
@@ -78,7 +86,9 @@ export class VitestExecutor implements TestExecutor {
   }
 
   async [Symbol.asyncDispose](): Promise<void> {
+    process.off('SIGINT', this.sigintListener);
     await this.vitest?.close();
+    await rm(this.outputPath, { recursive: true, force: true });
   }
 
   private async initializeVitest(): Promise<Vitest> {
