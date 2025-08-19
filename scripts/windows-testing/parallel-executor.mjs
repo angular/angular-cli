@@ -21,6 +21,15 @@ async function main() {
   const tasks = [];
   const progress = {};
 
+  console.log('---');
+  console.warn({
+    targetName,
+    testEntrypoint,
+    testWorkingDir,
+    testArgs,
+  });
+  console.log('---');
+
   for (let i = 0; i < maxShards; i++) {
     tasks.push(
       spawnTest(
