@@ -15,7 +15,7 @@ import type { InlineConfig, Vitest } from 'vitest/node';
 import { assertIsError } from '../../../../utils/error';
 import { loadEsmModule } from '../../../../utils/load-esm';
 import { toPosixPath } from '../../../../utils/path';
-import type { FullResult, IncrementalResult } from '../../../application/results';
+import { type FullResult, type IncrementalResult, ResultKind } from '../../../application/results';
 import { writeTestFiles } from '../../../karma/application_builder';
 import { NormalizedUnitTestBuilderOptions } from '../../options';
 import type { TestExecutor } from '../api';
@@ -40,12 +40,41 @@ export class VitestExecutor implements TestExecutor {
     await writeTestFiles(buildResult.files, this.outputPath);
 
     this.latestBuildResult = buildResult;
+
+    // Initialize Vitest if not already present.
     this.vitest ??= await this.initializeVitest();
+    const vitest = this.vitest;
+
+    let testResults;
+    if (buildResult.kind === ResultKind.Incremental) {
+      const addedFiles = buildResult.added.map((file) => path.join(this.outputPath, file));
+      const modifiedFiles = buildResult.modified.map((file) => path.join(this.outputPath, file));
+
+      if (addedFiles.length === 0 && modifiedFiles.length === 0) {
+        yield { success: true };
+
+        return;
+      }
+
+      // If new files are added, use `start` to trigger test discovery.
+      // Also pass modified files to `start` to ensure they are re-run.
+      if (addedFiles.length > 0) {
+        await vitest.start([...addedFiles, ...modifiedFiles]);
+      } else {
+        // For modified files only, use the more efficient `rerunTestSpecifications`
+        const specsToRerun = modifiedFiles.flatMap((file) => vitest.getModuleSpecifications(file));
+
+        if (specsToRerun.length > 0) {
+          modifiedFiles.forEach((file) => vitest.invalidateFile(file));
+          testResults = await vitest.rerunTestSpecifications(specsToRerun);
+        }
+      }
+    }
 
     // Check if all the tests pass to calculate the result
-    const testModules = this.vitest.state.getTestModules();
+    const testModules = testResults?.testModules;
 
-    yield { success: testModules.every((testModule) => testModule.ok()) };
+    yield { success: testModules?.every((testModule) => testModule.ok()) ?? true };
   }
 
   async [Symbol.asyncDispose](): Promise<void> {
@@ -53,7 +82,7 @@ export class VitestExecutor implements TestExecutor {
   }
 
   private async initializeVitest(): Promise<Vitest> {
-    const { codeCoverage, reporters, watch, workspaceRoot, setupFiles, browsers, debug } =
+    const { codeCoverage, reporters, workspaceRoot, setupFiles, browsers, debug, watch } =
       this.options;
     const { outputPath, projectName, latestBuildResult } = this;
 
@@ -101,7 +130,7 @@ export class VitestExecutor implements TestExecutor {
 
     return startVitest(
       'test',
-      undefined /* cliFilters */,
+      undefined,
       {
         // Disable configuration file resolution/loading
         config: false,
@@ -115,6 +144,11 @@ export class VitestExecutor implements TestExecutor {
         ...debugOptions,
       },
       {
+        server: {
+          // Disable the actual file watcher. The boolean watch option above should still
+          // be enabled as it controls other internal behavior related to rerunning tests.
+          watch: null,
+        },
         plugins: [
           {
             name: 'angular:project-init',
