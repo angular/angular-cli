@@ -140,6 +140,7 @@ npm.npm_translate_lock(
         "//modules/testing/builder:package.json",
         "//packages/angular/build:package.json",
         "//packages/angular/cli:package.json",
+        "//packages/angular/create/package.json",
         "//packages/angular/pwa:package.json",
         "//packages/angular/ssr:package.json",
         "//packages/angular_devkit/architect:package.json",
