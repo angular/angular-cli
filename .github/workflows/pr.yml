@@ -128,7 +128,6 @@ jobs:
         run: pnpm bazel test --test_env=E2E_SHARD_TOTAL=6 --test_env=E2E_SHARD_INDEX=${{ matrix.shard }} --config=e2e //tests/legacy-cli:e2e.${{ matrix.subset }}_node${{ matrix.node }}
 
   e2e-windows-subset:
-    needs: build
     runs-on: windows-2025
     steps:
       - name: Initialize environment
