@@ -9,7 +9,7 @@ js_library(
         "index.d.ts",
     ],
     deps = [
-        "//:node_modules/beasties",
+        "//packages/angular/ssr:node_modules/beasties",
     ],
 )
 
@@ -27,9 +27,9 @@ rollup.rollup(
         "//:node_modules/@rollup/plugin-alias",
         "//:node_modules/@rollup/plugin-commonjs",
         "//:node_modules/@rollup/plugin-node-resolve",
-        "//:node_modules/beasties",
         "//:node_modules/rollup-license-plugin",
         "//:node_modules/unenv",
+        "//packages/angular/ssr:node_modules/beasties",
     ],
     outs = [
         "THIRD_PARTY_LICENSES.txt",
@@ -39,7 +39,7 @@ rollup.rollup(
     args = [
         "--format=esm",
         "--config=$(rootpath rollup.config.mjs)",
-        "--input=node_modules/beasties/dist/index.mjs",
+        "--input=packages/angular/ssr/node_modules/beasties/dist/index.mjs",
         "--sourcemap=true",
         "--dir=packages/angular/ssr/third_party/beasties",
     ],
