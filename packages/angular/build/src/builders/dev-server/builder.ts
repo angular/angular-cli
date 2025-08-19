@@ -18,7 +18,7 @@ import {
 import { normalizeOptions } from './options';
 import type { DevServerBuilderOutput } from './output';
 import type { Schema as DevServerBuilderOptions } from './schema';
-import { serveWithVite } from './vite-server';
+import { serveWithVite } from './vite';
 
 /**
  * A Builder that executes a development server based on the provided browser target option.
