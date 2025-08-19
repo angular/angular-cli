@@ -4,7 +4,11 @@
   "ignorePaths": ["tests/legacy-cli/e2e/assets/**", "tests/schematics/update/packages/**"],
   "ignoreDeps": ["io_bazel_rules_webtesting"],
   "postUpgradeTasks": {
-    "commands": ["git restore .npmrc", "pnpm install --frozen-lockfile", "pnpm bazel mod tidy"],
+    "commands": [
+      "git restore .npmrc",
+      "pnpm install --frozen-lockfile",
+      "pnpm bazel mod deps --lockfile_mode=update"
+    ],
     "fileFilters": ["MODULE.bazel.lock"],
     "executionMode": "branch"
   },
