@@ -3,6 +3,11 @@
   "extends": ["github>angular/dev-infra//renovate-presets/default.json5"],
   "ignorePaths": ["tests/legacy-cli/e2e/assets/**", "tests/schematics/update/packages/**"],
   "ignoreDeps": ["io_bazel_rules_webtesting"],
+  "postUpgradeTasks": {
+    "commands": ["git restore .npmrc", "pnpm install --frozen-lockfile", "pnpm bazel mod tidy"],
+    "fileFilters": ["MODULE.bazel.lock"],
+    "executionMode": "branch"
+  },
   "packageRules": [
     {
       "matchFileNames": [
