@@ -176,3 +176,4 @@ function exec(command: string, captureStdout?: true) {
     return stdout.toString().trim();
   }
 }
+//json.stringify
