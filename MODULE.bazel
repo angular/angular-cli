@@ -9,10 +9,22 @@ bazel_dep(name = "rules_nodejs", version = "6.5.0")
 bazel_dep(name = "aspect_rules_js", version = "2.4.2")
 bazel_dep(name = "aspect_rules_ts", version = "3.6.3")
 bazel_dep(name = "rules_pkg", version = "0.8.1")
+
 # Alow for usage of rules_pkg@0.8.1 even though other deps want a later verison.
-multiple_version_override(module_name="rules_pkg", versions = ["0.8.1", "1.1.0"])
+multiple_version_override(
+    module_name = "rules_pkg",
+    versions = [
+        "0.8.1",
+        "1.1.0",
+    ],
+)
+
 bazel_dep(name = "rules_python", version = "1.5.3")
-single_version_override(module_name="rules_python", version = "1.5.3")
+single_version_override(
+    module_name = "rules_python",
+    version = "1.5.3",
+)
+
 bazel_dep(name = "aspect_bazel_lib", version = "2.20.0")
 bazel_dep(name = "bazel_skylib", version = "1.8.1")
 bazel_dep(name = "aspect_rules_esbuild", version = "0.22.1")
@@ -23,18 +35,21 @@ git_override(
     commit = "a957283cdef0ade1fc6d1d7404f14577cebd3642",
     remote = "https://github.com/devversion/rules_angular.git",
 )
+
 bazel_dep(name = "devinfra")
 git_override(
     module_name = "devinfra",
     commit = "7a11f99c467ca5ae4411c27beeec4300e32b616a",
     remote = "https://github.com/angular/dev-infra.git",
 )
+
 bazel_dep(name = "rules_sass")
 git_override(
     module_name = "rules_sass",
     commit = "76078d5e9776a0080dcee496e90b88d8a6179c19",
     remote = "https://github.com/devversion/rules_sass.git",
 )
+
 bazel_dep(name = "rules_browsers")
 git_override(
     module_name = "rules_browsers",
@@ -42,7 +57,9 @@ git_override(
     remote = "https://github.com/devversion/rules_browsers.git",
 )
 
+# The below is needed until https://github.com/bazel-contrib/rules_nodejs/pull/3853 is merged and released.
 NODE_24_VERSION = "24.0.0"
+
 NODE_24_REPO = {
     "24.0.0-darwin_arm64": ("node-v24.0.0-darwin-arm64.tar.gz", "node-v24.0.0-darwin-arm64", "194e2f3dd3ec8c2adcaa713ed40f44c5ca38467880e160974ceac1659be60121"),
     "24.0.0-darwin_amd64": ("node-v24.0.0-darwin-x64.tar.gz", "node-v24.0.0-darwin-x64", "f716b3ce14a7e37a6cbf97c9de10d444d7da07ef833cd8da81dd944d111e6a4a"),
@@ -60,43 +77,55 @@ node.toolchain(
     node_version = NODE_24_VERSION,
 )
 use_repo(node, "nodejs_toolchains")
+use_repo(node, "nodejs_darwin_amd64")
+use_repo(node, "nodejs_darwin_arm64")
+use_repo(node, "nodejs_linux_amd64")
+use_repo(node, "nodejs_linux_arm64")
+use_repo(node, "nodejs_linux_ppc64le")
+use_repo(node, "nodejs_linux_s390x")
+use_repo(node, "nodejs_windows_amd64")
 
-node.toolchain(
+node_dev = use_extension("@rules_nodejs//nodejs:extensions.bzl", "node", dev_dependency = True)
+
+# Node.js 20
+node_dev.toolchain(
     name = "node20",
-    node_repositories = {
-        "20.19.0-darwin_arm64": ("node-v20.19.0-darwin-arm64.tar.gz", "node-v20.19.0-darwin-arm64", "c016cd1975a264a29dc1b07c6fbe60d5df0a0c2beb4113c0450e3d998d1a0d9c"),
-        "20.19.0-darwin_amd64": ("node-v20.19.0-darwin-x64.tar.gz", "node-v20.19.0-darwin-x64", "a8554af97d6491fdbdabe63d3a1cfb9571228d25a3ad9aed2df856facb131b20"),
-        "20.19.0-linux_arm64": ("node-v20.19.0-linux-arm64.tar.xz", "node-v20.19.0-linux-arm64", "dbe339e55eb393955a213e6b872066880bb9feceaa494f4d44c7aac205ec2ab9"),
-        "20.19.0-linux_ppc64le": ("node-v20.19.0-linux-ppc64le.tar.xz", "node-v20.19.0-linux-ppc64le", "84937108f005679e60b486ed8e801cebfe923f02b76d8e710463d32f82181f65"),
-        "20.19.0-linux_s390x": ("node-v20.19.0-linux-s390x.tar.xz", "node-v20.19.0-linux-s390x", "11f8ee99d792a83bba7b29911e0229dd6cd5e88987d7416346067db1cc76d89a"),
-        "20.19.0-linux_amd64": ("node-v20.19.0-linux-x64.tar.xz", "node-v20.19.0-linux-x64", "b4e336584d62abefad31baecff7af167268be9bb7dd11f1297112e6eed3ca0d5"),
-        "20.19.0-windows_amd64": ("node-v20.19.0-win-x64.zip", "node-v20.19.0-win-x64", "be72284c7bc62de07d5a9fd0ae196879842c085f11f7f2b60bf8864c0c9d6a4f"),
-    },
     node_version = "20.19.0",
 )
-use_repo(node, "node20_toolchains")
+use_repo(node_dev, "node20_linux_amd64")
+use_repo(node_dev, "node20_darwin_arm64")
+use_repo(node_dev, "node20_darwin_amd64")
+use_repo(node_dev, "node20_linux_arm64")
+use_repo(node_dev, "node20_linux_s390x")
+use_repo(node_dev, "node20_linux_ppc64le")
+use_repo(node_dev, "node20_windows_amd64")
 
-node.toolchain(
+# Node.js 22
+node_dev.toolchain(
     name = "node22",
-    node_repositories = {
-        "22.12.0-darwin_arm64": ("node-v22.12.0-darwin-arm64.tar.gz", "node-v22.12.0-darwin-arm64", "293dcc6c2408da21562d135b0412525e381bb6fe150d688edb58fe850d0f3e13"),
-        "22.12.0-darwin_amd64": ("node-v22.12.0-darwin-x64.tar.gz", "node-v22.12.0-darwin-x64", "52bc25dd026db7247c3c00439afdb83e95087248267f02d6c1a7250d1f896173"),
-        "22.12.0-linux_arm64": ("node-v22.12.0-linux-arm64.tar.xz", "node-v22.12.0-linux-arm64", "8cfd5a8b9afae5a2e0bd86b0148ca31d2589c0ea669c2d0b11c132e35d90ed68"),
-        "22.12.0-linux_ppc64le": ("node-v22.12.0-linux-ppc64le.tar.xz", "node-v22.12.0-linux-ppc64le", "199a606ba1ee86cce6d6b369c71f9d00873d2836a6662592afc3b6a5923e2004"),
-        "22.12.0-linux_s390x": ("node-v22.12.0-linux-s390x.tar.xz", "node-v22.12.0-linux-s390x", "9b517f8006eb4b451d40c461cbe64f93c6455566dbe2613387ab02412bc06d35"),
-        "22.12.0-linux_amd64": ("node-v22.12.0-linux-x64.tar.xz", "node-v22.12.0-linux-x64", "22982235e1b71fa8850f82edd09cdae7e3f32df1764a9ec298c72d25ef2c164f"),
-        "22.12.0-windows_amd64": ("node-v22.12.0-win-x64.zip", "node-v22.12.0-win-x64", "2b8f2256382f97ad51e29ff71f702961af466c4616393f767455501e6aece9b8"),
-    },
     node_version = "22.12.0",
 )
-use_repo(node, "node22_toolchains")
+use_repo(node_dev, "node22_linux_amd64")
+use_repo(node_dev, "node22_darwin_arm64")
+use_repo(node_dev, "node22_darwin_amd64")
+use_repo(node_dev, "node22_linux_arm64")
+use_repo(node_dev, "node22_linux_s390x")
+use_repo(node_dev, "node22_linux_ppc64le")
+use_repo(node_dev, "node22_windows_amd64")
 
-node.toolchain(
+# Node.js 24
+node_dev.toolchain(
     name = "node24",
     node_repositories = NODE_24_REPO,
     node_version = NODE_24_VERSION,
 )
-use_repo(node, "node24_toolchains")
+use_repo(node_dev, "node24_linux_amd64")
+use_repo(node_dev, "node24_darwin_arm64")
+use_repo(node_dev, "node24_darwin_amd64")
+use_repo(node_dev, "node24_linux_arm64")
+use_repo(node_dev, "node24_linux_s390x")
+use_repo(node_dev, "node24_linux_ppc64le")
+use_repo(node_dev, "node24_windows_amd64")
 
 npm = use_extension("@aspect_rules_js//npm:extensions.bzl", "npm")
 npm.npm_translate_lock(
@@ -143,12 +172,12 @@ use_repo(npm, "npm")
 
 rules_ts_ext = use_extension("@aspect_rules_ts//ts:extensions.bzl", "ext")
 rules_ts_ext.deps(
+    name = "angular_cli_npm_typescript",
     # Obtained by: curl --silent https://registry.npmjs.org/typescript/5.9.2 | jq -r '.dist.integrity'
     ts_integrity = "sha512-CWBzXQrc/qOkhidw1OzBTQuYRbfyxDXJMVJ1XNwUHGROVmuaeiEm3OslpZ1RV96d7SKKjZKrSJu3+t/xlw3R9A==",
     ts_version_from = "//:package.json",
-    name = "angular_cli_npm_typescript",
 )
-use_repo(rules_ts_ext, **{"npm_typescript":"angular_cli_npm_typescript"})
+use_repo(rules_ts_ext, **{"npm_typescript": "angular_cli_npm_typescript"})
 
 rules_angular = use_extension("@rules_angular//setup:extensions.bzl", "rules_angular")
 rules_angular.setup(
@@ -156,7 +185,7 @@ rules_angular.setup(
     angular_compiler_cli = "//:node_modules/@angular/compiler-cli",
     typescript = "//:node_modules/typescript",
 )
-use_repo(rules_angular, **{"rules_angular_configurable_deps":"components_rules_angular_configurable_deps"})
+use_repo(rules_angular, **{"rules_angular_configurable_deps": "components_rules_angular_configurable_deps"})
 
 register_toolchains(
     "@devinfra//bazel/git-toolchain:git_linux_toolchain",
