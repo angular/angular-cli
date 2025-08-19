@@ -25,7 +25,7 @@ async function main() {
   console.log('---');
 
   console.log('---');
-  readdirSync(testWorkingDir).forEach((file) => {
+  readdirSync(testWorkingDir + '/external').forEach((file) => {
     console.log(file);
   });
   console.log('---');
