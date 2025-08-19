@@ -8,6 +8,7 @@
 
 import * as child_process from 'node:child_process';
 import path from 'node:path';
+import { readdirSync } from 'node:fs';
 import { stripVTControlCharacters } from 'node:util';
 
 const initialStatusRegex = /Running (\d+) tests/;
@@ -21,6 +22,12 @@ async function main() {
   const tasks = [];
   const progress = {};
 
+  console.log('---');
+
+  console.log('---');
+  readdirSync(testWorkingDir).forEach((file) => {
+    console.log(file);
+  });
   console.log('---');
   console.warn({
     targetName,
