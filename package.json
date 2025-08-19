@@ -129,7 +129,7 @@
     "rollup-plugin-sourcemaps2": "0.5.3",
     "prettier": "^3.0.0",
     "protractor": "~7.0.0",
-    "puppeteer": "18.2.1",
+    "puppeteer": "24.16.2",
     "quicktype-core": "23.2.6",
     "rollup": "4.46.2",
     "rollup-license-plugin": "~3.0.1",
