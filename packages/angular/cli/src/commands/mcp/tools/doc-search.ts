@@ -101,7 +101,7 @@ function createDocSearchHandler() {
           const response = await fetch(url);
           if (response.ok) {
             const html = await response.text();
-            const mainContent = extractBodyContent(html);
+            const mainContent = extractMainContent(html);
             if (mainContent) {
               topText += `\n\n--- DOCUMENTATION CONTENT ---\n${mainContent}`;
             }
@@ -129,24 +129,23 @@ function createDocSearchHandler() {
 }
 
 /**
- * Extracts the content of the `<body>` element from an HTML string.
+ * Extracts the content of the `<main>` element from an HTML string.
  *
  * @param html The HTML content of a page.
- * @returns The content of the `<body>` element, or `undefined` if not found.
+ * @returns The content of the `<main>` element, or `undefined` if not found.
  */
-function extractBodyContent(html: string): string | undefined {
-  // TODO: Use '<main>' element instead of '<body>' when available in angular.dev HTML.
-  const mainTagStart = html.indexOf('<body');
+function extractMainContent(html: string): string | undefined {
+  const mainTagStart = html.indexOf('<main');
   if (mainTagStart === -1) {
     return undefined;
   }
 
-  const mainTagEnd = html.lastIndexOf('</body>');
+  const mainTagEnd = html.lastIndexOf('</main>');
   if (mainTagEnd <= mainTagStart) {
     return undefined;
   }
 
-  // Add 7 to include '</body>'
+  // Add 7 to include '</main>'
   return html.substring(mainTagStart, mainTagEnd + 7);
 }
 
