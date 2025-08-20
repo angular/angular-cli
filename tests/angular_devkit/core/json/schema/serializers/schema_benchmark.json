@@ -547,7 +547,7 @@
     },
     "packageManager": {
       "description": "Specify which package manager tool to use.",
-      "enum": ["npm", "cnpm", "yarn", "default"],
+      "enum": ["npm", "yarn", "default"],
       "default": "default",
       "type": "string"
     },
