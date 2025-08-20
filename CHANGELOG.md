@@ -1,3 +1,15 @@
+<a name="21.0.0-next.0"></a>
+
+# 21.0.0-next.0 (2025-08-20)
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                              |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------- |
+| [0505f954d](https://github.com/angular/angular-cli/commit/0505f954dcf3b3339749ff461592d46d8ecc5e23) | fix  | allow unit-test progress option passthrough for building |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="20.2.0"></a>
 
 # 20.2.0 (2025-08-20)
