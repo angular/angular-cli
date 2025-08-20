@@ -62,8 +62,8 @@ e2e_suites(
 
         # Dynamically loaded.
         "//tests/legacy-cli/e2e/assets",
-        "//:node_modules/verdaccio",
-        "//:node_modules/verdaccio-auth-memory",
+        "//tests:node_modules/verdaccio",
+        "//tests:node_modules/verdaccio-auth-memory",
 
         # Extra runtime deps due to bundling issues.
         # TODO: Clean this up.

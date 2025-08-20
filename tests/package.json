@@ -2,6 +2,8 @@
   "devDependencies": {
     "@angular-devkit/schematics": "workspace:*",
     "rxjs": "7.8.2",
-    "tree-kill": "1.2.2"
+    "tree-kill": "1.2.2",
+    "verdaccio-auth-memory": "^10.0.0",
+    "verdaccio": "6.1.6"
   }
 }
