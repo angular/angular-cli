@@ -40,7 +40,7 @@
     "packageManager": {
       "description": "The package manager to use for installing dependencies.",
       "type": "string",
-      "enum": ["npm", "yarn", "pnpm", "cnpm", "bun"]
+      "enum": ["npm", "yarn", "pnpm", "bun"]
     }
   },
   "required": ["name", "version"]

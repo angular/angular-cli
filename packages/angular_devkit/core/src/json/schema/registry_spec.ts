@@ -118,7 +118,7 @@ describe('CoreSchemaRegistry', () => {
 
     const validator = await registry.compile({
       properties: {
-        packageManager: { type: 'string', enum: ['npm', 'yarn', 'pnpm', 'cnpm'] },
+        packageManager: { type: 'string', enum: ['npm', 'yarn', 'pnpm'] },
       },
       additionalProperties: false,
     });
@@ -126,7 +126,7 @@ describe('CoreSchemaRegistry', () => {
     const result = await validator(data);
     expect(result.success).toBe(false);
     expect(new SchemaValidationException(result.errors).message).toContain(
-      `Data path "/packageManager" must be equal to one of the allowed values. Allowed values are: "npm", "yarn", "pnpm", "cnpm".`,
+      `Data path "/packageManager" must be equal to one of the allowed values. Allowed values are: "npm", "yarn", "pnpm".`,
     );
   });
 
