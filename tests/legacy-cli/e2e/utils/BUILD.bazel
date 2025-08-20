@@ -19,9 +19,9 @@ ts_project(
         "//:node_modules/protractor",
         "//:node_modules/semver",
         "//:node_modules/tar",
-        "//:node_modules/verdaccio",
-        "//:node_modules/verdaccio-auth-memory",
         "//tests:node_modules/rxjs",
         "//tests:node_modules/tree-kill",
+        "//tests:node_modules/verdaccio",
+        "//tests:node_modules/verdaccio-auth-memory",
     ],
 )

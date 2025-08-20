@@ -307,12 +307,6 @@ importers:
       unenv:
         specifier: ^1.10.0
         version: 1.10.0
-      verdaccio:
-        specifier: 6.1.6
-        version: 6.1.6(encoding@0.1.13)
-      verdaccio-auth-memory:
-        specifier: ^10.0.0
-        version: 10.3.1
       yargs-parser:
         specifier: 22.0.0
         version: 22.0.0
@@ -894,6 +888,12 @@ importers:
       tree-kill:
         specifier: 1.2.2
         version: 1.2.2
+      verdaccio:
+        specifier: 6.1.6
+        version: 6.1.6(encoding@0.1.13)
+      verdaccio-auth-memory:
+        specifier: ^10.0.0
+        version: 10.3.1
 
   tools/baseline_browserslist:
     devDependencies:
