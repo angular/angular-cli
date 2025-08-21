@@ -112,4 +112,20 @@ describe('Ng New Schematic', () => {
     expect(files).toContain('/bar/.gemini/GEMINI.md');
     expect(files).toContain('/bar/.claude/CLAUDE.md');
   });
+
+  it('should create a tailwind project when style is tailwind', async () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const options = { ...defaultOptions, style: 'tailwind' as any };
+    const tree = await schematicRunner.runSchematic('ng-new', options);
+
+    expect(tree.exists('/bar/.postcssrc.json')).toBe(true);
+
+    const packageJson = JSON.parse(tree.readContent('/bar/package.json'));
+    expect(packageJson.devDependencies['tailwindcss']).toBeDefined();
+    expect(packageJson.devDependencies['postcss']).toBeDefined();
+    expect(packageJson.devDependencies['@tailwindcss/postcss']).toBeDefined();
+
+    const stylesContent = tree.readContent('/bar/src/styles.css');
+    expect(stylesContent).toContain('@import "tailwindcss";');
+  });
 });
