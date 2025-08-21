@@ -19,6 +19,8 @@
     "postcss": "^8.5.3",
     "protractor": "~7.0.0",
     "rxjs": "~7.8.0",
+    "tailwindcss": "^4.1.12",
+    "@tailwindcss/postcss": "^4.1.12",
     "tslib": "^2.3.0",
     "ts-node": "~10.9.0",
     "typescript": "~5.9.2",

@@ -136,6 +136,13 @@
       "factory": "./ai-config",
       "schema": "./ai-config/schema.json",
       "description": "Generates an AI tool configuration file."
+    },
+    "tailwind": {
+      "factory": "./tailwind",
+      "schema": "./tailwind/schema.json",
+      "hidden": true,
+      "private": true,
+      "description": "[INTERNAL] Adds tailwind to a project. Intended for use for ng new/add."
     }
   }
 }
