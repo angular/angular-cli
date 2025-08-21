@@ -1,4 +1,5 @@
 {
+  "encapsulation": false,
   "schematics": {
     "use-application-builder": {
       "version": "21.0.0",
