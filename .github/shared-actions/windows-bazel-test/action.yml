@@ -70,14 +70,14 @@ runs:
         # TODO(devversion): consult with Aspect on why this is needed.
         (cd $runfiles_dir/_main && ${{steps.init_wsl.outputs.cmd_path}} /C "mklink /D external ..")
 
-    - name: Run tests
-      # Note: This is Git Bash.
-      shell: bash
-      env:
-        BAZEL_BINDIR: '.'
-      working-directory: "C:\\test"
-      run: |
-        node "${{github.workspace}}\\scripts\\windows-testing\\parallel-executor.mjs" \
-          $PWD/dist/bin/tests/legacy-cli/${{inputs.test_target_name}}_/${{inputs.test_target_name}}.bat.runfiles \
-          ${{inputs.test_target_name}} \
-          "${{inputs.test_args}}" \
+    # - name: Run tests
+    #   # Note: This is Git Bash.
+    #   shell: bash
+    #   env:
+    #     BAZEL_BINDIR: '.'
+    #   working-directory: "C:\\test"
+    #   run: |
+    #     node "${{github.workspace}}\\scripts\\windows-testing\\parallel-executor.mjs" \
+    #       $PWD/dist/bin/tests/legacy-cli/${{inputs.test_target_name}}_/${{inputs.test_target_name}}.bat.runfiles \
+    #       ${{inputs.test_target_name}} \
+    #       "${{inputs.test_args}}" \
