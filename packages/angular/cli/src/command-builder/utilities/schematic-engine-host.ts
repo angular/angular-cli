@@ -20,7 +20,10 @@ import { assertIsError } from '../../utilities/error';
  */
 const schematicRedirectVariable = process.env['NG_SCHEMATIC_REDIRECT']?.toLowerCase();
 
-function shouldWrapSchematic(schematicFile: string, schematicEncapsulation: boolean): boolean {
+function shouldWrapSchematic(
+  schematicFile: string,
+  schematicEncapsulation: boolean | undefined,
+): boolean {
   // Check environment variable if present
   switch (schematicRedirectVariable) {
     case '0':
@@ -52,12 +55,12 @@ function shouldWrapSchematic(schematicFile: string, schematicEncapsulation: bool
 
   // Check for first-party Angular schematic packages
   // Angular schematics are safe to use in the wrapped VM context
-  if (/\/node_modules\/@(?:angular|schematics|nguniversal)\//.test(normalizedSchematicFile)) {
-    return true;
-  }
+  const isFirstParty = /\/node_modules\/@(?:angular|schematics|nguniversal)\//.test(
+    normalizedSchematicFile,
+  );
 
-  // Otherwise use the value of the schematic collection's encapsulation option (current default of false)
-  return schematicEncapsulation;
+  // Use value of defined option if present, otherwise default to first-party usage.
+  return schematicEncapsulation ?? isFirstParty;
 }
 
 export class SchematicEngineHost extends NodeModulesEngineHost {
@@ -73,7 +76,7 @@ export class SchematicEngineHost extends NodeModulesEngineHost {
     const referenceRequire = createRequire(__filename);
     const schematicFile = referenceRequire.resolve(fullPath, { paths: [parentPath] });
 
-    if (shouldWrapSchematic(schematicFile, !!collectionDescription?.encapsulation)) {
+    if (shouldWrapSchematic(schematicFile, collectionDescription?.encapsulation)) {
       const schematicPath = dirname(schematicFile);
 
       const moduleCache = new Map<string, unknown>();
