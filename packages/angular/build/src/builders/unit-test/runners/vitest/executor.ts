@@ -53,8 +53,16 @@ export class VitestExecutor implements TestExecutor {
   }
 
   private async initializeVitest(): Promise<Vitest> {
-    const { codeCoverage, reporters, watch, workspaceRoot, setupFiles, browsers, debug } =
-      this.options;
+    const {
+      codeCoverage,
+      reporters,
+      outputFile,
+      watch,
+      workspaceRoot,
+      setupFiles,
+      browsers,
+      debug,
+    } = this.options;
     const { outputPath, projectName, latestBuildResult } = this;
 
     let vitestNodeModule;
@@ -110,6 +118,7 @@ export class VitestExecutor implements TestExecutor {
         name: 'base',
         include: [],
         reporters: reporters ?? ['default'],
+        outputFile,
         watch,
         coverage: generateCoverageOption(codeCoverage, workspaceRoot, this.outputPath),
         ...debugOptions,
