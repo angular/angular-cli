@@ -141,8 +141,9 @@ jobs:
           allow_windows_rbe: true
       - name: Run CLI E2E tests
         uses: ./.github/shared-actions/windows-bazel-test
-        with:
+        env:
           E2E_SHARD_TOTAL: 1
+        with:
           test_target_name: e2e_node22
           test_args: --esbuild --glob "tests/basic/{build,rebuild}.ts"
 
