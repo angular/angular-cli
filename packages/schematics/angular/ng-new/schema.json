@@ -99,7 +99,7 @@
     "style": {
       "description": "The type of stylesheet files to be created for components in the initial project.",
       "type": "string",
-      "enum": ["css", "scss", "sass", "less"],
+      "enum": ["css", "scss", "sass", "less", "tailwind"],
       "x-user-analytics": "ep.ng_style"
     },
     "skipTests": {
