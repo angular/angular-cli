@@ -49,9 +49,11 @@ runs:
       run: |
         cd ${{steps.init_wsl.outputs.repo_path}}
         tar -cf /tmp/test.tar.gz dist/bin/tests/legacy-cli/${{inputs.test_target_name}}_
-        mkdir /mnt/c/test
-        mv /tmp/test.tar.gz /mnt/c/test
-        (cd /mnt/c/test && tar -xf /mnt/c/test/test.tar.gz)
+        # Use D:/ for better performance see: https://github.com/actions/runner-images/issues/12744
+        mkdir /mnt/d/test
+        mkdir /mnt/d/tmp_dir
+        mv /tmp/test.tar.gz /mnt/d/test
+        (cd /mnt/d/test && tar -xf /mnt/d/test/test.tar.gz)
 
     - name: Convert symlinks for Windows host
       shell: wsl-bash {0}
@@ -61,7 +63,7 @@ runs:
 
         cd ${{steps.init_wsl.outputs.repo_path}}
 
-        runfiles_dir="/mnt/c/test/dist/bin/tests/legacy-cli/${{inputs.test_target_name}}_/${{inputs.test_target_name}}.bat.runfiles"
+        runfiles_dir="/mnt/d/test/dist/bin/tests/legacy-cli/${{inputs.test_target_name}}_/${{inputs.test_target_name}}.bat.runfiles"
 
         # Make WSL symlinks compatible on Windows native file system.
         node scripts/windows-testing/convert-symlinks.mjs $runfiles_dir "${{steps.init_wsl.outputs.cmd_path}}"
@@ -75,7 +77,9 @@ runs:
       shell: bash
       env:
         BAZEL_BINDIR: '.'
-      working-directory: "C:\\test"
+        # Use D:/ for better performance see: https://github.com/actions/runner-images/issues/12744
+        E2E_TEMP: 'D:\\tmp_dir'
+      working-directory: "D:\\test"
       run: |
         node "${{github.workspace}}\\scripts\\windows-testing\\parallel-executor.mjs" \
           $PWD/dist/bin/tests/legacy-cli/${{inputs.test_target_name}}_/${{inputs.test_target_name}}.bat.runfiles \
