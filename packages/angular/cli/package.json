@@ -39,7 +39,7 @@
     "resolve": "1.22.10",
     "semver": "7.7.2",
     "yargs": "18.0.0",
-    "zod": "3.25.76"
+    "zod": "4.0.17"
   },
   "ng-update": {
     "migrations": "@schematics/angular/migrations/migration-collection.json",
