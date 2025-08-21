@@ -33,9 +33,9 @@ import {
 import { JSONFile } from '../utility/json-file';
 import { latestVersions } from '../utility/latest-versions';
 import { isStandaloneApp } from '../utility/ng-ast-utils';
-import { isUsingApplicationBuilder, targetBuildNotFoundError } from '../utility/project-targets';
+import { createProjectSchematic } from '../utility/project';
+import { isUsingApplicationBuilder } from '../utility/project-targets';
 import { getMainFilePath } from '../utility/standalone/util';
-import { getWorkspace } from '../utility/workspace';
 
 import { Schema as SSROptions } from './schema';
 
@@ -359,37 +359,29 @@ function addServerFile(
   };
 }
 
-export default function (options: SSROptions): Rule {
-  return async (host, context) => {
-    const browserEntryPoint = await getMainFilePath(host, options.project);
-    const isStandalone = isStandaloneApp(host, browserEntryPoint);
+export default createProjectSchematic<SSROptions>(async (options, { project, tree, context }) => {
+  const browserEntryPoint = await getMainFilePath(tree, options.project);
+  const isStandalone = isStandaloneApp(tree, browserEntryPoint);
 
-    const workspace = await getWorkspace(host);
-    const clientProject = workspace.projects.get(options.project);
-    if (!clientProject) {
-      throw targetBuildNotFoundError();
-    }
+  const usingApplicationBuilder = isUsingApplicationBuilder(project);
+  const sourceRoot = project.sourceRoot ?? posix.join(project.root, 'src');
 
-    const usingApplicationBuilder = isUsingApplicationBuilder(clientProject);
-    const sourceRoot = clientProject.sourceRoot ?? posix.join(clientProject.root, 'src');
-
-    return chain([
-      schematic('server', {
-        ...options,
-        skipInstall: true,
-      }),
-      ...(usingApplicationBuilder
-        ? [
-            updateApplicationBuilderWorkspaceConfigRule(sourceRoot, options, context),
-            updateApplicationBuilderTsConfigRule(options),
-          ]
-        : [
-            updateWebpackBuilderServerTsConfigRule(options),
-            updateWebpackBuilderWorkspaceConfigRule(sourceRoot, options),
-          ]),
-      addServerFile(sourceRoot, options, isStandalone),
-      addScriptsRule(options, usingApplicationBuilder),
-      addDependencies(options, usingApplicationBuilder),
-    ]);
-  };
-}
+  return chain([
+    schematic('server', {
+      ...options,
+      skipInstall: true,
+    }),
+    ...(usingApplicationBuilder
+      ? [
+          updateApplicationBuilderWorkspaceConfigRule(sourceRoot, options, context),
+          updateApplicationBuilderTsConfigRule(options),
+        ]
+      : [
+          updateWebpackBuilderServerTsConfigRule(options),
+          updateWebpackBuilderWorkspaceConfigRule(sourceRoot, options),
+        ]),
+    addServerFile(sourceRoot, options, isStandalone),
+    addScriptsRule(options, usingApplicationBuilder),
+    addDependencies(options, usingApplicationBuilder),
+  ]);
+});

@@ -16,6 +16,7 @@ import {
   chain,
   mergeWith,
   move,
+  noop,
   strings,
   url,
 } from '@angular-devkit/schematics';
@@ -26,10 +27,11 @@ import { JSONFile } from '../utility/json-file';
 import { latestVersions } from '../utility/latest-versions';
 import { isStandaloneApp } from '../utility/ng-ast-utils';
 import { relativePathToWorkspaceRoot } from '../utility/paths';
+import { createProjectSchematic } from '../utility/project';
 import { isUsingApplicationBuilder, targetBuildNotFoundError } from '../utility/project-targets';
 import { resolveBootstrappedComponentData } from '../utility/standalone/app_component';
 import { getMainFilePath } from '../utility/standalone/util';
-import { getWorkspace, updateWorkspace } from '../utility/workspace';
+import { updateWorkspace } from '../utility/workspace';
 import { Builders } from '../utility/workspace-models';
 import { Schema as ServerOptions } from './schema';
 
@@ -161,95 +163,91 @@ function addDependencies(skipInstall: boolean | undefined): Rule {
   };
 }
 
-export default function (options: ServerOptions): Rule {
-  return async (host: Tree) => {
-    const workspace = await getWorkspace(host);
-    const clientProject = workspace.projects.get(options.project);
-    if (clientProject?.extensions.projectType !== 'application') {
-      throw new SchematicsException(`Server schematic requires a project type of "application".`);
-    }
+export default createProjectSchematic<ServerOptions>(async (options, { project, tree }) => {
+  if (project?.extensions.projectType !== 'application') {
+    throw new SchematicsException(`Server schematic requires a project type of "application".`);
+  }
 
-    const clientBuildTarget = clientProject.targets.get('build');
-    if (!clientBuildTarget) {
-      throw targetBuildNotFoundError();
-    }
+  const clientBuildTarget = project.targets.get('build');
+  if (!clientBuildTarget) {
+    throw targetBuildNotFoundError();
+  }
 
-    const usingApplicationBuilder = isUsingApplicationBuilder(clientProject);
+  const usingApplicationBuilder = isUsingApplicationBuilder(project);
 
-    if (
-      clientProject.targets.has('server') ||
-      (usingApplicationBuilder && clientBuildTarget.options?.server !== undefined)
-    ) {
-      // Server has already been added.
-      return;
-    }
+  if (
+    project.targets.has('server') ||
+    (usingApplicationBuilder && clientBuildTarget.options?.server !== undefined)
+  ) {
+    // Server has already been added.
+    return noop();
+  }
 
-    const clientBuildOptions = clientBuildTarget.options as Record<string, string>;
-    const browserEntryPoint = await getMainFilePath(host, options.project);
-    const isStandalone = isStandaloneApp(host, browserEntryPoint);
-    const sourceRoot = clientProject.sourceRoot ?? join(normalize(clientProject.root), 'src');
+  const clientBuildOptions = clientBuildTarget.options as Record<string, string>;
+  const browserEntryPoint = await getMainFilePath(tree, options.project);
+  const isStandalone = isStandaloneApp(tree, browserEntryPoint);
+  const sourceRoot = project.sourceRoot ?? join(normalize(project.root), 'src');
 
-    let filesUrl = `./files/${usingApplicationBuilder ? 'application-builder/' : 'server-builder/'}`;
-    filesUrl += isStandalone ? 'standalone-src' : 'ngmodule-src';
+  let filesUrl = `./files/${usingApplicationBuilder ? 'application-builder/' : 'server-builder/'}`;
+  filesUrl += isStandalone ? 'standalone-src' : 'ngmodule-src';
 
-    const { componentName, componentImportPathInSameFile, moduleName, moduleImportPathInSameFile } =
-      resolveBootstrappedComponentData(host, browserEntryPoint) || {
-        componentName: 'App',
-        componentImportPathInSameFile: './app/app',
-        moduleName: 'AppModule',
-        moduleImportPathInSameFile: './app/app.module',
-      };
-    const templateSource = apply(url(filesUrl), [
-      applyTemplates({
-        ...strings,
-        ...options,
-        appComponentName: componentName,
-        appComponentPath: componentImportPathInSameFile,
-        appModuleName: moduleName,
-        appModulePath:
-          moduleImportPathInSameFile === null
-            ? null
-            : `./${posix.basename(moduleImportPathInSameFile)}`,
-      }),
-      move(sourceRoot),
-    ]);
+  const { componentName, componentImportPathInSameFile, moduleName, moduleImportPathInSameFile } =
+    resolveBootstrappedComponentData(tree, browserEntryPoint) || {
+      componentName: 'App',
+      componentImportPathInSameFile: './app/app',
+      moduleName: 'AppModule',
+      moduleImportPathInSameFile: './app/app.module',
+    };
+  const templateSource = apply(url(filesUrl), [
+    applyTemplates({
+      ...strings,
+      ...options,
+      appComponentName: componentName,
+      appComponentPath: componentImportPathInSameFile,
+      appModuleName: moduleName,
+      appModulePath:
+        moduleImportPathInSameFile === null
+          ? null
+          : `./${posix.basename(moduleImportPathInSameFile)}`,
+    }),
+    move(sourceRoot),
+  ]);
 
-    const clientTsConfig = normalize(clientBuildOptions.tsConfig);
-    const tsConfigExtends = basename(clientTsConfig);
-    const tsConfigDirectory = dirname(clientTsConfig);
+  const clientTsConfig = normalize(clientBuildOptions.tsConfig);
+  const tsConfigExtends = basename(clientTsConfig);
+  const tsConfigDirectory = dirname(clientTsConfig);
 
-    return chain([
-      mergeWith(templateSource),
-      ...(usingApplicationBuilder
-        ? [
-            updateConfigFileApplicationBuilder(options),
-            updateTsConfigFile(clientBuildOptions.tsConfig),
-          ]
-        : [
-            mergeWith(
-              apply(url('./files/server-builder/root'), [
-                applyTemplates({
-                  ...strings,
-                  ...options,
-                  stripTsExtension: (s: string) => s.replace(/\.ts$/, ''),
-                  tsConfigExtends,
-                  hasLocalizePackage: !!getPackageJsonDependency(host, '@angular/localize'),
-                  relativePathToWorkspaceRoot: relativePathToWorkspaceRoot(tsConfigDirectory),
-                }),
-                move(tsConfigDirectory),
-              ]),
-            ),
-            updateConfigFileBrowserBuilder(options, tsConfigDirectory),
-          ]),
-      addDependencies(options.skipInstall),
-      addRootProvider(
-        options.project,
-        ({ code, external }) =>
-          code`${external('provideClientHydration', '@angular/platform-browser')}(${external(
-            'withEventReplay',
-            '@angular/platform-browser',
-          )}())`,
-      ),
-    ]);
-  };
-}
+  return chain([
+    mergeWith(templateSource),
+    ...(usingApplicationBuilder
+      ? [
+          updateConfigFileApplicationBuilder(options),
+          updateTsConfigFile(clientBuildOptions.tsConfig),
+        ]
+      : [
+          mergeWith(
+            apply(url('./files/server-builder/root'), [
+              applyTemplates({
+                ...strings,
+                ...options,
+                stripTsExtension: (s: string) => s.replace(/\.ts$/, ''),
+                tsConfigExtends,
+                hasLocalizePackage: !!getPackageJsonDependency(tree, '@angular/localize'),
+                relativePathToWorkspaceRoot: relativePathToWorkspaceRoot(tsConfigDirectory),
+              }),
+              move(tsConfigDirectory),
+            ]),
+          ),
+          updateConfigFileBrowserBuilder(options, tsConfigDirectory),
+        ]),
+    addDependencies(options.skipInstall),
+    addRootProvider(
+      options.project,
+      ({ code, external }) =>
+        code`${external('provideClientHydration', '@angular/platform-browser')}(${external(
+          'withEventReplay',
+          '@angular/platform-browser',
+        )}())`,
+    ),
+  ]);
+});

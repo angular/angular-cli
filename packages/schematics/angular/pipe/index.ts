@@ -11,25 +11,24 @@ import { addDeclarationToNgModule } from '../utility/add-declaration-to-ng-modul
 import { findModuleFromOptions } from '../utility/find-module';
 import { generateFromFiles } from '../utility/generate-from-files';
 import { parseName } from '../utility/parse-name';
+import { createProjectSchematic } from '../utility/project';
 import { validateClassName } from '../utility/validation';
 import { createDefaultPath } from '../utility/workspace';
 import { Schema as PipeOptions } from './schema';
 
-export default function (options: PipeOptions): Rule {
-  return async (host: Tree) => {
-    options.path ??= await createDefaultPath(host, options.project);
-    options.module = findModuleFromOptions(host, options);
-    const parsedPath = parseName(options.path, options.name);
-    options.name = parsedPath.name;
-    options.path = parsedPath.path;
-    validateClassName(strings.classify(options.name));
+export default createProjectSchematic<PipeOptions>(async (options, { tree }) => {
+  options.path ??= await createDefaultPath(tree, options.project);
+  options.module = findModuleFromOptions(tree, options);
+  const parsedPath = parseName(options.path, options.name);
+  options.name = parsedPath.name;
+  options.path = parsedPath.path;
+  validateClassName(strings.classify(options.name));
 
-    return chain([
-      addDeclarationToNgModule({
-        type: 'pipe',
-        ...options,
-      }),
-      generateFromFiles(options),
-    ]);
-  };
-}
+  return chain([
+    addDeclarationToNgModule({
+      type: 'pipe',
+      ...options,
+    }),
+    generateFromFiles(options),
+  ]);
+});
