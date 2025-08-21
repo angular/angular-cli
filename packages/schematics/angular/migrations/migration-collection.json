@@ -1,4 +1,5 @@
 {
+  "encapsulation": false,
   "schematics": {
     "replace-provide-server-rendering-import": {
       "version": "20.0.0",
