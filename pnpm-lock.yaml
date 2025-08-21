@@ -228,7 +228,7 @@ importers:
         version: 7.0.0
       karma:
         specifier: ~6.4.0
-        version: 6.4.4(bufferutil@4.0.9)
+        version: 6.4.4(bufferutil@4.0.9)(utf-8-validate@6.0.5)
       karma-chrome-launcher:
         specifier: ~3.2.0
         version: 3.2.0
@@ -237,10 +237,10 @@ importers:
         version: 2.2.1
       karma-jasmine:
         specifier: ~5.1.0
-        version: 5.1.0(karma@6.4.4(bufferutil@4.0.9))
+        version: 5.1.0(karma@6.4.4(bufferutil@4.0.9)(utf-8-validate@6.0.5))
       karma-jasmine-html-reporter:
         specifier: ~2.1.0
-        version: 2.1.0(jasmine-core@5.9.0)(karma-jasmine@5.1.0(karma@6.4.4(bufferutil@4.0.9)))(karma@6.4.4(bufferutil@4.0.9))
+        version: 2.1.0(jasmine-core@5.9.0)(karma-jasmine@5.1.0(karma@6.4.4(bufferutil@4.0.9)(utf-8-validate@6.0.5)))(karma@6.4.4(bufferutil@4.0.9)(utf-8-validate@6.0.5))
       karma-source-map-support:
         specifier: 1.4.0
         version: 1.4.0
@@ -263,8 +263,8 @@ importers:
         specifier: ~7.0.0
         version: 7.0.0
       puppeteer:
-        specifier: 18.2.1
-        version: 18.2.1(bufferutil@4.0.9)(encoding@0.1.13)
+        specifier: 24.17.0
+        version: 24.17.0(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@6.0.5)
       quicktype-core:
         specifier: 23.2.6
         version: 23.2.6(encoding@0.1.13)
@@ -755,10 +755,10 @@ importers:
         version: link:../../angular/ssr
       '@web/test-runner':
         specifier: 0.20.2
-        version: 0.20.2(bufferutil@4.0.9)
+        version: 0.20.2(bufferutil@4.0.9)(utf-8-validate@6.0.5)
       browser-sync:
         specifier: 3.0.4
-        version: 3.0.4(bufferutil@4.0.9)
+        version: 3.0.4(bufferutil@4.0.9)(utf-8-validate@6.0.5)
       ng-packagr:
         specifier: 21.0.0-next.0
         version: 21.0.0-next.0(@angular/compiler-cli@21.0.0-next.0(@angular/compiler@21.0.0-next.0)(typescript@5.9.2))(tslib@2.8.1)(typescript@5.9.2)
@@ -2875,6 +2875,11 @@ packages:
     engines: {node: '>=18'}
     hasBin: true
 
+  '@puppeteer/browsers@2.10.7':
+    resolution: {integrity: sha512-wHWLkQWBjHtajZeqCB74nsa/X70KheyOhySYBRmVQDJiNj0zjZR/naPCvdWjMhcG1LmjaMV/9WtTo5mpe8qWLw==}
+    engines: {node: '>=18'}
+    hasBin: true
+
   '@rolldown/binding-android-arm64@1.0.0-beta.33':
     resolution: {integrity: sha512-xhDQXKftRkEULIxCddrKMR8y0YO/Y+6BKk/XrQP2B29YjV2wr8DByoEz+AHX9BfLHb2srfpdN46UquBW2QXWpQ==}
     cpu: [arm64]
@@ -4230,9 +4235,6 @@ packages:
     resolution: {integrity: sha512-Ceh+7ox5qe7LJuLHoY0feh3pHuUDHAcRUeyL2VYghZwfpkNIy/+8Ocg0a3UuSoYzavmylwuLWQOf3hl0jjMMIw==}
     engines: {node: '>=8'}
 
-  bl@4.1.0:
-    resolution: {integrity: sha512-1W07cM9gS6DcLperZfFSj+bWLtaPGSOHWhPiGzXmvVJbRLdG82sH/Kn8EtW1VqWVA54AKf2h5k5BbnIbwF3h6w==}
-
   blocking-proxy@1.0.1:
     resolution: {integrity: sha512-KE8NFMZr3mN2E0HcvCgRtX7DjhiIQrwle+nSVJVC/yqFb9+xznHl2ZcoBp2L9qzkI4t4cBFJ1efXF8Dwi132RA==}
     engines: {node: '>=6.9.x'}
@@ -4299,9 +4301,6 @@ packages:
 
   buffer-from@1.1.2:
     resolution: {integrity: sha512-E+XQCRwSbaaiChtv6k6Dwgc+bx+Bs6vuKJHHl5kox/BaKbhiXzqQOwK4cO22yElGp2OCmjwVhT3HmxgyPGnJfQ==}
-
-  buffer@5.7.1:
-    resolution: {integrity: sha512-EHcyIPBQ4BSGlvjB16k5KgAJ27CIsHY/2JBmCRReo48y9rQ3MaUzWX3KVlBa4U7MyX02HdVj0K7C3WaB3ju7FQ==}
 
   buffer@6.0.3:
     resolution: {integrity: sha512-FTiCpNxtwiZZHEZbcbTIcZjERVICn9yq/pDFkTl95/AxzD1naBctN7YO68riM/gLSDY7sdrMby8hofADYuuqOA==}
@@ -4402,9 +4401,6 @@ packages:
     resolution: {integrity: sha512-Qgzu8kfBvo+cA4962jnP1KkS6Dop5NS6g7R5LFYJr4b8Ub94PPQXUksCw9PvXoeXPRRddRNC5C1JQUR2SMGtnA==}
     engines: {node: '>= 14.16.0'}
 
-  chownr@1.1.4:
-    resolution: {integrity: sha512-jJ0bqzaylmJtVnNgzTeSOs8DPavpbYgEr/b0YL8/2GO3xJEhInFmhKMUnEJQjZumK7KXGFhUy89PrsJWlakBVg==}
-
   chownr@2.0.0:
     resolution: {integrity: sha512-bIomtDF5KGpdogkLd9VspvFzk9KfpyyGlS8YFVZl7TGPBHL5snIOnxeshwVgPteQ9b4Eydl+pVbIyE1DcvCWgQ==}
     engines: {node: '>=10'}
@@ -4424,6 +4420,11 @@ packages:
 
   chromium-bidi@7.3.1:
     resolution: {integrity: sha512-i+BMGluhZZc4Jic9L1aHJBTfaopxmCqQxGklyMcqFx4fvF3nI4BJ3bCe1ad474nvYRIo/ZN/VrdA4eOaRZua4Q==}
+    peerDependencies:
+      devtools-protocol: '*'
+
+  chromium-bidi@8.0.0:
+    resolution: {integrity: sha512-d1VmE0FD7lxZQHzcDUCKZSNRtRwISXDsdg4HjdTR5+Ll5nQ/vzU12JeNmupD6VWffrPSlrnGhEWlLESKH3VO+g==}
     peerDependencies:
       devtools-protocol: '*'
 
@@ -4632,9 +4633,6 @@ packages:
 
   create-require@1.1.1:
     resolution: {integrity: sha512-dcKFX3jn0MpIaXjisoRvexIJVEKzaq7z2rZKxf+MSr9TkdmHmsU4m2lcLojrj/FHl8mk5VxMmYA+ftRkP/3oKQ==}
-
-  cross-fetch@3.1.5:
-    resolution: {integrity: sha512-lvb1SBsI0Z7GDwmuid+mU3kWVBwTVUbe7S0H52yaaAdQOXq2YktTCZdlAcNKFzE6QtRz0snpw9bNiPeOIkkQvw==}
 
   cross-fetch@4.1.0:
     resolution: {integrity: sha512-uKm5PU+MHTootlWEY+mZ4vvXoCn4fLQxT9dSc1sXVMSFkINTJVN8cAQROpwcKm8bJ/c7rgZVIBWzH5T78sNZZw==}
@@ -4871,9 +4869,6 @@ packages:
     resolution: {integrity: sha512-LmVkry/oDShEgSZPNgqCIp2/TlqtExeGmymru3uCELnfyjY11IzpAproLYs+1X88fXO6DBoYP3ul2Xo2yz2j6A==}
     engines: {node: '>= 0.8.0'}
     hasBin: true
-
-  devtools-protocol@0.0.1045489:
-    resolution: {integrity: sha512-D+PTmWulkuQW4D1NTiCRCFxF7pQPn0hgp4YyX4wAQ6xYXKOadSWPR3ENGDQ47MW/Ewc9v2rpC/UEEGahgBYpSQ==}
 
   devtools-protocol@0.0.1475386:
     resolution: {integrity: sha512-RQ809ykTfJ+dgj9bftdeL2vRVxASAuGU+I9LEx9Ij5TXU5HrgAQVmzi72VA+mkzscE12uzlRv5/tWWv9R9J1SA==}
@@ -5442,9 +5437,6 @@ packages:
   fresh@2.0.0:
     resolution: {integrity: sha512-Rx/WycZ60HOaqLKAi6cHRKKI7zxWbJ31MhntmtwMoaTeF7XFH9hhBp8vITaMidfljRQ6eYWCKkaTK+ykVJHP2A==}
     engines: {node: '>= 0.8'}
-
-  fs-constants@1.0.0:
-    resolution: {integrity: sha512-y6OAwoSIf7FyjMIv94u+b5rdheZEjzR63GTyZJm5qh4Bi+2YgwLCcI/fPFZkL5PSixOt6ZNKm+w+Hfp/Bciwow==}
 
   fs-extra@3.0.1:
     resolution: {integrity: sha512-V3Z3WZWVUYd8hoCL5xfXJCaHWYzmtwW5XWYSlLgERi8PWd8bx1kUHUk8L1BT57e49oKnDDD180mjfrHc1yA9rg==}
@@ -6765,9 +6757,6 @@ packages:
   mitt@3.0.1:
     resolution: {integrity: sha512-vKivATfr97l2/QBCYAkXYDbrIWPM2IIKEl7YPhjCvKlG3kE2gm+uBo6nEXK3M5/Ffh/FLpKExzOQ3JJoJGFKBw==}
 
-  mkdirp-classic@0.5.3:
-    resolution: {integrity: sha512-gKLcREMhtuZRwRAfqP3RFW+TK4JqApVBtOIftVgjuABpAtpxhPGaDcfvbhNvD0B8iD1oUr/txX35NjcaY6Ns/A==}
-
   mkdirp@0.5.6:
     resolution: {integrity: sha512-FP+p8RB8OWpF3YZBCrP5gtADmtXApB5AMLn+vdyA+PyxCjrCs00mjyUozssO33cwDeT3wNGdLxJ5M//YqtHAJw==}
     hasBin: true
@@ -7516,18 +7505,18 @@ packages:
     resolution: {integrity: sha512-vYt7UD1U9Wg6138shLtLOvdAu+8DsC/ilFtEVHcH+wydcSpNE20AfSOduf6MkRFahL5FY7X1oU7nKVZFtfq8Fg==}
     engines: {node: '>=6'}
 
-  puppeteer-core@18.2.1:
-    resolution: {integrity: sha512-MRtTAZfQTluz3U2oU/X2VqVWPcR1+94nbA2V6ZrSZRVEwLqZ8eclZ551qGFQD/vD2PYqHJwWOW/fpC721uznVw==}
-    engines: {node: '>=14.1.0'}
-
   puppeteer-core@24.16.2:
     resolution: {integrity: sha512-areKSSQzpoHa5nCk3uD/o504yjrW5ws0N6jZfdFZ3a4H+Q7NBgvuDydjN5P87jN4Rj+eIpLcK3ELOThTtYuuxg==}
     engines: {node: '>=18'}
 
-  puppeteer@18.2.1:
-    resolution: {integrity: sha512-7+UhmYa7wxPh2oMRwA++k8UGVDxh3YdWFB52r9C3tM81T6BU7cuusUSxImz0GEYSOYUKk/YzIhkQ6+vc0gHbxQ==}
-    engines: {node: '>=14.1.0'}
-    deprecated: < 24.9.0 is no longer supported
+  puppeteer-core@24.17.0:
+    resolution: {integrity: sha512-RYOBKFiF+3RdwIZTEacqNpD567gaFcBAOKTT7742FdB1icXudrPI7BlZbYTYWK2wgGQUXt9Zi1Yn+D5PmCs4CA==}
+    engines: {node: '>=18'}
+
+  puppeteer@24.17.0:
+    resolution: {integrity: sha512-CGrmJ8WgilK3nyE73k+pbxHggETPpEvL6AQ9H5JSK1RgZRGMQVJ+iO3MocGm9yBQXQJ9U5xijyLvkYXFeb0/+g==}
+    engines: {node: '>=18'}
+    hasBin: true
 
   q@1.4.1:
     resolution: {integrity: sha512-/CdEdaw49VZVmyIDGUQKDDT53c7qBkO6g5CefWz91Ae+l4+cRtcDYwMTXh6me4O8TMldeGHG3N2Bl84V78Ywbg==}
@@ -8234,15 +8223,8 @@ packages:
     resolution: {integrity: sha512-Re10+NauLTMCudc7T5WLFLAwDhQ0JWdrMK+9B2M8zR5hRExKmsRDCBA7/aV/pNJFltmBFO5BAMlQFi/vq3nKOg==}
     engines: {node: '>=6'}
 
-  tar-fs@2.1.1:
-    resolution: {integrity: sha512-V0r2Y9scmbDRLCNex/+hYzvp/zyYjvFbHPNgVTKfQvVrb6guiE/fxP+XblDNR011utopbkex2nM4dHNV6GDsng==}
-
   tar-fs@3.1.0:
     resolution: {integrity: sha512-5Mty5y/sOF1YWj1J6GiBodjlDc05CUR8PKXrsnFAiSG0xA+GHeWLovaZPYUDXkH/1iKRf2+M5+OrRgzC7O9b7w==}
-
-  tar-stream@2.2.0:
-    resolution: {integrity: sha512-ujeqbceABgwMZxEJnk2HDY2DlnUZ+9oEcb1KzTVfYHio0UE6dG71n60d8D2I4qNvleWrrXpmjpt7vZeF1LnMZQ==}
-    engines: {node: '>=6'}
 
   tar-stream@3.1.7:
     resolution: {integrity: sha512-qJj60CXt7IU1Ffyc3NJMjh6EkuCFej46zUqJ4J7pqYlThyd9bO0XBTmcOIhSzZJVWfsLks0+nle/j538YAW9RQ==}
@@ -8502,9 +8484,6 @@ packages:
   unbox-primitive@1.1.0:
     resolution: {integrity: sha512-nWJ91DjeOkej/TA8pXQ3myruKpKEYgqvpw9lz4OPHj/NWFNluYrjbz9j01CJ8yKQd2g4jFoOkINCTW2I5LEEyw==}
     engines: {node: '>= 0.4'}
-
-  unbzip2-stream@1.4.3:
-    resolution: {integrity: sha512-mlExGW4w71ebDJviH16lQLtZS32VKqsSfk80GCfUlwT/4/hNRFsoscrF/c++9xinkMzECL1uL9DDwXqFWkruPg==}
 
   undici-types@6.21.0:
     resolution: {integrity: sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ==}
@@ -8977,18 +8956,6 @@ packages:
     peerDependencies:
       bufferutil: ^4.0.1
       utf-8-validate: '>=5.0.2'
-    peerDependenciesMeta:
-      bufferutil:
-        optional: true
-      utf-8-validate:
-        optional: true
-
-  ws@8.9.0:
-    resolution: {integrity: sha512-Ja7nszREasGaYUYCI2k4lCKIRTt+y7XuqVoHR44YpI49TtryyqbqvDMn5eqfW7e6HzTukDRIsXqzVHScqRcafg==}
-    engines: {node: '>=10.0.0'}
-    peerDependencies:
-      bufferutil: ^4.0.1
-      utf-8-validate: ^5.0.2
     peerDependenciesMeta:
       bufferutil:
         optional: true
@@ -11393,6 +11360,19 @@ snapshots:
       - bare-buffer
       - supports-color
 
+  '@puppeteer/browsers@2.10.7':
+    dependencies:
+      debug: 4.4.1(supports-color@10.1.0)
+      extract-zip: 2.0.1
+      progress: 2.0.3
+      proxy-agent: 6.5.0
+      semver: 7.7.2
+      tar-fs: 3.1.0
+      yargs: 17.7.2
+    transitivePeerDependencies:
+      - bare-buffer
+      - supports-color
+
   '@rolldown/binding-android-arm64@1.0.0-beta.33':
     optional: true
 
@@ -12377,7 +12357,7 @@ snapshots:
 
   '@web/config-loader@0.3.3': {}
 
-  '@web/dev-server-core@0.7.5(bufferutil@4.0.9)':
+  '@web/dev-server-core@0.7.5(bufferutil@4.0.9)(utf-8-validate@6.0.5)':
     dependencies:
       '@types/koa': 2.15.0
       '@types/ws': 7.4.7
@@ -12396,16 +12376,16 @@ snapshots:
       mime-types: 2.1.35
       parse5: 6.0.1
       picomatch: 2.3.1
-      ws: 7.5.10(bufferutil@4.0.9)
+      ws: 7.5.10(bufferutil@4.0.9)(utf-8-validate@6.0.5)
     transitivePeerDependencies:
       - bufferutil
       - supports-color
       - utf-8-validate
 
-  '@web/dev-server-rollup@0.6.4(bufferutil@4.0.9)':
+  '@web/dev-server-rollup@0.6.4(bufferutil@4.0.9)(utf-8-validate@6.0.5)':
     dependencies:
       '@rollup/plugin-node-resolve': 15.3.1(rollup@4.46.4)
-      '@web/dev-server-core': 0.7.5(bufferutil@4.0.9)
+      '@web/dev-server-core': 0.7.5(bufferutil@4.0.9)(utf-8-validate@6.0.5)
       nanocolors: 0.2.13
       parse5: 6.0.1
       rollup: 4.46.4
@@ -12415,13 +12395,13 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  '@web/dev-server@0.4.6(bufferutil@4.0.9)':
+  '@web/dev-server@0.4.6(bufferutil@4.0.9)(utf-8-validate@6.0.5)':
     dependencies:
       '@babel/code-frame': 7.27.1
       '@types/command-line-args': 5.2.3
       '@web/config-loader': 0.3.3
-      '@web/dev-server-core': 0.7.5(bufferutil@4.0.9)
-      '@web/dev-server-rollup': 0.6.4(bufferutil@4.0.9)
+      '@web/dev-server-core': 0.7.5(bufferutil@4.0.9)(utf-8-validate@6.0.5)
+      '@web/dev-server-rollup': 0.6.4(bufferutil@4.0.9)(utf-8-validate@6.0.5)
       camelcase: 6.3.0
       command-line-args: 5.2.1
       command-line-usage: 7.0.3
@@ -12441,28 +12421,28 @@ snapshots:
       '@types/parse5': 6.0.3
       parse5: 6.0.1
 
-  '@web/test-runner-chrome@0.18.1(bufferutil@4.0.9)':
+  '@web/test-runner-chrome@0.18.1(bufferutil@4.0.9)(utf-8-validate@6.0.5)':
     dependencies:
-      '@web/test-runner-core': 0.13.4(bufferutil@4.0.9)
-      '@web/test-runner-coverage-v8': 0.8.0(bufferutil@4.0.9)
+      '@web/test-runner-core': 0.13.4(bufferutil@4.0.9)(utf-8-validate@6.0.5)
+      '@web/test-runner-coverage-v8': 0.8.0(bufferutil@4.0.9)(utf-8-validate@6.0.5)
       chrome-launcher: 0.15.2
-      puppeteer-core: 24.16.2(bufferutil@4.0.9)
+      puppeteer-core: 24.16.2(bufferutil@4.0.9)(utf-8-validate@6.0.5)
     transitivePeerDependencies:
       - bare-buffer
       - bufferutil
       - supports-color
       - utf-8-validate
 
-  '@web/test-runner-commands@0.9.0(bufferutil@4.0.9)':
+  '@web/test-runner-commands@0.9.0(bufferutil@4.0.9)(utf-8-validate@6.0.5)':
     dependencies:
-      '@web/test-runner-core': 0.13.4(bufferutil@4.0.9)
+      '@web/test-runner-core': 0.13.4(bufferutil@4.0.9)(utf-8-validate@6.0.5)
       mkdirp: 1.0.4
     transitivePeerDependencies:
       - bufferutil
       - supports-color
       - utf-8-validate
 
-  '@web/test-runner-core@0.13.4(bufferutil@4.0.9)':
+  '@web/test-runner-core@0.13.4(bufferutil@4.0.9)(utf-8-validate@6.0.5)':
     dependencies:
       '@babel/code-frame': 7.27.1
       '@types/babel__code-frame': 7.0.6
@@ -12472,7 +12452,7 @@ snapshots:
       '@types/istanbul-lib-coverage': 2.0.6
       '@types/istanbul-reports': 3.0.4
       '@web/browser-logs': 0.4.1
-      '@web/dev-server-core': 0.7.5(bufferutil@4.0.9)
+      '@web/dev-server-core': 0.7.5(bufferutil@4.0.9)(utf-8-validate@6.0.5)
       chokidar: 4.0.3
       cli-cursor: 3.1.0
       co-body: 6.2.0
@@ -12495,9 +12475,9 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  '@web/test-runner-coverage-v8@0.8.0(bufferutil@4.0.9)':
+  '@web/test-runner-coverage-v8@0.8.0(bufferutil@4.0.9)(utf-8-validate@6.0.5)':
     dependencies:
-      '@web/test-runner-core': 0.13.4(bufferutil@4.0.9)
+      '@web/test-runner-core': 0.13.4(bufferutil@4.0.9)(utf-8-validate@6.0.5)
       istanbul-lib-coverage: 3.2.2
       lru-cache: 8.0.5
       picomatch: 2.3.1
@@ -12507,23 +12487,23 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  '@web/test-runner-mocha@0.9.0(bufferutil@4.0.9)':
+  '@web/test-runner-mocha@0.9.0(bufferutil@4.0.9)(utf-8-validate@6.0.5)':
     dependencies:
-      '@web/test-runner-core': 0.13.4(bufferutil@4.0.9)
+      '@web/test-runner-core': 0.13.4(bufferutil@4.0.9)(utf-8-validate@6.0.5)
     transitivePeerDependencies:
       - bufferutil
       - supports-color
       - utf-8-validate
 
-  '@web/test-runner@0.20.2(bufferutil@4.0.9)':
+  '@web/test-runner@0.20.2(bufferutil@4.0.9)(utf-8-validate@6.0.5)':
     dependencies:
       '@web/browser-logs': 0.4.1
       '@web/config-loader': 0.3.3
-      '@web/dev-server': 0.4.6(bufferutil@4.0.9)
-      '@web/test-runner-chrome': 0.18.1(bufferutil@4.0.9)
-      '@web/test-runner-commands': 0.9.0(bufferutil@4.0.9)
-      '@web/test-runner-core': 0.13.4(bufferutil@4.0.9)
-      '@web/test-runner-mocha': 0.9.0(bufferutil@4.0.9)
+      '@web/dev-server': 0.4.6(bufferutil@4.0.9)(utf-8-validate@6.0.5)
+      '@web/test-runner-chrome': 0.18.1(bufferutil@4.0.9)(utf-8-validate@6.0.5)
+      '@web/test-runner-commands': 0.9.0(bufferutil@4.0.9)(utf-8-validate@6.0.5)
+      '@web/test-runner-core': 0.13.4(bufferutil@4.0.9)(utf-8-validate@6.0.5)
+      '@web/test-runner-mocha': 0.9.0(bufferutil@4.0.9)(utf-8-validate@6.0.5)
       camelcase: 6.3.0
       command-line-args: 5.2.1
       command-line-usage: 7.0.3
@@ -12976,12 +12956,6 @@ snapshots:
 
   binary-extensions@2.3.0: {}
 
-  bl@4.1.0:
-    dependencies:
-      buffer: 5.7.1
-      inherits: 2.0.4
-      readable-stream: 3.6.2
-
   blocking-proxy@1.0.1:
     dependencies:
       minimist: 1.2.8
@@ -13045,24 +13019,24 @@ snapshots:
       fresh: 0.5.2
       mitt: 1.2.0
 
-  browser-sync-ui@3.0.4(bufferutil@4.0.9):
+  browser-sync-ui@3.0.4(bufferutil@4.0.9)(utf-8-validate@6.0.5):
     dependencies:
       async-each-series: 0.1.1
       chalk: 4.1.2
       connect-history-api-fallback: 1.6.0
       immutable: 3.8.2
       server-destroy: 1.0.1
-      socket.io-client: 4.8.1(bufferutil@4.0.9)
+      socket.io-client: 4.8.1(bufferutil@4.0.9)(utf-8-validate@6.0.5)
       stream-throttle: 0.1.3
     transitivePeerDependencies:
       - bufferutil
       - supports-color
       - utf-8-validate
 
-  browser-sync@3.0.4(bufferutil@4.0.9):
+  browser-sync@3.0.4(bufferutil@4.0.9)(utf-8-validate@6.0.5):
     dependencies:
       browser-sync-client: 3.0.4
-      browser-sync-ui: 3.0.4(bufferutil@4.0.9)
+      browser-sync-ui: 3.0.4(bufferutil@4.0.9)(utf-8-validate@6.0.5)
       bs-recipes: 1.3.4
       chalk: 4.1.2
       chokidar: 3.6.0
@@ -13086,7 +13060,7 @@ snapshots:
       serve-index: 1.9.1
       serve-static: 1.16.2
       server-destroy: 1.0.1
-      socket.io: 4.8.1(bufferutil@4.0.9)
+      socket.io: 4.8.1(bufferutil@4.0.9)(utf-8-validate@6.0.5)
       ua-parser-js: 1.0.40
       yargs: 17.7.2
     transitivePeerDependencies:
@@ -13119,11 +13093,6 @@ snapshots:
   buffer-equal-constant-time@1.0.1: {}
 
   buffer-from@1.1.2: {}
-
-  buffer@5.7.1:
-    dependencies:
-      base64-js: 1.5.1
-      ieee754: 1.2.1
 
   buffer@6.0.3:
     dependencies:
@@ -13246,8 +13215,6 @@ snapshots:
     dependencies:
       readdirp: 4.1.2
 
-  chownr@1.1.4: {}
-
   chownr@2.0.0: {}
 
   chownr@3.0.0: {}
@@ -13264,6 +13231,12 @@ snapshots:
   chrome-trace-event@1.0.4: {}
 
   chromium-bidi@7.3.1(devtools-protocol@0.0.1475386):
+    dependencies:
+      devtools-protocol: 0.0.1475386
+      mitt: 3.0.1
+      zod: 3.25.76
+
+  chromium-bidi@8.0.0(devtools-protocol@0.0.1475386):
     dependencies:
       devtools-protocol: 0.0.1475386
       mitt: 3.0.1
@@ -13487,12 +13460,6 @@ snapshots:
 
   create-require@1.1.1: {}
 
-  cross-fetch@3.1.5(encoding@0.1.13):
-    dependencies:
-      node-fetch: 2.6.7(encoding@0.1.13)
-    transitivePeerDependencies:
-      - encoding
-
   cross-fetch@4.1.0(encoding@0.1.13):
     dependencies:
       node-fetch: 2.7.0(encoding@0.1.13)
@@ -13685,8 +13652,6 @@ snapshots:
 
   dev-ip@1.0.1: {}
 
-  devtools-protocol@0.0.1045489: {}
-
   devtools-protocol@0.0.1475386: {}
 
   di@0.0.1: {}
@@ -13799,12 +13764,12 @@ snapshots:
     dependencies:
       once: 1.4.0
 
-  engine.io-client@6.6.3(bufferutil@4.0.9):
+  engine.io-client@6.6.3(bufferutil@4.0.9)(utf-8-validate@6.0.5):
     dependencies:
       '@socket.io/component-emitter': 3.1.2
       debug: 4.3.7
       engine.io-parser: 5.2.3
-      ws: 8.17.1(bufferutil@4.0.9)
+      ws: 8.17.1(bufferutil@4.0.9)(utf-8-validate@6.0.5)
       xmlhttprequest-ssl: 2.1.2
     transitivePeerDependencies:
       - bufferutil
@@ -13813,7 +13778,7 @@ snapshots:
 
   engine.io-parser@5.2.3: {}
 
-  engine.io@6.6.4(bufferutil@4.0.9):
+  engine.io@6.6.4(bufferutil@4.0.9)(utf-8-validate@6.0.5):
     dependencies:
       '@types/cors': 2.8.19
       '@types/node': 22.17.2
@@ -13823,7 +13788,7 @@ snapshots:
       cors: 2.8.5
       debug: 4.3.7
       engine.io-parser: 5.2.3
-      ws: 8.17.1(bufferutil@4.0.9)
+      ws: 8.17.1(bufferutil@4.0.9)(utf-8-validate@6.0.5)
     transitivePeerDependencies:
       - bufferutil
       - supports-color
@@ -14476,8 +14441,6 @@ snapshots:
   fresh@0.5.2: {}
 
   fresh@2.0.0: {}
-
-  fs-constants@1.0.0: {}
 
   fs-extra@3.0.1:
     dependencies:
@@ -15504,22 +15467,22 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  karma-jasmine-html-reporter@2.1.0(jasmine-core@5.9.0)(karma-jasmine@5.1.0(karma@6.4.4(bufferutil@4.0.9)))(karma@6.4.4(bufferutil@4.0.9)):
+  karma-jasmine-html-reporter@2.1.0(jasmine-core@5.9.0)(karma-jasmine@5.1.0(karma@6.4.4(bufferutil@4.0.9)(utf-8-validate@6.0.5)))(karma@6.4.4(bufferutil@4.0.9)(utf-8-validate@6.0.5)):
     dependencies:
       jasmine-core: 5.9.0
-      karma: 6.4.4(bufferutil@4.0.9)
-      karma-jasmine: 5.1.0(karma@6.4.4(bufferutil@4.0.9))
+      karma: 6.4.4(bufferutil@4.0.9)(utf-8-validate@6.0.5)
+      karma-jasmine: 5.1.0(karma@6.4.4(bufferutil@4.0.9)(utf-8-validate@6.0.5))
 
-  karma-jasmine@5.1.0(karma@6.4.4(bufferutil@4.0.9)):
+  karma-jasmine@5.1.0(karma@6.4.4(bufferutil@4.0.9)(utf-8-validate@6.0.5)):
     dependencies:
       jasmine-core: 4.6.1
-      karma: 6.4.4(bufferutil@4.0.9)
+      karma: 6.4.4(bufferutil@4.0.9)(utf-8-validate@6.0.5)
 
   karma-source-map-support@1.4.0:
     dependencies:
       source-map-support: 0.5.21
 
-  karma@6.4.4(bufferutil@4.0.9):
+  karma@6.4.4(bufferutil@4.0.9)(utf-8-validate@6.0.5):
     dependencies:
       '@colors/colors': 1.5.0
       body-parser: 1.20.3
@@ -15540,7 +15503,7 @@ snapshots:
       qjobs: 1.2.0
       range-parser: 1.2.1
       rimraf: 3.0.2
-      socket.io: 4.8.1(bufferutil@4.0.9)
+      socket.io: 4.8.1(bufferutil@4.0.9)(utf-8-validate@6.0.5)
       source-map: 0.6.1
       tmp: 0.2.5
       ua-parser-js: 0.7.40
@@ -15958,8 +15921,6 @@ snapshots:
   mitt@1.2.0: {}
 
   mitt@3.0.1: {}
-
-  mkdirp-classic@0.5.3: {}
 
   mkdirp@0.5.6:
     dependencies:
@@ -16696,25 +16657,7 @@ snapshots:
 
   punycode@2.3.1: {}
 
-  puppeteer-core@18.2.1(bufferutil@4.0.9)(encoding@0.1.13):
-    dependencies:
-      cross-fetch: 3.1.5(encoding@0.1.13)
-      debug: 4.3.4
-      devtools-protocol: 0.0.1045489
-      extract-zip: 2.0.1
-      https-proxy-agent: 5.0.1(supports-color@10.1.0)
-      proxy-from-env: 1.1.0
-      rimraf: 3.0.2
-      tar-fs: 2.1.1
-      unbzip2-stream: 1.4.3
-      ws: 8.9.0(bufferutil@4.0.9)
-    transitivePeerDependencies:
-      - bufferutil
-      - encoding
-      - supports-color
-      - utf-8-validate
-
-  puppeteer-core@24.16.2(bufferutil@4.0.9):
+  puppeteer-core@24.16.2(bufferutil@4.0.9)(utf-8-validate@6.0.5):
     dependencies:
       '@puppeteer/browsers': 2.10.6
       chromium-bidi: 7.3.1(devtools-protocol@0.0.1475386)
@@ -16728,16 +16671,33 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  puppeteer@18.2.1(bufferutil@4.0.9)(encoding@0.1.13):
+  puppeteer-core@24.17.0(bufferutil@4.0.9)(utf-8-validate@6.0.5):
     dependencies:
-      https-proxy-agent: 5.0.1(supports-color@10.1.0)
-      progress: 2.0.3
-      proxy-from-env: 1.1.0
-      puppeteer-core: 18.2.1(bufferutil@4.0.9)(encoding@0.1.13)
+      '@puppeteer/browsers': 2.10.7
+      chromium-bidi: 8.0.0(devtools-protocol@0.0.1475386)
+      debug: 4.4.1(supports-color@10.1.0)
+      devtools-protocol: 0.0.1475386
+      typed-query-selector: 2.12.0
+      ws: 8.18.3(bufferutil@4.0.9)(utf-8-validate@6.0.5)
     transitivePeerDependencies:
+      - bare-buffer
       - bufferutil
-      - encoding
       - supports-color
+      - utf-8-validate
+
+  puppeteer@24.17.0(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@6.0.5):
+    dependencies:
+      '@puppeteer/browsers': 2.10.7
+      chromium-bidi: 8.0.0(devtools-protocol@0.0.1475386)
+      cosmiconfig: 9.0.0(typescript@5.9.2)
+      devtools-protocol: 0.0.1475386
+      puppeteer-core: 24.17.0(bufferutil@4.0.9)(utf-8-validate@6.0.5)
+      typed-query-selector: 2.12.0
+    transitivePeerDependencies:
+      - bare-buffer
+      - bufferutil
+      - supports-color
+      - typescript
       - utf-8-validate
 
   q@1.4.1: {}
@@ -17382,20 +17342,20 @@ snapshots:
 
   smart-buffer@4.2.0: {}
 
-  socket.io-adapter@2.5.5(bufferutil@4.0.9):
+  socket.io-adapter@2.5.5(bufferutil@4.0.9)(utf-8-validate@6.0.5):
     dependencies:
       debug: 4.3.7
-      ws: 8.17.1(bufferutil@4.0.9)
+      ws: 8.17.1(bufferutil@4.0.9)(utf-8-validate@6.0.5)
     transitivePeerDependencies:
       - bufferutil
       - supports-color
       - utf-8-validate
 
-  socket.io-client@4.8.1(bufferutil@4.0.9):
+  socket.io-client@4.8.1(bufferutil@4.0.9)(utf-8-validate@6.0.5):
     dependencies:
       '@socket.io/component-emitter': 3.1.2
       debug: 4.3.7
-      engine.io-client: 6.6.3(bufferutil@4.0.9)
+      engine.io-client: 6.6.3(bufferutil@4.0.9)(utf-8-validate@6.0.5)
       socket.io-parser: 4.2.4
     transitivePeerDependencies:
       - bufferutil
@@ -17409,14 +17369,14 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  socket.io@4.8.1(bufferutil@4.0.9):
+  socket.io@4.8.1(bufferutil@4.0.9)(utf-8-validate@6.0.5):
     dependencies:
       accepts: 1.3.8
       base64id: 2.0.0
       cors: 2.8.5
       debug: 4.3.7
-      engine.io: 6.6.4(bufferutil@4.0.9)
-      socket.io-adapter: 2.5.5(bufferutil@4.0.9)
+      engine.io: 6.6.4(bufferutil@4.0.9)(utf-8-validate@6.0.5)
+      socket.io-adapter: 2.5.5(bufferutil@4.0.9)(utf-8-validate@6.0.5)
       socket.io-parser: 4.2.4
     transitivePeerDependencies:
       - bufferutil
@@ -17692,13 +17652,6 @@ snapshots:
 
   tapable@2.2.2: {}
 
-  tar-fs@2.1.1:
-    dependencies:
-      chownr: 1.1.4
-      mkdirp-classic: 0.5.3
-      pump: 3.0.3
-      tar-stream: 2.2.0
-
   tar-fs@3.1.0:
     dependencies:
       pump: 3.0.3
@@ -17708,14 +17661,6 @@ snapshots:
       bare-path: 3.0.0
     transitivePeerDependencies:
       - bare-buffer
-
-  tar-stream@2.2.0:
-    dependencies:
-      bl: 4.1.0
-      end-of-stream: 1.4.5
-      fs-constants: 1.0.0
-      inherits: 2.0.4
-      readable-stream: 3.6.2
 
   tar-stream@3.1.7:
     dependencies:
@@ -17979,11 +17924,6 @@ snapshots:
       has-bigints: 1.1.0
       has-symbols: 1.1.0
       which-boxed-primitive: 1.1.1
-
-  unbzip2-stream@1.4.3:
-    dependencies:
-      buffer: 5.7.1
-      through: 2.3.8
 
   undici-types@6.21.0: {}
 
@@ -18515,22 +18455,20 @@ snapshots:
 
   wrappy@1.0.2: {}
 
-  ws@7.5.10(bufferutil@4.0.9):
+  ws@7.5.10(bufferutil@4.0.9)(utf-8-validate@6.0.5):
     optionalDependencies:
       bufferutil: 4.0.9
+      utf-8-validate: 6.0.5
 
-  ws@8.17.1(bufferutil@4.0.9):
+  ws@8.17.1(bufferutil@4.0.9)(utf-8-validate@6.0.5):
     optionalDependencies:
       bufferutil: 4.0.9
+      utf-8-validate: 6.0.5
 
   ws@8.18.3(bufferutil@4.0.9)(utf-8-validate@6.0.5):
     optionalDependencies:
       bufferutil: 4.0.9
       utf-8-validate: 6.0.5
-
-  ws@8.9.0(bufferutil@4.0.9):
-    optionalDependencies:
-      bufferutil: 4.0.9
 
   wsl-utils@0.1.0:
     dependencies:
