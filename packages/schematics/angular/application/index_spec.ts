@@ -872,4 +872,20 @@ describe('Application Schematic', () => {
       expect(fileContent).not.toContain('provideZoneChangeDetection');
     });
   });
+
+  it('should call the tailwind schematic when style is tailwind', async () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const options = { ...defaultOptions, style: 'tailwind' as any };
+    const tree = await schematicRunner.runSchematic('application', options, workspaceTree);
+
+    expect(tree.exists('/projects/foo/.postcssrc.json')).toBe(true);
+
+    const packageJson = JSON.parse(tree.readContent('/package.json'));
+    expect(packageJson.devDependencies['tailwindcss']).toBeDefined();
+    expect(packageJson.devDependencies['postcss']).toBeDefined();
+    expect(packageJson.devDependencies['@tailwindcss/postcss']).toBeDefined();
+
+    const stylesContent = tree.readContent('/projects/foo/src/styles.css');
+    expect(stylesContent).toContain('@import "tailwindcss";');
+  });
 });

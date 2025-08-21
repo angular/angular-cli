@@ -22,7 +22,7 @@ import {
   strings,
   url,
 } from '@angular-devkit/schematics';
-import { Schema as ComponentOptions } from '../component/schema';
+import { Schema as ComponentOptions, Style as ComponentStyle } from '../component/schema';
 import {
   DependencyType,
   ExistingBehavior,
@@ -59,6 +59,11 @@ function addTsProjectReference(...paths: string[]) {
 
 export default function (options: ApplicationOptions): Rule {
   return async (host: Tree) => {
+    const isTailwind = options.style === Style.Tailwind;
+    if (isTailwind) {
+      options.style = Style.Css;
+    }
+
     const { appDir, appRootSelector, componentOptions, folderName, sourceDir } =
       await getAppOptions(host, options);
 
@@ -135,6 +140,11 @@ export default function (options: ApplicationOptions): Rule {
           })
         : noop(),
       options.skipPackageJson ? noop() : addDependenciesToPackageJson(options),
+      isTailwind
+        ? schematic('tailwind', {
+            project: options.name,
+          })
+        : noop(),
     ]);
   };
 }
@@ -368,14 +378,14 @@ function getComponentOptions(options: ApplicationOptions): Partial<ComponentOpti
         inlineStyle: options.inlineStyle,
         inlineTemplate: options.inlineTemplate,
         skipTests: options.skipTests,
-        style: options.style,
+        style: options.style as unknown as ComponentStyle,
         viewEncapsulation: options.viewEncapsulation,
       }
     : {
         inlineStyle: options.inlineStyle ?? true,
         inlineTemplate: options.inlineTemplate ?? true,
         skipTests: true,
-        style: options.style,
+        style: options.style as unknown as ComponentStyle,
         viewEncapsulation: options.viewEncapsulation,
       };
 
