@@ -25,8 +25,9 @@ import {
 import { addDeclarationToNgModule } from '../utility/add-declaration-to-ng-module';
 import { findModuleFromOptions } from '../utility/find-module';
 import { parseName } from '../utility/parse-name';
+import { createProjectSchematic } from '../utility/project';
 import { validateClassName, validateHtmlSelector } from '../utility/validation';
-import { buildDefaultPath, getWorkspace } from '../utility/workspace';
+import { buildDefaultPath } from '../utility/workspace';
 import { Schema as ComponentOptions, Style } from './schema';
 
 function buildSelector(options: ComponentOptions, projectPrefix: string) {
@@ -40,62 +41,52 @@ function buildSelector(options: ComponentOptions, projectPrefix: string) {
   return selector;
 }
 
-export default function (options: ComponentOptions): Rule {
-  return async (host: Tree) => {
-    const workspace = await getWorkspace(host);
-    const project = workspace.projects.get(options.project);
+export default createProjectSchematic<ComponentOptions>((options, { project, tree }) => {
+  if (options.path === undefined) {
+    options.path = buildDefaultPath(project);
+  }
 
-    if (!project) {
-      throw new SchematicsException(`Project "${options.project}" does not exist.`);
-    }
+  options.module = findModuleFromOptions(tree, options);
+  // Schematic templates require a defined type value
+  options.type ??= '';
 
-    if (options.path === undefined) {
-      options.path = buildDefaultPath(project);
-    }
+  const parsedPath = parseName(options.path, options.name);
+  options.name = parsedPath.name;
+  options.path = parsedPath.path;
+  options.selector = options.selector || buildSelector(options, (project && project.prefix) || '');
 
-    options.module = findModuleFromOptions(host, options);
-    // Schematic templates require a defined type value
-    options.type ??= '';
+  validateHtmlSelector(options.selector);
+  validateClassName(strings.classify(options.name));
 
-    const parsedPath = parseName(options.path, options.name);
-    options.name = parsedPath.name;
-    options.path = parsedPath.path;
-    options.selector =
-      options.selector || buildSelector(options, (project && project.prefix) || '');
+  const skipStyleFile = options.inlineStyle || options.style === Style.None;
+  const templateSource = apply(url('./files'), [
+    options.skipTests ? filter((path) => !path.endsWith('.spec.ts.template')) : noop(),
+    skipStyleFile ? filter((path) => !path.endsWith('.__style__.template')) : noop(),
+    options.inlineTemplate ? filter((path) => !path.endsWith('.html.template')) : noop(),
+    applyTemplates({
+      ...strings,
+      'if-flat': (s: string) => (options.flat ? '' : s),
+      'ngext': options.ngHtml ? '.ng' : '',
+      ...options,
+    }),
+    !options.type
+      ? forEach(((file) => {
+          return file.path.includes('..')
+            ? {
+                content: file.content,
+                path: file.path.replace('..', '.'),
+              }
+            : file;
+        }) as FileOperator)
+      : noop(),
+    move(parsedPath.path),
+  ]);
 
-    validateHtmlSelector(options.selector);
-    validateClassName(strings.classify(options.name));
-
-    const skipStyleFile = options.inlineStyle || options.style === Style.None;
-    const templateSource = apply(url('./files'), [
-      options.skipTests ? filter((path) => !path.endsWith('.spec.ts.template')) : noop(),
-      skipStyleFile ? filter((path) => !path.endsWith('.__style__.template')) : noop(),
-      options.inlineTemplate ? filter((path) => !path.endsWith('.html.template')) : noop(),
-      applyTemplates({
-        ...strings,
-        'if-flat': (s: string) => (options.flat ? '' : s),
-        'ngext': options.ngHtml ? '.ng' : '',
-        ...options,
-      }),
-      !options.type
-        ? forEach(((file) => {
-            return file.path.includes('..')
-              ? {
-                  content: file.content,
-                  path: file.path.replace('..', '.'),
-                }
-              : file;
-          }) as FileOperator)
-        : noop(),
-      move(parsedPath.path),
-    ]);
-
-    return chain([
-      addDeclarationToNgModule({
-        type: 'component',
-        ...options,
-      }),
-      mergeWith(templateSource),
-    ]);
-  };
-}
+  return chain([
+    addDeclarationToNgModule({
+      type: 'component',
+      ...options,
+    }),
+    mergeWith(templateSource),
+  ]);
+});

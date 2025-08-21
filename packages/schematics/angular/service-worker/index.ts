@@ -20,12 +20,13 @@ import {
   url,
 } from '@angular-devkit/schematics';
 import * as ts from '../third_party/github.com/Microsoft/TypeScript/lib/typescript';
-import { addDependency, addRootProvider, readWorkspace, writeWorkspace } from '../utility';
+import { addDependency, addRootProvider, writeWorkspace } from '../utility';
 import { addSymbolToNgModuleMetadata, insertImport } from '../utility/ast-utils';
 import { applyToUpdateRecorder } from '../utility/change';
 import { getDependency } from '../utility/dependency';
 import { getAppModulePath, isStandaloneApp } from '../utility/ng-ast-utils';
 import { relativePathToWorkspaceRoot } from '../utility/paths';
+import { createProjectSchematic } from '../utility/project';
 import { targetBuildNotFoundError } from '../utility/project-targets';
 import { findAppConfig } from '../utility/standalone/app_config';
 import { findBootstrapApplicationCall, getMainFilePath } from '../utility/standalone/util';
@@ -103,13 +104,8 @@ function getTsSourceFile(host: Tree, path: string): ts.SourceFile {
   return source;
 }
 
-export default function (options: ServiceWorkerOptions): Rule {
-  return async (host: Tree) => {
-    const workspace = await readWorkspace(host);
-    const project = workspace.projects.get(options.project);
-    if (!project) {
-      throw new SchematicsException(`Invalid project name (${options.project})`);
-    }
+export default createProjectSchematic<ServiceWorkerOptions>(
+  async (options, { project, workspace, tree }) => {
     if (project.extensions.projectType !== 'application') {
       throw new SchematicsException(`Service worker requires a project type of "application".`);
     }
@@ -119,7 +115,7 @@ export default function (options: ServiceWorkerOptions): Rule {
     }
 
     const buildOptions = buildTarget.options as Record<string, string | boolean>;
-    const browserEntryPoint = await getMainFilePath(host, options.project);
+    const browserEntryPoint = await getMainFilePath(tree, options.project);
     const ngswConfigPath = join(normalize(project.root), 'ngsw-config.json');
 
     if (
@@ -135,7 +131,7 @@ export default function (options: ServiceWorkerOptions): Rule {
       buildOptions.ngswConfigPath = ngswConfigPath;
     }
 
-    await writeWorkspace(host, workspace);
+    await writeWorkspace(tree, workspace);
 
     return chain([
       addDependencies(),
@@ -148,12 +144,12 @@ export default function (options: ServiceWorkerOptions): Rule {
           move(project.root),
         ]),
       ),
-      isStandaloneApp(host, browserEntryPoint)
+      isStandaloneApp(tree, browserEntryPoint)
         ? addProvideServiceWorker(options.project, browserEntryPoint)
         : updateAppModule(browserEntryPoint),
     ]);
-  };
-}
+  },
+);
 
 function addImport(host: Tree, filePath: string, symbolName: string, moduleName: string): void {
   const moduleSource = getTsSourceFile(host, filePath);

@@ -34,6 +34,7 @@ import {
   findModuleFromOptions,
 } from '../utility/find-module';
 import { parseName } from '../utility/parse-name';
+import { createProjectSchematic } from '../utility/project';
 import { validateClassName } from '../utility/validation';
 import { createDefaultPath } from '../utility/workspace';
 import { Schema as ModuleOptions, RoutingScope } from './schema';
@@ -133,61 +134,59 @@ function buildRoute(options: ModuleOptions, modulePath: string) {
   return `{ path: '${options.route}', loadChildren: ${loadChildren} }`;
 }
 
-export default function (options: ModuleOptions): Rule {
-  return async (host: Tree) => {
-    if (options.path === undefined) {
-      options.path = await createDefaultPath(host, options.project);
-    }
+export default createProjectSchematic<ModuleOptions>(async (options, { tree }) => {
+  if (options.path === undefined) {
+    options.path = await createDefaultPath(tree, options.project);
+  }
 
-    if (options.module) {
-      options.module = findModuleFromOptions(host, options);
-    }
+  if (options.module) {
+    options.module = findModuleFromOptions(tree, options);
+  }
 
-    let routingModulePath;
-    const isLazyLoadedModuleGen = !!(options.route && options.module);
-    if (isLazyLoadedModuleGen) {
-      options.routingScope = RoutingScope.Child;
-      routingModulePath = getRoutingModulePath(host, options.module as string);
-    }
+  let routingModulePath;
+  const isLazyLoadedModuleGen = !!(options.route && options.module);
+  if (isLazyLoadedModuleGen) {
+    options.routingScope = RoutingScope.Child;
+    routingModulePath = getRoutingModulePath(tree, options.module as string);
+  }
 
-    const parsedPath = parseName(options.path, options.name);
-    options.name = parsedPath.name;
-    options.path = parsedPath.path;
-    validateClassName(strings.classify(options.name));
+  const parsedPath = parseName(options.path, options.name);
+  options.name = parsedPath.name;
+  options.path = parsedPath.path;
+  validateClassName(strings.classify(options.name));
 
-    const templateSource = apply(url('./files'), [
-      options.routing || (isLazyLoadedModuleGen && routingModulePath)
-        ? noop()
-        : filter((path) => !path.includes('-routing')),
-      applyTemplates({
-        ...strings,
-        'if-flat': (s: string) => (options.flat ? '' : s),
-        lazyRoute: isLazyLoadedModuleGen,
-        lazyRouteWithoutRouteModule: isLazyLoadedModuleGen && !routingModulePath,
-        lazyRouteWithRouteModule: isLazyLoadedModuleGen && !!routingModulePath,
-        ...options,
-      }),
-      move(parsedPath.path),
-    ]);
-    const moduleDasherized = strings.dasherize(options.name);
-    const modulePath = `${
-      !options.flat ? moduleDasherized + '/' : ''
-    }${moduleDasherized}${options.typeSeparator}module.ts`;
+  const templateSource = apply(url('./files'), [
+    options.routing || (isLazyLoadedModuleGen && routingModulePath)
+      ? noop()
+      : filter((path) => !path.includes('-routing')),
+    applyTemplates({
+      ...strings,
+      'if-flat': (s: string) => (options.flat ? '' : s),
+      lazyRoute: isLazyLoadedModuleGen,
+      lazyRouteWithoutRouteModule: isLazyLoadedModuleGen && !routingModulePath,
+      lazyRouteWithRouteModule: isLazyLoadedModuleGen && !!routingModulePath,
+      ...options,
+    }),
+    move(parsedPath.path),
+  ]);
+  const moduleDasherized = strings.dasherize(options.name);
+  const modulePath = `${
+    !options.flat ? moduleDasherized + '/' : ''
+  }${moduleDasherized}${options.typeSeparator}module.ts`;
 
-    const componentOptions: ComponentOptions = {
-      module: modulePath,
-      flat: options.flat,
-      name: options.name,
-      path: options.path,
-      project: options.project,
-      standalone: false,
-    };
-
-    return chain([
-      !isLazyLoadedModuleGen ? addImportToNgModule(options) : noop(),
-      addRouteDeclarationToNgModule(options, routingModulePath),
-      mergeWith(templateSource),
-      isLazyLoadedModuleGen ? schematic('component', componentOptions) : noop(),
-    ]);
+  const componentOptions: ComponentOptions = {
+    module: modulePath,
+    flat: options.flat,
+    name: options.name,
+    path: options.path,
+    project: options.project,
+    standalone: false,
   };
-}
+
+  return chain([
+    !isLazyLoadedModuleGen ? addImportToNgModule(options) : noop(),
+    addRouteDeclarationToNgModule(options, routingModulePath),
+    mergeWith(templateSource),
+    isLazyLoadedModuleGen ? schematic('component', componentOptions) : noop(),
+  ]);
+});
