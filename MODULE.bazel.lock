@@ -527,7 +527,7 @@
         "bzlTransitiveDigest": "9IJp6IlB/FMHFBJe4MX/DQM4zi3oArC8yqYE/+NyPwk=",
         "usagesDigest": "ltWGqWW6sLMu/u31IwJqdHjhE4iS2Cto+bTSDdqQO0w=",
         "recordedFileInputs": {
-          "@@//package.json": "c4378283d77db23e769521899adbdb437c5ca5e8787b980ce9ca4c2239a682ec",
+          "@@//package.json": "979fbf01ad52eabee05ffb6b82672b74f7cd58f30e8552e0675c799994ef2345",
           "@@devinfra~//bazel/package.json": "960bcecf963a211f96a3967c7cfb5d3e1cea08d94b27056a3e8dbf2fad1e2dd3",
           "@@rules_browsers~//package.json": "45572077938c7a4916e4aaedf7db7ce8425854ab92f35348cff02a2134023bb8"
         },
@@ -674,7 +674,7 @@
     "@@rules_angular~//setup:extensions.bzl%rules_angular": {
       "general": {
         "bzlTransitiveDigest": "fkaH7HMicL3g7/NDaFzlq39kcLopMyQ3KdbDn+5CRzA=",
-        "usagesDigest": "4vjoXp94lW/cnp3G5Nbi6SdqHuFBsaA7m/u83of5HE8=",
+        "usagesDigest": "mthsJSuRvcThgmaeFEDgFmVR6HwM1CSMSOyLlJaCSI0=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
         "envVariables": {},
@@ -700,7 +700,7 @@
             "ruleClassName": "configurable_deps_repo",
             "attributes": {
               "angular_compiler_cli": "@@rules_angular~//:node_modules/@angular/compiler-cli",
-              "typescript": "@@rules_angular~//:node_modules/typescript-local"
+              "typescript": "@@rules_angular~//:node_modules/typescript"
             }
           }
         },
