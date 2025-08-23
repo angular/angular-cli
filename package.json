@@ -80,7 +80,7 @@
     "@types/jasmine-reporters": "^2",
     "@types/karma": "^6.3.0",
     "@types/less": "^3.0.3",
-    "@types/loader-utils": "^2.0.0",
+    "@types/loader-utils": "^3.0.0",
     "@types/lodash": "^4.17.0",
     "@types/node": "^22.12.0",
     "@types/npm-package-arg": "^6.1.0",
