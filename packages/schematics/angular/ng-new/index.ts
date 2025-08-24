@@ -60,6 +60,10 @@ export default function (options: NgNewOptions): Rule {
     zoneless: options.zoneless,
   };
 
+  if (options.aiConfig?.includes('none') && options.aiConfig.length > 1) {
+    options.aiConfig = options.aiConfig.filter(t => t !== 'none');
+  }
+
   return chain([
     mergeWith(
       apply(empty(), [
