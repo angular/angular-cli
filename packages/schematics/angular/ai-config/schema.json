@@ -50,21 +50,5 @@
         "enum": ["none", "gemini", "copilot", "claude", "cursor", "jetbrains", "windsurf"]
       }
     }
-  },
-  "if": {
-    "properties": {
-      "tool": {
-        "contains": {
-          "const": "none"
-        }
-      }
-    }
-  },
-  "then": {
-    "properties": {
-      "tool": {
-        "maxItems": 1
-      }
-    }
   }
 }
