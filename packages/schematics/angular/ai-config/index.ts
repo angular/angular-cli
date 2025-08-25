@@ -19,9 +19,7 @@ import {
 } from '@angular-devkit/schematics';
 import { Schema as ConfigOptions, Tool } from './schema';
 
-type ToolWithoutNone = Exclude<Tool, Tool.None>;
-
-const AI_TOOLS: { [key in ToolWithoutNone]: ContextFileInfo } = {
+const AI_TOOLS: { [key in Exclude<Tool, Tool.None>]: ContextFileInfo } = {
   gemini: {
     rulesName: 'GEMINI.md',
     directory: '.gemini',
@@ -57,26 +55,25 @@ interface ContextFileInfo {
 }
 
 export default function ({ tool }: ConfigOptions): Rule {
-  if (!tool || tool.includes(Tool.None)) {
+  if (!tool) {
     return noop();
   }
 
-  const files: ContextFileInfo[] = (tool as ToolWithoutNone[]).map(
-    (selectedTool) => AI_TOOLS[selectedTool],
-  );
-
-  const rules = files.map(({ rulesName, directory, frontmatter }) =>
-    mergeWith(
-      apply(url('./files'), [
-        applyTemplates({
-          ...strings,
-          rulesName,
-          frontmatter,
-        }),
-        move(directory),
-      ]),
-    ),
-  );
+  const rules = tool
+    .filter((tool) => tool !== Tool.None)
+    .map((selectedTool) => AI_TOOLS[selectedTool])
+    .map(({ rulesName, directory, frontmatter }) =>
+      mergeWith(
+        apply(url('./files'), [
+          applyTemplates({
+            ...strings,
+            rulesName,
+            frontmatter,
+          }),
+          move(directory),
+        ]),
+      ),
+    );
 
   return chain(rules);
 }
