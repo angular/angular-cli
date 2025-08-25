@@ -204,13 +204,20 @@ export abstract class SchematicsCommandModule
                     ? {
                         name: item,
                         value: item,
-                        checked: item === definition.default,
+                        checked:
+                          definition.multiselect && Array.isArray(definition.default)
+                            ? definition.default?.includes(item)
+                            : item === definition.default,
                       }
                     : {
                         ...item,
                         name: item.label,
                         value: item.value,
-                        checked: item.value === definition.default,
+                        checked:
+                          definition.multiselect && Array.isArray(definition.default)
+                            ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                              definition.default?.includes(item.value as any)
+                            : item.value === definition.default,
                       },
                 ),
               });
