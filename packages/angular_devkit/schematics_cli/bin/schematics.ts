@@ -93,7 +93,6 @@ function _createPromptProvider(): schema.PromptProvider {
             definition.multiselect ? prompts.checkbox : prompts.select
           )({
             message: definition.message,
-            default: definition.default,
             validate: (values) => {
               if (!definition.validator) {
                 return true;
@@ -101,15 +100,26 @@ function _createPromptProvider(): schema.PromptProvider {
 
               return definition.validator(Object.values(values).map(({ value }) => value));
             },
-            choices: definition.items.map((item) =>
+            default: definition.multiselect ? undefined : definition.default,
+            choices: definition.items?.map((item) =>
               typeof item == 'string'
                 ? {
                     name: item,
                     value: item,
+                    checked:
+                      definition.multiselect && Array.isArray(definition.default)
+                        ? definition.default?.includes(item)
+                        : item === definition.default,
                   }
                 : {
+                    ...item,
                     name: item.label,
                     value: item.value,
+                    checked:
+                      definition.multiselect && Array.isArray(definition.default)
+                        ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                          definition.default?.includes(item.value as any)
+                        : item.value === definition.default,
                   },
             ),
           });

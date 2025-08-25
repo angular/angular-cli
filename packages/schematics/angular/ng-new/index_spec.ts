@@ -58,7 +58,7 @@ describe('Ng New Schematic', () => {
     );
   });
 
-  it('should should set the prefix in angular.json and in app.ts', async () => {
+  it('should set the prefix in angular.json and in app.ts', async () => {
     const options = { ...defaultOptions, prefix: 'pre' };
 
     const tree = await schematicRunner.runSchematic('ng-new', options);

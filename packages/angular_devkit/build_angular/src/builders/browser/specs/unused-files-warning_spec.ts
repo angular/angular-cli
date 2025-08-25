@@ -238,7 +238,7 @@ describe('Browser Builder unused files warnings', () => {
               host.appendToFile('src/main.ts', '');
               break;
             case 2:
-              // The second should should have type.ts as unused but shouldn't warn.
+              // The second should have type.ts as unused but shouldn't warn.
               expect(logs.join().includes(warningMessageSuffix)).toBe(
                 false,
                 `Case ${buildNumber} failed.`,
