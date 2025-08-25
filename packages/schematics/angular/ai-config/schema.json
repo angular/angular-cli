@@ -9,7 +9,7 @@
     "tool": {
       "type": "array",
       "uniqueItems": true,
-      "default": "none",
+      "default": ["none"],
       "x-prompt": {
         "message": "Which AI tools do you want to configure with Angular best practices? https://angular.dev/ai/develop-with-ai",
         "type": "list",
@@ -48,22 +48,6 @@
       "items": {
         "type": "string",
         "enum": ["none", "gemini", "copilot", "claude", "cursor", "jetbrains", "windsurf"]
-      }
-    }
-  },
-  "if": {
-    "properties": {
-      "tool": {
-        "contains": {
-          "const": "none"
-        }
-      }
-    }
-  },
-  "then": {
-    "properties": {
-      "tool": {
-        "maxItems": 1
       }
     }
   }
