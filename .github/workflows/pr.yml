@@ -141,7 +141,7 @@ jobs:
         with:
           allow_windows_rbe: true
       - name: Run CLI E2E tests
-        run: pnpm bazel test --config=e2e //tests/legacy-cli:e2e.esbuild_node22 --test_arg="--glob=\"tests/basic/{build,rebuild}.ts\""
+        run: pnpm bazel test --repository_cache="c:/Users/runneradmin/.cache/bazel_repo_cache" --config=e2e //tests/legacy-cli:e2e.esbuild_node22 --test_arg="--glob=\"tests/basic/{build,rebuild}.ts\""
 
   e2e-package-managers:
     needs: build
