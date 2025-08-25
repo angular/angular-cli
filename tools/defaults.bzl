@@ -13,7 +13,6 @@ def ts_project(
         tsconfig = None,
         testonly = False,
         visibility = None,
-        ignore_strict_deps = False,
         **kwargs):
     if tsconfig == None:
         tsconfig = "//:test-tsconfig" if testonly else "//:build-tsconfig"
@@ -28,12 +27,12 @@ def ts_project(
         **kwargs
     )
 
-    if not ignore_strict_deps:
-        strict_deps_test(
-            name = "%s_strict_deps_test" % name,
-            srcs = kwargs.get("srcs", []),
-            deps = deps,
-        )
+    strict_deps_test(
+        name = "%s_strict_deps_test" % name,
+        srcs = kwargs.get("srcs", []),
+        tsconfig = tsconfig,
+        deps = deps,
+    )
 
 def npm_package(**kwargs):
     _npm_package(**kwargs)
