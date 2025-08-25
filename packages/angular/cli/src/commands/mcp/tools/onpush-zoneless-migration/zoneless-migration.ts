@@ -8,8 +8,8 @@
 
 import { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol';
 import { ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types';
-import { glob } from 'fast-glob';
-import * as fs from 'fs';
+import { glob } from 'node:fs/promises';
+import * as fs from 'node:fs';
 import ts from 'typescript';
 import { z } from 'zod';
 import { declareTool } from '../tool-registry';
@@ -53,8 +53,10 @@ export async function registerZonelessMigrationTool(
   const zoneFiles = new Set<ts.SourceFile>();
 
   if (fs.statSync(fileOrDirPath).isDirectory()) {
-    const allFiles = await glob(`${fileOrDirPath}/**/*.ts`);
-    files = allFiles.map(createSourceFile);
+    const allFiles = glob(`${fileOrDirPath}/**/*.ts`);
+    for await (const file of allFiles) {
+      files.push(createSourceFile(file));
+    }
   } else {
     files = [createSourceFile(fileOrDirPath)];
     const maybeTestFile = await getTestFilePath(fileOrDirPath);

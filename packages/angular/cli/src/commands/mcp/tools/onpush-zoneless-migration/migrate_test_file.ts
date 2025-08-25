@@ -7,8 +7,8 @@
  */
 
 import { glob } from 'fast-glob';
-import * as fs from 'fs';
-import { dirname, join } from 'path';
+import * as fs from 'node:fs';
+import { dirname, join } from 'node:path';
 import ts from 'typescript';
 import { createFixResponseForZoneTests, createProvideZonelessForTestsSetupPrompt } from './prompts';
 import { MigrationResponse } from './types';
