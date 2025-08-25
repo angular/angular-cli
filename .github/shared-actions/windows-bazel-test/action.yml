@@ -18,7 +18,7 @@ runs:
   steps:
     - name: Initialize WSL
       id: init_wsl
-      uses: alan-agius4/dev-infra/github-actions/setup-wsl@e7c2255347c352d5bce61b4623c78077c986e3aa
+      uses: alan-agius4/dev-infra/github-actions/setup-wsl@68825541aa5c3ade19751b37d1b2eba9b19a0706
       with:
         wsl_firewall_interface: 'vEthernet (WSL (Hyper-V firewall))'
 
