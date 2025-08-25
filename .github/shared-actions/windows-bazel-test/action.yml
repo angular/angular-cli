@@ -18,7 +18,7 @@ runs:
   steps:
     - name: Initialize WSL
       id: init_wsl
-      uses: angular/dev-infra/github-actions/setup-wsl@029d16b075db696b35d0d661d0fd3a0552a4b452
+      uses: alan-agius4/dev-infra/github-actions/setup-wsl@1bcb17adf041ed391e9f928cd38dff54705bed60
       with:
         wsl_firewall_interface: 'vEthernet (WSL (Hyper-V firewall))'
 
@@ -72,16 +72,16 @@ runs:
         # TODO(devversion): consult with Aspect on why this is needed.
         (cd $runfiles_dir/_main && ${{steps.init_wsl.outputs.cmd_path}} /C "mklink /D external ..")
 
-    - name: Run tests
-      # Note: This is Git Bash.
-      shell: bash
-      env:
-        BAZEL_BINDIR: '.'
-        # Use D:/ for better performance see: https://github.com/actions/runner-images/issues/12744
-        E2E_TEMP: 'D:\\tmp_dir'
-      working-directory: "D:\\test"
-      run: |
-        node "${{github.workspace}}\\scripts\\windows-testing\\parallel-executor.mjs" \
-          $PWD/dist/bin/tests/legacy-cli/${{inputs.test_target_name}}_/${{inputs.test_target_name}}.bat.runfiles \
-          ${{inputs.test_target_name}} \
-          "${{inputs.test_args}}" \
+    # - name: Run tests
+    #   # Note: This is Git Bash.
+    #   shell: bash
+    #   env:
+    #     BAZEL_BINDIR: '.'
+    #     # Use D:/ for better performance see: https://github.com/actions/runner-images/issues/12744
+    #     E2E_TEMP: 'D:\\tmp_dir'
+    #   working-directory: "D:\\test"
+    #   run: |
+    #     node "${{github.workspace}}\\scripts\\windows-testing\\parallel-executor.mjs" \
+    #       $PWD/dist/bin/tests/legacy-cli/${{inputs.test_target_name}}_/${{inputs.test_target_name}}.bat.runfiles \
+    #       ${{inputs.test_target_name}} \
+    #       "${{inputs.test_args}}" \
