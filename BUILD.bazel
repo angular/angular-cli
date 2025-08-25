@@ -19,10 +19,18 @@ exports_files([
 npm_link_all_packages()
 
 rules_js_tsconfig(
+    name = "tsconfig",
+    src = "tsconfig.json",
+    visibility = [
+        "//:__pkg__",
+    ],
+)
+
+rules_js_tsconfig(
     name = "build-tsconfig",
     src = "tsconfig-build.json",
     deps = [
-        "tsconfig.json",
+        ":tsconfig",
         "//:node_modules/@types/node",
     ],
 )
@@ -31,7 +39,7 @@ rules_js_tsconfig(
     name = "test-tsconfig",
     src = "tsconfig-test.json",
     deps = [
-        "tsconfig.json",
+        ":tsconfig",
         "//:node_modules/@types/jasmine",
         "//:node_modules/@types/node",
     ],
@@ -41,7 +49,7 @@ rules_js_tsconfig(
     name = "build-tsconfig-esm",
     src = "tsconfig-build-esm.json",
     deps = [
-        "tsconfig.json",
+        ":tsconfig",
     ],
 )
 
