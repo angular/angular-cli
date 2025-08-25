@@ -54,14 +54,18 @@
       "description": "The type of stylesheet files to be created for components in the application.",
       "type": "string",
       "default": "css",
-      "enum": ["css", "scss", "sass", "less"],
+      "enum": ["css", "scss", "sass", "less", "tailwind"],
       "x-prompt": {
-        "message": "Which stylesheet format would you like to use?",
+        "message": "Which stylesheet system would you like to use?",
         "type": "list",
         "items": [
           {
             "value": "css",
             "label": "CSS             [ https://developer.mozilla.org/docs/Web/CSS                     ]"
+          },
+          {
+            "value": "tailwind",
+            "label": "Tailwind CSS    [ https://tailwindcss.com                                        ]"
           },
           {
             "value": "scss",
