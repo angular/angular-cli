@@ -18,11 +18,11 @@ runs:
   steps:
     - name: Initialize WSL
       id: init_wsl
-      uses: alan-agius4/dev-infra/github-actions/setup-wsl@1ddb16c1c834fe0c70e342ec0203ebe9ae64ab0d
+      uses: alan-agius4/dev-infra/github-actions/setup-wsl@117c1e698e824ccebdd268e3c80ade4c1f8c9d03
       with:
         wsl_firewall_interface: 'vEthernet (WSL (Hyper-V firewall))'
 
-    - name: Install node modules in WSL (re-using from previous install/cache restore)
+    - name: Install node modules (inside WSL)
       run: |
         export NVM_DIR="$HOME/.nvm"
         [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
