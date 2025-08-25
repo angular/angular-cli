@@ -105,7 +105,7 @@ describe('@ngtools/webpack transformers', () => {
       expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
     });
 
-    it('should should support svg as templates', () => {
+    it('should support svg as templates', () => {
       const input = tags.stripIndent`
         import { Component } from '@angular/core';
 

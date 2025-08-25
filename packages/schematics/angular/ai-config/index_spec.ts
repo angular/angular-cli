@@ -72,13 +72,14 @@ describe('Ai Config Schematic', () => {
     expect(tree.exists('.cursor/rules/cursor.mdc')).toBeTruthy();
   });
 
-  it('should error is None is associated with other values', () => {
-    return expectAsync(runConfigSchematic([ConfigTool.None, ConfigTool.Cursor])).toBeRejected();
-  });
-
   it('should not create any files if None is selected', async () => {
     const filesCount = workspaceTree.files.length;
     const tree = await runConfigSchematic([ConfigTool.None]);
     expect(tree.files.length).toBe(filesCount);
+  });
+
+  it('should create for tool if None and Gemini are selected', async () => {
+    const tree = await runConfigSchematic([ConfigTool.Gemini, ConfigTool.None]);
+    expect(tree.exists('.gemini/GEMINI.md')).toBeTruthy();
   });
 });
