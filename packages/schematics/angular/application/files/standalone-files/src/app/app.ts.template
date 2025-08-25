@@ -13,7 +13,7 @@ import { RouterOutlet } from '@angular/router';<% } %>
   `,<% } else { %>
   templateUrl: './app.html',<% } if(inlineStyle) { %>
   styles: [],<% } else { %>
-  styleUrl: './app.<%= style %>'<% } %>
+  styleUrl: './app.<%= style %>'<% } %>,
 })
 export class App {
   protected readonly title = signal('<%= name %>');
