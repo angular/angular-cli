@@ -47,7 +47,7 @@ const parsed = parseArgs({
   options: {
     'debug': { type: 'boolean', default: !!process.env.BUILD_WORKSPACE_DIRECTORY },
     'esbuild': { type: 'boolean' },
-    'glob': { type: 'string', default: process.env.TESTBRIDGE_TEST_ONLY },
+    'glob': { type: 'string', default: 'tests/**/*.js' },
     'ignore': { type: 'string', multiple: true },
     'ng-snapshots': { type: 'boolean' },
     'ng-tag': { type: 'string' },
@@ -130,7 +130,7 @@ function lastLogger() {
 
 // Under bazel the compiled file (.js) and types (.d.ts) are available.
 const SRC_FILE_EXT_RE = /\.js$/;
-const testGlob = argv.glob?.replace(/\.ts$/, '.js') || `tests/**/*.js`;
+const testGlob = (process.env.TESTBRIDGE_TEST_ONLY ?? argv.glob).replace(/\.ts$/, '.js');
 
 const e2eRoot = path.join(__dirname, 'e2e');
 const allSetups = glob.sync(`setup/**/*.js`, { cwd: e2eRoot }).sort();
