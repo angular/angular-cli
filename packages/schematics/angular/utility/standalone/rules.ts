@@ -6,7 +6,6 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { tags } from '@angular-devkit/core';
 import { Rule, SchematicsException, Tree, chain } from '@angular-devkit/schematics';
 import ts from '../../third_party/github.com/Microsoft/TypeScript/lib/typescript';
 import { addSymbolToNgModuleMetadata, insertAfterLastOccurrence } from '../ast-utils';
@@ -188,7 +187,7 @@ function insertStandaloneRootProvider(tree: Tree, mainFilePath: string, expressi
     return;
   }
 
-  const newAppConfig = `, {\n${tags.indentBy(2)`providers: [${expression}]`}\n}`;
+  const newAppConfig = `, {\n${' '.repeat(2)}providers: [${expression}]\n}`;
   let targetCall: ts.CallExpression;
 
   if (bootstrapCall.arguments.length === 1) {
@@ -240,7 +239,7 @@ function addProvidersExpressionToAppConfig(
       ),
     ]);
   } else {
-    const prop = tags.indentBy(2)`providers: [${expression}]`;
+    const prop = `${' '.repeat(2)}providers: [${expression}]`;
     let toInsert: string;
     let insertPosition: number;
 
