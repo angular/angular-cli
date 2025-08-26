@@ -171,9 +171,9 @@ jobs:
         uses: ./.github/shared-actions/windows-bazel-test
         with:
           test_target_name: e2e.esbuild_node22
-          test_args: --glob "tests/basic/{build,rebuild}.ts"
         env:
           E2E_SHARD_TOTAL: 1
+          TESTBRIDGE_TEST_ONLY: tests/basic/{build,rebuild}.ts
 
   e2e-package-managers:
     needs: build

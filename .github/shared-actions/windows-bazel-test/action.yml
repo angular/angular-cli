@@ -6,12 +6,6 @@ inputs:
   test_target_name:
     description: E2E test target name.
     required: true
-  test_args:
-    description: |
-      Text representing the command line arguments that
-      should be passed to the e2e test runner.
-    required: false
-    default: ''
   e2e_temp_dir:
     description: 'The temporary directory path for E2E tests.'
     required: false
@@ -45,5 +39,4 @@ runs:
       run: |
         node ./scripts/windows-testing/parallel-executor.mjs \
           "./dist/bin/tests/legacy-cli/${{ inputs.test_target_name }}_/${{ inputs.test_target_name }}.bat.runfiles" \
-          ${{ inputs.test_target_name }} \
-          "${{ inputs.test_args }}"
+          ${{ inputs.test_target_name }}
