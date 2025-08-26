@@ -163,7 +163,7 @@ jobs:
       - name: Install node modules
         run: pnpm install --frozen-lockfile
       - name: Download built Windows E2E tests
-        uses: actions/download-artifact@abefc31eafcfbdf6c5336127c1346fdae79ff41c # v4.3.0
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
           name: win-e2e-build-artifacts
           path: dist/bin/tests/legacy-cli/
