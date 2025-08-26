@@ -6,7 +6,6 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { tags } from '@angular-devkit/core';
 import * as ts from '../third_party/github.com/Microsoft/TypeScript/lib/typescript';
 import { Change, InsertChange, NoopChange } from './change';
 import { getEOL } from './eol';
@@ -379,7 +378,11 @@ export function addSymbolToNgModuleMetadata(
     let toInsert: string;
     if (node.properties.length == 0) {
       position = node.getEnd() - 1;
-      toInsert = `\n  ${metadataField}: [\n${tags.indentBy(4)`${symbolName}`}\n  ]\n`;
+      toInsert = `
+  ${metadataField}: [
+${' '.repeat(4)}${symbolName}
+  ]
+`;
     } else {
       const childNode = node.properties[node.properties.length - 1];
       position = childNode.getEnd();
@@ -389,7 +392,7 @@ export function addSymbolToNgModuleMetadata(
       if (matches) {
         toInsert =
           `,${matches[0]}${metadataField}: [${matches[1]}` +
-          `${tags.indentBy(matches[2].length + 2)`${symbolName}`}${matches[0]}]`;
+          `${' '.repeat(matches[2].length + 2)}${symbolName}${matches[0]}]`;
       } else {
         toInsert = `, ${metadataField}: [${symbolName}]`;
       }
@@ -418,8 +421,8 @@ export function addSymbolToNgModuleMetadata(
   const elements = assignmentInit.elements;
 
   if (elements.length) {
-    const symbolsArray = elements.map((node) => tags.oneLine`${node.getText()}`);
-    if (symbolsArray.includes(tags.oneLine`${symbolName}`)) {
+    const symbolsArray = elements.map((node) => node.getText());
+    if (symbolsArray.includes(symbolName)) {
       return [];
     }
 
@@ -433,13 +436,13 @@ export function addSymbolToNgModuleMetadata(
   if (ts.isArrayLiteralExpression(expression)) {
     // We found the field but it's empty. Insert it just before the `]`.
     position--;
-    toInsert = `\n${tags.indentBy(4)`${symbolName}`}\n  `;
+    toInsert = `\n${' '.repeat(4)}${symbolName}\n  `;
   } else {
     // Get the indentation of the last element, if any.
     const text = expression.getFullText(source);
     const matches = text.match(/^(\r?\n)(\s*)/);
     if (matches) {
-      toInsert = `,${matches[1]}${tags.indentBy(matches[2].length)`${symbolName}`}`;
+      toInsert = `,${matches[1]}${' '.repeat(matches[2].length)}${symbolName}`;
     } else {
       toInsert = `, ${symbolName}`;
     }

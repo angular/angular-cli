@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { join, normalize, tags } from '@angular-devkit/core';
+import { join, normalize } from '@angular-devkit/core';
 import {
   Rule,
   SchematicContext,
@@ -51,18 +51,18 @@ function addSnippet(options: WebWorkerOptions): Rule {
 
     const siblingModulePath = `${options.path}/${siblingModules[0]}`;
     const logMessage = 'console.log(`page got message: ${data}`);';
-    const workerCreationSnippet = tags.stripIndent`
-      if (typeof Worker !== 'undefined') {
-        // Create a new
-        const worker = new Worker(new URL('./${options.name}.worker', import.meta.url));
-        worker.onmessage = ({ data }) => {
-          ${logMessage}
-        };
-        worker.postMessage('hello');
-      } else {
-        // Web Workers are not supported in this environment.
-        // You should add a fallback so that your program still executes correctly.
-      }
+    const workerCreationSnippet = `
+if (typeof Worker !== 'undefined') {
+  // Create a new
+  const worker = new Worker(new URL('./${options.name}.worker', import.meta.url));
+  worker.onmessage = ({ data }) => {
+    ${logMessage}
+  };
+  worker.postMessage('hello');
+} else {
+  // Web Workers are not supported in this environment.
+  // You should add a fallback so that your program still executes correctly.
+}
     `;
 
     // Append the worker creation snippet.

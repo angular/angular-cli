@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { join, normalize, tags } from '@angular-devkit/core';
+import { join, normalize } from '@angular-devkit/core';
 import {
   Rule,
   SchematicContext,
@@ -55,7 +55,7 @@ function updateAppModule(mainPath: string): Rule {
     addImport(host, modulePath, 'isDevMode', '@angular/core');
 
     // register SW in application module
-    const importText = tags.stripIndent`
+    const importText = `
       ServiceWorkerModule.register('ngsw-worker.js', {
         enabled: !isDevMode(),
         // Register the ServiceWorker as soon as the application is stable

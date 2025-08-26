@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { isJsonObject, join, normalize, strings } from '@angular-devkit/core';
+import { isJsonObject, join, normalize } from '@angular-devkit/core';
 import {
   Rule,
   SchematicContext,
@@ -18,6 +18,7 @@ import {
   mergeWith,
   move,
   schematic,
+  strings,
   url,
 } from '@angular-devkit/schematics';
 import { posix } from 'node:path';
