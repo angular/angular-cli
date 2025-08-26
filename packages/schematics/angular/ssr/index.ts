@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { isJsonObject, join, normalize } from '@angular-devkit/core';
+import { isJsonObject } from '@angular-devkit/core';
 import {
   Rule,
   SchematicContext,
@@ -21,7 +21,7 @@ import {
   strings,
   url,
 } from '@angular-devkit/schematics';
-import { posix } from 'node:path';
+import { join } from 'node:path/posix';
 import { Schema as ServerOptions } from '../server/schema';
 import {
   DependencyType,
@@ -85,7 +85,7 @@ async function getApplicationBuilderOutputPaths(
 
   let { outputPath } = architectTarget.options;
   // Use default if not explicitly specified
-  outputPath ??= posix.join('dist', projectName);
+  outputPath ??= join('dist', projectName);
 
   const defaultDirs = {
     server: DEFAULT_SERVER_DIR,
@@ -123,7 +123,7 @@ function addScriptsRule({ project }: SSROptions, isUsingApplicationBuilder: bool
     if (isUsingApplicationBuilder) {
       const { base, server } = await getApplicationBuilderOutputPaths(host, project);
       pkg.scripts ??= {};
-      pkg.scripts[`serve:ssr:${project}`] = `node ${posix.join(base, server)}/server.mjs`;
+      pkg.scripts[`serve:ssr:${project}`] = `node ${join(base, server)}/server.mjs`;
     } else {
       const serverDist = await getLegacyOutputPaths(host, project, 'server');
       pkg.scripts = {
@@ -185,7 +185,7 @@ function updateApplicationBuilderWorkspaceConfigRule(
       if (outputPath.browser === '') {
         const base = outputPath.base as string;
         logger.warn(
-          `The output location of the browser build has been updated from "${base}" to "${posix.join(
+          `The output location of the browser build has been updated from "${base}" to "${join(
             base,
             DEFAULT_BROWSER_DIR,
           )}".
@@ -208,7 +208,7 @@ function updateApplicationBuilderWorkspaceConfigRule(
       outputPath,
       outputMode: 'server',
       ssr: {
-        entry: join(normalize(projectSourceRoot), 'server.ts'),
+        entry: join(projectSourceRoot, 'server.ts'),
       },
     };
   });
@@ -227,7 +227,7 @@ function updateWebpackBuilderWorkspaceConfigRule(
 
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const serverTarget = project.targets.get('server')!;
-    (serverTarget.options ??= {}).main = posix.join(projectSourceRoot, 'server.ts');
+    (serverTarget.options ??= {}).main = join(projectSourceRoot, 'server.ts');
 
     const serveSSRTarget = project.targets.get(SERVE_SSR_TARGET_NAME);
     if (serveSSRTarget) {
@@ -365,7 +365,7 @@ export default createProjectSchematic<SSROptions>(async (options, { project, tre
   const isStandalone = isStandaloneApp(tree, browserEntryPoint);
 
   const usingApplicationBuilder = isUsingApplicationBuilder(project);
-  const sourceRoot = project.sourceRoot ?? posix.join(project.root, 'src');
+  const sourceRoot = project.sourceRoot ?? join(project.root, 'src');
 
   return chain([
     schematic('server', {

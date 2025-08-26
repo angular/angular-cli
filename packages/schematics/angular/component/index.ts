@@ -9,8 +9,6 @@
 import {
   FileOperator,
   Rule,
-  SchematicsException,
-  Tree,
   apply,
   applyTemplates,
   chain,

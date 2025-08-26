@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { Rule, Tree, chain, strings } from '@angular-devkit/schematics';
+import { chain, strings } from '@angular-devkit/schematics';
 import { addDeclarationToNgModule } from '../utility/add-declaration-to-ng-module';
 import { findModuleFromOptions } from '../utility/find-module';
 import { generateFromFiles } from '../utility/generate-from-files';

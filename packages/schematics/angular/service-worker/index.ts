@@ -6,7 +6,6 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { join, normalize } from '@angular-devkit/core';
 import {
   Rule,
   SchematicContext,
@@ -19,7 +18,8 @@ import {
   move,
   url,
 } from '@angular-devkit/schematics';
-import * as ts from '../third_party/github.com/Microsoft/TypeScript/lib/typescript';
+import { join } from 'node:path/posix';
+import ts from '../third_party/github.com/Microsoft/TypeScript/lib/typescript';
 import { addDependency, addRootProvider, writeWorkspace } from '../utility';
 import { addSymbolToNgModuleMetadata, insertImport } from '../utility/ast-utils';
 import { applyToUpdateRecorder } from '../utility/change';
@@ -116,7 +116,7 @@ export default createProjectSchematic<ServiceWorkerOptions>(
 
     const buildOptions = buildTarget.options as Record<string, string | boolean>;
     const browserEntryPoint = await getMainFilePath(tree, options.project);
-    const ngswConfigPath = join(normalize(project.root), 'ngsw-config.json');
+    const ngswConfigPath = join(project.root, 'ngsw-config.json');
 
     if (
       buildTarget.builder === Builders.Application ||
