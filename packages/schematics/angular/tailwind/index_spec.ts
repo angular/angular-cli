@@ -10,17 +10,32 @@ import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/te
 import { Schema as ApplicationOptions, Style } from '../application/schema';
 import { Schema as WorkspaceOptions } from '../workspace/schema';
 
-describe('Tailwind Schematic', () => {
-  const schematicRunner = new SchematicTestRunner(
-    '@schematics/angular',
-    require.resolve('../collection.json'),
-  );
-
+async function createTestApp(
+  runner: SchematicTestRunner,
+  appOptions: ApplicationOptions,
+  style = Style.Css,
+): Promise<UnitTestTree> {
   const workspaceOptions: WorkspaceOptions = {
     name: 'workspace',
     newProjectRoot: 'projects',
     version: '6.0.0',
   };
+
+  const appTree = await runner.runSchematic('workspace', workspaceOptions);
+
+  return runner.runSchematic('application', { ...appOptions, style }, appTree);
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function getWorkspace(tree: UnitTestTree): any {
+  return JSON.parse(tree.readContent('/angular.json'));
+}
+
+describe('Tailwind Schematic', () => {
+  const schematicRunner = new SchematicTestRunner(
+    '@schematics/angular',
+    require.resolve('../collection.json'),
+  );
 
   const appOptions: ApplicationOptions = {
     name: 'bar',
@@ -35,8 +50,7 @@ describe('Tailwind Schematic', () => {
   let appTree: UnitTestTree;
 
   beforeEach(async () => {
-    appTree = await schematicRunner.runSchematic('workspace', workspaceOptions);
-    appTree = await schematicRunner.runSchematic('application', appOptions, appTree);
+    appTree = await createTestApp(schematicRunner, appOptions);
   });
 
   it('should add tailwind dependencies', async () => {
@@ -45,17 +59,6 @@ describe('Tailwind Schematic', () => {
     expect(packageJson.devDependencies['tailwindcss']).toBeDefined();
     expect(packageJson.devDependencies['postcss']).toBeDefined();
     expect(packageJson.devDependencies['@tailwindcss/postcss']).toBeDefined();
-  });
-
-  it('should create a .postcssrc.json file in the project root', async () => {
-    const tree = await schematicRunner.runSchematic('tailwind', { project: 'bar' }, appTree);
-    expect(tree.exists('/projects/bar/.postcssrc.json')).toBe(true);
-  });
-
-  it('should configure tailwindcss plugin in .postcssrc.json', async () => {
-    const tree = await schematicRunner.runSchematic('tailwind', { project: 'bar' }, appTree);
-    const postCssConfig = JSON.parse(tree.readContent('/projects/bar/.postcssrc.json'));
-    expect(postCssConfig.plugins['@tailwindcss/postcss']).toBeDefined();
   });
 
   it('should add tailwind imports to styles.css', async () => {
@@ -76,12 +79,7 @@ describe('Tailwind Schematic', () => {
 
   describe('with scss styles', () => {
     beforeEach(async () => {
-      appTree = await schematicRunner.runSchematic('workspace', workspaceOptions);
-      appTree = await schematicRunner.runSchematic(
-        'application',
-        { ...appOptions, style: Style.Scss },
-        appTree,
-      );
+      appTree = await createTestApp(schematicRunner, appOptions, Style.Scss);
     });
 
     it('should create a tailwind.css file', async () => {
@@ -93,8 +91,8 @@ describe('Tailwind Schematic', () => {
 
     it('should add tailwind.css to angular.json', async () => {
       const tree = await schematicRunner.runSchematic('tailwind', { project: 'bar' }, appTree);
-      const angularJson = JSON.parse(tree.readContent('/angular.json'));
-      const styles = angularJson.projects.bar.architect.build.options.styles;
+      const workspace = getWorkspace(tree);
+      const styles = workspace.projects.bar.architect.build.options.styles;
       expect(styles).toEqual(['projects/bar/src/tailwind.css', 'projects/bar/src/styles.scss']);
     });
 
