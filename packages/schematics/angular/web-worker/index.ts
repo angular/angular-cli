@@ -6,7 +6,6 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { join, normalize } from '@angular-devkit/core';
 import {
   Rule,
   SchematicContext,
@@ -21,6 +20,7 @@ import {
   strings,
   url,
 } from '@angular-devkit/schematics';
+import { join } from 'node:path/posix';
 import { parseName } from '../utility/parse-name';
 import { relativePathToWorkspaceRoot } from '../utility/paths';
 import { createProjectSchematic } from '../utility/project';
@@ -111,7 +111,7 @@ export default createProjectSchematic<WebWorkerOptions>((options, { project }) =
         throw new Error(`Build target is not defined for this project.`);
       }
 
-      const workerConfigPath = join(normalize(root), 'tsconfig.worker.json');
+      const workerConfigPath = join(root, 'tsconfig.worker.json');
       (buildTarget.options ??= {}).webWorkerTsConfig ??= workerConfigPath;
       if (testTarget) {
         (testTarget.options ??= {}).webWorkerTsConfig ??= workerConfigPath;
