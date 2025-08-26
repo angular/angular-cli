@@ -105,49 +105,30 @@ describe('Tailwind Schematic', () => {
     });
   });
 
-  describe('with complex build configurations', () => {
-    beforeEach(async () => {
-      appTree = await schematicRunner.runSchematic('workspace', workspaceOptions);
-      appTree = await schematicRunner.runSchematic(
-        'application',
-        { ...appOptions, style: Style.Scss },
-        appTree,
+  describe('with postcss configuration', () => {
+    it('should create a .postcssrc.json if one does not exist', async () => {
+      const tree = await schematicRunner.runSchematic('tailwind', { project: 'bar' }, appTree);
+      expect(tree.exists('/projects/bar/.postcssrc.json')).toBe(true);
+    });
+
+    it('should update an existing .postcssrc.json in the project root', async () => {
+      appTree.create(
+        '/projects/bar/.postcssrc.json',
+        JSON.stringify({ plugins: { autoprefixer: {} } }),
       );
-
-      const angularJson = JSON.parse(appTree.readContent('/angular.json'));
-      angularJson.projects.bar.architect.build.configurations = {
-        ...angularJson.projects.bar.architect.build.configurations,
-        staging: {
-          styles: [],
-        },
-        production: {
-          styles: ['projects/bar/src/styles.prod.scss'],
-        },
-        development: {
-          // No styles property
-        },
-      };
-      appTree.overwrite('/angular.json', JSON.stringify(angularJson, null, 2));
+      const tree = await schematicRunner.runSchematic('tailwind', { project: 'bar' }, appTree);
+      const postCssConfig = JSON.parse(tree.readContent('/projects/bar/.postcssrc.json'));
+      expect(postCssConfig.plugins['@tailwindcss/postcss']).toBeDefined();
+      expect(postCssConfig.plugins['autoprefixer']).toBeDefined();
     });
 
-    it('should add tailwind.css to all configurations with styles', async () => {
+    it('should update an existing postcss.config.json in the workspace root', async () => {
+      appTree.create('/postcss.config.json', JSON.stringify({ plugins: { autoprefixer: {} } }));
       const tree = await schematicRunner.runSchematic('tailwind', { project: 'bar' }, appTree);
-      const angularJson = JSON.parse(tree.readContent('/angular.json'));
-      const { configurations } = angularJson.projects.bar.architect.build;
-
-      expect(configurations.production.styles).toEqual([
-        'projects/bar/src/tailwind.css',
-        'projects/bar/src/styles.prod.scss',
-      ]);
-      expect(configurations.staging.styles).toEqual(['projects/bar/src/tailwind.css']);
-    });
-
-    it('should not modify configurations without a styles property', async () => {
-      const tree = await schematicRunner.runSchematic('tailwind', { project: 'bar' }, appTree);
-      const angularJson = JSON.parse(tree.readContent('/angular.json'));
-      const { configurations } = angularJson.projects.bar.architect.build;
-
-      expect(configurations.development.styles).toBeUndefined();
+      const postCssConfig = JSON.parse(tree.readContent('/postcss.config.json'));
+      expect(postCssConfig.plugins['@tailwindcss/postcss']).toBeDefined();
+      expect(postCssConfig.plugins['autoprefixer']).toBeDefined();
+      expect(tree.exists('/projects/bar/.postcssrc.json')).toBe(false);
     });
   });
 });
