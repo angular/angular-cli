@@ -63,4 +63,91 @@ describe('Tailwind Schematic', () => {
     const stylesContent = tree.readContent('/projects/bar/src/styles.css');
     expect(stylesContent).toContain('@import "tailwindcss";');
   });
+
+  it('should not add duplicate tailwind imports to styles.css', async () => {
+    let tree = await schematicRunner.runSchematic('tailwind', { project: 'bar' }, appTree);
+    const stylesContent = tree.readContent('/projects/bar/src/styles.css');
+    expect(stylesContent.match(/@import "tailwindcss";/g)?.length).toBe(1);
+
+    tree = await schematicRunner.runSchematic('tailwind', { project: 'bar' }, tree);
+    const stylesContentAfter = tree.readContent('/projects/bar/src/styles.css');
+    expect(stylesContentAfter.match(/@import "tailwindcss";/g)?.length).toBe(1);
+  });
+
+  describe('with scss styles', () => {
+    beforeEach(async () => {
+      appTree = await schematicRunner.runSchematic('workspace', workspaceOptions);
+      appTree = await schematicRunner.runSchematic(
+        'application',
+        { ...appOptions, style: Style.Scss },
+        appTree,
+      );
+    });
+
+    it('should create a tailwind.css file', async () => {
+      const tree = await schematicRunner.runSchematic('tailwind', { project: 'bar' }, appTree);
+      expect(tree.exists('/projects/bar/src/tailwind.css')).toBe(true);
+      const stylesContent = tree.readContent('/projects/bar/src/tailwind.css');
+      expect(stylesContent).toContain('@import "tailwindcss";');
+    });
+
+    it('should add tailwind.css to angular.json', async () => {
+      const tree = await schematicRunner.runSchematic('tailwind', { project: 'bar' }, appTree);
+      const angularJson = JSON.parse(tree.readContent('/angular.json'));
+      const styles = angularJson.projects.bar.architect.build.options.styles;
+      expect(styles).toEqual(['projects/bar/src/tailwind.css', 'projects/bar/src/styles.scss']);
+    });
+
+    it('should not add tailwind imports to styles.scss', async () => {
+      const tree = await schematicRunner.runSchematic('tailwind', { project: 'bar' }, appTree);
+      const stylesContent = tree.readContent('/projects/bar/src/styles.scss');
+      expect(stylesContent).not.toContain('@import "tailwindcss";');
+    });
+  });
+
+  describe('with complex build configurations', () => {
+    beforeEach(async () => {
+      appTree = await schematicRunner.runSchematic('workspace', workspaceOptions);
+      appTree = await schematicRunner.runSchematic(
+        'application',
+        { ...appOptions, style: Style.Scss },
+        appTree,
+      );
+
+      const angularJson = JSON.parse(appTree.readContent('/angular.json'));
+      angularJson.projects.bar.architect.build.configurations = {
+        ...angularJson.projects.bar.architect.build.configurations,
+        staging: {
+          styles: [],
+        },
+        production: {
+          styles: ['projects/bar/src/styles.prod.scss'],
+        },
+        development: {
+          // No styles property
+        },
+      };
+      appTree.overwrite('/angular.json', JSON.stringify(angularJson, null, 2));
+    });
+
+    it('should add tailwind.css to all configurations with styles', async () => {
+      const tree = await schematicRunner.runSchematic('tailwind', { project: 'bar' }, appTree);
+      const angularJson = JSON.parse(tree.readContent('/angular.json'));
+      const { configurations } = angularJson.projects.bar.architect.build;
+
+      expect(configurations.production.styles).toEqual([
+        'projects/bar/src/tailwind.css',
+        'projects/bar/src/styles.prod.scss',
+      ]);
+      expect(configurations.staging.styles).toEqual(['projects/bar/src/tailwind.css']);
+    });
+
+    it('should not modify configurations without a styles property', async () => {
+      const tree = await schematicRunner.runSchematic('tailwind', { project: 'bar' }, appTree);
+      const angularJson = JSON.parse(tree.readContent('/angular.json'));
+      const { configurations } = angularJson.projects.bar.architect.build;
+
+      expect(configurations.development.styles).toBeUndefined();
+    });
+  });
 });
