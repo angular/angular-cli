@@ -13,7 +13,7 @@ import { stripVTControlCharacters } from 'node:util';
 const initialStatusRegex = /Running (\d+) tests/;
 
 async function main() {
-  const [runfilesDir, targetName, testArgs] = process.argv.slice(2);
+  const [runfilesDir, targetName, ...testArgs] = process.argv.slice(2);
   const testEntrypoint = path.resolve(runfilesDir, '../', targetName);
   const testWorkingDir = path.resolve(runfilesDir, '_main');
   const tasks = [];
@@ -22,7 +22,7 @@ async function main() {
   tasks.push(
     spawnTest(
       'bash',
-      [testEntrypoint, ...testArgs.split(' ').filter((arg) => arg !== '')],
+      [testEntrypoint, ...testArgs],
       {
         cwd: testWorkingDir,
         env: {
@@ -35,6 +35,8 @@ async function main() {
           BAZEL_BINDIR: '.',
           // Needed to run the E2E in a different temp path.
           E2E_TEMP: process.env.E2E_TEMP,
+          // Using the `--glob` causes a bunch of issues due to path expansion in nested bash scripts.
+          TESTBRIDGE_TEST_ONLY: process.env.TESTBRIDGE_TEST_ONLY,
         },
       },
       (s) => (progress[0] = s),
