@@ -26,10 +26,12 @@ import {
   addDependency,
   updateWorkspace,
 } from '../utility';
+import { JSONFile } from '../utility/json-file';
 import { latestVersions } from '../utility/latest-versions';
 import { createProjectSchematic } from '../utility/project';
 
 const TAILWIND_DEPENDENCIES = ['tailwindcss', '@tailwindcss/postcss', 'postcss'];
+const POSTCSS_CONFIG_FILES = ['.postcssrc.json', 'postcss.config.json'];
 
 function addTailwindStyles(options: { project: string }, project: ProjectDefinition): Rule {
   return async (tree) => {
@@ -85,18 +87,43 @@ function addTailwindStyles(options: { project: string }, project: ProjectDefinit
   };
 }
 
-export default createProjectSchematic((options, { project }) => {
-  const templateSource = apply(url('./files'), [
-    applyTemplates({
-      ...strings,
-      ...options,
-    }),
-    move(project.root),
-  ]);
+function managePostCssConfiguration(project: ProjectDefinition): Rule {
+  return async (tree) => {
+    const searchPaths = ['/', project.root]; // Workspace root and project root
 
+    for (const path of searchPaths) {
+      for (const configFile of POSTCSS_CONFIG_FILES) {
+        const fullPath = join(path, configFile);
+        if (tree.exists(fullPath)) {
+          const postcssConfig = new JSONFile(tree, fullPath);
+          const tailwindPluginPath = ['plugins', '@tailwindcss/postcss'];
+
+          if (postcssConfig.get(tailwindPluginPath) === undefined) {
+            postcssConfig.modify(tailwindPluginPath, {});
+          }
+
+          // Config found and handled
+          return;
+        }
+      }
+    }
+
+    // No existing config found, so create one from the template
+    const templateSource = apply(url('./files'), [
+      applyTemplates({
+        ...strings,
+      }),
+      move(project.root),
+    ]);
+
+    return mergeWith(templateSource);
+  };
+}
+
+export default createProjectSchematic((options, { project }) => {
   return chain([
     addTailwindStyles(options, project),
-    mergeWith(templateSource),
+    managePostCssConfiguration(project),
     ...TAILWIND_DEPENDENCIES.map((name) =>
       addDependency(name, latestVersions[name], {
         type: DependencyType.Dev,
