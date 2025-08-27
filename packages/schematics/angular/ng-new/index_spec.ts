@@ -128,4 +128,33 @@ describe('Ng New Schematic', () => {
     const stylesContent = tree.readContent('/bar/src/styles.css');
     expect(stylesContent).toContain('@import "tailwindcss";');
   });
+
+  it(`should create files with file name style guide '2016'`, async () => {
+    const options = { ...defaultOptions, fileNameStyleGuide: '2016' };
+
+    const tree = await schematicRunner.runSchematic('ng-new', options);
+    const files = tree.files;
+    expect(files).toEqual(
+      jasmine.arrayContaining([
+        '/bar/src/app/app.component.css',
+        '/bar/src/app/app.component.html',
+        '/bar/src/app/app.component.spec.ts',
+        '/bar/src/app/app.component.ts',
+      ]),
+    );
+
+    const {
+      projects: {
+        'foo': { schematics },
+      },
+    } = JSON.parse(tree.readContent('/bar/angular.json'));
+    expect(schematics['@schematics/angular:component'].type).toBe('component');
+    expect(schematics['@schematics/angular:directive'].type).toBe('directive');
+    expect(schematics['@schematics/angular:service'].type).toBe('service');
+    expect(schematics['@schematics/angular:guard'].typeSeparator).toBe('.');
+    expect(schematics['@schematics/angular:interceptor'].typeSeparator).toBe('.');
+    expect(schematics['@schematics/angular:module'].typeSeparator).toBe('.');
+    expect(schematics['@schematics/angular:pipe'].typeSeparator).toBe('.');
+    expect(schematics['@schematics/angular:resolver'].typeSeparator).toBe('.');
+  });
 });

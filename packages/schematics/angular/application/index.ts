@@ -67,6 +67,8 @@ export default function (options: ApplicationOptions): Rule {
     const { appDir, appRootSelector, componentOptions, folderName, sourceDir } =
       await getAppOptions(host, options);
 
+    const suffix = options.fileNameStyleGuide === '2016' ? '.component' : '';
+
     return chain([
       addAppToWorkspaceFile(options, appDir),
       addTsProjectReference('./' + join(normalize(appDir), 'tsconfig.app.json')),
@@ -108,6 +110,7 @@ export default function (options: ApplicationOptions): Rule {
             relativePathToWorkspaceRoot: relativePathToWorkspaceRoot(appDir),
             appName: options.name,
             folderName,
+            suffix,
           }),
           move(appDir),
         ]),
@@ -119,7 +122,7 @@ export default function (options: ApplicationOptions): Rule {
             ? filter((path) => !path.endsWith('tsconfig.spec.json.template'))
             : noop(),
           componentOptions.inlineTemplate
-            ? filter((path) => !path.endsWith('app.html.template'))
+            ? filter((path) => !path.endsWith('app__suffix__.html.template'))
             : noop(),
           applyTemplates({
             utils: strings,
@@ -128,6 +131,7 @@ export default function (options: ApplicationOptions): Rule {
             relativePathToWorkspaceRoot: relativePathToWorkspaceRoot(appDir),
             appName: options.name,
             folderName,
+            suffix,
           }),
           move(appDir),
         ]),
@@ -230,6 +234,19 @@ function addAppToWorkspaceFile(options: ApplicationOptions, appDir: string): Rul
     const schematicsWithStandalone = ['component', 'directive', 'pipe'];
     schematicsWithStandalone.forEach((type) => {
       ((schematics[`@schematics/angular:${type}`] ??= {}) as JsonObject).standalone = false;
+    });
+  }
+
+  if (options.fileNameStyleGuide === '2016') {
+    const schematicsWithTypeSymbols = ['component', 'directive', 'service'];
+    schematicsWithTypeSymbols.forEach((type) => {
+      const schematicDefaults = (schematics[`@schematics/angular:${type}`] ??= {}) as JsonObject;
+      schematicDefaults.type = type;
+    });
+
+    const schematicsWithTypeSeparator = ['guard', 'interceptor', 'module', 'pipe', 'resolver'];
+    schematicsWithTypeSeparator.forEach((type) => {
+      ((schematics[`@schematics/angular:${type}`] ??= {}) as JsonObject).typeSeparator = '.';
     });
   }
 
@@ -388,6 +405,10 @@ function getComponentOptions(options: ApplicationOptions): Partial<ComponentOpti
         style: options.style as unknown as ComponentStyle,
         viewEncapsulation: options.viewEncapsulation,
       };
+
+  if (options.fileNameStyleGuide === '2016') {
+    componentOptions.type = 'component';
+  }
 
   return componentOptions;
 }
