@@ -54,7 +54,11 @@ export default createProjectSchematic<ComponentOptions>((options, { project, tre
   options.selector = options.selector || buildSelector(options, (project && project.prefix) || '');
 
   validateHtmlSelector(options.selector);
-  validateClassName(strings.classify(options.name));
+
+  const classifiedName =
+    strings.classify(options.name) +
+    (options.addTypeToClassName && options.type ? strings.classify(options.type) : '');
+  validateClassName(classifiedName);
 
   const skipStyleFile = options.inlineStyle || options.style === Style.None;
   const templateSource = apply(url('./files'), [
@@ -66,6 +70,8 @@ export default createProjectSchematic<ComponentOptions>((options, { project, tre
       'if-flat': (s: string) => (options.flat ? '' : s),
       'ngext': options.ngHtml ? '.ng' : '',
       ...options,
+      // Add a new variable for the classified name, conditionally including the type
+      classifiedName,
     }),
     !options.type
       ? forEach(((file) => {

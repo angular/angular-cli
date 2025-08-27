@@ -163,7 +163,7 @@ describe('Component Schematic', () => {
 
     await expectAsync(
       schematicRunner.runSchematic('component', options, appTree),
-    ).toBeRejectedWithError('Class name "404" is invalid.');
+    ).toBeRejectedWithError('Class name "404Component" is invalid.');
   });
 
   it('should allow dash in selector before a number', async () => {
