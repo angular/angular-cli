@@ -157,4 +157,13 @@ describe('Ng New Schematic', () => {
     expect(schematics['@schematics/angular:pipe'].typeSeparator).toBe('.');
     expect(schematics['@schematics/angular:resolver'].typeSeparator).toBe('.');
   });
+
+  it(`should not add type to class name when file name style guide is '2016'`, async () => {
+    const options = { ...defaultOptions, fileNameStyleGuide: '2016' };
+
+    const tree = await schematicRunner.runSchematic('ng-new', options);
+    const appComponentContent = tree.readContent('/bar/src/app/app.component.ts');
+    expect(appComponentContent).toContain('export class App {');
+    expect(appComponentContent).not.toContain('export class AppComponent {');
+  });
 });

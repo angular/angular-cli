@@ -242,6 +242,7 @@ function addAppToWorkspaceFile(options: ApplicationOptions, appDir: string): Rul
     schematicsWithTypeSymbols.forEach((type) => {
       const schematicDefaults = (schematics[`@schematics/angular:${type}`] ??= {}) as JsonObject;
       schematicDefaults.type = type;
+      schematicDefaults.addTypeToClassName = false;
     });
 
     const schematicsWithTypeSeparator = ['guard', 'interceptor', 'module', 'pipe', 'resolver'];
@@ -408,6 +409,7 @@ function getComponentOptions(options: ApplicationOptions): Partial<ComponentOpti
 
   if (options.fileNameStyleGuide === '2016') {
     componentOptions.type = 'component';
+    componentOptions.addTypeToClassName = false;
   }
 
   return componentOptions;
