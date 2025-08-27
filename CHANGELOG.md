@@ -1,3 +1,49 @@
+<a name="21.0.0-next.1"></a>
+
+# 21.0.0-next.1 (2025-08-27)
+
+## Breaking Changes
+
+### @angular/cli
+
+- The `ng` commands will no longer automatically detect and use `cnpm` as the package manager. As an alternative use the `.npmrc` file to ensure npm uses the cnpm registry.
+
+### @angular-devkit/schematics-cli
+
+| Commit                                                                                              | Type | Description                        |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------- |
+| [aed26c388](https://github.com/angular/angular-cli/commit/aed26c38803a465842ff128c3f81bd6984e1fe3d) | fix  | correctly set default array values |
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                                                          |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------------------ |
+| [4912f3990](https://github.com/angular/angular-cli/commit/4912f39906b11a3212f11d5a00d577e2a0bacab4) | feat | add Tailwind CSS option to application schematic and `ng new`                        |
+| [6c7b79833](https://github.com/angular/angular-cli/commit/6c7b798332786d29070460669e093e37902c4438) | fix  | directly resolve karma config template in migration                                  |
+| [0f86cf878](https://github.com/angular/angular-cli/commit/0f86cf8782d1c08d11bb9ee54a30fe1954dd8bcc) | fix  | prevent AI config schematic from failing when 'none' and other AI tools are selected |
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                                |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------- |
+| [0d53e82d5](https://github.com/angular/angular-cli/commit/0d53e82d5ed8986603c2005fc06041dd076b08c6) | feat | provide detailed peer dependency conflict errors in ng add |
+| [f513089e2](https://github.com/angular/angular-cli/commit/f513089e276acf5a7c4f6879a95e2d6ed78ae67d) | feat | remove direct support for `cnpm`                           |
+| [47d77a3ed](https://github.com/angular/angular-cli/commit/47d77a3edea4dabb463d50c2bdba32475257d775) | fix  | correctly set default array values                         |
+| [e5aed6d65](https://github.com/angular/angular-cli/commit/e5aed6d655ed92ea6eb3ac03716b8a02a5f731d6) | fix  | show planned actions in `ng add` dry run                   |
+| [aeb49dd52](https://github.com/angular/angular-cli/commit/aeb49dd52bf88785a193fcb6caa0b36aaeef1d37) | perf | cache dependency lookups during `ng add`                   |
+| [5e534090e](https://github.com/angular/angular-cli/commit/5e534090e25e00a9fafbce2867030e7fdb0efbf6) | perf | parallelize peer dependency checks in `ng add`             |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                             |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------- |
+| [b554bd73a](https://github.com/angular/angular-cli/commit/b554bd73a9c248d986ed718028edf52ab5da6ccf) | fix  | add temporary directory cleanup for Vitest executor     |
+| [261dbb37c](https://github.com/angular/angular-cli/commit/261dbb37cbe01492240c4cedc644663b15a4296a) | fix  | correct JS/TS file paths when running under Bazel       |
+| [abf003268](https://github.com/angular/angular-cli/commit/abf003268c6cb18f0944665b0b3f2794c9469c3e) | fix  | correct Vitest builder watch mode execution             |
+| [4b49a207a](https://github.com/angular/angular-cli/commit/4b49a207a1de27b82416c6225a59bc10f48bdcbc) | fix  | ensure karma polyfills reporter factory returns a value |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="20.2.1"></a>
 
 # 20.2.1 (2025-08-27)
