@@ -1,3 +1,35 @@
+<a name="20.2.1"></a>
+
+# 20.2.1 (2025-08-27)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                        |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------- |
+| [3b693e09e](https://github.com/angular/angular-cli/commit/3b693e09e8148ef22031aab8f6bc70c928aabc03) | fix  | correctly set default array values |
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                                                          |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------------------ |
+| [6937123a3](https://github.com/angular/angular-cli/commit/6937123a393e2ba9221962b0174056c14437a988) | fix  | directly resolve karma config template in migration                                  |
+| [5d6dd4425](https://github.com/angular/angular-cli/commit/5d6dd44259a0d89098c2a0c784e726b43ce32316) | fix  | prevent AI config schematic from failing when 'none' and other AI tools are selected |
+
+### @angular-devkit/schematics-cli
+
+| Commit                                                                                              | Type | Description                        |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------- |
+| [e93919dea](https://github.com/angular/angular-cli/commit/e93919dea7df55a3aac2fa5c93c4560c50a2d749) | fix  | correctly set default array values |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                             |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------- |
+| [06a6ddc10](https://github.com/angular/angular-cli/commit/06a6ddc102f5dc9018ec982f6e4cf56259cc4b52) | fix  | correct JS/TS file paths when running under Bazel       |
+| [b6816b0cb](https://github.com/angular/angular-cli/commit/b6816b0cbaf1262d7015b9d7f7fb425f53995947) | fix  | ensure karma polyfills reporter factory returns a value |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="21.0.0-next.0"></a>
 
 # 21.0.0-next.0 (2025-08-20)
