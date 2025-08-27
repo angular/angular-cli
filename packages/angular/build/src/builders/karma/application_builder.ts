@@ -187,6 +187,9 @@ class AngularPolyfillsPlugin {
             included: true,
             watched: false,
           });
+
+          // Karma needs a return value for a factory and Karma's multi-reporter expects an `adapters` array
+          return { adapters: [] };
         }, AngularPolyfillsPlugin),
       ],
     };
