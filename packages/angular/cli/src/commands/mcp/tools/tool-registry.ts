@@ -13,6 +13,7 @@ import type { AngularWorkspace } from '../../../utilities/config';
 type ToolConfig = Parameters<McpServer['registerTool']>[1];
 
 export interface McpToolContext {
+  server: McpServer;
   workspace?: AngularWorkspace;
   logger: { warn(text: string): void };
   exampleDatabasePath?: string;
@@ -46,17 +47,18 @@ export function declareTool<TInput extends ZodRawShape, TOutput extends ZodRawSh
 
 export async function registerTools(
   server: McpServer,
-  context: McpToolContext,
+  context: Omit<McpToolContext, 'server'>,
   declarations: AnyMcpToolDeclaration[],
 ): Promise<void> {
   for (const declaration of declarations) {
-    if (declaration.shouldRegister && !(await declaration.shouldRegister(context))) {
+    const toolContext = { ...context, server };
+    if (declaration.shouldRegister && !(await declaration.shouldRegister(toolContext))) {
       continue;
     }
 
     const { name, factory, shouldRegister, isReadOnly, isLocalOnly, ...config } = declaration;
 
-    const handler = await factory(context);
+    const handler = await factory(toolContext);
 
     // Add declarative characteristics to annotations
     config.annotations ??= {};
