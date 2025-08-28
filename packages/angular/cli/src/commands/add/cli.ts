@@ -6,7 +6,6 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { NodePackageDoesNotSupportSchematics } from '@angular-devkit/schematics/tools';
 import { Listr, ListrRenderer, ListrTaskWrapper, color, figures } from 'listr2';
 import assert from 'node:assert';
 import { createRequire } from 'node:module';
@@ -52,6 +51,8 @@ interface AddCommandTaskContext {
   executeSchematic: AddCommandModule['executeSchematic'];
   getPeerDependencyConflicts: AddCommandModule['getPeerDependencyConflicts'];
   dryRun?: boolean;
+  hasSchematics?: boolean;
+  homepage?: string;
 }
 
 type AddCommandTaskWrapper = ListrTaskWrapper<
@@ -217,8 +218,21 @@ export default class AddCommandModule
       const result = await tasks.run(taskContext);
       assert(result.collectionName, 'Collection name should always be available');
 
+      if (!result.hasSchematics) {
+        let message = options.dryRun
+          ? 'The package does not provide any `ng add` actions, so no further actions would be taken.'
+          : 'Package installed successfully. The package does not provide any `ng add` actions, so no further actions were taken.';
+
+        if (result.homepage) {
+          message += `\nFor more information about this package, visit its homepage at ${result.homepage}`;
+        }
+        logger.info(message);
+
+        return;
+      }
+
       if (options.dryRun) {
-        logger.info('The package schematic would be executed next.');
+        logger.info("The package's `ng add` actions would be executed next.");
 
         return;
       }
@@ -384,8 +398,10 @@ export default class AddCommandModule
       );
     }
 
+    context.hasSchematics = !!manifest.schematics;
     context.savePackage = manifest['ng-add']?.save;
     context.collectionName = manifest.name;
+    context.homepage = manifest.homepage;
 
     if (await this.getPeerDependencyConflicts(manifest)) {
       task.output = color.yellow(
@@ -534,46 +550,33 @@ export default class AddCommandModule
     return false;
   }
 
-  private async executeSchematic(
+  private executeSchematic(
     options: Options<AddCommandArgs> & OtherOptions,
   ): Promise<number | void> {
-    try {
-      const {
-        verbose,
-        skipConfirmation,
+    const {
+      verbose,
+      skipConfirmation,
+      interactive,
+      force,
+      dryRun,
+      registry,
+      defaults,
+      collection: collectionName,
+      ...schematicOptions
+    } = options;
+
+    return this.runSchematic({
+      schematicOptions,
+      schematicName: this.schematicName,
+      collectionName,
+      executionOptions: {
         interactive,
         force,
         dryRun,
-        registry,
         defaults,
-        collection: collectionName,
-        ...schematicOptions
-      } = options;
-
-      return await this.runSchematic({
-        schematicOptions,
-        schematicName: this.schematicName,
-        collectionName,
-        executionOptions: {
-          interactive,
-          force,
-          dryRun,
-          defaults,
-          packageRegistry: registry,
-        },
-      });
-    } catch (e) {
-      if (e instanceof NodePackageDoesNotSupportSchematics) {
-        this.context.logger.error(
-          'The package that you are trying to add does not support schematics.' +
-            'You can try using a different version of the package or contact the package author to add ng-add support.',
-        );
-
-        return 1;
-      }
-
-      throw e;
-    }
+        packageRegistry: registry,
+      },
+    });
   }
 
   private async findProjectVersion(name: string): Promise<string | null> {
