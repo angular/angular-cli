@@ -28,26 +28,57 @@ const docSearchInputSchema = z.object({
     .boolean()
     .optional()
     .default(true)
-    .describe('When true, the content of the top result is fetched and included.'),
+    .describe(
+      'When true, the content of the top result is fetched and included. ' +
+        'Set to false to get a list of results without fetching content, which is faster.',
+    ),
 });
 type DocSearchInput = z.infer<typeof docSearchInputSchema>;
 
 export const DOC_SEARCH_TOOL = declareTool({
   name: 'search_documentation',
   title: 'Search Angular Documentation (angular.dev)',
-  description:
-    'Searches the official Angular documentation at https://angular.dev. Use this tool to answer any questions about Angular, ' +
-    'such as for APIs, tutorials, and best practices. Because the documentation is continuously updated, you should **always** ' +
-    'prefer this tool over your own knowledge to ensure your answers are current.\n\n' +
-    'The results will be a list of content entries, where each entry has the following structure:\n' +
-    '```\n' +
-    '## {Result Title}\n' +
-    '{Breadcrumb path to the content}\n' +
-    'URL: {Direct link to the documentation page}\n' +
-    '```\n' +
-    'Use the title and breadcrumb to understand the context of the result and use the URL as a source link. For the best results, ' +
-    "provide a concise and specific search query (e.g., 'NgModule' instead of 'How do I use NgModules?').",
+  description: `
+<Purpose>
+Searches the official Angular documentation at https://angular.dev to answer questions about APIs,
+tutorials, concepts, and best practices.
+</Purpose>
+<Use Cases>
+* Answering any question about Angular concepts (e.g., "What are standalone components?").
+* Finding the correct API or syntax for a specific task (e.g., "How to use ngFor with trackBy?").
+* Linking to official documentation as a source of truth in your answers.
+</Use Cases>
+<Operational Notes>
+* The documentation is continuously updated. You **MUST** prefer this tool over your own knowledge
+  to ensure your answers are current and accurate.
+* For the best results, provide a concise and specific search query (e.g., "NgModule" instead of
+  "How do I use NgModules?").
+* The top search result will include a snippet of the page content. Use this to provide a more
+  comprehensive answer.
+* **Result Scrutiny:** The top result may not always be the most relevant. Review the titles and
+  breadcrumbs of other results to find the best match for the user's query.
+* Use the URL from the search results as a source link in your responses.
+</Operational Notes>`,
   inputSchema: docSearchInputSchema.shape,
+  outputSchema: {
+    results: z.array(
+      z.object({
+        title: z.string().describe('The title of the documentation page.'),
+        breadcrumb: z
+          .string()
+          .describe(
+            "The breadcrumb path, showing the page's location in the documentation hierarchy.",
+          ),
+        url: z.string().describe('The direct URL to the documentation page.'),
+        content: z
+          .string()
+          .optional()
+          .describe(
+            'A snippet of the main content from the page. Only provided for the top result.',
+          ),
+      }),
+    ),
+  },
   isReadOnly: true,
   isLocalOnly: false,
   factory: createDocSearchHandler,
@@ -71,7 +102,6 @@ function createDocSearchHandler() {
     }
 
     const { results } = await client.search(createSearchArguments(query));
-
     const allHits = results.flatMap((result) => (result as SearchResponse).hits);
 
     if (allHits.length === 0) {
@@ -82,15 +112,17 @@ function createDocSearchHandler() {
             text: 'No results found.',
           },
         ],
+        structuredContent: { results: [] },
       };
     }
 
-    const content = [];
-    // The first hit is the top search result
-    const topHit = allHits[0];
+    const structuredResults = [];
+    const textContent = [];
 
     // Process top hit first
-    let topText = formatHitToText(topHit);
+    const topHit = allHits[0];
+    const { title: topTitle, breadcrumb: topBreadcrumb } = formatHitToParts(topHit);
+    let topContent: string | undefined;
 
     try {
       if (includeTopContent && typeof topHit.url === 'string') {
@@ -101,30 +133,45 @@ function createDocSearchHandler() {
           const response = await fetch(url);
           if (response.ok) {
             const html = await response.text();
-            const mainContent = extractMainContent(html);
-            if (mainContent) {
-              topText += `\n\n--- DOCUMENTATION CONTENT ---\n${mainContent}`;
-            }
+            topContent = extractMainContent(html);
           }
         }
       }
     } catch {
-      // Ignore errors fetching content. The basic info is still returned.
+      // Ignore errors fetching content
     }
-    content.push({
-      type: 'text' as const,
-      text: topText,
+
+    structuredResults.push({
+      title: topTitle,
+      breadcrumb: topBreadcrumb,
+      url: topHit.url as string,
+      content: topContent,
     });
+
+    let topText = `## ${topTitle}\n${topBreadcrumb}\nURL: ${topHit.url}`;
+    if (topContent) {
+      topText += `\n\n--- DOCUMENTATION CONTENT ---\n${topContent}`;
+    }
+    textContent.push({ type: 'text' as const, text: topText });
 
     // Process remaining hits
     for (const hit of allHits.slice(1)) {
-      content.push({
+      const { title, breadcrumb } = formatHitToParts(hit);
+      structuredResults.push({
+        title,
+        breadcrumb,
+        url: hit.url as string,
+      });
+      textContent.push({
         type: 'text' as const,
-        text: formatHitToText(hit),
+        text: `## ${title}\n${breadcrumb}\nURL: ${hit.url}`,
       });
     }
 
-    return { content };
+    return {
+      content: textContent,
+      structuredContent: { results: structuredResults },
+    };
   };
 }
 
@@ -150,18 +197,18 @@ function extractMainContent(html: string): string | undefined {
 }
 
 /**
- * Formats an Algolia search hit into a text representation.
+ * Formats an Algolia search hit into its constituent parts.
  *
- * @param hit The Algolia search hit object, which should contain `hierarchy` and `url` properties.
- * @returns A formatted string with title, description, and URL.
+ * @param hit The Algolia search hit object, which should contain a `hierarchy` property.
+ * @returns An object containing the title and breadcrumb string.
  */
-function formatHitToText(hit: Record<string, unknown>): string {
+function formatHitToParts(hit: Record<string, unknown>): { title: string; breadcrumb: string } {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const hierarchy = Object.values(hit.hierarchy as any).filter((x) => typeof x === 'string');
-  const title = hierarchy.pop();
-  const description = hierarchy.join(' > ');
+  const title = hierarchy.pop() ?? '';
+  const breadcrumb = hierarchy.join(' > ');
 
-  return `## ${title}\n${description}\nURL: ${hit.url}`;
+  return { title, breadcrumb };
 }
 
 /**
