@@ -75,6 +75,17 @@ const packageVersionExclusions: Record<string, string | Range> = {
 
 const DEFAULT_CONFLICT_DISPLAY_LIMIT = 5;
 
+/**
+ * A map of packages to built-in schematics.
+ * This is used for packages that do not have a native `ng-add` schematic.
+ */
+const BUILT_IN_SCHEMATICS = {
+  tailwindcss: {
+    collection: '@schematics/angular',
+    name: 'tailwind',
+  },
+} as const;
+
 export default class AddCommandModule
   extends SchematicsCommandModule
   implements CommandModuleImplementation<AddCommandArgs>
@@ -234,6 +245,25 @@ export default class AddCommandModule
       }
 
       if (!result.hasSchematics) {
+        // Fallback to a built-in schematic if the package does not have an `ng-add` schematic
+        const packageName = result.packageIdentifier.name;
+        if (packageName) {
+          const builtInSchematic =
+            BUILT_IN_SCHEMATICS[packageName as keyof typeof BUILT_IN_SCHEMATICS];
+          if (builtInSchematic) {
+            logger.info(
+              `The ${color.blue(packageName)} package does not provide \`ng add\` actions.`,
+            );
+            logger.info('The Angular CLI will use built-in actions to add it to your project.');
+
+            return this.executeSchematic({
+              ...options,
+              collection: builtInSchematic.collection,
+              schematicName: builtInSchematic.name,
+            });
+          }
+        }
+
         let message = options.dryRun
           ? 'The package does not provide any `ng add` actions, so no further actions would be taken.'
           : 'Package installed successfully. The package does not provide any `ng add` actions, so no further actions were taken.';
@@ -566,7 +596,7 @@ export default class AddCommandModule
   }
 
   private executeSchematic(
-    options: Options<AddCommandArgs> & OtherOptions,
+    options: Options<AddCommandArgs> & OtherOptions & { schematicName?: string },
   ): Promise<number | void> {
     const {
       verbose,
@@ -577,12 +607,13 @@ export default class AddCommandModule
       registry,
       defaults,
       collection: collectionName,
+      schematicName,
       ...schematicOptions
     } = options;
 
     return this.runSchematic({
       schematicOptions,
-      schematicName: this.schematicName,
+      schematicName: schematicName ?? this.schematicName,
       collectionName,
       executionOptions: {
         interactive,
