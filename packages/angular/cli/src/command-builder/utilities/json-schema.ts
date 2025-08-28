@@ -206,7 +206,7 @@ export async function parseJsonSchemaToOptions(
           }
           break;
         case 'array':
-          if (Array.isArray(current.default)) {
+          if (Array.isArray(current.default) && current.default.length > 0) {
             defaultValue = current.default;
           }
           break;
