@@ -218,6 +218,21 @@ export default class AddCommandModule
       const result = await tasks.run(taskContext);
       assert(result.collectionName, 'Collection name should always be available');
 
+      // Check if the installed package has actual add actions and not just schematic support
+      if (result.hasSchematics && !options.dryRun) {
+        const workflow = this.getOrCreateWorkflowForBuilder(result.collectionName);
+        const collection = workflow.engine.createCollection(result.collectionName);
+
+        // listSchematicNames cannot be used here since it does not list private schematics.
+        // Most `ng-add` schematics are marked as private.
+        // TODO: Consider adding a `hasSchematic` helper to the schematic collection object.
+        try {
+          collection.createSchematic(this.schematicName, true);
+        } catch {
+          result.hasSchematics = false;
+        }
+      }
+
       if (!result.hasSchematics) {
         let message = options.dryRun
           ? 'The package does not provide any `ng add` actions, so no further actions would be taken.'
