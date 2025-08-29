@@ -13,12 +13,21 @@ import { declareTool } from './tool-registry';
 export const BEST_PRACTICES_TOOL = declareTool({
   name: 'get_best_practices',
   title: 'Get Angular Coding Best Practices Guide',
-  description:
-    'You **MUST** use this tool to retrieve the Angular Best Practices Guide ' +
-    'before any interaction with Angular code (creating, analyzing, modifying). ' +
-    'It is mandatory to follow this guide to ensure all code adheres to ' +
-    'modern standards, including standalone components, typed forms, and ' +
-    'modern control flow. This is the first step for any Angular task.',
+  description: `
+<Purpose>
+Retrieves the official Angular Best Practices Guide. This guide contains the essential rules and conventions
+that **MUST** be followed for any task involving the creation, analysis, or modification of Angular code.
+</Purpose>
+<Use Cases>
+* As a mandatory first step before writing or modifying any Angular code to ensure adherence to modern standards.
+* To learn about key concepts like standalone components, typed forms, and modern control flow syntax (@if, @for, @switch).
+* To verify that existing code aligns with current Angular conventions before making changes.
+</Use Cases>
+<Operational Notes>
+* The content of this guide is non-negotiable and reflects the official, up-to-date standards for Angular development.
+* You **MUST** internalize and apply the principles from this guide in all subsequent Angular-related tasks.
+* Failure to adhere to these best practices will result in suboptimal and outdated code.
+</Operational Notes>`,
   isReadOnly: true,
   isLocalOnly: true,
   factory: () => {
