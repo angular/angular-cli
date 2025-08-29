@@ -23,11 +23,33 @@ import { createSourceFile, getImportSpecifier } from './ts_utils';
 export const ZONELESS_MIGRATION_TOOL = declareTool({
   name: 'onpush-zoneless-migration',
   title: 'Plan migration to OnPush and/or zoneless',
-  description:
-    '**Required tool for migrating Angular components to OnPush change detection or zoneless.**' +
-    ' This tool orchestrates the entire migration process, including running prerequisite migrations' +
-    ' for signal inputs and queries. Use this tool as the first step before making any manual changes' +
-    ' to adopt `ChangeDetectionStrategy.OnPush` or `provideZonelessChangeDetection`.',
+  description: `
+<Purpose>
+Analyzes Angular code and provides a step-by-step, iterative plan to migrate it to \`OnPush\`
+change detection, a prerequisite for a zoneless application. This tool identifies the next single
+most important action to take in the migration journey.
+</Purpose>
+<Use Cases>
+* **Step-by-Step Migration:** Running the tool repeatedly to get the next instruction for a full
+  migration to \`OnPush\`.
+* **Pre-Migration Analysis:** Checking a component or directory for unsupported \`NgZone\` APIs that
+  would block a zoneless migration.
+* **Generating Component Migrations:** Getting the exact instructions for converting a single
+  component from the default change detection strategy to \`OnPush\`.
+</Use Cases>
+<Operational Notes>
+* **Execution Model:** This tool **DOES NOT** modify code. It **PROVIDES INSTRUCTIONS** for a
+  single action at a time. You **MUST** apply the changes it suggests, and then run the tool
+  again to get the next step.
+* **Iterative Process:** The migration process is iterative. You must call this tool repeatedly,
+  applying the suggested fix after each call, until the tool indicates that no more actions are
+  needed.
+* **Relationship to \`modernize\`:** This tool is the specialized starting point for the zoneless/OnPush
+  migration. For other migrations (like signal inputs), you should use the \`modernize\` tool first,
+  as the zoneless migration may depend on them as prerequisites.
+* **Input:** The tool can operate on either a single file or an entire directory. Provide the
+  absolute path.
+</Operational Notes>`,
   isReadOnly: true,
   isLocalOnly: true,
   inputSchema: {
