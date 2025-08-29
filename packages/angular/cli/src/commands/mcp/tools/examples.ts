@@ -42,16 +42,39 @@ type FindExampleInput = z.infer<typeof findExampleInputSchema>;
 export const FIND_EXAMPLE_TOOL = declareTool({
   name: 'find_examples',
   title: 'Find Angular Code Examples',
-  description:
-    'Before writing or modifying any Angular code including templates, ' +
-    '**ALWAYS** use this tool to find current best-practice examples. ' +
-    'This is critical for ensuring code quality and adherence to modern Angular standards. ' +
-    'This tool searches a curated database of approved Angular code examples and returns the most relevant results for your query. ' +
-    'Example Use Cases: ' +
-    "1) Creating new components, directives, or services (e.g., query: 'standalone component' or 'signal input'). " +
-    "2) Implementing core features (e.g., query: 'lazy load route', 'httpinterceptor', or 'route guard'). " +
-    "3) Refactoring existing code to use modern patterns (e.g., query: 'ngfor trackby' or 'form validation').",
+  description: `
+<Purpose>
+Augments your knowledge base with a curated database of official, best-practice code examples,
+focusing on **modern, new, and recently updated** Angular features. This tool acts as a RAG
+(Retrieval-Augmented Generation) source, providing ground-truth information on the latest Angular
+APIs and patterns. You **MUST** use it to understand and apply current standards when working with
+new or evolving features.
+</Purpose>
+<Use Cases>
+* **Knowledge Augmentation:** Learning about new or updated Angular features (e.g., query: 'signal input' or 'deferrable views').
+* **Modern Implementation:** Finding the correct modern syntax for features
+  (e.g., query: 'functional route guard' or 'http client with fetch').
+* **Refactoring to Modern Patterns:** Upgrading older code by finding examples of new syntax
+  (e.g., query: 'built-in control flow' to replace "*ngIf').
+</Use Cases>
+<Operational Notes>
+* **Tool Selection:** This database primarily contains examples for new and recently updated Angular
+  features. For established, core features, the main documentation (via the
+  \`search_documentation\` tool) may be a better source of information.
+* The examples in this database are the single source of truth for modern Angular coding patterns.
+* The search query uses a powerful full-text search syntax (FTS5). Refer to the 'query'
+  parameter description for detailed syntax rules and examples.
+</Operational Notes>`,
   inputSchema: findExampleInputSchema.shape,
+  outputSchema: {
+    examples: z.array(
+      z.object({
+        content: z
+          .string()
+          .describe('A complete, self-contained Angular code example in Markdown format.'),
+      }),
+    ),
+  },
   isReadOnly: true,
   isLocalOnly: true,
   shouldRegister: ({ logger }) => {
@@ -96,14 +119,18 @@ async function createFindExampleHandler({ exampleDatabasePath }: McpToolContext)
 
     const sanitizedQuery = escapeSearchQuery(query);
 
-    // Query database and return results as text content
-    const content = [];
+    // Query database and return results
+    const examples = [];
+    const textContent = [];
     for (const exampleRecord of queryStatement.all(sanitizedQuery)) {
-      content.push({ type: 'text' as const, text: exampleRecord['content'] as string });
+      const exampleContent = exampleRecord['content'] as string;
+      examples.push({ content: exampleContent });
+      textContent.push({ type: 'text' as const, text: exampleContent });
     }
 
     return {
-      content,
+      content: textContent,
+      structuredContent: { examples },
     };
   };
 }
