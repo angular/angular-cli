@@ -39,7 +39,10 @@ export default createProjectSchematic<DirectiveOptions>((options, { project, tre
   options.selector = options.selector || buildSelector(options, project.prefix || '');
 
   validateHtmlSelector(options.selector);
-  validateClassName(strings.classify(options.name));
+  const classifiedName =
+    strings.classify(options.name) +
+    (options.addTypeToClassName && options.type ? strings.classify(options.type) : '');
+  validateClassName(classifiedName);
 
   return chain([
     addDeclarationToNgModule({
@@ -47,6 +50,9 @@ export default createProjectSchematic<DirectiveOptions>((options, { project, tre
 
       ...options,
     }),
-    generateFromFiles(options),
+    generateFromFiles({
+      ...options,
+      classifiedName,
+    }),
   ]);
 });

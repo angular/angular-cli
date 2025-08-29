@@ -34,6 +34,7 @@ export interface GenerateFromFilesOptions {
   skipTests?: boolean;
   templateFilesDirectory?: string;
   type?: string;
+  classifiedName?: string;
 }
 
 export function generateFromFiles(

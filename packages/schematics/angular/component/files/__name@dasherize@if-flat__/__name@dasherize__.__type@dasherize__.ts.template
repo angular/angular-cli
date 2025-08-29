@@ -19,6 +19,6 @@ import { <% if(changeDetection !== 'Default') { %>ChangeDetectionStrategy, <% }%
   encapsulation: ViewEncapsulation.<%= viewEncapsulation %><% } if (changeDetection !== 'Default') { %>,
   changeDetection: ChangeDetectionStrategy.<%= changeDetection %><% } %>
 })
-export <% if(exportDefault) {%>default <%}%>class <%= classify(name) %><%= classify(type) %> {
+export <% if(exportDefault) {%>default <%}%>class <%= classifiedName %> {
 
 }

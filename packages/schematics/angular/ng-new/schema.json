@@ -151,6 +151,12 @@
         "type": "string",
         "enum": ["none", "gemini", "copilot", "claude", "cursor", "jetbrains", "windsurf"]
       }
+    },
+    "fileNameStyleGuide": {
+      "type": "string",
+      "enum": ["2016", "2025"],
+      "default": "2025",
+      "description": "The file naming convention to use for generated files. The '2025' style guide (default) uses a concise format (e.g., `app.ts` for the root component), while the '2016' style guide includes the type in the file name (e.g., `app.component.ts`). For more information, see the Angular Style Guide (https://angular.dev/style-guide)."
     }
   },
   "required": ["name", "version"]

@@ -58,6 +58,7 @@ export default function (options: NgNewOptions): Rule {
     standalone: options.standalone,
     ssr: options.ssr,
     zoneless: options.zoneless,
+    fileNameStyleGuide: options.fileNameStyleGuide,
   };
 
   return chain([
