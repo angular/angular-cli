@@ -245,8 +245,8 @@ importers:
         specifier: 1.4.0
         version: 1.4.0
       listr2:
-        specifier: 9.0.2
-        version: 9.0.2
+        specifier: 9.0.3
+        version: 9.0.3
       lodash:
         specifier: ^4.17.21
         version: 4.17.21
@@ -383,8 +383,8 @@ importers:
         specifier: 3.3.1
         version: 3.3.1
       listr2:
-        specifier: 9.0.2
-        version: 9.0.2
+        specifier: 9.0.3
+        version: 9.0.3
       magic-string:
         specifier: 0.30.18
         version: 0.30.18
@@ -466,8 +466,8 @@ importers:
         specifier: 7.8.4
         version: 7.8.4(@types/node@24.3.0)
       '@listr2/prompt-adapter-inquirer':
-        specifier: 3.0.2
-        version: 3.0.2(@inquirer/prompts@7.8.4(@types/node@24.3.0))(@types/node@24.3.0)(listr2@9.0.2)
+        specifier: 3.0.3
+        version: 3.0.3(@inquirer/prompts@7.8.4(@types/node@24.3.0))(@types/node@24.3.0)(listr2@9.0.3)
       '@modelcontextprotocol/sdk':
         specifier: 1.17.4
         version: 1.17.4
@@ -487,8 +487,8 @@ importers:
         specifier: 3.3.1
         version: 3.3.1
       listr2:
-        specifier: 9.0.2
-        version: 9.0.2
+        specifier: 9.0.3
+        version: 9.0.3
       npm-package-arg:
         specifier: 13.0.0
         version: 13.0.0
@@ -898,8 +898,8 @@ importers:
   tools/baseline_browserslist:
     devDependencies:
       baseline-browser-mapping:
-        specifier: 2.7.1
-        version: 2.7.1
+        specifier: 2.7.2
+        version: 2.7.2
 
 packages:
 
@@ -2384,12 +2384,12 @@ packages:
   '@leichtgewicht/ip-codec@2.0.5':
     resolution: {integrity: sha512-Vo+PSpZG2/fmgmiNzYK9qWRh8h/CHrwD0mo1h1DzL4yzHNSfWYujGTYsWGreD000gcgmZ7K4Ys6Tx9TxtsKdDw==}
 
-  '@listr2/prompt-adapter-inquirer@3.0.2':
-    resolution: {integrity: sha512-/270wjZctsJhGsR38/OqlZmjTKnbm3H2mrhhmm1Y1Oe1gbNYpM1iP5dX8b0ocyjKH9nlneRJI5z0npPQnaMG0g==}
+  '@listr2/prompt-adapter-inquirer@3.0.3':
+    resolution: {integrity: sha512-h7Qzj7Z5RzXtuibNI2KEqzyX7w/D42CD8Llo4udC2WSbV38hpFvj4P/x0gzCEtPxDqYALVvclHAfjoKgifx/Ig==}
     engines: {node: '>=20.0.0'}
     peerDependencies:
       '@inquirer/prompts': '>= 3 < 8'
-      listr2: 9.0.2
+      listr2: 9.0.3
 
   '@lmdb/lmdb-darwin-arm64@3.4.2':
     resolution: {integrity: sha512-NK80WwDoODyPaSazKbzd3NEJ3ygePrkERilZshxBViBARNz21rmediktGHExoj9n5t9+ChlgLlxecdFKLCuCKg==}
@@ -4178,8 +4178,8 @@ packages:
     resolution: {integrity: sha512-lGe34o6EHj9y3Kts9R4ZYs/Gr+6N7MCaMlIFA3F1R2O5/m7K06AxfSeO5530PEERE6/WyEg3lsuyw4GHlPZHog==}
     engines: {node: ^4.5.0 || >= 5.9}
 
-  baseline-browser-mapping@2.7.1:
-    resolution: {integrity: sha512-OLFmOFzUptOAyNGOgfYSCIqfmc+h2UNoY2hY0ZAFwe/aGLcH7ms/bI0Vn/RAfzAQBfYV0tuBlHhZeYix0NHDag==}
+  baseline-browser-mapping@2.7.2:
+    resolution: {integrity: sha512-uAiDCXRpHi+FQgPGyJcfQc8/l9Wbo4aRDQdijbcXVCgBpNSCcW2np66iAX6mRgKhnnhAKSII9KaN5BOvITCofg==}
     hasBin: true
 
   basic-ftp@5.0.5:
@@ -6455,8 +6455,8 @@ packages:
   lines-and-columns@1.2.4:
     resolution: {integrity: sha512-7ylylesZQ/PV29jhEDl3Ufjo6ZX7gCqJr5F7PKrqc93v7fzSymt1BpwEU8nAUXs8qzzvqhbjhK5QZg6Mt/HkBg==}
 
-  listr2@9.0.2:
-    resolution: {integrity: sha512-VVd7cS6W+vLJu2wmq4QmfVj14Iep7cz4r/OWNk36Aq5ZOY7G8/BfCrQFexcwB1OIxB3yERiePfE/REBjEFulag==}
+  listr2@9.0.3:
+    resolution: {integrity: sha512-0aeh5HHHgmq1KRdMMDHfhMWQmIT/m7nRDTlxlFqni2Sp0had9baqsjJRvDGdlvgd6NmPE0nPloOipiQJGFtTHQ==}
     engines: {node: '>=20.0.0'}
 
   lmdb@3.4.2:
@@ -10860,11 +10860,11 @@ snapshots:
 
   '@leichtgewicht/ip-codec@2.0.5': {}
 
-  '@listr2/prompt-adapter-inquirer@3.0.2(@inquirer/prompts@7.8.4(@types/node@24.3.0))(@types/node@24.3.0)(listr2@9.0.2)':
+  '@listr2/prompt-adapter-inquirer@3.0.3(@inquirer/prompts@7.8.4(@types/node@24.3.0))(@types/node@24.3.0)(listr2@9.0.3)':
     dependencies:
       '@inquirer/prompts': 7.8.4(@types/node@24.3.0)
       '@inquirer/type': 3.0.8(@types/node@24.3.0)
-      listr2: 9.0.2
+      listr2: 9.0.3
     transitivePeerDependencies:
       - '@types/node'
 
@@ -12869,7 +12869,7 @@ snapshots:
 
   base64id@2.0.0: {}
 
-  baseline-browser-mapping@2.7.1: {}
+  baseline-browser-mapping@2.7.2: {}
 
   basic-ftp@5.0.5: {}
 
@@ -15596,7 +15596,7 @@ snapshots:
 
   lines-and-columns@1.2.4: {}
 
-  listr2@9.0.2:
+  listr2@9.0.3:
     dependencies:
       cli-truncate: 4.0.0
       colorette: 2.0.20
