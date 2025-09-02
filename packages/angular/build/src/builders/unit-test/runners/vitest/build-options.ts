@@ -46,6 +46,17 @@ function createTestBedInitVirtualFile(
   `;
 }
 
+function adjustOutputHashing(hashing?: OutputHashing): OutputHashing {
+  switch (hashing) {
+    case OutputHashing.All:
+    case OutputHashing.Media:
+      // Ensure media is continued to be hashed to avoid overwriting of output media files
+      return OutputHashing.Media;
+    default:
+      return OutputHashing.None;
+  }
+}
+
 export async function getVitestBuildOptions(
   options: NormalizedUnitTestBuilderOptions,
   baseBuildOptions: Partial<ApplicationBuilderInternalOptions>,
@@ -82,7 +93,7 @@ export async function getVitestBuildOptions(
     ssr: false,
     prerender: false,
     sourceMap: { scripts: true, vendor: false, styles: false },
-    outputHashing: OutputHashing.None,
+    outputHashing: adjustOutputHashing(baseBuildOptions.outputHashing),
     optimization: false,
     tsConfig,
     entryPoints,
