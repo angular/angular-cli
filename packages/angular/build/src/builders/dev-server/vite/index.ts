@@ -436,6 +436,7 @@ export async function* serveWithVite(
         browserOptions.loader as EsbuildLoaderOption | undefined,
         {
           ...browserOptions.define,
+          'ngJitMode': browserOptions.aot ? 'false' : 'true',
           'ngHmrMode': browserOptions.templateUpdates ? 'true' : 'false',
         },
         extensions?.middleware,
