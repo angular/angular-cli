@@ -30,6 +30,7 @@ ts_project(
     deps = [
         "//:node_modules/@angular/common",
         "//:node_modules/@angular/core",
+        "//:node_modules/@angular/platform-browser",
         "//:node_modules/@angular/platform-server",
         "//:node_modules/@angular/router",
         "//:node_modules/tslib",
