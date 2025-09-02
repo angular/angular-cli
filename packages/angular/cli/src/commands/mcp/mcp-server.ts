@@ -55,9 +55,34 @@ export async function createMcpServer(
         tools: {},
         logging: {},
       },
-      instructions:
-        'For Angular development, this server provides tools to adhere to best practices, search documentation, and find code examples. ' +
-        'When writing or modifying Angular code, use the MCP server and its tools instead of direct shell commands where possible.',
+      instructions: `
+<General Purpose>
+This server provides a safe, programmatic interface to the Angular CLI for an AI assistant.
+Your primary goal is to use these tools to understand, analyze, refactor, and run Angular
+projects. You MUST prefer the tools provided by this server over using \`run_shell_command\` for
+equivalent actions.
+</General Purpose>
+
+<Core Workflows & Tool Guide>
+* **1. Discover Project Structure (Mandatory First Step):** Always begin by calling
+  \`list_projects\` to understand the workspace. The outputs from this tool are often
+  required inputs for other tools.
+
+* **2. Write & Modify Code:** Before writing or changing code, you MUST consult the
+  \`get_best_practices\` tool to learn the current, non-negotiable coding standards.
+
+* **3. Answer User Questions:**
+    - For conceptual questions ("what is..."), use \`search_documentation\`.
+    - For code examples ("show me how to..."), use \`find_examples\`.
+</Core Workflows & Tool Guide>
+
+<Key Concepts>
+* **Workspace vs. Project:** A 'workspace' contains an \`angular.json\` file and defines 'projects'
+  (applications or libraries). A monorepo can have multiple workspaces.
+* **Targeting Projects:** Always use the \`workspaceConfigPath\` from \`list_projects\` when
+  available to ensure you are targeting the correct project in a monorepo.
+</Key Concepts>
+`,
     },
   );
 
