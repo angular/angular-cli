@@ -36,6 +36,17 @@ export type { UnitTestBuilderOptions };
 
 type VitestCoverageOption = Exclude<import('vitest/node').InlineConfig['coverage'], undefined>;
 
+function adjustOutputHashing(hashing?: OutputHashing): OutputHashing {
+  switch (hashing) {
+    case OutputHashing.All:
+    case OutputHashing.Media:
+      // Ensure media is continued to be hashed to avoid overwriting of output media files
+      return OutputHashing.Media;
+    default:
+      return OutputHashing.None;
+  }
+}
+
 /**
  * @experimental Direct usage of this function is considered experimental.
  */
@@ -135,7 +146,7 @@ export async function* execute(
     ssr: false,
     prerender: false,
     sourceMap: { scripts: true, vendor: false, styles: false },
-    outputHashing: OutputHashing.None,
+    outputHashing: adjustOutputHashing(buildTargetOptions.outputHashing),
     optimization: false,
     tsConfig: normalizedOptions.tsConfig,
     entryPoints,
