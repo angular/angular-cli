@@ -10,7 +10,7 @@ import type { LegacySearchMethodProps, SearchResponse } from 'algoliasearch';
 import { createDecipheriv } from 'node:crypto';
 import { z } from 'zod';
 import { at, iv, k1 } from '../constants';
-import { declareTool } from './tool-registry';
+import { McpToolContext, declareTool } from './tool-registry';
 
 const ALGOLIA_APP_ID = 'L1XWT2UJ7F';
 // https://www.algolia.com/doc/guides/security/api-keys/#search-only-api-key
@@ -84,7 +84,7 @@ tutorials, concepts, and best practices.
   factory: createDocSearchHandler,
 });
 
-function createDocSearchHandler() {
+function createDocSearchHandler({ logger }: McpToolContext) {
   let client: import('algoliasearch').SearchClient | undefined;
 
   return async ({ query, includeTopContent }: DocSearchInput) => {
@@ -124,21 +124,23 @@ function createDocSearchHandler() {
     const { title: topTitle, breadcrumb: topBreadcrumb } = formatHitToParts(topHit);
     let topContent: string | undefined;
 
-    try {
-      if (includeTopContent && typeof topHit.url === 'string') {
-        const url = new URL(topHit.url);
-
+    if (includeTopContent && typeof topHit.url === 'string') {
+      const url = new URL(topHit.url);
+      try {
         // Only fetch content from angular.dev
         if (url.hostname === 'angular.dev' || url.hostname.endsWith('.angular.dev')) {
           const response = await fetch(url);
           if (response.ok) {
             const html = await response.text();
-            topContent = extractMainContent(html);
+            const mainContent = extractMainContent(html);
+            if (mainContent) {
+              topContent = stripHtml(mainContent);
+            }
           }
         }
+      } catch (e) {
+        logger.warn(`Failed to fetch or parse content from ${url}: ${e}`);
       }
-    } catch {
-      // Ignore errors fetching content
     }
 
     structuredResults.push({
@@ -173,6 +175,22 @@ function createDocSearchHandler() {
       structuredContent: { results: structuredResults },
     };
   };
+}
+
+/**
+ * Strips HTML tags from a string.
+ * @param html The HTML string to strip.
+ * @returns The text content of the HTML.
+ */
+function stripHtml(html: string): string {
+  // This is a basic regex to remove HTML tags.
+  // It also decodes common HTML entities.
+  return html
+    .replace(/<[^>]*>/g, '')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&amp;/g, '&')
+    .trim();
 }
 
 /**
