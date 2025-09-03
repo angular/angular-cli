@@ -55,14 +55,12 @@ export function getSourceFile(tree: Tree, path: string): ts.SourceFile {
   return source;
 }
 
-/** Finds the call to `bootstrapApplication` within a file. */
+/** Finds the call to `bootstrapApplication` or `bootstrapServerApplication` within a file. */
 export function findBootstrapApplicationCall(tree: Tree, mainFilePath: string): ts.CallExpression {
   const sourceFile = getSourceFile(tree, mainFilePath);
-  const localName = findImportLocalName(
-    sourceFile,
-    'bootstrapApplication',
-    '@angular/platform-browser',
-  );
+  const localName =
+    findImportLocalName(sourceFile, 'bootstrapApplication', '@angular/platform-browser') ??
+    findImportLocalName(sourceFile, 'bootstrapServerApplication', '@angular/platform-server');
 
   if (localName) {
     let result: ts.CallExpression | null = null;
@@ -86,7 +84,9 @@ export function findBootstrapApplicationCall(tree: Tree, mainFilePath: string): 
     }
   }
 
-  throw new SchematicsException(`Could not find bootstrapApplication call in ${mainFilePath}`);
+  throw new SchematicsException(
+    `Could not find bootstrapApplication or bootstrapServerApplication call in ${mainFilePath}`,
+  );
 }
 
 /**
