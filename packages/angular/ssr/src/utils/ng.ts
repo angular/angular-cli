@@ -17,6 +17,7 @@ import {
 import {
   INITIAL_CONFIG,
   ɵSERVER_CONTEXT as SERVER_CONTEXT,
+  bootstrapServerApplication,
   platformServer,
   ɵrenderInternal as renderInternal,
 } from '@angular/platform-server';
@@ -31,7 +32,7 @@ import { joinUrlParts, stripIndexHtmlFromURL } from './url';
  * - A reference to an Angular component or module (`Type<unknown>`) that serves as the root of the application.
  * - A function that returns a `Promise<ApplicationRef>`, which resolves with the root application reference.
  */
-export type AngularBootstrap = Type<unknown> | (() => Promise<ApplicationRef>);
+export type AngularBootstrap = Type<unknown> | ReturnType<typeof bootstrapServerApplication>;
 
 /**
  * Renders an Angular application or module to an HTML string.
@@ -90,7 +91,7 @@ export async function renderAngular(
       const moduleRef = await platformRef.bootstrapModule(bootstrap);
       applicationRef = moduleRef.injector.get(ApplicationRef);
     } else {
-      applicationRef = await bootstrap();
+      applicationRef = await bootstrap(platformRef.injector);
     }
 
     // Block until application is stable.
