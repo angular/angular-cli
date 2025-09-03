@@ -1,3 +1,33 @@
+<a name="21.0.0-next.2"></a>
+
+# 21.0.0-next.2 (2025-09-03)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                                             |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------------- |
+| [301b50da4](https://github.com/angular/angular-cli/commit/301b50da4cf99b3cd87940606121d076b4f241c6) | feat | add fallback support for packages without direct `ng add` functionality |
+| [2c498d2b8](https://github.com/angular/angular-cli/commit/2c498d2b87c13a63bef2a9be2ca4f087c72c6b8a) | fix  | don't set a default for array options when length is 0                  |
+| [f099c9157](https://github.com/angular/angular-cli/commit/f099c91570b3cd748d7138bd18a4898a345549db) | fix  | improve list_projects MCP tool to find all workspaces in monorepos      |
+| [e192e8c7e](https://github.com/angular/angular-cli/commit/e192e8c7ecf506e4b03668f527de83f2a57f552d) | fix  | set process title when running architect commands                       |
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                            |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------ |
+| [e417c89f9](https://github.com/angular/angular-cli/commit/e417c89f9e9cfe0ce50ffbc72ef555793605aea1) | feat | Add `addTypeToClassName` option to relevant schematics |
+| [4e6c94f21](https://github.com/angular/angular-cli/commit/4e6c94f21e882c593cf11197900c29d693af9297) | feat | support different file name style guides in `ng new`   |
+| [14c0a9bac](https://github.com/angular/angular-cli/commit/14c0a9bacbb66b1db714ea7906c7d33f49c710fc) | perf | optimize AST traversal utilities                       |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                            |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------ |
+| [7b0f69798](https://github.com/angular/angular-cli/commit/7b0f69798f061d5500620828cf304e05d667199f) | fix  | avoid extra tick in SSR dev-server builds              |
+| [f806f6477](https://github.com/angular/angular-cli/commit/f806f6477af222907f1879181fb0f9839e889ea8) | fix  | maintain media output hashing with vitest unit-testing |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="20.2.2"></a>
 
 # 20.2.2 (2025-09-03)
