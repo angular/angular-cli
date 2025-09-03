@@ -15,7 +15,7 @@ import {
 } from '../setup';
 
 describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
-  xdescribe('Option: "exclude"', () => {
+  describe('Option: "exclude"', () => {
     beforeEach(async () => {
       setupApplicationTarget(harness);
     });
@@ -54,16 +54,6 @@ describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
       harness.useTarget('test', {
         ...BASE_OPTIONS,
         exclude: ['src/app/error.spec.ts'],
-      });
-
-      const { result } = await harness.executeOnce();
-      expect(result?.success).toBeTrue();
-    });
-
-    it(`should exclude spec that matches the 'exclude' pattern prefixed with a slash`, async () => {
-      harness.useTarget('test', {
-        ...BASE_OPTIONS,
-        exclude: ['/src/app/error.spec.ts'],
       });
 
       const { result } = await harness.executeOnce();

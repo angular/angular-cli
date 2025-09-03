@@ -95,6 +95,7 @@ export function setupApplicationTarget<T>(
     buildApplication,
     {
       ...APPLICATION_BASE_OPTIONS,
+      polyfills: ['zone.js', '@angular/localize/init'],
       ...extraOptions,
     },
     {
