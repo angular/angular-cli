@@ -39,7 +39,6 @@
       "items": {
         "type": "string"
       },
-      "default": [],
       "description": "Globs of files to exclude, relative to the project root."
     },
     "watch": {
