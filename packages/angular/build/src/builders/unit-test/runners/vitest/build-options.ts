@@ -61,8 +61,15 @@ export async function getVitestBuildOptions(
   options: NormalizedUnitTestBuilderOptions,
   baseBuildOptions: Partial<ApplicationBuilderInternalOptions>,
 ): Promise<RunnerOptions> {
-  const { workspaceRoot, projectSourceRoot, include, exclude, watch, tsConfig, providersFile } =
-    options;
+  const {
+    workspaceRoot,
+    projectSourceRoot,
+    include,
+    exclude = [],
+    watch,
+    tsConfig,
+    providersFile,
+  } = options;
 
   // Find test files
   const testFiles = await findTests(include, exclude, workspaceRoot, projectSourceRoot);
