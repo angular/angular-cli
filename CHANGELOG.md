@@ -1,3 +1,23 @@
+<a name="20.2.2"></a>
+
+# 20.2.2 (2025-09-03)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                            |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------ |
+| [a793bbc47](https://github.com/angular/angular-cli/commit/a793bbc473dfaddf3fe6ed15805dc4fc84f52865) | fix  | don't set a default for array options when length is 0 |
+| [2736599e2](https://github.com/angular/angular-cli/commit/2736599e2f6c61032810d8e336c1646db4066392) | fix  | set process title when running architect commands      |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                            |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------ |
+| [5c2abffea](https://github.com/angular/angular-cli/commit/5c2abffea6cf3f672ee256a944dba56dd257665b) | fix  | avoid extra tick in SSR dev-server builds              |
+| [f3c826853](https://github.com/angular/angular-cli/commit/f3c826853501c9cf6d07a1c8ee3363eb79f53005) | fix  | maintain media output hashing with vitest unit-testing |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="20.2.1"></a>
 
 # 20.2.1 (2025-08-27)
