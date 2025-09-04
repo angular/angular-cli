@@ -147,6 +147,7 @@ export default function (options: ApplicationOptions): Rule {
       isTailwind
         ? schematic('tailwind', {
             project: options.name,
+            skipInstall: options.skipInstall,
           })
         : noop(),
     ]);
