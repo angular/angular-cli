@@ -82,7 +82,11 @@ export async function getVitestBuildOptions(
     );
   }
 
-  const entryPoints = getTestEntrypoints(testFiles, { projectSourceRoot, workspaceRoot });
+  const entryPoints = getTestEntrypoints(testFiles, {
+    projectSourceRoot,
+    workspaceRoot,
+    removeTestExtension: true,
+  });
   entryPoints.set('init-testbed', 'angular:test-bed-init');
 
   const buildOptions: Partial<ApplicationBuilderInternalOptions> = {

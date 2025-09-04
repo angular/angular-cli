@@ -62,6 +62,36 @@ describe('getTestEntrypoints', () => {
           ]),
         );
       });
+
+      describe('with removeTestExtension enabled', () => {
+        function getEntrypoints(workspaceRelative: string[], sourceRootRelative: string[] = []) {
+          return getTestEntrypoints(
+            [
+              ...workspaceRelative.map((p) => joinWithSeparator(options.workspaceRoot, p)),
+              ...sourceRootRelative.map((p) => joinWithSeparator(options.projectSourceRoot, p)),
+            ],
+            { ...options, removeTestExtension: true },
+          );
+        }
+
+        it('removes .spec extension', () => {
+          expect(getEntrypoints(['a/b.spec.js'], ['c/d.spec.js'])).toEqual(
+            new Map<string, string>([
+              ['spec-a-b', joinWithSeparator(options.workspaceRoot, 'a/b.spec.js')],
+              ['spec-c-d', joinWithSeparator(options.projectSourceRoot, 'c/d.spec.js')],
+            ]),
+          );
+        });
+
+        it('removes .test extension', () => {
+          expect(getEntrypoints(['a/b.test.js'], ['c/d.test.js'])).toEqual(
+            new Map<string, string>([
+              ['spec-a-b', joinWithSeparator(options.workspaceRoot, 'a/b.test.js')],
+              ['spec-c-d', joinWithSeparator(options.projectSourceRoot, 'c/d.test.js')],
+            ]),
+          );
+        });
+      });
     });
   }
 });

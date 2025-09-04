@@ -30,12 +30,13 @@ export async function findTests(
 interface TestEntrypointsOptions {
   projectSourceRoot: string;
   workspaceRoot: string;
+  removeTestExtension?: boolean;
 }
 
 /** Generate unique bundle names for a set of test files. */
 export function getTestEntrypoints(
   testFiles: string[],
-  { projectSourceRoot, workspaceRoot }: TestEntrypointsOptions,
+  { projectSourceRoot, workspaceRoot, removeTestExtension }: TestEntrypointsOptions,
 ): Map<string, string> {
   const seen = new Set<string>();
 
@@ -46,7 +47,13 @@ export function getTestEntrypoints(
         .replace(/^[./\\]+/, '')
         // Replace any path separators with dashes.
         .replace(/[/\\]/g, '-');
-      const baseName = `spec-${basename(relativePath, extname(relativePath))}`;
+
+      let fileName = basename(relativePath, extname(relativePath));
+      if (removeTestExtension) {
+        fileName = fileName.replace(/\.(spec|test)$/, '');
+      }
+
+      const baseName = `spec-${fileName}`;
       let uniqueName = baseName;
       let suffix = 2;
       while (seen.has(uniqueName)) {
