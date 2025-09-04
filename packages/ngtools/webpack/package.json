@@ -27,8 +27,8 @@
   },
   "devDependencies": {
     "@angular-devkit/core": "workspace:0.0.0-PLACEHOLDER",
-    "@angular/compiler": "20.2.3",
-    "@angular/compiler-cli": "20.2.3",
+    "@angular/compiler": "20.2.4",
+    "@angular/compiler-cli": "20.2.4",
     "typescript": "5.9.2",
     "webpack": "5.101.2"
   }
