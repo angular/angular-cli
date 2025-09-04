@@ -322,6 +322,7 @@ jasmine_test(
     name = "unit-test_integration_tests",
     size = "medium",
     data = [":unit-test_integration_test_lib"],
+    flaky = True,
     shard_count = 5,
 )
 

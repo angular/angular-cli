@@ -68,7 +68,11 @@ export class VitestExecutor implements TestExecutor {
     if (this.testFileToEntryPoint.size === 0) {
       const { include, exclude = [], workspaceRoot, projectSourceRoot } = this.options;
       const testFiles = await findTests(include, exclude, workspaceRoot, projectSourceRoot);
-      const entryPoints = getTestEntrypoints(testFiles, { projectSourceRoot, workspaceRoot });
+      const entryPoints = getTestEntrypoints(testFiles, {
+        projectSourceRoot,
+        workspaceRoot,
+        removeTestExtension: true,
+      });
       for (const [entryPoint, testFile] of entryPoints) {
         this.testFileToEntryPoint.set(testFile, entryPoint);
         this.entryPointToTestFile.set(entryPoint + '.js', testFile);
@@ -90,6 +94,7 @@ export class VitestExecutor implements TestExecutor {
         if (source) {
           modifiedSourceFiles.add(source);
         }
+        vitest.invalidateFile(toPosixPath(path.join(this.options.workspaceRoot, modifiedFile)));
       }
 
       const specsToRerun = [];
@@ -162,16 +167,15 @@ export class VitestExecutor implements TestExecutor {
                 name: 'angular:test-in-memory-provider',
                 enforce: 'pre',
                 resolveId: (id, importer) => {
-                  if (importer && id.startsWith('.')) {
+                  if (importer && (id[0] === '.' || id[0] === '/')) {
                     let fullPath;
-                    let relativePath;
                     if (this.testFileToEntryPoint.has(importer)) {
                       fullPath = toPosixPath(path.join(this.options.workspaceRoot, id));
-                      relativePath = path.normalize(id);
                     } else {
                       fullPath = toPosixPath(path.join(path.dirname(importer), id));
-                      relativePath = path.relative(this.options.workspaceRoot, fullPath);
                     }
+
+                    const relativePath = path.relative(this.options.workspaceRoot, fullPath);
                     if (this.buildResultFiles.has(toPosixPath(relativePath))) {
                       return fullPath;
                     }
@@ -201,6 +205,12 @@ export class VitestExecutor implements TestExecutor {
                   let outputPath;
                   if (entryPoint) {
                     outputPath = entryPoint + '.js';
+
+                    // To support coverage exclusion of the actual test file, the virtual
+                    // test entry point only references the built and bundled intermediate file.
+                    return {
+                      code: `import "./${outputPath}";`,
+                    };
                   } else {
                     // Attempt to load as a built artifact.
                     const relativePath = path.relative(this.options.workspaceRoot, id);
@@ -247,15 +257,6 @@ export class VitestExecutor implements TestExecutor {
               },
             ],
           });
-
-          // Adjust coverage excludes to not include the otherwise automatically inserted included unit tests.
-          // Vite does this as a convenience but is problematic for the bundling strategy employed by the
-          // builder's test setup. To workaround this, the excludes are adjusted here to only automatically
-          // exclude the TypeScript source test files.
-          project.config.coverage.exclude = [
-            ...(codeCoverage?.exclude ?? []),
-            '**/*.{test,spec}.?(c|m)ts',
-          ];
         },
       },
     ];
@@ -343,7 +344,8 @@ function generateCoverageOption(
   return {
     enabled: true,
     excludeAfterRemap: true,
-    // Special handling for `reporter` due to an undefined value causing upstream failures
+    // Special handling for `exclude`/`reporters` due to an undefined value causing upstream failures
+    ...(codeCoverage.exclude ? { exclude: codeCoverage.exclude } : {}),
     ...(codeCoverage.reporters
       ? ({ reporter: codeCoverage.reporters } satisfies VitestCoverageOption)
       : {}),
