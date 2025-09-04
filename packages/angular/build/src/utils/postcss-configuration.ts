@@ -71,9 +71,13 @@ async function readPostcssConfiguration(
   return config;
 }
 
-export async function loadPostcssConfiguration(
-  searchDirectories: SearchDirectory[],
-): Promise<PostcssConfiguration | undefined> {
+export async function loadPostcssConfiguration(searchDirectories: SearchDirectory[]): Promise<
+  | {
+      configPath: string;
+      config: PostcssConfiguration;
+    }
+  | undefined
+> {
   const configPath = findFile(searchDirectories, postcssConfigurationFiles);
   if (!configPath) {
     return undefined;
@@ -101,7 +105,7 @@ export async function loadPostcssConfiguration(
       }
     }
 
-    return config;
+    return { config, configPath };
   }
 
   // Normalize plugin object map form
@@ -119,5 +123,5 @@ export async function loadPostcssConfiguration(
     config.plugins.push([name, options]);
   }
 
-  return config;
+  return { config, configPath };
 }

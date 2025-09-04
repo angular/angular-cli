@@ -13,6 +13,7 @@ import {
   loadPostcssConfiguration,
 } from '@angular/build/private';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
+import { createRequire } from 'node:module';
 import * as path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import type { FileImporter } from 'sass';
@@ -83,9 +84,10 @@ export async function getStylesConfig(wco: WebpackConfigOptions): Promise<Config
   const postcssConfig = await loadPostcssConfiguration(searchDirectories);
 
   if (postcssConfig) {
-    for (const [pluginName, pluginOptions] of postcssConfig.plugins) {
-      const resolvedPlugin = require.resolve(pluginName, { paths: [root] });
-      const { default: plugin } = await import(resolvedPlugin);
+    const postCssPluginRequire = createRequire(path.dirname(postcssConfig.configPath) + '/');
+
+    for (const [pluginName, pluginOptions] of postcssConfig.config.plugins) {
+      const plugin = postCssPluginRequire(pluginName);
       if (typeof plugin !== 'function' || plugin.postcss !== true) {
         throw new Error(`Attempted to load invalid Postcss plugin: "${pluginName}"`);
       }
