@@ -22,6 +22,7 @@ import { join } from 'node:path/posix';
 import {
   DependencyType,
   ExistingBehavior,
+  InstallBehavior,
   ProjectDefinition,
   addDependency,
   updateWorkspace,
@@ -29,6 +30,7 @@ import {
 import { JSONFile } from '../utility/json-file';
 import { latestVersions } from '../utility/latest-versions';
 import { createProjectSchematic } from '../utility/project';
+import { Schema as TailwindOptions } from './schema';
 
 const TAILWIND_DEPENDENCIES = ['tailwindcss', '@tailwindcss/postcss', 'postcss'];
 const POSTCSS_CONFIG_FILES = ['.postcssrc.json', 'postcss.config.json'];
@@ -120,7 +122,7 @@ function managePostCssConfiguration(project: ProjectDefinition): Rule {
   };
 }
 
-export default createProjectSchematic((options, { project }) => {
+export default createProjectSchematic<TailwindOptions>((options, { project }) => {
   return chain([
     addTailwindStyles(options, project),
     managePostCssConfiguration(project),
@@ -128,6 +130,7 @@ export default createProjectSchematic((options, { project }) => {
       addDependency(name, latestVersions[name], {
         type: DependencyType.Dev,
         existing: ExistingBehavior.Skip,
+        install: options.skipInstall ? InstallBehavior.None : InstallBehavior.Auto,
       }),
     ),
   ]);

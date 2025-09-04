@@ -9,6 +9,11 @@
       "$default": {
         "$source": "projectName"
       }
+    },
+    "skipInstall": {
+      "description": "Skip the automatic installation of packages. You will need to manually install the dependencies later.",
+      "type": "boolean",
+      "default": false
     }
   },
   "required": ["project"]
