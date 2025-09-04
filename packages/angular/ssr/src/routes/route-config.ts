@@ -353,16 +353,16 @@ export function withAppShell(
  *
  * @example
  * Basic example of how you can enable server-side rendering in your application
- * when using the `bootstrapApplication` function:
+ * when using the `bootstrapServerApplication` function:
  *
  * ```ts
- * import { bootstrapApplication } from '@angular/platform-browser';
+ * import { bootstrapServerApplication } from '@angular/platform-server';
  * import { provideServerRendering, withRoutes, withAppShell } from '@angular/ssr';
  * import { AppComponent } from './app/app.component';
  * import { SERVER_ROUTES } from './app/app.server.routes';
  * import { AppShellComponent } from './app/app-shell.component';
  *
- * bootstrapApplication(AppComponent, {
+ * export default bootstrapServerApplication(AppComponent, {
  *   providers: [
  *      provideServerRendering(
  *         withRoutes(SERVER_ROUTES),

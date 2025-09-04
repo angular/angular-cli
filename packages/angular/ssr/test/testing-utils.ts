@@ -13,7 +13,7 @@ import {
   Type,
   provideZonelessChangeDetection,
 } from '@angular/core';
-import { bootstrapApplication } from '@angular/platform-browser';
+import { bootstrapServerApplication } from '@angular/platform-server';
 import { RouterOutlet, Routes, provideRouter } from '@angular/router';
 import { destroyAngularServerApp } from '../src/app';
 import { ServerAsset, setAngularAppManifest } from '../src/manifest';
@@ -90,8 +90,8 @@ export function setAngularAppTestingManifest(
       `,
       },
     },
-    bootstrap: async () => () => {
-      return bootstrapApplication(rootComponent, {
+    bootstrap: async () => {
+      return bootstrapServerApplication(rootComponent, {
         providers: [
           provideZonelessChangeDetection(),
           provideRouter(routes),
