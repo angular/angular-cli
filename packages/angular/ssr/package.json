@@ -29,12 +29,12 @@
   },
   "devDependencies": {
     "@angular-devkit/schematics": "workspace:*",
-    "@angular/common": "20.2.3",
-    "@angular/compiler": "20.2.3",
-    "@angular/core": "20.2.3",
-    "@angular/platform-browser": "20.2.3",
-    "@angular/platform-server": "20.2.3",
-    "@angular/router": "20.2.3",
+    "@angular/common": "20.2.4",
+    "@angular/compiler": "20.2.4",
+    "@angular/core": "20.2.4",
+    "@angular/platform-browser": "20.2.4",
+    "@angular/platform-server": "20.2.4",
+    "@angular/router": "20.2.4",
     "@schematics/angular": "workspace:*"
   },
   "sideEffects": false,
