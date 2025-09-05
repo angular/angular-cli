@@ -126,7 +126,7 @@
     "npm": "^11.0.0",
     "magic-string": "0.30.18",
     "rollup-plugin-dts": "6.2.3",
-    "rollup-plugin-sourcemaps2": "0.5.3",
+    "rollup-plugin-sourcemaps2": "0.5.4",
     "prettier": "^3.0.0",
     "protractor": "~7.0.0",
     "puppeteer": "18.2.1",
