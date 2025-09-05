@@ -48,6 +48,6 @@ export default async function () {
     message,
     // When babel is used it will add names to the sourcemap and `constructor` will be used in the stack trace.
     // This will currently only happen if AOT and script optimizations are set which enables advanced optimizations.
-    /window is not defined[.\s\S]*(?:constructor|_App) \(.*app\.ts\:\d+:\d+\)/,
+    /window is not defined[.\s\S]*(?:constructor|App) \(.*app\.ts\:\d+:\d+\)/,
   );
 }
