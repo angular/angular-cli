@@ -25,4 +25,8 @@ export async function applyVitestBuilder(): Promise<void> {
       runner: 'vitest',
     };
   });
+
+  await updateJsonFile('tsconfig.spec.json', (tsconfig) => {
+    tsconfig['compilerOptions']['types'] = ['vitest/globals'];
+  });
 }
