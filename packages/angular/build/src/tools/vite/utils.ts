@@ -98,6 +98,7 @@ export function getDepOptimizationConfig({
     esbuildOptions: {
       // Set esbuild supported targets.
       target,
+      keepNames: true,
       supported: getFeatureSupport(target, zoneless),
       plugins,
       loader,
