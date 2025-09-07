@@ -656,9 +656,6 @@ importers:
       esbuild-wasm:
         specifier: 0.25.9
         version: 0.25.9
-      fast-glob:
-        specifier: 3.3.3
-        version: 3.3.3
       http-proxy-middleware:
         specifier: 3.0.5
         version: 3.0.5
@@ -728,6 +725,9 @@ importers:
       terser:
         specifier: 5.44.0
         version: 5.44.0
+      tinyglobby:
+        specifier: 0.2.15
+        version: 0.2.15
       tree-kill:
         specifier: 1.2.2
         version: 1.2.2
@@ -8200,6 +8200,10 @@ packages:
     resolution: {integrity: sha512-tX5e7OM1HnYr2+a2C/4V0htOcSQcoSTH9KgJnVvNm5zm/cyEWKJ7j7YutsH9CxMdtOkkLFy2AHrMci9IM8IPZQ==}
     engines: {node: '>=12.0.0'}
 
+  tinyglobby@0.2.15:
+    resolution: {integrity: sha512-j2Zq4NyQYG5XMST4cbs02Ak8iJUdxRM0XI5QyxXuZOzKOINmWurp3smXu3y5wDcJrptwpSjgXHzIQxR0omXljQ==}
+    engines: {node: '>=12.0.0'}
+
   tinypool@1.1.1:
     resolution: {integrity: sha512-Zba82s87IFq9A9XmjiX5uZA/ARWDrB03OHlq+Vw1fSdt0I+4/Kutwy8BP4Y/y/aORMo61FQ0vIb5j44vSo5Pkg==}
     engines: {node: ^18.0.0 || >=20.0.0}
@@ -9117,7 +9121,7 @@ snapshots:
       '@angular/compiler-cli': 21.0.0-next.2(@angular/compiler@21.0.0-next.2)(typescript@5.9.2)
       '@babel/core': 7.28.3
       '@types/babel__core': 7.20.5
-      tinyglobby: 0.2.14
+      tinyglobby: 0.2.15
       yargs: 18.0.0
     transitivePeerDependencies:
       - supports-color
@@ -13214,7 +13218,7 @@ snapshots:
       normalize-path: 3.0.0
       schema-utils: 4.3.2
       serialize-javascript: 6.0.2
-      tinyglobby: 0.2.14
+      tinyglobby: 0.2.15
       webpack: 5.101.3(esbuild@0.25.9)
 
   core-js-compat@3.45.1:
@@ -15878,7 +15882,7 @@ snapshots:
       proc-log: 5.0.0
       semver: 7.7.2
       tar: 7.4.3
-      tinyglobby: 0.2.14
+      tinyglobby: 0.2.15
       which: 5.0.0
     transitivePeerDependencies:
       - supports-color
@@ -17527,6 +17531,11 @@ snapshots:
   tinyexec@0.3.2: {}
 
   tinyglobby@0.2.14:
+    dependencies:
+      fdir: 6.5.0(picomatch@4.0.3)
+      picomatch: 4.0.3
+
+  tinyglobby@0.2.15:
     dependencies:
       fdir: 6.5.0(picomatch@4.0.3)
       picomatch: 4.0.3
