@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import fastGlob, { Options as GlobOptions } from 'fast-glob';
+import { GlobOptions, glob as globFn } from 'tinyglobby';
 
 /**
  * Finds all test files in the project.
@@ -21,7 +21,7 @@ export async function findTestFiles(
   include: string[],
   exclude: string[],
   workspaceRoot: string,
-  glob: typeof fastGlob = fastGlob,
+  glob: typeof globFn = globFn,
 ): Promise<Set<string>> {
   const globOptions: GlobOptions = {
     cwd: workspaceRoot,
