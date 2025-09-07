@@ -87,7 +87,7 @@
     "ng-packagr": "0.0.0-NG-PACKAGR-PEER-DEP",
     "protractor": "^7.0.0",
     "tailwindcss": "^2.0.0 || ^3.0.0 || ^4.0.0",
-    "typescript": ">=5.8 <6.0"
+    "typescript": ">=5.9 <6.0"
   },
   "peerDependenciesMeta": {
     "@angular/core": {
