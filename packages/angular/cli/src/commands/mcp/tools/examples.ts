@@ -158,7 +158,12 @@ async function createFindExampleHandler({ exampleDatabasePath }: McpToolContext)
     if (whereClauses.length > 0) {
       sql += ` WHERE ${whereClauses.join(' AND ')}`;
     }
-    sql += ' ORDER BY rank;';
+
+    // Order the results by relevance using the BM25 algorithm.
+    // The weights assigned to each column boost the ranking of documents where the
+    // search term appears in a more important field.
+    // Column order: title, summary, keywords, required_packages, related_concepts, related_tools, content
+    sql += ' ORDER BY bm25(examples_fts, 10.0, 5.0, 5.0, 1.0, 2.0, 1.0, 1.0);';
 
     const queryStatement = db.prepare(sql);
 
