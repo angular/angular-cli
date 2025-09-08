@@ -2,6 +2,7 @@ import { ng } from '../../utils/process';
 import { appendToFile, replaceInFile, readFile } from '../../utils/fs';
 import { applyVitestBuilder } from '../../utils/vitest';
 import assert from 'node:assert/strict';
+import { stripVTControlCharacters } from 'node:util';
 
 export default async function () {
   // Set up the test project to use the vitest runner
@@ -28,7 +29,7 @@ export default async function () {
   // First run: create snapshots
   const { stdout: firstRunStdout } = await ng('test');
   assert.match(
-    firstRunStdout,
+    stripVTControlCharacters(firstRunStdout),
     /Snapshots\s+2 written/,
     'Snapshots were not written on the first run.',
   );
@@ -58,7 +59,7 @@ export default async function () {
     () => ng('test'),
     (err: any) => {
       assert.match(
-        err.toString(),
+        stripVTControlCharacters(err.toString()),
         /Snapshots\s+2 failed/,
         'Expected snapshot mismatch error, but a different error occurred.',
       );
