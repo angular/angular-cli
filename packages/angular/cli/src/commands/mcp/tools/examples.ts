@@ -13,41 +13,102 @@ import { z } from 'zod';
 import { McpToolContext, declareTool } from './tool-registry';
 
 const findExampleInputSchema = z.object({
-  query: z.string().describe(
-    `Performs a full-text search using FTS5 syntax. The query should target relevant Angular concepts.
-
-Key Syntax Features (see https://www.sqlite.org/fts5.html for full documentation):
-  - AND (default): Space-separated terms are combined with AND.
-    - Example: 'standalone component' (finds results with both "standalone" and "component")
-  - OR: Use the OR operator to find results with either term.
-    - Example: 'validation OR validator'
-  - NOT: Use the NOT operator to exclude terms.
-    - Example: 'forms NOT reactive'
-  - Grouping: Use parentheses () to group expressions.
-    - Example: '(validation OR validator) AND forms'
-  - Phrase Search: Use double quotes "" for exact phrases.
-    - Example: '"template-driven forms"'
-  - Prefix Search: Use an asterisk * for prefix matching.
-    - Example: 'rout*' (matches "route", "router", "routing")
-
-Examples of queries:
-  - Find standalone components: 'standalone component'
-  - Find ngFor with trackBy: 'ngFor trackBy'
-  - Find signal inputs: 'signal input'
-  - Find lazy loading a route: 'lazy load route'
-  - Find forms with validation: 'form AND (validation OR validator)'`,
-  ),
-  keywords: z.array(z.string()).optional().describe('Filter examples by specific keywords.'),
+  query: z
+    .string()
+    .describe(
+      `The primary, conceptual search query. This should capture the user's main goal or question ` +
+        `(e.g., 'lazy loading a route' or 'how to use signal inputs'). The query will be processed ` +
+        'by a powerful full-text search engine.\n\n' +
+        'Key Syntax Features (see https://www.sqlite.org/fts5.html for full documentation):\n' +
+        '  - AND (default): Space-separated terms are combined with AND.\n' +
+        '    - Example: \'standalone component\' (finds results with both "standalone" and "component")\n' +
+        '  - OR: Use the OR operator to find results with either term.\n' +
+        "    - Example: 'validation OR validator'\n" +
+        '  - NOT: Use the NOT operator to exclude terms.\n' +
+        "    - Example: 'forms NOT reactive'\n" +
+        '  - Grouping: Use parentheses () to group expressions.\n' +
+        "    - Example: '(validation OR validator) AND forms'\n" +
+        '  - Phrase Search: Use double quotes "" for exact phrases.\n' +
+        '    - Example: \'"template-driven forms"\'\n' +
+        '  - Prefix Search: Use an asterisk * for prefix matching.\n' +
+        '    - Example: \'rout*\' (matches "route", "router", "routing")',
+    ),
+  keywords: z
+    .array(z.string())
+    .optional()
+    .describe(
+      'A list of specific, exact keywords to narrow the search. Use this for precise terms like ' +
+        'API names, function names, or decorators (e.g., `ngFor`, `trackBy`, `inject`).',
+    ),
   required_packages: z
     .array(z.string())
     .optional()
-    .describe('Filter examples by required NPM packages (e.g., "@angular/forms").'),
+    .describe(
+      "A list of NPM packages that an example must use. Use this when the user's request is " +
+        'specific to a feature within a certain package (e.g., if the user asks about `ngModel`, ' +
+        'you should filter by `@angular/forms`).',
+    ),
   related_concepts: z
     .array(z.string())
     .optional()
-    .describe('Filter examples by related high-level concepts.'),
+    .describe(
+      'A list of high-level concepts to filter by. Use this to find examples related to broader ' +
+        'architectural ideas or patterns (e.g., `signals`, `dependency injection`, `routing`).',
+    ),
 });
+
 type FindExampleInput = z.infer<typeof findExampleInputSchema>;
+
+const findExampleOutputSchema = z.object({
+  examples: z.array(
+    z.object({
+      title: z
+        .string()
+        .describe(
+          'The title of the example. Use this as a heading when presenting the example to the user.',
+        ),
+      summary: z
+        .string()
+        .describe(
+          "A one-sentence summary of the example's purpose. Use this to help the user decide " +
+            'if the example is relevant to them.',
+        ),
+      keywords: z
+        .array(z.string())
+        .optional()
+        .describe(
+          'A list of keywords for the example. You can use these to explain why this example ' +
+            "was a good match for the user's query.",
+        ),
+      required_packages: z
+        .array(z.string())
+        .optional()
+        .describe(
+          'A list of NPM packages required for the example to work. Before presenting the code, ' +
+            'you should inform the user if any of these packages need to be installed.',
+        ),
+      related_concepts: z
+        .array(z.string())
+        .optional()
+        .describe(
+          'A list of related concepts. You can suggest these to the user as topics for ' +
+            'follow-up questions.',
+        ),
+      related_tools: z
+        .array(z.string())
+        .optional()
+        .describe(
+          'A list of related MCP tools. You can suggest these as potential next steps for the user.',
+        ),
+      content: z
+        .string()
+        .describe(
+          'A complete, self-contained Angular code example in Markdown format. This should be ' +
+            'presented to the user inside a markdown code block.',
+        ),
+    }),
+  ),
+});
 
 export const FIND_EXAMPLE_TOOL = declareTool({
   name: 'find_examples',
@@ -80,15 +141,7 @@ new or evolving features.
   and 'related_concepts' to create highly specific searches.
 </Operational Notes>`,
   inputSchema: findExampleInputSchema.shape,
-  outputSchema: {
-    examples: z.array(
-      z.object({
-        content: z
-          .string()
-          .describe('A complete, self-contained Angular code example in Markdown format.'),
-      }),
-    ),
-  },
+  outputSchema: findExampleOutputSchema.shape,
   isReadOnly: true,
   isLocalOnly: true,
   shouldRegister: ({ logger }) => {
@@ -132,7 +185,8 @@ async function createFindExampleHandler({ exampleDatabasePath }: McpToolContext)
 
     // Build the query dynamically
     const params: SQLInputValue[] = [];
-    let sql = 'SELECT content FROM examples_fts';
+    let sql =
+      'SELECT title, summary, keywords, required_packages, related_concepts, related_tools, content FROM examples_fts';
     const whereClauses = [];
 
     // FTS query
@@ -171,9 +225,21 @@ async function createFindExampleHandler({ exampleDatabasePath }: McpToolContext)
     const examples = [];
     const textContent = [];
     for (const exampleRecord of queryStatement.all(...params)) {
-      const exampleContent = exampleRecord['content'] as string;
-      examples.push({ content: exampleContent });
-      textContent.push({ type: 'text' as const, text: exampleContent });
+      const record = exampleRecord as Record<string, string>;
+      const example = {
+        title: record['title'],
+        summary: record['summary'],
+        keywords: JSON.parse(record['keywords'] || '[]') as string[],
+        required_packages: JSON.parse(record['required_packages'] || '[]') as string[],
+        related_concepts: JSON.parse(record['related_concepts'] || '[]') as string[],
+        related_tools: JSON.parse(record['related_tools'] || '[]') as string[],
+        content: record['content'],
+      };
+      examples.push(example);
+
+      // Also create a more structured text output
+      const text = `## Example: ${example.title}\n**Summary:** ${example.summary}\n\n---\n\n${example.content}`;
+      textContent.push({ type: 'text' as const, text });
     }
 
     return {
