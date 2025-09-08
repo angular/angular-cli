@@ -84,6 +84,7 @@ function generate(inPath, outPath) {
       required_packages TEXT,
       related_concepts TEXT,
       related_tools TEXT,
+      experimental INTEGER NOT NULL DEFAULT 0,
       content TEXT NOT NULL
     );
   `);
@@ -120,8 +121,8 @@ function generate(inPath, outPath) {
 
   const insertStatement = db.prepare(
     'INSERT INTO examples(' +
-      'title, summary, keywords, required_packages, related_concepts, related_tools, content' +
-      ') VALUES(?, ?, ?, ?, ?, ?, ?);',
+      'title, summary, keywords, required_packages, related_concepts, related_tools, experimental, content' +
+      ') VALUES(?, ?, ?, ?, ?, ?, ?, ?);',
   );
 
   const frontmatterSchema = z.object({
@@ -131,6 +132,7 @@ function generate(inPath, outPath) {
     required_packages: z.array(z.string()).optional(),
     related_concepts: z.array(z.string()).optional(),
     related_tools: z.array(z.string()).optional(),
+    experimental: z.boolean().optional(),
   });
 
   db.exec('BEGIN TRANSACTION');
@@ -152,8 +154,15 @@ function generate(inPath, outPath) {
       throw new Error(`Invalid front matter in ${entry.name}`);
     }
 
-    const { title, summary, keywords, required_packages, related_concepts, related_tools } =
-      validation.data;
+    const {
+      title,
+      summary,
+      keywords,
+      required_packages,
+      related_concepts,
+      related_tools,
+      experimental,
+    } = validation.data;
     insertStatement.run(
       title,
       summary,
@@ -161,6 +170,7 @@ function generate(inPath, outPath) {
       JSON.stringify(required_packages ?? []),
       JSON.stringify(related_concepts ?? []),
       JSON.stringify(related_tools ?? []),
+      experimental ? 1 : 0,
       content,
     );
   }
