@@ -114,7 +114,9 @@ async function createFindExampleHandler({ exampleDatabasePath }: McpToolContext)
       db = new DatabaseSync(exampleDatabasePath, { readOnly: true });
     }
     if (!queryStatement) {
-      queryStatement = db.prepare('SELECT * from examples WHERE examples MATCH ? ORDER BY rank;');
+      queryStatement = db.prepare(
+        'SELECT content from examples_fts WHERE examples_fts MATCH ? ORDER BY rank;',
+      );
     }
 
     const sanitizedQuery = escapeSearchQuery(query);
@@ -218,24 +220,128 @@ function suppressSqliteWarning() {
   };
 }
 
+/**
+ * A simple YAML front matter parser.
+ *
+ * This function extracts the YAML block enclosed by `---` at the beginning of a string
+ * and parses it into a JavaScript object. It is not a full YAML parser and only
+ * supports simple key-value pairs and string arrays.
+ *
+ * @param content The string content to parse.
+ * @returns A record containing the parsed front matter data.
+ */
+function parseFrontmatter(content: string): Record<string, unknown> {
+  const match = content.match(/^---\r?\n(.*?)\r?\n---/s);
+  if (!match) {
+    return {};
+  }
+
+  const frontmatter = match[1];
+  const data: Record<string, unknown> = {};
+  const lines = frontmatter.split(/\r?\n/);
+
+  let currentKey = '';
+  let isArray = false;
+  const arrayValues: string[] = [];
+
+  for (const line of lines) {
+    const keyValueMatch = line.match(/^([^:]+):\s*(.*)/);
+    if (keyValueMatch) {
+      if (currentKey && isArray) {
+        data[currentKey] = arrayValues.slice();
+        arrayValues.length = 0;
+      }
+
+      const [, key, value] = keyValueMatch;
+      currentKey = key.trim();
+      isArray = value.trim() === '';
+
+      if (!isArray) {
+        data[currentKey] = value.trim();
+      }
+    } else {
+      const arrayItemMatch = line.match(/^\s*-\s*(.*)/);
+      if (arrayItemMatch && currentKey && isArray) {
+        arrayValues.push(arrayItemMatch[1].trim());
+      }
+    }
+  }
+
+  if (currentKey && isArray) {
+    data[currentKey] = arrayValues;
+  }
+
+  return data;
+}
+
 async function setupRuntimeExamples(
   examplesPath: string,
 ): Promise<import('node:sqlite').DatabaseSync> {
   const { DatabaseSync } = await import('node:sqlite');
   const db = new DatabaseSync(':memory:');
 
-  db.exec(`CREATE VIRTUAL TABLE examples USING fts5(content, tokenize = 'porter ascii');`);
+  // Create a relational table to store the structured example data.
+  db.exec(`
+    CREATE TABLE examples (
+      id INTEGER PRIMARY KEY,
+      title TEXT NOT NULL,
+      summary TEXT NOT NULL,
+      keywords TEXT,
+      content TEXT NOT NULL
+    );
+  `);
 
-  const insertStatement = db.prepare('INSERT INTO examples(content) VALUES(?);');
+  // Create an FTS5 virtual table to provide full-text search capabilities.
+  // It indexes the title, summary, keywords, and the full content.
+  db.exec(`
+    CREATE VIRTUAL TABLE examples_fts USING fts5(
+      title,
+      summary,
+      keywords,
+      content,
+      content='examples',
+      content_rowid='id',
+      tokenize = 'porter ascii'
+    );
+  `);
+
+  // Create triggers to keep the FTS table synchronized with the examples table.
+  db.exec(`
+    CREATE TRIGGER examples_after_insert AFTER INSERT ON examples BEGIN
+      INSERT INTO examples_fts(rowid, title, summary, keywords, content)
+      VALUES (new.id, new.title, new.summary, new.keywords, new.content);
+    END;
+  `);
+
+  const insertStatement = db.prepare(
+    'INSERT INTO examples(title, summary, keywords, content) VALUES(?, ?, ?, ?);',
+  );
+
+  const frontmatterSchema = z.object({
+    title: z.string(),
+    summary: z.string(),
+    keywords: z.array(z.string()).optional(),
+  });
 
   db.exec('BEGIN TRANSACTION');
-  for await (const entry of glob('*.md', { cwd: examplesPath, withFileTypes: true })) {
+  for await (const entry of glob('**/*.md', { cwd: examplesPath, withFileTypes: true })) {
     if (!entry.isFile()) {
       continue;
     }
 
-    const example = await readFile(path.join(entry.parentPath, entry.name), 'utf-8');
-    insertStatement.run(example);
+    const content = await readFile(path.join(entry.parentPath, entry.name), 'utf-8');
+    const frontmatter = parseFrontmatter(content);
+
+    const validation = frontmatterSchema.safeParse(frontmatter);
+    if (!validation.success) {
+      // eslint-disable-next-line no-console
+      console.warn(`Skipping invalid example file ${entry.name}:`, validation.error.issues);
+      continue;
+    }
+
+    const { title, summary, keywords } = validation.data;
+
+    insertStatement.run(title, summary, JSON.stringify(keywords ?? []), content);
   }
   db.exec('END TRANSACTION');
 
