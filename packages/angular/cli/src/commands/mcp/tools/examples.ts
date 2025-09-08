@@ -55,6 +55,16 @@ const findExampleInputSchema = z.object({
       'A list of high-level concepts to filter by. Use this to find examples related to broader ' +
         'architectural ideas or patterns (e.g., `signals`, `dependency injection`, `routing`).',
     ),
+  includeExperimental: z
+    .boolean()
+    .optional()
+    .default(false)
+    .describe(
+      'By default, this tool returns only production-safe examples. Set this to `true` **only if** ' +
+        'the user explicitly asks for a bleeding-edge feature or if a stable solution to their ' +
+        'problem cannot be found. If you set this to `true`, you **MUST** preface your answer by ' +
+        'warning the user that the example uses experimental APIs that are not suitable for production.',
+    ),
 });
 
 type FindExampleInput = z.infer<typeof findExampleInputSchema>;
@@ -181,7 +191,7 @@ async function createFindExampleHandler({ exampleDatabasePath }: McpToolContext)
       db = new DatabaseSync(exampleDatabasePath, { readOnly: true });
     }
 
-    const { query, keywords, required_packages, related_concepts } = input;
+    const { query, keywords, required_packages, related_concepts, includeExperimental } = input;
 
     // Build the query dynamically
     const params: SQLInputValue[] = [];
@@ -208,6 +218,10 @@ async function createFindExampleHandler({ exampleDatabasePath }: McpToolContext)
     addJsonFilter('keywords', keywords);
     addJsonFilter('required_packages', required_packages);
     addJsonFilter('related_concepts', related_concepts);
+
+    if (!includeExperimental) {
+      whereClauses.push('experimental = 0');
+    }
 
     if (whereClauses.length > 0) {
       sql += ` WHERE ${whereClauses.join(' AND ')}`;
@@ -402,6 +416,7 @@ async function setupRuntimeExamples(
       required_packages TEXT,
       related_concepts TEXT,
       related_tools TEXT,
+      experimental INTEGER NOT NULL DEFAULT 0,
       content TEXT NOT NULL
     );
   `);
@@ -435,8 +450,8 @@ async function setupRuntimeExamples(
 
   const insertStatement = db.prepare(
     'INSERT INTO examples(' +
-      'title, summary, keywords, required_packages, related_concepts, related_tools, content' +
-      ') VALUES(?, ?, ?, ?, ?, ?, ?);',
+      'title, summary, keywords, required_packages, related_concepts, related_tools, experimental, content' +
+      ') VALUES(?, ?, ?, ?, ?, ?, ?, ?);',
   );
 
   const frontmatterSchema = z.object({
@@ -446,6 +461,7 @@ async function setupRuntimeExamples(
     required_packages: z.array(z.string()).optional(),
     related_concepts: z.array(z.string()).optional(),
     related_tools: z.array(z.string()).optional(),
+    experimental: z.boolean().optional(),
   });
 
   db.exec('BEGIN TRANSACTION');
@@ -464,8 +480,15 @@ async function setupRuntimeExamples(
       continue;
     }
 
-    const { title, summary, keywords, required_packages, related_concepts, related_tools } =
-      validation.data;
+    const {
+      title,
+      summary,
+      keywords,
+      required_packages,
+      related_concepts,
+      related_tools,
+      experimental,
+    } = validation.data;
 
     insertStatement.run(
       title,
@@ -474,6 +497,7 @@ async function setupRuntimeExamples(
       JSON.stringify(required_packages ?? []),
       JSON.stringify(related_concepts ?? []),
       JSON.stringify(related_tools ?? []),
+      experimental ? 1 : 0,
       content,
     );
   }
