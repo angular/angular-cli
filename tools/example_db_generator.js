@@ -81,6 +81,9 @@ function generate(inPath, outPath) {
       title TEXT NOT NULL,
       summary TEXT NOT NULL,
       keywords TEXT,
+      required_packages TEXT,
+      related_concepts TEXT,
+      related_tools TEXT,
       content TEXT NOT NULL
     );
   `);
@@ -91,6 +94,9 @@ function generate(inPath, outPath) {
       title,
       summary,
       keywords,
+      required_packages,
+      related_concepts,
+      related_tools,
       content,
       content='examples',
       content_rowid='id',
@@ -101,19 +107,30 @@ function generate(inPath, outPath) {
   // Create triggers to keep the FTS table synchronized with the examples table.
   db.exec(`
     CREATE TRIGGER examples_after_insert AFTER INSERT ON examples BEGIN
-      INSERT INTO examples_fts(rowid, title, summary, keywords, content)
-      VALUES (new.id, new.title, new.summary, new.keywords, new.content);
+      INSERT INTO examples_fts(
+        rowid, title, summary, keywords, required_packages, related_concepts, related_tools,
+        content
+      )
+      VALUES (
+        new.id, new.title, new.summary, new.keywords, new.required_packages,
+        new.related_concepts, new.related_tools, new.content
+      );
     END;
   `);
 
   const insertStatement = db.prepare(
-    'INSERT INTO examples(title, summary, keywords, content) VALUES(?, ?, ?, ?);',
+    'INSERT INTO examples(' +
+      'title, summary, keywords, required_packages, related_concepts, related_tools, content' +
+      ') VALUES(?, ?, ?, ?, ?, ?, ?);',
   );
 
   const frontmatterSchema = z.object({
     title: z.string(),
     summary: z.string(),
     keywords: z.array(z.string()).optional(),
+    required_packages: z.array(z.string()).optional(),
+    related_concepts: z.array(z.string()).optional(),
+    related_tools: z.array(z.string()).optional(),
   });
 
   db.exec('BEGIN TRANSACTION');
@@ -135,8 +152,17 @@ function generate(inPath, outPath) {
       throw new Error(`Invalid front matter in ${entry.name}`);
     }
 
-    const { title, summary, keywords } = validation.data;
-    insertStatement.run(title, summary, JSON.stringify(keywords ?? []), content);
+    const { title, summary, keywords, required_packages, related_concepts, related_tools } =
+      validation.data;
+    insertStatement.run(
+      title,
+      summary,
+      JSON.stringify(keywords ?? []),
+      JSON.stringify(required_packages ?? []),
+      JSON.stringify(related_concepts ?? []),
+      JSON.stringify(related_tools ?? []),
+      content,
+    );
   }
   db.exec('END TRANSACTION');
 

@@ -8,6 +8,7 @@
 
 import { glob, readFile } from 'node:fs/promises';
 import path from 'node:path';
+import type { SQLInputValue } from 'node:sqlite';
 import { z } from 'zod';
 import { McpToolContext, declareTool } from './tool-registry';
 
@@ -36,6 +37,15 @@ Examples of queries:
   - Find lazy loading a route: 'lazy load route'
   - Find forms with validation: 'form AND (validation OR validator)'`,
   ),
+  keywords: z.array(z.string()).optional().describe('Filter examples by specific keywords.'),
+  required_packages: z
+    .array(z.string())
+    .optional()
+    .describe('Filter examples by required NPM packages (e.g., "@angular/forms").'),
+  related_concepts: z
+    .array(z.string())
+    .optional()
+    .describe('Filter examples by related high-level concepts.'),
 });
 type FindExampleInput = z.infer<typeof findExampleInputSchema>;
 
@@ -55,7 +65,9 @@ new or evolving features.
 * **Modern Implementation:** Finding the correct modern syntax for features
   (e.g., query: 'functional route guard' or 'http client with fetch').
 * **Refactoring to Modern Patterns:** Upgrading older code by finding examples of new syntax
-  (e.g., query: 'built-in control flow' to replace "*ngIf').
+  (e.g., query: 'built-in control flow' to replace "*ngIf").
+* **Advanced Filtering:** Combining a full-text search with filters to narrow results.
+  (e.g., query: 'forms', required_packages: ['@angular/forms'], keywords: ['validation'])
 </Use Cases>
 <Operational Notes>
 * **Tool Selection:** This database primarily contains examples for new and recently updated Angular
@@ -64,6 +76,8 @@ new or evolving features.
 * The examples in this database are the single source of truth for modern Angular coding patterns.
 * The search query uses a powerful full-text search syntax (FTS5). Refer to the 'query'
   parameter description for detailed syntax rules and examples.
+* You can combine the main 'query' with optional filters like 'keywords', 'required_packages',
+  and 'related_concepts' to create highly specific searches.
 </Operational Notes>`,
   inputSchema: findExampleInputSchema.shape,
   outputSchema: {
@@ -104,7 +118,7 @@ async function createFindExampleHandler({ exampleDatabasePath }: McpToolContext)
 
   suppressSqliteWarning();
 
-  return async ({ query }: FindExampleInput) => {
+  return async (input: FindExampleInput) => {
     if (!db) {
       if (!exampleDatabasePath) {
         // This should be prevented by the registration logic in mcp-server.ts
@@ -113,18 +127,45 @@ async function createFindExampleHandler({ exampleDatabasePath }: McpToolContext)
       const { DatabaseSync } = await import('node:sqlite');
       db = new DatabaseSync(exampleDatabasePath, { readOnly: true });
     }
-    if (!queryStatement) {
-      queryStatement = db.prepare(
-        'SELECT content from examples_fts WHERE examples_fts MATCH ? ORDER BY rank;',
-      );
+
+    const { query, keywords, required_packages, related_concepts } = input;
+
+    // Build the query dynamically
+    const params: SQLInputValue[] = [];
+    let sql = 'SELECT content FROM examples_fts';
+    const whereClauses = [];
+
+    // FTS query
+    if (query) {
+      whereClauses.push('examples_fts MATCH ?');
+      params.push(escapeSearchQuery(query));
     }
 
-    const sanitizedQuery = escapeSearchQuery(query);
+    // JSON array filters
+    const addJsonFilter = (column: string, values: string[] | undefined) => {
+      if (values?.length) {
+        for (const value of values) {
+          whereClauses.push(`${column} LIKE ?`);
+          params.push(`%"${value}"%`);
+        }
+      }
+    };
+
+    addJsonFilter('keywords', keywords);
+    addJsonFilter('required_packages', required_packages);
+    addJsonFilter('related_concepts', related_concepts);
+
+    if (whereClauses.length > 0) {
+      sql += ` WHERE ${whereClauses.join(' AND ')}`;
+    }
+    sql += ' ORDER BY rank;';
+
+    const queryStatement = db.prepare(sql);
 
     // Query database and return results
     const examples = [];
     const textContent = [];
-    for (const exampleRecord of queryStatement.all(sanitizedQuery)) {
+    for (const exampleRecord of queryStatement.all(...params)) {
       const exampleContent = exampleRecord['content'] as string;
       examples.push({ content: exampleContent });
       textContent.push({ type: 'text' as const, text: exampleContent });
@@ -287,17 +328,22 @@ async function setupRuntimeExamples(
       title TEXT NOT NULL,
       summary TEXT NOT NULL,
       keywords TEXT,
+      required_packages TEXT,
+      related_concepts TEXT,
+      related_tools TEXT,
       content TEXT NOT NULL
     );
   `);
 
   // Create an FTS5 virtual table to provide full-text search capabilities.
-  // It indexes the title, summary, keywords, and the full content.
   db.exec(`
     CREATE VIRTUAL TABLE examples_fts USING fts5(
       title,
       summary,
       keywords,
+      required_packages,
+      related_concepts,
+      related_tools,
       content,
       content='examples',
       content_rowid='id',
@@ -308,19 +354,27 @@ async function setupRuntimeExamples(
   // Create triggers to keep the FTS table synchronized with the examples table.
   db.exec(`
     CREATE TRIGGER examples_after_insert AFTER INSERT ON examples BEGIN
-      INSERT INTO examples_fts(rowid, title, summary, keywords, content)
-      VALUES (new.id, new.title, new.summary, new.keywords, new.content);
+      INSERT INTO examples_fts(rowid, title, summary, keywords, required_packages, related_concepts, related_tools, content)
+      VALUES (
+        new.id, new.title, new.summary, new.keywords, new.required_packages, new.related_concepts,
+        new.related_tools, new.content
+      );
     END;
   `);
 
   const insertStatement = db.prepare(
-    'INSERT INTO examples(title, summary, keywords, content) VALUES(?, ?, ?, ?);',
+    'INSERT INTO examples(' +
+      'title, summary, keywords, required_packages, related_concepts, related_tools, content' +
+      ') VALUES(?, ?, ?, ?, ?, ?, ?);',
   );
 
   const frontmatterSchema = z.object({
     title: z.string(),
     summary: z.string(),
     keywords: z.array(z.string()).optional(),
+    required_packages: z.array(z.string()).optional(),
+    related_concepts: z.array(z.string()).optional(),
+    related_tools: z.array(z.string()).optional(),
   });
 
   db.exec('BEGIN TRANSACTION');
@@ -339,9 +393,18 @@ async function setupRuntimeExamples(
       continue;
     }
 
-    const { title, summary, keywords } = validation.data;
+    const { title, summary, keywords, required_packages, related_concepts, related_tools } =
+      validation.data;
 
-    insertStatement.run(title, summary, JSON.stringify(keywords ?? []), content);
+    insertStatement.run(
+      title,
+      summary,
+      JSON.stringify(keywords ?? []),
+      JSON.stringify(required_packages ?? []),
+      JSON.stringify(related_concepts ?? []),
+      JSON.stringify(related_tools ?? []),
+      content,
+    );
   }
   db.exec('END TRANSACTION');
 
