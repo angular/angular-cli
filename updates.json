@@ -1,0 +1,177 @@
+{
+  "name": "@angular/devkit-repo",
+  "version": "21.0.0-next.0",
+  "private": true,
+  "description": "Software Development Kit for Angular",
+  "keywords": [
+    "angular",
+    "Angular CLI",
+    "devkit",
+    "sdk",
+    "Angular DevKit"
+  ],
+  "scripts": {
+    "admin": "node --no-warnings=ExperimentalWarning --loader ts-node/esm/transpile-only ./scripts/devkit-admin.mjs",
+    "bazel": "bazelisk",
+    "test": "bazel test //packages/...",
+    "build": "pnpm -s admin build",
+    "lint": "eslint --cache --max-warnings=0 \"**/*.@(ts|mts|cts)\"",
+    "templates": "pnpm -s admin templates",
+    "validate": "pnpm -s admin validate",
+    "postinstall": "pnpm -s webdriver-update && husky",
+    "webdriver-update": "webdriver-manager update --standalone false --gecko false --versions.chrome 106.0.5249.21",
+    "public-api:check": "node goldens/public-api/manage.js test",
+    "ng-dev": "node --no-warnings=ExperimentalWarning --loader ts-node/esm/transpile-only node_modules/@angular/ng-dev/bundles/cli.mjs",
+    "public-api:update": "node goldens/public-api/manage.js accept",
+    "ts-circular-deps": "pnpm -s ng-dev ts-circular-deps --config ./scripts/circular-deps-test.conf.mjs",
+    "check-tooling-setup": "tsc --project .ng-dev/tsconfig.json",
+    "diff-release-package": "node --no-warnings=ExperimentalWarning --loader ts-node/esm/transpile-only scripts/diff-release-package.mts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/angular/angular-cli.git"
+  },
+  "packageManager": "pnpm@10.14.0",
+  "engines": {
+    "node": "^20.19.0 || ^22.12.0 || >=24.0.0",
+    "npm": "Please use pnpm instead of NPM to install dependencies",
+    "yarn": "Please use pnpm instead of Yarn to install dependencies",
+    "pnpm": "^10.0.0"
+  },
+  "author": "Angular Authors",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/angular/angular-cli/issues"
+  },
+  "homepage": "https://github.com/angular/angular-cli",
+  "devDependencies": {
+    "@angular/animations": "20.2.4",
+    "@angular/cdk": "20.2.4",
+    "@angular/common": "20.2.4",
+    "@angular/compiler": "20.2.4",
+    "@angular/compiler-cli": "20.2.4",
+    "@angular/core": "20.2.4",
+    "@angular/forms": "20.2.4",
+    "@angular/localize": "20.2.4",
+    "@angular/material": "20.2.4",
+    "@angular/platform-browser": "20.2.4",
+    "@angular/platform-server": "20.2.4",
+    "@angular/router": "20.2.4",
+    "@angular/service-worker": "20.2.4",
+    "@angular/ng-dev": "https://github.com/angular/dev-infra-private-ng-dev-builds.git#b9bae2cc9b96652721067a69ece7e79dba123787",
+    "@bazel/bazelisk": "1.26.0",
+    "@bazel/buildifier": "8.2.1",
+    "@eslint/compat": "1.3.2",
+    "@eslint/eslintrc": "3.3.1",
+    "@eslint/js": "9.33.0",
+    "@rollup/plugin-alias": "^5.1.1",
+    "@rollup/plugin-commonjs": "^28.0.0",
+    "@rollup/plugin-json": "^6.1.0",
+    "@rollup/plugin-node-resolve": "16.0.1",
+    "@stylistic/eslint-plugin": "^5.0.0",
+    "@types/babel__core": "7.20.5",
+    "@types/babel__generator": "^7.6.8",
+    "@types/browser-sync": "^2.27.0",
+    "@types/express": "~5.0.1",
+    "@types/http-proxy": "^1.17.4",
+    "@types/ini": "^4.0.0",
+    "@types/jasmine": "~5.1.0",
+    "@types/jasmine-reporters": "^2",
+    "@types/karma": "^6.3.0",
+    "@types/less": "^3.0.3",
+    "@types/loader-utils": "^2.0.0",
+    "@types/lodash": "^4.17.0",
+    "@types/node": "^22.12.0",
+    "@types/npm-package-arg": "^6.1.0",
+    "@types/pacote": "^11.1.3",
+    "@types/picomatch": "^4.0.0",
+    "@types/progress": "^2.0.3",
+    "@types/resolve": "^1.17.1",
+    "@types/semver": "^7.3.12",
+    "@types/shelljs": "^0.8.11",
+    "@types/watchpack": "^2.4.4",
+    "@types/yargs": "^17.0.20",
+    "@types/yargs-parser": "^21.0.0",
+    "@types/yarnpkg__lockfile": "^1.1.5",
+    "@typescript-eslint/eslint-plugin": "8.39.1",
+    "@typescript-eslint/parser": "8.39.1",
+    "ajv": "8.17.1",
+    "ansi-colors": "4.1.3",
+    "beasties": "0.3.5",
+    "buffer": "6.0.3",
+    "esbuild": "0.25.9",
+    "esbuild-wasm": "0.25.9",
+    "eslint": "9.33.0",
+    "eslint-config-prettier": "10.1.8",
+    "eslint-plugin-header": "3.1.1",
+    "eslint-plugin-import": "2.32.0",
+    "express": "5.1.0",
+    "fast-glob": "3.3.3",
+    "globals": "16.3.0",
+    "http-proxy": "^1.18.1",
+    "http-proxy-middleware": "3.0.5",
+    "husky": "9.1.7",
+    "jasmine": "~5.9.0",
+    "jasmine-core": "~5.9.0",
+    "jasmine-reporters": "^2.5.2",
+    "jasmine-spec-reporter": "~7.0.0",
+    "karma": "~6.4.0",
+    "karma-chrome-launcher": "~3.2.0",
+    "karma-coverage": "~2.2.0",
+    "karma-jasmine": "~5.1.0",
+    "karma-jasmine-html-reporter": "~2.1.0",
+    "karma-source-map-support": "1.4.0",
+    "listr2": "9.0.1",
+    "lodash": "^4.17.21",
+    "npm": "^11.0.0",
+    "magic-string": "0.30.17",
+    "rollup-plugin-dts": "6.2.1",
+    "rollup-plugin-sourcemaps2": "0.5.3",
+    "prettier": "^3.0.0",
+    "protractor": "~7.0.0",
+    "puppeteer": "24.19.0",
+    "quicktype-core": "23.2.6",
+    "rollup": "4.46.2",
+    "rollup-license-plugin": "~3.0.1",
+    "semver": "7.7.2",
+    "shelljs": "^0.10.0",
+    "source-map-support": "0.5.21",
+    "tar": "^7.0.0",
+    "ts-node": "^10.9.1",
+    "tslib": "2.8.1",
+    "typescript": "5.9.2",
+    "undici": "7.13.0",
+    "unenv": "^1.10.0",
+    "verdaccio": "6.1.6",
+    "verdaccio-auth-memory": "^10.0.0",
+    "yargs-parser": "22.0.0",
+    "zone.js": "^0.15.0"
+  },
+  "dependenciesMeta": {
+    "esbuild": {
+      "built": true
+    },
+    "puppeteer": {
+      "built": true
+    }
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "puppeteer",
+      "webdriver-manager"
+    ],
+    "overrides": {
+      "@angular/build": "workspace:*"
+    },
+    "packageExtensions": {
+      "grpc-gcp": {
+        "peerDependencies": {
+          "protobufjs": "*"
+        }
+      }
+    }
+  },
+  "resolutions": {
+    "typescript": "5.9.2"
+  }
+}
