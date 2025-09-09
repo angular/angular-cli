@@ -47,8 +47,8 @@ importers:
         specifier: 20.2.2
         version: 20.2.2(287c6e0b7fcf3ed64c131b42d0a8e7e9)
       '@angular/ng-dev':
-        specifier: https://github.com/angular/dev-infra-private-ng-dev-builds.git#1b75cbad43a688705205725df89bf311a8d08652
-        version: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/1b75cbad43a688705205725df89bf311a8d08652(@modelcontextprotocol/sdk@1.17.3)
+        specifier: https://github.com/angular/dev-infra-private-ng-dev-builds.git#472b13c749d3436957c26d86e296545c4d208589
+        version: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/472b13c749d3436957c26d86e296545c4d208589(@modelcontextprotocol/sdk@1.17.3)
       '@angular/platform-browser':
         specifier: 20.2.4
         version: 20.2.4(@angular/animations@20.2.4(@angular/core@20.2.4(@angular/compiler@20.2.4)(rxjs@7.8.2)(zone.js@0.15.1)))(@angular/common@20.2.4(@angular/core@20.2.4(@angular/compiler@20.2.4)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@20.2.4(@angular/compiler@20.2.4)(rxjs@7.8.2)(zone.js@0.15.1))
@@ -342,7 +342,7 @@ importers:
         version: 7.8.2
       vitest:
         specifier: 3.2.4
-        version: 3.2.4(@types/node@24.3.0)(jiti@1.21.7)(jsdom@26.1.0(bufferutil@4.0.9)(utf-8-validate@6.0.5))(less@4.4.0)(sass@1.90.0)(terser@5.43.1)(yaml@2.8.1)
+        version: 3.2.4(@types/node@24.3.1)(jiti@1.21.7)(jsdom@26.1.0(bufferutil@4.0.9)(utf-8-validate@6.0.5))(less@4.4.0)(sass@1.90.0)(terser@5.43.1)(yaml@2.8.1)
 
   packages/angular/build:
     dependencies:
@@ -363,10 +363,10 @@ importers:
         version: 7.24.7
       '@inquirer/confirm':
         specifier: 5.1.14
-        version: 5.1.14(@types/node@24.3.0)
+        version: 5.1.14(@types/node@24.3.1)
       '@vitejs/plugin-basic-ssl':
         specifier: 2.1.0
-        version: 2.1.0(vite@7.1.2(@types/node@24.3.0)(jiti@1.21.7)(less@4.4.0)(sass@1.90.0)(terser@5.43.1)(yaml@2.8.1))
+        version: 2.1.0(vite@7.1.2(@types/node@24.3.1)(jiti@1.21.7)(less@4.4.0)(sass@1.90.0)(terser@5.43.1)(yaml@2.8.1))
       beasties:
         specifier: 0.3.5
         version: 0.3.5
@@ -378,7 +378,7 @@ importers:
         version: 0.25.9
       https-proxy-agent:
         specifier: 7.0.6
-        version: 7.0.6(supports-color@10.2.0)
+        version: 7.0.6(supports-color@10.2.2)
       istanbul-lib-instrument:
         specifier: 6.0.3
         version: 6.0.3
@@ -420,7 +420,7 @@ importers:
         version: 0.2.14
       vite:
         specifier: 7.1.2
-        version: 7.1.2(@types/node@24.3.0)(jiti@1.21.7)(less@4.4.0)(sass@1.90.0)(terser@5.43.1)(yaml@2.8.1)
+        version: 7.1.2(@types/node@24.3.1)(jiti@1.21.7)(less@4.4.0)(sass@1.90.0)(terser@5.43.1)(yaml@2.8.1)
       watchpack:
         specifier: 2.4.4
         version: 2.4.4
@@ -448,7 +448,7 @@ importers:
         version: 7.8.2
       vitest:
         specifier: 3.2.4
-        version: 3.2.4(@types/node@24.3.0)(jiti@1.21.7)(jsdom@26.1.0(bufferutil@4.0.9)(utf-8-validate@6.0.5))(less@4.4.0)(sass@1.90.0)(terser@5.43.1)(yaml@2.8.1)
+        version: 3.2.4(@types/node@24.3.1)(jiti@1.21.7)(jsdom@26.1.0(bufferutil@4.0.9)(utf-8-validate@6.0.5))(less@4.4.0)(sass@1.90.0)(terser@5.43.1)(yaml@2.8.1)
     optionalDependencies:
       lmdb:
         specifier: 3.4.2
@@ -467,10 +467,10 @@ importers:
         version: link:../../angular_devkit/schematics
       '@inquirer/prompts':
         specifier: 7.8.2
-        version: 7.8.2(@types/node@24.3.0)
+        version: 7.8.2(@types/node@24.3.1)
       '@listr2/prompt-adapter-inquirer':
         specifier: 3.0.1
-        version: 3.0.1(@inquirer/prompts@7.8.2(@types/node@24.3.0))(@types/node@24.3.0)(listr2@9.0.1)
+        version: 3.0.1(@inquirer/prompts@7.8.2(@types/node@24.3.1))(@types/node@24.3.1)(listr2@9.0.1)
       '@modelcontextprotocol/sdk':
         specifier: 1.17.3
         version: 1.17.3
@@ -845,7 +845,7 @@ importers:
         version: link:../schematics
       '@inquirer/prompts':
         specifier: 7.8.2
-        version: 7.8.2(@types/node@24.3.0)
+        version: 7.8.2(@types/node@24.3.1)
       ansi-colors:
         specifier: 4.1.3
         version: 4.1.3
@@ -1050,9 +1050,9 @@ packages:
       '@angular/platform-browser': ^20.0.0 || ^21.0.0
       rxjs: ^6.5.3 || ^7.4.0
 
-  '@angular/ng-dev@https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/1b75cbad43a688705205725df89bf311a8d08652':
-    resolution: {tarball: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/1b75cbad43a688705205725df89bf311a8d08652}
-    version: 0.0.0-3186a078ec23edea6e2f6192ed013ec57bd95f87
+  '@angular/ng-dev@https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/472b13c749d3436957c26d86e296545c4d208589':
+    resolution: {tarball: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/472b13c749d3436957c26d86e296545c4d208589}
+    version: 0.0.0-238d775bf817ed92f2ee2e570eada7c4d23ee2be
     hasBin: true
 
   '@angular/platform-browser@20.2.4':
@@ -2122,8 +2122,8 @@ packages:
     resolution: {integrity: sha512-IJn+8A3QZJfe7FUtWqHVNo3xJs7KFpurCWGWCiCz3oEh+BkRymKZ1QxfAbU2yGMDzTytLGQ2IV6T2r3cuo75/w==}
     engines: {node: '>=18'}
 
-  '@google/genai@1.17.0':
-    resolution: {integrity: sha512-r/OZWN9D8WvYrte3bcKPoLODrZ+2TjfxHm5OOyVHUbdFYIp1C4yJaXX4+sCS8I/+CbN9PxLjU5zm1cgmS7qz+A==}
+  '@google/genai@1.18.0':
+    resolution: {integrity: sha512-G1RTmr2nUud9zPfPgNOGGALgvncSMwtH90wgZdaKHULq+p4TY8E85krPbTfLrx7LgythCzWneH9/+bODM/PAZg==}
     engines: {node: '>=20.0.0'}
     peerDependencies:
       '@modelcontextprotocol/sdk': ^1.11.4
@@ -3244,9 +3244,6 @@ packages:
   '@types/content-disposition@0.5.9':
     resolution: {integrity: sha512-8uYXI3Gw35MhiVYhG3s295oihrxRyytcRHjSjqnqZVDDy/xcGBRny7+Xj1Wgfhv5QzRtN2hB2dVRBUX9XW3UcQ==}
 
-  '@types/conventional-commits-parser@5.0.1':
-    resolution: {integrity: sha512-7uz5EHdzz2TqoMfV7ee61Egf5y6NkcO4FB/1iCCQnbeiI1F3xzv3vK5dBCXUCLQgGYS+mUeigK1iKQzvED+QnQ==}
-
   '@types/convert-source-map@2.0.3':
     resolution: {integrity: sha512-ag0BfJLZf6CQz8VIuRIEYQ5Ggwk/82uvTQf27RcpyDNbY0Vw49LIPqAxk5tqYfrCs9xDaIMvl4aj7ZopnYL8bA==}
 
@@ -3374,8 +3371,8 @@ packages:
   '@types/node@22.18.0':
     resolution: {integrity: sha512-m5ObIqwsUp6BZzyiy4RdZpzWGub9bqLJMvZDD0QMXhxjqMHMENlj+SqF5QxoUwaQNFe+8kz8XM8ZQhqkQPTgMQ==}
 
-  '@types/node@24.3.0':
-    resolution: {integrity: sha512-aPTXCrfwnDLj4VvXrm+UUCQjNEvJgNA8s5F1cvwQU+3KNltTOkBm1j30uNLyqqPNe7gE3KFzImYoZEfLhp4Yow==}
+  '@types/node@24.3.1':
+    resolution: {integrity: sha512-3vXmQDXy+woz+gnrTvuvNrPzekOi+Ds0ReMxw0LzBiK3a+1k0kQn9f2NWk+lgD4rJehFUmYy2gMhJ2ZI+7YP9g==}
 
   '@types/npm-package-arg@6.1.4':
     resolution: {integrity: sha512-vDgdbMy2QXHnAruzlv68pUtXCjmqUk3WrBAsRboRovsOmxbfn/WiYCjmecyKjGztnMps5dWp4Uq2prp+Ilo17Q==}
@@ -4300,6 +4297,10 @@ packages:
     resolution: {integrity: sha512-46QrSQFyVSEyYAgQ22hQ+zDa60YHA4fBstHmtSApj1Y5vKtG27fWowW03jCk5KcbXEWPZUIR894aARCA/G1kfQ==}
     engines: {node: ^12.17.0 || ^14.13 || >=16.0.0}
 
+  chalk@5.6.2:
+    resolution: {integrity: sha512-7NzBL0rN6fMUW+f7A6Io4h40qQlG+xGmtMxfbnH/K7TAtt8JQWVQK+6g0UXKMeVJoyV5EkkNsErQ8pVD3bLHbA==}
+    engines: {node: ^12.17.0 || ^14.13 || >=16.0.0}
+
   chardet@2.1.0:
     resolution: {integrity: sha512-bNFETTG/pM5ryzQ9Ad0lJOTa6HWD/YsScAR3EnCPZRPlQh77JocYktSHOUHelyhm8IARL+o4c4F1bP5KVOjiRA==}
 
@@ -4489,9 +4490,9 @@ packages:
     resolution: {integrity: sha512-tQMagCOC59EVgNZcC5zl7XqO30Wki9i9J3acbUvkaosCT6JX3EeFwJD7Qqp4MCikRnzS18WXV3BLIQ66ytu6+Q==}
     engines: {node: '>=18'}
 
-  conventional-commits-parser@5.0.0:
-    resolution: {integrity: sha512-ZPMl0ZJbw74iS9LuX9YIAiW8pfM5p3yh2o/NbXHbkFuZzY5jvdi5jFycEOkmBW5H5I7nA+D6f3UcsCLP2vvSEA==}
-    engines: {node: '>=16'}
+  conventional-commits-parser@6.2.0:
+    resolution: {integrity: sha512-uLnoLeIW4XaoFtH37qEcg/SXMJmKF4vi7V0H2rnPueg+VEtFGA/asSCNTcq4M/GQ6QmlzchAEtOoDTtKqWeHag==}
+    engines: {node: '>=18'}
     hasBin: true
 
   convert-source-map@1.9.0:
@@ -6020,10 +6021,6 @@ packages:
     resolution: {integrity: sha512-9gGx6GTtCQM73BgmHQXfDmLtfjjTUDSyoxTCbp5WtoixAhfgsDirWIcVQ/IHpvI5Vgd5i/J5F7B9cN/WlVbC/w==}
     engines: {node: '>= 0.4'}
 
-  is-text-path@2.0.0:
-    resolution: {integrity: sha512-+oDTluR6WEjdXEJMnC2z6A4FRwFoYuvShVVEGsS7ewc0UTi2QtAKMDJuL4BDEVt+5T7MjFo12RP8ghOM75oKJw==}
-    engines: {node: '>=8'}
-
   is-typed-array@1.1.15:
     resolution: {integrity: sha512-p3EcsicXjit7SaskXHs1hA91QxgTw46Fv6EFKKGS5DRFLD8yKnohjF3hxoju94b/OcMZoQukzpPpBE9uLVKzgQ==}
     engines: {node: '>= 0.4'}
@@ -6547,10 +6544,6 @@ packages:
   memfs@4.38.2:
     resolution: {integrity: sha512-FpWsVHpAkoSh/LfY1BgAl72BVd374ooMRtDi2VqzBycX4XEfvC0XKACCe0C9VRZoYq5viuoyTv6lYXZ/Q7TrLQ==}
     engines: {node: '>= 4.0.0'}
-
-  meow@12.1.1:
-    resolution: {integrity: sha512-BhXM0Au22RwUneMPwSCnyhTOizdWoIEPU9sp0Aqa1PnDMR5Wv2FGXYDjuzJEIX+Eo2Rb8xuYe5jrnm5QowQFkw==}
-    engines: {node: '>=16.10'}
 
   meow@13.2.0:
     resolution: {integrity: sha512-pxQJQzB6djGPXh08dacEloMFopsOqGVRKFPYvPOt9XDZ1HasbgDZA74CJGreSU4G3Ak7EFJGoiH2auq+yXISgA==}
@@ -7460,7 +7453,7 @@ packages:
   puppeteer@18.2.1:
     resolution: {integrity: sha512-7+UhmYa7wxPh2oMRwA++k8UGVDxh3YdWFB52r9C3tM81T6BU7cuusUSxImz0GEYSOYUKk/YzIhkQ6+vc0gHbxQ==}
     engines: {node: '>=14.1.0'}
-    deprecated: < 24.9.0 is no longer supported
+    deprecated: < 24.10.2 is no longer supported
 
   q@1.4.1:
     resolution: {integrity: sha512-/CdEdaw49VZVmyIDGUQKDDT53c7qBkO6g5CefWz91Ae+l4+cRtcDYwMTXh6me4O8TMldeGHG3N2Bl84V78Ywbg==}
@@ -8131,8 +8124,8 @@ packages:
   stubs@3.0.0:
     resolution: {integrity: sha512-PdHt7hHUJKxvTCgbKX9C1V/ftOcjJQgz8BZwNfV5c4B6dcGqlpelTbJ999jBGZ2jYiPAwcX5dP6oBwVlBlUbxw==}
 
-  supports-color@10.2.0:
-    resolution: {integrity: sha512-5eG9FQjEjDbAlI5+kdpdyPIBMRH4GfTVDGREVupaZHmVoppknhM29b/S9BkQz7cathp85BVgRi/As3Siln7e0Q==}
+  supports-color@10.2.2:
+    resolution: {integrity: sha512-SS+jx45GF1QjgEXQx4NJZV9ImqmO2NPz5FNsIHrsDjh2YsHnawpan7SNQ1o8NuhrbHZy9AZhIoCUiCeaW/C80g==}
     engines: {node: '>=18'}
 
   supports-color@2.0.0:
@@ -8210,10 +8203,6 @@ packages:
 
   text-decoder@1.2.3:
     resolution: {integrity: sha512-3/o9z3X0X0fTupwsYvR03pJ/DjWuqqrfwBgTQzdWDiQSm9KitAyz/9WqsT2JQW7KV2m+bC2ol/zqpW37NHxLaA==}
-
-  text-extensions@2.4.0:
-    resolution: {integrity: sha512-te/NtwBwfiNRLf9Ijqx3T0nlqZiQ2XrrtBvu+cLL8ZRrGkO0NHTug8MYFKyoSrv/sHTaSKfilUkizV6XhxMJ3g==}
-    engines: {node: '>=8'}
 
   thingies@2.5.0:
     resolution: {integrity: sha512-s+2Bwztg6PhWUD7XMfeYm5qliDdSiZm7M7n8KjTkIsm3l/2lgVRc2/Gx/v+ZX8lT4FMA+i8aQvhcWylldc+ZNw==}
@@ -9181,13 +9170,13 @@ snapshots:
       rxjs: 7.8.2
       tslib: 2.8.1
 
-  '@angular/ng-dev@https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/1b75cbad43a688705205725df89bf311a8d08652(@modelcontextprotocol/sdk@1.17.3)':
+  '@angular/ng-dev@https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/472b13c749d3436957c26d86e296545c4d208589(@modelcontextprotocol/sdk@1.17.3)':
     dependencies:
       '@actions/core': 1.11.1
-      '@google-cloud/spanner': 8.0.0(supports-color@10.2.0)
-      '@google/genai': 1.17.0(@modelcontextprotocol/sdk@1.17.3)(bufferutil@4.0.9)(encoding@0.1.13)(supports-color@10.2.0)(utf-8-validate@6.0.5)
-      '@inquirer/prompts': 7.8.4(@types/node@24.3.0)
-      '@inquirer/type': 3.0.8(@types/node@24.3.0)
+      '@google-cloud/spanner': 8.0.0(supports-color@10.2.2)
+      '@google/genai': 1.18.0(@modelcontextprotocol/sdk@1.17.3)(bufferutil@4.0.9)(encoding@0.1.13)(supports-color@10.2.2)(utf-8-validate@6.0.5)
+      '@inquirer/prompts': 7.8.4(@types/node@24.3.1)
+      '@inquirer/type': 3.0.8(@types/node@24.3.1)
       '@octokit/auth-app': 8.1.0
       '@octokit/core': 7.0.3
       '@octokit/graphql': 9.0.1
@@ -9200,14 +9189,13 @@ snapshots:
       '@octokit/types': 14.1.0
       '@pnpm/dependency-path': 1001.1.0
       '@types/cli-progress': 3.11.6
-      '@types/conventional-commits-parser': 5.0.1
       '@types/ejs': 3.1.5
       '@types/events': 3.0.3
       '@types/folder-hash': 4.0.4
       '@types/git-raw-commits': 5.0.0
       '@types/jasmine': 5.1.9
       '@types/minimatch': 6.0.0
-      '@types/node': 24.3.0
+      '@types/node': 24.3.1
       '@types/semver': 7.7.1
       '@types/supports-color': 10.0.0
       '@types/which': 3.0.4
@@ -9215,16 +9203,16 @@ snapshots:
       '@types/yarnpkg__lockfile': 1.1.9
       '@yarnpkg/lockfile': 1.1.0
       bufferutil: 4.0.9
-      chalk: 5.6.0
+      chalk: 5.6.2
       cli-progress: 3.12.0
       conventional-commits-filter: 5.0.0
-      conventional-commits-parser: 5.0.0
+      conventional-commits-parser: 6.2.0
       ejs: 3.1.10
       encoding: 0.1.13
       fast-glob: 3.3.3
       firebase: 12.2.1
-      folder-hash: 4.1.1(supports-color@10.2.0)
-      git-raw-commits: 5.0.0(conventional-commits-filter@5.0.0)(conventional-commits-parser@5.0.0)
+      folder-hash: 4.1.1(supports-color@10.2.2)
+      git-raw-commits: 5.0.0(conventional-commits-filter@5.0.0)(conventional-commits-parser@6.2.0)
       jasmine: 5.10.0
       jasmine-core: 5.10.0
       jasmine-reporters: 2.5.2
@@ -9233,7 +9221,7 @@ snapshots:
       multimatch: 7.0.0
       nock: 14.0.10
       semver: 7.7.2
-      supports-color: 10.2.0
+      supports-color: 10.2.2
       typed-graphqlify: 3.1.6
       typescript: 5.9.2
       utf-8-validate: 6.0.5
@@ -9305,7 +9293,7 @@ snapshots:
       '@babel/traverse': 7.28.3
       '@babel/types': 7.28.2
       convert-source-map: 2.0.0
-      debug: 4.4.1(supports-color@10.2.0)
+      debug: 4.4.1(supports-color@10.2.2)
       gensync: 1.0.0-beta.2
       json5: 2.2.3
       semver: 6.3.1
@@ -9357,7 +9345,7 @@ snapshots:
       '@babel/core': 7.28.3
       '@babel/helper-compilation-targets': 7.27.2
       '@babel/helper-plugin-utils': 7.27.1
-      debug: 4.4.1(supports-color@10.2.0)
+      debug: 4.4.1(supports-color@10.2.2)
       lodash.debounce: 4.0.8
       resolve: 1.22.10
     transitivePeerDependencies:
@@ -9945,7 +9933,7 @@ snapshots:
       '@babel/parser': 7.28.3
       '@babel/template': 7.27.2
       '@babel/types': 7.28.2
-      debug: 4.4.1(supports-color@10.2.0)
+      debug: 4.4.1(supports-color@10.2.2)
     transitivePeerDependencies:
       - supports-color
 
@@ -9960,13 +9948,13 @@ snapshots:
 
   '@colors/colors@1.5.0': {}
 
-  '@conventional-changelog/git-client@1.0.1(conventional-commits-filter@5.0.0)(conventional-commits-parser@5.0.0)':
+  '@conventional-changelog/git-client@1.0.1(conventional-commits-filter@5.0.0)(conventional-commits-parser@6.2.0)':
     dependencies:
       '@types/semver': 7.7.1
       semver: 7.7.2
     optionalDependencies:
       conventional-commits-filter: 5.0.0
-      conventional-commits-parser: 5.0.0
+      conventional-commits-parser: 6.2.0
 
   '@cspotcode/source-map-support@0.8.1':
     dependencies:
@@ -10123,7 +10111,7 @@ snapshots:
   '@eslint/config-array@0.21.0':
     dependencies:
       '@eslint/object-schema': 2.1.6
-      debug: 4.4.1(supports-color@10.2.0)
+      debug: 4.4.1(supports-color@10.2.2)
       minimatch: 3.1.2
     transitivePeerDependencies:
       - supports-color
@@ -10137,7 +10125,7 @@ snapshots:
   '@eslint/eslintrc@3.3.1':
     dependencies:
       ajv: 6.12.6
-      debug: 4.4.1(supports-color@10.2.0)
+      debug: 4.4.1(supports-color@10.2.2)
       espree: 10.4.0
       globals: 14.0.0
       ignore: 5.3.2
@@ -10479,17 +10467,17 @@ snapshots:
 
   '@glideapps/ts-necessities@2.2.3': {}
 
-  '@google-cloud/common@6.0.0(supports-color@10.2.0)':
+  '@google-cloud/common@6.0.0(supports-color@10.2.2)':
     dependencies:
       '@google-cloud/projectify': 4.0.0
       '@google-cloud/promisify': 4.1.0
       arrify: 2.0.1
       duplexify: 4.1.3
       extend: 3.0.2
-      google-auth-library: 10.3.0(supports-color@10.2.0)
+      google-auth-library: 10.3.0(supports-color@10.2.2)
       html-entities: 2.6.0
-      retry-request: 8.0.2(supports-color@10.2.0)
-      teeny-request: 10.1.0(supports-color@10.2.0)
+      retry-request: 8.0.2(supports-color@10.2.2)
+      teeny-request: 10.1.0(supports-color@10.2.2)
     transitivePeerDependencies:
       - supports-color
 
@@ -10503,9 +10491,9 @@ snapshots:
 
   '@google-cloud/promisify@5.0.0': {}
 
-  '@google-cloud/spanner@8.0.0(supports-color@10.2.0)':
+  '@google-cloud/spanner@8.0.0(supports-color@10.2.2)':
     dependencies:
-      '@google-cloud/common': 6.0.0(supports-color@10.2.0)
+      '@google-cloud/common': 6.0.0(supports-color@10.2.2)
       '@google-cloud/precise-date': 5.0.0
       '@google-cloud/projectify': 5.0.0
       '@google-cloud/promisify': 5.0.0
@@ -10521,26 +10509,26 @@ snapshots:
       duplexify: 4.1.3
       events-intercept: 2.0.0
       extend: 3.0.2
-      google-auth-library: 10.3.0(supports-color@10.2.0)
-      google-gax: 5.0.3(supports-color@10.2.0)
+      google-auth-library: 10.3.0(supports-color@10.2.2)
+      google-gax: 5.0.3(supports-color@10.2.2)
       grpc-gcp: 1.0.1(protobufjs@7.5.4)
       is: 3.3.2
       lodash.snakecase: 4.1.1
       merge-stream: 2.0.0
       p-queue: 6.6.2
       protobufjs: 7.5.4
-      retry-request: 8.0.2(supports-color@10.2.0)
+      retry-request: 8.0.2(supports-color@10.2.2)
       split-array-stream: 2.0.0
       stack-trace: 0.0.10
       stream-events: 1.0.5
-      teeny-request: 10.1.0(supports-color@10.2.0)
+      teeny-request: 10.1.0(supports-color@10.2.2)
       through2: 4.0.2
     transitivePeerDependencies:
       - supports-color
 
-  '@google/genai@1.17.0(@modelcontextprotocol/sdk@1.17.3)(bufferutil@4.0.9)(encoding@0.1.13)(supports-color@10.2.0)(utf-8-validate@6.0.5)':
+  '@google/genai@1.18.0(@modelcontextprotocol/sdk@1.17.3)(bufferutil@4.0.9)(encoding@0.1.13)(supports-color@10.2.2)(utf-8-validate@6.0.5)':
     dependencies:
-      google-auth-library: 9.15.1(encoding@0.1.13)(supports-color@10.2.0)
+      google-auth-library: 9.15.1(encoding@0.1.13)(supports-color@10.2.2)
       ws: 8.18.3(bufferutil@4.0.9)(utf-8-validate@6.0.5)
     optionalDependencies:
       '@modelcontextprotocol/sdk': 1.17.3
@@ -10589,34 +10577,34 @@ snapshots:
 
   '@humanwhocodes/retry@0.4.3': {}
 
-  '@inquirer/checkbox@4.2.2(@types/node@24.3.0)':
+  '@inquirer/checkbox@4.2.2(@types/node@24.3.1)':
     dependencies:
-      '@inquirer/core': 10.2.0(@types/node@24.3.0)
+      '@inquirer/core': 10.2.0(@types/node@24.3.1)
       '@inquirer/figures': 1.0.13
-      '@inquirer/type': 3.0.8(@types/node@24.3.0)
+      '@inquirer/type': 3.0.8(@types/node@24.3.1)
       ansi-escapes: 4.3.2
       yoctocolors-cjs: 2.1.3
     optionalDependencies:
-      '@types/node': 24.3.0
+      '@types/node': 24.3.1
 
-  '@inquirer/confirm@5.1.14(@types/node@24.3.0)':
+  '@inquirer/confirm@5.1.14(@types/node@24.3.1)':
     dependencies:
-      '@inquirer/core': 10.2.0(@types/node@24.3.0)
-      '@inquirer/type': 3.0.8(@types/node@24.3.0)
+      '@inquirer/core': 10.2.0(@types/node@24.3.1)
+      '@inquirer/type': 3.0.8(@types/node@24.3.1)
     optionalDependencies:
-      '@types/node': 24.3.0
+      '@types/node': 24.3.1
 
-  '@inquirer/confirm@5.1.16(@types/node@24.3.0)':
+  '@inquirer/confirm@5.1.16(@types/node@24.3.1)':
     dependencies:
-      '@inquirer/core': 10.2.0(@types/node@24.3.0)
-      '@inquirer/type': 3.0.8(@types/node@24.3.0)
+      '@inquirer/core': 10.2.0(@types/node@24.3.1)
+      '@inquirer/type': 3.0.8(@types/node@24.3.1)
     optionalDependencies:
-      '@types/node': 24.3.0
+      '@types/node': 24.3.1
 
-  '@inquirer/core@10.2.0(@types/node@24.3.0)':
+  '@inquirer/core@10.2.0(@types/node@24.3.1)':
     dependencies:
       '@inquirer/figures': 1.0.13
-      '@inquirer/type': 3.0.8(@types/node@24.3.0)
+      '@inquirer/type': 3.0.8(@types/node@24.3.1)
       ansi-escapes: 4.3.2
       cli-width: 4.1.0
       mute-stream: 2.0.0
@@ -10624,115 +10612,115 @@ snapshots:
       wrap-ansi: 6.2.0
       yoctocolors-cjs: 2.1.3
     optionalDependencies:
-      '@types/node': 24.3.0
+      '@types/node': 24.3.1
 
-  '@inquirer/editor@4.2.18(@types/node@24.3.0)':
+  '@inquirer/editor@4.2.18(@types/node@24.3.1)':
     dependencies:
-      '@inquirer/core': 10.2.0(@types/node@24.3.0)
-      '@inquirer/external-editor': 1.0.1(@types/node@24.3.0)
-      '@inquirer/type': 3.0.8(@types/node@24.3.0)
+      '@inquirer/core': 10.2.0(@types/node@24.3.1)
+      '@inquirer/external-editor': 1.0.1(@types/node@24.3.1)
+      '@inquirer/type': 3.0.8(@types/node@24.3.1)
     optionalDependencies:
-      '@types/node': 24.3.0
+      '@types/node': 24.3.1
 
-  '@inquirer/expand@4.0.18(@types/node@24.3.0)':
+  '@inquirer/expand@4.0.18(@types/node@24.3.1)':
     dependencies:
-      '@inquirer/core': 10.2.0(@types/node@24.3.0)
-      '@inquirer/type': 3.0.8(@types/node@24.3.0)
+      '@inquirer/core': 10.2.0(@types/node@24.3.1)
+      '@inquirer/type': 3.0.8(@types/node@24.3.1)
       yoctocolors-cjs: 2.1.3
     optionalDependencies:
-      '@types/node': 24.3.0
+      '@types/node': 24.3.1
 
-  '@inquirer/external-editor@1.0.1(@types/node@24.3.0)':
+  '@inquirer/external-editor@1.0.1(@types/node@24.3.1)':
     dependencies:
       chardet: 2.1.0
       iconv-lite: 0.6.3
     optionalDependencies:
-      '@types/node': 24.3.0
+      '@types/node': 24.3.1
 
   '@inquirer/figures@1.0.13': {}
 
-  '@inquirer/input@4.2.2(@types/node@24.3.0)':
+  '@inquirer/input@4.2.2(@types/node@24.3.1)':
     dependencies:
-      '@inquirer/core': 10.2.0(@types/node@24.3.0)
-      '@inquirer/type': 3.0.8(@types/node@24.3.0)
+      '@inquirer/core': 10.2.0(@types/node@24.3.1)
+      '@inquirer/type': 3.0.8(@types/node@24.3.1)
     optionalDependencies:
-      '@types/node': 24.3.0
+      '@types/node': 24.3.1
 
-  '@inquirer/number@3.0.18(@types/node@24.3.0)':
+  '@inquirer/number@3.0.18(@types/node@24.3.1)':
     dependencies:
-      '@inquirer/core': 10.2.0(@types/node@24.3.0)
-      '@inquirer/type': 3.0.8(@types/node@24.3.0)
+      '@inquirer/core': 10.2.0(@types/node@24.3.1)
+      '@inquirer/type': 3.0.8(@types/node@24.3.1)
     optionalDependencies:
-      '@types/node': 24.3.0
+      '@types/node': 24.3.1
 
-  '@inquirer/password@4.0.18(@types/node@24.3.0)':
+  '@inquirer/password@4.0.18(@types/node@24.3.1)':
     dependencies:
-      '@inquirer/core': 10.2.0(@types/node@24.3.0)
-      '@inquirer/type': 3.0.8(@types/node@24.3.0)
+      '@inquirer/core': 10.2.0(@types/node@24.3.1)
+      '@inquirer/type': 3.0.8(@types/node@24.3.1)
       ansi-escapes: 4.3.2
     optionalDependencies:
-      '@types/node': 24.3.0
+      '@types/node': 24.3.1
 
-  '@inquirer/prompts@7.8.2(@types/node@24.3.0)':
+  '@inquirer/prompts@7.8.2(@types/node@24.3.1)':
     dependencies:
-      '@inquirer/checkbox': 4.2.2(@types/node@24.3.0)
-      '@inquirer/confirm': 5.1.14(@types/node@24.3.0)
-      '@inquirer/editor': 4.2.18(@types/node@24.3.0)
-      '@inquirer/expand': 4.0.18(@types/node@24.3.0)
-      '@inquirer/input': 4.2.2(@types/node@24.3.0)
-      '@inquirer/number': 3.0.18(@types/node@24.3.0)
-      '@inquirer/password': 4.0.18(@types/node@24.3.0)
-      '@inquirer/rawlist': 4.1.6(@types/node@24.3.0)
-      '@inquirer/search': 3.1.1(@types/node@24.3.0)
-      '@inquirer/select': 4.3.2(@types/node@24.3.0)
+      '@inquirer/checkbox': 4.2.2(@types/node@24.3.1)
+      '@inquirer/confirm': 5.1.14(@types/node@24.3.1)
+      '@inquirer/editor': 4.2.18(@types/node@24.3.1)
+      '@inquirer/expand': 4.0.18(@types/node@24.3.1)
+      '@inquirer/input': 4.2.2(@types/node@24.3.1)
+      '@inquirer/number': 3.0.18(@types/node@24.3.1)
+      '@inquirer/password': 4.0.18(@types/node@24.3.1)
+      '@inquirer/rawlist': 4.1.6(@types/node@24.3.1)
+      '@inquirer/search': 3.1.1(@types/node@24.3.1)
+      '@inquirer/select': 4.3.2(@types/node@24.3.1)
     optionalDependencies:
-      '@types/node': 24.3.0
+      '@types/node': 24.3.1
 
-  '@inquirer/prompts@7.8.4(@types/node@24.3.0)':
+  '@inquirer/prompts@7.8.4(@types/node@24.3.1)':
     dependencies:
-      '@inquirer/checkbox': 4.2.2(@types/node@24.3.0)
-      '@inquirer/confirm': 5.1.16(@types/node@24.3.0)
-      '@inquirer/editor': 4.2.18(@types/node@24.3.0)
-      '@inquirer/expand': 4.0.18(@types/node@24.3.0)
-      '@inquirer/input': 4.2.2(@types/node@24.3.0)
-      '@inquirer/number': 3.0.18(@types/node@24.3.0)
-      '@inquirer/password': 4.0.18(@types/node@24.3.0)
-      '@inquirer/rawlist': 4.1.6(@types/node@24.3.0)
-      '@inquirer/search': 3.1.1(@types/node@24.3.0)
-      '@inquirer/select': 4.3.2(@types/node@24.3.0)
+      '@inquirer/checkbox': 4.2.2(@types/node@24.3.1)
+      '@inquirer/confirm': 5.1.16(@types/node@24.3.1)
+      '@inquirer/editor': 4.2.18(@types/node@24.3.1)
+      '@inquirer/expand': 4.0.18(@types/node@24.3.1)
+      '@inquirer/input': 4.2.2(@types/node@24.3.1)
+      '@inquirer/number': 3.0.18(@types/node@24.3.1)
+      '@inquirer/password': 4.0.18(@types/node@24.3.1)
+      '@inquirer/rawlist': 4.1.6(@types/node@24.3.1)
+      '@inquirer/search': 3.1.1(@types/node@24.3.1)
+      '@inquirer/select': 4.3.2(@types/node@24.3.1)
     optionalDependencies:
-      '@types/node': 24.3.0
+      '@types/node': 24.3.1
 
-  '@inquirer/rawlist@4.1.6(@types/node@24.3.0)':
+  '@inquirer/rawlist@4.1.6(@types/node@24.3.1)':
     dependencies:
-      '@inquirer/core': 10.2.0(@types/node@24.3.0)
-      '@inquirer/type': 3.0.8(@types/node@24.3.0)
+      '@inquirer/core': 10.2.0(@types/node@24.3.1)
+      '@inquirer/type': 3.0.8(@types/node@24.3.1)
       yoctocolors-cjs: 2.1.3
     optionalDependencies:
-      '@types/node': 24.3.0
+      '@types/node': 24.3.1
 
-  '@inquirer/search@3.1.1(@types/node@24.3.0)':
+  '@inquirer/search@3.1.1(@types/node@24.3.1)':
     dependencies:
-      '@inquirer/core': 10.2.0(@types/node@24.3.0)
+      '@inquirer/core': 10.2.0(@types/node@24.3.1)
       '@inquirer/figures': 1.0.13
-      '@inquirer/type': 3.0.8(@types/node@24.3.0)
+      '@inquirer/type': 3.0.8(@types/node@24.3.1)
       yoctocolors-cjs: 2.1.3
     optionalDependencies:
-      '@types/node': 24.3.0
+      '@types/node': 24.3.1
 
-  '@inquirer/select@4.3.2(@types/node@24.3.0)':
+  '@inquirer/select@4.3.2(@types/node@24.3.1)':
     dependencies:
-      '@inquirer/core': 10.2.0(@types/node@24.3.0)
+      '@inquirer/core': 10.2.0(@types/node@24.3.1)
       '@inquirer/figures': 1.0.13
-      '@inquirer/type': 3.0.8(@types/node@24.3.0)
+      '@inquirer/type': 3.0.8(@types/node@24.3.1)
       ansi-escapes: 4.3.2
       yoctocolors-cjs: 2.1.3
     optionalDependencies:
-      '@types/node': 24.3.0
+      '@types/node': 24.3.1
 
-  '@inquirer/type@3.0.8(@types/node@24.3.0)':
+  '@inquirer/type@3.0.8(@types/node@24.3.1)':
     optionalDependencies:
-      '@types/node': 24.3.0
+      '@types/node': 24.3.1
 
   '@isaacs/balanced-match@4.0.1': {}
 
@@ -10818,10 +10806,10 @@ snapshots:
 
   '@leichtgewicht/ip-codec@2.0.5': {}
 
-  '@listr2/prompt-adapter-inquirer@3.0.1(@inquirer/prompts@7.8.2(@types/node@24.3.0))(@types/node@24.3.0)(listr2@9.0.1)':
+  '@listr2/prompt-adapter-inquirer@3.0.1(@inquirer/prompts@7.8.2(@types/node@24.3.1))(@types/node@24.3.1)(listr2@9.0.1)':
     dependencies:
-      '@inquirer/prompts': 7.8.2(@types/node@24.3.0)
-      '@inquirer/type': 3.0.8(@types/node@24.3.0)
+      '@inquirer/prompts': 7.8.2(@types/node@24.3.1)
+      '@inquirer/type': 3.0.8(@types/node@24.3.1)
       listr2: 9.0.1
     transitivePeerDependencies:
       - '@types/node'
@@ -10986,7 +10974,7 @@ snapshots:
     dependencies:
       agent-base: 7.1.4
       http-proxy-agent: 7.0.2
-      https-proxy-agent: 7.0.6(supports-color@10.2.0)
+      https-proxy-agent: 7.0.6(supports-color@10.2.2)
       lru-cache: 10.4.3
       socks-proxy-agent: 8.0.5
     transitivePeerDependencies:
@@ -11286,7 +11274,7 @@ snapshots:
 
   '@puppeteer/browsers@2.10.8':
     dependencies:
-      debug: 4.4.1(supports-color@10.2.0)
+      debug: 4.4.1(supports-color@10.2.2)
       extract-zip: 2.0.1
       progress: 2.0.3
       proxy-agent: 6.5.0
@@ -11600,10 +11588,6 @@ snapshots:
 
   '@types/content-disposition@0.5.9': {}
 
-  '@types/conventional-commits-parser@5.0.1':
-    dependencies:
-      '@types/node': 22.18.0
-
   '@types/convert-source-map@2.0.3': {}
 
   '@types/cookies@0.9.1':
@@ -11764,7 +11748,7 @@ snapshots:
     dependencies:
       undici-types: 6.21.0
 
-  '@types/node@24.3.0':
+  '@types/node@24.3.1':
     dependencies:
       undici-types: 7.10.0
 
@@ -11856,7 +11840,7 @@ snapshots:
 
   '@types/supports-color@10.0.0':
     dependencies:
-      supports-color: 10.2.0
+      supports-color: 10.2.2
 
   '@types/tapable@1.0.12': {}
 
@@ -11930,7 +11914,7 @@ snapshots:
       '@typescript-eslint/types': 8.39.1
       '@typescript-eslint/typescript-estree': 8.39.1(typescript@5.9.2)
       '@typescript-eslint/visitor-keys': 8.39.1
-      debug: 4.4.1(supports-color@10.2.0)
+      debug: 4.4.1(supports-color@10.2.2)
       eslint: 9.33.0(jiti@1.21.7)
       typescript: 5.9.2
     transitivePeerDependencies:
@@ -11940,7 +11924,7 @@ snapshots:
     dependencies:
       '@typescript-eslint/tsconfig-utils': 8.39.1(typescript@5.9.2)
       '@typescript-eslint/types': 8.39.1
-      debug: 4.4.1(supports-color@10.2.0)
+      debug: 4.4.1(supports-color@10.2.2)
       typescript: 5.9.2
     transitivePeerDependencies:
       - supports-color
@@ -11959,7 +11943,7 @@ snapshots:
       '@typescript-eslint/types': 8.39.1
       '@typescript-eslint/typescript-estree': 8.39.1(typescript@5.9.2)
       '@typescript-eslint/utils': 8.39.1(eslint@9.33.0(jiti@1.21.7))(typescript@5.9.2)
-      debug: 4.4.1(supports-color@10.2.0)
+      debug: 4.4.1(supports-color@10.2.2)
       eslint: 9.33.0(jiti@1.21.7)
       ts-api-utils: 2.1.0(typescript@5.9.2)
       typescript: 5.9.2
@@ -11976,7 +11960,7 @@ snapshots:
       '@typescript-eslint/tsconfig-utils': 8.39.1(typescript@5.9.2)
       '@typescript-eslint/types': 8.39.1
       '@typescript-eslint/visitor-keys': 8.39.1
-      debug: 4.4.1(supports-color@10.2.0)
+      debug: 4.4.1(supports-color@10.2.2)
       fast-glob: 3.3.3
       is-glob: 4.0.3
       minimatch: 9.0.5
@@ -12008,7 +11992,7 @@ snapshots:
       '@verdaccio/core': 8.0.0-next-8.19
       '@verdaccio/loaders': 8.0.0-next-8.9
       '@verdaccio/signature': 8.0.0-next-8.11
-      debug: 4.4.1(supports-color@10.2.0)
+      debug: 4.4.1(supports-color@10.2.2)
       lodash: 4.17.21
       verdaccio-htpasswd: 13.0.0-next-8.19
     transitivePeerDependencies:
@@ -12022,7 +12006,7 @@ snapshots:
   '@verdaccio/config@8.0.0-next-8.19':
     dependencies:
       '@verdaccio/core': 8.0.0-next-8.19
-      debug: 4.4.1(supports-color@10.2.0)
+      debug: 4.4.1(supports-color@10.2.2)
       js-yaml: 4.1.0
       lodash: 4.17.21
       minimatch: 7.4.6
@@ -12058,7 +12042,7 @@ snapshots:
   '@verdaccio/loaders@8.0.0-next-8.9':
     dependencies:
       '@verdaccio/core': 8.0.0-next-8.19
-      debug: 4.4.1(supports-color@10.2.0)
+      debug: 4.4.1(supports-color@10.2.2)
       lodash: 4.17.21
     transitivePeerDependencies:
       - supports-color
@@ -12081,7 +12065,7 @@ snapshots:
       '@verdaccio/core': 8.0.0-next-8.19
       '@verdaccio/logger-prettify': 8.0.0-next-8.3
       colorette: 2.0.20
-      debug: 4.4.1(supports-color@10.2.0)
+      debug: 4.4.1(supports-color@10.2.2)
     transitivePeerDependencies:
       - supports-color
 
@@ -12106,7 +12090,7 @@ snapshots:
       '@verdaccio/config': 8.0.0-next-8.19
       '@verdaccio/core': 8.0.0-next-8.19
       '@verdaccio/url': 13.0.0-next-8.19
-      debug: 4.4.1(supports-color@10.2.0)
+      debug: 4.4.1(supports-color@10.2.2)
       express: 4.21.2
       express-rate-limit: 5.5.1
       lodash: 4.17.21
@@ -12121,7 +12105,7 @@ snapshots:
     dependencies:
       '@verdaccio/config': 8.0.0-next-8.19
       '@verdaccio/core': 8.0.0-next-8.19
-      debug: 4.4.1(supports-color@10.2.0)
+      debug: 4.4.1(supports-color@10.2.2)
       jsonwebtoken: 9.0.2
     transitivePeerDependencies:
       - supports-color
@@ -12132,7 +12116,7 @@ snapshots:
     dependencies:
       '@verdaccio/core': 8.0.0-next-8.19
       '@verdaccio/url': 13.0.0-next-8.19
-      debug: 4.4.1(supports-color@10.2.0)
+      debug: 4.4.1(supports-color@10.2.2)
       gunzip-maybe: 1.4.2
       tar-stream: 3.1.7
     transitivePeerDependencies:
@@ -12143,7 +12127,7 @@ snapshots:
   '@verdaccio/url@13.0.0-next-8.19':
     dependencies:
       '@verdaccio/core': 8.0.0-next-8.19
-      debug: 4.4.1(supports-color@10.2.0)
+      debug: 4.4.1(supports-color@10.2.2)
       lodash: 4.17.21
       validator: 13.12.0
     transitivePeerDependencies:
@@ -12155,9 +12139,9 @@ snapshots:
       lodash: 4.17.21
       minimatch: 7.4.6
 
-  '@vitejs/plugin-basic-ssl@2.1.0(vite@7.1.2(@types/node@24.3.0)(jiti@1.21.7)(less@4.4.0)(sass@1.90.0)(terser@5.43.1)(yaml@2.8.1))':
+  '@vitejs/plugin-basic-ssl@2.1.0(vite@7.1.2(@types/node@24.3.1)(jiti@1.21.7)(less@4.4.0)(sass@1.90.0)(terser@5.43.1)(yaml@2.8.1))':
     dependencies:
-      vite: 7.1.2(@types/node@24.3.0)(jiti@1.21.7)(less@4.4.0)(sass@1.90.0)(terser@5.43.1)(yaml@2.8.1)
+      vite: 7.1.2(@types/node@24.3.1)(jiti@1.21.7)(less@4.4.0)(sass@1.90.0)(terser@5.43.1)(yaml@2.8.1)
 
   '@vitest/expect@3.2.4':
     dependencies:
@@ -12167,13 +12151,13 @@ snapshots:
       chai: 5.3.3
       tinyrainbow: 2.0.0
 
-  '@vitest/mocker@3.2.4(vite@7.1.2(@types/node@24.3.0)(jiti@1.21.7)(less@4.4.0)(sass@1.90.0)(terser@5.43.1)(yaml@2.8.1))':
+  '@vitest/mocker@3.2.4(vite@7.1.2(@types/node@24.3.1)(jiti@1.21.7)(less@4.4.0)(sass@1.90.0)(terser@5.43.1)(yaml@2.8.1))':
     dependencies:
       '@vitest/spy': 3.2.4
       estree-walker: 3.0.3
       magic-string: 0.30.17
     optionalDependencies:
-      vite: 7.1.2(@types/node@24.3.0)(jiti@1.21.7)(less@4.4.0)(sass@1.90.0)(terser@5.43.1)(yaml@2.8.1)
+      vite: 7.1.2(@types/node@24.3.1)(jiti@1.21.7)(less@4.4.0)(sass@1.90.0)(terser@5.43.1)(yaml@2.8.1)
 
   '@vitest/pretty-format@3.2.4':
     dependencies:
@@ -12499,9 +12483,9 @@ snapshots:
     dependencies:
       es6-promisify: 5.0.0
 
-  agent-base@6.0.2(supports-color@10.2.0):
+  agent-base@6.0.2(supports-color@10.2.2):
     dependencies:
-      debug: 4.4.1(supports-color@10.2.0)
+      debug: 4.4.1(supports-color@10.2.2)
     transitivePeerDependencies:
       - supports-color
 
@@ -12837,7 +12821,7 @@ snapshots:
     dependencies:
       bytes: 3.1.2
       content-type: 1.0.5
-      debug: 4.4.1(supports-color@10.2.0)
+      debug: 4.4.1(supports-color@10.2.2)
       http-errors: 2.0.0
       iconv-lite: 0.6.3
       on-finished: 2.4.1
@@ -13045,6 +13029,8 @@ snapshots:
       supports-color: 7.2.0
 
   chalk@5.6.0: {}
+
+  chalk@5.6.2: {}
 
   chardet@2.1.0: {}
 
@@ -13256,12 +13242,9 @@ snapshots:
 
   conventional-commits-filter@5.0.0: {}
 
-  conventional-commits-parser@5.0.0:
+  conventional-commits-parser@6.2.0:
     dependencies:
-      JSONStream: 1.3.5
-      is-text-path: 2.0.0
-      meow: 12.1.1
-      split2: 4.2.0
+      meow: 13.2.0
 
   convert-source-map@1.9.0: {}
 
@@ -13420,17 +13403,17 @@ snapshots:
     dependencies:
       ms: 2.1.3
 
-  debug@4.4.0(supports-color@10.2.0):
+  debug@4.4.0(supports-color@10.2.2):
     dependencies:
       ms: 2.1.3
     optionalDependencies:
-      supports-color: 10.2.0
+      supports-color: 10.2.2
 
-  debug@4.4.1(supports-color@10.2.0):
+  debug@4.4.1(supports-color@10.2.2):
     dependencies:
       ms: 2.1.3
     optionalDependencies:
-      supports-color: 10.2.0
+      supports-color: 10.2.2
 
   decamelize@1.2.0: {}
 
@@ -13916,7 +13899,7 @@ snapshots:
       ajv: 6.12.6
       chalk: 4.1.2
       cross-spawn: 7.0.6
-      debug: 4.4.1(supports-color@10.2.0)
+      debug: 4.4.1(supports-color@10.2.2)
       escape-string-regexp: 4.0.0
       eslint-scope: 8.4.0
       eslint-visitor-keys: 4.2.1
@@ -14054,7 +14037,7 @@ snapshots:
       content-type: 1.0.5
       cookie: 0.7.2
       cookie-signature: 1.2.2
-      debug: 4.4.1(supports-color@10.2.0)
+      debug: 4.4.1(supports-color@10.2.2)
       encodeurl: 2.0.0
       escape-html: 1.0.3
       etag: 1.8.1
@@ -14082,7 +14065,7 @@ snapshots:
 
   extract-zip@2.0.1:
     dependencies:
-      debug: 4.3.4
+      debug: 4.4.1(supports-color@10.2.2)
       get-stream: 5.2.0
       yauzl: 2.10.0
     optionalDependencies:
@@ -14185,7 +14168,7 @@ snapshots:
 
   finalhandler@2.1.0:
     dependencies:
-      debug: 4.4.1(supports-color@10.2.0)
+      debug: 4.4.1(supports-color@10.2.2)
       encodeurl: 2.0.0
       escape-html: 1.0.3
       on-finished: 2.4.1
@@ -14257,16 +14240,16 @@ snapshots:
 
   flatted@3.3.3: {}
 
-  folder-hash@4.1.1(supports-color@10.2.0):
+  folder-hash@4.1.1(supports-color@10.2.2):
     dependencies:
-      debug: 4.4.0(supports-color@10.2.0)
+      debug: 4.4.0(supports-color@10.2.2)
       minimatch: 7.4.6
     transitivePeerDependencies:
       - supports-color
 
   follow-redirects@1.15.11(debug@4.4.1):
     optionalDependencies:
-      debug: 4.4.1(supports-color@10.2.0)
+      debug: 4.4.1(supports-color@10.2.2)
 
   for-each@0.3.5:
     dependencies:
@@ -14345,10 +14328,10 @@ snapshots:
 
   functions-have-names@1.2.3: {}
 
-  gaxios@6.7.1(encoding@0.1.13)(supports-color@10.2.0):
+  gaxios@6.7.1(encoding@0.1.13)(supports-color@10.2.2):
     dependencies:
       extend: 3.0.2
-      https-proxy-agent: 7.0.6(supports-color@10.2.0)
+      https-proxy-agent: 7.0.6(supports-color@10.2.2)
       is-stream: 2.0.1
       node-fetch: 2.7.0(encoding@0.1.13)
       uuid: 9.0.1
@@ -14356,26 +14339,26 @@ snapshots:
       - encoding
       - supports-color
 
-  gaxios@7.1.1(supports-color@10.2.0):
+  gaxios@7.1.1(supports-color@10.2.2):
     dependencies:
       extend: 3.0.2
-      https-proxy-agent: 7.0.6(supports-color@10.2.0)
+      https-proxy-agent: 7.0.6(supports-color@10.2.2)
       node-fetch: 3.3.2
     transitivePeerDependencies:
       - supports-color
 
-  gcp-metadata@6.1.1(encoding@0.1.13)(supports-color@10.2.0):
+  gcp-metadata@6.1.1(encoding@0.1.13)(supports-color@10.2.2):
     dependencies:
-      gaxios: 6.7.1(encoding@0.1.13)(supports-color@10.2.0)
+      gaxios: 6.7.1(encoding@0.1.13)(supports-color@10.2.2)
       google-logging-utils: 0.0.2
       json-bigint: 1.0.0
     transitivePeerDependencies:
       - encoding
       - supports-color
 
-  gcp-metadata@7.0.1(supports-color@10.2.0):
+  gcp-metadata@7.0.1(supports-color@10.2.2):
     dependencies:
-      gaxios: 7.1.1(supports-color@10.2.0)
+      gaxios: 7.1.1(supports-color@10.2.2)
       google-logging-utils: 1.1.1
       json-bigint: 1.0.0
     transitivePeerDependencies:
@@ -14423,7 +14406,7 @@ snapshots:
     dependencies:
       basic-ftp: 5.0.5
       data-uri-to-buffer: 6.0.2
-      debug: 4.4.1(supports-color@10.2.0)
+      debug: 4.4.1(supports-color@10.2.2)
     transitivePeerDependencies:
       - supports-color
 
@@ -14431,9 +14414,9 @@ snapshots:
     dependencies:
       assert-plus: 1.0.0
 
-  git-raw-commits@5.0.0(conventional-commits-filter@5.0.0)(conventional-commits-parser@5.0.0):
+  git-raw-commits@5.0.0(conventional-commits-filter@5.0.0)(conventional-commits-parser@6.2.0):
     dependencies:
-      '@conventional-changelog/git-client': 1.0.1(conventional-commits-filter@5.0.0)(conventional-commits-parser@5.0.0)
+      '@conventional-changelog/git-client': 1.0.1(conventional-commits-filter@5.0.0)(conventional-commits-parser@6.2.0)
       meow: 13.2.0
     transitivePeerDependencies:
       - conventional-commits-filter
@@ -14507,43 +14490,43 @@ snapshots:
       pify: 2.3.0
       pinkie-promise: 2.0.1
 
-  google-auth-library@10.3.0(supports-color@10.2.0):
+  google-auth-library@10.3.0(supports-color@10.2.2):
     dependencies:
       base64-js: 1.5.1
       ecdsa-sig-formatter: 1.0.11
-      gaxios: 7.1.1(supports-color@10.2.0)
-      gcp-metadata: 7.0.1(supports-color@10.2.0)
+      gaxios: 7.1.1(supports-color@10.2.2)
+      gcp-metadata: 7.0.1(supports-color@10.2.2)
       google-logging-utils: 1.1.1
-      gtoken: 8.0.0(supports-color@10.2.0)
+      gtoken: 8.0.0(supports-color@10.2.2)
       jws: 4.0.0
     transitivePeerDependencies:
       - supports-color
 
-  google-auth-library@9.15.1(encoding@0.1.13)(supports-color@10.2.0):
+  google-auth-library@9.15.1(encoding@0.1.13)(supports-color@10.2.2):
     dependencies:
       base64-js: 1.5.1
       ecdsa-sig-formatter: 1.0.11
-      gaxios: 6.7.1(encoding@0.1.13)(supports-color@10.2.0)
-      gcp-metadata: 6.1.1(encoding@0.1.13)(supports-color@10.2.0)
-      gtoken: 7.1.0(encoding@0.1.13)(supports-color@10.2.0)
+      gaxios: 6.7.1(encoding@0.1.13)(supports-color@10.2.2)
+      gcp-metadata: 6.1.1(encoding@0.1.13)(supports-color@10.2.2)
+      gtoken: 7.1.0(encoding@0.1.13)(supports-color@10.2.2)
       jws: 4.0.0
     transitivePeerDependencies:
       - encoding
       - supports-color
 
-  google-gax@5.0.3(supports-color@10.2.0):
+  google-gax@5.0.3(supports-color@10.2.2):
     dependencies:
       '@grpc/grpc-js': 1.13.4
       '@grpc/proto-loader': 0.8.0
       abort-controller: 3.0.0
       duplexify: 4.1.3
-      google-auth-library: 10.3.0(supports-color@10.2.0)
+      google-auth-library: 10.3.0(supports-color@10.2.2)
       google-logging-utils: 1.1.1
       node-fetch: 3.3.2
       object-hash: 3.0.0
       proto3-json-serializer: 3.0.2
       protobufjs: 7.5.4
-      retry-request: 8.0.2(supports-color@10.2.0)
+      retry-request: 8.0.2(supports-color@10.2.2)
     transitivePeerDependencies:
       - supports-color
 
@@ -14569,17 +14552,17 @@ snapshots:
       '@grpc/grpc-js': 1.13.4
       protobufjs: 7.5.4
 
-  gtoken@7.1.0(encoding@0.1.13)(supports-color@10.2.0):
+  gtoken@7.1.0(encoding@0.1.13)(supports-color@10.2.2):
     dependencies:
-      gaxios: 6.7.1(encoding@0.1.13)(supports-color@10.2.0)
+      gaxios: 6.7.1(encoding@0.1.13)(supports-color@10.2.2)
       jws: 4.0.0
     transitivePeerDependencies:
       - encoding
       - supports-color
 
-  gtoken@8.0.0(supports-color@10.2.0):
+  gtoken@8.0.0(supports-color@10.2.2):
     dependencies:
-      gaxios: 7.1.1(supports-color@10.2.0)
+      gaxios: 7.1.1(supports-color@10.2.2)
       jws: 4.0.0
     transitivePeerDependencies:
       - supports-color
@@ -14701,18 +14684,18 @@ snapshots:
 
   http-parser-js@0.5.10: {}
 
-  http-proxy-agent@5.0.0(supports-color@10.2.0):
+  http-proxy-agent@5.0.0(supports-color@10.2.2):
     dependencies:
       '@tootallnate/once': 2.0.0
-      agent-base: 6.0.2(supports-color@10.2.0)
-      debug: 4.4.1(supports-color@10.2.0)
+      agent-base: 6.0.2(supports-color@10.2.2)
+      debug: 4.4.1(supports-color@10.2.2)
     transitivePeerDependencies:
       - supports-color
 
   http-proxy-agent@7.0.2:
     dependencies:
       agent-base: 7.1.4
-      debug: 4.4.1(supports-color@10.2.0)
+      debug: 4.4.1(supports-color@10.2.2)
     transitivePeerDependencies:
       - supports-color
 
@@ -14731,7 +14714,7 @@ snapshots:
   http-proxy-middleware@3.0.5:
     dependencies:
       '@types/http-proxy': 1.17.16
-      debug: 4.4.1(supports-color@10.2.0)
+      debug: 4.4.1(supports-color@10.2.2)
       http-proxy: 1.18.1(debug@4.4.1)
       is-glob: 4.0.3
       is-plain-object: 5.0.0
@@ -14770,17 +14753,17 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  https-proxy-agent@5.0.1(supports-color@10.2.0):
+  https-proxy-agent@5.0.1(supports-color@10.2.2):
     dependencies:
-      agent-base: 6.0.2(supports-color@10.2.0)
-      debug: 4.4.1(supports-color@10.2.0)
+      agent-base: 6.0.2(supports-color@10.2.2)
+      debug: 4.4.1(supports-color@10.2.2)
     transitivePeerDependencies:
       - supports-color
 
-  https-proxy-agent@7.0.6(supports-color@10.2.0):
+  https-proxy-agent@7.0.6(supports-color@10.2.2):
     dependencies:
       agent-base: 7.1.4
-      debug: 4.4.1(supports-color@10.2.0)
+      debug: 4.4.1(supports-color@10.2.2)
     transitivePeerDependencies:
       - supports-color
 
@@ -15036,10 +15019,6 @@ snapshots:
       has-symbols: 1.1.0
       safe-regex-test: 1.1.0
 
-  is-text-path@2.0.0:
-    dependencies:
-      text-extensions: 2.4.0
-
   is-typed-array@1.1.15:
     dependencies:
       which-typed-array: 1.1.19
@@ -15123,7 +15102,7 @@ snapshots:
 
   istanbul-lib-source-maps@4.0.1:
     dependencies:
-      debug: 4.4.1(supports-color@10.2.0)
+      debug: 4.4.1(supports-color@10.2.2)
       istanbul-lib-coverage: 3.2.2
       source-map: 0.6.1
     transitivePeerDependencies:
@@ -15212,7 +15191,7 @@ snapshots:
       decimal.js: 10.6.0
       html-encoding-sniffer: 4.0.0
       http-proxy-agent: 7.0.2
-      https-proxy-agent: 7.0.6(supports-color@10.2.0)
+      https-proxy-agent: 7.0.6(supports-color@10.2.2)
       is-potential-custom-element-name: 1.0.1
       nwsapi: 2.2.21
       parse5: 7.3.0
@@ -15415,7 +15394,7 @@ snapshots:
 
   koa-send@5.0.1:
     dependencies:
-      debug: 4.4.1(supports-color@10.2.0)
+      debug: 4.4.1(supports-color@10.2.2)
       http-errors: 1.8.1
       resolve-path: 1.4.0
     transitivePeerDependencies:
@@ -15435,7 +15414,7 @@ snapshots:
       content-disposition: 0.5.4
       content-type: 1.0.5
       cookies: 0.9.1
-      debug: 4.4.1(supports-color@10.2.0)
+      debug: 4.4.1(supports-color@10.2.2)
       delegates: 1.0.0
       depd: 2.0.0
       destroy: 1.2.0
@@ -15604,7 +15583,7 @@ snapshots:
   log4js@6.9.1:
     dependencies:
       date-format: 4.0.14
-      debug: 4.4.1(supports-color@10.2.0)
+      debug: 4.4.1(supports-color@10.2.2)
       flatted: 3.3.3
       rfdc: 1.4.1
       streamroller: 3.1.5
@@ -15683,8 +15662,6 @@ snapshots:
       thingies: 2.5.0(tslib@2.8.1)
       tree-dump: 1.0.3(tslib@2.8.1)
       tslib: 2.8.1
-
-  meow@12.1.1: {}
 
   meow@13.2.0: {}
 
@@ -16194,10 +16171,10 @@ snapshots:
     dependencies:
       '@tootallnate/quickjs-emscripten': 0.23.0
       agent-base: 7.1.4
-      debug: 4.4.1(supports-color@10.2.0)
+      debug: 4.4.1(supports-color@10.2.2)
       get-uri: 6.0.5
       http-proxy-agent: 7.0.2
-      https-proxy-agent: 7.0.6(supports-color@10.2.0)
+      https-proxy-agent: 7.0.6(supports-color@10.2.2)
       pac-resolver: 7.0.1
       socks-proxy-agent: 8.0.5
     transitivePeerDependencies:
@@ -16374,7 +16351,7 @@ snapshots:
   portfinder@1.0.37:
     dependencies:
       async: 3.2.6
-      debug: 4.4.1(supports-color@10.2.0)
+      debug: 4.4.1(supports-color@10.2.2)
     transitivePeerDependencies:
       - supports-color
 
@@ -16502,9 +16479,9 @@ snapshots:
   proxy-agent@6.5.0:
     dependencies:
       agent-base: 7.1.4
-      debug: 4.4.1(supports-color@10.2.0)
+      debug: 4.4.1(supports-color@10.2.2)
       http-proxy-agent: 7.0.2
-      https-proxy-agent: 7.0.6(supports-color@10.2.0)
+      https-proxy-agent: 7.0.6(supports-color@10.2.2)
       lru-cache: 7.18.3
       pac-proxy-agent: 7.2.0
       proxy-from-env: 1.1.0
@@ -16547,7 +16524,7 @@ snapshots:
       debug: 4.3.4
       devtools-protocol: 0.0.1045489
       extract-zip: 2.0.1
-      https-proxy-agent: 5.0.1(supports-color@10.2.0)
+      https-proxy-agent: 5.0.1(supports-color@10.2.2)
       proxy-from-env: 1.1.0
       rimraf: 3.0.2
       tar-fs: 2.1.1
@@ -16563,7 +16540,7 @@ snapshots:
     dependencies:
       '@puppeteer/browsers': 2.10.8
       chromium-bidi: 8.0.0(devtools-protocol@0.0.1475386)
-      debug: 4.4.1(supports-color@10.2.0)
+      debug: 4.4.1(supports-color@10.2.2)
       devtools-protocol: 0.0.1475386
       typed-query-selector: 2.12.0
       ws: 8.18.3(bufferutil@4.0.9)(utf-8-validate@6.0.5)
@@ -16575,7 +16552,7 @@ snapshots:
 
   puppeteer@18.2.1(bufferutil@4.0.9)(encoding@0.1.13):
     dependencies:
-      https-proxy-agent: 5.0.1(supports-color@10.2.0)
+      https-proxy-agent: 5.0.1(supports-color@10.2.2)
       progress: 2.0.3
       proxy-from-env: 1.1.0
       puppeteer-core: 18.2.1(bufferutil@4.0.9)(encoding@0.1.13)
@@ -16796,10 +16773,10 @@ snapshots:
       onetime: 7.0.0
       signal-exit: 4.1.0
 
-  retry-request@8.0.2(supports-color@10.2.0):
+  retry-request@8.0.2(supports-color@10.2.2):
     dependencies:
       extend: 3.0.2
-      teeny-request: 10.1.0(supports-color@10.2.0)
+      teeny-request: 10.1.0(supports-color@10.2.2)
     transitivePeerDependencies:
       - supports-color
 
@@ -16890,7 +16867,7 @@ snapshots:
 
   router@2.2.0:
     dependencies:
-      debug: 4.4.1(supports-color@10.2.0)
+      debug: 4.4.1(supports-color@10.2.2)
       depd: 2.0.0
       is-promise: 4.0.0
       parseurl: 1.3.3
@@ -17031,7 +17008,7 @@ snapshots:
 
   send@1.2.0:
     dependencies:
-      debug: 4.4.1(supports-color@10.2.0)
+      debug: 4.4.1(supports-color@10.2.2)
       encodeurl: 2.0.0
       escape-html: 1.0.3
       etag: 1.8.1
@@ -17243,7 +17220,7 @@ snapshots:
   socks-proxy-agent@8.0.5:
     dependencies:
       agent-base: 7.1.4
-      debug: 4.4.1(supports-color@10.2.0)
+      debug: 4.4.1(supports-color@10.2.2)
       socks: 2.8.7
     transitivePeerDependencies:
       - supports-color
@@ -17304,7 +17281,7 @@ snapshots:
 
   spdy-transport@3.0.0:
     dependencies:
-      debug: 4.4.1(supports-color@10.2.0)
+      debug: 4.4.1(supports-color@10.2.2)
       detect-node: 2.1.0
       hpack.js: 2.1.6
       obuf: 1.1.2
@@ -17315,7 +17292,7 @@ snapshots:
 
   spdy@4.0.2:
     dependencies:
-      debug: 4.4.1(supports-color@10.2.0)
+      debug: 4.4.1(supports-color@10.2.2)
       handle-thing: 2.0.1
       http-deceiver: 1.2.7
       select-hose: 2.0.0
@@ -17393,7 +17370,7 @@ snapshots:
   streamroller@3.1.5:
     dependencies:
       date-format: 4.0.14
-      debug: 4.4.1(supports-color@10.2.0)
+      debug: 4.4.1(supports-color@10.2.2)
       fs-extra: 8.1.0
     transitivePeerDependencies:
       - supports-color
@@ -17480,7 +17457,7 @@ snapshots:
 
   stubs@3.0.0: {}
 
-  supports-color@10.2.0: {}
+  supports-color@10.2.2: {}
 
   supports-color@2.0.0: {}
 
@@ -17552,10 +17529,10 @@ snapshots:
       mkdirp: 3.0.1
       yallist: 5.0.0
 
-  teeny-request@10.1.0(supports-color@10.2.0):
+  teeny-request@10.1.0(supports-color@10.2.2):
     dependencies:
-      http-proxy-agent: 5.0.0(supports-color@10.2.0)
-      https-proxy-agent: 5.0.1(supports-color@10.2.0)
+      http-proxy-agent: 5.0.0(supports-color@10.2.2)
+      https-proxy-agent: 5.0.1(supports-color@10.2.2)
       node-fetch: 3.3.2
       stream-events: 1.0.5
     transitivePeerDependencies:
@@ -17582,8 +17559,6 @@ snapshots:
   text-decoder@1.2.3:
     dependencies:
       b4a: 1.6.7
-
-  text-extensions@2.4.0: {}
 
   thingies@2.5.0(tslib@2.8.1):
     dependencies:
@@ -17700,7 +17675,7 @@ snapshots:
   tuf-js@3.1.0:
     dependencies:
       '@tufjs/models': 3.0.1
-      debug: 4.4.1(supports-color@10.2.0)
+      debug: 4.4.1(supports-color@10.2.2)
       make-fetch-happen: 14.0.3
     transitivePeerDependencies:
       - supports-color
@@ -17903,7 +17878,7 @@ snapshots:
       '@verdaccio/config': 8.0.0-next-8.19
       '@verdaccio/core': 8.0.0-next-8.19
       express: 4.21.2
-      https-proxy-agent: 5.0.1(supports-color@10.2.0)
+      https-proxy-agent: 5.0.1(supports-color@10.2.2)
       node-fetch: 2.6.7(encoding@0.1.13)
     transitivePeerDependencies:
       - encoding
@@ -17922,7 +17897,7 @@ snapshots:
       '@verdaccio/file-locking': 13.0.0-next-8.4
       apache-md5: 1.1.8
       bcryptjs: 2.4.3
-      debug: 4.4.1(supports-color@10.2.0)
+      debug: 4.4.1(supports-color@10.2.2)
       http-errors: 2.0.0
       unix-crypt-td-js: 1.1.4
     transitivePeerDependencies:
@@ -17950,7 +17925,7 @@ snapshots:
       clipanion: 4.0.0-rc.4
       compression: 1.8.1
       cors: 2.8.5
-      debug: 4.4.1(supports-color@10.2.0)
+      debug: 4.4.1(supports-color@10.2.2)
       envinfo: 7.14.0
       express: 4.21.2
       handlebars: 4.7.8
@@ -17972,13 +17947,13 @@ snapshots:
       core-util-is: 1.0.2
       extsprintf: 1.3.0
 
-  vite-node@3.2.4(@types/node@24.3.0)(jiti@1.21.7)(less@4.4.0)(sass@1.90.0)(terser@5.43.1)(yaml@2.8.1):
+  vite-node@3.2.4(@types/node@24.3.1)(jiti@1.21.7)(less@4.4.0)(sass@1.90.0)(terser@5.43.1)(yaml@2.8.1):
     dependencies:
       cac: 6.7.14
-      debug: 4.4.1(supports-color@10.2.0)
+      debug: 4.4.1(supports-color@10.2.2)
       es-module-lexer: 1.7.0
       pathe: 2.0.3
-      vite: 7.1.2(@types/node@24.3.0)(jiti@1.21.7)(less@4.4.0)(sass@1.90.0)(terser@5.43.1)(yaml@2.8.1)
+      vite: 7.1.2(@types/node@24.3.1)(jiti@1.21.7)(less@4.4.0)(sass@1.90.0)(terser@5.43.1)(yaml@2.8.1)
     transitivePeerDependencies:
       - '@types/node'
       - jiti
@@ -17993,7 +17968,7 @@ snapshots:
       - tsx
       - yaml
 
-  vite@7.1.2(@types/node@24.3.0)(jiti@1.21.7)(less@4.4.0)(sass@1.90.0)(terser@5.43.1)(yaml@2.8.1):
+  vite@7.1.2(@types/node@24.3.1)(jiti@1.21.7)(less@4.4.0)(sass@1.90.0)(terser@5.43.1)(yaml@2.8.1):
     dependencies:
       esbuild: 0.25.9
       fdir: 6.5.0(picomatch@4.0.3)
@@ -18002,7 +17977,7 @@ snapshots:
       rollup: 4.46.2
       tinyglobby: 0.2.14
     optionalDependencies:
-      '@types/node': 24.3.0
+      '@types/node': 24.3.1
       fsevents: 2.3.3
       jiti: 1.21.7
       less: 4.4.0
@@ -18010,18 +17985,18 @@ snapshots:
       terser: 5.43.1
       yaml: 2.8.1
 
-  vitest@3.2.4(@types/node@24.3.0)(jiti@1.21.7)(jsdom@26.1.0(bufferutil@4.0.9)(utf-8-validate@6.0.5))(less@4.4.0)(sass@1.90.0)(terser@5.43.1)(yaml@2.8.1):
+  vitest@3.2.4(@types/node@24.3.1)(jiti@1.21.7)(jsdom@26.1.0(bufferutil@4.0.9)(utf-8-validate@6.0.5))(less@4.4.0)(sass@1.90.0)(terser@5.43.1)(yaml@2.8.1):
     dependencies:
       '@types/chai': 5.2.2
       '@vitest/expect': 3.2.4
-      '@vitest/mocker': 3.2.4(vite@7.1.2(@types/node@24.3.0)(jiti@1.21.7)(less@4.4.0)(sass@1.90.0)(terser@5.43.1)(yaml@2.8.1))
+      '@vitest/mocker': 3.2.4(vite@7.1.2(@types/node@24.3.1)(jiti@1.21.7)(less@4.4.0)(sass@1.90.0)(terser@5.43.1)(yaml@2.8.1))
       '@vitest/pretty-format': 3.2.4
       '@vitest/runner': 3.2.4
       '@vitest/snapshot': 3.2.4
       '@vitest/spy': 3.2.4
       '@vitest/utils': 3.2.4
       chai: 5.3.3
-      debug: 4.4.1(supports-color@10.2.0)
+      debug: 4.4.1(supports-color@10.2.2)
       expect-type: 1.2.2
       magic-string: 0.30.17
       pathe: 2.0.3
@@ -18032,11 +18007,11 @@ snapshots:
       tinyglobby: 0.2.14
       tinypool: 1.1.1
       tinyrainbow: 2.0.0
-      vite: 7.1.2(@types/node@24.3.0)(jiti@1.21.7)(less@4.4.0)(sass@1.90.0)(terser@5.43.1)(yaml@2.8.1)
-      vite-node: 3.2.4(@types/node@24.3.0)(jiti@1.21.7)(less@4.4.0)(sass@1.90.0)(terser@5.43.1)(yaml@2.8.1)
+      vite: 7.1.2(@types/node@24.3.1)(jiti@1.21.7)(less@4.4.0)(sass@1.90.0)(terser@5.43.1)(yaml@2.8.1)
+      vite-node: 3.2.4(@types/node@24.3.1)(jiti@1.21.7)(less@4.4.0)(sass@1.90.0)(terser@5.43.1)(yaml@2.8.1)
       why-is-node-running: 2.3.0
     optionalDependencies:
-      '@types/node': 24.3.0
+      '@types/node': 24.3.1
       jsdom: 26.1.0(bufferutil@4.0.9)(utf-8-validate@6.0.5)
     transitivePeerDependencies:
       - jiti
