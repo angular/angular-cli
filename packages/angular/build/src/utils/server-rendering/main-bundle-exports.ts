@@ -8,11 +8,12 @@
 
 import type { ApplicationRef, Type, ɵConsole } from '@angular/core';
 import type { renderApplication, renderModule, ɵSERVER_CONTEXT } from '@angular/platform-server';
+import type { BootstrapContext } from '@angular/platform-browser';
 import type { extractRoutes } from '../routes-extractor/extractor';
 
 export interface MainServerBundleExports {
   /** Standalone application bootstrapping function. */
-  default: (() => Promise<ApplicationRef>) | Type<unknown>;
+  default: ((context: BootstrapContext) => Promise<ApplicationRef>) | Type<unknown>;
 }
 
 export interface RenderUtilsServerBundleExports {

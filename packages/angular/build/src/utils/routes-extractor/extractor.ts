@@ -16,6 +16,7 @@ import {
   ɵwhenStable as whenStable,
   ɵConsole,
 } from '@angular/core';
+import { BootstrapContext } from '@angular/platform-browser';
 import {
   INITIAL_CONFIG,
   ɵINTERNAL_SERVER_PLATFORM_PROVIDERS as INTERNAL_SERVER_PLATFORM_PROVIDERS,
@@ -76,7 +77,7 @@ async function* getRoutesFromRouterConfig(
 }
 
 export async function* extractRoutes(
-  bootstrapAppFnOrModule: (() => Promise<ApplicationRef>) | Type<unknown>,
+  bootstrapAppFnOrModule: ((context: BootstrapContext) => Promise<ApplicationRef>) | Type<unknown>,
   document: string,
 ): AsyncIterableIterator<RouterResult> {
   const platformRef = createPlatformFactory(platformCore, 'server', [
@@ -106,7 +107,7 @@ export async function* extractRoutes(
   try {
     let applicationRef: ApplicationRef;
     if (isBootstrapFn(bootstrapAppFnOrModule)) {
-      applicationRef = await bootstrapAppFnOrModule();
+      applicationRef = await bootstrapAppFnOrModule({ platformRef });
     } else {
       const moduleRef = await platformRef.bootstrapModule(bootstrapAppFnOrModule);
       applicationRef = moduleRef.injector.get(ApplicationRef);
@@ -131,7 +132,9 @@ export async function* extractRoutes(
   }
 }
 
-function isBootstrapFn(value: unknown): value is () => Promise<ApplicationRef> {
+function isBootstrapFn(
+  value: unknown,
+): value is (context: BootstrapContext) => Promise<ApplicationRef> {
   // We can differentiate between a module and a bootstrap function by reading compiler-generated `ɵmod` static property:
   return typeof value === 'function' && !('ɵmod' in value);
 }
