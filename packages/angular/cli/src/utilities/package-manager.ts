@@ -18,7 +18,9 @@ import { memoize } from './memoize';
 /**
  * A map of package managers to their corresponding lockfile names.
  */
-const LOCKFILE_NAMES: Readonly<Record<PackageManager, string | readonly string[]>> = {
+const LOCKFILE_NAMES: Readonly<
+  Record<Exclude<PackageManager, PackageManager.Cnpm>, string | readonly string[]>
+> = {
   [PackageManager.Yarn]: 'yarn.lock',
   [PackageManager.Pnpm]: 'pnpm-lock.yaml',
   [PackageManager.Bun]: ['bun.lockb', 'bun.lock'],
@@ -289,7 +291,10 @@ export class PackageManagerUtils {
    * @param filesInRoot An array of file names in the root directory.
    * @returns True if the lockfile exists, false otherwise.
    */
-  private hasLockfile(packageManager: PackageManager, filesInRoot: string[]): boolean {
+  private hasLockfile(
+    packageManager: Exclude<PackageManager, PackageManager.Cnpm>,
+    filesInRoot: string[],
+  ): boolean {
     const lockfiles = LOCKFILE_NAMES[packageManager];
 
     return typeof lockfiles === 'string'
