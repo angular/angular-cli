@@ -356,20 +356,23 @@ export function withAppShell(
  * when using the `bootstrapApplication` function:
  *
  * ```ts
- * import { bootstrapApplication } from '@angular/platform-browser';
+ * import { bootstrapApplication, BootstrapContext } from '@angular/platform-browser';
  * import { provideServerRendering, withRoutes, withAppShell } from '@angular/ssr';
  * import { AppComponent } from './app/app.component';
  * import { SERVER_ROUTES } from './app/app.server.routes';
  * import { AppShellComponent } from './app/app-shell.component';
  *
- * bootstrapApplication(AppComponent, {
- *   providers: [
- *      provideServerRendering(
- *         withRoutes(SERVER_ROUTES),
- *         withAppShell(AppShellComponent)
- *      )
- *   ]
- * });
+ * const bootstrap = (context: BootstrapContext) =>
+ *     bootstrapApplication(AppComponent, {
+ *       providers: [
+ *         provideServerRendering(
+ *           withRoutes(SERVER_ROUTES),
+ *           withAppShell(AppShellComponent),
+ *         ),
+ *       ],
+ *     }, context);
+ *
+ * export default bootstrap;
  * ```
  * @see {@link withRoutes} configures server-side routing
  * @see {@link withAppShell} configures the application shell
