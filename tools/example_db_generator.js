@@ -48,7 +48,14 @@ function parseFrontmatter(content) {
       isArray = value.trim() === '';
 
       if (!isArray) {
-        data[currentKey] = value.trim();
+        const trimmedValue = value.trim();
+        if (trimmedValue === 'true') {
+          data[currentKey] = true;
+        } else if (trimmedValue === 'false') {
+          data[currentKey] = false;
+        } else {
+          data[currentKey] = trimmedValue;
+        }
       }
     } else {
       const arrayItemMatch = line.match(/^\s*-\s*(.*)/);
