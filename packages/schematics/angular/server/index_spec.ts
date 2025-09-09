@@ -201,7 +201,7 @@ describe('Server Schematic', () => {
       const filePath = '/projects/bar/src/main.server.ts';
       expect(tree.exists(filePath)).toBeTrue();
       const contents = tree.readContent(filePath);
-      expect(contents).toContain(`bootstrapApplication(App, config)`);
+      expect(contents).toContain(`bootstrapApplication(App, config, context)`);
     });
 
     it('should account for renamed app component', async () => {
@@ -212,7 +212,7 @@ describe('Server Schematic', () => {
         import { appConfig } from './app/app.config';
         import { MyCustomApp } from './foo/bar/baz/app.foo';
 
-        bootstrapApplication(MyCustomApp, appConfig)
+        bootstrapApplication(MyCustomApp, appConfig, context)
           .catch((err) => console.error(err));
       `,
       );
@@ -222,7 +222,7 @@ describe('Server Schematic', () => {
       expect(tree.exists(filePath)).toBeTrue();
       const contents = tree.readContent(filePath);
       expect(contents).toContain(`import { MyCustomApp } from './foo/bar/baz/app.foo';`);
-      expect(contents).toContain(`bootstrapApplication(MyCustomApp, config)`);
+      expect(contents).toContain(`bootstrapApplication(MyCustomApp, config, context)`);
     });
 
     it('should account for renamed app component that is aliased within the main file', async () => {
@@ -243,7 +243,7 @@ describe('Server Schematic', () => {
       expect(tree.exists(filePath)).toBeTrue();
       const contents = tree.readContent(filePath);
       expect(contents).toContain(`import { MyCustomApp } from './foo/bar/baz/app.foo';`);
-      expect(contents).toContain(`bootstrapApplication(MyCustomApp, config)`);
+      expect(contents).toContain(`bootstrapApplication(MyCustomApp, config, context)`);
     });
 
     it('should create server app config file', async () => {
