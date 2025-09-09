@@ -40,7 +40,7 @@ export default async function () {
 
     const { stdout: stdoutOutsideWorkspace } = await runInspector('--method', 'tools/list');
 
-    assert.doesNotMatch(stdoutOutsideWorkspace, /"list_projects"/);
+    assert.match(stdoutOutsideWorkspace, /"list_projects"/);
     assert.match(stdoutOutsideWorkspace, /"get_best_practices"/);
     assert.match(stdoutInsideWorkspace, /"search_documentation"/);
   } finally {

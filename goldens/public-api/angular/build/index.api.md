@@ -223,6 +223,7 @@ export type UnitTestBuilderOptions = {
     debug?: boolean;
     exclude?: string[];
     include?: string[];
+    progress?: boolean;
     providersFile?: string;
     reporters?: string[];
     runner: Runner;

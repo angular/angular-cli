@@ -18,7 +18,7 @@ import {
 } from '../utility/ast-utils';
 import { applyToUpdateRecorder } from '../utility/change';
 import { getAppModulePath, isStandaloneApp } from '../utility/ng-ast-utils';
-import { targetBuildNotFoundError } from '../utility/project-targets';
+import { createProjectSchematic } from '../utility/project';
 import { findBootstrapApplicationCall, getMainFilePath } from '../utility/standalone/util';
 import { getWorkspace } from '../utility/workspace';
 import { Schema as AppShellOptions } from './schema';
@@ -190,27 +190,19 @@ function addServerRoutingConfig(options: AppShellOptions, isStandalone: boolean)
   };
 }
 
-export default function (options: AppShellOptions): Rule {
-  return async (tree) => {
-    const browserEntryPoint = await getMainFilePath(tree, options.project);
-    const isStandalone = isStandaloneApp(tree, browserEntryPoint);
+export default createProjectSchematic<AppShellOptions>(async (options, { tree }) => {
+  const browserEntryPoint = await getMainFilePath(tree, options.project);
+  const isStandalone = isStandaloneApp(tree, browserEntryPoint);
 
-    const workspace = await getWorkspace(tree);
-    const project = workspace.projects.get(options.project);
-    if (!project) {
-      throw targetBuildNotFoundError();
-    }
-
-    return chain([
-      validateProject(browserEntryPoint),
-      schematic('server', options),
-      addServerRoutingConfig(options, isStandalone),
-      schematic('component', {
-        name: 'app-shell',
-        module: 'app.module.server.ts',
-        project: options.project,
-        standalone: isStandalone,
-      }),
-    ]);
-  };
-}
+  return chain([
+    validateProject(browserEntryPoint),
+    schematic('server', options),
+    addServerRoutingConfig(options, isStandalone),
+    schematic('component', {
+      name: 'app-shell',
+      module: 'app.module.server.ts',
+      project: options.project,
+      standalone: isStandalone,
+    }),
+  ]);
+});

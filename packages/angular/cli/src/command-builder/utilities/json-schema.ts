@@ -197,12 +197,16 @@ export async function parseJsonSchemaToOptions(
       .filter((value) => isValidTypeForEnum(typeof value))
       .sort() as (string | true | number)[];
 
-    let defaultValue: string | number | boolean | undefined = undefined;
+    let defaultValue: string | number | boolean | unknown[] | undefined = undefined;
     if (current.default !== undefined) {
       switch (types[0]) {
         case 'string':
-        case 'array':
           if (typeof current.default == 'string') {
+            defaultValue = current.default;
+          }
+          break;
+        case 'array':
+          if (Array.isArray(current.default) && current.default.length > 0) {
             defaultValue = current.default;
           }
           break;

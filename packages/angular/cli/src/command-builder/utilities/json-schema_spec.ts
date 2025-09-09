@@ -37,7 +37,7 @@ describe('parseJsonSchemaToOptions', () => {
           },
           'arrayWithChoices': {
             'type': 'array',
-            'default': 'default-array',
+            'default': ['default-array'],
             'items': {
               'type': 'string',
               'enum': ['always', 'never', 'default-array'],
@@ -91,7 +91,7 @@ describe('parseJsonSchemaToOptions', () => {
       });
 
       it('should add default value to help', async () => {
-        expect(await localYargs.getHelp()).toContain('[default: "default-array"]');
+        expect(await localYargs.getHelp()).toContain('[default: ["default-array"]]');
       });
     });
 

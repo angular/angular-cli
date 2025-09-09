@@ -13,37 +13,35 @@ import { stripVTControlCharacters } from 'node:util';
 const initialStatusRegex = /Running (\d+) tests/;
 
 async function main() {
-  const [runfilesDir, targetName, testArgs] = process.argv.slice(2);
-  const maxShards = 4;
-
+  const [runfilesDir, targetName, ...testArgs] = process.argv.slice(2);
   const testEntrypoint = path.resolve(runfilesDir, '../', targetName);
   const testWorkingDir = path.resolve(runfilesDir, '_main');
   const tasks = [];
   const progress = {};
 
-  for (let i = 0; i < maxShards; i++) {
-    tasks.push(
-      spawnTest(
-        'bash',
-        [testEntrypoint, ...testArgs.split(' ').filter((arg) => arg !== '')],
-        {
-          cwd: testWorkingDir,
-          env: {
-            // Try to construct a pretty hermetic environment, as within Bazel.
-            PATH: process.env.PATH,
-            TEST_TOTAL_SHARDS: maxShards,
-            TEST_SHARD_INDEX: i,
-            E2E_SHARD_TOTAL: process.env.E2E_SHARD_TOTAL,
-            E2E_SHARD_INDEX: process.env.E2E_SHARD_INDEX,
-            FORCE_COLOR: '3',
-            // Needed by `rules_js`
-            BAZEL_BINDIR: '.',
-          },
+  tasks.push(
+    spawnTest(
+      'bash',
+      [testEntrypoint, ...testArgs],
+      {
+        cwd: testWorkingDir,
+        env: {
+          // Try to construct a pretty hermetic environment, as within Bazel.
+          PATH: process.env.PATH,
+          E2E_SHARD_TOTAL: process.env.E2E_SHARD_TOTAL,
+          E2E_SHARD_INDEX: process.env.E2E_SHARD_INDEX,
+          FORCE_COLOR: '3',
+          // Needed by `rules_js`
+          BAZEL_BINDIR: '.',
+          // Needed to run the E2E in a different temp path.
+          E2E_TEMP: process.env.E2E_TEMP,
+          // Using the `--glob` causes a bunch of issues due to path expansion in nested bash scripts.
+          TESTBRIDGE_TEST_ONLY: process.env.TESTBRIDGE_TEST_ONLY,
         },
-        (s) => (progress[i] = s),
-      ),
-    );
-  }
+      },
+      (s) => (progress[0] = s),
+    ),
+  );
 
   const printUpdate = () => {
     console.error(`----`);

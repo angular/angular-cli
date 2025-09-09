@@ -6,7 +6,6 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { tags } from '@angular-devkit/core';
 import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/testing';
 import { Schema as ApplicationOptions } from '../application/schema';
 import { Schema as WorkspaceOptions } from '../workspace/schema';
@@ -126,8 +125,8 @@ describe('App Shell Schematic', () => {
     it(`should update the 'provideServerRendering' call to include 'withAppShell'`, async () => {
       const tree = await schematicRunner.runSchematic('app-shell', defaultOptions, appTree);
       const content = tree.readContent('/projects/bar/src/app/app.config.server.ts');
-      expect(tags.oneLine`${content}`).toContain(
-        tags.oneLine`provideServerRendering(withRoutes(serverRoutes), withAppShell(AppShell))`,
+      expect(content.replace(/\s/g, '')).toContain(
+        'provideServerRendering(withRoutes(serverRoutes),withAppShell(AppShell))',
       );
     });
 

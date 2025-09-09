@@ -13,8 +13,10 @@ import validateUserAnalytics from './validate-user-analytics.mjs';
 export default async function (options: { verbose: boolean }) {
   let error = false;
 
-  if (execSync(`git status --porcelain`).toString()) {
-    console.error('There are local changes.');
+  const changes = execSync(`git status --porcelain`).toString();
+  if (changes) {
+    console.error('There are local changes. See below:');
+    console.error(changes);
     if (!options.verbose) {
       return 101;
     }

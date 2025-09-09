@@ -15,7 +15,7 @@ import {
 } from '../setup';
 
 describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
-  xdescribe('Option: "watch"', () => {
+  describe('Option: "watch"', () => {
     beforeEach(async () => {
       setupApplicationTarget(harness);
     });

@@ -30,12 +30,6 @@ const TRANSFORMATIONS: Array<Transformation> = [
     documentationUrl: 'https://angular.dev/reference/migrations/self-closing-tags',
   },
   {
-    name: 'test-bed-get',
-    description:
-      'Updates `TestBed.get` to the preferred and type-safe `TestBed.inject` in TypeScript test files.',
-    documentationUrl: 'https://angular.dev/guide/testing/dependency-injection',
-  },
-  {
     name: 'inject',
     description: 'Converts usages of constructor-based injection to the inject() function.',
     documentationUrl: 'https://angular.dev/reference/migrations/inject-function',
@@ -70,18 +64,17 @@ const TRANSFORMATIONS: Array<Transformation> = [
       '3. Run `ng g @angular/core:standalone` and select "Bootstrap the project using standalone APIs"',
     documentationUrl: 'https://angular.dev/reference/migrations/standalone',
   },
-  {
-    name: 'zoneless',
-    description: 'Migrates the application to be zoneless.',
-    documentationUrl: 'https://angular.dev/guide/zoneless',
-  },
 ];
 
 const modernizeInputSchema = z.object({
   // Casting to [string, ...string[]] since the enum definition requires a nonempty array.
   transformations: z
     .array(z.enum(TRANSFORMATIONS.map((t) => t.name) as [string, ...string[]]))
-    .optional(),
+    .optional()
+    .describe(
+      'A list of specific transformations to get instructions for. ' +
+        'If omitted, general guidance is provided.',
+    ),
 });
 
 export type ModernizeInput = z.infer<typeof modernizeInputSchema>;
@@ -127,28 +120,38 @@ export async function runModernization(input: ModernizeInput) {
 export const MODERNIZE_TOOL = declareTool({
   name: 'modernize',
   title: 'Modernize Angular Code',
-  description:
-    '<Purpose>\n' +
-    'This tool modernizes Angular code by applying the latest best practices and syntax improvements, ' +
-    'ensuring it is idiomatic, readable, and maintainable.\n\n' +
-    '</Purpose>\n' +
-    '<Use Cases>\n' +
-    '* After generating new code: Run this tool immediately after creating new Angular components, directives, ' +
-    'or services to ensure they adhere to modern standards.\n' +
-    '* On existing code: Apply to existing TypeScript files (.ts) and Angular templates (.html) to update ' +
-    'them with the latest features, such as the new built-in control flow syntax.\n\n' +
-    '* When the user asks for a specific transformation: When the transformation list is populated, ' +
-    'these specific ones will be ran on the inputs.\n' +
-    '</Use Cases>\n' +
-    '<Transformations>\n' +
-    TRANSFORMATIONS.map((t) => `* ${t.name}: ${t.description}`).join('\n') +
-    '\n</Transformations>\n',
+  description: `
+<Purpose>
+Provides instructions and commands for modernizing Angular code to align with the latest best
+practices and syntax. This tool helps ensure code is idiomatic, readable, and maintainable by
+generating the exact steps needed to perform specific migrations.
+</Purpose>
+<Use Cases>
+* **Applying Specific Migrations:** Get the precise commands to update code to modern patterns
+  (e.g., selecting 'control-flow-migration' to replace *ngIf with @if).
+* **Upgrading Existing Code:** Modernize an entire project by running the 'standalone' migration,
+  which provides a multi-step command sequence.
+* **Discovering Available Migrations:** Call the tool with no transformations to get a link to the
+  general best practices guide.
+</Use Cases>
+<Operational Notes>
+* **Execution:** This tool **provides instructions**, which you **MUST** then execute as shell commands.
+  It does not modify code directly.
+* **Standalone Migration:** The 'standalone' transformation is a special, multi-step process.
+  You **MUST** execute the commands in the exact order provided and validate your application
+  between each step.
+* **Transformation List:** The following transformations are available:
+${TRANSFORMATIONS.map((t) => `  * ${t.name}: ${t.description}`).join('\n')}
+</Operational Notes>`,
   inputSchema: modernizeInputSchema.shape,
   outputSchema: {
     instructions: z
       .array(z.string())
       .optional()
-      .describe('A list of instructions on how to run the migrations.'),
+      .describe(
+        'A list of instructions and shell commands to run the requested modernizations. ' +
+          'Each string in the array is a separate step or command.',
+      ),
   },
   isLocalOnly: true,
   isReadOnly: true,

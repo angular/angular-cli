@@ -27,12 +27,6 @@ const packageManagers: { [name: string]: PackageManagerProfile } = {
       installPackage: 'install',
     },
   },
-  'cnpm': {
-    commands: {
-      installAll: 'install',
-      installPackage: 'install',
-    },
-  },
   'yarn': {
     commands: {
       installAll: 'install',

@@ -39,7 +39,6 @@
       "items": {
         "type": "string"
       },
-      "default": [],
       "description": "Globs of files to exclude, relative to the project root."
     },
     "watch": {
@@ -61,8 +60,7 @@
       "description": "Globs to exclude from code coverage.",
       "items": {
         "type": "string"
-      },
-      "default": []
+      }
     },
     "codeCoverageReporters": {
       "type": "array",
@@ -106,6 +104,10 @@
         "type": "string"
       },
       "description": "A list of global setup and configuration files that are included before the test files. The application's polyfills are always included before these files. The Angular Testbed is also initialized prior to the execution of these files."
+    },
+    "progress": {
+      "type": "boolean",
+      "description": "Log progress to the console while building. Defaults to the build target's progress value."
     }
   },
   "additionalProperties": false,

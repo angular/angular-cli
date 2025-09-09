@@ -20,40 +20,33 @@ import {
 import { readFile } from 'node:fs/promises';
 import { posix as path } from 'node:path';
 import { relativePathToWorkspaceRoot } from '../utility/paths';
-import { getWorkspace as readWorkspace, updateWorkspace } from '../utility/workspace';
+import { createProjectSchematic } from '../utility/project';
+import { updateWorkspace } from '../utility/workspace';
 import { Builders as AngularBuilder } from '../utility/workspace-models';
 import { Schema as ConfigOptions, Type as ConfigType } from './schema';
 
-export default function (options: ConfigOptions): Rule {
+export default createProjectSchematic<ConfigOptions>((options, { project }) => {
   switch (options.type) {
     case ConfigType.Karma:
       return addKarmaConfig(options);
     case ConfigType.Browserslist:
-      return addBrowserslistConfig(options);
+      return addBrowserslistConfig(project.root);
     default:
       throw new SchematicsException(`"${options.type}" is an unknown configuration file type.`);
   }
-}
+});
 
-function addBrowserslistConfig(options: ConfigOptions): Rule {
-  return async (host) => {
-    const workspace = await readWorkspace(host);
-    const project = workspace.projects.get(options.project);
-    if (!project) {
-      throw new SchematicsException(`Project name "${options.project}" doesn't not exist.`);
-    }
+async function addBrowserslistConfig(projectRoot: string): Promise<Rule> {
+  // Read Angular's default vendored `.browserslistrc` file.
+  const config = await readFile(path.join(__dirname, '.browserslistrc'), 'utf8');
 
-    // Read Angular's default vendored `.browserslistrc` file.
-    const config = await readFile(path.join(__dirname, '.browserslistrc'), 'utf8');
-
-    return mergeWith(
-      apply(url('./files'), [
-        filter((p) => p.endsWith('.browserslistrc.template')),
-        applyTemplates({ config }),
-        move(project.root),
-      ]),
-    );
-  };
+  return mergeWith(
+    apply(url('./files'), [
+      filter((p) => p.endsWith('.browserslistrc.template')),
+      applyTemplates({ config }),
+      move(projectRoot),
+    ]),
+  );
 }
 
 function addKarmaConfig(options: ConfigOptions): Rule {

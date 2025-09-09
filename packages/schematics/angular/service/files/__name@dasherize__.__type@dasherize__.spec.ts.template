@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { <%= classify(name) %><%= classify(type) %> } from './<%= dasherize(name) %><%= type ? '.' + dasherize(type) : '' %>';
+import { <%= classifiedName %> } from './<%= dasherize(name) %><%= type ? '.' + dasherize(type) : '' %>';
 
-describe('<%= classify(name) %><%= classify(type) %>', () => {
-  let service: <%= classify(name) %><%= classify(type) %>;
+describe('<%= classifiedName %>', () => {
+  let service: <%= classifiedName %>;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(<%= classify(name) %><%= classify(type) %>);
+    service = TestBed.inject(<%= classifiedName %>);
   });
 
   it('should be created', () => {

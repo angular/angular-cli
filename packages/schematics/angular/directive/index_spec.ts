@@ -137,6 +137,35 @@ describe('Directive Schematic', () => {
     expect(testContent).toContain("describe('Foo'");
   });
 
+  it('should not add type to class name when addTypeToClassName is false', async () => {
+    const options = { ...defaultOptions, type: 'Directive', addTypeToClassName: false };
+    const tree = await schematicRunner.runSchematic('directive', options, appTree);
+    const content = tree.readContent('/projects/bar/src/app/foo.directive.ts');
+    const testContent = tree.readContent('/projects/bar/src/app/foo.directive.spec.ts');
+    expect(content).toContain('export class Foo {');
+    expect(content).not.toContain('export class FooDirective {');
+    expect(testContent).toContain("describe('Foo', () => {");
+    expect(testContent).not.toContain("describe('FooDirective', () => {");
+  });
+
+  it('should add type to class name when addTypeToClassName is true', async () => {
+    const options = { ...defaultOptions, type: 'Directive', addTypeToClassName: true };
+    const tree = await schematicRunner.runSchematic('directive', options, appTree);
+    const content = tree.readContent('/projects/bar/src/app/foo.directive.ts');
+    const testContent = tree.readContent('/projects/bar/src/app/foo.directive.spec.ts');
+    expect(content).toContain('export class FooDirective {');
+    expect(testContent).toContain("describe('FooDirective', () => {");
+  });
+
+  it('should add type to class name by default', async () => {
+    const options = { ...defaultOptions, type: 'Directive', addTypeToClassName: undefined };
+    const tree = await schematicRunner.runSchematic('directive', options, appTree);
+    const content = tree.readContent('/projects/bar/src/app/foo.directive.ts');
+    const testContent = tree.readContent('/projects/bar/src/app/foo.directive.spec.ts');
+    expect(content).toContain('export class FooDirective {');
+    expect(testContent).toContain("describe('FooDirective', () => {");
+  });
+
   describe('standalone=false', () => {
     const defaultNonStandaloneOptions: DirectiveOptions = {
       ...defaultOptions,

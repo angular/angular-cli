@@ -6,7 +6,6 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { tags } from '@angular-devkit/core';
 import * as ts from '../third_party/github.com/Microsoft/TypeScript/lib/typescript';
 import { Change, InsertChange, NoopChange } from './change';
 import { getEOL } from './eol';
@@ -91,6 +90,11 @@ export function insertImport(
   );
 }
 
+const findNodesCache = new WeakMap<
+  ts.SourceFile,
+  Map<ts.SyntaxKind | ((node: ts.Node) => boolean), ts.Node[]>
+>();
+
 /**
  * Find all nodes from the AST in the subtree of node of SyntaxKind kind.
  * @param node
@@ -138,6 +142,14 @@ export function findNodes<T extends ts.Node>(
       ? kindOrGuard
       : (node: ts.Node): node is T => node.kind === kindOrGuard;
 
+  // Caching is only supported for the entire file
+  if (ts.isSourceFile(node)) {
+    const sourceFileCache = findNodesCache.get(node);
+    if (sourceFileCache?.has(kindOrGuard)) {
+      return sourceFileCache.get(kindOrGuard) as T[];
+    }
+  }
+
   const arr: T[] = [];
   if (test(node)) {
     arr.push(node);
@@ -158,6 +170,15 @@ export function findNodes<T extends ts.Node>(
     }
   }
 
+  if (ts.isSourceFile(node)) {
+    let sourceFileCache = findNodesCache.get(node);
+    if (!sourceFileCache) {
+      sourceFileCache = new Map();
+      findNodesCache.set(node, sourceFileCache);
+    }
+    sourceFileCache.set(kindOrGuard, arr);
+  }
+
   return arr;
 }
 
@@ -168,20 +189,14 @@ export function findNodes<T extends ts.Node>(
  */
 export function getSourceNodes(sourceFile: ts.SourceFile): ts.Node[] {
   const nodes: ts.Node[] = [sourceFile];
-  const result: ts.Node[] = [];
 
-  while (nodes.length > 0) {
-    const node = nodes.shift();
-
-    if (node) {
-      result.push(node);
-      if (node.getChildCount(sourceFile) >= 0) {
-        nodes.unshift(...node.getChildren());
-      }
-    }
+  // NOTE: nodes.length changes inside of the loop but we only append to the end
+  for (let i = 0; i < nodes.length; i++) {
+    const node = nodes[i];
+    nodes.push(...node.getChildren(sourceFile));
   }
 
-  return result;
+  return nodes;
 }
 
 export function findNode(node: ts.Node, kind: ts.SyntaxKind, text: string): ts.Node | null {
@@ -379,7 +394,11 @@ export function addSymbolToNgModuleMetadata(
     let toInsert: string;
     if (node.properties.length == 0) {
       position = node.getEnd() - 1;
-      toInsert = `\n  ${metadataField}: [\n${tags.indentBy(4)`${symbolName}`}\n  ]\n`;
+      toInsert = `
+  ${metadataField}: [
+${' '.repeat(4)}${symbolName}
+  ]
+`;
     } else {
       const childNode = node.properties[node.properties.length - 1];
       position = childNode.getEnd();
@@ -389,7 +408,7 @@ export function addSymbolToNgModuleMetadata(
       if (matches) {
         toInsert =
           `,${matches[0]}${metadataField}: [${matches[1]}` +
-          `${tags.indentBy(matches[2].length + 2)`${symbolName}`}${matches[0]}]`;
+          `${' '.repeat(matches[2].length + 2)}${symbolName}${matches[0]}]`;
       } else {
         toInsert = `, ${metadataField}: [${symbolName}]`;
       }
@@ -418,8 +437,8 @@ export function addSymbolToNgModuleMetadata(
   const elements = assignmentInit.elements;
 
   if (elements.length) {
-    const symbolsArray = elements.map((node) => tags.oneLine`${node.getText()}`);
-    if (symbolsArray.includes(tags.oneLine`${symbolName}`)) {
+    const symbolsArray = elements.map((node) => node.getText());
+    if (symbolsArray.includes(symbolName)) {
       return [];
     }
 
@@ -433,13 +452,13 @@ export function addSymbolToNgModuleMetadata(
   if (ts.isArrayLiteralExpression(expression)) {
     // We found the field but it's empty. Insert it just before the `]`.
     position--;
-    toInsert = `\n${tags.indentBy(4)`${symbolName}`}\n  `;
+    toInsert = `\n${' '.repeat(4)}${symbolName}\n  `;
   } else {
     // Get the indentation of the last element, if any.
     const text = expression.getFullText(source);
     const matches = text.match(/^(\r?\n)(\s*)/);
     if (matches) {
-      toInsert = `,${matches[1]}${tags.indentBy(matches[2].length)`${symbolName}`}`;
+      toInsert = `,${matches[1]}${' '.repeat(matches[2].length)}${symbolName}`;
     } else {
       toInsert = `, ${symbolName}`;
     }

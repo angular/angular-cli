@@ -41,7 +41,7 @@ export async function generateDefaultKarmaConfig(
   projectName: string,
   needDevkitPlugin: boolean,
 ): Promise<string> {
-  const templatePath = path.join(__dirname, '../../config/files/karma.conf.js.template');
+  const templatePath = require.resolve('../../config/files/karma.conf.js.template');
   let template = await readFile(templatePath, 'utf-8');
 
   // TODO: Replace this with the actual schematic templating logic.

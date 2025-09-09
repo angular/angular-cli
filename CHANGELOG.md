@@ -1,34 +1,159 @@
-<a name="20.2.0-rc.1"></a>
+<a name="21.0.0-next.2"></a>
 
-# 20.2.0-rc.1 (2025-08-15)
+# 21.0.0-next.2 (2025-09-03)
 
 ### @angular/cli
 
-| Commit                                                                                              | Type | Description                                      |
-| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------ |
-| [8ba6b0bcc](https://github.com/angular/angular-cli/commit/8ba6b0bcc8c8087875d14a0aefc6b7b52f39ce2a) | fix  | use correct path for MCP get_best_practices tool |
+| Commit                                                                                              | Type | Description                                                             |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------------- |
+| [301b50da4](https://github.com/angular/angular-cli/commit/301b50da4cf99b3cd87940606121d076b4f241c6) | feat | add fallback support for packages without direct `ng add` functionality |
+| [2c498d2b8](https://github.com/angular/angular-cli/commit/2c498d2b87c13a63bef2a9be2ca4f087c72c6b8a) | fix  | don't set a default for array options when length is 0                  |
+| [f099c9157](https://github.com/angular/angular-cli/commit/f099c91570b3cd748d7138bd18a4898a345549db) | fix  | improve list_projects MCP tool to find all workspaces in monorepos      |
+| [e192e8c7e](https://github.com/angular/angular-cli/commit/e192e8c7ecf506e4b03668f527de83f2a57f552d) | fix  | set process title when running architect commands                       |
 
 ### @schematics/angular
 
-| Commit                                                                                              | Type | Description                                                    |
-| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------- |
-| [ffe6fb916](https://github.com/angular/angular-cli/commit/ffe6fb916d496da1c6c20942f6e6b05a679b0f7d) | fix  | allow AI config prompt to be skipped without selecting a value |
-| [6a79f9a75](https://github.com/angular/angular-cli/commit/6a79f9a75cdcbb0761c4044066748f4eb788a57f) | fix  | zoneless is now stable                                         |
+| Commit                                                                                              | Type | Description                                            |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------ |
+| [e417c89f9](https://github.com/angular/angular-cli/commit/e417c89f9e9cfe0ce50ffbc72ef555793605aea1) | feat | Add `addTypeToClassName` option to relevant schematics |
+| [4e6c94f21](https://github.com/angular/angular-cli/commit/4e6c94f21e882c593cf11197900c29d693af9297) | feat | support different file name style guides in `ng new`   |
+| [14c0a9bac](https://github.com/angular/angular-cli/commit/14c0a9bacbb66b1db714ea7906c7d33f49c710fc) | perf | optimize AST traversal utilities                       |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                            |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------ |
+| [7b0f69798](https://github.com/angular/angular-cli/commit/7b0f69798f061d5500620828cf304e05d667199f) | fix  | avoid extra tick in SSR dev-server builds              |
+| [f806f6477](https://github.com/angular/angular-cli/commit/f806f6477af222907f1879181fb0f9839e889ea8) | fix  | maintain media output hashing with vitest unit-testing |
 
 <!-- CHANGELOG SPLIT MARKER -->
 
-<a name="20.2.0-rc.0"></a>
+<a name="20.2.2"></a>
 
-# 20.2.0-rc.0 (2025-08-13)
+# 20.2.2 (2025-09-03)
 
 ### @angular/cli
 
-| Commit                                                                                              | Type | Description                                   |
-| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------- |
-| [b4de9a1bf](https://github.com/angular/angular-cli/commit/b4de9a1bf50a35404fb79eb3f120faafd0ce825a) | feat | add --experimental-tool option to mcp command |
-| [755ba70fd](https://github.com/angular/angular-cli/commit/755ba70fd7ef38793d15797ba402020c375c3295) | feat | add --local-only option to mcp command        |
-| [59d7ef343](https://github.com/angular/angular-cli/commit/59d7ef343b6f1feea37a019935578c560d3d5e41) | feat | add --read-only option to mcp command         |
-| [4e92eb6f1](https://github.com/angular/angular-cli/commit/4e92eb6f17cb30259bc8e8d1979bbd9989bc5ad0) | feat | add modernize tool to the MCP server          |
+| Commit                                                                                              | Type | Description                                            |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------ |
+| [a793bbc47](https://github.com/angular/angular-cli/commit/a793bbc473dfaddf3fe6ed15805dc4fc84f52865) | fix  | don't set a default for array options when length is 0 |
+| [2736599e2](https://github.com/angular/angular-cli/commit/2736599e2f6c61032810d8e336c1646db4066392) | fix  | set process title when running architect commands      |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                            |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------ |
+| [5c2abffea](https://github.com/angular/angular-cli/commit/5c2abffea6cf3f672ee256a944dba56dd257665b) | fix  | avoid extra tick in SSR dev-server builds              |
+| [f3c826853](https://github.com/angular/angular-cli/commit/f3c826853501c9cf6d07a1c8ee3363eb79f53005) | fix  | maintain media output hashing with vitest unit-testing |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
+<a name="21.0.0-next.1"></a>
+
+# 21.0.0-next.1 (2025-08-27)
+
+## Breaking Changes
+
+### @angular/cli
+
+- The `ng` commands will no longer automatically detect and use `cnpm` as the package manager. As an alternative use the `.npmrc` file to ensure npm uses the cnpm registry.
+
+### @angular-devkit/schematics-cli
+
+| Commit                                                                                              | Type | Description                        |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------- |
+| [aed26c388](https://github.com/angular/angular-cli/commit/aed26c38803a465842ff128c3f81bd6984e1fe3d) | fix  | correctly set default array values |
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                                                          |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------------------ |
+| [4912f3990](https://github.com/angular/angular-cli/commit/4912f39906b11a3212f11d5a00d577e2a0bacab4) | feat | add Tailwind CSS option to application schematic and `ng new`                        |
+| [6c7b79833](https://github.com/angular/angular-cli/commit/6c7b798332786d29070460669e093e37902c4438) | fix  | directly resolve karma config template in migration                                  |
+| [0f86cf878](https://github.com/angular/angular-cli/commit/0f86cf8782d1c08d11bb9ee54a30fe1954dd8bcc) | fix  | prevent AI config schematic from failing when 'none' and other AI tools are selected |
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                                |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------- |
+| [0d53e82d5](https://github.com/angular/angular-cli/commit/0d53e82d5ed8986603c2005fc06041dd076b08c6) | feat | provide detailed peer dependency conflict errors in ng add |
+| [f513089e2](https://github.com/angular/angular-cli/commit/f513089e276acf5a7c4f6879a95e2d6ed78ae67d) | feat | remove direct support for `cnpm`                           |
+| [47d77a3ed](https://github.com/angular/angular-cli/commit/47d77a3edea4dabb463d50c2bdba32475257d775) | fix  | correctly set default array values                         |
+| [e5aed6d65](https://github.com/angular/angular-cli/commit/e5aed6d655ed92ea6eb3ac03716b8a02a5f731d6) | fix  | show planned actions in `ng add` dry run                   |
+| [aeb49dd52](https://github.com/angular/angular-cli/commit/aeb49dd52bf88785a193fcb6caa0b36aaeef1d37) | perf | cache dependency lookups during `ng add`                   |
+| [5e534090e](https://github.com/angular/angular-cli/commit/5e534090e25e00a9fafbce2867030e7fdb0efbf6) | perf | parallelize peer dependency checks in `ng add`             |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                             |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------- |
+| [b554bd73a](https://github.com/angular/angular-cli/commit/b554bd73a9c248d986ed718028edf52ab5da6ccf) | fix  | add temporary directory cleanup for Vitest executor     |
+| [261dbb37c](https://github.com/angular/angular-cli/commit/261dbb37cbe01492240c4cedc644663b15a4296a) | fix  | correct JS/TS file paths when running under Bazel       |
+| [abf003268](https://github.com/angular/angular-cli/commit/abf003268c6cb18f0944665b0b3f2794c9469c3e) | fix  | correct Vitest builder watch mode execution             |
+| [4b49a207a](https://github.com/angular/angular-cli/commit/4b49a207a1de27b82416c6225a59bc10f48bdcbc) | fix  | ensure karma polyfills reporter factory returns a value |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
+<a name="20.2.1"></a>
+
+# 20.2.1 (2025-08-27)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                        |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------- |
+| [3b693e09e](https://github.com/angular/angular-cli/commit/3b693e09e8148ef22031aab8f6bc70c928aabc03) | fix  | correctly set default array values |
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                                                          |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------------------ |
+| [6937123a3](https://github.com/angular/angular-cli/commit/6937123a393e2ba9221962b0174056c14437a988) | fix  | directly resolve karma config template in migration                                  |
+| [5d6dd4425](https://github.com/angular/angular-cli/commit/5d6dd44259a0d89098c2a0c784e726b43ce32316) | fix  | prevent AI config schematic from failing when 'none' and other AI tools are selected |
+
+### @angular-devkit/schematics-cli
+
+| Commit                                                                                              | Type | Description                        |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------- |
+| [e93919dea](https://github.com/angular/angular-cli/commit/e93919dea7df55a3aac2fa5c93c4560c50a2d749) | fix  | correctly set default array values |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                             |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------- |
+| [06a6ddc10](https://github.com/angular/angular-cli/commit/06a6ddc102f5dc9018ec982f6e4cf56259cc4b52) | fix  | correct JS/TS file paths when running under Bazel       |
+| [b6816b0cb](https://github.com/angular/angular-cli/commit/b6816b0cbaf1262d7015b9d7f7fb425f53995947) | fix  | ensure karma polyfills reporter factory returns a value |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
+<a name="21.0.0-next.0"></a>
+
+# 21.0.0-next.0 (2025-08-20)
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                              |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------- |
+| [0505f954d](https://github.com/angular/angular-cli/commit/0505f954dcf3b3339749ff461592d46d8ecc5e23) | fix  | allow unit-test progress option passthrough for building |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
+<a name="20.2.0"></a>
+
+# 20.2.0 (2025-08-20)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                                           |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------------------- |
+| [b4de9a1bf](https://github.com/angular/angular-cli/commit/b4de9a1bf50a35404fb79eb3f120faafd0ce825a) | feat | add --experimental-tool option to mcp command                         |
+| [755ba70fd](https://github.com/angular/angular-cli/commit/755ba70fd7ef38793d15797ba402020c375c3295) | feat | add --local-only option to mcp command                                |
+| [59d7ef343](https://github.com/angular/angular-cli/commit/59d7ef343b6f1feea37a019935578c560d3d5e41) | feat | add --read-only option to mcp command                                 |
+| [4e92eb6f1](https://github.com/angular/angular-cli/commit/4e92eb6f17cb30259bc8e8d1979bbd9989bc5ad0) | feat | add modernize tool to the MCP server                                  |
+| [a3b25f675](https://github.com/angular/angular-cli/commit/a3b25f675283fdd8cc5689e3ec88f27aa1386390) | fix  | add choices to command line parser when type is array and has an enum |
+| [e19eee614](https://github.com/angular/angular-cli/commit/e19eee61404a9ca6268ebbc69f671a422d81df9b) | fix  | address Node.js deprecation DEP0190                                   |
+| [4ee6f327a](https://github.com/angular/angular-cli/commit/4ee6f327a206f8ff2ad5eeab43193df56b92b5e0) | fix  | apply default to array types                                          |
+| [8ba6b0bcc](https://github.com/angular/angular-cli/commit/8ba6b0bcc8c8087875d14a0aefc6b7b52f39ce2a) | fix  | use correct path for MCP get_best_practices tool                      |
 
 ### @schematics/angular
 
@@ -36,9 +161,22 @@
 | --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------------- |
 | [2e3cfd598](https://github.com/angular/angular-cli/commit/2e3cfd598c9366d0036a52cd18024317b33e6fca) | feat | add migration to remove default Karma configurations                    |
 | [d80dae276](https://github.com/angular/angular-cli/commit/d80dae276e9554c13e0c37640d0db8acafc9d48b) | feat | add schematics to generate ai context files.                            |
-| [6a78ef0ce](https://github.com/angular/angular-cli/commit/6a78ef0cec4875be76d9241499db67ddac6e14df) | fix  | add extra prettier config                                               |
-| [e46d9c54f](https://github.com/angular/angular-cli/commit/e46d9c54f07e32dc05e29a3533ce1bd063ff9f61) | fix  | correct configure the `typeSeparator` in the library schematic          |
+| [ffe6fb916](https://github.com/angular/angular-cli/commit/ffe6fb916d496da1c6c20942f6e6b05a679b0f7d) | fix  | allow AI config prompt to be skipped without selecting a value          |
+| [ae2802b7d](https://github.com/angular/angular-cli/commit/ae2802b7db358c5a3f0590feea212a768a710353) | fix  | improve AI config prompt wording                                        |
 | [b017f84fd](https://github.com/angular/angular-cli/commit/b017f84fdaf36bc0fcad2241846665c73b52b6d8) | fix  | improve coverage directory handling for Karma configuration comparisons |
+| [6a79f9a75](https://github.com/angular/angular-cli/commit/6a79f9a75cdcbb0761c4044066748f4eb788a57f) | fix  | zoneless is now stable                                                  |
+
+### @angular-devkit/schematics
+
+| Commit                                                                                              | Type | Description                         |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------- |
+| [c43504d8d](https://github.com/angular/angular-cli/commit/c43504d8d96a4436ce71c23d957aec2d080106b8) | fix  | address Node.js deprecation DEP0190 |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                               |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------- |
+| [fb06bb505](https://github.com/angular/angular-cli/commit/fb06bb5050e92eb4d0f95d7774552d0902163f6a) | feat | add headless mode for vitest browser mode |
 
 <!-- CHANGELOG SPLIT MARKER -->
 
@@ -55,18 +193,6 @@
 
 <!-- CHANGELOG SPLIT MARKER -->
 
-<a name="20.2.0-next.3"></a>
-
-# 20.2.0-next.3 (2025-08-08)
-
-### @angular/cli
-
-| Commit                                                                                              | Type | Description                                               |
-| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------- |
-| [51d56f770](https://github.com/angular/angular-cli/commit/51d56f770714a015aa7621d53c4a1634e8a01cc8) | fix  | cache MCP best practices content and add tool annotations |
-
-<!-- CHANGELOG SPLIT MARKER -->
-
 <a name="20.1.5"></a>
 
 # 20.1.5 (2025-08-06)
@@ -76,24 +202,6 @@
 | Commit                                                                                              | Type | Description                                               |
 | --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------- |
 | [48ca04474](https://github.com/angular/angular-cli/commit/48ca044745f49bc7fc365a621827294f4cc82c50) | fix  | cache MCP best practices content and add tool annotations |
-
-<!-- CHANGELOG SPLIT MARKER -->
-
-<a name="20.2.0-next.2"></a>
-
-# 20.2.0-next.2 (2025-07-30)
-
-### @angular/cli
-
-| Commit                                                                                              | Type | Description                                            |
-| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------ |
-| [193b39416](https://github.com/angular/angular-cli/commit/193b39416731fa439fea7da8c06d5d287df99bc1) | fix  | skip workspace-specific tools when outside a workspace |
-
-### @angular/build
-
-| Commit                                                                                              | Type | Description                                 |
-| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------- |
-| [7a183730c](https://github.com/angular/angular-cli/commit/7a183730c77689fb9e63625f5ef20aef1cefb88b) | fix  | skip vite transformation of CSS-like assets |
 
 <!-- CHANGELOG SPLIT MARKER -->
 
@@ -127,30 +235,6 @@
 
 <!-- CHANGELOG SPLIT MARKER -->
 
-<a name="20.2.0-next.1"></a>
-
-# 20.2.0-next.1 (2025-07-23)
-
-### @angular/cli
-
-| Commit                                                                                              | Type | Description                                                       |
-| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------- |
-| [fefa7a46f](https://github.com/angular/angular-cli/commit/fefa7a46f5733fd77852a61fddc3120b1bb4b202) | fix  | `define` option is being included multiple times in the JSON help |
-
-### @angular-devkit/core
-
-| Commit                                                                                              | Type | Description                                                                   |
-| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------------------- |
-| [7595e1f88](https://github.com/angular/angular-cli/commit/7595e1f8887bafd344ec939e647e3fca8bbd98be) | fix  | use crypto.randomUUID instead of Date.now for unique string in tmp file names |
-
-### @angular/build
-
-| Commit                                                                                              | Type | Description                               |
-| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------- |
-| [fb06bb505](https://github.com/angular/angular-cli/commit/fb06bb5050e92eb4d0f95d7774552d0902163f6a) | feat | add headless mode for vitest browser mode |
-
-<!-- CHANGELOG SPLIT MARKER -->
-
 <a name="20.1.2"></a>
 
 # 20.1.2 (2025-07-23)
@@ -166,12 +250,6 @@
 | Commit                                                                                              | Type | Description                                                                   |
 | --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------------------- |
 | [0d0040bdf](https://github.com/angular/angular-cli/commit/0d0040bdf58a82e18f7669363b6f149313524bfc) | fix  | use crypto.randomUUID instead of Date.now for unique string in tmp file names |
-
-<!-- CHANGELOG SPLIT MARKER -->
-
-<a name="20.2.0-next.0"></a>
-
-# 20.2.0-next.0 (2025-07-16)
 
 <!-- CHANGELOG SPLIT MARKER -->
 

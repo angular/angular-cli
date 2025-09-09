@@ -52,7 +52,7 @@ export class KarmaExecutor implements TestExecutor {
       include: unitTestOptions.include,
       exclude: unitTestOptions.exclude,
       sourceMap: buildTargetOptions.sourceMap,
-      progress: buildTargetOptions.progress,
+      progress: unitTestOptions.buildProgress ?? buildTargetOptions.progress,
       watch: unitTestOptions.watch,
       poll: buildTargetOptions.poll,
       preserveSymlinks: buildTargetOptions.preserveSymlinks,

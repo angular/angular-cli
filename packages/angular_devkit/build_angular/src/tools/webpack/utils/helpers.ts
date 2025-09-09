@@ -7,9 +7,9 @@
  */
 
 import type { ObjectPattern } from 'copy-webpack-plugin';
-import glob from 'fast-glob';
 import { createHash } from 'node:crypto';
 import * as path from 'node:path';
+import { globSync } from 'tinyglobby';
 import type { Configuration, WebpackOptionsNormalized } from 'webpack';
 import {
   AssetPatternClass,
@@ -126,7 +126,7 @@ export function getInstrumentationExcludedPaths(
 
   for (const excludeGlob of excludedPaths) {
     const excludePath = excludeGlob[0] === '/' ? excludeGlob.slice(1) : excludeGlob;
-    glob.sync(excludePath, { cwd: root }).forEach((p) => excluded.add(path.join(root, p)));
+    globSync(excludePath, { cwd: root }).forEach((p) => excluded.add(path.join(root, p)));
   }
 
   return excluded;

@@ -22,7 +22,7 @@ import {
   strings,
   url,
 } from '@angular-devkit/schematics';
-import { Schema as ComponentOptions } from '../component/schema';
+import { Schema as ComponentOptions, Style as ComponentStyle } from '../component/schema';
 import {
   DependencyType,
   ExistingBehavior,
@@ -59,8 +59,15 @@ function addTsProjectReference(...paths: string[]) {
 
 export default function (options: ApplicationOptions): Rule {
   return async (host: Tree) => {
+    const isTailwind = options.style === Style.Tailwind;
+    if (isTailwind) {
+      options.style = Style.Css;
+    }
+
     const { appDir, appRootSelector, componentOptions, folderName, sourceDir } =
       await getAppOptions(host, options);
+
+    const suffix = options.fileNameStyleGuide === '2016' ? '.component' : '';
 
     return chain([
       addAppToWorkspaceFile(options, appDir),
@@ -103,6 +110,7 @@ export default function (options: ApplicationOptions): Rule {
             relativePathToWorkspaceRoot: relativePathToWorkspaceRoot(appDir),
             appName: options.name,
             folderName,
+            suffix,
           }),
           move(appDir),
         ]),
@@ -114,7 +122,7 @@ export default function (options: ApplicationOptions): Rule {
             ? filter((path) => !path.endsWith('tsconfig.spec.json.template'))
             : noop(),
           componentOptions.inlineTemplate
-            ? filter((path) => !path.endsWith('app.html.template'))
+            ? filter((path) => !path.endsWith('app__suffix__.html.template'))
             : noop(),
           applyTemplates({
             utils: strings,
@@ -123,6 +131,7 @@ export default function (options: ApplicationOptions): Rule {
             relativePathToWorkspaceRoot: relativePathToWorkspaceRoot(appDir),
             appName: options.name,
             folderName,
+            suffix,
           }),
           move(appDir),
         ]),
@@ -135,6 +144,12 @@ export default function (options: ApplicationOptions): Rule {
           })
         : noop(),
       options.skipPackageJson ? noop() : addDependenciesToPackageJson(options),
+      isTailwind
+        ? schematic('tailwind', {
+            project: options.name,
+            skipInstall: options.skipInstall,
+          })
+        : noop(),
     ]);
   };
 }
@@ -220,6 +235,20 @@ function addAppToWorkspaceFile(options: ApplicationOptions, appDir: string): Rul
     const schematicsWithStandalone = ['component', 'directive', 'pipe'];
     schematicsWithStandalone.forEach((type) => {
       ((schematics[`@schematics/angular:${type}`] ??= {}) as JsonObject).standalone = false;
+    });
+  }
+
+  if (options.fileNameStyleGuide === '2016') {
+    const schematicsWithTypeSymbols = ['component', 'directive', 'service'];
+    schematicsWithTypeSymbols.forEach((type) => {
+      const schematicDefaults = (schematics[`@schematics/angular:${type}`] ??= {}) as JsonObject;
+      schematicDefaults.type = type;
+      schematicDefaults.addTypeToClassName = false;
+    });
+
+    const schematicsWithTypeSeparator = ['guard', 'interceptor', 'module', 'pipe', 'resolver'];
+    schematicsWithTypeSeparator.forEach((type) => {
+      ((schematics[`@schematics/angular:${type}`] ??= {}) as JsonObject).typeSeparator = '.';
     });
   }
 
@@ -368,16 +397,21 @@ function getComponentOptions(options: ApplicationOptions): Partial<ComponentOpti
         inlineStyle: options.inlineStyle,
         inlineTemplate: options.inlineTemplate,
         skipTests: options.skipTests,
-        style: options.style,
+        style: options.style as unknown as ComponentStyle,
         viewEncapsulation: options.viewEncapsulation,
       }
     : {
         inlineStyle: options.inlineStyle ?? true,
         inlineTemplate: options.inlineTemplate ?? true,
         skipTests: true,
-        style: options.style,
+        style: options.style as unknown as ComponentStyle,
         viewEncapsulation: options.viewEncapsulation,
       };
+
+  if (options.fileNameStyleGuide === '2016') {
+    componentOptions.type = 'component';
+    componentOptions.addTypeToClassName = false;
+  }
 
   return componentOptions;
 }

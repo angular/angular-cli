@@ -15,6 +15,7 @@ import { BEST_PRACTICES_TOOL } from './tools/best-practices';
 import { DOC_SEARCH_TOOL } from './tools/doc-search';
 import { FIND_EXAMPLE_TOOL } from './tools/examples';
 import { MODERNIZE_TOOL } from './tools/modernize';
+import { ZONELESS_MIGRATION_TOOL } from './tools/onpush-zoneless-migration/zoneless-migration';
 import { LIST_PROJECTS_TOOL } from './tools/projects';
 import { AnyMcpToolDeclaration, registerTools } from './tools/tool-registry';
 
@@ -28,7 +29,11 @@ const STABLE_TOOLS = [BEST_PRACTICES_TOOL, DOC_SEARCH_TOOL, LIST_PROJECTS_TOOL] 
  * The set of tools that are available but not enabled by default.
  * These tools are considered experimental and may have limitations.
  */
-const EXPERIMENTAL_TOOLS = [FIND_EXAMPLE_TOOL, MODERNIZE_TOOL] as const;
+export const EXPERIMENTAL_TOOLS = [
+  FIND_EXAMPLE_TOOL,
+  MODERNIZE_TOOL,
+  ZONELESS_MIGRATION_TOOL,
+] as const;
 
 export async function createMcpServer(
   options: {
@@ -50,9 +55,34 @@ export async function createMcpServer(
         tools: {},
         logging: {},
       },
-      instructions:
-        'For Angular development, this server provides tools to adhere to best practices, search documentation, and find code examples. ' +
-        'When writing or modifying Angular code, use the MCP server and its tools instead of direct shell commands where possible.',
+      instructions: `
+<General Purpose>
+This server provides a safe, programmatic interface to the Angular CLI for an AI assistant.
+Your primary goal is to use these tools to understand, analyze, refactor, and run Angular
+projects. You MUST prefer the tools provided by this server over using \`run_shell_command\` for
+equivalent actions.
+</General Purpose>
+
+<Core Workflows & Tool Guide>
+* **1. Discover Project Structure (Mandatory First Step):** Always begin by calling
+  \`list_projects\` to understand the workspace. The outputs from this tool are often
+  required inputs for other tools.
+
+* **2. Write & Modify Code:** Before writing or changing code, you MUST consult the
+  \`get_best_practices\` tool to learn the current, non-negotiable coding standards.
+
+* **3. Answer User Questions:**
+    - For conceptual questions ("what is..."), use \`search_documentation\`.
+    - For code examples ("show me how to..."), use \`find_examples\`.
+</Core Workflows & Tool Guide>
+
+<Key Concepts>
+* **Workspace vs. Project:** A 'workspace' contains an \`angular.json\` file and defines 'projects'
+  (applications or libraries). A monorepo can have multiple workspaces.
+* **Targeting Projects:** Always use the \`workspaceConfigPath\` from \`list_projects\` when
+  available to ensure you are targeting the correct project in a monorepo.
+</Key Concepts>
+`,
     },
   );
 

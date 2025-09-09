@@ -58,7 +58,7 @@ describe('Ng New Schematic', () => {
     );
   });
 
-  it('should should set the prefix in angular.json and in app.ts', async () => {
+  it('should set the prefix in angular.json and in app.ts', async () => {
     const options = { ...defaultOptions, prefix: 'pre' };
 
     const tree = await schematicRunner.runSchematic('ng-new', options);
@@ -111,5 +111,59 @@ describe('Ng New Schematic', () => {
     const files = tree.files;
     expect(files).toContain('/bar/.gemini/GEMINI.md');
     expect(files).toContain('/bar/.claude/CLAUDE.md');
+  });
+
+  it('should create a tailwind project when style is tailwind', async () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const options = { ...defaultOptions, style: 'tailwind' as any };
+    const tree = await schematicRunner.runSchematic('ng-new', options);
+
+    expect(tree.exists('/bar/.postcssrc.json')).toBe(true);
+
+    const packageJson = JSON.parse(tree.readContent('/bar/package.json'));
+    expect(packageJson.devDependencies['tailwindcss']).toBeDefined();
+    expect(packageJson.devDependencies['postcss']).toBeDefined();
+    expect(packageJson.devDependencies['@tailwindcss/postcss']).toBeDefined();
+
+    const stylesContent = tree.readContent('/bar/src/styles.css');
+    expect(stylesContent).toContain('@import "tailwindcss";');
+  });
+
+  it(`should create files with file name style guide '2016'`, async () => {
+    const options = { ...defaultOptions, fileNameStyleGuide: '2016' };
+
+    const tree = await schematicRunner.runSchematic('ng-new', options);
+    const files = tree.files;
+    expect(files).toEqual(
+      jasmine.arrayContaining([
+        '/bar/src/app/app.component.css',
+        '/bar/src/app/app.component.html',
+        '/bar/src/app/app.component.spec.ts',
+        '/bar/src/app/app.component.ts',
+      ]),
+    );
+
+    const {
+      projects: {
+        'foo': { schematics },
+      },
+    } = JSON.parse(tree.readContent('/bar/angular.json'));
+    expect(schematics['@schematics/angular:component'].type).toBe('component');
+    expect(schematics['@schematics/angular:directive'].type).toBe('directive');
+    expect(schematics['@schematics/angular:service'].type).toBe('service');
+    expect(schematics['@schematics/angular:guard'].typeSeparator).toBe('.');
+    expect(schematics['@schematics/angular:interceptor'].typeSeparator).toBe('.');
+    expect(schematics['@schematics/angular:module'].typeSeparator).toBe('.');
+    expect(schematics['@schematics/angular:pipe'].typeSeparator).toBe('.');
+    expect(schematics['@schematics/angular:resolver'].typeSeparator).toBe('.');
+  });
+
+  it(`should not add type to class name when file name style guide is '2016'`, async () => {
+    const options = { ...defaultOptions, fileNameStyleGuide: '2016' };
+
+    const tree = await schematicRunner.runSchematic('ng-new', options);
+    const appComponentContent = tree.readContent('/bar/src/app/app.component.ts');
+    expect(appComponentContent).toContain('export class App {');
+    expect(appComponentContent).not.toContain('export class AppComponent {');
   });
 });

@@ -1,4 +1,4 @@
-load("//tools:defaults.bzl", "ts_project")
+load("@aspect_rules_js//js:defs.bzl", "js_library")
 
 # files fetched on 2025-08-01
 
@@ -14,8 +14,10 @@ exports_files([
     "LICENSE",
 ])
 
-ts_project(
+js_library(
     name = "TypeScript",
-    srcs = ["lib/typescript.d.ts"],
-    data = ["lib/typescript.js"],
+    srcs = [
+        "lib/typescript.d.ts",
+        "lib/typescript.js",
+    ],
 )

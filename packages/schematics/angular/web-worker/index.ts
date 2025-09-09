@@ -6,7 +6,6 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { join, normalize, tags } from '@angular-devkit/core';
 import {
   Rule,
   SchematicContext,
@@ -21,9 +20,11 @@ import {
   strings,
   url,
 } from '@angular-devkit/schematics';
+import { join } from 'node:path/posix';
 import { parseName } from '../utility/parse-name';
 import { relativePathToWorkspaceRoot } from '../utility/paths';
-import { buildDefaultPath, getWorkspace, updateWorkspace } from '../utility/workspace';
+import { createProjectSchematic } from '../utility/project';
+import { buildDefaultPath, updateWorkspace } from '../utility/workspace';
 import { Schema as WebWorkerOptions } from './schema';
 
 function addSnippet(options: WebWorkerOptions): Rule {
@@ -50,18 +51,18 @@ function addSnippet(options: WebWorkerOptions): Rule {
 
     const siblingModulePath = `${options.path}/${siblingModules[0]}`;
     const logMessage = 'console.log(`page got message: ${data}`);';
-    const workerCreationSnippet = tags.stripIndent`
-      if (typeof Worker !== 'undefined') {
-        // Create a new
-        const worker = new Worker(new URL('./${options.name}.worker', import.meta.url));
-        worker.onmessage = ({ data }) => {
-          ${logMessage}
-        };
-        worker.postMessage('hello');
-      } else {
-        // Web Workers are not supported in this environment.
-        // You should add a fallback so that your program still executes correctly.
-      }
+    const workerCreationSnippet = `
+if (typeof Worker !== 'undefined') {
+  // Create a new
+  const worker = new Worker(new URL('./${options.name}.worker', import.meta.url));
+  worker.onmessage = ({ data }) => {
+    ${logMessage}
+  };
+  worker.postMessage('hello');
+} else {
+  // Web Workers are not supported in this environment.
+  // You should add a fallback so that your program still executes correctly.
+}
     `;
 
     // Append the worker creation snippet.
@@ -72,67 +73,54 @@ function addSnippet(options: WebWorkerOptions): Rule {
   };
 }
 
-export default function (options: WebWorkerOptions): Rule {
-  return async (host: Tree) => {
-    const workspace = await getWorkspace(host);
+export default createProjectSchematic<WebWorkerOptions>((options, { project }) => {
+  const projectType = project.extensions['projectType'];
+  if (projectType !== 'application') {
+    throw new SchematicsException(`Web Worker requires a project type of "application".`);
+  }
 
-    if (!options.project) {
-      throw new SchematicsException('Option "project" is required.');
-    }
+  if (options.path === undefined) {
+    options.path = buildDefaultPath(project);
+  }
+  const parsedPath = parseName(options.path, options.name);
+  options.name = parsedPath.name;
+  options.path = parsedPath.path;
 
-    const project = workspace.projects.get(options.project);
-    if (!project) {
-      throw new SchematicsException(`Invalid project name (${options.project})`);
-    }
+  const templateSourceWorkerCode = apply(url('./files/worker'), [
+    applyTemplates({ ...options, ...strings }),
+    move(parsedPath.path),
+  ]);
 
-    const projectType = project.extensions['projectType'];
-    if (projectType !== 'application') {
-      throw new SchematicsException(`Web Worker requires a project type of "application".`);
-    }
+  const root = project.root || '';
+  const templateSourceWorkerConfig = apply(url('./files/worker-tsconfig'), [
+    applyTemplates({
+      ...options,
+      relativePathToWorkspaceRoot: relativePathToWorkspaceRoot(root),
+    }),
+    move(root),
+  ]);
 
-    if (options.path === undefined) {
-      options.path = buildDefaultPath(project);
-    }
-    const parsedPath = parseName(options.path, options.name);
-    options.name = parsedPath.name;
-    options.path = parsedPath.path;
+  return chain([
+    // Add project configuration.
+    updateWorkspace((workspace) => {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const project = workspace.projects.get(options.project)!;
+      const buildTarget = project.targets.get('build');
+      const testTarget = project.targets.get('test');
+      if (!buildTarget) {
+        throw new Error(`Build target is not defined for this project.`);
+      }
 
-    const templateSourceWorkerCode = apply(url('./files/worker'), [
-      applyTemplates({ ...options, ...strings }),
-      move(parsedPath.path),
-    ]);
-
-    const root = project.root || '';
-    const templateSourceWorkerConfig = apply(url('./files/worker-tsconfig'), [
-      applyTemplates({
-        ...options,
-        relativePathToWorkspaceRoot: relativePathToWorkspaceRoot(root),
-      }),
-      move(root),
-    ]);
-
-    return chain([
-      // Add project configuration.
-      updateWorkspace((workspace) => {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        const project = workspace.projects.get(options.project)!;
-        const buildTarget = project.targets.get('build');
-        const testTarget = project.targets.get('test');
-        if (!buildTarget) {
-          throw new Error(`Build target is not defined for this project.`);
-        }
-
-        const workerConfigPath = join(normalize(root), 'tsconfig.worker.json');
-        (buildTarget.options ??= {}).webWorkerTsConfig ??= workerConfigPath;
-        if (testTarget) {
-          (testTarget.options ??= {}).webWorkerTsConfig ??= workerConfigPath;
-        }
-      }),
-      // Create the worker in a sibling module.
-      options.snippet ? addSnippet(options) : noop(),
-      // Add the worker.
-      mergeWith(templateSourceWorkerCode),
-      mergeWith(templateSourceWorkerConfig),
-    ]);
-  };
-}
+      const workerConfigPath = join(root, 'tsconfig.worker.json');
+      (buildTarget.options ??= {}).webWorkerTsConfig ??= workerConfigPath;
+      if (testTarget) {
+        (testTarget.options ??= {}).webWorkerTsConfig ??= workerConfigPath;
+      }
+    }),
+    // Create the worker in a sibling module.
+    options.snippet ? addSnippet(options) : noop(),
+    // Add the worker.
+    mergeWith(templateSourceWorkerCode),
+    mergeWith(templateSourceWorkerConfig),
+  ]);
+});

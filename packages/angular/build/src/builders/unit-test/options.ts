@@ -33,7 +33,7 @@ export async function normalizeOptions(
   const buildTargetSpecifier = options.buildTarget ?? `::development`;
   const buildTarget = targetFromTargetString(buildTargetSpecifier, projectName, 'build');
 
-  const { tsConfig, runner, reporters, browsers } = options;
+  const { tsConfig, runner, reporters, browsers, progress } = options;
 
   return {
     // Project/workspace information
@@ -44,7 +44,7 @@ export async function normalizeOptions(
     // Target/configuration specified options
     buildTarget,
     include: options.include ?? ['**/*.spec.ts'],
-    exclude: options.exclude ?? [],
+    exclude: options.exclude,
     runnerName: runner,
     codeCoverage: options.codeCoverage
       ? {
@@ -57,6 +57,7 @@ export async function normalizeOptions(
         }
       : undefined,
     tsConfig,
+    buildProgress: progress,
     reporters,
     browsers,
     watch: options.watch ?? isTTY(),

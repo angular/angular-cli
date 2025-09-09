@@ -46,12 +46,30 @@ function createTestBedInitVirtualFile(
   `;
 }
 
+function adjustOutputHashing(hashing?: OutputHashing): OutputHashing {
+  switch (hashing) {
+    case OutputHashing.All:
+    case OutputHashing.Media:
+      // Ensure media is continued to be hashed to avoid overwriting of output media files
+      return OutputHashing.Media;
+    default:
+      return OutputHashing.None;
+  }
+}
+
 export async function getVitestBuildOptions(
   options: NormalizedUnitTestBuilderOptions,
   baseBuildOptions: Partial<ApplicationBuilderInternalOptions>,
 ): Promise<RunnerOptions> {
-  const { workspaceRoot, projectSourceRoot, include, exclude, watch, tsConfig, providersFile } =
-    options;
+  const {
+    workspaceRoot,
+    projectSourceRoot,
+    include,
+    exclude = [],
+    watch,
+    tsConfig,
+    providersFile,
+  } = options;
 
   // Find test files
   const testFiles = await findTests(include, exclude, workspaceRoot, projectSourceRoot);
@@ -64,7 +82,11 @@ export async function getVitestBuildOptions(
     );
   }
 
-  const entryPoints = getTestEntrypoints(testFiles, { projectSourceRoot, workspaceRoot });
+  const entryPoints = getTestEntrypoints(testFiles, {
+    projectSourceRoot,
+    workspaceRoot,
+    removeTestExtension: true,
+  });
   entryPoints.set('init-testbed', 'angular:test-bed-init');
 
   const buildOptions: Partial<ApplicationBuilderInternalOptions> = {
@@ -82,7 +104,7 @@ export async function getVitestBuildOptions(
     ssr: false,
     prerender: false,
     sourceMap: { scripts: true, vendor: false, styles: false },
-    outputHashing: OutputHashing.None,
+    outputHashing: adjustOutputHashing(baseBuildOptions.outputHashing),
     optimization: false,
     tsConfig,
     entryPoints,

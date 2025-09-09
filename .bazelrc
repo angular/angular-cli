@@ -16,6 +16,9 @@ test:debug --test_arg=--node_options=--inspect-brk --test_output=streamed --test
 # The below is useful to while using `fit` and `fdescribe` to avoid sharing and re-runs of failed flaky tests.
 test:no-sharding --flaky_test_attempts=1 --test_sharding_strategy=disabled
 
+# Frozen lockfile
+common --lockfile_mode=error
+
 ###############################
 # Filesystem interactions     #
 ###############################
