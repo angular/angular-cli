@@ -116,6 +116,18 @@ const findExampleOutputSchema = z.object({
           'A complete, self-contained Angular code example in Markdown format. This should be ' +
             'presented to the user inside a markdown code block.',
         ),
+      snippet: z
+        .string()
+        .optional()
+        .describe(
+          'A contextual snippet from the content showing the matched search term. This field is ' +
+            'critical for efficiently evaluating a result`s relevance. It enables two primary ' +
+            'workflows:\n\n' +
+            '1. For direct questions: You can internally review snippets to select the single best ' +
+            'result before generating a comprehensive answer from its full `content`.\n' +
+            '2. For ambiguous or exploratory questions: You can present a summary of titles and ' +
+            'snippets to the user, allowing them to guide the next step.',
+        ),
     }),
   ),
 });
@@ -196,7 +208,11 @@ async function createFindExampleHandler({ exampleDatabasePath }: McpToolContext)
     // Build the query dynamically
     const params: SQLInputValue[] = [];
     let sql =
-      'SELECT title, summary, keywords, required_packages, related_concepts, related_tools, content FROM examples_fts';
+      'SELECT title, summary, keywords, required_packages, related_concepts, related_tools, content, ' +
+      // The `snippet` function generates a contextual snippet of the matched text.
+      // Column 6 is the `content` column. We highlight matches with asterisks and limit the snippet size.
+      "snippet(examples_fts, 6, '**', '**', '...', 15) AS snippet " +
+      'FROM examples_fts';
     const whereClauses = [];
 
     // FTS query
@@ -248,11 +264,16 @@ async function createFindExampleHandler({ exampleDatabasePath }: McpToolContext)
         related_concepts: JSON.parse(record['related_concepts'] || '[]') as string[],
         related_tools: JSON.parse(record['related_tools'] || '[]') as string[],
         content: record['content'],
+        snippet: record['snippet'],
       };
       examples.push(example);
 
       // Also create a more structured text output
-      const text = `## Example: ${example.title}\n**Summary:** ${example.summary}\n\n---\n\n${example.content}`;
+      let text = `## Example: ${example.title}\n**Summary:** ${example.summary}`;
+      if (example.snippet) {
+        text += `\n**Snippet:** ${example.snippet}`;
+      }
+      text += `\n\n---\n\n${example.content}`;
       textContent.push({ type: 'text' as const, text });
     }
 
