@@ -90,7 +90,7 @@ jobs:
 
   test:
     needs: build
-    runs-on: ubuntu-latest-16core
+    runs-on: ubuntu-latest
     steps:
       - name: Initialize environment
         uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@3186a078ec23edea6e2f6192ed013ec57bd95f87
