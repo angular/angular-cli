@@ -12,7 +12,7 @@ import { renderApplication, renderModule, ɵSERVER_CONTEXT } from '@angular/plat
 import * as fs from 'node:fs';
 import { dirname, join, normalize, resolve } from 'node:path';
 import { URL } from 'node:url';
-import { InlineCriticalCssProcessor, InlineCriticalCssResult } from './inline-css-processor';
+import { CommonEngineInlineCriticalCssProcessor } from './inline-css-processor';
 import {
   noopRunMethodAndMeasurePerf,
   printPerformanceLogs,
@@ -27,6 +27,7 @@ export interface CommonEngineOptions {
 
   /** A set of platform level providers for all requests. */
   providers?: StaticProvider[];
+
   /** Enable request performance profiling data collection and printing the results in the server console. */
   enablePerformanceProfiler?: boolean;
 }
@@ -34,16 +35,19 @@ export interface CommonEngineOptions {
 export interface CommonEngineRenderOptions {
   /** A method that when invoked returns a promise that returns an `ApplicationRef` instance once resolved or an NgModule. */
   bootstrap?: Type<{}> | (() => Promise<ApplicationRef>);
+
   /** A set of platform level providers for the current request. */
   providers?: StaticProvider[];
   url?: string;
   document?: string;
   documentFilePath?: string;
+
   /**
    * Reduce render blocking requests by inlining critical CSS.
    * Defaults to true.
    */
   inlineCriticalCss?: boolean;
+
   /**
    * Base path location of index file.
    * Defaults to the 'documentFilePath' dirname when not provided.
@@ -57,14 +61,10 @@ export interface CommonEngineRenderOptions {
 
 export class CommonEngine {
   private readonly templateCache = new Map<string, string>();
-  private readonly inlineCriticalCssProcessor: InlineCriticalCssProcessor;
+  private readonly inlineCriticalCssProcessor = new CommonEngineInlineCriticalCssProcessor();
   private readonly pageIsSSG = new Map<string, boolean>();
 
-  constructor(private options?: CommonEngineOptions) {
-    this.inlineCriticalCssProcessor = new InlineCriticalCssProcessor({
-      minify: false,
-    });
-  }
+  constructor(private options?: CommonEngineOptions) {}
 
   /**
    * Render an HTML document for a specific URL with specified
@@ -83,17 +83,12 @@ export class CommonEngine {
       html = await runMethod('Render Page', () => this.renderApplication(opts));
 
       if (opts.inlineCriticalCss !== false) {
-        const { content, errors, warnings } = await runMethod('Inline Critical CSS', () =>
+        const content = await runMethod('Inline Critical CSS', () =>
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           this.inlineCriticalCss(html!, opts),
         );
 
         html = content;
-
-        // eslint-disable-next-line no-console
-        warnings?.forEach((m) => console.warn(m));
-        // eslint-disable-next-line no-console
-        errors?.forEach((m) => console.error(m));
       }
     }
 
@@ -104,13 +99,11 @@ export class CommonEngine {
     return html;
   }
 
-  private inlineCriticalCss(
-    html: string,
-    opts: CommonEngineRenderOptions,
-  ): Promise<InlineCriticalCssResult> {
-    return this.inlineCriticalCssProcessor.process(html, {
-      outputPath: opts.publicPath ?? (opts.documentFilePath ? dirname(opts.documentFilePath) : ''),
-    });
+  private inlineCriticalCss(html: string, opts: CommonEngineRenderOptions): Promise<string> {
+    const outputPath =
+      opts.publicPath ?? (opts.documentFilePath ? dirname(opts.documentFilePath) : '');
+
+    return this.inlineCriticalCssProcessor.process(html, outputPath);
   }
 
   private async retrieveSSGPage(opts: CommonEngineRenderOptions): Promise<string | undefined> {

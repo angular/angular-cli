@@ -7,6 +7,7 @@
  */
 
 import type { ApplicationRef, StaticProvider, Type } from '@angular/core';
+import type { BootstrapContext } from '@angular/platform-browser';
 import type { renderApplication, renderModule, ɵSERVER_CONTEXT } from '@angular/platform-server';
 import assert from 'node:assert';
 import { workerData } from 'node:worker_threads';
@@ -119,7 +120,9 @@ async function render({ serverBundlePath, document, url }: RenderRequest): Promi
   return Promise.race([renderAppPromise, renderingTimeout]).finally(() => clearTimeout(timer));
 }
 
-function isBootstrapFn(value: unknown): value is () => Promise<ApplicationRef> {
+function isBootstrapFn(
+  value: unknown,
+): value is (context: BootstrapContext) => Promise<ApplicationRef> {
   // We can differentiate between a module and a bootstrap function by reading compiler-generated `ɵmod` static property:
   return typeof value === 'function' && !('ɵmod' in value);
 }

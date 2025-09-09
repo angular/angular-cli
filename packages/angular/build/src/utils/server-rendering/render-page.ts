@@ -7,6 +7,7 @@
  */
 
 import type { ApplicationRef, StaticProvider } from '@angular/core';
+import type { BootstrapContext } from '@angular/platform-browser';
 import assert from 'node:assert';
 import { basename } from 'node:path';
 import { loadEsmModuleFromMemory } from './load-esm-from-memory';
@@ -139,7 +140,9 @@ export async function renderPage({
   };
 }
 
-function isBootstrapFn(value: unknown): value is () => Promise<ApplicationRef> {
+function isBootstrapFn(
+  value: unknown,
+): value is (context: BootstrapContext) => Promise<ApplicationRef> {
   // We can differentiate between a module and a bootstrap function by reading compiler-generated `ɵmod` static property:
   return typeof value === 'function' && !('ɵmod' in value);
 }
