@@ -7,6 +7,7 @@
  */
 
 import type { ApplicationRef, Type } from '@angular/core';
+import type { BootstrapContext } from '@angular/platform-browser';
 import type { ɵgetRoutesFromAngularRouterConfig } from '@angular/ssr';
 import assert from 'node:assert';
 import * as fs from 'node:fs';
@@ -25,7 +26,7 @@ interface ServerBundleExports {
   AppServerModule?: Type<unknown>;
 
   /** Standalone application bootstrapping function. */
-  default?: (() => Promise<ApplicationRef>) | Type<unknown>;
+  default?: ((context: BootstrapContext) => Promise<ApplicationRef>) | Type<unknown>;
 
   /** Method to extract routes from the router config. */
   ɵgetRoutesFromAngularRouterConfig: typeof ɵgetRoutesFromAngularRouterConfig;
