@@ -219,6 +219,7 @@ async function initialize(
           {
             plugins: [
               new webpack.DefinePlugin({
+                'ngJitMode': false,
                 'ngServerMode': true,
               }),
             ],
