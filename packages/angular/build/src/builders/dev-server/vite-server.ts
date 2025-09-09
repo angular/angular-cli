@@ -320,6 +320,7 @@ export async function* serveWithVite(
         extensions?.middleware,
         transformers?.indexHtml,
         thirdPartySourcemaps,
+        !!browserOptions.aot,
       );
 
       server = await createServer(serverConfiguration);
@@ -503,6 +504,7 @@ export async function setupServer(
   extensionMiddleware?: Connect.NextHandleFunction[],
   indexHtmlTransformer?: (content: string) => Promise<string>,
   thirdPartySourcemaps = false,
+  aot = false,
 ): Promise<InlineConfig> {
   const proxy = await loadProxyConfiguration(
     serverOptions.workspaceRoot,
@@ -589,6 +591,7 @@ export async function setupServer(
         // Include all implict dependencies from the external packages internal option
         include: externalMetadata.implicitServer,
         ssr: true,
+        aot,
         prebundleTransformer,
         zoneless,
         target,
@@ -625,6 +628,7 @@ export async function setupServer(
       zoneless,
       loader: prebundleLoaderExtensions,
       thirdPartySourcemaps,
+      aot,
     }),
   };
 
@@ -663,6 +667,7 @@ function getDepOptimizationConfig({
   ssr,
   loader,
   thirdPartySourcemaps,
+  aot,
 }: {
   disabled: boolean;
   exclude: string[];
@@ -673,6 +678,7 @@ function getDepOptimizationConfig({
   zoneless: boolean;
   loader?: EsbuildLoaderOption;
   thirdPartySourcemaps: boolean;
+  aot: boolean;
 }): DepOptimizationConfig {
   const plugins: ViteEsBuildPlugin[] = [
     {
@@ -704,6 +710,9 @@ function getDepOptimizationConfig({
       supported: getFeatureSupport(target, zoneless),
       plugins,
       loader,
+      define: {
+        'ngJitMode': aot ? 'false' : 'true',
+      },
       resolveExtensions: ['.mjs', '.js', '.cjs'],
     },
   };
