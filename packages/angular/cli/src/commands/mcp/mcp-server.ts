@@ -23,17 +23,18 @@ import { AnyMcpToolDeclaration, registerTools } from './tools/tool-registry';
  * The set of tools that are enabled by default for the MCP server.
  * These tools are considered stable and suitable for general use.
  */
-const STABLE_TOOLS = [BEST_PRACTICES_TOOL, DOC_SEARCH_TOOL, LIST_PROJECTS_TOOL] as const;
+const STABLE_TOOLS = [
+  BEST_PRACTICES_TOOL,
+  DOC_SEARCH_TOOL,
+  FIND_EXAMPLE_TOOL,
+  LIST_PROJECTS_TOOL,
+] as const;
 
 /**
  * The set of tools that are available but not enabled by default.
  * These tools are considered experimental and may have limitations.
  */
-export const EXPERIMENTAL_TOOLS = [
-  FIND_EXAMPLE_TOOL,
-  MODERNIZE_TOOL,
-  ZONELESS_MIGRATION_TOOL,
-] as const;
+export const EXPERIMENTAL_TOOLS = [MODERNIZE_TOOL, ZONELESS_MIGRATION_TOOL] as const;
 
 export async function createMcpServer(
   options: {
