@@ -10,7 +10,7 @@ import type { BuilderOutput } from '@angular-devkit/architect';
 import assert from 'node:assert';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
-import type { InlineConfig, Vitest } from 'vitest/node';
+import type { InlineConfig, Vitest, VitestPlugin } from 'vitest/node';
 import { assertIsError } from '../../../../utils/error';
 import { loadEsmModule } from '../../../../utils/load-esm';
 import { toPosixPath } from '../../../../utils/path';
@@ -26,6 +26,7 @@ import type { TestExecutor } from '../api';
 import { setupBrowserConfiguration } from './browser-provider';
 
 type VitestCoverageOption = Exclude<InlineConfig['coverage'], undefined>;
+type VitestPlugins = Awaited<ReturnType<typeof VitestPlugin>>;
 
 export class VitestExecutor implements TestExecutor {
   private vitest: Vitest | undefined;
@@ -137,8 +138,8 @@ export class VitestExecutor implements TestExecutor {
   private createVitestPlugins(
     testSetupFiles: string[],
     browserOptions: Awaited<ReturnType<typeof setupBrowserConfiguration>>,
-  ): NonNullable<import('vite').PluginOption>[] {
-    const { workspaceRoot, codeCoverage } = this.options;
+  ): VitestPlugins {
+    const { workspaceRoot } = this.options;
 
     return [
       {
@@ -149,7 +150,7 @@ export class VitestExecutor implements TestExecutor {
           // Create a subproject that can be configured with plugins for browser mode.
           // Plugins defined directly in the vite overrides will not be present in the
           // browser specific Vite instance.
-          const [project] = await context.injectTestProjects({
+          await context.injectTestProjects({
             test: {
               name: this.projectName,
               root: workspaceRoot,
