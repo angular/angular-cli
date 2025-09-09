@@ -91,16 +91,20 @@ export function setAngularAppTestingManifest(
       `,
       },
     },
-    bootstrap: async () => () => {
-      return bootstrapApplication(rootComponent, {
-        providers: [
-          provideServerRendering(),
-          provideExperimentalZonelessChangeDetection(),
-          provideRouter(routes),
-          provideServerRouting(serverRoutes),
-          ...extraProviders,
-        ],
-      });
+    bootstrap: async () => (context) => {
+      return bootstrapApplication(
+        rootComponent,
+        {
+          providers: [
+            provideServerRendering(),
+            provideExperimentalZonelessChangeDetection(),
+            provideRouter(routes),
+            provideServerRouting(serverRoutes),
+            ...extraProviders,
+          ],
+        },
+        context,
+      );
     },
   });
 }

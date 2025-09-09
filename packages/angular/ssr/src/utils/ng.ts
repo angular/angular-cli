@@ -8,6 +8,7 @@
 
 import { ɵConsole } from '@angular/core';
 import type { ApplicationRef, StaticProvider, Type } from '@angular/core';
+import { BootstrapContext } from '@angular/platform-browser';
 import {
   ɵSERVER_CONTEXT as SERVER_CONTEXT,
   renderApplication,
@@ -23,7 +24,9 @@ import { stripIndexHtmlFromURL } from './url';
  * - A reference to an Angular component or module (`Type<unknown>`) that serves as the root of the application.
  * - A function that returns a `Promise<ApplicationRef>`, which resolves with the root application reference.
  */
-export type AngularBootstrap = Type<unknown> | (() => Promise<ApplicationRef>);
+export type AngularBootstrap =
+  | Type<unknown>
+  | ((context: BootstrapContext) => Promise<ApplicationRef>);
 
 /**
  * Renders an Angular application or module to an HTML string.

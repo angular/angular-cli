@@ -629,7 +629,7 @@ export async function getRoutesFromAngularRouterConfig(
       const moduleRef = await platformRef.bootstrapModule(bootstrap);
       applicationRef = moduleRef.injector.get(ApplicationRef);
     } else {
-      applicationRef = await bootstrap();
+      applicationRef = await bootstrap({ platformRef });
     }
 
     const injector = applicationRef.injector;

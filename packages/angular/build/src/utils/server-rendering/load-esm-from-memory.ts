@@ -7,6 +7,7 @@
  */
 
 import type { ApplicationRef, Type } from '@angular/core';
+import type { BootstrapContext } from '@angular/platform-browser';
 import type { ɵextractRoutesAndCreateRouteTree, ɵgetOrCreateAngularServerApp } from '@angular/ssr';
 import { assertIsError } from '../error';
 import { loadEsmModule } from '../load-esm';
@@ -15,7 +16,7 @@ import { loadEsmModule } from '../load-esm';
  * Represents the exports available from the main server bundle.
  */
 interface MainServerBundleExports {
-  default: (() => Promise<ApplicationRef>) | Type<unknown>;
+  default: ((context: BootstrapContext) => Promise<ApplicationRef>) | Type<unknown>;
   ɵextractRoutesAndCreateRouteTree: typeof ɵextractRoutesAndCreateRouteTree;
   ɵgetOrCreateAngularServerApp: typeof ɵgetOrCreateAngularServerApp;
 }

@@ -87,6 +87,7 @@ ts_project(
         "//:node_modules/@angular/compiler-cli",
         "//:node_modules/@angular/core",
         "//:node_modules/@angular/localize",
+        "//:node_modules/@angular/platform-browser",
         "//:node_modules/@angular/platform-server",
         "//:node_modules/@angular/service-worker",
         "//:node_modules/@babel/core",

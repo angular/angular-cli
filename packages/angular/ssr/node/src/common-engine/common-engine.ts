@@ -7,6 +7,7 @@
  */
 
 import { ApplicationRef, StaticProvider, Type } from '@angular/core';
+import { BootstrapContext } from '@angular/platform-browser';
 import { renderApplication, renderModule, ɵSERVER_CONTEXT } from '@angular/platform-server';
 import * as fs from 'node:fs';
 import { dirname, join, normalize, resolve } from 'node:path';
@@ -22,7 +23,7 @@ const SSG_MARKER_REGEXP = /ng-server-context=["']\w*\|?ssg\|?\w*["']/;
 
 export interface CommonEngineOptions {
   /** A method that when invoked returns a promise that returns an `ApplicationRef` instance once resolved or an NgModule. */
-  bootstrap?: Type<{}> | (() => Promise<ApplicationRef>);
+  bootstrap?: Type<{}> | ((context: BootstrapContext) => Promise<ApplicationRef>);
 
   /** A set of platform level providers for all requests. */
   providers?: StaticProvider[];
@@ -33,7 +34,7 @@ export interface CommonEngineOptions {
 
 export interface CommonEngineRenderOptions {
   /** A method that when invoked returns a promise that returns an `ApplicationRef` instance once resolved or an NgModule. */
-  bootstrap?: Type<{}> | (() => Promise<ApplicationRef>);
+  bootstrap?: Type<{}> | ((context: BootstrapContext) => Promise<ApplicationRef>);
 
   /** A set of platform level providers for the current request. */
   providers?: StaticProvider[];
@@ -194,7 +195,9 @@ async function exists(path: fs.PathLike): Promise<boolean> {
   }
 }
 
-function isBootstrapFn(value: unknown): value is () => Promise<ApplicationRef> {
+function isBootstrapFn(
+  value: unknown,
+): value is (context: BootstrapContext) => Promise<ApplicationRef> {
   // We can differentiate between a module and a bootstrap function by reading compiler-generated `ɵmod` static property:
   return typeof value === 'function' && !('ɵmod' in value);
 }
