@@ -1,6 +1,6 @@
 {
   "name": "@angular/devkit-repo",
-  "version": "20.2.2",
+  "version": "20.3.0-next.0",
   "private": true,
   "description": "Software Development Kit for Angular",
   "keywords": [
@@ -174,5 +174,6 @@
   },
   "resolutions": {
     "typescript": "5.9.2"
-  }
+  },
+  "__ngDevExceptionalMinor__": true
 }
