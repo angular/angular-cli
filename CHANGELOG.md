@@ -1,3 +1,46 @@
+<a name="18.2.21"></a>
+
+# 18.2.21 (2025-09-10)
+
+## Breaking Changes
+
+### @angular/ssr
+
+- The server-side bootstrapping process has been changed to eliminate the reliance on a global platform injector.
+
+  Before:
+
+  ```ts
+  const bootstrap = () => bootstrapApplication(AppComponent, config);
+  ```
+
+  After:
+
+  ```ts
+  const bootstrap = (context: BootstrapContext) =>
+    bootstrapApplication(AppComponent, config, context);
+  ```
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                    |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------ |
+| [700e6bc01](https://github.com/angular/angular-cli/commit/700e6bc0177a3e345a88e31be22496cc3054349b) | fix  | avoid extra tick in SSR builds |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                               |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------- |
+| [cccc91b91](https://github.com/angular/angular-cli/commit/cccc91b919b4a8365efce9ee691940e351349075) | fix  | avoid extra tick in SSR dev-server builds |
+
+### @angular/ssr
+
+| Commit                                                                                              | Type | Description                                                   |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------- |
+| [4af385201](https://github.com/angular/angular-cli/commit/4af385201bf8ba05352faec26c6efa866b69d999) | feat | introduce BootstrapContext for isolated server-side rendering |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="19.2.16"></a>
 
 # 19.2.16 (2025-09-10)
