@@ -1,3 +1,58 @@
+<a name="20.3.0-rc.0"></a>
+
+# 20.3.0-rc.0 (2025-09-10)
+
+## Breaking Changes
+
+### @angular/ssr
+
+- The server-side bootstrapping process has been changed to eliminate the reliance on a global platform injector.
+
+  Before:
+
+  ```ts
+  const bootstrap = () => bootstrapApplication(AppComponent, config);
+  ```
+
+  After:
+
+  ```ts
+  const bootstrap = (context: BootstrapContext) =>
+    bootstrapApplication(AppComponent, config, context);
+  ```
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                      |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------- |
+| [ef20a278d](https://github.com/angular/angular-cli/commit/ef20a278d1455b9cdffc5102b13d0b2206ef1ecb) | fix  | align labels in ai-config schema |
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                                 |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------- |
+| [f6ad41c13](https://github.com/angular/angular-cli/commit/f6ad41c134c7ae938ccda908967e7cc863b3db16) | fix  | improve bun lockfile detection and optimize lockfile checks |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                    |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------ |
+| [1a7890873](https://github.com/angular/angular-cli/commit/1a789087344aa94d061839122e6a63efbfc9c905) | fix  | avoid extra tick in SSR builds |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                                  |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------ |
+| [5d46d6ec1](https://github.com/angular/angular-cli/commit/5d46d6ec114052715a8bd17761a4f258961ad26b) | fix  | preserve names in esbuild for improved debugging in dev mode |
+
+### @angular/ssr
+
+| Commit                                                                                              | Type | Description                                                   |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------- |
+| [7eacb4187](https://github.com/angular/angular-cli/commit/7eacb41878f5fdac8d40aedfcca6794b77eda5ff) | feat | introduce BootstrapContext for isolated server-side rendering |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="21.0.0-next.2"></a>
 
 # 21.0.0-next.2 (2025-09-03)
