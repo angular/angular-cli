@@ -1,3 +1,46 @@
+<a name="18.2.21"></a>
+
+# 18.2.21 (2025-09-10)
+
+## Breaking Changes
+
+### @angular/ssr
+
+- The server-side bootstrapping process has been changed to eliminate the reliance on a global platform injector.
+
+  Before:
+
+  ```ts
+  const bootstrap = () => bootstrapApplication(AppComponent, config);
+  ```
+
+  After:
+
+  ```ts
+  const bootstrap = (context: BootstrapContext) =>
+    bootstrapApplication(AppComponent, config, context);
+  ```
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                    |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------ |
+| [700e6bc01](https://github.com/angular/angular-cli/commit/700e6bc0177a3e345a88e31be22496cc3054349b) | fix  | avoid extra tick in SSR builds |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                               |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------- |
+| [cccc91b91](https://github.com/angular/angular-cli/commit/cccc91b919b4a8365efce9ee691940e351349075) | fix  | avoid extra tick in SSR dev-server builds |
+
+### @angular/ssr
+
+| Commit                                                                                              | Type | Description                                                   |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------- |
+| [4af385201](https://github.com/angular/angular-cli/commit/4af385201bf8ba05352faec26c6efa866b69d999) | feat | introduce BootstrapContext for isolated server-side rendering |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="18.2.20"></a>
 
 # 18.2.20 (2025-06-11)
@@ -3512,7 +3555,6 @@ Alan Agius, Charles Lyding and Doug Parker
 ### @angular/cli
 
 - Several changes to the `ng analytics` command syntax.
-
   - `ng analytics project <setting>` has been replaced with `ng analytics <setting>`
   - `ng analytics <setting>` has been replaced with `ng analytics <setting> --global`
 
@@ -3523,7 +3565,6 @@ Alan Agius, Charles Lyding and Doug Parker
 - `--configuration` cannot be used with `ng run`. Provide the configuration as part of the target. Ex: `ng run project:builder:configuration`.
 - Deprecated `ng x18n` and `ng i18n-extract` commands have been removed in favor of `ng extract-i18n`.
 - Several changes in the Angular CLI commands and arguments handling.
-
   - `ng help` has been removed in favour of the `—-help` option.
   - `ng —-version` has been removed in favour of `ng version` and `ng v`.
   - Deprecated camel cased arguments are no longer supported. Ex. using `—-sourceMap` instead of `—-source-map` will result in an error.
@@ -3543,7 +3584,6 @@ Alan Agius, Charles Lyding and Doug Parker
 - `browser` and `karma` builders `script` and `styles` options input files extensions are now validated.
 
   Valid extensions for `scripts` are:
-
   - `.js`
   - `.cjs`
   - `.mjs`
@@ -3552,7 +3592,6 @@ Alan Agius, Charles Lyding and Doug Parker
   - `.mjsx`
 
   Valid extensions for `styles` are:
-
   - `.css`
   - `.less`
   - `.sass`
@@ -3595,7 +3634,6 @@ Alan Agius, Charles Lyding and Doug Parker
 ### @ngtools/webpack
 
 - `ivy` namespace has been removed from the public API.
-
   - `ivy.AngularWebpackPlugin` -> `AngularWebpackPlugin`
   - `ivy.AngularPluginOptions` -> `AngularPluginOptions`
 
