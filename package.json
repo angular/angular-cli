@@ -26,6 +26,7 @@
     "public-api:update": "node goldens/public-api/manage.js accept",
     "ts-circular-deps": "pnpm -s ng-dev ts-circular-deps --config ./scripts/circular-deps-test.conf.mjs",
     "check-tooling-setup": "tsc --project .ng-dev/tsconfig.json",
+    "check-mcp-examples": "node tools/process_examples.mjs packages/angular/cli/lib/examples --mode validate-structure",
     "diff-release-package": "node --no-warnings=ExperimentalWarning --loader ts-node/esm/transpile-only scripts/diff-release-package.mts"
   },
   "repository": {
@@ -124,6 +125,7 @@
     "listr2": "9.0.3",
     "lodash": "^4.17.21",
     "magic-string": "0.30.19",
+    "marked": "^16.2.1",
     "npm": "^11.0.0",
     "prettier": "^3.0.0",
     "protractor": "~7.0.0",
