@@ -5,6 +5,7 @@
 ```ts
 
 import { ApplicationRef } from '@angular/core';
+import { BootstrapContext } from '@angular/platform-browser';
 import { StaticProvider } from '@angular/core';
 import { Type } from '@angular/core';
 
@@ -16,14 +17,14 @@ export class CommonEngine {
 
 // @public (undocumented)
 export interface CommonEngineOptions {
-    bootstrap?: Type<{}> | (() => Promise<ApplicationRef>);
+    bootstrap?: Type<{}> | ((context: BootstrapContext) => Promise<ApplicationRef>);
     enablePerformanceProfiler?: boolean;
     providers?: StaticProvider[];
 }
 
 // @public (undocumented)
 export interface CommonEngineRenderOptions {
-    bootstrap?: Type<{}> | (() => Promise<ApplicationRef>);
+    bootstrap?: Type<{}> | ((context: BootstrapContext) => Promise<ApplicationRef>);
     // (undocumented)
     document?: string;
     // (undocumented)

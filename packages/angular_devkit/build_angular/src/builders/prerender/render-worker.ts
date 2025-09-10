@@ -43,7 +43,7 @@ interface ServerBundleExports {
   renderApplication?: typeof renderApplication;
 
   /** Standalone application bootstrapping function. */
-  default?: (() => Promise<ApplicationRef>) | Type<unknown>;
+  default?: ((context: BootstrapContext) => Promise<ApplicationRef>) | Type<unknown>;
 }
 
 /**

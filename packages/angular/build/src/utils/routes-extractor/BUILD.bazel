@@ -19,6 +19,7 @@ ts_library(
     prodmode_module = "es2015",
     deps = [
         "@npm//@angular/core",
+        "@npm//@angular/platform-browser",
         "@npm//@angular/platform-server",
         "@npm//@angular/router",
         "@npm//@types/node",

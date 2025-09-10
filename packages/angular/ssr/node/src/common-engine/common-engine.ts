@@ -34,7 +34,7 @@ export interface CommonEngineOptions {
 
 export interface CommonEngineRenderOptions {
   /** A method that when invoked returns a promise that returns an `ApplicationRef` instance once resolved or an NgModule. */
-  bootstrap?: Type<{}> | (() => Promise<ApplicationRef>);
+  bootstrap?: Type<{}> | ((context: BootstrapContext) => Promise<ApplicationRef>);
 
   /** A set of platform level providers for the current request. */
   providers?: StaticProvider[];
