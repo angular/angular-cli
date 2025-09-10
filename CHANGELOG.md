@@ -1,3 +1,72 @@
+<a name="21.0.0-next.3"></a>
+
+# 21.0.0-next.3 (2025-09-10)
+
+## Breaking Changes
+
+### @angular/build
+
+- - TypeScript versions older than 5.9 are no longer supported.
+
+### @angular/ssr
+
+- The server-side bootstrapping process has been changed to eliminate the reliance on a global platform injector.
+
+  Before:
+
+  ```ts
+  const bootstrap = () => bootstrapApplication(AppComponent, config);
+  ```
+
+  After:
+
+  ```ts
+  const bootstrap = (context: BootstrapContext) =>
+    bootstrapApplication(AppComponent, config, context);
+  ```
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                 |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------- |
+| [ddebe3d4f](https://github.com/angular/angular-cli/commit/ddebe3d4fc35486a57f4051fdd4493caba4e6c07) | fix  | align labels in ai-config schema            |
+| [8e6e0a293](https://github.com/angular/angular-cli/commit/8e6e0a2931bfb178e77cf2c9ca7f92a56c673449) | fix  | remove explicit flag for host bindings      |
+| [b983ea8e5](https://github.com/angular/angular-cli/commit/b983ea8e5107420a910dbbc05c6b74f0ff6fbddd) | fix  | respect skip-install for tailwind schematic |
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                                 |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------- |
+| [d014630fa](https://github.com/angular/angular-cli/commit/d014630fad765ae3928b698122038cbe00d37102) | feat | add advanced filtering to MCP example search                |
+| [1ee9ce3c9](https://github.com/angular/angular-cli/commit/1ee9ce3c93caff419f8095a91cf58601e3df3f74) | feat | promote MCP `find_examples` tool to a stable tool           |
+| [dbf1aaf70](https://github.com/angular/angular-cli/commit/dbf1aaf70bc3e3dd0de05d760bafacc43b34dce8) | fix  | add snippet support to example search MCP tool              |
+| [11cee1acb](https://github.com/angular/angular-cli/commit/11cee1acb59afbad1ef88d8340b5438f7dbefe57) | fix  | correct boolean parsing in MCP example front matter         |
+| [def412a55](https://github.com/angular/angular-cli/commit/def412a558d71cb51fa16d826418bd0ed0a085cf) | fix  | enhance find_examples MCP tool with structured output       |
+| [2037b912b](https://github.com/angular/angular-cli/commit/2037b912b2f78eb4469d8671fbca8c43f06cd2ff) | fix  | improve bun lockfile detection and optimize lockfile checks |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                    |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------ |
+| [9749ec687](https://github.com/angular/angular-cli/commit/9749ec687800c1bbeae4b75550dee3608bbe6823) | fix  | avoid extra tick in SSR builds |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                                  |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------ |
+| [cd5c92b99](https://github.com/angular/angular-cli/commit/cd5c92b99a5d8e9cb991a2551f564353c3df0fbe) | fix  | correct Vitest coverage reporting for test files             |
+| [1529595d4](https://github.com/angular/angular-cli/commit/1529595d4a8d8ff9251d1680b1a23bf4ef817db0) | fix  | drop support for TypeScript 5.8                              |
+| [58da860fc](https://github.com/angular/angular-cli/commit/58da860fc4e040d1dbce0b1955c361a2efdb3559) | fix  | preserve names in esbuild for improved debugging in dev mode |
+| [26127bd3b](https://github.com/angular/angular-cli/commit/26127bd3bb2c4b9aacf2a8f4c2cbdf732512bafb) | fix  | resolve PostCSS plugins relative to config file              |
+
+### @angular/ssr
+
+| Commit                                                                                              | Type | Description                                                   |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------- |
+| [f0b0980fb](https://github.com/angular/angular-cli/commit/f0b0980fbd55473f152ec3b87fa5e1923c876854) | feat | introduce BootstrapContext for isolated server-side rendering |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="20.3.0"></a>
 
 # 20.3.0 (2025-09-10)
