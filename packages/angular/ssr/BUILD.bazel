@@ -1,6 +1,6 @@
+load("@npm//@angular/build-tooling/bazel/api-golden:index.bzl", "api_golden_test_npm_package")
 load("@rules_pkg//:pkg.bzl", "pkg_tar")
 load("//tools:defaults.bzl", "ng_package", "ts_library")
-load("@npm//@angular/build-tooling/bazel/api-golden:index.bzl", "api_golden_test_npm_package")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -14,6 +14,7 @@ ts_library(
     module_name = "@angular/ssr",
     deps = [
         "@npm//@angular/core",
+        "@npm//@angular/platform-browser",
         "@npm//@angular/platform-server",
         "@npm//@types/node",
         "@npm//critters",

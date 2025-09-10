@@ -7,6 +7,7 @@
  */
 
 import type { ApplicationRef, Type } from '@angular/core';
+import type { BootstrapContext } from '@angular/platform-browser';
 import assert from 'node:assert';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
@@ -24,11 +25,13 @@ interface ServerBundleExports {
   AppServerModule?: Type<unknown>;
 
   /** Standalone application bootstrapping function. */
-  default?: (() => Promise<ApplicationRef>) | Type<unknown>;
+  default?: ((context: BootstrapContext) => Promise<ApplicationRef>) | Type<unknown>;
 
   /** Method to extract routes from the router config. */
   extractRoutes(
-    bootstrapFunctionOrModule: (() => Promise<ApplicationRef>) | Type<unknown>,
+    bootstrapFunctionOrModule:
+      | ((context: BootstrapContext) => Promise<ApplicationRef>)
+      | Type<unknown>,
     document: string,
   ): AsyncIterable<{ success: boolean; route: string }>;
 }

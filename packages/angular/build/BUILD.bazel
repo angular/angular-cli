@@ -62,6 +62,7 @@ ts_library(
         "@npm//@angular/compiler-cli",
         "@npm//@angular/core",
         "@npm//@angular/localize",
+        "@npm//@angular/platform-browser",
         "@npm//@angular/platform-server",
         "@npm//@angular/service-worker",
         "@npm//@babel/core",
