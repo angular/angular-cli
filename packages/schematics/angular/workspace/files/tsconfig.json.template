@@ -19,7 +19,6 @@
     "enableI18nLegacyMessageIdFormat": false<% if (strict) { %>,
     "strictInjectionParameters": true,
     "strictInputAccessModifiers": true,
-    "typeCheckHostBindings": true,
     "strictTemplates": true<% } %>
   },
   "files": []
