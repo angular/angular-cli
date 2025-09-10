@@ -1,6 +1,6 @@
 {
   "type": "module",
   "devDependencies": {
-    "baseline-browser-mapping": "2.7.4"
+    "baseline-browser-mapping": "2.8.0"
   }
 }
