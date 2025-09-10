@@ -20,27 +20,27 @@
           },
           {
             "value": "claude",
-            "label": "Claude                 [ https://docs.anthropic.com/en/docs/claude-code/memory                                 ]"
+            "label": "Claude         [ https://docs.anthropic.com/en/docs/claude-code/memory            ]"
           },
           {
             "value": "cursor",
-            "label": "Cursor                 [ https://docs.cursor.com/en/context/rules                                              ]"
+            "label": "Cursor         [ https://docs.cursor.com/en/context/rules                         ]"
           },
           {
             "value": "gemini",
-            "label": "Gemini                 [ https://ai.google.dev/gemini-api/docs                                                 ]"
+            "label": "Gemini         [ https://ai.google.dev/gemini-api/docs                            ]"
           },
           {
             "value": "copilot",
-            "label": "GitHub Copilot         [ https://code.visualstudio.com/docs/copilot/copilot-customization#_custom-instructions ]"
+            "label": "GitHub Copilot [ https://code.visualstudio.com/docs/copilot/copilot-customization ]"
           },
           {
             "value": "jetbrains",
-            "label": "JetBrains AI Assistant [ https://www.jetbrains.com/help/junie/customize-guidelines.html                        ]"
+            "label": "JetBrains AI   [ https://www.jetbrains.com/help/junie/customize-guidelines.html   ]"
           },
           {
             "value": "windsurf",
-            "label": "Windsurf               [ https://docs.windsurf.com/windsurf/cascade/memories#rules                             ]"
+            "label": "Windsurf       [ https://docs.windsurf.com/windsurf/cascade/memories#rules        ]"
           }
         ]
       },
