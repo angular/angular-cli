@@ -1,3 +1,46 @@
+<a name="19.2.16"></a>
+
+# 19.2.16 (2025-09-10)
+
+## Breaking Changes
+
+### @angular/ssr
+
+- The server-side bootstrapping process has been changed to eliminate the reliance on a global platform injector.
+
+  Before:
+
+  ```ts
+  const bootstrap = () => bootstrapApplication(AppComponent, config);
+  ```
+
+  After:
+
+  ```ts
+  const bootstrap = (context: BootstrapContext) =>
+    bootstrapApplication(AppComponent, config, context);
+  ```
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                    |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------ |
+| [b0f4330a9](https://github.com/angular/angular-cli/commit/b0f4330a9a2f598b71f12d07e49b6c7c6891febd) | fix  | avoid extra tick in SSR builds |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                               |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------- |
+| [ee5c5f823](https://github.com/angular/angular-cli/commit/ee5c5f823c87a36c9bcb92db2fc9b4e652dc16c2) | fix  | avoid extra tick in SSR dev-server builds |
+
+### @angular/ssr
+
+| Commit                                                                                              | Type | Description                                                   |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------- |
+| [32980f7e7](https://github.com/angular/angular-cli/commit/32980f7e7a5821bc9bd311dda6e134970e735722) | feat | introduce BootstrapContext for isolated server-side rendering |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="19.2.15"></a>
 
 # 19.2.15 (2025-06-11)
@@ -784,7 +827,6 @@
 - Protractor is no longer supported.
 
   Protractor was marked end-of-life in August 2023 (see https://protractortest.org/). Projects still relying on Protractor should consider migrating to another E2E testing framework, several support solid migration paths from Protractor.
-
   - https://angular.dev/tools/cli/end-to-end
   - https://blog.angular.dev/the-state-of-end-to-end-testing-with-angular-d175f751cb9c
 
@@ -4419,7 +4461,6 @@ Alan Agius, Charles Lyding and Doug Parker
 ### @angular/cli
 
 - Several changes to the `ng analytics` command syntax.
-
   - `ng analytics project <setting>` has been replaced with `ng analytics <setting>`
   - `ng analytics <setting>` has been replaced with `ng analytics <setting> --global`
 
@@ -4430,7 +4471,6 @@ Alan Agius, Charles Lyding and Doug Parker
 - `--configuration` cannot be used with `ng run`. Provide the configuration as part of the target. Ex: `ng run project:builder:configuration`.
 - Deprecated `ng x18n` and `ng i18n-extract` commands have been removed in favor of `ng extract-i18n`.
 - Several changes in the Angular CLI commands and arguments handling.
-
   - `ng help` has been removed in favour of the `—-help` option.
   - `ng —-version` has been removed in favour of `ng version` and `ng v`.
   - Deprecated camel cased arguments are no longer supported. Ex. using `—-sourceMap` instead of `—-source-map` will result in an error.
@@ -4450,7 +4490,6 @@ Alan Agius, Charles Lyding and Doug Parker
 - `browser` and `karma` builders `script` and `styles` options input files extensions are now validated.
 
   Valid extensions for `scripts` are:
-
   - `.js`
   - `.cjs`
   - `.mjs`
@@ -4459,7 +4498,6 @@ Alan Agius, Charles Lyding and Doug Parker
   - `.mjsx`
 
   Valid extensions for `styles` are:
-
   - `.css`
   - `.less`
   - `.sass`
@@ -4502,7 +4540,6 @@ Alan Agius, Charles Lyding and Doug Parker
 ### @ngtools/webpack
 
 - `ivy` namespace has been removed from the public API.
-
   - `ivy.AngularWebpackPlugin` -> `AngularWebpackPlugin`
   - `ivy.AngularPluginOptions` -> `AngularPluginOptions`
 
