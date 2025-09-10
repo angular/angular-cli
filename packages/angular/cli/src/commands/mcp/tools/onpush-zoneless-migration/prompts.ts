@@ -154,6 +154,7 @@ export function generateZonelessMigrationInstructionsForComponent(
   3.  **DO NOT** use \`ChangeDetectionStrategy.OnPush\`. This will be the next step in the migration, but it is not part of this task.
   4.  **DO NOT** modify properties that are already signals or are used with the \`async\` pipe in the template, as they are already zoneless-compatible.
   5.  **DO NOT** make any changes to files other than the component file at \`${filePath}\` and its direct template/style files if necessary.
+  6.  **DO NOT** remove or modify usages of \`NgZone.run\` or \`NgZone.runOutsideAngular\`. These are still required.
 
   ### Final Step
   After you have applied all the required changes and followed all the rules, consult this tool again for the next steps in the migration process.`;
