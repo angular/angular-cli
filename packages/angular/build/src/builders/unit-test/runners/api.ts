@@ -11,9 +11,27 @@ import type { ApplicationBuilderInternalOptions } from '../../application/option
 import type { FullResult, IncrementalResult } from '../../application/results';
 import type { NormalizedUnitTestBuilderOptions } from '../options';
 
+/**
+ * Represents the options for a test runner.
+ */
 export interface RunnerOptions {
+  /**
+   * Partial options for the application builder.
+   * These will be merged with the options from the build target.
+   */
   buildOptions: Partial<ApplicationBuilderInternalOptions>;
+
+  /**
+   * A record of virtual files to be added to the build.
+   * The key is the file path and the value is the file content.
+   */
   virtualFiles?: Record<string, string>;
+
+  /**
+   * A map of test entry points to their corresponding test files.
+   * This is used to avoid re-discovering the test files in the executor.
+   */
+  testEntryPointMappings?: Map<string, string>;
 }
 
 /**
@@ -51,10 +69,12 @@ export interface TestRunner {
    *
    * @param context The Architect builder context.
    * @param options The normalized unit test options.
+   * @param testEntryPointMappings A map of test entry points to their corresponding test files.
    * @returns A TestExecutor instance that will handle the test runs.
    */
   createExecutor(
     context: BuilderContext,
     options: NormalizedUnitTestBuilderOptions,
+    testEntryPointMappings: Map<string, string> | undefined,
   ): Promise<TestExecutor>;
 }
