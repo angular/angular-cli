@@ -54,7 +54,7 @@ jobs:
         run: yarn ng-dev release build
 
   test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest-16core
     steps:
       - name: Initialize environment
         uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@b45dfa77df2021b23eeda5928ca6cd8bb89b21e7
