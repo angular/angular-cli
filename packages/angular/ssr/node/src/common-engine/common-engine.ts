@@ -85,7 +85,7 @@ export class CommonEngine {
       if (opts.inlineCriticalCss !== false) {
         const content = await runMethod('Inline Critical CSS', () =>
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          this.inlineCriticalCss(html!, opts),
+          this.inlineCriticalCss(html, opts),
         );
 
         html = content;
