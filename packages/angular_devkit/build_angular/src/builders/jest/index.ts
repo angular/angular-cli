@@ -6,10 +6,9 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { ResultKind, buildApplicationInternal } from '@angular/build/private';
 import { BuilderContext, BuilderOutput, createBuilder } from '@angular-devkit/architect';
+import { ResultKind, buildApplicationInternal } from '@angular/build/private';
 import { execFile as execFileCb } from 'node:child_process';
-import { randomUUID } from 'node:crypto';
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { promisify } from 'node:util';
@@ -30,7 +29,10 @@ export default createBuilder(
     );
 
     const options = normalizeOptions(schema);
-    const testOut = path.join(context.workspaceRoot, 'dist/test-out', randomUUID()); // TODO(dgp1130): Hide in temp directory.
+    // Could be extended later to optionally allow for a randomUUID or a custom outputPath.
+    const testOutput = '.angular/cache/test-out';
+
+    const testOut = path.join(context.workspaceRoot, testOutput);
 
     // Verify Jest installation and get the path to it's binary.
     // We need to `node_modules/.bin/jest`, but there is no means to resolve that directly. Fortunately Jest's `package.json` exports the

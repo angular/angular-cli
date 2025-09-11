@@ -8,7 +8,6 @@
 
 import type { BuilderContext, BuilderOutput } from '@angular-devkit/architect';
 import type { Config, ConfigOptions, FilePattern, InlinePluginDef, Server } from 'karma';
-import { randomUUID } from 'node:crypto';
 import * as fs from 'node:fs/promises';
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import { createRequire } from 'node:module';
@@ -24,9 +23,9 @@ import { ApplicationBuilderInternalOptions } from '../application/options';
 import { Result, ResultFile, ResultKind } from '../application/results';
 import { OutputHashing } from '../application/schema';
 import { findTests, getTestEntrypoints } from './find-tests';
+import type { KarmaBuilderTransformsOptions } from './index';
 import { NormalizedKarmaBuilderOptions, normalizeOptions } from './options';
 import { Schema as KarmaBuilderOptions } from './schema';
-import type { KarmaBuilderTransformsOptions } from './index';
 
 const localResolve = createRequire(__filename).resolve;
 const isWindows = process.platform === 'win32';
@@ -383,7 +382,8 @@ async function initializeApplication(
 ): Promise<
   [typeof import('karma'), Config & ConfigOptions, BuildOptions, AsyncIterator<Result> | null]
 > {
-  const outputPath = path.join(context.workspaceRoot, 'dist/test-out', randomUUID());
+  const testOutput = '.angular/cache/test-out'; // Could be extended later to optionally allow for a randomUUID or a custom outputPath.
+  const outputPath = path.join(context.workspaceRoot, testOutput);
   const projectSourceRoot = await getProjectSourceRoot(context);
 
   const [karma, entryPoints] = await Promise.all([
