@@ -94,7 +94,6 @@ export function execute(
   });
 }
 
-// eslint-disable-next-line max-lines-per-function
 async function initializeApplication(
   options: NormalizedKarmaBuilderOptions,
   context: BuilderContext,
@@ -103,14 +102,41 @@ async function initializeApplication(
 ): Promise<
   [typeof import('karma'), Config & ConfigOptions, BuildOptions, AsyncIterator<Result> | null]
 > {
-  const outputPath = path.join(context.workspaceRoot, 'dist/test-out', randomUUID());
+  const karma = await import('karma');
   const projectSourceRoot = await getProjectSourceRoot(context);
+  const outputPath = path.join(context.workspaceRoot, 'dist/test-out', randomUUID());
+  await fs.rm(outputPath, { recursive: true, force: true });
 
-  const [karma, entryPoints] = await Promise.all([
-    import('karma'),
-    collectEntrypoints(options, context, projectSourceRoot),
-    fs.rm(outputPath, { recursive: true, force: true }),
-  ]);
+  const { buildOptions, mainName } = await setupBuildOptions(
+    options,
+    context,
+    projectSourceRoot,
+    outputPath,
+  );
+
+  const [buildOutput, buildIterator] = await runEsbuild(buildOptions, context, projectSourceRoot);
+
+  const karmaConfig = await configureKarma(
+    karma,
+    context,
+    karmaOptions,
+    options,
+    buildOptions,
+    buildOutput,
+    mainName,
+    transforms,
+  );
+
+  return [karma, karmaConfig, buildOptions, buildIterator];
+}
+
+async function setupBuildOptions(
+  options: NormalizedKarmaBuilderOptions,
+  context: BuilderContext,
+  projectSourceRoot: string,
+  outputPath: string,
+): Promise<{ buildOptions: BuildOptions; mainName: string }> {
+  const entryPoints = await collectEntrypoints(options, context, projectSourceRoot);
 
   const mainName = 'test_main';
   if (options.main) {
@@ -156,6 +182,14 @@ async function initializeApplication(
     externalDependencies: options.externalDependencies,
   };
 
+  return { buildOptions, mainName };
+}
+
+async function runEsbuild(
+  buildOptions: BuildOptions,
+  context: BuilderContext,
+  projectSourceRoot: string,
+): Promise<[Result & { kind: ResultKind.Full }, AsyncIterator<Result> | null]> {
   const virtualTestBedInit = createVirtualModulePlugin({
     namespace: 'angular:test-bed-init',
     loadContent: async () => {
@@ -166,7 +200,7 @@ async function initializeApplication(
         `getTestBed().initTestEnvironment(BrowserTestingModule, platformBrowserTesting(), {`,
         `  errorOnUnknownElements: true,`,
         `  errorOnUnknownProperties: true,`,
-        '});',
+        `});`,
       ];
 
       return {
@@ -192,6 +226,21 @@ async function initializeApplication(
 
   // Write test files
   await writeTestFiles(buildOutput.files, buildOptions.outputPath);
+
+  return [buildOutput, buildIterator];
+}
+
+async function configureKarma(
+  karma: typeof import('karma'),
+  context: BuilderContext,
+  karmaOptions: ConfigOptions,
+  options: NormalizedKarmaBuilderOptions,
+  buildOptions: BuildOptions,
+  buildOutput: Result & { kind: ResultKind.Full },
+  mainName: string,
+  transforms?: KarmaBuilderTransformsOptions,
+): Promise<Config & ConfigOptions> {
+  const outputPath = buildOptions.outputPath;
 
   // We need to add this to the beginning *after* the testing framework has
   // prepended its files. The output path is required for each since they are
@@ -352,5 +401,5 @@ async function initializeApplication(
     parsedKarmaConfig.reporters = (parsedKarmaConfig.reporters ?? []).concat(['coverage']);
   }
 
-  return [karma, parsedKarmaConfig, buildOptions, buildIterator];
+  return parsedKarmaConfig;
 }
