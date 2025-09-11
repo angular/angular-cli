@@ -109,7 +109,8 @@ export async function* buildApplicationInternal(
         const hasError = result.errors.length > 0;
 
         result.addLog(
-          `Application bundle generation ${hasError ? 'failed' : 'complete'}. [${buildTime.toFixed(3)} seconds]\n`,
+          `Application bundle generation ${hasError ? 'failed' : 'complete'}.` +
+            ` [${buildTime.toFixed(3)} seconds] - ${new Date().toISOString()}\n`,
         );
       }
 
