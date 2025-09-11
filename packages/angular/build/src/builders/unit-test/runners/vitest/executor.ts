@@ -8,9 +8,8 @@
 
 import type { BuilderOutput } from '@angular-devkit/architect';
 import assert from 'node:assert';
-import { readFile } from 'node:fs/promises';
 import path from 'node:path';
-import type { InlineConfig, Vitest, VitestPlugin } from 'vitest/node';
+import type { InlineConfig, Vitest } from 'vitest/node';
 import { assertIsError } from '../../../../utils/error';
 import { loadEsmModule } from '../../../../utils/load-esm';
 import { toPosixPath } from '../../../../utils/path';
@@ -24,22 +23,22 @@ import { NormalizedUnitTestBuilderOptions } from '../../options';
 import { findTests, getTestEntrypoints } from '../../test-discovery';
 import type { TestExecutor } from '../api';
 import { setupBrowserConfiguration } from './browser-provider';
+import { createVitestPlugins } from './plugins';
 
 type VitestCoverageOption = Exclude<InlineConfig['coverage'], undefined>;
-type VitestPlugins = Awaited<ReturnType<typeof VitestPlugin>>;
 
 export class VitestExecutor implements TestExecutor {
   private vitest: Vitest | undefined;
   private readonly projectName: string;
   private readonly options: NormalizedUnitTestBuilderOptions;
-  private buildResultFiles = new Map<string, ResultFile>();
+  private readonly buildResultFiles = new Map<string, ResultFile>();
 
   // This is a reverse map of the entry points created in `build-options.ts`.
   // It is used by the in-memory provider plugin to map the requested test file
   // path back to its bundled output path.
   // Example: `Map<'/path/to/src/app.spec.ts', 'spec-src-app-spec'>`
-  private testFileToEntryPoint = new Map<string, string>();
-  private entryPointToTestFile = new Map<string, string>();
+  private readonly testFileToEntryPoint = new Map<string, string>();
+  private readonly entryPointToTestFile = new Map<string, string>();
 
   constructor(projectName: string, options: NormalizedUnitTestBuilderOptions) {
     this.projectName = projectName;
@@ -135,134 +134,6 @@ export class VitestExecutor implements TestExecutor {
     return testSetupFiles;
   }
 
-  private createVitestPlugins(
-    testSetupFiles: string[],
-    browserOptions: Awaited<ReturnType<typeof setupBrowserConfiguration>>,
-  ): VitestPlugins {
-    const { workspaceRoot } = this.options;
-
-    return [
-      {
-        name: 'angular:project-init',
-        // Type is incorrect. This allows a Promise<void>.
-        // eslint-disable-next-line @typescript-eslint/no-misused-promises
-        configureVitest: async (context) => {
-          // Create a subproject that can be configured with plugins for browser mode.
-          // Plugins defined directly in the vite overrides will not be present in the
-          // browser specific Vite instance.
-          await context.injectTestProjects({
-            test: {
-              name: this.projectName,
-              root: workspaceRoot,
-              globals: true,
-              setupFiles: testSetupFiles,
-              // Use `jsdom` if no browsers are explicitly configured.
-              // `node` is effectively no "environment" and the default.
-              environment: browserOptions.browser ? 'node' : 'jsdom',
-              browser: browserOptions.browser,
-              include: this.options.include,
-              ...(this.options.exclude ? { exclude: this.options.exclude } : {}),
-            },
-            plugins: [
-              {
-                name: 'angular:test-in-memory-provider',
-                enforce: 'pre',
-                resolveId: (id, importer) => {
-                  if (importer && (id[0] === '.' || id[0] === '/')) {
-                    let fullPath;
-                    if (this.testFileToEntryPoint.has(importer)) {
-                      fullPath = toPosixPath(path.join(this.options.workspaceRoot, id));
-                    } else {
-                      fullPath = toPosixPath(path.join(path.dirname(importer), id));
-                    }
-
-                    const relativePath = path.relative(this.options.workspaceRoot, fullPath);
-                    if (this.buildResultFiles.has(toPosixPath(relativePath))) {
-                      return fullPath;
-                    }
-                  }
-
-                  if (this.testFileToEntryPoint.has(id)) {
-                    return id;
-                  }
-
-                  assert(
-                    this.buildResultFiles.size > 0,
-                    'buildResult must be available for resolving.',
-                  );
-                  const relativePath = path.relative(this.options.workspaceRoot, id);
-                  if (this.buildResultFiles.has(toPosixPath(relativePath))) {
-                    return id;
-                  }
-                },
-                load: async (id) => {
-                  assert(
-                    this.buildResultFiles.size > 0,
-                    'buildResult must be available for in-memory loading.',
-                  );
-
-                  // Attempt to load as a source test file.
-                  const entryPoint = this.testFileToEntryPoint.get(id);
-                  let outputPath;
-                  if (entryPoint) {
-                    outputPath = entryPoint + '.js';
-
-                    // To support coverage exclusion of the actual test file, the virtual
-                    // test entry point only references the built and bundled intermediate file.
-                    return {
-                      code: `import "./${outputPath}";`,
-                    };
-                  } else {
-                    // Attempt to load as a built artifact.
-                    const relativePath = path.relative(this.options.workspaceRoot, id);
-                    outputPath = toPosixPath(relativePath);
-                  }
-
-                  const outputFile = this.buildResultFiles.get(outputPath);
-                  if (outputFile) {
-                    const sourceMapPath = outputPath + '.map';
-                    const sourceMapFile = this.buildResultFiles.get(sourceMapPath);
-                    const code =
-                      outputFile.origin === 'memory'
-                        ? Buffer.from(outputFile.contents).toString('utf-8')
-                        : await readFile(outputFile.inputPath, 'utf-8');
-                    const map = sourceMapFile
-                      ? sourceMapFile.origin === 'memory'
-                        ? Buffer.from(sourceMapFile.contents).toString('utf-8')
-                        : await readFile(sourceMapFile.inputPath, 'utf-8')
-                      : undefined;
-
-                    return {
-                      code,
-                      map: map ? JSON.parse(map) : undefined,
-                    };
-                  }
-                },
-              },
-              {
-                name: 'angular:html-index',
-                transformIndexHtml: () => {
-                  // Add all global stylesheets
-                  if (this.buildResultFiles.has('styles.css')) {
-                    return [
-                      {
-                        tag: 'link',
-                        attrs: { href: 'styles.css', rel: 'stylesheet' },
-                        injectTo: 'head',
-                      },
-                    ];
-                  }
-
-                  return [];
-                },
-              },
-            ],
-          });
-        },
-      },
-    ];
-  }
-
   private async initializeVitest(): Promise<Vitest> {
     const { codeCoverage, reporters, workspaceRoot, browsers, debug, watch } = this.options;
 
@@ -296,7 +167,15 @@ export class VitestExecutor implements TestExecutor {
     );
 
     const testSetupFiles = this.prepareSetupFiles();
-    const plugins = this.createVitestPlugins(testSetupFiles, browserOptions);
+    const plugins = createVitestPlugins(this.options, testSetupFiles, browserOptions, {
+      workspaceRoot,
+      projectSourceRoot: this.options.projectSourceRoot,
+      projectName: this.projectName,
+      include: this.options.include,
+      exclude: this.options.exclude,
+      buildResultFiles: this.buildResultFiles,
+      testFileToEntryPoint: this.testFileToEntryPoint,
+    });
 
     const debugOptions = debug
       ? {

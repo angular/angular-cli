@@ -8,6 +8,11 @@
 
 import { createRequire } from 'node:module';
 
+export interface BrowserConfiguration {
+  browser?: import('vitest/node').BrowserConfigOptions;
+  errors?: string[];
+}
+
 function findBrowserProvider(
   projectResolver: NodeJS.RequireResolve,
 ): import('vitest/node').BrowserBuiltinProvider | undefined {
@@ -38,7 +43,7 @@ export function setupBrowserConfiguration(
   browsers: string[] | undefined,
   debug: boolean,
   projectSourceRoot: string,
-): { browser?: import('vitest/node').BrowserConfigOptions; errors?: string[] } {
+): BrowserConfiguration {
   if (browsers === undefined) {
     return {};
   }
