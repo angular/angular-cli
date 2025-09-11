@@ -144,9 +144,8 @@ export async function* execute(
   const normalizedOptions = await normalizeOptions(context, projectName, options);
   const runner = await loadTestRunner(normalizedOptions.runnerName);
 
-  await using executor = await runner.createExecutor(context, normalizedOptions);
-
   if (runner.isStandalone) {
+    await using executor = await runner.createExecutor(context, normalizedOptions, undefined);
     yield* executor.execute({
       kind: ResultKind.Full,
       files: {},
@@ -174,9 +173,16 @@ export async function* execute(
   }
 
   // Get runner-specific build options from the hook
-  const { buildOptions: runnerBuildOptions, virtualFiles } = await runner.getBuildOptions(
+  const {
+    buildOptions: runnerBuildOptions,
+    virtualFiles,
+    testEntryPointMappings,
+  } = await runner.getBuildOptions(normalizedOptions, buildTargetOptions);
+
+  await using executor = await runner.createExecutor(
+    context,
     normalizedOptions,
-    buildTargetOptions,
+    testEntryPointMappings,
   );
 
   const finalExtensions = prepareBuildExtensions(

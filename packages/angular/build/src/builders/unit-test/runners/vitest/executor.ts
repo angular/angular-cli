@@ -40,9 +40,20 @@ export class VitestExecutor implements TestExecutor {
   private readonly testFileToEntryPoint = new Map<string, string>();
   private readonly entryPointToTestFile = new Map<string, string>();
 
-  constructor(projectName: string, options: NormalizedUnitTestBuilderOptions) {
+  constructor(
+    projectName: string,
+    options: NormalizedUnitTestBuilderOptions,
+    testEntryPointMappings: Map<string, string> | undefined,
+  ) {
     this.projectName = projectName;
     this.options = options;
+
+    if (testEntryPointMappings) {
+      for (const [entryPoint, testFile] of testEntryPointMappings) {
+        this.testFileToEntryPoint.set(testFile, entryPoint);
+        this.entryPointToTestFile.set(entryPoint + '.js', testFile);
+      }
+    }
   }
 
   async *execute(buildResult: FullResult | IncrementalResult): AsyncIterable<BuilderOutput> {
@@ -57,25 +68,6 @@ export class VitestExecutor implements TestExecutor {
       }
       for (const [path, file] of Object.entries(buildResult.files)) {
         this.buildResultFiles.set(path, file);
-      }
-    }
-
-    // The `getTestEntrypoints` function is used here to create the same mapping
-    // that was used in `build-options.ts` to generate the build entry points.
-    // This is a deliberate duplication to avoid a larger refactoring of the
-    // builder's core interfaces to pass the entry points from the build setup
-    // phase to the execution phase.
-    if (this.testFileToEntryPoint.size === 0) {
-      const { include, exclude = [], workspaceRoot, projectSourceRoot } = this.options;
-      const testFiles = await findTests(include, exclude, workspaceRoot, projectSourceRoot);
-      const entryPoints = getTestEntrypoints(testFiles, {
-        projectSourceRoot,
-        workspaceRoot,
-        removeTestExtension: true,
-      });
-      for (const [entryPoint, testFile] of entryPoints) {
-        this.testFileToEntryPoint.set(testFile, entryPoint);
-        this.entryPointToTestFile.set(entryPoint + '.js', testFile);
       }
     }
 
