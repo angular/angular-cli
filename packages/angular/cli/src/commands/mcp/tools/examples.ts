@@ -8,7 +8,7 @@
 
 import { glob, readFile } from 'node:fs/promises';
 import path from 'node:path';
-import type { SQLInputValue } from 'node:sqlite';
+import type { DatabaseSync, SQLInputValue } from 'node:sqlite';
 import { z } from 'zod';
 import { McpToolContext, declareTool } from './tool-registry';
 
@@ -184,8 +184,7 @@ new or evolving features.
 });
 
 async function createFindExampleHandler({ exampleDatabasePath }: McpToolContext) {
-  let db: import('node:sqlite').DatabaseSync | undefined;
-  let queryStatement: import('node:sqlite').StatementSync | undefined;
+  let db: DatabaseSync | undefined;
 
   if (process.env['NG_MCP_EXAMPLES_DIR']) {
     db = await setupRuntimeExamples(process.env['NG_MCP_EXAMPLES_DIR']);
@@ -428,9 +427,7 @@ function parseFrontmatter(content: string): Record<string, unknown> {
   return data;
 }
 
-async function setupRuntimeExamples(
-  examplesPath: string,
-): Promise<import('node:sqlite').DatabaseSync> {
+async function setupRuntimeExamples(examplesPath: string): Promise<DatabaseSync> {
   const { DatabaseSync } = await import('node:sqlite');
   const db = new DatabaseSync(':memory:');
 
