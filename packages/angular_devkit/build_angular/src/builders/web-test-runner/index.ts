@@ -6,10 +6,9 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { Result, ResultKind, buildApplicationInternal } from '@angular/build/private';
 import { BuilderContext, BuilderOutput, createBuilder } from '@angular-devkit/architect';
+import { Result, ResultKind, buildApplicationInternal } from '@angular/build/private';
 import type * as WebTestRunner from '@web/test-runner';
-import { randomUUID } from 'node:crypto';
 import fs from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import path from 'node:path';
@@ -43,8 +42,10 @@ export default createBuilder(
     }
 
     const options = normalizeOptions(schema);
+    // Could be extended later to optionally allow for a randomUUID or a custom outputPath.
+    const testOutput = '.angular/cache/test-out';
 
-    const testDir = path.join(ctx.workspaceRoot, 'dist/test-out', randomUUID());
+    const testDir = path.join(ctx.workspaceRoot, testOutput);
 
     // Parallelize startup work.
     const [testFiles] = await Promise.all([
