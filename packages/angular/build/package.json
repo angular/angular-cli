@@ -42,7 +42,7 @@
     "semver": "7.7.2",
     "source-map-support": "0.5.21",
     "tinyglobby": "0.2.14",
-    "vite": "7.1.2",
+    "vite": "7.1.5",
     "watchpack": "2.4.4"
   },
   "optionalDependencies": {
