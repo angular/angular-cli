@@ -141,7 +141,8 @@
     },
     "zoneless": {
       "description": "Create an initial application that does not utilize `zone.js`.",
-      "type": "boolean"
+      "type": "boolean",
+      "default": true
     },
     "aiConfig": {
       "type": "array",
