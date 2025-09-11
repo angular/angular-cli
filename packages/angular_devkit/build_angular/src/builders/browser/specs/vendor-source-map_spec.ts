@@ -25,13 +25,7 @@ describe('Browser Builder external source map', () => {
   afterEach(async () => host.restore().toPromise());
 
   it('works', async () => {
-    const overrides = {
-      sourceMap: {
-        scripts: true,
-        styles: true,
-        vendor: true,
-      },
-    };
+    const overrides = { sourceMap: { scripts: true, styles: true, vendor: true } };
 
     const { files } = await browserBuild(architect, host, target, overrides);
     const sourcePaths: string[] = JSON.parse(await files['vendor.js.map']).sources;
@@ -40,13 +34,7 @@ describe('Browser Builder external source map', () => {
   });
 
   it('does not map sourcemaps from external library when disabled', async () => {
-    const overrides = {
-      sourceMap: {
-        scripts: true,
-        styles: true,
-        vendor: false,
-      },
-    };
+    const overrides = { sourceMap: { scripts: true, styles: true, vendor: false } };
 
     const { files } = await browserBuild(architect, host, target, overrides);
     const sourcePaths: string[] = JSON.parse(await files['vendor.js.map']).sources;
@@ -71,12 +59,7 @@ describe('Identifying third-party code in source maps', () => {
   afterEach(async () => host.restore().toPromise());
 
   it('specifies which sources are third party when vendor processing is disabled', async () => {
-    const overrides = {
-      sourceMap: {
-        scripts: true,
-        vendor: false,
-      },
-    };
+    const overrides = { sourceMap: { scripts: true, vendor: false } };
 
     const { files } = await browserBuild(architect, host, target, overrides);
     const mainMap: SourceMap = JSON.parse(await files['main.js.map']);
@@ -104,11 +87,14 @@ describe('Identifying third-party code in source maps', () => {
     expect(thirdPartyInVendor).toBe(true, `vendor.js.map should include some node modules`);
 
     // All sources in the main map are first-party.
-    expect(mainMap.sources.filter((_, i) => !mainMap[IGNORE_LIST].includes(i))).toEqual([
+    const sources = mainMap.sources.filter((_, i) => !mainMap[IGNORE_LIST].includes(i));
+    sources.sort();
+
+    expect(sources).toEqual([
+      './src/app/app.component.css',
       './src/app/app.component.ts',
       './src/app/app.module.ts',
       './src/main.ts',
-      './src/app/app.component.css',
     ]);
 
     // Only some sources in the polyfills map are first-party.

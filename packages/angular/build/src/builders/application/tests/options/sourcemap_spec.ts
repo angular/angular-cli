@@ -12,10 +12,7 @@ import { APPLICATION_BUILDER_INFO, BASE_OPTIONS, describeBuilder } from '../setu
 describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
   describe('Option: "sourceMap"', () => {
     it('should not generate script sourcemap files by default', async () => {
-      harness.useTarget('build', {
-        ...BASE_OPTIONS,
-        sourceMap: undefined,
-      });
+      harness.useTarget('build', { ...BASE_OPTIONS, sourceMap: undefined });
 
       const { result } = await harness.executeOnce();
 
@@ -25,10 +22,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
     });
 
     it('should not generate script sourcemap files when false', async () => {
-      harness.useTarget('build', {
-        ...BASE_OPTIONS,
-        sourceMap: false,
-      });
+      harness.useTarget('build', { ...BASE_OPTIONS, sourceMap: false });
 
       const { result } = await harness.executeOnce();
 
@@ -38,10 +32,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
     });
 
     it('should not generate script sourcemap files when scripts suboption is false', async () => {
-      harness.useTarget('build', {
-        ...BASE_OPTIONS,
-        sourceMap: { scripts: false },
-      });
+      harness.useTarget('build', { ...BASE_OPTIONS, sourceMap: { scripts: false } });
 
       const { result } = await harness.executeOnce();
 
@@ -51,10 +42,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
     });
 
     it('should generate script sourcemap files when true', async () => {
-      harness.useTarget('build', {
-        ...BASE_OPTIONS,
-        sourceMap: true,
-      });
+      harness.useTarget('build', { ...BASE_OPTIONS, sourceMap: true });
 
       const { result } = await harness.executeOnce();
 
@@ -64,10 +52,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
     });
 
     it('should generate script sourcemap files when scripts suboption is true', async () => {
-      harness.useTarget('build', {
-        ...BASE_OPTIONS,
-        sourceMap: { scripts: true },
-      });
+      harness.useTarget('build', { ...BASE_OPTIONS, sourceMap: { scripts: true } });
 
       const { result } = await harness.executeOnce();
 
@@ -79,10 +64,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
     it('should not include third-party sourcemaps when true', async () => {
       await harness.writeFile('src/polyfills.js', `console.log('main');`);
 
-      harness.useTarget('build', {
-        ...BASE_OPTIONS,
-        sourceMap: true,
-      });
+      harness.useTarget('build', { ...BASE_OPTIONS, sourceMap: true });
 
       const { result } = await harness.executeOnce();
 
@@ -95,10 +77,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
     it('should not include third-party sourcemaps when vendor suboption is false', async () => {
       await harness.writeFile('src/polyfills.js', `console.log('main');`);
 
-      harness.useTarget('build', {
-        ...BASE_OPTIONS,
-        sourceMap: { scripts: true, vendor: false },
-      });
+      harness.useTarget('build', { ...BASE_OPTIONS, sourceMap: { scripts: true, vendor: false } });
 
       const { result } = await harness.executeOnce();
 
@@ -111,17 +90,18 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
     it('should include third-party sourcemaps when vendor suboption is true', async () => {
       await harness.writeFile('src/polyfills.js', `console.log('main');`);
 
-      harness.useTarget('build', {
-        ...BASE_OPTIONS,
-        sourceMap: { scripts: true, vendor: true },
-      });
+      harness.useTarget('build', { ...BASE_OPTIONS, sourceMap: { scripts: true, vendor: true } });
 
       const { result } = await harness.executeOnce();
 
       expect(result?.success).toBe(true);
 
-      harness.expectFile('dist/browser/main.js.map').content.toContain('/core/index.ts');
-      harness.expectFile('dist/browser/main.js.map').content.toContain('/common/index.ts');
+      harness
+        .expectFile('dist/browser/main.js.map')
+        .content.toContain('/core/src/application/application_ref.ts');
+      harness
+        .expectFile('dist/browser/main.js.map')
+        .content.toContain('/common/src/directives/ng_if.ts');
     });
 
     it(`should not include 'sourceMappingURL' sourcemaps when hidden suboption is true`, async () => {
@@ -193,10 +173,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
     });
 
     it('should add "x_google_ignoreList" extension to script sourcemap files when true', async () => {
-      harness.useTarget('build', {
-        ...BASE_OPTIONS,
-        sourceMap: true,
-      });
+      harness.useTarget('build', { ...BASE_OPTIONS, sourceMap: true });
 
       const { result } = await harness.executeOnce();
 
@@ -208,10 +185,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
     it('should generate component sourcemaps when sourcemaps when true', async () => {
       await harness.writeFile('src/app/app.component.css', `* { color: red}`);
 
-      harness.useTarget('build', {
-        ...BASE_OPTIONS,
-        sourceMap: true,
-      });
+      harness.useTarget('build', { ...BASE_OPTIONS, sourceMap: true });
 
       const { result } = await harness.executeOnce();
 
@@ -226,10 +200,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
     it('should not generate component sourcemaps when sourcemaps when false', async () => {
       await harness.writeFile('src/app/app.component.css', `* { color: red}`);
 
-      harness.useTarget('build', {
-        ...BASE_OPTIONS,
-        sourceMap: false,
-      });
+      harness.useTarget('build', { ...BASE_OPTIONS, sourceMap: false });
 
       const { result } = await harness.executeOnce();
 
