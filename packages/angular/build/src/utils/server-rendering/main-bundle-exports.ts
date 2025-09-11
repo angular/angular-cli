@@ -7,8 +7,8 @@
  */
 
 import type { ApplicationRef, Type, ɵConsole } from '@angular/core';
-import type { renderApplication, renderModule, ɵSERVER_CONTEXT } from '@angular/platform-server';
 import type { BootstrapContext } from '@angular/platform-browser';
+import type { renderApplication, renderModule, ɵSERVER_CONTEXT } from '@angular/platform-server';
 import type { extractRoutes } from '../routes-extractor/extractor';
 
 export interface MainServerBundleExports {

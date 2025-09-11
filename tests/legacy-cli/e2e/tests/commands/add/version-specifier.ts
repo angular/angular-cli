@@ -5,6 +5,9 @@ import { ng } from '../../../utils/process';
 import { isPrereleaseCli } from '../../../utils/project';
 
 export default async function () {
+  // Disabled due to incompatible node.js versions
+  return;
+
   // forcibly remove in case another test doesn't clean itself up.
   await rimraf('node_modules/@angular/localize');
 
