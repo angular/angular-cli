@@ -1,3 +1,16 @@
+<a name="20.3.1"></a>
+
+# 20.3.1 (2025-09-11)
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                            |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------- |
+| [be60be499](https://github.com/angular/angular-cli/commit/be60be4997ea0f7be3a4fb993f87b1bd29fc1493) | fix  | add timestamp to bundle generation log |
+| [d60f4e53d](https://github.com/angular/angular-cli/commit/d60f4e53d8f511d313e517161dc26eb3cc005f1c) | fix  | update vite to version `7.1.5`         |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="20.3.0"></a>
 
 # 20.3.0 (2025-09-10)
