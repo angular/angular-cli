@@ -222,6 +222,7 @@ export type UnitTestBuilderOptions = {
     codeCoverageReporters?: SchemaCodeCoverageReporter[];
     debug?: boolean;
     exclude?: string[];
+    filter?: string;
     include?: string[];
     progress?: boolean;
     providersFile?: string;

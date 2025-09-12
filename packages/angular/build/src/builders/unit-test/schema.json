@@ -41,6 +41,10 @@
       },
       "description": "Globs of files to exclude, relative to the project root."
     },
+    "filter": {
+      "type": "string",
+      "description": "Specifies a regular expression pattern to match against test suite and test names. Only tests with a name matching the pattern will be executed. For example, `^App` will run only tests in suites beginning with 'App'."
+    },
     "watch": {
       "type": "boolean",
       "description": "Re-run tests when source files change. Defaults to `true` in TTY environments and `false` otherwise."

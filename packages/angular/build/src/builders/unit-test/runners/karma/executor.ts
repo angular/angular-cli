@@ -8,7 +8,7 @@
 
 import type { BuilderContext, BuilderOutput } from '@angular-devkit/architect';
 import type { ApplicationBuilderInternalOptions } from '../../../application/options';
-import type { KarmaBuilderOptions } from '../../../karma';
+import type { KarmaBuilderOptions, KarmaBuilderTransformsOptions } from '../../../karma';
 import { NormalizedUnitTestBuilderOptions } from '../../options';
 import type { TestExecutor } from '../api';
 
@@ -74,9 +74,31 @@ export class KarmaExecutor implements TestExecutor {
       aot: buildTargetOptions.aot,
     };
 
+    const transformOptions = {
+      karmaOptions: (options) => {
+        if (unitTestOptions.filter) {
+          let filter = unitTestOptions.filter;
+          if (filter[0] === '/' && filter.at(-1) === '/') {
+            this.context.logger.warn(
+              'The `--filter` option is always a regular expression.' +
+                'Leading and trailing `/` are not required and will be ignored.',
+            );
+          } else {
+            filter = `/${filter}/`;
+          }
+
+          options.client ??= {};
+          options.client.args ??= [];
+          options.client.args.push('--grep', filter);
+        }
+
+        return options;
+      },
+    } satisfies KarmaBuilderTransformsOptions;
+
     const { execute } = await import('../../../karma');
 
-    yield* execute(karmaOptions, context);
+    yield* execute(karmaOptions, context, transformOptions);
   }
 
   async [Symbol.asyncDispose](): Promise<void> {
