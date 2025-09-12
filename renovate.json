@@ -5,14 +5,6 @@
   "ignorePaths": ["tests/legacy-cli/e2e/assets/**", "tests/schematics/update/packages/**"],
   "packageRules": [
     {
-      "matchBaseBranches": ["main"],
-      "addLabels": ["target: minor"]
-    },
-    {
-      "matchBaseBranches": ["!main"],
-      "addLabels": ["target: patch"]
-    },
-    {
       "enabled": false,
       "matchFileNames": ["tests/legacy-cli/e2e/ng-snapshot/package.json"],
       "matchBaseBranches": ["!main"]
