@@ -33,6 +33,12 @@ export class KarmaExecutor implements TestExecutor {
       );
     }
 
+    if (unitTestOptions.filter) {
+      context.logger.warn(
+        'The "karma" test runner does not support the "filter" option. The option will be ignored.',
+      );
+    }
+
     const buildTargetOptions = (await context.validateOptions(
       await context.getTargetOptions(unitTestOptions.buildTarget),
       await context.getBuilderNameForTarget(unitTestOptions.buildTarget),
