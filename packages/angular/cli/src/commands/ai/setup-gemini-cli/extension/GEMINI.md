@@ -1,0 +1,1 @@
+../../../mcp/instructions/best-practices.md
