@@ -41,6 +41,10 @@
       },
       "description": "Globs of files to exclude, relative to the project root."
     },
+    "filter": {
+      "type": "string",
+      "description": "A regular expression to match against test names, running only matching tests."
+    },
     "watch": {
       "type": "boolean",
       "description": "Re-run tests when source files change. Defaults to `true` in TTY environments and `false` otherwise."
