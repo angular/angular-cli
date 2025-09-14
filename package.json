@@ -121,7 +121,7 @@
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
     "karma-source-map-support": "1.4.0",
-    "listr2": "9.0.3",
+    "listr2": "9.0.4",
     "lodash": "^4.17.21",
     "magic-string": "0.30.19",
     "npm": "^11.0.0",
@@ -145,7 +145,7 @@
     "verdaccio": "6.1.6",
     "verdaccio-auth-memory": "^10.0.0",
     "yargs-parser": "22.0.0",
-    "zod": "4.1.7",
+    "zod": "4.1.8",
     "zone.js": "^0.15.0"
   },
   "dependenciesMeta": {
