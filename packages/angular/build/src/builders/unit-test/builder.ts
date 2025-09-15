@@ -97,6 +97,7 @@ async function* runBuildAndTest(
   context: BuilderContext,
   extensions: ApplicationBuilderExtensions | undefined,
 ): AsyncIterable<BuilderOutput> {
+  let consecutiveErrorCount = 0;
   for await (const buildResult of buildApplicationInternal(
     applicationBuildOptions,
     context,
@@ -117,7 +118,25 @@ async function* runBuildAndTest(
     assert(buildResult.files, 'Builder did not provide result files.');
 
     // Pass the build artifacts to the executor
-    yield* executor.execute(buildResult);
+    try {
+      yield* executor.execute(buildResult);
+
+      // Successful execution resets the failure counter
+      consecutiveErrorCount = 0;
+    } catch (e) {
+      assertIsError(e);
+      context.logger.error(`An exception occurred during test execution:\n${e.stack ?? e.message}`);
+      yield { success: false };
+      consecutiveErrorCount++;
+    }
+
+    if (consecutiveErrorCount >= 3) {
+      context.logger.error(
+        'Test runner process has failed multiple times in a row. Please fix the configuration and restart the process.',
+      );
+
+      return;
+    }
   }
 }
 
@@ -141,15 +160,36 @@ export async function* execute(
     `NOTE: The "unit-test" builder is currently EXPERIMENTAL and not ready for production use.`,
   );
 
-  const normalizedOptions = await normalizeOptions(context, projectName, options);
-  const runner = await loadTestRunner(normalizedOptions.runnerName);
+  // Initialize the test runner and normalize options
+  let runner;
+  let normalizedOptions;
+  try {
+    normalizedOptions = await normalizeOptions(context, projectName, options);
+    runner = await loadTestRunner(normalizedOptions.runnerName);
+  } catch (e) {
+    assertIsError(e);
+    context.logger.error(
+      `An exception occurred during initialization of the test runner:\n${e.stack ?? e.message}`,
+    );
+    yield { success: false };
+
+    return;
+  }
 
   if (runner.isStandalone) {
-    await using executor = await runner.createExecutor(context, normalizedOptions, undefined);
-    yield* executor.execute({
-      kind: ResultKind.Full,
-      files: {},
-    });
+    try {
+      await using executor = await runner.createExecutor(context, normalizedOptions, undefined);
+      yield* executor.execute({
+        kind: ResultKind.Full,
+        files: {},
+      });
+    } catch (e) {
+      assertIsError(e);
+      context.logger.error(
+        `An exception occurred during standalone test execution:\n${e.stack ?? e.message}`,
+      );
+      yield { success: false };
+    }
 
     return;
   }
@@ -164,41 +204,65 @@ export async function* execute(
   } catch (e) {
     assertIsError(e);
     context.logger.error(
-      `Could not load build target options for "${targetStringFromTarget(normalizedOptions.buildTarget)}".\n` +
+      `Could not load build target options for "${targetStringFromTarget(
+        normalizedOptions.buildTarget,
+      )}".\n` +
         `Please check your 'angular.json' configuration.\n` +
         `Error: ${e.message}`,
     );
+    yield { success: false };
 
     return;
   }
 
-  // Get runner-specific build options from the hook
-  const {
-    buildOptions: runnerBuildOptions,
-    virtualFiles,
-    testEntryPointMappings,
-  } = await runner.getBuildOptions(normalizedOptions, buildTargetOptions);
+  // Get runner-specific build options
+  let runnerBuildOptions;
+  let virtualFiles;
+  let testEntryPointMappings;
+  try {
+    ({
+      buildOptions: runnerBuildOptions,
+      virtualFiles,
+      testEntryPointMappings,
+    } = await runner.getBuildOptions(normalizedOptions, buildTargetOptions));
+  } catch (e) {
+    assertIsError(e);
+    context.logger.error(
+      `An exception occurred while getting runner-specific build options:\n${e.stack ?? e.message}`,
+    );
+    yield { success: false };
 
-  await using executor = await runner.createExecutor(
-    context,
-    normalizedOptions,
-    testEntryPointMappings,
-  );
+    return;
+  }
 
-  const finalExtensions = prepareBuildExtensions(
-    virtualFiles,
-    normalizedOptions.projectSourceRoot,
-    extensions,
-  );
+  try {
+    await using executor = await runner.createExecutor(
+      context,
+      normalizedOptions,
+      testEntryPointMappings,
+    );
 
-  // Prepare and run the application build
-  const applicationBuildOptions = {
-    ...buildTargetOptions,
-    ...runnerBuildOptions,
-    watch: normalizedOptions.watch,
-    tsConfig: normalizedOptions.tsConfig,
-    progress: normalizedOptions.buildProgress ?? buildTargetOptions.progress,
-  } satisfies ApplicationBuilderInternalOptions;
+    const finalExtensions = prepareBuildExtensions(
+      virtualFiles,
+      normalizedOptions.projectSourceRoot,
+      extensions,
+    );
 
-  yield* runBuildAndTest(executor, applicationBuildOptions, context, finalExtensions);
+    // Prepare and run the application build
+    const applicationBuildOptions = {
+      ...buildTargetOptions,
+      ...runnerBuildOptions,
+      watch: normalizedOptions.watch,
+      tsConfig: normalizedOptions.tsConfig,
+      progress: normalizedOptions.buildProgress ?? buildTargetOptions.progress,
+    } satisfies ApplicationBuilderInternalOptions;
+
+    yield* runBuildAndTest(executor, applicationBuildOptions, context, finalExtensions);
+  } catch (e) {
+    assertIsError(e);
+    context.logger.error(
+      `An exception occurred while creating the test executor:\n${e.stack ?? e.message}`,
+    );
+    yield { success: false };
+  }
 }

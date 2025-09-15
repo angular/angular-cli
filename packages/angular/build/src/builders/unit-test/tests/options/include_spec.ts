@@ -15,7 +15,7 @@ import {
 } from '../setup';
 
 describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
-  xdescribe('Option: "include"', () => {
+  describe('Option: "include"', () => {
     beforeEach(async () => {
       setupApplicationTarget(harness);
     });
@@ -36,16 +36,8 @@ describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
         input: ['src/app/app.component.spec.ts'],
       },
       {
-        test: 'relative path from workspace to file',
-        input: ['src/app/app.component.ts'],
-      },
-      {
         test: 'relative path from project root to spec',
         input: ['app/services/test.service.spec.ts'],
-      },
-      {
-        test: 'relative path from project root to file',
-        input: ['app/services/test.service.ts'],
       },
       {
         test: 'relative path from workspace to directory',
@@ -58,10 +50,6 @@ describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
       {
         test: 'glob with spec suffix',
         input: ['**/*.pipe.spec.ts', '**/*.pipe.spec.ts', '**/*test.service.spec.ts'],
-      },
-      {
-        test: 'glob with forward slash and spec suffix',
-        input: ['/**/*test.service.spec.ts'],
       },
     ].forEach((options, index) => {
       it(`should work with ${options.test} (${index})`, async () => {

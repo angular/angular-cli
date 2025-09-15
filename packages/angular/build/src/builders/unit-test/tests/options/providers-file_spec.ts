@@ -15,7 +15,7 @@ import {
 } from '../setup';
 
 describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
-  xdescribe('Option: "providersFile"', () => {
+  describe('Option: "providersFile"', () => {
     beforeEach(async () => {
       setupApplicationTarget(harness);
     });
@@ -26,10 +26,12 @@ describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
         providersFile: 'src/my.providers.ts',
       });
 
-      const { result, error } = await harness.executeOnce({ outputLogsOnFailure: false });
-      expect(result).toBeUndefined();
-      expect(error?.message).toMatch(
-        `The specified providers file "src/my.providers.ts" does not exist.`,
+      const { result, logs } = await harness.executeOnce({ outputLogsOnFailure: false });
+      expect(result?.success).toBeFalse();
+      expect(logs).toContain(
+        jasmine.objectContaining({
+          message: jasmine.stringMatching('Could not resolve "./my.providers"'),
+        }),
       );
     });
 
@@ -40,6 +42,14 @@ describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
           import { CommonModule } from '@angular/common';
           export default [importProvidersFrom(CommonModule)];
         `,
+      });
+
+      await harness.modifyFile('src/tsconfig.spec.json', (content) => {
+        const tsConfig = JSON.parse(content);
+        tsConfig.files ??= [];
+        tsConfig.files.push('my.providers.ts');
+
+        return JSON.stringify(tsConfig);
       });
 
       harness.useTarget('test', {
