@@ -6,20 +6,20 @@
   "properties": {
     "buildTarget": {
       "type": "string",
-      "description": "A build builder target to serve in the format of `project:target[:configuration]`. You can also pass in more than one configuration name as a comma-separated list. Example: `project:target:production,staging`.",
+      "description": "Specifies the build target to use for the unit test build in the format `project:target[:configuration]`. You can also pass a comma-separated list of configurations. Example: `project:target:production,staging`.",
       "pattern": "^[^:\\s]*:[^:\\s]*(:[^\\s]+)?$"
     },
     "tsConfig": {
       "type": "string",
-      "description": "The name of the TypeScript configuration file."
+      "description": "The path to the TypeScript configuration file, relative to the workspace root."
     },
     "runner": {
       "type": "string",
-      "description": "The name of the test runner to use for test execution.",
+      "description": "Specifies the test runner to use for test execution.",
       "enum": ["karma", "vitest"]
     },
     "browsers": {
-      "description": "A list of browsers to use for test execution. If undefined, jsdom on Node.js will be used instead of a browser. For Vitest and Karma, browser names ending with 'Headless' (e.g., 'ChromeHeadless') will enable headless mode for that browser.",
+      "description": "Specifies the browsers to use for test execution. When not specified, tests are run in a Node.js environment using jsdom. For both Vitest and Karma, browser names ending with 'Headless' (e.g., 'ChromeHeadless') will enable headless mode.",
       "type": "array",
       "items": {
         "type": "string"
@@ -32,39 +32,39 @@
         "type": "string"
       },
       "default": ["**/*.spec.ts"],
-      "description": "Globs of files to include, relative to project root. \nThere are 2 special cases:\n - when a path to directory is provided, all spec files ending \".spec.@(ts|tsx)\" will be included\n - when a path to a file is provided, and a matching spec file exists it will be included instead."
+      "description": "Specifies glob patterns of files to include for testing, relative to the project root. This option also has special handling for directory paths (includes all `.spec.ts` files within) and file paths (includes the corresponding `.spec` file if one exists)."
     },
     "exclude": {
       "type": "array",
       "items": {
         "type": "string"
       },
-      "description": "Globs of files to exclude, relative to the project root."
+      "description": "Specifies glob patterns of files to exclude from testing, relative to the project root."
     },
     "watch": {
       "type": "boolean",
-      "description": "Re-run tests when source files change. Defaults to `true` in TTY environments and `false` otherwise."
+      "description": "Enables watch mode, which re-runs tests when source files change. Defaults to `true` in TTY environments and `false` otherwise."
     },
     "debug": {
       "type": "boolean",
-      "description": "Initialize the test runner to support using the Node Inspector for test debugging.",
+      "description": "Enables debugging mode for tests, allowing the use of the Node Inspector.",
       "default": false
     },
     "codeCoverage": {
       "type": "boolean",
-      "description": "Output a code coverage report.",
+      "description": "Enables code coverage reporting for tests.",
       "default": false
     },
     "codeCoverageExclude": {
       "type": "array",
-      "description": "Globs to exclude from code coverage.",
+      "description": "Specifies glob patterns of files to exclude from the code coverage report.",
       "items": {
         "type": "string"
       }
     },
     "codeCoverageReporters": {
       "type": "array",
-      "description": "Reporters to use for code coverage results.",
+      "description": "Specifies the reporters to use for code coverage results. Each reporter can be a string representing its name, or a tuple containing the name and an options object. Built-in reporters include 'html', 'lcov', 'lcovonly', 'text', 'text-summary', 'cobertura', 'json', and 'json-summary'.",
       "items": {
         "oneOf": [
           {
@@ -126,11 +126,11 @@
     },
     "outputFile": {
       "type": "string",
-      "description": "The file to output the test report to. If not specified, the test runner will output to the console."
+      "description": "Specifies a file path for the test report, applying only to the first reporter. To configure output files for multiple reporters, use the tuple format `['reporter-name', { outputFile: '...' }]` within the `reporters` option. When not provided, output is written to the console."
     },
     "providersFile": {
       "type": "string",
-      "description": "TypeScript file that exports an array of Angular providers to use during test execution. The array must be a default export.",
+      "description": "Specifies the path to a TypeScript file that provides an array of Angular providers for the test environment. The file must contain a default export of the provider array.",
       "minLength": 1
     },
     "setupFiles": {
@@ -138,11 +138,11 @@
       "items": {
         "type": "string"
       },
-      "description": "A list of global setup and configuration files that are included before the test files. The application's polyfills are always included before these files. The Angular Testbed is also initialized prior to the execution of these files."
+      "description": "A list of paths to global setup files that are executed before the test files. The application's polyfills and the Angular TestBed are always initialized before these files."
     },
     "progress": {
       "type": "boolean",
-      "description": "Log progress to the console while building. Defaults to the build target's progress value."
+      "description": "Shows build progress information in the console. Defaults to the `progress` setting of the specified `buildTarget`."
     }
   },
   "additionalProperties": false,
