@@ -225,7 +225,7 @@ export type UnitTestBuilderOptions = {
     include?: string[];
     progress?: boolean;
     providersFile?: string;
-    reporters?: string[];
+    reporters?: SchemaReporter[];
     runner: Runner;
     setupFiles?: string[];
     tsConfig: string;

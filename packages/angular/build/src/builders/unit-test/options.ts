@@ -15,6 +15,16 @@ import type { Schema as UnitTestBuilderOptions } from './schema';
 
 export type NormalizedUnitTestBuilderOptions = Awaited<ReturnType<typeof normalizeOptions>>;
 
+function normalizeReporterOption(
+  reporters: unknown[] | undefined,
+): [string, Record<string, unknown>][] | undefined {
+  return reporters?.map((entry) =>
+    typeof entry === 'string'
+      ? ([entry, {}] as [string, Record<string, unknown>])
+      : (entry as [string, Record<string, unknown>]),
+  );
+}
+
 export async function normalizeOptions(
   context: BuilderContext,
   projectName: string,
@@ -33,7 +43,7 @@ export async function normalizeOptions(
   const buildTargetSpecifier = options.buildTarget ?? `::development`;
   const buildTarget = targetFromTargetString(buildTargetSpecifier, projectName, 'build');
 
-  const { tsConfig, runner, reporters, browsers, progress } = options;
+  const { tsConfig, runner, browsers, progress } = options;
 
   return {
     // Project/workspace information
@@ -49,16 +59,12 @@ export async function normalizeOptions(
     codeCoverage: options.codeCoverage
       ? {
           exclude: options.codeCoverageExclude,
-          reporters: options.codeCoverageReporters?.map((entry) =>
-            typeof entry === 'string'
-              ? ([entry, {}] as [string, Record<string, unknown>])
-              : (entry as [string, Record<string, unknown>]),
-          ),
+          reporters: normalizeReporterOption(options.codeCoverageReporters),
         }
       : undefined,
     tsConfig,
     buildProgress: progress,
-    reporters,
+    reporters: normalizeReporterOption(options.reporters),
     browsers,
     watch: options.watch ?? isTTY(),
     debug: options.debug ?? false,
