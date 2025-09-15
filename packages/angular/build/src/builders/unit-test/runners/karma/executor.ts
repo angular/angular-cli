@@ -60,7 +60,16 @@ export class KarmaExecutor implements TestExecutor {
       codeCoverage: !!unitTestOptions.codeCoverage,
       codeCoverageExclude: unitTestOptions.codeCoverage?.exclude,
       fileReplacements: buildTargetOptions.fileReplacements,
-      reporters: unitTestOptions.reporters,
+      reporters: unitTestOptions.reporters?.map((reporter) => {
+        // Karma only supports string reporters.
+        if (Object.keys(reporter[1]).length > 0) {
+          context.logger.warn(
+            `The "karma" test runner does not support options for the "${reporter[0]}" reporter. The options will be ignored.`,
+          );
+        }
+
+        return reporter[0];
+      }),
       webWorkerTsConfig: buildTargetOptions.webWorkerTsConfig,
       aot: buildTargetOptions.aot,
     };
