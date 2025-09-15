@@ -21,6 +21,7 @@ ts_project(
         # resolvable in the test project.
         ":node_modules/@angular/ssr",
         ":node_modules/vitest",
+        ":node_modules/@vitest/coverage-v8",
     ] + glob(["projects/**/*"]),
     deps = [
         ":node_modules/@angular-devkit/architect",

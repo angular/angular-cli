@@ -15,7 +15,7 @@ import {
 } from '../setup';
 
 describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
-  xdescribe('Option: "codeCoverage"', () => {
+  describe('Option: "codeCoverage"', () => {
     beforeEach(async () => {
       setupApplicationTarget(harness);
     });
