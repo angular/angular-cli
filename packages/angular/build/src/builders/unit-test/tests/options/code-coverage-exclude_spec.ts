@@ -15,7 +15,7 @@ import {
 } from '../setup';
 
 describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
-  xdescribe('Option: "codeCoverageExclude"', () => {
+  describe('Option: "codeCoverageExclude"', () => {
     beforeEach(async () => {
       setupApplicationTarget(harness);
       await harness.writeFiles({
@@ -31,8 +31,8 @@ describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
 
       const { result } = await harness.executeOnce();
       expect(result?.success).toBeTrue();
-      const summary = harness.readFile('coverage/coverage-summary.json');
-      expect(summary).toContain('"src/app/error.ts"');
+      const summary = harness.readFile('coverage/coverage-final.json');
+      expect(summary).toContain('src/app/error.ts"');
     });
 
     it('should exclude files from coverage that match the glob pattern', async () => {
@@ -44,8 +44,8 @@ describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
 
       const { result } = await harness.executeOnce();
       expect(result?.success).toBeTrue();
-      const summary = harness.readFile('coverage/coverage-summary.json');
-      expect(summary).not.toContain('"src/app/error.ts"');
+      const summary = harness.readFile('coverage/coverage-final.json');
+      expect(summary).not.toContain('src/app/error.ts"');
     });
   });
 });
