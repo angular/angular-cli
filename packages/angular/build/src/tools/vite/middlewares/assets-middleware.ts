@@ -12,6 +12,7 @@ import { readFileSync } from 'node:fs';
 import type { ServerResponse } from 'node:http';
 import { extname } from 'node:path';
 import type { Connect, ViteDevServer } from 'vite';
+import { ResultFile } from '../../../builders/application/results';
 import { AngularMemoryOutputFiles, AngularOutputAssets, pathnameWithoutBasePath } from '../utils';
 
 export interface ComponentStyleRecord {
@@ -213,4 +214,46 @@ function checkAndHandleEtag(
   }
 
   return false;
+}
+
+export function createBuildAssetsMiddleware(
+  basePath: string,
+  buildResultFiles: ReadonlyMap<string, ResultFile>,
+  readHandler: (path: string) => Buffer = readFileSync,
+): Connect.NextHandleFunction {
+  return function buildAssetsMiddleware(req, res, next) {
+    if (req.url === undefined || res.writableEnded) {
+      return;
+    }
+
+    // Parse the incoming request.
+    // The base of the URL is unused but required to parse the URL.
+    const pathname = pathnameWithoutBasePath(req.url, basePath);
+    const extension = extname(pathname);
+    if (extension && !/\.[mc]?[jt]s(?:\.map)?$/.test(extension)) {
+      const outputFile = buildResultFiles.get(pathname.slice(1));
+      if (outputFile) {
+        const contents =
+          outputFile.origin === 'memory' ? outputFile.contents : readHandler(outputFile.inputPath);
+
+        const etag = `W/${createHash('sha256').update(contents).digest('hex')}`;
+        if (checkAndHandleEtag(req, res, etag)) {
+          return;
+        }
+
+        const mimeType = lookupMimeType(extension);
+        if (mimeType) {
+          res.setHeader('Content-Type', mimeType);
+        }
+
+        res.setHeader('ETag', etag);
+        res.setHeader('Cache-Control', 'no-cache');
+        res.end(contents);
+
+        return;
+      }
+    }
+
+    next();
+  };
 }
