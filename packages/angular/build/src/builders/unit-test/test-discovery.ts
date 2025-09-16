@@ -85,19 +85,11 @@ export function getTestEntrypoints(
   { projectSourceRoot, workspaceRoot, removeTestExtension }: TestEntrypointsOptions,
 ): Map<string, string> {
   const seen = new Set<string>();
+  const roots = [projectSourceRoot, workspaceRoot];
 
   return new Map(
     Array.from(testFiles, (testFile) => {
-      const relativePath = removeRoots(testFile, [projectSourceRoot, workspaceRoot])
-        // Strip leading dots and path separators.
-        .replace(/^[./\\]+/, '')
-        // Replace any path separators with dashes.
-        .replace(/[/\\]/g, '-');
-      let fileName = basename(relativePath, extname(relativePath));
-      if (removeTestExtension) {
-        fileName = fileName.replace(/\.(spec|test)$/, '');
-      }
-
+      const fileName = generateNameFromPath(testFile, roots, !!removeTestExtension);
       const baseName = `spec-${fileName}`;
       let uniqueName = baseName;
       let suffix = 2;
@@ -110,6 +102,50 @@ export function getTestEntrypoints(
       return [uniqueName, testFile];
     }),
   );
+}
+
+/**
+ * Generates a unique, dash-delimited name from a file path.
+ * This is used to create a consistent and readable bundle name for a given test file.
+ * @param testFile The absolute path to the test file.
+ * @param roots An array of root paths to remove from the beginning of the test file path.
+ * @param removeTestExtension Whether to remove the `.spec` or `.test` extension from the result.
+ * @returns A dash-cased name derived from the relative path of the test file.
+ */
+function generateNameFromPath(
+  testFile: string,
+  roots: string[],
+  removeTestExtension: boolean,
+): string {
+  const relativePath = removeRoots(testFile, roots);
+
+  let startIndex = 0;
+  // Skip leading dots and slashes
+  while (startIndex < relativePath.length && /^[./\\]$/.test(relativePath[startIndex])) {
+    startIndex++;
+  }
+
+  let endIndex = relativePath.length;
+  if (removeTestExtension) {
+    const match = relativePath.match(/\.(spec|test)\.[^.]+$/);
+    if (match?.index) {
+      endIndex = match.index;
+    }
+  } else {
+    const extIndex = relativePath.lastIndexOf('.');
+    if (extIndex > startIndex) {
+      endIndex = extIndex;
+    }
+  }
+
+  // Build the final string in a single pass
+  let result = '';
+  for (let i = startIndex; i < endIndex; i++) {
+    const char = relativePath[i];
+    result += char === '/' || char === '\\' ? '-' : char;
+  }
+
+  return result;
 }
 
 const removeLeadingSlash = (pattern: string): string => {
