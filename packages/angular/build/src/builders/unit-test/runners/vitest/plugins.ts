@@ -10,6 +10,7 @@ import assert from 'node:assert';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import type { VitestPlugin } from 'vitest/node';
+import { createBuildAssetsMiddleware } from '../../../../tools/vite/middlewares/assets-middleware';
 import { toPosixPath } from '../../../../utils/path';
 import type { ResultFile } from '../../../application/results';
 import type { NormalizedUnitTestBuilderOptions } from '../../options';
@@ -128,6 +129,11 @@ export function createVitestPlugins(
                     map: map ? JSON.parse(map) : undefined,
                   };
                 }
+              },
+              configureServer: (server) => {
+                server.middlewares.use(
+                  createBuildAssetsMiddleware(server.config.base, buildResultFiles),
+                );
               },
             },
             {
