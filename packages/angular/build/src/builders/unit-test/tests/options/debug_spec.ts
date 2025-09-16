@@ -12,6 +12,8 @@ import {
   describeBuilder,
   UNIT_TEST_BUILDER_INFO,
   setupApplicationTarget,
+  expectLog,
+  expectNoLog,
 } from '../setup';
 
 describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
@@ -28,9 +30,7 @@ describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
 
       const { result, logs } = await harness.executeOnce();
       expect(result?.success).toBeTrue();
-      expect(logs).not.toContain(
-        jasmine.objectContaining({ message: jasmine.stringMatching(/Node.js inspector/) }),
-      );
+      expectNoLog(logs, /Node.js inspector/);
     });
 
     it('should enter debug mode when debug is true', async () => {
@@ -41,11 +41,7 @@ describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
 
       const { result, logs } = await harness.executeOnce();
       expect(result?.success).toBeTrue();
-      expect(logs).toContain(
-        jasmine.objectContaining({
-          message: jasmine.stringMatching(/Node.js inspector is active/),
-        }),
-      );
+      expectLog(logs, /Node.js inspector is active/);
     });
   });
 });

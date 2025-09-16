@@ -6,10 +6,9 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import type { logging } from '@angular-devkit/core';
 import { buildApplication } from '../../index';
 import { OutputHashing } from '../../schema';
-import { APPLICATION_BUILDER_INFO, BASE_OPTIONS, describeBuilder } from '../setup';
+import { APPLICATION_BUILDER_INFO, BASE_OPTIONS, describeBuilder, expectLog } from '../setup';
 
 describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
   beforeEach(async () => {
@@ -57,13 +56,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
           },
           async ({ result, logs }) => {
             expect(result?.success).toBeFalse();
-            expect(logs).toContain(
-              jasmine.objectContaining<logging.LogEntry>({
-                message: jasmine.stringMatching(
-                  `Type 'number' is not assignable to type 'string'.`,
-                ),
-              }),
-            );
+            expectLog(logs, `Type 'number' is not assignable to type 'string'.`);
 
             // Fix TS error
             await harness.writeFile('src/lazy.ts', `export const foo: string = "1";`);

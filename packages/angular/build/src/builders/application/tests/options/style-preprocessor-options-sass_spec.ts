@@ -7,8 +7,7 @@
  */
 
 import { buildApplication } from '../../index';
-import { APPLICATION_BUILDER_INFO, BASE_OPTIONS, describeBuilder } from '../setup';
-import { logging } from '@angular-devkit/core';
+import { APPLICATION_BUILDER_INFO, BASE_OPTIONS, describeBuilder, expectNoLog } from '../setup';
 
 describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
   describe('Option: "stylePreprocessorOptions.sass"', () => {
@@ -28,11 +27,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       const { result, logs } = await harness.executeOnce({ outputLogsOnFailure: false });
 
       expect(result?.success).toBeFalse();
-      expect(logs).not.toContain(
-        jasmine.objectContaining<logging.LogEntry>({
-          message: jasmine.stringMatching('darken() is deprecated'),
-        }),
-      );
+      expectNoLog(logs, 'darken() is deprecated');
     });
 
     it('should succeed without `fatalDeprecations` despite using deprecated color functions', async () => {
@@ -79,11 +74,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       });
 
       expect(result?.success).toBeFalse();
-      expect(logs).not.toContain(
-        jasmine.objectContaining<logging.LogEntry>({
-          message: jasmine.stringMatching('darken() is deprecated'),
-        }),
-      );
+      expectNoLog(logs, 'darken() is deprecated');
     });
   });
 });

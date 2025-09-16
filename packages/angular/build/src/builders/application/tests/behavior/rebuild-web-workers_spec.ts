@@ -6,9 +6,14 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { logging } from '@angular-devkit/core';
 import { buildApplication } from '../../index';
-import { APPLICATION_BUILDER_INFO, BASE_OPTIONS, describeBuilder } from '../setup';
+import {
+  APPLICATION_BUILDER_INFO,
+  BASE_OPTIONS,
+  describeBuilder,
+  expectLog,
+  expectNoLog,
+} from '../setup';
 
 /**
  * A regular expression used to check if a built worker is correctly referenced in application code.
@@ -62,22 +67,14 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
           },
           async ({ result, logs }) => {
             expect(result?.success).toBeFalse();
-            expect(logs).toContain(
-              jasmine.objectContaining<logging.LogEntry>({
-                message: jasmine.stringMatching(errorText),
-              }),
-            );
+            expectLog(logs, errorText);
 
             // Make an unrelated change to verify error cache was updated
             // Should persist error in the next rebuild
             await harness.modifyFile('src/main.ts', (content) => content + '\n');
           },
           async ({ logs }) => {
-            expect(logs).toContain(
-              jasmine.objectContaining<logging.LogEntry>({
-                message: jasmine.stringMatching(errorText),
-              }),
-            );
+            expectLog(logs, errorText);
 
             // Revert the change that caused the error
             // Should remove the error
@@ -85,11 +82,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
           },
           async ({ result, logs }) => {
             expect(result?.success).toBeTrue();
-            expect(logs).not.toContain(
-              jasmine.objectContaining<logging.LogEntry>({
-                message: jasmine.stringMatching(errorText),
-              }),
-            );
+            expectNoLog(logs, errorText);
 
             // Make an unrelated change to verify error cache was updated
             // Should continue showing no error
@@ -97,11 +90,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
           },
           ({ result, logs }) => {
             expect(result?.success).toBeTrue();
-            expect(logs).not.toContain(
-              jasmine.objectContaining<logging.LogEntry>({
-                message: jasmine.stringMatching(errorText),
-              }),
-            );
+            expectNoLog(logs, errorText);
 
             // Ensure built worker is referenced in the application code
             harness.expectFile('dist/browser/main.js').content.toMatch(REFERENCED_WORKER_REGEXP);

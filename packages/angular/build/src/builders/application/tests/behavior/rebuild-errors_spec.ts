@@ -6,9 +6,14 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { logging } from '@angular-devkit/core';
 import { buildApplication } from '../../index';
-import { APPLICATION_BUILDER_INFO, BASE_OPTIONS, describeBuilder } from '../setup';
+import {
+  APPLICATION_BUILDER_INFO,
+  BASE_OPTIONS,
+  describeBuilder,
+  expectLog,
+  expectNoLog,
+} from '../setup';
 
 /**
  * Maximum time in milliseconds for single build/rebuild
@@ -92,11 +97,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
           },
           async ({ result, logs }) => {
             expect(result?.success).toBeFalse();
-            expect(logs).toContain(
-              jasmine.objectContaining<logging.LogEntry>({
-                message: jasmine.stringMatching(typeErrorText),
-              }),
-            );
+            expectLog(logs, typeErrorText);
 
             // Make an unrelated change to verify error cache was updated
             // Should persist error in the next rebuild
@@ -104,11 +105,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
           },
           async ({ result, logs }) => {
             expect(result?.success).toBeFalse();
-            expect(logs).toContain(
-              jasmine.objectContaining<logging.LogEntry>({
-                message: jasmine.stringMatching(typeErrorText),
-              }),
-            );
+            expectLog(logs, typeErrorText);
 
             // Revert the directive change that caused the error
             // Should remove the error
@@ -116,11 +113,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
           },
           async ({ result, logs }) => {
             expect(result?.success).toBeTrue();
-            expect(logs).not.toContain(
-              jasmine.objectContaining<logging.LogEntry>({
-                message: jasmine.stringMatching(typeErrorText),
-              }),
-            );
+            expectNoLog(logs, typeErrorText);
 
             // Make an unrelated change to verify error cache was updated
             // Should continue showing no error
@@ -128,11 +121,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
           },
           ({ result, logs }) => {
             expect(result?.success).toBeTrue();
-            expect(logs).not.toContain(
-              jasmine.objectContaining<logging.LogEntry>({
-                message: jasmine.stringMatching(typeErrorText),
-              }),
-            );
+            expectNoLog(logs, typeErrorText);
           },
         ],
         { outputLogsOnFailure: false },
@@ -152,78 +141,38 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
             await harness.appendToFile('src/app/app.component.html', '@if-one');
           },
           async ({ logs }) => {
-            expect(logs).toContain(
-              jasmine.objectContaining<logging.LogEntry>({
-                message: jasmine.stringContaining('@if-one'),
-              }),
-            );
+            expectLog(logs, '@if-one');
 
             // Make an unrelated change to verify error cache was updated
             // Should persist error in the next rebuild
             await harness.modifyFile('src/main.ts', (content) => content + '\n');
           },
           async ({ logs }) => {
-            expect(logs).toContain(
-              jasmine.objectContaining<logging.LogEntry>({
-                message: jasmine.stringContaining('@if-one'),
-              }),
-            );
+            expectLog(logs, '@if-one');
 
             // Add more invalid block syntax
             await harness.appendToFile('src/app/app.component.html', '@if-two');
           },
           async ({ logs }) => {
-            expect(logs).toContain(
-              jasmine.objectContaining<logging.LogEntry>({
-                message: jasmine.stringContaining('@if-one'),
-              }),
-            );
-            expect(logs).toContain(
-              jasmine.objectContaining<logging.LogEntry>({
-                message: jasmine.stringContaining('@if-two'),
-              }),
-            );
+            expectLog(logs, '@if-one');
+            expectLog(logs, '@if-two');
 
             // Add more invalid block syntax
             await harness.appendToFile('src/app/app.component.html', '@if-three');
           },
           async ({ logs }) => {
-            expect(logs).toContain(
-              jasmine.objectContaining<logging.LogEntry>({
-                message: jasmine.stringContaining('@if-one'),
-              }),
-            );
-            expect(logs).toContain(
-              jasmine.objectContaining<logging.LogEntry>({
-                message: jasmine.stringContaining('@if-two'),
-              }),
-            );
-            expect(logs).toContain(
-              jasmine.objectContaining<logging.LogEntry>({
-                message: jasmine.stringContaining('@if-three'),
-              }),
-            );
+            expectLog(logs, '@if-one');
+            expectLog(logs, '@if-two');
+            expectLog(logs, '@if-three');
 
             // Revert the changes that caused the error
             // Should remove the error
             await harness.writeFile('src/app/app.component.html', '<p>GOOD</p>');
           },
           ({ logs }) => {
-            expect(logs).not.toContain(
-              jasmine.objectContaining<logging.LogEntry>({
-                message: jasmine.stringContaining('@if-one'),
-              }),
-            );
-            expect(logs).not.toContain(
-              jasmine.objectContaining<logging.LogEntry>({
-                message: jasmine.stringContaining('@if-two'),
-              }),
-            );
-            expect(logs).not.toContain(
-              jasmine.objectContaining<logging.LogEntry>({
-                message: jasmine.stringContaining('@if-three'),
-              }),
-            );
+            expectNoLog(logs, '@if-one');
+            expectNoLog(logs, '@if-two');
+            expectNoLog(logs, '@if-three');
           },
         ],
         { outputLogsOnFailure: false },
@@ -243,20 +192,12 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
             await harness.writeFile('src/app/app.component.css', 'invalid-css-content');
           },
           async ({ logs }) => {
-            expect(logs).toContain(
-              jasmine.objectContaining<logging.LogEntry>({
-                message: jasmine.stringMatching('invalid-css-content'),
-              }),
-            );
+            expectLog(logs, 'invalid-css-content');
 
             await harness.writeFile('src/app/app.component.css', 'p { color: green }');
           },
           ({ logs }) => {
-            expect(logs).not.toContain(
-              jasmine.objectContaining<logging.LogEntry>({
-                message: jasmine.stringMatching('invalid-css-content'),
-              }),
-            );
+            expectNoLog(logs, 'invalid-css-content');
 
             harness
               .expectFile('dist/browser/main.js')
@@ -280,20 +221,12 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
             await harness.appendToFile('src/app/app.component.html', '<div>Hello, world!</div');
           },
           async ({ logs }) => {
-            expect(logs).toContain(
-              jasmine.objectContaining<logging.LogEntry>({
-                message: jasmine.stringMatching('Unexpected character "EOF"'),
-              }),
-            );
+            expectLog(logs, 'Unexpected character "EOF"');
 
             await harness.appendToFile('src/app/app.component.html', '>');
           },
           async ({ logs }) => {
-            expect(logs).not.toContain(
-              jasmine.objectContaining<logging.LogEntry>({
-                message: jasmine.stringMatching('Unexpected character "EOF"'),
-              }),
-            );
+            expectNoLog(logs, 'Unexpected character "EOF"');
 
             harness.expectFile('dist/browser/main.js').content.toContain('Hello, world!');
 
@@ -301,11 +234,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
             await harness.appendToFile('src/app/app.component.html', '<div>Guten Tag</div>');
           },
           ({ logs }) => {
-            expect(logs).not.toContain(
-              jasmine.objectContaining<logging.LogEntry>({
-                message: jasmine.stringMatching('invalid-css-content'),
-              }),
-            );
+            expectNoLog(logs, 'invalid-css-content');
 
             harness.expectFile('dist/browser/main.js').content.toContain('Hello, world!');
             harness.expectFile('dist/browser/main.js').content.toContain('Guten Tag');

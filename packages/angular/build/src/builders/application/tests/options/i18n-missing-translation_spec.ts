@@ -7,7 +7,7 @@
  */
 
 import { buildApplication } from '../../index';
-import { APPLICATION_BUILDER_INFO, BASE_OPTIONS, describeBuilder } from '../setup';
+import { APPLICATION_BUILDER_INFO, BASE_OPTIONS, describeBuilder, expectNoLog } from '../setup';
 
 describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
   describe('Option: "i18nMissingTranslation"', () => {
@@ -131,11 +131,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       const { result, logs } = await harness.executeOnce({ outputLogsOnFailure: false });
 
       expect(result?.success).toBeTrue();
-      expect(logs).not.toContain(
-        jasmine.objectContaining({
-          message: jasmine.stringMatching('No translation found for'),
-        }),
-      );
+      expectNoLog(logs, 'No translation found for');
     });
 
     it('should not error or warn when i18nMissingTranslation is set to error and all found', async () => {
@@ -158,11 +154,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       const { result, logs } = await harness.executeOnce({ outputLogsOnFailure: false });
 
       expect(result?.success).toBeTrue();
-      expect(logs).not.toContain(
-        jasmine.objectContaining({
-          message: jasmine.stringMatching('No translation found for'),
-        }),
-      );
+      expectNoLog(logs, 'No translation found for');
     });
 
     it('should not error or warn when i18nMissingTranslation is set to warning and all found', async () => {
@@ -185,11 +177,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       const { result, logs } = await harness.executeOnce({ outputLogsOnFailure: false });
 
       expect(result?.success).toBeTrue();
-      expect(logs).not.toContain(
-        jasmine.objectContaining({
-          message: jasmine.stringMatching('No translation found for'),
-        }),
-      );
+      expectNoLog(logs, 'No translation found for');
     });
   });
 });

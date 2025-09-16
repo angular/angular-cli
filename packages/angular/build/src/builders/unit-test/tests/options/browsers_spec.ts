@@ -12,6 +12,7 @@ import {
   describeBuilder,
   UNIT_TEST_BUILDER_INFO,
   setupApplicationTarget,
+  expectLog,
 } from '../setup';
 
 describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
@@ -28,9 +29,7 @@ describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
 
       const { result, logs } = await harness.executeOnce();
       expect(result?.success).toBeTrue();
-      expect(logs).toContain(
-        jasmine.objectContaining({ message: 'Using jsdom in Node.js for test execution.' }),
-      );
+      expectLog(logs, 'Using jsdom in Node.js for test execution.');
     });
 
     it('should fail when browsers is empty', async () => {
@@ -52,9 +51,7 @@ describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
 
       const { result, logs } = await harness.executeOnce();
       expect(result?.success).toBeTrue();
-      expect(logs).toContain(
-        jasmine.objectContaining({ message: jasmine.stringMatching(/Starting browser "chrome"/) }),
-      );
+      expectLog(logs, /Starting browser "chrome"/);
     });
 
     it('should launch a browser in headless mode when specified', async () => {
@@ -65,11 +62,7 @@ describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
 
       const { result, logs } = await harness.executeOnce();
       expect(result?.success).toBeTrue();
-      expect(logs).toContain(
-        jasmine.objectContaining({
-          message: jasmine.stringMatching(/Starting browser "chrome" in headless mode/),
-        }),
-      );
+      expectLog(logs, /Starting browser "chrome" in headless mode/);
     });
   });
 });
