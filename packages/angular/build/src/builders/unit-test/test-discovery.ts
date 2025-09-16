@@ -11,20 +11,59 @@ import { basename, dirname, extname, join, relative } from 'node:path';
 import { glob, isDynamicPattern } from 'tinyglobby';
 import { toPosixPath } from '../../utils/path';
 
-/* Go through all patterns and find unique list of files */
+/**
+ * Finds all test files in the project.
+ *
+ * @param include Glob patterns of files to include.
+ * @param exclude Glob patterns of files to exclude.
+ * @param workspaceRoot The absolute path to the workspace root.
+ * @param projectSourceRoot The absolute path to the project's source root.
+ * @returns A unique set of absolute paths to all test files.
+ */
 export async function findTests(
   include: string[],
   exclude: string[],
   workspaceRoot: string,
   projectSourceRoot: string,
 ): Promise<string[]> {
-  const matchingTestsPromises = include.map((pattern) =>
-    findMatchingTests(pattern, exclude, workspaceRoot, projectSourceRoot),
-  );
-  const files = await Promise.all(matchingTestsPromises);
+  const staticMatches = new Set<string>();
+  const dynamicPatterns: string[] = [];
 
-  // Unique file names
-  return [...new Set(files.flat())];
+  const normalizedExcludes = exclude.map((p) =>
+    normalizePattern(p, workspaceRoot, projectSourceRoot),
+  );
+
+  // 1. Separate static and dynamic patterns
+  for (const pattern of include) {
+    const normalized = normalizePattern(pattern, workspaceRoot, projectSourceRoot);
+    if (isDynamicPattern(normalized)) {
+      dynamicPatterns.push(normalized);
+    } else {
+      const result = await handleStaticPattern(normalized, projectSourceRoot);
+      if (Array.isArray(result)) {
+        result.forEach((file) => staticMatches.add(file));
+      } else {
+        // It was a static path that didn't resolve to a spec, treat as dynamic
+        dynamicPatterns.push(result);
+      }
+    }
+  }
+
+  // 2. Execute a single glob for all dynamic patterns
+  if (dynamicPatterns.length > 0) {
+    const globMatches = await glob(dynamicPatterns, {
+      cwd: projectSourceRoot,
+      absolute: true,
+      ignore: ['**/node_modules/**', ...normalizedExcludes],
+    });
+
+    for (const match of globMatches) {
+      staticMatches.add(match);
+    }
+  }
+
+  // 3. Combine and de-duplicate results
+  return [...staticMatches];
 }
 
 interface TestEntrypointsOptions {
@@ -33,7 +72,14 @@ interface TestEntrypointsOptions {
   removeTestExtension?: boolean;
 }
 
-/** Generate unique bundle names for a set of test files. */
+/**
+ * Generates unique, dash-delimited bundle names for a set of test files.
+ * This is used to create distinct output files for each test.
+ *
+ * @param testFiles An array of absolute paths to test files.
+ * @param options Configuration options for generating entry points.
+ * @returns A map where keys are the generated unique bundle names and values are the original file paths.
+ */
 export function getTestEntrypoints(
   testFiles: string[],
   { projectSourceRoot, workspaceRoot, removeTestExtension }: TestEntrypointsOptions,
@@ -82,6 +128,10 @@ const removeRelativeRoot = (path: string, root: string): string => {
   return path;
 };
 
+/**
+ * Removes potential root paths from a file path, returning a relative path.
+ * If no root path matches, it returns the file's basename.
+ */
 function removeRoots(path: string, roots: string[]): string {
   for (const root of roots) {
     if (path.startsWith(root)) {
@@ -92,12 +142,20 @@ function removeRoots(path: string, roots: string[]): string {
   return basename(path);
 }
 
-async function findMatchingTests(
+/**
+ * Normalizes a glob pattern by converting it to a POSIX path, removing leading slashes,
+ * and making it relative to the project source root.
+ *
+ * @param pattern The glob pattern to normalize.
+ * @param workspaceRoot The absolute path to the workspace root.
+ * @param projectSourceRoot The absolute path to the project's source root.
+ * @returns A normalized glob pattern.
+ */
+function normalizePattern(
   pattern: string,
-  ignore: string[],
   workspaceRoot: string,
   projectSourceRoot: string,
-): Promise<string[]> {
+): string {
   // normalize pattern, glob lib only accepts forward slashes
   let normalizedPattern = toPosixPath(pattern);
   normalizedPattern = removeLeadingSlash(normalizedPattern);
@@ -106,40 +164,43 @@ async function findMatchingTests(
 
   // remove relativeProjectRoot to support relative paths from root
   // such paths are easy to get when running scripts via IDEs
-  normalizedPattern = removeRelativeRoot(normalizedPattern, relativeProjectRoot);
-
-  // special logic when pattern does not look like a glob
-  if (!isDynamicPattern(normalizedPattern)) {
-    if (await isDirectory(join(projectSourceRoot, normalizedPattern))) {
-      normalizedPattern = `${normalizedPattern}/**/*.spec.@(ts|tsx)`;
-    } else {
-      // see if matching spec file exists
-      const fileExt = extname(normalizedPattern);
-      // Replace extension to `.spec.ext`. Example: `src/app/app.component.ts`-> `src/app/app.component.spec.ts`
-      const potentialSpec = join(
-        projectSourceRoot,
-        dirname(normalizedPattern),
-        `${basename(normalizedPattern, fileExt)}.spec${fileExt}`,
-      );
-
-      if (await exists(potentialSpec)) {
-        return [potentialSpec];
-      }
-    }
-  }
-
-  // normalize the patterns in the ignore list
-  const normalizedIgnorePatternList = ignore.map((pattern: string) =>
-    removeRelativeRoot(removeLeadingSlash(toPosixPath(pattern)), relativeProjectRoot),
-  );
-
-  return glob(normalizedPattern, {
-    cwd: projectSourceRoot,
-    absolute: true,
-    ignore: ['**/node_modules/**', ...normalizedIgnorePatternList],
-  });
+  return removeRelativeRoot(normalizedPattern, relativeProjectRoot);
 }
 
+/**
+ * Handles static (non-glob) patterns by attempting to resolve them to a directory
+ * of spec files or a corresponding `.spec` file.
+ *
+ * @param pattern The static path pattern.
+ * @param projectSourceRoot The absolute path to the project's source root.
+ * @returns A promise that resolves to either an array of found spec files, a new glob pattern,
+ * or the original pattern if no special handling was applied.
+ */
+async function handleStaticPattern(
+  pattern: string,
+  projectSourceRoot: string,
+): Promise<string[] | string> {
+  const fullPath = join(projectSourceRoot, pattern);
+  if (await isDirectory(fullPath)) {
+    return `${pattern}/**/*.spec.@(ts|tsx)`;
+  }
+
+  const fileExt = extname(pattern);
+  // Replace extension to `.spec.ext`. Example: `src/app/app.component.ts`-> `src/app/app.component.spec.ts`
+  const potentialSpec = join(
+    projectSourceRoot,
+    dirname(pattern),
+    `${basename(pattern, fileExt)}.spec${fileExt}`,
+  );
+
+  if (await exists(potentialSpec)) {
+    return [potentialSpec];
+  }
+
+  return pattern;
+}
+
+/** Checks if a path exists and is a directory. */
 async function isDirectory(path: PathLike): Promise<boolean> {
   try {
     const stats = await fs.stat(path);
@@ -150,6 +211,7 @@ async function isDirectory(path: PathLike): Promise<boolean> {
   }
 }
 
+/** Checks if a path exists on the file system. */
 async function exists(path: PathLike): Promise<boolean> {
   try {
     await fs.access(path, constants.F_OK);
