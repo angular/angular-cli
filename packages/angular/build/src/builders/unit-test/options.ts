@@ -75,6 +75,7 @@ export async function normalizeOptions(
       ? options.setupFiles.map((setupFile) => path.join(workspaceRoot, setupFile))
       : [],
     dumpVirtualFiles: options.dumpVirtualFiles,
+    listTests: options.listTests,
   };
 }
 
