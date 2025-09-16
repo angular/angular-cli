@@ -1,9 +1,7 @@
 load("@devinfra//bazel/api-golden:index.bzl", "api_golden_test_npm_package")
 load("@npm//:defs.bzl", "npm_link_all_packages")
-load("//:constants.bzl", "BASELINE_DATE")
 load("//tools:defaults.bzl", "copy_to_bin", "jasmine_test", "npm_package", "ts_project")
 load("//tools:ts_json_schema.bzl", "ts_json_schema")
-load("//tools/baseline_browserslist:baseline_browserslist.bzl", "baseline_browserslist")
 
 licenses(["notice"])
 
@@ -46,12 +44,6 @@ copy_to_bin(
     srcs = glob(["**/schema.json"]),
 )
 
-baseline_browserslist(
-    name = "angular_browserslist",
-    out = ".browserslistrc",
-    baseline = BASELINE_DATE,
-)
-
 RUNTIME_ASSETS = glob(
     include = [
         "src/**/schema.json",
@@ -62,7 +54,6 @@ RUNTIME_ASSETS = glob(
 ) + [
     "builders.json",
     "package.json",
-    ":angular_browserslist",
 ]
 
 ts_project(
@@ -343,6 +334,7 @@ npm_package(
         "src/utils/version.js",
         "src/tools/esbuild/utils.js",
         "src/utils/normalize-cache.js",
+        "src/utils/supported-browsers.js",
     ],
     tags = ["release-package"],
     deps = RUNTIME_ASSETS + [

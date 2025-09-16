@@ -123,12 +123,15 @@ will block the next weekly release.
     pnpm ng-dev release build
     ```
 1.  Log in to NPM as `angular`.
+
     ```shell
     npm login
     ```
+
     - See these two Valentine entries for authentication details:
       - https://valentine.corp.google.com/#/show/1460636514618735
       - https://valentine.corp.google.com/#/show/1531867371192103
+
 1.  Publish the release.
     ```shell
     (cd dist/releases/my-scope/my-pkg/ && npm publish --access public)
@@ -161,17 +164,10 @@ A few weeks before a major (around feature freeze):
     - Picking a date at the end of a month makes it easier to cross-reference
       Angular's support with other tools (like MDN) which state Baseline support
       using month specificity.
-    - You can view the generated `browserlist` configuration with:
-      ```shell
-      bazel build //packages/angular/build:angular_browserslist
-      cat dist/bin/packages/angular/build/.browserslistrc
-      ```
     - Commit and merge the change, no other alterations or automation is
       necessary in the CLI repo.
-2.  Update
-    [`/.browserslistrc`](https://github.com/ng-packagr/ng-packagr/tree/main/.browserslistrc)
-    in the `ng-packagr` repo.
-    - Use the generated configuration from above.
+2.  Update the date in the `ng-packagr` repo.
+    [`/.stylesheet-processor.ts`](https://github.com/ng-packagr/ng-packagr/blob/main/src/lib/styles/stylesheet-processor.ts#L25).
 3.  Update
     [`angular.dev` documentation](https://github.com/angular/angular/tree/main/adev/src/content/reference/versions.md#browser-support)
     to specify the date used and link to [browsersl.ist](https://browsersl.ist)
