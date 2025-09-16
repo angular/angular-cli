@@ -9,11 +9,11 @@
 import type { BuilderOutput } from '@angular-devkit/architect';
 import type { Config, ConfigOptions } from 'karma';
 import type { ReadableStreamController } from 'node:stream/web';
+import { writeTestFiles } from '../../utils/test-files';
 import type { ApplicationBuilderInternalOptions } from '../application/options';
 import type { Result } from '../application/results';
 import { ResultKind } from '../application/results';
 import type { LatestBuildFiles } from './assets-middleware';
-import { writeTestFiles } from './utils';
 
 const LATEST_BUILD_FILES_TOKEN = 'angularLatestBuildFiles';
 

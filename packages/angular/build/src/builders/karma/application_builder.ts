@@ -13,6 +13,7 @@ import * as fs from 'node:fs/promises';
 import path from 'node:path';
 import { ReadableStream } from 'node:stream/web';
 import { createVirtualModulePlugin } from '../../tools/esbuild/virtual-module-plugin';
+import { writeTestFiles } from '../../utils/test-files';
 import { buildApplicationInternal } from '../application/index';
 import { ApplicationBuilderInternalOptions } from '../application/options';
 import { Result, ResultKind } from '../application/results';
@@ -30,7 +31,6 @@ import {
   getProjectSourceRoot,
   hasChunkOrWorkerFiles,
   normalizePolyfills,
-  writeTestFiles,
 } from './utils';
 import type { KarmaBuilderTransformsOptions } from './index';
 

@@ -221,6 +221,7 @@ export type UnitTestBuilderOptions = {
     codeCoverageExclude?: string[];
     codeCoverageReporters?: SchemaCodeCoverageReporter[];
     debug?: boolean;
+    dumpVirtualFiles?: boolean;
     exclude?: string[];
     filter?: string;
     include?: string[];
