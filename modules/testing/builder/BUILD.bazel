@@ -20,6 +20,7 @@ ts_project(
         # Needed at runtime by some builder tests relying on SSR being
         # resolvable in the test project.
         ":node_modules/@angular/ssr",
+        ":node_modules/jsdom",
         ":node_modules/vitest",
         ":node_modules/@vitest/coverage-v8",
     ] + glob(["projects/**/*"]),
