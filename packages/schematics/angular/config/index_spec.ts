@@ -94,7 +94,7 @@ describe('Config Schematic', () => {
   describe(`when 'type' is 'browserslist'`, () => {
     it('should create a .browserslistrc file', async () => {
       const tree = await runConfigSchematic(ConfigType.Browserslist);
-      expect(tree.readContent('projects/foo/.browserslistrc')).toContain('Chrome >=');
+      expect(tree.exists('projects/foo/.browserslistrc')).toBeTrue();
     });
   });
 });

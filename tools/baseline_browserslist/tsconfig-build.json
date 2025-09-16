@@ -1,8 +1,0 @@
-{
-  "extends": "../../tsconfig-build-esm.json",
-  "include": ["**.mts"],
-  "exclude": ["**_spec.mts"],
-  "compilerOptions": {
-    "types": ["node"]
-  }
-}

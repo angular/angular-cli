@@ -1,4 +1,0 @@
-{
-  "extends": "../../tsconfig-test-esm.json",
-  "include": ["**_spec.mts"]
-}

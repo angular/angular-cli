@@ -8,14 +8,15 @@
 
 import browserslist from 'browserslist';
 
+// The below is replaced by bazel `npm_package`.
+const BASELINE_DATE = 'BASELINE-DATE-PLACEHOLDER';
+
 export function getSupportedBrowsers(
   projectRoot: string,
   logger: { warn(message: string): void },
 ): string[] {
   // Read the browserslist configuration containing Angular's browser support policy.
-  const angularBrowserslist = browserslist(undefined, {
-    path: require.resolve('../../.browserslistrc'),
-  });
+  const angularBrowserslist = browserslist(`baseline widely available on ${getBaselineDate()}`);
 
   // Use Angular's configuration as the default.
   browserslist.defaults = angularBrowserslist;
@@ -59,4 +60,9 @@ export function getSupportedBrowsers(
   }
 
   return Array.from(browsersFromConfigOrDefault);
+}
+
+function getBaselineDate(): string {
+  // Unlike `npm_package`, `ts_project` which is used to run unit tests does not support substitutions.
+  return BASELINE_DATE[0] === 'B' ? '2025-01-01' : BASELINE_DATE;
 }

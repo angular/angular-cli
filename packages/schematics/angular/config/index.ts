@@ -17,7 +17,6 @@ import {
   strings,
   url,
 } from '@angular-devkit/schematics';
-import { readFile } from 'node:fs/promises';
 import { posix as path } from 'node:path';
 import { relativePathToWorkspaceRoot } from '../utility/paths';
 import { createProjectSchematic } from '../utility/project';
@@ -37,13 +36,11 @@ export default createProjectSchematic<ConfigOptions>((options, { project }) => {
 });
 
 async function addBrowserslistConfig(projectRoot: string): Promise<Rule> {
-  // Read Angular's default vendored `.browserslistrc` file.
-  const config = await readFile(path.join(__dirname, '.browserslistrc'), 'utf8');
-
   return mergeWith(
     apply(url('./files'), [
       filter((p) => p.endsWith('.browserslistrc.template')),
-      applyTemplates({ config }),
+      // The below is replaced by bazel `npm_package`.
+      applyTemplates({ baselineDate: 'BASELINE-DATE-PLACEHOLDER' }),
       move(projectRoot),
     ]),
   );
