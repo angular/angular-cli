@@ -225,6 +225,7 @@ export type UnitTestBuilderOptions = {
     exclude?: string[];
     filter?: string;
     include?: string[];
+    listTests?: boolean;
     outputFile?: string;
     progress?: boolean;
     providersFile?: string;

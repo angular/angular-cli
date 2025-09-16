@@ -27,6 +27,7 @@ import { normalizeOptions } from './options';
 import type { TestRunner } from './runners/api';
 import { MissingDependenciesError } from './runners/dependency-checker';
 import type { Schema as UnitTestBuilderOptions } from './schema';
+import { findTests } from './test-discovery';
 
 export type { UnitTestBuilderOptions };
 
@@ -196,6 +197,24 @@ export async function* execute(
       );
     }
     yield { success: false };
+
+    return;
+  }
+
+  if (normalizedOptions.listTests) {
+    const testFiles = await findTests(
+      normalizedOptions.include,
+      normalizedOptions.exclude ?? [],
+      normalizedOptions.workspaceRoot,
+      normalizedOptions.projectSourceRoot,
+    );
+
+    context.logger.info('Discovered test files:');
+    for (const file of testFiles) {
+      context.logger.info(`  ${path.relative(normalizedOptions.workspaceRoot, file)}`);
+    }
+
+    yield { success: true };
 
     return;
   }

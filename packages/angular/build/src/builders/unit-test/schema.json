@@ -148,6 +148,11 @@
       "type": "boolean",
       "description": "Shows build progress information in the console. Defaults to the `progress` setting of the specified `buildTarget`."
     },
+    "listTests": {
+      "type": "boolean",
+      "description": "Lists all discovered test files and exits the process without building or executing the tests.",
+      "default": false
+    },
     "dumpVirtualFiles": {
       "type": "boolean",
       "description": "Dumps build output files to the `.angular/cache` directory for debugging purposes.",
