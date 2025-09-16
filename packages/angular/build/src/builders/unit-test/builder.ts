@@ -22,6 +22,7 @@ import type {
 import { ResultKind } from '../application/results';
 import { normalizeOptions } from './options';
 import type { TestRunner } from './runners/api';
+import { MissingDependenciesError } from './runners/dependency-checker';
 import type { Schema as UnitTestBuilderOptions } from './schema';
 
 export type { UnitTestBuilderOptions };
@@ -166,11 +167,16 @@ export async function* execute(
   try {
     normalizedOptions = await normalizeOptions(context, projectName, options);
     runner = await loadTestRunner(normalizedOptions.runnerName);
+    await runner.validateDependencies?.(normalizedOptions);
   } catch (e) {
     assertIsError(e);
-    context.logger.error(
-      `An exception occurred during initialization of the test runner:\n${e.stack ?? e.message}`,
-    );
+    if (e instanceof MissingDependenciesError) {
+      context.logger.error(e.message);
+    } else {
+      context.logger.error(
+        `An exception occurred during initialization of the test runner:\n${e.stack ?? e.message}`,
+      );
+    }
     yield { success: false };
 
     return;

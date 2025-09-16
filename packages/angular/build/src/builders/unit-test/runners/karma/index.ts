@@ -7,6 +7,7 @@
  */
 
 import type { TestRunner } from '../api';
+import { DependencyChecker } from '../dependency-checker';
 import { KarmaExecutor } from './executor';
 
 /**
@@ -15,6 +16,26 @@ import { KarmaExecutor } from './executor';
 const KarmaTestRunner: TestRunner = {
   name: 'karma',
   isStandalone: true,
+
+  validateDependencies(options) {
+    const checker = new DependencyChecker(options.projectSourceRoot);
+    checker.check('karma');
+    checker.check('karma-jasmine');
+
+    // Check for browser launchers
+    if (options.browsers?.length) {
+      for (const browser of options.browsers) {
+        const launcherName = `karma-${browser.toLowerCase().split('headless')[0]}-launcher`;
+        checker.check(launcherName);
+      }
+    }
+
+    if (options.codeCoverage) {
+      checker.check('karma-coverage');
+    }
+
+    checker.report();
+  },
 
   getBuildOptions() {
     return {

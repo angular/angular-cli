@@ -8,6 +8,7 @@
 
 import assert from 'node:assert';
 import type { TestRunner } from '../api';
+import { DependencyChecker } from '../dependency-checker';
 import { getVitestBuildOptions } from './build-options';
 import { VitestExecutor } from './executor';
 
@@ -16,6 +17,28 @@ import { VitestExecutor } from './executor';
  */
 const VitestTestRunner: TestRunner = {
   name: 'vitest',
+
+  validateDependencies(options) {
+    const checker = new DependencyChecker(options.projectSourceRoot);
+    checker.check('vitest');
+
+    if (options.browsers?.length) {
+      checker.check('@vitest/browser');
+      checker.checkAny(
+        ['playwright', 'webdriverio'],
+        'The "browsers" option requires either "playwright" or "webdriverio" to be installed.',
+      );
+    } else {
+      // JSDOM is used when no browsers are specified
+      checker.check('jsdom');
+    }
+
+    if (options.codeCoverage) {
+      checker.check('@vitest/coverage-v8');
+    }
+
+    checker.report();
+  },
 
   getBuildOptions(options, baseBuildOptions) {
     return getVitestBuildOptions(options, baseBuildOptions);
