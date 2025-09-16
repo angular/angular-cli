@@ -12,8 +12,11 @@ import {
   targetStringFromTarget,
 } from '@angular-devkit/architect';
 import assert from 'node:assert';
+import { rm } from 'node:fs/promises';
+import path from 'node:path';
 import { createVirtualModulePlugin } from '../../tools/esbuild/virtual-module-plugin';
 import { assertIsError } from '../../utils/error';
+import { writeTestFiles } from '../../utils/test-files';
 import { buildApplicationInternal } from '../application';
 import type {
   ApplicationBuilderExtensions,
@@ -96,6 +99,7 @@ async function* runBuildAndTest(
   executor: import('./runners/api').TestExecutor,
   applicationBuildOptions: ApplicationBuilderInternalOptions,
   context: BuilderContext,
+  dumpDirectory: string | undefined,
   extensions: ApplicationBuilderExtensions | undefined,
 ): AsyncIterable<BuilderOutput> {
   let consecutiveErrorCount = 0;
@@ -117,6 +121,20 @@ async function* runBuildAndTest(
     }
 
     assert(buildResult.files, 'Builder did not provide result files.');
+
+    if (dumpDirectory) {
+      if (buildResult.kind === ResultKind.Full) {
+        // Full build, so clean the directory
+        await rm(dumpDirectory, { recursive: true, force: true });
+      } else {
+        // Incremental build, so delete removed files
+        for (const file of buildResult.removed) {
+          await rm(path.join(dumpDirectory, file.path), { force: true });
+        }
+      }
+      await writeTestFiles(buildResult.files, dumpDirectory);
+      context.logger.info(`Build output files successfully dumped to '${dumpDirectory}'.`);
+    }
 
     // Pass the build artifacts to the executor
     try {
@@ -263,7 +281,17 @@ export async function* execute(
       progress: normalizedOptions.buildProgress ?? buildTargetOptions.progress,
     } satisfies ApplicationBuilderInternalOptions;
 
-    yield* runBuildAndTest(executor, applicationBuildOptions, context, finalExtensions);
+    const dumpDirectory = normalizedOptions.dumpVirtualFiles
+      ? path.join(normalizedOptions.cacheOptions.path, 'unit-test', 'output-files')
+      : undefined;
+
+    yield* runBuildAndTest(
+      executor,
+      applicationBuildOptions,
+      context,
+      dumpDirectory,
+      finalExtensions,
+    );
   } catch (e) {
     assertIsError(e);
     context.logger.error(
