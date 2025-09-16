@@ -7,7 +7,7 @@
  */
 
 import { BuilderHandlerFn } from '@angular-devkit/architect';
-import { json } from '@angular-devkit/core';
+import { json, logging } from '@angular-devkit/core';
 import { readFileSync } from 'node:fs';
 import { concatMap, count, debounceTime, firstValueFrom, take, timeout } from 'rxjs';
 import {
@@ -195,4 +195,26 @@ export function expectDirectory<T>(
       return !exists;
     },
   };
+}
+
+export function expectLog(logs: readonly logging.LogEntry[], message: string | RegExp) {
+  expect(logs).toContain(
+    jasmine.objectContaining({
+      message: jasmine.stringMatching(message),
+    }),
+  );
+}
+
+export function expectNoLog(
+  logs: readonly logging.LogEntry[],
+  message: string | RegExp,
+  failureMessage?: string,
+) {
+  expect(logs)
+    .withContext(failureMessage ?? '')
+    .not.toContain(
+      jasmine.objectContaining({
+        message: jasmine.stringMatching(message),
+      }),
+    );
 }

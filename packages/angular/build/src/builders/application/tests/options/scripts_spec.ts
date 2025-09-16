@@ -7,7 +7,7 @@
  */
 
 import { buildApplication } from '../../index';
-import { APPLICATION_BUILDER_INFO, BASE_OPTIONS, describeBuilder } from '../setup';
+import { APPLICATION_BUILDER_INFO, BASE_OPTIONS, describeBuilder, expectLog } from '../setup';
 
 describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
   describe('Option: "scripts"', () => {
@@ -145,9 +145,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
         expect(result?.success).toBe(true);
 
-        expect(logs).toContain(
-          jasmine.objectContaining({ message: jasmine.stringMatching(/scripts\.js.+\d+ bytes/) }),
-        );
+        expectLog(logs, /scripts\.js.+\d+ bytes/);
       });
     });
 
@@ -412,9 +410,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
         expect(result?.success).toBe(true);
 
-        expect(logs).toContain(
-          jasmine.objectContaining({ message: jasmine.stringMatching(/scripts\.js.+\d+ bytes/) }),
-        );
+        expectLog(logs, /scripts\.js.+\d+ bytes/);
       });
 
       it('shows the output script as a chunk entry with bundleName in the logging output', async () => {
@@ -429,9 +425,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
         expect(result?.success).toBe(true);
 
-        expect(logs).toContain(
-          jasmine.objectContaining({ message: jasmine.stringMatching(/extra\.js.+\d+ bytes/) }),
-        );
+        expectLog(logs, /extra\.js.+\d+ bytes/);
       });
     });
   });

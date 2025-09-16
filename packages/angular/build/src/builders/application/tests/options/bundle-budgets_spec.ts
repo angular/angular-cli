@@ -6,13 +6,14 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { logging } from '@angular-devkit/core';
 import { buildApplication } from '../../index';
 import { Type } from '../../schema';
 import {
   APPLICATION_BUILDER_INFO,
   BASE_OPTIONS,
   describeBuilder,
+  expectLog,
+  expectNoLog,
   lazyModuleFiles,
   lazyModuleFnImport,
 } from '../setup';
@@ -31,12 +32,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
       const { result, logs } = await harness.executeOnce();
       expect(result?.success).toBe(true);
-      expect(logs).not.toContain(
-        jasmine.objectContaining<logging.LogEntry>({
-          level: 'warn',
-          message: jasmine.stringMatching(BUDGET_NOT_MET_REGEXP),
-        }),
-      );
+      expectNoLog(logs, BUDGET_NOT_MET_REGEXP);
     });
 
     it(`should error when size is above 'maximumError' threshold`, async () => {
@@ -48,12 +44,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
       const { result, logs } = await harness.executeOnce();
       expect(result?.success).toBeFalse();
-      expect(logs).toContain(
-        jasmine.objectContaining<logging.LogEntry>({
-          level: 'error',
-          message: jasmine.stringMatching(BUDGET_NOT_MET_REGEXP),
-        }),
-      );
+      expectLog(logs, BUDGET_NOT_MET_REGEXP);
     });
 
     it(`should warn when size is above 'maximumWarning' threshold`, async () => {
@@ -65,12 +56,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
       const { result, logs } = await harness.executeOnce();
       expect(result?.success).toBe(true);
-      expect(logs).toContain(
-        jasmine.objectContaining<logging.LogEntry>({
-          level: 'warn',
-          message: jasmine.stringMatching(BUDGET_NOT_MET_REGEXP),
-        }),
-      );
+      expectLog(logs, BUDGET_NOT_MET_REGEXP);
     });
 
     it(`should warn when lazy bundle is above 'maximumWarning' threshold`, async () => {
@@ -85,12 +71,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
       const { result, logs } = await harness.executeOnce();
       expect(result?.success).toBe(true);
-      expect(logs).toContain(
-        jasmine.objectContaining<logging.LogEntry>({
-          level: 'warn',
-          message: jasmine.stringMatching('lazy-module exceeded maximum budget'),
-        }),
-      );
+      expectLog(logs, 'lazy-module exceeded maximum budget');
     });
 
     it(`should not warn when non-injected style is not within the baseline threshold`, async () => {
@@ -118,12 +99,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
       const { result, logs } = await harness.executeOnce();
       expect(result?.success).toBeTrue();
-      expect(logs).not.toContain(
-        jasmine.objectContaining<logging.LogEntry>({
-          level: 'warn',
-          message: jasmine.stringMatching('lazy-styles failed to meet minimum budget'),
-        }),
-      );
+      expectNoLog(logs, 'lazy-styles failed to meet minimum budget');
     });
 
     CSS_EXTENSIONS.forEach((ext) => {
@@ -154,12 +130,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
         const { result, logs } = await harness.executeOnce();
         expect(result?.success).toBe(true);
-        expect(logs).toContain(
-          jasmine.objectContaining<logging.LogEntry>({
-            level: 'warn',
-            message: jasmine.stringMatching(new RegExp(`app.component.${ext}`)),
-          }),
-        );
+        expectLog(logs, new RegExp(`app.component.${ext}`));
       });
     });
 
@@ -175,12 +146,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
         const { result, logs } = await harness.executeOnce();
         expect(result?.success).toBe(true);
-        expect(logs).not.toContain(
-          jasmine.objectContaining<logging.LogEntry>({
-            level: 'error',
-            message: jasmine.stringMatching(BUDGET_NOT_MET_REGEXP),
-          }),
-        );
+        expectNoLog(logs, BUDGET_NOT_MET_REGEXP);
       });
 
       it(`when 'intial' budget`, async () => {
@@ -194,12 +160,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
         const { result, logs } = await harness.executeOnce();
         expect(result?.success).toBe(true);
-        expect(logs).not.toContain(
-          jasmine.objectContaining<logging.LogEntry>({
-            level: 'error',
-            message: jasmine.stringMatching(BUDGET_NOT_MET_REGEXP),
-          }),
-        );
+        expectNoLog(logs, BUDGET_NOT_MET_REGEXP);
       });
 
       it(`when 'all' budget`, async () => {
@@ -213,12 +174,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
         const { result, logs } = await harness.executeOnce();
         expect(result?.success).toBe(true);
-        expect(logs).not.toContain(
-          jasmine.objectContaining<logging.LogEntry>({
-            level: 'error',
-            message: jasmine.stringMatching(BUDGET_NOT_MET_REGEXP),
-          }),
-        );
+        expectNoLog(logs, BUDGET_NOT_MET_REGEXP);
       });
 
       it(`when 'any' budget`, async () => {
@@ -232,12 +188,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
         const { result, logs } = await harness.executeOnce();
         expect(result?.success).toBe(true);
-        expect(logs).not.toContain(
-          jasmine.objectContaining<logging.LogEntry>({
-            level: 'error',
-            message: jasmine.stringMatching(BUDGET_NOT_MET_REGEXP),
-          }),
-        );
+        expectNoLog(logs, BUDGET_NOT_MET_REGEXP);
       });
     });
   });

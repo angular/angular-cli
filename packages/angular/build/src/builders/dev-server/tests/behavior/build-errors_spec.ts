@@ -6,10 +6,9 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { logging } from '@angular-devkit/core';
 import { executeDevServer } from '../../index';
 import { describeServeBuilder } from '../jasmine-helpers';
-import { BASE_OPTIONS, DEV_SERVER_BUILDER_INFO } from '../setup';
+import { BASE_OPTIONS, DEV_SERVER_BUILDER_INFO, expectLog, expectNoLog } from '../setup';
 
 describeServeBuilder(executeDevServer, DEV_SERVER_BUILDER_INFO, (harness, setupTarget) => {
   describe('Behavior: "Rebuild Error Detection"', () => {
@@ -31,21 +30,13 @@ describeServeBuilder(executeDevServer, DEV_SERVER_BUILDER_INFO, (harness, setupT
           async ({ result, logs }) => {
             expect(result?.success).toBeFalse();
             debugger;
-            expect(logs).toContain(
-              jasmine.objectContaining<logging.LogEntry>({
-                message: jasmine.stringMatching('Unexpected character "EOF"'),
-              }),
-            );
+            expectLog(logs, 'Unexpected character "EOF"');
 
             await harness.appendToFile('src/app/app.component.html', '>');
           },
           ({ result, logs }) => {
             expect(result?.success).toBeTrue();
-            expect(logs).not.toContain(
-              jasmine.objectContaining<logging.LogEntry>({
-                message: jasmine.stringMatching('Unexpected character "EOF"'),
-              }),
-            );
+            expectNoLog(logs, 'Unexpected character "EOF"');
           },
         ],
         { outputLogsOnFailure: false },

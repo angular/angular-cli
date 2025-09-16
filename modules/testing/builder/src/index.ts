@@ -15,5 +15,7 @@ export {
   type HarnessFileMatchers,
   JasmineBuilderHarness,
   describeBuilder,
+  expectLog,
+  expectNoLog,
 } from './jasmine-helpers';
 export * from './test-utils';

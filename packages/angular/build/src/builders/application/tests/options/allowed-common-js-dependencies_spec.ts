@@ -6,9 +6,14 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { logging } from '@angular-devkit/core';
 import { buildApplication } from '../../index';
-import { APPLICATION_BUILDER_INFO, BASE_OPTIONS, describeBuilder } from '../setup';
+import {
+  APPLICATION_BUILDER_INFO,
+  BASE_OPTIONS,
+  describeBuilder,
+  expectLog,
+  expectNoLog,
+} from '../setup';
 
 describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
   describe('Option: "allowedCommonJsDependencies"', () => {
@@ -30,22 +35,11 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
           const { result, logs } = await harness.executeOnce();
 
           expect(result?.success).toBe(true);
-          expect(logs).toContain(
-            jasmine.objectContaining<logging.LogEntry>({
-              message: jasmine.stringMatching(
-                /Module 'buffer' used by 'src\/app\/app\.component\.ts' is not ESM/,
-              ),
-            }),
-          );
-          expect(logs).toContain(
-            jasmine.objectContaining<logging.LogEntry>({
-              message: jasmine.stringMatching(/CommonJS or AMD dependencies/),
-            }),
-          );
-          expect(logs).not.toContain(
-            jasmine.objectContaining<logging.LogEntry>({
-              message: jasmine.stringMatching('base64-js'),
-            }),
+          expectLog(logs, /Module 'buffer' used by 'src\/app\/app\.component\.ts' is not ESM/);
+          expectLog(logs, /CommonJS or AMD dependencies/);
+          expectNoLog(
+            logs,
+            'base64-js',
             'Should not warn on transitive CommonJS packages which parent is also CommonJS.',
           );
         });
@@ -70,11 +64,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       const { result, logs } = await harness.executeOnce();
 
       expect(result?.success).toBe(true);
-      expect(logs).not.toContain(
-        jasmine.objectContaining<logging.LogEntry>({
-          message: jasmine.stringMatching(/CommonJS or AMD dependencies/),
-        }),
-      );
+      expectNoLog(logs, /CommonJS or AMD dependencies/);
     });
 
     it('should not show warning when all dependencies are allowed by wildcard', async () => {
@@ -95,11 +85,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       const { result, logs } = await harness.executeOnce();
 
       expect(result?.success).toBe(true);
-      expect(logs).not.toContain(
-        jasmine.objectContaining<logging.LogEntry>({
-          message: jasmine.stringMatching(/CommonJS or AMD dependencies/),
-        }),
-      );
+      expectNoLog(logs, /CommonJS or AMD dependencies/);
     });
 
     it('should not show warning when depending on zone.js', async () => {
@@ -120,11 +106,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       const { result, logs } = await harness.executeOnce();
 
       expect(result?.success).toBe(true);
-      expect(logs).not.toContain(
-        jasmine.objectContaining<logging.LogEntry>({
-          message: jasmine.stringMatching(/CommonJS or AMD dependencies/),
-        }),
-      );
+      expectNoLog(logs, /CommonJS or AMD dependencies/);
     });
 
     it(`should not show warning when importing non global local data '@angular/common/locale/fr'`, async () => {
@@ -142,11 +124,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       const { result, logs } = await harness.executeOnce();
 
       expect(result?.success).toBe(true);
-      expect(logs).not.toContain(
-        jasmine.objectContaining<logging.LogEntry>({
-          message: jasmine.stringMatching(/CommonJS or AMD dependencies/),
-        }),
-      );
+      expectNoLog(logs, /CommonJS or AMD dependencies/);
     });
 
     it('should not show warning in JIT for templateUrl and styleUrl when using paths', async () => {
@@ -178,11 +156,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       const { result, logs } = await harness.executeOnce();
 
       expect(result?.success).toBe(true);
-      expect(logs).not.toContain(
-        jasmine.objectContaining<logging.LogEntry>({
-          message: jasmine.stringMatching(/CommonJS or AMD dependencies/),
-        }),
-      );
+      expectNoLog(logs, /CommonJS or AMD dependencies/);
     });
 
     it('should not show warning for relative imports', async () => {
@@ -198,11 +172,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       const { result, logs } = await harness.executeOnce();
 
       expect(result?.success).toBe(true);
-      expect(logs).not.toContain(
-        jasmine.objectContaining<logging.LogEntry>({
-          message: jasmine.stringMatching(/CommonJS or AMD dependencies/),
-        }),
-      );
+      expectNoLog(logs, /CommonJS or AMD dependencies/);
     });
   });
 });

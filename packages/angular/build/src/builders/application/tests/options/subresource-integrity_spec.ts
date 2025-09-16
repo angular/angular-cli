@@ -6,9 +6,8 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { logging } from '@angular-devkit/core';
 import { buildApplication } from '../../index';
-import { APPLICATION_BUILDER_INFO, BASE_OPTIONS, describeBuilder } from '../setup';
+import { APPLICATION_BUILDER_INFO, BASE_OPTIONS, describeBuilder, expectNoLog } from '../setup';
 
 describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
   describe('Option: "subresourceIntegrity"', () => {
@@ -64,11 +63,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       harness
         .expectFile('dist/browser/index.html')
         .content.toMatch(/integrity="\w+-[A-Za-z0-9/+=]+"/);
-      expect(logs).not.toContain(
-        jasmine.objectContaining<logging.LogEntry>({
-          message: jasmine.stringMatching(/subresource-integrity/),
-        }),
-      );
+      expectNoLog(logs, /subresource-integrity/);
     });
   });
 });

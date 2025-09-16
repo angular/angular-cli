@@ -12,6 +12,7 @@ import {
   describeBuilder,
   UNIT_TEST_BUILDER_INFO,
   setupApplicationTarget,
+  expectLog,
 } from '../setup';
 
 describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
@@ -50,7 +51,7 @@ describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
 
       const { result, logs } = await harness.executeOnce();
       expect(result?.success).toBeTrue();
-      expect(logs).toContain(jasmine.objectContaining({ message: 'Hello from setup.ts' }));
+      expectLog(logs, 'Hello from setup.ts');
     });
   });
 });

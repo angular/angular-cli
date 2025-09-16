@@ -7,7 +7,7 @@
  */
 
 import { buildApplication } from '../../index';
-import { APPLICATION_BUILDER_INFO, BASE_OPTIONS, describeBuilder } from '../setup';
+import { APPLICATION_BUILDER_INFO, BASE_OPTIONS, describeBuilder, expectLog } from '../setup';
 
 describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
   describe('Option: "styles"', () => {
@@ -147,9 +147,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
         expect(result?.success).toBe(true);
 
-        expect(logs).toContain(
-          jasmine.objectContaining({ message: jasmine.stringMatching(/styles\.css.+\d+ bytes/) }),
-        );
+        expectLog(logs, /styles\.css.+\d+ bytes/);
       });
     });
 
@@ -440,9 +438,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
         expect(result?.success).toBe(true);
 
-        expect(logs).toContain(
-          jasmine.objectContaining({ message: jasmine.stringMatching(/styles\.css.+\d+ bytes/) }),
-        );
+        expectLog(logs, /styles\.css.+\d+ bytes/);
       });
 
       it('shows the output style as a chunk entry with bundleName in the logging output', async () => {
@@ -457,9 +453,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
         expect(result?.success).toBe(true);
 
-        expect(logs).toContain(
-          jasmine.objectContaining({ message: jasmine.stringMatching(/extra\.css.+\d+ bytes/) }),
-        );
+        expectLog(logs, /extra\.css.+\d+ bytes/);
       });
     });
   });
