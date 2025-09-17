@@ -1,3 +1,21 @@
+<a name="21.0.0-next.4"></a>
+
+# 21.0.0-next.4 (2025-09-17)
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                             |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------- |
+| [a908bf3d4](https://github.com/angular/angular-cli/commit/a908bf3d4e8a59f3546f117bcc1f12fd69ad2d0b) | feat | add 'filter' option to unit-test builder                |
+| [c0b00d78e](https://github.com/angular/angular-cli/commit/c0b00d78ec37426f4474f473ddf9e627a0dd23df) | feat | add reporter output file option for unit-test           |
+| [66dd6dd83](https://github.com/angular/angular-cli/commit/66dd6dd835d6b489e6b4be2138aa443e11bfa076) | feat | allow options for unit test reporters                   |
+| [43fc5536f](https://github.com/angular/angular-cli/commit/43fc5536fd42694a09a7b7c25fe8c5665e3e28d3) | fix  | add timestamp to bundle generation log                  |
+| [c6176f6df](https://github.com/angular/angular-cli/commit/c6176f6dffdae5c8d8708a1dd20fb51ca72e3c24) | fix  | add upfront dependency validation for unit-test runners |
+| [69c3b1226](https://github.com/angular/angular-cli/commit/69c3b1226880835fd8087cea5684ababb92b1c05) | fix  | improve error handling in unit-test builder             |
+| [dae732059](https://github.com/angular/angular-cli/commit/dae732059d17e9e374ac7635fbca9480751f70b3) | fix  | serve build assets and styles in vitest                 |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="20.3.2"></a>
 
 # 20.3.2 (2025-09-17)
