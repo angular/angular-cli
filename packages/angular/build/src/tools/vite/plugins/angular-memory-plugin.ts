@@ -136,7 +136,10 @@ async function loadViteClientCode(file: string, disableViteTransport = false): P
   if (disableViteTransport) {
     const previousUpdatedContents = updatedContents;
 
-    updatedContents = updatedContents.replace('transport.connect(handleMessage)', '');
+    updatedContents = updatedContents.replace(
+      'transport.connect(createHMRHandler(handleMessage));',
+      '',
+    );
     assert(
       previousUpdatedContents !== updatedContents,
       'Failed to update Vite client WebSocket disable.',
