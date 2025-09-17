@@ -55,7 +55,7 @@
     "@angular/forms": "20.3.0",
     "@angular/localize": "20.3.0",
     "@angular/material": "20.2.3",
-    "@angular/ng-dev": "https://github.com/angular/dev-infra-private-ng-dev-builds.git#03721faa87ef097af8cb4f657e8e4becc594f727",
+    "@angular/ng-dev": "https://github.com/angular/dev-infra-private-ng-dev-builds.git#5c80533a1292f228111945c42a81614a03be6ab3",
     "@angular/platform-browser": "20.3.0",
     "@angular/platform-server": "20.3.0",
     "@angular/router": "20.3.0",
