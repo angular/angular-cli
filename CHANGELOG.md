@@ -1,3 +1,15 @@
+<a name="19.2.17"></a>
+
+# 19.2.17 (2025-09-17)
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description              |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------ |
+| [365d525b5](https://github.com/angular/angular-cli/commit/365d525b596b437ad0b1a74b1417eaae6aa8694e) | fix  | update `vite` to `6.3.6` |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="19.2.16"></a>
 
 # 19.2.16 (2025-09-10)
