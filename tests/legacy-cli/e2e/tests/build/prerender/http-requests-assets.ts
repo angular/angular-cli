@@ -20,7 +20,7 @@ export default async function () {
   await writeMultipleFiles({
     // Add http client and route
     'src/app/app.config.ts': `
-      import { ApplicationConfig } from '@angular/core';
+      import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
       import { provideRouter } from '@angular/router';
 
       import {Home} from './home/home';
@@ -35,6 +35,7 @@ export default async function () {
           }]),
           provideClientHydration(),
           provideHttpClient(withFetch()),
+          provideZoneChangeDetection({ eventCoalescing: true }),
         ],
       };
     `,

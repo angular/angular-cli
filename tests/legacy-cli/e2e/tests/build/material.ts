@@ -55,9 +55,9 @@ export default async function () {
   // Issue: https://github.com/angular/angular-cli/issues/17320
   await replaceInFile(
     'src/app/app.config.ts',
-    `import { ApplicationConfig } from '@angular/core';`,
+    `from '@angular/core';`,
     `
-    import { ApplicationConfig } from '@angular/core';
+    from '@angular/core';
     import {
       MomentDateAdapter,
       MAT_MOMENT_DATE_FORMATS
@@ -72,10 +72,8 @@ export default async function () {
 
   await replaceInFile(
     'src/app/app.config.ts',
-    `providers: [provideRouter(routes) ]`,
-    `
-    providers: [
-      provideRouter(routes),
+    `provideRouter(routes)`,
+    `provideRouter(routes),
       {
         provide: DateAdapter,
         useClass: MomentDateAdapter,
@@ -84,9 +82,7 @@ export default async function () {
       {
         provide: MAT_DATE_FORMATS,
         useValue: MAT_MOMENT_DATE_FORMATS
-      }
-    ]
-  `,
+      }`,
   );
 
   await ng('e2e', '--configuration=production');
