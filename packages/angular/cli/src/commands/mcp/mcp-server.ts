@@ -11,6 +11,7 @@ import path from 'node:path';
 import type { AngularWorkspace } from '../../utilities/config';
 import { VERSION } from '../../utilities/version';
 import { registerInstructionsResource } from './resources/instructions';
+import { AI_TUTOR_TOOL } from './tools/ai-tutor';
 import { BEST_PRACTICES_TOOL } from './tools/best-practices';
 import { DOC_SEARCH_TOOL } from './tools/doc-search';
 import { FIND_EXAMPLE_TOOL } from './tools/examples';
@@ -24,6 +25,7 @@ import { AnyMcpToolDeclaration, registerTools } from './tools/tool-registry';
  * These tools are considered stable and suitable for general use.
  */
 const STABLE_TOOLS = [
+  AI_TUTOR_TOOL,
   BEST_PRACTICES_TOOL,
   DOC_SEARCH_TOOL,
   FIND_EXAMPLE_TOOL,
