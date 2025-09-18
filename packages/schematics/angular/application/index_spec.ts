@@ -871,6 +871,72 @@ describe('Application Schematic', () => {
       const fileContent = tree.readContent(path);
       expect(fileContent).not.toContain('provideZoneChangeDetection');
     });
+
+    it('should add provideZonelessChangeDetection() in initial spec files when zoneless application', async () => {
+      const tree = await schematicRunner.runSchematic(
+        'application',
+        {
+          ...defaultOptions,
+          zoneless: true,
+          standalone: false,
+        },
+        workspaceTree,
+      );
+
+      const content = tree.readContent('/projects/foo/src/app/app.spec.ts');
+      expect(content).toContain('provideZonelessChangeDetection()');
+      expect(content).toContain('fixture.whenStable()');
+      expect(content).not.toContain('fixture.detectChanges()');
+    });
+
+    it('should not add provideZonelessChangeDetection() in initial spec files when its not zoneless application', async () => {
+      const tree = await schematicRunner.runSchematic(
+        'application',
+        {
+          ...defaultOptions,
+          zoneless: false,
+          standalone: false,
+        },
+        workspaceTree,
+      );
+
+      const content = tree.readContent('/projects/foo/src/app/app.spec.ts');
+      expect(content).not.toContain('provideZonelessChangeDetection()');
+      expect(content).not.toContain('fixture.whenStable()');
+      expect(content).toContain('fixture.detectChanges()');
+    });
+  });
+
+  it('should add provideZonelessChangeDetection() when zoneless application', async () => {
+    const tree = await schematicRunner.runSchematic(
+      'application',
+      {
+        ...defaultOptions,
+        zoneless: true,
+      },
+      workspaceTree,
+    );
+
+    const content = tree.readContent('/projects/foo/src/app/app.spec.ts');
+    expect(content).toContain('provideZonelessChangeDetection()');
+    expect(content).toContain('fixture.whenStable()');
+    expect(content).not.toContain('fixture.detectChanges()');
+  });
+
+  it('should not add provideZonelessChangeDetection() in initial spec files when its not zoneless application', async () => {
+    const tree = await schematicRunner.runSchematic(
+      'application',
+      {
+        ...defaultOptions,
+        zoneless: false,
+      },
+      workspaceTree,
+    );
+
+    const content = tree.readContent('/projects/foo/src/app/app.spec.ts');
+    expect(content).not.toContain('provideZonelessChangeDetection()');
+    expect(content).not.toContain('fixture.whenStable()');
+    expect(content).toContain('fixture.detectChanges()');
   });
 
   it('should call the tailwind schematic when style is tailwind', async () => {

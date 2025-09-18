@@ -531,6 +531,17 @@ describe('Component Schematic', () => {
 
       await expectAsync(schematicRunner.runSchematic('component', options, appTree)).toBeRejected();
     });
+
+    it('should not add provideZonelessChangeDetection() in spec file when not zoneless application', async () => {
+      const options = { ...defaultNonStandaloneOptions };
+
+      const tree = await schematicRunner.runSchematic('component', options, appTree);
+      const tsContent = tree.readContent('/projects/baz/src/app/foo/foo.component.spec.ts');
+
+      expect(tsContent).not.toContain('provideZonelessChangeDetection()');
+      expect(tsContent).not.toContain('fixture.whenStable()');
+      expect(tsContent).toContain('fixture.detectChanges()');
+    });
   });
 
   it('should export the component as default when exportDefault is true', async () => {
@@ -553,5 +564,60 @@ describe('Component Schematic', () => {
 
     const specContent = tree.readContent('/projects/bar/src/app/foo/foo.component.spec.ts');
     expect(specContent).toContain("import { FooComponent } from './foo.component';");
+  });
+
+  it('should not add provideZonelessChangeDetection() in spec file when not zoneless application', async () => {
+    const tree = await schematicRunner.runSchematic('component', { ...defaultOptions }, appTree);
+    const tsContent = tree.readContent('/projects/bar/src/app/foo/foo.component.spec.ts');
+
+    expect(tsContent).not.toContain('provideZonelessChangeDetection()');
+    expect(tsContent).not.toContain('fixture.whenStable()');
+    expect(tsContent).toContain('fixture.detectChanges()');
+  });
+
+  describe('with zoneless application', () => {
+    const zonelessAppOptions: ApplicationOptions = {
+      ...appOptions,
+      name: 'baz',
+      zoneless: true,
+    };
+
+    it('should add provideZonelessChangeDetection() in spec file for standalone', async () => {
+      appTree = await schematicRunner.runSchematic(
+        'application',
+        { ...zonelessAppOptions, standalone: true },
+        appTree,
+      );
+      const tree = await schematicRunner.runSchematic(
+        'component',
+        { ...defaultOptions, standalone: true, project: 'baz' },
+        appTree,
+      );
+
+      const tsContent = tree.readContent('/projects/baz/src/app/foo/foo.component.spec.ts');
+
+      expect(tsContent).toContain('provideZonelessChangeDetection()');
+      expect(tsContent).toContain('fixture.whenStable()');
+      expect(tsContent).not.toContain('fixture.detectChanges()');
+    });
+
+    it('should add provideZonelessChangeDetection() in spec file for standalone is false', async () => {
+      appTree = await schematicRunner.runSchematic(
+        'application',
+        { ...zonelessAppOptions },
+        appTree,
+      );
+
+      const tree = await schematicRunner.runSchematic(
+        'component',
+        { ...defaultOptions, standalone: false, skipImport: true, project: 'baz' },
+        appTree,
+      );
+
+      const tsContent = tree.readContent('/projects/baz/src/app/foo/foo.component.spec.ts');
+      expect(tsContent).toContain('provideZonelessChangeDetection()');
+      expect(tsContent).toContain('fixture.whenStable()');
+      expect(tsContent).not.toContain('fixture.detectChanges()');
+    });
   });
 });
