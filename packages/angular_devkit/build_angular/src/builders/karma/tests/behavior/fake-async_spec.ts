@@ -35,12 +35,14 @@ describeKarmaBuilder(execute, KARMA_BUILDER_INFO, (harness, setupTarget) => {
               }
             }`,
         './src/app/app.component.spec.ts': `
+            import { provideZoneChangeDetection } from '@angular/core';
             import { TestBed, fakeAsync, tick } from '@angular/core/testing';
             import { By } from '@angular/platform-browser';
             import { AppComponent } from './app.component';
 
             describe('AppComponent', () => {
               beforeEach(() => TestBed.configureTestingModule({
+                providers: [provideZoneChangeDetection()],
                 declarations: [AppComponent]
               }));
 
