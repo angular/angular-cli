@@ -69,6 +69,7 @@ export enum UserCustomDimension {
  */
 export enum EventCustomDimension {
   Command = 'ep.ng_command',
+  AiConfigTool = 'ep.ng_ai_config_tool',
   SchematicCollectionName = 'ep.ng_schematic_collection_name',
   SchematicName = 'ep.ng_schematic_name',
   Standalone = 'ep.ng_standalone',
