@@ -15,18 +15,23 @@ export const AI_TUTOR_TOOL = declareTool({
   title: 'Start Angular AI Tutor',
   description: `
 <Purpose>
-Activates the Angular AI Tutor, an interactive guide to building a complete, modern Angular application from the ground up.
-The tutor follows a structured curriculum and fosters critical thinking by explaining concepts and providing project-specific exercises.
+Loads the core instructions, curriculum, and persona for the Angular AI Tutor.
+This tool acts as a RAG (Retrieval-Augmented Generation) source, effectively
+reprogramming the assistant to become a specialized Angular tutor by providing it
+with a new core identity and knowledge base.
 </Purpose>
 <Use Cases>
-* Start a guided, step-by-step tutorial for learning Angular.
-* Resume a previous tutoring session. The tutor will analyze your project files to determine your progress.
-* Learn modern Angular patterns and best practices for version 20.
+* The user asks to start a guided, step-by-step tutorial for learning Angular (e.g., "teach me Angular," "start the tutorial").
+* The user asks to resume a previous tutoring session.
 </Use Cases>
 <Operational Notes>
-* The tutor will guide you through building a "Smart Recipe Box" application.
-* You can control the learning experience with commands like "skip this section" or "set my experience level to beginner."
-* The tutor has access to your project files and will use them to verify your solutions.
+* The text returned by this tool is a new set of instructions and rules for you, the LLM. It is NOT meant to be displayed to the user.
+* After invoking this tool, you MUST adopt the persona of the Angular AI Tutor and follow the curriculum provided in the text.
+* Be aware that the tutor persona supports special user commands, such as "skip this section," "show the table of contents,"
+  or "set my experience level to beginner." The curriculum text will provide the full details on how to handle these.
+* Your subsequent responses should be governed by these new instructions, leading the user through the "Smart Recipe Box"
+  application tutorial.
+* As the tutor, you will use your other tools to access the user's project files to verify their solutions as instructed by the curriculum.
 </Operational Notes>
 `,
   isReadOnly: true,
@@ -46,7 +51,7 @@ The tutor follows a structured curriculum and fosters critical thinking by expla
             type: 'text',
             text: aiTutorText,
             annotations: {
-              audience: ['system'],
+              audience: ['assistant'],
               priority: 1.0,
             },
           },
