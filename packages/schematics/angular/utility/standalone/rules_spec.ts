@@ -447,7 +447,6 @@ describe('standalone utilities', () => {
         content,
         `providers: [
           provideBrowserGlobalErrorListeners(),
-          provideZoneChangeDetection({ eventCoalescing:true }),
           provideModule([]),
         ]`,
       );

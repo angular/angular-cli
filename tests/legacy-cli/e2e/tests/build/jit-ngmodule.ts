@@ -3,7 +3,14 @@ import { ng } from '../../utils/process';
 import { updateJsonFile, useCIChrome, useCIDefaults } from '../../utils/project';
 
 export default async function () {
-  await ng('generate', 'app', 'test-project-two', '--no-standalone', '--skip-install');
+  await ng(
+    'generate',
+    'app',
+    'test-project-two',
+    '--no-standalone',
+    '--skip-install',
+    '--no-zoneless',
+  );
   await ng('generate', 'private-e2e', '--related-app-name=test-project-two');
 
   // Setup testing to use CI Chrome.

@@ -135,7 +135,7 @@ describe('Service Worker Schematic', () => {
     const tree = await schematicRunner.runSchematic('service-worker', defaultOptions, appTree);
     const content = tree.readContent('/projects/bar/src/app/app.config.ts');
     expect(content).toContain(
-      `import { ApplicationConfig, provideBrowserGlobalErrorListeners, provideZoneChangeDetection, isDevMode } from '@angular/core';`,
+      `import { ApplicationConfig, provideBrowserGlobalErrorListeners, isDevMode } from '@angular/core';`,
     );
   });
 
