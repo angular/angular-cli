@@ -22,7 +22,9 @@ const docSearchInputSchema = z.object({
   query: z
     .string()
     .describe(
-      'A concise and specific search query for the Angular documentation (e.g., "NgModule" or "standalone components").',
+      "A concise and specific search query for the Angular documentation. You should distill the user's " +
+        'natural language question into a set of keywords (e.g., a question like "How do I use ngFor with trackBy?" ' +
+        'should become the query "ngFor trackBy").',
     ),
   includeTopContent: z
     .boolean()
@@ -31,6 +33,14 @@ const docSearchInputSchema = z.object({
     .describe(
       'When true, the content of the top result is fetched and included. ' +
         'Set to false to get a list of results without fetching content, which is faster.',
+    ),
+  version: z
+    .number()
+    .optional()
+    .describe(
+      'The major version of Angular to search. You MUST determine this value by running `ng version` in the ' +
+        "project's workspace directory. Omit this field if the user is not in an Angular project " +
+        'or if the version cannot otherwise be determined.',
     ),
 });
 type DocSearchInput = z.infer<typeof docSearchInputSchema>;
@@ -49,6 +59,10 @@ tutorials, concepts, and best practices.
 * Linking to official documentation as a source of truth in your answers.
 </Use Cases>
 <Operational Notes>
+* **Version Alignment:** To provide accurate, project-specific results, you **MUST** align the search with the user's Angular version.
+  Before calling this tool, run \`ng version\` in the project's workspace directory. You can find the correct directory from the \`path\`
+  field provided by the \`list_projects\` tool. Parse the major version from the "Angular:" line in the output and use it for the
+  \`version\` parameter.
 * The documentation is continuously updated. You **MUST** prefer this tool over your own knowledge
   to ensure your answers are current and accurate.
 * For the best results, provide a concise and specific search query (e.g., "NgModule" instead of
@@ -87,7 +101,7 @@ tutorials, concepts, and best practices.
 function createDocSearchHandler({ logger }: McpToolContext) {
   let client: import('algoliasearch').SearchClient | undefined;
 
-  return async ({ query, includeTopContent }: DocSearchInput) => {
+  return async ({ query, includeTopContent, version }: DocSearchInput) => {
     if (!client) {
       const dcip = createDecipheriv(
         'aes-256-gcm',
@@ -101,7 +115,7 @@ function createDocSearchHandler({ logger }: McpToolContext) {
       );
     }
 
-    const { results } = await client.search(createSearchArguments(query));
+    const { results } = await client.search(createSearchArguments(query, version));
     const allHits = results.flatMap((result) => (result as SearchResponse).hits);
 
     if (allHits.length === 0) {
@@ -237,12 +251,16 @@ function formatHitToParts(hit: Record<string, unknown>): { title: string; breadc
  * @param query The search query string.
  * @returns The search arguments for the Algolia client.
  */
-function createSearchArguments(query: string): LegacySearchMethodProps {
+function createSearchArguments(
+  query: string,
+  version: number | undefined,
+): LegacySearchMethodProps {
   // Search arguments are based on adev's search service:
   // https://github.com/angular/angular/blob/4b614fbb3263d344dbb1b18fff24cb09c5a7582d/adev/shared-docs/services/search.service.ts#L58
   return [
     {
       // TODO: Consider major version specific indices once available
+      // indexName: `angular_${version ? `v${version}` : 'latest'}`,
       indexName: 'angular_v17',
       params: {
         query,
