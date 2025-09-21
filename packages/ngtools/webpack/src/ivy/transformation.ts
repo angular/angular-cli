@@ -110,7 +110,7 @@ export function replaceBootstrap(
             bootstrapImport = nodeFactory.createImportDeclaration(
               undefined,
               nodeFactory.createImportClause(
-                false,
+                undefined,
                 undefined,
                 nodeFactory.createNamespaceImport(bootstrapNamespace),
               ),
