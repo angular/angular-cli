@@ -11,7 +11,7 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { BuilderHarness } from '../../../../../../../modules/testing/builder/src';
 import {
-  ApplicationBuilderOptions as AppilicationSchema,
+  ApplicationBuilderOptions as ApplicationSchema,
   buildApplication,
 } from '../../../builders/application';
 import { Schema } from '../schema';
@@ -33,7 +33,7 @@ export const APPLICATION_BUILDER_INFO = Object.freeze({
  * Contains all required application builder fields.
  * Also disables progress reporting to minimize logging output.
  */
-export const APPLICATION_BASE_OPTIONS = Object.freeze<AppilicationSchema>({
+export const APPLICATION_BASE_OPTIONS = Object.freeze<ApplicationSchema>({
   index: 'src/index.html',
   browser: 'src/main.ts',
   outputPath: 'dist',
@@ -84,7 +84,7 @@ let applicationSchema: json.schema.JsonSchema | undefined;
  */
 export function setupApplicationTarget<T>(
   harness: BuilderHarness<T>,
-  extraOptions?: Partial<AppilicationSchema>,
+  extraOptions?: Partial<ApplicationSchema>,
 ): void {
   applicationSchema ??= JSON.parse(
     readFileSync(APPLICATION_BUILDER_INFO.schemaPath, 'utf8'),

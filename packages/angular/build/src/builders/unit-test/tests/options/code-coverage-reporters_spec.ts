@@ -29,7 +29,7 @@ describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
 
       const { result } = await harness.executeOnce();
       expect(result?.success).toBeTrue();
-      expect(harness.hasFile('coverage/coverage-summary.json')).toBeTrue();
+      expect(harness.hasFile('coverage/test/coverage-summary.json')).toBeTrue();
     });
 
     it('should generate multiple reports when specified', async () => {
@@ -41,8 +41,8 @@ describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
 
       const { result } = await harness.executeOnce();
       expect(result?.success).toBeTrue();
-      expect(harness.hasFile('coverage/coverage-summary.json')).toBeTrue();
-      expect(harness.hasFile('coverage/lcov.info')).toBeTrue();
+      expect(harness.hasFile('coverage/test/coverage-summary.json')).toBeTrue();
+      expect(harness.hasFile('coverage/test/lcov.info')).toBeTrue();
     });
   });
 });

@@ -31,7 +31,7 @@ describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
 
       const { result } = await harness.executeOnce();
       expect(result?.success).toBeTrue();
-      const summary = harness.readFile('coverage/coverage-final.json');
+      const summary = harness.readFile('coverage/test/coverage-final.json');
       expect(summary).toContain('src/app/error.ts"');
     });
 
@@ -44,7 +44,7 @@ describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
 
       const { result } = await harness.executeOnce();
       expect(result?.success).toBeTrue();
-      const summary = harness.readFile('coverage/coverage-final.json');
+      const summary = harness.readFile('coverage/test/coverage-final.json');
       expect(summary).not.toContain('src/app/error.ts"');
     });
   });

@@ -20,7 +20,6 @@ import {
   ResultKind,
 } from '../../../application/results';
 import { NormalizedUnitTestBuilderOptions } from '../../options';
-import { findTests, getTestEntrypoints } from '../../test-discovery';
 import type { TestExecutor } from '../api';
 import { setupBrowserConfiguration } from './browser-provider';
 import { createVitestPlugins } from './plugins';
@@ -191,7 +190,7 @@ export class VitestExecutor implements TestExecutor {
         reporters: reporters ?? ['default'],
         outputFile,
         watch,
-        coverage: generateCoverageOption(codeCoverage),
+        coverage: generateCoverageOption(codeCoverage, this.projectName),
         ...debugOptions,
       },
       {
@@ -208,6 +207,7 @@ export class VitestExecutor implements TestExecutor {
 
 function generateCoverageOption(
   codeCoverage: NormalizedUnitTestBuilderOptions['codeCoverage'],
+  projectName: string,
 ): VitestCoverageOption {
   if (!codeCoverage) {
     return {
@@ -218,6 +218,7 @@ function generateCoverageOption(
   return {
     enabled: true,
     excludeAfterRemap: true,
+    reportsDirectory: toPosixPath(path.join('coverage', projectName)),
     // Special handling for `exclude`/`reporters` due to an undefined value causing upstream failures
     ...(codeCoverage.exclude ? { exclude: codeCoverage.exclude } : {}),
     ...(codeCoverage.reporters
