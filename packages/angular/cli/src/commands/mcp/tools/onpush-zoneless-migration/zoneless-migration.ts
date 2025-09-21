@@ -16,7 +16,7 @@ import { declareTool } from '../tool-registry';
 import { analyzeForUnsupportedZoneUses } from './analyze_for_unsupported_zone_uses';
 import { migrateSingleFile } from './migrate_single_file';
 import { migrateTestFile } from './migrate_test_file';
-import { createTestDebuggingGuideForNonActionableInput } from './prompts';
+import { createResponse, createTestDebuggingGuideForNonActionableInput } from './prompts';
 import { sendDebugMessage } from './send_debug_message';
 import { createSourceFile, getImportSpecifier } from './ts_utils';
 
@@ -65,7 +65,58 @@ most important action to take in the migration journey.
     ({ fileOrDirPath }, requestHandlerExtra) =>
       registerZonelessMigrationTool(fileOrDirPath, requestHandlerExtra),
 });
+
 export async function registerZonelessMigrationTool(
+  fileOrDirPath: string,
+  extras: RequestHandlerExtra<ServerRequest, ServerNotification>,
+) {
+  let filesWithComponents, componentTestFiles, zoneFiles;
+  try {
+    ({ filesWithComponents, componentTestFiles, zoneFiles } = await discoverAndCategorizeFiles(
+      fileOrDirPath,
+      extras,
+    ));
+  } catch (e) {
+    return createResponse(
+      `Error: Could not access the specified path. Please ensure the following path is correct ` +
+        `and that you have the necessary permissions:\n${fileOrDirPath}`,
+    );
+  }
+
+  if (zoneFiles.size > 0) {
+    for (const file of zoneFiles) {
+      const result = await analyzeForUnsupportedZoneUses(file);
+      if (result !== null) {
+        return result;
+      }
+    }
+  }
+
+  if (filesWithComponents.size > 0) {
+    const rankedFiles =
+      filesWithComponents.size > 1
+        ? await rankComponentFilesForMigration(extras, Array.from(filesWithComponents))
+        : Array.from(filesWithComponents);
+
+    for (const file of rankedFiles) {
+      const result = await migrateSingleFile(file, extras);
+      if (result !== null) {
+        return result;
+      }
+    }
+  }
+
+  for (const file of componentTestFiles) {
+    const result = await migrateTestFile(file);
+    if (result !== null) {
+      return result;
+    }
+  }
+
+  return createTestDebuggingGuideForNonActionableInput(fileOrDirPath);
+}
+
+async function discoverAndCategorizeFiles(
   fileOrDirPath: string,
   extras: RequestHandlerExtra<ServerRequest, ServerNotification>,
 ) {
@@ -74,7 +125,15 @@ export async function registerZonelessMigrationTool(
   const filesWithComponents = new Set<SourceFile>();
   const zoneFiles = new Set<SourceFile>();
 
-  if (fs.statSync(fileOrDirPath).isDirectory()) {
+  let isDirectory: boolean;
+  try {
+    isDirectory = fs.statSync(fileOrDirPath).isDirectory();
+  } catch (e) {
+    // Re-throw to be handled by the main function as a user input error
+    throw new Error(`Failed to access path: ${fileOrDirPath}`);
+  }
+
+  if (isDirectory) {
     const allFiles = glob(`${fileOrDirPath}/**/*.ts`);
     for await (const file of allFiles) {
       files.push(await createSourceFile(file));
@@ -120,37 +179,7 @@ export async function registerZonelessMigrationTool(
     }
   }
 
-  if (zoneFiles.size > 0) {
-    for (const file of zoneFiles) {
-      const result = await analyzeForUnsupportedZoneUses(file);
-      if (result !== null) {
-        return result;
-      }
-    }
-  }
-
-  if (filesWithComponents.size > 0) {
-    const rankedFiles =
-      filesWithComponents.size > 1
-        ? await rankComponentFilesForMigration(extras, Array.from(filesWithComponents))
-        : Array.from(filesWithComponents);
-
-    for (const file of rankedFiles) {
-      const result = await migrateSingleFile(file, extras);
-      if (result !== null) {
-        return result;
-      }
-    }
-  }
-
-  for (const file of componentTestFiles) {
-    const result = await migrateTestFile(file);
-    if (result !== null) {
-      return result;
-    }
-  }
-
-  return createTestDebuggingGuideForNonActionableInput(fileOrDirPath);
+  return { filesWithComponents, componentTestFiles, zoneFiles };
 }
 
 async function rankComponentFilesForMigration(
