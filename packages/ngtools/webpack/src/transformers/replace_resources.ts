@@ -309,7 +309,7 @@ function createResourceImport(
     resourceImportDeclarations.push(
       nodeFactory.createImportDeclaration(
         undefined,
-        nodeFactory.createImportClause(false, importName, undefined),
+        nodeFactory.createImportClause(undefined, importName, undefined),
         urlLiteral,
       ),
     );
