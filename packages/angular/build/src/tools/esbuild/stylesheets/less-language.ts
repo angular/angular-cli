@@ -32,13 +32,7 @@ export const LessStylesheetLanguage = Object.freeze<StylesheetLanguage>({
   componentFilter: /^less;/,
   fileFilter: /\.less$/,
   process(data, file, _, options, build) {
-    return compileString(
-      data,
-      file,
-      options,
-      build.resolve.bind(build),
-      /* unsafeInlineJavaScript */ false,
-    );
+    return compileString(data, file, options, build.resolve.bind(build));
   },
 });
 
@@ -47,7 +41,6 @@ async function compileString(
   filename: string,
   options: StylesheetPluginOptions,
   resolver: PluginBuild['resolve'],
-  unsafeInlineJavaScript: boolean,
 ): Promise<OnLoadResult> {
   try {
     lessPreprocessor ??= (await import('less')).default;
@@ -118,7 +111,6 @@ async function compileString(
       paths: options.includePaths,
       plugins: [resolverPlugin],
       rewriteUrls: 'all',
-      javascriptEnabled: unsafeInlineJavaScript,
       sourceMap: options.sourcemap
         ? {
             sourceMapFileInline: true,
@@ -135,35 +127,6 @@ async function compileString(
   } catch (error) {
     if (isLessException(error)) {
       const location = convertExceptionLocation(error);
-
-      // Retry with a warning for less files requiring the deprecated inline JavaScript option
-      if (error.message.includes('Inline JavaScript is not enabled.')) {
-        const withJsResult = await compileString(
-          data,
-          filename,
-          options,
-          resolver,
-          /* unsafeInlineJavaScript */ true,
-        );
-        withJsResult.warnings = [
-          {
-            text: 'Deprecated inline execution of JavaScript has been enabled ("javascriptEnabled")',
-            location,
-            notes: [
-              {
-                location: null,
-                text: 'JavaScript found within less stylesheets may be executed at build time. [https://lesscss.org/usage/#less-options]',
-              },
-              {
-                location: null,
-                text: 'Support for "javascriptEnabled" may be removed from the Angular CLI starting with Angular v19.',
-              },
-            ],
-          },
-        ];
-
-        return withJsResult;
-      }
 
       return {
         errors: [
