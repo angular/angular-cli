@@ -332,43 +332,62 @@ export class AngularServerApp {
       return createRedirectResponse(result.redirectTo, status);
     }
 
-    const { inlineCriticalCssProcessor, criticalCssLRUCache, textDecoder } = this;
+    if (renderMode === RenderMode.Prerender) {
+      const renderedHtml = await result.content();
+      const finalHtml = await this.inlineCriticalCss(renderedHtml, url);
+
+      return new Response(finalHtml, responseInit);
+    }
 
     // Use a stream to send the response before finishing rendering and inling critical CSS, improving performance via header flushing.
     const stream = new ReadableStream({
-      async start(controller) {
+      start: async (controller) => {
         const renderedHtml = await result.content();
-
-        if (!inlineCriticalCssProcessor) {
-          controller.enqueue(textDecoder.encode(renderedHtml));
-          controller.close();
-
-          return;
-        }
-
-        let htmlWithCriticalCss;
-        try {
-          if (renderMode === RenderMode.Server) {
-            const cacheKey = await sha256(renderedHtml);
-            htmlWithCriticalCss = criticalCssLRUCache.get(cacheKey);
-            if (!htmlWithCriticalCss) {
-              htmlWithCriticalCss = await inlineCriticalCssProcessor.process(renderedHtml);
-              criticalCssLRUCache.put(cacheKey, htmlWithCriticalCss);
-            }
-          } else {
-            htmlWithCriticalCss = await inlineCriticalCssProcessor.process(renderedHtml);
-          }
-        } catch (error) {
-          // eslint-disable-next-line no-console
-          console.error(`An error occurred while inlining critical CSS for: ${url}.`, error);
-        }
-
-        controller.enqueue(textDecoder.encode(htmlWithCriticalCss ?? renderedHtml));
+        const finalHtml = await this.inlineCriticalCss(renderedHtml, url, true);
+        controller.enqueue(this.textDecoder.encode(finalHtml));
         controller.close();
       },
     });
 
     return new Response(stream, responseInit);
+  }
+
+  /**
+   * Inlines critical CSS into the given HTML content.
+   *
+   * @param html - The HTML content to process.
+   * @param url - The URL associated with the request, for logging purposes.
+   * @param cache - A flag to indicate if the result should be cached.
+   * @returns A promise that resolves to the HTML with inlined critical CSS.
+   */
+  private async inlineCriticalCss(html: string, url: URL, cache = false): Promise<string> {
+    const { inlineCriticalCssProcessor, criticalCssLRUCache } = this;
+
+    if (!inlineCriticalCssProcessor) {
+      return html;
+    }
+
+    try {
+      if (!cache) {
+        return await inlineCriticalCssProcessor.process(html);
+      }
+
+      const cacheKey = await sha256(html);
+      const cachedHtml = criticalCssLRUCache.get(cacheKey);
+      if (cachedHtml) {
+        return cachedHtml;
+      }
+
+      const processedHtml = await inlineCriticalCssProcessor.process(html);
+      criticalCssLRUCache.put(cacheKey, processedHtml);
+
+      return processedHtml;
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error(`An error occurred while inlining critical CSS for: ${url}.`, error);
+
+      return html;
+    }
   }
 
   /**
