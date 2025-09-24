@@ -1,3 +1,52 @@
+<a name="21.0.0-next.5"></a>
+
+# 21.0.0-next.5 (2025-09-24)
+
+## Breaking Changes
+
+### @angular/build
+
+- The `javascriptEnabled` option for Less is no longer supported. Projects relying on inline JavaScript within Less files will need to refactor their stylesheets to remove this dependency.
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                            |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------ |
+| [2a518016d](https://github.com/angular/angular-cli/commit/2a518016d9585dd4d16f90102d5409459ebba024) | feat | Applications are zoneless by default                   |
+| [9f255f2b3](https://github.com/angular/angular-cli/commit/9f255f2b3cc435f3bea2f0266a137176ca599aef) | feat | set `packageManager` in `package.json` on new projects |
+| [77741f5ee](https://github.com/angular/angular-cli/commit/77741f5eec735f23b0f2865101471e045e4889b8) | fix  | add 'update-typescript-lib' migration                  |
+| [3af4dcbbf](https://github.com/angular/angular-cli/commit/3af4dcbbf4019e13a9547a404516502cf4eda736) | fix  | add `__screenshots__/` to `.gitignore`                 |
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description           |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------- |
+| [6d3a3c579](https://github.com/angular/angular-cli/commit/6d3a3c5799bde1bab5c3878e0783ffa6854e36ad) | feat | add ai-tutor mcp tool |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                            |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------ |
+| [7a8c94615](https://github.com/angular/angular-cli/commit/7a8c94615164e114533fae0f84796a374dc1b47b) | fix  | make zone.js optional in server and app-shell builders |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                            |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------ |
+| [00426e315](https://github.com/angular/angular-cli/commit/00426e3150c846913a5aa31510b5a1126df9e570) | feat | add --list-tests flag to unit-test builder             |
+| [3478aa332](https://github.com/angular/angular-cli/commit/3478aa332ef0241c04e7eeef9dd74b017292b2c4) | fix  | exclude .angular from coverage instrumentation         |
+| [139758586](https://github.com/angular/angular-cli/commit/13975858683421a5712bbfccee57cf141a0b96f6) | fix  | remove deprecated `javascriptEnabled` option for Less  |
+| [705af2278](https://github.com/angular/angular-cli/commit/705af22788102eeade08404d357582c39de8900b) | fix  | set coverage report directory to coverage/project-name |
+| [907eabdd3](https://github.com/angular/angular-cli/commit/907eabdd3c7447ed2c211b6d6c2719b04443c545) | fix  | support ESM PostCSS plugins                            |
+
+### @angular/ssr
+
+| Commit                                                                                              | Type | Description                                          |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------- |
+| [afa273849](https://github.com/angular/angular-cli/commit/afa273849d0e0e62a7df2236d818bf7800c3ad13) | fix  | avoid retaining rendered HTML in memory post-request |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="20.3.3"></a>
 
 # 20.3.3 (2025-09-24)
