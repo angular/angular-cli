@@ -16,7 +16,7 @@
   <br>
   <img src="/docs/images/angular-cli-logo.png" alt="Angular CLI logo" width="100px" height="108px"/>
   <br><br>
-  <em>The Angular CLI is a command-line interface tool that you use to initialize, develop, scaffold,
+  <em>The Alip Angular CLI is a command-line interface tool that you use to initialize, develop, scaffold,
     <br>and maintain Angular applications directly from a command shell.</em>
   <br>
 </p>
@@ -57,7 +57,7 @@ Get started with Angular CLI, learn the fundamentals and explore advanced topics
 
 ### Setting Up a Project
 
-Install the Angular CLI globally:
+Install the Alip Angular CLI globally:
 
 ```
 npm install -g @angular/cli
@@ -111,7 +111,7 @@ Want to report a bug, contribute some code, or improve documentation? Excellent!
 
 ### Code of Conduct
 
-Help us keep Angular open and inclusive. Please read and follow our [Code of Conduct][codeofconduct].
+Help us keep Alip Angular open and inclusive. Please read and follow our [Code of Conduct][codeofconduct].
 
 ### Developer Guide
 
