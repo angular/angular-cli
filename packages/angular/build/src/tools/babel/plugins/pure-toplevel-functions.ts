@@ -6,12 +6,17 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import type { PluginObj } from '@babel/core';
+import type { NodePath, PluginObj, PluginPass, types } from '@babel/core';
 import annotateAsPure from '@babel/helper-annotate-as-pure';
 import * as tslib from 'tslib';
 
 /**
- * A cached set of TypeScript helper function names used by the helper name matcher utility function.
+ * A set of constructor names that are considered to be side-effect free.
+ */
+const sideEffectFreeConstructors = new Set<string>(['InjectionToken']);
+
+/**
+ * A set of TypeScript helper function names used by the helper name matcher utility function.
  */
 const tslibHelpers = new Set<string>(Object.keys(tslib).filter((h) => h.startsWith('__')));
 
@@ -44,15 +49,23 @@ function isBabelHelperName(name: string): boolean {
   return babelHelpers.has(name);
 }
 
+interface ExtendedPluginPass extends PluginPass {
+  opts: { topLevelSafeMode?: boolean };
+}
+
 /**
  * A babel plugin factory function for adding the PURE annotation to top-level new and call expressions.
- *
  * @returns A babel plugin object instance.
  */
 export default function (): PluginObj {
   return {
     visitor: {
-      CallExpression(path) {
+      CallExpression(path: NodePath<types.CallExpression>, state: ExtendedPluginPass) {
+        const { topLevelSafeMode = false } = state.opts;
+        if (topLevelSafeMode) {
+          return;
+        }
+
         // If the expression has a function parent, it is not top-level
         if (path.getFunctionParent()) {
           return;
@@ -65,6 +78,7 @@ export default function (): PluginObj {
         ) {
           return;
         }
+
         // Do not annotate TypeScript helpers emitted by the TypeScript compiler or Babel helpers.
         // They are intended to cause side effects.
         if (
@@ -76,9 +90,22 @@ export default function (): PluginObj {
 
         annotateAsPure(path);
       },
-      NewExpression(path) {
+      NewExpression(path: NodePath<types.NewExpression>, state: ExtendedPluginPass) {
         // If the expression has a function parent, it is not top-level
-        if (!path.getFunctionParent()) {
+        if (path.getFunctionParent()) {
+          return;
+        }
+
+        const { topLevelSafeMode = false } = state.opts;
+
+        if (!topLevelSafeMode) {
+          annotateAsPure(path);
+
+          return;
+        }
+
+        const callee = path.get('callee');
+        if (callee.isIdentifier() && sideEffectFreeConstructors.has(callee.node.name)) {
           annotateAsPure(path);
         }
       },
