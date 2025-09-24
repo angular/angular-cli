@@ -1,3 +1,21 @@
+<a name="20.3.3"></a>
+
+# 20.3.3 (2025-09-24)
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                            |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------- |
+| [b7f92da78](https://github.com/angular/angular-cli/commit/b7f92da7835c14b568d07dfb3313802704f28cfd) | fix  | add `__screenshots__/` to `.gitignore` |
+
+### @angular/ssr
+
+| Commit                                                                                              | Type | Description                                          |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------- |
+| [a4c9a2007](https://github.com/angular/angular-cli/commit/a4c9a2007ab3e33b2c97fa63f0df8f8662427031) | fix  | avoid retaining rendered HTML in memory post-request |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="20.3.2"></a>
 
 # 20.3.2 (2025-09-17)
