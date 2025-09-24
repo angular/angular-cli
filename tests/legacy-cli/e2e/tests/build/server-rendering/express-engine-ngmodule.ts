@@ -15,14 +15,7 @@ export default async function () {
   // forcibly remove in case another test doesn't clean itself up
   await rimraf('node_modules/@angular/ssr');
 
-  await ng(
-    'generate',
-    'app',
-    'test-project-two',
-    '--no-standalone',
-    '--skip-install',
-    '--no-zoneless',
-  );
+  await ng('generate', 'app', 'test-project-two', '--no-standalone', '--skip-install');
   await ng('generate', 'private-e2e', '--related-app-name=test-project-two');
 
   // Setup testing to use CI Chrome.

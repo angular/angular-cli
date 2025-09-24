@@ -62,16 +62,6 @@ export default async function () {
     // of a JIT production build.
     json.projects['test-project'].architect.build.options.polyfills = [];
   });
-  await replaceInFile(
-    'src/app/app.config.ts',
-    'provideZoneChangeDetection',
-    'provideZonelessChangeDetection',
-  );
-  await replaceInFile(
-    'src/app/app.config.ts',
-    'provideZoneChangeDetection({ eventCoalescing: true })',
-    'provideZonelessChangeDetection()',
-  );
 
   await ng('build');
 
@@ -94,7 +84,7 @@ export default async function () {
   await ng('e2e');
 
   // Setup prerendering and build to test Node.js functionality
-  await ng('add', '@angular/ssr', '--skip-confirmation');
+  await ng('add', '@angular/ssr', '--skip-confirmation', '--skip-install');
   await useSha();
   await installWorkspacePackages();
 

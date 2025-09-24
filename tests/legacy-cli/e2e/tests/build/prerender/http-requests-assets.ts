@@ -1,7 +1,7 @@
 import { ng } from '../../../utils/process';
 import { getGlobalVariable } from '../../../utils/env';
-import { expectFileToMatch, rimraf, writeMultipleFiles } from '../../../utils/fs';
-import { installWorkspacePackages } from '../../../utils/packages';
+import { expectFileToMatch, writeMultipleFiles } from '../../../utils/fs';
+import { installWorkspacePackages, uninstallPackage } from '../../../utils/packages';
 import { useSha } from '../../../utils/project';
 
 export default async function () {
@@ -11,16 +11,15 @@ export default async function () {
     return;
   }
 
-  // Forcibly remove in case another test doesn't clean itself up.
-  await rimraf('node_modules/@angular/ssr');
-  await ng('add', '@angular/ssr', '--skip-confirmation');
+  await uninstallPackage('@angular/ssr');
+  await ng('add', '@angular/ssr', '--skip-confirmation', '--skip-install');
   await useSha();
   await installWorkspacePackages();
 
   await writeMultipleFiles({
     // Add http client and route
     'src/app/app.config.ts': `
-      import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
+      import { ApplicationConfig } from '@angular/core';
       import { provideRouter } from '@angular/router';
 
       import {Home} from './home/home';
@@ -35,7 +34,6 @@ export default async function () {
           }]),
           provideClientHydration(),
           provideHttpClient(withFetch()),
-          provideZoneChangeDetection({ eventCoalescing: true }),
         ],
       };
     `,
@@ -46,7 +44,7 @@ export default async function () {
 
     // Update component to do an HTTP call to asset.
     'src/app/app.ts': `
-    import { Component, inject } from '@angular/core';
+    import { ChangeDetectorRef, Component, inject } from '@angular/core';
     import { CommonModule } from '@angular/common';
     import { RouterOutlet } from '@angular/router';
     import { HttpClient } from '@angular/common/http';
@@ -64,15 +62,18 @@ export default async function () {
     export class App {
       data: any;
       dataWithSpace: any;
+      private readonly cdr: ChangeDetectorRef = inject(ChangeDetectorRef);
 
       constructor() {
         const http = inject(HttpClient);
         http.get('/media.json').subscribe((d) => {
           this.data = d;
+          this.cdr.markForCheck();
         });
 
         http.get('/media%20with-space.json').subscribe((d) => {
           this.dataWithSpace = d;
+          this.cdr.markForCheck();
         });
       }
     }

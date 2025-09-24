@@ -1,7 +1,7 @@
 import { join } from 'node:path';
 import { existsSync } from 'node:fs';
 import assert from 'node:assert';
-import { expectFileNotToExist, expectFileToMatch, writeFile } from '../../../utils/fs';
+import { expectFileToMatch, writeFile } from '../../../utils/fs';
 import { ng, noSilentNg, silentNg } from '../../../utils/process';
 import { installWorkspacePackages, uninstallPackage } from '../../../utils/packages';
 import { useSha } from '../../../utils/project';
@@ -66,7 +66,7 @@ export default async function () {
   await writeFile(
     'src/app/app.config.ts',
     `
-      import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
+      import { ApplicationConfig } from '@angular/core';
       import { provideRouter } from '@angular/router';
 
       import { routes } from './app.routes';
@@ -75,7 +75,6 @@ export default async function () {
 
       export const appConfig: ApplicationConfig = {
         providers: [
-          provideZoneChangeDetection({ eventCoalescing: true }),
           provideRouter(routes),
           provideClientHydration(),
           {

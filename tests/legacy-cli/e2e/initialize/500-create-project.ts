@@ -20,7 +20,7 @@ export default async function () {
     // Ensure local test registry is used when outside a project
     await setNPMConfigRegistry(true);
 
-    await ng('new', 'test-project', '--skip-install', '--no-zoneless');
+    await ng('new', 'test-project', '--skip-install');
     await expectFileToExist(join(process.cwd(), 'test-project'));
     process.chdir('./test-project');
 

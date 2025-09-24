@@ -168,7 +168,10 @@ async function _renderUniversal(
     browserOptions.optimization,
   );
 
-  const zonePackage = require.resolve('zone.js', { paths: [context.workspaceRoot] });
+  let zonePackage: string | undefined;
+  try {
+    zonePackage = require.resolve('zone.js/node', { paths: [context.workspaceRoot] });
+  } catch {}
 
   const { baseOutputPath = '' } = serverResult;
   const worker = new Piscina({

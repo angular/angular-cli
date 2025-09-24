@@ -14,8 +14,8 @@ export default async function () {
     delete workspaceJson.projects['test-project'];
   });
 
-  await ng('generate', 'app', 'second-app', '--skip-install', '--no-zoneless');
-  await ng('generate', 'app', 'third-app', '--skip-install', '--no-zoneless');
+  await ng('generate', 'app', 'second-app', '--skip-install');
+  await ng('generate', 'app', 'third-app', '--skip-install');
 
   const startCwd = process.cwd();
 

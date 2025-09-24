@@ -12,10 +12,10 @@ export default async function () {
   await ng('build', '--output-hashing=bundles', '--source-map', '--configuration=development');
 
   await ng('build', '--output-hashing=none', '--source-map');
-  await testForSourceMaps(useWebpackBuilder ? 3 : 2);
+  await testForSourceMaps(useWebpackBuilder ? 2 : 1);
 
   await ng('build', '--output-hashing=none', '--source-map', '--configuration=development');
-  await testForSourceMaps(useWebpackBuilder ? 4 : 2);
+  await testForSourceMaps(useWebpackBuilder ? 3 : 1);
 }
 
 async function testForSourceMaps(expectedNumberOfFiles: number): Promise<void> {

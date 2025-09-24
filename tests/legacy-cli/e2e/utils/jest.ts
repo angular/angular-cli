@@ -5,7 +5,6 @@ import { updateJsonFile } from './project';
 export async function applyJestBuilder(
   options: {} = {
     tsConfig: 'tsconfig.spec.json',
-    polyfills: ['zone.js', 'zone.js/testing'],
   },
 ): Promise<void> {
   await silentNpm('install', 'jest@29.5.0', 'jest-environment-jsdom@29.5.0', '--save-dev');
