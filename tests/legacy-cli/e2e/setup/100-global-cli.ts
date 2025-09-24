@@ -5,8 +5,8 @@ import { globalNpm } from '../utils/process';
 const PACKAGE_MANAGER_VERSION = {
   'npm': '10.8.1',
   'yarn': '1.22.22',
-  'pnpm': '9.3.0',
-  'bun': '1.1.13',
+  'pnpm': '10.17.1',
+  'bun': '1.2.21',
 };
 
 export default async function () {

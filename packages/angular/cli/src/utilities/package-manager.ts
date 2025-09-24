@@ -6,9 +6,9 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { isJsonObject, json } from '@angular-devkit/core';
+import { JsonValue, isJsonObject } from '@angular-devkit/core';
 import { execSync, spawn } from 'node:child_process';
-import { promises as fs, readdirSync, realpathSync, rmSync } from 'node:fs';
+import { promises as fs, readFileSync, readdirSync, realpathSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { PackageManager } from '../../lib/config/workspace-schema';
@@ -233,7 +233,6 @@ export class PackageManagerUtils {
     }
 
     const filesInRoot = readdirSync(this.context.root);
-
     const hasNpmLock = this.hasLockfile(PackageManager.Npm, filesInRoot);
     const hasYarnLock = this.hasLockfile(PackageManager.Yarn, filesInRoot);
     const hasPnpmLock = this.hasLockfile(PackageManager.Pnpm, filesInRoot);
@@ -298,19 +297,19 @@ export class PackageManagerUtils {
   }
 
   private getConfiguredPackageManager(): PackageManager | undefined {
-    const getPackageManager = (source: json.JsonValue | undefined): PackageManager | undefined => {
-      if (source && isJsonObject(source)) {
-        const value = source['packageManager'];
-        if (typeof value === 'string') {
-          return value as PackageManager;
-        }
-      }
-
-      return undefined;
-    };
-
-    let result: PackageManager | undefined;
     const { workspace: localWorkspace, globalConfiguration: globalWorkspace } = this.context;
+    let result: PackageManager | undefined;
+
+    try {
+      const packageJsonPath = join(this.context.root, 'package.json');
+      const pkgJson = JSON.parse(readFileSync(packageJsonPath, 'utf-8')) as JsonValue;
+      result = getPackageManager(pkgJson);
+    } catch {}
+
+    if (result) {
+      return result;
+    }
+
     if (localWorkspace) {
       const project = getProjectByCwd(localWorkspace);
       if (project) {
@@ -320,10 +319,19 @@ export class PackageManagerUtils {
       result ??= getPackageManager(localWorkspace.extensions['cli']);
     }
 
-    if (!result) {
-      result = getPackageManager(globalWorkspace.extensions['cli']);
-    }
+    result ??= getPackageManager(globalWorkspace.extensions['cli']);
 
     return result;
   }
+}
+
+function getPackageManager(source: JsonValue | undefined): PackageManager | undefined {
+  if (source && isJsonObject(source)) {
+    const value = source['packageManager'];
+    if (typeof value === 'string') {
+      return value.split('@', 1)[0] as PackageManager;
+    }
+  }
+
+  return undefined;
 }

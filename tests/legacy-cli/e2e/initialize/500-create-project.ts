@@ -2,7 +2,7 @@ import { join } from 'node:path';
 import { getGlobalVariable } from '../utils/env';
 import { expectFileToExist } from '../utils/fs';
 import { gitClean } from '../utils/git';
-import { setRegistry as setNPMConfigRegistry } from '../utils/packages';
+import { getActivePackageManager, setRegistry as setNPMConfigRegistry } from '../utils/packages';
 import { ng } from '../utils/process';
 import { prepareProjectForE2e, updateJsonFile } from '../utils/project';
 
@@ -20,7 +20,14 @@ export default async function () {
     // Ensure local test registry is used when outside a project
     await setNPMConfigRegistry(true);
 
-    await ng('new', 'test-project', '--skip-install');
+    await ng(
+      'new',
+      'test-project',
+      '--skip-install',
+      '--package-manager',
+      getActivePackageManager(),
+    );
+
     await expectFileToExist(join(process.cwd(), 'test-project'));
     process.chdir('./test-project');
 

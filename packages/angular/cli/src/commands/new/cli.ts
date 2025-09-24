@@ -73,6 +73,10 @@ export default class NewCommandModule
       defaults,
     });
     workflow.registry.addSmartDefaultProvider('ng-cli-version', () => VERSION.full);
+    workflow.registry.addSmartDefaultProvider(
+      'packageManager',
+      () => this.context.packageManager.name,
+    );
 
     return this.runSchematic({
       collectionName,

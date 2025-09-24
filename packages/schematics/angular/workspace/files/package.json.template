@@ -21,6 +21,7 @@
     ]
   },
   "private": true,
+  <% if (packageManagerWithVersion) { %>"packageManager": "<%= packageManagerWithVersion %>",<% } %>
   "dependencies": {
     "@angular/common": "<%= latestVersions.Angular %>",
     "@angular/compiler": "<%= latestVersions.Angular %>",
