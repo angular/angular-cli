@@ -4,6 +4,7 @@ import { updateJsonFile } from './project';
 /** Updates the `test` builder in the current workspace to use Jest with the given options. */
 export async function applyJestBuilder(
   options: {} = {
+    polyfills: [],
     tsConfig: 'tsconfig.spec.json',
   },
 ): Promise<void> {

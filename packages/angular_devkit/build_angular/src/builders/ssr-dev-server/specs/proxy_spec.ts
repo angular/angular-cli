@@ -32,8 +32,6 @@ describe('Serve SSR Builder', () => {
 
     host.writeMultipleFiles({
       'src/main.server.ts': `
-        import 'zone.js/node';
-
         import { CommonEngine } from '@angular/ssr/node';
         import * as express from 'express';
         import { resolve, join } from 'node:path';

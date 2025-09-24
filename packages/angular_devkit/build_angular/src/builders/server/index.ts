@@ -198,7 +198,6 @@ async function initialize(
   const originalOutputPath = options.outputPath;
   // Assets are processed directly by the builder except when watching
   const adjustedOptions = options.watch ? options : { ...options, assets: [] };
-
   const { config, projectRoot, projectSourceRoot, i18n } =
     await generateI18nBrowserWebpackConfigFromContext(
       {
@@ -271,23 +270,18 @@ function getPlatformServerExportsConfig(wco: BrowserWebpackConfigOptions): Parti
   // Add `@angular/platform-server` exports.
   // This is needed so that DI tokens can be referenced and set at runtime outside of the bundle.
 
-  // Only add `@angular/platform-server` exports when it is installed.
-  // In some cases this builder is used when `@angular/platform-server` is not installed.
-  // Example: when using `@nguniversal/common/clover` which does not need `@angular/platform-server`.
-
-  return isPackageInstalled(wco.root, '@angular/platform-server')
-    ? {
-        module: {
-          rules: [
-            {
-              loader: require.resolve('./platform-server-exports-loader'),
-              include: [path.resolve(wco.root, wco.buildOptions.main)],
-              options: {
-                angularSSRInstalled: isPackageInstalled(wco.root, '@angular/ssr'),
-              },
-            },
-          ],
+  return {
+    module: {
+      rules: [
+        {
+          loader: require.resolve('./platform-server-exports-loader'),
+          include: [path.resolve(wco.root, wco.buildOptions.main)],
+          options: {
+            angularSSRInstalled: isPackageInstalled(wco.root, '@angular/ssr'),
+            isZoneJsInstalled: isPackageInstalled(wco.root, 'zone.js'),
+          },
         },
-      }
-    : {};
+      ],
+    },
+  };
 }
