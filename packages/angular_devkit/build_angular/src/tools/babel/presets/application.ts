@@ -57,7 +57,7 @@ export interface ApplicationPresetOptions {
     inputSourceMap: unknown;
   };
   optimize?: {
-    pureTopLevel: boolean;
+    topLevelSafeMode: boolean;
     wrapDecorators: boolean;
   };
 
@@ -220,14 +220,12 @@ export default function (api: unknown, options: ApplicationPresetOptions) {
       elideAngularMetadata,
       markTopLevelPure,
     } = require('@angular/build/private');
-    if (options.optimize.pureTopLevel) {
-      plugins.push(markTopLevelPure);
-    }
-
-    plugins.push(elideAngularMetadata, adjustTypeScriptEnums, [
-      adjustStaticMembers,
-      { wrapDecorators: options.optimize.wrapDecorators },
-    ]);
+    plugins.push(
+      [markTopLevelPure, { topLevelSafeMode: options.optimize.topLevelSafeMode }],
+      elideAngularMetadata,
+      adjustTypeScriptEnums,
+      [adjustStaticMembers, { wrapDecorators: options.optimize.wrapDecorators }],
+    );
   }
 
   if (options.instrumentCode) {
