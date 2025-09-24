@@ -1,22 +1,13 @@
 import { doesNotMatch, match } from 'node:assert';
 import { ng } from '../../utils/process';
-import { appendToFile, rimraf } from '../../utils/fs';
+import { appendToFile } from '../../utils/fs';
 import { ngServe, useSha } from '../../utils/project';
-import { installWorkspacePackages } from '../../utils/packages';
-import { getGlobalVariable } from '../../utils/env';
+import { installWorkspacePackages, uninstallPackage } from '../../utils/packages';
 
 export default async function () {
-  const useWebpackBuilder = !getGlobalVariable('argv')['esbuild'];
-
   // Forcibly remove in case another test doesn't clean itself up.
-  await rimraf('node_modules/@angular/ssr');
-  if (useWebpackBuilder) {
-    // `--server-routing` not supported in `browser` builder.
-    await ng('add', '@angular/ssr', '--skip-confirmation', '--skip-install');
-  } else {
-    await ng('add', '@angular/ssr', '--skip-confirmation', '--skip-install');
-  }
-
+  await uninstallPackage('@angular/ssr');
+  await ng('add', '@angular/ssr', '--skip-confirmation', '--skip-install');
   await useSha();
   await installWorkspacePackages();
 

@@ -58,7 +58,6 @@ export default async function () {
     await expectFileToMatch(
       'dist/test-project/browser/index.html',
       [
-        '<script src="polyfills.js" type="module"></script>',
         '<script src="scripts.js" defer></script>',
         '<script src="renamed-script.js" defer></script>',
         '<script src="main.js" type="module"></script>',
@@ -69,7 +68,6 @@ export default async function () {
       'dist/test-project/browser/index.html',
       [
         '<script src="runtime.js" type="module"></script>',
-        '<script src="polyfills.js" type="module"></script>',
         '<script src="scripts.js" defer></script>',
         '<script src="renamed-script.js" defer></script>',
         '<script src="vendor.js" type="module"></script>',
