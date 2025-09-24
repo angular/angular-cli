@@ -7,23 +7,24 @@
  */
 
 import { transformSync } from '@babel/core';
-// eslint-disable-next-line import/no-extraneous-dependencies
 import { format } from 'prettier';
 import pureTopLevelPlugin from './pure-toplevel-functions';
 
 function testCase({
   input,
   expected,
+  options,
 }: {
   input: string;
   expected: string;
+  options?: { topLevelSafeMode: boolean };
 }): jasmine.ImplementationCallback {
   return async () => {
     const result = transformSync(input, {
       configFile: false,
       babelrc: false,
       compact: true,
-      plugins: [pureTopLevelPlugin],
+      plugins: [[pureTopLevelPlugin, options]],
     });
     if (!result?.code) {
       fail('Expected babel to return a transform result.');
@@ -152,4 +153,33 @@ describe('pure-toplevel-functions Babel plugin', () => {
       };
     `),
   );
+
+  describe('topLevelSafeMode: true', () => {
+    it(
+      'annotates top-level `new InjectionToken` expressions',
+      testCase({
+        input: `const result = new InjectionToken('abc');`,
+        expected: `const result = /*#__PURE__*/ new InjectionToken('abc');`,
+        options: { topLevelSafeMode: true },
+      }),
+    );
+
+    it(
+      'does not annotate other top-level `new` expressions',
+      testCase({
+        input: 'const result = new SomeClass();',
+        expected: 'const result = new SomeClass();',
+        options: { topLevelSafeMode: true },
+      }),
+    );
+
+    it(
+      'does not annotate top-level function calls',
+      testCase({
+        input: 'const result = someCall();',
+        expected: 'const result = someCall();',
+        options: { topLevelSafeMode: true },
+      }),
+    );
+  });
 });
