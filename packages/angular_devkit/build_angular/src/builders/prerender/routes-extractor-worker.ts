@@ -15,7 +15,7 @@ import * as path from 'node:path';
 import { workerData } from 'node:worker_threads';
 
 export interface RoutesExtractorWorkerData {
-  zonePackage: string;
+  zonePackage: string | undefined;
   indexFile: string;
   outputPath: string;
   serverBundlePath: string;
@@ -74,8 +74,10 @@ async function extract(): Promise<string[]> {
  * @returns A promise resolving to the extract function of the worker.
  */
 async function initialize() {
-  // Setup Zone.js
-  await import(zonePackage);
+  if (zonePackage) {
+    // Setup Zone.js
+    await import(zonePackage);
+  }
 
   return extract;
 }

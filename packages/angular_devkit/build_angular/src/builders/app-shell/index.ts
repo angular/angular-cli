@@ -43,7 +43,11 @@ async function _renderUniversal(
 
   // Locate zone.js to load in the render worker
   const root = context.workspaceRoot;
-  const zonePackage = require.resolve('zone.js', { paths: [root] });
+  let zonePackage: string | undefined;
+
+  try {
+    zonePackage = require.resolve('zone.js', { paths: [root] });
+  } catch {}
 
   const projectName = context.target && context.target.project;
   if (!projectName) {

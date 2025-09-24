@@ -57,6 +57,11 @@ async function getRoutes(
     }
   }
 
+  let zonePackage: string | undefined;
+  try {
+    zonePackage = require.resolve('zone.js/node', { paths: [workspaceRoot] });
+  } catch {}
+
   if (discoverRoutes) {
     const renderWorker = new Piscina({
       filename: require.resolve('./routes-extractor-worker'),
@@ -65,7 +70,7 @@ async function getRoutes(
         indexFile,
         outputPath,
         serverBundlePath,
-        zonePackage: require.resolve('zone.js', { paths: [workspaceRoot] }),
+        zonePackage,
       } as RoutesExtractorWorkerData,
       recordTiming: false,
     });

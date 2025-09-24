@@ -51,7 +51,7 @@ interface ServerBundleExports {
  * This is passed as workerData when setting up the worker via the `piscina` package.
  */
 const { zonePackage } = workerData as {
-  zonePackage: string;
+  zonePackage: string | undefined;
 };
 
 /**
@@ -163,8 +163,10 @@ function isBootstrapFn(
  * @returns A promise resolving to the render function of the worker.
  */
 async function initialize() {
-  // Setup Zone.js
-  await import(zonePackage);
+  if (zonePackage) {
+    // Setup Zone.js
+    await import(zonePackage);
+  }
 
   // Return the render function for use
   return render;

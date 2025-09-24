@@ -133,7 +133,7 @@ export default createBuilder(
       // the environment for fake async to work correctly.
       // Third, we initialize `TestBed`. This is dependent on fake async being set up correctly beforehand.
       `--setupFilesAfterEnv="<rootDir>/jest-global.mjs"`,
-      ...(options.polyfills ? [`--setupFilesAfterEnv="<rootDir>/polyfills.mjs"`] : []),
+      ...(options.polyfills?.length ? [`--setupFilesAfterEnv="<rootDir>/polyfills.mjs"`] : []),
       `--setupFilesAfterEnv="<rootDir>/init-test-bed.mjs"`,
 
       // Don't run any infrastructure files as tests, they are manually loaded where needed.

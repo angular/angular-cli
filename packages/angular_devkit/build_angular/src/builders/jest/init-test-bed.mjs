@@ -9,7 +9,7 @@
 // TODO(dgp1130): These imports likely don't resolve in stricter package environments like `pnpm`, since they are resolved relative to
 // `@angular-devkit/build-angular` rather than the user's workspace. Should look into virtual modules to support those use cases.
 
-import { provideZoneChangeDetection, NgModule } from '@angular/core';
+import { NgModule, provideZoneChangeDetection } from '@angular/core';
 import { getTestBed } from '@angular/core/testing';
 import { BrowserTestingModule, platformBrowserTesting } from '@angular/platform-browser/testing';
 

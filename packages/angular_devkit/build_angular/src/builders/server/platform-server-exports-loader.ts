@@ -12,11 +12,14 @@
  * @see https://github.com/webpack/webpack/issues/15936.
  */
 export default function (
-  this: import('webpack').LoaderContext<{ angularSSRInstalled: boolean }>,
+  this: import('webpack').LoaderContext<{
+    angularSSRInstalled: boolean;
+    isZoneJsInstalled: boolean;
+  }>,
   content: string,
   map: Parameters<import('webpack').LoaderDefinitionFunction>[1],
 ) {
-  const { angularSSRInstalled } = this.getOptions();
+  const { angularSSRInstalled, isZoneJsInstalled } = this.getOptions();
 
   let source = `${content}
 
@@ -28,6 +31,11 @@ export default function (
     source += `
       export { ɵgetRoutesFromAngularRouterConfig } from '@angular/ssr';
     `;
+  }
+
+  if (isZoneJsInstalled) {
+    source = `import 'zone.js/node';
+    ${source}`;
   }
 
   this.callback(null, source, map);
