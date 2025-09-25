@@ -387,7 +387,6 @@ describe('Application Schematic', () => {
       expect(prj.root).toEqual('');
       const buildOpt = prj.architect.build.options;
       expect(buildOpt.index).toBeUndefined();
-      expect(buildOpt.browser).toEqual('src/main.ts');
       expect(buildOpt.assets).toEqual([{ 'glob': '**/*', 'input': 'public' }]);
       expect(buildOpt.polyfills).toBeUndefined();
       expect(buildOpt.tsConfig).toEqual('tsconfig.app.json');
@@ -477,7 +476,6 @@ describe('Application Schematic', () => {
       const project = config.projects.foo;
       expect(project.root).toEqual('foo');
       const buildOpt = project.architect.build.options;
-      expect(buildOpt.browser).toEqual('foo/src/main.ts');
       expect(buildOpt.polyfills).toBeUndefined();
       expect(buildOpt.tsConfig).toEqual('foo/tsconfig.app.json');
       expect(buildOpt.assets).toEqual([{ 'glob': '**/*', 'input': 'foo/public' }]);

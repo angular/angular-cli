@@ -295,7 +295,6 @@ function addAppToWorkspaceFile(options: ApplicationOptions, appDir: string): Rul
         builder: Builders.BuildApplication,
         defaultConfiguration: 'production',
         options: {
-          browser: `${sourceRoot}/main.ts`,
           polyfills: options.zoneless ? undefined : ['zone.js'],
           tsConfig: `${projectRoot}tsconfig.app.json`,
           inlineStyleLanguage,
