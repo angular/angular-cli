@@ -14,7 +14,7 @@ describe('<%= classifiedName %>', () => {
 
     fixture = TestBed.createComponent(<%= classifiedName %>);
     component = fixture.componentInstance;
-    fixture.detectChanges();
+    <%= zoneless ? 'await fixture.whenStable();' : 'fixture.detectChanges();' %>
   });
 
   it('should create', () => {
