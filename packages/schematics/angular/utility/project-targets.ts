@@ -21,3 +21,15 @@ export function isUsingApplicationBuilder(project: ProjectDefinition): boolean {
 
   return isUsingApplicationBuilder;
 }
+
+export function isZonelessApp(project: ProjectDefinition): boolean {
+  const buildTarget = project.targets.get('build');
+  if (!buildTarget?.options?.polyfills) {
+    return true;
+  }
+
+  const polyfills = buildTarget.options.polyfills as string[] | string;
+  const polyfillsList = Array.isArray(polyfills) ? polyfills : [polyfills];
+
+  return !polyfillsList.includes('zone.js');
+}

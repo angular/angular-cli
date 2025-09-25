@@ -24,6 +24,7 @@ import { addDeclarationToNgModule } from '../utility/add-declaration-to-ng-modul
 import { findModuleFromOptions } from '../utility/find-module';
 import { parseName } from '../utility/parse-name';
 import { createProjectSchematic } from '../utility/project';
+import { isZonelessApp } from '../utility/project-targets';
 import { validateClassName, validateHtmlSelector } from '../utility/validation';
 import { buildDefaultPath } from '../utility/workspace';
 import { Schema as ComponentOptions, Style } from './schema';
@@ -59,6 +60,7 @@ export default createProjectSchematic<ComponentOptions>((options, { project, tre
     strings.classify(options.name) +
     (options.addTypeToClassName && options.type ? strings.classify(options.type) : '');
   validateClassName(classifiedName);
+  const zoneless = isZonelessApp(project);
 
   const skipStyleFile = options.inlineStyle || options.style === Style.None;
   const templateSource = apply(url('./files'), [
@@ -72,6 +74,7 @@ export default createProjectSchematic<ComponentOptions>((options, { project, tre
       ...options,
       // Add a new variable for the classified name, conditionally including the type
       classifiedName,
+      zoneless,
     }),
     !options.type
       ? forEach(((file) => {

@@ -831,6 +831,35 @@ describe('Application Schematic', () => {
     });
   });
 
+  it('should add fixture.whenStable() when zoneless application', async () => {
+    const tree = await schematicRunner.runSchematic(
+      'application',
+      {
+        ...defaultOptions,
+      },
+      workspaceTree,
+    );
+
+    const content = tree.readContent('/projects/foo/src/app/app.spec.ts');
+    expect(content).toContain('fixture.whenStable()');
+    expect(content).not.toContain('fixture.detectChanges()');
+  });
+
+  it('should not add fixture.whenStable() in initial spec files when its not zoneless application', async () => {
+    const tree = await schematicRunner.runSchematic(
+      'application',
+      {
+        ...defaultOptions,
+        zoneless: false,
+      },
+      workspaceTree,
+    );
+
+    const content = tree.readContent('/projects/foo/src/app/app.spec.ts');
+    expect(content).not.toContain('fixture.whenStable()');
+    expect(content).toContain('fixture.detectChanges()');
+  });
+
   it('should call the tailwind schematic when style is tailwind', async () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const options = { ...defaultOptions, style: 'tailwind' as any };
