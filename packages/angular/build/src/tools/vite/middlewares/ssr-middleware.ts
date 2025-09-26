@@ -10,6 +10,7 @@ import type {
   AngularAppEngine as SSRAngularAppEngine,
   ɵgetOrCreateAngularServerApp as getOrCreateAngularServerApp,
 } from '@angular/ssr';
+import type * as AngularSsrNode from '@angular/ssr/node' with { 'resolution-mode': 'import' };
 import type { ServerResponse } from 'node:http';
 import type { Connect, ViteDevServer } from 'vite';
 import { loadEsmModule } from '../../../utils/load-esm';
@@ -38,7 +39,7 @@ export function createAngularSsrInternalMiddleware(
       // which must be processed by the runtime linker, even if they are not used.
       await loadEsmModule('@angular/compiler');
       const { writeResponseToNodeResponse, createWebRequestFromNodeRequest } =
-        await loadEsmModule<typeof import('@angular/ssr/node')>('@angular/ssr/node');
+        await loadEsmModule<typeof AngularSsrNode>('@angular/ssr/node');
 
       const { ɵgetOrCreateAngularServerApp } = (await server.ssrLoadModule('/main.server.mjs')) as {
         ɵgetOrCreateAngularServerApp: typeof getOrCreateAngularServerApp;
@@ -93,7 +94,7 @@ export async function createAngularSsrExternalMiddleware(
   await loadEsmModule('@angular/compiler');
 
   const { createWebRequestFromNodeRequest, writeResponseToNodeResponse } =
-    await loadEsmModule<typeof import('@angular/ssr/node')>('@angular/ssr/node');
+    await loadEsmModule<typeof AngularSsrNode>('@angular/ssr/node');
 
   return function angularSsrExternalMiddleware(
     req: Connect.IncomingMessage,
