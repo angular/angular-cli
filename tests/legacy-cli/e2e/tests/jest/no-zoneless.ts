@@ -1,3 +1,4 @@
+import { replaceInFile } from '../../utils/fs';
 import { applyJestBuilder } from '../../utils/jest';
 import { installPackage, uninstallPackage } from '../../utils/packages';
 import { ng } from '../../utils/process';
@@ -8,8 +9,15 @@ export default async function (): Promise<void> {
     polyfills: ['zone.js', 'zone.js/testing'],
   });
 
+  await replaceInFile(
+    'src/app/app.spec.ts',
+    'await fixture.whenStable();',
+    'fixture.detectChanges();',
+  );
+
   try {
     await installPackage('zone.js');
+
     const { stderr } = await ng('test');
 
     if (!stderr.includes('Jest builder is currently EXPERIMENTAL')) {
