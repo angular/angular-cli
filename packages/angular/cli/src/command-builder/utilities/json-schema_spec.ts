@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { schema } from '@angular-devkit/core';
+import { JsonObject, schema } from '@angular-devkit/core';
 import yargs from 'yargs';
 
 import { addSchemaOptionsToCommand, parseJsonSchemaToOptions } from './json-schema';
@@ -56,10 +56,74 @@ describe('parseJsonSchemaToOptions', () => {
               'type': 'string',
             },
           },
+          'arrayWithChoicesInOneOf': {
+            'type': 'array',
+            'items': {
+              'oneOf': [
+                {
+                  'enum': ['default', 'verbose'],
+                },
+                {
+                  'type': 'array',
+                  'minItems': 1,
+                  'maxItems': 2,
+                  'items': [
+                    {
+                      'enum': ['default', 'verbose'],
+                    },
+                    {
+                      'type': 'object',
+                    },
+                  ],
+                },
+              ],
+            },
+          },
+          'arrayWithComplexAnyOf': {
+            'type': 'array',
+            'items': {
+              'oneOf': [
+                {
+                  'anyOf': [
+                    {
+                      'type': 'string',
+                    },
+                    {
+                      'enum': ['default', 'verbose'],
+                    },
+                  ],
+                },
+                {
+                  'type': 'array',
+                  'minItems': 1,
+                  'maxItems': 2,
+                  'items': [
+                    {
+                      'anyOf': [
+                        {
+                          'type': 'string',
+                        },
+                        {
+                          'enum': ['default', 'verbose'],
+                        },
+                      ],
+                    },
+                    {
+                      'type': 'object',
+                    },
+                  ],
+                },
+              ],
+            },
+          },
         },
       };
       const registry = new schema.CoreSchemaRegistry();
-      const options = await parseJsonSchemaToOptions(registry, jsonSchema, false);
+      const options = await parseJsonSchemaToOptions(
+        registry,
+        jsonSchema as unknown as JsonObject,
+        false,
+      );
       addSchemaOptionsToCommand(localYargs, options, true);
     });
 
@@ -92,6 +156,46 @@ describe('parseJsonSchemaToOptions', () => {
 
       it('should add default value to help', async () => {
         expect(await localYargs.getHelp()).toContain('[default: ["default-array"]]');
+      });
+    });
+
+    describe('type=array, enum in oneOf', () => {
+      it('parses valid option value', async () => {
+        expect(
+          await parse([
+            '--arrayWithChoicesInOneOf',
+            'default',
+            '--arrayWithChoicesInOneOf',
+            'verbose',
+          ]),
+        ).toEqual(
+          jasmine.objectContaining({
+            'arrayWithChoicesInOneOf': ['default', 'verbose'],
+          }),
+        );
+      });
+
+      it('rejects non-enum values', async () => {
+        await expectAsync(parse(['--arrayWithChoicesInOneOf', 'yes'])).toBeRejectedWithError(
+          /Argument: array-with-choices-in-one-of, Given: "yes", Choices:/,
+        );
+      });
+    });
+
+    describe('type=array, anyOf', () => {
+      it('parses valid option value', async () => {
+        expect(
+          await parse([
+            '--arrayWithComplexAnyOf',
+            'default',
+            '--arrayWithComplexAnyOf',
+            'something-else',
+          ]),
+        ).toEqual(
+          jasmine.objectContaining({
+            'arrayWithComplexAnyOf': ['default', 'something-else'],
+          }),
+        );
       });
     });
 
