@@ -55,6 +55,7 @@ PROJECT NAME TO BUILD OR A MODULE NAME.**
 | Name | Parameter | Type |
 |:---:|:---|:---|
 | Command | `ep.ng_command` | `string` |
+| AiConfigTool | `ep.ng_ai_config_tool` | `string` |
 | SchematicCollectionName | `ep.ng_schematic_collection_name` | `string` |
 | SchematicName | `ep.ng_schematic_name` | `string` |
 | Standalone | `ep.ng_standalone` | `string` |
