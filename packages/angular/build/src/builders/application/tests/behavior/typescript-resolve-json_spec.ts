@@ -20,6 +20,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       // Enable tsconfig resolveJsonModule option in tsconfig
       await harness.modifyFile('tsconfig.json', (content) => {
         const tsconfig = JSON.parse(content);
+        tsconfig.compilerOptions.moduleResolution = 'node';
         tsconfig.compilerOptions.resolveJsonModule = true;
 
         return JSON.stringify(tsconfig);
@@ -43,6 +44,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       // Enable tsconfig resolveJsonModule option in tsconfig
       await harness.modifyFile('tsconfig.json', (content) => {
         const tsconfig = JSON.parse(content);
+        tsconfig.compilerOptions.moduleResolution = 'node';
         tsconfig.compilerOptions.resolveJsonModule = undefined;
 
         return JSON.stringify(tsconfig);
@@ -71,6 +73,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       // Enable tsconfig resolveJsonModule option in tsconfig
       await harness.modifyFile('tsconfig.json', (content) => {
         const tsconfig = JSON.parse(content);
+        tsconfig.compilerOptions.moduleResolution = 'node';
         tsconfig.compilerOptions.resolveJsonModule = false;
 
         return JSON.stringify(tsconfig);

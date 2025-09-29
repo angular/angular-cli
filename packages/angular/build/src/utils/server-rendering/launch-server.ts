@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
+import type * as AngularSsrNode from '@angular/ssr/node' with { 'resolution-mode': 'import' };
 import assert from 'node:assert';
 import { createServer } from 'node:http';
 import { loadEsmModule } from '../load-esm';
@@ -22,7 +23,7 @@ export const DEFAULT_URL = new URL('http://ng-localhost/');
 export async function launchServer(): Promise<URL> {
   const { reqHandler } = await loadEsmModuleFromMemory('./server.mjs');
   const { createWebRequestFromNodeRequest, writeResponseToNodeResponse } =
-    await loadEsmModule<typeof import('@angular/ssr/node')>('@angular/ssr/node');
+    await loadEsmModule<typeof AngularSsrNode>('@angular/ssr/node');
 
   if (!isSsrNodeRequestHandler(reqHandler) && !isSsrRequestHandler(reqHandler)) {
     return DEFAULT_URL;
