@@ -45,24 +45,34 @@ export default class VersionCommandModule
    * @returns The configured `yargs` instance.
    */
   builder(localYargs: Argv): Argv {
-    return localYargs;
+    return localYargs.option('json', {
+      describe: 'Outputs version information in JSON format.',
+      type: 'boolean',
+    });
   }
 
   /**
    * The main execution logic for the `ng version` command.
    */
-  async run(): Promise<void> {
+  async run(options: { json?: boolean }): Promise<void> {
     const { logger } = this.context;
     const versionInfo = gatherVersionInfo(this.context);
+
+    if (options.json) {
+      // eslint-disable-next-line no-console
+      console.log(JSON.stringify(versionInfo, null, 2));
+
+      return;
+    }
+
     const {
-      ngCliVersion,
-      nodeVersion,
-      unsupportedNodeVersion,
-      packageManagerName,
-      packageManagerVersion,
-      os,
-      arch,
-      versions,
+      cli: { version: ngCliVersion },
+      system: {
+        node: { version: nodeVersion, unsupported: unsupportedNodeVersion },
+        os: { platform: os, architecture: arch },
+        packageManager: { name: packageManagerName, version: packageManagerVersion },
+      },
+      packages,
     } = versionInfo;
 
     const headerInfo = [
@@ -87,7 +97,7 @@ export default class VersionCommandModule
       )
       .join('\n');
 
-    const packageTable = this.formatPackageTable(versions);
+    const packageTable = this.formatPackageTable(packages);
 
     logger.info([ASCII_ART, header, packageTable].join('\n\n'));
 
