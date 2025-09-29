@@ -13,11 +13,13 @@ import type {
   OnStartResult,
   OutputFile,
   PartialMessage,
+  PartialNote,
   Plugin,
   PluginBuild,
 } from 'esbuild';
 import assert from 'node:assert';
 import { createHash } from 'node:crypto';
+import { readFile } from 'node:fs/promises';
 import * as path from 'node:path';
 import { maxWorkers, useTypeChecking } from '../../../utils/environment-options';
 import { AngularHostOptions } from '../../angular/angular-host';
@@ -441,11 +443,23 @@ export function createCompilerPlugin(
             return undefined;
           }
 
+          const diangosticRoot = build.initialOptions.absWorkingDir ?? '';
+
+          // Evaluate whether the file requires the Angular compiler transpilation.
+          // If not, issue a warning but allow bundler to process the file (no type-checking).
+          const directContents = await readFile(request, 'utf-8');
+          if (!requiresAngularCompiler(directContents)) {
+            return {
+              warnings: [createMissingFileDiagnostic(request, args.path, diangosticRoot, false)],
+              contents,
+              loader: 'ts',
+              resolveDir: path.dirname(request),
+            };
+          }
+
           // Otherwise return an error
           return {
-            errors: [
-              createMissingFileError(request, args.path, build.initialOptions.absWorkingDir ?? ''),
-            ],
+            errors: [createMissingFileDiagnostic(request, args.path, diangosticRoot, true)],
           };
         } else if (typeof contents === 'string' && (useTypeScriptTranspilation || isJS)) {
           // A string indicates untransformed output from the TS/NG compiler.
@@ -762,23 +776,46 @@ function bundleWebWorker(
   }
 }
 
-function createMissingFileError(request: string, original: string, root: string): PartialMessage {
+function createMissingFileDiagnostic(
+  request: string,
+  original: string,
+  root: string,
+  angular: boolean,
+): PartialMessage {
   const relativeRequest = path.relative(root, request);
-  const error = {
-    text: `File '${relativeRequest}' is missing from the TypeScript compilation.`,
-    notes: [
-      {
-        text: `Ensure the file is part of the TypeScript program via the 'files' or 'include' property.`,
-      },
-    ],
-  };
+  const notes: PartialNote[] = [];
+
+  if (angular) {
+    notes.push({
+      text:
+        `Files containing Angular metadata ('@Component'/'@Directive'/etc.) must be part of the TypeScript compilation.` +
+        ` You can ensure the file is part of the TypeScript program via the 'files' or 'include' property.`,
+    });
+  } else {
+    notes.push({
+      text:
+        `The file will be bundled and included in the output but will not be type-checked at build time.` +
+        ` To remove this message you can add the file to the TypeScript program via the 'files' or 'include' property.`,
+    });
+  }
 
   const relativeOriginal = path.relative(root, original);
   if (relativeRequest !== relativeOriginal) {
-    error.notes.push({
+    notes.push({
       text: `File is requested from a file replacement of '${relativeOriginal}'.`,
     });
   }
 
-  return error;
+  const diagnostic = {
+    text: `File '${relativeRequest}' not found in TypeScript compilation.`,
+    notes,
+  };
+
+  return diagnostic;
+}
+
+const POTENTIAL_METADATA_REGEX = /@angular\/core|@Component|@Directive|@Injectable|@Pipe|@NgModule/;
+
+function requiresAngularCompiler(contents: string): boolean {
+  return POTENTIAL_METADATA_REGEX.test(contents);
 }
