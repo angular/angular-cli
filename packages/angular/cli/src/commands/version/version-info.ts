@@ -7,7 +7,7 @@
  */
 
 import { createRequire } from 'node:module';
-import { resolve } from 'node:path';
+import { VERSION } from '../../utilities/version';
 
 /**
  * A subset of `package.json` fields that are relevant for the version command.
@@ -65,11 +65,9 @@ export function gatherVersionInfo(context: {
   packageManager: { name: string; version: string | undefined };
   root: string;
 }): VersionInfo {
-  const localRequire = createRequire(resolve(__filename, '../../../'));
   // Trailing slash is used to allow the path to be treated as a directory
   const workspaceRequire = createRequire(context.root + '/');
 
-  const cliPackage: PartialPackageInfo = localRequire('./package.json');
   let workspacePackage: PartialPackageInfo | undefined;
   try {
     workspacePackage = workspaceRequire('./package.json');
@@ -80,8 +78,6 @@ export function gatherVersionInfo(context: {
 
   const packageNames = new Set(
     Object.keys({
-      ...cliPackage.dependencies,
-      ...cliPackage.devDependencies,
       ...workspacePackage?.dependencies,
       ...workspacePackage?.devDependencies,
     }),
@@ -90,11 +86,11 @@ export function gatherVersionInfo(context: {
   const versions: Record<string, string> = {};
   for (const name of packageNames) {
     if (PACKAGE_PATTERNS.some((p) => p.test(name))) {
-      versions[name] = getVersion(name, workspaceRequire, localRequire);
+      versions[name] = getVersion(name, workspaceRequire);
     }
   }
 
-  const ngCliVersion = cliPackage.version;
+  const ngCliVersion = VERSION.full;
   let angularCoreVersion = '';
   const angularSameAsCore: string[] = [];
 
@@ -135,32 +131,17 @@ export function gatherVersionInfo(context: {
  * @param localRequire A `require` function for the CLI.
  * @returns The version of the package, or `<error>` if it could not be found.
  */
-function getVersion(
-  moduleName: string,
-  workspaceRequire: NodeJS.Require,
-  localRequire: NodeJS.Require,
-): string {
+function getVersion(moduleName: string, workspaceRequire: NodeJS.Require): string {
   let packageInfo: PartialPackageInfo | undefined;
-  let cliOnly = false;
 
   // Try to find the package in the workspace
   try {
     packageInfo = workspaceRequire(`${moduleName}/package.json`);
   } catch {}
 
-  // If not found, try to find within the CLI
-  if (!packageInfo) {
-    try {
-      packageInfo = localRequire(`${moduleName}/package.json`);
-      cliOnly = true;
-    } catch {}
-  }
-
   // If found, attempt to get the version
   if (packageInfo) {
-    try {
-      return packageInfo.version + (cliOnly ? ' (cli-only)' : '');
-    } catch {}
+    return packageInfo.version;
   }
 
   return '<error>';
