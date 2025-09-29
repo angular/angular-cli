@@ -6,7 +6,6 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { tags } from '@angular-devkit/core';
 import { AugmentIndexHtmlOptions, augmentIndexHtml } from './augment-index-html';
 
 describe('augment-index-html', () => {
@@ -25,7 +24,7 @@ describe('augment-index-html', () => {
   };
 
   const oneLineHtml = (html: TemplateStringsArray) =>
-    tags.stripIndents`${html}`.replace(/(>\s+)/g, '>');
+    `${html}`.replace(/(>\s+)/g, '>').replace(/\s+</g, '<');
 
   it('can generate index.html', async () => {
     const { content } = await augmentIndexHtml({
