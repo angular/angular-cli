@@ -7,7 +7,6 @@
  */
 
 import { setTimeout } from 'node:timers/promises';
-import { tags } from '@angular-devkit/core';
 import { last, tap } from 'rxjs';
 import { execute } from '../../index';
 import { BASE_OPTIONS, KARMA_BUILDER_INFO, describeKarmaBuilder } from '../setup';
@@ -96,12 +95,12 @@ describeKarmaBuilder(execute, KARMA_BUILDER_INFO, (harness, setupTarget) => {
       await harness.modifyFile('src/app/app.component.ts', (content) => {
         return content.replace(
           `title = 'app'`,
-          tags.stripIndents`
-          title = 'app';
+          `
+title = 'app';
 
-          async foo() {
-            return 'foo';
-          }
+async foo() {
+  return 'foo';
+}
         `,
         );
       });
