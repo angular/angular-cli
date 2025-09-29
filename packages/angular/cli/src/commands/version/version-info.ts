@@ -24,8 +24,6 @@ interface PartialPackageInfo {
  */
 export interface VersionInfo {
   ngCliVersion: string;
-  angularCoreVersion: string;
-  angularSameAsCore: string[];
   versions: Record<string, string>;
   unsupportedNodeVersion: boolean;
   nodeVersion: string;
@@ -90,30 +88,8 @@ export function gatherVersionInfo(context: {
     }
   }
 
-  const ngCliVersion = VERSION.full;
-  let angularCoreVersion = '';
-  const angularSameAsCore: string[] = [];
-
-  if (workspacePackage) {
-    // Filter all angular versions that are the same as core.
-    angularCoreVersion = versions['@angular/core'];
-    if (angularCoreVersion) {
-      for (const [name, version] of Object.entries(versions)) {
-        if (version === angularCoreVersion && name.startsWith('@angular/')) {
-          angularSameAsCore.push(name.replace(/^@angular\//, ''));
-          delete versions[name];
-        }
-      }
-
-      // Make sure we list them in alphabetical order.
-      angularSameAsCore.sort();
-    }
-  }
-
   return {
-    ngCliVersion,
-    angularCoreVersion,
-    angularSameAsCore,
+    ngCliVersion: VERSION.full,
     versions,
     unsupportedNodeVersion,
     nodeVersion: process.versions.node,
