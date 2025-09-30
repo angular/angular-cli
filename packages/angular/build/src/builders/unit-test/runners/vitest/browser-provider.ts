@@ -83,15 +83,18 @@ export function setupBrowserConfiguration(
     return { errors };
   }
 
+  const isCI = !!process.env['CI'];
+  const headless = isCI || browsers.some((name) => name.toLowerCase().includes('headless'));
+
   const browser = {
     enabled: true,
     provider,
-    headless: browsers.some((name) => name.toLowerCase().includes('headless')),
-
+    headless,
+    ui: !headless,
     instances: browsers.map((browserName) => ({
       browser: normalizeBrowserName(browserName),
     })),
-  };
+  } satisfies import('vitest/node').BrowserConfigOptions;
 
   return { browser };
 }
