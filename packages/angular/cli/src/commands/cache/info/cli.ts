@@ -6,7 +6,6 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { tags } from '@angular-devkit/core';
 import * as fs from 'node:fs/promises';
 import { join } from 'node:path';
 import { Argv } from 'yargs';
@@ -15,6 +14,7 @@ import {
   CommandModuleImplementation,
   CommandScope,
 } from '../../../command-builder/command-module';
+import { colors } from '../../../utilities/color';
 import { isCI } from '../../../utilities/environment-options';
 import { getCacheConfig } from '../utilities';
 
@@ -29,15 +29,44 @@ export class CacheInfoCommandModule extends CommandModule implements CommandModu
   }
 
   async run(): Promise<void> {
-    const { path, environment, enabled } = getCacheConfig(this.context.workspace);
+    const cacheConfig = getCacheConfig(this.context.workspace);
+    const { path, environment, enabled } = cacheConfig;
 
-    this.context.logger.info(tags.stripIndents`
-      Enabled: ${enabled ? 'yes' : 'no'}
-      Environment: ${environment}
-      Path: ${path}
-      Size on disk: ${await this.getSizeOfDirectory(path)}
-      Effective status on current machine: ${this.effectiveEnabledStatus() ? 'enabled' : 'disabled'}
-    `);
+    const effectiveStatus = this.effectiveEnabledStatus(cacheConfig);
+    const sizeOnDisk = await this.getSizeOfDirectory(path);
+
+    const info: { label: string; value: string }[] = [
+      {
+        label: 'Enabled',
+        value: enabled ? colors.green('Yes') : colors.red('No'),
+      },
+      {
+        label: 'Environment',
+        value: colors.cyan(environment),
+      },
+      {
+        label: 'Path',
+        value: colors.cyan(path),
+      },
+      {
+        label: 'Size on disk',
+        value: colors.cyan(sizeOnDisk),
+      },
+      {
+        label: 'Effective Status',
+        value:
+          (effectiveStatus ? colors.green('Enabled') : colors.red('Disabled')) +
+          ' (current machine)',
+      },
+    ];
+
+    const maxLabelLength = Math.max(...info.map((l) => l.label.length));
+
+    const output = info
+      .map(({ label, value }) => colors.bold(label.padEnd(maxLabelLength + 2)) + `: ${value}`)
+      .join('\n');
+
+    this.context.logger.info(`\n${colors.bold('Cache Information')}\n\n${output}\n`);
   }
 
   private async getSizeOfDirectory(path: string): Promise<string> {
@@ -82,8 +111,8 @@ export class CacheInfoCommandModule extends CommandModule implements CommandModu
     return `${roundedSize.toFixed(fractionDigits)} ${abbreviations[index]}`;
   }
 
-  private effectiveEnabledStatus(): boolean {
-    const { enabled, environment } = getCacheConfig(this.context.workspace);
+  private effectiveEnabledStatus(cacheConfig: { enabled: boolean; environment: string }): boolean {
+    const { enabled, environment } = cacheConfig;
 
     if (enabled) {
       switch (environment) {
