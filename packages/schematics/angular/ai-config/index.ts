@@ -55,25 +55,41 @@ interface ContextFileInfo {
 }
 
 export default function ({ tool }: ConfigOptions): Rule {
-  if (!tool) {
-    return noop();
-  }
+  return (tree, context) => {
+    if (!tool) {
+      return noop();
+    }
 
-  const rules = tool
-    .filter((tool) => tool !== Tool.None)
-    .map((selectedTool) => AI_TOOLS[selectedTool])
-    .map(({ rulesName, directory, frontmatter }) =>
-      mergeWith(
-        apply(url('./files'), [
-          applyTemplates({
-            ...strings,
-            rulesName,
-            frontmatter,
-          }),
-          move(directory),
-        ]),
-      ),
-    );
+    const rules = tool
+      .filter((tool) => tool !== Tool.None)
+      .map((selectedTool) => {
+        const { rulesName, directory, frontmatter } = AI_TOOLS[selectedTool];
+        const path = `${directory}/${rulesName}`;
 
-  return chain(rules);
+        if (tree.exists(path)) {
+          const toolName = strings.classify(selectedTool);
+          context.logger.warn(
+            `Skipping configuration file for '${toolName}' at '${path}' because it already exists.\n` +
+              'This is to prevent overwriting a potentially customized file. ' +
+              'If you want to regenerate it with Angular recommended defaults, please delete the existing file and re-run the command.\n' +
+              'You can review the latest recommendations at https://angular.dev/ai/develop-with-ai.',
+          );
+
+          return noop();
+        }
+
+        return mergeWith(
+          apply(url('./files'), [
+            applyTemplates({
+              ...strings,
+              rulesName,
+              frontmatter,
+            }),
+            move(directory),
+          ]),
+        );
+      });
+
+    return chain(rules);
+  };
 }
