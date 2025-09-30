@@ -78,6 +78,28 @@ describe('Ai Config Schematic', () => {
     expect(tree.files.length).toBe(filesCount);
   });
 
+  it('should not overwrite an existing file', async () => {
+    const customContent = 'custom user content';
+    workspaceTree.create('.gemini/GEMINI.md', customContent);
+
+    const messages: string[] = [];
+    const loggerSubscription = schematicRunner.logger.subscribe((x) => messages.push(x.message));
+
+    try {
+      const tree = await runConfigSchematic([ConfigTool.Gemini]);
+
+      expect(tree.readContent('.gemini/GEMINI.md')).toBe(customContent);
+      expect(messages).toContain(
+        `Skipping configuration file for 'Gemini' at '.gemini/GEMINI.md' because it already exists.\n` +
+          'This is to prevent overwriting a potentially customized file. ' +
+          'If you want to regenerate it with Angular recommended defaults, please delete the existing file and re-run the command.\n' +
+          'You can review the latest recommendations at https://angular.dev/ai/develop-with-ai.',
+      );
+    } finally {
+      loggerSubscription.unsubscribe();
+    }
+  });
+
   it('should create for tool if None and Gemini are selected', async () => {
     const tree = await runConfigSchematic([ConfigTool.Gemini, ConfigTool.None]);
     expect(tree.exists('.gemini/GEMINI.md')).toBeTruthy();
