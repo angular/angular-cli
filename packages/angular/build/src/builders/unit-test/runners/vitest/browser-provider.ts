@@ -43,6 +43,7 @@ export function setupBrowserConfiguration(
   browsers: string[] | undefined,
   debug: boolean,
   projectSourceRoot: string,
+  viewport: { width: number; height: number } | undefined,
 ): BrowserConfiguration {
   if (browsers === undefined) {
     return {};
@@ -91,6 +92,7 @@ export function setupBrowserConfiguration(
     provider,
     headless,
     ui: !headless,
+    viewport,
     instances: browsers.map((browserName) => ({
       browser: normalizeBrowserName(browserName),
     })),
