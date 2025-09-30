@@ -26,6 +26,11 @@
       },
       "minItems": 1
     },
+    "browserViewport": {
+      "description": "Specifies the browser viewport dimensions for browser-based tests in the format `widthxheight`.",
+      "type": "string",
+      "pattern": "^\\d+x\\d+$"
+    },
     "include": {
       "type": "array",
       "items": {

@@ -54,7 +54,8 @@ export async function normalizeOptions(
   const buildTargetSpecifier = options.buildTarget ?? `::development`;
   const buildTarget = targetFromTargetString(buildTargetSpecifier, projectName, 'build');
 
-  const { runner, browsers, progress, filter } = options;
+  const { runner, browsers, progress, filter, browserViewport } = options;
+  const [width, height] = browserViewport?.split('x').map(Number) ?? [];
 
   let tsConfig = options.tsConfig;
   if (tsConfig) {
@@ -104,6 +105,7 @@ export async function normalizeOptions(
     reporters: normalizeReporterOption(options.reporters),
     outputFile: options.outputFile,
     browsers,
+    browserViewport: width && height ? { width, height } : undefined,
     watch: options.watch ?? isTTY(),
     debug: options.debug ?? false,
     providersFile: options.providersFile && path.join(workspaceRoot, options.providersFile),
