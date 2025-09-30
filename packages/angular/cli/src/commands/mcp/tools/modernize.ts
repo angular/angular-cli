@@ -6,8 +6,13 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
+import { exec } from 'child_process';
+import { existsSync } from 'fs';
+import { stat } from 'fs/promises';
+import { dirname, join, relative } from 'path';
+import { promisify } from 'util';
 import { z } from 'zod';
-import { declareTool } from './tool-registry';
+import { McpToolDeclaration, declareTool } from './tool-registry';
 
 interface Transformation {
   name: string;
@@ -18,13 +23,13 @@ interface Transformation {
 
 const TRANSFORMATIONS: Array<Transformation> = [
   {
-    name: 'control-flow-migration',
+    name: 'control-flow',
     description:
       'Migrates from `*ngIf`, `*ngFor`, and `*ngSwitch` to the new `@if`, `@for`, and `@switch` block syntax in templates.',
     documentationUrl: 'https://angular.dev/reference/migrations/control-flow',
   },
   {
-    name: 'self-closing-tags-migration',
+    name: 'self-closing-tag',
     description:
       'Converts tags for elements with no content to be self-closing (e.g., `<app-foo></app-foo>` becomes `<app-foo />`).',
     documentationUrl: 'https://angular.dev/reference/migrations/self-closing-tags',
@@ -67,57 +72,134 @@ const TRANSFORMATIONS: Array<Transformation> = [
 ];
 
 const modernizeInputSchema = z.object({
-  // Casting to [string, ...string[]] since the enum definition requires a nonempty array.
+  directories: z
+    .array(z.string())
+    .optional()
+    .describe('A list of paths to directories with files to modernize.'),
   transformations: z
     .array(z.enum(TRANSFORMATIONS.map((t) => t.name) as [string, ...string[]]))
     .optional()
+    .describe('A list of specific transformations to apply.'),
+});
+
+const modernizeOutputSchema = z.object({
+  instructions: z
+    .array(z.string())
+    .optional()
     .describe(
-      'A list of specific transformations to get instructions for. ' +
-        'If omitted, general guidance is provided.',
+      'Migration summary, as well as any instructions that need to be performed to complete the migrations.',
     ),
+  stdout: z.string().optional().describe('The stdout from the executed commands.'),
+  stderr: z.string().optional().describe('The stderr from the executed commands.'),
 });
 
 export type ModernizeInput = z.infer<typeof modernizeInputSchema>;
+export type ModernizeOutput = z.infer<typeof modernizeOutputSchema>;
 
-function generateInstructions(transformationNames: string[]): string[] {
-  if (transformationNames.length === 0) {
-    return [
-      'See https://angular.dev/best-practices for Angular best practices. ' +
-        'You can call this tool if you have specific transformation you want to run.',
-    ];
-  }
+const execAsync = promisify(exec);
 
-  const instructions: string[] = [];
-  const transformationsToRun = TRANSFORMATIONS.filter((t) => transformationNames?.includes(t.name));
-
-  for (const transformation of transformationsToRun) {
-    let transformationInstructions = '';
-    if (transformation.instructions) {
-      transformationInstructions = transformation.instructions;
-    } else {
-      // If no instructions are included, default to running a cli schematic with the transformation name.
-      const command = `ng generate @angular/core:${transformation.name}`;
-      transformationInstructions = `To run the ${transformation.name} migration, execute the following command: \`${command}\`.`;
-    }
-    if (transformation.documentationUrl) {
-      transformationInstructions += `\nFor more information, see ${transformation.documentationUrl}.`;
-    }
-    instructions.push(transformationInstructions);
-  }
-
-  return instructions;
-}
-
-export async function runModernization(input: ModernizeInput) {
-  const structuredContent = { instructions: generateInstructions(input.transformations ?? []) };
-
+function createToolOutput(structuredContent: ModernizeOutput) {
   return {
-    content: [{ type: 'text' as const, text: JSON.stringify(structuredContent) }],
+    content: [{ type: 'text' as const, text: JSON.stringify(structuredContent, null, 2) }],
     structuredContent,
   };
 }
 
-export const MODERNIZE_TOOL = declareTool({
+function findAngularJsonDir(startDir: string): string | null {
+  let currentDir = startDir;
+  while (true) {
+    if (existsSync(join(currentDir, 'angular.json'))) {
+      return currentDir;
+    }
+    const parentDir = dirname(currentDir);
+    if (parentDir === currentDir) {
+      return null;
+    }
+    currentDir = parentDir;
+  }
+}
+
+export async function runModernization(input: ModernizeInput) {
+  const transformationNames = input.transformations ?? [];
+  const directories = input.directories ?? [];
+
+  if (transformationNames.length === 0) {
+    return createToolOutput({
+      instructions: [
+        'See https://angular.dev/best-practices for Angular best practices. ' +
+          'You can call this tool if you have specific transformation you want to run.',
+      ],
+    });
+  }
+  if (directories.length === 0) {
+    return createToolOutput({
+      instructions: [
+        'Provide this tool with a list of directory paths in your workspace ' +
+          'to run the modernization on.',
+      ],
+    });
+  }
+
+  const firstDir = directories[0];
+  const executionDir = (await stat(firstDir)).isDirectory() ? firstDir : dirname(firstDir);
+
+  const angularProjectRoot = findAngularJsonDir(executionDir);
+  if (!angularProjectRoot) {
+    return createToolOutput({
+      instructions: ['Could not find an angular.json file in the current or parent directories.'],
+    });
+  }
+
+  const instructions: string[] = [];
+  const stdoutMessages: string[] = [];
+  const stderrMessages: string[] = [];
+  const transformationsToRun = TRANSFORMATIONS.filter((t) => transformationNames.includes(t.name));
+
+  for (const transformation of transformationsToRun) {
+    if (transformation.instructions) {
+      // This is a complex case, return instructions.
+      let transformationInstructions = transformation.instructions;
+      if (transformation.documentationUrl) {
+        transformationInstructions += `\nFor more information, see ${transformation.documentationUrl}.`;
+      }
+      instructions.push(transformationInstructions);
+    } else {
+      // Simple case, run the command.
+      for (const dir of directories) {
+        const relativePath = relative(angularProjectRoot, dir) || '.';
+        const command = `ng generate @angular/core:${transformation.name} --path ${relativePath}`;
+        try {
+          const { stdout, stderr } = await execAsync(command, { cwd: angularProjectRoot });
+          if (stdout) {
+            stdoutMessages.push(stdout);
+          }
+          if (stderr) {
+            stderrMessages.push(stderr);
+          }
+          instructions.push(
+            `Migration ${transformation.name} on directory ${relativePath} completed successfully.`,
+          );
+        } catch (e) {
+          stderrMessages.push((e as Error).message);
+          instructions.push(
+            `Migration ${transformation.name} on directory ${relativePath} failed.`,
+          );
+        }
+      }
+    }
+  }
+
+  return createToolOutput({
+    instructions: instructions.length > 0 ? instructions : undefined,
+    stdout: stdoutMessages?.join('\n\n') ?? undefined,
+    stderr: stderrMessages?.join('\n\n') ?? undefined,
+  });
+}
+
+export const MODERNIZE_TOOL: McpToolDeclaration<
+  typeof modernizeInputSchema.shape,
+  typeof modernizeOutputSchema.shape
+> = declareTool({
   name: 'modernize',
   title: 'Modernize Angular Code',
   description: `
@@ -135,25 +217,19 @@ generating the exact steps needed to perform specific migrations.
   general best practices guide.
 </Use Cases>
 <Operational Notes>
-* **Execution:** This tool **provides instructions**, which you **MUST** then execute as shell commands.
-  It does not modify code directly.
+* **Execution:** This tool executes 'ng generate' commands for simple migrations in a temporary
+  environment using the provided file content. For complex migrations like 'standalone', it
+  provides instructions which you **MUST** then execute as shell commands.
+* **File Modifications:** This tool has been fixed and now correctly finds the node_modules directory in a Bazel environment.
 * **Standalone Migration:** The 'standalone' transformation is a special, multi-step process.
-  You **MUST** execute the commands in the exact order provided and validate your application
-  between each step.
+  The tool will provide instructions. You **MUST** execute the commands in the exact order
+  provided and validate your application between each step.
 * **Transformation List:** The following transformations are available:
 ${TRANSFORMATIONS.map((t) => `  * ${t.name}: ${t.description}`).join('\n')}
 </Operational Notes>`,
   inputSchema: modernizeInputSchema.shape,
-  outputSchema: {
-    instructions: z
-      .array(z.string())
-      .optional()
-      .describe(
-        'A list of instructions and shell commands to run the requested modernizations. ' +
-          'Each string in the array is a separate step or command.',
-      ),
-  },
+  outputSchema: modernizeOutputSchema.shape,
   isLocalOnly: true,
-  isReadOnly: true,
-  factory: () => (input) => runModernization(input),
+  isReadOnly: false,
+  factory: () => runModernization,
 });
