@@ -19,6 +19,10 @@
             "label": "None"
           },
           {
+            "value": "agents",
+            "label": "Agents.md      [ https://agents.md/                                               ]"
+          },
+          {
             "value": "claude",
             "label": "Claude         [ https://docs.anthropic.com/en/docs/claude-code/memory            ]"
           },
@@ -47,7 +51,7 @@
       "description": "Specifies which AI tools to generate configuration files for. These file are used to improve the outputs of AI tools by following the best practices.",
       "items": {
         "type": "string",
-        "enum": ["none", "gemini", "copilot", "claude", "cursor", "jetbrains", "windsurf"]
+        "enum": ["none", "gemini", "copilot", "claude", "cursor", "jetbrains", "windsurf", "agents"]
       }
     }
   }

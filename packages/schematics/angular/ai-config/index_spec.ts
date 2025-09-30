@@ -31,6 +31,11 @@ describe('Ai Config Schematic', () => {
     workspaceTree = await schematicRunner.runSchematic('workspace', workspaceOptions);
   });
 
+  it('should create an AGENTS.md file', async () => {
+    const tree = await runConfigSchematic([ConfigTool.Agents]);
+    expect(tree.exists('AGENTS.md')).toBeTruthy();
+  });
+
   it('should create a GEMINI.MD file', async () => {
     const tree = await runConfigSchematic([ConfigTool.Gemini]);
     expect(tree.exists('.gemini/GEMINI.md')).toBeTruthy();

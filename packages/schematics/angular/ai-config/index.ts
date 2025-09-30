@@ -20,6 +20,10 @@ import {
 import { Schema as ConfigOptions, Tool } from './schema';
 
 const AI_TOOLS: { [key in Exclude<Tool, Tool.None>]: ContextFileInfo } = {
+  agents: {
+    rulesName: 'AGENTS.md',
+    directory: '.',
+  },
   gemini: {
     rulesName: 'GEMINI.md',
     directory: '.gemini',
