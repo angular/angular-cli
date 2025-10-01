@@ -39,7 +39,7 @@ export class KarmaExecutor implements TestExecutor {
     )) as unknown as ApplicationBuilderInternalOptions;
 
     const karmaOptions: KarmaBuilderOptions = {
-      tsConfig: unitTestOptions.tsConfig,
+      tsConfig: unitTestOptions.tsConfig ?? buildTargetOptions.tsConfig,
       polyfills: buildTargetOptions.polyfills,
       assets: buildTargetOptions.assets,
       scripts: buildTargetOptions.scripts,

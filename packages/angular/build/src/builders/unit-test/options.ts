@@ -7,6 +7,7 @@
  */
 
 import { type BuilderContext, targetFromTargetString } from '@angular-devkit/architect';
+import { constants, promises as fs } from 'node:fs';
 import path from 'node:path';
 import { normalizeCacheOptions } from '../../utils/normalize-cache';
 import { getProjectRootPaths } from '../../utils/project-metadata';
@@ -14,6 +15,16 @@ import { isTTY } from '../../utils/tty';
 import type { Schema as UnitTestBuilderOptions } from './schema';
 
 export type NormalizedUnitTestBuilderOptions = Awaited<ReturnType<typeof normalizeOptions>>;
+
+async function exists(path: string): Promise<boolean> {
+  try {
+    await fs.access(path, constants.F_OK);
+
+    return true;
+  } catch {
+    return false;
+  }
+}
 
 function normalizeReporterOption(
   reporters: unknown[] | undefined,
@@ -43,7 +54,21 @@ export async function normalizeOptions(
   const buildTargetSpecifier = options.buildTarget ?? `::development`;
   const buildTarget = targetFromTargetString(buildTargetSpecifier, projectName, 'build');
 
-  const { tsConfig, runner, browsers, progress, filter } = options;
+  const { runner, browsers, progress, filter } = options;
+
+  let tsConfig = options.tsConfig;
+  if (tsConfig) {
+    const fullTsConfigPath = path.join(workspaceRoot, tsConfig);
+    if (!(await exists(fullTsConfigPath))) {
+      throw new Error(`The specified tsConfig file '${tsConfig}' does not exist.`);
+    }
+  } else {
+    const tsconfigSpecPath = path.join(projectRoot, 'tsconfig.spec.json');
+    if (await exists(tsconfigSpecPath)) {
+      // The application builder expects a path relative to the workspace root.
+      tsConfig = path.relative(workspaceRoot, tsconfigSpecPath);
+    }
+  }
 
   return {
     // Project/workspace information
