@@ -444,8 +444,8 @@ importers:
         specifier: 4.4.1
         version: 4.4.1
       ng-packagr:
-        specifier: 21.0.0-next.3
-        version: 21.0.0-next.3(@angular/compiler-cli@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(typescript@5.9.2))(tslib@2.8.1)(typescript@5.9.2)
+        specifier: 21.0.0-next.4
+        version: 21.0.0-next.4(@angular/compiler-cli@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(typescript@5.9.2))(tslib@2.8.1)(typescript@5.9.2)
       postcss:
         specifier: 8.5.6
         version: 8.5.6
@@ -769,8 +769,8 @@ importers:
         specifier: 3.0.4
         version: 3.0.4(bufferutil@4.0.9)
       ng-packagr:
-        specifier: 21.0.0-next.3
-        version: 21.0.0-next.3(@angular/compiler-cli@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(typescript@5.9.2))(tslib@2.8.1)(typescript@5.9.2)
+        specifier: 21.0.0-next.4
+        version: 21.0.0-next.4(@angular/compiler-cli@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(typescript@5.9.2))(tslib@2.8.1)(typescript@5.9.2)
       undici:
         specifier: 7.16.0
         version: 7.16.0
@@ -6834,8 +6834,8 @@ packages:
     resolution: {integrity: sha512-dBpDMdxv9Irdq66304OLfEmQ9tbNRFnFTuZiLo+bD+r332bBmMJ8GBLXklIXXgxd3+v9+KUnZaUR5PJMa75Gsg==}
     engines: {node: '>= 0.4.0'}
 
-  ng-packagr@21.0.0-next.3:
-    resolution: {integrity: sha512-pQpCt14RJFzJmAxLeLrCf4UGTeRc9rVGNyLCdp95OD+5rpxdBuWLla/54xdXiyB6VJcVTfny+b7rWBGmtxMENQ==}
+  ng-packagr@21.0.0-next.4:
+    resolution: {integrity: sha512-WDa+yU3iCjQR9/Y9R88l13Cpm0OeElT99yC3cXN6ETN23aMLjvZayma0pC+FhPnsentzYaz2tGyMRgnL/9TNNw==}
     engines: {node: ^20.19.0 || ^22.12.0 || >=24.0.0}
     hasBin: true
     peerDependencies:
@@ -16027,7 +16027,7 @@ snapshots:
 
   netmask@2.0.2: {}
 
-  ng-packagr@21.0.0-next.3(@angular/compiler-cli@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(typescript@5.9.2))(tslib@2.8.1)(typescript@5.9.2):
+  ng-packagr@21.0.0-next.4(@angular/compiler-cli@21.0.0-next.5(@angular/compiler@21.0.0-next.5)(typescript@5.9.2))(tslib@2.8.1)(typescript@5.9.2):
     dependencies:
       '@ampproject/remapping': 2.3.0
       '@angular/compiler-cli': 21.0.0-next.5(@angular/compiler@21.0.0-next.5)(typescript@5.9.2)
