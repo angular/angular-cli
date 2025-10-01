@@ -5,6 +5,7 @@ import { concat, defer, EMPTY, from, lastValueFrom, catchError, repeat } from 'r
 import { getGlobalVariable, getGlobalVariablesEnv } from './env';
 import treeKill from 'tree-kill';
 import { delimiter, join, resolve } from 'node:path';
+import { stripVTControlCharacters } from 'node:util';
 
 interface ExecOptions {
   silent?: boolean;
@@ -236,14 +237,14 @@ export async function waitForAnyProcessOutputToMatch(
 
         childProcess.stdout!.on('data', (data: Buffer) => {
           stdout += data.toString();
-          if (stdout.match(match)) {
+          if (stripVTControlCharacters(stdout).match(match)) {
             resolve({ stdout, stderr });
           }
         });
 
         childProcess.stderr!.on('data', (data: Buffer) => {
           stderr += data.toString();
-          if (stderr.match(match)) {
+          if (stripVTControlCharacters(stderr).match(match)) {
             resolve({ stdout, stderr });
           }
         });
