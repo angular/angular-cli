@@ -6,7 +6,7 @@
   "properties": {
     "buildTarget": {
       "type": "string",
-      "description": "Specifies the build target to use for the unit test build in the format `project:target[:configuration]`. You can also pass a comma-separated list of configurations. Example: `project:target:production,staging`.",
+      "description": "Specifies the build target to use for the unit test build in the format `project:target[:configuration]`. This defaults to the `build` target of the current project with the `development` configuration. You can also pass a comma-separated list of configurations. Example: `project:target:production,staging`.",
       "pattern": "^[^:\\s]*:[^:\\s]*(:[^\\s]+)?$"
     },
     "tsConfig": {
@@ -262,5 +262,5 @@
     }
   },
   "additionalProperties": false,
-  "required": ["buildTarget", "runner"]
+  "required": ["runner"]
 }
