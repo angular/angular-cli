@@ -11,7 +11,7 @@
     },
     "tsConfig": {
       "type": "string",
-      "description": "The path to the TypeScript configuration file, relative to the workspace root."
+      "description": "The path to the TypeScript configuration file, relative to the workspace root. Defaults to `tsconfig.spec.json` in the project root if it exists. If not specified and the default does not exist, the `tsConfig` from the specified `buildTarget` will be used."
     },
     "runner": {
       "type": "string",
@@ -188,5 +188,5 @@
     }
   },
   "additionalProperties": false,
-  "required": ["buildTarget", "tsConfig", "runner"]
+  "required": ["buildTarget", "runner"]
 }

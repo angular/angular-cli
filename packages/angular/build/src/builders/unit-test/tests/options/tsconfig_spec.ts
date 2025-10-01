@@ -12,43 +12,48 @@ import {
   describeBuilder,
   UNIT_TEST_BUILDER_INFO,
   setupApplicationTarget,
+  expectLog,
 } from '../setup';
 
 describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
-  xdescribe('Option: "tsConfig"', () => {
+  describe('Option: "tsConfig"', () => {
     beforeEach(async () => {
       setupApplicationTarget(harness);
     });
 
-    it('should fail when tsConfig is not provided', async () => {
+    it('should use "tsconfig.spec.json" by default when it exists', async () => {
       const { tsConfig, ...rest } = BASE_OPTIONS;
-      harness.useTarget('test', rest as any);
+      harness.useTarget('test', rest);
 
-      await expectAsync(harness.executeOnce()).toBeRejectedWithError(/"tsConfig" is required/);
+      // Create tsconfig.spec.json
+      await harness.writeFile(
+        'tsconfig.spec.json',
+        `{ "extends": "./tsconfig.json", "compilerOptions": { "types": ["jasmine"] }, "include": ["src/**/*.ts"] }`,
+      );
+
+      const { result } = await harness.executeOnce();
+      expect(result?.success).toBeTrue();
+      // TODO: Add expectation that the file was used.
     });
 
-    it('should fail when tsConfig is empty', async () => {
-      harness.useTarget('test', {
-        ...BASE_OPTIONS,
-        tsConfig: '',
-      });
+    it('should use build target tsConfig when "tsconfig.spec.json" does not exist', async () => {
+      const { tsConfig, ...rest } = BASE_OPTIONS;
+      harness.useTarget('test', rest);
 
-      await expectAsync(harness.executeOnce()).toBeRejectedWithError(
-        /must NOT have fewer than 1 characters/,
-      );
+      // The build target tsconfig is not setup to build the tests and should fail
+      const { result } = await harness.executeOnce();
+      expect(result?.success).toBeFalse();
     });
 
-    it('should fail when tsConfig does not exist', async () => {
+    it('should fail when user specified tsConfig does not exist', async () => {
       harness.useTarget('test', {
         ...BASE_OPTIONS,
-        tsConfig: 'src/tsconfig.spec.json',
+        tsConfig: 'random/tsconfig.spec.json',
       });
 
-      const { result, error } = await harness.executeOnce({ outputLogsOnFailure: false });
-      expect(result).toBeUndefined();
-      expect(error?.message).toMatch(
-        `The specified tsConfig file "src/tsconfig.spec.json" does not exist.`,
-      );
+      const { result, logs } = await harness.executeOnce({ outputLogsOnFailure: false });
+      expect(result?.success).toBeFalse();
+      expectLog(logs, `The specified tsConfig file 'random/tsconfig.spec.json' does not exist.`);
     });
   });
 });

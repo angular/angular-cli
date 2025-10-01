@@ -232,7 +232,7 @@ export type UnitTestBuilderOptions = {
     reporters?: SchemaReporter[];
     runner: Runner;
     setupFiles?: string[];
-    tsConfig: string;
+    tsConfig?: string;
     watch?: boolean;
 };
 

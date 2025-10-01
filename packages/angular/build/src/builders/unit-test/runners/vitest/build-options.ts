@@ -63,15 +63,7 @@ export async function getVitestBuildOptions(
   options: NormalizedUnitTestBuilderOptions,
   baseBuildOptions: Partial<ApplicationBuilderInternalOptions>,
 ): Promise<RunnerOptions> {
-  const {
-    workspaceRoot,
-    projectSourceRoot,
-    include,
-    exclude = [],
-    watch,
-    tsConfig,
-    providersFile,
-  } = options;
+  const { workspaceRoot, projectSourceRoot, include, exclude = [], watch, providersFile } = options;
 
   // Find test files
   const testFiles = await findTests(include, exclude, workspaceRoot, projectSourceRoot);
@@ -108,7 +100,6 @@ export async function getVitestBuildOptions(
     sourceMap: { scripts: true, vendor: false, styles: false },
     outputHashing: adjustOutputHashing(baseBuildOptions.outputHashing),
     optimization: false,
-    tsConfig,
     entryPoints,
     externalDependencies: ['vitest', '@vitest/browser/context'],
   };
