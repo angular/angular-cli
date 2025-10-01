@@ -33,7 +33,7 @@ const VitestTestRunner: TestRunner = {
       checker.check('jsdom');
     }
 
-    if (options.codeCoverage) {
+    if (options.coverage) {
       checker.check('@vitest/coverage-v8');
     }
 

@@ -30,7 +30,7 @@ const KarmaTestRunner: TestRunner = {
       }
     }
 
-    if (options.codeCoverage) {
+    if (options.coverage) {
       checker.check('karma-coverage');
     }
 

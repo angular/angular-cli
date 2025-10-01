@@ -33,6 +33,18 @@ export class KarmaExecutor implements TestExecutor {
       );
     }
 
+    if (unitTestOptions.coverage?.all) {
+      context.logger.warn(
+        'The "karma" test runner does not support the "coverageAll" option. The option will be ignored.',
+      );
+    }
+
+    if (unitTestOptions.coverage?.include) {
+      context.logger.warn(
+        'The "karma" test runner does not support the "coverageInclude" option. The option will be ignored.',
+      );
+    }
+
     const buildTargetOptions = (await context.validateOptions(
       await context.getTargetOptions(unitTestOptions.buildTarget),
       await context.getBuilderNameForTarget(unitTestOptions.buildTarget),
@@ -57,8 +69,8 @@ export class KarmaExecutor implements TestExecutor {
       poll: buildTargetOptions.poll,
       preserveSymlinks: buildTargetOptions.preserveSymlinks,
       browsers: unitTestOptions.browsers?.join(','),
-      codeCoverage: !!unitTestOptions.codeCoverage,
-      codeCoverageExclude: unitTestOptions.codeCoverage?.exclude,
+      codeCoverage: !!unitTestOptions.coverage,
+      codeCoverageExclude: unitTestOptions.coverage?.exclude,
       fileReplacements: buildTargetOptions.fileReplacements,
       reporters: unitTestOptions.reporters?.map((reporter) => {
         // Karma only supports string reporters.
@@ -90,6 +102,23 @@ export class KarmaExecutor implements TestExecutor {
           options.client ??= {};
           options.client.args ??= [];
           options.client.args.push('--grep', filter);
+        }
+
+        // Add coverage options
+        if (unitTestOptions.coverage) {
+          const { thresholds, watermarks } = unitTestOptions.coverage;
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const coverageReporter = ((options as any).coverageReporter ??= {});
+
+          if (thresholds) {
+            coverageReporter.check = thresholds.perFile
+              ? { each: thresholds }
+              : { global: thresholds };
+          }
+
+          if (watermarks) {
+            coverageReporter.watermarks = watermarks;
+          }
         }
 
         return options;
