@@ -104,7 +104,7 @@ export function runWebpack(
 
               // Teardown logic. Close the watcher when unsubscribed from.
               return () => {
-                watching.close(() => {});
+                watching?.close(() => {});
                 webpackCompiler.close(() => {});
               };
             } else {
