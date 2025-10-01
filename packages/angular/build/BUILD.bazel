@@ -111,7 +111,7 @@ ts_project(
         ":node_modules/picomatch",
         ":node_modules/piscina",
         ":node_modules/postcss",
-        ":node_modules/rolldown",
+        ":node_modules/rollup",
         ":node_modules/sass",
         ":node_modules/source-map-support",
         ":node_modules/tinyglobby",
