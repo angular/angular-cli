@@ -30,7 +30,7 @@ async function main() {
           PATH: process.env.PATH,
           E2E_SHARD_TOTAL: process.env.E2E_SHARD_TOTAL,
           E2E_SHARD_INDEX: process.env.E2E_SHARD_INDEX,
-          FORCE_COLOR: '3',
+          FORCE_COLOR: '0',
           // Needed by `rules_js`
           BAZEL_BINDIR: '.',
           // Needed to run the E2E in a different temp path.
