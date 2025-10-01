@@ -15,15 +15,15 @@ import {
 } from '../setup';
 
 describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
-  describe('Option: "codeCoverage"', () => {
+  describe('Option: "coverage"', () => {
     beforeEach(async () => {
       setupApplicationTarget(harness);
     });
 
-    it('should not generate a code coverage report when codeCoverage is false', async () => {
+    it('should not generate a code coverage report when coverage is false', async () => {
       harness.useTarget('test', {
         ...BASE_OPTIONS,
-        codeCoverage: false,
+        coverage: false,
       });
 
       const { result } = await harness.executeOnce();
@@ -31,10 +31,10 @@ describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
       expect(harness.hasFile('coverage/test/index.html')).toBeFalse();
     });
 
-    it('should generate a code coverage report when codeCoverage is true', async () => {
+    it('should generate a code coverage report when coverage is true', async () => {
       harness.useTarget('test', {
         ...BASE_OPTIONS,
-        codeCoverage: true,
+        coverage: true,
       });
 
       const { result } = await harness.executeOnce();

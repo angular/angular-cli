@@ -217,9 +217,13 @@ export type NgPackagrBuilderOptions = {
 export type UnitTestBuilderOptions = {
     browsers?: string[];
     buildTarget: string;
-    codeCoverage?: boolean;
-    codeCoverageExclude?: string[];
-    codeCoverageReporters?: SchemaCodeCoverageReporter[];
+    coverage?: boolean;
+    coverageAll?: boolean;
+    coverageExclude?: string[];
+    coverageInclude?: string[];
+    coverageReporters?: SchemaCoverageReporter[];
+    coverageThresholds?: CoverageThresholds;
+    coverageWatermarks?: CoverageWatermarks;
     debug?: boolean;
     dumpVirtualFiles?: boolean;
     exclude?: string[];

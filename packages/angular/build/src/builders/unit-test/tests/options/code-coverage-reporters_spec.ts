@@ -15,7 +15,7 @@ import {
 } from '../setup';
 
 describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
-  describe('Option: "codeCoverageReporters"', () => {
+  describe('Option: "coverageReporters"', () => {
     beforeEach(async () => {
       setupApplicationTarget(harness);
     });
@@ -23,8 +23,8 @@ describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
     it('should generate a json summary report when specified', async () => {
       harness.useTarget('test', {
         ...BASE_OPTIONS,
-        codeCoverage: true,
-        codeCoverageReporters: ['json-summary'] as any,
+        coverage: true,
+        coverageReporters: ['json-summary'] as any,
       });
 
       const { result } = await harness.executeOnce();
@@ -35,8 +35,8 @@ describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
     it('should generate multiple reports when specified', async () => {
       harness.useTarget('test', {
         ...BASE_OPTIONS,
-        codeCoverage: true,
-        codeCoverageReporters: ['json-summary', 'lcov'] as any,
+        coverage: true,
+        coverageReporters: ['json-summary', 'lcov'] as any,
       });
 
       const { result } = await harness.executeOnce();

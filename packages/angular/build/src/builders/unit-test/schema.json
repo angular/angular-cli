@@ -54,21 +54,33 @@
       "description": "Enables debugging mode for tests, allowing the use of the Node Inspector.",
       "default": false
     },
-    "codeCoverage": {
+    "coverage": {
       "type": "boolean",
-      "description": "Enables code coverage reporting for tests.",
+      "description": "Enables coverage reporting for tests.",
       "default": false
     },
-    "codeCoverageExclude": {
+    "coverageAll": {
+      "type": "boolean",
+      "description": "Includes all files that match the `coverageInclude` pattern in the coverage report, not just those touched by tests.",
+      "default": true
+    },
+    "coverageInclude": {
       "type": "array",
-      "description": "Specifies glob patterns of files to exclude from the code coverage report.",
+      "description": "Specifies glob patterns of files to include in the coverage report.",
       "items": {
         "type": "string"
       }
     },
-    "codeCoverageReporters": {
+    "coverageExclude": {
       "type": "array",
-      "description": "Specifies the reporters to use for code coverage results. Each reporter can be a string representing its name, or a tuple containing the name and an options object. Built-in reporters include 'html', 'lcov', 'lcovonly', 'text', 'text-summary', 'cobertura', 'json', and 'json-summary'.",
+      "description": "Specifies glob patterns of files to exclude from the coverage report.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "coverageReporters": {
+      "type": "array",
+      "description": "Specifies the reporters to use for coverage results. Each reporter can be a string representing its name, or a tuple containing the name and an options object. Built-in reporters include 'html', 'lcov', 'lcovonly', 'text', 'text-summary', 'cobertura', 'json', and 'json-summary'.",
       "items": {
         "oneOf": [
           {
@@ -107,6 +119,68 @@
           }
         ]
       }
+    },
+    "coverageThresholds": {
+      "type": "object",
+      "description": "Specifies minimum coverage thresholds that must be met. If thresholds are not met, the builder will exit with an error.",
+      "properties": {
+        "perFile": {
+          "type": "boolean",
+          "description": "When true, thresholds are enforced for each file individually."
+        },
+        "statements": {
+          "type": "number",
+          "description": "Minimum percentage of statements covered."
+        },
+        "branches": {
+          "type": "number",
+          "description": "Minimum percentage of branches covered."
+        },
+        "functions": {
+          "type": "number",
+          "description": "Minimum percentage of functions covered."
+        },
+        "lines": {
+          "type": "number",
+          "description": "Minimum percentage of lines covered."
+        }
+      },
+      "additionalProperties": false
+    },
+    "coverageWatermarks": {
+      "type": "object",
+      "description": "Specifies coverage watermarks for the HTML reporter. These determine the color coding for high, medium, and low coverage.",
+      "properties": {
+        "statements": {
+          "type": "array",
+          "description": "The high and low watermarks for statements coverage. `[low, high]`",
+          "items": { "type": "number" },
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "branches": {
+          "type": "array",
+          "description": "The high and low watermarks for branches coverage. `[low, high]`",
+          "items": { "type": "number" },
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "functions": {
+          "type": "array",
+          "description": "The high and low watermarks for functions coverage. `[low, high]`",
+          "items": { "type": "number" },
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "lines": {
+          "type": "array",
+          "description": "The high and low watermarks for lines coverage. `[low, high]`",
+          "items": { "type": "number" },
+          "minItems": 2,
+          "maxItems": 2
+        }
+      },
+      "additionalProperties": false
     },
     "reporters": {
       "type": "array",

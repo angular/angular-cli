@@ -15,7 +15,7 @@ import {
 } from '../setup';
 
 describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
-  describe('Option: "codeCoverageExclude"', () => {
+  describe('Option: "coverageExclude"', () => {
     beforeEach(async () => {
       setupApplicationTarget(harness);
       await harness.writeFiles({
@@ -26,7 +26,7 @@ describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
     it('should not exclude any files from coverage when not provided', async () => {
       harness.useTarget('test', {
         ...BASE_OPTIONS,
-        codeCoverage: true,
+        coverage: true,
       });
 
       const { result } = await harness.executeOnce();
@@ -38,8 +38,8 @@ describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
     it('should exclude files from coverage that match the glob pattern', async () => {
       harness.useTarget('test', {
         ...BASE_OPTIONS,
-        codeCoverage: true,
-        codeCoverageExclude: ['**/error.ts'],
+        coverage: true,
+        coverageExclude: ['**/error.ts'],
       });
 
       const { result } = await harness.executeOnce();
