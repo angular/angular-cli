@@ -19,7 +19,7 @@
 
 import type { Message, Metafile } from 'esbuild';
 import assert from 'node:assert';
-import { type OutputAsset, type OutputChunk, rolldown } from 'rolldown';
+import { type OutputAsset, type OutputChunk, rollup } from 'rollup';
 import {
   BuildOutputFile,
   BuildOutputFileType,
@@ -216,7 +216,7 @@ export async function optimizeChunks(
   let bundle;
   let optimizedOutput;
   try {
-    bundle = await rolldown({
+    bundle = await rollup({
       input: mainFile,
       plugins: [
         {
@@ -252,8 +252,7 @@ export async function optimizeChunks(
     });
 
     const result = await bundle.generate({
-      minify: { mangle: false, compress: false },
-      advancedChunks: { minSize: 8192 },
+      compact: true,
       sourcemap,
       chunkFileNames: (chunkInfo) => `${chunkInfo.name.replace(/-[a-zA-Z0-9]{8}$/, '')}-[hash].js`,
     });
