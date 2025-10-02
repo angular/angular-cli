@@ -1,3 +1,28 @@
+<a name="20.3.4"></a>
+
+# 20.3.4 (2025-10-02)
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                     |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------- |
+| [c94bf7ff0](https://github.com/angular/angular-cli/commit/c94bf7ff0845fe325c39737057ff1ed4ea553011) | fix  | Out of the box support for PM2                  |
+| [465436c9f](https://github.com/angular/angular-cli/commit/465436c9fa21173befe5e39b61afb7f29435c2aa) | fix  | use bracket notation for `process.env['pm_id']` |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                             |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------- |
+| [bc6b63114](https://github.com/angular/angular-cli/commit/bc6b631146c719a337c937e95c7cc5ebca29254b) | fix  | mark `InjectionToken` as pure for improved tree-shaking |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                             |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------- |
+| [e510ff828](https://github.com/angular/angular-cli/commit/e510ff828f033478d8e1720050a7b3d75d551e16) | fix  | mark `InjectionToken` as pure for improved tree-shaking |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="21.0.0-next.5"></a>
 
 # 21.0.0-next.5 (2025-09-24)
