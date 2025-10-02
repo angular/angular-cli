@@ -6,9 +6,12 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import type { Config, Filesystem } from '@angular/service-worker/config';
+import type {
+  Config,
+  Filesystem,
+} from '@angular/service-worker/config' with { 'resolution-mode': 'import' };
 import * as crypto from 'node:crypto';
-import { existsSync, constants as fsConstants, promises as fsPromises } from 'node:fs';
+import { existsSync, promises as fsPromises } from 'node:fs';
 import * as path from 'node:path';
 import { BuildOutputFile, BuildOutputFileType } from '../tools/esbuild/bundler-context';
 import { BuildOutputAsset } from '../tools/esbuild/bundler-execution-result';
