@@ -223,9 +223,9 @@ export async function augmentAppWithServiceWorkerCore(
   // Once TypeScript provides support for keeping the dynamic import this workaround can be
   // changed to a direct dynamic import.
   const GeneratorConstructor = (
-    await loadEsmModule<typeof import('@angular/service-worker/config')>(
-      '@angular/service-worker/config',
-    )
+    await loadEsmModule<
+      typeof import('@angular/service-worker/config', { with: { 'resolution-mode': 'import' } })
+    >('@angular/service-worker/config')
   ).Generator;
 
   // Generate the manifest

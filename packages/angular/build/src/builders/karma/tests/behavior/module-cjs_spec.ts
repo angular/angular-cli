@@ -22,7 +22,7 @@ describeKarmaBuilder(execute, KARMA_BUILDER_INFO, (harness, setupTarget) => {
 
       await harness.modifyFile('src/tsconfig.spec.json', (content) => {
         const tsConfig = JSON.parse(content);
-        tsConfig.compilerOptions.moduleResolution = 'node';
+        tsConfig.compilerOptions.moduleResolution = 'bundler';
         tsConfig.compilerOptions.module = 'commonjs';
 
         return JSON.stringify(tsConfig);
