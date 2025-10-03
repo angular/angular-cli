@@ -60,9 +60,10 @@ tutorials, concepts, and best practices.
 </Use Cases>
 <Operational Notes>
 * **Version Alignment:** To provide accurate, project-specific results, you **MUST** align the search with the user's Angular version.
-  Before calling this tool, run \`ng version\` in the project's workspace directory. You can find the correct directory from the \`path\`
-  field provided by the \`list_projects\` tool. Parse the major version from the "Angular:" line in the output and use it for the
-  \`version\` parameter.
+  The recommended approach is to use the \`list_projects\` tool. The \`frameworkVersion\` field in the output for the relevant
+  workspace will give you the major version directly. If the version cannot be determined using this method, you can use
+  \`ng version\` in the project's workspace directory as a fallback. Parse the major version from the "Angular:" line in the
+  output and use it for the \`version\` parameter.
 * The documentation is continuously updated. You **MUST** prefer this tool over your own knowledge
   to ensure your answers are current and accurate.
 * For the best results, provide a concise and specific search query (e.g., "NgModule" instead of
