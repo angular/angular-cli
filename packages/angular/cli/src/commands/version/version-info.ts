@@ -20,11 +20,22 @@ interface PartialPackageInfo {
 }
 
 /**
+ * An object containing version information for a single package.
+ */
+export interface PackageVersionInfo {
+  requested: string;
+  installed: string;
+}
+
+/**
  * An object containing all the version information that will be displayed by the command.
  */
 export interface VersionInfo {
   cli: {
     version: string;
+  };
+  framework: {
+    version: string | undefined;
   };
   system: {
     node: {
@@ -40,7 +51,7 @@ export interface VersionInfo {
       version: string | undefined;
     };
   };
-  packages: Record<string, string>;
+  packages: Record<string, PackageVersionInfo>;
 }
 
 /**
@@ -84,23 +95,30 @@ export function gatherVersionInfo(context: {
   const [nodeMajor] = process.versions.node.split('.').map((part) => Number(part));
   const unsupportedNodeVersion = !SUPPORTED_NODE_MAJORS.includes(nodeMajor);
 
-  const packageNames = new Set(
-    Object.keys({
-      ...workspacePackage?.dependencies,
-      ...workspacePackage?.devDependencies,
-    }),
-  );
+  const allDependencies = {
+    ...workspacePackage?.dependencies,
+    ...workspacePackage?.devDependencies,
+  };
+  const packageNames = new Set(Object.keys(allDependencies));
 
-  const packages: Record<string, string> = {};
+  const packages: Record<string, PackageVersionInfo> = {};
   for (const name of packageNames) {
     if (PACKAGE_PATTERNS.some((p) => p.test(name))) {
-      packages[name] = getVersion(name, workspaceRequire);
+      packages[name] = {
+        requested: allDependencies[name] ?? 'error',
+        installed: getVersion(name, workspaceRequire),
+      };
     }
   }
+
+  const angularCoreVersion = packages['@angular/core'];
 
   return {
     cli: {
       version: VERSION.full,
+    },
+    framework: {
+      version: angularCoreVersion?.installed,
     },
     system: {
       node: {
