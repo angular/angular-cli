@@ -1,3 +1,43 @@
+<a name="21.0.0-next.6"></a>
+
+# 21.0.0-next.6 (2025-10-03)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                     |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------- |
+| [58d101d5e](https://github.com/angular/angular-cli/commit/58d101d5e78cf4c158dbaf52103639d56b84f9ed) | feat | add `--json` output to `ng version`             |
+| [50453fdee](https://github.com/angular/angular-cli/commit/50453fdeec4a00d88deada49d2dd0867bdb784fb) | feat | overhaul `ng version` command output            |
+| [0922a033f](https://github.com/angular/angular-cli/commit/0922a033f546b38f83d1cae524cf7237dd37a2ac) | fix  | improve JSON schema parsing for command options |
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                             |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------- |
+| [c119910f4](https://github.com/angular/angular-cli/commit/c119910f4505e280eea83ea6647b6d279a46f36d) | feat | add AGENTS.md support to ai-config schematic            |
+| [9dab5780a](https://github.com/angular/angular-cli/commit/9dab5780a1befbd76ee9ba4c4e6ac2d3fd714bb9) | fix  | add fixture.whenStable in spec files when zoneless apps |
+| [e304821d5](https://github.com/angular/angular-cli/commit/e304821d5d789fab2725d3152612d3e5b6bd0dc7) | fix  | make ai-config schematic non-destructive                |
+| [8ac515699](https://github.com/angular/angular-cli/commit/8ac515699cfd5a4e7eda9bcc054dfd7c68faba39) | fix  | Out of the box support for PM2                          |
+| [57075a31a](https://github.com/angular/angular-cli/commit/57075a31ad8f95a82304fe8533b3bca828d8da42) | fix  | use bracket notation for `process.env['pm_id']`         |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                             |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------- |
+| [acd785afc](https://github.com/angular/angular-cli/commit/acd785afc956efad56b03402085ff94855b9fcc6) | fix  | mark `InjectionToken` as pure for improved tree-shaking |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                             |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------- |
+| [3e0209d0a](https://github.com/angular/angular-cli/commit/3e0209d0a6bc6d7985d6294fc1430cdbe4d2d9a6) | feat | add `browserViewport` option for vitest browser tests   |
+| [3b7dabbf1](https://github.com/angular/angular-cli/commit/3b7dabbf1df9b2b6ca9ffc6c038abb6e40b6df2b) | feat | add advanced coverage options to unit-test builder      |
+| [65562114c](https://github.com/angular/angular-cli/commit/65562114cdf725fa52f6d805f26a1aa265b9badb) | fix  | mark `InjectionToken` as pure for improved tree-shaking |
+| [d0787c11d](https://github.com/angular/angular-cli/commit/d0787c11d68841c36ef28bc3f15963406d1209a9) | fix  | provide default excludes for vitest coverage            |
+| [ac10f323e](https://github.com/angular/angular-cli/commit/ac10f323ece9f4a35068e510f10786fbcb15adbb) | fix  | relax requirement for files to be in TS compilation     |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="20.3.4"></a>
 
 # 20.3.4 (2025-10-02)
