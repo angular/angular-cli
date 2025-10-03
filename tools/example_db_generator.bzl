@@ -8,5 +8,5 @@ def cli_example_db(name, srcs, path, out, data = []):
         tool = "//tools:ng_example_db",
         progress_message = "Generating code example database from %s" % path,
         mnemonic = "NgExampleSqliteDb",
-        args = [path, "$(rootpath %s)" % out],
+        args = ["--mode generate-db", "--output $(rootpath %s)" % out, path],
     )

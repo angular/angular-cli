@@ -59,6 +59,8 @@ jobs:
         uses: angular/dev-infra/github-actions/linting/licenses@b7672ff60456719e6d9b0cc052abc73a7adc8df2
       - name: Check tooling setup
         run: pnpm check-tooling-setup
+      - name: Validate MCP Example Markdown
+        run: pnpm check-mcp-examples
       - name: Check commit message
         # Commit message validation is only done on pull requests as its too late to validate once
         # it has been merged.
