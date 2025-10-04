@@ -10,7 +10,7 @@ import type { Argv } from 'yargs';
 import { CommandModule, CommandModuleImplementation } from '../../command-builder/command-module';
 import { colors } from '../../utilities/color';
 import { RootCommands } from '../command-config';
-import { gatherVersionInfo } from './version-info';
+import { PackageVersionInfo, gatherVersionInfo } from './version-info';
 
 /**
  * The Angular CLI logo, displayed as ASCII art.
@@ -67,6 +67,7 @@ export default class VersionCommandModule
 
     const {
       cli: { version: ngCliVersion },
+      framework,
       system: {
         node: { version: nodeVersion, unsupported: unsupportedNodeVersion },
         os: { platform: os, architecture: arch },
@@ -75,8 +76,13 @@ export default class VersionCommandModule
       packages,
     } = versionInfo;
 
-    const headerInfo = [
-      { label: 'Angular CLI', value: ngCliVersion },
+    const headerInfo = [{ label: 'Angular CLI', value: ngCliVersion }];
+
+    if (framework.version) {
+      headerInfo.push({ label: 'Angular', value: framework.version });
+    }
+
+    headerInfo.push(
       {
         label: 'Node.js',
         value: `${nodeVersion}${unsupportedNodeVersion ? colors.yellow(' (Unsupported)') : ''}`,
@@ -86,7 +92,7 @@ export default class VersionCommandModule
         value: `${packageManagerName} ${packageManagerVersion ?? '<error>'}`,
       },
       { label: 'Operating System', value: `${os} ${arch}` },
-    ];
+    );
 
     const maxHeaderLabelLength = Math.max(...headerInfo.map((l) => l.label.length));
 
@@ -113,38 +119,56 @@ export default class VersionCommandModule
    * @param versions A map of package names to their versions.
    * @returns A string containing the formatted package table.
    */
-  private formatPackageTable(versions: Record<string, string>): string {
+  private formatPackageTable(versions: Record<string, PackageVersionInfo>): string {
     const versionKeys = Object.keys(versions);
     if (versionKeys.length === 0) {
       return '';
     }
 
-    const nameHeader = 'Package';
-    const versionHeader = 'Version';
+    const headers = {
+      name: 'Package',
+      installed: 'Installed Version',
+      requested: 'Requested Version',
+    };
 
-    const maxNameLength = Math.max(nameHeader.length, ...versionKeys.map((key) => key.length));
-    const maxVersionLength = Math.max(
-      versionHeader.length,
-      ...versionKeys.map((key) => versions[key].length),
+    const maxNameLength = Math.max(headers.name.length, ...versionKeys.map((key) => key.length));
+    const maxInstalledLength = Math.max(
+      headers.installed.length,
+      ...versionKeys.map((key) => versions[key].installed.length),
+    );
+    const maxRequestedLength = Math.max(
+      headers.requested.length,
+      ...versionKeys.map((key) => versions[key].requested.length),
     );
 
     const tableRows = versionKeys
       .map((module) => {
+        const { requested, installed } = versions[module];
         const name = module.padEnd(maxNameLength);
-        const version = versions[module];
-        const coloredVersion = version === '<error>' ? colors.red(version) : colors.cyan(version);
-        const padding = ' '.repeat(maxVersionLength - version.length);
 
-        return `│ ${name} │ ${coloredVersion}${padding} │`;
+        const coloredInstalled =
+          installed === '<error>' ? colors.red(installed) : colors.cyan(installed);
+        const installedPadding = ' '.repeat(maxInstalledLength - installed.length);
+
+        return `│ ${name} │ ${coloredInstalled}${installedPadding} │ ${requested.padEnd(
+          maxRequestedLength,
+        )} │`;
       })
       .sort();
 
-    const top = `┌─${'─'.repeat(maxNameLength)}─┬─${'─'.repeat(maxVersionLength)}─┐`;
-    const header = `│ ${nameHeader.padEnd(maxNameLength)} │ ${versionHeader.padEnd(
-      maxVersionLength,
-    )} │`;
-    const separator = `├─${'─'.repeat(maxNameLength)}─┼─${'─'.repeat(maxVersionLength)}─┤`;
-    const bottom = `└─${'─'.repeat(maxNameLength)}─┴─${'─'.repeat(maxVersionLength)}─┘`;
+    const top = `┌─${'─'.repeat(maxNameLength)}─┬─${'─'.repeat(
+      maxInstalledLength,
+    )}─┬─${'─'.repeat(maxRequestedLength)}─┐`;
+    const header =
+      `│ ${headers.name.padEnd(maxNameLength)} │ ` +
+      `${headers.installed.padEnd(maxInstalledLength)} │ ` +
+      `${headers.requested.padEnd(maxRequestedLength)} │`;
+    const separator = `├─${'─'.repeat(maxNameLength)}─┼─${'─'.repeat(
+      maxInstalledLength,
+    )}─┼─${'─'.repeat(maxRequestedLength)}─┤`;
+    const bottom = `└─${'─'.repeat(maxNameLength)}─┴─${'─'.repeat(
+      maxInstalledLength,
+    )}─┴─${'─'.repeat(maxRequestedLength)}─┘`;
 
     return [top, header, separator, ...tableRows, bottom].join('\n');
   }
