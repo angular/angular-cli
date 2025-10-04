@@ -6,9 +6,10 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { readdir } from 'node:fs/promises';
+import { readFile, readdir } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import semver from 'semver';
 import z from 'zod';
 import { AngularWorkspace } from '../../../utilities/config';
 import { assertIsError } from '../../../utilities/error';
@@ -18,6 +19,12 @@ const listProjectsOutputSchema = {
   workspaces: z.array(
     z.object({
       path: z.string().describe('The path to the `angular.json` file for this workspace.'),
+      frameworkVersion: z
+        .string()
+        .optional()
+        .describe(
+          'The major version of the Angular framework (`@angular/core`) in this workspace, if found.',
+        ),
       projects: z.array(
         z.object({
           name: z
@@ -55,6 +62,17 @@ const listProjectsOutputSchema = {
     )
     .default([])
     .describe('A list of files that looked like workspaces but failed to parse.'),
+  versioningErrors: z
+    .array(
+      z.object({
+        filePath: z
+          .string()
+          .describe('The path to the workspace `angular.json` for which versioning failed.'),
+        message: z.string().describe('The error message detailing why versioning failed.'),
+      }),
+    )
+    .default([])
+    .describe('A list of workspaces for which the framework version could not be determined.'),
 };
 
 export const LIST_PROJECTS_TOOL = declareTool({
@@ -71,6 +89,7 @@ their types, and their locations.
 * Identifying the \`root\` and \`sourceRoot\` of a project to read, analyze, or modify its files.
 * Determining if a project is an \`application\` or a \`library\`.
 * Getting the \`selectorPrefix\` for a project before generating a new component to ensure it follows conventions.
+* Identifying the major version of the Angular framework for each workspace, which is crucial for monorepos.
 </Use Cases>
 <Operational Notes>
 * **Working Directory:** Shell commands for a project (like \`ng generate\`) **MUST**
@@ -135,6 +154,77 @@ async function* findAngularJsonFiles(rootDir: string): AsyncGenerator<string> {
   }
 }
 
+/**
+ * Searches upwards from a starting directory to find the version of '@angular/core'.
+ * It caches results to avoid redundant lookups.
+ * @param startDir The directory to start the search from.
+ * @param cache A map to store cached results.
+ * @param searchRoot The directory at which to stop the search.
+ * @returns The major version of '@angular/core' as a string, otherwise undefined.
+ */
+async function findAngularCoreVersion(
+  startDir: string,
+  cache: Map<string, string | undefined>,
+  searchRoot: string,
+): Promise<string | undefined> {
+  let currentDir = startDir;
+  const dirsToCache: string[] = [];
+
+  while (currentDir) {
+    dirsToCache.push(currentDir);
+    if (cache.has(currentDir)) {
+      const cachedResult = cache.get(currentDir);
+      // Populate cache for all intermediate directories.
+      for (const dir of dirsToCache) {
+        cache.set(dir, cachedResult);
+      }
+
+      return cachedResult;
+    }
+
+    const pkgPath = path.join(currentDir, 'package.json');
+    try {
+      const pkgContent = await readFile(pkgPath, 'utf-8');
+      const pkg = JSON.parse(pkgContent);
+      const versionSpecifier =
+        pkg.dependencies?.['@angular/core'] ?? pkg.devDependencies?.['@angular/core'];
+
+      if (versionSpecifier) {
+        const minVersion = semver.minVersion(versionSpecifier);
+        const result = minVersion ? String(minVersion.major) : undefined;
+        for (const dir of dirsToCache) {
+          cache.set(dir, result);
+        }
+
+        return result;
+      }
+    } catch (error) {
+      assertIsError(error);
+      if (error.code !== 'ENOENT') {
+        // Ignore missing package.json files, but rethrow other errors.
+        throw error;
+      }
+    }
+
+    // Stop if we are at the search root or the filesystem root.
+    if (currentDir === searchRoot) {
+      break;
+    }
+    const parentDir = path.dirname(currentDir);
+    if (parentDir === currentDir) {
+      break; // Reached the filesystem root.
+    }
+    currentDir = parentDir;
+  }
+
+  // Cache the failure for all traversed directories.
+  for (const dir of dirsToCache) {
+    cache.set(dir, undefined);
+  }
+
+  return undefined;
+}
+
 // Types for the structured output of the helper function.
 type WorkspaceData = z.infer<typeof listProjectsOutputSchema.workspaces>[number];
 type ParsingError = z.infer<typeof listProjectsOutputSchema.parsingErrors>[number];
@@ -186,7 +276,9 @@ async function createListProjectsHandler({ server }: McpToolContext) {
   return async () => {
     const workspaces: WorkspaceData[] = [];
     const parsingErrors: ParsingError[] = [];
+    const versioningErrors: z.infer<typeof listProjectsOutputSchema.versioningErrors> = [];
     const seenPaths = new Set<string>();
+    const versionCache = new Map<string, string | undefined>();
 
     let searchRoots: string[];
     const clientCapabilities = server.server.getClientCapabilities();
@@ -201,11 +293,25 @@ async function createListProjectsHandler({ server }: McpToolContext) {
     for (const root of searchRoots) {
       for await (const configFile of findAngularJsonFiles(root)) {
         const { workspace, error } = await loadAndParseWorkspace(configFile, seenPaths);
-        if (workspace) {
-          workspaces.push(workspace);
-        }
         if (error) {
           parsingErrors.push(error);
+        }
+
+        if (workspace) {
+          try {
+            const workspaceDir = path.dirname(configFile);
+            workspace.frameworkVersion = await findAngularCoreVersion(
+              workspaceDir,
+              versionCache,
+              root,
+            );
+          } catch (e) {
+            versioningErrors.push({
+              filePath: workspace.path,
+              message: e instanceof Error ? e.message : 'An unknown error occurred.',
+            });
+          }
+          workspaces.push(workspace);
         }
       }
     }
@@ -230,10 +336,14 @@ async function createListProjectsHandler({ server }: McpToolContext) {
       text += `\n\nWarning: The following ${parsingErrors.length} file(s) could not be parsed and were skipped:\n`;
       text += parsingErrors.map((e) => `- ${e.filePath}: ${e.message}`).join('\n');
     }
+    if (versioningErrors.length > 0) {
+      text += `\n\nWarning: The framework version for the following ${versioningErrors.length} workspace(s) could not be determined:\n`;
+      text += versioningErrors.map((e) => `- ${e.filePath}: ${e.message}`).join('\n');
+    }
 
     return {
       content: [{ type: 'text' as const, text }],
-      structuredContent: { workspaces, parsingErrors },
+      structuredContent: { workspaces, parsingErrors, versioningErrors },
     };
   };
 }
