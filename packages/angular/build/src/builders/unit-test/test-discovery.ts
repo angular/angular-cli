@@ -54,6 +54,7 @@ export async function findTests(
     const globMatches = await glob(dynamicPatterns, {
       cwd: projectSourceRoot,
       absolute: true,
+      expandDirectories: false,
       ignore: ['**/node_modules/**', ...normalizedExcludes],
     });
 
