@@ -34,6 +34,10 @@ const listProjectsOutputSchema = {
             .enum(['application', 'library'])
             .optional()
             .describe(`The type of the project, either 'application' or 'library'.`),
+          builder: z
+            .string()
+            .optional()
+            .describe('The primary builder for the project, typically from the "build" target.'),
           root: z
             .string()
             .describe('The root directory of the project, relative to the workspace root.'),
@@ -90,6 +94,7 @@ their types, and their locations.
 * Determining if a project is an \`application\` or a \`library\`.
 * Getting the \`selectorPrefix\` for a project before generating a new component to ensure it follows conventions.
 * Identifying the major version of the Angular framework for each workspace, which is crucial for monorepos.
+* Determining a project's primary function by inspecting its builder (e.g., '@angular-devkit/build-angular:browser' for an application).
 </Use Cases>
 <Operational Notes>
 * **Working Directory:** Shell commands for a project (like \`ng generate\`) **MUST**
@@ -253,6 +258,7 @@ async function loadAndParseWorkspace(
       projects.push({
         name,
         type: project.extensions['projectType'] as 'application' | 'library' | undefined,
+        builder: project.targets.get('build')?.builder,
         root: project.root,
         sourceRoot: project.sourceRoot ?? path.posix.join(project.root, 'src'),
         selectorPrefix: project.extensions['prefix'] as string,
