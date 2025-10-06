@@ -9,6 +9,7 @@
 import type { BuilderContext, BuilderOutput } from '@angular-devkit/architect';
 import type { Config, ConfigOptions, FilePattern, InlinePluginDef, Server } from 'karma';
 import { randomUUID } from 'node:crypto';
+import { rmSync } from 'node:fs';
 import * as fs from 'node:fs/promises';
 import path from 'node:path';
 import { ReadableStream } from 'node:stream/web';
@@ -104,8 +105,15 @@ async function initializeApplication(
 > {
   const karma = await import('karma');
   const projectSourceRoot = await getProjectSourceRoot(context);
+
+  // Setup temporary output path and ensure it is empty
   const outputPath = path.join(context.workspaceRoot, 'dist/test-out', randomUUID());
   await fs.rm(outputPath, { recursive: true, force: true });
+  // Setup exit cleanup for temporary directory
+  const handleProcessExit = () => rmSync(outputPath, { recursive: true, force: true });
+  process.once('exit', handleProcessExit);
+  process.once('SIGINT', handleProcessExit);
+  process.once('uncaughtException', handleProcessExit);
 
   const { buildOptions, mainName } = await setupBuildOptions(
     options,
