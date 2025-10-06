@@ -272,6 +272,56 @@ async function loadAndParseWorkspace(
   }
 }
 
+// Types for the structured output of the helper function.
+type VersioningError = z.infer<typeof listProjectsOutputSchema.versioningErrors>[number];
+
+/**
+ * Processes a single `angular.json` file to extract workspace and framework version information.
+ * @param configFile The path to the `angular.json` file.
+ * @param searchRoot The directory at which to stop the upward search for `package.json`.
+ * @param seenPaths A Set of absolute paths that have already been processed to avoid duplicates.
+ * @param versionCache A Map to cache framework version lookups for performance.
+ * @returns A promise resolving to an object containing the processed data and any errors.
+ */
+async function processConfigFile(
+  configFile: string,
+  searchRoot: string,
+  seenPaths: Set<string>,
+  versionCache: Map<string, string | undefined>,
+): Promise<{
+  workspace?: WorkspaceData;
+  parsingError?: ParsingError;
+  versioningError?: VersioningError;
+}> {
+  const { workspace, error } = await loadAndParseWorkspace(configFile, seenPaths);
+  if (error) {
+    return { parsingError: error };
+  }
+
+  if (!workspace) {
+    return {}; // Skipped as it was already seen.
+  }
+
+  try {
+    const workspaceDir = path.dirname(configFile);
+    workspace.frameworkVersion = await findAngularCoreVersion(
+      workspaceDir,
+      versionCache,
+      searchRoot,
+    );
+
+    return { workspace };
+  } catch (e) {
+    return {
+      workspace,
+      versioningError: {
+        filePath: workspace.path,
+        message: e instanceof Error ? e.message : 'An unknown error occurred.',
+      },
+    };
+  }
+}
+
 async function createListProjectsHandler({ server }: McpToolContext) {
   return async () => {
     const workspaces: WorkspaceData[] = [];
@@ -292,26 +342,21 @@ async function createListProjectsHandler({ server }: McpToolContext) {
 
     for (const root of searchRoots) {
       for await (const configFile of findAngularJsonFiles(root)) {
-        const { workspace, error } = await loadAndParseWorkspace(configFile, seenPaths);
-        if (error) {
-          parsingErrors.push(error);
-        }
+        const { workspace, parsingError, versioningError } = await processConfigFile(
+          configFile,
+          root,
+          seenPaths,
+          versionCache,
+        );
 
         if (workspace) {
-          try {
-            const workspaceDir = path.dirname(configFile);
-            workspace.frameworkVersion = await findAngularCoreVersion(
-              workspaceDir,
-              versionCache,
-              root,
-            );
-          } catch (e) {
-            versioningErrors.push({
-              filePath: workspace.path,
-              message: e instanceof Error ? e.message : 'An unknown error occurred.',
-            });
-          }
           workspaces.push(workspace);
+        }
+        if (parsingError) {
+          parsingErrors.push(parsingError);
+        }
+        if (versioningError) {
+          versioningErrors.push(versioningError);
         }
       }
     }
