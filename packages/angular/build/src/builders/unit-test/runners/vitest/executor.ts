@@ -28,6 +28,7 @@ type VitestCoverageOption = Exclude<InlineConfig['coverage'], undefined>;
 
 export class VitestExecutor implements TestExecutor {
   private vitest: Vitest | undefined;
+  private normalizePath: ((id: string) => string) | undefined;
   private readonly projectName: string;
   private readonly options: NormalizedUnitTestBuilderOptions;
   private readonly buildResultFiles = new Map<string, ResultFile>();
@@ -56,17 +57,19 @@ export class VitestExecutor implements TestExecutor {
   }
 
   async *execute(buildResult: FullResult | IncrementalResult): AsyncIterable<BuilderOutput> {
+    this.normalizePath ??= (await import('vite')).normalizePath;
+
     if (buildResult.kind === ResultKind.Full) {
       this.buildResultFiles.clear();
       for (const [path, file] of Object.entries(buildResult.files)) {
-        this.buildResultFiles.set(path, file);
+        this.buildResultFiles.set(this.normalizePath(path), file);
       }
     } else {
       for (const file of buildResult.removed) {
-        this.buildResultFiles.delete(file.path);
+        this.buildResultFiles.delete(this.normalizePath(file.path));
       }
       for (const [path, file] of Object.entries(buildResult.files)) {
-        this.buildResultFiles.set(path, file);
+        this.buildResultFiles.set(this.normalizePath(path), file);
       }
     }
 
