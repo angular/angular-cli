@@ -56,8 +56,6 @@ RUNTIME_ASSETS = glob(
     include = [
         "src/**/schema.json",
         "src/**/*.js",
-        "src/**/*.mjs",
-        "src/**/*.html",
     ],
 ) + [
     "builders.json",

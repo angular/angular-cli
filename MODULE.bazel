@@ -19,12 +19,6 @@ multiple_version_override(
     ],
 )
 
-bazel_dep(name = "rules_python", version = "1.5.3")
-single_version_override(
-    module_name = "rules_python",
-    version = "1.5.3",
-)
-
 bazel_dep(name = "aspect_bazel_lib", version = "2.21.2")
 bazel_dep(name = "bazel_skylib", version = "1.8.2")
 bazel_dep(name = "aspect_rules_esbuild", version = "0.22.1")

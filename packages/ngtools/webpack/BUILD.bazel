@@ -21,7 +21,6 @@ ts_project(
         ],
         exclude = [
             "src/**/*_spec.ts",
-            "src/**/*_spec_helpers.ts",
         ],
     ) + [
         "index.ts",
@@ -43,7 +42,6 @@ ts_project(
     srcs = glob(
         include = [
             "src/**/*_spec.ts",
-            "src/**/*_spec_helpers.ts",
         ],
     ),
     deps = [

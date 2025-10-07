@@ -60,7 +60,6 @@ RUNTIME_ASSETS = [
     include = [
         "*/schema.json",
         "*/files/**/*",
-        "*/other-files/**/*",
         "*/implements-files/**/*",
         "*/type-files/**/*",
         "*/functional-files/**/*",
