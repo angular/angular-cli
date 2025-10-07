@@ -539,9 +539,9 @@
     "@@aspect_rules_ts~//ts:extensions.bzl%ext": {
       "general": {
         "bzlTransitiveDigest": "9IJp6IlB/FMHFBJe4MX/DQM4zi3oArC8yqYE/+NyPwk=",
-        "usagesDigest": "e5XRwK/3pKvlHC3QfqiuvKJYwdZVuVMRdzwwT+tENNM=",
+        "usagesDigest": "PB65rYTG/QbLoSQfRhLDeERG+0m7bjTPzYXBqieQ5/4=",
         "recordedFileInputs": {
-          "@@rules_browsers~//package.json": "45572077938c7a4916e4aaedf7db7ce8425854ab92f35348cff02a2134023bb8"
+          "@@rules_browsers~//package.json": "d5e7a05131b6ebf4c09d49afe82c3018182415b3a9c53000a32a7032f491d2c4"
         },
         "recordedDirentsInputs": {},
         "envVariables": {},
@@ -719,8 +719,8 @@
     },
     "@@rules_browsers~//browsers:extensions.bzl%browsers": {
       "general": {
-        "bzlTransitiveDigest": "ep2OrXzFai22oPOQwhS3aeTWxT9Jn6Us7ws4lRa4bU8=",
-        "usagesDigest": "78aLbl2cYObLkrJFomb3ZkfFUiUFbqzqZK8lnW+Y7Uk=",
+        "bzlTransitiveDigest": "gdpz377/gr/oSZxJsWmqNfdy1fiSkrvL/11Umvw987c=",
+        "usagesDigest": "1PlExi+b77pSr2tAxFCVbpCtFoA7oixHabaL3dmas4Y=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
         "envVariables": {},
@@ -729,9 +729,9 @@
             "bzlFile": "@@rules_browsers~//browsers/private:browser_repo.bzl",
             "ruleClassName": "browser_repo",
             "attributes": {
-              "sha256": "14086c6c0844122d4066a5e3a846b963259648945d7fb6c51b520f2105edd597",
+              "sha256": "155fe3738dc90b9723752974eb93a0500de631fe5de0732be1a79d00ff565962",
               "urls": [
-                "https://storage.googleapis.com/chrome-for-testing-public/139.0.7258.68/linux64/chrome-headless-shell-linux64.zip"
+                "https://storage.googleapis.com/chrome-for-testing-public/142.0.7444.6/linux64/chrome-headless-shell-linux64.zip"
               ],
               "named_files": {
                 "CHROME-HEADLESS-SHELL": "chrome-headless-shell-linux64/chrome-headless-shell"
@@ -748,9 +748,9 @@
             "bzlFile": "@@rules_browsers~//browsers/private:browser_repo.bzl",
             "ruleClassName": "browser_repo",
             "attributes": {
-              "sha256": "fa2ff20c870e289511cdde481d069f167e403d289b91b1d9d063dd7b2f77ed6e",
+              "sha256": "16882cc7cb5b86d491ecd9669c9d9a3b2c591f9ac031774476cf4f99c254b579",
               "urls": [
-                "https://storage.googleapis.com/chrome-for-testing-public/139.0.7258.68/mac-x64/chrome-headless-shell-mac-x64.zip"
+                "https://storage.googleapis.com/chrome-for-testing-public/142.0.7444.6/mac-x64/chrome-headless-shell-mac-x64.zip"
               ],
               "named_files": {
                 "CHROME-HEADLESS-SHELL": "chrome-headless-shell-mac-x64/chrome-headless-shell"
@@ -767,9 +767,9 @@
             "bzlFile": "@@rules_browsers~//browsers/private:browser_repo.bzl",
             "ruleClassName": "browser_repo",
             "attributes": {
-              "sha256": "cbb938bd24ed648280e3654592c46f7eb8e2e184ca331f2138816bd59fcaed32",
+              "sha256": "ad608b5afff4dec60778ed83fab4f0d6b8563ab7ac94b3b48b1e0cebabec392e",
               "urls": [
-                "https://storage.googleapis.com/chrome-for-testing-public/139.0.7258.68/mac-arm64/chrome-headless-shell-mac-arm64.zip"
+                "https://storage.googleapis.com/chrome-for-testing-public/142.0.7444.6/mac-arm64/chrome-headless-shell-mac-arm64.zip"
               ],
               "named_files": {
                 "CHROME-HEADLESS-SHELL": "chrome-headless-shell-mac-arm64/chrome-headless-shell"
@@ -786,9 +786,9 @@
             "bzlFile": "@@rules_browsers~//browsers/private:browser_repo.bzl",
             "ruleClassName": "browser_repo",
             "attributes": {
-              "sha256": "68bf73ab78647e697bf7b81e8329f23c1331d8792af6e2ab66553aeb9ede9cd3",
+              "sha256": "f3d396ad4b6244feee263a6b39d8e8b32f1d568db74a333c2e7679e0fcd7ab09",
               "urls": [
-                "https://storage.googleapis.com/chrome-for-testing-public/139.0.7258.68/win64/chrome-headless-shell-win64.zip"
+                "https://storage.googleapis.com/chrome-for-testing-public/142.0.7444.6/win64/chrome-headless-shell-win64.zip"
               ],
               "named_files": {
                 "CHROME-HEADLESS-SHELL": "chrome-headless-shell-win64/chrome-headless-shell.exe"
@@ -805,9 +805,9 @@
             "bzlFile": "@@rules_browsers~//browsers/private:browser_repo.bzl",
             "ruleClassName": "browser_repo",
             "attributes": {
-              "sha256": "ec29104132a6ff1ae5f2ffe7b27b7ff675a58ab9b1ef616badcbdd35577b31b3",
+              "sha256": "da19a48eca2e7a09d757003eda2e814c8b7a9db462301faccc24564e5e593eca",
               "urls": [
-                "https://storage.googleapis.com/chrome-for-testing-public/139.0.7258.68/linux64/chromedriver-linux64.zip"
+                "https://storage.googleapis.com/chrome-for-testing-public/142.0.7444.6/linux64/chromedriver-linux64.zip"
               ],
               "named_files": {
                 "CHROMEDRIVER": "chromedriver-linux64/chromedriver"
@@ -822,9 +822,9 @@
             "bzlFile": "@@rules_browsers~//browsers/private:browser_repo.bzl",
             "ruleClassName": "browser_repo",
             "attributes": {
-              "sha256": "2b9787f5f758c9f3e3888ac23270f8de47b168679718a4440bd1cea2b3cc57e9",
+              "sha256": "156dc49c7f1707c72b670182d63fc2e6414734950221ba5c2fc133f580ed3713",
               "urls": [
-                "https://storage.googleapis.com/chrome-for-testing-public/139.0.7258.68/mac-x64/chromedriver-mac-x64.zip"
+                "https://storage.googleapis.com/chrome-for-testing-public/142.0.7444.6/mac-x64/chromedriver-mac-x64.zip"
               ],
               "named_files": {
                 "CHROMEDRIVER": "chromedriver-mac-x64/chromedriver"
@@ -839,9 +839,9 @@
             "bzlFile": "@@rules_browsers~//browsers/private:browser_repo.bzl",
             "ruleClassName": "browser_repo",
             "attributes": {
-              "sha256": "6da850508d250c00c10b09dcac00c97a58d51346047972c2c47d3e3b850d4662",
+              "sha256": "83cd191d57d4d841a761b2bbd42d29d5df6b748c510ad474e3d0a17ca46929ae",
               "urls": [
-                "https://storage.googleapis.com/chrome-for-testing-public/139.0.7258.68/mac-arm64/chromedriver-mac-arm64.zip"
+                "https://storage.googleapis.com/chrome-for-testing-public/142.0.7444.6/mac-arm64/chromedriver-mac-arm64.zip"
               ],
               "named_files": {
                 "CHROMEDRIVER": "chromedriver-mac-arm64/chromedriver"
@@ -856,9 +856,9 @@
             "bzlFile": "@@rules_browsers~//browsers/private:browser_repo.bzl",
             "ruleClassName": "browser_repo",
             "attributes": {
-              "sha256": "d4af3e6c8f3a7ceb50ff298e43ff07efcad46c1d6ceb0d894eeb2d593db7e522",
+              "sha256": "8b1cad695e78e1a68055680f411eb65c5d305d2d3dadc1b60fdaf73ea373fc22",
               "urls": [
-                "https://storage.googleapis.com/chrome-for-testing-public/139.0.7258.68/win64/chromedriver-win64.zip"
+                "https://storage.googleapis.com/chrome-for-testing-public/142.0.7444.6/win64/chromedriver-win64.zip"
               ],
               "named_files": {
                 "CHROMEDRIVER": "chromedriver-win64/chromedriver.exe"
@@ -873,9 +873,9 @@
             "bzlFile": "@@rules_browsers~//browsers/private:browser_repo.bzl",
             "ruleClassName": "browser_repo",
             "attributes": {
-              "sha256": "6fcc1a2f95a6b232af82b4b7644566638c5df349e3095c65b7c18d1a63412d3d",
+              "sha256": "1c87a9de21941a15177384d4820a6aa3c7dacb38d34089c73a621734ebf1ea9a",
               "urls": [
-                "https://archive.mozilla.org/pub/firefox/releases/135.0/linux-x86_64/en-US/firefox-135.0.tar.xz"
+                "https://archive.mozilla.org/pub/firefox/releases/143.0/linux-x86_64/en-US/firefox-143.0.tar.xz"
               ],
               "named_files": {
                 "FIREFOX": "firefox/firefox"
@@ -890,9 +890,9 @@
             "bzlFile": "@@rules_browsers~//browsers/private:browser_repo.bzl",
             "ruleClassName": "browser_repo",
             "attributes": {
-              "sha256": "e55e24e6b2a4980f4b9091900835977b282f599dcdd5e38b753d95bad8a11da9",
+              "sha256": "a5c570e277021b61df1295efe77446617ebd768d8ad36a20b309aa382685f6f2",
               "urls": [
-                "https://archive.mozilla.org/pub/firefox/releases/135.0/mac/en-US/Firefox%20135.0.dmg"
+                "https://archive.mozilla.org/pub/firefox/releases/143.0/mac/en-US/Firefox%20143.0.dmg"
               ],
               "named_files": {
                 "FIREFOX": "Firefox.app/Contents/MacOS/firefox"
@@ -907,9 +907,9 @@
             "bzlFile": "@@rules_browsers~//browsers/private:browser_repo.bzl",
             "ruleClassName": "browser_repo",
             "attributes": {
-              "sha256": "e55e24e6b2a4980f4b9091900835977b282f599dcdd5e38b753d95bad8a11da9",
+              "sha256": "a5c570e277021b61df1295efe77446617ebd768d8ad36a20b309aa382685f6f2",
               "urls": [
-                "https://archive.mozilla.org/pub/firefox/releases/135.0/mac/en-US/Firefox%20135.0.dmg"
+                "https://archive.mozilla.org/pub/firefox/releases/143.0/mac/en-US/Firefox%20143.0.dmg"
               ],
               "named_files": {
                 "FIREFOX": "Firefox.app/Contents/MacOS/firefox"
@@ -924,9 +924,9 @@
             "bzlFile": "@@rules_browsers~//browsers/private:browser_repo.bzl",
             "ruleClassName": "browser_repo",
             "attributes": {
-              "sha256": "f46d3cb68caa4d4366b942c225d256e0fc15a189263cd9efe29eff0dbfe02685",
+              "sha256": "fbbadc9a6881aa90d266b572304a75e8814b91817a1db7fc01015d667f60318d",
               "urls": [
-                "https://archive.mozilla.org/pub/firefox/releases/135.0/win64/en-US/Firefox%20Setup%20135.0.exe"
+                "https://archive.mozilla.org/pub/firefox/releases/143.0/win64/en-US/Firefox%20Setup%20143.0.exe"
               ],
               "named_files": {
                 "FIREFOX": "core/firefox.exe"
@@ -1127,7 +1127,7 @@
     "@@rules_nodejs~//nodejs:extensions.bzl%node": {
       "general": {
         "bzlTransitiveDigest": "FmfMiNXAxRoLWw3NloQbssosE1egrSvzirbQnso7j7E=",
-        "usagesDigest": "dQPwfMGn82Q5590JUruHiQBsYUxIunUFb+wBb/czUI4=",
+        "usagesDigest": "2LQPThd5tV1PolM/G9ODu23//lwYi98BOd3V2h9W7xM=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
         "envVariables": {},
