@@ -14,7 +14,6 @@ ts_project(
         include = ["**/*.ts"],
         exclude = [
             "**/*_spec.ts",
-            "test/**/*.ts",
         ],
     ),
     data = ["package.json"],
@@ -35,7 +34,6 @@ ts_project(
     srcs = glob(
         include = [
             "**/*_spec.ts",
-            "test/**/*.ts",
         ],
     ),
     deps = [
