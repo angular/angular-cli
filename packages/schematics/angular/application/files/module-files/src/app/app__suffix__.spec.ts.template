@@ -20,7 +20,7 @@ describe('App', () => {
     expect(app).toBeTruthy();
   });
 
-  it('should render title', <% if(zoneless) { %> async <% } %>() => {
+  it('should render title', <% if(zoneless) { %>async <% } %>() => {
     const fixture = TestBed.createComponent(App);
     <%= zoneless ? 'await fixture.whenStable();' : 'fixture.detectChanges();' %>
     const compiled = fixture.nativeElement as HTMLElement;
