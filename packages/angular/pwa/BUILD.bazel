@@ -15,8 +15,6 @@ npm_link_all_packages()
 
 RUNTIME_ASSETS = glob(
     include = [
-        "pwa/*.js",
-        "pwa/*.mjs",
         "pwa/files/**/*",
     ],
 ) + [

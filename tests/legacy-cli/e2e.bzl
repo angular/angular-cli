@@ -129,12 +129,7 @@ def _e2e_tests(name, runner, toolchain, **kwargs):
         tags = tags,
         toolchains = toolchains,
         node_toolchain = toolchain,
-        include_npm = select({
-            # For Windows testing mode, we use the real global NPM as otherwise this
-            # will be a lot of files that need to be brought from WSL to the host FS.
-            "@platforms//os:windows": False,
-            "//conditions:default": True,
-        }),
+        include_npm = False,
         **kwargs
     )
 
