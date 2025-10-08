@@ -133,7 +133,7 @@
     "rollup-license-plugin": "~3.0.1",
     "rollup-plugin-dts": "6.2.3",
     "rollup-plugin-sourcemaps2": "0.5.4",
-    "semver": "7.7.2",
+    "semver": "7.7.3",
     "shelljs": "^0.10.0",
     "source-map-support": "0.5.21",
     "tar": "^7.0.0",
