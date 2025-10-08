@@ -1,3 +1,30 @@
+<a name="21.0.0-next.7"></a>
+
+# 21.0.0-next.7 (2025-10-08)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                   |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------- |
+| [1c06b16a9](https://github.com/angular/angular-cli/commit/1c06b16a962d3c2cc122dc40e01c64bc8a8d754d) | feat | add builder info to `list_projects` MCP tool  |
+| [104c90768](https://github.com/angular/angular-cli/commit/104c90768000b3e0052ee7e7de2c5e04c1bffdaf) | feat | enhance `ng version` output with more details |
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                       |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------- |
+| [afb4d3e37](https://github.com/angular/angular-cli/commit/afb4d3e377b11315a03563cb8c143c35d37f113a) | fix  | remove extra space before async in spec templates |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                          |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------- |
+| [1c2d49ec7](https://github.com/angular/angular-cli/commit/1c2d49ec736818d22773916d7eaafd3446275ea0) | fix  | cleanup karma temporary directory after process exit |
+| [50e330d33](https://github.com/angular/angular-cli/commit/50e330d331fc8cfc4c12f7258012305ecb419d2d) | fix  | disable glob directory expansion when finding tests  |
+| [73621998f](https://github.com/angular/angular-cli/commit/73621998f91db189ad9b1ab006681404e30f7900) | fix  | normalize paths for Vitest runner output files       |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="20.3.5"></a>
 
 # 20.3.5 (2025-10-08)
