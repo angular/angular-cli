@@ -1,0 +1,49 @@
+// A launch configuration that compiles the extension and then opens it inside a new window
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "DEBUG: Attach to bazel test",
+      "type": "node",
+      "request": "attach",
+      "port": 9229,
+      "restart": true,
+      "timeout": 600000,
+      "sourceMaps": true,
+      "skipFiles": ["<node_internals>/**"],
+      "sourceMapPathOverrides": {
+        "?:*@0.0.0/node_modules/@angular-devkit/build-angular/*": "${workspaceFolder}/packages/angular_devkit/build_angular/*",
+        "?:*@0.0.0/node_modules/@angular-devkit/build-webpack/*": "${workspaceFolder}/packages/angular_devkit/build_webpack/*",
+        "?:*@0.0.0/node_modules/@angular-devkit/*": "${workspaceFolder}/packages/angular_devkit/*",
+        "?:*@0.0.0/node_modules/@angular/*": "${workspaceFolder}/packages/angular/*",
+        "?:*/bin/*": "${workspaceFolder}/*"
+      },
+      "resolveSourceMapLocations": ["*/**", "!**/rxjs**"]
+    },
+    {
+      "name": "DEBUG: Run bazel test (Custom Target)",
+      "type": "node",
+      "request": "launch",
+      "restart": true,
+      "timeout": 600000,
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["bazel", "test", "${input:bazelTarget}", "--config=debug"],
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}"
+    }
+  ],
+  "compounds": [
+    {
+      "name": "DEBUG: Run bazel test (Custom Target) + Attach",
+      "configurations": ["DEBUG: Attach to bazel test", "DEBUG: Run bazel test (Custom Target)"]
+    }
+  ],
+  "inputs": [
+    {
+      "id": "bazelTarget",
+      "type": "promptString",
+      "description": "Enter the Bazel test target (e.g., //path/to/my:unit_test)",
+      "default": "//packages/..."
+    }
+  ]
+}

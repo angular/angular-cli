@@ -23,7 +23,6 @@ describe('Workspace Schematic', () => {
 
   it('should create all files of a workspace', async () => {
     const options = { ...defaultOptions };
-
     const tree = await schematicRunner.runSchematic('workspace', options);
     const files = tree.files;
     expect(files).toEqual(
