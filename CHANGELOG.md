@@ -1,3 +1,15 @@
+<a name="20.3.5"></a>
+
+# 20.3.5 (2025-10-08)
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                          |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------- |
+| [7f7140680](https://github.com/angular/angular-cli/commit/7f7140680b75ff6b41f7f04349fe10cd928f1a23) | fix  | cleanup karma temporary directory after process exit |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="21.0.0-next.6"></a>
 
 # 21.0.0-next.6 (2025-10-03)
