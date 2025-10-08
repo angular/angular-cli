@@ -1,6 +1,6 @@
 load("@aspect_bazel_lib//lib:copy_to_bin.bzl", _copy_to_bin = "copy_to_bin")
-load("@aspect_rules_jasmine//jasmine:defs.bzl", _jasmine_test = "jasmine_test")
 load("@aspect_rules_js//js:defs.bzl", _js_binary = "js_binary")
+load("@devinfra//bazel/jasmine:jasmine.bzl", _jasmine_test = "jasmine_test")
 load("@devinfra//bazel/ts_project:index.bzl", "strict_deps_test")
 load("@rules_angular//src/ng_package:index.bzl", _ng_package = "ng_package")
 load("@rules_angular//src/ts_project:index.bzl", _ts_project = "ts_project")
@@ -12,6 +12,7 @@ def ts_project(
         deps = [],
         tsconfig = None,
         testonly = False,
+        source_map = True,
         visibility = None,
         **kwargs):
     if tsconfig == None:
@@ -21,6 +22,7 @@ def ts_project(
         name = name,
         testonly = testonly,
         declaration = True,
+        source_map = source_map,
         tsconfig = tsconfig,
         visibility = visibility,
         deps = deps,
@@ -54,21 +56,15 @@ def ng_package(deps = [], **kwargs):
         **kwargs
     )
 
-def jasmine_test(data = [], args = [], **kwargs):
-    # Create relative path to root, from current package dir. Necessary as
-    # we change the `chdir` below to the package directory.
-    relative_to_root = "/".join([".."] * len(native.package_name().split("/")))
-
+def jasmine_test(args = [], tsconfig = "//:test-tsconfig", **kwargs):
     _jasmine_test(
         node_modules = "//:node_modules",
+        tsconfig = tsconfig,
         chdir = native.package_name(),
         args = [
-            "--require=%s/node_modules/source-map-support/register.js" % relative_to_root,
-            # Escape so that the `js_binary` launcher triggers Bash expansion.
             "'**/*+(.|_)spec.js'",
             "'**/*+(.|_)spec.mjs'",
             "'**/*+(.|_)spec.cjs'",
         ] + args,
-        data = data + ["//:node_modules/source-map-support"],
         **kwargs
     )

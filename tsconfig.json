@@ -10,6 +10,7 @@
     "noImplicitOverride": true,
     "isolatedModules": true,
     "skipLibCheck": true,
+    "sourceMap": true,
     "strict": true,
     "target": "es2023",
     "lib": ["es2023"],

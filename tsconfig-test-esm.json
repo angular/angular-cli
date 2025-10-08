@@ -6,9 +6,6 @@
 {
   "extends": "./tsconfig-build-esm.json",
   "compilerOptions": {
-    "sourceMap": false,
-    "inlineSourceMap": true,
-    "inlineSources": true,
     "types": ["node", "jasmine"]
   }
 }
