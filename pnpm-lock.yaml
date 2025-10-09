@@ -47,8 +47,8 @@ importers:
         specifier: 20.2.8
         version: 20.2.8(77988740ae74fb4aaf3ed71e07feeca3)
       '@angular/ng-dev':
-        specifier: https://github.com/angular/dev-infra-private-ng-dev-builds.git#650ac6faed7c4d83a70a7d9418f30bd383c520cb
-        version: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/650ac6faed7c4d83a70a7d9418f30bd383c520cb(@modelcontextprotocol/sdk@1.17.3)
+        specifier: https://github.com/angular/dev-infra-private-ng-dev-builds.git#e877c7e4fe14a67d425f5af705bf583fbbba9967
+        version: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/e877c7e4fe14a67d425f5af705bf583fbbba9967(@modelcontextprotocol/sdk@1.17.3)
       '@angular/platform-browser':
         specifier: 20.3.4
         version: 20.3.4(@angular/animations@20.3.4(@angular/core@20.3.4(@angular/compiler@20.3.4)(rxjs@7.8.2)(zone.js@0.15.1)))(@angular/common@20.3.4(@angular/core@20.3.4(@angular/compiler@20.3.4)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@20.3.4(@angular/compiler@20.3.4)(rxjs@7.8.2)(zone.js@0.15.1))
@@ -1050,9 +1050,9 @@ packages:
       '@angular/platform-browser': ^20.0.0 || ^21.0.0
       rxjs: ^6.5.3 || ^7.4.0
 
-  '@angular/ng-dev@https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/650ac6faed7c4d83a70a7d9418f30bd383c520cb':
-    resolution: {tarball: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/650ac6faed7c4d83a70a7d9418f30bd383c520cb}
-    version: 0.0.0-26b2c129c4e494126cc9c42d10a273a26e766244
+  '@angular/ng-dev@https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/e877c7e4fe14a67d425f5af705bf583fbbba9967':
+    resolution: {tarball: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/e877c7e4fe14a67d425f5af705bf583fbbba9967}
+    version: 0.0.0-56543b10ddb9941c76b4413cc24ec3fa7a43cf5c
     hasBin: true
 
   '@angular/platform-browser@20.3.4':
@@ -7848,6 +7848,11 @@ packages:
     engines: {node: '>=10'}
     hasBin: true
 
+  semver@7.7.3:
+    resolution: {integrity: sha512-SdsKMrI9TdgjdweUSR9MweHA4EJ8YxHn8DFaDisvhVlUOe4BF1tLD7GAj0lIqWVl+dPb/rExr0Btby5loQm20Q==}
+    engines: {node: '>=10'}
+    hasBin: true
+
   send@0.19.0:
     resolution: {integrity: sha512-dW41u5VfLXu8SJh5bwRmyYUbAoSB3c9uQh6L8h/KtsFREPWpbX1lrljJo186Jc4nmci/sGUZ9a0a0J2zgfq2hw==}
     engines: {node: '>= 0.8.0'}
@@ -9252,7 +9257,7 @@ snapshots:
       rxjs: 7.8.2
       tslib: 2.8.1
 
-  '@angular/ng-dev@https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/650ac6faed7c4d83a70a7d9418f30bd383c520cb(@modelcontextprotocol/sdk@1.17.3)':
+  '@angular/ng-dev@https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/e877c7e4fe14a67d425f5af705bf583fbbba9967(@modelcontextprotocol/sdk@1.17.3)':
     dependencies:
       '@actions/core': 1.11.1
       '@google-cloud/spanner': 8.0.0(supports-color@10.2.2)
@@ -9300,7 +9305,7 @@ snapshots:
       minimatch: 10.0.3
       multimatch: 7.0.0
       nock: 14.0.10
-      semver: 7.7.2
+      semver: 7.7.3
       supports-color: 10.2.2
       tsx: 4.20.6
       typed-graphqlify: 3.1.6
@@ -17100,6 +17105,8 @@ snapshots:
   semver@6.3.1: {}
 
   semver@7.7.2: {}
+
+  semver@7.7.3: {}
 
   send@0.19.0:
     dependencies:
