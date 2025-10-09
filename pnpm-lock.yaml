@@ -47,8 +47,8 @@ importers:
         specifier: 21.0.0-next.8
         version: 21.0.0-next.8(05250061371eb0125d7904add36a5bf0)
       '@angular/ng-dev':
-        specifier: https://github.com/angular/dev-infra-private-ng-dev-builds.git#650ac6faed7c4d83a70a7d9418f30bd383c520cb
-        version: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/650ac6faed7c4d83a70a7d9418f30bd383c520cb(@modelcontextprotocol/sdk@1.19.1)
+        specifier: https://github.com/angular/dev-infra-private-ng-dev-builds.git#e877c7e4fe14a67d425f5af705bf583fbbba9967
+        version: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/e877c7e4fe14a67d425f5af705bf583fbbba9967(@modelcontextprotocol/sdk@1.19.1)
       '@angular/platform-browser':
         specifier: 21.0.0-next.7
         version: 21.0.0-next.7(@angular/animations@21.0.0-next.7(@angular/core@21.0.0-next.7(@angular/compiler@21.0.0-next.7)(rxjs@7.8.2)(zone.js@0.15.1)))(@angular/common@21.0.0-next.7(@angular/core@21.0.0-next.7(@angular/compiler@21.0.0-next.7)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@21.0.0-next.7(@angular/compiler@21.0.0-next.7)(rxjs@7.8.2)(zone.js@0.15.1))
@@ -1054,9 +1054,9 @@ packages:
       '@angular/platform-browser': ^21.0.0-0 || ^21.1.0-0 || ^21.2.0-0 || ^21.3.0-0 || ^22.0.0-0
       rxjs: ^6.5.3 || ^7.4.0
 
-  '@angular/ng-dev@https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/650ac6faed7c4d83a70a7d9418f30bd383c520cb':
-    resolution: {tarball: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/650ac6faed7c4d83a70a7d9418f30bd383c520cb}
-    version: 0.0.0-26b2c129c4e494126cc9c42d10a273a26e766244
+  '@angular/ng-dev@https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/e877c7e4fe14a67d425f5af705bf583fbbba9967':
+    resolution: {tarball: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/e877c7e4fe14a67d425f5af705bf583fbbba9967}
+    version: 0.0.0-56543b10ddb9941c76b4413cc24ec3fa7a43cf5c
     hasBin: true
 
   '@angular/platform-browser@21.0.0-next.7':
@@ -9326,7 +9326,7 @@ snapshots:
       rxjs: 7.8.2
       tslib: 2.8.1
 
-  '@angular/ng-dev@https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/650ac6faed7c4d83a70a7d9418f30bd383c520cb(@modelcontextprotocol/sdk@1.19.1)':
+  '@angular/ng-dev@https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/e877c7e4fe14a67d425f5af705bf583fbbba9967(@modelcontextprotocol/sdk@1.19.1)':
     dependencies:
       '@actions/core': 1.11.1
       '@google-cloud/spanner': 8.0.0(supports-color@10.2.2)
@@ -9374,7 +9374,7 @@ snapshots:
       minimatch: 10.0.3
       multimatch: 7.0.0
       nock: 14.0.10
-      semver: 7.7.2
+      semver: 7.7.3
       supports-color: 10.2.2
       tsx: 4.20.6
       typed-graphqlify: 3.1.6
