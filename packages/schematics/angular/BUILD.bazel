@@ -20,7 +20,10 @@ ALL_SCHEMA_TARGETS = [
         x.replace("/", "_").replace("-", "_").replace(".json", ""),
     )
     for x in glob(
-        include = ["*/schema.json"],
+        include = [
+            "*/schema.json",
+            "refactor/*/schema.json",
+        ],
         exclude = [
             # NB: we need to exclude the nested node_modules that is laid out by yarn workspaces
             "node_modules/**",
@@ -55,6 +58,7 @@ RUNTIME_ASSETS = [
         "*/type-files/**/*",
         "*/functional-files/**/*",
         "*/class-files/**/*",
+        "refactor/*/schema.json",
     ],
     exclude = [
         # NB: we need to exclude the nested node_modules that is laid out by yarn workspaces
@@ -123,6 +127,7 @@ ts_project(
         ":node_modules/jsonc-parser",
         "//:node_modules/@types/jasmine",
         "//:node_modules/@types/node",
+        "//:node_modules/prettier",
         "//packages/schematics/angular/third_party/github.com/Microsoft/TypeScript",
     ],
 )

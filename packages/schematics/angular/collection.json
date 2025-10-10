@@ -143,6 +143,11 @@
       "hidden": true,
       "private": true,
       "description": "[INTERNAL] Adds tailwind to a project. Intended for use for ng new/add."
+    },
+    "jasmine-to-vitest": {
+      "factory": "./refactor/jasmine-vitest",
+      "schema": "./refactor/jasmine-vitest/schema.json",
+      "description": "[EXPERIMENTAL] Refactors Jasmine tests to use Vitest APIs."
     }
   }
 }
