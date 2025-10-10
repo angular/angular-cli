@@ -24,8 +24,6 @@ _stamp_substitutions = {
     "0.0.0-NG-PACKAGR-PEER-DEP": NG_PACKAGR_PEER_DEP,
     "0.0.0-ANGULAR-FW-VERSION": ANGULAR_FW_VERSION,
     "0.0.0-ANGULAR-FW-PEER-DEP": ANGULAR_FW_PEER_DEP,
-    # The below is needed for @angular/ssr FESM file.
-    "\\./(.+)/packages/angular/ssr/third_party/beasties": "../third_party/beasties/index.js",
 }
 
 _no_stamp_substitutions = dict(_stamp_substitutions, **{

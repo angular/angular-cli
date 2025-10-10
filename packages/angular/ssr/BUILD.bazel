@@ -49,6 +49,12 @@ ng_package(
         "@angular/ssr/node",
         "../../third_party/beasties",
     ],
+    extra_substitutions = {
+        # Needed for ssr.d.ts file
+        "\\./third_party/beasties": "../third_party/beasties",
+        # Needed for the FESM file.
+        "\\./(.+)/packages/angular/ssr/third_party/beasties": "../third_party/beasties/index.js",
+    },
     nested_packages = [
         "//packages/angular/ssr/schematics:pkg",
         # Included directly as the generated types reference the types file in this location.
