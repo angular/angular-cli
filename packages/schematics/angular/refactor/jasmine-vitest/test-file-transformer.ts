@@ -25,6 +25,14 @@ import {
   transformtoHaveBeenCalledBefore,
 } from './transformers/jasmine-matcher';
 import {
+  transformDefaultTimeoutInterval,
+  transformFail,
+  transformGlobalFunctions,
+  transformTimerMocks,
+  transformUnknownJasmineProperties,
+  transformUnsupportedJasmineCalls,
+} from './transformers/jasmine-misc';
+import {
   transformCreateSpyObj,
   transformSpies,
   transformSpyCallInspection,
@@ -80,13 +88,23 @@ export function transformJasmineToVitest(
           transformDoneCallback,
           transformtoHaveBeenCalledBefore,
           transformToHaveClass,
+          transformTimerMocks,
+          transformFocusedAndSkippedTests,
+          transformPending,
+          transformDoneCallback,
+          transformGlobalFunctions,
+          transformUnsupportedJasmineCalls,
         ];
 
         for (const transformer of transformations) {
           transformedNode = transformer(transformedNode, refactorCtx);
         }
       } else if (ts.isPropertyAccessExpression(transformedNode)) {
-        const transformations = [transformAsymmetricMatchers, transformSpyCallInspection];
+        const transformations = [
+          transformAsymmetricMatchers,
+          transformSpyCallInspection,
+          transformUnknownJasmineProperties,
+        ];
         for (const transformer of transformations) {
           transformedNode = transformer(transformedNode, refactorCtx);
         }
@@ -95,6 +113,8 @@ export function transformJasmineToVitest(
           transformCalledOnceWith,
           transformArrayWithExactContents,
           transformExpectNothing,
+          transformFail,
+          transformDefaultTimeoutInterval,
         ];
 
         for (const transformer of statementTransformers) {
