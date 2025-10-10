@@ -1,0 +1,26 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "SchematicsAngularJasmineToVitest",
+  "title": "Angular Jasmine to Vitest Schematic",
+  "type": "object",
+  "description": "Refactors a Jasmine test file to use Vitest.",
+  "properties": {
+    "fileSuffix": {
+      "type": "string",
+      "description": "The file suffix to identify test files (e.g., '.spec.ts', '.test.ts').",
+      "default": ".spec.ts"
+    },
+    "project": {
+      "type": "string",
+      "description": "The name of the project where the tests should be refactored. If not specified, the CLI will determine the project from the current directory.",
+      "$default": {
+        "$source": "projectName"
+      }
+    },
+    "verbose": {
+      "type": "boolean",
+      "description": "Enable verbose logging to see detailed information about the transformations being applied.",
+      "default": false
+    }
+  }
+}
