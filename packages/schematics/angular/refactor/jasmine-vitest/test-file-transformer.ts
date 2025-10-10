@@ -24,6 +24,12 @@ import {
   transformWithContext,
   transformtoHaveBeenCalledBefore,
 } from './transformers/jasmine-matcher';
+import {
+  transformCreateSpyObj,
+  transformSpies,
+  transformSpyCallInspection,
+  transformSpyReset,
+} from './transformers/jasmine-spy';
 import { RefactorContext } from './utils/refactor-context';
 import { RefactorReporter } from './utils/refactor-reporter';
 
@@ -65,6 +71,11 @@ export function transformJasmineToVitest(
           transformSyntacticSugarMatchers,
           transformFocusedAndSkippedTests,
           transformComplexMatchers,
+          transformSpies,
+          transformCreateSpyObj,
+          transformSpyReset,
+          transformFocusedAndSkippedTests,
+          transformSpyCallInspection,
           transformPending,
           transformDoneCallback,
           transformtoHaveBeenCalledBefore,
@@ -75,8 +86,7 @@ export function transformJasmineToVitest(
           transformedNode = transformer(transformedNode, refactorCtx);
         }
       } else if (ts.isPropertyAccessExpression(transformedNode)) {
-        const transformations = [transformAsymmetricMatchers];
-
+        const transformations = [transformAsymmetricMatchers, transformSpyCallInspection];
         for (const transformer of transformations) {
           transformedNode = transformer(transformedNode, refactorCtx);
         }
