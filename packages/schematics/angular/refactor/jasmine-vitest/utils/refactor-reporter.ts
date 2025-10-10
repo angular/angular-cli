@@ -17,6 +17,10 @@ export class RefactorReporter {
 
   constructor(private logger: logging.LoggerApi) {}
 
+  get hasTodos(): boolean {
+    return this.todos.size > 0;
+  }
+
   incrementScannedFiles(): void {
     this.filesScanned++;
   }
