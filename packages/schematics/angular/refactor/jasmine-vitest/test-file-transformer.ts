@@ -12,6 +12,18 @@ import {
   transformFocusedAndSkippedTests,
   transformPending,
 } from './transformers/jasmine-lifecycle';
+import {
+  transformArrayWithExactContents,
+  transformAsymmetricMatchers,
+  transformCalledOnceWith,
+  transformComplexMatchers,
+  transformExpectAsync,
+  transformExpectNothing,
+  transformSyntacticSugarMatchers,
+  transformToHaveClass,
+  transformWithContext,
+  transformtoHaveBeenCalledBefore,
+} from './transformers/jasmine-matcher';
 import { RefactorContext } from './utils/refactor-context';
 import { RefactorReporter } from './utils/refactor-reporter';
 
@@ -48,13 +60,39 @@ export function transformJasmineToVitest(
       // Transform the node itself based on its type
       if (ts.isCallExpression(transformedNode)) {
         const transformations = [
+          transformWithContext,
+          transformExpectAsync,
+          transformSyntacticSugarMatchers,
           transformFocusedAndSkippedTests,
+          transformComplexMatchers,
           transformPending,
           transformDoneCallback,
+          transformtoHaveBeenCalledBefore,
+          transformToHaveClass,
         ];
 
         for (const transformer of transformations) {
           transformedNode = transformer(transformedNode, refactorCtx);
+        }
+      } else if (ts.isPropertyAccessExpression(transformedNode)) {
+        const transformations = [transformAsymmetricMatchers];
+
+        for (const transformer of transformations) {
+          transformedNode = transformer(transformedNode, refactorCtx);
+        }
+      } else if (ts.isExpressionStatement(transformedNode)) {
+        const statementTransformers = [
+          transformCalledOnceWith,
+          transformArrayWithExactContents,
+          transformExpectNothing,
+        ];
+
+        for (const transformer of statementTransformers) {
+          const result = transformer(transformedNode, refactorCtx);
+          if (result !== transformedNode) {
+            transformedNode = result;
+            break;
+          }
         }
       }
 
@@ -62,7 +100,7 @@ export function transformJasmineToVitest(
       if (Array.isArray(transformedNode)) {
         return transformedNode.map((node) => ts.visitEachChild(node, visitor, context));
       } else {
-        return ts.visitEachChild(transformedNode, visitor, context);
+        return ts.visitEachChild(transformedNode as ts.Node, visitor, context);
       }
     };
 
@@ -70,7 +108,7 @@ export function transformJasmineToVitest(
   };
 
   const result = ts.transform(sourceFile, [transformer]);
-  if (result.transformed[0] === sourceFile) {
+  if (result.transformed[0] === sourceFile && !reporter.hasTodos) {
     return content;
   }
 
