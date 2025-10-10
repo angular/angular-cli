@@ -45,13 +45,16 @@ def copy_to_bin(**kwargs):
 def js_binary(**kwargs):
     _js_binary(**kwargs)
 
-def ng_package(deps = [], **kwargs):
+def ng_package(deps = [], extra_substitutions = {}, **kwargs):
+    nostamp_subs = dict(substitutions["nostamp"], **extra_substitutions)
+    stamp_subs = dict(substitutions["stamp"], **extra_substitutions)
+
     _ng_package(
         deps = deps,
         license = "//:LICENSE",
         substitutions = select({
-            "//:stamp": substitutions["stamp"],
-            "//conditions:default": substitutions["nostamp"],
+            "//:stamp": stamp_subs,
+            "//conditions:default": nostamp_subs,
         }),
         **kwargs
     )

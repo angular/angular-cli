@@ -25,10 +25,16 @@ const CRITTERS_ACTUAL_LICENSE_FILE_PATH = join(
 );
 
 describe('NPM Package Tests', () => {
-  it('should not include the contents of third_party/beasties/index.js in the FESM bundle', async () => {
+  it('should not include the contents of `third_party/beasties/index.js` in the FESM bundle', async () => {
     const fesmFilePath = join(ANGULAR_SSR_PACKAGE_PATH, 'fesm2022/ssr.mjs');
     const fesmContent = await readFile(fesmFilePath, 'utf-8');
     expect(fesmContent).toContain(`import Beasties from '../third_party/beasties/index.js'`);
+  });
+
+  it('should correctly reference `third_party/beasties` in the ssr types bundle', async () => {
+    const fesmFilePath = join(ANGULAR_SSR_PACKAGE_PATH, 'types/ssr.d.ts');
+    const fesmContent = await readFile(fesmFilePath, 'utf-8');
+    expect(fesmContent).toContain(`import Beasties from '../third_party/beasties'`);
   });
 
   describe('third_party/beasties/THIRD_PARTY_LICENSES.txt', () => {
