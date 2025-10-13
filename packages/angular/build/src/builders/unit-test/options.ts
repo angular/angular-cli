@@ -85,7 +85,6 @@ export async function normalizeOptions(
     runnerName: runner ?? 'vitest',
     coverage: options.coverage
       ? {
-          all: options.coverageAll,
           exclude: options.coverageExclude,
           include: options.coverageInclude,
           reporters: normalizeReporterOption(options.coverageReporters),

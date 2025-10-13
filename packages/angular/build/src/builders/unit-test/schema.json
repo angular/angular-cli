@@ -65,11 +65,6 @@
       "description": "Enables coverage reporting for tests.",
       "default": false
     },
-    "coverageAll": {
-      "type": "boolean",
-      "description": "Includes all files that match the `coverageInclude` pattern in the coverage report, not just those touched by tests.",
-      "default": true
-    },
     "coverageInclude": {
       "type": "array",
       "description": "Specifies glob patterns of files to include in the coverage report.",
