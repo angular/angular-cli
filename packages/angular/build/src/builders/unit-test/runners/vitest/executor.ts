@@ -153,7 +153,7 @@ export class VitestExecutor implements TestExecutor {
     const { startVitest } = vitestNodeModule;
 
     // Setup vitest browser options if configured
-    const browserOptions = setupBrowserConfiguration(
+    const browserOptions = await setupBrowserConfiguration(
       browsers,
       debug,
       this.options.projectSourceRoot,
@@ -236,7 +236,6 @@ async function generateCoverageOption(
 
   return {
     enabled: true,
-    all: coverage.all,
     excludeAfterRemap: true,
     include: coverage.include,
     reportsDirectory: toPosixPath(path.join('coverage', projectName)),

@@ -27,6 +27,7 @@ describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
       harness.useTarget('test', {
         ...BASE_OPTIONS,
         coverage: true,
+        coverageInclude: ['**/*.ts'],
       });
 
       const { result } = await harness.executeOnce();
@@ -39,6 +40,7 @@ describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
       harness.useTarget('test', {
         ...BASE_OPTIONS,
         coverage: true,
+        coverageInclude: ['**/*.ts'],
         coverageExclude: ['**/error.ts'],
       });
 

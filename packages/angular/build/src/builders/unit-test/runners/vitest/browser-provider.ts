@@ -8,6 +8,7 @@
 
 import { createRequire } from 'node:module';
 import type { BrowserBuiltinProvider, BrowserConfigOptions } from 'vitest/node';
+import { assertIsError } from '../../../../utils/error';
 
 export interface BrowserConfiguration {
   browser?: BrowserConfigOptions;
@@ -40,12 +41,12 @@ function normalizeBrowserName(browserName: string): string {
   return normalized.replace(/headless$/, '');
 }
 
-export function setupBrowserConfiguration(
+export async function setupBrowserConfiguration(
   browsers: string[] | undefined,
   debug: boolean,
   projectSourceRoot: string,
   viewport: { width: number; height: number } | undefined,
-): BrowserConfiguration {
+): Promise<BrowserConfiguration> {
   if (browsers === undefined) {
     return {};
   }
@@ -53,18 +54,8 @@ export function setupBrowserConfiguration(
   const projectResolver = createRequire(projectSourceRoot + '/').resolve;
   let errors: string[] | undefined;
 
-  try {
-    projectResolver('@vitest/browser');
-  } catch {
-    errors ??= [];
-    errors.push(
-      'The "browsers" option requires the "@vitest/browser" package to be installed within the project.' +
-        ' Please install this package and rerun the test command.',
-    );
-  }
-
-  const provider = findBrowserProvider(projectResolver);
-  if (!provider) {
+  const providerName = findBrowserProvider(projectResolver);
+  if (!providerName) {
     errors ??= [];
     errors.push(
       'The "browsers" option requires either "playwright" or "webdriverio" to be installed within the project.' +
@@ -72,13 +63,38 @@ export function setupBrowserConfiguration(
     );
   }
 
-  // Vitest current requires the playwright browser provider to use the inspect-brk option used by "debug"
-  if (debug && provider !== 'playwright') {
-    errors ??= [];
-    errors.push(
-      'Debugging browser mode tests currently requires the use of "playwright".' +
-        ' Please install this package and rerun the test command.',
-    );
+  let provider: import('vitest/node').BrowserProviderOption | undefined;
+  if (providerName) {
+    const providerPackage = `@vitest/browser-${providerName}`;
+    try {
+      const providerModule = await import(providerPackage);
+
+      // Validate that the imported module has the expected structure
+      const providerFactory = providerModule[providerName];
+      if (typeof providerFactory === 'function') {
+        provider = providerFactory();
+      } else {
+        errors ??= [];
+        errors.push(
+          `The "${providerPackage}" package does not have a valid browser provider export.`,
+        );
+      }
+    } catch (e) {
+      assertIsError(e);
+      errors ??= [];
+      // Check for a module not found error to provide a more specific message
+      if (e.code === 'ERR_MODULE_NOT_FOUND') {
+        errors.push(
+          `The "browsers" option with "${providerName}" requires the "${providerPackage}" package.` +
+            ' Please install this package and rerun the test command.',
+        );
+      } else {
+        // Handle other potential errors during import
+        errors.push(
+          `An error occurred while loading the "${providerPackage}" browser provider:\n  ${e.message}`,
+        );
+      }
+    }
   }
 
   if (errors) {
@@ -88,7 +104,7 @@ export function setupBrowserConfiguration(
   const isCI = !!process.env['CI'];
   const headless = isCI || browsers.some((name) => name.toLowerCase().includes('headless'));
 
-  const browser: BrowserConfigOptions = {
+  const browser = {
     enabled: true,
     provider,
     headless,
@@ -97,7 +113,7 @@ export function setupBrowserConfiguration(
     instances: browsers.map((browserName) => ({
       browser: normalizeBrowserName(browserName),
     })),
-  };
+  } satisfies BrowserConfigOptions;
 
   return { browser };
 }
