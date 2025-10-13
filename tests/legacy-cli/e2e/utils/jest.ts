@@ -8,7 +8,7 @@ export async function applyJestBuilder(
     tsConfig: 'tsconfig.spec.json',
   },
 ): Promise<void> {
-  await silentNpm('install', 'jest@29.5.0', 'jest-environment-jsdom@29.5.0', '--save-dev');
+  await silentNpm('install', 'jest@30.2.0', 'jest-environment-jsdom@30.2.0', '--save-dev');
 
   await updateJsonFile('angular.json', (json) => {
     const projects = Object.values(json['projects']);
