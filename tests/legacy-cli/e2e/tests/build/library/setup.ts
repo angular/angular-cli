@@ -10,7 +10,6 @@ export async function libraryConsumptionSetup(): Promise<void> {
     'projects/my-lib/src/lib/my-lib.ts': `import { Component } from '@angular/core';
 
     @Component({
-      standalone: true,
       selector: 'lib-my-lib',
       templateUrl: './my-lib.html',
     })
@@ -20,7 +19,6 @@ export async function libraryConsumptionSetup(): Promise<void> {
     import { MyLibComponent } from 'my-lib';
 
     @Component({
-      standalone: true,
       selector: 'app-root',
       template: '<lib-my-lib></lib-my-lib>',
       imports: [MyLibComponent],

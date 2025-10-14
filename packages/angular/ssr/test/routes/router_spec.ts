@@ -23,7 +23,6 @@ describe('ServerRouter', () => {
 
   beforeAll(() => {
     @Component({
-      standalone: true,
       selector: 'app-dummy',
       template: `dummy works`,
     })

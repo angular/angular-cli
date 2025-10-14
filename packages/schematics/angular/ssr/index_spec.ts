@@ -109,7 +109,6 @@ describe('SSR Schematic', () => {
           routing: false,
           style: 'css',
           skipTests: false,
-          standalone: true,
         },
         appTree,
       );

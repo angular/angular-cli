@@ -45,7 +45,6 @@ describe('@angular/ssr ng-add schematic', () => {
         routing: false,
         style: 'css',
         skipTests: false,
-        standalone: true,
       },
       appTree,
     );

@@ -20,14 +20,12 @@ import { setAngularAppTestingManifest } from './testing-utils';
 
 function createEntryPoint(locale: string) {
   @Component({
-    standalone: true,
     selector: `app-ssr-${locale}`,
     template: `SSR works ${locale.toUpperCase()}`,
   })
   class SSRComponent {}
 
   @Component({
-    standalone: true,
     selector: `app-ssg-${locale}`,
     template: `SSG works ${locale.toUpperCase()}`,
   })
@@ -35,21 +33,18 @@ function createEntryPoint(locale: string) {
 
   return async () => {
     @Component({
-      standalone: true,
       selector: `app-home-${locale}`,
       template: `Home works ${locale.toUpperCase()}`,
     })
     class HomeComponent {}
 
     @Component({
-      standalone: true,
       selector: `app-ssr-${locale}`,
       template: `SSR works ${locale.toUpperCase()}`,
     })
     class SSRComponent {}
 
     @Component({
-      standalone: true,
       selector: `app-ssg-${locale}`,
       template: `SSG works ${locale.toUpperCase()}`,
     })
@@ -177,7 +172,6 @@ describe('AngularAppEngine', () => {
   describe('Non-localized app', () => {
     beforeAll(() => {
       @Component({
-        standalone: true,
         selector: 'app-home',
         template: `Home works`,
       })

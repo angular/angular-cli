@@ -107,7 +107,6 @@ export async function setupI18nConfig() {
     @Component({
       selector: 'app-root',
       imports: [DatePipe, RouterOutlet],
-      standalone: true,
       templateUrl: './app.html'
     })
     export class App {
