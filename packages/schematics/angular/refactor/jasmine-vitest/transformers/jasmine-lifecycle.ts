@@ -84,11 +84,9 @@ export function transformPending(
         bodyNode,
         'Converted `pending()` to a skipped test (`it.skip`).',
       );
-      reporter.recordTodo('pending');
-      addTodoComment(
-        replacement,
-        'The pending() function was converted to a skipped test (`it.skip`).',
-      );
+      const category = 'pending';
+      reporter.recordTodo(category);
+      addTodoComment(replacement, category);
       ts.addSyntheticLeadingComment(
         replacement,
         ts.SyntaxKind.SingleLineCommentTrivia,

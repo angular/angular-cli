@@ -8,6 +8,7 @@
 
 import { logging } from '@angular-devkit/core';
 import ts from '../../../third_party/github.com/Microsoft/TypeScript/lib/typescript';
+import { TodoCategory } from './todo-notes';
 
 export class RefactorReporter {
   private filesScanned = 0;
@@ -29,7 +30,7 @@ export class RefactorReporter {
     this.filesTransformed++;
   }
 
-  recordTodo(category: string): void {
+  recordTodo(category: TodoCategory): void {
     this.todos.set(category, (this.todos.get(category) ?? 0) + 1);
   }
 

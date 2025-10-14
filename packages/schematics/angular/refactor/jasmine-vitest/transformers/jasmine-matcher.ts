@@ -51,22 +51,17 @@ export function transformSyntacticSugarMatchers(
   const matcherName = pae.name.text;
 
   if (matcherName === 'toHaveSpyInteractions') {
-    reporter.recordTodo('toHaveSpyInteractions');
-    addTodoComment(
-      node,
-      'Unsupported matcher ".toHaveSpyInteractions()" found. ' +
-        'Please migrate this manually by checking the `mock.calls.length` of the individual spies.',
-    );
+    const category = 'toHaveSpyInteractions';
+    reporter.recordTodo(category);
+    addTodoComment(node, category);
 
     return node;
   }
 
   if (matcherName === 'toThrowMatching') {
-    reporter.recordTodo('toThrowMatching');
-    addTodoComment(
-      node,
-      'Unsupported matcher ".toThrowMatching()" found. Please migrate this manually.',
-    );
+    const category = 'toThrowMatching';
+    reporter.recordTodo(category);
+    addTodoComment(node, category, { name: matcherName });
 
     return node;
   }
@@ -303,18 +298,13 @@ export function transformExpectAsync(
 
   if (matcherName) {
     if (matcherName === 'toBePending') {
-      reporter.recordTodo('toBePending');
-      addTodoComment(
-        node,
-        'Unsupported matcher ".toBePending()" found. Vitest does not have a direct equivalent. ' +
-          'Please migrate this manually, for example by using `Promise.race` to check if the promise settles within a short timeout.',
-      );
+      const category = 'toBePending';
+      reporter.recordTodo(category);
+      addTodoComment(node, category);
     } else {
-      reporter.recordTodo('unsupported-expect-async-matcher');
-      addTodoComment(
-        node,
-        `Unsupported expectAsync matcher ".${matcherName}()" found. Please migrate this manually.`,
-      );
+      const category = 'unsupported-expect-async-matcher';
+      reporter.recordTodo(category);
+      addTodoComment(node, category, { name: matcherName });
     }
   }
 
@@ -422,11 +412,9 @@ export function transformArrayWithExactContents(
   }
 
   if (!ts.isArrayLiteralExpression(argument.arguments[0])) {
-    reporter.recordTodo('arrayWithExactContents-dynamic-variable');
-    addTodoComment(
-      node,
-      'Cannot transform jasmine.arrayWithExactContents with a dynamic variable. Please migrate this manually.',
-    );
+    const category = 'arrayWithExactContents-dynamic-variable';
+    reporter.recordTodo(category);
+    addTodoComment(node, category);
 
     return node;
   }
@@ -617,11 +605,9 @@ export function transformExpectNothing(
   const originalText = node.getFullText().trim();
 
   reporter.reportTransformation(sourceFile, node, 'Removed `expect().nothing()` statement.');
-  reporter.recordTodo('expect-nothing');
-  addTodoComment(
-    replacement,
-    'expect().nothing() has been removed because it is redundant in Vitest. Tests without assertions pass by default.',
-  );
+  const category = 'expect-nothing';
+  reporter.recordTodo(category);
+  addTodoComment(replacement, category);
   ts.addSyntheticLeadingComment(
     replacement,
     ts.SyntaxKind.SingleLineCommentTrivia,

@@ -146,12 +146,12 @@ export function transformSpies(node: ts.Node, refactorCtx: RefactorContext): ts.
 
             return ts.factory.createCallExpression(newExpression, undefined, [arrowFunction]);
           }
-          default:
-            reporter.recordTodo('unsupported-spy-strategy');
-            addTodoComment(
-              node,
-              `Unsupported spy strategy ".and.${strategyName}()" found. Please migrate this manually.`,
-            );
+          default: {
+            const category = 'unsupported-spy-strategy';
+            reporter.recordTodo(category);
+            addTodoComment(node, category, { name: strategyName });
+            break;
+          }
         }
 
         if (newMethodName) {
@@ -184,20 +184,18 @@ export function transformSpies(node: ts.Node, refactorCtx: RefactorContext): ts.
 
       // jasmine.createSpy(name, originalFn) -> vi.fn(originalFn)
       return createViCallExpression('fn', node.arguments.length > 1 ? [node.arguments[1]] : []);
-    case 'spyOnAllFunctions':
+    case 'spyOnAllFunctions': {
       reporter.reportTransformation(
         sourceFile,
         node,
         'Found unsupported `jasmine.spyOnAllFunctions()`.',
       );
-      reporter.recordTodo('spyOnAllFunctions');
-      addTodoComment(
-        node,
-        'Vitest does not have a direct equivalent for jasmine.spyOnAllFunctions().' +
-          ' Please spy on individual methods manually using vi.spyOn().',
-      );
+      const category = 'spyOnAllFunctions';
+      reporter.recordTodo(category);
+      addTodoComment(node, category);
 
       return node;
+    }
   }
 
   return node;
@@ -218,11 +216,9 @@ export function transformCreateSpyObj(
   );
 
   if (node.arguments.length < 2) {
-    reporter.recordTodo('createSpyObj-single-argument');
-    addTodoComment(
-      node,
-      'jasmine.createSpyObj called with a single argument is not supported for transformation.',
-    );
+    const category = 'createSpyObj-single-argument';
+    reporter.recordTodo(category);
+    addTodoComment(node, category);
 
     return node;
   }
@@ -236,11 +232,9 @@ export function transformCreateSpyObj(
   } else if (ts.isObjectLiteralExpression(methods)) {
     properties = createSpyObjWithObject(methods);
   } else {
-    reporter.recordTodo('createSpyObj-dynamic-variable');
-    addTodoComment(
-      node,
-      'Cannot transform jasmine.createSpyObj with a dynamic variable. Please migrate this manually.',
-    );
+    const category = 'createSpyObj-dynamic-variable';
+    reporter.recordTodo(category);
+    addTodoComment(node, category);
 
     return node;
   }
@@ -249,11 +243,9 @@ export function transformCreateSpyObj(
     if (ts.isObjectLiteralExpression(propertiesArg)) {
       properties.push(...(propertiesArg.properties as unknown as ts.PropertyAssignment[]));
     } else {
-      reporter.recordTodo('createSpyObj-dynamic-property-map');
-      addTodoComment(
-        node,
-        'Cannot transform jasmine.createSpyObj with a dynamic property map. Please migrate this manually.',
-      );
+      const category = 'createSpyObj-dynamic-property-map';
+      reporter.recordTodo(category);
+      addTodoComment(node, category);
     }
   }
 
@@ -426,12 +418,9 @@ export function transformSpyCallInspection(
             !ts.isIdentifier(node.parent.name) ||
             node.parent.name.text !== 'args'
           ) {
-            reporter.recordTodo('mostRecent-without-args');
-            addTodoComment(
-              node,
-              'Direct usage of mostRecent() is not supported.' +
-                ' Please refactor to access .args directly or use vi.mocked(spy).mock.lastCall.',
-            );
+            const category = 'mostRecent-without-args';
+            reporter.recordTodo(category);
+            addTodoComment(node, category);
           }
 
           return node;

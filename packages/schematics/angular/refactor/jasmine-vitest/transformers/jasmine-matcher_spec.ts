@@ -168,7 +168,7 @@ describe('Jasmine to Vitest Transformer', () => {
       {
         description: 'should add a TODO for toThrowMatching',
         input: `expect(() => {}).toThrowMatching((e) => e.message === 'foo');`,
-        expected: `// TODO: vitest-migration: Unsupported matcher ".toThrowMatching()" found. Please migrate this manually.
+        expected: `// TODO: vitest-migration: Unsupported matcher ".toThrowMatching()" found. Please migrate this manually. See: https://vitest.dev/api/expect.html#tothrowerror
 expect(() => {}).toThrowMatching((e) => e.message === 'foo');`,
       },
       {

@@ -34,14 +34,14 @@ describe('RefactorReporter', () => {
   });
 
   it('should record and count todos by category', () => {
-    reporter.recordTodo('category-a');
-    reporter.recordTodo('category-b');
-    reporter.recordTodo('category-a');
+    reporter.recordTodo('pending');
+    reporter.recordTodo('spyOnAllFunctions');
+    reporter.recordTodo('pending');
     reporter.printSummary();
 
     expect(logger.warn).toHaveBeenCalledWith('- 3 TODO(s) added for manual review:');
-    expect(logger.warn).toHaveBeenCalledWith('  - 2x category-a');
-    expect(logger.warn).toHaveBeenCalledWith('  - 1x category-b');
+    expect(logger.warn).toHaveBeenCalledWith('  - 2x pending');
+    expect(logger.warn).toHaveBeenCalledWith('  - 1x spyOnAllFunctions');
   });
 
   it('should not print the todos section if none were recorded', () => {
