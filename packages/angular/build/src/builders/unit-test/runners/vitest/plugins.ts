@@ -45,7 +45,7 @@ export function createVitestPlugins(
         // Create a subproject that can be configured with plugins for browser mode.
         // Plugins defined directly in the vite overrides will not be present in the
         // browser specific Vite instance.
-        await context.injectTestProjects({
+        const [project] = await context.injectTestProjects({
           test: {
             name: projectName,
             root: workspaceRoot,
@@ -155,6 +155,13 @@ export function createVitestPlugins(
             },
           ],
         });
+
+        // Filter the resolved coverage exclude patterns to remove non-string values.
+        // This is a workaround for vitest adding `false` into the array when `startVitest` is
+        // used with `config: false`. This can be removed once corrected in Vitest.
+        project.config.coverage.exclude = project.config.coverage.exclude.filter(
+          (pattern) => typeof pattern === 'string',
+        );
       },
     },
   ];

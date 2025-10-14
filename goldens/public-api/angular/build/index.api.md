@@ -219,7 +219,6 @@ export type UnitTestBuilderOptions = {
     browsers?: string[];
     buildTarget?: string;
     coverage?: boolean;
-    coverageAll?: boolean;
     coverageExclude?: string[];
     coverageInclude?: string[];
     coverageReporters?: SchemaCoverageReporter[];
