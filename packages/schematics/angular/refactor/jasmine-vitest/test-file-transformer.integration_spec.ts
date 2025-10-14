@@ -362,7 +362,7 @@ describe('Jasmine to Vitest Transformer - Integration Tests', () => {
         });
 
         it.skip('should handle pending tests', () => {
-          // TODO: vitest-migration: The pending() function was converted to a skipped test (\`it.skip\`).
+          // TODO: vitest-migration: The pending() function was converted to a skipped test (\`it.skip\`). See: https://vitest.dev/api/vi.html#it-skip
           // pending('This test is not yet implemented.');
         });
 
@@ -422,7 +422,7 @@ describe('Jasmine to Vitest Transformer - Integration Tests', () => {
     const vitestCode = `
       describe('Unsupported Features', () => {
         beforeAll(() => {
-          // TODO: vitest-migration: jasmine.addMatchers is not supported. Please manually migrate to expect.extend().
+          // TODO: vitest-migration: jasmine.addMatchers is not supported. Please manually migrate to expect.extend(). See: https://vitest.dev/api/expect.html#expect-extend
           jasmine.addMatchers({
             toBeAwesome: () => ({
               compare: (actual) => ({ pass: actual === 'awesome' })
@@ -437,7 +437,7 @@ describe('Jasmine to Vitest Transformer - Integration Tests', () => {
 
         it('should handle spyOnAllFunctions', () => {
           const myObj = { func1: () => {}, func2: () => {} };
-          // TODO: vitest-migration: Vitest does not have a direct equivalent for jasmine.spyOnAllFunctions(). Please spy on individual methods manually using vi.spyOn().
+          // TODO: vitest-migration: Vitest does not have a direct equivalent for jasmine.spyOnAllFunctions(). Please spy on individual methods manually using vi.spyOn(). See: https://vitest.dev/api/vi.html#vi-spyon
           jasmine.spyOnAllFunctions(myObj);
           myObj.func1();
           expect(myObj.func1).toHaveBeenCalled();

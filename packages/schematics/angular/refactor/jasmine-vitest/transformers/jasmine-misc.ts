@@ -18,6 +18,7 @@ import { createViCallExpression } from '../utils/ast-helpers';
 import { getJasmineMethodName, isJasmineCallExpression } from '../utils/ast-validation';
 import { addTodoComment } from '../utils/comment-helpers';
 import { RefactorContext } from '../utils/refactor-context';
+import { TodoCategory } from '../utils/todo-notes';
 
 export function transformTimerMocks(
   node: ts.Node,
@@ -140,56 +141,42 @@ export function transformGlobalFunctions(
       node,
       `Found unsupported global function \`${functionName}\`.`,
     );
-    reporter.recordTodo(functionName);
-    addTodoComment(
-      node,
-      `Unsupported global function \`${functionName}\` found. This function is used for custom reporters in Jasmine ` +
-        'and has no direct equivalent in Vitest.',
-    );
+    const category = 'unsupported-global-function';
+    reporter.recordTodo(category);
+    addTodoComment(node, category, { name: functionName });
   }
 
   return node;
 }
 
-const JASMINE_UNSUPPORTED_CALLS = new Map<string, string>([
-  [
-    'addMatchers',
-    'jasmine.addMatchers is not supported. Please manually migrate to expect.extend().',
-  ],
-  [
-    'addCustomEqualityTester',
-    'jasmine.addCustomEqualityTester is not supported. Please manually migrate to expect.addEqualityTesters().',
-  ],
-  [
-    'mapContaining',
-    'jasmine.mapContaining is not supported. Vitest does not have a built-in matcher for Maps.' +
-      ' Please manually assert the contents of the Map.',
-  ],
-  [
-    'setContaining',
-    'jasmine.setContaining is not supported. Vitest does not have a built-in matcher for Sets.' +
-      ' Please manually assert the contents of the Set.',
-  ],
+const UNSUPPORTED_JASMINE_CALLS_CATEGORIES = new Set<TodoCategory>([
+  'addMatchers',
+  'addCustomEqualityTester',
+  'mapContaining',
+  'setContaining',
 ]);
+
+// A type guard to ensure that the methodName is one of the categories handled by this transformer.
+function isUnsupportedJasmineCall(
+  methodName: string,
+): methodName is 'addMatchers' | 'addCustomEqualityTester' | 'mapContaining' | 'setContaining' {
+  return UNSUPPORTED_JASMINE_CALLS_CATEGORIES.has(methodName as TodoCategory);
+}
 
 export function transformUnsupportedJasmineCalls(
   node: ts.Node,
   { sourceFile, reporter }: RefactorContext,
 ): ts.Node {
   const methodName = getJasmineMethodName(node);
-  if (!methodName) {
-    return node;
-  }
 
-  const message = JASMINE_UNSUPPORTED_CALLS.get(methodName);
-  if (message) {
+  if (methodName && isUnsupportedJasmineCall(methodName)) {
     reporter.reportTransformation(
       sourceFile,
       node,
       `Found unsupported call \`jasmine.${methodName}\`.`,
     );
     reporter.recordTodo(methodName);
-    addTodoComment(node, message);
+    addTodoComment(node, methodName);
   }
 
   return node;
@@ -238,11 +225,9 @@ export function transformUnknownJasmineProperties(
         node,
         `Found unknown jasmine property \`jasmine.${propName}\`.`,
       );
-      reporter.recordTodo(`unknown-jasmine-property: ${propName}`);
-      addTodoComment(
-        node,
-        `Unsupported jasmine property "${propName}" found. Please migrate this manually.`,
-      );
+      const category = 'unknown-jasmine-property';
+      reporter.recordTodo(category);
+      addTodoComment(node, category, { name: propName });
     }
   }
 

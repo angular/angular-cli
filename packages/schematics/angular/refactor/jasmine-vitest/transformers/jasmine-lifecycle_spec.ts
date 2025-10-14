@@ -190,8 +190,8 @@ describe('Jasmine to Vitest Transformer', () => {
         `,
         expected: `
           it.skip('is a work in progress', () => {
-              // TODO: vitest-migration: The pending() function was converted to a skipped test (\`it.skip\`).
-              // pending('Not yet implemented');
+            // TODO: vitest-migration: The pending() function was converted to a skipped test (\`it.skip\`). See: https://vitest.dev/api/vi.html#it-skip
+            // pending('Not yet implemented');
           });
         `,
       },
@@ -204,8 +204,8 @@ describe('Jasmine to Vitest Transformer', () => {
         `,
         expected: `
           it.skip('is a work in progress', function() {
-              // TODO: vitest-migration: The pending() function was converted to a skipped test (\`it.skip\`).
-              // pending('Not yet implemented');
+            // TODO: vitest-migration: The pending() function was converted to a skipped test (\`it.skip\`). See: https://vitest.dev/api/vi.html#it-skip
+            // pending('Not yet implemented');
           });
         `,
       },

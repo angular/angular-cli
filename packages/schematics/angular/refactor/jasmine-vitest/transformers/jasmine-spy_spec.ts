@@ -73,7 +73,7 @@ describe('Jasmine to Vitest Transformer', () => {
         description: 'should add a TODO for jasmine.spyOnAllFunctions(object)',
         input: `jasmine.spyOnAllFunctions(myObject);`,
         // eslint-disable-next-line max-len
-        expected: `// TODO: vitest-migration: Vitest does not have a direct equivalent for jasmine.spyOnAllFunctions(). Please spy on individual methods manually using vi.spyOn().
+        expected: `// TODO: vitest-migration: Vitest does not have a direct equivalent for jasmine.spyOnAllFunctions(). Please spy on individual methods manually using vi.spyOn(). See: https://vitest.dev/api/vi.html#vi-spyon
           jasmine.spyOnAllFunctions(myObject);
         `,
       },
@@ -109,6 +109,13 @@ describe('Jasmine to Vitest Transformer', () => {
         input: `spyOn(service, 'myMethod').and.rejectWith('some error');`,
         expected: `vi.spyOn(service, 'myMethod').mockRejectedValue('some error');`,
       },
+      {
+        description: 'should add a TODO for an unsupported spy strategy',
+        input: `spyOn(service, 'myMethod').and.unknownStrategy();`,
+        // eslint-disable-next-line max-len
+        expected: `// TODO: vitest-migration: Unsupported spy strategy ".and.unknownStrategy()" found. Please migrate this manually. See: https://vitest.dev/api/mocked.html#mock
+vi.spyOn(service, 'myMethod').and.unknownStrategy();`,
+      },
     ];
 
     testCases.forEach(({ description, input, expected }) => {
@@ -132,7 +139,7 @@ describe('Jasmine to Vitest Transformer', () => {
         description: 'should add a TODO if the second argument is not a literal',
         input: `const myService = jasmine.createSpyObj('MyService', methodNames);`,
         expected: `
-          // TODO: vitest-migration: Cannot transform jasmine.createSpyObj with a dynamic variable. Please migrate this manually.
+          // TODO: vitest-migration: Cannot transform jasmine.createSpyObj with a dynamic variable. Please migrate this manually. See: https://vitest.dev/api/vi.html#vi-fn
           const myService = jasmine.createSpyObj('MyService', methodNames);
         `,
       },
@@ -156,7 +163,7 @@ describe('Jasmine to Vitest Transformer', () => {
         description: 'should add a TODO for jasmine.createSpyObj with only one argument',
         input: `const myService = jasmine.createSpyObj('MyService');`,
         expected: `
-          // TODO: vitest-migration: jasmine.createSpyObj called with a single argument is not supported for transformation.
+          // TODO: vitest-migration: jasmine.createSpyObj called with a single argument is not supported for transformation. See: https://vitest.dev/api/vi.html#vi-fn
           const myService = jasmine.createSpyObj('MyService');
         `,
       },
@@ -249,7 +256,7 @@ describe('Jasmine to Vitest Transformer', () => {
         description: 'should add a TODO for spy.calls.mostRecent() without .args',
         input: `const mostRecent = mySpy.calls.mostRecent();`,
         // eslint-disable-next-line max-len
-        expected: `// TODO: vitest-migration: Direct usage of mostRecent() is not supported. Please refactor to access .args directly or use vi.mocked(spy).mock.lastCall.
+        expected: `// TODO: vitest-migration: Direct usage of mostRecent() is not supported. Please refactor to access .args directly or use vi.mocked(spy).mock.lastCall. See: https://vitest.dev/api/mocked.html#mock-lastcall
 const mostRecent = mySpy.calls.mostRecent();`,
       },
     ];
