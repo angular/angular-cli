@@ -205,12 +205,7 @@ async function* handleRoute(options: {
           )
         : parentInjector;
 
-      const loadedChildRoutes = await loadChildrenHelper(
-        route,
-        compiler,
-        routeInjector,
-      ).toPromise();
-
+      const loadedChildRoutes = await loadChildrenHelper(route, compiler, routeInjector);
       if (loadedChildRoutes) {
         const { routes: childRoutes, injector = routeInjector } = loadedChildRoutes;
         yield* traverseRoutesConfig({
