@@ -5,6 +5,10 @@
   "type": "object",
   "description": "Refactors a Jasmine test file to use Vitest.",
   "properties": {
+    "include": {
+      "type": "string",
+      "description": "A path to a specific file or directory to refactor. If not provided, all test files in the project will be refactored."
+    },
     "fileSuffix": {
       "type": "string",
       "description": "The file suffix to identify test files (e.g., '.spec.ts', '.test.ts').",

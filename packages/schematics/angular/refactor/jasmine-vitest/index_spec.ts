@@ -123,6 +123,94 @@ describe('Jasmine to Vitest Schematic', () => {
     expect(logs.some((log) => log.includes('Transformed `spyOn` to `vi.spyOn`'))).toBe(true);
   });
 
+  describe('with `include` option', () => {
+    beforeEach(() => {
+      // Create a nested structure for testing directory-specific inclusion
+      appTree.create(
+        'projects/bar/src/app/nested/nested.spec.ts',
+        `describe('Nested', () => { it('should work', () => { spyOn(window, 'confirm'); }); });`,
+      );
+      appTree.overwrite(
+        'projects/bar/src/app/app.spec.ts',
+        `describe('App', () => { it('should work', () => { spyOn(window, 'alert'); }); });`,
+      );
+    });
+
+    it('should only transform the specified file', async () => {
+      const tree = await schematicRunner.runSchematic(
+        'jasmine-to-vitest',
+        { project: 'bar', include: 'src/app/nested/nested.spec.ts' },
+        appTree,
+      );
+
+      const changedContent = tree.readContent('projects/bar/src/app/nested/nested.spec.ts');
+      expect(changedContent).toContain(`vi.spyOn(window, 'confirm');`);
+
+      const unchangedContent = tree.readContent('projects/bar/src/app/app.spec.ts');
+      expect(unchangedContent).toContain(`spyOn(window, 'alert');`);
+    });
+
+    it('should handle a Windows-style path', async () => {
+      const tree = await schematicRunner.runSchematic(
+        'jasmine-to-vitest',
+        { project: 'bar', include: 'src\\app\\nested\\nested.spec.ts' },
+        appTree,
+      );
+
+      const changedContent = tree.readContent('projects/bar/src/app/nested/nested.spec.ts');
+      expect(changedContent).toContain(`vi.spyOn(window, 'confirm');`);
+
+      const unchangedContent = tree.readContent('projects/bar/src/app/app.spec.ts');
+      expect(unchangedContent).toContain(`spyOn(window, 'alert');`);
+    });
+
+    it('should only transform files in the specified directory', async () => {
+      appTree.create(
+        'projects/bar/src/other/other.spec.ts',
+        `describe('Other', () => { it('should work', () => { spyOn(window, 'close'); }); });`,
+      );
+
+      const tree = await schematicRunner.runSchematic(
+        'jasmine-to-vitest',
+        { project: 'bar', include: 'src/app' },
+        appTree,
+      );
+
+      const changedAppContent = tree.readContent('projects/bar/src/app/app.spec.ts');
+      expect(changedAppContent).toContain(`vi.spyOn(window, 'alert');`);
+
+      const changedNestedContent = tree.readContent('projects/bar/src/app/nested/nested.spec.ts');
+      expect(changedNestedContent).toContain(`vi.spyOn(window, 'confirm');`);
+
+      const unchangedContent = tree.readContent('projects/bar/src/other/other.spec.ts');
+      expect(unchangedContent).toContain(`spyOn(window, 'close');`);
+    });
+
+    it('should process all files if `include` is not provided', async () => {
+      const tree = await schematicRunner.runSchematic(
+        'jasmine-to-vitest',
+        { project: 'bar' },
+        appTree,
+      );
+
+      const changedAppContent = tree.readContent('projects/bar/src/app/app.spec.ts');
+      expect(changedAppContent).toContain(`vi.spyOn(window, 'alert');`);
+
+      const changedNestedContent = tree.readContent('projects/bar/src/app/nested/nested.spec.ts');
+      expect(changedNestedContent).toContain(`vi.spyOn(window, 'confirm');`);
+    });
+
+    it('should throw if the include path does not exist', async () => {
+      await expectAsync(
+        schematicRunner.runSchematic(
+          'jasmine-to-vitest',
+          { project: 'bar', include: 'src/non-existent' },
+          appTree,
+        ),
+      ).toBeRejectedWithError(`The specified include path 'src/non-existent' does not exist.`);
+    });
+  });
+
   it('should print a summary report after running', async () => {
     const specFilePath = 'projects/bar/src/app/app.spec.ts';
     const content = `
@@ -138,7 +226,7 @@ describe('Jasmine to Vitest Schematic', () => {
     const logs: string[] = [];
     schematicRunner.logger.subscribe((entry) => logs.push(entry.message));
 
-    await schematicRunner.runSchematic('jasmine-to-vitest', { include: specFilePath }, appTree);
+    await schematicRunner.runSchematic('jasmine-to-vitest', {}, appTree);
 
     expect(logs).toContain('Jasmine to Vitest Refactoring Summary:');
     expect(logs).toContain('- 1 test file(s) scanned.');
