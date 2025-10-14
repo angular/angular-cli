@@ -18,7 +18,6 @@ export default async function () {
     import { I18nTest } from './i18n-test/i18n-test';
 
     @Component({
-      standalone: true,
       selector: 'app-root',
       imports: [I18nTest],
       template: '<app-i18n-test />'

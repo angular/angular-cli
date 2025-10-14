@@ -43,7 +43,6 @@ export default async function () {
 
     @Component({
       selector: 'app-root',
-      standalone: true,
       imports: [CommonModule, RouterOutlet],
       template: \`
         <p>{{ data | json }}</p>

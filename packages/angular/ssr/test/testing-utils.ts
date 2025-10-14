@@ -20,7 +20,6 @@ import { ServerAsset, setAngularAppManifest } from '../src/manifest';
 import { ServerRoute, provideServerRendering, withRoutes } from '../src/routes/route-config';
 
 @Component({
-  standalone: true,
   selector: 'app-root',
   template: '<router-outlet />',
   imports: [RouterOutlet],

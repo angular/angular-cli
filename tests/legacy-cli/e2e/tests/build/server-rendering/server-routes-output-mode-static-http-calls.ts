@@ -29,7 +29,6 @@ export default async function () {
 
     @Component({
       selector: 'app-root',
-      standalone: true,
       imports: [JsonPipe, RouterOutlet],
       template: \`
         <p>{{ assetsData | json }}</p>

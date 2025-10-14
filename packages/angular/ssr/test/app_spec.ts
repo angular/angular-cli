@@ -21,7 +21,6 @@ describe('AngularServerApp', () => {
 
   beforeAll(() => {
     @Component({
-      standalone: true,
       selector: 'app-home',
       template: `Home works`,
     })

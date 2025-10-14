@@ -26,7 +26,6 @@ describe('extractRoutesAndCreateRouteTree', () => {
   const url = new URL('http://localhost');
 
   @Component({
-    standalone: true,
     selector: 'app-dummy-comp',
     template: `dummy works`,
   })
@@ -630,7 +629,6 @@ describe('extractRoutesAndCreateRouteTree', () => {
 
   it('should not bootstrap the root component', async () => {
     @Component({
-      standalone: true,
       selector: 'app-root',
       template: '',
     })
@@ -659,7 +657,6 @@ describe('extractRoutesAndCreateRouteTree', () => {
 
   it('should not bootstrap the root component when using `withEnabledBlockingInitialNavigation`', async () => {
     @Component({
-      standalone: true,
       selector: 'app-root',
       template: '',
     })
