@@ -205,11 +205,13 @@ async function* handleRoute(options: {
           )
         : parentInjector;
 
-      const loadedChildRoutes = await loadChildrenHelper(
-        route,
-        compiler,
-        routeInjector,
-      ).toPromise();
+      // TODO(alanagius): replace all the below when FW 21.0.0-next.7 is out.
+      const loadChildrenHelperResult = loadChildrenHelper(route, compiler, routeInjector);
+      const loadedChildRoutes = await ('then' in loadChildrenHelperResult
+        ? (loadChildrenHelperResult as unknown as ReturnType<
+            typeof loadChildrenHelperResult.toPromise
+          >)
+        : loadChildrenHelperResult.toPromise());
 
       if (loadedChildRoutes) {
         const { routes: childRoutes, injector = routeInjector } = loadedChildRoutes;
