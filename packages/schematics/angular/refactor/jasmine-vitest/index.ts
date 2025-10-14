@@ -13,37 +13,37 @@ import {
   SchematicsException,
   Tree,
 } from '@angular-devkit/schematics';
+import { join, normalize } from 'node:path/posix';
 import { ProjectDefinition, getWorkspace } from '../../utility/workspace';
 import { Schema } from './schema';
 import { transformJasmineToVitest } from './test-file-transformer';
 import { RefactorReporter } from './utils/refactor-reporter';
 
-async function getProjectRoot(tree: Tree, projectName: string | undefined): Promise<string> {
+async function getProject(
+  tree: Tree,
+  projectName: string | undefined,
+): Promise<{ project: ProjectDefinition; name: string }> {
   const workspace = await getWorkspace(tree);
 
-  let project: ProjectDefinition | undefined;
   if (projectName) {
-    project = workspace.projects.get(projectName);
+    const project = workspace.projects.get(projectName);
     if (!project) {
       throw new SchematicsException(`Project "${projectName}" not found.`);
     }
-  } else {
-    if (workspace.projects.size === 1) {
-      project = workspace.projects.values().next().value;
-    } else {
-      const projectNames = Array.from(workspace.projects.keys());
-      throw new SchematicsException(
-        `Multiple projects found: [${projectNames.join(', ')}]. Please specify a project name.`,
-      );
-    }
+
+    return { project, name: projectName };
   }
 
-  if (!project) {
-    // This case should theoretically not be hit due to the checks above, but it's good for type safety.
-    throw new SchematicsException('Could not determine a project.');
+  if (workspace.projects.size === 1) {
+    const [name, project] = Array.from(workspace.projects.entries())[0];
+
+    return { project, name };
   }
 
-  return project.root;
+  const projectNames = Array.from(workspace.projects.keys());
+  throw new SchematicsException(
+    `Multiple projects found: [${projectNames.join(', ')}]. Please specify a project name.`,
+  );
 }
 
 const DIRECTORIES_TO_SKIP = new Set(['node_modules', '.git', 'dist', '.angular']);
@@ -74,14 +74,45 @@ function findTestFiles(directory: DirEntry, fileSuffix: string): string[] {
 export default function (options: Schema): Rule {
   return async (tree: Tree, context: SchematicContext) => {
     const reporter = new RefactorReporter(context.logger);
-    const projectRoot = await getProjectRoot(tree, options.project);
+    const { project, name: projectName } = await getProject(tree, options.project);
+    const projectRoot = project.root;
     const fileSuffix = options.fileSuffix ?? '.spec.ts';
 
-    const files = findTestFiles(tree.getDir(projectRoot), fileSuffix);
+    let files: string[];
+    let searchScope: string;
+
+    if (options.include) {
+      const normalizedInclude = options.include.replace(/\\/g, '/');
+      const includePath = normalize(join(projectRoot, normalizedInclude));
+      searchScope = options.include;
+
+      let dirEntry: DirEntry | null = null;
+      try {
+        dirEntry = tree.getDir(includePath);
+      } catch {
+        // Path is not a directory.
+      }
+
+      // Approximation of a directory exists check
+      if (dirEntry && (dirEntry.subdirs.length > 0 || dirEntry.subfiles.length > 0)) {
+        // It is a directory
+        files = findTestFiles(dirEntry, fileSuffix);
+      } else if (tree.exists(includePath)) {
+        // It is a file
+        files = [includePath];
+      } else {
+        throw new SchematicsException(
+          `The specified include path '${options.include}' does not exist.`,
+        );
+      }
+    } else {
+      searchScope = `project '${projectName}'`;
+      files = findTestFiles(tree.getDir(projectRoot), fileSuffix);
+    }
 
     if (files.length === 0) {
       throw new SchematicsException(
-        `No files ending with '${fileSuffix}' found in project '${options.project}'.`,
+        `No files ending with '${fileSuffix}' found in ${searchScope}.`,
       );
     }
 
