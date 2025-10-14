@@ -51,7 +51,11 @@ export function addTodoComment(
 
   let statement: ts.Node = node;
 
-  // Attempt to find the containing statement
+  // Traverse up the AST to find the containing statement for the node.
+  // This ensures that the comment is placed before the entire statement,
+  // rather than being attached to a deeply nested node. For example, if the
+  // node is an `Identifier`, we want the comment on the `VariableStatement`
+  // or `ExpressionStatement` that contains it.
   while (statement.parent && !ts.isBlock(statement.parent) && !ts.isSourceFile(statement.parent)) {
     if (ts.isExpressionStatement(statement) || ts.isVariableStatement(statement)) {
       break;
