@@ -1,3 +1,15 @@
+<a name="19.2.18"></a>
+
+# 19.2.18 (2025-10-15)
+
+### @angular/ssr
+
+| Commit                                                                                              | Type | Description                                |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------ |
+| [9136a5d13](https://github.com/angular/angular-cli/commit/9136a5d1302bb224ea245460ae29474bd2a3a10b) | fix  | prevent malicious URL from overriding host |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="19.2.17"></a>
 
 # 19.2.17 (2025-09-17)
