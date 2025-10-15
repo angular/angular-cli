@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { readFile, readdir } from 'node:fs/promises';
+import { readFile, readdir, stat } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import semver from 'semver';
@@ -124,14 +124,26 @@ const EXCLUDED_DIRS = new Set(['node_modules', 'dist', 'out', 'coverage']);
 
 /**
  * Iteratively finds all 'angular.json' files with controlled concurrency and directory exclusions.
- * This non-recursive implementation is suitable for very large directory trees
- * and prevents file descriptor exhaustion (`EMFILE` errors).
+ * This non-recursive implementation is suitable for very large directory trees,
+ * prevents file descriptor exhaustion (`EMFILE` errors), and handles symbolic link loops.
  * @param rootDir The directory to start the search from.
  * @returns An async generator that yields the full path of each found 'angular.json' file.
  */
 async function* findAngularJsonFiles(rootDir: string): AsyncGenerator<string> {
   const CONCURRENCY_LIMIT = 50;
   const queue: string[] = [rootDir];
+  const seenInodes = new Set<number>();
+
+  try {
+    const rootStats = await stat(rootDir);
+    seenInodes.add(rootStats.ino);
+  } catch (error) {
+    assertIsError(error);
+    if (error.code === 'EACCES' || error.code === 'EPERM' || error.code === 'ENOENT') {
+      return; // Cannot access root, so there's nothing to do.
+    }
+    throw error;
+  }
 
   while (queue.length > 0) {
     const batch = queue.splice(0, CONCURRENCY_LIMIT);
@@ -148,6 +160,19 @@ async function* findAngularJsonFiles(rootDir: string): AsyncGenerator<string> {
             if (entry.name.startsWith('.') || EXCLUDED_DIRS.has(entry.name)) {
               continue;
             }
+
+            // Check for symbolic link loops
+            try {
+              const entryStats = await stat(fullPath);
+              if (seenInodes.has(entryStats.ino)) {
+                continue; // Already visited this directory (symlink loop), skip.
+              }
+              seenInodes.add(entryStats.ino);
+            } catch {
+              // Ignore errors from stat (e.g., broken symlinks)
+              continue;
+            }
+
             subdirectories.push(fullPath);
           } else if (entry.name === 'angular.json') {
             foundFilesInBatch.push(fullPath);
