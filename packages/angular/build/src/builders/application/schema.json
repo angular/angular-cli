@@ -6,7 +6,7 @@
   "properties": {
     "assets": {
       "type": "array",
-      "description": "List of static application assets.",
+      "description": "Define the assets to be copied to the output directory. These assets are copied as-is without any further processing or hashing.",
       "default": [],
       "items": {
         "$ref": "#/definitions/assetPattern"
@@ -441,7 +441,7 @@
     },
     "outputHashing": {
       "type": "string",
-      "description": "Define the output filename cache-busting hashing mode.",
+      "description": "Define the output filename cache-busting hashing mode.\n\n- `none`: No hashing.\n- `all`: Hash for all output bundles. \n- `media`: Hash for all output media (e.g., images, fonts, etc. that are referenced in CSS files).\n- `bundles`: Hash for output of lazy and main bundles.",
       "default": "none",
       "enum": ["none", "all", "media", "bundles"]
     },
