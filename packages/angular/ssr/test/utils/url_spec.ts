@@ -13,6 +13,7 @@ import {
   joinUrlParts,
   stripIndexHtmlFromURL,
   stripLeadingSlash,
+  stripMatrixParams,
   stripTrailingSlash,
 } from '../../src/utils/url';
 
@@ -179,6 +180,32 @@ describe('URL Utils', () => {
       expect(() => {
         buildPathWithParams(toPath, fromPath);
       }).toThrowError(`Invalid toPath: The string must start with a '/'. Received: 'details'`);
+    });
+  });
+
+  describe('stripMatrixParams', () => {
+    it('should remove a single matrix parameter', () => {
+      expect(stripMatrixParams('/path;param=value')).toBe('/path');
+    });
+
+    it('should remove multiple matrix parameters in the same segment', () => {
+      expect(stripMatrixParams('/path;p1=v1;p2=v2')).toBe('/path');
+    });
+
+    it('should remove matrix parameters from multiple segments', () => {
+      expect(stripMatrixParams('/path;p1=v1/to;p2=v2/resource')).toBe('/path/to/resource');
+    });
+
+    it('should not modify a path without matrix parameters', () => {
+      expect(stripMatrixParams('/path/to/resource')).toBe('/path/to/resource');
+    });
+
+    it('should handle a root path with matrix parameters', () => {
+      expect(stripMatrixParams('/;p1=v1')).toBe('/');
+    });
+
+    it('should handle an empty string', () => {
+      expect(stripMatrixParams('')).toBe('');
     });
   });
 });
