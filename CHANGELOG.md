@@ -1,3 +1,15 @@
+<a name="19.2.18"></a>
+
+# 19.2.18 (2025-10-15)
+
+### @angular/ssr
+
+| Commit                                                                                              | Type | Description                                |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------ |
+| [9136a5d13](https://github.com/angular/angular-cli/commit/9136a5d1302bb224ea245460ae29474bd2a3a10b) | fix  | prevent malicious URL from overriding host |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="21.0.0-next.7"></a>
 
 # 21.0.0-next.7 (2025-10-08)
@@ -1964,6 +1976,7 @@
 - Protractor is no longer supported.
 
   Protractor was marked end-of-life in August 2023 (see https://protractortest.org/). Projects still relying on Protractor should consider migrating to another E2E testing framework, several support solid migration paths from Protractor.
+
   - https://angular.dev/tools/cli/end-to-end
   - https://blog.angular.dev/the-state-of-end-to-end-testing-with-angular-d175f751cb9c
 
@@ -5598,6 +5611,7 @@ Alan Agius, Charles Lyding and Doug Parker
 ### @angular/cli
 
 - Several changes to the `ng analytics` command syntax.
+
   - `ng analytics project <setting>` has been replaced with `ng analytics <setting>`
   - `ng analytics <setting>` has been replaced with `ng analytics <setting> --global`
 
@@ -5627,6 +5641,7 @@ Alan Agius, Charles Lyding and Doug Parker
 - `browser` and `karma` builders `script` and `styles` options input files extensions are now validated.
 
   Valid extensions for `scripts` are:
+
   - `.js`
   - `.cjs`
   - `.mjs`
@@ -5635,6 +5650,7 @@ Alan Agius, Charles Lyding and Doug Parker
   - `.mjsx`
 
   Valid extensions for `styles` are:
+
   - `.css`
   - `.less`
   - `.sass`
