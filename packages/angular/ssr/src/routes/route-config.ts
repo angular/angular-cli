@@ -233,19 +233,19 @@ export const SERVER_ROUTES_CONFIG = new InjectionToken<ServerRoutesConfig>('SERV
  *
  * const serverRoutes: ServerRoute[] = [
  *   {
- *     route: '', // This renders the "/" route on the client (CSR)
+ *     path: '', // This renders the "/" route on the client (CSR)
  *     renderMode: RenderMode.Client,
  *   },
  *   {
- *     route: 'about', // This page is static, so we prerender it (SSG)
+ *     path: 'about', // This page is static, so we prerender it (SSG)
  *     renderMode: RenderMode.Prerender,
  *   },
  *   {
- *     route: 'profile', // This page requires user-specific data, so we use SSR
+ *     path: 'profile', // This page requires user-specific data, so we use SSR
  *     renderMode: RenderMode.Server,
  *   },
  *   {
- *     route: '**', // All other routes will be rendered on the server (SSR)
+ *     path: '**', // All other routes will be rendered on the server (SSR)
  *     renderMode: RenderMode.Server,
  *   },
  * ];
