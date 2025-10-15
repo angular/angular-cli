@@ -78,13 +78,15 @@ export function transformFail(node: ts.Node, { sourceFile, reporter }: RefactorC
     reporter.reportTransformation(sourceFile, node, 'Transformed `fail()` to `throw new Error()`.');
     const reason = node.expression.arguments[0];
 
-    return ts.factory.createThrowStatement(
+    const replacement = ts.factory.createThrowStatement(
       ts.factory.createNewExpression(
         ts.factory.createIdentifier('Error'),
         undefined,
         reason ? [reason] : [],
       ),
     );
+
+    return ts.setOriginalNode(ts.setTextRange(replacement, node), node);
   }
 
   return node;
@@ -119,7 +121,7 @@ export function transformDefaultTimeoutInterval(
         ),
       ]);
 
-      return ts.factory.createExpressionStatement(setConfigCall);
+      return ts.factory.updateExpressionStatement(node, setConfigCall);
     }
   }
 

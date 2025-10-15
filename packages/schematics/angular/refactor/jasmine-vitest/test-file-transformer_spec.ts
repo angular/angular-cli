@@ -151,7 +151,6 @@ describe('Jasmine to Vitest Transformer', () => {
              */
             .mockReturnValue(true);
         `,
-        skipped: true,
       },
       {
         description: 'should preserve a trailing comment on a matcher line',

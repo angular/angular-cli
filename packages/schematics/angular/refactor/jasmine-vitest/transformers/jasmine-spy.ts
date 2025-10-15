@@ -160,7 +160,12 @@ export function transformSpies(node: ts.Node, refactorCtx: RefactorContext): ts.
             node,
             `Transformed spy strategy \`.and.${strategyName}()\` to \`.${newMethodName}()\`.`,
           );
-          const newExpression = createPropertyAccess(spyCall, newMethodName);
+
+          const newExpression = ts.factory.updatePropertyAccessExpression(
+            pae,
+            spyCall,
+            ts.factory.createIdentifier(newMethodName),
+          );
 
           return ts.factory.updateCallExpression(
             node,
