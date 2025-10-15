@@ -76,7 +76,7 @@ function createRequestHeaders(nodeHeaders: IncomingHttpHeaders): Headers {
  * @param nodeRequest - The Node.js `IncomingMessage` or `Http2ServerRequest` object to extract URL information from.
  * @returns A `URL` object representing the request URL.
  */
-function createRequestUrl(nodeRequest: IncomingMessage | Http2ServerRequest): URL {
+export function createRequestUrl(nodeRequest: IncomingMessage | Http2ServerRequest): URL {
   const {
     headers,
     socket,
@@ -101,7 +101,7 @@ function createRequestUrl(nodeRequest: IncomingMessage | Http2ServerRequest): UR
     }
   }
 
-  return new URL(originalUrl ?? url, `${protocol}://${hostnameWithPort}`);
+  return new URL(`${protocol}://${hostnameWithPort}${originalUrl ?? url}`);
 }
 
 /**
