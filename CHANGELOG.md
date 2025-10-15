@@ -1,3 +1,39 @@
+<a name="21.0.0-next.8"></a>
+
+# 21.0.0-next.8 (2025-10-15)
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                                        |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------ |
+| [ede5e52bc](https://github.com/angular/angular-cli/commit/ede5e52bc701c42948bd98826cd4fa901350015c) | feat | add `include` option to jasmine-to-vitest schematic                |
+| [d0d2a17b8](https://github.com/angular/angular-cli/commit/d0d2a17b8adb2c1ce6eee70494f5d2298622c40e) | feat | add Jasmine spy API transformations to jasmine-to-vitest schematic |
+| [e7d955bed](https://github.com/angular/angular-cli/commit/e7d955bedd5ca6957903cb73f8ebe06823a808da) | feat | add matcher transformations to jasmine-to-vitest schematic         |
+| [629f5cb18](https://github.com/angular/angular-cli/commit/629f5cb181fee562645baf02b44ebb3b39f3fb06) | feat | add misc transformations to jasmine-to-vitest schematic            |
+| [58474ec7d](https://github.com/angular/angular-cli/commit/58474ec7dd85fc34639c138d9b8d545affb50e3e) | feat | introduce initial jasmine-to-vitest unit test refactor schematic   |
+| [8f0f6a5f1](https://github.com/angular/angular-cli/commit/8f0f6a5f113ffc9e81d99eeeba71f8054e2d3686) | fix  | add migration to update `moduleResolution` to `bundler`            |
+| [f35b9f331](https://github.com/angular/angular-cli/commit/f35b9f3310995b05d501f2abaec58dcd283e3aa0) | fix  | improve comment preservation in jasmine-to-vitest                  |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                    |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------- |
+| [53899511a](https://github.com/angular/angular-cli/commit/53899511afe5665541984085914a313390af6ce2) | fix  | expand `jest` and `jest-environment-jsdom` to allow version 30 |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                              |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------- |
+| [a90bea5b5](https://github.com/angular/angular-cli/commit/a90bea5b51c6978441919ed2af85c090fe99fd38) | feat | support `.test.ts` files by default in unit test builder |
+
+### @angular/ssr
+
+| Commit                                                                                              | Type | Description                                |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------ |
+| [7be6c8f0e](https://github.com/angular/angular-cli/commit/7be6c8f0e2883c85546eb1691c91fa7d4aefc0d3) | fix  | prevent malicious URL from overriding host |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="20.3.6"></a>
 
 # 20.3.6 (2025-10-15)
