@@ -72,6 +72,7 @@ ts_project(
         include = ["**/*.ts"],
         exclude = [
             "**/*_spec.ts",
+            "refactor/jasmine-vitest/test-helpers.ts",
             # Also exclude templated files.
             "*/files/**/*.ts",
             "*/other-files/**/*.ts",
@@ -114,6 +115,7 @@ ts_project(
         include = [
             "**/*_spec.ts",
             "utility/test/**/*.ts",
+            "refactor/jasmine-vitest/test-helpers.ts",
         ],
         exclude = [
             # NB: we need to exclude the nested node_modules that is laid out by yarn workspaces
