@@ -6,20 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { logging } from '@angular-devkit/core';
-import { format } from 'prettier';
-import { transformJasmineToVitest } from '../test-file-transformer';
-import { RefactorReporter } from '../utils/refactor-reporter';
-
-async function expectTransformation(input: string, expected: string): Promise<void> {
-  const logger = new logging.NullLogger();
-  const reporter = new RefactorReporter(logger);
-  const transformed = transformJasmineToVitest('spec.ts', input, reporter);
-  const formattedTransformed = await format(transformed, { parser: 'typescript' });
-  const formattedExpected = await format(expected, { parser: 'typescript' });
-
-  expect(formattedTransformed).toBe(formattedExpected);
-}
+import { expectTransformation } from '../test-helpers';
 
 describe('Jasmine to Vitest Transformer', () => {
   describe('transformDoneCallback', () => {
