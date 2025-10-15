@@ -74,19 +74,28 @@ export function transformJasmineToVitest(
       // Transform the node itself based on its type
       if (ts.isCallExpression(transformedNode)) {
         const transformations = [
+          // **Stage 1: High-Level & Context-Sensitive Transformations**
+          // These transformers often wrap or fundamentally change the nature of the call,
+          // so they need to run before more specific matchers.
           transformWithContext,
           transformExpectAsync,
-          transformSyntacticSugarMatchers,
           transformFocusedAndSkippedTests,
+          transformPending,
+          transformDoneCallback,
+
+          // **Stage 2: Core Matcher & Spy Transformations**
+          // This is the bulk of the `expect(...)` and `spyOn(...)` conversions.
+          transformSyntacticSugarMatchers,
           transformComplexMatchers,
           transformSpies,
           transformCreateSpyObj,
           transformSpyReset,
           transformSpyCallInspection,
-          transformPending,
-          transformDoneCallback,
           transformtoHaveBeenCalledBefore,
           transformToHaveClass,
+
+          // **Stage 3: Global Functions & Cleanup**
+          // These handle global Jasmine functions and catch-alls for unsupported APIs.
           transformTimerMocks,
           transformGlobalFunctions,
           transformUnsupportedJasmineCalls,
@@ -97,6 +106,7 @@ export function transformJasmineToVitest(
         }
       } else if (ts.isPropertyAccessExpression(transformedNode)) {
         const transformations = [
+          // These transformers handle `jasmine.any()` and other `jasmine.*` properties.
           transformAsymmetricMatchers,
           transformSpyCallInspection,
           transformUnknownJasmineProperties,
@@ -105,6 +115,8 @@ export function transformJasmineToVitest(
           transformedNode = transformer(transformedNode, refactorCtx);
         }
       } else if (ts.isExpressionStatement(transformedNode)) {
+        // Statement-level transformers are mutually exclusive. The first one that
+        // matches will be applied, and then the visitor will stop for this node.
         const statementTransformers = [
           transformCalledOnceWith,
           transformArrayWithExactContents,
@@ -130,7 +142,7 @@ export function transformJasmineToVitest(
       }
     };
 
-    return (node) => ts.visitNode(node, visitor) as ts.SourceFile;
+    return (node) => ts.visitEachChild(node, visitor, context);
   };
 
   const result = ts.transform(sourceFile, [transformer]);
