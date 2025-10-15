@@ -23,7 +23,7 @@
     "@babel/core": "7.28.4",
     "@babel/helper-annotate-as-pure": "7.27.3",
     "@babel/helper-split-export-declaration": "7.24.7",
-    "@inquirer/confirm": "5.1.18",
+    "@inquirer/confirm": "5.1.19",
     "@vitejs/plugin-basic-ssl": "2.1.0",
     "beasties": "0.3.5",
     "browserslist": "^4.26.0",
@@ -42,7 +42,7 @@
     "semver": "7.7.3",
     "source-map-support": "0.5.21",
     "tinyglobby": "0.2.15",
-    "vite": "7.1.9",
+    "vite": "7.1.10",
     "watchpack": "2.4.4"
   },
   "optionalDependencies": {
