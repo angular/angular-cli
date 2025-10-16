@@ -109,7 +109,7 @@ export async function renderAngular(
 
     if (!routerIsProvided) {
       hasNavigationError = false;
-    } else if (lastSuccessfulNavigation?.finalUrl && initialUrl !== null) {
+    } else if (lastSuccessfulNavigation?.finalUrl && initialUrl !== undefined) {
       hasNavigationError = false;
 
       const { finalUrl } = lastSuccessfulNavigation;
