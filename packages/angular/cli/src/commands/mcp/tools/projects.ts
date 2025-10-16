@@ -15,6 +15,26 @@ import { AngularWorkspace } from '../../../utilities/config';
 import { assertIsError } from '../../../utilities/error';
 import { McpToolContext, declareTool } from './tool-registry';
 
+// Single source of truth for what constitutes a valid style language.
+const styleLanguageSchema = z.enum(['css', 'scss', 'sass', 'less']);
+type StyleLanguage = z.infer<typeof styleLanguageSchema>;
+const VALID_STYLE_LANGUAGES = styleLanguageSchema.options;
+
+// Explicitly ordered for the file system search heuristic.
+const STYLE_LANGUAGE_SEARCH_ORDER: ReadonlyArray<StyleLanguage> = ['scss', 'sass', 'less', 'css'];
+
+function isStyleLanguage(value: unknown): value is StyleLanguage {
+  return (
+    typeof value === 'string' && (VALID_STYLE_LANGUAGES as ReadonlyArray<string>).includes(value)
+  );
+}
+
+function getStyleLanguageFromExtension(extension: string): StyleLanguage | undefined {
+  const style = extension.toLowerCase().substring(1); // remove leading '.'
+
+  return isStyleLanguage(style) ? style : undefined;
+}
+
 const listProjectsOutputSchema = {
   workspaces: z.array(
     z.object({
@@ -61,6 +81,12 @@ const listProjectsOutputSchema = {
                 'This field is critical for generating correct and idiomatic unit tests. ' +
                 'When writing or modifying tests, you MUST use the APIs corresponding to this framework.',
             ),
+          styleLanguage: styleLanguageSchema
+            .optional()
+            .describe(
+              'The default style language for the project (e.g., "scss"). ' +
+                'This determines the file extension for new component styles.',
+            ),
         }),
       ),
     }),
@@ -100,6 +126,7 @@ their types, and their locations.
 * Finding the correct project name to use in other commands (e.g., \`ng generate component my-comp --project=my-app\`).
 * Identifying the \`root\` and \`sourceRoot\` of a project to read, analyze, or modify its files.
 * Determining a project's unit test framework (\`unitTestFramework\`) before writing or modifying tests.
+* Identifying the project's style language (\`styleLanguage\`) to use the correct file extension (e.g., \`.scss\`).
 * Getting the \`selectorPrefix\` for a project before generating a new component to ensure it follows conventions.
 * Identifying the major version of the Angular framework for each workspace, which is crucial for monorepos.
 * Determining a project's primary function by inspecting its builder (e.g., '@angular-devkit/build-angular:browser' for an application).
@@ -318,6 +345,74 @@ function getUnitTestFramework(
 }
 
 /**
+ * Determines the style language for a project using a prioritized heuristic.
+ * It checks project-specific schematics, then workspace-level schematics,
+ * and finally infers from the build target's inlineStyleLanguage option.
+ * @param project The project definition from the workspace configuration.
+ * @param workspace The loaded Angular workspace.
+ * @returns The determined style language ('css', 'scss', 'sass', 'less').
+ */
+async function getProjectStyleLanguage(
+  project: import('@angular-devkit/core').workspaces.ProjectDefinition,
+  workspace: AngularWorkspace,
+  fullSourceRoot: string,
+): Promise<StyleLanguage> {
+  const projectSchematics = project.extensions.schematics as
+    | Record<string, Record<string, unknown>>
+    | undefined;
+  const workspaceSchematics = workspace.extensions.schematics as
+    | Record<string, Record<string, unknown>>
+    | undefined;
+
+  // 1. Check for a project-specific schematic setting.
+  let style = projectSchematics?.['@schematics/angular:component']?.['style'];
+  if (isStyleLanguage(style)) {
+    return style;
+  }
+
+  // 2. Check for a workspace-level schematic setting.
+  style = workspaceSchematics?.['@schematics/angular:component']?.['style'];
+  if (isStyleLanguage(style)) {
+    return style;
+  }
+
+  const buildTarget = project.targets.get('build');
+  if (buildTarget?.options) {
+    // 3. Infer from the build target's inlineStyleLanguage option.
+    style = buildTarget.options['inlineStyleLanguage'];
+    if (isStyleLanguage(style)) {
+      return style;
+    }
+
+    // 4. Infer from the 'styles' array (explicit).
+    const styles = buildTarget.options['styles'] as string[] | undefined;
+    if (Array.isArray(styles)) {
+      for (const stylePath of styles) {
+        const style = getStyleLanguageFromExtension(path.extname(stylePath));
+        if (style) {
+          return style;
+        }
+      }
+    }
+  }
+
+  // 5. Infer from implicit default styles file (future-proofing).
+  for (const ext of STYLE_LANGUAGE_SEARCH_ORDER) {
+    try {
+      await stat(path.join(fullSourceRoot, `styles.${ext}`));
+
+      return ext;
+    } catch {
+      // Silently ignore all errors (e.g., file not found, permissions).
+      // If we can't read the file, we can't use it for detection.
+    }
+  }
+
+  // 6. Fallback to 'css'.
+  return 'css';
+}
+
+/**
  * Loads, parses, and transforms a single angular.json file into the tool's output format.
  * It checks a set of seen paths to avoid processing the same workspace multiple times.
  * @param configFile The path to the angular.json file.
@@ -337,17 +432,22 @@ async function loadAndParseWorkspace(
 
     const ws = await AngularWorkspace.load(configFile);
     const projects = [];
+    const workspaceRoot = path.dirname(configFile);
     for (const [name, project] of ws.projects.entries()) {
+      const sourceRoot = path.posix.join(project.root, project.sourceRoot ?? 'src');
+      const fullSourceRoot = path.join(workspaceRoot, sourceRoot);
       const unitTestFramework = getUnitTestFramework(project.targets.get('test'));
+      const styleLanguage = await getProjectStyleLanguage(project, ws, fullSourceRoot);
 
       projects.push({
         name,
         type: project.extensions['projectType'] as 'application' | 'library' | undefined,
         builder: project.targets.get('build')?.builder,
         root: project.root,
-        sourceRoot: project.sourceRoot ?? path.posix.join(project.root, 'src'),
+        sourceRoot,
         selectorPrefix: project.extensions['prefix'] as string,
         unitTestFramework,
+        styleLanguage,
       });
     }
 
