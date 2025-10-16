@@ -96,24 +96,26 @@ export async function renderAngular(
       applicationRef = await bootstrap({ platformRef });
     }
 
+    const envInjector = applicationRef.injector;
+    const router = envInjector.get(Router);
+    const initialUrl = router.currentNavigation()?.initialUrl.toString();
+
     // Block until application is stable.
     await applicationRef.whenStable();
 
     // TODO(alanagius): Find a way to avoid rendering here especially for redirects as any output will be discarded.
-    const envInjector = applicationRef.injector;
     const routerIsProvided = !!envInjector.get(ActivatedRoute, null);
-    const router = envInjector.get(Router);
     const lastSuccessfulNavigation = router.lastSuccessfulNavigation();
 
     if (!routerIsProvided) {
       hasNavigationError = false;
-    } else if (lastSuccessfulNavigation?.finalUrl) {
+    } else if (lastSuccessfulNavigation?.finalUrl && initialUrl !== null) {
       hasNavigationError = false;
 
-      const { finalUrl, initialUrl } = lastSuccessfulNavigation;
+      const { finalUrl } = lastSuccessfulNavigation;
       const finalUrlStringified = finalUrl.toString();
 
-      if (initialUrl.toString() !== finalUrlStringified) {
+      if (initialUrl !== finalUrlStringified) {
         const baseHref =
           envInjector.get(APP_BASE_HREF, null, { optional: true }) ??
           envInjector.get(PlatformLocation).getBaseHrefFromDOM();

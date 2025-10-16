@@ -19,18 +19,6 @@ import { RenderMode } from '../src/routes/route-config';
 import { setAngularAppTestingManifest } from './testing-utils';
 
 function createEntryPoint(locale: string) {
-  @Component({
-    selector: `app-ssr-${locale}`,
-    template: `SSR works ${locale.toUpperCase()}`,
-  })
-  class SSRComponent {}
-
-  @Component({
-    selector: `app-ssg-${locale}`,
-    template: `SSG works ${locale.toUpperCase()}`,
-  })
-  class SSGComponent {}
-
   return async () => {
     @Component({
       selector: `app-home-${locale}`,
