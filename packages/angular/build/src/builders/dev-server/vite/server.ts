@@ -12,7 +12,6 @@ import type { Connect, InlineConfig, SSROptions, ServerOptions } from 'vite';
 import type { ComponentStyleRecord } from '../../../tools/vite/middlewares';
 import {
   ServerSsrMode,
-  createAngularLocaleDataPlugin,
   createAngularMemoryPlugin,
   createAngularSetupMiddlewaresPlugin,
   createAngularSsrTransformPlugin,
@@ -221,7 +220,6 @@ export async function setupServer(
       define,
     ),
     plugins: [
-      createAngularLocaleDataPlugin(),
       createAngularSetupMiddlewaresPlugin({
         outputFiles,
         assets,
