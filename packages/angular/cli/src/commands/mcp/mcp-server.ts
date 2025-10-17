@@ -68,11 +68,12 @@ equivalent actions.
 
 <Core Workflows & Tool Guide>
 * **1. Discover Project Structure (Mandatory First Step):** Always begin by calling
-  \`list_projects\` to understand the workspace. The outputs from this tool are often
-  required inputs for other tools.
+  \`list_projects\` to understand the workspace. The \`path\` property for a workspace
+  is a required input for other tools.
 
-* **2. Write & Modify Code:** Before writing or changing code, you MUST consult the
-  \`get_best_practices\` tool to learn the current, non-negotiable coding standards.
+* **2. Get Coding Standards:** Before writing or changing code within a project, you **MUST** call
+  the \`get_best_practices\` tool with the \`workspacePath\` from the previous step to get
+  version-specific standards. For general knowledge, you can call the tool without this path.
 
 * **3. Answer User Questions:**
     - For conceptual questions ("what is..."), use \`search_documentation\`.
