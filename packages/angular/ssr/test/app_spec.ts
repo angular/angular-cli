@@ -11,7 +11,8 @@
 import '@angular/compiler';
 /* eslint-enable import/no-unassigned-import */
 
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
+import { CanActivateFn, Router } from '@angular/router';
 import { AngularServerApp } from '../src/app';
 import { RenderMode } from '../src/routes/route-config';
 import { setAngularAppTestingManifest } from './testing-utils';
@@ -27,6 +28,31 @@ describe('AngularServerApp', () => {
     })
     class HomeComponent {}
 
+    @Component({
+      selector: 'app-redirect',
+    })
+    class RedirectComponent {
+      constructor() {
+        void inject(Router).navigate([], {
+          queryParams: { filter: 'test' },
+        });
+      }
+    }
+
+    const queryParamAdderGuard: CanActivateFn = (_route, state) => {
+      const urlTree = inject(Router).parseUrl(state.url);
+
+      if (urlTree.queryParamMap.has('filter')) {
+        return true;
+      }
+
+      urlTree.queryParams = {
+        filter: 'test',
+      };
+
+      return urlTree;
+    };
+
     setAngularAppTestingManifest(
       [
         { path: 'home', component: HomeComponent },
@@ -34,7 +60,14 @@ describe('AngularServerApp', () => {
         { path: 'home-ssg', component: HomeComponent },
         { path: 'page-with-headers', component: HomeComponent },
         { path: 'page-with-status', component: HomeComponent },
+
         { path: 'redirect', redirectTo: 'home' },
+        { path: 'redirect-via-navigate', component: RedirectComponent },
+        {
+          path: 'redirect-via-guard',
+          canActivate: [queryParamAdderGuard],
+          component: HomeComponent,
+        },
         { path: 'redirect/relative', redirectTo: 'home' },
         { path: 'redirect/:param/relative', redirectTo: 'home' },
         { path: 'redirect/absolute', redirectTo: '/home' },
@@ -260,9 +293,21 @@ describe('AngularServerApp', () => {
     });
 
     describe('SSR pages', () => {
-      it('returns a 302 status and redirects to the correct location when redirectTo is a function', async () => {
+      it('returns a 302 status and redirects to the correct location when `redirectTo` is a function', async () => {
         const response = await app.handle(new Request('http://localhost/redirect-to-function'));
         expect(response?.headers.get('location')).toBe('/home');
+        expect(response?.status).toBe(302);
+      });
+
+      it('returns a 302 status and redirects to the correct location when `router.navigate` is used', async () => {
+        const response = await app.handle(new Request('http://localhost/redirect-via-navigate'));
+        expect(response?.headers.get('location')).toBe('/redirect-via-navigate?filter=test');
+        expect(response?.status).toBe(302);
+      });
+
+      it('returns a 302 status and redirects to the correct location when `urlTree` is updated in a guard', async () => {
+        const response = await app.handle(new Request('http://localhost/redirect-via-guard'));
+        expect(response?.headers.get('location')).toBe('/redirect-via-guard?filter=test');
         expect(response?.status).toBe(302);
       });
     });
