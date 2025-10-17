@@ -56,6 +56,7 @@ WEBPACK_IGNORE_TESTS = [
     "tests/build/auto-csp*",
     "tests/build/incremental-watch.js",
     "tests/build/chunk-optimizer.js",
+    "tests/build/chunk-optimizer-lazy.js",
 ]
 
 def _to_glob(patterns):
