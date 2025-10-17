@@ -165,3 +165,11 @@ export const useComponentTemplateHmr = parseTristate(process.env['NG_HMR_TEMPLAT
  * When `NG_BUILD_PARTIAL_SSR` is enabled, a partial server-side rendering build will be performed.
  */
 export const usePartialSsrBuild = parseTristate(process.env['NG_BUILD_PARTIAL_SSR']) === true;
+
+const bazelBinDirectory = process.env['BAZEL_BINDIR'];
+const bazelExecRoot = process.env['JS_BINARY__EXECROOT'];
+
+export const bazelEsbuildPluginPath =
+  bazelBinDirectory && bazelExecRoot
+    ? process.env['NG_INTERNAL_ESBUILD_PLUGINS_DO_NOT_USE']
+    : undefined;
