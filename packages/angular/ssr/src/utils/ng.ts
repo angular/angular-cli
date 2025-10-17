@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { LocationStrategy } from '@angular/common';
+import { PlatformLocation } from '@angular/common';
 import {
   ApplicationRef,
   type PlatformRef,
@@ -21,9 +21,9 @@ import {
   platformServer,
   ɵrenderInternal as renderInternal,
 } from '@angular/platform-server';
-import { ActivatedRoute, Router, UrlSerializer } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Console } from '../console';
-import { joinUrlParts, stripIndexHtmlFromURL } from './url';
+import { stripIndexHtmlFromURL, stripTrailingSlash } from './url';
 
 /**
  * Represents the bootstrap mechanism for an Angular application.
@@ -107,16 +107,13 @@ export async function renderAngular(
 
     if (!routerIsProvided) {
       hasNavigationError = false;
-    } else if (lastSuccessfulNavigation?.finalUrl) {
+    } else if (lastSuccessfulNavigation) {
       hasNavigationError = false;
+      const { pathname, search, hash } = envInjector.get(PlatformLocation);
+      const finalUrl = [stripTrailingSlash(pathname), search, hash].join('');
 
-      const urlSerializer = envInjector.get(UrlSerializer);
-      const locationStrategy = envInjector.get(LocationStrategy);
-      const finalUrlSerialized = urlSerializer.serialize(lastSuccessfulNavigation.finalUrl);
-      const finalExternalUrl = joinUrlParts(locationStrategy.getBaseHref(), finalUrlSerialized);
-
-      if (urlToRender.href !== new URL(finalExternalUrl, urlToRender.origin).href) {
-        redirectTo = finalExternalUrl;
+      if (urlToRender.href !== new URL(finalUrl, urlToRender.origin).href) {
+        redirectTo = finalUrl;
       }
     }
 
