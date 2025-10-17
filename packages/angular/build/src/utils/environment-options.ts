@@ -112,3 +112,11 @@ export const useComponentTemplateHmr =
 const partialSsrBuildVariable = process.env['NG_BUILD_PARTIAL_SSR'];
 export const usePartialSsrBuild =
   isPresent(partialSsrBuildVariable) && isEnabled(partialSsrBuildVariable);
+
+const bazelBinDirectory = process.env['BAZEL_BINDIR'];
+const bazelExecRoot = process.env['JS_BINARY__EXECROOT'];
+
+export const bazelEsbuildPluginPath =
+  bazelBinDirectory && bazelExecRoot
+    ? process.env['NG_INTERNAL_ESBUILD_PLUGINS_DO_NOT_USE']
+    : undefined;
