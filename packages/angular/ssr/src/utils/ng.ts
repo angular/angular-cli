@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { APP_BASE_HREF, PlatformLocation } from '@angular/common';
+import { LocationStrategy } from '@angular/common';
 import {
   ApplicationRef,
   type PlatformRef,
@@ -21,7 +21,7 @@ import {
   platformServer,
   ɵrenderInternal as renderInternal,
 } from '@angular/platform-server';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, UrlSerializer } from '@angular/router';
 import { Console } from '../console';
 import { joinUrlParts, stripIndexHtmlFromURL } from './url';
 
@@ -60,12 +60,12 @@ export async function renderAngular(
   serverContext: string,
 ): Promise<{ hasNavigationError: boolean; redirectTo?: string; content: () => Promise<string> }> {
   // A request to `http://www.example.com/page/index.html` will render the Angular route corresponding to `http://www.example.com/page`.
-  const urlToRender = stripIndexHtmlFromURL(url).toString();
+  const urlToRender = stripIndexHtmlFromURL(url);
   const platformRef = platformServer([
     {
       provide: INITIAL_CONFIG,
       useValue: {
-        url: urlToRender,
+        url: urlToRender.href,
         document: html,
       },
     },
@@ -96,31 +96,27 @@ export async function renderAngular(
       applicationRef = await bootstrap({ platformRef });
     }
 
-    const envInjector = applicationRef.injector;
-    const router = envInjector.get(Router);
-    const initialUrl = router.currentNavigation()?.initialUrl.toString();
-
     // Block until application is stable.
     await applicationRef.whenStable();
 
     // TODO(alanagius): Find a way to avoid rendering here especially for redirects as any output will be discarded.
+    const envInjector = applicationRef.injector;
     const routerIsProvided = !!envInjector.get(ActivatedRoute, null);
+    const router = envInjector.get(Router);
     const lastSuccessfulNavigation = router.lastSuccessfulNavigation();
 
     if (!routerIsProvided) {
       hasNavigationError = false;
-    } else if (lastSuccessfulNavigation?.finalUrl && initialUrl !== null) {
+    } else if (lastSuccessfulNavigation?.finalUrl) {
       hasNavigationError = false;
 
-      const { finalUrl } = lastSuccessfulNavigation;
-      const finalUrlStringified = finalUrl.toString();
+      const urlSerializer = envInjector.get(UrlSerializer);
+      const locationStrategy = envInjector.get(LocationStrategy);
+      const finalUrlSerialized = urlSerializer.serialize(lastSuccessfulNavigation.finalUrl);
+      const finalExternalUrl = joinUrlParts(locationStrategy.getBaseHref(), finalUrlSerialized);
 
-      if (initialUrl !== finalUrlStringified) {
-        const baseHref =
-          envInjector.get(APP_BASE_HREF, null, { optional: true }) ??
-          envInjector.get(PlatformLocation).getBaseHrefFromDOM();
-
-        redirectTo = joinUrlParts(baseHref, finalUrlStringified);
+      if (urlToRender.href !== new URL(finalExternalUrl, urlToRender.origin).href) {
+        redirectTo = finalExternalUrl;
       }
     }
 
