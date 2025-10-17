@@ -14,7 +14,7 @@ import { BuildOutputFileType } from '../../tools/esbuild/bundler-context';
 import { createJsonBuildManifest, emitFilesToDisk } from '../../tools/esbuild/utils';
 import { colors as ansiColors } from '../../utils/color';
 import { deleteOutputDir } from '../../utils/delete-output-dir';
-import { useJSONBuildLogs } from '../../utils/environment-options';
+import { bazelEsbuildPluginPath, useJSONBuildLogs } from '../../utils/environment-options';
 import { purgeStaleBuildCache } from '../../utils/purge-cache';
 import { assertCompatibleAngularVersion } from '../../utils/version';
 import { runEsBuildBuildAction } from './build-action';
@@ -54,6 +54,14 @@ export async function* buildApplicationInternal(
     yield { kind: ResultKind.Failure, errors: [] };
 
     return;
+  }
+
+  if (bazelEsbuildPluginPath) {
+    extensions ??= {};
+    extensions.codePlugins ??= [];
+
+    const { default: bazelEsbuildPlugin } = await import(bazelEsbuildPluginPath);
+    extensions.codePlugins.push(bazelEsbuildPlugin);
   }
 
   const normalizedOptions = await normalizeOptions(context, projectName, options, extensions);
