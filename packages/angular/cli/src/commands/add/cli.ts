@@ -8,11 +8,11 @@
 
 import { Listr, ListrRenderer, ListrTaskWrapper, color, figures } from 'listr2';
 import assert from 'node:assert';
-import { promises as fs } from 'node:fs';
+import fs from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import { dirname, join } from 'node:path';
 import npa from 'npm-package-arg';
-import { Range, compare, intersects, prerelease, satisfies, valid } from 'semver';
+import semver, { Range, compare, intersects, prerelease, satisfies, valid } from 'semver';
 import { Argv } from 'yargs';
 import {
   CommandModuleImplementation,
@@ -358,30 +358,27 @@ export default class AddCommandModule
       throw new CommandError('Unable to load package information from registry.');
     }
 
-    // Allow prelease versions if the CLI itself is a prerelease.
-    const allowPrereleases = !!prerelease(VERSION.full);
+    // Allow prelease versions if the CLI itself is a prerelease or locally built.
+    const allowPrereleases = !!prerelease(VERSION.full) || VERSION.full === '0.0.0';
     const potentialVersions = this.#getPotentialVersions(packageMetadata, allowPrereleases);
 
-    let found;
-    for (const version of potentialVersions) {
-      const manifest = await packageManager.getPackageManifest(`${packageName}@${version}`, {
+    // Heuristic-based search: Check the latest release of each major version first.
+    const majorVersions = this.#getMajorVersions(potentialVersions);
+    let found = await this.#findCompatibleVersion(context, majorVersions, {
+      registry,
+      verbose,
+      rejectionReasons,
+    });
+
+    // Exhaustive search: If no compatible major version is found, fall back to checking all versions.
+    if (!found) {
+      const checkedVersions = new Set(majorVersions);
+      const remainingVersions = potentialVersions.filter((v) => !checkedVersions.has(v));
+      found = await this.#findCompatibleVersion(context, remainingVersions, {
         registry,
+        verbose,
+        rejectionReasons,
       });
-      if (!manifest) {
-        continue;
-      }
-
-      const conflicts = await this.getPeerDependencyConflicts(manifest);
-      if (conflicts) {
-        if (verbose || rejectionReasons.length < DEFAULT_CONFLICT_DISPLAY_LIMIT) {
-          rejectionReasons.push(...conflicts);
-        }
-        continue;
-      }
-
-      context.packageIdentifier = npa.resolve(manifest.name, manifest.version);
-      found = manifest;
-      break;
     }
 
     if (!found) {
@@ -403,10 +400,54 @@ export default class AddCommandModule
     }
   }
 
+  async #findCompatibleVersion(
+    context: AddCommandTaskContext,
+    versions: string[],
+    options: {
+      registry?: string;
+      verbose?: boolean;
+      rejectionReasons: string[];
+    },
+  ): Promise<PackageManifest | null> {
+    const { packageManager, packageIdentifier } = context;
+    const { registry, verbose, rejectionReasons } = options;
+    const packageName = packageIdentifier.name;
+    assert(packageName, 'Package name must be defined.');
+
+    for (const version of versions) {
+      const manifest = await packageManager.getPackageManifest(`${packageName}@${version}`, {
+        registry,
+      });
+      if (!manifest) {
+        continue;
+      }
+
+      const conflicts = await this.getPeerDependencyConflicts(manifest);
+      if (conflicts) {
+        if (verbose || rejectionReasons.length < DEFAULT_CONFLICT_DISPLAY_LIMIT) {
+          rejectionReasons.push(...conflicts);
+        }
+        continue;
+      }
+
+      context.packageIdentifier = npa.resolve(manifest.name, manifest.version);
+
+      return manifest;
+    }
+
+    return null;
+  }
+
   #getPotentialVersions(packageMetadata: PackageMetadata, allowPrereleases: boolean): string[] {
     const versionExclusions = packageVersionExclusions[packageMetadata.name];
+    const latestVersion = packageMetadata['dist-tags']['latest'];
 
     const versions = Object.values(packageMetadata.versions).filter((version) => {
+      // Latest tag has already been checked
+      if (latestVersion && version === latestVersion) {
+        return false;
+      }
+
       // Prerelease versions are not stable and should not be considered by default
       if (!allowPrereleases && prerelease(version)) {
         return false;
@@ -422,6 +463,19 @@ export default class AddCommandModule
 
     // Sort in reverse SemVer order so that the newest compatible version is chosen
     return versions.sort((a, b) => compare(b, a, true));
+  }
+
+  #getMajorVersions(versions: string[]): string[] {
+    const majorVersions = new Map<number, string>();
+    for (const version of versions) {
+      const major = semver.major(version);
+      const existing = majorVersions.get(major);
+      if (!existing || semver.gt(version, existing)) {
+        majorVersions.set(major, version);
+      }
+    }
+
+    return [...majorVersions.values()].sort((a, b) => compare(b, a, true));
   }
 
   private async loadPackageInfoTask(
