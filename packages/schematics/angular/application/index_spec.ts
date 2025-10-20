@@ -110,6 +110,19 @@ describe('Application Schematic', () => {
     expect(_extends).toBe('../../tsconfig.json');
   });
 
+  it('should set the right types in the tsconfig.spec.json when testRunner is karma', async () => {
+    const tree = await schematicRunner.runSchematic(
+      'application',
+      { ...defaultOptions, testRunner: 'karma' },
+      workspaceTree,
+    );
+
+    const {
+      compilerOptions: { types },
+    } = readJsonFile(tree, '/projects/foo/tsconfig.spec.json');
+    expect(types).toEqual(['jasmine']);
+  });
+
   it('should add project references in the root tsconfig.json', async () => {
     const tree = await schematicRunner.runSchematic('application', defaultOptions, workspaceTree);
 
@@ -324,6 +337,30 @@ describe('Application Schematic', () => {
       expect(pkg.dependencies['zone.js']).toBeUndefined();
     });
 
+    it('should add karma dependencies when testRunner is karma', async () => {
+      const tree = await schematicRunner.runSchematic(
+        'application',
+        {
+          ...defaultOptions,
+          testRunner: 'karma',
+        },
+        workspaceTree,
+      );
+
+      const pkg = JSON.parse(tree.readContent('/package.json'));
+      expect(pkg.devDependencies['karma']).toEqual(latestVersions['karma']);
+      expect(pkg.devDependencies['karma-chrome-launcher']).toEqual(
+        latestVersions['karma-chrome-launcher'],
+      );
+      expect(pkg.devDependencies['karma-coverage']).toEqual(latestVersions['karma-coverage']);
+      expect(pkg.devDependencies['karma-jasmine']).toEqual(latestVersions['karma-jasmine']);
+      expect(pkg.devDependencies['karma-jasmine-html-reporter']).toEqual(
+        latestVersions['karma-jasmine-html-reporter'],
+      );
+      expect(pkg.devDependencies['jasmine-core']).toEqual(latestVersions['jasmine-core']);
+      expect(pkg.devDependencies['@types/jasmine']).toEqual(latestVersions['@types/jasmine']);
+    });
+
     it(`should not override existing users dependencies`, async () => {
       const oldPackageJson = workspaceTree.readContent('package.json');
       workspaceTree.overwrite(
@@ -391,12 +428,6 @@ describe('Application Schematic', () => {
       expect(buildOpt.assets).toEqual([{ 'glob': '**/*', 'input': 'public' }]);
       expect(buildOpt.polyfills).toBeUndefined();
       expect(buildOpt.tsConfig).toEqual('tsconfig.app.json');
-
-      const testOpt = prj.architect.test.options;
-      expect(testOpt.tsConfig).toEqual('tsconfig.spec.json');
-      expect(testOpt.karmaConfig).toBeUndefined();
-      expect(testOpt.assets).toEqual([{ 'glob': '**/*', 'input': 'public' }]);
-      expect(testOpt.styles).toEqual(['src/styles.css']);
     });
 
     it('should set values in angular.json correctly when using a style preprocessor', async () => {
@@ -407,51 +438,20 @@ describe('Application Schematic', () => {
       const prj = config.projects.foo;
       const buildOpt = prj.architect.build.options;
       expect(buildOpt.styles).toEqual(['src/styles.sass']);
-      const testOpt = prj.architect.test.options;
-      expect(testOpt.styles).toEqual(['src/styles.sass']);
       expect(tree.exists('src/styles.sass')).toBe(true);
     });
 
-    it('sets "inlineStyleLanguage" in angular.json when using a style preprocessor', async () => {
-      const options = { ...defaultOptions, projectRoot: '', style: Style.Sass };
+    it('should set values in angular.json correctly when testRunner is karma', async () => {
+      const options = { ...defaultOptions, projectRoot: '', testRunner: 'karma' as const };
       const tree = await schematicRunner.runSchematic('application', options, workspaceTree);
 
       const config = JSON.parse(tree.readContent('/angular.json'));
       const prj = config.projects.foo;
-
-      const buildOpt = prj.architect.build.options;
-      expect(buildOpt.inlineStyleLanguage).toBe('sass');
-
-      const testOpt = prj.architect.test.options;
-      expect(testOpt.inlineStyleLanguage).toBe('sass');
-    });
-
-    it('does not set "inlineStyleLanguage" in angular.json when not using a style preprocessor', async () => {
-      const options = { ...defaultOptions, projectRoot: '' };
-      const tree = await schematicRunner.runSchematic('application', options, workspaceTree);
-
-      const config = JSON.parse(tree.readContent('/angular.json'));
-      const prj = config.projects.foo;
-
-      const buildOpt = prj.architect.build.options;
-      expect(buildOpt.inlineStyleLanguage).toBeUndefined();
-
-      const testOpt = prj.architect.test.options;
-      expect(testOpt.inlineStyleLanguage).toBeUndefined();
-    });
-
-    it('does not set "inlineStyleLanguage" in angular.json when using CSS styles', async () => {
-      const options = { ...defaultOptions, projectRoot: '', style: Style.Css };
-      const tree = await schematicRunner.runSchematic('application', options, workspaceTree);
-
-      const config = JSON.parse(tree.readContent('/angular.json'));
-      const prj = config.projects.foo;
-
-      const buildOpt = prj.architect.build.options;
-      expect(buildOpt.inlineStyleLanguage).toBeUndefined();
-
-      const testOpt = prj.architect.test.options;
-      expect(testOpt.inlineStyleLanguage).toBeUndefined();
+      const testOpt = prj.architect.test;
+      expect(testOpt.builder).toEqual('@angular/build:karma');
+      expect(testOpt.options.tsConfig).toEqual('tsconfig.spec.json');
+      expect(testOpt.options.assets).toEqual([{ glob: '**/*', input: 'public' }]);
+      expect(testOpt.options.styles).toEqual(['src/styles.css']);
     });
 
     it('should set the relative tsconfig paths', async () => {
@@ -481,12 +481,6 @@ describe('Application Schematic', () => {
       expect(buildOpt.polyfills).toBeUndefined();
       expect(buildOpt.tsConfig).toEqual('foo/tsconfig.app.json');
       expect(buildOpt.assets).toEqual([{ 'glob': '**/*', 'input': 'foo/public' }]);
-
-      const testOpt = project.architect.test.options;
-      expect(testOpt.tsConfig).toEqual('foo/tsconfig.spec.json');
-      expect(testOpt.karmaConfig).toBeUndefined();
-      expect(testOpt.assets).toEqual([{ 'glob': '**/*', 'input': 'foo/public' }]);
-      expect(testOpt.styles).toEqual(['foo/src/styles.css']);
 
       const appTsConfig = readJsonFile(tree, '/foo/tsconfig.app.json');
       expect(appTsConfig.extends).toEqual('../tsconfig.json');

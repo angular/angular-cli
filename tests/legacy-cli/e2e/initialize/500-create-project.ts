@@ -24,6 +24,8 @@ export default async function () {
       'new',
       'test-project',
       '--skip-install',
+      '--test-runner',
+      'karma',
       '--package-manager',
       getActivePackageManager(),
     );

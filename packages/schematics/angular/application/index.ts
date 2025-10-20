@@ -132,6 +132,7 @@ export default function (options: ApplicationOptions): Rule {
             appName: options.name,
             folderName,
             suffix,
+            testRunner: options.testRunner,
           }),
           move(appDir),
         ]),
@@ -181,6 +182,65 @@ function addDependenciesToPackageJson(options: ApplicationOptions): Rule {
         install: options.skipInstall ? InstallBehavior.None : InstallBehavior.Auto,
       }),
     );
+  }
+
+  if (!options.skipTests) {
+    if (options.testRunner === 'vitest') {
+      rules.push(
+        addDependency('vitest', latestVersions['vitest'], {
+          type: DependencyType.Dev,
+          existing: ExistingBehavior.Skip,
+          install: options.skipInstall ? InstallBehavior.None : InstallBehavior.Auto,
+        }),
+        addDependency('jsdom', latestVersions['jsdom'], {
+          type: DependencyType.Dev,
+          existing: ExistingBehavior.Skip,
+          install: options.skipInstall ? InstallBehavior.None : InstallBehavior.Auto,
+        }),
+      );
+    } else {
+      rules.push(
+        addDependency('karma', latestVersions['karma'], {
+          type: DependencyType.Dev,
+          existing: ExistingBehavior.Skip,
+          install: options.skipInstall ? InstallBehavior.None : InstallBehavior.Auto,
+        }),
+        addDependency('karma-chrome-launcher', latestVersions['karma-chrome-launcher'], {
+          type: DependencyType.Dev,
+          existing: ExistingBehavior.Skip,
+          install: options.skipInstall ? InstallBehavior.None : InstallBehavior.Auto,
+        }),
+        addDependency('karma-coverage', latestVersions['karma-coverage'], {
+          type: DependencyType.Dev,
+          existing: ExistingBehavior.Skip,
+          install: options.skipInstall ? InstallBehavior.None : InstallBehavior.Auto,
+        }),
+        addDependency('karma-jasmine', latestVersions['karma-jasmine'], {
+          type: DependencyType.Dev,
+          existing: ExistingBehavior.Skip,
+          install: options.skipInstall ? InstallBehavior.None : InstallBehavior.Auto,
+        }),
+        addDependency(
+          'karma-jasmine-html-reporter',
+          latestVersions['karma-jasmine-html-reporter'],
+          {
+            type: DependencyType.Dev,
+            existing: ExistingBehavior.Skip,
+            install: options.skipInstall ? InstallBehavior.None : InstallBehavior.Auto,
+          },
+        ),
+        addDependency('jasmine-core', latestVersions['jasmine-core'], {
+          type: DependencyType.Dev,
+          existing: ExistingBehavior.Skip,
+          install: options.skipInstall ? InstallBehavior.None : InstallBehavior.Auto,
+        }),
+        addDependency('@types/jasmine', latestVersions['@types/jasmine'], {
+          type: DependencyType.Dev,
+          existing: ExistingBehavior.Skip,
+          install: options.skipInstall ? InstallBehavior.None : InstallBehavior.Auto,
+        }),
+      );
+    }
   }
 
   return chain(rules);
@@ -327,18 +387,24 @@ function addAppToWorkspaceFile(options: ApplicationOptions, appDir: string): Rul
           },
         },
       },
-      test: options.minimal
-        ? undefined
-        : {
-            builder: Builders.BuildKarma,
-            options: {
-              polyfills: options.zoneless ? undefined : ['zone.js', 'zone.js/testing'],
-              tsConfig: `${projectRoot}tsconfig.spec.json`,
-              inlineStyleLanguage,
-              assets: [{ 'glob': '**/*', 'input': `${projectRoot}public` }],
-              styles: [`${sourceRoot}/styles.${options.style}`],
-            },
-          },
+      test:
+        options.skipTests || options.minimal
+          ? undefined
+          : options.testRunner === 'vitest'
+            ? {
+                builder: Builders.BuildUnitTest,
+                options: {},
+              }
+            : {
+                builder: Builders.BuildKarma,
+                options: {
+                  polyfills: options.zoneless ? undefined : ['zone.js', 'zone.js/testing'],
+                  tsConfig: `${projectRoot}tsconfig.spec.json`,
+                  inlineStyleLanguage,
+                  assets: [{ 'glob': '**/*', 'input': `${projectRoot}public` }],
+                  styles: [`${sourceRoot}/styles.${options.style}`],
+                },
+              },
     },
   };
 

@@ -11,7 +11,7 @@ export default async function () {
 
   await silentGit('init', '.');
 
-  await ng('new', 'subdirectory-test-project', '--skip-install');
+  await ng('new', 'subdirectory-test-project', '--skip-install', '--test-runner', 'karma');
   process.chdir('./subdirectory-test-project');
   await prepareProjectForE2e('subdirectory-test-project');
 

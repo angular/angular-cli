@@ -158,6 +158,32 @@ describe('Ng New Schematic', () => {
     expect(schematics['@schematics/angular:resolver'].typeSeparator).toBe('.');
   });
 
+  it(`should set 'testRunner' to 'karma'`, async () => {
+    const options = { ...defaultOptions, testRunner: 'karma' as const };
+    const tree = await schematicRunner.runSchematic('ng-new', options);
+
+    const {
+      projects: {
+        'foo': {
+          architect: { test },
+        },
+      },
+    } = JSON.parse(tree.readContent('/bar/angular.json'));
+    expect(test.builder).toBe('@angular/build:karma');
+
+    const { devDependencies } = JSON.parse(tree.readContent('/bar/package.json'));
+    expect(devDependencies['karma']).toBeDefined();
+    expect(devDependencies['jasmine-core']).toBeDefined();
+  });
+
+  it(`should set 'testRunner' to 'karma' in workspace schematic options`, async () => {
+    const options = { ...defaultOptions, testRunner: 'karma' as const };
+    const tree = await schematicRunner.runSchematic('ng-new', options);
+
+    const { schematics } = JSON.parse(tree.readContent('/bar/angular.json'));
+    expect(schematics['@schematics/angular:application'].testRunner).toBe('karma');
+  });
+
   it(`should not add type to class name when file name style guide is '2016'`, async () => {
     const options = { ...defaultOptions, fileNameStyleGuide: '2016' };
 
