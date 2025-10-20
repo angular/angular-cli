@@ -58,6 +58,7 @@ ts_project(
         ":node_modules/jsonc-parser",
         ":node_modules/npm-package-arg",
         ":node_modules/pacote",
+        ":node_modules/parse5-html-rewriting-stream",
         ":node_modules/resolve",
         ":node_modules/yargs",
         ":node_modules/zod",
