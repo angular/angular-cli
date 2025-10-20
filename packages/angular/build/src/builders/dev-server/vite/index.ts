@@ -130,9 +130,11 @@ export async function* serveWithVite(
     browserOptions.forceI18nFlatOutput = true;
   }
 
-  const { vendor: thirdPartySourcemaps, scripts: scriptsSourcemaps } = normalizeSourceMaps(
-    browserOptions.sourceMap ?? false,
-  );
+  const {
+    vendor: thirdPartySourcemaps,
+    scripts: scriptsSourcemaps,
+    styles: stylesSourceMap,
+  } = normalizeSourceMaps(browserOptions.sourceMap ?? false);
 
   if (scriptsSourcemaps && browserOptions.server) {
     // https://nodejs.org/api/process.html#processsetsourcemapsenabledval
@@ -441,6 +443,7 @@ export async function* serveWithVite(
         },
         extensions?.middleware,
         transformers?.indexHtml,
+        scriptsSourcemaps || stylesSourceMap,
         thirdPartySourcemaps,
       );
 

@@ -10,3 +10,4 @@ export { createAngularMemoryPlugin } from './angular-memory-plugin';
 export { createRemoveIdPrefixPlugin } from './id-prefix-plugin';
 export { createAngularSetupMiddlewaresPlugin, ServerSsrMode } from './setup-middlewares-plugin';
 export { createAngularSsrTransformPlugin } from './ssr-transform-plugin';
+export { removeSourceMapsPlugin } from './remove-sourcemaps';
