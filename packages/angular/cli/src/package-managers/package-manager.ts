@@ -35,6 +35,7 @@ const METADATA_FIELDS = ['name', 'dist-tags', 'versions', 'time'] as const;
 const MANIFEST_FIELDS = [
   'name',
   'version',
+  'deprecated',
   'dependencies',
   'peerDependencies',
   'devDependencies',
@@ -337,7 +338,7 @@ export class PackageManager {
     return this.#fetchAndParse(
       commandArgs,
       (stdout, logger) => this.descriptor.outputParsers.getRegistryMetadata(stdout, logger),
-      { ...options, cache: this.#metadataCache, cacheKey: packageName },
+      { ...options, cache: this.#metadataCache, cacheKey },
     );
   }
 
@@ -369,7 +370,7 @@ export class PackageManager {
     return this.#fetchAndParse(
       commandArgs,
       (stdout, logger) => this.descriptor.outputParsers.getPackageManifest(stdout, logger),
-      { ...options, cache: this.#manifestCache, cacheKey: specifier },
+      { ...options, cache: this.#manifestCache, cacheKey },
     );
   }
 

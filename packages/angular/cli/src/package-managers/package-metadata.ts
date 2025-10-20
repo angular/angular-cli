@@ -80,6 +80,9 @@ export interface PackageManifest {
   /** The version of the package. */
   version: string;
 
+  /** A message indicating that the package version is deprecated. */
+  deprecated?: string;
+
   /** A mapping of production dependencies. */
   dependencies?: Record<string, string>;
 
