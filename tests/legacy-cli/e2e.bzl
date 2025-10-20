@@ -129,7 +129,11 @@ def _e2e_tests(name, runner, toolchain, **kwargs):
         tags = tags,
         toolchains = toolchains,
         node_toolchain = toolchain,
-        include_npm = False,
+        include_npm = select({
+            # TODO(alanagius): check why on windows this fails.
+            "@platforms//os:windows": False,
+            "//conditions:default": True,
+        }),
         **kwargs
     )
 
