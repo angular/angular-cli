@@ -504,6 +504,9 @@ importers:
       pacote:
         specifier: 21.0.3
         version: 21.0.3
+      parse5-html-rewriting-stream:
+        specifier: 8.0.0
+        version: 8.0.0
       resolve:
         specifier: 1.22.10
         version: 1.22.10
