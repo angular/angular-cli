@@ -34,14 +34,7 @@
   },
   "devDependencies": {
     "@angular/cli": "<%= '^' + version %>",
-    "@angular/compiler-cli": "<%= latestVersions.Angular %>",<% if (!minimal) { %>
-    "@types/jasmine": "<%= latestVersions['@types/jasmine'] %>",
-    "jasmine-core": "<%= latestVersions['jasmine-core'] %>",
-    "karma": "<%= latestVersions['karma'] %>",
-    "karma-chrome-launcher": "<%= latestVersions['karma-chrome-launcher'] %>",
-    "karma-coverage": "<%= latestVersions['karma-coverage'] %>",
-    "karma-jasmine": "<%= latestVersions['karma-jasmine'] %>",
-    "karma-jasmine-html-reporter": "<%= latestVersions['karma-jasmine-html-reporter'] %>",<% } %>
+    "@angular/compiler-cli": "<%= latestVersions.Angular %>",
     "typescript": "<%= latestVersions['typescript'] %>"
   }
 }

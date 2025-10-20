@@ -27,6 +27,7 @@ export enum Builders {
   BrowserEsbuild = '@angular-devkit/build-angular:browser-esbuild',
   Karma = '@angular-devkit/build-angular:karma',
   BuildKarma = '@angular/build:karma',
+  BuildUnitTest = '@angular/build:unit-test',
   TsLint = '@angular-devkit/build-angular:tslint',
   NgPackagr = '@angular-devkit/build-angular:ng-packagr',
   BuildNgPackagr = '@angular/build:ng-packagr',

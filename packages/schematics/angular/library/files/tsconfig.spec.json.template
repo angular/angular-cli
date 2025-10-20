@@ -5,7 +5,7 @@
   "compilerOptions": {
     "outDir": "<%= relativePathToWorkspaceRoot %>/out-tsc/spec",
     "types": [
-      "jasmine"
+      "<%= testTypesPackage %>"
     ]
   },
   "include": [

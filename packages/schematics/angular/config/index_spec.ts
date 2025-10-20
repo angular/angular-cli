@@ -50,6 +50,12 @@ describe('Config Schematic', () => {
       defaultAppOptions,
       workspaceTree,
     );
+
+    // Set builder to a karma builder for testing purposes
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const angularJson = applicationTree.readJson('angular.json') as any;
+    angularJson['projects']['foo']['architect']['test']['builder'] = '@angular/build:karma';
+    applicationTree.overwrite('angular.json', JSON.stringify(angularJson));
   });
 
   describe(`when 'type' is 'karma'`, () => {

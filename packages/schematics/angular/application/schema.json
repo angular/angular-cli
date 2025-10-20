@@ -89,6 +89,12 @@
       "default": false,
       "alias": "S"
     },
+    "testRunner": {
+      "description": "The unit testing runner to use.",
+      "type": "string",
+      "enum": ["vitest", "karma"],
+      "default": "vitest"
+    },
     "skipPackageJson": {
       "type": "boolean",
       "default": false,

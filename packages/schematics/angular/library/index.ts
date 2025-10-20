@@ -91,6 +91,7 @@ function addLibToWorkspaceFile(
   projectRoot: string,
   projectName: string,
   hasZoneDependency: boolean,
+  hasVitest: boolean,
 ): Rule {
   return updateWorkspace((workspace) => {
     workspace.projects.add({
@@ -112,13 +113,20 @@ function addLibToWorkspaceFile(
             },
           },
         },
-        test: {
-          builder: Builders.BuildKarma,
-          options: {
-            tsConfig: `${projectRoot}/tsconfig.spec.json`,
-            polyfills: hasZoneDependency ? ['zone.js', 'zone.js/testing'] : undefined,
-          },
-        },
+        test: hasVitest
+          ? {
+              builder: Builders.BuildUnitTest,
+              options: {
+                tsConfig: `${projectRoot}/tsconfig.spec.json`,
+              },
+            }
+          : {
+              builder: Builders.BuildKarma,
+              options: {
+                tsConfig: `${projectRoot}/tsconfig.spec.json`,
+                polyfills: hasZoneDependency ? ['zone.js', 'zone.js/testing'] : undefined,
+              },
+            },
       },
     });
   });
@@ -150,6 +158,7 @@ export default function (options: LibraryOptions): Rule {
 
     const distRoot = `dist/${folderName}`;
     const sourceDir = `${libDir}/src/lib`;
+    const hasVitest = getDependency(host, 'vitest') !== null;
 
     const templateSource = apply(url('./files'), [
       applyTemplates({
@@ -163,6 +172,7 @@ export default function (options: LibraryOptions): Rule {
         angularLatestVersion: latestVersions.Angular.replace(/~|\^/, ''),
         tsLibLatestVersion: latestVersions['tslib'].replace(/~|\^/, ''),
         folderName,
+        testTypesPackage: hasVitest ? 'vitest/globals' : 'jasmine',
       }),
       move(libDir),
     ]);
@@ -171,7 +181,7 @@ export default function (options: LibraryOptions): Rule {
 
     return chain([
       mergeWith(templateSource),
-      addLibToWorkspaceFile(options, libDir, packageName, hasZoneDependency),
+      addLibToWorkspaceFile(options, libDir, packageName, hasZoneDependency, hasVitest),
       options.skipPackageJson ? noop() : addDependenciesToPackageJson(!!options.skipInstall),
       options.skipTsConfig ? noop() : updateTsConfig(packageName, './' + distRoot),
       options.skipTsConfig

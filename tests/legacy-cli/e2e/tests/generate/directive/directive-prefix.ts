@@ -17,7 +17,9 @@ export default function () {
       )
       .then(() => ng('generate', 'directive', 'test2-directive'))
       .then(() => expectFileToMatch(join(directiveDir, 'test2-directive.ts'), /selector: '\[preW/))
-      .then(() => ng('generate', 'application', 'app-two', '--skip-install'))
+      .then(() =>
+        ng('generate', 'application', 'app-two', '--skip-install', '--test-runner', 'karma'),
+      )
       .then(() => useCIDefaults('app-two'))
       .then(() => useCIChrome('app-two', './projects/app-two'))
       .then(() =>
