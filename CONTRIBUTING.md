@@ -301,15 +301,3 @@ changes to be accepted, the CLA must be signed. It's a quick process, we promise
 [js-style-guide]: https://google.github.io/styleguide/jsguide.html
 [stackoverflow]: https://stackoverflow.com/questions/tagged/angular-devkit
 
-## <a name="public-api"></a> Updating the Public API
-Our Public API surface is tracked using golden files.
-
-You check all golden files by running:
-```bash
-pnpm public-api:check
-```
-
-If you modified the public API, the test will fail. To update the golden files you need to run:
-```bash
-pnpm public-api:update
-```

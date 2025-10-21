@@ -14,9 +14,17 @@
 
 import { BuiltPackage } from '@angular/ng-dev';
 import { execSync } from 'node:child_process';
-import { chmodSync, copyFileSync, mkdirSync, rmSync } from 'node:fs';
+import {
+  chmodSync,
+  copyFileSync,
+  cpSync,
+  existsSync,
+  lstatSync,
+  mkdirSync,
+  readdirSync,
+  rmSync,
+} from 'node:fs';
 import { dirname, join } from 'node:path';
-import sh from 'shelljs';
 
 /** Name of the Bazel tag that will be used to find release package targets. */
 const releaseTargetTag = 'release-package';
@@ -89,14 +97,15 @@ function buildReleasePackages(
     // Archive output is created by the npm_package_archive target
     const archiveOutputPath = directoryOutputPath + '_archive.tgz';
 
-    if (sh.test('-d', directoryOutputPath)) {
-      sh.chmod('-R', 'u+w', directoryOutputPath);
-      sh.rm('-rf', directoryOutputPath);
+    if (existsSync(directoryOutputPath)) {
+      chmodRecursiveSync(directoryOutputPath, '0755');
+      rmSync(directoryOutputPath, { recursive: true, force: true });
     }
-    try {
+
+    if (existsSync(archiveOutputPath)) {
       chmodSync(archiveOutputPath, '0755');
       rmSync(archiveOutputPath, { force: true });
-    } catch {}
+    }
   });
 
   // Build both the npm_package and npm_package_archive targets for each package
@@ -123,8 +132,8 @@ function buildReleasePackages(
     mkdirSync(dirname(targetFolder), { recursive: true });
 
     // Copy package contents to target directory
-    sh.cp('-R', directoryOutputPath, targetFolder);
-    sh.chmod('-R', 'u+w', targetFolder);
+    cpSync(directoryOutputPath, targetFolder, { recursive: true });
+    chmodRecursiveSync(targetFolder, '0755');
 
     // Copy archive of package to target directory
     const archiveTargetPath = join(distPath, `${pkgName.replace('/', '_')}.tgz`);
@@ -174,5 +183,27 @@ function exec(command: string, captureStdout?: true) {
     process.stdout.write(stdout);
 
     return stdout.toString().trim();
+  }
+}
+
+/**
+ * Recursively changes the permissions (mode) of a directory and all its contents (files and subdirectories).
+ * @param startPath The starting directory path.
+ * @param mode The new permissions mode (e.g., 0755).
+ */
+function chmodRecursiveSync(startPath: string, mode: string): void {
+  chmodSync(startPath, mode);
+
+  const files = readdirSync(startPath);
+
+  for (const file of files) {
+    const filePath = join(startPath, file);
+    const stat = lstatSync(filePath);
+
+    if (stat.isDirectory()) {
+      chmodRecursiveSync(filePath, mode);
+    } else {
+      chmodSync(filePath, mode);
+    }
   }
 }
