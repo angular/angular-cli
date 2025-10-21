@@ -339,11 +339,11 @@ function queryDatabase(db: DatabaseSync, input: FindExampleInput) {
   // Build the query dynamically
   const params: SQLInputValue[] = [];
   let sql =
-    'SELECT title, summary, keywords, required_packages, related_concepts, related_tools, content, ' +
+    `SELECT e.title, e.summary, e.keywords, e.required_packages, e.related_concepts, e.related_tools, e.content, ` +
     // The `snippet` function generates a contextual snippet of the matched text.
     // Column 6 is the `content` column. We highlight matches with asterisks and limit the snippet size.
     "snippet(examples_fts, 6, '**', '**', '...', 15) AS snippet " +
-    'FROM examples_fts';
+    'FROM examples e JOIN examples_fts ON e.id = examples_fts.rowid';
   const whereClauses = [];
 
   // FTS query
@@ -356,7 +356,7 @@ function queryDatabase(db: DatabaseSync, input: FindExampleInput) {
   const addJsonFilter = (column: string, values: string[] | undefined) => {
     if (values?.length) {
       for (const value of values) {
-        whereClauses.push(`${column} LIKE ?`);
+        whereClauses.push(`e.${column} LIKE ?`);
         params.push(`%"${value}"%`);
       }
     }
@@ -367,7 +367,7 @@ function queryDatabase(db: DatabaseSync, input: FindExampleInput) {
   addJsonFilter('related_concepts', related_concepts);
 
   if (!includeExperimental) {
-    whereClauses.push('experimental = 0');
+    whereClauses.push('e.experimental = 0');
   }
 
   if (whereClauses.length > 0) {
