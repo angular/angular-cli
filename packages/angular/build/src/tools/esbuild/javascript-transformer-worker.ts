@@ -10,7 +10,6 @@ import { type PluginItem, transformAsync } from '@babel/core';
 import fs from 'node:fs';
 import path from 'node:path';
 import Piscina from 'piscina';
-import { loadEsmModule } from '../../utils/load-esm';
 
 interface JavaScriptTransformRequest {
   filename: string;
@@ -133,11 +132,8 @@ async function requiresLinking(path: string, source: string): Promise<boolean> {
 }
 
 async function createLinkerPlugin(options: Omit<JavaScriptTransformRequest, 'filename' | 'data'>) {
-  linkerPluginCreator ??= (
-    await loadEsmModule<typeof import('@angular/compiler-cli/linker/babel')>(
-      '@angular/compiler-cli/linker/babel',
-    )
-  ).createEs2015LinkerPlugin;
+  linkerPluginCreator ??= (await import('@angular/compiler-cli/linker/babel'))
+    .createEs2015LinkerPlugin;
 
   const linkerPlugin = linkerPluginCreator({
     linkerJitMode: options.jit,

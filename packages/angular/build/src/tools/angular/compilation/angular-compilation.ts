@@ -9,7 +9,6 @@
 import type ng from '@angular/compiler-cli';
 import type { PartialMessage } from 'esbuild';
 import type ts from 'typescript';
-import { loadEsmModule } from '../../../utils/load-esm';
 import { convertTypeScriptDiagnostic } from '../../esbuild/angular/diagnostics';
 import { profileAsync, profileSync } from '../../esbuild/profiling';
 import type { AngularHostOptions } from '../angular-host';
@@ -33,10 +32,7 @@ export abstract class AngularCompilation {
   static #typescriptModule?: typeof ts;
 
   static async loadCompilerCli(): Promise<typeof ng> {
-    // This uses a wrapped dynamic import to load `@angular/compiler-cli` which is ESM.
-    // Once TypeScript provides support for retaining dynamic imports this workaround can be dropped.
-    AngularCompilation.#angularCompilerCliModule ??=
-      await loadEsmModule<typeof ng>('@angular/compiler-cli');
+    AngularCompilation.#angularCompilerCliModule ??= await import('@angular/compiler-cli');
 
     return AngularCompilation.#angularCompilerCliModule;
   }

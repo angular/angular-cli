@@ -7,7 +7,6 @@
  */
 
 import * as nodePath from 'node:path';
-import { loadEsmModule } from '../../utils/load-esm';
 
 // Extract loader source map parameter type since it is not exported directly
 type LoaderSourceMap = Parameters<import('webpack').LoaderDefinitionFunction>[1];
@@ -46,17 +45,10 @@ async function extract(
   map: string | LoaderSourceMap | undefined,
   options: LocalizeExtractLoaderOptions,
 ) {
-  // Try to load the `@angular/localize` message extractor.
-  // All the localize usages are setup to first try the ESM entry point then fallback to the deep imports.
-  // This provides interim compatibility while the framework is transitioned to bundled ESM packages.
   let MessageExtractor;
   try {
-    // Load ESM `@angular/localize/tools` using the TypeScript dynamic import workaround.
-    // Once TypeScript provides support for keeping the dynamic import this workaround can be
-    // changed to a direct dynamic import.
-    const localizeToolsModule =
-      await loadEsmModule<typeof import('@angular/localize/tools')>('@angular/localize/tools');
-    MessageExtractor = localizeToolsModule.MessageExtractor;
+    const { MessageExtractor: MsgExtractor } = await import('@angular/localize/tools');
+    MessageExtractor = MsgExtractor;
   } catch {
     throw new Error(
       `Unable to load message extractor. Please ensure '@angular/localize' is installed.`,

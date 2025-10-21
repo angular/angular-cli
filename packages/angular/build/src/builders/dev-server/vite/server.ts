@@ -19,7 +19,6 @@ import {
 } from '../../../tools/vite/plugins';
 import { EsbuildLoaderOption, getDepOptimizationConfig } from '../../../tools/vite/utils';
 import { loadProxyConfiguration } from '../../../utils';
-import { loadEsmModule } from '../../../utils/load-esm';
 import { type ApplicationBuilderInternalOptions, JavaScriptTransformer } from '../internal';
 import type { NormalizedDevServerOptions } from '../options';
 import { DevServerExternalResultMetadata, OutputAssetRecord, OutputFileRecord } from './utils';
@@ -152,8 +151,7 @@ export async function setupServer(
   indexHtmlTransformer?: (content: string) => Promise<string>,
   thirdPartySourcemaps = false,
 ): Promise<InlineConfig> {
-  // dynamically import Vite for ESM compatibility
-  const { normalizePath } = await loadEsmModule<typeof import('vite')>('vite');
+  const { normalizePath } = await import('vite');
 
   // Path will not exist on disk and only used to provide separate path for Vite requests
   const virtualProjectRoot = normalizePath(

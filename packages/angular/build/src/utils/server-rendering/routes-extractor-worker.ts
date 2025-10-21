@@ -28,6 +28,10 @@ const { outputMode, hasSsrEntry } = workerData as {
 
 /** Renders an application based on a provided options. */
 async function extractRoutes(): Promise<RoutersExtractorWorkerResult> {
+  // Load the compiler because `@angular/ssr/node` depends on `@angular/` packages,
+  // which must be processed by the runtime linker, even if they are not used.
+  await import('@angular/compiler');
+
   const serverURL = outputMode !== undefined && hasSsrEntry ? await launchServer() : DEFAULT_URL;
 
   patchFetchToLoadInMemoryAssets(serverURL);

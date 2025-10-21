@@ -10,7 +10,6 @@ import type { Diagnostics } from '@angular/localize/tools';
 import type { BuilderContext, BuilderOutput } from '@angular-devkit/architect';
 import fs from 'node:fs';
 import path from 'node:path';
-import { loadEsmModule } from '../../utils/load-esm';
 import { assertCompatibleAngularVersion } from '../../utils/version';
 import type { ApplicationBuilderExtensions } from '../application/options';
 import { normalizeOptions } from './options';
@@ -51,8 +50,7 @@ export async function execute(
   // The package is a peer dependency and might not be present
   let localizeToolsModule;
   try {
-    localizeToolsModule =
-      await loadEsmModule<typeof import('@angular/localize/tools')>('@angular/localize/tools');
+    localizeToolsModule = await import('@angular/localize/tools');
   } catch {
     return {
       success: false,

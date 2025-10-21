@@ -8,9 +8,9 @@
 
 import assert from 'node:assert';
 import { randomUUID } from 'node:crypto';
+import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { JavaScriptTransformer } from '../../../tools/esbuild/javascript-transformer';
 
 /**
  * @note For some unknown reason, setting `globalThis.ngServerMode = true` does not work when using ESM loader hooks.
@@ -31,14 +31,6 @@ export interface ESMInMemoryFileLoaderWorkerData {
 
 let memoryVirtualRootUrl: string;
 let outputFiles: Record<string, string>;
-
-const javascriptTransformer = new JavaScriptTransformer(
-  // Always enable JIT linking to support applications built with and without AOT.
-  // In a development environment the additional scope information does not
-  // have a negative effect unlike production where final output size is relevant.
-  { sourcemap: true, jit: true },
-  1,
-);
 
 export function initialize(data: ESMInMemoryFileLoaderWorkerData) {
   // This path does not actually exist but is used to overlay the in memory files with the
@@ -137,7 +129,7 @@ export async function load(url: string, context: { format?: string | null }, nex
   // need linking are ESM only.
   if (format === 'module' && isFileProtocol(url)) {
     const filePath = fileURLToPath(url);
-    let source = await javascriptTransformer.transformFile(filePath);
+    let source = await readFile(filePath);
 
     if (filePath.includes('@angular/')) {
       // Prepend 'var ngServerMode=true;' to the source.
@@ -158,11 +150,3 @@ export async function load(url: string, context: { format?: string | null }, nex
 function isFileProtocol(url: string): boolean {
   return url.startsWith('file://');
 }
-
-function handleProcessExit(): void {
-  void javascriptTransformer.close();
-}
-
-process.once('exit', handleProcessExit);
-process.once('SIGINT', handleProcessExit);
-process.once('uncaughtException', handleProcessExit);

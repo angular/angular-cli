@@ -7,15 +7,16 @@
  */
 
 import { createRequire } from 'node:module';
+import type { BrowserBuiltinProvider, BrowserConfigOptions } from 'vitest/node';
 
 export interface BrowserConfiguration {
-  browser?: import('vitest/node').BrowserConfigOptions;
+  browser?: BrowserConfigOptions;
   errors?: string[];
 }
 
 function findBrowserProvider(
   projectResolver: NodeJS.RequireResolve,
-): import('vitest/node').BrowserBuiltinProvider | undefined {
+): BrowserBuiltinProvider | undefined {
   // One of these must be installed in the project to use browser testing
   const vitestBuiltinProviders = ['playwright', 'webdriverio'] as const;
 
@@ -87,7 +88,7 @@ export function setupBrowserConfiguration(
   const isCI = !!process.env['CI'];
   const headless = isCI || browsers.some((name) => name.toLowerCase().includes('headless'));
 
-  const browser = {
+  const browser: BrowserConfigOptions = {
     enabled: true,
     provider,
     headless,
@@ -96,7 +97,7 @@ export function setupBrowserConfiguration(
     instances: browsers.map((browserName) => ({
       browser: normalizeBrowserName(browserName),
     })),
-  } satisfies import('vitest/node').BrowserConfigOptions;
+  };
 
   return { browser };
 }

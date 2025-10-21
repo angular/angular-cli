@@ -9,11 +9,11 @@
 import { assertCompatibleAngularVersion, purgeStaleBuildCache } from '@angular/build/private';
 import type { Diagnostics } from '@angular/localize/tools';
 import type { BuilderContext, BuilderOutput } from '@angular-devkit/architect';
+import assert from 'node:assert';
 import fs from 'node:fs';
 import path from 'node:path';
 import type webpack from 'webpack';
 import type { ExecutionTransformer } from '../../transforms';
-import { loadEsmModule } from '../../utils/load-esm';
 import { normalizeOptions } from './options';
 import { Schema as ExtractI18nBuilderOptions, Format } from './schema';
 
@@ -52,10 +52,9 @@ export async function execute(
 
   // Load the Angular localize package.
   // The package is a peer dependency and might not be present
-  let localizeToolsModule;
+  let localizeToolsModule: typeof import('@angular/localize/tools');
   try {
-    localizeToolsModule =
-      await loadEsmModule<typeof import('@angular/localize/tools')>('@angular/localize/tools');
+    localizeToolsModule = await import('@angular/localize/tools');
   } catch {
     return {
       success: false,
@@ -138,6 +137,9 @@ export async function execute(
     extractionResult.useLegacyIds,
     diagnostics,
   );
+
+  assert(serializer);
+
   const content = serializer.serialize(extractionResult.messages);
 
   // Ensure directory exists

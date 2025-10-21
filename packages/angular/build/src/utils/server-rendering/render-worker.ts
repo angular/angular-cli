@@ -52,6 +52,10 @@ async function renderPage({ url }: RenderOptions): Promise<string | null> {
 }
 
 async function initialize() {
+  // Load the compiler because `@angular/ssr/node` depends on `@angular/` packages,
+  // which must be processed by the runtime linker, even if they are not used.
+  await import('@angular/compiler');
+
   if (outputMode !== undefined && hasSsrEntry) {
     serverURL = await launchServer();
   }

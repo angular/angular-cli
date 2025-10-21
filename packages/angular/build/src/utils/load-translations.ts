@@ -9,7 +9,6 @@
 import type { Diagnostics } from '@angular/localize/tools';
 import { createHash } from 'node:crypto';
 import * as fs from 'node:fs';
-import { loadEsmModule } from './load-esm';
 
 export type TranslationLoader = (path: string) => {
   translations: Record<string, import('@angular/localize').ɵParsedTranslation>;
@@ -62,7 +61,7 @@ async function importParsers() {
       Xliff1TranslationParser,
       Xliff2TranslationParser,
       XtbTranslationParser,
-    } = await loadEsmModule<typeof import('@angular/localize/tools')>('@angular/localize/tools');
+    } = await import('@angular/localize/tools');
 
     const diagnostics = new Diagnostics();
     const parsers = {

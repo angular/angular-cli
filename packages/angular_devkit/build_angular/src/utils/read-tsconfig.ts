@@ -8,7 +8,6 @@
 
 import type { ParsedConfiguration } from '@angular/compiler-cli';
 import * as path from 'node:path';
-import { loadEsmModule } from './load-esm';
 
 /**
  * Reads and parses a given TsConfig file.
@@ -23,11 +22,7 @@ export async function readTsconfig(
 ): Promise<ParsedConfiguration> {
   const tsConfigFullPath = workspaceRoot ? path.resolve(workspaceRoot, tsconfigPath) : tsconfigPath;
 
-  // Load ESM `@angular/compiler-cli` using the TypeScript dynamic import workaround.
-  // Once TypeScript provides support for keeping the dynamic import this workaround can be
-  // changed to a direct dynamic import.
-  const { formatDiagnostics, readConfiguration } =
-    await loadEsmModule<typeof import('@angular/compiler-cli')>('@angular/compiler-cli');
+  const { formatDiagnostics, readConfiguration } = await import('@angular/compiler-cli');
 
   const configResult = readConfiguration(tsConfigFullPath);
   if (configResult.errors && configResult.errors.length) {

@@ -9,7 +9,6 @@
 import { Readable } from 'node:stream';
 import { pipeline } from 'node:stream/promises';
 import type { RewritingStream } from 'parse5-html-rewriting-stream';
-import { loadEsmModule } from '../load-esm';
 
 // Export helper types for the rewriter
 export type StartTag = Parameters<RewritingStream['emitStartTag']>[0];
@@ -20,9 +19,7 @@ export async function htmlRewritingStream(content: string): Promise<{
   rewriter: RewritingStream;
   transformedContent: () => Promise<string>;
 }> {
-  const { RewritingStream } = await loadEsmModule<typeof import('parse5-html-rewriting-stream')>(
-    'parse5-html-rewriting-stream',
-  );
+  const { RewritingStream } = await import('parse5-html-rewriting-stream');
   const rewriter = new RewritingStream();
 
   return {

@@ -19,7 +19,6 @@ import {
 import { SubresourceIntegrityPlugin } from 'webpack-subresource-integrity';
 import { WebpackConfigOptions } from '../../../utils/build-options';
 import { allowMangle } from '../../../utils/environment-options';
-import { loadEsmModule } from '../../../utils/load-esm';
 import { AngularBabelLoaderOptions } from '../../babel/webpack-loader';
 import {
   CommonJsUsageWarnPlugin,
@@ -83,11 +82,10 @@ export async function getCommonConfig(wco: WebpackConfigOptions): Promise<Config
   // Load ESM `@angular/compiler-cli` using the TypeScript dynamic import workaround.
   // Once TypeScript provides support for keeping the dynamic import this workaround can be
   // changed to a direct dynamic import.
-  const { VERSION: NG_VERSION } =
-    await loadEsmModule<typeof import('@angular/compiler-cli')>('@angular/compiler-cli');
-  const { GLOBAL_DEFS_FOR_TERSER, GLOBAL_DEFS_FOR_TERSER_WITH_AOT } = await loadEsmModule<
-    typeof import('@angular/compiler-cli/private/tooling')
-  >('@angular/compiler-cli/private/tooling');
+  const { VERSION: NG_VERSION } = await import('@angular/compiler-cli');
+  const { GLOBAL_DEFS_FOR_TERSER, GLOBAL_DEFS_FOR_TERSER_WITH_AOT } = await import(
+    '@angular/compiler-cli/private/tooling'
+  );
 
   // determine hashing format
   const hashFormat = getOutputHashFormat(buildOptions.outputHashing);
