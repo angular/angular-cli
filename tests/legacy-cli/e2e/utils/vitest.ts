@@ -19,11 +19,7 @@ export async function applyVitestBuilder(): Promise<void> {
     // Update to Vitest builder.
     const test = project['architect']['test'];
     test['builder'] = '@angular/build:unit-test';
-    test['options'] = {
-      tsConfig: test['options']['tsConfig'],
-      buildTarget: '::development',
-      runner: 'vitest',
-    };
+    test['options'] = {};
   });
 
   await updateJsonFile('tsconfig.spec.json', (tsconfig) => {
