@@ -24,7 +24,6 @@ import { InlineOptions } from './bundle-inline-options';
 import { allowMinify, shouldBeautify } from './environment-options';
 import { assertIsError } from './error';
 import { I18nOptions } from './i18n-webpack';
-import { loadEsmModule } from './load-esm';
 
 // Extract Sourcemap input type from the remapping function since it is not currently exported
 type SourceMapInput = Exclude<Parameters<typeof remapping>[0], unknown[]>;
@@ -60,10 +59,7 @@ async function loadLocalizeTools(): Promise<LocalizeUtilityModule> {
     return localizeToolsModule;
   }
 
-  // Load ESM `@angular/localize/tools` using the TypeScript dynamic import workaround.
-  // Once TypeScript provides support for keeping the dynamic import this workaround can be
-  // changed to a direct dynamic import.
-  return loadEsmModule('@angular/localize/tools');
+  return import('@angular/localize/tools');
 }
 
 async function createI18nPlugins(

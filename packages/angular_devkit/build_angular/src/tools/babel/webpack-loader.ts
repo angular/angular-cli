@@ -7,7 +7,6 @@
  */
 
 import { custom } from 'babel-loader';
-import { loadEsmModule } from '../../utils/load-esm';
 import { VERSION } from '../../utils/package-version';
 import {
   ApplicationPresetOptions,
@@ -69,11 +68,8 @@ export default custom<ApplicationPresetOptions>(() => {
         // Load ESM `@angular/compiler-cli/linker/babel` using the TypeScript dynamic import workaround.
         // Once TypeScript provides support for keeping the dynamic import this workaround can be
         // changed to a direct dynamic import.
-        linkerPluginCreator ??= (
-          await loadEsmModule<typeof import('@angular/compiler-cli/linker/babel')>(
-            '@angular/compiler-cli/linker/babel',
-          )
-        ).createEs2015LinkerPlugin;
+        linkerPluginCreator ??= (await import('@angular/compiler-cli/linker/babel'))
+          .createEs2015LinkerPlugin;
 
         customOptions.angularLinker = {
           shouldLink: true,
@@ -110,7 +106,7 @@ export default custom<ApplicationPresetOptions>(() => {
           // Load ESM `@angular/localize/tools` using the TypeScript dynamic import workaround.
           // Once TypeScript provides support for keeping the dynamic import this workaround can be
           // changed to a direct dynamic import.
-          i18nPluginCreators = await loadEsmModule<I18nPluginCreators>('@angular/localize/tools');
+          i18nPluginCreators = await import('@angular/localize/tools');
         }
 
         customOptions.i18n = {

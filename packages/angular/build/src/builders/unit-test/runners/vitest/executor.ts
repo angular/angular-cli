@@ -11,7 +11,6 @@ import assert from 'node:assert';
 import path from 'node:path';
 import type { InlineConfig, Vitest } from 'vitest/node';
 import { assertIsError } from '../../../../utils/error';
-import { loadEsmModule } from '../../../../utils/load-esm';
 import { toPosixPath } from '../../../../utils/path';
 import {
   type FullResult,
@@ -141,7 +140,7 @@ export class VitestExecutor implements TestExecutor {
     } = this.options;
     let vitestNodeModule;
     try {
-      vitestNodeModule = await loadEsmModule<typeof import('vitest/node')>('vitest/node');
+      vitestNodeModule = await import('vitest/node');
     } catch (error: unknown) {
       assertIsError(error);
       if (error.code !== 'ERR_MODULE_NOT_FOUND') {
@@ -230,7 +229,7 @@ async function generateCoverageOption(
   let defaultExcludes: string[] = [];
   if (coverage.exclude) {
     try {
-      const vitestConfig = await loadEsmModule<typeof import('vitest/config')>('vitest/config');
+      const vitestConfig = await import('vitest/config');
       defaultExcludes = vitestConfig.coverageConfigDefaults.exclude;
     } catch {}
   }

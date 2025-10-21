@@ -7,7 +7,6 @@
  */
 
 import type { Connect, Plugin } from 'vite';
-import { loadEsmModule } from '../../../utils/load-esm';
 import {
   ComponentStyleRecord,
   angularHtmlFallbackMiddleware,
@@ -61,8 +60,7 @@ interface AngularSetupMiddlewaresPluginOptions {
 async function createEncapsulateStyle(): Promise<
   (style: Uint8Array, componentId: string) => string
 > {
-  const { encapsulateStyle } =
-    await loadEsmModule<typeof import('@angular/compiler')>('@angular/compiler');
+  const { encapsulateStyle } = await import('@angular/compiler');
   const decoder = new TextDecoder('utf-8');
 
   return (style, componentId) => {

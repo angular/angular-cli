@@ -11,7 +11,6 @@ import { PluginObj, parseSync, transformFromAstAsync, types } from '@babel/core'
 import assert from 'node:assert';
 import { workerData } from 'node:worker_threads';
 import { assertIsError } from '../../utils/error';
-import { loadEsmModule } from '../../utils/load-esm';
 
 /**
  * The options passed to the inliner for each file request
@@ -131,7 +130,7 @@ async function loadLocalizeTools(): Promise<LocalizeUtilityModule> {
   // Load ESM `@angular/localize/tools` using the TypeScript dynamic import workaround.
   // Once TypeScript provides support for keeping the dynamic import this workaround can be
   // changed to a direct dynamic import.
-  localizeToolsModule ??= await loadEsmModule<LocalizeUtilityModule>('@angular/localize/tools');
+  localizeToolsModule ??= await import('@angular/localize/tools');
 
   return localizeToolsModule;
 }

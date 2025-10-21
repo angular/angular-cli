@@ -17,7 +17,6 @@ import { ServerSsrMode } from '../../../tools/vite/plugins';
 import { EsbuildLoaderOption } from '../../../tools/vite/utils';
 import { normalizeSourceMaps } from '../../../utils';
 import { useComponentStyleHmr, useComponentTemplateHmr } from '../../../utils/environment-options';
-import { loadEsmModule } from '../../../utils/load-esm';
 import { Result, ResultKind } from '../../application/results';
 import { OutputHashing } from '../../application/schema';
 import {
@@ -175,8 +174,7 @@ export async function* serveWithVite(
   // The index HTML path will be updated from the build results if provided by the builder
   let htmlIndexPath = 'index.html';
 
-  // dynamically import Vite for ESM compatibility
-  const { createServer, normalizePath } = await loadEsmModule<typeof import('vite')>('vite');
+  const { createServer, normalizePath } = await import('vite');
 
   let server: ViteDevServer | undefined;
   let serverUrl: URL | undefined;

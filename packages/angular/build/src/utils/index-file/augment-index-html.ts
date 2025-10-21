@@ -8,7 +8,6 @@
 
 import { createHash } from 'node:crypto';
 import { extname } from 'node:path';
-import { loadEsmModule } from '../load-esm';
 import { htmlRewritingStream } from './html-rewriting-stream';
 import { VALID_SELF_CLOSING_TAGS } from './valid-self-closing-tags';
 
@@ -352,12 +351,7 @@ async function getLanguageDirection(
 
 async function getLanguageDirectionFromLocales(locale: string): Promise<string | undefined> {
   try {
-    const localeData = (
-      await loadEsmModule<typeof import('@angular/common/locales/en')>(
-        `@angular/common/locales/${locale}`,
-      )
-    ).default;
-
+    const localeData = (await import(`@angular/common/locales/${locale}`)).default;
     const dir = localeData[localeData.length - 2];
 
     return isString(dir) ? dir : undefined;

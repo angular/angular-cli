@@ -8,10 +8,9 @@
 
 import remapping, { SourceMapInput } from '@ampproject/remapping';
 import type { Plugin } from 'vite';
-import { loadEsmModule } from '../../../utils/load-esm';
 
 export async function createAngularSsrTransformPlugin(workspaceRoot: string): Promise<Plugin> {
-  const { normalizePath } = await loadEsmModule<typeof import('vite')>('vite');
+  const { normalizePath } = await import('vite');
 
   return {
     name: 'vite:angular-ssr-transform',

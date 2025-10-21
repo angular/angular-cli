@@ -16,7 +16,6 @@ import type {
 import assert from 'node:assert';
 import fs from 'node:fs';
 import path from 'node:path';
-import { loadEsmModule } from '../../../utils/load-esm';
 
 /**
  * Cached instance of the compiler-cli linker's needsLinking function.
@@ -255,12 +254,7 @@ export async function requiresLinking(path: string, source: string): Promise<boo
   }
 
   if (!needsLinking) {
-    // Load ESM `@angular/compiler-cli/linker` using the TypeScript dynamic import workaround.
-    // Once TypeScript provides support for keeping the dynamic import this workaround can be
-    // changed to a direct dynamic import.
-    const linkerModule = await loadEsmModule<typeof import('@angular/compiler-cli/linker')>(
-      '@angular/compiler-cli/linker',
-    );
+    const linkerModule = await import('@angular/compiler-cli/linker');
     needsLinking = linkerModule.needsLinking;
   }
 
