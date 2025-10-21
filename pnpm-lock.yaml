@@ -253,9 +253,6 @@ importers:
       magic-string:
         specifier: 0.30.19
         version: 0.30.19
-      npm:
-        specifier: ^11.0.0
-        version: 11.6.2
       prettier:
         specifier: ^3.0.0
         version: 3.6.2
@@ -339,7 +336,7 @@ importers:
         version: link:../../../packages/angular/ssr
       '@vitest/coverage-v8':
         specifier: 3.2.4
-        version: 3.2.4(vitest@3.2.4(@types/node@24.8.0)(jiti@2.6.1)(jsdom@27.0.1(bufferutil@4.0.9)(postcss@8.5.6)(utf-8-validate@6.0.5))(less@4.4.2)(sass@1.93.2)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1))
+        version: 3.2.4(vitest@3.2.4(@types/node@24.8.0)(jiti@2.6.1)(jsdom@27.0.1(bufferutil@4.0.9)(utf-8-validate@6.0.5))(less@4.4.2)(sass@1.93.2)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1))
       jsdom:
         specifier: 27.0.1
         version: 27.0.1(bufferutil@4.0.9)(postcss@8.5.6)(utf-8-validate@6.0.5)
@@ -348,7 +345,7 @@ importers:
         version: 7.8.2
       vitest:
         specifier: 3.2.4
-        version: 3.2.4(@types/node@24.8.0)(jiti@2.6.1)(jsdom@27.0.1(bufferutil@4.0.9)(postcss@8.5.6)(utf-8-validate@6.0.5))(less@4.4.2)(sass@1.93.2)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)
+        version: 3.2.4(@types/node@24.8.0)(jiti@2.6.1)(jsdom@27.0.1(bufferutil@4.0.9)(utf-8-validate@6.0.5))(less@4.4.2)(sass@1.93.2)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)
 
   packages/angular/build:
     dependencies:
@@ -454,7 +451,7 @@ importers:
         version: 7.8.2
       vitest:
         specifier: 3.2.4
-        version: 3.2.4(@types/node@24.8.0)(jiti@2.6.1)(jsdom@27.0.1(bufferutil@4.0.9)(postcss@8.5.6)(utf-8-validate@6.0.5))(less@4.4.2)(sass@1.93.2)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)
+        version: 3.2.4(@types/node@24.8.0)(jiti@2.6.1)(jsdom@27.0.1(bufferutil@4.0.9)(utf-8-validate@6.0.5))(less@4.4.2)(sass@1.93.2)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)
     optionalDependencies:
       lmdb:
         specifier: 3.4.3
@@ -7128,77 +7125,6 @@ packages:
     resolution: {integrity: sha512-S48WzZW777zhNIrn7gxOlISNAqi9ZC/uQFnRdbeIHhZhCA6UqpkOT8T1G7BvfdgP4Er8gF4sUbaS0i7QvIfCWw==}
     engines: {node: '>=8'}
 
-  npm@11.6.2:
-    resolution: {integrity: sha512-7iKzNfy8lWYs3zq4oFPa8EXZz5xt9gQNKJZau3B1ErLBb6bF7sBJ00x09485DOvRT2l5Gerbl3VlZNT57MxJVA==}
-    engines: {node: ^20.17.0 || >=22.9.0}
-    hasBin: true
-    bundledDependencies:
-      - '@isaacs/string-locale-compare'
-      - '@npmcli/arborist'
-      - '@npmcli/config'
-      - '@npmcli/fs'
-      - '@npmcli/map-workspaces'
-      - '@npmcli/package-json'
-      - '@npmcli/promise-spawn'
-      - '@npmcli/redact'
-      - '@npmcli/run-script'
-      - '@sigstore/tuf'
-      - abbrev
-      - archy
-      - cacache
-      - chalk
-      - ci-info
-      - cli-columns
-      - fastest-levenshtein
-      - fs-minipass
-      - glob
-      - graceful-fs
-      - hosted-git-info
-      - ini
-      - init-package-json
-      - is-cidr
-      - json-parse-even-better-errors
-      - libnpmaccess
-      - libnpmdiff
-      - libnpmexec
-      - libnpmfund
-      - libnpmorg
-      - libnpmpack
-      - libnpmpublish
-      - libnpmsearch
-      - libnpmteam
-      - libnpmversion
-      - make-fetch-happen
-      - minimatch
-      - minipass
-      - minipass-pipeline
-      - ms
-      - node-gyp
-      - nopt
-      - npm-audit-report
-      - npm-install-checks
-      - npm-package-arg
-      - npm-pick-manifest
-      - npm-profile
-      - npm-registry-fetch
-      - npm-user-validate
-      - p-map
-      - pacote
-      - parse-conflict-json
-      - proc-log
-      - qrcode-terminal
-      - read
-      - semver
-      - spdx-expression-parse
-      - ssri
-      - supports-color
-      - tar
-      - text-table
-      - tiny-relative-date
-      - treeverse
-      - validate-npm-package-name
-      - which
-
   nth-check@2.1.1:
     resolution: {integrity: sha512-lqjrjmaOoAnWfMmBPL+XNnynZh2+swxiX3WUE0s4yEHI6m+AwrK2UZOimIRl3X/4QctVqS8AiZjFqyOGrMXb/w==}
 
@@ -12528,7 +12454,7 @@ snapshots:
     dependencies:
       vite: 7.1.10(@types/node@24.8.0)(jiti@2.6.1)(less@4.4.2)(sass@1.93.2)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)
 
-  '@vitest/coverage-v8@3.2.4(vitest@3.2.4(@types/node@24.8.0)(jiti@2.6.1)(jsdom@27.0.1(bufferutil@4.0.9)(postcss@8.5.6)(utf-8-validate@6.0.5))(less@4.4.2)(sass@1.93.2)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1))':
+  '@vitest/coverage-v8@3.2.4(vitest@3.2.4(@types/node@24.8.0)(jiti@2.6.1)(jsdom@27.0.1(bufferutil@4.0.9)(utf-8-validate@6.0.5))(less@4.4.2)(sass@1.93.2)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1))':
     dependencies:
       '@ampproject/remapping': 2.3.0
       '@bcoe/v8-coverage': 1.0.2
@@ -12543,7 +12469,7 @@ snapshots:
       std-env: 3.10.0
       test-exclude: 7.0.1
       tinyrainbow: 2.0.0
-      vitest: 3.2.4(@types/node@24.8.0)(jiti@2.6.1)(jsdom@27.0.1(bufferutil@4.0.9)(postcss@8.5.6)(utf-8-validate@6.0.5))(less@4.4.2)(sass@1.93.2)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)
+      vitest: 3.2.4(@types/node@24.8.0)(jiti@2.6.1)(jsdom@27.0.1(bufferutil@4.0.9)(utf-8-validate@6.0.5))(less@4.4.2)(sass@1.93.2)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)
     transitivePeerDependencies:
       - supports-color
 
@@ -16509,8 +16435,6 @@ snapshots:
     dependencies:
       path-key: 3.1.1
 
-  npm@11.6.2: {}
-
   nth-check@2.1.1:
     dependencies:
       boolbase: 1.0.0
@@ -18567,7 +18491,7 @@ snapshots:
       tsx: 4.20.6
       yaml: 2.8.1
 
-  vitest@3.2.4(@types/node@24.8.0)(jiti@2.6.1)(jsdom@27.0.1(bufferutil@4.0.9)(postcss@8.5.6)(utf-8-validate@6.0.5))(less@4.4.2)(sass@1.93.2)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1):
+  vitest@3.2.4(@types/node@24.8.0)(jiti@2.6.1)(jsdom@27.0.1(bufferutil@4.0.9)(utf-8-validate@6.0.5))(less@4.4.2)(sass@1.93.2)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1):
     dependencies:
       '@types/chai': 5.2.2
       '@vitest/expect': 3.2.4
