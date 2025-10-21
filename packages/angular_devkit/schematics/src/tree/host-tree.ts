@@ -20,7 +20,6 @@ import {
 import { ParseError, parse as jsoncParse, printParseErrorCode } from 'jsonc-parser';
 import {
   ContentHasMutatedException,
-  FileAlreadyExistException,
   FileDoesNotExistException,
   InvalidUpdateRecordException,
   MergeConflictException,
@@ -407,12 +406,8 @@ export class HostTree implements Tree {
 
   // Structural methods.
   create(path: string, content: Buffer | string): void {
-    const p = this._normalizePath(path);
-    if (this._recordSync.exists(p)) {
-      throw new FileAlreadyExistException(p);
-    }
     const c = typeof content == 'string' ? Buffer.from(content) : content;
-    this._record.create(p, c as {} as virtualFs.FileBuffer).subscribe();
+    this._record.create(this._normalizePath(path), c as {} as virtualFs.FileBuffer).subscribe();
   }
   delete(path: string): void {
     this._recordSync.delete(this._normalizePath(path));
