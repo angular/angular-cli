@@ -16,6 +16,7 @@
     "runner": {
       "type": "string",
       "description": "Specifies the test runner to use for test execution.",
+      "default": "vitest",
       "enum": ["karma", "vitest"]
     },
     "browsers": {
@@ -267,5 +268,5 @@
     }
   },
   "additionalProperties": false,
-  "required": ["runner"]
+  "required": []
 }
