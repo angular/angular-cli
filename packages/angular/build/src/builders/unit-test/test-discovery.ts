@@ -232,18 +232,18 @@ async function resolveStaticPattern(
     return { resolved: [], unresolved: [`${pattern}/**/*.@(${infixes}).@(ts|tsx)`] };
   }
 
-  const fileExt = extname(pattern);
-  const baseName = basename(pattern, fileExt);
+  const fileExt = extname(fullPath);
+  const baseName = basename(fullPath, fileExt);
 
   for (const infix of TEST_FILE_INFIXES) {
-    const potentialSpec = join(
-      projectSourceRoot,
-      dirname(pattern),
-      `${baseName}${infix}${fileExt}`,
-    );
+    const potentialSpec = join(dirname(fullPath), `${baseName}${infix}${fileExt}`);
     if (await exists(potentialSpec)) {
       return { resolved: [potentialSpec], unresolved: [] };
     }
+  }
+
+  if (await exists(fullPath)) {
+    return { resolved: [fullPath], unresolved: [] };
   }
 
   return { resolved: [], unresolved: [pattern] };
