@@ -15,7 +15,6 @@ ts_project(
         "//:node_modules/@types/semver",
         "//:node_modules/ansi-colors",
         "//:node_modules/fast-glob",
-        "//:node_modules/npm",
         "//:node_modules/protractor",
         "//:node_modules/semver",
         "//:node_modules/tar",

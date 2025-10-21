@@ -124,7 +124,6 @@
     "listr2": "9.0.4",
     "lodash": "^4.17.21",
     "magic-string": "0.30.19",
-    "npm": "^11.0.0",
     "prettier": "^3.0.0",
     "protractor": "~7.0.0",
     "puppeteer": "18.2.1",
