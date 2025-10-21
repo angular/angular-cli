@@ -6,13 +6,23 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { glob, readFile } from 'node:fs/promises';
+import { glob, readFile, stat } from 'node:fs/promises';
+import { createRequire } from 'node:module';
 import path from 'node:path';
 import type { DatabaseSync, SQLInputValue } from 'node:sqlite';
 import { z } from 'zod';
 import { McpToolContext, declareTool } from './tool-registry';
 
 const findExampleInputSchema = z.object({
+  workspacePath: z
+    .string()
+    .optional()
+    .describe(
+      'The absolute path to the `angular.json` file for the workspace. This is used to find the ' +
+        'version-specific code examples that correspond to the installed version of the ' +
+        'Angular framework. You **MUST** get this path from the `list_projects` tool. If omitted, ' +
+        'the tool will search the generic code examples bundled with the CLI.',
+    ),
   query: z
     .string()
     .describe(
@@ -153,6 +163,12 @@ new or evolving features.
   (e.g., query: 'forms', required_packages: ['@angular/forms'], keywords: ['validation'])
 </Use Cases>
 <Operational Notes>
+* **Project-Specific Use (Recommended):** For tasks inside a user's project, you **MUST** provide the
+  \`workspacePath\` argument to get examples that match the project's Angular version. Get this
+  path from \`list_projects\`.
+* **General Use:** If no project context is available (e.g., for general questions or learning),
+  you can call the tool without the \`workspacePath\` argument. It will return the latest
+  generic examples.
 * **Tool Selection:** This database primarily contains examples for new and recently updated Angular
   features. For established, core features, the main documentation (via the
   \`search_documentation\` tool) may be a better source of information.
@@ -183,103 +199,218 @@ new or evolving features.
   factory: createFindExampleHandler,
 });
 
-async function createFindExampleHandler({ exampleDatabasePath }: McpToolContext) {
-  let db: DatabaseSync | undefined;
+/**
+ * Attempts to find a version-specific example database from the user's installed
+ * version of `@angular/core`. It looks for a custom `angular` metadata property in the
+ * framework's `package.json` to locate the database.
+ *
+ * @example A sample `package.json` `angular` field:
+ * ```json
+ * {
+ *   "angular": {
+ *     "examples": {
+ *       "format": "sqlite",
+ *       "path": "./resources/code-examples.db"
+ *     }
+ *   }
+ * }
+ * ```
+ *
+ * @param workspacePath The absolute path to the user's `angular.json` file.
+ * @param logger The MCP tool context logger for reporting warnings.
+ * @returns A promise that resolves to an object containing the database path and source,
+ *     or `undefined` if the database could not be resolved.
+ */
+async function getVersionSpecificExampleDatabase(
+  workspacePath: string,
+  logger: McpToolContext['logger'],
+): Promise<{ dbPath: string; source: string } | undefined> {
+  // 1. Resolve the path to package.json
+  let pkgJsonPath: string;
+  try {
+    const workspaceRequire = createRequire(workspacePath);
+    pkgJsonPath = workspaceRequire.resolve('@angular/core/package.json');
+  } catch (e) {
+    logger.warn(
+      `Could not resolve '@angular/core/package.json' from '${workspacePath}'. ` +
+        'Is Angular installed in this project? Falling back to the bundled examples.',
+    );
 
-  if (process.env['NG_MCP_EXAMPLES_DIR']) {
-    db = await setupRuntimeExamples(process.env['NG_MCP_EXAMPLES_DIR']);
+    return undefined;
   }
+
+  // 2. Read and parse package.json, then find the database.
+  try {
+    const pkgJsonContent = await readFile(pkgJsonPath, 'utf-8');
+    const pkgJson = JSON.parse(pkgJsonContent);
+    const examplesInfo = pkgJson['angular']?.examples;
+
+    if (examplesInfo && examplesInfo.format === 'sqlite' && typeof examplesInfo.path === 'string') {
+      const packageDirectory = path.dirname(pkgJsonPath);
+      const dbPath = path.resolve(packageDirectory, examplesInfo.path);
+
+      // Ensure the resolved database path is within the package boundary.
+      const relativePath = path.relative(packageDirectory, dbPath);
+      if (relativePath.startsWith('..') || path.isAbsolute(relativePath)) {
+        logger.warn(
+          `Detected a potential path traversal attempt in '${pkgJsonPath}'. ` +
+            `The path '${examplesInfo.path}' escapes the package boundary. ` +
+            'Falling back to the bundled examples.',
+        );
+
+        return undefined;
+      }
+
+      // Check the file size to prevent reading a very large file.
+      const stats = await stat(dbPath);
+      if (stats.size > 10 * 1024 * 1024) {
+        // 10MB
+        logger.warn(
+          `The example database at '${dbPath}' is larger than 10MB (${stats.size} bytes). ` +
+            'This is unexpected and the file will not be used. Falling back to the bundled examples.',
+        );
+
+        return undefined;
+      }
+
+      const source = `framework version ${pkgJson.version}`;
+
+      return { dbPath, source };
+    } else {
+      logger.warn(
+        `Did not find valid 'angular.examples' metadata in '${pkgJsonPath}'. ` +
+          'Falling back to the bundled examples.',
+      );
+    }
+  } catch (e) {
+    logger.warn(
+      `Failed to read or parse version-specific examples metadata referenced in '${pkgJsonPath}': ${
+        e instanceof Error ? e.message : e
+      }. Falling back to the bundled examples.`,
+    );
+  }
+
+  return undefined;
+}
+
+async function createFindExampleHandler({ logger, exampleDatabasePath }: McpToolContext) {
+  const runtimeDb = process.env['NG_MCP_EXAMPLES_DIR']
+    ? await setupRuntimeExamples(process.env['NG_MCP_EXAMPLES_DIR'])
+    : undefined;
 
   suppressSqliteWarning();
 
   return async (input: FindExampleInput) => {
-    if (!db) {
-      if (!exampleDatabasePath) {
-        // This should be prevented by the registration logic in mcp-server.ts
-        throw new Error('Example database path is not available.');
-      }
-      const { DatabaseSync } = await import('node:sqlite');
-      db = new DatabaseSync(exampleDatabasePath, { readOnly: true });
+    // If the dev-time override is present, use it and bypass all other logic.
+    if (runtimeDb) {
+      return queryDatabase(runtimeDb, input);
     }
 
-    const { query, keywords, required_packages, related_concepts, includeExperimental } = input;
+    let dbPath: string | undefined;
 
-    // Build the query dynamically
-    const params: SQLInputValue[] = [];
-    let sql =
-      'SELECT title, summary, keywords, required_packages, related_concepts, related_tools, content, ' +
-      // The `snippet` function generates a contextual snippet of the matched text.
-      // Column 6 is the `content` column. We highlight matches with asterisks and limit the snippet size.
-      "snippet(examples_fts, 6, '**', '**', '...', 15) AS snippet " +
-      'FROM examples_fts';
-    const whereClauses = [];
-
-    // FTS query
-    if (query) {
-      whereClauses.push('examples_fts MATCH ?');
-      params.push(escapeSearchQuery(query));
+    // First, try to get the version-specific guide.
+    if (input.workspacePath) {
+      const versionSpecific = await getVersionSpecificExampleDatabase(input.workspacePath, logger);
+      if (versionSpecific) {
+        dbPath = versionSpecific.dbPath;
+      }
     }
 
-    // JSON array filters
-    const addJsonFilter = (column: string, values: string[] | undefined) => {
-      if (values?.length) {
-        for (const value of values) {
-          whereClauses.push(`${column} LIKE ?`);
-          params.push(`%"${value}"%`);
-        }
+    // If the version-specific guide was not found for any reason, fall back to the bundled version.
+    if (!dbPath) {
+      dbPath = exampleDatabasePath;
+    }
+
+    if (!dbPath) {
+      // This should be prevented by the registration logic in mcp-server.ts
+      throw new Error('Example database path is not available.');
+    }
+
+    const { DatabaseSync } = await import('node:sqlite');
+    const db = new DatabaseSync(dbPath, { readOnly: true });
+
+    return queryDatabase(db, input);
+  };
+}
+
+function queryDatabase(db: DatabaseSync, input: FindExampleInput) {
+  const { query, keywords, required_packages, related_concepts, includeExperimental } = input;
+
+  // Build the query dynamically
+  const params: SQLInputValue[] = [];
+  let sql =
+    'SELECT title, summary, keywords, required_packages, related_concepts, related_tools, content, ' +
+    // The `snippet` function generates a contextual snippet of the matched text.
+    // Column 6 is the `content` column. We highlight matches with asterisks and limit the snippet size.
+    "snippet(examples_fts, 6, '**', '**', '...', 15) AS snippet " +
+    'FROM examples_fts';
+  const whereClauses = [];
+
+  // FTS query
+  if (query) {
+    whereClauses.push('examples_fts MATCH ?');
+    params.push(escapeSearchQuery(query));
+  }
+
+  // JSON array filters
+  const addJsonFilter = (column: string, values: string[] | undefined) => {
+    if (values?.length) {
+      for (const value of values) {
+        whereClauses.push(`${column} LIKE ?`);
+        params.push(`%"${value}"%`);
       }
+    }
+  };
+
+  addJsonFilter('keywords', keywords);
+  addJsonFilter('required_packages', required_packages);
+  addJsonFilter('related_concepts', related_concepts);
+
+  if (!includeExperimental) {
+    whereClauses.push('experimental = 0');
+  }
+
+  if (whereClauses.length > 0) {
+    sql += ` WHERE ${whereClauses.join(' AND ')}`;
+  }
+
+  // Order the results by relevance using the BM25 algorithm.
+  // The weights assigned to each column boost the ranking of documents where the
+  // search term appears in a more important field.
+  // Column order: title, summary, keywords, required_packages, related_concepts, related_tools, content
+  sql += ' ORDER BY bm25(examples_fts, 10.0, 5.0, 5.0, 1.0, 2.0, 1.0, 1.0);';
+
+  const queryStatement = db.prepare(sql);
+
+  // Query database and return results
+  const examples = [];
+  const textContent = [];
+  for (const exampleRecord of queryStatement.all(...params)) {
+    const record = exampleRecord as Record<string, string>;
+    const example = {
+      title: record['title'],
+      summary: record['summary'],
+      keywords: JSON.parse(record['keywords'] || '[]') as string[],
+      required_packages: JSON.parse(record['required_packages'] || '[]') as string[],
+      related_concepts: JSON.parse(record['related_concepts'] || '[]') as string[],
+      related_tools: JSON.parse(record['related_tools'] || '[]') as string[],
+      content: record['content'],
+      snippet: record['snippet'],
     };
+    examples.push(example);
 
-    addJsonFilter('keywords', keywords);
-    addJsonFilter('required_packages', required_packages);
-    addJsonFilter('related_concepts', related_concepts);
-
-    if (!includeExperimental) {
-      whereClauses.push('experimental = 0');
+    // Also create a more structured text output
+    let text = `## Example: ${example.title}\n**Summary:** ${example.summary}`;
+    if (example.snippet) {
+      text += `\n**Snippet:** ${example.snippet}`;
     }
+    text += `\n\n---\n\n${example.content}`;
+    textContent.push({ type: 'text' as const, text });
+  }
 
-    if (whereClauses.length > 0) {
-      sql += ` WHERE ${whereClauses.join(' AND ')}`;
-    }
-
-    // Order the results by relevance using the BM25 algorithm.
-    // The weights assigned to each column boost the ranking of documents where the
-    // search term appears in a more important field.
-    // Column order: title, summary, keywords, required_packages, related_concepts, related_tools, content
-    sql += ' ORDER BY bm25(examples_fts, 10.0, 5.0, 5.0, 1.0, 2.0, 1.0, 1.0);';
-
-    const queryStatement = db.prepare(sql);
-
-    // Query database and return results
-    const examples = [];
-    const textContent = [];
-    for (const exampleRecord of queryStatement.all(...params)) {
-      const record = exampleRecord as Record<string, string>;
-      const example = {
-        title: record['title'],
-        summary: record['summary'],
-        keywords: JSON.parse(record['keywords'] || '[]') as string[],
-        required_packages: JSON.parse(record['required_packages'] || '[]') as string[],
-        related_concepts: JSON.parse(record['related_concepts'] || '[]') as string[],
-        related_tools: JSON.parse(record['related_tools'] || '[]') as string[],
-        content: record['content'],
-        snippet: record['snippet'],
-      };
-      examples.push(example);
-
-      // Also create a more structured text output
-      let text = `## Example: ${example.title}\n**Summary:** ${example.summary}`;
-      if (example.snippet) {
-        text += `\n**Snippet:** ${example.snippet}`;
-      }
-      text += `\n\n---\n\n${example.content}`;
-      textContent.push({ type: 'text' as const, text });
-    }
-
-    return {
-      content: textContent,
-      structuredContent: { examples },
-    };
+  return {
+    content: textContent,
+    structuredContent: { examples },
   };
 }
 
