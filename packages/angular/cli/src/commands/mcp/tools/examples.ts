@@ -546,7 +546,15 @@ function parseFrontmatter(content: string): Record<string, unknown> {
     } else {
       const arrayItemMatch = line.match(/^\s*-\s*(.*)/);
       if (arrayItemMatch && currentKey && isArray) {
-        arrayValues.push(arrayItemMatch[1].trim());
+        let value = arrayItemMatch[1].trim();
+        // Unquote if the value is quoted.
+        if (
+          (value.startsWith("'") && value.endsWith("'")) ||
+          (value.startsWith('"') && value.endsWith('"'))
+        ) {
+          value = value.slice(1, -1);
+        }
+        arrayValues.push(value);
       }
     }
   }
