@@ -17,7 +17,7 @@ const ALGOLIA_APP_ID = 'L1XWT2UJ7F';
 // https://www.algolia.com/doc/guides/security/api-keys/#search-only-api-key
 // This is a search only, rate limited key. It is sent within the URL of the query request.
 // This is not the actual key.
-const ALGOLIA_API_E = '322d89dab5f2080fe09b795c93413c6a89222b13a447cdf3e6486d692717bc0c';
+const ALGOLIA_API_E = '34738e8ae1a45e58bbce7b0f9810633d8b727b44a6479cf5e14b6a337148bd50';
 
 /**
  * The minimum major version of Angular for which a version-specific documentation index is known to exist.
@@ -45,7 +45,7 @@ const docSearchInputSchema = z.object({
   includeTopContent: z
     .boolean()
     .optional()
-    .default(true)
+    .default(false)
     .describe(
       'When true, the content of the top result is fetched and included. ' +
         'Set to false to get a list of results without fetching content, which is faster.',
@@ -145,22 +145,22 @@ function createDocSearchHandler({ logger }: McpToolContext) {
       version ?? LATEST_KNOWN_DOCS_VERSION,
       MIN_SUPPORTED_DOCS_VERSION,
     );
-    let searchResults = await client.search(createSearchArguments(query, finalSearchedVersion));
+    let searchResults;
+    try {
+      searchResults = await client.search(createSearchArguments(query, finalSearchedVersion));
+    } catch {}
 
     // If the initial search for a newer-than-stable version returns no results, it may be because
     // the index for that version doesn't exist yet. In this case, fall back to the latest known
     // stable version.
-    if (
-      searchResults.results.every((result) => !('hits' in result) || result.hits.length === 0) &&
-      finalSearchedVersion > LATEST_KNOWN_DOCS_VERSION
-    ) {
+    if (!searchResults && finalSearchedVersion > LATEST_KNOWN_DOCS_VERSION) {
       finalSearchedVersion = LATEST_KNOWN_DOCS_VERSION;
       searchResults = await client.search(createSearchArguments(query, finalSearchedVersion));
     }
 
-    const allHits = searchResults.results.flatMap((result) => (result as SearchResponse).hits);
+    const allHits = searchResults?.results.flatMap((result) => (result as SearchResponse).hits);
 
-    if (allHits.length === 0) {
+    if (!allHits?.length) {
       return {
         content: [
           {
