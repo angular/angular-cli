@@ -41,7 +41,8 @@ export abstract class ArchitectCommandModule
     // Add default builder if target is not in project and a command default is provided
     if (this.findDefaultBuilderName && this.context.workspace) {
       for (const [project, projectDefinition] of this.context.workspace.projects) {
-        if (projectDefinition.targets.has(target)) {
+        const targetDefinition = projectDefinition.targets.get(target);
+        if (targetDefinition?.builder) {
           continue;
         }
 
@@ -49,7 +50,13 @@ export abstract class ArchitectCommandModule
           project,
           target,
         });
-        if (defaultBuilder) {
+        if (!defaultBuilder) {
+          continue;
+        }
+
+        if (targetDefinition) {
+          targetDefinition.builder = defaultBuilder;
+        } else {
           projectDefinition.targets.set(target, {
             builder: defaultBuilder,
           });
