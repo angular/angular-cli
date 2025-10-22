@@ -327,9 +327,6 @@ function addAppToWorkspaceFile(options: ApplicationOptions, appDir: string): Rul
           },
         },
       },
-      'extract-i18n': {
-        builder: Builders.BuildExtractI18n,
-      },
       test: options.minimal
         ? undefined
         : {
