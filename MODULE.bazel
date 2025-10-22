@@ -5,7 +5,7 @@ module(
 )
 
 bazel_dep(name = "yq.bzl", version = "0.3.1")
-bazel_dep(name = "rules_nodejs", version = "6.5.2")
+bazel_dep(name = "rules_nodejs", version = "6.6.0")
 bazel_dep(name = "aspect_rules_js", version = "2.6.2")
 bazel_dep(name = "aspect_rules_ts", version = "3.7.0")
 bazel_dep(name = "rules_pkg", version = "0.8.1")
@@ -51,33 +51,17 @@ git_override(
     remote = "https://github.com/devversion/rules_browsers.git",
 )
 
-# The below is needed until https://github.com/bazel-contrib/rules_nodejs/pull/3853 is merged and released.
-NODE_24_VERSION = "24.0.0"
-
-NODE_24_REPO = {
-    "24.0.0-darwin_arm64": ("node-v24.0.0-darwin-arm64.tar.gz", "node-v24.0.0-darwin-arm64", "194e2f3dd3ec8c2adcaa713ed40f44c5ca38467880e160974ceac1659be60121"),
-    "24.0.0-darwin_amd64": ("node-v24.0.0-darwin-x64.tar.gz", "node-v24.0.0-darwin-x64", "f716b3ce14a7e37a6cbf97c9de10d444d7da07ef833cd8da81dd944d111e6a4a"),
-    "24.0.0-linux_arm64": ("node-v24.0.0-linux-arm64.tar.xz", "node-v24.0.0-linux-arm64", "d40ec7ffe0b82b02dce94208c84351424099bd70fa3a42b65c46d95322305040"),
-    "24.0.0-linux_ppc64le": ("node-v24.0.0-linux-ppc64le.tar.xz", "node-v24.0.0-linux-ppc64le", "cfa0e8d51a2f9a446f1bfb81cdf4c7e95336ad622e2aa230e3fa1d093c63d77d"),
-    "24.0.0-linux_s390x": ("node-v24.0.0-linux-s390x.tar.xz", "node-v24.0.0-linux-s390x", "e37a04c7ee05416ec1234fd3255e05b6b81287eb0424a57441c8b69f0a155021"),
-    "24.0.0-linux_amd64": ("node-v24.0.0-linux-x64.tar.xz", "node-v24.0.0-linux-x64", "59b8af617dccd7f9f68cc8451b2aee1e86d6bd5cb92cd51dd6216a31b707efd7"),
-    "24.0.0-windows_amd64": ("node-v24.0.0-win-x64.zip", "node-v24.0.0-win-x64", "3d0fff80c87bb9a8d7f49f2f27832aa34a1477d137af46f5b14df5498be81304"),
-}
-
 node = use_extension("@rules_nodejs//nodejs:extensions.bzl", "node")
-node.toolchain(
-    name = "nodejs",
-    node_repositories = NODE_24_REPO,
-    node_version = NODE_24_VERSION,
+node.toolchain(node_version = "24.0.0")
+use_repo(
+    node,
+    "nodejs_darwin_amd64",
+    "nodejs_darwin_arm64",
+    "nodejs_linux_amd64",
+    "nodejs_linux_arm64",
+    "nodejs_toolchains",
+    "nodejs_windows_amd64",
 )
-use_repo(node, "nodejs_toolchains")
-use_repo(node, "nodejs_darwin_amd64")
-use_repo(node, "nodejs_darwin_arm64")
-use_repo(node, "nodejs_linux_amd64")
-use_repo(node, "nodejs_linux_arm64")
-use_repo(node, "nodejs_linux_ppc64le")
-use_repo(node, "nodejs_linux_s390x")
-use_repo(node, "nodejs_windows_amd64")
 
 node_dev = use_extension("@rules_nodejs//nodejs:extensions.bzl", "node", dev_dependency = True)
 
@@ -86,40 +70,42 @@ node_dev.toolchain(
     name = "node20",
     node_version = "20.19.0",
 )
-use_repo(node_dev, "node20_darwin_arm64")
-use_repo(node_dev, "node20_darwin_amd64")
-use_repo(node_dev, "node20_linux_amd64")
-use_repo(node_dev, "node20_linux_arm64")
-use_repo(node_dev, "node20_linux_s390x")
-use_repo(node_dev, "node20_linux_ppc64le")
-use_repo(node_dev, "node20_windows_amd64")
 
 # Node.js 22
 node_dev.toolchain(
     name = "node22",
     node_version = "22.12.0",
 )
-use_repo(node_dev, "node22_darwin_arm64")
-use_repo(node_dev, "node22_darwin_amd64")
-use_repo(node_dev, "node22_linux_amd64")
-use_repo(node_dev, "node22_linux_arm64")
-use_repo(node_dev, "node22_linux_s390x")
-use_repo(node_dev, "node22_linux_ppc64le")
-use_repo(node_dev, "node22_windows_amd64")
 
 # Node.js 24
 node_dev.toolchain(
     name = "node24",
-    node_repositories = NODE_24_REPO,
-    node_version = NODE_24_VERSION,
+    node_version = "24.0.0",
 )
-use_repo(node_dev, "node24_darwin_arm64")
-use_repo(node_dev, "node24_darwin_amd64")
-use_repo(node_dev, "node24_linux_amd64")
-use_repo(node_dev, "node24_linux_arm64")
-use_repo(node_dev, "node24_linux_s390x")
-use_repo(node_dev, "node24_linux_ppc64le")
-use_repo(node_dev, "node24_windows_amd64")
+use_repo(
+    node_dev,
+    "node20_darwin_amd64",
+    "node20_darwin_arm64",
+    "node20_linux_amd64",
+    "node20_linux_arm64",
+    "node20_toolchains",
+    "node20_windows_amd64",
+    "node22_darwin_amd64",
+    "node22_darwin_arm64",
+    "node22_linux_amd64",
+    "node22_linux_arm64",
+    "node22_toolchains",
+    "node22_windows_amd64",
+    "node24_darwin_amd64",
+    "node24_darwin_arm64",
+    "node24_linux_amd64",
+    "node24_linux_arm64",
+    "node24_toolchains",
+    "node24_windows_amd64",
+)
+
+# This is needed following https://github.com/bazel-contrib/rules_nodejs/pull/3859
+register_toolchains("//:node22_windows_no_exec_config_toolchain")
 
 npm = use_extension("@aspect_rules_js//npm:extensions.bzl", "npm")
 npm.npm_translate_lock(
