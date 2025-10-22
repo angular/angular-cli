@@ -16,9 +16,7 @@ async function expectTransformation(input: string, expected: string): Promise<vo
   const reporter = new RefactorReporter(logger);
   const transformed = transformJasmineToVitest('spec.ts', input, reporter);
   const formattedTransformed = await format(transformed, { parser: 'typescript' });
-  let formattedExpected = await format(expected, { parser: 'typescript' });
-  // Strip blank lines to avoid test failures due to cosmetic differences.
-  formattedExpected = formattedExpected.replace(/\n\s*\n/g, '\n');
+  const formattedExpected = await format(expected, { parser: 'typescript' });
 
   expect(formattedTransformed).toBe(formattedExpected);
 }

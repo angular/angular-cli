@@ -41,6 +41,21 @@ import {
 import { RefactorContext } from './utils/refactor-context';
 import { RefactorReporter } from './utils/refactor-reporter';
 
+const BLANK_LINE_PLACEHOLDER = '// __PRESERVE_BLANK_LINE__';
+
+function preserveBlankLines(content: string): string {
+  return content
+    .split('\n')
+    .map((line) => (line.trim() === '' ? BLANK_LINE_PLACEHOLDER : line))
+    .join('\n');
+}
+
+function restoreBlankLines(content: string): string {
+  const regex = new RegExp(`^\\s*${BLANK_LINE_PLACEHOLDER.replace(/\//g, '\\/')}\\s*$`, 'gm');
+
+  return content.replace(regex, '');
+}
+
 /**
  * Transforms a string of Jasmine test code to Vitest test code.
  * This is the main entry point for the transformation.
@@ -53,9 +68,11 @@ export function transformJasmineToVitest(
   content: string,
   reporter: RefactorReporter,
 ): string {
+  const contentWithPlaceholders = preserveBlankLines(content);
+
   const sourceFile = ts.createSourceFile(
     filePath,
-    content,
+    contentWithPlaceholders,
     ts.ScriptTarget.Latest,
     true,
     ts.ScriptKind.TS,
@@ -151,6 +168,7 @@ export function transformJasmineToVitest(
   }
 
   const printer = ts.createPrinter();
+  const transformedContentWithPlaceholders = printer.printFile(result.transformed[0]);
 
-  return printer.printFile(result.transformed[0]);
+  return restoreBlankLines(transformedContentWithPlaceholders);
 }
