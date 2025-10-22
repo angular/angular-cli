@@ -1,3 +1,29 @@
+<a name="20.3.7"></a>
+
+# 20.3.7 (2025-10-22)
+
+### @angular-devkit/schematics
+
+| Commit                                                                                              | Type | Description                                                    |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------- |
+| [a31533cf4](https://github.com/angular/angular-cli/commit/a31533cf492048f62a41b9c09e53779269ee172d) | fix  | respect `--force` option when schematic contains `host.create` |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                      |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------ |
+| [8cdda111c](https://github.com/angular/angular-cli/commit/8cdda111cc0b343aa5eb6a7ccbad93302a543226) | fix  | resolve Angular locale data namespace in esbuild |
+| [5847ccc54](https://github.com/angular/angular-cli/commit/5847ccc545e54eb77a78b2435db7970faf748156) | fix  | update `vite` to `7.11.1`                        |
+
+### @angular/ssr
+
+| Commit                                                                                              | Type | Description                                       |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------- |
+| [3a28fb6a1](https://github.com/angular/angular-cli/commit/3a28fb6a13061215b881c49232db979fc3c2f641) | fix  | correctly handle routes with matrix parameters    |
+| [5db6d6487](https://github.com/angular/angular-cli/commit/5db6d64870c7ce0b883722a07c828946b7d2217d) | fix  | ensure server-side navigation triggers a redirect |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="21.0.0-next.8"></a>
 
 # 21.0.0-next.8 (2025-10-15)
