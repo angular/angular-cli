@@ -26,5 +26,3 @@ minimumReleaseAgeExclude:
   - '@ngtools/webpack'
   - '@schematics/*'
   - 'ng-packagr'
-  - 'vitest' # temporary to support v21
-  - '@vitest/*' # temporary to support v21
