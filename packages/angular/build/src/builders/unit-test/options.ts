@@ -54,7 +54,7 @@ export async function normalizeOptions(
   const buildTargetSpecifier = options.buildTarget ?? `::development`;
   const buildTarget = targetFromTargetString(buildTargetSpecifier, projectName, 'build');
 
-  const { runner, browsers, progress, filter, browserViewport, ui } = options;
+  const { runner, browsers, progress, filter, browserViewport, ui, runnerConfig } = options;
 
   if (ui && runner !== 'vitest') {
     throw new Error('The "ui" option is only available for the "vitest" runner.');
@@ -127,6 +127,8 @@ export async function normalizeOptions(
       : [],
     dumpVirtualFiles: options.dumpVirtualFiles,
     listTests: options.listTests,
+    runnerConfig:
+      typeof runnerConfig === 'string' ? path.join(workspaceRoot, runnerConfig) : runnerConfig,
   };
 }
 

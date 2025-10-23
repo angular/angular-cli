@@ -235,6 +235,7 @@ export type UnitTestBuilderOptions = {
     providersFile?: string;
     reporters?: SchemaReporter[];
     runner?: Runner;
+    runnerConfig?: RunnerConfig;
     setupFiles?: string[];
     tsConfig?: string;
     ui?: boolean;
