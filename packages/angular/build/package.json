@@ -42,7 +42,7 @@
     "semver": "7.7.3",
     "source-map-support": "0.5.21",
     "tinyglobby": "0.2.15",
-    "vite": "7.1.11",
+    "vite": "7.1.12",
     "watchpack": "2.4.4"
   },
   "optionalDependencies": {
@@ -56,7 +56,7 @@
     "ng-packagr": "21.0.0-next.4",
     "postcss": "8.5.6",
     "rxjs": "7.8.2",
-    "vitest": "4.0.0"
+    "vitest": "4.0.1"
   },
   "peerDependencies": {
     "@angular/core": "0.0.0-ANGULAR-FW-PEER-DEP",
