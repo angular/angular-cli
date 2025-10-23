@@ -481,8 +481,8 @@ importers:
         specifier: 5.40.1
         version: 5.40.1
       ini:
-        specifier: 5.0.0
-        version: 5.0.0
+        specifier: 6.0.0
+        version: 6.0.0
       jsonc-parser:
         specifier: 3.3.1
         version: 3.3.1
@@ -5999,6 +5999,10 @@ packages:
   ini@5.0.0:
     resolution: {integrity: sha512-+N0ngpO3e7cRUWOJAS7qw0IZIVc6XPrW4MlFBdD066F2L4k1L6ker3hLqSq7iXxU5tgS4WGkIUElWn5vogAEnw==}
     engines: {node: ^18.17.0 || >=20.5.0}
+
+  ini@6.0.0:
+    resolution: {integrity: sha512-IBTdIkzZNOpqm7q3dRqJvMaldXjDHWkEDfrwGEQTs5eaQMWV+djAhR+wahyNNMAa+qpbDUhBMVt4ZKNwpPm7xQ==}
+    engines: {node: ^20.17.0 || >=22.9.0}
 
   injection-js@2.6.0:
     resolution: {integrity: sha512-uRUO2qh7rFFeAo3UWTbLHCFr8x3VLHRNZ2jbMv/MAxbFIFgw7QtNVfxc3iC7CV5U11cvIyAt12nxVWu1NqVsYg==}
@@ -15112,6 +15116,8 @@ snapshots:
   ini@1.3.8: {}
 
   ini@5.0.0: {}
+
+  ini@6.0.0: {}
 
   injection-js@2.6.0:
     dependencies:
