@@ -38,6 +38,8 @@ import {
   transformSpyCallInspection,
   transformSpyReset,
 } from './transformers/jasmine-spy';
+import { transformJasmineTypes } from './transformers/jasmine-type';
+import { getVitestAutoImports } from './utils/ast-helpers';
 import { RefactorContext } from './utils/refactor-context';
 import { RefactorReporter } from './utils/refactor-reporter';
 
@@ -78,11 +80,13 @@ export function transformJasmineToVitest(
     ts.ScriptKind.TS,
   );
 
+  const pendingVitestImports = new Set<string>();
   const transformer: ts.TransformerFactory<ts.SourceFile> = (context) => {
     const refactorCtx: RefactorContext = {
       sourceFile,
       reporter,
       tsContext: context,
+      pendingVitestImports,
     };
 
     const visitor: ts.Visitor = (node) => {
@@ -149,6 +153,8 @@ export function transformJasmineToVitest(
             break;
           }
         }
+      } else if (ts.isQualifiedName(transformedNode) || ts.isTypeReferenceNode(transformedNode)) {
+        transformedNode = transformJasmineTypes(transformedNode, refactorCtx);
       }
 
       // Visit the children of the node to ensure they are transformed
@@ -163,12 +169,22 @@ export function transformJasmineToVitest(
   };
 
   const result = ts.transform(sourceFile, [transformer]);
-  if (result.transformed[0] === sourceFile && !reporter.hasTodos) {
+  let transformedSourceFile = result.transformed[0];
+
+  if (transformedSourceFile === sourceFile && !reporter.hasTodos && !pendingVitestImports.size) {
     return content;
   }
 
+  const vitestImport = getVitestAutoImports(pendingVitestImports);
+  if (vitestImport) {
+    transformedSourceFile = ts.factory.updateSourceFile(transformedSourceFile, [
+      vitestImport,
+      ...transformedSourceFile.statements,
+    ]);
+  }
+
   const printer = ts.createPrinter();
-  const transformedContentWithPlaceholders = printer.printFile(result.transformed[0]);
+  const transformedContentWithPlaceholders = printer.printFile(transformedSourceFile);
 
   return restoreBlankLines(transformedContentWithPlaceholders);
 }
