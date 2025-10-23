@@ -33,7 +33,7 @@ git_override(
 bazel_dep(name = "devinfra")
 git_override(
     module_name = "devinfra",
-    commit = "43d4ea5534ce399657a64c94a9dc1ea883324804",
+    commit = "ab6a00e9a219c2169ae0540cc5a32be5f481e004",
     remote = "https://github.com/angular/dev-infra.git",
 )
 
