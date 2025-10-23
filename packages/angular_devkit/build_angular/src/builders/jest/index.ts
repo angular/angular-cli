@@ -116,7 +116,7 @@ export default createBuilder(
       '--experimental-vm-modules',
       jest,
 
-      `--rootDir="${testOut}"`,
+      `--rootDir=${testOut}`,
       `--config=${path.join(__dirname, 'jest.config.mjs')}`,
       '--testEnvironment=jsdom',
 
