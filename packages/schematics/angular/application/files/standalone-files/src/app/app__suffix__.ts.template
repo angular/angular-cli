@@ -11,9 +11,9 @@ import { RouterOutlet } from '@angular/router';<% } %>
      %><router-outlet /><%
     } %>
   `,<% } else { %>
-  templateUrl: './app.html',<% } if(inlineStyle) { %>
+  templateUrl: './app<%= suffix %>.html',<% } if(inlineStyle) { %>
   styles: [],<% } else { %>
-  styleUrl: './app.<%= style %>'<% } %>
+  styleUrl: './app<%= suffix %>.<%= style %>'<% } %>
 })
 export class App {
   protected readonly title = signal('<%= name %>');

@@ -869,4 +869,14 @@ describe('Application Schematic', () => {
     const stylesContent = tree.readContent('/projects/foo/src/styles.css');
     expect(stylesContent).toContain('@import "tailwindcss";');
   });
+
+  describe(`fileNameStyleGuide: '2016'`, () => {
+    it('should create a component with the correct template and style urls', async () => {
+      const options = { ...defaultOptions, fileNameStyleGuide: '2016' as const };
+      const tree = await schematicRunner.runSchematic('application', options, workspaceTree);
+      const component = tree.readContent('/projects/foo/src/app/app.component.ts');
+      expect(component).toContain(`templateUrl: './app.component.html'`);
+      expect(component).toContain(`styleUrl: './app.component.css'`);
+    });
+  });
 });
