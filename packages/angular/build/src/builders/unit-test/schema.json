@@ -60,6 +60,11 @@
       "description": "Enables debugging mode for tests, allowing the use of the Node Inspector.",
       "default": false
     },
+    "ui": {
+      "type": "boolean",
+      "description": "Enables the Vitest UI for interactive test execution. This option is only available for the Vitest runner.",
+      "default": false
+    },
     "coverage": {
       "type": "boolean",
       "description": "Enables coverage reporting for tests.",

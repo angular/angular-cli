@@ -137,6 +137,7 @@ export class VitestExecutor implements TestExecutor {
       debug,
       watch,
       browserViewport,
+      ui,
     } = this.options;
     let vitestNodeModule;
     try {
@@ -201,6 +202,7 @@ export class VitestExecutor implements TestExecutor {
         reporters: reporters ?? ['default'],
         outputFile,
         watch,
+        ui,
         coverage: await generateCoverageOption(coverage, this.projectName),
         ...debugOptions,
       },
