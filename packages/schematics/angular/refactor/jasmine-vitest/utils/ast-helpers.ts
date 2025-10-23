@@ -8,6 +8,32 @@
 
 import ts from '../../../third_party/github.com/Microsoft/TypeScript/lib/typescript';
 
+export function addVitestAutoImport(imports: Set<string>, importName: string): void {
+  imports.add(importName);
+}
+
+export function getVitestAutoImports(imports: Set<string>): ts.ImportDeclaration | undefined {
+  if (!imports?.size) {
+    return undefined;
+  }
+
+  const importNames = [...imports];
+  importNames.sort();
+  const importSpecifiers = importNames.map((i) =>
+    ts.factory.createImportSpecifier(false, undefined, ts.factory.createIdentifier(i)),
+  );
+
+  return ts.factory.createImportDeclaration(
+    undefined,
+    ts.factory.createImportClause(
+      ts.SyntaxKind.TypeKeyword,
+      undefined,
+      ts.factory.createNamedImports(importSpecifiers),
+    ),
+    ts.factory.createStringLiteral('vitest'),
+  );
+}
+
 export function createViCallExpression(
   methodName: string,
   args: readonly ts.Expression[] = [],
