@@ -6,12 +6,11 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { exec } from 'child_process';
 import { existsSync } from 'fs';
 import { stat } from 'fs/promises';
 import { dirname, join, relative } from 'path';
-import { promisify } from 'util';
 import { z } from 'zod';
+import { execAsync } from './process-executor';
 import { McpToolDeclaration, declareTool } from './tool-registry';
 
 interface Transformation {
@@ -95,8 +94,6 @@ const modernizeOutputSchema = z.object({
 
 export type ModernizeInput = z.infer<typeof modernizeInputSchema>;
 export type ModernizeOutput = z.infer<typeof modernizeOutputSchema>;
-
-const execAsync = promisify(exec);
 
 function createToolOutput(structuredContent: ModernizeOutput) {
   return {
@@ -191,8 +188,8 @@ export async function runModernization(input: ModernizeInput) {
 
   return createToolOutput({
     instructions: instructions.length > 0 ? instructions : undefined,
-    stdout: stdoutMessages?.join('\n\n') ?? undefined,
-    stderr: stderrMessages?.join('\n\n') ?? undefined,
+    stdout: stdoutMessages?.join('\n\n') || undefined,
+    stderr: stderrMessages?.join('\n\n') || undefined,
   });
 }
 

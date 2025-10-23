@@ -6,213 +6,149 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { exec } from 'child_process';
-import { mkdir, mkdtemp, readFile, rm, writeFile } from 'fs/promises';
+import { mkdir, mkdtemp, rm, writeFile } from 'fs/promises';
 import { tmpdir } from 'os';
 import { join } from 'path';
-import { promisify } from 'util';
 import { ModernizeOutput, runModernization } from './modernize';
-
-const execAsync = promisify(exec);
+import * as processExecutor from './process-executor';
 
 describe('Modernize Tool', () => {
+  let execAsyncSpy: jasmine.Spy;
   let projectDir: string;
-  let originalPath: string | undefined;
 
   beforeEach(async () => {
-    originalPath = process.env.PATH;
+    // Create a temporary directory and a fake angular.json to satisfy the tool's project root search.
     projectDir = await mkdtemp(join(tmpdir(), 'angular-modernize-test-'));
+    await writeFile(join(projectDir, 'angular.json'), JSON.stringify({ version: 1, projects: {} }));
 
-    // Create a dummy Angular project structure.
-    await writeFile(
-      join(projectDir, 'angular.json'),
-      JSON.stringify(
-        {
-          version: 1,
-          projects: {
-            app: {
-              root: '',
-              projectType: 'application',
-              architect: {
-                build: {
-                  options: {
-                    tsConfig: 'tsconfig.json',
-                  },
-                },
-              },
-            },
-          },
-        },
-        null,
-        2,
-      ),
-    );
-    await writeFile(
-      join(projectDir, 'package.json'),
-      JSON.stringify(
-        {
-          dependencies: {
-            '@angular/core': 'latest',
-          },
-          devDependencies: {
-            '@angular/cli': 'latest',
-            '@angular-devkit/schematics': 'latest',
-            typescript: 'latest',
-          },
-        },
-        null,
-        2,
-      ),
-    );
-    await writeFile(
-      join(projectDir, 'tsconfig.base.json'),
-      JSON.stringify(
-        {
-          compilerOptions: {
-            strict: true,
-            forceConsistentCasingInFileNames: true,
-            skipLibCheck: true,
-          },
-        },
-        null,
-        2,
-      ),
-    );
-    await writeFile(
-      join(projectDir, 'tsconfig.json'),
-      JSON.stringify(
-        {
-          extends: './tsconfig.base.json',
-          compilerOptions: {
-            outDir: './dist/out-tsc',
-          },
-        },
-        null,
-        2,
-      ),
-    );
-
-    // Symlink the node_modules directory from the runfiles to the temporary project.
-    const nodeModulesPath = require
-      .resolve('@angular/core/package.json')
-      .replace(/\/@angular\/core\/package\.json$/, '');
-    await execAsync(`ln -s ${nodeModulesPath} ${join(projectDir, 'node_modules')}`);
-
-    // Prepend the node_modules/.bin path to the PATH environment variable
-    // so that `ng` can be found by `execAsync` calls.
-    process.env.PATH = `${join(nodeModulesPath, '.bin')}:${process.env.PATH}`;
+    // Spy on the execAsync function from our new module.
+    execAsyncSpy = spyOn(processExecutor, 'execAsync').and.resolveTo({ stdout: '', stderr: '' });
   });
 
   afterEach(async () => {
-    process.env.PATH = originalPath;
     await rm(projectDir, { recursive: true, force: true });
   });
 
-  async function modernize(
-    dir: string,
-    file: string,
-    transformations: string[],
-  ): Promise<{ structuredContent: ModernizeOutput; newContent: string }> {
-    const structuredContent = (
-      (await runModernization({ directories: [dir], transformations })) as {
-        structuredContent: ModernizeOutput;
-      }
-    ).structuredContent;
-    const newContent = await readFile(file, 'utf8');
+  it('should return instructions if no transformations are provided', async () => {
+    const { structuredContent } = (await runModernization({})) as {
+      structuredContent: ModernizeOutput;
+    };
 
-    return { structuredContent, newContent };
-  }
+    expect(execAsyncSpy).not.toHaveBeenCalled();
+    expect(structuredContent?.instructions).toEqual([
+      'See https://angular.dev/best-practices for Angular best practices. ' +
+        'You can call this tool if you have specific transformation you want to run.',
+    ]);
+  });
+
+  it('should return instructions if no directories are provided', async () => {
+    const { structuredContent } = (await runModernization({
+      transformations: ['control-flow'],
+    })) as {
+      structuredContent: ModernizeOutput;
+    };
+
+    expect(execAsyncSpy).not.toHaveBeenCalled();
+    expect(structuredContent?.instructions).toEqual([
+      'Provide this tool with a list of directory paths in your workspace ' +
+        'to run the modernization on.',
+    ]);
+  });
 
   it('can run a single transformation', async () => {
-    const componentPath = join(projectDir, 'test.component.ts');
-    const componentContent = `
-      import { Component } from '@angular/core';
+    const { structuredContent } = (await runModernization({
+      directories: [projectDir],
+      transformations: ['self-closing-tag'],
+    })) as { structuredContent: ModernizeOutput };
 
-      @Component({
-        selector: 'app-foo',
-        template: '<app-bar></app-bar>',
-      })
-      export class FooComponent {}
-    `;
-    await writeFile(componentPath, componentContent);
-
-    const { structuredContent, newContent } = await modernize(projectDir, componentPath, [
-      'self-closing-tag',
-    ]);
-
-    expect(structuredContent?.stderr).toBe('');
-    expect(newContent).toContain('<app-bar />');
+    expect(execAsyncSpy).toHaveBeenCalledOnceWith(
+      'ng generate @angular/core:self-closing-tag --path .',
+      { cwd: projectDir },
+    );
+    expect(structuredContent?.stderr).toBeUndefined();
     expect(structuredContent?.instructions).toEqual([
       'Migration self-closing-tag on directory . completed successfully.',
     ]);
   });
 
   it('can run multiple transformations', async () => {
-    const componentPath = join(projectDir, 'test.component.ts');
-    const componentContent = `
-      import { Component } from '@angular/core';
+    const { structuredContent } = (await runModernization({
+      directories: [projectDir],
+      transformations: ['control-flow', 'self-closing-tag'],
+    })) as { structuredContent: ModernizeOutput };
 
-      @Component({
-        selector: 'app-foo',
-        template: '<app-bar *ngIf="show"></app-bar>',
-      })
-      export class FooComponent {
-        show = true;
-      }
-    `;
-    await writeFile(componentPath, componentContent);
-
-    const { structuredContent, newContent } = await modernize(projectDir, componentPath, [
-      'control-flow',
-      'self-closing-tag',
-    ]);
-
-    expect(structuredContent?.stderr).toBe('');
-    expect(newContent).toContain('@if (show) {<app-bar />}');
+    expect(execAsyncSpy).toHaveBeenCalledTimes(2);
+    expect(execAsyncSpy).toHaveBeenCalledWith('ng generate @angular/core:control-flow --path .', {
+      cwd: projectDir,
+    });
+    expect(execAsyncSpy).toHaveBeenCalledWith(
+      'ng generate @angular/core:self-closing-tag --path .',
+      { cwd: projectDir },
+    );
+    expect(structuredContent?.stderr).toBeUndefined();
+    expect(structuredContent?.instructions).toEqual(
+      jasmine.arrayWithExactContents([
+        'Migration control-flow on directory . completed successfully.',
+        'Migration self-closing-tag on directory . completed successfully.',
+      ]),
+    );
   });
 
   it('can run multiple transformations across multiple directories', async () => {
     const subfolder1 = join(projectDir, 'subfolder1');
-    await mkdir(subfolder1);
-    const componentPath1 = join(subfolder1, 'test.component.ts');
-    const componentContent1 = `
-    import { Component } from '@angular/core';
-
-    @Component({
-      selector: 'app-foo',
-      template: '<app-bar *ngIf="show"></app-bar>',
-      })
-      export class FooComponent {
-        show = true;
-        }
-        `;
-    await writeFile(componentPath1, componentContent1);
-
     const subfolder2 = join(projectDir, 'subfolder2');
+    await mkdir(subfolder1);
     await mkdir(subfolder2);
-    const componentPath2 = join(subfolder2, 'test.component.ts');
-    const componentContent2 = `
-    import { Component } from '@angular/core';
 
-    @Component({
-      selector: 'app-bar',
-      template: '<app-baz></app-baz>',
-      })
-      export class BarComponent {}
-      `;
-    await writeFile(componentPath2, componentContent2);
+    const { structuredContent } = (await runModernization({
+      directories: [subfolder1, subfolder2],
+      transformations: ['control-flow', 'self-closing-tag'],
+    })) as { structuredContent: ModernizeOutput };
 
-    const structuredContent = (
-      (await runModernization({
-        directories: [subfolder1, subfolder2],
-        transformations: ['control-flow', 'self-closing-tag'],
-      })) as { structuredContent: ModernizeOutput }
-    ).structuredContent;
-    const newContent1 = await readFile(componentPath1, 'utf8');
-    const newContent2 = await readFile(componentPath2, 'utf8');
+    expect(execAsyncSpy).toHaveBeenCalledTimes(4);
+    expect(execAsyncSpy).toHaveBeenCalledWith(
+      'ng generate @angular/core:control-flow --path subfolder1',
+      { cwd: projectDir },
+    );
+    expect(execAsyncSpy).toHaveBeenCalledWith(
+      'ng generate @angular/core:self-closing-tag --path subfolder1',
+      { cwd: projectDir },
+    );
+    expect(execAsyncSpy).toHaveBeenCalledWith(
+      'ng generate @angular/core:control-flow --path subfolder2',
+      { cwd: projectDir },
+    );
+    expect(execAsyncSpy).toHaveBeenCalledWith(
+      'ng generate @angular/core:self-closing-tag --path subfolder2',
+      { cwd: projectDir },
+    );
+    expect(structuredContent?.stderr).toBeUndefined();
+    expect(structuredContent?.instructions).toEqual(
+      jasmine.arrayWithExactContents([
+        'Migration control-flow on directory subfolder1 completed successfully.',
+        'Migration self-closing-tag on directory subfolder1 completed successfully.',
+        'Migration control-flow on directory subfolder2 completed successfully.',
+        'Migration self-closing-tag on directory subfolder2 completed successfully.',
+      ]),
+    );
+  });
 
-    expect(structuredContent?.stderr).toBe('');
-    expect(newContent1).toContain('@if (show) {<app-bar />}');
-    expect(newContent2).toContain('<app-baz />');
+  it('should report errors from transformations', async () => {
+    // Simulate a failed execution
+    execAsyncSpy.and.rejectWith(new Error('Command failed with error'));
+
+    const { structuredContent } = (await runModernization({
+      directories: [projectDir],
+      transformations: ['self-closing-tag'],
+    })) as { structuredContent: ModernizeOutput };
+
+    expect(execAsyncSpy).toHaveBeenCalledOnceWith(
+      'ng generate @angular/core:self-closing-tag --path .',
+      { cwd: projectDir },
+    );
+    expect(structuredContent?.stderr).toContain('Command failed with error');
+    expect(structuredContent?.instructions).toEqual([
+      'Migration self-closing-tag on directory . failed.',
+    ]);
   });
 });
