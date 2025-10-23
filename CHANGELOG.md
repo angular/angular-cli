@@ -1,3 +1,50 @@
+<a name="21.0.0-next.9"></a>
+
+# 21.0.0-next.9 (2025-10-23)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                             |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------- |
+| [3040b777e](https://github.com/angular/angular-cli/commit/3040b777e40bc90fd1ed961e3d134875b3f9b464) | feat | add style language detection to list_projects tool      |
+| [45024e836](https://github.com/angular/angular-cli/commit/45024e836b4006cc48b18bb99d025ae1a572db12) | feat | add unit test framework detection to list_projects tool |
+| [286b6204c](https://github.com/angular/angular-cli/commit/286b6204c825c990761a0d5e5b91bb439dd13655) | feat | make documentation search tool version-aware            |
+| [406315d09](https://github.com/angular/angular-cli/commit/406315d0939c62d9f4f39ce64b168e72bbdd588c) | feat | make find_examples tool version-aware                   |
+| [68e711307](https://github.com/angular/angular-cli/commit/68e711307eae88a621698c2a9cc2abc30d44efc8) | feat | make get_best_practices tool version-aware              |
+| [122a8c0e2](https://github.com/angular/angular-cli/commit/122a8c0e27342db79eb4d38e23032548054709b9) | fix  | correct frontmatter parsing in MCP examples tool        |
+| [431106559](https://github.com/angular/angular-cli/commit/431106559d6e75f5113876a3f92fdf4dc4b2114d) | fix  | correct query in find_examples to prevent runtime error |
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                                       |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------- |
+| [2ffc527b1](https://github.com/angular/angular-cli/commit/2ffc527b1bbe237e9f732d3506ce3a75ca1ca9d0) | feat | configure Vitest for new projects and allow runner choice         |
+| [512ad282a](https://github.com/angular/angular-cli/commit/512ad282aecbfdf1e5c9e9700cc722addb949b68) | fix  | preserve blank lines in jasmine-to-vitest schematic               |
+| [b524ba426](https://github.com/angular/angular-cli/commit/b524ba42625cd690177a300ca4843ef4edce035f) | fix  | remove empty i18n-extract target for new projects                 |
+| [54c4eae2a](https://github.com/angular/angular-cli/commit/54c4eae2aa49c6b45c41f0718a5915a10d426cb4) | fix  | transform Jasmine type annotations in jasmine-to-vitest schematic |
+
+### @angular-devkit/schematics
+
+| Commit                                                                                              | Type | Description                                                    |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------- |
+| [18bf8e7b3](https://github.com/angular/angular-cli/commit/18bf8e7b3b36b968d064299e5c557942c0ed7ec0) | fix  | respect `--force` option when schematic contains `host.create` |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                             |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------- |
+| [bf468e1eb](https://github.com/angular/angular-cli/commit/bf468e1eb1050c60359b6f52692ce0db286982c2) | fix  | direct check include file exists in unit-test discovery |
+| [b1d6d2f17](https://github.com/angular/angular-cli/commit/b1d6d2f174027a1f7800bd70ebd35143f92dc38c) | fix  | resolve Angular locale data namespace in esbuild        |
+
+### @angular/ssr
+
+| Commit                                                                                              | Type | Description                                       |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------- |
+| [85c18b4ea](https://github.com/angular/angular-cli/commit/85c18b4ead77c6c090b9f5c63e9e034e58369152) | fix  | correctly handle routes with matrix parameters    |
+| [58dcfd109](https://github.com/angular/angular-cli/commit/58dcfd1094fec52102f339e8fd3b5dd2925229b9) | fix  | ensure server-side navigation triggers a redirect |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="20.3.7"></a>
 
 # 20.3.7 (2025-10-22)
