@@ -54,7 +54,12 @@ export async function normalizeOptions(
   const buildTargetSpecifier = options.buildTarget ?? `::development`;
   const buildTarget = targetFromTargetString(buildTargetSpecifier, projectName, 'build');
 
-  const { runner, browsers, progress, filter, browserViewport } = options;
+  const { runner, browsers, progress, filter, browserViewport, ui } = options;
+
+  if (ui && runner !== 'vitest') {
+    throw new Error('The "ui" option is only available for the "vitest" runner.');
+  }
+
   const [width, height] = browserViewport?.split('x').map(Number) ?? [];
 
   let tsConfig = options.tsConfig;
@@ -69,6 +74,14 @@ export async function normalizeOptions(
       // The application builder expects a path relative to the workspace root.
       tsConfig = path.relative(workspaceRoot, tsconfigSpecPath);
     }
+  }
+
+  let watch = options.watch ?? isTTY();
+  if (options.ui && options.watch === false) {
+    context.logger.warn(
+      `The '--ui' option requires watch mode. The '--no-watch' flag will be ignored.`,
+    );
+    watch = true;
   }
 
   return {
@@ -105,8 +118,9 @@ export async function normalizeOptions(
     outputFile: options.outputFile,
     browsers,
     browserViewport: width && height ? { width, height } : undefined,
-    watch: options.watch ?? isTTY(),
+    watch,
     debug: options.debug ?? false,
+    ui: options.ui ?? false,
     providersFile: options.providersFile && path.join(workspaceRoot, options.providersFile),
     setupFiles: options.setupFiles
       ? options.setupFiles.map((setupFile) => path.join(workspaceRoot, setupFile))
