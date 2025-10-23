@@ -47,6 +47,12 @@ const VitestTestRunner: TestRunner = {
     const projectName = context.target?.project;
     assert(projectName, 'The builder requires a target.');
 
+    if (typeof options.runnerConfig === 'string') {
+      context.logger.info(`Using Vitest configuration file: ${options.runnerConfig}`);
+    } else if (options.runnerConfig) {
+      context.logger.info('Automatically searching for and using Vitest configuration file.');
+    }
+
     return new VitestExecutor(projectName, options, testEntryPointMappings);
   },
 };

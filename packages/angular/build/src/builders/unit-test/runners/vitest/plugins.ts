@@ -51,12 +51,11 @@ export function createVitestPlugins(
             root: workspaceRoot,
             globals: true,
             setupFiles: testSetupFiles,
-            // Use `jsdom` if no browsers are explicitly configured.
-            // `node` is effectively no "environment" and the default.
-            environment: browserOptions.browser ? 'node' : 'jsdom',
-            browser: browserOptions.browser,
             include: options.include,
             ...(options.exclude ? { exclude: options.exclude } : {}),
+            browser: browserOptions.browser,
+            // Use `jsdom` if no browsers are explicitly configured.
+            ...(browserOptions.browser ? {} : { environment: 'jsdom' }),
           },
           plugins: [
             {

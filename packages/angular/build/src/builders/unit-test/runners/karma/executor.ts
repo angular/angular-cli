@@ -7,6 +7,8 @@
  */
 
 import type { BuilderContext, BuilderOutput } from '@angular-devkit/architect';
+import fs from 'node:fs/promises';
+import path from 'node:path';
 import type { ApplicationBuilderInternalOptions } from '../../../application/options';
 import type { KarmaBuilderOptions, KarmaBuilderTransformsOptions } from '../../../karma';
 import { NormalizedUnitTestBuilderOptions } from '../../options';
@@ -50,7 +52,23 @@ export class KarmaExecutor implements TestExecutor {
       await context.getBuilderNameForTarget(unitTestOptions.buildTarget),
     )) as unknown as ApplicationBuilderInternalOptions;
 
+    let karmaConfig: string | undefined;
+    if (typeof unitTestOptions.runnerConfig === 'string') {
+      karmaConfig = unitTestOptions.runnerConfig;
+      context.logger.info(`Using Karma configuration file: ${karmaConfig}`);
+    } else if (unitTestOptions.runnerConfig) {
+      const potentialPath = path.join(unitTestOptions.projectRoot, 'karma.conf.js');
+      try {
+        await fs.access(potentialPath);
+        karmaConfig = potentialPath;
+        context.logger.info(`Using Karma configuration file: ${karmaConfig}`);
+      } catch {
+        context.logger.info('No Karma configuration file found. Using default configuration.');
+      }
+    }
+
     const karmaOptions: KarmaBuilderOptions = {
+      karmaConfig,
       tsConfig: unitTestOptions.tsConfig ?? buildTargetOptions.tsConfig,
       polyfills: buildTargetOptions.polyfills,
       assets: buildTargetOptions.assets,
