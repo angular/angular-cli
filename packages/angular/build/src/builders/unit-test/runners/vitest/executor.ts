@@ -139,6 +139,7 @@ export class VitestExecutor implements TestExecutor {
       browserViewport,
       ui,
     } = this.options;
+
     let vitestNodeModule;
     try {
       vitestNodeModule = await import('vitest/node');
@@ -192,21 +193,22 @@ export class VitestExecutor implements TestExecutor {
       'test',
       undefined,
       {
-        // Disable configuration file resolution/loading
-        config: false,
+        config: this.options.runnerConfig === true ? undefined : this.options.runnerConfig,
         root: workspaceRoot,
         project: ['base', this.projectName],
         name: 'base',
         include: [],
         testNamePattern: this.options.filter,
-        reporters: reporters ?? ['default'],
-        outputFile,
         watch,
         ui,
-        coverage: await generateCoverageOption(coverage, this.projectName),
-        ...debugOptions,
       },
       {
+        test: {
+          coverage: await generateCoverageOption(coverage, this.projectName),
+          outputFile,
+          ...debugOptions,
+          ...(reporters ? { reporters } : {}),
+        },
         server: {
           // Disable the actual file watcher. The boolean watch option above should still
           // be enabled as it controls other internal behavior related to rerunning tests.
