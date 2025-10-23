@@ -1,13 +1,25 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "baseBranchPatterns": ["main", "20.3.x"],
-  "extends": ["github>angular/dev-infra//renovate-presets/default.json5"],
-  "ignorePaths": ["tests/legacy-cli/e2e/assets/**", "tests/schematics/update/packages/**"],
+  "baseBranchPatterns": [
+    "main",
+    "21.0.x"
+  ],
+  "extends": [
+    "github>angular/dev-infra//renovate-presets/default.json5"
+  ],
+  "ignorePaths": [
+    "tests/legacy-cli/e2e/assets/**",
+    "tests/schematics/update/packages/**"
+  ],
   "packageRules": [
     {
       "enabled": false,
-      "matchFileNames": ["tests/legacy-cli/e2e/ng-snapshot/package.json"],
-      "matchBaseBranches": ["!main"]
+      "matchFileNames": [
+        "tests/legacy-cli/e2e/ng-snapshot/package.json"
+      ],
+      "matchBaseBranches": [
+        "!main"
+      ]
     },
     {
       "matchFileNames": [
@@ -15,7 +27,9 @@
         "packages/angular_devkit/schematics_cli/schematic/files/package.json",
         "packages/schematics/angular/utility/latest-versions/package.json"
       ],
-      "matchPackageNames": ["*"],
+      "matchPackageNames": [
+        "*"
+      ],
       "groupName": "schematics dependencies",
       "lockFileMaintenance": {
         "enabled": false
