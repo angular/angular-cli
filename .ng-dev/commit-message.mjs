@@ -9,7 +9,6 @@ export const commitMessage = {
   maxLineLength: Infinity,
   minBodyLength: 0,
   minBodyLengthTypeExcludes: ['docs'],
-  disallowFixup: true,
   // Note: When changing this logic, also change the `contributing.ejs` file.
   scopes: packages.map(({ name }) => name),
 };
