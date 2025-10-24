@@ -8,7 +8,7 @@
 
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
-import type { Connect, InlineConfig, SSROptions, ServerOptions } from 'vite';
+import type { Connect, InlineConfig, Plugin, SSROptions, ServerOptions } from 'vite';
 import type { ComponentStyleRecord } from '../../../tools/vite/middlewares';
 import {
   ServerSsrMode,
@@ -16,6 +16,7 @@ import {
   createAngularSetupMiddlewaresPlugin,
   createAngularSsrTransformPlugin,
   createRemoveIdPrefixPlugin,
+  removeSourceMapsPlugin,
 } from '../../../tools/vite/plugins';
 import { EsbuildLoaderOption, getDepOptimizationConfig } from '../../../tools/vite/utils';
 import { loadProxyConfiguration } from '../../../utils';
@@ -149,6 +150,7 @@ export async function setupServer(
   define: ApplicationBuilderInternalOptions['define'],
   extensionMiddleware?: Connect.NextHandleFunction[],
   indexHtmlTransformer?: (content: string) => Promise<string>,
+  sourceMaps = true,
   thirdPartySourcemaps = false,
 ): Promise<InlineConfig> {
   const { normalizePath } = await import('vite');
@@ -169,6 +171,33 @@ export async function setupServer(
     externalMetadata.explicitBrowser.length === 0 && ssrMode === ServerSsrMode.NoSsr;
   const cacheDir = join(serverOptions.cacheOptions.path, serverOptions.buildTarget.project, 'vite');
 
+  const plugins: Plugin[] = [
+    createAngularSetupMiddlewaresPlugin({
+      outputFiles,
+      assets,
+      indexHtmlTransformer,
+      extensionMiddleware,
+      componentStyles,
+      templateUpdates,
+      ssrMode,
+      resetComponentUpdates: () => templateUpdates.clear(),
+      projectRoot: serverOptions.projectRoot,
+    }),
+    createRemoveIdPrefixPlugin(externalMetadata.explicitBrowser),
+    await createAngularSsrTransformPlugin(serverOptions.workspaceRoot),
+    await createAngularMemoryPlugin({
+      virtualProjectRoot,
+      outputFiles,
+      templateUpdates,
+      external: externalMetadata.explicitBrowser,
+      disableViteTransport: !serverOptions.liveReload,
+    }),
+  ];
+
+  if (!sourceMaps) {
+    plugins.push(removeSourceMapsPlugin);
+  }
+
   const configuration: InlineConfig = {
     configFile: false,
     envFile: false,
@@ -180,7 +209,7 @@ export async function setupServer(
     // We use custom as we do not rely on Vite's htmlFallbackMiddleware and indexHtmlMiddleware.
     appType: 'custom',
     css: {
-      devSourcemap: true,
+      devSourcemap: sourceMaps,
     },
     // Ensure custom 'file' loader build option entries are handled by Vite in application code that
     // reference third-party libraries. Relative usage is handled directly by the build and not Vite.
@@ -217,28 +246,7 @@ export async function setupServer(
       thirdPartySourcemaps,
       define,
     ),
-    plugins: [
-      createAngularSetupMiddlewaresPlugin({
-        outputFiles,
-        assets,
-        indexHtmlTransformer,
-        extensionMiddleware,
-        componentStyles,
-        templateUpdates,
-        ssrMode,
-        resetComponentUpdates: () => templateUpdates.clear(),
-        projectRoot: serverOptions.projectRoot,
-      }),
-      createRemoveIdPrefixPlugin(externalMetadata.explicitBrowser),
-      await createAngularSsrTransformPlugin(serverOptions.workspaceRoot),
-      await createAngularMemoryPlugin({
-        virtualProjectRoot,
-        outputFiles,
-        templateUpdates,
-        external: externalMetadata.explicitBrowser,
-        disableViteTransport: !serverOptions.liveReload,
-      }),
-    ],
+    plugins,
     // Browser only optimizeDeps. (This does not run for SSR dependencies).
     optimizeDeps: getDepOptimizationConfig({
       // Only enable with caching since it causes prebundle dependencies to be cached
