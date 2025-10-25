@@ -120,7 +120,7 @@
     "karma-source-map-support": "1.4.0",
     "listr2": "9.0.5",
     "lodash": "^4.17.21",
-    "magic-string": "0.30.19",
+    "magic-string": "0.30.21",
     "prettier": "^3.0.0",
     "protractor": "~7.0.0",
     "puppeteer": "18.2.1",
