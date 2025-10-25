@@ -55,7 +55,7 @@ describe('Service Schematic', () => {
 
     const tree = await schematicRunner.runSchematic('service', options, appTree);
     const content = tree.readContent('/projects/bar/src/app/foo/foo.ts');
-    expect(content).toMatch(/providedIn: 'root'/);
+    expect(content).toMatch(/providedIn: 'root',/);
   });
 
   it('should respect the skipTests flag', async () => {
