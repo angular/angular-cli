@@ -13,6 +13,7 @@ import { VERSION } from '../../utilities/version';
 import { registerInstructionsResource } from './resources/instructions';
 import { AI_TUTOR_TOOL } from './tools/ai-tutor';
 import { BEST_PRACTICES_TOOL } from './tools/best-practices';
+import { BUILD_TOOL } from './tools/build';
 import { DOC_SEARCH_TOOL } from './tools/doc-search';
 import { FIND_EXAMPLE_TOOL } from './tools/examples';
 import { MODERNIZE_TOOL } from './tools/modernize';
@@ -27,6 +28,7 @@ import { AnyMcpToolDeclaration, registerTools } from './tools/tool-registry';
 const STABLE_TOOLS = [
   AI_TUTOR_TOOL,
   BEST_PRACTICES_TOOL,
+  BUILD_TOOL,
   DOC_SEARCH_TOOL,
   FIND_EXAMPLE_TOOL,
   LIST_PROJECTS_TOOL,
