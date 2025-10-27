@@ -14,9 +14,10 @@
  */
 
 import { existsSync as nodeExistsSync } from 'fs';
-import { spawn } from 'node:child_process';
+import { ChildProcess, spawn } from 'node:child_process';
 import { Stats } from 'node:fs';
 import { stat } from 'node:fs/promises';
+import { createServer } from 'node:net';
 
 /**
  * An error thrown when a command fails to execute.
@@ -24,8 +25,7 @@ import { stat } from 'node:fs/promises';
 export class CommandError extends Error {
   constructor(
     message: string,
-    public readonly stdout: string,
-    public readonly stderr: string,
+    public readonly logs: string[],
     public readonly code: number | null,
   ) {
     super(message);
@@ -67,7 +67,29 @@ export interface Host {
       cwd?: string;
       env?: Record<string, string>;
     },
-  ): Promise<{ stdout: string; stderr: string }>;
+  ): Promise<{ logs: string[] }>;
+
+  /**
+   * Spawns a long-running child process and returns the `ChildProcess` object.
+   * @param command The command to run.
+   * @param args The arguments to pass to the command.
+   * @param options Options for the child process.
+   * @returns The spawned `ChildProcess` instance.
+   */
+  spawn(
+    command: string,
+    args: readonly string[],
+    options?: {
+      stdio?: 'pipe' | 'ignore';
+      cwd?: string;
+      env?: Record<string, string>;
+    },
+  ): ChildProcess;
+
+  /**
+   * Finds an available TCP port on the system.
+   */
+  getAvailablePort(): Promise<number>;
 }
 
 /**
@@ -75,7 +97,9 @@ export interface Host {
  */
 export const LocalWorkspaceHost: Host = {
   stat,
+
   existsSync: nodeExistsSync,
+
   runCommand: async (
     command: string,
     args: readonly string[],
@@ -85,7 +109,7 @@ export const LocalWorkspaceHost: Host = {
       cwd?: string;
       env?: Record<string, string>;
     } = {},
-  ): Promise<{ stdout: string; stderr: string }> => {
+  ): Promise<{ logs: string[] }> => {
     const signal = options.timeout ? AbortSignal.timeout(options.timeout) : undefined;
 
     return new Promise((resolve, reject) => {
@@ -100,30 +124,74 @@ export const LocalWorkspaceHost: Host = {
         },
       });
 
-      let stdout = '';
-      childProcess.stdout?.on('data', (data) => (stdout += data.toString()));
-
-      let stderr = '';
-      childProcess.stderr?.on('data', (data) => (stderr += data.toString()));
+      const logs: string[] = [];
+      childProcess.stdout?.on('data', (data) => logs.push(data.toString()));
+      childProcess.stderr?.on('data', (data) => logs.push(data.toString()));
 
       childProcess.on('close', (code) => {
         if (code === 0) {
-          resolve({ stdout, stderr });
+          resolve({ logs });
         } else {
           const message = `Process exited with code ${code}.`;
-          reject(new CommandError(message, stdout, stderr, code));
+          reject(new CommandError(message, logs, code));
         }
       });
 
       childProcess.on('error', (err) => {
         if (err.name === 'AbortError') {
           const message = `Process timed out.`;
-          reject(new CommandError(message, stdout, stderr, null));
+          reject(new CommandError(message, logs, null));
 
           return;
         }
         const message = `Process failed with error: ${err.message}`;
-        reject(new CommandError(message, stdout, stderr, null));
+        reject(new CommandError(message, logs, null));
+      });
+    });
+  },
+
+  spawn(
+    command: string,
+    args: readonly string[],
+    options: {
+      stdio?: 'pipe' | 'ignore';
+      cwd?: string;
+      env?: Record<string, string>;
+    } = {},
+  ): ChildProcess {
+    return spawn(command, args, {
+      shell: false,
+      stdio: options.stdio ?? 'pipe',
+      cwd: options.cwd,
+      env: {
+        ...process.env,
+        ...options.env,
+      },
+    });
+  },
+
+  getAvailablePort(): Promise<number> {
+    return new Promise((resolve, reject) => {
+      // Create a new temporary server from Node's net library.
+      const server = createServer();
+
+      server.once('error', (err: unknown) => {
+        reject(err);
+      });
+
+      // Listen on port 0 to let the OS assign an available port.
+      server.listen(0, () => {
+        const address = server.address();
+
+        // Ensure address is an object with a port property.
+        if (address && typeof address === 'object') {
+          const port = address.port;
+
+          server.close();
+          resolve(port);
+        } else {
+          reject(new Error('Unable to retrieve address information from server.'));
+        }
       });
     });
   },

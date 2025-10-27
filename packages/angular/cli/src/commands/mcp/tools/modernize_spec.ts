@@ -10,12 +10,13 @@ import { Stats } from 'fs';
 import { mkdir, mkdtemp, rm, writeFile } from 'fs/promises';
 import { tmpdir } from 'os';
 import { join } from 'path';
-import * as host from '../host';
+import { CommandError } from '../host';
+import { MockHost } from '../testing/mock-host';
 import { ModernizeOutput, runModernization } from './modernize';
 
 describe('Modernize Tool', () => {
   let projectDir: string;
-  let mockHost: host.Host;
+  let mockHost: MockHost;
 
   beforeEach(async () => {
     // Create a temporary directory and a fake angular.json to satisfy the tool's project root search.
@@ -28,7 +29,7 @@ describe('Modernize Tool', () => {
       existsSync: jasmine.createSpy('existsSync').and.callFake((p: string) => {
         return p === join(projectDir, 'angular.json');
       }),
-    };
+    } as Partial<MockHost> as MockHost;
   });
 
   afterEach(async () => {
@@ -105,7 +106,7 @@ describe('Modernize Tool', () => {
       ['generate', '@angular/core:self-closing-tag', '--path', '.'],
       { cwd: projectDir },
     );
-    expect(structuredContent?.stderr).toBeUndefined();
+    expect(structuredContent?.logs).toBeUndefined();
     expect(structuredContent?.instructions).toEqual(
       jasmine.arrayWithExactContents([
         'Migration control-flow on directory . completed successfully.',
@@ -149,7 +150,7 @@ describe('Modernize Tool', () => {
       ['generate', '@angular/core:self-closing-tag', '--path', 'subfolder2'],
       { cwd: projectDir },
     );
-    expect(structuredContent?.stderr).toBeUndefined();
+    expect(structuredContent?.logs).toBeUndefined();
     expect(structuredContent?.instructions).toEqual(
       jasmine.arrayWithExactContents([
         'Migration control-flow on directory subfolder1 completed successfully.',
@@ -161,7 +162,7 @@ describe('Modernize Tool', () => {
   });
 
   it('should return an error if angular.json is not found', async () => {
-    (mockHost.existsSync as jasmine.Spy).and.returnValue(false);
+    mockHost.existsSync.and.returnValue(false);
 
     const { structuredContent } = (await runModernization(
       {
@@ -179,8 +180,8 @@ describe('Modernize Tool', () => {
 
   it('should report errors from transformations', async () => {
     // Simulate a failed execution
-    (mockHost.runCommand as jasmine.Spy).and.rejectWith(
-      new host.CommandError('Command failed with error', 'stdout', 'stderr', 1),
+    mockHost.runCommand.and.rejectWith(
+      new CommandError('Command failed with error', ['some logs'], 1),
     );
 
     const { structuredContent } = (await runModernization(
@@ -196,9 +197,7 @@ describe('Modernize Tool', () => {
       ['generate', '@angular/core:self-closing-tag', '--path', '.'],
       { cwd: projectDir },
     );
-    expect(structuredContent?.stdout).toContain('stdout');
-    expect(structuredContent?.stderr).toContain('stderr');
-    expect(structuredContent?.stderr).toContain('Command failed with error');
+    expect(structuredContent?.logs).toEqual(['some logs', 'Command failed with error']);
     expect(structuredContent?.instructions).toEqual([
       'Migration self-closing-tag on directory . failed.',
     ]);
