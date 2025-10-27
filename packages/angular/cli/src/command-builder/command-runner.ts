@@ -8,7 +8,7 @@
 
 import { logging } from '@angular-devkit/core';
 import yargs from 'yargs';
-import { Parser } from 'yargs/helpers';
+import { Parser as yargsParser } from 'yargs/helpers';
 import {
   CommandConfig,
   CommandNames,
@@ -28,8 +28,6 @@ import {
 } from './utilities/command';
 import { jsonHelpUsage } from './utilities/json-help';
 import { createNormalizeOptionsMiddleware } from './utilities/normalize-options-middleware';
-
-const yargsParser = Parser as unknown as typeof Parser.default;
 
 export async function runCommand(args: string[], logger: logging.Logger): Promise<number> {
   const {
