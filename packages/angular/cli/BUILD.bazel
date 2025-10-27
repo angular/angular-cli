@@ -38,6 +38,7 @@ ts_project(
         ],
         exclude = [
             "**/*_spec.ts",
+            "**/testing/**",
         ],
     ) + [
         # These files are generated from the JSON schema
@@ -116,7 +117,10 @@ ts_project(
     name = "angular-cli_test_lib",
     testonly = True,
     srcs = glob(
-        include = ["**/*_spec.ts"],
+        include = [
+            "**/*_spec.ts",
+            "**/testing/**",
+        ],
         exclude = [
             # NB: we need to exclude the nested node_modules that is laid out by yarn workspaces
             "node_modules/**",
