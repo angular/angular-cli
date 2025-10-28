@@ -1,8 +1,8 @@
 import { Directive } from '@angular/core';
 
 @Directive({
-  selector: '[<%= selector %>]'<% if(!standalone) {%>,
-  standalone: false<%}%>
+  selector: '[<%= selector %>]',<% if(!standalone) {%>
+  standalone: false,<%}%>
 })
 export class <%= classifiedName %> {
 
