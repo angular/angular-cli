@@ -130,6 +130,5 @@
       ]
     }
   },
-  "additionalProperties": false,
-  "required": ["buildTarget"]
+  "additionalProperties": false
 }
