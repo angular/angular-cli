@@ -23,8 +23,9 @@ import { writeTestFiles } from './write-test-files';
 export default createBuilder(
   async (schema: Schema, ctx: BuilderContext): Promise<BuilderOutput> => {
     ctx.logger.warn(
-      'NOTE: The Web Test Runner builder is currently EXPERIMENTAL and not ready for production use.',
+      'NOTE: The Web Test Runner builder is currently EXPERIMENTAL and will be removed in version 22.',
     );
+
     logBuilderStatusWarnings(schema, ctx);
 
     // Dynamic import `@web/test-runner` from the user's workspace. As an optional peer dep, it may not be installed
