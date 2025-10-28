@@ -6,11 +6,9 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { existsSync } from 'fs';
-import { stat } from 'fs/promises';
 import { dirname, join, relative } from 'path';
 import { z } from 'zod';
-import { execAsync } from './process-executor';
+import { CommandError, Host, LocalWorkspaceHost } from '../host';
 import { McpToolDeclaration, declareTool } from './tool-registry';
 
 interface Transformation {
@@ -102,10 +100,10 @@ function createToolOutput(structuredContent: ModernizeOutput) {
   };
 }
 
-function findAngularJsonDir(startDir: string): string | null {
+function findAngularJsonDir(startDir: string, host: Host): string | null {
   let currentDir = startDir;
   while (true) {
-    if (existsSync(join(currentDir, 'angular.json'))) {
+    if (host.existsSync(join(currentDir, 'angular.json'))) {
       return currentDir;
     }
     const parentDir = dirname(currentDir);
@@ -116,7 +114,7 @@ function findAngularJsonDir(startDir: string): string | null {
   }
 }
 
-export async function runModernization(input: ModernizeInput) {
+export async function runModernization(input: ModernizeInput, host: Host) {
   const transformationNames = input.transformations ?? [];
   const directories = input.directories ?? [];
 
@@ -138,9 +136,9 @@ export async function runModernization(input: ModernizeInput) {
   }
 
   const firstDir = directories[0];
-  const executionDir = (await stat(firstDir)).isDirectory() ? firstDir : dirname(firstDir);
+  const executionDir = (await host.stat(firstDir)).isDirectory() ? firstDir : dirname(firstDir);
 
-  const angularProjectRoot = findAngularJsonDir(executionDir);
+  const angularProjectRoot = findAngularJsonDir(executionDir, host);
   if (!angularProjectRoot) {
     return createToolOutput({
       instructions: ['Could not find an angular.json file in the current or parent directories.'],
@@ -164,9 +162,12 @@ export async function runModernization(input: ModernizeInput) {
       // Simple case, run the command.
       for (const dir of directories) {
         const relativePath = relative(angularProjectRoot, dir) || '.';
-        const command = `ng generate @angular/core:${transformation.name} --path ${relativePath}`;
+        const command = 'ng';
+        const args = ['generate', `@angular/core:${transformation.name}`, '--path', relativePath];
         try {
-          const { stdout, stderr } = await execAsync(command, { cwd: angularProjectRoot });
+          const { stdout, stderr } = await host.runCommand(command, args, {
+            cwd: angularProjectRoot,
+          });
           if (stdout) {
             stdoutMessages.push(stdout);
           }
@@ -177,6 +178,14 @@ export async function runModernization(input: ModernizeInput) {
             `Migration ${transformation.name} on directory ${relativePath} completed successfully.`,
           );
         } catch (e) {
+          if (e instanceof CommandError) {
+            if (e.stdout) {
+              stdoutMessages.push(e.stdout);
+            }
+            if (e.stderr) {
+              stderrMessages.push(e.stderr);
+            }
+          }
           stderrMessages.push((e as Error).message);
           instructions.push(
             `Migration ${transformation.name} on directory ${relativePath} failed.`,
@@ -228,5 +237,5 @@ ${TRANSFORMATIONS.map((t) => `  * ${t.name}: ${t.description}`).join('\n')}
   outputSchema: modernizeOutputSchema.shape,
   isLocalOnly: true,
   isReadOnly: false,
-  factory: () => runModernization,
+  factory: () => (input) => runModernization(input, LocalWorkspaceHost),
 });
