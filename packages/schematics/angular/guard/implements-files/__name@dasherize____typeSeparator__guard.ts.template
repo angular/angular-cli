@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { <%= routerImports %> } from '@angular/router';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class <%= classify(name) %>Guard implements <%= implementations %> {
   <% if (implements.includes('CanActivate')) { %>canActivate(
