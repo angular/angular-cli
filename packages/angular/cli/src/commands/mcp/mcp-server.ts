@@ -17,9 +17,9 @@ import { BUILD_TOOL } from './tools/build';
 import { DOC_SEARCH_TOOL } from './tools/doc-search';
 import { FIND_EXAMPLE_TOOL } from './tools/examples';
 import { MODERNIZE_TOOL } from './tools/modernize';
-import { SERVE_TOOL } from './tools/serve';
 import { ZONELESS_MIGRATION_TOOL } from './tools/onpush-zoneless-migration/zoneless-migration';
 import { LIST_PROJECTS_TOOL } from './tools/projects';
+import { SERVE_TOOL } from './tools/serve';
 import { AnyMcpToolDeclaration, registerTools } from './tools/tool-registry';
 
 /**
