@@ -28,7 +28,7 @@ describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
 
       const { result } = await harness.executeOnce();
       expect(result?.success).toBeTrue();
-      expect(harness.hasFile('coverage/test/index.html')).toBeFalse();
+      harness.expectFile('coverage/test/index.html').toNotExist();
     });
 
     it('should generate a code coverage report when coverage is true', async () => {
@@ -39,7 +39,19 @@ describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
 
       const { result } = await harness.executeOnce();
       expect(result?.success).toBeTrue();
-      expect(harness.hasFile('coverage/test/index.html')).toBeTrue();
+      harness.expectFile('coverage/test/index.html').toExist();
+    });
+
+    it('should generate a code coverage report when coverage is true', async () => {
+      harness.useTarget('test', {
+        ...BASE_OPTIONS,
+        coverage: true,
+        coverageReporters: ['json'] as any,
+      });
+
+      const { result } = await harness.executeOnce();
+      expect(result?.success).toBeTrue();
+      harness.expectFile('coverage/test/coverage-final.json').content.toContain('app.component.ts');
     });
   });
 });
