@@ -22,6 +22,7 @@ import {
 import { NormalizedUnitTestBuilderOptions } from '../../options';
 import type { TestExecutor } from '../api';
 import { setupBrowserConfiguration } from './browser-provider';
+import { findVitestBaseConfig } from './configuration';
 import { createVitestPlugins } from './plugins';
 
 type VitestCoverageOption = Exclude<InlineConfig['coverage'], undefined>;
@@ -207,11 +208,16 @@ export class VitestExecutor implements TestExecutor {
         }
       : {};
 
+    const runnerConfig = this.options.runnerConfig;
+
     return startVitest(
       'test',
       undefined,
       {
-        config: this.options.runnerConfig === true ? undefined : this.options.runnerConfig,
+        config:
+          runnerConfig === true
+            ? await findVitestBaseConfig([this.options.projectRoot, this.options.workspaceRoot])
+            : runnerConfig,
         root: workspaceRoot,
         project: ['base', this.projectName],
         name: 'base',

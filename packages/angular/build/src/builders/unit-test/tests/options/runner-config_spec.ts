@@ -44,7 +44,7 @@ describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
       });
 
       it('should search for a config file when `true`', async () => {
-        harness.writeFile('vitest.config.ts', VITEST_CONFIG_CONTENT);
+        harness.writeFile('vitest-base.config.ts', VITEST_CONFIG_CONTENT);
         harness.useTarget('test', {
           ...BASE_OPTIONS,
           runnerConfig: true,
@@ -57,7 +57,7 @@ describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
       });
 
       it('should ignore config file when `false`', async () => {
-        harness.writeFile('vitest.config.ts', VITEST_CONFIG_CONTENT);
+        harness.writeFile('vitest-base.config.ts', VITEST_CONFIG_CONTENT);
         harness.useTarget('test', {
           ...BASE_OPTIONS,
           runnerConfig: false,
@@ -70,9 +70,53 @@ describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
       });
 
       it('should ignore config file by default', async () => {
+        harness.writeFile('vitest-base.config.ts', VITEST_CONFIG_CONTENT);
+        harness.useTarget('test', {
+          ...BASE_OPTIONS,
+        });
+
+        const { result } = await harness.executeOnce();
+
+        expect(result?.success).toBeTrue();
+        harness.expectFile('vitest-results.xml').toNotExist();
+      });
+
+      it('should find and use a `vitest-base.config.mts` in the project root', async () => {
+        harness.writeFile('vitest-base.config.mts', VITEST_CONFIG_CONTENT);
+        harness.useTarget('test', {
+          ...BASE_OPTIONS,
+          runnerConfig: true,
+        });
+
+        const { result } = await harness.executeOnce();
+
+        expect(result?.success).toBeTrue();
+        harness.expectFile('vitest-results.xml').toExist();
+      });
+
+      it('should find and use a `vitest-base.config.js` in the workspace root', async () => {
+        // This file should be ignored because the new logic looks for `vitest-base.config.*`.
+        harness.writeFile('vitest.config.ts', VITEST_CONFIG_CONTENT);
+        // The workspace root is the directory containing the project root in the test harness.
+        harness.writeFile('vitest-base.config.js', VITEST_CONFIG_CONTENT);
+        harness.useTarget('test', {
+          ...BASE_OPTIONS,
+          runnerConfig: true,
+        });
+
+        const { result } = await harness.executeOnce();
+
+        expect(result?.success).toBeTrue();
+        harness.expectFile('vitest-results.xml').toExist();
+      });
+
+      it('should fallback to in-memory config when no base config is found', async () => {
+        // This file should be ignored because the new logic looks for `vitest-base.config.*`
+        // and when `runnerConfig` is true, it should not fall back to the default search.
         harness.writeFile('vitest.config.ts', VITEST_CONFIG_CONTENT);
         harness.useTarget('test', {
           ...BASE_OPTIONS,
+          runnerConfig: true,
         });
 
         const { result } = await harness.executeOnce();
