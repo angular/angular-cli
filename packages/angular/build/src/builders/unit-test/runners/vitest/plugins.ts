@@ -117,15 +117,26 @@ export function createVitestPlugins(
                     outputFile.origin === 'memory'
                       ? Buffer.from(outputFile.contents).toString('utf-8')
                       : await readFile(outputFile.inputPath, 'utf-8');
-                  const map = sourceMapFile
+                  const sourceMapText = sourceMapFile
                     ? sourceMapFile.origin === 'memory'
                       ? Buffer.from(sourceMapFile.contents).toString('utf-8')
                       : await readFile(sourceMapFile.inputPath, 'utf-8')
                     : undefined;
 
+                  // Vitest will include files in the coverage report if the sourcemap contains no sources.
+                  // For builder-internal generated code chunks, which are typically helper functions,
+                  // a virtual source is added to the sourcemap to prevent them from being incorrectly
+                  // included in the final coverage report.
+                  const map = sourceMapText ? JSON.parse(sourceMapText) : undefined;
+                  if (map) {
+                    if (!map.sources?.length && !map.sourcesContent?.length && !map.mappings) {
+                      map.sources = ['virtual:builder'];
+                    }
+                  }
+
                   return {
                     code,
-                    map: map ? JSON.parse(map) : undefined,
+                    map,
                   };
                 }
               },
