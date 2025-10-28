@@ -176,10 +176,6 @@ export async function* execute(
     return;
   }
 
-  context.logger.warn(
-    `NOTE: The "unit-test" builder is currently EXPERIMENTAL and not ready for production use.`,
-  );
-
   // Initialize the test runner and normalize options
   let runner;
   let normalizedOptions;

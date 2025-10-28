@@ -26,7 +26,7 @@ const execFile = promisify(execFileCb);
 export default createBuilder(
   async (schema: JestBuilderSchema, context: BuilderContext): Promise<BuilderOutput> => {
     context.logger.warn(
-      'NOTE: The Jest builder is currently EXPERIMENTAL and not ready for production use.',
+      'NOTE: The Jest builder is currently EXPERIMENTAL and will be removed in version 22.',
     );
 
     const options = normalizeOptions(schema);
