@@ -9,6 +9,7 @@
 import type { BuilderOutput } from '@angular-devkit/architect';
 import assert from 'node:assert';
 import path from 'node:path';
+import { isMatch } from 'picomatch';
 import type { InlineConfig, Vitest } from 'vitest/node';
 import { assertIsError } from '../../../../utils/error';
 import { toPosixPath } from '../../../../utils/path';
@@ -141,7 +142,9 @@ export class VitestExecutor implements TestExecutor {
     } = this.options;
 
     let vitestNodeModule;
+    let vitestCoverageModule;
     try {
+      vitestCoverageModule = await import('vitest/coverage');
       vitestNodeModule = await import('vitest/node');
     } catch (error: unknown) {
       assertIsError(error);
@@ -153,6 +156,21 @@ export class VitestExecutor implements TestExecutor {
       );
     }
     const { startVitest } = vitestNodeModule;
+
+    // Augment BaseCoverageProvider to include logic to support the built virtual files.
+    // Temporary workaround to avoid the direct filesystem checks in the base provider that
+    // were introduced in v4. Also ensures that all built virtual files are available.
+    const builtVirtualFiles = this.buildResultFiles;
+    vitestCoverageModule.BaseCoverageProvider.prototype.isIncluded = function (filename) {
+      const relativeFilename = path.relative(workspaceRoot, filename);
+      if (!this.options.include || builtVirtualFiles.has(relativeFilename)) {
+        return !isMatch(relativeFilename, this.options.exclude);
+      } else {
+        return isMatch(relativeFilename, this.options.include, {
+          ignore: this.options.exclude,
+        });
+      }
+    };
 
     // Setup vitest browser options if configured
     const browserOptions = await setupBrowserConfiguration(
