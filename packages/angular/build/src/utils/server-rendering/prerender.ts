@@ -26,6 +26,7 @@ import {
   WritableSerializableRouteTreeNode,
 } from './models';
 import type { RenderWorkerData } from './render-worker';
+import { generateRedirectStaticPage } from './utils';
 
 type PrerenderOptions = NormalizedApplicationBuildOptions['prerenderOptions'];
 type AppShellOptions = NormalizedApplicationBuildOptions['appShellOptions'];
@@ -379,29 +380,4 @@ function addTrailingSlash(url: string): string {
 
 function removeLeadingSlash(value: string): string {
   return value[0] === '/' ? value.slice(1) : value;
-}
-
-/**
- * Generates a static HTML page with a meta refresh tag to redirect the user to a specified URL.
- *
- * This function creates a simple HTML page that performs a redirect using a meta tag.
- * It includes a fallback link in case the meta-refresh doesn't work.
- *
- * @param url - The URL to which the page should redirect.
- * @returns The HTML content of the static redirect page.
- */
-function generateRedirectStaticPage(url: string): string {
-  return `
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <title>Redirecting</title>
-    <meta http-equiv="refresh" content="0; url=${url}">
-  </head>
-  <body>
-    <pre>Redirecting to <a href="${url}">${url}</a></pre>
-  </body>
-</html>
-`.trim();
 }
