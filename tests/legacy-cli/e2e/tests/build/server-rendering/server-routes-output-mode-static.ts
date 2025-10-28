@@ -29,7 +29,8 @@ export default async function () {
   await writeFile(
     'src/app/app.routes.ts',
     `
-  import { Routes } from '@angular/router';
+  import { inject } from '@angular/core';
+  import { Routes, Router } from '@angular/router';
   import { Home } from './home/home';
   import { Ssg } from './ssg/ssg';
   import { SsgWithParams } from './ssg-with-params/ssg-with-params';
@@ -46,6 +47,12 @@ export default async function () {
     {
       path: 'ssg-redirect',
       redirectTo: 'ssg'
+    },
+    {
+      path: 'ssg-redirect-via-guard',
+      canActivate: [() => {
+        return inject(Router).createUrlTree(['ssg'], { queryParams: { foo: 'bar' }})
+      }],
     },
     {
       path: 'ssg/:id',
@@ -106,8 +113,10 @@ export default async function () {
     'ssg/index.html': /ng-server-context="ssg".+ssg works!/,
     'ssg/one/index.html': /ng-server-context="ssg".+ssg-with-params works!/,
     'ssg/two/index.html': /ng-server-context="ssg".+ssg-with-params works!/,
-    // When static redirects as generated as meta tags.
+    // When static redirects are generated as meta tags.
     'ssg-redirect/index.html': '<meta http-equiv="refresh" content="0; url=/ssg">',
+    'ssg-redirect-via-guard/index.html':
+      '<meta http-equiv="refresh" content="0; url=/ssg?foo=bar">',
   };
 
   for (const [filePath, fileMatch] of Object.entries(expects)) {
