@@ -97,6 +97,7 @@ export function execute(
               normalizedOptions as typeof normalizedOptions & {
                 hmr: boolean;
                 allowedHosts: true | string[];
+                define: { [key: string]: string } | undefined;
               },
               builderName,
               (options, context, codePlugins) => {
