@@ -162,6 +162,24 @@ export class BuilderHarness<T> {
     return this;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  modifyTarget<O extends object = any>(
+    targetName: string,
+    modifier: (options: O) => O | void,
+  ): this {
+    const target = this.builderTargets.get(targetName);
+    if (!target) {
+      throw new Error(`Target "${targetName}" not found.`);
+    }
+
+    const newOptions = modifier(target.options as O);
+    if (newOptions) {
+      target.options = newOptions as json.JsonObject;
+    }
+
+    return this;
+  }
+
   execute(
     options: Partial<BuilderHarnessExecutionOptions> = {},
   ): Observable<BuilderHarnessExecutionResult> {

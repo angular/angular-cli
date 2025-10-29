@@ -49,7 +49,7 @@ export type BuilderAction = (
  * Build options that are also present on the dev server but are only passed
  * to the build.
  */
-const CONVENIENCE_BUILD_OPTIONS = ['watch', 'poll', 'verbose'] as const;
+const CONVENIENCE_BUILD_OPTIONS = ['watch', 'poll', 'verbose', 'define'] as const;
 
 // eslint-disable-next-line max-lines-per-function
 export async function* serveWithVite(
@@ -75,7 +75,15 @@ export async function* serveWithVite(
   for (const optionName of CONVENIENCE_BUILD_OPTIONS) {
     const optionValue = serverOptions[optionName];
     if (optionValue !== undefined) {
-      rawBrowserOptions[optionName] = optionValue;
+      if (optionName === 'define' && rawBrowserOptions[optionName]) {
+        // Define has merging behavior within the application
+        for (const [key, value] of Object.entries(optionValue)) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          (rawBrowserOptions[optionName] as any)[key] = value;
+        }
+      } else {
+        rawBrowserOptions[optionName] = optionValue;
+      }
     }
   }
 
