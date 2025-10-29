@@ -8,10 +8,8 @@
 
 import { ChildProcess, spawn } from 'child_process';
 import { z } from 'zod';
-import { McpToolContext, declareTool } from './tool-registry';
-
-let devServerProcess: ChildProcess | null = null;
-const serverLogs: string[] = [];
+import { Host, LocalWorkspaceHost } from '../host';
+import { McpToolDeclaration, declareTool } from './tool-registry';
 
 const serveToolInputSchema = z.object({
   command: z.enum(['start_devserver', 'stop_devserver']).describe('The subcommand to execute.'),
@@ -37,69 +35,74 @@ const serveToolOutputSchema = z.object({
 
 export type ServeToolOutput = z.infer<typeof serveToolOutputSchema>;
 
-function serveToolFactory(context: McpToolContext) {
-  return (input: ServeToolInput) => {
-    switch (input.command) {
-      case 'start_devserver':
-        if (devServerProcess) {
-          return {
-            structuredContent: {
-              message: 'Development server is already running.',
-            },
-          };
-        }
-
-        const args = ['serve'];
-        if (input.project) {
-          args.push(input.project);
-        }
-        if (input.configuration) {
-          args.push(`--configuration=${input.configuration}`);
-        }
-
-        serverLogs.length = 0; // Clear previous logs
-        devServerProcess = spawn('ng', args, { stdio: 'pipe' });
-
-        devServerProcess.stdout?.on('data', (data) => {
-          serverLogs.push(data.toString());
-        });
-        devServerProcess.stderr?.on('data', (data) => {
-          serverLogs.push(data.toString());
-        });
-
-        devServerProcess.on('close', () => {
-          devServerProcess = null;
-        });
-
-        return {
-          structuredContent: {
-            message: 'Development server started.',
-          },
-        };
-
-      case 'stop_devserver':
-        if (!devServerProcess) {
-          return {
-            structuredContent: {
-              message: 'Development server is not running.',
-            },
-          };
-        }
-
-        devServerProcess.kill('SIGTERM');
-        devServerProcess = null;
-
-        return {
-          structuredContent: {
-            message: 'Development server stopped.',
-            logs: serverLogs,
-          },
-        };
-    }
-  };
+interface ServeContext {
+  devServerProcess: ChildProcess | null;
+  serverLogs: string[];
 }
 
-export const SERVE_TOOL = declareTool({
+function startDevserver(input: ServeToolInput, host: Host, context: ServeContext) {
+  if (context.devServerProcess) {
+    return createStructureContentOutput({
+      message: 'Development server is already running.',
+    });
+  }
+
+  const args = ['serve'];
+  if (input.project) {
+    args.push(input.project);
+  }
+  if (input.configuration) {
+    args.push(`--configuration=${input.configuration}`);
+  }
+
+  context.serverLogs.length = 0; // Clear previous logs
+  context.devServerProcess = host.spawn('ng', args, { stdio: 'pipe' });
+
+  context.devServerProcess.stdout?.on('data', (data) => {
+    context.serverLogs.push(data.toString());
+  });
+  context.devServerProcess.stderr?.on('data', (data) => {
+    context.serverLogs.push(data.toString());
+  });
+
+  context.devServerProcess.on('close', () => {
+    context.devServerProcess = null;
+  });
+
+  return createStructureContentOutput({
+    message: 'Development server started.',
+  });
+}
+
+function stopDevserver(context: ServeContext) {
+  if (!context.devServerProcess) {
+    return createStructureContentOutput({
+      message: 'Development server is already not running.',
+    });
+  }
+
+  context.devServerProcess.kill('SIGTERM');
+  context.devServerProcess = null;
+
+  return createStructureContentOutput({
+    message: 'Development server stopped.',
+    logs: context.serverLogs,
+  });
+}
+
+function runServeTool(input: ServeToolInput, host: Host, context: ServeContext) {
+  switch (input.command) {
+    case 'start_devserver':
+      return startDevserver(input, host, context);
+    case 'stop_devserver':
+      return stopDevserver(context);
+  }
+}
+
+export const SERVE_TOOL: McpToolDeclaration<
+  typeof serveToolInputSchema.shape,
+  typeof serveToolOutputSchema.shape
+> = declareTool({
   name: 'serve',
   title: 'Serve Tool',
   description: `
@@ -107,7 +110,8 @@ export const SERVE_TOOL = declareTool({
 Manages the Angular development server ("ng serve"). It allows you to start and stop the server as a background process.
 </Purpose>
 <Use Cases>
-* **Starting the Server:** Use the 'start_devserver' command to begin serving the application. The tool will return immediately while the server runs in the background.
+* **Starting the Server:** Use the 'start_devserver' command to begin serving the application. The tool will return immediately
+  while the server runs in the background.
 * **Stopping the Server:** Use the 'stop_devserver' command to terminate the running development server and retrieve the logs.
 </Use Cases>
 <Operational Notes>
@@ -120,5 +124,7 @@ Manages the Angular development server ("ng serve"). It allows you to start and 
   isLocalOnly: true,
   inputSchema: serveToolInputSchema.shape,
   outputSchema: serveToolOutputSchema.shape,
-  factory: serveToolFactory,
+  factory: () => (input) => {
+    return runServeTool(input, LocalWorkspaceHost, { devServerProcess: null, serverLogs: [] });
+  },
 });

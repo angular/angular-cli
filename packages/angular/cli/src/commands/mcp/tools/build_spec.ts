@@ -17,7 +17,7 @@ describe('Build Tool', () => {
       runCommand: jasmine.createSpy('runCommand').and.resolveTo({ stdout: '', stderr: '' }),
       stat: jasmine.createSpy('stat'),
       existsSync: jasmine.createSpy('existsSync'),
-    };
+    } as Partial<Host> as Host;
   });
 
   it('should handle a successful build and extract the output path', async () => {

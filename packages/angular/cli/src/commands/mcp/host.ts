@@ -14,7 +14,7 @@
  */
 
 import { existsSync as nodeExistsSync } from 'fs';
-import { spawn } from 'node:child_process';
+import { ChildProcess, spawn } from 'node:child_process';
 import { Stats } from 'node:fs';
 import { stat } from 'node:fs/promises';
 
@@ -68,6 +68,23 @@ export interface Host {
       env?: Record<string, string>;
     },
   ): Promise<{ stdout: string; stderr: string }>;
+
+  /**
+   * Spawns a long-running child process and returns the `ChildProcess` object.
+   * @param command The command to run.
+   * @param args The arguments to pass to the command.
+   * @param options Options for the child process.
+   * @returns The spawned `ChildProcess` instance.
+   */
+  spawn(
+    command: string,
+    args: readonly string[],
+    options?: {
+      stdio?: 'pipe' | 'ignore';
+      cwd?: string;
+      env?: Record<string, string>;
+    },
+  ): ChildProcess;
 }
 
 /**
@@ -75,7 +92,9 @@ export interface Host {
  */
 export const LocalWorkspaceHost: Host = {
   stat,
+
   existsSync: nodeExistsSync,
+
   runCommand: async (
     command: string,
     args: readonly string[],
@@ -125,6 +144,26 @@ export const LocalWorkspaceHost: Host = {
         const message = `Process failed with error: ${err.message}`;
         reject(new CommandError(message, stdout, stderr, null));
       });
+    });
+  },
+
+  spawn(
+    command: string,
+    args: readonly string[],
+    options: {
+      stdio?: 'pipe' | 'ignore';
+      cwd?: string;
+      env?: Record<string, string>;
+    } = {},
+  ): ChildProcess {
+    return spawn(command, args, {
+      shell: false,
+      stdio: options.stdio ?? 'pipe',
+      cwd: options.cwd,
+      env: {
+        ...process.env,
+        ...options.env,
+      },
     });
   },
 };
