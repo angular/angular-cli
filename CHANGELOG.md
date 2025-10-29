@@ -1,3 +1,36 @@
+<a name="21.0.0-next.10"></a>
+
+# 21.0.0-next.10 (2025-10-29)
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                         |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------- |
+| [c967a447c](https://github.com/angular/angular-cli/commit/c967a447ce755fbf582ec35aa24bb6e0fa0043cf) | fix  | correct spacing in application spec tsconfig        |
+| [00d941c43](https://github.com/angular/angular-cli/commit/00d941c433de718cf3c38033d5d68dd86f790291) | fix  | correct style guide paths for standalone components |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                 |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------- |
+| [6e395fc0c](https://github.com/angular/angular-cli/commit/6e395fc0c4505dd32b3237ea116e8db6bde25758) | fix  | ensure vitest code coverage handles virtual files correctly |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                              |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------- |
+| [b2f048773](https://github.com/angular/angular-cli/commit/b2f048773c6014022983e7ccc52cb760619d8a1b) | fix  | add --ui option for Vitest runner                        |
+| [530d9270e](https://github.com/angular/angular-cli/commit/530d9270e87786594dd8d1956b0806a28650db25) | fix  | add `define` option to dev-server                        |
+| [091d1c03e](https://github.com/angular/angular-cli/commit/091d1c03e9665371f52c4cb8ec6cd9f1f862a407) | fix  | add adapters to new reporter                             |
+| [542d52868](https://github.com/angular/angular-cli/commit/542d528683cc0e51fd5a55ed6dbf43168f7a51a5) | fix  | allow custom runner configuration file for unit-test     |
+| [9975c7249](https://github.com/angular/angular-cli/commit/9975c72494bc2a71359dc4c5a31e43eed040716e) | fix  | ensure locale data plugin runs before other plugins      |
+| [7c529c1bc](https://github.com/angular/angular-cli/commit/7c529c1bc606101ab8c506e0b7845d2e9f509db4) | fix  | externalize Angular dependencies in Vitest runner        |
+| [a41f4e860](https://github.com/angular/angular-cli/commit/a41f4e860dd28bee28af47c1513f55450ca74b5f) | fix  | handle redirects from guards during prerendering         |
+| [bab5806c2](https://github.com/angular/angular-cli/commit/bab5806c281fd4cdd63b7969e691d703ed1e7680) | fix  | introduce vitest-base.config for test configuration      |
+| [9132e6af9](https://github.com/angular/angular-cli/commit/9132e6af9fd573d8b39c69a50b4b93e256145fd4) | fix  | resolve browser provider packages using project resolver |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="21.0.0-next.9"></a>
 
 # 21.0.0-next.9 (2025-10-23)
