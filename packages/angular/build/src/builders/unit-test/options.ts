@@ -96,22 +96,21 @@ export async function normalizeOptions(
     exclude: options.exclude,
     filter,
     runnerName: runner ?? 'vitest',
-    coverage: options.coverage
-      ? {
-          exclude: options.coverageExclude,
-          include: options.coverageInclude,
-          reporters: normalizeReporterOption(options.coverageReporters),
-          thresholds: options.coverageThresholds,
-          // The schema generation tool doesn't support tuple types for items, but the schema validation
-          // does ensure that the array has exactly two numbers.
-          watermarks: options.coverageWatermarks as {
-            statements?: [number, number];
-            branches?: [number, number];
-            functions?: [number, number];
-            lines?: [number, number];
-          },
-        }
-      : undefined,
+    coverage: {
+      enabled: options.coverage,
+      exclude: options.coverageExclude,
+      include: options.coverageInclude,
+      reporters: normalizeReporterOption(options.coverageReporters),
+      thresholds: options.coverageThresholds,
+      // The schema generation tool doesn't support tuple types for items, but the schema validation
+      // does ensure that the array has exactly two numbers.
+      watermarks: options.coverageWatermarks as {
+        statements?: [number, number];
+        branches?: [number, number];
+        functions?: [number, number];
+        lines?: [number, number];
+      },
+    },
     tsConfig,
     buildProgress: progress,
     reporters: normalizeReporterOption(options.reporters),
