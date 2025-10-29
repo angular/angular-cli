@@ -67,7 +67,7 @@ export async function setupBrowserConfiguration(
   if (providerName) {
     const providerPackage = `@vitest/browser-${providerName}`;
     try {
-      const providerModule = await import(providerPackage);
+      const providerModule = await import(projectResolver(providerPackage));
 
       // Validate that the imported module has the expected structure
       const providerFactory = providerModule[providerName];
