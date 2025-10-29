@@ -21,12 +21,12 @@ multiple_version_override(
 
 bazel_dep(name = "aspect_bazel_lib", version = "2.21.2")
 bazel_dep(name = "bazel_skylib", version = "1.8.2")
-bazel_dep(name = "aspect_rules_esbuild", version = "0.23.0")
+bazel_dep(name = "aspect_rules_esbuild", version = "0.24.0")
 bazel_dep(name = "aspect_rules_jasmine", version = "2.0.0")
 bazel_dep(name = "rules_angular")
 git_override(
     module_name = "rules_angular",
-    commit = "1f1aa3edb32f5e9135088548a419874a094eb687",
+    commit = "b97a21c7cead2a07ea1bffa68eaae7f7e08dfc5f",
     remote = "https://github.com/devversion/rules_angular.git",
 )
 
