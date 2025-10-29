@@ -87,8 +87,8 @@ export class KarmaExecutor implements TestExecutor {
       poll: buildTargetOptions.poll,
       preserveSymlinks: buildTargetOptions.preserveSymlinks,
       browsers: unitTestOptions.browsers?.join(','),
-      codeCoverage: !!unitTestOptions.coverage,
-      codeCoverageExclude: unitTestOptions.coverage?.exclude,
+      codeCoverage: unitTestOptions.coverage.enabled,
+      codeCoverageExclude: unitTestOptions.coverage.exclude,
       fileReplacements: buildTargetOptions.fileReplacements,
       reporters: unitTestOptions.reporters?.map((reporter) => {
         // Karma only supports string reporters.
@@ -123,7 +123,7 @@ export class KarmaExecutor implements TestExecutor {
         }
 
         // Add coverage options
-        if (unitTestOptions.coverage) {
+        if (unitTestOptions.coverage.enabled) {
           const { thresholds, watermarks } = unitTestOptions.coverage;
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const coverageReporter = ((options as any).coverageReporter ??= {});

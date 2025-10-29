@@ -242,12 +242,6 @@ async function generateCoverageOption(
   coverage: NormalizedUnitTestBuilderOptions['coverage'],
   projectName: string,
 ): Promise<VitestCoverageOption> {
-  if (!coverage) {
-    return {
-      enabled: false,
-    };
-  }
-
   let defaultExcludes: string[] = [];
   if (coverage.exclude) {
     try {
@@ -257,7 +251,7 @@ async function generateCoverageOption(
   }
 
   return {
-    enabled: true,
+    enabled: coverage.enabled,
     excludeAfterRemap: true,
     include: coverage.include,
     reportsDirectory: toPosixPath(path.join('coverage', projectName)),
