@@ -8,6 +8,7 @@
 
 import { z } from 'zod';
 import { CommandError, Host, LocalWorkspaceHost } from '../host';
+import { createStructureContentOutput } from '../utils';
 import { McpToolContext, McpToolDeclaration, declareTool } from './tool-registry';
 
 const CONFIGURATIONS = {

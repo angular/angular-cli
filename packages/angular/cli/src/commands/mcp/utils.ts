@@ -18,7 +18,7 @@
  * @param structuredContent
  * @returns
  */
-function createStructureContentOutput<OutputType>(structuredContent: OutputType) {
+export function createStructureContentOutput<OutputType>(structuredContent: OutputType) {
   return {
     content: [{ type: 'text' as const, text: JSON.stringify(structuredContent, null, 2) }],
     structuredContent,

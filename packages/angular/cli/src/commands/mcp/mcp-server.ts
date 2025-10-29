@@ -19,8 +19,10 @@ import { FIND_EXAMPLE_TOOL } from './tools/examples';
 import { MODERNIZE_TOOL } from './tools/modernize';
 import { ZONELESS_MIGRATION_TOOL } from './tools/onpush-zoneless-migration/zoneless-migration';
 import { LIST_PROJECTS_TOOL } from './tools/projects';
-import { SERVE_TOOL } from './tools/serve';
+import { START_DEVSERVER_TOOL } from './tools/start-devserver';
+import { STOP_DEVSERVER_TOOL } from './tools/stop-devserver';
 import { AnyMcpToolDeclaration, registerTools } from './tools/tool-registry';
+import { WAIT_FOR_DEVSERVER_BUILD_TOOL } from './tools/wait-for-devserver-build';
 
 /**
  * The set of tools that are enabled by default for the MCP server.
@@ -36,10 +38,19 @@ const STABLE_TOOLS = [
 ] as const;
 
 /**
+ * Tools to manage devservers. Should be bundled together.
+ */
+const SERVE_TOOLS = [START_DEVSERVER_TOOL, STOP_DEVSERVER_TOOL, WAIT_FOR_DEVSERVER_BUILD_TOOL];
+
+/**
  * The set of tools that are available but not enabled by default.
  * These tools are considered experimental and may have limitations.
  */
-export const EXPERIMENTAL_TOOLS = [MODERNIZE_TOOL, ZONELESS_MIGRATION_TOOL, SERVE_TOOL] as const;
+export const EXPERIMENTAL_TOOLS = [
+  MODERNIZE_TOOL,
+  ZONELESS_MIGRATION_TOOL,
+  ...SERVE_TOOLS,
+] as const;
 
 export async function createMcpServer(
   options: {
