@@ -4,9 +4,9 @@
     "@angular-devkit/architect": "workspace:*",
     "@angular/ssr": "workspace:*",
     "@angular-devkit/build-angular": "workspace:*",
-    "@vitest/coverage-v8": "4.0.3",
+    "@vitest/coverage-v8": "4.0.4",
     "jsdom": "27.0.1",
     "rxjs": "7.8.2",
-    "vitest": "4.0.3"
+    "vitest": "4.0.4"
   }
 }
