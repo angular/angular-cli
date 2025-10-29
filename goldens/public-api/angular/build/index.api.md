@@ -112,6 +112,9 @@ export enum BuildOutputFileType {
 export type DevServerBuilderOptions = {
     allowedHosts?: AllowedHosts;
     buildTarget: string;
+    define?: {
+        [key: string]: string;
+    };
     headers?: {
         [key: string]: string;
     };
