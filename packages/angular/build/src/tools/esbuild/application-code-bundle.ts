@@ -686,7 +686,7 @@ function getEsBuildCommonPolyfillsOptions(
     needLocaleDataPlugin = true;
   }
   if (needLocaleDataPlugin) {
-    buildOptions.plugins.push(createAngularLocaleDataPlugin());
+    buildOptions.plugins.unshift(createAngularLocaleDataPlugin());
   }
 
   if (polyfills.length === 0) {
