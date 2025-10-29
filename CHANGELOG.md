@@ -1,3 +1,23 @@
+<a name="20.3.8"></a>
+
+# 20.3.8 (2025-10-29)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------- |
+| [813cba9b9](https://github.com/angular/angular-cli/commit/813cba9b9bfe60e874595ce25608ca85a890f6bf) | fix  | expand jest and jest-environment-jsdom to allow version 30 |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                         |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------- |
+| [542973ab0](https://github.com/angular/angular-cli/commit/542973ab074ccd9a5f09f73ee7f2706a21db45fc) | fix  | add adapters to new reporter                        |
+| [f0885691d](https://github.com/angular/angular-cli/commit/f0885691d18b6575351774fcc50d746d981285f6) | fix  | ensure locale data plugin runs before other plugins |
+| [45e498f95](https://github.com/angular/angular-cli/commit/45e498f9576ff83eebe02deb235d36498ce06bde) | fix  | handle redirects from guards during prerendering    |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="20.3.7"></a>
 
 # 20.3.7 (2025-10-22)
