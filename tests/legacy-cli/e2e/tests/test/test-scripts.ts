@@ -1,3 +1,4 @@
+import { getGlobalVariable } from '../../utils/env';
 import { writeMultipleFiles } from '../../utils/fs';
 import { ng } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';
@@ -60,9 +61,10 @@ export default async function () {
   // should fail because the global scripts were not added to scripts array
   await expectToFail(() => ng('test', '--watch=false'));
 
+  const isWebpack = !getGlobalVariable('argv')['esbuild'];
   await updateJsonFile('angular.json', (workspaceJson) => {
     const appArchitect = workspaceJson.projects['test-project'].architect;
-    appArchitect.test.options.scripts = [
+    appArchitect[isWebpack ? 'test' : 'build'].options.scripts = [
       { input: 'src/string-script.js' },
       { input: 'src/input-script.js' },
     ];
