@@ -29,7 +29,7 @@ const stopDevserverToolOutputSchema = z.object({
 
 export type StopDevserverToolOutput = z.infer<typeof stopDevserverToolOutputSchema>;
 
-function stopDevserver(input: StopDevserverToolInput, context: McpToolContext) {
+export function stopDevserver(input: StopDevserverToolInput, context: McpToolContext) {
   const projectKey = devServerKey(input.project);
   const devServer = context.devServers.get(projectKey);
 

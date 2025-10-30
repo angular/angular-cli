@@ -17,6 +17,7 @@ import { existsSync as nodeExistsSync } from 'fs';
 import { ChildProcess, spawn } from 'node:child_process';
 import { Stats } from 'node:fs';
 import { stat } from 'node:fs/promises';
+import { createServer } from 'node:net';
 
 /**
  * An error thrown when a command fails to execute.
@@ -85,6 +86,11 @@ export interface Host {
       env?: Record<string, string>;
     },
   ): ChildProcess;
+
+  /**
+   * Finds an available TCP port on the system.
+   */
+  getAvailablePort(): Promise<number>;
 }
 
 /**
@@ -164,6 +170,32 @@ export const LocalWorkspaceHost: Host = {
         ...process.env,
         ...options.env,
       },
+    });
+  },
+
+  getAvailablePort(): Promise<number> {
+    return new Promise((resolve, reject) => {
+      // Create a new temporary server from Node's net library.
+      const server = createServer();
+
+      server.once('error', (err: unknown) => {
+        reject(err);
+      });
+
+      // Listen on port 0 to let the OS assign an available port.
+      server.listen(0, () => {
+        const address = server.address();
+
+        // Ensure address is an object with a port property.
+        if (address && typeof address === 'object') {
+          const port = address.port;
+
+          server.close();
+          resolve(port);
+        } else {
+          reject(new Error('Unable to retrieve address information from server.'));
+        }
+      });
     });
   },
 };

@@ -25,7 +25,6 @@ const waitForDevserverBuildToolInputSchema = z.object({
     ),
   timeout: z
     .number()
-    .optional()
     .default(30000)
     .describe('The maximum time to wait for the build to complete, in milliseconds.'),
 });
@@ -50,7 +49,7 @@ function wait(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-async function waitForDevserverBuild(
+export async function waitForDevserverBuild(
   input: WaitForDevserverBuildToolInput,
   context: McpToolContext,
 ) {
@@ -59,7 +58,7 @@ async function waitForDevserverBuild(
   const deadline = Date.now() + input.timeout;
 
   if (!devServer) {
-    return createStructureContentOutput({
+    return createStructureContentOutput<WaitForDevserverBuildToolOutput>({
       status: 'no_devserver_found',
     });
   }
@@ -67,14 +66,14 @@ async function waitForDevserverBuild(
   await wait(DEBOUNCE_DELAY);
   while (devServer.isBuilding()) {
     if (Date.now() > deadline) {
-      return createStructureContentOutput({
+      return createStructureContentOutput<WaitForDevserverBuildToolOutput>({
         status: 'timeout',
       });
     }
     await wait(DEBOUNCE_DELAY);
   }
 
-  return createStructureContentOutput({
+  return createStructureContentOutput<WaitForDevserverBuildToolOutput>({
     ...devServer.getMostRecentBuild(),
   });
 }

@@ -6,14 +6,13 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { createServer } from 'net';
 import { z } from 'zod';
 import { LocalDevServer, devServerKey } from '../dev-server';
 import { Host, LocalWorkspaceHost } from '../host';
 import { createStructureContentOutput } from '../utils';
 import { McpToolContext, McpToolDeclaration, declareTool } from './tool-registry';
 
-const startDevserverToolInputSchema = z.object({
+const startDevServerToolInputSchema = z.object({
   project: z
     .string()
     .optional()
@@ -22,9 +21,9 @@ const startDevserverToolInputSchema = z.object({
     ),
 });
 
-export type StartDevserverToolInput = z.infer<typeof startDevserverToolInputSchema>;
+export type StartDevserverToolInput = z.infer<typeof startDevServerToolInputSchema>;
 
-const startDevserverToolOutputSchema = z.object({
+const startDevServerToolOutputSchema = z.object({
   message: z.string().describe('A message indicating the result of the operation.'),
   address: z
     .string()
@@ -34,42 +33,17 @@ const startDevserverToolOutputSchema = z.object({
     ),
 });
 
-export type StartDevserverToolOutput = z.infer<typeof startDevserverToolOutputSchema>;
-
-/**
- * Finds an available TCP port on the system.
- */
-function getAvailablePort(): Promise<number> {
-  return new Promise((resolve, reject) => {
-    // Create a new temporary server from Node's net library.
-    const server = createServer();
-
-    server.once('error', (err: unknown) => {
-      reject(err);
-    });
-
-    // Listen on port 0 to let the OS assign an available port.
-    server.listen(0, () => {
-      const address = server.address();
-
-      // Ensure address is an object with a port property.
-      if (address && typeof address === 'object') {
-        const port = address.port;
-
-        server.close();
-        resolve(port);
-      } else {
-        reject(new Error('Unable to retrieve address information from server.'));
-      }
-    });
-  });
-}
+export type StartDevserverToolOutput = z.infer<typeof startDevServerToolOutputSchema>;
 
 function localhostAddress(port: number) {
   return `http://localhost:${port}/`;
 }
 
-async function startDevserver(input: StartDevserverToolInput, context: McpToolContext, host: Host) {
+export async function startDevServer(
+  input: StartDevserverToolInput,
+  context: McpToolContext,
+  host: Host,
+) {
   const projectKey = devServerKey(input.project);
 
   let devServer = context.devServers.get(projectKey);
@@ -80,7 +54,7 @@ async function startDevserver(input: StartDevserverToolInput, context: McpToolCo
     });
   }
 
-  const port = await getAvailablePort();
+  const port = await host.getAvailablePort();
 
   devServer = new LocalDevServer({ host, project: input.project, port });
   devServer.start();
@@ -94,8 +68,8 @@ async function startDevserver(input: StartDevserverToolInput, context: McpToolCo
 }
 
 export const START_DEVSERVER_TOOL: McpToolDeclaration<
-  typeof startDevserverToolInputSchema.shape,
-  typeof startDevserverToolOutputSchema.shape
+  typeof startDevServerToolInputSchema.shape,
+  typeof startDevServerToolOutputSchema.shape
 > = declareTool({
   name: 'start_devserver',
   title: 'Start Development Server',
@@ -117,9 +91,9 @@ Starts the Angular development server ("ng serve") as a background process.
 `,
   isReadOnly: false,
   isLocalOnly: true,
-  inputSchema: startDevserverToolInputSchema.shape,
-  outputSchema: startDevserverToolOutputSchema.shape,
+  inputSchema: startDevServerToolInputSchema.shape,
+  outputSchema: startDevServerToolOutputSchema.shape,
   factory: (context) => (input) => {
-    return startDevserver(input, context, LocalWorkspaceHost);
+    return startDevServer(input, context, LocalWorkspaceHost);
   },
 });
