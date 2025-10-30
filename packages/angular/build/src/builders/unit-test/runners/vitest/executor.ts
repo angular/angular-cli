@@ -190,7 +190,7 @@ export class VitestExecutor implements TestExecutor {
     );
 
     const testSetupFiles = this.prepareSetupFiles();
-    const plugins = createVitestPlugins(this.options, testSetupFiles, browserOptions, {
+    const plugins = createVitestPlugins({
       workspaceRoot,
       projectSourceRoot: this.options.projectSourceRoot,
       projectName: this.projectName,
@@ -209,36 +209,54 @@ export class VitestExecutor implements TestExecutor {
       : {};
 
     const runnerConfig = this.options.runnerConfig;
+    const externalConfigPath =
+      runnerConfig === true
+        ? await findVitestBaseConfig([this.options.projectRoot, this.options.workspaceRoot])
+        : runnerConfig;
+    const projectName = this.projectName;
 
     return startVitest(
       'test',
       undefined,
       {
-        config:
-          runnerConfig === true
-            ? await findVitestBaseConfig([this.options.projectRoot, this.options.workspaceRoot])
-            : runnerConfig,
+        config: externalConfigPath,
         root: workspaceRoot,
-        project: ['base', this.projectName],
-        name: 'base',
-        include: [],
+        project: projectName,
+        outputFile,
         testNamePattern: this.options.filter,
         watch,
         ui,
+        ...debugOptions,
       },
       {
         test: {
           coverage: await generateCoverageOption(coverage, this.projectName),
-          outputFile,
-          ...debugOptions,
           ...(reporters ? { reporters } : {}),
+          projects: [
+            {
+              extends: externalConfigPath || true,
+              test: {
+                name: projectName,
+                globals: true,
+                setupFiles: testSetupFiles,
+                ...(this.options.exclude ? { exclude: this.options.exclude } : {}),
+                browser: browserOptions.browser,
+                // Use `jsdom` if no browsers are explicitly configured.
+                ...(browserOptions.browser ? {} : { environment: 'jsdom' }),
+                ...(this.options.include ? { include: this.options.include } : {}),
+              },
+              optimizeDeps: {
+                noDiscovery: true,
+              },
+              plugins,
+            },
+          ],
         },
         server: {
           // Disable the actual file watcher. The boolean watch option above should still
           // be enabled as it controls other internal behavior related to rerunning tests.
           watch: null,
         },
-        plugins,
       },
     );
   }
