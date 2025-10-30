@@ -18,7 +18,7 @@ export interface McpToolContext {
   workspace?: AngularWorkspace;
   logger: { warn(text: string): void };
   exampleDatabasePath?: string;
-  devServers?: Map<string, DevServer>;
+  devServers: Map<string, DevServer>;
 }
 
 export type McpToolFactory<TInput extends ZodRawShape> = (

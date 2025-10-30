@@ -9,7 +9,7 @@
 import { z } from 'zod';
 import { CommandError, Host, LocalWorkspaceHost } from '../host';
 import { createStructureContentOutput } from '../utils';
-import { McpToolContext, McpToolDeclaration, declareTool } from './tool-registry';
+import { McpToolDeclaration, declareTool } from './tool-registry';
 
 const CONFIGURATIONS = {
   development: {
@@ -50,6 +50,7 @@ export type BuildToolOutput = z.infer<typeof buildToolOutputSchema>;
 export async function runBuild(input: BuildToolInput, host: Host) {
   const configurationName = input.configuration ?? 'development';
   const configuration = CONFIGURATIONS[configurationName as keyof typeof CONFIGURATIONS];
+
   const args = ['build'];
   if (input.project) {
     args.push(input.project);
@@ -99,18 +100,18 @@ export const BUILD_TOOL: McpToolDeclaration<
   title: 'Build Tool',
   description: `
 <Purpose>
-Perform a one-off, non-watched build with "ng build". Use this tool whenever
-the user wants to build an Angular project; this is similar to "ng build", but
-the tool is smarter about using the right configuration and collecting the
-output logs.
+Perform a one-off, non-watched build with "ng build". Use this tool whenever the user wants to build an Angular project; this is similar to
+"ng build", but the tool is smarter about using the right configuration and collecting the output logs.
 </Purpose>
 <Use Cases>
 * Building the Angular project and getting build logs back.
 </Use Cases>
 <Operational Notes>
 * This tool runs "ng build" so it expects to run within an Angular workspace.
-* You can provide a project instead of building the root one. The
-  "list_projects" MCP tool could be used to obtain the list of projects.
+* If you want a watched build which updates as files are changed, use "start_devserver" instead, which also serves the app.
+* You can provide a project instead of building the root one. The "list_projects" MCP tool could be used to obtain the list of projects.
+* This tool defaults to a development environment while a regular "ng build" defaults to a production environment. An unexpected build
+  failure might suggest the project is not configured for the requested environment.
 </Operational Notes>
 `,
   isReadOnly: false,

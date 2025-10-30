@@ -9,6 +9,8 @@
 import { ChildProcess } from 'child_process';
 import { Host } from './host';
 
+// Log messages that we want to catch to identify the build status.
+
 const BUILD_SUCCEEDED_MESSAGE = 'Application bundle generation complete.';
 const BUILD_FAILED_MESSAGE = 'Application bundle generation failed.';
 const WAITING_FOR_CHANGES_MESSAGE = 'Watch mode enabled. Watching for file changes...';
@@ -55,6 +57,15 @@ export interface DevServer {
    * Whether the dev server is currently being built, or is awaiting further changes.
    */
   isBuilding(): boolean;
+
+  /**
+   * `ng serve` port to use.
+   */
+  port: number;
+}
+
+export function devServerKey(project?: string) {
+  return project ?? '<default>';
 }
 
 /**
@@ -62,17 +73,16 @@ export interface DevServer {
  */
 export class LocalDevServer implements DevServer {
   readonly host: Host;
-  readonly port?: number;
+  readonly port: number;
   readonly project?: string;
 
   private devServerProcess: ChildProcess | null = null;
   private serverLogs: string[] = [];
   private buildInProgress = false;
-  private latestBuildLogStartIndex = 0;
-  private latestBuildLogEndIndex = 0;
-  private latestBuildStatus?: BuildStatus;
+  private latestBuildLogStartIndex?: number = undefined;
+  private latestBuildStatus: BuildStatus = 'unknown';
 
-  constructor({ host, port, project }: { host: Host; port?: number; project?: string }) {
+  constructor({ host, port, project }: { host: Host; port: number; project?: string }) {
     this.host = host;
     this.project = project;
     this.port = port;
@@ -93,10 +103,10 @@ export class LocalDevServer implements DevServer {
 
     this.devServerProcess = this.host.spawn('ng', args, { stdio: 'pipe' });
     this.devServerProcess.stdout?.on('data', (data) => {
-      this.serverLogs.push(data.toString());
+      this.addLog(data.toString());
     });
     this.devServerProcess.stderr?.on('data', (data) => {
-      this.serverLogs.push(data.toString());
+      this.addLog(data.toString());
     });
   }
 
@@ -108,8 +118,8 @@ export class LocalDevServer implements DevServer {
       this.latestBuildLogStartIndex = this.serverLogs.length;
     } else if (BUILD_END_MESSAGES.some((message) => log.startsWith(message))) {
       this.buildInProgress = false;
-      this.latestBuildLogEndIndex = this.serverLogs.length;
-      this.latestBuildStatus = log.startsWith(BUILD_FAILED_MESSAGE) ? 'success' : 'failure';
+      // We consider everything except a specific failure message to be a success.
+      this.latestBuildStatus = log.startsWith(BUILD_FAILED_MESSAGE) ? 'failure' : 'success';
     }
   }
 
@@ -124,8 +134,8 @@ export class LocalDevServer implements DevServer {
 
   getMostRecentBuild() {
     return {
-      status: this.latestBuildStatus ?? 'unknown',
-      logs: this.serverLogs.slice(this.latestBuildLogStartIndex, this.latestBuildLogEndIndex),
+      status: this.latestBuildStatus,
+      logs: this.serverLogs.slice(this.latestBuildLogStartIndex),
     };
   }
 

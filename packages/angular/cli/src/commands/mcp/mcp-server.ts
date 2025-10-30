@@ -10,6 +10,7 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import path from 'node:path';
 import type { AngularWorkspace } from '../../utilities/config';
 import { VERSION } from '../../utilities/version';
+import { DevServer } from './dev-server';
 import { registerInstructionsResource } from './resources/instructions';
 import { AI_TUTOR_TOOL } from './tools/ai-tutor';
 import { BEST_PRACTICES_TOOL } from './tools/best-practices';
@@ -25,28 +26,28 @@ import { AnyMcpToolDeclaration, registerTools } from './tools/tool-registry';
 import { WAIT_FOR_DEVSERVER_BUILD_TOOL } from './tools/wait-for-devserver-build';
 
 /**
+ * Tools to manage devservers. Should be bundled together.
+ */
+const SERVE_TOOLS = [START_DEVSERVER_TOOL, STOP_DEVSERVER_TOOL, WAIT_FOR_DEVSERVER_BUILD_TOOL];
+
+/**
  * The set of tools that are enabled by default for the MCP server.
  * These tools are considered stable and suitable for general use.
  */
 const STABLE_TOOLS = [
   AI_TUTOR_TOOL,
   BEST_PRACTICES_TOOL,
-  BUILD_TOOL,
   DOC_SEARCH_TOOL,
   FIND_EXAMPLE_TOOL,
   LIST_PROJECTS_TOOL,
 ] as const;
 
 /**
- * Tools to manage devservers. Should be bundled together.
- */
-const SERVE_TOOLS = [START_DEVSERVER_TOOL, STOP_DEVSERVER_TOOL, WAIT_FOR_DEVSERVER_BUILD_TOOL];
-
-/**
  * The set of tools that are available but not enabled by default.
  * These tools are considered experimental and may have limitations.
  */
 export const EXPERIMENTAL_TOOLS = [
+  BUILD_TOOL,
   MODERNIZE_TOOL,
   ZONELESS_MIGRATION_TOOL,
   ...SERVE_TOOLS,
@@ -117,6 +118,7 @@ equivalent actions.
       workspace: options.workspace,
       logger,
       exampleDatabasePath: path.join(__dirname, '../../../lib/code-examples.db'),
+      devServers: new Map<string, DevServer>(),
     },
     toolDeclarations,
   );
