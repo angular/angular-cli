@@ -64,6 +64,9 @@ export default async function () {
 
         const test = json['projects']['test-project']['architect']['test'];
         test.builder = '@angular-devkit/build-angular:karma';
+        test.options ??= {};
+        test.options.tsConfig = 'tsconfig.spec.json';
+        delete test.options.runner;
       });
       await updateJsonFile('tsconfig.json', (tsconfig) => {
         delete tsconfig.compilerOptions.esModuleInterop;
