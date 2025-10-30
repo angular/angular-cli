@@ -1,21 +1,23 @@
 import { ng } from '../../utils/process';
 import { writeFile, writeMultipleFiles } from '../../utils/fs';
 import { updateJsonFile } from '../../utils/project';
+import { getGlobalVariable } from '../../utils/env';
 
-export default function () {
+export default async function () {
+  const isWebpack = !getGlobalVariable('argv')['esbuild'];
+
   // Tests run in 'dev' environment by default.
-  return (
-    writeMultipleFiles({
-      'src/environment.prod.ts': `
+  await writeMultipleFiles({
+    'src/environment.prod.ts': `
       export const environment = {
         production: true
       };`,
-      'src/environment.ts': `
+    'src/environment.ts': `
       export const environment = {
         production: false
       };
       `,
-      'src/app/environment.spec.ts': `
+    'src/app/environment.spec.ts': `
       import { environment } from '../environment';
 
       describe('Test environment', () => {
@@ -24,29 +26,33 @@ export default function () {
         });
       });
     `,
-    })
-      .then(() => ng('test', '--watch=false'))
-      .then(() =>
-        updateJsonFile('angular.json', (configJson) => {
-          const appArchitect = configJson.projects['test-project'].architect;
-          appArchitect.test.configurations = {
-            production: {
-              fileReplacements: [
-                {
-                  replace: 'src/environment.ts',
-                  with: 'src/environment.prod.ts',
-                },
-              ],
-            },
-          };
-        }),
-      )
+  });
 
-      // Tests can run in different environment.
-      .then(() =>
-        writeFile(
-          'src/app/environment.spec.ts',
-          `
+  await ng('test', '--watch=false');
+
+  await updateJsonFile('angular.json', (configJson) => {
+    const appArchitect = configJson.projects['test-project'].architect;
+    appArchitect[isWebpack ? 'test' : 'build'].configurations = {
+      production: {
+        fileReplacements: [
+          {
+            replace: 'src/environment.ts',
+            with: 'src/environment.prod.ts',
+          },
+        ],
+      },
+    };
+    if (!isWebpack) {
+      appArchitect.test.options ??= {};
+      appArchitect.test.options.buildTarget = '::production';
+    }
+  });
+
+  // Tests can run in different environment.
+
+  await writeFile(
+    'src/app/environment.spec.ts',
+    `
       import { environment } from '../environment';
 
       describe('Test environment', () => {
@@ -55,8 +61,11 @@ export default function () {
         });
       });
     `,
-        ),
-      )
-      .then(() => ng('test', '--configuration=production', '--watch=false'))
   );
+
+  if (isWebpack) {
+    await ng('test', '--watch=false', '--configuration=production');
+  } else {
+    await ng('test', '--watch=false');
+  }
 }

@@ -448,10 +448,11 @@ describe('Application Schematic', () => {
       const config = JSON.parse(tree.readContent('/angular.json'));
       const prj = config.projects.foo;
       const testOpt = prj.architect.test;
-      expect(testOpt.builder).toEqual('@angular/build:karma');
-      expect(testOpt.options.tsConfig).toEqual('tsconfig.spec.json');
-      expect(testOpt.options.assets).toEqual([{ glob: '**/*', input: 'public' }]);
-      expect(testOpt.options.styles).toEqual(['src/styles.css']);
+      expect(testOpt.builder).toEqual('@angular/build:unit-test');
+      expect(testOpt.options.runner).toEqual('karma');
+      expect(testOpt.options.tsConfig).toBeUndefined();
+      expect(testOpt.options.assets).toBeUndefined();
+      expect(testOpt.options.styles).toBeUndefined();
     });
 
     it('should set the relative tsconfig paths', async () => {

@@ -191,7 +191,11 @@ export async function useCIChrome(projectName: string, projectDir = ''): Promise
   return updateJsonFile('angular.json', (workspaceJson) => {
     const project = workspaceJson.projects[projectName];
     const appTargets = project.targets || project.architect;
-    appTargets.test.options.browsers = 'ChromeHeadlessNoSandbox';
+    if (appTargets.test.builder === '@angular/build:unit-test') {
+      appTargets.test.options.browsers = ['ChromeHeadlessNoSandbox'];
+    } else {
+      appTargets.test.options.browsers = 'ChromeHeadlessNoSandbox';
+    }
   });
 }
 
