@@ -10,12 +10,12 @@ import { Stats } from 'fs';
 import { mkdir, mkdtemp, rm, writeFile } from 'fs/promises';
 import { tmpdir } from 'os';
 import { join } from 'path';
-import * as host from '../host';
+import { CommandError, Host } from '../host';
 import { ModernizeOutput, runModernization } from './modernize';
 
 describe('Modernize Tool', () => {
   let projectDir: string;
-  let mockHost: host.Host;
+  let mockHost: Host;
 
   beforeEach(async () => {
     // Create a temporary directory and a fake angular.json to satisfy the tool's project root search.
@@ -28,7 +28,7 @@ describe('Modernize Tool', () => {
       existsSync: jasmine.createSpy('existsSync').and.callFake((p: string) => {
         return p === join(projectDir, 'angular.json');
       }),
-    };
+    } as Partial<Host> as Host;
   });
 
   afterEach(async () => {
@@ -180,7 +180,7 @@ describe('Modernize Tool', () => {
   it('should report errors from transformations', async () => {
     // Simulate a failed execution
     (mockHost.runCommand as jasmine.Spy).and.rejectWith(
-      new host.CommandError('Command failed with error', 'stdout', 'stderr', 1),
+      new CommandError('Command failed with error', 'stdout', 'stderr', 1),
     );
 
     const { structuredContent } = (await runModernization(
