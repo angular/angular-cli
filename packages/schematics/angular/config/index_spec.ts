@@ -95,6 +95,88 @@ describe('Config Schematic', () => {
       const { karmaConfig } = prj.architect.test.options;
       expect(karmaConfig).toBe('projects/foo/karma.conf.js');
     });
+
+    describe('with "unit-test" builder', () => {
+      beforeEach(() => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const angularJson = applicationTree.readJson('angular.json') as any;
+        angularJson.projects.foo.architect.test.builder = '@angular/build:unit-test';
+        applicationTree.overwrite('angular.json', JSON.stringify(angularJson));
+      });
+
+      it(`should not set 'karmaConfig' in test builder`, async () => {
+        const tree = await runConfigSchematic(ConfigType.Karma);
+        const config = JSON.parse(tree.readContent('/angular.json'));
+        const prj = config.projects.foo;
+        const { karmaConfig } = prj.architect.test.options;
+        expect(karmaConfig).toBeUndefined();
+      });
+
+      it(`should warn when 'runner' is not specified`, async () => {
+        const logs: string[] = [];
+        schematicRunner.logger.subscribe(({ message }) => logs.push(message));
+        await runConfigSchematic(ConfigType.Karma);
+        expect(
+          logs.some((v) => v.includes('may not be used as the default runner is "vitest"')),
+        ).toBeTrue();
+      });
+
+      it(`should warn when 'runner' is 'vitest' in options`, async () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const angularJson = applicationTree.readJson('angular.json') as any;
+        angularJson.projects.foo.architect.test.options ??= {};
+        angularJson.projects.foo.architect.test.options.runner = 'vitest';
+        applicationTree.overwrite('angular.json', JSON.stringify(angularJson));
+
+        const logs: string[] = [];
+        schematicRunner.logger.subscribe(({ message }) => logs.push(message));
+        await runConfigSchematic(ConfigType.Karma);
+        expect(
+          logs.some((v) => v.includes('runner other than "karma" in the main options')),
+        ).toBeTrue();
+      });
+
+      it(`should warn when 'runner' is 'vitest' in a configuration`, async () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const angularJson = applicationTree.readJson('angular.json') as any;
+        angularJson.projects.foo.architect.test.configurations ??= {};
+        angularJson.projects.foo.architect.test.configurations.ci = { runner: 'vitest' };
+        applicationTree.overwrite('angular.json', JSON.stringify(angularJson));
+
+        const logs: string[] = [];
+        schematicRunner.logger.subscribe(({ message }) => logs.push(message));
+        await runConfigSchematic(ConfigType.Karma);
+        expect(
+          logs.some((v) => v.includes(`"ci" configuration is configured to use a runner`)),
+        ).toBeTrue();
+      });
+
+      it(`should not warn when 'runner' is 'karma' in options`, async () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const angularJson = applicationTree.readJson('angular.json') as any;
+        angularJson.projects.foo.architect.test.options ??= {};
+        angularJson.projects.foo.architect.test.options.runner = 'karma';
+        applicationTree.overwrite('angular.json', JSON.stringify(angularJson));
+
+        const logs: string[] = [];
+        schematicRunner.logger.subscribe(({ message }) => logs.push(message));
+        await runConfigSchematic(ConfigType.Karma);
+        expect(logs.length).toBe(0);
+      });
+
+      it(`should not warn when 'runner' is 'karma' in a configuration`, async () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const angularJson = applicationTree.readJson('angular.json') as any;
+        angularJson.projects.foo.architect.test.configurations ??= {};
+        angularJson.projects.foo.architect.test.configurations.ci = { runner: 'karma' };
+        applicationTree.overwrite('angular.json', JSON.stringify(angularJson));
+
+        const logs: string[] = [];
+        schematicRunner.logger.subscribe(({ message }) => logs.push(message));
+        await runConfigSchematic(ConfigType.Karma);
+        expect(logs.length).toBe(0);
+      });
+    });
   });
 
   describe(`when 'type' is 'browserslist'`, () => {
