@@ -396,13 +396,9 @@ function addAppToWorkspaceFile(options: ApplicationOptions, appDir: string): Rul
                 options: {},
               }
             : {
-                builder: Builders.BuildKarma,
+                builder: Builders.BuildUnitTest,
                 options: {
-                  polyfills: options.zoneless ? undefined : ['zone.js', 'zone.js/testing'],
-                  tsConfig: `${projectRoot}tsconfig.spec.json`,
-                  inlineStyleLanguage,
-                  assets: [{ 'glob': '**/*', 'input': `${projectRoot}public` }],
-                  styles: [`${sourceRoot}/styles.${options.style}`],
+                  runner: 'karma',
                 },
               },
     },

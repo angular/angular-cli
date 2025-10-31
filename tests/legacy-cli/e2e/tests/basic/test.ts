@@ -1,5 +1,6 @@
 import { ng } from '../../utils/process';
 import { writeMultipleFiles } from '../../utils/fs';
+import { getGlobalVariable } from '../../utils/env';
 
 export default async function () {
   // make sure both --watch=false work
@@ -48,5 +49,11 @@ export default async function () {
       `,
   });
 
-  await ng('test', '--watch=false', '--karma-config=karma.conf.bis.js');
+  const isWebpack = !getGlobalVariable('argv')['esbuild'];
+
+  if (isWebpack) {
+    await ng('test', '--watch=false', '--karma-config=karma.conf.bis.js');
+  } else {
+    await ng('test', '--watch=false', '--runner-config=karma.conf.bis.js');
+  }
 }

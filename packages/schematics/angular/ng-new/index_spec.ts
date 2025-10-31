@@ -169,7 +169,8 @@ describe('Ng New Schematic', () => {
         },
       },
     } = JSON.parse(tree.readContent('/bar/angular.json'));
-    expect(test.builder).toBe('@angular/build:karma');
+    expect(test.builder).toBe('@angular/build:unit-test');
+    expect(test.options).toEqual({ runner: 'karma' });
 
     const { devDependencies } = JSON.parse(tree.readContent('/bar/package.json'));
     expect(devDependencies['karma']).toBeDefined();
