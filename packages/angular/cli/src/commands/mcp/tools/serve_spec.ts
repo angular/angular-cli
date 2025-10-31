@@ -12,7 +12,7 @@ import { Host } from '../host';
 import { startDevServer } from './start-devserver';
 import { stopDevserver } from './stop-devserver';
 import { McpToolContext } from './tool-registry';
-import { waitForDevserverBuild } from './wait-for-devserver-build';
+import { WATCH_DELAY, waitForDevserverBuild } from './wait-for-devserver-build';
 
 class MockChildProcess extends EventEmitter {
   stdout = new EventEmitter();
@@ -55,17 +55,12 @@ describe('Serve Tools', () => {
     expect(mockProcess.kill).toHaveBeenCalled();
   });
 
-  it('should find a free port if none is provided', async () => {
-    await startDevServer({}, mockContext, mockHost);
-    expect(mockHost.getAvailablePort).toHaveBeenCalled();
-  });
-
   it('should wait for a build to complete', async () => {
     await startDevServer({}, mockContext, mockHost);
 
     const waitPromise = waitForDevserverBuild({ timeout: 10 }, mockContext);
 
-    // Simulate build logs
+    // Simulate build logs.
     mockProcess.stdout.emit('data', '... building ...');
     mockProcess.stdout.emit('data', '✔ Changes detected. Rebuilding...');
     mockProcess.stdout.emit('data', '... more logs ...');
@@ -74,6 +69,7 @@ describe('Serve Tools', () => {
     const waitResult = await waitPromise;
     expect(waitResult.structuredContent.status).toBe('success');
     expect(waitResult.structuredContent.logs).toEqual([
+      '... building ...',
       '✔ Changes detected. Rebuilding...',
       '... more logs ...',
       'Application bundle generation complete.',
@@ -81,21 +77,20 @@ describe('Serve Tools', () => {
   });
 
   it('should handle multiple dev servers', async () => {
-    // Start server for project 1
+    // Start server for project 1. This uses the basic mockProcess created for the tests.
     const startResult1 = await startDevServer({ project: 'app-one' }, mockContext, mockHost);
     expect(startResult1.structuredContent.message).toBe(
       `Development server for project 'app-one' started and watching for workspace changes.`,
     );
     const process1 = mockProcess;
 
-    // Start server for project 2
-    mockProcess = new MockChildProcess();
-    (mockHost.spawn as jasmine.Spy).and.returnValue(mockProcess as unknown as ChildProcess);
+    // Start server for project 2, returning a new mock process.
+    const process2 = new MockChildProcess();
+    (mockHost.spawn as jasmine.Spy).and.returnValue(process2 as unknown as ChildProcess);
     const startResult2 = await startDevServer({ project: 'app-two' }, mockContext, mockHost);
     expect(startResult2.structuredContent.message).toBe(
       `Development server for project 'app-two' started and watching for workspace changes.`,
     );
-    const process2 = mockProcess;
 
     expect(mockHost.spawn).toHaveBeenCalledWith('ng', ['serve', 'app-one', '--port=12345'], {
       stdio: 'pipe',
@@ -122,10 +117,14 @@ describe('Serve Tools', () => {
 
   it('should handle server crash', async () => {
     await startDevServer({ project: 'crash-app' }, mockContext, mockHost);
-    mockProcess.emit('close', 1); // Simulate a crash with exit code 1
+
+    // Simulate a crash with exit code 1
+    mockProcess.stdout.emit('data', 'Fatal error.');
+    mockProcess.emit('close', 1);
 
     const stopResult = stopDevserver({ project: 'crash-app' }, mockContext);
-    expect(stopResult.structuredContent.message).toContain('is not running');
+    expect(stopResult.structuredContent.message).toContain('stopped');
+    expect(stopResult.structuredContent.logs).toEqual(['Fatal error.']);
   });
 
   it('wait should timeout if build takes too long', async () => {
@@ -135,5 +134,39 @@ describe('Serve Tools', () => {
       mockContext,
     );
     expect(waitResult.structuredContent.status).toBe('timeout');
+  });
+
+  it('should wait through multiple cycles for a build to complete', async () => {
+    jasmine.clock().install();
+    try {
+      await startDevServer({}, mockContext, mockHost);
+
+      // Immediately simulate a build starting so isBuilding() is true.
+      mockProcess.stdout.emit('data', '❯ Changes detected. Rebuilding...');
+
+      const waitPromise = waitForDevserverBuild({ timeout: 5 * WATCH_DELAY }, mockContext);
+
+      // Tick past the first debounce. The while loop will be entered.
+      jasmine.clock().tick(WATCH_DELAY + 1);
+
+      // Tick past the second debounce (inside the loop).
+      jasmine.clock().tick(WATCH_DELAY + 1);
+
+      // Now finish the build.
+      mockProcess.stdout.emit('data', 'Application bundle generation complete.');
+
+      // Tick past another debounce to exit the loop.
+      jasmine.clock().tick(WATCH_DELAY + 1);
+
+      const waitResult = await waitPromise;
+
+      expect(waitResult.structuredContent.status).toBe('success');
+      expect(waitResult.structuredContent.logs).toEqual([
+        '❯ Changes detected. Rebuilding...',
+        'Application bundle generation complete.',
+      ]);
+    } finally {
+      jasmine.clock().uninstall();
+    }
   });
 });

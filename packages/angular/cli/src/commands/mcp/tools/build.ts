@@ -8,7 +8,7 @@
 
 import { z } from 'zod';
 import { CommandError, Host, LocalWorkspaceHost } from '../host';
-import { createStructureContentOutput } from '../utils';
+import { createStructuredContentOutput } from '../utils';
 import { McpToolDeclaration, declareTool } from './tool-registry';
 
 const CONFIGURATIONS = {
@@ -19,6 +19,8 @@ const CONFIGURATIONS = {
     args: '',
   },
 };
+
+const DEFAULT_CONFIGURATION_NAME = 'development';
 
 const BUILD_STATUSES = ['success', 'failure'] as const;
 type BuildStatus = (typeof BUILD_STATUSES)[number];
@@ -42,15 +44,16 @@ const buildToolOutputSchema = z.object({
   status: z.enum(BUILD_STATUSES).describe('Build status.'),
   stdout: z.string().optional().describe('The standard output from `ng build`.'),
   stderr: z.string().optional().describe('The standard error from `ng build`.'),
-  path: z.string().optional().describe('The output path the build project was written into.'),
+  path: z.string().optional().describe('The output location for the build, if successful.'),
 });
 
 export type BuildToolOutput = z.infer<typeof buildToolOutputSchema>;
 
 export async function runBuild(input: BuildToolInput, host: Host) {
-  const configurationName = input.configuration ?? 'development';
+  const configurationName = input.configuration ?? DEFAULT_CONFIGURATION_NAME;
   const configuration = CONFIGURATIONS[configurationName as keyof typeof CONFIGURATIONS];
 
+  // Build "ng"'s command line.
   const args = ['build'];
   if (input.project) {
     args.push(input.project);
@@ -89,7 +92,7 @@ export async function runBuild(input: BuildToolInput, host: Host) {
     path: outputPath,
   };
 
-  return createStructureContentOutput(structuredContent);
+  return createStructuredContentOutput(structuredContent);
 }
 
 export const BUILD_TOOL: McpToolDeclaration<
@@ -100,11 +103,11 @@ export const BUILD_TOOL: McpToolDeclaration<
   title: 'Build Tool',
   description: `
 <Purpose>
-Perform a one-off, non-watched build with "ng build". Use this tool whenever the user wants to build an Angular project; this is similar to
+Perform a one-off, non-watched build using "ng build". Use this tool whenever the user wants to build an Angular project; this is similar to
 "ng build", but the tool is smarter about using the right configuration and collecting the output logs.
 </Purpose>
 <Use Cases>
-* Building the Angular project and getting build logs back.
+* Building an Angular project and getting build logs back.
 </Use Cases>
 <Operational Notes>
 * This tool runs "ng build" so it expects to run within an Angular workspace.

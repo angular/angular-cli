@@ -26,7 +26,7 @@ import { AnyMcpToolDeclaration, registerTools } from './tools/tool-registry';
 import { WAIT_FOR_DEVSERVER_BUILD_TOOL } from './tools/wait-for-devserver-build';
 
 /**
- * Tools to manage devservers. Should be bundled together.
+ * Tools to manage devservers. Should be bundled together, then added to experimental or stable as a group.
  */
 const SERVE_TOOLS = [START_DEVSERVER_TOOL, STOP_DEVSERVER_TOOL, WAIT_FOR_DEVSERVER_BUILD_TOOL];
 

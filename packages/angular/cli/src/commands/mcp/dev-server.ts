@@ -108,6 +108,10 @@ export class LocalDevServer implements DevServer {
     this.devServerProcess.stderr?.on('data', (data) => {
       this.addLog(data.toString());
     });
+    this.devServerProcess.stderr?.on('close', () => {
+      this.stop();
+    });
+    this.buildInProgress = true;
   }
 
   private addLog(log: string) {
@@ -115,7 +119,7 @@ export class LocalDevServer implements DevServer {
 
     if (BUILD_START_MESSAGES.some((message) => log.startsWith(message))) {
       this.buildInProgress = true;
-      this.latestBuildLogStartIndex = this.serverLogs.length;
+      this.latestBuildLogStartIndex = this.serverLogs.length - 1;
     } else if (BUILD_END_MESSAGES.some((message) => log.startsWith(message))) {
       this.buildInProgress = false;
       // We consider everything except a specific failure message to be a success.

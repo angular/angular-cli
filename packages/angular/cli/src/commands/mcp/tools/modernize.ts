@@ -9,6 +9,7 @@
 import { dirname, join, relative } from 'path';
 import { z } from 'zod';
 import { CommandError, Host, LocalWorkspaceHost } from '../host';
+import { createStructuredContentOutput } from '../utils';
 import { McpToolDeclaration, declareTool } from './tool-registry';
 
 interface Transformation {
@@ -93,13 +94,6 @@ const modernizeOutputSchema = z.object({
 export type ModernizeInput = z.infer<typeof modernizeInputSchema>;
 export type ModernizeOutput = z.infer<typeof modernizeOutputSchema>;
 
-function createToolOutput(structuredContent: ModernizeOutput) {
-  return {
-    content: [{ type: 'text' as const, text: JSON.stringify(structuredContent, null, 2) }],
-    structuredContent,
-  };
-}
-
 function findAngularJsonDir(startDir: string, host: Host): string | null {
   let currentDir = startDir;
   while (true) {
@@ -119,7 +113,7 @@ export async function runModernization(input: ModernizeInput, host: Host) {
   const directories = input.directories ?? [];
 
   if (transformationNames.length === 0) {
-    return createToolOutput({
+    return createStructuredContentOutput({
       instructions: [
         'See https://angular.dev/best-practices for Angular best practices. ' +
           'You can call this tool if you have specific transformation you want to run.',
@@ -127,7 +121,7 @@ export async function runModernization(input: ModernizeInput, host: Host) {
     });
   }
   if (directories.length === 0) {
-    return createToolOutput({
+    return createStructuredContentOutput({
       instructions: [
         'Provide this tool with a list of directory paths in your workspace ' +
           'to run the modernization on.',
@@ -140,7 +134,7 @@ export async function runModernization(input: ModernizeInput, host: Host) {
 
   const angularProjectRoot = findAngularJsonDir(executionDir, host);
   if (!angularProjectRoot) {
-    return createToolOutput({
+    return createStructuredContentOutput({
       instructions: ['Could not find an angular.json file in the current or parent directories.'],
     });
   }
@@ -195,7 +189,7 @@ export async function runModernization(input: ModernizeInput, host: Host) {
     }
   }
 
-  return createToolOutput({
+  return createStructuredContentOutput({
     instructions: instructions.length > 0 ? instructions : undefined,
     stdout: stdoutMessages?.join('\n\n') || undefined,
     stderr: stderrMessages?.join('\n\n') || undefined,

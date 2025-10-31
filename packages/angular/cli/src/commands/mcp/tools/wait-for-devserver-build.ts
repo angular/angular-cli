@@ -8,13 +8,13 @@
 
 import { z } from 'zod';
 import { devServerKey } from '../dev-server';
-import { createStructureContentOutput } from '../utils';
+import { createStructuredContentOutput } from '../utils';
 import { McpToolContext, McpToolDeclaration, declareTool } from './tool-registry';
 
 /**
  * How long to wait to give "ng serve" time to identify whether the watched workspace has changed.
  */
-const DEBOUNCE_DELAY = 1000;
+export const WATCH_DELAY = 1000;
 
 const waitForDevserverBuildToolInputSchema = z.object({
   project: z
@@ -26,7 +26,9 @@ const waitForDevserverBuildToolInputSchema = z.object({
   timeout: z
     .number()
     .default(30000)
-    .describe('The maximum time to wait for the build to complete, in milliseconds.'),
+    .describe(
+      `The maximum time to wait for the build to complete, in milliseconds. This can't be lower than ${WATCH_DELAY}.`,
+    ),
 });
 
 export type WaitForDevserverBuildToolInput = z.infer<typeof waitForDevserverBuildToolInputSchema>;
@@ -58,22 +60,22 @@ export async function waitForDevserverBuild(
   const deadline = Date.now() + input.timeout;
 
   if (!devServer) {
-    return createStructureContentOutput<WaitForDevserverBuildToolOutput>({
+    return createStructuredContentOutput<WaitForDevserverBuildToolOutput>({
       status: 'no_devserver_found',
     });
   }
 
-  await wait(DEBOUNCE_DELAY);
+  await wait(WATCH_DELAY);
   while (devServer.isBuilding()) {
     if (Date.now() > deadline) {
-      return createStructureContentOutput<WaitForDevserverBuildToolOutput>({
+      return createStructuredContentOutput<WaitForDevserverBuildToolOutput>({
         status: 'timeout',
       });
     }
-    await wait(DEBOUNCE_DELAY);
+    await wait(WATCH_DELAY);
   }
 
-  return createStructureContentOutput<WaitForDevserverBuildToolOutput>({
+  return createStructuredContentOutput<WaitForDevserverBuildToolOutput>({
     ...devServer.getMostRecentBuild(),
   });
 }

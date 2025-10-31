@@ -14,11 +14,9 @@
 /**
  * Returns simple structured content output from an MCP tool.
  *
- * Returns a structure with both `content` and `structuredContent` for maximum compatibility.
- * @param structuredContent
- * @returns
+ * @returns A structure with both `content` and `structuredContent` for maximum compatibility.
  */
-export function createStructureContentOutput<OutputType>(structuredContent: OutputType) {
+export function createStructuredContentOutput<OutputType>(structuredContent: OutputType) {
   return {
     content: [{ type: 'text' as const, text: JSON.stringify(structuredContent, null, 2) }],
     structuredContent,

@@ -9,7 +9,7 @@
 import { z } from 'zod';
 import { LocalDevServer, devServerKey } from '../dev-server';
 import { Host, LocalWorkspaceHost } from '../host';
-import { createStructureContentOutput } from '../utils';
+import { createStructuredContentOutput } from '../utils';
 import { McpToolContext, McpToolDeclaration, declareTool } from './tool-registry';
 
 const startDevServerToolInputSchema = z.object({
@@ -48,7 +48,7 @@ export async function startDevServer(
 
   let devServer = context.devServers.get(projectKey);
   if (devServer) {
-    return createStructureContentOutput({
+    return createStructuredContentOutput({
       message: `Development server for project '${projectKey}' is already running.`,
       address: localhostAddress(devServer.port),
     });
@@ -61,7 +61,7 @@ export async function startDevServer(
 
   context.devServers.set(projectKey, devServer);
 
-  return createStructureContentOutput({
+  return createStructuredContentOutput({
     message: `Development server for project '${projectKey}' started and watching for workspace changes.`,
     address: localhostAddress(port),
   });

@@ -8,7 +8,7 @@
 
 import { z } from 'zod';
 import { devServerKey } from '../dev-server';
-import { createStructureContentOutput } from '../utils';
+import { createStructuredContentOutput } from '../utils';
 import { McpToolContext, McpToolDeclaration, declareTool } from './tool-registry';
 
 const stopDevserverToolInputSchema = z.object({
@@ -34,15 +34,16 @@ export function stopDevserver(input: StopDevserverToolInput, context: McpToolCon
   const devServer = context.devServers.get(projectKey);
 
   if (!devServer) {
-    return createStructureContentOutput({
+    return createStructuredContentOutput({
       message: `Development server for project '${projectKey}' is not running.`,
+      logs: undefined,
     });
   }
 
   devServer.stop();
   context.devServers.delete(projectKey);
 
-  return createStructureContentOutput({
+  return createStructuredContentOutput({
     message: `Development server for project '${projectKey}' stopped.`,
     logs: devServer.getServerLogs(),
   });
