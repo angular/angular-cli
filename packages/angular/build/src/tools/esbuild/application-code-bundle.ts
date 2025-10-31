@@ -30,6 +30,7 @@ import { createAngularLocaleDataPlugin } from './i18n-locale-plugin';
 import type { LoadResultCache } from './load-result-cache';
 import { createLoaderImportAttributePlugin } from './loader-import-attribute-plugin';
 import { createRxjsEsmResolutionPlugin } from './rxjs-esm-resolution-plugin';
+import { createBazelSandboxPlugin } from './sandbox-plugin-bazel';
 import { createServerBundleMetadata } from './server-bundle-metadata-plugin';
 import { createSourcemapIgnorelistPlugin } from './sourcemap-ignorelist-plugin';
 import { SERVER_GENERATED_EXTERNALS, getFeatureSupport, isZonelessApp } from './utils';
@@ -604,6 +605,31 @@ function getEsBuildCommonOptions(options: NormalizedApplicationBuildOptions): Bu
     } else {
       // Safe to use the packages external option directly
       packages = 'external';
+    }
+  }
+
+  // Inject the Bazel sandbox plugin only when specifically enabled to be fully backward compatible.
+  // Most users will never need this and as such should not have it influence their builds.
+  if (
+    process.env.ENABLE_BAZEL_SANDBOX_PLUGIN === 'true' ||
+    process.env.ENABLE_BAZEL_SANDBOX_PLUGIN === '1'
+  ) {
+    const bindir = process.env.BAZEL_BINDIR;
+    const execroot = process.env.JS_BINARY__EXECROOT;
+
+    let runfiles: string | undefined;
+    // If requested, remap paths to the runfiles tree in the sandbox instead of the bindir
+    // directly. This allows `js_binary` and `js_test` rules to invoke the Angular CLI against
+    // their runfiles.
+    if (
+      process.env.BAZEL_SANDBOX_PLUGIN_REMAP_TO_RUNFILES === '1' ||
+      process.env.BAZEL_SANDBOX_PLUGIN_REMAP_TO_RUNFILES === 'true'
+    ) {
+      runfiles = process.env.JS_BINARY__RUNFILES;
+    }
+
+    if (bindir && execroot) {
+      plugins.push(createBazelSandboxPlugin({ bindir, execroot, runfiles }));
     }
   }
 
