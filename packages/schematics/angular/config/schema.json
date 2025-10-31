@@ -16,7 +16,7 @@
     "type": {
       "type": "string",
       "description": "Specifies the type of configuration file to generate.",
-      "enum": ["karma", "browserslist"],
+      "enum": ["karma", "browserslist", "vitest"],
       "x-prompt": "Which type of configuration file would you like to create?",
       "$default": {
         "$source": "argv",

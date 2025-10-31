@@ -185,4 +185,78 @@ describe('Config Schematic', () => {
       expect(tree.exists('projects/foo/.browserslistrc')).toBeTrue();
     });
   });
+
+  describe(`when 'type' is 'vitest'`, () => {
+    beforeEach(() => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const angularJson = applicationTree.readJson('angular.json') as any;
+      angularJson.projects.foo.architect.test.builder = '@angular/build:unit-test';
+      applicationTree.overwrite('angular.json', JSON.stringify(angularJson));
+    });
+
+    it('should create a vitest-base.config.ts file', async () => {
+      const tree = await runConfigSchematic(ConfigType.Vitest);
+      expect(tree.exists('projects/foo/vitest-base.config.ts')).toBeTrue();
+    });
+
+    it(`should set 'runnerConfig' in test builder`, async () => {
+      const tree = await runConfigSchematic(ConfigType.Vitest);
+      const config = JSON.parse(tree.readContent('/angular.json'));
+      const prj = config.projects.foo;
+      const { runnerConfig } = prj.architect.test.options;
+      expect(runnerConfig).toBe(true);
+    });
+
+    it('should throw an error if the builder is not "unit-test"', async () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const angularJson = applicationTree.readJson('angular.json') as any;
+      angularJson.projects.foo.architect.test.builder = '@angular/build:karma';
+      applicationTree.overwrite('angular.json', JSON.stringify(angularJson));
+
+      await expectAsync(runConfigSchematic(ConfigType.Vitest)).toBeRejectedWithError(
+        /Cannot add a Vitest configuration as builder for "test" target/,
+      );
+    });
+
+    it(`should warn when 'runner' is 'karma' in options`, async () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const angularJson = applicationTree.readJson('angular.json') as any;
+      angularJson.projects.foo.architect.test.options ??= {};
+      angularJson.projects.foo.architect.test.options.runner = 'karma';
+      applicationTree.overwrite('angular.json', JSON.stringify(angularJson));
+
+      const logs: string[] = [];
+      schematicRunner.logger.subscribe(({ message }) => logs.push(message));
+      await runConfigSchematic(ConfigType.Vitest);
+      expect(
+        logs.some((v) =>
+          v.includes(
+            `The "test" target is configured to use the "karma" runner in the main options.`,
+          ),
+        ),
+      ).toBeTrue();
+    });
+
+    it(`should warn when 'runner' is 'karma' in a configuration`, async () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const angularJson = applicationTree.readJson('angular.json') as any;
+      angularJson.projects.foo.architect.test.configurations ??= {};
+      angularJson.projects.foo.architect.test.configurations.ci = { runner: 'karma' };
+      applicationTree.overwrite('angular.json', JSON.stringify(angularJson));
+
+      const logs: string[] = [];
+      schematicRunner.logger.subscribe(({ message }) => logs.push(message));
+      await runConfigSchematic(ConfigType.Vitest);
+      expect(
+        logs.some((v) => v.includes(`"ci" configuration is configured to use the "karma" runner`)),
+      ).toBeTrue();
+    });
+
+    it(`should not warn when 'runner' is not set`, async () => {
+      const logs: string[] = [];
+      schematicRunner.logger.subscribe(({ message }) => logs.push(message));
+      await runConfigSchematic(ConfigType.Vitest);
+      expect(logs.length).toBe(0);
+    });
+  });
 });
