@@ -121,4 +121,22 @@ describe('Service Schematic', () => {
     expect(content).toContain('export class FooService {');
     expect(testContent).toContain("describe('FooService', () => {");
   });
+
+  it('should allow skipping providedIn when skipProvidedIn is true', async () => {
+    const options = { ...defaultOptions, skipProvidedIn: true };
+
+    const tree = await schematicRunner.runSchematic('service', options, appTree);
+    const content = tree.readContent('/projects/bar/src/app/foo/foo.ts');
+    expect(content).not.toMatch(/providedIn/);
+    expect(content).toMatch(/^@Injectable\(\)$/m);
+  });
+
+  it('should include providedIn: "root" by default', async () => {
+    const options = { ...defaultOptions };
+
+    const tree = await schematicRunner.runSchematic('service', options, appTree);
+    const content = tree.readContent('/projects/bar/src/app/foo/foo.ts');
+    expect(content).toMatch(/providedIn: 'root'/);
+    expect(content).toMatch(/^@Injectable\({$/m);
+  });
 });
