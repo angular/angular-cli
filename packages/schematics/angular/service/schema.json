@@ -40,6 +40,11 @@
       "description": "Skip the generation of a unit test file `spec.ts` for the service.",
       "default": false
     },
+    "skipProvidedIn": {
+      "type": "boolean",
+      "default": false,
+      "description": "When true, does not add the providedIn property to the @Injectable decorator. The service must then be provided manually"
+    },
     "type": {
       "type": "string",
       "description": "Append a custom type to the service's filename. For example, if you set the type to `service`, the file will be named `my-service.service.ts`."

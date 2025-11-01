@@ -1,8 +1,6 @@
 import { Injectable } from '@angular/core';
 
-@Injectable({
+<% if (!skipProvidedIn) { %>@Injectable({
   providedIn: 'root',
-})
-export class <%= classifiedName %> {
-  
-}
+})<% } else { %>@Injectable()<% } %>
+export class <%= classifiedName %> {}
