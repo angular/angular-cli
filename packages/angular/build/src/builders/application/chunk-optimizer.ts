@@ -253,7 +253,7 @@ export async function optimizeChunks(
 
     const result = await bundle.generate({
       minify: { mangle: false, compress: false },
-      advancedChunks: { minSize: 8192 },
+      advancedChunks: { groups: [{ name: 'chunks' }], minSize: 8 * 1024, maxSize: 512 * 1024 },
       sourcemap,
       chunkFileNames: (chunkInfo) => `${chunkInfo.name.replace(/-[a-zA-Z0-9]{8}$/, '')}-[hash].js`,
     });
