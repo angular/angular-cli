@@ -343,29 +343,30 @@ export class PackageManager {
   }
 
   /**
-   * Fetches the registry manifest for a specific version of a package.
+   * Fetches the manifest for a package.
    * The manifest is similar to the package's `package.json` file.
-   * @param packageName The name of the package to fetch the manifest for.
-   * @param version The version of the package to fetch the manifest for.
+   * This method can handle various package sources, including registry specifiers
+   * (`name@version`), local tarballs (`./package.tgz`), and local directories (`file:.`).
+   * @param packageSpecifier The identifier of the package to fetch the manifest for.
    * @param options Options for the fetch.
    * @param options.timeout The maximum time in milliseconds to wait for the command to complete.
-   * @param options.registry The registry to use for the fetch.
+   * @param options.registry The registry to use for the fetch (for registry specifiers).
    * @param options.bypassCache If true, ignores the in-memory cache and fetches fresh data.
    * @returns A promise that resolves to the `PackageManifest` object, or `null` if the package is not found.
    */
   async getPackageManifest(
-    packageName: string,
-    version: string,
+    packageSpecifier: string,
     options: { timeout?: number; registry?: string; bypassCache?: boolean } = {},
   ): Promise<PackageManifest | null> {
-    const specifier = `${packageName}@${version}`;
-    const commandArgs = [...this.descriptor.getManifestCommand, specifier];
+    const commandArgs = [...this.descriptor.getManifestCommand, packageSpecifier];
     const formatter = this.descriptor.viewCommandFieldArgFormatter;
     if (formatter) {
       commandArgs.push(...formatter(MANIFEST_FIELDS));
     }
 
-    const cacheKey = options.registry ? `${specifier}|${options.registry}` : specifier;
+    const cacheKey = options.registry
+      ? `${packageSpecifier}|${options.registry}`
+      : packageSpecifier;
 
     return this.#fetchAndParse(
       commandArgs,
