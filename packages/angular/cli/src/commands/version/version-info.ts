@@ -72,6 +72,7 @@ const PACKAGE_PATTERNS = [
   /^rxjs$/,
   /^typescript$/,
   /^ng-packagr$/,
+  /^vitest$/,
   /^webpack$/,
   /^zone\.js$/,
 ];
