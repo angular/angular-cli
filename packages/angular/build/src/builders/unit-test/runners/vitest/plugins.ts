@@ -9,12 +9,16 @@
 import assert from 'node:assert';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
-import type { VitestPlugin } from 'vitest/node';
+import type {
+  BrowserConfigOptions,
+  InlineConfig,
+  UserWorkspaceConfig,
+  VitestPlugin,
+} from 'vitest/node';
 import { createBuildAssetsMiddleware } from '../../../../tools/vite/middlewares/assets-middleware';
 import { toPosixPath } from '../../../../utils/path';
 import type { ResultFile } from '../../../application/results';
 import type { NormalizedUnitTestBuilderOptions } from '../../options';
-import type { BrowserConfiguration } from './browser-provider';
 
 type VitestPlugins = Awaited<ReturnType<typeof VitestPlugin>>;
 
@@ -22,10 +26,57 @@ interface PluginOptions {
   workspaceRoot: string;
   projectSourceRoot: string;
   projectName: string;
-  include?: string[];
-  exclude?: string[];
   buildResultFiles: ReadonlyMap<string, ResultFile>;
   testFileToEntryPoint: ReadonlyMap<string, string>;
+}
+
+type VitestCoverageOption = Exclude<InlineConfig['coverage'], undefined>;
+
+interface VitestConfigPluginOptions {
+  browser: BrowserConfigOptions | undefined;
+  coverage: NormalizedUnitTestBuilderOptions['coverage'];
+  projectName: string;
+  reporters?: string[] | [string, object][];
+  setupFiles: string[];
+  projectPlugins: VitestPlugins;
+  include: string[];
+}
+
+export function createVitestConfigPlugin(options: VitestConfigPluginOptions): VitestPlugins[0] {
+  const { include, browser, projectName, reporters, setupFiles, projectPlugins } = options;
+
+  return {
+    name: 'angular:vitest-configuration',
+    async config(config) {
+      const testConfig = config.test;
+
+      const projectConfig: UserWorkspaceConfig = {
+        test: {
+          ...testConfig,
+          name: projectName,
+          setupFiles,
+          include,
+          globals: testConfig?.globals ?? true,
+          ...(browser ? { browser } : {}),
+          // If the user has not specified an environment, use `jsdom`.
+          ...(!testConfig?.environment ? { environment: 'jsdom' } : {}),
+        },
+        optimizeDeps: {
+          noDiscovery: true,
+        },
+        plugins: projectPlugins,
+      };
+
+      return {
+        test: {
+          coverage: await generateCoverageOption(options.coverage, projectName),
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          ...(reporters ? ({ reporters } as any) : {}),
+          projects: [projectConfig],
+        },
+      };
+    },
+  };
 }
 
 export function createVitestPlugins(pluginOptions: PluginOptions): VitestPlugins {
@@ -133,4 +184,40 @@ export function createVitestPlugins(pluginOptions: PluginOptions): VitestPlugins
       },
     },
   ];
+}
+
+async function generateCoverageOption(
+  coverage: NormalizedUnitTestBuilderOptions['coverage'],
+  projectName: string,
+): Promise<VitestCoverageOption> {
+  let defaultExcludes: string[] = [];
+  if (coverage.exclude) {
+    try {
+      const vitestConfig = await import('vitest/config');
+      defaultExcludes = vitestConfig.coverageConfigDefaults.exclude;
+    } catch {}
+  }
+
+  return {
+    enabled: coverage.enabled,
+    excludeAfterRemap: true,
+    include: coverage.include,
+    reportsDirectory: toPosixPath(path.join('coverage', projectName)),
+    thresholds: coverage.thresholds,
+    watermarks: coverage.watermarks,
+    // Special handling for `exclude`/`reporters` due to an undefined value causing upstream failures
+    ...(coverage.exclude
+      ? {
+          exclude: [
+            // Augment the default exclude https://vitest.dev/config/#coverage-exclude
+            // with the user defined exclusions
+            ...coverage.exclude,
+            ...defaultExcludes,
+          ],
+        }
+      : {}),
+    ...(coverage.reporters
+      ? ({ reporter: coverage.reporters } satisfies VitestCoverageOption)
+      : {}),
+  };
 }
