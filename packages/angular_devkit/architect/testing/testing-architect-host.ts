@@ -72,7 +72,7 @@ export class TestingArchitectHost implements ArchitectHost {
     const name = targetStringFromTarget(target);
     const maybeTarget = this._targetMap.get(name);
     if (!maybeTarget) {
-      return this._backendHost && this._backendHost.getBuilderNameForTarget(target);
+      return this._backendHost?.getBuilderNameForTarget(target) ?? null;
     }
 
     return maybeTarget.builderName;
@@ -87,8 +87,7 @@ export class TestingArchitectHost implements ArchitectHost {
    */
   async resolveBuilder(builderName: string): Promise<BuilderInfo | null> {
     return (
-      this._builderMap.get(builderName) ||
-      (this._backendHost && this._backendHost.resolveBuilder(builderName))
+      this._builderMap.get(builderName) || (this._backendHost?.resolveBuilder(builderName) ?? null)
     );
   }
 
@@ -103,20 +102,19 @@ export class TestingArchitectHost implements ArchitectHost {
     const name = targetStringFromTarget(target);
     const maybeTarget = this._targetMap.get(name);
     if (!maybeTarget) {
-      return this._backendHost && this._backendHost.getOptionsForTarget(target);
+      return this._backendHost?.getOptionsForTarget(target) ?? null;
     }
 
     return maybeTarget.options;
   }
 
   async getProjectMetadata(target: Target | string): Promise<json.JsonObject | null> {
-    return this._backendHost && this._backendHost.getProjectMetadata(target as string);
+    return this._backendHost?.getProjectMetadata(target as string) ?? null;
   }
 
   async loadBuilder(info: BuilderInfo): Promise<Builder | null> {
     return (
-      this._builderImportMap.get(info.builderName) ||
-      (this._backendHost && this._backendHost.loadBuilder(info))
+      this._builderImportMap.get(info.builderName) || (this._backendHost?.loadBuilder(info) ?? null)
     );
   }
 }
