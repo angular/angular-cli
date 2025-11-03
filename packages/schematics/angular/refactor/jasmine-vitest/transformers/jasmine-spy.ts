@@ -338,104 +338,124 @@ function createMockedSpyMockProperty(spyIdentifier: ts.Expression): ts.PropertyA
   return createPropertyAccess(mockedSpy, 'mock');
 }
 
-export function transformSpyCallInspection(
+function transformMostRecentArgs(
   node: ts.Node,
   { sourceFile, reporter }: RefactorContext,
 ): ts.Node {
-  // mySpy.calls.mostRecent().args -> vi.mocked(mySpy).mock.lastCall
+  // Check 1: Is it a property access for `.args`?
   if (
-    ts.isPropertyAccessExpression(node) &&
-    ts.isIdentifier(node.name) &&
-    node.name.text === 'args'
+    !ts.isPropertyAccessExpression(node) ||
+    !ts.isIdentifier(node.name) ||
+    node.name.text !== 'args'
   ) {
-    const mostRecentCall = node.expression;
-    if (
-      ts.isCallExpression(mostRecentCall) &&
-      ts.isPropertyAccessExpression(mostRecentCall.expression)
-    ) {
-      const mostRecentPae = mostRecentCall.expression; // mySpy.calls.mostRecent
-      if (
-        ts.isIdentifier(mostRecentPae.name) &&
-        mostRecentPae.name.text === 'mostRecent' &&
-        ts.isPropertyAccessExpression(mostRecentPae.expression)
-      ) {
-        const spyIdentifier = getSpyIdentifierFromCalls(mostRecentPae.expression);
-        if (spyIdentifier) {
-          reporter.reportTransformation(
-            sourceFile,
-            node,
-            'Transformed `spy.calls.mostRecent().args` to `vi.mocked(spy).mock.lastCall`.',
-          );
-          const mockProperty = createMockedSpyMockProperty(spyIdentifier);
-
-          return createPropertyAccess(mockProperty, 'lastCall');
-        }
-      }
-    }
+    return node;
   }
 
-  if (ts.isCallExpression(node) && ts.isPropertyAccessExpression(node.expression)) {
-    const pae = node.expression; // e.g., mySpy.calls.count
-    const spyIdentifier = ts.isPropertyAccessExpression(pae.expression)
-      ? getSpyIdentifierFromCalls(pae.expression)
-      : undefined;
+  // Check 2: Is the preceding expression a call expression?
+  const mostRecentCall = node.expression;
+  if (
+    !ts.isCallExpression(mostRecentCall) ||
+    !ts.isPropertyAccessExpression(mostRecentCall.expression)
+  ) {
+    return node;
+  }
 
-    if (spyIdentifier) {
-      const mockProperty = createMockedSpyMockProperty(spyIdentifier);
-      const callsProperty = createPropertyAccess(mockProperty, 'calls');
+  // Check 3: Is it a call to `.mostRecent`?
+  const mostRecentPae = mostRecentCall.expression;
+  if (
+    !ts.isIdentifier(mostRecentPae.name) ||
+    mostRecentPae.name.text !== 'mostRecent' ||
+    !ts.isPropertyAccessExpression(mostRecentPae.expression)
+  ) {
+    return node;
+  }
 
-      const callName = pae.name.text;
-      let newExpression: ts.Node | undefined;
-      let message: string | undefined;
+  // Check 4: Can we get the spy identifier from `spy.calls`?
+  const spyIdentifier = getSpyIdentifierFromCalls(mostRecentPae.expression);
+  if (!spyIdentifier) {
+    return node;
+  }
 
-      switch (callName) {
-        case 'any':
-          message = 'Transformed `spy.calls.any()` to a check on `mock.calls.length`.';
-          newExpression = ts.factory.createBinaryExpression(
-            createPropertyAccess(callsProperty, 'length'),
-            ts.SyntaxKind.GreaterThanToken,
-            ts.factory.createNumericLiteral(0),
-          );
-          break;
-        case 'count':
-          message = 'Transformed `spy.calls.count()` to `mock.calls.length`.';
-          newExpression = createPropertyAccess(callsProperty, 'length');
-          break;
-        case 'first':
-          message = 'Transformed `spy.calls.first()` to `mock.calls[0]`.';
-          newExpression = ts.factory.createElementAccessExpression(callsProperty, 0);
-          break;
-        case 'all':
-        case 'allArgs':
-          message = `Transformed \`spy.calls.${callName}()\` to \`mock.calls\`.`;
-          newExpression = callsProperty;
-          break;
-        case 'argsFor':
-          message = 'Transformed `spy.calls.argsFor()` to `mock.calls[i]`.';
-          newExpression = ts.factory.createElementAccessExpression(
-            callsProperty,
-            node.arguments[0],
-          );
-          break;
-        case 'mostRecent':
-          if (
-            !ts.isPropertyAccessExpression(node.parent) ||
-            !ts.isIdentifier(node.parent.name) ||
-            node.parent.name.text !== 'args'
-          ) {
-            const category = 'mostRecent-without-args';
-            reporter.recordTodo(category);
-            addTodoComment(node, category);
-          }
+  // If all checks pass, perform the transformation.
+  reporter.reportTransformation(
+    sourceFile,
+    node,
+    'Transformed `spy.calls.mostRecent().args` to `vi.mocked(spy).mock.lastCall`.',
+  );
+  const mockProperty = createMockedSpyMockProperty(spyIdentifier);
 
-          return node;
-      }
+  return createPropertyAccess(mockProperty, 'lastCall');
+}
 
-      if (newExpression && message) {
-        reporter.reportTransformation(sourceFile, node, message);
+export function transformSpyCallInspection(node: ts.Node, refactorCtx: RefactorContext): ts.Node {
+  const mostRecentArgsTransformed = transformMostRecentArgs(node, refactorCtx);
+  if (mostRecentArgsTransformed !== node) {
+    return mostRecentArgsTransformed;
+  }
 
-        return newExpression;
-      }
+  if (!ts.isCallExpression(node) || !ts.isPropertyAccessExpression(node.expression)) {
+    return node;
+  }
+
+  const { sourceFile, reporter } = refactorCtx;
+
+  const pae = node.expression; // e.g., mySpy.calls.count
+  const spyIdentifier = ts.isPropertyAccessExpression(pae.expression)
+    ? getSpyIdentifierFromCalls(pae.expression)
+    : undefined;
+
+  if (spyIdentifier) {
+    const mockProperty = createMockedSpyMockProperty(spyIdentifier);
+    const callsProperty = createPropertyAccess(mockProperty, 'calls');
+
+    const callName = pae.name.text;
+    let newExpression: ts.Node | undefined;
+    let message: string | undefined;
+
+    switch (callName) {
+      case 'any':
+        message = 'Transformed `spy.calls.any()` to a check on `mock.calls.length`.';
+        newExpression = ts.factory.createBinaryExpression(
+          createPropertyAccess(callsProperty, 'length'),
+          ts.SyntaxKind.GreaterThanToken,
+          ts.factory.createNumericLiteral(0),
+        );
+        break;
+      case 'count':
+        message = 'Transformed `spy.calls.count()` to `mock.calls.length`.';
+        newExpression = createPropertyAccess(callsProperty, 'length');
+        break;
+      case 'first':
+        message = 'Transformed `spy.calls.first()` to `mock.calls[0]`.';
+        newExpression = ts.factory.createElementAccessExpression(callsProperty, 0);
+        break;
+      case 'all':
+      case 'allArgs':
+        message = `Transformed \`spy.calls.${callName}()\` to \`mock.calls\`.`;
+        newExpression = callsProperty;
+        break;
+      case 'argsFor':
+        message = 'Transformed `spy.calls.argsFor()` to `mock.calls[i]`.';
+        newExpression = ts.factory.createElementAccessExpression(callsProperty, node.arguments[0]);
+        break;
+      case 'mostRecent':
+        if (
+          !ts.isPropertyAccessExpression(node.parent) ||
+          !ts.isIdentifier(node.parent.name) ||
+          node.parent.name.text !== 'args'
+        ) {
+          const category = 'mostRecent-without-args';
+          reporter.recordTodo(category);
+          addTodoComment(node, category);
+        }
+
+        return node;
+    }
+
+    if (newExpression && message) {
+      reporter.reportTransformation(sourceFile, node, message);
+
+      return newExpression;
     }
   }
 
