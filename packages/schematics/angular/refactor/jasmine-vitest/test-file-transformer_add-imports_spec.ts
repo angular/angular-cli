@@ -52,5 +52,34 @@ describe('Jasmine to Vitest Transformer', () => {
       const expected = `const a = 1;`;
       await expectTransformation(input, expected, true);
     });
+
+    it('should add imports for top-level describe and it when addImports is true', async () => {
+      const input = `
+        describe('My Suite', () => {
+          it('should do something', () => {
+            // test content
+          });
+        });
+      `;
+      const expected = `
+        import { describe, it } from 'vitest';
+
+        describe('My Suite', () => {
+          it('should do something', () => {
+            // test content
+          });
+        });
+      `;
+      await expectTransformation(input, expected, true);
+    });
+
+    it('should add imports for top-level expect when addImports is true', async () => {
+      const input = `expect(true).toBe(true);`;
+      const expected = `
+        import { expect } from 'vitest';
+        expect(true).toBe(true);
+      `;
+      await expectTransformation(input, expected, true);
+    });
   });
 });
