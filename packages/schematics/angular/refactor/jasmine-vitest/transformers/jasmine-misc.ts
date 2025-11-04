@@ -14,7 +14,7 @@
  */
 
 import ts from '../../../third_party/github.com/Microsoft/TypeScript/lib/typescript';
-import { createViCallExpression } from '../utils/ast-helpers';
+import { addVitestValueImport, createViCallExpression } from '../utils/ast-helpers';
 import { getJasmineMethodName, isJasmineCallExpression } from '../utils/ast-validation';
 import { addTodoComment } from '../utils/comment-helpers';
 import { RefactorContext } from '../utils/refactor-context';
@@ -22,7 +22,7 @@ import { TodoCategory } from '../utils/todo-notes';
 
 export function transformTimerMocks(
   node: ts.Node,
-  { sourceFile, reporter }: RefactorContext,
+  { sourceFile, reporter, pendingVitestValueImports }: RefactorContext,
 ): ts.Node {
   if (
     !ts.isCallExpression(node) ||
@@ -55,6 +55,7 @@ export function transformTimerMocks(
   }
 
   if (newMethodName) {
+    addVitestValueImport(pendingVitestValueImports, 'vi');
     reporter.reportTransformation(
       sourceFile,
       node,
@@ -94,7 +95,7 @@ export function transformFail(node: ts.Node, { sourceFile, reporter }: RefactorC
 
 export function transformDefaultTimeoutInterval(
   node: ts.Node,
-  { sourceFile, reporter }: RefactorContext,
+  { sourceFile, reporter, pendingVitestValueImports }: RefactorContext,
 ): ts.Node {
   if (
     ts.isExpressionStatement(node) &&
@@ -108,6 +109,7 @@ export function transformDefaultTimeoutInterval(
       assignment.left.expression.text === 'jasmine' &&
       assignment.left.name.text === 'DEFAULT_TIMEOUT_INTERVAL'
     ) {
+      addVitestValueImport(pendingVitestValueImports, 'vi');
       reporter.reportTransformation(
         sourceFile,
         node,

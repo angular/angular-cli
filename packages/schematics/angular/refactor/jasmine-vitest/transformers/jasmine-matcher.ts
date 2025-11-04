@@ -15,7 +15,11 @@
  */
 
 import ts from '../../../third_party/github.com/Microsoft/TypeScript/lib/typescript';
-import { createExpectCallExpression, createPropertyAccess } from '../utils/ast-helpers';
+import {
+  addVitestValueImport,
+  createExpectCallExpression,
+  createPropertyAccess,
+} from '../utils/ast-helpers';
 import { getJasmineMethodName, isJasmineCallExpression } from '../utils/ast-validation';
 import { addTodoComment } from '../utils/comment-helpers';
 import { RefactorContext } from '../utils/refactor-context';
@@ -94,7 +98,7 @@ const ASYMMETRIC_MATCHER_NAMES: ReadonlyArray<string> = [
 
 export function transformAsymmetricMatchers(
   node: ts.Node,
-  { sourceFile, reporter }: RefactorContext,
+  { sourceFile, reporter, pendingVitestValueImports }: RefactorContext,
 ): ts.Node {
   if (
     ts.isPropertyAccessExpression(node) &&
@@ -103,6 +107,7 @@ export function transformAsymmetricMatchers(
   ) {
     const matcherName = node.name.text;
     if (ASYMMETRIC_MATCHER_NAMES.includes(matcherName)) {
+      addVitestValueImport(pendingVitestValueImports, 'expect');
       reporter.reportTransformation(
         sourceFile,
         node,

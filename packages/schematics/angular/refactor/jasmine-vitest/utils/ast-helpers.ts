@@ -8,28 +8,55 @@
 
 import ts from '../../../third_party/github.com/Microsoft/TypeScript/lib/typescript';
 
-export function addVitestAutoImport(imports: Set<string>, importName: string): void {
+export function addVitestValueImport(imports: Set<string>, importName: string): void {
   imports.add(importName);
 }
 
-export function getVitestAutoImports(imports: Set<string>): ts.ImportDeclaration | undefined {
-  if (!imports?.size) {
+export function addVitestTypeImport(imports: Set<string>, importName: string): void {
+  imports.add(importName);
+}
+
+export function getVitestAutoImports(
+  valueImports: Set<string>,
+  typeImports: Set<string>,
+): ts.ImportDeclaration | undefined {
+  if (valueImports.size === 0 && typeImports.size === 0) {
     return undefined;
   }
 
-  const importNames = [...imports];
-  importNames.sort();
-  const importSpecifiers = importNames.map((i) =>
-    ts.factory.createImportSpecifier(false, undefined, ts.factory.createIdentifier(i)),
+  const isClauseTypeOnly = valueImports.size === 0 && typeImports.size > 0;
+  const allSpecifiers: ts.ImportSpecifier[] = [];
+
+  // Add value imports
+  for (const i of [...valueImports].sort()) {
+    allSpecifiers.push(
+      ts.factory.createImportSpecifier(false, undefined, ts.factory.createIdentifier(i)),
+    );
+  }
+
+  // Add type imports
+  for (const i of [...typeImports].sort()) {
+    // Only set isTypeOnly on individual specifiers if the clause itself is NOT type-only
+    allSpecifiers.push(
+      ts.factory.createImportSpecifier(
+        !isClauseTypeOnly,
+        undefined,
+        ts.factory.createIdentifier(i),
+      ),
+    );
+  }
+
+  allSpecifiers.sort((a, b) => a.name.text.localeCompare(b.name.text));
+
+  const importClause = ts.factory.createImportClause(
+    isClauseTypeOnly, // Set isTypeOnly on the clause if only type imports
+    undefined,
+    ts.factory.createNamedImports(allSpecifiers),
   );
 
   return ts.factory.createImportDeclaration(
     undefined,
-    ts.factory.createImportClause(
-      ts.SyntaxKind.TypeKeyword,
-      undefined,
-      ts.factory.createNamedImports(importSpecifiers),
-    ),
+    importClause,
     ts.factory.createStringLiteral('vitest'),
   );
 }
