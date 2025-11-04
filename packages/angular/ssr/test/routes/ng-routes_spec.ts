@@ -428,6 +428,45 @@ describe('extractRoutesAndCreateRouteTree', () => {
     ]);
   });
 
+  it('should extract routes with a route level matcher captured by "**"', async () => {
+    setAngularAppTestingManifest(
+      [
+        {
+          path: '',
+          component: DummyComponent,
+        },
+        {
+          path: 'list',
+          component: DummyComponent,
+        },
+        {
+          path: 'product',
+          component: DummyComponent,
+          children: [
+            {
+              matcher: () => null,
+              component: DummyComponent,
+            },
+          ],
+        },
+      ],
+      [
+        { path: 'list', renderMode: RenderMode.Client },
+        { path: '', renderMode: RenderMode.Client },
+        { path: '**', renderMode: RenderMode.Server },
+      ],
+    );
+
+    const { routeTree, errors } = await extractRoutesAndCreateRouteTree({ url });
+    expect(errors).toHaveSize(0);
+    expect(routeTree.toObject()).toEqual([
+      { route: '/', renderMode: RenderMode.Client },
+      { route: '/list', renderMode: RenderMode.Client },
+      { route: '/product', renderMode: RenderMode.Server },
+      { route: '/**', renderMode: RenderMode.Server },
+    ]);
+  });
+
   it('should extract nested redirects that are not explicitly defined.', async () => {
     setAngularAppTestingManifest(
       [

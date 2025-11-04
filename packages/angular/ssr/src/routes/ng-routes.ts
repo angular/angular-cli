@@ -251,15 +251,22 @@ async function* traverseRoutesConfig(options: {
     const currentRoutePath = joinUrlParts(parentRoute, path);
 
     if (matcher && serverConfigRouteTree) {
-      let foundMatch = false;
+      const matches: (RouteTreeNodeMetadata & ServerConfigRouteTreeAdditionalMetadata)[] = [];
       for (const matchedMetaData of serverConfigRouteTree.traverse()) {
-        if (!matchedMetaData.route.startsWith(currentRoutePath)) {
-          continue;
+        if (matchedMetaData.route.startsWith(currentRoutePath)) {
+          matches.push(matchedMetaData);
         }
+      }
 
-        foundMatch = true;
+      if (!matches.length) {
+        const matchedMetaData = serverConfigRouteTree.match(currentRoutePath);
+        if (matchedMetaData) {
+          matches.push(matchedMetaData);
+        }
+      }
+
+      for (const matchedMetaData of matches) {
         matchedMetaData.presentInClientRouter = true;
-
         if (matchedMetaData.renderMode === RenderMode.Prerender) {
           yield {
             error:
@@ -282,7 +289,7 @@ async function* traverseRoutesConfig(options: {
         });
       }
 
-      if (!foundMatch) {
+      if (!matches.length) {
         yield {
           error:
             `The route '${stripLeadingSlash(currentRoutePath)}' has a defined matcher but does not ` +
