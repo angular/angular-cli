@@ -14,7 +14,7 @@ import { RefactorReporter } from './utils/refactor-reporter';
 async function expectTransformation(input: string, expected: string): Promise<void> {
   const logger = new logging.NullLogger();
   const reporter = new RefactorReporter(logger);
-  const transformed = transformJasmineToVitest('spec.ts', input, reporter);
+  const transformed = transformJasmineToVitest('spec.ts', input, reporter, { addImports: false });
   const formattedTransformed = await format(transformed, { parser: 'typescript' });
   const formattedExpected = await format(expected, { parser: 'typescript' });
 

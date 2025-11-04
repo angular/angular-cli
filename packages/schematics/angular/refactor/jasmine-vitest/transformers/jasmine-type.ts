@@ -14,12 +14,12 @@
  */
 
 import ts from '../../../third_party/github.com/Microsoft/TypeScript/lib/typescript';
-import { addVitestAutoImport } from '../utils/ast-helpers';
+import { addVitestTypeImport } from '../utils/ast-helpers';
 import { RefactorContext } from '../utils/refactor-context';
 
 export function transformJasmineTypes(
   node: ts.Node,
-  { sourceFile, reporter, pendingVitestImports }: RefactorContext,
+  { sourceFile, reporter, pendingVitestTypeImports }: RefactorContext,
 ): ts.Node {
   const typeNameNode = ts.isTypeReferenceNode(node) ? node.typeName : node;
   if (
@@ -40,7 +40,7 @@ export function transformJasmineTypes(
         node,
         `Transformed type \`jasmine.Spy\` to \`${vitestTypeName}\`.`,
       );
-      addVitestAutoImport(pendingVitestImports, vitestTypeName);
+      addVitestTypeImport(pendingVitestTypeImports, vitestTypeName);
 
       return ts.factory.createIdentifier(vitestTypeName);
     }
@@ -51,7 +51,7 @@ export function transformJasmineTypes(
         node,
         `Transformed type \`jasmine.SpyObj\` to \`${vitestTypeName}\`.`,
       );
-      addVitestAutoImport(pendingVitestImports, vitestTypeName);
+      addVitestTypeImport(pendingVitestTypeImports, vitestTypeName);
 
       if (ts.isTypeReferenceNode(node)) {
         return ts.factory.updateTypeReferenceNode(
