@@ -14,13 +14,17 @@
  */
 
 import ts from '../../../third_party/github.com/Microsoft/TypeScript/lib/typescript';
-import { createPropertyAccess, createViCallExpression } from '../utils/ast-helpers';
+import {
+  addVitestValueImport,
+  createPropertyAccess,
+  createViCallExpression,
+} from '../utils/ast-helpers';
 import { getJasmineMethodName, isJasmineCallExpression } from '../utils/ast-validation';
 import { addTodoComment } from '../utils/comment-helpers';
 import { RefactorContext } from '../utils/refactor-context';
 
 export function transformSpies(node: ts.Node, refactorCtx: RefactorContext): ts.Node {
-  const { sourceFile, reporter } = refactorCtx;
+  const { sourceFile, reporter, pendingVitestValueImports } = refactorCtx;
   if (!ts.isCallExpression(node)) {
     return node;
   }
@@ -29,6 +33,7 @@ export function transformSpies(node: ts.Node, refactorCtx: RefactorContext): ts.
     ts.isIdentifier(node.expression) &&
     (node.expression.text === 'spyOn' || node.expression.text === 'spyOnProperty')
   ) {
+    addVitestValueImport(pendingVitestValueImports, 'vi');
     reporter.reportTransformation(
       sourceFile,
       node,
@@ -181,6 +186,7 @@ export function transformSpies(node: ts.Node, refactorCtx: RefactorContext): ts.
   const jasmineMethodName = getJasmineMethodName(node);
   switch (jasmineMethodName) {
     case 'createSpy':
+      addVitestValueImport(pendingVitestValueImports, 'vi');
       reporter.reportTransformation(
         sourceFile,
         node,
@@ -208,12 +214,13 @@ export function transformSpies(node: ts.Node, refactorCtx: RefactorContext): ts.
 
 export function transformCreateSpyObj(
   node: ts.Node,
-  { sourceFile, reporter }: RefactorContext,
+  { sourceFile, reporter, pendingVitestValueImports }: RefactorContext,
 ): ts.Node {
   if (!isJasmineCallExpression(node, 'createSpyObj')) {
     return node;
   }
 
+  addVitestValueImport(pendingVitestValueImports, 'vi');
   reporter.reportTransformation(
     sourceFile,
     node,
@@ -328,7 +335,11 @@ function getSpyIdentifierFromCalls(node: ts.PropertyAccessExpression): ts.Expres
   return undefined;
 }
 
-function createMockedSpyMockProperty(spyIdentifier: ts.Expression): ts.PropertyAccessExpression {
+function createMockedSpyMockProperty(
+  spyIdentifier: ts.Expression,
+  pendingVitestValueImports: Set<string>,
+): ts.PropertyAccessExpression {
+  addVitestValueImport(pendingVitestValueImports, 'vi');
   const mockedSpy = ts.factory.createCallExpression(
     createPropertyAccess('vi', 'mocked'),
     undefined,
@@ -340,7 +351,7 @@ function createMockedSpyMockProperty(spyIdentifier: ts.Expression): ts.PropertyA
 
 function transformMostRecentArgs(
   node: ts.Node,
-  { sourceFile, reporter }: RefactorContext,
+  { sourceFile, reporter, pendingVitestValueImports }: RefactorContext,
 ): ts.Node {
   // Check 1: Is it a property access for `.args`?
   if (
@@ -382,7 +393,7 @@ function transformMostRecentArgs(
     node,
     'Transformed `spy.calls.mostRecent().args` to `vi.mocked(spy).mock.lastCall`.',
   );
-  const mockProperty = createMockedSpyMockProperty(spyIdentifier);
+  const mockProperty = createMockedSpyMockProperty(spyIdentifier, pendingVitestValueImports);
 
   return createPropertyAccess(mockProperty, 'lastCall');
 }
@@ -397,7 +408,7 @@ export function transformSpyCallInspection(node: ts.Node, refactorCtx: RefactorC
     return node;
   }
 
-  const { sourceFile, reporter } = refactorCtx;
+  const { sourceFile, reporter, pendingVitestValueImports } = refactorCtx;
 
   const pae = node.expression; // e.g., mySpy.calls.count
   const spyIdentifier = ts.isPropertyAccessExpression(pae.expression)
@@ -405,7 +416,7 @@ export function transformSpyCallInspection(node: ts.Node, refactorCtx: RefactorC
     : undefined;
 
   if (spyIdentifier) {
-    const mockProperty = createMockedSpyMockProperty(spyIdentifier);
+    const mockProperty = createMockedSpyMockProperty(spyIdentifier, pendingVitestValueImports);
     const callsProperty = createPropertyAccess(mockProperty, 'calls');
 
     const callName = pae.name.text;

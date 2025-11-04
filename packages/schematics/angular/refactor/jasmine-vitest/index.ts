@@ -119,7 +119,9 @@ export default function (options: Schema): Rule {
     for (const file of files) {
       reporter.incrementScannedFiles();
       const content = tree.readText(file);
-      const newContent = transformJasmineToVitest(file, content, reporter);
+      const newContent = transformJasmineToVitest(file, content, reporter, {
+        addImports: !!options.addImports,
+      });
 
       if (content !== newContent) {
         tree.overwrite(file, newContent);

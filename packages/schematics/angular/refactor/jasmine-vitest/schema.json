@@ -25,6 +25,11 @@
       "type": "boolean",
       "description": "Enable verbose logging to see detailed information about the transformations being applied.",
       "default": false
+    },
+    "addImports": {
+      "type": "boolean",
+      "description": "Whether to add imports for the Vitest API. The Angular `unit-test` system automatically uses the Vitest globals option, which means explicit imports for global APIs like `describe`, `it`, `expect`, and `vi` are often not strictly necessary unless Vitest has been configured not to use globals.",
+      "default": false
     }
   }
 }

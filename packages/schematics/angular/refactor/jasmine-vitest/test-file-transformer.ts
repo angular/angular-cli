@@ -39,7 +39,7 @@ import {
   transformSpyReset,
 } from './transformers/jasmine-spy';
 import { transformJasmineTypes } from './transformers/jasmine-type';
-import { getVitestAutoImports } from './utils/ast-helpers';
+import { addVitestValueImport, getVitestAutoImports } from './utils/ast-helpers';
 import { RefactorContext } from './utils/refactor-context';
 import { RefactorReporter } from './utils/refactor-reporter';
 
@@ -61,14 +61,17 @@ function restoreBlankLines(content: string): string {
 /**
  * Transforms a string of Jasmine test code to Vitest test code.
  * This is the main entry point for the transformation.
+ * @param filePath The path to the file being transformed.
  * @param content The source code to transform.
  * @param reporter The reporter to track TODOs.
+ * @param options Transformation options.
  * @returns The transformed code.
  */
 export function transformJasmineToVitest(
   filePath: string,
   content: string,
   reporter: RefactorReporter,
+  options: { addImports: boolean },
 ): string {
   const contentWithPlaceholders = preserveBlankLines(content);
 
@@ -80,13 +83,15 @@ export function transformJasmineToVitest(
     ts.ScriptKind.TS,
   );
 
-  const pendingVitestImports = new Set<string>();
+  const pendingVitestValueImports = new Set<string>();
+  const pendingVitestTypeImports = new Set<string>();
   const transformer: ts.TransformerFactory<ts.SourceFile> = (context) => {
     const refactorCtx: RefactorContext = {
       sourceFile,
       reporter,
       tsContext: context,
-      pendingVitestImports,
+      pendingVitestValueImports,
+      pendingVitestTypeImports,
     };
 
     const visitor: ts.Visitor = (node) => {
@@ -94,6 +99,13 @@ export function transformJasmineToVitest(
 
       // Transform the node itself based on its type
       if (ts.isCallExpression(transformedNode)) {
+        if (options.addImports && ts.isIdentifier(transformedNode.expression)) {
+          const name = transformedNode.expression.text;
+          if (name === 'describe' || name === 'it' || name === 'expect') {
+            addVitestValueImport(pendingVitestValueImports, name);
+          }
+        }
+
         const transformations = [
           // **Stage 1: High-Level & Context-Sensitive Transformations**
           // These transformers often wrap or fundamentally change the nature of the call,
@@ -171,16 +183,29 @@ export function transformJasmineToVitest(
   const result = ts.transform(sourceFile, [transformer]);
   let transformedSourceFile = result.transformed[0];
 
-  if (transformedSourceFile === sourceFile && !reporter.hasTodos && !pendingVitestImports.size) {
+  const hasPendingValueImports = pendingVitestValueImports.size > 0;
+  const hasPendingTypeImports = pendingVitestTypeImports.size > 0;
+
+  if (
+    transformedSourceFile === sourceFile &&
+    !reporter.hasTodos &&
+    !hasPendingValueImports &&
+    !hasPendingTypeImports
+  ) {
     return content;
   }
 
-  const vitestImport = getVitestAutoImports(pendingVitestImports);
-  if (vitestImport) {
-    transformedSourceFile = ts.factory.updateSourceFile(transformedSourceFile, [
-      vitestImport,
-      ...transformedSourceFile.statements,
-    ]);
+  if (hasPendingTypeImports || (options.addImports && hasPendingValueImports)) {
+    const vitestImport = getVitestAutoImports(
+      options.addImports ? pendingVitestValueImports : new Set(),
+      pendingVitestTypeImports,
+    );
+    if (vitestImport) {
+      transformedSourceFile = ts.factory.updateSourceFile(transformedSourceFile, [
+        vitestImport,
+        ...transformedSourceFile.statements,
+      ]);
+    }
   }
 
   const printer = ts.createPrinter();
