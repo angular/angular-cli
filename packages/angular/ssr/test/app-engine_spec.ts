@@ -157,6 +157,66 @@ describe('AngularAppEngine', () => {
     });
   });
 
+  describe('Localized app with single locale', () => {
+    beforeAll(() => {
+      setAngularAppEngineManifest({
+        entryPoints: {
+          it: createEntryPoint('it'),
+        },
+        supportedLocales: { 'it': 'it' },
+        basePath: '/',
+      });
+
+      appEngine = new AngularAppEngine();
+    });
+
+    describe('handle', () => {
+      it('should return null for requests to unknown pages', async () => {
+        const request = new Request('https://example.com/unknown/page');
+        const response = await appEngine.handle(request);
+        expect(response).toBeNull();
+      });
+
+      it('should return a rendered page with correct locale', async () => {
+        const request = new Request('https://example.com/it/ssr');
+        const response = await appEngine.handle(request);
+        expect(await response?.text()).toContain('SSR works IT');
+      });
+
+      it('should correctly render the content when the URL ends with "index.html" with correct locale', async () => {
+        const request = new Request('https://example.com/it/ssr/index.html');
+        const response = await appEngine.handle(request);
+        expect(await response?.text()).toContain('SSR works IT');
+        expect(response?.headers?.get('Content-Language')).toBe('it');
+      });
+
+      it('should return a serve prerendered page with correct locale', async () => {
+        const request = new Request('https://example.com/it/ssg');
+        const response = await appEngine.handle(request);
+        expect(await response?.text()).toContain('SSG works IT');
+        expect(response?.headers?.get('Content-Language')).toBe('it');
+      });
+
+      it('should correctly serve the prerendered content when the URL ends with "index.html" with correct locale', async () => {
+        const request = new Request('https://example.com/it/ssg/index.html');
+        const response = await appEngine.handle(request);
+        expect(await response?.text()).toContain('SSG works IT');
+      });
+
+      it('should return null for requests to unknown pages in a locale', async () => {
+        const request = new Request('https://example.com/it/unknown/page');
+        const response = await appEngine.handle(request);
+        expect(response).toBeNull();
+      });
+
+      it('should return null for requests to file-like resources in a locale', async () => {
+        const request = new Request('https://example.com/it/logo.png');
+        const response = await appEngine.handle(request);
+        expect(response).toBeNull();
+      });
+    });
+  });
+
   describe('Non-localized app', () => {
     beforeAll(() => {
       @Component({
