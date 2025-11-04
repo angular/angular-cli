@@ -191,9 +191,10 @@ export class AngularAppEngine {
    * @returns A promise that resolves to the entry point exports or `undefined` if not found.
    */
   private getEntryPointExportsForUrl(url: URL): Promise<EntryPointExports> | undefined {
-    const { basePath } = this.manifest;
+    const { basePath, supportedLocales } = this.manifest;
+
     if (this.supportedLocales.length === 1) {
-      return this.getEntryPointExports('');
+      return this.getEntryPointExports(supportedLocales[this.supportedLocales[0]]);
     }
 
     const potentialLocale = getPotentialLocaleIdFromUrl(url, basePath);
