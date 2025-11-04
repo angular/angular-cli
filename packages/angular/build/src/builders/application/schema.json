@@ -611,7 +611,7 @@
     },
     "outputMode": {
       "type": "string",
-      "description": "Defines the build output target. 'static': Generates a static site build artifact for deployment on any static hosting service. 'server': Generates a server application build artifact, required for applications using hybrid rendering or APIs.",
+      "description": "Defines the type of build output artifact. 'static': Generates a static site build artifact for deployment on any static hosting service. 'server': Generates a server application build artifact, required for applications using hybrid rendering or APIs.",
       "enum": ["static", "server"]
     }
   },
