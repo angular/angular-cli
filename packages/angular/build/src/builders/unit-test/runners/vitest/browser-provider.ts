@@ -18,12 +18,16 @@ export interface BrowserConfiguration {
 function findBrowserProvider(
   projectResolver: NodeJS.RequireResolve,
 ): BrowserBuiltinProvider | undefined {
+  const requiresPreview = !!process.versions.webcontainer;
+
   // One of these must be installed in the project to use browser testing
-  const vitestBuiltinProviders = ['playwright', 'webdriverio'] as const;
+  const vitestBuiltinProviders = requiresPreview
+    ? (['preview'] as const)
+    : (['playwright', 'webdriverio', 'preview'] as const);
 
   for (const providerName of vitestBuiltinProviders) {
     try {
-      projectResolver(providerName);
+      projectResolver(`@vitest/browser-${providerName}`);
 
       return providerName;
     } catch {}
@@ -102,13 +106,18 @@ export async function setupBrowserConfiguration(
   }
 
   const isCI = !!process.env['CI'];
-  const headless = isCI || browsers.some((name) => name.toLowerCase().includes('headless'));
+  let headless = isCI || browsers.some((name) => name.toLowerCase().includes('headless'));
+  if (providerName === 'preview') {
+    // `preview` provider does not support headless mode
+    headless = false;
+  }
 
   const browser = {
     enabled: true,
     provider,
     headless,
     ui: !headless,
+    isolate: debug,
     viewport,
     instances: browsers.map((browserName) => ({
       browser: normalizeBrowserName(browserName),
