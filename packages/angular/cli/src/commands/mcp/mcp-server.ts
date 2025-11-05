@@ -30,13 +30,14 @@ const STABLE_TOOLS = [
   DOC_SEARCH_TOOL,
   FIND_EXAMPLE_TOOL,
   LIST_PROJECTS_TOOL,
+  ZONELESS_MIGRATION_TOOL,
 ] as const;
 
 /**
  * The set of tools that are available but not enabled by default.
  * These tools are considered experimental and may have limitations.
  */
-export const EXPERIMENTAL_TOOLS = [MODERNIZE_TOOL, ZONELESS_MIGRATION_TOOL] as const;
+export const EXPERIMENTAL_TOOLS = [MODERNIZE_TOOL] as const;
 
 export async function createMcpServer(
   options: {
