@@ -1,3 +1,37 @@
+<a name="21.0.0-rc.1"></a>
+
+# 21.0.0-rc.1 (2025-11-05)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                          |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------ |
+| [dfb4242b3](https://github.com/angular/angular-cli/commit/dfb4242b347365f3a2c6d006f07a16c982ff4dbe) | fix  | add vitest to version command output |
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                                   |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------- |
+| [f89750b27](https://github.com/angular/angular-cli/commit/f89750b27866c307da546fe4f33da980693ca5c1) | fix  | add `addImports` option to jasmine-vitest schematic           |
+| [515b09c4f](https://github.com/angular/angular-cli/commit/515b09c4f28ef1c2eb911cb73135a6086dcab3c9) | fix  | add Vitest config generation and runner checks                |
+| [0e83fe1a8](https://github.com/angular/angular-cli/commit/0e83fe1a87cc3dcbc9daa4440a050ae6aafc8042) | fix  | add warnings and improve Karma config generation              |
+| [b91fa31f2](https://github.com/angular/angular-cli/commit/b91fa31f20b49ead021c72c271f67da38b340584) | fix  | align Karma project generation with unified unit-test builder |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                           |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------- |
+| [62938e799](https://github.com/angular/angular-cli/commit/62938e79977d14045b7883d459d786dbb8d4d7ee) | fix  | update vitest to 4.0.6 and remove coverage workaround |
+
+### @angular/ssr
+
+| Commit                                                                                              | Type | Description                                |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------ |
+| [5d76d84e6](https://github.com/angular/angular-cli/commit/5d76d84e64db717e177b77f7a07ee8819b258877) | fix  | improve locale handling in app-engine      |
+| [4a3cfdfce](https://github.com/angular/angular-cli/commit/4a3cfdfce75b7cedf64e26d85b0a92ec92ddd12d) | fix  | improve route matching for wildcard routes |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="21.0.0-rc.0"></a>
 
 # 21.0.0-rc.0 (2025-10-30)
