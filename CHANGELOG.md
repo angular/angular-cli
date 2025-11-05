@@ -1,3 +1,16 @@
+<a name="20.3.9"></a>
+
+# 20.3.9 (2025-11-05)
+
+### @angular/ssr
+
+| Commit                                                                                              | Type | Description                                |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------ |
+| [08e07e338](https://github.com/angular/angular-cli/commit/08e07e338edd799400e18cd62cd131b6d408f4cf) | fix  | improve locale handling in app-engine      |
+| [683697ebc](https://github.com/angular/angular-cli/commit/683697ebc5e129d2b17bded9e4ff318d598e0bd3) | fix  | improve route matching for wildcard routes |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="21.0.0-rc.0"></a>
 
 # 21.0.0-rc.0 (2025-10-30)
