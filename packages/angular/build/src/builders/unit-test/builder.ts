@@ -146,6 +146,13 @@ async function* runBuildAndTest(
     } catch (e) {
       assertIsError(e);
       context.logger.error(`An exception occurred during test execution:\n${e.stack ?? e.message}`);
+      if (e instanceof AggregateError) {
+        e.errors.forEach((inner) => {
+          assertIsError(inner);
+          context.logger.error(inner.stack ?? inner.message);
+        });
+      }
+
       yield { success: false };
       consecutiveErrorCount++;
     }
