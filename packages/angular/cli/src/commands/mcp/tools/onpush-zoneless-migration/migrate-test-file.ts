@@ -6,12 +6,13 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import * as fs from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { glob } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import type { SourceFile } from 'typescript';
+import { findAngularJsonDir } from '../../utils';
 import { createFixResponseForZoneTests, createProvideZonelessForTestsSetupPrompt } from './prompts';
-import { loadTypescript } from './ts_utils';
+import { loadTypescript } from './ts-utils';
 import { MigrationResponse } from './types';
 
 export async function migrateTestFile(sourceFile: SourceFile): Promise<MigrationResponse | null> {
@@ -52,7 +53,7 @@ export async function searchForGlobalZoneless(startPath: string): Promise<boolea
   try {
     const files = glob(`${angularJsonDir}/**/*.ts`);
     for await (const file of files) {
-      const content = fs.readFileSync(file, 'utf-8');
+      const content = readFileSync(file, 'utf-8');
       if (
         content.includes('initTestEnvironment') &&
         content.includes('provideZonelessChangeDetection')
@@ -65,18 +66,4 @@ export async function searchForGlobalZoneless(startPath: string): Promise<boolea
   }
 
   return false;
-}
-
-function findAngularJsonDir(startDir: string): string | null {
-  let currentDir = startDir;
-  while (true) {
-    if (fs.existsSync(join(currentDir, 'angular.json'))) {
-      return currentDir;
-    }
-    const parentDir = dirname(currentDir);
-    if (parentDir === currentDir) {
-      return null;
-    }
-    currentDir = parentDir;
-  }
 }

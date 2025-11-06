@@ -7,9 +7,9 @@
  */
 
 import { z } from 'zod';
-import { CommandError, Host, LocalWorkspaceHost } from '../host';
+import { CommandError, type Host, LocalWorkspaceHost } from '../host';
 import { createStructuredContentOutput } from '../utils';
-import { McpToolDeclaration, declareTool } from './tool-registry';
+import { type McpToolDeclaration, declareTool } from './tool-registry';
 
 const DEFAULT_CONFIGURATION = 'development';
 

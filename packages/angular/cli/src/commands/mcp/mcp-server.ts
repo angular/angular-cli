@@ -7,10 +7,10 @@
  */
 
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import path from 'node:path';
+import { join } from 'node:path';
 import type { AngularWorkspace } from '../../utilities/config';
 import { VERSION } from '../../utilities/version';
-import { DevServer } from './dev-server';
+import type { DevServer } from './dev-server';
 import { registerInstructionsResource } from './resources/instructions';
 import { AI_TUTOR_TOOL } from './tools/ai-tutor';
 import { BEST_PRACTICES_TOOL } from './tools/best-practices';
@@ -23,7 +23,7 @@ import { FIND_EXAMPLE_TOOL } from './tools/examples';
 import { MODERNIZE_TOOL } from './tools/modernize';
 import { ZONELESS_MIGRATION_TOOL } from './tools/onpush-zoneless-migration/zoneless-migration';
 import { LIST_PROJECTS_TOOL } from './tools/projects';
-import { AnyMcpToolDeclaration, registerTools } from './tools/tool-registry';
+import { type AnyMcpToolDeclaration, registerTools } from './tools/tool-registry';
 
 /**
  * Tools to manage devservers. Should be bundled together, then added to experimental or stable as a group.
@@ -113,7 +113,7 @@ equivalent actions.
     {
       workspace: options.workspace,
       logger,
-      exampleDatabasePath: path.join(__dirname, '../../../lib/code-examples.db'),
+      exampleDatabasePath: join(__dirname, '../../../lib/code-examples.db'),
       devServers: new Map<string, DevServer>(),
     },
     toolDeclarations,

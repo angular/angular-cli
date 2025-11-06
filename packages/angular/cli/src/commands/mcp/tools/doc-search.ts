@@ -11,7 +11,7 @@ import { createDecipheriv } from 'node:crypto';
 import { Readable } from 'node:stream';
 import { z } from 'zod';
 import { at, iv, k1 } from '../constants';
-import { McpToolContext, declareTool } from './tool-registry';
+import { type McpToolContext, declareTool } from './tool-registry';
 
 const ALGOLIA_APP_ID = 'L1XWT2UJ7F';
 // https://www.algolia.com/doc/guides/security/api-keys/#search-only-api-key

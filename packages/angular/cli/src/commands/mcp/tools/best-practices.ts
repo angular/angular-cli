@@ -17,10 +17,10 @@
 
 import { readFile, stat } from 'node:fs/promises';
 import { createRequire } from 'node:module';
-import path from 'node:path';
+import { dirname, isAbsolute, join, relative, resolve } from 'node:path';
 import { z } from 'zod';
 import { VERSION } from '../../../utilities/version';
-import { McpToolContext, declareTool } from './tool-registry';
+import { type McpToolContext, declareTool } from './tool-registry';
 
 const bestPracticesInputSchema = z.object({
   workspacePath: z
@@ -72,7 +72,7 @@ that **MUST** be followed for any task involving the creation, analysis, or modi
  * @returns A promise that resolves to the string content of the bundled markdown file.
  */
 async function getBundledBestPractices(): Promise<string> {
-  return readFile(path.join(__dirname, '..', 'resources', 'best-practices.md'), 'utf-8');
+  return readFile(join(__dirname, '..', 'resources', 'best-practices.md'), 'utf-8');
 }
 
 /**
@@ -126,14 +126,14 @@ async function getVersionSpecificBestPractices(
       bestPracticesInfo.format === 'markdown' &&
       typeof bestPracticesInfo.path === 'string'
     ) {
-      const packageDirectory = path.dirname(pkgJsonPath);
-      const guidePath = path.resolve(packageDirectory, bestPracticesInfo.path);
+      const packageDirectory = dirname(pkgJsonPath);
+      const guidePath = resolve(packageDirectory, bestPracticesInfo.path);
 
       // Ensure the resolved guide path is within the package boundary.
       // Uses path.relative to create a cross-platform, case-insensitive check.
       // If the relative path starts with '..' or is absolute, it is a traversal attempt.
-      const relativePath = path.relative(packageDirectory, guidePath);
-      if (relativePath.startsWith('..') || path.isAbsolute(relativePath)) {
+      const relativePath = relative(packageDirectory, guidePath);
+      if (relativePath.startsWith('..') || isAbsolute(relativePath)) {
         logger.warn(
           `Detected a potential path traversal attempt in '${pkgJsonPath}'. ` +
             `The path '${bestPracticesInfo.path}' escapes the package boundary. ` +

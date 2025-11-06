@@ -7,7 +7,7 @@
  */
 
 import { CommandError, Host } from '../host';
-import { MockHost } from '../testing/mock-host';
+import type { MockHost } from '../testing/mock-host';
 import { runBuild } from './build';
 
 describe('Build Tool', () => {
@@ -18,7 +18,7 @@ describe('Build Tool', () => {
       runCommand: jasmine.createSpy<Host['runCommand']>('runCommand').and.resolveTo({ logs: [] }),
       stat: jasmine.createSpy<Host['stat']>('stat'),
       existsSync: jasmine.createSpy<Host['existsSync']>('existsSync'),
-    } as Partial<MockHost> as MockHost;
+    } as MockHost;
   });
 
   it('should construct the command correctly with default configuration', async () => {

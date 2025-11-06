@@ -6,8 +6,8 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { ChildProcess } from 'child_process';
-import { Host } from './host';
+import type { ChildProcess } from 'child_process';
+import type { Host } from './host';
 
 // Log messages that we want to catch to identify the build status.
 

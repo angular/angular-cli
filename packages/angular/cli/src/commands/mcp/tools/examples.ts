@@ -8,10 +8,10 @@
 
 import { glob, readFile, stat } from 'node:fs/promises';
 import { createRequire } from 'node:module';
-import path from 'node:path';
+import { dirname, isAbsolute, join, relative, resolve } from 'node:path';
 import type { DatabaseSync, SQLInputValue } from 'node:sqlite';
 import { z } from 'zod';
-import { McpToolContext, declareTool } from './tool-registry';
+import { type McpToolContext, declareTool } from './tool-registry';
 
 const findExampleInputSchema = z.object({
   workspacePath: z
@@ -246,12 +246,12 @@ async function getVersionSpecificExampleDatabase(
     const examplesInfo = pkgJson['angular']?.examples;
 
     if (examplesInfo && examplesInfo.format === 'sqlite' && typeof examplesInfo.path === 'string') {
-      const packageDirectory = path.dirname(pkgJsonPath);
-      const dbPath = path.resolve(packageDirectory, examplesInfo.path);
+      const packageDirectory = dirname(pkgJsonPath);
+      const dbPath = resolve(packageDirectory, examplesInfo.path);
 
       // Ensure the resolved database path is within the package boundary.
-      const relativePath = path.relative(packageDirectory, dbPath);
-      if (relativePath.startsWith('..') || path.isAbsolute(relativePath)) {
+      const relativePath = relative(packageDirectory, dbPath);
+      if (relativePath.startsWith('..') || isAbsolute(relativePath)) {
         logger.warn(
           `Detected a potential path traversal attempt in '${pkgJsonPath}'. ` +
             `The path '${examplesInfo.path}' escapes the package boundary. ` +
@@ -634,7 +634,7 @@ async function setupRuntimeExamples(examplesPath: string): Promise<DatabaseSync>
       continue;
     }
 
-    const content = await readFile(path.join(entry.parentPath, entry.name), 'utf-8');
+    const content = await readFile(join(entry.parentPath, entry.name), 'utf-8');
     const frontmatter = parseFrontmatter(content);
 
     const validation = frontmatterSchema.safeParse(frontmatter);

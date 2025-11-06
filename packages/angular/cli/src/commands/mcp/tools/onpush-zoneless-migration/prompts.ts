@@ -7,8 +7,8 @@
  */
 
 import type { Node, SourceFile } from 'typescript';
-import { loadTypescript } from './ts_utils';
-import { MigrationResponse } from './types';
+import { loadTypescript } from './ts-utils';
+import type { MigrationResponse } from './types';
 
 /* eslint-disable max-len */
 
@@ -31,7 +31,7 @@ export function createProvideZonelessForTestsSetupPrompt(testFilePath: string): 
     \`\`\`diff
     - import {{ SomeImport }} from '@angular/core';
     + import {{ SomeImport, provideZonelessChangeDetection }} from '@angular/core';
-      
+
       describe('MyComponent', () => {
    +    beforeEach(() => {
    +      TestBed.configureTestingModule({providers: [provideZonelessChangeDetection()]});

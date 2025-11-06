@@ -8,9 +8,9 @@
 
 import { z } from 'zod';
 import { LocalDevServer, devServerKey } from '../../dev-server';
-import { Host, LocalWorkspaceHost } from '../../host';
+import { type Host, LocalWorkspaceHost } from '../../host';
 import { createStructuredContentOutput } from '../../utils';
-import { McpToolContext, McpToolDeclaration, declareTool } from '../tool-registry';
+import { type McpToolContext, type McpToolDeclaration, declareTool } from '../tool-registry';
 
 const startDevServerToolInputSchema = z.object({
   project: z
