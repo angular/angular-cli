@@ -16,10 +16,10 @@ export function createAngularServerSideSSLPlugin(): Plugin {
     async configureServer({ config, httpServer }) {
       const {
         ssr,
-        server: { https: cert },
+        server: { https },
       } = config;
 
-      if (!ssr || !cert) {
+      if (!ssr || !https?.cert) {
         return;
       }
 
@@ -27,6 +27,7 @@ export function createAngularServerSideSSLPlugin(): Plugin {
       // See: https://nodejs.org/api/tls.html#tlssetdefaultcacertificatescerts
       const { getGlobalDispatcher, setGlobalDispatcher, Agent } = await import('undici');
       const originalDispatcher = getGlobalDispatcher();
+      const { cert } = https;
       const certificates = Array.isArray(cert) ? cert : [cert];
 
       setGlobalDispatcher(
