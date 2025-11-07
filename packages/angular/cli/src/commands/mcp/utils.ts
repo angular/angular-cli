@@ -11,7 +11,7 @@
  * Utility functions shared across MCP tools.
  */
 
-import { dirname, join } from 'path';
+import { dirname, join } from 'node:path';
 import { LocalWorkspaceHost } from './host';
 
 /**
