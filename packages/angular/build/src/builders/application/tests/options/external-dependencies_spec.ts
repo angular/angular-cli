@@ -24,7 +24,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
         .content.not.toMatch(/from ['"]@angular\/common['"]/);
     });
 
-    it('should only externalize the listed depedencies when option is set', async () => {
+    it('should only externalize the listed dependencies when option is set', async () => {
       harness.useTarget('build', {
         ...BASE_OPTIONS,
         externalDependencies: ['@angular/core'],
@@ -39,7 +39,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
         .content.not.toMatch(/from ['"]@angular\/common['"]/);
     });
 
-    it('should externalize the listed depedencies in Web Workers when option is set', async () => {
+    it('should externalize the listed dependencies in Web Workers when option is set', async () => {
       harness.useTarget('build', {
         ...BASE_OPTIONS,
         externalDependencies: ['path'],
