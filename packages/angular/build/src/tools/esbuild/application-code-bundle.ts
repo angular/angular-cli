@@ -654,7 +654,7 @@ function getEsBuildCommonPolyfillsOptions(
   tryToResolvePolyfillsAsRelative: boolean,
   loadResultCache: LoadResultCache | undefined,
 ): BuildOptions | undefined {
-  const { jit, workspaceRoot, i18nOptions } = options;
+  const { jit, workspaceRoot, i18nOptions, externalPackages } = options;
 
   const buildOptions = getEsBuildCommonOptions(options);
   buildOptions.splitting = false;
@@ -671,8 +671,10 @@ function getEsBuildCommonPolyfillsOptions(
   // Locale data should go first so that project provided polyfill code can augment if needed.
   let needLocaleDataPlugin = false;
   if (i18nOptions.shouldInline) {
-    // Remove localize polyfill as this is not needed for build time i18n.
-    polyfills = polyfills.filter((path) => !path.startsWith('@angular/localize'));
+    if (!externalPackages) {
+      // Remove localize polyfill when i18n inline transformation have been applied to all the packages.
+      polyfills = polyfills.filter((path) => !path.startsWith('@angular/localize'));
+    }
 
     // Add locale data for all active locales
     // TODO: Inject each individually within the inlining process itself
