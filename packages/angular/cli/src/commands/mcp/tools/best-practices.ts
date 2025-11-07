@@ -72,7 +72,7 @@ that **MUST** be followed for any task involving the creation, analysis, or modi
  * @returns A promise that resolves to the string content of the bundled markdown file.
  */
 async function getBundledBestPractices(): Promise<string> {
-  return readFile(join(__dirname, '..', 'resources', 'best-practices.md'), 'utf-8');
+  return readFile(join(__dirname, '../resources/best-practices.md'), 'utf-8');
 }
 
 /**

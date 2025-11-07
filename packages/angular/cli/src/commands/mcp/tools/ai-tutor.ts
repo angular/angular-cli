@@ -40,7 +40,7 @@ with a new core identity and knowledge base.
     let aiTutorText: string;
 
     return async () => {
-      aiTutorText ??= await readFile(join(__dirname, '..', 'resources', 'ai-tutor.md'), 'utf-8');
+      aiTutorText ??= await readFile(join(__dirname, '../resources/ai-tutor.md'), 'utf-8');
 
       return {
         content: [
