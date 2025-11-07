@@ -8,6 +8,7 @@
 
 import assert from 'node:assert';
 import { readFile } from 'node:fs/promises';
+import { createRequire } from 'node:module';
 import path from 'node:path';
 import type {
   BrowserConfigOptions,
@@ -36,19 +37,43 @@ interface VitestConfigPluginOptions {
   browser: BrowserConfigOptions | undefined;
   coverage: NormalizedUnitTestBuilderOptions['coverage'];
   projectName: string;
+  projectSourceRoot: string;
   reporters?: string[] | [string, object][];
   setupFiles: string[];
   projectPlugins: VitestPlugins;
   include: string[];
 }
 
+async function findTestEnvironment(
+  projectResolver: NodeJS.RequireResolve,
+): Promise<'jsdom' | 'happy-dom'> {
+  try {
+    projectResolver('happy-dom');
+
+    return 'happy-dom';
+  } catch {
+    // happy-dom is not installed, fallback to jsdom
+    return 'jsdom';
+  }
+}
+
 export function createVitestConfigPlugin(options: VitestConfigPluginOptions): VitestPlugins[0] {
-  const { include, browser, projectName, reporters, setupFiles, projectPlugins } = options;
+  const {
+    include,
+    browser,
+    projectName,
+    reporters,
+    setupFiles,
+    projectPlugins,
+    projectSourceRoot,
+  } = options;
 
   return {
     name: 'angular:vitest-configuration',
     async config(config) {
       const testConfig = config.test;
+
+      const projectResolver = createRequire(projectSourceRoot + '/').resolve;
 
       const projectConfig: UserWorkspaceConfig = {
         test: {
@@ -58,8 +83,10 @@ export function createVitestConfigPlugin(options: VitestConfigPluginOptions): Vi
           include,
           globals: testConfig?.globals ?? true,
           ...(browser ? { browser } : {}),
-          // If the user has not specified an environment, use `jsdom`.
-          ...(!testConfig?.environment ? { environment: 'jsdom' } : {}),
+          // If the user has not specified an environment, use a smart default.
+          ...(!testConfig?.environment
+            ? { environment: await findTestEnvironment(projectResolver) }
+            : {}),
         },
         optimizeDeps: {
           noDiscovery: true,
