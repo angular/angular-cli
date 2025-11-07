@@ -219,6 +219,7 @@ export class VitestExecutor implements TestExecutor {
             browser: browserOptions.browser,
             coverage,
             projectName,
+            projectSourceRoot: this.options.projectSourceRoot,
             reporters,
             setupFiles: testSetupFiles,
             projectPlugins,
