@@ -25,7 +25,7 @@ for (const file of testFiles) {
 
 export default {
   input: chunks,
-  external: [],
+  external: ['undici'], // This cannot be bundled as `node:sqlite` is experimental in node.js 22. Remove once this feature is no longer behind a flag
   plugins: [
     nodeResolve({
       preferBuiltins: true,

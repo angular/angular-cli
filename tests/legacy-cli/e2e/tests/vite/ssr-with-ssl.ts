@@ -1,3 +1,4 @@
+import { Agent } from 'undici';
 import assert from 'node:assert';
 import { writeMultipleFiles } from '../../utils/fs';
 import { ng, silentNg } from '../../utils/process';
@@ -46,14 +47,16 @@ export default async function () {
   await validateResponse('/home', /home works/);
 
   async function validateResponse(pathname: string, match: RegExp): Promise<void> {
-    try {
-      process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
-      const response = await fetch(new URL(pathname, `https://localhost:${port}`));
-      const text = await response.text();
-      assert.match(text, match);
-      assert.equal(response.status, 200);
-    } finally {
-      process.env.NODE_TLS_REJECT_UNAUTHORIZED = '1';
-    }
+    const response = await fetch(new URL(pathname, `https://localhost:${port}`), {
+      dispatcher: new Agent({
+        connect: {
+          rejectUnauthorized: false,
+        },
+      }),
+    });
+
+    const text = await response.text();
+    assert.match(text, match);
+    assert.equal(response.status, 200);
   }
 }
