@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
+import { rootCertificates } from 'node:tls';
 import type { Plugin } from 'vite';
 
 export function createAngularServerSideSSLPlugin(): Plugin {
@@ -15,20 +16,23 @@ export function createAngularServerSideSSLPlugin(): Plugin {
     async configureServer({ config, httpServer }) {
       const {
         ssr,
-        server: { https },
+        server: { https: cert },
       } = config;
 
-      if (!ssr || !https) {
+      if (!ssr || !cert) {
         return;
       }
 
+      // TODO(alanagius): Replace `undici` with `tls.setDefaultCACertificates` once we only support Node.js 22.18.0+ and 24.5.0+.
+      // See: https://nodejs.org/api/tls.html#tlssetdefaultcacertificatescerts
       const { getGlobalDispatcher, setGlobalDispatcher, Agent } = await import('undici');
       const originalDispatcher = getGlobalDispatcher();
+      const certificates = Array.isArray(cert) ? cert : [cert];
 
       setGlobalDispatcher(
         new Agent({
           connect: {
-            ca: [...getCerts(https.key), ...getCerts(https.cert)].join('\n'),
+            ca: [...rootCertificates, ...certificates],
           },
         }),
       );
@@ -38,25 +42,4 @@ export function createAngularServerSideSSLPlugin(): Plugin {
       });
     },
   };
-}
-
-function getCerts(
-  items: string | Buffer | (string | Buffer | { pem: string | Buffer })[] | undefined,
-): string[] {
-  if (!items) {
-    return [];
-  }
-
-  const certs: string[] = [];
-  if (Array.isArray(items)) {
-    for (const item of items) {
-      const value = typeof item === 'string' ? item : item.toString('utf-8');
-      certs.push(value.trim());
-    }
-  } else {
-    const value = typeof items === 'string' ? items : items.toString('utf-8');
-    certs.push(value.trim());
-  }
-
-  return certs;
 }
