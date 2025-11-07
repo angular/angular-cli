@@ -13,7 +13,6 @@ export function createAngularServerSideSSLPlugin(): Plugin {
     name: 'angular-ssr-ssl-plugin',
     apply: 'serve',
     async configureServer({ config, httpServer }) {
-      console.log('config server');
       const {
         ssr,
         server: { https },
@@ -35,7 +34,6 @@ export function createAngularServerSideSSLPlugin(): Plugin {
       );
 
       httpServer?.on('close', () => {
-        console.log('setting original');
         setGlobalDispatcher(originalDispatcher);
       });
     },
