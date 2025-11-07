@@ -33,8 +33,11 @@ const VitestTestRunner: TestRunner = {
         );
       }
     } else {
-      // JSDOM is used when no browsers are specified
-      checker.check('jsdom');
+      // DOM emulation is used when no browsers are specified
+      checker.checkAny(
+        ['jsdom', 'happy-dom'],
+        'A DOM environment is required for non-browser tests. Please install either "jsdom" or "happy-dom".',
+      );
     }
 
     if (options.coverage.enabled) {
