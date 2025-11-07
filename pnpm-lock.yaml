@@ -432,6 +432,9 @@ importers:
       '@angular-devkit/core':
         specifier: workspace:*
         version: link:../../angular_devkit/core
+      '@angular/ssr':
+        specifier: workspace:*
+        version: link:../ssr
       jsdom:
         specifier: 27.0.1
         version: 27.0.1(bufferutil@4.0.9)(utf-8-validate@6.0.5)
