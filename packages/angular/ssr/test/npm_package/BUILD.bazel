@@ -1,5 +1,4 @@
-load("@bazel_skylib//rules:diff_test.bzl", "diff_test")
-load("@bazel_skylib//rules:write_file.bzl", "write_file")
+load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_file")
 load("//tools:defaults.bzl", "jasmine_test", "ts_project")
 
 ts_project(
@@ -32,26 +31,8 @@ genrule(
     """,
 )
 
-diff_test(
-    name = "beasties_license_test",
-    failure_message = """
-
-    To accept the new golden file, execute:
-    pnpm bazel run //packages/angular/ssr/test/npm_package:beasties_license_test.accept
-    """,
-    file1 = ":THIRD_PARTY_LICENSES.txt.golden",
-    file2 = ":beasties_license_file",
-)
-
-write_file(
-    name = "beasties_license_test.accept",
-    out = "beasties_license_file_accept.sh",
-    content =
-        [
-            "#!/usr/bin/env bash",
-            "cd ${BUILD_WORKSPACE_DIRECTORY}",
-            "pnpm bazel build //packages/angular/ssr:npm_package",
-            "cp -fv dist/bin/packages/angular/ssr/npm_package/third_party/beasties/THIRD_PARTY_LICENSES.txt packages/angular/ssr/test/npm_package/THIRD_PARTY_LICENSES.txt.golden",
-        ],
-    is_executable = True,
+write_source_file(
+    name = "beasties_license",
+    in_file = ":beasties_license_file",
+    out_file = ":THIRD_PARTY_LICENSES.txt.golden",
 )
