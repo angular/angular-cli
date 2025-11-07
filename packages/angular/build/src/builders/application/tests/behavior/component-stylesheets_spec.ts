@@ -11,7 +11,7 @@ import { APPLICATION_BUILDER_INFO, BASE_OPTIONS, describeBuilder } from '../setu
 
 describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
   describe('Behavior: "Component Stylesheets"', () => {
-    it('should successfuly compile with an empty inline style', async () => {
+    it('should successfully compile with an empty inline style', async () => {
       await harness.modifyFile('src/app/app.component.ts', (content) => {
         return content.replace('styleUrls', 'styles').replace('./app.component.css', '');
       });
