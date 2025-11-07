@@ -7,8 +7,11 @@
  */
 
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
-import { Argv } from 'yargs';
-import { CommandModule, CommandModuleImplementation } from '../../command-builder/command-module';
+import type { Argv } from 'yargs';
+import {
+  CommandModule,
+  type CommandModuleImplementation,
+} from '../../command-builder/command-module';
 import { isTTY } from '../../utilities/tty';
 import { EXPERIMENTAL_TOOLS, createMcpServer } from './mcp-server';
 

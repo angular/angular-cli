@@ -6,19 +6,19 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol';
-import { ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types';
-import * as fs from 'node:fs';
+import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol';
+import type { ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types';
+import { existsSync, statSync } from 'node:fs';
 import { glob } from 'node:fs/promises';
-import { type SourceFile } from 'typescript';
+import type { SourceFile } from 'typescript';
 import { z } from 'zod';
 import { declareTool } from '../tool-registry';
-import { analyzeForUnsupportedZoneUses } from './analyze_for_unsupported_zone_uses';
-import { migrateSingleFile } from './migrate_single_file';
-import { migrateTestFile } from './migrate_test_file';
+import { analyzeForUnsupportedZoneUses } from './analyze-for-unsupported-zone-uses';
+import { migrateSingleFile } from './migrate-single-file';
+import { migrateTestFile } from './migrate-test-file';
 import { createResponse, createTestDebuggingGuideForNonActionableInput } from './prompts';
-import { sendDebugMessage } from './send_debug_message';
-import { createSourceFile, getImportSpecifier } from './ts_utils';
+import { sendDebugMessage } from './send-debug-message';
+import { createSourceFile, getImportSpecifier } from './ts-utils';
 
 export const ZONELESS_MIGRATION_TOOL = declareTool({
   name: 'onpush-zoneless-migration',
@@ -127,7 +127,7 @@ async function discoverAndCategorizeFiles(
 
   let isDirectory: boolean;
   try {
-    isDirectory = fs.statSync(fileOrDirPath).isDirectory();
+    isDirectory = statSync(fileOrDirPath).isDirectory();
   } catch (e) {
     // Re-throw to be handled by the main function as a user input error
     throw new Error(`Failed to access path: ${fileOrDirPath}`);
@@ -232,7 +232,7 @@ async function rankComponentFilesForMigration(
 
 async function getTestFilePath(filePath: string): Promise<string | undefined> {
   const testFilePath = filePath.replace(/\.ts$/, '.spec.ts');
-  if (fs.existsSync(testFilePath)) {
+  if (existsSync(testFilePath)) {
     return testFilePath;
   }
 

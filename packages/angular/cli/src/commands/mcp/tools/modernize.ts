@@ -8,9 +8,9 @@
 
 import { dirname, join, relative } from 'path';
 import { z } from 'zod';
-import { CommandError, Host, LocalWorkspaceHost } from '../host';
-import { createStructuredContentOutput } from '../utils';
-import { McpToolDeclaration, declareTool } from './tool-registry';
+import { CommandError, type Host, LocalWorkspaceHost } from '../host';
+import { createStructuredContentOutput, findAngularJsonDir } from '../utils';
+import { type McpToolDeclaration, declareTool } from './tool-registry';
 
 interface Transformation {
   name: string;
@@ -92,20 +92,6 @@ const modernizeOutputSchema = z.object({
 
 export type ModernizeInput = z.infer<typeof modernizeInputSchema>;
 export type ModernizeOutput = z.infer<typeof modernizeOutputSchema>;
-
-function findAngularJsonDir(startDir: string, host: Host): string | null {
-  let currentDir = startDir;
-  while (true) {
-    if (host.existsSync(join(currentDir, 'angular.json'))) {
-      return currentDir;
-    }
-    const parentDir = dirname(currentDir);
-    if (parentDir === currentDir) {
-      return null;
-    }
-    currentDir = parentDir;
-  }
-}
 
 export async function runModernization(input: ModernizeInput, host: Host) {
   const transformationNames = input.transformations ?? [];

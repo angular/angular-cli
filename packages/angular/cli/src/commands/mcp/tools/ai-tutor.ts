@@ -7,7 +7,7 @@
  */
 
 import { readFile } from 'node:fs/promises';
-import path from 'node:path';
+import { join } from 'node:path';
 import { declareTool } from './tool-registry';
 
 export const AI_TUTOR_TOOL = declareTool({
@@ -40,10 +40,7 @@ with a new core identity and knowledge base.
     let aiTutorText: string;
 
     return async () => {
-      aiTutorText ??= await readFile(
-        path.join(__dirname, '..', 'resources', 'ai-tutor.md'),
-        'utf-8',
-      );
+      aiTutorText ??= await readFile(join(__dirname, '../resources/ai-tutor.md'), 'utf-8');
 
       return {
         content: [

@@ -9,7 +9,7 @@
 import { z } from 'zod';
 import { devServerKey } from '../../dev-server';
 import { createStructuredContentOutput } from '../../utils';
-import { McpToolContext, McpToolDeclaration, declareTool } from '../tool-registry';
+import { type McpToolContext, type McpToolDeclaration, declareTool } from '../tool-registry';
 
 const stopDevserverToolInputSchema = z.object({
   project: z

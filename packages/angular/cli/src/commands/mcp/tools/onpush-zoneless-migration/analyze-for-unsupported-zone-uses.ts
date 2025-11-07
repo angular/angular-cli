@@ -8,8 +8,8 @@
 
 import type { ImportSpecifier, Node, SourceFile } from 'typescript';
 import { createUnsupportedZoneUsagesMessage } from './prompts';
-import { getImportSpecifier, loadTypescript } from './ts_utils';
-import { MigrationResponse } from './types';
+import { getImportSpecifier, loadTypescript } from './ts-utils';
+import type { MigrationResponse } from './types';
 
 export async function analyzeForUnsupportedZoneUses(
   sourceFile: SourceFile,

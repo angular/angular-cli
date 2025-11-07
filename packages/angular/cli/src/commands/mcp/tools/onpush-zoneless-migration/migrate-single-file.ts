@@ -6,15 +6,15 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol';
-import { ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types';
+import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol';
+import type { ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types';
 import type { SourceFile } from 'typescript';
-import { analyzeForUnsupportedZoneUses } from './analyze_for_unsupported_zone_uses';
-import { migrateTestFile } from './migrate_test_file';
+import { analyzeForUnsupportedZoneUses } from './analyze-for-unsupported-zone-uses';
+import { migrateTestFile } from './migrate-test-file';
 import { generateZonelessMigrationInstructionsForComponent } from './prompts';
-import { sendDebugMessage } from './send_debug_message';
-import { getImportSpecifier, loadTypescript } from './ts_utils';
-import { MigrationResponse } from './types';
+import { sendDebugMessage } from './send-debug-message';
+import { getImportSpecifier, loadTypescript } from './ts-utils';
+import type { MigrationResponse } from './types';
 
 export async function migrateSingleFile(
   sourceFile: SourceFile,

@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { Host } from '../host';
+import type { Host } from '../host';
 
 /**
  * A mock implementation of the `Host` interface for testing purposes.

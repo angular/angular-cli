@@ -7,13 +7,13 @@
  */
 
 import { readFile, readdir, stat } from 'node:fs/promises';
-import path from 'node:path';
+import { dirname, extname, join, normalize, posix, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import semver from 'semver';
-import z from 'zod';
+import { z } from 'zod';
 import { AngularWorkspace } from '../../../utilities/config';
 import { assertIsError } from '../../../utilities/error';
-import { McpToolContext, declareTool } from './tool-registry';
+import { type McpToolContext, declareTool } from './tool-registry';
 
 // Single source of truth for what constitutes a valid style language.
 const styleLanguageSchema = z.enum(['css', 'scss', 'sass', 'less']);
@@ -181,7 +181,7 @@ async function* findAngularJsonFiles(rootDir: string): AsyncGenerator<string> {
         const entries = await readdir(dir, { withFileTypes: true });
         const subdirectories: string[] = [];
         for (const entry of entries) {
-          const fullPath = path.join(dir, entry.name);
+          const fullPath = join(dir, entry.name);
           if (entry.isDirectory()) {
             // Exclude dot-directories, build/cache directories, and node_modules
             if (entry.name.startsWith('.') || EXCLUDED_DIRS.has(entry.name)) {
@@ -251,7 +251,7 @@ async function findAngularCoreVersion(
       return cachedResult;
     }
 
-    const pkgPath = path.join(currentDir, 'package.json');
+    const pkgPath = join(currentDir, 'package.json');
     try {
       const pkgContent = await readFile(pkgPath, 'utf-8');
       const pkg = JSON.parse(pkgContent);
@@ -279,7 +279,7 @@ async function findAngularCoreVersion(
     if (currentDir === searchRoot) {
       break;
     }
-    const parentDir = path.dirname(currentDir);
+    const parentDir = dirname(currentDir);
     if (parentDir === currentDir) {
       break; // Reached the filesystem root.
     }
@@ -388,7 +388,7 @@ async function getProjectStyleLanguage(
     const styles = buildTarget.options['styles'] as string[] | undefined;
     if (Array.isArray(styles)) {
       for (const stylePath of styles) {
-        const style = getStyleLanguageFromExtension(path.extname(stylePath));
+        const style = getStyleLanguageFromExtension(extname(stylePath));
         if (style) {
           return style;
         }
@@ -399,7 +399,7 @@ async function getProjectStyleLanguage(
   // 5. Infer from implicit default styles file (future-proofing).
   for (const ext of STYLE_LANGUAGE_SEARCH_ORDER) {
     try {
-      await stat(path.join(fullSourceRoot, `styles.${ext}`));
+      await stat(join(fullSourceRoot, `styles.${ext}`));
 
       return ext;
     } catch {
@@ -424,7 +424,7 @@ async function loadAndParseWorkspace(
   seenPaths: Set<string>,
 ): Promise<{ workspace: WorkspaceData | null; error: ParsingError | null }> {
   try {
-    const resolvedPath = path.resolve(configFile);
+    const resolvedPath = resolve(configFile);
     if (seenPaths.has(resolvedPath)) {
       return { workspace: null, error: null }; // Already processed, skip.
     }
@@ -432,10 +432,10 @@ async function loadAndParseWorkspace(
 
     const ws = await AngularWorkspace.load(configFile);
     const projects = [];
-    const workspaceRoot = path.dirname(configFile);
+    const workspaceRoot = dirname(configFile);
     for (const [name, project] of ws.projects.entries()) {
-      const sourceRoot = path.posix.join(project.root, project.sourceRoot ?? 'src');
-      const fullSourceRoot = path.join(workspaceRoot, sourceRoot);
+      const sourceRoot = posix.join(project.root, project.sourceRoot ?? 'src');
+      const fullSourceRoot = join(workspaceRoot, sourceRoot);
       const unitTestFramework = getUnitTestFramework(project.targets.get('test'));
       const styleLanguage = await getProjectStyleLanguage(project, ws, fullSourceRoot);
 
@@ -492,7 +492,7 @@ async function processConfigFile(
   }
 
   try {
-    const workspaceDir = path.dirname(configFile);
+    const workspaceDir = dirname(configFile);
     workspace.frameworkVersion = await findAngularCoreVersion(
       workspaceDir,
       versionCache,
@@ -523,7 +523,7 @@ async function createListProjectsHandler({ server }: McpToolContext) {
     const clientCapabilities = server.server.getClientCapabilities();
     if (clientCapabilities?.roots) {
       const { roots } = await server.server.listRoots();
-      searchRoots = roots?.map((r) => path.normalize(fileURLToPath(r.uri))) ?? [];
+      searchRoots = roots?.map((r) => normalize(fileURLToPath(r.uri))) ?? [];
     } else {
       // Fallback to the current working directory if client does not support roots
       searchRoots = [process.cwd()];

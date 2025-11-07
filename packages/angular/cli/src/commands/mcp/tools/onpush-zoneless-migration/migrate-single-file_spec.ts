@@ -6,10 +6,10 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol';
-import { ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types';
+import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol';
+import type { ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types';
 import ts from 'typescript';
-import { migrateSingleFile } from './migrate_single_file';
+import { migrateSingleFile } from './migrate-single-file';
 
 const fakeExtras = {
   sendDebugMessage: jasmine.createSpy(),

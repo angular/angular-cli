@@ -6,8 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import * as fs from 'node:fs';
-import type { ImportSpecifier, NodeArray, SourceFile } from 'typescript';
+import { readFileSync } from 'node:fs';
 import type ts from 'typescript';
 
 let typescriptModule: typeof ts;
@@ -34,10 +33,10 @@ export async function loadTypescript(): Promise<typeof ts> {
  *    their original name.
  */
 export async function getImportSpecifier(
-  sourceFile: SourceFile,
+  sourceFile: ts.SourceFile,
   moduleName: string | RegExp,
   specifierName: string,
-): Promise<ImportSpecifier | null> {
+): Promise<ts.ImportSpecifier | null> {
   return (
     getImportSpecifiers(sourceFile, moduleName, specifierName, await loadTypescript())[0] ?? null
   );
@@ -61,12 +60,12 @@ export async function getImportSpecifier(
  *   names. Aliases will be resolved to their original name.
  */
 function getImportSpecifiers(
-  sourceFile: SourceFile,
+  sourceFile: ts.SourceFile,
   moduleName: string | RegExp,
   specifierOrSpecifiers: string | string[],
   { isNamedImports, isImportDeclaration, isStringLiteral }: typeof ts,
-): ImportSpecifier[] {
-  const matches: ImportSpecifier[] = [];
+): ts.ImportSpecifier[] {
+  const matches: ts.ImportSpecifier[] = [];
   for (const node of sourceFile.statements) {
     if (!isImportDeclaration(node) || !isStringLiteral(node.moduleSpecifier)) {
       continue;
@@ -106,9 +105,9 @@ function getImportSpecifiers(
  * @param specifierName Name of the specifier to look for.
  */
 export function findImportSpecifier(
-  nodes: NodeArray<ImportSpecifier>,
+  nodes: ts.NodeArray<ts.ImportSpecifier>,
   specifierName: string,
-): ImportSpecifier | undefined {
+): ts.ImportSpecifier | undefined {
   return nodes.find((element) => {
     const { name, propertyName } = element;
 
@@ -118,7 +117,7 @@ export function findImportSpecifier(
 
 /** Creates a TypeScript source file from a file path. */
 export async function createSourceFile(file: string) {
-  const content = fs.readFileSync(file, 'utf8');
+  const content = readFileSync(file, 'utf8');
 
   const ts = await loadTypescript();
 

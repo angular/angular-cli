@@ -7,7 +7,7 @@
  */
 
 import ts from 'typescript';
-import { migrateTestFile } from './migrate_test_file';
+import { migrateTestFile } from './migrate-test-file';
 
 describe('migrateTestFile', () => {
   it('should return setup prompt when zoneless is not detected', async () => {

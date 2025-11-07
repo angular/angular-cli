@@ -11,8 +11,8 @@ import { mkdir, mkdtemp, rm, writeFile } from 'fs/promises';
 import { tmpdir } from 'os';
 import { join } from 'path';
 import { CommandError } from '../host';
-import { MockHost } from '../testing/mock-host';
-import { ModernizeOutput, runModernization } from './modernize';
+import type { MockHost } from '../testing/mock-host';
+import { type ModernizeOutput, runModernization } from './modernize';
 
 describe('Modernize Tool', () => {
   let projectDir: string;
@@ -29,7 +29,7 @@ describe('Modernize Tool', () => {
       existsSync: jasmine.createSpy('existsSync').and.callFake((p: string) => {
         return p === join(projectDir, 'angular.json');
       }),
-    } as Partial<MockHost> as MockHost;
+    } as MockHost;
   });
 
   afterEach(async () => {

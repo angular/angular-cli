@@ -6,9 +6,9 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
+import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { readFile } from 'node:fs/promises';
-import path from 'node:path';
+import { join } from 'node:path';
 
 export function registerInstructionsResource(server: McpServer): void {
   server.registerResource(
@@ -24,7 +24,7 @@ export function registerInstructionsResource(server: McpServer): void {
       mimeType: 'text/markdown',
     },
     async () => {
-      const text = await readFile(path.join(__dirname, 'best-practices.md'), 'utf-8');
+      const text = await readFile(join(__dirname, 'best-practices.md'), 'utf-8');
 
       return { contents: [{ uri: 'instructions://best-practices', text }] };
     },

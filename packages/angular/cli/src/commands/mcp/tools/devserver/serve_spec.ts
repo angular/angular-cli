@@ -7,9 +7,9 @@
  */
 
 import { EventEmitter } from 'events';
-import { ChildProcess } from 'node:child_process';
-import { MockHost } from '../../testing/mock-host';
-import { McpToolContext } from '../tool-registry';
+import type { ChildProcess } from 'node:child_process';
+import type { MockHost } from '../../testing/mock-host';
+import type { McpToolContext } from '../tool-registry';
 import { startDevServer } from './start-devserver';
 import { stopDevserver } from './stop-devserver';
 import { WATCH_DELAY, waitForDevserverBuild } from './wait-for-devserver-build';
@@ -34,7 +34,7 @@ describe('Serve Tools', () => {
       getAvailablePort: jasmine.createSpy('getAvailablePort').and.callFake(() => {
         return Promise.resolve(portCounter++);
       }),
-    } as Partial<MockHost> as MockHost;
+    } as MockHost;
 
     mockContext = {
       devServers: new Map(),
