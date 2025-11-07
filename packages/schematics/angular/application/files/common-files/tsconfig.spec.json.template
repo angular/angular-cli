@@ -9,6 +9,6 @@
     ]
   },
   "include": [
-    "src/**/*.ts"
+    "src/**/*<% if (standalone) { %>.spec<% } %>.ts"
   ]
 }
