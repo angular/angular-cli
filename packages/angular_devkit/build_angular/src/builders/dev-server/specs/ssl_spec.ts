@@ -114,19 +114,11 @@ describe('Dev Server Builder ssl', () => {
     expect(output.success).toBe(true);
     expect(output.baseUrl).toMatch(/^https:\/\/localhost:\d+\//);
 
-    // The self-signed certificate used by the dev server will cause fetch to fail
-    // unless reject unauthorized is disabled.
-    const originalDispatcher = getGlobalDispatcher();
-    setGlobalDispatcher(
-      new Agent({
+    const response = await fetch(output.baseUrl, {
+      dispatcher: new Agent({
         connect: { rejectUnauthorized: false },
       }),
-    );
-    try {
-      const response = await fetch(output.baseUrl);
-      expect(await response.text()).toContain('<title>HelloWorldApp</title>');
-    } finally {
-      setGlobalDispatcher(originalDispatcher);
-    }
+    });
+    expect(await response.text()).toContain('<title>HelloWorldApp</title>');
   });
 });
