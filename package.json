@@ -169,6 +169,7 @@
     }
   },
   "resolutions": {
-    "typescript": "5.9.3"
+    "typescript": "5.9.3",
+    "undici-types": "^7.16.0"
   }
 }

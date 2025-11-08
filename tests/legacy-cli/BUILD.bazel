@@ -68,6 +68,7 @@ e2e_suites(
         # Extra runtime deps due to bundling issues.
         # TODO: Clean this up.
         "//:node_modules/express",
+        "//:node_modules/undici",
     ],
     runner = ":runner_entrypoint",
 )
