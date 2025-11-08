@@ -13,6 +13,7 @@ import type { ComponentStyleRecord } from '../../../tools/vite/middlewares';
 import {
   ServerSsrMode,
   createAngularMemoryPlugin,
+  createAngularServerSideSSLPlugin,
   createAngularSetupMiddlewaresPlugin,
   createAngularSsrTransformPlugin,
   createRemoveIdPrefixPlugin,
@@ -207,16 +208,19 @@ export async function setupServer(
       preTransformRequests,
       cacheDir,
     ),
-    ssr: createSsrConfig(
-      externalMetadata,
-      serverOptions,
-      prebundleTransformer,
-      zoneless,
-      target,
-      prebundleLoaderExtensions,
-      thirdPartySourcemaps,
-      define,
-    ),
+    ssr:
+      ssrMode === ServerSsrMode.NoSsr
+        ? undefined
+        : createSsrConfig(
+            externalMetadata,
+            serverOptions,
+            prebundleTransformer,
+            zoneless,
+            target,
+            prebundleLoaderExtensions,
+            thirdPartySourcemaps,
+            define,
+          ),
     plugins: [
       createAngularSetupMiddlewaresPlugin({
         outputFiles,
@@ -258,10 +262,14 @@ export async function setupServer(
   };
 
   if (serverOptions.ssl) {
+    configuration.plugins ??= [];
     if (!serverOptions.sslCert || !serverOptions.sslKey) {
       const { default: basicSslPlugin } = await import('@vitejs/plugin-basic-ssl');
-      configuration.plugins ??= [];
       configuration.plugins.push(basicSslPlugin());
+    }
+
+    if (ssrMode !== ServerSsrMode.NoSsr) {
+      configuration.plugins?.push(createAngularServerSideSSLPlugin());
     }
   }
 
