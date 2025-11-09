@@ -62,6 +62,7 @@ export class AotCompilation extends AngularCompilation {
     referencedFiles: readonly string[];
     externalStylesheets?: ReadonlyMap<string, string>;
     templateUpdates?: ReadonlyMap<string, string>;
+    componentResourcesDependencies?: ReadonlyMap<string, readonly string[]>;
   }> {
     // Dynamically load the Angular compiler CLI package
     const { NgtscProgram, OptimizeFor } = await AngularCompilation.loadCompilerCli();
@@ -175,13 +176,15 @@ export class AotCompilation extends AngularCompilation {
       findAffectedFiles(typeScriptProgram, angularCompiler, usingBuildInfo),
     );
 
+    const componentResourcesDependencies = new Map<string, string[]>();
+
     // Get all files referenced in the TypeScript/Angular program including component resources
     const referencedFiles = typeScriptProgram
       .getSourceFiles()
       .filter((sourceFile) => !angularCompiler.ignoreForEmit.has(sourceFile))
       .flatMap((sourceFile) => {
         const resourceDependencies = angularCompiler.getResourceDependencies(sourceFile);
-
+        componentResourcesDependencies.set(sourceFile.fileName, resourceDependencies);
         // Also invalidate Angular diagnostics for a source file if component resources are modified
         if (this.#state && hostOptions.modifiedFiles?.size) {
           for (const resourceDependency of resourceDependencies) {
@@ -212,6 +215,7 @@ export class AotCompilation extends AngularCompilation {
       referencedFiles,
       externalStylesheets: hostOptions.externalStylesheets,
       templateUpdates,
+      componentResourcesDependencies,
     };
   }
 
