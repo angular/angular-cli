@@ -88,6 +88,7 @@ describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
       const results = JSON.parse(harness.readFile('vitest-results.json'));
       expect(results.numPassedTests).toBe(1);
     });
+
     it('should allow overriding builder options via runnerConfig file', async () => {
       harness.useTarget('test', {
         ...BASE_OPTIONS,
@@ -141,6 +142,180 @@ describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
 
       const { result } = await harness.executeOnce();
       expect(result?.success).toBeFalse();
+    });
+
+    it('should warn and ignore "test.projects" option from runnerConfig file', async () => {
+      harness.useTarget('test', {
+        ...BASE_OPTIONS,
+        runnerConfig: 'vitest.config.ts',
+      });
+
+      harness.writeFile(
+        'vitest.config.ts',
+        `
+        import { defineConfig } from 'vitest/config';
+        export default defineConfig({
+          test: {
+            projects: ['./foo.config.ts'],
+          },
+        });
+        `,
+      );
+
+      const { result, logs } = await harness.executeOnce();
+      expect(result?.success).toBeTrue();
+
+      // TODO: Re-enable once Vite logs are remapped through build system
+      // expect(logs).toContain(
+      //   jasmine.objectContaining({
+      //     level: 'warn',
+      //     message: jasmine.stringMatching(
+      //       'The "test.projects" option in the Vitest configuration file is not supported.',
+      //     ),
+      //   }),
+      // );
+    });
+
+    it('should warn and ignore "test.include" option from runnerConfig file', async () => {
+      harness.useTarget('test', {
+        ...BASE_OPTIONS,
+        runnerConfig: 'vitest.config.ts',
+      });
+
+      harness.writeFile(
+        'vitest.config.ts',
+        `
+        import { defineConfig } from 'vitest/config';
+        export default defineConfig({
+          test: {
+            include: ['src/app/non-existent.spec.ts'],
+          },
+        });
+        `,
+      );
+
+      const { result, logs } = await harness.executeOnce();
+      expect(result?.success).toBeTrue();
+
+      // TODO: Re-enable once Vite logs are remapped through build system
+      // expect(logs).toContain(
+      //   jasmine.objectContaining({
+      //     level: 'warn',
+      //     message: jasmine.stringMatching(
+      //       'The "test.include" option in the Vitest configuration file is not supported.',
+      //     ),
+      //   }),
+      // );
+    });
+
+    it(`should append "test.setupFiles" (string) from runnerConfig to the CLI's setup`, async () => {
+      harness.useTarget('test', {
+        ...BASE_OPTIONS,
+        runnerConfig: 'vitest.config.ts',
+      });
+
+      harness.writeFile(
+        'vitest.config.ts',
+        `
+        import { defineConfig } from 'vitest/config';
+        export default defineConfig({
+          test: {
+            setupFiles: './src/app/custom-setup.ts',
+          },
+        });
+        `,
+      );
+
+      harness.writeFile('src/app/custom-setup.ts', `(globalThis as any).customSetupLoaded = true;`);
+
+      harness.writeFile(
+        'src/app/app.component.spec.ts',
+        `
+        import { test, expect } from 'vitest';
+        test('should have custom setup loaded', () => {
+          expect((globalThis as any).customSetupLoaded).toBe(true);
+        });
+        `,
+      );
+
+      const { result } = await harness.executeOnce();
+      expect(result?.success).toBeTrue();
+    });
+
+    it(`should append "test.setupFiles" (array) from runnerConfig to the CLI's setup`, async () => {
+      harness.useTarget('test', {
+        ...BASE_OPTIONS,
+        runnerConfig: 'vitest.config.ts',
+      });
+
+      harness.writeFile(
+        'vitest.config.ts',
+        `
+        import { defineConfig } from 'vitest/config';
+        export default defineConfig({
+          test: {
+            setupFiles: ['./src/app/custom-setup-1.ts', './src/app/custom-setup-2.ts'],
+          },
+        });
+        `,
+      );
+
+      harness.writeFile('src/app/custom-setup-1.ts', `(globalThis as any).customSetup1 = true;`);
+      harness.writeFile('src/app/custom-setup-2.ts', `(globalThis as any).customSetup2 = true;`);
+
+      harness.writeFile(
+        'src/app/app.component.spec.ts',
+        `
+        import { test, expect } from 'vitest';
+        test('should have custom setups loaded', () => {
+          expect((globalThis as any).customSetup1).toBe(true);
+          expect((globalThis as any).customSetup2).toBe(true);
+        });
+        `,
+      );
+
+      const { result } = await harness.executeOnce();
+      expect(result?.success).toBeTrue();
+    });
+
+    it('should merge and apply custom Vite plugins from runnerConfig file', async () => {
+      harness.useTarget('test', {
+        ...BASE_OPTIONS,
+        runnerConfig: 'vitest.config.ts',
+      });
+
+      harness.writeFile(
+        'vitest.config.ts',
+        `
+        import { defineConfig } from 'vitest/config';
+        export default defineConfig({
+          plugins: [
+            {
+              name: 'my-custom-transform-plugin',
+              transform(code, id) {
+                if (code.includes('__PLACEHOLDER__')) {
+                  return code.replace('__PLACEHOLDER__', 'transformed by custom plugin');
+                }
+              },
+            },
+          ],
+        });
+        `,
+      );
+
+      harness.writeFile(
+        'src/app/app.component.spec.ts',
+        `
+        import { test, expect } from 'vitest';
+        test('should have been transformed by custom plugin', () => {
+          const placeholder = '__PLACEHOLDER__';
+          expect(placeholder).toBe('transformed by custom plugin');
+        });
+        `,
+      );
+
+      const { result } = await harness.executeOnce();
+      expect(result?.success).toBeTrue();
     });
   });
 });
