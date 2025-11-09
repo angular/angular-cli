@@ -125,6 +125,8 @@ export function createVitestConfigPlugin(options: VitestConfigPluginOptions): Vi
           setupFiles: combinedSetupFiles,
           include,
           globals: testConfig?.globals ?? true,
+          // Default to `false` to align with the Karma/Jasmine experience.
+          isolate: testConfig?.isolate ?? false,
           ...(browser ? { browser } : {}),
           // If the user has not specified an environment, use a smart default.
           ...(!testConfig?.environment

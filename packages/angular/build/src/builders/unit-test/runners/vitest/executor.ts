@@ -223,7 +223,10 @@ export class VitestExecutor implements TestExecutor {
             reporters,
             setupFiles: testSetupFiles,
             projectPlugins,
-            include: [...this.testFileToEntryPoint.keys()],
+            include: [...this.testFileToEntryPoint.keys()].filter(
+              // Filter internal entries
+              (entry) => !entry.startsWith('angular:'),
+            ),
           }),
         ],
       },
