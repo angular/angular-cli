@@ -76,6 +76,7 @@ export abstract class AngularCompilation {
     referencedFiles: readonly string[];
     externalStylesheets?: ReadonlyMap<string, string>;
     templateUpdates?: ReadonlyMap<string, string>;
+    componentResourcesDependencies?: ReadonlyMap<string, readonly string[]>;
   }>;
 
   abstract emitAffectedFiles(): Iterable<EmitFileResult> | Promise<Iterable<EmitFileResult>>;
