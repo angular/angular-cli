@@ -142,12 +142,17 @@ export class AngularAppEngine {
       return null;
     }
 
+    const { ɵgetOrCreateAngularServerApp } = entryPoint;
+    if (!ɵgetOrCreateAngularServerApp) {
+      // Sometimes in Vite `ɵgetOrCreateAngularServerApp` is undefined,
+      // which causes a runtime error `Error: ɵgetOrCreateAngularServerApp is not a function`
+      // See: https://github.com/angular/angular-cli/issues/31671
+      return null;
+    }
+
     // Note: Using `instanceof` is not feasible here because `AngularServerApp` will
     // be located in separate bundles, making `instanceof` checks unreliable.
-    const ɵgetOrCreateAngularServerApp =
-      entryPoint.ɵgetOrCreateAngularServerApp as typeof getOrCreateAngularServerApp;
-
-    const serverApp = ɵgetOrCreateAngularServerApp({
+    const serverApp = (ɵgetOrCreateAngularServerApp as typeof getOrCreateAngularServerApp)({
       allowStaticRouteRender: AngularAppEngine.ɵallowStaticRouteRender,
       hooks: AngularAppEngine.ɵhooks,
     });
