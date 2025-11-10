@@ -62,7 +62,7 @@
     "webpack-subresource-integrity": "5.1.0"
   },
   "optionalDependencies": {
-    "esbuild": "0.25.11"
+    "esbuild": "0.26.0"
   },
   "devDependencies": {
     "@angular/ssr": "workspace:*",
