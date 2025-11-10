@@ -3,7 +3,8 @@ import { updateJsonFile } from './project';
 
 /** Updates the `test` builder in the current workspace to use Vitest. */
 export async function applyVitestBuilder(): Promise<void> {
-  await silentNpm('install', 'vitest@4.0.6', 'jsdom@27.0.0', '--save-dev');
+  // These deps matches the deps in `@schematics/angular`
+  await silentNpm('install', 'vitest@^4.0.8', 'jsdom@^27.1.0', '--save-dev');
 
   await updateJsonFile('angular.json', (json) => {
     const projects = Object.values(json['projects']);
