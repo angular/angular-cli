@@ -9,8 +9,11 @@
 import type { BuilderOutput } from '@angular-devkit/architect';
 import assert from 'node:assert';
 import path from 'node:path';
-import { isMatch } from 'picomatch';
 import type { Vitest } from 'vitest/node';
+import {
+  DevServerExternalResultMetadata,
+  updateExternalMetadata,
+} from '../../../../tools/vite/utils';
 import { assertIsError } from '../../../../utils/error';
 import {
   type FullResult,
@@ -30,6 +33,12 @@ export class VitestExecutor implements TestExecutor {
   private readonly projectName: string;
   private readonly options: NormalizedUnitTestBuilderOptions;
   private readonly buildResultFiles = new Map<string, ResultFile>();
+  private readonly externalMetadata: DevServerExternalResultMetadata = {
+    implicitBrowser: [],
+    implicitServer: [],
+    explicitBrowser: [],
+    explicitServer: [],
+  };
 
   // This is a reverse map of the entry points created in `build-options.ts`.
   // It is used by the in-memory provider plugin to map the requested test file
@@ -70,6 +79,8 @@ export class VitestExecutor implements TestExecutor {
         this.buildResultFiles.set(this.normalizePath(path), file);
       }
     }
+
+    updateExternalMetadata(buildResult, this.externalMetadata, undefined, true);
 
     // Initialize Vitest if not already present.
     this.vitest ??= await this.initializeVitest();
@@ -220,6 +231,7 @@ export class VitestExecutor implements TestExecutor {
             coverage,
             projectName,
             projectSourceRoot: this.options.projectSourceRoot,
+            optimizeDepsInclude: this.externalMetadata.explicitBrowser,
             reporters,
             setupFiles: testSetupFiles,
             projectPlugins,

@@ -42,6 +42,7 @@ interface VitestConfigPluginOptions {
   setupFiles: string[];
   projectPlugins: Exclude<UserWorkspaceConfig['plugins'], undefined>;
   include: string[];
+  optimizeDepsInclude: string[];
 }
 
 async function findTestEnvironment(
@@ -133,6 +134,7 @@ export function createVitestConfigPlugin(options: VitestConfigPluginOptions): Vi
         },
         optimizeDeps: {
           noDiscovery: true,
+          include: options.optimizeDepsInclude,
         },
         plugins: projectPlugins,
       };
