@@ -15,7 +15,7 @@
     "karma-jasmine-html-reporter": "~2.1.0",
     "karma-jasmine": "~5.1.0",
     "karma": "~6.4.0",
-    "jsdom": "^27.0.0",
+    "jsdom": "^27.1.0",
     "less": "^4.2.0",
     "postcss": "^8.5.3",
     "protractor": "~7.0.0",
