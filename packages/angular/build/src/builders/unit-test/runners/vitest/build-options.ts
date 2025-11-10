@@ -99,11 +99,8 @@ export async function getVitestBuildOptions(
   entryPoints.set('init-testbed', 'angular:test-bed-init');
 
   const externalDependencies = new Set(['vitest']);
-  if (!options.browsers?.length) {
-    // Only add for non-browser setups.
-    // Comprehensive browser prebundling will be handled separately.
-    ANGULAR_PACKAGES_TO_EXTERNALIZE.forEach((dep) => externalDependencies.add(dep));
-  }
+  ANGULAR_PACKAGES_TO_EXTERNALIZE.forEach((dep) => externalDependencies.add(dep));
+
   if (baseBuildOptions.externalDependencies) {
     baseBuildOptions.externalDependencies.forEach((dep) => externalDependencies.add(dep));
   }

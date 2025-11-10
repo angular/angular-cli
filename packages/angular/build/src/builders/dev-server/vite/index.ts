@@ -14,7 +14,7 @@ import { join } from 'node:path';
 import type { Connect, ViteDevServer } from 'vite';
 import type { ComponentStyleRecord } from '../../../tools/vite/middlewares';
 import { ServerSsrMode } from '../../../tools/vite/plugins';
-import { EsbuildLoaderOption } from '../../../tools/vite/utils';
+import { EsbuildLoaderOption, updateExternalMetadata } from '../../../tools/vite/utils';
 import { normalizeSourceMaps } from '../../../utils';
 import { useComponentStyleHmr, useComponentTemplateHmr } from '../../../utils/environment-options';
 import { Result, ResultKind } from '../../application/results';
@@ -35,7 +35,6 @@ import {
   DevServerExternalResultMetadata,
   OutputAssetRecord,
   OutputFileRecord,
-  isAbsoluteUrl,
   updateResultRecord,
 } from './utils';
 
@@ -333,34 +332,7 @@ export async function* serveWithVite(
     }
 
     // To avoid disconnecting the array objects from the option, these arrays need to be mutated instead of replaced.
-    if (result.detail?.['externalMetadata']) {
-      const { implicitBrowser, implicitServer, explicit } = result.detail[
-        'externalMetadata'
-      ] as ExternalResultMetadata;
-      const implicitServerFiltered = implicitServer.filter(
-        (m) => !isBuiltin(m) && !isAbsoluteUrl(m),
-      );
-      const implicitBrowserFiltered = implicitBrowser.filter((m) => !isAbsoluteUrl(m));
-
-      // Empty Arrays to avoid growing unlimited with every re-build.
-      externalMetadata.explicitBrowser.length = 0;
-      externalMetadata.explicitServer.length = 0;
-      externalMetadata.implicitServer.length = 0;
-      externalMetadata.implicitBrowser.length = 0;
-
-      const externalDeps = browserOptions.externalDependencies ?? [];
-      externalMetadata.explicitBrowser.push(...explicit, ...externalDeps);
-      externalMetadata.explicitServer.push(...explicit, ...externalDeps, ...builtinModules);
-      externalMetadata.implicitServer.push(...implicitServerFiltered);
-      externalMetadata.implicitBrowser.push(...implicitBrowserFiltered);
-
-      // The below needs to be sorted as Vite uses these options are part of the hashing invalidation algorithm.
-      // See: https://github.com/vitejs/vite/blob/0873bae0cfe0f0718ad2f5743dd34a17e4ab563d/packages/vite/src/node/optimizer/index.ts#L1203-L1239
-      externalMetadata.explicitBrowser.sort();
-      externalMetadata.explicitServer.sort();
-      externalMetadata.implicitServer.sort();
-      externalMetadata.implicitBrowser.sort();
-    }
+    updateExternalMetadata(result, externalMetadata, browserOptions.externalDependencies);
 
     if (server) {
       // Update fs allow list to include any new assets from the build option.
