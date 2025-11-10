@@ -75,7 +75,7 @@
     "tailwindcss": "^2.0.0 || ^3.0.0 || ^4.0.0",
     "tslib": "^2.3.0",
     "typescript": ">=5.9 <6.0",
-    "vitest": "^4.0.6"
+    "vitest": "^4.0.8"
   },
   "peerDependenciesMeta": {
     "@angular/core": {
