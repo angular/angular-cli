@@ -28,7 +28,7 @@
     "browserslist": "^4.26.0",
     "copy-webpack-plugin": "13.0.1",
     "css-loader": "7.1.2",
-    "esbuild-wasm": "0.25.11",
+    "esbuild-wasm": "0.26.0",
     "http-proxy-middleware": "3.0.5",
     "istanbul-lib-instrument": "6.0.3",
     "jsonc-parser": "3.3.1",

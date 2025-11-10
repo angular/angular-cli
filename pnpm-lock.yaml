@@ -183,8 +183,8 @@ importers:
         specifier: 0.26.0
         version: 0.26.0
       esbuild-wasm:
-        specifier: 0.25.11
-        version: 0.25.11
+        specifier: 0.26.0
+        version: 0.26.0
       eslint:
         specifier: 9.38.0
         version: 9.38.0(jiti@2.6.1)
@@ -664,8 +664,8 @@ importers:
         specifier: 7.1.2
         version: 7.1.2(webpack@5.102.1(esbuild@0.26.0))
       esbuild-wasm:
-        specifier: 0.25.11
-        version: 0.25.11
+        specifier: 0.26.0
+        version: 0.26.0
       http-proxy-middleware:
         specifier: 3.0.5
         version: 3.0.5
@@ -5245,8 +5245,8 @@ packages:
   es6-promisify@5.0.0:
     resolution: {integrity: sha512-C+d6UdsYDk0lMebHNR4S2NybQMMngAOnOwYBQjTOiv0MkoJMP0Myw2mgpDLBcpfCmRLxyFqYhS/CfOENq4SJhQ==}
 
-  esbuild-wasm@0.25.11:
-    resolution: {integrity: sha512-60gllbYFIRGzB6KALBB5Va9Wy3VeCi2U0NgmM7r+TFnRgzeEyoCn2D7fhacW2zWbd7MUeTKLDE7RlfYGBQ00bw==}
+  esbuild-wasm@0.26.0:
+    resolution: {integrity: sha512-9rZuermDo9ZbWvKBv/vDRaRciCpR4L3rEbZLDs5kDq3TrCHRQZaQipQeV9wK/btpLBzNUBujTrd1uorDxbL/GA==}
     engines: {node: '>=18'}
     hasBin: true
 
@@ -14150,7 +14150,7 @@ snapshots:
     dependencies:
       es6-promise: 4.2.8
 
-  esbuild-wasm@0.25.11: {}
+  esbuild-wasm@0.26.0: {}
 
   esbuild@0.25.11:
     optionalDependencies:
