@@ -200,9 +200,15 @@ new or evolving features.
 });
 
 /**
- * Attempts to find a version-specific example database from the user's installed
- * version of `@angular/core`. It looks for a custom `angular` metadata property in the
- * framework's `package.json` to locate the database.
+ * A list of known Angular packages that may contain example databases.
+ * The tool will attempt to resolve and load example databases from these packages.
+ */
+const KNOWN_EXAMPLE_PACKAGES = ['@angular/core', '@angular/aria', '@angular/forms'];
+
+/**
+ * Attempts to find version-specific example databases from the user's installed
+ * versions of known Angular packages. It looks for a custom `angular` metadata property in each
+ * package's `package.json` to locate the database.
  *
  * @example A sample `package.json` `angular` field:
  * ```json
@@ -218,79 +224,74 @@ new or evolving features.
  *
  * @param workspacePath The absolute path to the user's `angular.json` file.
  * @param logger The MCP tool context logger for reporting warnings.
- * @returns A promise that resolves to an object containing the database path and source,
- *     or `undefined` if the database could not be resolved.
+ * @returns A promise that resolves to an array of objects, each containing a database path and source.
  */
-async function getVersionSpecificExampleDatabase(
+async function getVersionSpecificExampleDatabases(
   workspacePath: string,
   logger: McpToolContext['logger'],
-): Promise<{ dbPath: string; source: string } | undefined> {
-  // 1. Resolve the path to package.json
-  let pkgJsonPath: string;
-  try {
-    const workspaceRequire = createRequire(workspacePath);
-    pkgJsonPath = workspaceRequire.resolve('@angular/core/package.json');
-  } catch (e) {
-    logger.warn(
-      `Could not resolve '@angular/core/package.json' from '${workspacePath}'. ` +
-        'Is Angular installed in this project? Falling back to the bundled examples.',
-    );
+): Promise<{ dbPath: string; source: string }[]> {
+  const workspaceRequire = createRequire(workspacePath);
+  const databases: { dbPath: string; source: string }[] = [];
 
-    return undefined;
-  }
+  for (const packageName of KNOWN_EXAMPLE_PACKAGES) {
+    // 1. Resolve the path to package.json
+    let pkgJsonPath: string;
+    try {
+      pkgJsonPath = workspaceRequire.resolve(`${packageName}/package.json`);
+    } catch (e) {
+      // This is not a warning because the user may not have all known packages installed.
+      continue;
+    }
 
-  // 2. Read and parse package.json, then find the database.
-  try {
-    const pkgJsonContent = await readFile(pkgJsonPath, 'utf-8');
-    const pkgJson = JSON.parse(pkgJsonContent);
-    const examplesInfo = pkgJson['angular']?.examples;
+    // 2. Read and parse package.json, then find the database.
+    try {
+      const pkgJsonContent = await readFile(pkgJsonPath, 'utf-8');
+      const pkgJson = JSON.parse(pkgJsonContent);
+      const examplesInfo = pkgJson['angular']?.examples;
 
-    if (examplesInfo && examplesInfo.format === 'sqlite' && typeof examplesInfo.path === 'string') {
-      const packageDirectory = path.dirname(pkgJsonPath);
-      const dbPath = path.resolve(packageDirectory, examplesInfo.path);
+      if (
+        examplesInfo &&
+        examplesInfo.format === 'sqlite' &&
+        typeof examplesInfo.path === 'string'
+      ) {
+        const packageDirectory = path.dirname(pkgJsonPath);
+        const dbPath = path.resolve(packageDirectory, examplesInfo.path);
 
-      // Ensure the resolved database path is within the package boundary.
-      const relativePath = path.relative(packageDirectory, dbPath);
-      if (relativePath.startsWith('..') || path.isAbsolute(relativePath)) {
-        logger.warn(
-          `Detected a potential path traversal attempt in '${pkgJsonPath}'. ` +
-            `The path '${examplesInfo.path}' escapes the package boundary. ` +
-            'Falling back to the bundled examples.',
-        );
+        // Ensure the resolved database path is within the package boundary.
+        const relativePath = path.relative(packageDirectory, dbPath);
+        if (relativePath.startsWith('..') || path.isAbsolute(relativePath)) {
+          logger.warn(
+            `Detected a potential path traversal attempt in '${pkgJsonPath}'. ` +
+              `The path '${examplesInfo.path}' escapes the package boundary. ` +
+              'This database will be skipped.',
+          );
+          continue;
+        }
 
-        return undefined;
+        // Check the file size to prevent reading a very large file.
+        const stats = await stat(dbPath);
+        if (stats.size > 10 * 1024 * 1024) {
+          // 10MB
+          logger.warn(
+            `The example database at '${dbPath}' is larger than 10MB (${stats.size} bytes). ` +
+              'This is unexpected and the file will not be used.',
+          );
+          continue;
+        }
+
+        const source = `package ${packageName}@${pkgJson.version}`;
+        databases.push({ dbPath, source });
       }
-
-      // Check the file size to prevent reading a very large file.
-      const stats = await stat(dbPath);
-      if (stats.size > 10 * 1024 * 1024) {
-        // 10MB
-        logger.warn(
-          `The example database at '${dbPath}' is larger than 10MB (${stats.size} bytes). ` +
-            'This is unexpected and the file will not be used. Falling back to the bundled examples.',
-        );
-
-        return undefined;
-      }
-
-      const source = `framework version ${pkgJson.version}`;
-
-      return { dbPath, source };
-    } else {
+    } catch (e) {
       logger.warn(
-        `Did not find valid 'angular.examples' metadata in '${pkgJsonPath}'. ` +
-          'Falling back to the bundled examples.',
+        `Failed to read or parse version-specific examples metadata referenced in '${pkgJsonPath}': ${
+          e instanceof Error ? e.message : e
+        }.`,
       );
     }
-  } catch (e) {
-    logger.warn(
-      `Failed to read or parse version-specific examples metadata referenced in '${pkgJsonPath}': ${
-        e instanceof Error ? e.message : e
-      }. Falling back to the bundled examples.`,
-    );
   }
 
-  return undefined;
+  return databases;
 }
 
 async function createFindExampleHandler({ logger, exampleDatabasePath }: McpToolContext) {
@@ -303,69 +304,57 @@ async function createFindExampleHandler({ logger, exampleDatabasePath }: McpTool
   return async (input: FindExampleInput) => {
     // If the dev-time override is present, use it and bypass all other logic.
     if (runtimeDb) {
-      return queryDatabase(runtimeDb, input);
+      return queryDatabase([runtimeDb], input);
     }
 
-    let resolvedDbPath: string | undefined;
-    let dbSource: string | undefined;
+    const resolvedDbs: { path: string; source: string }[] = [];
 
-    // First, try to get the version-specific guide.
+    // First, try to get all available version-specific guides.
     if (input.workspacePath) {
-      const versionSpecific = await getVersionSpecificExampleDatabase(input.workspacePath, logger);
-      if (versionSpecific) {
-        resolvedDbPath = versionSpecific.dbPath;
-        dbSource = versionSpecific.source;
+      const versionSpecificDbs = await getVersionSpecificExampleDatabases(
+        input.workspacePath,
+        logger,
+      );
+      for (const db of versionSpecificDbs) {
+        resolvedDbs.push({ path: db.dbPath, source: db.source });
       }
     }
 
-    // If the version-specific guide was not found for any reason, fall back to the bundled version.
-    if (!resolvedDbPath) {
-      resolvedDbPath = exampleDatabasePath;
-      dbSource = 'bundled';
+    // If no version-specific guides were found for any reason, fall back to the bundled version.
+    if (resolvedDbs.length === 0 && exampleDatabasePath) {
+      resolvedDbs.push({ path: exampleDatabasePath, source: 'bundled' });
     }
 
-    if (!resolvedDbPath) {
+    if (resolvedDbs.length === 0) {
       // This should be prevented by the registration logic in mcp-server.ts
-      throw new Error('Example database path is not available.');
+      throw new Error('No example databases are available.');
     }
 
     const { DatabaseSync } = await import('node:sqlite');
-    const db = new DatabaseSync(resolvedDbPath, { readOnly: true });
+    const dbConnections: DatabaseSync[] = [];
 
-    // Validate the schema version of the database.
-    const EXPECTED_SCHEMA_VERSION = 1;
-    const schemaVersionResult = db
-      .prepare('SELECT value FROM metadata WHERE key = ?')
-      .get('schema_version') as { value: string } | undefined;
-    const actualSchemaVersion = schemaVersionResult ? Number(schemaVersionResult.value) : undefined;
-
-    if (actualSchemaVersion !== EXPECTED_SCHEMA_VERSION) {
-      db.close();
-
-      let errorMessage: string;
-      if (actualSchemaVersion === undefined) {
-        errorMessage = 'The example database is missing a schema version and cannot be used.';
-      } else if (actualSchemaVersion > EXPECTED_SCHEMA_VERSION) {
-        errorMessage =
-          `This project's example database (version ${actualSchemaVersion})` +
-          ` is newer than what this version of the Angular CLI supports (version ${EXPECTED_SCHEMA_VERSION}).` +
-          ' Please update your `@angular/cli` package to a newer version.';
-      } else {
-        errorMessage =
-          `This version of the Angular CLI (expects schema version ${EXPECTED_SCHEMA_VERSION})` +
-          ` requires a newer example database than the one found in this project (version ${actualSchemaVersion}).`;
+    for (const { path, source } of resolvedDbs) {
+      const db = new DatabaseSync(path, { readOnly: true });
+      try {
+        validateDatabaseSchema(db, source);
+        dbConnections.push(db);
+      } catch (e) {
+        logger.warn((e as Error).message);
+        // If a database is invalid, we should not query it, but we should not fail the whole tool.
+        // We will just skip this database and try to use the others.
+        continue;
       }
-
-      throw new Error(
-        `Incompatible example database schema from source '${dbSource}':\n${errorMessage}`,
-      );
     }
 
-    return queryDatabase(db, input);
+    if (dbConnections.length === 0) {
+      throw new Error('All available example databases were invalid. Cannot perform query.');
+    }
+
+    return queryDatabase(dbConnections, input);
   };
 }
 
-function queryDatabase(db: DatabaseSync, input: FindExampleInput) {
+function queryDatabase(dbs: DatabaseSync[], input: FindExampleInput) {
   const { query, keywords, required_packages, related_concepts, includeExperimental } = input;
 
   // Build the query dynamically
@@ -374,7 +363,12 @@ function queryDatabase(db: DatabaseSync, input: FindExampleInput) {
     `SELECT e.title, e.summary, e.keywords, e.required_packages, e.related_concepts, e.related_tools, e.content, ` +
     // The `snippet` function generates a contextual snippet of the matched text.
     // Column 6 is the `content` column. We highlight matches with asterisks and limit the snippet size.
-    "snippet(examples_fts, 6, '**', '**', '...', 15) AS snippet " +
+    "snippet(examples_fts, 6, '**', '**', '...', 15) AS snippet, " +
+    // The `bm25` function returns the relevance score of the match. The weights
+    // assigned to each column boost the ranking of documents where the search
+    // term appears in a more important field.
+    // Column order: title, summary, keywords, required_packages, related_concepts, related_tools, content
+    'bm25(examples_fts, 10.0, 5.0, 5.0, 1.0, 2.0, 1.0, 1.0) AS rank ' +
     'FROM examples e JOIN examples_fts ON e.id = examples_fts.rowid';
   const whereClauses = [];
 
@@ -406,31 +400,38 @@ function queryDatabase(db: DatabaseSync, input: FindExampleInput) {
     sql += ` WHERE ${whereClauses.join(' AND ')}`;
   }
 
-  // Order the results by relevance using the BM25 algorithm.
-  // The weights assigned to each column boost the ranking of documents where the
-  // search term appears in a more important field.
-  // Column order: title, summary, keywords, required_packages, related_concepts, related_tools, content
-  sql += ' ORDER BY bm25(examples_fts, 10.0, 5.0, 5.0, 1.0, 2.0, 1.0, 1.0);';
-
-  const queryStatement = db.prepare(sql);
-
   // Query database and return results
   const examples = [];
   const textContent = [];
-  for (const exampleRecord of queryStatement.all(...params)) {
-    const record = exampleRecord as Record<string, string>;
-    const example = {
-      title: record['title'],
-      summary: record['summary'],
-      keywords: JSON.parse(record['keywords'] || '[]') as string[],
-      required_packages: JSON.parse(record['required_packages'] || '[]') as string[],
-      related_concepts: JSON.parse(record['related_concepts'] || '[]') as string[],
-      related_tools: JSON.parse(record['related_tools'] || '[]') as string[],
-      content: record['content'],
-      snippet: record['snippet'],
-    };
-    examples.push(example);
 
+  for (const db of dbs) {
+    const queryStatement = db.prepare(sql);
+    for (const exampleRecord of queryStatement.all(...params)) {
+      const record = exampleRecord as Record<string, string | number>;
+      const example = {
+        title: record['title'] as string,
+        summary: record['summary'] as string,
+        keywords: JSON.parse((record['keywords'] as string) || '[]') as string[],
+        required_packages: JSON.parse((record['required_packages'] as string) || '[]') as string[],
+        related_concepts: JSON.parse((record['related_concepts'] as string) || '[]') as string[],
+        related_tools: JSON.parse((record['related_tools'] as string) || '[]') as string[],
+        content: record['content'] as string,
+        snippet: record['snippet'] as string,
+        rank: record['rank'] as number,
+      };
+      examples.push(example);
+    }
+  }
+
+  // Order the combined results by relevance.
+  // The `bm25` algorithm returns a smaller number for a more relevant match.
+  examples.sort((a, b) => a.rank - b.rank);
+
+  // The `rank` field is an internal implementation detail for sorting and should not be
+  // returned to the user. We create a new array of examples without the `rank`.
+  const finalExamples = examples.map(({ rank, ...rest }) => rest);
+
+  for (const example of finalExamples) {
     // Also create a more structured text output
     let text = `## Example: ${example.title}\n**Summary:** ${example.summary}`;
     if (example.snippet) {
@@ -442,7 +443,7 @@ function queryDatabase(db: DatabaseSync, input: FindExampleInput) {
 
   return {
     content: textContent,
-    structuredContent: { examples },
+    structuredContent: { examples: finalExamples },
   };
 }
 
@@ -713,4 +714,42 @@ async function setupRuntimeExamples(examplesPath: string): Promise<DatabaseSync>
   db.exec('END TRANSACTION');
 
   return db;
+}
+
+const EXPECTED_SCHEMA_VERSION = 1;
+
+/**
+ * Validates the schema version of the example database.
+ *
+ * @param db The database connection to validate.
+ * @param dbSource A string identifying the source of the database (e.g., 'bundled' or a version number).
+ * @throws An error if the schema version is missing or incompatible.
+ */
+function validateDatabaseSchema(db: DatabaseSync, dbSource: string): void {
+  const schemaVersionResult = db
+    .prepare('SELECT value FROM metadata WHERE key = ?')
+    .get('schema_version') as { value: string } | undefined;
+  const actualSchemaVersion = schemaVersionResult ? Number(schemaVersionResult.value) : undefined;
+
+  if (actualSchemaVersion !== EXPECTED_SCHEMA_VERSION) {
+    db.close();
+
+    let errorMessage: string;
+    if (actualSchemaVersion === undefined) {
+      errorMessage = 'The example database is missing a schema version and cannot be used.';
+    } else if (actualSchemaVersion > EXPECTED_SCHEMA_VERSION) {
+      errorMessage =
+        `This project's example database (version ${actualSchemaVersion})` +
+        ` is newer than what this version of the Angular CLI supports (version ${EXPECTED_SCHEMA_VERSION}).` +
+        ' Please update your `@angular/cli` package to a newer version.';
+    } else {
+      errorMessage =
+        `This version of the Angular CLI (expects schema version ${EXPECTED_SCHEMA_VERSION})` +
+        ` requires a newer example database than the one found in this project (version ${actualSchemaVersion}).`;
+    }
+
+    throw new Error(
+      `Incompatible example database schema from source '${dbSource}':\n${errorMessage}`,
+    );
+  }
 }
