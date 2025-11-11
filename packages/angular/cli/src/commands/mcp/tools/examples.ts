@@ -20,8 +20,8 @@ const findExampleInputSchema = z.object({
     .describe(
       'The absolute path to the `angular.json` file for the workspace. This is used to find the ' +
         'version-specific code examples that correspond to the installed version of the ' +
-        'Angular framework. You **MUST** get this path from the `list_projects` tool. If omitted, ' +
-        'the tool will search the generic code examples bundled with the CLI.',
+        'Angular framework. You **MUST** get this path from the `list_projects` tool. ' +
+        'If omitted, the tool will search the generic code examples bundled with the CLI.',
     ),
   query: z
     .string()
@@ -306,28 +306,60 @@ async function createFindExampleHandler({ logger, exampleDatabasePath }: McpTool
       return queryDatabase(runtimeDb, input);
     }
 
-    let dbPath: string | undefined;
+    let resolvedDbPath: string | undefined;
+    let dbSource: string | undefined;
 
     // First, try to get the version-specific guide.
     if (input.workspacePath) {
       const versionSpecific = await getVersionSpecificExampleDatabase(input.workspacePath, logger);
       if (versionSpecific) {
-        dbPath = versionSpecific.dbPath;
+        resolvedDbPath = versionSpecific.dbPath;
+        dbSource = versionSpecific.source;
       }
     }
 
     // If the version-specific guide was not found for any reason, fall back to the bundled version.
-    if (!dbPath) {
-      dbPath = exampleDatabasePath;
+    if (!resolvedDbPath) {
+      resolvedDbPath = exampleDatabasePath;
+      dbSource = 'bundled';
     }
 
-    if (!dbPath) {
+    if (!resolvedDbPath) {
       // This should be prevented by the registration logic in mcp-server.ts
       throw new Error('Example database path is not available.');
     }
 
     const { DatabaseSync } = await import('node:sqlite');
-    const db = new DatabaseSync(dbPath, { readOnly: true });
+    const db = new DatabaseSync(resolvedDbPath, { readOnly: true });
+
+    // Validate the schema version of the database.
+    const EXPECTED_SCHEMA_VERSION = 1;
+    const schemaVersionResult = db
+      .prepare('SELECT value FROM metadata WHERE key = ?')
+      .get('schema_version') as { value: string } | undefined;
+    const actualSchemaVersion = schemaVersionResult ? Number(schemaVersionResult.value) : undefined;
+
+    if (actualSchemaVersion !== EXPECTED_SCHEMA_VERSION) {
+      db.close();
+
+      let errorMessage: string;
+      if (actualSchemaVersion === undefined) {
+        errorMessage = 'The example database is missing a schema version and cannot be used.';
+      } else if (actualSchemaVersion > EXPECTED_SCHEMA_VERSION) {
+        errorMessage =
+          `This project's example database (version ${actualSchemaVersion})` +
+          ` is newer than what this version of the Angular CLI supports (version ${EXPECTED_SCHEMA_VERSION}).` +
+          ' Please update your `@angular/cli` package to a newer version.';
+      } else {
+        errorMessage =
+          `This version of the Angular CLI (expects schema version ${EXPECTED_SCHEMA_VERSION})` +
+          ` requires a newer example database than the one found in this project (version ${actualSchemaVersion}).`;
+      }
+
+      throw new Error(
+        `Incompatible example database schema from source '${dbSource}':\n${errorMessage}`,
+      );
+    }
 
     return queryDatabase(db, input);
   };
@@ -571,6 +603,19 @@ async function setupRuntimeExamples(examplesPath: string): Promise<DatabaseSync>
   const db = new DatabaseSync(':memory:');
 
   // Create a relational table to store the structured example data.
+  db.exec(`
+    CREATE TABLE metadata (
+      key TEXT PRIMARY KEY NOT NULL,
+      value TEXT NOT NULL
+    );
+  `);
+
+  db.exec(`
+    INSERT INTO metadata (key, value) VALUES
+      ('schema_version', '1'),
+      ('created_at', '${new Date().toISOString()}');
+  `);
+
   db.exec(`
     CREATE TABLE examples (
       id INTEGER PRIMARY KEY,

@@ -89,6 +89,20 @@ function generate(inPath, outPath) {
   }
   const db = new DatabaseSync(dbPath);
 
+  // Create a table to store metadata.
+  db.exec(`
+    CREATE TABLE metadata (
+      key TEXT PRIMARY KEY NOT NULL,
+      value TEXT NOT NULL
+    );
+  `);
+
+  db.exec(`
+    INSERT INTO metadata (key, value) VALUES
+      ('schema_version', '1'),
+      ('created_at', '${new Date().toISOString()}');
+  `);
+
   // Create a relational table to store the structured example data.
   db.exec(`
     CREATE TABLE examples (
