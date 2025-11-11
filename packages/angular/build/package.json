@@ -52,7 +52,7 @@
   "devDependencies": {
     "@angular-devkit/core": "workspace:*",
     "@angular/ssr": "workspace:*",
-    "jsdom": "27.0.1",
+    "jsdom": "27.1.0",
     "less": "4.4.2",
     "ng-packagr": "21.0.0-rc.0",
     "postcss": "8.5.6",
