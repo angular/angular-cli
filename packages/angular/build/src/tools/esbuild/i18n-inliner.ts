@@ -11,7 +11,7 @@ import { createHash } from 'node:crypto';
 import { extname, join } from 'node:path';
 import { WorkerPool } from '../../utils/worker-pool';
 import { BuildOutputFile, BuildOutputFileType } from './bundler-context';
-import type { LmbdCacheStore } from './lmdb-cache-store';
+import type { LmdbCacheStore } from './lmdb-cache-store';
 import { createOutputFile } from './utils';
 
 /**
@@ -39,7 +39,7 @@ export interface I18nInlinerOptions {
 export class I18nInliner {
   #cacheInitFailed = false;
   #workerPool: WorkerPool;
-  #cache: LmbdCacheStore | undefined;
+  #cache: LmdbCacheStore | undefined;
   readonly #localizeFiles: ReadonlyMap<string, BuildOutputFile>;
   readonly #unmodifiedFiles: Array<BuildOutputFile>;
 
@@ -274,9 +274,9 @@ export class I18nInliner {
 
     // Initialize a persistent cache for i18n transformations.
     try {
-      const { LmbdCacheStore } = await import('./lmdb-cache-store');
+      const { LmdbCacheStore } = await import('./lmdb-cache-store');
 
-      this.#cache = new LmbdCacheStore(join(persistentCachePath, 'angular-i18n.db'));
+      this.#cache = new LmdbCacheStore(join(persistentCachePath, 'angular-i18n.db'));
     } catch {
       this.#cacheInitFailed = true;
 

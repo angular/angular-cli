@@ -9,7 +9,7 @@
 import { RootDatabase, open } from 'lmdb';
 import { Cache, CacheStore } from './cache';
 
-export class LmbdCacheStore implements CacheStore<unknown> {
+export class LmdbCacheStore implements CacheStore<unknown> {
   readonly #cacheFileUrl;
   #db: RootDatabase | undefined;
 

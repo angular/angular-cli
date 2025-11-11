@@ -36,7 +36,7 @@ export { SassWorkerImplementation } from './tools/sass/sass-service';
 
 export { SourceFileCache } from './tools/esbuild/angular/source-file-cache';
 export { Cache } from './tools/esbuild/cache';
-export { LmbdCacheStore } from './tools/esbuild/lmdb-cache-store';
+export { LmdbCacheStore } from './tools/esbuild/lmdb-cache-store';
 export { createJitResourceTransformer } from './tools/angular/transformers/jit-resource-transformer';
 export { JavaScriptTransformer } from './tools/esbuild/javascript-transformer';
 

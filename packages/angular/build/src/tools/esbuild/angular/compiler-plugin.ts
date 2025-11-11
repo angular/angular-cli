@@ -73,11 +73,11 @@ export function createCompilerPlugin(
 
       // Initialize a worker pool for JavaScript transformations.
       // Webcontainers currently do not support this persistent cache store.
-      let cacheStore: import('../lmdb-cache-store').LmbdCacheStore | undefined;
+      let cacheStore: import('../lmdb-cache-store').LmdbCacheStore | undefined;
       if (pluginOptions.sourceFileCache?.persistentCachePath && !process.versions.webcontainer) {
         try {
-          const { LmbdCacheStore } = await import('../lmdb-cache-store');
-          cacheStore = new LmbdCacheStore(
+          const { LmdbCacheStore } = await import('../lmdb-cache-store');
+          cacheStore = new LmdbCacheStore(
             path.join(pluginOptions.sourceFileCache.persistentCachePath, 'angular-compiler.db'),
           );
         } catch (e) {
