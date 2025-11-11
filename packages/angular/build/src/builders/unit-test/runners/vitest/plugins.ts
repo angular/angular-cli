@@ -58,7 +58,9 @@ async function findTestEnvironment(
   }
 }
 
-export function createVitestConfigPlugin(options: VitestConfigPluginOptions): VitestPlugins[0] {
+export async function createVitestConfigPlugin(
+  options: VitestConfigPluginOptions,
+): Promise<VitestPlugins[0]> {
   const {
     include,
     browser,
@@ -68,6 +70,8 @@ export function createVitestConfigPlugin(options: VitestConfigPluginOptions): Vi
     projectPlugins,
     projectSourceRoot,
   } = options;
+
+  const { mergeConfig } = await import('vitest/config');
 
   return {
     name: 'angular:vitest-configuration',
@@ -90,17 +94,6 @@ export function createVitestConfigPlugin(options: VitestConfigPluginOptions): Vi
         delete testConfig.include;
       }
 
-      // The user's setup files should be appended to the CLI's setup files.
-      const combinedSetupFiles = [...setupFiles];
-      if (testConfig?.setupFiles) {
-        if (typeof testConfig.setupFiles === 'string') {
-          combinedSetupFiles.push(testConfig.setupFiles);
-        } else if (Array.isArray(testConfig.setupFiles)) {
-          combinedSetupFiles.push(...testConfig.setupFiles);
-        }
-        delete testConfig.setupFiles;
-      }
-
       // Merge user-defined plugins from the Vitest config with the CLI's internal plugins.
       if (config.plugins) {
         const userPlugins = config.plugins.filter(
@@ -115,38 +108,49 @@ export function createVitestConfigPlugin(options: VitestConfigPluginOptions): Vi
         if (userPlugins.length > 0) {
           projectPlugins.push(...userPlugins);
         }
+        delete config.plugins;
       }
 
       const projectResolver = createRequire(projectSourceRoot + '/').resolve;
 
-      const projectConfig: UserWorkspaceConfig = {
+      const projectDefaults: UserWorkspaceConfig = {
         test: {
-          ...testConfig,
-          name: projectName,
-          setupFiles: combinedSetupFiles,
-          include,
-          globals: testConfig?.globals ?? true,
+          setupFiles,
+          globals: true,
           // Default to `false` to align with the Karma/Jasmine experience.
-          isolate: testConfig?.isolate ?? false,
+          isolate: false,
+        },
+        optimizeDeps: {
+          noDiscovery: true,
+          include: options.optimizeDepsInclude,
+        },
+      };
+
+      const { optimizeDeps, resolve } = config;
+      const projectOverrides: UserWorkspaceConfig = {
+        test: {
+          name: projectName,
+          include,
+          // CLI provider browser options override, if present
           ...(browser ? { browser } : {}),
           // If the user has not specified an environment, use a smart default.
           ...(!testConfig?.environment
             ? { environment: await findTestEnvironment(projectResolver) }
             : {}),
         },
-        optimizeDeps: {
-          noDiscovery: true,
-          include: options.optimizeDepsInclude,
-        },
         plugins: projectPlugins,
+        optimizeDeps,
+        resolve,
       };
+
+      const projectBase = mergeConfig(projectDefaults, testConfig ? { test: testConfig } : {});
+      const projectConfig = mergeConfig(projectBase, projectOverrides);
 
       return {
         test: {
           coverage: await generateCoverageOption(options.coverage, projectName),
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           ...(reporters ? ({ reporters } as any) : {}),
-          ...(browser ? { browser } : {}),
           projects: [projectConfig],
         },
       };

@@ -226,7 +226,7 @@ export class VitestExecutor implements TestExecutor {
           watch: null,
         },
         plugins: [
-          createVitestConfigPlugin({
+          await createVitestConfigPlugin({
             browser: browserOptions.browser,
             coverage,
             projectName,
