@@ -334,16 +334,16 @@ importers:
         version: link:../../../packages/angular/ssr
       '@vitest/coverage-v8':
         specifier: 4.0.8
-        version: 4.0.8(vitest@4.0.8(@types/node@24.10.0)(jiti@2.6.1)(jsdom@27.0.1(bufferutil@4.0.9)(utf-8-validate@6.0.5))(less@4.4.2)(sass@1.93.2)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1))
+        version: 4.0.8(vitest@4.0.8(@types/node@24.10.0)(jiti@2.6.1)(jsdom@27.1.0(bufferutil@4.0.9)(utf-8-validate@6.0.5))(less@4.4.2)(sass@1.93.2)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1))
       jsdom:
-        specifier: 27.0.1
-        version: 27.0.1(bufferutil@4.0.9)(utf-8-validate@6.0.5)
+        specifier: 27.1.0
+        version: 27.1.0(bufferutil@4.0.9)(utf-8-validate@6.0.5)
       rxjs:
         specifier: 7.8.2
         version: 7.8.2
       vitest:
         specifier: 4.0.8
-        version: 4.0.8(@types/node@24.10.0)(jiti@2.6.1)(jsdom@27.0.1(bufferutil@4.0.9)(utf-8-validate@6.0.5))(less@4.4.2)(sass@1.93.2)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)
+        version: 4.0.8(@types/node@24.10.0)(jiti@2.6.1)(jsdom@27.1.0(bufferutil@4.0.9)(utf-8-validate@6.0.5))(less@4.4.2)(sass@1.93.2)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)
 
   packages/angular/build:
     dependencies:
@@ -436,8 +436,8 @@ importers:
         specifier: workspace:*
         version: link:../ssr
       jsdom:
-        specifier: 27.0.1
-        version: 27.0.1(bufferutil@4.0.9)(utf-8-validate@6.0.5)
+        specifier: 27.1.0
+        version: 27.1.0(bufferutil@4.0.9)(utf-8-validate@6.0.5)
       less:
         specifier: 4.4.2
         version: 4.4.2
@@ -452,7 +452,7 @@ importers:
         version: 7.8.2
       vitest:
         specifier: 4.0.8
-        version: 4.0.8(@types/node@24.10.0)(jiti@2.6.1)(jsdom@27.0.1(bufferutil@4.0.9)(utf-8-validate@6.0.5))(less@4.4.2)(sass@1.93.2)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)
+        version: 4.0.8(@types/node@24.10.0)(jiti@2.6.1)(jsdom@27.1.0(bufferutil@4.0.9)(utf-8-validate@6.0.5))(less@4.4.2)(sass@1.93.2)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)
     optionalDependencies:
       lmdb:
         specifier: 3.4.3
@@ -906,6 +906,9 @@ importers:
         version: 1.2.2
 
 packages:
+
+  '@acemir/cssom@0.9.23':
+    resolution: {integrity: sha512-2kJ1HxBKzPLbmhZpxBiTZggjtgCwKg1ma5RHShxvd6zgqhDEdEkzpiwe7jLkI2p2BrZvFCXIihdoMkl1H39VnA==}
 
   '@actions/core@1.11.1':
     resolution: {integrity: sha512-hXJCSrkwfA46Vd9Z3q4cpEpHB1rL5NG04+/rbqW9d3+CSvtB1tYe8UTpAlixa1vj0m/ULglfEK2UKxMGxCxv5A==}
@@ -6570,9 +6573,9 @@ packages:
   jsbn@0.1.1:
     resolution: {integrity: sha512-UVU9dibq2JcFWxQPA6KCqj5O42VOmAY3zQUfEKxU0KpTGXwNoCjkX1e13eHNvw/xPynt6pU0rZ1htjWTNTSXsg==}
 
-  jsdom@27.0.1:
-    resolution: {integrity: sha512-SNSQteBL1IlV2zqhwwolaG9CwhIhTvVHWg3kTss/cLE7H/X4644mtPQqYvCfsSrGQWt9hSZcgOXX8bOZaMN+kA==}
-    engines: {node: '>=20'}
+  jsdom@27.1.0:
+    resolution: {integrity: sha512-Pcfm3eZ+eO4JdZCXthW9tCDT3nF4K+9dmeZ+5X39n+Kqz0DDIABRP5CAEOHRFZk8RGuC2efksTJxrjp8EXCunQ==}
+    engines: {node: ^20.19.0 || ^22.12.0 || >=24.0.0}
     peerDependencies:
       canvas: ^3.0.0
     peerDependenciesMeta:
@@ -7998,9 +8001,6 @@ packages:
     resolution: {integrity: sha512-nLTrUKm2UyiL7rlhapu/Zl45FwNgkZGaCpZbIHajDYgwlJCOzLSk+cIPAnsEqV955GjILJnKbdQC1nVPz+gAYQ==}
     engines: {node: '>= 18'}
 
-  rrweb-cssom@0.8.0:
-    resolution: {integrity: sha512-guoltQEx+9aMf2gDZ0s62EcV8lsXR+0w8915TC3ITdn2YueuNjdAYh/levpU9nFaoChh9RUS5ZdQMrKfVEN9tw==}
-
   run-applescript@7.1.0:
     resolution: {integrity: sha512-DPe5pVFaAsinSaV6QjQ6gdiedWDcRCbUuiQfQa2wmWV7+xC9bGulGI8+TdRmoFkAPaBXk8CrAbnlY2ISniJ47Q==}
     engines: {node: '>=18'}
@@ -9331,6 +9331,8 @@ packages:
     resolution: {integrity: sha512-XE96n56IQpJM7NAoXswY3XRLcWFW83xe0BiAOeMD7K5k5xecOeul3Qcpx6GqEeeHNkW5DWL5zOyTbEfB4eti8w==}
 
 snapshots:
+
+  '@acemir/cssom@0.9.23': {}
 
   '@actions/core@1.11.1':
     dependencies:
@@ -12724,7 +12726,7 @@ snapshots:
     dependencies:
       vite: 7.2.2(@types/node@24.10.0)(jiti@2.6.1)(less@4.4.2)(sass@1.93.2)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)
 
-  '@vitest/coverage-v8@4.0.8(vitest@4.0.8(@types/node@24.10.0)(jiti@2.6.1)(jsdom@27.0.1(bufferutil@4.0.9)(utf-8-validate@6.0.5))(less@4.4.2)(sass@1.93.2)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1))':
+  '@vitest/coverage-v8@4.0.8(vitest@4.0.8(@types/node@24.10.0)(jiti@2.6.1)(jsdom@27.1.0(bufferutil@4.0.9)(utf-8-validate@6.0.5))(less@4.4.2)(sass@1.93.2)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1))':
     dependencies:
       '@bcoe/v8-coverage': 1.0.2
       '@vitest/utils': 4.0.8
@@ -12737,7 +12739,7 @@ snapshots:
       magicast: 0.5.1
       std-env: 3.10.0
       tinyrainbow: 3.0.3
-      vitest: 4.0.8(@types/node@24.10.0)(jiti@2.6.1)(jsdom@27.0.1(bufferutil@4.0.9)(utf-8-validate@6.0.5))(less@4.4.2)(sass@1.93.2)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)
+      vitest: 4.0.8(@types/node@24.10.0)(jiti@2.6.1)(jsdom@27.1.0(bufferutil@4.0.9)(utf-8-validate@6.0.5))(less@4.4.2)(sass@1.93.2)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1)
     transitivePeerDependencies:
       - supports-color
 
@@ -15845,8 +15847,9 @@ snapshots:
 
   jsbn@0.1.1: {}
 
-  jsdom@27.0.1(bufferutil@4.0.9)(utf-8-validate@6.0.5):
+  jsdom@27.1.0(bufferutil@4.0.9)(utf-8-validate@6.0.5):
     dependencies:
+      '@acemir/cssom': 0.9.23
       '@asamuzakjp/dom-selector': 6.7.4
       cssstyle: 5.3.2
       data-urls: 6.0.0
@@ -15856,7 +15859,6 @@ snapshots:
       https-proxy-agent: 7.0.6(supports-color@10.2.2)
       is-potential-custom-element-name: 1.0.1
       parse5: 8.0.0
-      rrweb-cssom: 0.8.0
       saxes: 6.0.0
       symbol-tree: 3.2.4
       tough-cookie: 6.0.0
@@ -17562,8 +17564,6 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  rrweb-cssom@0.8.0: {}
-
   run-applescript@7.1.0: {}
 
   run-parallel@1.2.0:
@@ -18657,7 +18657,7 @@ snapshots:
       tsx: 4.20.6
       yaml: 2.8.1
 
-  vitest@4.0.8(@types/node@24.10.0)(jiti@2.6.1)(jsdom@27.0.1(bufferutil@4.0.9)(utf-8-validate@6.0.5))(less@4.4.2)(sass@1.93.2)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1):
+  vitest@4.0.8(@types/node@24.10.0)(jiti@2.6.1)(jsdom@27.1.0(bufferutil@4.0.9)(utf-8-validate@6.0.5))(less@4.4.2)(sass@1.93.2)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1):
     dependencies:
       '@vitest/expect': 4.0.8
       '@vitest/mocker': 4.0.8(vite@7.2.2(@types/node@24.10.0)(jiti@2.6.1)(less@4.4.2)(sass@1.93.2)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1))
@@ -18681,7 +18681,7 @@ snapshots:
       why-is-node-running: 2.3.0
     optionalDependencies:
       '@types/node': 24.10.0
-      jsdom: 27.0.1(bufferutil@4.0.9)(utf-8-validate@6.0.5)
+      jsdom: 27.1.0(bufferutil@4.0.9)(utf-8-validate@6.0.5)
     transitivePeerDependencies:
       - jiti
       - less
