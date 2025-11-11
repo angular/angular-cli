@@ -199,6 +199,13 @@ new or evolving features.
   factory: createFindExampleHandler,
 });
 
+const SQLITE_FORMAT = 'sqlite';
+const MARKDOWN_DIR_FORMAT = 'markdown-dir';
+
+type ExampleSource =
+  | { type: typeof SQLITE_FORMAT; path: string; source: string }
+  | { type: typeof MARKDOWN_DIR_FORMAT; path: string; source: string };
+
 /**
  * A list of known Angular packages that may contain example databases.
  * The tool will attempt to resolve and load example databases from these packages.
@@ -229,9 +236,9 @@ const KNOWN_EXAMPLE_PACKAGES = ['@angular/core', '@angular/aria', '@angular/form
 async function getVersionSpecificExampleDatabases(
   workspacePath: string,
   logger: McpToolContext['logger'],
-): Promise<{ dbPath: string; source: string }[]> {
+): Promise<ExampleSource[]> {
   const workspaceRequire = createRequire(workspacePath);
-  const databases: { dbPath: string; source: string }[] = [];
+  const databases: ExampleSource[] = [];
 
   for (const packageName of KNOWN_EXAMPLE_PACKAGES) {
     // 1. Resolve the path to package.json
@@ -251,7 +258,7 @@ async function getVersionSpecificExampleDatabases(
 
       if (
         examplesInfo &&
-        examplesInfo.format === 'sqlite' &&
+        (examplesInfo.format === SQLITE_FORMAT || examplesInfo.format === MARKDOWN_DIR_FORMAT) &&
         typeof examplesInfo.path === 'string'
       ) {
         const packageDirectory = dirname(pkgJsonPath);
@@ -268,19 +275,21 @@ async function getVersionSpecificExampleDatabases(
           continue;
         }
 
-        // Check the file size to prevent reading a very large file.
-        const stats = await stat(dbPath);
-        if (stats.size > 10 * 1024 * 1024) {
-          // 10MB
-          logger.warn(
-            `The example database at '${dbPath}' is larger than 10MB (${stats.size} bytes). ` +
-              'This is unexpected and the file will not be used.',
-          );
-          continue;
+        if (examplesInfo.format === SQLITE_FORMAT) {
+          // Check the file size to prevent reading a very large file.
+          const stats = await stat(dbPath);
+          if (stats.size > 10 * 1024 * 1024) {
+            // 10MB
+            logger.warn(
+              `The example database at '${dbPath}' is larger than 10MB (${stats.size} bytes). ` +
+                'This is unexpected and the file will not be used.',
+            );
+            continue;
+          }
         }
 
         const source = `package ${packageName}@${pkgJson.version}`;
-        databases.push({ dbPath, source });
+        databases.push({ type: examplesInfo.format, path: dbPath, source });
       }
     } catch (e) {
       logger.warn(
@@ -296,7 +305,7 @@ async function getVersionSpecificExampleDatabases(
 
 async function createFindExampleHandler({ logger, exampleDatabasePath }: McpToolContext) {
   const runtimeDb = process.env['NG_MCP_EXAMPLES_DIR']
-    ? await setupRuntimeExamples(process.env['NG_MCP_EXAMPLES_DIR'])
+    ? await setupRuntimeExamples(process.env['NG_MCP_EXAMPLES_DIR'], logger)
     : undefined;
 
   suppressSqliteWarning();
@@ -307,7 +316,7 @@ async function createFindExampleHandler({ logger, exampleDatabasePath }: McpTool
       return queryDatabase([runtimeDb], input);
     }
 
-    const resolvedDbs: { path: string; source: string }[] = [];
+    const resolvedSources: ExampleSource[] = [];
 
     // First, try to get all available version-specific guides.
     if (input.workspacePath) {
@@ -315,17 +324,15 @@ async function createFindExampleHandler({ logger, exampleDatabasePath }: McpTool
         input.workspacePath,
         logger,
       );
-      for (const db of versionSpecificDbs) {
-        resolvedDbs.push({ path: db.dbPath, source: db.source });
-      }
+      resolvedSources.push(...versionSpecificDbs);
     }
 
     // If no version-specific guides were found for any reason, fall back to the bundled version.
-    if (resolvedDbs.length === 0 && exampleDatabasePath) {
-      resolvedDbs.push({ path: exampleDatabasePath, source: 'bundled' });
+    if (resolvedSources.length === 0 && exampleDatabasePath) {
+      resolvedSources.push({ type: SQLITE_FORMAT, path: exampleDatabasePath, source: 'bundled' });
     }
 
-    if (resolvedDbs.length === 0) {
+    if (resolvedSources.length === 0) {
       // This should be prevented by the registration logic in mcp-server.ts
       throw new Error('No example databases are available.');
     }
@@ -333,16 +340,21 @@ async function createFindExampleHandler({ logger, exampleDatabasePath }: McpTool
     const { DatabaseSync } = await import('node:sqlite');
     const dbConnections: DatabaseSync[] = [];
 
-    for (const { path, source } of resolvedDbs) {
-      const db = new DatabaseSync(path, { readOnly: true });
-      try {
-        validateDatabaseSchema(db, source);
+    for (const source of resolvedSources) {
+      if (source.type === SQLITE_FORMAT) {
+        const db = new DatabaseSync(source.path, { readOnly: true });
+        try {
+          validateDatabaseSchema(db, source.source);
+          dbConnections.push(db);
+        } catch (e) {
+          logger.warn((e as Error).message);
+          // If a database is invalid, we should not query it, but we should not fail the whole tool.
+          // We will just skip this database and try to use the others.
+          continue;
+        }
+      } else if (source.type === MARKDOWN_DIR_FORMAT) {
+        const db = await setupRuntimeExamples(source.path, logger);
         dbConnections.push(db);
-      } catch (e) {
-        logger.warn((e as Error).message);
-        // If a database is invalid, we should not query it, but we should not fail the whole tool.
-        // We will just skip this database and try to use the others.
-        continue;
       }
     }
 
@@ -599,7 +611,10 @@ function parseFrontmatter(content: string): Record<string, unknown> {
   return data;
 }
 
-async function setupRuntimeExamples(examplesPath: string): Promise<DatabaseSync> {
+async function setupRuntimeExamples(
+  examplesPath: string,
+  logger: McpToolContext['logger'],
+): Promise<DatabaseSync> {
   const { DatabaseSync } = await import('node:sqlite');
   const db = new DatabaseSync(':memory:');
 
@@ -672,21 +687,53 @@ async function setupRuntimeExamples(examplesPath: string): Promise<DatabaseSync>
     related_concepts: z.array(z.string()).optional(),
     related_tools: z.array(z.string()).optional(),
     experimental: z.boolean().optional(),
+    format_version: z.preprocess(
+      (val) => (val === undefined ? 1 : val),
+      z.literal(1, {
+        errorMap: () => ({
+          message:
+            'The example format is incompatible. This version of the CLI requires format_version: 1.',
+        }),
+      }),
+    ),
   });
 
+  const MAX_FILE_COUNT = 1000;
+  const MAX_FILE_SIZE_BYTES = 1 * 1024 * 1024; // 1MB
+
   db.exec('BEGIN TRANSACTION');
-  for await (const entry of glob('**/*.md', { cwd: examplesPath, withFileTypes: true })) {
-    if (!entry.isFile()) {
+  let fileCount = 0;
+  for await (const filePath of glob('**/*.md', { cwd: examplesPath })) {
+    if (fileCount >= MAX_FILE_COUNT) {
+      logger.warn(
+        `Warning: Example directory '${examplesPath}' contains more than the maximum allowed ` +
+          `${MAX_FILE_COUNT} files. Only the first ${MAX_FILE_COUNT} files will be processed.`,
+      );
+      break;
+    }
+
+    const fullPath = join(examplesPath, filePath);
+    const stats = await stat(fullPath);
+
+    if (!stats.isFile()) {
+      continue;
+    }
+    fileCount++;
+
+    if (stats.size > MAX_FILE_SIZE_BYTES) {
+      logger.warn(
+        `Warning: Skipping example file '${filePath}' because it exceeds the ` +
+          `maximum file size of ${MAX_FILE_SIZE_BYTES} bytes.`,
+      );
       continue;
     }
 
-    const content = await readFile(join(entry.parentPath, entry.name), 'utf-8');
+    const content = await readFile(fullPath, 'utf-8');
     const frontmatter = parseFrontmatter(content);
 
     const validation = frontmatterSchema.safeParse(frontmatter);
     if (!validation.success) {
-      // eslint-disable-next-line no-console
-      console.warn(`Skipping invalid example file ${entry.name}:`, validation.error.issues);
+      logger.warn(`Skipping invalid example file ${filePath}: ` + validation.error.issues);
       continue;
     }
 
