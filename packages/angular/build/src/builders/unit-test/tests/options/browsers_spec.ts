@@ -16,53 +16,33 @@ import {
 } from '../setup';
 
 describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
-  xdescribe('Option: "browsers"', () => {
+  describe('Option: "browsers"', () => {
     beforeEach(async () => {
       setupApplicationTarget(harness);
     });
 
-    it('should use jsdom when browsers is not provided', async () => {
+    it('should use DOM emulation when browsers is not provided', async () => {
       harness.useTarget('test', {
         ...BASE_OPTIONS,
         browsers: undefined,
       });
 
-      const { result, logs } = await harness.executeOnce();
+      const { result } = await harness.executeOnce();
       expect(result?.success).toBeTrue();
-      expectLog(logs, 'Using jsdom in Node.js for test execution.');
     });
 
-    it('should fail when browsers is empty', async () => {
-      harness.useTarget('test', {
-        ...BASE_OPTIONS,
-        browsers: [],
-      });
-
-      await expectAsync(harness.executeOnce()).toBeRejectedWithError(
-        /must NOT have fewer than 1 items/,
-      );
-    });
-
-    it('should launch a browser when provided', async () => {
+    it('should fail when a browser is requested but no provider is installed', async () => {
       harness.useTarget('test', {
         ...BASE_OPTIONS,
         browsers: ['chrome'],
       });
 
       const { result, logs } = await harness.executeOnce();
-      expect(result?.success).toBeTrue();
-      expectLog(logs, /Starting browser "chrome"/);
-    });
-
-    it('should launch a browser in headless mode when specified', async () => {
-      harness.useTarget('test', {
-        ...BASE_OPTIONS,
-        browsers: ['chromeheadless'],
-      });
-
-      const { result, logs } = await harness.executeOnce();
-      expect(result?.success).toBeTrue();
-      expectLog(logs, /Starting browser "chrome" in headless mode/);
+      expect(result?.success).toBeFalse();
+      expectLog(
+        logs,
+        `The "browsers" option requires either "@vitest/browser-playwright", "@vitest/browser-webdriverio", or "@vitest/browser-preview" to be installed`,
+      );
     });
   });
 });
