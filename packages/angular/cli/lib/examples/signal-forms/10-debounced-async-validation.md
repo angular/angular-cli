@@ -57,7 +57,7 @@ import { UsernameService } from './username.service';
 import { Subject, firstValueFrom } from 'rxjs';
 import { debounceTime, switchMap, takeUntil } from 'rxjs/operators';
 
-export interface RegistrationForm {
+export interface RegistrationData {
   username: string;
 }
 
@@ -68,7 +68,7 @@ export interface RegistrationForm {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RegistrationFormComponent implements OnDestroy {
-  readonly submitted = output<RegistrationForm>();
+  readonly submitted = output<RegistrationData>();
 
   private usernameService = inject(UsernameService);
   private destroy$ = new Subject<void>();
@@ -80,11 +80,11 @@ export class RegistrationFormComponent implements OnDestroy {
     takeUntil(this.destroy$),
   );
 
-  registrationModel = signal<RegistrationForm>({ username: '' });
+  registrationModel = signal<RegistrationData>({ username: '' });
   registrationForm = form(this.registrationModel, this.createSchema());
 
   private createSchema() {
-    return schema<RegistrationForm>((form) => {
+    return schema<RegistrationData>((form) => {
       validate(form.username, ({ value }) => (value() === '' ? { required: true } : null));
       validateAsync(form.username, async ({ value }) => {
         if (value() === '') return null;
@@ -149,7 +149,7 @@ The parent component listens for the `(submitted)` event and receives the strong
 // in app.component.ts
 import { Component } from '@angular/core';
 import { JsonPipe } from '@angular/common';
-import { RegistrationFormComponent, RegistrationForm } from './registration-form.component';
+import { RegistrationFormComponent, RegistrationData } from './registration-form.component';
 
 @Component({
   selector: 'app-root',
@@ -165,9 +165,9 @@ import { RegistrationFormComponent, RegistrationForm } from './registration-form
   `,
 })
 export class AppComponent {
-  submittedData: RegistrationForm | null = null;
+  submittedData: RegistrationData | null = null;
 
-  onFormSubmit(data: RegistrationForm) {
+  onFormSubmit(data: RegistrationData) {
     this.submittedData = data;
     console.log('Registration data submitted:', data);
   }

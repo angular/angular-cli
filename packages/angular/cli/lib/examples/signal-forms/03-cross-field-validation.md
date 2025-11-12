@@ -54,12 +54,12 @@ import {
 } from '@angular/forms/signals';
 import { JsonPipe } from '@angular/common';
 
-export interface PasswordForm {
+export interface PasswordData {
   password: string;
   confirmPassword: string;
 }
 
-const passwordSchema = schema<PasswordForm>((passwordForm) => {
+const passwordSchema = schema<PasswordData>((passwordForm) => {
   validate(passwordForm.password, ({ value }) => {
     if (value() === '') return requiredError();
     if (value().length < 8) return minLengthError(8);
@@ -81,9 +81,9 @@ const passwordSchema = schema<PasswordForm>((passwordForm) => {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PasswordFormComponent {
-  readonly submitted = output<PasswordForm>();
+  readonly submitted = output<PasswordData>();
 
-  passwordModel = signal<PasswordForm>({
+  passwordModel = signal<PasswordData>({
     password: '',
     confirmPassword: '',
   });
@@ -152,7 +152,7 @@ The parent component listens for the `(submitted)` event and receives the strong
 // in app.component.ts
 import { Component } from '@angular/core';
 import { JsonPipe } from '@angular/common';
-import { PasswordFormComponent, PasswordForm } from './password-form.component';
+import { PasswordFormComponent, PasswordData } from './password-form.component';
 
 @Component({
   selector: 'app-root',
@@ -168,9 +168,9 @@ import { PasswordFormComponent, PasswordForm } from './password-form.component';
   `,
 })
 export class AppComponent {
-  submittedData: PasswordForm | null = null;
+  submittedData: PasswordData | null = null;
 
-  onPasswordSubmit(data: PasswordForm) {
+  onPasswordSubmit(data: PasswordData) {
     this.submittedData = data;
     console.log('Password data submitted:', data);
   }

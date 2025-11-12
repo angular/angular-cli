@@ -41,12 +41,12 @@ import { Component, signal, output, ChangeDetectionStrategy } from '@angular/cor
 import { form, schema, hidden, required, submit, Control } from '@angular/forms/signals';
 import { JsonPipe } from '@angular/common';
 
-export interface ContactForm {
+export interface ContactData {
   reason: 'question' | 'feedback' | 'other';
   otherReason: string;
 }
 
-const contactSchema = schema<ContactForm>((form) => {
+const contactSchema = schema<ContactData>((form) => {
   // The `otherReason` field is hidden unless the reason is 'other'.
   hidden(form.otherReason, ({ valueOf }) => valueOf(form.reason) !== 'other');
 
@@ -61,9 +61,9 @@ const contactSchema = schema<ContactForm>((form) => {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ContactFormComponent {
-  readonly submitted = output<ContactForm>();
+  readonly submitted = output<ContactData>();
 
-  contactModel = signal<ContactForm>({
+  contactModel = signal<ContactData>({
     reason: 'question',
     otherReason: '',
   });
@@ -123,7 +123,7 @@ The parent component listens for the `(submitted)` event to receive the form dat
 // in app.component.ts
 import { Component } from '@angular/core';
 import { JsonPipe } from '@angular/common';
-import { ContactFormComponent, ContactForm } from './contact-form.component';
+import { ContactFormComponent, ContactData } from './contact-form.component';
 
 @Component({
   selector: 'app-root',
@@ -139,9 +139,9 @@ import { ContactFormComponent, ContactForm } from './contact-form.component';
   `,
 })
 export class AppComponent {
-  submittedData: ContactForm | null = null;
+  submittedData: ContactData | null = null;
 
-  onFormSubmit(data: ContactForm) {
+  onFormSubmit(data: ContactData) {
     this.submittedData = data;
     console.log('Contact data submitted:', data);
   }

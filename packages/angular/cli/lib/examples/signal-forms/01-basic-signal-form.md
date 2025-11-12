@@ -41,7 +41,7 @@ import { Component, signal, output, ChangeDetectionStrategy } from '@angular/cor
 import { form, submit, Control } from '@angular/forms/signals';
 import { JsonPipe } from '@angular/common';
 
-export interface UserProfile {
+export interface UserProfileData {
   firstName: string;
   lastName: string;
   email: string;
@@ -54,9 +54,9 @@ export interface UserProfile {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UserProfileComponent {
-  readonly submitted = output<UserProfile>();
+  readonly submitted = output<UserProfileData>();
 
-  profileModel = signal<UserProfile>({
+  profileModel = signal<UserProfileData>({
     firstName: '',
     lastName: '',
     email: '',
@@ -115,13 +115,13 @@ The template is wrapped in a `<form>` tag with a `(submit)` event and a submit b
 
 ## How to Use This Example
 
-The parent component imports the `UserProfile` interface and listens for the `(submitted)` event to receive the strongly-typed form data.
+The parent component imports the `UserProfileData` interface and listens for the `(submitted)` event to receive the strongly-typed form data.
 
 ```typescript
 // in app.component.ts
 import { Component } from '@angular/core';
 import { JsonPipe } from '@angular/common';
-import { UserProfileComponent, UserProfile } from './user-profile.component';
+import { UserProfileComponent, UserProfileData } from './user-profile.component';
 
 @Component({
   selector: 'app-root',
@@ -137,9 +137,9 @@ import { UserProfileComponent, UserProfile } from './user-profile.component';
   `,
 })
 export class AppComponent {
-  submittedData: UserProfile | null = null;
+  submittedData: UserProfileData | null = null;
 
-  onProfileSubmit(data: UserProfile) {
+  onProfileSubmit(data: UserProfileData) {
     this.submittedData = data;
     console.log('Profile data submitted:', data);
   }

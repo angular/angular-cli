@@ -61,12 +61,12 @@ import { form, schema, required, aggregateProperty, submit } from '@angular/form
 import { JsonPipe } from '@angular/common';
 import { warnings, FieldWarning } from './custom-properties';
 
-export interface RegistrationForm {
+export interface RegistrationData {
   username: string;
   password: string;
 }
 
-const registrationSchema = schema<RegistrationForm>((form) => {
+const registrationSchema = schema<RegistrationData>((form) => {
   required(form.username);
   required(form.password);
 
@@ -87,9 +87,9 @@ const registrationSchema = schema<RegistrationForm>((form) => {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RegistrationFormComponent {
-  readonly submitted = output<RegistrationForm>();
+  readonly submitted = output<RegistrationData>();
 
-  registrationModel = signal<RegistrationForm>({
+  registrationModel = signal<RegistrationData>({
     username: '',
     password: '',
   });

@@ -49,14 +49,14 @@ import { form, schema, submit, Control } from '@angular/forms/signals';
 import { required, minLength, maxLength, min, max, email, pattern } from '@angular/forms/signals';
 import { JsonPipe } from '@angular/common';
 
-export interface UserSettings {
+export interface UserSettingsData {
   username: string;
   age: number;
   email: string;
   website: string;
 }
 
-const settingsSchema = schema<UserSettings>((form) => {
+const settingsSchema = schema<UserSettingsData>((form) => {
   required(form.username);
   minLength(form.username, 3);
   maxLength(form.username, 20);
@@ -78,9 +78,9 @@ const settingsSchema = schema<UserSettings>((form) => {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UserSettingsComponent {
-  readonly submitted = output<UserSettings>();
+  readonly submitted = output<UserSettingsData>();
 
-  settingsModel = signal<UserSettings>({
+  settingsModel = signal<UserSettingsData>({
     username: '',
     age: 18,
     email: '',
@@ -183,7 +183,7 @@ The parent component listens for the `(submitted)` event to receive the validate
 // in app.component.ts
 import { Component } from '@angular/core';
 import { JsonPipe } from '@angular/common';
-import { UserSettingsComponent, UserSettings } from './user-settings.component';
+import { UserSettingsComponent, UserSettingsData } from './user-settings.component';
 
 @Component({
   selector: 'app-root',
@@ -199,9 +199,9 @@ import { UserSettingsComponent, UserSettings } from './user-settings.component';
   `,
 })
 export class AppComponent {
-  submittedData: UserSettings | null = null;
+  submittedData: UserSettingsData | null = null;
 
-  onFormSubmit(data: UserSettings) {
+  onFormSubmit(data: UserSettingsData) {
     this.submittedData = data;
     console.log('Settings data submitted:', data);
   }

@@ -40,13 +40,13 @@ This file defines a reusable schema for a specific data structure (an address).
 ```typescript
 import { schema, validate } from '@angular/forms/signals';
 
-export interface Address {
+export interface AddressData {
   street: string;
   city: string;
   zipCode: string;
 }
 
-export const addressSchema = schema<Address>((address) => {
+export const addressSchema = schema<AddressData>((address) => {
   validate(address.street, ({ value }) => (value() === '' ? { required: true } : null));
   validate(address.city, ({ value }) => (value() === '' ? { required: true } : null));
   validate(address.zipCode, ({ value }) => {
@@ -65,14 +65,14 @@ This file defines the main component, which imports the address schema and compo
 import { Component, signal, output, ChangeDetectionStrategy } from '@angular/core';
 import { form, schema, validate, apply, submit } from '@angular/forms/signals';
 import { JsonPipe } from '@angular/common';
-import { Address, addressSchema } from './address.schema';
+import { AddressData, addressSchema } from './address.schema';
 
-export interface RegistrationForm {
+export interface RegistrationData {
   name: string;
-  address: Address;
+  address: AddressData;
 }
 
-const registrationSchema = schema<RegistrationForm>((form) => {
+const registrationSchema = schema<RegistrationData>((form) => {
   validate(form.name, ({ value }) => (value() === '' ? { required: true } : null));
 
   // Apply the external address schema to the address field.
@@ -86,9 +86,9 @@ const registrationSchema = schema<RegistrationForm>((form) => {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RegistrationFormComponent {
-  readonly submitted = output<RegistrationForm>();
+  readonly submitted = output<RegistrationData>();
 
-  registrationModel = signal<RegistrationForm>({
+  registrationModel = signal<RegistrationData>({
     name: '',
     address: {
       street: '',
@@ -177,7 +177,7 @@ The parent component listens for the `(submitted)` event and receives the strong
 // in app.component.ts
 import { Component } from '@angular/core';
 import { JsonPipe } from '@angular/common';
-import { RegistrationFormComponent, RegistrationForm } from './registration-form.component';
+import { RegistrationFormComponent, RegistrationData } from './registration-form.component';
 
 @Component({
   selector: 'app-root',
@@ -193,9 +193,9 @@ import { RegistrationFormComponent, RegistrationForm } from './registration-form
   `,
 })
 export class AppComponent {
-  submittedData: RegistrationForm | null = null;
+  submittedData: RegistrationData | null = null;
 
-  onFormSubmit(data: RegistrationForm) {
+  onFormSubmit(data: RegistrationData) {
     this.submittedData = data;
     console.log('Registration data submitted:', data);
   }

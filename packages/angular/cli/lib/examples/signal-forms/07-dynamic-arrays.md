@@ -42,21 +42,21 @@ import { Component, signal, output, ChangeDetectionStrategy } from '@angular/cor
 import { form, schema, applyEach, validate, submit } from '@angular/forms/signals';
 import { JsonPipe } from '@angular/common';
 
-export interface Question {
+export interface QuestionData {
   text: string;
   required: boolean;
 }
 
-export interface SurveyForm {
+export interface SurveyData {
   title: string;
-  questions: Question[];
+  questions: QuestionData[];
 }
 
-const questionSchema = schema<Question>((question) => {
+const questionSchema = schema<QuestionData>((question) => {
   validate(question.text, ({ value }) => (value() === '' ? { required: true } : null));
 });
 
-const surveySchema = schema<SurveyForm>((survey) => {
+const surveySchema = schema<SurveyData>((survey) => {
   validate(survey.title, ({ value }) => (value() === '' ? { required: true } : null));
   applyEach(survey.questions, questionSchema);
 });
@@ -68,9 +68,9 @@ const surveySchema = schema<SurveyForm>((survey) => {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SurveyFormComponent {
-  readonly submitted = output<SurveyForm>();
+  readonly submitted = output<SurveyData>();
 
-  surveyModel = signal<SurveyForm>({
+  surveyModel = signal<SurveyData>({
     title: '',
     questions: [{ text: '', required: false }],
   });
@@ -151,7 +151,7 @@ The parent component listens for the `(submitted)` event and receives the strong
 // in app.component.ts
 import { Component } from '@angular/core';
 import { JsonPipe } from '@angular/common';
-import { SurveyFormComponent, SurveyForm } from './survey-form.component';
+import { SurveyFormComponent, SurveyData } from './survey-form.component';
 
 @Component({
   selector: 'app-root',
@@ -167,9 +167,9 @@ import { SurveyFormComponent, SurveyForm } from './survey-form.component';
   `,
 })
 export class AppComponent {
-  submittedData: SurveyForm | null = null;
+  submittedData: SurveyData | null = null;
 
-  onFormSubmit(data: SurveyForm) {
+  onFormSubmit(data: SurveyData) {
     this.submittedData = data;
     console.log('Survey data submitted:', data);
   }

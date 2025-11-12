@@ -41,13 +41,13 @@ import { Component, signal, output, ChangeDetectionStrategy, effect } from '@ang
 import { form, schema, readonly, submit } from '@angular/forms/signals';
 import { JsonPipe } from '@angular/common';
 
-export interface AddressForm {
+export interface AddressData {
   billingAddress: string;
   useBillingForShipping: boolean;
   shippingAddress: string;
 }
 
-const addressSchema = schema<AddressForm>((form) => {
+const addressSchema = schema<AddressData>((form) => {
   // The `shippingAddress` field is readonly if `useBillingForShipping` is true.
   readonly(form.shippingAddress, ({ valueOf }) => valueOf(form.useBillingForShipping));
 });
@@ -59,9 +59,9 @@ const addressSchema = schema<AddressForm>((form) => {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AddressFormComponent {
-  readonly submitted = output<AddressForm>();
+  readonly submitted = output<AddressData>();
 
-  addressModel = signal<AddressForm>({
+  addressModel = signal<AddressData>({
     billingAddress: '123 Main St',
     useBillingForShipping: true,
     shippingAddress: '123 Main St', // Initially synced
@@ -132,7 +132,7 @@ The parent component listens for the `(submitted)` event to receive the form dat
 // in app.component.ts
 import { Component } from '@angular/core';
 import { JsonPipe } from '@angular/common';
-import { AddressFormComponent, AddressForm } from './address-form.component';
+import { AddressFormComponent, AddressData } from './address-form.component';
 
 @Component({
   selector: 'app-root',
@@ -148,9 +148,9 @@ import { AddressFormComponent, AddressForm } from './address-form.component';
   `,
 })
 export class AppComponent {
-  submittedData: AddressForm | null = null;
+  submittedData: AddressData | null = null;
 
-  onFormSubmit(data: AddressForm) {
+  onFormSubmit(data: AddressData) {
     this.submittedData = data;
     console.log('Address data submitted:', data);
   }

@@ -42,12 +42,12 @@ This file defines a standalone login form component with basic validation, servi
 import { Component, signal, output, ChangeDetectionStrategy } from '@angular/core';
 import { form, schema, required, email, submit } from '@angular/forms/signals';
 
-export interface LoginForm {
+export interface LoginData {
   email: string;
   password: string;
 }
 
-const loginSchema = schema<LoginForm>((form) => {
+const loginSchema = schema<LoginData>((form) => {
   required(form.email);
   email(form.email);
   required(form.password);
@@ -65,9 +65,9 @@ const loginSchema = schema<LoginForm>((form) => {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LoginFormComponent {
-  readonly submitted = output<LoginForm>();
+  readonly submitted = output<LoginData>();
 
-  loginModel = signal<LoginForm>({ email: '', password: '' });
+  loginModel = signal<LoginData>({ email: '', password: '' });
   loginForm = form(this.loginModel, loginSchema);
 
   async handleSubmit() {
@@ -84,7 +84,7 @@ This file contains the unit tests for the component, demonstrating how to assert
 
 ```typescript
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { LoginFormComponent, LoginForm } from './login-form.component';
+import { LoginFormComponent, LoginData } from './login-form.component';
 
 describe('LoginFormComponent', () => {
   let fixture: ComponentFixture<LoginFormComponent>;
@@ -152,7 +152,7 @@ describe('LoginFormComponent', () => {
     form.dispatchEvent(new Event('submit'));
     await fixture.whenStable(); // Wait for async submit() helper
 
-    const expectedData: LoginForm = { email: 'test@example.com', password: 'password123' };
+    const expectedData: LoginData = { email: 'test@example.com', password: 'password123' };
     expect(component.submitted.emit).toHaveBeenCalledWith(expectedData);
   });
 });

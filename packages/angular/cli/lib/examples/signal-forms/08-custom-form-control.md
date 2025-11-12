@@ -74,7 +74,7 @@ import { form, submit, Control } from '@angular/forms/signals';
 import { JsonPipe } from '@angular/common';
 import { NumericStepperComponent } from './numeric-stepper.component';
 
-export interface ProductForm {
+export interface ProductData {
   name: string;
   quantity: number;
 }
@@ -86,9 +86,9 @@ export interface ProductForm {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProductFormComponent {
-  readonly submitted = output<ProductForm>();
+  readonly submitted = output<ProductData>();
 
-  productModel = signal<ProductForm>({
+  productModel = signal<ProductData>({
     name: 'Angular T-Shirt',
     quantity: 1,
   });
@@ -140,7 +140,7 @@ The parent component listens for the `(submitted)` event and receives the strong
 // in app.component.ts
 import { Component } from '@angular/core';
 import { JsonPipe } from '@angular/common';
-import { ProductFormComponent, ProductForm } from './product-form.component';
+import { ProductFormComponent, ProductData } from './product-form.component';
 
 @Component({
   selector: 'app-root',
@@ -156,9 +156,9 @@ import { ProductFormComponent, ProductForm } from './product-form.component';
   `,
 })
 export class AppComponent {
-  submittedData: ProductForm | null = null;
+  submittedData: ProductData | null = null;
 
-  onFormSubmit(data: ProductForm) {
+  onFormSubmit(data: ProductData) {
     this.submittedData = data;
     console.log('Product data submitted:', data);
   }

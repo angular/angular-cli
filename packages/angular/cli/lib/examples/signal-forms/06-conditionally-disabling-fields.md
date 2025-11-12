@@ -41,12 +41,12 @@ import { Component, signal, output, ChangeDetectionStrategy } from '@angular/cor
 import { form, schema, disabled, required, submit, Control } from '@angular/forms/signals';
 import { JsonPipe } from '@angular/common';
 
-export interface PromoForm {
+export interface PromoData {
   hasPromoCode: boolean;
   promoCode: string;
 }
 
-const promoSchema = schema<PromoForm>((form) => {
+const promoSchema = schema<PromoData>((form) => {
   // The `promoCode` field is disabled if `hasPromoCode` is false.
   disabled(form.promoCode, ({ valueOf }) => !valueOf(form.hasPromoCode));
 
@@ -61,9 +61,9 @@ const promoSchema = schema<PromoForm>((form) => {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PromoFormComponent {
-  readonly submitted = output<PromoForm>();
+  readonly submitted = output<PromoData>();
 
-  promoModel = signal<PromoForm>({
+  promoModel = signal<PromoData>({
     hasPromoCode: false,
     promoCode: '',
   });
@@ -123,7 +123,7 @@ The parent component listens for the `(submitted)` event to receive the form dat
 // in app.component.ts
 import { Component } from '@angular/core';
 import { JsonPipe } from '@angular/common';
-import { PromoFormComponent, PromoForm } from './promo-form.component';
+import { PromoFormComponent, PromoData } from './promo-form.component';
 
 @Component({
   selector: 'app-root',
@@ -139,9 +139,9 @@ import { PromoFormComponent, PromoForm } from './promo-form.component';
   `,
 })
 export class AppComponent {
-  submittedData: PromoForm | null = null;
+  submittedData: PromoData | null = null;
 
-  onFormSubmit(data: PromoForm) {
+  onFormSubmit(data: PromoData) {
     this.submittedData = data;
     console.log('Promo data submitted:', data);
   }

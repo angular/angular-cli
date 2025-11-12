@@ -45,11 +45,11 @@ import { Component, signal, output, ChangeDetectionStrategy } from '@angular/cor
 import { form, schema, required, validateHttp, submit, Control } from '@angular/forms/signals';
 import { JsonPipe } from '@angular/common';
 
-export interface RegistrationForm {
+export interface RegistrationData {
   username: string;
 }
 
-const registrationSchema = schema<RegistrationForm>((form) => {
+const registrationSchema = schema<RegistrationData>((form) => {
   required(form.username);
   validateHttp(form.username, {
     request: ({ value }) => `/api/username-check?username=${value}`,
@@ -64,9 +64,9 @@ const registrationSchema = schema<RegistrationForm>((form) => {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RegistrationFormComponent {
-  readonly submitted = output<RegistrationForm>();
+  readonly submitted = output<RegistrationData>();
 
-  registrationModel = signal<RegistrationForm>({
+  registrationModel = signal<RegistrationData>({
     username: '',
   });
 
@@ -154,7 +154,7 @@ export const appConfig: ApplicationConfig = {
 // in app.component.ts
 import { Component } from '@angular/core';
 import { JsonPipe } from '@angular/common';
-import { RegistrationFormComponent, RegistrationForm } from './registration-form.component';
+import { RegistrationFormComponent, RegistrationData } from './registration-form.component';
 
 @Component({
   selector: 'app-root',
@@ -170,9 +170,9 @@ import { RegistrationFormComponent, RegistrationForm } from './registration-form
   `,
 })
 export class AppComponent {
-  submittedData: RegistrationForm | null = null;
+  submittedData: RegistrationData | null = null;
 
-  onFormSubmit(data: RegistrationForm) {
+  onFormSubmit(data: RegistrationData) {
     this.submittedData = data;
     console.log('Registration data submitted:', data);
   }

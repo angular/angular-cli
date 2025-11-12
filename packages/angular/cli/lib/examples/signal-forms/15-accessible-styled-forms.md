@@ -44,12 +44,12 @@ This file defines the component's logic, focusing on the form's state and valida
 import { Component, signal, output, ChangeDetectionStrategy } from '@angular/core';
 import { form, schema, required, email, minLength, submit } from '@angular/forms/signals';
 
-export interface RegistrationForm {
+export interface RegistrationData {
   name: string;
   email: string;
 }
 
-const registrationSchema = schema<RegistrationForm>((form) => {
+const registrationSchema = schema<RegistrationData>((form) => {
   required(form.name);
   minLength(form.name, 2);
   required(form.email);
@@ -63,9 +63,9 @@ const registrationSchema = schema<RegistrationForm>((form) => {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RegistrationFormComponent {
-  readonly submitted = output<RegistrationForm>();
+  readonly submitted = output<RegistrationData>();
 
-  registrationModel = signal<RegistrationForm>({ name: '', email: '' });
+  registrationModel = signal<RegistrationData>({ name: '', email: '' });
   registrationForm = form(this.registrationModel, registrationSchema);
 
   async handleSubmit() {

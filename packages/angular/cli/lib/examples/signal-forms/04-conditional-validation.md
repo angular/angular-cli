@@ -43,12 +43,12 @@ import { Component, signal, output, ChangeDetectionStrategy } from '@angular/cor
 import { form, schema, applyWhen, required, submit, Control } from '@angular/forms/signals';
 import { JsonPipe } from '@angular/common';
 
-export interface ContactForm {
+export interface ContactData {
   subscribe: boolean;
   email: string;
 }
 
-const contactSchema = schema<ContactForm>((contactForm) => {
+const contactSchema = schema<ContactData>((contactForm) => {
   applyWhen(
     contactForm,
     ({ value }) => value().subscribe,
@@ -63,9 +63,9 @@ const contactSchema = schema<ContactForm>((contactForm) => {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ContactFormComponent {
-  readonly submitted = output<ContactForm>();
+  readonly submitted = output<ContactData>();
 
-  contactModel = signal<ContactForm>({
+  contactModel = signal<ContactData>({
     subscribe: false,
     email: '',
   });
@@ -122,7 +122,7 @@ The parent component listens for the `(submitted)` event and receives the strong
 // in app.component.ts
 import { Component } from '@angular/core';
 import { JsonPipe } from '@angular/common';
-import { ContactFormComponent, ContactForm } from './contact-form.component';
+import { ContactFormComponent, ContactData } from './contact-form.component';
 
 @Component({
   selector: 'app-root',
@@ -138,9 +138,9 @@ import { ContactFormComponent, ContactForm } from './contact-form.component';
   `,
 })
 export class AppComponent {
-  submittedData: ContactForm | null = null;
+  submittedData: ContactData | null = null;
 
-  onFormSubmit(data: ContactForm) {
+  onFormSubmit(data: ContactData) {
     this.submittedData = data;
     console.log('Contact data submitted:', data);
   }
