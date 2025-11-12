@@ -29,7 +29,7 @@ Apply these patterns to all forms in a production application. Accessibility is 
 
 - **`[class.invalid]`:** A class binding that applies a CSS class to an element when a condition is true. Here, it's used to style an input based on its validity.
 - **`touched` signal:** A signal on the `FieldState` that becomes `true` when the user has interacted with and then left the form control. This is useful for showing errors only after the user has had a chance to enter a value.
-- **`aria-describedby`:** An accessibility attribute that links a form control to the element that describes it, such as an error message. This allows screen readers to announce the error when the user focuses on the invalid input.
+- **`aria-errormessage`:** An accessibility attribute that links a form control to the element that contains its error message. This allows screen readers to announce the error when the user focuses on the invalid input.
 - **`submit()`:** An async helper function that manages the form's submission state and should be called from the submit event handler.
 
 ## Example Files
@@ -161,7 +161,7 @@ input.invalid {
 
 - **Error Visibility:** Errors are only shown when a field is both `invalid` and `touched` (`@if (field().invalid() && field().touched())`). This provides a better user experience by not showing errors before the user has finished typing.
 - **Styling:** The `[class.invalid]` binding adds a red border to the input only when it's invalid and has been touched, providing clear visual feedback.
-- **Accessibility:** The `id` of the error message container is linked to the input via `aria-describedby`. This tells screen readers to announce the specific error message when the user focuses on the invalid input.
+- **Accessibility:** The `id` of the error message container is linked to the input via `aria-errormessage`. This tells screen readers to announce the specific error message when the user focuses on the invalid input.
 
 ## How to Use This Example
 
