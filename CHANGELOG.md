@@ -1,3 +1,35 @@
+<a name="21.0.0-rc.2"></a>
+
+# 21.0.0-rc.2 (2025-11-12)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                            |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------ |
+| [c17d7a929](https://github.com/angular/angular-cli/commit/c17d7a929adccb77f3c2c33e70005f50032d8cae) | fix  | add schema versioning and metadata to example database |
+| [1be35b343](https://github.com/angular/angular-cli/commit/1be35b3433179481be85ea1cb892d66170e0aebe) | fix  | promote zoneless migration MCP tool to stable          |
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                         |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------- |
+| [02f579f6e](https://github.com/angular/angular-cli/commit/02f579f6e7e490744deea5a193b0751ce31262db) | fix  | correct `tsconfig.spec.json` include for spec files |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                                                                                                   |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------------------------------------------------------------------- |
+| [63c98741a](https://github.com/angular/angular-cli/commit/63c98741adcd21701b8bc572e9410cc1cf4f91c3) | fix  | add webcontainer support for Vitest browser provider                                                                          |
+| [07f712253](https://github.com/angular/angular-cli/commit/07f712253bb6c37d27ae7be9845f497002b0780c) | fix  | correctly handle absolute paths and casing in test discovery                                                                  |
+| [f82b77e47](https://github.com/angular/angular-cli/commit/f82b77e475e270dd0d23ce5d6b445c0a8aa8599a) | fix  | do not remove `@angular/localize` when having external packages ([#31721](https://github.com/angular/angular-cli/pull/31721)) |
+| [a44f8fa94](https://github.com/angular/angular-cli/commit/a44f8fa94bbf6ce8cdee05552dc56124507c6971) | fix  | dynamically select Vitest DOM environment                                                                                     |
+| [ae35543af](https://github.com/angular/angular-cli/commit/ae35543af7f5b3a5328c39fd4617d61b48067357) | fix  | enhance Vitest config merging and validation                                                                                  |
+| [41b12509a](https://github.com/angular/angular-cli/commit/41b12509a9db8bca637e0c67d21301a75774129c) | fix  | ensure TestBed setup is robust in non-isolated Vitest                                                                         |
+| [0851d2eae](https://github.com/angular/angular-cli/commit/0851d2eae1e5b854a0a8a7df3a47b00693508a0f) | fix  | show full aggregate errors from vitest                                                                                        |
+| [cc2668f57](https://github.com/angular/angular-cli/commit/cc2668f5744588f9c3d847d2450dd1361e73c690) | fix  | simplify SSL handling for `ng serve` with SSR ([#31723](https://github.com/angular/angular-cli/pull/31723))                   |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="21.0.0-rc.1"></a>
 
 # 21.0.0-rc.1 (2025-11-05)
