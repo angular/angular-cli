@@ -85,7 +85,7 @@ export class RegistrationFormComponent {
 This file provides the template for the form, showing how to display feedback while the asynchronous validation is pending.
 
 ```html
-<form (submit)="handleSubmit(); $event.preventDefault()">
+<form (submit)="handleSubmit(); $event.preventDefault()" novalidate>
   <div>
     <label>
       Username:
@@ -104,9 +104,7 @@ This file provides the template for the form, showing how to display feedback wh
     }
   </div>
 
-  <button type="submit" [disabled]="!registrationForm().valid() || registrationForm().pending()">
-    Submit
-  </button>
+  <button type="submit" [disabled]="registrationForm().pending()">Submit</button>
 </form>
 ```
 

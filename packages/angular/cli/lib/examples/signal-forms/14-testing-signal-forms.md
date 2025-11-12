@@ -56,10 +56,10 @@ const loginSchema = schema<LoginForm>((form) => {
 @Component({
   selector: 'app-login-form',
   template: `
-    <form (submit)="handleSubmit(); $event.preventDefault()">
+    <form (submit)="handleSubmit(); $event.preventDefault()" novalidate>
       <input type="email" [control]="loginForm.email" />
       <input type="password" [control]="loginForm.password" />
-      <button type="submit" [disabled]="!loginForm().valid()">Log In</button>
+      <button type="submit">Log In</button>
     </form>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,

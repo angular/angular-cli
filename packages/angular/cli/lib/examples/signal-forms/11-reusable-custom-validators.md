@@ -100,7 +100,7 @@ export class RegistrationFormComponent {
 This file provides the template for the form, displaying detailed error messages from the custom validator.
 
 ```html
-<form (submit)="handleSubmit(); $event.preventDefault()">
+<form (submit)="handleSubmit(); $event.preventDefault()" novalidate>
   <div>
     <label>
       Username:
@@ -128,7 +128,7 @@ This file provides the template for the form, displaying detailed error messages
     }
   </div>
 
-  <button type="submit" [disabled]="!registrationForm().valid()">Submit</button>
+  <button type="submit">Submit</button>
 </form>
 ```
 

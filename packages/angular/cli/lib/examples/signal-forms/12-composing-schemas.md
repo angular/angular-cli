@@ -112,7 +112,7 @@ export class RegistrationFormComponent {
 This file provides the template for the form, binding to the nested fields of the composed schema.
 
 ```html
-<form (submit)="handleSubmit(); $event.preventDefault()">
+<form (submit)="handleSubmit(); $event.preventDefault()" novalidate>
   <div>
     <label>
       Name:
@@ -160,7 +160,7 @@ This file provides the template for the form, binding to the nested fields of th
     </div>
   </fieldset>
 
-  <button type="submit" [disabled]="!registrationForm().valid()">Submit</button>
+  <button type="submit">Submit</button>
 </form>
 ```
 

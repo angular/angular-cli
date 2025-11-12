@@ -83,7 +83,7 @@ export class ContactFormComponent {
 This file provides the template for the form, using an `@if` block to conditionally render a field based on its `hidden` signal.
 
 ```html
-<form (submit)="handleSubmit(); $event.preventDefault()">
+<form (submit)="handleSubmit(); $event.preventDefault()" novalidate>
   <div>
     <label>Reason for Contact:</label>
     <select [control]="contactForm.reason">
@@ -105,7 +105,7 @@ This file provides the template for the form, using an `@if` block to conditiona
   </div>
   }
 
-  <button type="submit" [disabled]="!contactForm().valid()">Submit</button>
+  <button type="submit">Submit</button>
 </form>
 ```
 

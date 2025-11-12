@@ -108,7 +108,7 @@ export class ProductFormComponent {
 This file provides the template for the parent form, showing how the `[control]` directive is used on the custom component.
 
 ```html
-<form (submit)="handleSubmit(); $event.preventDefault()">
+<form (submit)="handleSubmit(); $event.preventDefault()" novalidate>
   <div>
     <label>
       Product Name:

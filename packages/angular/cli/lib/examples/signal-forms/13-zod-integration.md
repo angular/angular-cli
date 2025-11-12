@@ -100,7 +100,7 @@ export class RegistrationFormComponent {
 This file provides the template for the form, displaying validation errors that originate from the Zod schema.
 
 ```html
-<form (submit)="handleSubmit(); $event.preventDefault()">
+<form (submit)="handleSubmit(); $event.preventDefault()" novalidate>
   <div>
     <label>Email:</label>
     <input type="email" [control]="registrationForm.email" />
@@ -131,7 +131,7 @@ This file provides the template for the form, displaying validation errors that 
     }
   </div>
 
-  <button type="submit" [disabled]="!registrationForm().valid()">Register</button>
+  <button type="submit">Register</button>
 </form>
 ```
 

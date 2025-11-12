@@ -102,7 +102,7 @@ export class UserSettingsComponent {
 This file provides the template for the form, displaying specific error messages for each potential validation failure.
 
 ```html
-<form (submit)="handleSubmit(); $event.preventDefault()">
+<form (submit)="handleSubmit(); $event.preventDefault()" novalidate>
   <div>
     <label>Username:</label>
     <input type="text" [control]="settingsForm.username" />
@@ -165,7 +165,7 @@ This file provides the template for the form, displaying specific error messages
     }
   </div>
 
-  <button type="submit" [disabled]="!settingsForm().valid()">Save Settings</button>
+  <button type="submit">Save Settings</button>
 </form>
 ```
 

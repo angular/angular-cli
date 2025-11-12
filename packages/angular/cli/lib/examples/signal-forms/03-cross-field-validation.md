@@ -103,7 +103,7 @@ export class PasswordFormComponent {
 This file provides the template for the form, showing how to display errors for both field-level and cross-field validation rules.
 
 ```html
-<form (submit)="handleSubmit(); $event.preventDefault()">
+<form (submit)="handleSubmit(); $event.preventDefault()" novalidate>
   <div>
     <label>
       Password:
@@ -135,7 +135,7 @@ This file provides the template for the form, showing how to display errors for 
     }
   </div>
 
-  <button type="submit" [disabled]="!passwordForm().valid()">Submit</button>
+  <button type="submit">Submit</button>
 </form>
 ```
 

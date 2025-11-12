@@ -104,7 +104,7 @@ export class SurveyFormComponent {
 This file provides the template for the form, using an `@for` block to render the fields for each question in the array.
 
 ```html
-<form (submit)="handleSubmit(); $event.preventDefault()">
+<form (submit)="handleSubmit(); $event.preventDefault()" novalidate>
   <div>
     <label>
       Survey Title:
@@ -134,7 +134,7 @@ This file provides the template for the form, using an `@for` block to render th
   }
 
   <button type="button" (click)="addQuestion()">Add Question</button>
-  <button type="submit" [disabled]="!surveyForm().valid()">Submit Survey</button>
+  <button type="submit">Submit Survey</button>
 </form>
 ```
 

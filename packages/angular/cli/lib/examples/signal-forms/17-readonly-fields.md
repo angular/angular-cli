@@ -92,7 +92,7 @@ export class AddressFormComponent {
 This file provides the template for the form, binding an input's `readonly` attribute to its corresponding field's `readonly` signal.
 
 ```html
-<form (submit)="handleSubmit(); $event.preventDefault()">
+<form (submit)="handleSubmit(); $event.preventDefault()" novalidate>
   <div>
     <label>Billing Address:</label>
     <input type="text" [control]="addressForm.billingAddress" />

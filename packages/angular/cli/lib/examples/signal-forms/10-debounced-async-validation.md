@@ -113,7 +113,7 @@ export class RegistrationFormComponent implements OnDestroy {
 This file provides the template for the form, showing how to disable the submit button while validation is in progress.
 
 ```html
-<form (submit)="handleSubmit(); $event.preventDefault()">
+<form (submit)="handleSubmit(); $event.preventDefault()" novalidate>
   <div>
     <label>
       Username:
@@ -132,9 +132,7 @@ This file provides the template for the form, showing how to disable the submit 
     }
   </div>
 
-  <button type="submit" [disabled]="!registrationForm().valid() || registrationForm().pending()">
-    Submit
-  </button>
+  <button type="submit" [disabled]="registrationForm().pending()">Submit</button>
 </form>
 ```
 

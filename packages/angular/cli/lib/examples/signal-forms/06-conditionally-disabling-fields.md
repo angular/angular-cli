@@ -83,7 +83,7 @@ export class PromoFormComponent {
 This file provides the template for the form, binding an input's `disabled` attribute to its corresponding field's `disabled` signal.
 
 ```html
-<form (submit)="handleSubmit(); $event.preventDefault()">
+<form (submit)="handleSubmit(); $event.preventDefault()" novalidate>
   <div>
     <label>
       <input type="checkbox" [control]="promoForm.hasPromoCode" />
@@ -105,7 +105,7 @@ This file provides the template for the form, binding an input's `disabled` attr
     }
   </div>
 
-  <button type="submit" [disabled]="!promoForm().valid()">Apply</button>
+  <button type="submit">Apply</button>
 </form>
 ```
 

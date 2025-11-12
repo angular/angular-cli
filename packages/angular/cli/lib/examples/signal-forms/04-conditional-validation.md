@@ -85,7 +85,7 @@ export class ContactFormComponent {
 This file provides the template for the form, which includes a checkbox that controls the validation of another field.
 
 ```html
-<form (submit)="handleSubmit(); $event.preventDefault()">
+<form (submit)="handleSubmit(); $event.preventDefault()" novalidate>
   <div>
     <label>
       <input type="checkbox" [control]="contactForm.subscribe" />
@@ -105,7 +105,7 @@ This file provides the template for the form, which includes a checkbox that con
     }
   </div>
 
-  <button type="submit" [disabled]="!contactForm().valid()">Submit</button>
+  <button type="submit">Submit</button>
 </form>
 ```
 

@@ -79,7 +79,7 @@ export class UserProfileComponent {
 The template is wrapped in a `<form>` tag with a `(submit)` event and a submit button.
 
 ```html
-<form (submit)="handleSubmit(); $event.preventDefault()">
+<form (submit)="handleSubmit(); $event.preventDefault()" novalidate>
   <div>
     <label>
       First Name:

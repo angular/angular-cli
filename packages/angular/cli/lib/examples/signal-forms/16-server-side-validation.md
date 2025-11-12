@@ -108,7 +108,7 @@ export class RegistrationFormComponent {
 This file provides the template, which disables the submit button based on the form's `submitting` and `valid` states.
 
 ```html
-<form (submit)="handleSubmit(); $event.preventDefault()">
+<form (submit)="handleSubmit(); $event.preventDefault()" novalidate>
   <div>
     <label>Username:</label>
     <input type="text" [control]="registrationForm.username" />
@@ -133,7 +133,7 @@ This file provides the template, which disables the submit button based on the f
     }
   </div>
 
-  <button type="submit" [disabled]="!registrationForm().valid() || registrationForm().submitting()">
+  <button type="submit" [disabled]="registrationForm().submitting()">
     @if (registrationForm().submitting()) {
     <span>Submitting...</span>
     } @else {

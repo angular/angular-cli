@@ -81,7 +81,7 @@ export class RegistrationFormComponent {
 This file provides the template, enhanced with ARIA attributes and class bindings for stateful styling.
 
 ```html
-<form (submit)="handleSubmit(); $event.preventDefault()">
+<form (submit)="handleSubmit(); $event.preventDefault()" novalidate>
   <div class="form-field">
     <label for="name-input">Name:</label>
     <input
@@ -90,7 +90,9 @@ This file provides the template, enhanced with ARIA attributes and class binding
       [control]="registrationForm.name"
       [class.invalid]="registrationForm.name().invalid() && registrationForm.name().touched()"
       [attr.aria-invalid]="registrationForm.name().invalid()"
-      aria-describedby="name-errors"
+      [attr.aria-errormessage]="
+        registrationForm.name().invalid() && registrationForm.name().touched() ? 'name-errors' : null
+      "
     />
 
     @if (registrationForm.name().invalid() && registrationForm.name().touched()) {
@@ -112,7 +114,11 @@ This file provides the template, enhanced with ARIA attributes and class binding
       [control]="registrationForm.email"
       [class.invalid]="registrationForm.email().invalid() && registrationForm.email().touched()"
       [attr.aria-invalid]="registrationForm.email().invalid()"
-      aria-describedby="email-errors"
+      [attr.aria-errormessage]="
+        registrationForm.email().invalid() && registrationForm.email().touched()
+          ? 'email-errors'
+          : null
+      "
     />
 
     @if (registrationForm.email().invalid() && registrationForm.email().touched()) {
@@ -126,7 +132,7 @@ This file provides the template, enhanced with ARIA attributes and class binding
     }
   </div>
 
-  <button type="submit" [disabled]="!registrationForm().valid()">Register</button>
+  <button type="submit">Register</button>
 </form>
 ```
 
