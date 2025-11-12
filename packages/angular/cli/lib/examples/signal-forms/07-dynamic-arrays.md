@@ -141,7 +141,6 @@ This file provides the template for the form, using an `@for` block to render th
 ## Usage Notes
 
 - The "Remove" and "Add" buttons have `type="button"` to prevent them from submitting the form.
-- The "Submit" button is disabled based on the form's overall `valid` signal.
 
 ## How to Use This Example
 

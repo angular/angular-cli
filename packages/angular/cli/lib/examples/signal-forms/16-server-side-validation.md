@@ -145,7 +145,7 @@ This file provides the template, which disables the submit button based on the f
 
 ## Usage Notes
 
-- The submit button is disabled while the form is invalid OR while it is submitting (`[disabled]="!registrationForm().valid() || registrationForm().submitting()"`).
+- The submit button is disabled while the form is submitting (`[disabled]="registrationForm().submitting()"`).
 - The `submit` function automatically sets the form's `submitting` signal to `true` before the async action and `false` after it completes.
 - If the async action returns an array of `ValidationError`, `submit` will automatically find the `field` specified in each error and add the error to that field's `errors` signal.
 

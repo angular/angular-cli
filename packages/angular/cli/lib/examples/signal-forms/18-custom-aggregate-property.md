@@ -131,7 +131,7 @@ This file provides the template, which reads the custom `warnings` property and 
     }
   </div>
 
-  <button type="submit" [disabled]="!registrationForm().valid()">Register</button>
+  <button type="submit">Register</button>
 </form>
 ```
 
