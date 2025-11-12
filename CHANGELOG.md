@@ -1,3 +1,21 @@
+<a name="20.3.10"></a>
+
+# 20.3.10 (2025-11-12)
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                         |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------- |
+| [c854a719b](https://github.com/angular/angular-cli/commit/c854a719bb3a8d92fe42c8fba4b0b1789081b21c) | fix  | correct `tsconfig.spec.json` include for spec files |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                                                                                                   |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------------------------------------------------------------------- |
+| [b3908f68e](https://github.com/angular/angular-cli/commit/b3908f68ed2f05cee56cbf0d9895dcfc3dc0ac25) | fix  | do not remove `@angular/localize` when having external packages ([#31721](https://github.com/angular/angular-cli/pull/31721)) |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="21.0.0-rc.1"></a>
 
 # 21.0.0-rc.1 (2025-11-05)
