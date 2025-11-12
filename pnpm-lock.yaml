@@ -5,11 +5,12 @@ settings:
   excludeLinksFromLockfile: false
 
 overrides:
-  typescript: 5.9.3
   undici-types: ^7.16.0
   '@angular/build': workspace:*
 
 packageExtensionsChecksum: sha256-3L73Fw32UVtE6x5BJxJPBtQtH/mgsr31grNpdhHP1IY=
+
+pnpmfileChecksum: sha256-uP8jbELX5QePWiOvv7dnhxXXQrLZ8/Qxn4a0akzOcCQ=
 
 importers:
 
@@ -654,6 +655,9 @@ importers:
       babel-loader:
         specifier: 10.0.0
         version: 10.0.0(@babel/core@7.28.4)(webpack@5.102.1(esbuild@0.26.0))
+      browser-sync:
+        specifier: 3.0.4
+        version: 3.0.4(bufferutil@4.0.9)
       browserslist:
         specifier: ^4.26.0
         version: 4.27.0
@@ -766,9 +770,6 @@ importers:
       '@web/test-runner':
         specifier: 0.20.2
         version: 0.20.2(bufferutil@4.0.9)
-      browser-sync:
-        specifier: 3.0.4
-        version: 3.0.4(bufferutil@4.0.9)
       ng-packagr:
         specifier: 21.0.0-rc.0
         version: 21.0.0-rc.0(@angular/compiler-cli@21.0.0-rc.1(@angular/compiler@21.0.0-rc.1)(typescript@5.9.3))(tslib@2.8.1)(typescript@5.9.3)
@@ -788,6 +789,12 @@ importers:
       rxjs:
         specifier: 7.8.2
         version: 7.8.2
+      webpack:
+        specifier: 5.102.1
+        version: 5.102.1(esbuild@0.26.0)
+      webpack-dev-server:
+        specifier: 5.2.2
+        version: 5.2.2(bufferutil@4.0.9)(utf-8-validate@6.0.5)(webpack@5.102.1(esbuild@0.26.0))
     devDependencies:
       '@angular-devkit/core':
         specifier: workspace:0.0.0-PLACEHOLDER
@@ -795,12 +802,6 @@ importers:
       '@ngtools/webpack':
         specifier: workspace:0.0.0-PLACEHOLDER
         version: link:../../ngtools/webpack
-      webpack:
-        specifier: 5.102.1
-        version: 5.102.1(esbuild@0.26.0)
-      webpack-dev-server:
-        specifier: 5.2.2
-        version: 5.2.2(bufferutil@4.0.9)(utf-8-validate@6.0.5)(webpack@5.102.1(esbuild@0.26.0))
 
   packages/angular_devkit/core:
     dependencies:
@@ -864,6 +865,10 @@ importers:
         version: 22.0.0
 
   packages/ngtools/webpack:
+    dependencies:
+      webpack:
+        specifier: 5.102.1
+        version: 5.102.1(esbuild@0.26.0)
     devDependencies:
       '@angular-devkit/core':
         specifier: workspace:0.0.0-PLACEHOLDER
@@ -877,9 +882,6 @@ importers:
       typescript:
         specifier: 5.9.3
         version: 5.9.3
-      webpack:
-        specifier: 5.102.1
-        version: 5.102.1(esbuild@0.26.0)
 
   packages/schematics/angular:
     dependencies:
@@ -1008,7 +1010,7 @@ packages:
     hasBin: true
     peerDependencies:
       '@angular/compiler': 21.0.0-rc.1
-      typescript: 5.9.3
+      typescript: '>=5.9 <6.0'
     peerDependenciesMeta:
       typescript:
         optional: true
@@ -3742,20 +3744,20 @@ packages:
     peerDependencies:
       '@typescript-eslint/parser': ^8.46.2
       eslint: ^8.57.0 || ^9.0.0
-      typescript: 5.9.3
+      typescript: '>=4.8.4 <6.0.0'
 
   '@typescript-eslint/parser@8.46.2':
     resolution: {integrity: sha512-BnOroVl1SgrPLywqxyqdJ4l3S2MsKVLDVxZvjI1Eoe8ev2r3kGDo+PcMihNmDE+6/KjkTubSJnmqGZZjQSBq/g==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
     peerDependencies:
       eslint: ^8.57.0 || ^9.0.0
-      typescript: 5.9.3
+      typescript: '>=4.8.4 <6.0.0'
 
   '@typescript-eslint/project-service@8.46.2':
     resolution: {integrity: sha512-PULOLZ9iqwI7hXcmL4fVfIsBi6AN9YxRc0frbvmg8f+4hQAjQ5GYNKK0DIArNo+rOKmR/iBYwkpBmnIwin4wBg==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
     peerDependencies:
-      typescript: 5.9.3
+      typescript: '>=4.8.4 <6.0.0'
 
   '@typescript-eslint/scope-manager@8.46.2':
     resolution: {integrity: sha512-LF4b/NmGvdWEHD2H4MsHD8ny6JpiVNDzrSZr3CsckEgCbAGZbYM4Cqxvi9L+WqDMT+51Ozy7lt2M+d0JLEuBqA==}
@@ -3765,14 +3767,14 @@ packages:
     resolution: {integrity: sha512-a7QH6fw4S57+F5y2FIxxSDyi5M4UfGF+Jl1bCGd7+L4KsaUY80GsiF/t0UoRFDHAguKlBaACWJRmdrc6Xfkkag==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
     peerDependencies:
-      typescript: 5.9.3
+      typescript: '>=4.8.4 <6.0.0'
 
   '@typescript-eslint/type-utils@8.46.2':
     resolution: {integrity: sha512-HbPM4LbaAAt/DjxXaG9yiS9brOOz6fabal4uvUmaUYe6l3K1phQDMQKBRUrr06BQkxkvIZVVHttqiybM9nJsLA==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
     peerDependencies:
       eslint: ^8.57.0 || ^9.0.0
-      typescript: 5.9.3
+      typescript: '>=4.8.4 <6.0.0'
 
   '@typescript-eslint/types@8.46.2':
     resolution: {integrity: sha512-lNCWCbq7rpg7qDsQrd3D6NyWYu+gkTENkG5IKYhUIcxSb59SQC/hEQ+MrG4sTgBVghTonNWq42bA/d4yYumldQ==}
@@ -3786,14 +3788,14 @@ packages:
     resolution: {integrity: sha512-f7rW7LJ2b7Uh2EiQ+7sza6RDZnajbNbemn54Ob6fRwQbgcIn+GWfyuHDHRYgRoZu1P4AayVScrRW+YfbTvPQoQ==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
     peerDependencies:
-      typescript: 5.9.3
+      typescript: '>=4.8.4 <6.0.0'
 
   '@typescript-eslint/utils@8.46.2':
     resolution: {integrity: sha512-sExxzucx0Tud5tE0XqR0lT0psBQvEpnpiul9XbGUB1QwpWJJAps1O/Z7hJxLGiZLBKMCutjTzDgmd1muEhBnVg==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
     peerDependencies:
       eslint: ^8.57.0 || ^9.0.0
-      typescript: 5.9.3
+      typescript: '>=4.8.4 <6.0.0'
 
   '@typescript-eslint/visitor-keys@8.46.2':
     resolution: {integrity: sha512-tUFMXI4gxzzMXt4xpGJEsBsTox0XbNQ1y94EwlD/CuZwFcQP79xfQqMhau9HsRc/J0cAPA/HZt1dZPtGn9V/7w==}
@@ -4810,7 +4812,7 @@ packages:
     resolution: {integrity: sha512-itvL5h8RETACmOTFc4UfIyB2RfEHi71Ax6E/PivVxq9NseKbOWpeyHEOIbmAw1rs8Ak0VursQNww7lf7YtUwzg==}
     engines: {node: '>=14'}
     peerDependencies:
-      typescript: 5.9.3
+      typescript: '>=4.9.5'
     peerDependenciesMeta:
       typescript:
         optional: true
@@ -7052,7 +7054,7 @@ packages:
       '@angular/compiler-cli': ^21.0.0-next
       tailwindcss: ^2.0.0 || ^3.0.0 || ^4.0.0
       tslib: ^2.3.0
-      typescript: 5.9.3
+      typescript: '>=5.9 <6.0'
     peerDependenciesMeta:
       tailwindcss:
         optional: true
@@ -7654,7 +7656,6 @@ packages:
     engines: {node: '>=0.6.0', teleport: '>=0.2.0'}
     deprecated: |-
       You or someone you depend on is using Q, the JavaScript Promise library that gave JavaScript developers strong feelings about promises. They can almost certainly migrate to the native JavaScript promise now. Thank you literally everyone for joining me in this bet against the odds. Be excellent to each other.
-
       (For a CapTP with native promises, see @endo/eventual-send and @endo/captp)
 
   qjobs@1.2.0:
@@ -7864,7 +7865,7 @@ packages:
     engines: {node: '>=16'}
     peerDependencies:
       rollup: ^3.29.4 || ^4
-      typescript: 5.9.3
+      typescript: ^4.5 || ^5.0
 
   rollup-plugin-sourcemaps2@0.5.4:
     resolution: {integrity: sha512-XK6ITvEsKtUFN1GQbYKoqilwh1yKxTS9BLaFlVsm0IaYUYe3eVnhBWzKP4AHbkBO2BNOheGNlf407K7wCj6Rrw==}
@@ -8516,7 +8517,7 @@ packages:
     resolution: {integrity: sha512-CUgTZL1irw8u29bzrOD/nH85jqyc74D6SshFgujOIA7osm2Rz7dYH77agkx7H4FBNxDq7Cjf+IjaX/8zwFW+ZQ==}
     engines: {node: '>=18.12'}
     peerDependencies:
-      typescript: 5.9.3
+      typescript: '>=4.8.4'
 
   ts-node@10.9.2:
     resolution: {integrity: sha512-f0FFpIdcHgn8zcPSbf1dRevwt047YMnaiJM3u2w2RewrB+fob/zePZcrOyQoLMMO7aBIddLcQIEK5dYjkLnGrQ==}
@@ -8525,7 +8526,7 @@ packages:
       '@swc/core': '>=1.2.50'
       '@swc/wasm': '>=1.2.50'
       '@types/node': '*'
-      typescript: 5.9.3
+      typescript: '>=2.7'
     peerDependenciesMeta:
       '@swc/core':
         optional: true
@@ -11958,7 +11959,7 @@ snapshots:
 
   '@types/connect-history-api-fallback@1.5.4':
     dependencies:
-      '@types/express-serve-static-core': 4.19.7
+      '@types/express-serve-static-core': 5.1.0
       '@types/node': 22.19.0
 
   '@types/connect@3.4.38':
