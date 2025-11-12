@@ -53,7 +53,7 @@ describe('Jasmine to Vitest Schematic', () => {
     appTree.overwrite(specFilePath, content);
 
     const tree = await schematicRunner.runSchematic(
-      'jasmine-to-vitest',
+      'refactor-jasmine-vitest',
       { project: 'bar' },
       appTree,
     );
@@ -84,7 +84,7 @@ describe('Jasmine to Vitest Schematic', () => {
     appTree.create(testFilePath, testFileContent);
 
     const tree = await schematicRunner.runSchematic(
-      'jasmine-to-vitest',
+      'refactor-jasmine-vitest',
       { project: 'bar', fileSuffix: '.test.ts' },
       appTree,
     );
@@ -113,7 +113,7 @@ describe('Jasmine to Vitest Schematic', () => {
     schematicRunner.logger.subscribe((entry) => logs.push(entry.message));
 
     await schematicRunner.runSchematic(
-      'jasmine-to-vitest',
+      'refactor-jasmine-vitest',
       { project: 'bar', verbose: true },
       appTree,
     );
@@ -138,7 +138,7 @@ describe('Jasmine to Vitest Schematic', () => {
 
     it('should only transform the specified file', async () => {
       const tree = await schematicRunner.runSchematic(
-        'jasmine-to-vitest',
+        'refactor-jasmine-vitest',
         { project: 'bar', include: 'src/app/nested/nested.spec.ts' },
         appTree,
       );
@@ -152,7 +152,7 @@ describe('Jasmine to Vitest Schematic', () => {
 
     it('should handle a Windows-style path', async () => {
       const tree = await schematicRunner.runSchematic(
-        'jasmine-to-vitest',
+        'refactor-jasmine-vitest',
         { project: 'bar', include: 'src\\app\\nested\\nested.spec.ts' },
         appTree,
       );
@@ -171,7 +171,7 @@ describe('Jasmine to Vitest Schematic', () => {
       );
 
       const tree = await schematicRunner.runSchematic(
-        'jasmine-to-vitest',
+        'refactor-jasmine-vitest',
         { project: 'bar', include: 'src/app' },
         appTree,
       );
@@ -188,7 +188,7 @@ describe('Jasmine to Vitest Schematic', () => {
 
     it('should process all files if `include` is not provided', async () => {
       const tree = await schematicRunner.runSchematic(
-        'jasmine-to-vitest',
+        'refactor-jasmine-vitest',
         { project: 'bar' },
         appTree,
       );
@@ -203,7 +203,7 @@ describe('Jasmine to Vitest Schematic', () => {
     it('should throw if the include path does not exist', async () => {
       await expectAsync(
         schematicRunner.runSchematic(
-          'jasmine-to-vitest',
+          'refactor-jasmine-vitest',
           { project: 'bar', include: 'src/non-existent' },
           appTree,
         ),
@@ -226,7 +226,7 @@ describe('Jasmine to Vitest Schematic', () => {
     const logs: string[] = [];
     schematicRunner.logger.subscribe((entry) => logs.push(entry.message));
 
-    await schematicRunner.runSchematic('jasmine-to-vitest', {}, appTree);
+    await schematicRunner.runSchematic('refactor-jasmine-vitest', {}, appTree);
 
     expect(logs).toContain('Jasmine to Vitest Refactoring Summary:');
     expect(logs).toContain('- 1 test file(s) scanned.');
