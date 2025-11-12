@@ -53,7 +53,7 @@
     "@angular/forms": "21.0.0-rc.2",
     "@angular/localize": "21.0.0-rc.2",
     "@angular/material": "21.0.0-rc.1",
-    "@angular/ng-dev": "https://github.com/angular/dev-infra-private-ng-dev-builds.git#fa2b2b9a824c1599b99b5279a3e2f28ecf472a6a",
+    "@angular/ng-dev": "https://github.com/angular/dev-infra-private-ng-dev-builds.git#58db89e9679349076ef973b2f2e64d0c808edffa",
     "@angular/platform-browser": "21.0.0-rc.2",
     "@angular/platform-server": "21.0.0-rc.2",
     "@angular/router": "21.0.0-rc.2",
