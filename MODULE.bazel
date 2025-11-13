@@ -115,7 +115,6 @@ npm.npm_translate_lock(
         "webdriver-manager": "node ./bin/webdriver-manager update --standalone false --gecko false --versions.chrome 106.0.5249.21",
     },
     data = [
-        "//:.pnpmfile.cjs",
         "//:package.json",
         "//:pnpm-workspace.yaml",
         "//modules/testing/builder:package.json",
