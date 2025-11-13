@@ -1,5 +1,5 @@
 import { ng } from '../../utils/process';
-import { appendToFile, replaceInFile, readFile } from '../../utils/fs';
+import { replaceInFile, readFile, writeFile } from '../../utils/fs';
 import { applyVitestBuilder } from '../../utils/vitest';
 import assert from 'node:assert/strict';
 import { stripVTControlCharacters } from 'node:util';
@@ -9,22 +9,31 @@ export default async function () {
   await applyVitestBuilder();
 
   // Add snapshot assertions to the test file
-  await appendToFile(
+  await replaceInFile(
     'src/app/app.spec.ts',
+    `describe('App', () => {`,
     `
-    it('should match file snapshot', () => {
-      const fixture = TestBed.createComponent(App);
-      const app = fixture.componentInstance;
-      expect((app as any).title()).toMatchSnapshot();
-    });
+describe('App', () => {
+  it('should match file snapshot', () => {
+    const fixture = TestBed.createComponent(App);
+    const app = fixture.componentInstance;
+    expect((app as any).title()).toMatchSnapshot();
+  });
 
-    it('should match inline snapshot', () => {
-      const fixture = TestBed.createComponent(App);
-      const app = fixture.componentInstance;
-      expect((app as any).title()).toMatchInlineSnapshot();
-    });
-  `,
+  it('should match inline snapshot', () => {
+    const fixture = TestBed.createComponent(App);
+    const app = fixture.componentInstance;
+    expect((app as any).title()).toMatchInlineSnapshot();
+  });
+`,
   );
+
+  // Synchronize line endings for Vitest which currently may miscalculate line counts
+  // with mixed file line endings.
+  let content = await readFile('src/app/app.spec.ts');
+  content = content.replace(/\r\n/g, '\n');
+  content = content.replace(/\r/g, '\n');
+  await writeFile('src/app/app.spec.ts', content);
 
   // First run: create snapshots
   const { stdout: firstRunStdout } = await ng('test');
@@ -44,7 +53,7 @@ export default async function () {
   const snapshotContent = await readFile('src/app/__snapshots__/app.spec.ts.snap');
   assert.match(
     snapshotContent,
-    /exports\[`should match file snapshot 1`\] = `"test-project"`;/,
+    /exports\[`App > should match file snapshot 1`\] = `"test-project"`;/,
     'File snapshot was not written to disk.',
   );
 
