@@ -89,7 +89,7 @@ describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
       expect(results.numPassedTests).toBe(1);
     });
 
-    it('should allow overriding builder options via runnerConfig file', async () => {
+    it('should allow overriding globals to false via runnerConfig file', async () => {
       harness.useTarget('test', {
         ...BASE_OPTIONS,
         runnerConfig: 'vitest.config.ts',
@@ -111,7 +111,7 @@ describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
       harness.writeFile(
         'src/app/app.component.spec.ts',
         `
-        import { vi, test, expect } from 'vitest';
+        import { expect } from 'vitest';
         test('should pass', () => {
           expect(true).toBe(true);
         });
@@ -120,6 +120,38 @@ describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
 
       const { result } = await harness.executeOnce();
       expect(result?.success).toBeFalse();
+    });
+
+    it('should initialize environment even when globals are disabled in runnerConfig file', async () => {
+      harness.useTarget('test', {
+        ...BASE_OPTIONS,
+        runnerConfig: 'vitest.config.ts',
+      });
+
+      harness.writeFile(
+        'vitest.config.ts',
+        `
+        import { defineConfig } from 'vitest/config';
+        export default defineConfig({
+          test: {
+            globals: false,
+          },
+        });
+        `,
+      );
+
+      harness.writeFile(
+        'src/app/app.component.spec.ts',
+        `
+        import { test, expect } from 'vitest';
+        test('should pass', () => {
+          expect(true).toBe(true);
+        });
+        `,
+      );
+
+      const { result } = await harness.executeOnce();
+      expect(result?.success).toBeTrue();
     });
 
     it('should fail when a DOM-dependent test is run in a node environment', async () => {
