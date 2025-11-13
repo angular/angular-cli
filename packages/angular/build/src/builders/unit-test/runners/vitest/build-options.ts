@@ -36,6 +36,12 @@ function createTestBedInitVirtualFile(
     import { afterEach, beforeEach } from 'vitest';
     ${providersImport}
 
+    // The beforeEach and afterEach hooks are registered outside the globalThis guard.
+    // This ensures that the hooks are always applied, even in non-isolated browser environments.
+    // Same as https://github.com/angular/angular/blob/05a03d3f975771bb59c7eefd37c01fa127ee2229/packages/core/testing/srcs/test_hooks.ts#L21-L29
+    beforeEach(getCleanupHook(false));
+    afterEach(getCleanupHook(true));
+
     const ANGULAR_TESTBED_SETUP = Symbol.for('@angular/cli/testbed-setup');
     if (!globalThis[ANGULAR_TESTBED_SETUP]) {
       globalThis[ANGULAR_TESTBED_SETUP] = true;
@@ -43,10 +49,6 @@ function createTestBedInitVirtualFile(
       // The Angular TestBed needs to be initialized before any tests are run.
       // In a non-isolated environment, this setup file can be executed multiple times.
       // The guard condition above ensures that the setup is only performed once.
-
-      // Same as https://github.com/angular/angular/blob/05a03d3f975771bb59c7eefd37c01fa127ee2229/packages/core/testing/srcs/test_hooks.ts#L21-L29
-      beforeEach(getCleanupHook(false));
-      afterEach(getCleanupHook(true));
 
       @NgModule({
         providers: [${usesZoneJS ? 'provideZoneChangeDetection(), ' : ''}...providers],
