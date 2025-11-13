@@ -21,6 +21,7 @@ import type {
   MiddlewareHandler,
   ProxyOptions,
 } from 'browser-sync';
+import { createRequire } from 'node:module';
 import { join, resolve as pathResolve } from 'node:path';
 import * as url from 'node:url';
 import {
@@ -64,7 +65,7 @@ export function execute(
 ): Observable<SSRDevServerBuilderOutput> {
   let browserSync: typeof import('browser-sync');
   try {
-    browserSync = require('browser-sync');
+    browserSync = createRequire(context.workspaceRoot + '/')('browser-sync');
   } catch {
     return of({
       success: false,

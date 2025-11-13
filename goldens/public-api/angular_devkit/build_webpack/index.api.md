@@ -7,8 +7,8 @@
 import { BuilderContext } from '@angular-devkit/architect';
 import { BuilderOutput } from '@angular-devkit/architect';
 import { Observable } from 'rxjs';
-import webpack from 'webpack';
-import WebpackDevServer from 'webpack-dev-server';
+import type webpack from 'webpack';
+import type WebpackDevServer from 'webpack-dev-server';
 
 // @public (undocumented)
 export type BuildResult = BuilderOutput & {

@@ -10,8 +10,8 @@ import { Builder, BuilderContext, createBuilder } from '@angular-devkit/architec
 import assert from 'node:assert';
 import { resolve as pathResolve } from 'node:path';
 import { Observable, from, isObservable, of, switchMap } from 'rxjs';
-import webpack from 'webpack';
-import WebpackDevServer from 'webpack-dev-server';
+import type webpack from 'webpack';
+import type WebpackDevServer from 'webpack-dev-server';
 import { getEmittedFiles, getWebpackConfig } from '../../utils';
 import { BuildResult, WebpackFactory, WebpackLoggingCallback } from '../webpack';
 import { Schema as WebpackDevServerBuilderSchema } from './schema';
@@ -44,7 +44,7 @@ export function runWebpackDevServer(
         return of(result);
       }
     } else {
-      return of(webpack(c));
+      return from(import('webpack').then((mod) => mod.default(c)));
     }
   };
 
@@ -54,9 +54,9 @@ export function runWebpackDevServer(
   ) => {
     if (options.webpackDevServerFactory) {
       return new options.webpackDevServerFactory(config, webpack);
+    } else {
+      return from(import('webpack-dev-server').then((mod) => new mod.default(config, webpack)));
     }
-
-    return new WebpackDevServer(config, webpack);
   };
 
   const {
@@ -70,8 +70,14 @@ export function runWebpackDevServer(
   } = options;
 
   return createWebpack({ ...config, watch: false }).pipe(
+    switchMap(async (webpackCompiler) => {
+      return [
+        webpackCompiler,
+        options.webpackDevServerFactory ?? (await import('webpack-dev-server')).default,
+      ] as unknown as [webpack.Compiler | null, WebpackDevServerFactory];
+    }),
     switchMap(
-      (webpackCompiler) =>
+      ([webpackCompiler, webpackDevServerFactory]) =>
         new Observable<DevServerBuildOutput>((obs) => {
           assert(webpackCompiler, 'Webpack compiler factory did not return a compiler instance.');
 
@@ -79,7 +85,6 @@ export function runWebpackDevServer(
           devServerConfig.host ??= 'localhost';
 
           let result: Partial<DevServerBuildOutput>;
-
           const statsOptions = typeof config.stats === 'boolean' ? undefined : config.stats;
 
           webpackCompiler.hooks.done.tap('build-webpack', (stats) => {
@@ -94,7 +99,7 @@ export function runWebpackDevServer(
             } as unknown as DevServerBuildOutput);
           });
 
-          const devServer = createWebpackDevServer(webpackCompiler, devServerConfig);
+          const devServer = new webpackDevServerFactory(devServerConfig, webpackCompiler);
           devServer.startCallback((err) => {
             if (err) {
               obs.error(err);
