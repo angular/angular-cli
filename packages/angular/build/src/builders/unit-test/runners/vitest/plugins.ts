@@ -117,8 +117,9 @@ export async function createVitestConfigPlugin(
         test: {
           setupFiles,
           globals: true,
-          // Default to `false` to align with the Karma/Jasmine experience.
-          isolate: false,
+          // Default to `false` to align with the Karma/Jasmine experience when using DOM emulation
+          // TODO: Investigate how this can be the default for browser mode as well
+          isolate: !!browser?.enabled,
           sequence: { setupFiles: 'list' },
         },
         optimizeDeps: {
