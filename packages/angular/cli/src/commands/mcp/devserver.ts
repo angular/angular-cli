@@ -30,7 +30,7 @@ export type BuildStatus = 'success' | 'failure' | 'unknown';
 /**
  * An Angular development server managed by the MCP server.
  */
-export interface DevServer {
+export interface Devserver {
   /**
    * Launches the dev server and returns immediately.
    *
@@ -64,19 +64,19 @@ export interface DevServer {
   port: number;
 }
 
-export function devServerKey(project?: string) {
+export function devserverKey(project?: string) {
   return project ?? '<default>';
 }
 
 /**
  * A local Angular development server managed by the MCP server.
  */
-export class LocalDevServer implements DevServer {
+export class LocalDevserver implements Devserver {
   readonly host: Host;
   readonly port: number;
   readonly project?: string;
 
-  private devServerProcess: ChildProcess | null = null;
+  private devserverProcess: ChildProcess | null = null;
   private serverLogs: string[] = [];
   private buildInProgress = false;
   private latestBuildLogStartIndex?: number = undefined;
@@ -89,7 +89,7 @@ export class LocalDevServer implements DevServer {
   }
 
   start() {
-    if (this.devServerProcess) {
+    if (this.devserverProcess) {
       throw Error('Dev server already started.');
     }
 
@@ -100,14 +100,14 @@ export class LocalDevServer implements DevServer {
 
     args.push(`--port=${this.port}`);
 
-    this.devServerProcess = this.host.spawn('ng', args, { stdio: 'pipe' });
-    this.devServerProcess.stdout?.on('data', (data) => {
+    this.devserverProcess = this.host.spawn('ng', args, { stdio: 'pipe' });
+    this.devserverProcess.stdout?.on('data', (data) => {
       this.addLog(data.toString());
     });
-    this.devServerProcess.stderr?.on('data', (data) => {
+    this.devserverProcess.stderr?.on('data', (data) => {
       this.addLog(data.toString());
     });
-    this.devServerProcess.stderr?.on('close', () => {
+    this.devserverProcess.stderr?.on('close', () => {
       this.stop();
     });
     this.buildInProgress = true;
@@ -127,8 +127,8 @@ export class LocalDevServer implements DevServer {
   }
 
   stop() {
-    this.devServerProcess?.kill();
-    this.devServerProcess = null;
+    this.devserverProcess?.kill();
+    this.devserverProcess = null;
   }
 
   getServerLogs(): string[] {

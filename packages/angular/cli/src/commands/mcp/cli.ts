@@ -13,7 +13,7 @@ import {
   type CommandModuleImplementation,
 } from '../../command-builder/command-module';
 import { isTTY } from '../../utilities/tty';
-import { EXPERIMENTAL_TOOLS, createMcpServer } from './mcp-server';
+import { EXPERIMENTAL_TOOLS, EXPERIMENTAL_TOOL_GROUPS, createMcpServer } from './mcp-server';
 
 const INTERACTIVE_MESSAGE = `
 To start using the Angular CLI MCP Server, add this configuration to your host:
@@ -54,7 +54,10 @@ export default class McpCommandModule extends CommandModule implements CommandMo
         alias: 'E',
         array: true,
         describe: 'Enable an experimental tool.',
-        choices: EXPERIMENTAL_TOOLS.map(({ name }) => name),
+        choices: [
+          ...EXPERIMENTAL_TOOLS.map(({ name }) => name),
+          ...Object.keys(EXPERIMENTAL_TOOL_GROUPS),
+        ],
         hidden: true,
       });
   }
