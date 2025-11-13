@@ -231,7 +231,7 @@ export class VitestExecutor implements TestExecutor {
             coverage,
             projectName,
             projectSourceRoot: this.options.projectSourceRoot,
-            optimizeDepsInclude: this.externalMetadata.explicitBrowser,
+            optimizeDepsInclude: this.externalMetadata.implicitBrowser,
             reporters,
             setupFiles: testSetupFiles,
             projectPlugins,
