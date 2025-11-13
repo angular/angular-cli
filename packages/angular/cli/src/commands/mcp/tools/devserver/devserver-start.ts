@@ -7,12 +7,12 @@
  */
 
 import { z } from 'zod';
-import { LocalDevServer, devServerKey } from '../../dev-server';
+import { LocalDevserver, devserverKey } from '../../devserver';
 import { type Host, LocalWorkspaceHost } from '../../host';
 import { createStructuredContentOutput } from '../../utils';
 import { type McpToolContext, type McpToolDeclaration, declareTool } from '../tool-registry';
 
-const startDevServerToolInputSchema = z.object({
+const devserverStartToolInputSchema = z.object({
   project: z
     .string()
     .optional()
@@ -21,9 +21,9 @@ const startDevServerToolInputSchema = z.object({
     ),
 });
 
-export type StartDevserverToolInput = z.infer<typeof startDevServerToolInputSchema>;
+export type DevserverStartToolInput = z.infer<typeof devserverStartToolInputSchema>;
 
-const startDevServerToolOutputSchema = z.object({
+const devserverStartToolOutputSchema = z.object({
   message: z.string().describe('A message indicating the result of the operation.'),
   address: z
     .string()
@@ -33,33 +33,33 @@ const startDevServerToolOutputSchema = z.object({
     ),
 });
 
-export type StartDevserverToolOutput = z.infer<typeof startDevServerToolOutputSchema>;
+export type DevserverStartToolOutput = z.infer<typeof devserverStartToolOutputSchema>;
 
 function localhostAddress(port: number) {
   return `http://localhost:${port}/`;
 }
 
-export async function startDevServer(
-  input: StartDevserverToolInput,
+export async function startDevserver(
+  input: DevserverStartToolInput,
   context: McpToolContext,
   host: Host,
 ) {
-  const projectKey = devServerKey(input.project);
+  const projectKey = devserverKey(input.project);
 
-  let devServer = context.devServers.get(projectKey);
-  if (devServer) {
+  let devserver = context.devservers.get(projectKey);
+  if (devserver) {
     return createStructuredContentOutput({
       message: `Development server for project '${projectKey}' is already running.`,
-      address: localhostAddress(devServer.port),
+      address: localhostAddress(devserver.port),
     });
   }
 
   const port = await host.getAvailablePort();
 
-  devServer = new LocalDevServer({ host, project: input.project, port });
-  devServer.start();
+  devserver = new LocalDevserver({ host, project: input.project, port });
+  devserver.start();
 
-  context.devServers.set(projectKey, devServer);
+  context.devservers.set(projectKey, devserver);
 
   return createStructuredContentOutput({
     message: `Development server for project '${projectKey}' started and watching for workspace changes.`,
@@ -67,37 +67,37 @@ export async function startDevServer(
   });
 }
 
-export const START_DEVSERVER_TOOL: McpToolDeclaration<
-  typeof startDevServerToolInputSchema.shape,
-  typeof startDevServerToolOutputSchema.shape
+export const DEVSERVER_START_TOOL: McpToolDeclaration<
+  typeof devserverStartToolInputSchema.shape,
+  typeof devserverStartToolOutputSchema.shape
 > = declareTool({
-  name: 'start_devserver',
+  name: 'devserver_start',
   title: 'Start Development Server',
   description: `
 <Purpose>
-Starts the Angular development server ("ng serve") as a background process. Follow this up with "wait_for_devserver_build" to wait until
+Starts the Angular development server ("ng serve") as a background process. Follow this up with "devserver_wait_for_build" to wait until
 the first build completes.
 </Purpose>
 <Use Cases>
 * **Starting the Server:** Use this tool to begin serving the application. The tool will return immediately while the server runs in the
   background.
-* **Get Initial Build Logs:** Once a dev server has started, use the "wait_for_devserver_build" tool to ensure it's alive. If there are any
-  build errors, "wait_for_devserver_build" would provide them back and you can give them to the user or rely on them to propose a fix.
-* **Get Updated Build Logs:** Important: as long as a devserver is alive (i.e. "stop_devserver" wasn't called), after every time you make a
-  change to the workspace, re-run "wait_for_devserver_build" to see whether the change was successfully built and wait for the devserver to
+* **Get Initial Build Logs:** Once a dev server has started, use the "devserver_wait_for_build" tool to ensure it's alive. If there are any
+  build errors, "devserver_wait_for_build" would provide them back and you can give them to the user or rely on them to propose a fix.
+* **Get Updated Build Logs:** Important: as long as a devserver is alive (i.e. "devserver_stop" wasn't called), after every time you make a
+  change to the workspace, re-run "devserver_wait_for_build" to see whether the change was successfully built and wait for the devserver to
   be updated.
 </Use Cases>
 <Operational Notes>
 * This tool manages development servers by itself. It maintains at most a single dev server instance for each project in the monorepo.
 * This is an asynchronous operation. Subsequent commands can be ran while the server is active.
-* Use 'stop_devserver' to gracefully shut down the server and access the full log output.
+* Use 'devserver_stop' to gracefully shut down the server and access the full log output.
 </Operational Notes>
 `,
   isReadOnly: true,
   isLocalOnly: true,
-  inputSchema: startDevServerToolInputSchema.shape,
-  outputSchema: startDevServerToolOutputSchema.shape,
+  inputSchema: devserverStartToolInputSchema.shape,
+  outputSchema: devserverStartToolOutputSchema.shape,
   factory: (context) => (input) => {
-    return startDevServer(input, context, LocalWorkspaceHost);
+    return startDevserver(input, context, LocalWorkspaceHost);
   },
 });
