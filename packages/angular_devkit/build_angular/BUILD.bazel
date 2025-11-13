@@ -332,6 +332,7 @@ LARGE_SPECS = {
             "//:node_modules/karma-jasmine",
             "//:node_modules/karma-jasmine-html-reporter",
             "//:node_modules/puppeteer",
+            ":node_modules/webpack",
         ],
     },
     "protractor": {
