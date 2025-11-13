@@ -117,7 +117,6 @@ export async function setupBrowserConfiguration(
     provider,
     headless,
     ui: !headless,
-    isolate: debug,
     viewport,
     instances: browsers.map((browserName) => ({
       browser: normalizeBrowserName(browserName),
