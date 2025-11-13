@@ -10,9 +10,8 @@ import { execute } from '../../index';
 import {
   BASE_OPTIONS,
   describeBuilder,
-  UNIT_TEST_BUILDER_INFO,
   setupApplicationTarget,
-  expectLog,
+  UNIT_TEST_BUILDER_INFO,
 } from '../setup';
 
 describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
@@ -45,6 +44,13 @@ describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
         });`,
       });
 
+      await harness.modifyFile('src/tsconfig.spec.json', (content) => {
+        const tsConfig = JSON.parse(content);
+        tsConfig.files ??= [];
+        tsConfig.files.push('setup.ts');
+        return JSON.stringify(tsConfig);
+      });
+
       harness.useTarget('test', {
         ...BASE_OPTIONS,
         setupFiles: ['src/setup.ts'],
@@ -55,14 +61,16 @@ describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
     });
 
     it('should allow setup files to configure testing module', async () => {
-      pending('failing');
       await harness.writeFiles({
         'src/setup.ts': `
         import { TestBed } from '@angular/core/testing';
+        import { beforeEach } from 'vitest';
         import { SETUP_LOADED_TOKEN } from './setup-loaded-token';
 
-        TestBed.configureTestingModule({
-          providers: [{provide: SETUP_LOADED_TOKEN, useValue: true}],
+        beforeEach(() => {
+          TestBed.configureTestingModule({
+            providers: [{provide: SETUP_LOADED_TOKEN, useValue: true}],
+          });
         });
         `,
         'src/setup-loaded-token.ts': `
@@ -71,7 +79,7 @@ describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
         export const SETUP_LOADED_TOKEN = new InjectionToken<boolean>('SETUP_LOADED_TOKEN');
         `,
         'src/app/app.component.spec.ts': `
-        import { describe, expect, test } from 'vitest';
+        import { beforeEach, describe, expect, test } from 'vitest';
         import { TestBed } from '@angular/core/testing';
         import { SETUP_LOADED_TOKEN } from '../setup-loaded-token';
 
@@ -80,6 +88,13 @@ describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
             expect(TestBed.inject(SETUP_LOADED_TOKEN)).toBe(true);
           });
         });`,
+      });
+
+      await harness.modifyFile('src/tsconfig.spec.json', (content) => {
+        const tsConfig = JSON.parse(content);
+        tsConfig.files ??= [];
+        tsConfig.files.push('setup.ts');
+        return JSON.stringify(tsConfig);
       });
 
       harness.useTarget('test', {

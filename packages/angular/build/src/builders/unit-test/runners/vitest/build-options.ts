@@ -11,7 +11,7 @@ import { toPosixPath } from '../../../../utils/path';
 import type { ApplicationBuilderInternalOptions } from '../../../application/options';
 import { OutputHashing } from '../../../application/schema';
 import { NormalizedUnitTestBuilderOptions, injectTestingPolyfills } from '../../options';
-import { findTests, getTestEntrypoints } from '../../test-discovery';
+import { findTests, getSetupEntrypoints, getTestEntrypoints } from '../../test-discovery';
 import { RunnerOptions } from '../api';
 
 function createTestBedInitVirtualFile(
@@ -88,12 +88,19 @@ export async function getVitestBuildOptions(
     );
   }
 
-  const entryPoints = getTestEntrypoints(testFiles, {
+  const testEntryPoints = getTestEntrypoints(testFiles, {
     projectSourceRoot,
     workspaceRoot,
     removeTestExtension: true,
   });
-  entryPoints.set('init-testbed', 'angular:test-bed-init');
+  const setupEntryPoints = getSetupEntrypoints(options.setupFiles, {
+    projectSourceRoot,
+    workspaceRoot,
+    removeTestExtension: true,
+  });
+  setupEntryPoints.set('init-testbed', 'angular:test-bed-init');
+
+  const entryPoints = new Map([...testEntryPoints, ...setupEntryPoints]);
 
   // The 'vitest' package is always external for testing purposes
   const externalDependencies = ['vitest'];
@@ -138,6 +145,6 @@ export async function getVitestBuildOptions(
     virtualFiles: {
       'angular:test-bed-init': testBedInitContents,
     },
-    testEntryPointMappings: entryPoints,
+    testEntryPointMappings: testEntryPoints,
   };
 }
