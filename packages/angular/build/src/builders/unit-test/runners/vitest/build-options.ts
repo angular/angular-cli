@@ -48,6 +48,7 @@ function createTestBedInitVirtualFile(
     import { NgModule${usesZoneJS ? ', provideZoneChangeDetection' : ''} } from '@angular/core';
     import { getTestBed, ɵgetCleanupHook as getCleanupHook } from '@angular/core/testing';
     import { BrowserTestingModule, platformBrowserTesting } from '@angular/platform-browser/testing';
+    import { afterEach, beforeEach } from 'vitest';
     ${providersImport}
 
     const ANGULAR_TESTBED_SETUP = Symbol.for('@angular/cli/testbed-setup');
