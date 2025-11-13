@@ -119,6 +119,7 @@ export async function createVitestConfigPlugin(
           globals: true,
           // Default to `false` to align with the Karma/Jasmine experience.
           isolate: false,
+          sequence: { setupFiles: 'list' },
         },
         optimizeDeps: {
           noDiscovery: true,
