@@ -10,7 +10,7 @@ import { Builder, BuilderContext, BuilderOutput, createBuilder } from '@angular-
 import assert from 'node:assert';
 import { resolve as pathResolve } from 'node:path';
 import { Observable, from, isObservable, of, switchMap } from 'rxjs';
-import webpack from 'webpack';
+import type webpack from 'webpack';
 import { EmittedFiles, getEmittedFiles, getWebpackConfig } from '../../utils';
 import { Schema as RealWebpackBuilderSchema } from './schema';
 
@@ -57,7 +57,7 @@ export function runWebpack(
         return of(result);
       }
     } else {
-      return of(webpack(c));
+      return from(import('webpack').then((mod) => mod.default(c)));
     }
   };
 
