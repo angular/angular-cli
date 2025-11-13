@@ -14,21 +14,6 @@ import { NormalizedUnitTestBuilderOptions, injectTestingPolyfills } from '../../
 import { findTests, getTestEntrypoints } from '../../test-discovery';
 import { RunnerOptions } from '../api';
 
-/**
- * A list of Angular related packages that should be marked as external.
- * This allows Vite to pre-bundle them, improving performance.
- */
-const ANGULAR_PACKAGES_TO_EXTERNALIZE = [
-  '@angular/core',
-  '@angular/common',
-  '@angular/platform-browser',
-  '@angular/compiler',
-  '@angular/router',
-  '@angular/forms',
-  '@angular/animations',
-  'rxjs',
-];
-
 function createTestBedInitVirtualFile(
   providersFile: string | undefined,
   projectSourceRoot: string,
@@ -110,11 +95,10 @@ export async function getVitestBuildOptions(
   });
   entryPoints.set('init-testbed', 'angular:test-bed-init');
 
-  const externalDependencies = new Set(['vitest']);
-  ANGULAR_PACKAGES_TO_EXTERNALIZE.forEach((dep) => externalDependencies.add(dep));
-
+  // The 'vitest' package is always external for testing purposes
+  const externalDependencies = ['vitest'];
   if (baseBuildOptions.externalDependencies) {
-    baseBuildOptions.externalDependencies.forEach((dep) => externalDependencies.add(dep));
+    externalDependencies.push(...baseBuildOptions.externalDependencies);
   }
 
   const buildOptions: Partial<ApplicationBuilderInternalOptions> = {
@@ -135,7 +119,10 @@ export async function getVitestBuildOptions(
     outputHashing: adjustOutputHashing(baseBuildOptions.outputHashing),
     optimization: false,
     entryPoints,
-    externalDependencies: [...externalDependencies],
+    // Enable support for vitest browser prebundling. Excludes can be controlled with a runnerConfig
+    // and the `optimizeDeps.exclude` option.
+    externalPackages: true,
+    externalDependencies,
   };
 
   buildOptions.polyfills = injectTestingPolyfills(buildOptions.polyfills);
