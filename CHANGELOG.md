@@ -1,3 +1,16 @@
+<a name="21.0.0-rc.4"></a>
+
+# 21.0.0-rc.4 (2025-11-14)
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                           |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------- |
+| [f7c4a4c1d](https://github.com/angular/angular-cli/commit/f7c4a4c1dcd575dec82cc06597e3d6620b1be729) | fix  | enhance Vitest resolution for optimal package loading |
+| [0830f4fb5](https://github.com/angular/angular-cli/commit/0830f4fb549e2c45b1ef752dd42f002a1347d7c8) | fix  | ensure TestBed cleanup hooks are always registered    |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="21.0.0-rc.3"></a>
 
 # 21.0.0-rc.3 (2025-11-13)
