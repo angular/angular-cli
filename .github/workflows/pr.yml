@@ -116,6 +116,29 @@ jobs:
     steps:
       - name: Initialize environment
         uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@854a5073df0fbdb0ea42232ba84b28d64014c56c
+      - name: Aggressive Cleanup
+        # Note: Use this only AFTER you are sure your project doesn't need these tools
+        run: |
+          echo "Current disk usage:"
+          df -h
+          echo "Removing large pre-installed tools..."
+          # Remove Android SDKs (~6-12 GB)
+          sudo rm -rf /usr/local/lib/android
+          # Remove .NET SDKs and runtime (~1.5-2 GB)
+          sudo rm -rf /usr/share/dotnet
+          # Remove Java/JDKs (~1.5 GB)
+          sudo rm -rf /usr/lib/jvm
+          # Remove Haskell (GHC) (~3 GB)
+          sudo rm -rf /usr/local/.ghcup
+          # Remove CodeQL bundles (~2-3 GB)
+          sudo rm -rf /opt/hostedtoolcache/CodeQL
+
+          # Clean up apt/package manager cache
+          sudo apt-get autoremove -y
+          sudo apt-get clean
+
+          echo "Current disk usage:"
+          df -h
       - name: Install node modules
         run: pnpm install --frozen-lockfile
       - name: Setup Bazel
