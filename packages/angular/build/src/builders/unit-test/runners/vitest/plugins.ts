@@ -124,6 +124,10 @@ export async function createVitestConfigPlugin(
           noDiscovery: true,
           include: options.optimizeDepsInclude,
         },
+        resolve: {
+          mainFields: ['es2020', 'module', 'main'],
+          conditions: ['es2015', 'es2020', 'module'],
+        },
       };
 
       const { optimizeDeps, resolve } = config;
