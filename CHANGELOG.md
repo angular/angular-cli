@@ -1,3 +1,26 @@
+<a name="21.0.0-rc.3"></a>
+
+# 21.0.0-rc.3 (2025-11-13)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                             |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------- |
+| [4deac3ec7](https://github.com/angular/angular-cli/commit/4deac3ec785b1a53156aac90441d0ed129df71ef) | fix  | support multi-database search in find_examples MCP tool |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                                          |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------------- |
+| [fcdbf6c19](https://github.com/angular/angular-cli/commit/fcdbf6c19b5a8549011aebec9e517feb12a99895) | fix  | allow `globals` to be set to false                                   |
+| [931c62d20](https://github.com/angular/angular-cli/commit/931c62d20915c6c772b61d76ab88657c0858f6bd) | fix  | allow unit-test runner config with absolute path                     |
+| [fec106b60](https://github.com/angular/angular-cli/commit/fec106b60553394aab51d713e5437a713085089b) | fix  | enhance Vitest dependency externalization and pre-bundling           |
+| [ee5e127d5](https://github.com/angular/angular-cli/commit/ee5e127d551269fa9a3e39b9b28e38d7ab35806f) | fix  | ensure `ɵgetOrCreateAngularServerApp` is always defined after errors |
+| [55145f582](https://github.com/angular/angular-cli/commit/55145f582253b4ecb47add7ff2ef459b7535dfdb) | fix  | ensure Vitest setup files are executed in order                      |
+| [6576bb598](https://github.com/angular/angular-cli/commit/6576bb5985c18dca7cecd9509939c2a78bf9758a) | fix  | remove explicit test isolation configuration                         |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="21.0.0-rc.2"></a>
 
 # 21.0.0-rc.2 (2025-11-12)
