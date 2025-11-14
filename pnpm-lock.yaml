@@ -47,8 +47,8 @@ importers:
         specifier: 21.0.0-rc.2
         version: 21.0.0-rc.2(4c9afee98155400dc203886c5442fc76)
       '@angular/ng-dev':
-        specifier: https://github.com/angular/dev-infra-private-ng-dev-builds.git#b1fe943cca3ab648a18dbb0df7711af7c3079159
-        version: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/b1fe943cca3ab648a18dbb0df7711af7c3079159(@modelcontextprotocol/sdk@1.20.1)
+        specifier: https://github.com/angular/dev-infra-private-ng-dev-builds.git#49d7316da246484759b94f87e6eda47fde86b992
+        version: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/49d7316da246484759b94f87e6eda47fde86b992(@modelcontextprotocol/sdk@1.20.1)
       '@angular/platform-browser':
         specifier: 21.0.0-rc.2
         version: 21.0.0-rc.2(@angular/animations@21.0.0-rc.2(@angular/core@21.0.0-rc.2(@angular/compiler@21.0.0-rc.2)(rxjs@7.8.2)(zone.js@0.15.1)))(@angular/common@21.0.0-rc.2(@angular/core@21.0.0-rc.2(@angular/compiler@21.0.0-rc.2)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@21.0.0-rc.2(@angular/compiler@21.0.0-rc.2)(rxjs@7.8.2)(zone.js@0.15.1))
@@ -1060,9 +1060,9 @@ packages:
       '@angular/platform-browser': ^21.0.0-0 || ^21.1.0-0 || ^21.2.0-0 || ^21.3.0-0 || ^22.0.0-0
       rxjs: ^6.5.3 || ^7.4.0
 
-  '@angular/ng-dev@https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/b1fe943cca3ab648a18dbb0df7711af7c3079159':
-    resolution: {tarball: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/b1fe943cca3ab648a18dbb0df7711af7c3079159}
-    version: 0.0.0-59529b10d01f74a47b7200a9fe92033d3f5c36e4
+  '@angular/ng-dev@https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/49d7316da246484759b94f87e6eda47fde86b992':
+    resolution: {tarball: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/49d7316da246484759b94f87e6eda47fde86b992}
+    version: 0.0.0-c855fffb4b01bc06e743eb3bdfd54c866af09ad8
     hasBin: true
 
   '@angular/platform-browser@21.0.0-rc.2':
@@ -9568,7 +9568,7 @@ snapshots:
       rxjs: 7.8.2
       tslib: 2.8.1
 
-  '@angular/ng-dev@https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/b1fe943cca3ab648a18dbb0df7711af7c3079159(@modelcontextprotocol/sdk@1.20.1)':
+  '@angular/ng-dev@https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/49d7316da246484759b94f87e6eda47fde86b992(@modelcontextprotocol/sdk@1.20.1)':
     dependencies:
       '@actions/core': 1.11.1
       '@google-cloud/spanner': 8.0.0(supports-color@10.2.2)
