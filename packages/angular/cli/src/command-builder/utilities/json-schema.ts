@@ -257,18 +257,18 @@ function getEnumValues(
  */
 function getDefaultValue(
   current: json.JsonObject,
-  type: string,
+  type: ReadonlyArray<string>,
 ): string | number | boolean | unknown[] | undefined {
   const defaultValue = current.default;
   if (defaultValue === undefined) {
     return undefined;
   }
 
-  if (type === 'array') {
+  if (type.includes('array')) {
     return Array.isArray(defaultValue) && defaultValue.length > 0 ? defaultValue : undefined;
   }
 
-  if (typeof defaultValue === type) {
+  if (type.includes(typeof defaultValue)) {
     return defaultValue as string | number | boolean;
   }
 
@@ -343,7 +343,12 @@ export async function parseJsonSchemaToOptions(
       return;
     }
 
-    const [type] = types;
+    // Allow Yargs to infer the option type for string AND boolean options
+    const type =
+      types.length === 2 && types.includes('string') && types.includes('boolean')
+        ? undefined
+        : types[0];
+
     const $default = current.$default;
     const $defaultIndex =
       isJsonObject($default) && $default['$source'] === 'argv' ? $default['index'] : undefined;
@@ -362,7 +367,7 @@ export async function parseJsonSchemaToOptions(
     const option: Option = {
       name,
       description: String(current.description ?? ''),
-      default: getDefaultValue(current, type),
+      default: getDefaultValue(current, types),
       choices: enumValues?.length ? enumValues : undefined,
       required,
       alias: getAliases(current),
