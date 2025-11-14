@@ -178,7 +178,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest]
+        # These tests can generate a significant amount of temp files, especially when
+        # flaky targets are retried. The larger machine type comes with 2x more SSD space.
+        os: [ubuntu-latest-4core]
         node: [22]
         subset: [yarn, pnpm]
         shard: [0, 1, 2]
