@@ -257,6 +257,29 @@ describe('parseJsonSchemaToOptions', () => {
     });
   });
 
+  it(`should not set 'type' when it is a 'string' and a 'boolean'`, async () => {
+    const registry = new schema.CoreSchemaRegistry();
+    const options = await parseJsonSchemaToOptions(
+      registry,
+      {
+        'type': 'object',
+        'properties': {
+          'runner': {
+            'type': ['string', 'boolean'],
+          },
+        },
+      },
+      false,
+    );
+
+    expect(options).toEqual([
+      jasmine.objectContaining({
+        name: 'runner',
+        type: undefined,
+      }),
+    ]);
+  });
+
   describe('with required positional argument', () => {
     it('marks the required argument as required', async () => {
       const jsonSchema = {
