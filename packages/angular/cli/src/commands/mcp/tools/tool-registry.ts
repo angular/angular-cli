@@ -10,6 +10,7 @@ import type { McpServer, ToolCallback } from '@modelcontextprotocol/sdk/server/m
 import type { ZodRawShape } from 'zod';
 import type { AngularWorkspace } from '../../../utilities/config';
 import type { DevServer } from '../dev-server';
+import type { SchematicMeta } from './schematics/types';
 
 type ToolConfig = Parameters<McpServer['registerTool']>[1];
 
@@ -19,6 +20,7 @@ export interface McpToolContext {
   logger: { warn(text: string): void };
   exampleDatabasePath?: string;
   devServers: Map<string, DevServer>;
+  schematicMetaLoader?: () => Promise<{ meta: SchematicMeta[] }>;
 }
 
 export type McpToolFactory<TInput extends ZodRawShape> = (
