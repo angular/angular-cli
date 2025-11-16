@@ -68,6 +68,7 @@ export default function (options: ApplicationOptions): Rule {
       await getAppOptions(host, options);
 
     const suffix = options.fileNameStyleGuide === '2016' ? '.component' : '';
+    const typeSeparator = options.fileNameStyleGuide === '2016' ? '.' : '-';
 
     return chain([
       addAppToWorkspaceFile(options, appDir),
@@ -85,7 +86,7 @@ export default function (options: ApplicationOptions): Rule {
             routingScope: 'Root',
             path: sourceDir,
             project: options.name,
-            typeSeparator: undefined,
+            typeSeparator,
           }),
       schematic('component', {
         name: 'app',
@@ -111,6 +112,7 @@ export default function (options: ApplicationOptions): Rule {
             appName: options.name,
             folderName,
             suffix,
+            typeSeparator,
           }),
           move(appDir),
         ]),
