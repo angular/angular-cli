@@ -9,10 +9,10 @@ import { Component, signal } from '@angular/core';
      %><router-outlet /><%
     } %>
   `,<% } else { %>
-  templateUrl: './app.html',<% } %>
+  templateUrl: './app<%= suffix %>.html',<% } %>
   standalone: false,<% if(inlineStyle) { %>
   styles: []<% } else { %>
-  styleUrl: './app.<%= style %>'<% } %>
+  styleUrl: './app<%= suffix %>.<%= style %>'<% } %>
 })
 export class App {
   protected readonly title = signal('<%= name %>');

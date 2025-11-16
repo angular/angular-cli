@@ -1,8 +1,8 @@
 import { NgModule, provideBrowserGlobalErrorListeners } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 <% if (routing) { %>
-import { AppRoutingModule } from './app-routing-module';<% } %>
-import { App } from './app';
+import { AppRoutingModule } from './app-routing<%= typeSeparator %>module';<% } %>
+import { App } from './app<%= suffix %>';
 
 @NgModule({
   declarations: [

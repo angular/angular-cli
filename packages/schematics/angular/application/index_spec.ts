@@ -879,5 +879,62 @@ describe('Application Schematic', () => {
       expect(component).toContain(`templateUrl: './app.component.html'`);
       expect(component).toContain(`styleUrl: './app.component.css'`);
     });
+
+    it('should create a test file with import from the path without suffix', async () => {
+      const options = { ...defaultOptions, fileNameStyleGuide: '2016' as const };
+      const tree = await schematicRunner.runSchematic('application', options, workspaceTree);
+      const componentSpec = tree.readContent('/projects/foo/src/app/app.component.spec.ts');
+      expect(componentSpec).toContain(`import { App } from './app.component'`);
+    });
+
+    describe('standalone: false', () => {
+      it('should create a component with the correct template and style urls', async () => {
+        const options = {
+          ...defaultOptions,
+          standalone: false,
+          fileNameStyleGuide: '2016' as const,
+        };
+        const tree = await schematicRunner.runSchematic('application', options, workspaceTree);
+        const component = tree.readContent('/projects/foo/src/app/app.component.ts');
+        expect(component).toContain(`templateUrl: './app.component.html'`);
+        expect(component).toContain(`styleUrl: './app.component.css'`);
+      });
+
+      it('should create a test file with import from the path without suffix', async () => {
+        const options = {
+          ...defaultOptions,
+          standalone: false,
+          fileNameStyleGuide: '2016' as const,
+        };
+        const tree = await schematicRunner.runSchematic('application', options, workspaceTree);
+        const componentSpec = tree.readContent('/projects/foo/src/app/app.component.spec.ts');
+        expect(componentSpec).toContain(`import { App } from './app.component'`);
+      });
+
+      it('should create a module with the correct suffix', async () => {
+        const options = {
+          ...defaultOptions,
+          standalone: false,
+          fileNameStyleGuide: '2016' as const,
+        };
+        const tree = await schematicRunner.runSchematic('application', options, workspaceTree);
+        const module = tree.readContent('/projects/foo/src/app/app.module.ts');
+        expect(module).toContain(`import { App } from './app.component'`);
+      });
+
+      it('should create a routing module with the correct suffix', async () => {
+        const options = {
+          ...defaultOptions,
+          standalone: false,
+          routing: true,
+          fileNameStyleGuide: '2016' as const,
+        };
+        const tree = await schematicRunner.runSchematic('application', options, workspaceTree);
+        const module = tree.readContent('/projects/foo/src/app/app.module.ts');
+        const routingModule = tree.readContent('/projects/foo/src/app/app-routing.module.ts');
+        expect(routingModule).toBeDefined();
+        expect(module).toContain(`import { AppRoutingModule } from './app-routing.module'`);
+      });
+    });
   });
 });
