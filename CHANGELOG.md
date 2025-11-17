@@ -1,3 +1,25 @@
+<a name="21.0.0-rc.5"></a>
+
+# 21.0.0-rc.5 (2025-11-17)
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                                       |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------- |
+| [e8feba9ee](https://github.com/angular/angular-cli/commit/e8feba9ee163f688c51d6463336474591e886647) | fix  | add missing typeSeparator to main.ts.template file                |
+| [6615fcf03](https://github.com/angular/angular-cli/commit/6615fcf037686cd96e97b469937b7f0736afaa77) | fix  | issues in apps generated with '--file-name-style-guide=2016' flag |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                                |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------- |
+| [a11dd31f0](https://github.com/angular/angular-cli/commit/a11dd31f0c80a189e7dcb3172c89a731cfc34702) | fix  | configure Vitest cache to use Angular cache                |
+| [f05ffd104](https://github.com/angular/angular-cli/commit/f05ffd104255e86fe93f3736e1430f940cb83007) | fix  | correct Vitest coverage include handling for virtual files |
+| [49b65aba8](https://github.com/angular/angular-cli/commit/49b65aba8d7cd2839776e987366b981d7762760c) | fix  | disable Vitest test isolation by default                   |
+| [fa5c92346](https://github.com/angular/angular-cli/commit/fa5c92346d14a6ad03aa30ad6392fc649038605e) | fix  | prioritize string type for runnerConfig schema             |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="21.0.0-rc.4"></a>
 
 # 21.0.0-rc.4 (2025-11-14)
