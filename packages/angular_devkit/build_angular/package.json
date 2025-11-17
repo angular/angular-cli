@@ -38,7 +38,7 @@
     "license-webpack-plugin": "4.0.2",
     "loader-utils": "3.3.1",
     "mini-css-extract-plugin": "2.9.4",
-    "open": "10.2.0",
+    "open": "11.0.0",
     "ora": "9.0.0",
     "picomatch": "4.0.3",
     "piscina": "5.1.4",
