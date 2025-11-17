@@ -4,6 +4,7 @@ import colors from 'ansi-colors';
 import glob from 'fast-glob';
 import * as path from 'node:path';
 import * as fs from 'node:fs';
+import { rm } from 'node:fs/promises';
 import { getGlobalVariable, setGlobalVariable } from './e2e/utils/env';
 import { gitClean } from './e2e/utils/git';
 import { createNpmRegistry } from './e2e/utils/registry';
@@ -13,7 +14,7 @@ import { findFreePort } from './e2e/utils/network';
 import { extractFile } from './e2e/utils/tar';
 import { realpathSync } from 'node:fs';
 import { PkgInfo } from './e2e/utils/packages';
-import { rm } from 'node:fs/promises';
+import { getTestProjectDir } from './e2e/utils/project';
 
 Error.stackTraceLimit = Infinity;
 
@@ -271,6 +272,14 @@ Promise.all([findFreePort(), findFreePort(), findPackageTars()])
     } finally {
       registryProcess.kill();
       secureRegistryProcess.kill();
+
+      await rm(getGlobalVariable('projects-root'), {
+        recursive: true,
+        force: true,
+        maxRetries: 3,
+      }).catch(() => {
+        // If this fails it is not fatal.
+      });
     }
   })
   .catch((err) => {
@@ -334,7 +343,7 @@ function runInitializer(absoluteName: string): Promise<void> {
  * Run a file from the main 'test-project' directory in a subprocess via launchTestProcess().
  */
 async function runTest(absoluteName: string): Promise<void> {
-  process.chdir(join(getGlobalVariable('projects-root'), 'test-project'));
+  process.chdir(getTestProjectDir());
 
   await launchTestProcess(absoluteName);
   await cleanTestProject();
@@ -343,7 +352,7 @@ async function runTest(absoluteName: string): Promise<void> {
 async function cleanTestProject() {
   await gitClean();
 
-  const testProject = join(getGlobalVariable('projects-root'), 'test-project');
+  const testProject = getTestProjectDir();
 
   // Note: Dist directory is not cleared between tests, as `git clean`
   // doesn't delete it.

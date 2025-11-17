@@ -7,6 +7,7 @@ import { gitCommit } from './git';
 import { findFreePort } from './network';
 import { installWorkspacePackages, PkgInfo } from './packages';
 import { execAndWaitForOutputToMatch, git, ng } from './process';
+import { join } from 'node:path';
 
 export function updateJsonFile(filePath: string, fn: (json: any) => any | void) {
   return readFile(filePath).then((tsConfigJson) => {
@@ -269,4 +270,8 @@ export function updateServerFileForEsbuild(filepath: string): Promise<void> {
     run();
     `,
   );
+}
+
+export function getTestProjectDir(): string {
+  return join(getGlobalVariable('projects-root'), 'test-project');
 }

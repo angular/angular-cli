@@ -5,7 +5,7 @@ import { getGlobalVariable } from './env';
 import { resolve } from 'node:path';
 import { copyFile } from './fs';
 import { installWorkspacePackages, setRegistry } from './packages';
-import { useBuiltPackagesVersions } from './project';
+import { getTestProjectDir, useBuiltPackagesVersions } from './project';
 
 export function assetDir(assetName: string) {
   return join(__dirname, '../e2e/assets', assetName);
@@ -21,7 +21,7 @@ export function copyProjectAsset(assetName: string, to?: string) {
 
 export function copyAssets(assetName: string, to?: string) {
   const seed = +Date.now();
-  const tempRoot = join(getGlobalVariable('projects-root'), 'assets', assetName + '-' + seed);
+  const tempRoot = join(getTestAssetsDir(), assetName + '-' + seed);
   const root = assetDir(assetName);
 
   return Promise.resolve()
@@ -30,9 +30,7 @@ export function copyAssets(assetName: string, to?: string) {
 
       return allFiles.reduce((promise, filePath) => {
         const toPath =
-          to !== undefined
-            ? resolve(getGlobalVariable('projects-root'), 'test-project', to, filePath)
-            : join(tempRoot, filePath);
+          to !== undefined ? resolve(getTestProjectDir(), to, filePath) : join(tempRoot, filePath);
 
         return promise
           .then(() => copyFile(join(root, filePath), toPath))
@@ -64,4 +62,8 @@ export async function createProjectFromAsset(
   }
 
   return () => setRegistry(true /** useTestRegistry */);
+}
+
+export function getTestAssetsDir(): string {
+  return join(getGlobalVariable('projects-root'), 'assets');
 }
