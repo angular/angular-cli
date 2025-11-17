@@ -61,7 +61,7 @@
     "@babel/core": "7.28.5",
     "@bazel/bazelisk": "1.26.0",
     "@bazel/buildifier": "8.2.1",
-    "@eslint/compat": "1.4.1",
+    "@eslint/compat": "2.0.0",
     "@eslint/eslintrc": "3.3.1",
     "@eslint/js": "9.39.1",
     "@rollup/plugin-alias": "^6.0.0",
