@@ -919,7 +919,9 @@ describe('Application Schematic', () => {
         };
         const tree = await schematicRunner.runSchematic('application', options, workspaceTree);
         const module = tree.readContent('/projects/foo/src/app/app.module.ts');
+        const main = tree.readContent('/projects/foo/src/main.ts');
         expect(module).toContain(`import { App } from './app.component'`);
+        expect(main).toContain(`import { AppModule } from './app/app.module'`);
       });
 
       it('should create a routing module with the correct suffix', async () => {
