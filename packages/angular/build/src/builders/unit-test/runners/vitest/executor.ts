@@ -8,7 +8,7 @@
 
 import type { BuilderOutput } from '@angular-devkit/architect';
 import assert from 'node:assert';
-import path from 'node:path';
+import path, { join } from 'node:path';
 import type { Vitest } from 'vitest/node';
 import {
   DevServerExternalResultMetadata,
@@ -150,6 +150,10 @@ export class VitestExecutor implements TestExecutor {
       watch,
       browserViewport,
       ui,
+      projectRoot,
+      runnerConfig,
+      projectSourceRoot,
+      cacheOptions,
     } = this.options;
     const projectName = this.projectName;
 
@@ -171,7 +175,7 @@ export class VitestExecutor implements TestExecutor {
     const browserOptions = await setupBrowserConfiguration(
       browsers,
       debug,
-      this.options.projectSourceRoot,
+      projectSourceRoot,
       browserViewport,
     );
     if (browserOptions.errors?.length) {
@@ -186,7 +190,7 @@ export class VitestExecutor implements TestExecutor {
     const testSetupFiles = this.prepareSetupFiles();
     const projectPlugins = createVitestPlugins({
       workspaceRoot,
-      projectSourceRoot: this.options.projectSourceRoot,
+      projectSourceRoot,
       projectName,
       buildResultFiles: this.buildResultFiles,
       testFileToEntryPoint: this.testFileToEntryPoint,
@@ -200,10 +204,9 @@ export class VitestExecutor implements TestExecutor {
         }
       : {};
 
-    const runnerConfig = this.options.runnerConfig;
     const externalConfigPath =
       runnerConfig === true
-        ? await findVitestBaseConfig([this.options.projectRoot, this.options.workspaceRoot])
+        ? await findVitestBaseConfig([projectRoot, workspaceRoot])
         : runnerConfig;
 
     return startVitest(
@@ -214,12 +217,15 @@ export class VitestExecutor implements TestExecutor {
         root: workspaceRoot,
         project: projectName,
         outputFile,
+        cache: cacheOptions.enabled ? undefined : false,
         testNamePattern: this.options.filter,
         watch,
         ui,
         ...debugOptions,
       },
       {
+        // Note `.vitest` is auto appended to the path.
+        cacheDir: cacheOptions.path,
         server: {
           // Disable the actual file watcher. The boolean watch option above should still
           // be enabled as it controls other internal behavior related to rerunning tests.
@@ -230,7 +236,7 @@ export class VitestExecutor implements TestExecutor {
             browser: browserOptions.browser,
             coverage,
             projectName,
-            projectSourceRoot: this.options.projectSourceRoot,
+            projectSourceRoot,
             optimizeDepsInclude: this.externalMetadata.implicitBrowser,
             reporters,
             setupFiles: testSetupFiles,
