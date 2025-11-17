@@ -127,7 +127,11 @@ export async function normalizeOptions(
     dumpVirtualFiles: options.dumpVirtualFiles,
     listTests: options.listTests,
     runnerConfig:
-      typeof runnerConfig === 'string' ? path.resolve(workspaceRoot, runnerConfig) : runnerConfig,
+      typeof runnerConfig === 'string'
+        ? runnerConfig.length === 0
+          ? true
+          : path.resolve(workspaceRoot, runnerConfig)
+        : runnerConfig,
   };
 }
 
