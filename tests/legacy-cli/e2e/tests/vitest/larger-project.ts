@@ -12,26 +12,7 @@ export default async function () {
   // Each generated artifact will add one more test file.
   const initialTestCount = 1;
 
-  // Generate a mix of components, services, and pipes
-  for (let i = 0; i < artifactCount; i++) {
-    const type = i % 3;
-    const name = `test-artifact-${i}`;
-    let generateType;
-
-    switch (type) {
-      case 0:
-        generateType = 'component';
-        break;
-      case 1:
-        generateType = 'service';
-        break;
-      default:
-        generateType = 'pipe';
-        break;
-    }
-
-    await ng('generate', generateType, name, '--skip-tests=false');
-  }
+  await generateArtifactsInBatches(artifactCount);
 
   const totalTests = initialTestCount + artifactCount;
   const expectedMessage = new RegExp(`${totalTests} passed`);
@@ -43,7 +24,6 @@ export default async function () {
   // Setup for browser mode
   await installPackage('playwright@1');
   await installPackage('@vitest/browser-playwright@4');
-  await exec('npx', 'playwright', 'install', 'chromium', '--only-shell');
 
   // Run tests in browser mode
   const { stdout: browserStdout } = await ng(
@@ -57,4 +37,34 @@ export default async function () {
     expectedMessage,
     `Expected ${totalTests} tests to pass in browser mode.`,
   );
+}
+
+async function generateArtifactsInBatches(artifactCount: number): Promise<void> {
+  const BATCH_SIZE = 5;
+  let commands: Promise<any>[] = [];
+
+  for (let i = 0; i < artifactCount; i++) {
+    const type = i % 3;
+    const name = `test-artifact-${i}`;
+    let generateType: string;
+
+    switch (type) {
+      case 0:
+        generateType = 'component';
+        break;
+      case 1:
+        generateType = 'service';
+        break;
+      default:
+        generateType = 'pipe';
+        break;
+    }
+
+    commands.push(ng('generate', generateType, name, '--skip-tests=false'));
+
+    if (commands.length === BATCH_SIZE || i === artifactCount - 1) {
+      await Promise.all(commands);
+      commands = [];
+    }
+  }
 }

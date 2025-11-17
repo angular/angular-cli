@@ -1,6 +1,6 @@
 import { writeFile } from '../../utils/fs';
 import { installPackage } from '../../utils/packages';
-import { exec, ng } from '../../utils/process';
+import { ng } from '../../utils/process';
 import { applyVitestBuilder } from '../../utils/vitest';
 import assert from 'node:assert';
 
@@ -8,7 +8,6 @@ export default async function () {
   await applyVitestBuilder();
   await installPackage('playwright@1');
   await installPackage('@vitest/browser-playwright@4');
-  await exec('npx', 'playwright', 'install', 'chromium', '--only-shell');
 
   // Add a custom decorator to trigger tslib usage
   await writeFile(
