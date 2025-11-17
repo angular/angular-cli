@@ -285,7 +285,10 @@ async function generateCoverageOption(
   return {
     enabled: coverage.enabled,
     excludeAfterRemap: true,
-    include: coverage.include,
+    // Vitest performs a pre-check and a post-check for sourcemaps.
+    // The pre-check uses the bundled files, so specific bundled entry points and chunks need to be included.
+    // The post-check uses the original source files, so the user's include is used.
+    ...(coverage.include ? { include: ['spec-*.js', 'chunk-*.js', ...coverage.include] } : {}),
     reportsDirectory: toPosixPath(path.join('coverage', projectName)),
     thresholds: coverage.thresholds,
     watermarks: coverage.watermarks,
