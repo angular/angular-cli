@@ -76,7 +76,21 @@ export async function setupBrowserConfiguration(
       // Validate that the imported module has the expected structure
       const providerFactory = providerModule[providerName];
       if (typeof providerFactory === 'function') {
-        provider = providerFactory();
+        if (
+          providerName === 'playwright' &&
+          process.env['CHROME_BIN']?.includes('rules_browsers')
+        ) {
+          // Use the Chrome binary from the 'rules_browsers' toolchain (via CHROME_BIN)
+          // for Playwright when available to ensure hermetic testing, preventing reliance
+          // on locally installed or NPM-managed browser versions.
+          provider = providerFactory({
+            launchOptions: {
+              executablePath: process.env.CHROME_BIN,
+            },
+          });
+        } else {
+          provider = providerFactory();
+        }
       } else {
         errors ??= [];
         errors.push(
