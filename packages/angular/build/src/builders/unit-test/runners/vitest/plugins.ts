@@ -10,6 +10,7 @@ import assert from 'node:assert';
 import { readFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import path from 'node:path';
+import { platform } from 'node:os';
 import type {
   BrowserConfigOptions,
   InlineConfig,
@@ -171,6 +172,10 @@ export function createVitestPlugins(pluginOptions: PluginOptions): VitestPlugins
       name: 'angular:test-in-memory-provider',
       enforce: 'pre',
       resolveId: (id, importer) => {
+        if (id[0] === '/' && platform() === 'win32' && path.isAbsolute(id.slice(1))) {
+          return id.slice(1);
+        }
+
         if (importer && (id[0] === '.' || id[0] === '/')) {
           let fullPath;
           if (testFileToEntryPoint.has(importer)) {

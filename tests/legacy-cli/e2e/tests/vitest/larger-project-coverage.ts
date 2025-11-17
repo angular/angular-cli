@@ -1,10 +1,10 @@
-import { ng } from '../../utils/process';
+import { ng, noSilentNg } from '../../utils/process';
 import { applyVitestBuilder } from '../../utils/vitest';
 import assert from 'node:assert';
 import { installPackage } from '../../utils/packages';
 import { exec } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';
-import { readFile } from '../../utils/fs';
+import { readFile, replaceInFile } from '../../utils/fs';
 
 export default async function () {
   await applyVitestBuilder();
@@ -59,20 +59,22 @@ export default async function () {
   const expectedMessage = new RegExp(`${totalTests} passed`);
   const coverageJsonPath = 'coverage/test-project/coverage-final.json';
 
+  // await replaceInFile(
+  //   'node_modules/@vitest/coverage-v8/dist/provider.js',
+  //   `removeStartsWith(url, FILE_PROTOCOL)`,
+  //   `fileURLToPath(url)`,
+  // );
+
   // Run tests in default (JSDOM) mode with coverage
-  const { stdout: jsdomStdout } = await ng('test', '--no-watch', '--coverage');
+  const { stdout: jsdomStdout } = await noSilentNg('test', '--no-watch', '--coverage');
   assert.match(jsdomStdout, expectedMessage, `Expected ${totalTests} tests to pass in JSDOM mode.`);
 
-  // TODO: Investigate why coverage-final.json is empty on Windows in JSDOM mode.
-  // For now, skip the coverage report check on Windows.
-  if (process.platform !== 'win32') {
-    // Assert that every generated file is in the coverage report by reading the JSON output.
-    const jsdomSummary = JSON.parse(await readFile(coverageJsonPath));
-    const jsdomSummaryKeys = Object.keys(jsdomSummary);
-    for (const file of generatedFiles) {
-      const found = jsdomSummaryKeys.some((key) => key.endsWith(file));
-      assert.ok(found, `Expected ${file} to be in the JSDOM coverage report.`);
-    }
+  // Assert that every generated file is in the coverage report by reading the JSON output.
+  const jsdomSummary = JSON.parse(await readFile(coverageJsonPath));
+  const jsdomSummaryKeys = Object.keys(jsdomSummary);
+  for (const file of generatedFiles) {
+    const found = jsdomSummaryKeys.some((key) => key.endsWith(file));
+    assert.ok(found, `Expected ${file} to be in the JSDOM coverage report.`);
   }
 
   // Setup for browser mode
@@ -81,7 +83,7 @@ export default async function () {
   await exec('npx', 'playwright', 'install', 'chromium', '--only-shell');
 
   // Run tests in browser mode with coverage
-  const { stdout: browserStdout } = await ng(
+  const { stdout: browserStdout } = await noSilentNg(
     'test',
     '--no-watch',
     '--coverage',
