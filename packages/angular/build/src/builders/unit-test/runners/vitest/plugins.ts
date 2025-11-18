@@ -163,6 +163,14 @@ export async function createVitestConfigPlugin(
   };
 }
 
+async function loadResultFile(file: ResultFile): Promise<string> {
+  if (file.origin === 'memory') {
+    return new TextDecoder('utf-8').decode(file.contents);
+  }
+
+  return readFile(file.inputPath, 'utf-8');
+}
+
 export function createVitestPlugins(pluginOptions: PluginOptions): VitestPlugins {
   const { workspaceRoot, buildResultFiles, testFileToEntryPoint } = pluginOptions;
 
@@ -221,17 +229,10 @@ export function createVitestPlugins(pluginOptions: PluginOptions): VitestPlugins
 
         const outputFile = buildResultFiles.get(outputPath);
         if (outputFile) {
+          const code = await loadResultFile(outputFile);
           const sourceMapPath = outputPath + '.map';
           const sourceMapFile = buildResultFiles.get(sourceMapPath);
-          const code =
-            outputFile.origin === 'memory'
-              ? Buffer.from(outputFile.contents).toString('utf-8')
-              : await readFile(outputFile.inputPath, 'utf-8');
-          const sourceMapText = sourceMapFile
-            ? sourceMapFile.origin === 'memory'
-              ? Buffer.from(sourceMapFile.contents).toString('utf-8')
-              : await readFile(sourceMapFile.inputPath, 'utf-8')
-            : undefined;
+          const sourceMapText = sourceMapFile ? await loadResultFile(sourceMapFile) : undefined;
 
           // Vitest will include files in the coverage report if the sourcemap contains no sources.
           // For builder-internal generated code chunks, which are typically helper functions,
