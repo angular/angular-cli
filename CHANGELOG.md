@@ -1,3 +1,15 @@
+<a name="21.0.0-rc.6"></a>
+
+# 21.0.0-rc.6 (2025-11-18)
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                                   |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------- |
+| [e33e77d12](https://github.com/angular/angular-cli/commit/e33e77d12984446fe7bc77deb7438806817ba8a7) | fix  | flag '--file-name-style-guide=2016' - wrong import in main.ts |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="21.0.0-rc.5"></a>
 
 # 21.0.0-rc.5 (2025-11-17)
