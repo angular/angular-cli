@@ -65,7 +65,7 @@ export async function findTests(
     });
 
     for (const match of globMatches) {
-      resolvedTestFiles.add(match);
+      resolvedTestFiles.add(toPosixPath(match));
     }
   }
 
@@ -261,15 +261,15 @@ async function resolveStaticPattern(
   for (const infix of TEST_FILE_INFIXES) {
     const potentialSpec = join(dirname(fullPath), `${baseName}${infix}${fileExt}`);
     if (await exists(potentialSpec)) {
-      return { resolved: [potentialSpec], unresolved: [] };
+      return { resolved: [toPosixPath(potentialSpec)], unresolved: [] };
     }
   }
 
   if (await exists(fullPath)) {
-    return { resolved: [fullPath], unresolved: [] };
+    return { resolved: [toPosixPath(fullPath)], unresolved: [] };
   }
 
-  return { resolved: [], unresolved: [pattern] };
+  return { resolved: [], unresolved: [toPosixPath(pattern)] };
 }
 
 /** Checks if a path exists and is a directory. */
