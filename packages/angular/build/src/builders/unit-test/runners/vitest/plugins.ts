@@ -171,29 +171,33 @@ export function createVitestPlugins(pluginOptions: PluginOptions): VitestPlugins
       name: 'angular:test-in-memory-provider',
       enforce: 'pre',
       resolveId: (id, importer) => {
-        if (importer && (id[0] === '.' || id[0] === '/')) {
-          let fullPath;
-          if (testFileToEntryPoint.has(importer)) {
-            fullPath = toPosixPath(path.join(workspaceRoot, id));
-          } else {
-            fullPath = toPosixPath(path.join(path.dirname(importer), id));
-          }
-
-          const relativePath = path.relative(workspaceRoot, fullPath);
-          if (buildResultFiles.has(toPosixPath(relativePath))) {
-            return fullPath;
-          }
-        }
-
+        // Fast path for test entry points.
         if (testFileToEntryPoint.has(id)) {
           return id;
         }
 
-        assert(buildResultFiles.size > 0, 'buildResult must be available for resolving.');
-        const relativePath = path.relative(workspaceRoot, id);
-        if (buildResultFiles.has(toPosixPath(relativePath))) {
-          return id;
+        // Determine the base directory for resolution.
+        let baseDir: string;
+        if (importer) {
+          // If the importer is a test entry point, resolve relative to the workspace root.
+          // Otherwise, resolve relative to the importer's directory.
+          baseDir = testFileToEntryPoint.has(importer) ? workspaceRoot : path.dirname(importer);
+        } else {
+          // If there's no importer, assume the id is relative to the workspace root.
+          baseDir = workspaceRoot;
         }
+
+        // Construct the full, absolute path and normalize it to POSIX format.
+        const fullPath = toPosixPath(path.join(baseDir, id));
+
+        // Check if the resolved path corresponds to a known build artifact.
+        const relativePath = path.relative(workspaceRoot, fullPath);
+        if (buildResultFiles.has(toPosixPath(relativePath))) {
+          return fullPath;
+        }
+
+        // If the module cannot be resolved from the build artifacts, let other plugins handle it.
+        return undefined;
       },
       load: async (id) => {
         assert(buildResultFiles.size > 0, 'buildResult must be available for in-memory loading.');
