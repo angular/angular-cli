@@ -15,6 +15,17 @@ package(default_visibility = ["//visibility:public"])
 
 npm_link_all_packages()
 
+genrule(
+    name = "angular_best_practices",
+    srcs = [
+        "//:node_modules/@angular/core/dir",
+    ],
+    outs = ["src/commands/mcp/resources/best-practices.md"],
+    cmd = """
+        cp "$(location //:node_modules/@angular/core/dir)/resources/best-practices.md" $@
+    """,
+)
+
 RUNTIME_ASSETS = glob(
     include = [
         "bin/**/*",
@@ -27,6 +38,7 @@ RUNTIME_ASSETS = glob(
 ) + [
     "//packages/angular/cli:lib/config/schema.json",
     "//packages/angular/cli:lib/code-examples.db",
+    ":angular_best_practices",
 ]
 
 ts_project(

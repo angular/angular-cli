@@ -45,11 +45,24 @@ copy_to_bin(
     srcs = glob(["**/schema.json"]),
 )
 
+genrule(
+    name = "angular_best_practices",
+    srcs = [
+        "//:node_modules/@angular/core/dir",
+    ],
+    outs = ["ai-config/files/__rulesName__.template"],
+    cmd = """
+        echo -e "<% if (frontmatter) { %><%= frontmatter %>\\n<% } %>" > $@
+        cat "$(location //:node_modules/@angular/core/dir)/resources/best-practices.md" >> $@
+    """,
+)
+
 RUNTIME_ASSETS = [
     "collection.json",
     "migrations/migration-collection.json",
     "package.json",
     "utility/latest-versions/package.json",
+    ":angular_best_practices",
 ] + glob(
     include = [
         "*/schema.json",
@@ -115,13 +128,12 @@ ts_project(
         include = [
             "**/*_spec.ts",
             "utility/test/**/*.ts",
-            "refactor/jasmine-vitest/test-helpers.ts",
         ],
         exclude = [
             # NB: we need to exclude the nested node_modules that is laid out by yarn workspaces
             "node_modules/**",
         ],
-    ),
+    ) + ["refactor/jasmine-vitest/test-helpers.ts"],
     deps = [
         ":angular",
         ":node_modules/@angular-devkit/core",
