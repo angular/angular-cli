@@ -2,7 +2,6 @@ import { ng } from '../../utils/process';
 import { applyVitestBuilder } from '../../utils/vitest';
 import assert from 'node:assert';
 import { installPackage } from '../../utils/packages';
-import { exec } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';
 import { readFile } from '../../utils/fs';
 
@@ -27,33 +26,7 @@ export default async function () {
 
   const artifactCount = 100;
   const initialTestCount = 1;
-  const generatedFiles: string[] = [];
-
-  // Generate a mix of components, services, and pipes
-  for (let i = 0; i < artifactCount; i++) {
-    const type = i % 3;
-    const name = `test-artifact${i}`;
-    let generateType;
-    let fileSuffix;
-
-    switch (type) {
-      case 0:
-        generateType = 'component';
-        fileSuffix = '.ts';
-        break;
-      case 1:
-        generateType = 'service';
-        fileSuffix = '.ts';
-        break;
-      default:
-        generateType = 'pipe';
-        fileSuffix = '-pipe.ts';
-        break;
-    }
-
-    await ng('generate', generateType, name, '--skip-tests=false');
-    generatedFiles.push(`${name}${fileSuffix}`);
-  }
+  const generatedFiles = await generateArtifactsInBatches(artifactCount);
 
   const totalTests = initialTestCount + artifactCount;
   const expectedMessage = new RegExp(`${totalTests} passed`);
@@ -78,7 +51,6 @@ export default async function () {
   // Setup for browser mode
   await installPackage('playwright@1');
   await installPackage('@vitest/browser-playwright@4');
-  await exec('npx', 'playwright', 'install', 'chromium', '--only-shell');
 
   // Run tests in browser mode with coverage
   const { stdout: browserStdout } = await ng(
@@ -101,4 +73,43 @@ export default async function () {
     const found = browserSummaryKeys.some((key) => key.endsWith(file));
     assert.ok(found, `Expected ${file} to be in the browser coverage report.`);
   }
+}
+
+async function generateArtifactsInBatches(artifactCount: number): Promise<string[]> {
+  const BATCH_SIZE = 5;
+  const generatedFiles: string[] = [];
+  let commands: Promise<any>[] = [];
+
+  for (let i = 0; i < artifactCount; i++) {
+    const type = i % 3;
+    const name = `test-artifact-${i}`;
+
+    let generateType: string;
+    let fileSuffix: string;
+
+    switch (type) {
+      case 0:
+        generateType = 'component';
+        fileSuffix = '.ts';
+        break;
+      case 1:
+        generateType = 'service';
+        fileSuffix = '.ts';
+        break;
+      default:
+        generateType = 'pipe';
+        fileSuffix = '-pipe.ts';
+        break;
+    }
+
+    commands.push(ng('generate', generateType, name, '--skip-tests=false'));
+    generatedFiles.push(`${name}${fileSuffix}`);
+
+    if (commands.length === BATCH_SIZE || i === artifactCount - 1) {
+      await Promise.all(commands);
+      commands = [];
+    }
+  }
+
+  return generatedFiles;
 }
