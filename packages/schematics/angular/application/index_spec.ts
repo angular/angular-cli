@@ -876,8 +876,10 @@ describe('Application Schematic', () => {
       const options = { ...defaultOptions, fileNameStyleGuide: '2016' as const };
       const tree = await schematicRunner.runSchematic('application', options, workspaceTree);
       const component = tree.readContent('/projects/foo/src/app/app.component.ts');
+      const main = tree.readContent('/projects/foo/src/main.ts');
       expect(component).toContain(`templateUrl: './app.component.html'`);
       expect(component).toContain(`styleUrl: './app.component.css'`);
+      expect(main).toContain(`import { App } from './app/app.component'`);
     });
 
     it('should create a test file with import from the path without suffix', async () => {
