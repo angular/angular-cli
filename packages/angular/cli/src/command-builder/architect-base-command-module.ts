@@ -12,8 +12,7 @@ import {
   WorkspaceNodeModulesArchitectHost,
 } from '@angular-devkit/architect/node';
 import { json } from '@angular-devkit/core';
-import { existsSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { createRequire } from 'node:module';
 import { isPackageNameSafeForAnalytics } from '../analytics/analytics';
 import { EventCustomDimension, EventCustomMetric } from '../analytics/analytics-parameters';
 import { assertIsError } from '../utilities/error';
@@ -210,15 +209,13 @@ export abstract class ArchitectBaseCommandModule<T extends object>
       return;
     }
 
-    // Check if yarn PnP is used. https://yarnpkg.com/advanced/pnpapi#processversionspnp
-    if (process.versions.pnp) {
-      return;
-    }
+    const workspaceResolve = createRequire(basePath + '/').resolve;
 
-    // Check for a `node_modules` directory (npm, yarn non-PnP, etc.)
-    if (existsSync(resolve(basePath, 'node_modules'))) {
+    try {
+      workspaceResolve('@angular/core');
+
       return;
-    }
+    } catch {}
 
     this.context.logger.warn(
       `Node packages may not be installed. Try installing with '${this.context.packageManager.name} install'.`,
