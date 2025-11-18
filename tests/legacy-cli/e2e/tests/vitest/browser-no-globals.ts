@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { writeFile } from '../../utils/fs';
 import { installPackage } from '../../utils/packages';
-import { exec, ng } from '../../utils/process';
+import { ng } from '../../utils/process';
 import { applyVitestBuilder } from '../../utils/vitest';
 
 /**
@@ -13,8 +13,6 @@ export default async function (): Promise<void> {
 
   await installPackage('playwright@1');
   await installPackage('@vitest/browser-playwright@4');
-
-  await exec('npx', 'playwright', 'install', 'chromium', '--only-shell');
 
   await writeFile(
     'src/app/app.spec.ts',
