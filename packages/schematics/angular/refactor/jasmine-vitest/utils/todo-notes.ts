@@ -120,6 +120,9 @@ export const TODO_NOTES = {
       ' Please refactor to access .args directly or use vi.mocked(spy).mock.lastCall.',
     url: 'https://vitest.dev/api/mocked.html#mock-lastcall',
   },
+  'unhandled-done-usage': {
+    message: "The 'done' callback was used in an unhandled way. Please migrate manually.",
+  },
 } as const;
 
 /**
