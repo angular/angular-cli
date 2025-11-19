@@ -1,3 +1,15 @@
+<a name="20.3.11"></a>
+
+# 20.3.11 (2025-11-19)
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                                          |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------------- |
+| [8053f2d92](https://github.com/angular/angular-cli/commit/8053f2d92a68a8bd01854eb81aa472249f5a83b2) | fix  | ensure `ɵgetOrCreateAngularServerApp` is always defined after errors |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="21.0.0-rc.6"></a>
 
 # 21.0.0-rc.6 (2025-11-18)
