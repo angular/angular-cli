@@ -85,10 +85,13 @@ describe('Jasmine to Vitest Transformer', () => {
       {
         description: 'should handle arrayWithExactContents containing nested asymmetric matchers',
         input: `expect(myArray).toEqual(jasmine.arrayWithExactContents([jasmine.objectContaining({ id: 1 })]));`,
+        /* eslint-disable max-len */
         expected: `
+          // TODO: vitest-migration: Verify this matches strict array content (multiset equality). Vitest's arrayContaining is a subset check.
           expect(myArray).toHaveLength(1);
           expect(myArray).toEqual(expect.arrayContaining([expect.objectContaining({ id: 1 })]));
         `,
+        /* eslint-enable max-len */
       },
       {
         description: 'should handle a spy rejecting with an asymmetric matcher',
