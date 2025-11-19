@@ -4,8 +4,8 @@ module(
     name = "angular_cli",
 )
 
-bazel_dep(name = "yq.bzl", version = "0.3.1")
-bazel_dep(name = "rules_nodejs", version = "6.6.1")
+bazel_dep(name = "yq.bzl", version = "0.3.2")
+bazel_dep(name = "rules_nodejs", version = "6.6.2")
 bazel_dep(name = "aspect_rules_js", version = "2.8.1")
 bazel_dep(name = "aspect_rules_ts", version = "3.7.1")
 bazel_dep(name = "rules_pkg", version = "0.8.1")
@@ -47,7 +47,7 @@ git_override(
 bazel_dep(name = "rules_browsers")
 git_override(
     module_name = "rules_browsers",
-    commit = "6a699bf3e896690e2923cf3ade29fbd4e492e366",
+    commit = "f066f614451374721fac787fb1f0dbbd818d50d4",
     remote = "https://github.com/devversion/rules_browsers.git",
 )
 
