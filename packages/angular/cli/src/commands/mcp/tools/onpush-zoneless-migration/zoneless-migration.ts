@@ -21,7 +21,7 @@ import { sendDebugMessage } from './send_debug_message';
 import { createSourceFile, getImportSpecifier } from './ts_utils';
 
 export const ZONELESS_MIGRATION_TOOL = declareTool({
-  name: 'onpush-zoneless-migration',
+  name: 'onpush_zoneless_migration',
   title: 'Plan migration to OnPush and/or zoneless',
   description: `
 <Purpose>
