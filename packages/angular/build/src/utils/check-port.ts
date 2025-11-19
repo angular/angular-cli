@@ -32,7 +32,7 @@ export async function checkPort(port: number, host: string): Promise<number> {
           return;
         }
 
-        if (!isTTY) {
+        if (!isTTY()) {
           reject(createInUseError(port));
 
           return;
