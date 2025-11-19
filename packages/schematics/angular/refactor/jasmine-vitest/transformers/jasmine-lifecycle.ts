@@ -282,6 +282,19 @@ function transformPromiseBasedDone(
   return undefined;
 }
 
+function countDoneUsages(node: ts.Node, doneIdentifier: ts.Identifier): number {
+  let count = 0;
+  const visitor = (n: ts.Node) => {
+    if (ts.isIdentifier(n) && n.text === doneIdentifier.text) {
+      count++;
+    }
+    ts.forEachChild(n, visitor);
+  };
+  ts.forEachChild(node, visitor);
+
+  return count;
+}
+
 export function transformDoneCallback(node: ts.Node, refactorCtx: RefactorContext): ts.Node {
   const { sourceFile, reporter, tsContext } = refactorCtx;
   if (
@@ -309,12 +322,17 @@ export function transformDoneCallback(node: ts.Node, refactorCtx: RefactorContex
     return node;
   }
   const doneIdentifier = doneParam.name;
+
+  // Count total usages of 'done' in the body
+  const totalUsages = countDoneUsages(functionArg.body, doneIdentifier);
+  let handledUsages = 0;
   let doneWasUsed = false;
 
   const bodyVisitor = (bodyNode: ts.Node): ts.Node | ts.Node[] | undefined => {
     const complexTransformed = transformComplexDoneCallback(bodyNode, doneIdentifier, refactorCtx);
     if (complexTransformed !== bodyNode) {
       doneWasUsed = true;
+      handledUsages++; // complex transform handles one usage
 
       return complexTransformed;
     }
@@ -330,6 +348,7 @@ export function transformDoneCallback(node: ts.Node, refactorCtx: RefactorContex
         callExpr.expression.name.text === 'fail'
       ) {
         doneWasUsed = true;
+        handledUsages++;
         reporter.reportTransformation(
           sourceFile,
           bodyNode,
@@ -350,6 +369,7 @@ export function transformDoneCallback(node: ts.Node, refactorCtx: RefactorContex
       const promiseTransformed = transformPromiseBasedDone(callExpr, doneIdentifier, refactorCtx);
       if (promiseTransformed) {
         doneWasUsed = true;
+        handledUsages++;
 
         return promiseTransformed;
       }
@@ -360,6 +380,7 @@ export function transformDoneCallback(node: ts.Node, refactorCtx: RefactorContex
         callExpr.expression.text === doneIdentifier.text
       ) {
         doneWasUsed = true;
+        handledUsages++;
 
         return ts.setTextRange(ts.factory.createEmptyStatement(), callExpr.expression);
       }
@@ -382,6 +403,20 @@ export function transformDoneCallback(node: ts.Node, refactorCtx: RefactorContex
 
     return bodyVisitor(node);
   });
+
+  // Safety check: if we found usages but didn't handle all of them, abort.
+  if (handledUsages < totalUsages) {
+    reporter.reportTransformation(
+      sourceFile,
+      node,
+      `Found unhandled usage of \`${doneIdentifier.text}\` callback. Skipping transformation.`,
+    );
+    const category = 'unhandled-done-usage';
+    reporter.recordTodo(category);
+    addTodoComment(node, category);
+
+    return node;
+  }
 
   if (!doneWasUsed) {
     return node;

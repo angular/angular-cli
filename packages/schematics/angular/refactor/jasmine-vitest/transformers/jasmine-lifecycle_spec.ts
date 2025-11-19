@@ -132,6 +132,7 @@ describe('Jasmine to Vitest Transformer', () => {
           });
         `,
         expected: `
+          // TODO: vitest-migration: The 'done' callback was used in an unhandled way. Please migrate manually.
           it('should not transform a function with a parameter that is not a done callback', (value) => {
             expect(value).toBe(true);
           });
@@ -154,6 +155,20 @@ describe('Jasmine to Vitest Transformer', () => {
             await myPromise.then(() => {
               myValue = true;
             });
+          });
+        `,
+      },
+      {
+        description: 'should add a TODO for unhandled done usage',
+        input: `
+          it('should do something with helper', (done) => {
+            someHelper(done);
+          });
+        `,
+        expected: `
+          // TODO: vitest-migration: The 'done' callback was used in an unhandled way. Please migrate manually.
+          it('should do something with helper', (done) => {
+            someHelper(done);
           });
         `,
       },
