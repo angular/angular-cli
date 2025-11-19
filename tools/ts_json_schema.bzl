@@ -12,6 +12,7 @@ def ts_json_schema(name, src, data = []):
         name = name + ".interface",
         outs = [out],
         srcs = [src] + data,
+        tags = ["schema"],
         tool = "//tools:quicktype_runner",
         progress_message = "Generating TS interface for %s" % src,
         mnemonic = "TsJsonSchema",

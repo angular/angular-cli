@@ -15,6 +15,7 @@
     "bazel": "bazelisk",
     "test": "bazel test //packages/...",
     "build": "pnpm -s admin build",
+    "build-schema": "bazel build //... --build_tag_filters schema --symlink_prefix dist-schema/",
     "lint": "eslint --cache --max-warnings=0 \"**/*.@(ts|mts|cts)\"",
     "templates": "pnpm -s admin templates",
     "validate": "pnpm -s admin validate",
