@@ -225,19 +225,25 @@ expect(mySpyObj).toHaveSpyInteractions();`,
       {
         description: 'should transform toEqual(jasmine.arrayWithExactContents()) into two calls',
         input: `expect(myArray).toEqual(jasmine.arrayWithExactContents(['a', 'b']));`,
+        /* eslint-disable max-len */
         expected: `
+          // TODO: vitest-migration: Verify this matches strict array content (multiset equality). Vitest's arrayContaining is a subset check.
           expect(myArray).toHaveLength(2);
           expect(myArray).toEqual(expect.arrayContaining(['a', 'b']));
         `,
+        /* eslint-enable max-len */
       },
       {
         description:
           'should transform toEqual(jasmine.arrayWithExactContents()) with asymmetric matchers',
         input: `expect(myArray).toEqual(jasmine.arrayWithExactContents([jasmine.any(Number), 'a']));`,
+        /* eslint-disable max-len */
         expected: `
+          // TODO: vitest-migration: Verify this matches strict array content (multiset equality). Vitest's arrayContaining is a subset check.
           expect(myArray).toHaveLength(2);
           expect(myArray).toEqual(expect.arrayContaining([expect.any(Number), 'a']));
         `,
+        /* eslint-enable max-len */
       },
       {
         description:
