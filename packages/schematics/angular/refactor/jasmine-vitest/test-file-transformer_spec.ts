@@ -78,7 +78,7 @@ describe('Jasmine to Vitest Transformer', () => {
         input: `const spy = jasmine.createSpyObj('MyService', { getPromise: Promise.resolve(jasmine.any(String)) });`,
         expected: `
           const spy = {
-            getPromise: vi.fn().mockReturnValue(Promise.resolve(expect.any(String))),
+            getPromise: vi.fn().mockName("MyService.getPromise").mockReturnValue(Promise.resolve(expect.any(String))),
           };
         `,
       },
@@ -105,8 +105,8 @@ describe('Jasmine to Vitest Transformer', () => {
         `,
         expected: `
           const myService = {
-            methodA: vi.fn(),
-            propA: 'valueA'
+            methodA: vi.fn().mockName("MyService.methodA"),
+            propA: 'valueA',
           };
           vi.spyOn(myService, 'methodA').mockReturnValue('mocked value');
           myService.methodA('test');

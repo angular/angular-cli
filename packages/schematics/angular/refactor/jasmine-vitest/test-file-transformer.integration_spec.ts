@@ -255,14 +255,15 @@ describe('Jasmine to Vitest Transformer - Integration Tests', () => {
       });
     `;
 
+    /* eslint-disable max-len */
     const vitestCode = `
       describe('Complex Scenarios', () => {
         let serviceMock;
 
         beforeEach(() => {
           serviceMock = {
-            getData: vi.fn().mockReturnValue(expect.any(String)),
-            process: vi.fn().mockReturnValue(undefined),
+            getData: vi.fn().mockName("MyService.getData").mockReturnValue(expect.any(String)),
+            process: vi.fn().mockName("MyService.process").mockReturnValue(undefined),
           };
         });
 
@@ -299,6 +300,7 @@ describe('Jasmine to Vitest Transformer - Integration Tests', () => {
         });
       });
     `;
+    /* eslint-enable max-len */
 
     await expectTransformation(jasmineCode, vitestCode);
   });
