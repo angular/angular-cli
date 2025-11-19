@@ -9,6 +9,7 @@
 import assert from 'node:assert';
 import { readFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
+import { platform } from 'node:os';
 import path from 'node:path';
 import type {
   BrowserConfigOptions,
@@ -173,6 +174,7 @@ async function loadResultFile(file: ResultFile): Promise<string> {
 
 export function createVitestPlugins(pluginOptions: PluginOptions): VitestPlugins {
   const { workspaceRoot, buildResultFiles, testFileToEntryPoint } = pluginOptions;
+  const isWindows = platform() === 'win32';
 
   return [
     {
@@ -182,6 +184,31 @@ export function createVitestPlugins(pluginOptions: PluginOptions): VitestPlugins
         // Fast path for test entry points.
         if (testFileToEntryPoint.has(id)) {
           return id;
+        }
+
+        // Workaround for Vitest in Windows when a fully qualified absolute path is provided with
+        // a superfluous leading slash. This can currently occur with the `@vitest/coverage-v8` provider
+        // when it uses `removeStartsWith(url, FILE_PROTOCOL)` to convert a file URL resulting in
+        // `/D:/tmp_dir/...` instead of `D:/tmp_dir/...`.
+        if (id[0] === '/' && isWindows) {
+          const slicedId = id.slice(1);
+          if (path.isAbsolute(slicedId)) {
+            return slicedId;
+          }
+        }
+
+        if (importer && (id[0] === '.' || id[0] === '/')) {
+          let fullPath;
+          if (testFileToEntryPoint.has(importer)) {
+            fullPath = toPosixPath(path.join(workspaceRoot, id));
+          } else {
+            fullPath = toPosixPath(path.join(path.dirname(importer), id));
+          }
+
+          const relativePath = path.relative(workspaceRoot, fullPath);
+          if (buildResultFiles.has(toPosixPath(relativePath))) {
+            return fullPath;
+          }
         }
 
         // Determine the base directory for resolution.
