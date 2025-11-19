@@ -69,10 +69,15 @@ Releasing is performed using Angular's unified release tooling. Each week, two r
 
 Once FW releases the actual minor/major release (for example: `13.0.0` or `13.1.0`), update dependencies with the following:
 
-1.  Update [`constants.bzl`](../../constants.bzl) so `@angular/core` and `ng-packagr` are using the release version (drop `-next.0`).
+1.  Update [`constants.bzl`](../../constants.bzl) so `@angular/core` and `ng-packagr` are using the release version (drop `-rc.*`).
+2.  Update all `package.json` dependencies on framework packages to to the release version (drop `-rc.*`).
+    - Components packages release _after_ CLI, so those should be left as `-rc.*`.
+3.  `pnpm install` to update the `pnpm-lock.yaml` file.
 
-Merge the above change in a separate PR which lands _after_ FW releases (or else CI will fail) but _before_ the CLI
-release PR. Releases are built before the PR is sent for review, so any changes after that point won't be included in the release.
+Create a PR with the above changes ([example](https://github.com/angular/angular-cli/pull/31872)) and merge it directly to the RC
+branch. This PR must land _after_ FW releases (or else CI will fail) but _before_ the CLI release PR. Releases are built before
+the PR is sent for review, so any changes after that point won't be included in the release and this cannot be combined with the
+release PR.
 
 **AFTER a minor OR major CLI release:**
 
