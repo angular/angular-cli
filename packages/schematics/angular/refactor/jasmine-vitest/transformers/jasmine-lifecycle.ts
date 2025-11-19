@@ -85,7 +85,7 @@ export function transformPending(
         'Converted `pending()` to a skipped test (`it.skip`).',
       );
       const category = 'pending';
-      reporter.recordTodo(category);
+      reporter.recordTodo(category, sourceFile, bodyNode);
       addTodoComment(replacement, category);
       ts.addSyntheticLeadingComment(
         replacement,
@@ -412,7 +412,7 @@ export function transformDoneCallback(node: ts.Node, refactorCtx: RefactorContex
       `Found unhandled usage of \`${doneIdentifier.text}\` callback. Skipping transformation.`,
     );
     const category = 'unhandled-done-usage';
-    reporter.recordTodo(category);
+    reporter.recordTodo(category, sourceFile, node);
     addTodoComment(node, category);
 
     return node;

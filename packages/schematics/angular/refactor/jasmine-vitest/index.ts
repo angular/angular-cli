@@ -130,6 +130,11 @@ export default function (options: Schema): Rule {
       }
     }
 
+    if (options.report) {
+      const reportContent = reporter.generateReportContent();
+      tree.create(`jasmine-vitest-${new Date().toISOString()}.md`, reportContent);
+    }
+
     reporter.printSummary(options.verbose);
   };
 }
