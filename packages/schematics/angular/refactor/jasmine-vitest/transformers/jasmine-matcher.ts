@@ -451,10 +451,14 @@ export function transformArrayWithExactContents(
     ],
   );
 
-  return [
-    ts.factory.createExpressionStatement(lengthCall),
-    ts.factory.createExpressionStatement(containingCall),
-  ];
+  const lengthStmt = ts.factory.createExpressionStatement(lengthCall);
+  const containingStmt = ts.factory.createExpressionStatement(containingCall);
+
+  const category = 'arrayWithExactContents-check';
+  reporter.recordTodo(category);
+  addTodoComment(lengthStmt, category);
+
+  return [lengthStmt, containingStmt];
 }
 
 export function transformCalledOnceWith(

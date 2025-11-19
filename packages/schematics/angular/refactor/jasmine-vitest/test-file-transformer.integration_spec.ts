@@ -275,6 +275,7 @@ describe('Jasmine to Vitest Transformer - Integration Tests', () => {
 
         it('should handle array contents checking', () => {
           const arr = [1, 2, 3];
+          // TODO: vitest-migration: Verify this matches strict array content (multiset equality). Vitest's arrayContaining is a subset check.
           expect(arr).toHaveLength(3);
           expect(arr).toEqual(expect.arrayContaining([3, 2, 1]));
         });
