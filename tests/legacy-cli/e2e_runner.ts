@@ -15,6 +15,7 @@ import { extractFile } from './e2e/utils/tar';
 import { realpathSync } from 'node:fs';
 import { PkgInfo } from './e2e/utils/packages';
 import { getTestProjectDir } from './e2e/utils/project';
+import { mktempd } from './e2e/utils/utils';
 
 Error.stackTraceLimit = Infinity;
 
@@ -31,13 +32,9 @@ Error.stackTraceLimit = Infinity;
  *   --ng-snapshots    Install angular snapshot builds in the test project.
  *   --glob            Run tests matching this glob pattern (relative to tests/e2e/).
  *   --ignore          Ignore tests matching this glob pattern.
- *   --reuse=/path     Use a path instead of create a new project. That project should have been
- *                     created, and npm installed. Ideally you want a project created by a previous
- *                     run of e2e.
  *   --nb-shards       Total number of shards that this is part of. Default is 2 if --shard is
  *                     passed in.
  *   --shard           Index of this processes' shard.
- *   --tmpdir=path     Override temporary directory to use for new projects.
  *   --package-manager Package manager to use.
  *   --package=path    An npm package to be published before running tests
  *
@@ -58,8 +55,6 @@ const parsed = parseArgs({
     'nosilent': { type: 'boolean' },
     'package': { type: 'string', multiple: true, default: ['./dist/_*.tgz'] },
     'package-manager': { type: 'string', default: 'npm' },
-    'reuse': { type: 'string' },
-    'tmpdir': { type: 'string' },
     'verbose': { type: 'boolean' },
 
     'nb-shards': { type: 'string' },
@@ -227,65 +222,68 @@ process.env.CHROME_BIN = path.resolve(process.env.CHROME_BIN!);
 process.env.CHROME_PATH = path.resolve(process.env.CHROME_PATH!);
 process.env.CHROMEDRIVER_BIN = path.resolve(process.env.CHROMEDRIVER_BIN!);
 
-Promise.all([findFreePort(), findFreePort(), findPackageTars()])
-  .then(async ([httpPort, httpsPort, packageTars]) => {
-    setGlobalVariable('package-registry', 'http://localhost:' + httpPort);
-    setGlobalVariable('package-secure-registry', 'http://localhost:' + httpsPort);
-    setGlobalVariable('package-tars', packageTars);
+(async () => {
+  const tempRoot = await mktempd('angular-cli-e2e-', process.env.E2E_TEMP);
+  setGlobalVariable('tmp-root', tempRoot);
 
-    // NPM registries for the lifetime of the test execution
-    const registryProcess = await createNpmRegistry(httpPort, httpPort);
-    const secureRegistryProcess = await createNpmRegistry(httpPort, httpsPort, true);
+  process.on('SIGINT', deleteTemporaryRoot);
+  process.on('exit', deleteTemporaryRoot);
 
-    try {
-      await runSteps(runSetup, allSetups, 'setup');
-      await runSteps(runInitializer, allInitializers, 'initializer');
-      await runSteps(runTest, testsToRun, 'test');
+  const [httpPort, httpsPort, packageTars] = await Promise.all([
+    findFreePort(),
+    findFreePort(),
+    findPackageTars(),
+  ]);
+  setGlobalVariable('package-registry', 'http://localhost:' + httpPort);
+  setGlobalVariable('package-secure-registry', 'http://localhost:' + httpsPort);
+  setGlobalVariable('package-tars', packageTars);
 
-      if (shardId !== null) {
-        console.log(colors.green(`Done shard ${shardId} of ${nbShards}.`));
-      } else {
-        console.log(colors.green('Done.'));
-      }
+  // NPM registries for the lifetime of the test execution
+  const registryProcess = await createNpmRegistry(httpPort, httpPort);
+  const secureRegistryProcess = await createNpmRegistry(httpPort, httpsPort, true);
 
-      process.exitCode = 0;
-    } catch (err) {
-      if (err instanceof Error) {
-        console.log('\n');
-        console.error(colors.red(err.message));
-        if (err.stack) {
-          console.error(colors.red(err.stack));
-        }
-      } else {
-        console.error(colors.red(String(err)));
-      }
+  try {
+    console.log(`  Using "${tempRoot}" as temporary directory for a new project.`);
 
-      if (argv.debug) {
-        console.log(`Current Directory: ${process.cwd()}`);
-        console.log('Will loop forever while you debug... CTRL-C to quit.');
+    await runSteps(runSetup, allSetups, 'setup');
+    await runSteps(runInitializer, allInitializers, 'initializer');
+    await runSteps(runTest, testsToRun, 'test');
 
-        // Wait forever until user explicitly cancels.
-        await new Promise(() => {});
-      }
-
-      process.exitCode = 1;
-    } finally {
-      registryProcess.kill();
-      secureRegistryProcess.kill();
-
-      await rm(getGlobalVariable('projects-root'), {
-        recursive: true,
-        force: true,
-        maxRetries: 3,
-      }).catch(() => {
-        // If this fails it is not fatal.
-      });
+    if (shardId !== null) {
+      console.log(colors.green(`Done shard ${shardId} of ${nbShards}.`));
+    } else {
+      console.log(colors.green('Done.'));
     }
-  })
-  .catch((err) => {
-    console.error(colors.red(`Unkown Error: ${err}`));
+
+    process.exitCode = 0;
+  } catch (err) {
+    if (err instanceof Error) {
+      console.log('\n');
+      console.error(colors.red(err.message));
+      if (err.stack) {
+        console.error(colors.red(err.stack));
+      }
+    } else {
+      console.error(colors.red(String(err)));
+    }
+
+    if (argv.debug) {
+      console.log(`Current Directory: ${process.cwd()}`);
+      console.log('Will loop forever while you debug... CTRL-C to quit.');
+
+      // Wait forever until user explicitly cancels.
+      await new Promise(() => {});
+    }
+
     process.exitCode = 1;
-  });
+  } finally {
+    registryProcess.kill();
+    secureRegistryProcess.kill();
+  }
+})().catch((err) => {
+  console.error(colors.red(`Unkown Error: ${err}`));
+  process.exitCode = 1;
+});
 
 async function runSteps(
   run: (name: string) => Promise<void> | void,
@@ -414,4 +412,14 @@ async function findPackageTars(): Promise<{ [pkg: string]: PkgInfo }> {
     },
     {} as { [pkg: string]: PkgInfo },
   );
+}
+
+function deleteTemporaryRoot(): void {
+  try {
+    fs.rmSync(getGlobalVariable('tmp-root'), {
+      recursive: true,
+      force: true,
+      maxRetries: 3,
+    });
+  } catch {}
 }
