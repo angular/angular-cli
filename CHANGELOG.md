@@ -1,222 +1,153 @@
-<a name="21.0.0-rc.6"></a>
+<a name="21.0.0"></a>
 
-# 21.0.0-rc.6 (2025-11-18)
+# 21.0.0 (2025-11-19)
 
-### @schematics/angular
-
-| Commit                                                                                              | Type | Description                                                   |
-| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------- |
-| [e33e77d12](https://github.com/angular/angular-cli/commit/e33e77d12984446fe7bc77deb7438806817ba8a7) | fix  | flag '--file-name-style-guide=2016' - wrong import in main.ts |
-
-<!-- CHANGELOG SPLIT MARKER -->
-
-<a name="21.0.0-rc.5"></a>
-
-# 21.0.0-rc.5 (2025-11-17)
-
-### @schematics/angular
-
-| Commit                                                                                              | Type | Description                                                       |
-| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------- |
-| [e8feba9ee](https://github.com/angular/angular-cli/commit/e8feba9ee163f688c51d6463336474591e886647) | fix  | add missing typeSeparator to main.ts.template file                |
-| [6615fcf03](https://github.com/angular/angular-cli/commit/6615fcf037686cd96e97b469937b7f0736afaa77) | fix  | issues in apps generated with '--file-name-style-guide=2016' flag |
-
-### @angular/build
-
-| Commit                                                                                              | Type | Description                                                |
-| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------- |
-| [a11dd31f0](https://github.com/angular/angular-cli/commit/a11dd31f0c80a189e7dcb3172c89a731cfc34702) | fix  | configure Vitest cache to use Angular cache                |
-| [f05ffd104](https://github.com/angular/angular-cli/commit/f05ffd104255e86fe93f3736e1430f940cb83007) | fix  | correct Vitest coverage include handling for virtual files |
-| [49b65aba8](https://github.com/angular/angular-cli/commit/49b65aba8d7cd2839776e987366b981d7762760c) | fix  | disable Vitest test isolation by default                   |
-| [fa5c92346](https://github.com/angular/angular-cli/commit/fa5c92346d14a6ad03aa30ad6392fc649038605e) | fix  | prioritize string type for runnerConfig schema             |
-
-<!-- CHANGELOG SPLIT MARKER -->
-
-<a name="21.0.0-rc.4"></a>
-
-# 21.0.0-rc.4 (2025-11-14)
-
-### @angular/build
-
-| Commit                                                                                              | Type | Description                                           |
-| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------- |
-| [f7c4a4c1d](https://github.com/angular/angular-cli/commit/f7c4a4c1dcd575dec82cc06597e3d6620b1be729) | fix  | enhance Vitest resolution for optimal package loading |
-| [0830f4fb5](https://github.com/angular/angular-cli/commit/0830f4fb549e2c45b1ef752dd42f002a1347d7c8) | fix  | ensure TestBed cleanup hooks are always registered    |
-
-<!-- CHANGELOG SPLIT MARKER -->
-
-<a name="21.0.0-rc.3"></a>
-
-# 21.0.0-rc.3 (2025-11-13)
+## Breaking Changes
 
 ### @angular/cli
 
-| Commit                                                                                              | Type | Description                                             |
-| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------- |
-| [4deac3ec7](https://github.com/angular/angular-cli/commit/4deac3ec785b1a53156aac90441d0ed129df71ef) | fix  | support multi-database search in find_examples MCP tool |
+- The `ng` commands will no longer automatically detect and use `cnpm` as the package manager. As an alternative use the `.npmrc` file to ensure npm uses the cnpm registry.
 
 ### @angular/build
 
-| Commit                                                                                              | Type | Description                                                          |
-| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------------- |
-| [fcdbf6c19](https://github.com/angular/angular-cli/commit/fcdbf6c19b5a8549011aebec9e517feb12a99895) | fix  | allow `globals` to be set to false                                   |
-| [931c62d20](https://github.com/angular/angular-cli/commit/931c62d20915c6c772b61d76ab88657c0858f6bd) | fix  | allow unit-test runner config with absolute path                     |
-| [fec106b60](https://github.com/angular/angular-cli/commit/fec106b60553394aab51d713e5437a713085089b) | fix  | enhance Vitest dependency externalization and pre-bundling           |
-| [ee5e127d5](https://github.com/angular/angular-cli/commit/ee5e127d551269fa9a3e39b9b28e38d7ab35806f) | fix  | ensure `ɵgetOrCreateAngularServerApp` is always defined after errors |
-| [55145f582](https://github.com/angular/angular-cli/commit/55145f582253b4ecb47add7ff2ef459b7535dfdb) | fix  | ensure Vitest setup files are executed in order                      |
-| [6576bb598](https://github.com/angular/angular-cli/commit/6576bb5985c18dca7cecd9509939c2a78bf9758a) | fix  | remove explicit test isolation configuration                         |
+- - TypeScript versions older than 5.9 are no longer supported.
+- The `javascriptEnabled` option for Less is no longer supported. Projects relying on inline JavaScript within Less files will need to refactor their stylesheets to remove this dependency.
 
-<!-- CHANGELOG SPLIT MARKER -->
+### @schematics/angular
 
-<a name="21.0.0-rc.2"></a>
-
-# 21.0.0-rc.2 (2025-11-12)
+| Commit                                                                                              | Type | Description                                                        |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------ |
+| [e417c89f9](https://github.com/angular/angular-cli/commit/e417c89f9e9cfe0ce50ffbc72ef555793605aea1) | feat | Add `addTypeToClassName` option to relevant schematics             |
+| [ede5e52bc](https://github.com/angular/angular-cli/commit/ede5e52bc701c42948bd98826cd4fa901350015c) | feat | add `include` option to jasmine-to-vitest schematic                |
+| [c119910f4](https://github.com/angular/angular-cli/commit/c119910f4505e280eea83ea6647b6d279a46f36d) | feat | add AGENTS.md support to ai-config schematic                       |
+| [d0d2a17b8](https://github.com/angular/angular-cli/commit/d0d2a17b8adb2c1ce6eee70494f5d2298622c40e) | feat | add Jasmine spy API transformations to jasmine-to-vitest schematic |
+| [e7d955bed](https://github.com/angular/angular-cli/commit/e7d955bedd5ca6957903cb73f8ebe06823a808da) | feat | add matcher transformations to jasmine-to-vitest schematic         |
+| [629f5cb18](https://github.com/angular/angular-cli/commit/629f5cb181fee562645baf02b44ebb3b39f3fb06) | feat | add misc transformations to jasmine-to-vitest schematic            |
+| [4912f3990](https://github.com/angular/angular-cli/commit/4912f39906b11a3212f11d5a00d577e2a0bacab4) | feat | add Tailwind CSS option to application schematic and `ng new`      |
+| [2a518016d](https://github.com/angular/angular-cli/commit/2a518016d9585dd4d16f90102d5409459ebba024) | feat | Applications are zoneless by default                               |
+| [2ffc527b1](https://github.com/angular/angular-cli/commit/2ffc527b1bbe237e9f732d3506ce3a75ca1ca9d0) | feat | configure Vitest for new projects and allow runner choice          |
+| [58474ec7d](https://github.com/angular/angular-cli/commit/58474ec7dd85fc34639c138d9b8d545affb50e3e) | feat | introduce initial jasmine-to-vitest unit test refactor schematic   |
+| [9f255f2b3](https://github.com/angular/angular-cli/commit/9f255f2b3cc435f3bea2f0266a137176ca599aef) | feat | set `packageManager` in `package.json` on new projects             |
+| [4e6c94f21](https://github.com/angular/angular-cli/commit/4e6c94f21e882c593cf11197900c29d693af9297) | feat | support different file name style guides in `ng new`               |
+| [77741f5ee](https://github.com/angular/angular-cli/commit/77741f5eec735f23b0f2865101471e045e4889b8) | fix  | add 'update-typescript-lib' migration                              |
+| [f89750b27](https://github.com/angular/angular-cli/commit/f89750b27866c307da546fe4f33da980693ca5c1) | fix  | add `addImports` option to jasmine-vitest schematic                |
+| [9dab5780a](https://github.com/angular/angular-cli/commit/9dab5780a1befbd76ee9ba4c4e6ac2d3fd714bb9) | fix  | add fixture.whenStable in spec files when zoneless apps            |
+| [8f0f6a5f1](https://github.com/angular/angular-cli/commit/8f0f6a5f113ffc9e81d99eeeba71f8054e2d3686) | fix  | add migration to update `moduleResolution` to `bundler`            |
+| [e8feba9ee](https://github.com/angular/angular-cli/commit/e8feba9ee163f688c51d6463336474591e886647) | fix  | add missing typeSeparator to main.ts.template file                 |
+| [515b09c4f](https://github.com/angular/angular-cli/commit/515b09c4f28ef1c2eb911cb73135a6086dcab3c9) | fix  | add Vitest config generation and runner checks                     |
+| [0e83fe1a8](https://github.com/angular/angular-cli/commit/0e83fe1a87cc3dcbc9daa4440a050ae6aafc8042) | fix  | add warnings and improve Karma config generation                   |
+| [b91fa31f2](https://github.com/angular/angular-cli/commit/b91fa31f20b49ead021c72c271f67da38b340584) | fix  | align Karma project generation with unified unit-test builder      |
+| [c967a447c](https://github.com/angular/angular-cli/commit/c967a447ce755fbf582ec35aa24bb6e0fa0043cf) | fix  | correct spacing in application spec tsconfig                       |
+| [00d941c43](https://github.com/angular/angular-cli/commit/00d941c433de718cf3c38033d5d68dd86f790291) | fix  | correct style guide paths for standalone components                |
+| [e33e77d12](https://github.com/angular/angular-cli/commit/e33e77d12984446fe7bc77deb7438806817ba8a7) | fix  | flag '--file-name-style-guide=2016' - wrong import in main.ts      |
+| [f35b9f331](https://github.com/angular/angular-cli/commit/f35b9f3310995b05d501f2abaec58dcd283e3aa0) | fix  | improve comment preservation in jasmine-to-vitest                  |
+| [6615fcf03](https://github.com/angular/angular-cli/commit/6615fcf037686cd96e97b469937b7f0736afaa77) | fix  | issues in apps generated with '--file-name-style-guide=2016' flag  |
+| [e304821d5](https://github.com/angular/angular-cli/commit/e304821d5d789fab2725d3152612d3e5b6bd0dc7) | fix  | make ai-config schematic non-destructive                           |
+| [512ad282a](https://github.com/angular/angular-cli/commit/512ad282aecbfdf1e5c9e9700cc722addb949b68) | fix  | preserve blank lines in jasmine-to-vitest schematic                |
+| [b524ba426](https://github.com/angular/angular-cli/commit/b524ba42625cd690177a300ca4843ef4edce035f) | fix  | remove empty i18n-extract target for new projects                  |
+| [8e6e0a293](https://github.com/angular/angular-cli/commit/8e6e0a2931bfb178e77cf2c9ca7f92a56c673449) | fix  | remove explicit flag for host bindings                             |
+| [afb4d3e37](https://github.com/angular/angular-cli/commit/afb4d3e377b11315a03563cb8c143c35d37f113a) | fix  | remove extra space before async in spec templates                  |
+| [b983ea8e5](https://github.com/angular/angular-cli/commit/b983ea8e5107420a910dbbc05c6b74f0ff6fbddd) | fix  | respect skip-install for tailwind schematic                        |
+| [54c4eae2a](https://github.com/angular/angular-cli/commit/54c4eae2aa49c6b45c41f0718a5915a10d426cb4) | fix  | transform Jasmine type annotations in jasmine-to-vitest schematic  |
+| [14c0a9bac](https://github.com/angular/angular-cli/commit/14c0a9bacbb66b1db714ea7906c7d33f49c710fc) | perf | optimize AST traversal utilities                                   |
 
 ### @angular/cli
 
-| Commit                                                                                              | Type | Description                                            |
-| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------ |
-| [c17d7a929](https://github.com/angular/angular-cli/commit/c17d7a929adccb77f3c2c33e70005f50032d8cae) | fix  | add schema versioning and metadata to example database |
-| [1be35b343](https://github.com/angular/angular-cli/commit/1be35b3433179481be85ea1cb892d66170e0aebe) | fix  | promote zoneless migration MCP tool to stable          |
-
-### @schematics/angular
-
-| Commit                                                                                              | Type | Description                                         |
-| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------- |
-| [02f579f6e](https://github.com/angular/angular-cli/commit/02f579f6e7e490744deea5a193b0751ce31262db) | fix  | correct `tsconfig.spec.json` include for spec files |
-
-### @angular/build
-
-| Commit                                                                                              | Type | Description                                                                                                                   |
-| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------------------------------------------------------------------- |
-| [63c98741a](https://github.com/angular/angular-cli/commit/63c98741adcd21701b8bc572e9410cc1cf4f91c3) | fix  | add webcontainer support for Vitest browser provider                                                                          |
-| [07f712253](https://github.com/angular/angular-cli/commit/07f712253bb6c37d27ae7be9845f497002b0780c) | fix  | correctly handle absolute paths and casing in test discovery                                                                  |
-| [f82b77e47](https://github.com/angular/angular-cli/commit/f82b77e475e270dd0d23ce5d6b445c0a8aa8599a) | fix  | do not remove `@angular/localize` when having external packages ([#31721](https://github.com/angular/angular-cli/pull/31721)) |
-| [a44f8fa94](https://github.com/angular/angular-cli/commit/a44f8fa94bbf6ce8cdee05552dc56124507c6971) | fix  | dynamically select Vitest DOM environment                                                                                     |
-| [ae35543af](https://github.com/angular/angular-cli/commit/ae35543af7f5b3a5328c39fd4617d61b48067357) | fix  | enhance Vitest config merging and validation                                                                                  |
-| [41b12509a](https://github.com/angular/angular-cli/commit/41b12509a9db8bca637e0c67d21301a75774129c) | fix  | ensure TestBed setup is robust in non-isolated Vitest                                                                         |
-| [0851d2eae](https://github.com/angular/angular-cli/commit/0851d2eae1e5b854a0a8a7df3a47b00693508a0f) | fix  | show full aggregate errors from vitest                                                                                        |
-| [cc2668f57](https://github.com/angular/angular-cli/commit/cc2668f5744588f9c3d847d2450dd1361e73c690) | fix  | simplify SSL handling for `ng serve` with SSR ([#31723](https://github.com/angular/angular-cli/pull/31723))                   |
-
-<!-- CHANGELOG SPLIT MARKER -->
-
-<a name="21.0.0-rc.1"></a>
-
-# 21.0.0-rc.1 (2025-11-05)
-
-### @angular/cli
-
-| Commit                                                                                              | Type | Description                          |
-| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------ |
-| [dfb4242b3](https://github.com/angular/angular-cli/commit/dfb4242b347365f3a2c6d006f07a16c982ff4dbe) | fix  | add vitest to version command output |
-
-### @schematics/angular
-
-| Commit                                                                                              | Type | Description                                                   |
-| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------- |
-| [f89750b27](https://github.com/angular/angular-cli/commit/f89750b27866c307da546fe4f33da980693ca5c1) | fix  | add `addImports` option to jasmine-vitest schematic           |
-| [515b09c4f](https://github.com/angular/angular-cli/commit/515b09c4f28ef1c2eb911cb73135a6086dcab3c9) | fix  | add Vitest config generation and runner checks                |
-| [0e83fe1a8](https://github.com/angular/angular-cli/commit/0e83fe1a87cc3dcbc9daa4440a050ae6aafc8042) | fix  | add warnings and improve Karma config generation              |
-| [b91fa31f2](https://github.com/angular/angular-cli/commit/b91fa31f20b49ead021c72c271f67da38b340584) | fix  | align Karma project generation with unified unit-test builder |
-
-### @angular/build
-
-| Commit                                                                                              | Type | Description                                           |
-| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------- |
-| [62938e799](https://github.com/angular/angular-cli/commit/62938e79977d14045b7883d459d786dbb8d4d7ee) | fix  | update vitest to 4.0.6 and remove coverage workaround |
-
-### @angular/ssr
-
-| Commit                                                                                              | Type | Description                                |
-| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------ |
-| [5d76d84e6](https://github.com/angular/angular-cli/commit/5d76d84e64db717e177b77f7a07ee8819b258877) | fix  | improve locale handling in app-engine      |
-| [4a3cfdfce](https://github.com/angular/angular-cli/commit/4a3cfdfce75b7cedf64e26d85b0a92ec92ddd12d) | fix  | improve route matching for wildcard routes |
-
-<!-- CHANGELOG SPLIT MARKER -->
-
-<a name="21.0.0-rc.0"></a>
-
-# 21.0.0-rc.0 (2025-10-30)
-
-<!-- CHANGELOG SPLIT MARKER -->
-
-<a name="21.0.0-next.10"></a>
-
-# 21.0.0-next.10 (2025-10-29)
-
-### @schematics/angular
-
-| Commit                                                                                              | Type | Description                                         |
-| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------- |
-| [c967a447c](https://github.com/angular/angular-cli/commit/c967a447ce755fbf582ec35aa24bb6e0fa0043cf) | fix  | correct spacing in application spec tsconfig        |
-| [00d941c43](https://github.com/angular/angular-cli/commit/00d941c433de718cf3c38033d5d68dd86f790291) | fix  | correct style guide paths for standalone components |
+| Commit                                                                                              | Type | Description                                                             |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------------- |
+| [58d101d5e](https://github.com/angular/angular-cli/commit/58d101d5e78cf4c158dbaf52103639d56b84f9ed) | feat | add `--json` output to `ng version`                                     |
+| [d014630fa](https://github.com/angular/angular-cli/commit/d014630fad765ae3928b698122038cbe00d37102) | feat | add advanced filtering to MCP example search                            |
+| [6d3a3c579](https://github.com/angular/angular-cli/commit/6d3a3c5799bde1bab5c3878e0783ffa6854e36ad) | feat | add ai-tutor mcp tool                                                   |
+| [1c06b16a9](https://github.com/angular/angular-cli/commit/1c06b16a962d3c2cc122dc40e01c64bc8a8d754d) | feat | add builder info to `list_projects` MCP tool                            |
+| [301b50da4](https://github.com/angular/angular-cli/commit/301b50da4cf99b3cd87940606121d076b4f241c6) | feat | add fallback support for packages without direct `ng add` functionality |
+| [3040b777e](https://github.com/angular/angular-cli/commit/3040b777e40bc90fd1ed961e3d134875b3f9b464) | feat | add style language detection to list_projects tool                      |
+| [45024e836](https://github.com/angular/angular-cli/commit/45024e836b4006cc48b18bb99d025ae1a572db12) | feat | add unit test framework detection to list_projects tool                 |
+| [104c90768](https://github.com/angular/angular-cli/commit/104c90768000b3e0052ee7e7de2c5e04c1bffdaf) | feat | enhance `ng version` output with more details                           |
+| [286b6204c](https://github.com/angular/angular-cli/commit/286b6204c825c990761a0d5e5b91bb439dd13655) | feat | make documentation search tool version-aware                            |
+| [406315d09](https://github.com/angular/angular-cli/commit/406315d0939c62d9f4f39ce64b168e72bbdd588c) | feat | make find_examples tool version-aware                                   |
+| [68e711307](https://github.com/angular/angular-cli/commit/68e711307eae88a621698c2a9cc2abc30d44efc8) | feat | make get_best_practices tool version-aware                              |
+| [50453fdee](https://github.com/angular/angular-cli/commit/50453fdeec4a00d88deada49d2dd0867bdb784fb) | feat | overhaul `ng version` command output                                    |
+| [1ee9ce3c9](https://github.com/angular/angular-cli/commit/1ee9ce3c93caff419f8095a91cf58601e3df3f74) | feat | promote MCP `find_examples` tool to a stable tool                       |
+| [0d53e82d5](https://github.com/angular/angular-cli/commit/0d53e82d5ed8986603c2005fc06041dd076b08c6) | feat | provide detailed peer dependency conflict errors in ng add              |
+| [f513089e2](https://github.com/angular/angular-cli/commit/f513089e276acf5a7c4f6879a95e2d6ed78ae67d) | feat | remove direct support for `cnpm`                                        |
+| [c17d7a929](https://github.com/angular/angular-cli/commit/c17d7a929adccb77f3c2c33e70005f50032d8cae) | fix  | add schema versioning and metadata to example database                  |
+| [dbf1aaf70](https://github.com/angular/angular-cli/commit/dbf1aaf70bc3e3dd0de05d760bafacc43b34dce8) | fix  | add snippet support to example search MCP tool                          |
+| [dfb4242b3](https://github.com/angular/angular-cli/commit/dfb4242b347365f3a2c6d006f07a16c982ff4dbe) | fix  | add vitest to version command output                                    |
+| [11cee1acb](https://github.com/angular/angular-cli/commit/11cee1acb59afbad1ef88d8340b5438f7dbefe57) | fix  | correct boolean parsing in MCP example front matter                     |
+| [122a8c0e2](https://github.com/angular/angular-cli/commit/122a8c0e27342db79eb4d38e23032548054709b9) | fix  | correct frontmatter parsing in MCP examples tool                        |
+| [431106559](https://github.com/angular/angular-cli/commit/431106559d6e75f5113876a3f92fdf4dc4b2114d) | fix  | correct query in find_examples to prevent runtime error                 |
+| [def412a55](https://github.com/angular/angular-cli/commit/def412a558d71cb51fa16d826418bd0ed0a085cf) | fix  | enhance find_examples MCP tool with structured output                   |
+| [0922a033f](https://github.com/angular/angular-cli/commit/0922a033f546b38f83d1cae524cf7237dd37a2ac) | fix  | improve JSON schema parsing for command options                         |
+| [f099c9157](https://github.com/angular/angular-cli/commit/f099c91570b3cd748d7138bd18a4898a345549db) | fix  | improve list_projects MCP tool to find all workspaces in monorepos      |
+| [1be35b343](https://github.com/angular/angular-cli/commit/1be35b3433179481be85ea1cb892d66170e0aebe) | fix  | promote zoneless migration MCP tool to stable                           |
+| [e5aed6d65](https://github.com/angular/angular-cli/commit/e5aed6d655ed92ea6eb3ac03716b8a02a5f731d6) | fix  | show planned actions in `ng add` dry run                                |
+| [4deac3ec7](https://github.com/angular/angular-cli/commit/4deac3ec785b1a53156aac90441d0ed129df71ef) | fix  | support multi-database search in find_examples MCP tool                 |
+| [aeb49dd52](https://github.com/angular/angular-cli/commit/aeb49dd52bf88785a193fcb6caa0b36aaeef1d37) | perf | cache dependency lookups during `ng add`                                |
+| [5e534090e](https://github.com/angular/angular-cli/commit/5e534090e25e00a9fafbce2867030e7fdb0efbf6) | perf | parallelize peer dependency checks in `ng add`                          |
 
 ### @angular-devkit/build-angular
 
-| Commit                                                                                              | Type | Description                                                 |
-| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------- |
-| [6e395fc0c](https://github.com/angular/angular-cli/commit/6e395fc0c4505dd32b3237ea116e8db6bde25758) | fix  | ensure vitest code coverage handles virtual files correctly |
-
-### @angular/build
-
-| Commit                                                                                              | Type | Description                                              |
-| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------- |
-| [b2f048773](https://github.com/angular/angular-cli/commit/b2f048773c6014022983e7ccc52cb760619d8a1b) | fix  | add --ui option for Vitest runner                        |
-| [530d9270e](https://github.com/angular/angular-cli/commit/530d9270e87786594dd8d1956b0806a28650db25) | fix  | add `define` option to dev-server                        |
-| [091d1c03e](https://github.com/angular/angular-cli/commit/091d1c03e9665371f52c4cb8ec6cd9f1f862a407) | fix  | add adapters to new reporter                             |
-| [542d52868](https://github.com/angular/angular-cli/commit/542d528683cc0e51fd5a55ed6dbf43168f7a51a5) | fix  | allow custom runner configuration file for unit-test     |
-| [9975c7249](https://github.com/angular/angular-cli/commit/9975c72494bc2a71359dc4c5a31e43eed040716e) | fix  | ensure locale data plugin runs before other plugins      |
-| [7c529c1bc](https://github.com/angular/angular-cli/commit/7c529c1bc606101ab8c506e0b7845d2e9f509db4) | fix  | externalize Angular dependencies in Vitest runner        |
-| [a41f4e860](https://github.com/angular/angular-cli/commit/a41f4e860dd28bee28af47c1513f55450ca74b5f) | fix  | handle redirects from guards during prerendering         |
-| [bab5806c2](https://github.com/angular/angular-cli/commit/bab5806c281fd4cdd63b7969e691d703ed1e7680) | fix  | introduce vitest-base.config for test configuration      |
-| [9132e6af9](https://github.com/angular/angular-cli/commit/9132e6af9fd573d8b39c69a50b4b93e256145fd4) | fix  | resolve browser provider packages using project resolver |
-
-<!-- CHANGELOG SPLIT MARKER -->
-
-<a name="21.0.0-next.9"></a>
-
-# 21.0.0-next.9 (2025-10-23)
-
-### @angular/cli
-
-| Commit                                                                                              | Type | Description                                             |
-| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------- |
-| [3040b777e](https://github.com/angular/angular-cli/commit/3040b777e40bc90fd1ed961e3d134875b3f9b464) | feat | add style language detection to list_projects tool      |
-| [45024e836](https://github.com/angular/angular-cli/commit/45024e836b4006cc48b18bb99d025ae1a572db12) | feat | add unit test framework detection to list_projects tool |
-| [286b6204c](https://github.com/angular/angular-cli/commit/286b6204c825c990761a0d5e5b91bb439dd13655) | feat | make documentation search tool version-aware            |
-| [406315d09](https://github.com/angular/angular-cli/commit/406315d0939c62d9f4f39ce64b168e72bbdd588c) | feat | make find_examples tool version-aware                   |
-| [68e711307](https://github.com/angular/angular-cli/commit/68e711307eae88a621698c2a9cc2abc30d44efc8) | feat | make get_best_practices tool version-aware              |
-| [122a8c0e2](https://github.com/angular/angular-cli/commit/122a8c0e27342db79eb4d38e23032548054709b9) | fix  | correct frontmatter parsing in MCP examples tool        |
-| [431106559](https://github.com/angular/angular-cli/commit/431106559d6e75f5113876a3f92fdf4dc4b2114d) | fix  | correct query in find_examples to prevent runtime error |
-
-### @schematics/angular
-
-| Commit                                                                                              | Type | Description                                                       |
-| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------- |
-| [2ffc527b1](https://github.com/angular/angular-cli/commit/2ffc527b1bbe237e9f732d3506ce3a75ca1ca9d0) | feat | configure Vitest for new projects and allow runner choice         |
-| [512ad282a](https://github.com/angular/angular-cli/commit/512ad282aecbfdf1e5c9e9700cc722addb949b68) | fix  | preserve blank lines in jasmine-to-vitest schematic               |
-| [b524ba426](https://github.com/angular/angular-cli/commit/b524ba42625cd690177a300ca4843ef4edce035f) | fix  | remove empty i18n-extract target for new projects                 |
-| [54c4eae2a](https://github.com/angular/angular-cli/commit/54c4eae2aa49c6b45c41f0718a5915a10d426cb4) | fix  | transform Jasmine type annotations in jasmine-to-vitest schematic |
-
-### @angular-devkit/schematics
-
 | Commit                                                                                              | Type | Description                                                    |
 | --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------- |
-| [18bf8e7b3](https://github.com/angular/angular-cli/commit/18bf8e7b3b36b968d064299e5c557942c0ed7ec0) | fix  | respect `--force` option when schematic contains `host.create` |
+| [6e395fc0c](https://github.com/angular/angular-cli/commit/6e395fc0c4505dd32b3237ea116e8db6bde25758) | fix  | ensure vitest code coverage handles virtual files correctly    |
+| [53899511a](https://github.com/angular/angular-cli/commit/53899511afe5665541984085914a313390af6ce2) | fix  | expand `jest` and `jest-environment-jsdom` to allow version 30 |
+| [7a8c94615](https://github.com/angular/angular-cli/commit/7a8c94615164e114533fae0f84796a374dc1b47b) | fix  | make zone.js optional in server and app-shell builders         |
 
 ### @angular/build
 
-| Commit                                                                                              | Type | Description                                             |
-| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------- |
-| [bf468e1eb](https://github.com/angular/angular-cli/commit/bf468e1eb1050c60359b6f52692ce0db286982c2) | fix  | direct check include file exists in unit-test discovery |
-| [b1d6d2f17](https://github.com/angular/angular-cli/commit/b1d6d2f174027a1f7800bd70ebd35143f92dc38c) | fix  | resolve Angular locale data namespace in esbuild        |
-
-### @angular/ssr
-
-| Commit                                                                                              | Type | Description                                       |
-| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------- |
-| [85c18b4ea](https://github.com/angular/angular-cli/commit/85c18b4ead77c6c090b9f5c63e9e034e58369152) | fix  | correctly handle routes with matrix parameters    |
-| [58dcfd109](https://github.com/angular/angular-cli/commit/58dcfd1094fec52102f339e8fd3b5dd2925229b9) | fix  | ensure server-side navigation triggers a redirect |
+| Commit                                                                                              | Type | Description                                                                                                 |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------------------------------------------------- |
+| [00426e315](https://github.com/angular/angular-cli/commit/00426e3150c846913a5aa31510b5a1126df9e570) | feat | add --list-tests flag to unit-test builder                                                                  |
+| [a908bf3d4](https://github.com/angular/angular-cli/commit/a908bf3d4e8a59f3546f117bcc1f12fd69ad2d0b) | feat | add 'filter' option to unit-test builder                                                                    |
+| [3e0209d0a](https://github.com/angular/angular-cli/commit/3e0209d0a6bc6d7985d6294fc1430cdbe4d2d9a6) | feat | add `browserViewport` option for vitest browser tests                                                       |
+| [3b7dabbf1](https://github.com/angular/angular-cli/commit/3b7dabbf1df9b2b6ca9ffc6c038abb6e40b6df2b) | feat | add advanced coverage options to unit-test builder                                                          |
+| [c0b00d78e](https://github.com/angular/angular-cli/commit/c0b00d78ec37426f4474f473ddf9e627a0dd23df) | feat | add reporter output file option for unit-test                                                               |
+| [66dd6dd83](https://github.com/angular/angular-cli/commit/66dd6dd835d6b489e6b4be2138aa443e11bfa076) | feat | allow options for unit test reporters                                                                       |
+| [a90bea5b5](https://github.com/angular/angular-cli/commit/a90bea5b51c6978441919ed2af85c090fe99fd38) | feat | support `.test.ts` files by default in unit test builder                                                    |
+| [b2f048773](https://github.com/angular/angular-cli/commit/b2f048773c6014022983e7ccc52cb760619d8a1b) | fix  | add --ui option for Vitest runner                                                                           |
+| [530d9270e](https://github.com/angular/angular-cli/commit/530d9270e87786594dd8d1956b0806a28650db25) | fix  | add `define` option to dev-server                                                                           |
+| [b554bd73a](https://github.com/angular/angular-cli/commit/b554bd73a9c248d986ed718028edf52ab5da6ccf) | fix  | add temporary directory cleanup for Vitest executor                                                         |
+| [c6176f6df](https://github.com/angular/angular-cli/commit/c6176f6dffdae5c8d8708a1dd20fb51ca72e3c24) | fix  | add upfront dependency validation for unit-test runners                                                     |
+| [63c98741a](https://github.com/angular/angular-cli/commit/63c98741adcd21701b8bc572e9410cc1cf4f91c3) | fix  | add webcontainer support for Vitest browser provider                                                        |
+| [fcdbf6c19](https://github.com/angular/angular-cli/commit/fcdbf6c19b5a8549011aebec9e517feb12a99895) | fix  | allow `globals` to be set to false                                                                          |
+| [542d52868](https://github.com/angular/angular-cli/commit/542d528683cc0e51fd5a55ed6dbf43168f7a51a5) | fix  | allow custom runner configuration file for unit-test                                                        |
+| [0505f954d](https://github.com/angular/angular-cli/commit/0505f954dcf3b3339749ff461592d46d8ecc5e23) | fix  | allow unit-test progress option passthrough for building                                                    |
+| [931c62d20](https://github.com/angular/angular-cli/commit/931c62d20915c6c772b61d76ab88657c0858f6bd) | fix  | allow unit-test runner config with absolute path                                                            |
+| [a11dd31f0](https://github.com/angular/angular-cli/commit/a11dd31f0c80a189e7dcb3172c89a731cfc34702) | fix  | configure Vitest cache to use Angular cache                                                                 |
+| [abf003268](https://github.com/angular/angular-cli/commit/abf003268c6cb18f0944665b0b3f2794c9469c3e) | fix  | correct Vitest builder watch mode execution                                                                 |
+| [f05ffd104](https://github.com/angular/angular-cli/commit/f05ffd104255e86fe93f3736e1430f940cb83007) | fix  | correct Vitest coverage include handling for virtual files                                                  |
+| [cd5c92b99](https://github.com/angular/angular-cli/commit/cd5c92b99a5d8e9cb991a2551f564353c3df0fbe) | fix  | correct Vitest coverage reporting for test files                                                            |
+| [07f712253](https://github.com/angular/angular-cli/commit/07f712253bb6c37d27ae7be9845f497002b0780c) | fix  | correctly handle absolute paths and casing in test discovery                                                |
+| [bf468e1eb](https://github.com/angular/angular-cli/commit/bf468e1eb1050c60359b6f52692ce0db286982c2) | fix  | direct check include file exists in unit-test discovery                                                     |
+| [50e330d33](https://github.com/angular/angular-cli/commit/50e330d331fc8cfc4c12f7258012305ecb419d2d) | fix  | disable glob directory expansion when finding tests                                                         |
+| [49b65aba8](https://github.com/angular/angular-cli/commit/49b65aba8d7cd2839776e987366b981d7762760c) | fix  | disable Vitest test isolation by default                                                                    |
+| [1529595d4](https://github.com/angular/angular-cli/commit/1529595d4a8d8ff9251d1680b1a23bf4ef817db0) | fix  | drop support for TypeScript 5.8                                                                             |
+| [a44f8fa94](https://github.com/angular/angular-cli/commit/a44f8fa94bbf6ce8cdee05552dc56124507c6971) | fix  | dynamically select Vitest DOM environment                                                                   |
+| [ae35543af](https://github.com/angular/angular-cli/commit/ae35543af7f5b3a5328c39fd4617d61b48067357) | fix  | enhance Vitest config merging and validation                                                                |
+| [fec106b60](https://github.com/angular/angular-cli/commit/fec106b60553394aab51d713e5437a713085089b) | fix  | enhance Vitest dependency externalization and pre-bundling                                                  |
+| [f7c4a4c1d](https://github.com/angular/angular-cli/commit/f7c4a4c1dcd575dec82cc06597e3d6620b1be729) | fix  | enhance Vitest resolution for optimal package loading                                                       |
+| [ee5e127d5](https://github.com/angular/angular-cli/commit/ee5e127d551269fa9a3e39b9b28e38d7ab35806f) | fix  | ensure `ɵgetOrCreateAngularServerApp` is always defined after errors                                        |
+| [0830f4fb5](https://github.com/angular/angular-cli/commit/0830f4fb549e2c45b1ef752dd42f002a1347d7c8) | fix  | ensure TestBed cleanup hooks are always registered                                                          |
+| [41b12509a](https://github.com/angular/angular-cli/commit/41b12509a9db8bca637e0c67d21301a75774129c) | fix  | ensure TestBed setup is robust in non-isolated Vitest                                                       |
+| [55145f582](https://github.com/angular/angular-cli/commit/55145f582253b4ecb47add7ff2ef459b7535dfdb) | fix  | ensure Vitest setup files are executed in order                                                             |
+| [3478aa332](https://github.com/angular/angular-cli/commit/3478aa332ef0241c04e7eeef9dd74b017292b2c4) | fix  | exclude .angular from coverage instrumentation                                                              |
+| [7c529c1bc](https://github.com/angular/angular-cli/commit/7c529c1bc606101ab8c506e0b7845d2e9f509db4) | fix  | externalize Angular dependencies in Vitest runner                                                           |
+| [69c3b1226](https://github.com/angular/angular-cli/commit/69c3b1226880835fd8087cea5684ababb92b1c05) | fix  | improve error handling in unit-test builder                                                                 |
+| [bab5806c2](https://github.com/angular/angular-cli/commit/bab5806c281fd4cdd63b7969e691d703ed1e7680) | fix  | introduce vitest-base.config for test configuration                                                         |
+| [73621998f](https://github.com/angular/angular-cli/commit/73621998f91db189ad9b1ab006681404e30f7900) | fix  | normalize paths for Vitest runner output files                                                              |
+| [fa5c92346](https://github.com/angular/angular-cli/commit/fa5c92346d14a6ad03aa30ad6392fc649038605e) | fix  | prioritize string type for runnerConfig schema                                                              |
+| [d0787c11d](https://github.com/angular/angular-cli/commit/d0787c11d68841c36ef28bc3f15963406d1209a9) | fix  | provide default excludes for vitest coverage                                                                |
+| [ac10f323e](https://github.com/angular/angular-cli/commit/ac10f323ece9f4a35068e510f10786fbcb15adbb) | fix  | relax requirement for files to be in TS compilation                                                         |
+| [139758586](https://github.com/angular/angular-cli/commit/13975858683421a5712bbfccee57cf141a0b96f6) | fix  | remove deprecated `javascriptEnabled` option for Less                                                       |
+| [6576bb598](https://github.com/angular/angular-cli/commit/6576bb5985c18dca7cecd9509939c2a78bf9758a) | fix  | remove explicit test isolation configuration                                                                |
+| [9132e6af9](https://github.com/angular/angular-cli/commit/9132e6af9fd573d8b39c69a50b4b93e256145fd4) | fix  | resolve browser provider packages using project resolver                                                    |
+| [26127bd3b](https://github.com/angular/angular-cli/commit/26127bd3bb2c4b9aacf2a8f4c2cbdf732512bafb) | fix  | resolve PostCSS plugins relative to config file                                                             |
+| [dae732059](https://github.com/angular/angular-cli/commit/dae732059d17e9e374ac7635fbca9480751f70b3) | fix  | serve build assets and styles in vitest                                                                     |
+| [705af2278](https://github.com/angular/angular-cli/commit/705af22788102eeade08404d357582c39de8900b) | fix  | set coverage report directory to coverage/project-name                                                      |
+| [0851d2eae](https://github.com/angular/angular-cli/commit/0851d2eae1e5b854a0a8a7df3a47b00693508a0f) | fix  | show full aggregate errors from vitest                                                                      |
+| [cc2668f57](https://github.com/angular/angular-cli/commit/cc2668f5744588f9c3d847d2450dd1361e73c690) | fix  | simplify SSL handling for `ng serve` with SSR ([#31723](https://github.com/angular/angular-cli/pull/31723)) |
+| [907eabdd3](https://github.com/angular/angular-cli/commit/907eabdd3c7447ed2c211b6d6c2719b04443c545) | fix  | support ESM PostCSS plugins                                                                                 |
+| [62938e799](https://github.com/angular/angular-cli/commit/62938e79977d14045b7883d459d786dbb8d4d7ee) | fix  | update vitest to 4.0.6 and remove coverage workaround                                                       |
 
 <!-- CHANGELOG SPLIT MARKER -->
 
@@ -246,42 +177,6 @@
 
 <!-- CHANGELOG SPLIT MARKER -->
 
-<a name="21.0.0-next.8"></a>
-
-# 21.0.0-next.8 (2025-10-15)
-
-### @schematics/angular
-
-| Commit                                                                                              | Type | Description                                                        |
-| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------ |
-| [ede5e52bc](https://github.com/angular/angular-cli/commit/ede5e52bc701c42948bd98826cd4fa901350015c) | feat | add `include` option to jasmine-to-vitest schematic                |
-| [d0d2a17b8](https://github.com/angular/angular-cli/commit/d0d2a17b8adb2c1ce6eee70494f5d2298622c40e) | feat | add Jasmine spy API transformations to jasmine-to-vitest schematic |
-| [e7d955bed](https://github.com/angular/angular-cli/commit/e7d955bedd5ca6957903cb73f8ebe06823a808da) | feat | add matcher transformations to jasmine-to-vitest schematic         |
-| [629f5cb18](https://github.com/angular/angular-cli/commit/629f5cb181fee562645baf02b44ebb3b39f3fb06) | feat | add misc transformations to jasmine-to-vitest schematic            |
-| [58474ec7d](https://github.com/angular/angular-cli/commit/58474ec7dd85fc34639c138d9b8d545affb50e3e) | feat | introduce initial jasmine-to-vitest unit test refactor schematic   |
-| [8f0f6a5f1](https://github.com/angular/angular-cli/commit/8f0f6a5f113ffc9e81d99eeeba71f8054e2d3686) | fix  | add migration to update `moduleResolution` to `bundler`            |
-| [f35b9f331](https://github.com/angular/angular-cli/commit/f35b9f3310995b05d501f2abaec58dcd283e3aa0) | fix  | improve comment preservation in jasmine-to-vitest                  |
-
-### @angular-devkit/build-angular
-
-| Commit                                                                                              | Type | Description                                                    |
-| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------- |
-| [53899511a](https://github.com/angular/angular-cli/commit/53899511afe5665541984085914a313390af6ce2) | fix  | expand `jest` and `jest-environment-jsdom` to allow version 30 |
-
-### @angular/build
-
-| Commit                                                                                              | Type | Description                                              |
-| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------- |
-| [a90bea5b5](https://github.com/angular/angular-cli/commit/a90bea5b51c6978441919ed2af85c090fe99fd38) | feat | support `.test.ts` files by default in unit test builder |
-
-### @angular/ssr
-
-| Commit                                                                                              | Type | Description                                |
-| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------ |
-| [7be6c8f0e](https://github.com/angular/angular-cli/commit/7be6c8f0e2883c85546eb1691c91fa7d4aefc0d3) | fix  | prevent malicious URL from overriding host |
-
-<!-- CHANGELOG SPLIT MARKER -->
-
 <a name="20.3.6"></a>
 
 # 20.3.6 (2025-10-15)
@@ -306,33 +201,6 @@
 
 <!-- CHANGELOG SPLIT MARKER -->
 
-<a name="21.0.0-next.7"></a>
-
-# 21.0.0-next.7 (2025-10-08)
-
-### @angular/cli
-
-| Commit                                                                                              | Type | Description                                   |
-| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------- |
-| [1c06b16a9](https://github.com/angular/angular-cli/commit/1c06b16a962d3c2cc122dc40e01c64bc8a8d754d) | feat | add builder info to `list_projects` MCP tool  |
-| [104c90768](https://github.com/angular/angular-cli/commit/104c90768000b3e0052ee7e7de2c5e04c1bffdaf) | feat | enhance `ng version` output with more details |
-
-### @schematics/angular
-
-| Commit                                                                                              | Type | Description                                       |
-| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------- |
-| [afb4d3e37](https://github.com/angular/angular-cli/commit/afb4d3e377b11315a03563cb8c143c35d37f113a) | fix  | remove extra space before async in spec templates |
-
-### @angular/build
-
-| Commit                                                                                              | Type | Description                                          |
-| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------- |
-| [1c2d49ec7](https://github.com/angular/angular-cli/commit/1c2d49ec736818d22773916d7eaafd3446275ea0) | fix  | cleanup karma temporary directory after process exit |
-| [50e330d33](https://github.com/angular/angular-cli/commit/50e330d331fc8cfc4c12f7258012305ecb419d2d) | fix  | disable glob directory expansion when finding tests  |
-| [73621998f](https://github.com/angular/angular-cli/commit/73621998f91db189ad9b1ab006681404e30f7900) | fix  | normalize paths for Vitest runner output files       |
-
-<!-- CHANGELOG SPLIT MARKER -->
-
 <a name="20.3.5"></a>
 
 # 20.3.5 (2025-10-08)
@@ -342,46 +210,6 @@
 | Commit                                                                                              | Type | Description                                          |
 | --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------- |
 | [7f7140680](https://github.com/angular/angular-cli/commit/7f7140680b75ff6b41f7f04349fe10cd928f1a23) | fix  | cleanup karma temporary directory after process exit |
-
-<!-- CHANGELOG SPLIT MARKER -->
-
-<a name="21.0.0-next.6"></a>
-
-# 21.0.0-next.6 (2025-10-03)
-
-### @angular/cli
-
-| Commit                                                                                              | Type | Description                                     |
-| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------- |
-| [58d101d5e](https://github.com/angular/angular-cli/commit/58d101d5e78cf4c158dbaf52103639d56b84f9ed) | feat | add `--json` output to `ng version`             |
-| [50453fdee](https://github.com/angular/angular-cli/commit/50453fdeec4a00d88deada49d2dd0867bdb784fb) | feat | overhaul `ng version` command output            |
-| [0922a033f](https://github.com/angular/angular-cli/commit/0922a033f546b38f83d1cae524cf7237dd37a2ac) | fix  | improve JSON schema parsing for command options |
-
-### @schematics/angular
-
-| Commit                                                                                              | Type | Description                                             |
-| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------- |
-| [c119910f4](https://github.com/angular/angular-cli/commit/c119910f4505e280eea83ea6647b6d279a46f36d) | feat | add AGENTS.md support to ai-config schematic            |
-| [9dab5780a](https://github.com/angular/angular-cli/commit/9dab5780a1befbd76ee9ba4c4e6ac2d3fd714bb9) | fix  | add fixture.whenStable in spec files when zoneless apps |
-| [e304821d5](https://github.com/angular/angular-cli/commit/e304821d5d789fab2725d3152612d3e5b6bd0dc7) | fix  | make ai-config schematic non-destructive                |
-| [8ac515699](https://github.com/angular/angular-cli/commit/8ac515699cfd5a4e7eda9bcc054dfd7c68faba39) | fix  | Out of the box support for PM2                          |
-| [57075a31a](https://github.com/angular/angular-cli/commit/57075a31ad8f95a82304fe8533b3bca828d8da42) | fix  | use bracket notation for `process.env['pm_id']`         |
-
-### @angular-devkit/build-angular
-
-| Commit                                                                                              | Type | Description                                             |
-| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------- |
-| [acd785afc](https://github.com/angular/angular-cli/commit/acd785afc956efad56b03402085ff94855b9fcc6) | fix  | mark `InjectionToken` as pure for improved tree-shaking |
-
-### @angular/build
-
-| Commit                                                                                              | Type | Description                                             |
-| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------- |
-| [3e0209d0a](https://github.com/angular/angular-cli/commit/3e0209d0a6bc6d7985d6294fc1430cdbe4d2d9a6) | feat | add `browserViewport` option for vitest browser tests   |
-| [3b7dabbf1](https://github.com/angular/angular-cli/commit/3b7dabbf1df9b2b6ca9ffc6c038abb6e40b6df2b) | feat | add advanced coverage options to unit-test builder      |
-| [65562114c](https://github.com/angular/angular-cli/commit/65562114cdf725fa52f6d805f26a1aa265b9badb) | fix  | mark `InjectionToken` as pure for improved tree-shaking |
-| [d0787c11d](https://github.com/angular/angular-cli/commit/d0787c11d68841c36ef28bc3f15963406d1209a9) | fix  | provide default excludes for vitest coverage            |
-| [ac10f323e](https://github.com/angular/angular-cli/commit/ac10f323ece9f4a35068e510f10786fbcb15adbb) | fix  | relax requirement for files to be in TS compilation     |
 
 <!-- CHANGELOG SPLIT MARKER -->
 
@@ -410,55 +238,6 @@
 
 <!-- CHANGELOG SPLIT MARKER -->
 
-<a name="21.0.0-next.5"></a>
-
-# 21.0.0-next.5 (2025-09-24)
-
-## Breaking Changes
-
-### @angular/build
-
-- The `javascriptEnabled` option for Less is no longer supported. Projects relying on inline JavaScript within Less files will need to refactor their stylesheets to remove this dependency.
-
-### @schematics/angular
-
-| Commit                                                                                              | Type | Description                                            |
-| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------ |
-| [2a518016d](https://github.com/angular/angular-cli/commit/2a518016d9585dd4d16f90102d5409459ebba024) | feat | Applications are zoneless by default                   |
-| [9f255f2b3](https://github.com/angular/angular-cli/commit/9f255f2b3cc435f3bea2f0266a137176ca599aef) | feat | set `packageManager` in `package.json` on new projects |
-| [77741f5ee](https://github.com/angular/angular-cli/commit/77741f5eec735f23b0f2865101471e045e4889b8) | fix  | add 'update-typescript-lib' migration                  |
-| [3af4dcbbf](https://github.com/angular/angular-cli/commit/3af4dcbbf4019e13a9547a404516502cf4eda736) | fix  | add `__screenshots__/` to `.gitignore`                 |
-
-### @angular/cli
-
-| Commit                                                                                              | Type | Description           |
-| --------------------------------------------------------------------------------------------------- | ---- | --------------------- |
-| [6d3a3c579](https://github.com/angular/angular-cli/commit/6d3a3c5799bde1bab5c3878e0783ffa6854e36ad) | feat | add ai-tutor mcp tool |
-
-### @angular-devkit/build-angular
-
-| Commit                                                                                              | Type | Description                                            |
-| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------ |
-| [7a8c94615](https://github.com/angular/angular-cli/commit/7a8c94615164e114533fae0f84796a374dc1b47b) | fix  | make zone.js optional in server and app-shell builders |
-
-### @angular/build
-
-| Commit                                                                                              | Type | Description                                            |
-| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------ |
-| [00426e315](https://github.com/angular/angular-cli/commit/00426e3150c846913a5aa31510b5a1126df9e570) | feat | add --list-tests flag to unit-test builder             |
-| [3478aa332](https://github.com/angular/angular-cli/commit/3478aa332ef0241c04e7eeef9dd74b017292b2c4) | fix  | exclude .angular from coverage instrumentation         |
-| [139758586](https://github.com/angular/angular-cli/commit/13975858683421a5712bbfccee57cf141a0b96f6) | fix  | remove deprecated `javascriptEnabled` option for Less  |
-| [705af2278](https://github.com/angular/angular-cli/commit/705af22788102eeade08404d357582c39de8900b) | fix  | set coverage report directory to coverage/project-name |
-| [907eabdd3](https://github.com/angular/angular-cli/commit/907eabdd3c7447ed2c211b6d6c2719b04443c545) | fix  | support ESM PostCSS plugins                            |
-
-### @angular/ssr
-
-| Commit                                                                                              | Type | Description                                          |
-| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------- |
-| [afa273849](https://github.com/angular/angular-cli/commit/afa273849d0e0e62a7df2236d818bf7800c3ad13) | fix  | avoid retaining rendered HTML in memory post-request |
-
-<!-- CHANGELOG SPLIT MARKER -->
-
 <a name="20.3.3"></a>
 
 # 20.3.3 (2025-09-24)
@@ -474,24 +253,6 @@
 | Commit                                                                                              | Type | Description                                          |
 | --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------- |
 | [a4c9a2007](https://github.com/angular/angular-cli/commit/a4c9a2007ab3e33b2c97fa63f0df8f8662427031) | fix  | avoid retaining rendered HTML in memory post-request |
-
-<!-- CHANGELOG SPLIT MARKER -->
-
-<a name="21.0.0-next.4"></a>
-
-# 21.0.0-next.4 (2025-09-17)
-
-### @angular/build
-
-| Commit                                                                                              | Type | Description                                             |
-| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------- |
-| [a908bf3d4](https://github.com/angular/angular-cli/commit/a908bf3d4e8a59f3546f117bcc1f12fd69ad2d0b) | feat | add 'filter' option to unit-test builder                |
-| [c0b00d78e](https://github.com/angular/angular-cli/commit/c0b00d78ec37426f4474f473ddf9e627a0dd23df) | feat | add reporter output file option for unit-test           |
-| [66dd6dd83](https://github.com/angular/angular-cli/commit/66dd6dd835d6b489e6b4be2138aa443e11bfa076) | feat | allow options for unit test reporters                   |
-| [43fc5536f](https://github.com/angular/angular-cli/commit/43fc5536fd42694a09a7b7c25fe8c5665e3e28d3) | fix  | add timestamp to bundle generation log                  |
-| [c6176f6df](https://github.com/angular/angular-cli/commit/c6176f6dffdae5c8d8708a1dd20fb51ca72e3c24) | fix  | add upfront dependency validation for unit-test runners |
-| [69c3b1226](https://github.com/angular/angular-cli/commit/69c3b1226880835fd8087cea5684ababb92b1c05) | fix  | improve error handling in unit-test builder             |
-| [dae732059](https://github.com/angular/angular-cli/commit/dae732059d17e9e374ac7635fbca9480751f70b3) | fix  | serve build assets and styles in vitest                 |
 
 <!-- CHANGELOG SPLIT MARKER -->
 
@@ -612,75 +373,6 @@
 
 <!-- CHANGELOG SPLIT MARKER -->
 
-<a name="21.0.0-next.3"></a>
-
-# 21.0.0-next.3 (2025-09-10)
-
-## Breaking Changes
-
-### @angular/build
-
-- - TypeScript versions older than 5.9 are no longer supported.
-
-### @angular/ssr
-
-- The server-side bootstrapping process has been changed to eliminate the reliance on a global platform injector.
-
-  Before:
-
-  ```ts
-  const bootstrap = () => bootstrapApplication(AppComponent, config);
-  ```
-
-  After:
-
-  ```ts
-  const bootstrap = (context: BootstrapContext) =>
-    bootstrapApplication(AppComponent, config, context);
-  ```
-
-### @schematics/angular
-
-| Commit                                                                                              | Type | Description                                 |
-| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------- |
-| [ddebe3d4f](https://github.com/angular/angular-cli/commit/ddebe3d4fc35486a57f4051fdd4493caba4e6c07) | fix  | align labels in ai-config schema            |
-| [8e6e0a293](https://github.com/angular/angular-cli/commit/8e6e0a2931bfb178e77cf2c9ca7f92a56c673449) | fix  | remove explicit flag for host bindings      |
-| [b983ea8e5](https://github.com/angular/angular-cli/commit/b983ea8e5107420a910dbbc05c6b74f0ff6fbddd) | fix  | respect skip-install for tailwind schematic |
-
-### @angular/cli
-
-| Commit                                                                                              | Type | Description                                                 |
-| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------- |
-| [d014630fa](https://github.com/angular/angular-cli/commit/d014630fad765ae3928b698122038cbe00d37102) | feat | add advanced filtering to MCP example search                |
-| [1ee9ce3c9](https://github.com/angular/angular-cli/commit/1ee9ce3c93caff419f8095a91cf58601e3df3f74) | feat | promote MCP `find_examples` tool to a stable tool           |
-| [dbf1aaf70](https://github.com/angular/angular-cli/commit/dbf1aaf70bc3e3dd0de05d760bafacc43b34dce8) | fix  | add snippet support to example search MCP tool              |
-| [11cee1acb](https://github.com/angular/angular-cli/commit/11cee1acb59afbad1ef88d8340b5438f7dbefe57) | fix  | correct boolean parsing in MCP example front matter         |
-| [def412a55](https://github.com/angular/angular-cli/commit/def412a558d71cb51fa16d826418bd0ed0a085cf) | fix  | enhance find_examples MCP tool with structured output       |
-| [2037b912b](https://github.com/angular/angular-cli/commit/2037b912b2f78eb4469d8671fbca8c43f06cd2ff) | fix  | improve bun lockfile detection and optimize lockfile checks |
-
-### @angular-devkit/build-angular
-
-| Commit                                                                                              | Type | Description                    |
-| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------ |
-| [9749ec687](https://github.com/angular/angular-cli/commit/9749ec687800c1bbeae4b75550dee3608bbe6823) | fix  | avoid extra tick in SSR builds |
-
-### @angular/build
-
-| Commit                                                                                              | Type | Description                                                  |
-| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------ |
-| [cd5c92b99](https://github.com/angular/angular-cli/commit/cd5c92b99a5d8e9cb991a2551f564353c3df0fbe) | fix  | correct Vitest coverage reporting for test files             |
-| [1529595d4](https://github.com/angular/angular-cli/commit/1529595d4a8d8ff9251d1680b1a23bf4ef817db0) | fix  | drop support for TypeScript 5.8                              |
-| [58da860fc](https://github.com/angular/angular-cli/commit/58da860fc4e040d1dbce0b1955c361a2efdb3559) | fix  | preserve names in esbuild for improved debugging in dev mode |
-| [26127bd3b](https://github.com/angular/angular-cli/commit/26127bd3bb2c4b9aacf2a8f4c2cbdf732512bafb) | fix  | resolve PostCSS plugins relative to config file              |
-
-### @angular/ssr
-
-| Commit                                                                                              | Type | Description                                                   |
-| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------- |
-| [f0b0980fb](https://github.com/angular/angular-cli/commit/f0b0980fbd55473f152ec3b87fa5e1923c876854) | feat | introduce BootstrapContext for isolated server-side rendering |
-
-<!-- CHANGELOG SPLIT MARKER -->
-
 <a name="20.3.0"></a>
 
 # 20.3.0 (2025-09-10)
@@ -736,36 +428,6 @@
 
 <!-- CHANGELOG SPLIT MARKER -->
 
-<a name="21.0.0-next.2"></a>
-
-# 21.0.0-next.2 (2025-09-03)
-
-### @angular/cli
-
-| Commit                                                                                              | Type | Description                                                             |
-| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------------- |
-| [301b50da4](https://github.com/angular/angular-cli/commit/301b50da4cf99b3cd87940606121d076b4f241c6) | feat | add fallback support for packages without direct `ng add` functionality |
-| [2c498d2b8](https://github.com/angular/angular-cli/commit/2c498d2b87c13a63bef2a9be2ca4f087c72c6b8a) | fix  | don't set a default for array options when length is 0                  |
-| [f099c9157](https://github.com/angular/angular-cli/commit/f099c91570b3cd748d7138bd18a4898a345549db) | fix  | improve list_projects MCP tool to find all workspaces in monorepos      |
-| [e192e8c7e](https://github.com/angular/angular-cli/commit/e192e8c7ecf506e4b03668f527de83f2a57f552d) | fix  | set process title when running architect commands                       |
-
-### @schematics/angular
-
-| Commit                                                                                              | Type | Description                                            |
-| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------ |
-| [e417c89f9](https://github.com/angular/angular-cli/commit/e417c89f9e9cfe0ce50ffbc72ef555793605aea1) | feat | Add `addTypeToClassName` option to relevant schematics |
-| [4e6c94f21](https://github.com/angular/angular-cli/commit/4e6c94f21e882c593cf11197900c29d693af9297) | feat | support different file name style guides in `ng new`   |
-| [14c0a9bac](https://github.com/angular/angular-cli/commit/14c0a9bacbb66b1db714ea7906c7d33f49c710fc) | perf | optimize AST traversal utilities                       |
-
-### @angular/build
-
-| Commit                                                                                              | Type | Description                                            |
-| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------ |
-| [7b0f69798](https://github.com/angular/angular-cli/commit/7b0f69798f061d5500620828cf304e05d667199f) | fix  | avoid extra tick in SSR dev-server builds              |
-| [f806f6477](https://github.com/angular/angular-cli/commit/f806f6477af222907f1879181fb0f9839e889ea8) | fix  | maintain media output hashing with vitest unit-testing |
-
-<!-- CHANGELOG SPLIT MARKER -->
-
 <a name="20.2.2"></a>
 
 # 20.2.2 (2025-09-03)
@@ -783,52 +445,6 @@
 | --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------ |
 | [5c2abffea](https://github.com/angular/angular-cli/commit/5c2abffea6cf3f672ee256a944dba56dd257665b) | fix  | avoid extra tick in SSR dev-server builds              |
 | [f3c826853](https://github.com/angular/angular-cli/commit/f3c826853501c9cf6d07a1c8ee3363eb79f53005) | fix  | maintain media output hashing with vitest unit-testing |
-
-<!-- CHANGELOG SPLIT MARKER -->
-
-<a name="21.0.0-next.1"></a>
-
-# 21.0.0-next.1 (2025-08-27)
-
-## Breaking Changes
-
-### @angular/cli
-
-- The `ng` commands will no longer automatically detect and use `cnpm` as the package manager. As an alternative use the `.npmrc` file to ensure npm uses the cnpm registry.
-
-### @angular-devkit/schematics-cli
-
-| Commit                                                                                              | Type | Description                        |
-| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------- |
-| [aed26c388](https://github.com/angular/angular-cli/commit/aed26c38803a465842ff128c3f81bd6984e1fe3d) | fix  | correctly set default array values |
-
-### @schematics/angular
-
-| Commit                                                                                              | Type | Description                                                                          |
-| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------------------ |
-| [4912f3990](https://github.com/angular/angular-cli/commit/4912f39906b11a3212f11d5a00d577e2a0bacab4) | feat | add Tailwind CSS option to application schematic and `ng new`                        |
-| [6c7b79833](https://github.com/angular/angular-cli/commit/6c7b798332786d29070460669e093e37902c4438) | fix  | directly resolve karma config template in migration                                  |
-| [0f86cf878](https://github.com/angular/angular-cli/commit/0f86cf8782d1c08d11bb9ee54a30fe1954dd8bcc) | fix  | prevent AI config schematic from failing when 'none' and other AI tools are selected |
-
-### @angular/cli
-
-| Commit                                                                                              | Type | Description                                                |
-| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------- |
-| [0d53e82d5](https://github.com/angular/angular-cli/commit/0d53e82d5ed8986603c2005fc06041dd076b08c6) | feat | provide detailed peer dependency conflict errors in ng add |
-| [f513089e2](https://github.com/angular/angular-cli/commit/f513089e276acf5a7c4f6879a95e2d6ed78ae67d) | feat | remove direct support for `cnpm`                           |
-| [47d77a3ed](https://github.com/angular/angular-cli/commit/47d77a3edea4dabb463d50c2bdba32475257d775) | fix  | correctly set default array values                         |
-| [e5aed6d65](https://github.com/angular/angular-cli/commit/e5aed6d655ed92ea6eb3ac03716b8a02a5f731d6) | fix  | show planned actions in `ng add` dry run                   |
-| [aeb49dd52](https://github.com/angular/angular-cli/commit/aeb49dd52bf88785a193fcb6caa0b36aaeef1d37) | perf | cache dependency lookups during `ng add`                   |
-| [5e534090e](https://github.com/angular/angular-cli/commit/5e534090e25e00a9fafbce2867030e7fdb0efbf6) | perf | parallelize peer dependency checks in `ng add`             |
-
-### @angular/build
-
-| Commit                                                                                              | Type | Description                                             |
-| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------- |
-| [b554bd73a](https://github.com/angular/angular-cli/commit/b554bd73a9c248d986ed718028edf52ab5da6ccf) | fix  | add temporary directory cleanup for Vitest executor     |
-| [261dbb37c](https://github.com/angular/angular-cli/commit/261dbb37cbe01492240c4cedc644663b15a4296a) | fix  | correct JS/TS file paths when running under Bazel       |
-| [abf003268](https://github.com/angular/angular-cli/commit/abf003268c6cb18f0944665b0b3f2794c9469c3e) | fix  | correct Vitest builder watch mode execution             |
-| [4b49a207a](https://github.com/angular/angular-cli/commit/4b49a207a1de27b82416c6225a59bc10f48bdcbc) | fix  | ensure karma polyfills reporter factory returns a value |
 
 <!-- CHANGELOG SPLIT MARKER -->
 
@@ -861,18 +477,6 @@
 | --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------- |
 | [06a6ddc10](https://github.com/angular/angular-cli/commit/06a6ddc102f5dc9018ec982f6e4cf56259cc4b52) | fix  | correct JS/TS file paths when running under Bazel       |
 | [b6816b0cb](https://github.com/angular/angular-cli/commit/b6816b0cbaf1262d7015b9d7f7fb425f53995947) | fix  | ensure karma polyfills reporter factory returns a value |
-
-<!-- CHANGELOG SPLIT MARKER -->
-
-<a name="21.0.0-next.0"></a>
-
-# 21.0.0-next.0 (2025-08-20)
-
-### @angular/build
-
-| Commit                                                                                              | Type | Description                                              |
-| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------- |
-| [0505f954d](https://github.com/angular/angular-cli/commit/0505f954dcf3b3339749ff461592d46d8ecc5e23) | fix  | allow unit-test progress option passthrough for building |
 
 <!-- CHANGELOG SPLIT MARKER -->
 
