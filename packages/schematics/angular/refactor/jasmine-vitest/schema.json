@@ -35,6 +35,11 @@
       "type": "boolean",
       "description": "Whether the tests are intended to run in browser mode. If true, the `toHaveClass` assertions are left as is because Vitest browser mode has such an assertion. Otherwise they're migrated to an equivalent assertion.",
       "default": false
+    },
+    "report": {
+      "type": "boolean",
+      "description": "Whether to generate a summary report file (jasmine-vitest-<date>.md) in the project root.",
+      "default": true
     }
   }
 }

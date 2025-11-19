@@ -56,7 +56,7 @@ export function transformSyntacticSugarMatchers(
 
   if (matcherName === 'toHaveSpyInteractions') {
     const category = 'toHaveSpyInteractions';
-    reporter.recordTodo(category);
+    reporter.recordTodo(category, sourceFile, node);
     addTodoComment(node, category);
 
     return node;
@@ -64,7 +64,7 @@ export function transformSyntacticSugarMatchers(
 
   if (matcherName === 'toThrowMatching') {
     const category = 'toThrowMatching';
-    reporter.recordTodo(category);
+    reporter.recordTodo(category, sourceFile, node);
     addTodoComment(node, category, { name: matcherName });
 
     return node;
@@ -304,11 +304,11 @@ export function transformExpectAsync(
   if (matcherName) {
     if (matcherName === 'toBePending') {
       const category = 'toBePending';
-      reporter.recordTodo(category);
+      reporter.recordTodo(category, sourceFile, node);
       addTodoComment(node, category);
     } else {
       const category = 'unsupported-expect-async-matcher';
-      reporter.recordTodo(category);
+      reporter.recordTodo(category, sourceFile, node);
       addTodoComment(node, category, { name: matcherName });
     }
   }
@@ -418,7 +418,7 @@ export function transformArrayWithExactContents(
 
   if (!ts.isArrayLiteralExpression(argument.arguments[0])) {
     const category = 'arrayWithExactContents-dynamic-variable';
-    reporter.recordTodo(category);
+    reporter.recordTodo(category, sourceFile, node);
     addTodoComment(node, category);
 
     return node;
@@ -455,7 +455,7 @@ export function transformArrayWithExactContents(
   const containingStmt = ts.factory.createExpressionStatement(containingCall);
 
   const category = 'arrayWithExactContents-check';
-  reporter.recordTodo(category);
+  reporter.recordTodo(category, sourceFile, node);
   addTodoComment(lengthStmt, category);
 
   return [lengthStmt, containingStmt];
@@ -615,7 +615,7 @@ export function transformExpectNothing(
 
   reporter.reportTransformation(sourceFile, node, 'Removed `expect().nothing()` statement.');
   const category = 'expect-nothing';
-  reporter.recordTodo(category);
+  reporter.recordTodo(category, sourceFile, node);
   addTodoComment(replacement, category);
   ts.addSyntheticLeadingComment(
     replacement,
