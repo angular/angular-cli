@@ -493,7 +493,9 @@ export default class AddCommandModule
     // Only show if installation will actually occur
     task.title = 'Installing package';
 
-    if (context.savePackage === false) {
+    if (context.savePackage === false && packageManager.name !== PackageManager.Bun) {
+      // Bun has a `--no-save` option which we are using to
+      // install the package and not update the package.json and the lock file.
       task.title += ' in temporary location';
 
       // Temporary packages are located in a different directory
