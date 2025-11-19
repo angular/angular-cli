@@ -61,7 +61,7 @@ export class PackageManagerUtils {
   /** Install a single package. */
   async install(
     packageName: string,
-    save: 'dependencies' | 'devDependencies' | true = true,
+    save: 'dependencies' | 'devDependencies' | boolean = true,
     extraArgs: string[] = [],
     cwd?: string,
   ): Promise<boolean> {
@@ -70,6 +70,8 @@ export class PackageManagerUtils {
 
     if (save === 'devDependencies') {
       installArgs.push(packageManagerArgs.saveDev);
+    } else if (save === false) {
+      installArgs.push(packageManagerArgs.noLockfile);
     }
 
     return this.run([...installArgs, ...extraArgs], { cwd, silent: true });
@@ -158,11 +160,11 @@ export class PackageManagerUtils {
         };
       case PackageManager.Bun:
         return {
-          saveDev: '--development',
+          saveDev: '--dev',
           install: 'add',
           installAll: 'install',
           prefix: '--cwd',
-          noLockfile: '',
+          noLockfile: '--no-save',
         };
       default:
         return {

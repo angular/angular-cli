@@ -182,7 +182,7 @@ jobs:
         # flaky targets are retried. The larger machine type comes with 2x more SSD space.
         os: [ubuntu-latest-4core]
         node: [22]
-        subset: [yarn, pnpm]
+        subset: [yarn, pnpm, bun]
         shard: [0, 1, 2]
     runs-on: ${{ matrix.os }}
     steps:
