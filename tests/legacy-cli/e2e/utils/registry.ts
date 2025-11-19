@@ -1,9 +1,10 @@
 import { ChildProcess, fork } from 'node:child_process';
 import { on } from 'node:events';
+import { mkdir } from 'node:fs/promises';
 import { join } from 'node:path';
 import { getGlobalVariable } from './env';
 import { writeFile, readFile } from './fs';
-import { mktempd } from './utils';
+import { existsSync } from 'node:fs';
 
 export async function createNpmRegistry(
   port: number,
@@ -11,14 +12,18 @@ export async function createNpmRegistry(
   withAuthentication = false,
 ): Promise<ChildProcess> {
   // Setup local package registry
-  const registryPath = await mktempd('angular-cli-e2e-registry-');
+  const registryPath = join(getGlobalVariable('tmp-root'), 'registry');
+  if (!existsSync(registryPath)) {
+    await mkdir(registryPath);
+  }
 
-  let configContent = await readFile(
-    join(__dirname, '../', withAuthentication ? 'verdaccio_auth.yaml' : 'verdaccio.yaml'),
-  );
-  configContent = configContent.replace(/\$\{HTTP_PORT\}/g, String(port));
-  configContent = configContent.replace(/\$\{HTTPS_PORT\}/g, String(httpsPort));
-  const configPath = join(registryPath, 'verdaccio.yaml');
+  const configFileName = withAuthentication ? 'verdaccio_auth.yaml' : 'verdaccio.yaml';
+  let configContent = await readFile(join(__dirname, '../', configFileName));
+  configContent = configContent
+    .replace(/\$\{HTTP_PORT\}/g, String(port))
+    .replace(/\$\{HTTPS_PORT\}/g, String(httpsPort));
+  const configPath = join(registryPath, configFileName);
+
   await writeFile(configPath, configContent);
 
   const verdaccioServer = fork(require.resolve('verdaccio/bin/verdaccio'), ['-c', configPath]);
