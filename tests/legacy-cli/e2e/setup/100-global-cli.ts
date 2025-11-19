@@ -6,7 +6,7 @@ const PACKAGE_MANAGER_VERSION = {
   'npm': '10.8.1',
   'yarn': '1.22.22',
   'pnpm': '10.17.1',
-  'bun': '1.2.21',
+  'bun': '1.3.2',
 };
 
 export default async function () {

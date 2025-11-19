@@ -162,7 +162,7 @@ jobs:
       matrix:
         os: [ubuntu-latest]
         node: [22]
-        subset: [yarn, pnpm]
+        subset: [yarn, pnpm, bun]
         shard: [0, 1, 2]
     runs-on: ${{ matrix.os }}
     steps:

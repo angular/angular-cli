@@ -4,7 +4,7 @@ import { ng } from '../../../utils/process';
 import { expectToFail } from '../../../utils/utils';
 
 export default async function () {
-  await symlinkFile(assetDir('add-collection'), `./node_modules/add-collection`, 'dir');
+  await symlinkFile(assetDir('add-collection-dir'), `./node_modules/add-collection`, 'dir');
 
   await ng('add', 'add-collection');
   await expectFileToExist('empty-file');
