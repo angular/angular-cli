@@ -118,8 +118,8 @@ vi.spyOn(service, 'myMethod').and.unknownStrategy();`,
         description: 'should transform jasmine.createSpyObj with an array of methods',
         input: `const myService = jasmine.createSpyObj('MyService', ['methodA', 'methodB']);`,
         expected: `const myService = {
-          methodA: vi.fn(),
-          methodB: vi.fn()
+          methodA: vi.fn().mockName("MyService.methodA"),
+          methodB: vi.fn().mockName("MyService.methodB"),
         };`,
       },
       {
@@ -134,8 +134,8 @@ vi.spyOn(service, 'myMethod').and.unknownStrategy();`,
         description: 'should transform jasmine.createSpyObj with an object of return values',
         input: `const myService = jasmine.createSpyObj('MyService', { methodA: 'foo', methodB: 42 });`,
         expected: `const myService = {
-          methodA: vi.fn().mockReturnValue('foo'),
-          methodB: vi.fn().mockReturnValue(42)
+          methodA: vi.fn().mockName("MyService.methodA").mockReturnValue('foo'),
+          methodB: vi.fn().mockName("MyService.methodB").mockReturnValue(42),
         };`,
       },
       {
@@ -143,7 +143,7 @@ vi.spyOn(service, 'myMethod').and.unknownStrategy();`,
           'should transform jasmine.createSpyObj with an object of return values containing an asymmetric matcher',
         input: `const myService = jasmine.createSpyObj('MyService', { methodA: jasmine.any(String) });`,
         expected: `const myService = {
-          methodA: vi.fn().mockReturnValue(expect.any(String))
+          methodA: vi.fn().mockName("MyService.methodA").mockReturnValue(expect.any(String)),
         };`,
       },
       {
@@ -158,23 +158,23 @@ vi.spyOn(service, 'myMethod').and.unknownStrategy();`,
         description: 'should transform jasmine.createSpyObj with a property map',
         input: `const myService = jasmine.createSpyObj('MyService', ['methodA'], { propA: 'valueA' });`,
         expected: `const myService = {
-          methodA: vi.fn(),
-          propA: 'valueA'
+          methodA: vi.fn().mockName("MyService.methodA"),
+          propA: 'valueA',
         };`,
       },
       {
         description: 'should transform jasmine.createSpyObj with a method map and a property map',
         input: `const myService = jasmine.createSpyObj('MyService', { methodA: 'foo' }, { propA: 'valueA' });`,
         expected: `const myService = {
-          methodA: vi.fn().mockReturnValue('foo'),
-          propA: 'valueA'
+          methodA: vi.fn().mockName("MyService.methodA").mockReturnValue('foo'),
+          propA: 'valueA',
         };`,
       },
       {
         description: 'should ignore non-string literals in the method array',
         input: `const myService = jasmine.createSpyObj('MyService', ['methodA', 123, someVar]);`,
         expected: `const myService = {
-          methodA: vi.fn()
+          methodA: vi.fn().mockName("MyService.methodA"),
         };`,
       },
     ];
