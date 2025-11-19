@@ -36,13 +36,17 @@ function findBrowserProvider(
   return undefined;
 }
 
-function normalizeBrowserName(browserName: string): string {
+function normalizeBrowserName(browserName: string): { browser: string; headless: boolean } {
   // Normalize browser names to match Vitest's expectations for headless but also supports karma's names
   // e.g., 'ChromeHeadless' -> 'chrome', 'FirefoxHeadless' -> 'firefox'
   // and 'Chrome' -> 'chrome', 'Firefox' -> 'firefox'.
   const normalized = browserName.toLowerCase();
+  const headless = normalized.endsWith('headless');
 
-  return normalized.replace(/headless$/, '');
+  return {
+    browser: headless ? normalized.slice(0, -8) : normalized,
+    headless: headless,
+  };
 }
 
 export async function setupBrowserConfiguration(
@@ -120,21 +124,23 @@ export async function setupBrowserConfiguration(
   }
 
   const isCI = !!process.env['CI'];
-  let headless = isCI || browsers.some((name) => name.toLowerCase().includes('headless'));
+  const instances = browsers.map(normalizeBrowserName);
   if (providerName === 'preview') {
-    // `preview` provider does not support headless mode
-    headless = false;
+    instances.forEach((instance) => {
+      instance.headless = false;
+    });
+  } else if (isCI) {
+    instances.forEach((instance) => {
+      instance.headless = true;
+    });
   }
 
   const browser = {
     enabled: true,
     provider,
-    headless,
-    ui: !headless,
+    ui: !isCI && instances.some((instance) => !instance.headless),
     viewport,
-    instances: browsers.map((browserName) => ({
-      browser: normalizeBrowserName(browserName),
-    })),
+    instances,
   } satisfies BrowserConfigOptions;
 
   return { browser };
