@@ -67,16 +67,21 @@ export default function (options: NgNewOptions): Rule {
     mergeWith(
       apply(empty(), [
         schematic('workspace', workspaceOptions),
+        (tree: Tree) => {
+          if (options.testRunner === 'karma') {
+            const file = new JSONFile(tree, 'angular.json');
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const schematics = file.get(['schematics']) ?? ({} as any);
+            (schematics['@schematics/angular:application'] ??= {}).testRunner = 'karma';
+            (schematics['@schematics/angular:library'] ??= {}).testRunner = 'karma';
+
+            file.modify(['schematics'], schematics);
+          }
+        },
         options.createApplication ? schematic('application', applicationOptions) : noop,
         schematic('ai-config', {
           tool: options.aiConfig?.length ? options.aiConfig : undefined,
         }),
-        (tree: Tree) => {
-          if (options.testRunner === 'karma') {
-            const file = new JSONFile(tree, 'angular.json');
-            file.modify(['schematics', '@schematics/angular:application', 'testRunner'], 'karma');
-          }
-        },
         move(options.directory),
       ]),
     ),
