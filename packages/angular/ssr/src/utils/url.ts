@@ -220,3 +220,18 @@ export function stripMatrixParams(pathname: string): string {
   // This regex finds all occurrences of a semicolon followed by any characters
   return pathname.includes(';') ? pathname.replace(MATRIX_PARAMS_REGEX, '') : pathname;
 }
+
+/**
+ * Constructs a decoded URL string from its components.
+ *
+ * This function joins the pathname (with trailing slash removed), search, and hash,
+ * and then decodes the result.
+ *
+ * @param pathname - The path of the URL.
+ * @param search - The query string of the URL (including '?').
+ * @param hash - The hash fragment of the URL (including '#').
+ * @returns The constructed and decoded URL string.
+ */
+export function constructUrl(pathname: string, search: string, hash: string): string {
+  return decodeURIComponent([stripTrailingSlash(pathname), search, hash].join(''));
+}
