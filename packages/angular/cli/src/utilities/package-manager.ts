@@ -234,7 +234,7 @@ export class PackageManagerUtils {
       }).trim();
 
       if (name === PackageManager.Deno) {
-        // Deno CLI outputs "deno 2.4.4"
+        // Deno CLI outputs "deno 2.5.6"
         return version.replace('deno ', '');
       }
 
