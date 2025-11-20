@@ -183,6 +183,7 @@ describe('Ng New Schematic', () => {
 
     const { schematics } = JSON.parse(tree.readContent('/bar/angular.json'));
     expect(schematics['@schematics/angular:application'].testRunner).toBe('karma');
+    expect(schematics['@schematics/angular:library'].testRunner).toBe('karma');
   });
 
   it(`should not add type to class name when file name style guide is '2016'`, async () => {

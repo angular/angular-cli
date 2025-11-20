@@ -20,6 +20,7 @@ import {
   url,
 } from '@angular-devkit/schematics';
 import { join } from 'node:path/posix';
+import { getTestRunnerDependencies } from '../utility/dependencies';
 import {
   DependencyType,
   ExistingBehavior,
@@ -69,7 +70,7 @@ function addTsProjectReference(...paths: string[]) {
   };
 }
 
-function addDependenciesToPackageJson(skipInstall: boolean): Rule {
+function addDependenciesToPackageJson({ skipInstall, testRunner }: LibraryOptions): Rule {
   return chain([
     ...LIBRARY_DEV_DEPENDENCIES.map((dependency) =>
       addDependency(dependency.name, dependency.version, {
@@ -78,6 +79,7 @@ function addDependenciesToPackageJson(skipInstall: boolean): Rule {
         install: skipInstall ? InstallBehavior.None : InstallBehavior.Auto,
       }),
     ),
+    ...getTestRunnerDependencies(testRunner, !!skipInstall),
     addDependency('tslib', latestVersions['tslib'], {
       type: DependencyType.Default,
       existing: ExistingBehavior.Skip,
@@ -91,7 +93,6 @@ function addLibToWorkspaceFile(
   projectRoot: string,
   projectName: string,
   hasZoneDependency: boolean,
-  hasVitest: boolean,
 ): Rule {
   return updateWorkspace((workspace) => {
     workspace.projects.add({
@@ -113,20 +114,21 @@ function addLibToWorkspaceFile(
             },
           },
         },
-        test: hasVitest
-          ? {
-              builder: Builders.BuildUnitTest,
-              options: {
-                tsConfig: `${projectRoot}/tsconfig.spec.json`,
+        test:
+          options.testRunner === 'vitest'
+            ? {
+                builder: Builders.BuildUnitTest,
+                options: {
+                  tsConfig: `${projectRoot}/tsconfig.spec.json`,
+                },
+              }
+            : {
+                builder: Builders.BuildKarma,
+                options: {
+                  tsConfig: `${projectRoot}/tsconfig.spec.json`,
+                  polyfills: hasZoneDependency ? ['zone.js', 'zone.js/testing'] : undefined,
+                },
               },
-            }
-          : {
-              builder: Builders.BuildKarma,
-              options: {
-                tsConfig: `${projectRoot}/tsconfig.spec.json`,
-                polyfills: hasZoneDependency ? ['zone.js', 'zone.js/testing'] : undefined,
-              },
-            },
       },
     });
   });
@@ -158,7 +160,6 @@ export default function (options: LibraryOptions): Rule {
 
     const distRoot = `dist/${folderName}`;
     const sourceDir = `${libDir}/src/lib`;
-    const hasVitest = getDependency(host, 'vitest') !== null;
 
     const templateSource = apply(url('./files'), [
       applyTemplates({
@@ -172,7 +173,7 @@ export default function (options: LibraryOptions): Rule {
         angularLatestVersion: latestVersions.Angular.replace(/~|\^/, ''),
         tsLibLatestVersion: latestVersions['tslib'].replace(/~|\^/, ''),
         folderName,
-        testTypesPackage: hasVitest ? 'vitest/globals' : 'jasmine',
+        testTypesPackage: options.testRunner === 'vitest' ? 'vitest/globals' : 'jasmine',
       }),
       move(libDir),
     ]);
@@ -181,8 +182,8 @@ export default function (options: LibraryOptions): Rule {
 
     return chain([
       mergeWith(templateSource),
-      addLibToWorkspaceFile(options, libDir, packageName, hasZoneDependency, hasVitest),
-      options.skipPackageJson ? noop() : addDependenciesToPackageJson(!!options.skipInstall),
+      addLibToWorkspaceFile(options, libDir, packageName, hasZoneDependency),
+      options.skipPackageJson ? noop() : addDependenciesToPackageJson(options),
       options.skipTsConfig ? noop() : updateTsConfig(packageName, './' + distRoot),
       options.skipTsConfig
         ? noop()
