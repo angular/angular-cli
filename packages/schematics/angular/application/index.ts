@@ -35,7 +35,7 @@ import { latestVersions } from '../utility/latest-versions';
 import { relativePathToWorkspaceRoot } from '../utility/paths';
 import { getWorkspace, updateWorkspace } from '../utility/workspace';
 import { Builders, ProjectType } from '../utility/workspace-models';
-import { Schema as ApplicationOptions, Style } from './schema';
+import { Schema as ApplicationOptions, Style, TestRunner } from './schema';
 
 const APPLICATION_DEV_DEPENDENCIES = [
   { name: '@angular/compiler-cli', version: latestVersions.Angular },
@@ -341,7 +341,7 @@ function addAppToWorkspaceFile(options: ApplicationOptions, appDir: string): Rul
           : {
               builder: Builders.BuildUnitTest,
               options:
-                options.testRunner === 'vitest'
+                options.testRunner === TestRunner.Vitest
                   ? {}
                   : {
                       runner: 'karma',

@@ -10,7 +10,7 @@ import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/te
 import { parse as parseJson } from 'jsonc-parser';
 import { latestVersions } from '../utility/latest-versions';
 import { Schema as WorkspaceOptions } from '../workspace/schema';
-import { Schema as ApplicationOptions, Style, ViewEncapsulation } from './schema';
+import { Schema as ApplicationOptions, Style, TestRunner, ViewEncapsulation } from './schema';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function readJsonFile(tree: UnitTestTree, path: string): any {
@@ -442,7 +442,7 @@ describe('Application Schematic', () => {
     });
 
     it('should set values in angular.json correctly when testRunner is karma', async () => {
-      const options = { ...defaultOptions, projectRoot: '', testRunner: 'karma' as const };
+      const options = { ...defaultOptions, projectRoot: '', testRunner: TestRunner.Karma };
       const tree = await schematicRunner.runSchematic('application', options, workspaceTree);
 
       const config = JSON.parse(tree.readContent('/angular.json'));
