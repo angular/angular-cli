@@ -407,11 +407,11 @@ describe('Library Schematic', () => {
     expect(workspace.projects.foo.architect.build.builder).toBe('@angular/build:ng-packagr');
   });
 
-  it(`should add 'karma' test builder`, async () => {
+  it(`should add 'unit-test' test builder`, async () => {
     const tree = await schematicRunner.runSchematic('library', defaultOptions, workspaceTree);
 
     const workspace = JSON.parse(tree.readContent('/angular.json'));
-    expect(workspace.projects.foo.architect.test.builder).toBe('@angular/build:karma');
+    expect(workspace.projects.foo.architect.test.builder).toBe('@angular/build:unit-test');
   });
 
   it(`should add 'unit-test' test builder`, async () => {
