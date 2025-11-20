@@ -10,7 +10,7 @@ const PACKAGE_MANAGER_VERSION = {
   'deno': '2.5.6',
 };
 
-export default async function() {
+export default async function () {
   const argv = getGlobalVariable('argv');
   if (argv.noglobal) {
     return;

@@ -188,12 +188,12 @@ export class PackageManagerUtils {
 
   private async run(
     args: string[],
-    options: { cwd?: string; silent?: boolean; } = {},
+    options: { cwd?: string; silent?: boolean } = {},
   ): Promise<boolean> {
     const { cwd = process.cwd(), silent = false } = options;
 
     return new Promise((resolve) => {
-      const bufferedOutput: { stream: NodeJS.WriteStream; data: Buffer; }[] = [];
+      const bufferedOutput: { stream: NodeJS.WriteStream; data: Buffer }[] = [];
 
       const childProcess = spawn(`${this.name} ${args.join(' ')}`, {
         // Always pipe stderr to allow for failures to be reported
