@@ -91,7 +91,7 @@ export abstract class BaseWorkflow implements Workflow {
   }
 
   get context(): Readonly<WorkflowExecutionContext> {
-    const maybeContext = this._context[this._context.length - 1];
+    const maybeContext = this._context.at(-1);
     if (!maybeContext) {
       throw new Error('Cannot get context when workflow is not executing...');
     }
@@ -146,7 +146,7 @@ export abstract class BaseWorkflow implements Workflow {
   execute(
     options: Partial<WorkflowExecutionContext> & RequiredWorkflowExecutionContext,
   ): Observable<void> {
-    const parentContext = this._context[this._context.length - 1];
+    const parentContext = this._context.at(-1);
 
     if (!parentContext) {
       this._lifeCycle.next({ kind: 'start' });

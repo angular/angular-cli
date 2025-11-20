@@ -105,8 +105,7 @@ DDIy4xXPW1STWfsmSYJfYW3wa0wk+pJQ3j2cTzkPQQ8gwpvM3U9DJl43uwb37v6I
 
 async function goToPageAndWaitForWS(page: Page, url: string): Promise<void> {
   const baseUrl = url.replace(/^http/, 'ws');
-  const socksRequest =
-    baseUrl[baseUrl.length - 1] === '/' ? `${baseUrl}ng-cli-ws` : `${baseUrl}/ng-cli-ws`;
+  const socksRequest = baseUrl.at(-1) === '/' ? `${baseUrl}ng-cli-ws` : `${baseUrl}/ng-cli-ws`;
   // Create a Chrome dev tools session so that we can capturing websocket request.
   // https://github.com/puppeteer/puppeteer/issues/2974
 

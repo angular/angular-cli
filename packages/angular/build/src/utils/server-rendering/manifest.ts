@@ -77,7 +77,7 @@ export function generateAngularServerAppEngineManifest(
 
   // Remove trailing slash but retain leading slash.
   let basePath = baseHref || '/';
-  if (basePath.length > 1 && basePath[basePath.length - 1] === '/') {
+  if (basePath.length > 1 && basePath.at(-1) === '/') {
     basePath = basePath.slice(0, -1);
   }
 
