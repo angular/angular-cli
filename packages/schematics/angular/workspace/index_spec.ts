@@ -29,6 +29,7 @@ describe('Workspace Schematic', () => {
       jasmine.arrayContaining([
         '/.vscode/extensions.json',
         '/.vscode/launch.json',
+        '/.vscode/mcp.json',
         '/.vscode/tasks.json',
         '/.editorconfig',
         '/angular.json',
@@ -70,6 +71,7 @@ describe('Workspace Schematic', () => {
       jasmine.arrayContaining([
         '/.vscode/extensions.json',
         '/.vscode/launch.json',
+        '/.vscode/mcp.json',
         '/.vscode/tasks.json',
         '/angular.json',
         '/.gitignore',
