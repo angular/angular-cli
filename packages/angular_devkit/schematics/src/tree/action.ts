@@ -31,7 +31,7 @@ export class ActionList implements Iterable<Action> {
     this._actions.push({
       ...(action as Action),
       id: _id++,
-      parent: this._actions[this._actions.length - 1]?.id ?? 0,
+      parent: this._actions.at(-1)?.id ?? 0,
     });
   }
 

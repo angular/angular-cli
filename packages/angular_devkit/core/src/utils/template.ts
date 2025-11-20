@@ -253,9 +253,7 @@ function templateWithSourceMap(ast: TemplateAst, options?: TemplateOptions): str
     ]),
   );
 
-  const end = ast.children.length
-    ? ast.children[ast.children.length - 1].end
-    : { line: 0, column: 0 };
+  const end = ast.children.at(-1)?.end ?? { line: 0, column: 0 };
   const nodes = ast.children
     .reduce((chunk, node) => {
       let code: string | SourceNode | (SourceNode | string)[] = '';

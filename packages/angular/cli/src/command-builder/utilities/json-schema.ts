@@ -334,7 +334,7 @@ export async function parseJsonSchemaToOptions(
       // Skip any non-property items.
       return;
     }
-    const name = ptr[ptr.length - 1];
+    const name = ptr.at(-1) as string;
 
     const types = getSupportedTypes(current);
 

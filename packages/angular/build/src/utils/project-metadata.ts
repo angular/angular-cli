@@ -15,7 +15,7 @@ import { join } from 'node:path';
  * @returns A normalized path string.
  */
 export function normalizeDirectoryPath(path: string): string {
-  const last = path[path.length - 1];
+  const last = path.at(-1);
   if (last === '/' || last === '\\') {
     return path.slice(0, -1);
   }

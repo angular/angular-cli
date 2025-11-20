@@ -57,7 +57,7 @@ export const NormalizedRoot: Path = NormalizedSep;
  */
 export function split(path: Path): PathFragment[] {
   const fragments = path.split(NormalizedSep).map((x) => fragment(x));
-  if (fragments[fragments.length - 1].length === 0) {
+  if (fragments.at(-1)?.length === 0) {
     fragments.pop();
   }
 

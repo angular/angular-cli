@@ -121,7 +121,7 @@ const logger = createConsoleLogger(argv.verbose, process.stdout, process.stderr,
 
 const logStack = [logger];
 function lastLogger() {
-  return logStack[logStack.length - 1];
+  return logStack.at(-1)!;
 }
 
 // Under bazel the compiled file (.js) and types (.d.ts) are available.
