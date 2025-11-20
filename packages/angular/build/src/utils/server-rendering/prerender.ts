@@ -14,7 +14,7 @@ import { BuildOutputFile, BuildOutputFileType } from '../../tools/esbuild/bundle
 import { BuildOutputAsset } from '../../tools/esbuild/bundler-execution-result';
 import { assertIsError } from '../error';
 import { toPosixPath } from '../path';
-import { urlJoin } from '../url';
+import { addLeadingSlash, addTrailingSlash, joinUrlParts, stripLeadingSlash } from '../url';
 import { WorkerPool } from '../worker-pool';
 import { IMPORT_EXEC_ARGV } from './esm-in-memory-loader/utils';
 import { SERVER_APP_MANIFEST_FILENAME } from './manifest';
@@ -240,7 +240,7 @@ async function renderPages(
         ? addLeadingSlash(route.slice(baseHrefPathnameWithLeadingSlash.length))
         : route;
 
-      const outPath = posix.join(removeLeadingSlash(routeWithoutBaseHref), 'index.html');
+      const outPath = stripLeadingSlash(posix.join(routeWithoutBaseHref, 'index.html'));
 
       if (typeof redirectTo === 'string') {
         output[outPath] = { content: generateRedirectStaticPage(redirectTo), appShellRoute: false };
@@ -298,7 +298,7 @@ async function getAllRoutes(
   let appShellRoute: string | undefined;
 
   if (appShellOptions) {
-    appShellRoute = urlJoin(baseHref, appShellOptions.route);
+    appShellRoute = joinUrlParts(baseHref, appShellOptions.route);
 
     routes.push({
       renderMode: RouteRenderMode.Prerender,
@@ -311,7 +311,7 @@ async function getAllRoutes(
     for (const route of routesFromFile) {
       routes.push({
         renderMode: RouteRenderMode.Prerender,
-        route: urlJoin(baseHref, route.trim()),
+        route: joinUrlParts(baseHref, route.trim()),
       });
     }
   }
@@ -368,16 +368,4 @@ async function getAllRoutes(
   } finally {
     void renderWorker.destroy();
   }
-}
-
-function addLeadingSlash(value: string): string {
-  return value[0] === '/' ? value : '/' + value;
-}
-
-function addTrailingSlash(url: string): string {
-  return url[url.length - 1] === '/' ? url : `${url}/`;
-}
-
-function removeLeadingSlash(value: string): string {
-  return value[0] === '/' ? value.slice(1) : value;
 }
