@@ -23,7 +23,7 @@ import {
   url,
 } from '@angular-devkit/schematics';
 import { Schema as ComponentOptions, Style as ComponentStyle } from '../component/schema';
-import { getTestRunnerDependencies } from '../utility/dependencies';
+import { addTestRunnerDependencies } from '../utility/dependencies';
 import {
   DependencyType,
   ExistingBehavior,
@@ -188,7 +188,7 @@ function addDependenciesToPackageJson(options: ApplicationOptions): Rule {
   }
 
   if (!options.skipTests) {
-    rules.push(...getTestRunnerDependencies(options.testRunner, !!options.skipInstall));
+    rules.push(...addTestRunnerDependencies(options.testRunner, !!options.skipInstall));
   }
 
   return chain(rules);
