@@ -33,7 +33,7 @@ import { latestVersions } from '../utility/latest-versions';
 import { relativePathToWorkspaceRoot } from '../utility/paths';
 import { getWorkspace, updateWorkspace } from '../utility/workspace';
 import { Builders, ProjectType } from '../utility/workspace-models';
-import { Schema as LibraryOptions } from './schema';
+import { Schema as LibraryOptions, TestRunner } from './schema';
 
 const LIBRARY_DEV_DEPENDENCIES = [
   { name: '@angular/compiler-cli', version: latestVersions.Angular },
@@ -115,7 +115,7 @@ function addLibToWorkspaceFile(
           },
         },
         test:
-          options.testRunner === 'vitest'
+          options.testRunner === TestRunner.Vitest
             ? {
                 builder: Builders.BuildUnitTest,
                 options: {
@@ -173,7 +173,7 @@ export default function (options: LibraryOptions): Rule {
         angularLatestVersion: latestVersions.Angular.replace(/~|\^/, ''),
         tsLibLatestVersion: latestVersions['tslib'].replace(/~|\^/, ''),
         folderName,
-        testTypesPackage: options.testRunner === 'vitest' ? 'vitest/globals' : 'jasmine',
+        testTypesPackage: options.testRunner === TestRunner.Vitest ? 'vitest/globals' : 'jasmine',
       }),
       move(libDir),
     ]);
