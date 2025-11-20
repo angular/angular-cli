@@ -14,7 +14,7 @@ import {
   ApplicationBuilderOptions as ApplicationSchema,
   buildApplication,
 } from '../../../builders/application';
-import { Schema } from '../schema';
+import { Runner, Schema } from '../schema';
 
 // TODO: Consider using package.json imports field instead of relative path
 //       after the switch to rules_js.
@@ -61,7 +61,7 @@ export const UNIT_TEST_BUILDER_INFO = Object.freeze({
 export const BASE_OPTIONS = Object.freeze<Schema>({
   buildTarget: 'test:build',
   tsConfig: 'src/tsconfig.spec.json',
-  runner: 'vitest' as any,
+  runner: Runner.Vitest,
 });
 
 /**

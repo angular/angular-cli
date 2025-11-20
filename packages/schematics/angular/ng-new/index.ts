@@ -25,7 +25,7 @@ import {
 import { Schema as ApplicationOptions } from '../application/schema';
 import { JSONFile } from '../utility/json-file';
 import { Schema as WorkspaceOptions } from '../workspace/schema';
-import { Schema as NgNewOptions } from './schema';
+import { Schema as NgNewOptions, TestRunner } from './schema';
 
 export default function (options: NgNewOptions): Rule {
   if (!options.directory) {
@@ -68,12 +68,12 @@ export default function (options: NgNewOptions): Rule {
       apply(empty(), [
         schematic('workspace', workspaceOptions),
         (tree: Tree) => {
-          if (options.testRunner === 'karma') {
+          if (options.testRunner === TestRunner.Karma) {
             const file = new JSONFile(tree, 'angular.json');
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const schematics = file.get(['schematics']) ?? ({} as any);
-            (schematics['@schematics/angular:application'] ??= {}).testRunner = 'karma';
-            (schematics['@schematics/angular:library'] ??= {}).testRunner = 'karma';
+            (schematics['@schematics/angular:application'] ??= {}).testRunner = TestRunner.Karma;
+            (schematics['@schematics/angular:library'] ??= {}).testRunner = TestRunner.Karma;
 
             file.modify(['schematics'], schematics);
           }

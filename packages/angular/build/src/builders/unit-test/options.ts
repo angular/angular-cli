@@ -12,7 +12,7 @@ import path from 'node:path';
 import { normalizeCacheOptions } from '../../utils/normalize-cache';
 import { getProjectRootPaths } from '../../utils/project-metadata';
 import { isTTY } from '../../utils/tty';
-import type { Schema as UnitTestBuilderOptions } from './schema';
+import { Runner, type Schema as UnitTestBuilderOptions } from './schema';
 
 export type NormalizedUnitTestBuilderOptions = Awaited<ReturnType<typeof normalizeOptions>>;
 
@@ -56,7 +56,7 @@ export async function normalizeOptions(
 
   const { runner, browsers, progress, filter, browserViewport, ui, runnerConfig } = options;
 
-  if (ui && runner !== 'vitest') {
+  if (ui && runner !== Runner.Vitest) {
     throw new Error('The "ui" option is only available for the "vitest" runner.');
   }
 
@@ -95,7 +95,7 @@ export async function normalizeOptions(
     include: options.include ?? ['**/*.spec.ts'],
     exclude: options.exclude,
     filter,
-    runnerName: runner ?? 'vitest',
+    runnerName: runner ?? Runner.Vitest,
     coverage: {
       enabled: options.coverage,
       exclude: options.coverageExclude,
