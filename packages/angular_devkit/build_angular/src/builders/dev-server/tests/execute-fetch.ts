@@ -27,7 +27,7 @@ export async function executeOnceAndFetch<T>(
         let content = undefined;
         if (executionResult.result?.success) {
           let baseUrl = `${executionResult.result.baseUrl}`;
-          baseUrl = baseUrl[baseUrl.length - 1] === '/' ? baseUrl : `${baseUrl}/`;
+          baseUrl = baseUrl.at(-1) === '/' ? baseUrl : `${baseUrl}/`;
           const resolvedUrl = new URL(url, baseUrl);
           const originalResponse = await fetch(resolvedUrl, options?.request);
           response = originalResponse.clone();

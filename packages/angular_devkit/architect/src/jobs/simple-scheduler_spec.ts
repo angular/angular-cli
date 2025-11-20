@@ -168,7 +168,7 @@ describe('SimpleScheduler', () => {
     // Might be out of order.
     expect(done).toEqual(jasmine.arrayContaining([1, 2, 3, 4, 5, 6, 7]));
     // Verify at least partial order.
-    expect(done[done.length - 1]).toBe(7);
+    expect(done.at(-1)).toBe(7);
     expect(done.indexOf(4)).toBeGreaterThan(done.indexOf(1));
     expect(done.indexOf(5)).toBeGreaterThan(done.indexOf(2));
     expect(done.indexOf(6)).toBeGreaterThan(done.indexOf(3));

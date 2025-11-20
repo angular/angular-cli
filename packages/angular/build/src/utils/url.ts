@@ -22,7 +22,7 @@
  */
 export function stripTrailingSlash(url: string): string {
   // Check if the last character of the URL is a slash
-  return url.length > 1 && url[url.length - 1] === '/' ? url.slice(0, -1) : url;
+  return url.length > 1 && url.at(-1) === '/' ? url.slice(0, -1) : url;
 }
 
 /**
@@ -75,7 +75,7 @@ export function addLeadingSlash(url: string): string {
  */
 export function addTrailingSlash(url: string): string {
   // Check if the URL already end with a slash
-  return url[url.length - 1] === '/' ? url : `${url}/`;
+  return url.at(-1) === '/' ? url : `${url}/`;
 }
 
 /**
@@ -107,7 +107,7 @@ export function joinUrlParts(...parts: string[]): string {
     if (part[0] === '/') {
       normalizedPart = normalizedPart.slice(1);
     }
-    if (part[part.length - 1] === '/') {
+    if (part.at(-1) === '/') {
       normalizedPart = normalizedPart.slice(0, -1);
     }
     if (normalizedPart !== '') {
