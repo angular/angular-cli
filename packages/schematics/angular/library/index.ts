@@ -20,7 +20,7 @@ import {
   url,
 } from '@angular-devkit/schematics';
 import { join } from 'node:path/posix';
-import { getTestRunnerDependencies } from '../utility/dependencies';
+import { addTestRunnerDependencies } from '../utility/dependencies';
 import {
   DependencyType,
   ExistingBehavior,
@@ -79,7 +79,7 @@ function addDependenciesToPackageJson({ skipInstall, testRunner }: LibraryOption
         install: skipInstall ? InstallBehavior.None : InstallBehavior.Auto,
       }),
     ),
-    ...getTestRunnerDependencies(testRunner, !!skipInstall),
+    ...addTestRunnerDependencies(testRunner, !!skipInstall),
     addDependency('tslib', latestVersions['tslib'], {
       type: DependencyType.Default,
       existing: ExistingBehavior.Skip,
