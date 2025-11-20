@@ -82,60 +82,28 @@ export function getPackageJsonDependency(
   return null;
 }
 
-export function getTestRunnerDependencies(
+export function addTestRunnerDependencies(
   testRunner: TestRunner | undefined,
   skipInstall: boolean,
 ): Rule[] {
-  if (testRunner === TestRunner.Vitest) {
-    return [
-      addDependency('vitest', latestVersions['vitest'], {
-        type: DependencyType.Dev,
-        existing: ExistingBehavior.Skip,
-        install: skipInstall ? InstallBehavior.None : InstallBehavior.Auto,
-      }),
-      addDependency('jsdom', latestVersions['jsdom'], {
-        type: DependencyType.Dev,
-        existing: ExistingBehavior.Skip,
-        install: skipInstall ? InstallBehavior.None : InstallBehavior.Auto,
-      }),
-    ];
-  }
+  const dependencies =
+    testRunner === TestRunner.Vitest
+      ? ['vitest', 'jsdom']
+      : [
+          'karma',
+          'karma-chrome-launcher',
+          'karma-coverage',
+          'karma-jasmine',
+          'karma-jasmine-html-reporter',
+          'jasmine-core',
+          '@types/jasmine',
+        ];
 
-  return [
-    addDependency('karma', latestVersions['karma'], {
+  return dependencies.map((name) =>
+    addDependency(name, latestVersions[name], {
       type: DependencyType.Dev,
       existing: ExistingBehavior.Skip,
       install: skipInstall ? InstallBehavior.None : InstallBehavior.Auto,
     }),
-    addDependency('karma-chrome-launcher', latestVersions['karma-chrome-launcher'], {
-      type: DependencyType.Dev,
-      existing: ExistingBehavior.Skip,
-      install: skipInstall ? InstallBehavior.None : InstallBehavior.Auto,
-    }),
-    addDependency('karma-coverage', latestVersions['karma-coverage'], {
-      type: DependencyType.Dev,
-      existing: ExistingBehavior.Skip,
-      install: skipInstall ? InstallBehavior.None : InstallBehavior.Auto,
-    }),
-    addDependency('karma-jasmine', latestVersions['karma-jasmine'], {
-      type: DependencyType.Dev,
-      existing: ExistingBehavior.Skip,
-      install: skipInstall ? InstallBehavior.None : InstallBehavior.Auto,
-    }),
-    addDependency('karma-jasmine-html-reporter', latestVersions['karma-jasmine-html-reporter'], {
-      type: DependencyType.Dev,
-      existing: ExistingBehavior.Skip,
-      install: skipInstall ? InstallBehavior.None : InstallBehavior.Auto,
-    }),
-    addDependency('jasmine-core', latestVersions['jasmine-core'], {
-      type: DependencyType.Dev,
-      existing: ExistingBehavior.Skip,
-      install: skipInstall ? InstallBehavior.None : InstallBehavior.Auto,
-    }),
-    addDependency('@types/jasmine', latestVersions['@types/jasmine'], {
-      type: DependencyType.Dev,
-      existing: ExistingBehavior.Skip,
-      install: skipInstall ? InstallBehavior.None : InstallBehavior.Auto,
-    }),
-  ];
+  );
 }
