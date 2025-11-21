@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
+import { JsonObject } from '@angular-devkit/core';
 import { EmptyTree } from '@angular-devkit/schematics';
 import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/testing';
 import { Builders, ProjectType, WorkspaceSchema } from '../../utility/workspace-models';
@@ -447,5 +448,17 @@ describe(`Migration to use the application builder`, () => {
     const { devDependencies } = JSON.parse(newTree.readContent('/package.json'));
 
     expect(devDependencies['postcss']).toBeUndefined();
+  });
+
+  it('it should not add esModuleInterop and moduleResolution when module is preserve', async () => {
+    tree.overwrite(
+      'tsconfig.json',
+      JSON.stringify({
+        compilerOptions: { module: 'preserve' },
+      }),
+    );
+    const newTree = await schematicRunner.runSchematic(schematicName, {}, tree);
+    const { compilerOptions } = newTree.readJson('tsconfig.json') as JsonObject;
+    expect(compilerOptions).toEqual({ module: 'preserve' });
   });
 });
