@@ -6,10 +6,11 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { PlatformLocation } from '@angular/common';
+import { APP_BASE_HREF, PlatformLocation } from '@angular/common';
 import {
   ApplicationRef,
   type PlatformRef,
+  REQUEST,
   type StaticProvider,
   type Type,
   ɵConsole,
@@ -23,7 +24,7 @@ import {
 } from '@angular/platform-server';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Console } from '../console';
-import { stripIndexHtmlFromURL, stripTrailingSlash } from './url';
+import { addTrailingSlash, joinUrlParts, stripIndexHtmlFromURL, stripTrailingSlash } from './url';
 
 /**
  * Represents the bootstrap mechanism for an Angular application.
@@ -110,9 +111,13 @@ export async function renderAngular(
     } else if (lastSuccessfulNavigation?.finalUrl) {
       hasNavigationError = false;
 
+      const requestPrefix =
+        envInjector.get(APP_BASE_HREF, null, { optional: true }) ??
+        envInjector.get(REQUEST, null, { optional: true })?.headers.get('X-Forwarded-Prefix');
+
       const { pathname, search, hash } = envInjector.get(PlatformLocation);
-      const finalUrl = constructDecodedUrl({ pathname, search, hash });
-      const urlToRenderString = constructDecodedUrl(urlToRender);
+      const finalUrl = constructDecodedUrl({ pathname, search, hash }, requestPrefix);
+      const urlToRenderString = constructDecodedUrl(urlToRender, requestPrefix);
 
       if (urlToRenderString !== finalUrl) {
         redirectTo = [pathname, search, hash].join('');
@@ -186,10 +191,23 @@ function asyncDestroyPlatform(platformRef: PlatformRef): Promise<void> {
  *   - `pathname`: The path of the URL.
  *   - `search`: The query string of the URL (including '?').
  *   - `hash`: The hash fragment of the URL (including '#').
+ * @param prefix - An optional prefix (e.g., `APP_BASE_HREF`) to prepend to the pathname
+ * if it is not already present.
  * @returns The constructed and decoded URL string.
  */
-function constructDecodedUrl(url: { pathname: string; search: string; hash: string }): string {
-  const joinedUrl = [stripTrailingSlash(url.pathname), url.search, url.hash].join('');
+function constructDecodedUrl(
+  url: { pathname: string; search: string; hash: string },
+  prefix?: string | null,
+): string {
+  const { pathname, hash, search } = url;
+  const urlParts: string[] = [];
+  if (prefix && !addTrailingSlash(pathname).startsWith(addTrailingSlash(prefix))) {
+    urlParts.push(joinUrlParts(prefix, pathname));
+  } else {
+    urlParts.push(stripTrailingSlash(pathname));
+  }
 
-  return decodeURIComponent(joinedUrl);
+  urlParts.push(search, hash);
+
+  return decodeURIComponent(urlParts.join(''));
 }
