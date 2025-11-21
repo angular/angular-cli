@@ -153,7 +153,7 @@ export function transformSpies(node: ts.Node, refactorCtx: RefactorContext): ts.
           }
           default: {
             const category = 'unsupported-spy-strategy';
-            reporter.recordTodo(category);
+            reporter.recordTodo(category, sourceFile, node);
             addTodoComment(node, category, { name: strategyName });
             break;
           }
@@ -202,7 +202,7 @@ export function transformSpies(node: ts.Node, refactorCtx: RefactorContext): ts.
         'Found unsupported `jasmine.spyOnAllFunctions()`.',
       );
       const category = 'spyOnAllFunctions';
-      reporter.recordTodo(category);
+      reporter.recordTodo(category, sourceFile, node);
       addTodoComment(node, category);
 
       return node;
@@ -235,7 +235,7 @@ export function transformCreateSpyObj(
 
   if (node.arguments.length < 2) {
     const category = 'createSpyObj-single-argument';
-    reporter.recordTodo(category);
+    reporter.recordTodo(category, sourceFile, node);
     addTodoComment(node, category);
 
     return node;
@@ -247,7 +247,7 @@ export function transformCreateSpyObj(
     properties = createSpyObjWithObject(methods, baseName);
   } else {
     const category = 'createSpyObj-dynamic-variable';
-    reporter.recordTodo(category);
+    reporter.recordTodo(category, sourceFile, node);
     addTodoComment(node, category);
 
     return node;
@@ -258,7 +258,7 @@ export function transformCreateSpyObj(
       properties.push(...(propertiesArg.properties as unknown as ts.PropertyAssignment[]));
     } else {
       const category = 'createSpyObj-dynamic-property-map';
-      reporter.recordTodo(category);
+      reporter.recordTodo(category, sourceFile, node);
       addTodoComment(node, category);
     }
   }
@@ -485,7 +485,7 @@ export function transformSpyCallInspection(node: ts.Node, refactorCtx: RefactorC
           node.parent.name.text !== 'args'
         ) {
           const category = 'mostRecent-without-args';
-          reporter.recordTodo(category);
+          reporter.recordTodo(category, sourceFile, node);
           addTodoComment(node, category);
         }
 

@@ -146,7 +146,7 @@ export function transformGlobalFunctions(
       `Found unsupported global function \`${functionName}\`.`,
     );
     const category = 'unsupported-global-function';
-    reporter.recordTodo(category);
+    reporter.recordTodo(category, sourceFile, node);
     addTodoComment(node, category, { name: functionName });
   }
 
@@ -179,7 +179,7 @@ export function transformUnsupportedJasmineCalls(
       node,
       `Found unsupported call \`jasmine.${methodName}\`.`,
     );
-    reporter.recordTodo(methodName);
+    reporter.recordTodo(methodName, sourceFile, node);
     addTodoComment(node, methodName);
   }
 
@@ -230,7 +230,7 @@ export function transformUnknownJasmineProperties(
         `Found unknown jasmine property \`jasmine.${propName}\`.`,
       );
       const category = 'unknown-jasmine-property';
-      reporter.recordTodo(category);
+      reporter.recordTodo(category, sourceFile, node);
       addTodoComment(node, category, { name: propName });
     }
   }
