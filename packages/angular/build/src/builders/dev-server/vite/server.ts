@@ -60,13 +60,7 @@ async function createServerConfig(
     headers: serverOptions.headers,
     // Disable the websocket if live reload is disabled (false/undefined are the only valid values)
     ws: serverOptions.liveReload === false && serverOptions.hmr === false ? false : undefined,
-    // When server-side rendering (SSR) is enabled togather with SSL and Express is being used,
-    // we must configure Vite to use HTTP/1.1.
-    // This is necessary because Express does not support HTTP/2.
-    // We achieve this by defining an empty proxy.
-    // See: https://github.com/vitejs/vite/blob/c4b532cc900bf988073583511f57bd581755d5e3/packages/vite/src/node/http.ts#L106
-    proxy:
-      serverOptions.ssl && ssrMode === ServerSsrMode.ExternalSsrMiddleware ? (proxy ?? {}) : proxy,
+    proxy,
     cors: {
       // This will add the header `Access-Control-Allow-Origin: http://example.com`,
       // where `http://example.com` is the requesting origin.
