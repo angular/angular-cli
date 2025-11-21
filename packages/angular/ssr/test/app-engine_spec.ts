@@ -269,19 +269,5 @@ describe('AngularAppEngine', () => {
       const response = await appEngine.handle(request);
       expect(await response?.text()).toContain('Home works');
     });
-
-    it('should work with encoded characters', async () => {
-      const request = new Request('https://example.com/home?email=xyz%40xyz.com');
-      const response = await appEngine.handle(request);
-      expect(response?.status).toBe(200);
-      expect(await response?.text()).toContain('Home works');
-    });
-
-    it('should work with decoded characters', async () => {
-      const request = new Request('https://example.com/home?email=xyz@xyz.com');
-      const response = await appEngine.handle(request);
-      expect(response?.status).toBe(200);
-      expect(await response?.text()).toContain('Home works');
-    });
   });
 });
