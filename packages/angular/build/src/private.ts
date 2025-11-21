@@ -61,6 +61,7 @@ export function createCompilerPlugin(
 }
 
 export type { AngularCompilation } from './tools/angular/compilation';
+export { DiagnosticModes } from './tools/angular/compilation';
 export { createAngularCompilation };
 export { ComponentStylesheetBundler } from './tools/esbuild/angular/component-stylesheets';
 
