@@ -42,14 +42,23 @@ export default async function () {
 
   const port = await ngServe('--ssl');
 
-  // Verify the server is running and the API response is correct.
-  await validateResponse('/main.js', /bootstrapApplication/);
-  await validateResponse('/home', /home works/);
+  // http 2
+  await validateResponse('/main.js', /bootstrapApplication/, true);
+  await validateResponse('/home', /home works/, true);
 
-  async function validateResponse(pathname: string, match: RegExp): Promise<void> {
+  // http 1.1
+  await validateResponse('/main.js', /bootstrapApplication/, false);
+  await validateResponse('/home', /home works/, false);
+
+  async function validateResponse(
+    pathname: string,
+    match: RegExp,
+    allowH2: boolean,
+  ): Promise<void> {
     const response = await fetch(new URL(pathname, `https://localhost:${port}`), {
       dispatcher: new Agent({
         connect: {
+          allowH2,
           rejectUnauthorized: false,
         },
       }),
