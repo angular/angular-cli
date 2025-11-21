@@ -175,8 +175,15 @@ export class AngularServerApp {
     }
 
     const { redirectTo, status, renderMode } = matchedRoute;
+
     if (redirectTo !== undefined) {
-      return createRedirectResponse(buildPathWithParams(redirectTo, url.pathname), status);
+      return createRedirectResponse(
+        joinUrlParts(
+          request.headers.get('X-Forwarded-Prefix') ?? '',
+          buildPathWithParams(redirectTo, url.pathname),
+        ),
+        status,
+      );
     }
 
     if (renderMode === RenderMode.Prerender) {

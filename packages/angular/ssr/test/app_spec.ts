@@ -11,7 +11,8 @@
 import '@angular/compiler';
 /* eslint-enable import/no-unassigned-import */
 
-import { Component, inject } from '@angular/core';
+import { APP_BASE_HREF } from '@angular/common';
+import { Component, REQUEST, inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
 import { AngularServerApp } from '../src/app';
 import { RenderMode } from '../src/routes/route-config';
@@ -124,6 +125,14 @@ describe('AngularServerApp', () => {
           hash: 'f799132d0a09e0fef93c68a12e443527700eb59e6f67fcb7854c3a60ff082fde',
         },
       },
+      undefined,
+      undefined,
+      [
+        {
+          provide: APP_BASE_HREF,
+          useFactory: () => inject(REQUEST)?.headers.get('X-Forwarded-Prefix'),
+        },
+      ],
     );
 
     app = new AngularServerApp();
@@ -308,6 +317,50 @@ describe('AngularServerApp', () => {
         const response = await app.handle(new Request('http://localhost/redirect-via-guard'));
         expect(response?.headers.get('location')).toBe('/redirect-via-guard?filter=test');
         expect(response?.status).toBe(302);
+      });
+
+      it('should work with encoded characters', async () => {
+        const request = new Request('http://localhost/home?email=xyz%40xyz.com');
+        const response = await app.handle(request);
+        expect(response?.status).toBe(200);
+        expect(await response?.text()).toContain('Home works');
+      });
+
+      it('should work with decoded characters', async () => {
+        const request = new Request('http://localhost/home?email=xyz@xyz.com');
+        const response = await app.handle(request);
+        expect(response?.status).toBe(200);
+        expect(await response?.text()).toContain('Home works');
+      });
+
+      describe('APP_BASE_HREF / X-Forwarded-Prefix', () => {
+        const headers = new Headers({ 'X-Forwarded-Prefix': '/base/' });
+
+        it('should return a rendered page for known paths', async () => {
+          const request = new Request('https://example.com/home', { headers });
+          const response = await app.handle(request);
+          expect(await response?.text()).toContain('Home works');
+        });
+
+        it('returns a 302 status and redirects to the correct location when `redirectTo` is a function', async () => {
+          const response = await app.handle(
+            new Request('http://localhost/redirect-to-function', {
+              headers,
+            }),
+          );
+          expect(response?.headers.get('location')).toBe('/base/home');
+          expect(response?.status).toBe(302);
+        });
+
+        it('returns a 302 status and redirects to the correct location when `redirectTo` is a string', async () => {
+          const response = await app.handle(
+            new Request('http://localhost/redirect', {
+              headers,
+            }),
+          );
+          expect(response?.headers.get('location')).toBe('/base/home');
+          expect(response?.status).toBe(302);
+        });
       });
     });
   });
