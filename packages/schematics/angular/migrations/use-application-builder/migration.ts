@@ -174,7 +174,11 @@ function updateProjects(tree: Tree, context: SchematicContext) {
       }
 
       const buildTarget = project.targets.get('build');
-      if (!buildTarget || buildTarget.builder === Builders.Application) {
+      if (
+        !buildTarget ||
+        buildTarget.builder === Builders.Application ||
+        buildTarget.builder === Builders.BuildApplication
+      ) {
         continue;
       }
 
