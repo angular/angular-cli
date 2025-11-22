@@ -81,5 +81,41 @@ describe('Jasmine to Vitest Transformer', () => {
       `;
       await expectTransformation(input, expected, true);
     });
+
+    it('should add imports for beforeEach and afterEach when addImports is true', async () => {
+      const input = `
+        describe('My Suite', () => {
+          beforeEach(() => {});
+          afterEach(() => {});
+        });
+      `;
+      const expected = `
+        import { afterEach, beforeEach, describe } from 'vitest';
+
+        describe('My Suite', () => {
+          beforeEach(() => {});
+          afterEach(() => {});
+        });
+      `;
+      await expectTransformation(input, expected, true);
+    });
+
+    it('should add imports for beforeAll and afterAll when addImports is true', async () => {
+      const input = `
+        describe('My Suite', () => {
+          beforeAll(() => {});
+          afterAll(() => {});
+        });
+      `;
+      const expected = `
+        import { afterAll, beforeAll, describe } from 'vitest';
+
+        describe('My Suite', () => {
+          beforeAll(() => {});
+          afterAll(() => {});
+        });
+      `;
+      await expectTransformation(input, expected, true);
+    });
   });
 });
