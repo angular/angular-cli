@@ -30,7 +30,10 @@ export async function expectTransformation(
 ): Promise<void> {
   const logger = new logging.NullLogger();
   const reporter = new RefactorReporter(logger);
-  const transformed = transformJasmineToVitest('spec.ts', input, reporter, { addImports });
+  const transformed = transformJasmineToVitest('spec.ts', input, reporter, {
+    addImports,
+    browserMode: false,
+  });
   const formattedTransformed = await format(transformed, { parser: 'typescript' });
   const formattedExpected = await format(expected, { parser: 'typescript' });
 
