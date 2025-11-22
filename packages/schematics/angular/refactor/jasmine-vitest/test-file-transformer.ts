@@ -152,7 +152,7 @@ export function transformJasmineToVitest(
   filePath: string,
   content: string,
   reporter: RefactorReporter,
-  options: { addImports: boolean },
+  options: { addImports: boolean; browserMode: boolean },
 ): string {
   const contentWithPlaceholders = preserveBlankLines(content);
 
@@ -189,7 +189,9 @@ export function transformJasmineToVitest(
         }
 
         for (const transformer of callExpressionTransformers) {
-          transformedNode = transformer(transformedNode, refactorCtx);
+          if (!(options.browserMode && transformer === transformToHaveClass)) {
+            transformedNode = transformer(transformedNode, refactorCtx);
+          }
         }
       } else if (ts.isPropertyAccessExpression(transformedNode)) {
         for (const transformer of propertyAccessExpressionTransformers) {
