@@ -61,7 +61,15 @@ export function transformTimerMocks(
       node,
       `Transformed \`jasmine.clock().${pae.name.text}\` to \`vi.${newMethodName}\`.`,
     );
-    const newArgs = newMethodName === 'useFakeTimers' ? [] : node.arguments;
+    let newArgs: readonly ts.Expression[] = node.arguments;
+    if (newMethodName === 'useFakeTimers') {
+      newArgs = [];
+    }
+    if (newMethodName === 'setSystemTime' && node.arguments.length === 0) {
+      newArgs = [
+        ts.factory.createNewExpression(ts.factory.createIdentifier('Date'), undefined, []),
+      ];
+    }
 
     return createViCallExpression(newMethodName, newArgs);
   }
