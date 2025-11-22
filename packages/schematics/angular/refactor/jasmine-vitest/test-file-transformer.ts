@@ -183,7 +183,15 @@ export function transformJasmineToVitest(
       if (ts.isCallExpression(transformedNode)) {
         if (options.addImports && ts.isIdentifier(transformedNode.expression)) {
           const name = transformedNode.expression.text;
-          if (name === 'describe' || name === 'it' || name === 'expect') {
+          if (
+            name === 'describe' ||
+            name === 'it' ||
+            name === 'expect' ||
+            name === 'beforeEach' ||
+            name === 'afterEach' ||
+            name === 'beforeAll' ||
+            name === 'afterAll'
+          ) {
             addVitestValueImport(pendingVitestValueImports, name);
           }
         }
