@@ -71,9 +71,9 @@ new or evolving features.
   factory: createFindExampleHandler,
 });
 
-async function createFindExampleHandler({ logger, exampleDatabasePath }: McpToolContext) {
+async function createFindExampleHandler({ logger, exampleDatabasePath, host }: McpToolContext) {
   const runtimeDb = process.env['NG_MCP_EXAMPLES_DIR']
-    ? await setupRuntimeExamples(process.env['NG_MCP_EXAMPLES_DIR'])
+    ? await setupRuntimeExamples(process.env['NG_MCP_EXAMPLES_DIR'], host)
     : undefined;
 
   suppressSqliteWarning();
@@ -91,6 +91,7 @@ async function createFindExampleHandler({ logger, exampleDatabasePath }: McpTool
       const versionSpecificDbs = await getVersionSpecificExampleDatabases(
         input.workspacePath,
         logger,
+        host,
       );
       for (const db of versionSpecificDbs) {
         resolvedDbs.push({ path: db.dbPath, source: db.source });
