@@ -57,7 +57,7 @@
     "ng-packagr": "21.1.0-next.0",
     "postcss": "8.5.6",
     "rxjs": "7.8.2",
-    "vitest": "4.0.12"
+    "vitest": "4.0.13"
   },
   "peerDependencies": {
     "@angular/compiler": "0.0.0-ANGULAR-FW-PEER-DEP",
