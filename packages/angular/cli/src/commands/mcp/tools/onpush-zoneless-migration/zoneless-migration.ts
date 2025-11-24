@@ -70,12 +70,10 @@ export async function registerZonelessMigrationTool(
   fileOrDirPath: string,
   extras: RequestHandlerExtra<ServerRequest, ServerNotification>,
 ) {
-  let filesWithComponents, componentTestFiles, zoneFiles;
+  let filesWithComponents, componentTestFiles, zoneFiles, categorizationErrors;
   try {
-    ({ filesWithComponents, componentTestFiles, zoneFiles } = await discoverAndCategorizeFiles(
-      fileOrDirPath,
-      extras,
-    ));
+    ({ filesWithComponents, componentTestFiles, zoneFiles, categorizationErrors } =
+      await discoverAndCategorizeFiles(fileOrDirPath, extras));
   } catch (e) {
     return createResponse(
       `Error: Could not access the specified path. Please ensure the following path is correct ` +
@@ -113,6 +111,14 @@ export async function registerZonelessMigrationTool(
     }
   }
 
+  if (categorizationErrors.length > 0) {
+    let errorMessage =
+      'Migration analysis is complete for all actionable files. However, the following files could not be analyzed due to errors:\n';
+    errorMessage += categorizationErrors.map((e) => `- ${e.filePath}: ${e.message}`).join('\n');
+
+    return createResponse(errorMessage);
+  }
+
   return createTestDebuggingGuideForNonActionableInput(fileOrDirPath);
 }
 
@@ -120,10 +126,11 @@ async function discoverAndCategorizeFiles(
   fileOrDirPath: string,
   extras: RequestHandlerExtra<ServerRequest, ServerNotification>,
 ) {
-  let files: SourceFile[] = [];
+  const filePaths: string[] = [];
   const componentTestFiles = new Set<SourceFile>();
   const filesWithComponents = new Set<SourceFile>();
   const zoneFiles = new Set<SourceFile>();
+  const categorizationErrors: { filePath: string; message: string }[] = [];
 
   let isDirectory: boolean;
   try {
@@ -134,52 +141,87 @@ async function discoverAndCategorizeFiles(
   }
 
   if (isDirectory) {
-    const allFiles = glob(`${fileOrDirPath}/**/*.ts`);
-    for await (const file of allFiles) {
-      files.push(await createSourceFile(file));
+    for await (const file of glob(`${fileOrDirPath}/**/*.ts`)) {
+      filePaths.push(file);
     }
   } else {
-    files = [await createSourceFile(fileOrDirPath)];
+    filePaths.push(fileOrDirPath);
     const maybeTestFile = await getTestFilePath(fileOrDirPath);
     if (maybeTestFile) {
-      componentTestFiles.add(await createSourceFile(maybeTestFile));
+      // Eagerly add the test file path for categorization.
+      filePaths.push(maybeTestFile);
     }
   }
 
-  for (const sourceFile of files) {
-    const content = sourceFile.getFullText();
-    const componentSpecifier = await getImportSpecifier(sourceFile, '@angular/core', 'Component');
-    const zoneSpecifier = await getImportSpecifier(sourceFile, '@angular/core', 'NgZone');
-    const testBedSpecifier = await getImportSpecifier(
-      sourceFile,
-      /(@angular\/core)?\/testing/,
-      'TestBed',
+  const CONCURRENCY_LIMIT = 50;
+  const filesToProcess = [...filePaths];
+  while (filesToProcess.length > 0) {
+    const batch = filesToProcess.splice(0, CONCURRENCY_LIMIT);
+    const results = await Promise.allSettled(
+      batch.map(async (filePath) => {
+        const sourceFile = await createSourceFile(filePath);
+        await categorizeFile(sourceFile, extras, {
+          filesWithComponents,
+          componentTestFiles,
+          zoneFiles,
+        });
+      }),
     );
-    if (testBedSpecifier) {
-      componentTestFiles.add(sourceFile);
-    } else if (componentSpecifier) {
-      if (
-        !content.includes('changeDetectionStrategy: ChangeDetectionStrategy.OnPush') &&
-        !content.includes('changeDetectionStrategy: ChangeDetectionStrategy.Default')
-      ) {
-        filesWithComponents.add(sourceFile);
-      } else {
-        sendDebugMessage(
-          `Component file already has change detection strategy: ${sourceFile.fileName}. Skipping migration.`,
-          extras,
-        );
-      }
 
-      const testFilePath = await getTestFilePath(sourceFile.fileName);
-      if (testFilePath) {
-        componentTestFiles.add(await createSourceFile(testFilePath));
+    for (let i = 0; i < results.length; i++) {
+      const result = results[i];
+      if (result.status === 'rejected') {
+        const failedFile = batch[i];
+        const reason = result.reason instanceof Error ? result.reason.message : `${result.reason}`;
+        categorizationErrors.push({ filePath: failedFile, message: reason });
       }
-    } else if (zoneSpecifier) {
-      zoneFiles.add(sourceFile);
     }
   }
 
-  return { filesWithComponents, componentTestFiles, zoneFiles };
+  return { filesWithComponents, componentTestFiles, zoneFiles, categorizationErrors };
+}
+
+async function categorizeFile(
+  sourceFile: SourceFile,
+  extras: RequestHandlerExtra<ServerRequest, ServerNotification>,
+  categorizedFiles: {
+    filesWithComponents: Set<SourceFile>;
+    componentTestFiles: Set<SourceFile>;
+    zoneFiles: Set<SourceFile>;
+  },
+) {
+  const { filesWithComponents, componentTestFiles, zoneFiles } = categorizedFiles;
+  const content = sourceFile.getFullText();
+  const componentSpecifier = await getImportSpecifier(sourceFile, '@angular/core', 'Component');
+  const zoneSpecifier = await getImportSpecifier(sourceFile, '@angular/core', 'NgZone');
+  const testBedSpecifier = await getImportSpecifier(
+    sourceFile,
+    /(@angular\/core)?\/testing/,
+    'TestBed',
+  );
+
+  if (testBedSpecifier) {
+    componentTestFiles.add(sourceFile);
+  } else if (componentSpecifier) {
+    if (
+      !content.includes('changeDetectionStrategy: ChangeDetectionStrategy.OnPush') &&
+      !content.includes('changeDetectionStrategy: ChangeDetectionStrategy.Default')
+    ) {
+      filesWithComponents.add(sourceFile);
+    } else {
+      sendDebugMessage(
+        `Component file already has change detection strategy: ${sourceFile.fileName}. Skipping migration.`,
+        extras,
+      );
+    }
+
+    const testFilePath = await getTestFilePath(sourceFile.fileName);
+    if (testFilePath) {
+      componentTestFiles.add(await createSourceFile(testFilePath));
+    }
+  } else if (zoneSpecifier) {
+    zoneFiles.add(sourceFile);
+  }
 }
 
 async function rankComponentFilesForMigration(
