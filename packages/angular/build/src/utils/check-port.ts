@@ -38,7 +38,11 @@ export async function checkPort(port: number, host: string): Promise<number> {
           return;
         }
 
-        import('@inquirer/confirm')
+        (
+          import('@inquirer/confirm' as string) as Promise<
+            typeof import('@inquirer/confirm', { with: { 'resolution-mode': 'import' } })
+          >
+        )
           .then(({ default: confirm }) =>
             confirm({
               message: `Port ${port} is already in use.\nWould you like to use a different port?`,
