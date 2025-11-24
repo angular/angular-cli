@@ -105,15 +105,21 @@ export function createAngularSetupMiddlewaresPlugin(
 
       extensionMiddleware?.forEach((middleware) => server.middlewares.use(middleware));
 
+      // For ExternalSsrMiddleware, install the middleware early to ensure custom middleware
+      // in server.ts can handle requests outside the base path (e.g., /ping when baseHref=/custom/)
+      // This allows fallthrough for custom routes that don't start with the configured baseHref
+      if (ssrMode === ServerSsrMode.ExternalSsrMiddleware) {
+        server.middlewares.use(
+          await createAngularSsrExternalMiddleware(server, indexHtmlTransformer),
+        );
+      }
+
       // Returning a function, installs middleware after the main transform middleware but
       // before the built-in HTML middleware
       // eslint-disable-next-line @typescript-eslint/no-misused-promises
       return async () => {
+        // ExternalSsrMiddleware was already installed above, skip here
         if (ssrMode === ServerSsrMode.ExternalSsrMiddleware) {
-          server.middlewares.use(
-            await createAngularSsrExternalMiddleware(server, indexHtmlTransformer),
-          );
-
           return;
         }
 
