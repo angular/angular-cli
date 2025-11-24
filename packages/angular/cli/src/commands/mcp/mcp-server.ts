@@ -11,6 +11,7 @@ import { join } from 'node:path';
 import type { AngularWorkspace } from '../../utilities/config';
 import { VERSION } from '../../utilities/version';
 import type { DevServer } from './dev-server';
+import { LocalWorkspaceHost } from './host';
 import { registerInstructionsResource } from './resources/instructions';
 import { AI_TUTOR_TOOL } from './tools/ai-tutor';
 import { BEST_PRACTICES_TOOL } from './tools/best-practices';
@@ -115,6 +116,7 @@ equivalent actions.
       logger,
       exampleDatabasePath: join(__dirname, '../../../lib/code-examples.db'),
       devServers: new Map<string, DevServer>(),
+      host: LocalWorkspaceHost,
     },
     toolDeclarations,
   );

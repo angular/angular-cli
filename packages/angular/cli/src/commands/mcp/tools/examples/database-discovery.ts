@@ -6,8 +6,6 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { readFile, stat } from 'node:fs/promises';
-import { createRequire } from 'node:module';
 import { dirname, isAbsolute, relative, resolve } from 'node:path';
 import type { McpToolContext } from '../tool-registry';
 
@@ -36,20 +34,21 @@ const KNOWN_EXAMPLE_PACKAGES = ['@angular/core', '@angular/aria', '@angular/form
  *
  * @param workspacePath The absolute path to the user's `angular.json` file.
  * @param logger The MCP tool context logger for reporting warnings.
+ * @param host The host interface for file system and module resolution operations.
  * @returns A promise that resolves to an array of objects, each containing a database path and source.
  */
 export async function getVersionSpecificExampleDatabases(
   workspacePath: string,
   logger: McpToolContext['logger'],
+  host: McpToolContext['host'],
 ): Promise<{ dbPath: string; source: string }[]> {
-  const workspaceRequire = createRequire(workspacePath);
   const databases: { dbPath: string; source: string }[] = [];
 
   for (const packageName of KNOWN_EXAMPLE_PACKAGES) {
     // 1. Resolve the path to package.json
     let pkgJsonPath: string;
     try {
-      pkgJsonPath = workspaceRequire.resolve(`${packageName}/package.json`);
+      pkgJsonPath = host.resolveModule(`${packageName}/package.json`, workspacePath);
     } catch (e) {
       // This is not a warning because the user may not have all known packages installed.
       continue;
@@ -57,7 +56,7 @@ export async function getVersionSpecificExampleDatabases(
 
     // 2. Read and parse package.json, then find the database.
     try {
-      const pkgJsonContent = await readFile(pkgJsonPath, 'utf-8');
+      const pkgJsonContent = await host.readFile(pkgJsonPath, 'utf-8');
       const pkgJson = JSON.parse(pkgJsonContent);
       const examplesInfo = pkgJson['angular']?.examples;
 
@@ -81,7 +80,7 @@ export async function getVersionSpecificExampleDatabases(
         }
 
         // Check the file size to prevent reading a very large file.
-        const stats = await stat(dbPath);
+        const stats = await host.stat(dbPath);
         if (stats.size > 10 * 1024 * 1024) {
           // 10MB
           logger.warn(

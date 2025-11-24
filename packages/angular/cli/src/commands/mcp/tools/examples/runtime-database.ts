@@ -6,10 +6,10 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { glob, readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import type { DatabaseSync } from 'node:sqlite';
 import { z } from 'zod';
+import type { McpToolContext } from '../tool-registry';
 
 /**
  * A simple YAML front matter parser.
@@ -80,7 +80,10 @@ function parseFrontmatter(content: string): Record<string, unknown> {
   return data;
 }
 
-export async function setupRuntimeExamples(examplesPath: string): Promise<DatabaseSync> {
+export async function setupRuntimeExamples(
+  examplesPath: string,
+  host: McpToolContext['host'],
+): Promise<DatabaseSync> {
   const { DatabaseSync } = await import('node:sqlite');
   const db = new DatabaseSync(':memory:');
 
@@ -156,12 +159,12 @@ export async function setupRuntimeExamples(examplesPath: string): Promise<Databa
   });
 
   db.exec('BEGIN TRANSACTION');
-  for await (const entry of glob('**/*.md', { cwd: examplesPath, withFileTypes: true })) {
+  for await (const entry of host.glob('**/*.md', { cwd: examplesPath })) {
     if (!entry.isFile()) {
       continue;
     }
 
-    const content = await readFile(join(entry.parentPath, entry.name), 'utf-8');
+    const content = await host.readFile(join(entry.parentPath, entry.name), 'utf-8');
     const frontmatter = parseFrontmatter(content);
 
     const validation = frontmatterSchema.safeParse(frontmatter);

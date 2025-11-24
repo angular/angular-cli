@@ -16,7 +16,8 @@
 import { existsSync as nodeExistsSync } from 'fs';
 import { ChildProcess, spawn } from 'node:child_process';
 import { Stats } from 'node:fs';
-import { stat } from 'node:fs/promises';
+import { glob as nodeGlob, readFile as nodeReadFile, stat } from 'node:fs/promises';
+import { createRequire } from 'node:module';
 import { createServer } from 'node:net';
 
 /**
@@ -49,6 +50,33 @@ export interface Host {
    * @returns A boolean indicating whether the path exists.
    */
   existsSync(path: string): boolean;
+
+  /**
+   * Reads a file and returns its content.
+   * @param path The path to the file.
+   * @param encoding The encoding to use.
+   * @returns A promise that resolves to the file content.
+   */
+  readFile(path: string, encoding: 'utf-8'): Promise<string>;
+
+  /**
+   * Finds files matching a glob pattern.
+   * @param pattern The glob pattern.
+   * @param options Options for the glob search.
+   * @returns An async iterable of file entries.
+   */
+  glob(
+    pattern: string,
+    options: { cwd: string },
+  ): AsyncIterable<{ name: string; parentPath: string; isFile(): boolean }>;
+
+  /**
+   * Resolves a module request from a given path.
+   * @param request The module request to resolve.
+   * @param from The path from which to resolve the request.
+   * @returns The resolved module path.
+   */
+  resolveModule(request: string, from: string): string;
 
   /**
    * Spawns a child process and returns a promise that resolves with the process's
@@ -99,6 +127,19 @@ export const LocalWorkspaceHost: Host = {
   stat,
 
   existsSync: nodeExistsSync,
+
+  readFile: nodeReadFile,
+
+  glob: function (
+    pattern: string,
+    options: { cwd: string },
+  ): AsyncIterable<{ name: string; parentPath: string; isFile(): boolean }> {
+    return nodeGlob(pattern, { ...options, withFileTypes: true });
+  },
+
+  resolveModule(request: string, from: string): string {
+    return createRequire(from).resolve(request);
+  },
 
   runCommand: async (
     command: string,
