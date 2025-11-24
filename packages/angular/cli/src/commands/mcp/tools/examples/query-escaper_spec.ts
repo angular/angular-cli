@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { escapeSearchQuery } from './examples';
+import { escapeSearchQuery } from './query-escaper';
 
 describe('escapeSearchQuery', () => {
   it('should wrap single terms in double quotes', () => {

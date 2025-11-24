@@ -19,7 +19,7 @@ import { START_DEVSERVER_TOOL } from './tools/devserver/start-devserver';
 import { STOP_DEVSERVER_TOOL } from './tools/devserver/stop-devserver';
 import { WAIT_FOR_DEVSERVER_BUILD_TOOL } from './tools/devserver/wait-for-devserver-build';
 import { DOC_SEARCH_TOOL } from './tools/doc-search';
-import { FIND_EXAMPLE_TOOL } from './tools/examples';
+import { FIND_EXAMPLE_TOOL } from './tools/examples/index';
 import { MODERNIZE_TOOL } from './tools/modernize';
 import { ZONELESS_MIGRATION_TOOL } from './tools/onpush-zoneless-migration/zoneless-migration';
 import { LIST_PROJECTS_TOOL } from './tools/projects';
