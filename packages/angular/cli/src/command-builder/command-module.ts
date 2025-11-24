@@ -14,8 +14,7 @@ import type {
   Argv,
   CamelCaseKey,
   CommandModule as YargsCommandModule,
-  // Resolution mode is required due to CamelCaseKey missing from esm types
-} from 'yargs' with { 'resolution-mode': 'require' };
+} from 'yargs';
 import { Parser as yargsParser } from 'yargs/helpers';
 import { getAnalyticsUserId } from '../analytics/analytics';
 import { AnalyticsCollector } from '../analytics/analytics-collector';

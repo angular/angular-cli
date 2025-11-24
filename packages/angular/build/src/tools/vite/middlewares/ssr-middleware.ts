@@ -37,8 +37,7 @@ export function createAngularSsrInternalMiddleware(
       // which must be processed by the runtime linker, even if they are not used.
       await import('@angular/compiler');
       const { writeResponseToNodeResponse, createWebRequestFromNodeRequest } = (await import(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        '@angular/ssr/node' as any
+        '@angular/ssr/node' as string
       )) as typeof import('@angular/ssr/node', { with: { 'resolution-mode': 'import' } });
 
       const { ɵgetOrCreateAngularServerApp } = (await server.ssrLoadModule('/main.server.mjs')) as {
@@ -88,8 +87,7 @@ export async function createAngularSsrExternalMiddleware(
   await import('@angular/compiler');
 
   const { createWebRequestFromNodeRequest, writeResponseToNodeResponse } = (await import(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    '@angular/ssr/node' as any
+    '@angular/ssr/node' as string
   )) as typeof import('@angular/ssr/node', { with: { 'resolution-mode': 'import' } });
 
   return function angularSsrExternalMiddleware(
