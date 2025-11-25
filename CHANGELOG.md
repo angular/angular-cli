@@ -1,3 +1,22 @@
+<a name="20.3.12"></a>
+
+# 20.3.12 (2025-11-25)
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                     |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------- |
+| [25bb7e65c](https://github.com/angular/angular-cli/commit/25bb7e65c4fc7e401c658126c53b0b7a13d62965) | fix  | ensure correct URL joining for prerender routes |
+
+### @angular/ssr
+
+| Commit                                                                                              | Type | Description                                                  |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------ |
+| [cceb86296](https://github.com/angular/angular-cli/commit/cceb862969e541a5f54b689a6439e32773eafe65) | fix  | handle `X-Forwarded-Prefix` and `APP_BASE_HREF` in redirects |
+| [1abe68ad8](https://github.com/angular/angular-cli/commit/1abe68ad87f9b892734117a087b5775068bd232b) | fix  | prevent redirect loop with encoded query parameters          |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="21.0.0"></a>
 
 # 21.0.0 (2025-11-19)
