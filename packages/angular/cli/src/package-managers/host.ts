@@ -15,7 +15,7 @@
 
 import { spawn } from 'node:child_process';
 import { Stats } from 'node:fs';
-import { mkdtemp, readdir, rm, stat, writeFile } from 'node:fs/promises';
+import { mkdtemp, readFile, readdir, rm, stat, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { PackageManagerError } from './error';
@@ -37,6 +37,13 @@ export interface Host {
    * @returns A promise that resolves to an array of file and directory names.
    */
   readdir(path: string): Promise<string[]>;
+
+  /**
+   * Reads the content of a file.
+   * @param path The path to the file.
+   * @returns A promise that resolves to the file content as a string.
+   */
+  readFile(path: string): Promise<string>;
 
   /**
    * Creates a new, unique temporary directory.
@@ -85,6 +92,7 @@ export interface Host {
 export const NodeJS_HOST: Host = {
   stat,
   readdir,
+  readFile: (path: string) => readFile(path, { encoding: 'utf8' }),
   writeFile,
   createTempDirectory: () => mkdtemp(join(tmpdir(), 'angular-cli-')),
   deleteDirectory: (path: string) => rm(path, { recursive: true, force: true }),

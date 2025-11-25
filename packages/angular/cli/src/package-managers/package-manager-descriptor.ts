@@ -82,7 +82,7 @@ export interface PackageManagerDescriptor {
     listDependencies: (stdout: string, logger?: Logger) => Map<string, InstalledPackage>;
 
     /** A function to parse the output of `getManifestCommand` for a specific version. */
-    getPackageManifest: (stdout: string, logger?: Logger) => PackageManifest | null;
+    getRegistryManifest: (stdout: string, logger?: Logger) => PackageManifest | null;
 
     /** A function to parse the output of `getManifestCommand` for the full package metadata. */
     getRegistryMetadata: (stdout: string, logger?: Logger) => PackageMetadata | null;
@@ -122,7 +122,7 @@ export const SUPPORTED_PACKAGE_MANAGERS = {
     viewCommandFieldArgFormatter: (fields) => [...fields],
     outputParsers: {
       listDependencies: parseNpmLikeDependencies,
-      getPackageManifest: parseNpmLikeManifest,
+      getRegistryManifest: parseNpmLikeManifest,
       getRegistryMetadata: parseNpmLikeMetadata,
     },
   },
@@ -144,7 +144,7 @@ export const SUPPORTED_PACKAGE_MANAGERS = {
     viewCommandFieldArgFormatter: (fields) => ['--fields', fields.join(',')],
     outputParsers: {
       listDependencies: parseYarnModernDependencies,
-      getPackageManifest: parseNpmLikeManifest,
+      getRegistryManifest: parseNpmLikeManifest,
       getRegistryMetadata: parseNpmLikeMetadata,
     },
   },
@@ -168,7 +168,7 @@ export const SUPPORTED_PACKAGE_MANAGERS = {
     getManifestCommand: ['info', '--json'],
     outputParsers: {
       listDependencies: parseYarnClassicDependencies,
-      getPackageManifest: parseYarnLegacyManifest,
+      getRegistryManifest: parseYarnLegacyManifest,
       getRegistryMetadata: parseNpmLikeMetadata,
     },
   },
@@ -190,7 +190,7 @@ export const SUPPORTED_PACKAGE_MANAGERS = {
     viewCommandFieldArgFormatter: (fields) => [...fields],
     outputParsers: {
       listDependencies: parseNpmLikeDependencies,
-      getPackageManifest: parseNpmLikeManifest,
+      getRegistryManifest: parseNpmLikeManifest,
       getRegistryMetadata: parseNpmLikeMetadata,
     },
   },
@@ -212,7 +212,7 @@ export const SUPPORTED_PACKAGE_MANAGERS = {
     viewCommandFieldArgFormatter: (fields) => [...fields],
     outputParsers: {
       listDependencies: parseNpmLikeDependencies,
-      getPackageManifest: parseNpmLikeManifest,
+      getRegistryManifest: parseNpmLikeManifest,
       getRegistryMetadata: parseNpmLikeMetadata,
     },
   },
