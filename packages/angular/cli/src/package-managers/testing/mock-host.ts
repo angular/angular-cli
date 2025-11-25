@@ -58,4 +58,8 @@ export class MockHost implements Host {
   writeFile(): Promise<void> {
     throw new Error('Method not implemented.');
   }
+
+  readFile(): Promise<string> {
+    throw new Error('Method not implemented.');
+  }
 }
