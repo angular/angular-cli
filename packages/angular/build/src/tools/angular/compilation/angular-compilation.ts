@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import type ng from '@angular/compiler-cli';
+import type * as ng from '@angular/compiler-cli';
 import type { PartialMessage } from 'esbuild';
 import type ts from 'typescript';
 import { convertTypeScriptDiagnostic } from '../../esbuild/angular/diagnostics';
