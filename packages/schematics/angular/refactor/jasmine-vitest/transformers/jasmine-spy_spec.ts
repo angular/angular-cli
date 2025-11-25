@@ -123,6 +123,15 @@ vi.spyOn(service, 'myMethod').and.unknownStrategy();`,
         };`,
       },
       {
+        description:
+          'should transform jasmine.createSpyObj with an array of methods without base name',
+        input: `const myService = jasmine.createSpyObj(['methodA', 'methodB']);`,
+        expected: `const myService = {
+          methodA: vi.fn(),
+          methodB: vi.fn(),
+        };`,
+      },
+      {
         description: 'should add a TODO if the second argument is not a literal',
         input: `const myService = jasmine.createSpyObj('MyService', methodNames);`,
         expected: `
@@ -140,6 +149,15 @@ vi.spyOn(service, 'myMethod').and.unknownStrategy();`,
       },
       {
         description:
+          'should transform jasmine.createSpyObj with an object of return values without base name',
+        input: `const myService = jasmine.createSpyObj({ methodA: 'foo', methodB: 42 });`,
+        expected: `const myService = {
+          methodA: vi.fn().mockReturnValue('foo'),
+          methodB: vi.fn().mockReturnValue(42),
+        };`,
+      },
+      {
+        description:
           'should transform jasmine.createSpyObj with an object of return values containing an asymmetric matcher',
         input: `const myService = jasmine.createSpyObj('MyService', { methodA: jasmine.any(String) });`,
         expected: `const myService = {
@@ -147,7 +165,7 @@ vi.spyOn(service, 'myMethod').and.unknownStrategy();`,
         };`,
       },
       {
-        description: 'should add a TODO for jasmine.createSpyObj with only one argument',
+        description: 'should add a TODO for jasmine.createSpyObj with only base name argument',
         input: `const myService = jasmine.createSpyObj('MyService');`,
         expected: `
           // TODO: vitest-migration: jasmine.createSpyObj called with a single argument is not supported for transformation. See: https://vitest.dev/api/vi.html#vi-fn
@@ -167,6 +185,15 @@ vi.spyOn(service, 'myMethod').and.unknownStrategy();`,
         input: `const myService = jasmine.createSpyObj('MyService', { methodA: 'foo' }, { propA: 'valueA' });`,
         expected: `const myService = {
           methodA: vi.fn().mockName("MyService.methodA").mockReturnValue('foo'),
+          propA: 'valueA',
+        };`,
+      },
+      {
+        description:
+          'should transform jasmine.createSpyObj with a method map and a property map without base name',
+        input: `const myService = jasmine.createSpyObj({ methodA: 'foo' }, { propA: 'valueA' });`,
+        expected: `const myService = {
+          methodA: vi.fn().mockReturnValue('foo'),
           propA: 'valueA',
         };`,
       },
