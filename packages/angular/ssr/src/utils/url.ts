@@ -235,3 +235,36 @@ export function stripMatrixParams(pathname: string): string {
 export function constructUrl(pathname: string, search: string, hash: string): string {
   return decodeURIComponent([stripTrailingSlash(pathname), search, hash].join(''));
 }
+
+/**
+ * Removes Angular auxiliary route segments from a given URL path.
+ *
+ * Auxiliary routes have the format `(outlet:segment)` appended to a primary URL.
+ * Multiple auxiliary routes and even nested forms will be removed entirely.
+ *
+ * @param pathname - The URL path from which to remove auxiliary route segments.
+ * @returns The cleaned URL path without auxiliary outlet routes.
+ *
+ * @example
+ * ```ts
+ * // Single auxiliary route
+ * stripAuxiliaryRoutes('/inbox/33(popup:compose)');
+ * // → '/inbox/33'
+ *
+ * // Multiple auxiliary routes
+ * stripAuxiliaryRoutes('/mail/7(popup:compose)(drawer:details)(chat:room42)');
+ * // → '/mail/7'
+ *
+ * // Nested auxiliary routes (rare but possible)
+ * stripAuxiliaryRoutes('/inbox(overlay:view(popup:info))(tracker:read)');
+ * // → '/inbox'
+ *
+ * // Path without auxiliary routes remains unchanged
+ * stripAuxiliaryRoutes('/path/to/resource');
+ * // → '/path/to/resource'
+ * ```
+ */
+export function stripAuxiliaryRoutes(pathname: string): string {
+  const index = pathname.indexOf('(');
+  return index !== -1 ? pathname.slice(0, index) : pathname;
+}

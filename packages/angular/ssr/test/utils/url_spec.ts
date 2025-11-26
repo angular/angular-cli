@@ -15,6 +15,7 @@ import {
   stripLeadingSlash,
   stripMatrixParams,
   stripTrailingSlash,
+  stripAuxiliaryRoutes,
 } from '../../src/utils/url';
 
 describe('URL Utils', () => {
@@ -206,6 +207,26 @@ describe('URL Utils', () => {
 
     it('should handle an empty string', () => {
       expect(stripMatrixParams('')).toBe('');
+    });
+  });
+
+  describe('stripAuxiliaryRoutes', () => {
+    it('should remove a single auxiliary route', () => {
+      expect(stripAuxiliaryRoutes('/inbox/33(popup:compose)')).toBe('/inbox/33');
+    });
+
+    it('should remove multiple auxiliary routes', () => {
+      expect(stripAuxiliaryRoutes('/mail/7(popup:compose)(drawer:details)(chat:room42)')).toBe(
+        '/mail/7',
+      );
+    });
+
+    it('should remove nested auxiliary routes', () => {
+      expect(stripAuxiliaryRoutes('/inbox(overlay:view(popup:info))(tracker:read)')).toBe('/inbox');
+    });
+
+    it('should not modify a path without auxiliary routes', () => {
+      expect(stripAuxiliaryRoutes('/path/to/resource')).toBe('/path/to/resource');
     });
   });
 });
