@@ -1,3 +1,47 @@
+<a name="21.0.1"></a>
+
+# 21.0.1 (2025-11-26)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                                                 |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------------------------- |
+| [363496ae0](https://github.com/angular/angular-cli/commit/363496ae0d2850545274cd7fe4dc6902ccb64e10) | fix  | ensure dependencies are resolved correctly for node modules directory check |
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                                                   |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------------------- |
+| [2f58705cb](https://github.com/angular/angular-cli/commit/2f58705cb5389019ceb49616a0e4ec3f92a558ed) | fix  | add missing imports for lifecycle hooks in jasmine-vitest migration           |
+| [c973bb9ca](https://github.com/angular/angular-cli/commit/c973bb9cafc8d59b901a9d763347f4b615257867) | fix  | add mock names to createSpyObj transformation                                 |
+| [4534c9848](https://github.com/angular/angular-cli/commit/4534c9848745eea516bdb58d86914252c35b5b9c) | fix  | do not set `esModuleInterop` and `moduleResolution` when module is `preserve` |
+| [16d898e75](https://github.com/angular/angular-cli/commit/16d898e7587036d68786cebe764da08304559d41) | fix  | fix migration of `jasmine.clock().mockDate()`                                 |
+| [21c3eac72](https://github.com/angular/angular-cli/commit/21c3eac726c198132af760ffacc0dab9dfccb430) | fix  | handle createSpyObj without base name on refactor-jasmine-vitest              |
+| [b8c99aa4c](https://github.com/angular/angular-cli/commit/b8c99aa4c909647285d1dcc61a2bb97a36100c63) | fix  | improve safety of done callback transformation                                |
+| [4a71e06fc](https://github.com/angular/angular-cli/commit/4a71e06fcafaadbcb820d285c0c186aa0e92f158) | fix  | silently skip when the build target already uses one of the new builders      |
+| [2ffdae421](https://github.com/angular/angular-cli/commit/2ffdae42149b0f3da44f96271af1bca6d09b7ed5) | fix  | support testRunner option in library schematic                                |
+| [145de4a58](https://github.com/angular/angular-cli/commit/145de4a584ce8f72746704547282299306d9bafb) | fix  | warn about loose matching in arrayWithExactContents                           |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                                    |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------- |
+| [d097df2d7](https://github.com/angular/angular-cli/commit/d097df2d7088dd2bb97643c3acfc1f977a767dd9) | fix  | correct Vitest coverage path resolution for JSDOM on Windows   |
+| [cdb607ada](https://github.com/angular/angular-cli/commit/cdb607ada4bf9aaec6ed8aafd8826d782fd13109) | fix  | correctly configure per-browser headless mode in Vitest runner |
+| [244931ece](https://github.com/angular/angular-cli/commit/244931ece877a1cacd1cfce64314e04a52526f80) | fix  | correctly invoke `isTTY` as a function                         |
+| [54d542738](https://github.com/angular/angular-cli/commit/54d542738e23c275ac6827f19da92213c405f9e2) | fix  | ensure correct URL joining for prerender routes                |
+| [a28b38bbe](https://github.com/angular/angular-cli/commit/a28b38bbeba0977e99142a15d1ecc77c15abc416) | fix  | force dev-server to use HTTP/1.1 when using SSR with SSL       |
+| [59ff867f0](https://github.com/angular/angular-cli/commit/59ff867f0d2e7f7f88480deefa0ee470c037197a) | fix  | normalize `--include` paths to posix                           |
+
+### @angular/ssr
+
+| Commit                                                                                              | Type | Description                                                  |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------ |
+| [03e231216](https://github.com/angular/angular-cli/commit/03e231216d3b8ba0de81da53a446eff0c701658d) | fix  | handle `X-Forwarded-Prefix` and `APP_BASE_HREF` in redirects |
+| [3cac01882](https://github.com/angular/angular-cli/commit/3cac0188271175e12cc238c6610b542f3ae14db3) | fix  | prevent redirect loop with encoded query parameters          |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="21.0.0"></a>
 
 # 21.0.0 (2025-11-19)
