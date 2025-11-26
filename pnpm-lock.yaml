@@ -47,8 +47,8 @@ importers:
         specifier: 21.0.0
         version: 21.0.0(103397789c5753d84dae18b75e29321d)
       '@angular/ng-dev':
-        specifier: https://github.com/angular/dev-infra-private-ng-dev-builds.git#e0bb3b2b000ff0c0c18a2020d5d42371bca51ecf
-        version: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/e0bb3b2b000ff0c0c18a2020d5d42371bca51ecf(@modelcontextprotocol/sdk@1.22.0)
+        specifier: https://github.com/angular/dev-infra-private-ng-dev-builds.git#4c28145df03aff8c74d0a53f4f5602140e4d1a23
+        version: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/4c28145df03aff8c74d0a53f4f5602140e4d1a23(@modelcontextprotocol/sdk@1.22.0)
       '@angular/platform-browser':
         specifier: 21.1.0-next.0
         version: 21.1.0-next.0(@angular/animations@21.1.0-next.0(@angular/core@21.1.0-next.0(@angular/compiler@21.1.0-next.0)(rxjs@7.8.2)(zone.js@0.16.0)))(@angular/common@21.1.0-next.0(@angular/core@21.1.0-next.0(@angular/compiler@21.1.0-next.0)(rxjs@7.8.2)(zone.js@0.16.0))(rxjs@7.8.2))(@angular/core@21.1.0-next.0(@angular/compiler@21.1.0-next.0)(rxjs@7.8.2)(zone.js@0.16.0))
@@ -1060,9 +1060,9 @@ packages:
       '@angular/platform-browser': ^21.0.0 || ^22.0.0
       rxjs: ^6.5.3 || ^7.4.0
 
-  '@angular/ng-dev@https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/e0bb3b2b000ff0c0c18a2020d5d42371bca51ecf':
-    resolution: {tarball: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/e0bb3b2b000ff0c0c18a2020d5d42371bca51ecf}
-    version: 0.0.0-f47684669736e28fd77eab64e65b2952c8a948ee
+  '@angular/ng-dev@https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/4c28145df03aff8c74d0a53f4f5602140e4d1a23':
+    resolution: {tarball: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/4c28145df03aff8c74d0a53f4f5602140e4d1a23}
+    version: 0.0.0-95e3a0ede6dfa1aedd34b03918ad72b18f87e5ae
     hasBin: true
 
   '@angular/platform-browser@21.1.0-next.0':
@@ -2982,8 +2982,8 @@ packages:
     resolution: {integrity: sha512-4zCpzP1fWc7QlqunZ5bSEjxc6yLAlRTnDwKtgXfcI/FxxGoqedDG8V2+xJ60bV2kODqcGB+nATdtap/XYq2NZQ==}
     engines: {node: '>= 20'}
 
-  '@octokit/graphql-schema@15.26.0':
-    resolution: {integrity: sha512-SoVbh+sXe9nsoweFbLT3tAk3XWYbYLs5ku05wij1zhyQ2U3lewdrhjo5Tb7lfaOGWNHSkPZT4uuPZp8neF7P7A==}
+  '@octokit/graphql-schema@15.26.1':
+    resolution: {integrity: sha512-RFDC2MpRBd4AxSRvUeBIVeBU7ojN/SxDfALUd7iVYOSeEK3gZaqR2MGOysj4Zh2xj2RY5fQAUT+Oqq7hWTraMA==}
 
   '@octokit/graphql@9.0.3':
     resolution: {integrity: sha512-grAEuupr/C1rALFnXTv6ZQhFuL1D8G5y8CN04RgrO4FIPMrtm+mcZzFG7dcBm+nq+1ppNixu+Jd78aeJOYxlGA==}
@@ -3168,16 +3168,16 @@ packages:
     resolution: {integrity: sha512-tNe7a6U4rCpxLMBaR0SIYTdjxGdL0Vwb3G1zY8++sPtHSvy7qd54u8CIB0Z+Y6t5tc9pNYMYCMwhE/wdSY7ltg==}
     engines: {node: '>=18.12'}
 
-  '@pnpm/dependency-path@1001.1.4':
-    resolution: {integrity: sha512-AUFsnxZB13ME7JKFis3/zo+Cz4qvYl7PzpzFFrw0bL75OY2+jeXcG3dbNXoVfpjaA3/lyZBtQmxE+Q6xbjyV5Q==}
+  '@pnpm/dependency-path@1001.1.5':
+    resolution: {integrity: sha512-powgYgNzuAdrZK+bx1Vxes5LRFp8ByUCcFsCeo0pQpyFbKpRDFF31FUVSE3CGs61WgL0lTBQr7ZoUSRc+BDrCw==}
     engines: {node: '>=18.12'}
 
   '@pnpm/graceful-fs@1000.0.1':
     resolution: {integrity: sha512-JnzaAVFJIEgwTcB55eww8N3h5B6qJdZqDA2wYkSK+OcTvvMSQb9c2STMhBP6GfkWygG1fs3w8D7JRx9SPZnxJg==}
     engines: {node: '>=18.12'}
 
-  '@pnpm/types@1001.0.0':
-    resolution: {integrity: sha512-9P7I8Zv8hvAO81+D5KVmwveH4nmxhBNFEEeb77YYPV72bkyqzKTR6I8OGEs7TNZ6gPHufF+lIyBVEqO6SMFpJA==}
+  '@pnpm/types@1001.0.1':
+    resolution: {integrity: sha512-v5X09E6LkJFOOw9FgGITpAs7nQJtx6u3N0SNtyIC5mSeIC5SebMrrelpCz6QUTJvyXBEa1AWj2dZhYfLj59xhA==}
     engines: {node: '>=18.12'}
 
   '@protobufjs/aspromise@1.1.2':
@@ -9517,7 +9517,7 @@ snapshots:
       rxjs: 7.8.2
       tslib: 2.8.1
 
-  '@angular/ng-dev@https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/e0bb3b2b000ff0c0c18a2020d5d42371bca51ecf(@modelcontextprotocol/sdk@1.22.0)':
+  '@angular/ng-dev@https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/4c28145df03aff8c74d0a53f4f5602140e4d1a23(@modelcontextprotocol/sdk@1.22.0)':
     dependencies:
       '@actions/core': 1.11.1
       '@google-cloud/spanner': 8.0.0(supports-color@10.2.2)
@@ -9527,14 +9527,14 @@ snapshots:
       '@octokit/auth-app': 8.1.2
       '@octokit/core': 7.0.6
       '@octokit/graphql': 9.0.3
-      '@octokit/graphql-schema': 15.26.0
+      '@octokit/graphql-schema': 15.26.1
       '@octokit/openapi-types': 27.0.0
       '@octokit/plugin-paginate-rest': 14.0.0(@octokit/core@7.0.6)
       '@octokit/plugin-rest-endpoint-methods': 17.0.0(@octokit/core@7.0.6)
       '@octokit/request-error': 7.1.0
       '@octokit/rest': 22.0.1
       '@octokit/types': 16.0.0
-      '@pnpm/dependency-path': 1001.1.4
+      '@pnpm/dependency-path': 1001.1.5
       '@types/cli-progress': 3.11.6
       '@types/ejs': 3.1.5
       '@types/events': 3.0.3
@@ -11628,7 +11628,7 @@ snapshots:
       '@octokit/types': 16.0.0
       universal-user-agent: 7.0.3
 
-  '@octokit/graphql-schema@15.26.0':
+  '@octokit/graphql-schema@15.26.1':
     dependencies:
       graphql: 16.12.0
       graphql-tag: 2.12.6(graphql@16.12.0)
@@ -11785,17 +11785,17 @@ snapshots:
 
   '@pnpm/crypto.polyfill@1000.1.0': {}
 
-  '@pnpm/dependency-path@1001.1.4':
+  '@pnpm/dependency-path@1001.1.5':
     dependencies:
       '@pnpm/crypto.hash': 1000.2.1
-      '@pnpm/types': 1001.0.0
+      '@pnpm/types': 1001.0.1
       semver: 7.7.3
 
   '@pnpm/graceful-fs@1000.0.1':
     dependencies:
       graceful-fs: 4.2.11
 
-  '@pnpm/types@1001.0.0': {}
+  '@pnpm/types@1001.0.1': {}
 
   '@protobufjs/aspromise@1.1.2': {}
 
