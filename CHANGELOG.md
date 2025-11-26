@@ -1,3 +1,28 @@
+<a name="21.1.0-next.0"></a>
+
+# 21.1.0-next.0 (2025-11-26)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                       |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------- |
+| [c3c9ac506](https://github.com/angular/angular-cli/commit/c3c9ac5067275461e2d8caefba81ac9701949776) | feat | Add MCP tools for building and running devservers |
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                        |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------- |
+| [36cf3afb4](https://github.com/angular/angular-cli/commit/36cf3afb485a01f86c4c90f136b38a3cf338e313) | feat | add browserMode option to jasmine-vitest schematic |
+| [18cf6c51b](https://github.com/angular/angular-cli/commit/18cf6c51b72ce5c7f23012585ed992cf91cef5ed) | fix  | add MCP configuration file to new workspaces       |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                                                                                 |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------------------------------------------------- |
+| [ad99e00ad](https://github.com/angular/angular-cli/commit/ad99e00ad7edd17e369777c8d38b4137ea736121) | fix  | simplify SSL handling for `ng serve` with SSR ([#31722](https://github.com/angular/angular-cli/pull/31722)) |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="21.0.1"></a>
 
 # 21.0.1 (2025-11-26)
