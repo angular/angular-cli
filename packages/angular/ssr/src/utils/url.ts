@@ -264,7 +264,9 @@ export function constructUrl(pathname: string, search: string, hash: string): st
  * // → '/path/to/resource'
  * ```
  */
+
 export function stripAuxiliaryRoutes(pathname: string): string {
   const index = pathname.indexOf('(');
+
   return index !== -1 ? pathname.slice(0, index) : pathname;
 }

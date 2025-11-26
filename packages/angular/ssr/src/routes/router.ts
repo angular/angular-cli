@@ -7,7 +7,7 @@
  */
 
 import { AngularAppManifest } from '../manifest';
-import { stripIndexHtmlFromURL, stripMatrixParams, stripAuxiliaryRoutes } from '../utils/url';
+import { stripAuxiliaryRoutes, stripIndexHtmlFromURL, stripMatrixParams } from '../utils/url';
 import { extractRoutesAndCreateRouteTree } from './ng-routes';
 import { RouteTree, RouteTreeNodeMetadata } from './route-tree';
 

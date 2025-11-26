@@ -11,11 +11,11 @@ import {
   addTrailingSlash,
   buildPathWithParams,
   joinUrlParts,
+  stripAuxiliaryRoutes,
   stripIndexHtmlFromURL,
   stripLeadingSlash,
   stripMatrixParams,
   stripTrailingSlash,
-  stripAuxiliaryRoutes,
 } from '../../src/utils/url';
 
 describe('URL Utils', () => {
