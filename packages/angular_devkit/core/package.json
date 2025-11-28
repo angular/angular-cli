@@ -33,10 +33,10 @@
     "source-map": "0.7.6"
   },
   "devDependencies": {
-    "chokidar": "4.0.3"
+    "chokidar": "5.0.0"
   },
   "peerDependencies": {
-    "chokidar": "^4.0.0"
+    "chokidar": "^5.0.0"
   },
   "peerDependenciesMeta": {
     "chokidar": {
