@@ -393,6 +393,10 @@ export function silentBun(...args: string[]) {
   return _exec({ silent: true }, 'bun', args);
 }
 
+export function silentDeno(...args: string[]) {
+  return _exec({ silent: true }, 'deno', args);
+}
+
 export function globalNpm(args: string[], env?: NodeJS.ProcessEnv) {
   if (!process.env.LEGACY_CLI_RUNNER) {
     throw new Error(
