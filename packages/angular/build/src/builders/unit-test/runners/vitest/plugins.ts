@@ -154,7 +154,11 @@ export async function createVitestConfigPlugin(
 
       return {
         test: {
-          coverage: await generateCoverageOption(options.coverage, projectName),
+          coverage: await generateCoverageOption(
+            options.coverage,
+            testConfig?.coverage,
+            projectName,
+          ),
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           ...(reporters ? ({ reporters } as any) : {}),
           projects: [projectConfig],
@@ -303,11 +307,12 @@ export function createVitestPlugins(pluginOptions: PluginOptions): VitestPlugins
 }
 
 async function generateCoverageOption(
-  coverage: NormalizedUnitTestBuilderOptions['coverage'],
+  optionsCoverage: NormalizedUnitTestBuilderOptions['coverage'],
+  configCoverage: VitestCoverageOption | undefined,
   projectName: string,
 ): Promise<VitestCoverageOption> {
   let defaultExcludes: string[] = [];
-  if (coverage.exclude) {
+  if (optionsCoverage.exclude) {
     try {
       const vitestConfig = await import('vitest/config');
       defaultExcludes = vitestConfig.coverageConfigDefaults.exclude;
@@ -315,28 +320,31 @@ async function generateCoverageOption(
   }
 
   return {
-    enabled: coverage.enabled,
     excludeAfterRemap: true,
+    reportsDirectory:
+      configCoverage?.reportsDirectory ?? toPosixPath(path.join('coverage', projectName)),
+    ...(optionsCoverage.enabled !== undefined ? { enabled: optionsCoverage.enabled } : {}),
     // Vitest performs a pre-check and a post-check for sourcemaps.
     // The pre-check uses the bundled files, so specific bundled entry points and chunks need to be included.
     // The post-check uses the original source files, so the user's include is used.
-    ...(coverage.include ? { include: ['spec-*.js', 'chunk-*.js', ...coverage.include] } : {}),
-    reportsDirectory: toPosixPath(path.join('coverage', projectName)),
-    thresholds: coverage.thresholds,
-    watermarks: coverage.watermarks,
+    ...(optionsCoverage.include
+      ? { include: ['spec-*.js', 'chunk-*.js', ...optionsCoverage.include] }
+      : {}),
+    thresholds: optionsCoverage.thresholds,
+    watermarks: optionsCoverage.watermarks,
     // Special handling for `exclude`/`reporters` due to an undefined value causing upstream failures
-    ...(coverage.exclude
+    ...(optionsCoverage.exclude
       ? {
           exclude: [
             // Augment the default exclude https://vitest.dev/config/#coverage-exclude
             // with the user defined exclusions
-            ...coverage.exclude,
+            ...optionsCoverage.exclude,
             ...defaultExcludes,
           ],
         }
       : {}),
-    ...(coverage.reporters
-      ? ({ reporter: coverage.reporters } satisfies VitestCoverageOption)
+    ...(optionsCoverage.reporters
+      ? ({ reporter: optionsCoverage.reporters } satisfies VitestCoverageOption)
       : {}),
   };
 }
