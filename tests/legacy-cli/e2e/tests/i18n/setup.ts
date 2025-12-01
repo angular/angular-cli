@@ -100,7 +100,7 @@ export async function setupI18nConfig() {
   await writeFile(
     'src/app/app.ts',
     `
-    import { Component, Inject, LOCALE_ID } from '@angular/core';
+    import { Component, inject, LOCALE_ID } from '@angular/core';
     import { DatePipe } from '@angular/common';
     import { RouterOutlet } from '@angular/router';
 
@@ -110,7 +110,7 @@ export async function setupI18nConfig() {
       templateUrl: './app.html'
     })
     export class App {
-      constructor(@Inject(LOCALE_ID) public locale: string) { }
+      locale = inject(LOCALE_ID);
       title = 'i18n';
       jan = new Date(2000, 0, 1);
       minutes = 3;

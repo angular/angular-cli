@@ -14,7 +14,7 @@ export default async function () {
     'src/app/custom-decorator.ts',
     `
     export function MyDecorator() {
-      return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+      return function (originalMethod: any, context: ClassMethodDecoratorContext) {
         // do nothing
       };
     }
