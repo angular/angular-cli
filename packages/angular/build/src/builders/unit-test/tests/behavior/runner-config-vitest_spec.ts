@@ -42,6 +42,56 @@ describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
       harness.expectFile('vitest-results.xml').toExist();
     });
 
+    it('should use custom reportsDirectory defined in runnerConfig file', async () => {
+      harness.useTarget('test', {
+        ...BASE_OPTIONS,
+        runnerConfig: 'vitest.config.ts',
+        coverage: true,
+      });
+
+      harness.writeFile(
+        'vitest.config.ts',
+        `
+        import { defineConfig } from 'vitest/config';
+        export default defineConfig({
+          test: {
+            coverage: {
+              reportsDirectory: './custom-coverage-reports',
+            },
+          },
+        });
+        `,
+      );
+
+      const { result } = await harness.executeOnce();
+      expect(result?.success).toBeTrue();
+      harness.expectFile('custom-coverage-reports/coverage-final.json').toExist();
+    });
+
+    it('should use default reportsDirectory when not defined in runnerConfig file', async () => {
+      harness.useTarget('test', {
+        ...BASE_OPTIONS,
+        coverage: true,
+        runnerConfig: 'vitest.config.ts',
+      });
+
+      harness.writeFile(
+        'vitest.config.ts',
+        `
+        import { defineConfig } from 'vitest/config';
+        export default defineConfig({
+          test: {
+            coverage: {},
+          },
+        });
+        `,
+      );
+
+      const { result } = await harness.executeOnce();
+      expect(result?.success).toBeTrue();
+      harness.expectFile('coverage/test/coverage-final.json').toExist();
+    });
+
     it('should exclude test files based on runnerConfig file', async () => {
       harness.useTarget('test', {
         ...BASE_OPTIONS,
