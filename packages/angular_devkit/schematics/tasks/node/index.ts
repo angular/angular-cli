@@ -7,29 +7,28 @@
  */
 
 import { TaskExecutor, TaskExecutorFactory } from '../../src';
+import NodePackageExecutor from '../package-manager/executor';
 import { NodePackageName, NodePackageTaskFactoryOptions } from '../package-manager/options';
+import RepositoryInitializerExecutor from '../repo-init/executor';
 import {
   RepositoryInitializerName,
   RepositoryInitializerTaskFactoryOptions,
 } from '../repo-init/options';
+import RunSchematicExecutor from '../run-schematic/executor';
 import { RunSchematicName } from '../run-schematic/options';
 
 export class BuiltinTaskExecutor {
   static readonly NodePackage: TaskExecutorFactory<NodePackageTaskFactoryOptions> = {
     name: NodePackageName,
-    create: (options) =>
-      import('../package-manager/executor').then((mod) => mod.default(options)) as Promise<
-        TaskExecutor<{}>
-      >,
+    create: async (options) => NodePackageExecutor(options) as TaskExecutor<{}>,
   };
   static readonly RepositoryInitializer: TaskExecutorFactory<RepositoryInitializerTaskFactoryOptions> =
     {
       name: RepositoryInitializerName,
-      create: (options) => import('../repo-init/executor').then((mod) => mod.default(options)),
+      create: async (options) => RepositoryInitializerExecutor(options) as TaskExecutor<{}>,
     };
   static readonly RunSchematic: TaskExecutorFactory<{}> = {
     name: RunSchematicName,
-    create: () =>
-      import('../run-schematic/executor').then((mod) => mod.default()) as Promise<TaskExecutor<{}>>,
+    create: async () => RunSchematicExecutor() as TaskExecutor<{}>,
   };
 }
