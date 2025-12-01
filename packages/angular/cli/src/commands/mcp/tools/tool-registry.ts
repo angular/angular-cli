@@ -7,10 +7,9 @@
  */
 
 import type { McpServer, ToolCallback } from '@modelcontextprotocol/sdk/server/mcp.js';
-import { ZodRawShape } from 'zod';
+import type { ToolAnnotations } from '@modelcontextprotocol/sdk/types';
+import type { ZodRawShape } from 'zod';
 import type { AngularWorkspace } from '../../../utilities/config';
-
-type ToolConfig = Parameters<McpServer['registerTool']>[1];
 
 export interface McpToolContext {
   workspace?: AngularWorkspace;
@@ -26,7 +25,7 @@ export interface McpToolDeclaration<TInput extends ZodRawShape, TOutput extends 
   name: string;
   title?: string;
   description: string;
-  annotations?: ToolConfig['annotations'];
+  annotations?: ToolAnnotations;
   inputSchema?: TInput;
   outputSchema?: TOutput;
   factory: McpToolFactory<TInput>;
