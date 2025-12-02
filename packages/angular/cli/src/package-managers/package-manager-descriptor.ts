@@ -20,7 +20,8 @@ import {
   parseNpmLikeManifest,
   parseNpmLikeMetadata,
   parseYarnClassicDependencies,
-  parseYarnLegacyManifest,
+  parseYarnClassicManifest,
+  parseYarnClassicMetadata,
   parseYarnModernDependencies,
 } from './parsers';
 
@@ -72,6 +73,9 @@ export interface PackageManagerDescriptor {
 
   /** The command to fetch the registry manifest of a package. */
   readonly getManifestCommand: readonly string[];
+
+  /** Whether a specific version lookup is needed prior to fetching a registry manifest. */
+  readonly requiresManifestVersionLookup?: boolean;
 
   /** A function that formats the arguments for field-filtered registry views. */
   readonly viewCommandFieldArgFormatter?: (fields: readonly string[]) => string[];
@@ -166,10 +170,11 @@ export const SUPPORTED_PACKAGE_MANAGERS = {
     versionCommand: ['--version'],
     listDependenciesCommand: ['list', '--depth=0', '--json'],
     getManifestCommand: ['info', '--json'],
+    requiresManifestVersionLookup: true,
     outputParsers: {
       listDependencies: parseYarnClassicDependencies,
-      getRegistryManifest: parseYarnLegacyManifest,
-      getRegistryMetadata: parseNpmLikeMetadata,
+      getRegistryManifest: parseYarnClassicManifest,
+      getRegistryMetadata: parseYarnClassicMetadata,
     },
   },
   pnpm: {

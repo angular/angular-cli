@@ -14,6 +14,7 @@
 
 import { join } from 'node:path';
 import npa from 'npm-package-arg';
+import { maxSatisfying } from 'semver';
 import { PackageManagerError } from './error';
 import { Host } from './host';
 import { Logger } from './logger';
@@ -156,12 +157,14 @@ export class PackageManager {
       return { stdout: '', stderr: '' };
     }
 
-    return this.host.runCommand(this.descriptor.binary, finalArgs, {
+    const commandResult = await this.host.runCommand(this.descriptor.binary, finalArgs, {
       ...runOptions,
       cwd: executionDirectory,
       stdio: 'pipe',
       env: finalEnv,
     });
+
+    return { stdout: commandResult.stdout.trim(), stderr: commandResult.stderr.trim() };
   }
 
   /**
@@ -395,13 +398,34 @@ export class PackageManager {
     switch (type) {
       case 'range':
       case 'version':
-      case 'tag':
+      case 'tag': {
         if (!name) {
           throw new Error(`Could not parse package name from specifier: ${specifier}`);
         }
 
         // `fetchSpec` is the version, range, or tag.
-        return this.getRegistryManifest(name, fetchSpec ?? 'latest', options);
+        let versionSpec = fetchSpec ?? 'latest';
+        if (this.descriptor.requiresManifestVersionLookup) {
+          if (type === 'tag' || !fetchSpec) {
+            const metadata = await this.getRegistryMetadata(name, options);
+            if (!metadata) {
+              return null;
+            }
+            versionSpec = metadata['dist-tags'][versionSpec];
+          } else if (type === 'range') {
+            const metadata = await this.getRegistryMetadata(name, options);
+            if (!metadata) {
+              return null;
+            }
+            versionSpec = maxSatisfying(metadata.versions, fetchSpec) ?? '';
+          }
+          if (!versionSpec) {
+            return null;
+          }
+        }
+
+        return this.getRegistryManifest(name, versionSpec, options);
+      }
       case 'directory': {
         if (!fetchSpec) {
           throw new Error(`Could not parse directory path from specifier: ${specifier}`);
