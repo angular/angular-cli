@@ -269,12 +269,12 @@ export function parseNpmLikeMetadata(stdout: string, logger?: Logger): PackageMe
 }
 
 /**
- * Parses the output of `yarn info` (classic).
+ * Parses the output of `yarn info` (classic) to get a package manifest.
  * @param stdout The standard output of the command.
  * @param logger An optional logger instance.
  * @returns The package manifest object.
  */
-export function parseYarnLegacyManifest(stdout: string, logger?: Logger): PackageManifest | null {
+export function parseYarnClassicManifest(stdout: string, logger?: Logger): PackageManifest | null {
   logger?.debug(`Parsing yarn classic manifest...`);
   logStdout(stdout, logger);
 
@@ -287,5 +287,43 @@ export function parseYarnLegacyManifest(stdout: string, logger?: Logger): Packag
   const data = JSON.parse(stdout);
 
   // Yarn classic wraps the manifest in a `data` property.
-  return data.data ?? data;
+  const manifest = data.data as PackageManifest;
+
+  // Yarn classic removes any field with a falsy value
+  // https://github.com/yarnpkg/yarn/blob/7cafa512a777048ce0b666080a24e80aae3d66a9/src/cli/commands/info.js#L26-L29
+  // Add a default of 'false' for the `save` field when the `ng-add` object is present but does not have any fields.
+  // There is a small chance this causes an incorrect value. However, the use of `ng-add` is rare and, in the cases
+  // it is used, save is set to either a `false` literal or a truthy value. Special cases can be added for specific
+  // packages if discovered.
+  if (
+    manifest['ng-add'] &&
+    typeof manifest['ng-add'] === 'object' &&
+    Object.keys(manifest['ng-add']).length === 0
+  ) {
+    manifest['ng-add'].save ??= false;
+  }
+
+  return manifest;
+}
+
+/**
+ * Parses the output of `yarn info` (classic) to get package metadata.
+ * @param stdout The standard output of the command.
+ * @param logger An optional logger instance.
+ * @returns The package metadata object.
+ */
+export function parseYarnClassicMetadata(stdout: string, logger?: Logger): PackageMetadata | null {
+  logger?.debug(`Parsing yarn classic metadata...`);
+  logStdout(stdout, logger);
+
+  if (!stdout) {
+    logger?.debug('  stdout is empty. No metadata found.');
+
+    return null;
+  }
+
+  const data = JSON.parse(stdout);
+
+  // Yarn classic wraps the metadata in a `data` property.
+  return data.data;
 }
