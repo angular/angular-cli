@@ -243,7 +243,6 @@ export const SUPPORTED_PACKAGE_MANAGERS = {
     versionCommand: ['--version'],
     listDependenciesCommand: ['pm', 'ls', '--json'],
     getManifestCommand: ['pm', 'view', '--json'],
-    viewCommandFieldArgFormatter: (fields) => [...fields],
     outputParsers: {
       listDependencies: parseNpmLikeDependencies,
       getRegistryManifest: parseNpmLikeManifest,
