@@ -23,6 +23,7 @@ import { FIND_EXAMPLE_TOOL } from './tools/examples/index';
 import { MODERNIZE_TOOL } from './tools/modernize';
 import { ZONELESS_MIGRATION_TOOL } from './tools/onpush-zoneless-migration/zoneless-migration';
 import { LIST_PROJECTS_TOOL } from './tools/projects';
+import { SCHEMATICS_TOOLS } from './tools/schematics';
 import { type AnyMcpToolDeclaration, registerTools } from './tools/tool-registry';
 
 /**
@@ -47,7 +48,12 @@ const STABLE_TOOLS = [
  * The set of tools that are available but not enabled by default.
  * These tools are considered experimental and may have limitations.
  */
-export const EXPERIMENTAL_TOOLS = [BUILD_TOOL, MODERNIZE_TOOL, ...SERVE_TOOLS] as const;
+export const EXPERIMENTAL_TOOLS = [
+  BUILD_TOOL,
+  MODERNIZE_TOOL,
+  ...SCHEMATICS_TOOLS,
+  ...SERVE_TOOLS,
+] as const;
 
 export async function createMcpServer(
   options: {
