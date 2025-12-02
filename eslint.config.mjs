@@ -190,9 +190,7 @@ export default [
       ],
 
       '@typescript-eslint/await-thenable': 'off',
-      '@typescript-eslint/ban-types': 'off',
       '@typescript-eslint/no-implied-eval': 'off',
-      '@typescript-eslint/no-var-requires': 'off',
       '@typescript-eslint/no-unsafe-argument': 'off',
       '@typescript-eslint/no-unsafe-assignment': 'off',
       '@typescript-eslint/no-unsafe-call': 'off',
