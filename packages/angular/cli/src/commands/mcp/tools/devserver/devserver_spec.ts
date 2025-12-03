@@ -38,11 +38,12 @@ describe('Serve Tools', () => {
 
     mockContext = {
       devservers: new Map(),
+      host: mockHost,
     } as Partial<McpToolContext> as McpToolContext;
   });
 
   it('should start and stop a dev server', async () => {
-    const startResult = await startDevserver({}, mockContext, mockHost);
+    const startResult = await startDevserver({}, mockContext);
     expect(startResult.structuredContent.message).toBe(
       `Development server for project '<default>' started and watching for workspace changes.`,
     );
@@ -56,7 +57,7 @@ describe('Serve Tools', () => {
   });
 
   it('should wait for a build to complete', async () => {
-    await startDevserver({}, mockContext, mockHost);
+    await startDevserver({}, mockContext);
 
     const waitPromise = waitForDevserverBuild({ timeout: 10 }, mockContext);
 
@@ -78,7 +79,7 @@ describe('Serve Tools', () => {
 
   it('should handle multiple dev servers', async () => {
     // Start server for project 1. This uses the basic mockProcess created for the tests.
-    const startResult1 = await startDevserver({ project: 'app-one' }, mockContext, mockHost);
+    const startResult1 = await startDevserver({ project: 'app-one' }, mockContext);
     expect(startResult1.structuredContent.message).toBe(
       `Development server for project 'app-one' started and watching for workspace changes.`,
     );
@@ -87,7 +88,7 @@ describe('Serve Tools', () => {
     // Start server for project 2, returning a new mock process.
     const process2 = new MockChildProcess();
     mockHost.spawn.and.returnValue(process2 as unknown as ChildProcess);
-    const startResult2 = await startDevserver({ project: 'app-two' }, mockContext, mockHost);
+    const startResult2 = await startDevserver({ project: 'app-two' }, mockContext);
     expect(startResult2.structuredContent.message).toBe(
       `Development server for project 'app-two' started and watching for workspace changes.`,
     );
@@ -116,7 +117,7 @@ describe('Serve Tools', () => {
   });
 
   it('should handle server crash', async () => {
-    await startDevserver({ project: 'crash-app' }, mockContext, mockHost);
+    await startDevserver({ project: 'crash-app' }, mockContext);
 
     // Simulate a crash with exit code 1
     mockProcess.stdout.emit('data', 'Fatal error.');
@@ -128,7 +129,7 @@ describe('Serve Tools', () => {
   });
 
   it('wait should timeout if build takes too long', async () => {
-    await startDevserver({ project: 'timeout-app' }, mockContext, mockHost);
+    await startDevserver({ project: 'timeout-app' }, mockContext);
     const waitResult = await waitForDevserverBuild(
       { project: 'timeout-app', timeout: 10 },
       mockContext,
@@ -139,7 +140,7 @@ describe('Serve Tools', () => {
   it('should wait through multiple cycles for a build to complete', async () => {
     jasmine.clock().install();
     try {
-      await startDevserver({}, mockContext, mockHost);
+      await startDevserver({}, mockContext);
 
       // Immediately simulate a build starting so isBuilding() is true.
       mockProcess.stdout.emit('data', '❯ Changes detected. Rebuilding...');

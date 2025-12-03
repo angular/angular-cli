@@ -8,7 +8,6 @@
 
 import { z } from 'zod';
 import { LocalDevserver, devserverKey } from '../../devserver';
-import { type Host, LocalWorkspaceHost } from '../../host';
 import { createStructuredContentOutput } from '../../utils';
 import { type McpToolContext, type McpToolDeclaration, declareTool } from '../tool-registry';
 
@@ -39,11 +38,7 @@ function localhostAddress(port: number) {
   return `http://localhost:${port}/`;
 }
 
-export async function startDevserver(
-  input: DevserverStartToolInput,
-  context: McpToolContext,
-  host: Host,
-) {
+export async function startDevserver(input: DevserverStartToolInput, context: McpToolContext) {
   const projectKey = devserverKey(input.project);
 
   let devserver = context.devservers.get(projectKey);
@@ -54,9 +49,9 @@ export async function startDevserver(
     });
   }
 
-  const port = await host.getAvailablePort();
+  const port = await context.host.getAvailablePort();
 
-  devserver = new LocalDevserver({ host, project: input.project, port });
+  devserver = new LocalDevserver({ host: context.host, project: input.project, port });
   devserver.start();
 
   context.devservers.set(projectKey, devserver);
@@ -98,6 +93,6 @@ the first build completes.
   inputSchema: devserverStartToolInputSchema.shape,
   outputSchema: devserverStartToolOutputSchema.shape,
   factory: (context) => (input) => {
-    return startDevserver(input, context, LocalWorkspaceHost);
+    return startDevserver(input, context);
   },
 });

@@ -7,7 +7,7 @@
  */
 
 import { z } from 'zod';
-import { CommandError, type Host, LocalWorkspaceHost } from '../host';
+import { CommandError, type Host } from '../host';
 import { createStructuredContentOutput } from '../utils';
 import { type McpToolDeclaration, declareTool } from './tool-registry';
 
@@ -107,5 +107,5 @@ Perform a one-off, non-watched build using "ng build". Use this tool whenever th
   isLocalOnly: true,
   inputSchema: buildToolInputSchema.shape,
   outputSchema: buildToolOutputSchema.shape,
-  factory: () => (input) => runBuild(input, LocalWorkspaceHost),
+  factory: (context) => (input) => runBuild(input, context.host),
 });
