@@ -1,6 +1,5 @@
-import { parseArgs } from 'node:util';
+import { parseArgs, styleText } from 'node:util';
 import { createConsoleLogger } from '../../packages/angular_devkit/core/node';
-import colors from 'ansi-colors';
 import glob from 'fast-glob';
 import * as path from 'node:path';
 import * as fs from 'node:fs';
@@ -114,9 +113,9 @@ if (process.env.CHROME_BIN) {
 const logger = createConsoleLogger(argv.verbose, process.stdout, process.stderr, {
   info: (s) => s,
   debug: (s) => s,
-  warn: (s) => colors.bold.yellow(s),
-  error: (s) => colors.bold.red(s),
-  fatal: (s) => colors.bold.red(s),
+  warn: (s) => styleText(['bold', 'yellow'], s),
+  error: (s) => styleText(['bold', 'red'], s),
+  fatal: (s) => styleText(['bold', 'red'], s),
 });
 
 const logStack = [logger];
@@ -250,21 +249,21 @@ process.env.CHROMEDRIVER_BIN = path.resolve(process.env.CHROMEDRIVER_BIN!);
     await runSteps(runTest, testsToRun, 'test');
 
     if (shardId !== null) {
-      console.log(colors.green(`Done shard ${shardId} of ${nbShards}.`));
+      console.log(styleText(['green'], `Done shard ${shardId} of ${nbShards}.`));
     } else {
-      console.log(colors.green('Done.'));
+      console.log(styleText(['green'], 'Done.'));
     }
 
     process.exitCode = 0;
   } catch (err) {
     if (err instanceof Error) {
       console.log('\n');
-      console.error(colors.red(err.message));
+      console.error(styleText(['red'], err.message));
       if (err.stack) {
-        console.error(colors.red(err.stack));
+        console.error(styleText(['red'], err.stack));
       }
     } else {
-      console.error(colors.red(String(err)));
+      console.error(styleText(['red'], String(err)));
     }
 
     if (argv.debug) {
@@ -281,7 +280,7 @@ process.env.CHROMEDRIVER_BIN = path.resolve(process.env.CHROMEDRIVER_BIN!);
     secureRegistryProcess.kill();
   }
 })().catch((err) => {
-  console.error(colors.red(`Unkown Error: ${err}`));
+  console.error(styleText(['red'], `Unkown Error: ${err}`));
   process.exitCode = 1;
 });
 
@@ -310,7 +309,7 @@ async function runSteps(
       await run(absoluteName);
     } catch (e) {
       console.log('\n');
-      console.error(colors.red(`${capsType} "${name}" failed...`));
+      console.error(styleText(['red'], `${capsType} "${name}" failed...`));
 
       throw e;
     } finally {
@@ -363,16 +362,22 @@ function printHeader(
   count: number,
   type: 'setup' | 'initializer' | 'test',
 ) {
-  const text = `${testIndex + 1} of ${count}`;
+  const text = `(${testIndex + 1} of ${count})`;
   const fullIndex = testIndex * nbShards + (shardId ?? 0) + 1;
   const shard =
     shardId === null || type !== 'test'
       ? ''
-      : colors.yellow(` [${shardId}:${nbShards}]` + colors.bold(` (${fullIndex}/${tests.length})`));
+      : styleText(
+          ['yellow'],
+          ` [${shardId}:${nbShards}]` + styleText(['bold'], ` (${fullIndex}/${tests.length})`),
+        );
   console.log(
-    colors.green(
-      `Running ${type} "${colors.bold.blue(testName)}" (${colors.bold.white(text)}${shard})...`,
-    ),
+    styleText(['green'], `Running ${type} "`) +
+      styleText(['bold', 'blue'], testName) +
+      styleText(['green'], '" ') +
+      styleText(['bold', 'white'], text) +
+      shard +
+      styleText(['green'], '...'),
   );
 }
 
@@ -382,9 +387,11 @@ function printFooter(testName: string, type: 'setup' | 'initializer' | 'test', s
   // Round to hundredth of a second.
   const t = Math.round((Date.now() - startTime) / 10) / 100;
   console.log(
-    colors.green(`${capsType} "${colors.bold.blue(testName)}" took `) +
-      colors.bold.blue('' + t) +
-      colors.green('s...'),
+    styleText(['green'], `${capsType} "`) +
+      styleText(['bold', 'blue'], testName) +
+      styleText(['green'], '" took ') +
+      styleText(['bold', 'blue'], t.toFixed(2)) +
+      styleText(['green'], 's...'),
   );
   console.log('');
 }
