@@ -139,7 +139,6 @@
     "unenv": "^1.10.0",
     "verdaccio": "6.2.3",
     "verdaccio-auth-memory": "^10.0.0",
-    "yargs-parser": "22.0.0",
     "zod": "4.1.13",
     "zone.js": "^0.16.0"
   },
