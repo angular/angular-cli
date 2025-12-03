@@ -7,8 +7,8 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import colors from 'ansi-colors';
 import path from 'node:path';
+import { styleText } from 'node:util';
 import yargsParser from 'yargs-parser';
 
 const args = yargsParser(process.argv.slice(2), {
@@ -26,11 +26,11 @@ process.chdir(path.join(scriptDir, '..'));
 const originalConsole = { ...console };
 console.warn = function (...args) {
   const [m, ...rest] = args;
-  originalConsole.warn(colors.yellow(m), ...rest);
+  originalConsole.warn(styleText(['yellow'], m), ...rest);
 };
 console.error = function (...args) {
   const [m, ...rest] = args;
-  originalConsole.error(colors.red(m), ...rest);
+  originalConsole.error(styleText(['red'], m), ...rest);
 };
 
 try {
