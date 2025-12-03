@@ -8,7 +8,8 @@
 
 import { createReadStream } from 'node:fs';
 import { normalize } from 'node:path';
-import { Parser } from 'tar';
+import { createGunzip } from 'node:zlib';
+import { extract } from 'tar-stream';
 
 /**
  * Extract and return the contents of a single file out of a tar file.
@@ -21,20 +22,27 @@ export function extractFile(tarball: string, filePath: string): Promise<Buffer> 
   const normalizedFilePath = normalize(filePath);
 
   return new Promise((resolve, reject) => {
-    createReadStream(tarball)
-      .pipe(
-        new Parser({
-          strict: true,
-          filter: (p) => normalize(p) === normalizedFilePath,
-          onReadEntry: (entry) => {
-            const chunks: Buffer[] = [];
+    const extractor = extract();
 
-            entry.on('data', (chunk) => chunks.push(chunk));
-            entry.on('error', reject);
-            entry.on('finish', () => resolve(Buffer.concat(chunks)));
-          },
-        }),
-      )
-      .on('close', () => reject(`${tarball} does not contain ${filePath}`));
+    extractor.on('entry', (header, stream, next) => {
+      if (normalize(header.name) !== normalizedFilePath) {
+        stream.resume();
+        next();
+
+        return;
+      }
+
+      const chunks: Buffer[] = [];
+      stream.on('data', (chunk) => chunks.push(chunk));
+      stream.on('error', reject);
+      stream.on('end', () => {
+        resolve(Buffer.concat(chunks));
+        next();
+      });
+    });
+
+    extractor.on('finish', () => reject(new Error(`'${filePath}' not found in '${tarball}'.`)));
+
+    createReadStream(tarball).pipe(createGunzip()).pipe(extractor).on('error', reject);
   });
 }
