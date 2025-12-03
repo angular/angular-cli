@@ -280,9 +280,6 @@ importers:
       source-map-support:
         specifier: 0.5.21
         version: 0.5.21
-      tar:
-        specifier: ^7.0.0
-        version: 7.5.2
       ts-node:
         specifier: ^10.9.1
         version: 10.9.2(@types/node@22.19.1)(typescript@5.9.3)
@@ -897,9 +894,15 @@ importers:
       '@angular-devkit/schematics':
         specifier: workspace:*
         version: link:../packages/angular_devkit/schematics
+      '@types/tar-stream':
+        specifier: 3.1.4
+        version: 3.1.4
       rxjs:
         specifier: 7.8.2
         version: 7.8.2
+      tar-stream:
+        specifier: 3.1.7
+        version: 3.1.7
       tree-kill:
         specifier: 1.2.2
         version: 1.2.2
@@ -3823,6 +3826,9 @@ packages:
 
   '@types/stack-trace@0.0.33':
     resolution: {integrity: sha512-O7in6531Bbvlb2KEsJ0dq0CHZvc3iWSR5ZYMtvGgnHA56VgriAN/AU2LorfmcvAl2xc9N5fbCTRyMRRl8nd74g==}
+
+  '@types/tar-stream@3.1.4':
+    resolution: {integrity: sha512-921gW0+g29mCJX0fRvqeHzBlE/XclDaAG0Ousy1LCghsOhvaKacDeRGEVzQP9IPfKn8Vysy7FEXAIxycpc/CMg==}
 
   '@types/watchpack@2.4.5':
     resolution: {integrity: sha512-8CarnGOIYYRL342jwQyHrGwz4vCD3y5uwwYmzQVzT2Z24DqSd6wwBva6m0eNJX4S5pVmrx9xUEbOsOoqBVhWsg==}
@@ -12476,6 +12482,10 @@ snapshots:
       '@types/node': 22.19.1
 
   '@types/stack-trace@0.0.33': {}
+
+  '@types/tar-stream@3.1.4':
+    dependencies:
+      '@types/node': 22.19.1
 
   '@types/watchpack@2.4.5':
     dependencies:
