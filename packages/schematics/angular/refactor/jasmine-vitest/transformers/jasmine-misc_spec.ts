@@ -132,7 +132,6 @@ describe('Jasmine to Vitest Transformer', () => {
             return a.toString() === b.toString();
           });
         `,
-        // eslint-disable-next-line max-len
         expected: `// TODO: vitest-migration: jasmine.addCustomEqualityTester is not supported. Please manually migrate to expect.addEqualityTesters(). See: https://vitest.dev/api/expect.html#expect-addequalitytesters
           jasmine.addCustomEqualityTester((a, b) => {
             return a.toString() === b.toString();

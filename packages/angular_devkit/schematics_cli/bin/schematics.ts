@@ -216,7 +216,6 @@ function getPackageManagerName() {
   return 'npm';
 }
 
-// eslint-disable-next-line max-lines-per-function
 export async function main({
   args,
   stdout = process.stdout,

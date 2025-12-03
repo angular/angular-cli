@@ -28,7 +28,6 @@ function transform(
 }
 
 describe('@ngtools/webpack transformers', () => {
-  /* eslint-disable max-len */
   describe('find_resources', () => {
     it('should replace resources', () => {
       const input = tags.stripIndent`

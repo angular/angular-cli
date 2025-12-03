@@ -6,7 +6,6 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { path } from '../path';
 import { stringToFileBuffer } from './buffer';
 import { CordHost } from './record';

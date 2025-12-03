@@ -464,7 +464,6 @@ describe('Jasmine to Vitest Transformer - Integration Tests', () => {
       });
     `;
 
-    /* eslint-disable max-len */
     const vitestCode = `
       describe('Unsupported Features', () => {
         beforeAll(() => {
@@ -496,7 +495,6 @@ describe('Jasmine to Vitest Transformer - Integration Tests', () => {
         });
       });
     `;
-    /* eslint-enable max-len */
 
     await expectTransformation(jasmineCode, vitestCode);
   });
