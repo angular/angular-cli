@@ -8,16 +8,24 @@
  */
 
 import path from 'node:path';
-import { styleText } from 'node:util';
-import yargsParser from 'yargs-parser';
+import { parseArgs, styleText } from 'node:util';
 
-const args = yargsParser(process.argv.slice(2), {
-  boolean: ['verbose'],
-  configuration: {
-    'camel-case-expansion': false,
+const { values, positionals } = parseArgs({
+  args: process.argv.slice(2),
+  options: {
+    verbose: {
+      type: 'boolean',
+    },
   },
+  allowPositionals: true,
+  strict: false, // Allow unknown options to pass through.
 });
-const scriptName = args._.shift();
+
+const scriptName = positionals.shift();
+const args = {
+  ...values,
+  _: positionals,
+};
 
 const cwd = process.cwd();
 const scriptDir = import.meta.dirname;
