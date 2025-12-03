@@ -12,6 +12,7 @@
  * into their own file improves modularity and allows for focused testing.
  */
 
+import { ErrorInfo } from './error';
 import { Logger } from './logger';
 import { PackageManifest, PackageMetadata } from './package-metadata';
 import { InstalledPackage } from './package-tree';
@@ -29,6 +30,26 @@ function logStdout(stdout: string, logger?: Logger): void {
   }
 
   logger.debug(`  stdout:\n${output}`);
+}
+
+/**
+ * A generator function that parses a string containing JSONL (newline-delimited JSON)
+ * and yields each successfully parsed JSON object.
+ * @param output The string output to parse.
+ * @param logger An optional logger instance.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function* parseJsonLines(output: string, logger?: Logger): Generator<any> {
+  for (const line of output.split('\n')) {
+    if (!line.trim()) {
+      continue;
+    }
+    try {
+      yield JSON.parse(line);
+    } catch (e) {
+      logger?.debug(`  Ignoring non-JSON line: ${e}`);
+    }
+  }
 }
 
 interface NpmListDependency {
@@ -106,7 +127,7 @@ export function parseNpmLikeDependencies(
  * Parses the output of `yarn list` (classic).
  *
  * The expected output is a JSON stream (JSONL), where each line is a JSON object.
- * The relevant object has a `type` of `'tree'`.
+ * The relevant object has a `type` of `'tree'` with a `data` property.
  * Yarn classic does not provide a path, so the `path` property will be `undefined`.
  *
  * ```json
@@ -131,11 +152,7 @@ export function parseYarnClassicDependencies(
     return dependencies;
   }
 
-  for (const line of stdout.split('\n')) {
-    if (!line) {
-      continue;
-    }
-    const json = JSON.parse(line);
+  for (const json of parseJsonLines(stdout, logger)) {
     if (json.type === 'tree' && json.data?.trees) {
       for (const info of json.data.trees) {
         const name = info.name.split('@')[0];
@@ -202,25 +219,16 @@ export function parseYarnModernDependencies(
       `  Failed to parse as single JSON object: ${e}. Falling back to line-by-line parsing.`,
     );
     // Fallback for older versions of yarn berry that might still output json lines
-    for (const line of stdout.split('\n')) {
-      if (!line) {
-        continue;
-      }
-      try {
-        const json = JSON.parse(line);
-        if (json.type === 'tree' && json.data?.trees) {
-          for (const info of json.data.trees) {
-            const name = info.name.split('@')[0];
-            const version = info.name.split('@').pop();
-            dependencies.set(name, {
-              name,
-              version,
-            });
-          }
+    for (const json of parseJsonLines(stdout, logger)) {
+      if (json.type === 'tree' && json.data?.trees) {
+        for (const info of json.data.trees) {
+          const name = info.name.split('@')[0];
+          const version = info.name.split('@').pop();
+          dependencies.set(name, {
+            name,
+            version,
+          });
         }
-      } catch (innerError) {
-        logger?.debug(`  Ignoring non-JSON line: ${innerError}`);
-        // Ignore lines that are not valid JSON.
       }
     }
   }
@@ -270,9 +278,16 @@ export function parseNpmLikeMetadata(stdout: string, logger?: Logger): PackageMe
 
 /**
  * Parses the output of `yarn info` (classic) to get a package manifest.
+ *
+ * When `yarn info --verbose` is used, the output is a JSONL stream. This function
+ * iterates through the lines to find the object with `type: 'inspect'` which contains
+ * the package manifest.
+ *
+ * For non-verbose output, it falls back to parsing a single JSON object.
+ *
  * @param stdout The standard output of the command.
  * @param logger An optional logger instance.
- * @returns The package manifest object.
+ * @returns The package manifest object, or `null` if not found.
  */
 export function parseYarnClassicManifest(stdout: string, logger?: Logger): PackageManifest | null {
   logger?.debug(`Parsing yarn classic manifest...`);
@@ -284,10 +299,21 @@ export function parseYarnClassicManifest(stdout: string, logger?: Logger): Packa
     return null;
   }
 
-  const data = JSON.parse(stdout);
+  // Yarn classic outputs JSONL. We need to find the relevant object.
+  let manifest;
+  for (const json of parseJsonLines(stdout, logger)) {
+    // The manifest data is in a JSON object with type 'inspect'.
+    if (json.type === 'inspect' && json.data) {
+      manifest = json.data;
+      break;
+    }
+  }
 
-  // Yarn classic wraps the manifest in a `data` property.
-  const manifest = data.data as PackageManifest;
+  if (!manifest) {
+    logger?.debug('  Failed to find manifest in yarn classic output.');
+
+    return null;
+  }
 
   // Yarn classic removes any field with a falsy value
   // https://github.com/yarnpkg/yarn/blob/7cafa512a777048ce0b666080a24e80aae3d66a9/src/cli/commands/info.js#L26-L29
@@ -322,8 +348,174 @@ export function parseYarnClassicMetadata(stdout: string, logger?: Logger): Packa
     return null;
   }
 
-  const data = JSON.parse(stdout);
+  // Yarn classic outputs JSONL. We need to find the relevant object.
+  let metadata;
+  for (const json of parseJsonLines(stdout, logger)) {
+    // The metadata data is in a JSON object with type 'inspect'.
+    if (json.type === 'inspect' && json.data) {
+      metadata = json.data;
+      break;
+    }
+  }
 
-  // Yarn classic wraps the metadata in a `data` property.
-  return data.data;
+  if (!metadata) {
+    logger?.debug('  Failed to find metadata in yarn classic output.');
+
+    return null;
+  }
+
+  return metadata;
+}
+
+/**
+ * Parses the `stdout` or `stderr` output of npm, pnpm, modern yarn, or bun to extract structured error information.
+ *
+ * This parser uses a multi-stage approach. It first attempts to parse the entire `output` as a
+ * single JSON object, which is the standard for modern tools like pnpm, yarn, and bun. If JSON
+ * parsing fails, it falls back to a line-by-line regex-based approach to handle the plain
+ * text output from older versions of npm.
+ *
+ * Example JSON output (pnpm):
+ * ```json
+ * {
+ *   "code": "E404",
+ *   "summary": "Not Found - GET https://registry.npmjs.org/@angular%2fnon-existent - Not found",
+ *   "detail": "The requested resource '@angular/non-existent@*' could not be found or you do not have permission to access it."
+ * }
+ * ```
+ *
+ * Example text output (npm):
+ * ```
+ * npm error code E404
+ * npm error 404 Not Found - GET https://registry.npmjs.org/@angular%2fnon-existent - Not found
+ * ```
+ *
+ * @param output The standard output or standard error of the command.
+ * @param logger An optional logger instance.
+ * @returns An `ErrorInfo` object if parsing is successful, otherwise `null`.
+ */
+export function parseNpmLikeError(output: string, logger?: Logger): ErrorInfo | null {
+  logger?.debug(`Parsing npm-like error output...`);
+  logStdout(output, logger); // Log output for debugging purposes
+
+  if (!output) {
+    logger?.debug('  output is empty. No error found.');
+
+    return null;
+  }
+
+  // Attempt to parse as JSON first (common for pnpm, modern yarn, bun)
+  try {
+    const jsonError = JSON.parse(output);
+    if (
+      jsonError &&
+      typeof jsonError.code === 'string' &&
+      (typeof jsonError.summary === 'string' || typeof jsonError.message === 'string')
+    ) {
+      const summary = jsonError.summary || jsonError.message;
+      logger?.debug(`  Successfully parsed JSON error with code '${jsonError.code}'.`);
+
+      return {
+        code: jsonError.code,
+        summary,
+        detail: jsonError.detail,
+      };
+    }
+  } catch (e) {
+    logger?.debug(`  Failed to parse output as JSON: ${e}. Attempting regex fallback.`);
+    // Fallback to regex for plain text errors (common for npm)
+  }
+
+  // Regex for npm-like error codes (e.g., `npm ERR! code E404` or `npm error code E404`)
+  const errorCodeMatch = output.match(/npm (ERR!|error) code (E\d{3}|[A-Z_]+)/);
+  if (errorCodeMatch) {
+    const code = errorCodeMatch[2]; // Capture group 2 is the actual error code
+    let summary: string | undefined;
+
+    // Find the most descriptive summary line (the line after `npm ERR! code ...` or `npm error code ...`).
+    for (const line of output.split('\n')) {
+      if (line.startsWith('npm ERR!') && !line.includes(' code ')) {
+        summary = line.replace('npm ERR! ', '').trim();
+        break;
+      } else if (line.startsWith('npm error') && !line.includes(' code ')) {
+        summary = line.replace('npm error ', '').trim();
+        break;
+      }
+    }
+
+    logger?.debug(`  Successfully parsed text error with code '${code}'.`);
+
+    return {
+      code,
+      summary: summary || `Package manager error: ${code}`,
+    };
+  }
+
+  logger?.debug('  Failed to parse npm-like error. No structured error found.');
+
+  return null;
+}
+
+/**
+ * Parses the `stdout` or `stderr` output of yarn classic to extract structured error information.
+ *
+ * This parser first attempts to find an HTTP status code (e.g., 404, 401) in the verbose output.
+ * If found, it returns a standardized error code (`E${statusCode}`).
+ * If no HTTP status code is found, it falls back to parsing generic JSON error lines.
+ *
+ * Example verbose output (with HTTP status code):
+ * ```json
+ * {"type":"verbose","data":"Request \"https://registry.npmjs.org/@angular%2fnon-existent\" finished with status code 404."}
+ * ```
+ *
+ * Example generic JSON error output:
+ * ```json
+ * {"type":"error","data":"Received invalid response from npm."}
+ * ```
+ *
+ * @param output The standard output or standard error of the command.
+ * @param logger An optional logger instance.
+ * @returns An `ErrorInfo` object if parsing is successful, otherwise `null`.
+ */
+export function parseYarnClassicError(output: string, logger?: Logger): ErrorInfo | null {
+  logger?.debug(`Parsing yarn classic error output...`);
+  logStdout(output, logger); // Log output for debugging purposes
+
+  if (!output) {
+    logger?.debug('  output is empty. No error found.');
+
+    return null;
+  }
+
+  // First, check for any HTTP status code in the verbose output.
+  const statusCodeMatch = output.match(/finished with status code (\d{3})/);
+  if (statusCodeMatch) {
+    const statusCode = Number(statusCodeMatch[1]);
+    // Status codes in the 200-299 range are successful.
+    if (statusCode < 200 || statusCode >= 300) {
+      logger?.debug(`  Detected HTTP error status code '${statusCode}' in verbose output.`);
+
+      return {
+        code: `E${statusCode}`,
+        summary: `Request failed with status code ${statusCode}.`,
+      };
+    }
+  }
+
+  // Fallback to the JSON error type if no HTTP status code is present.
+  for (const json of parseJsonLines(output, logger)) {
+    if (json.type === 'error' && typeof json.data === 'string') {
+      const summary = json.data;
+      logger?.debug(`  Successfully parsed generic yarn classic error.`);
+
+      return {
+        code: 'UNKNOWN_ERROR',
+        summary,
+      };
+    }
+  }
+
+  logger?.debug('  Failed to parse yarn classic error. No structured error found.');
+
+  return null;
 }

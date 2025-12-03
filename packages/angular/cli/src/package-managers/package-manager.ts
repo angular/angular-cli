@@ -15,7 +15,7 @@
 import { join } from 'node:path';
 import npa from 'npm-package-arg';
 import { maxSatisfying } from 'semver';
-import { PackageManagerError } from './error';
+import { ErrorInfo, PackageManagerError } from './error';
 import { Host } from './host';
 import { Logger } from './logger';
 import { PackageManagerDescriptor } from './package-manager-descriptor';
@@ -194,20 +194,56 @@ export class PackageManager {
 
     let stdout;
     let stderr;
+    let exitCode;
+    let thrownError;
     try {
       ({ stdout, stderr } = await this.#run(args, runOptions));
+      exitCode = 0;
     } catch (e) {
-      if (e instanceof PackageManagerError && typeof e.exitCode === 'number' && e.exitCode !== 0) {
-        // Some package managers exit with a non-zero code when the package is not found.
+      thrownError = e;
+      if (e instanceof PackageManagerError) {
+        stdout = e.stdout;
+        stderr = e.stderr;
+        exitCode = e.exitCode;
+      } else {
+        // Re-throw unexpected errors
+        throw e;
+      }
+    }
+
+    // Yarn classic can exit with code 0 even when an error occurs.
+    // To ensure we capture these cases, we will always attempt to parse a
+    // structured error from the output, regardless of the exit code.
+    const getError = this.descriptor.outputParsers.getError;
+    const parsedError =
+      getError?.(stdout, this.options.logger) ?? getError?.(stderr, this.options.logger) ?? null;
+
+    if (parsedError) {
+      this.options.logger?.debug(
+        `[${this.descriptor.binary}] Structured error (code: ${parsedError.code}): ${parsedError.summary}`,
+      );
+
+      // Special case for 'not found' errors (e.g., E404). Return null for these.
+      if (this.descriptor.isNotFound(parsedError)) {
         if (cache && cacheKey) {
           cache.set(cacheKey, null);
         }
 
         return null;
+      } else {
+        // For all other structured errors, throw a more informative error.
+        throw new PackageManagerError(parsedError.summary, stdout, stderr, exitCode);
       }
-      throw e;
     }
 
+    // If an error was originally thrown and we didn't parse a more specific
+    // structured error, re-throw the original error now.
+    if (thrownError) {
+      throw thrownError;
+    }
+
+    // If we reach this point, the command succeeded and no structured error was found.
+    // We can now safely parse the successful output.
     try {
       const result = parser(stdout, this.options.logger);
       if (cache && cacheKey) {
@@ -219,7 +255,7 @@ export class PackageManager {
       const message = `Failed to parse package manager output: ${
         e instanceof Error ? e.message : ''
       }`;
-      throw new PackageManagerError(message, stdout, stderr, 0);
+      throw new PackageManagerError(message, stdout, stderr, exitCode);
     }
   }
 
