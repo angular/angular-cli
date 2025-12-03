@@ -354,7 +354,6 @@ describe('standalone utilities', () => {
         host,
       );
 
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
       await expectAsync(promise).toBeRejectedWithError(
         `Cannot add provider to invalid bootstrapApplication call in ${mainPath}`,
       );
@@ -384,7 +383,6 @@ describe('standalone utilities', () => {
         host,
       );
 
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
       await expectAsync(promise).toBeRejectedWithError(
         `Cannot statically analyze bootstrapApplication call in ${mainPath}`,
       );
@@ -402,7 +400,6 @@ describe('standalone utilities', () => {
         host,
       );
 
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
       await expectAsync(promise).toBeRejectedWithError('Bootstrap call not found');
     });
   });

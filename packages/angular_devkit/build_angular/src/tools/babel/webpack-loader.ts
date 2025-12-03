@@ -36,7 +36,6 @@ let linkerPluginCreator:
  */
 let i18nPluginCreators: I18nPluginCreators | undefined;
 
-// eslint-disable-next-line max-lines-per-function
 export default custom<ApplicationPresetOptions>(() => {
   const baseOptions = Object.freeze({
     babelrc: false,
