@@ -32,15 +32,6 @@ import { type AnyMcpToolDeclaration, registerTools } from './tools/tool-registry
 const DEVSERVER_TOOLS = [DEVSERVER_START_TOOL, DEVSERVER_STOP_TOOL, DEVSERVER_WAIT_FOR_BUILD_TOOL];
 
 /**
- * Experimental tools that are grouped together under a single name.
- *
- * Used for enabling them as a group.
- */
-export const EXPERIMENTAL_TOOL_GROUPS = {
-  'devserver': DEVSERVER_TOOLS,
-};
-
-/**
  * The set of tools that are enabled by default for the MCP server.
  * These tools are considered stable and suitable for general use.
  */
@@ -58,6 +49,16 @@ const STABLE_TOOLS = [
  * These tools are considered experimental and may have limitations.
  */
 export const EXPERIMENTAL_TOOLS = [BUILD_TOOL, MODERNIZE_TOOL, ...DEVSERVER_TOOLS] as const;
+
+/**
+ * Experimental tools that are grouped together under a single name.
+ *
+ * Used for enabling them as a group.
+ */
+export const EXPERIMENTAL_TOOL_GROUPS = {
+  'all': EXPERIMENTAL_TOOLS,
+  'devserver': DEVSERVER_TOOLS,
+};
 
 export async function createMcpServer(
   options: {
