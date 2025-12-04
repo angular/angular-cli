@@ -49,7 +49,7 @@ export async function createNpmRegistry(
 // Token was generated using `echo -n 'testing:s3cret' | openssl base64`.
 const VALID_TOKEN = `dGVzdGluZzpzM2NyZXQ=`;
 
-export function createNpmConfigForAuthentication(
+export async function createNpmConfigForAuthentication(
   /**
    * When true, the authentication token will be scoped to the registry URL.
    * @example
@@ -70,17 +70,30 @@ export function createNpmConfigForAuthentication(
   const token = invalidToken ? `invalid=` : VALID_TOKEN;
   const registry = (getGlobalVariable('package-secure-registry') as string).replace(/^\w+:/, '');
 
-  return writeFile(
+  await writeFile(
     '.npmrc',
     scopedAuthentication
       ? `
-        ${registry}:_auth="${token}"
-        registry=http:${registry}
-      `
+${registry}/:_auth="${token}"
+registry=http:${registry}
+`
       : `
-        _auth="${token}"
-        registry=http:${registry}
-      `,
+_auth="${token}"
+registry=http:${registry}
+`,
+  );
+
+  await writeFile(
+    '.yarnrc',
+    scopedAuthentication
+      ? `
+${registry}/:_auth "${token}"
+registry http:${registry}
+`
+      : `
+_auth "${token}"
+registry http:${registry}
+`,
   );
 }
 
