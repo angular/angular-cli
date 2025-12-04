@@ -221,7 +221,8 @@ export class PackageManagerUtils {
   @memoize
   private getVersion(name: PackageManager): string | undefined {
     try {
-      const versionArg = name !== PackageManager.Deno ? '--version' : '-v';
+      const isDeno = name === PackageManager.Deno;
+      const versionArg = isDeno ? '-v' : '--version';
       const version = execSync(`${name} ${versionArg}`, {
         encoding: 'utf8',
         stdio: ['ignore', 'pipe', 'ignore'],
@@ -233,12 +234,8 @@ export class PackageManagerUtils {
         },
       }).trim();
 
-      if (name === PackageManager.Deno) {
-        // Deno CLI outputs "deno 2.5.6"
-        return version.replace('deno ', '');
-      }
-
-      return version;
+      // Deno CLI outputs "deno 2.5.6"
+      return isDeno ? version.replace('deno ', '') : version;
     } catch {
       return undefined;
     }
