@@ -6,19 +6,16 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { CommandError, Host } from '../host';
+import { CommandError } from '../host';
 import type { MockHost } from '../testing/mock-host';
+import { createMockHost } from '../testing/test-utils';
 import { runBuild } from './build';
 
 describe('Build Tool', () => {
   let mockHost: MockHost;
 
   beforeEach(() => {
-    mockHost = {
-      runCommand: jasmine.createSpy<Host['runCommand']>('runCommand').and.resolveTo({ logs: [] }),
-      stat: jasmine.createSpy<Host['stat']>('stat'),
-      existsSync: jasmine.createSpy<Host['existsSync']>('existsSync'),
-    } as MockHost;
+    mockHost = createMockHost();
   });
 
   it('should construct the command correctly with default configuration', async () => {
@@ -82,7 +79,7 @@ describe('Build Tool', () => {
       'production',
     ]);
     expect(structuredContent.status).toBe('failure');
-    expect(structuredContent.logs).toEqual(buildLogs);
+    expect(structuredContent.logs).toEqual([...buildLogs, 'Build failed']);
     expect(structuredContent.path).toBeUndefined();
   });
 

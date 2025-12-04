@@ -6,17 +6,16 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { CommandError, Host } from '../host';
+import { CommandError } from '../host';
 import type { MockHost } from '../testing/mock-host';
+import { createMockHost } from '../testing/test-utils';
 import { runTest } from './test';
 
 describe('Test Tool', () => {
   let mockHost: MockHost;
 
   beforeEach(() => {
-    mockHost = {
-      runCommand: jasmine.createSpy<Host['runCommand']>('runCommand').and.resolveTo({ logs: [] }),
-    } as unknown as MockHost;
+    mockHost = createMockHost();
   });
 
   it('should construct the command correctly with defaults', async () => {
@@ -83,6 +82,6 @@ describe('Test Tool', () => {
     const { structuredContent } = await runTest({ project: 'my-failed-app' }, mockHost);
 
     expect(structuredContent.status).toBe('failure');
-    expect(structuredContent.logs).toEqual(testLogs);
+    expect(structuredContent.logs).toEqual([...testLogs, 'Test failed']);
   });
 });

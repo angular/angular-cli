@@ -11,8 +11,10 @@
  * Utility functions shared across MCP tools.
  */
 
+import { workspaces } from '@angular-devkit/core';
 import { dirname, join } from 'node:path';
-import { LocalWorkspaceHost } from './host';
+import { CommandError, LocalWorkspaceHost } from './host';
+import { McpToolContext } from './tools/tool-registry';
 
 /**
  * Returns simple structured content output from an MCP tool.
@@ -50,5 +52,61 @@ export function findAngularJsonDir(startDir: string, host = LocalWorkspaceHost):
       return null;
     }
     currentDir = parentDir;
+  }
+}
+
+/**
+ * Searches for a project in the current workspace, by name.
+ */
+export function getProject(
+  context: McpToolContext,
+  name: string,
+): workspaces.ProjectDefinition | undefined {
+  const projects = context.workspace?.projects;
+  if (!projects) {
+    return undefined;
+  }
+
+  return projects.get(name);
+}
+
+/**
+ * Returns the name of the default project in the current workspace, or undefined if none exists.
+ *
+ * If no default project is defined but there's only a single project in the workspace, its name will
+ * be returned.
+ */
+export function getDefaultProjectName(context: McpToolContext): string | undefined {
+  const projects = context.workspace?.projects;
+
+  if (!projects) {
+    return undefined;
+  }
+
+  const defaultProjectName = context.workspace?.extensions['defaultProject'] as string | undefined;
+  if (defaultProjectName) {
+    return defaultProjectName;
+  }
+
+  // No default project defined? This might still be salvageable if only a single project exists.
+  if (projects.size === 1) {
+    return Array.from(projects.keys())[0];
+  }
+
+  return undefined;
+}
+
+/**
+ * Get the logs of a failing command.
+ *
+ * This call has fallbacks in case the exception was thrown from the command-calling code itself.
+ */
+export function getCommandErrorLogs(e: unknown): string[] {
+  if (e instanceof CommandError) {
+    return [...e.logs, e.message];
+  } else if (e instanceof Error) {
+    return [e.message];
+  } else {
+    return [String(e)];
   }
 }

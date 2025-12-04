@@ -8,7 +8,12 @@
 
 import { z } from 'zod';
 import { CommandError, type Host, LocalWorkspaceHost } from '../host';
-import { createStructuredContentOutput } from '../utils';
+import {
+  createStructuredContentOutput,
+  getCommandErrorLogs,
+  getDefaultProjectName,
+  getProject,
+} from '../utils';
 import { type McpToolContext, type McpToolDeclaration, declareTool } from './tool-registry';
 
 const e2eStatusSchema = z.enum(['success', 'failure']);
@@ -33,32 +38,19 @@ const e2eToolOutputSchema = z.object({
 export type E2eToolOutput = z.infer<typeof e2eToolOutputSchema>;
 
 export async function runE2e(input: E2eToolInput, host: Host, context: McpToolContext) {
-  const projectName = input.project;
+  const projectName = input.project ?? getDefaultProjectName(context);
 
-  if (context.workspace) {
-    let targetProject;
-    const projects = context.workspace.projects;
-
-    if (projectName) {
-      targetProject = projects.get(projectName);
-    } else {
-      // Try to find default project
-      const defaultProjectName = context.workspace.extensions['defaultProject'] as
-        | string
-        | undefined;
-      if (defaultProjectName) {
-        targetProject = projects.get(defaultProjectName);
-      } else if (projects.size === 1) {
-        targetProject = Array.from(projects.values())[0];
-      }
-    }
-
+  if (context.workspace && projectName) {
+    // Verify that if a project can be found, it has an e2e testing already set up.
+    const targetProject = getProject(context, projectName);
     if (targetProject) {
       if (!targetProject.targets.has('e2e')) {
         return createStructuredContentOutput({
           status: 'failure',
           logs: [
-            `No e2e target is defined for project '${projectName ?? 'default'}'. Please setup e2e testing first.`,
+            `No e2e target is defined for project '${projectName}'. Please set up e2e testing` +
+              ' first by calling `ng e2e` in an interactive console.' +
+              ' See https://angular.dev/tools/cli/end-to-end.',
           ],
         });
       }
@@ -78,13 +70,7 @@ export async function runE2e(input: E2eToolInput, host: Host, context: McpToolCo
     logs = (await host.runCommand('ng', args)).logs;
   } catch (e) {
     status = 'failure';
-    if (e instanceof CommandError) {
-      logs = e.logs;
-    } else if (e instanceof Error) {
-      logs = [e.message];
-    } else {
-      logs = [String(e)];
-    }
+    logs = getCommandErrorLogs(e);
   }
 
   const structuredContent: E2eToolOutput = {
@@ -106,11 +92,12 @@ export const E2E_TOOL: McpToolDeclaration<
 Perform an end-to-end test with ng e2e.
 </Purpose>
 <Use Cases>
-* Running end-to-end tests for the project.
+* When the user requests running end-to-end tests for the project.
+* When verifying changes that cross unit boundaries, such as changes to both client and server, changes to shared data types, etc.
 </Use Cases>
 <Operational Notes>
-* This tool runs "ng e2e".
-* It will error if no "e2e" target is defined in the project, to avoid interactive setup prompts.
+* This tool uses "ng e2e".
+* Important: this relies on e2e tests being already configured for this project. It will error out if no "e2e" target is defined.
 </Operational Notes>
 `,
   isReadOnly: false,

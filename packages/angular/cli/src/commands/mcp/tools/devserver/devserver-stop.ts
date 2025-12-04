@@ -7,8 +7,7 @@
  */
 
 import { z } from 'zod';
-import { devserverKey } from '../../devserver';
-import { createStructuredContentOutput } from '../../utils';
+import { createStructuredContentOutput, getDefaultProjectName } from '../../utils';
 import { type McpToolContext, type McpToolDeclaration, declareTool } from '../tool-registry';
 
 const devserverStopToolInputSchema = z.object({
@@ -30,21 +29,41 @@ const devserverStopToolOutputSchema = z.object({
 export type DevserverStopToolOutput = z.infer<typeof devserverStopToolOutputSchema>;
 
 export function stopDevserver(input: DevserverStopToolInput, context: McpToolContext) {
-  const projectKey = devserverKey(input.project);
-  const devServer = context.devservers.get(projectKey);
+  if (context.devservers.size === 0) {
+    return createStructuredContentOutput({
+      message: ['No development servers are currently running.'],
+      logs: undefined,
+    });
+  }
+
+  let projectName = input.project ?? getDefaultProjectName(context);
+
+  if (!projectName) {
+    // This should not happen. But if there's just a single running devserver, stop it.
+    if (context.devservers.size === 1) {
+      projectName = Array.from(context.devservers.keys())[0];
+    } else {
+      return createStructuredContentOutput({
+        message: ['Project name not provided, and no default project found.'],
+        logs: undefined,
+      });
+    }
+  }
+
+  const devServer = context.devservers.get(projectName);
 
   if (!devServer) {
     return createStructuredContentOutput({
-      message: `Development server for project '${projectKey}' was not running.`,
+      message: `Development server for project '${projectName}' was not running.`,
       logs: undefined,
     });
   }
 
   devServer.stop();
-  context.devservers.delete(projectKey);
+  context.devservers.delete(projectName);
 
   return createStructuredContentOutput({
-    message: `Development server for project '${projectKey}' stopped.`,
+    message: `Development server for project '${projectName}' stopped.`,
     logs: devServer.getServerLogs(),
   });
 }
