@@ -7,8 +7,8 @@
  */
 
 import { z } from 'zod';
-import { LocalDevserver, devserverKey } from '../../devserver';
-import { createStructuredContentOutput } from '../../utils';
+import { LocalDevserver } from '../../devserver';
+import { createStructuredContentOutput, getDefaultProjectName } from '../../utils';
 import { type McpToolContext, type McpToolDeclaration, declareTool } from '../tool-registry';
 
 const devserverStartToolInputSchema = z.object({
@@ -39,12 +39,18 @@ function localhostAddress(port: number) {
 }
 
 export async function startDevserver(input: DevserverStartToolInput, context: McpToolContext) {
-  const projectKey = devserverKey(input.project);
+  const projectName = input.project ?? getDefaultProjectName(context);
 
-  let devserver = context.devservers.get(projectKey);
+  if (!projectName) {
+    return createStructuredContentOutput({
+      message: ['Project name not provided, and no default project found.'],
+    });
+  }
+
+  let devserver = context.devservers.get(projectName);
   if (devserver) {
     return createStructuredContentOutput({
-      message: `Development server for project '${projectKey}' is already running.`,
+      message: `Development server for project '${projectName}' is already running.`,
       address: localhostAddress(devserver.port),
     });
   }
@@ -54,10 +60,10 @@ export async function startDevserver(input: DevserverStartToolInput, context: Mc
   devserver = new LocalDevserver({ host: context.host, project: input.project, port });
   devserver.start();
 
-  context.devservers.set(projectKey, devserver);
+  context.devservers.set(projectName, devserver);
 
   return createStructuredContentOutput({
-    message: `Development server for project '${projectKey}' started and watching for workspace changes.`,
+    message: `Development server for project '${projectName}' started and watching for workspace changes.`,
     address: localhostAddress(port),
   });
 }

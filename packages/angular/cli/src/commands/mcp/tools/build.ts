@@ -8,7 +8,7 @@
 
 import { z } from 'zod';
 import { CommandError, type Host } from '../host';
-import { createStructuredContentOutput } from '../utils';
+import { createStructuredContentOutput, getCommandErrorLogs } from '../utils';
 import { type McpToolDeclaration, declareTool } from './tool-registry';
 
 const DEFAULT_CONFIGURATION = 'development';
@@ -55,13 +55,7 @@ export async function runBuild(input: BuildToolInput, host: Host) {
     logs = (await host.runCommand('ng', args)).logs;
   } catch (e) {
     status = 'failure';
-    if (e instanceof CommandError) {
-      logs = e.logs;
-    } else if (e instanceof Error) {
-      logs = [e.message];
-    } else {
-      logs = [String(e)];
-    }
+    logs = getCommandErrorLogs(e);
   }
 
   for (const line of logs) {

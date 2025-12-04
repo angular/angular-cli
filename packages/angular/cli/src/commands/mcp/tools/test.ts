@@ -8,7 +8,7 @@
 
 import { z } from 'zod';
 import { CommandError, type Host, LocalWorkspaceHost } from '../host';
-import { createStructuredContentOutput } from '../utils';
+import { createStructuredContentOutput, getCommandErrorLogs } from '../utils';
 import { type McpToolDeclaration, declareTool } from './tool-registry';
 
 const testStatusSchema = z.enum(['success', 'failure']);
@@ -53,13 +53,7 @@ export async function runTest(input: TestToolInput, host: Host) {
     logs = (await host.runCommand('ng', args)).logs;
   } catch (e) {
     status = 'failure';
-    if (e instanceof CommandError) {
-      logs = e.logs;
-    } else if (e instanceof Error) {
-      logs = [e.message];
-    } else {
-      logs = [String(e)];
-    }
+    logs = getCommandErrorLogs(e);
   }
 
   const structuredContent: TestToolOutput = {
@@ -85,8 +79,9 @@ Perform a one-off, non-watched unit test execution with ng test.
 * Verifying code changes with tests.
 </Use Cases>
 <Operational Notes>
-* This tool runs "ng test" with "--watch false".
+* This tool uses "ng test".
 * It supports filtering by spec name if the underlying builder supports it (e.g., 'unit-test' builder).
+* This runs a headless Chrome as a browser, so requires Chrome to be installed.
 </Operational Notes>
 `,
   isReadOnly: false,
