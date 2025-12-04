@@ -18,7 +18,7 @@ import {
 } from '@angular-devkit/schematics';
 import { execSync } from 'node:child_process';
 import { latestVersions } from '../utility/latest-versions';
-import { Schema as WorkspaceOptions, PackageManager } from './schema';
+import { PackageManager, Schema as WorkspaceOptions } from './schema';
 
 export default function (options: WorkspaceOptions): Rule {
   return () => {
