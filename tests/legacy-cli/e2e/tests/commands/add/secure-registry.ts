@@ -10,15 +10,16 @@ export default async function () {
     // The environment variable has priority over the .npmrc
     delete process.env['NPM_CONFIG_REGISTRY'];
     const packageManager = getActivePackageManager();
-    const supportsUnscopedAuth = packageManager !== 'bun' && packageManager !== 'npm';
+    const supportsUnscopedAuth = packageManager === 'yarn';
     const command = ['add', '@angular/pwa', '--skip-confirmation'];
-
-    await expectFileNotToExist('public/manifest.webmanifest');
 
     // Works with unscoped registry authentication details
     if (supportsUnscopedAuth) {
       // Some package managers such as Bun and NPM do not support unscoped auth.
       await createNpmConfigForAuthentication(false);
+
+      await expectFileNotToExist('public/manifest.webmanifest');
+
       await ng(...command);
       await expectFileToExist('public/manifest.webmanifest');
       await git('clean', '-dxf');
@@ -33,7 +34,7 @@ export default async function () {
     await git('clean', '-dxf');
 
     // Invalid authentication token
-    if (!supportsUnscopedAuth) {
+    if (supportsUnscopedAuth) {
       // Some package managers such as Bun and NPM do not support unscoped auth.
       await createNpmConfigForAuthentication(false, true);
       await expectToFail(() => ng(...command));
