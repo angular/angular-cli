@@ -25,7 +25,7 @@ import {
   loadPostcssConfiguration,
 } from '../../utils/postcss-configuration';
 import { getProjectRootPaths, normalizeDirectoryPath } from '../../utils/project-metadata';
-import { addTrailingSlash, joinUrlParts } from '../../utils/url';
+import { addTrailingSlash, joinUrlParts, stripLeadingSlash } from '../../utils/url';
 import {
   Schema as ApplicationBuilderOptions,
   ExperimentalPlatform,
@@ -681,9 +681,16 @@ export function getLocaleBaseHref(
 
   const baseHrefSuffix = localeData.baseHref ?? localeData.subPath + '/';
 
-  return baseHrefSuffix !== ''
-    ? addTrailingSlash(joinUrlParts(baseHref, baseHrefSuffix))
-    : undefined;
+  let joinedBaseHref: string | undefined;
+  if (baseHrefSuffix !== '') {
+    joinedBaseHref = addTrailingSlash(joinUrlParts(baseHref, baseHrefSuffix));
+
+    if (baseHref && baseHref[0] !== '/') {
+      joinedBaseHref = stripLeadingSlash(joinedBaseHref);
+    }
+  }
+
+  return joinedBaseHref;
 }
 
 /**
