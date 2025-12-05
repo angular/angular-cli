@@ -122,8 +122,9 @@ export default async function (
   argv: { local?: boolean; snapshot?: boolean } = {},
 ): Promise<{ name: string; outputPath: string; tarPath: string }[]> {
   const logger = globalThis.console;
-
-  const bazelBin = await _exec(`${bazelCmd} info bazel-bin`, true, logger);
+  // TODO: Remove --ignore_all_rc_files flag once repository can be loaded in bazelrc during info
+  // commands again.
+  const bazelBin = await _exec(`${bazelCmd} --ignore_all_rc_files info bazel-bin`, true, logger);
 
   await _clean(logger);
 

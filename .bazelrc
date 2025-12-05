@@ -53,7 +53,7 @@ test --incompatible_strict_action_env
 build --experimental_remote_merkle_tree_cache
 
 # Ensure that tags applied in BUILDs propagate to actions
-common --experimental_allow_tags_propagation
+common --incompatible_allow_tags_propagation
 
 # Ensure sandboxing is enabled even for exclusive tests
 test --incompatible_exclusive_test_sandboxed
