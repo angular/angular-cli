@@ -5,9 +5,9 @@
     "@angular/ssr": "workspace:*",
     "@angular-devkit/build-angular": "workspace:*",
     "browser-sync": "3.0.4",
-    "@vitest/coverage-v8": "4.0.14",
+    "@vitest/coverage-v8": "4.0.15",
     "jsdom": "27.2.0",
     "rxjs": "7.8.2",
-    "vitest": "4.0.14"
+    "vitest": "4.0.15"
   }
 }
