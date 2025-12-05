@@ -11,7 +11,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import type { ApplicationBuilderInternalOptions } from '../../../application/options';
 import type { KarmaBuilderOptions, KarmaBuilderTransformsOptions } from '../../../karma';
-import { NormalizedUnitTestBuilderOptions } from '../../options';
+import { type NormalizedUnitTestBuilderOptions, injectTestingPolyfills } from '../../options';
 import type { TestExecutor } from '../api';
 
 export class KarmaExecutor implements TestExecutor {
@@ -70,7 +70,7 @@ export class KarmaExecutor implements TestExecutor {
     const karmaOptions: KarmaBuilderOptions = {
       karmaConfig,
       tsConfig: unitTestOptions.tsConfig ?? buildTargetOptions.tsConfig,
-      polyfills: buildTargetOptions.polyfills,
+      polyfills: injectTestingPolyfills(buildTargetOptions.polyfills),
       assets: buildTargetOptions.assets,
       scripts: buildTargetOptions.scripts,
       styles: buildTargetOptions.styles,
