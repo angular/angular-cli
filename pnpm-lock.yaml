@@ -891,9 +891,6 @@ importers:
       '@types/tar-stream':
         specifier: 3.1.4
         version: 3.1.4
-      rxjs:
-        specifier: 7.8.2
-        version: 7.8.2
       tar-stream:
         specifier: 3.1.7
         version: 3.1.7

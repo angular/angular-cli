@@ -1,6 +1,5 @@
 import { spawn, SpawnOptions } from 'node:child_process';
 import * as child_process from 'node:child_process';
-import { concat, defer, EMPTY, from, lastValueFrom, catchError, repeat } from 'rxjs';
 import { getGlobalVariable, getGlobalVariablesEnv } from './env';
 import treeKill from 'tree-kill';
 import { delimiter, join, resolve } from 'node:path';
@@ -310,7 +309,7 @@ export async function execAndCaptureError(
   }
 }
 
-export function execAndWaitForOutputToMatch(
+export async function execAndWaitForOutputToMatch(
   cmd: string,
   args: string[],
   match: RegExp,
@@ -322,15 +321,19 @@ export function execAndWaitForOutputToMatch(
     // happened just before the build (e.g. `git clean`).
     // This seems to be due to host file system differences, see
     // https://nodejs.org/docs/latest/api/fs.html#fs_caveats
-    return lastValueFrom(
-      concat(
-        from(_exec({ waitForMatch: match, env }, cmd, args)),
-        defer(() => waitForAnyProcessOutputToMatch(match, 2500)).pipe(
-          repeat(20),
-          catchError(() => EMPTY),
-        ),
-      ),
-    );
+    const maxRetries = 20;
+    let lastResult = await _exec({ waitForMatch: match, env }, cmd, args);
+
+    for (let i = 0; i < maxRetries; i++) {
+      try {
+        lastResult = await waitForAnyProcessOutputToMatch(match, 2500);
+      } catch {
+        // If we timeout (no new match found), we assume the process is stable.
+        break;
+      }
+    }
+
+    return lastResult;
   } else {
     return _exec({ waitForMatch: match, env }, cmd, args);
   }
