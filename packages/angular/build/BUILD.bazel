@@ -292,6 +292,10 @@ jasmine_test(
     name = "dev-server_integration_tests",
     size = "medium",
     data = [":dev-server_integration_test_lib"],
+    env = {
+        # Force IPv4 to resolve RBE resolution issues
+        "NODE_OPTIONS": "--dns-result-order=ipv4first",
+    },
     flaky = True,
     shard_count = 10,
 )
