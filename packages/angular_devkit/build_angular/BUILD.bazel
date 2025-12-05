@@ -422,6 +422,9 @@ LARGE_SPECS = {
             "//modules/testing/builder:node_modules/@angular-devkit/build-angular",
         ],
         env = {
+            # Force IPv4 to resolve RBE resolution issues
+            "NODE_OPTIONS": "--dns-result-order=ipv4first",
+
             # TODO: Replace Puppeteer downloaded browsers with Bazel-managed browsers,
             # or standardize to avoid complex configuration like this!
             "PUPPETEER_DOWNLOAD_PATH": "../../../node_modules/puppeteer/downloads",
