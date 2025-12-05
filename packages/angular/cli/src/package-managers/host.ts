@@ -13,10 +13,10 @@
  * enabling the injection of mock or test-specific implementations.
  */
 
-import { spawn } from 'node:child_process';
+import { type SpawnOptions, spawn } from 'node:child_process';
 import { Stats } from 'node:fs';
 import { mkdtemp, readFile, readdir, rm, stat, writeFile } from 'node:fs/promises';
-import { tmpdir } from 'node:os';
+import { platform, tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { PackageManagerError } from './error';
 
@@ -107,10 +107,11 @@ export const NodeJS_HOST: Host = {
     } = {},
   ): Promise<{ stdout: string; stderr: string }> => {
     const signal = options.timeout ? AbortSignal.timeout(options.timeout) : undefined;
+    const isWin32 = platform() === 'win32';
 
     return new Promise((resolve, reject) => {
-      const childProcess = spawn(command, args, {
-        shell: false,
+      const spawnOptions = {
+        shell: isWin32,
         stdio: options.stdio ?? 'pipe',
         signal,
         cwd: options.cwd,
@@ -118,7 +119,10 @@ export const NodeJS_HOST: Host = {
           ...process.env,
           ...options.env,
         },
-      });
+      } satisfies SpawnOptions;
+      const childProcess = isWin32
+        ? spawn(`${command} ${args.join(' ')}`, spawnOptions)
+        : spawn(command, args, spawnOptions);
 
       let stdout = '';
       childProcess.stdout?.on('data', (data) => (stdout += data.toString()));
