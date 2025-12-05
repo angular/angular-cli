@@ -176,7 +176,7 @@ function createDocSearchHandler({ logger }: McpToolContext) {
     const textContent: {
       type: 'text';
       text: string;
-      annotations?: { audience: string[]; priority: number };
+      annotations?: { audience: Array<'user' | 'assistant'>; priority: number };
     }[] = [
       {
         type: 'text' as const,
