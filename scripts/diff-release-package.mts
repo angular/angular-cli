@@ -63,7 +63,9 @@ async function main(packageName: string) {
   console.log(`--> Cloned snapshot repo.`);
 
   const bazelBinDir = childProcess
-    .spawnSync(`${bazel} info bazel-bin`, {
+    // TODO: Remove --ignore_all_rc_files flag once repository can be loaded in bazelrc during info
+    // commands again.
+    .spawnSync(`${bazel} --ignore_all_rc_files info bazel-bin`, {
       shell: true,
       encoding: 'utf8',
       stdio: ['pipe', 'pipe', 'inherit'],
