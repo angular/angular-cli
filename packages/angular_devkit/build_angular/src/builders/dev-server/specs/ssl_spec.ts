@@ -33,7 +33,7 @@ describe('Dev Server Builder ssl', () => {
     runs.push(run);
     const output = (await run.result) as DevServerBuilderOutput;
     expect(output.success).toBe(true);
-    expect(output.baseUrl).toMatch(/^https:\/\/127\.0\.0\.1:\d+\//);
+    expect(output.baseUrl).toMatch(/^https:\/\/localhost:\d+\//);
 
     const response = await fetch(output.baseUrl, {
       dispatcher: new Agent({
@@ -112,7 +112,7 @@ describe('Dev Server Builder ssl', () => {
     runs.push(run);
     const output = (await run.result) as DevServerBuilderOutput;
     expect(output.success).toBe(true);
-    expect(output.baseUrl).toMatch(/^https:\/\/127\.0\.0\.1:\d+\//);
+    expect(output.baseUrl).toMatch(/^https:\/\/localhost:\d+\//);
 
     const response = await fetch(output.baseUrl, {
       dispatcher: new Agent({

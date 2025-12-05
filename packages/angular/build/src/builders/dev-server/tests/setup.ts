@@ -62,10 +62,6 @@ export const BASE_OPTIONS = Object.freeze<Schema>({
   buildTarget: 'test:build',
   port: 0,
 
-  // Force an IPv4 address as with RBE there are currently resolution issues with IPv6 addresses.
-  // http://localhost is resolved to IPv6 address with vite and webpack but to IPv4 with node fetch.
-  host: '127.0.0.1',
-
   // Watch is not supported for testing in vite as currently there is no teardown logic to stop the watchers.
   watch: false,
 });
