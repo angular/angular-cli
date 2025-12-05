@@ -103,8 +103,7 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
             "buildTarget": "app:build",
-            "watch": false,
-            "host": "127.0.0.1"
+            "watch": false
           },
           "configurations": {
             "production": {
