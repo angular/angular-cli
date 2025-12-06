@@ -14,6 +14,7 @@ import {
   createAngularComponentMiddleware,
   createAngularHeadersMiddleware,
   createAngularIndexHtmlMiddleware,
+  createAngularHostCheckMiddleware,
   createAngularSsrExternalMiddleware,
   createAngularSsrInternalMiddleware,
   createChromeDevtoolsMiddleware,
@@ -55,6 +56,8 @@ interface AngularSetupMiddlewaresPluginOptions {
   ssrMode: ServerSsrMode;
   resetComponentUpdates: () => void;
   projectRoot: string;
+  allowedHosts: true | string[];
+  devHost: string;
 }
 
 async function createEncapsulateStyle(): Promise<
@@ -85,6 +88,11 @@ export function createAngularSetupMiddlewaresPlugin(
         ssrMode,
         resetComponentUpdates,
       } = options;
+
+      // Install host check first to ensure blocked hosts receive a tailored HTML message.
+      server.middlewares.use(
+        createAngularHostCheckMiddleware(server, options.allowedHosts, options.devHost),
+      );
 
       // Headers, assets and resources get handled first
       server.middlewares.use(createAngularHeadersMiddleware(server));

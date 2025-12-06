@@ -56,7 +56,10 @@ async function createServerConfig(
     strictPort: true,
     host: serverOptions.host,
     open: serverOptions.open,
-    allowedHosts: serverOptions.allowedHosts,
+    // Disable Vite's built-in allowed hosts page so we can present
+    // an Angular-tailored message and keep behavior consistent with CLI options.
+    // Re-implement the host check via a custom middleware.
+    allowedHosts: true,
     headers: serverOptions.headers,
     // Disable the websocket if live reload is disabled (false/undefined are the only valid values)
     ws: serverOptions.liveReload === false && serverOptions.hmr === false ? false : undefined,
@@ -226,6 +229,8 @@ export async function setupServer(
         ssrMode,
         resetComponentUpdates: () => templateUpdates.clear(),
         projectRoot: serverOptions.projectRoot,
+        allowedHosts: serverOptions.allowedHosts,
+        devHost: serverOptions.host,
       }),
       createRemoveIdPrefixPlugin(externalMetadata.explicitBrowser),
       await createAngularSsrTransformPlugin(serverOptions.workspaceRoot),
