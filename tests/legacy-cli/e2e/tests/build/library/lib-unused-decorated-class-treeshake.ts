@@ -14,7 +14,7 @@ export default async function () {
     'projects/my-lib/src/lib/my-lib.ts',
     `
     function something() {
-      return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+      return function (originalMethod: any, context: ClassMethodDecoratorContext) {
         console.log("someDecorator");
       };
     }
