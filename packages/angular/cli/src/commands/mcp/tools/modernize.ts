@@ -8,7 +8,7 @@
 
 import { dirname, join, relative } from 'path';
 import { z } from 'zod';
-import { CommandError, type Host, LocalWorkspaceHost } from '../host';
+import { CommandError, type Host } from '../host';
 import { createStructuredContentOutput, findAngularJsonDir } from '../utils';
 import { type McpToolDeclaration, declareTool } from './tool-registry';
 
@@ -205,5 +205,5 @@ ${TRANSFORMATIONS.map((t) => `  * ${t.name}: ${t.description}`).join('\n')}
   outputSchema: modernizeOutputSchema.shape,
   isLocalOnly: true,
   isReadOnly: false,
-  factory: () => (input) => runModernization(input, LocalWorkspaceHost),
+  factory: (context) => (input) => runModernization(input, context.host),
 });

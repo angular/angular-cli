@@ -7,11 +7,11 @@
  */
 
 import { z } from 'zod';
-import { devServerKey } from '../../dev-server';
+import { devserverKey } from '../../devserver';
 import { createStructuredContentOutput } from '../../utils';
 import { type McpToolContext, type McpToolDeclaration, declareTool } from '../tool-registry';
 
-const stopDevserverToolInputSchema = z.object({
+const devserverStopToolInputSchema = z.object({
   project: z
     .string()
     .optional()
@@ -20,18 +20,18 @@ const stopDevserverToolInputSchema = z.object({
     ),
 });
 
-export type StopDevserverToolInput = z.infer<typeof stopDevserverToolInputSchema>;
+export type DevserverStopToolInput = z.infer<typeof devserverStopToolInputSchema>;
 
-const stopDevserverToolOutputSchema = z.object({
+const devserverStopToolOutputSchema = z.object({
   message: z.string().describe('A message indicating the result of the operation.'),
   logs: z.array(z.string()).optional().describe('The full logs from the dev server.'),
 });
 
-export type StopDevserverToolOutput = z.infer<typeof stopDevserverToolOutputSchema>;
+export type DevserverStopToolOutput = z.infer<typeof devserverStopToolOutputSchema>;
 
-export function stopDevserver(input: StopDevserverToolInput, context: McpToolContext) {
-  const projectKey = devServerKey(input.project);
-  const devServer = context.devServers.get(projectKey);
+export function stopDevserver(input: DevserverStopToolInput, context: McpToolContext) {
+  const projectKey = devserverKey(input.project);
+  const devServer = context.devservers.get(projectKey);
 
   if (!devServer) {
     return createStructuredContentOutput({
@@ -41,7 +41,7 @@ export function stopDevserver(input: StopDevserverToolInput, context: McpToolCon
   }
 
   devServer.stop();
-  context.devServers.delete(projectKey);
+  context.devservers.delete(projectKey);
 
   return createStructuredContentOutput({
     message: `Development server for project '${projectKey}' stopped.`,
@@ -49,15 +49,15 @@ export function stopDevserver(input: StopDevserverToolInput, context: McpToolCon
   });
 }
 
-export const STOP_DEVSERVER_TOOL: McpToolDeclaration<
-  typeof stopDevserverToolInputSchema.shape,
-  typeof stopDevserverToolOutputSchema.shape
+export const DEVSERVER_STOP_TOOL: McpToolDeclaration<
+  typeof devserverStopToolInputSchema.shape,
+  typeof devserverStopToolOutputSchema.shape
 > = declareTool({
-  name: 'stop_devserver',
+  name: 'devserver/stop',
   title: 'Stop Development Server',
   description: `
 <Purpose>
-Stops a running Angular development server ("ng serve") that was started with the "start_devserver" tool.
+Stops a running Angular development server ("ng serve") that was started with the "devserver/start" tool.
 </Purpose>
 <Use Cases>
 * **Stopping the Server:** Use this tool to terminate a running development server and retrieve the logs.
@@ -70,8 +70,8 @@ Stops a running Angular development server ("ng serve") that was started with th
 `,
   isReadOnly: true,
   isLocalOnly: true,
-  inputSchema: stopDevserverToolInputSchema.shape,
-  outputSchema: stopDevserverToolOutputSchema.shape,
+  inputSchema: devserverStopToolInputSchema.shape,
+  outputSchema: devserverStopToolOutputSchema.shape,
   factory: (context) => (input) => {
     return stopDevserver(input, context);
   },

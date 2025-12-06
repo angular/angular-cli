@@ -10,15 +10,15 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { join } from 'node:path';
 import type { AngularWorkspace } from '../../utilities/config';
 import { VERSION } from '../../utilities/version';
-import type { DevServer } from './dev-server';
+import type { Devserver } from './devserver';
 import { LocalWorkspaceHost } from './host';
 import { registerInstructionsResource } from './resources/instructions';
 import { AI_TUTOR_TOOL } from './tools/ai-tutor';
 import { BEST_PRACTICES_TOOL } from './tools/best-practices';
 import { BUILD_TOOL } from './tools/build';
-import { START_DEVSERVER_TOOL } from './tools/devserver/start-devserver';
-import { STOP_DEVSERVER_TOOL } from './tools/devserver/stop-devserver';
-import { WAIT_FOR_DEVSERVER_BUILD_TOOL } from './tools/devserver/wait-for-devserver-build';
+import { DEVSERVER_START_TOOL } from './tools/devserver/devserver-start';
+import { DEVSERVER_STOP_TOOL } from './tools/devserver/devserver-stop';
+import { DEVSERVER_WAIT_FOR_BUILD_TOOL } from './tools/devserver/devserver-wait-for-build';
 import { DOC_SEARCH_TOOL } from './tools/doc-search';
 import { FIND_EXAMPLE_TOOL } from './tools/examples/index';
 import { MODERNIZE_TOOL } from './tools/modernize';
@@ -29,7 +29,16 @@ import { type AnyMcpToolDeclaration, registerTools } from './tools/tool-registry
 /**
  * Tools to manage devservers. Should be bundled together, then added to experimental or stable as a group.
  */
-const SERVE_TOOLS = [START_DEVSERVER_TOOL, STOP_DEVSERVER_TOOL, WAIT_FOR_DEVSERVER_BUILD_TOOL];
+const DEVSERVER_TOOLS = [DEVSERVER_START_TOOL, DEVSERVER_STOP_TOOL, DEVSERVER_WAIT_FOR_BUILD_TOOL];
+
+/**
+ * Experimental tools that are grouped together under a single name.
+ *
+ * Used for enabling them as a group.
+ */
+export const EXPERIMENTAL_TOOL_GROUPS = {
+  'devserver': DEVSERVER_TOOLS,
+};
 
 /**
  * The set of tools that are enabled by default for the MCP server.
@@ -48,7 +57,7 @@ const STABLE_TOOLS = [
  * The set of tools that are available but not enabled by default.
  * These tools are considered experimental and may have limitations.
  */
-export const EXPERIMENTAL_TOOLS = [BUILD_TOOL, MODERNIZE_TOOL, ...SERVE_TOOLS] as const;
+export const EXPERIMENTAL_TOOLS = [BUILD_TOOL, MODERNIZE_TOOL, ...DEVSERVER_TOOLS] as const;
 
 export async function createMcpServer(
   options: {
@@ -115,7 +124,7 @@ equivalent actions.
       workspace: options.workspace,
       logger,
       exampleDatabasePath: join(__dirname, '../../../lib/code-examples.db'),
-      devServers: new Map<string, DevServer>(),
+      devservers: new Map<string, Devserver>(),
       host: LocalWorkspaceHost,
     },
     toolDeclarations,
@@ -147,6 +156,13 @@ export function assembleToolDeclarations(
   const enabledExperimentalTools = new Set(options.experimentalTools);
   if (process.env['NG_MCP_CODE_EXAMPLES'] === '1') {
     enabledExperimentalTools.add('find_examples');
+  }
+  for (const [toolGroupName, toolGroup] of Object.entries(EXPERIMENTAL_TOOL_GROUPS)) {
+    if (enabledExperimentalTools.delete(toolGroupName)) {
+      for (const tool of toolGroup) {
+        enabledExperimentalTools.add(tool.name);
+      }
+    }
   }
 
   if (enabledExperimentalTools.size > 0) {
