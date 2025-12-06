@@ -27,12 +27,13 @@ describeServeBuilder(executeDevServer, DEV_SERVER_BUILDER_INFO, (harness, setupT
         ...BASE_OPTIONS,
       });
 
-      const { result, response } = await executeOnceAndGet(harness, '/', {
+      const { result, response, content } = await executeOnceAndGet(harness, '/', {
         request: { headers: FETCH_HEADERS },
       });
 
       expect(result?.success).toBeTrue();
       expect(response?.statusCode).toBe(403);
+      expect(content).toContain('angular.json');
     });
 
     it('does not allow an invalid host when option is an empty array', async () => {
@@ -41,12 +42,13 @@ describeServeBuilder(executeDevServer, DEV_SERVER_BUILDER_INFO, (harness, setupT
         allowedHosts: [],
       });
 
-      const { result, response } = await executeOnceAndGet(harness, '/', {
+      const { result, response, content } = await executeOnceAndGet(harness, '/', {
         request: { headers: FETCH_HEADERS },
       });
 
       expect(result?.success).toBeTrue();
       expect(response?.statusCode).toBe(403);
+      expect(content).toContain('angular.json');
     });
 
     it('allows a host when specified in the option', async () => {
