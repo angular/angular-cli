@@ -13,15 +13,13 @@ import {
   NodeWorkflow,
 } from '@angular-devkit/schematics/tools';
 import { Listr } from 'listr2';
-import { SpawnSyncReturns, execSync, spawnSync } from 'node:child_process';
+import { SpawnSyncReturns } from 'node:child_process';
 import { existsSync, promises as fs } from 'node:fs';
 import { createRequire } from 'node:module';
 import * as path from 'node:path';
-import { join, resolve } from 'node:path';
 import npa from 'npm-package-arg';
 import * as semver from 'semver';
 import { Argv } from 'yargs';
-import { PackageManager } from '../../../lib/config/workspace-schema';
 import {
   CommandModule,
   CommandModuleError,
@@ -37,7 +35,6 @@ import { writeErrorToLogFile } from '../../utilities/log-file';
 import {
   PackageIdentifier,
   PackageManifest,
-  fetchPackageManifest,
   fetchPackageMetadata,
 } from '../../utilities/package-metadata';
 import {
@@ -48,7 +45,20 @@ import {
 } from '../../utilities/package-tree';
 import { askChoices } from '../../utilities/prompt';
 import { isTTY } from '../../utilities/tty';
-import { VERSION } from '../../utilities/version';
+import {
+  checkCLIVersion,
+  coerceVersionNumber,
+  runTempBinary,
+  shouldForcePackageManager,
+} from './utilities/cli-version';
+import { ANGULAR_PACKAGES_REGEXP } from './utilities/constants';
+import {
+  checkCleanGit,
+  createCommit,
+  findCurrentGitSha,
+  getShortHash,
+  hasChangesToCommit,
+} from './utilities/git';
 
 interface UpdateCommandArgs {
   packages?: string[];
@@ -63,8 +73,10 @@ interface UpdateCommandArgs {
   'create-commits': boolean;
 }
 
-interface MigrationSchematicDescription
-  extends SchematicDescription<FileSystemCollectionDescription, FileSystemSchematicDescription> {
+interface MigrationSchematicDescription extends SchematicDescription<
+  FileSystemCollectionDescription,
+  FileSystemSchematicDescription
+> {
   version?: string;
   optional?: boolean;
   recommended?: boolean;
@@ -77,7 +89,6 @@ interface MigrationSchematicDescriptionWithVersion extends MigrationSchematicDes
 
 class CommandError extends Error {}
 
-const ANGULAR_PACKAGES_REGEXP = /^@(?:angular|nguniversal)\//;
 const UPDATE_SCHEMATIC_COLLECTION = path.join(__dirname, 'schematic/collection.json');
 
 export default class UpdateCommandModule extends CommandModule<UpdateCommandArgs> {
@@ -87,7 +98,7 @@ export default class UpdateCommandModule extends CommandModule<UpdateCommandArgs
 
   command = 'update [packages..]';
   describe = 'Updates your workspace and its dependencies. See https://update.angular.dev/.';
-  longDescriptionPath = join(__dirname, 'long-description.md');
+  longDescriptionPath = path.join(__dirname, 'long-description.md');
 
   builder(localYargs: Argv): Argv<UpdateCommandArgs> {
     return localYargs
@@ -161,7 +172,7 @@ export default class UpdateCommandModule extends CommandModule<UpdateCommandArgs
         const { logger } = this.context;
 
         // This allows the user to easily reset any changes from the update.
-        if (packages?.length && !this.checkCleanGit()) {
+        if (packages?.length && !checkCleanGit(this.context.root)) {
           if (allowDirty) {
             logger.warn(
               'Repository is not clean. Update changes will be mixed with pre-existing changes.',
@@ -192,8 +203,10 @@ export default class UpdateCommandModule extends CommandModule<UpdateCommandArgs
     // Check if the current installed CLI version is older than the latest compatible version.
     // Skip when running `ng update` without a package name as this will not trigger an actual update.
     if (!disableVersionCheck && options.packages?.length) {
-      const cliVersionToInstall = await this.checkCLIVersion(
+      const cliVersionToInstall = await checkCLIVersion(
         options.packages,
+        logger,
+        packageManager,
         options.verbose,
         options.next,
       );
@@ -204,7 +217,11 @@ export default class UpdateCommandModule extends CommandModule<UpdateCommandArgs
             `Installing a temporary Angular CLI versioned ${cliVersionToInstall} to perform the update.`,
         );
 
-        return this.runTempBinary(`@angular/cli@${cliVersionToInstall}`, process.argv.slice(2));
+        return runTempBinary(
+          `@angular/cli@${cliVersionToInstall}`,
+          packageManager,
+          process.argv.slice(2),
+        );
       }
     }
 
@@ -254,7 +271,7 @@ export default class UpdateCommandModule extends CommandModule<UpdateCommandArgs
 
     const workflow = new NodeWorkflow(this.context.root, {
       packageManager: packageManager.name,
-      packageManagerForce: this.packageManagerForce(options.verbose),
+      packageManagerForce: shouldForcePackageManager(packageManager, logger, options.verbose),
       // __dirname -> favor @schematics/update from this package
       // Otherwise, use packages from the active workspace (migrations)
       resolvePaths: this.resolvePaths,
@@ -771,7 +788,9 @@ export default class UpdateCommandModule extends CommandModule<UpdateCommandArgs
 
     if (success) {
       const { root: commandRoot, packageManager } = this.context;
-      const installArgs = this.packageManagerForce(options.verbose) ? ['--force'] : [];
+      const installArgs = shouldForcePackageManager(packageManager, logger, options.verbose)
+        ? ['--force']
+        : [];
       const tasks = new Listr([
         {
           title: 'Cleaning node modules directory',
@@ -961,158 +980,6 @@ export default class UpdateCommandModule extends CommandModule<UpdateCommandArgs
     return true;
   }
 
-  private checkCleanGit(): boolean {
-    try {
-      const topLevel = execSync('git rev-parse --show-toplevel', {
-        encoding: 'utf8',
-        stdio: 'pipe',
-      });
-      const result = execSync('git status --porcelain', { encoding: 'utf8', stdio: 'pipe' });
-      if (result.trim().length === 0) {
-        return true;
-      }
-
-      // Only files inside the workspace root are relevant
-      for (const entry of result.split('\n')) {
-        const relativeEntry = path.relative(
-          path.resolve(this.context.root),
-          path.resolve(topLevel.trim(), entry.slice(3).trim()),
-        );
-
-        if (!relativeEntry.startsWith('..') && !path.isAbsolute(relativeEntry)) {
-          return false;
-        }
-      }
-    } catch {}
-
-    return true;
-  }
-
-  /**
-   * Checks if the current installed CLI version is older or newer than a compatible version.
-   * @returns the version to install or null when there is no update to install.
-   */
-  private async checkCLIVersion(
-    packagesToUpdate: string[],
-    verbose = false,
-    next = false,
-  ): Promise<string | null> {
-    const { version } = await fetchPackageManifest(
-      `@angular/cli@${this.getCLIUpdateRunnerVersion(packagesToUpdate, next)}`,
-      this.context.logger,
-      {
-        verbose,
-        usingYarn: this.context.packageManager.name === PackageManager.Yarn,
-      },
-    );
-
-    return VERSION.full === version ? null : version;
-  }
-
-  private getCLIUpdateRunnerVersion(
-    packagesToUpdate: string[] | undefined,
-    next: boolean,
-  ): string | number {
-    if (next) {
-      return 'next';
-    }
-
-    const updatingAngularPackage = packagesToUpdate?.find((r) => ANGULAR_PACKAGES_REGEXP.test(r));
-    if (updatingAngularPackage) {
-      // If we are updating any Angular package we can update the CLI to the target version because
-      // migrations for @angular/core@13 can be executed using Angular/cli@13.
-      // This is same behaviour as `npx @angular/cli@13 update @angular/core@13`.
-
-      // `@angular/cli@13` -> ['', 'angular/cli', '13']
-      // `@angular/cli` -> ['', 'angular/cli']
-      const tempVersion = coerceVersionNumber(updatingAngularPackage.split('@')[2]);
-
-      return semver.parse(tempVersion)?.major ?? 'latest';
-    }
-
-    // When not updating an Angular package we cannot determine which schematic runtime the migration should to be executed in.
-    // Typically, we can assume that the `@angular/cli` was updated previously.
-    // Example: Angular official packages are typically updated prior to NGRX etc...
-    // Therefore, we only update to the latest patch version of the installed major version of the Angular CLI.
-
-    // This is important because we might end up in a scenario where locally Angular v12 is installed, updating NGRX from 11 to 12.
-    // We end up using Angular ClI v13 to run the migrations if we run the migrations using the CLI installed major version + 1 logic.
-    return VERSION.major;
-  }
-
-  private async runTempBinary(packageName: string, args: string[] = []): Promise<number> {
-    const { success, tempNodeModules } = await this.context.packageManager.installTemp(packageName);
-    if (!success) {
-      return 1;
-    }
-
-    // Remove version/tag etc... from package name
-    // Ex: @angular/cli@latest -> @angular/cli
-    const packageNameNoVersion = packageName.substring(0, packageName.lastIndexOf('@'));
-    const pkgLocation = join(tempNodeModules, packageNameNoVersion);
-    const packageJsonPath = join(pkgLocation, 'package.json');
-
-    // Get a binary location for this package
-    let binPath: string | undefined;
-    if (existsSync(packageJsonPath)) {
-      const content = await fs.readFile(packageJsonPath, 'utf-8');
-      if (content) {
-        const { bin = {} } = JSON.parse(content) as { bin: Record<string, string> };
-        const binKeys = Object.keys(bin);
-
-        if (binKeys.length) {
-          binPath = resolve(pkgLocation, bin[binKeys[0]]);
-        }
-      }
-    }
-
-    if (!binPath) {
-      throw new Error(`Cannot locate bin for temporary package: ${packageNameNoVersion}.`);
-    }
-
-    const { status, error } = spawnSync(process.execPath, [binPath, ...args], {
-      stdio: 'inherit',
-      env: {
-        ...process.env,
-        NG_DISABLE_VERSION_CHECK: 'true',
-        NG_CLI_ANALYTICS: 'false',
-      },
-    });
-
-    if (status === null && error) {
-      throw error;
-    }
-
-    return status ?? 0;
-  }
-
-  private packageManagerForce(verbose: boolean): boolean {
-    // npm 7+ can fail due to it incorrectly resolving peer dependencies that have valid SemVer
-    // ranges during an update. Update will set correct versions of dependencies within the
-    // package.json file. The force option is set to workaround these errors.
-    // Example error:
-    // npm ERR! Conflicting peer dependency: @angular/compiler-cli@14.0.0-rc.0
-    // npm ERR! node_modules/@angular/compiler-cli
-    // npm ERR!   peer @angular/compiler-cli@"^14.0.0 || ^14.0.0-rc" from @angular-devkit/build-angular@14.0.0-rc.0
-    // npm ERR!   node_modules/@angular-devkit/build-angular
-    // npm ERR!     dev @angular-devkit/build-angular@"~14.0.0-rc.0" from the root project
-    if (
-      this.context.packageManager.name === PackageManager.Npm &&
-      this.context.packageManager.version &&
-      semver.gte(this.context.packageManager.version, '7.0.0')
-    ) {
-      if (verbose) {
-        this.context.logger.info(
-          'NPM 7+ detected -- enabling force option for package installation',
-        );
-      }
-
-      return true;
-    }
-
-    return false;
-  }
-
   private async getOptionalMigrationsToRun(
     optionalMigrations: MigrationSchematicDescription[],
     packageName: string,
@@ -1159,68 +1026,6 @@ export default class UpdateCommandModule extends CommandModule<UpdateCommandArgs
 
     return optionalMigrations.filter(({ name }) => answer?.includes(name));
   }
-}
-
-/**
- * @return Whether or not the working directory has Git changes to commit.
- */
-function hasChangesToCommit(): boolean {
-  // List all modified files not covered by .gitignore.
-  // If any files are returned, then there must be something to commit.
-
-  return execSync('git ls-files -m -d -o --exclude-standard').toString() !== '';
-}
-
-/**
- * Precondition: Must have pending changes to commit, they do not need to be staged.
- * Postcondition: The Git working tree is committed and the repo is clean.
- * @param message The commit message to use.
- */
-function createCommit(message: string) {
-  // Stage entire working tree for commit.
-  execSync('git add -A', { encoding: 'utf8', stdio: 'pipe' });
-
-  // Commit with the message passed via stdin to avoid bash escaping issues.
-  execSync('git commit --no-verify -F -', { encoding: 'utf8', stdio: 'pipe', input: message });
-}
-
-/**
- * @return The Git SHA hash of the HEAD commit. Returns null if unable to retrieve the hash.
- */
-function findCurrentGitSha(): string | null {
-  try {
-    return execSync('git rev-parse HEAD', { encoding: 'utf8', stdio: 'pipe' }).trim();
-  } catch {
-    return null;
-  }
-}
-
-function getShortHash(commitHash: string): string {
-  return commitHash.slice(0, 9);
-}
-
-function coerceVersionNumber(version: string | undefined): string | undefined {
-  if (!version) {
-    return undefined;
-  }
-
-  if (!/^\d{1,30}\.\d{1,30}\.\d{1,30}/.test(version)) {
-    const match = version.match(/^\d{1,30}(\.\d{1,30})*/);
-
-    if (!match) {
-      return undefined;
-    }
-
-    if (!match[1]) {
-      version = version.substring(0, match[0].length) + '.0.0' + version.substring(match[0].length);
-    } else if (!match[2]) {
-      version = version.substring(0, match[0].length) + '.0' + version.substring(match[0].length);
-    } else {
-      return undefined;
-    }
-  }
-
-  return semver.valid(version) ?? undefined;
 }
 
 function getMigrationTitleAndDescription(migration: MigrationSchematicDescription): {
