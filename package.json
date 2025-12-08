@@ -119,7 +119,6 @@
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
     "karma-source-map-support": "1.4.0",
-    "listr2": "9.0.5",
     "lodash": "^4.17.21",
     "magic-string": "0.30.21",
     "prettier": "^3.0.0",
