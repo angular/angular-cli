@@ -6,14 +6,8 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { SchematicDescription, UnsuccessfulWorkflowExecution } from '@angular-devkit/schematics';
-import {
-  FileSystemCollectionDescription,
-  FileSystemSchematicDescription,
-  NodeWorkflow,
-} from '@angular-devkit/schematics/tools';
+import { NodeWorkflow } from '@angular-devkit/schematics/tools';
 import { Listr } from 'listr2';
-import { SpawnSyncReturns } from 'node:child_process';
 import { existsSync, promises as fs } from 'node:fs';
 import { createRequire } from 'node:module';
 import * as path from 'node:path';
@@ -27,11 +21,9 @@ import {
   Options,
 } from '../../command-builder/command-module';
 import { SchematicEngineHost } from '../../command-builder/utilities/schematic-engine-host';
-import { subscribeToWorkflow } from '../../command-builder/utilities/schematic-workflow';
-import { colors, figures } from '../../utilities/color';
+import { colors } from '../../utilities/color';
 import { disableVersionCheck } from '../../utilities/environment-options';
 import { assertIsError } from '../../utilities/error';
-import { writeErrorToLogFile } from '../../utilities/log-file';
 import {
   PackageIdentifier,
   PackageManifest,
@@ -43,8 +35,6 @@ import {
   getProjectDependencies,
   readPackageJson,
 } from '../../utilities/package-tree';
-import { askChoices } from '../../utilities/prompt';
-import { isTTY } from '../../utilities/tty';
 import {
   checkCLIVersion,
   coerceVersionNumber,
@@ -52,13 +42,13 @@ import {
   shouldForcePackageManager,
 } from './utilities/cli-version';
 import { ANGULAR_PACKAGES_REGEXP } from './utilities/constants';
+import { checkCleanGit } from './utilities/git';
 import {
-  checkCleanGit,
-  createCommit,
-  findCurrentGitSha,
-  getShortHash,
-  hasChangesToCommit,
-} from './utilities/git';
+  commitChanges,
+  executeMigration,
+  executeMigrations,
+  executeSchematic,
+} from './utilities/migration';
 
 interface UpdateCommandArgs {
   packages?: string[];
@@ -71,20 +61,6 @@ interface UpdateCommandArgs {
   'allow-dirty': boolean;
   verbose: boolean;
   'create-commits': boolean;
-}
-
-interface MigrationSchematicDescription extends SchematicDescription<
-  FileSystemCollectionDescription,
-  FileSystemSchematicDescription
-> {
-  version?: string;
-  optional?: boolean;
-  recommended?: boolean;
-  documentation?: string;
-}
-
-interface MigrationSchematicDescriptionWithVersion extends MigrationSchematicDescription {
-  version: string;
 }
 
 class CommandError extends Error {}
@@ -281,8 +257,9 @@ export default class UpdateCommandModule extends CommandModule<UpdateCommandArgs
 
     if (packages.length === 0) {
       // Show status
-      const { success } = await this.executeSchematic(
+      const { success } = await executeSchematic(
         workflow,
+        logger,
         UPDATE_SCHEMATIC_COLLECTION,
         'update',
         {
@@ -300,213 +277,6 @@ export default class UpdateCommandModule extends CommandModule<UpdateCommandArgs
     return options.migrateOnly
       ? this.migrateOnly(workflow, (options.packages ?? [])[0], rootDependencies, options)
       : this.updatePackagesAndMigrate(workflow, rootDependencies, options, packages);
-  }
-
-  private async executeSchematic(
-    workflow: NodeWorkflow,
-    collection: string,
-    schematic: string,
-    options: Record<string, unknown> = {},
-  ): Promise<{ success: boolean; files: Set<string> }> {
-    const { logger } = this.context;
-    const workflowSubscription = subscribeToWorkflow(workflow, logger);
-
-    // TODO: Allow passing a schematic instance directly
-    try {
-      await workflow
-        .execute({
-          collection,
-          schematic,
-          options,
-          logger,
-        })
-        .toPromise();
-
-      return { success: !workflowSubscription.error, files: workflowSubscription.files };
-    } catch (e) {
-      if (e instanceof UnsuccessfulWorkflowExecution) {
-        logger.error(`${figures.cross} Migration failed. See above for further details.\n`);
-      } else {
-        assertIsError(e);
-        const logPath = writeErrorToLogFile(e);
-        logger.fatal(
-          `${figures.cross} Migration failed: ${e.message}\n` +
-            `  See "${logPath}" for further details.\n`,
-        );
-      }
-
-      return { success: false, files: workflowSubscription.files };
-    } finally {
-      workflowSubscription.unsubscribe();
-    }
-  }
-
-  /**
-   * @return Whether or not the migration was performed successfully.
-   */
-  private async executeMigration(
-    workflow: NodeWorkflow,
-    packageName: string,
-    collectionPath: string,
-    migrationName: string,
-    commit?: boolean,
-  ): Promise<number> {
-    const { logger } = this.context;
-    const collection = workflow.engine.createCollection(collectionPath);
-    const name = collection.listSchematicNames().find((name) => name === migrationName);
-    if (!name) {
-      logger.error(`Cannot find migration '${migrationName}' in '${packageName}'.`);
-
-      return 1;
-    }
-
-    logger.info(colors.cyan(`** Executing '${migrationName}' of package '${packageName}' **\n`));
-    const schematic = workflow.engine.createSchematic(name, collection);
-
-    return this.executePackageMigrations(workflow, [schematic.description], packageName, commit);
-  }
-
-  /**
-   * @return Whether or not the migrations were performed successfully.
-   */
-  private async executeMigrations(
-    workflow: NodeWorkflow,
-    packageName: string,
-    collectionPath: string,
-    from: string,
-    to: string,
-    commit?: boolean,
-  ): Promise<number> {
-    const collection = workflow.engine.createCollection(collectionPath);
-    const migrationRange = new semver.Range(
-      '>' + (semver.prerelease(from) ? from.split('-')[0] + '-0' : from) + ' <=' + to.split('-')[0],
-    );
-
-    const requiredMigrations: MigrationSchematicDescriptionWithVersion[] = [];
-    const optionalMigrations: MigrationSchematicDescriptionWithVersion[] = [];
-
-    for (const name of collection.listSchematicNames()) {
-      const schematic = workflow.engine.createSchematic(name, collection);
-      const description = schematic.description as MigrationSchematicDescription;
-
-      description.version = coerceVersionNumber(description.version);
-      if (!description.version) {
-        continue;
-      }
-
-      if (semver.satisfies(description.version, migrationRange, { includePrerelease: true })) {
-        (description.optional ? optionalMigrations : requiredMigrations).push(
-          description as MigrationSchematicDescriptionWithVersion,
-        );
-      }
-    }
-
-    if (requiredMigrations.length === 0 && optionalMigrations.length === 0) {
-      return 0;
-    }
-
-    // Required migrations
-    if (requiredMigrations.length) {
-      this.context.logger.info(
-        colors.cyan(`** Executing migrations of package '${packageName}' **\n`),
-      );
-
-      requiredMigrations.sort(
-        (a, b) => semver.compare(a.version, b.version) || a.name.localeCompare(b.name),
-      );
-
-      const result = await this.executePackageMigrations(
-        workflow,
-        requiredMigrations,
-        packageName,
-        commit,
-      );
-
-      if (result === 1) {
-        return 1;
-      }
-    }
-
-    // Optional migrations
-    if (optionalMigrations.length) {
-      this.context.logger.info(
-        colors.magenta(`** Optional migrations of package '${packageName}' **\n`),
-      );
-
-      optionalMigrations.sort(
-        (a, b) => semver.compare(a.version, b.version) || a.name.localeCompare(b.name),
-      );
-
-      const migrationsToRun = await this.getOptionalMigrationsToRun(
-        optionalMigrations,
-        packageName,
-      );
-
-      if (migrationsToRun?.length) {
-        return this.executePackageMigrations(workflow, migrationsToRun, packageName, commit);
-      }
-    }
-
-    return 0;
-  }
-
-  private async executePackageMigrations(
-    workflow: NodeWorkflow,
-    migrations: MigrationSchematicDescription[],
-    packageName: string,
-    commit = false,
-  ): Promise<1 | 0> {
-    const { logger } = this.context;
-    for (const migration of migrations) {
-      const { title, description } = getMigrationTitleAndDescription(migration);
-
-      logger.info(colors.cyan(figures.pointer) + ' ' + colors.bold(title));
-
-      if (description) {
-        logger.info('  ' + description);
-      }
-
-      const { success, files } = await this.executeSchematic(
-        workflow,
-        migration.collection.name,
-        migration.name,
-      );
-      if (!success) {
-        return 1;
-      }
-
-      let modifiedFilesText: string;
-      switch (files.size) {
-        case 0:
-          modifiedFilesText = 'No changes made';
-          break;
-        case 1:
-          modifiedFilesText = '1 file modified';
-          break;
-        default:
-          modifiedFilesText = `${files.size} files modified`;
-          break;
-      }
-
-      logger.info(`  Migration completed (${modifiedFilesText}).`);
-
-      // Commit migration
-      if (commit) {
-        const commitPrefix = `${packageName} migration - ${migration.name}`;
-        const commitMessage = migration.description
-          ? `${commitPrefix}\n\n${migration.description}`
-          : commitPrefix;
-        const committed = this.commit(commitMessage);
-        if (!committed) {
-          // Failed to commit, something went wrong. Abort the update.
-          return 1;
-        }
-      }
-
-      logger.info(''); // Extra trailing newline.
-    }
-
-    return 0;
   }
 
   private async migrateOnly(
@@ -592,8 +362,9 @@ export default class UpdateCommandModule extends CommandModule<UpdateCommandArgs
     }
 
     if (options.name) {
-      return this.executeMigration(
+      return executeMigration(
         workflow,
+        logger,
         packageName,
         migrations,
         options.name,
@@ -608,8 +379,9 @@ export default class UpdateCommandModule extends CommandModule<UpdateCommandArgs
       return 1;
     }
 
-    return this.executeMigrations(
+    return executeMigrations(
       workflow,
+      logger,
       packageName,
       migrations,
       from,
@@ -773,8 +545,9 @@ export default class UpdateCommandModule extends CommandModule<UpdateCommandArgs
       return 0;
     }
 
-    const { success } = await this.executeSchematic(
+    const { success } = await executeSchematic(
       workflow,
+      logger,
       UPDATE_SCHEMATIC_COLLECTION,
       'update',
       {
@@ -833,7 +606,9 @@ export default class UpdateCommandModule extends CommandModule<UpdateCommandArgs
     }
 
     if (success && options.createCommits) {
-      if (!this.commit(`Angular CLI update for packages - ${packagesToUpdate.join(', ')}`)) {
+      if (
+        !commitChanges(logger, `Angular CLI update for packages - ${packagesToUpdate.join(', ')}`)
+      ) {
         return 1;
       }
     }
@@ -913,8 +688,9 @@ export default class UpdateCommandModule extends CommandModule<UpdateCommandArgs
             return 1;
           }
         }
-        const result = await this.executeMigrations(
+        const result = await executeMigrations(
           workflow,
+          logger,
           migration.package,
           migrations,
           migration.from,
@@ -931,115 +707,4 @@ export default class UpdateCommandModule extends CommandModule<UpdateCommandArgs
 
     return success ? 0 : 1;
   }
-
-  /**
-   * @return Whether or not the commit was successful.
-   */
-  private commit(message: string): boolean {
-    const { logger } = this.context;
-
-    // Check if a commit is needed.
-    let commitNeeded: boolean;
-    try {
-      commitNeeded = hasChangesToCommit();
-    } catch (err) {
-      logger.error(`  Failed to read Git tree:\n${(err as SpawnSyncReturns<string>).stderr}`);
-
-      return false;
-    }
-
-    if (!commitNeeded) {
-      logger.info('  No changes to commit after migration.');
-
-      return true;
-    }
-
-    // Commit changes and abort on error.
-    try {
-      createCommit(message);
-    } catch (err) {
-      logger.error(
-        `Failed to commit update (${message}):\n${(err as SpawnSyncReturns<string>).stderr}`,
-      );
-
-      return false;
-    }
-
-    // Notify user of the commit.
-    const hash = findCurrentGitSha();
-    const shortMessage = message.split('\n')[0];
-    if (hash) {
-      logger.info(`  Committed migration step (${getShortHash(hash)}): ${shortMessage}.`);
-    } else {
-      // Commit was successful, but reading the hash was not. Something weird happened,
-      // but nothing that would stop the update. Just log the weirdness and continue.
-      logger.info(`  Committed migration step: ${shortMessage}.`);
-      logger.warn('  Failed to look up hash of most recent commit, continuing anyways.');
-    }
-
-    return true;
-  }
-
-  private async getOptionalMigrationsToRun(
-    optionalMigrations: MigrationSchematicDescription[],
-    packageName: string,
-  ): Promise<MigrationSchematicDescription[] | undefined> {
-    const { logger } = this.context;
-    const numberOfMigrations = optionalMigrations.length;
-    logger.info(
-      `This package has ${numberOfMigrations} optional migration${
-        numberOfMigrations > 1 ? 's' : ''
-      } that can be executed.`,
-    );
-
-    if (!isTTY()) {
-      for (const migration of optionalMigrations) {
-        const { title } = getMigrationTitleAndDescription(migration);
-        logger.info(colors.cyan(figures.pointer) + ' ' + colors.bold(title));
-        logger.info(colors.gray(`  ng update ${packageName} --name ${migration.name}`));
-        logger.info(''); // Extra trailing newline.
-      }
-
-      return undefined;
-    }
-
-    logger.info(
-      'Optional migrations may be skipped and executed after the update process, if preferred.',
-    );
-    logger.info(''); // Extra trailing newline.
-
-    const answer = await askChoices(
-      `Select the migrations that you'd like to run`,
-      optionalMigrations.map((migration) => {
-        const { title, documentation } = getMigrationTitleAndDescription(migration);
-
-        return {
-          name: `[${colors.white(migration.name)}] ${title}${documentation ? ` (${documentation})` : ''}`,
-          value: migration.name,
-          checked: migration.recommended,
-        };
-      }),
-      null,
-    );
-
-    logger.info(''); // Extra trailing newline.
-
-    return optionalMigrations.filter(({ name }) => answer?.includes(name));
-  }
-}
-
-function getMigrationTitleAndDescription(migration: MigrationSchematicDescription): {
-  title: string;
-  description: string;
-  documentation?: string;
-} {
-  const [title, ...description] = migration.description.split('. ');
-
-  return {
-    title: title.endsWith('.') ? title : title + '.',
-    description: description.join('.\n  '),
-    documentation: migration.documentation
-      ? new URL(migration.documentation, 'https://angular.dev').href
-      : undefined,
-  };
 }
