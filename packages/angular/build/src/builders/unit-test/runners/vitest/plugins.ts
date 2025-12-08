@@ -128,7 +128,7 @@ export async function createVitestConfigPlugin(
         },
         resolve: {
           mainFields: ['es2020', 'module', 'main'],
-          conditions: ['es2015', 'es2020', 'module'],
+          conditions: ['es2015', 'es2020', 'module', ...(browser ? ['browser'] : [])],
         },
       };
 
