@@ -12,7 +12,6 @@ import { existsSync, promises as fs } from 'node:fs';
 import { createRequire } from 'node:module';
 import * as path from 'node:path';
 import npa from 'npm-package-arg';
-import * as semver from 'semver';
 import { Argv } from 'yargs';
 import {
   CommandModule,
@@ -21,14 +20,10 @@ import {
   Options,
 } from '../../command-builder/command-module';
 import { SchematicEngineHost } from '../../command-builder/utilities/schematic-engine-host';
+import { PackageManager, PackageManifest, createPackageManager } from '../../package-managers';
 import { colors } from '../../utilities/color';
 import { disableVersionCheck } from '../../utilities/environment-options';
 import { assertIsError } from '../../utilities/error';
-import {
-  PackageIdentifier,
-  PackageManifest,
-  fetchPackageMetadata,
-} from '../../utilities/package-metadata';
 import {
   PackageTreeNode,
   findPackageJson,
@@ -174,7 +169,13 @@ export default class UpdateCommandModule extends CommandModule<UpdateCommandArgs
   }
 
   async run(options: Options<UpdateCommandArgs>): Promise<number | void> {
-    const { logger, packageManager } = this.context;
+    const { logger } = this.context;
+    // Instantiate the package manager
+    const packageManager = await createPackageManager({
+      cwd: this.context.root,
+      logger,
+      configuredPackageManager: this.context.packageManager.name,
+    });
 
     // Check if the current installed CLI version is older than the latest compatible version.
     // Skip when running `ng update` without a package name as this will not trigger an actual update.
@@ -183,7 +184,6 @@ export default class UpdateCommandModule extends CommandModule<UpdateCommandArgs
         options.packages,
         logger,
         packageManager,
-        options.verbose,
         options.next,
       );
 
@@ -201,7 +201,7 @@ export default class UpdateCommandModule extends CommandModule<UpdateCommandArgs
       }
     }
 
-    const packages: PackageIdentifier[] = [];
+    const packages: npa.Result[] = [];
     for (const request of options.packages ?? []) {
       try {
         const packageIdentifier = npa(request);
@@ -230,7 +230,7 @@ export default class UpdateCommandModule extends CommandModule<UpdateCommandArgs
           packageIdentifier.type = 'tag';
         }
 
-        packages.push(packageIdentifier as PackageIdentifier);
+        packages.push(packageIdentifier);
       } catch (e) {
         assertIsError(e);
         logger.error(e.message);
@@ -247,7 +247,7 @@ export default class UpdateCommandModule extends CommandModule<UpdateCommandArgs
 
     const workflow = new NodeWorkflow(this.context.root, {
       packageManager: packageManager.name,
-      packageManagerForce: shouldForcePackageManager(packageManager, logger, options.verbose),
+      packageManagerForce: await shouldForcePackageManager(packageManager, logger, options.verbose),
       // __dirname -> favor @schematics/update from this package
       // Otherwise, use packages from the active workspace (migrations)
       resolvePaths: this.resolvePaths,
@@ -276,7 +276,13 @@ export default class UpdateCommandModule extends CommandModule<UpdateCommandArgs
 
     return options.migrateOnly
       ? this.migrateOnly(workflow, (options.packages ?? [])[0], rootDependencies, options)
-      : this.updatePackagesAndMigrate(workflow, rootDependencies, options, packages);
+      : this.updatePackagesAndMigrate(
+          workflow,
+          rootDependencies,
+          options,
+          packages,
+          packageManager,
+        );
   }
 
   private async migrateOnly(
@@ -395,7 +401,8 @@ export default class UpdateCommandModule extends CommandModule<UpdateCommandArgs
     workflow: NodeWorkflow,
     rootDependencies: Map<string, PackageTreeNode>,
     options: Options<UpdateCommandArgs>,
-    packages: PackageIdentifier[],
+    packages: npa.Result[],
+    packageManager: PackageManager,
   ): Promise<number> {
     const { logger } = this.context;
 
@@ -406,13 +413,14 @@ export default class UpdateCommandModule extends CommandModule<UpdateCommandArgs
     };
 
     const requests: {
-      identifier: PackageIdentifier;
+      identifier: npa.Result;
       node: PackageTreeNode;
     }[] = [];
 
     // Validate packages actually are part of the workspace
     for (const pkg of packages) {
-      const node = rootDependencies.get(pkg.name);
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const node = rootDependencies.get(pkg.name!);
       if (!node?.package) {
         logger.error(`Package '${pkg.name}' is not a dependency.`);
 
@@ -438,62 +446,14 @@ export default class UpdateCommandModule extends CommandModule<UpdateCommandArgs
     for (const { identifier: requestIdentifier, node } of requests) {
       const packageName = requestIdentifier.name;
 
-      let metadata;
+      let manifest: PackageManifest | null = null;
       try {
-        // Metadata requests are internally cached; multiple requests for same name
-        // does not result in additional network traffic
-        metadata = await fetchPackageMetadata(packageName, logger, {
-          verbose: options.verbose,
-        });
+        manifest = await packageManager.getManifest(requestIdentifier);
       } catch (e) {
         assertIsError(e);
-        logger.error(`Error fetching metadata for '${packageName}': ` + e.message);
+        logger.error(`Error fetching manifest for '${packageName}': ` + e.message);
 
         return 1;
-      }
-
-      // Try to find a package version based on the user requested package specifier
-      // registry specifier types are either version, range, or tag
-      let manifest: PackageManifest | undefined;
-      switch (requestIdentifier.type) {
-        case 'tag':
-          manifest = metadata.tags[requestIdentifier.fetchSpec];
-          // If not found and next option was used and user did not provide a specifier, try latest.
-          // Package may not have a next tag.
-          if (
-            !manifest &&
-            requestIdentifier.fetchSpec === 'next' &&
-            requestIdentifier.rawSpec === '*'
-          ) {
-            manifest = metadata.tags['latest'];
-          }
-          break;
-        case 'version':
-          manifest = metadata.versions[requestIdentifier.fetchSpec];
-          break;
-        case 'range':
-          for (const potentialManifest of Object.values(metadata.versions)) {
-            // Ignore deprecated package versions
-            if (potentialManifest.deprecated) {
-              continue;
-            }
-            // Only consider versions that are within the range
-            if (
-              !semver.satisfies(potentialManifest.version, requestIdentifier.fetchSpec, {
-                loose: true,
-              })
-            ) {
-              continue;
-            }
-            // Update the used manifest if current potential is newer than existing or there is not one yet
-            if (
-              !manifest ||
-              semver.gt(potentialManifest.version, manifest.version, { loose: true })
-            ) {
-              manifest = potentialManifest;
-            }
-          }
-          break;
       }
 
       if (!manifest) {
@@ -560,10 +520,8 @@ export default class UpdateCommandModule extends CommandModule<UpdateCommandArgs
     );
 
     if (success) {
-      const { root: commandRoot, packageManager } = this.context;
-      const installArgs = shouldForcePackageManager(packageManager, logger, options.verbose)
-        ? ['--force']
-        : [];
+      const { root: commandRoot } = this.context;
+      const force = await shouldForcePackageManager(packageManager, logger, options.verbose);
       const tasks = new Listr([
         {
           title: 'Cleaning node modules directory',
@@ -585,9 +543,11 @@ export default class UpdateCommandModule extends CommandModule<UpdateCommandArgs
         {
           title: 'Installing packages',
           async task() {
-            const installationSuccess = await packageManager.installAll(installArgs, commandRoot);
-
-            if (!installationSuccess) {
+            try {
+              await packageManager.install({
+                force,
+              });
+            } catch (e) {
               throw new CommandError('Unable to install packages');
             }
           },
