@@ -241,9 +241,6 @@ importers:
       karma-source-map-support:
         specifier: 1.4.0
         version: 1.4.0
-      listr2:
-        specifier: 9.0.5
-        version: 9.0.5
       lodash:
         specifier: ^4.17.21
         version: 4.17.21
