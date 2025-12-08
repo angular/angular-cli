@@ -11,9 +11,7 @@ import { spawnSync } from 'node:child_process';
 import { existsSync, promises as fs } from 'node:fs';
 import { join, resolve } from 'node:path';
 import * as semver from 'semver';
-import { PackageManager } from '../../../../lib/config/workspace-schema';
-import { PackageManagerUtils } from '../../../utilities/package-manager';
-import { fetchPackageManifest } from '../../../utilities/package-metadata';
+import { PackageManager } from '../../../package-managers';
 import { VERSION } from '../../../utilities/version';
 import { ANGULAR_PACKAGES_REGEXP } from './constants';
 
@@ -58,18 +56,19 @@ export function coerceVersionNumber(version: string | undefined): string | undef
 export async function checkCLIVersion(
   packagesToUpdate: string[],
   logger: logging.LoggerApi,
-  packageManager: PackageManagerUtils,
-  verbose = false,
+  packageManager: PackageManager,
   next = false,
 ): Promise<string | null> {
-  const { version } = await fetchPackageManifest(
-    `@angular/cli@${getCLIUpdateRunnerVersion(packagesToUpdate, next)}`,
-    logger,
-    {
-      verbose,
-      usingYarn: packageManager.name === PackageManager.Yarn,
-    },
-  );
+  const runnerVersion = getCLIUpdateRunnerVersion(packagesToUpdate, next);
+  const manifest = await packageManager.getManifest(`@angular/cli@${runnerVersion}`);
+
+  if (!manifest) {
+    logger.warn(`Could not find @angular/cli version '${runnerVersion}'.`);
+
+    return null;
+  }
+
+  const version = manifest.version;
 
   return VERSION.full === version ? null : version;
 }
@@ -120,52 +119,53 @@ export function getCLIUpdateRunnerVersion(
  */
 export async function runTempBinary(
   packageName: string,
-  packageManager: PackageManagerUtils,
+  packageManager: PackageManager,
   args: string[] = [],
 ): Promise<number> {
-  const { success, tempNodeModules } = await packageManager.installTemp(packageName);
-  if (!success) {
-    return 1;
-  }
+  const { workingDirectory, cleanup } = await packageManager.acquireTempPackage(packageName);
 
-  // Remove version/tag etc... from package name
-  // Ex: @angular/cli@latest -> @angular/cli
-  const packageNameNoVersion = packageName.substring(0, packageName.lastIndexOf('@'));
-  const pkgLocation = join(tempNodeModules, packageNameNoVersion);
-  const packageJsonPath = join(pkgLocation, 'package.json');
+  try {
+    // Remove version/tag etc... from package name
+    // Ex: @angular/cli@latest -> @angular/cli
+    const packageNameNoVersion = packageName.substring(0, packageName.lastIndexOf('@'));
+    const pkgLocation = join(workingDirectory, 'node_modules', packageNameNoVersion);
+    const packageJsonPath = join(pkgLocation, 'package.json');
 
-  // Get a binary location for this package
-  let binPath: string | undefined;
-  if (existsSync(packageJsonPath)) {
-    const content = await fs.readFile(packageJsonPath, 'utf-8');
-    if (content) {
-      const { bin = {} } = JSON.parse(content) as { bin: Record<string, string> };
-      const binKeys = Object.keys(bin);
+    // Get a binary location for this package
+    let binPath: string | undefined;
+    if (existsSync(packageJsonPath)) {
+      const content = await fs.readFile(packageJsonPath, 'utf-8');
+      if (content) {
+        const { bin = {} } = JSON.parse(content) as { bin: Record<string, string> };
+        const binKeys = Object.keys(bin);
 
-      if (binKeys.length) {
-        binPath = resolve(pkgLocation, bin[binKeys[0]]);
+        if (binKeys.length) {
+          binPath = resolve(pkgLocation, bin[binKeys[0]]);
+        }
       }
     }
+
+    if (!binPath) {
+      throw new Error(`Cannot locate bin for temporary package: ${packageNameNoVersion}.`);
+    }
+
+    const { status, error } = spawnSync(process.execPath, [binPath, ...args], {
+      stdio: 'inherit',
+      env: {
+        ...process.env,
+        NG_DISABLE_VERSION_CHECK: 'true',
+        NG_CLI_ANALYTICS: 'false',
+      },
+    });
+
+    if (status === null && error) {
+      throw error;
+    }
+
+    return status ?? 0;
+  } finally {
+    await cleanup();
   }
-
-  if (!binPath) {
-    throw new Error(`Cannot locate bin for temporary package: ${packageNameNoVersion}.`);
-  }
-
-  const { status, error } = spawnSync(process.execPath, [binPath, ...args], {
-    stdio: 'inherit',
-    env: {
-      ...process.env,
-      NG_DISABLE_VERSION_CHECK: 'true',
-      NG_CLI_ANALYTICS: 'false',
-    },
-  });
-
-  if (status === null && error) {
-    throw error;
-  }
-
-  return status ?? 0;
 }
 
 /**
@@ -175,30 +175,23 @@ export async function runTempBinary(
  * @param verbose Whether to log verbose output.
  * @returns True if the package manager should be forced, false otherwise.
  */
-export function shouldForcePackageManager(
-  packageManager: PackageManagerUtils,
+export async function shouldForcePackageManager(
+  packageManager: PackageManager,
   logger: logging.LoggerApi,
   verbose: boolean,
-): boolean {
+): Promise<boolean> {
   // npm 7+ can fail due to it incorrectly resolving peer dependencies that have valid SemVer
   // ranges during an update. Update will set correct versions of dependencies within the
   // package.json file. The force option is set to workaround these errors.
-  // Example error:
-  // npm ERR! Conflicting peer dependency: @angular/compiler-cli@14.0.0-rc.0
-  // npm ERR! node_modules/@angular/compiler-cli
-  // npm ERR!   peer @angular/compiler-cli@"^14.0.0 || ^14.0.0-rc" from @angular-devkit/build-angular@14.0.0-rc.0
-  // npm ERR!   node_modules/@angular-devkit/build-angular
-  // npm ERR!     dev @angular-devkit/build-angular@"~14.0.0-rc.0" from the root project
-  if (
-    packageManager.name === PackageManager.Npm &&
-    packageManager.version &&
-    semver.gte(packageManager.version, '7.0.0')
-  ) {
-    if (verbose) {
-      logger.info('NPM 7+ detected -- enabling force option for package installation');
-    }
+  if (packageManager.name === 'npm') {
+    const version = await packageManager.getVersion();
+    if (semver.gte(version, '7.0.0')) {
+      if (verbose) {
+        logger.info('NPM 7+ detected -- enabling force option for package installation');
+      }
 
-    return true;
+      return true;
+    }
   }
 
   return false;
