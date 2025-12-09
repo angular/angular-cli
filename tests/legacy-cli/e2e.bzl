@@ -83,11 +83,14 @@ def e2e_suites(name, runner, data):
         # Default target meant to be run manually for debugging, customizing test cli via bazel
         _e2e_tests(name + "_" + toolchain_name, runner, data = data, toolchain = toolchain, tags = ["manual"])
 
-        _e2e_suite(name, runner, "npm", data, toolchain_name, toolchain)
+        # Main test suites
+        _e2e_suite(name, runner, "webpack", data, toolchain_name, toolchain)
+        _e2e_suite(name, runner, "esbuild", data, toolchain_name, toolchain)
+
+        # Package manager subsets
         _e2e_suite(name, runner, "bun", data, toolchain_name, toolchain)
         _e2e_suite(name, runner, "pnpm", data, toolchain_name, toolchain)
         _e2e_suite(name, runner, "yarn", data, toolchain_name, toolchain)
-        _e2e_suite(name, runner, "esbuild", data, toolchain_name, toolchain)
 
     # Saucelabs tests are only run on the default toolchain
     _e2e_suite(name, runner, "saucelabs", data)
@@ -162,7 +165,7 @@ def _e2e_suite(name, runner, type, data, toolchain_name = "", toolchain = None):
         args.append("--esbuild")
         tests = BROWSER_TESTS
         ignore = None
-    elif type == "npm":
+    elif type == "webpack":
         tests = None
         ignore = BROWSER_TESTS + WEBPACK_IGNORE_TESTS
 
