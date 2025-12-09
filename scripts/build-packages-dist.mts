@@ -75,9 +75,7 @@ function buildReleasePackages(
   // List of targets to build. e.g. "packages/angular/cli:npm_package"
   const targets = exec(queryPackagesCmd, true).split(/\r?\n/);
   const packageNames = getPackageNamesOfTargets(targets);
-  // TODO: Remove --ignore_all_rc_files flag once repository can be loaded in bazelrc during info
-  // commands again.
-  const bazelBinPath = exec(`${bazelCmd} --ignore_all_rc_files info bazel-bin`, true);
+  const bazelBinPath = join(import.meta.dirname, '../dist/bin');
   const getBazelOutputPath = (pkgName: string) =>
     join(bazelBinPath, 'packages', pkgName, 'npm_package');
   const getDistPath = (pkgName: string) => join(distPath, pkgName);
