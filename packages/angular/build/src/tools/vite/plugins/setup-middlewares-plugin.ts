@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
+import { IncomingMessage, ServerResponse } from 'node:http';
 import type { Connect, Plugin } from 'vite';
 import {
   ComponentStyleRecord,
@@ -17,6 +18,7 @@ import {
   createAngularSsrExternalMiddleware,
   createAngularSsrInternalMiddleware,
   createChromeDevtoolsMiddleware,
+  html403,
 } from '../middlewares';
 import { AngularMemoryOutputFiles, AngularOutputAssets } from '../utils';
 
@@ -55,6 +57,8 @@ interface AngularSetupMiddlewaresPluginOptions {
   ssrMode: ServerSsrMode;
   resetComponentUpdates: () => void;
   projectRoot: string;
+  allowedHosts: true | string[];
+  devHost: string;
 }
 
 async function createEncapsulateStyle(): Promise<
@@ -109,6 +113,36 @@ export function createAngularSetupMiddlewaresPlugin(
       // before the built-in HTML middleware
       // eslint-disable-next-line @typescript-eslint/no-misused-promises
       return async () => {
+        // Vite/Connect do not expose a typed stack, cast once to a precise structural type.
+        const entry = server.middlewares.stack.find(
+          ({ handle }) =>
+            typeof handle === 'function' && handle.name.startsWith('hostValidationMiddleware'),
+        );
+
+        if (typeof entry?.handle === 'function') {
+          const originalHandle = entry.handle as Connect.NextHandleFunction;
+
+          entry.handle = function angularHostValidationMiddleware(
+            req: IncomingMessage,
+            res: ServerResponse,
+            next: (err?: unknown) => void,
+          ) {
+            originalHandle(
+              req,
+              {
+                writeHead: (code) => {
+                  res.writeHead(code, { 'content-type': 'text/html' });
+                },
+                end: () => {
+                  const hostname = req.headers.host?.toLowerCase().split(':')[0] ?? '';
+                  res.end(html403(hostname));
+                },
+              } as ServerResponse,
+              next,
+            );
+          };
+        }
+
         if (ssrMode === ServerSsrMode.ExternalSsrMiddleware) {
           server.middlewares.use(
             await createAngularSsrExternalMiddleware(server, indexHtmlTransformer),
