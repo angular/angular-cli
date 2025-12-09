@@ -403,7 +403,7 @@ async function findPackageTars(): Promise<{ [pkg: string]: PkgInfo }> {
   );
 
   const pkgJsons = await Promise.all(
-    pkgs.map((pkg) => realpathSync(pkg)).map((pkg) => extractFile(pkg, './package.json')),
+    pkgs.map((pkg) => realpathSync(pkg)).map((pkg) => extractFile(pkg, 'npm_package/package.json')),
   );
 
   return pkgs.reduce(

@@ -108,15 +108,3 @@ validate_ts_version_matching(
     module_lock_file = "MODULE.bazel.lock",
     package_json = "package.json",
 )
-
-# This is needed following https://github.com/bazel-contrib/rules_nodejs/pull/3859
-toolchain(
-    name = "node22_windows_no_exec_config_toolchain",
-    exec_compatible_with = [],
-    target_compatible_with = [
-        "@platforms//os:windows",
-        "@platforms//cpu:x86_64",
-    ],
-    toolchain = "@node22_windows_amd64//:toolchain",
-    toolchain_type = "@rules_nodejs//nodejs:toolchain_type",
-)

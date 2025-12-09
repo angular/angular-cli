@@ -159,8 +159,6 @@
     "https://bcr.bazel.build/modules/rules_nodejs/6.6.2/MODULE.bazel": "9fdb5e1d50246a25761f150fcc820dc47e4052330a8408451e628804f9ca64a6",
     "https://bcr.bazel.build/modules/rules_nodejs/6.6.2/source.json": "6e8c1ecc64ff8da147c1620f862ad77d7b19c5d1b52b3aa5e847d5b3d0de4cc3",
     "https://bcr.bazel.build/modules/rules_pkg/0.7.0/MODULE.bazel": "df99f03fc7934a4737122518bb87e667e62d780b610910f0447665a7e2be62dc",
-    "https://bcr.bazel.build/modules/rules_pkg/0.8.1/MODULE.bazel": "7e9e7b5b26bd7ff012dfe63930db2f0176ddcd25e44a858fc72d63e995b6aab9",
-    "https://bcr.bazel.build/modules/rules_pkg/0.8.1/source.json": "15dd7e13dc303f7fcde2b55300bcb8de5c0dd08a7a7269749cbbaa0fb1dfbe16",
     "https://bcr.bazel.build/modules/rules_pkg/1.0.1/MODULE.bazel": "5b1df97dbc29623bccdf2b0dcd0f5cb08e2f2c9050aab1092fd39a41e82686ff",
     "https://bcr.bazel.build/modules/rules_pkg/1.1.0/MODULE.bazel": "9db8031e71b6ef32d1846106e10dd0ee2deac042bd9a2de22b4761b0c3036453",
     "https://bcr.bazel.build/modules/rules_pkg/1.1.0/source.json": "fef768df13a92ce6067e1cd0cdc47560dace01354f1d921cfb1d632511f7d608",

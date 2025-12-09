@@ -119,6 +119,5 @@ def npm_package(
             name = "npm_package_archive",
             srcs = [":pkg"],
             extension = "tgz",
-            strip_prefix = "./npm_package",
             visibility = visibility,
         )

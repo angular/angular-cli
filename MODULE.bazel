@@ -9,17 +9,8 @@ bazel_dep(name = "yq.bzl", version = "0.3.2")
 bazel_dep(name = "rules_nodejs", version = "6.6.2")
 bazel_dep(name = "aspect_rules_js", version = "2.8.3")
 bazel_dep(name = "aspect_rules_ts", version = "3.7.1")
-bazel_dep(name = "rules_pkg", version = "0.8.1")
-
-# Alow for usage of rules_pkg@0.8.1 even though other deps want a later verison.
-multiple_version_override(
-    module_name = "rules_pkg",
-    versions = [
-        "0.8.1",
-        "1.1.0",
-    ],
-)
-
+bazel_dep(name = "rules_pkg", version = "1.1.0")
+bazel_dep(name = "rules_cc", version = "0.1.1")
 bazel_dep(name = "aspect_bazel_lib", version = "2.22.0")
 bazel_dep(name = "bazel_skylib", version = "1.8.2")
 bazel_dep(name = "aspect_rules_esbuild", version = "0.24.0")
@@ -105,9 +96,6 @@ use_repo(
     "node24_windows_amd64",
 )
 
-# This is needed following https://github.com/bazel-contrib/rules_nodejs/pull/3859
-register_toolchains("//:node22_windows_no_exec_config_toolchain")
-
 npm = use_extension("@aspect_rules_js//npm:extensions.bzl", "npm")
 npm.npm_translate_lock(
     name = "npm",
@@ -173,4 +161,6 @@ register_toolchains(
     "@devinfra//bazel/git-toolchain:git_macos_x86_toolchain",
     "@devinfra//bazel/git-toolchain:git_macos_arm64_toolchain",
     "@devinfra//bazel/git-toolchain:git_windows_toolchain",
+    "//tools/toolchains:dummy_cc_windows_no_exec_toolchain",
+    "//tools/toolchains:node22_windows_no_exec_toolchain",
 )
