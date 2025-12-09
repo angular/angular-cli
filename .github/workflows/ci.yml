@@ -114,7 +114,7 @@ jobs:
         run: |
           pnpm bazel build \
             --config=e2e \
-            //tests/legacy-cli:e2e.npm_node22 \
+            //tests/legacy-cli:e2e.webpack_node22 \
             //tests/legacy-cli:e2e.esbuild_node22 \
             --platforms=tools:windows_x64
       - name: Store built Windows E2E tests
