@@ -110,7 +110,7 @@ jobs:
       matrix:
         os: [ubuntu-latest]
         node: [22]
-        subset: [npm, esbuild]
+        subset: [esbuild, webpack]
         shard: [0, 1, 2, 3, 4, 5]
     runs-on: ${{ matrix.os }}
     steps:
@@ -203,7 +203,7 @@ jobs:
       matrix:
         os: [ubuntu-latest]
         node: [22]
-        subset: [npm, esbuild]
+        subset: [esbuild, webpack]
         shard: [0, 1, 2, 3, 4, 5]
     runs-on: ${{ matrix.os }}
     steps:
