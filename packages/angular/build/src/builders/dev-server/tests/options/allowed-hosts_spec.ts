@@ -34,7 +34,7 @@ describeServeBuilder(executeDevServer, DEV_SERVER_BUILDER_INFO, (harness, setupT
 
       expect(result?.success).toBeTrue();
       expect(response?.statusCode).toBe(403);
-      expect(response && text(response)).toContain('angular.json');
+      expect(response && (await text(response))).toContain('angular.json');
     });
 
     it('does not allow an invalid host when option is an empty array', async () => {
@@ -49,7 +49,7 @@ describeServeBuilder(executeDevServer, DEV_SERVER_BUILDER_INFO, (harness, setupT
 
       expect(result?.success).toBeTrue();
       expect(response?.statusCode).toBe(403);
-      expect(response && text(response)).toContain('angular.json');
+      expect(response && (await text(response))).toContain('angular.json');
     });
 
     it('allows a host when specified in the option', async () => {
