@@ -9,7 +9,7 @@
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import type { Connect } from 'vite';
 
-export function createAngularHostCheckMiddleware(middlewares: Connect.Server): void {
+export function patchHostValidationMiddleware(middlewares: Connect.Server): void {
   const entry = middlewares.stack.find(
     ({ handle }) =>
       typeof handle === 'function' && handle.name.startsWith('hostValidationMiddleware'),

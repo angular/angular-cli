@@ -13,11 +13,11 @@ import {
   createAngularAssetsMiddleware,
   createAngularComponentMiddleware,
   createAngularHeadersMiddleware,
-  createAngularHostCheckMiddleware,
   createAngularIndexHtmlMiddleware,
   createAngularSsrExternalMiddleware,
   createAngularSsrInternalMiddleware,
   createChromeDevtoolsMiddleware,
+  patchHostValidationMiddleware,
 } from '../middlewares';
 import { AngularMemoryOutputFiles, AngularOutputAssets } from '../utils';
 
@@ -56,8 +56,6 @@ interface AngularSetupMiddlewaresPluginOptions {
   ssrMode: ServerSsrMode;
   resetComponentUpdates: () => void;
   projectRoot: string;
-  allowedHosts: true | string[];
-  devHost: string;
 }
 
 async function createEncapsulateStyle(): Promise<
@@ -112,7 +110,7 @@ export function createAngularSetupMiddlewaresPlugin(
       // before the built-in HTML middleware
       // eslint-disable-next-line @typescript-eslint/no-misused-promises
       return async () => {
-        createAngularHostCheckMiddleware(server.middlewares);
+        patchHostValidationMiddleware(server.middlewares);
 
         if (ssrMode === ServerSsrMode.ExternalSsrMiddleware) {
           server.middlewares.use(
