@@ -111,7 +111,7 @@ jobs:
         os: [ubuntu-latest]
         node: [22]
         subset: [esbuild, webpack]
-        shard: [0, 1, 2, 3, 4, 5]
+        shard: [0, 1, 2, 3, 4]
     runs-on: ${{ matrix.os }}
     steps:
       - name: Initialize environment
@@ -123,7 +123,7 @@ jobs:
       - name: Setup Bazel RBE
         uses: angular/dev-infra/github-actions/bazel/configure-remote@73051ae248ba64911a8e7e66536d8c99ba07ef2a
       - name: Run CLI E2E tests
-        run: pnpm bazel test --test_env=E2E_SHARD_TOTAL=6 --test_env=E2E_SHARD_INDEX=${{ matrix.shard }} --config=e2e //tests/legacy-cli:e2e.${{ matrix.subset }}_node${{ matrix.node }}
+        run: pnpm bazel test --test_env=E2E_SHARD_TOTAL=5 --test_env=E2E_SHARD_INDEX=${{ matrix.shard }} --config=e2e //tests/legacy-cli:e2e.${{ matrix.subset }}_node${{ matrix.node }}
 
   build-e2e-windows-subset:
     runs-on: ubuntu-latest
@@ -180,7 +180,7 @@ jobs:
       matrix:
         os: [ubuntu-latest]
         node: [22]
-        subset: [yarn, pnpm, bun]
+        subset: [npm, yarn, pnpm, bun]
         shard: [0, 1, 2]
     runs-on: ${{ matrix.os }}
     steps:
@@ -204,7 +204,7 @@ jobs:
         os: [ubuntu-latest]
         node: [22]
         subset: [esbuild, webpack]
-        shard: [0, 1, 2, 3, 4, 5]
+        shard: [0, 1, 2, 3, 4]
     runs-on: ${{ matrix.os }}
     steps:
       - name: Initialize environment
@@ -216,4 +216,4 @@ jobs:
       - name: Setup Bazel RBE
         uses: angular/dev-infra/github-actions/bazel/configure-remote@73051ae248ba64911a8e7e66536d8c99ba07ef2a
       - name: Run CLI E2E tests
-        run: pnpm bazel test --test_env=E2E_SHARD_TOTAL=6 --test_env=E2E_SHARD_INDEX=${{ matrix.shard }} --config=e2e //tests/legacy-cli:e2e.snapshots.${{ matrix.subset }}_node${{ matrix.node }}
+        run: pnpm bazel test --test_env=E2E_SHARD_TOTAL=5 --test_env=E2E_SHARD_INDEX=${{ matrix.shard }} --config=e2e //tests/legacy-cli:e2e.snapshots.${{ matrix.subset }}_node${{ matrix.node }}

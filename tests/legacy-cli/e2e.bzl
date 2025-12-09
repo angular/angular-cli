@@ -88,6 +88,7 @@ def e2e_suites(name, runner, data):
         _e2e_suite(name, runner, "esbuild", data, toolchain_name, toolchain)
 
         # Package manager subsets
+        _e2e_suite(name, runner, "npm", data, toolchain_name, toolchain)
         _e2e_suite(name, runner, "bun", data, toolchain_name, toolchain)
         _e2e_suite(name, runner, "pnpm", data, toolchain_name, toolchain)
         _e2e_suite(name, runner, "yarn", data, toolchain_name, toolchain)
@@ -143,7 +144,7 @@ def _e2e_tests(name, runner, toolchain, **kwargs):
 
 def _e2e_suite(name, runner, type, data, toolchain_name = "", toolchain = None):
     """
-    Setup a predefined test suite (yarn|pnpm|bun|esbuild|saucelabs|npm).
+    Setup a predefined test suite (yarn|pnpm|bun|esbuild|webpack|saucelabs|npm).
     """
     args = []
     tests = None
@@ -152,22 +153,22 @@ def _e2e_suite(name, runner, type, data, toolchain_name = "", toolchain = None):
     if toolchain_name:
         toolchain_name = "_" + toolchain_name
 
-    if type == "yarn" or type == "bun" or type == "pnpm":
+    if type == "npm" or type == "yarn" or type == "bun" or type == "pnpm":
         args.append("--package-manager=%s" % type)
         args.append("--esbuild")
         tests = PACKAGE_MANAGER_SUBSET_TESTS
-        ignore = BROWSER_TESTS + WEBPACK_IGNORE_TESTS
+        ignore = BROWSER_TESTS
     elif type == "esbuild":
         args.append("--esbuild")
         tests = ESBUILD_TESTS
-        ignore = BROWSER_TESTS
+        ignore = BROWSER_TESTS + PACKAGE_MANAGER_SUBSET_TESTS
     elif type == "saucelabs":
         args.append("--esbuild")
         tests = BROWSER_TESTS
         ignore = None
     elif type == "webpack":
         tests = None
-        ignore = BROWSER_TESTS + WEBPACK_IGNORE_TESTS
+        ignore = BROWSER_TESTS + WEBPACK_IGNORE_TESTS + PACKAGE_MANAGER_SUBSET_TESTS
 
     # Standard e2e tests
     _e2e_tests(
