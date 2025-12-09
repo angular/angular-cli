@@ -53,10 +53,9 @@ function html403(hostname: string): string {
       body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif;
       line-height:1.4;margin:2rem;color:#1f2937}
       code{background:#f3f4f6;padding:.15rem .35rem;border-radius:.25rem}
-      .box{max-width:760px;margin:0 auto}
+      main{max-width:760px;margin:0 auto}
       h1{font-size:1.5rem;margin-bottom:.75rem}
       p{margin:.5rem 0}
-      .muted{color:#6b7280}
       pre{background:#f9fafb;border:1px solid #e5e7eb;padding:.75rem;border-radius:.5rem;overflow:auto}
     </style>
   </head>
