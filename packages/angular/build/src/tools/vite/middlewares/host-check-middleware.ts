@@ -6,7 +6,43 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-export function html403(hostname: string): string {
+import type { IncomingMessage, ServerResponse } from 'node:http';
+import type { Connect } from 'vite';
+
+export function createAngularHostCheckMiddleware(middlewares: Connect.Server): void {
+  const entry = middlewares.stack.find(
+    ({ handle }) =>
+      typeof handle === 'function' && handle.name.startsWith('hostValidationMiddleware'),
+  );
+
+  if (typeof entry?.handle !== 'function') {
+    return;
+  }
+
+  const originalHandle = entry.handle as Connect.NextHandleFunction;
+
+  entry.handle = function angularHostValidationMiddleware(
+    req: IncomingMessage,
+    res: ServerResponse,
+    next: (err?: unknown) => void,
+  ) {
+    originalHandle(
+      req,
+      {
+        writeHead: (code) => {
+          res.writeHead(code, { 'content-type': 'text/html' });
+        },
+        end: () => {
+          const hostname = req.headers.host?.toLowerCase().split(':')[0] ?? '';
+          res.end(html403(hostname));
+        },
+      } as ServerResponse,
+      next,
+    );
+  };
+}
+
+function html403(hostname: string): string {
   return `<!doctype html>
 <html>
   <head>
