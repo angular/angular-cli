@@ -17,6 +17,7 @@ import {
   createAngularSsrExternalMiddleware,
   createAngularSsrInternalMiddleware,
   createChromeDevtoolsMiddleware,
+  patchHostValidationMiddleware,
 } from '../middlewares';
 import { AngularMemoryOutputFiles, AngularOutputAssets } from '../utils';
 
@@ -109,6 +110,8 @@ export function createAngularSetupMiddlewaresPlugin(
       // before the built-in HTML middleware
       // eslint-disable-next-line @typescript-eslint/no-misused-promises
       return async () => {
+        patchHostValidationMiddleware(server.middlewares);
+
         if (ssrMode === ServerSsrMode.ExternalSsrMiddleware) {
           server.middlewares.use(
             await createAngularSsrExternalMiddleware(server, indexHtmlTransformer),
