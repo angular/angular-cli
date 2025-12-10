@@ -59,6 +59,7 @@ export function createCompilerPlugin(
     ),
   );
 }
+export { getSharedCompilationStateCleanup } from './tools/esbuild/angular/compilation-state';
 
 export type { AngularCompilation } from './tools/angular/compilation';
 export { DiagnosticModes } from './tools/angular/compilation';
