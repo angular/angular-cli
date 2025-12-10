@@ -1,3 +1,33 @@
+<a name="21.1.0-next.2"></a>
+
+# 21.1.0-next.2 (2025-12-10)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                                    |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------- |
+| [d8b76e93d](https://github.com/angular/angular-cli/commit/d8b76e93d3e9e4e7bd7ad6e12fdf59cd663cbb8e) | fix  | correctly handle yarn classic tag manifest fetching            |
+| [7ab5c0b0a](https://github.com/angular/angular-cli/commit/7ab5c0b0a1c637f3e0adb71486e5e7e8716561e4) | fix  | correctly spawn package managers on Windows in new abstraction |
+| [240588b7e](https://github.com/angular/angular-cli/commit/240588b7e3c8698c83110793ab98d20caee4e1a4) | perf | optimize `ng add` version discovery                            |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                                   |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------------------- |
+| [985aa18d0](https://github.com/angular/angular-cli/commit/985aa18d0b6cf728c498c0873793e131a4c416c1) | fix  | conditionally provide Zone.js change detection in the built-in test main file |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                                                                                 |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------------------------------------------------- |
+| [30b5d81b4](https://github.com/angular/angular-cli/commit/30b5d81b4adafca32c94672a39574daa2e3fc8b7) | fix  | Add custom middleware for to present an Angular-tailored message                                            |
+| [2e7227b8d](https://github.com/angular/angular-cli/commit/2e7227b8dc04d4b2ca20e18baaeebaa65d3c2aac) | fix  | Ensure disposal of close-javascript-transformer                                                             |
+| [38b16ea01](https://github.com/angular/angular-cli/commit/38b16ea0108c48835dc0d81863eca84f7b8cea6e) | fix  | ensure locale base href retains leading slash ([#32040](https://github.com/angular/angular-cli/pull/32040)) |
+| [385165cbc](https://github.com/angular/angular-cli/commit/385165cbc6ff087e6bc1fb6f686d4929e83a075a) | fix  | inject testing polyfills in Karma unit-test executor                                                        |
+| [6d212206f](https://github.com/angular/angular-cli/commit/6d212206fdfc94e661a25bed1287c0bc15219b63) | fix  | support NODE_EXTRA_CA_CERTS in SSR SSL plugin                                                               |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="21.0.3"></a>
 
 # 21.0.3 (2025-12-10)
