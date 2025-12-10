@@ -6,7 +6,7 @@
     "@angular-devkit/build-angular": "workspace:*",
     "browser-sync": "3.0.4",
     "@vitest/coverage-v8": "4.0.15",
-    "jsdom": "27.2.0",
+    "jsdom": "27.3.0",
     "rxjs": "7.8.2",
     "vitest": "4.0.15"
   }
