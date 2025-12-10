@@ -1,0 +1,44 @@
+load("@rules_cc//cc:defs.bzl", "cc_toolchain")
+load(":dummy_cc_toolchain.bzl", "dummy_cc_toolchain_config")
+
+# This is needed following https://github.com/bazel-contrib/rules_nodejs/pull/3859
+toolchain(
+    name = "node22_windows_no_exec_toolchain",
+    exec_compatible_with = [],
+    target_compatible_with = [
+        "@platforms//os:windows",
+        "@platforms//cpu:x86_64",
+    ],
+    toolchain = "@node22_windows_amd64//:toolchain",
+    toolchain_type = "@rules_nodejs//nodejs:toolchain_type",
+)
+
+# This defines a dummy C++ toolchain for Windows.
+# Without this, the build fails with "Unable to find a CC toolchain using toolchain resolution".
+dummy_cc_toolchain_config(name = "dummy_cc_toolchain_config")
+
+filegroup(name = "empty")
+
+cc_toolchain(
+    name = "dummy_cc_toolchain",
+    all_files = ":empty",
+    compiler_files = ":empty",
+    dwp_files = ":empty",
+    linker_files = ":empty",
+    objcopy_files = ":empty",
+    strip_files = ":empty",
+    supports_param_files = 0,
+    toolchain_config = ":dummy_cc_toolchain_config",
+    toolchain_identifier = "dummy_cc_toolchain",
+)
+
+toolchain(
+    name = "dummy_cc_windows_no_exec_toolchain",
+    exec_compatible_with = [],
+    target_compatible_with = [
+        "@platforms//os:windows",
+        "@platforms//cpu:x86_64",
+    ],
+    toolchain = ":dummy_cc_toolchain",
+    toolchain_type = "@rules_cc//cc:toolchain_type",
+)

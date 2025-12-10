@@ -119,6 +119,7 @@ def npm_package(
             name = "npm_package_archive",
             srcs = [":pkg"],
             extension = "tgz",
-            strip_prefix = "./npm_package",
+            # should not be built unless it is a dependency of another rule
+            tags = ["manual"],
             visibility = visibility,
         )

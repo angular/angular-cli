@@ -122,8 +122,7 @@ export default async function (
   argv: { local?: boolean; snapshot?: boolean } = {},
 ): Promise<{ name: string; outputPath: string; tarPath: string }[]> {
   const logger = globalThis.console;
-
-  const bazelBin = await _exec(`${bazelCmd} info bazel-bin`, true, logger);
+  const bazelBin = join(import.meta.dirname, '../dist/bin');
 
   await _clean(logger);
 

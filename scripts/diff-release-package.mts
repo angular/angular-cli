@@ -62,17 +62,7 @@ async function main(packageName: string) {
   git.run(['clone', `https://github.com/${snapshotRepoName}.git`, tmpDir]);
   console.log(`--> Cloned snapshot repo.`);
 
-  const bazelBinDir = childProcess
-    .spawnSync(`${bazel} info bazel-bin`, {
-      shell: true,
-      encoding: 'utf8',
-      stdio: ['pipe', 'pipe', 'inherit'],
-    })
-    .stdout.trim();
-  if (bazelBinDir === '') {
-    throw new Error('Could not determine bazel-bin directory.');
-  }
-
+  const bazelBinDir = join(import.meta.dirname, '../dist/bin');
   const outputPath = path.join(bazelBinDir, 'packages/', targetDir, 'npm_package');
 
   // Delete old directory to avoid surprises, or stamping being outdated.
