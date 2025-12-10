@@ -12,7 +12,7 @@
  * distribution folder within the project.
  */
 
-import { BuiltPackage } from '@angular/ng-dev';
+import type { BuiltPackage } from '@angular/ng-dev';
 import { execSync } from 'node:child_process';
 import {
   chmodSync,

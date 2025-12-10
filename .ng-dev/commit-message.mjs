@@ -1,4 +1,4 @@
-import { packages } from '../scripts/packages.mjs';
+import { packages } from '../scripts/packages.mts';
 
 /**
  * The configuration for `ng-dev commit-message` commands.

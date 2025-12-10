@@ -42,7 +42,7 @@ console.error = function (...args) {
 };
 
 try {
-  const script = await import(`./${scriptName}.mjs`);
+  const script = await import(`./${scriptName}.mts`);
   const exitCode = await script.default(args, cwd);
   process.exitCode = typeof exitCode === 'number' ? exitCode : 0;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

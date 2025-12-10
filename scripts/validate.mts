@@ -7,8 +7,8 @@
  */
 
 import { execSync } from 'node:child_process';
-import templates from './templates.mjs';
-import validateUserAnalytics from './validate-user-analytics.mjs';
+import templates from './templates.mts';
+import validateUserAnalytics from './validate-user-analytics.mts';
 
 export default async function (options: { verbose: boolean }) {
   let error = false;
@@ -24,7 +24,7 @@ export default async function (options: { verbose: boolean }) {
   }
 
   console.info('Running templates validation...');
-  await templates({});
+  await templates();
   if (execSync(`git status --porcelain`).toString()) {
     console.error(
       'Running templates updated files... Please run "devkit-admin templates" before submitting a PR.',

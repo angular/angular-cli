@@ -11,8 +11,8 @@ import * as child_process from 'node:child_process';
 import { copyFile, readFile, rm, writeFile } from 'node:fs/promises';
 import * as path from 'node:path';
 import { pathToFileURL } from 'node:url';
-import build from './build.mjs';
-import { packages } from './packages.mjs';
+import build from './build.mts';
+import { packages } from './packages.mts';
 
 export interface CreateOptions extends Record<string, unknown> {
   _: string[];

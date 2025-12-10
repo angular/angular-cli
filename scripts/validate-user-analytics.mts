@@ -15,7 +15,7 @@ import {
   EventCustomDimension,
   EventCustomMetric,
   UserCustomDimension,
-} from '../packages/angular/cli/src/analytics/analytics-parameters.mjs';
+} from '../packages/angular/cli/src/analytics/analytics-parameters.ts';
 
 const __dirname = import.meta.dirname;
 const userAnalyticsTable = lodash.template(
@@ -82,7 +82,7 @@ async function _checkDimensions(dimensionsTable: string) {
   };
 
   // Find all the schemas
-  const { packages } = await import('./packages.mjs');
+  const { packages } = await import('./packages.mts');
   const packagesPaths = packages.map(({ root }) => root);
   for (const packagePath of packagesPaths) {
     const schemasPaths = await glob('**/schema.json', { cwd: packagePath });

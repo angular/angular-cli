@@ -11,7 +11,7 @@
     "Angular DevKit"
   ],
   "scripts": {
-    "admin": "node --no-warnings=ExperimentalWarning --loader ts-node/esm/transpile-only ./scripts/devkit-admin.mjs",
+    "admin": "node --no-warnings=ExperimentalWarning --experimental-transform-types ./scripts/devkit-admin.mts",
     "bazel": "bazelisk",
     "test": "bazel test //packages/...",
     "build": "pnpm -s admin build",
@@ -20,10 +20,9 @@
     "templates": "pnpm -s admin templates",
     "validate": "pnpm -s admin validate",
     "postinstall": "husky",
-    "ng-dev": "node --no-warnings=ExperimentalWarning --loader ts-node/esm/transpile-only node_modules/@angular/ng-dev/bundles/cli.mjs",
-    "ts-circular-deps": "pnpm -s ng-dev ts-circular-deps --config ./scripts/circular-deps-test.conf.mjs",
+    "ts-circular-deps": "ng-dev ts-circular-deps --config ./scripts/circular-deps-test.conf.mjs",
     "check-tooling-setup": "tsc --project .ng-dev/tsconfig.json",
-    "diff-release-package": "node --no-warnings=ExperimentalWarning --loader ts-node/esm/transpile-only scripts/diff-release-package.mts"
+    "diff-release-package": "node scripts/diff-release-package.mts"
   },
   "repository": {
     "type": "git",
