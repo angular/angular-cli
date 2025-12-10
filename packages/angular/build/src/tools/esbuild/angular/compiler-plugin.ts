@@ -591,6 +591,7 @@ export function createCompilerPlugin(
       build.onDispose(() => {
         sharedTSCompilationState?.dispose();
         void compilation.close?.();
+        void javascriptTransformer.close();
         void cacheStore?.close();
       });
 
