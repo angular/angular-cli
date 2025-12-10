@@ -3,6 +3,9 @@
   "compilerOptions": {
     "module": "Node16",
     "moduleResolution": "Node16",
+    "erasableSyntaxOnly": true,
+    "verbatimModuleSyntax": true,
+    "rewriteRelativeImportExtensions": true,
     "noEmit": true,
     "types": []
   },

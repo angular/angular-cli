@@ -9,7 +9,7 @@
 import lodash from 'lodash';
 import { readFile, writeFile } from 'node:fs/promises';
 import * as path from 'node:path';
-import { releasePackages } from './packages.mjs';
+import { releasePackages } from './packages.mts';
 
 const __dirname = import.meta.dirname;
 

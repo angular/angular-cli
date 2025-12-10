@@ -9,7 +9,7 @@
 import { statSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { packages } from './packages.mjs';
+import { packages } from './packages.mts';
 
 export const baseDir = '../';
 export const goldenFile = '../goldens/circular-deps/packages.json';

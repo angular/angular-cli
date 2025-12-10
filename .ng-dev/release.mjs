@@ -1,5 +1,5 @@
 import semver from 'semver';
-import { releasePackages } from '../scripts/packages.mjs';
+import { releasePackages } from '../scripts/packages.mts';
 
 /**
  * Configuration for the `ng-dev release` command.
@@ -12,14 +12,13 @@ export const release = {
   buildPackages: async () => {
     // The `performNpmReleaseBuild` function is loaded at runtime to avoid loading additional
     // files and dependencies unless a build is required.
-    const { performNpmReleaseBuild } = await import('../scripts/build-packages-dist.mjs');
+    const { performNpmReleaseBuild } = await import('../scripts/build-packages-dist.mts');
     return performNpmReleaseBuild();
   },
   prereleaseCheck: async (newVersionStr) => {
     const newVersion = new semver.SemVer(newVersionStr);
-    const { assertValidDependencyRanges } = await import(
-      '../scripts/release-checks/dependency-ranges/index.mjs'
-    );
+    const { assertValidDependencyRanges } =
+      await import('../scripts/release-checks/dependency-ranges/index.mts');
 
     await assertValidDependencyRanges(newVersion, releasePackages);
   },

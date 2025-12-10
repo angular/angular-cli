@@ -8,8 +8,8 @@
 
 import { Log, ReleasePrecheckError, bold } from '@angular/ng-dev';
 import semver from 'semver';
-import { checkSchematicsAngularLatestVersion } from './latest-versions-check.mjs';
-import { PackageJson, checkPeerDependencies } from './peer-deps-check.mjs';
+import { checkSchematicsAngularLatestVersion } from './latest-versions-check.mts';
+import { type PackageJson, checkPeerDependencies } from './peer-deps-check.mts';
 
 /** Environment variable that can be used to skip this pre-check. */
 const skipEnvVar = 'SKIP_DEPENDENCY_RANGE_PRECHECK';

@@ -3,6 +3,9 @@
   "compilerOptions": {
     "resolveJsonModule": true,
     "allowJs": true,
+    "rewriteRelativeImportExtensions": true,
+    "erasableSyntaxOnly": true,
+    "verbatimModuleSyntax": true,
     "module": "Node16",
     "moduleResolution": "Node16",
     "checkJs": true,
