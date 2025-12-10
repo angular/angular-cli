@@ -1,3 +1,25 @@
+<a name="21.0.3"></a>
+
+# 21.0.3 (2025-12-10)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                                   |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------------------- |
+| [5d85f416f](https://github.com/angular/angular-cli/commit/5d85f416f43b6bcd07b28ab920cb40c61a83ebdd) | fix  | conditionally provide Zone.js change detection in the built-in test main file |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                                                                                 |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------------------------------------------------- |
+| [778b4cffc](https://github.com/angular/angular-cli/commit/778b4cffc03e7c137940e3b8c89f290fd226cf17) | fix  | Add custom middleware for to present an Angular-tailored message                                            |
+| [9b02ab2ee](https://github.com/angular/angular-cli/commit/9b02ab2ee0a36aa6aafd94ea8059b48679845860) | fix  | Ensure disposal of close-javascript-transformer                                                             |
+| [0fc7d576e](https://github.com/angular/angular-cli/commit/0fc7d576e53f45601fdbeb95f4a853ebceae4fad) | fix  | ensure locale base href retains leading slash ([#32040](https://github.com/angular/angular-cli/pull/32040)) |
+| [b141670a2](https://github.com/angular/angular-cli/commit/b141670a2453dd0ea5fe6aa22ddae7175893d813) | fix  | inject testing polyfills in Karma unit-test executor                                                        |
+| [88c18ce68](https://github.com/angular/angular-cli/commit/88c18ce68585726652b88b10ce090039fbe1829f) | fix  | support NODE_EXTRA_CA_CERTS in SSR SSL plugin                                                               |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="21.1.0-next.1"></a>
 
 # 21.1.0-next.1 (2025-12-03)
