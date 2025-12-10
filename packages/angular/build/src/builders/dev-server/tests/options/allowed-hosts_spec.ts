@@ -10,6 +10,7 @@ import { executeDevServer } from '../../index';
 import { executeOnceAndGet } from '../execute-fetch';
 import { describeServeBuilder } from '../jasmine-helpers';
 import { BASE_OPTIONS, DEV_SERVER_BUILDER_INFO } from '../setup';
+import { text } from 'node:stream/consumers';
 
 const FETCH_HEADERS = Object.freeze({ Host: 'example.com' });
 
@@ -33,6 +34,7 @@ describeServeBuilder(executeDevServer, DEV_SERVER_BUILDER_INFO, (harness, setupT
 
       expect(result?.success).toBeTrue();
       expect(response?.statusCode).toBe(403);
+      expect(response && (await text(response))).toContain('angular.json');
     });
 
     it('does not allow an invalid host when option is an empty array', async () => {
@@ -47,6 +49,7 @@ describeServeBuilder(executeDevServer, DEV_SERVER_BUILDER_INFO, (harness, setupT
 
       expect(result?.success).toBeTrue();
       expect(response?.statusCode).toBe(403);
+      expect(response && (await text(response))).toContain('angular.json');
     });
 
     it('allows a host when specified in the option', async () => {
