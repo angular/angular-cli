@@ -588,11 +588,14 @@ export function createCompilerPlugin(
         logCumulativeDurations();
       });
 
-      build.onDispose(() => {
-        sharedTSCompilationState?.dispose();
-        void compilation.close?.();
-        void cacheStore?.close();
-      });
+      build.onDispose(
+        () =>
+          void Promise.all(
+            [compilation?.close?.(), cacheStore?.close(), javascriptTransformer.close()].filter(
+              Boolean,
+            ),
+          ).then(() => sharedTSCompilationState?.dispose()),
+      );
 
       /**
        * Checks if the file has side-effects when `advancedOptimizations` is enabled.
