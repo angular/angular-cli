@@ -81,7 +81,6 @@ pkg_tar(
     name = "npm_package_archive",
     srcs = [":npm_package"],
     extension = "tgz",
-    strip_prefix = "./npm_package",
     # should not be built unless it is a dependency of another rule
     tags = ["manual"],
 )
