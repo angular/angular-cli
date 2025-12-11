@@ -6,7 +6,6 @@
     "outDir": "<%= relativePathToWorkspaceRoot %>/out-tsc/lib",
     "declaration": true,
     "declarationMap": true,
-    "inlineSources": true,
     "types": []
   },
   "include": [
