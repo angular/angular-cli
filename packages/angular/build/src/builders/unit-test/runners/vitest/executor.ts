@@ -220,7 +220,7 @@ export class VitestExecutor implements TestExecutor {
         cache: cacheOptions.enabled ? undefined : false,
         testNamePattern: this.options.filter,
         watch,
-        ui,
+        ...(typeof ui === 'boolean' ? { ui } : {}),
         ...debugOptions,
       },
       {

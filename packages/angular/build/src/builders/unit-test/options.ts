@@ -119,7 +119,7 @@ export async function normalizeOptions(
     browserViewport: width && height ? { width, height } : undefined,
     watch,
     debug: options.debug ?? false,
-    ui: options.ui ?? false,
+    ui: process.env['CI'] ? false : ui,
     providersFile: options.providersFile && path.join(workspaceRoot, options.providersFile),
     setupFiles: options.setupFiles
       ? options.setupFiles.map((setupFile) => path.join(workspaceRoot, setupFile))
