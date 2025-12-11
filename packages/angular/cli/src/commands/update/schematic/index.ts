@@ -389,20 +389,6 @@ function _getUpdateMetadata(
     result.packageGroupName = metadata['packageGroupName'];
   }
 
-  if (metadata['requirements']) {
-    const requirements = metadata['requirements'];
-    // Verify that requirements are
-    if (
-      typeof requirements != 'object' ||
-      Array.isArray(requirements) ||
-      Object.keys(requirements).some((name) => typeof requirements[name] != 'string')
-    ) {
-      logger.warn(`requirements metadata of package ${packageJson.name} is malformed. Ignoring.`);
-    } else {
-      result.requirements = requirements;
-    }
-  }
-
   if (metadata['migrations']) {
     const migrations = metadata['migrations'];
     if (typeof migrations != 'string') {
