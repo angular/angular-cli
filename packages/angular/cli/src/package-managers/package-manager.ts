@@ -15,7 +15,7 @@
 import { join } from 'node:path';
 import npa from 'npm-package-arg';
 import { maxSatisfying } from 'semver';
-import { ErrorInfo, PackageManagerError } from './error';
+import { PackageManagerError } from './error';
 import { Host } from './host';
 import { Logger } from './logger';
 import { PackageManagerDescriptor } from './package-manager-descriptor';
@@ -407,11 +407,22 @@ export class PackageManager {
 
     const cacheKey = options.registry ? `${specifier}|${options.registry}` : specifier;
 
-    return this.#fetchAndParse(
+    const manifest = await this.#fetchAndParse(
       commandArgs,
       (stdout, logger) => this.descriptor.outputParsers.getRegistryManifest(stdout, logger),
       { ...options, cache: this.#manifestCache, cacheKey },
     );
+
+    // If the provided version was not a specific version, also cache the specific fetched version
+    if (manifest && manifest.version !== version) {
+      const manifestSpecifier = `${manifest.name}@${manifest.version}`;
+      const manifestCacheKey = options.registry
+        ? `${manifestSpecifier}|${options.registry}`
+        : manifestSpecifier;
+      this.#manifestCache.set(manifestCacheKey, manifest);
+    }
+
+    return manifest;
   }
 
   /**
