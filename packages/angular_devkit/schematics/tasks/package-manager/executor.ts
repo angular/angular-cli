@@ -39,6 +39,12 @@ const packageManagers: { [name: string]: PackageManagerProfile } = {
       installPackage: 'add',
     },
   },
+  'deno': {
+    commands: {
+      installAll: 'install',
+      installPackage: 'add',
+    },
+  },
   'pnpm': {
     commands: {
       installAll: 'install',
