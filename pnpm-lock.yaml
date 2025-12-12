@@ -571,16 +571,9 @@ importers:
       ansi-colors:
         specifier: 4.1.3
         version: 4.1.3
-      progress:
-        specifier: 2.0.3
-        version: 2.0.3
       yargs-parser:
         specifier: 22.0.0
         version: 22.0.0
-    devDependencies:
-      '@types/progress':
-        specifier: 2.0.7
-        version: 2.0.7
 
   packages/angular_devkit/build_angular:
     dependencies:
