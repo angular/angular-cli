@@ -117,7 +117,7 @@ jobs:
             //tests/legacy-cli:e2e.esbuild_node22 \
             --platforms=tools:windows_x64
       - name: Store built Windows E2E tests
-        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           name: win-e2e-build-artifacts
           path: |
@@ -141,7 +141,7 @@ jobs:
       - name: Install node modules
         run: pnpm install --frozen-lockfile
       - name: Download built Windows E2E tests
-        uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6.0.0
+        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
         with:
           name: win-e2e-build-artifacts
           path: dist/bin/tests/legacy-cli/
@@ -231,7 +231,7 @@ jobs:
           ./scripts/saucelabs/wait-for-tunnel.sh
           pnpm bazel test --config=saucelabs //tests/legacy-cli:e2e.saucelabs
           ./scripts/saucelabs/stop-tunnel.sh
-      - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         if: ${{ failure() }}
         with:
           name: sauce-connect-log
