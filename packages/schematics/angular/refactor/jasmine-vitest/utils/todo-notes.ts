@@ -39,7 +39,7 @@ export const TODO_NOTES = {
       'Please migrate this manually by checking the `mock.calls.length` of the individual spies.',
   },
   'toThrowMatching': {
-    message: (context: { name: string }) =>
+    message: (context: { name: string }): string =>
       `Unsupported matcher ".${context.name}()" found. Please migrate this manually.`,
     url: 'https://vitest.dev/api/expect.html#tothrowerror',
   },
@@ -49,7 +49,7 @@ export const TODO_NOTES = {
       'Please migrate this manually, for example by using `Promise.race` to check if the promise settles within a short timeout.',
   },
   'unsupported-expect-async-matcher': {
-    message: (context: { name: string }) =>
+    message: (context: { name: string }): string =>
       `Unsupported expectAsync matcher ".${context.name}()" found. Please migrate this manually.`,
   },
   'arrayWithExactContents-dynamic-variable': {
@@ -65,7 +65,7 @@ export const TODO_NOTES = {
       'expect().nothing() has been removed because it is redundant in Vitest. Tests without assertions pass by default.',
   },
   'unsupported-global-function': {
-    message: (context: { name: string }) =>
+    message: (context: { name: string }): string =>
       `Unsupported global function \`${context.name}\` found. This function is used for custom reporters in Jasmine ` +
       'and has no direct equivalent in Vitest.',
   },
@@ -89,7 +89,7 @@ export const TODO_NOTES = {
       ' Please manually assert the contents of the Set.',
   },
   'unknown-jasmine-property': {
-    message: (context: { name: string }) =>
+    message: (context: { name: string }): string =>
       `Unsupported jasmine property "${context.name}" found. Please migrate this manually.`,
   },
   'spyOnAllFunctions': {
@@ -114,7 +114,7 @@ export const TODO_NOTES = {
     url: 'https://vitest.dev/api/vi.html#vi-fn',
   },
   'unsupported-spy-strategy': {
-    message: (context: { name: string }) =>
+    message: (context: { name: string }): string =>
       `Unsupported spy strategy ".and.${context.name}()" found. Please migrate this manually.`,
     url: 'https://vitest.dev/api/mocked.html#mock',
   },

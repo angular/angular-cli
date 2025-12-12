@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { Rule, chain, strings } from '@angular-devkit/schematics';
+import { RuleFactory, chain, strings } from '@angular-devkit/schematics';
 import { addDeclarationToNgModule } from '../utility/add-declaration-to-ng-module';
 import { findModuleFromOptions } from '../utility/find-module';
 import { generateFromFiles } from '../utility/generate-from-files';
@@ -27,32 +27,36 @@ function buildSelector(options: DirectiveOptions, projectPrefix: string) {
   return strings.camelize(selector);
 }
 
-export default createProjectSchematic<DirectiveOptions>((options, { project, tree }) => {
-  if (options.path === undefined) {
-    options.path = buildDefaultPath(project);
-  }
+const directiveSchematic: RuleFactory<DirectiveOptions> = createProjectSchematic(
+  (options, { project, tree }) => {
+    if (options.path === undefined) {
+      options.path = buildDefaultPath(project);
+    }
 
-  options.module = findModuleFromOptions(tree, options);
-  const parsedPath = parseName(options.path, options.name);
-  options.name = parsedPath.name;
-  options.path = parsedPath.path;
-  options.selector = options.selector || buildSelector(options, project.prefix || '');
+    options.module = findModuleFromOptions(tree, options);
+    const parsedPath = parseName(options.path, options.name);
+    options.name = parsedPath.name;
+    options.path = parsedPath.path;
+    options.selector = options.selector || buildSelector(options, project.prefix || '');
 
-  validateHtmlSelector(options.selector);
-  const classifiedName =
-    strings.classify(options.name) +
-    (options.addTypeToClassName && options.type ? strings.classify(options.type) : '');
-  validateClassName(classifiedName);
+    validateHtmlSelector(options.selector);
+    const classifiedName =
+      strings.classify(options.name) +
+      (options.addTypeToClassName && options.type ? strings.classify(options.type) : '');
+    validateClassName(classifiedName);
 
-  return chain([
-    addDeclarationToNgModule({
-      type: 'directive',
+    return chain([
+      addDeclarationToNgModule({
+        type: 'directive',
 
-      ...options,
-    }),
-    generateFromFiles({
-      ...options,
-      classifiedName,
-    }),
-  ]);
-});
+        ...options,
+      }),
+      generateFromFiles({
+        ...options,
+        classifiedName,
+      }),
+    ]);
+  },
+);
+
+export default directiveSchematic;

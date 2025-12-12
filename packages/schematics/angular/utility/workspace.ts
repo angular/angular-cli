@@ -81,7 +81,7 @@ export function updateWorkspace(
  */
 export async function getWorkspace(
   tree: Tree,
-  path = DEFAULT_WORKSPACE_PATH,
+  path: string = DEFAULT_WORKSPACE_PATH,
 ): Promise<WorkspaceDefinition> {
   const host = new TreeWorkspaceHost(tree);
 

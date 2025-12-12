@@ -8,6 +8,7 @@
 
 import {
   type Rule,
+  RuleFactory,
   SchematicsException,
   apply,
   applyTemplates,
@@ -122,16 +123,20 @@ function managePostCssConfiguration(project: ProjectDefinition): Rule {
   };
 }
 
-export default createProjectSchematic<TailwindOptions>((options, { project }) => {
-  return chain([
-    addTailwindStyles(options, project),
-    managePostCssConfiguration(project),
-    ...TAILWIND_DEPENDENCIES.map((name) =>
-      addDependency(name, latestVersions[name], {
-        type: DependencyType.Dev,
-        existing: ExistingBehavior.Skip,
-        install: options.skipInstall ? InstallBehavior.None : InstallBehavior.Auto,
-      }),
-    ),
-  ]);
-});
+const tailwindSchematic: RuleFactory<TailwindOptions> = createProjectSchematic(
+  (options, { project }) => {
+    return chain([
+      addTailwindStyles(options, project),
+      managePostCssConfiguration(project),
+      ...TAILWIND_DEPENDENCIES.map((name) =>
+        addDependency(name, latestVersions[name], {
+          type: DependencyType.Dev,
+          existing: ExistingBehavior.Skip,
+          install: options.skipInstall ? InstallBehavior.None : InstallBehavior.Auto,
+        }),
+      ),
+    ]);
+  },
+);
+
+export default tailwindSchematic;

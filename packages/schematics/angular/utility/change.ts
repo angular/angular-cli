@@ -33,9 +33,9 @@ export interface Change {
  */
 export class NoopChange implements Change {
   description = 'No operation.';
-  order = Infinity;
+  order: number = Infinity;
   path = null;
-  apply() {
+  apply(): Promise<void> {
     return Promise.resolve();
   }
 }
@@ -62,7 +62,7 @@ export class InsertChange implements Change {
   /**
    * This method does not insert spaces if there is none in the original string.
    */
-  apply(host: Host) {
+  apply(host: Host): Promise<void> {
     return host.read(this.path).then((content) => {
       const prefix = content.substring(0, this.pos);
       const suffix = content.substring(this.pos);

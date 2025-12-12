@@ -137,7 +137,7 @@ function findImportLocalName(
  * @param path Path to the file that is being changed.
  * @param changes Changes that should be applied to the file.
  */
-export function applyChangesToFile(tree: Tree, path: string, changes: Change[]) {
+export function applyChangesToFile(tree: Tree, path: string, changes: Change[]): void {
   if (changes.length > 0) {
     const recorder = tree.beginUpdate(path);
     applyToUpdateRecorder(recorder, changes);

@@ -9,6 +9,7 @@
 import { JsonValue, Path, basename, dirname, join, normalize } from '@angular-devkit/core';
 import {
   Rule,
+  RuleFactory,
   SchematicsException,
   Tree,
   apply,
@@ -163,91 +164,97 @@ function addDependencies(skipInstall: boolean | undefined): Rule {
   };
 }
 
-export default createProjectSchematic<ServerOptions>(async (options, { project, tree }) => {
-  if (project?.extensions.projectType !== 'application') {
-    throw new SchematicsException(`Server schematic requires a project type of "application".`);
-  }
+const serverSchematic: RuleFactory<ServerOptions> = createProjectSchematic(
+  async (options, { project, tree }) => {
+    if (project?.extensions.projectType !== 'application') {
+      throw new SchematicsException(`Server schematic requires a project type of "application".`);
+    }
 
-  const clientBuildTarget = project.targets.get('build');
-  if (!clientBuildTarget) {
-    throw targetBuildNotFoundError();
-  }
+    const clientBuildTarget = project.targets.get('build');
+    if (!clientBuildTarget) {
+      throw targetBuildNotFoundError();
+    }
 
-  const usingApplicationBuilder = isUsingApplicationBuilder(project);
+    const usingApplicationBuilder = isUsingApplicationBuilder(project);
 
-  if (
-    project.targets.has('server') ||
-    (usingApplicationBuilder && clientBuildTarget.options?.server !== undefined)
-  ) {
-    // Server has already been added.
-    return noop();
-  }
+    if (
+      project.targets.has('server') ||
+      (usingApplicationBuilder && clientBuildTarget.options?.server !== undefined)
+    ) {
+      // Server has already been added.
+      return noop();
+    }
 
-  const clientBuildOptions = clientBuildTarget.options as Record<string, string>;
-  const browserEntryPoint = await getMainFilePath(tree, options.project);
-  const isStandalone = isStandaloneApp(tree, browserEntryPoint);
-  const sourceRoot = project.sourceRoot ?? join(normalize(project.root), 'src');
+    const clientBuildOptions = clientBuildTarget.options as Record<string, string>;
+    const browserEntryPoint = await getMainFilePath(tree, options.project);
+    const isStandalone = isStandaloneApp(tree, browserEntryPoint);
+    const sourceRoot = project.sourceRoot ?? join(normalize(project.root), 'src');
 
-  let filesUrl = `./files/${usingApplicationBuilder ? 'application-builder/' : 'server-builder/'}`;
-  filesUrl += isStandalone ? 'standalone-src' : 'ngmodule-src';
+    let filesUrl = `./files/${
+      usingApplicationBuilder ? 'application-builder/' : 'server-builder/'
+    }`;
+    filesUrl += isStandalone ? 'standalone-src' : 'ngmodule-src';
 
-  const { componentName, componentImportPathInSameFile, moduleName, moduleImportPathInSameFile } =
-    resolveBootstrappedComponentData(tree, browserEntryPoint) || {
-      componentName: 'App',
-      componentImportPathInSameFile: './app/app',
-      moduleName: 'AppModule',
-      moduleImportPathInSameFile: './app/app.module',
-    };
-  const templateSource = apply(url(filesUrl), [
-    applyTemplates({
-      ...strings,
-      ...options,
-      appComponentName: componentName,
-      appComponentPath: componentImportPathInSameFile,
-      appModuleName: moduleName,
-      appModulePath:
-        moduleImportPathInSameFile === null
-          ? null
-          : `./${posix.basename(moduleImportPathInSameFile)}`,
-    }),
-    move(sourceRoot),
-  ]);
+    const { componentName, componentImportPathInSameFile, moduleName, moduleImportPathInSameFile } =
+      resolveBootstrappedComponentData(tree, browserEntryPoint) || {
+        componentName: 'App',
+        componentImportPathInSameFile: './app/app',
+        moduleName: 'AppModule',
+        moduleImportPathInSameFile: './app/app.module',
+      };
+    const templateSource = apply(url(filesUrl), [
+      applyTemplates({
+        ...strings,
+        ...options,
+        appComponentName: componentName,
+        appComponentPath: componentImportPathInSameFile,
+        appModuleName: moduleName,
+        appModulePath:
+          moduleImportPathInSameFile === null
+            ? null
+            : `./${posix.basename(moduleImportPathInSameFile)}`,
+      }),
+      move(sourceRoot),
+    ]);
 
-  const clientTsConfig = normalize(clientBuildOptions.tsConfig);
-  const tsConfigExtends = basename(clientTsConfig);
-  const tsConfigDirectory = dirname(clientTsConfig);
+    const clientTsConfig = normalize(clientBuildOptions.tsConfig);
+    const tsConfigExtends = basename(clientTsConfig);
+    const tsConfigDirectory = dirname(clientTsConfig);
 
-  return chain([
-    mergeWith(templateSource),
-    ...(usingApplicationBuilder
-      ? [
-          updateConfigFileApplicationBuilder(options),
-          updateTsConfigFile(clientBuildOptions.tsConfig),
-        ]
-      : [
-          mergeWith(
-            apply(url('./files/server-builder/root'), [
-              applyTemplates({
-                ...strings,
-                ...options,
-                stripTsExtension: (s: string) => s.replace(/\.ts$/, ''),
-                tsConfigExtends,
-                hasLocalizePackage: !!getPackageJsonDependency(tree, '@angular/localize'),
-                relativePathToWorkspaceRoot: relativePathToWorkspaceRoot(tsConfigDirectory),
-              }),
-              move(tsConfigDirectory),
-            ]),
-          ),
-          updateConfigFileBrowserBuilder(options, tsConfigDirectory),
-        ]),
-    addDependencies(options.skipInstall),
-    addRootProvider(
-      options.project,
-      ({ code, external }) =>
-        code`${external('provideClientHydration', '@angular/platform-browser')}(${external(
-          'withEventReplay',
-          '@angular/platform-browser',
-        )}())`,
-    ),
-  ]);
-});
+    return chain([
+      mergeWith(templateSource),
+      ...(usingApplicationBuilder
+        ? [
+            updateConfigFileApplicationBuilder(options),
+            updateTsConfigFile(clientBuildOptions.tsConfig),
+          ]
+        : [
+            mergeWith(
+              apply(url('./files/server-builder/root'), [
+                applyTemplates({
+                  ...strings,
+                  ...options,
+                  stripTsExtension: (s: string) => s.replace(/\.ts$/, ''),
+                  tsConfigExtends,
+                  hasLocalizePackage: !!getPackageJsonDependency(tree, '@angular/localize'),
+                  relativePathToWorkspaceRoot: relativePathToWorkspaceRoot(tsConfigDirectory),
+                }),
+                move(tsConfigDirectory),
+              ]),
+            ),
+            updateConfigFileBrowserBuilder(options, tsConfigDirectory),
+          ]),
+      addDependencies(options.skipInstall),
+      addRootProvider(
+        options.project,
+        ({ code, external }) =>
+          code`${external('provideClientHydration', '@angular/platform-browser')}(${external(
+            'withEventReplay',
+            '@angular/platform-browser',
+          )}())`,
+      ),
+    ]);
+  },
+);
+
+export default serverSchematic;

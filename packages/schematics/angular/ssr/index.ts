@@ -9,6 +9,7 @@
 import { isJsonObject } from '@angular-devkit/core';
 import {
   Rule,
+  RuleFactory,
   SchematicContext,
   SchematicsException,
   Tree,
@@ -360,29 +361,33 @@ function addServerFile(
   };
 }
 
-export default createProjectSchematic<SSROptions>(async (options, { project, tree, context }) => {
-  const browserEntryPoint = await getMainFilePath(tree, options.project);
-  const isStandalone = isStandaloneApp(tree, browserEntryPoint);
+const ssrSchematic: RuleFactory<SSROptions> = createProjectSchematic(
+  async (options, { project, tree, context }) => {
+    const browserEntryPoint = await getMainFilePath(tree, options.project);
+    const isStandalone = isStandaloneApp(tree, browserEntryPoint);
 
-  const usingApplicationBuilder = isUsingApplicationBuilder(project);
-  const sourceRoot = project.sourceRoot ?? join(project.root, 'src');
+    const usingApplicationBuilder = isUsingApplicationBuilder(project);
+    const sourceRoot = project.sourceRoot ?? join(project.root, 'src');
 
-  return chain([
-    schematic('server', {
-      ...options,
-      skipInstall: true,
-    }),
-    ...(usingApplicationBuilder
-      ? [
-          updateApplicationBuilderWorkspaceConfigRule(sourceRoot, options, context),
-          updateApplicationBuilderTsConfigRule(options),
-        ]
-      : [
-          updateWebpackBuilderServerTsConfigRule(options),
-          updateWebpackBuilderWorkspaceConfigRule(sourceRoot, options),
-        ]),
-    addServerFile(sourceRoot, options, isStandalone),
-    addScriptsRule(options, usingApplicationBuilder),
-    addDependencies(options, usingApplicationBuilder),
-  ]);
-});
+    return chain([
+      schematic('server', {
+        ...options,
+        skipInstall: true,
+      }),
+      ...(usingApplicationBuilder
+        ? [
+            updateApplicationBuilderWorkspaceConfigRule(sourceRoot, options, context),
+            updateApplicationBuilderTsConfigRule(options),
+          ]
+        : [
+            updateWebpackBuilderServerTsConfigRule(options),
+            updateWebpackBuilderWorkspaceConfigRule(sourceRoot, options),
+          ]),
+      addServerFile(sourceRoot, options, isStandalone),
+      addScriptsRule(options, usingApplicationBuilder),
+      addDependencies(options, usingApplicationBuilder),
+    ]);
+  },
+);
+
+export default ssrSchematic;

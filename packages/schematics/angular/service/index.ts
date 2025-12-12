@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { Rule, strings } from '@angular-devkit/schematics';
+import { RuleFactory, strings } from '@angular-devkit/schematics';
 import { generateFromFiles } from '../utility/generate-from-files';
 import { parseName } from '../utility/parse-name';
 import { createProjectSchematic } from '../utility/project';
@@ -14,22 +14,26 @@ import { validateClassName } from '../utility/validation';
 import { buildDefaultPath } from '../utility/workspace';
 import { Schema as ServiceOptions } from './schema';
 
-export default createProjectSchematic<ServiceOptions>((options, { project, tree }) => {
-  if (options.path === undefined) {
-    options.path = buildDefaultPath(project);
-  }
+const serviceSchematic: RuleFactory<ServiceOptions> = createProjectSchematic(
+  (options, { project, tree }) => {
+    if (options.path === undefined) {
+      options.path = buildDefaultPath(project);
+    }
 
-  const parsedPath = parseName(options.path, options.name);
-  options.name = parsedPath.name;
-  options.path = parsedPath.path;
+    const parsedPath = parseName(options.path, options.name);
+    options.name = parsedPath.name;
+    options.path = parsedPath.path;
 
-  const classifiedName =
-    strings.classify(options.name) +
-    (options.addTypeToClassName && options.type ? strings.classify(options.type) : '');
-  validateClassName(classifiedName);
+    const classifiedName =
+      strings.classify(options.name) +
+      (options.addTypeToClassName && options.type ? strings.classify(options.type) : '');
+    validateClassName(classifiedName);
 
-  return generateFromFiles({
-    ...options,
-    classifiedName,
-  });
-});
+    return generateFromFiles({
+      ...options,
+      classifiedName,
+    });
+  },
+);
+
+export default serviceSchematic;

@@ -75,7 +75,10 @@ export class CodeBlock {
    * @param initialCode Code pending transformed.
    * @param filePath Path of the file in which the code will be inserted.
    */
-  static transformPendingCode(initialCode: PendingCode, filePath: string) {
+  static transformPendingCode(
+    initialCode: PendingCode,
+    filePath: string,
+  ): { code: PendingCode; rules: Rule[] } {
     const code = { ...initialCode };
     const rules: Rule[] = [];
 
