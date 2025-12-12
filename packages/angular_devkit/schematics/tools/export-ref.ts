@@ -26,13 +26,13 @@ export class ExportStringRef<T> {
     }
   }
 
-  get ref() {
+  get ref(): T | undefined {
     return this._ref;
   }
-  get module() {
+  get module(): string {
     return this._module;
   }
-  get path() {
+  get path(): string {
     return this._path;
   }
 }

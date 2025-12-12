@@ -25,7 +25,7 @@ import { BuiltinTaskExecutor } from '../tasks/node';
 import { NodeModulesTestEngineHost, validateOptionsWithSchema } from '../tools';
 
 export class UnitTestTree extends DelegateTree {
-  get files() {
+  get files(): string[] {
     const result: string[] = [];
     this.visit((path) => result.push(path));
 
@@ -74,7 +74,7 @@ export class SchematicTestRunner {
     this._collection = this._engine.createCollection(this._collectionName);
   }
 
-  get engine() {
+  get engine(): SchematicEngine<{}, {}> {
     return this._engine;
   }
   get logger(): logging.Logger {
@@ -84,7 +84,7 @@ export class SchematicTestRunner {
     return [...this._engineHost.tasks];
   }
 
-  registerCollection(collectionName: string, collectionPath: string) {
+  registerCollection(collectionName: string, collectionPath: string): void {
     this._engineHost.registerCollection(collectionName, collectionPath);
   }
 

@@ -119,7 +119,7 @@ export abstract class FileSystemEngineHostBase implements FileSystemEngineHost {
   private _contextTransforms: ContextTransform[] = [];
   private _taskFactories = new Map<string, () => Observable<TaskExecutor>>();
 
-  listSchematicNames(collection: FileSystemCollectionDesc, includeHidden?: boolean) {
+  listSchematicNames(collection: FileSystemCollectionDesc, includeHidden?: boolean): string[] {
     const schematics: string[] = [];
     for (const key of Object.keys(collection.schematics)) {
       const schematic = collection.schematics[key];
@@ -140,11 +140,13 @@ export abstract class FileSystemEngineHostBase implements FileSystemEngineHost {
     return schematics;
   }
 
-  registerOptionsTransform<T extends object | null, R extends object>(t: OptionTransform<T, R>) {
+  registerOptionsTransform<T extends object | null, R extends object>(
+    t: OptionTransform<T, R>,
+  ): void {
     this._transforms.push(t);
   }
 
-  registerContextTransform(t: ContextTransform) {
+  registerContextTransform(t: ContextTransform): void {
     this._contextTransforms.push(t);
   }
 

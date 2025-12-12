@@ -41,7 +41,7 @@ export class FallbackEngineHost implements EngineHost<{}, {}> {
 
   addHost<CollectionT extends object, SchematicT extends object>(
     host: EngineHost<CollectionT, SchematicT>,
-  ) {
+  ): void {
     this._hosts.push(host);
   }
 

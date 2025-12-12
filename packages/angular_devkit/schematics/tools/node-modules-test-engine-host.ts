@@ -18,15 +18,15 @@ export class NodeModulesTestEngineHost extends NodeModulesEngineHost {
   #collections = new Map<string, string>();
   #tasks: TaskConfiguration[] = [];
 
-  get tasks() {
+  get tasks(): TaskConfiguration[] {
     return this.#tasks;
   }
 
-  clearTasks() {
+  clearTasks(): void {
     this.#tasks = [];
   }
 
-  registerCollection(name: string, path: string) {
+  registerCollection(name: string, path: string): void {
     this.#collections.set(name, path);
   }
 

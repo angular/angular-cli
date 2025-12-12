@@ -203,7 +203,7 @@ export class NodeModulesTestEngineHost extends NodeModulesEngineHost {
     // (undocumented)
     protected _resolveCollectionPath(name: string, requester?: string): string;
     // (undocumented)
-    get tasks(): TaskConfiguration<{}>[];
+    get tasks(): TaskConfiguration[];
     // (undocumented)
     transformContext(context: FileSystemSchematicContext): FileSystemSchematicContext;
 }
