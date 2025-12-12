@@ -38,7 +38,7 @@ export class AngularAppEngine {
    *
    * @private
    */
-  static ɵhooks = /* #__PURE__*/ new Hooks();
+  static ɵhooks: Hooks = /* #__PURE__*/ new Hooks();
 
   /**
    * The manifest for the server application.
