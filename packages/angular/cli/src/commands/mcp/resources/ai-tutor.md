@@ -327,8 +327,9 @@ When teaching or generating code for Phase 5 (Signal Forms), you **must** strict
   - Use the `[field]` directive to bind a form control to an input.
   - **Correct Syntax**: `<input [field]="myForm.username">` (Note: `field` is lowercase here).
 - **Submission Logic**:
-  - Use the `submit()` utility function inside a standard click handler.
-  - **Syntax**: `submit(this.myForm, async () => { /* logic */ })`.
+  - Use the `submit()` utility function inside the form's `(submit)` event handler.
+  - **Syntax**: Add `(submit)="save($event)"` to the `<form>` element and use `submit(this.myForm, async () => { /* logic */ })` in the handler.
+  - The handler must call `event.preventDefault()` to prevent the default form submission behavior.
 - **Resetting Logic**:
   - To reset the form, you must perform two actions:
   1.  **Clear Interaction State**: Call `.reset()` on the form signal's value: `this.myForm().reset()`.
@@ -344,7 +345,7 @@ When teaching or generating code for Phase 5 (Signal Forms), you **must** strict
     ```html
     @if (myForm.email().invalid()) {
     <ul>
-      @for (error of myForm.email().errors(); track error) {
+      @for (error of myForm.email().errors(); track error.kind) {
       <li>{{ error.message }}</li>
       }
     </ul>
@@ -363,14 +364,14 @@ When teaching or generating code for Phase 5 (Signal Forms), you **must** strict
     standalone: true,
     imports: [Field],
     template: `
-      <form>
+      <form (submit)="save($event)">
         <label>
           Email
           <input [field]="loginForm.email" />
         </label>
         @if (loginForm.email().touched() && loginForm.email().invalid()) {
           <p class="error">
-            @for (error of loginForm.email().errors(); track $index) {
+            @for (error of loginForm.email().errors(); track error.kind) {
               <span>{{ error.message }}</span>
             }
           </p>
@@ -378,7 +379,7 @@ When teaching or generating code for Phase 5 (Signal Forms), you **must** strict
 
         <label>Password <input type="password" [field]="loginForm.password" /></label>
 
-        <button (click)="save($event)" [disabled]="loginForm().invalid()">Log In</button>
+        <button type="submit">Log In</button>
       </form>
     `,
   })
@@ -553,7 +554,6 @@ _(The LLM will need to interpret "project-specific" or "app-themed" below based 
 - **Module 20 (Validation in Signal Forms)**
   - **20a**: The component imports validator functions (e.g., `required`, `email`) from `@angular/forms/signals`. `description`: "importing functional validators."
   - **20b**: The `form()` definition uses a validation callback. `description`: "defining the validation schema."
-  - **20c**: The button uses `[disabled]` bound to `myForm.invalid()`. `description`: "disabling the button for invalid forms."
 - **Module 21 (Field State & Error Messages)**
   - **21a**: The template uses an `@if` block checking `field().invalid()` (e.g., `myForm.name().invalid()`). `description`: "checking field invalidity."
   - **21b**: Inside the check, an `@for` loop iterates over `field().errors()`. `description`: "iterating over validation errors."
@@ -804,20 +804,21 @@ touch src/app/mock-recipes.ts
 
   **Exercise**: Your goal is to create a new `AddRecipe` component that uses the modern `Signal Forms` API. Import `form` and `Field` from `@angular/forms/signals`. Create a form using the `form()` function that includes fields for `name`, `description`, and `authorEmail`. In your template, use the `[field]` binding to connect your inputs to these form controls.
 
-- **Module 19**: **Submitting & Resetting**: Concept: Handling form submission and resetting state. **Exercise**: Inject the service into your `AddRecipe` component. Create a protected `save()` method triggered by a "Save Recipe" button's `(click)` event. Inside this method:
-  1. Use the `submit(this.myForm, ...)` utility.
-  2. Update the `RecipeService` to include an `addRecipe(newRecipe: RecipeModel)` method.
-  3. Construct a complete `RecipeModel` (merging form values with defaults) and pass it to the service.
-  4. **Reset the form**: Call `this.myForm().reset()` to clear interaction flags.
-  5. **Clear the values**: Call `this.myModel.set(...)` to reset the inputs.
+- **Module 19**: **Submitting & Resetting**: Concept: Handling form submission and resetting state. **Exercise**: Inject the service into your `AddRecipe` component. Create a protected `save()` method triggered by the form's `(submit)` event. Inside this method:
+  1. Call `event.preventDefault()` to prevent the default form submission.
+  2. Use the `submit(this.myForm, ...)` utility.
+  3. Update the `RecipeService` to include an `addRecipe(newRecipe: RecipeModel)` method.
+  4. Construct a complete `RecipeModel` (merging form values with defaults) and pass it to the service.
+  5. **Reset the form**: Call `this.myForm().reset()` to clear interaction flags.
+  6. **Clear the values**: Call `this.myModel.set(...)` to reset the inputs.
 
 - **Module 20**: **Validation in Signal Forms**: Concept: Applying functional validators. **Exercise**: Import `required` and `email` from `@angular/forms/signals`. Modify your `form()` definition to add a validation callback enforcing:
   - `name`: Required (Message: 'Recipe name is required.').
   - `description`: Required (Message: 'Description is required.').
   - `authorEmail`: Required (Message: 'Author email is required.') AND Email format (Message: 'Please enter a valid email address.').
-    **Finally, bind the `[disabled]` property of your button to `myForm.invalid()` so users cannot submit invalid data.**
+    **Finally, ensure your submit button has `type="submit"`. Note: the `submit()` utility automatically handles validation by marking all fields as touched when submission is attempted.**
 
 - **Module 21**: **Field State & Error Messages**: Concept: Providing user feedback by accessing field state signals. **Exercise**: Improve the UX of your `AddRecipe` component by showing specific error messages when data is missing or incorrect. In your template, for the `name`, `description`, and `authorEmail` inputs:
   1. Create an `@if` block that checks if the field is `invalid()` (e.g., `myForm.name().invalid()`).
-  2. Inside the block, use `@for` to iterate over the field's `.errors()`.
+  2. Inside the block, use `@for` to iterate over the field's `.errors()` (use `track error.kind` to identify each error by its type).
   3. Display the `error.message` in a red text color or helper text style so the user knows exactly what to fix.
