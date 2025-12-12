@@ -48,7 +48,10 @@ export class FileSystemEngineHost extends FileSystemEngineHostBase {
     throw new CollectionCannotBeResolvedException(name);
   }
 
-  protected _resolveReferenceString(refString: string, parentPath: string) {
+  protected _resolveReferenceString(
+    refString: string,
+    parentPath: string,
+  ): { ref: RuleFactory<{}>; path: string } | null {
     // Use the same kind of export strings as NodeModule.
     const ref = new ExportStringRef<RuleFactory<{}>>(refString, parentPath);
     if (!ref.ref) {

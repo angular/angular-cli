@@ -106,7 +106,7 @@ export class NodeModulesEngineHost extends FileSystemEngineHostBase {
     refString: string,
     parentPath: string,
     collectionDescription?: FileSystemCollectionDesc,
-  ) {
+  ): { ref: RuleFactory<{}>; path: string } | null {
     const ref = new ExportStringRef<RuleFactory<{}>>(refString, parentPath);
     if (!ref.ref) {
       return null;
