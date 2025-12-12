@@ -7,7 +7,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { Architect, BuilderInfo, BuilderProgressState, Target } from '@angular-devkit/architect';
+import { Architect } from '@angular-devkit/architect';
 import { WorkspaceNodeModulesArchitectHost } from '@angular-devkit/architect/node';
 import { JsonValue, json, logging, schema, tags, workspaces } from '@angular-devkit/core';
 import { NodeJsSyncHost, createConsoleLogger } from '@angular-devkit/core/node';
@@ -15,7 +15,6 @@ import * as ansiColors from 'ansi-colors';
 import { existsSync } from 'node:fs';
 import * as path from 'node:path';
 import yargsParser, { camelCase, decamelize } from 'yargs-parser';
-import { MultiProgressBar } from '../src/progress';
 
 function findUp(names: string | string[], from: string) {
   if (!Array.isArray(names)) {
@@ -59,16 +58,6 @@ function usage(logger: logging.Logger, exitCode = 0): never {
   return process.exit(exitCode);
 }
 
-function _targetStringFromTarget({ project, target, configuration }: Target) {
-  return `${project}:${target}${configuration !== undefined ? ':' + configuration : ''}`;
-}
-
-interface BarInfo {
-  status?: string;
-  builder: BuilderInfo;
-  target?: Target;
-}
-
 // Create a separate instance to prevent unintended global changes to the color configuration
 const colors = ansiColors.create();
 
@@ -106,47 +95,6 @@ async function _executeTarget(
   }
 
   const run = await architect.scheduleTarget(targetSpec, camelCasedOptions, { logger });
-  const bars = new MultiProgressBar<number, BarInfo>(':name :bar (:current/:total) :status');
-
-  run.progress.subscribe((update) => {
-    const data = bars.get(update.id) || {
-      id: update.id,
-      builder: update.builder,
-      target: update.target,
-      status: update.status || '',
-      name: (
-        (update.target ? _targetStringFromTarget(update.target) : update.builder.name) +
-        ' '.repeat(80)
-      ).substring(0, 40),
-    };
-
-    if (update.status !== undefined) {
-      data.status = update.status;
-    }
-
-    switch (update.state) {
-      case BuilderProgressState.Error:
-        data.status = 'Error: ' + update.error;
-        bars.update(update.id, data);
-        break;
-
-      case BuilderProgressState.Stopped:
-        data.status = 'Done.';
-        bars.complete(update.id);
-        bars.update(update.id, data, update.total, update.total);
-        break;
-
-      case BuilderProgressState.Waiting:
-        bars.update(update.id, data);
-        break;
-
-      case BuilderProgressState.Running:
-        bars.update(update.id, data, update.current, update.total);
-        break;
-    }
-
-    bars.render();
-  });
 
   // Wait for full completion of the builder.
   try {
@@ -163,7 +111,6 @@ async function _executeTarget(
     logs.splice(0);
 
     await run.stop();
-    bars.terminate();
 
     return result.success ? 0 : 1;
   } catch (err) {
