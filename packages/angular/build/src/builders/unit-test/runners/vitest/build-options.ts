@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
+import { createRequire } from 'node:module';
 import path from 'node:path';
 import { toPosixPath } from '../../../../utils/path';
 import type { ApplicationBuilderInternalOptions } from '../../../application/options';
@@ -18,6 +19,7 @@ function createTestBedInitVirtualFile(
   providersFile: string | undefined,
   projectSourceRoot: string,
   polyfills: string[] = [],
+  sourcemapSupport: boolean = false,
 ): string {
   const usesZoneJS = polyfills.includes('zone.js');
   let providersImport = 'const providers = [];';
@@ -28,6 +30,18 @@ function createTestBedInitVirtualFile(
     providersImport = `import providers from './${importPath}';`;
   }
 
+  // Resolve and add sourcemap support (mainly for browsers)
+  let sourceMapSetup;
+  if (sourcemapSupport) {
+    const packageResolve = createRequire(__filename).resolve;
+    const sourceMapPath = packageResolve('source-map-support');
+
+    sourceMapSetup = `
+      import sourceMapSupport from '${sourceMapPath}';
+      sourceMapSupport.install();
+    `;
+  }
+
   return `
     // Initialize the Angular testing environment
     import { NgModule${usesZoneJS ? ', provideZoneChangeDetection' : ''} } from '@angular/core';
@@ -35,6 +49,7 @@ function createTestBedInitVirtualFile(
     import { BrowserTestingModule, platformBrowserTesting } from '@angular/platform-browser/testing';
     import { afterEach, beforeEach } from 'vitest';
     ${providersImport}
+    ${sourceMapSetup}
 
     // The beforeEach and afterEach hooks are registered outside the globalThis guard.
     // This ensures that the hooks are always applied, even in non-isolated browser environments.
@@ -98,8 +113,13 @@ export async function getVitestBuildOptions(
   });
   entryPoints.set('init-testbed', 'angular:test-bed-init');
 
+  const hasBrowsers = !!options.browsers?.length;
+
   // The 'vitest' package is always external for testing purposes
   const externalDependencies = ['vitest'];
+  if (hasBrowsers) {
+    externalDependencies.push('source-map');
+  }
   if (baseBuildOptions.externalDependencies) {
     externalDependencies.push(...baseBuildOptions.externalDependencies);
   }
@@ -134,6 +154,7 @@ export async function getVitestBuildOptions(
     providersFile,
     projectSourceRoot,
     buildOptions.polyfills,
+    hasBrowsers,
   );
 
   return {
