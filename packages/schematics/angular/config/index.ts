@@ -8,6 +8,7 @@
 
 import {
   Rule,
+  RuleFactory,
   SchematicsException,
   apply,
   applyTemplates,
@@ -24,18 +25,22 @@ import { updateWorkspace } from '../utility/workspace';
 import { Builders as AngularBuilder } from '../utility/workspace-models';
 import { Schema as ConfigOptions, Type as ConfigType } from './schema';
 
-export default createProjectSchematic<ConfigOptions>((options, { project }) => {
-  switch (options.type) {
-    case ConfigType.Karma:
-      return addKarmaConfig(options);
-    case ConfigType.Browserslist:
-      return addBrowserslistConfig(project.root);
-    case ConfigType.Vitest:
-      return addVitestConfig(options);
-    default:
-      throw new SchematicsException(`"${options.type}" is an unknown configuration file type.`);
-  }
-});
+const configSchematic: RuleFactory<ConfigOptions> = createProjectSchematic(
+  (options, { project }) => {
+    switch (options.type) {
+      case ConfigType.Karma:
+        return addKarmaConfig(options);
+      case ConfigType.Browserslist:
+        return addBrowserslistConfig(project.root);
+      case ConfigType.Vitest:
+        return addVitestConfig(options);
+      default:
+        throw new SchematicsException(`"${options.type}" is an unknown configuration file type.`);
+    }
+  },
+);
+
+export default configSchematic;
 
 function addVitestConfig(options: ConfigOptions): Rule {
   return (tree, context) =>

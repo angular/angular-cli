@@ -8,6 +8,7 @@
 
 import {
   Rule,
+  RuleFactory,
   SchematicContext,
   SchematicsException,
   Tree,
@@ -104,7 +105,7 @@ function getTsSourceFile(host: Tree, path: string): ts.SourceFile {
   return source;
 }
 
-export default createProjectSchematic<ServiceWorkerOptions>(
+const serviceWorkerSchematic: RuleFactory<ServiceWorkerOptions> = createProjectSchematic(
   async (options, { project, workspace, tree }) => {
     if (project.extensions.projectType !== 'application') {
       throw new SchematicsException(`Service worker requires a project type of "application".`);
@@ -150,6 +151,8 @@ export default createProjectSchematic<ServiceWorkerOptions>(
     ]);
   },
 );
+
+export default serviceWorkerSchematic;
 
 function addImport(host: Tree, filePath: string, symbolName: string, moduleName: string): void {
   const moduleSource = getTsSourceFile(host, filePath);

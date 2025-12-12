@@ -8,6 +8,7 @@
 
 import {
   Rule,
+  RuleFactory,
   SchematicContext,
   SchematicsException,
   Tree,
@@ -73,54 +74,58 @@ if (typeof Worker !== 'undefined') {
   };
 }
 
-export default createProjectSchematic<WebWorkerOptions>((options, { project }) => {
-  const projectType = project.extensions['projectType'];
-  if (projectType !== 'application') {
-    throw new SchematicsException(`Web Worker requires a project type of "application".`);
-  }
+const webWorkerSchematic: RuleFactory<WebWorkerOptions> = createProjectSchematic(
+  (options, { project }) => {
+    const projectType = project.extensions['projectType'];
+    if (projectType !== 'application') {
+      throw new SchematicsException(`Web Worker requires a project type of "application".`);
+    }
 
-  if (options.path === undefined) {
-    options.path = buildDefaultPath(project);
-  }
-  const parsedPath = parseName(options.path, options.name);
-  options.name = parsedPath.name;
-  options.path = parsedPath.path;
+    if (options.path === undefined) {
+      options.path = buildDefaultPath(project);
+    }
+    const parsedPath = parseName(options.path, options.name);
+    options.name = parsedPath.name;
+    options.path = parsedPath.path;
 
-  const templateSourceWorkerCode = apply(url('./files/worker'), [
-    applyTemplates({ ...options, ...strings }),
-    move(parsedPath.path),
-  ]);
+    const templateSourceWorkerCode = apply(url('./files/worker'), [
+      applyTemplates({ ...options, ...strings }),
+      move(parsedPath.path),
+    ]);
 
-  const root = project.root || '';
-  const templateSourceWorkerConfig = apply(url('./files/worker-tsconfig'), [
-    applyTemplates({
-      ...options,
-      relativePathToWorkspaceRoot: relativePathToWorkspaceRoot(root),
-    }),
-    move(root),
-  ]);
+    const root = project.root || '';
+    const templateSourceWorkerConfig = apply(url('./files/worker-tsconfig'), [
+      applyTemplates({
+        ...options,
+        relativePathToWorkspaceRoot: relativePathToWorkspaceRoot(root),
+      }),
+      move(root),
+    ]);
 
-  return chain([
-    // Add project configuration.
-    updateWorkspace((workspace) => {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      const project = workspace.projects.get(options.project)!;
-      const buildTarget = project.targets.get('build');
-      const testTarget = project.targets.get('test');
-      if (!buildTarget) {
-        throw new Error(`Build target is not defined for this project.`);
-      }
+    return chain([
+      // Add project configuration.
+      updateWorkspace((workspace) => {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        const project = workspace.projects.get(options.project)!;
+        const buildTarget = project.targets.get('build');
+        const testTarget = project.targets.get('test');
+        if (!buildTarget) {
+          throw new Error(`Build target is not defined for this project.`);
+        }
 
-      const workerConfigPath = join(root, 'tsconfig.worker.json');
-      (buildTarget.options ??= {}).webWorkerTsConfig ??= workerConfigPath;
-      if (testTarget) {
-        (testTarget.options ??= {}).webWorkerTsConfig ??= workerConfigPath;
-      }
-    }),
-    // Create the worker in a sibling module.
-    options.snippet ? addSnippet(options) : noop(),
-    // Add the worker.
-    mergeWith(templateSourceWorkerCode),
-    mergeWith(templateSourceWorkerConfig),
-  ]);
-});
+        const workerConfigPath = join(root, 'tsconfig.worker.json');
+        (buildTarget.options ??= {}).webWorkerTsConfig ??= workerConfigPath;
+        if (testTarget) {
+          (testTarget.options ??= {}).webWorkerTsConfig ??= workerConfigPath;
+        }
+      }),
+      // Create the worker in a sibling module.
+      options.snippet ? addSnippet(options) : noop(),
+      // Add the worker.
+      mergeWith(templateSourceWorkerCode),
+      mergeWith(templateSourceWorkerConfig),
+    ]);
+  },
+);
+
+export default webWorkerSchematic;

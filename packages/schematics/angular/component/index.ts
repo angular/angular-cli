@@ -8,7 +8,7 @@
 
 import {
   FileOperator,
-  Rule,
+  RuleFactory,
   apply,
   applyTemplates,
   chain,
@@ -40,60 +40,65 @@ function buildSelector(options: ComponentOptions, projectPrefix: string) {
   return selector;
 }
 
-export default createProjectSchematic<ComponentOptions>((options, { project, tree }) => {
-  if (options.path === undefined) {
-    options.path = buildDefaultPath(project);
-  }
+const componentSchematic: RuleFactory<ComponentOptions> = createProjectSchematic(
+  (options, { project, tree }) => {
+    if (options.path === undefined) {
+      options.path = buildDefaultPath(project);
+    }
 
-  options.module = findModuleFromOptions(tree, options);
-  // Schematic templates require a defined type value
-  options.type ??= '';
+    options.module = findModuleFromOptions(tree, options);
+    // Schematic templates require a defined type value
+    options.type ??= '';
 
-  const parsedPath = parseName(options.path, options.name);
-  options.name = parsedPath.name;
-  options.path = parsedPath.path;
-  options.selector = options.selector || buildSelector(options, (project && project.prefix) || '');
+    const parsedPath = parseName(options.path, options.name);
+    options.name = parsedPath.name;
+    options.path = parsedPath.path;
+    options.selector =
+      options.selector || buildSelector(options, (project && project.prefix) || '');
 
-  validateHtmlSelector(options.selector);
+    validateHtmlSelector(options.selector);
 
-  const classifiedName =
-    strings.classify(options.name) +
-    (options.addTypeToClassName && options.type ? strings.classify(options.type) : '');
-  validateClassName(classifiedName);
-  const zoneless = isZonelessApp(project);
+    const classifiedName =
+      strings.classify(options.name) +
+      (options.addTypeToClassName && options.type ? strings.classify(options.type) : '');
+    validateClassName(classifiedName);
+    const zoneless = isZonelessApp(project);
 
-  const skipStyleFile = options.inlineStyle || options.style === Style.None;
-  const templateSource = apply(url('./files'), [
-    options.skipTests ? filter((path) => !path.endsWith('.spec.ts.template')) : noop(),
-    skipStyleFile ? filter((path) => !path.endsWith('.__style__.template')) : noop(),
-    options.inlineTemplate ? filter((path) => !path.endsWith('.html.template')) : noop(),
-    applyTemplates({
-      ...strings,
-      'if-flat': (s: string) => (options.flat ? '' : s),
-      'ngext': options.ngHtml ? '.ng' : '',
-      ...options,
-      // Add a new variable for the classified name, conditionally including the type
-      classifiedName,
-      zoneless,
-    }),
-    !options.type
-      ? forEach(((file) => {
-          return file.path.includes('..')
-            ? {
-                content: file.content,
-                path: file.path.replace('..', '.'),
-              }
-            : file;
-        }) as FileOperator)
-      : noop(),
-    move(parsedPath.path),
-  ]);
+    const skipStyleFile = options.inlineStyle || options.style === Style.None;
+    const templateSource = apply(url('./files'), [
+      options.skipTests ? filter((path) => !path.endsWith('.spec.ts.template')) : noop(),
+      skipStyleFile ? filter((path) => !path.endsWith('.__style__.template')) : noop(),
+      options.inlineTemplate ? filter((path) => !path.endsWith('.html.template')) : noop(),
+      applyTemplates({
+        ...strings,
+        'if-flat': (s: string) => (options.flat ? '' : s),
+        'ngext': options.ngHtml ? '.ng' : '',
+        ...options,
+        // Add a new variable for the classified name, conditionally including the type
+        classifiedName,
+        zoneless,
+      }),
+      !options.type
+        ? forEach(((file) => {
+            return file.path.includes('..')
+              ? {
+                  content: file.content,
+                  path: file.path.replace('..', '.'),
+                }
+              : file;
+          }) as FileOperator)
+        : noop(),
+      move(parsedPath.path),
+    ]);
 
-  return chain([
-    addDeclarationToNgModule({
-      type: 'component',
-      ...options,
-    }),
-    mergeWith(templateSource),
-  ]);
-});
+    return chain([
+      addDeclarationToNgModule({
+        type: 'component',
+        ...options,
+      }),
+      mergeWith(templateSource),
+    ]);
+  },
+);
+
+export default componentSchematic;

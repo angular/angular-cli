@@ -6,7 +6,14 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { Rule, SchematicsException, Tree, chain, schematic } from '@angular-devkit/schematics';
+import {
+  Rule,
+  RuleFactory,
+  SchematicsException,
+  Tree,
+  chain,
+  schematic,
+} from '@angular-devkit/schematics';
 import { dirname, join } from 'node:path/posix';
 import ts from '../third_party/github.com/Microsoft/TypeScript/lib/typescript';
 import {
@@ -190,19 +197,23 @@ function addServerRoutingConfig(options: AppShellOptions, isStandalone: boolean)
   };
 }
 
-export default createProjectSchematic<AppShellOptions>(async (options, { tree }) => {
-  const browserEntryPoint = await getMainFilePath(tree, options.project);
-  const isStandalone = isStandaloneApp(tree, browserEntryPoint);
+const appShellSchematic: RuleFactory<AppShellOptions> = createProjectSchematic(
+  async (options, { tree }) => {
+    const browserEntryPoint = await getMainFilePath(tree, options.project);
+    const isStandalone = isStandaloneApp(tree, browserEntryPoint);
 
-  return chain([
-    validateProject(browserEntryPoint),
-    schematic('server', options),
-    addServerRoutingConfig(options, isStandalone),
-    schematic('component', {
-      name: 'app-shell',
-      module: 'app.module.server.ts',
-      project: options.project,
-      standalone: isStandalone,
-    }),
-  ]);
-});
+    return chain([
+      validateProject(browserEntryPoint),
+      schematic('server', options),
+      addServerRoutingConfig(options, isStandalone),
+      schematic('component', {
+        name: 'app-shell',
+        module: 'app.module.server.ts',
+        project: options.project,
+        standalone: isStandalone,
+      }),
+    ]);
+  },
+);
+
+export default appShellSchematic;
