@@ -9,12 +9,12 @@
 
 import { JsonValue, logging, schema } from '@angular-devkit/core';
 import { ProcessOutput, createConsoleLogger } from '@angular-devkit/core/node';
-import { UnsuccessfulWorkflowExecution } from '@angular-devkit/schematics';
+import { UnsuccessfulWorkflowExecution, strings } from '@angular-devkit/schematics';
 import { NodeWorkflow } from '@angular-devkit/schematics/tools';
 import ansiColors from 'ansi-colors';
 import { existsSync } from 'node:fs';
 import * as path from 'node:path';
-import yargsParser, { camelCase, decamelize } from 'yargs-parser';
+import { parseArgs } from 'node:util';
 
 /**
  * Parse the name of schematic passed in argument, and return a {collection, schematic} named
@@ -221,7 +221,7 @@ export async function main({
   stdout = process.stdout,
   stderr = process.stderr,
 }: MainOptions): Promise<0 | 1> {
-  const { cliOptions, schematicOptions, _ } = parseArgs(args);
+  const { cliOptions, schematicOptions, _ } = parseOptions(args);
 
   // Create a separate instance to prevent unintended global changes to the color configuration
   const colors = ansiColors.create();
@@ -249,10 +249,9 @@ export async function main({
   const isLocalCollection = collectionName.startsWith('.') || collectionName.startsWith('/');
 
   /** Gather the arguments for later use. */
-  const debugPresent = cliOptions.debug !== null;
-  const debug = debugPresent ? !!cliOptions.debug : isLocalCollection;
-  const dryRunPresent = cliOptions['dry-run'] !== null;
-  const dryRun = dryRunPresent ? !!cliOptions['dry-run'] : debug;
+  const debug = cliOptions.debug ?? isLocalCollection;
+  const dryRunPresent = cliOptions['dry-run'] != null;
+  const dryRun = cliOptions['dry-run'] ?? debug;
   const force = !!cliOptions.force;
   const allowPrivate = !!cliOptions['allow-private'];
 
@@ -446,69 +445,105 @@ Any additional option is passed to the Schematics depending on its schema.
 `;
 }
 
-/** Parse the command line. */
-const booleanArgs = [
-  'allow-private',
-  'debug',
-  'dry-run',
-  'force',
-  'help',
-  'list-schematics',
-  'verbose',
-  'interactive',
-] as const;
-
-type ElementType<T extends ReadonlyArray<unknown>> =
-  T extends ReadonlyArray<infer ElementType> ? ElementType : never;
+const CLI_OPTION_DEFINITIONS = {
+  'allow-private': { type: 'boolean' },
+  'debug': { type: 'boolean' },
+  'dry-run': { type: 'boolean' },
+  'force': { type: 'boolean' },
+  'help': { type: 'boolean' },
+  'list-schematics': { type: 'boolean' },
+  'verbose': { type: 'boolean' },
+  'interactive': { type: 'boolean', default: true },
+} as const;
 
 interface Options {
   _: string[];
   schematicOptions: Record<string, unknown>;
-  cliOptions: Partial<Record<ElementType<typeof booleanArgs>, boolean | null>>;
+  cliOptions: Partial<Record<keyof typeof CLI_OPTION_DEFINITIONS, boolean>>;
 }
 
 /** Parse the command line. */
-function parseArgs(args: string[]): Options {
-  const { _, ...options } = yargsParser(args, {
-    boolean: booleanArgs as unknown as string[],
-    default: {
-      'interactive': true,
-      'debug': null,
-      'dry-run': null,
-    },
-    configuration: {
-      'dot-notation': false,
-      'boolean-negation': true,
-      'strip-aliased': true,
-      'camel-case-expansion': false,
-    },
+function parseOptions(args: string[]): Options {
+  const { values, tokens } = parseArgs({
+    args,
+    strict: false,
+    tokens: true,
+    allowPositionals: true,
+    allowNegative: true,
+    options: CLI_OPTION_DEFINITIONS,
   });
 
-  // Camelize options as yargs will return the object in kebab-case when camel casing is disabled.
   const schematicOptions: Options['schematicOptions'] = {};
-  const cliOptions: Options['cliOptions'] = {};
+  const positionals: string[] = [];
 
-  const isCliOptions = (
-    key: ElementType<typeof booleanArgs> | string,
-  ): key is ElementType<typeof booleanArgs> =>
-    booleanArgs.includes(key as ElementType<typeof booleanArgs>);
+  for (let i = 0; i < tokens.length; i++) {
+    const token = tokens[i];
 
-  for (const [key, value] of Object.entries(options)) {
-    if (/[A-Z]/.test(key)) {
-      throw new Error(`Unknown argument ${key}. Did you mean ${decamelize(key)}?`);
+    if (token.kind === 'positional') {
+      positionals.push(token.value);
+      continue;
     }
 
-    if (isCliOptions(key)) {
-      cliOptions[key] = value;
+    if (token.kind !== 'option') {
+      continue;
+    }
+
+    const name = token.name;
+    let value: string | number | boolean = token.value ?? true;
+
+    // `parseArgs` already handled known boolean args and their --no- forms.
+    // Only process options not in CLI_OPTION_DEFINITIONS here.
+    if (name in CLI_OPTION_DEFINITIONS) {
+      continue;
+    }
+
+    if (/[A-Z]/.test(name)) {
+      throw new Error(
+        `Unknown argument ${name}. Did you mean ${strings.decamelize(name).replaceAll('_', '-')}?`,
+      );
+    }
+
+    // Handle --no-flag for unknown options, treating it as false
+    if (name.startsWith('no-')) {
+      const realName = name.slice(3);
+      schematicOptions[strings.camelize(realName)] = false;
+      continue;
+    }
+
+    // Handle value for unknown options
+    if (token.inlineValue === undefined) {
+      // Look ahead
+      const nextToken = tokens[i + 1];
+      if (nextToken?.kind === 'positional') {
+        value = nextToken.value;
+        i++; // Consume next token
+      } else {
+        value = true; // Treat as boolean if no value follows
+      }
+    }
+
+    // Type inference for numbers
+    if (typeof value === 'string' && !isNaN(Number(value))) {
+      value = Number(value);
+    }
+
+    const camelName = strings.camelize(name);
+    if (Object.prototype.hasOwnProperty.call(schematicOptions, camelName)) {
+      const existing = schematicOptions[camelName];
+      if (Array.isArray(existing)) {
+        existing.push(value);
+      } else {
+        schematicOptions[camelName] = [existing, value];
+      }
     } else {
-      schematicOptions[camelCase(key)] = value;
+      schematicOptions[camelName] = value;
     }
   }
 
   return {
-    _: _.map((v) => v.toString()),
+    _: positionals,
     schematicOptions,
-    cliOptions,
+    cliOptions: values as Options['cliOptions'],
   };
 }
 

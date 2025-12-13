@@ -846,9 +846,6 @@ importers:
       ansi-colors:
         specifier: 4.1.3
         version: 4.1.3
-      yargs-parser:
-        specifier: 22.0.0
-        version: 22.0.0
 
   packages/ngtools/webpack:
     devDependencies:
