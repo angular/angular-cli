@@ -8,6 +8,7 @@
 
 import { type BuilderContext, targetFromTargetString } from '@angular-devkit/architect';
 import { constants, promises as fs } from 'node:fs';
+import { createRequire } from 'node:module';
 import path from 'node:path';
 import { normalizeCacheOptions } from '../../utils/normalize-cache';
 import { getProjectRootPaths } from '../../utils/project-metadata';
@@ -135,6 +136,22 @@ export async function normalizeOptions(
   };
 }
 
-export function injectTestingPolyfills(polyfills: string[] = []): string[] {
-  return polyfills.includes('zone.js') ? [...polyfills, 'zone.js/testing'] : polyfills;
+export function injectTestingPolyfills(
+  configuredPolyfills: string[] = [],
+  sourcemapSupport: boolean = false,
+): string[] {
+  const updatedPolyfills = [...configuredPolyfills];
+
+  // Resolve and add sourcemap support (mainly for browsers)
+  if (sourcemapSupport) {
+    const packageResolve = createRequire(__filename).resolve;
+    updatedPolyfills.unshift(packageResolve('source-map-support/browser-source-map-support.js'));
+  }
+
+  // Add zone.js testing if zone.js is present
+  if (configuredPolyfills.includes('zone.js')) {
+    updatedPolyfills.push('zone.js/testing');
+  }
+
+  return updatedPolyfills;
 }

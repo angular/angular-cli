@@ -128,7 +128,10 @@ export async function getVitestBuildOptions(
     externalDependencies,
   };
 
-  buildOptions.polyfills = injectTestingPolyfills(buildOptions.polyfills);
+  buildOptions.polyfills = injectTestingPolyfills(
+    buildOptions.polyfills,
+    !!options.browsers?.length,
+  );
 
   const testBedInitContents = createTestBedInitVirtualFile(
     providersFile,
