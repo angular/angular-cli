@@ -28,6 +28,17 @@ import { promiseWithAbort } from './utils/promise';
 import { buildPathWithParams, joinUrlParts, stripLeadingSlash } from './utils/url';
 
 /**
+ * A set of well-known URLs that are not handled by Angular.
+ *
+ * These URLs are typically for static assets or endpoints that should
+ * bypass the Angular routing and rendering process.
+ */
+const WELL_KNOWN_NON_ANGULAR_URLS: ReadonlySet<string> = new Set<string>([
+  'favicon.ico',
+  '.well-known/appspecific/com.chrome.devtools.json',
+]);
+
+/**
  * Maximum number of critical CSS entries the cache can store.
  * This value determines the capacity of the LRU (Least Recently Used) cache, which stores critical CSS for pages.
  */
@@ -166,6 +177,10 @@ export class AngularServerApp {
    */
   async handle(request: Request, requestContext?: unknown): Promise<Response | null> {
     const url = new URL(request.url);
+    if (WELL_KNOWN_NON_ANGULAR_URLS.has(url.pathname)) {
+      return null;
+    }
+
     this.router ??= await ServerRouter.from(this.manifest, url);
     const matchedRoute = this.router.match(url);
 
