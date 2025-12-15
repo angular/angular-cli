@@ -833,9 +833,6 @@ importers:
       '@inquirer/prompts':
         specifier: 7.10.1
         version: 7.10.1(@types/node@24.10.2)
-      ansi-colors:
-        specifier: 4.1.3
-        version: 4.1.3
 
   packages/ngtools/webpack:
     devDependencies:
