@@ -568,9 +568,6 @@ importers:
       '@angular-devkit/core':
         specifier: workspace:0.0.0-PLACEHOLDER
         version: link:../core
-      ansi-colors:
-        specifier: 4.1.3
-        version: 4.1.3
       yargs-parser:
         specifier: 22.0.0
         version: 22.0.0

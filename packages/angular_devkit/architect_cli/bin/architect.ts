@@ -11,9 +11,9 @@ import { Architect } from '@angular-devkit/architect';
 import { WorkspaceNodeModulesArchitectHost } from '@angular-devkit/architect/node';
 import { JsonValue, json, logging, schema, tags, workspaces } from '@angular-devkit/core';
 import { NodeJsSyncHost, createConsoleLogger } from '@angular-devkit/core/node';
-import * as ansiColors from 'ansi-colors';
 import { existsSync } from 'node:fs';
 import * as path from 'node:path';
+import { styleText } from 'node:util';
 import yargsParser, { camelCase, decamelize } from 'yargs-parser';
 
 function findUp(names: string | string[], from: string) {
@@ -58,9 +58,6 @@ function usage(logger: logging.Logger, exitCode = 0): never {
   return process.exit(exitCode);
 }
 
-// Create a separate instance to prevent unintended global changes to the color configuration
-const colors = ansiColors.create();
-
 async function _executeTarget(
   parentLogger: logging.Logger,
   workspace: workspaces.WorkspaceDefinition,
@@ -100,9 +97,9 @@ async function _executeTarget(
   try {
     const result = await run.lastOutput;
     if (result.success) {
-      parentLogger.info(colors.green('SUCCESS'));
+      parentLogger.info(styleText(['green'], 'SUCCESS'));
     } else {
-      parentLogger.info(colors.red('FAILURE'));
+      parentLogger.info(styleText(['red'], 'FAILURE'));
     }
     parentLogger.info('Result: ' + JSON.stringify({ ...result, info: undefined }, null, 4));
 
@@ -114,7 +111,7 @@ async function _executeTarget(
 
     return result.success ? 0 : 1;
   } catch (err) {
-    parentLogger.info(colors.red('ERROR'));
+    parentLogger.info(styleText(['red'], 'ERROR'));
     parentLogger.info('\nLogs:');
     logs.forEach((l) => parentLogger.next(l));
 
@@ -141,9 +138,9 @@ async function main(args: string[]): Promise<number> {
   const logger = createConsoleLogger(argv['verbose'], process.stdout, process.stderr, {
     info: (s) => s,
     debug: (s) => s,
-    warn: (s) => colors.bold.yellow(s),
-    error: (s) => colors.bold.red(s),
-    fatal: (s) => colors.bold.red(s),
+    warn: (s) => styleText(['yellow', 'bold'], s),
+    error: (s) => styleText(['red', 'bold'], s),
+    fatal: (s) => styleText(['red', 'bold'], s),
   });
 
   // Check the target.
