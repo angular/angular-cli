@@ -43,7 +43,6 @@ import {
   normalizeOptimization,
   urlJoin,
 } from '../../utils';
-import { colors } from '../../utils/color';
 import { copyAssets } from '../../utils/copy-assets';
 import { assertIsError } from '../../utils/error';
 import { i18nInlineEmittedFiles } from '../../utils/i18n-inlining';
@@ -280,7 +279,7 @@ export function buildWebpackBrowser(
                       );
                       spinner.succeed('Copying assets complete.');
                     } catch (err) {
-                      spinner.fail(colors.redBright('Copying of assets failed.'));
+                      spinner.fail('Copying of assets failed.');
                       assertIsError(err);
 
                       return {
