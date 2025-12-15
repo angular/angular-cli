@@ -11,10 +11,9 @@ import { JsonValue, logging, schema } from '@angular-devkit/core';
 import { ProcessOutput, createConsoleLogger } from '@angular-devkit/core/node';
 import { UnsuccessfulWorkflowExecution, strings } from '@angular-devkit/schematics';
 import { NodeWorkflow } from '@angular-devkit/schematics/tools';
-import ansiColors from 'ansi-colors';
 import { existsSync } from 'node:fs';
 import * as path from 'node:path';
-import { parseArgs } from 'node:util';
+import { parseArgs, styleText } from 'node:util';
 
 /**
  * Parse the name of schematic passed in argument, and return a {collection, schematic} named
@@ -223,16 +222,13 @@ export async function main({
 }: MainOptions): Promise<0 | 1> {
   const { cliOptions, schematicOptions, _ } = parseOptions(args);
 
-  // Create a separate instance to prevent unintended global changes to the color configuration
-  const colors = ansiColors.create();
-
   /** Create the DevKit Logger used through the CLI. */
   const logger = createConsoleLogger(!!cliOptions.verbose, stdout, stderr, {
     info: (s) => s,
     debug: (s) => s,
-    warn: (s) => colors.bold.yellow(s),
-    error: (s) => colors.bold.red(s),
-    fatal: (s) => colors.bold.red(s),
+    warn: (s) => styleText(['bold', 'yellow'], s),
+    error: (s) => styleText(['bold', 'red'], s),
+    fatal: (s) => styleText(['bold', 'red'], s),
   });
 
   if (cliOptions.help) {
@@ -315,21 +311,21 @@ export async function main({
       case 'update':
         loggingQueue.push(
           // TODO: `as unknown` was necessary during TS 5.9 update. Figure out a long-term solution.
-          `${colors.cyan('UPDATE')} ${eventPath} (${(event.content as unknown as Buffer).length} bytes)`,
+          `${styleText(['cyan'], 'UPDATE')} ${eventPath} (${(event.content as unknown as Buffer).length} bytes)`,
         );
         break;
       case 'create':
         loggingQueue.push(
           // TODO: `as unknown` was necessary during TS 5.9 update. Figure out a long-term solution.
-          `${colors.green('CREATE')} ${eventPath} (${(event.content as unknown as Buffer).length} bytes)`,
+          `${styleText(['green'], 'CREATE')} ${eventPath} (${(event.content as unknown as Buffer).length} bytes)`,
         );
         break;
       case 'delete':
-        loggingQueue.push(`${colors.yellow('DELETE')} ${eventPath}`);
+        loggingQueue.push(`${styleText(['yellow'], 'DELETE')} ${eventPath}`);
         break;
       case 'rename':
         loggingQueue.push(
-          `${colors.blue('RENAME')} ${eventPath} => ${removeLeadingSlash(event.to)}`,
+          `${styleText(['blue'], 'RENAME')} ${eventPath} => ${removeLeadingSlash(event.to)}`,
         );
         break;
     }
