@@ -17,6 +17,7 @@ import {
   createAngularSsrExternalMiddleware,
   createAngularSsrInternalMiddleware,
   createChromeDevtoolsMiddleware,
+  patchBaseMiddleware,
   patchHostValidationMiddleware,
 } from '../middlewares';
 import { AngularMemoryOutputFiles, AngularOutputAssets } from '../utils';
@@ -87,10 +88,12 @@ export function createAngularSetupMiddlewaresPlugin(
         resetComponentUpdates,
       } = options;
 
+      const middlewares = server.middlewares;
+
       // Headers, assets and resources get handled first
-      server.middlewares.use(createAngularHeadersMiddleware(server));
-      server.middlewares.use(createAngularComponentMiddleware(server, templateUpdates));
-      server.middlewares.use(
+      middlewares.use(createAngularHeadersMiddleware(server));
+      middlewares.use(createAngularComponentMiddleware(server, templateUpdates));
+      middlewares.use(
         createAngularAssetsMiddleware(
           server,
           assets,
@@ -100,11 +103,9 @@ export function createAngularSetupMiddlewaresPlugin(
         ),
       );
 
-      server.middlewares.use(
-        createChromeDevtoolsMiddleware(server.config.cacheDir, options.projectRoot),
-      );
+      middlewares.use(createChromeDevtoolsMiddleware(server.config.cacheDir, options.projectRoot));
 
-      extensionMiddleware?.forEach((middleware) => server.middlewares.use(middleware));
+      extensionMiddleware?.forEach((middleware) => middlewares.use(middleware));
 
       // Returning a function, installs middleware after the main transform middleware but
       // before the built-in HTML middleware
@@ -113,19 +114,18 @@ export function createAngularSetupMiddlewaresPlugin(
         patchHostValidationMiddleware(server.middlewares);
 
         if (ssrMode === ServerSsrMode.ExternalSsrMiddleware) {
-          server.middlewares.use(
-            await createAngularSsrExternalMiddleware(server, indexHtmlTransformer),
-          );
+          patchBaseMiddleware(server.middlewares, server.config.base);
+          middlewares.use(await createAngularSsrExternalMiddleware(server, indexHtmlTransformer));
 
           return;
         }
 
         if (ssrMode === ServerSsrMode.InternalSsrMiddleware) {
-          server.middlewares.use(createAngularSsrInternalMiddleware(server, indexHtmlTransformer));
+          middlewares.use(createAngularSsrInternalMiddleware(server, indexHtmlTransformer));
         }
 
-        server.middlewares.use(angularHtmlFallbackMiddleware);
-        server.middlewares.use(
+        middlewares.use(angularHtmlFallbackMiddleware);
+        middlewares.use(
           createAngularIndexHtmlMiddleware(
             server,
             outputFiles,
