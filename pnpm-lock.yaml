@@ -568,9 +568,6 @@ importers:
       '@angular-devkit/core':
         specifier: workspace:0.0.0-PLACEHOLDER
         version: link:../core
-      yargs-parser:
-        specifier: 22.0.0
-        version: 22.0.0
 
   packages/angular_devkit/build_angular:
     dependencies:

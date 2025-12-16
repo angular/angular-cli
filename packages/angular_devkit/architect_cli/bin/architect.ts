@@ -9,12 +9,11 @@
 
 import { Architect } from '@angular-devkit/architect';
 import { WorkspaceNodeModulesArchitectHost } from '@angular-devkit/architect/node';
-import { JsonValue, json, logging, schema, tags, workspaces } from '@angular-devkit/core';
+import { JsonValue, json, logging, schema, strings, tags, workspaces } from '@angular-devkit/core';
 import { NodeJsSyncHost, createConsoleLogger } from '@angular-devkit/core/node';
 import { existsSync } from 'node:fs';
 import * as path from 'node:path';
-import { styleText } from 'node:util';
-import yargsParser, { camelCase, decamelize } from 'yargs-parser';
+import { parseArgs, styleText } from 'node:util';
 
 function findUp(names: string | string[], from: string) {
   if (!Array.isArray(names)) {
@@ -62,36 +61,22 @@ async function _executeTarget(
   parentLogger: logging.Logger,
   workspace: workspaces.WorkspaceDefinition,
   root: string,
-  argv: ReturnType<typeof yargsParser>,
+  targetStr: string,
+  options: json.JsonObject,
   registry: schema.SchemaRegistry,
 ) {
   const architectHost = new WorkspaceNodeModulesArchitectHost(workspace, root);
   const architect = new Architect(architectHost, registry);
 
   // Split a target into its parts.
-  const {
-    _: [targetStr = ''],
-    help,
-    ...options
-  } = argv;
-  const [project, target, configuration] = targetStr.toString().split(':');
+  const [project, target, configuration] = targetStr.split(':');
   const targetSpec = { project, target, configuration };
 
   const logger = new logging.Logger('jobs');
   const logs: logging.LogEntry[] = [];
   logger.subscribe((entry) => logs.push({ ...entry, message: `${entry.name}: ` + entry.message }));
 
-  // Camelize options as yargs will return the object in kebab-case when camel casing is disabled.
-  const camelCasedOptions: json.JsonObject = {};
-  for (const [key, value] of Object.entries(options)) {
-    if (/[A-Z]/.test(key)) {
-      throw new Error(`Unknown argument ${key}. Did you mean ${decamelize(key)}?`);
-    }
-
-    camelCasedOptions[camelCase(key)] = value as JsonValue;
-  }
-
-  const run = await architect.scheduleTarget(targetSpec, camelCasedOptions, { logger });
+  const run = await architect.scheduleTarget(targetSpec, options, { logger });
 
   // Wait for full completion of the builder.
   try {
@@ -122,20 +107,108 @@ async function _executeTarget(
   }
 }
 
-async function main(args: string[]): Promise<number> {
-  /** Parse the command line. */
-  const argv = yargsParser(args, {
-    boolean: ['help'],
-    configuration: {
-      'dot-notation': false,
-      'boolean-negation': true,
-      'strip-aliased': true,
-      'camel-case-expansion': false,
-    },
+const CLI_OPTION_DEFINITIONS = {
+  'help': { type: 'boolean' },
+  'verbose': { type: 'boolean' },
+} as const;
+
+interface Options {
+  positionals: string[];
+  builderOptions: json.JsonObject;
+  cliOptions: Partial<Record<keyof typeof CLI_OPTION_DEFINITIONS, boolean>>;
+}
+
+/** Parse the command line. */
+function parseOptions(args: string[]): Options {
+  const { values, tokens } = parseArgs({
+    args,
+    strict: false,
+    tokens: true,
+    allowPositionals: true,
+    allowNegative: true,
+    options: CLI_OPTION_DEFINITIONS,
   });
 
+  const builderOptions: json.JsonObject = {};
+  const positionals: string[] = [];
+
+  for (let i = 0; i < tokens.length; i++) {
+    const token = tokens[i];
+
+    if (token.kind === 'positional') {
+      positionals.push(token.value);
+      continue;
+    }
+
+    if (token.kind !== 'option') {
+      continue;
+    }
+
+    const name = token.name;
+    let value: JsonValue = token.value ?? true;
+
+    // `parseArgs` already handled known boolean args and their --no- forms.
+    // Only process options not in CLI_OPTION_DEFINITIONS here.
+    if (name in CLI_OPTION_DEFINITIONS) {
+      continue;
+    }
+
+    if (/[A-Z]/.test(name)) {
+      throw new Error(
+        `Unknown argument ${name}. Did you mean ${strings.decamelize(name).replaceAll('_', '-')}?`,
+      );
+    }
+
+    // Handle --no-flag for unknown options, treating it as false
+    if (name.startsWith('no-')) {
+      const realName = name.slice(3);
+      builderOptions[strings.camelize(realName)] = false;
+      continue;
+    }
+
+    // Handle value for unknown options
+    if (token.inlineValue === undefined) {
+      // Look ahead
+      const nextToken = tokens[i + 1];
+      if (nextToken?.kind === 'positional') {
+        value = nextToken.value;
+        i++; // Consume next token
+      } else {
+        value = true; // Treat as boolean if no value follows
+      }
+    }
+
+    // Type inference for numbers
+    if (typeof value === 'string' && !isNaN(Number(value))) {
+      value = Number(value);
+    }
+
+    const camelName = strings.camelize(name);
+    if (Object.prototype.hasOwnProperty.call(builderOptions, camelName)) {
+      const existing = builderOptions[camelName];
+      if (Array.isArray(existing)) {
+        existing.push(value);
+      } else {
+        builderOptions[camelName] = [existing, value] as JsonValue;
+      }
+    } else {
+      builderOptions[camelName] = value;
+    }
+  }
+
+  return {
+    positionals,
+    builderOptions,
+    cliOptions: values as Options['cliOptions'],
+  };
+}
+
+async function main(args: string[]): Promise<number> {
+  /** Parse the command line. */
+  const { positionals, cliOptions, builderOptions } = parseOptions(args);
+
   /** Create the DevKit Logger used through the CLI. */
-  const logger = createConsoleLogger(argv['verbose'], process.stdout, process.stderr, {
+  const logger = createConsoleLogger(!!cliOptions['verbose'], process.stdout, process.stderr, {
     info: (s) => s,
     debug: (s) => s,
     warn: (s) => styleText(['yellow', 'bold'], s),
@@ -144,8 +217,8 @@ async function main(args: string[]): Promise<number> {
   });
 
   // Check the target.
-  const targetStr = argv._[0] || '';
-  if (!targetStr || argv.help) {
+  const targetStr = positionals[0];
+  if (!targetStr || cliOptions.help) {
     // Show architect usage if there's no target.
     usage(logger);
   }
@@ -181,7 +254,7 @@ async function main(args: string[]): Promise<number> {
   // Clear the console.
   process.stdout.write('\u001Bc');
 
-  return await _executeTarget(logger, workspace, root, argv, registry);
+  return await _executeTarget(logger, workspace, root, targetStr, builderOptions, registry);
 }
 
 main(process.argv.slice(2)).then(
