@@ -89,6 +89,7 @@ def e2e_suites(name, runner, data):
 
         # Package manager subsets
         _e2e_suite(name, runner, "bun", data, toolchain_name, toolchain)
+        _e2e_suite(name, runner, "deno", data, toolchain_name, toolchain)
         _e2e_suite(name, runner, "pnpm", data, toolchain_name, toolchain)
         _e2e_suite(name, runner, "yarn", data, toolchain_name, toolchain)
 
@@ -143,7 +144,7 @@ def _e2e_tests(name, runner, toolchain, **kwargs):
 
 def _e2e_suite(name, runner, type, data, toolchain_name = "", toolchain = None):
     """
-    Setup a predefined test suite (yarn|pnpm|bun|esbuild|saucelabs|npm).
+    Setup a predefined test suite (yarn|pnpm|bun|deno|esbuild|saucelabs|npm).
     """
     args = []
     tests = None
@@ -152,7 +153,7 @@ def _e2e_suite(name, runner, type, data, toolchain_name = "", toolchain = None):
     if toolchain_name:
         toolchain_name = "_" + toolchain_name
 
-    if type == "yarn" or type == "bun" or type == "pnpm":
+    if type == "yarn" or type == "bun" or type == "deno" or type == "pnpm":
         args.append("--package-manager=%s" % type)
         args.append("--esbuild")
         tests = PACKAGE_MANAGER_SUBSET_TESTS

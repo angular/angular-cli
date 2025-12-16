@@ -18,7 +18,7 @@ import {
 } from '@angular-devkit/schematics';
 import { execSync } from 'node:child_process';
 import { latestVersions } from '../utility/latest-versions';
-import { Schema as WorkspaceOptions } from './schema';
+import { PackageManager, Schema as WorkspaceOptions } from './schema';
 
 export default function (options: WorkspaceOptions): Rule {
   return () => {
@@ -28,7 +28,9 @@ export default function (options: WorkspaceOptions): Rule {
     if (packageManager) {
       let packageManagerVersion: string | undefined;
       try {
-        packageManagerVersion = execSync(`${packageManager} --version`, {
+        const isDeno = packageManager === PackageManager.Deno;
+        const versionArg = isDeno ? '-v' : '--version';
+        packageManagerVersion = execSync(`${packageManager} ${versionArg}`, {
           encoding: 'utf8',
           stdio: 'pipe',
           env: {
@@ -38,6 +40,11 @@ export default function (options: WorkspaceOptions): Rule {
             NPM_CONFIG_UPDATE_NOTIFIER: 'false',
           },
         }).trim();
+
+        if (isDeno) {
+          // Deno CLI outputs "deno 2.5.6"
+          packageManagerVersion = packageManagerVersion.replace('deno ', '');
+        }
       } catch {}
 
       if (packageManagerVersion) {

@@ -29,3 +29,9 @@ pnpm create @angular [project-name] [...options]
 ```
 bun create @angular [project-name] [...options]
 ```
+
+### deno
+
+```
+deno init --npm @angular [project-name] [...options]
+```

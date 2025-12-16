@@ -23,6 +23,7 @@ const LOCKFILE_NAMES: Readonly<Record<PackageManager, string | readonly string[]
   [PackageManager.Pnpm]: 'pnpm-lock.yaml',
   [PackageManager.Bun]: ['bun.lockb', 'bun.lock'],
   [PackageManager.Npm]: 'package-lock.json',
+  [PackageManager.Deno]: 'deno.lock',
 };
 
 interface PackageManagerOptions {
@@ -166,6 +167,14 @@ export class PackageManagerUtils {
           prefix: '--cwd',
           noLockfile: '--no-save',
         };
+      case PackageManager.Deno:
+        return {
+          saveDev: '--dev',
+          install: 'add',
+          installAll: 'install',
+          prefix: '--root',
+          noLockfile: '--no-lock',
+        };
       default:
         return {
           saveDev: '--save-dev',
@@ -212,7 +221,9 @@ export class PackageManagerUtils {
   @memoize
   private getVersion(name: PackageManager): string | undefined {
     try {
-      return execSync(`${name} --version`, {
+      const isDeno = name === PackageManager.Deno;
+      const versionArg = isDeno ? '-v' : '--version';
+      const version = execSync(`${name} ${versionArg}`, {
         encoding: 'utf8',
         stdio: ['ignore', 'pipe', 'ignore'],
         env: {
@@ -222,6 +233,9 @@ export class PackageManagerUtils {
           NPM_CONFIG_UPDATE_NOTIFIER: 'false',
         },
       }).trim();
+
+      // Deno CLI outputs "deno 2.5.6"
+      return isDeno ? version.replace('deno ', '') : version;
     } catch {
       return undefined;
     }
@@ -239,6 +253,7 @@ export class PackageManagerUtils {
     const hasYarnLock = this.hasLockfile(PackageManager.Yarn, filesInRoot);
     const hasPnpmLock = this.hasLockfile(PackageManager.Pnpm, filesInRoot);
     const hasBunLock = this.hasLockfile(PackageManager.Bun, filesInRoot);
+    const hasDenoLock = this.hasLockfile(PackageManager.Deno, filesInRoot);
 
     // PERF NOTE: `this.getVersion` spawns the package a the child_process which can take around ~300ms at times.
     // Therefore, we should only call this method when needed. IE: don't call `this.getVersion(PackageManager.Pnpm)` unless truly needed.
@@ -246,7 +261,13 @@ export class PackageManagerUtils {
 
     if (hasNpmLock) {
       // Has NPM lock file.
-      if (!hasYarnLock && !hasPnpmLock && !hasBunLock && this.getVersion(PackageManager.Npm)) {
+      if (
+        !hasYarnLock &&
+        !hasPnpmLock &&
+        !hasBunLock &&
+        !hasDenoLock &&
+        this.getVersion(PackageManager.Npm)
+      ) {
         // Only NPM lock file and NPM binary is available.
         return PackageManager.Npm;
       }
@@ -261,6 +282,9 @@ export class PackageManagerUtils {
       } else if (hasBunLock && this.getVersion(PackageManager.Bun)) {
         // Bun lock file and Bun binary is available.
         return PackageManager.Bun;
+      } else if (hasDenoLock && this.getVersion(PackageManager.Deno)) {
+        // Deno lock file and Deno binary is available.
+        return PackageManager.Deno;
       }
     }
 
@@ -269,13 +293,16 @@ export class PackageManagerUtils {
       const hasYarn = !!this.getVersion(PackageManager.Yarn);
       const hasPnpm = !!this.getVersion(PackageManager.Pnpm);
       const hasBun = !!this.getVersion(PackageManager.Bun);
+      const hasDeno = !!this.getVersion(PackageManager.Deno);
 
-      if (hasYarn && !hasPnpm && !hasBun) {
+      if (hasYarn && !hasPnpm && !hasBun && !hasDeno) {
         return PackageManager.Yarn;
-      } else if (hasPnpm && !hasYarn && !hasBun) {
+      } else if (hasPnpm && !hasYarn && !hasBun && !hasDeno) {
         return PackageManager.Pnpm;
-      } else if (hasBun && !hasYarn && !hasPnpm) {
+      } else if (hasBun && !hasYarn && !hasPnpm && !hasDeno) {
         return PackageManager.Bun;
+      } else if (hasDeno && !hasYarn && !hasPnpm && !hasBun) {
+        return PackageManager.Deno;
       }
     }
 
