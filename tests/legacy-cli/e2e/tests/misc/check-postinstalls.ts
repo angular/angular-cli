@@ -8,6 +8,7 @@ const CURRENT_SCRIPT_PACKAGES: ReadonlySet<string> = new Set([
   'msgpackr-extract (install)',
   'nice-napi (install)',
   'unrs-resolver (postinstall)',
+  'less (postinstall)',
 ]);
 
 const POTENTIAL_SCRIPTS: ReadonlyArray<string> = ['preinstall', 'install', 'postinstall'];
