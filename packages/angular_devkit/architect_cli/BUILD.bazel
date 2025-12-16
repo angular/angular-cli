@@ -19,9 +19,7 @@ ts_project(
     deps = [
         ":node_modules/@angular-devkit/architect",
         ":node_modules/@angular-devkit/core",
-        ":node_modules/yargs-parser",
         "//:node_modules/@types/node",
-        "//:node_modules/@types/yargs-parser",
     ],
 )
 

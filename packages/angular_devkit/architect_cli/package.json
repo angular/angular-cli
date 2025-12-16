@@ -15,7 +15,6 @@
   ],
   "dependencies": {
     "@angular-devkit/architect": "workspace:0.0.0-EXPERIMENTAL-PLACEHOLDER",
-    "@angular-devkit/core": "workspace:0.0.0-PLACEHOLDER",
-    "yargs-parser": "22.0.0"
+    "@angular-devkit/core": "workspace:0.0.0-PLACEHOLDER"
   }
 }
