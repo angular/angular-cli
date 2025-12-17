@@ -15,6 +15,7 @@ ts_project(
         "//:node_modules/@types/semver",
         "//:node_modules/fast-glob",
         "//:node_modules/protractor",
+        "//:node_modules/puppeteer",
         "//:node_modules/semver",
         "//:node_modules/verdaccio",
         "//:node_modules/verdaccio-auth-memory",

@@ -1,6 +1,6 @@
 import { getGlobalVariable } from '../../utils/env';
-import { ng } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';
+import { executeBrowserTest } from '../../utils/puppeteer';
 
 export default async function () {
   // Make prod use JIT.
@@ -18,5 +18,5 @@ export default async function () {
   });
 
   // Test it works
-  await ng('e2e', '--configuration=production');
+  await executeBrowserTest({ configuration: 'production' });
 }
