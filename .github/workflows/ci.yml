@@ -71,7 +71,7 @@ jobs:
       - name: Install node modules
         run: pnpm install --frozen-lockfile
       - name: Run module and package tests
-        run: pnpm bazel test -- //... -//tests/legacy-cli/...
+        run: pnpm bazel test -- //... -//tests/...
 
   e2e:
     needs: test
@@ -94,7 +94,7 @@ jobs:
         with:
           google_credential: ${{ secrets.RBE_TRUSTED_BUILDS_USER }}
       - name: Run CLI E2E tests
-        run: pnpm bazel test --test_env=E2E_SHARD_TOTAL=6 --test_env=E2E_SHARD_INDEX=${{ matrix.shard }} --config=e2e //tests/legacy-cli:e2e.${{ matrix.subset }}_node${{ matrix.node }}
+        run: pnpm bazel test --test_env=E2E_SHARD_TOTAL=6 --test_env=E2E_SHARD_INDEX=${{ matrix.shard }} --config=e2e //tests:e2e.${{ matrix.subset }}_node${{ matrix.node }}
 
   build-e2e-windows:
     runs-on: ubuntu-latest
@@ -113,15 +113,15 @@ jobs:
         run: |
           pnpm bazel build \
             --config=e2e \
-            //tests/legacy-cli:e2e.webpack_node22 \
-            //tests/legacy-cli:e2e.esbuild_node22 \
+            //tests:e2e.webpack_node22 \
+            //tests:e2e.esbuild_node22 \
             --platforms=tools:windows_x64
       - name: Store built Windows E2E tests
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           name: win-e2e-build-artifacts
           path: |
-            dist/bin/tests/legacy-cli/**
+            dist/bin/tests/**
             !**/node_modules/**
           retention-days: 1
           if-no-files-found: 'error'
@@ -144,7 +144,7 @@ jobs:
         uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
         with:
           name: win-e2e-build-artifacts
-          path: dist/bin/tests/legacy-cli/
+          path: dist/bin/tests/
       - name: Run CLI E2E tests
         uses: ./.github/shared-actions/windows-bazel-test
         with:
@@ -174,7 +174,7 @@ jobs:
         with:
           google_credential: ${{ secrets.RBE_TRUSTED_BUILDS_USER }}
       - name: Run CLI E2E tests
-        run: pnpm bazel test --test_env=E2E_SHARD_TOTAL=3 --test_env=E2E_SHARD_INDEX=${{ matrix.shard }} --config=e2e //tests/legacy-cli:e2e.${{ matrix.subset }}_node${{ matrix.node }}
+        run: pnpm bazel test --test_env=E2E_SHARD_TOTAL=3 --test_env=E2E_SHARD_INDEX=${{ matrix.shard }} --config=e2e //tests:e2e.${{ matrix.subset }}_node${{ matrix.node }}
 
   e2e-snapshots:
     needs: test
@@ -198,7 +198,7 @@ jobs:
         with:
           google_credential: ${{ secrets.RBE_TRUSTED_BUILDS_USER }}
       - name: Run CLI E2E tests
-        run: pnpm bazel test --test_env=E2E_SHARD_TOTAL=6 --test_env=E2E_SHARD_INDEX=${{ matrix.shard }} --config=e2e //tests/legacy-cli:e2e.snapshots.${{ matrix.subset }}_node${{ matrix.node }}
+        run: pnpm bazel test --test_env=E2E_SHARD_TOTAL=6 --test_env=E2E_SHARD_INDEX=${{ matrix.shard }} --config=e2e //tests:e2e.snapshots.${{ matrix.subset }}_node${{ matrix.node }}
 
   browsers:
     needs: build
@@ -229,7 +229,7 @@ jobs:
         run: |
           ./scripts/saucelabs/start-tunnel.sh &
           ./scripts/saucelabs/wait-for-tunnel.sh
-          pnpm bazel test --config=saucelabs //tests/legacy-cli:e2e.saucelabs
+          pnpm bazel test --config=saucelabs //tests:e2e.saucelabs
           ./scripts/saucelabs/stop-tunnel.sh
       - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         if: ${{ failure() }}

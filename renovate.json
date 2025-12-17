@@ -3,11 +3,11 @@
   "baseBranchPatterns": ["main", "21.0.x"],
   "extends": ["github>angular/dev-infra//renovate-presets/default.json5"],
   "ignoreDeps": ["less"],
-  "ignorePaths": ["tests/legacy-cli/e2e/assets/**", "tests/schematics/update/packages/**"],
+  "ignorePaths": ["tests/e2e/assets/**", "tests/schematics/update/packages/**"],
   "packageRules": [
     {
       "enabled": false,
-      "matchFileNames": ["tests/legacy-cli/e2e/ng-snapshot/package.json"],
+      "matchFileNames": ["tests/e2e/ng-snapshot/package.json"],
       "matchBaseBranches": ["!main"]
     },
     {
