@@ -97,7 +97,7 @@ Perform a one-off, non-watched build using "ng build". Use this tool whenever th
 </Use Cases>
 <Operational Notes>
 * This tool runs "ng build" so it expects to run within an Angular workspace.
-* If you want a watched build which updates as files are changed, use "devserver/start" instead, which also serves the app.
+* If you want a watched build which updates as files are changed, use "devserver.start" instead, which also serves the app.
 * You can provide a project instead of building the root one. The "list_projects" MCP tool could be used to obtain the list of projects.
 * This tool defaults to a development environment while a regular "ng build" defaults to a production environment. An unexpected build
   failure might suggest the project is not configured for the requested environment.

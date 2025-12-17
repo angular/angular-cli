@@ -66,26 +66,26 @@ export const DEVSERVER_START_TOOL: McpToolDeclaration<
   typeof devserverStartToolInputSchema.shape,
   typeof devserverStartToolOutputSchema.shape
 > = declareTool({
-  name: 'devserver/start',
+  name: 'devserver.start',
   title: 'Start Development Server',
   description: `
 <Purpose>
-Starts the Angular development server ("ng serve") as a background process. Follow this up with "devserver/wait_for_build" to wait until
+Starts the Angular development server ("ng serve") as a background process. Follow this up with "devserver.wait_for_build" to wait until
 the first build completes.
 </Purpose>
 <Use Cases>
 * **Starting the Server:** Use this tool to begin serving the application. The tool will return immediately while the server runs in the
   background.
-* **Get Initial Build Logs:** Once a dev server has started, use the "devserver/wait_for_build" tool to ensure it's alive. If there are any
-  build errors, "devserver/wait_for_build" would provide them back and you can give them to the user or rely on them to propose a fix.
-* **Get Updated Build Logs:** Important: as long as a devserver is alive (i.e. "devserver/stop" wasn't called), after every time you make a
-  change to the workspace, re-run "devserver/wait_for_build" to see whether the change was successfully built and wait for the devserver to
+* **Get Initial Build Logs:** Once a dev server has started, use the "devserver.wait_for_build" tool to ensure it's alive. If there are any
+  build errors, "devserver.wait_for_build" would provide them back and you can give them to the user or rely on them to propose a fix.
+* **Get Updated Build Logs:** Important: as long as a devserver is alive (i.e. "devserver.stop" wasn't called), after every time you make a
+  change to the workspace, re-run "devserver.wait_for_build" to see whether the change was successfully built and wait for the devserver to
   be updated.
 </Use Cases>
 <Operational Notes>
 * This tool manages development servers by itself. It maintains at most a single dev server instance for each project in the monorepo.
 * This is an asynchronous operation. Subsequent commands can be ran while the server is active.
-* Use 'devserver/stop' to gracefully shut down the server and access the full log output.
+* Use 'devserver.stop' to gracefully shut down the server and access the full log output.
 </Operational Notes>
 `,
   isReadOnly: true,
