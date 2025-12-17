@@ -1,0 +1,28 @@
+# Copyright Google Inc. All Rights Reserved.
+#
+# Use of this source code is governed by an MIT-style license that can be
+# found in the LICENSE file at https://angular.dev/license
+
+load("//tools:defaults.bzl", "ts_project")
+
+licenses(["notice"])
+
+package(default_visibility = ["//visibility:public"])
+
+exports_files([
+    "cli.js",
+])
+
+ts_project(
+    name = "bin",
+    srcs = glob(
+        include = ["**/*.ts"],
+        exclude = ["**/*_spec.ts"],
+    ),
+    deps = [
+        "//:node_modules/@types/node",
+        "//packages/angular_devkit/architect",
+        "//packages/angular_devkit/architect:node_modules/@angular-devkit/core",
+        "//packages/angular_devkit/architect/node",
+    ],
+)

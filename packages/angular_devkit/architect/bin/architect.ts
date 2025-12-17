@@ -7,13 +7,13 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { Architect } from '@angular-devkit/architect';
-import { WorkspaceNodeModulesArchitectHost } from '@angular-devkit/architect/node';
 import { JsonValue, json, logging, schema, strings, tags, workspaces } from '@angular-devkit/core';
 import { NodeJsSyncHost, createConsoleLogger } from '@angular-devkit/core/node';
 import { existsSync } from 'node:fs';
 import * as path from 'node:path';
 import { parseArgs, styleText } from 'node:util';
+import { Architect } from '../index';
+import { WorkspaceNodeModulesArchitectHost } from '../node/index';
 
 function findUp(names: string | string[], from: string) {
   if (!Array.isArray(names)) {

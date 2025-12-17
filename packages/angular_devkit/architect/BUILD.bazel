@@ -110,6 +110,8 @@ npm_package(
         "README.md",
         ":architect",
         ":license",
+        "//packages/angular_devkit/architect/bin",
+        "//packages/angular_devkit/architect/bin:cli.js",
         "//packages/angular_devkit/architect/node",
         "//packages/angular_devkit/architect/testing",
     ],

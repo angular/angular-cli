@@ -1,5 +1,5 @@
 load("@npm//:defs.bzl", "npm_link_all_packages")
-load("//tools:defaults.bzl", "npm_package", "ts_project")
+load("//tools:defaults.bzl", "npm_package")
 
 # Copyright Google Inc. All Rights Reserved.
 #
@@ -10,18 +10,6 @@ licenses(["notice"])
 package(default_visibility = ["//visibility:public"])
 
 npm_link_all_packages()
-
-ts_project(
-    name = "architect_cli",
-    srcs = [
-        "bin/architect.ts",
-    ],
-    deps = [
-        ":node_modules/@angular-devkit/architect",
-        ":node_modules/@angular-devkit/core",
-        "//:node_modules/@types/node",
-    ],
-)
 
 genrule(
     name = "license",
@@ -34,12 +22,11 @@ npm_package(
     name = "pkg",
     pkg_deps = [
         "//packages/angular_devkit/architect:package.json",
-        "//packages/angular_devkit/core:package.json",
     ],
     tags = ["release-package"],
     deps = [
         ":README.md",
-        ":architect_cli",
+        ":bin/cli.js",
         ":license",
     ],
 )
