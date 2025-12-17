@@ -73,6 +73,7 @@ e2e_suites(
         # TODO: Clean this up.
         "//:node_modules/express",
         "//:node_modules/undici",
+        "//:node_modules/puppeteer",
     ],
     runner = ":runner_entrypoint",
 )

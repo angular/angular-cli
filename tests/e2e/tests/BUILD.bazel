@@ -12,6 +12,7 @@ ts_project(
         "//:node_modules/@types/semver",
         "//:node_modules/express",
         "//:node_modules/fast-glob",
+        "//:node_modules/puppeteer",
         "//:node_modules/semver",
         "//:node_modules/undici",
         "//tests/e2e/utils",
