@@ -3,6 +3,9 @@
   "version": "0.0.0-EXPERIMENTAL-PLACEHOLDER",
   "description": "Angular Build Facade",
   "experimental": true,
+  "bin": {
+    "architect": "./bin/cli.js"
+  },
   "main": "src/index.js",
   "typings": "src/index.d.ts",
   "dependencies": {

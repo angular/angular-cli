@@ -565,9 +565,6 @@ importers:
       '@angular-devkit/architect':
         specifier: workspace:0.0.0-EXPERIMENTAL-PLACEHOLDER
         version: link:../architect
-      '@angular-devkit/core':
-        specifier: workspace:0.0.0-PLACEHOLDER
-        version: link:../core
 
   packages/angular_devkit/build_angular:
     dependencies:
