@@ -34,8 +34,8 @@ import { buildPathWithParams, joinUrlParts, stripLeadingSlash } from './utils/ur
  * bypass the Angular routing and rendering process.
  */
 const WELL_KNOWN_NON_ANGULAR_URLS: ReadonlySet<string> = new Set<string>([
-  'favicon.ico',
-  '.well-known/appspecific/com.chrome.devtools.json',
+  '/favicon.ico',
+  '/.well-known/appspecific/com.chrome.devtools.json',
 ]);
 
 /**

@@ -139,6 +139,14 @@ describe('AngularServerApp', () => {
   });
 
   describe('handle', () => {
+    it('should return null for well-known non-angular URLs', async () => {
+      const response = await app.handle(
+        new Request('http://localhost/.well-known/appspecific/com.chrome.devtools.json'),
+      );
+
+      expect(response).toBeNull();
+    });
+
     describe('CSR and SSG pages', () => {
       it('should correctly render the content for the requested page', async () => {
         const response = await app.handle(new Request('http://localhost/home'));
