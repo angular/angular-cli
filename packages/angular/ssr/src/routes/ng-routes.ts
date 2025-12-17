@@ -28,6 +28,7 @@ import { Console } from '../console';
 import { AngularAppManifest, getAngularAppManifest } from '../manifest';
 import { AngularBootstrap, isNgModule } from '../utils/ng';
 import { promiseWithAbort } from '../utils/promise';
+import { VALID_REDIRECT_RESPONSE_CODES, isValidRedirectResponseCode } from '../utils/redirect';
 import { addTrailingSlash, joinUrlParts, stripLeadingSlash } from '../utils/url';
 import {
   PrerenderFallback,
@@ -58,11 +59,6 @@ const CATCH_ALL_REGEXP = /\/(\*\*)$/;
  * Regular expression to match segments preceded by a colon in a string.
  */
 const URL_PARAMETER_REGEXP = /(?<!\\):([^/]+)/g;
-
-/**
- * An set of HTTP status codes that are considered valid for redirect responses.
- */
-const VALID_REDIRECT_RESPONSE_CODES = new Set([301, 302, 303, 307, 308]);
 
 /**
  * Additional metadata for a server configuration route tree.
@@ -163,7 +159,7 @@ async function* handleRoute(options: {
         includePrerenderFallbackRoutes,
       );
     } else if (redirectTo !== undefined) {
-      if (metadata.status && !VALID_REDIRECT_RESPONSE_CODES.has(metadata.status)) {
+      if (metadata.status && !isValidRedirectResponseCode(metadata.status)) {
         yield {
           error:
             `The '${metadata.status}' status code is not a valid redirect response code. ` +
