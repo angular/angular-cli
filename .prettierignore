@@ -11,8 +11,7 @@
 /packages/schematics/angular/third_party/
 /README.md
 /CONTRIBUTING.md
-.yarn/
 dist/
-/tests/legacy-cli/e2e/assets/
+/tests/e2e/assets/
 /tools/test/*.json
 pnpm-lock.yaml

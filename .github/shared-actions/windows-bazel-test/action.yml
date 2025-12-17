@@ -24,7 +24,7 @@ runs:
     - name: Convert symlinks for Windows host
       shell: pwsh
       run: |
-        $runfiles_dir = "./dist/bin/tests/legacy-cli/${{inputs.test_target_name}}_/${{inputs.test_target_name}}.bat.runfiles"
+        $runfiles_dir = "./dist/bin/tests/${{inputs.test_target_name}}_/${{inputs.test_target_name}}.bat.runfiles"
 
         # Needed for resolution because Aspect/Bazel looks for repositories at `<workspace>/external`.
         # TODO(devversion): consult with Aspect on why this is needed.
@@ -38,5 +38,5 @@ runs:
         E2E_TEMP: ${{ inputs.e2e_temp_dir }}
       run: |
         node ./scripts/windows-testing/parallel-executor.mjs \
-          "./dist/bin/tests/legacy-cli/${{ inputs.test_target_name }}_/${{ inputs.test_target_name }}.bat.runfiles" \
+          "./dist/bin/tests/${{ inputs.test_target_name }}_/${{ inputs.test_target_name }}.bat.runfiles" \
           ${{ inputs.test_target_name }}
