@@ -5,7 +5,7 @@ import { join } from 'node:path';
 
 export default async function () {
   // Install CLI package
-  installPackage('@angular-devkit/architect-cli');
+  await installPackage('@angular-devkit/architect-cli');
 
   try {
     // Run help command
@@ -17,6 +17,6 @@ export default async function () {
       'Expected stdout to contain usage information.',
     );
   } finally {
-    uninstallPackage('@angular-devkit/architect-cli');
+    await uninstallPackage('@angular-devkit/architect-cli');
   }
 }
