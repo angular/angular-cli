@@ -1,13 +1,10 @@
 import { getGlobalVariable } from '../../utils/env';
 import { ng } from '../../utils/process';
-import { updateJsonFile, useCIChrome, useCIDefaults } from '../../utils/project';
+import { updateJsonFile, useCIDefaults } from '../../utils/project';
+import { executeBrowserTest } from '../../utils/puppeteer';
 
 export default async function () {
   await ng('generate', 'app', 'test-project-two', '--no-standalone', '--skip-install');
-  await ng('generate', 'private-e2e', '--related-app-name=test-project-two');
-
-  // Setup testing to use CI Chrome.
-  await useCIChrome('test-project-two', './projects/test-project-two/e2e');
   await useCIDefaults('test-project-two');
 
   // Make prod use JIT.
@@ -46,6 +43,6 @@ export default async function () {
     serve.builder = '@angular-devkit/build-angular:dev-server';
   });
   // Test it works
-  await ng('e2e', 'test-project-two', '--configuration=production');
-  await ng('e2e', 'test-project-two', '--configuration=development');
+  await executeBrowserTest({ project: 'test-project-two', configuration: 'production' });
+  await executeBrowserTest({ project: 'test-project-two', configuration: 'development' });
 }

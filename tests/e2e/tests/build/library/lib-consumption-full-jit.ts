@@ -1,8 +1,8 @@
-import { setTimeout } from 'node:timers/promises';
 import { updateJsonFile } from '../../../utils/project';
 import { expectFileToMatch } from '../../../utils/fs';
 import { ng } from '../../../utils/process';
-import { libraryConsumptionSetup } from './setup';
+import { executeBrowserTest } from '../../../utils/puppeteer';
+import { browserCheck, libraryConsumptionSetup } from './setup';
 import { getGlobalVariable } from '../../../utils/env';
 
 export default async function () {
@@ -21,10 +21,9 @@ export default async function () {
     }
   });
 
-  // Check that the e2e succeeds prod and non prod mode
-  await ng('e2e', '--configuration=production');
-  await setTimeout(500);
-  await ng('e2e', '--configuration=development');
+  // Ensure app works in prod and non prod mode
+  await executeBrowserTest({ configuration: 'production', checkFn: browserCheck });
+  await executeBrowserTest({ configuration: 'development', checkFn: browserCheck });
 
   // Validate that sourcemaps for the library exists.
   await ng('build', '--configuration=development');

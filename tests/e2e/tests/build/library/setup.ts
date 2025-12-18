@@ -1,3 +1,4 @@
+import type { Page } from 'puppeteer';
 import { writeMultipleFiles } from '../../../utils/fs';
 import { silentNg } from '../../../utils/process';
 
@@ -30,30 +31,15 @@ export async function libraryConsumptionSetup(): Promise<void> {
       }
     }
   `,
-    'e2e/src/app.e2e-spec.ts': `
-  import { browser, logging, element, by } from 'protractor';
-  import { AppPage } from './app.po';
-
-  describe('workspace-project App', () => {
-    let page: AppPage;
-
-    beforeEach(() => {
-      page = new AppPage();
-    });
-
-    it('should display text from library component', async () => {
-      await page.navigateTo();
-      expect(await element(by.css('lib-my-lib p')).getText()).toEqual('my-lib works!');
-    });
-
-    afterEach(async () => {
-      // Assert that there are no errors emitted from the browser
-      const logs = await browser.manage().logs().get(logging.Type.BROWSER);
-      expect(logs).not.toContain(jasmine.objectContaining({
-        level: logging.Level.SEVERE,
-      }));
-    });
   });
-`,
-  });
+}
+
+export async function browserCheck(page: Page): Promise<void> {
+  await page.waitForFunction(
+    () =>
+      !!(globalThis as any).document
+        .querySelector('lib-my-lib p')
+        ?.textContent?.includes('my-lib works!'),
+    { timeout: 10000 },
+  );
 }

@@ -5,10 +5,11 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-import { setTimeout } from 'node:timers/promises';
-import { replaceInFile, writeFile } from '../../utils/fs';
+
+import { replaceInFile } from '../../utils/fs';
 import { ng } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';
+import { executeBrowserTest } from '../../utils/puppeteer';
 
 export default async function () {
   // Add lazy route.
@@ -22,29 +23,6 @@ export default async function () {
     }];`,
   );
 
-  // Add lazy route e2e
-  await writeFile(
-    'e2e/src/app.e2e-spec.ts',
-    `
-      import { browser, logging, element, by } from 'protractor';
-
-      describe('workspace-project App', () => {
-        it('should display lazy route', async () => {
-          await browser.get(browser.baseUrl + '/lazy');
-          expect(await element(by.css('app-lazy-comp p')).getText()).toEqual('lazy-comp works!');
-        });
-
-        afterEach(async () => {
-          // Assert that there are no errors emitted from the browser
-          const logs = await browser.manage().logs().get(logging.Type.BROWSER);
-          expect(logs).not.toContain(jasmine.objectContaining({
-            level: logging.Level.SEVERE,
-          }));
-        });
-      });
-    `,
-  );
-
   // Convert the default config to use JIT and prod to just do AOT.
   // This way we can use `ng e2e` to test JIT and `ng e2e --configuration=production` to test AOT.
   await updateJsonFile('angular.json', (json) => {
@@ -53,7 +31,17 @@ export default async function () {
     buildTarget['configurations']['development']['aot'] = false;
   });
 
-  await ng('e2e');
-  await setTimeout(500);
-  await ng('e2e', '--configuration=production');
+  const checkFn = async (page: any) => {
+    await page.goto(page.url() + 'lazy');
+    await page.waitForFunction(
+      () =>
+        !!(globalThis as any).document
+          .querySelector('app-lazy-comp p')
+          ?.textContent?.includes('lazy-comp works!'),
+      { timeout: 10000 },
+    );
+  };
+
+  await executeBrowserTest({ checkFn });
+  await executeBrowserTest({ configuration: 'production', checkFn });
 }
