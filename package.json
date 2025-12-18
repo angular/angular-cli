@@ -22,7 +22,8 @@
     "postinstall": "husky",
     "ts-circular-deps": "ng-dev ts-circular-deps --config ./scripts/circular-deps-test.conf.mjs",
     "check-tooling-setup": "tsc --project .ng-dev/tsconfig.json",
-    "diff-release-package": "node scripts/diff-release-package.mts"
+    "diff-release-package": "node scripts/diff-release-package.mts",
+    "ng-dev": "ng-dev"
   },
   "repository": {
     "type": "git",
