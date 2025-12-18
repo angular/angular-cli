@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { killAllProcesses } from '../../utils/process';
 import { ngServe } from '../../utils/project';
+import { executeBrowserTest } from '../../utils/puppeteer';
 
 export default async function () {
   // Serve works without HMR
@@ -11,6 +12,8 @@ export default async function () {
   // Serve works with HMR
   const hmrPort = await ngServe('--hmr');
   await verifyResponse(hmrPort);
+
+  await executeBrowserTest({ baseUrl: `http://localhost:${hmrPort}/` });
 }
 
 async function verifyResponse(port: number): Promise<void> {
