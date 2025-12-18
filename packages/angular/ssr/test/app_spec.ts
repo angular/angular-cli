@@ -35,8 +35,7 @@ describe('AngularServerApp', () => {
       constructor() {
         const responseInit = inject(RESPONSE_INIT);
         if (responseInit) {
-          // TODO(alanagius): Remove once https://github.com/angular/angular/pull/66126 is merged and released.
-          (responseInit as { status: number }).status = 308;
+          responseInit.status = 308;
         }
 
         void inject(Router).navigate([], {
