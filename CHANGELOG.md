@@ -1,3 +1,43 @@
+<a name="21.1.0-next.3"></a>
+
+# 21.1.0-next.3 (2025-12-18)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                                               |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------- |
+| [348096623](https://github.com/angular/angular-cli/commit/348096623326857a5d8cf77d56712776e1190180) | fix  | enhance list_projects MCP tool file system traversal and symlink handling |
+| [032257a6d](https://github.com/angular/angular-cli/commit/032257a6d00360d2c4e6d5406409dcfa5b27d1d5) | fix  | improve signal forms lesson examples in AI tutor                          |
+| [18d74dde8](https://github.com/angular/angular-cli/commit/18d74dde8938dbe566df80753d5c148c19040179) | fix  | rename mcp devserver tools to comply with naming spec                     |
+| [a15db28b2](https://github.com/angular/angular-cli/commit/a15db28b29f6f43bef1ed1ca7c6a963d9943f801) | perf | cache resolved specific version in package manager abstraction            |
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                                |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------- |
+| [52ace04a7](https://github.com/angular/angular-cli/commit/52ace04a7ca1c102fdf1addf5ab6fe400c0eab0e) | fix  | improve VS Code background compilation start/end detection |
+| [288a9225c](https://github.com/angular/angular-cli/commit/288a9225c83edec9560e2b39901740e792c54d27) | fix  | remove `inlineSources` from library tsconfig template      |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                              |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------- |
+| [98c207bc0](https://github.com/angular/angular-cli/commit/98c207bc0e44caccd6fffa5b8d3a013a2a3a871a) | fix  | add browser condition to resolver for vitest             |
+| [f39f7ee95](https://github.com/angular/angular-cli/commit/f39f7ee9529113f7c75d0e0e3ffa628fed9ce92f) | fix  | allow non-prefixed requests when using SSR and base href |
+| [7c7e6a614](https://github.com/angular/angular-cli/commit/7c7e6a6142a9d294e04c612463449d2a4360e692) | fix  | conditionally manage Vitest UI option                    |
+| [edeb41c0e](https://github.com/angular/angular-cli/commit/edeb41c0e01881c21dec4d7f63fe8d302ce0521d) | fix  | ensure tests run when compilation error is resolved      |
+| [9744af1f8](https://github.com/angular/angular-cli/commit/9744af1f82a8e9c2816adf636e4e8a1a8be06c60) | fix  | remove LmdbCacheStore export from private API            |
+
+### @angular/ssr
+
+| Commit                                                                                              | Type | Description                                                          |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------------- |
+| [e5651224b](https://github.com/angular/angular-cli/commit/e5651224b5086335d48b133e1d0b9c8536c22e5f) | fix  | add leading slash to well-known non-Angular URLs                     |
+| [081e31337](https://github.com/angular/angular-cli/commit/081e3133764c9a23f70969bfd182259be34a411e) | fix  | propagate status code to redirect                                    |
+| [2d56a319d](https://github.com/angular/angular-cli/commit/2d56a319d8d45f36d9e5d958cbbd96e195c2c15e) | fix  | skip SSR processing for well-known non-Angular URLs like favicon.ico |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="21.0.4"></a>
 
 # 21.0.4 (2025-12-18)
