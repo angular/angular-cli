@@ -4,6 +4,7 @@ import { expectFileMatchToExist } from '../../utils/fs';
 import { getActivePackageManager } from '../../utils/packages';
 import { ng, noSilentNg } from '../../utils/process';
 import { isPrereleaseCli, useCIChrome, useCIDefaults, getNgCLIVersion } from '../../utils/project';
+import { executeBrowserTest } from '../../utils/puppeteer';
 
 export default async function () {
   let restoreRegistry: (() => Promise<void>) | undefined;
@@ -70,20 +71,22 @@ export default async function () {
 
   await ng('update', '@angular/cli', ...extraUpdateArgs);
 
-  // Generate E2E setup
-  await ng('generate', 'private-e2e', '--related-app-name=nineteen-project');
-
   // Setup testing to use CI Chrome.
   await useCIChrome('nineteen-project', './');
-  await useCIChrome('nineteen-project', './e2e/');
   await useCIDefaults('nineteen-project');
 
   // Run CLI commands.
   await ng('generate', 'component', 'my-comp');
   await ng('test', '--watch=false');
 
-  await ng('e2e');
-  await ng('e2e', '--configuration=production');
+  await executeBrowserTest({
+    configuration: 'production',
+    expectedTitleText: 'Hello, nineteen-project',
+  });
+  await executeBrowserTest({
+    configuration: 'development',
+    expectedTitleText: 'Hello, nineteen-project',
+  });
 
   // Verify project now creates bundles
   await noSilentNg('build', '--configuration=production');

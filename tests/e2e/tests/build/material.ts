@@ -1,5 +1,4 @@
-import assert from 'node:assert/strict';
-import { appendFile, readdir } from 'node:fs/promises';
+import { appendFile } from 'node:fs/promises';
 import { getGlobalVariable } from '../../utils/env';
 import { readFile, replaceInFile } from '../../utils/fs';
 import {
@@ -7,8 +6,9 @@ import {
   installPackage,
   installWorkspacePackages,
 } from '../../utils/packages';
-import { execWithEnv, ng } from '../../utils/process';
+import { ng } from '../../utils/process';
 import { isPrereleaseCli, updateJsonFile } from '../../utils/project';
+import { executeBrowserTest } from '../../utils/puppeteer';
 
 const snapshots = require('../../ng-snapshot/package.json');
 
@@ -85,5 +85,5 @@ export default async function () {
       }`,
   );
 
-  await ng('e2e', '--configuration=production');
+  await executeBrowserTest({ configuration: 'production' });
 }

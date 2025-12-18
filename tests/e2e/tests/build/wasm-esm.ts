@@ -11,6 +11,7 @@ import { ng } from '../../utils/process';
 import { prependToFile, replaceInFile } from '../../utils/fs';
 import { updateJsonFile, useSha } from '../../utils/project';
 import { installWorkspacePackages } from '../../utils/packages';
+import { executeBrowserTest } from '../../utils/puppeteer';
 
 /**
  * Compiled and base64 encoded WASM file for the following WAT:
@@ -66,22 +67,7 @@ export default async function () {
   await ng('build');
 
   // Update E2E test to check for WASM execution
-  await writeFile(
-    'e2e/src/app.e2e-spec.ts',
-    `
-    import { AppPage } from './app.po';
-    import { browser, logging } from 'protractor';
-    describe('WASM execution', () => {
-      it('should log WASM result messages', async () => {
-        const page = new AppPage();
-        await page.navigateTo();
-        expect(await page.getTitleText()).toEqual('Hello, 32');
-      });
-    });
-  `,
-  );
-
-  await ng('e2e');
+  await executeBrowserTest({ expectedTitleText: 'Hello, 32' });
 
   // Setup prerendering and build to test Node.js functionality
   await ng('add', '@angular/ssr', '--skip-confirmation', '--skip-install');

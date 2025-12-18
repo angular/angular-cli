@@ -1,6 +1,7 @@
 import { getGlobalVariable } from '../../utils/env';
 import { ng } from '../../utils/process';
 import { updateJsonFile, updateTsConfig } from '../../utils/project';
+import { executeBrowserTest } from '../../utils/puppeteer';
 
 export default async function () {
   // Update project to disable experimental decorators
@@ -31,6 +32,6 @@ export default async function () {
   // Unit tests (JIT only)
   await ng('test', '--no-watch');
 
-  // E2E tests to ensure application functions in a browser
-  await ng('e2e');
+  // Ensure application functions in a browser
+  await executeBrowserTest();
 }
