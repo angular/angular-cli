@@ -1,3 +1,34 @@
+<a name="21.0.4"></a>
+
+# 21.0.4 (2025-12-18)
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                                |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------- |
+| [b671245b9](https://github.com/angular/angular-cli/commit/b671245b9d3ba98ac0f66dbd34f272539113be61) | fix  | improve VS Code background compilation start/end detection |
+| [85a28dec7](https://github.com/angular/angular-cli/commit/85a28dec771cce77a3ffee35f419b5fedca807b8) | fix  | remove `inlineSources` from library tsconfig template      |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                              |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------- |
+| [deb4fff61](https://github.com/angular/angular-cli/commit/deb4fff6196d2eb147e358a7143e2ada2b6114c9) | fix  | add browser condition to resolver for vitest             |
+| [570ce8d3e](https://github.com/angular/angular-cli/commit/570ce8d3eeb280eeb6dca6ba54593c9325674741) | fix  | allow non-prefixed requests when using SSR and base href |
+| [4dd3c1a32](https://github.com/angular/angular-cli/commit/4dd3c1a324c8e90808cc1c5febf65c8fa49dd3b9) | fix  | conditionally manage Vitest UI option                    |
+| [4b8b7caec](https://github.com/angular/angular-cli/commit/4b8b7caece41f86746321a98786dfdff499582b6) | fix  | ensure tests run when compilation error is resolved      |
+| [bef4fcecb](https://github.com/angular/angular-cli/commit/bef4fcecb6d116f9f022da845f06708cf29be02a) | fix  | remove LmdbCacheStore export from private API            |
+
+### @angular/ssr
+
+| Commit                                                                                              | Type | Description                                                          |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------------- |
+| [bb54747da](https://github.com/angular/angular-cli/commit/bb54747da69fb15b6c2ebb52b45a83cbff3231c8) | fix  | add leading slash to well-known non-Angular URLs                     |
+| [0cfe2e749](https://github.com/angular/angular-cli/commit/0cfe2e749f50b832c64bbba322eb0cef7ad40365) | fix  | propagate status code to redirect                                    |
+| [eadadb848](https://github.com/angular/angular-cli/commit/eadadb848ca7fa45c4dda835af39400e017bbe1c) | fix  | skip SSR processing for well-known non-Angular URLs like favicon.ico |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="21.0.3"></a>
 
 # 21.0.3 (2025-12-10)
