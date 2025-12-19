@@ -4,6 +4,7 @@ import { findFreePort } from '../../../utils/network';
 import { installWorkspacePackages } from '../../../utils/packages';
 import { execAndWaitForOutputToMatch, ng } from '../../../utils/process';
 import { updateJsonFile, updateServerFileForEsbuild, useSha } from '../../../utils/project';
+import { executeBrowserTest } from '../../../utils/puppeteer';
 
 export default async function () {
   // forcibly remove in case another test doesn't clean itself up
@@ -36,71 +37,6 @@ export default async function () {
         bootstrapApplication(App, appConfig).catch((err) => console.error(err));
       };
       `,
-    'e2e/src/app.e2e-spec.ts': `
-      import { browser, by, element } from 'protractor';
-      import * as webdriver from 'selenium-webdriver';
-
-      function verifyNoBrowserErrors() {
-        return browser
-          .manage()
-          .logs()
-          .get('browser')
-          .then(function (browserLog: any[]) {
-            const errors: any[] = [];
-            browserLog.filter((logEntry) => {
-              const msg = logEntry.message;
-              console.log('>> ' + msg);
-              if (logEntry.level.value >= webdriver.logging.Level.INFO.value) {
-                errors.push(msg);
-              }
-            });
-            expect(errors).toEqual([]);
-          });
-      }
-
-      describe('Hello world E2E Tests', () => {
-        beforeAll(async () => {
-          await browser.waitForAngularEnabled(false);
-        });
-
-        it('should display: Welcome', async () => {
-          // Load the page without waiting for Angular since it is not bootstrapped automatically.
-          await browser.driver.get(browser.baseUrl);
-
-          const style = await browser.driver.findElement(by.css('style[ng-app-id="ng"]'));
-          expect(await style.getText()).not.toBeNull();
-
-          // Test the contents from the server.
-          const serverDiv = await browser.driver.findElement(by.css('h1'));
-          expect(await serverDiv.getText()).toMatch('Hello');
-
-          // Bootstrap the client side app.
-          await browser.executeScript('doBootstrap()');
-
-          // Retest the contents after the client bootstraps.
-          expect(await element(by.css('h1')).getText()).toMatch('Hello');
-
-          // Make sure the server styles got replaced by client side ones.
-          expect(await element(by.css('style[ng-app-id="ng"]')).isPresent()).toBeFalsy();
-          expect(await element(by.css('style')).getText()).toMatch('');
-
-          // Make sure there were no client side errors.
-          await verifyNoBrowserErrors();
-        });
-
-        it('stylesheets should be configured to load asynchronously', async () => {
-          // Load the page without waiting for Angular since it is not bootstrapped automatically.
-          await browser.driver.get(browser.baseUrl);
-
-          // Test the contents from the server.
-          const styleTag = await browser.driver.findElement(by.css('link[rel="stylesheet"]'));
-          expect(await styleTag.getAttribute('media')).toMatch('all');
-
-          // Make sure there were no client side errors.
-          await verifyNoBrowserErrors();
-        });
-      });
-      `,
   });
 
   async function spawnServer(): Promise<number> {
@@ -127,5 +63,41 @@ export default async function () {
   }
 
   const port = await spawnServer();
-  await ng('e2e', `--base-url=http://localhost:${port}`, '--dev-server-target=');
+  await executeBrowserTest({
+    baseUrl: `http://localhost:${port}/`,
+    checkFn: async (page) => {
+      // Test the contents from the server.
+      const h1Text = await page.$eval('h1', (el) => el.textContent);
+      if (!h1Text?.includes('Hello')) {
+        throw new Error(`Expected h1 to contain 'Hello', but got '${h1Text}'`);
+      }
+
+      const serverStylePresent = await page.evaluate(
+        `!!document.querySelector('style[ng-app-id="ng"]')`,
+      );
+      if (!serverStylePresent) {
+        throw new Error('Expected server-side style to be present');
+      }
+
+      // stylesheets should be configured to load asynchronously
+      const linkMedia = await page.$eval('link[rel="stylesheet"]', (el) =>
+        el.getAttribute('media'),
+      );
+      if (linkMedia !== 'all') {
+        throw new Error(`Expected link media to be 'all', but got '${linkMedia}'`);
+      }
+
+      // Bootstrap the client side app.
+      await page.evaluate('window.doBootstrap()');
+
+      // Wait for server style to be removed by client
+      await page.waitForSelector('style[ng-app-id="ng"]', { hidden: true });
+
+      // Retest the contents after the client bootstraps.
+      const h1TextPost = await page.$eval('h1', (el) => el.textContent);
+      if (!h1TextPost?.includes('Hello')) {
+        throw new Error(`Expected h1 to contain 'Hello' after bootstrap, but got '${h1TextPost}'`);
+      }
+    },
+  });
 }

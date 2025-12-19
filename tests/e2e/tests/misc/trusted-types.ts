@@ -6,9 +6,10 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { replaceInFile, writeFile } from '../../utils/fs';
+import { replaceInFile } from '../../utils/fs';
 import { ng } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';
+import { executeBrowserTest } from '../../utils/puppeteer';
 
 export default async function () {
   // Add lazy route.
@@ -17,29 +18,6 @@ export default async function () {
     'src/app/app.routes.ts',
     'routes: Routes = [];',
     `routes: Routes = [{path: 'lazy', loadComponent: () => import('./lazy/lazy').then(c => c.Lazy)}];`,
-  );
-
-  // Add lazy route e2e
-  await writeFile(
-    'e2e/src/app.e2e-spec.ts',
-    `
-     import { browser, logging, element, by } from 'protractor';
-
-     describe('workspace-project App', () => {
-       it('should display lazy route', async () => {
-         await browser.get(browser.baseUrl + '/lazy');
-         expect(await element(by.css('app-lazy p')).getText()).toEqual('lazy works!');
-       });
-
-       afterEach(async () => {
-         // Assert that there are no errors emitted from the browser
-         const logs = await browser.manage().logs().get(logging.Type.BROWSER);
-         expect(logs).not.toContain(jasmine.objectContaining({
-           level: logging.Level.SEVERE,
-         }));
-       });
-     });
-   `,
   );
 
   const testCases = [
@@ -64,7 +42,18 @@ export default async function () {
     });
 
     try {
-      await ng('e2e');
+      await executeBrowserTest({
+        checkFn: async (page) => {
+          const baseUrl = page.url();
+          await page.goto(new URL('/lazy', baseUrl).href);
+
+          await page.waitForSelector('app-lazy p');
+          const lazyText = await page.$eval('app-lazy p', (el) => el.textContent);
+          if (lazyText !== 'lazy works!') {
+            throw new Error(`Expected lazy text to be 'lazy works!', but got '${lazyText}'`);
+          }
+        },
+      });
     } catch (error) {
       console.error(`Test case AOT ${aot} with CSP header ${csp} failed.`);
       throw error;
