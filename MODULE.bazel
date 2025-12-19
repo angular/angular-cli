@@ -44,7 +44,7 @@ git_override(
 )
 
 node = use_extension("@rules_nodejs//nodejs:extensions.bzl", "node")
-node.toolchain(node_version = "24.0.0")
+node.toolchain(node_version_from_nvmrc = "//:.nvmrc")
 use_repo(
     node,
     "nodejs_darwin_amd64",
