@@ -7,6 +7,7 @@ import { updateJsonFile } from '../../utils/project';
 import { readNgVersion } from '../../utils/version';
 import { Server } from 'node:http';
 import { AddressInfo } from 'node:net';
+import type { Page } from 'puppeteer';
 
 // Configurations for each locale.
 const translationFile = 'src/locale/messages.xlf';
@@ -60,6 +61,35 @@ export const langTranslations = [
   },
 ];
 export const sourceLocale = langTranslations[0].lang;
+
+export async function browserCheck(page: Page, lang: string) {
+  const translation = langTranslations.find((t) => t.lang === lang)?.translation;
+  if (!translation) {
+    throw new Error(`Could not find translation for language '${lang}'`);
+  }
+
+  const getParagraph = async (id: string) => page.$eval(`p#${id}`, (el) => el.textContent?.trim());
+
+  const hello = await getParagraph('hello');
+  if (hello !== translation.hello) {
+    throw new Error(`Expected 'hello' to be '${translation.hello}', but got '${hello}'.`);
+  }
+
+  const locale = await getParagraph('locale');
+  if (locale !== lang) {
+    throw new Error(`Expected 'locale' to be '${lang}', but got '${locale}'.`);
+  }
+
+  const date = await getParagraph('date');
+  if (date !== translation.date) {
+    throw new Error(`Expected 'date' to be '${translation.date}', but got '${date}'.`);
+  }
+
+  const plural = await getParagraph('plural');
+  if (plural !== translation.plural) {
+    throw new Error(`Expected 'plural' to be '${translation.plural}', but got '${plural}'.`);
+  }
+}
 
 export interface ExternalServer {
   readonly server: Server;
@@ -173,47 +203,12 @@ export async function setupI18nConfig() {
   `,
   );
 
-  // Add e2e specs for each lang.
-  for (const { lang, translation } of langTranslations) {
-    await writeFile(
-      `./e2e/src/app.${lang}.e2e-spec.ts`,
-      `
-      import { browser, logging, element, by } from 'protractor';
-
-      describe('workspace-project App', () => {
-        const getParagraph = async (name: string) => element(by.css('app-root p#' + name)).getText();
-        beforeEach(() => browser.get(browser.baseUrl));
-        afterEach(async () => {
-          // Assert that there are no errors emitted from the browser
-          const logs = await browser.manage().logs().get(logging.Type.BROWSER);
-          expect(logs).not.toContain(jasmine.objectContaining({
-            level: logging.Level.SEVERE,
-          } as logging.Entry));
-        });
-
-        it('should display welcome message', async () =>
-          expect(await getParagraph('hello')).toEqual('${translation.hello}'));
-
-        it('should display locale', async () =>
-          expect(await getParagraph('locale')).toEqual('${lang}'));
-
-        it('should display localized date', async () =>
-          expect(await getParagraph('date')).toEqual('${translation.date}'));
-
-        it('should display pluralized message', async () =>
-          expect(await getParagraph('plural')).toEqual('${translation.plural}'));
-      });
-    `,
-    );
-  }
-
   // Update angular.json to build, serve, and test each locale.
   await updateJsonFile('angular.json', (workspaceJson) => {
     const appProject = workspaceJson.projects['test-project'];
     const appArchitect = workspaceJson.projects['test-project'].architect;
     const buildConfigs = appArchitect['build'].configurations;
     const serveConfigs = appArchitect['serve'].configurations;
-    const e2eConfigs = appArchitect['e2e'].configurations;
 
     appArchitect['build'].defaultConfiguration = undefined;
 
@@ -245,10 +240,6 @@ export async function setupI18nConfig() {
 
       buildConfigs[lang] = { localize: [lang] };
       serveConfigs[lang] = { buildTarget: `test-project:build:${lang}` };
-      e2eConfigs[lang] = {
-        specs: [`./src/app.${lang}.e2e-spec.ts`],
-        devServerTarget: `test-project:serve:${lang}`,
-      };
     }
   });
 
