@@ -5,7 +5,7 @@ import { RouterOutlet } from '@angular/router';<% } %>
   selector: '<%= selector %>',
   imports: [<% if(routing) { %>RouterOutlet<% } %>],<% if(inlineTemplate) { %>
   template: `
-    <h1>Welcome to {{ title() }}!</h1>
+    <h1>Hello, {{ title() }}</h1>
 
     <% if (routing) {
      %><router-outlet /><%
