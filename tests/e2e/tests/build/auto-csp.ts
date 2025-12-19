@@ -1,9 +1,11 @@
-import assert from 'node:assert';
+import assert from 'node:assert/strict';
+import { setTimeout } from 'node:timers/promises';
 import { getGlobalVariable } from '../../utils/env';
 import { expectFileToMatch, writeFile, writeMultipleFiles } from '../../utils/fs';
 import { findFreePort } from '../../utils/network';
 import { execAndWaitForOutputToMatch, ng } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';
+import { executeBrowserTest } from '../../utils/puppeteer';
 
 const CSP_META_TAG = /<meta http-equiv="Content-Security-Policy"/;
 
@@ -67,55 +69,6 @@ export default async function () {
         </body>
       </html>
     `,
-    'e2e/src/app.e2e-spec.ts': `
-      import { browser, by, element } from 'protractor';
-      import * as webdriver from 'selenium-webdriver';
-
-      function allConsoleWarnMessagesAndErrors() {
-        return browser
-          .manage()
-          .logs()
-          .get('browser')
-          .then(function (browserLog: any[]) {
-            const warnMessages: any[] = [];
-            browserLog.filter((logEntry) => {
-              const msg = logEntry.message;
-              console.log('>> ' + msg);
-              if (logEntry.level.value >= webdriver.logging.Level.INFO.value) {
-                warnMessages.push(msg);
-              }
-            });
-            return warnMessages;
-          });
-      }
-
-      describe('Hello world E2E Tests', () => {
-        beforeAll(async () => {
-          await browser.waitForAngularEnabled(true);
-        });
-
-        it('should display: Welcome and run all scripts in order', async () => {
-          // Load the page without waiting for Angular since it is not bootstrapped automatically.
-          await browser.driver.get(browser.baseUrl);
-
-          // Test the contents.
-          expect(await element(by.css('h1')).getText()).toMatch('Hello');
-
-          // Make sure all scripts ran and there were no client side errors.
-          const consoleMessages = await allConsoleWarnMessagesAndErrors();
-          expect(consoleMessages.length).toEqual(4); // No additional errors
-          // Extract just the printed messages from the console data.
-          const printedMessages = consoleMessages.map(m => m.match(/"(.*?)"/)[1]);
-          expect(printedMessages).toEqual([
-            // All messages printed in order because execution order is preserved.
-            "Inline Script Head",
-            "Inline Script Body: 1339",
-            "First External Script: 1338",
-            "Second External Script: 1337",
-          ]);
-        });
-      });
-      `,
   });
 
   async function spawnServer(): Promise<number> {
@@ -137,7 +90,49 @@ export default async function () {
   // Make sure if contains the critical CSS inlining CSP code.
   await expectFileToMatch('dist/test-project/browser/index.html', 'ngCspMedia');
 
-  // Make sure that our e2e protractor tests run to confirm that our angular project runs.
+  // Make sure that our e2e tests run to confirm that our angular project runs.
   const port = await spawnServer();
-  await ng('e2e', `--base-url=http://localhost:${port}`, '--dev-server-target=');
+  await executeBrowserTest({
+    baseUrl: `http://localhost:${port}/`,
+    checkFn: async (page) => {
+      const warnMessages: string[] = [];
+      page.on('console', (msg) => {
+        if (msg.type() === 'warning') {
+          warnMessages.push(msg.text());
+        }
+      });
+
+      // Reload to ensure we capture messages from the start if needed,
+      // although executeBrowserTest already navigated.
+      await page.reload();
+
+      // Wait for the expected number of warnings
+      let retries = 50;
+      while (warnMessages.length < 4 && retries > 0) {
+        await setTimeout(100);
+        retries--;
+      }
+
+      assert.strictEqual(
+        warnMessages.length,
+        4,
+        `Expected 4 console warnings, but got ${warnMessages.length}:\n${warnMessages.join('\n')}`,
+      );
+
+      const expectedMessages = [
+        'Inline Script Head',
+        'Inline Script Body: 1339',
+        'First External Script: 1338',
+        'Second External Script: 1337',
+      ];
+
+      for (let i = 0; i < expectedMessages.length; i++) {
+        if (!warnMessages[i].includes(expectedMessages[i])) {
+          assert.fail(
+            `Expected warning ${i} to include '${expectedMessages[i]}', but got '${warnMessages[i]}'`,
+          );
+        }
+      }
+    },
+  });
 }
