@@ -1,5 +1,6 @@
 import { type Page, launch } from 'puppeteer';
 import { execAndWaitForOutputToMatch, killAllProcesses } from './process';
+import { stripVTControlCharacters } from 'node:util';
 
 export interface BrowserTestOptions {
   project?: string;
@@ -25,8 +26,11 @@ export async function executeBrowserTest(options: BrowserTestOptions = {}) {
         serveArgs.push(`--configuration=${options.configuration}`);
       }
 
-      const { stdout } = await execAndWaitForOutputToMatch('ng', serveArgs, match);
-      url = stdout.match(match)?.[1];
+      const { stdout } = await execAndWaitForOutputToMatch('ng', serveArgs, match, {
+        ...process.env,
+        'NO_COLOR': '1',
+      });
+      url = stripVTControlCharacters(stdout).match(match)?.[1];
       if (!url) {
         throw new Error('Could not find serving URL');
       }
