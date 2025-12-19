@@ -8,10 +8,12 @@
 
 import assert from 'node:assert/strict';
 import { readdir } from 'node:fs/promises';
+import { setTimeout } from 'node:timers/promises';
 import { getGlobalVariable } from '../../utils/env';
 import { expectFileToExist, expectFileToMatch, replaceInFile, writeFile } from '../../utils/fs';
 import { ng } from '../../utils/process';
 import { expectToFail } from '../../utils/utils';
+import { executeBrowserTest } from '../../utils/puppeteer';
 
 export default async function () {
   const useWebpackBuilder = !getGlobalVariable('argv')['esbuild'];
@@ -55,24 +57,32 @@ export default async function () {
   // https://github.com/angular/protractor/issues/2207
   await replaceInFile('src/app/app.ts', 'console.log', 'console.warn');
 
-  await writeFile(
-    'e2e/app.e2e-spec.ts',
-    `
-    import { AppPage } from './app.po';
-    import { browser, logging } from 'protractor';
-    describe('worker bundle', () => {
-      it('should log worker messages', async () => {
-        const page = new AppPage();;
-        page.navigateTo();
-        const logs = await browser.manage().logs().get(logging.Type.BROWSER);
-        expect(logs.length).toEqual(1);
-        expect(logs[0].message).toContain('page got message: worker response to hello');
+  await executeBrowserTest({
+    checkFn: async (page) => {
+      const messages: string[] = [];
+      page.on('console', (msg) => {
+        messages.push(msg.text());
       });
-    });
-  `,
-  );
 
-  await ng('e2e');
+      // Reload to ensure we capture messages from the start if needed,
+      // although executeBrowserTest already navigated.
+      await page.reload();
+
+      // Wait for the worker message
+      let retries = 50;
+      while (
+        !messages.some((m) => m.includes('page got message: worker response to hello')) &&
+        retries > 0
+      ) {
+        await setTimeout(100);
+        retries--;
+      }
+
+      if (!messages.some((m) => m.includes('page got message: worker response to hello'))) {
+        assert.fail(`Expected worker message not found in console. Got:\n${messages.join('\n')}`);
+      }
+    },
+  });
 }
 
 async function getWorkerOutputFile(useWebpackBuilder: boolean): Promise<string> {
