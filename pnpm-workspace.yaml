@@ -15,7 +15,6 @@ packages:
   - packages/ngtools/webpack
   - modules/testing/builder
   - tests
-  - tools/baseline_browserslist
 # The minimum age of a release to be considered for dependency installation.
 # The value is in minutes (1440 minutes = 1 day).
 minimumReleaseAge: 1440
