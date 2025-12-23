@@ -14,7 +14,6 @@ import type { Compiler } from 'webpack';
 import webpackDevMiddleware from 'webpack-dev-middleware';
 
 import { statsErrorsToString } from '../../utils/stats';
-import { createConsoleLogger } from '@angular-devkit/core/node';
 import { logging } from '@angular-devkit/core';
 import { BuildOptions } from '../../../../utils/build-options';
 import { normalizeSourceMaps } from '../../../../utils/index';
@@ -33,7 +32,7 @@ const init: any = (config: any, emitter: any) => {
     );
   }
   const options = config.buildWebpack.options as BuildOptions;
-  const logger: logging.Logger = config.buildWebpack.logger || createConsoleLogger();
+  const logger: logging.Logger = config.buildWebpack.logger;
 
   // Add a reporter that fixes sourcemap urls.
   if (normalizeSourceMaps(options.sourceMap).scripts) {
