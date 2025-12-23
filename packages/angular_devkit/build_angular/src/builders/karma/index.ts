@@ -17,7 +17,6 @@ import { strings } from '@angular-devkit/core';
 import type { ConfigOptions } from 'karma';
 import { createRequire } from 'node:module';
 import * as path from 'node:path';
-import { Observable, from, mergeMap } from 'rxjs';
 import { Configuration } from 'webpack';
 import { ExecutionTransformer } from '../../transforms';
 import { normalizeFileReplacements } from '../../utils';
@@ -31,7 +30,7 @@ export type KarmaConfigOptions = ConfigOptions & {
 /**
  * @experimental Direct usage of this function is considered experimental.
  */
-export function execute(
+export async function* execute(
   options: KarmaBuilderOptions,
   context: BuilderContext,
   transforms: {
@@ -39,37 +38,38 @@ export function execute(
     // The karma options transform cannot be async without a refactor of the builder implementation
     karmaOptions?: (options: KarmaConfigOptions) => KarmaConfigOptions;
   } = {},
-): Observable<BuilderOutput> {
+): AsyncIterable<BuilderOutput> {
   // Check Angular version.
   assertCompatibleAngularVersion(context.workspaceRoot);
 
-  return from(getExecuteWithBuilder(options, context)).pipe(
-    mergeMap(([useEsbuild, executeWithBuilder]) => {
-      if (useEsbuild) {
-        if (transforms.webpackConfiguration) {
-          context.logger.warn(
-            `This build is using the application builder but transforms.webpackConfiguration was provided. The transform will be ignored.`,
-          );
-        }
+  if (await checkForEsbuild(options, context)) {
+    if (transforms.webpackConfiguration) {
+      context.logger.warn(
+        `This build is using the application builder but transforms.webpackConfiguration was provided. The transform will be ignored.`,
+      );
+    }
 
-        if (options.fileReplacements) {
-          options.fileReplacements = normalizeFileReplacements(options.fileReplacements, './');
-        }
+    if (options.fileReplacements) {
+      options.fileReplacements = normalizeFileReplacements(options.fileReplacements, './');
+    }
 
-        if (typeof options.polyfills === 'string') {
-          options.polyfills = [options.polyfills];
-        }
+    if (typeof options.polyfills === 'string') {
+      options.polyfills = [options.polyfills];
+    }
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        return executeWithBuilder(options as any, context, transforms);
-      } else {
-        const karmaOptions = getBaseKarmaOptions(options, context);
+    const { executeKarmaBuilder } = await import('@angular/build');
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        return executeWithBuilder(options as any, context, karmaOptions, transforms);
-      }
-    }),
-  );
+    yield* executeKarmaBuilder(
+      options as unknown as import('@angular/build').KarmaBuilderOptions,
+      context,
+      transforms,
+    );
+  } else {
+    const karmaOptions = getBaseKarmaOptions(options, context);
+    const { execute } = await import('./browser_builder');
+
+    yield* execute(options, context, karmaOptions, transforms);
+  }
 }
 
 function getBaseKarmaOptions(
@@ -169,32 +169,7 @@ function getBuiltInKarmaConfig(
 }
 
 export type { KarmaBuilderOptions };
-export default createBuilder<Record<string, string> & KarmaBuilderOptions>(execute);
-
-async function getExecuteWithBuilder(
-  options: KarmaBuilderOptions,
-  context: BuilderContext,
-): Promise<
-  [
-    boolean,
-    (
-      | (typeof import('@angular/build'))['executeKarmaBuilder']
-      | (typeof import('./browser_builder'))['execute']
-    ),
-  ]
-> {
-  const useEsbuild = await checkForEsbuild(options, context);
-  let execute;
-  if (useEsbuild) {
-    const { executeKarmaBuilder } = await import('@angular/build');
-    execute = executeKarmaBuilder;
-  } else {
-    const browserBuilderModule = await import('./browser_builder');
-    execute = browserBuilderModule.execute;
-  }
-
-  return [useEsbuild, execute];
-}
+export default createBuilder<KarmaBuilderOptions>(execute);
 
 async function checkForEsbuild(
   options: KarmaBuilderOptions,

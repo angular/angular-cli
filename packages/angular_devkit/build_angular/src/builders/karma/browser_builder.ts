@@ -7,17 +7,16 @@
  */
 
 import { purgeStaleBuildCache } from '@angular/build/private';
-import { BuilderContext, BuilderOutput } from '@angular-devkit/architect';
-import type { Config, ConfigOptions } from 'karma';
+import type { BuilderContext, BuilderOutput } from '@angular-devkit/architect';
+import type { ConfigOptions, Server } from 'karma';
 import * as path from 'node:path';
-import { Observable, defaultIfEmpty, from, switchMap } from 'rxjs';
-import { Configuration } from 'webpack';
+import webpack, { Configuration } from 'webpack';
 import { getCommonConfig, getStylesConfig } from '../../tools/webpack/configs';
-import { ExecutionTransformer } from '../../transforms';
+import type { ExecutionTransformer } from '../../transforms';
 import { generateBrowserWebpackConfigFromContext } from '../../utils/webpack-browser-config';
-import { Schema as BrowserBuilderOptions, OutputHashing } from '../browser/schema';
+import { type Schema as BrowserBuilderOptions, OutputHashing } from '../browser/schema';
 import { FindTestsPlugin } from './find-tests-plugin';
-import { Schema as KarmaBuilderOptions } from './schema';
+import type { Schema as KarmaBuilderOptions } from './schema';
 
 export type KarmaConfigOptions = ConfigOptions & {
   buildWebpack?: unknown;
@@ -33,9 +32,22 @@ export function execute(
     // The karma options transform cannot be async without a refactor of the builder implementation
     karmaOptions?: (options: KarmaConfigOptions) => KarmaConfigOptions;
   } = {},
-): Observable<BuilderOutput> {
-  return from(initializeBrowser(options, context, transforms.webpackConfiguration)).pipe(
-    switchMap(async ([karma, webpackConfig]) => {
+): AsyncIterable<BuilderOutput> {
+  let karmaServer: Server;
+  let isCancelled = false;
+
+  return new ReadableStream({
+    async start(controller) {
+      const [karma, webpackConfig] = await initializeBrowser(
+        options,
+        context,
+        transforms.webpackConfiguration,
+      );
+
+      if (isCancelled) {
+        return;
+      }
+
       const projectName = context.target?.project;
       if (!projectName) {
         throw new Error(`The 'karma' builder requires a target to be specified.`);
@@ -65,9 +77,31 @@ export function execute(
         }),
       );
 
+      const KARMA_APPLICATION_PATH = '_karma_webpack_';
+      webpackConfig.output ??= {};
+      webpackConfig.output.path = `/${KARMA_APPLICATION_PATH}/`;
+      webpackConfig.output.publicPath = `/${KARMA_APPLICATION_PATH}/`;
+
+      if (karmaOptions.singleRun) {
+        webpackConfig.plugins.unshift({
+          apply: (compiler: webpack.Compiler) => {
+            compiler.hooks.afterEnvironment.tap('karma', () => {
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              compiler.watchFileSystem = { watch: () => {} } as any;
+            });
+          },
+        });
+      }
+
+      // Remove the watch option to avoid the [DEP_WEBPACK_WATCH_WITHOUT_CALLBACK] warning.
+      // The compiler is initialized in watch mode by webpack-dev-middleware.
+      delete webpackConfig.watch;
+
+      const compiler = webpack(webpackConfig);
+
       karmaOptions.buildWebpack = {
         options,
-        webpackConfig,
+        compiler,
         logger: context.logger,
       };
 
@@ -77,38 +111,43 @@ export function execute(
         { promiseConfig: true, throwErrors: true },
       );
 
-      return [karma, parsedKarmaConfig] as [typeof karma, KarmaConfigOptions];
-    }),
-    switchMap(
-      ([karma, karmaConfig]) =>
-        new Observable<BuilderOutput>((subscriber) => {
-          // Pass onto Karma to emit BuildEvents.
-          karmaConfig.buildWebpack ??= {};
-          if (typeof karmaConfig.buildWebpack === 'object') {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            (karmaConfig.buildWebpack as any).failureCb ??= () =>
-              subscriber.next({ success: false });
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            (karmaConfig.buildWebpack as any).successCb ??= () =>
-              subscriber.next({ success: true });
-          }
+      if (isCancelled) {
+        return;
+      }
 
-          // Complete the observable once the Karma server returns.
-          const karmaServer = new karma.Server(karmaConfig as Config, (exitCode) => {
-            subscriber.next({ success: exitCode === 0 });
-            subscriber.complete();
-          });
+      const enqueue = (value: BuilderOutput) => {
+        try {
+          controller.enqueue(value);
+        } catch {
+          // Controller is already closed
+        }
+      };
 
-          const karmaStart = karmaServer.start();
+      const close = () => {
+        try {
+          controller.close();
+        } catch {
+          // Controller is already closed
+        }
+      };
 
-          // Cleanup, signal Karma to exit.
-          return () => {
-            void karmaStart.then(() => karmaServer.stop());
-          };
-        }),
-    ),
-    defaultIfEmpty({ success: false }),
-  );
+      // Close the stream once the Karma server returns.
+      karmaServer = new karma.Server(parsedKarmaConfig, (exitCode) => {
+        enqueue({ success: exitCode === 0 });
+        close();
+      });
+
+      karmaServer.on('run_complete', (_, results) => {
+        enqueue({ success: results.exitCode === 0 });
+      });
+
+      await karmaServer.start();
+    },
+    async cancel() {
+      isCancelled = true;
+      await karmaServer?.stop();
+    },
+  });
 }
 
 async function initializeBrowser(
