@@ -55,8 +55,6 @@ const init: any = (config: any, emitter: any) => {
     );
   }
 
-  config.reporters.unshift('@angular-devkit/build-angular--event-reporter');
-
   // When using code-coverage, auto-add karma-coverage.
   if (
     options.codeCoverage &&
@@ -181,18 +179,6 @@ function muteDuplicateReporterLogging(context: any, config: any) {
   }
 }
 
-// Emits builder events.
-const eventReporter: any = function (this: any, baseReporterDecorator: any, config: any) {
-  baseReporterDecorator(this);
-
-  muteDuplicateReporterLogging(this, config);
-
-  // avoid duplicate failure message
-  this.specFailure = () => {};
-};
-
-eventReporter.$inject = ['baseReporterDecorator', 'config'];
-
 // Strip the server address and webpack scheme (webpack://) from error log.
 const sourceMapReporter: any = function (this: any, baseReporterDecorator: any, config: any) {
   baseReporterDecorator(this);
@@ -246,7 +232,6 @@ function fallbackMiddleware() {
 module.exports = {
   'framework:@angular-devkit/build-angular': ['factory', init],
   'reporter:@angular-devkit/build-angular--sourcemap-reporter': ['type', sourceMapReporter],
-  'reporter:@angular-devkit/build-angular--event-reporter': ['type', eventReporter],
   'middleware:@angular-devkit/build-angular--blocker': ['factory', requestBlocker],
   'middleware:@angular-devkit/build-angular--fallback': ['factory', fallbackMiddleware],
 };
