@@ -6,6 +6,15 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
+import type { BuilderContext, BuilderOutput } from '@angular-devkit/architect';
+import { type Observable, from } from 'rxjs';
+import {
+  type KarmaBuilderOptions,
+  type KarmaConfigOptions,
+  execute as executeKarmaBuilderInternal,
+} from './builders/karma';
+import type { ExecutionTransformer } from './transforms';
+
 export * from './transforms';
 
 export { CrossOrigin, OutputHashing, Type } from './builders/browser/schema';
@@ -40,11 +49,21 @@ export {
   type ExtractI18nBuilderOptions,
 } from './builders/extract-i18n';
 
-export {
-  execute as executeKarmaBuilder,
-  type KarmaBuilderOptions,
-  type KarmaConfigOptions,
-} from './builders/karma';
+/**
+ * @experimental Direct usage of this function is considered experimental.
+ */
+export function executeKarmaBuilder(
+  options: KarmaBuilderOptions,
+  context: BuilderContext,
+  transforms?: {
+    webpackConfiguration?: ExecutionTransformer<import('webpack').Configuration>;
+    karmaOptions?: (options: KarmaConfigOptions) => KarmaConfigOptions;
+  },
+): Observable<BuilderOutput> {
+  return from(executeKarmaBuilderInternal(options, context, transforms));
+}
+
+export { type KarmaBuilderOptions, type KarmaConfigOptions };
 
 export {
   execute as executeProtractorBuilder,

@@ -171,7 +171,6 @@ function getBuiltInKarmaConfig(
 export type { KarmaBuilderOptions };
 export default createBuilder<KarmaBuilderOptions>(execute);
 
-
 async function checkForEsbuild(
   options: KarmaBuilderOptions,
   context: BuilderContext,
