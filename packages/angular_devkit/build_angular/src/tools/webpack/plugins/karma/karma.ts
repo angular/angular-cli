@@ -85,28 +85,6 @@ const init: any = (config: any, emitter: any) => {
   config.middleware = config.middleware || [];
   config.middleware.push('@angular-devkit/build-angular--fallback');
 
-  compiler.hooks.done.tap('karma', (stats) => {
-    if (stats.hasErrors()) {
-      // Only generate needed JSON stats and when needed.
-      const statsJson = stats.toJson({
-        all: false,
-        children: true,
-        errors: true,
-        warnings: true,
-      });
-
-      logger.error(statsErrorsToString(statsJson, { colors: true }));
-
-      if (config.singleRun) {
-        // Notify potential listeners of the compile error.
-        emitter.emit('load_error');
-      }
-
-      // Finish Karma run early in case of compilation error.
-      emitter.emit('run_complete', [], { exitCode: 1 });
-    }
-  });
-
   function handler(callback?: () => void): void {
     isBlocked = true;
     callback?.();
@@ -133,6 +111,32 @@ const init: any = (config: any, emitter: any) => {
 
   return new Promise<void>((resolve) => {
     compiler.hooks.done.tap('karma', (stats) => {
+      if (stats.hasErrors()) {
+        lastCompilationHash = undefined;
+
+        // Only generate needed JSON stats and when needed.
+        const statsJson = stats.toJson({
+          all: false,
+          children: true,
+          errors: true,
+          warnings: true,
+        });
+
+        logger.error(statsErrorsToString(statsJson, { colors: true }));
+
+        if (config.singleRun) {
+          // Notify potential listeners of the compile error.
+          emitter.emit('load_error');
+        }
+
+        // Finish Karma run early in case of compilation error.
+        emitter.emit('run_complete', [], { exitCode: 1 });
+      } else if (stats.hash != lastCompilationHash) {
+        // Refresh karma only when there are no webpack errors, and if the compilation changed.
+        lastCompilationHash = stats.hash;
+        emitter.refreshFiles();
+      }
+
       if (isFirstRun) {
         // This is needed to block Karma from launching browsers before Webpack writes the assets in memory.
         // See the below:
@@ -140,14 +144,6 @@ const init: any = (config: any, emitter: any) => {
         // https://github.com/angular/angular-cli/issues/22495
         isFirstRun = false;
         resolve();
-      }
-
-      if (stats.hasErrors()) {
-        lastCompilationHash = undefined;
-      } else if (stats.hash != lastCompilationHash) {
-        // Refresh karma only when there are no webpack errors, and if the compilation changed.
-        lastCompilationHash = stats.hash;
-        emitter.refreshFiles();
       }
 
       unblock();
