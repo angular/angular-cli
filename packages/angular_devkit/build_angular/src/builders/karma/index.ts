@@ -42,9 +42,7 @@ export async function* execute(
   // Check Angular version.
   assertCompatibleAngularVersion(context.workspaceRoot);
 
-  const [useEsbuild, executeWithBuilder] = await getExecuteWithBuilder(options, context);
-
-  if (useEsbuild) {
+  if (await checkForEsbuild(options, context)) {
     if (transforms.webpackConfiguration) {
       context.logger.warn(
         `This build is using the application builder but transforms.webpackConfiguration was provided. The transform will be ignored.`,
@@ -59,13 +57,18 @@ export async function* execute(
       options.polyfills = [options.polyfills];
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    yield* executeWithBuilder(options as any, context, transforms);
+    const { executeKarmaBuilder } = await import('@angular/build');
+
+    yield* executeKarmaBuilder(
+      options as unknown as import('@angular/build').KarmaBuilderOptions,
+      context,
+      transforms,
+    );
   } else {
     const karmaOptions = getBaseKarmaOptions(options, context);
+    const { execute } = await import('./browser_builder');
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    yield* executeWithBuilder(options as any, context, karmaOptions, transforms);
+    yield* execute(options, context, karmaOptions, transforms);
   }
 }
 
@@ -168,30 +171,6 @@ function getBuiltInKarmaConfig(
 export type { KarmaBuilderOptions };
 export default createBuilder<KarmaBuilderOptions>(execute);
 
-async function getExecuteWithBuilder(
-  options: KarmaBuilderOptions,
-  context: BuilderContext,
-): Promise<
-  [
-    boolean,
-    (
-      | (typeof import('@angular/build'))['executeKarmaBuilder']
-      | (typeof import('./browser_builder'))['execute']
-    ),
-  ]
-> {
-  const useEsbuild = await checkForEsbuild(options, context);
-  let execute;
-  if (useEsbuild) {
-    const { executeKarmaBuilder } = await import('@angular/build');
-    execute = executeKarmaBuilder;
-  } else {
-    const browserBuilderModule = await import('./browser_builder');
-    execute = browserBuilderModule.execute;
-  }
-
-  return [useEsbuild, execute];
-}
 
 async function checkForEsbuild(
   options: KarmaBuilderOptions,
