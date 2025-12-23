@@ -8,7 +8,7 @@
 
 /* eslint-disable */
 // TODO: cleanup this file, it's copied as is from Angular CLI.
-import * as http from 'node:http';
+import type { IncomingMessage, ServerResponse } from 'node:http';
 import * as path from 'node:path';
 import type { Compiler } from 'webpack';
 import webpackDevMiddleware from 'webpack-dev-middleware';
@@ -20,9 +20,9 @@ import { normalizeSourceMaps } from '../../../../utils/index';
 
 const KARMA_APPLICATION_PATH = '_karma_webpack_';
 
-let blocked: any[] = [];
+let blocked: ((err?: unknown) => void)[] = [];
 let isBlocked = false;
-let webpackMiddleware: any;
+let webpackMiddleware: webpackDevMiddleware.API<IncomingMessage, ServerResponse>;
 
 const init: any = (config: any, emitter: any) => {
   if (!config.buildWebpack) {
@@ -94,8 +94,7 @@ const init: any = (config: any, emitter: any) => {
 
   webpackMiddleware = webpackDevMiddleware(compiler, webpackMiddlewareConfig);
   emitter.on('exit', (done: any) => {
-    webpackMiddleware.close();
-    compiler.close(() => done());
+    webpackMiddleware.close(() => compiler.close(() => done()));
   });
 
   function unblock() {
@@ -153,7 +152,11 @@ init.$inject = ['config', 'emitter'];
 
 // Block requests until the Webpack compilation is done.
 function requestBlocker() {
-  return function (_request: any, _response: any, next: () => void) {
+  return function (
+    _request: IncomingMessage,
+    _response: ServerResponse,
+    next: (err?: unknown) => void,
+  ) {
     if (isBlocked) {
       blocked.push(next);
     } else {
@@ -203,7 +206,11 @@ sourceMapReporter.$inject = ['baseReporterDecorator', 'config'];
 
 // When a request is not found in the karma server, try looking for it from the webpack server root.
 function fallbackMiddleware() {
-  return function (request: http.IncomingMessage, response: http.ServerResponse, next: () => void) {
+  return function (
+    request: IncomingMessage,
+    response: ServerResponse,
+    next: (err?: unknown) => void,
+  ) {
     if (webpackMiddleware) {
       if (request.url && !new RegExp(`\\/${KARMA_APPLICATION_PATH}\\/.*`).test(request.url)) {
         request.url = '/' + KARMA_APPLICATION_PATH + request.url;
