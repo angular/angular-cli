@@ -17,7 +17,6 @@ import { strings } from '@angular-devkit/core';
 import type { ConfigOptions } from 'karma';
 import { createRequire } from 'node:module';
 import * as path from 'node:path';
-import { Observable, from, mergeMap } from 'rxjs';
 import { Configuration } from 'webpack';
 import { ExecutionTransformer } from '../../transforms';
 import { normalizeFileReplacements } from '../../utils';
@@ -31,7 +30,7 @@ export type KarmaConfigOptions = ConfigOptions & {
 /**
  * @experimental Direct usage of this function is considered experimental.
  */
-export function execute(
+export async function* execute(
   options: KarmaBuilderOptions,
   context: BuilderContext,
   transforms: {
@@ -39,37 +38,35 @@ export function execute(
     // The karma options transform cannot be async without a refactor of the builder implementation
     karmaOptions?: (options: KarmaConfigOptions) => KarmaConfigOptions;
   } = {},
-): Observable<BuilderOutput> {
+): AsyncIterable<BuilderOutput> {
   // Check Angular version.
   assertCompatibleAngularVersion(context.workspaceRoot);
 
-  return from(getExecuteWithBuilder(options, context)).pipe(
-    mergeMap(([useEsbuild, executeWithBuilder]) => {
-      if (useEsbuild) {
-        if (transforms.webpackConfiguration) {
-          context.logger.warn(
-            `This build is using the application builder but transforms.webpackConfiguration was provided. The transform will be ignored.`,
-          );
-        }
+  const [useEsbuild, executeWithBuilder] = await getExecuteWithBuilder(options, context);
 
-        if (options.fileReplacements) {
-          options.fileReplacements = normalizeFileReplacements(options.fileReplacements, './');
-        }
+  if (useEsbuild) {
+    if (transforms.webpackConfiguration) {
+      context.logger.warn(
+        `This build is using the application builder but transforms.webpackConfiguration was provided. The transform will be ignored.`,
+      );
+    }
 
-        if (typeof options.polyfills === 'string') {
-          options.polyfills = [options.polyfills];
-        }
+    if (options.fileReplacements) {
+      options.fileReplacements = normalizeFileReplacements(options.fileReplacements, './');
+    }
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        return executeWithBuilder(options as any, context, transforms);
-      } else {
-        const karmaOptions = getBaseKarmaOptions(options, context);
+    if (typeof options.polyfills === 'string') {
+      options.polyfills = [options.polyfills];
+    }
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        return executeWithBuilder(options as any, context, karmaOptions, transforms);
-      }
-    }),
-  );
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    yield* executeWithBuilder(options as any, context, transforms);
+  } else {
+    const karmaOptions = getBaseKarmaOptions(options, context);
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    yield* executeWithBuilder(options as any, context, karmaOptions, transforms);
+  }
 }
 
 function getBaseKarmaOptions(
@@ -169,7 +166,7 @@ function getBuiltInKarmaConfig(
 }
 
 export type { KarmaBuilderOptions };
-export default createBuilder<Record<string, string> & KarmaBuilderOptions>(execute);
+export default createBuilder<KarmaBuilderOptions>(execute);
 
 async function getExecuteWithBuilder(
   options: KarmaBuilderOptions,
