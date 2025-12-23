@@ -10,7 +10,7 @@
 // TODO: cleanup this file, it's copied as is from Angular CLI.
 import * as http from 'node:http';
 import * as path from 'node:path';
-import webpack from 'webpack';
+import type { Compiler } from 'webpack';
 import webpackDevMiddleware from 'webpack-dev-middleware';
 
 import { statsErrorsToString } from '../../utils/stats';
@@ -18,7 +18,6 @@ import { createConsoleLogger } from '@angular-devkit/core/node';
 import { logging } from '@angular-devkit/core';
 import { BuildOptions } from '../../../../utils/build-options';
 import { normalizeSourceMaps } from '../../../../utils/index';
-import assert from 'node:assert';
 
 const KARMA_APPLICATION_PATH = '_karma_webpack_';
 
@@ -67,16 +66,13 @@ const init: any = (config: any, emitter: any) => {
     config.reporters.push('coverage');
   }
 
-  // Add webpack config.
-  const webpackConfig = config.buildWebpack.webpackConfig;
+  const compiler = config.buildWebpack.compiler as Compiler;
   const webpackMiddlewareConfig = {
     // Hide webpack output because its noisy.
     stats: false,
     publicPath: `/${KARMA_APPLICATION_PATH}/`,
   };
 
-  // Use existing config if any.
-  config.webpack = { ...webpackConfig, ...config.webpack };
   config.webpackMiddleware = { ...webpackMiddlewareConfig, ...config.webpackMiddleware };
 
   // Our custom context and debug files list the webpack bundles directly instead of using
@@ -90,29 +86,10 @@ const init: any = (config: any, emitter: any) => {
   config.middleware = config.middleware || [];
   config.middleware.push('@angular-devkit/build-angular--fallback');
 
-  if (config.singleRun) {
-    // There's no option to turn off file watching in webpack-dev-server, but
-    // we can override the file watcher instead.
-    webpackConfig.plugins.unshift({
-      apply: (compiler: any) => {
-        compiler.hooks.afterEnvironment.tap('karma', () => {
-          compiler.watchFileSystem = { watch: () => {} };
-        });
-      },
-    });
-  }
-  // Files need to be served from a custom path for Karma.
-  webpackConfig.output.path = `/${KARMA_APPLICATION_PATH}/`;
-  webpackConfig.output.publicPath = `/${KARMA_APPLICATION_PATH}/`;
-
-  const compiler = webpack(webpackConfig, (error, stats) => {
-    if (error) {
-      throw error;
-    }
-
-    if (stats?.hasErrors()) {
+  compiler.hooks.done.tap('karma', (stats) => {
+    if (stats.hasErrors()) {
       // Only generate needed JSON stats and when needed.
-      const statsJson = stats?.toJson({
+      const statsJson = stats.toJson({
         all: false,
         children: true,
         errors: true,
@@ -135,8 +112,6 @@ const init: any = (config: any, emitter: any) => {
     isBlocked = true;
     callback?.();
   }
-
-  assert(compiler, 'Webpack compiler factory did not return a compiler instance.');
 
   compiler.hooks.invalid.tap('karma', () => handler());
   compiler.hooks.watchRun.tapAsync('karma', (_: any, callback: () => void) => handler(callback));

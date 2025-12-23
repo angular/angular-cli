@@ -10,7 +10,7 @@ import { purgeStaleBuildCache } from '@angular/build/private';
 import type { BuilderContext, BuilderOutput } from '@angular-devkit/architect';
 import type { ConfigOptions, Server } from 'karma';
 import * as path from 'node:path';
-import type { Configuration } from 'webpack';
+import webpack, { Configuration } from 'webpack';
 import { getCommonConfig, getStylesConfig } from '../../tools/webpack/configs';
 import type { ExecutionTransformer } from '../../transforms';
 import { generateBrowserWebpackConfigFromContext } from '../../utils/webpack-browser-config';
@@ -77,9 +77,31 @@ export function execute(
         }),
       );
 
+      const KARMA_APPLICATION_PATH = '_karma_webpack_';
+      webpackConfig.output ??= {};
+      webpackConfig.output.path = `/${KARMA_APPLICATION_PATH}/`;
+      webpackConfig.output.publicPath = `/${KARMA_APPLICATION_PATH}/`;
+
+      if (karmaOptions.singleRun) {
+        webpackConfig.plugins.unshift({
+          apply: (compiler: webpack.Compiler) => {
+            compiler.hooks.afterEnvironment.tap('karma', () => {
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              compiler.watchFileSystem = { watch: () => {} } as any;
+            });
+          },
+        });
+      }
+
+      // Remove the watch option to avoid the [DEP_WEBPACK_WATCH_WITHOUT_CALLBACK] warning.
+      // The compiler is initialized in watch mode by webpack-dev-middleware.
+      delete webpackConfig.watch;
+
+      const compiler = webpack(webpackConfig);
+
       karmaOptions.buildWebpack = {
         options,
-        webpackConfig,
+        compiler,
         logger: context.logger,
       };
 
