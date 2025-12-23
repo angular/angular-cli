@@ -25,8 +25,6 @@ const KARMA_APPLICATION_PATH = '_karma_webpack_';
 let blocked: any[] = [];
 let isBlocked = false;
 let webpackMiddleware: any;
-let successCb: () => void;
-let failureCb: () => void;
 
 const init: any = (config: any, emitter: any) => {
   if (!config.buildWebpack) {
@@ -37,8 +35,6 @@ const init: any = (config: any, emitter: any) => {
   }
   const options = config.buildWebpack.options as BuildOptions;
   const logger: logging.Logger = config.buildWebpack.logger || createConsoleLogger();
-  successCb = config.buildWebpack.successCb;
-  failureCb = config.buildWebpack.failureCb;
 
   // Add a reporter that fixes sourcemap urls.
   if (normalizeSourceMaps(options.sourceMap).scripts) {
@@ -132,9 +128,6 @@ const init: any = (config: any, emitter: any) => {
 
       // Finish Karma run early in case of compilation error.
       emitter.emit('run_complete', [], { exitCode: 1 });
-
-      // Emit a failure build event if there are compilation errors.
-      failureCb();
     }
   });
 
@@ -223,14 +216,6 @@ const eventReporter: any = function (this: any, baseReporterDecorator: any, conf
   baseReporterDecorator(this);
 
   muteDuplicateReporterLogging(this, config);
-
-  this.onRunComplete = function (_browsers: any, results: any) {
-    if (results.exitCode === 0) {
-      successCb();
-    } else {
-      failureCb();
-    }
-  };
 
   // avoid duplicate failure message
   this.specFailure = () => {};

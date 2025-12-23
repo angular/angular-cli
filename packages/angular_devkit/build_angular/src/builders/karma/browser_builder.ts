@@ -8,7 +8,7 @@
 
 import { purgeStaleBuildCache } from '@angular/build/private';
 import type { BuilderContext, BuilderOutput } from '@angular-devkit/architect';
-import type { Config, ConfigOptions, Server } from 'karma';
+import type { ConfigOptions, Server } from 'karma';
 import * as path from 'node:path';
 import type { Configuration } from 'webpack';
 import { getCommonConfig, getStylesConfig } from '../../tools/webpack/configs';
@@ -83,11 +83,11 @@ export function execute(
         logger: context.logger,
       };
 
-      const parsedKarmaConfig = (await karma.config.parseConfig(
+      const parsedKarmaConfig = await karma.config.parseConfig(
         options.karmaConfig && path.resolve(context.workspaceRoot, options.karmaConfig),
         transforms.karmaOptions ? transforms.karmaOptions(karmaOptions) : karmaOptions,
         { promiseConfig: true, throwErrors: true },
-      )) as KarmaConfigOptions;
+      );
 
       if (isCancelled) {
         return;
@@ -109,19 +109,14 @@ export function execute(
         }
       };
 
-      // Pass onto Karma to emit BuildEvents.
-      parsedKarmaConfig.buildWebpack ??= {};
-      if (typeof parsedKarmaConfig.buildWebpack === 'object') {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (parsedKarmaConfig.buildWebpack as any).failureCb ??= () => enqueue({ success: false });
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (parsedKarmaConfig.buildWebpack as any).successCb ??= () => enqueue({ success: true });
-      }
-
       // Close the stream once the Karma server returns.
-      karmaServer = new karma.Server(parsedKarmaConfig as Config, (exitCode) => {
+      karmaServer = new karma.Server(parsedKarmaConfig, (exitCode) => {
         enqueue({ success: exitCode === 0 });
         close();
+      });
+
+      karmaServer.on('run_complete', (_, results) => {
+        enqueue({ success: results.exitCode === 0 });
       });
 
       await karmaServer.start();
