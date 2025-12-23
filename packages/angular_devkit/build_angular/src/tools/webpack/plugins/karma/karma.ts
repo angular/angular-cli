@@ -20,8 +20,6 @@ import { normalizeSourceMaps } from '../../../../utils/index';
 
 const KARMA_APPLICATION_PATH = '_karma_webpack_';
 
-let blocked: ((err?: unknown) => void)[] = [];
-let isBlocked = false;
 let webpackMiddleware: webpackDevMiddleware.API<IncomingMessage, ServerResponse>;
 
 const init: any = (config: any, emitter: any) => {
@@ -77,31 +75,14 @@ const init: any = (config: any, emitter: any) => {
   config.customContextFile = `${__dirname}/karma-context.html`;
   config.customDebugFile = `${__dirname}/karma-debug.html`;
 
-  // Add the request blocker and the webpack server fallback.
-  config.beforeMiddleware = config.beforeMiddleware || [];
-  config.beforeMiddleware.push('@angular-devkit/build-angular--blocker');
+  // Add the webpack server fallback.
   config.middleware = config.middleware || [];
   config.middleware.push('@angular-devkit/build-angular--fallback');
-
-  function handler(callback?: () => void): void {
-    isBlocked = true;
-    callback?.();
-  }
-
-  compiler.hooks.invalid.tap('karma', () => handler());
-  compiler.hooks.watchRun.tapAsync('karma', (_: any, callback: () => void) => handler(callback));
-  compiler.hooks.run.tapAsync('karma', (_: any, callback: () => void) => handler(callback));
 
   webpackMiddleware = webpackDevMiddleware(compiler, webpackMiddlewareConfig);
   emitter.on('exit', (done: any) => {
     webpackMiddleware.close(() => compiler.close(() => done()));
   });
-
-  function unblock() {
-    isBlocked = false;
-    blocked.forEach((cb) => cb());
-    blocked = [];
-  }
 
   let lastCompilationHash: string | undefined;
   let isFirstRun = true;
@@ -142,28 +123,11 @@ const init: any = (config: any, emitter: any) => {
         isFirstRun = false;
         resolve();
       }
-
-      unblock();
     });
   });
 };
 
 init.$inject = ['config', 'emitter'];
-
-// Block requests until the Webpack compilation is done.
-function requestBlocker() {
-  return function (
-    _request: IncomingMessage,
-    _response: ServerResponse,
-    next: (err?: unknown) => void,
-  ) {
-    if (isBlocked) {
-      blocked.push(next);
-    } else {
-      next();
-    }
-  };
-}
 
 // Copied from "karma-jasmine-diff-reporter" source code:
 // In case, when multiple reporters are used in conjunction
@@ -239,6 +203,5 @@ function fallbackMiddleware() {
 module.exports = {
   'framework:@angular-devkit/build-angular': ['factory', init],
   'reporter:@angular-devkit/build-angular--sourcemap-reporter': ['type', sourceMapReporter],
-  'middleware:@angular-devkit/build-angular--blocker': ['factory', requestBlocker],
   'middleware:@angular-devkit/build-angular--fallback': ['factory', fallbackMiddleware],
 };
