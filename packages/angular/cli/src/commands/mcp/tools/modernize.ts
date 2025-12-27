@@ -9,7 +9,7 @@
 import { dirname, join, relative } from 'path';
 import { z } from 'zod';
 import { CommandError, type Host } from '../host';
-import { createStructuredContentOutput, findAngularJsonDir } from '../utils';
+import { createStructuredContentOutput, findAngularJsonDir, getCommandErrorLogs } from '../utils';
 import { type McpToolDeclaration, declareTool } from './tool-registry';
 
 interface Transformation {
@@ -152,10 +152,7 @@ export async function runModernization(input: ModernizeInput, host: Host) {
             `Migration ${transformation.name} on directory ${relativePath} completed successfully.`,
           );
         } catch (e) {
-          if (e instanceof CommandError) {
-            logs = e.logs;
-          }
-          logs.push((e as Error).message);
+          logs = getCommandErrorLogs(e);
           instructions.push(
             `Migration ${transformation.name} on directory ${relativePath} failed.`,
           );

@@ -7,8 +7,7 @@
  */
 
 import { z } from 'zod';
-import { devserverKey } from '../../devserver';
-import { createStructuredContentOutput } from '../../utils';
+import { createStructuredContentOutput, getDefaultProjectName } from '../../utils';
 import { type McpToolContext, type McpToolDeclaration, declareTool } from '../tool-registry';
 
 /**
@@ -60,21 +59,43 @@ export async function waitForDevserverBuild(
   input: DevserverWaitForBuildToolInput,
   context: McpToolContext,
 ) {
-  const projectKey = devserverKey(input.project);
-  const devServer = context.devservers.get(projectKey);
-  const deadline = Date.now() + input.timeout;
+  if (context.devservers.size === 0) {
+    return createStructuredContentOutput({
+      status: 'no_devserver_found',
+      logs: undefined,
+    });
+  }
+
+  let projectName = input.project ?? getDefaultProjectName(context);
+
+  if (!projectName) {
+    // This should not happen. But if there's just a single running devserver, wait for it.
+    if (context.devservers.size === 1) {
+      projectName = Array.from(context.devservers.keys())[0];
+    } else {
+      return createStructuredContentOutput({
+        status: 'no_devserver_found',
+        logs: undefined,
+      });
+    }
+  }
+
+  const devServer = context.devservers.get(projectName);
 
   if (!devServer) {
     return createStructuredContentOutput<DevserverWaitForBuildToolOutput>({
       status: 'no_devserver_found',
+      logs: undefined,
     });
   }
 
+  const deadline = Date.now() + input.timeout;
   await wait(WATCH_DELAY);
   while (devServer.isBuilding()) {
     if (Date.now() > deadline) {
       return createStructuredContentOutput<DevserverWaitForBuildToolOutput>({
         status: 'timeout',
+        logs: undefined,
       });
     }
     await wait(WATCH_DELAY);
