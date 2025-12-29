@@ -1,9 +1,10 @@
 <% if(!!viewEncapsulation) { %>import { ViewEncapsulation } from '@angular/core';
+<% }%><% if(!zoneless) { %>import { provideZoneChangeDetection } from '@angular/core';
 <% }%>import { platformBrowser } from '@angular/platform-browser';
 import { AppModule } from './app/app<%= typeSeparator %>module';
 
 platformBrowser().bootstrapModule(AppModule, {
-  <% if(!zoneless) { %>ngZoneEventCoalescing: true,<% } %><% if(!!viewEncapsulation) { %>
-  defaultEncapsulation: ViewEncapsulation.<%= viewEncapsulation %><% } %>
+  <% if(!zoneless) { %> applicationProviders: [provideZoneChangeDetection({ eventCoalescing: true })], <% } %>
+  <% if(!!viewEncapsulation) { %> defaultEncapsulation: ViewEncapsulation.<%= viewEncapsulation %><% } %>
 })
   .catch(err => console.error(err));
