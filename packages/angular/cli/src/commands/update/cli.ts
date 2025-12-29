@@ -521,7 +521,11 @@ export default class UpdateCommandModule extends CommandModule<UpdateCommandArgs
 
     if (success) {
       const { root: commandRoot } = this.context;
-      const force = await shouldForcePackageManager(packageManager, logger, options.verbose);
+      const ignorePeerDependencies = await shouldForcePackageManager(
+        packageManager,
+        logger,
+        options.verbose,
+      );
       const tasks = new Listr([
         {
           title: 'Cleaning node modules directory',
@@ -545,7 +549,7 @@ export default class UpdateCommandModule extends CommandModule<UpdateCommandArgs
           async task() {
             try {
               await packageManager.install({
-                force,
+                ignorePeerDependencies,
               });
             } catch (e) {
               throw new CommandError('Unable to install packages');
@@ -553,7 +557,6 @@ export default class UpdateCommandModule extends CommandModule<UpdateCommandArgs
           },
         },
       ]);
-
       try {
         await tasks.run();
       } catch (e) {
