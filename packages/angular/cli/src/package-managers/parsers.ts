@@ -254,7 +254,9 @@ export function parseNpmLikeManifest(stdout: string, logger?: Logger): PackageMa
     return null;
   }
 
-  return JSON.parse(stdout);
+  const result = JSON.parse(stdout);
+
+  return Array.isArray(result) ? result[result.length - 1] : result;
 }
 
 /**

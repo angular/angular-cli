@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { parseNpmLikeError, parseYarnClassicError } from './parsers';
+import { parseNpmLikeError, parseNpmLikeManifest, parseYarnClassicError } from './parsers';
 
 describe('parsers', () => {
   describe('parseNpmLikeError', () => {
@@ -66,6 +66,25 @@ describe('parsers', () => {
     it('should return null for unparsable stdout', () => {
       const error = parseNpmLikeError('An unexpected error occurred.');
       expect(error).toBeNull();
+    });
+  });
+
+  describe('parseNpmLikeManifest', () => {
+    it('should parse a single manifest', () => {
+      const stdout = JSON.stringify({ name: 'foo', version: '1.0.0' });
+      expect(parseNpmLikeManifest(stdout)).toEqual({ name: 'foo', version: '1.0.0' });
+    });
+
+    it('should return the last manifest from an array', () => {
+      const stdout = JSON.stringify([
+        { name: 'foo', version: '1.0.0' },
+        { name: 'foo', version: '1.1.0' },
+      ]);
+      expect(parseNpmLikeManifest(stdout)).toEqual({ name: 'foo', version: '1.1.0' });
+    });
+
+    it('should return null for empty stdout', () => {
+      expect(parseNpmLikeManifest('')).toBeNull();
     });
   });
 
