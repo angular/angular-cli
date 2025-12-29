@@ -687,7 +687,7 @@ describe('Application Schematic', () => {
   });
 
   describe('standalone=false', () => {
-    it('should add the ngZoneEventCoalescing option by default with zone.js apps', async () => {
+    it('should add the provideZoneChangeDetection with event coalescing option by default with zone.js apps', async () => {
       const tree = await schematicRunner.runSchematic(
         'application',
         {
@@ -699,7 +699,9 @@ describe('Application Schematic', () => {
       );
 
       const content = tree.readContent('/projects/foo/src/main.ts');
-      expect(content).toContain('ngZoneEventCoalescing: true');
+      expect(content).toContain(
+        'applicationProviders: [provideZoneChangeDetection({ eventCoalescing: true })]',
+      );
     });
 
     it(`should set 'defaultEncapsulation' in main.ts when 'ViewEncapsulation' is provided`, async () => {
