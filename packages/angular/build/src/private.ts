@@ -59,6 +59,7 @@ export function createCompilerPlugin(
   );
 }
 
+export type { CompilerPluginOptions, BundleStylesheetOptions };
 export type { AngularCompilation } from './tools/angular/compilation';
 export { DiagnosticModes } from './tools/angular/compilation';
 export { createAngularCompilation };
