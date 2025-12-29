@@ -62,6 +62,9 @@ export interface PackageManagerDescriptor {
   /** The flag to prevent lifecycle scripts from being executed. */
   readonly ignoreScriptsFlag: string;
 
+  /** The flag to ignore peer dependency warnings/errors. */
+  readonly ignorePeerDependenciesFlag?: string;
+
   /** A function that returns the arguments and environment variables to use a custom registry. */
   readonly getRegistryOptions?: (registry: string) => {
     args?: string[];
@@ -140,6 +143,7 @@ export const SUPPORTED_PACKAGE_MANAGERS = {
     saveDevFlag: '--save-dev',
     noLockfileFlag: '--no-package-lock',
     ignoreScriptsFlag: '--ignore-scripts',
+    ignorePeerDependenciesFlag: '--force',
     getRegistryOptions: (registry: string) => ({ args: ['--registry', registry] }),
     versionCommand: ['--version'],
     listDependenciesCommand: ['list', '--depth=0', '--json=true', '--all=true'],
@@ -215,6 +219,7 @@ export const SUPPORTED_PACKAGE_MANAGERS = {
     saveDevFlag: '--save-dev',
     noLockfileFlag: '--no-lockfile',
     ignoreScriptsFlag: '--ignore-scripts',
+    ignorePeerDependenciesFlag: '--strict-peer-dependencies=false',
     getRegistryOptions: (registry: string) => ({ args: ['--registry', registry] }),
     versionCommand: ['--version'],
     listDependenciesCommand: ['list', '--depth=0', '--json'],

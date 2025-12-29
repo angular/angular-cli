@@ -308,11 +308,13 @@ export class PackageManager {
       force?: boolean;
       registry?: string;
       ignoreScripts?: boolean;
+      ignorePeerDependencies?: boolean;
     } = { ignoreScripts: true },
   ): Promise<void> {
     const flags = [
       options.force ? this.descriptor.forceFlag : '',
       options.ignoreScripts ? this.descriptor.ignoreScriptsFlag : '',
+      options.ignorePeerDependencies ? (this.descriptor.ignorePeerDependenciesFlag ?? '') : '',
     ].filter((flag) => flag);
     const args = [...this.descriptor.installCommand, ...flags];
 
