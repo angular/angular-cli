@@ -129,7 +129,7 @@ export function generateNameFromPath(
   roots: string[],
   removeTestExtension: boolean,
 ): string {
-  const relativePath = removeRoots(testFile, roots);
+  const relativePath = removeRoots(testFile, roots.map(toPosixPath));
 
   let startIndex = 0;
   // Skip leading dots and slashes
