@@ -167,7 +167,7 @@ export const SUPPORTED_PACKAGE_MANAGERS = {
     ignoreScriptsFlag: '--ignore-scripts',
     getRegistryOptions: (registry: string) => ({ env: { NPM_CONFIG_REGISTRY: registry } }),
     versionCommand: ['--version'],
-    listDependenciesCommand: ['list', '--depth=0', '--json', '--recursive=false'],
+    listDependenciesCommand: ['info', '--name-only', '--json'],
     getManifestCommand: ['npm', 'info', '--json'],
     viewCommandFieldArgFormatter: (fields) => ['--fields', fields.join(',')],
     outputParsers: {
