@@ -9,6 +9,7 @@
 import {
   parseBunDependencies,
   parseNpmLikeError,
+  parseYarnClassicDependencies,
   parseYarnClassicError,
   parseYarnModernDependencies,
 } from './parsers';
@@ -112,6 +113,38 @@ describe('parsers', () => {
     it('should return null for unparsable stdout', () => {
       const error = parseYarnClassicError('A random error message.');
       expect(error).toBeNull();
+    });
+  });
+
+  describe('parseYarnClassicDependencies', () => {
+    it('should parse yarn classic list output', () => {
+      const stdout = JSON.stringify({
+        type: 'tree',
+        data: {
+          trees: [{ name: 'rxjs@7.8.2', children: [] }],
+        },
+      });
+
+      const deps = parseYarnClassicDependencies(stdout);
+      expect(deps.size).toBe(1);
+      expect(deps.get('rxjs')).toEqual({ name: 'rxjs', version: '7.8.2' });
+    });
+
+    it('should handle scoped packages', () => {
+      const stdout = JSON.stringify({
+        type: 'tree',
+        data: {
+          trees: [{ name: '@angular/core@18.0.0', children: [] }],
+        },
+      });
+
+      const deps = parseYarnClassicDependencies(stdout);
+      expect(deps.size).toBe(1);
+      expect(deps.get('@angular/core')).toEqual({ name: '@angular/core', version: '18.0.0' });
+    });
+
+    it('should return empty map for empty stdout', () => {
+      expect(parseYarnClassicDependencies('').size).toBe(0);
     });
   });
 
