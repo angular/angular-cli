@@ -20,16 +20,16 @@ import {
   Options,
 } from '../../command-builder/command-module';
 import { SchematicEngineHost } from '../../command-builder/utilities/schematic-engine-host';
-import { PackageManager, PackageManifest, createPackageManager } from '../../package-managers';
+import {
+  InstalledPackage,
+  PackageManager,
+  PackageManifest,
+  createPackageManager,
+} from '../../package-managers';
 import { colors } from '../../utilities/color';
 import { disableVersionCheck } from '../../utilities/environment-options';
 import { assertIsError } from '../../utilities/error';
-import {
-  PackageTreeNode,
-  findPackageJson,
-  getProjectDependencies,
-  readPackageJson,
-} from '../../utilities/package-tree';
+import { findPackageJson } from '../../utilities/package-tree';
 import {
   checkCLIVersion,
   coerceVersionNumber,
@@ -242,7 +242,7 @@ export default class UpdateCommandModule extends CommandModule<UpdateCommandArgs
     logger.info(`Using package manager: ${colors.gray(packageManager.name)}`);
     logger.info('Collecting installed dependencies...');
 
-    const rootDependencies = await getProjectDependencies(this.context.root);
+    const rootDependencies = await packageManager.getProjectDependencies();
     logger.info(`Found ${rootDependencies.size} dependencies.`);
 
     const workflow = new NodeWorkflow(this.context.root, {
@@ -275,7 +275,13 @@ export default class UpdateCommandModule extends CommandModule<UpdateCommandArgs
     }
 
     return options.migrateOnly
-      ? this.migrateOnly(workflow, (options.packages ?? [])[0], rootDependencies, options)
+      ? this.migrateOnly(
+          workflow,
+          (options.packages ?? [])[0],
+          rootDependencies,
+          options,
+          packageManager,
+        )
       : this.updatePackagesAndMigrate(
           workflow,
           rootDependencies,
@@ -288,25 +294,35 @@ export default class UpdateCommandModule extends CommandModule<UpdateCommandArgs
   private async migrateOnly(
     workflow: NodeWorkflow,
     packageName: string,
-    rootDependencies: Map<string, PackageTreeNode>,
+    rootDependencies: Map<string, InstalledPackage>,
     options: Options<UpdateCommandArgs>,
+    packageManager: PackageManager,
   ): Promise<number | void> {
     const { logger } = this.context;
-    const packageDependency = rootDependencies.get(packageName);
+    let packageDependency = rootDependencies.get(packageName);
     let packagePath = packageDependency?.path;
-    let packageNode = packageDependency?.package;
-    if (packageDependency && !packageNode) {
-      logger.error('Package found in package.json but is not installed.');
+    let packageNode: PackageManifest | undefined;
 
-      return 1;
-    } else if (!packageDependency) {
-      // Allow running migrations on transitively installed dependencies
-      // There can technically be nested multiple versions
-      // TODO: If multiple, this should find all versions and ask which one to use
-      const packageJson = findPackageJson(this.context.root, packageName);
-      if (packageJson) {
-        packagePath = path.dirname(packageJson);
-        packageNode = await readPackageJson(packageJson);
+    if (!packageDependency) {
+      const installed = await packageManager.getInstalledPackage(packageName);
+      if (installed) {
+        packageDependency = installed;
+        packagePath = installed.path;
+      }
+    }
+
+    if (packagePath) {
+      packageNode = await readPackageManifest(path.join(packagePath, 'package.json'));
+    }
+
+    if (!packageNode) {
+      const jsonPath = findPackageJson(this.context.root, packageName);
+      if (jsonPath) {
+        packageNode = await readPackageManifest(jsonPath);
+
+        if (!packagePath) {
+          packagePath = path.dirname(jsonPath);
+        }
       }
     }
 
@@ -399,7 +415,7 @@ export default class UpdateCommandModule extends CommandModule<UpdateCommandArgs
   // eslint-disable-next-line max-lines-per-function
   private async updatePackagesAndMigrate(
     workflow: NodeWorkflow,
-    rootDependencies: Map<string, PackageTreeNode>,
+    rootDependencies: Map<string, InstalledPackage>,
     options: Options<UpdateCommandArgs>,
     packages: npa.Result[],
     packageManager: PackageManager,
@@ -414,21 +430,21 @@ export default class UpdateCommandModule extends CommandModule<UpdateCommandArgs
 
     const requests: {
       identifier: npa.Result;
-      node: PackageTreeNode;
+      node: InstalledPackage;
     }[] = [];
 
     // Validate packages actually are part of the workspace
     for (const pkg of packages) {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const node = rootDependencies.get(pkg.name!);
-      if (!node?.package) {
+      if (!node) {
         logger.error(`Package '${pkg.name}' is not a dependency.`);
 
         return 1;
       }
 
       // If a specific version is requested and matches the installed version, skip.
-      if (pkg.type === 'version' && node.package.version === pkg.fetchSpec) {
+      if (pkg.type === 'version' && node.version === pkg.fetchSpec) {
         logger.info(`Package '${pkg.name}' is already at '${pkg.fetchSpec}'.`);
         continue;
       }
@@ -464,13 +480,13 @@ export default class UpdateCommandModule extends CommandModule<UpdateCommandArgs
         return 1;
       }
 
-      if (manifest.version === node.package?.version) {
+      if (manifest.version === node.version) {
         logger.info(`Package '${packageName}' is already up to date.`);
         continue;
       }
 
-      if (node.package && ANGULAR_PACKAGES_REGEXP.test(node.package.name)) {
-        const { name, version } = node.package;
+      if (ANGULAR_PACKAGES_REGEXP.test(node.name)) {
+        const { name, version } = node;
         const toBeInstalledMajorVersion = +manifest.version.split('.')[0];
         const currentMajorVersion = +version.split('.')[0];
 
@@ -669,5 +685,15 @@ export default class UpdateCommandModule extends CommandModule<UpdateCommandArgs
     }
 
     return success ? 0 : 1;
+  }
+}
+
+async function readPackageManifest(manifestPath: string): Promise<PackageManifest | undefined> {
+  try {
+    const content = await fs.readFile(manifestPath, 'utf8');
+
+    return JSON.parse(content) as PackageManifest;
+  } catch {
+    return undefined;
   }
 }
