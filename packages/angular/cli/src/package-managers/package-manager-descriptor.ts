@@ -182,7 +182,7 @@ export const SUPPORTED_PACKAGE_MANAGERS = {
     configFiles: ['.yarnrc.yml', '.yarnrc.yaml'],
     getRegistryOptions: (registry: string) => ({ env: { YARN_NPM_REGISTRY_SERVER: registry } }),
     versionCommand: ['--version'],
-    listDependenciesCommand: ['list', '--depth=0', '--json', '--recursive=false'],
+    listDependenciesCommand: ['info', '--name-only', '--json'],
     getManifestCommand: ['npm', 'info', '--json'],
     viewCommandFieldArgFormatter: (fields) => ['--fields', fields.join(',')],
     outputParsers: {
